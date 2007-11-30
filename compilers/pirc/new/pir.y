@@ -59,14 +59,14 @@ extern YY_DECL;
 #endif
 
 /* the lexer contains a special temp. field for this purpose. */
-#define STORE_NAMED_ALIAS(NAME)     lexer->temp_flag_arg1 = NAME
+#define STORE_NAMED_ALIAS(NAME)             lexer->temp_flag_arg1 = NAME
 
 #define IF_NAMED_ARG_SET_ALIAS(OBJ,EXPR)    if (TEST_FLAG(EXPR, ARG_FLAG_NAMED)) {       \
                                               set_arg_named(OBJ, lexer->temp_flag_arg1); \
                                             }
 
 
-#define IF_NAMED_PARAM_SET_ALIAS(OBJ,EXPR)  if (TEST_FLAG(EXPR, PARAM_FLAG_NAMED)) {       \
+#define IF_NAMED_PARAM_SET_ALIAS(OBJ,EXPR)  if (TEST_FLAG(EXPR, TARGET_FLAG_NAMED)) {      \
                                               set_param_named(OBJ, lexer->temp_flag_arg1); \
                                             }
 
@@ -211,13 +211,14 @@ extern YY_DECL;
              if_null_type
              sub_id
              opt_paren_string
+             parrot_instruction
 
 
 %type <targ> sub
              method
              string_object
              invokable
-             opt_return_continuation
+             opt_ret_cont
 
 %type <targ> reg
              pasm_reg
@@ -229,6 +230,8 @@ extern YY_DECL;
              opt_target_list
              target_list
              param_def
+             local_id
+             local_id_list
 
 %type <argm> named_arg
              short_arg
@@ -246,7 +249,12 @@ extern YY_DECL;
              long_arguments
              long_argument
 
-%type <expr> expression1 expression key
+%type <expr> expression1
+             expression
+             key
+             pasm_expression
+             other_op_args
+             keys
 
 %type <ival> has_unique_reg
              type
@@ -274,12 +282,12 @@ extern YY_DECL;
 %type <fixme> assignment_tail
               assignment_expression
               keylist
-              parrot_instruction
+              first_op_arg
               long_invocation_statement
               short_return_statement
               opt_namespace_id
               namespace_id
-              keys
+
 
 
 
@@ -333,18 +341,18 @@ compilation_unit: sub_definition
                 | pir_pragma
                 ;
 
-pir_pragma: ".pragma" "n_operators" TK_INTC                 { set_pragma(PRAGMA_N_OPERATORS, $3); }
+pir_pragma: ".pragma" "n_operators" TK_INTC                { set_pragma(PRAGMA_N_OPERATORS, $3); }
           ;
 
-loadlib: ".loadlib" TK_STRINGC                              { load_library(lexer, $2); }
+loadlib: ".loadlib" TK_STRINGC                             { load_library(lexer, $2); }
        ;
 
 /* HLL stuff */
 
-hll_specifier: ".HLL" TK_STRINGC ',' TK_STRINGC             { set_hll($2, $4); }
+hll_specifier: ".HLL" TK_STRINGC ',' TK_STRINGC            { set_hll($2, $4); }
              ;
 
-hll_mapping: ".HLL_map" TK_STRINGC ',' TK_STRINGC           { set_hll_map($2, $4); }
+hll_mapping: ".HLL_map" TK_STRINGC ',' TK_STRINGC          { set_hll_map($2, $4); }
            ;
 
 
@@ -353,18 +361,18 @@ hll_mapping: ".HLL_map" TK_STRINGC ',' TK_STRINGC           { set_hll_map($2, $4
 namespace_declaration: ".namespace" opt_namespace_id
                      ;
 
-opt_namespace_id: /* empty */                     { $$ = NULL; }
-                | '[' namespace_id ']'            { $$ = $2; }
+opt_namespace_id: /* empty */                              { $$ = NULL; }
+                | '[' namespace_id ']'                     { $$ = $2; }
                 ;
 
-namespace_id: TK_STRINGC                          {}
-            | namespace_id separator TK_STRINGC   {}
+namespace_id: TK_STRINGC                                   { $$ = $1; }
+            | namespace_id separator TK_STRINGC            { }
             ;
 
 /* Sub definition */
 
-sub_definition: ".sub" sub_id               { new_sub(lexer, $2);  /* create a new sub node */ }
-                sub_flags "\n"              { set_sub_flag(lexer, $4); }
+sub_definition: ".sub" sub_id                              { new_sub(lexer, $2); }
+                sub_flags "\n"                             { set_sub_flag(lexer, $4); }
                 parameters
                 instructions
                 ".end"
@@ -374,21 +382,21 @@ sub_id: identifier
       | TK_STRINGC
       ;
 
-sub_flags: /* empty */                      { $$ = 0; }
-         | sub_flags sub_flag               { SET_FLAG($$, $1); }
+sub_flags: /* empty */                                     { $$ = 0; }
+         | sub_flags sub_flag                              { SET_FLAG($$, $1); }
          ;
 
-sub_flag: ":anon"                           { $$ = SUB_FLAG_ANON; }
-        | ":init"                           { $$ = SUB_FLAG_INIT; }
-        | ":load"                           { $$ = SUB_FLAG_LOAD; }
-        | ":main"                           { $$ = SUB_FLAG_MAIN; }
-        | ":method"                         { $$ = SUB_FLAG_METHOD; }
-        | ":lex"                            { $$ = SUB_FLAG_LEX; }
-        | ":postcomp"                       { $$ = SUB_FLAG_POSTCOMP; }
-        | ":immediate"                      { $$ = SUB_FLAG_IMMEDIATE; }
-        | ":multi" '(' multi_type_list ')'  { $$ = SUB_FLAG_MULTI; }
-        | ":outer" '(' sub_id ')'           { $$ = SUB_FLAG_OUTER;  set_sub_outer(lexer, $3); }
-        | ":vtable" opt_paren_string        { $$ = SUB_FLAG_VTABLE; set_sub_vtable(lexer, $2); }
+sub_flag: ":anon"                                          { $$ = SUB_FLAG_ANON; }
+        | ":init"                                          { $$ = SUB_FLAG_INIT; }
+        | ":load"                                          { $$ = SUB_FLAG_LOAD; }
+        | ":main"                                          { $$ = SUB_FLAG_MAIN; }
+        | ":method"                                        { $$ = SUB_FLAG_METHOD; }
+        | ":lex"                                           { $$ = SUB_FLAG_LEX; }
+        | ":postcomp"                                      { $$ = SUB_FLAG_POSTCOMP; }
+        | ":immediate"                                     { $$ = SUB_FLAG_IMMEDIATE; }
+        | ":multi" '(' multi_type_list ')'                 { $$ = SUB_FLAG_MULTI; }
+        | ":outer" '(' sub_id ')'                          { $$ = SUB_FLAG_OUTER;  set_sub_outer(lexer, $3); }
+        | ":vtable" opt_paren_string                       { $$ = SUB_FLAG_VTABLE; set_sub_vtable(lexer, $2); }
         ;
 
 multi_type_list: /* empty */
@@ -405,26 +413,26 @@ parameters: /* empty */
           | parameters parameter
           ;
 
-parameter: ".param" param_def param_flags "\n"      { set_param_flag($2, $3);
-                                                      IF_NAMED_PARAM_SET_ALIAS($2, $3);
-                                                    }
+parameter: ".param" param_def param_flags "\n"             { set_param_flag($2, $3);
+                                                             IF_NAMED_PARAM_SET_ALIAS($2, $3);
+                                                           }
          ;
 
-param_def: type identifier                  { $$ = add_param(lexer, $1, $2); }
-         | type TK_STRINGC "=>" identifier  { $$ = add_param_named(lexer, $1, $4, $2); }
+param_def: type identifier                                 { $$ = add_param(lexer, $1, $2); }
+         | type TK_STRINGC "=>" identifier                 { $$ = add_param_named(lexer, $1, $4, $2); }
          ;
 
 /* Instructions */
 
 
 instructions: /* empty */
-            | instructions          { new_instr(lexer); } /* create a new instruction node */
+            | instructions                                 { new_instr(lexer); }
               instruction
             ;
 
 
-instruction: TK_LABEL "\n"          { set_label(lexer, $1); }
-           | TK_LABEL statement     { set_label(lexer, $1); }
+instruction: TK_LABEL "\n"                                 { set_label(lexer, $1); }
+           | TK_LABEL statement                            { set_label(lexer, $1); }
            | statement
            ;
 
@@ -451,23 +459,23 @@ error_statement: error "\n" { if (lexer->parse_errors > MAX_NUM_ERRORS) {
                             }
                ;
 
-null_statement: "null" target "\n"                          { set_instr(lexer, "null");
-                                                              /* set arguments */
-                                                            }
-              | target '=' "null" "\n"                      { set_instr(lexer, "null");
-                                                              /* set arguments */
-                                                            }
+null_statement: "null" target "\n"                         { set_instr(lexer, "null");
+                                                             add_operand(lexer, expr_from_target($2));
+                                                           }
+              | target '=' "null" "\n"                     { set_instr(lexer, "null");
+                                                             add_operand(lexer, expr_from_target($1));
+                                                           }
               ;
 
-getresults_statement: ".get_results" opt_target_list "\n"   { set_instr(lexer, "get_results");
-                                                              /* set arguments */
-                                                            }
+getresults_statement: ".get_results" opt_target_list "\n"  { set_instr(lexer, "get_results");
+                                                             add_operand(lexer, expr_from_target($2));
+                                                           }
                     ;
 
 parrot_statement: parrot_instruction "\n"
                 ;
 
-assignment_statement: target assignment_tail "\n"
+assignment_statement: target assignment_tail "\n"          { add_operand(lexer, expr_from_target($1)); }
                     ;
 
 /* possible assignment statements:
@@ -484,67 +492,73 @@ assignment_statement: target assignment_tail "\n"
 
 
 */
-assignment_tail: augmented_op expression            { assign(lexer, RHS_AUGMENT, $1, $2); }
-               | keylist '=' expression             { assign(lexer, RHS_SETKEYED, $1, $3); }
-               | '=' assignment_expression          { /* nothing to do */ }
+assignment_tail: augmented_op expression                   { assign(lexer, RHS_AUGMENT, $1, $2); }
+               | keylist '=' expression                    { assign(lexer, RHS_SETKEYED, $1, $3); }
+               | '=' assignment_expression                 { /* nothing to do */ }
                ;
 
-assignment_expression: unop expression              { assign(lexer, RHS_UNOP, $1, $2); }
-                     | expression1                  { assign(lexer, RHS_SIMPLE, $1); }
-                     | expression binop expression  { assign(lexer, RHS_BINOP, $2, $1, $3); }
-                     | target keylist               { assign(lexer, RHS_GETKEYED, $1, $2); }
-                     | parrot_instruction
+assignment_expression: unop expression                     { assign(lexer, RHS_UNOP, $1, $2); }
+                     | expression1                         { assign(lexer, RHS_SIMPLE, $1); }
+                     | expression binop expression         { assign(lexer, RHS_BINOP, $2, $1, $3); }
+                     | target keylist                      { assign(lexer, RHS_GETKEYED, $1, $2); }
+                     | parrot_instruction                  {  }
                      ;
 
 
-parrot_instruction: TK_PARROT_OP                    { set_instr(lexer, $1); }
-                    opt_parrot_op_args              { $$ = 0; }
+parrot_instruction: TK_PARROT_OP                           { set_instr(lexer, $1); }
+                    opt_parrot_op_args
                   ;
 
 opt_parrot_op_args: /* empty */
                   | parrot_op_args
                   ;
 
-parrot_op_args: first_parrot_op_arg other_op_args
+parrot_op_args: first_op_arg other_op_args
               ;
 
 /* the first argument must be a normal expression */
-first_parrot_op_arg: pasm_expression
-                   ;
+first_op_arg: pasm_expression                              { add_operand(lexer, $1); }
+            ;
 
 /* later arguments can be either an expression or a keylist. */
-other_op_args: /* empty */
-             | other_op_args ',' other_op_arg
+other_op_args: /* empty */                                 {  }
+             | other_op_args ',' other_op_arg              { add_operand(lexer, $1); }
              ;
 
 other_op_arg: pasm_expression
             | keylist
             ;
 
-keylist: '[' keys ']'              { $$ = $2; }
+keylist: '[' keys ']'                                      { $$ = $2; }
        ;
 
-keys: key                          {}
-    | keys separator key           {}
+keys: key                                                  { $$ = $1; }
+    | keys separator key                                   { $$ = add_key($1, $3); }
     ;
 
 key: expression
    ;
 
-separator: ';'                     { $$ = 0; }
-         | ','                     { $$ = 1; }
+separator: ';'                                             { $$ = 0; }
+         | ','                                             { $$ = 1; }
          ;
 
 
 conditional_statement: if_type condition then identifier "\n"
-                       { /* add $4 as argument, and set a flag if $1 is "unless" */
-                         if ($1 > 0) { /* it was "unless", so we need to "invert" the opcode */
-                            invert_instr(lexer);
-                         }
-
-                       }
+                                                           { /**/
+                                                             if ($1 > 0) {
+                                                                /* it was "unless", so we need to
+                                                                   "invert" the opcode
+                                                                 */
+                                                                invert_instr(lexer);
+                                                             }
+                                                             add_operand(lexer, expr_from_ident($4));
+                                                           }
                      | if_null_type expression then identifier "\n"
-                       { set_instr(lexer, $1); }
+                                                           { set_instr(lexer, $1);
+                                                             add_operand(lexer, $2);
+                                                             add_operand(lexer, expr_from_ident($4));
+                                                           }
                      ;
 
 if_type: "if"                                              { $$ = 0; /* no need to invert */ }
@@ -561,26 +575,29 @@ then: "goto" /* PIR mode */
     ;
 
 
-condition: expression                                      { set_instr(lexer, "if" /*, $1 */);
-                                                             /* set $1 as argument */
+condition: expression                                      { set_instr(lexer, "if");
+                                                             add_operand(lexer, $1);
                                                            }
-         | expression rel_op expression                    { set_instr(lexer, $2 /*, $1, $3 */ );
-                                                             /* set $1 and $3 as arguments */
+         | expression rel_op expression                    { set_instr(lexer, $2);
+                                                             add_operand(lexer, $1);
+                                                             add_operand(lexer, $3);
                                                            }
          ;
 
 
-goto_statement: "goto" identifier "\n"                     { set_instr(lexer, "branch"); }
+goto_statement: "goto" identifier "\n"                     { set_instr(lexer, "branch");
+                                                             add_operand(lexer, expr_from_ident($2));
+                                                           }
               ;
 
-local_declaration: ".local" type local_id_list "\n"
+local_declaration: ".local" type local_id_list "\n"        { declare_local(lexer, $2, $3); }
                  ;
 
-local_id_list: local_id
-             | local_id_list ',' local_id
+local_id_list: local_id                                    { $$ = $1; }
+             | local_id_list ',' local_id                  { $$ = add_local($1, $3); }
              ;
 
-local_id: identifier has_unique_reg                        { declare_local(lexer, $1, $2); }
+local_id: identifier has_unique_reg                        { $$ = new_local($1, $2); }
         ;
 
 has_unique_reg: /* empty */     { $$ = 0; }
@@ -589,7 +606,7 @@ has_unique_reg: /* empty */     { $$ = 0; }
 
 
 
-lex_declaration: ".lex" TK_STRINGC ',' target "\n"          { set_lex_flag($4, $2); }
+lex_declaration: ".lex" TK_STRINGC ',' target "\n"         { set_lex_flag($4, $2); }
                ;
 
 
@@ -602,54 +619,54 @@ long_invocation_statement: ".begin_call" "\n"
                            long_invocation "\n"
                            opt_long_results
                            ".end_call" "\n"
-                                                            { /* $4 contains a invocation object */
-                                                              set_invocation_args($4, $3);
-                                                              set_invocation_results($4, $6);
-                                                              $$ = NULL;
-                                                            }
+                                                           { /* $4 contains a invocation object */
+                                                             set_invocation_args($4, $3);
+                                                             set_invocation_results($4, $6);
+                                                             $$ = NULL;
+                                                           }
                          ;
 
-opt_long_arguments: /* empty */                             { $$ = NULL; }
-                  | long_arguments                          { $$ = $1; }
+opt_long_arguments: /* empty */                            { $$ = NULL; }
+                  | long_arguments                         { $$ = $1; }
                   ;
 
-long_arguments: long_argument                               { $$ = $1; }
-              | long_arguments long_argument                { $$ = add_arg($1, $2); }
+long_arguments: long_argument                              { $$ = $1; }
+              | long_arguments long_argument               { $$ = add_arg($1, $2); }
               ;
 
-long_argument: ".arg" short_arg "\n"                        { $$ = $2; }
+long_argument: ".arg" short_arg "\n"                       { $$ = $2; }
              ;
 
-long_invocation: ".call" invokable opt_return_continuation  { $$ = invoke(lexer, CALL_PCC, $2, $3); }
-               | ".nci_call" invokable                      { $$ = invoke(lexer, CALL_NCI, $2, NULL); }
+long_invocation: ".call" invokable opt_ret_cont            { $$ = invoke(lexer, CALL_PCC, $2, $3); }
+               | ".nci_call" invokable                     { $$ = invoke(lexer, CALL_NCI, $2); }
                | ".invocant" invokable "\n"
-                 ".meth_call" method                        { $$ = invoke(lexer, CALL_METH, $2, $5); }
+                 ".meth_call" method                       { $$ = invoke(lexer, CALL_METH, $2, $5); }
                ;
 
-opt_return_continuation: /* empty */                        { $$ = NULL; }
-                       | ',' invokable                      { $$ = $2; }
-                       ;
-
-
-
-opt_long_results: /* empty */                               { $$ = NULL; }
-                | long_results                              { $$ = $1; }
-                ;
-
-long_results: long_result                                   { $$ = $1; }
-            | long_results long_result                      { $$ = add_target(lexer, $1, $2); }
+opt_ret_cont: /* empty */                                  { $$ = NULL; }
+            | ',' invokable                                { $$ = $2; }
             ;
 
-long_result: ".result" result_target "\n"                   { $$ = $2; }
-           | local_declaration                              { $$ = NULL; }
+
+
+opt_long_results: /* empty */                              { $$ = NULL; }
+                | long_results                             { $$ = $1; }
+                ;
+
+long_results: long_result                                  { $$ = $1; }
+            | long_results long_result                     { $$ = add_target(lexer, $1, $2); }
+            ;
+
+long_result: ".result" result_target "\n"                  { $$ = $2; }
+           | local_declaration                             { $$ = NULL; }
            ;
 
 short_invocation_statement: opt_target_list '=' simple_invocation "\n"
-                                                            { set_invocation_results($3, $1); }
+                                                           { set_invocation_results($3, $1); }
                           | target '=' simple_invocation "\n"
-                                                            { set_invocation_results($3, $1); }
+                                                           { set_invocation_results($3, $1); }
                           | simple_invocation "\n"
-                                                            { set_invocation_results($1, NULL); }
+                                                           { set_invocation_results($1, NULL); }
                           ;
 
 
@@ -657,61 +674,61 @@ simple_invocation: subcall
                  | methodcall
                  ;
 
-methodcall: invokable '.' method arguments                  { $$ = invoke(lexer, CALL_METH, $1, $3);
-                                                              set_invocation_args($$, $4);
-                                                            }
+methodcall: invokable '.' method arguments                 { $$ = invoke(lexer, CALL_METH, $1, $3);
+                                                             set_invocation_args($$, $4);
+                                                           }
           ;
 
 
-subcall: sub arguments                                      { $$ = invoke(lexer, CALL_PCC, $1, NULL);
-                                                              set_invocation_args($$, $2);
-                                                            }
+subcall: sub arguments                                     { $$ = invoke(lexer, CALL_PCC, $1, NULL);
+                                                             set_invocation_args($$, $2);
+                                                           }
        ;
 
-sub: invokable                                 { $$ = $1; }
-   | TK_STRINGC                                { $$ = target_from_string($1); }
+sub: invokable                                             { $$ = $1; }
+   | TK_STRINGC                                            { $$ = target_from_string($1); }
    ;
 
 method: invokable
       | string_object
       ;
 
-invokable: identifier                          { $$ = target_from_ident($1); }
-         | TK_SYM_PREG                         { $$ = target_from_reg(PMC_TYPE, $1, !IS_PASM_REG); }
-         | TK_PASM_PREG                        { $$ = target_from_reg(PMC_TYPE, $1, IS_PASM_REG); }
+invokable: identifier                                      { $$ = target_from_ident($1); }
+         | TK_SYM_PREG                                     { $$ = reg(PMC_TYPE, $1, !IS_PASM_REG); }
+         | TK_PASM_PREG                                    { $$ = reg(PMC_TYPE, $1, IS_PASM_REG); }
          ;
 
-string_object: TK_STRINGC                      { $$ = target_from_string($1); }
-             | TK_SYM_SREG                     { $$ = target_from_reg(STRING_TYPE, $1, !IS_PASM_REG); }
-             | TK_PASM_SREG                    { $$ = target_from_reg(STRING_TYPE, $1, IS_PASM_REG); }
+string_object: TK_STRINGC                                  { $$ = target_from_string($1); }
+             | TK_SYM_SREG                                 { $$ = reg(STRING_TYPE, $1, !IS_PASM_REG); }
+             | TK_PASM_SREG                                { $$ = reg(STRING_TYPE, $1, IS_PASM_REG); }
              ;
 
-opt_target_list: '(' ')'                          { $$ = NULL; }
-               | '(' target_list ')'              { $$ = $2; }
+opt_target_list: '(' ')'                                   { $$ = NULL; }
+               | '(' target_list ')'                       { $$ = $2; }
                ;
 
-target_list: result_target                        { $$ = $1; }
-           | target_list ',' result_target        { $$ = add_target(lexer, $1, $3); }
+target_list: result_target                                 { $$ = $1; }
+           | target_list ',' result_target                 { $$ = add_target(lexer, $1, $3); }
            ;
 
-result_target: target param_flags                 { $$ = $1;
-                                                    set_param_flag($1, $2);
-                                                    /* get the :named argument if necessary */
-                                                    IF_NAMED_PARAM_SET_ALIAS($1, $2);
-                                                  }
+result_target: target param_flags                          { $$ = $1;
+                                                             set_param_flag($1, $2);
+                                                             /* get the :named argument if necessary */
+                                                             IF_NAMED_PARAM_SET_ALIAS($1, $2);
+                                                           }
              ;
 
-param_flags: /* empty */                          { $$ = 0; }
-           | param_flags param_flag               { SET_FLAG($$, $2); }
+param_flags: /* empty */                                   { $$ = 0; }
+           | param_flags param_flag                        { SET_FLAG($$, $2); }
            ;
 
-param_flag: ":optional"                           { $$ = PARAM_FLAG_OPTIONAL; }
-          | ":opt_flag"                           { $$ = PARAM_FLAG_OPT_FLAG; }
-          | ":slurpy"                             { $$ = PARAM_FLAG_SLURPY; }
-          | ":unique_reg"                         { $$ = PARAM_FLAG_UNIQUE_REG; }
-          | ":named" opt_paren_string             { STORE_NAMED_ALIAS($2);
-                                                    $$ = PARAM_FLAG_NAMED;
-                                                  }
+param_flag: ":optional"                                    { $$ = TARGET_FLAG_OPTIONAL; }
+          | ":opt_flag"                                    { $$ = TARGET_FLAG_OPT_FLAG; }
+          | ":slurpy"                                      { $$ = TARGET_FLAG_SLURPY; }
+          | ":unique_reg"                                  { $$ = TARGET_FLAG_UNIQUE_REG; }
+          | ":named" opt_paren_string                      { $$ = TARGET_FLAG_NAMED;
+                                                                  STORE_NAMED_ALIAS($2);
+                                                           }
           ;
 
 
@@ -725,13 +742,13 @@ yield_statement: short_yield_statement
                | long_yield_statement
                ;
 
-short_return_statement: ".return" arguments "\n"           { $$ = invoke(lexer, CALL_RET, NULL, NULL);
+short_return_statement: ".return" arguments "\n"           { $$ = invoke(lexer, CALL_RET);
                                                              set_invocation_args($$, $2);
                                                            }
-                      | ".return" simple_invocation "\n"   { set_invocation_flag($2, CALL_TAIL); }
+                      | ".return" simple_invocation "\n"   { set_invocation_type($2, CALL_TAIL); }
                       ;
 
-short_yield_statement: ".yield" arguments "\n"             { $$ = invoke(lexer, CALL_YIELD, NULL, NULL);
+short_yield_statement: ".yield" arguments "\n"             { $$ = invoke(lexer, CALL_YIELD);
                                                              set_invocation_args($$, $2);
                                                            }
                      ;
@@ -766,14 +783,14 @@ short_arg: expression arg_flags                            { $$ = new_argument($
 
 long_return_statement: ".begin_return" "\n"
                        opt_return_expressions
-                       ".end_return" "\n"                  { $$ = invoke(lexer, CALL_RET, NULL, NULL);
+                       ".end_return" "\n"                  { $$ = invoke(lexer, CALL_RET);
                                                              set_invocation_args($$, $3);
                                                            }
                      ;
 
 long_yield_statement: ".begin_yield" "\n"
                       opt_yield_expressions
-                      ".end_yield" "\n"                    { $$ = invoke(lexer, CALL_YIELD, NULL, NULL);
+                      ".end_yield" "\n"                    { $$ = invoke(lexer, CALL_YIELD);
                                                              set_invocation_args($$, $3);
                                                            }
                     ;
@@ -808,8 +825,8 @@ arg_flags: /* empty */                                     { $$ = 0; }
          ;
 
 arg_flag: ":flat"                                          { $$ = ARG_FLAG_FLAT; }
-        | ":named" opt_paren_string                        { STORE_NAMED_ALIAS($2);
-                                                             $$ = ARG_FLAG_NAMED;
+        | ":named" opt_paren_string                        { $$ = ARG_FLAG_NAMED;
+                                                             STORE_NAMED_ALIAS($2);
                                                            }
         ;
 
@@ -817,35 +834,35 @@ opt_paren_string: /* empty */                              { $$ = NULL; }
                 | '(' TK_STRINGC ')'                       { $$ = $2; }
                 ;
 
-const_declaration: ".const" const_tail                     { define_const(lexer, $2, !GLOBALCONST);  }
+const_declaration: ".const" const_tail                     { define_const(lexer, $2, !GLOBALCONST); }
                  ;
 
 const_decl_statement: const_declaration "\n"
-                    | ".globalconst" const_tail "\n"       { define_const(lexer, $2, GLOBALCONST);  }
+                    | ".globalconst" const_tail "\n"       { define_const(lexer, $2, GLOBALCONST); }
                     ;
 
-const_tail: "int"    identifier '=' TK_INTC                { $$ = new_constant(INT_TYPE, $2, $4); }
-          | "num"    identifier '=' TK_NUMC                { $$ = new_constant(NUM_TYPE, $2, $4); }
-          | "pmc"    identifier '=' TK_STRINGC             { $$ = new_constant(PMC_TYPE, $2, $4); }
-          | "string" identifier '=' TK_STRINGC             { $$ = new_constant(STRING_TYPE, $2, $4); }
+const_tail: "int"    identifier '=' TK_INTC                { $$ = new_const(INT_TYPE, $2, $4); }
+          | "num"    identifier '=' TK_NUMC                { $$ = new_const(NUM_TYPE, $2, $4); }
+          | "pmc"    identifier '=' TK_STRINGC             { $$ = new_const(PMC_TYPE, $2, $4); }
+          | "string" identifier '=' TK_STRINGC             { $$ = new_const(STRING_TYPE, $2, $4); }
           ;
 
 pasm_expression: expression
                ;
 
 /* expression1 is similar to expression, but it doesn't accept TK_PARROT_OP */
-expression1: constant                                      { $$ = expr_from_constant($1); }
+expression1: constant                                      { $$ = expr_from_const($1); }
            | reg                                           { $$ = expr_from_target($1); }
            | TK_IDENT                                      { $$ = expr_from_ident($1); }
            ;
 
 expression: target                                         { $$ = expr_from_target($1); }
-          | constant                                       { $$ = expr_from_constant($1); }
+          | constant                                       { $$ = expr_from_const($1); }
           ;
 
-constant: TK_STRINGC                                       { $$ = new_constant(STRING_TYPE, NULL, $1); }
-        | TK_INTC                                          { $$ = new_constant(INT_TYPE, NULL, $1); }
-        | TK_NUMC                                          { $$ = new_constant(NUM_TYPE, NULL, $1); }
+constant: TK_STRINGC                                       { $$ = new_const(STRING_TYPE, NULL, $1); }
+        | TK_INTC                                          { $$ = new_const(INT_TYPE, NULL, $1); }
+        | TK_NUMC                                          { $$ = new_const(NUM_TYPE, NULL, $1); }
         ;
 
 rel_op: "!="                                               { $$ = "ne"; }
@@ -883,51 +900,51 @@ identifier: TK_IDENT
           | TK_PARROT_OP
           ;
 
-unop: '-'     { $$ = "neg"; }
-    | '!'     { $$ = "not"; }
-    | '~'     { $$ = "bnot"; }
+unop: '-'                                                  { $$ = "neg"; }
+    | '!'                                                  { $$ = "not"; }
+    | '~'                                                  { $$ = "bnot"; }
     ;
 
-binop: '+'    { $$ = "add"; }
-     | '-'    { $$ = "sub"; }
-     | '/'    { $$ = "div"; }
-     | '*'    { $$ = "mul"; }
-     | '%'    { $$ = "mod"; }
-     | '|'    { $$ = "bor"; }
-     | '&'    { $$ = "band"; }
-     | '~'    { $$ = "bxor"; }
-     | "**"   { $$ = "pow"; }
-     | "."    { $$ = "concat"; }
-     | ">>>"  { $$ = "lsr"; }
-     | ">>"   { $$ = "shr"; }
-     | "<<"   { $$ = "shl"; }
-     | "||"   { $$ = "or";  }
-     | "&&"   { $$ = "and"; }
-     | "//"   { $$ = "fdiv"; }
-     | "~~"   { $$ = "xor"; }
-     | "=="   { $$ = "iseq"; }
-     | "<="   { $$ = "isle"; }
-     | "<"    { $$ = "islt"; }
-     | ">="   { $$ = "isge"; }
-     | ">"    { $$ = "isgt"; }
-     | "!="   { $$ = "isne"; }
+binop: '+'                                                 { $$ = "add"; }
+     | '-'                                                 { $$ = "sub"; }
+     | '/'                                                 { $$ = "div"; }
+     | '*'                                                 { $$ = "mul"; }
+     | '%'                                                 { $$ = "mod"; }
+     | '|'                                                 { $$ = "bor"; }
+     | '&'                                                 { $$ = "band"; }
+     | '~'                                                 { $$ = "bxor"; }
+     | "**"                                                { $$ = "pow"; }
+     | "."                                                 { $$ = "concat"; }
+     | ">>>"                                               { $$ = "lsr"; }
+     | ">>"                                                { $$ = "shr"; }
+     | "<<"                                                { $$ = "shl"; }
+     | "||"                                                { $$ = "or";  }
+     | "&&"                                                { $$ = "and"; }
+     | "//"                                                { $$ = "fdiv"; }
+     | "~~"                                                { $$ = "xor"; }
+     | "=="                                                { $$ = "iseq"; }
+     | "<="                                                { $$ = "isle"; }
+     | "<"                                                 { $$ = "islt"; }
+     | ">="                                                { $$ = "isge"; }
+     | ">"                                                 { $$ = "isgt"; }
+     | "!="                                                { $$ = "isne"; }
      ;
 
 
-augmented_op: "+="   { $$ = "add"; }
-            | "-="   { $$ = "sub"; }
-            | "*="   { $$ = "mul"; }
-            | "%="   { $$ = "mod"; }
-            | "**="  { $$ = "pow"; }
-            | "/="   { $$ = "div"; }
-            | "//="  { $$ = "fdiv"; }
-            | "|="   { $$ = "bor"; }
-            | "&="   { $$ = "band" }
-            | "~="   { $$ = "bxor"; }
-            | ".="   { $$ = "concat"; }
-            | ">>="  { $$ = "shr"; }
-            | "<<="  { $$ = "shl"; }
-            | ">>>=" { $$ = "lsr"; }
+augmented_op: "+="                                         { $$ = "add"; }
+            | "-="                                         { $$ = "sub"; }
+            | "*="                                         { $$ = "mul"; }
+            | "%="                                         { $$ = "mod"; }
+            | "**="                                        { $$ = "pow"; }
+            | "/="                                         { $$ = "div"; }
+            | "//="                                        { $$ = "fdiv"; }
+            | "|="                                         { $$ = "bor"; }
+            | "&="                                         { $$ = "band" }
+            | "~="                                         { $$ = "bxor"; }
+            | ".="                                         { $$ = "concat"; }
+            | ">>="                                        { $$ = "shr"; }
+            | "<<="                                        { $$ = "shl"; }
+            | ">>>="                                       { $$ = "lsr"; }
             ;
 %%
 

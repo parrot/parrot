@@ -193,7 +193,6 @@ new_lexer(char * const filename) {
     lexer->parse_errors  = 0;
 
     lexer->subs          = NULL;
-    lexer->currentstat   = NULL;
     lexer->is_instr      = 0;
 
     printdebug(stderr, "Constructing new lexer\n");

@@ -27,18 +27,34 @@
 
 #define out stderr
 
+/*
+
+Set the lexically enclosing sub for the current sub.
+Thus, set the :outer() argument to the current subroutine.
+
+*/
 void
 set_sub_outer(struct lexer_state *lexer, char *outersub) {
     lexer->subs->outer_sub = outersub;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_OUTER);
 }
 
+/*
+
+Set the :vtable() flag argument to the current subroutine.
+
+*/
 void
 set_sub_vtable(struct lexer_state *lexer, char *vtablename) {
     lexer->subs->vtable_method = vtablename;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_VTABLE);
 }
 
+/*
+
+Set a subroutine flag on the current sub.
+
+*/
 void
 set_sub_flag(struct lexer_state *lexer, sub_flag flag) {
     /* set the specified flag in the current subroutine */
@@ -46,22 +62,50 @@ set_sub_flag(struct lexer_state *lexer, sub_flag flag) {
 }
 
 /*
+
+Create a new subroutine node, and set it as the "current"
+subroutine, on which all other sub-related operations do
+their thing.
+
 */
 void
 new_sub(struct lexer_state *lexer, char *subname) {
-    /* fprintf(out, ".sub %s\n", subname);
-    */
     subroutine *newsub = (subroutine *)malloc(sizeof (subroutine));
     assert(newsub != NULL);
 
+    /* set the sub fields */
     newsub->sub_name = subname;
     newsub->parameters = NULL;
     newsub->statements = NULL;
     newsub->stat_tail  = NULL;
 
-    /* link the new sub into the list */
-    newsub->next = lexer->subs;
-    lexer->subs  = newsub;
+    if (lexer->subs == NULL) { /* no subroutine yet */
+        lexer->subs  = newsub;
+        newsub->next = newsub; /* set next field to itself, to make the list circular linked */
+    }
+    else { /* there is at least 1 other subroutine */
+        /* lexer->subs points to "end of list", to the last added one */
+        newsub->next      = lexer->subs->next; /* set newsub's next to the first item in the list */
+        lexer->subs->next = newsub;    /* set current sub's next to the new sub. */
+        lexer->subs       = newsub; /* set pointer to current sub to this last added one */
+    }
+}
+
+/* constructor for an instruction */
+void
+new_instr(struct lexer_state *lexer) {
+    statement *instr = (statement *)calloc(1, sizeof (statement));
+
+    if (lexer->subs->statements == NULL) {
+        lexer->subs->statements = instr;
+        instr->next = instr; /* set next field to itself, to make the list circular linked */
+    }
+    else { /* there is at least 1 other instruction */
+        instr->next = lexer->subs->statements->next;
+        lexer->subs->statements->next = instr;
+        lexer->subs->statements = instr;
+    }
+
 }
 
 
@@ -70,20 +114,22 @@ new_target(pir_type type, char *name) {
     target *t = (target *)calloc(1, sizeof (target));
     t->type = type;
     t->name = name;
+    t->next = t; /* circly linked list */
     return t;
 }
 
+/*
+
+Add
+
+*/
 target *
 add_target(struct lexer_state *lexer, target *t, target *t2) {
-    target *iter = t;
     assert(t);
     assert(t2);
 
-    while(iter->next) {
-        iter = iter->next;
-    }
-
-    iter->next = t2;
+    t->next = t2;
+    t2->next = t;
 
     return t;
 }
@@ -100,19 +146,19 @@ target *
 add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias) {
     target *t = add_param(lexer, type, name);
     t->named_flag_arg = alias;
-    SET_FLAG(t->flags, PARAM_FLAG_NAMED);
+    SET_FLAG(t->flags, TARGET_FLAG_NAMED);
     return t;
 }
 
 
 void
 set_param_named(target *t, char *alias) {
-    SET_FLAG(t->flags, PARAM_FLAG_NAMED); /* should already be the case */
+    SET_FLAG(t->flags, TARGET_FLAG_NAMED); /* should already be the case */
     t->named_flag_arg = alias;
 }
 
 void
-set_param_flag(target *param, param_flag flag) {
+set_param_flag(target *param, target_flag flag) {
     SET_FLAG(param->flags, flag);
 }
 
@@ -120,6 +166,7 @@ argument *
 new_argument(expression *expr) {
     argument *arg = (argument *)calloc(1, sizeof (argument));
     arg->value = expr;
+    arg->next  = arg;
     return arg;
 }
 
@@ -127,20 +174,16 @@ new_argument(expression *expr) {
 
 /*
 
-Add arg2 to the list pointed to by arg1. Both
-arg1 and arg2 should be not null.
 
 */
 argument *
 add_arg(argument *arg1, argument *arg2) {
-    argument *iter = arg1;
     assert(arg1);
     assert(arg2);
-    while (iter->next != NULL) {
-        iter = iter->next;
-    }
-    /* iter->next is NULL at this point */
-    iter->next = arg2;
+
+    arg1->next = arg2;
+    arg2->next = arg1;
+
     return arg1;
 }
 
@@ -153,7 +196,7 @@ set_arg_named(argument *arg, char *alias) {
 }
 
 void
-set_arg_flag(argument *arg, int flag) {
+set_arg_flag(argument *arg, arg_flag flag) {
     SET_FLAG(arg->flags, flag);
 }
 
@@ -165,31 +208,15 @@ load_library(struct lexer_state *lexer, char *library) {
 }
 
 void
-declare_local(struct lexer_state *lexer, char *id, int use_unique_reg) {
+declare_local(struct lexer_state *lexer, pir_type type, target *list) {
 
 }
 
-/* constructor for an instruction */
-void
-new_instr(struct lexer_state *lexer) {
-    statement *instr = (statement *)calloc(1, sizeof (statement));
-    lexer->currentstat = instr;
 
-
-    /* only first time */
-    if (lexer->subs->statements == NULL) {
-        lexer->subs->stat_tail = lexer->subs->statements = instr;
-    }
-    else {
-        lexer->subs->stat_tail->next = instr;
-        lexer->subs->stat_tail = lexer->subs->stat_tail->next;
-    }
-
-}
 
 void
 set_label(struct lexer_state *lexer, char *label) {
-    lexer->currentstat->label = label;
+    lexer->subs->statements->label = label;
 }
 
 static instruction *
@@ -203,8 +230,8 @@ void
 set_instr(struct lexer_state *lexer, char *opname, ...) {
     va_list arg_ptr;
 
-    lexer->currentstat->instr.ins = new_instruction(opname);
-    lexer->currentstat->type = STAT_TYPE_INSTRUCTION;
+    lexer->subs->statements->instr.ins = new_instruction(opname);
+    lexer->subs->statements->type = STAT_TYPE_INSTRUCTION;
 
     va_start(arg_ptr, opname);
 
@@ -220,7 +247,7 @@ be the case anyway in the future, but for now, we'd like to pretty-print everyth
 */
 void
 invert_instr(struct lexer_state *lexer) {
-    char *instr = lexer->currentstat->instr.ins->opname;
+    char *instr = lexer->subs->statements->instr.ins->opname;
     if (strcmp(instr, "if") == 0) instr = "unless"; /* it's never 'unless' by default. */
     else if (strcmp(instr, "isgt") == 0) instr = "isle";
     else if (strcmp(instr, "isge") == 0) instr = "islt";
@@ -229,13 +256,13 @@ invert_instr(struct lexer_state *lexer) {
     else if (strcmp(instr, "isne") == 0) instr = "iseq";
     else if (strcmp(instr, "iseq") == 0) instr = "isne";
     /* and set the new instruction */
-    lexer->currentstat->instr.ins->opname = instr;
+    lexer->subs->statements->instr.ins->opname = instr;
 }
 
 /* constant constructors */
 
 constant *
-new_constant(pir_type type, char *name, ...) {
+new_const(pir_type type, char *name, ...) {
     va_list arg_ptr;
     constant *c = (constant *)malloc(sizeof (constant));
     assert(c != NULL);
@@ -273,28 +300,30 @@ define_const(struct lexer_state *lexer, constant *var, int is_globalconst) {
 static invocation *
 new_invocation(void) {
     invocation *inv = (invocation *)malloc(sizeof (invocation));
+    assert(inv);
     inv->sub       = NULL;
     inv->object    = NULL;
     inv->retcc     = NULL;
     inv->results   = NULL;
     inv->arguments = NULL;
+    inv->type = 0;
     return inv;
 }
 
 void
 set_invocation(struct lexer_state *lexer) {
-    lexer->currentstat->instr.inv = new_invocation();
-    lexer->currentstat->type = STAT_TYPE_INVOCATION;
+    lexer->subs->statements->instr.inv = new_invocation();
+    lexer->subs->statements->type = STAT_TYPE_INVOCATION;
 }
 
 void
 set_invocation_sub(struct lexer_state *lexer, target *sub) {
-    lexer->currentstat->instr.inv->sub = sub;
+    lexer->subs->statements->instr.inv->sub = sub;
 }
 
 void
 set_invocation_object(struct lexer_state *lexer, target *object) {
-    lexer->currentstat->instr.inv->object = object;
+    lexer->subs->statements->instr.inv->object = object;
 }
 
 
@@ -305,52 +334,66 @@ assign(struct lexer_state *lexer, rhs_type type, ...) {
     va_start(arg_ptr, type);
 
     switch (type) {
-        case RHS_BINOP:
+        case RHS_BINOP: {
+            expression *left_op, *right_op;
             /* get instruction */
-            lexer->currentstat->instr.ins = new_instruction(va_arg(arg_ptr, char *));
+            lexer->subs->statements->instr.ins = new_instruction(va_arg(arg_ptr, char *));
             /* get 2 operands */
-            va_arg(arg_ptr, expression *);
-            va_arg(arg_ptr, expression *);
+            left_op  = va_arg(arg_ptr, expression *);
+            add_operand(lexer, left_op);
+            right_op = va_arg(arg_ptr, expression *);
+            add_operand(lexer, right_op);
             break;
-        case RHS_SIMPLE:
+        }
+        case RHS_SIMPLE: {
             /* get only the rhs expression */
-            /**/
-            va_arg(arg_ptr, expression *);
+            expression *operand = va_arg(arg_ptr, expression *);
+            add_operand(lexer, operand);
             break;
-        case RHS_UNOP:
+        }
+        case RHS_UNOP: {
             /* get instruction */
-            lexer->currentstat->instr.ins = new_instruction(va_arg(arg_ptr, char *));
+            expression *operand;
+            lexer->subs->statements->instr.ins = new_instruction(va_arg(arg_ptr, char *));
             /* get 1 operand */
-            va_arg(arg_ptr, expression *);
+            operand = va_arg(arg_ptr, expression *);
+            add_operand(lexer, operand);
             break;
+        }
         case RHS_GETKEYED:
             /* x = x [1] -> set x, x[1] */
-            lexer->currentstat->instr.ins = new_instruction("set");
+            lexer->subs->statements->instr.ins = new_instruction("set");
             break;
-        case RHS_SETKEYED:
+        case RHS_SETKEYED: {
             /* x[1] = 1 -> set x[1], 1 */
-            lexer->currentstat->instr.ins = new_instruction("set");
+            target *keylist;
+            lexer->subs->statements->instr.ins = new_instruction("set");
+            keylist = va_arg(arg_ptr, target *);
             break;
-        case RHS_AUGMENT:
+        }
+        case RHS_AUGMENT: {
             /* get instruction */
-            lexer->currentstat->instr.ins = new_instruction(va_arg(arg_ptr, char *));
+            expression *expr;
+            lexer->subs->statements->instr.ins = new_instruction(va_arg(arg_ptr, char *));
             /* get 1 operand */
-            va_arg(arg_ptr, expression *);
+            expr = va_arg(arg_ptr, expression *);
+            add_operand(lexer, expr);
             break;
-
-
+        }
         default:
             fprintf(stderr, "Fatal error: unknown rhs type\n");
             exit(EXIT_FAILURE);
     }
 
     va_end(arg_ptr);
+    puts("");
 
 }
 static expression *
 new_expr(expr_type type) {
     expression *expr = (expression *)calloc(1, sizeof (expression));
     expr->type = type;
+    expr->next = expr;
     return expr;
 }
 
@@ -374,7 +417,7 @@ expr_from_target(target *t) {
 
 /* convert a constant to an expression node */
 expression *
-expr_from_constant(constant *c) {
+expr_from_const(constant *c) {
     expression *e = new_expr(EXPR_CONSTANT);
     e->expr.c = c;
     return e;
@@ -399,40 +442,42 @@ set_invocation_results(invocation *inv, target *results) {
 }
 
 void
-set_invocation_flag(invocation *inv, invoke_type flag) {
-    SET_FLAG(inv->type, flag);
+set_invocation_type(invocation *inv, invoke_type type) {
+    inv->type = type;
 }
 
 invocation *
-invoke(struct lexer_state *lexer, invoke_type type, target *obj1, target *obj2) {
+invoke(struct lexer_state *lexer, invoke_type type, ...) {
+    va_list arg_ptr;
+
     invocation *inv = new_invocation();
     SET_FLAG(inv->type, type);
 
+    va_start(arg_ptr, type);
     switch (type) {
         case CALL_PCC:  /* .call $P0, $P1 */
-            inv->sub   = obj1;
-            inv->retcc = obj2;
+            inv->sub   = va_arg(arg_ptr, target *);
+            inv->retcc = va_arg(arg_ptr, target *);
             break;
         case CALL_NCI:  /* .nci_call $P0 */
-            inv->sub   = obj1;
-            inv->retcc = NULL;
+            inv->sub   = va_arg(arg_ptr, target *);
             break;
         case CALL_METH: /* $P0.$P1() */
-            inv->object = obj1;
-            inv->sub    = obj2;
+            inv->object = va_arg(arg_ptr, target *);
+            inv->sub    = va_arg(arg_ptr, target *);
             break;
-        case CALL_RET:
-
-            break;
-        case CALL_YIELD:
-        case CALL_TAIL:
+        case CALL_RET:   /* no extra args */
+        case CALL_YIELD: /* no extra args */
+        case CALL_TAIL:  /* no extra args */
             break;
         default:
             fprintf(stderr, "Fatal error: unknown invoke_type\n");
             exit(EXIT_FAILURE);
     }
-    lexer->currentstat->instr.inv = inv;
-    lexer->currentstat->type = STAT_TYPE_INVOCATION;
+    va_end(arg_ptr);
+
+    lexer->subs->statements->instr.inv = inv;
+    lexer->subs->statements->type = STAT_TYPE_INVOCATION;
 
     return inv;
 }
@@ -454,13 +499,6 @@ target_from_ident(char *id) {
 
 }
 
-target *
-target_from_reg(pir_type type, int regno, int is_pasm) {
-    target *var = new_target(type, NULL);
-    var->regno = regno;
-    return var;
-}
-
 
 void
 set_lex_flag(target *t, char *lexname) {
@@ -469,19 +507,61 @@ set_lex_flag(target *t, char *lexname) {
 
 void
 set_pragma(int flag, int value) {
-
+    /* TODO */
 }
 
 void
 set_hll(char *hll, char *lib) {
-
+    /* TODO */
 }
 
 void
 set_hll_map(char *stdtype, char *maptype) {
-
+    /* TODO */
 }
 
+
+void
+add_operand(struct lexer_state *lexer, expression *operand) {
+    if (lexer->subs->statements->instr.ins->operands == NULL) {
+        lexer->subs->statements->instr.ins->operands = operand;
+    }
+    else {
+        operand->next = lexer->subs->statements->instr.ins->operands->next;
+        lexer->subs->statements->instr.ins->operands->next = operand;
+        lexer->subs->statements->instr.ins->operands = operand;
+    }
+}
+
+expression *
+add_key(expression *key1, expression *key2) {
+    key2->next = key1->next;
+    key1->next = key2;
+    return key1;
+}
+
+/*
+
+Add a target node to the list pointed to by list.
+The list is a circular linked list. C<list> points
+to the list I<tail>. Inserting is thus a constant
+time operation. The first node is list->next, also
+constant time.
+
+*/
+target *
+add_local(target *list, target *local) {
+    local->next = list->next;
+    list->next  = local;
+    return list;
+}
+
+target *
+new_local(char *name, int has_unique_reg) {
+    target *t = new_target(UNKNOWN_TYPE, name);
+    SET_FLAG(t->flags, TARGET_FLAG_UNIQUE_REG);
+    return t;
+}
 
 
 /* debug functions */
@@ -524,22 +604,36 @@ print_expr(expression *expr) {
 
 void
 print_args(argument *args) {
-    while (args) {
-        print_expr(args->value);
-
-        if (args->next)
-            printf(", ");
-
-        args = args->next;
+    if (args == NULL) {
+        return;
+    }
+    else {
+        argument *iter = args->next;
+        fprintf(stderr, "print args\n");
+        do {
+            print_expr(iter->value);
+            iter = iter->next;
+        }
+        while (iter != args);
     }
 }
 
 void
 print_expressions(expression *expr) {
-    while (expr) {
-        print_expr(expr);
-        expr = expr->next;
+    expression *iter;
+
+    if (expr == NULL)
+        return;
+
+    /* set iterator to first item */
+    iter = expr->next;
+    do {
+        print_expr(iter);
+        iter = iter->next;
     }
+    while (iter != expr->next);
+
+    puts("");
 }
 
 void
@@ -547,7 +641,7 @@ print_instruction(instruction *ins) {
     assert(ins != NULL);
 
     if (ins->opname) {
-        printf("\n  %s ", ins->opname);
+        printf("   %s ", ins->opname);
 
         print_expressions(ins->operands);
 
@@ -561,66 +655,107 @@ print_invocation(invocation *inv) {
     switch (inv->type) {
 
         case CALL_PCC:
-            printf("  get_results\n");
-            printf("  invoke\n");
+            printf("   get_results");
+            printf("\n");
+            printf("   invoke");
             break;
         case CALL_RET:
-            printf("  set_returns\n");
-            printf("  returncc\n");
+            printf("   set_returns");
+            printf("\n");
+            printf("   returncc");
             break;
         case CALL_NCI:
+            printf("   invokecc");
+            break;
         case CALL_YIELD:
+            printf("   set_returns");
+            printf("\n");
+            printf("   yield");
+            break;
         case CALL_TAIL:
-
+            printf("   set_args");
+            printf("\n");
+            printf("   tailcall");
+            break;
         case CALL_METH:
+            printf("   set_args");
+            printf("\n");
+            printf("   callmethod");
+            break;
+        case CALL_METH_TAIL:
+            printf("   set_args");
+            printf("\n");
+            printf("   tailcallmethod");
             break;
         default:
-            fprintf(stderr, "Unknown invocation type\n");
+            fprintf(stderr, "Unknown invocation type (%d)\n", inv->type);
             exit(EXIT_FAILURE);
     }
 
-    if (inv->results) print_target(inv->results);
-    if (inv->arguments) print_args(inv->arguments);
+   // if (inv->results) print_target(inv->results);
+   // if (inv->arguments) print_args(inv->arguments);
+
+    puts("");
 
 }
 
 void
 print_statement(subroutine *sub) {
-    statement *statiter = sub->statements;
+    if (sub->statements == NULL) {
+        return;
+    }
+    else {
+        statement *statiter = sub->statements->next;
 
-    while (statiter) {
-        switch (statiter->type) {
-            case STAT_TYPE_INSTRUCTION:
-                if (statiter->instr.ins)
-                    print_instruction(statiter->instr.ins);
-                break;
-            case STAT_TYPE_INVOCATION:
-                print_invocation(statiter->instr.inv);
-                break;
-            default:
-                fprintf(stderr, "Fatal error: unknown statement type\n");
-                exit(EXIT_FAILURE);
+        do {
+            switch (statiter->type) {
+                case STAT_TYPE_INSTRUCTION:
+                    if (statiter->instr.ins)
+                        print_instruction(statiter->instr.ins);
+                    break;
+                case STAT_TYPE_INVOCATION:
+                    if (statiter->instr.inv)
+                        print_invocation(statiter->instr.inv);
+                    break;
+                default:
+                    fprintf(stderr, "Fatal error: unknown statement type\n");
+                    exit(EXIT_FAILURE);
+            }
+            statiter = statiter->next;
         }
-        statiter = statiter->next;
+        while (statiter != sub->statements->next);
     }
 }
 
 void
-print_subs(struct lexer_state *lexer) {     /*
-    subroutine *subiter = lexer->subs;
+print_subs(struct lexer_state *lexer) {
+    if (lexer->subs == NULL) {
+        return;
+    }
+    else {
+        /* set iterator to first item */
+        subroutine *subiter = lexer->subs->next;
 
-    while (subiter) {
-        print_statement(subiter);
-        subiter = subiter->next;
+        do {
+            printf(".pcc_sub %s:\n", subiter->sub_name);
+            print_statement(subiter);
+            subiter = subiter->next;
+        }
+        while (subiter != lexer->subs->next);
     }
 
+    printf("   end\n");
 
+
+
+ /*
     printf("size of a target:     %d\n", sizeof (target));
     printf("size of a expression: %d\n", sizeof (expression));
     printf("size of a constant:   %d\n", sizeof (constant));
     printf("size of a statement:  %d\n", sizeof (statement));
     printf("size of a invocation: %d\n", sizeof (invocation));
     printf("size of a instruction: %d\n", sizeof (instruction));     */
+
 }
 
 /*
