@@ -402,7 +402,7 @@ You can do so either with the class name:
 
 or with the class object:
 
-    $P1 = get_class 'Dog'	# find the 'Dog' class
+    $P1 = get_class 'Dog'   # find the 'Dog' class
     unless null $P1 goto have_dog_class
     printerr "Oops; can't find the 'Dog' class.\n"
     .return ()
@@ -554,6 +554,58 @@ makefile:
       @cd $(OPSDIR) && $(BUILD) compile $(OPLIBS)
       @cd $(OPSDIR) && $(BUILD) linklibs $(OPLIBS)
       @cd $(OPSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(OPLIBS)
+
+
+=head2 How do I use the Native Calling Interface (NCI)?
+
+Using the NCI you can invoke functions written in C from a Parrot script.
+To every NCI invocation, there are two parts: the native function to be invoked,
+and the PIR code to do the invocation.
+
+First the native function, to be written in C.  On Windows, it is necessary
+to do a DLL export specification of the NCI function:
+
+  /* foo.c */
+
+  /* specify the function prototype */
+  #ifdef __WIN32
+  __declspec(dllexport) void foo(void);
+  #else
+  void foo(void);
+  #endif
+
+  void foo(void) {
+    printf("Hello Parrot!\n");
+  }
+
+Then, after having compiled the file as a shared library, the PIR code looks
+like this:
+
+  .sub main :main
+     .local pmc lib, func
+
+     # load the shared library
+     lib = loadlib "hello" # no extension, .so or .dll is assumed
+
+     # get a reference to the function from the library just
+     # loaded, called "foo", and signature "void" (and no arguments)
+     func = dlfunc lib, "foo", "v"
+
+     # invoke
+     func()
+
+  .end
+
+If you embedded a Parrot in your C file and you want to invoke another function
+in that same C file, you should pass a null string to loadlib. Do that as follows:
+
+ .local pmc lib
+ .local string libname
+ null libname
+
+ lib = loadlib libname
+
+Under Linux, the .c file must then be linked with the -export-dynamic option.
 
 =head1 Misc
 
