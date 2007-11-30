@@ -16,10 +16,11 @@ either PIR or executable bytecode.
 .namespace [ 'POST::Compiler' ]
 
 .sub '__onload' :load :init
-    $P99 = subclass 'PCT::HLLCompiler', 'POST::Compiler'
-    addattribute $P99, '$!code'
-    $P0 = new 'POST::Compiler'
-    $P0.'language'('POST')
+    $P0 = get_hll_global 'Protomaker'
+    ($P1, $P2) = $P0.'new_subclass'('PCT::HLLCompiler', 'POST::Compiler', '$!code')
+    $P2.'language'('POST')
+    $P0 = new 'String'
+    set_global '$?NAMESPACE', $P0
     .return ()
 .end
 
@@ -225,14 +226,17 @@ the sub.
     # concat flags, ' :method'                   # FIXME: RT#47794
   have_method:
 
-    .local pmc ns
-    ns = node.'namespace'()
-    unless ns goto namespace_done
-    ns = code.'key'(ns)
+    .local pmc ns, outerns
+    outerns = get_global '$?NAMESPACE'
+    ns = outerns
+    $P0 = node.'namespace'()
+    unless $P0 goto have_ns
+    ns = code.'key'($P0)
+    set_global '$?NAMESPACE', ns
+  have_ns:
     code.'emit'("\n.namespace %0", ns)
-  namespace_done:
 
-    code.'emit'("\n.sub %0%1", name, flags)
+    code.'emit'(".sub %0%1", name, flags)
     .local pmc paramlist
     paramlist = node['paramlist']
     if null paramlist goto paramlist_done
@@ -252,6 +256,8 @@ the sub.
     $P0 = self.'code'()
     code .= $P0
     self.'code'(code)
+
+    set_global '$?NAMESPACE', outerns
 
     code = new 'CodeString'
     .return (code)
