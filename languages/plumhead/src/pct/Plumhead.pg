@@ -5,39 +5,39 @@
 
 # The starting rule is TOP
 
-grammar Plumhead::Grammar;
+grammar Plumhead::Grammar is PCT::Grammar;
 
 token TOP                     { <program> }
 
 regex SEA                     { <-[<]>+? ( <?before: \<> | $ ) }
 regex SEA_empty_allowed       { <-[<]>*? <?before: \<> }
-token CODE_START              { <'<?php'> }
-token CODE_END                { <'?>'> \n? }
-token DOUBLEQUOTE_STRING      { " <-["]>* " }
-token SINGLEQUOTE_STRING      { ' <-[']>* ' }
-token ECHO                    { <'echo'> }
-token VAR_DUMP                { <'var_dump'> }
-token PHP_SAPI_NAME           { <'php_sapi_name'> }
+token CODE_START              { '<?php' }
+token CODE_END                { '?>' \n? }
+token DOUBLEQUOTE_STRING      { '"' <string_literal: "> '"' }
+token SINGLEQUOTE_STRING      { \' <string_literal: '> \' }
+token ECHO                    { 'echo' }
+token VAR_DUMP                { 'var_dump' }
+token PHP_SAPI_NAME           { 'php_sapi_name' }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
-token IDENT                   { ( <[a..z]> | <[A..Z]> | <'_'> )( <[a..z]> | <[A..Z]> | <'_'> )* }
-token VAR_NAME                {  <'$'> <IDENT> }
+token IDENT                   { ( <[a..z]> | <[A..Z]> | '_' )( <[a..z]> | <[A..Z]> | '_' )* }
+token VAR_NAME                {  '$' <IDENT> }
 
 token INTEGER                 { \d+ }
-token NUMBER                  { ( \d+ )? <'.'> \d+ }
+token NUMBER                  { ( \d+ )? '.' \d+ }
 
 token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
 token CONCAT_OP               { \. }
 token ADD_OP                  { \+ | \- }
-token MUL_OP                  { \* | / | % }
-token BITWISE_OP              { <'|'>  | <'&'> | <'^'> }
-token ASSIGN_OP               { <'='> }
-token REL_OP                  { <'=='> | <'<='> | <'>='> | <'!='> | <'<'>  | <'>'> }
+token MUL_OP                  { '*' | '/' | '%' }
+token BITWISE_OP              { '|'  | '&' | '^' }
+token ASSIGN_OP               { '=' }
+token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
 
-token IF                      { <'if'> }
-token ELSE                    { <'else'> }
+token IF                      { 'if' }
+token ELSE                    { 'else' }
 token program                 { ^ <sea_or_code>+ }
 token sea_or_code             { <SEA> | <code> }
 
@@ -45,8 +45,8 @@ rule  code                    { <?CODE_START> <statement>* <?CODE_END>? }
 
 rule relational_expression    { <expression> <rel_op_clause>? }
 
-rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <?PAREN_OPEN> <?PAREN_CLOSE> )  ( ; | <?before: \? > | $ )
-                              | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ( ; | <?before: \? > | $ )
+rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <?PAREN_OPEN> <?PAREN_CLOSE> )  ( ';' | <?before: \? > | $ )
+                              | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ( ';' | <?before: \? > | $ )
                               | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
                               | <inline_sea> 
                               | <scalar_assign>
@@ -58,14 +58,14 @@ rule else_clause              { <?ELSE> \{ <statement>* \} }
 rule  rel_op_clause           { <REL_OP> <expression> }
 rule  else_clause             { <?ELSE> \{ <statement>* \} }
 token inline_sea              { <?CODE_END> <SEA_empty_allowed> <?CODE_START> }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
-rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <?before: \? > | $ ) }
+rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <?before: \? > | $ ) }
 
 token expression              { <concat_expression>
                               | <bitwise_expression>
                               }
 
-rule  array_elem              { <VAR_NAME> <'['> <array_key> <']'> }
+rule  array_elem              { <VAR_NAME> '[' <array_key> ']' }
 rule  array_key               { <expression>  }
 rule  var                     { <VAR_NAME> }
 

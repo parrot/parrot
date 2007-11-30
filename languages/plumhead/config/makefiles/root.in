@@ -10,6 +10,8 @@ RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 BUILD_DIR     = @build_dir@
 PGE_DIR       = ../../compilers/pge
 TGE_DIR       = ../../compilers/tge
+PGE_LIBRARY   = @build_dir@/runtime/parrot/library/PGE
+
 
 # default
 all: build
@@ -95,19 +97,23 @@ build-antlr3:    build-common
 	javac src/antlr3/*.java 
 
 src/partridge/Plumhead_gen.pir: src/partridge/Plumhead.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/partridge/Plumhead_gen.pir src/partridge/Plumhead.pg
+	$(PARROT) $(PGE_DIR)/pgc.pir
+            --output=src/partridge/Plumhead_gen.pir src/partridge/Plumhead.pg
 
 src/partridge/PlumheadPAST_gen.pir: src/partridge/PlumheadPAST.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/partridge/PlumheadPAST_gen.pir src/partridge/PlumheadPAST.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir \
+            --output=src/partridge/PlumheadPAST_gen.pir src/partridge/PlumheadPAST.tg
 
 src/common/plumheadlib.pbc: src/common/builtins.pir
 	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
 
-src/pct/Plumhead_gen.pir: src/pct/Plumhead.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/pct/Plumhead_gen.pir src/pct/Plumhead.pg
+src/pct/Plumhead_gen.pir: $(PGE_LIBRARY)/Perl6Grammar.pir src/pct/Plumhead.pg
+	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir \
+            --output=src/pct/Plumhead_gen.pir src/pct/Plumhead.pg
 
 src/pct/PlumheadPAST_gen.pir: src/pct/PlumheadPAST.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/pct/PlumheadPAST_gen.pir src/pct/PlumheadPAST.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir \
+            --output=src/pct/PlumheadPAST_gen.pir src/pct/PlumheadPAST.tg
 
 plumhead.pbc: src/common/plumhead.pir src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
