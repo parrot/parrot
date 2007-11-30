@@ -167,12 +167,12 @@ err:
 
     e = new_expr(expInc, NUL, NUL)
     global "Inc" = e
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     e = new_expr(expNum, $P0, NUL)
     global "Zero" = e
 
     .local pmc cache
-    cache = new FixedPMCArray
+    cache = new 'FixedPMCArray'
     cache = 257
     cache[0] = KI
     cache[1] = I
@@ -187,7 +187,7 @@ err:
     .param pmc rhs
 
     .local pmc expr
-    expr = new FixedPMCArray
+    expr = new 'FixedPMCArray'
     expr = 3
     expr[0] = type
     expr[1] = lhs
@@ -389,7 +389,7 @@ not_s2:
 	    printerr "invalid Inc of non-number\n"
 	    exit 1
 num_ok:
-	$P0 = new Integer
+	$P0 = new 'Integer'
 	$P0 = $I0
 	expr[0] = expNum
 	expr[1] = $P0
