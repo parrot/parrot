@@ -1,12 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -23,169 +17,129 @@ composition.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'isa by string name' );
 .sub main :main
+    .include 'include/test_more.pir'
+
+    plan(22)
+
+    isa_by_string_name()
+    isa_by_class_object()
+    subclass_isa_by_string_name()
+    subclass_isa_by_class_object()
+    string_isa_and_pmc_isa_have_same_result()
+.end    
+
+
+.sub isa_by_string_name
     $P1 = newclass "Foo"
     $S1 = typeof $P1
-    say $S1
+    
+    is( 'Class', $S1, 'typeof newclass retval')
 
     $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    ok( $I3, 'isa newclass retval a Class')
 
     $P2 = new $P1
-
     $S1 = typeof $P2
-    say $S1
+    is ( 'Foo', $S1, 'typeof instance of our class')
 
     $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    ok ( $I3, 'isa instance of our class')
 
     $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    ok ( $I3, 'isa instance of object')
 .end
-CODE
-Class
-1
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'isa by class object' );
-.sub main :main
+.sub isa_by_class_object
     .local pmc foo_class
-    foo_class = newclass "Foo"
+    foo_class = newclass "Foo2"
     $S1 = typeof foo_class
-    say $S1
+
+    is( 'Class', $S1, 'typeof newclass retval')
 
     .local pmc class_class
     class_class = get_class "Class"
     $I3 = isa foo_class, class_class
-    print $I3
-    print "\n"
+    ok ($I3, 'isa newclass retval a Class')
 
     $P2 = new foo_class 
-
     $S1 = typeof $P2
-    say $S1
+    is ( 'Foo2', $S1, 'typeof new our class?')
 
     $I3 = isa $P2, foo_class
-    print $I3
-    print "\n"
+    ok ( $I3, 'isa instance of our class')
 
     .local pmc object_class
     object_class = get_class "Object"
     $I3 = isa $P2, object_class
-    print $I3
-    print "\n"
+    ok ( $I3, 'isa instance of Object')
 .end
-CODE
-Class
-1
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'subclass isa by string name' );
-.sub main :main
+.sub subclass_isa_by_string_name
     .local pmc foo_class, bar_class
-    foo_class = newclass "Foo"
-    bar_class = subclass "Foo", "Bar"
+    foo_class = newclass "Foo3"
+    bar_class = subclass "Foo3", "Bar3"
 
     $I3 = isa bar_class, "Class"
-    print $I3
-    print "\n"
+    ok ($I3, 'does subclass generate class objects')
 
     $P2 = new bar_class 
-
     $S1 = typeof $P2
-    say $S1
+    is ('Bar3', $S1, 'does new give us an obj of our type')
 
-    $I3 = isa $P2, "Bar"
-    print $I3
-    print "\n"
+    $I3 = isa $P2, "Bar3"
+    ok ($I3, 'does new give us an obj that isa our type')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa $P2, "Foo3"
+    ok ($I3, 'does new give us an obj that isa our parent type')
 
     $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    ok ($I3, 'does new give us an obj that isa Object')
 .end
-CODE
-1
-Bar
-1
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'subclass isa by class object' );
-.sub main :main
+.sub subclass_isa_by_class_object
     .local pmc foo_class, bar_class
-    foo_class = newclass "Foo"
-    bar_class = subclass "Foo", "Bar"
+    foo_class = newclass "Foo4"
+    bar_class = subclass "Foo4", "Bar4"
 
     .local pmc class_class
     class_class = get_class "Class"
     $I3 = isa bar_class, class_class
-    print $I3
-    print "\n"
+    ok ($I3, 'is the class of a subclass Class')
 
     $P2 = new bar_class 
-
     $S1 = typeof $P2
-    say $S1
+    is ('Bar4', $S1, 'typeof new class our class')
 
     $I3 = isa $P2, bar_class
-    print $I3
-    print "\n"
+    ok ($I3, 'new class isa our class')
 
     $I3 = isa $P2, foo_class
-    print $I3
-    print "\n"
+    ok ($I3, 'new class isa our parent class')
 
     .local pmc object_class
     object_class = get_class "Object"
     $I3 = isa $P2, object_class
-    print $I3
-    print "\n"
+    ok ($I3, 'new class isa Object')
 .end
-CODE
-1
-Bar
-1
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'string isa and pmc isa have same result' );
-.sub main
+
+.sub string_isa_and_pmc_isa_have_same_result
     .local pmc class, obj
     class = new 'Class'
     obj = class.'new'()
     $I0 = isa obj, 'Object'
-    print $I0
-    print "\n"
+    ok ($I0, 'isa Class instance an Object')
+
     .local pmc cl
     cl = new 'String'
     cl = 'Object'
     $I1 = isa obj, cl
-    print $I1
-    print "\n"
+    ok ($I1, 'isa String instance an Object')
 .end
-CODE
-1
-1
-OUT
+
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
