@@ -1,3 +1,7 @@
+#!./parrot
+
+# class
+
 plan(1);
 
 class XYZ {

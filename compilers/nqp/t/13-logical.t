@@ -1,6 +1,6 @@
 #!./parrot
 
-# lists and for
+# check '||' and '&&'
 
 plan(4);
 

@@ -1,5 +1,7 @@
 #!./parrot
 
+# check variables
+
 say('1..14');
 
 my $o1 := 'ok 1'; print($o1); say(" # direct binding and scoping");

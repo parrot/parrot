@@ -1,5 +1,7 @@
 #!./parrot
 
+# check subs
+
 say('1..10');
 
 sub one ( ) {

@@ -1,6 +1,6 @@
 #!./parrot
 
-# check literals
+# check control structure 'if'
 
 say('1..4');
 

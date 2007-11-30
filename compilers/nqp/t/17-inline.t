@@ -1,3 +1,6 @@
+#!./parrot
+
+# inline
 
 plan(1);
 

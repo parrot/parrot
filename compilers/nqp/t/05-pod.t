@@ -1,6 +1,6 @@
 #!./parrot
 
-# check literals
+# check pod
 
 say('1..4');
 

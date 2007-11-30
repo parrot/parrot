@@ -1,5 +1,7 @@
 #!./parrot
 
+# check module
+
 say('1..1');
 
 our $value := 'ok 2';
