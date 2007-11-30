@@ -80,7 +80,7 @@ exception:
 
 
 .sub ' compile'
-    .param string input
+    .param pmc input
 
     .local pmc code, stream, stack
     code   = new 'CodeString'
