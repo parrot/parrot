@@ -95,14 +95,15 @@ rule statement_list {
 ##  or an expression.  Any statement termination is handled by
 ##  the calling rule.
 rule statement {
-    | <if_statement> {*}                                   #= if_statement
-    | <while_statement> {*}                                #= while_statement
-    | <repeat_statement> {*}                               #= repeat_statement
-    | <for_statement> {*}                                  #= for_statement
-    | <return_statement> {*}                               #= return_statement
-    | <make_statement> {*}                                 #= make_statement
-    | <block> {*}                                          #= block
-    | <EXPR> {*}                                           #= EXPR
+    | <if_statement> {*}                         #= if_statement
+    | <while_statement> {*}                      #= while_statement
+    | <repeat_statement> {*}                     #= repeat_statement
+    | <for_statement> {*}                        #= for_statement
+    | <return_statement> {*}                     #= return_statement
+    | <make_statement> {*}                       #= make_statement
+    | <inline_pir_statement> {*}                 #= inline_pir_statement
+    | <block> {*}                                #= block
+    | <EXPR> {*}                                 #= EXPR
 }
 
 
@@ -163,6 +164,11 @@ rule make_statement {
     $<sym>:=['make']
     [ <EXPR> | <panic: Unable to parse argument to 'make'> ]
     {*}
+}
+
+rule inline_pir_statement {
+    'PIR'
+    <quote> {*}                                  #= quote
 }
 
 
@@ -304,7 +310,7 @@ token value {
 token quote {
     [ \'  <string_literal: '> \'
     | '"' <string_literal: "> '"'
-    | '<' <string_literal: \>> '>'
+    | 'q' <.ws> '<' <string_literal: \>> '>'
     ]
     {*}
 }

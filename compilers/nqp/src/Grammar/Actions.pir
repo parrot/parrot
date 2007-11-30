@@ -311,6 +311,24 @@
 .end
 
 
+##    method inline_pir_statement($/, $key) {
+##        make PAST::Op.new( :inline( ~$($<quote><string_literal>) ),
+##                           :pasttype('inline'),
+##                           :node( $/ )
+##                         );
+##    }
+.sub 'inline_pir_statement' :method
+    .param pmc match
+    .param pmc key
+    $P0 = match['quote']
+    $P0 = $P0['string_literal']
+    $P0 = $P0.'get_scalar'()
+    $P1 = get_hll_global ['PAST'], 'Op'
+    $P2 = $P1.'new'( 'inline'=>$P0, 'pasttype'=>'inline', 'node'=>match)
+    match.'result_object'($P2)
+.end
+
+
 ##    method block($/, $key) {
 ##        make $($<statement_block>);
 ##    }
