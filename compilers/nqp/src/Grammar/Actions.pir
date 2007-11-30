@@ -312,7 +312,11 @@
 
 
 ##    method inline_pir_statement($/, $key) {
-##        make PAST::Op.new( :inline( ~$($<quote><string_literal>) ),
+##        my $inline;
+##        if ($key eq 'quote')   { $inline := ~$($<quote><string_literal>) }
+##        if ($key eq 'heredoc') { $inline := ~$/<text> }
+##
+##        make PAST::Op.new( :inline( $inline ),
 ##                           :pasttype('inline'),
 ##                           :node( $/ )
 ##                         );
@@ -320,11 +324,20 @@
 .sub 'inline_pir_statement' :method
     .param pmc match
     .param pmc key
+    .local pmc inline
+    if key != 'quote' goto not_quote
     $P0 = match['quote']
     $P0 = $P0['string_literal']
-    $P0 = $P0.'get_scalar'()
+    inline = $P0.'get_scalar'()
+    goto make
+  not_quote:
+    if key != 'heredoc' goto not_heredoc
+    $P0 = match['text']
+    inline = $P0.'get_scalar'()
+  not_heredoc:
+  make:
     $P1 = get_hll_global ['PAST'], 'Op'
-    $P2 = $P1.'new'( 'inline'=>$P0, 'pasttype'=>'inline', 'node'=>match)
+    $P2 = $P1.'new'( 'inline'=>inline, 'pasttype'=>'inline', 'node'=>match)
     match.'result_object'($P2)
 .end
 

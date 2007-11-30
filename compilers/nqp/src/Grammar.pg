@@ -177,12 +177,20 @@ rule make_statement {
 
 rule inline_pir_statement {
     'PIR'
-    <quote> {*}                                  #= quote
+    [ <quote> {*}                              #= quote
+    | 'q:to:' [ \' (<-['\n]>+) \' | \" (<-["\n]>+) \" | \< (<-[\>\n]>+) \> ]
+      [:sigspace(0):ratchet(0)
+        ';' \h*: \n
+        $<text>:=[ [\N*:\n]*? ]
+        ^^ \h*: $0 \h*: \n
+        <.MARK_STATEMENT_END>
+      ] {*}                                    #= heredoc
+    ]
 }
 
 
 ##  Parse a block.  If the closing brace is at the end of a line,
-##  then we call <MARK_STATEMENT_END> to so that any following
+##  then we call <.MARK_STATEMENT_END> so that any following
 ##  <statement_end> rule can succeed.
 
 token block {
