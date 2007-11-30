@@ -224,7 +224,6 @@ no_args:
   rule = globber.'compile'(match_str)
 
   iter = new 'Iterator', the_array
-  iter = .ITERATE_FROM_START
 
   retval = new 'TclList'
 
@@ -290,7 +289,6 @@ no_args:
   (rule, $P0, $P1) = globber.'compile'(match_str)
 
   iter = new 'Iterator', the_array
-  iter = .ITERATE_FROM_START
 
 push_loop:
   unless iter goto push_end
@@ -375,7 +373,6 @@ not_array:
   rule = globber.'compile'(pattern)
 
   iter = new 'Iterator', the_array
-  iter = .ITERATE_FROM_START
 
   retval = new 'TclList'
 
@@ -405,7 +402,6 @@ check_end:
   .local string name
 
   iter = new 'Iterator', the_array
-  iter = .ITERATE_FROM_START
 
   retval = new 'String'
   retval = ''
@@ -437,7 +433,6 @@ found_match:
   rule = tclARE(pattern)
 
   iter = new 'Iterator', the_array
-  iter = .ITERATE_FROM_START
 
   retval = new 'TclList'
 
