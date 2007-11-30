@@ -577,7 +577,7 @@ EOC
             );
             if (pmc_id > 0) {
 EOC
-        foreach my $maps ( keys %{ $self->{flags}{maps} } ) {
+        foreach my $maps ( sort keys %{ $self->{flags}{maps} } ) {
             $cout .= <<"EOC";
                 Parrot_register_HLL_type( interp, pmc_id, enum_class_$maps, entry);
 EOC
