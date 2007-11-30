@@ -13,13 +13,13 @@ CP       = @cp@
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
 
-TARGETS = \
+PCT_TARGETS = \
   $(PARROT_LIBRARY)/PCT.pbc \
   $(PARROT_LIBRARY)/PCT/PAST.pbc \
   $(PARROT_LIBRARY)/PCT/Grammar.pbc \
   $(PARROT_LIBRARY)/PCT/HLLCompiler.pbc
 
-SOURCES = \
+PCT_SOURCES = \
   PCT.pir \
   src/Grammar.pir \
   src/HLLCompiler.pir \
@@ -31,7 +31,7 @@ SOURCES = \
 # the default target
 all: $(PARROT_LIBRARY)/PCT.pbc
 
-$(PARROT_LIBRARY)/PCT.pbc: $(PARROT) $(SOURCES)
+$(PARROT_LIBRARY)/PCT.pbc: $(PARROT) $(PCT_SOURCES)
 	$(PARROT) -o $(PARROT_LIBRARY)/PCT.pbc --output-pbc PCT.pir
 	$(PARROT) -o $(PARROT_LIBRARY)/PCT/PAST.pbc --output-pbc src/PAST.pir
 	$(PARROT) -o $(PARROT_LIBRARY)/PCT/Grammar.pbc --output-pbc src/Grammar.pir
@@ -65,7 +65,7 @@ testclean:
 	    $(TEST_DIR)/*.pbc
 
 clean: testclean
-	$(RM_F) $(TARGETS)
+	$(RM_F) $(PCT_TARGETS)
 
 realclean: clean
 	$(RM_F) Makefile
