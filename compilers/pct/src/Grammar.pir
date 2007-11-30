@@ -2,6 +2,7 @@
 # $Id$
 
 .sub '__onload' :init :load
+    load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
     $P0 = subclass 'PGE::Grammar', 'PCT::Grammar'
     $P1 = get_hll_global ['PGE::Util'], 'die'
