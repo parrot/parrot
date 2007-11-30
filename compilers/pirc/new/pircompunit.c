@@ -606,7 +606,7 @@ print_statement(subroutine *sub) {
 }
 
 void
-print_subs(struct lexer_state *lexer) {
+print_subs(struct lexer_state *lexer) {     /*
     subroutine *subiter = lexer->subs;
 
     while (subiter) {
@@ -620,7 +620,7 @@ print_subs(struct lexer_state *lexer) {
     printf("size of a constant:   %d\n", sizeof (constant));
     printf("size of a statement:  %d\n", sizeof (statement));
     printf("size of a invocation: %d\n", sizeof (invocation));
-    printf("size of a instruction: %d\n", sizeof (instruction));
+    printf("size of a instruction: %d\n", sizeof (instruction));     */
 }
 
 /*
