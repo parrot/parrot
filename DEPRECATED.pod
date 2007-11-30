@@ -95,7 +95,7 @@ will be removed after the 0.5.0 release. (RT#47972)
 =item 4
 
 The C<get_mro> opcode is deprecated (replaced by C<inspect>) and will be
-removed after the 0.5.0 release.
+removed after the 0.5.0 release. (RT#47976)
 
 =item 5
 
