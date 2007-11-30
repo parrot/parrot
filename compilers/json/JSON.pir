@@ -34,7 +34,7 @@ documentation at L<http://www.json.org/>.
     $P1 = get_global '__compiler'
     compreg "JSON", $P1
 
-    $P1 = new .Hash
+    $P1 = new 'Hash'
     $P1['\"'] = '"'
     $P1['\\'] = "\\"
     $P1['\/'] = '/'
@@ -70,7 +70,7 @@ documentation at L<http://www.json.org/>.
    .return result()
 
   failed:
-   P0 = new .Exception
+   P0 = new 'Exception'
    P0[0] = "invalid JSON value"
    throw P0
 .end

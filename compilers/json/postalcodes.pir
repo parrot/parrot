@@ -77,7 +77,7 @@ END:
 
     $P2 = $P2['postalCodes']
     .local pmc iter, code
-    iter = new .Iterator, $P2
+    iter = new 'Iterator', $P2
   
  code_loop:
     push_eh code_end

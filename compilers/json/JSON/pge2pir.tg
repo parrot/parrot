@@ -55,7 +55,7 @@ transform pir (thing) {
     pir = new 'CodeString'
     result = pir.unique('$P')
     $S0 = node
-    pir.emit('    %0 = new .Boolean', result)
+    pir.emit("    %0 = new 'Boolean'", result)
     pir.emit('    %0 = 1', result, $S0)
     node['ret'] = result
     .return(pir)
@@ -64,7 +64,7 @@ transform pir (thing) {
     pir = new 'CodeString'
     result = pir.unique('$P')
     $S0 = node
-    pir.emit('    %0 = new .Boolean', result)
+    pir.emit("    %0 = new 'Boolean'", result)
     pir.emit('    %0 = 0', result, $S0)
     node['ret'] = result
     .return(pir)
@@ -83,7 +83,7 @@ transform pir (object) {
     pir = new 'CodeString'
     .local string result, child_result, key_result
     result = pir.unique('$P')
-    pir.emit('    %0 = new .Hash', result)
+    pir.emit("    %0 = new 'Hash'", result)
     
     .local pmc items
 
@@ -97,8 +97,8 @@ transform pir (object) {
     items = items['thing']
 
     .local pmc iter, key_iter, child, key
-    key_iter = new .Iterator, keys
-    iter     = new .Iterator, items
+    key_iter = new 'Iterator', keys
+    iter     = new 'Iterator', items
 
     # the two iters should be in lockstep as a result of the PGE grammar
 loop:
@@ -130,7 +130,7 @@ transform pir (array) {
     pir = new 'CodeString'
     .local string result, child_result
     result = pir.unique('$P')
-    pir.emit('    %0 = new .ResizablePMCArray', result)
+    pir.emit("    %0 = new 'ResizablePMCArray'", result)
     
     .local pmc items
 
@@ -141,7 +141,7 @@ transform pir (array) {
     items = items['thing']
 
     .local pmc iter, child
-    iter = new .Iterator, items
+    iter = new 'Iterator', items
 loop:
     unless iter goto end
     child = shift iter
@@ -165,7 +165,7 @@ transform pir (string) {
     pir = new 'CodeString'
     children = node['char']
     if null children goto loop_end
-    iter = new .Iterator, children 
+    iter = new 'Iterator', children 
   loop:
     push_eh loop_end
       child = shift iter
@@ -176,7 +176,7 @@ transform pir (string) {
     if $I0 == 1 goto char
     if $I0 == 2 goto escape
   unicode:
-    $P1 = new .String
+    $P1 = new 'String'
     $S1 = substr $S0, 2, 4
     $P1 = $S1
     $I0 = $P1.to_int(16)
@@ -192,7 +192,7 @@ transform pir (string) {
 
     result = pir.unique('$P')
     $S1 = pir.escape(tmp)
-    pir.emit('    %0 = new .String', result)
+    pir.emit("    %0 = new 'String'", result)
     pir.emit('    %0 = %1', result, $S1)
     node['ret'] = result
    .return(pir)
@@ -203,7 +203,7 @@ transform pir (number) {
     pir = new 'CodeString'
     result = pir.unique('$P')
     $S0 = node
-    pir.emit('    %0 = new .Integer', result)
+    pir.emit("    %0 = new 'Integer'", result)
     pir.emit('    %0 = %1', result, $S0)
     node['ret'] = result
    .return(pir)
