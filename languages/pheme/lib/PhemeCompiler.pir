@@ -98,7 +98,7 @@
 	load_bytecode 'PAST.pbc'
 
 	.local pmc compiled_symbols
-	compiled_symbols = new .Hash
+	compiled_symbols = new 'Hash'
 
 	store_global 'PhemeCompiler', 'symbols', compiled_symbols
 

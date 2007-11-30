@@ -2,7 +2,7 @@
 
 .sub __onload :load :init
 	.local pmc symbols
-	symbols = new .Hash
+	symbols = new 'Hash'
 
 	symbols["'define'"]            = 1
 	symbols["'car'"]               = 1
@@ -75,7 +75,7 @@
 	.param pmc cons
 
 	.local pmc cons_list
-	cons_list = new .ResizablePMCArray
+	cons_list = new 'ResizablePMCArray'
 
 	# walk through cons
 	# push onto stack backwards
@@ -173,7 +173,7 @@
 	.param pmc exps :slurpy
 
 	.local pmc iter
-	iter = new .Iterator, exps
+	iter = new 'Iterator', exps
 	iter = 0
 
 	.local pmc cond
@@ -200,7 +200,7 @@
 
 	.local string message
 	.local pmc iter
-	iter = new .Iterator, messages
+	iter = new 'Iterator', messages
 	iter = 0
 
   iter_loop:
@@ -321,7 +321,7 @@
 	result   = first
 
 	.local pmc iter
-	iter = new .Iterator, rest
+	iter = new 'Iterator', rest
 
 	.local pmc   next
 	.local num next_val
@@ -345,7 +345,7 @@
 	result   = first
 
 	.local pmc iter
-	iter = new .Iterator, rest
+	iter = new 'Iterator', rest
 
 	.local pmc   next
 	.local num next_val
@@ -369,7 +369,7 @@
 	result   = first
 
 	.local pmc iter
-	iter = new .Iterator, rest
+	iter = new 'Iterator', rest
 
 	.local pmc   next
 	.local num next_val
