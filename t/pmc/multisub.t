@@ -18,13 +18,7 @@ Tests the creation and invocation of Perl6 multi subs.
 
 
 .sub main :main
-    load_bytecode 'library/Test/More.pir'
-
-    .local pmc exports, curr_namespace, test_namespace
-    curr_namespace = get_namespace
-    test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "plan ok is"
-    test_namespace.export_to(curr_namespace, exports)
+    .include 'include/test_more.pir'
 
     plan( 8 )
 

@@ -45,13 +45,7 @@ Tests all non-branching conditional operators.
 
 
 .sub 'main' :main
-    load_bytecode 'Test/More.pir'
-
-    .local pmc exports, curr_namespace, test_namespace
-    curr_namespace = get_namespace
-    test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "plan is"
-    test_namespace.export_to(curr_namespace, exports)
+    .include 'include/test_more.pir'
 
     .local string res, exp, desc
 

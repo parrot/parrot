@@ -5,8 +5,6 @@
 .const int TESTS = 47
 
 .sub 'main' :main
-    load_bytecode 'Test/More.pir'
-
     $P0 = new 'Env'
     $P0 = $P0['TEST_VERBOSE']
     unless null $P0 goto set_verbose
@@ -16,11 +14,7 @@
     store_global 'TEST_VERBOSE', $P0
 
   import:
-    .local pmc exports, curr_namespace, test_namespace
-    curr_namespace = get_namespace
-    test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "plan ok is diag"
-    test_namespace.export_to(curr_namespace, exports)
+    .include 'include/test_more.pir'
 
     'plan'( TESTS )
 
