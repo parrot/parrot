@@ -30,6 +30,7 @@ pmclass TclList
     group   tcl_group
     hll     Tcl
     maps    Array
+    maps    ResizablePMCArray
 {
 
 /*

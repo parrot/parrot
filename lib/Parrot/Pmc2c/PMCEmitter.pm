@@ -569,15 +569,21 @@ EOC
     if ( $self->{flags}{hll} && $self->{flags}{maps} ) {
 
         my $hll  = $self->{flags}{hll};
-        my $maps = ( keys %{ $self->{flags}{maps} } )[0];
         $cout .= <<"EOC";
 
         {
             /* Register this PMC as a HLL mapping */
             INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "$hll")
             );
-            if (pmc_id > 0)
+            if (pmc_id > 0) {
+EOC
+        foreach my $maps ( keys %{ $self->{flags}{maps} } ) {
+            $cout .= <<"EOC";
                 Parrot_register_HLL_type( interp, pmc_id, enum_class_$maps, entry);
+EOC
+        }
+        $cout .= <<"EOC";
+            }
         } /* Register */
 EOC
     }

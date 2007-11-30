@@ -7,10 +7,7 @@
 .sub '&list'
   .param pmc argv :slurpy
 
-  $P0 = new 'TclList'
-  assign $P0, argv
-
-  .return($P0)
+  .return(argv)
 .end
 
 # Local Variables:

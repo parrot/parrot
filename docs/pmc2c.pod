@@ -126,11 +126,13 @@ The High level language this PMC corresponds to.
 The basic parrot PMC type that this PMC correspond to for C<.HLL>
 usage. For example:
 
-    pmcclass TclInt hll Tcl maps Integer
+ pmclass TclInt hll Tcl maps Integer
 
 allows this PMC to automatically be used when autoboxing C<I> registers to PMCs.
 
-Requires the C<hll> flag.
+Requires the C<hll> flag. Note that multiple mappings can be specified:
+
+ pmclass myOrderedHash hll frob maps Hash maps Array
 
 =back
 
