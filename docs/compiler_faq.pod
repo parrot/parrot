@@ -31,7 +31,9 @@ you can get with:
 
 =head2 How do I embed source locations in my code for debugging?
 
-Right now you can't.
+Use C<#line 42 "file.pir"> for this. Note that this command must be in the first
+column; there must not be any leading space, otherwise the command is treated
+as a comment (due to the C<#> character).
 
 =head1 Subroutines
 
