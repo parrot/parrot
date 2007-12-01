@@ -26,25 +26,6 @@ Fortunately, the new design of S05 means that we don't really need
 return statements for developing action grammars, so this is no
 longer as much of a priority as it was.
 
-=item * inline PIR
-
-It would be nice to have a way to embed PIR instructions
-directly into NQP source files.  Even better would be to do
-with a Perl 6 compatible syntax.  One approach easily understood
-by non-Perl 6 programmers would be to use labeled blocks like
-
-    PIR {
-        $S0 = 'foo'
-        say $S0
-    }
-
-but this probably isn't valid Perl 6.  So, another approach would
-be to embed it in something that is syntactically a Perl 6 comment.
-
-(There's also the possibility of doing something like 'eval',
-but eval probably implies more of a runtime evaluation than
-inline code generation.)
-
 =item * Named argument (not param) support
 
 C<PAST> now supports named arguments in subroutines, we simply need
