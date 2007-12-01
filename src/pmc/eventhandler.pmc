@@ -220,11 +220,12 @@ Runs the contained code, if any; this is what handles the event.
         /* can't invoke on INTERP and can't return its result; this may not be
          * the right interpreter */
         if (e) {
-            unused = VTABLE_invoke(e->interp, e->code, next);
+            unused = VTABLE_invoke(PMC_data_typed(e->interp, Parrot_Interp),
+                    e->code, next);
             UNUSED(unused);
         }
 
-        return next;
+        return (opcode_t *)next;
     }
 }
 
