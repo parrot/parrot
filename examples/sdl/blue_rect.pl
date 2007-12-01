@@ -1,5 +1,8 @@
 # $Id$
 
+## no critic TestingAndDebugging::RequireUseStrict
+## no critic TestingAndDebugging::RequireUseWarnings
+
 =head1 TITLE
 
 blue_rect.pl - draw a blue rectangle using the SDL library and NQP
@@ -62,8 +65,8 @@ Copyright (C) 2004-2007, The Perl Foundation.
 =cut
 
 # Local Variables:
-#   mode: pir
+#   mode: cperl
+#   cperl-indent-level: 4
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
