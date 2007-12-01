@@ -138,8 +138,10 @@ An interpreter in which to execute this task.
         else
             core_struct->birthtime = 0;
 
-        core_struct->codeblock = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
-        core_struct->interp    = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
+        core_struct->codeblock =
+            VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
+        core_struct->interp =
+            VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
     }
 
 /*
