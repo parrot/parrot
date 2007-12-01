@@ -7,14 +7,43 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+
+=head1 NAME
+
+compilers/pirc/pirc.c
+
+=head1 DESCRIPTION
+
+TODO: Not yet documented!!!
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 typedef enum arg_flags {
     FLAG_PREPROCESS = 0x01,
     FLAG_ONLY_HEREDOC = 0x02,
 
 } arg_flag;
 
-#define SET_FLAG(obj,flag)  obj |= flag
-#define TEST_FLAG(obj,flag) obj & flag
+#define SET_FLAG(obj, flag)  obj |= flag
+#define TEST_FLAG(obj, flag) obj & flag
+
+/*
+
+=item C<static void
+print_help(void)>
+
+Prints help message and usage information
+
+=cut
+
+*/
 
 static void
 print_help(void) {
@@ -25,7 +54,7 @@ print_help(void) {
         "  -E        pre-process only, do not parse\n"
         "  -H        only heredoc processing\n"
       /*"  -o <file> write output to the specified file\n" */
-        );
+        "");
 }
 
 /*
@@ -109,6 +138,14 @@ main(int argc, char *argv[]) {
     free(command);
     return 0;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 
 /*
