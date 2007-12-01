@@ -26,6 +26,7 @@ This is a complete rewrite of the parser for the PIR language.
 #include "pirparser.h"
 #include "pircompiler.h"
 #include "pircompunit.h"
+#include "pirsymbol.h"
 
 /* prevent inclusion of <unistd.h> on windows */
 #define YY_NO_UNISTD_H
@@ -219,8 +220,7 @@ extern YY_DECL;
              string_object
              invokable
              opt_ret_cont
-
-%type <targ> reg
+             reg
              pasm_reg
              target
              result_target
@@ -252,8 +252,10 @@ extern YY_DECL;
 %type <expr> expression1
              expression
              key
+             keylist
              pasm_expression
              other_op_args
+             other_op_arg
              keys
 
 %type <ival> has_unique_reg
@@ -281,7 +283,7 @@ extern YY_DECL;
 
 %type <fixme> assignment_tail
               assignment_expression
-              keylist
+
               first_op_arg
               long_invocation_statement
               short_return_statement
@@ -371,7 +373,7 @@ namespace_id: TK_STRINGC                                   { $$ = $1; }
 
 /* Sub definition */
 
-sub_definition: ".sub" sub_id                              { new_sub(lexer, $2); }
+sub_definition: ".sub" sub_id                              { new_subr(lexer, $2); }
                 sub_flags "\n"                             { set_sub_flag(lexer, $4); }
                 parameters
                 instructions
@@ -522,7 +524,7 @@ first_op_arg: pasm_expression                              { add_operand(lexer, 
 
 /* later arguments can be either an expression or a keylist. */
 other_op_args: /* empty */                                 {  }
-             | other_op_args ',' other_op_arg              { add_operand(lexer, $1); }
+             | other_op_args ',' other_op_arg              { add_operand(lexer, $3); }
              ;
 
 other_op_arg: pasm_expression
@@ -545,11 +547,9 @@ separator: ';'                                             { $$ = 0; }
 
 
 conditional_statement: if_type condition then identifier "\n"
-                                                           { /**/
+                                                           { /* it was "unless", so "invert" the opcode */
                                                              if ($1 > 0) {
-                                                                /* it was "unless", so we need to
-                                                                   "invert" the opcode
-                                                                 */
+
                                                                 invert_instr(lexer);
                                                              }
                                                              add_operand(lexer, expr_from_ident($4));
@@ -693,7 +693,7 @@ method: invokable
       | string_object
       ;
 
-invokable: identifier                                      { $$ = target_from_ident($1); }
+invokable: identifier                                      { $$ = target_from_ident($1); find_target(lexer, $1);}
          | TK_SYM_PREG                                     { $$ = reg(PMC_TYPE, $1, !IS_PASM_REG); }
          | TK_PASM_PREG                                    { $$ = reg(PMC_TYPE, $1, IS_PASM_REG); }
          ;

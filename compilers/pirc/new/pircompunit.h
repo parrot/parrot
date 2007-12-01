@@ -158,7 +158,7 @@ typedef struct expression {
  * return continuation.
  */
 typedef struct target {
-    pir_type type;
+    pir_type    type;
     char       *name;  /* if this is a symbolic variable */
     int         regno; /* if this is a symbolic register */
     int         color; /* for register allocation */
@@ -170,7 +170,7 @@ typedef struct target {
 } target;
 
 
-/* todo: possibly unify expression and argument. */
+
 
 
 /* function arguments or return values, but a return value is just
@@ -195,13 +195,11 @@ typedef struct argument {
  */
 typedef struct invocation {
     invoke_type type;
-    target *object;
-    target *sub;
-    target *retcc;
-
-    target   *results;
-    argument *arguments;
-
+    target     *object;
+    target     *sub;
+    target     *retcc;
+    target     *results;
+    argument   *arguments;
 
 } invocation;
 
@@ -289,7 +287,7 @@ struct lexer_state;
 
 void set_sub_outer(struct lexer_state *lexer, char *outersub);
 void set_sub_vtable(struct lexer_state *lexer, char *vtablename);
-void new_sub(struct lexer_state *lexer, char *subname);
+void new_subr(struct lexer_state *lexer, char *subname);
 
 void set_param_named(target *t, char *alias);
 void add_instr(struct lexer_state *lexer, char *label, instruction *instr);
@@ -340,7 +338,7 @@ void define_const(struct lexer_state *lexer, constant *var, int is_globalconst);
 
 void set_invocation_args(invocation *inv, argument *args);
 void set_invocation_results(invocation *inv, target *results);
-void declare_local(struct lexer_state *lexer, pir_type type, target *list);
+
 void set_lex_flag(target *t, char *lexname);
 void invert_instr(struct lexer_state *lexer);
 void assign(struct lexer_state *lexer, rhs_type type, ...);

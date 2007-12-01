@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include "pircompunit.h"
 #include "pircompiler.h"
+#include "pirsymbol.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +27,26 @@
 
 
 #define out stderr
+
+
+void
+parse_error(struct lexer_state *lexer, char *message, ...) {
+    va_list arg_ptr;
+    va_start(arg_ptr, message);
+    fprintf(stderr, "Parse error (line %d:%d): ", lexer->line_nr, lexer->line_pos);
+    vfprintf(stderr, message, arg_ptr);
+    va_end(arg_ptr);
+    lexer->parse_errors++;
+}
+
+target *
+find_target(struct lexer_state *lexer, char * const name) {
+    target *t = find_symbol(lexer, name);
+    if (t == NULL) { /* not declared */
+        parse_error(lexer, "symbol '%s' was not declared\n", name);
+    }
+    return t;
+}
 
 /*
 
@@ -69,7 +90,7 @@ their thing.
 
 */
 void
-new_sub(struct lexer_state *lexer, char *subname) {
+new_subr(struct lexer_state *lexer, char *subname) {
     subroutine *newsub = (subroutine *)malloc(sizeof (subroutine));
     assert(newsub != NULL);
 
@@ -108,7 +129,9 @@ new_instr(struct lexer_state *lexer) {
 
 }
 
-
+/* Create a new target node. The node's next pointer is initialized to
+   itself.
+ */
 target *
 new_target(pir_type type, char *name) {
     target *t = (target *)calloc(1, sizeof (target));
@@ -207,10 +230,6 @@ load_library(struct lexer_state *lexer, char *library) {
 
 }
 
-void
-declare_local(struct lexer_state *lexer, pir_type type, target *list) {
-
-}
 
 
 
@@ -335,6 +354,7 @@ assign(struct lexer_state *lexer, rhs_type type, ...) {
 
     switch (type) {
         case RHS_BINOP: {
+            /* x = a binop b -> binop x, a, b */
             expression *left_op, *right_op;
             /* get instruction */
             lexer->subs->statements->instr.ins = new_instruction(va_arg(arg_ptr, char *));
@@ -346,13 +366,14 @@ assign(struct lexer_state *lexer, rhs_type type, ...) {
             break;
         }
         case RHS_SIMPLE: {
-            /* get only the rhs expression */
+            /* x = y -> set x, y */
             expression *operand = va_arg(arg_ptr, expression *);
+            lexer->subs->statements->instr.ins = new_instruction("set");
             add_operand(lexer, operand);
             break;
         }
         case RHS_UNOP: {
-            /* get instruction */
+            /* x = unop y -> unop x, y */
             expression *operand;
             lexer->subs->statements->instr.ins = new_instruction(va_arg(arg_ptr, char *));
             /* get 1 operand */
@@ -451,7 +472,7 @@ invoke(struct lexer_state *lexer, invoke_type type, ...) {
     va_list arg_ptr;
 
     invocation *inv = new_invocation();
-    SET_FLAG(inv->type, type);
+    inv->type = type;
 
     va_start(arg_ptr, type);
     switch (type) {
@@ -494,7 +515,6 @@ target_from_string(char *str) {
 target *
 target_from_ident(char *id) {
     target *var = new_target(UNKNOWN_TYPE, id);
-
     return var;
 
 }
@@ -502,7 +522,7 @@ target_from_ident(char *id) {
 
 void
 set_lex_flag(target *t, char *lexname) {
-
+    /* TODO */
 }
 
 void
@@ -523,6 +543,7 @@ set_hll_map(char *stdtype, char *maptype) {
 
 void
 add_operand(struct lexer_state *lexer, expression *operand) {
+    assert(lexer->subs->statements->instr.ins);
     if (lexer->subs->statements->instr.ins->operands == NULL) {
         lexer->subs->statements->instr.ins->operands = operand;
     }
@@ -614,8 +635,9 @@ print_args(argument *args) {
             print_expr(iter->value);
             iter = iter->next;
         }
-        while (iter != args);
+        while (iter != args->next);
     }
+    printf("\n");
 }
 
 void
@@ -627,6 +649,9 @@ print_expressions(expression *expr) {
 
     /* set iterator to first item */
     iter = expr->next;
+    /* do something with the iterator while it doesn't point
+     * to the first item.
+     */
     do {
         print_expr(iter);
         iter = iter->next;
@@ -655,9 +680,10 @@ print_invocation(invocation *inv) {
     switch (inv->type) {
 
         case CALL_PCC:
-            printf("   get_results");
+            printf("   set_args");
             printf("\n");
-            printf("   invoke");
+            printf("   set_p_pc P%d, %s\n", 0, inv->sub->name);
+            printf("   invokecc");
             break;
         case CALL_RET:
             printf("   set_returns");
@@ -691,10 +717,10 @@ print_invocation(invocation *inv) {
             fprintf(stderr, "Unknown invocation type (%d)\n", inv->type);
             exit(EXIT_FAILURE);
     }
-
-   // if (inv->results) print_target(inv->results);
-   // if (inv->arguments) print_args(inv->arguments);
-
+/*
+    if (inv->results) print_target(inv->results);
+    if (inv->arguments) print_args(inv->arguments);
+*/
     puts("");
 
 }
