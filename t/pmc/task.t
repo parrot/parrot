@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -72,6 +72,57 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
   .end
 CODE
 created
+inprocess
+event
+10
+7405
+100000000
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
+  .sub main :main
+    .local pmc data
+    data = new 'Hash'
+
+    $P2 = new 'String'
+    $P2 = 'inprocess'
+    data['status'] = $P2
+
+    $P2 = new 'String'
+    $P2 = 'event'
+    data['type'] = $P2
+
+    $P2 = new 'Integer'
+    $P2 = 10
+    data['priority'] = $P2
+
+    $P2 = new 'Integer'
+    $P2 = 7405
+    data['id'] = $P2
+
+    $P2 = new 'Integer'
+    $P2 = 100000000
+    data['birthtime'] = $P2
+
+    $P0 = new 'Task', data
+
+    $P3 = getattribute $P0, 'status'
+    say $P3
+
+    $P3 = getattribute $P0, 'type'
+    say $P3
+
+    $P3 = getattribute $P0, 'priority'
+    say $P3
+
+    $P3 = getattribute $P0, 'id'
+    say $P3
+
+    $P3 = getattribute $P0, 'birthtime'
+    say $P3
+    end
+  .end
+CODE
 inprocess
 event
 10
