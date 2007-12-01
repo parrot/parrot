@@ -1,183 +1,123 @@
+# $Id$
 
 =head1 Deprecation in Parrot
 
 This is a list of currently deprecated features of Parrot.
 Every deprecation should have an associated RT ticket, but this
-is not the case yet [RT#41226].
+is not the case yet (See [RT #41226]). Each item indicates indicates the
+last release it's guaranteed to appear in. Items marked with a release
+of ??? are still deprecated, but a firm deadline for their removal has not
+yet been established.
 
-=head1 new object system
+=head1 new object system [post 0.5.0]
 
 The object system of Parrot is being overhauled. This touches some opcode
 and PIR syntax. So some deprecation can be found in pdd17_pmc.pod.
 
-=head1 PGE::P6Regex and pgc.pir
-
-In early 2007 there were a number of changes made to the Perl 6
-regular expression syntax (as given by Synopsis 5).  The new
-syntax is implemented via the PGE::Perl6Regex compiler, and the
-PGE::P6Regex compiler is now deprecated in favor of the new
-syntax.
-
-Similarly, the pgc.pir compiler (for grammars) is deprecated
-in favor of runtime/parrot/library/PGE/Perl6Grammar.{pir|pbc} .
-
-=head1 Deprecated C APIs
-
-Currently no C APIs are deprecated.
-
-=head1 Deprecated methods
-
-No methods are known to be deprecated.
-
-=head1 Deprecated ops
-
-From L<http://www.parrotcode.org/docs/ops/var.html>, the following ops are
-deprecated:
+=head1 vtable entries
 
 =over 4
 
-=item B<store_global>
+=item * C<hash> [post 0.5.1]
 
-=item B<find_global>
+See RT #42352.
 
-=item B<find_name>
+=item * C<new_from_string> [post 0.5.0]
 
-There are several variants of some of the above ops; all are deprecated,
-and are replaced by the ops {set,get}_[hll,root]_global.
+See RT #47011.
 
 =back
 
-From L<http://www.parrotcode.org/docs/ops/experimental.html>, the following ops
-are deprecated:
+=head1 opcodes
 
 =over 4
 
-=item B<new>(out PMC, in INT, in STR) (RT #47011)
+=item * C<store_global> [post 0.5.0]
 
-The VTABLE method 'new_from_string' will be removed.
+See RT #48016. Replace usage with set_[hll,root]_global variants.
+
+=item * C<find_global> [post 0.5.0]
+
+See RT #48018. Replace usage with get_[hll,root]_global variants.
+
+=item * C<find_name> [post 0.5.0]
+
+See RT #48020. Replace usage with ... ?
+
+=item * C<new>(out PMC, in INT, in STR) [post 0.5.0]
+
+See RT #47011.
+
+=item * C<instantiate> [post 0.5.0]
+
+See RT #48022.
+
+=item * C<getclass> [post 0.5.0]
+
+See RT #47972. Future use should use the C<get_class> opcode.
+
+=item * C<get_mro> [post 0.5.0]
+
+See RT #47976.
+
+=item * C<print_newline> [post 0.5.1]
+
+See RT #48010.
 
 =back
 
-They will be removed after the 0.5.0 release.
-
-=head1 Deprecated Class Features
+=head1 Class Features
 
 =over 4
 
-=item 1
+=item * Integer Type IDs [post 0.5.0]
 
-Type IDs will go away after 0.5.0.
-Instead of:
-
-  $P0 = new Integer
-
-or
-
-  $P0 = new .Integer
-
-we are moving to use:
+See RT #48024. Instead of C<$P0 = new Integer> or <$P0 = new .Integer>, 
+use the following syntax, which works for both PMCs and objects.
 
   $P0 = new 'Integer'
 
-=item 2
+=item * PMC union struct [post 0.5.0]
 
-The experimental C<instantiate> opcode is deprecated and will be removed after
-the 0.5.0 release.
-
-(The C<instantiate> vtable function becomes core in 0.5.0, but is accessed via
-the "new" opcode for the PMCs that use it.)
-
-=item 3
-
-The C<getclass> opcode is deprecated (replaced by the C<get_class> opcode) and
-will be removed after the 0.5.0 release. (RT#47972)
-
-=item 4
-
-The C<get_mro> opcode is deprecated (replaced by C<inspect>) and will be
-removed after the 0.5.0 release. (RT#47976)
-
-=item 5
-
-The PMC union struct is deprecated and will be removed once all core PMCs have
-been updated.
+See RT #48014. This will be removed once all core PMCs have been updated.
 
 =back
 
-=head1 Deprecated Exception Features
+=head1 Exceptions
 
 =over 4
 
-=item 1
+=item * Keyed access to exception attributes [post 0.5.1]
 
-Attributes on exception objects will no longer be accessible by integer or
-string key, use C<getattribute> and C<setattribute> instead. Slated for removal
-in the 0.5.2 release.
+See RT #48012. Attributes on exception objects will no longer be accessible 
+by integer or string key, use C<getattribute> and C<setattribute> instead. 
 
 =back
 
-=head1 deprecated PIR syntax
+=head1 PIR syntax
 
 =over 4
 
-=item C<.HLL_map INTC, INTC> will become C<.HLL_map STRINGC, STRINGC>
+=item * C<.HLL_map INTC, INTC> [post ???]
+
+See RT #45453. This will become C<.HLL_map STRINGC, STRINGC> 
 
 As the dot-prefix type notation (for instance, '.Integer') is disappearing, the
 C<.HLL_map> syntax will also be updated to take strings to indicate the types.
-[RT#45453].
 
+=item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
 
-=item .namespace [ "a" .. "b" ]
+See RT #4671.
 
-IMCC currently allows for writing:
+=item * C<.emit> / C<.eom> [post 0.5.1]
 
-.namespace ["a" .. "b"]
+See RT #47846.  Any C<.emit>/C<.eom> blocks should be replaced with 
+Anonymous C<.sub>s 
 
-This does not make sense, and this slicing syntax will be deprecated.
+=item * Assignment syntax with opcodes [post ???]
 
-See [RT#46715]
-
-=item .emit / .eom
-
-The .emit and .eom directives that can be used to emit pure pasm instructions
-in a PIR file, without using a .sub are deprecated, and will be removed after
-the 0.5.1 release.
-
-See [RT#47846] for rationale.
-
-=back
-
-=head1 Deprecated compiler tools
-
-=over 4
-
-=item pgc.pir
-
-The pgc.pir compiler for P6 grammars (pre-2007 regex syntax) is deprecated.
-Switch to using the new Perl6Grammar.pir compiler instead, and the
-Perl6Regex syntax.
-
-=item compilers/PAST-pm
-
-The compiler tools in compilers/PAST-pm/ and
-runtime/parrot/library/Parrot/HLLCompiler.pir are deprecated
-in favor of the new versions in the Parrot Compiler Toolkit
-( compilers/pct/ ).  In particular, the PAST representation in
-PCT follows the specification given by pdd26 .
-
-=back
-
-=head1 FUTURE changes
-
-Not yet deprecated, but it's recommended to use the new syntax and
-gradually change the old.
-
-=over 4
-
-=item Assignment syntax with opcodes [RT#36283]
-
-When the first argument of an opcode is C<OUT>, then the assignment syntax
-will be allowed, as it is today.
+See RT #36283.  When the first argument of an opcode is C<OUT>, then 
+the assignment syntax will be allowed, as it is today.
 
 In any other case (i.e. C<INOUT>, C<IN>), this will become
 a syntax error. For example:
@@ -189,5 +129,33 @@ Will have to be:
 
     print $S0
     substr $P0, 1, 2, "x"
+
+
+=back
+
+=head1 Compiler tools
+
+=over 4
+
+=item * pgc.pir [post 0.5.0]
+
+See RT #48026. The pgc.pir compiler for P6 grammars (pre-2007 regex syntax)
+is deprecated.  Switch to using the new PGE::Perl6Grammar.pir compiler instead,
+and the Perl6Regex syntax.
+
+=item * PGE::P6Regex [post 0.5.0]
+
+See RT #48028. In early 2007 there were a number of changes made to the Perl
+6 regular expression syntax (as given by Synopsis 5).  The new syntax is
+implemented via the PGE::Perl6Regex compiler, and the PGE::P6Regex compiler
+is now deprecated in favor of the new syntax.
+
+=item * compilers/PAST-pm [post 0.5.1]
+
+See RT #48030. The compiler tools in compilers/PAST-pm/ and
+runtime/parrot/library/Parrot/HLLCompiler.pir are deprecated
+in favor of the new versions in the Parrot Compiler Toolkit
+( compilers/pct/ ).  In particular, the PAST representation in
+PCT follows the specification given by pdd26 .
 
 =back
