@@ -24,8 +24,8 @@ use_ok('config::auto::warnings');
 my $step = 'dummy';
 
 my $conf = Parrot::Configure->new;
-$conf->data->set('cc', 'cc'); # XXX Cannot assume there iss a compiler 'cc'
-$conf->data->set('ccflags', '-I/usr/include'); # XXX Cannot assume this.
+$conf->data->set('cc', 'cc'); # RT#47395 Cannot assume there is a compiler 'cc'
+$conf->data->set('ccflags', '-I/usr/include'); # RT#47395 Cannot assume this.
 
 my $cwd = cwd();
 my $warning;
@@ -33,7 +33,7 @@ my $warning;
 TODO: {
     # http://rt.perl.org/rt3/Ticket/Display.html?id=47395
     local $TODO = q<Not all compilers support -Wall>;
-    $warning = "-Wall"; # XXX Cannot assume all compilers accept -Wall.
+    $warning = "-Wall"; # RT#47395 Cannot assume all compilers accept -Wall.
     {
         my $verbose = 0;
         my $rv      = auto::warnings::try_warning($step, $conf, $warning);
