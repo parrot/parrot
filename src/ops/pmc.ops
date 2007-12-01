@@ -83,9 +83,8 @@ op new(out PMC, in INT, in PMC) {
 }
 
 op new(out PMC, in STR) {
-    PMC *hll_ns, *ns;
-    STRING *classname = $2;
-    PMC *classobj = Parrot_oo_get_class_str(interp, classname);
+    STRING * const classname = $2;
+    PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
 
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
@@ -102,9 +101,8 @@ op new(out PMC, in STR) {
 }
 
 op new(out PMC, in STR, in PMC) {
-    PMC *hll_ns, *ns;
-    STRING *classname = $2;
-    PMC *classobj = Parrot_oo_get_class_str(interp, classname);
+    STRING * const classname = $2;
+    PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
 
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, $3);
@@ -121,13 +119,13 @@ op new(out PMC, in STR, in PMC) {
 }
 
 inline op new(out PMC, in PMC) :object_classes {
-    PMC *classname_key = $2;
-    PMC *classobj = Parrot_oo_get_class(interp, classname_key);
+    PMC * const classname_key = $2;
+    PMC * const classobj = Parrot_oo_get_class(interp, classname_key);
 
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        INTVAL type = pmc_type_p(interp, classname_key);
+        const INTVAL type = pmc_type_p(interp, classname_key);
         if (type <= 0)
             real_exception(interp, NULL, NO_CLASS,
                 "Class '%Ss' not found", readable_name(interp, classname_key));
@@ -137,13 +135,13 @@ inline op new(out PMC, in PMC) :object_classes {
 }
 
 op new(out PMC, in PMC, in PMC) {
-    PMC *classname_key = $2;
-    PMC *classobj = Parrot_oo_get_class(interp, classname_key);
+    PMC * const classname_key = $2;
+    PMC * const classobj = Parrot_oo_get_class(interp, classname_key);
 
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, $3);
     else {
-        INTVAL type = pmc_type_p(interp, classname_key);
+        const INTVAL type = pmc_type_p(interp, classname_key);
         if (type <= 0)
             real_exception(interp, NULL, NO_CLASS,
                 "Class '%Ss' not found", readable_name(interp, classname_key));
@@ -305,7 +303,7 @@ PMC in $1.
 =cut
 
 op find_method(out PMC, invar PMC, in STR) {
-    opcode_t * resume = expr NEXT();
+    opcode_t * const resume = expr NEXT();
     $1 = $2->vtable->find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
         real_exception(interp, resume, METH_NOT_FOUND,
