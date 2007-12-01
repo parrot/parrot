@@ -64,13 +64,17 @@ our @potential_warnings = qw(
     -Winit-self
     -Winline
     -Winvalid-pch
+    -Wlogical-op
     -Wmain
     -Wmissing-braces
     -Wmissing-declarations
     -Wmissing-field-initializers
+    -Wmissing-format-attribute
+    -Wmissing-include-dirs
     -Wmissing-prototypes
     -Wnested-externs
     -Wno-accumulate-outgoing-args
+    -Wno-endif-labels
     -Wno-shadow
     -Wno-unused
     -Wnonnull
@@ -86,8 +90,10 @@ our @potential_warnings = qw(
     -Wstrict-prototypes
     -Wswitch
     -Wswitch-default
+    -Wtrigraphs
     -Wundef
     -Wunknown-pragmas
+    -Wvariadic-macros
     -Wwrite-strings
     -Wnot-a-real-warning
 );
@@ -98,14 +104,11 @@ our @cage_warnings = qw(
     -Werror-implicit-function-declaration
     -Wformat=2
     -Wlarger-than-4096
-    -Wlogical-op
     -Wlong-long
     -Wmissing-format-attribute
-    -Wmissing-include-dirs
     -Wmissing-noreturn
     -Wno-deprecated-declarations
     -Wno-div-by-zero
-    -Wno-endif-labels
     -Wno-format-extra-args
     -Wno-import
     -Wno-multichar
@@ -114,14 +117,12 @@ our @cage_warnings = qw(
     -Wredundant-decls
     -Wswitch-enum
     -Wsystem-headers
-    -Wtrigraphs
     -Wunreachable-code
     -Wunused-function
     -Wunused-label
     -Wunused-parameter
     -Wunused-value
     -Wunused-variable
-    -Wvariadic-macros
     );
 
 our $verbose;
