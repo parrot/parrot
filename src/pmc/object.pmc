@@ -516,8 +516,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 */
 
     void visit(visit_info *info) {
-        INTVAL i, n;
-        Parrot_Object * obj_data = PARROT_OBJECT(SELF);
+        Parrot_Object * const obj_data = PARROT_OBJECT(SELF);
         PMC **pos;
 
         /* 1) visit class */
@@ -581,7 +580,7 @@ Called after the object has been thawed.
 */
 
     void thawfinish(visit_info *info) {
-        Parrot_Object * obj_data = PARROT_OBJECT(SELF);
+        Parrot_Object * const obj_data = PARROT_OBJECT(SELF);
 
         /* Set custom DOD mark and destroy on the object. */
         PObj_custom_mark_SET(SELF);
