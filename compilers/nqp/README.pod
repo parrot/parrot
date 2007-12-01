@@ -63,7 +63,7 @@ language constructs that we explicitly know will be supported
 
 =item * for                   # iterative loop
 
-=item PIR q<>, PIR q:to:<END> # inline PIR
+=item * PIR q<>, PIR q:to:<END> # inline PIR
 
 =back
 
