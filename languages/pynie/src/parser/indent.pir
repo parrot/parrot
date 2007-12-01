@@ -17,7 +17,7 @@ src/parser/indent.pir - Helper parsing function for Python indents
     .local pmc optable, ws
     optable = get_global '$optable'
     ws = get_global 'ws'
-    setattribute optable, "PGE::OPTable\x0&!ws", ws
+    setattribute optable, "&!ws", ws
     .return ()
 .end
 
