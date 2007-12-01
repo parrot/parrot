@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 blue_rect.pl - draw a blue rectangle using the SDL library and NQP
