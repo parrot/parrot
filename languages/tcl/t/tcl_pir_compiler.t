@@ -78,8 +78,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Verify HLL autoboxing: Int" );
 .sub _main :main
   $P1 = test()
   $S1 = typeof $P1
-  print $S1
-  print_newline
+  say $S1
 .end
 .sub test
   .return (1)
@@ -93,8 +92,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Verify HLL autoboxing: String" );
 .sub _main :main
   $P1 = test()
   $S1 = typeof $P1
-  print $S1
-  print_newline
+  say $S1
 .end
 .sub test
   .return ("coke")
@@ -108,8 +106,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Verify HLL autoboxing: Float" );
 .sub _main :main
   $P1 = test()
   $S1 = typeof $P1
-  print $S1
-  print_newline
+  say $S1
 .end
 .sub test
   .return (8.14)
