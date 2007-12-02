@@ -74,16 +74,12 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
     .local pmc pmc1
     pmc1 = new "WmlsBoolean"
     .local string str1
-    str1 = classname pmc1
-    print str1
-    print "\n"
     str1 = typeof pmc1
     print str1
     print "\n"
     end
 .end
 CODE
-WmlsBoolean
 WmlsBoolean
 OUTPUT
 
@@ -115,7 +111,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check clone' );
     pmc2 = clone pmc1
     pmc1 = 0
     .local string str1
-    str1 = classname pmc2
+    str1 = typeof pmc2
     print str1
     print "\n"
     .local string str2
