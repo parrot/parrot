@@ -728,6 +728,67 @@ handler.
 .end
 
 
+=item xor(PAST::Op node)
+
+A short-circuiting exclusive-or operation.  Each child is evaluated,
+if exactly one child evaluates to true then its value is returned,
+otherwise return Undef.  Short-circuits with Undef as soon as
+a second child is found that evaluates as true.
+
+=cut
+
+.sub 'xor' :method :multi(_,['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+    $S0 = ops.'unique'('$P')
+    ops.'result'($S0)
+
+    .local pmc labelproto, endlabel, falselabel
+    labelproto = get_hll_global ['POST'], 'Label'
+    falselabel = labelproto.'new'('name'=>'xor_false')
+    endlabel = labelproto.'new'('name'=>'xor_end')
+
+    .local pmc iter, apast, apost, i, t, u
+    i = ops.'unique'('$I')
+    t = ops.'unique'('$I')
+    u = ops.'unique'('$I')
+    iter = node.'iterator'()
+    apast = shift iter
+    apost = self.'post'(apast, 'rtype'=>'P')
+    ops.'push'(apost)
+    ops.'push_pirop'('set', ops, apost)
+    ops.'push_pirop'('istrue', t, apost)
+  middle_child:
+    .local pmc bpast, bpost
+    bpast = shift iter
+    bpost = self.'post'(bpast, 'rtype'=>'P')
+    ops.'push'(bpost)
+    ops.'push_pirop'('istrue', u, bpost)
+    ops.'push_pirop'('and', i, t, u)
+    ops.'push_pirop'('if', i, falselabel)
+    unless iter goto last_child
+    .local pmc truelabel
+    truelabel = labelproto.'new'('name'=>'xor_true')
+    ops.'push_pirop'('if', t, truelabel)
+    ops.'push_pirop'('set', ops, bpost)
+    ops.'push_pirop'('set', t, u)
+    ops.'push'(truelabel)
+    goto middle_child
+  last_child:
+    ops.'push_pirop'('if', t, endlabel)
+    ops.'push_pirop'('set', ops, bpost)
+    ops.'push_pirop'('goto', endlabel)
+    ops.'push'(falselabel)
+    ops.'push_pirop'('new', ops, '"Undef"')
+    ops.'push'(endlabel)
+    .return (ops)
+.end
+
+
 =item bind(PAST::Op node)
 
 Return the POST representation of a C<PAST::Op>
