@@ -58,7 +58,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
                 $P3  = cnode[0]
                 past_expression = tree.'get'('past', $P3, 'Plumhead::Grammar::gen_past')
                 past_echo = new 'PAST::Op'
-                past_echo.'init'( past_expression, 'node'=> node, 'pasttype' => 'call', 'name' => 'print' )  
+                past_echo.'init'( past_expression, 'node'=> node, 'pasttype' => 'call', 'name' => 'echo' )  
                 past.'push'(past_echo)
                 goto iter_loop_1
             no_echo:
@@ -362,7 +362,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
             if null $P2 goto no_minus
                 past = new 'PAST::Op'
                 past_expression = tree.'get'('past', $P1, 'Plumhead::Grammar::gen_past')
-                past.init( past_expression, 'node' => $P0, 'name' => 'prefix:-' )
+                past.init( past_expression, 'node' => $P0, 'name' => 'prefix:-', 'pirop' => 'n_neg' )
                 goto handled_expression
             no_minus:
             $P2 = $P1['expression']
@@ -413,7 +413,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
         past_val.'init'( 'name' => val, 'returns' => 'String' )                              
 
         past = new 'PAST::Op'
-        past.'init'( past_val, 'node'=> node, 'pasttype' => 'call', 'name' => 'print' )  
+        past.'init'( past_val, 'node'=> node, 'pasttype' => 'call', 'name' => 'echo' )  
         goto handled_expression
     no_SEA:
 
