@@ -241,6 +241,8 @@ needed for compiling regexes.
     optable.newtok('infix:&',  'looser'=>'infix:', 'nows'=>1, 'match'=>'PGE::Exp::Conj')
     optable.newtok('infix:|',  'looser'=>'infix:&', 'nows'=>1, 'match'=>'PGE::Exp::Alt')
     optable.newtok('prefix:|', 'equiv'=>'infix:|', 'nows'=>1, 'match'=>'PGE::Exp::Alt')
+    optable.newtok('infix:||', 'equiv'=>'infix:|', 'nows'=>1, 'match'=>'PGE::Exp::Alt')
+    optable.newtok('prefix:||', 'equiv'=>'infix:|', 'nows'=>1, 'match'=>'PGE::Exp::Alt')
 
     optable.newtok('infix::=', 'tighter'=>'infix:', 'assoc'=>'right', 'match'=>'PGE::Exp::Alias')
     optable.newtok('infix:=', 'tighter'=>'infix:', 'assoc'=>'right', 'match'=>'PGE::Exp::Alias')
