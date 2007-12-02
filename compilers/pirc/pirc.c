@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 /*
 
@@ -15,7 +16,10 @@ compilers/pirc/pirc.c
 
 =head1 DESCRIPTION
 
-TODO: Not yet documented!!!
+This program is the PIR compiler driver. It invokes the three PIR compilation
+phases, consisting of the heredoc preprocessor, the macro processor and
+the pure PIR compiler. Invocation is done using calls to C<system()>.
+
 
 =head2 Functions
 
@@ -58,8 +62,18 @@ print_help(void) {
 }
 
 /*
- * Main driver for the PIR compiler.
- */
+
+=item C<int
+main(int argc, char *argv[])>
+
+Depending on the program arguments, invoke the PIR compiler phases.
+There are three options: run only the heredoc preprocessor, do only
+pre-processing (heredoc + macro processing), or invoke all three
+compilation phases.
+
+=cut
+
+*/
 int
 main(int argc, char *argv[]) {
     char * command;
@@ -67,7 +81,7 @@ main(int argc, char *argv[]) {
     char const * const format0 = "heredoc\\hdocprep %s | macro\\macroparser | new\\main";
     char const * const format1 = "heredoc\\hdocprep %s";
     char const * const format2 = "heredoc\\hdocprep %s | macro\\macroparser";
-    char *outfile = NULL;
+    /* char *outfile = NULL; */
 
     arg_flag flags = 0;
 
@@ -87,7 +101,7 @@ main(int argc, char *argv[]) {
             case 'H':
                 SET_FLAG(flags, FLAG_ONLY_HEREDOC);
                 break;
-            /*
+            /* handle output. add redirection of output to the formatx strings.
             case 'o':
                  if (argc > 1) {
                     argc--;
@@ -116,22 +130,26 @@ main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    /* based on the program arguments, invoke the selected compilation phases. */
     switch (flags) {
         case FLAG_PREPROCESS:
             command = (char *)calloc(strlen(argv[0]) + strlen(format2) + 1, sizeof (char));
+            assert(command);
             sprintf(command, format2, argv[0]);
             break;
         case FLAG_ONLY_HEREDOC:
             command = (char *)calloc(strlen(argv[0]) + strlen(format1) + 1, sizeof (char));
+            assert(command);
             sprintf(command, format1, argv[0]);
             break;
         default:
             command = (char *)calloc(strlen(argv[0]) + strlen(format0) + 1, sizeof (char));
+            assert(command);
             sprintf(command, format0, argv[0]);
             break;
     }
 
-    /* execute */
+    /* execute the command*/
     system(command);
 
     /* clean up and exit */
