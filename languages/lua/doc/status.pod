@@ -51,7 +51,7 @@ with F<compilers/past-pm/POST/Node.pir>.
 =item HLLCompiler
 
 This Lua compiler extends the base class
-F<runtime/parrot/library/Parrot/HLLCompiler.pir>.
+F<compilers/pct/src/HLLCompiler.pir>.
 
 =back
 
