@@ -386,6 +386,7 @@ struct parrot_interp_t {
 
     STRING **const_cstring_table;             /* CONST_STRING(x) items */
 
+    PMC *scheduler;                           /* concurrency scheduler */
     struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;   /* exit.c */
     int sleeping;                             /* used during sleep in events */
