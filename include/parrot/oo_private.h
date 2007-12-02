@@ -56,7 +56,7 @@ STRING* Parrot_Class_get_fq_classname(Parrot_Interp interp, Parrot_Class *class_
 typedef enum {
     CLASS_instantiated_FLAG      = PObj_private0_FLAG,
     CLASS_is_anon_FLAG           = PObj_private1_FLAG,
-    CLASS_has_alien_parents_FLAG = PObj_private2_FLAG,
+    CLASS_has_alien_parents_FLAG = PObj_private2_FLAG
 } class_flags_enum;
 
 #define CLASS_get_FLAGS(o) (PObj_get_FLAGS(o))
