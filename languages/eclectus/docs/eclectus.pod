@@ -1,3 +1,5 @@
 # $Id$
 
 See http://scheme2006.cs.uchicago.edu/11-ghuloum.pdf
+
+See also http://www.cs.indiana.edu/%7Eaghuloum/ikarus/index.html
