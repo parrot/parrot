@@ -269,6 +269,20 @@ Generate PIR code which can be used to generate our value
    .return compiler(argnum, self)
 .end
 
+=head2 _dump
+
+This method enables Data::Dumper to work on us; shouldn't need it, because
+we're subclassing String...
+
+=cut
+
+.sub '__dump' :method
+  .param pmc dumper
+  .param string label
+  print self
+.end
+
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
