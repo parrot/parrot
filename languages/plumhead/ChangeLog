@@ -1,5 +1,8 @@
 # $Id$
 
+2007-12-02    Bernhard Schmalhofer
+        * Port to PCT
+
 2006-12-31    Bernhard Schmalhofer
         * Add stub for the partridge variant
         * Add the file ChangeLog, and add fill it with info from 'svn log'

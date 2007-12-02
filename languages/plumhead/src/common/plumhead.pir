@@ -10,15 +10,23 @@ plumhead.pir - four variants of PHP on Parrot
 
    ./parrot languages/plumhead/plumhead.pbc t.php
 
+   ./parrot languages/plumhead/plumhead.pbc --variant=antlr t.php
+
+   ./parrot languages/plumhead/plumhead.pbc --variant=phc t.php
+
+   ./parrot languages/plumhead/plumhead.pbc --variant=pct t.php
+
+   ./parrot languages/plumhead/plumhead.pbc --variant=yacc t.php
+
 =head1 DESCRIPTION
 
 Driver for four variants of PHP on Parrot.
 
 =head1 Variants
 
-=head2 Plumhead partridge
+=head2 Plumhead pct
 
-Parse PHP with the Parrot compiler tools. This is the default variant.
+Parse PHP with the Parrot compiler toolkit. This is the default variant.
 
 =head2 Plumhead phc
 
@@ -51,26 +59,26 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 .include "library/dumper.pir"
 
 .sub '__onload' :load :init
-    load_bytecode 'Getopt/Obj.pbc'
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-    load_bytecode 'PAST-pm.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+    load_bytecode 'PCT.pbc'
     load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
     load_bytecode 'CGI/QueryHash.pbc'    
     load_bytecode 'dumper.pbc'                                      
+    load_bytecode 'Getopt/Obj.pbc'
     
 
     # import PGE::Util::die into Plumhead::Grammar
     $P0 = get_hll_global ['PGE::Util'], 'die'
     set_hll_global ['Plumhead::Grammar'], 'die', $P0
 
-    $P0 = new [ 'HLLCompiler' ]
-    $P0.'language'('Plumhead')
-    $P0.'parsegrammar'('Plumhead::Grammar')
-    $P0.'astgrammar'('Plumhead::PAST::Grammar')
+    .local pmc plumhead_compiler
+    plumhead_compiler = new [ 'PCT::HLLCompiler' ]
+    plumhead_compiler.'language'('Plumhead')
+    plumhead_compiler.'parsegrammar'('Plumhead::Grammar')
+    plumhead_compiler.'astgrammar'('Plumhead::PAST::Grammar')
 
 .end
 
@@ -95,11 +103,11 @@ GOT_PHP_SOURCE_FN:
     variant = opt['variant']
 
     if variant == 'antlr3'    goto VARIANT_ANTLR3
-    if variant == 'partridge' goto VARIANT_PARTRIDGE
+    if variant == 'pct'       goto VARIANT_PCT
     if variant == 'phc'       goto VARIANT_PHC
     if variant == 'yacc'      goto VARIANT_YACC
 
-VARIANT_PARTRIDGE:
+VARIANT_PCT:
     # look for subs in other namespaces                           
     .local pmc parse_get_sub, parse_post_sub   
     parse_get_sub  = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'         
@@ -116,15 +124,16 @@ VARIANT_PARTRIDGE:
     set_hll_global '$_POST', superglobal_POST                          
     #'_dumper'( superglobal_POST, 'POST' ) 
                                                                   
-    err_msg = 'Compiling and executing with partridge failed'
-    $P0 = compreg 'Plumhead'
+    err_msg = 'Compiling and executing with pct failed'
+    .local pmc plumhead_compiler
+    plumhead_compiler = compreg 'Plumhead'
 
     .local string target
     target = opt['target']
     unless target goto got_no_target
-        .return $P0.'evalfiles'(php_source_fn, 'target' => target )
+        .return plumhead_compiler.'evalfiles'(php_source_fn, 'target' => target )
     got_no_target:
-    .return $P0.'evalfiles'( php_source_fn )
+    .return plumhead_compiler.'evalfiles'( php_source_fn )
 
 VARIANT_PHC:
     err_msg = 'Creating XML-AST with phc failed'
@@ -171,7 +180,7 @@ EXECUTE_PAST_PIR:
     if ret goto ERROR
 
     # Clean up temporary files
-    .local pmc os
+    #.local pmc os
     #os = new .OS
     #os."rm"('plumhead_phc_ast.xml')
     #os."rm"('plumhead_past.xml')
@@ -214,7 +223,7 @@ FINISH:
     push getopts, 'f=s'
     push getopts, 'C'
     push getopts, 'variant=s'          # switch between variants
-    push getopts, 'target=s'           # relevant for 'Plumhead partridge'
+    push getopts, 'target=s'           # relevant for 'Plumhead pct'
 
     .local pmc opt
     opt = getopts."get_options"(argv)
@@ -256,9 +265,9 @@ n_deb:
 
 .namespace [ 'Plumhead::Grammar' ]
 
-.include 'src/partridge/Plumhead_gen.pir'
+.include 'src/pct/Plumhead_gen.pir'
 
-.include 'src/partridge/PlumheadPAST_gen.pir'
+.include 'src/pct/PlumheadPAST_gen.pir'
 
 # Local Variables:
 #   mode: pir

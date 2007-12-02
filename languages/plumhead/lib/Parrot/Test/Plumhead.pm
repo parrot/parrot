@@ -15,7 +15,6 @@ use Parrot::Test;
 use Parrot::Test::Plumhead::PHP;
 use Parrot::Test::Plumhead::Phc;
 use Parrot::Test::Plumhead::Antlr3;
-use Parrot::Test::Plumhead::Partridge;
 use Parrot::Test::Plumhead::PCT;
 use Parrot::Test::Plumhead::Yacc;
 
@@ -39,7 +38,7 @@ Use plumhead.pl in smoke testing.
 
 sub new {
     my $test_module =    $ENV{PARROT_PLUMHEAD_TEST_MODULE}
-                      || 'Parrot::Test::Plumhead::Partridge';
+                      || 'Parrot::Test::Plumhead::PCT';
     return bless {}, $test_module;
 }
 

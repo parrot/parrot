@@ -9,8 +9,8 @@
 use strict;
 use warnings;
 
-# possible values are qw( phc antlr3 partridge yacc );
-my $variant = $ENV{PLUMHEAD_VARIANT} || 'partridge';
+# possible values are qw( phc antlr3 pct yacc );
+my $variant = $ENV{PLUMHEAD_VARIANT} || 'pct';
 exec './parrot', 'languages/plumhead/plumhead.pbc', "--variant=$variant", @ARGV;
 
 # Local Variables:

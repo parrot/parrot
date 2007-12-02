@@ -17,7 +17,7 @@ sub get_out_fn {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    return Parrot::Test::per_test( '_partridge.out', $count );
+    return Parrot::Test::per_test( '_pct.out', $count );
 }
 
 # Use PHP on the command line
@@ -27,7 +27,7 @@ sub get_test_prog {
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
 
-    return "./parrot languages/plumhead/plumhead_pct.pbc --variant=pct languages/${lang_fn}";
+    return "./parrot languages/plumhead/plumhead.pbc --variant=pct languages/${lang_fn}";
 }
 
 # never skip the reference implementation
