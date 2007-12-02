@@ -250,8 +250,8 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
 
     $P0 = node['DOUBLEQUOTE_STRING']
     if null $P0 goto no_DOUBLEQUOTE_STRING
-        past = new 'PAST::Val'                             
-        val = node
+        past = new 'PAST::Val'
+        val = $P0['string_literal']                             
         past.'init'( 'value' => val, 'returns' => 'String' )                              
         goto handled_expression
     no_DOUBLEQUOTE_STRING:
