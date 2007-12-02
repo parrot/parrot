@@ -78,7 +78,6 @@ static opcode_t fetch_op_test(NOTNULL(unsigned char *b))
 
 
 #define TRACE_PACKFILE 0
-#define TRACE_PACKFILE_PMC 0
 
 /*
  * round val up to whole size, return result in bytes

@@ -87,15 +87,11 @@ lookup of the cache has to be done in the opcode itself.
 #  include "jit.h"
 #endif
 
-#define PIC_TEST 1
-
 /* needs a Makefile dependency */
 /* #include "pmc/pmc_integer.h" */
 
 /* XXX Define this in a header file */
 extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
-
-#define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
 /*
  * hack to turn on inlining - just sub_p_p for mops done

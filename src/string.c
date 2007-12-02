@@ -42,8 +42,6 @@ strings.
  * time -C          5.2 s       0.3 s         0.2 s
  */
 
-#define EXTRA_SIZE 256
-
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \
     PARROT_ASSERT(s->encoding); \

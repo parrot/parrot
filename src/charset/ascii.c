@@ -20,16 +20,9 @@ charset functionality for similar charsets like iso-8859-1.
 #include "parrot/parrot.h"
 #include "ascii.h"
 
-#ifdef EXCEPTION
-#  undef EXCEPTION
-#endif
-
 /*
  * TODO check interpreter error and warnings setting
  */
-
-#define EXCEPTION(err, str) \
-    real_exception(interp, NULL, err, str)
 
 #include "tables.h"
 
