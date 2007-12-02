@@ -29,9 +29,9 @@ Creates the 3 Stream objects and dumps the combined stream.
     .local pmc text
     .local pmc combined
 
-    load_bytecode "library/Stream/Base.pir"
-    load_bytecode "library/Stream/Combiner.pir"
-    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode "library/Stream/Base.pbc"
+    load_bytecode "library/Stream/Combiner.pbc"
+    load_bytecode "library/Stream/Sub.pbc"
 
     # create the counter stream
     counter = new "Stream::Sub"

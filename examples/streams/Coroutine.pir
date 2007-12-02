@@ -24,8 +24,8 @@ Creates a coroutine stream and dumps it.
     .local pmc stream
     .local pmc temp
 
-    load_bytecode "library/Stream/Base.pir"
-    load_bytecode "library/Stream/Coroutine.pir"
+    load_bytecode "library/Stream/Base.pbc"
+    load_bytecode "library/Stream/Coroutine.pbc"
 
     # create the coroutine stream    
     stream = new "Stream::Coroutine"
