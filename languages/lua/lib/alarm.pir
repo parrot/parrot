@@ -16,7 +16,7 @@ The library exports a single function: alarm(s,[f]).
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::alarm' ]
+.namespace [ 'Lua'; 'alarm' ]
 
 .sub '__onload' :anon :load
 #    print "__onload alarm\n"

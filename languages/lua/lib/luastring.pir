@@ -30,7 +30,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.4>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::string' ]
+.namespace [ 'Lua'; 'string' ]
 
 .sub 'luaopen_string'
 #    print "init Lua String\n"

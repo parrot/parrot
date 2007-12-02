@@ -234,7 +234,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 .sub __start :main
     load_bytecode 'languages/lua/lib/luaaux.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
-    $P0 = get_hll_global ['Lua::basic'], 'luaopen_basic'
+    $P0 = get_hll_global ['Lua'; 'basic'], 'luaopen_basic'
     $P0()
     _main()
 .end

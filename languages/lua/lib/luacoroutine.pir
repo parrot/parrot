@@ -20,7 +20,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::coroutine' ]
+.namespace [ 'Lua'; 'coroutine' ]
 
 .sub 'luaopen_coroutine'
     load_bytecode 'Parrot/Coroutine.pbc'

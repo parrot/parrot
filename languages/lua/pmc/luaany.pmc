@@ -27,8 +27,11 @@ find_meth(PARROT_INTERP, PMC *obj, const char *name) {
     INTVAL type = PMC_type(obj);
 
     if (dynpmc_LuaString == type) {
-        meta = Parrot_find_global_s(interp,
-                                    const_string(interp, "Lua::string"),
+        PMC *ns = Parrot_get_ctx_HLL_namespace(interp);
+        ns = Parrot_make_namespace_keyed_str(interp, ns, const_string(interp, "Lua"));
+        ns = Parrot_make_namespace_keyed_str(interp, ns, const_string(interp, "string"));
+        meta = Parrot_find_global_n(interp,
+                                    ns,
                                     const_string(interp, "mt_string"));
     }
     if (dynpmc_LuaClosure != type && dynpmc_LuaFunction != type) {
