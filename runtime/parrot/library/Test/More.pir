@@ -5,7 +5,7 @@ Test::More - Parrot extension for testing modules
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/Test/More.pir'
+    load_bytecode 'library/Test/More.pbc'
 
     # get the testing functions
     .local pmc exports, curr_namespace, test_namespace
@@ -64,7 +64,7 @@ This class defines the following functions:
 .namespace [ 'Test'; 'More' ]
 
 .sub _initialize :load
-    load_bytecode 'library/Test/Builder.pir'
+    load_bytecode 'library/Test/Builder.pbc'
 
     .local pmc test
     test = new 'Test::Builder'
@@ -696,9 +696,9 @@ optional test description in C<description>.
 
     .local pmc p6rule_compile
     load_bytecode "PGE.pbc"
-    load_bytecode "PGE/Dumper.pir"
-    load_bytecode "PGE/Text.pir"
-    load_bytecode "PGE/Util.pir"
+    load_bytecode "PGE/Dumper.pbc"
+    load_bytecode "PGE/Text.pbc"
+    load_bytecode "PGE/Util.pbc"
     p6rule_compile = compreg "PGE::P6Regex"
 
     .local string diagnostic
