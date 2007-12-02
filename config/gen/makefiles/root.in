@@ -298,6 +298,12 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Stream/Sub.pbc \
     $(LIBRARY_DIR)/Stream/Writer.pbc \
     $(LIBRARY_DIR)/String/Utils.pbc \
+    $(LIBRARY_DIR)/Test/Builder/Output.pbc \
+    $(LIBRARY_DIR)/Test/Builder/Test.pbc \
+    $(LIBRARY_DIR)/Test/Builder/Tester.pbc \
+    $(LIBRARY_DIR)/Test/Builder/TestPlan.pbc \
+    $(LIBRARY_DIR)/Test/Builder.pbc \
+    $(LIBRARY_DIR)/Test/More.pbc \
     $(LIBRARY_DIR)/Tcl/Glob.pbc \
     $(LIBRARY_DIR)/YAML/Parser/Syck.pbc \
     $(LIBRARY_DIR)/STM.pbc \
