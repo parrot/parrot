@@ -251,7 +251,7 @@ children of the node.  Defined values of C<pasttype> are:
 
 =over 4
 
-=item assign
+=item copy
 
 Copy the value of the node's second child into the variable
 expression given by its first child.
@@ -381,7 +381,7 @@ operands automatically.  Note that except for the C<assign>
 opcode, any destination is typically generated automatically
 and should not be explicitly given as a child operand to the node.
 The table of PIR opcodes that PAST "knows" about is given in
-F<compilers/pct/src/POST/Node.pir> .
+F<compilers/pct/src/PAST/Compiler.pir> .
 
 =item lvalue([flag])
 

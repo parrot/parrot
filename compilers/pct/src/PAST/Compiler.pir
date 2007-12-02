@@ -820,6 +820,34 @@ node with a 'pasttype' of bind.
 .end
 
 
+=item assign(PAST::Op node)
+
+Implement a 'copy' assignment (at least until we get the 'copy'
+opcode -- see RT#47828).
+
+=cut
+
+.sub 'copy' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+    .local pmc rpast, rpost, lpast, lpost
+    rpast = node[1]
+    lpast = node[0]
+    rpost = self.'post'(rpast, 'rtype'=>'P')
+    lpost = self.'post'(lpast, 'rtype'=>'P')
+    .local pmc ops, alabel
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'(rpost, lpost, 'node'=>node, 'result'=>lpost)
+    $P0 = get_hll_global ['POST'], 'Label'
+    alabel = $P0.'new'('name'=>'copy_')
+    ops.'push_pirop'('eq_addr', lpost, rpost, alabel)
+    ops.'push_pirop'('morph', lpost, '"Undef"')
+    ops.'push_pirop'('assign', lpost, rpost)
+    ops.'push'(alabel)
+    .return (ops)
+.end
+
+
 =item inline(PAST::Op node)
 
 Return the POST representation of a C<PAST::Op>
