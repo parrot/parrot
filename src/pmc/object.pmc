@@ -559,7 +559,6 @@ Used to unarchive the object.
 */
 
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             SUPER(info);
         }
