@@ -21,7 +21,8 @@ sub runstep {
         }
     }
 
-    $ldflags .= " -L" . $conf->data->get('build_dir') . "/blib/lib";
+    my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
+    $ldflags .= " -L$lib_dir";
     $ccflags .= " -pipe -fno-common -Wno-long-double ";
     $ccflags =~ s/-flat_namespace\s*//;
     $ldflags =~ s/-flat_namespace\s*//;
@@ -49,7 +50,7 @@ sub runstep {
         libparrot_shared_alias => 'libparrot$(SHARE_EXT)',
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
-            . $conf->data->get('lib_dir')
+            . $lib_dir
             . $conf->data->get('slash')
             . "libparrot"
             . $conf->data->get('share_ext')
