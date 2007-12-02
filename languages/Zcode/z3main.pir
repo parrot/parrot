@@ -425,7 +425,7 @@ inner:
 	inc $I1
 	if $I1 < $I0 goto deb_arg_loop
     done_deb_args:
-      print_newline
+     say ''
   no_deb_5:
     # if the opcode did a return, is_ret is set
     if is_ret goto maybe_fin
