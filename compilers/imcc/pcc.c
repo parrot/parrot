@@ -412,7 +412,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo
     struct move_info_t *info = (struct move_info_t *)vinfo;
     SymReg *regs[2], *src, *dest;
     static SymReg *temps[4];
-    const char types[] = "INSP";
+    static const char types[] = "INSP";
 
     src = dest = NULL;
     if (d == 255) {

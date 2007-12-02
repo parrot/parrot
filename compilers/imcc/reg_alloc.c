@@ -624,7 +624,7 @@ static void
 rebuild_reglist(NOTNULL(IMC_Unit *unit))
 {
     int i, count, unused;
-    const char types[] = "INSP";
+    static const char types[] = "INSP";
 
     for (i = count = unused = 0; i < unit->n_symbols; i++) {
         SymReg * const r = unit->reglist[i];

@@ -62,7 +62,7 @@ static int e_file_open(SHIM_INTERP, NOTNULL(void *param))
 
 /* HEADERIZER END: static */
 
-const char types[] = "INPS";
+static const char types[] = "INPS";
 
 Emitter emitters[2] = {
     {e_file_open,
