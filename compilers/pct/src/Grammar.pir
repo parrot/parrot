@@ -1,6 +1,40 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
+=head1 NAME
+
+PCT::Grammar - base grammar with useful rules
+
+=head1 SYNOPSIS
+
+    grammar MyGrammar is PCT::Grammar;
+
+    rule abc { [ word | <panic: word not found> ] }
+
+    rule quote {
+        [ \' <string_literal: '> \'
+        | \" <string_literal: "> \"
+        ]
+    }
+
+=head1 DESCRIPTION
+
+This file implements C<PCT::Grammar>, which is a basic grammar object
+with a few useful methods for parsing thrown in.
+
+=head2 Methods
+
+=over 4
+
+=item panic(match [, message, ...] )
+
+Throws an exception at the current point of the match, with message
+as part of the exception payload.  The message doesn't end with
+a newline, then the line number and offset of the match are
+also included.
+
+=cut
+
 .sub '__onload' :init :load
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
