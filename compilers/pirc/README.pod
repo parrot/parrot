@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
-# $Id: README.pod 22723 2007-11-05 20:13:25Z kjs $
+# $Id$
 
 =head1 NAME
 
