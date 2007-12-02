@@ -371,7 +371,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
             ptr  = VTABLE_get_pmc_keyed_int(interp, init, idx*3);
 
             if (ptr->pmc_ext && PMC_metadata(ptr)) {
-                STRING *signature_str = CONST_STRING(interp, "_signature"); 
+                STRING *signature_str = CONST_STRING(interp, "_signature");
                 PMC *sig = VTABLE_getprop(interp, ptr, signature_str);
                 if (VTABLE_defined(interp, sig)) {
                     STRING *sig_str = VTABLE_get_string(interp, sig);
