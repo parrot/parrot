@@ -39,6 +39,8 @@ structures.
 
 #include "parrot/parrot.h"
 
+#define VALID_RANGE(r) ((r) && ((INTVAL)(r) != -1))
+
 /*
  * create range_t structure
  *
@@ -120,7 +122,7 @@ range_end:
         key = PMC_data_typed(key, PMC *);
 
         if (key) {
-            parrot_range_t *n = mem_allocate_typed(parrot_range_t);
+            parrot_range_t * const n = mem_allocate_typed(parrot_range_t);
             range->next       = n;
             range             = n;
             goto next_range;
@@ -171,7 +173,7 @@ set_slice_next(PARROT_INTERP, PMC *self, PMC *agg)
 {
     parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(self);
 
-    if (!r || (INTVAL) r == -1)
+    if (!VALID_RANGE(r))
         real_exception(interp, NULL, E_StopIteration, "StopIteration");
 
     if (r->type == enum_type_INTVAL) {
@@ -213,7 +215,7 @@ pmclass Slice need_ext extends Key {
     }
 
     void mark() {
-        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+        parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
 
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
@@ -222,7 +224,7 @@ pmclass Slice need_ext extends Key {
          * the pointer must not be null, or at the end of iteration and it must
          * point to STRINGs.  Note that r->step is always the integer value 1.
          */
-        if (r && (int)r != -1 && r->type == enum_type_STRING) {
+        if (VALID_RANGE(r) && r->type == enum_type_STRING) {
             if (RVal_str(r->start))
                 pobject_lives(INTERP, (PObj *)RVal_str(r->start));
             if (RVal_str(r->end))
@@ -249,11 +251,11 @@ pmclass Slice need_ext extends Key {
         parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
 
         /* iteration ended - all is freed */
-        if ((INTVAL) r == -1)
+        if ((INTVAL)r == -1)
             return;
 
         while (r) {
-            parrot_range_t *n = r->next;
+            parrot_range_t * const n = r->next;
             mem_sys_free(r);
             r = n;
         }
@@ -278,16 +280,16 @@ Get the next string key from the current slice range.
 */
 
     INTVAL get_integer() {
-        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+        const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
 
-        if (!r || (INTVAL) r == -1)
+        if (!VALID_RANGE(r))
             real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
 
         return RVal_int(r->cur);
     }
 
     STRING *get_string() {
-        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+        const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
 
         return RVal_str(r->cur);
     }
@@ -318,13 +320,13 @@ This is used for implementing Pythons xrange()
     }
 
     PMC *get_iter() {
-        PMC *iter            = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = SELF;
         return iter;
     }
 
     INTVAL elements() {
-        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+        parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
         /* only start .. end supported so:
          * TODO check flags somewhere
          * */
@@ -332,18 +334,18 @@ This is used for implementing Pythons xrange()
     }
 
     INTVAL get_integer_keyed(PMC *key) {
-        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(key);
+        parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
         return RVal_int(r->cur);
     }
 
     STRING *get_string_keyed(PMC *key) {
-        INTVAL v = VTABLE_get_integer(INTERP, key);
+        const INTVAL v = VTABLE_get_integer(INTERP, key);
         return string_from_int(INTERP, v);
     }
 
     PMC *get_pmc_keyed(PMC *key) {
-        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(key);
-        PMC *res          = PMC_pmc_val(SELF);
+        parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
+        PMC * const res   = PMC_pmc_val(SELF);
         PMC_int_val(res)  = RVal_int(r->cur);
 
         return res;
