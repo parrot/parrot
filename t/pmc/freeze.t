@@ -824,8 +824,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
     print $I0
     print ' '
     $I0 = klentable['foobar']
-    print $I0
-    print_newline
+    say $I0
 .end
 CODE
 1 2 3 6

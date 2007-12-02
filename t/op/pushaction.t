@@ -139,8 +139,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pushaction - return from main" );
 .sub exit_handler
     .param int flag
     print "at_exit, flag = "
-    print flag
-    print_newline
+    say flag
 .end
 CODE
 main
@@ -158,8 +157,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pushaction - end in main" );
 .sub exit_handler
     .param int flag
     print "at_exit, flag = "
-    print flag
-    print_newline
+    say flag
 .end
 CODE
 main
@@ -180,8 +178,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pushaction as closure" );
 .sub exit_handler :outer(main)
     .param int flag
     print "at_exit, flag = "
-    print flag
-    print_newline
+    say flag
     .local pmc a
     a = find_lex 'a'
     print 'a = '

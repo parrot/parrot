@@ -133,8 +133,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexinfo' );
     print $S0
     print ' '
     $I0 = elements $P2
-    print $I0
-    print_newline
+    say $I0
 .end
 CODE
 LexInfo 2

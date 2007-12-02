@@ -299,8 +299,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "check loaded lib hash" );
   # print $S0          not portable
   $I3 = index $S0, 'temp2.pbc'
   $I4 = isgt $I3, -1
-  print $I4
-  print_newline
+  say $I4
 .end
 CODE
 hello from foo_1

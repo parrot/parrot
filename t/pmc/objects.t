@@ -408,8 +408,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
     print $P0
     print ' '
     $P0 = getattribute o, 'k'
-    print $P0
-    print_newline
+    say $P0
+
     $P0 = getattribute o, 'i'
     print $P0
     print ' '
@@ -420,8 +420,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
     print $P0
     print ' '
     $P0 = getattribute o, 'k'
-    print $P0
-    print_newline
+    say $P0
 .end
 .namespace ['Bar']
 .sub init :vtable :method

@@ -412,8 +412,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "shift integer" );
     print $I0
     print ' '
     $I0 = elements ar
-    print $I0
-    print_newline
+    say $I0
 .end
 CODE
 2 10 1 20 0
@@ -432,8 +431,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift integer" );
     print $I0
     print ' '
     $I0 = ar[1]
-    print $I0
-    print_newline
+    say $I0
 .end
 CODE
 2 20 10

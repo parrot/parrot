@@ -54,8 +54,7 @@ loop:
     print ' '
     goto loop
 ex:
-    print 'G'
-    print_newline
+    say 'G'
 .end
 CODE
 F C D A B E G
@@ -124,8 +123,7 @@ loop:
     print ' '
     goto loop
 ex:
-    print 'G'
-    print_newline
+    say 'G'
 .end
 CODE
 A B C D E F O G
@@ -195,8 +193,7 @@ loop:
     print ' '
     goto loop
 ex:
-    print 'G'
-    print_newline
+    say 'G'
 .end
 CODE
 A B E C D F O G
@@ -233,8 +230,7 @@ loop:
     print ' '
     goto loop
 ex:
-    print 'G'
-    print_newline
+    say 'G'
 .end
 CODE
 D A B C G
@@ -293,8 +289,7 @@ loop:
     print ' '
     goto loop
 ex:
-    print 'R'
-    print_newline
+    say 'R'
 .end
 CODE
 Vulcan Intelligent Sentient Humanoid BiPedal LifeForm TestObject R

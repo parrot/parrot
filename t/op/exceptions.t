@@ -601,8 +601,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
 .sub exit_handler
     .param int flag
     print "at_exit, flag = "
-    print flag
-    print_newline
+    say flag
 .end
 CODE
 /^main
@@ -630,8 +629,7 @@ h:
 .sub exit_handler :outer(main)
     .param int flag
     print "at_exit, flag = "
-    print flag
-    print_newline
+    say flag
     $P2 = new 'Exception'
     throw $P2
     print "never 2\n"

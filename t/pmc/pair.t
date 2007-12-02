@@ -61,8 +61,7 @@ pir_output_is( <<'CODE', <<'OUT', 'methods' );
     print $P0
     print ' '
     $P0 = kv[1]
-    print $P0
-    print_newline
+    say $P0
 .end
 CODE
 key 42 2 key 42
@@ -91,9 +90,7 @@ SKIP: {
     v = 77
     assign p, v
     $P0 = p."value"()
-    print $P0
-
-    print_newline
+    say $P0
 .end
 CODE
 key value 77
