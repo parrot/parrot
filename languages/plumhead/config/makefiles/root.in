@@ -97,7 +97,7 @@ build-antlr3:    build-common
 	javac src/antlr3/*.java 
 
 src/partridge/Plumhead_gen.pir: src/partridge/Plumhead.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir
+	$(PARROT) $(PGE_DIR)/pgc.pir \
             --output=src/partridge/Plumhead_gen.pir src/partridge/Plumhead.pg
 
 src/partridge/PlumheadPAST_gen.pir: src/partridge/PlumheadPAST.tg
