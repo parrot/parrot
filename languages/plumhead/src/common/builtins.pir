@@ -22,9 +22,6 @@
 .sub 'echo'
     .param pmc list            :slurpy
 
-    _dumper( list, 'list' )
-    print "entered echo"
-
     .local pmc iter
     iter = new .Iterator, list
   iter_loop:
