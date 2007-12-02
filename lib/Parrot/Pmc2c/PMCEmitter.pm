@@ -22,7 +22,6 @@ C<Parrot::Pmc2c::PMCEmitter> is used by F<tools/build/pmc2c.pl> to generate C co
 package Parrot::Pmc2c::PMC;
 use strict;
 use warnings;
-use Data::Dumper;
 use Parrot::Pmc2c::Emitter;
 use Parrot::Pmc2c::Method;
 use Parrot::Pmc2c::MethodEmitter;

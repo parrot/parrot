@@ -262,7 +262,6 @@ use strict;
 use warnings;
 
 use Cwd;
-use Data::Dumper;
 use File::Basename;
 use File::Spec;
 use Memoize ();

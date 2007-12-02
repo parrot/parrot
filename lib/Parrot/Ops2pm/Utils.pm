@@ -4,7 +4,7 @@ package Parrot::Ops2pm::Utils;
 use strict;
 use warnings;
 use Cwd;
-use Data::Dumper;
+use Data::Dumper ();
 use File::Path ();
 use File::Spec;
 use lib ("lib/");

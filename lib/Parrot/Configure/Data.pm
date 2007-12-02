@@ -42,7 +42,7 @@ package Parrot::Configure::Data;
 use strict;
 use warnings;
 
-use Data::Dumper;
+use Data::Dumper ();
 
 =head2 Methods
 

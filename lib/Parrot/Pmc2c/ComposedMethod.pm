@@ -4,7 +4,6 @@ package Parrot::Pmc2c::ComposedMethod;
 use strict;
 use warnings;
 use base qw( Parrot::Pmc2c::Method Exporter );
-use Data::Dumper;
 
 sub new {
     my ( $class, $self_hash ) = @_;

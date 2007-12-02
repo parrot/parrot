@@ -4,7 +4,6 @@
 package Parrot::Pmc2c::PCCMETHOD;
 use strict;
 use warnings;
-use Data::Dumper;
 use Carp qw(longmess croak);
 
 =head1 NAME

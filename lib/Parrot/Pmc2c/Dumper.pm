@@ -4,7 +4,6 @@ package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
 use FindBin;
-use Data::Dumper;
 use Parrot::Vtable;
 use Parrot::Pmc2c::UtilFunctions qw(slurp spew filename);
 use Parrot::Pmc2c::Parser qw(parse_pmc);

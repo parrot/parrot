@@ -23,7 +23,6 @@ C<Parrot::Pmc2c> is used by F<tools/build/pmc2c.pl> to generate C code from PMC 
 package Parrot::Pmc2c::Method;
 use strict;
 use warnings;
-use Data::Dumper;
 use Parrot::Pmc2c::Emitter;
 use Parrot::Pmc2c::UtilFunctions
     qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );

@@ -10,7 +10,6 @@
 package Parrot::Pmc2c::PMC::default;
 use strict;
 use warnings;
-use Data::Dumper;
 use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
 use base qw( Parrot::Pmc2c::PMC );
 
