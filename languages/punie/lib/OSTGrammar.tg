@@ -653,7 +653,7 @@ transform print_op (PAST::Op) :language('PIR') {
     # Iterate through the children of the node, and generate the result
     # for each child.
     .local pmc iter
-    iter = new Iterator, $P1
+    iter = new 'Iterator', $P1
     iter = 0
   iter_loop:
     unless iter goto iter_end         # while (entries) ...

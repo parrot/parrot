@@ -79,7 +79,7 @@ transform past (PunieGrammar::lineseq) :language('PIR') {
     $P0 = node["line"]
 
     .local pmc iter
-    iter = new Iterator, $P0    # setup iterator for node
+    iter = new 'Iterator', $P0    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -100,7 +100,7 @@ transform past (PunieGrammar::line) :language('PIR') {
     result = new 'ResizablePMCArray'
 
     .local pmc iter
-    iter = new Iterator, node    # setup iterator for node
+    iter = new 'Iterator', node    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -127,7 +127,7 @@ transform past (PunieGrammar::expr) :language('PIR') {
     result = new 'ResizablePMCArray'
 
     $P1 = node.get_hash()
-    $P0 = new Iterator, $P1    # setup iterator for node
+    $P0 = new 'Iterator', $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
@@ -156,7 +156,7 @@ transform past (PunieGrammar::gprint) :language('PIR') {
     result.'name'($S1)
 
     $P1 = node.get_hash()
-    $P0 = new Iterator, $P1    # setup iterator for node
+    $P0 = new 'Iterator', $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
@@ -188,7 +188,7 @@ transform past (PunieGrammar::cond) :language('PIR') {
 
     $P1 = node.get_hash()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
+    iter = new 'Iterator', $P1    # setup iterator for node
     set iter, 0 # reset iterator, begin at start
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -222,7 +222,7 @@ transform past (PunieGrammar::else) :language('PIR') {
 
     $P1 = onechild.get_hash()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
+    iter = new 'Iterator', $P1    # setup iterator for node
     set iter, 0 # reset iterator, begin at start
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -251,7 +251,7 @@ transform past (PunieGrammar::oexpr) :language('PIR') {
 
     $P1 = node.get_hash()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
+    iter = new 'Iterator', $P1    # setup iterator for node
     set iter, 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -457,7 +457,7 @@ transform op (expr) :language('PIR') {
 
     $P1 = node.'get_array'()
     .local pmc iter
-    iter = new Iterator, $P1    # setup iterator for node
+    iter = new 'Iterator', $P1    # setup iterator for node
     set iter, 0 # reset iterator, begin at start
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -496,7 +496,7 @@ transform term (expr) :language('PIR') {
     .local pmc children
     children = new "ResizablePMCArray"
     $P1 = node.get_hash()
-    $P0 = new Iterator, $P1    # setup iterator for node
+    $P0 = new 'Iterator', $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
   iter_loop:
     unless $P0, iter_end         # while (entries) ...
