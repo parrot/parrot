@@ -45,22 +45,20 @@ our @potential_attributes = qw(
     HASATTRIBUTE_NEVER_WORKS
 );
 
-our $verbose;
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $verbose = $conf->options->get('verbose');
+    my $verbose = $conf->options->get('verbose');
     print "\n" if $verbose;
 
     for my $maybe_attr (@potential_attributes) {
-        $self->try_attr( $conf, $maybe_attr );
+        $self->try_attr( $conf, $maybe_attr, $verbose );
     }
     return 1;
 }
 
 sub try_attr {
-    my ( $self, $conf, $attr ) = @_;
+    my ( $self, $conf, $attr, $verbose ) = @_;
 
     my $output_file = 'test.cco';
 
@@ -89,7 +87,10 @@ sub try_attr {
 
     $conf->data->set( $attr => !$exit_code | 0 );
 
-    return if $exit_code;
+    if ($exit_code) {
+        $verbose and print "Rejecting bogus attribute:  $attr\n";
+        return;
+    }
 
     my $output = Parrot::BuildUtil::slurp_file($output_file);
     $verbose and print "  output: $output\n";
