@@ -245,8 +245,7 @@ Parrot_oo_newclass_from_str(PARROT_INTERP, NOTNULL(STRING *name))
     VTABLE_set_string_native(interp, namearg, name);
     namehash = pmc_new(interp, enum_class_Hash);
 
-    VTABLE_set_pmc_keyed_str(interp, namehash,
-        CONST_STRING(interp, "name"), namearg);
+    VTABLE_set_pmc_keyed_str(interp, namehash, CONST_STRING(interp, "name"), namearg);
 
     classobj = pmc_new_init(interp, enum_class_Class, namehash);
 
