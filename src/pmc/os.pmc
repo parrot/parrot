@@ -83,12 +83,12 @@ Returns the current working directory.
 #  endif
 #endif
         if (cwd) {
-            STRING *scwd = string_from_cstring(interp, cwd, strlen(cwd));
+            STRING * const scwd = string_from_cstring(interp, cwd, strlen(cwd));
             mem_sys_free(cwd);
             return scwd;
         }
         else {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
     }
@@ -105,7 +105,7 @@ Changes the current working directory to the one specified by C<path>.
 
     METHOD void chdir(STRING *path) {
         int error;
-        char *cpath = string_to_cstring(interp, path);
+        char * const cpath = string_to_cstring(interp, path);
 #ifdef _MSC_VER
         error = _chdir(cpath);
 #else
@@ -135,7 +135,7 @@ C<path>.
         int   error = stat(cpath, &info);
 
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
 
@@ -147,7 +147,7 @@ C<path>.
 #endif
             string_cstring_free(cpath);
             if (error) {
-                char *errmsg = strerror(errno);
+                const char * const errmsg = strerror(errno);
                 real_exception(interp, NULL, E_SystemError, errmsg);
             }
         }
@@ -155,7 +155,7 @@ C<path>.
             error = remove(cpath);
             string_cstring_free(cpath);
             if (error) {
-                char *errmsg = strerror(errno);
+                const char * const errmsg = strerror(errno);
                 real_exception(interp, NULL, E_SystemError, errmsg);
             }
         }
@@ -173,7 +173,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 
     METHOD void mkdir(STRING *path, INTVAL mode) {
         int   error;
-        char *cpath = string_to_cstring(interp, path);
+        char * const cpath = string_to_cstring(interp, path);
         /* should we validate mode? */
 #ifdef WIN32
         error = _mkdir(cpath);
@@ -182,7 +182,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 #endif
         string_cstring_free(cpath);
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
     }
@@ -215,17 +215,16 @@ Stats a file, and returns a 13 position array as in Perl:
 
     METHOD PMC *stat(STRING *path) {
         struct stat info;
-        PMC   *array;
-        char  *cpath = string_to_cstring(interp, path);
-        int    error = stat(cpath, &info);
+        char  * const cpath = string_to_cstring(interp, path);
+        const int     error = stat(cpath, &info);
         string_cstring_free(cpath);
 
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
         else {
-            array = pmc_new(interp, enum_class_FixedPMCArray);
+            PMC * const array = pmc_new(interp, enum_class_FixedPMCArray);
             VTABLE_set_integer_native(interp, array, 13);
 
             VTABLE_set_integer_keyed_int(interp, array, 0, info.st_dev);
@@ -276,21 +275,20 @@ Stats a file, and returns a 13 position array as in Perl:
     METHOD PMC *lstat(STRING *path) {
         struct stat info;
 
-        PMC  *array;
-        char *cpath = string_to_cstring(interp, path);
+        char * const cpath = string_to_cstring(interp, path);
 #ifdef WIN32
-        int error = stat(cpath, &info);
+        const int error = stat(cpath, &info);
 #else
-        int error = lstat(cpath, &info);
+        const int error = lstat(cpath, &info);
 #endif
         string_cstring_free(cpath);
 
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
         else {
-            array = pmc_new(interp, enum_class_FixedPMCArray);
+            PMC * const array = pmc_new(interp, enum_class_FixedPMCArray);
             VTABLE_set_integer_native(interp, array, 13);
 
             VTABLE_set_integer_keyed_int(interp, array, 0, info.st_dev);
@@ -324,15 +322,15 @@ Creates a symlink, where available
 
     METHOD void symlink(STRING *from, STRING *to) {
 #ifndef WIN32
-        char *cfrom = string_to_cstring(interp, from);
-        char *cto   = string_to_cstring(interp, to);
-        int error   = symlink(cfrom, cto);
+        char * const cfrom = string_to_cstring(interp, from);
+        char * const cto   = string_to_cstring(interp, to);
+        const int error    = symlink(cfrom, cto);
 
         string_cstring_free(cfrom);
         string_cstring_free(cto);
 
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
 #else
@@ -353,15 +351,15 @@ Creates a hard link, where available(?)
 
     METHOD void link(STRING *from, STRING *to) {
 #ifndef WIN32
-        char *cfrom = string_to_cstring(interp, from);
-        char *cto   = string_to_cstring(interp, to);
-        int   error = link(cfrom, cto);
+        char * const cfrom = string_to_cstring(interp, from);
+        char * const cto   = string_to_cstring(interp, to);
+        const int    error = link(cfrom, cto);
 
         string_cstring_free(cfrom);
         string_cstring_free(cto);
 
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
 #else
@@ -383,7 +381,7 @@ previous one).
 
     METHOD INTVAL umask(INTVAL mask) {
 #ifndef _MSC_VER
-        INTVAL old = umask(mask);
+        const INTVAL old = umask(mask);
         return old;
 #else
         real_exception(interp, NULL, E_NotImplementedError,
@@ -407,13 +405,13 @@ idea to do the same with parrot.
 
     METHOD void chroot(STRING *path) {
 #ifndef WIN32
-        char *cpath = string_to_cstring(interp, path);
-        int   error = chroot(cpath);
+        char * const cpath = string_to_cstring(interp, path);
+        const int    error = chroot(cpath);
 
         string_cstring_free(cpath);
 
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
 #else
@@ -443,7 +441,7 @@ reads entries from a directory.
         string_cstring_free(cpath);
 
         if (!dir) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
 
@@ -471,9 +469,9 @@ thrown.
 =cut
 */
     METHOD void rename(STRING *oldpath, STRING *newpath) {
-        char *coldpath = string_to_cstring(interp, oldpath);
-        char *cnewpath = string_to_cstring(interp, newpath);
-        int   ret      = rename(coldpath, cnewpath);
+        char * const coldpath = string_to_cstring(interp, oldpath);
+        char * const cnewpath = string_to_cstring(interp, newpath);
+        const int    ret      = rename(coldpath, cnewpath);
 
         string_cstring_free(coldpath);
         string_cstring_free(cnewpath);
