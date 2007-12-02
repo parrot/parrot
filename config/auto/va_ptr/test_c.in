@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#if defined VA_TYPE_PPC
+#if defined VA_TYPE_REGISTER
 #  define PARROT_VA_TO_VAPTR(x) (x)
 #endif
-#if defined VA_TYPE_X86
+#if defined VA_TYPE_STACK
 #  define PARROT_VA_TO_VAPTR(x) (&(x))
 #endif
 

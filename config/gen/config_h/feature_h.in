@@ -73,13 +73,13 @@ print OUT <<"END_PRINT";
 
 /* from config/auto/va_ptr.pm: va_ptr_type => $va_result */
 END_PRINT
-if (@va_ptr_type@ eq 'ppc') {
+if (@va_ptr_type@ eq 'register') {
     print OUT <<'END_PRINT';
 /* if defined __powerpc__ || defined __x86_64__ || defined __s390__ */
 #  define PARROT_VA_TO_VAPTR(x) (x)
 END_PRINT
 }
-if (@va_ptr_type@ eq 'x86') {
+if (@va_ptr_type@ eq 'stack') {
     print OUT <<'END_PRINT';
 #  define PARROT_VA_TO_VAPTR(x) (&(x))
 END_PRINT

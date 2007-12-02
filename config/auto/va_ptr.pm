@@ -36,17 +36,17 @@ sub runstep {
 
     my $va_type;
     cc_gen('config/auto/va_ptr/test_c.in');
-    eval { cc_build('-DVA_TYPE_X86'); };
+    eval { cc_build('-DVA_TYPE_STACK'); };
 
     if ( $@ || cc_run() !~ /^ok/ ) {
-        eval { cc_build('-DVA_TYPE_PPC'); };
+        eval { cc_build('-DVA_TYPE_REGISTER'); };
         if ( $@ || cc_run() !~ /^ok/ ) {
             die "Unknown va_ptr type";
         }
-        $va_type = 'ppc';
+        $va_type = 'register';
     }
     else {
-        $va_type = 'x86';
+        $va_type = 'stack';
     }
     cc_clean();
     $self->set_result($va_type);
