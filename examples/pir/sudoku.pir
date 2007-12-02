@@ -347,7 +347,7 @@ loop:
     print " "
     goto loop
 fin:
-    print_newline
+    say ''
     end
 
 sel_name:
@@ -1425,8 +1425,7 @@ next:
 	    print " bx "
 	    print bx
 	    print " by "
-	    print by
-	    print_newline
+	    say by
 	    self."display"()
 	    goto ex
 
@@ -1570,8 +1569,7 @@ nxt_x:
 	print " x="
 	print xx
 	print " n="
-	print n
-	print_newline
+	say n
 nxt_n:
     inc n
     if n <= 9 goto lpn
@@ -1735,8 +1733,7 @@ not_set:
 	print " sx "
 	print sx
 	print " sy "
-	print sy
-	print_newline
+	say sy
 	self."display"()
 nd:
     .return (1)
@@ -1883,8 +1880,7 @@ nxt:
 	print "="
 	print r
 	print " n="
-	print n
-	print_newline
+	say n
 ret:
     .return (any)
 .end
