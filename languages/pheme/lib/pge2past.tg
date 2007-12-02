@@ -20,7 +20,7 @@ transform past (ROOT) :language('PIR') {
     lists = node['list']
 
     .local pmc iter
-    iter = new Iterator, lists
+    iter = new 'Iterator', lists
 
     .local pmc elem
 
@@ -38,7 +38,7 @@ transform past (ROOT) :language('PIR') {
 
 transform past (list) :language('PIR') {
     .local pmc iter
-    iter = new Iterator, node
+    iter = new 'Iterator', node
 
     .local string key_name
     key_name = shift iter
@@ -81,7 +81,7 @@ transform past (list) :language('PIR') {
     list = elem['list_item']
 
     .local pmc iter
-    iter = new Iterator, list
+    iter = new 'Iterator', list
 
     .local pmc item
   iter_loop:
@@ -104,7 +104,7 @@ transform past (list) :language('PIR') {
 
 transform past (list_item) :language('PIR') {
     .local pmc iter
-    iter = new Iterator, node
+    iter = new 'Iterator', node
 
     .local string key_name
     key_name = shift iter
