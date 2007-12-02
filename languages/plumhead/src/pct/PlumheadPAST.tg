@@ -195,7 +195,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
             var = dummy_1
             past = new 'PAST::Var'
             past_expression_1 = tree.'get'('past', $P0, 'Plumhead::Grammar::gen_past')
-            past.'init'( past_expression_1, 'name' => var, 'viviself' => '.Hash', 'islvalue' => 1 )
+            past.'init'( past_expression_1, 'name' => var, 'viviself' => 'Hash', 'lvalue' => 1 )
             goto handled_expression
         no_var_name_1:
             past = tree.'get'('past', $P0, 'Plumhead::Grammar::gen_past')
@@ -208,10 +208,10 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
         $P2 = $P0['array_key']
         var = $P1
         past_var_name = tree.'get'('past', $P0, 'Plumhead::Grammar::gen_past')
-        past_var_name.'attr'('viviself', '.Hash', 1 )
+        past_var_name.'attr'('viviself', 'Hash', 1 )
         past_key      = tree.'get'('past', $P2, 'Plumhead::Grammar::gen_past')
         past = new 'PAST::Var'
-        past.'init'( past_var_name, past_key, 'scope' => 'keyed', 'viviself' => 'Undef', 'islvalue' => 1 )
+        past.'init'( past_var_name, past_key, 'scope' => 'keyed', 'viviself' => 'Undef', 'lvalue' => 1 )
         goto handled_expression
     no_array_elem_1:
 
@@ -390,7 +390,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     if null $P0 goto no_var_name
         var = $P0
         past = new 'PAST::Var'
-        past.'init'( 'name' => var, 'viviself' => 'Undef', 'islvalue' => 1 )                              
+        past.'init'( 'name' => var, 'viviself' => 'Undef', 'lvalue' => 1 )                              
         goto handled_expression
     no_var_name:
 
