@@ -299,7 +299,6 @@ static int sub_pragma(PARROT_INTERP,
 #endif
 
 #define TRACE_PACKFILE 0
-#define TRACE_PACKFILE_PMC 0
 
 #define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
 #define ALIGN_16(st, cursor) \

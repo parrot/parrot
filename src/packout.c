@@ -28,8 +28,6 @@ Determine the size of the buffer needed in order to pack the PackFile into a
 contiguous region of memory.
 ***************************************/
 
-#define TRACE_PACKFILE_PMC 0
-
 /*
 
 =item C<PARROT_API
