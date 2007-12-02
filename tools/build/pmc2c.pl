@@ -8,12 +8,11 @@ use FindBin;
 use lib "$FindBin::Bin/../..";
 use lib "$FindBin::Bin/../../lib";
 use Getopt::Long;
-use Parrot::Pmc2c::Pmc2cMain;
+use Parrot::Pmc2c::Pmc2cMain ();
 
 my ( %action, %options, @pmc_include_paths );
 
 GetOptions(
-
     #pmc include paths
     "include=s" => \@pmc_include_paths,
 
