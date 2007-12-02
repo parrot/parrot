@@ -49,7 +49,7 @@ typedef struct Parrot_Task {
  * Scheduler private flags
  */
 typedef enum {
-    SCHEDULER_cache_valid_FLAG = PObj_private0_FLAG,
+    SCHEDULER_cache_valid_FLAG = PObj_private0_FLAG
 } scheduler_flags_enum;
 
 #define SCHEDULER_get_FLAGS(o) (PObj_get_FLAGS(o))
