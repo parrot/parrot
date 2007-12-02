@@ -113,7 +113,7 @@ err_no_tree:
     .local pmc result
 
     .local pmc iter
-    iter = new Iterator, node    # setup iterator for node
+    iter = new 'Iterator', node    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -135,11 +135,11 @@ err_no_tree:
     rule = new 'Hash'
 
     .local pmc iter
-    iter = new Iterator, node    # setup iterator for node
+    iter = new 'Iterator', node    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
-      $P3 = new Undef
+      $P3 = new 'Undef'
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
 
@@ -169,11 +169,11 @@ err_no_rule:
     decl = new 'Hash'
 
     .local pmc iter
-    iter = new Iterator, node    # setup iterator for node
+    iter = new 'Iterator', node    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
-      $P3 = new Undef
+      $P3 = new 'Undef'
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
 
