@@ -3,12 +3,9 @@
 package Parrot::Pmc2c::Emitter;
 use strict;
 use warnings;
-use base qw( Exporter );
-our @EXPORT_OK = qw();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines spew escape_filename);
 use overload '""'   => \&stringify;
 use overload 'bool' => \&boolify;
-use Data::Dumper;
 
 sub new {
     my ( $class, $filename ) = @_;

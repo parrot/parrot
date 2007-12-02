@@ -23,9 +23,8 @@ C<Parrot::Pmc2c> is used by F<tools/build/pmc2c.pl> to generate C code from PMC 
 package Parrot::Pmc2c::PMC::RO;
 use strict;
 use warnings;
-use base qw( Exporter Parrot::Pmc2c::PMC );
-our @EXPORT_OK = qw( );
-use Data::Dumper;
+use base qw( Parrot::Pmc2c::PMC );
+
 use Parrot::Pmc2c::Emitter;
 use Parrot::Pmc2c::PMCEmitter;
 use Parrot::Pmc2c::Method;

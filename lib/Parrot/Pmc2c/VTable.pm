@@ -3,8 +3,7 @@
 package Parrot::Pmc2c::VTable;
 use strict;
 use warnings;
-use base qw( Exporter );
-our @EXPORT_OK = qw();
+
 use Storable;
 use Parrot::Vtable;
 use Parrot::Pmc2c::Method;

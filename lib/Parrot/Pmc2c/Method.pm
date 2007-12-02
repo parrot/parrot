@@ -6,8 +6,6 @@ use warnings;
 use constant VTABLE_ENTRY => 'VTABLE_ENTRY';
 use constant VTABLE       => 'VTABLE';
 use constant NON_VTABLE   => 'NON_VTABLE';
-use base qw( Exporter );
-our @EXPORT_OK = qw();
 use Carp;
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines);
 
