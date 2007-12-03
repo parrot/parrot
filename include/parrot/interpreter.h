@@ -759,9 +759,11 @@ PMC * Parrot_compile_string(PARROT_INTERP,
 
 PARROT_API
 void Parrot_compreg(PARROT_INTERP,
-    STRING *type,
-    Parrot_compiler_func_t func)
-        __attribute__nonnull__(1);
+    NOTNULL(STRING *type),
+    NOTNULL(Parrot_compiler_func_t func))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_mark_method_writes(PARROT_INTERP,
@@ -773,17 +775,22 @@ void Parrot_mark_method_writes(PARROT_INTERP,
 PARROT_API
 void register_nci_method(PARROT_INTERP,
     const int type,
-    void *func,
-    const char *name,
-    const char *proto)
-        __attribute__nonnull__(1);
+    NOTNULL(void *func),
+    NOTNULL(const char *name),
+    NOTNULL(const char *proto))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 void register_raw_nci_method_in_ns(PARROT_INTERP,
     const int type,
-    void *func,
-    const char *name)
-        __attribute__nonnull__(1);
+    NOTNULL(void *func),
+    NOTNULL(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL sysinfo_i(SHIM_INTERP, INTVAL info_wanted);

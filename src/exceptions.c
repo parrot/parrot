@@ -41,6 +41,7 @@ Define the internal interpreter exceptions.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static opcode_t * create_exception(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -719,6 +720,7 @@ Create an exception.
 
 */
 
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static opcode_t *
 create_exception(PARROT_INTERP)

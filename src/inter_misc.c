@@ -44,8 +44,8 @@ class C<type>.
 
 PARROT_API
 void
-register_nci_method(PARROT_INTERP, const int type, void *func,
-                    const char *name, const char *proto)
+register_nci_method(PARROT_INTERP, const int type, NOTNULL(void *func),
+                    NOTNULL(const char *name), NOTNULL(const char *proto))
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
     STRING * const method_name = string_make(interp, name, strlen(name),
@@ -77,8 +77,8 @@ TODO: Not yet documented!!!
 
 PARROT_API
 void
-register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void *func,
-        const char *name)
+register_raw_nci_method_in_ns(PARROT_INTERP, const int type, NOTNULL(void *func),
+        NOTNULL(const char *name))
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
     STRING * const method_name = string_make(interp, name, strlen(name),
@@ -132,8 +132,8 @@ Register a parser/compiler function.
 
 PARROT_API
 void
-Parrot_compreg(PARROT_INTERP, STRING *type,
-                    Parrot_compiler_func_t func)
+Parrot_compreg(PARROT_INTERP, NOTNULL(STRING *type),
+                    NOTNULL(Parrot_compiler_func_t func))
 {
     PMC* const iglobals = interp->iglobals;
     PMC *hash, *nci;
