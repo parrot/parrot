@@ -57,6 +57,7 @@ language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '!= for equal st
 <?php
 if ( 'asdf' != 'asdf' )
 {
+  echo "dummy";
 }
 else
 {
