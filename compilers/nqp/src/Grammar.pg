@@ -306,10 +306,12 @@ token circumfix {
 token variable {
     | '$<' ( <-[\>]>* ) '>' {*}                            #= $< >
     | '$/' {*}                                             #= $/
-    | <sigil> <ident> {*}                                  #= $var
+    | <sigil> <twigil>? <ident> {*}                        #= $var
 }
 
-token sigil { '$' }
+token sigil { <[$@%&]> }
+
+token twigil { <[.!^*+?=]> }
 
 token value {
     | <quote> {*}                                          #= quote

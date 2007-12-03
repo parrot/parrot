@@ -56,4 +56,6 @@ and exercise methods using that.
 
 =item * List context @( ... )
 
+=item * Variables with twigils
+
 =back
