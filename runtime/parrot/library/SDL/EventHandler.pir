@@ -76,10 +76,7 @@ SDL::EventHandler provides the following methods:
 .sub 'init' :method
     .param pmc args
 
-    .local int offset
-    classoffset offset, self, 'SDL::EventHandler'
-
-    setattribute self, offset, args
+    setattribute self, 'args', args
 .end
 
 =item key_down( event, event_args )

@@ -171,14 +171,10 @@ The name of this method may change.
     .local int loss
     .local int shift_bits
 
-    .local int offset
-    classoffset offset, self, 'SDL::Color'
-
     color = 0
 
     # red
-    inc offset
-    getattribute component, self, offset
+    getattribute component, self, 'r'
 
     .local int red
     red = component
@@ -189,8 +185,7 @@ The name of this method may change.
     add color, red
 
     # green
-    inc offset
-    getattribute component, self, offset
+    getattribute component, self, 'g'
     (loss, shift_bits) = surface.'convert_green'()
 
     .local int green
@@ -201,8 +196,7 @@ The name of this method may change.
     add color, green
 
     # blue
-    inc offset
-    getattribute component, self, offset
+    getattribute component, self, 'b'
     (loss, shift_bits) = surface.'convert_blue'()
 
     .local int blue
