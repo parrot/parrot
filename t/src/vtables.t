@@ -8,9 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 3;
-
-my @TODO = ( todo => 'vtable not NULL after destroy' );
+plan tests => 4;
 
 =head1 NAME
 
@@ -98,6 +96,7 @@ ok
 ok
 OUTPUT
 
+my @TODO = ( todo => 'vtable not NULL after destroy' );
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot_destroy_vtable", @TODO );
 
 #include <parrot/parrot.h>
@@ -132,6 +131,50 @@ main(int argc, char* argv[])
     return 0;
 }
 CODE
+ok
+ok
+OUTPUT
+
+# XXX why isn't parrot written with an upper case 'p' here?
+c_output_is( <<'CODE', <<'OUTPUT', "parrot_alloc_vtables" );
+
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/vtables.h>
+
+int
+main(int argc, char* argv[])
+{
+    Interp *interp;
+    VTABLE *vtable;
+
+    interp = Parrot_new(NULL);
+    if (!interp) {
+        return 1;
+    }
+
+    parrot_alloc_vtables(interp);
+
+    if (interp->vtables)
+        printf("ok\n");
+    else
+        printf("not ok\n");
+
+    if (interp->n_vtable_max == enum_class_core_max)
+        printf("ok\n");
+    else
+        printf("not ok\n");
+
+    if (interp->n_vtable_alloced == PARROT_MAX_CLASSES)
+        printf("ok\n");
+    else
+        printf("not ok\n");
+
+    Parrot_exit(interp, 0);
+    return 0;
+}
+CODE
+ok
 ok
 ok
 OUTPUT
