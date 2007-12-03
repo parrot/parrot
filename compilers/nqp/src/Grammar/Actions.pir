@@ -772,7 +772,8 @@
 ##            make PAST::Var.new(
 ##                     PAST::Var.new(scope=>'lexical', name=>'$/'),
 ##                     PAST::Val.new(value=>~$[0]),
-##                     scope=>'keyed');
+##                     :scope('keyed'),
+##                     :viviself('Undef') );
 ##        }
 ##        else {
 ##            make PAST::Var.new(node=>$/, name=>~$/)
@@ -788,7 +789,7 @@
     $P2 = get_hll_global ['PAST'], 'Val'
     $S0 = match[0]
     $P3 = $P2.'new'('value'=>$S0)
-    $P4 = $P0.'new'($P1, $P3, 'scope'=>'keyed')
+    $P4 = $P0.'new'($P1, $P3, 'scope'=>'keyed', 'viviself'=>'Undef')
     match.'result_object'($P4)
     .return ()
   past_var:
