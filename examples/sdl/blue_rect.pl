@@ -1,8 +1,5 @@
 # $Id$
 
-## no critic TestingAndDebugging::RequireUseStrict
-## no critic TestingAndDebugging::RequireUseWarnings
-
 =head1 TITLE
 
 blue_rect.pl - draw a blue rectangle using the SDL library and NQP
@@ -15,7 +12,6 @@ directory:
     $ ./parrot compilers/nqp/nqp.pbc examples/sdl/blue_rect.pl
 
 =cut
-
 
 # load the SDL class libraries
 PIR  q<  load_bytecode 'SDL/App.pir'   >;
@@ -58,7 +54,7 @@ $app.quit();
 blue_rect.pl created by Patrick R. Michaud (pmichaud@pobox.com)
 based on blue_rect.pir by chromatic (chromatic at wgz dot org).
 
-=head1 COPYRIGHt
+=head1 COPYRIGHT
 
 Copyright (C) 2004-2007, The Perl Foundation.
 
