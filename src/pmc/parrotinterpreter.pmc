@@ -64,7 +64,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
 
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
         INTVAL i, last_remove;
-        INTVAL start = d->n_vtable_max;
+        const INTVAL start = d->n_vtable_max;
 
         /* copy type registrations to keep type numbers the same */
         d->class_hash   = Parrot_clone(d, s->class_hash);
@@ -94,10 +94,10 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     }
 
     if (flags & PARROT_CLONE_LIBRARIES) {
-        PMC   *libs     = VTABLE_get_pmc_keyed_int(s, s->iglobals,
+        PMC   * const libs     = VTABLE_get_pmc_keyed_int(s, s->iglobals,
             IGLOBALS_DYN_LIBS);
-        PMC   *lib_iter = VTABLE_get_iter(s, libs);
-        INTVAL n        = VTABLE_elements(s, libs);
+        PMC   * const lib_iter = VTABLE_get_iter(s, libs);
+        const INTVAL n         = VTABLE_elements(s, libs);
         INTVAL i;
 
         for (i = 0; i < n; ++i) {
@@ -163,7 +163,7 @@ create_interp(PMC *self, Parrot_Interp parent)
 static int
 recursion_limit(Parrot_Interp interp, PMC *self, int l)
 {
-    int ret                 = interp->recursion_limit;
+    const int ret           = interp->recursion_limit;
     interp->recursion_limit = l;
     return ret;
 }
@@ -187,7 +187,7 @@ Class initialization.
 */
 
     void class_init() {
-        int typ = enum_class_ParrotInterpreter;
+        const int typ = enum_class_ParrotInterpreter;
 
         if (pass) {
             /* TODO unify and fix signatures */
@@ -198,7 +198,6 @@ Class initialization.
             register_nci_method(INTERP, typ,
                     F2DPTR(recursion_limit), "recursion_limit", "iJOi");
         }
-
     }
 
 /*
@@ -286,7 +285,7 @@ Returns the thread id of the interpreter.
 */
 
     INTVAL get_integer() {
-        Parrot_Interp i = PMC_data_typed(SELF, Parrot_Interp);
+        const Parrot_Interp i = PMC_data_typed(SELF, Parrot_Interp);
         return (INTVAL)i->thread_data->tid;
     }
 
@@ -301,7 +300,7 @@ Runs the interpreter's byte code.
 */
 
     opcode_t *invoke(void *next) {
-        Interp *new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         /* setup code */
         pt_thread_prepare_for_run(new_interp, interp);
@@ -327,7 +326,7 @@ Returns the PMC global value for C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        Interp *new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         if (key >= 0 && key < IGLOBALS_SIZE)
             return VTABLE_get_pmc_keyed_int(new_interp,
@@ -458,7 +457,7 @@ Returns the interpreter info for C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        Interp *new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         if (key == -1)
             return (INTVAL)new_interp->flags;
@@ -477,11 +476,11 @@ Sets the interpreter info for C<key> to C<val>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL val) {
-        Interp *new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         /* set interpreter flags */
         if (key == -1) {
-            INTVAL allowed = PARROT_BOUNDS_FLAG | PARROT_PROFILE_FLAG |
+            const INTVAL allowed = PARROT_BOUNDS_FLAG | PARROT_PROFILE_FLAG |
                              PARROT_GC_DEBUG_FLAG;
             Parrot_clear_flag(new_interp, allowed);
             Parrot_set_flag(new_interp, val & allowed);
@@ -502,7 +501,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 */
 
     PMC *clone() {
-        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         clone_interpreter((Parrot_Interp)PMC_data(dest),
                           (Parrot_Interp)PMC_data(SELF), PARROT_CLONE_DEFAULT);
@@ -611,8 +610,8 @@ Finish thawing.
     }
 
     void thawfinish(visit_info *info) {
-        PMC    *new_info = PMC_pmc_val(SELF);
-        INTVAL  m        = VTABLE_elements(INTERP, new_info);
+        PMC * const new_info = PMC_pmc_val(SELF);
+        const INTVAL  m      = VTABLE_elements(INTERP, new_info);
         INTVAL  i;
 
         PMC_pmc_val(SELF) = NULL;
@@ -621,15 +620,14 @@ Finish thawing.
         /* TODO compare old entries */
 
         for (i = 0; i < m; ++i) {
-            PMC *entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
-            PMC *lib_pmc  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_lib);
-            PMC *name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
-            PMC *typemap  =
-                VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_typemap);
+            PMC * const entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
+            PMC * const lib_pmc  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_lib);
+            PMC * const name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
+            PMC * const typemap  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_typemap);
             INTVAL hll_id = - 1;
 
             if (!PMC_IS_NULL(name_pmc)) {
-                STRING *hll_name = VTABLE_get_string(INTERP, name_pmc);
+                STRING * const hll_name = VTABLE_get_string(INTERP, name_pmc);
 
                 PObj_constant_SET(hll_name);
                 hll_id           = Parrot_register_HLL(INTERP, hll_name);
@@ -656,9 +654,9 @@ Finish thawing.
                 INTVAL i;
 
                 for (i = 0; i < e; ++i) {
-                    PMC   *key       = VTABLE_shift_pmc(INTERP, iter);
-                    INTVAL core_type = VTABLE_get_integer(INTERP, key);
-                    INTVAL hll_type  =
+                    PMC * const key        = VTABLE_shift_pmc(INTERP, iter);
+                    const INTVAL core_type = VTABLE_get_integer(INTERP, key);
+                    const INTVAL hll_type  =
                         VTABLE_get_integer_keyed_int(INTERP, typemap, core_type);
 
                     Parrot_register_HLL_type(INTERP, hll_id,
