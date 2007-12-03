@@ -14,7 +14,7 @@ regex SEA_empty_allowed       { <-[<]>*? <?before: \<> }
 token CODE_START              { '<?php' }
 token CODE_END                { '?>' \n? }
 token DOUBLEQUOTE_STRING      { '"' <string_literal: "> '"' }
-token SINGLEQUOTE_STRING      { \' <string_literal: '> \' }
+token SINGLEQUOTE_STRING      { \'  <string_literal: '> \'  }
 token ECHO                    { 'echo' }
 token VAR_DUMP                { 'var_dump' }
 token PHP_SAPI_NAME           { 'php_sapi_name' }
