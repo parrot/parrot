@@ -33,7 +33,6 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     .local pmc past_mult, past_string, past_adding
     .local pmc past_unary, multiplicand, multiplicand_0, past_multiplicand_0
     .local pmc past_expression
-    .local pmc code_string
     .local pmc past_var, past_val, past_sea, past_code 
     .local pmc past_else_block, past_condition
     .local pmc past_array_elem, past_assign, past_rel_expression
@@ -408,11 +407,8 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     $P0 = node['SEA_empty_allowed']
     if null $P0 goto no_SEA
     SEA:
-        val = $P0
-        code_string = new 'CodeString'
-        ( val ) = code_string.'escape'( val )
         past_val = new 'PAST::Val'                             
-        past_val.'init'( 'name' => val, 'returns' => 'String' )                              
+        past_val.'init'( 'value' => $P0, 'returns' => 'String' )                              
 
         past = new 'PAST::Op'
         past.'init'( past_val, 'node'=> node, 'pasttype' => 'call', 'name' => 'echo' )  
