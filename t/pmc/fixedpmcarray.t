@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 =head1 NAME
@@ -539,6 +539,60 @@ pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
 .end
 CODE
 010
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "elements, get_integer, get_number" );
+.sub 'test' :main
+    .local pmc arr1
+    .local int elems_i
+    .local num elems_f
+    arr1 = new 'FixedPMCArray'
+    arr1 = 0
+    elems_i = elements arr1
+    if elems_i == 0 goto ok_1
+    print 'not '
+  ok_1:
+    say 'ok 1'
+
+    elems_i = arr1
+    if elems_i == 0 goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2'
+
+    elems_f = arr1
+    if elems_f == 0 goto ok_3
+    print 'not '
+  ok_3:
+    say 'ok 3'
+
+    arr1 = new 'FixedPMCArray'
+    arr1 = 2048
+    elems_i = elements arr1
+    if elems_i == 2048 goto ok_4
+    print 'not '
+  ok_4:
+    say 'ok 4'
+
+    elems_i = arr1
+    if elems_i == 2048 goto ok_5
+    print 'not '
+  ok_5:
+    say 'ok 5'
+
+    elems_f = arr1
+    if elems_f == 2048 goto ok_6
+    print 'not '
+  ok_6:
+    say 'ok 6'
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
 # Local Variables:
