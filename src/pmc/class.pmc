@@ -106,29 +106,28 @@ build_attrib_index(PARROT_INTERP, PMC *self)
        /* Get the class and check that it respects the standard class interface
         * (if not we don't know how it stores its attributes, so we'll have to
         * delegate the lookup). */
-        PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents,
-            i);
+        PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
         if (PObj_is_class_TEST(cur_class)) {
             /* The attribute metadata hash. */
-            Parrot_Class *class_info = PARROT_CLASS(cur_class);
-            PMC          *attribs    = class_info->attrib_metadata;
-            PMC          *iter       = VTABLE_get_iter(interp, attribs);
+            Parrot_Class * const class_info = PARROT_CLASS(cur_class);
+            PMC          * const attribs    = class_info->attrib_metadata;
+            PMC          * const iter       = VTABLE_get_iter(interp, attribs);
 
             /* Build a string representing the fully qualified class name. */
             /* Retrieve the fully qualified class name for the class. */
-            STRING *fq_class         = VTABLE_get_string(interp, cur_class);
+            STRING * const fq_class         = VTABLE_get_string(interp, cur_class);
 
             /* Iterate over the attributes. */
             while (VTABLE_get_bool(interp, iter)) {
                 /* Get attribute. */
-                PMC    *cur_attrib  = VTABLE_get_pmc_keyed_str(interp, attribs,
+                PMC    * const cur_attrib  = VTABLE_get_pmc_keyed_str(interp, attribs,
                     VTABLE_shift_string(interp, iter));
-                STRING *full_key    = string_copy(interp, fq_class);
+                STRING *full_key           = string_copy(interp, fq_class);
 
                 /* Get attribute name and append it to the key. */
-                STRING *name_str = CONST_STRING(interp, "name");
-                STRING *attrib_name = VTABLE_get_string_keyed_str(
+                STRING * const name_str = CONST_STRING(interp, "name");
+                STRING * const attrib_name = VTABLE_get_string_keyed_str(
                     interp, cur_attrib, name_str);
 
                 full_key = string_append(interp, full_key, attrib_name);
@@ -220,12 +219,12 @@ register_type(PARROT_INTERP, PMC *name) {
 static void
 init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 {
-    Parrot_Class *_class      = PARROT_CLASS(self);
-    STRING       *name_str    = CONST_STRING(interp, "name");
-    STRING       *parents_str = CONST_STRING(interp, "parents");
-    STRING       *methods_str = CONST_STRING(interp, "methods");
-    STRING       *roles_str   = CONST_STRING(interp, "roles");
-    STRING       *attrs_str   = CONST_STRING(interp, "attributes");
+    Parrot_Class * const _class      = PARROT_CLASS(self);
+    STRING       * const name_str    = CONST_STRING(interp, "name");
+    STRING       * const parents_str = CONST_STRING(interp, "parents");
+    STRING       * const methods_str = CONST_STRING(interp, "methods");
+    STRING       * const roles_str   = CONST_STRING(interp, "roles");
+    STRING       * const attrs_str   = CONST_STRING(interp, "attributes");
     PMC          *old_ns;
     INTVAL        i, type_num;
     STRING *resolve_method_str = NULL;
@@ -1246,7 +1245,6 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 */
 
     void visit(visit_info *info) {
-        INTVAL i, n;
         Parrot_Class * const class_data = PARROT_CLASS(SELF);
         PMC **pos;
 
@@ -1293,9 +1291,9 @@ Used to archive the class.
 */
 
     void freeze(visit_info *info) {
-        IMAGE_IO     *io                = info->image_io;
+        IMAGE_IO     * const io         = info->image_io;
         Parrot_Class * const class_data = PARROT_CLASS(SELF);
-        STRING       * serial_namespace = CONST_STRING(interp, "");
+        STRING       *serial_namespace  = CONST_STRING(interp, "");
 
         /* 1) freeze class id */
         VTABLE_push_integer(INTERP, io, class_data->id);
@@ -1305,7 +1303,7 @@ Used to archive the class.
 
         /* 3) serialize namespace name, including HLL */
         if (!PMC_IS_NULL(class_data->_namespace)) {
-            PMC *names = Parrot_NameSpace_nci_get_name(interp,
+            PMC * const names = Parrot_NameSpace_nci_get_name(interp,
                     class_data->_namespace);
             if (!PMC_IS_NULL(names))
                 serial_namespace = string_join(interp, CONST_STRING(interp, ";"), names);
@@ -1324,8 +1322,6 @@ Used to unarchive the class.
 */
 
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-
         /* The class might already exist in the interpreter, so create it as an
          * anonymous class and later decide whether to link it into the
          * namespace.
@@ -1335,16 +1331,18 @@ Used to unarchive the class.
             SUPER(info);
         }
         else if (info->extra_flags == EXTRA_IS_NULL) {
+            IMAGE_IO * const io = info->image_io;
+
             /* 1) thaw class id */
-            INTVAL  id = VTABLE_shift_integer(INTERP, io);
+            const INTVAL id = VTABLE_shift_integer(INTERP, io);
 
             /* 2) thaw class name */
-            STRING *name = VTABLE_shift_string(INTERP, io);
+            STRING * const name = VTABLE_shift_string(INTERP, io);
 
             /* 3) deserialize namespace name, including HLL */
-            STRING *serial_namespace = VTABLE_shift_string(INTERP, io);
-            STRING *semicolon_str = CONST_STRING(INTERP, ";");
-            PMC    *namespace_array =
+            STRING * const serial_namespace = VTABLE_shift_string(INTERP, io);
+            STRING * const semicolon_str = CONST_STRING(INTERP, ";");
+            PMC    * const namespace_array =
                 string_split(INTERP, semicolon_str, serial_namespace);
             PMC *ns = Parrot_get_namespace_keyed(interp,
                     INTERP->root_namespace, namespace_array);
@@ -1382,7 +1380,7 @@ Called after the class has been thawed.
 */
 
     void thawfinish(visit_info *info) {
-        Parrot_Class  *_class    = PARROT_CLASS(SELF);
+        Parrot_Class * const _class = PARROT_CLASS(SELF);
 
         /* Recalculate full MRO from thawed parents */
         _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
@@ -1407,15 +1405,15 @@ Sets the name of the class, and updates the namespace accoringly.
 
 */
     PCCMETHOD name(STRING *name :optional, int has_name :opt_flag) {
-        Parrot_Class *_class   = PARROT_CLASS(SELF);
+        Parrot_Class * const _class = PARROT_CLASS(SELF);
         STRING       *ret_name = NULL;
 
         if (has_name) {
             /* We'll build a hash just containing the name, then give this to
              * init_class_from_hash - saves some code duplication. */
-            PMC *naming_hash = pmc_new(interp, enum_class_Hash);
+            PMC * const naming_hash = pmc_new(interp, enum_class_Hash);
 
-            STRING *name_str = CONST_STRING(interp, "name");
+            STRING * const name_str = CONST_STRING(interp, "name");
             VTABLE_set_string_keyed_str(interp, naming_hash, name_str, name);
             init_class_from_hash(interp, SELF, naming_hash);
         }
@@ -1434,8 +1432,8 @@ Gets the namespace that this class is attached to.
 
 */
     PCCMETHOD pmc_namespace(PMC *_namespace :optional, int has_name :opt_flag) {
-        Parrot_Class *_class        = PARROT_CLASS(SELF);
-        PMC          *ret_namespace = _class->_namespace;
+        Parrot_Class * const _class        = PARROT_CLASS(SELF);
+        PMC          * const ret_namespace = _class->_namespace;
         UNUSED(_namespace);
         UNUSED(has_name);
         PCCRETURN(PMC *ret_namespace);
@@ -1453,7 +1451,7 @@ methods from roles. When called with no parameter, returns the list.
 */
     PCCMETHOD resolve_method(PMC *resolve_list :optional,
                                   int has_list :opt_flag) {
-        Parrot_Class *_class   = PARROT_CLASS(SELF);
+        Parrot_Class * const _class   = PARROT_CLASS(SELF);
         PMC          *ret_list = NULL;
 
         /* Store list. */
@@ -1497,8 +1495,8 @@ providing a set of key/value pairs describing the attribute.
 
 */
     PCCMETHOD attributes() {
-        STRING *attr_str = CONST_STRING(interp, "attributes");
-        PMC *ret_attrib_metadata = DYNSELF.inspect_str(attr_str);
+        STRING * const attr_str = CONST_STRING(interp, "attributes");
+        PMC * const ret_attrib_metadata = DYNSELF.inspect_str(attr_str);
 
         PCCRETURN(PMC *ret_attrib_metadata);
     }
@@ -1514,7 +1512,7 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 */
     PCCMETHOD add_attribute(STRING *attribute_name,
             PMC *attribute_type :optional, int has_type :opt_flag) {
-        PMC *type = has_type ? attribute_type : PMCNULL;
+        PMC * const type = has_type ? attribute_type : PMCNULL;
         DYNSELF.add_attribute(attribute_name, type);
     }
 
@@ -1528,7 +1526,7 @@ Return a hash where the keys are method names and the values are methods.
 
 */
     PCCMETHOD methods() {
-        PMC *ret_methods = DYNSELF.inspect_str(CONST_STRING(interp, "methods"));
+        PMC * const ret_methods = DYNSELF.inspect_str(CONST_STRING(interp, "methods"));
 
         PCCRETURN(PMC *ret_methods);
     }
@@ -1601,7 +1599,7 @@ Return the parents array PMC.
 
 */
     PCCMETHOD parents() {
-        PMC *ret_parents = DYNSELF.inspect_str(CONST_STRING(interp, "parents"));
+        PMC * const ret_parents = DYNSELF.inspect_str(CONST_STRING(interp, "parents"));
 
         PCCRETURN(PMC *ret_parents);
     }
@@ -1629,7 +1627,7 @@ Return the roles array PMC.
 
 */
     PCCMETHOD roles() {
-        PMC *ret_roles = DYNSELF.inspect_str(CONST_STRING(interp, "roles"));
+        PMC * const ret_roles = DYNSELF.inspect_str(CONST_STRING(interp, "roles"));
 
         PCCRETURN(PMC *ret_roles);
     }
@@ -1650,7 +1648,7 @@ Compose a role into a class with the given exclusions and aliases.
             PMC *alias_method       :optional :named["alias_method"],
             int has_alias_method    :opt_flag) {
 
-        Parrot_Class *_class = PARROT_CLASS(SELF);
+        Parrot_Class * const _class = PARROT_CLASS(SELF);
 
         /* Add everything on the resolve list to the exclude list; if we have
          * no exclude list, pass along the resolve list in its place if it has
@@ -1662,11 +1660,11 @@ Compose a role into a class with the given exclusions and aliases.
             }
         }
         else {
-            int resolve_count = VTABLE_elements(interp, _class->resolve_method);
+            const int resolve_count = VTABLE_elements(interp, _class->resolve_method);
             int i;
 
             for (i = 0; i < resolve_count; i++) {
-                STRING *meth_name = VTABLE_get_string_keyed_int(interp,
+                STRING * const meth_name = VTABLE_get_string_keyed_int(interp,
                     _class->resolve_method, i);
                 VTABLE_push_string(interp, exclude_method, meth_name);
             }
@@ -1711,7 +1709,7 @@ C<class_name>, false otherwise.
 
 */
     PCCMETHOD isa(STRING *class_name) {
-        INTVAL isa = DYNSELF.isa(class_name);
+        const INTVAL isa = DYNSELF.isa(class_name);
 
         PCCRETURN(INTVAL isa);
     }
@@ -1728,7 +1726,7 @@ false otherwise.
 */
     PCCMETHOD does(STRING *role_name) {
         INTVAL i, role_count, isa;
-        PMC *role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
+        PMC * const role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
 
         if (!role_list)
             PCCRETURN(INTVAL 0);
@@ -1737,7 +1735,7 @@ false otherwise.
 
         for (i = 0; i < role_count; i++) {
             INTVAL  role_does;
-            PMC    *role       = VTABLE_get_pmc_keyed_int(interp, role_list, i);
+            PMC    * const role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
 
             (INTVAL role_does) = PCCINVOKE(interp, role, "does",
                                            STRING *role_name);
