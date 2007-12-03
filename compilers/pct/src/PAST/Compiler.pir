@@ -728,6 +728,70 @@ handler.
 .end
 
 
+=item chain(PAST::Op node)
+
+A short-circuiting chain of operations.  In a sequence of nodes
+with pasttype 'chain', the right operand of a node serves as
+the left operand of its parent.  Each node is evaluated only
+once, and the first false result short-circuits the chain.
+In other words,  C<<  $x < $y < $z >>  is true only if
+$x < $y and $y < $z, but $y only gets evaluated once.
+
+=cut
+
+.sub 'chain' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+    .local pmc clist, cpast
+
+    ##  first, we build up the list of nodes in the chain
+    clist = new 'ResizablePMCArray'
+    cpast = node
+  chain_loop:
+    $I0 = isa cpast, 'PAST::Op'
+    if $I0 == 0 goto chain_end
+    .local string pasttype
+    pasttype = cpast.'pasttype'()
+    if pasttype != 'chain' goto chain_end
+    push clist, cpast
+    cpast = cpast[0]
+    goto chain_loop
+  chain_end:
+
+    .local pmc ops, endlabel
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+    $S0 = ops.'unique'('$P')
+    ops.'result'($S0)
+    $P0 = get_hll_global ['POST'], 'Label'
+    endlabel = $P0.'new'('name'=>'chain_end_')
+
+    .local pmc apast, apost
+    cpast = pop clist
+    apast = cpast[0]
+    apost = self.'post'(apast, 'rtype'=>'P')
+    ops.'push'(apost)
+
+  clist_loop:
+    .local pmc bpast, bpost
+    bpast = cpast[1]
+    bpost = self.'post'(bpast, 'rtype'=>'P')
+    ops.'push'(bpost)
+    .local string name
+    name = cpast.'name'()
+    name = ops.'escape'(name)
+    ops.'push_pirop'('call', name, apost, bpost, 'result'=>ops)
+    unless clist goto clist_end
+    ops.'push_pirop'('unless', ops, endlabel)
+    cpast = pop clist
+    apost = bpost
+    goto clist_loop
+  clist_end:
+    ops.'push'(endlabel)
+    .return (ops)
+.end
+
+
 =item xor(PAST::Op node)
 
 A short-circuiting exclusive-or operation.  Each child is evaluated,
