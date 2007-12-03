@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 =head1 NAME
 
@@ -802,6 +802,71 @@ bar
 bar
 xyzzy
 xyzzy
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'freeze/thaw 3' );
+.sub main :main
+    .local string frozen
+    frozen = get_frozen_hash()
+
+    sweep 1
+
+    .local pmc parent
+    parent = thaw frozen
+    $S0 = parent['a']
+    say $S0
+
+    $S0 = parent[0]
+    say $S0
+
+    .local pmc child
+    child = parent[1]
+    $S0   = child[0]
+    say $S0
+
+    $S0   = child['foo']
+    say $S0
+
+    $S0   = parent[1; 'foo']
+    say $S0
+
+    $S0   = parent['b'; 'foo']
+    say $S0
+
+    $S0   = parent['b'; 'quux']
+    say $S0
+
+    $S0   = parent['b'; 2]
+    say $S0
+    end
+.end
+
+.sub get_frozen_hash
+    .local pmc parent
+    parent      = new 'OrderedHash'
+    parent['a'] = 'Foo'
+
+    .local pmc child
+    child        = new 'OrderedHash'
+    child['foo'] = 'bar'
+    push child, 'baz'
+
+    parent['b']         = child
+    parent['b'; 'quux'] = 'qaax'
+
+    .local string frozen
+    frozen = freeze parent
+    .return( frozen )
+.end
+CODE
+Foo
+Foo
+bar
+bar
+bar
+bar
+qaax
+qaax
 OUTPUT
 
 # Local Variables:
