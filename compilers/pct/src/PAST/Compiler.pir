@@ -663,7 +663,9 @@ by C<node>.
     .local string iter
     iter = ops.'unique'('$P')
     ops.'result'(iter)
-    ops.'push_pirop'('if_null', collpost, endlabel)        ## FIXME
+    $S0 = ops.'unique'('$I')
+    ops.'push_pirop'('defined', $S0, collpost)
+    ops.'push_pirop'('unless', $S0, endlabel)
     ops.'push_pirop'('new', iter, '"Iterator"', collpost)
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', iter, endlabel)
