@@ -696,8 +696,8 @@ Sets C<*value> (see C<init_pmc()> and calculates the offsets.
 
     void set_pmc(PMC *value) {
         PMC_pmc_val(SELF) = value;
-        calc_offsets(INTERP, SELF, value, 0);
         PObj_custom_mark_SET(SELF);
+        calc_offsets(INTERP, SELF, value, 0);
     }
 
 /*
