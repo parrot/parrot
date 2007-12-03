@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More qw(no_plan);    # tests => 14;
+use Test::More tests => 14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
