@@ -401,8 +401,9 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry * PackFile_find_fixup_entry(PARROT_INTERP,
     INTVAL type,
-    char *name)
-        __attribute__nonnull__(1);
+    NOTNULL(char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

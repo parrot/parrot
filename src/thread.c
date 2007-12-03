@@ -26,6 +26,7 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 /* HEADERIZER BEGIN: static */
 
 static Parrot_Interp detach(UINTVAL tid);
+PARROT_CAN_RETURN_NULL
 static Shared_gc_info * get_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -35,7 +36,7 @@ static int is_suspended_for_gc(PARROT_INTERP)
 PARROT_CAN_RETURN_NULL
 static PMC * make_local_args_copy(PARROT_INTERP,
     Parrot_Interp old_interp,
-    PMC *args)
+    NULLOK(PMC *args))
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
@@ -61,10 +62,14 @@ static void pt_gc_wakeup_check(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void pt_ns_clone(
-    Parrot_Interp d,
-    PMC *dest_ns,
-    Parrot_Interp s,
-    PMC *source_ns);
+    NOTNULL(Parrot_Interp d),
+    NOTNULL(PMC *dest_ns),
+    NOTNULL(Parrot_Interp s),
+    NOTNULL(PMC *source_ns))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static void pt_suspend_all_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -83,7 +88,7 @@ static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-static void* thread_func(void *arg);
+static void* thread_func(NULLOK(void *arg));
 
 /* HEADERIZER END: static */
 
@@ -167,6 +172,7 @@ Get the shared gc information.  TODO: improve the docs here.
 
 */
 
+PARROT_CAN_RETURN_NULL
 static Shared_gc_info *
 get_pool(PARROT_INTERP)
 {
@@ -187,7 +193,7 @@ Make a local copy of the corresponding array of arguments.
 
 PARROT_CAN_RETURN_NULL
 static PMC *
-make_local_args_copy(PARROT_INTERP, Parrot_Interp old_interp, PMC *args)
+make_local_args_copy(PARROT_INTERP, Parrot_Interp old_interp, NULLOK(PMC *args))
 {
     PMC   *ret_val;
     INTVAL old_size;
@@ -237,7 +243,7 @@ pt_shared_fixup(PARROT_INTERP, PMC *pmc)
      */
     INTVAL        type_num;
     Parrot_Interp master = interpreter_array[0];
-    int           is_ro  = pmc->vtable->flags & VTABLE_IS_READONLY_FLAG;
+    const int     is_ro  = pmc->vtable->flags & VTABLE_IS_READONLY_FLAG;
 
     /* This lock is paired with one in objects.c. It is necessary to protect
      * against the master interpreter adding classes and consequently
@@ -406,7 +412,7 @@ The actual thread function.
 
 PARROT_CAN_RETURN_NULL
 static void*
-thread_func(void *arg)
+thread_func(NULLOK(void *arg))
 {
     Parrot_exception exp;
     int              lo_var_ptr;
@@ -516,7 +522,8 @@ Clone all globals from C<s> to C<d>.
 */
 
 static void
-pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns)
+pt_ns_clone(NOTNULL(Parrot_Interp d), NOTNULL(PMC *dest_ns),
+            NOTNULL(Parrot_Interp s), NOTNULL(PMC *source_ns))
 {
     PMC * const iter = VTABLE_get_iter(s, source_ns);
     const INTVAL n   = VTABLE_elements(s, source_ns);
@@ -525,13 +532,10 @@ pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns)
     for (i = 0; i < n; ++i) {
         /* XXX what if 'key' is a non-constant-pool string? */
         STRING * const key = VTABLE_shift_string(s, iter);
-        PMC           *val;
-
-        val = VTABLE_get_pmc_keyed_str(s, source_ns, key);
+        PMC    * const val = VTABLE_get_pmc_keyed_str(s, source_ns, key);
 
         if (val->vtable->base_type == enum_class_NameSpace) {
-            PMC *sub_ns;
-            sub_ns = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
+            PMC *sub_ns = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
             if (PMC_IS_NULL(sub_ns) || sub_ns->vtable->base_type !=
                     enum_class_NameSpace) {
                 sub_ns = pmc_new(d, enum_class_NameSpace);
@@ -543,8 +547,8 @@ pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns)
             PMC * const dval = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
 
             if (PMC_IS_NULL(dval)) {
-                PMC *copy;
-                copy = make_local_copy(d, s, val);
+                PMC * const copy = make_local_copy(d, s, val);
+
                 /* Vtable overrides and methods were already cloned, so don't reclone them. */
                 if (!(val->vtable->base_type == enum_class_Sub
                         && (PMC_sub(val)->vtable_index != -1
@@ -615,6 +619,7 @@ create a clone of the sub suitable for the other interpreter
 
 */
 
+PARROT_CAN_RETURN_NULL
 PMC *
 pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, NULLOK(PMC *sub))
 {
@@ -641,7 +646,7 @@ int
 */
 
 int
-pt_thread_run(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
+pt_thread_run(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))
 {
     PMC *old_dest_interp;
     PMC *parent;
@@ -685,8 +690,7 @@ pt_thread_run(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
     pt_thread_prepare_for_run(interpreter, interp);
 
     PMC_struct_val(dest_interp) = pt_transfer_sub(interpreter, interp, sub);
-    PMC_pmc_val(dest_interp)    = make_local_args_copy(interpreter, interp,
-                                                       arg);
+    PMC_pmc_val(dest_interp)    = make_local_args_copy(interpreter, interp, arg);
 
     /*
      * set regs according to pdd03
@@ -1187,6 +1191,7 @@ Join (wait for) a joinable thread.
 
 */
 
+PARROT_CAN_RETURN_NULL
 PMC*
 pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
 {

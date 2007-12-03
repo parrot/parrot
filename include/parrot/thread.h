@@ -195,13 +195,18 @@ void pt_suspend_self_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void pt_thread_detach(UINTVAL tid);
+PARROT_CAN_RETURN_NULL
 PMC* pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
         __attribute__nonnull__(1);
 
 void pt_thread_kill(UINTVAL tid);
 void pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s);
-int pt_thread_run(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
-        __attribute__nonnull__(1);
+int pt_thread_run(PARROT_INTERP,
+    NOTNULL(PMC* dest_interp),
+    NULLOK(PMC* sub),
+    NULLOK(PMC *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 int pt_thread_run_1(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
         __attribute__nonnull__(1);
@@ -216,7 +221,9 @@ void pt_thread_wait_with(PARROT_INTERP, Parrot_mutex *mutex)
         __attribute__nonnull__(1);
 
 void pt_thread_yield(void);
+PARROT_CAN_RETURN_NULL
 PMC * pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, NULLOK(PMC *sub));
+
 /* HEADERIZER END: src/thread.c */
 
 #endif /* PARROT_THREAD_H_GUARD */

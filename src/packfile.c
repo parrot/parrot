@@ -3304,7 +3304,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry *
-PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)
+PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, NOTNULL(char *name))
 {
     /* TODO make a hash of all fixups */
     PackFile_Directory * const dir = interp->code->base.dir;
