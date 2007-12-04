@@ -190,30 +190,68 @@
 
 
 ##    method if_statement($/) {
-##        my $past := PAST::Op.new($($<EXPR>),
-##                                 $($<block>[0]),
-##                                 pasttype => $<sym>,
-##                                 node => $/);
-##        if ($<block>[1]) {
-##            $past.push($(<block>[1]));
+##        my $cond := +$<EXPR> - 1;
+##        my $past := PAST::Op.new( $( $<EXPR>[$cond] ),
+##                                  $( $<block>[$cond] ),
+##                                  :pasttype('if'),
+##                                  :node( $/ )
+##                                );
+##        if ( $<else> ) {
+##            $past.push( $( $<else>[0] ) );
 ##        }
+##        while ($cond != 0) {
+##            $cond := $cond - 1;
+##            $past := PAST::Op.new( $( $<EXPR>[$cond] ),
+##                                   $( $<block>[$cond] ),
+##                                   $past,
+##                                   :pasttype('if'),
+##                                   :node( $/ )
+##                                 );
+##        }
+##        $past.pasttype( ~$<sym> );
 ##        make $past;
 .sub 'if_statement' :method
     .param pmc match
-    .local pmc block, past
-    $P0 = match['EXPR']
-    $P0 = $P0.'get_scalar'()
-    block = match['block']
-    $P1 = block[0]
-    $P1 = $P1.'get_scalar'()
+    .local pmc expr, block, past
+    .local int cond
+    .local string sym
+    cond = match['EXPR']
+    cond -= 1
+    bsr get_expr
+    bsr get_block
     $P2 = get_hll_global ['PAST'], 'Op'
-    $S1 = match['sym']
-    past = $P2.'new'($P0, $P1, 'pasttype'=>$S1, 'node'=>match)
-    $I0 = exists block[1]
-    unless $I0 goto end
-    $P1 = block[1]
-    $P1 = $P1.'get_scalar'()
-    past.'push'($P1)
+    past = $P2.'new'(expr, block, 'pasttype'=>'if', 'node'=>match)
+
+    $I0 = exists match['else']
+    unless $I0 goto while
+    block = match['else']
+    block = block[0]
+    block = block.'get_scalar'()
+    past.'push'( block )
+
+  while:
+    unless cond != 0 goto end_while
+    cond -= 1
+    bsr get_expr
+    bsr get_block
+    past = $P2.'new'(expr, block, past, 'pasttype'=>'if', 'node'=>match)
+    goto while
+
+  end_while:
+    sym = match['sym']
+    past.'pasttype'( sym )
+    goto end
+
+  get_expr:
+    expr = match['EXPR']
+    expr = expr[cond]
+    expr = expr.'get_scalar'()
+    ret
+  get_block:
+    block = match['block']
+    block = block[cond]
+    block = block.'get_scalar'()
+    ret
   end:
     match.'result_object'(past)
 .end

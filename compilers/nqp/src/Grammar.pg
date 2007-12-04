@@ -142,8 +142,10 @@ token MARK_STATEMENT_END {
 ##  'unless'.
 
 rule if_statement {
-    $<sym>:=['if'|'unless'] <EXPR> <block>
-    [ 'else' <block> ]?
+    $<sym>:=['if'|'unless']
+    <EXPR> <block>
+    [ 'elsif' <EXPR> <block> ]*
+    [ 'else' $<else>=<block> ]?
     {*}
 }
 
