@@ -337,7 +337,7 @@ Returns the PMC value of the element at index C<key>.
 
 =back
 
-=head1 TODO
+=head1 RT#48124
 
 Fix the arithmetic ops (right now they just corrupt the array length and
 possibly seg fault).

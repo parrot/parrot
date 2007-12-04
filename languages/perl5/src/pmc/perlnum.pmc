@@ -50,7 +50,7 @@ Returns the number as a Parrot string.
         d = fabs(d);
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
 #else
-        /* XXX signbit isn't portable and as we are calling Parrot_sprintf_c
+        /* RT#48120 signbit isn't portable and as we are calling Parrot_sprintf_c
         * anyway, we can use the builtin number formatting too
         * this might still be a problem with -0.0
         */
