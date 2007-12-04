@@ -135,8 +135,11 @@ ok
 ok
 OUTPUT
 
+@TODO = $^O =~ /MSWin32/
+    ? ( todo => 'Unresolved externals on Win32' ) : ();
+
 # XXX why isn't parrot written with an upper case 'p' here?
-c_output_is( <<'CODE', <<'OUTPUT', "parrot_alloc_vtables" );
+c_output_is( <<'CODE', <<'OUTPUT', "parrot_alloc_vtables", @TODO );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>

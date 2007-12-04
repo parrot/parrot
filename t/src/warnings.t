@@ -10,6 +10,9 @@ use Parrot::Test;
 
 plan tests => 3;
 
+my @TODO = $^O =~ /MSWin32/
+    ? ( todo => 'Unresolved externals on Win32' ) : ();
+
 =head1 NAME
 
 t/src/warnings.t - Parrot warnings
@@ -28,7 +31,7 @@ Hacked from t/src/basics.t
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location" );
+c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location", @TODO );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
