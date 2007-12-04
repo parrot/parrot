@@ -221,8 +221,12 @@ sub runsteps {
     my $conf = shift;
 
     my $n = 0;    # step number
-    my ( $verbose, $verbose_step, $fatal, $fatal_step, $ask ) =
-        $conf->options->get(qw( verbose verbose-step fatal fatal-step ask ));
+    my ( $silent, $verbose, $verbose_step, $fatal, $fatal_step, $ask );
+    $silent = $conf->options->get(qw( silent ));
+    unless ($silent) {
+        ( $verbose, $verbose_step, $fatal, $fatal_step, $ask ) =
+            $conf->options->get(qw( verbose verbose-step fatal fatal-step ask ));
+    }
 
     $conf->{log} = [];
     my %steps_to_die_for = ();
@@ -259,6 +263,7 @@ sub runsteps {
                 verbose_step    => $verbose_step,
                 ask             => $ask,
                 n               => $n,
+                silent          => $silent,
             }
         );
         if ( ! defined $rv ) {
@@ -383,8 +388,10 @@ sub _run_this_step {
         }
     }
 
-    print "\n", $step->description, '...';
-    print "\n" if $args->{verbose} && $args->{verbose} == 2;
+    unless ($args->{silent}) {
+        print "\n", $step->description, '...';
+        print "\n" if $args->{verbose} && $args->{verbose} == 2;
+    }
 
     my $ret;
     # When successful, a Parrot configuration step now returns 1
@@ -405,14 +412,16 @@ sub _run_this_step {
         # A Parrot configuration step can run successfully, but if it fails to
         # achieve its objective it is supposed to return an undefined status.
         if ( $ret ) {
-            _finish_printing_result(
-                {
-                    step        => $step,
-                    step_name   => $step_name,
-                    args        => $args,
-                    description => $step->description,
-                }
-            );
+            unless ($args->{silent}) {
+                _finish_printing_result(
+                    {
+                        step        => $step,
+                        step_name   => $step_name,
+                        args        => $args,
+                        description => $step->description,
+                    }
+                );
+            }
             # reset verbose value for the next step
             $conf->options->set( verbose => $args->{verbose} );
             if ($conf->options->get(q{configure_trace}) ) {

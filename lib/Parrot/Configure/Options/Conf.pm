@@ -69,6 +69,7 @@ our @valid_options = qw{
     profile
     sbindir
     sharedstatedir
+    silent
     sysconfdir
     test
     verbose
@@ -128,6 +129,7 @@ General Options:
                         Configure.pl to halt
    --fatal-step         Comma-delimited string of configuration steps
                         which upon failure cause Configure.pl to halt
+   --silent             Don't be verbose, interactive or fatal
    --nomanicheck        Don't check the MANIFEST
    --languages="list of languages"
                         Specify a list of languages to process
