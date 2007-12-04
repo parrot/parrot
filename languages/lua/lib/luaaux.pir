@@ -26,6 +26,9 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $S1 = narg
     new $P0, 'Lua'
     $S0 = $P0.'caller'()
+    $I0 = index $S0, ':'
+    inc $I0
+    $S0 = substr $S0, $I0
     lua_error("bad argument #", $S1, " to '", $S0, "' (", extramsg :flat, ")")
 .end
 
