@@ -60,7 +60,7 @@ pmclass RubyString
           return 1;
         }
 
-        return 0; /* XXX Throw exception about invalid boolean type. */
+        return 0; /* RT#48132 Throw exception about invalid boolean type. */
     }
 }
 

@@ -163,7 +163,7 @@ pmclass DotNetSignature dynpmc group dotnet {
             sig->cur_pos += 4;
         }
 
-        /* Otherwise, it's a null byte. XXX Need special handling? */
+        /* Otherwise, it's a null byte. RT#48128 Need special handling? */
         else
         {
             val = 0;

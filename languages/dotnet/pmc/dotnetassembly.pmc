@@ -737,7 +737,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
         bytecode->body_size = read_word_u(in);
         sig_token = read_word_u(in);
         if (ass->rows[Table_StandAloneSig] < 2 << 15)
-            sig_token &= 0xFFFF; /* XXX Why do we have to do this? */
+            sig_token &= 0xFFFF; /* RT#48130 Why do we have to do this? */
 
         /* Load code. */
         bytecode->body = mem_sys_allocate(bytecode->body_size);
