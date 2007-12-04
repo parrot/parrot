@@ -40,12 +40,14 @@ program : HELLO
         printf("                                                                  \n");
         printf(".sub 'php_init' :load :init                                       \n");
         printf("                                                                  \n");
+        printf("  load_bytecode 'PGE.pbc'                                         \n");
+        printf("  load_bytecode 'PGE/Text.pbc'                                    \n");
+        printf("  load_bytecode 'PGE/Util.pbc'                                    \n");
+        printf("  load_bytecode 'PGE/Dumper.pbc'                                  \n");
+        printf("  load_bytecode 'PCT.pbc'                                         \n");
         printf("  load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'   \n");
-        printf("  load_bytecode 'PAST-pm.pbc'                                     \n");
-        printf("  load_bytecode 'Parrot/HLLCompiler.pbc'                          \n");
         printf("  load_bytecode 'MIME/Base64.pbc'                                 \n");
         printf("  load_bytecode 'dumper.pbc'                                      \n");
-        printf("  load_bytecode 'PGE.pbc'                                         \n");
         printf("  load_bytecode 'CGI/QueryHash.pbc'                               \n");
         printf("                                                                  \n");
         printf(".end                                                              \n");
@@ -92,7 +94,7 @@ program : HELLO
         printf("  .local pmc code_string                                          \n");
         printf("  code_string = new 'CodeString'                                  \n");
         printf("  ( val ) = code_string.'escape'( val )                           \n");
-        printf("      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n");
+        printf("      past_temp.'init'( 'value' => val, 'returns' => 'Undef' )      \n");
         printf("  past_echo.'push'( past_temp )                    \n");
         printf("  # end of NOQUOTE_STRING                                         \n");
         printf("                                                                  \n");
@@ -119,7 +121,7 @@ program : HELLO
         printf("    # print pir                                                   \n");
         printf("                                                                  \n");
         printf("    .local pmc pastcompiler, eval_past                            \n");
-        printf("    pastcompiler = new 'HLLCompiler'                              \n");
+        printf("    pastcompiler = new [ 'PCT::HLLCompiler' ]                     \n");
         printf("    pastcompiler.'removestage'('parse')                           \n");
         printf("    pastcompiler.'removestage'('past')                            \n");
         printf("    eval_past = pastcompiler.'compile'(past_root)                 \n");
