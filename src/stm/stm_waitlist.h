@@ -55,6 +55,7 @@ typedef struct waitlist_head STM_waitlist;
 
 /* HEADERIZER BEGIN: src/stm/waitlist.c */
 
+PARROT_CANNOT_RETURN_NULL
 STM_tx_log * Parrot_STM_tx_log_get(PARROT_INTERP)
         __attribute__nonnull__(1);
 

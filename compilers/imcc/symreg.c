@@ -843,6 +843,7 @@ Makes a new address
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
             int uniq)
@@ -892,8 +893,9 @@ Eventually make mk_address static
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_address(PARROT_INTERP, char *name, int uniq)
+mk_address(PARROT_INTERP, NOTNULL(char *name), int uniq)
 {
     const int begins_with_underscore = *name == '_';
     SymHash * const h = begins_with_underscore
@@ -918,6 +920,7 @@ Label gets a fixup entry.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_sub_label(PARROT_INTERP, NOTNULL(char *name))
 {
@@ -940,6 +943,7 @@ Make a symbol for a label, symbol gets a fixup entry.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_sub_address(PARROT_INTERP, NOTNULL(char *name))
 {
@@ -962,6 +966,7 @@ Make a local symbol, no fixup entry.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_local_label(PARROT_INTERP, NOTNULL(char *name))
 {

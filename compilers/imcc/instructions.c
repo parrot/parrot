@@ -94,6 +94,7 @@ Creates a new instruction
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Instruction *
 _mk_instruction(NOTNULL(const char *op), NOTNULL(const char *fmt), int n,
         SymReg ** r, int flags)

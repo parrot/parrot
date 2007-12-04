@@ -190,8 +190,9 @@ void Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_push_action(PARROT_INTERP, PMC *sub)
-        __attribute__nonnull__(1);
+void Parrot_push_action(PARROT_INTERP, NOTNULL(PMC *sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_push_mark(PARROT_INTERP, INTVAL mark)
@@ -246,6 +247,7 @@ void do_panic(
     unsigned int line);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * get_all_exception_handlers(PARROT_INTERP)
         __attribute__nonnull__(1);
 

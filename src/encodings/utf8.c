@@ -50,6 +50,7 @@ static STRING * get_bytes(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes_inplace(PARROT_INTERP,
     SHIM(STRING *src),
     UINTVAL offset,
@@ -136,6 +137,7 @@ static UINTVAL utf8_decode_and_advance(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static void * utf8_encode(PARROT_INTERP, NOTNULL(void *ptr), UINTVAL c)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -154,6 +156,7 @@ static void utf8_set_position(SHIM_INTERP,
 static const void * utf8_skip_backward(NOTNULL(const void *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static const void * utf8_skip_forward(NOTNULL(const void *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
@@ -266,11 +269,12 @@ Returns the UTF-8 encoding of integer C<c>.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static void *
 utf8_encode(PARROT_INTERP, NOTNULL(void *ptr), UINTVAL c)
 {
-    utf8_t *u8ptr = (utf8_t *)ptr;
-    UINTVAL len = UNISKIP(c);
+    const utf8_t * const u8ptr = (utf8_t *)ptr;
+    const UINTVAL len = UNISKIP(c);
     utf8_t *u8end = u8ptr + len - 1;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
@@ -299,6 +303,7 @@ Moves C<ptr> C<n> characters forward.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static const void *
 utf8_skip_forward(NOTNULL(const void *ptr), UINTVAL n)
 {
@@ -724,6 +729,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))

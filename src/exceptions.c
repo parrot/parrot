@@ -225,7 +225,7 @@ Push an action handler onto the dynamic environment.
 
 PARROT_API
 void
-Parrot_push_action(PARROT_INTERP, PMC *sub)
+Parrot_push_action(PARROT_INTERP, NOTNULL(PMC *sub))
 {
     if (!VTABLE_isa(interp, sub,
                 const_string(interp, "Sub"))) {
@@ -469,6 +469,7 @@ Return an array of all exception handlers.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 get_all_exception_handlers(PARROT_INTERP)
 {

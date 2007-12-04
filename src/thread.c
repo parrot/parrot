@@ -30,6 +30,7 @@ PARROT_CAN_RETURN_NULL
 static Shared_gc_info * get_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int is_suspended_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -84,6 +85,7 @@ static void pt_thread_signal(NOTNULL(Parrot_Interp self), PARROT_INTERP)
 static void pt_thread_wait(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
 static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -848,6 +850,7 @@ be performed. interpreter_array_mutex must be held.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 is_suspended_for_gc(PARROT_INTERP)
 {
@@ -876,6 +879,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CAN_RETURN_NULL
 static QUEUE_ENTRY *
 remove_queued_suspend_gc(PARROT_INTERP)
 {

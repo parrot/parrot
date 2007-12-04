@@ -35,18 +35,22 @@ static void add_entry(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static struct waitlist_entry * alloc_entry(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static struct waitlist_thread_data * get_thread(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static struct waitlist_thread_data * get_thread_noalloc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static STM_tx_log * Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
@@ -83,6 +87,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static struct waitlist_thread_data *
 get_thread(PARROT_INTERP)
@@ -114,6 +119,7 @@ TODO: Not yet documented!!!
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static struct waitlist_thread_data *
 get_thread_noalloc(PARROT_INTERP)
 {
@@ -133,14 +139,14 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static struct waitlist_entry *
 alloc_entry(PARROT_INTERP)
 {
-    struct waitlist_thread_data *thr;
     size_t i;
 
-    thr = get_thread(interp);
+    struct waitlist_thread_data * const thr = get_thread(interp);
 
     if (!thr->entries) {
         thr->entries = (waitlist_entry**)mem_sys_allocate_zeroed(sizeof (*thr->entries) * 4);
@@ -565,6 +571,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STM_tx_log *
 Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
 {
@@ -609,6 +616,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STM_tx_log *
 Parrot_STM_tx_log_get(PARROT_INTERP)
 {

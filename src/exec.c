@@ -77,8 +77,8 @@ section. And emits the executable.
 */
 
 void
-Parrot_exec(PARROT_INTERP, opcode_t *pc,
-        opcode_t *code_start, opcode_t *code_end)
+Parrot_exec(PARROT_INTERP, NOTNULL(opcode_t *pc),
+        NOTNULL(opcode_t *code_start), NOTNULL(opcode_t *code_end))
 {
 #ifdef JIT_CGP
     int i, j *k;
@@ -278,8 +278,8 @@ TODO: Not yet documented!!!
 PARROT_API
 int *
 Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
-                                     char *nptr, const char *var, int offset,
-                                     int disp)
+                                     NOTNULL(char *nptr), NOTNULL(const char *var),
+                                     int offset, int disp)
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_COM, var, disp);
     return (int *)offset;
@@ -301,7 +301,7 @@ TODO: Not yet documented!!!
 PARROT_API
 void
 Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
-                                      char *nptr, const char *func_name)
+                                      NOTNULL(char *nptr), NOTNULL(const char *func_name))
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_FUNC, func_name, 1);
 }
@@ -321,12 +321,12 @@ Adds a text rellocation to the object file.
 
 PARROT_API
 void
-Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr,
-    int type, const char *symbol, int disp)
+Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), NOTNULL(char *nptr),
+    int type, NOTNULL(const char *symbol), int disp)
 {
-    int symbol_number = 0;
+    int symbol_number;
     char *addr;
-    Parrot_exec_rellocation_t *new_relloc = (Parrot_exec_rellocation_t *)
+    Parrot_exec_rellocation_t * const new_relloc = (Parrot_exec_rellocation_t *)
         mem_sys_realloc(obj->text_rellocation_table,
             (size_t)(obj->text_rellocation_count + 1) *
             sizeof (Parrot_exec_rellocation_t));
@@ -346,6 +346,7 @@ Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_GDATA);
             break;
         default:
+            symbol_number = 0;
             break;
     }
 

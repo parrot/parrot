@@ -102,33 +102,42 @@ typedef struct Parrot_exec_objfile_t {
 PARROT_API
 void Parrot_exec_add_text_rellocation(
     NOTNULL(Parrot_exec_objfile_t *obj),
-    char *nptr,
+    NOTNULL(char *nptr),
     int type,
-    const char *symbol,
+    NOTNULL(const char *symbol),
     int disp)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void Parrot_exec_add_text_rellocation_func(
     NOTNULL(Parrot_exec_objfile_t *obj),
-    char *nptr,
-    const char *func_name)
-        __attribute__nonnull__(1);
+    NOTNULL(char *nptr),
+    NOTNULL(const char *func_name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 int * Parrot_exec_add_text_rellocation_reg(
     NOTNULL(Parrot_exec_objfile_t *obj),
-    char *nptr,
-    const char *var,
+    NOTNULL(char *nptr),
+    NOTNULL(const char *var),
     int offset,
     int disp)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 void Parrot_exec(PARROT_INTERP,
-    opcode_t *pc,
-    opcode_t *code_start,
-    opcode_t *code_end)
-        __attribute__nonnull__(1);
+    NOTNULL(opcode_t *pc),
+    NOTNULL(opcode_t *code_start),
+    NOTNULL(opcode_t *code_end))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 int Parrot_exec_add_symbol(
     NOTNULL(Parrot_exec_objfile_t *obj),
