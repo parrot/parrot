@@ -603,9 +603,11 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .local pmc ex
     .local string msg
     .get_results (ex, msg)
-    .local int severity
-    severity = ex[2]
-    if severity == .EXCEPT_EXIT goto L1
+    $P0 = getattribute ex, 'severity'
+    if null $P0 goto L1
+    $I0 = $P0
+    if $I0 == .EXCEPT_EXIT goto L2
+  L1:
     .local int lineno
     $S1 = where
     $S0 = $S1
@@ -615,7 +617,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $S1 = traceback
     $S0 .= $S1
     .return (1, $S0)
-  L1:
+  L2:
     rethrow ex
 .end
 
