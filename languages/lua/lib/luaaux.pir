@@ -178,7 +178,9 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $S0 = join '', message
     .local pmc ex
     new ex, 'Exception'
-    ex['_message'] =  $S0
+    new $P0, 'String'
+    set $P0, $S0
+    setattribute ex, 'message', $P0
     throw ex
 .end
 
@@ -650,7 +652,9 @@ Support variable number of arguments function call.
 .sub 'not_implemented'
     .local pmc ex
     new ex, 'Exception'
-    ex['_message'] =  "not implemented"
+    new $P0, 'String'
+    set $P0, "not implemented"
+    setattribute ex, 'message', $P0
     throw ex
 .end
 

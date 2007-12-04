@@ -95,7 +95,9 @@ L<http://www.lua.org/manual/5.1/manual.html#2.1>.
   L1:
     .local pmc ex
     new ex, 'Exception'
-    ex['_message'] = $S0
+    new $P0, 'String'
+    set $P0, $S0
+    setattribute ex, 'message', $P0
     throw ex
 .end
 

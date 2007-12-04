@@ -334,7 +334,9 @@ Francois Perrad
     $S1 = substr $S1, pos, 1
     $S0 .= $S1
     $S0 .= "'"
-    ex['_message'] = $S0
+    new $P0, 'String'
+    set $P0, $S0
+    setattribute ex, 'message', $P0
     throw ex
     .return ()
 .end

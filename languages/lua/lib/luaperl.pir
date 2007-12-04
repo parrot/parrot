@@ -110,7 +110,9 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     unlink(out)  # cleaning up the temporary file
     .local pmc ex
     new ex, 'Exception'
-    ex['_message'] = $S0
+    new $P0, 'String'
+    set $P0, $S0
+    setattribute ex, 'message', $P0
     throw ex
   L1:
     unlink(out)  # cleaning up the temporary file
