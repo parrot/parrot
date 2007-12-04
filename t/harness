@@ -166,6 +166,7 @@ my @runcore_tests = qw(
     t/compilers/imcc/*/*.t
     t/op/*.t
     t/pmc/*.t
+    t/oo/*.t
     t/native_pbc/*.t
     t/dynpmc/*.t
     t/dynoplibs/*.t
