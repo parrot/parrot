@@ -30,13 +30,11 @@ create a new step.
 
 =head2 Initialization Steps
 
-I<Initialization steps> are run before any other steps. They do tasks such as
-preparing the configuration system's data structures and checking the
-F<MANIFEST>. These will rarely be added; when they are, it usually means that
-the configuration system is getting significant new capabilities. They're kept
-in the directory F<config/init>.
-
-Initialization steps usually do not output anything under normal circumstances.
+I<Initialization steps> are run before any other steps. They do tasks
+such as preparing the configuration system's data structures and
+checking the F<MANIFEST>. New initialization steps will only be added
+when the configuration system is getting significant new capabilities.
+They're kept in the directory F<config/init>.
 
 =head2 Prompts
 
@@ -47,27 +45,21 @@ in the F<config/inter> folder.
 Interactive steps often include simple probes to determine good guesses of what
 the user will answer. See L</Prompt or Probe?> for more information.
 
-Interactive steps virtually always output something.
-
 Note that, by default, these prompts are turned off. To enable them run
 F<Configure.pl> with the C<--ask> option.
 
 =head2 Probes
 
 Probes are automated tests of some feature of the computer. These should be
-used wherever a value will not often need to be modified by the user.  A step
+used wherever a value will not need to be modified often by the user.  A step
 containing probes is an I<automatic step>. Automatic steps should be in the
 F<config/auto> folder.
-
-Automatic steps usually do not output anything under normal circumstances.
 
 =head2 Generations
 
 Generations create files needed after configuration has completed, such as
 Makefiles and configuration headers. A step containing generations is a
 I<generation step>. Generation steps should be in the F<config/gen> folder.
-
-Generation steps usually do not output anything under normal circumstances.
 
 Templates for files to be generated usually have the extension F<.in>.  There
 are variable substitutes and funny macros like 'CONDITIONED_LINE' and
@@ -80,7 +72,7 @@ or an interactive step. The guiding question is I<Would a user ever want to
 change this?>, or conversely, I<Is this something that can be completely
 determined without user intervention?>  A step figuring out what the compiler's
 command is would probably be an interactive step; conversely, a step figuring
-out if that command is connected to a specific compiler (like gcc) would be an
+out if that command is connected to a specific compiler (like F<gcc>) would be an
 automatic step.
 
 =head2 Configuring Configuration
@@ -92,7 +84,7 @@ and then calling C<Parrot::Configure::runsteps()>.
 
 =head2 Adding New Steps
 
-New steps should be added in one of the three folders mentioned above.
+New steps should be added in one of the four folders mentioned above.
 
 All steps are really classes; each exists in a unique namespace.  The
 namespace used depends on the step's relative path in the source tree sans the
@@ -129,14 +121,6 @@ other steps have terse descriptions ending in "...".
 Some example descriptions:
 
 =over 4
-
-=item F<config/inter/progs.pm>
-
-    Okay, I'm going to start by asking you a couple questions about your
-    compiler and linker. Default values are in square brackets; you can
-    hit ENTER to accept them. If you don't understand a question, the
-    default will usually work--they've been intuited from your Perl 5
-    configuration.
 
 =item F<config/auto/cgoto.pm>
 
@@ -314,6 +298,18 @@ These settings are deleted before F<lib/Parrot/Config.pm> is written. These
 entries are only used e.g. for Makefile creation.
 
 =back
+
+=head2 Accessing Configuration Information via Perl 5 Variables
+
+Parrot configuration is currently jump-started by extracting
+considerable information from variables associated with the instance of
+Perl 5 which the user is using to run F<Configure.pl>.  These variables
+are largely looked up in the C<%Config> found in the Perl 5
+F<Config.pm>, but may also be sought in Perl 5 special variables such as
+C<$^O>.  All such lookups should be done in configuration step
+C<init::defaults> and B<only> in that step.  Special accessors are
+available for working with such variables; see
+F<config/init/defaults.pm> and F<lib/Parrot/Configure/Data.pm>.
 
 =head1 HISTORY
 

@@ -19,8 +19,6 @@ use warnings;
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
-use Config;
-
 
 sub _init {
     my $self = shift;
@@ -45,7 +43,7 @@ sub runstep {
         $align = $conf->data->get('ptr_alignment');
         $result_str .= "configured: ";
     }
-    elsif ( $^O eq 'hpux' && $Config{ccflags} !~ /DD64/ ) {
+    elsif ( $conf->data->get_p5('OSNAME') eq 'hpux' && $conf->data->get_p5('ccflags') !~ /DD64/ ) {
 
         # HP-UX 10.20/32 hangs in this test.
         $align = 4;

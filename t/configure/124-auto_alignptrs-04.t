@@ -41,18 +41,17 @@ isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
 {
-    use Config;
-    local $^O = q{hpux};
+    $conf->data->set_p5( OSNAME => 'hpux' );
     my $ret = $step->runstep($conf);
     ok( $ret, "$step_name runstep() returned true value" );
-    if ( $Config{ccflags} !~ /DD64/ ) {
+    if ( $conf->data->get_p5('ccflags') !~ /DD64/ ) {
         is($conf->data->get('ptr_alignment'), 4,
             "Got expected pointer alignment for HP Unix");
         is($step->result(), qq{for hpux:  4 bytes},
             "Expected result was set");
     } else {
-        pass("Cannot mock %Config");
-        pass("Cannot mock %Config");
+        pass("Cannot mock \%Config");
+        pass("Cannot mock \%Config");
     }
 }
 

@@ -19,8 +19,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Config;
-
 use Parrot::Configure::Step qw(copy_if_diff);
 
 sub _init {
@@ -36,14 +34,14 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose  = $conf->options->get('verbose');
-    my $platform = lc $^O;
+    my $platform = lc ( $conf->data->get_p5('OSNAME') );
 
     $platform = "ansi"  if defined( $conf->options->get('miniparrot') );
     $platform = "win32" if $platform =~ /^msys/;
     $platform = "win32" if $platform =~ /^mingw/;
     $platform =~ s/^ms//;
 
-    if ( ( split m/-/, $Config{archname}, 2 )[0] eq 'ia64' ) {
+    if ( ( split m/-/, $conf->data->get_p5('archname'), 2 )[0] eq 'ia64' ) {
         $platform = 'ia64';
     }
 

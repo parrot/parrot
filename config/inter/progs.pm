@@ -96,8 +96,9 @@ END
     $conf->data->set( ldflags => $ldflags );
 
     $libs = $conf->data->get('libs');
-    $libs = join ' ', grep { $^O =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
-        split( ' ', $libs );
+    $libs = join q{ },
+        grep { $conf->data->get_p5('OSNAME') =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
+        split( q{ }, $libs );
     $libs = integrate( $libs, $conf->options->get('libs') );
     $libs = prompt( "What libraries should your C compiler use?", $libs ) if $ask;
     $conf->data->set( libs => $libs );

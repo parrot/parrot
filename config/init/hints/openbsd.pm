@@ -5,7 +5,6 @@ package init::hints::openbsd;
 
 use strict;
 use warnings;
-use Config;
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -22,7 +21,7 @@ sub runstep {
     }
     $conf->data->set( libs => $libs );
 
-    if ( ( split( m/-/, $Config{archname}, 2 ) )[0] eq 'powerpc' ) {
+    if ( ( split( m/-/, $conf->data->get_p5('archname'), 2 ) )[0] eq 'powerpc' ) {
         $conf->data->set( as => 'as -mregnames' );
     }
 

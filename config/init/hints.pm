@@ -38,7 +38,7 @@ sub runstep {
 
     my $hints_used = 0;
 
-    my $hints = "init::hints::" . lc($^O);
+    my $hints = "init::hints::" . lc( $conf->data->get_p5('OSNAME') );
 
     print "[ $hints " if $verbose;
 

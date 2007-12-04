@@ -25,15 +25,23 @@ Parrot::Configure::Data - Configuration data container
 
 =head1 DESCRIPTION
 
-This module contains configuration data for use by the other
-L<Parrot::Configure::*> modules.
+This module provides methods by which other Parrot::Configure::* modules
+can access configuration data.
+
+The module supplies a constructor for Parrot::Configure::Data objects
+and three kinds of accessors:
+
+=over 4
+
+=item 1  Main configuration data
+
+=item 2  Triggers
+
+=item 3  Data read from Perl 5's C<%Config> or Perl 5 special variables.
+
+=back
 
 =head1 USAGE
-
-=head2 Import Parameters
-
-This module accepts no arguments to its C<import> method and exports no
-I<symbols>.
 
 =cut
 
@@ -44,17 +52,29 @@ use warnings;
 
 use Data::Dumper ();
 
-=head2 Methods
-
-=head3 Constructors
+=head2 Constructor
 
 =over 4
 
-=item C<new()>
+=item * C<new()>
+
+=over 4
+
+=item * Purpose
 
 Basic object constructor.
 
-Accepts no arguments and returns a L<Parrot::Configure::Data> object.
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+Parrot::Configure::Data object.
+
+=back
+
+=back
 
 =cut
 
@@ -64,23 +84,36 @@ sub new {
     my $self = {
         c        => {},
         triggers => {},
+        p5       => {},
     };
 
     bless $self, ref $class || $class;
     return $self;
 }
 
-=back
-
-=head3 Object Methods
+=head2 Methods for Main Configuration Data
 
 =over 4
 
-=item C<get($key, ...)>
+=item * C<get($key, ...)>
 
-Provides access to key values.
+=over 4
 
-Accepts a list and returns a list.
+=item * Purpose
+
+Provides access to the values assigned to elements in the
+Parrot::Configure object's main data structure.
+
+=item * Arguments
+
+List of elements found in the Parrot::Configure object's main data
+structure.
+
+=item * Return Value
+
+List of values associated with corresponding arguments.
+
+=back
 
 =cut
 
@@ -92,12 +125,24 @@ sub get {
     return @$c{@_};
 }
 
-=item C<set($key => $val, ...)>
+=item * C<set($key => $val, ...)>
 
-Modifies or creates a new value.
+=over 4
 
-Accepts a list of C<< key => value >> pairs and returns a
-L<Parrot::Configure::Data> object.
+=item * Purpose
+
+Modifies or creates new values in the main part of the Parrot::Configure
+object's data structure..
+
+=item * Arguments
+
+List of C<< key => value >> pairs.
+
+=item * Return Value
+
+Parrot::Configure::Data object.
+
+=back
 
 =cut
 
@@ -126,13 +171,24 @@ sub set {
     return $self;
 }
 
-=item C<add($delim, $key => $val, ...)>
+=item * C<add($delim, $key => $val, ...)>
+
+=over 4
+
+=item * Purpose
 
 Either creates a new key or appends to an existing key, with the previous/new
 values joined together by C<$delim>.
 
-Accepts a delimiter value followed by a list of C<< key => value >> pairs and
-returns a L<Parrot::Configure::Data> object.
+=item * Arguments
+
+Delimiter value followed by a list of C<< key => value >> pairs.
+
+=item * Return Value
+
+Parrot::Configure::Data object.
+
+=back
 
 =cut
 
@@ -153,11 +209,24 @@ sub add {
     return $self;
 }
 
-=item C<keys()>
+=item * C<keys()>
 
-Provides a list of keys.
+=over 4
 
-Accepts no arguments and returns a list.
+=item * Purpose
+
+Provides a list of names of elements in the Parrot::Configure object's
+main data structure.
+
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+List of elements in the Parrot::Configure object's main data structure.
+
+=back
 
 =cut
 
@@ -167,11 +236,23 @@ sub keys {
     return keys %{ $self->{c} };
 }
 
-=item C<slurp()>
+=item * C<slurp()>
 
-Slurps in L<Parrot::Config> data from previous configure.
+=over 4
 
-Accepts no arguments.
+=item * Purpose
+
+Slurps in L<Parrot::Config> data from previous run of I<Configure.pl>.
+
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+Reference to hash holding main Parrot::Configure data structure.
+
+=back
 
 =cut
 
@@ -189,12 +270,25 @@ EVAL_CONFIG
     $self->{c} = $res;
 }
 
-=item C<slurp_temp()>
+=item * C<slurp_temp()>
 
-Slurps in L<Parrot::Config> temporary data from previous configure.
-Only to be used when running C<gen::makefiles> plugin.
+=over 4
 
-Accepts no arguments.
+=item * Purpose
+
+Slurps in L<Parrot::Config> temporary data from previous run of
+Configure.pl.  Only to be used when running C<gen::makefiles> plugin.
+
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+Reference to hash holding that part of the main Parrot::Configure data
+structure holding temporary data.
+
+=back
 
 =cut
 
@@ -212,12 +306,18 @@ EVAL_CONFIG_TEMP
     $self->{c}{$_} = $res->{$_} for CORE::keys %$res;
 }
 
-=item C<dump()>
+=item * C<dump()>
+
+=over 4
+
+=item * Purpose
 
 Provides a L<Data::Dumper> serialized string of the objects key/value pairs
 suitable for being C<eval>ed.
 
-Takes two arguments:
+=item * Arguments
+
+Two scalar arguments:
 
 =over 4
 
@@ -236,7 +336,11 @@ Example:
     $conf->data->dump(q{c}, q{*PConfig});
     $conf->data->dump(q{c_temp}, q{*PConfig_Temp});
 
-Returns a string.
+=item * Return Value
+
+String.
+
+=back
 
 =cut
 
@@ -259,15 +363,29 @@ Returns a string.
     }
 }
 
-=item C<clean()>
+=item * C<clean()>
 
-Deletes keys matching C</^TEMP_/> from the internal config store,
+=over 4
+
+=item * Purpose
+
+Deletes keys matching C</^TEMP_/> from the internal configuration store,
 and copies them to a special store for temporary keys.
-Keys using this naming convention are intended to be used only temporally,
-e.g.  as file lists for Makefile generation.
+Keys using this naming convention are intended to be used only temporarily,
+I<e.g.>  as file lists for Makefile generation.
 Temporary keys are used B<only> to regenerate makefiles after configuration.
 
-Accepts no arguments and returns a L<Parrot::Configure::Data> object.
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+Parrot::Configure::Data object.
+
+=back
+
+=back
 
 =cut
 
@@ -279,15 +397,30 @@ sub clean {
     return $self;
 }
 
-=item C<settrigger($key, $trigger, $cb)>
+=head2 Triggers
+
+=over 4
+
+=item * C<settrigger($key, $trigger, $cb)>
+
+=over 4
+
+=item * Purpose
 
 Set a callback on C<$key> named C<$trigger>.  Multiple triggers can be set on a
 given key.  When the key is set via C<set> or C<add> then all callbacks that
 are defined will be called.  Triggers are passed the key and value that was set
 after it has been changed.
 
-Accepts a key name, a trigger name, & a C<CODE> ref and returns a
-L<Parrot::Configure::Data> object.
+=item * Arguments
+
+Accepts a key name, a trigger name, & a C<CODE> ref.
+
+=item * Return Value
+
+Parrot::Configure::Data object.
+
+=back
 
 =cut
 
@@ -306,11 +439,23 @@ sub settrigger {
     return $self;
 }
 
-=item C<gettriggers($key)>
+=item * C<gettriggers($key)>
+
+=over 4
+
+=item * Purpose
 
 Get the names of all triggers set for C<$key>.
 
-Accepts a key name and returns a list.
+=item * Arguments
+
+String holding single key name.
+
+=item * Return Value
+
+List of triggers set for that key.
+
+=back
 
 =cut
 
@@ -327,11 +472,23 @@ sub gettriggers {
     return CORE::keys %{ $self->{triggers}{$key} };
 }
 
-=item C<gettrigger($key, $trigger)>
+=item * C<gettrigger($key, $trigger)>
+
+=over 4
+
+=item * Purpose
 
 Get the callback set for C<$key> under the name C<$trigger>
 
-Accepts a key name & a trigger name and returns a C<CODE> ref.
+=item * Arguments
+
+Accepts a key name & a trigger name.
+
+=item * Return Value
+
+C<CODE> ref.
+
+=back
 
 =cut
 
@@ -350,12 +507,23 @@ sub gettrigger {
     return $self->{triggers}{$key}{$trigger};
 }
 
-=item C<deltrigger($key, $trigger)>
+=item * C<deltrigger($key, $trigger)>
+
+=over 4
+
+=item * Purpose
 
 Removes the trigger on C<$key> named by C<$trigger>
 
-Accepts a key name & a trigger name and returns a L<Parrot::Configure::Data>
-object.
+=item * Arguments
+
+Accepts a key name & a trigger name.
+
+=item * Return Value
+
+Parrot::Configure::Data object.
+
+=back
 
 =cut
 
@@ -377,6 +545,133 @@ sub deltrigger {
 }
 
 =back
+
+=head2 Methods for Perl 5 Data
+
+
+=over 4
+
+=item * C<get_p5($key, ...)>
+
+=over 4
+
+=item * Purpose
+
+Retrieve data originally derived from the Perl 5 environment during
+configuration step C<init::defaults> and stored in a special part of the
+Parrot::Configure::Data object.
+
+=item * Arguments
+
+List of elements found in the Perl 5-related part of the
+Parrot::Configure object's data structure.
+
+=item * Return Value
+
+List of values associated with corresponding arguments.
+
+=item * Note
+
+Once data from Perl 5's C<%Config> or special variables has been stored
+in configuration step C<init::defaults>, C<%Config> and the special
+variables should not be further accessed.  Use this method instead.
+
+=back
+
+=cut
+
+sub get_p5 {
+    my $self = shift;
+
+    my $p5 = $self->{p5};
+
+    return @$p5{@_};
+}
+
+=item * C<set_p5($key => $val, ...)>
+
+=over 4
+
+=item * Purpose
+
+Looks up values from either (a) the C<%Config>, located in Config.pm
+and imported via C<use Config;>, associated with the instance of Perl
+(C<$^X>) used to run I<Configure.pl> and assigns those values to a
+special part of the Parrot::Configure::Data object.
+
+=item * Arguments
+
+List of C<< key => value >> pairs.  If the key being set is from
+C<%Config>, the corresponding value should have the same name.  If,
+however, the key being set is a Perl 5 special variable (I<e.g.>,
+C<%^O>), the corresponding value should be the 'English' name of that
+special variable as documented in L<perlvar> (less the initial C<$>, of
+course).
+
+=item * Return Value
+
+Parrot::Configure::Data object.
+
+=item * Examples
+
+=item * Note
+
+This method should B<only> be used in configuration step
+C<init::defaults>.  It is B<not> the method used to assign values to the
+main Parrot::Configure data structure; use C<set()> (above) instead.
+
+=back
+
+=cut
+
+sub set_p5 {
+    my $self = shift;
+
+    my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
+
+    print "\nSetting Configuration Data:\n(\n" if $verbose;
+
+    while ( my ( $key, $val ) = splice @_, 0, 2 ) {
+        print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"
+            if $verbose;
+        $self->{p5}{$key} = $val;
+
+    }
+
+    print ");\n" if $verbose;
+
+    return $self;
+}
+
+=item * C<keys_p5()>
+
+=over 4
+
+=item * Purpose
+
+Provides a list of names of elements in the Parrot::Configure object's
+main data structure.
+
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+List of elements in the part of the Parrot::Configure object's data
+structure storing Perl 5 configuration data.
+
+=back
+
+=back
+
+=cut
+
+sub keys_p5 {
+    my $self = shift;
+
+    return CORE::keys %{ $self->{p5} };
+}
 
 =head1 CREDITS
 

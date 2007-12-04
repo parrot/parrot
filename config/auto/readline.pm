@@ -18,9 +18,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Config;
 use Parrot::Configure::Step ':auto';
-
 
 sub _init {
     my $self = shift;
@@ -40,7 +38,7 @@ sub runstep {
     my $libs      = $conf->data->get('libs');
     my $linkflags = $conf->data->get('linkflags');
     my $ccflags   = $conf->data->get('ccflags');
-    if ( $^O =~ /mswin32/i ) {
+    if ( $conf->data->get_p5('OSNAME') =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
             $conf->data->add( ' ',
                 libs => '-lreadline -lgw32c -lole32 -luuid -lwsock32 -lmsvcp60' );
@@ -53,7 +51,7 @@ sub runstep {
         $conf->data->add( ' ', libs => '-lreadline' );
     }
 
-    my $osname = $Config{osname};
+    my $osname = $conf->data->get_p5('OSNAME');
 
     # On OS X check the presence of the readline header in the standard
     # Fink/macports location.

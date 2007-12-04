@@ -19,7 +19,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Config;
 use Parrot::Configure::Step ':auto';
 
 
@@ -53,7 +52,7 @@ sub runstep {
     my $linkflags = $conf->data->get('linkflags');
     my $ccflags   = $conf->data->get('ccflags');
 
-    my $osname = $Config{osname};
+    my $osname = $conf->data->get_p5('OSNAME');
 
     # On OS X check the presence of the gdbm header in the standard
     # Fink location.
@@ -68,7 +67,7 @@ sub runstep {
     }
 
     cc_gen('config/auto/gdbm/gdbm.in');
-    if ( $^O =~ /mswin32/i ) {
+    if ( $conf->data->get_p5('OSNAME') =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
             eval { cc_build( '', '-llibgdbm' ); };
         }

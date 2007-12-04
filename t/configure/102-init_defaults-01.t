@@ -7,7 +7,6 @@ use strict;
 use warnings;
 use Test::More tests => 6;
 use Carp;
-use Data::Dumper;
 use lib qw( lib );
 use_ok('config::init::defaults');
 use Parrot::Configure;

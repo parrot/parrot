@@ -34,8 +34,7 @@ test_step_thru_runstep( $conf, q{init::install},  $args );
 my ( $task, $step_name, @step_params, $step, $ret );
 my $pkg = q{init::hints};
 
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
+$conf->add_steps($pkg); $conf->options->set( %{$args} );
 
 $task        = $conf->steps->[2];
 $step_name   = $task->step;
@@ -47,11 +46,12 @@ isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
 {
-    local $^O = q{imaginaryOS};
+    $conf->data->set_p5( OSNAME => q{imaginaryOS} );
+    my $os = $conf->data->get_p5( 'OSNAME' );
     eval { $ret = $step->runstep($conf); };
     like(
         $@,
-        qr{^Can't locate init/hints/$^O\.pm}i,
+        qr{^Can't locate init/hints/$os\.pm}i,
         "Got expected error message upon bad value for \$^O"
     );
 }

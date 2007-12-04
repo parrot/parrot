@@ -5,9 +5,8 @@
 
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 14;
 use Carp;
-use Config;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::headers');
@@ -42,13 +41,13 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-auto::headers::_set_from_Config($conf, \%Config);
-ok($conf->data->get('i_netinetin'), "Mapping made correctly");
+auto::headers::_set_from_Config($conf);
 ok(! $conf->data->get('i_niin'), "Mapping made correctly");
 
 {
-    local $^O = "msys";
-    my %extra_headers = map {$_, 1} auto::headers::_list_extra_headers();
+    $conf->data->set_p5( OSNAME => "msys" );
+    my %extra_headers =
+        map {$_, 1} auto::headers::_list_extra_headers($conf);
     ok($extra_headers{'sysmman.h'}, "Special header set for msys");
     ok($extra_headers{'netdb.h'}, "Special header set for msys");
 }

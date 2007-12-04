@@ -80,7 +80,8 @@ EOF
         }
     }
 
-    print {$HH} "\n#define BUILD_OS_NAME \"$^O\"\n";
+    my $osname = $conf->data->get_p5('OSNAME');
+    print {$HH} "\n#define BUILD_OS_NAME \"$osname\"\n";
 
     my $define = $conf->options->get('define');
 

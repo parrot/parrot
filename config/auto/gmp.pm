@@ -18,9 +18,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Config;
 use Parrot::Configure::Step ':auto';
-
 
 sub _init {
     my $self = shift;
@@ -51,7 +49,7 @@ sub runstep {
     my $libs      = $conf->data->get('libs');
     my $linkflags = $conf->data->get('linkflags');
     my $ccflags   = $conf->data->get('ccflags');
-    if ( $^O =~ /mswin32/i ) {
+    if ( $conf->data->get_p5('OSNAME') =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
             $conf->data->add( ' ', libs => '-lgmp' );
         }
@@ -63,7 +61,7 @@ sub runstep {
         $conf->data->add( ' ', libs => '-lgmp' );
     }
 
-    my $osname = $Config{osname};
+    my $osname = $conf->data->get_p5('OSNAME');
 
     # On OS X check the presence of the gmp header in the standard
     # Fink location.

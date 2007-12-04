@@ -19,7 +19,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Config;
 use Parrot::Configure::Step;
 
 
@@ -56,7 +55,7 @@ sub runstep {
 
             # use perl5's value
             # gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
-            my $opts = $Config{optimize};
+            my $opts = $conf->data->get_p5('optimize');
             my $gccversion = $conf->data->get( 'gccversion' );
             my $arch_opt = 'cpu';
             if ( defined $gccversion and $gccversion > 3.3 ) {

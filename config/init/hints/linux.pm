@@ -6,10 +6,6 @@ package init::hints::linux;
 use strict;
 use warnings;
 
-use Config;
-
-our $verbose;
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
@@ -17,6 +13,7 @@ sub runstep {
     my $ccflags   = $conf->option_or_data('ccflags');
     my $cc        = $conf->option_or_data('cc');
     my $linkflags = $conf->option_or_data('linkflags');
+    my $verbose;
 
     $verbose = $conf->options->get('verbose');
     print $/ if $verbose;
@@ -147,7 +144,8 @@ sub runstep {
         libparrot_soname       => '-Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION)',
     );
 
-    if ( ( split( m/-/, $Config{archname}, 2 ) )[0] eq 'ia64' ) {
+     if ( ( split( m/-/, $conf->data->get_p5('archname'), 2 ) )[0] eq 'ia64' ) {
+
         $conf->data->set( platform_asm => 1 );
     }
     return;

@@ -19,8 +19,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Config;
-
 use Parrot::Configure::Step ':auto';
 
 sub _init {
@@ -44,7 +42,9 @@ sub runstep {
 
 sub _probe_for_socklen_t {
     my $conf = shift;
-    return $conf->data->get('has_socklen_t') || $Config{d_socklen_t};
+    return $conf->data->get('has_socklen_t')
+            ||
+           $conf->data->get_p5('d_socklen_t');
 }
 
 sub _evaluate_socklen_t {

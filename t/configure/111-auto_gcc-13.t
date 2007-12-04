@@ -41,7 +41,7 @@ my $gnucref = {};
 $gnucref->{__GNUC__} = q{3};
 $gnucref->{__GNUC_MINOR__} = q{1};
 {
-    local $^O = 'hpux';
+    $conf->data->set_p5( OSNAME => 'hpux' );
     ok($step->_evaluate_gcc($conf, $gnucref),
         "_evaluate_gcc() returned true value");
     ok(defined $conf->data->get( 'gccversion' ),
