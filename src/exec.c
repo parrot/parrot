@@ -327,7 +327,7 @@ Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), NOTNULL(ch
 {
     int symbol_number;
     char *addr;
-    Parrot_exec_rellocation_t * const new_relloc = (Parrot_exec_rellocation_t *)
+    Parrot_exec_rellocation_t * new_relloc = (Parrot_exec_rellocation_t *)
         mem_sys_realloc(obj->text_rellocation_table,
             (size_t)(obj->text_rellocation_count + 1) *
             sizeof (Parrot_exec_rellocation_t));
