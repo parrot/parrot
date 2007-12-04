@@ -371,7 +371,10 @@ Parses terms beginning with backslash.
   term_metachar:
     .local int isnegated
     isnegated = is_cclass .CCLASS_UPPERCASE, initchar, 0
-    $S0 = downcase initchar
+    ## $S0 = downcase     FIXME: RT# 48108
+            $I0 = ord initchar
+            $S0 = chr $I0
+            $S0 = downcase $S0
     if $S0 == 'x' goto scan_xdo
     if $S0 == 'o' goto scan_xdo
     $P0 = get_global '%esclist'
