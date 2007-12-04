@@ -108,15 +108,18 @@ current maximum.
 
 */
 
-    void push_pmc(PMC *value) {
+    void push_pmc(PMC *task) {
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
-        PMC * const key = pmc_new(INTERP, enum_class_Integer);
+        PMC * const task_id = pmc_new(INTERP, enum_class_Integer);
 
         core_struct->max_tid++;
-        VTABLE_set_integer_native(INTERP, key, core_struct->max_tid);
+        VTABLE_set_integer_native(INTERP, task_id, core_struct->max_tid);
 
-        VTABLE_set_pmc_keyed(INTERP, core_struct->task_list, key, value);
-        VTABLE_push_pmc(INTERP, core_struct->task_index, key);
+        VTABLE_set_integer_native(INTERP, task, core_struct->max_tid);
+
+        VTABLE_set_pmc_keyed(INTERP, core_struct->task_list, task_id, task);
+        VTABLE_push_pmc(INTERP, core_struct->task_index, task_id);
+        Parrot_cx_runloop_wake(core_struct->interp, SELF);
     }
 
 /*
@@ -180,6 +183,33 @@ Removes the task with the given task ID from the task list.
 
 /*
 
+=item C<PMC *share_ro()>
+
+Set this PMC as shared.
+
+=cut
+
+*/
+
+    PMC *share_ro() {
+        PMC *shared_self;
+        Parrot_Scheduler *shared_struct;
+
+        if (PObj_is_PMC_shared_TEST(SELF))
+            return SELF;
+
+        shared_self = pt_shared_fixup(INTERP, SELF);
+        shared_struct = PARROT_SCHEDULER(shared_self);
+
+        shared_struct->task_list  = pt_shared_fixup(INTERP, shared_struct->task_list);
+        shared_struct->task_index = pt_shared_fixup(INTERP, shared_struct->task_index);
+        shared_struct->handlers   = pt_shared_fixup(INTERP, shared_struct->handlers);
+
+        return shared_self;
+    }
+
+/*
+
 =item C<void destroy()>
 
 Free the scheduler's underlying struct.
@@ -188,6 +218,7 @@ Free the scheduler's underlying struct.
 
 */
     void destroy() {
+        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
         mem_sys_free(PMC_data(SELF));
     }
 

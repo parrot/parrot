@@ -49,6 +49,9 @@ Initialize a concurrency task object.
         core_struct->codeblock   = PMCNULL;
         core_struct->interp      = PMCNULL;
 
+        /* Make sure the flag is cleared by default */
+        TASK_terminate_runloop_CLEAR(SELF);
+
     }
 /*
 
@@ -208,6 +211,35 @@ Sets the value of an attribute for this task.
         else if (string_equal(interp, name, CONST_STRING(interp, "birthtime")) == 0) {
             core_struct->birthtime = VTABLE_get_integer(interp, value);
         }
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Retrieves the task ID for this task.
+
+=cut
+
+*/
+    INTVAL get_integer() {
+        Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        return core_struct->id;
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Sets the task ID of the task.
+
+=cut
+
+*/
+
+    void set_integer_native(INTVAL value) {
+        Parrot_Task * const core_struct = PARROT_TASK(SELF);
+        core_struct->id = value;
     }
 
 /*

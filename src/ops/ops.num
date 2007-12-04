@@ -1245,3 +1245,4 @@ stm_commit_ic                  1214
 stm_wait_ic                    1215
 stm_abort                      1216
 stm_depth_i                    1217
+schedule_p                     1218

@@ -17,6 +17,25 @@
 
 /* HEADERIZER BEGIN: src/scheduler.c */
 
+PARROT_API
+void Parrot_cx_init_scheduler(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_cx_runloop_end(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_cx_schedule_task(PARROT_INTERP, NOTNULL(PMC *task))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_cx_runloop_sleep(NOTNULL(PMC *scheduler))
+        __attribute__nonnull__(1);
+
+void Parrot_cx_runloop_wake(PARROT_INTERP, NOTNULL(PMC *scheduler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/scheduler.c */
 
@@ -54,7 +73,8 @@ typedef struct Parrot_Task {
  * Scheduler private flags
  */
 typedef enum {
-    SCHEDULER_cache_valid_FLAG = PObj_private0_FLAG
+    SCHEDULER_cache_valid_FLAG       = PObj_private0_FLAG,
+    SCHEDULER_terminate_runloop_FLAG = PObj_private1_FLAG
 } scheduler_flags_enum;
 
 #define SCHEDULER_get_FLAGS(o) (PObj_get_FLAGS(o))
@@ -66,6 +86,28 @@ typedef enum {
 #define SCHEDULER_cache_valid_TEST(o)  SCHEDULER_flag_TEST(cache_valid, o)
 #define SCHEDULER_cache_valid_SET(o)   SCHEDULER_flag_SET(cache_valid, o)
 #define SCHEDULER_cache_valid_CLEAR(o) SCHEDULER_flag_CLEAR(cache_valid, o)
+
+/* Mark if the scheduler should terminate the scheduler runloop */
+#define SCHEDULER_terminate_runloop_TEST(o)  SCHEDULER_flag_TEST(terminate_runloop, o)
+#define SCHEDULER_terminate_runloop_SET(o)   SCHEDULER_flag_SET(terminate_runloop, o)
+#define SCHEDULER_terminate_runloop_CLEAR(o) SCHEDULER_flag_CLEAR(terminate_runloop, o)
+
+/*
+ * Task private flags
+ */
+typedef enum {
+    TASK_terminate_runloop_FLAG = PObj_private0_FLAG
+} task_flags_enum;
+
+#define TASK_get_FLAGS(o) (PObj_get_FLAGS(o))
+#define TASK_flag_TEST(flag, o) (TASK_get_FLAGS(o) & TASK_ ## flag ## _FLAG)
+#define TASK_flag_SET(flag, o) (TASK_get_FLAGS(o) |= TASK_ ## flag ## _FLAG)
+#define TASK_flag_CLEAR(flag, o) (TASK_get_FLAGS(o) &= ~(UINTVAL)(TASK_ ## flag ## _FLAG))
+
+/* Mark a task to terminate the scheduler runloop */
+#define TASK_terminate_runloop_TEST(o)  TASK_flag_TEST(terminate_runloop, o)
+#define TASK_terminate_runloop_SET(o)   TASK_flag_SET(terminate_runloop, o)
+#define TASK_terminate_runloop_CLEAR(o) TASK_flag_CLEAR(terminate_runloop, o)
 
 #endif /* PARROT_SCHEDULER_H_GUARD */
 

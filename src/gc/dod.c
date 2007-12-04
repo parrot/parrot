@@ -309,6 +309,11 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     /* mark the root_namespace */
     pobject_lives(interp, (PObj *)interp->root_namespace);
 
+    /* mark the concurrency scheduler */
+    if (interp->scheduler)
+        pobject_lives(interp, (PObj *)interp->scheduler);
+
+
     /* s. packfile.c */
     mark_const_subs(interp);
 

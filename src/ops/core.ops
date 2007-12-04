@@ -677,6 +677,26 @@ inline op get_addr(out INT, invar PMC) {
 
 ########################################
 
+=head2 Concurrency operations
+
+=over 4
+
+=item B<schedule>(invar PMC)
+
+Register a task with the concurrency scheduler. Details about the task are
+stored within the task PMC.
+
+inline op schedule(invar PMC) {
+    Parrot_cx_schedule_task(interp, $1);
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+########################################
+
 =head2 Exception handling
 
 =over 4
