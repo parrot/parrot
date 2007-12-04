@@ -30,7 +30,10 @@ TODO: Not yet documented!!!
 =item C<void
 declare_local(struct lexer_state *lexer, pir_type type, target *list)>
 
-TODO: Not yet documented!!!
+Declare the local variables in the list pointed to by C<list>, all of which
+are of the type C<type>. The variables are entered into the symbol table for
+the current subroutine that is being parsed (each subroutine must have its
+own symbol table).
 
 =cut
 
