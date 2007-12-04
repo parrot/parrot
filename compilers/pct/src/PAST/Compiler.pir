@@ -19,14 +19,16 @@ By default PAST::Compiler transforms a PAST tree into POST.
 
     .local pmc piropsig
     piropsig = new 'Hash'
+    piropsig['n_abs']    = 'PP'
     piropsig['n_add']    = 'PP+'
-    piropsig['n_sub']    = 'PP+'
-    piropsig['n_mul']    = 'PP+'
+    piropsig['n_bnot']   = 'PP'
+    piropsig['n_concat'] = 'PP~'
     piropsig['n_div']    = 'PP+'
     piropsig['n_mod']    = 'PP+'
+    piropsig['n_mul']    = 'PP+'
     piropsig['n_neg']    = 'PP'
     piropsig['n_not']    = 'PP'
-    piropsig['n_concat'] = 'PP~'
+    piropsig['n_sub']    = 'PP+'
     piropsig['print']    = 'v*'
     piropsig['set']      = 'PP'
     set_global '%piropsig', piropsig
