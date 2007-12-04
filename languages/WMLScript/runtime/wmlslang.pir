@@ -530,8 +530,7 @@ None (this function aborts the interpretation).
     .param pmc value
     .local pmc ex
     new ex, 'Exception'
-    $S0 = value
-    ex['_message'] = $S0
+    setattribute ex, 'message', value
     throw ex
 .end
 

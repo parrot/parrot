@@ -49,7 +49,9 @@ See "WMLScript Standard Libraries Specification".
 .sub 'not_implemented'
     .local pmc ex
     new ex, 'Exception'
-    ex['_message'] =  "not implemented"
+    new $P0, 'String'
+    set $P0, "not implemented"
+    setattribute ex, 'message', $P0
     throw ex
 .end
 
@@ -122,7 +124,9 @@ helper for CALL_URL* opcodes.
     $S0 = "verification failed (can't translate '"
     $S0 .= url
     $S0 .= "')"
-    ex['_message'] = $S0
+    new $P0, 'String'
+    set $P0, $S0
+    setattribute ex, 'message', $P0
     throw ex
   _handler_2:
     new ex, 'Exception'
@@ -131,12 +135,15 @@ helper for CALL_URL* opcodes.
     $S0 .= "' not found in '"
     $S0 .= url
     $S0 .= "'"
-    ex['_message'] = $S0
+    new $P0, 'String'
+    set $P0, $S0
+    setattribute ex, 'message', $P0
     throw ex
   L1:
     new ex, 'Exception'
-    $S0 = "unable to load compilation unit"
-    ex['_message'] = $S0
+    new $P0, 'String'
+    set $P0, "unable to load compilation unit"
+    setattribute ex, 'message', $P0
     throw ex
 .end
 

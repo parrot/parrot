@@ -439,7 +439,9 @@ PIRCODE
     $S0 = cur_ic
     msg = concat $S0
     msg = concat ")"
-    ex['_message'] = msg
+    new $P0, 'String'
+    set $P0, msg
+    setattribute ex, 'message', $P0
     throw ex
 
 PIRCODE
