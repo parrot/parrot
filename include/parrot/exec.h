@@ -120,6 +120,7 @@ void Parrot_exec_add_text_rellocation_func(
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 int * Parrot_exec_add_text_rellocation_reg(
     NOTNULL(Parrot_exec_objfile_t *obj),
     NOTNULL(char *nptr),

@@ -61,15 +61,21 @@ static int remove_first(
         __attribute__nonnull__(2);
 
 static void waitlist_remove(
-    STM_waitlist *waitlist,
-    struct waitlist_entry *what);
+    NULLOK(STM_waitlist *waitlist),
+    NOTNULL(struct waitlist_entry *what))
+        __attribute__nonnull__(2);
 
 static void waitlist_remove_check(
-    STM_waitlist *waitlist,
-    struct waitlist_entry *what);
+    NULLOK(STM_waitlist *waitlist),
+    NOTNULL(struct waitlist_entry *what))
+        __attribute__nonnull__(2);
 
-static void waitlist_signal_all(STM_waitlist *list);
-static void waitlist_signal_one(struct waitlist_entry *who);
+static void waitlist_signal_all(NOTNULL(STM_waitlist *list))
+        __attribute__nonnull__(1);
+
+static void waitlist_signal_one(NOTNULL(struct waitlist_entry *who))
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: static */
 
 #define WAITLIST_REMOVE_CHECK 0 /* if set, make sure removes really
@@ -240,7 +246,7 @@ TODO: Not yet documented!!!
 */
 
 static void
-waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)
+waitlist_remove(NULLOK(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *what))
 {
     struct waitlist_entry *cur;
     void *result;
@@ -299,7 +305,7 @@ TODO: Not yet documented!!!
 */
 
 static void
-waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what)
+waitlist_remove_check(NULLOK(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *what))
 {
     struct waitlist_entry *cur;
 
@@ -328,7 +334,7 @@ TODO: Not yet documented!!!
 */
 
 static void
-waitlist_signal_one(struct waitlist_entry *who)
+waitlist_signal_one(NOTNULL(struct waitlist_entry *who))
 {
     struct waitlist_thread_data *thread;
 
@@ -357,7 +363,7 @@ TODO: Not yet documented!!!
 */
 
 static void
-waitlist_signal_all(STM_waitlist *list)
+waitlist_signal_all(NOTNULL(STM_waitlist *list))
 {
     int successp;
     struct waitlist_entry *cur;
@@ -404,7 +410,7 @@ TODO: Not yet documented!!!
 */
 
 void
-Parrot_STM_waitlist_add_self(PARROT_INTERP, STM_waitlist *waitlist) {
+Parrot_STM_waitlist_add_self(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist)) {
     struct waitlist_entry *entry;
 
 
@@ -429,7 +435,7 @@ TODO: Not yet documented!!!
 */
 
 void
-Parrot_STM_waitlist_signal(PARROT_INTERP, STM_waitlist *waitlist)
+Parrot_STM_waitlist_signal(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist))
 {
 #if WAITLIST_DEBUG
     fprintf(stderr, "%p: signal %p\n", interp, waitlist);

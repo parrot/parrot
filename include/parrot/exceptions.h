@@ -169,6 +169,7 @@ void internal_exception(int exitcode, NOTNULL(const char *format), ...)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC* new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
         __attribute__nonnull__(1);
 

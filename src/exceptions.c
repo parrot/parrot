@@ -545,6 +545,7 @@ flag bit is set.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC*
 new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
 {

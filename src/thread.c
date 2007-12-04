@@ -47,7 +47,9 @@ static PMC * make_local_copy(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void mutex_unlock(void *arg);
+static void mutex_unlock(NOTNULL(void *arg))
+        __attribute__nonnull__(1);
+
 static Parrot_Interp pt_check_tid(UINTVAL tid, NOTNULL(const char *from))
         __attribute__nonnull__(2);
 
@@ -237,8 +239,9 @@ interpreter.
 
 */
 
+PARROT_CAN_RETURN_NULL
 PMC *
-pt_shared_fixup(PARROT_INTERP, PMC *pmc)
+pt_shared_fixup(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
     /* TODO this will need to change for thread pools
      * XXX should we have a separate interpreter for this?
@@ -313,7 +316,7 @@ this function, then a spurious wakeup may occur.
 */
 
 void
-pt_thread_wait_with(PARROT_INTERP, Parrot_mutex *mutex)
+pt_thread_wait_with(PARROT_INTERP, NOTNULL(Parrot_mutex *mutex))
 {
     LOCK(interpreter_array_mutex);
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
@@ -733,7 +736,7 @@ running without any communication.
 */
 
 int
-pt_thread_run_1(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
+pt_thread_run_1(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))
 {
     interp->flags |= PARROT_THR_TYPE_1;
     return pt_thread_run(interp, dest_interp, sub, arg);
@@ -752,7 +755,7 @@ sending messages.
 */
 
 int
-pt_thread_run_2(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
+pt_thread_run_2(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))
 {
     interp->flags |= PARROT_THR_TYPE_2;
     return pt_thread_run(interp, dest_interp, sub, arg);
@@ -771,7 +774,7 @@ in a thread pool.
 */
 
 int
-pt_thread_run_3(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
+pt_thread_run_3(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))
 {
     interp->flags |= PARROT_THR_TYPE_3;
     return pt_thread_run(interp, dest_interp, sub, arg);
@@ -834,7 +837,7 @@ Unlocks the mutex C<*arg>.
 */
 
 static void
-mutex_unlock(void *arg)
+mutex_unlock(NOTNULL(void *arg))
 {
     UNLOCK(*(Parrot_mutex *) arg);
 }

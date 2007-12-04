@@ -188,8 +188,10 @@ void pt_DOD_stop_mark(PARROT_INTERP)
 void pt_join_threads(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PMC * pt_shared_fixup(PARROT_INTERP, PMC *pmc)
-        __attribute__nonnull__(1);
+PARROT_CAN_RETURN_NULL
+PMC * pt_shared_fixup(PARROT_INTERP, NOTNULL(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void pt_suspend_self_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -208,17 +210,30 @@ int pt_thread_run(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int pt_thread_run_1(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
-        __attribute__nonnull__(1);
+int pt_thread_run_1(PARROT_INTERP,
+    NOTNULL(PMC* dest_interp),
+    NULLOK(PMC* sub),
+    NULLOK(PMC *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-int pt_thread_run_2(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
-        __attribute__nonnull__(1);
+int pt_thread_run_2(PARROT_INTERP,
+    NOTNULL(PMC* dest_interp),
+    NULLOK(PMC* sub),
+    NULLOK(PMC *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-int pt_thread_run_3(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
-        __attribute__nonnull__(1);
+int pt_thread_run_3(PARROT_INTERP,
+    NOTNULL(PMC* dest_interp),
+    NULLOK(PMC* sub),
+    NULLOK(PMC *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void pt_thread_wait_with(PARROT_INTERP, Parrot_mutex *mutex)
-        __attribute__nonnull__(1);
+void pt_thread_wait_with(PARROT_INTERP, NOTNULL(Parrot_mutex *mutex))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void pt_thread_yield(void);
 PARROT_CAN_RETURN_NULL

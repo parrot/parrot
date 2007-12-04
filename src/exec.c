@@ -276,6 +276,7 @@ TODO: Not yet documented!!!
 */
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 int *
 Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
                                      NOTNULL(char *nptr), NOTNULL(const char *var),
