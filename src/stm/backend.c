@@ -1313,7 +1313,7 @@ wait_for_version(PARROT_INTERP,
         NOTNULL(STM_tx_log *log), Parrot_STM_PMC_handle handle)
 {
     void                  *version;
-    STM_tx_log_sub        *curlog;
+    STM_tx_log_sub        *curlog     = NULL;
     Parrot_atomic_pointer *in_what    = &handle->owner_or_version;
     UINTVAL                wait_count = 0;
     FLOATVAL               start_wait = 0.0;
@@ -1586,10 +1586,10 @@ find_write_record(PARROT_INTERP, NOTNULL(STM_tx_log *log),
     /* FIXME check for read log or previous tx's write log */
     STM_tx_log_sub   *cursub;
     int               have_old_value = 0;
-    PMC              *old_value;
-    STM_read_record  *read;
-    STM_tx_log_sub   *outersub;
-    STM_write_record *write;
+    PMC              *old_value      = NULL;
+    STM_read_record  *read           = NULL;
+    STM_tx_log_sub   *outersub       = NULL;
+    STM_write_record *write          = NULL;
     int               i;
 
     STM_TRACE("finding write record for %p", handle);
@@ -1598,15 +1598,11 @@ find_write_record(PARROT_INTERP, NOTNULL(STM_tx_log *log),
     PARROT_ASSERT(log->depth > 0);
 
     cursub   = get_sublog(log, log->depth);
-    outersub = NULL;
 
     STM_TRACE("searching %d local; %d non-local; %d read",
                 log->last_write - cursub->first_write + 1,
                 cursub->first_write,
                 log->last_read + 1);
-
-    write = NULL;
-    read  = NULL;
 
     for (i = cursub->first_write; i <= log->last_write; ++i) {
         STM_TRACE("current record %d (%p), handle = %p",
