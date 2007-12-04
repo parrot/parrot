@@ -162,8 +162,8 @@ by phc from PHP source. It generates a PAST-pm data structure in XML.
 
 <!-- looks like phc is running into a floating point issue -->
 <xsl:template match="phc:Token_real" >
-  <past:Val ctype='n+' vtype='.Float' >
-    <xsl:attribute name="name" ><xsl:value-of select="phc:source_rep" /></xsl:attribute>
+  <past:Val returns='Float' >
+    <xsl:attribute name="value" ><xsl:value-of select="phc:source_rep" /></xsl:attribute>
   </past:Val>
 </xsl:template>
 
