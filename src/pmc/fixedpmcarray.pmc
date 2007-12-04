@@ -242,7 +242,8 @@ Returns the number of elements in the array.
 */
 
     FLOATVAL get_number() {
-        return (FLOATVAL)DYNSELF.elements();
+        INTVAL e = DYNSELF.elements();
+        return (FLOATVAL)e;
     }
 
 /*

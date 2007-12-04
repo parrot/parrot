@@ -273,9 +273,12 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 utf8_encode(PARROT_INTERP, NOTNULL(void *ptr), UINTVAL c)
 {
+    const UINTVAL        len   = UNISKIP(c);
+
+    /* the const is good on u8ptr, but using ptr on other variables avoids the
+     * need to do a yucky cast to remove constness */
     const utf8_t * const u8ptr = (utf8_t *)ptr;
-    const UINTVAL len = UNISKIP(c);
-    utf8_t *u8end = u8ptr + len - 1;
+    utf8_t              *u8end = (utf8_t *)ptr + len - 1;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         real_exception(interp, NULL, INVALID_CHARACTER,
@@ -289,7 +292,7 @@ utf8_encode(PARROT_INTERP, NOTNULL(void *ptr), UINTVAL c)
     }
     *u8end = (utf8_t)((c & UTF8_START_MASK(len)) | UTF8_START_MARK(len));
 
-    return u8ptr + len;
+    return (utf8_t *)ptr + len;
 }
 
 /*
