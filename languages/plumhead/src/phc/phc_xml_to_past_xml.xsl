@@ -124,13 +124,13 @@ by phc from PHP source. It generates a PAST-pm data structure in XML.
 </xsl:template>
 
 <xsl:template match="phc:AST_variable" >
-  <past:Var viviself=".Undef" islvalue="1" >
+  <past:Var scope="package" viviself="Undef" lvalue="1" >
     <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
   </past:Var>
 </xsl:template>
 
 <xsl:template match="phc:AST_variable[phc:AST_expr_list/phc:Token_string | phc:AST_expr_list/phc:Token_int]" >
-  <past:Var scope="keyed" viviself= ".Undef" islvalue="1" >
+  <past:Var scope="keyed" viviself="Undef" lvalue="1" >
     <xsl:choose>
       <xsl:when test="phc:Token_variable_name/phc:value = '_GET' or phc:Token_variable_name/phc:value = '_POST'" >
         <past:Var scope="package" >
@@ -138,7 +138,7 @@ by phc from PHP source. It generates a PAST-pm data structure in XML.
         </past:Var>
       </xsl:when>
       <xsl:otherwise>
-        <past:Var viviself=".Hash" islvalue="1" >
+        <past:Var viviself="Hash" scope="package" lvalue="1" >
           <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
         </past:Var>
       </xsl:otherwise>
