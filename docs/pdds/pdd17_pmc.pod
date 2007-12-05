@@ -474,7 +474,7 @@ passing in the initialization argument, I<init>, which is usually a
 hash. This opcode is most often used with high-level classes, but
 low-level PMCs may instantiate an object of their own type.
 
-=item new_from_string [deprecated]
+=item new_from_string [deprecated: See RT# 47011]
 
   PMC* new_from_string(INTERP, PMC* self, STRING* rep, INTVAL flags)
 
@@ -563,14 +563,13 @@ Return the class object for this PMC. For high-level objects, this is a
 C<Class> object (or other high-level class object). For low-level PMCs,
 this returns a C<PMCProxy> object.
 
-=item class_type
+=item class_type [deprecated: See RT# 48142]
 
   INTVAL class_type(INTERP, PMC* self)
 
-Return the integer type of the PMC. [NOTE: will be deprecated when type
-IDs are deprecated.]
+Return the integer type of the PMC. 
 
-=item pmc_namespace [deprecated]
+=item pmc_namespace [deprecated: See RT# 48144]
 
   PMC* pmc_namespace(INTERP, PMC* self)
 
