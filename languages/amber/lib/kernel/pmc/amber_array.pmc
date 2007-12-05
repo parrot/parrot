@@ -44,7 +44,7 @@ pmclass Amber_ARRAY need_ext
     }
 
     METHOD PMC* first() {
-        /* XXX reject if count = 0 */
+        /* RT#48180 reject if count = 0 */
         return VTABLE_get_pmc_keyed_int(INTERP, SELF, (INTVAL) 0);
     }
 
@@ -61,14 +61,14 @@ pmclass Amber_ARRAY need_ext
     }
 
     METHOD PMC* item(PMC* index) {
-        /* XXX reject out-of-range values (0, or > count, or < -count) */
+        /* RT#48182 reject out-of-range values (0, or > count, or < -count) */
         INTVAL adjusted_index = PMC_int_val(index);
         if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
         return VTABLE_get_pmc_keyed_int(INTERP, SELF, adjusted_index);
     }
 
     METHOD PMC* last() {
-        /* XXX reject if count = 0 */
+        /* RT#48180 reject if count = 0 */
         return VTABLE_get_pmc_keyed_int(
             INTERP, SELF, VTABLE_get_integer(INTERP, SELF) - 1);
     }
@@ -79,7 +79,7 @@ pmclass Amber_ARRAY need_ext
     }
 
     METHOD void set_item(PMC* index, PMC* value) {
-        /* XXX --require has(index) */
+        /* RT#48184 --require has(index) */
         INTVAL adjusted_index = PMC_int_val(index);
         if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
         VTABLE_set_pmc_keyed_int(INTERP, SELF, adjusted_index, value);

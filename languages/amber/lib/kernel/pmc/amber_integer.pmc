@@ -23,7 +23,7 @@ pmclass Amber_INTEGER
 
     PMC* neg(PMC* dest) {
         INTVAL a = -DYNSELF.get_integer();
-        /* if (!dest)  --TODO: can we reinstate this if we generate n_neg instead of neg? */
+        /* if (!dest)  --RT#48190: can we reinstate this if we generate n_neg instead of neg? */
             dest = pmc_new(
                 INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(INTERP, dest, a);
@@ -33,7 +33,7 @@ pmclass Amber_INTEGER
 /* non-vtable methods follow */
 
     METHOD PMC* abs() {
-        /* XXX overflow for -maxint */
+        /* RT#48188 overflow for -maxint */
         PMC* result = pmc_new(
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(INTERP, result, abs(PMC_int_val(SELF)));
@@ -48,7 +48,7 @@ pmclass Amber_INTEGER
     }
 
     METHOD PMC* character() {
-        /* XXX consider Unicode */
+        /* RT#48186 consider Unicode */
         PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, PMC_int_val(SELF));
         return result;
