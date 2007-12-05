@@ -140,7 +140,7 @@ pass("Completed all tests in $0");
 The files in this directory test functionality used by F<Configure.pl>.
 
 The tests in this file test subroutines found in config::auto::pmc
-called within that class's C<runstep() method.
+called within that class's C<runstep()> method.
 
 =head1 AUTHOR
 
