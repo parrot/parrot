@@ -96,6 +96,7 @@ rule statement_list {
 ##  the calling rule.
 rule statement {
     | <if_statement> {*}                         #= if_statement
+    | <unless_statement> {*}                     #= unless_statement
     | <while_statement> {*}                      #= while_statement
     | <repeat_statement> {*}                     #= repeat_statement
     | <for_statement> {*}                        #= for_statement
@@ -142,10 +143,16 @@ token MARK_STATEMENT_END {
 ##  'unless'.
 
 rule if_statement {
-    $<sym>:=['if'|'unless']
+    $<sym>:=['if']
     <EXPR> <block>
     [ 'elsif' <EXPR> <block> ]*
     [ 'else' $<else>=<block> ]?
+    {*}
+}
+
+rule unless_statement {
+    $<sym>:=['unless']
+    <EXPR> <block>
     {*}
 }
 
@@ -395,6 +402,11 @@ proto infix:<+> is looser(infix:<*>)
     { ... }
 proto infix:<-> is equiv(infix:<+>)
     is pirop('n_sub')
+    { ... }
+
+## Concatenation operators
+proto infix:<~> is looser(infix:<+>)
+    is pirop('n_concat')
     { ... }
 
 ## Comparison operators

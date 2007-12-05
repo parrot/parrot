@@ -208,13 +208,11 @@
 ##                                   :node( $/ )
 ##                                 );
 ##        }
-##        $past.pasttype( ~$<sym> );
 ##        make $past;
 .sub 'if_statement' :method
     .param pmc match
     .local pmc expr, block, past
     .local int cond
-    .local string sym
     cond = match['EXPR']
     cond -= 1
     bsr get_expr
@@ -238,8 +236,6 @@
     goto while
 
   end_while:
-    sym = match['sym']
-    past.'pasttype'( sym )
     goto end
 
   get_expr:
@@ -253,6 +249,29 @@
     block = block.'get_scalar'()
     ret
   end:
+    match.'result_object'(past)
+.end
+
+
+##    method unless_statement($/) {
+##        my $past := PAST::Op.new( $( $<EXPR> ),
+##                                  $( $<block> ),
+##                                  :pasttype('unless'),
+##                                  :node( $/ )
+##                                );
+##        make $past;
+##    }
+.sub 'unless_statement' :method
+    .param pmc match
+    .local pmc expr, block, past
+    expr = match['EXPR']
+    expr = expr
+    expr = expr.'get_scalar'()
+    block = match['block']
+    block = block
+    block = block.'get_scalar'()
+    $P0 = get_hll_global ['PAST'], 'Op'
+    past = $P0.'new'(expr, block, 'pasttype'=>'unless', 'node'=>match)
     match.'result_object'(past)
 .end
 
