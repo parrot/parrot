@@ -41,15 +41,19 @@ void Parrot_cx_runloop_wake(PARROT_INTERP, NOTNULL(PMC *scheduler))
 
 /* Scheduler PMC's underlying struct. */
 typedef struct Parrot_Scheduler {
-    int           id;         /* The scheduler's ID. */
-    int           max_tid;    /* The highest assigned task ID. */
-    int           pending;    /* A count of pending tasks (cached for fast lookup). */
-    PMC          *task_list;  /* The current list of tasks. */
-    PMC          *task_index; /* An index into the current list of tasks, ordered by priority. */
-    PMC          *handlers;   /* The list of currently active handlers. */
-    Parrot_cond   condition;  /* Flag used by scheduler runloop */
-    Parrot_mutex  lock;       /* Flag used by scheduler runloop */
-    Parrot_Interp interp;     /* A link back to the scheduler's interpreter. */
+    int           id;             /* The scheduler's ID. */
+    int           max_tid;        /* The highest assigned task ID. */
+    int           pending;        /* A count of pending tasks (cached for fast
+                                     lookup). */
+    PMC          *task_list;      /* The current list of tasks. */
+    PMC          *task_index;     /* An index into the current list of tasks,
+                                     ordered by priority. */
+    PMC          *handlers;       /* The list of currently active handlers. */
+    Parrot_cond   condition;      /* Flag used by scheduler runloop */
+    Parrot_mutex  lock;           /* Flag used by scheduler runloop */
+    Parrot_Interp interp;         /* A link back to the scheduler's interpreter. */
+    Parrot_thread runloop_handle; /* A handle for the scheduler's runloop
+                                     thread, if any. */
 } Parrot_Scheduler;
 
 /* Macro to access underlying structure of a Scheduler PMC. */
