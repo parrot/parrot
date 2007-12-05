@@ -800,15 +800,14 @@ mmd_add_function(PARROT_INTERP,
 {
     if (func_nr >= (INTVAL)interp->n_binop_mmd_funcs) {
         INTVAL i;
+        const size_t bytes = (func_nr + 1) * sizeof (MMD_table);
 
         if (interp->binop_mmd_funcs) {
             interp->binop_mmd_funcs =
-                (MMD_table *)mem_sys_realloc(interp->binop_mmd_funcs,
-                                (func_nr + 1) * sizeof (MMD_table));
+                (MMD_table *)mem_sys_realloc(interp->binop_mmd_funcs, bytes);
         }
         else {
-            interp->binop_mmd_funcs =
-                (MMD_table *)mem_sys_allocate((func_nr + 1) * sizeof (MMD_table));
+            interp->binop_mmd_funcs = (MMD_table *)mem_sys_allocate(bytes);
         }
 
         for (i = interp->n_binop_mmd_funcs; i <= func_nr; ++i)  {
