@@ -65,10 +65,10 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
 Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data,
-        STRING *cb_signature)
+        NOTNULL(STRING *cb_signature))
 {
     PMC *cb, *cb_sig;
-    int type = '?';     /* avoid -Ox warning */
+    int type;
     char * sig_str;
     STRING *sc;
     /*

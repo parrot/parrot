@@ -709,8 +709,9 @@ PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_make_cb(PARROT_INTERP,
     PMC* sub,
     PMC* user_data,
-    STRING *cb_signature)
-        __attribute__nonnull__(1);
+    NOTNULL(STRING *cb_signature))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void Parrot_run_callback(PARROT_INTERP, PMC* user_data, char* external_data)
