@@ -101,13 +101,13 @@ static PMC* retval(Interp *interp, void *ret)
     if (ret == 0) {
         real_exception(interp, NULL, OUT_OF_BOUNDS, "Array index out of bounds!\n");
     }
-    /* XXX getting non existent value, exception or undef?
+    /* RT#48172 getting non existent value, exception or undef?
      * current is for perlarray */
     if (ret == (void*) -1)
         value = undef(interp);
     else {
         value = *(PMC**) ret;
-        if (value == NULL)  /* XXX same here */
+        if (value == NULL)  /* RT#48172 same here */
             value = undef(interp);
     }
     return value;
@@ -302,7 +302,7 @@ pmclass PugsCapture extends PugsAny
         HashBucket *b = parrot_hash_get_bucket(INTERP, siva_hash(SELF),
                                         key);
         if (b == NULL) {
-            /* XXX should store the undef for consistency */
+            /* RT#48174 should store the undef for consistency */
             PMC *new_undef = pmc_new(INTERP, enum_class_Undef);
             return new_undef;
         }
@@ -339,7 +339,7 @@ pmclass PugsCapture extends PugsAny
         b = parrot_hash_get_bucket(INTERP, siva_hash(SELF),
                                         keystr);
         if (b == NULL) {
-            /* XXX should store the undef for consistency */
+            /* RT#48174 should store the undef for consistency */
             PMC *new_undef = pmc_new(INTERP, enum_class_Undef);
             return new_undef;
         }
@@ -377,7 +377,7 @@ pmclass PugsCapture extends PugsAny
         HashBucket *b = parrot_hash_get_bucket(INTERP, (Hash*) siva_hash(SELF),
                                         key);
         if (b == NULL) {
-            /* XXX should store the undef for consistency */
+            /* RT#48174 should store the undef for consistency */
             PMC *new_undef = pmc_new(INTERP, enum_class_Undef);
             return new_undef;
         }
@@ -389,7 +389,7 @@ pmclass PugsCapture extends PugsAny
         HashBucket *b = parrot_hash_get_bucket(INTERP, siva_hash(SELF),
                                         key);
         if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
+            /* RT#48176 Warning: use of uninitialized value */
             return VTABLE_get_string(INTERP, pmc_new(INTERP, enum_class_Undef));
         }
         return VTABLE_get_string(INTERP, (PMC*) b->value);
@@ -442,7 +442,7 @@ pmclass PugsCapture extends PugsAny
         }
         b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
+            /* RT#48176 Warning: use of uninitialized value */
             return VTABLE_get_string(INTERP, undef_pmc);
         }
         nextkey = key_next(INTERP, key);

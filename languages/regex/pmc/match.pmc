@@ -116,7 +116,7 @@ needs to be done once.
         Hash* hash = (Hash*) PMC_struct_val(SELF);
         HashBucket *b = parrot_hash_get_bucket(interp, hash, key);
         if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
+            /* RT#48170 Warning: use of uninitialized value */
             /* return VTABLE_get_string(interp, undef); */
             return NULL;
         }
@@ -190,7 +190,7 @@ Returns the string value for the element at C<*key>.
         }
         b = parrot_hash_get_bucket(interp, hash, keystr);
         if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
+            /* RT#48170 Warning: use of uninitialized value */
             return 0;
         }
 
