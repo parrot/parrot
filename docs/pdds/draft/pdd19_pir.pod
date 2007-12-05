@@ -338,8 +338,6 @@ constant. Bare identifiers must be valid PIR identifiers (see L<Identifiers>
 above), but string sub names can contain any characters, including characters
 from different character sets (see L<Constants> above).
 
-{{ NOTE: the optional comma in the flag list is deprecated RT#45697 }}
-
 Always paired with C<.end>.
 
 =item .end
@@ -359,8 +357,6 @@ C<.emit>.
 =back
 
 =head3 Directives used for Parrot calling conventions.
-
-{{ DEPRECATED: the "pcc_" prefix. See #45925. }}
 
 =over 4
 
@@ -419,6 +415,24 @@ C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 
 {{ TODO: once these flag bits are solidified by long-term use, then we
 may choose to copy appropriate bits of the documentation to here. }}
+
+
+=head3 Catching Exceptions
+
+Using the C<push_eh> op you can install an exception handler. If an exception
+is thrown, Parrot will execute the installed exception handler. In order to
+retrieve the thrown exception, use the C<.get_results> directive.
+
+   push_eh handler
+   ...
+ handler:
+   .local pmc exception
+   .local string message
+   .get_results (exception, message)
+   ...
+
+This is syntactic sugar for the C<get_results> op, but any flags set on the
+targets will be handled automatically by the PIR compiler.
 
 =head2 Syntactic Sugar
 
