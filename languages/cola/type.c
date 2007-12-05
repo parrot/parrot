@@ -18,7 +18,7 @@ languages/cola/type.c
 
 =head1 DESCRIPTION
 
-TODO
+RT#48200
 
 =head2 Functions
 
@@ -104,7 +104,7 @@ Type * store_type(const char * name, int size)
 =item C<Type * lookup_type(const char * name)>
 
 Start at inner scope and work out, looking for a type name.
-FIXME: Add support for member resolution (namespace.namespace.type, etc.)
+RT#48198: Add support for member resolution (namespace.namespace.type, etc.)
 
 =cut
 
@@ -160,7 +160,7 @@ Type * lookup_type_symbol(Symbol * id)
 
 =item C<const char * type_name(Type * t)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -175,7 +175,7 @@ const char * type_name(Type * t)
 
 =item C<Rank * new_rank(int dim)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -194,7 +194,7 @@ Rank * new_rank(int dim)
 
 =item C<Type * new_array_type(Symbol * typename, Symbol * sig)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -243,7 +243,7 @@ Symbol * array_signature(Type * t) {
 
 =item C<void resolve_identifier(Symbol ** ps)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 

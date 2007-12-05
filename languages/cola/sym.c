@@ -65,7 +65,7 @@ AST             *primary_block_stack[256];
 
 =item C<void assert(void * p)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -83,7 +83,7 @@ void assert(void * p)
 
 =item C<unsigned int hash_str(const char * str)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -102,7 +102,7 @@ unsigned int hash_str(const char * str)
 
 =item C<void init_symbol_tables()>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -123,7 +123,7 @@ void init_symbol_tables()
 
 =item C<SymbolTable * new_symbol_table()>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -142,7 +142,7 @@ SymbolTable * new_symbol_table()
 
 =item C<Symbol * new_symbol(const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -170,7 +170,7 @@ Symbol * new_symbol(const char * name)
 
 =item C<Symbol * new_identifier_symbol(const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -187,7 +187,7 @@ Symbol * new_identifier_symbol(const char * name)
 
 =item C<Symbol * new_literal_symbol(const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -204,7 +204,7 @@ Symbol * new_literal_symbol(const char * name)
 
 =item C<Symbol * new_type_symbol(const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -221,7 +221,7 @@ Symbol * new_type_symbol(const char * name)
 
 =item C<Symbol * mk_namespace_symbol(Symbol * identifier)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -239,7 +239,7 @@ Symbol * mk_namespace_symbol(Symbol * identifier)
 
 =item C<Symbol * mk_class_symbol(Symbol * identifier)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -260,7 +260,7 @@ Symbol * mk_class_symbol(Symbol * identifier)
 
 =item C<Symbol * mk_method_symbol(Symbol * rettype, const char * name, const char * sig)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -277,7 +277,7 @@ Symbol * mk_method_symbol(Symbol * rettype, const char * name, const char * sig)
 
 =item C<Symbol * symbol_concat(Symbol * s1, Symbol * s2)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -297,7 +297,7 @@ Symbol * symbol_concat(Symbol * s1, Symbol * s2)
 
 =item C<Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -319,7 +319,7 @@ Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3)
 
 =item C<Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -343,7 +343,7 @@ Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4)
 
 =item C<AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -378,7 +378,7 @@ AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2)
 
 =item C<void push(Node ** list, Node * p)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -394,7 +394,7 @@ void push(Node ** list, Node * p)
 
 =item C<void tpush(Node ** list, Node * p)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -471,13 +471,13 @@ Node * tpop(Node ** list)
 
 
 
-/* Easy FIXME, rewrite below to call above generic Node versions */
+/* Easy RT#48202, rewrite below to call above generic Node versions */
 
 /*
 
 =item C<void push_sym(Symbol ** list, Symbol * p)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -493,7 +493,7 @@ void push_sym(Symbol ** list, Symbol * p)
 
 =item C<void tpush_sym(Symbol ** list, Symbol * p)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -647,7 +647,7 @@ void unshift_ast(AST ** list, AST * p)
 
 =item C<AST * new_statement(int stmnttype, AST * left, AST * right)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -663,7 +663,7 @@ AST * new_statement(int stmnttype, AST * left, AST * right)
 
 =item C<AST * new_expr(int exprtype, AST * left, AST * right)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -696,7 +696,7 @@ AST * new_op_expr(AST * left, int op, AST * right)
 
 =item C<AST * new_logical_expr(AST * left, int op, AST * right)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -713,7 +713,7 @@ AST * new_logical_expr(AST * left, int op, AST * right)
 
 =item C<AST * new_if(AST * condition, AST * then_part, AST * else_part)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -742,7 +742,7 @@ AST * new_if(AST * condition, AST * then_part, AST * else_part)
 
 =item C<AST * new_conditional(AST * condition, AST * then_part, AST * else_part)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -759,7 +759,7 @@ AST * new_conditional(AST * condition, AST * then_part, AST * else_part)
 
 =item C<AST * new_while(AST * condition, AST * block)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -777,7 +777,7 @@ AST * new_while(AST * condition, AST * block)
 
 =item C<AST * new_for(AST * init, AST * condition, AST * iteration, AST * block)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -879,7 +879,7 @@ Symbol * lookup_symbol(const char * name)
 
 =item C<Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -906,7 +906,7 @@ Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name)
 
 =item C<Symbol * lookup_namespace(SymbolTable * tab, const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -928,7 +928,7 @@ Symbol * lookup_namespace(SymbolTable * tab, const char * name)
 
 =item C<Symbol * lookup_class(SymbolTable * tab, const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -950,7 +950,7 @@ Symbol * lookup_class(SymbolTable * tab, const char * name)
 
 =item C<Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_level)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -973,7 +973,7 @@ Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_lev
 
 =item C<Symbol * store_symbol(SymbolTable * tab, Symbol * sym)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1019,7 +1019,7 @@ Symbol * store_identifier(SymbolTable * tab, const char * name) {
 
 =item C<Symbol * store_method(SymbolTable * tab, const char * name, Type * type)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1105,7 +1105,7 @@ void declare_field(Symbol * s)
 
 =item C<void dump_namespace(Symbol * ns)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1129,7 +1129,7 @@ void dump_namespace(Symbol * ns)
 
 =item C<void dump_symbol_table(SymbolTable * tab)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1185,7 +1185,7 @@ void dump_symbol_table(SymbolTable * tab)
 
 =item C<Symbol * check_id_redecl(SymbolTable * table, const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1206,7 +1206,7 @@ Symbol * check_id_redecl(SymbolTable * table, const char * name)
 
 =item C<Symbol * check_id_decl(SymbolTable * table, const char * name)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1224,7 +1224,7 @@ Symbol * check_id_decl(SymbolTable * table, const char * name)
 
 =item C<int push_scope()>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1336,7 +1336,7 @@ void push_primary_block(AST * p)
 
 =item C<AST * pop_primary_block()>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1353,7 +1353,7 @@ AST * pop_primary_block()
 
 =item C<AST * get_cur_primary_block()>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1370,7 +1370,7 @@ AST * get_cur_primary_block()
 
 =item C<char * str_dup(const char * old)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -1387,7 +1387,7 @@ char * str_dup(const char * old)
 
 =item C<char * str_cat(const char * s1, const char * s2)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 

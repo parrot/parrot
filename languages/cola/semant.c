@@ -70,7 +70,7 @@ void build_ast(AST * tree)
 
 =item C<void build_class_decl(AST * c)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -92,7 +92,7 @@ void build_class_decl(AST * c)
 
 =item C<void build_class_body(AST * b)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -223,7 +223,7 @@ void build_var_decl(AST * d)
 
 =item C<void build_if(AST * i)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -246,7 +246,7 @@ void build_if(AST * i)
 
 =item C<void build_conditional(AST * c)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -275,7 +275,7 @@ void build_conditional(AST * c)
 
 =item C<void build_method_call(AST * c)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -295,7 +295,7 @@ void build_method_call(AST * c)
 
 =item C<void build_new_expr(AST * n)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -315,7 +315,7 @@ void build_new_expr(AST * n)
 
 =item C<void build_loop(AST * l)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -336,7 +336,7 @@ void build_loop(AST * l)
 
 =item C<void build_return(AST * r)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -352,7 +352,7 @@ void build_return(AST * r)
 
 =item C<void build_expr_list(AST * e)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -371,7 +371,7 @@ void build_expr_list(AST * e)
 
 =item C<void build_expr(AST * e)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
@@ -450,7 +450,7 @@ void build_expr(AST * e)
 
 =item C<void build_statement_list(AST * s)>
 
-TODO: Not yet documented!!!
+RT#48200: Not yet documented!!!
 
 =cut
 
