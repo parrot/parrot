@@ -484,15 +484,14 @@ Parrot_clone_lib_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *lib_p
         VTABLE_getprop(s, lib_pmc, const_string(s, "_type")));
 
     if (0 == string_equal(s, type, const_string(s, "Ops"))) {
-        PMC *new_lib_pmc;
-
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.
          * Anyways, if we hope to share bytecode at runtime, we need to have
          * them have identical opcodes anyways.
          */
-        new_lib_pmc = constant_pmc_new(d, enum_class_ParrotLibrary);
+        PMC * const new_lib_pmc = constant_pmc_new(d, enum_class_ParrotLibrary);
+
         PMC_data(new_lib_pmc) = handle;
         VTABLE_setprop(d, new_lib_pmc, const_string(d, "_filename"),
             make_string_pmc(d, wo_ext));
