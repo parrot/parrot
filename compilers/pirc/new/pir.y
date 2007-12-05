@@ -385,10 +385,10 @@ sub_id: identifier
       ;
 
 sub_flags: /* empty */                                     { $$ = 0; }
-         | sub_flags sub_flag                              { SET_FLAG($$, $1); }
+         | sub_flags sub_flag                              { $$ |= $2; }
          ;
 
-sub_flag: ":anon"                                          { $$ = SUB_FLAG_ANON; }
+sub_flag: ":anon"                                          { $$ = SUB_FLAG_ANON;}
         | ":init"                                          { $$ = SUB_FLAG_INIT; }
         | ":load"                                          { $$ = SUB_FLAG_LOAD; }
         | ":main"                                          { $$ = SUB_FLAG_MAIN; }
@@ -693,7 +693,7 @@ method: invokable
       | string_object
       ;
 
-invokable: identifier                                      { $$ = target_from_ident($1); find_target(lexer, $1);}
+invokable: identifier                                      { $$ = target_from_ident($1); }
          | TK_SYM_PREG                                     { $$ = reg(PMC_TYPE, $1, !IS_PASM_REG); }
          | TK_PASM_PREG                                    { $$ = reg(PMC_TYPE, $1, IS_PASM_REG); }
          ;

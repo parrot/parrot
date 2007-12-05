@@ -105,7 +105,7 @@ typedef enum invoke_type {
 /* use these macros for manipulating bits; don't do it yourself */
 #define SET_FLAG(obj,flag)      obj |= flag
 #define CLEAR_FLAG(obj,flag)    obj &= ~flag
-#define TEST_FLAG(obj,flag)     obj & flag
+#define TEST_FLAG(obj,flag)     (obj & flag)
 
 
 

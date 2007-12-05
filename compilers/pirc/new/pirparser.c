@@ -2147,12 +2147,12 @@ yyreduce:
 
   case 29:
 #line 388 "pir.y"
-    { SET_FLAG((yyval.ival), (yyvsp[(1) - (2)].ival)); ;}
+    { (yyval.ival) |= (yyvsp[(2) - (2)].ival); ;}
     break;
 
   case 30:
 #line 391 "pir.y"
-    { (yyval.ival) = SUB_FLAG_ANON; ;}
+    { (yyval.ival) = SUB_FLAG_ANON;;}
     break;
 
   case 31:
@@ -2584,7 +2584,7 @@ yyreduce:
 
   case 149:
 #line 696 "pir.y"
-    { (yyval.targ) = target_from_ident((yyvsp[(1) - (1)].sval)); find_target(lexer, (yyvsp[(1) - (1)].sval));;}
+    { (yyval.targ) = target_from_ident((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 150:

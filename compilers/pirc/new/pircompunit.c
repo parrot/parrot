@@ -42,6 +42,7 @@ parse_error(struct lexer_state *lexer, char *message, ...) {
 target *
 find_target(struct lexer_state *lexer, char * const name) {
     target *t = find_symbol(lexer, name);
+
     if (t == NULL) { /* not declared */
         parse_error(lexer, "symbol '%s' was not declared\n", name);
     }
@@ -80,6 +81,11 @@ void
 set_sub_flag(struct lexer_state *lexer, sub_flag flag) {
     /* set the specified flag in the current subroutine */
     SET_FLAG(lexer->subs->flags, flag);
+
+    /* if the sub is a method or a :vtable method, then also add a "self" parameter */
+    if (TEST_FLAG(flag, SUB_FLAG_VTABLE) || TEST_FLAG(flag, SUB_FLAG_METHOD)) {
+        add_param(lexer, PMC_TYPE, "self");
+    }
 }
 
 /*
@@ -160,9 +166,21 @@ add_target(struct lexer_state *lexer, target *t, target *t2) {
 target *
 add_param(struct lexer_state *lexer, pir_type type, char *name) {
     target *t = new_target(type, name);
-    t->next = lexer->subs->parameters;
-    lexer->subs->parameters = t;
+
+    assert(lexer->subs);
+    if (lexer->subs->parameters == NULL) {
+        lexer->subs->parameters = t;
+        t->next = t;
+    }
+    else {
+
+        assert(lexer->subs->parameters);
+        t->next = lexer->subs->parameters->next;
+        lexer->subs->parameters->next = t;
+        lexer->subs->parameters = t;
+    }
     return t;
+
 }
 
 target *
@@ -682,6 +700,7 @@ print_invocation(invocation *inv) {
         case CALL_PCC:
             printf("   set_args");
             printf("\n");
+            printf("   get_results\n");
             printf("   set_p_pc P%d, %s\n", 0, inv->sub->name);
             printf("   invokecc");
             break;
@@ -701,11 +720,13 @@ print_invocation(invocation *inv) {
         case CALL_TAIL:
             printf("   set_args");
             printf("\n");
+
             printf("   tailcall");
             break;
         case CALL_METH:
             printf("   set_args");
             printf("\n");
+            printf("   get_results\n");
             printf("   callmethod");
             break;
         case CALL_METH_TAIL:
@@ -727,10 +748,7 @@ print_invocation(invocation *inv) {
 
 void
 print_statement(subroutine *sub) {
-    if (sub->statements == NULL) {
-        return;
-    }
-    else {
+    if (sub->statements != NULL) {
         statement *statiter = sub->statements->next;
 
         do {
@@ -751,6 +769,35 @@ print_statement(subroutine *sub) {
         }
         while (statiter != sub->statements->next);
     }
+
+    printf("   set_returns\n");
+    printf("   returncc\n");
+}
+
+void
+print_parameters(target *parameters) {
+    if (parameters != NULL) {
+        target *iter = parameters->next;
+        printf("   get_params '");
+        do {
+            printf("0");
+            iter = iter->next;
+            if (iter != parameters->next) printf(",");
+            else printf("', ");
+        }
+        while (iter != parameters->next);
+
+        iter = parameters->next;
+        do {
+            print_target(iter);
+            iter = iter->next;
+            if (iter != parameters->next) printf(", ");
+            else printf("\n");
+        }
+        while (iter != parameters->next);
+
+    }
+
 }
 
 void
@@ -764,13 +811,16 @@ print_subs(struct lexer_state *lexer) {
 
         do {
             printf(".pcc_sub %s:\n", subiter->sub_name);
+            print_parameters(subiter->parameters);
             print_statement(subiter);
             subiter = subiter->next;
         }
         while (subiter != lexer->subs->next);
     }
 
+    /*
     printf("   end\n");
+    */
 
 
 

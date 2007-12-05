@@ -15,7 +15,7 @@ compilers/pirc/new/pirsymbol.c
 
 =head1 DESCRIPTION
 
-TODO: Not yet documented!!!
+Functions for handling symbols.
 
 =head2 Functions
 
