@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 =head1 NAME
 
@@ -166,6 +166,19 @@ CODE
 ["abc";"def";unicode:"T\x{e9}st"]
 ["abc";"def";unicode:"T\x{e9}st"]
 ["_perl6";"abc";"def";unicode:"T\x{e9}st"]
+OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'regression on first char repl bug' );
+.sub main :main
+    .local pmc code
+    null $P0
+    code = new 'CodeString'
+    code.emit('new', 'n'=>$P0)
+    print code
+.end
+CODE
+new
 OUTPUT
 
 # Local Variables:

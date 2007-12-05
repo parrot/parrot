@@ -76,6 +76,7 @@ A newline is automatically added to the end of the fmt.
     while (pos >= 0) {
         pos += replen;
         pos = string_str_index(INTERP, fmt, percent, pos);
+        if (pos < 0) break;
 
         key = string_substr(INTERP, fmt, pos+1, 1, &key, 0);
 
