@@ -30,17 +30,18 @@ sub _init {
     $data{description} = q{Determining what pmc files should be compiled in};
     $data{args}        = [ qw( ask pmc ) ];
     $data{result}      = q{};
+    $data{PMC_PARENTS} = {};
+    $data{srcpmc} = [ sort map { basename($_) } glob "./src/pmc/*.pmc" ];
     return \%data;
 }
-
-my %PMC_PARENTS;
 
 # Return the (lowercased) name of the immediate parent of the given
 # (lowercased) pmc name.
 sub pmc_parent {
+    my $self = shift;
     my ($pmc) = @_;
 
-    return $PMC_PARENTS{$pmc} if defined $PMC_PARENTS{$pmc};
+    return $self->{PMC_PARENTS}->{$pmc} if defined $self->{PMC_PARENTS}->{$pmc};
 
     local $/;
     open( my $PMC, '<', "src/pmc/$pmc.pmc" )
@@ -52,16 +53,18 @@ sub pmc_parent {
     s/^.*?pmclass//s;
     s/\{.*$//s;
 
-    return $PMC_PARENTS{$pmc} = lc($1) if m/extends\s+(\w+)/;
-    return $PMC_PARENTS{$pmc} = 'default';
+    return $self->{PMC_PARENTS}->{$pmc} = lc($1) if m/extends\s+(\w+)/;
+    return $self->{PMC_PARENTS}->{$pmc} = 'default';
 }
 
 # Return an array of all
 sub pmc_parents {
+    my $self = shift;
     my ($pmc) = @_;
 
     my @parents = ($pmc);
-    push @parents, pmc_parent( $parents[-1] ) until $parents[-1] eq 'default';
+    push @parents, $self->pmc_parent( $parents[-1] )
+        until $parents[-1] eq 'default';
     shift(@parents);
 
     return @parents;
@@ -89,16 +92,11 @@ sub sort_pmcs {
     for (@pmcs) {
         if ( exists $pmc_order->{$_} ) {
             $sorted_pmcs[ $pmc_order->{$_} ] = $_;
-
-            #if (exists $pmc_order->{"const$_"}) {
-            #   $sorted_pmcs[$pmc_order->{"const$_"}] = "const$_";
-            #}
         }
         else {
             $sorted_pmcs[ $n++ ] = $_;
         }
     }
-    ## print "***\n", join(' ', @sorted_pmcs), "\n";
     return @sorted_pmcs;
 }
 
@@ -118,12 +116,7 @@ sub contains_pccmethod {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my @pmc = (
-        sort
-            map { basename($_) } glob "./src/pmc/*.pmc"
-    );
-
-    @pmc = sort_pmcs(@pmc);
+    my @pmc = sort_pmcs( @{ $self->{srcpmc} } );
 
     my $pmc_list = $conf->options->get('pmc')
         || join( ' ', grep { defined $_ } @pmc );
@@ -166,11 +159,12 @@ END
         next if ( $pmc =~ /^const/ );
 
         # make each pmc depend upon its parent.
-        my $parent       = pmc_parent($pmc) . ".pmc";
         my $parent_dumps = '';
-        $parent_dumps .= "src/pmc/$_.dump " foreach reverse( ( pmc_parents($pmc) ) );
+        $parent_dumps .= "src/pmc/$_.dump "
+            foreach reverse( ( $self->pmc_parents($pmc) ) );
         my $parent_headers = '';
-        $parent_headers .= "src/pmc/pmc_$_.h " foreach ( pmc_parents($pmc) );
+        $parent_headers .= "src/pmc/pmc_$_.h "
+            foreach ( $self->pmc_parents($pmc) );
 
         # make each pmc depend upon PCCMETHOD.pm if it uses PCCMETHOD
         my $pmc_fname = catfile('src', 'pmc', "$pmc.pmc");
