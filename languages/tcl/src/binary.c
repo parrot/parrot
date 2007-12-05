@@ -22,7 +22,7 @@ languages/tcl/src/binary.c
 
 =head1 DESCRIPTION
 
-TODO
+RT#48162
 
 =head2 Functions
 
@@ -358,7 +358,7 @@ PMC *ParTcl_binary_scan(PARROT_INTERP, STRING *BINSTR, STRING *FORMAT)
 =item C<static STRING *
 binary_format_number_field(PARROT_INTERP, char field, STRING *binstr, PMC *value)>
 
-TODO: Not yet documented!!!
+RT#48164: Not yet documented!!!
 
 =cut
 
@@ -410,7 +410,7 @@ binary_format_number_field(PARROT_INTERP, char field, STRING *binstr, PMC *value
 binary_format_number(PARROT_INTERP, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)>
 
-TODO: Not yet documented!!!
+RT#48164: Not yet documented!!!
 
 =cut
 
@@ -431,7 +431,7 @@ binary_format_number(PARROT_INTERP, char field, STRING *binstr, PMC *value,
 binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
                            STRING *strval, int length)>
 
-TODO: Not yet documented!!!
+RT#48164: Not yet documented!!!
 
 =cut
 
@@ -472,7 +472,7 @@ binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
 binary_format_string(PARROT_INTERP, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)>
 
-TODO: Not yet documented!!!
+RT#48164: Not yet documented!!!
 
 =cut
 
@@ -503,7 +503,7 @@ binary_format_string(PARROT_INTERP, char field, STRING *binstr, PMC *value,
 
 =item C<STRING *ParTcl_binary_format(PARROT_INTERP, STRING *FORMAT, PMC *values)>
 
-TODO: Not yet documented!!!
+RT#48164: Not yet documented!!!
 
 =cut
 
