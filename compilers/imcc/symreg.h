@@ -271,8 +271,9 @@ SymReg * mk_local_label(PARROT_INTERP, NOTNULL(char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-SymReg * mk_pasm_reg(PARROT_INTERP, char *name)
-        __attribute__nonnull__(1);
+SymReg * mk_pasm_reg(PARROT_INTERP, NOTNULL(char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 SymReg * mk_pcc_sub(PARROT_INTERP, NOTNULL(char *name), int proto)
         __attribute__nonnull__(1)

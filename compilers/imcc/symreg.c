@@ -498,7 +498,7 @@ TODO: Not yet documented!!!
 */
 
 SymReg *
-mk_pasm_reg(PARROT_INTERP, char *name)
+mk_pasm_reg(PARROT_INTERP, NOTNULL(char *name))
 {
     SymReg * r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 

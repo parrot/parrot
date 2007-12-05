@@ -82,9 +82,9 @@ Adds a new timer event to the event queue.
 */
 
 static void
-add_timer(PARROT_INTERP, PMC *pmc)
+add_timer(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
-    const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(pmc);
+    const const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(pmc);
 
     if (!PMC_IS_NULL(t->sub))
         Parrot_new_timer_event(interp, pmc, t->abs_time,
@@ -103,7 +103,7 @@ Deletes the timer event.
 */
 
 static void
-del_timer(PARROT_INTERP, PMC *pmc)
+del_timer(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
    Parrot_del_timer_event(interp, pmc);
 }
@@ -205,7 +205,7 @@ Returns the timer info for C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
+        const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
         switch (key) {
             case PARROT_TIMER_SEC:
@@ -232,7 +232,7 @@ Returns the PMC associated with C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
+        const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
         if (key == PARROT_TIMER_HANDLER)
             return t->sub;
@@ -251,7 +251,7 @@ Returns the number associated with C<key>.
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
+        const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
         if (key == PARROT_TIMER_NSEC)
             return t->abs_time;

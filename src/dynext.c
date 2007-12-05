@@ -77,7 +77,7 @@ static void set_cstring_prop(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static void store_lib_pmc(PARROT_INTERP,
-    NOTNULL(NOTNULL(PMC *lib_pmc)),
+    NOTNULL(PMC *lib_pmc),
     NOTNULL(STRING *path),
     NOTNULL(STRING *type),
     NOTNULL(STRING *lib_name))
@@ -130,7 +130,7 @@ Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 */
 
 static void
-store_lib_pmc(PARROT_INTERP, NOTNULL(NOTNULL(PMC *lib_pmc)), NOTNULL(STRING *path),
+store_lib_pmc(PARROT_INTERP, NOTNULL(PMC *lib_pmc), NOTNULL(STRING *path),
         NOTNULL(STRING *type), NOTNULL(STRING *lib_name))
 {
     PMC * const iglobals = interp->iglobals;
