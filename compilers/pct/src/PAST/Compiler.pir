@@ -359,8 +359,14 @@ the node's "pasttype" attribute.
   post_pirop:
     .local pmc pirop
     pirop = node.'pirop'()
-    unless pirop goto post_call
+    unless pirop goto post_inline
     .return self.'pirop'(node, options :flat :named)
+
+  post_inline:
+    .local pmc inline
+    inline = node.'inline'()
+    unless inline goto post_call
+    .return self.'inline'(node, options :flat :named)
 
   post_call:
     .return self.'call'(node, options :flat :named)
