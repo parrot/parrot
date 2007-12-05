@@ -719,6 +719,7 @@ handler.
     ops.'push_pirop'('push_eh', catchlabel)
     ops.'push'(trypost)
     ops.'push_pirop'('pop_eh')
+    ops.'push_pirop'('goto', endlabel)
     ops.'push'(catchlabel)
     .local pmc catchpast, catchpost
     catchpast = node[1]
