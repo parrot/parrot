@@ -49,8 +49,6 @@ print $OUT <<'EOF';
 
 #define VTABLE_SIZE 512
 
-#define YOU_LOSE_VTABLE NULL
-
 EOF
 
 print $OUT vtbl_defs($vtable);
