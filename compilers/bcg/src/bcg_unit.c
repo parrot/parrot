@@ -33,7 +33,7 @@ static int get_pargma_type(BCG_info * bcg_info, char *pragma);
 =item C<bcg_unit *
 bcg_unit_create(BCG_info * bcg_info, char *name, char *pragma)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -56,7 +56,7 @@ bcg_unit_create(BCG_info * bcg_info, char *name, char *pragma)
 =item C<void
 bcg_unit_destroy(BCG_info * bcg_info, bcg_unit * unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -85,7 +85,7 @@ bcg_unit_destroy(BCG_info * bcg_info, bcg_unit * unit)
 =item C<void
 bcg_unit_add_op(BCG_info * bcg_info, bcg_unit * unit, bcg_op * op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -112,7 +112,7 @@ bcg_unit_add_op(BCG_info * bcg_info, bcg_unit * unit, bcg_op * op)
 =item C<bcg_unit *
 bcg_info_current_unit(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -130,7 +130,7 @@ bcg_info_current_unit(BCG_info * bcg_info)
 =item C<static int
 get_pargma_type(BCG_info * bcg_info, char *pragma)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -85,7 +85,7 @@ BCG_destroy(BCG_info *bcg_info)
 =item C<void
 BCG_start_code_gen(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -108,7 +108,7 @@ BCG_start_code_gen(BCG_info * bcg_info)
 =item C<void
 BCG_end_code_gen(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -130,7 +130,7 @@ BCG_end_code_gen(BCG_info * bcg_info)
 =item C<void
 BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -158,7 +158,7 @@ BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)
 =item C<void
 BCG_end_sub(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -184,7 +184,7 @@ BCG_end_sub(BCG_info * bcg_info)
 =item C<void
 BCG_start_call(BCG_info * bcg_info, char *sub_name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -206,7 +206,7 @@ BCG_start_call(BCG_info * bcg_info, char *sub_name)
 =item C<void
 BCG_end_call(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -228,7 +228,7 @@ BCG_end_call(BCG_info * bcg_info)
 =item C<void
 BCG_start_op(BCG_info * bcg_info, char *op_name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -256,7 +256,7 @@ BCG_start_op(BCG_info * bcg_info, char *op_name)
 =item C<void
 BCG_end_op(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -282,7 +282,7 @@ BCG_end_op(BCG_info * bcg_info)
 =item C<void
 BCG_var(BCG_info * bcg_info, char *var_name, char var_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -317,7 +317,7 @@ BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
 =item C<void
 BCG_val(BCG_info * bcg_info, char *val, char val_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -344,7 +344,7 @@ BCG_val(BCG_info * bcg_info, char *val, char val_type)
 =item C<void
 BCG_label(BCG_info * bcg_info, char *label)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -371,7 +371,7 @@ BCG_label(BCG_info * bcg_info, char *label)
 =item C<void
 BCG_print_pasm(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -388,7 +388,7 @@ BCG_print_pasm(BCG_info * bcg_info)
 =item C<bcg_info_private *
 bcg_info_private_create(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -410,7 +410,7 @@ bcg_info_private_create(BCG_info * bcg_info)
 =item C<void
 bcg_info_private_destroy(BCG_info * bcg_info, bcg_info_private * bcg_info_priv)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -438,7 +438,7 @@ bcg_info_private_destroy(BCG_info * bcg_info, bcg_info_private * bcg_info_priv)
 =item C<void
 bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -466,7 +466,7 @@ bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)
 =item C<static void
 set_state(BCG_info * bcg_info, bcg_state state)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -483,7 +483,7 @@ set_state(BCG_info * bcg_info, bcg_state state)
 =item C<static void
 unset_state(BCG_info * bcg_info, bcg_state state)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -500,7 +500,7 @@ unset_state(BCG_info * bcg_info, bcg_state state)
 =item C<static int
 in_state(BCG_info * bcg_info, bcg_state state)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

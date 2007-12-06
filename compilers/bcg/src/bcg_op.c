@@ -32,7 +32,7 @@ TODO
 bcg_op_arg_create(BCG_info * bcg_info, char *name, bcg_op_arg_type type,
                   char data_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -58,7 +58,7 @@ bcg_op_arg_create(BCG_info * bcg_info, char *name, bcg_op_arg_type type,
 =item C<void
 bcg_op_arg_destroy(BCG_info * bcg_info, bcg_op_arg * op_arg)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -77,7 +77,7 @@ bcg_op_arg_destroy(BCG_info * bcg_info, bcg_op_arg * op_arg)
 =item C<bcg_op *
 bcg_op_create(BCG_info * bcg_info, char *name, bcg_op_type op_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -101,7 +101,7 @@ bcg_op_create(BCG_info * bcg_info, char *name, bcg_op_type op_type)
 =item C<void
 bcg_op_destroy(BCG_info * bcg_info, bcg_op * op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -126,7 +126,7 @@ bcg_op_destroy(BCG_info * bcg_info, bcg_op * op)
 =item C<void
 bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -156,7 +156,7 @@ bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)
 =item C<void
 bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -192,7 +192,7 @@ bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op)
 =item C<bcg_op *
 bcg_info_current_op(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

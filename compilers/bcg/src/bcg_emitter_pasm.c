@@ -30,7 +30,7 @@ TODO
 =item C<void
 emit_pasm(BCG_info * bcg_info)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
