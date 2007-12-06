@@ -149,7 +149,7 @@ function(opcode_t *pc, Interp *interp) \
 =item C<static void
 run(Interp *interp, opcode_t *pc)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -243,7 +243,7 @@ ENDRUN
 =item C<static void
 init(Interp *interp, opcode_t *prog)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -293,7 +293,7 @@ init(Interp *interp, opcode_t *prog)
 =item C<int
 main(int argc, char *argv[])>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

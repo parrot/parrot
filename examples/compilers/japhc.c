@@ -70,7 +70,7 @@ Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)
 =item C<static int
 unescape(char *string)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
