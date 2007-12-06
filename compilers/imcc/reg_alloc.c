@@ -153,7 +153,7 @@ static unsigned int*
 ig_get_word(int i, int j, int N, NOTNULL(unsigned int *graph),
         NOTNULL(int* bit_ofs))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -174,7 +174,7 @@ ig_get_word(int i, int j, int N, NOTNULL(unsigned int *graph),
 =item C<static void
 ig_set(int i, int j, int N, NOTNULL(unsigned int *graph))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -193,7 +193,7 @@ ig_set(int i, int j, int N, NOTNULL(unsigned int *graph))
 =item C<int
 ig_test(int i, int j, int N, NOTNULL(unsigned int *graph))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -213,7 +213,7 @@ ig_test(int i, int j, int N, NOTNULL(unsigned int *graph))
 static unsigned int*
 ig_allocate(int N)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -337,7 +337,7 @@ done:
 =item C<void
 free_reglist(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -368,7 +368,7 @@ free_reglist(NOTNULL(IMC_Unit *unit))
 =item C<void
 graph_coloring_reg_alloc(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -533,7 +533,7 @@ reg_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
 =item C<static void
 sort_reglist(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -748,7 +748,7 @@ compute_du_chain(NOTNULL(IMC_Unit *unit))
 =item C<static void
 compute_one_du_chain(NOTNULL(SymReg *r), NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1111,7 +1111,7 @@ allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
 =item C<static void
 vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1164,7 +1164,7 @@ vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
 =item C<static void
 allocate_lexicals(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1182,7 +1182,7 @@ allocate_lexicals(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 =item C<static void
 allocate_non_volatile(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

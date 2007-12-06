@@ -42,7 +42,7 @@ TODO
 Set*
 set_make(int length)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -64,7 +64,7 @@ set_make(int length)
 Set*
 set_make_full(int length)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -88,7 +88,7 @@ set_make_full(int length)
 =item C<void
 set_free(NOTNULL(Set *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -107,7 +107,7 @@ set_free(NOTNULL(Set *s))
 =item C<void
 set_clear(NOTNULL(Set *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -125,7 +125,7 @@ set_clear(NOTNULL(Set *s))
 Set*
 set_copy(NOTNULL(Set *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -146,7 +146,7 @@ set_copy(NOTNULL(Set *s))
 =item C<int
 set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -182,7 +182,7 @@ set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 =item C<void
 set_add(NOTNULL(Set *s), int element)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -210,7 +210,7 @@ PARROT_PURE_FUNCTION
 int
 set_first_zero(NOTNULL(const Set *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -245,7 +245,7 @@ PARROT_PURE_FUNCTION
 int
 set_contains(NOTNULL(const Set *s), int element)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -272,7 +272,7 @@ set_contains(NOTNULL(const Set *s), int element)
 Set *
 set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -302,7 +302,7 @@ set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 Set *
 set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -331,7 +331,7 @@ set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 =item C<void
 set_intersec_inplace(NOTNULL(Set *s1), NOTNULL(const Set *s2))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

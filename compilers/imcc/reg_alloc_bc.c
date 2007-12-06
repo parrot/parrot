@@ -92,7 +92,7 @@ static int spill_registers(Interp *, IMC_Unit *, graph*);
 
 =item C<static unsigned int bits_per_int(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -111,7 +111,7 @@ static unsigned int bits_per_int(void)
 =item C<static unsigned int* ig_get_word(int i, int j, int N, unsigned int* edgebits,
                                  int* bit_ofs)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -131,7 +131,7 @@ static unsigned int* ig_get_word(int i, int j, int N, unsigned int* edgebits,
 
 =item C<static void ig_set(int i, int j, int N, unsigned int* edgebits)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -159,7 +159,7 @@ int ig_test(int i, int j, int N, unsigned int* edgebits);
 
 =item C<int ig_test(int i, int j, int N, unsigned int* edgebits)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -176,7 +176,7 @@ int ig_test(int i, int j, int N, unsigned int* edgebits)
 
 =item C<static unsigned int* ig_allocate(int N)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -354,7 +354,7 @@ imc_reg_alloc(PARROT_INTERP, IMC_Unit * unit)
 =item C<void
 free_reglist(IMC_Unit * unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -416,7 +416,7 @@ static int imcsets[4]; /*FIXME global*/
 =item C<static void
 imc_stat_init(IMC_Unit * unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -436,7 +436,7 @@ imc_stat_init(IMC_Unit * unit)
 =item C<static void
 print_stat(Parrot_Interp interp, IMC_Unit * unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -506,7 +506,7 @@ reg_sort_f(const void *a, const void *b)
 =item C<static void
 sort_reglist(IMC_Unit *unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -692,7 +692,7 @@ compute_du_chain(IMC_Unit * unit)
 =item C<static void
 compute_one_du_chain(SymReg * r, IMC_Unit * unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1333,7 +1333,7 @@ apply_coloring(PARROT_INTERP, IMC_Unit* unit, graph* G)
 
 =item C<static int degree_comparator(const void * u, const void * v)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1349,7 +1349,7 @@ static int degree_comparator(const void * u, const void * v)
 =item C<static int
 ig_init_graph(PARROT_INTERP, IMC_Unit* unit, graph* G)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1408,7 +1408,7 @@ ig_init_graph(PARROT_INTERP, IMC_Unit* unit, graph* G)
 =item C<static void
 ig_clear_graph(IMC_Unit* unit, graph* G)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1598,7 +1598,7 @@ ig_color_node(PARROT_INTERP, IMC_Unit* unit, graph* G, int j)
 =item C<static void
 ig_remove_node(PARROT_INTERP, IMC_Unit *unit, graph* G, int j)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

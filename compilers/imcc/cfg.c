@@ -139,7 +139,7 @@ static void sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 static int
 check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const Instruction *ins))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -175,7 +175,7 @@ check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const I
 =item C<void
 find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -281,7 +281,7 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
 bb_check_set_addr(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
         NOTNULL(Basic_block *bb), NOTNULL(SymReg *label))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -498,7 +498,7 @@ bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
 int
 blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block *to))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -524,7 +524,7 @@ blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block
 =item C<static void
 bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_block *to))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -567,7 +567,7 @@ bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_b
 =item C<static void
 bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -623,7 +623,7 @@ bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
 =item C<static void
 free_edge(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -648,7 +648,7 @@ free_edge(NOTNULL(IMC_Unit *unit))
 int
 edge_count(NOTNULL(const struct _IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -673,7 +673,7 @@ edge_count(NOTNULL(const struct _IMC_Unit *unit))
 =item C<void
 life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -696,7 +696,7 @@ life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
 analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
         NOTNULL(SymReg* r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -763,7 +763,7 @@ analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
 =item C<void
 free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -880,7 +880,7 @@ analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 =item C<static void
 propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1139,7 +1139,7 @@ compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 =item C<static void
 free_dominators(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1165,7 +1165,7 @@ free_dominators(NOTNULL(IMC_Unit *unit))
 =item C<static void
 free_dominance_frontiers(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1191,7 +1191,7 @@ free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
 =item C<static void
 sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1432,7 +1432,7 @@ mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))
 =item C<static void
 free_loops(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1458,7 +1458,7 @@ free_loops(NOTNULL(IMC_Unit *unit))
 =item C<void
 search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1488,7 +1488,7 @@ search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))
 =item C<static void
 init_basic_blocks(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1512,7 +1512,7 @@ init_basic_blocks(NOTNULL(IMC_Unit *unit))
 =item C<void
 clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1541,7 +1541,7 @@ PARROT_WARN_UNUSED_RESULT
 static Basic_block*
 make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* ins))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1589,7 +1589,7 @@ PARROT_CANNOT_RETURN_NULL
 Life_range *
 make_life_range(NOTNULL(SymReg *r), int idx)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

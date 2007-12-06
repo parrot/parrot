@@ -68,7 +68,7 @@ static void resize_symhash(NOTNULL(SymHash *hsh))
 =item C<void
 push_namespace(char * name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -90,7 +90,7 @@ push_namespace(char * name)
 =item C<void
 pop_namespace(NULLOK(char *name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -199,7 +199,7 @@ _mk_symreg(NOTNULL(SymHash* hsh), NOTNULL(char *name), int t)
 =item C<SymReg *
 mk_symreg(PARROT_INTERP, NOTNULL(char *name), int t)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -258,7 +258,7 @@ symreg_to_str(NOTNULL(const SymReg *s))
 =item C<SymReg *
 mk_temp_reg(PARROT_INTERP, int t)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -278,7 +278,7 @@ mk_temp_reg(PARROT_INTERP, int t)
 =item C<SymReg *
 mk_pcc_sub(PARROT_INTERP, NOTNULL(char *name), int proto)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -367,7 +367,7 @@ add_pcc_arg(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 =item C<void
 add_pcc_param(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -384,7 +384,7 @@ add_pcc_param(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 =item C<void
 add_pcc_result(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -417,7 +417,7 @@ add_pcc_result(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 =item C<void
 add_pcc_multi(NOTNULL(SymReg *r), SymReg *arg)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -440,7 +440,7 @@ add_pcc_multi(NOTNULL(SymReg *r), SymReg *arg)
 =item C<void
 add_pcc_return(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -457,7 +457,7 @@ add_pcc_return(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 =item C<void
 add_pcc_sub(NOTNULL(SymReg *r), SymReg * arg)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -474,7 +474,7 @@ add_pcc_sub(NOTNULL(SymReg *r), SymReg * arg)
 =item C<void
 add_pcc_cc(NOTNULL(SymReg *r), SymReg *arg)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -491,7 +491,7 @@ add_pcc_cc(NOTNULL(SymReg *r), SymReg *arg)
 =item C<SymReg *
 mk_pasm_reg(PARROT_INTERP, char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -521,7 +521,7 @@ mk_pasm_reg(PARROT_INTERP, NOTNULL(char *name))
 =item C<char *
 _mk_fullname(NULLOK(const Namespace *ns), NOTNULL(const char *name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -546,7 +546,7 @@ _mk_fullname(NULLOK(const Namespace *ns), NOTNULL(const char *name))
 =item C<char *
 mk_fullname(NOTNULL(const char *name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -608,7 +608,7 @@ PARROT_WARN_UNUSED_RESULT
 SymReg*
 mk_ident_ur(PARROT_INTERP, NOTNULL(char *name), int t)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -632,7 +632,7 @@ PARROT_WARN_UNUSED_RESULT
 static SymReg*
 mk_pmc_const_2(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *left), NOTNULL(SymReg *rhs))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -770,7 +770,7 @@ _mk_const(NOTNULL(SymHash *hsh), NOTNULL(const char *name), int t)
 =item C<SymReg *
 mk_const(PARROT_INTERP, NOTNULL(const char *name), int t)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -979,7 +979,7 @@ mk_local_label(PARROT_INTERP, NOTNULL(char *name))
 =item C<SymReg *
 mk_label_address(PARROT_INTERP, NOTNULL(char *name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1055,7 +1055,7 @@ dup_sym(NOTNULL(const SymReg *r))
 =item C<SymReg *
 link_keys(PARROT_INTERP, int nargs, NOTNULL(SymReg * keys[]), int force)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1148,7 +1148,7 @@ link_keys(PARROT_INTERP, int nargs, NOTNULL(SymReg * keys[]), int force)
 =item C<void
 free_sym(NOTNULL(SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1185,7 +1185,7 @@ free_sym(NOTNULL(SymReg *r))
 =item C<void
 create_symhash(NOTNULL(SymHash *hash))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1204,7 +1204,7 @@ create_symhash(NOTNULL(SymHash *hash))
 =item C<static void
 resize_symhash(NOTNULL(SymHash *hsh))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1290,7 +1290,7 @@ _store_symreg(NOTNULL(SymHash *hsh), NOTNULL(SymReg *r))
 =item C<void
 store_symreg(PARROT_INTERP, NOTNULL(SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1409,7 +1409,7 @@ PARROT_WARN_UNUSED_RESULT
 SymReg *
 find_sym(PARROT_INTERP, NOTNULL(const char *name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1433,7 +1433,7 @@ find_sym(PARROT_INTERP, NOTNULL(const char *name))
 =item C<void
 clear_sym_hash(NOTNULL(SymHash *hsh))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1469,7 +1469,7 @@ clear_sym_hash(NOTNULL(SymHash *hsh))
 =item C<void
 debug_dump_sym_hash(NOTNULL(SymHash *hsh))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1552,7 +1552,7 @@ clear_globals(PARROT_INTERP)
 unsigned int
 hash_str(NOTNULL(const char *str))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -52,7 +52,7 @@ extern FILE* yyin;
 void
 imc_compile_all_units(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -224,7 +224,7 @@ imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
 =item C<static void
 imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

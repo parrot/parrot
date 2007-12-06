@@ -138,7 +138,7 @@ static int w_special[1+4*3];
 =item C<void
 imcc_init_tables(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -297,7 +297,7 @@ instruction_reads(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))
 =item C<int
 instruction_writes(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -735,7 +735,7 @@ static char *output;
 =item C<static int
 e_file_open(SHIM_INTERP, NOTNULL(void *param))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -759,7 +759,7 @@ e_file_open(SHIM_INTERP, NOTNULL(void *param))
 =item C<static int
 e_file_close(PARROT_INTERP, SHIM(void *param))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -782,7 +782,7 @@ e_file_emit(PARROT_INTERP,
     SHIM(IMC_Unit *unit),
     NOTNULL(const Instruction *ins))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -812,7 +812,7 @@ e_file_emit(PARROT_INTERP,
 int
 emit_open(PARROT_INTERP, int type, NULLOK(void *param))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -834,7 +834,7 @@ emit_open(PARROT_INTERP, int type, NULLOK(void *param))
 int
 emit_flush(PARROT_INTERP, NULLOK(void *param), NOTNULL(struct _IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -863,7 +863,7 @@ emit_flush(PARROT_INTERP, NULLOK(void *param), NOTNULL(struct _IMC_Unit *unit))
 int
 emit_close(PARROT_INTERP, NULLOK(void *param))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

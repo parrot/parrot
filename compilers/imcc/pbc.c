@@ -193,7 +193,7 @@ static void verify_signature(PARROT_INTERP,
 =item C<static void
 imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -230,7 +230,7 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
 =item C<int
 e_pbc_open(PARROT_INTERP, SHIM(void *param))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -325,7 +325,7 @@ old_blocks(void)
 =item C<opcode_t *
 make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -427,7 +427,7 @@ get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))
 =item C<static void
 store_sub_size(size_t size, size_t ins_line)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -445,7 +445,7 @@ store_sub_size(size_t size, size_t ins_line)
 =item C<static void
 store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -473,7 +473,7 @@ store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)
 =item C<static void
 store_key_const(NOTNULL(const char *str), int idx)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -689,7 +689,7 @@ fixup_globals(PARROT_INTERP)
 =item C<STRING *
 IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -766,7 +766,7 @@ add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
 =item C<static int
 add_const_num(PARROT_INTERP, const char *buf)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -789,7 +789,7 @@ add_const_num(PARROT_INTERP, const char *buf)
 =item C<static PMC*
 mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -850,7 +850,7 @@ typedef void (*decl_func_t)(Interp *, PMC*, STRING *, INTVAL);
 =item C<static PMC*
 create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -934,7 +934,7 @@ create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)
 =item C<static PMC*
 find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -994,7 +994,7 @@ find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 =item C<static int
 add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1194,7 +1194,7 @@ add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const ch
 static const char *
 slice_deb(int bits)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1358,7 +1358,7 @@ build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
 =item C<INTVAL
 IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1401,7 +1401,7 @@ IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 =item C<static void
 make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1439,7 +1439,7 @@ make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))
 =item C<static void
 add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1554,7 +1554,7 @@ constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 =item C<int
 e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1577,7 +1577,7 @@ e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 =item C<int
 e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1933,7 +1933,7 @@ e_pbc_emit(PARROT_INTERP,
 =item C<int
 e_pbc_close(PARROT_INTERP, SHIM(void *param))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

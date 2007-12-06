@@ -213,7 +213,7 @@ cfg_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 =item C<int
 optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1147,7 +1147,7 @@ branch_reorg(PARROT_INTERP, IMC_Unit * unit)
 branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
         Instruction *start, Instruction *cond)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1387,7 +1387,7 @@ unused_label(PARROT_INTERP, IMC_Unit * unit)
 =item C<static int
 dead_code_remove(PARROT_INTERP, IMC_Unit * unit)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1466,7 +1466,7 @@ dead_code_remove(PARROT_INTERP, IMC_Unit * unit)
 =item C<static int
 used_once(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1508,7 +1508,7 @@ enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
 _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
         NOTNULL(SymReg *r), int what)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1612,7 +1612,7 @@ static int
 is_ins_save(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
             NOTNULL(Instruction *ins), NOTNULL(SymReg *r), int what)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1640,7 +1640,7 @@ is_ins_save(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
 =item C<int
 max_loop_depth(NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1663,7 +1663,7 @@ max_loop_depth(NOTNULL(IMC_Unit *unit))
 =item C<int
 is_invariant(PARROT_INTERP, NOTNULL(IMC_Unit * unit), NOTNULL(Instruction *ins))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1697,7 +1697,7 @@ is_invariant(PARROT_INTERP, NOTNULL(IMC_Unit * unit), NOTNULL(Instruction *ins))
 =item C<Basic_block *
 find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1778,7 +1778,7 @@ move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
 =item C<int
 loop_one(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1817,7 +1817,7 @@ loop_one(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr)
 =item C<int
 loop_optimization(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

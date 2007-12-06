@@ -101,7 +101,7 @@ static int load_pbc, run_pbc, write_pbc, pre_process_only, pasm_file;
 =item C<static void
 usage(NOTNULL(FILE* fp))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -120,7 +120,7 @@ usage(NOTNULL(FILE* fp))
 =item C<static void
 help_debug(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -165,7 +165,7 @@ help_debug(void)
 =item C<static void
 help(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -221,7 +221,7 @@ help(void)
 =item C<static void
 Parrot_version(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -306,7 +306,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(NOTNULL(const char *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -331,7 +331,7 @@ PARROT_CAN_RETURN_NULL
 char *
 parseflags(PARROT_INTERP, int *argc, char **argv[])>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -568,7 +568,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
 =item C<static void
 do_pre_process(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -693,7 +693,7 @@ do_pre_process(PARROT_INTERP)
 =item C<static void
 imcc_get_optimization_description(const PARROT_INTERP, int opt_level, NOTNULL(char *opt_desc))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -730,7 +730,7 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, NOTNULL(ch
 =item C<void
 imcc_initialize(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -767,7 +767,7 @@ imcc_initialize(PARROT_INTERP)
 imcc_run_pbc(PARROT_INTERP, int obj_file, NOTNULL(const char *output_file),
              int argc, NOTNULL(char *argv[]))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -804,7 +804,7 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, NOTNULL(const char *output_file),
 =item C<static void
 imcc_write_pbc(PARROT_INTERP, NOTNULL(const char *output_file))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -843,7 +843,7 @@ imcc_write_pbc(PARROT_INTERP, NOTNULL(const char *output_file))
 =item C<static void determine_input_file_type(PARROT_INTERP,
                                       NOTNULL(const char * const sourcefile))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -884,7 +884,7 @@ static void determine_input_file_type(PARROT_INTERP,
 =item C<static void determine_output_file_type(PARROT_INTERP,
     NOTNULL(int *obj_file), NOTNULL(const char *output_file))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -920,7 +920,7 @@ compile_to_bytecode(PARROT_INTERP,
                     NOTNULL(const char * const sourcefile),
                     NOTNULL(const char * const output_file))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -998,7 +998,7 @@ compile_to_bytecode(PARROT_INTERP,
 =item C<int
 imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

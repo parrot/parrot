@@ -400,7 +400,7 @@ struct move_info_t {
 =item C<static int
 pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -473,7 +473,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo
 move_regs(PARROT_INTERP, IMC_Unit * unit,
         NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -593,7 +593,7 @@ recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
 insert_tail_call(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
         NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub), NULLOK(SymReg *meth))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

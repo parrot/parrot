@@ -34,7 +34,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -60,7 +60,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -86,7 +86,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -112,7 +112,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -140,7 +140,7 @@ IMCC_fataly_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
 void
 IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -165,7 +165,7 @@ IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...)
 void
 IMCC_info(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -191,7 +191,7 @@ IMCC_info(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
 void
 IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -215,7 +215,7 @@ IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
 =item C<void
 dump_instructions(PARROT_INTERP, NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -256,7 +256,7 @@ dump_instructions(PARROT_INTERP, NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_cfg(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -292,7 +292,7 @@ dump_cfg(NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_loops(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -333,7 +333,7 @@ dump_loops(NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_labels(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -367,7 +367,7 @@ dump_labels(NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_symreg(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -413,7 +413,7 @@ dump_symreg(NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_liveness_status(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -441,7 +441,7 @@ dump_liveness_status(NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_liveness_status_var(NOTNULL(const IMC_Unit *unit), NOTNULL(const SymReg* r))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -491,7 +491,7 @@ dump_liveness_status_var(NOTNULL(const IMC_Unit *unit), NOTNULL(const SymReg* r)
 =item C<void
 dump_interference_graph(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -531,7 +531,7 @@ dump_interference_graph(NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_dominators(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -565,7 +565,7 @@ dump_dominators(NOTNULL(const IMC_Unit *unit))
 =item C<void
 dump_dominance_frontiers(NOTNULL(const IMC_Unit *unit))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
