@@ -29,7 +29,7 @@ Environment manipulation stuff
 =item C<void
 Parrot_setenv(const char *name, const char *value)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -65,7 +65,7 @@ Parrot_setenv(const char *name, const char *value)
 =item C<void
 Parrot_unsetenv(const char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -86,7 +86,7 @@ Parrot_unsetenv(const char *name)
 =item C<char *
 Parrot_getenv(const char *name, int *free_it)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

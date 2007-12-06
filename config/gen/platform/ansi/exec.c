@@ -43,7 +43,7 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
 
 =item C<INTVAL Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -61,7 +61,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 
 =item C<void Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

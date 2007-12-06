@@ -25,7 +25,7 @@ TODO
 
 =item C<void Parrot_platform_init_code(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

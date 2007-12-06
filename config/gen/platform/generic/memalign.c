@@ -28,7 +28,7 @@ memalign related stuff
 
 =item C<void * Parrot_memalign(size_t align, size_t size)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -54,7 +54,7 @@ Parrot_memalign(size_t align, size_t size)
 
 =item C<void * Parrot_memalign(size_t align, size_t size)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -72,7 +72,7 @@ Parrot_memalign(size_t align, size_t size)
 
 =item C<void Parrot_free_memalign(void *p)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
