@@ -123,7 +123,7 @@ dedent(emit_data *data)
 
 =item C<static target * new_target(char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -141,7 +141,7 @@ new_target(char *name)
 
 =item C<static void add_target(emit_data *data, target *t)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -171,7 +171,7 @@ add_target(emit_data *data, target *t)
 =item C<static void
 json_start_object(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -189,7 +189,7 @@ json_start_object(emit_data *data)
 =item C<static void
 json_init(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -211,7 +211,7 @@ json_init(emit_data *data)
 =item C<static void
 json_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -229,7 +229,7 @@ json_end(emit_data *data)
 =item C<static void
 json_sub_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -251,7 +251,7 @@ json_sub_start(emit_data *data)
 =item C<static void
 json_source(emit_data *data, char *source)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -268,7 +268,7 @@ json_source(emit_data *data, char *source)
 =item C<static void
 json_position(emit_data *data, int pos)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -285,7 +285,7 @@ json_position(emit_data *data, int pos)
 =item C<static void
 json_sub_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -307,7 +307,7 @@ json_sub_end(emit_data *data)
 =item C<static void
 json_name(emit_data *data, char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -326,7 +326,7 @@ json_name(emit_data *data, char *name)
 =item C<static void
 json_stmts_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -347,7 +347,7 @@ json_stmts_start(emit_data *data)
 =item C<static void
 json_param_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -368,7 +368,7 @@ json_param_start(emit_data *data)
 =item C<static void
 json_sub_flag_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -390,7 +390,7 @@ json_sub_flag_start(emit_data *data)
 =item C<static void
 json_sub_flag_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -410,7 +410,7 @@ json_sub_flag_end(emit_data *data)
 =item C<static void
 json_sub_flag(emit_data *data, int flag)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -428,7 +428,7 @@ json_sub_flag(emit_data *data, int flag)
 =item C<static void
 json_list_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -447,7 +447,7 @@ json_list_start(emit_data *data)
 =item C<static void
 json_list_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -465,7 +465,7 @@ json_list_end(emit_data *data)
 =item C<static void
 json_stmts_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -485,7 +485,7 @@ json_stmts_end(emit_data *data)
 =item C<static void
 json_op_start(emit_data *data, char *op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -507,7 +507,7 @@ json_op_start(emit_data *data, char *op)
 =item C<static void
 json_op_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -528,7 +528,7 @@ json_op_end(emit_data *data)
 =item C<static void
 json_expr(emit_data *data, char *expr)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -547,7 +547,7 @@ json_expr(emit_data *data, char *expr)
 =item C<static void
 json_method(emit_data *data, char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -564,7 +564,7 @@ json_method(emit_data *data, char *name)
 =item C<static void
 json_invocant(emit_data *data, char *invocant)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -581,7 +581,7 @@ json_invocant(emit_data *data, char *invocant)
 =item C<static void
 json_args_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -601,7 +601,7 @@ json_args_start(emit_data *data)
 =item C<static void
 json_args_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -622,7 +622,7 @@ json_args_end(emit_data *data)
 =item C<static void
 json_target(emit_data *data, char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -640,7 +640,7 @@ json_target(emit_data *data, char *name)
 =item C<static void
 json_invokable(emit_data *data, char *invokable)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -657,7 +657,7 @@ json_invokable(emit_data *data, char *invokable)
 =item C<static void
 json_invocation_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -675,7 +675,7 @@ json_invocation_start(emit_data *data)
 =item C<static void
 json_invocation_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

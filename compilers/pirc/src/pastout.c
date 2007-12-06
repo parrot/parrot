@@ -130,7 +130,7 @@ past_block(struct emit_data *data)
 =item C<static void
 past_source(emit_data *data, char *source)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -147,7 +147,7 @@ past_source(emit_data *data, char *source)
 =item C<static void
 past_position(emit_data *data, int pos)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -234,7 +234,7 @@ past_param(struct emit_data *data)
 
 =item C<static void past_type(struct emit_data *data, char *type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -250,7 +250,7 @@ past_type(struct emit_data *data, char *type)
 
 =item C<static void past_subflag(struct emit_data *data, int flag)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -268,7 +268,7 @@ past_subflag(struct emit_data *data, int flag)
 
 =item C<static void past_op(struct emit_data *data, char *op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -287,7 +287,7 @@ past_op(struct emit_data *data, char *op)
 
 =item C<static void past_expr(struct emit_data *data, char *expr)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -48,7 +48,7 @@ typedef struct emit_data {
 
 =item C<static target * new_target(char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -66,7 +66,7 @@ new_target(char *name)
 
 =item C<static void add_target(emit_data *data, target *t)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -96,7 +96,7 @@ add_target(emit_data *data, target *t)
 =item C<static void
 pir_name(struct emit_data *data, char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -115,7 +115,7 @@ pir_name(struct emit_data *data, char *name)
 =item C<static void
 pir_sub(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -133,7 +133,7 @@ pir_sub(struct emit_data *data)
 =item C<static void
 pir_end(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -151,7 +151,7 @@ pir_end(struct emit_data *data)
 =item C<static void
 pir_newline(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -168,7 +168,7 @@ pir_newline(struct emit_data *data)
 =item C<static void
 pir_param(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -185,7 +185,7 @@ pir_param(struct emit_data *data)
 =item C<static void
 pir_type(struct emit_data *data, char *type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -203,7 +203,7 @@ pir_type(struct emit_data *data, char *type)
 =item C<static void
 pir_sub_flag(struct emit_data *data, int flag)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -220,7 +220,7 @@ pir_sub_flag(struct emit_data *data, int flag)
 =item C<static void
 pir_expr(struct emit_data *data, char *expr)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -237,7 +237,7 @@ pir_expr(struct emit_data *data, char *expr)
 =item C<static void
 pir_op(struct emit_data *data, char *op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -256,7 +256,7 @@ pir_op(struct emit_data *data, char *op)
 =item C<static void
 pir_list_start(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -274,7 +274,7 @@ pir_list_start(struct emit_data *data)
 =item C<static void
 pir_list_end(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -292,7 +292,7 @@ pir_list_end(struct emit_data *data)
 =item C<static void
 pir_sub_flag_start(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -310,7 +310,7 @@ pir_sub_flag_start(struct emit_data *data)
 =item C<static void
 pir_sub_flag_end(struct emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -346,7 +346,7 @@ pir_destroy(emit_data *data)
 =item C<static void
 pir_target(emit_data *data, char *target)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -363,7 +363,7 @@ pir_target(emit_data *data, char *target)
 =item C<static void
 pir_begin_return(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -380,7 +380,7 @@ pir_begin_return(emit_data *data)
 =item C<static void
 pir_init(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -426,7 +426,7 @@ print_target(emit_data *data, target *t)
 =item C<static void
 pir_assign(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -447,7 +447,7 @@ pir_assign(emit_data *data)
 =item C<static void
 pir_assign_start(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -464,7 +464,7 @@ pir_assign_start(emit_data *data)
 =item C<static void
 pir_assign_end(emit_data *data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -481,7 +481,7 @@ pir_assign_end(emit_data *data)
 =item C<static void
 pir_comp_op(emit_data *data, char *op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -498,7 +498,7 @@ pir_comp_op(emit_data *data, char *op)
 =item C<static void
 pir_bin_op(emit_data *data, char *op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
