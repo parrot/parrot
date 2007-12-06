@@ -10,7 +10,7 @@
 
 void declare_local(struct lexer_state *lexer, pir_type type, target *list);
 
-target *find_target(struct lexer_state *lexer, char * const name);
+target *find_symbol(struct lexer_state *lexer, char * const name);
 
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 

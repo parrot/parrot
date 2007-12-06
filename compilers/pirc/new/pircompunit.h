@@ -108,7 +108,14 @@ typedef enum invoke_type {
 #define TEST_FLAG(obj,flag)     (obj & flag)
 
 
+typedef enum value_types {
+    INT_VAL,
+    NUM_VAL,
+    PMC_VAL,
+    STR_VAL,
+    REG_VAL
 
+} value_type;
 
 /* for representing constant values */
 typedef union value {
@@ -116,6 +123,7 @@ typedef union value {
         double nval;
         int    ival;
         char  *pval;
+        int    rval;
 
 } value;
 
@@ -169,8 +177,27 @@ typedef struct target {
 
 } target;
 
+void *panic(char *msg);
 
+/* maybe this is handy? */
+#define type(obj)   obj->type
+#define name(obj)   obj->name
+#define flags(obj)  obj->flags
+#define color(obj)  obj->color
+#define next(obj)   obj->next
 
+/* I think it's best to unify target, argument, constant and expression into 1 node type */
+typedef struct object {
+    pir_type    type;  /* type of this object */
+    char       *name;  /* name of this object */
+    value_type  vtype; /* selector for val union */
+    value       val;
+    int         flags;
+    int         color; /* this is the PASM register allocated to this object */
+
+    struct object *next;
+
+} object;
 
 
 /* function arguments or return values, but a return value is just
@@ -260,7 +287,7 @@ typedef struct subroutine {
 
     target    *parameters;
     statement *statements;
-    statement *stat_tail;
+
 
     struct subroutine *next;
 
@@ -307,7 +334,7 @@ argument *add_arg(argument *arg1, argument *arg2);
 target *add_param(struct lexer_state *lexer, pir_type type, char *name);
 target *add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias);
 
-target *add_target(struct lexer_state *lexer, target *t, target *newt);
+target *add_target(struct lexer_state *lexer, target *t1, target *t);
 
 target *new_target(pir_type type, char *name);
 target *reg(int type, int regno, int is_pasm);

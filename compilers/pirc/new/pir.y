@@ -523,7 +523,7 @@ first_op_arg: pasm_expression                              { add_operand(lexer, 
             ;
 
 /* later arguments can be either an expression or a keylist. */
-other_op_args: /* empty */                                 {  }
+other_op_args: /* empty */                                 { /* nothing to do */}
              | other_op_args ',' other_op_arg              { add_operand(lexer, $3); }
              ;
 
@@ -549,7 +549,6 @@ separator: ';'                                             { $$ = 0; }
 conditional_statement: if_type condition then identifier "\n"
                                                            { /* it was "unless", so "invert" the opcode */
                                                              if ($1 > 0) {
-
                                                                 invert_instr(lexer);
                                                              }
                                                              add_operand(lexer, expr_from_ident($4));
