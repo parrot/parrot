@@ -40,7 +40,7 @@ or
 
 =item Per Language Harness
 
-For well behaved languages you can do something like:
+For almost all languages you can do something like:
 
     cd languages/tcl && make test
 
@@ -53,7 +53,7 @@ For well behaved languages you can do something like:
 =head1 TODO
 
 It should be possible to use non-Perl5 test files,
-like for languages/perl6 or languages/pheme.
+like for languages/perl6, languages/pheme or languages/eclectus.
 
 =cut
 
@@ -77,6 +77,7 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 #
 # BASIC                No t/harness, two implementations
 # cola                 not maintained
+# eclectus             soon, with Perl5 wrappers for test files
 # ecmascript           No t/harness
 # forth                No t/harness
 # perl6                test scripts are written in Perl 6, not Perl 5

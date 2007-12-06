@@ -22,10 +22,12 @@ use warnings;
 use 5.008;
 use lib qw( ../lib ../../lib ../../lib );
 
-use Parrot::Test::Harness language => 'eclectus', exec => [ 'petite', '--script' ];
+use Parrot::Test::Harness language => 'eclectus', exec => [ 'petite', '--script' ], files => [ 't/*.pl' ];
 
 =head1 SEE ALSO
 
   F<languages/perl6/t/harness>
+  F<languages/t/harness>
+  F<lib/Parrot/Test/Harness>
 
 =cut

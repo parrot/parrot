@@ -22,7 +22,7 @@ you want to use in a file called F<t/harness>:
 
   # or
 
-  use Parrot::Test::Harness language => 'eclectus', exec => [ 'petite', '--script' ];
+  use Parrot::Test::Harness language => 'eclectus', exec => [ 'petite', '--script' ], files => [ 't/*.pl' ];
 
 That's it. Seriously.
 
@@ -78,44 +78,60 @@ sub set_flags {
     return;
 }
 
+# return a list of test files
 sub get_files {
     my %options = @_;
 
 =pod
 
-Conformant to a recent post on p6i, if called with a single argument of
-C<--files>, return a list of files to process.  This list is one per line, and
-is relative to the languages dir.
+The option '--files' is used for supporting unified testing of language implementations.
+It is used by F<languages/t/harness> for collecting a list testfiles from
+many language implementations.
 
-If called with no args, run the suite.
+When that option is passed, a list of pathes to test files is printed.
+Currently these test files need to Perl 5 scripts.
+The file pathes are relative to a language implementation dir.
+
+When there is no '--files' option, then things are saner.
+Nothing is printed. An array of file pathes is returned to the caller.
 
 =cut
 
     if ( grep { /^--files$/ } @{ $options{arguments} } ) {
 
         # --files indicates the 'languages/t/harness' wants a list of test files
-        my $dir = File::Spec->catfile( $options{language}, 't' );
-        my @files = (
-            glob( File::Spec->catfile( $dir, '*.t' ) ),
-            glob( File::Spec->catfile( $dir, '*/*.t' ) )
-        );
+        my @files;
+        {
+            # file patterns are either passed from a <language>/t/harness,
+            # or a default is used
+            my @file_patterns =
+                ( $options{files} && ref $options{files} eq 'ARRAY' ) ? 
+                    @{ $options{files} }
+                    :
+                    ( 't/*.t', 't/*/*.t' );
+            foreach ( @file_patterns ) {
+                push @files, glob( File::Spec->catfile( $options{language}, $_  ) ),
+            }
+        }
         print join( "\n", @files );
         print "\n" if @files;
+
         exit;
     }
     elsif ( @{ $options{arguments} } ) {
 
         # Someone specified tests for me to run.
-        my @files = ();
+        my @files;
         foreach my $arg ( @{ $options{arguments} } ) {
             -f $arg && push @files, glob $arg;
             -d $arg && push @files, glob( File::Spec->catfile( $arg, '*.t' ) );
         }
+
         return @files;
     }
     else {
 
-        # I must be running out of languages/$language
+        # I must be running out of languages/$language.
         # You may want a deeper search than this.
         return (
             glob( File::Spec->catfile( 't', '*.t' ) ),
