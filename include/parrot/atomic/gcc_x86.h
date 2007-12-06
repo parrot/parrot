@@ -28,22 +28,8 @@ typedef struct Parrot_atomic_integer {
  * reuse existing code
  */
 PARROT_INLINE
-static void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
-                                        void *update)
-{
-#if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
-    __asm__ __volatile__("lock\n"
-                         "cmpxchgq %1,%2":"=a"(expect):"q"(update), "m"(*ptr),
-                         "0"(expect)
-                         :"memory");
-#else
-    __asm__ __volatile__("lock\n"
-                         "cmpxchgl %1,%2":"=a"(expect):"q"(update), "m"(*ptr),
-                         "0"(expect)
-                         :"memory");
-#endif
-    return expect;
-}
+void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
+                                        void *update);
 
 #define PARROT_ATOMIC_PTR_GET(result, a) (result = (a).val)
 
@@ -84,18 +70,7 @@ static void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
     } while (0)
 
 PARROT_INLINE
-static long parrot_i386_xadd(volatile long *l, long amount)
-{
-    long result = amount;
-#if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
-    __asm__ __volatile__("lock\n" "xaddq %0, %1" : "=r"(result), "=m"(*l) :
-            "0"(result), "m"(*l));
-#else
-    __asm__ __volatile__("lock\n" "xaddl %0, %1" : "=r"(result), "=m"(*l) :
-            "0"(result), "m"(*l));
-#endif
-    return result + amount;
-}
+long parrot_i386_xadd(volatile long *l, long amount);
 
 #define PARROT_ATOMIC_INT_INC(result, a) \
     do { \
