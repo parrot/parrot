@@ -140,7 +140,7 @@ recalculate it before retrieving the next task.
             Parrot_task_recalculate_index(INTERP, SELF); */
 
         if (VTABLE_elements(INTERP, core_struct->task_index) > 0) {
-            INTVAL tid = VTABLE_pop_integer(INTERP, core_struct->task_index);
+            INTVAL tid = VTABLE_unshift_integer(INTERP, core_struct->task_index);
             return VTABLE_get_pmc_keyed_int(INTERP, core_struct->task_list, tid);
         }
         else
