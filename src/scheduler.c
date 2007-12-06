@@ -21,6 +21,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 */
 
 #include "parrot/parrot.h"
+#include "parrot/scheduler_private.h"
 
 #define CX_DEBUG 0
 
@@ -254,3 +255,9 @@ Parrot_cx_schedule_task(PARROT_INTERP, NOTNULL(PMC *task))
     VTABLE_push_pmc(interp, interp->scheduler, task);
 }
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
