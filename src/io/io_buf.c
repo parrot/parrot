@@ -575,7 +575,7 @@ PIO_buf_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io)
 PIO_buf_peek(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
         NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

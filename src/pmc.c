@@ -506,7 +506,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 create_class_pmc(PARROT_INTERP, INTVAL type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

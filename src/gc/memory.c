@@ -62,7 +62,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -122,7 +122,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -225,7 +225,7 @@ void *
 mem__internal_realloc(NOTNULL(void *from), size_t size,
         NOTNULL(const char *file), int line)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -280,7 +280,7 @@ mem_sys_free(NULLOK(void *from))
 =item C<void
 mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

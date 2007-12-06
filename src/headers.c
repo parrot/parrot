@@ -777,7 +777,7 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, NULLOK(void *arg), NOTNULL(p
 =item C<static void
 free_pool(NOTNULL(Small_Object_Pool *pool))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -803,7 +803,7 @@ free_pool(NOTNULL(Small_Object_Pool *pool))
 sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), SHIM(int flag),
         NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -838,7 +838,7 @@ sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), SHIM(int flag),
 sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
         NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -900,7 +900,7 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 =item C<static void
 fix_pmc_syncs(NOTNULL(Interp *dest_interp), NOTNULL(Small_Object_Pool *pool))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

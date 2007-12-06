@@ -1018,7 +1018,7 @@ static void
 freeze_pmc(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
         int seen, UINTVAL id)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1291,7 +1291,7 @@ do_thaw(PARROT_INTERP, NOTNULL(PMC* pmc), NOTNULL(visit_info *info))
 =item C<static UINTVAL
 id_from_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -34,7 +34,7 @@ contiguous region of memory.
 opcode_t
 PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

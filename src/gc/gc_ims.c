@@ -571,7 +571,7 @@ gc_ims_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 =item C<static void
 gc_ims_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -591,7 +591,7 @@ gc_ims_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
 =item C<static void
 parrot_gc_ims_deinit(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -717,7 +717,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
 =item C<static int
 sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -788,7 +788,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 =item C<static int
 collect_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

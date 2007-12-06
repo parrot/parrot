@@ -264,7 +264,7 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 =item C<static UINTVAL
 get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -292,7 +292,7 @@ get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 =item C<static void
 set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codepoint)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -309,7 +309,7 @@ set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codep
 =item C<static UINTVAL
 get_byte(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -334,7 +334,7 @@ get_byte(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 set_byte(PARROT_INTERP, NOTNULL(const STRING *src),
         UINTVAL offset, UINTVAL byte)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -357,7 +357,7 @@ set_byte(PARROT_INTERP, NOTNULL(const STRING *src),
 =item C<static STRING *
 get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -388,7 +388,7 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL coun
 get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *src),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *return_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -417,7 +417,7 @@ get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *src),
 =item C<static STRING *
 get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -435,7 +435,7 @@ get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -454,7 +454,7 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
 set_codepoints(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_codepoints))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -473,7 +473,7 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -509,7 +509,7 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
 =item C<static UINTVAL
 codepoints(PARROT_INTERP, NOTNULL(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -534,7 +534,7 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 =item C<static UINTVAL
 bytes(PARROT_INTERP, NOTNULL(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -552,7 +552,7 @@ bytes(PARROT_INTERP, NOTNULL(STRING *src))
 =item C<static UINTVAL
 utf16_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -578,7 +578,7 @@ utf16_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
 =item C<static void
 utf16_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -600,7 +600,7 @@ utf16_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 =item C<static void
 utf16_set_position(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL n)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -624,7 +624,7 @@ utf16_set_position(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL n)
 =item C<static void
 iter_init(PARROT_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -650,7 +650,7 @@ iter_init(PARROT_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
 =item C<ENCODING *
 Parrot_encoding_utf16_init(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

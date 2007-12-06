@@ -260,7 +260,7 @@ PARROT_WARN_UNUSED_RESULT
 static const char*
 buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -293,7 +293,7 @@ buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))
 =item C<static void
 debug_print_buf(PARROT_INTERP, NOTNULL(const PObj *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -569,7 +569,7 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 aligned_size(NOTNULL(const Buffer *buffer), size_t len)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -596,7 +596,7 @@ PARROT_WARN_UNUSED_RESULT
 static char *
 aligned_mem(NOTNULL(const Buffer *buffer), NOTNULL(char *mem))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -625,7 +625,7 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 aligned_string_size(size_t len)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -648,7 +648,7 @@ aligned_string_size(size_t len)
 int
 Parrot_in_memory_pool(PARROT_INTERP, NOTNULL(void *bufstart))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1009,7 +1009,7 @@ Parrot_destroy_memory_pools(PARROT_INTERP)
 =item C<static void
 merge_pools(NOTNULL(Memory_Pool *dest), NOTNULL(Memory_Pool *source))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -130,7 +130,7 @@ static UINTVAL validate(PARROT_INTERP, SHIM(STRING *source_string))
 set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -150,7 +150,7 @@ set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
 static STRING*
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -174,7 +174,7 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 static STRING*
 compose(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -194,7 +194,7 @@ compose(PARROT_INTERP, SHIM(STRING *source_string))
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -213,7 +213,7 @@ decompose(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static void
 upcase(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -230,7 +230,7 @@ upcase(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static void
 downcase(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -247,7 +247,7 @@ downcase(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static void
 titlecase(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -264,7 +264,7 @@ titlecase(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static void
 upcase_first(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -281,7 +281,7 @@ upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static void
 downcase_first(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -298,7 +298,7 @@ downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static void
 titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -315,7 +315,7 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static INTVAL
 compare(PARROT_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -333,7 +333,7 @@ compare(PARROT_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))
 cs_index(PARROT_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -352,7 +352,7 @@ cs_index(PARROT_INTERP, SHIM(STRING *source_string),
 cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -370,7 +370,7 @@ cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
 =item C<static UINTVAL
 validate(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -388,7 +388,7 @@ validate(PARROT_INTERP, SHIM(STRING *source_string))
 =item C<static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags, SHIM(STRING *source_string), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -406,7 +406,7 @@ is_cclass(PARROT_INTERP, INTVAL flags, SHIM(STRING *source_string), UINTVAL offs
 find_cclass(PARROT_INTERP, INTVAL flags,
             NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -425,7 +425,7 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 find_not_cclass(PARROT_INTERP, INTVAL flags,
                 NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -444,7 +444,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -467,7 +467,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 const CHARSET *
 Parrot_charset_binary_init(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

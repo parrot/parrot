@@ -137,7 +137,7 @@ PARROT_API char   nci_dlvar_cstring[] = "This is a C-string.\n";
 =item C<PARROT_API char
 nci_c(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -153,7 +153,7 @@ nci_c(void) {
 =item C<PARROT_API char
 nci_csc(short l1, char l2)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -170,7 +170,7 @@ nci_csc(short l1, char l2)
 =item C<PARROT_API double
 nci_d(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -189,7 +189,7 @@ nci_d(void)
 =item C<PARROT_API double
 nci_dd(double d)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -206,7 +206,7 @@ nci_dd(double d)
 =item C<PARROT_API float
 nci_f(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -225,7 +225,7 @@ nci_f(void)
 =item C<PARROT_API float
 nci_fff(float l1, float l2)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -242,7 +242,7 @@ nci_fff(float l1, float l2)
 =item C<PARROT_API int
 nci_i(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -259,7 +259,7 @@ nci_i(void)
 =item C<PARROT_API int
 nci_isc(short l1, char l2)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -276,7 +276,7 @@ nci_isc(short l1, char l2)
 =item C<PARROT_API int
 nci_ip(void *p)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -323,7 +323,7 @@ nci_it(void *p)
 =item C<PARROT_API long
 nci_l(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -340,7 +340,7 @@ nci_l(void)
 =item C<PARROT_API int *
 nci_p(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -357,7 +357,7 @@ nci_p(void)
 =item C<PARROT_API char *
 nci_t(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -374,7 +374,7 @@ nci_t(void)
 =item C<PARROT_API char *
 nci_tb(void *p)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -396,7 +396,7 @@ nci_tb(void *p)
 =item C<PARROT_API char *
 nci_tt(void *p)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -418,7 +418,7 @@ nci_tt(void *p)
 =item C<PARROT_API char *
 nci_tB(void **p)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -440,7 +440,7 @@ nci_tB(void **p)
 =item C<PARROT_API void *
 nci_pp(void *p)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -457,7 +457,7 @@ nci_pp(void *p)
 =item C<PARROT_API int
 nci_iiii(int i1, int i2, int i3)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -477,7 +477,7 @@ nci_iiii(int i1, int i2, int i3)
 =item C<PARROT_API int
 nci_i4i(long * l, int i)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -495,7 +495,7 @@ nci_i4i(long * l, int i)
 =item C<PARROT_API int
 nci_ii3(int a, int *bp)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -515,7 +515,7 @@ nci_ii3(int a, int *bp)
 =item C<PARROT_API int
 call_back(const char *str)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -535,7 +535,7 @@ call_back(const char *str)
 =item C<PARROT_API void *
 nci_pi(int test)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -682,7 +682,7 @@ nci_pi(int test)
 =item C<PARROT_API short
 nci_s(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -699,7 +699,7 @@ nci_s(void)
 =item C<PARROT_API short
 nci_ssc(short l1, char l2)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -716,7 +716,7 @@ nci_ssc(short l1, char l2)
 =item C<PARROT_API void
 nci_vP(void *pmc)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -749,7 +749,7 @@ nci_vP(void *pmc)
 =item C<PARROT_API void
 nci_cb_C1(cb_C1_func cb, void* user_data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -770,7 +770,7 @@ nci_cb_C1(cb_C1_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_C2(cb_C2_func cb, void* user_data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -790,7 +790,7 @@ nci_cb_C2(cb_C2_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_C3(cb_C3_func cb, void* user_data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -812,7 +812,7 @@ nci_cb_C3(cb_C3_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D1(cb_D1_func cb, void* user_data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -833,7 +833,7 @@ nci_cb_D1(cb_D1_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D2(cb_D2_func cb, void* user_data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -853,7 +853,7 @@ nci_cb_D2(cb_D2_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D3(cb_D3_func cb, void* user_data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -875,7 +875,7 @@ nci_cb_D3(cb_D3_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D4(cb_D4_func times_ten, void* user_data)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -899,7 +899,7 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data)
 =item C<PARROT_API void
 nci_pip(int count, Rect_Like *rects)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -920,7 +920,7 @@ nci_pip(int count, Rect_Like *rects)
 =item C<PARROT_API int
 nci_i33(int *double_me, int *triple_me)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -940,7 +940,7 @@ nci_i33(int *double_me, int *triple_me)
 =item C<PARROT_API void
 nci_vpii(Outer *my_data, int my_x, int my_y)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -958,7 +958,7 @@ nci_vpii(Outer *my_data, int my_x, int my_y)
 =item C<PARROT_API void *
 nci_piiii(int alpha, int beta, int gamma, int delta)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -991,7 +991,7 @@ nci_piiii(int alpha, int beta, int gamma, int delta)
 =item C<PARROT_API void *
 nci_pii(int fac1, int fac2)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1010,7 +1010,7 @@ nci_pii(int fac1, int fac2)
 =item C<PARROT_API void
 nci_v(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1027,7 +1027,7 @@ nci_v(void)
 =item C<PARROT_API void
 nci_vv(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1049,7 +1049,7 @@ float f2 = 4.0;
 =item C<int
 main(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

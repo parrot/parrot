@@ -283,7 +283,7 @@ Parrot_unblock_signal(int sig)
 void
 Parrot_init_signals(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -784,7 +784,7 @@ Parrot_schedule_broadcast_qentry(NOTNULL(struct QUEUE_ENTRY *entry))
 =item C<static void
 store_io_event(NOTNULL(pending_io_events *ios), NOTNULL(parrot_event *ev))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -809,7 +809,7 @@ store_io_event(NOTNULL(pending_io_events *ios), NOTNULL(parrot_event *ev))
 =item C<static void
 io_thread_ready_rd(NOTNULL(pending_io_events *ios), int ready_rd)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1001,7 +1001,7 @@ void
 Parrot_event_add_io_event(PARROT_INTERP,
         NULLOK(PMC *pio), NULLOK(PMC *sub), NULLOK(PMC *data), INTVAL which)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

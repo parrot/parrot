@@ -97,7 +97,7 @@ PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
 PIO_utf8_register_layer(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -117,7 +117,7 @@ PIO_utf8_register_layer(void)
 PIO_utf8_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
         NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -182,7 +182,7 @@ ok:
 =item C<static size_t
 PIO_utf8_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

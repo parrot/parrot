@@ -207,7 +207,7 @@ static STRING*
 str_append_w_flags(PARROT_INTERP, NOTNULL(STRING* dest), NOTNULL(SpfInfo *info),
         NOTNULL(STRING* src), NULLOK(STRING *prefix))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

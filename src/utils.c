@@ -677,7 +677,7 @@ INTVAL
 Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
         NOTNULL(const STRING *search), UINTVAL start_offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -724,7 +724,7 @@ INTVAL
 Parrot_byte_rindex(SHIM_INTERP, NOTNULL(const STRING *base),
         NOTNULL(const STRING *search), UINTVAL start_offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -792,7 +792,7 @@ Parrot_class_lookup_p(PARROT_INTERP, NOTNULL(PMC *class_name))
 static INTVAL
 register_type(PARROT_INTERP, NOTNULL(PMC *name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -954,7 +954,7 @@ static PMC*
 get_init_meth(PARROT_INTERP, NOTNULL(PMC *_class),
         NOTNULL(STRING *prop_str), NOTNULL(STRING **meth_str))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1002,7 +1002,7 @@ get_init_meth(PARROT_INTERP, NOTNULL(PMC *_class),
 do_initcall(PARROT_INTERP, NULLOK(PMC* _class), NULLOK(PMC *object),
         NULLOK(PMC *init))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1134,7 +1134,7 @@ Parrot_instantiate_object_init(PARROT_INTERP, NOTNULL(PMC *object), NOTNULL(PMC 
 void
 Parrot_instantiate_object(PARROT_INTERP, NOTNULL(PMC *object))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1152,7 +1152,7 @@ Parrot_instantiate_object(PARROT_INTERP, NOTNULL(PMC *object))
 =item C<static void
 instantiate_object(PARROT_INTERP, NOTNULL(PMC *object), NULLOK(PMC *init))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1473,7 +1473,7 @@ Parrot_new_method_cache(PARROT_INTERP)
 =item C<void
 mark_object_cache(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1490,7 +1490,7 @@ mark_object_cache(PARROT_INTERP)
 =item C<void
 init_object_cache(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1508,7 +1508,7 @@ init_object_cache(PARROT_INTERP)
 =item C<void
 destroy_object_cache(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1538,7 +1538,7 @@ destroy_object_cache(PARROT_INTERP)
 =item C<static void
 invalidate_type_caches(PARROT_INTERP, UINTVAL type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1575,7 +1575,7 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
 =item C<static void
 invalidate_all_caches(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1770,7 +1770,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, NOTNULL(PMC *_class), NOTNULL(STRIN
 debug_trace_find_meth(PARROT_INTERP, NOTNULL(PMC *_class),
         NOTNULL(STRING *name), NULLOK(PMC *sub))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1823,7 +1823,7 @@ static PMC *
 find_method_direct_1(PARROT_INTERP, NOTNULL(PMC *_class),
                               NOTNULL(STRING *method_name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1973,7 +1973,7 @@ Parrot_get_attrib_by_num(PARROT_INTERP, NOTNULL(PMC *object), INTVAL attrib)
 =item C<static INTVAL
 attr_str_2_num(PARROT_INTERP, NOTNULL(PMC *object), NOTNULL(STRING *attr))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2111,7 +2111,7 @@ Parrot_set_attrib_by_str(PARROT_INTERP, NOTNULL(PMC *object),
 INTVAL
 Parrot_class_offset(PARROT_INTERP, NOTNULL(PMC *object), NOTNULL(STRING *_class))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2193,7 +2193,7 @@ PMC *
 Parrot_find_class_destructor(PARROT_INTERP, NOTNULL(STRING *_class),
                                   INTVAL classtoken)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2220,7 +2220,7 @@ PMC *
 Parrot_find_class_fallback(PARROT_INTERP, NOTNULL(STRING *_class),
                                 INTVAL classtoken)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2246,7 +2246,7 @@ void
 Parrot_set_class_constructor(PARROT_INTERP, NOTNULL(STRING *_class),
                                   INTVAL classtoken, NOTNULL(STRING *method))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2270,7 +2270,7 @@ void
 Parrot_set_class_destructor(PARROT_INTERP, NOTNULL(STRING *_class),
                                  INTVAL classtoken, NOTNULL(STRING *method))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2294,7 +2294,7 @@ void
 Parrot_set_class_fallback(PARROT_INTERP, NOTNULL(STRING *_class),
                                INTVAL classtoken, NOTNULL(STRING *method))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2323,7 +2323,7 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 C3_merge(PARROT_INTERP, NOTNULL(PMC *merge_list))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

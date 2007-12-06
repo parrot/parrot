@@ -130,7 +130,7 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -157,7 +157,7 @@ pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))
 static int
 jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -201,7 +201,7 @@ static int
 args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *start))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -251,7 +251,7 @@ args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
 static int
 returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -290,7 +290,7 @@ returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result
 static int
 call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -343,7 +343,7 @@ ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const PMC *sig_results),
         NOTNULL(PackFile_ByteCode *seg), NOTNULL(opcode_t *pc),
         NOTNULL(opcode_t *end), NOTNULL(int *flags))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -421,7 +421,7 @@ int
 parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(PMC *sig_args), NOTNULL(PMC *sig_results), NOTNULL(int *flags))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -486,7 +486,7 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
 =item C<funcptr_t
 parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

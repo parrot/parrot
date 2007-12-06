@@ -234,7 +234,7 @@ parrot_gc_context(PARROT_INTERP)
 =item C<static void
 clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -285,7 +285,7 @@ clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
         NULLOK(const parrot_context_t *old))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -788,7 +788,7 @@ mark_register_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk))
 void
 Parrot_clear_i(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -809,7 +809,7 @@ Parrot_clear_i(PARROT_INTERP)
 void
 Parrot_clear_s(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -830,7 +830,7 @@ Parrot_clear_s(PARROT_INTERP)
 void
 Parrot_clear_p(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -851,7 +851,7 @@ Parrot_clear_p(PARROT_INTERP)
 void
 Parrot_clear_n(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

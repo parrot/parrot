@@ -125,7 +125,7 @@ PIO_peek_down(PARROT_INTERP,
         NOTNULL(ParrotIO *io),
         NOTNULL(STRING **buf))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

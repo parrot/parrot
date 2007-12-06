@@ -600,7 +600,7 @@ mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
 =item C<static INTVAL
 find_const_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(void *user_data))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -624,7 +624,7 @@ find_const_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(void *user
 =item C<void
 mark_const_subs(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1435,7 +1435,7 @@ static PackFile_Segment *
 create_seg(PARROT_INTERP, NOTNULL(PackFile_Directory *dir), pack_file_types t,
            NOTNULL(const char *name), NOTNULL(const char *file_name), int add)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1509,7 +1509,7 @@ PF_create_default_segs(PARROT_INTERP, NOTNULL(const char *file_name), int add)
 void
 PackFile_Segment_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1532,7 +1532,7 @@ PackFile_Segment_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 size_t
 PackFile_Segment_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1562,7 +1562,7 @@ opcode_t *
 PackFile_Segment_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self),
         NOTNULL(opcode_t *cursor))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2783,7 +2783,7 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile_Constant *
 clone_constant(PARROT_INTERP, NOTNULL(PackFile_Constant *old_const))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2891,7 +2891,7 @@ find_constants(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
 void
 Parrot_destroy_constants(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3008,7 +3008,7 @@ fixup_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 I<What does this do?>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3048,7 +3048,7 @@ fixup_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cur
 
 I<What does this do?>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3183,7 +3183,7 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
 
 I<What does this do?>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3258,7 +3258,7 @@ find_fixup_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NOTNULL(void *use
 
 I<What does this do?>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3294,7 +3294,7 @@ PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)>
 
 I<What does this do?>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

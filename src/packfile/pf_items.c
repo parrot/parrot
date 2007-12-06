@@ -159,7 +159,7 @@ nul:
 =item C<static void
 cvt_num12_num8_be(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -178,7 +178,7 @@ cvt_num12_num8_be(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src
 =item C<static void
 cvt_num12_num8_le(NOTNULL(unsigned char *dest), NOTNULL(unsigned char *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -197,7 +197,7 @@ cvt_num12_num8_le(NOTNULL(unsigned char *dest), NOTNULL(unsigned char *src))
 =item C<static opcode_t
 fetch_op_test(NOTNULL(unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -292,7 +292,7 @@ fetch_op_mixed_be(NOTNULL(unsigned char *b))
 =item C<static opcode_t
 fetch_op_be_4(NOTNULL(unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -326,7 +326,7 @@ fetch_op_be_4(NOTNULL(unsigned char *b))
 =item C<static opcode_t
 fetch_op_be_8(NOTNULL(unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -356,7 +356,7 @@ fetch_op_be_8(NOTNULL(unsigned char *b))
 =item C<static opcode_t
 fetch_op_le_4(NOTNULL(unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -390,7 +390,7 @@ fetch_op_le_4(NOTNULL(unsigned char *b))
 =item C<static opcode_t
 fetch_op_le_8(NOTNULL(unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -133,7 +133,7 @@ Parrot_init_builtins(PARROT_INTERP)
 static int
 find_builtin(NOTNULL(const char *func))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -173,7 +173,7 @@ find_builtin(NOTNULL(const char *func))
 static int
 find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -207,7 +207,7 @@ find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))
 static int
 check_builtin_sig(size_t i, NOTNULL(const char *sig), int convert_pmcs)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -346,7 +346,7 @@ PARROT_CANNOT_RETURN_NULL
 const char *
 Parrot_builtin_get_c_namespace(int bi)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -369,7 +369,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 Parrot_builtin_is_class_method(int bi)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -391,7 +391,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 Parrot_builtin_is_void(int bi)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -207,7 +207,7 @@ out of a padded buffer.
 =item C<void
 fetch_buf_be_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -231,7 +231,7 @@ fetch_buf_be_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =item C<void
 fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -255,7 +255,7 @@ fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =item C<void
 fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -283,7 +283,7 @@ fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =item C<void
 fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -311,7 +311,7 @@ fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =item C<void
 fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -343,7 +343,7 @@ fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =item C<void
 fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -375,7 +375,7 @@ fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =item C<void
 fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -411,7 +411,7 @@ fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =item C<void
 fetch_buf_be_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

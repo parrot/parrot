@@ -180,7 +180,7 @@ static parrot_context_t *
 runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
         SHIM(STRING *meth), NOTNULL(const char *sig), va_list ap)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -376,7 +376,7 @@ INTVAL
 Parrot_runops_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -405,7 +405,7 @@ FLOATVAL
 Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -435,7 +435,7 @@ void*
 Parrot_run_meth_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
         NOTNULL(STRING *meth), NOTNULL(const char *sig), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -465,7 +465,7 @@ INTVAL
 Parrot_run_meth_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
         NOTNULL(STRING *meth), NOTNULL(const char *sig), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -494,7 +494,7 @@ FLOATVAL
 Parrot_run_meth_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
         NOTNULL(STRING *meth), NOTNULL(const char *sig), ...)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -524,7 +524,7 @@ void *
 Parrot_runops_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), va_list args)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -550,7 +550,7 @@ INTVAL
 Parrot_runops_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), va_list args)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -575,7 +575,7 @@ FLOATVAL
 Parrot_runops_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), va_list args)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -601,7 +601,7 @@ void*
 Parrot_run_meth_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
         NOTNULL(STRING *meth), NOTNULL(const char *sig), va_list args)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -629,7 +629,7 @@ INTVAL
 Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
         NOTNULL(STRING *meth), NOTNULL(const char *sig), va_list args)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -655,7 +655,7 @@ FLOATVAL
 Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
         NOTNULL(STRING *meth), NOTNULL(const char *sig), va_list args)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

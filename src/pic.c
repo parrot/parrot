@@ -360,7 +360,7 @@ PARROT_CAN_RETURN_NULL
 void *
 parrot_pic_opcode(PARROT_INTERP, INTVAL op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -392,7 +392,7 @@ parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 pass_int(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
         NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -418,7 +418,7 @@ pass_int(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
 pass_num(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
         NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -444,7 +444,7 @@ pass_num(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
 pass_str(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
         NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -470,7 +470,7 @@ pass_str(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
 pass_pmc(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
         NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -496,7 +496,7 @@ pass_pmc(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
 pass_mixed(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
         NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -621,7 +621,7 @@ parrot_pic_check_sig(NOTNULL(const PMC *sig1), NOTNULL(const PMC *sig2),
 =item C<static int
 is_pic_param(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC* const mic), opcode_t op)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -698,7 +698,7 @@ is_pic_param(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC* const mic), 
 =item C<static int
 is_pic_func(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC *mic), int core_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -846,7 +846,7 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, NOTNULL(void **pc_pred), int cor
 =item C<static void
 parrot_pic_move(PARROT_INTERP, NOTNULL(Parrot_MIC *mic))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -888,7 +888,7 @@ parrot_pic_move(PARROT_INTERP, NOTNULL(Parrot_MIC *mic))
 parrot_pic_find_infix_v_pp(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right),
                 NOTNULL(Parrot_MIC *mic), NOTNULL(opcode_t *cur_opcode))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

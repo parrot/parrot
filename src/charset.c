@@ -82,7 +82,7 @@ PARROT_MALLOC
 CHARSET *
 Parrot_new_charset(SHIM_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -103,7 +103,7 @@ Parrot_new_charset(SHIM_INTERP)
 void
 Parrot_charsets_encodings_deinit(SHIM_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -135,7 +135,7 @@ PARROT_WARN_UNUSED_RESULT
 const CHARSET *
 Parrot_find_charset(SHIM_INTERP, NOTNULL(const char *charsetname))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -166,7 +166,7 @@ PARROT_WARN_UNUSED_RESULT
 CHARSET *
 Parrot_load_charset(PARROT_INTERP, NOTNULL(const char *charsetname))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -247,7 +247,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -272,7 +272,7 @@ PARROT_WARN_UNUSED_RESULT
 const CHARSET *
 Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -297,7 +297,7 @@ PARROT_WARN_UNUSED_RESULT
 const char *
 Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -320,7 +320,7 @@ Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
 register_charset(PARROT_INTERP, NOTNULL(const char *charsetname),
         NOTNULL(CHARSET *charset))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -360,7 +360,7 @@ register_charset(PARROT_INTERP, NOTNULL(const char *charsetname),
 =item C<static void
 register_static_converters(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -391,7 +391,7 @@ INTVAL
 Parrot_register_charset(PARROT_INTERP, NOTNULL(const char *charsetname),
         NOTNULL(CHARSET *charset))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -435,7 +435,7 @@ Parrot_register_charset(PARROT_INTERP, NOTNULL(const char *charsetname),
 void
 Parrot_charsets_encodings_init(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -476,7 +476,7 @@ INTVAL
 Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
         NOTNULL(CHARSET *charset))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -499,7 +499,7 @@ PARROT_CAN_RETURN_NULL
 const CHARSET *
 Parrot_default_charset(SHIM_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -523,7 +523,7 @@ charset_converter_t
 Parrot_find_charset_converter(SHIM_INTERP,
         NOTNULL(const CHARSET *lhs), NOTNULL(const CHARSET *rhs))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -562,7 +562,7 @@ Parrot_register_charset_converter(SHIM_INTERP,
         NOTNULL(const CHARSET *lhs), NOTNULL(CHARSET *rhs),
         NOTNULL(charset_converter_t func))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

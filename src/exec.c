@@ -269,7 +269,7 @@ Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
                                      char *nptr, const char *var, int offset,
                                      int disp)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -293,7 +293,7 @@ void
 Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
                                       char *nptr, const char *func_name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

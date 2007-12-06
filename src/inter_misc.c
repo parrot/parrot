@@ -69,7 +69,7 @@ void
 register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void *func,
         const char *name)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -363,7 +363,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING*
 interpinfo_s(PARROT_INTERP, INTVAL what)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

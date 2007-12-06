@@ -148,7 +148,7 @@ static void ucs2_set_position(SHIM_INTERP,
 =item C<static STRING *
 to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -174,7 +174,7 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 =item C<static UINTVAL
 get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -197,7 +197,7 @@ get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 =item C<static void
 set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codepoint)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -221,7 +221,7 @@ set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codep
 =item C<static UINTVAL
 get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -238,7 +238,7 @@ get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 =item C<static void
 set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -255,7 +255,7 @@ set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 =item C<static STRING *
 get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -291,7 +291,7 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL coun
 =item C<static STRING *
 get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -310,7 +310,7 @@ get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *dest_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -330,7 +330,7 @@ get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -349,7 +349,7 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
 set_codepoints(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_codepoints))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -368,7 +368,7 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -404,7 +404,7 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
 =item C<static UINTVAL
 codepoints(PARROT_INTERP, NOTNULL(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -426,7 +426,7 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 =item C<static UINTVAL
 bytes(PARROT_INTERP, NOTNULL(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -443,7 +443,7 @@ bytes(PARROT_INTERP, NOTNULL(STRING *src))
 =item C<static UINTVAL
 ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -470,7 +470,7 @@ ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
 =item C<static void
 ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -491,7 +491,7 @@ ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 =item C<static void
 ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -511,7 +511,7 @@ ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)
 =item C<static void
 iter_init(PARROT_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -539,7 +539,7 @@ iter_init(PARROT_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
 ENCODING *
 Parrot_encoding_ucs2_init(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

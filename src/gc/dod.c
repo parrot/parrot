@@ -166,7 +166,7 @@ mark_special(PARROT_INTERP, NOTNULL(PMC *obj))
 void
 pobject_lives(PARROT_INTERP, NOTNULL(PObj *obj))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -468,7 +468,7 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
 =item C<void
 Parrot_dod_trace_pmc_data(PARROT_INTERP, NOTNULL(PMC * const p))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -677,7 +677,7 @@ next:
 Parrot_dod_free_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
     NOTNULL(PObj *p))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -746,7 +746,7 @@ Parrot_free_pmc_ext(PARROT_INTERP, NOTNULL(PMC *p))
 Parrot_dod_free_sysmem(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
     NOTNULL(PObj *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -770,7 +770,7 @@ Parrot_dod_free_sysmem(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
     NOTNULL(PObj *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -806,7 +806,7 @@ Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 Parrot_dod_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
     NOTNULL(PObj *b))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -975,7 +975,7 @@ clear_live_bits(NOTNULL(Small_Object_Pool *pool))
 =item C<void
 Parrot_dod_clear_live_bits(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1069,7 +1069,7 @@ Parrot_dod_ms_run_init(PARROT_INTERP)
 sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
     NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

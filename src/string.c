@@ -699,7 +699,7 @@ STRING *
 string_make_direct(PARROT_INTERP, NULLOK(const char *buffer), UINTVAL len,
         NOTNULL(const ENCODING *encoding), NOTNULL(const CHARSET *charset), UINTVAL flags)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1463,7 +1463,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 string_compare(PARROT_INTERP, NULLOK(const STRING *s1), NULLOK(const STRING *s2))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2914,7 +2914,7 @@ INTVAL
 Parrot_string_find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *s),
                           UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2940,7 +2940,7 @@ INTVAL
 Parrot_string_find_not_cclass(PARROT_INTERP, INTVAL flags, NULLOK(STRING *s),
                               UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3082,7 +3082,7 @@ PARROT_CAN_RETURN_NULL
 STRING *
 string_compose(PARROT_INTERP, NULLOK(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3111,7 +3111,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING*
 string_join(PARROT_INTERP, NULLOK(STRING *j), NOTNULL(PMC *ar))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -3153,7 +3153,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 string_split(PARROT_INTERP, NOTNULL(STRING *delim), NOTNULL(STRING *str))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

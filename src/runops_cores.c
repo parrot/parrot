@@ -119,7 +119,7 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_trace_core(PARROT_INTERP, NOTNULL(opcode_t *pc))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

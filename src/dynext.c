@@ -292,7 +292,7 @@ Parrot_init_lib(PARROT_INTERP,
                 NULLOK(PMC *(*load_func)(PARROT_INTERP)),
                 NULLOK(void (*init_func)(PARROT_INTERP, NULLOK(PMC *))))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -336,7 +336,7 @@ static PMC *
 run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
             NOTNULL(STRING *lib_name), NOTNULL(STRING *wo_ext))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -410,7 +410,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), PMC *value)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -438,7 +438,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC *
 make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -463,7 +463,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_clone_lib_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *lib_pmc))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

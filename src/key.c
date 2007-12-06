@@ -331,7 +331,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_integer(PARROT_INTERP, NOTNULL(PMC *key))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -373,7 +373,7 @@ PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 key_number(PARROT_INTERP, NOTNULL(PMC *key))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -410,7 +410,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 key_string(PARROT_INTERP, NOTNULL(PMC *key))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -572,7 +572,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -261,7 +261,7 @@ Parrot_STM_alloc(PARROT_INTERP, NULLOK(PMC *pmc))
 Parrot_freeze_STM_PMC_handle(PARROT_INTERP, NOTNULL(IMAGE_IO *io),
             NOTNULL(Parrot_STM_PMC_handle handle))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -279,7 +279,7 @@ Parrot_freeze_STM_PMC_handle(PARROT_INTERP, NOTNULL(IMAGE_IO *io),
 =item C<Parrot_STM_PMC_handle
 Parrot_thaw_STM_PMC_handle(PARROT_INTERP, NOTNULL(IMAGE_IO *io))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -300,7 +300,7 @@ PARROT_CAN_RETURN_NULL
 static STM_write_record *
 get_write(PARROT_INTERP, NOTNULL(STM_tx_log *log), int i)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -323,7 +323,7 @@ PARROT_CAN_RETURN_NULL
 static STM_read_record *
 get_read(PARROT_INTERP, NOTNULL(STM_tx_log *log), int i)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -352,7 +352,7 @@ PARROT_CANNOT_RETURN_NULL
 static STM_write_record *
 alloc_write(PARROT_INTERP, NOTNULL(STM_tx_log *log))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -385,7 +385,7 @@ PARROT_CANNOT_RETURN_NULL
 static STM_read_record *
 alloc_read(PARROT_INTERP, NOTNULL(STM_tx_log *log))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -418,7 +418,7 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 next_version(NOTNULL(const void *old_version))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -440,7 +440,7 @@ next_version(NOTNULL(const void *old_version))
 static int
 is_version(NOTNULL(const void *maybe_version))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -461,7 +461,7 @@ PARROT_CANNOT_RETURN_NULL
 static STM_tx_log_sub *
 get_sublog(NOTNULL(STM_tx_log *log), int i)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -483,7 +483,7 @@ get_sublog(NOTNULL(STM_tx_log *log), int i)
 static int
 is_aborted(NOTNULL(STM_tx_log *log))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -650,7 +650,7 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 force_sharing(PARROT_INTERP, NULLOK(PMC *pmc))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1019,7 +1019,7 @@ Parrot_STM_abort(PARROT_INTERP)
 =item C<static int
 setup_wait(PARROT_INTERP, NOTNULL(STM_tx_log *log))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1172,7 +1172,7 @@ Parrot_STM_validate(PARROT_INTERP)
 =item C<static void
 mark_write_record(PARROT_INTERP, NOTNULL(STM_write_record *write))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1192,7 +1192,7 @@ mark_write_record(PARROT_INTERP, NOTNULL(STM_write_record *write))
 =item C<static void
 mark_read_record(PARROT_INTERP, NOTNULL(STM_read_record *read))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1512,7 +1512,7 @@ Parrot_STM_read(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 static int
 safe_to_clone(PARROT_INTERP, NOTNULL(const PMC * const original))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1538,7 +1538,7 @@ PARROT_WARN_UNUSED_RESULT
 static PMC *
 local_pmc_copy(PARROT_INTERP, NULLOK(PMC * const original))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1975,7 +1975,7 @@ Parrot_STM_dump_profile(PARROT_INTERP)
 =item C<void
 Parrot_STM_merge_profile(NOTNULL(Interp *d), NOTNULL(Interp *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

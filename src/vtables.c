@@ -104,7 +104,7 @@ Parrot_destroy_vtable(SHIM_INTERP, NULLOK(VTABLE *vtable))
 =item C<void
 parrot_alloc_vtables(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -125,7 +125,7 @@ parrot_alloc_vtables(PARROT_INTERP)
 =item C<void
 parrot_realloc_vtables(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -150,7 +150,7 @@ parrot_realloc_vtables(PARROT_INTERP)
 =item C<void
 parrot_free_vtables(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -172,7 +172,7 @@ parrot_free_vtables(PARROT_INTERP)
 =item C<void
 mark_vtables(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

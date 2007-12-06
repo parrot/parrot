@@ -2701,7 +2701,7 @@ PARROT_CANNOT_RETURN_NULL
 static const char*
 GDB_P(PARROT_INTERP, NOTNULL(const char *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -2762,7 +2762,7 @@ static PDB_breakpoint_t *gdb_bps;
 =item C<static int
 GDB_B(PARROT_INTERP, NOTNULL(char *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

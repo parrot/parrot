@@ -353,7 +353,7 @@ int
 Parrot_Context_get_info(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
                     NOTNULL(Parrot_Context_info *info))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -448,7 +448,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_Context_infostr(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -539,7 +539,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC*
 parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

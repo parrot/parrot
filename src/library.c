@@ -195,7 +195,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 get_search_paths(PARROT_INTERP, enum_lib_paths which)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -218,7 +218,7 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
 static int
 is_abs_path(NOTNULL(const STRING *file))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -286,7 +286,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_finalize(PARROT_INTERP, NOTNULL(STRING *path))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -420,7 +420,7 @@ PARROT_CAN_RETURN_NULL
 static STRING*
 try_load_path(PARROT_INTERP, NOTNULL(STRING* path))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -593,7 +593,7 @@ char*
 Parrot_locate_runtime_file(PARROT_INTERP, NOTNULL(const char *file_name),
         enum_runtime_ft type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

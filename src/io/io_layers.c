@@ -179,7 +179,7 @@ PARROT_API
 ParrotIOLayer *
 PIO_get_layer(SHIM_INTERP, NOTNULL(const char *name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

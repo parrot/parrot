@@ -139,7 +139,7 @@ STRING *
 ascii_get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -160,7 +160,7 @@ ascii_get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
 set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -183,7 +183,7 @@ STRING *
 ascii_get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -205,7 +205,7 @@ ascii_get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 static STRING *
 to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -249,7 +249,7 @@ to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 static STRING *
 to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -278,7 +278,7 @@ to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 static STRING *
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -306,7 +306,7 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -326,7 +326,7 @@ compose(PARROT_INTERP, NOTNULL(STRING *src))
 static STRING*
 decompose(PARROT_INTERP, NOTNULL(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -344,7 +344,7 @@ decompose(PARROT_INTERP, NOTNULL(STRING *src))
 =item C<static void
 upcase(PARROT_INTERP, NOTNULL(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -371,7 +371,7 @@ upcase(PARROT_INTERP, NOTNULL(STRING *source_string))
 =item C<static void
 downcase(PARROT_INTERP, NOTNULL(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -398,7 +398,7 @@ downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
 =item C<static void
 titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -426,7 +426,7 @@ titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
 =item C<static void
 upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -448,7 +448,7 @@ upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 =item C<static void
 downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -470,7 +470,7 @@ downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 =item C<static void
 titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -493,7 +493,7 @@ titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 INTVAL
 ascii_compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *rhs))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -539,7 +539,7 @@ ascii_compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *r
 INTVAL
 mixed_cs_index(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *search), UINTVAL offs)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -585,7 +585,7 @@ INTVAL
 ascii_cs_index(PARROT_INTERP, NOTNULL(STRING *source_string),
         NOTNULL(STRING *search_string), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -615,7 +615,7 @@ INTVAL
 ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
         NOTNULL(STRING *search_string), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -643,7 +643,7 @@ ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
 static UINTVAL
 validate(PARROT_INTERP, NOTNULL(STRING *src))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -672,7 +672,7 @@ PARROT_WARN_UNUSED_RESULT
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -694,7 +694,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string), UINTVAL offset)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -724,7 +724,7 @@ static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
             UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -755,7 +755,7 @@ find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
 find_not_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
                 UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -785,7 +785,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
 size_t
 ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t seed)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -816,7 +816,7 @@ ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t see
 const CHARSET *
 Parrot_charset_ascii_init(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -865,7 +865,7 @@ Parrot_charset_ascii_init(PARROT_INTERP)
 STRING *
 charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -897,7 +897,7 @@ charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *
 STRING *
 charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

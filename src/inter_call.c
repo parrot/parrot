@@ -376,7 +376,7 @@ start_flatten(PARROT_INTERP, NOTNULL(call_state *st), NOTNULL(PMC *p_arg))
 =item C<static void
 next_arg_sig(NOTNULL(call_state_item *sti))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -418,7 +418,7 @@ next_arg_sig(NOTNULL(call_state_item *sti))
 =item C<static int
 fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -476,7 +476,7 @@ fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static int
 fetch_arg_op(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -536,7 +536,7 @@ fetch_arg_op(PARROT_INTERP, NOTNULL(call_state *st))
 int
 Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -608,7 +608,7 @@ Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))
 int
 Parrot_fetch_arg_nci(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -645,7 +645,7 @@ Parrot_fetch_arg_nci(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 convert_arg_from_int(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -679,7 +679,7 @@ convert_arg_from_int(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 convert_arg_from_num(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -713,7 +713,7 @@ convert_arg_from_num(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 convert_arg_from_str(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -747,7 +747,7 @@ convert_arg_from_str(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 convert_arg_from_pmc(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -776,7 +776,7 @@ convert_arg_from_pmc(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 check_for_opt_flag(NOTNULL(call_state *st), int has_arg)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -951,7 +951,7 @@ locate_named_named(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 store_arg(NOTNULL(call_state *st), INTVAL idx)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -984,7 +984,7 @@ store_arg(NOTNULL(call_state *st), INTVAL idx)
 =item C<static int
 store_current_arg(NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1010,7 +1010,7 @@ store_current_arg(NOTNULL(call_state *st))
 =item C<int
 Parrot_store_arg(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1029,7 +1029,7 @@ Parrot_store_arg(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 too_few(PARROT_INTERP, NOTNULL(const call_state *st), NOTNULL(const char *action))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1055,7 +1055,7 @@ too_few(PARROT_INTERP, NOTNULL(const call_state *st), NOTNULL(const char *action
 =item C<static void
 too_many(PARROT_INTERP, NOTNULL(const call_state *st), NOTNULL(const char *action))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1081,7 +1081,7 @@ too_many(PARROT_INTERP, NOTNULL(const call_state *st), NOTNULL(const char *actio
 =item C<static void
 null_val(int sig, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1189,7 +1189,7 @@ check_named(PARROT_INTERP, NOTNULL(call_state *st))
 =item C<static void
 init_call_stats(NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1212,7 +1212,7 @@ init_call_stats(NOTNULL(call_state *st))
 void
 Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_result)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1403,7 +1403,7 @@ Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_
 void
 Parrot_convert_arg(PARROT_INTERP, NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1537,7 +1537,7 @@ parrot_pass_args_fromc(PARROT_INTERP, NOTNULL(const char *sig),
 set_retval_util(PARROT_INTERP, NOTNULL(const char *sig), NOTNULL(parrot_context_t *ctx),
         NOTNULL(call_state *st))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

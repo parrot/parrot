@@ -777,7 +777,7 @@ PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen *
 gc_gms_find_gen(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -815,7 +815,7 @@ gc_gms_find_gen(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
 =item C<static void
 gc_gms_promote(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -863,7 +863,7 @@ gc_gms_promote(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
 =item C<static void
 gc_gms_store_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l), NOTNULL(Gc_gms_hdr *h))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -897,7 +897,7 @@ gc_gms_store_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l), NOTNULL(Gc_gms
 =item C<static void
 gc_gms_clear_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -920,7 +920,7 @@ gc_gms_clear_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l))
 =item C<static void
 gc_gms_store_igp(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -940,7 +940,7 @@ gc_gms_store_igp(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h))
 =item C<static void
 gc_gms_clear_igp(PARROT_INTERP, NOTNULL(Gc_gms_gen *gen))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -996,7 +996,7 @@ parrot_gc_gms_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(void *old), NOTNULL(v
 parrot_gc_gms_wb_key(PARROT_INTERP, NOTNULL(PMC *agg),
         NOTNULL(void *old), NOTNULL(void *old_key), NOTNULL(void *new), NOTNULL(void *new_key))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1033,7 +1033,7 @@ typedef struct Gc_gms_plan {
 gc_gms_merge_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
         int flag, NOTNULL(Gc_gms_plan *plan))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1069,7 +1069,7 @@ gc_gms_merge_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 gc_gms_use_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
         int flag, NOTNULL(Gc_gms_plan *plan))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1107,7 +1107,7 @@ gc_gms_use_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 static int
 set_gen_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1131,7 +1131,7 @@ set_gen_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(vo
 =item C<static void
 gc_gms_set_gen(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1402,7 +1402,7 @@ parrot_gc_gms_pobject_lives(PARROT_INTERP, NOTNULL(PObj *obj))
 =item C<static int
 init_mark_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1446,7 +1446,7 @@ gc_gms_init_mark(PARROT_INTERP)
 =item C<static int
 trace_igp_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1496,7 +1496,7 @@ gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 =item C<static int
 trace_children_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1619,7 +1619,7 @@ sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
 =item C<static int
 sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1705,7 +1705,7 @@ gc_gms_sweep(PARROT_INTERP)
 =item C<static int
 end_cycle_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1732,7 +1732,7 @@ end_cycle_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
 =item C<static void
 gc_gms_end_cycle(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1811,7 +1811,7 @@ parrot_gc_gms_run(PARROT_INTERP, int flags)
 =item C<static void
 gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(const char *action))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

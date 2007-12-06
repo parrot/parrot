@@ -379,7 +379,7 @@ new_small_object_pool(size_t object_size, size_t objects_per_alloc)
 =item C<void
 gc_pmc_ext_pool_init(NOTNULL(Small_Object_Pool *pool))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -399,7 +399,7 @@ gc_pmc_ext_pool_init(NOTNULL(Small_Object_Pool *pool))
 =item C<static void
 gc_ms_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

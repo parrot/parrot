@@ -254,7 +254,7 @@ PARROT_CANNOT_RETURN_NULL
 static ParrotIO *
 PIO_stdio_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fptr, INTVAL flags)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -285,7 +285,7 @@ PIO_stdio_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fptr, INTV
 =item C<static INTVAL
 PIO_stdio_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -308,7 +308,7 @@ PIO_stdio_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 =item C<static INTVAL
 PIO_stdio_isatty(PIOHANDLE fptr)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -331,7 +331,7 @@ PIO_stdio_peek(PARROT_INTERP,
         NOTNULL(ParrotIO *io),
         NOTNULL(STRING **buf))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -366,7 +366,7 @@ PIO_stdio_peek(PARROT_INTERP,
 =item C<INTVAL
 PIO_stdio_getblksize(PIOHANDLE fptr)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -387,7 +387,7 @@ PIO_stdio_getblksize(PIOHANDLE fptr)
 =item C<static INTVAL
 PIO_stdio_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -406,7 +406,7 @@ PIO_stdio_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 PIO_stdio_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
               NOTNULL(STRING **buf))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -440,7 +440,7 @@ PIO_stdio_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 =item C<static size_t
 PIO_stdio_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -459,7 +459,7 @@ PIO_stdio_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), 
 PIO_stdio_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
               PIOOFF_T offset, INTVAL whence)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -487,7 +487,7 @@ PIO_stdio_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 =item C<static PIOOFF_T
 PIO_stdio_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

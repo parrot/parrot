@@ -205,7 +205,7 @@ PARROT_PURE_FUNCTION
 static size_t
 key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -424,7 +424,7 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
 =item C<static void
 hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info* info))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -473,7 +473,7 @@ hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info*
 void
 parrot_hash_visit(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *pinfo))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -705,7 +705,7 @@ init_hash(NOTNULL(Hash *hash),
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -768,7 +768,7 @@ init_hash(NOTNULL(Hash *hash),
 void
 parrot_hash_destroy(SHIM_INTERP, NOTNULL(Hash *hash))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -787,7 +787,7 @@ parrot_hash_destroy(SHIM_INTERP, NOTNULL(Hash *hash))
 =item C<void
 parrot_chash_destroy(PARROT_INTERP, NOTNULL(Hash *hash))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

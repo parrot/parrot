@@ -784,7 +784,7 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 static PMC*
 set_current_sub(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

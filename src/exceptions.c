@@ -194,7 +194,7 @@ push_exception(PARROT_INTERP, NOTNULL(PMC *handler))
 =item C<static void
 run_cleanup_action(PARROT_INTERP, NOTNULL(Stack_Entry_t *e))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -840,7 +840,7 @@ free_internal_exception(PARROT_INTERP)
 =item C<void
 destroy_exception_list(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -858,7 +858,7 @@ destroy_exception_list(PARROT_INTERP)
 =item C<void
 really_destroy_exception_list(NULLOK(Parrot_exception *e))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -1041,7 +1041,7 @@ Parrot_confess(NOTNULL(const char *cond), NOTNULL(const char *file), unsigned in
 =item C<void
 Parrot_print_backtrace(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

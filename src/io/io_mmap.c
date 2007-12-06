@@ -104,7 +104,7 @@ PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
 PIO_mmap_register_layer(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

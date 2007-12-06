@@ -570,7 +570,7 @@ pt_ns_clone(NOTNULL(Parrot_Interp d), NOTNULL(PMC *dest_ns),
 =item C<void
 pt_clone_globals(Parrot_Interp d, Parrot_Interp s)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -876,7 +876,7 @@ is_suspended_for_gc(PARROT_INTERP)
 
 XXX should this function be in a different file?
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -962,7 +962,7 @@ pt_gc_count_threads(PARROT_INTERP)
 pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum from_stage,
             thread_gc_stage_enum to_stage)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

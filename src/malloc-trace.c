@@ -55,7 +55,7 @@ TODO
 =item C<static void
 open_log_file()>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -103,7 +103,7 @@ open_log_file()
 =item C<static void
 malloc_trace_destructor(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -138,7 +138,7 @@ malloc_trace_destructor(void)
 =item C<static void
 malloc_segv_handler(int i, struct sigcontext_struct sc)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -160,7 +160,7 @@ malloc_segv_handler(int i, struct sigcontext_struct sc)
 =item C<static void
 malloc_record(int code, size_t size, void *ptr, void *ptr2)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -205,7 +205,7 @@ void* _real_malloc(size_t bytes);
 
 =item C<void* malloc(size_t bytes)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -231,7 +231,7 @@ void _real_free(void* mem);
 
 =item C<void free(void* mem)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -250,7 +250,7 @@ void* _real_realloc(void* mem, size_t bytes);
 
 =item C<void* realloc(void* mem, size_t bytes)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -272,7 +272,7 @@ void* _real_memalign(size_t alignment, size_t bytes);
 
 =item C<void* memalign(size_t alignment, size_t bytes)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -298,7 +298,7 @@ void* _real_calloc(size_t n, size_t elem_size);
 
 =item C<void* calloc(size_t n, size_t elem_size)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -324,7 +324,7 @@ void _real_cfree(void *mem);
 
 =item C<void cfree(void *mem)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

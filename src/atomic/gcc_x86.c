@@ -36,7 +36,7 @@ assembly suppport.
 void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
                                         void *update)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -66,7 +66,7 @@ void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
 =item C<PARROT_INLINE
 long parrot_i386_xadd(volatile long *l, long amount)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

@@ -95,7 +95,7 @@ PARROT_WARN_UNUSED_RESULT
 static PMC*
 new_hll_entry(PARROT_INTERP, NULLOK(STRING *entry_name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -136,7 +136,7 @@ new_hll_entry(PARROT_INTERP, NULLOK(STRING *entry_name))
 =item C<void
 Parrot_init_HLL(PARROT_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -159,7 +159,7 @@ Parrot_init_HLL(PARROT_INTERP)
 INTVAL
 Parrot_register_HLL(PARROT_INTERP, NOTNULL(STRING *hll_name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -227,7 +227,7 @@ Parrot_register_HLL(PARROT_INTERP, NOTNULL(STRING *hll_name))
 INTVAL
 Parrot_register_HLL_lib(PARROT_INTERP, NOTNULL(STRING *hll_lib))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -286,7 +286,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_get_HLL_id(PARROT_INTERP, NULLOK(STRING *hll_name))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -323,7 +323,7 @@ PARROT_API
 STRING *
 Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -364,7 +364,7 @@ void
 Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         INTVAL core_type, INTVAL hll_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -412,7 +412,7 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
 INTVAL
 Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -459,7 +459,7 @@ Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 INTVAL
 Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

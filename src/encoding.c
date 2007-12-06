@@ -55,7 +55,7 @@ static All_encodings *all_encodings;
 =item C<void
 parrot_init_encodings_2(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -77,7 +77,7 @@ parrot_init_encodings_2(void)
 =item C<void
 parrot_deinit_encodings(void)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -104,7 +104,7 @@ PARROT_MALLOC
 ENCODING *
 Parrot_new_encoding(SHIM_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -126,7 +126,7 @@ PARROT_CAN_RETURN_NULL
 const ENCODING *
 Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -154,7 +154,7 @@ PARROT_WARN_UNUSED_RESULT
 const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -238,7 +238,7 @@ PARROT_CAN_RETURN_NULL
 STRING*
 Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -263,7 +263,7 @@ PARROT_CAN_RETURN_NULL
 const ENCODING*
 Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -288,7 +288,7 @@ PARROT_CAN_RETURN_NULL
 const char *
 Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -311,7 +311,7 @@ Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
 register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
         NOTNULL(ENCODING *encoding))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -352,7 +352,7 @@ INTVAL
 Parrot_register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
         NOTNULL(ENCODING *encoding))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -398,7 +398,7 @@ INTVAL
 Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
         NOTNULL(ENCODING *encoding))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -419,7 +419,7 @@ Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
 const ENCODING *
 Parrot_default_encoding(SHIM_INTERP)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -438,7 +438,7 @@ Parrot_default_encoding(SHIM_INTERP)
 encoding_converter_t
 Parrot_find_encoding_converter(PARROT_INTERP, ENCODING *lhs, ENCODING *rhs)>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 

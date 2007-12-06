@@ -425,7 +425,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_cur(PARROT_INTERP, NULLOK(STRING *globalname))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -540,7 +540,7 @@ Parrot_store_global_n(PARROT_INTERP, NULLOK(PMC *ns),
 void
 Parrot_store_global_cur(PARROT_INTERP, NULLOK(STRING *globalname), NULLOK(PMC *val))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -728,7 +728,7 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 get_namespace_pmc(PARROT_INTERP, NOTNULL(PMC *sub))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -758,7 +758,7 @@ get_namespace_pmc(PARROT_INTERP, NOTNULL(PMC *sub))
 =item C<static void
 store_sub_in_multi(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *ns))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
@@ -796,7 +796,7 @@ store_sub_in_multi(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *ns))
 void
 Parrot_store_sub_in_namespace(PARROT_INTERP, NOTNULL(PMC *sub))>
 
-TODO: Not yet documented!!!
+RT#48260: Not yet documented!!!
 
 =cut
 
