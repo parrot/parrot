@@ -112,6 +112,8 @@ current maximum.
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
         STRING *task_id_str;
 
+        task = pt_shared_fixup(INTERP, task);
+
         core_struct->max_tid++;
         VTABLE_set_integer_native(INTERP, task, core_struct->max_tid);
 
@@ -140,7 +142,7 @@ recalculate it before retrieving the next task.
             Parrot_task_recalculate_index(INTERP, SELF); */
 
         if (VTABLE_elements(INTERP, core_struct->task_index) > 0) {
-            INTVAL tid = VTABLE_unshift_integer(INTERP, core_struct->task_index);
+            INTVAL tid = VTABLE_shift_integer(INTERP, core_struct->task_index);
             return VTABLE_get_pmc_keyed_int(INTERP, core_struct->task_list, tid);
         }
         else
