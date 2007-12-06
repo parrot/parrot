@@ -59,7 +59,7 @@ Parrot_setenv(const char *name, const char *value)
                     + 1);        /* string terminator */
 
             if (envstring == NULL) {
-                /* TODO: Shouldn't we tell anyone that we failed? */
+                /* RT#48276: Shouldn't we tell anyone that we failed? */
                 return;
             }
 
@@ -73,7 +73,7 @@ Parrot_setenv(const char *name, const char *value)
                 /* success */
             }
             else {
-                /* TODO: Shouldn't we tell anyone that we failed? */
+                /* RT#48276: Shouldn't we tell anyone that we failed? */
             }
             free(envstring);
         }

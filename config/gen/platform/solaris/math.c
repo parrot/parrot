@@ -40,7 +40,7 @@ return true if the Numval has a negative sign.
 This is mostly for handling the -0.0 case.
 
 Parrot_signbit is exported because PerlNum.set_number_native() uses it.
-XXX: This is probably not a good reason.
+RT#48272: This is probably not a good reason.
 
 =cut
 

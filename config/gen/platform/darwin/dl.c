@@ -153,7 +153,7 @@ Parrot_dlopen(const char *filename)
          */
 
         switch (dyld_result) {
-        /* XXX for now, ignore all the known errors */
+        /* RT#48274 for now, ignore all the known errors */
         case NSObjectFileImageFailure:
         case NSObjectFileImageInappropriateFile:
         case NSObjectFileImageArch:

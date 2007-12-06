@@ -61,7 +61,7 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
     WaitForSingleObject(pi.hProcess, INFINITE);
 
     if (!GetExitCodeProcess(pi.hProcess, &status)) {
-        /* XXX njs Should call GetLastError for failure message? */
+        /* RT#48278 njs Should call GetLastError for failure message? */
         Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG,
             "Process completed: Failed to get exit code.");
     }
@@ -129,7 +129,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 
     /* Get exit code. */
     if (!GetExitCodeProcess(pi.hProcess, &status)) {
-        /* XXX njs Should call GetLastError for failure message? */
+        /* RT#48278 njs Should call GetLastError for failure message? */
         Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG,
             "Process completed: Failed to get exit code.");
     }
