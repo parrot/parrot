@@ -1992,27 +1992,27 @@ YY_RULE_SETUP
 case 110:
 YY_RULE_SETUP
 #line 414 "pir.l"
-{ return TK_NUMC; }
+{ yylval->dval = atof(yytext); return TK_NUMC; }
     YY_BREAK
 case 111:
 YY_RULE_SETUP
 #line 415 "pir.l"
-{ return TK_INTC; }
+{ yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 112:
 YY_RULE_SETUP
 #line 416 "pir.l"
-{ return TK_INTC; }
+{ yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 113:
 YY_RULE_SETUP
 #line 417 "pir.l"
-{ return TK_INTC; }
+{ yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 114:
 YY_RULE_SETUP
 #line 418 "pir.l"
-{ return TK_INTC; }
+{ yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 115:
 YY_RULE_SETUP

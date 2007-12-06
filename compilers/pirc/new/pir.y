@@ -477,7 +477,7 @@ getresults_statement: ".get_results" opt_target_list "\n"  { set_instr(lexer, "g
 parrot_statement: parrot_instruction "\n"
                 ;
 
-assignment_statement: target assignment_tail "\n"          { add_operand(lexer, expr_from_target($1)); }
+assignment_statement: target assignment_tail "\n"          { add_first_operand(lexer, expr_from_target($1)); }
                     ;
 
 /* possible assignment statements:
@@ -503,7 +503,7 @@ assignment_expression: unop expression                     { assign(lexer, RHS_U
                      | expression1                         { assign(lexer, RHS_SIMPLE, $1); }
                      | expression binop expression         { assign(lexer, RHS_BINOP, $2, $1, $3); }
                      | target keylist                      { assign(lexer, RHS_GETKEYED, $1, $2); }
-                     | parrot_instruction                  {  }
+                     | parrot_instruction                  { /* nothing to do */ }
                      ;
 
 

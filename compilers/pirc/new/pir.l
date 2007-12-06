@@ -411,11 +411,11 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
               }
 
 
-{FLOATNUM}        { return TK_NUMC; }
-{SIGN}?{DIGITS}   { return TK_INTC; }
-{HEX}             { return TK_INTC; }
-{BIN}             { return TK_INTC; }
-{OCT}             { return TK_INTC; }
+{FLOATNUM}        { yylval->dval = atof(yytext); return TK_NUMC; }
+{SIGN}?{DIGITS}   { yylval->ival = atoi(yytext); return TK_INTC; }
+{HEX}             { yylval->ival = atoi(yytext); return TK_INTC; }
+{BIN}             { yylval->ival = atoi(yytext); return TK_INTC; }
+{OCT}             { yylval->ival = atoi(yytext); return TK_INTC; }
 
 
 

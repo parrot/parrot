@@ -2270,7 +2270,7 @@ yyreduce:
 
   case 76:
 #line 480 "pir.y"
-    { add_operand(lexer, expr_from_target((yyvsp[(1) - (3)].targ))); ;}
+    { add_first_operand(lexer, expr_from_target((yyvsp[(1) - (3)].targ))); ;}
     break;
 
   case 77:
@@ -2310,7 +2310,7 @@ yyreduce:
 
   case 84:
 #line 506 "pir.y"
-    {  ;}
+    { /* nothing to do */ ;}
     break;
 
   case 85:

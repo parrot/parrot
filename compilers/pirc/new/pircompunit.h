@@ -370,6 +370,7 @@ void set_lex_flag(target *t, char *lexname);
 void invert_instr(struct lexer_state *lexer);
 void assign(struct lexer_state *lexer, rhs_type type, ...);
 
+void add_first_operand(struct lexer_state *lexer, expression *operand);
 void add_operand(struct lexer_state *lexer, expression *operand);
 expression *add_key(expression *k1, expression *k2);
 
