@@ -11,7 +11,7 @@ bcg_emitter_pasm.c
 
 =head1 DESCRIPTION
 
-TODO
+RT#48264
 
 =head2 Methods
 
