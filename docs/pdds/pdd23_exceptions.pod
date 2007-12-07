@@ -410,10 +410,12 @@ execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
 resumable.
 
-  $P0 = new String
+  $P0 = new 'String'
   $P0 = "something bad happened"
   $P1 = new ['parrot';'exception'], $P0  # create new exception object
   throw $P1                              # throw it
+
+{{ The above example doesn't work in r23568 -- see RT#48320. }}
 
 =head1 ATTACHMENTS
 
