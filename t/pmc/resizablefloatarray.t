@@ -476,7 +476,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "shift float" );
     print ' '
     $I0 = elements ar
     print $I0
-    print_newline
+    print "\n"
 .end
 CODE
 2 10.100000 1 20.200000 0
@@ -496,7 +496,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift float" );
     print ' '
     $N0 = ar[1]
     print $N0
-    print_newline
+    print "\n"
 .end
 CODE
 2 20.200000 10.100000

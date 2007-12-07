@@ -17,7 +17,7 @@ pir_output_is( <<'CODE', <<'OUT', "karl trivial test" );
 .sub _main
     $I1 = foo(10)
     print $I1
-    print_newline
+    print "\n"
 .end
 .sub foo
     .param int i
@@ -53,7 +53,7 @@ pir_output_is( <<'CODE', <<'OUT', "karl spot bug 1" );
     print " l "
     print l
 
-    print_newline
+    print "\n"
     end
 tc:
     .return foo(1, 9, i, j,k)
@@ -78,7 +78,7 @@ pir_output_is( <<'CODE', <<'OUT', "karl tailcall 3 args" );
     print j
     print " k "
     print k
-    print_newline
+    print "\n"
     end
 tc:
     .return foo(1, j, i, i)
@@ -112,7 +112,7 @@ pir_output_is( <<'CODE', <<'OUT', "cycle no exit 1" );
     print " m "
     print m
 
-    print_newline
+    print "\n"
     end
 tc:
     .return foo(1, m,i,j,k,l)
@@ -146,7 +146,7 @@ pir_output_is( <<'CODE', <<'OUT', "cycle no exit 2" );
     print " m "
     print m
 
-    print_newline
+    print "\n"
     end
 tc:
     .return foo(1, m,l,j,i,k)
@@ -180,7 +180,7 @@ pir_output_is( <<'CODE', <<'OUT', "2 unconnected cycles no exit " );
     print " m "
     print m
 
-    print_newline
+    print "\n"
     end
 tc:
     .return foo(1, k,m,i,j,l)
@@ -214,7 +214,7 @@ pir_output_is( <<'CODE', <<'OUT', "cycle with exit 1" );
     print " m "
     print m
 
-    print_newline
+    print "\n"
     end
 tc:
     .return foo(1, j,i,j,i,j)
@@ -298,7 +298,7 @@ pir_output_is( <<'CODE', <<'OUT', "tailcall 3 args" );
     print j
     print " k "
     print k
-    print_newline
+    print "\n"
     end
 tc:
     .return foo(1, i, k, j)
@@ -344,7 +344,7 @@ foreach $x (@b) {
     print j
     print ","
     print k
-    print_newline
+    print "\\n"
     end
 tc:
     .return foo(1, $x )
@@ -379,7 +379,7 @@ foreach $x (@b) {
     print k
     print ","
     print l
-    print_newline
+    print "\\n"
     end
 tc:
     .return foo(1, $x )
@@ -409,7 +409,7 @@ foreach $x (@b) {
     print i
     print ","
     print j
-    print_newline
+    print "\\n"
     end
 tc:
     .return foo(1, $x )

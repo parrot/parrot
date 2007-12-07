@@ -365,7 +365,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - autobox" );
     print ' '
     $S0 = $P0[2]
     print $S0
-    print_newline
+    print "\n"
 .end
 CODE
 hello 42 bar
@@ -425,7 +425,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - fetch" );
     print $S0
     print ' '
     print $N0
-    print_newline
+    print "\n"
     returncc
 .end
 CODE
@@ -753,7 +753,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir call evaled code" );
     s .= "print i\n"
     s .= "print ' '\n"
     s .= "print j\n"
-    s .= "print_newline\n"
+    s .= "print \"\\n\"\n"
     s .= ".return(99)\n"
     s .= ".end\n"
     .local pmc comp
@@ -809,7 +809,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
     print $I1
     print ' '
     print $I2
-    print_newline
+    print "\n"
 .end
 .sub foo_float
     get_params "0,0,0", $N0, $N1, $N2
@@ -818,7 +818,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
     print $N1
     print ' '
     print $N2
-    print_newline
+    print "\n"
 .end
 .sub foo_string
     get_params "0,0,0", $S0, $S1, $S2
@@ -827,7 +827,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
     print $S1
     print ' '
     print $S2
-    print_newline
+    print "\n"
 .end
 CODE
 42 42 42
@@ -904,7 +904,7 @@ ok:
     print i3
     print ' '
     print i4
-    print_newline
+    print "\n"
 .end
 
 
@@ -1364,7 +1364,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - optional not set" );
 no_c:
     print 'no'
 got_c:
-    print_newline
+    print "\n"
 .end
 CODE
 10 20 no
@@ -1395,7 +1395,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - optional set" );
 no_c:
     print 'no'
 got_c:
-    print_newline
+    print "\n"
 .end
 CODE
 10 20 30
@@ -1432,7 +1432,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone_key_arg" );
     print key
     print ' '
     print val
-    print_newline
+    print "\n"
 .end
 CODE
 key 3 42
@@ -1714,7 +1714,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 1" );
     print I1
     print ' '
     print I0
-    print_newline
+    print "\n"
     returncc
 CODE
 10 20
@@ -1737,7 +1737,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 2 flatten" );
     print I1
     print ' '
     print I0
-    print_newline
+    print "\n"
     returncc
 CODE
 10 20
@@ -1767,7 +1767,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 3 slurpy hash" );
     print ' '
     set I2, P0['c']
     print I2
-    print_newline
+    print "\n"
     returncc
 
 CODE
@@ -1790,7 +1790,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 4 positional -> named" );
     print I1
     print ' '
     print I2
-    print_newline
+    print "\n"
     returncc
 CODE
 10 20 30
@@ -1818,7 +1818,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named" );
     print I1
     print ' '
     print I2
-    print_newline
+    print "\n"
     returncc
 CODE
 10 20 30 50 40
@@ -1872,7 +1872,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ":named(\"...\") syntax for .param and sub 
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
         .return()
 .end
 CODE
@@ -1887,7 +1887,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ":named(\"...\") syntax for the 4 kind" );
         print $I0
         print ' '
         print $I1
-        print_newline
+        print "\n"
         print "ok\n"
 
         end
@@ -1900,7 +1900,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ":named(\"...\") syntax for the 4 kind" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 
         .return ( 10 :named("a"), 20 :named("b"))
 .end
@@ -1926,7 +1926,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => 10 syntax for function call" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 
         .return ()
 .end
@@ -1951,7 +1951,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for parameters" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 
         .return ()
 .end
@@ -1967,7 +1967,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for target list" );
         print $I0
         print ' '
         print $I1
-        print_newline
+        print "\n"
         print "ok\n"
 
         end
@@ -1980,7 +1980,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for target list" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 
         .return ( 10 :named("a"), 20 :named("b"))
 .end
@@ -1997,7 +1997,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for return" );
         print $I0
         print ' '
         print $I1
-        print_newline
+        print "\n"
         print "ok\n"
 
         end
@@ -2010,7 +2010,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for return" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 
         .return ( "a" => 10, "b" => 20 )
 .end
@@ -2047,7 +2047,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 .end
 CODE
 10 20
@@ -2066,7 +2066,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 .end
 CODE
 10 20
@@ -2091,7 +2091,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set, :opt_flag" );
         print c
         print ' '
         print has_c
-        print_newline
+        print "\n"
 .end
 CODE
 10 1 20 1
@@ -2119,7 +2119,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named optional - mix" );
         print c
         print ' '
         print has_c
-        print_newline
+        print "\n"
 .end
 CODE
 10 1 20 1
@@ -2147,7 +2147,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named flat/slurpy" );
         print $I0
         print ' '
         print $I1
-        print_newline
+        print "\n"
 .end
 CODE
 20 10
@@ -2214,7 +2214,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 .end
 CODE
 /too few arguments/
@@ -2234,7 +2234,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 .end
 CODE
 /too few arguments/
@@ -2254,7 +2254,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - too many named" );
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 .end
 CODE
 /too many/
@@ -2274,7 +2274,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - duplicate named" )
         print d
         print ' '
         print c
-        print_newline
+        print "\n"
 .end
 CODE
 /duplicate name/

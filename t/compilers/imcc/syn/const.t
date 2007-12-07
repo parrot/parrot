@@ -581,9 +581,9 @@ pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
     # Uncomment this line, and the c symbol is 'forgotten'
     a += c
     print a
-    print_newline
+    print "\n"
     print c
-    print_newline
+    print "\n"
     end
 .end
 CODE
