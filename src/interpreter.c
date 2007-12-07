@@ -550,7 +550,7 @@ Initializes JIT function for the specified opcode and returns it.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void *
 init_jit(PARROT_INTERP, NULLOK(opcode_t *pc))
 {
