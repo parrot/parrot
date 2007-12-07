@@ -170,7 +170,7 @@ value.
 
 .sub width :method
     .param int new_width     :optional
-    .param int has_new_width :optional
+    .param int has_new_width :opt_flag
 
     .local pmc rect
     rect            = self.'rect'()

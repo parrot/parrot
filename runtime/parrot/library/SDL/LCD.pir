@@ -45,42 +45,37 @@ An SDL::LCD object has the following methods:
     .return()
 
   create_class:
-    load_bytecode "library/SDL/Image.pir"
-    load_bytecode "library/SDL/Rect.pir"
+    load_bytecode 'library/SDL/Image.pir'
+    load_bytecode 'library/SDL/Rect.pir'
 
-    $P0 = new 'String'
-    $P0 = "runtime/parrot/library/SDL/LCD.png"
-    $P0 = new 'SDL::Image', $P0
-    store_global "SDL::LCD", "digits", $P0
+    .local pmc digits
+    digits = new 'SDL::Image'
+    digits.'init'( 'runtime/parrot/library/SDL/LCD.png' )
+    global 'digits' = digits
 
-    $P0 = newclass 'SDL::LCD'
-    addattribute $P0, "value"
-    addattribute $P0, "numdigits"
-    addattribute $P0, "xpos"
-    addattribute $P0, "ypos"
+    newclass class, 'SDL::LCD'
+    addattribute class, 'value'
+    addattribute class, 'numdigits'
+    addattribute class, 'xpos'
+    addattribute class, 'ypos'
 END:
 .end
 
 .sub init :vtable :method
-    $I0 = classoffset self, "SDL::LCD"
-
     $P0 = new 'String'
-    setattribute self, $I0, $P0
+    setattribute self, 'value', $P0
 
-    inc $I0
     $P0 = new 'Integer'
     $P0 = -1
-    setattribute self, $I0, $P0
+    setattribute self, 'numdigits', $P0
 
-    inc $I0
     $P0 = new 'Integer'
     $P0 = 0
-    setattribute self, $I0, $P0
+    setattribute self, 'xpos', $P0
 
-    inc $I0
     $P0 = new 'Integer'
     $P0 = 0
-    setattribute self, $I0, $P0
+    setattribute self, 'ypos', $P0
 .end
 
 =item _digits( count )
@@ -92,9 +87,7 @@ Adjusts the minimum number of digits to display.
 .sub _digits :method
     .param int val
 
-    $I0 = classoffset self, "SDL::LCD"
-    inc $I0
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'numdigits'
     $P0 = val
 .end
 
@@ -107,8 +100,7 @@ Sets the LCD content to display.
 .sub set_integer_native :vtable :method
     .param int val
 
-    $I0 = classoffset self, "SDL::LCD"
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'value'
     $P0 = val
 .end
 
@@ -121,8 +113,7 @@ Sets the LCD content to display.
 .sub set_string_native :vtable :method
     .param string val
 
-    $I0 = classoffset self, "SDL::LCD"
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'value'
     $P0 = val
 .end
 
@@ -134,6 +125,7 @@ Draws the LCD onto the specified screen.
 
 .sub draw :method
     .param pmc screen
+
     .local string val
     .local int i
     .local int len
@@ -143,20 +135,16 @@ Draws the LCD onto the specified screen.
     .local int xpos
     .local int ypos
 
-    $I0 = classoffset self, "SDL::LCD"
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'value'
     val = $P0
 
-    inc $I0
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'numdigits'
     len = $P0
 
-    inc $I0
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'xpos'
     xpos = $P0
 
-    inc $I0
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'ypos'
     ypos = $P0
 
     if len != -1 goto NO_AUTOLEN
@@ -174,18 +162,21 @@ NO_AUTOLEN:
     val = $S0
 LEN_OK:
 
-    rect           = new 'Hash'
-    rect['width']  = 10
-    rect['height'] = 21
-    rect['x']      = 0
-    rect['y']      = 0
+    rect           = new 'SDL::Rect'
+    rect.'init'()
+    rect.'width'( 21 )
+    rect.'height'( 21 )
+    rect.'x'( 0 )
+    rect.'y'( 0 )
 
-    drect          = new 'SDL::Rect', rect
-    rect['x']      = xpos
-    rect['y']      = ypos
-    rect           = new 'SDL::Rect', rect
+    drect          = new 'SDL::Rect'
+    drect.'init'()
+    drect.'width'( 10 )
+    drect.'height'( 21 )
+    drect.'x'( 0 )
+    drect.'y'( 0 )
 
-    digits         = find_global 'SDL::LCD', 'digits'
+    digits         = find_global 'digits'
 
     i = 0
 LOOP:

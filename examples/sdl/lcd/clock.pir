@@ -31,21 +31,19 @@ The main function.
     load_bytecode "library/SDL/EventHandler.pir"
     load_bytecode "library/SDL/LCD.pir"
 
-    # set some screen properties
-    $P0 = new 'Hash'
-    $P0["height"] = 21
-    $P0["width"]  = 94
-    $P0["bpp"]    = 16
-    $P0["flags"]  =  5
-
     # create the SDL application object
-    $P0 = new 'SDL::App', $P0
-    $P0 = $P0."surface"()
-    global "screen" = $P0
+    .local pmc app
+    app = new 'SDL::App'
+    app.'init'( 'height' => 21, 'width' => 94, 'bpp' => 16, 'flags' => 5 )
+
+    .local pmc screen
+    screen = app.'surface'()
+    global 'screen' = screen
 
     # create the LCD
-    $P0 = new 'SDL::LCD'
-    global "LCD" = $P0
+    .local pmc lcd
+    lcd = new 'SDL::LCD'
+    global 'LCD' = lcd
 
     # draw the watch
     drawWatch()
@@ -67,9 +65,10 @@ The main function.
     .local pmc eh
     .local pmc loop
 
-    eh = new "SDL::EventHandler"
-    loop = new "SDL::Event"
-    loop."process_events"( 0.1, eh )
+    eh   = new 'SDL::EventHandler'
+    loop = new 'SDL::Event'
+    loop.'init'()
+    loop.'process_events'( 0.1, eh )
 .end
 
 =item drawWatch
@@ -80,8 +79,7 @@ Creates, sets and redraws the LCD display content.
 
 .sub drawWatch
     # decode the current time
-    $N0 = time
-    $I0 = $N0
+    $I0 = time
     $P0 = decodelocaltime $I0
 
     # use a dot or a space?
