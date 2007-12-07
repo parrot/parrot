@@ -9,10 +9,12 @@
 use strict;
 use warnings;
 
-# possible values are qw( phc antlr3 pct yacc );
-my $variant = $ENV{PLUMHEAD_VARIANT} || 'pct';
+use FindBin;
+
+( my $t_fn = $FindBin::Script ) =~ s/\.pl$/\.t/;
+
 chdir 'eclectus';
-exec 'petite', '--script', 't/integers.t';
+exec 'petite', '--script', "t/$t_fn";
 
 # Local Variables:
 #   mode: cperl
