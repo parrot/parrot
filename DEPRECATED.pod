@@ -75,6 +75,10 @@ See RT #47976.
 
 See RT #48010.
 
+=item * C<getfd> [post 0.5.1]
+
+See RT #48310.
+
 =back
 
 =head1 Class Features

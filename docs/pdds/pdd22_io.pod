@@ -257,7 +257,7 @@ operations, or after flushing the buffer. If the new size is larger than
 the existing data in the buffer, a size change is non-disruptive, but if
 the new size is smaller, it will truncate the buffer with a warning.
 
-=item C<get_fd>
+=item C<get_fd> [RT #48312]
 
   $I0 = $P1.get_fd()
 
@@ -270,6 +270,7 @@ the method before calling it.
 No asynchronous version.
 
 {{ NOTE: use a config probe (behind C<does> or C<can>) to determine support }}
+
 
 =back
 
@@ -584,7 +585,7 @@ asynchronously.
 
 C<getfd> retrieves the UNIX integer file descriptor of a stream object.
 The opcode has been replaced by a 'get_fd' method on the ParrotIO
-object.
+object. See RT #48310.
 
 
 =item *
