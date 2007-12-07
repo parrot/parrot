@@ -582,12 +582,6 @@ asynchronously.
 
 =item *
 
-C<write> prints to standard output but it cannot select another stream.
-It only accepts a PMC value to write. This is redundant with the
-C<print> opcode, so it will be deprecated.
-
-=item *
-
 C<getfd> retrieves the UNIX integer file descriptor of a stream object.
 The opcode has been replaced by a 'get_fd' method on the ParrotIO
 object.
