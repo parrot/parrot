@@ -3,61 +3,65 @@
 
 ( define (compile-program x)
 
-  (emit ".namespace")
+  (emit 
+"
+    .namespace
 
-  (emit ".sub '__onload' :init")
-  (emit "    load_bytecode 'PGE.pbc'")
-  (emit "    load_bytecode 'PGE/Text.pbc'")
-  (emit "    load_bytecode 'PGE/Util.pbc'")
-  (emit "    load_bytecode 'PGE/Dumper.pbc'")
-  (emit "    load_bytecode 'PCT.pbc'")
-  (emit ".end")
-  (emit "")
-  (emit ".sub main :main")
-  (emit "")
-  (emit "    .local pmc val_x")
-  (emit "    val_x = new 'PAST::Val'")
-  (emit "    val_x.init( 'value' => '~a', 'returns' => 'Integer' )" x )
-  (emit "")
-  (emit "    .local pmc var_last")
-  (emit "    var_last = new 'PAST::Var'")
-  (emit "    var_last.init( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )")
-  (emit "               ")
-  (emit "    .local pmc op_bind")
-  (emit "    op_bind = new 'PAST::Op'")
-  (emit "    op_bind.init( var_last, val_x, 'pasttype' => 'bind' )")
-  (emit "           ")
-  (emit "    .local pmc op_say")
-  (emit "    op_say = new 'PAST::Op'")
-  (emit "    op_say.init( op_bind, 'name' => 'say', 'pasttype' => 'call' )")
-  (emit "")
-  (emit "    .local pmc stmts")
-  (emit "    stmts = new 'PAST::Stmts'")
-  (emit "    stmts.'init'( op_say, 'name'=>'stmts' )")
-  (emit "")
-  (emit "    # compile to PIR and display")
-  (emit "    .local pmc astcompiler")
-  (emit "    astcompiler = new [ 'PCT::HLLCompiler' ]")
-  (emit "    astcompiler.'removestage'('parse')")
-  (emit "    astcompiler.'removestage'('past')")
-  (emit "")
-  (emit "    astcompiler.'eval'(stmts)")
-  (emit "")
-  (emit ".end")
-  (emit "")
-  (emit "")
-  (emit ".sub 'say'")
-  (emit "    .param pmc args :slurpy")
-  (emit "    if null args goto end")
-  (emit "    .local pmc iter")
-  (emit "    iter = new 'Iterator', args")
-  (emit "  loop:")
-  (emit "    unless iter goto end")
-  (emit "    $P0 = shift iter")
-  (emit "    print $P0")
-  (emit "    goto loop")
-  (emit "  end:")
-  (emit "    say ''")
-  (emit "    .return ()")
-  (emit ".end"))
+    .sub '__onload' :init
+        load_bytecode 'PGE.pbc'
+        load_bytecode 'PGE/Text.pbc'
+        load_bytecode 'PGE/Util.pbc'
+        load_bytecode 'PGE/Dumper.pbc'
+        load_bytecode 'PCT.pbc'
+    .end
+    
+    .sub main :main
+    
+        .local pmc val_x
+        val_x = new 'PAST::Val'
+        val_x.init( 'value' => '~a', 'returns' => 'Integer' )
+    
+        .local pmc var_last
+        var_last = new 'PAST::Var'
+        var_last.init( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
+                   
+        .local pmc op_bind
+        op_bind = new 'PAST::Op'
+        op_bind.init( var_last, val_x, 'pasttype' => 'bind' )
+               
+        .local pmc op_say
+        op_say = new 'PAST::Op'
+        op_say.init( op_bind, 'name' => 'say', 'pasttype' => 'call' )
+ 
+        .local pmc stmts
+        stmts = new 'PAST::Stmts'
+        stmts.'init'( op_say, 'name'=>'stmts' )
+ 
+        # compile to PIR and display
+        .local pmc astcompiler
+        astcompiler = new [ 'PCT::HLLCompiler' ]
+        astcompiler.'removestage'('parse')
+        astcompiler.'removestage'('past')
+ 
+        astcompiler.'eval'(stmts)
+ 
+    .end
+ 
+ 
+    .sub 'say'
+        .param pmc args :slurpy
+        if null args goto end
+        .local pmc iter
+        iter = new 'Iterator', args
+      loop:
+        unless iter goto end
+        $P0 = shift iter
+        print $P0
+        goto loop
+      end:
+        say ''
+        .return ()
+    .end
+"
+ x ) )
 
