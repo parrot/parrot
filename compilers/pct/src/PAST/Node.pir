@@ -70,7 +70,8 @@ or other construct may not have been translated into PAST.
     if $I0 goto add_value
     $P0 = new 'String'
     $P0 = "Cannot unshift non-PAST value"
-    $P1 = new 'Exception', $P0
+    $P1 = new 'Exception'
+    setattribute $P1, 'message', $P0
     throw $P0
   add_value:
     unshift self, value
@@ -86,7 +87,8 @@ or other construct may not have been translated into PAST.
     if $I0 goto add_value
     $P0 = new 'String'
     $P0 = "Cannot push non-PAST value"
-    $P1 = new 'Exception', $P0
+    $P1 = new 'Exception'
+    setattribute $P1, 'message', $P0
     throw $P0
   add_value:
     push self, value
