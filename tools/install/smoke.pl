@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: smoke.pl $
+# $Id$
 
 use strict;
 use warnings;
@@ -173,3 +173,11 @@ $out = `$parrot languages/tcl/tcl.pbc $filename`;
 ok($out eq "hello world!\n", "check tcl");
 unlink($filename);
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
+
