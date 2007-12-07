@@ -9,6 +9,8 @@ to build the PAST.pbc module.
 
 =cut
 
+.include 'src/PCT/Node.pir'
+
 .include 'src/PAST/Node.pir'
 
 .include 'src/PAST/Compiler.pir'

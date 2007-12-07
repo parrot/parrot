@@ -21,8 +21,8 @@ PCT_TARGETS = \
 
 PCT_SOURCES = \
   PCT.pir \
-  src/Grammar.pir \
-  src/HLLCompiler.pir \
+  src/PCT/Grammar.pir \
+  src/PCT/HLLCompiler.pir \
   src/PAST/Compiler.pir \
   src/PAST/Node.pir \
   src/POST/Compiler.pir \
@@ -34,8 +34,8 @@ all: $(PARROT_LIBRARY)/PCT.pbc
 $(PARROT_LIBRARY)/PCT.pbc: $(PARROT) $(PCT_SOURCES)
 	$(PARROT) -o $(PARROT_LIBRARY)/PCT.pbc --output-pbc PCT.pir
 	$(PARROT) -o $(PARROT_LIBRARY)/PCT/PAST.pbc --output-pbc src/PAST.pir
-	$(PARROT) -o $(PARROT_LIBRARY)/PCT/Grammar.pbc --output-pbc src/Grammar.pir
-	$(PARROT) -o $(PARROT_LIBRARY)/PCT/HLLCompiler.pbc --output-pbc src/HLLCompiler.pir
+	$(PARROT) -o $(PARROT_LIBRARY)/PCT/Grammar.pbc --output-pbc src/PCT/Grammar.pir
+	$(PARROT) -o $(PARROT_LIBRARY)/PCT/HLLCompiler.pbc --output-pbc src/PCT/HLLCompiler.pir
 
 # This is a listing of all targets, that are meant to be called by users
 help:

@@ -16,7 +16,7 @@ for compiling programs in Parrot.
 
     ##  create POST classes
     protomaker = new 'Protomaker'
-    $P0 = get_class 'PAST::Node'
+    $P0 = get_class 'PCT::Node'
     base = protomaker.'new_subclass'($P0 , 'POST::Node')
     $P0  = protomaker.'new_subclass'(base, 'POST::Op')
     $P0  = protomaker.'new_subclass'(base, 'POST::Ops')
