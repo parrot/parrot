@@ -84,7 +84,7 @@ Adds a new timer event to the event queue.
 static void
 add_timer(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
-    const const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(pmc);
+    const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(pmc);
 
     if (!PMC_IS_NULL(t->sub))
         Parrot_new_timer_event(interp, pmc, t->abs_time,
@@ -348,14 +348,6 @@ Sets the floating-point value associated with C<key> to C<value>.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial proposal by leo 2003.07.15
-
-Initial revision 2003.07.17
-
-Switch to events 2004.01.07
 
 =cut
 
