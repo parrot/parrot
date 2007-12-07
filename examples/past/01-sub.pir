@@ -1,3 +1,7 @@
+# RT#48030
+# This example is based on the depreceted PAST-pm data structure.
+# The example should be rewritten, so that it uses the new PAST.
+
 ## code for (assuming package scoped variables)
 ## sub foo { $a = 4; $b = $a + 1; say($b); }
 
