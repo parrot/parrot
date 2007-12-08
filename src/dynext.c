@@ -28,9 +28,10 @@ PARROT_CANNOT_RETURN_NULL
 static STRING * clone_string_into(
     NOTNULL(Interp *d),
     NOTNULL(Interp *s),
-    PMC *value)
+    NOTNULL(PMC *value))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -419,7 +420,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), PMC *value)
+clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *value))
 {
     STRING * const orig = VTABLE_get_string(s, value);
     char * const raw_str = string_to_cstring(s, orig);

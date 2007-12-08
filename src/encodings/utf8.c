@@ -116,6 +116,7 @@ static void set_codepoints(PARROT_INTERP,
     SHIM(STRING *new_codepoints))
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
 static STRING * to_encoding(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))
@@ -153,6 +154,8 @@ static void utf8_set_position(SHIM_INTERP,
     UINTVAL pos)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const void * utf8_skip_backward(NOTNULL(const void *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
@@ -330,6 +333,8 @@ Moves C<ptr> C<n> characters back.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const void *
 utf8_skip_backward(NOTNULL(const void *ptr), UINTVAL n)
 {
@@ -462,6 +467,7 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_CAN_RETURN_NULL
 static STRING *
 to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -873,6 +879,7 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_encoding_utf8_init(PARROT_INTERP)
 {

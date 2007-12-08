@@ -15,6 +15,7 @@
 
 /* HEADERIZER BEGIN: src/encodings/utf16.c */
 
+PARROT_CANNOT_RETURN_NULL
 ENCODING * Parrot_encoding_utf16_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 

@@ -75,6 +75,8 @@ typedef INTVAL (*encoding_converter_t)(PARROT_INTERP, ENCODING *lhs, ENCODING *r
 
 /* HEADERIZER BEGIN: src/encoding.c */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PARROT_API
 const ENCODING * Parrot_default_encoding(SHIM_INTERP);
 
@@ -111,9 +113,11 @@ const ENCODING * Parrot_find_encoding(SHIM_INTERP,
 
 PARROT_API
 encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
-    ENCODING *lhs,
-    ENCODING *rhs)
-        __attribute__nonnull__(1);
+    NOTNULL(ENCODING *lhs),
+    NOTNULL(ENCODING *rhs))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -124,6 +128,7 @@ const ENCODING* Parrot_get_encoding(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const ENCODING * Parrot_load_encoding(PARROT_INTERP,
     NOTNULL(const char *encodingname))
         __attribute__nonnull__(1)
@@ -137,6 +142,7 @@ INTVAL Parrot_make_default_encoding(SHIM_INTERP,
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 ENCODING * Parrot_new_encoding(SHIM_INTERP);
 
 PARROT_API

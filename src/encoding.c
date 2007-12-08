@@ -112,6 +112,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_new_encoding(SHIM_INTERP)
 {
@@ -166,6 +167,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 {
@@ -425,6 +427,8 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PARROT_API
 const ENCODING *
 Parrot_default_encoding(SHIM_INTERP)
@@ -446,7 +450,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 encoding_converter_t
-Parrot_find_encoding_converter(PARROT_INTERP, ENCODING *lhs, ENCODING *rhs)
+Parrot_find_encoding_converter(PARROT_INTERP, NOTNULL(ENCODING *lhs), NOTNULL(ENCODING *rhs))
 {
     UNUSED(interp);
     UNUSED(lhs);
