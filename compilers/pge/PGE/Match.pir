@@ -217,30 +217,29 @@ object.
 =cut
 
 .sub 'get_scalar' :method
-    .local pmc obj
-    obj = getattribute self, '$!result'
-    if null obj goto scalar_text
-    .return (obj)
-  scalar_text:
-    .return self.'text'()
+    .return self.'result_object'()
 .end
 
 
 =item C<result_object([pmc obj])>
 
-Returns or sets the "result object" for the match object.  
+Returns or sets the "result object" for the match object.
 
 =cut
 
 .sub 'result_object' :method
     .param pmc obj             :optional
     .param int has_obj         :opt_flag
-    if has_obj == 0 goto get
+    if has_obj == 0 goto get_obj
     setattribute self, '$!result', obj
-    if null obj goto get
+    goto ret_obj
+  get_obj:
+    obj = getattribute self, '$!result'
+  ret_obj:
+    if null obj goto ret_null
     .return (obj)
-  get:
-    .return self.'get_scalar'()
+  ret_null:
+    .return self.'text'()
 .end
 
 
@@ -359,12 +358,12 @@ matches, a space seperated list of matches is returned.
 =cut
 
 .sub 'get_string_keyed_int' :vtable :method
-	.param int key
+    .param int key
     $P0 = getattribute self, '@!capt'
-	$S0 = ''
+    $S0 = ''
     if_null $P0, get_1
     $P0 = $P0[key]
-	$S0 = $P0
+    $S0 = $P0
   get_1:
     .return ($S0)
 .end
