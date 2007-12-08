@@ -11,34 +11,46 @@
 ## Available online at http://docs.python.org/ref/ and
 ## http://docs.python.org/ref/grammar.txt .
 
-grammar Pynie::Grammar ;
+grammar Pynie::Grammar is PCT::Grammar;
 
 ## C<TOP> defines the top level rule to the HLLCompiler.
-token TOP { <?indent_zero> <file_input> }
+token TOP {
+    <.indent_zero>
+    <file_input>
+    {*}
+}
 
-token newline { [ <?ws> \n ]+ }
+token newline { [ <.ws> \n ]+ }
 
 token ws { \h* [ '#' \N* ]? }
 
-token file_input { ^ [ <?newline> | <statement> ]* [ $ | <?die: syntax_error> ] }
+token file_input {
+    ^ [ <.newline> | <statement> ]*
+    [ $ | <.panic: syntax_error> ]
+    {*}
+}
 
 token suite {
-    | <stmt_list> <?newline>
-    | <?newline> <?indent> <statement>
-        [ <?indent_same> <statement> ]*
-        [ <?dedent> | <?die: IndentationError: unindent does not match any outer indentation level> ]
+    | <stmt_list> <.newline> {*}                 #= stmt_list
+    | <.newline> <.indent> <statement>
+        [ <.indent_same> <statement> ]*
+        [ <.dedent> | <.panic: IndentationError: unindent does not match any outer indentation level> ]
+      {*}                                        #= indent
 }
 
 token statement {
-    | <compound_stmt>
-    | <stmt_list> <?newline>
+    | <compound_stmt> {*}                        #= compound_stmt
+    | <stmt_list> <.newline> {*}                 #= stmt_list
 }
 
-token stmt_list { <simple_stmt> [ ';' <simple_stmt> ]* ';'? }
+token stmt_list {
+    <simple_stmt> [ ';' <simple_stmt> ]* ';'?
+    {*}
+}
 
 token compound_stmt {
-    | <if_stmt>
-    | <while_stmt>
+    | <if_stmt> {*}                              #= if_stmt
+    | <while_stmt> {*}                           #= while_stmt
     | <for_stmt>
     | <try_stmt>
     | <with_stmt>
@@ -49,12 +61,14 @@ token compound_stmt {
 rule if_stmt {
     'if' <expression> ':' <suite>
     [ 'elif' <expression> ':' <suite> ]*
-    [ 'else' ':' <suite> ]?
+    [ 'else' ':' $<else>=<suite> ]?
+    {*}
 }
 
 rule while_stmt {
     'while' <expression> ':' <suite>
-    [ 'else' ':' <suite> ]?
+    [ 'else' ':' $<else>=<suite> ]?
+    {*}
 }
 
 rule for_stmt {
@@ -93,7 +107,7 @@ rule decorators {
 }
 
 rule decorator {
-    '@' <dotted_name> [ '(' [ <argument_list> ','? ]? ')' ]? <?newline>
+    '@' <dotted_name> [ '(' [ <argument_list> ','? ]? ')' ]? <.newline>
 }
 
 rule argument_list {
@@ -168,12 +182,12 @@ rule lambda_form {
 
 token simple_stmt {
     | <assert_stmt>
-    | <assignment_stmt>
+    | <assignment_stmt> {*}                      #= assignment_stmt
     | <augmented_assignment_stmt>
-    | <expression_list>
+    | <expression_list> {*}                      #= expression_list
     | <pass_stmt>
     | <del_stmt>
-    | <print_stmt>
+    | <print_stmt> {*}                           #= print_stmt
     | <return_stmt>
     | <yield_stmt>
     | <raise_stmt>
@@ -192,17 +206,22 @@ rule assert_stmt {
     'assert' <expression> [ ',' <expression> ]?
 }
 
-rule assignment_stmt { [ <target_list> '=' ]+ <expression_list> }
+rule assignment_stmt {
+    <target_list> '=' <expression_list>
+    {*}
+}
 
 rule augmented_assignment_stmt { <target> <augop> <expression_list> }
 
-rule target_list { <target> [ ',' <target> ]* ','? }
+rule target_list {
+    <target> [ ',' <target> ]* ','?
+    {*}
+}
 
 rule target {
     | '(' <target_list> ')'
     | '[' <target_list> ']'
-    | <identifier>
-    #| <primary>
+    | <identifier> {*}                           #= identifier
     #| <primary> <attributeref>
     #| <primary> <subscription>
     #| <primary> <slicing>
@@ -253,12 +272,13 @@ rule long_slice {
     <short_slice> ':' <expression>?
 }
 
-token identifier { <!reserved> [ <?alpha> | '_' ] \w* }
+token identifier { <!reserved> [ <.alpha> | '_' ] \w* {*} }
 
 token name { <!reserved> <[a..z]> [ <alpha> | '_' ]* }
 
 rule print_stmt {
-    'print' [ <expression> [ ',' <expression> ]* ( ','? ) ]?
+    'print' [ <expression> [ ',' <expression> ]* ( ',' )? ]?
+    {*}
 }
 
 rule pass_stmt {
@@ -322,17 +342,20 @@ rule module {
 }
 
 token literal {
-    | <stringliteral>
+    | <stringliteral> {*}                        #= stringliteral
     | <imagnumber>
     | <floatnumber>
     | <longinteger>
-    | <integer>
+    | <integer> {*}                              #= integer
 }
 
 token integer {
+    [
     | '0' <[0..7]>+
     | '0' <[xX]> [ \d | <[a..f]> | <[A..F]> ]+
     | <[1..9]> \d* | '0'
+    ]
+    {*}
 }
 
 token intpart { \d+ }
@@ -349,12 +372,17 @@ token floatnumber {
 
 token stringliteral {
     <stringprefix>?
-    [ <longstring> | <shortstring> ]
+    [ <longstring> {*}                           #= longstring
+    | <shortstring> {*}                          #= shortstring
+    ]
 }
 
 token shortstring {
+    [
     | \" ( [ \\ . | <-["\n]> ]* ) \"
     | \' ( [ \\ . | <-['\n]> ]* ) \'
+    ]
+    {*}
 }
 
 regex longstring {
@@ -367,7 +395,10 @@ token stringprefix {
     'r' | 'u' | 'ur' | 'R' | 'U' | 'UR' | 'Ur' | 'uR'
 }
 
-rule expression_list { <expression> [ ',' <expression> ]* ','? }
+rule expression_list {
+    <expression> [ ',' <expression> ]* ','?
+    {*}
+}
 
 rule list_display { '[' <listmaker>? ']' }
 
@@ -406,6 +437,7 @@ token augop {
 
 rule primary {
     <atom> <postop>*
+    {*}
 }
 
 rule postop {
@@ -417,9 +449,9 @@ rule postop {
 
 
 rule atom {
-    | <identifier>
-    | <literal>
-    | <parenth_form>                   # python's <enclosure>
+    | <identifier> {*}                           #= identifier
+    | <literal> {*}                              #= literal
+    | <parenth_form> {*}                         #= parenth_form
    #| <list_display>                   #   ""
    #| <generator_expression>           #   ""
    #| <dict_display>                   #   ""
@@ -428,6 +460,7 @@ rule atom {
 
 rule parenth_form {
     '(' <expression_list>? ')'
+    {*}
 }
 
 rule generator_expression {
@@ -468,29 +501,33 @@ rule string_conversion {
 #
 #
 rule expression {
-    | <or_test> [ 'if' <or_test> 'else' <test> ]?
-    | <lambda_form>
+    | <or_test> [ 'if' <or_test> 'else' <test> ]?  {*}     #= or_test
+    | <lambda_form> {*}                                    #= lambda_form
 }
 
 rule or_test {
     <and_test> [ 'or' <and_test> ]*
+    {*}
 }
 
 rule and_test {
     <not_test> [ 'and' <not_test> ]*
+    {*}
 }
 
 rule not_test {
-    | 'not' <not_test>
-    | <in_test>
+    | 'not' <not_test> {*}                       #= not_test
+    | <in_test> {*}                              #= in_test
 }
 
 rule in_test {
     <is_test> [ ('not')? 'in' <is_test> ]*
+    {*}
 }
 
 rule is_test {
     <comparison> [ 'is' ('not')? <comparison> ]*
+    {*}
 }
 
 token 'comparison' is optable { ... }
@@ -499,16 +536,16 @@ proto 'term:'      is precedence('=')    is parsed(&primary) { ... }
 proto infix:<**>   is looser('term:')        { ... }
 proto prefix:<~>   is looser(infix:<**>)     { ... }
 proto prefix:<+>   is looser(prefix:<~>)     { ... }
-proto prefix:<->   is equiv(prefix:<+>)  is pirop('neg')     { ... }
-proto infix:<*>    is looser(prefix:<+>) is pirop('mul')     { ... }
-proto infix:</>    is equiv(infix:<*>)   is pirop('div')     { ... }
-proto infix:<//>   is equiv(infix:<*>)   is pirop('fdiv')    { ... }
-proto infix:<%>    is equiv(infix:<*>)   is pirop('mod')     { ... }
-proto infix:<+>    is looser(infix:<*>)  is pirop('add')     { ... }
-proto infix:<->    is equiv(infix:<+>)   is pirop('sub')     { ... }
+proto prefix:<->   is equiv(prefix:<+>)  is pirop('n_neg')     { ... }
+proto infix:<*>    is looser(prefix:<+>) is pirop('n_mul')     { ... }
+proto infix:</>    is equiv(infix:<*>)   is pirop('n_div')     { ... }
+proto infix:<//>   is equiv(infix:<*>)   is pirop('n_fdiv')    { ... }
+proto infix:<%>    is equiv(infix:<*>)   is pirop('n_mod')     { ... }
+proto infix:<+>    is looser(infix:<*>)  is pirop('n_add')     { ... }
+proto infix:<->    is equiv(infix:<+>)   is pirop('n_sub')     { ... }
 
-proto infix:«<<»   is looser(infix:<+>)  is pirop('shl')     { ... }
-proto infix:«>>»   is equiv(infix:«<<»)  is pirop('shr')     { ... }
+proto infix:«<<»   is looser(infix:<+>)  is pirop('n_shl')     { ... }
+proto infix:«>>»   is equiv(infix:«<<»)  is pirop('n_shr')     { ... }
 proto infix:<&>    is looser(infix:«<<»)     { ... }
 proto infix:<^>    is looser(infix:<&>)      { ... }
 proto infix:<|>    is looser(infix:<^>)      { ... }

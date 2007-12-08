@@ -18,29 +18,19 @@ object.
 
 =cut
 
-.namespace [ 'Pynie::Compiler' ]
-
 .sub '__onload' :load :init
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-    load_bytecode 'PAST-pm.pbc'
+    load_bytecode 'PCT.pbc'
 
-    $P0 = subclass 'PGE::Match', 'Match'
-    $P0 = subclass 'Match', 'Grammar'
-    $P0 = subclass 'Grammar', 'Pynie::Grammar'
-
-    $P0 = new [ 'HLLCompiler' ]
+    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+    $P0 = $P0.'new'()
     $P0.'language'('Pynie')
     $P0.'parsegrammar'('Pynie::Grammar')
-    $P0.'astgrammar'('Pynie::PAST::Grammar')
+    $P1 = split '::', 'Pynie::Grammar::Actions'
+    $P0.'parseactions'($P1)
 
     $P0.'commandline_banner'("Pynie: a Python compiler for Parrot.\n")
     $P0.'commandline_prompt'('>>> ')
 
-    $P0 = get_hll_global ['PGE::Util'], 'die'
-    set_hll_global ['Pynie::Grammar'], 'die', $P0
 .end
 
 
@@ -58,14 +48,10 @@ to the Pynie compiler.
     .return $P0.'command_line'(args)
 .end
 
-.namespace [ 'Pynie::Grammar' ]
 
-.include 'src/parser/Grammar_gen.pir'
+.include 'src/gen_grammar.pir'
+.include 'src/gen_actions.pir'
 .include 'src/parser/indent.pir'
-
-.include 'src/PAST/Grammar_gen.pir'
-
-.namespace [ 'Pynie' ]
 
 .include 'src/builtins/io.pir'
 .include 'src/builtins/lists.pir'
