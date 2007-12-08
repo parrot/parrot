@@ -559,6 +559,11 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 Return the MMD signature PMC, if any or a Null PMC.
 
+=item C<METHOD INTVAL arity()>
+
+Return the arity of the Sub (the number of arugments, excluding optional and
+slurpy arguments).
+
 =cut
 
 */
@@ -604,6 +609,38 @@ Return the MMD signature PMC, if any or a Null PMC.
     METHOD PMC *get_multisig() {
         const Parrot_sub * const sub = PMC_sub(SELF);
         return sub->multi_signature ? sub->multi_signature : PMCNULL;
+    }
+
+    METHOD INTVAL arity() {
+        /* Get pointer into the bytecode where this sub starts. */
+        Parrot_sub * const sub = PMC_sub(SELF);
+        opcode_t *pc = sub->seg->base.data + sub->start_offs;
+
+        /* If the first instruction is a get_params... */
+        if (*pc == PARROT_OP_get_params_pc) {
+            int arity = 0;
+            int i, sig_length;
+            PMC *sig;
+
+            /* Get the signature (the next thing in the bytecode). */
+            pc++;
+            sig = PF_CONST(sub->seg, *pc)->u.key;
+            ASSERT_SIG_PMC(sig);
+
+            /* Iterate over the signature and compute the arity; don't
+             * count optional, opt_flag and slurpy. */
+            sig_length = SIG_ELEMS(sig);
+            for (i = 0; i < sig_length; i++)
+                if ((SIG_ITEM(sig, i) & (PARROT_ARG_SLURPY_ARRAY |
+                    PARROT_ARG_OPTIONAL | PARROT_ARG_OPT_FLAG)) == 0)
+                    arity++;
+            
+            return arity;
+        }
+        else {
+            /* No parameters taken. */
+            return 0;
+        }
     }
 }
 

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 62;
 use Parrot::Config;
 
 =head1 NAME
@@ -1367,6 +1367,85 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_namespace()' );
 CODE
 parrot
 parrot;Foo;Bar
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'arity()' );
+.sub main :main
+    $P0 = get_global 'none'
+    $I0 = $P0.arity()
+    say $I0
+
+    $P0 = get_global 'one'
+    $I0 = $P0.arity()
+    say $I0
+
+    $P0 = get_global 'four'
+    $I0 = $P0.arity()
+    say $I0
+
+    $P0 = get_global 'all_slurpy'
+    $I0 = $P0.arity()
+    say $I0
+
+    $P0 = get_global 'some_optional'
+    $I0 = $P0.arity()
+    say $I0
+
+    $P0 = get_global 'some_named'
+    $I0 = $P0.arity()
+    say $I0
+
+    $P0 = get_global 'allsorts'
+    $I0 = $P0.arity()
+    say $I0
+.end
+
+.sub none
+.end
+
+.sub one
+    .param int a
+.end
+
+.sub four
+    .param int a
+    .param pmc b
+    .param string c
+    .param num d
+.end
+
+.sub all_slurpy
+    .param pmc s :slurpy
+.end
+
+.sub some_optional
+    .param int a
+    .param int b :optional
+    .param int bo :opt_flag
+    .param int c
+.end
+
+.sub some_named
+    .param int a :named
+    .param int b
+    .param int c :named
+.end
+
+.sub allsorts
+    .param int a :named
+    .param int b :optional
+    .param int bo :opt_flag
+    .param int c
+    .param pmc s :slurpy
+.end
+CODE
+0
+1
+4
+0
+2
+3
+2
 OUTPUT
 
 # Local Variables:
