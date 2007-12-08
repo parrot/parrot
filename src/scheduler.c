@@ -29,6 +29,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
 static int Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -148,12 +149,13 @@ continue the runloop.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))
 {
     while (VTABLE_get_integer(interp, scheduler) > 0) {
         PMC *task = VTABLE_pop_pmc(interp, scheduler);
-        INTVAL tid = VTABLE_get_integer(interp, task);
+        const INTVAL tid = VTABLE_get_integer(interp, task);
 
         /* When sent a terminate task, notify the scheduler */
         if (TASK_terminate_runloop_TEST(task)) {
@@ -229,7 +231,7 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 {
     Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(interp->scheduler);
     void *raw_retval = NULL;
-    PMC *term_event = pmc_new(interp, enum_class_Task);
+    PMC * const term_event = pmc_new(interp, enum_class_Task);
     TASK_terminate_runloop_SET(term_event);
     Parrot_cx_schedule_task(interp, term_event);
 
