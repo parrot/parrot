@@ -34,7 +34,6 @@ $conf->options->set( %{$args} );
 
 my $task        = $conf->steps->[0];
 my $step_name   = $task->step;
-my @step_params = @{ $task->params };
 
 my $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );

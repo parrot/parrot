@@ -41,7 +41,7 @@ test_step_thru_runstep( $conf, q{init::defaults}, $args );
 test_step_thru_runstep( $conf, q{init::install},  $args );
 test_step_thru_runstep( $conf, q{init::hints},    $args );
 
-my ( $task, $step_name, @step_params, $step, $ret );
+my ( $task, $step_name, $step, $ret );
 my $pkg = q{inter::progs};
 
 $conf->add_steps($pkg);
@@ -49,7 +49,6 @@ $conf->options->set( %{$args} );
 
 $task        = $conf->steps->[3];
 $step_name   = $task->step;
-@step_params = @{ $task->params };
 
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );

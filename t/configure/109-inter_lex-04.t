@@ -34,7 +34,7 @@ $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
-my ( $task, $step_name, @step_params, $step, $ret );
+my ( $task, $step_name, $step, $ret );
 my $pkg = q{inter::lex};
 
 $conf->add_steps($pkg);
@@ -42,7 +42,6 @@ $conf->options->set( %{$args} );
 
 $task        = $conf->steps->[1];
 $step_name   = $task->step;
-@step_params = @{ $task->params };
 
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );

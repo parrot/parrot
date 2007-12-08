@@ -27,7 +27,7 @@ my $conf = Parrot::Configure->new();
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my ( $task, $step_name, @step_params, $step, $ret );
+my ( $task, $step_name, $step, $ret );
 my $pkg = q{inter::yacc};
 
 $conf->add_steps($pkg);
@@ -35,7 +35,6 @@ $conf->options->set( %{$args} );
 
 $task        = $conf->steps->[1];
 $step_name   = $task->step;
-@step_params = @{ $task->params };
 
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
