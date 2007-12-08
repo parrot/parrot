@@ -390,7 +390,7 @@
   not_quote:
     if key != 'heredoc' goto not_heredoc
     $P0 = match['text']
-    inline = $P0.'get_scalar'()
+    inline = $P0.'text'()
   not_heredoc:
   make:
     $P1 = get_hll_global ['PAST'], 'Op'

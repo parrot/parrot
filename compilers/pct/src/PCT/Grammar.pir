@@ -47,6 +47,27 @@ also included.
 .end
 
 
+=item get_scalar()
+
+Here we overload the get_scalar() method from PGE::Match to
+throw an exception if a result object hasn't been set.
+
+=cut
+
+.sub 'get_scalar' :method
+    .local pmc obj
+    obj = getattribute self, '$!result'
+    unless null obj goto end
+    $P0 = new 'String'
+    $P0 = 'No result object'
+    $P1 = new 'Exception'
+    setattribute $P1, 'message', $P0
+    throw $P1
+  end:
+    .return (obj)
+.end
+
+
 .sub 'string_literal' :method
     .param string stop
     .param pmc adverbs         :slurpy :named
