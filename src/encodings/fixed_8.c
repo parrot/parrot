@@ -56,6 +56,7 @@ static UINTVAL get_byte(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -64,6 +65,7 @@ static STRING * get_bytes(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes_inplace(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -81,6 +83,7 @@ static UINTVAL get_codepoint(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING * get_codepoints(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -89,6 +92,7 @@ static STRING * get_codepoints(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING * get_codepoints_inplace(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -137,6 +141,7 @@ static void set_codepoints(PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_DOES_NOT_RETURN
+PARROT_CANNOT_RETURN_NULL
 static STRING * to_encoding(PARROT_INTERP,
     SHIM(STRING *src),
     SHIM(STRING *dest))
@@ -159,6 +164,7 @@ RT#48260: Not yet documented!!!
 */
 
 PARROT_DOES_NOT_RETURN
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_encoding(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *dest))
 {
@@ -270,6 +276,7 @@ Delegate to get_bytes
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
@@ -294,6 +301,7 @@ RT#48260: Not yet documented!!!
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
@@ -327,6 +335,7 @@ Delegate to get_bytes
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))
@@ -350,6 +359,7 @@ RT#48260: Not yet documented!!!
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *return_string))
