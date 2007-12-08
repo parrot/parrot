@@ -48,53 +48,6 @@ Other node attributes are generally defined by subclasses of C<PAST::Node>.
 
 =over 4
 
-=item unshift(child [, 'force'=>force])
-
-=item push(child [, 'force'=>force])
-
-Add C<child> to the beginning or end of the invocant's list of
-children, throwing an exception if C<child> isn't a C<PAST::Node>
-and the C<force> flag isn't set.  Checking the type of C<child>
-makes it easier for compilers to determine where a parse tree
-or other construct may not have been translated into PAST.
-
-=cut
-
-.sub 'unshift' :method
-    .param pmc value
-    .param int force           :optional :named('force')
-    .param int has_force       :opt_flag
-    $I0 = and has_force, force
-    if $I0 goto add_value
-    $I0 = isa value, 'PAST::Node'
-    if $I0 goto add_value
-    $P0 = new 'String'
-    $P0 = "Cannot unshift non-PAST value"
-    $P1 = new 'Exception'
-    setattribute $P1, 'message', $P0
-    throw $P0
-  add_value:
-    unshift self, value
-.end
-
-.sub 'push' :method
-    .param pmc value
-    .param int force           :optional :named('force')
-    .param int has_force       :opt_flag
-    $I0 = and has_force, force
-    if $I0 goto add_value
-    $I0 = isa value, 'PAST::Node'
-    if $I0 goto add_value
-    $P0 = new 'String'
-    $P0 = "Cannot push non-PAST value"
-    $P1 = new 'Exception'
-    setattribute $P1, 'message', $P0
-    throw $P0
-  add_value:
-    push self, value
-.end
-
-
 =item returns([value])
 
 Accessor method -- sets/returns the return type for the invocant.

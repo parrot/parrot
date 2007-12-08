@@ -35,7 +35,9 @@ also included.
 
 =cut
 
-.sub '__onload' :init :load
+.namespace [ 'PCT::Grammar' ]
+
+.sub 'onload' :anon :init :load
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
     $P0 = subclass 'PGE::Grammar', 'PCT::Grammar'
@@ -44,15 +46,16 @@ also included.
     .return ()
 .end
 
-.sub 'string_literal'
-    .param pmc mob
+
+.sub 'string_literal' :method
     .param string stop
     .param pmc adverbs         :slurpy :named
 
     ##  create a new match object, get the new match position
+    .local pmc mob
     .local int pos, lastpos, stoplen
     .local string target, escapechars
-    (mob, pos, target) = mob.'new'(mob)
+    (mob, pos, target) = self.'new'(self)
     lastpos = length target
     stoplen = length stop
     $S0 = substr stop, 0, 1
