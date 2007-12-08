@@ -25,6 +25,7 @@ int set_contains(NOTNULL(const Set *s), int element)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set* set_copy(NOTNULL(Set *s))
         __attribute__nonnull__(1);
 
@@ -41,6 +42,7 @@ void set_free(NOTNULL(Set *s))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set * set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -50,12 +52,15 @@ void set_intersec_inplace(NOTNULL(Set *s1), NOTNULL(const Set *s2))
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set* set_make(int length);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set* set_make_full(int length);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set * set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

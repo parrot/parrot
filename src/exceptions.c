@@ -430,6 +430,7 @@ Return an exception handler by index into the exeception handler stack.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 get_exception_handler(PARROT_INTERP, INTVAL target_depth)
 {
@@ -547,7 +548,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
+new_c_exception_handler(PARROT_INTERP, NOTNULL(Parrot_exception *jb))
 {
     PMC * const handler = pmc_new(interp, enum_class_Exception_Handler);
     /*
@@ -572,7 +573,7 @@ Pushes an new C exception handler onto the stack.
 
 PARROT_API
 void
-push_new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
+push_new_c_exception_handler(PARROT_INTERP, NOTNULL(Parrot_exception *jb))
 {
     push_exception(interp, new_c_exception_handler(interp, jb));
 }
@@ -593,7 +594,7 @@ Throw the exception.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 opcode_t *
-throw_exception(PARROT_INTERP, PMC *exception, SHIM(void *dest))
+throw_exception(PARROT_INTERP, NOTNULL(PMC *exception), SHIM(void *dest))
 {
     opcode_t *address;
     PMC * const handler = find_exception_handler(interp, exception);
@@ -627,6 +628,7 @@ Rethrow the exception.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t *
 rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
 {

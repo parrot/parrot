@@ -191,12 +191,12 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_buffer_pool(PARROT_INTERP)
 {
-    Small_Object_Pool *pool = make_bufferlike_pool(interp, sizeof (Buffer));
+    Small_Object_Pool * const pool = make_bufferlike_pool(interp, sizeof (Buffer));
 
 #ifdef GC_IS_MALLOC
-    pool->dod_object        = Parrot_dod_free_buffer_malloc;
+    pool->dod_object = Parrot_dod_free_buffer_malloc;
 #else
-    pool->dod_object        = Parrot_dod_free_buffer;
+    pool->dod_object = Parrot_dod_free_buffer;
 #endif
 
     return pool;

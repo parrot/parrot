@@ -170,8 +170,9 @@ void internal_exception(int exitcode, NOTNULL(const char *format), ...)
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC* new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
-        __attribute__nonnull__(1);
+PMC* new_c_exception_handler(PARROT_INTERP, NOTNULL(Parrot_exception *jb))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void new_internal_exception(PARROT_INTERP)
@@ -209,8 +210,10 @@ void push_exception(PARROT_INTERP, NOTNULL(PMC *handler))
         __attribute__nonnull__(2);
 
 PARROT_API
-void push_new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
-        __attribute__nonnull__(1);
+void push_new_c_exception_handler(PARROT_INTERP,
+    NOTNULL(Parrot_exception *jb))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -224,14 +227,18 @@ void real_exception(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t * rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-opcode_t * throw_exception(PARROT_INTERP, PMC *exception, SHIM(void *dest))
-        __attribute__nonnull__(1);
+opcode_t * throw_exception(PARROT_INTERP,
+    NOTNULL(PMC *exception),
+    SHIM(void *dest))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL count_exception_handlers(PARROT_INTERP)
@@ -253,6 +260,7 @@ PMC * get_all_exception_handlers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC * get_exception_handler(PARROT_INTERP, INTVAL target_depth)
         __attribute__nonnull__(1);
 

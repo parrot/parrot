@@ -707,15 +707,21 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_make_cb(PARROT_INTERP,
-    PMC* sub,
-    PMC* user_data,
+    NOTNULL(PMC* sub),
+    NOTNULL(PMC* user_data),
     NOTNULL(STRING *cb_signature))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 PARROT_API
-void Parrot_run_callback(PARROT_INTERP, PMC* user_data, char* external_data)
-        __attribute__nonnull__(1);
+void Parrot_run_callback(PARROT_INTERP,
+    NOTNULL(PMC* user_data),
+    NOTNULL(char* external_data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/inter_cb.c */
 

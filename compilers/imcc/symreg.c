@@ -75,7 +75,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-push_namespace(char * name)
+push_namespace(NOTNULL(char* name))
 {
     Namespace * const ns = (Namespace *) malloc(sizeof (*ns));
 
