@@ -1,5 +1,36 @@
 # $Id$
 
-See http://scheme2006.cs.uchicago.edu/11-ghuloum.pdf
+=head1 Eclectus
 
-See also http://www.cs.indiana.edu/%7Eaghuloum/ikarus/index.html
+Eclectus aims to be a Scheme to PIR compiler implemented in Scheme.
+It is based on Abdulaziz Ghuloums compiler tutorial.
+
+=head1 Status
+
+Still at step 1.
+
+=head1 Testing
+
+Tests are written in Scheme. The test-driver is derived from the tutorial, 
+tweaked to emit TAP.
+There are Perl 5 wrappers for the scheme test scripts, in order to allow
+unified languages testing.
+
+=head1 TODO
+
+- Step 2, immediate constants
+- Add a check whether 'petite' is installed in the Perl 5 wrappers.
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer
+
+=head1 SEE ALSO
+
+L<http://en.wikipedia.org/wiki/Eclectus>
+
+L<http://www.cs.indiana.edu/%7Eaghuloum/compilers-tutorial-2006-09-16.pdf>
+
+L<http://scheme2006.cs.uchicago.edu/11-ghuloum.pdf>
+
+L<http://www.cs.indiana.edu/%7Eaghuloum/ikarus/index.html>
