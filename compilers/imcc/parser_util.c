@@ -26,7 +26,7 @@
 #include "parser.h"
 #include "optimizer.h"
 
-#define STREQ(x,y) (strcmp((x),(y))==0)
+#define STREQ(x, y) (strcmp((x), (y))==0)
 
 /*
 

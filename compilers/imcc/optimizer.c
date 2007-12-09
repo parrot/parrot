@@ -160,7 +160,7 @@ static int used_once(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 int loop_optimization(Interp *, IMC_Unit *);
 #endif
 
-#define STREQ(x,y) (strcmp((x),(y))==0)
+#define STREQ(x, y) (strcmp((x), (y))==0)
 
 /*
 
