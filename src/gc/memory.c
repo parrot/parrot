@@ -46,7 +46,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_allocate(size_t size)
 {
-    void * const ptr = malloc((size_t)size);
+    void * const ptr = malloc(size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
