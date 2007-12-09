@@ -105,7 +105,7 @@ Nothing is printed. An array of file pathes is returned to the caller.
             # file patterns are either passed from a <language>/t/harness,
             # or a default is used
             my @file_patterns =
-                ( $options{files} && ref $options{files} eq 'ARRAY' ) ? 
+                ( $options{files} && ref $options{files} eq 'ARRAY' ) ?
                     @{ $options{files} }
                     :
                     ( 't/*.t', 't/*/*.t' );
