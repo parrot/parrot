@@ -45,7 +45,7 @@ sub runstep {
         my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
         my $size = $conf->data->get($_);
         my $format;
-        if (    
+        if (
             ( $] >= 5.006 ) &&
             ( $size == $longsize ) &&
             ( $size == $conf->data->get_p5('longsize') )

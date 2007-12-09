@@ -45,7 +45,7 @@ sub runstep {
     # %Config.  However, other later configuration steps may change
     # the corresponding values in the Parrot::Configure object.  In
     # order to provide access to the original values from Perl 5
-    # %Config, we grab those settings we need now and store them in 
+    # %Config, we grab those settings we need now and store them in
     # special keys within the Parrot::Configure object.
     # This is a multi-stage process.
 
