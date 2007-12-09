@@ -202,6 +202,8 @@ PMC * imcc_compile_pir(PARROT_INTERP, NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile_pir_ex(PARROT_INTERP, NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -229,6 +231,7 @@ int imcc_vfprintf(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction * iNEW(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
@@ -332,11 +335,17 @@ void expand_pcc_sub_ret(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-SymReg* get_const(PARROT_INTERP, const char *name, int type)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg* get_const(PARROT_INTERP, NOTNULL(const char *name), int type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-SymReg* get_pasm_reg(PARROT_INTERP, const char *name)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg* get_pasm_reg(PARROT_INTERP, NOTNULL(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: compilers/imcc/pcc.c */
 

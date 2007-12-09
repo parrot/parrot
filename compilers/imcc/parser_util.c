@@ -97,6 +97,8 @@ static const char * try_rev_cmp(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Instruction * var_arg_ins(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
@@ -145,6 +147,7 @@ iNEW(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0),
 
  */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
 iNEW(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0),
@@ -512,6 +515,8 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Instruction *
 var_arg_ins(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
@@ -1025,6 +1030,8 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pir_ex(PARROT_INTERP, NOTNULL(const char *s))
 {

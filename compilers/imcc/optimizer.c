@@ -98,6 +98,7 @@ static int branch_branch(PARROT_INTERP, NOTNULL(IMC_Unit * unit))
 static int branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int branch_cond_loop_swap(PARROT_INTERP,
     IMC_Unit *unit,
     Instruction *branch,
@@ -1153,6 +1154,7 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
         Instruction *start, Instruction *cond)

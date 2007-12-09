@@ -50,11 +50,12 @@ static void insert_tail_call(PARROT_INTERP,
 static Instruction * insINS(PARROT_INTERP,
     IMC_Unit * unit,
     NOTNULL(Instruction *ins),
-    char *name,
+    NOTNULL(const char *name),
     SymReg **regs,
     int n)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -114,7 +115,7 @@ into the current block in one call.
 
 static Instruction *
 insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
-        char *name, SymReg **regs, int n)
+        NOTNULL(const char *name), SymReg **regs, int n)
 {
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
     insert_ins(unit, ins, tmp);
@@ -132,13 +133,16 @@ get or create the SymReg
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 SymReg*
-get_pasm_reg(PARROT_INTERP, const char *name)
+get_pasm_reg(PARROT_INTERP, NOTNULL(const char *name))
 {
     SymReg * const r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 
     if (r)
         return r;
+
     return mk_pasm_reg(interp, str_dup(name));
 }
 
@@ -155,8 +159,10 @@ get or create a constant
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 SymReg*
-get_const(PARROT_INTERP, const char *name, int type)
+get_const(PARROT_INTERP, NOTNULL(const char *name), int type)
 {
     SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, name);
 
