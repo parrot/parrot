@@ -440,7 +440,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-add_pcc_multi(NOTNULL(SymReg *r), SymReg *arg)
+add_pcc_multi(NOTNULL(SymReg *r), NULLOK(SymReg *arg))
 {
     const int n       = r->pcc_sub->nmulti;
 
