@@ -69,7 +69,6 @@ our @potential_warnings = qw(
     -Wmissing-braces
     -Wmissing-declarations
     -Wmissing-field-initializers
-    -Wmissing-format-attribute
     -Wmissing-include-dirs
     -Wmissing-prototypes
     -Wnested-externs
