@@ -1,7 +1,7 @@
 /* scheduler.h
  *  Copyright (C) 2007, The Perl Foundation.
  *  SVN Info
- *     $Id: scheduler_private.h 23490 2007-12-05 12:06:10Z allison $
+ *     $Id$
  *  Overview:
  *     Parrot concurrency scheduler private core structs and flags
  *  Data Structure and Algorithms:

@@ -1,6 +1,6 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: warnings.t 23381 2007-12-02 21:33:30Z paultcochrane $
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
 
 use strict;
 use warnings;
