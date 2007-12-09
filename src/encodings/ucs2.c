@@ -157,7 +157,9 @@ static void ucs2_set_position(SHIM_INTERP,
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
 to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))>
 
 RT#48260: Not yet documented!!!
@@ -266,7 +268,9 @@ set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
 get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)>
 
 RT#48260: Not yet documented!!!
@@ -304,7 +308,9 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL coun
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
 get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)>
 
 RT#48260: Not yet documented!!!
@@ -324,7 +330,9 @@ get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
 get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *dest_string))>
 
@@ -346,7 +354,9 @@ get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))>
 
@@ -423,7 +433,8 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
 
 /*
 
-=item C<static UINTVAL
+=item C<PARROT_WARN_UNUSED_RESULT
+static UINTVAL
 codepoints(PARROT_INTERP, NOTNULL(STRING *src))>
 
 RT#48260: Not yet documented!!!
@@ -446,7 +457,8 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 
 /*
 
-=item C<static UINTVAL
+=item C<PARROT_WARN_UNUSED_RESULT
+static UINTVAL
 bytes(PARROT_INTERP, NOTNULL(STRING *src))>
 
 RT#48260: Not yet documented!!!

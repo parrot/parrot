@@ -32,8 +32,8 @@ void Parrot_NCI_nci_make_raw_nci(PARROT_INTERP, PMC *method, void *func);
 
 =item C<PARROT_API
 void
-register_nci_method(PARROT_INTERP, const int type, void *func,
-                    const char *name, const char *proto)>
+register_nci_method(PARROT_INTERP, const int type, NOTNULL(void *func),
+                    NOTNULL(const char *name), NOTNULL(const char *proto))>
 
 Create an entry in the C<nci_method_table> for the given NCI method of PMC
 class C<type>.
@@ -66,8 +66,8 @@ register_nci_method(PARROT_INTERP, const int type, NOTNULL(void *func),
 
 =item C<PARROT_API
 void
-register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void *func,
-        const char *name)>
+register_raw_nci_method_in_ns(PARROT_INTERP, const int type, NOTNULL(void *func),
+        NOTNULL(const char *name))>
 
 RT#48260: Not yet documented!!!
 
@@ -121,8 +121,8 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, NOTNULL(const char *name))
 
 =item C<PARROT_API
 void
-Parrot_compreg(PARROT_INTERP, STRING *type,
-                    Parrot_compiler_func_t func)>
+Parrot_compreg(PARROT_INTERP, NOTNULL(STRING *type),
+                    NOTNULL(Parrot_compiler_func_t func))>
 
 Register a parser/compiler function.
 

@@ -168,7 +168,8 @@ make_local_copy(PARROT_INTERP, NOTNULL(Parrot_Interp from), NULLOK(PMC *arg))
 
 /*
 
-=item C<static Shared_gc_info * get_pool(PARROT_INTERP)>
+=item C<PARROT_CAN_RETURN_NULL
+static Shared_gc_info * get_pool(PARROT_INTERP)>
 
 Get the shared gc information.  TODO: improve the docs here.
 
@@ -187,7 +188,7 @@ get_pool(PARROT_INTERP)
 
 =item C<PARROT_CAN_RETURN_NULL
 static PMC *
-make_local_args_copy(PARROT_INTERP, Parrot_Interp old_interp, PMC *args)>
+make_local_args_copy(PARROT_INTERP, Parrot_Interp old_interp, NULLOK(PMC *args))>
 
 Make a local copy of the corresponding array of arguments.
 
@@ -224,8 +225,9 @@ make_local_args_copy(PARROT_INTERP, Parrot_Interp old_interp, NULLOK(PMC *args))
 
 /*
 
-=item C<PMC *
-pt_shared_fixup(PARROT_INTERP, PMC *pmc)>
+=item C<PARROT_CAN_RETURN_NULL
+PMC *
+pt_shared_fixup(PARROT_INTERP, NOTNULL(PMC *pmc))>
 
 Fixup a PMC to be sharable. Right now, reassigns the vtable to one
 owned by some master interpreter, so the PMC can be safely reused
@@ -304,7 +306,7 @@ pt_thread_signal(NOTNULL(Parrot_Interp self), PARROT_INTERP)
 /*
 
 =item C<void
-pt_thread_wait_with(PARROT_INTERP, Parrot_mutex *mutex)>
+pt_thread_wait_with(PARROT_INTERP, NOTNULL(Parrot_mutex *mutex))>
 
 Wait for this interpreter to be signalled through its condition variable,
 dealing properly with GC issues. C<*mutex> is assumed locked on entry and
@@ -407,7 +409,7 @@ pt_thread_wait(PARROT_INTERP)
 
 =item C<PARROT_CAN_RETURN_NULL
 static void*
-thread_func(void *arg)>
+thread_func(NULLOK(void *arg))>
 
 The actual thread function.
 
@@ -518,7 +520,8 @@ pt_clone_code(Parrot_Interp d, Parrot_Interp s)
 /*
 
 =item C<static void
-pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns)>
+pt_ns_clone(NOTNULL(Parrot_Interp d), NOTNULL(PMC *dest_ns),
+            NOTNULL(Parrot_Interp s), NOTNULL(PMC *source_ns))>
 
 Clone all globals from C<s> to C<d>.
 
@@ -615,7 +618,8 @@ pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
 
 /*
 
-=item C<PMC *
+=item C<PARROT_CAN_RETURN_NULL
+PMC *
 pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, NULLOK(PMC *sub))>
 
 create a clone of the sub suitable for the other interpreter
@@ -638,7 +642,7 @@ pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, NULLOK(PMC *sub))
 /*
 
 =item C<int
-pt_thread_run(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)>
+pt_thread_run(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))>
 
 Run the C<*sub> PMC in a separate thread using interpreter in
 C<*dest_interp>.
@@ -726,7 +730,7 @@ pt_thread_run(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK
 /*
 
 =item C<int
-pt_thread_run_1(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)>
+pt_thread_run_1(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))>
 
 Runs a type 1 thread. Nothing is shared, both interpreters are free
 running without any communication.
@@ -745,7 +749,7 @@ pt_thread_run_1(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULL
 /*
 
 =item C<int
-pt_thread_run_2(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)>
+pt_thread_run_2(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))>
 
 Runs a type 2 thread. No shared variables, threads are communicating by
 sending messages.
@@ -764,7 +768,7 @@ pt_thread_run_2(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULL
 /*
 
 =item C<int
-pt_thread_run_3(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)>
+pt_thread_run_3(PARROT_INTERP, NOTNULL(PMC* dest_interp), NULLOK(PMC* sub), NULLOK(PMC *arg))>
 
 Run a type 3 thread. Threads may have shared variables and are managed
 in a thread pool.
@@ -828,7 +832,7 @@ pt_check_tid(UINTVAL tid, NOTNULL(const char *from))
 
 /*
 
-=item C<static void mutex_unlock(void *arg)>
+=item C<static void mutex_unlock(NOTNULL(void *arg))>
 
 Unlocks the mutex C<*arg>.
 
@@ -844,7 +848,8 @@ mutex_unlock(NOTNULL(void *arg))
 
 /*
 
-=item C<static int is_suspended_for_gc(PARROT_INTERP)>
+=item C<PARROT_WARN_UNUSED_RESULT
+static int is_suspended_for_gc(PARROT_INTERP)>
 
 Returns true iff C<interp> is suspended so a global GC can
 be performed. interpreter_array_mutex must be held.
@@ -872,7 +877,8 @@ is_suspended_for_gc(PARROT_INTERP)
 
 /*
 
-=item C<static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)>
+=item C<PARROT_CAN_RETURN_NULL
+static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)>
 
 XXX should this function be in a different file?
 
@@ -1190,7 +1196,8 @@ pt_suspend_self_for_gc(PARROT_INTERP)
 
 /*
 
-=item C<PMC* pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)>
+=item C<PARROT_CAN_RETURN_NULL
+PMC* pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)>
 
 Join (wait for) a joinable thread.
 

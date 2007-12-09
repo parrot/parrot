@@ -121,7 +121,7 @@ set_cstring_prop(PARROT_INTERP, NOTNULL(PMC *lib_pmc), NOTNULL(const char *what)
 /*
 
 =item C<static void
-store_lib_pmc(PARROT_INTERP, NOTNULL(NOTNULL(PMC *lib_pmc)), NOTNULL(STRING *path),
+store_lib_pmc(PARROT_INTERP, NOTNULL(PMC *lib_pmc), NOTNULL(STRING *path),
         NOTNULL(STRING *type), NOTNULL(STRING *lib_name))>
 
 Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
@@ -409,7 +409,7 @@ run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), PMC *value)>
+clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *value))>
 
 RT#48260: Not yet documented!!!
 

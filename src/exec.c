@@ -66,8 +66,8 @@ extern PARROT_API int Parrot_exec_rel_count;
 /*
 
 =item C<void
-Parrot_exec(PARROT_INTERP, opcode_t *pc,
-        opcode_t *code_start, opcode_t *code_end)>
+Parrot_exec(PARROT_INTERP, NOTNULL(opcode_t *pc),
+        NOTNULL(opcode_t *code_start), NOTNULL(opcode_t *code_end))>
 
 Call the jit to get the program code. Adds the members of the data
 section. And emits the executable.
@@ -264,10 +264,11 @@ Parrot_exec_add_symbol(NOTNULL(Parrot_exec_objfile_t *obj),
 /*
 
 =item C<PARROT_API
+PARROT_CAN_RETURN_NULL
 int *
 Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
-                                     char *nptr, const char *var, int offset,
-                                     int disp)>
+                                     NOTNULL(char *nptr), NOTNULL(const char *var),
+                                     int offset, int disp)>
 
 RT#48260: Not yet documented!!!
 
@@ -291,7 +292,7 @@ Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
 =item C<PARROT_API
 void
 Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
-                                      char *nptr, const char *func_name)>
+                                      NOTNULL(char *nptr), NOTNULL(const char *func_name))>
 
 RT#48260: Not yet documented!!!
 
@@ -311,8 +312,8 @@ Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
 
 =item C<PARROT_API
 void
-Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr,
-    int type, const char *symbol, int disp)>
+Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), NOTNULL(char *nptr),
+    int type, NOTNULL(const char *symbol), int disp)>
 
 Adds a text rellocation to the object file.
 

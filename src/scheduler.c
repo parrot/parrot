@@ -81,7 +81,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void*
-scheduler_runloop(NOTNULL(PMC *data))>
+scheduler_runloop(NOTNULL(PMC *scheduler))>
 
 The scheduler runloop is started by the interpreter. It manages the flow of
 concurrent scheduling for the parent interpreter, and for lightweight
@@ -138,7 +138,8 @@ scheduler_runloop(NOTNULL(PMC *scheduler))
 
 /*
 
-=item C<static int
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
 Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))>
 
 Handle the pending tasks in the scheduler's task list. Returns when there are
@@ -178,7 +179,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_runloop_sleep(PARROT_INTERP, NOTNULL(PMC *scheduler))>
+=item C<void Parrot_cx_runloop_sleep(NOTNULL(PMC *scheduler))>
 
 Pause the scheduler runloop. Called when there are no more pending tasks in the
 scheduler's task list, to freeze the runloop until there are tasks to handle.

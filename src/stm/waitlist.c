@@ -83,7 +83,8 @@ static void waitlist_signal_one(NOTNULL(struct waitlist_entry *who))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static struct waitlist_thread_data *
 get_thread(PARROT_INTERP)>
 
@@ -115,6 +116,7 @@ get_thread(PARROT_INTERP)
 /*
 
 =item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static struct waitlist_thread_data *
 get_thread_noalloc(PARROT_INTERP)>
 
@@ -135,7 +137,8 @@ get_thread_noalloc(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static struct waitlist_entry *
 alloc_entry(PARROT_INTERP)>
 
@@ -237,7 +240,7 @@ remove_first(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *exp
 /*
 
 =item C<static void
-waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)>
+waitlist_remove(NULLOK(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *what))>
 
 RT#48260: Not yet documented!!!
 
@@ -296,7 +299,7 @@ waitlist_remove(NULLOK(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *w
 /*
 
 =item C<static void
-waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what)>
+waitlist_remove_check(NULLOK(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *what))>
 
 RT#48260: Not yet documented!!!
 
@@ -325,7 +328,7 @@ waitlist_remove_check(NULLOK(STM_waitlist *waitlist), NOTNULL(struct waitlist_en
 /*
 
 =item C<static void
-waitlist_signal_one(struct waitlist_entry *who)>
+waitlist_signal_one(NOTNULL(struct waitlist_entry *who))>
 
 RT#48260: Not yet documented!!!
 
@@ -354,7 +357,7 @@ waitlist_signal_one(NOTNULL(struct waitlist_entry *who))
 /*
 
 =item C<static void
-waitlist_signal_all(STM_waitlist *list)>
+waitlist_signal_all(NOTNULL(STM_waitlist *list))>
 
 RT#48260: Not yet documented!!!
 
@@ -401,7 +404,7 @@ waitlist_signal_all(NOTNULL(STM_waitlist *list))
 /*
 
 =item C<void
-Parrot_STM_waitlist_add_self(PARROT_INTERP, STM_waitlist *waitlist)>
+Parrot_STM_waitlist_add_self(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist))>
 
 RT#48260: Not yet documented!!!
 
@@ -426,7 +429,7 @@ Parrot_STM_waitlist_add_self(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist)) {
 /*
 
 =item C<void
-Parrot_STM_waitlist_signal(PARROT_INTERP, STM_waitlist *waitlist)>
+Parrot_STM_waitlist_signal(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist))>
 
 RT#48260: Not yet documented!!!
 
@@ -568,7 +571,8 @@ Parrot_STM_waitlist_destroy_thread(PARROT_INTERP)
 
 /*
 
-=item C<static STM_tx_log *
+=item C<PARROT_CANNOT_RETURN_NULL
+static STM_tx_log *
 Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)>
 
 RT#48260: Not yet documented!!!
@@ -613,7 +617,8 @@ Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<STM_tx_log *
+=item C<PARROT_CANNOT_RETURN_NULL
+STM_tx_log *
 Parrot_STM_tx_log_get(PARROT_INTERP)>
 
 RT#48260: Not yet documented!!!

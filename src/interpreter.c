@@ -539,7 +539,7 @@ exec_init_prederef(PARROT_INTERP, void *prederef_arena)
 /*
 
 =item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 void *
 init_jit(PARROT_INTERP, NULLOK(opcode_t *pc))>
 
