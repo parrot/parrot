@@ -242,7 +242,8 @@ symreg_to_str(NOTNULL(const SymReg *s))
 {
     /* NOTE: the below magic number encompasses all the quoted strings which
      * may be included in the sprintf output */
-    char * const buf = (char *) malloc(250 + strlen(s->name)); /* XXX This needs to check for NULL */
+    /* XXX This needs to check for NULL */
+    char * const buf = (char *) malloc(250 + strlen(s->name));
     const int    t   = s->type;
 
     sprintf(buf, "symbol [%s]  set [%c]  color [" INTVAL_FMT "]  type [",
