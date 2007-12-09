@@ -202,7 +202,7 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
         }
     }
 
-    /* XXX FIXME: Now the way to check for a sub is unit->type */
+    /* RT#48280: Now the way to check for a sub is unit->type */
     ins = unit->instructions;
     if (first && ins->type == ITLABEL && (ins->r[0]->type & VT_PCC_SUB)) {
         IMCC_debug(interp, DEBUG_CFG, "pcc_sub %s nparams %d\n",
@@ -225,7 +225,7 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
 
         if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
             if (first) {
-                /* XXX FIXME: Now the way to check for a sub is unit->type */
+                /* RT#48280: Now the way to check for a sub is unit->type */
                 if (ins->type & ITLABEL) {
                     expand_pcc_sub_ret(interp, unit, ins);
                     ins->type &= ~ITLABEL;
@@ -475,7 +475,7 @@ bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
     else {
         IMCC_debug(interp, DEBUG_CFG, "register branch %I ",
                 from->end);
-        /* XXX is probably only ok, if the invoke is "near" the
+        /* RT#48282 is probably only ok, if the invoke is "near" the
          *     set_addr ins
          */
         for (ins = from->end; ins; ins = ins->prev) {
@@ -893,8 +893,8 @@ propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
     Basic_block *pred;
     Life_range *l;
 
-    l = r->life_info[bb->index]; /* XXX Will never get used */
-    /* l->last_ins = bb->end; XXX:leo why? */
+    l = r->life_info[bb->index]; /* RT#48284 Will never get used */
+    /* l->last_ins = bb->end; RT#48284:leo why? */
 
     /* every predecessor of a LF_lv_in block must be in LF_lv_out
        and, unless itself is LV_def, this should be propagated to
@@ -923,7 +923,7 @@ propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
                  * where the var is not initialized, so this might
                  * even be correct :)
                  *
-                 * XXX subroutines
+                 * RT#48286 subroutines
                  */
 #if 0
                 if (pred->index == 0) {
