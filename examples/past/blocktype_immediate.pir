@@ -62,3 +62,9 @@ F<docs/pdds/pdd26_ast.pod>
     _dumper( result, 'result' )
 
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
