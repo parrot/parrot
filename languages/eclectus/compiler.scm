@@ -23,12 +23,8 @@
 "
 .sub drive :main
 
-    .local pmc x
-    ( x ) = scheme_entry()
-
     .local pmc val_x
-    val_x = new 'PAST::Val'
-    val_x.init( 'value' => x, 'returns' => 'Integer' )
+    ( val_x ) = scheme_entry()
 
     .local pmc var_last
     var_last = new 'PAST::Var'
@@ -86,11 +82,11 @@
   (emit 
 "
 .sub scheme_entry
-    .local pmc x
-    x = new 'Integer'
-    x = ~a
+    .local pmc val_x
+    val_x = new 'PAST::Val'
+    val_x.init( 'value' => ~a, 'returns' => 'Integer' )
 
-    .return ( x )
+    .return ( val_x )
 .end
 "
  x ) )
