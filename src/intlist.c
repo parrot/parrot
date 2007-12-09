@@ -323,7 +323,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 intlist_get(PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx)
 {
-    // XXX list_get can return NULL RT #48367
+    /* XXX list_get can return NULL RT #48367 */
     void * const ret = list_get(interp, (List *)list, idx, enum_type_INTVAL);
     const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
