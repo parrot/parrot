@@ -1400,9 +1400,8 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-dead_code_remove(PARROT_INTERP, IMC_Unit * unit)
+dead_code_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
-    Basic_block *bb;
     int i;
     int changed = 0;
     Instruction *ins, *last;
@@ -1415,12 +1414,13 @@ dead_code_remove(PARROT_INTERP, IMC_Unit * unit)
     /* Unreachable blocks */
 
     for (i=1; i < unit->n_basic_blocks; i++) {
-        bb = unit->bb_list[i];
+        Basic_block * const bb = unit->bb_list[i];
+
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
             continue;
         /* this block isn't entered from anywhere */
         if (!bb->pred_list) {
-            int bbi = bb->index;
+            const int bbi = bb->index;
             IMCC_debug(interp, DEBUG_OPT1,
                        "found dead block %d\n", bb->index);
             for (ins = bb->start; ins && ins->bbindex == bbi;) {
