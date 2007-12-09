@@ -102,7 +102,11 @@ src/pct/PlumheadPAST_gen.pir: src/pct/PlumheadPAST.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir \
             --output=src/pct/PlumheadPAST_gen.pir src/pct/PlumheadPAST.tg
 
-plumhead.pbc: src/common/plumhead.pir src/pct/Plumhead_gen.pir src/pct/PlumheadPAST_gen.pir
+plumhead.pbc: \
+    src/common/plumhead.pir \
+    src/pct/Plumhead/Grammar.pir \
+    src/pct/Plumhead_gen.pir \
+    src/pct/PlumheadPAST_gen.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
 test:     all test-pct
