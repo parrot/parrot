@@ -124,7 +124,7 @@ Instruction * _mk_instruction(
     NOTNULL(const char *op),
     NOTNULL(const char *fmt),
     int n,
-    SymReg ** r,
+    SymReg **r,
     int flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

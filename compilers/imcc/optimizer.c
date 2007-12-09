@@ -100,11 +100,12 @@ static int branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
 
 PARROT_WARN_UNUSED_RESULT
 static int branch_cond_loop_swap(PARROT_INTERP,
-    IMC_Unit *unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction *branch),
     NOTNULL(Instruction *start),
     NOTNULL(Instruction *cond))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
@@ -120,8 +121,14 @@ static int dead_code_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static int eval_ins(PARROT_INTERP,
+    NOTNULL(const char *op),
+    size_t ops,
+    NOTNULL(SymReg **r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 static int if_branch(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -715,11 +722,11 @@ rewrite e.g. add_n_ic => add_n_nc
 */
 
 Instruction *
-IMCC_subst_constants_umix(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
-        SymReg **r, int n)
+IMCC_subst_constants_umix(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
+        NOTNULL(SymReg **r), int n)
 {
     Instruction *tmp;
-    const char *ops[] = {
+    const char * const ops[] = {
         "abs", "add", "div", "mul", "sub", "fdiv"
     };
     size_t i;
@@ -755,8 +762,9 @@ core evaluates the constants.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
-eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
+eval_ins(PARROT_INTERP, NOTNULL(const char *op), size_t ops, NOTNULL(SymReg **r))
 {
     opcode_t eval[4], *pc;
     int opnum;
@@ -1163,7 +1171,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, NOTNULL(Instruction *branch),
+branch_cond_loop_swap(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *branch),
         NOTNULL(Instruction *start), NOTNULL(Instruction *cond))
 {
     int changed = 0;

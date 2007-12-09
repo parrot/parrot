@@ -97,7 +97,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Instruction *
 _mk_instruction(NOTNULL(const char *op), NOTNULL(const char *fmt), int n,
-        SymReg ** r, int flags)
+        SymReg **r, int flags)
 {
     int i, reg_space;
     Instruction * ins;

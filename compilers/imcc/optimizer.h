@@ -35,12 +35,14 @@ Instruction * IMCC_subst_constants(PARROT_INTERP,
         __attribute__nonnull__(6);
 
 Instruction * IMCC_subst_constants_umix(PARROT_INTERP,
-    IMC_Unit * unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(const char *name),
-    SymReg **r,
+    NOTNULL(SymReg **r),
     int n)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 int is_invariant(PARROT_INTERP,
     NOTNULL(IMC_Unit * unit),
