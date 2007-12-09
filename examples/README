@@ -22,7 +22,7 @@ nci        - Native call interface
 
 pasm       - Examples in Parrot Assembler, PASM
 
-past       - Examples in Leo's Parrot Abstract Syntax Tree, PAST
+past       - Examples of PAST, Parrot Abstract Syntax Tree, see pdd26_ast
 
 pge        - Parrot grammar engine
 
@@ -35,3 +35,7 @@ shootout   - PIR for the great computer languages shootout at http://shootout.al
 streams    - Examples for the streams library
 
 subs       - calling subroutines in PIR and PASM
+
+tge        - usage of TGE, see compilers/tge
+
+tutorial   - a PIR tutorial
