@@ -66,7 +66,7 @@ my $cwd = cwd();
     my $file = 'foobar';
     eval { auto::pmc::contains_pccmethod($file); };
     like($@, qr/Can't read '$file'/, "Got expected 'die' message"); #'
-    
+
     ok( chdir $cwd, 'changed back to original directory after testing' );
 }
 
