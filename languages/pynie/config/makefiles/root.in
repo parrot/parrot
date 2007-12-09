@@ -58,7 +58,6 @@ help:
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
 	@echo "  testclean:         Clean up test results."
-	@echo "  spectest:          Run the official Perl 6 tests"
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Basic cleaning up."
