@@ -338,7 +338,9 @@ old_blocks(void)
 
 /*
 
-=item C<opcode_t *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t *
 make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
 RT#48260: Not yet documented!!!
@@ -413,7 +415,8 @@ make_new_sub(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static int
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
 get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))>
 
 get size/line of bytecode in ops till now
@@ -568,7 +571,9 @@ get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
 
 /*
 
-=item C<static subs_t *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static subs_t *
 find_global_label(NOTNULL(const char *name), NOTNULL(const subs_t *sym), NOTNULL(int *pc))>
 
 get a global label, return the pc (absolute)
@@ -706,7 +711,9 @@ fixup_globals(PARROT_INTERP)
 
 /*
 
-=item C<STRING *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
 IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))>
 
 RT#48260: Not yet documented!!!
@@ -762,7 +769,8 @@ IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 
 /*
 
-=item C<static int
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
 add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))>
 
 add constant string to constant_table
@@ -786,8 +794,9 @@ add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
 
 /*
 
-=item C<static int
-add_const_num(PARROT_INTERP, const char *buf)>
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+add_const_num(PARROT_INTERP, NULLOK(const char *buf))>
 
 RT#48260: Not yet documented!!!
 
@@ -810,7 +819,9 @@ add_const_num(PARROT_INTERP, NULLOK(const char *buf))
 
 /*
 
-=item C<static PMC*
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+static PMC*
 mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))>
 
 RT#48260: Not yet documented!!!
@@ -872,8 +883,10 @@ typedef void (*decl_func_t)(Interp *, PMC*, STRING *, INTVAL);
 
 /*
 
-=item C<static PMC*
-create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC*
+create_lexinfo(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(PMC *sub), int need_lex)>
 
 RT#48260: Not yet documented!!!
 
@@ -958,7 +971,9 @@ create_lexinfo(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(PMC *sub), int ne
 
 /*
 
-=item C<static PMC*
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC*
 find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
 RT#48260: Not yet documented!!!
@@ -1219,6 +1234,8 @@ add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const ch
 /*
 
 =item C<PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const char *
 slice_deb(int bits)>
 
@@ -1650,7 +1667,7 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 /*
 
 =item C<static void
-verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)>
+verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), NOTNULL(opcode_t *pc))>
 
  - check if any get_ argument contains constants
  - fill in type bits for argument types and constants, if missing

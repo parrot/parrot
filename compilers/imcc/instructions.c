@@ -83,9 +83,10 @@ static int emitter;     /* XXX */
 /*
 
 =item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Instruction *
 _mk_instruction(NOTNULL(const char *op), NOTNULL(const char *fmt), int n,
-        SymReg ** r, int flags)>
+        SymReg **r, int flags)>
 
 Creates a new instruction
 
@@ -580,7 +581,8 @@ move_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), NOTNULL(Ins
 
 /*
 
-=item C<Instruction *
+=item C<PARROT_CAN_RETURN_NULL
+Instruction *
 emitb(PARROT_INTERP, NULLOK(struct _IMC_Unit *unit), NULLOK(Instruction *i))>
 
 Emit a single instruction into the current unit buffer.

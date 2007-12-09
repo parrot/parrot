@@ -104,7 +104,7 @@ static void unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
 
 =item C<static Instruction *
 insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
-        char *name, SymReg **regs, int n)>
+        NOTNULL(const char *name), SymReg **regs, int n)>
 
 Utility instruction routine. Creates and inserts an instruction
 into the current block in one call.
@@ -124,8 +124,10 @@ insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
 
 /*
 
-=item C<SymReg*
-get_pasm_reg(PARROT_INTERP, const char *name)>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg*
+get_pasm_reg(PARROT_INTERP, NOTNULL(const char *name))>
 
 get or create the SymReg
 
@@ -147,11 +149,11 @@ get_pasm_reg(PARROT_INTERP, NOTNULL(const char *name))
 }
 
 /*
- */
-/*
 
-=item C<SymReg*
-get_const(PARROT_INTERP, const char *name, int type)>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg*
+get_const(PARROT_INTERP, NOTNULL(const char *name), int type)>
 
 get or create a constant
 
@@ -244,7 +246,7 @@ pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
 /*
 
 =item C<static void
-unshift_self(NOTNULL(SymReg *sub), SymReg *obj)>
+unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))>
 
 prepend the object to args or self to params
 
@@ -477,8 +479,10 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo
 
 /*
 
-=item C<static Instruction *
-move_regs(PARROT_INTERP, IMC_Unit * unit,
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Instruction *
+move_regs(PARROT_INTERP, IMC_Unit *unit,
         NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)>
 
 RT#48260: Not yet documented!!!

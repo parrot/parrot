@@ -134,7 +134,8 @@ static INTVAL eval_nr = 0;
 
 =over 4
 
-=item C<PARROT_CAN_RETURN_NULL
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction *
 iNEW(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0),
         NOTNULL(char *type), NULLOK(SymReg *init), int emit)>
@@ -506,7 +507,9 @@ is_infix(NOTNULL(const char *name), int n, NOTNULL(SymReg **r))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static Instruction *
 var_arg_ins(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
         NOTNULL(SymReg **r), int n, int emit)>
@@ -919,7 +922,9 @@ imcc_compile(PARROT_INTERP, NOTNULL(const char *s), int pasm_file,
 
 /*
 
-=item C<PMC *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
 imcc_compile_pasm(PARROT_INTERP, NOTNULL(const char *s))>
 
 TODO: Needs to be documented!!!
@@ -942,7 +947,9 @@ imcc_compile_pasm(PARROT_INTERP, NOTNULL(const char *s))
 
 /*
 
-=item C<PMC *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
 imcc_compile_pir(PARROT_INTERP, NOTNULL(const char *s))>
 
 TODO: Needs to be documented!!!
@@ -965,7 +972,9 @@ imcc_compile_pir(PARROT_INTERP, NOTNULL(const char *s))
 
 /*
 
-=item C<PMC *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
 IMCC_compile_pir_s(PARROT_INTERP, NOTNULL(const char *s),
                    NOTNULL(STRING **error_message))>
 
@@ -986,7 +995,9 @@ IMCC_compile_pir_s(PARROT_INTERP, NOTNULL(const char *s),
 
 /*
 
-=item C<PMC *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
 IMCC_compile_pasm_s(PARROT_INTERP, NOTNULL(const char *s),
                     NOTNULL(STRING **error_message))>
 
@@ -1007,7 +1018,9 @@ IMCC_compile_pasm_s(PARROT_INTERP, NOTNULL(const char *s),
 
 /*
 
-=item C<PMC *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
 imcc_compile_pasm_ex(PARROT_INTERP, NOTNULL(const char *s))>
 
 TODO: Needs to be documented!!!
@@ -1033,7 +1046,9 @@ imcc_compile_pasm_ex(PARROT_INTERP, NOTNULL(const char *s))
 
 /*
 
-=item C<PMC *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
 imcc_compile_pir_ex(PARROT_INTERP, NOTNULL(const char *s))>
 
 TODO: Needs to be documented!!!
@@ -1286,8 +1301,8 @@ change_op(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg **r), int num, 
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-try_find_op(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
-        SymReg ** r, int n, int keyvec, int emit)>
+try_find_op(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
+        NOTNULL(SymReg **r), int n, int keyvec, int emit)>
 
 Try to find valid op doing the same operation e.g.
 
@@ -1425,7 +1440,8 @@ try_rev_cmp(NOTNULL(const char *name), NOTNULL(SymReg **r))
 
 /*
 
-=item C<Instruction *
+=item C<PARROT_CAN_RETURN_NULL
+Instruction *
 multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
             NOTNULL(SymReg **r), int nr, int keyvec, int emit)>
 
@@ -1667,6 +1683,7 @@ imcc_vfprintf(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const char *format), va_
 
 =item C<PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 char *
 str_dup(NOTNULL(const char *old))>
 

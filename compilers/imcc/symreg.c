@@ -70,7 +70,7 @@ static void resize_symhash(NOTNULL(SymHash *hsh))
 /*
 
 =item C<void
-push_namespace(char * name)>
+push_namespace(NOTNULL(char *name))>
 
 RT#48260: Not yet documented!!!
 
@@ -79,7 +79,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-push_namespace(NOTNULL(char* name))
+push_namespace(NOTNULL(char *name))
 {
     Namespace * const ns = (Namespace *) mem_sys_allocate(sizeof (*ns));
 
@@ -128,7 +128,9 @@ pop_namespace(NULLOK(char *name))
 
 /*
 
-=item C<static SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static SymReg *
 _get_sym_typed(NOTNULL(const SymHash *hsh), NOTNULL(const char *name), int t)>
 
 Gets a symbol from the hash
@@ -157,7 +159,9 @@ _get_sym_typed(NOTNULL(const SymHash *hsh), NOTNULL(const char *name), int t)
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 _mk_symreg(NOTNULL(SymHash* hsh), NOTNULL(char *name), int t)>
 
 Makes a new SymReg from its varname and type
@@ -204,7 +208,9 @@ _mk_symreg(NOTNULL(SymHash* hsh), NOTNULL(char *name), int t)
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_symreg(PARROT_INTERP, NOTNULL(char *name), int t)>
 
 RT#48260: Not yet documented!!!
@@ -225,6 +231,8 @@ mk_symreg(PARROT_INTERP, NOTNULL(char *name), int t)
 /*
 
 =item C<PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 char *
 symreg_to_str(NOTNULL(const SymReg *s))>
 
@@ -268,7 +276,9 @@ symreg_to_str(NOTNULL(const SymReg *s))
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_temp_reg(PARROT_INTERP, int t)>
 
 RT#48260: Not yet documented!!!
@@ -290,7 +300,9 @@ mk_temp_reg(PARROT_INTERP, int t)
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_pcc_sub(PARROT_INTERP, NOTNULL(char *name), int proto)>
 
 RT#48260: Not yet documented!!!
@@ -432,7 +444,7 @@ add_pcc_result(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 /*
 
 =item C<void
-add_pcc_multi(NOTNULL(SymReg *r), SymReg *arg)>
+add_pcc_multi(NOTNULL(SymReg *r), NULLOK(SymReg *arg))>
 
 RT#48260: Not yet documented!!!
 
@@ -472,7 +484,7 @@ add_pcc_return(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 /*
 
 =item C<void
-add_pcc_sub(NOTNULL(SymReg *r), SymReg * arg)>
+add_pcc_sub(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))>
 
 RT#48260: Not yet documented!!!
 
@@ -489,7 +501,7 @@ add_pcc_sub(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 /*
 
 =item C<void
-add_pcc_cc(NOTNULL(SymReg *r), SymReg *arg)>
+add_pcc_cc(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))>
 
 RT#48260: Not yet documented!!!
 
@@ -505,8 +517,10 @@ add_pcc_cc(NOTNULL(SymReg *r), NOTNULL(SymReg *arg))
 
 /*
 
-=item C<SymReg *
-mk_pasm_reg(PARROT_INTERP, char *name)>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
+mk_pasm_reg(PARROT_INTERP, NOTNULL(char *name))>
 
 RT#48260: Not yet documented!!!
 
@@ -536,7 +550,9 @@ mk_pasm_reg(PARROT_INTERP, NOTNULL(char *name))
 
 /*
 
-=item C<char *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+char *
 _mk_fullname(NULLOK(const Namespace *ns), NOTNULL(const char *name))>
 
 RT#48260: Not yet documented!!!
@@ -563,7 +579,9 @@ _mk_fullname(NULLOK(const Namespace *ns), NOTNULL(const char *name))
 
 /*
 
-=item C<char *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+char *
 mk_fullname(NOTNULL(const char *name))>
 
 RT#48260: Not yet documented!!!
@@ -708,7 +726,9 @@ mk_pmc_const_2(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *left), NO
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_const_ident(PARROT_INTERP,
         NOTNULL(char *name), int t, NOTNULL(SymReg *val), int global)>
 
@@ -762,7 +782,9 @@ mk_const_ident(PARROT_INTERP,
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 _mk_const(NOTNULL(SymHash *hsh), NOTNULL(const char *name), int t)>
 
 Makes a new constant
@@ -793,7 +815,9 @@ _mk_const(NOTNULL(SymHash *hsh), NOTNULL(const char *name), int t)
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_const(PARROT_INTERP, NOTNULL(const char *name), int t)>
 
 RT#48260: Not yet documented!!!
@@ -817,7 +841,9 @@ mk_const(PARROT_INTERP, NOTNULL(const char *name), int t)
 
 /*
 
-=item C<static char *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static char *
 add_ns(PARROT_INTERP, NOTNULL(char *name))>
 
 add namespace to sub if any
@@ -863,7 +889,9 @@ add_ns(PARROT_INTERP, NOTNULL(char *name))
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
             int uniq)>
 
@@ -915,8 +943,10 @@ _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
 
 /*
 
-=item C<SymReg *
-mk_address(PARROT_INTERP, char *name, int uniq)>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
+mk_address(PARROT_INTERP, NOTNULL(char *name), int uniq)>
 
 Eventually make mk_address static
 
@@ -942,7 +972,9 @@ mk_address(PARROT_INTERP, NOTNULL(char *name), int uniq)
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_sub_label(PARROT_INTERP, NOTNULL(char *name))>
 
 Make and store a new address label for a sub.
@@ -967,7 +999,9 @@ mk_sub_label(PARROT_INTERP, NOTNULL(char *name))
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_sub_address(PARROT_INTERP, NOTNULL(char *name))>
 
 Make a symbol for a label, symbol gets a fixup entry.
@@ -991,7 +1025,9 @@ mk_sub_address(PARROT_INTERP, NOTNULL(char *name))
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_local_label(PARROT_INTERP, NOTNULL(char *name))>
 
 Make a local symbol, no fixup entry.
@@ -1011,7 +1047,9 @@ mk_local_label(PARROT_INTERP, NOTNULL(char *name))
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg *
 mk_label_address(PARROT_INTERP, NOTNULL(char *name))>
 
 RT#48260: Not yet documented!!!
@@ -1033,6 +1071,7 @@ mk_label_address(PARROT_INTERP, NOTNULL(char *name))
 /*
 
 =item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 dup_sym(NOTNULL(const SymReg *r))>
 
@@ -1090,7 +1129,8 @@ dup_sym(NOTNULL(const SymReg *r))
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_CANNOT_RETURN_NULL
+SymReg *
 link_keys(PARROT_INTERP, int nargs, NOTNULL(SymReg * keys[]), int force)>
 
 RT#48260: Not yet documented!!!
@@ -1347,7 +1387,7 @@ store_symreg(PARROT_INTERP, NOTNULL(SymReg *r))
 =item C<PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg *
-_get_sym(NOTNULL(SymHash *hsh), NOTNULL(const char *name))>
+_get_sym(NOTNULL(const SymHash *hsh), NOTNULL(const char *name))>
 
 Gets a symbol from the hash
 

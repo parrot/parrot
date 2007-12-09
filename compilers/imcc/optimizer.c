@@ -616,7 +616,7 @@ strength_reduce(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 /*
 
 =item C<static int
-constant_propagation(PARROT_INTERP, IMC_Unit * unit)>
+constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
 Does conservative constant propagation.
 This code will not propagate constants past labels or saves,
@@ -720,8 +720,8 @@ next_constant:;
 /*
 
 =item C<Instruction *
-IMCC_subst_constants_umix(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
-        SymReg **r, int n)>
+IMCC_subst_constants_umix(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
+        NOTNULL(SymReg **r), int n)>
 
 rewrite e.g. add_n_ic => add_n_nc
 
@@ -761,8 +761,9 @@ IMCC_subst_constants_umix(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const 
 
 /*
 
-=item C<static int
-eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)>
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+eval_ins(PARROT_INTERP, NOTNULL(const char *op), size_t ops, NOTNULL(SymReg **r))>
 
 Run one parrot instruction, registers are filled with the
 according constants. Thus the result is always ok as the function
@@ -1171,9 +1172,10 @@ branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static int
-branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
-        Instruction *start, Instruction *cond)>
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+branch_cond_loop_swap(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *branch),
+        NOTNULL(Instruction *start), NOTNULL(Instruction *cond))>
 
 RT#48260: Not yet documented!!!
 
@@ -1415,7 +1417,7 @@ unused_label(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 /*
 
 =item C<static int
-dead_code_remove(PARROT_INTERP, IMC_Unit * unit)>
+dead_code_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
 
 RT#48260: Not yet documented!!!
 

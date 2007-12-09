@@ -39,6 +39,7 @@ RT#48264
 /*
 
 =item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set*
 set_make(int length)>
 
@@ -62,6 +63,7 @@ set_make(int length)
 /*
 
 =item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set*
 set_make_full(int length)>
 
@@ -124,6 +126,7 @@ set_clear(NOTNULL(Set *s))
 /*
 
 =item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set*
 set_copy(NOTNULL(Set *s))>
 
@@ -272,6 +275,7 @@ set_contains(NOTNULL(const Set *s), int element)
 /*
 
 =item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set *
 set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
 
@@ -303,6 +307,7 @@ set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 /*
 
 =item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Set *
 set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
 
