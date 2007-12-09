@@ -249,22 +249,21 @@ prepend the object to args or self to params
 static void
 unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
 {
+    struct pcc_sub_t * const pcc_sub = sub->pcc_sub;
+    const int n = pcc_sub->nargs;
     int i;
-    const int n = sub->pcc_sub->nargs;
 
-    sub->pcc_sub->args      = (SymReg **)realloc(sub->pcc_sub->args,
-            (n + 1) * sizeof (SymReg *));
-    sub->pcc_sub->arg_flags = (int *)realloc(sub->pcc_sub->arg_flags,
-            (n + 1) * sizeof (int));
+    pcc_sub->args      = (SymReg **)realloc(pcc_sub->args, (n + 1) * sizeof (SymReg *));
+    pcc_sub->arg_flags = (int *)realloc(pcc_sub->arg_flags, (n + 1) * sizeof (int));
 
     for (i = n; i; --i) {
-        sub->pcc_sub->args[i]      = sub->pcc_sub->args[i - 1];
-        sub->pcc_sub->arg_flags[i] = sub->pcc_sub->arg_flags[i - 1];
+        pcc_sub->args[i]      = pcc_sub->args[i - 1];
+        pcc_sub->arg_flags[i] = pcc_sub->arg_flags[i - 1];
     }
 
-    sub->pcc_sub->args[0]      = obj;
-    sub->pcc_sub->arg_flags[0] = 0;
-    sub->pcc_sub->nargs++;
+    pcc_sub->args[0]      = obj;
+    pcc_sub->arg_flags[0] = 0;
+    pcc_sub->nargs++;
 }
 
 /*
