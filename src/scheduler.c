@@ -78,7 +78,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
         /* Start the scheduler runloop */
         THREAD_CREATE_JOINABLE(sched_struct->runloop_handle,
-                        scheduler_runloop, (void *) scheduler);
+                        (void *) scheduler_runloop, (void *) scheduler);
 
     }
 }
