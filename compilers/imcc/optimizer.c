@@ -116,8 +116,9 @@ static int constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int dead_code_remove(PARROT_INTERP, IMC_Unit * unit)
-        __attribute__nonnull__(1);
+static int dead_code_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
         __attribute__nonnull__(1);
@@ -151,6 +152,8 @@ static int used_once(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 #if DO_LOOP_OPTIMIZATION
 int loop_optimization(Interp *, IMC_Unit *);
 #endif
+
+#define STREQ(x,y) (strcmp((x),(y))==0)
 
 /*
 
@@ -268,9 +271,9 @@ get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))
     unsigned int i;
     for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
         *n = br_pairs[i].n;
-        if (strcmp(op, br_pairs[i].op) == 0)
+        if (STREQ(op, br_pairs[i].op))
             return br_pairs[i].nop;
-        if (strcmp(op, br_pairs[i].nop) == 0)
+        if (STREQ(op, br_pairs[i].nop))
             return br_pairs[i].op;
     }
     return 0;
@@ -311,7 +314,7 @@ if_branch(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     for (ins = last->next; ins;) {
         if ((last->type & ITBRANCH) &&          /* if ...L1 */
                 (ins->type & IF_goto) &&        /* branch L2*/
-                !strcmp(ins->op, "branch") &&
+                STREQ(ins->op, "branch") &&
                 (reg = get_branch_regno(last)) >= 0) {
             SymReg * const br_dest = last->r[reg];
             if (ins->next &&
@@ -623,14 +626,14 @@ constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     IMCC_info(interp, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
         found = 0;
-        if (!strcmp(ins->op, "set") &&
+        if (STREQ(ins->op, "set") &&
                 ins->opsize == 3 &&             /* no keyed set */
                 ins->r[1]->type == VTCONST &&
                 ins->r[0]->set != 'P') {        /* no PMC consts */
             found = 1;
             c = ins->r[1];
             o = ins->r[0];
-        } else if (!strcmp(ins->op, "null") && ins->r[0]->set == 'I') {
+        } else if (STREQ(ins->op, "null") && ins->r[0]->set == 'I') {
             found = 1;
             c = mk_const(interp, str_dup("0"), 'I');
             o = ins->r[0];
@@ -648,7 +651,7 @@ constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
                 /* was opsize - 2, changed to n_r - 1
                  */
                 for (i = ins2->n_r - 1; i >= 0; i--) {
-                    if (!strcmp(o->name, ins2->r[i]->name)) {
+                    if (STREQ(o->name, ins2->r[i]->name)) {
                         if (instruction_writes(ins2, ins2->r[i]))
                             goto next_constant;
                         else if (instruction_reads(ins2, ins2->r[i])) {
@@ -728,7 +731,7 @@ IMCC_subst_constants_umix(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *na
                 r[0]->set == 'N' &&
                 r[1]->type == VTCONST &&
                 r[1]->set == 'I' &&
-                !strcmp(name, ops[i])) {
+                STREQ(name, ops[i])) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %s_nc_ic => ", name);
             strcpy(b, r[1]->name);
             r[1] = mk_const(interp, str_dup(b), 'N');
@@ -894,7 +897,7 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
         if (n == 4 &&
                 r[1]->type & (VTCONST|VT_CONSTP) &&
                 r[2]->type & (VTCONST|VT_CONSTP) &&
-                !strcmp(name, ops[i])) {
+                STREQ(name, ops[i])) {
             found = 4;
             /*
              * create instruction e.g. add_i_ic_ic => add_i_i_i
@@ -911,7 +914,7 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
          */
         if (n == 3 &&
                 r[1]->type & (VTCONST|VT_CONSTP) &&
-                !strcmp(name, ops2[i])) {
+                STREQ(name, ops2[i])) {
             found = 3;
             sprintf(op, "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set));
@@ -926,7 +929,7 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
         if (n == 4 &&
                 r[0]->type & (VTCONST|VT_CONSTP) &&
                 r[1]->type & (VTCONST|VT_CONSTP)  &&
-                !strcmp(name, ops3[i])) {
+                STREQ(name, ops3[i])) {
             found = 2;
             sprintf(op, "%s_%c_%c_ic", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set));
@@ -940,7 +943,7 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
          */
         if (n == 3 &&
                 r[0]->type & (VTCONST|VT_CONSTP) &&
-                !strcmp(name, ops4[i])) {
+                STREQ(name, ops4[i])) {
             found = 1;
             sprintf(op, "%s_%c_ic", name, tolower((unsigned char)r[0]->set));
             debug_fmt = "opt %s_xc_ic => ";
@@ -1039,12 +1042,12 @@ branch_branch(PARROT_INTERP, NOTNULL(IMC_Unit * unit))
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 next = r->first_ins->next;
 /*                if (!next ||
-                      !strcmp(next->r[0]->name, get_branch_reg(ins)->name))
+                      STREQ(next->r[0]->name, get_branch_reg(ins)->name))
                     break;*/
                 if (next &&
                       (next->type & IF_goto) &&
-                      !strcmp(next->op, "branch") &&
-                      strcmp(next->r[0]->name, get_branch_reg(ins)->name)) {
+                      STREQ(next->op, "branch") &&
+                      !STREQ(next->r[0]->name, get_branch_reg(ins)->name)) {
                     const int regno = get_branch_regno(ins);
                     IMCC_debug(interp, DEBUG_OPT1,
                             "found branch to branch '%s' %I\n",
@@ -1096,7 +1099,7 @@ branch_reorg(PARROT_INTERP, IMC_Unit * unit)
     for (i = 0; i < unit->n_basic_blocks; i++) {
         ins = unit->bb_list[i]->end;
         /* if basic block ends with unconditional jump */
-        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
+        if ((ins->type & IF_goto) && STREQ(ins->op, "branch")) {
             r = get_sym(interp, ins->r[0]->name);
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 start = r->first_ins;
@@ -1117,7 +1120,7 @@ branch_reorg(PARROT_INTERP, IMC_Unit * unit)
                      * (this could actually be in another block) */
                     for (end = start; end->next; end = end->next) {
                         if ((end->type & IF_goto) &&
-                            !strcmp(end->op, "branch")) {
+                            STREQ(end->op, "branch")) {
                             break;
                         }
                     }
@@ -1262,7 +1265,7 @@ branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
     /* reset statistic globals */
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
+        if ((ins->type & IF_goto) && STREQ(ins->op, "branch")) {
             /* get `end` label */
             end = ins->next;
             /* get `start` label */
@@ -1276,7 +1279,7 @@ branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
 
                 for (cond = start->next; cond; cond = cond->next) {
                     /* no good if it's an unconditional branch*/
-                    if (cond->type & IF_goto && !strcmp(cond->op, "branch")) {
+                    if (cond->type & IF_goto && STREQ(cond->op, "branch")) {
                         break;
                     } else if (cond->type & ITPCCRET || cond->type & ITPCCSUB
                             || cond->type & ITCALL) {
@@ -1439,7 +1442,7 @@ dead_code_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
          last && ins;
          ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
-            !strcmp(last->op, "branch")) {
+            STREQ(last->op, "branch")) {
             IMCC_debug(interp, DEBUG_OPT1,
                     "unreachable ins deleted (after branch) %I\n", ins);
             ins = delete_ins(unit, ins, 1);
@@ -1451,8 +1454,8 @@ dead_code_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
          * L1: ...            L1:
          */
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
-                !strcmp(last->op, "branch") &&
-                !strcmp(last->r[0]->name, ins->r[0]->name)) {
+                STREQ(last->op, "branch") &&
+                STREQ(last->r[0]->name, ins->r[0]->name)) {
             IMCC_debug(interp, DEBUG_OPT1,
                        "dead branch deleted %I\n", ins);
             ins = delete_ins(unit, last, 1);
@@ -1485,20 +1488,17 @@ used_once(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     int opt = 0;
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        SymReg *r;
-        if (!ins->r)
-            continue;
-        r = ins->r[0];
-        if (!r)
-            continue;
-        if (r->use_count == 1 && r->lhs_use_count == 1) {
-            IMCC_debug(interp, DEBUG_OPT2,
-                       "used once '%I' deleted\n", ins);
-            ins = delete_ins(unit, ins, 1);
-            ins = ins->prev ? ins->prev : unit->instructions;
-            unit->ostat.deleted_ins++;
-            unit->ostat.used_once++;
-            opt++;
+        if (ins->r) {
+            SymReg * const r = ins->r[0];
+            if (r) && (r->use_count == 1 && r->lhs_use_count == 1) {
+                IMCC_debug(interp, DEBUG_OPT2,
+                        "used once '%I' deleted\n", ins);
+                ins = delete_ins(unit, ins, 1);
+                ins = ins->prev ? ins->prev : unit->instructions;
+                unit->ostat.deleted_ins++;
+                unit->ostat.used_once++;
+                opt++;
+            }
         }
     }
     return opt;
@@ -1571,9 +1571,9 @@ _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
             use_count--;
             if (instruction_writes(ins, r)) {
                 lhs_use_count--;
-                if (!strcmp(ins->op, "new"))
+                if (STREQ(ins->op, "new"))
                     new_bl=bb;
-                if (!strcmp(ins->op, ""))
+                if (STREQ(ins->op, ""))
                     set_bl=bb;
             }
             /* this is the instruction, to check, it's safe */
@@ -1581,18 +1581,18 @@ _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
                 continue;
 
             /* now look for dangerous ops */
-            if (!strcmp(ins->op, "find_global"))
+            if (STREQ(ins->op, "find_global"))
                 return reason=4, 0;
-            if (!strcmp(ins->op, "store_global"))
+            if (STREQ(ins->op, "store_global"))
                 return reason=4, 0;
-            if (!strcmp(ins->op, "push"))
+            if (STREQ(ins->op, "push"))
                 return reason=4, 0;
-            if (!strcmp(ins->op, "pop"))
+            if (STREQ(ins->op, "pop"))
                 return reason=4, 0;
-            if (!strcmp(ins->op, "clone"))
+            if (STREQ(ins->op, "clone"))
                 return reason=4, 0;
             /* indexed set/get ??? RT#46289, as index is ok */
-            if (0 && ! strcmp(ins->op, "set") && nregs != 2)
+            if (0 && STREQ(ins->op, "set") && nregs != 2)
                 return reason=5, 0;
             /*
              * set P, P  - dangerous?
@@ -1680,12 +1680,12 @@ is_invariant(PARROT_INTERP, NOTNULL(IMC_Unit * unit), NOTNULL(Instruction *ins))
 {
     int ok = 0;
     int what = 0;
-    if (! strcmp(ins->op, "new")) {
+    if (STREQ(ins->op, "new")) {
         ok = 1;
         what = CHK_INV_NEW;
     }
     /* only, if once assigned and not changed */
-    else if (! strcmp(ins->op, "set") &&
+    else if (STREQ(ins->op, "set") &&
             !(ins->r[0]->usage & U_KEYED) &&
             ins->r[1]->type & VTCONST) {
         ok = 1;
