@@ -634,7 +634,7 @@ slurpy arguments).
                 if ((SIG_ITEM(sig, i) & (PARROT_ARG_SLURPY_ARRAY |
                     PARROT_ARG_OPTIONAL | PARROT_ARG_OPT_FLAG)) == 0)
                     arity++;
-            
+
             return arity;
         }
         else {
