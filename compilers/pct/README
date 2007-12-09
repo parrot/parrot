@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Parrot Compiler Toolkit (PCT)
 
 This is an implementation of an abstract tree representation
@@ -5,7 +7,7 @@ and compiler for Parrot.  This version is a redesign based
 on PAST-pm.  Only simple nodes are available, but it will
 expand rapidly.
 
-There aren't any compilers using PCT yet, but that should
-change soon.
+PCT is used for example by F<compilers/nqp>, F<languages/abc>, F<languages/perl6>
+and F<languages/plumhead>.
 
-
+=cut

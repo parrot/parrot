@@ -33,7 +33,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 # Set up expected output for examples
 
-# A stub for future PAST-pm example
+# A stub for future PAST examples
 my %expected = (
     '01-sub.pir'        => "5\n",
     'four_plus_one.pir' => "5\n",

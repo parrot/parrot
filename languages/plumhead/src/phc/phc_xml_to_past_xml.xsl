@@ -9,7 +9,7 @@
 $Id$
 
 This transformation takes a XML abstract syntax tree as generated 
-by phc from PHP source. It generates a PAST-pm data structure in XML.
+by phc from PHP source. It generates a PAST data structure in XML.
 
 -->
 <xsl:output method='xml' indent='yes' />

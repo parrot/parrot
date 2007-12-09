@@ -30,8 +30,8 @@ Parse PHP with the Parrot compiler toolkit. This is the default variant.
 
 =head2 Plumhead phc
 
-Take XML from phc and transform it with XSLT to PIR setting up PAST-pm.
-Run the PAST-pm with the help of TGE.
+Take XML from phc and transform it with XSLT to PIR setting up PAST.
+Run the PAST with the help of PCT.
 
 =head2 Plumhead antlr3
 

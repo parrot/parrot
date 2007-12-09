@@ -10,7 +10,7 @@ $Id$
 
 This transformation takes an abstract syntax tree as generated 
 by phc_xml_to_past_xml.xsl. It generates a PIR-script that creates
-a PAST-pm data structure and runs it with the help of a HLLCompiler.
+a PAST data structure and runs it with the help of a PCT::HLLCompiler.
 
 -->
 <xsl:output method='text' />

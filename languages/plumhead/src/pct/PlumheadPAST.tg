@@ -3,7 +3,7 @@
 
 grammar Plumhead::PAST::Grammar is TGE::Grammar;
 
-# Generate PAST-pm from Plumhead parse tree
+# Generate PAST from Plumhead parse tree
 
 transform past (ROOT) :language('PIR') {
 

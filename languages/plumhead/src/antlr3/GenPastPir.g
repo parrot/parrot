@@ -392,7 +392,7 @@ node[String reg_mother]
           "                                                                  \n"
         + "  past_name = new 'PAST::Var'                                     \n"
         + "  past_name.'init'( 'name' => '" + $ARRAY.text + "', 'scope' => 'package', 'viviself' => 'Hash', 'lvalue' => 1 )      \n"
-        + "  # PAST-pm has no unshift yet                                    \n"
+        + "  # PAST has probably no unshift yet                              \n"
         + "  \$P0 = " + reg_array + ".'get_array'()                          \n"
         + "  unshift \$P0, past_name                                         \n"
         + "  " + $node.reg_mother + ".'push'( " + reg_array + " )            \n"

@@ -50,7 +50,7 @@ The other files needed for the compiler are in the F<src/> subdirectory.
 The F<src/parser/Grammar.pg> file defines the tokens, rules,
 and protos for Python.  Much of this has been taken from
 the "Python Language Reference Manual (release 2.3)" by
-Guido van Rossum (Fred L. Drake, Jr., editor).  PGE's "pgc.pir"
+Guido van Rossum (Fred L. Drake, Jr., editor).  PGE's "Perl6Grammar.pbc"
 compiler is then used to compile the two grammar files into
 F<src/parser/Grammar_gen.pir>, which is included by F<pynie.pir>.
 (See Synopsis 5 for more details on Perl 6 rules syntax,
@@ -63,7 +63,7 @@ Currently this file defines the C<< <expression> >> rule,
 which just calls into the operator precedence parser.
 
 The file F<src/PAST/Grammar.tg> is a tree grammar that specifies
-how to convert the parse tree into the abstract syntax tree (PAST-pm).
+how to convert the parse tree into the abstract syntax tree (PAST).
 
 The PIR files in F<src/builtins> are included as part of 
 compiling F<pynie.pir> to produce F<pynie.pbc>.
