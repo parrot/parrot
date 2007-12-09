@@ -35,19 +35,13 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 # A stub for future PAST-pm example
 my %expected = (
-    'four_plus_one.pir' => "5\n"
+    '01-sub.pir'        => "5\n",
+    'four_plus_one.pir' => "5\n",
 );
 
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "examples/past/$example", $expected );
 }
-
-# 01-sub.pir prints PIR source code and the result 5
-# Test with a regex, in order to avoid trailing whitespace
-# and insignificant changes in generated PIR.
-example_output_like( "examples/past/01-sub.pir", <<'OUTPUT' );
-/ \A \s* \.sub .* foo.* 5 \s* \z/xms
-OUTPUT
 
 # Local Variables:
 #   mode: cperl
