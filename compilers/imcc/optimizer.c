@@ -1490,7 +1490,7 @@ used_once(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     for (ins = unit->instructions; ins; ins = ins->next) {
         if (ins->r) {
             SymReg * const r = ins->r[0];
-            if (r) && (r->use_count == 1 && r->lhs_use_count == 1) {
+            if (r && (r->use_count == 1 && r->lhs_use_count == 1)) {
                 IMCC_debug(interp, DEBUG_OPT2,
                         "used once '%I' deleted\n", ins);
                 ins = delete_ins(unit, ins, 1);
