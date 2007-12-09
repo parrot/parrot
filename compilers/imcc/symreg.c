@@ -717,6 +717,8 @@ Makes a new identifier constant with value val
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_const_ident(PARROT_INTERP,
         NOTNULL(char *name), int t, NOTNULL(SymReg *val), int global)
@@ -870,6 +872,7 @@ Makes a new address
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
 _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
@@ -920,6 +923,7 @@ Eventually make mk_address static
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_address(PARROT_INTERP, NOTNULL(char *name), int uniq)
@@ -947,6 +951,7 @@ Label gets a fixup entry.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_sub_label(PARROT_INTERP, NOTNULL(char *name))
@@ -970,6 +975,7 @@ Make a symbol for a label, symbol gets a fixup entry.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_sub_address(PARROT_INTERP, NOTNULL(char *name))
@@ -993,6 +999,7 @@ Make a local symbol, no fixup entry.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_local_label(PARROT_INTERP, NOTNULL(char *name))
@@ -1012,6 +1019,8 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_label_address(PARROT_INTERP, NOTNULL(char *name))
 {
@@ -1067,6 +1076,7 @@ what         op      type        pbc.c:build_key()
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 dup_sym(NOTNULL(const SymReg *r))
 {
@@ -1088,6 +1098,7 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 SymReg *
 link_keys(PARROT_INTERP, int nargs, NOTNULL(SymReg * keys[]), int force)
 {

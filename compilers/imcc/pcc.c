@@ -56,8 +56,10 @@ static Instruction * insINS(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static Instruction * move_regs(PARROT_INTERP,
-    IMC_Unit * unit,
+    IMC_Unit *unit,
     NOTNULL(Instruction *ins),
     int n,
     SymReg **dest,
@@ -91,8 +93,9 @@ static int recursive_tail_call(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
-        __attribute__nonnull__(1);
+static void unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -244,7 +247,7 @@ prepend the object to args or self to params
 */
 
 static void
-unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
+unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
 {
     int i;
     const int n = sub->pcc_sub->nargs;
@@ -479,8 +482,10 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static Instruction *
-move_regs(PARROT_INTERP, IMC_Unit * unit,
+move_regs(PARROT_INTERP, IMC_Unit *unit,
         NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)
 {
     unsigned char *move_list;
@@ -500,10 +505,10 @@ move_regs(PARROT_INTERP, IMC_Unit * unit,
     memset(move_list, -1, 2 * n);
 
     for (i = 0; i < 2 * n; ++i) {
-        SymReg * const ri = i < n ? dest[i] : src[i - n];
+        const SymReg * const ri = i < n ? dest[i] : src[i - n];
         int j;
         for (j = 0; j < i; ++j) {
-            SymReg * const rj = j < n ? dest[j] : src[j - n];
+            const SymReg * const rj = j < n ? dest[j] : src[j - n];
             if (ri == rj) {
                 PARROT_ASSERT(j < 255);
                 move_list[i] = (unsigned char)j;
