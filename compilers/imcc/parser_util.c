@@ -1461,6 +1461,7 @@ multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
     SymReg *preg[3];    /* px, py, pz */
     SymReg *nreg[3];
     Instruction *ins = 0;
+    Instruction *unused_ins = 0;
 
     /* count keys in keyvec */
     kv = keyvec;
@@ -1539,7 +1540,8 @@ multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
         }
     }
     /* make a new undef */
-    iNEW(interp, unit, preg[0], str_dup("Undef"), NULL, 1);
+    unused_ins = iNEW(interp, unit, preg[0], str_dup("Undef"), NULL, 1);
+    UNUSED(unused_ins);
     /* emit the operand */
     INS(interp, unit, name, 0, preg, 3, 0, 1);
     /* emit the LHS op */
