@@ -1028,8 +1028,12 @@ blocks to determine the scope.
 
     .local string scope
     scope = self.'scope'(node)
+    push_eh scope_error
     $P0 = find_method self, scope
+    pop_eh
     .return self.$P0(node)
+  scope_error:
+    .return self.'panic'("No scope found for PAST::Var '", $S0, "'")
 .end
 
 

@@ -57,6 +57,23 @@ by C<attrname> based on C<has_value>.
 .end
 
 
+=item panic(message :slurpy)
+
+Helper method to throw an exception (with a message).
+
+=cut
+
+.sub 'panic' :method
+    .param pmc args            :slurpy
+    $S0 = join '', args
+    $P0 = new 'String'
+    $P0 = $S0
+    $P1 = new 'Exception'
+    setattribute $P1, 'message', $P0
+    throw $P1
+.end
+
+
 =item language(string name)
 
 Register this object as the compiler for C<name> using the
