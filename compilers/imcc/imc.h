@@ -287,6 +287,7 @@ void register_compilers(PARROT_INTERP)
 
 PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 char * str_dup(NOTNULL(const char *old))
         __attribute__nonnull__(1);
 

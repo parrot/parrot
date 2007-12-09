@@ -1665,6 +1665,7 @@ TODO: Needs to be documented!!!
 
 PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 char *
 str_dup(NOTNULL(const char *old))
 {
