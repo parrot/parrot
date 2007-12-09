@@ -13,7 +13,8 @@ the program.
 
 The #= markers at the ends of lines are used to distinguish
 among multiple {*} actions within a rule, by passing the value
-after the marker as a 'key' argument to the action method.
+after the marker as a 'key' argument to the action method. Note
+that there must be space between the #= marker and the key.
 
 =end overview
 
