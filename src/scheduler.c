@@ -57,9 +57,16 @@ PARROT_API
 void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
+#if CX_DEBUG
+        fprintf(stderr, "call to Parrot_cx_init_scheduler\n");
+#endif
     if (!interp->parent_interpreter) {
         PMC *scheduler;
         Parrot_Scheduler *sched_struct;
+
+#if CX_DEBUG
+        fprintf(stderr, "initializing scheduler runloop\n");
+#endif
 
         scheduler = pmc_new(interp, enum_class_Scheduler);
         scheduler = VTABLE_share_ro(interp, scheduler);
@@ -230,13 +237,21 @@ PARROT_API
 void
 Parrot_cx_runloop_end(PARROT_INTERP)
 {
-    Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(interp->scheduler);
-    void *raw_retval = NULL;
-    PMC * const term_event = pmc_new(interp, enum_class_Task);
-    TASK_terminate_runloop_SET(term_event);
-    Parrot_cx_schedule_task(interp, term_event);
+#if CX_DEBUG
+        fprintf(stderr, "call to Parrot_cx_runloop_end\n");
+#endif
+    if (!interp->parent_interpreter) {
+        Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(interp->scheduler);
+        void *raw_retval = NULL;
+        PMC * const term_event = pmc_new(interp, enum_class_Task);
+#if CX_DEBUG
+        fprintf(stderr, "terminating scheduler runloop\n");
+#endif
+        TASK_terminate_runloop_SET(term_event);
+        Parrot_cx_schedule_task(interp, term_event);
 
-    JOIN(sched_struct->runloop_handle, raw_retval);
+        JOIN(sched_struct->runloop_handle, raw_retval);
+    }
 }
 
 /*
