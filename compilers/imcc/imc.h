@@ -183,14 +183,20 @@ void * IMCC_compile_file_s(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile_pasm(PARROT_INTERP, NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile_pasm_ex(PARROT_INTERP, NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * IMCC_compile_pasm_s(PARROT_INTERP,
     NOTNULL(const char *s),
     NOTNULL(STRING **error_message))
@@ -198,6 +204,8 @@ PMC * IMCC_compile_pasm_s(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile_pir(PARROT_INTERP, NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -208,6 +216,8 @@ PMC * imcc_compile_pir_ex(PARROT_INTERP, NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * IMCC_compile_pir_s(PARROT_INTERP,
     NOTNULL(const char *s),
     NOTNULL(STRING **error_message))
@@ -263,6 +273,7 @@ int is_op(PARROT_INTERP, NOTNULL(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
 Instruction * multi_keyed(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(char *name),
@@ -296,14 +307,16 @@ char * str_dup(NOTNULL(const char *old))
 
 PARROT_WARN_UNUSED_RESULT
 int try_find_op(PARROT_INTERP,
-    IMC_Unit * unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(const char *name),
-    SymReg ** r,
+    NOTNULL(SymReg **r),
     int n,
     int keyvec,
     int emit)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 

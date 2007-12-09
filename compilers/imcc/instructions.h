@@ -136,6 +136,7 @@ Instruction * delete_ins(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
 Instruction * emitb(PARROT_INTERP,
     NULLOK(struct _IMC_Unit *unit),
     NULLOK(Instruction *i))

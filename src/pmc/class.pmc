@@ -593,15 +593,14 @@ Return the name of the class (without the HLL namespace).
 
     STRING *get_string() {
         Parrot_Class * const  _class    = PARROT_CLASS(SELF);
-        PMC                  *_namespace = _class->_namespace;
-        PMC                  *names;
+        PMC          * const _namespace = _class->_namespace;
 
         if (!PMC_IS_NULL(_namespace)) {
             /* Call the 'get_name' method on the class's associated namespace
              * to retrieve a fully qualified list of names, then join the list
              * with a semicolon.
              */
-            names = Parrot_NameSpace_nci_get_name(interp, _namespace);
+            PMC * const names = Parrot_NameSpace_nci_get_name(interp, _namespace);
 
             if (!PMC_IS_NULL(names))
                 /* remove the HLL namespace name */

@@ -93,7 +93,8 @@ static int add_const_key(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static int add_const_num(PARROT_INTERP, const char *buf)
+PARROT_WARN_UNUSED_RESULT
+static int add_const_num(PARROT_INTERP, NULLOK(const char *buf))
         __attribute__nonnull__(1);
 
 static int add_const_pmc_sub(PARROT_INTERP,
@@ -103,6 +104,7 @@ static int add_const_pmc_sub(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static int add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -695,6 +697,8 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
@@ -749,6 +753,7 @@ add constant string to constant_table
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
@@ -772,8 +777,9 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
-add_const_num(PARROT_INTERP, const char *buf)
+add_const_num(PARROT_INTERP, NULLOK(const char *buf))
 {
     const int      k = PDB_extend_const_table(interp);
     STRING * const s = string_from_cstring(interp, buf, 0);

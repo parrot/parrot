@@ -585,6 +585,7 @@ Emit a single instruction into the current unit buffer.
 
 */
 
+PARROT_CAN_RETURN_NULL
 Instruction *
 emitb(PARROT_INTERP, NULLOK(struct _IMC_Unit *unit), NULLOK(Instruction *i))
 {

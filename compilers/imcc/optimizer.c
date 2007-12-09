@@ -101,16 +101,20 @@ static int branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
 PARROT_WARN_UNUSED_RESULT
 static int branch_cond_loop_swap(PARROT_INTERP,
     IMC_Unit *unit,
-    Instruction *branch,
-    Instruction *start,
-    Instruction *cond)
-        __attribute__nonnull__(1);
+    NOTNULL(Instruction *branch),
+    NOTNULL(Instruction *start),
+    NOTNULL(Instruction *cond))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 static int branch_reorg(PARROT_INTERP, IMC_Unit * unit)
         __attribute__nonnull__(1);
 
-static int constant_propagation(PARROT_INTERP, IMC_Unit * unit)
-        __attribute__nonnull__(1);
+static int constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int dead_code_remove(PARROT_INTERP, IMC_Unit * unit)
         __attribute__nonnull__(1);
@@ -252,8 +256,8 @@ const char *
 get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))
 {
     static struct br_pairs {
-        const char *op;
-        const char *nop;
+        const char * const op;
+        const char * const nop;
         int n;
     } br_pairs[] = {
         { "if", "unless", 2 },
@@ -604,7 +608,7 @@ even though sometimes it may be safe.
 */
 
 static int
-constant_propagation(PARROT_INTERP, IMC_Unit * unit)
+constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins, *ins2, *tmp, *prev;
     int op;
@@ -1156,15 +1160,15 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
-        Instruction *start, Instruction *cond)
+branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, NOTNULL(Instruction *branch),
+        NOTNULL(Instruction *start), NOTNULL(Instruction *cond))
 {
     int changed = 0;
     int args;
     const char * const neg_op = get_neg_op(cond->op, &args);
     if (neg_op) {
         const size_t size  = strlen(branch->r[0]->name) + 10; /* + '_post999' */
-        char * const label = (char *)malloc(size);
+        char * const label = (char *)mem_sys_allocate(size);
         int count;
         int found = 0;
 

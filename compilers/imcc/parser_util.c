@@ -929,6 +929,8 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pasm(PARROT_INTERP, NOTNULL(const char *s))
 {
@@ -950,6 +952,8 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pir(PARROT_INTERP, NOTNULL(const char *s))
 {
@@ -969,6 +973,8 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 IMCC_compile_pir_s(PARROT_INTERP, NOTNULL(const char *s),
                    NOTNULL(STRING **error_message))
@@ -988,6 +994,8 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 IMCC_compile_pasm_s(PARROT_INTERP, NOTNULL(const char *s),
                     NOTNULL(STRING **error_message))
@@ -1006,6 +1014,8 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pasm_ex(PARROT_INTERP, NOTNULL(const char *s))
 {
@@ -1291,8 +1301,8 @@ Try to find valid op doing the same operation e.g.
 
 PARROT_WARN_UNUSED_RESULT
 int
-try_find_op(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
-        SymReg ** r, int n, int keyvec, int emit)
+try_find_op(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
+        NOTNULL(SymReg **r), int n, int keyvec, int emit)
 {
     char fullname[64];
     int changed = 0;
@@ -1430,6 +1440,7 @@ TODO: Needs to be documented!!!
 
 */
 
+PARROT_CAN_RETURN_NULL
 Instruction *
 multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
             NOTNULL(SymReg **r), int nr, int keyvec, int emit)
@@ -1446,7 +1457,7 @@ multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
         if (kv & 1)
             keyf++;
     if (keyf <= 1)
-        return 0;
+        return NULL;
     /* XXX what to do, if we don't emit instruction? */
     PARROT_ASSERT(emit);
     UNUSED(emit);
