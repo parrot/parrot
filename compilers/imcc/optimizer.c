@@ -95,8 +95,9 @@ static int branch_branch(PARROT_INTERP, NOTNULL(IMC_Unit * unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
-        __attribute__nonnull__(1);
+static int branch_cond_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static int branch_cond_loop_swap(PARROT_INTERP,
@@ -110,8 +111,10 @@ static int branch_cond_loop_swap(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static int branch_reorg(PARROT_INTERP, IMC_Unit * unit)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static int branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -145,11 +148,14 @@ static int is_ins_save(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static int strength_reduce(PARROT_INTERP, IMC_Unit * unit)
-        __attribute__nonnull__(1);
+static int strength_reduce(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static int unused_label(PARROT_INTERP, IMC_Unit * unit)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static int unused_label(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int used_once(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -201,6 +207,7 @@ FALSE.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 int
 cfg_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
@@ -256,12 +263,14 @@ optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 =item C<const char *
 get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))>
 
-Get negated form of operator. If no negated form is known, return 0.
+Get negated form of operator. If no negated form is known, return NULL.
 
 =cut
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 const char *
 get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))
 {
@@ -275,7 +284,7 @@ get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))
         { "gt", "le", 3 },
         { "ge", "lt", 3 },
     };
-    unsigned int i;
+    size_t i;
     for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
         *n = br_pairs[i].n;
         if (STREQ(op, br_pairs[i].op))
@@ -283,7 +292,7 @@ get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))
         if (STREQ(op, br_pairs[i].nop))
             return br_pairs[i].op;
     }
-    return 0;
+    return NULL;
 }
 
 /*
@@ -374,7 +383,7 @@ guaranteed that one operand is non constant if opsize == 4
 */
 
 static int
-strength_reduce(PARROT_INTERP, IMC_Unit * unit)
+strength_reduce(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins, *tmp;
     SymReg *r;
@@ -626,13 +635,12 @@ constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     char fullname[128];
     SymReg *c, *old, *o;
     int any = 0;
-    int found;
 
     o = c = NULL; /* silence compiler uninit warning */
 
     IMCC_info(interp, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
-        found = 0;
+        int found = 0;
         if (STREQ(ins->op, "set") &&
                 ins->opsize == 3 &&             /* no keyed set */
                 ins->r[1]->type == VTCONST &&
@@ -721,6 +729,8 @@ rewrite e.g. add_n_ic => add_n_nc
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction *
 IMCC_subst_constants_umix(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
         NOTNULL(SymReg **r), int n)
@@ -852,11 +862,11 @@ rewrite e.g. add_n_nc_nc => set_n_nc
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
-        SymReg **r, int n, NOTNULL(int *ok))
+IMCC_subst_constants(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
+        NOTNULL(SymReg **r), int n, NOTNULL(int *ok))
 {
     Instruction *tmp;
-    const char *ops[] = {
+    const char * const ops[] = {
         "add", "sub", "mul", "div", "fdiv", "pow",
         "cmod", "mod", "atan",
         "shr", "shl", "lsr",
@@ -866,16 +876,16 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
         "and", "or", "xor",
         "iseq", "isne", "islt", "isle", "isgt", "isge", "cmp"
     };
-    const char *ops2[] = {
+    const char * const ops2[] = {
         "abs", "neg", "not", "fact", "sqrt", "ceil", "floor"
         "acos", "asec", "asin",
         "atan", "cos", "cosh", "exp", "ln", "log10", "log2", "sec",
         "sech", "sin", "sinh", "tan", "tanh", "fact"
     };
-    const char *ops3[] = {
+    const char * const ops3[] = {
         "eq", "ne", "gt", "ge", "lt", "le"
     };
-    const char *ops4[] = {
+    const char * const ops4[] = {
         "if", "unless"
     };
 
@@ -1095,22 +1105,24 @@ FALSE.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
-branch_reorg(PARROT_INTERP, IMC_Unit * unit)
+branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
-    Instruction *ins, *start, *end;
+    Instruction *end;
     SymReg * r;
-    Edge *edge;
     int changed = 0, i, found;
 
     IMCC_info(interp, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-        ins = unit->bb_list[i]->end;
+        Instruction *ins = unit->bb_list[i]->end;
+
         /* if basic block ends with unconditional jump */
         if ((ins->type & IF_goto) && STREQ(ins->op, "branch")) {
             r = get_sym(interp, ins->r[0]->name);
             if (r && (r->type & VTADDRESS) && r->first_ins) {
-                start = r->first_ins;
+                Edge *edge;
+                Instruction * const start = r->first_ins;
                 found = 0;
                 for (edge = unit->bb_list[start->bbindex]->pred_list;
                      edge; edge = edge->pred_next)
@@ -1263,9 +1275,9 @@ FALSE.
 */
 
 static int
-branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
+branch_cond_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
-    Instruction *ins, *cond, *end, *start, *prev;
+    Instruction *ins, *cond, *start, *prev;
     SymReg * r;
     int changed = 0, found;
 
@@ -1275,7 +1287,7 @@ branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
     for (ins = unit->instructions; ins; ins = ins->next) {
         if ((ins->type & IF_goto) && STREQ(ins->op, "branch")) {
             /* get `end` label */
-            end = ins->next;
+            Instruction * const end = ins->next;
             /* get `start` label */
             r = get_sym(interp, ins->r[0]->name);
 
@@ -1335,8 +1347,9 @@ FALSE.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
-unused_label(PARROT_INTERP, IMC_Unit * unit)
+unused_label(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins;
     int used;
@@ -1717,20 +1730,22 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Basic_block *
 find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))
 {
-    int bb = blk->index;
+    const int bb = blk->index;
     int i;
-    int n_loops = unit->n_loops;
-    Loop_info ** loop_info = unit->loop_info;
+    const int n_loops = unit->n_loops;
+    Loop_info ** const loop_info = unit->loop_info;
 
     /* loops are sorted depth last */
     for (i = n_loops-1; i >= 0; i--)
         if (set_contains(loop_info[i]->loop, bb))
             if (loop_info[i]->preheader >= 0)
                 return unit->bb_list[loop_info[i]->preheader];
-    return 0;
+    return NULL;
 }
 #  endif
 

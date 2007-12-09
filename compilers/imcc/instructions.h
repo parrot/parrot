@@ -129,6 +129,7 @@ Instruction * _mk_instruction(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
 Instruction * delete_ins(
     NOTNULL(struct _IMC_Unit *unit),
     NOTNULL(Instruction *ins),
@@ -145,6 +146,8 @@ Instruction * emitb(PARROT_INTERP,
 void free_ins(NOTNULL(Instruction *ins))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 SymReg * get_branch_reg(NOTNULL(const Instruction *ins))
         __attribute__nonnull__(1);
 
@@ -186,6 +189,7 @@ int instruction_writes(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
 Instruction * move_ins(
     NOTNULL(struct _IMC_Unit *unit),
     NOTNULL(Instruction *ins),

@@ -399,6 +399,8 @@ Get the register corresponding to an address which is a branch target
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 SymReg *
 get_branch_reg(NOTNULL(const Instruction *ins))
 {
@@ -422,6 +424,7 @@ The instruction following ins is returned.
 
 */
 
+PARROT_CAN_RETURN_NULL
 Instruction *
 delete_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), int needs_freeing)
 {
@@ -565,6 +568,7 @@ initial position of ins.
 
 */
 
+PARROT_CAN_RETURN_NULL
 Instruction *
 move_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), NOTNULL(Instruction *to))
 {
