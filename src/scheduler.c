@@ -53,7 +53,8 @@ Initalize the concurrency scheduler for the interpreter.
 
 */
 
-PARROT_API
+typedef void *(pt_start_routine_f)(void *);
+
 void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
@@ -78,7 +79,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
         /* Start the scheduler runloop */
         THREAD_CREATE_JOINABLE(sched_struct->runloop_handle,
-                        (void *) scheduler_runloop, (void *) scheduler);
+            (pt_start_routine_f *)scheduler_runloop, (void *) scheduler);
 
     }
 }
