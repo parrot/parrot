@@ -47,15 +47,19 @@ static void insert_tail_call(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction * insINS(PARROT_INTERP,
-    IMC_Unit * unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction *ins),
     NOTNULL(const char *name),
-    SymReg **regs,
+    NOTNULL(SymReg **regs),
     int n)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -71,6 +75,8 @@ static Instruction * move_regs(PARROT_INTERP,
         __attribute__nonnull__(5)
         __attribute__nonnull__(6);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction* pcc_get_args(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction *ins),
@@ -118,9 +124,11 @@ into the current block in one call.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction *
-insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
-        NOTNULL(const char *name), SymReg **regs, int n)
+insINS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
+        NOTNULL(const char *name), NOTNULL(SymReg **regs), int n)
 {
     /* XXX INS can return NULL, but insert_ins() cannot take one */
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
@@ -194,6 +202,8 @@ used by expand_pcc_sub_call and expand_pcc_sub
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction*
 pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
         NOTNULL(const char *op_name), int n,
