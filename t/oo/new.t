@@ -248,8 +248,7 @@ pir_output_is(
     say $S1
 
     $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    say $I3
 
     # How do you set the value of a non-constant key PMC?
     $P3 = new 'Key'
@@ -260,12 +259,10 @@ pir_output_is(
     say $S1
 
     $I3 = isa $P2, 'Bar'
-    print $I3
-    print "\n"
+    say $I3
 
     $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    say $I3
 .end
 CODE
 Class

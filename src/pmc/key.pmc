@@ -143,7 +143,11 @@ Returns the Parrot string value of the key.
 */
 
     STRING *get_string() {
-        return key_string(INTERP, SELF);
+        /* key_string() is only useful if this PMC has a key type */
+        if (PObj_get_FLAGS(SELF) & KEY_type_FLAGS)
+            return key_string(INTERP, SELF);
+
+        return CONST_STRING(INTERP, "");
     }
 
 /*
