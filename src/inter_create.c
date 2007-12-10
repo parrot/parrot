@@ -321,12 +321,15 @@ Note that C<exit_code> is ignored.
 void
 Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 {
+
     /*
-     * wait for threads to complete if needed
+     * wait for threads to complete if needed; terminate the event loop
      */
     if (!interp->parent_interpreter) {
         pt_join_threads(interp);
+        Parrot_cx_runloop_end(interp);
     }
+
     /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:
      *
@@ -377,7 +380,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (!interp->parent_interpreter) {
         PIO_internal_shutdown(interp);
         Parrot_kill_event_loop(interp);
-        Parrot_cx_runloop_end(interp);
     }
 
     /* we destroy all child interpreters and the last one too,
