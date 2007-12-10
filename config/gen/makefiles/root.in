@@ -1787,17 +1787,20 @@ SPLINT_TMP = $(TMP)/splint
 
 # Splint flags: http://splint.org/manual/html/appB.html
 SPLINTFLAGS  = \
-    -standard \
-    -tmpdir $(SPLINT_TMP) \
-    -message-stream-stdout \
-    -declundef \
-    -show-summary \
-    -exportlocal \
-    +linelen 120 \
-    +indentspaces 4 \
-    +showdeephistory \
-    -showfunc \
+    +checks \
     -hints \
+    \
+    +indentspaces 4 \
+    +locindentspaces 4 \
+    +linelen 120 \
+    -message-stream-stdout \
+    +showdeephistory \
+    -show-func \
+    -tmpdir $(SPLINT_TMP) \
+    \
+    -show-summary \
+    +show-scan \
+    +time-dist \
     \
     -abstract \
     +aliasunique \
@@ -1816,6 +1819,7 @@ SPLINTFLAGS  = \
     +declundef \
     -distinctinternalnames \
     +evalorder \
+    -exportlocal \
     -fcnuse \
     +fielduse \
     +forcehints \
@@ -1837,7 +1841,7 @@ SPLINTFLAGS  = \
     +nullderef \
     +nullret \
     +nullpass \
-    -nullstate \
+    +nullstate \
     -paramuse \
     +posixstrictlib \
     -predboolint \
@@ -1853,11 +1857,8 @@ SPLINTFLAGS  = \
     -shiftimplementation \
     -shiftnegative \
     +showscan \
-    +showsummary \
     -skipposixheaders \
     -type \
-    \
-    \
     \
     -branchstate \
     -compdef \
@@ -1883,7 +1884,6 @@ SPLINTFLAGS  = \
 
 # Other options we'd like to add back
 # +paramuse: As soon as we get SHIM()s in the ops
-# +nullstate, +nullpass: This is one of the great things about splint, so it's tops on my list
 # -includedepth 8 : Let's investigate why we do so many includes.
 # +initallelements : Right now, the *.ops files don't initialize all values of the arrays
 # +casebreak: Auto-generated ops have way too case fallthrus right now
@@ -1906,13 +1906,9 @@ splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
     +fcnpost \
-    +show-scan \
-    +time-dist \
     +showsourceloc \
-    +stats \
-    -showsummary \
     +partial \
-    src/oo.c \
+    src/debug.c \
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 COVER_DIRS = \

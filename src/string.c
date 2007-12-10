@@ -77,7 +77,7 @@ copied over and the copy-on-write flag is cleared.
 
 PARROT_API
 void
-Parrot_unmake_COW(PARROT_INTERP, NOTNULL(STRING *s))
+Parrot_unmake_COW(PARROT_INTERP, ARGIN(STRING *s))
 {
     PARROT_ASSERT(s);
 
@@ -135,7 +135,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
+Parrot_make_COW_reference(PARROT_INTERP, ARGIN(STRING *s))
 {
     STRING *d;
 
@@ -226,7 +226,7 @@ second.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_set(PARROT_INTERP, NULLOK(STRING *dest), NOTNULL(STRING *src))
+string_set(PARROT_INTERP, ARGOUT(STRING *dest), NOTNULL(STRING *src))
 {
     if (dest == src)
         return dest;
@@ -344,7 +344,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 UINTVAL
-string_capacity(SHIM_INTERP, NOTNULL(const STRING *s))
+string_capacity(SHIM_INTERP, ARGIN(const STRING *s))
 {
     PARROT_ASSERT(s);
 
@@ -803,7 +803,7 @@ Returns the number of characters in the specified Parrot string.
 PARROT_API
 PARROT_PURE_FUNCTION
 UINTVAL
-string_length(SHIM_INTERP, NOTNULL(const STRING *s))
+string_length(SHIM_INTERP, ARGIN(const STRING *s))
 {
     PARROT_ASSERT(s);
 
@@ -2827,7 +2827,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_increment(PARROT_INTERP, NOTNULL(const STRING *s))
+string_increment(PARROT_INTERP, ARGINOUT(const STRING *s))
 {
     INTVAL o;
 
@@ -2923,7 +2923,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_string_find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *s),
+Parrot_string_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
                           UINTVAL offset, UINTVAL count)
 {
     if (!s)
@@ -3039,8 +3039,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_string_trans_encoding(PARROT_INTERP, NULLOK(STRING *src),
-        INTVAL encoding_nr, NULLOK(STRING *dest))
+Parrot_string_trans_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
+        INTVAL encoding_nr, ARGOUT_NULLOK(STRING *dest))
 {
     const ENCODING *new_encoding;
 
@@ -3092,7 +3092,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_compose(PARROT_INTERP, NULLOK(STRING *src))
+string_compose(PARROT_INTERP, ARGIN_NULLOK(STRING *src))
 {
     if (!src)
         return NULL;
@@ -3163,7 +3163,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-string_split(PARROT_INTERP, NOTNULL(STRING *delim), NOTNULL(STRING *str))
+string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
 {
     PMC * const res  = pmc_new(interp, enum_class_ResizableStringArray);
     const int   slen = string_length(interp, str);
@@ -3241,7 +3241,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
 uint_to_str(PARROT_INTERP,
-            NOTNULL(char *tc), UHUGEINTVAL num, char base, int minus)
+            ARGOUT(char *tc), UHUGEINTVAL num, char base, int minus)
 {
     /* the buffer must be at least as long as this */
     char *p = tc + sizeof (UHUGEINTVAL)*8 + 1;
@@ -3286,7 +3286,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-int_to_str(PARROT_INTERP, NOTNULL(char *tc), HUGEINTVAL num, char base)
+int_to_str(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, char base)
 {
     const int is_neg = (num < 0);
 

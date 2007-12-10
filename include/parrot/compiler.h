@@ -114,6 +114,8 @@
 #define NOTNULL(x)                  /*@notnull@*/ x
 #define NULLOK(x)                   /*@null@*/ x
 
+#define ARGIN(x)                    /*@notnull@*/ /*@in@*/ x
+#define ARGIN_NULLOK(x)             /*@in@*/ x
 #define ARGOUT(x)                   /*@notnull@*/ /*@out@*/ x
 #define ARGINOUT(x)                 /*@notnull@*/ /*@in@*/ /*@out@*/ x
 #define ARGOUT_NULLOK(x)            /*@out@*/ /*@null@*/ x

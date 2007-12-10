@@ -219,7 +219,7 @@ void PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         __attribute__nonnull__(1);
 
 size_t PDB_disassemble_op(PARROT_INTERP,
-    NOTNULL(char *dest),
+    ARGOUT(char *dest),
     int space,
     NOTNULL(op_info_t *info),
     NOTNULL(opcode_t *op),
