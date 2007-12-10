@@ -28,7 +28,11 @@ pmclass EclectusBoolean
     maps Boolean {
 
     STRING* get_string() {
-        return SUPER();
+        return PMC_int_val(SELF) ?
+                   const_string(INTERP, "#t")
+                   :
+                   const_string(INTERP, "#f");
+
     }
 }
 

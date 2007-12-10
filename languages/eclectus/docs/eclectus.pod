@@ -18,8 +18,10 @@ unified languages testing.
 
 =head1 TODO
 
+- Allow test failures in test-driver.scm, currently it simply exits on failure
 - Step 2, immediate constants
 - Add a check whether 'petite' is installed in the Perl 5 wrappers.
+- Determine number of tests in test-driver.scm
 
 =head1 AUTHOR
 

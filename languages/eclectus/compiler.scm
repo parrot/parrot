@@ -6,6 +6,10 @@
 (define (emit-init)
   (emit 
 "
+
+# EclectusBoolean is defined here
+.loadlib 'eclectus_group'
+
 .namespace
 
 .sub '__onload' :init
@@ -25,6 +29,7 @@
 
     .local pmc val_x
     ( val_x ) = scheme_entry()
+    # _dumper( val_x, 'val_x' )
 
     .local pmc var_last
     var_last = new 'PAST::Var'
@@ -73,6 +78,23 @@
 .end
 "))
 
+; forms represented by a scalar PMC
+(define (immediate? x)
+  (or (fixnum? x) (boolean? x)))
+
+(define (immediate-rep x)
+  (cond
+     [(fixnum? x) (format
+"
+    val_x = new 'PAST::Val'
+    val_x.init( 'value' => ~a, 'returns' => 'Integer' )
+" x )]
+     [else 
+"
+    val_x = new 'PAST::Val'
+    val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
+"]))
+
 ; the actual compiler
 ( define (compile-program x)
   (emit-init)
@@ -83,10 +105,12 @@
 "
 .sub scheme_entry
     .local pmc val_x
-    val_x = new 'PAST::Val'
-    val_x.init( 'value' => ~a, 'returns' => 'Integer' )
+")
+  (if (immediate? x)
+    (emit (immediate-rep x))) 
 
+   (emit
+"
     .return ( val_x )
 .end
-"
- x ) )
+"))
