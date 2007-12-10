@@ -60,23 +60,28 @@ static Instruction * insINS(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction * move_regs(PARROT_INTERP,
-    IMC_Unit *unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction *ins),
     int n,
-    SymReg **dest,
-    SymReg **src)
+    NOTNULL(SymReg **dest),
+    NOTNULL(SymReg **src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5)
+        __attribute__nonnull__(6);
 
 static Instruction* pcc_get_args(PARROT_INTERP,
-    IMC_Unit * unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction *ins),
-    char *op_name,
+    NOTNULL(const char *op_name),
     int n,
-    SymReg **args,
-    int *arg_flags)
+    NULLOK(SymReg **args),
+    NULLOK(const int *arg_flags))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static int pcc_reg_mov(PARROT_INTERP,
     unsigned char d,
@@ -117,6 +122,7 @@ static Instruction *
 insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
         NOTNULL(const char *name), SymReg **regs, int n)
 {
+    /* XXX INS can return NULL, but insert_ins() cannot take one */
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
     insert_ins(unit, ins, tmp);
     return tmp;
@@ -189,8 +195,9 @@ used by expand_pcc_sub_call and expand_pcc_sub
 */
 
 static Instruction*
-pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
-        char *op_name, int n, SymReg **args, int *arg_flags)
+pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
+        NOTNULL(const char *op_name), int n,
+        NULLOK(SymReg **args), NULLOK(const int *arg_flags))
 {
     int i, flags;
     char buf[1024], s[16];
@@ -494,8 +501,8 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction *
-move_regs(PARROT_INTERP, IMC_Unit *unit,
-        NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)
+move_regs(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
+        int n, NOTNULL(SymReg **dest), NOTNULL(SymReg **src))
 {
     unsigned char *move_list;
     int i;
