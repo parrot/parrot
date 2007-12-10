@@ -89,11 +89,16 @@
     val_x = new 'PAST::Val'
     val_x.init( 'value' => ~a, 'returns' => 'Integer' )
 " x )]
-     [else 
+     [(boolean? x)
+        (if x 
 "
     val_x = new 'PAST::Val'
     val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-"]))
+"
+"
+    val_x = new 'PAST::Val'
+    val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
+" )]))
 
 ; the actual compiler
 ( define (compile-program x)
