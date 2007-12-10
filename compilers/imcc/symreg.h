@@ -328,7 +328,7 @@ SymReg * mk_temp_reg(PARROT_INTERP, int t)
         __attribute__nonnull__(1);
 
 void pop_namespace(NULLOK(char *name));
-void push_namespace(NOTNULL(char* name))
+void push_namespace(NOTNULL(char *name))
         __attribute__nonnull__(1);
 
 void store_symreg(PARROT_INTERP, NOTNULL(SymReg *r))
