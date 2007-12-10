@@ -1794,6 +1794,7 @@ SPLINTFLAGS  = \
     -show-summary \
     -exportlocal \
     +linelen 120 \
+    +indentspaces 4 \
     +showdeephistory \
     -showfunc \
     -hints \
@@ -1858,27 +1859,27 @@ SPLINTFLAGS  = \
     \
     \
     \
-    -nullstate \
-    -usereleased \
-    -mustfreefresh \
-    -mustfreeonly \
-    -compdestroy \
     -branchstate \
+    -compdef \
+    -compdestroy \
     -compmempass \
     -globstate \
-    -compdef \
     -modobserver \
-    -retalias \
+    -mustfreefresh \
+    -mustfreeonly \
+    -nullstate \
     -redecl \
+    -retalias \
+    -usereleased \
     \
-    -readonlytrans \
-    -onlytrans \
-    -unqualifiedtrans \
-    -observertrans \
-    -kepttrans \
-    -statictrans \
     -immediatetrans \
+    -kepttrans \
+    -observertrans \
+    -onlytrans \
+    -readonlytrans \
+    -statictrans \
     -temptrans \
+    -unqualifiedtrans \
 
 # Other options we'd like to add back
 # +paramuse: As soon as we get SHIM()s in the ops
@@ -1905,12 +1906,13 @@ splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
     +fcnpost \
-    +showscan \
+    +show-scan \
+    +time-dist \
+    +showsourceloc \
     +stats \
     -showsummary \
     +partial \
-    src/nci.c \
-    src/inte*.c \
+    src/oo.c \
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 COVER_DIRS = \
