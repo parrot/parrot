@@ -63,11 +63,15 @@ static void dynop_register_xx(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static oplib_init_f get_op_lib_init(PARROT_INTERP,
-    int core_op,
-    int which,
-    NULLOK(const PMC *lib))
+static oplib_init_f get_core_op_lib_init(PARROT_INTERP, int which)
         __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static oplib_init_f get_dynamic_op_lib_init(PARROT_INTERP,
+    NOTNULL(const PMC *lib))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void init_prederef(PARROT_INTERP, int which)
         __attribute__nonnull__(1);
@@ -340,16 +344,11 @@ turn_ev_check(PARROT_INTERP, int on)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
-get_op_lib_init(PARROT_INTERP, int core_op, int which, NULLOK(PMC *lib))>
+get_core_op_lib_init(PARROT_INTERP, int which)>
 
 Returns an opcode's library C<op_lib> init function.
 
-C<core_op> indicates whether the opcode represents a core Parrot operation.
-
 C<which> is the run core type.
-
-For dynamic oplibs C<core_op> will be 0 and C<lib> will be a
-C<ParrotLibrary> PMC.
 
 =cut
 
@@ -358,36 +357,57 @@ C<ParrotLibrary> PMC.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
-get_op_lib_init(PARROT_INTERP, int core_op, int which, NULLOK(const PMC *lib))
+get_core_op_lib_init(PARROT_INTERP, int which)
 {
-    if (core_op) {
-        oplib_init_f init_func;
-        switch (which) {
-            case PARROT_SWITCH_CORE:
-            case PARROT_SWITCH_JIT_CORE:
-                init_func = PARROT_CORE_SWITCH_OPLIB_INIT;
-                break;
+    oplib_init_f init_func;
+    switch (which) {
+        case PARROT_SWITCH_CORE:
+        case PARROT_SWITCH_JIT_CORE:
+            init_func = PARROT_CORE_SWITCH_OPLIB_INIT;
+            break;
 #ifdef HAVE_COMPUTED_GOTO
-            case PARROT_CGP_CORE:
-            case PARROT_CGP_JIT_CORE:
-                init_func = PARROT_CORE_CGP_OPLIB_INIT;
-                break;
-            case PARROT_CGOTO_CORE:
-                init_func = PARROT_CORE_CG_OPLIB_INIT;
-                break;
+        case PARROT_CGP_CORE:
+        case PARROT_CGP_JIT_CORE:
+            init_func = PARROT_CORE_CGP_OPLIB_INIT;
+            break;
+        case PARROT_CGOTO_CORE:
+            init_func = PARROT_CORE_CG_OPLIB_INIT;
+            break;
 #endif
-            case PARROT_EXEC_CORE:     /* normal func core */
-            case PARROT_JIT_CORE:      /* normal func core */
-            case PARROT_SLOW_CORE:     /* normal func core */
-            case PARROT_FAST_CORE:     /* normal func core */
-            case PARROT_GC_DEBUG_CORE: /* normal func core */
-                init_func = PARROT_CORE_OPLIB_INIT;
-                break;
-            default:
-                real_exception(interp, NULL, 1, "Couldn't find init_func for core %d", which);
-        }
-        return init_func;
+        case PARROT_EXEC_CORE:     /* normal func core */
+        case PARROT_JIT_CORE:      /* normal func core */
+        case PARROT_SLOW_CORE:     /* normal func core */
+        case PARROT_FAST_CORE:     /* normal func core */
+        case PARROT_GC_DEBUG_CORE: /* normal func core */
+            init_func = PARROT_CORE_OPLIB_INIT;
+            break;
+        default:
+            real_exception(interp, NULL, 1, "Couldn't find init_func for core %d", which);
     }
+    return init_func;
+}
+
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static oplib_init_f
+get_dynamic_op_lib_init(PARROT_INTERP, NULLOK(PMC *lib))>
+
+Returns an dynamic oplib's opcode's library C<op_lib> init function.
+
+C<lib> will be a C<ParrotLibrary> PMC.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static oplib_init_f
+get_dynamic_op_lib_init(PARROT_INTERP, NOTNULL(const PMC *lib))
+{
     return (oplib_init_f) D2FPTR(PMC_struct_val(lib));
 }
 
@@ -405,7 +425,7 @@ C<< interp->op_lib >> = prederefed oplib.
 static void
 load_prederef(PARROT_INTERP, int which)
 {
-    const oplib_init_f init_func = get_op_lib_init(interp, 1, which, NULL);
+    const oplib_init_f init_func = get_core_op_lib_init(interp, which);
     int (*get_op)(const char * name, int full);
 
     get_op = interp->op_lib->op_code;
@@ -915,7 +935,7 @@ void
 Parrot_setup_event_func_ptrs(PARROT_INTERP)
 {
     const size_t n = interp->op_count;
-    const oplib_init_f init_func = get_op_lib_init(interp, 1, interp->run_core, NULL);
+    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
     op_lib_t * const lib = init_func(1);
     /*
      * remember op_func_table
@@ -983,7 +1003,7 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
         interp->all_op_libs = (op_lib_t **)mem_sys_realloc(interp->all_op_libs,
                 sizeof (op_lib_t *) * (interp->n_libs + 1));
 
-    init_func = get_op_lib_init(interp, 0, 0, lib_pmc);
+    init_func = get_dynamic_op_lib_init(interp, lib_pmc);
     lib = init_func(1);
 
     interp->all_op_libs[interp->n_libs++] = lib;
@@ -1135,7 +1155,7 @@ dynop_register_xx(PARROT_INTERP,
     if (0 /*lib_variant */) {
         size_t i;
 
-        new_init_func = get_op_lib_init(interp, 0, 0, lib_variant);
+        new_init_func = get_dynamic_op_lib_init(interp, lib_variant);
         new_lib = new_init_func(1);
         for (i = n_old; i < n_tot; ++i)
             ops_addr[i] = (new_lib->op_func_table)[i - n_old];
@@ -1201,7 +1221,7 @@ Tell the interpreter's running core about the new function table.
 static void
 notify_func_table(PARROT_INTERP, NOTNULL(op_func_t* table), int on)
 {
-    const oplib_init_f init_func = get_op_lib_init(interp, 1, interp->run_core, NULL);
+    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
 
     init_func((long) table);
     switch (interp->run_core) {
