@@ -15,6 +15,17 @@
 #ifndef PARROT_ATOMIC_GCC_X86_H_GUARD
 #define PARROT_ATOMIC_GCC_X86_H_GUARD
 
+/* HEADERIZER BEGIN: src/atomic/gcc_x86.c */
+
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+void * parrot_i386_cmpxchg(void *volatile *ptr, void *expect, void *update);
+
+PARROT_INLINE
+long parrot_i386_xadd(volatile long *l, long amount);
+
+/* HEADERIZER END: src/atomic/gcc_x86.c */
+
 typedef struct Parrot_atomic_pointer {
     void *volatile val;
 } Parrot_atomic_pointer;

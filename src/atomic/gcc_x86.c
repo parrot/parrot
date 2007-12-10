@@ -7,6 +7,8 @@
 #include "parrot/parrot.h"
 #include "parrot/atomic/gcc_x86.h"
 
+/* HEADERIZER HFILE: include/parrot/atomic/gcc_x86.h */
+
 /*
 
 =head1 NAME
@@ -33,7 +35,8 @@ assembly suppport.
 /*
 
 =item C<PARROT_INLINE
-void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
+void *
+parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
                                         void *update)>
 
 RT#48260: Not yet documented!!!
@@ -44,7 +47,9 @@ RT#48260: Not yet documented!!!
 
 
 PARROT_INLINE
-void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
+PARROT_CANNOT_RETURN_NULL
+void *
+parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
                                         void *update)
 {
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
@@ -64,7 +69,8 @@ void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
 /*
 
 =item C<PARROT_INLINE
-long parrot_i386_xadd(volatile long *l, long amount)>
+long
+parrot_i386_xadd(volatile long *l, long amount)>
 
 RT#48260: Not yet documented!!!
 
@@ -74,7 +80,8 @@ RT#48260: Not yet documented!!!
 
 
 PARROT_INLINE
-long parrot_i386_xadd(volatile long *l, long amount)
+long
+parrot_i386_xadd(volatile long *l, long amount)
 {
     long result = amount;
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
