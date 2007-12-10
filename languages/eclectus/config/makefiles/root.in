@@ -58,10 +58,25 @@ $(ECLECTUS_GROUP): $(PARROT) $(PMC_SOURCES)
 
 # cleaning up
 
-clean:
-	$(RM_F) foo.pasm foo.pbc \
+clean: dynext-clean
+	$(RM_F) \
+  foo.pasm foo.pbc \
   "*.out" \
   "*.pir"
+
+dynext-clean:
+	$(RM_F) \
+  $(PMC_DIR)/*.h \
+  $(PMC_DIR)/*.c \
+  $(PMC_DIR)/*.dump \
+  $(PMC_DIR)/*$(O) \
+  $(PMC_DIR)/*$(LOAD_EXT) \
+  $(PMC_DIR)/*.exp \
+  $(PMC_DIR)/*.ilk \
+  $(PMC_DIR)/*.manifest \
+  $(PMC_DIR)/*.pdb \
+  $(PMC_DIR)/*.lib
+
 
 realclean: clean
 	$(RM_F) Makefile
