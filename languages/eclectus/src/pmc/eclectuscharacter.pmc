@@ -1,0 +1,60 @@
+/*
+$Id$
+Copyright (C) 2007, The Perl Foundation.
+
+=head1 NAME
+
+src/pmc/eclectuscharacter.pmc - Eclectus Character
+
+=head1 DESCRIPTION
+
+C<EclectusCharacter> extends C<Integer> to provide Scheme-specific
+character behavior. Derived from the Amber_CHARACTER PMC.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+pmclass EclectusCharacter
+    extends Integer
+    does string
+    dynpmc
+    group eclectus_group
+    hll Eclectus
+    maps Integer {
+
+    STRING* get_string() {
+        return string_chr(INTERP, PMC_int_val(SELF));
+    }
+
+    void set_string_native(STRING *value) {
+        INTVAL ord;
+
+        if (string_length(INTERP, value) != 3)
+            real_exception(interp, NULL, UNIMPLEMENTED, "value must have length=3");
+
+        ord = string_ord(INTERP, value, 2);
+        DYNSELF.set_integer_native(ord);
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
