@@ -1430,15 +1430,8 @@ tree as a PIR code object that can be compiled.
           $I1 = can $P1, %2
           if $I1 == 0 goto %1
           mpos = pos
-          ($P0 :optional, $I0 :opt_flag) = $P1.%2(mob%3)
-          if $I0 == 0 goto %1
-          mob.'result_object'($P0)
-          push ustack, pos
-          bsr succeed
-          pos = pop ustack
-          null $P0
-          mob.'result_object'($P0)
-          goto fail
+          $P1.%2(mob%3)
+          goto %1
         CODE
   end:
     .return ()
