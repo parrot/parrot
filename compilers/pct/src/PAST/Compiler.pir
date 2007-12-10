@@ -1033,6 +1033,7 @@ blocks to determine the scope.
     pop_eh
     .return self.$P0(node)
   scope_error:
+    $S0 = node.'name'()
     .return self.'panic'("No scope found for PAST::Var '", $S0, "'")
 .end
 

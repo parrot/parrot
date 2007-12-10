@@ -23,6 +23,7 @@ PCT_SOURCES = \
   PCT.pir \
   src/PCT/Grammar.pir \
   src/PCT/HLLCompiler.pir \
+  src/PCT/Node.pir \
   src/PAST/Compiler.pir \
   src/PAST/Node.pir \
   src/POST/Compiler.pir \
