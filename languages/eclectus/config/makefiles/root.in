@@ -4,13 +4,19 @@
 # Makefile for languages/eclectus
 
 # Set up commands
-PERL          = @perl@
-RM_F          = @rm_f@
-RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+PERL            = @perl@
+RM_F            = @rm_f@
+RECONFIGURE     = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+BUILD_DYNPMC    = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 # Set up directories
-BUILD_DIR     = @build_dir@
+PARROT_DYNEXT   = @build_dir@/runtime/parrot/dynext
+BUILD_DIR       = @build_dir@
+PMC_DIR         = src/pmc
 
+ECLECTUS_GROUP  = $(PMC_DIR)/eclectus_group@load_ext@
+PMCS            = eclectusboolean
+PMC_SOURCES     = $(PMC_DIR)/eclectusboolean.pmc
 
 
 # The default target
@@ -33,11 +39,16 @@ help :
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=scheme
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=eclectus
 
 # Compilation:
-build:
-	@echo "Nothing to do"
+build: $(ECLECTUS_GROUP)
+
+$(ECLECTUS_GROUP): $(PARROT) $(PMC_SOURCES)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) generate $(PMCS)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) compile $(PMCS)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) linklibs $(PMCS)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) copy --destination=$(PARROT_DYNEXT) $(PMCS)
 
 # cleaning up
 
