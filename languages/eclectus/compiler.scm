@@ -80,7 +80,10 @@
 
 ; forms represented by a scalar PMC
 (define (immediate? x)
-  (or (fixnum? x) (boolean? x) (char? x)))
+  (or (fixnum? x)
+      (boolean? x)
+      (char? x)
+      (and (list? x) (= (length x) 0 ))))
 
 (define (immediate-rep x)
   (cond
@@ -94,6 +97,11 @@
     val_x = new 'PAST::Val'
     val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
 " (char->integer x) )]
+     [(and (list? x) (= (length x) 0 ))
+"
+    val_x = new 'PAST::Val'
+    val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
+" ]
      [(boolean? x)
         (if x 
 "

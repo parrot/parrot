@@ -15,10 +15,14 @@ BUILD_DIR       = @build_dir@
 PMC_DIR         = src/pmc
 
 ECLECTUS_GROUP  = $(PMC_DIR)/eclectus_group@load_ext@
-PMCS            = eclectusboolean eclectuscharacter
+PMCS            = \
+    eclectusboolean \
+    eclectuscharacter \
+    eclectusemptylist
 PMC_SOURCES     = \
     $(PMC_DIR)/eclectusboolean.pmc \
-    $(PMC_DIR)/eclectuscharacter.pmc
+    $(PMC_DIR)/eclectuscharacter.pmc \
+    $(PMC_DIR)/eclectusemptylist.pmc
 
 
 # The default target
