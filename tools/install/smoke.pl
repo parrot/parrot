@@ -89,8 +89,14 @@ $out = `$parrot languages/abc/abc.pbc $filename`;
 ok($out eq "3\n", "check abc");
 unlink($filename);
 
-$out = `$parrot languages/APL/APL.pbc`;
-ok($out eq q{}, "check APL");
+$filename = 'test.apl';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "\"Hello world!\"";
+close $FH;
+$out = `$parrot languages/APL/APL.pbc $filename`;
+ok($out eq "Hello world!\n", "check APL");
+unlink($filename);
 
 $out = `$parrot languages/bf/bf.pbc`;
 ok($out =~ /^usage/, "check bf");
