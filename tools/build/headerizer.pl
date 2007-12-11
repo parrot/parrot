@@ -91,6 +91,7 @@ main();
 sub extract_function_declarations {
     my $text = shift;
 
+    # Drop all text after HEADERIZER STOP
     $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
 
     # Strip blocks of comments
@@ -163,7 +164,7 @@ sub function_components_from_declaration {
     }
 
     my $return_type = shift @lines;
-    my $args = join( " ", @lines );
+    my $args = join( ' ', @lines );
 
     $args =~ s/\s+/ /g;
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
@@ -304,6 +305,54 @@ sub squawk {
     push( @{ $warnings{$file}->{$func} }, $error );
 }
 
+sub read_file {
+    my $filename = shift;
+
+    open my $fh, '<', $filename or die "couldn't read '$filename': $!";
+    my $text = do { local $/ = undef; <$fh> };
+    close $fh;
+
+    return $text;
+}
+
+sub write_file {
+    my $filename = shift;
+    my $text     = shift;
+
+    open my $fh, '>', $filename or die "couldn't write '$filename': $!";
+    print {$fh} $text;
+    close $fh;
+}
+
+sub replace_headerized_declarations {
+    my $source_code = shift;
+    my $cfile       = shift;
+    my $hfile       = shift;
+    my @funcs       = @_;
+
+    # Allow a way to not headerize statics
+    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$cfile\s*\*/} ) {
+        return $source_code;
+    }
+
+    @funcs = sort api_first_then_alpha @funcs;
+
+    my @function_decls = make_function_decls(@funcs);
+
+    my $function_decls = join( "\n", @function_decls );
+    my $STARTMARKER    = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
+    my $ENDMARKER      = qr#/\* HEADERIZER END: $cfile \*/\n?#;
+    $source_code =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1\n$function_decls\n$2#s
+        or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
+
+    return $source_code;
+}
+
+sub api_first_then_alpha {
+    return ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
+        || ( lc $a->{name} cmp lc $b->{name} );
+}
+
 sub main {
     GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
 
@@ -396,54 +445,6 @@ sub main {
     }
 
     return;
-}
-
-sub read_file {
-    my $filename = shift;
-
-    open my $fh, '<', $filename or die "couldn't read '$filename': $!";
-    my $text = do { local $/ = undef; <$fh> };
-    close $fh;
-
-    return $text;
-}
-
-sub write_file {
-    my $filename = shift;
-    my $text     = shift;
-
-    open my $fh, '>', $filename or die "couldn't write '$filename': $!";
-    print {$fh} $text;
-    close $fh;
-}
-
-sub replace_headerized_declarations {
-    my $source_code = shift;
-    my $cfile       = shift;
-    my $hfile       = shift;
-    my @funcs       = @_;
-
-    # Allow a way to not headerize statics
-    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$cfile\s*\*/} ) {
-        return $source_code;
-    }
-
-    @funcs = sort api_first_then_alpha @funcs;
-
-    my @function_decls = make_function_decls(@funcs);
-
-    my $function_decls = join( "\n", @function_decls );
-    my $STARTMARKER    = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
-    my $ENDMARKER      = qr#/\* HEADERIZER END: $cfile \*/\n?#;
-    $source_code =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1\n$function_decls\n$2#s
-        or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
-
-    return $source_code;
-}
-
-sub api_first_then_alpha {
-    return ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
-        || ( lc $a->{name} cmp lc $b->{name} );
 }
 
 =head1 NAME
