@@ -374,11 +374,6 @@ sub main {
         my $cfile = $ofile;
         $cfile =~ s/\Q$PConfig{o}\E$/.c/ or die "$cfile doesn't look like an object file";
 
-        my $pmcfile = $ofile;
-        $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
-
-        my $sourcefile = -f $pmcfile ? $pmcfile : $cfile;
-
         my $source = read_file($cfile);
 
         die "can't find HEADERIZER HFILE directive in '$cfile'"
