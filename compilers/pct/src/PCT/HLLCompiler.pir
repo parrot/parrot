@@ -291,32 +291,43 @@ to any options and return the resulting parse tree.
     unless parsegrammar_name goto err_no_parsegrammar
     top = get_hll_global parsegrammar_name, 'TOP'
     unless null top goto have_top
-    top = get_hll_global parsegrammar_name, 'apply'    # FIXME: deprecated
-    unless null top goto have_top                      # FIXME: deprecated
-    $P0 = get_class 'Exception'
-    $P1 = $P0.'new'('Cannot find rule TOP in ', parsegrammar_name)
-    throw $P1
+    self.'panic'('Cannot find rule TOP in ', parsegrammar_name)
   have_top:
-    .local pmc parseactions
-    null parseactions
-    if target == 'parse' goto have_parseactions
-    $P0 = self.'parseactions'()
-    unless $P0 goto have_parseactions
-    parseactions = new $P0
-  have_parseactions:
+    .local pmc parseactions, action
+    null action
+    if target == 'parse' goto have_action
+    parseactions = self.'parseactions'()
+    unless parseactions goto have_action
+    ##  if parseactions is a Class or array, make action directly from that
+    $I0 = isa parseactions, 'Class'
+    if $I0 goto action_make
+    $I0 = does parseactions, 'array'
+    if $I0 goto action_make
+    ##  if parseactions is not a String, use it directly.
+    $I0 = isa parseactions, 'String'
+    if $I0 goto action_string
+    action = parseactions
+    goto have_action
+  action_string:
+    ##  Try the string itself, if that fails try splitting on '::'
+    $P0 = get_class parseactions
+    unless null $P0 goto action_make
+    $S0 = parseactions
+    parseactions = split '::', $S0
+  action_make:
+    action = new parseactions
+  have_action:
     .local pmc match
-    match = top(source, 'grammar' => parsegrammar_name, 'action' => parseactions)
+    match = top(source, 'grammar' => parsegrammar_name, 'action' => action)
     unless match goto err_failedparse
     .return (match)
 
   err_no_parsegrammar:
-    $P0 = new 'Exception'
-    $P0['_message'] = 'Missing parsegrammar in compiler'
-    throw $P0
+    self.'panic'('Missing parsegrammar in compiler')
+    .return ()
   err_failedparse:
-    $P0 = new 'Exception'
-    $P0['_message'] = 'Failed to parse source'
-    throw $P0
+    self.'panic'('Failed to parse source')
+    .return ()
 .end
 
 
