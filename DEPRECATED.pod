@@ -51,10 +51,6 @@ See RT #48016. Replace usage with set_[hll,root]_global variants.
 
 See RT #48018. Replace usage with get_[hll,root]_global variants.
 
-=item * C<find_name> [post 0.5.0]
-
-See RT #48020. Replace usage with ... ?
-
 =item * C<new>(out PMC, in INT, in STR) [post 0.5.0]
 
 See RT #47011.
