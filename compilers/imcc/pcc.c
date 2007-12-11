@@ -370,8 +370,10 @@ expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(
             tmp = INS(interp, unit, "end", NULL, regs, 0, 0, 0);
         }
         else {
-            pcc_get_args(interp, unit, unit->last_ins, "set_returns",
-                    0, NULL, NULL);
+            Instruction *unused_ins;
+            unused_ins = pcc_get_args(interp, unit, unit->last_ins,
+                    "set_returns", 0, NULL, NULL);
+            UNUSED(unused_ins);
             tmp = INS(interp, unit, "returncc", NULL, regs, 0, 0, 0);
         }
         IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
@@ -576,7 +578,7 @@ recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
 {
     SymReg *called_sub, *this_sub, *label;
     SymReg *regs[2];
-    Instruction *get_params, *tmp_ins;
+    Instruction *get_params, *tmp_ins, *unused_ins;
     char *buf;
 
     if (!(unit->instructions->type & ITLABEL))
@@ -614,11 +616,12 @@ recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
 
     free(buf);
 
-    ins     = move_regs(interp, unit, ins, sub->pcc_sub->nargs,
+    ins = move_regs(interp, unit, ins, sub->pcc_sub->nargs,
             this_sub->pcc_sub->args, sub->pcc_sub->args);
 
     regs[0] = label;
-    insINS(interp, unit, ins, "branch", regs, 1);
+    unused_ins = insINS(interp, unit, ins, "branch", regs, 1);
+    UNUSED(unused_ins);
 
     return 1;
 }
