@@ -18,7 +18,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step ':auto', 'capture_output';
+use Parrot::Configure::Step ':auto';
 
 
 sub _init {
