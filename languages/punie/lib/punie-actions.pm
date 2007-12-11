@@ -3,6 +3,19 @@ class Punie::Grammar::Actions;
 ##  The ast of the entire program is the ast of the
 ##  top-level <lineseq>.
 method TOP($/) {
+    my $?GLOBAL;
+    my $init := PAST::Stmts.new();
+    $init.push( PAST::Var.new(:name('$_'), :isdecl(1)) );
+    $init.push( PAST::Var.new(:name('$#'), :isdecl(1)) );
+    $init.push( PAST::Var.new(:name('$ '), :isdecl(1)) );
+    $?GLOBAL := PAST::Block.new(
+            PAST::Stmts.new( $init ),
+            :blocktype('immediate'),
+            :node($/)
+    );
+    $?GLOBAL.symbol( '$_', :scope('package') );
+    $?GLOBAL.symbol( '$#', :scope('package') );
+    $?GLOBAL.symbol( '$ ', :scope('package') );
     my $past := PAST::Block.new( :node($/), :name('anon') );
     $past.push( $($<lineseq>) );
     make $past;
@@ -156,6 +169,8 @@ method variable($/) {
         );
     }
     else {
+        if ~$<sigil> eq '$#' { # XXX not yet implemented
+        }
         make PAST::Var.new(
             :node($/),
             :name( $sigil ~ $<word> ),
@@ -164,4 +179,8 @@ method variable($/) {
         );
     }
 
+}
+
+method special_variable($/) {
+    make PAST::Var.new( :node($/), :name(~$/), :scope('package') );
 }

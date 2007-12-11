@@ -58,8 +58,14 @@ regex term {
     | <subcall> {*}                              #= subcall
     | <variable> {*}                             #= variable
 }
-rule variable { <sigil>? <word> <key>? {*} }
-token sigil { <[$@%]> {*} }
+rule variable {
+    | <special_variable> <key>? {*}
+    | <sigil>? <word> <key>? {*}
+}
+
+token special_variable { '$_' | '$#' | '$ ' }
+
+token sigil { '$#' | <[$@%]> {*} }
 token key {
     | $<KEY>:=[\[] <?ws> <expr> <?ws> $<KEY_CLOSE>:=[\]]
     | $<KEY>:=[\{] <?ws> <expr> <?ws> $<KEY_CLOSE>:=[\}]
