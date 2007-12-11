@@ -29,8 +29,7 @@ and registers the "compile" subroutine as the "ABC" compiler.
     $P0 = new [ 'PCT::HLLCompiler' ]
     $P0.'language'('ABC')
     $P0.'parsegrammar'('ABC::Grammar')
-    $P1 = split '::', 'ABC::Grammar::Actions'
-    $P0.'parseactions'($P1)
+    $P0.'parseactions'('ABC::Grammar::Actions')
 .end
 
 

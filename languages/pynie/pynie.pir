@@ -25,8 +25,7 @@ object.
     $P0 = $P0.'new'()
     $P0.'language'('Pynie')
     $P0.'parsegrammar'('Pynie::Grammar')
-    $P1 = split '::', 'Pynie::Grammar::Actions'
-    $P0.'parseactions'($P1)
+    $P0.'parseactions'('Pynie::Grammar::Actions')
 
     $P0.'commandline_banner'("Pynie: a Python compiler for Parrot.\n")
     $P0.'commandline_prompt'('>>> ')
