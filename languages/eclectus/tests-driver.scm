@@ -1,3 +1,4 @@
+; $Id$
 
 (define all-tests '())
 
@@ -54,12 +55,12 @@
      [else (error 'test "invalid test type ~s" type)])
     (printf "ok ~s - ~s ~s\n" ( + test-id 1 ) test-name expr )))
  
-(define (plan num_tests)
-  ( printf "~s..~s\n" 1 num_tests))
+(define (plan all-tests)
+  ( printf "~s..~s\n" 1 ( length (cdar all-tests))))
 
 (define (test-all)
   ;; there has to be an easy way of getting the number of tests
-  (plan 9)
+  (plan all-tests)
 
   ;; run the tests
   (let f ([i 0] [ls (reverse all-tests)])
