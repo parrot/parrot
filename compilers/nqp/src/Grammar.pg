@@ -22,7 +22,7 @@ grammar NQP::Grammar is PCT::Grammar;
 
 token TOP {
   <statement_block>
-  [ $ | <panic: Syntax error> ]
+  [ $ || <panic: Syntax error> ]
   {*}
 }
 
@@ -174,13 +174,13 @@ rule for_statement {
 
 rule return_statement {
     $<sym>:=['return']
-    [ <EXPR> | <panic: Unable to parse argument to 'return'> ]
+    [ <EXPR> || <panic: Unable to parse argument to 'return'> ]
     {*}
 }
 
 rule make_statement {
     $<sym>:=['make']
-    [ <EXPR> | <panic: Unable to parse argument to 'make'> ]
+    [ <EXPR> || <panic: Unable to parse argument to 'make'> ]
     {*}
 }
 
@@ -205,7 +205,7 @@ rule inline_pir_statement {
 token block {
     '{'
     <statement_block>
-    [ '}' | <panic: Missing '}'> ]
+    [ '}' || <panic: Missing '}'> ]
     [ \h* [ \# \N* ]? \n  <.MARK_STATEMENT_END> ]?
     {*}
 }
@@ -254,7 +254,7 @@ token postfix {
 token methodop {
     '.' <ident>
     '(' <arglist>
-    [ <.ws> ')' | <panic: Missing ')'> ]
+    [ <.ws> ')' || <panic: Missing ')'> ]
     {*}                                                    #= methodop
 }
 
