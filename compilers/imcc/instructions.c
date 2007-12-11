@@ -391,7 +391,9 @@ get_branch_regno(NOTNULL(const Instruction *ins))
 
 /*
 
-=item C<SymReg *
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+SymReg *
 get_branch_reg(NOTNULL(const Instruction *ins))>
 
 Get the register corresponding to an address which is a branch target
@@ -415,7 +417,8 @@ get_branch_reg(NOTNULL(const Instruction *ins))
 
 /*
 
-=item C<Instruction *
+=item C<PARROT_CAN_RETURN_NULL
+Instruction *
 delete_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), int needs_freeing)>
 
 Delete instruction ins. Also free it if needs_freeing is true.
@@ -558,7 +561,8 @@ subst_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins),
 
 /*
 
-=item C<Instruction *
+=item C<PARROT_CAN_RETURN_NULL
+Instruction *
 move_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), NOTNULL(Instruction *to))>
 
 Move instruction ins from its current position to the position

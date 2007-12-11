@@ -113,9 +113,11 @@ static void unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
 
 /*
 
-=item C<static Instruction *
-insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
-        NOTNULL(const char *name), SymReg **regs, int n)>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static Instruction *
+insINS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
+        NOTNULL(const char *name), NOTNULL(SymReg **regs), int n)>
 
 Utility instruction routine. Creates and inserts an instruction
 into the current block in one call.
@@ -190,9 +192,12 @@ get_const(PARROT_INTERP, NOTNULL(const char *name), int type)
 
 /*
 
-=item C<static Instruction*
-pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
-        char *op_name, int n, SymReg **args, int *arg_flags)>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static Instruction*
+pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
+        NOTNULL(const char *op_name), int n,
+        NULLOK(SymReg **args), NULLOK(const int *arg_flags))>
 
 set arguments or return values
 get params or results
@@ -499,8 +504,8 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction *
-move_regs(PARROT_INTERP, IMC_Unit *unit,
-        NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)>
+move_regs(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
+        int n, NOTNULL(SymReg **dest), NOTNULL(SymReg **src))>
 
 RT#48260: Not yet documented!!!
 
