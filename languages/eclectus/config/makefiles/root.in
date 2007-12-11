@@ -3,6 +3,11 @@
 
 # Makefile for languages/eclectus
 
+# configuration settings
+BUILD_DIR       = @build_dir@
+LOAD_EXT        = @load_ext@
+O               = @o@
+
 # Set up commands
 PERL            = @perl@
 RM_F            = @rm_f@
@@ -11,7 +16,6 @@ BUILD_DYNPMC    = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 # Set up directories
 PARROT_DYNEXT   = @build_dir@/runtime/parrot/dynext
-BUILD_DIR       = @build_dir@
 PMC_DIR         = src/pmc
 
 ECLECTUS_GROUP  = $(PMC_DIR)/eclectus_group@load_ext@
