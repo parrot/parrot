@@ -20,7 +20,7 @@ that there must be space between the #= marker and the key.
 
 rule TOP {
     ^ <statement_list>
-    [ $ | <panic: parse error> ]
+    [ $ || <panic: parse error> ]
     {*}
 }
 
