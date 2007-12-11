@@ -64,7 +64,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_vsprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), va_list args)
+Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 {
     SPRINTF_OBJ obj = va_core;
     obj.data = PARROT_VA_TO_VAPTR(args);
@@ -88,7 +88,7 @@ C string version of C<Parrot_vsprintf_s()>.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_vsprintf_c(PARROT_INTERP, NOTNULL(const char *pat), va_list args)
+Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 {
     STRING * const realpat = string_make(interp, pat, strlen(pat),
                                   NULL, PObj_external_FLAG);
@@ -114,8 +114,8 @@ Similar to C<Parrot_vsprintf()> but with an option to specify the length
 
 PARROT_API
 void
-Parrot_vsnprintf(PARROT_INTERP, NOTNULL(char *targ),
-                 size_t len, NOTNULL(const char *pat), va_list args)
+Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
+                 size_t len, ARGIN(const char *pat), va_list args)
 {
     if (len == 0)
         return;
@@ -152,7 +152,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_sprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), ...)
+Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 {
     STRING *ret;
     va_list args;
@@ -184,7 +184,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_sprintf_c(PARROT_INTERP, NOTNULL(const char *pat), ...)
+Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
 {
     STRING *ret;
     va_list args;
@@ -214,8 +214,8 @@ Similar to C<Parrot_sprintf()> but with an option to specify the length
 
 PARROT_API
 void
-Parrot_snprintf(PARROT_INTERP, NOTNULL(char *targ), size_t len,
-                NOTNULL(const char *pat), ...)
+Parrot_snprintf(PARROT_INTERP, ARGOUT(char *targ), size_t len,
+                ARGIN(const char *pat), ...)
 {
     va_list args;
 
@@ -245,7 +245,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_psprintf(PARROT_INTERP, NOTNULL(STRING *pat), NOTNULL(PMC *ary))
+Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))
 {
     SPRINTF_OBJ obj = pmc_core;
     obj.data = ary;

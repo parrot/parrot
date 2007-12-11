@@ -119,62 +119,53 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_psprintf(PARROT_INTERP,
-    NOTNULL(STRING *pat),
-    NOTNULL(PMC *ary))
+    ARGIN(STRING *pat),
+    ARGOUT(PMC *ary))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_snprintf(PARROT_INTERP,
-    NOTNULL(char *targ),
+    ARGOUT(char *targ),
     size_t len,
-    NOTNULL(const char *pat),
+    ARGIN(const char *pat),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_sprintf_c(PARROT_INTERP, NOTNULL(const char *pat), ...)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_sprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), ...)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+STRING * Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
+        __attribute__nonnull__(1);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_vsnprintf(PARROT_INTERP,
-    NOTNULL(char *targ),
+    ARGOUT(char *targ),
     size_t len,
-    NOTNULL(const char *pat),
+    ARGIN(const char *pat),
     va_list args)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_vsprintf_c(PARROT_INTERP,
-    NOTNULL(const char *pat),
+    ARGIN(const char *pat),
     va_list args)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_vsprintf_s(PARROT_INTERP,
-    NOTNULL(STRING *pat),
-    va_list args)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/misc.c */
 
