@@ -54,13 +54,14 @@ regex term {
     | <integer> {*}                              #= integer
     | <stringdouble> {*}                         #= stringdouble
     | <stringsingle> {*}                         #= stringsingle
+    | <stringbacktick> {*}                       #= stringbacktick
     | do <block> {*}                             #= block
     | <subcall> {*}                              #= subcall
     | <variable> {*}                             #= variable
 }
 rule variable {
-    | <special_variable> <key>? {*}
     | <sigil>? <word> <key>? {*}
+    | <special_variable> <key>? {*}
 }
 
 token special_variable { '$_' | '$#' | '$ ' }
@@ -75,6 +76,7 @@ token integer { \d+ {*} }
 token number { \d+\.\d+ {*} }
 token stringdouble { '"' <string_literal: "> '"' {*} }
 token stringsingle { \' <string_literal: '> \' {*} }
+token stringbacktick { \` <string_literal: `> \` {*} }
 rule subcall { do <word> \( <expr>? \) {*} }
 
 token ws {

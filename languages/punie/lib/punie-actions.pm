@@ -102,6 +102,10 @@ method stringsingle($/) {
     make PAST::Val.new( :value( ~$<string_literal> ), :node($/) );
 }
 
+method stringbacktick($/) {
+    make PAST::Val.new( :value( ~$<string_literal> ), :node($/) );
+}
+
 method subcall($/) {
     my $past := PAST::Op.new( :node($/) );
     if $<expr> {
@@ -180,6 +184,7 @@ method variable($/) {
     }
 
 }
+
 
 method special_variable($/) {
     make PAST::Var.new( :node($/), :name(~$/), :scope('package') );
