@@ -18,7 +18,7 @@ unified languages testing.
 
 =head1 TODO
 
-- Add a check whether 'petite' is installed in the Perl 5 wrappers.
+- Add a proper check whether 'petite' is installed.
 
 =head1 AUTHOR
 
