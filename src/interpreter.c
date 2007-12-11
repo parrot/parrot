@@ -393,7 +393,7 @@ get_core_op_lib_init(PARROT_INTERP, int which)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
-get_dynamic_op_lib_init(PARROT_INTERP, NULLOK(PMC *lib))>
+get_dynamic_op_lib_init(PARROT_INTERP, NOTNULL(const PMC *lib))>
 
 Returns an dynamic oplib's opcode's library C<op_lib> init function.
 

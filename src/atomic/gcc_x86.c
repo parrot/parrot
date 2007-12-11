@@ -35,6 +35,7 @@ assembly suppport.
 /*
 
 =item C<PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
 void *
 parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
                                         void *update)>

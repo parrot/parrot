@@ -50,7 +50,7 @@ the type for the format.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_vsprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), va_list args)>
+Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)>
 
 Almost all the other sprintf variants in this file are implemented in
 terms of this function (see C<Parrot_psprintf()> for the exception). It
@@ -77,7 +77,7 @@ Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 =item C<PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_vsprintf_c(PARROT_INTERP, NOTNULL(const char *pat), va_list args)>
+Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)>
 
 C string version of C<Parrot_vsprintf_s()>.
 
@@ -102,8 +102,8 @@ Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 
 =item C<PARROT_API
 void
-Parrot_vsnprintf(PARROT_INTERP, NOTNULL(char *targ),
-                 size_t len, NOTNULL(const char *pat), va_list args)>
+Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
+                 size_t len, ARGIN(const char *pat), va_list args)>
 
 Similar to C<Parrot_vsprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
@@ -140,7 +140,7 @@ Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_sprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), ...)>
+Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)>
 
 Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 
@@ -172,7 +172,7 @@ Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_sprintf_c(PARROT_INTERP, NOTNULL(const char *pat), ...)>
+Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)>
 
 C string version of C<Parrot_sprintf_s()>.
 
@@ -202,8 +202,8 @@ Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
 
 =item C<PARROT_API
 void
-Parrot_snprintf(PARROT_INTERP, NOTNULL(char *targ), size_t len,
-                NOTNULL(const char *pat), ...)>
+Parrot_snprintf(PARROT_INTERP, ARGOUT(char *targ), size_t len,
+                ARGIN(const char *pat), ...)>
 
 Similar to C<Parrot_sprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
@@ -232,7 +232,7 @@ Parrot_snprintf(PARROT_INTERP, ARGOUT(char *targ), size_t len,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_psprintf(PARROT_INTERP, NOTNULL(STRING *pat), NOTNULL(PMC *ary))>
+Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))>
 
 Calls C<Parrot_sprintf_format()> with the insertion arguments in an
 C<Array> PMC.

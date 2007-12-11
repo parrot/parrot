@@ -66,7 +66,7 @@ static void make_writable(PARROT_INTERP,
 
 =item C<PARROT_API
 void
-Parrot_unmake_COW(PARROT_INTERP, NOTNULL(STRING *s))>
+Parrot_unmake_COW(PARROT_INTERP, ARGIN(STRING *s))>
 
 If the specified Parrot string is copy-on-write then the memory is
 copied over and the copy-on-write flag is cleared.
@@ -122,7 +122,7 @@ Parrot_unmake_COW(PARROT_INTERP, ARGIN(STRING *s))
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))>
+Parrot_make_COW_reference(PARROT_INTERP, ARGIN(STRING *s))>
 
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer.
@@ -214,7 +214,7 @@ Parrot_reuse_COW_reference(SHIM_INTERP, NOTNULL(STRING *s), NOTNULL(STRING *d))
 =item C<PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_set(PARROT_INTERP, NULLOK(STRING *dest), NOTNULL(STRING *src))>
+string_set(PARROT_INTERP, ARGOUT(STRING *dest), NOTNULL(STRING *src))>
 
 Makes the contents of first Parrot string a copy of the contents of
 second.
@@ -331,7 +331,7 @@ string_deinit(PARROT_INTERP)
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 UINTVAL
-string_capacity(SHIM_INTERP, NOTNULL(const STRING *s))>
+string_capacity(SHIM_INTERP, ARGIN(const STRING *s))>
 
 Returns the capacity of the specified Parrot string in bytes, that
 is how many bytes can be appended onto strstart.
@@ -792,7 +792,7 @@ string_grow(PARROT_INTERP, NOTNULL(STRING *s), INTVAL addlen)
 =item C<PARROT_API
 PARROT_PURE_FUNCTION
 UINTVAL
-string_length(SHIM_INTERP, NOTNULL(const STRING *s))>
+string_length(SHIM_INTERP, ARGIN(const STRING *s))>
 
 Returns the number of characters in the specified Parrot string.
 
@@ -2815,7 +2815,7 @@ string_titlecase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_increment(PARROT_INTERP, NOTNULL(const STRING *s))>
+string_increment(PARROT_INTERP, ARGINOUT(const STRING *s))>
 
 Perl5ish increment the string. Currently single char only.
 
@@ -2911,7 +2911,7 @@ Parrot_string_is_cclass(PARROT_INTERP,
 =item C<PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_string_find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *s),
+Parrot_string_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
                           UINTVAL offset, UINTVAL count)>
 
 RT#48260: Not yet documented!!!
@@ -3025,8 +3025,8 @@ Parrot_string_trans_charset(PARROT_INTERP, NULLOK(STRING *src),
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_string_trans_encoding(PARROT_INTERP, NULLOK(STRING *src),
-        INTVAL encoding_nr, NULLOK(STRING *dest))>
+Parrot_string_trans_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
+        INTVAL encoding_nr, ARGOUT_NULLOK(STRING *dest))>
 
 If C<dest> == NULL, converts C<src> to the given charset or encoding inplace,
 else returns a copy of C<src> with the charset/encoding in dest.
@@ -3080,7 +3080,7 @@ Parrot_string_trans_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_compose(PARROT_INTERP, NULLOK(STRING *src))>
+string_compose(PARROT_INTERP, ARGIN_NULLOK(STRING *src))>
 
 RT#48260: Not yet documented!!!
 
@@ -3151,7 +3151,7 @@ string_join(PARROT_INTERP, NULLOK(STRING *j), NOTNULL(PMC *ar))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-string_split(PARROT_INTERP, NOTNULL(STRING *delim), NOTNULL(STRING *str))>
+string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))>
 
 RT#48260: Not yet documented!!!
 
@@ -3222,7 +3222,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
 uint_to_str(PARROT_INTERP,
-            NOTNULL(char *tc), UHUGEINTVAL num, char base, int minus)>
+            ARGOUT(char *tc), UHUGEINTVAL num, char base, int minus)>
 
 Returns C<num> converted to a Parrot C<STRING>.
 
@@ -3270,7 +3270,7 @@ uint_to_str(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-int_to_str(PARROT_INTERP, NOTNULL(char *tc), HUGEINTVAL num, char base)>
+int_to_str(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, char base)>
 
 Returns C<num> converted to a Parrot C<STRING>.
 

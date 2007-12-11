@@ -43,8 +43,7 @@ static void* scheduler_runloop(NOTNULL(PMC *scheduler))
 
 /*
 
-=item C<PARROT_API
-void
+=item C<void
 Parrot_cx_init_scheduler(PARROT_INTERP)>
 
 Initalize the concurrency scheduler for the interpreter.

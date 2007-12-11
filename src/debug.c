@@ -139,7 +139,7 @@ nextarg(NOTNULL(char const *command))
 =item C<PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-skip_ws(NOTNULL(const char *str))>
+skip_ws(ARGIN(const char *str))>
 
 Returns the pointer past any whitespace.
 
@@ -194,7 +194,7 @@ skip_command(NOTNULL(const char *str))
 =item C<PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-parse_int(NOTNULL(const char *str), NOTNULL(int *intP))>
+parse_int(ARGIN(const char *str), ARGOUT(int *intP))>
 
 Parse an C<int> out of a string and return a pointer to just after the C<int>.
 The output parameter C<intP> contains the parsed value.
@@ -220,7 +220,7 @@ parse_int(ARGIN(const char *str), ARGOUT(int *intP))
 =item C<PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-parse_string(PARROT_INTERP, NOTNULL(const char *str), NOTNULL(STRING **strP))>
+parse_string(PARROT_INTERP, ARGIN(const char *str), ARGOUT(STRING **strP))>
 
 Parse a double-quoted string out of a C string and return a pointer to
 just after the string. The parsed string is converted to a Parrot
@@ -270,7 +270,7 @@ parse_string(PARROT_INTERP, ARGIN(const char *str), ARGOUT(STRING **strP))
 =item C<PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char*
-parse_key(PARROT_INTERP, NOTNULL(const char *str), NOTNULL(PMC **keyP))>
+parse_key(PARROT_INTERP, ARGIN(const char *str), ARGOUT(PMC **keyP))>
 
 Parse an aggregate key out of a string and return a pointer to just
 after the key. Currently only string and integer keys are allowed.
@@ -1590,7 +1590,7 @@ PDB_unescape(NOTNULL(char *string))
 /*
 
 =item C<size_t
-PDB_disassemble_op(PARROT_INTERP, NOTNULL(char *dest), int space,
+PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
                    NOTNULL(op_info_t *info), NOTNULL(opcode_t *op),
                    NULLOK(PDB_file_t *file), NULLOK(opcode_t *code_start), int full_name)>
 
