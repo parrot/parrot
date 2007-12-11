@@ -29,8 +29,8 @@ pmclass EclectusCharacter
 
     STRING* get_string() {
         return string_append( INTERP,
-		              const_string(INTERP, "#\\" ),
-		              string_chr(INTERP, PMC_int_val(SELF)) );
+                              const_string(INTERP, "#\\" ),
+                              string_chr(INTERP, PMC_int_val(SELF)) );
     }
 }
 
