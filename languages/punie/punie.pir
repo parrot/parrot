@@ -35,29 +35,25 @@ and logic ops.
 
 .include "errors.pasm"
 
-.sub '__onload' :load :init
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode "languages/punie/lib/PunieGrammar.pbc"
-    load_bytecode "languages/punie/lib/ASTGrammar.pbc"
-    load_bytecode "languages/punie/lib/PunieBuiltins.pir"
+.sub 'onload' :load :init :anon
+    load_bytecode 'PCT.pbc'
 
-    $P0 = new [ 'HLLCompiler' ]
+    $P0 = new [ 'PCT::HLLCompiler' ]
     $P0.'language'('Punie')
-    $P0.'parsegrammar'('PunieGrammar')
-    $P0.'astgrammar'('ASTGrammar')
+    $P0.'parsegrammar'('Punie::Grammar')
+    $P1 = split '::', 'Punie::Grammar::Actions'
+    $P0.'parseactions'($P1)
 .end
 
 .sub 'main' :main
     .param pmc args
-
-    load_bytecode 'PGE/Dumper.pbc'
-    load_bytecode 'dumper.pbc'
     $P0 = compreg 'Punie'
-    $P1 = $P0.'command_line'(args)
-    .return ($P1)
+    .return $P0.'command_line'(args)
 .end
+
+.include 'lib/builtins.pir'
+.include 'lib/gen_punie.pir'
+.include 'lib/gen_punie-actions.pir'
 
 =head1 LICENSE
 

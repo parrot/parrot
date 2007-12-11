@@ -5,31 +5,28 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+PGE_DIR       = ../../compilers/pge
+NQP_DIR       = ../../compilers/nqp
 CP       = @cp@
+
+PARROT_LIBRARY = ../../runtime/parrot/library
+PGE_LIBRARY   = ../../runtime/parrot/library/PGE
 
 # the default target
 all: punie.pbc
 
-lib/PunieGrammar.pbc: lib/PunieGrammar.pir lib/punie.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/punie_grammar_gen.pir lib/punie.pg
-	$(PARROT) -o lib/PunieGrammar.pbc --output-pbc lib/PunieGrammar.pir 
+SOURCES = punie.pir \
+  lib/punie.pg \
+  lib/punie-actions.pm \
+  lib/builtins.pir \
 
-lib/ASTGrammar.pbc: lib/ASTGrammar.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/ASTGrammar.pir lib/ASTGrammar.tg
-	$(PARROT) -o lib/ASTGrammar.pbc --output-pbc lib/ASTGrammar.pir 
-
-lib/OSTGrammar.pbc: lib/OSTGrammar.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/OSTGrammar.pir lib/OSTGrammar.tg
-	$(PARROT) -o lib/OSTGrammar.pbc --output-pbc lib/OSTGrammar.pir 
-
-lib/PIRGrammar.pbc: lib/PIRGrammar.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/PIRGrammar.pir lib/PIRGrammar.tg
-	$(PARROT) -o lib/PIRGrammar.pbc --output-pbc lib/PIRGrammar.pir 
-
-punie.pbc: punie.pir lib/PunieGrammar.pbc lib/ASTGrammar.pbc lib/OSTGrammar.pbc lib/PIRGrammar.pbc
-	$(PARROT) -o punie.pbc --output-pbc punie.pir 
+# the default target
+punie.pbc: $(PARROT) $(NQP_DIR)/nqp.pbc $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
+	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/gen_punie.pir lib/punie.pg
+	$(PARROT) $(NQP_DIR)/nqp.pbc --target=pir --output=lib/gen_punie-actions.pir lib/punie-actions.pm
+	$(PARROT) -o punie.pbc punie.pir
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -54,19 +51,20 @@ help:
 test: all
 	$(PERL) -Ilib -I../../lib t/harness
 
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=punie
+
 testclean:
 	$(RM_F) "t/*.p1" "t/*.out" "t/*.pir"
 
+CLEANUPS = \
+  punie.pbc \
+  lib/gen_punie.pir \
+  lib/gen_punie-actions.pir \
+
 clean: testclean
-	$(RM_F) punie.pbc \
-	lib/punie_grammar_gen.pir \
-	lib/PunieGrammar.pbc \
-	lib/ASTGrammar.pbc \
-	lib/ASTGrammar.pir \
-	lib/OSTGrammar.pbc \
-	lib/OSTGrammar.pir \
-	lib/PIRGrammar.pbc \
-	lib/PIRGrammar.pir
+	$(RM_F) $(CLEANUPS)
 
 realclean: clean
 	$(RM_F) Makefile

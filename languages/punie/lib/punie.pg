@@ -1,151 +1,160 @@
-grammar PunieGrammar;
+grammar Punie::Grammar is PCT::Grammar;
 
-token TOP    { ^<lineseq>$ }
-
-rule block { \s* \{ <lineseq> \} \s* }
-
-rule lineseq { <line>* }
-
-token line { 
-    <label>
-    [ <cond> 
-    | <subroutine>
-    | <expr>;
-    ] \s* 
+token TOP    {
+    <lineseq> [ $ || <panic: parse error> ] {*}
 }
 
-rule label { [<word>\:]? }
+token ws {
+    || \v+
+    || \h+
+    || '#' \N*
+}
+
+token block { \{ <lineseq> \} {*} }
+
+rule lineseq {
+    <line>*
+    {*}
+}
+
+token line {
+    <label>
+    [ <cond> {*}                                 #= cond
+    | <subroutine> {*}                           #= subroutine
+    | <expr> ';' {*}                             #= expr
+    ] \s*
+}
+
+rule label { [<word>\:]? {*} }
 
 token word { [\w|_][\w|\d|_]* }
 
-rule subroutine { sub <word> <block> }
-
-rule else {
-    (else) <block>
-    | (elsif) \( <expr> \)
-              <block>
-              <else>?
-}
+rule subroutine { sub <word> <block> {*} }
 
 rule cond {
-    (if|unless) \( <expr> \)
-              <block>
-              <else>?
-} 
+    $<sym>=[if|unless]
+    \( <expr> \) <block>
+    [ 'elsif' \( <expr> \) <block> ]*
+    [ 'else' $<else>=<block> ]?
+    {*}
+}
 
-rule expr    { <gprint> | <oexpr> }
+rule expr    {
+    | <gprint> {*}                               #= gprint
+    | <oexpr> {*}                                #= oexpr
+}
 
-rule gprint  { (print) <expr> }
+rule gprint  { (print) <expr> {*} }
+
+rule 'oexpr' is optable { ... }
 
 regex term {
-      \( <expr> \)
-    | <number>
-    | <integer>
-    | <stringdouble>
-    | <stringsingle>
-    | do <block>
-    | <subcall>
-    | <variable>
+    | \( <expr> \) {*}                           #= expr
+    | <number> {*}                               #= number
+    | <integer> {*}                              #= integer
+    | <stringdouble> {*}                         #= stringdouble
+    | <stringsingle> {*}                         #= stringsingle
+    | do <block> {*}                             #= block
+    | <subcall> {*}                              #= subcall
+    | <variable> {*}                             #= variable
 }
-rule variable { <sigil>? <word> <key>? }
-token sigil { <[$@]> }
+rule variable { <sigil>? <word> <key>? {*} }
+token sigil { <[$@%]> {*} }
 token key {
-    $<KEY>:=[\[] <?ws> <expr> <?ws> $<KEY_CLOSE>:=[\]]
+    | $<KEY>:=[\[] <?ws> <expr> <?ws> $<KEY_CLOSE>:=[\]]
     | $<KEY>:=[\{] <?ws> <expr> <?ws> $<KEY_CLOSE>:=[\}]
+    {*}
 }
-token integer { \d+ }
-token number { \d+\.\d+ }
-regex stringdouble { <PGE::Text::bracketed: "> }
-regex stringsingle { <PGE::Text::bracketed: '> }
-rule subcall { do <word> \( <expr>? \) }
+token integer { \d+ {*} }
+token number { \d+\.\d+ {*} }
+token stringdouble { '"' <string_literal: "> '"' {*} }
+token stringsingle { \' <string_literal: '> \' {*} }
+rule subcall { do <word> \( <expr>? \) {*} }
 
 token ws {
     [ \s+
     | \# \N*
     ]*
+    {*}
 }
 
-proto infix:+ is precedence('=') 
+proto infix:<+> is precedence('=')
     is pirop('n_add')
     {...}
 
-proto infix:- is equiv('infix:+') 
+proto infix:<-> is equiv(infix:<+>)
     is pirop('n_sub')
     {...}
 
-proto infix:. is equiv('infix:+')
-    is pirop('concat')
+proto infix:<.> is equiv(infix:<+>)
+    is pirop('n_concat')
     {...}
 
-proto infix:* is tighter('infix:+')
+proto infix:<*> is tighter(infix:<+>)
     is pirop('n_mul')
     {...}
 
-proto infix:/ is equiv('infix:*')
+proto infix:</> is equiv(infix:<*>)
     is pirop('n_div')
     {...}
 
-proto infix:% is equiv('infix:*')
+proto infix:<%> is equiv(infix:<*>)
     is pirop('n_mod')
     {...}
 
-proto infix:x is equiv('infix:*')
-    is pirop('repeat')
+proto infix:<x> is equiv(infix:<*>)
     {...}
 
-proto infix:<< is looser('infix:+')
-    is pirop('shl')
+proto infix:«<<» is looser(infix:<+>)
+#    is pirop('shl') # XXX pirop()s with non PREG destinations don't work yet
     {...}
 
-proto infix:>> is equiv('infix:<<')
-    is pirop('shr')
+proto infix:«>>» is equiv(infix:«<<»)
+#    is pirop('shr') # XXX pirop()s with non PREG destinations don't work yet
     {...}
 
-proto infix:<  is looser('infix:<<') is assoc('non') {...}
-proto infix:>  is equiv('infix:<')   is assoc('non') {...}
-proto infix:<= is equiv('infix:<')   is assoc('non') {...}
-proto infix:>= is equiv('infix:<')   is assoc('non') {...}
-proto infix:lt is equiv('infix:<')   is assoc('non') {...}
-proto infix:gt is equiv('infix:<')   is assoc('non') {...}
-proto infix:le is equiv('infix:<')   is assoc('non') {...}
-proto infix:ge is equiv('infix:<')   is assoc('non') {...}
+proto infix:«<»  is looser(infix:«<<») is assoc('non') {...}
+proto infix:«>»  is equiv(infix:«<»)   is assoc('non') {...}
+proto infix:«<=» is equiv(infix:«<»)   is assoc('non') {...}
+proto infix:«>=» is equiv(infix:«<»)   is assoc('non') {...}
+proto infix:<lt> is equiv(infix:«<»)   is assoc('non') {...}
+proto infix:<gt> is equiv(infix:«<»)   is assoc('non') {...}
+proto infix:<le> is equiv(infix:«<»)   is assoc('non') {...}
+proto infix:<ge> is equiv(infix:«<»)   is assoc('non') {...}
 
-proto infix:== is looser('infix:<') is assoc('non') {...}
-proto infix:!= is equiv('infix:==') is assoc('non') {...}
+proto infix:<==> is looser(infix:«<») is assoc('non') {...}
+proto infix:<!=> is equiv(infix:<==>) is assoc('non') {...}
 
-proto infix:eq is equiv('infix:==') is assoc('non')
-    is past('chain')
+proto infix:<eq> is equiv(infix:<==>) is assoc('non')
     {...}
-proto infix:ne is equiv('infix:==') is assoc('non')
-    is past('chain')
+proto infix:<ne> is equiv(infix:<==>) is assoc('non')
     {...}
 
-proto infix:& is looser('infix:==') is assoc('left')
-    is pirop('band')
+proto infix:<&> is looser(infix:<==>) is assoc('left')
+#    is pirop('band') # XXX pirop()s with non PREG destinations don't work yet
     {...}
 
-proto infix:| is looser('infix:&') is assoc('left')
-    is pirop('bor')
+proto infix:<|> is looser(infix:<&>) is assoc('left')
+#    is pirop('bor') # XXX pirop()s with non PREG destinations don't work yet
     {...}
 
-proto infix:^ is equiv('infix:|')   is assoc('left')
-    is pirop('bxor')
+proto infix:<^> is equiv(infix:<|>)   is assoc('left')
+#    is pirop('bxor') # XXX pirop()s with non PREG destinations don't work yet
     {...}
 
-proto infix:&& is looser('infix:|')  is assoc('left')
-    is past('if')
+proto infix:<&&> is looser(infix:<|>)  is assoc('left')
+    is pasttype('if')
     {...}
-proto infix:|| is looser('infix:&&') is assoc('left')
-    is past('unless')
+proto infix:<||> is looser(infix:<&&>) is assoc('left')
+    is pasttype('unless')
     {...}
 
-proto infix:= is looser('infix:||')
-    is past('assign')
+proto infix:<=> is looser(infix:<||>)
+    is pirop('assign')
     is lvalue(1)
     {...}
 
-proto 'infix:,' is looser('infix:=') is assoc('list')
-    is nullterm
+proto infix:<,> is looser(infix:<=>) is assoc('list')
     { ... }
 
-proto term: is tighter('infix:+') is parsed(&term) { ... }
+proto term: is tighter(infix:<+>) is parsed(&term) { ... }
