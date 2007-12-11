@@ -374,17 +374,25 @@ sub main {
         my $cfile = $ofile;
         $cfile =~ s/\Q$PConfig{o}\E$/.c/ or die "$cfile doesn't look like an object file";
 
-        my $source = read_file($cfile);
+        my $pmcfile = $ofile;
+        $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
 
+        my $csource = read_file($cfile);
         die "can't find HEADERIZER HFILE directive in '$cfile'"
-            unless $source =~ m#/\*\s+HEADERIZER HFILE:\s+([^*]+?)\s+\*/#s;
+            unless $csource =~ m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
         my $hfile = $1;
-
         if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
             die "'$hfile' not found (referenced from '$cfile')";
         }
 
-        my @decls = extract_function_declarations($source);
+        my @decls;
+        if ( -f $pmcfile ) {
+            @decls = extract_function_declarations( $csource );
+        }
+        else {
+            @decls = extract_function_declarations( $csource );
+        }
+
         for my $decl (@decls) {
             my $components = function_components_from_declaration( $cfile, $decl );
             push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
