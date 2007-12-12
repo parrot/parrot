@@ -44,17 +44,21 @@ extern int yydebug;
 static void compile_to_bytecode(PARROT_INTERP,
     ARGIN(const char * const sourcefile),
     ARGIN(const char * const output_file))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void determine_input_file_type(PARROT_INTERP,
     ARGIN(const char * const sourcefile))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void determine_output_file_type(PARROT_INTERP,
     NOTNULL(int *obj_file),
     ARGIN(const char *output_file))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void do_pre_process(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -73,14 +77,17 @@ static void imcc_run_pbc(PARROT_INTERP,
     int argc,
     NOTNULL(char *argv[]))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
 static void imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int is_all_hex_digits(ARGIN(const char *s));
+static int is_all_hex_digits(ARGIN(const char *s))
+        __attribute__nonnull__(1);
 
 static void Parrot_version(PARROT_INTERP)
         __attribute__nonnull__(1);

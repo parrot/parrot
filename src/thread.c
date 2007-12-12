@@ -50,7 +50,9 @@ static PMC * make_local_copy(PARROT_INTERP,
 static void mutex_unlock(NOTNULL(void *arg))
         __attribute__nonnull__(1);
 
-static Parrot_Interp pt_check_tid(UINTVAL tid, ARGIN(const char *from));
+static Parrot_Interp pt_check_tid(UINTVAL tid, ARGIN(const char *from))
+        __attribute__nonnull__(2);
+
 static int pt_gc_count_threads(PARROT_INTERP)
         __attribute__nonnull__(1);
 

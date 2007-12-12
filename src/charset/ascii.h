@@ -23,12 +23,15 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL ascii_compare(PARROT_INTERP,
     ARGIN(const STRING *lhs),
     ARGIN(const STRING *rhs))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_PURE_FUNCTION
 size_t ascii_compute_hash(SHIM_INTERP,
     ARGIN(const STRING *source_string),
-    size_t seed);
+    size_t seed)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL ascii_cs_index(PARROT_INTERP,

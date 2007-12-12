@@ -143,7 +143,8 @@ static void push_ascii_pmc(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
     ARGIN(const PMC* v))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void push_ascii_string(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
@@ -226,14 +227,16 @@ static void str_append(PARROT_INTERP,
     ARGIN(const void *b),
     size_t len)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static PMC* thaw_create_pmc(PARROT_INTERP,
     ARGIN(const visit_info *info),
     INTVAL type)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_INLINE
 static int thaw_pmc(PARROT_INTERP,

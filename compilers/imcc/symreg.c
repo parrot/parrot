@@ -41,7 +41,9 @@ PARROT_CAN_RETURN_NULL
 static SymReg * _get_sym_typed(
     ARGIN(const SymHash *hsh),
     ARGIN(const char *name),
-    int t);
+    int t)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

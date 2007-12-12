@@ -90,7 +90,8 @@ static int add_const_key(PARROT_INTERP,
     int size,
     ARGIN(const char *s_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 static int add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
@@ -105,7 +106,8 @@ static int add_const_pmc_sub(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static opcode_t build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
         __attribute__nonnull__(1)
@@ -131,6 +133,8 @@ static subs_t * find_global_label(
     ARGIN(const char *name),
     ARGIN(const subs_t *sym),
     NOTNULL(int *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -187,12 +191,15 @@ static void store_fixup(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void store_key_const(ARGIN(const char *str), int idx);
+static void store_key_const(ARGIN(const char *str), int idx)
+        __attribute__nonnull__(1);
+
 static void store_sub_size(size_t size, size_t ins_line);
 static void verify_signature(PARROT_INTERP,
     ARGIN(const Instruction *ins),
     NOTNULL(opcode_t *pc))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */

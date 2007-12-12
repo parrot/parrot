@@ -16,7 +16,8 @@ int e_pbc_emit(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 int e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -29,12 +30,14 @@ int e_pbc_open(PARROT_INTERP, SHIM(void *param))
         __attribute__nonnull__(1);
 
 INTVAL IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

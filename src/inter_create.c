@@ -29,7 +29,8 @@ Create or destroy a Parrot interpreter
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static int is_env_var_set(ARGIN(const char* var));
+static int is_env_var_set(ARGIN(const char* var))
+        __attribute__nonnull__(1);
 
 static void setup_default_compreg(PARROT_INTERP)
         __attribute__nonnull__(1);

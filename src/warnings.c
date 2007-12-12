@@ -25,7 +25,7 @@ messages.
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL print_warning(PARROT_INTERP, NULLOK(STRING *msg))
+static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -64,7 +64,7 @@ Prints the warning message and the bytecode location.
 */
 
 static INTVAL
-print_warning(PARROT_INTERP, NULLOK(STRING *msg))
+print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 {
     if (!msg)
         PIO_puts(interp, PIO_STDERR(interp), "Unknown warning\n");
@@ -139,7 +139,7 @@ C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
 PARROT_API
 INTVAL
 Parrot_warn_s(NULLOK_INTERP, INTVAL warnclass,
-              NOTNULL(STRING *message), ...)
+              ARGIN(STRING *message), ...)
 {
     STRING *targ;
 

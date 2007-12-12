@@ -264,7 +264,8 @@ static void gms_debug_verify(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     ARGIN(const char *action))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static int init_mark_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),

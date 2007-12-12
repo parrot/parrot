@@ -102,6 +102,7 @@ static int set_retval_util(PARROT_INTERP,
     NOTNULL(parrot_context_t *ctx),
     NOTNULL(call_state *st))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -121,12 +122,16 @@ static int store_current_arg(NOTNULL(call_state *st))
 static void too_few(PARROT_INTERP,
     ARGIN(const call_state *st),
     ARGIN(const char *action))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void too_many(PARROT_INTERP,
     ARGIN(const call_state *st),
     ARGIN(const char *action))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
 

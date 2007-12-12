@@ -54,7 +54,8 @@ static int e_file_emit(PARROT_INTERP,
     SHIM(void *param),
     SHIM(IMC_Unit *unit),
     ARGIN(const Instruction *ins))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
 static int e_file_open(SHIM_INTERP, NOTNULL(void *param))
         __attribute__nonnull__(2);

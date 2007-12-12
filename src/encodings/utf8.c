@@ -39,7 +39,8 @@ static UINTVAL codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 
 static UINTVAL get_byte(SHIM_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset);
+    UINTVAL offset)
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes(PARROT_INTERP,
@@ -60,7 +61,8 @@ static STRING * get_bytes_inplace(PARROT_INTERP,
 static UINTVAL get_codepoint(PARROT_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_codepoints(PARROT_INTERP,
@@ -83,13 +85,15 @@ static STRING * get_codepoints_inplace(PARROT_INTERP,
 static void iter_init(SHIM_INTERP,
     ARGIN(const STRING *src),
     NOTNULL(String_iter *iter))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void set_byte(PARROT_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL byte)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void set_bytes(PARROT_INTERP,
     SHIM(STRING *src),
@@ -122,10 +126,12 @@ static STRING * to_encoding(PARROT_INTERP,
 static UINTVAL utf8_characters(PARROT_INTERP,
     ARGIN(const utf8_t *ptr),
     UINTVAL byte_len)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static UINTVAL utf8_decode(PARROT_INTERP, ARGIN(const utf8_t *ptr))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static UINTVAL utf8_decode_and_advance(PARROT_INTERP,
     NOTNULL(String_iter *i))
@@ -150,10 +156,12 @@ static void utf8_set_position(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static const void * utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n);
+static const void * utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n)
+        __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static const void * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n);
+static const void * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 

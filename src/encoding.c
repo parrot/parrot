@@ -27,6 +27,7 @@ static INTVAL register_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname),
     NOTNULL(ENCODING *encoding))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
@@ -192,7 +193,7 @@ Return the number of the encoding or -1 if not found.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))
+Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
 {
     const int n = all_encodings->n_encodings;
     int i;

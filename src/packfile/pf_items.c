@@ -38,12 +38,14 @@ C<opcode_t> units.
 static void cvt_num12_num8(
     NOTNULL(unsigned char *dest),
     ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void cvt_num12_num8_be(
     NOTNULL(unsigned char *dest),
     ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void cvt_num12_num8_le(
     NOTNULL(unsigned char *dest),

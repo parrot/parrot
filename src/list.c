@@ -232,7 +232,9 @@ static void list_append(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void list_dump(ARGIN(const List *list), INTVAL type);
+static void list_dump(ARGIN(const List *list), INTVAL type)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void * list_item(PARROT_INTERP,

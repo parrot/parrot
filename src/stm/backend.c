@@ -124,7 +124,8 @@ static int is_aborted(NOTNULL(STM_tx_log *log))
         __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION
-static int is_version(ARGIN(const void *maybe_version));
+static int is_version(ARGIN(const void *maybe_version))
+        __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -152,7 +153,8 @@ static int merge_transactions(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void * next_version(ARGIN(const void *old_version));
+static void * next_version(ARGIN(const void *old_version))
+        __attribute__nonnull__(1);
 
 static void replay_writes(PARROT_INTERP,
     NOTNULL(STM_tx_log *log),
@@ -163,7 +165,8 @@ static void replay_writes(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int safe_to_clone(PARROT_INTERP, ARGIN(const PMC * const original))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int setup_wait(PARROT_INTERP, NOTNULL(STM_tx_log *log))
         __attribute__nonnull__(1)

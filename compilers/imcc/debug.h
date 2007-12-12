@@ -28,7 +28,8 @@
 
 PARROT_API
 void IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -36,7 +37,8 @@ void IMCC_fatal(PARROT_INTERP,
     NULLOK(int code),
     ARGIN(const char *fmt),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -44,7 +46,8 @@ void IMCC_fatal_standalone(PARROT_INTERP,
     int code,
     ARGIN(const char *fmt),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -52,7 +55,8 @@ void IMCC_fataly(PARROT_INTERP,
     NULLOK(int code),
     ARGIN(const char *fmt),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -60,31 +64,53 @@ void IMCC_fataly_standalone(PARROT_INTERP,
     int code,
     ARGIN(const char *fmt),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void dump_cfg(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_cfg(ARGIN(const IMC_Unit *unit));
-void dump_dominance_frontiers(ARGIN(const IMC_Unit *unit));
-void dump_dominators(ARGIN(const IMC_Unit *unit));
+void dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
+void dump_dominators(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
 void dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void dump_interference_graph(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_interference_graph(ARGIN(const IMC_Unit *unit));
-void dump_labels(ARGIN(const IMC_Unit *unit));
-void dump_liveness_status(ARGIN(const IMC_Unit *unit));
+void dump_labels(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
+void dump_liveness_status(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
 void dump_liveness_status_var(
     ARGIN(const IMC_Unit *unit),
-    ARGIN(const SymReg* r));
+    ARGIN(const SymReg* r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void dump_loops(ARGIN(const IMC_Unit *unit));
-void dump_symreg(ARGIN(const IMC_Unit *unit));
+void dump_loops(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
+void dump_symreg(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: compilers/imcc/debug.c */
 
 

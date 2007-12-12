@@ -35,14 +35,18 @@ PARROT_API
 INTVAL Parrot_byte_index(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
-    UINTVAL start_offset);
+    UINTVAL start_offset)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_byte_rindex(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
-    UINTVAL start_offset);
+    UINTVAL start_offset)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_destroy_cpa(ARGINOUT(char **array))
@@ -86,6 +90,7 @@ void Parrot_register_move(PARROT_INTERP,
     NOTNULL(void *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         __attribute__nonnull__(8);
 
 PARROT_API
@@ -97,7 +102,8 @@ INTVAL Parrot_uint_rand(INTVAL how_random);
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_CONST_FUNCTION
 FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
@@ -117,6 +123,7 @@ STRING * Parrot_psprintf(PARROT_INTERP,
     ARGIN(STRING *pat),
     ARGOUT(PMC *ary))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -126,19 +133,22 @@ void Parrot_snprintf(PARROT_INTERP,
     ARGIN(const char *pat),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_vsnprintf(PARROT_INTERP,
@@ -147,20 +157,23 @@ void Parrot_vsnprintf(PARROT_INTERP,
     ARGIN(const char *pat),
     va_list args)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_vsprintf_c(PARROT_INTERP,
     ARGIN(const char *pat),
     va_list args)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/misc.c */
 

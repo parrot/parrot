@@ -39,7 +39,8 @@ static ParrotIO * PIO_mmap_open(PARROT_INTERP,
     ARGIN(const char *path),
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static size_t PIO_mmap_read(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),

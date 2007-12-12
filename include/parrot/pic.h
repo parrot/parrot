@@ -89,6 +89,8 @@ int parrot_pic_check_sig(
     ARGIN(const PMC *sig1),
     ARGIN(const PMC *sig2),
     NOTNULL(int *type))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 void parrot_PIC_destroy(NOTNULL(struct PackFile_ByteCode *cs))

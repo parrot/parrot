@@ -58,6 +58,7 @@ static Instruction * insINS(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
@@ -85,7 +86,8 @@ static Instruction* pcc_get_args(PARROT_INTERP,
     ARGIN_NULLOK(const int *arg_flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static int pcc_reg_mov(PARROT_INTERP,
     unsigned char d,

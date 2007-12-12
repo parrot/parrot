@@ -130,6 +130,7 @@ static int eval_ins(PARROT_INTERP,
     size_t ops,
     NOTNULL(SymReg **r))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 static int if_branch(PARROT_INTERP, NOTNULL(IMC_Unit *unit))

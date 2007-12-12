@@ -52,7 +52,8 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL get_byte(PARROT_INTERP,
     ARGIN(const STRING *source_string),
     UINTVAL offset)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -78,7 +79,8 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL get_codepoint(PARROT_INTERP,
     ARGIN(const STRING *source_string),
     UINTVAL offset)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -103,13 +105,15 @@ static STRING * get_codepoints_inplace(PARROT_INTERP,
 static void iter_init(SHIM_INTERP,
     ARGIN(const STRING *src),
     NOTNULL(String_iter *iter))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void set_byte(PARROT_INTERP,
     ARGIN(const STRING *source_string),
     UINTVAL offset,
     UINTVAL byte)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void set_bytes(PARROT_INTERP,
     NOTNULL(STRING *source_string),

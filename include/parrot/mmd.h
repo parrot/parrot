@@ -194,7 +194,8 @@ void Parrot_mmd_register_table(PARROT_INTERP,
     INTVAL type,
     ARGIN(const MMD_init *mmd_table),
     INTVAL n)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL

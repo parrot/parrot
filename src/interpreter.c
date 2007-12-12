@@ -70,7 +70,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f get_dynamic_op_lib_init(PARROT_INTERP,
     ARGIN(const PMC *lib))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void init_prederef(PARROT_INTERP, int which)
         __attribute__nonnull__(1);
@@ -91,7 +92,8 @@ static void prederef_args(
     ARGIN(const op_info_t *opinfo))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

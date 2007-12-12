@@ -19,10 +19,12 @@
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-VTABLE * Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable));
+VTABLE * Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))
+        __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_destroy_vtable(SHIM_INTERP, NULLOK(VTABLE *vtable));
+void Parrot_destroy_vtable(SHIM_INTERP, ARGINOUT(VTABLE *vtable))
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_MALLOC

@@ -74,7 +74,8 @@ typedef struct _hash {
 /* HEADERIZER BEGIN: src/hash.c */
 
 PARROT_API
-void parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash));
+void parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
+        __attribute__nonnull__(2);
 
 PARROT_API
 void parrot_hash_clone(PARROT_INTERP,
@@ -122,6 +123,7 @@ HashBucket * parrot_hash_get_bucket(PARROT_INTERP,
     ARGIN(const Hash *hash),
     NOTNULL(void *key))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -130,6 +132,7 @@ PARROT_CAN_RETURN_NULL
 void * parrot_hash_get_idx(SHIM_INTERP,
     ARGIN(const Hash *hash),
     NOTNULL(PMC *key))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -147,7 +150,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void parrot_hash_visit(PARROT_INTERP,

@@ -91,13 +91,15 @@ PARROT_WARN_UNUSED_RESULT
 static int check_builtin_sig(
     size_t i,
     ARGIN(const char *sig),
-    int convert_pmcs);
+    int convert_pmcs)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int find_builtin(ARGIN(const char *func));
+static int find_builtin(ARGIN(const char *func))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static int find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))
+static int find_builtin_s(PARROT_INTERP, ARGIN(const STRING *func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -179,7 +181,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))
+find_builtin_s(PARROT_INTERP, ARGIN(const STRING *func))
 {
     int low  = 0;
     int high = N_BUILTINS - 1;

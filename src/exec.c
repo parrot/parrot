@@ -44,7 +44,8 @@ static void exec_init(NOTNULL(Parrot_exec_objfile_t *obj))
 static int symbol_list_find(
     NOTNULL(Parrot_exec_objfile_t *obj),
     ARGIN(const char *symbol))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 

@@ -139,7 +139,9 @@ typedef struct Small_Object_Pool {
 PARROT_WARN_UNUSED_RESULT
 INTVAL contained_in_pool(
     ARGIN(const Small_Object_Pool *pool),
-    ARGIN(const void *ptr));
+    ARGIN(const void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void gc_pmc_ext_pool_init(NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1);

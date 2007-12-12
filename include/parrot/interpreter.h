@@ -527,7 +527,8 @@ void* Parrot_run_meth_fromc_arglist(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -540,7 +541,8 @@ FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -554,7 +556,8 @@ INTVAL Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -568,7 +571,8 @@ void* Parrot_run_meth_fromc_args(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -581,7 +585,8 @@ FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -594,7 +599,8 @@ INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -611,7 +617,8 @@ void * Parrot_runops_fromc_arglist(PARROT_INTERP,
     ARGIN(const char *sig),
     va_list args)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -620,7 +627,8 @@ FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP,
     ARGIN(const char *sig),
     va_list args)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -629,7 +637,8 @@ INTVAL Parrot_runops_fromc_arglist_reti(PARROT_INTERP,
     ARGIN(const char *sig),
     va_list args)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -639,7 +648,8 @@ PMC * Parrot_runops_fromc_args(PARROT_INTERP,
     ARGIN(const char *sig),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -649,7 +659,8 @@ void * Parrot_runops_fromc_args_event(PARROT_INTERP,
     ARGIN(const char *sig),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -658,7 +669,8 @@ FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP,
     ARGIN(const char *sig),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -667,7 +679,8 @@ INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP,
     ARGIN(const char *sig),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 void runops(PARROT_INTERP, size_t offs)
         __attribute__nonnull__(1);
@@ -736,6 +749,7 @@ void * Parrot_compile_file(PARROT_INTERP,
     ARGIN(const char *fullname),
     NOTNULL(STRING **error))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -747,6 +761,7 @@ PMC * Parrot_compile_string(PARROT_INTERP,
     NOTNULL(STRING **error))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 PARROT_API
@@ -761,7 +776,8 @@ PARROT_API
 void Parrot_mark_method_writes(PARROT_INTERP,
     int type,
     ARGIN(const char *name))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void register_nci_method(PARROT_INTERP,
@@ -770,7 +786,9 @@ void register_nci_method(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(const char *proto))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_API
 void register_raw_nci_method_in_ns(PARROT_INTERP,
@@ -778,7 +796,8 @@ void register_raw_nci_method_in_ns(PARROT_INTERP,
     NOTNULL(void *func),
     ARGIN(const char *name))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL sysinfo_i(SHIM_INTERP, INTVAL info_wanted);

@@ -31,7 +31,8 @@ src/test_main.c
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* trace_class_name(ARGIN(const PMC* pmc));
+static STRING* trace_class_name(ARGIN(const PMC* pmc))
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -77,7 +78,7 @@ Prints a PMC to C<stderr>.
 */
 
 void
-trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))
+trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     Interp * const debugger = interp->debugger;
 

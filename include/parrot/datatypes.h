@@ -132,7 +132,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_get_datatype_enum(PARROT_INTERP,
     ARGIN(const STRING *type_name))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

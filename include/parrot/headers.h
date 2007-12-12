@@ -78,11 +78,13 @@ size_t get_min_pmc_address(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 int is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 int is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

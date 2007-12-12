@@ -135,7 +135,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 struct Parrot_Context * Parrot_dup_context(PARROT_INTERP,
     ARGIN(const struct Parrot_Context *old))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void setup_register_stacks(PARROT_INTERP)
         __attribute__nonnull__(1);

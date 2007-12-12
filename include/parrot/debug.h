@@ -192,24 +192,28 @@ char PDB_check_condition(PARROT_INTERP, NOTNULL(PDB_condition_t *condition))
 
 PARROT_CAN_RETURN_NULL
 opcode_t * PDB_compile(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 PDB_condition_t * PDB_cond(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_delete_condition(SHIM_INTERP,
     NOTNULL(PDB_breakpoint_t *breakpoint))
         __attribute__nonnull__(2);
 
 void PDB_disable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         __attribute__nonnull__(1);
@@ -228,14 +232,17 @@ size_t PDB_disassemble_op(PARROT_INTERP,
         __attribute__nonnull__(5);
 
 void PDB_enable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-char * PDB_escape(ARGIN(const char *string), INTVAL length);
+char * PDB_escape(ARGIN(const char *string), INTVAL length)
+        __attribute__nonnull__(1);
 
 void PDB_eval(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 int PDB_extend_const_table(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -244,7 +251,8 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PDB_breakpoint_t * PDB_find_breakpoint(PARROT_INTERP,
     ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_free_file(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -254,10 +262,12 @@ void PDB_get_command(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-char PDB_hasinstruction(ARGIN(const char *c));
+char PDB_hasinstruction(ARGIN(const char *c))
+        __attribute__nonnull__(1);
 
 void PDB_help(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_info(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -266,32 +276,39 @@ void PDB_init(PARROT_INTERP, SHIM(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_list(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_print(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_print_user_stack(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 char PDB_program_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
 int PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_set_break(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_skip_breakpoint(PARROT_INTERP, long i)
         __attribute__nonnull__(1);
@@ -303,7 +320,8 @@ int PDB_unescape(NOTNULL(char *string))
         __attribute__nonnull__(1);
 
 void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/debug.c */
 

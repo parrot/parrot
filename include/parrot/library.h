@@ -47,7 +47,8 @@ PARROT_CAN_RETURN_NULL
 char* Parrot_locate_runtime_file(PARROT_INTERP,
     ARGIN(const char *file_name),
     enum_runtime_ft type)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

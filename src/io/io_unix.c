@@ -107,7 +107,8 @@ static ParrotIO * PIO_unix_open(PARROT_INTERP,
     ARGIN(const char *spath),
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -115,7 +116,8 @@ static ParrotIO * PIO_unix_pipe(PARROT_INTERP,
     SHIM(ParrotIOLayer *l),
     ARGIN(const char *cmd),
     int flags)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_poll(SHIM_INTERP,
     SHIM(ParrotIOLayer *l),

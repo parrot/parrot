@@ -43,7 +43,8 @@ static opcode_t * do_event(PARROT_INTERP,
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static QUEUE_ENTRY* dup_entry(ARGIN(const QUEUE_ENTRY *entry));
+static QUEUE_ENTRY* dup_entry(ARGIN(const QUEUE_ENTRY *entry))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -59,7 +60,8 @@ static void* event_thread(NOTNULL(void *data))
 
 static void event_to_exception(PARROT_INTERP,
     ARGIN(const parrot_event* event))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void init_events_all(PARROT_INTERP)
         __attribute__nonnull__(1);

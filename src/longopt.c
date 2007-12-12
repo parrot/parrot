@@ -32,6 +32,7 @@ static int longopt_get_longopt(PARROT_INTERP,
     NOTNULL(struct longopt_opt_info* info_buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
 static int longopt_get_shortopt(PARROT_INTERP,
@@ -41,6 +42,7 @@ static int longopt_get_shortopt(PARROT_INTERP,
     NOTNULL(struct longopt_opt_info* info_buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
 /* HEADERIZER END: static */

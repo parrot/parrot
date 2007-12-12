@@ -43,7 +43,9 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int cstring_compare(SHIM_INTERP,
     ARGIN(const char *a),
-    ARGIN(const char *b));
+    ARGIN(const char *b))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
         __attribute__nonnull__(1)
@@ -53,6 +55,7 @@ static void hash_freeze(PARROT_INTERP,
     ARGIN(const Hash * const hash),
     NOTNULL(visit_info* info))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void hash_thaw(PARROT_INTERP,
@@ -74,7 +77,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t key_hash_cstring(SHIM_INTERP,
     ARGIN(const void *value),
-    size_t seed);
+    size_t seed)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -99,7 +103,9 @@ PARROT_WARN_UNUSED_RESULT
 static int STRING_compare(PARROT_INTERP,
     ARGIN(const void *search_key),
     ARGIN(const void *bucket_key))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
 

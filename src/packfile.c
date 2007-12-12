@@ -74,7 +74,9 @@ static PackFile_Segment * create_seg(PARROT_INTERP,
     ARGIN(const char *file_name),
     int add)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 static void default_destroy(NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1);
@@ -88,9 +90,12 @@ PARROT_CANNOT_RETURN_NULL
 static opcode_t * default_pack(
     ARGIN(const PackFile_Segment *self),
     NOTNULL(opcode_t *dest))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static size_t default_packed_size(ARGIN(const PackFile_Segment *self));
+static size_t default_packed_size(ARGIN(const PackFile_Segment *self))
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * default_unpack(
@@ -165,7 +170,8 @@ static PackFile_FixupEntry * find_fixup(
     NOTNULL(PackFile_FixupTable *ft),
     INTVAL type,
     ARGIN(const char *name))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static INTVAL find_fixup_iter(PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
@@ -274,13 +280,15 @@ static void segment_init(
     NOTNULL(PackFile *pf),
     ARGIN(const char *name))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void sort_segs(NOTNULL(PackFile_Directory *dir))
         __attribute__nonnull__(1);
 
 static int sub_pragma(PARROT_INTERP, int action, ARGIN(const PMC *sub_pmc))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
 

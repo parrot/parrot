@@ -48,7 +48,8 @@ static opcode_t * create_exception(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 static size_t dest2offset(PARROT_INTERP, ARGIN(const opcode_t *dest))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL

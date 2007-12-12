@@ -77,7 +77,9 @@ static unsigned int* ig_allocate(int N);
 
 static int ig_find_color(
     ARGIN(const IMC_Unit *unit),
-    ARGIN(const char *avail));
+    ARGIN(const char *avail))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static unsigned int* ig_get_word(
@@ -128,7 +130,10 @@ static void print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 static void rebuild_reglist(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static int reg_sort_f(ARGIN(const void *a), ARGIN(const void *b));
+static int reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void sort_reglist(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 

@@ -41,6 +41,7 @@ static void analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 static void analyse_life_symbol(
     ARGIN(const struct _IMC_Unit *unit),
     NOTNULL(SymReg* r))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void bb_add_edge(
@@ -77,7 +78,9 @@ PARROT_WARN_UNUSED_RESULT
 static int check_invoke_type(PARROT_INTERP,
     ARGIN(const IMC_Unit * unit),
     ARGIN(const Instruction *ins))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
@@ -107,7 +110,8 @@ static void mark_loop(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     ARGIN(const Edge *e))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void propagate_need(
     NOTNULL(Basic_block *bb),

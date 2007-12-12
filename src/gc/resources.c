@@ -37,11 +37,13 @@ typedef void (*compact_f) (Interp *, Memory_Pool *);
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static char * aligned_mem(ARGIN(const Buffer *buffer), NOTNULL(char *mem))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-static size_t aligned_size(ARGIN(const Buffer *buffer), size_t len);
+static size_t aligned_size(ARGIN(const Buffer *buffer), size_t len)
+        __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
@@ -52,19 +54,22 @@ static void alloc_new_block(PARROT_INTERP,
     NOTNULL(Memory_Pool *pool),
     ARGIN(const char *why))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL

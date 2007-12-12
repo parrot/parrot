@@ -39,7 +39,10 @@ static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 static void print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
 
-static int prof_sort_f(ARGIN(const void *a), ARGIN(const void *b));
+static int prof_sort_f(ARGIN(const void *a), ARGIN(const void *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);

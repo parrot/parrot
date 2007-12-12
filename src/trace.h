@@ -18,22 +18,26 @@
 /* HEADERIZER BEGIN: src/trace.c */
 
 int trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void trace_op(PARROT_INTERP,
     ARGIN(const opcode_t *code_start),
     ARGIN(const opcode_t *code_end),
     ARGIN_NULLOK(const opcode_t *pc))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 void trace_op_dump(PARROT_INTERP,
     ARGIN(const opcode_t *code_start),
     ARGIN(const opcode_t *pc))
-        __attribute__nonnull__(1);
-
-void trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/trace.c */
 

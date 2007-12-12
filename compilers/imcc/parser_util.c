@@ -61,10 +61,12 @@ static void * imcc_compile_file(PARROT_INTERP,
     ARGIN(const char *fullname),
     NOTNULL(STRING **error_message))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 static int is_infix(ARGIN(const char *name), int n, NOTNULL(SymReg **r))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -74,6 +76,7 @@ static Instruction * maybe_builtin(PARROT_INTERP,
     NOTNULL(SymReg **r),
     int n)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -84,6 +87,7 @@ static const char * to_infix(PARROT_INTERP,
     NOTNULL(int *n),
     int mmd_op)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -92,6 +96,7 @@ PARROT_CAN_RETURN_NULL
 static const char * try_rev_cmp(
     ARGIN(const char *name),
     NOTNULL(SymReg **r))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
@@ -105,6 +110,7 @@ static Instruction * var_arg_ins(PARROT_INTERP,
     int emit)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 /* HEADERIZER END: static */

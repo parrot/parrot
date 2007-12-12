@@ -101,7 +101,8 @@ static ParrotIO * PIO_win32_open(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     ARGIN(const char *spath),
     INTVAL flags)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static size_t PIO_win32_read(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),

@@ -157,7 +157,8 @@ STRING * key_string(PARROT_INTERP, NOTNULL(PMC *key))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key));
+INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key))
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/key.c */
 

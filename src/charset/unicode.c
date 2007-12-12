@@ -28,7 +28,9 @@ This file implements the charset functions for unicode data
 static INTVAL compare(PARROT_INTERP,
     ARGIN(const STRING *lhs),
     ARGIN(const STRING *rhs))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, NOTNULL(STRING *src))
@@ -38,7 +40,8 @@ static STRING* compose(PARROT_INTERP, NOTNULL(STRING *src))
 static size_t compute_hash(PARROT_INTERP,
     ARGIN(const STRING *src),
     size_t seed)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static INTVAL cs_rindex(PARROT_INTERP,
     NOTNULL(STRING *source_string),

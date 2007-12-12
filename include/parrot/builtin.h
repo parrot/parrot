@@ -42,7 +42,8 @@ void Parrot_init_builtins(PARROT_INTERP)
 PARROT_WARN_UNUSED_RESULT
 int Parrot_is_builtin(
     ARGIN(const char *func),
-    ARGIN_NULLOK(const char *sig));
+    ARGIN_NULLOK(const char *sig))
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/builtin.c */
 

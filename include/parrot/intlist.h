@@ -50,7 +50,8 @@ void intlist_assign(PARROT_INTERP,
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 IntList * intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void intlist_dump(NOTNULL(FILE *fp), NOTNULL(IntList *list), int verbose)
         __attribute__nonnull__(1)
@@ -63,7 +64,8 @@ INTVAL intlist_get(PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL intlist_length(SHIM_INTERP, ARGIN(const IntList *list));
+INTVAL intlist_length(SHIM_INTERP, ARGIN(const IntList *list))
+        __attribute__nonnull__(2);
 
 void intlist_mark(PARROT_INTERP, NOTNULL(IntList *l))
         __attribute__nonnull__(1)

@@ -121,7 +121,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_loadpbc(PARROT_INTERP,
     ARGIN(const char *fullname))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void pbc_merge_pic_index(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
@@ -137,11 +138,13 @@ static void pbc_merge_write(PARROT_INTERP,
     NOTNULL(PackFile *pf),
     ARGIN(const char *filename))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static char * str_dup(ARGIN(const char *old));
+static char * str_dup(ARGIN(const char *old))
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 

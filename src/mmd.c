@@ -84,7 +84,8 @@ static void mmd_create_builtin_multi_meth(PARROT_INTERP,
     INTVAL type,
     ARGIN(const MMD_init *entry))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 static void mmd_create_builtin_multi_meth_2(PARROT_INTERP,
     NOTNULL(PMC *ns),

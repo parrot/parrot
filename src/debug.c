@@ -51,7 +51,8 @@ static int GDB_B(PARROT_INTERP, NOTNULL(char *s))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char* GDB_P(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -63,11 +64,13 @@ PARROT_WARN_UNUSED_RESULT
 static const char * parse_command(
     ARGIN(const char *command),
     NOTNULL(unsigned long *cmdP))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * parse_int(ARGIN(const char *str), ARGOUT(int *intP))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
@@ -76,6 +79,7 @@ static const char* parse_key(PARROT_INTERP,
     ARGIN(const char *str),
     ARGOUT(PMC **keyP))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
@@ -84,14 +88,17 @@ static const char * parse_string(PARROT_INTERP,
     ARGIN(const char *str),
     ARGOUT(STRING **strP))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static const char * skip_command(ARGIN(const char *str));
+static const char * skip_command(ARGIN(const char *str))
+        __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * skip_ws(ARGIN(const char *str));
+static const char * skip_ws(ARGIN(const char *str))
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 

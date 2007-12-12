@@ -74,6 +74,7 @@ static void set_cstring_prop(PARROT_INTERP,
     NOTNULL(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void store_lib_pmc(PARROT_INTERP,

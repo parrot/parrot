@@ -164,7 +164,8 @@ size_t handle_exception(PARROT_INTERP)
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void internal_exception(int exitcode, ARGIN(const char *format), ...);
+void internal_exception(int exitcode, ARGIN(const char *format), ...)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -182,7 +183,9 @@ PARROT_DOES_NOT_RETURN
 void Parrot_confess(
     ARGIN(const char *cond),
     ARGIN(const char *file),
-    unsigned int line);
+    unsigned int line)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
@@ -219,7 +222,8 @@ void real_exception(PARROT_INTERP,
     int exitcode,
     ARGIN(const char *format),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

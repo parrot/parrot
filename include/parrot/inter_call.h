@@ -102,7 +102,8 @@ int Parrot_init_arg_nci(PARROT_INTERP,
     ARGOUT(call_state *st),
     ARGIN(const char *sig))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 int Parrot_init_arg_op(PARROT_INTERP,
@@ -120,6 +121,7 @@ int Parrot_init_arg_sig(SHIM_INTERP,
     NULLOK(void *ap),
     NOTNULL(call_state_item *sti))
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
 PARROT_API
@@ -127,7 +129,8 @@ int Parrot_init_ret_nci(PARROT_INTERP,
     ARGOUT(call_state *st),
     ARGIN(const char *sig))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void parrot_pass_args(PARROT_INTERP,
@@ -149,7 +152,8 @@ void Parrot_PCCINVOKE(PARROT_INTERP,
     ARGIN(const char *signature),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void Parrot_process_args(PARROT_INTERP,
@@ -166,6 +170,7 @@ opcode_t * parrot_pass_args_fromc(PARROT_INTERP,
     NOTNULL(parrot_context_t *old_ctxp),
     va_list ap)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 

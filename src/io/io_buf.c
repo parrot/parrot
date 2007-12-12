@@ -66,7 +66,8 @@ static ParrotIO * PIO_buf_open(PARROT_INTERP,
     ARGIN(const char *path),
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static size_t PIO_buf_peek(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
@@ -125,9 +126,9 @@ static PIOOFF_T PIO_buf_tell(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 static size_t PIO_buf_write(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s))
+    ARGINOUT(ParrotIOLayer *layer),
+    ARGINOUT(ParrotIO *io),
+    ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -728,8 +729,8 @@ The buffer layer's C<Write> function.
 */
 
 static size_t
-PIO_buf_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io), NOTNULL(STRING *s))
+PIO_buf_write(PARROT_INTERP, ARGINOUT(ParrotIOLayer *layer),
+        ARGINOUT(ParrotIO *io), ARGIN(STRING *s))
 {
     size_t avail;
     void * const buffer = s->strstart;

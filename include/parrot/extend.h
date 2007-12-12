@@ -66,7 +66,8 @@ void * Parrot_call_method(PARROT_INTERP,
     Parrot_String method,
     ARGIN(const char *signature),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(5);
 
 PARROT_API
 Parrot_Float Parrot_call_method_ret_float(PARROT_INTERP,
@@ -75,7 +76,8 @@ Parrot_Float Parrot_call_method_ret_float(PARROT_INTERP,
     Parrot_String method,
     ARGIN(const char *signature),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(5);
 
 PARROT_API
 Parrot_Int Parrot_call_method_ret_int(PARROT_INTERP,
@@ -84,7 +86,8 @@ Parrot_Int Parrot_call_method_ret_int(PARROT_INTERP,
     Parrot_String method,
     ARGIN(const char *signature),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -93,21 +96,24 @@ void* Parrot_call_sub(PARROT_INTERP,
     Parrot_PMC sub,
     ARGIN(const char *signature),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 Parrot_Float Parrot_call_sub_ret_float(PARROT_INTERP,
     Parrot_PMC sub,
     ARGIN(const char *signature),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP,
     Parrot_PMC sub,
     ARGIN(const char *signature),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

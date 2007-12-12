@@ -66,6 +66,7 @@ static INTVAL register_charset(PARROT_INTERP,
     ARGIN(const char *charsetname),
     NOTNULL(CHARSET *charset))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void register_static_converters(PARROT_INTERP)

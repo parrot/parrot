@@ -194,7 +194,8 @@ INTVAL PIO_eof(SHIM_INTERP, NOTNULL(PMC *pmc))
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PIO_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...);
+INTVAL PIO_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -203,7 +204,8 @@ PMC * PIO_fdopen(PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
     PIOHANDLE fd,
     ARGIN(const char *sflags))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void PIO_finish(PARROT_INTERP)
@@ -220,7 +222,8 @@ INTVAL PIO_fprintf(PARROT_INTERP,
     ARGIN(const char *s),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -265,7 +268,9 @@ PMC * PIO_open(PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
     ARGIN(const char *spath),
     ARGIN(const char *sflags))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -293,7 +298,8 @@ INTVAL PIO_poll(PARROT_INTERP,
 
 PARROT_API
 INTVAL PIO_printf(PARROT_INTERP, ARGIN(const char *s), ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 INTVAL PIO_putps(PARROT_INTERP, NOTNULL(PMC *pmc), NULLOK(STRING *s))
@@ -303,7 +309,8 @@ INTVAL PIO_putps(PARROT_INTERP, NOTNULL(PMC *pmc), NULLOK(STRING *s))
 PARROT_API
 INTVAL PIO_puts(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const char *s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -391,7 +398,8 @@ INTVAL PIO_write(PARROT_INTERP,
     ARGIN(const void *buffer),
     size_t len)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -428,7 +436,8 @@ ParrotIOLayer * PIO_copy_stack(NULLOK(ParrotIOLayer *stack));
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_API
-ParrotIOLayer * PIO_get_layer(SHIM_INTERP, ARGIN(const char *name));
+ParrotIOLayer * PIO_get_layer(SHIM_INTERP, ARGIN(const char *name))
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT

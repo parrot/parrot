@@ -35,7 +35,8 @@ static PMC* get_search_paths(PARROT_INTERP, enum_lib_paths which)
         __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION
-static int is_abs_path(ARGIN(const STRING *file));
+static int is_abs_path(ARGIN(const STRING *file))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

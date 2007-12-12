@@ -43,11 +43,13 @@ static int args_match_params(
     ARGIN(const PMC *sig_args),
     NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *start))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 static int call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -65,6 +67,7 @@ static int ops_jittable(PARROT_INTERP,
     NOTNULL(int *flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         __attribute__nonnull__(6)
@@ -81,7 +84,9 @@ static opcode_t * pic_test_func(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 static int returns_match_results(
     ARGIN(const PMC *sig_ret),
-    ARGIN(const PMC *sig_result));
+    ARGIN(const PMC *sig_result))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 

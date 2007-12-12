@@ -63,7 +63,8 @@ static STRING * get_bytes_inplace(PARROT_INTERP,
 static UINTVAL get_codepoint(PARROT_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -87,6 +88,7 @@ static void iter_init(PARROT_INTERP,
     ARGIN(const STRING *src),
     NOTNULL(String_iter *iter))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void set_byte(PARROT_INTERP,

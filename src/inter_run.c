@@ -36,7 +36,8 @@ static parrot_context_t * runops_args(PARROT_INTERP,
     va_list ap)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5);
 
 /* HEADERIZER END: static */
 
