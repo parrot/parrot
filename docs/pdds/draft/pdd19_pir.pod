@@ -1,4 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -358,8 +359,6 @@ C<.emit>.
 
 =head3 Subroutine flags
 
-This is a list of zero or more items with the following meanings:
-
 =over 4
 
 =item :main
@@ -446,24 +445,52 @@ The marked C<.sub> is lexically nested within the sub known by B<subname>.
 
 =item .begin_call and .end_call
 
+Directives to start and end a subroutine invocation, respectively.
+
 =item .begin_return and .end_return
+
+Directives to start and end a statement to return values.
 
 =item .begin_yield and .end_yield
 
+Directives to start and end a statement to yield values.
+
 =item .call
 
-=item .return <var> [:<flag> ...]
+Takes either 2 arguments: the sub and the return continuation, or the
+sub only. For the latter case an B<invokecc> gets emitted. Providing
+an explicit return continuation is more efficient, if its created
+outside of a loop and the call is done inside a loop.
+
+=item .invocant
+
+Directive to specify the object for a method call. Use it in combination
+with C<.meth_call>.
+
+=item  .meth_call
+
+Directive to do a method call. It calls the specified method on the object
+that was specified with the C<.invocant> directive.
+
+=item .nci_call
+
+Directive to make a call through the Native Calling Interface (NCI).
+The specified subroutine must be loaded using the <dlfunc> op that takes
+the library, function name and function signature as arguments.
+See L<docs/pdds/pdd16_native_call> for details.
+
+=item .return <var> [:<flag>]*
 
 Between C<.begin_return> and C<.end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
 flags: C<:flat>, C<:named>.
 
-=item .arg <var> [:<flag> ...]
+=item .arg <var> [:<flag>]*
 
 Between C<.begin_call> and C<.call>, specify an argument to be
 passed.  Available flags: C<:flat>, C<:named>.
 
-=item .result <var> [:<flag> ...]
+=item .result <var> [:<flag>]*
 
 Between C<.call> and C<.end_call>, specify where one or more return
 value(s) should be stored.  Available flags:
@@ -497,15 +524,16 @@ the meaning of the flag bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
 and C<FLAT>, which correspond to the calling convention flags
 C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 
-{{ TODO: once these flag bits are solidified by long-term use, then we
-may choose to copy appropriate bits of the documentation to here. }}
-
 
 =head3 Catching Exceptions
 
 Using the C<push_eh> op you can install an exception handler. If an exception
 is thrown, Parrot will execute the installed exception handler. In order to
-retrieve the thrown exception, use the C<.get_results> directive.
+retrieve the thrown exception, use the C<.get_results> directive. This directive
+always takes 2 arguments: an exception object and a message string.
+
+{{ Wouldn't it be more useful to make this flexible, or at least only the
+   exception object? The message can be retrieved from the exception object. }}
 
    push_eh handler
    ...
@@ -966,12 +994,12 @@ the C<assign_pmc> vtable function.
 =head2 Subroutine Definition
 
   .sub _sub_label [Subpragma, ...]
-   .param int a # I5
-   .param int b # I6
-   .param int c # I7
+   .param int a
+   .param int b
+   .param int c
   ...
   .begin_return
-   .return xy   # e.g. I5
+   .return xy
   .end_return
   ...
   .end
