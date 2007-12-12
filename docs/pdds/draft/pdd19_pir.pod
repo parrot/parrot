@@ -850,8 +850,6 @@ the value of a macro parameter, like so:
   ...
   .endm
 
-{{ NOTE: Currently, IMCC still allows for writing C<.local> to declare a local
-label, but that is deprecated. Use C<.label> instead. }}
 
 =head3 Unique local variables
 
@@ -993,7 +991,7 @@ the C<assign_pmc> vtable function.
 
 =head2 Subroutine Definition
 
-  .sub _sub_label [Subpragma, ...]
+  .sub _sub_label [<subflag>]*
    .param int a
    .param int b
    .param int c
@@ -1023,6 +1021,20 @@ the C<assign_pmc> vtable function.
   .result r
   .end_call
 
+=head2 NCI Call
+
+  load_lib $P0, "libname"
+  dlfunc $P1, $P0, "funcname", "signature"
+  ...
+  .begin_call
+  .arg x
+  .arg y
+  .arg z
+  .nci_call $P1 # r = funcname(x, y, z)
+  .local int r  # optional - new result var
+  .result r
+  .end_call
+
 =head2 Subroutine Call Syntactic Sugar
 
   ...  # variable decls
@@ -1034,6 +1046,100 @@ Instead of the label a subroutine object can be used too:
 
    find_global $P0, "_sub_label"
    $P0(args)
+
+
+=head2 Methods
+
+  .namespace [ "Foo" ]
+
+  .sub _sub_label :method [,Subpragma, ...]
+   .param int a
+   .param int b
+   .param int c
+   ...
+   self."_other_meth"()
+  ...
+  .begin_return
+   .return xy
+  .end_return
+  ...
+  .end
+
+The variable "self" automatically refers to the invocating object, if the
+subroutine declaration contains "method".
+
+=head2 Calling Methods
+
+The syntax is very similar to subroutine calls. The call is done with
+C<meth_call> which must immediately be preceded by the C<.invocant>:
+
+   .local pmc class
+   .local pmc obj
+   newclass class, "Foo"
+   new obj, class
+  .begin_call
+  .arg x
+  .arg y
+  .arg z
+  .invocant obj
+  .meth_call "_method" [, $P1 ] # r = obj."_method"(x, y, z)
+  .local int r  # optional - new result var
+  .result r
+  .end_call
+
+The return continuation is optional. The method can be a string
+constant or a string variable.
+
+=head2 Returning and Yielding
+
+  .return ( a, b )      # return the values of a and b
+
+  .return ()            # return no value
+
+  .return func_call()   # tail call function
+
+  .return o."meth"()    # tail method call
+
+Similarly, one can yield using the .yield directive
+
+  .yield ( a, b )      # yield with the values of a and b
+
+  .yield ()            # yield with no value
+
+
+=head2 Stack calling conventions
+
+Arguments are B<save>d in reverse order onto the user stack:
+
+   .arg y   # save args in reversed order
+   .arg x
+   call _foo    #(r, s) = _foo(x,y)
+   .local int r
+   .local int s
+   .result r    # restore results in order
+   .result s    #
+
+and return values are B<restore>d in argument order from there.
+
+
+
+ .sub _foo      # sub foo(int a, int b)
+   saveall
+   .param int a         # receive arguments from left to right
+   .param int b
+   ...
+
+   .return mi       # return (pl, mi), push results
+   .return pl       # in reverse order
+   restoreall
+   ret
+ .end
+
+Pushing arguments in reversed order on the user stack makes the left
+most argument the top of stack entry. This allows for a variable
+number of function arguments (and return values), where the left most
+argument before a variable number of following arguments is the
+argument count.
 
 
 =head1 ATTACHMENTS
