@@ -119,7 +119,7 @@ method subcall($/) {
             $past.push( $expr );
         }
     }
-    $past.name( ~$<word> );
+    $past.name( ~$<sym> );
     $past.pasttype('call');
     $past.node($/);
     make $past;

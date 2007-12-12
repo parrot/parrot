@@ -78,8 +78,8 @@ token number { \d+\.\d+ {*} }
 token stringdouble { '"' <string_literal: "> '"' {*} }
 token stringsingle { \' <string_literal: '> \' {*} }
 token stringbacktick { \` <string_literal: `> \` {*} }
-rule subcall { do $sym:=<word> \( <expr>? \) {*} }
-rule opcall  { $sym:=<op> \( <expr>? \) {*} }
+rule subcall { do $<sym>:=<word> \( <expr>? \) {*} }
+rule opcall  { $<sym>:=<op> \( <expr>? \) {*} }
 
 token op {
     | open
