@@ -156,13 +156,15 @@ void do_exception(PARROT_INTERP, INTVAL severity, long error)
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void do_str_exception(PARROT_INTERP, STRING *msg)
-        __attribute__nonnull__(1);
+void do_pmc_exception(PARROT_INTERP, ARGIN(PMC *msg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void do_pmc_exception(PARROT_INTERP, PMC *msg)
-        __attribute__nonnull__(1);
+void do_str_exception(PARROT_INTERP, ARGIN(STRING *msg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void free_internal_exception(PARROT_INTERP)
@@ -215,7 +217,7 @@ void pop_exception(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void push_exception(PARROT_INTERP, NOTNULL(PMC *handler))
+void push_exception(PARROT_INTERP, ARGIN(PMC *handler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

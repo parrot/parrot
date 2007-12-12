@@ -29,10 +29,6 @@ PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, NOTNULL(PMC *task))
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_cx_init_scheduler(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
 void Parrot_cx_runloop_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 

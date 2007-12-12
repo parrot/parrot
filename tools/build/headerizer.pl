@@ -6,6 +6,10 @@ use strict;
 use warnings;
 use Carp qw( confess );
 
+# While I work on files individually to make sure headerizing and
+# rewriting doesn't stomp on them.
+my $experimental_file = 'src/exceptions.c';
+
 =head1 NAME
 
 tools/build/headerizer.pl - Generates the function header parts of .h
@@ -420,7 +424,6 @@ sub main {
             die "'$hfile' not found (referenced from '$cfile')";
         }
 
-        my $experimental_file = 'src/tsq.c';
         my @decls;
         if ( -f $pmcfile || ( $cfile ne $experimental_file ) ) {
             @decls = extract_function_declarations( $csource );
