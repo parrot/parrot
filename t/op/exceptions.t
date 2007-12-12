@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 33;
 
 =head1 NAME
 
@@ -692,6 +692,24 @@ CODE
 something broke
 something broke
 current inst/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'die_s' );
+.sub main :main
+    die 'We are dying str!'
+.end
+CODE
+/We are dying str!/
+OUTPUT
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'die_p' );
+.sub main :main
+    .local pmc msg
+    msg = new 'String'
+    msg = 'We are dying pmc!'
+    die msg
+.end
+CODE
+/We are dying pmc!/
 OUTPUT
 
 # Local Variables:

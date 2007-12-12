@@ -899,6 +899,34 @@ execution then resumes.
 PARROT_API
 PARROT_DOES_NOT_RETURN
 void
+do_str_exception(PARROT_INTERP, STRING *msg)
+{
+    Parrot_exception * const the_exception = interp->exceptions;
+
+    the_exception->error = E_RuntimeError;
+    the_exception->severity = EXCEPT_error;
+    the_exception->msg = msg;
+    the_exception->resume = NULL;
+    longjmp(the_exception->destination, 1);
+}
+
+PARROT_API
+PARROT_DOES_NOT_RETURN
+void
+do_pmc_exception(PARROT_INTERP, PMC *msg)
+{
+    Parrot_exception * const the_exception = interp->exceptions;
+
+    the_exception->error = E_RuntimeError;
+    the_exception->severity = EXCEPT_error;
+    the_exception->msg = VTABLE_get_string(interp, msg);;
+    the_exception->resume = NULL;
+    longjmp(the_exception->destination, 1);
+}
+
+PARROT_API
+PARROT_DOES_NOT_RETURN
+void
 do_exception(PARROT_INTERP, INTVAL severity, long error)
 {
     Parrot_exception * const the_exception = interp->exceptions;

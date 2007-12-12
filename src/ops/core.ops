@@ -736,6 +736,11 @@ of the stack, with '0' being the top.
 
 Return an array of all current exception handlers.
 
+=item B<die>(in STR)
+=item B<die>(in PMC)
+
+Die with message $1
+
 =item B<die>(in INT, in INT)
 
 Die with severity $1 and error $2. If severity is .EXCEPT_DOOMED,
@@ -818,6 +823,14 @@ inline op get_all_eh(out PMC) {
     goto NEXT();
 }
 
+
+inline op die(in STR) {
+    do_str_exception(interp, $1);
+}
+
+inline op die(in PMC) {
+    do_pmc_exception(interp, $1);
+}
 
 inline op die(in INT, in INT) {
     if ($1 == EXCEPT_doomed)
