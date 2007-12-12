@@ -11,6 +11,10 @@ Last updated: 2007-11-24
 
 =over 4
 
+=item * C<&> sigil
+
+Handle the mapping between C<&foo> and 'foo' subroutines.
+
 =item * C<return> statement
 
 While it seems like implementing C<return> would be a simple
