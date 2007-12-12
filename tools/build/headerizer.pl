@@ -8,7 +8,7 @@ use Carp qw( confess );
 
 # While I work on files individually to make sure headerizing and
 # rewriting doesn't stomp on them.
-my $experimental_file = 'src/exceptions.c';
+my $experimental_file = 'src/utils.c';
 
 =head1 NAME
 
@@ -169,8 +169,10 @@ sub extract_function_declarations_and_update_source {
         my $specs = function_components_from_declaration( $cfile_name, $decl );
         my $name = $specs->{name};
         my $return_type = $specs->{return_type};
+        my $heading = "$return_type $name";
+        $heading = "static $heading" if $specs->{is_static};
 
-        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n/=item C<$return_type $name>\n/sm or
+        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n/=item C<$heading>\n/sm or
             warn "Couldn't replace $name\n";
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
