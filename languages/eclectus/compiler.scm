@@ -79,56 +79,92 @@
 "))
 
 ; forms represented by a scalar PMC
-(define (immediate? x)
-  (or (fixnum? x)
-      (boolean? x)
-      (char? x)
-      (and (list? x) (= (length x) 0 ))))
+(define (immediate? expr)
+  (or (fixnum? expr)
+      (boolean? expr)
+      (char? expr)
+      (and (list? expr) (= (length expr) 0 ))))
+
+; 
+(define (primcall expr)
+  (and (pair? expr) (primitive? (car expr))))
 
 (define (immediate-rep x)
   (cond
      [(fixnum? x) (format
 "
+    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => ~a, 'returns' => 'Integer' )
+    .return ( val_x )
+.end
 " x )]
      [(char? x) (format
 "
+    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
+    .return ( val_x )
+.end
 " (char->integer x) )]
      [(and (list? x) (= (length x) 0 ))
 "
+    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
+    .return ( val_x )
+.end
 " ]
      [(boolean? x)
         (if x 
 "
+    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
+    .return ( val_x )
+.end
 "
 "
+    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
+    .return ( val_x )
+.end
 " )]))
 
+; a unary function is a symbol with the properties
+; *is-prim*, *arg-count* and *emitter*
+(define-syntax define-primitive
+  (syntax-rules ()
+    [(_ (prim-name arg) b)
+     (begin
+        (putprop 'prim-name '*is-prim*
+          #t)
+        (putprop 'prim-name '*arg-count*
+          (length '(arg*)))
+        (putprop 'prim-name '*emitter*
+          (lambda (arg) b)))]))
+
+; add implementation of functions
+(define-primitive (fxadd1 arg)
+  (emit-expr arg))
+
+(define (emit-function-header function-name)
+  (emit (string-append ".sub " function-name)))
+
+(define (emit-immediate x)
+  (emit (immediate-rep x)))
+ 
+(define (emit-expr expr)
+  (cond
+    [(immediate? expr) (emit-immediate expr)]
+    [(primcall? expr)  (emit-immediate expr)])) 
+
 ; the actual compiler
-( define (compile-program x)
+(define (compile-program x)
   (emit-init)
   (emit-driver)
   (emit-builtins)
+  (emit-function-header "scheme_entry")
+  (emit-expr x)) 
 
-  (emit 
-"
-.sub scheme_entry
-    .local pmc val_x
-")
-  (if (immediate? x)
-    (emit (immediate-rep x))) 
-
-   (emit
-"
-    .return ( val_x )
-.end
-"))
