@@ -600,7 +600,7 @@ get_min_pmc_address(PARROT_INTERP)
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-is_buffer_ptr(PARROT_INTERP, NOTNULL(const void *ptr))>
+is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))>
 
 Checks that C<ptr> is actually a C<Buffer>.
 
@@ -610,7 +610,7 @@ Checks that C<ptr> is actually a C<Buffer>.
 
 PARROT_WARN_UNUSED_RESULT
 int
-is_buffer_ptr(PARROT_INTERP, NOTNULL(const void *ptr))
+is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 {
     UINTVAL i;
     Arenas * const arena_base = interp->arena_base;
@@ -628,7 +628,7 @@ is_buffer_ptr(PARROT_INTERP, NOTNULL(const void *ptr))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-is_pmc_ptr(PARROT_INTERP, NOTNULL(const void *ptr))>
+is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))>
 
 Checks that C<ptr> is actually a PMC.
 
@@ -638,7 +638,7 @@ Checks that C<ptr> is actually a PMC.
 
 PARROT_WARN_UNUSED_RESULT
 int
-is_pmc_ptr(PARROT_INTERP, NOTNULL(const void *ptr))
+is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 {
     return contained_in_pool(interp->arena_base->pmc_pool, ptr);
 }

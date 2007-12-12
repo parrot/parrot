@@ -262,10 +262,9 @@ static void gc_gms_use_gen(PARROT_INTERP,
 
 static void gms_debug_verify(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(const char *action))
+    ARGIN(const char *action))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static int init_mark_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
@@ -1809,7 +1808,7 @@ parrot_gc_gms_run(PARROT_INTERP, int flags)
 /*
 
 =item C<static void
-gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(const char *action))>
+gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), ARGIN(const char *action))>
 
 RT#48260: Not yet documented!!!
 
@@ -1819,7 +1818,7 @@ RT#48260: Not yet documented!!!
 
 #  if GC_GMS_DEBUG
 static void
-gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(const char *action))
+gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), ARGIN(const char *action))
 {
     Gc_gms_hdr *h;
     int bf, gf, wf, ff;

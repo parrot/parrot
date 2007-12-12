@@ -149,7 +149,7 @@ static INTVAL register_type(PARROT_INTERP, NOTNULL(PMC *name))
 
 =item C<PARROT_API
 INTVAL
-Parrot_get_vtable_index(PARROT_INTERP, NOTNULL(const STRING *name))>
+Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))>
 
 Return index if C<name> is a valid vtable slot name.
 
@@ -159,7 +159,7 @@ Return index if C<name> is a valid vtable slot name.
 
 PARROT_API
 INTVAL
-Parrot_get_vtable_index(PARROT_INTERP, NOTNULL(const STRING *name))
+Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 {
     char * const name_c      = string_to_cstring(interp, name);
 
@@ -531,7 +531,7 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 =item C<PARROT_API
 PARROT_PURE_FUNCTION
 INTVAL
-Parrot_MMD_method_idx(SHIM_INTERP, NOTNULL(const char *name))>
+Parrot_MMD_method_idx(SHIM_INTERP, ARGIN(const char *name))>
 
 Return the MMD function number for method name or -1 on failure.
 
@@ -544,7 +544,7 @@ RT#45973 allow dynamic expansion at runtime.
 PARROT_API
 PARROT_PURE_FUNCTION
 INTVAL
-Parrot_MMD_method_idx(SHIM_INTERP, NOTNULL(const char *name))
+Parrot_MMD_method_idx(SHIM_INTERP, ARGIN(const char *name))
 {
     INTVAL i;
 

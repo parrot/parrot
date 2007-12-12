@@ -160,7 +160,7 @@ intlist_mark(PARROT_INTERP, NOTNULL(IntList *l))
 =item C<PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 IntList *
-intlist_clone(PARROT_INTERP, NOTNULL(const IntList *list))>
+intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))>
 
 Returns a clone of the list.
 
@@ -171,7 +171,7 @@ Returns a clone of the list.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 IntList *
-intlist_clone(PARROT_INTERP, NOTNULL(const IntList *list))
+intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))
 {
     return (IntList *)list_clone(interp, (const List *)list);
 }
@@ -202,7 +202,7 @@ intlist_new(PARROT_INTERP)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-intlist_length(SHIM_INTERP, NOTNULL(const IntList *list))>
+intlist_length(SHIM_INTERP, ARGIN(const IntList *list))>
 
 Returns the length of the list.
 
@@ -213,7 +213,7 @@ Returns the length of the list.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-intlist_length(SHIM_INTERP, NOTNULL(const IntList *list))
+intlist_length(SHIM_INTERP, ARGIN(const IntList *list))
 {
     return ((const List *)list)->length;
 }

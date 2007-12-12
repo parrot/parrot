@@ -42,20 +42,17 @@ don't apply.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int cstring_compare(SHIM_INTERP,
-    NOTNULL(const char *a),
-    NOTNULL(const char *b))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    ARGIN(const char *a),
+    ARGIN(const char *b));
 
 static void expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void hash_freeze(PARROT_INTERP,
-    NOTNULL(const Hash * const hash),
+    ARGIN(const Hash * const hash),
     NOTNULL(visit_info* info))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void hash_thaw(PARROT_INTERP,
@@ -76,9 +73,8 @@ static void init_hash(
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t key_hash_cstring(SHIM_INTERP,
-    NOTNULL(const void *value),
-    size_t seed)
-        __attribute__nonnull__(2);
+    ARGIN(const void *value),
+    size_t seed);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -101,11 +97,9 @@ static int pointer_compare(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int STRING_compare(PARROT_INTERP,
-    NOTNULL(const void *search_key),
-    NOTNULL(const void *bucket_key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    ARGIN(const void *search_key),
+    ARGIN(const void *bucket_key))
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -141,7 +135,7 @@ key_hash_STRING(PARROT_INTERP, NOTNULL(STRING *value), size_t seed)
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-STRING_compare(PARROT_INTERP, NOTNULL(const void *search_key), NOTNULL(const void *bucket_key))>
+STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const void *bucket_key))>
 
 Compares the two strings, returning 0 if they are identical.
 
@@ -151,7 +145,7 @@ Compares the two strings, returning 0 if they are identical.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-STRING_compare(PARROT_INTERP, NOTNULL(const void *search_key), NOTNULL(const void *bucket_key))
+STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const void *bucket_key))
 {
     return string_equal(interp, (const STRING *)search_key, (const STRING *)bucket_key);
 }
@@ -203,7 +197,7 @@ key_hash_pointer(SHIM_INTERP, NULLOK(void *value), size_t seed)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t
-key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)>
+key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)>
 
 RT#48260: Not yet documented!!!
 
@@ -214,7 +208,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t
-key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)
+key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
     register size_t h = seed;
     const unsigned char * p = (const unsigned char *) value;
@@ -231,7 +225,7 @@ key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-cstring_compare(SHIM_INTERP, NOTNULL(const char *a), NOTNULL(const char *b))>
+cstring_compare(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))>
 
 C string versions of the C<key_hash> and C<compare> functions.
 
@@ -242,7 +236,7 @@ C string versions of the C<key_hash> and C<compare> functions.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-cstring_compare(SHIM_INTERP, NOTNULL(const char *a), NOTNULL(const char *b))
+cstring_compare(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
 {
     return strcmp(a, b);
 }
@@ -293,7 +287,7 @@ int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
 
 =item C<PARROT_API
 void
-parrot_dump_hash(SHIM_INTERP, NOTNULL(const Hash *hash))>
+parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))>
 
 Print out the hash in human-readable form.  Except it's empty.
 
@@ -303,7 +297,7 @@ Print out the hash in human-readable form.  Except it's empty.
 
 PARROT_API
 void
-parrot_dump_hash(SHIM_INTERP, NOTNULL(const Hash *hash))
+parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
 {
     UNUSED(hash);
 }
@@ -422,7 +416,7 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
 /*
 
 =item C<static void
-hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info* info))>
+hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), NOTNULL(visit_info* info))>
 
 RT#48260: Not yet documented!!!
 
@@ -431,7 +425,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info* info))
+hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), NOTNULL(visit_info* info))
 {
     size_t i;
     IMAGE_IO * const io = info->image_io;
@@ -934,7 +928,7 @@ Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))>
+parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))>
 
 Return the number of used entries in the hash.
 
@@ -946,7 +940,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))
+parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
 {
     if (hash)
         return hash->entries;
@@ -959,7 +953,7 @@ parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
-parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))>
+parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), NOTNULL(PMC *key))>
 
 Called by iterator.
 
@@ -971,7 +965,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
-parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))
+parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), NOTNULL(PMC *key))
 {
     INTVAL i = PMC_int_val(key);
     const BucketIndex bi = (BucketIndex)PMC_data(key);
@@ -1017,7 +1011,7 @@ parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 HashBucket *
-parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *key))>
+parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), NOTNULL(void *key))>
 
 Returns the bucket for C<key>.
 
@@ -1029,7 +1023,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 HashBucket *
-parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *key))
+parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), NOTNULL(void *key))
 {
     if (hash->entries == 0)
         return NULL;

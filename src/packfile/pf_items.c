@@ -37,15 +37,13 @@ C<opcode_t> units.
 
 static void cvt_num12_num8(
     NOTNULL(unsigned char *dest),
-    NOTNULL(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1);
 
 static void cvt_num12_num8_be(
     NOTNULL(unsigned char *dest),
-    NOTNULL(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1);
 
 static void cvt_num12_num8_le(
     NOTNULL(unsigned char *dest),
@@ -98,7 +96,7 @@ static opcode_t fetch_op_test(NOTNULL(unsigned char *b))
 /*
 
 =item C<static void
-cvt_num12_num8(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))>
+cvt_num12_num8(NOTNULL(unsigned char *dest), ARGIN(const unsigned char *src))>
 
 convert i386 LE 12 byte long double to IEEE 754 8 byte double
 
@@ -107,7 +105,7 @@ convert i386 LE 12 byte long double to IEEE 754 8 byte double
 */
 
 static void
-cvt_num12_num8(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))
+cvt_num12_num8(NOTNULL(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     int expo, i, s;
 #ifdef __LCC__
@@ -157,7 +155,7 @@ nul:
 /*
 
 =item C<static void
-cvt_num12_num8_be(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))>
+cvt_num12_num8_be(NOTNULL(unsigned char *dest), ARGIN(const unsigned char *src))>
 
 RT#48260: Not yet documented!!!
 
@@ -166,7 +164,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-cvt_num12_num8_be(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))
+cvt_num12_num8_be(NOTNULL(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     cvt_num12_num8(dest, src);
     /* TODO endianize */
@@ -611,7 +609,7 @@ PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-PF_store_number(NOTNULL(opcode_t *cursor), NOTNULL(const FLOATVAL *val))>
+PF_store_number(NOTNULL(opcode_t *cursor), ARGIN(const FLOATVAL *val))>
 
 Write a C<FLOATVAL> to the opcode stream as is.
 
@@ -622,7 +620,7 @@ Write a C<FLOATVAL> to the opcode stream as is.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-PF_store_number(NOTNULL(opcode_t *cursor), NOTNULL(const FLOATVAL *val))
+PF_store_number(NOTNULL(opcode_t *cursor), ARGIN(const FLOATVAL *val))
 {
     opcode_t padded_size  = (sizeof (FLOATVAL) + sizeof (opcode_t) - 1) /
         sizeof (opcode_t);
@@ -783,7 +781,7 @@ PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
 
 =item C<PARROT_PURE_FUNCTION
 size_t
-PF_size_string(NOTNULL(const STRING *s))>
+PF_size_string(ARGIN(const STRING *s))>
 
 Report store size of C<STRING> in C<opcode_t> units.
 
@@ -793,7 +791,7 @@ Report store size of C<STRING> in C<opcode_t> units.
 
 PARROT_PURE_FUNCTION
 size_t
-PF_size_string(NOTNULL(const STRING *s))
+PF_size_string(ARGIN(const STRING *s))
 {
     opcode_t padded_size = s->bufused;
 
@@ -839,7 +837,7 @@ PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-PF_store_cstring(NOTNULL(opcode_t *cursor), NOTNULL(const char *s))>
+PF_store_cstring(NOTNULL(opcode_t *cursor), ARGIN(const char *s))>
 
 Write a 0-terminated string to the stream.
 
@@ -850,7 +848,7 @@ Write a 0-terminated string to the stream.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-PF_store_cstring(NOTNULL(opcode_t *cursor), NOTNULL(const char *s))
+PF_store_cstring(NOTNULL(opcode_t *cursor), ARGIN(const char *s))
 {
     strcpy((char *) cursor, s);
     return cursor + PF_size_cstring(s);
@@ -860,7 +858,7 @@ PF_store_cstring(NOTNULL(opcode_t *cursor), NOTNULL(const char *s))
 
 =item C<PARROT_PURE_FUNCTION
 size_t
-PF_size_cstring(NOTNULL(const char *s))>
+PF_size_cstring(ARGIN(const char *s))>
 
 Return store size of a C-string in C<opcode_t> units.
 
@@ -870,7 +868,7 @@ Return store size of a C-string in C<opcode_t> units.
 
 PARROT_PURE_FUNCTION
 size_t
-PF_size_cstring(NOTNULL(const char *s))
+PF_size_cstring(ARGIN(const char *s))
 {
     size_t str_len;
 

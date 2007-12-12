@@ -82,10 +82,9 @@ static PMC* mmd_arg_tuple_inline(PARROT_INTERP,
 static void mmd_create_builtin_multi_meth(PARROT_INTERP,
     NOTNULL(PMC *ns),
     INTVAL type,
-    NOTNULL(const MMD_init *entry))
+    ARGIN(const MMD_init *entry))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
 static void mmd_create_builtin_multi_meth_2(PARROT_INTERP,
     NOTNULL(PMC *ns),
@@ -2046,7 +2045,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
 
 =item C<static void
 mmd_create_builtin_multi_meth(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL type,
-        NOTNULL(const MMD_init *entry))>
+        ARGIN(const MMD_init *entry))>
 
 RT#48260: Not yet documented!!!
 
@@ -2056,7 +2055,7 @@ RT#48260: Not yet documented!!!
 
 static void
 mmd_create_builtin_multi_meth(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL type,
-        NOTNULL(const MMD_init *entry))
+        ARGIN(const MMD_init *entry))
 {
     mmd_create_builtin_multi_meth_2(interp, ns,
             entry->func_nr, type, entry->right, entry->func_ptr);
@@ -2067,7 +2066,7 @@ mmd_create_builtin_multi_meth(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL type,
 =item C<PARROT_API
 void
 Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
-        NOTNULL(const MMD_init *mmd_table), INTVAL n)>
+        ARGIN(const MMD_init *mmd_table), INTVAL n)>
 
 Register MMD functions for this PMC type.
 
@@ -2078,7 +2077,7 @@ Register MMD functions for this PMC type.
 PARROT_API
 void
 Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
-        NOTNULL(const MMD_init *mmd_table), INTVAL n)
+        ARGIN(const MMD_init *mmd_table), INTVAL n)
 {
     MMD_table * const table = interp->binop_mmd_funcs;
     PMC * const ns = mmd_make_ns(interp);

@@ -53,10 +53,8 @@ struct _IMC_Unit;
 
 PARROT_WARN_UNUSED_RESULT
 int blocks_are_connected(
-    NOTNULL(const Basic_block *from),
-    NOTNULL(const Basic_block *to))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const Basic_block *from),
+    ARGIN(const Basic_block *to));
 
 void build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -75,8 +73,7 @@ void compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-int edge_count(NOTNULL(const struct _IMC_Unit *unit))
-        __attribute__nonnull__(1);
+int edge_count(ARGIN(const struct _IMC_Unit *unit));
 
 void find_basic_blocks(PARROT_INTERP,
     NOTNULL(struct _IMC_Unit *unit),
@@ -88,15 +85,11 @@ void find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void free_life_info(
-    NOTNULL(const struct _IMC_Unit *unit),
-    NOTNULL(SymReg *r))
-        __attribute__nonnull__(1)
+void free_life_info(ARGIN(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
         __attribute__nonnull__(2);
 
-void life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -105,15 +98,12 @@ Life_range * make_life_range(NOTNULL(SymReg *r), int idx)
 
 PARROT_WARN_UNUSED_RESULT
 int natural_preheader(
-    NOTNULL(const struct _IMC_Unit *unit),
-    NOTNULL(const Loop_info* loop_info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const struct _IMC_Unit *unit),
+    ARGIN(const Loop_info* loop_info));
 
 void search_predecessors_not_in(
-    NOTNULL(const Basic_block *node),
+    ARGIN(const Basic_block *node),
     NOTNULL(Set* s))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: compilers/imcc/cfg.c */

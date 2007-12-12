@@ -386,7 +386,7 @@ static void begin_return_or_yield(PARROT_INTERP, int yield)
 static void clear_state(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
+static void do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -428,7 +428,7 @@ static Instruction * iSUBROUTINE(PARROT_INTERP,
 
 static Instruction * MK_I(PARROT_INTERP,
     IMC_Unit *unit,
-    NOTNULL(const char *fmt),
+    ARGIN(const char *fmt),
     int n,
     ...)
         __attribute__nonnull__(1)
@@ -437,7 +437,7 @@ static Instruction * MK_I(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 static Instruction* mk_pmc_const(PARROT_INTERP,
     IMC_Unit *unit,
-    NOTNULL(const char *type),
+    ARGIN(const char *type),
     NOTNULL(SymReg *left),
     NOTNULL(char *constant))
         __attribute__nonnull__(1)
@@ -488,7 +488,7 @@ static void set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
  *        code.
  */
 static Instruction *
-MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
+MK_I(PARROT_INTERP, IMC_Unit *unit, ARGIN(const char *fmt), int n, ...)
 {
     char opname[64];
     char *p;
@@ -519,7 +519,7 @@ MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
 
 PARROT_WARN_UNUSED_RESULT
 static Instruction*
-mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
+mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, ARGIN(const char *type),
              NOTNULL(SymReg *left), NOTNULL(char *constant))
 {
     const   int type_enum = atoi(type);
@@ -823,7 +823,7 @@ adv_named_set(PARROT_INTERP, char *name) {
 }
 
 static void
-do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
+do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 {
     PMC *ignored;
     STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);

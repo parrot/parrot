@@ -21,9 +21,8 @@
 
 PARROT_API
 void Parrot_set_config_hash_internal(
-    NOTNULL(const unsigned char* parrot_config),
-    unsigned int parrot_config_size)
-        __attribute__nonnull__(1);
+    ARGIN(const unsigned char* parrot_config),
+    unsigned int parrot_config_size);
 
 void init_world(PARROT_INTERP)
         __attribute__nonnull__(1);

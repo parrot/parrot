@@ -50,7 +50,7 @@ Parrot_new_vtable(SHIM_INTERP)
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE *
-Parrot_clone_vtable(SHIM_INTERP, NOTNULL(const VTABLE *base_vtable))>
+Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
@@ -62,7 +62,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE *
-Parrot_clone_vtable(SHIM_INTERP, NOTNULL(const VTABLE *base_vtable))
+Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))
 {
     VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
 

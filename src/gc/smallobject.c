@@ -67,7 +67,7 @@ static void more_traceable_objects(PARROT_INTERP,
 
 =item C<PARROT_WARN_UNUSED_RESULT
 INTVAL
-contained_in_pool(NOTNULL(const Small_Object_Pool *pool), NOTNULL(const void *ptr))>
+contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))>
 
 Returns whether C<pool> contains C<*ptr>.
 
@@ -77,7 +77,7 @@ Returns whether C<pool> contains C<*ptr>.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-contained_in_pool(NOTNULL(const Small_Object_Pool *pool), NOTNULL(const void *ptr))
+contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
 {
     const Small_Object_Arena *arena;
 

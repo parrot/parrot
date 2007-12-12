@@ -131,9 +131,8 @@ extern const struct _data_types data_types[];
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_get_datatype_enum(PARROT_INTERP,
-    NOTNULL(const STRING *type_name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const STRING *type_name))
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

@@ -63,11 +63,10 @@ static INTVAL PIO_buf_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_buf_open(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(const char *path),
+    ARGIN(const char *path),
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static size_t PIO_buf_peek(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
@@ -186,7 +185,7 @@ PIO_buf_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 =item C<PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_buf_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(const char *path), INTVAL flags)>
+        ARGIN(const char *path), INTVAL flags)>
 
 The buffer layer's C<Open> function.
 
@@ -197,7 +196,7 @@ The buffer layer's C<Open> function.
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_buf_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(const char *path), INTVAL flags)
+        ARGIN(const char *path), INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
     ParrotIO * const io = PIO_open_down(interp, l, path, flags);

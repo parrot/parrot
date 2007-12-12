@@ -141,10 +141,9 @@ static void push_ascii_number(PARROT_INTERP,
 
 static void push_ascii_pmc(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    NOTNULL(const PMC* v))
+    ARGIN(const PMC* v))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void push_ascii_string(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
@@ -224,19 +223,17 @@ static STRING* shift_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 
 static void str_append(PARROT_INTERP,
     NOTNULL(STRING *s),
-    NOTNULL(const void *b),
+    ARGIN(const void *b),
     size_t len)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static PMC* thaw_create_pmc(PARROT_INTERP,
-    NOTNULL(const visit_info *info),
+    ARGIN(const visit_info *info),
     INTVAL type)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_INLINE
 static int thaw_pmc(PARROT_INTERP,
@@ -332,7 +329,7 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 =over 4
 
 =item C<static void
-str_append(PARROT_INTERP, NOTNULL(STRING *s), NOTNULL(const void *b), size_t len)>
+str_append(PARROT_INTERP, NOTNULL(STRING *s), ARGIN(const void *b), size_t len)>
 
 Appends C<len> bytes from buffer C<*b> to string C<*s>.
 
@@ -347,7 +344,7 @@ No encoding of strings, no transcoding.
 */
 
 static void
-str_append(PARROT_INTERP, NOTNULL(STRING *s), NOTNULL(const void *b), size_t len)
+str_append(PARROT_INTERP, NOTNULL(STRING *s), ARGIN(const void *b), size_t len)
 {
     const size_t used = s->bufused;
     const int need_free = (int)PObj_buflen(s) - used - len;
@@ -444,7 +441,7 @@ push_ascii_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(STRING *s))
 /*
 
 =item C<static void
-push_ascii_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(const PMC* v))>
+push_ascii_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io), ARGIN(const PMC* v))>
 
 Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
 "stream".
@@ -454,7 +451,7 @@ Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
 */
 
 static void
-push_ascii_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(const PMC* v))
+push_ascii_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io), ARGIN(const PMC* v))
 {
     char buffer[128];
     sprintf(buffer, "%p ", (const void *)v);
@@ -1158,7 +1155,7 @@ do_action(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
 =item C<PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-thaw_create_pmc(PARROT_INTERP, NOTNULL(const visit_info *info),
+thaw_create_pmc(PARROT_INTERP, ARGIN(const visit_info *info),
         INTVAL type)>
 
 Called from C<do_thaw()> to attach the vtable etc. to C<*pmc>.
@@ -1170,7 +1167,7 @@ Called from C<do_thaw()> to attach the vtable etc. to C<*pmc>.
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-thaw_create_pmc(PARROT_INTERP, NOTNULL(const visit_info *info),
+thaw_create_pmc(PARROT_INTERP, ARGIN(const visit_info *info),
         INTVAL type)
 {
     PMC *pmc;

@@ -177,7 +177,7 @@ PIO_push_layer(PARROT_INTERP, NULLOK(PMC *pmc), NULLOK(ParrotIOLayer *layer))
 PARROT_CAN_RETURN_NULL
 PARROT_API
 ParrotIOLayer *
-PIO_get_layer(SHIM_INTERP, NOTNULL(const char *name))>
+PIO_get_layer(SHIM_INTERP, ARGIN(const char *name))>
 
 RT#48260: Not yet documented!!!
 
@@ -189,7 +189,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_API
 ParrotIOLayer *
-PIO_get_layer(SHIM_INTERP, NOTNULL(const char *name))
+PIO_get_layer(SHIM_INTERP, ARGIN(const char *name))
 {
     ParrotIOLayer **t;
 

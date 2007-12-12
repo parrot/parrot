@@ -99,10 +99,9 @@ static INTVAL PIO_win32_listen(SHIM_INTERP,
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_win32_open(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(const char *spath),
+    ARGIN(const char *spath),
     INTVAL flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(1);
 
 static size_t PIO_win32_read(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
@@ -306,7 +305,7 @@ PIO_win32_getblksize(SHIM(PIOHANDLE fd))
 =item C<PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_win32_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
-               NOTNULL(const char *spath), INTVAL flags)>
+               ARGIN(const char *spath), INTVAL flags)>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
@@ -318,7 +317,7 @@ C<flags>.
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_win32_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
-               NOTNULL(const char *spath), INTVAL flags)
+               ARGIN(const char *spath), INTVAL flags)
 {
     ParrotIO *io;
     DWORD fAcc, fShare, fCreat;

@@ -60,7 +60,7 @@ mem_sys_allocate(size_t size)
 =item C<PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)>
+mem__internal_allocate(size_t size, ARGIN(const char *file), int line)>
 
 RT#48260: Not yet documented!!!
 
@@ -71,7 +71,7 @@ RT#48260: Not yet documented!!!
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)
+mem__internal_allocate(size_t size, ARGIN(const char *file), int line)
 {
     void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -120,7 +120,7 @@ mem_sys_allocate_zeroed(size_t size)
 =item C<PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)>
+mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)>
 
 RT#48260: Not yet documented!!!
 
@@ -131,7 +131,7 @@ RT#48260: Not yet documented!!!
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)
+mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)
 {
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -223,7 +223,7 @@ mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)
 PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_realloc(NOTNULL(void *from), size_t size,
-        NOTNULL(const char *file), int line)>
+        ARGIN(const char *file), int line)>
 
 RT#48260: Not yet documented!!!
 
@@ -235,7 +235,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_realloc(NOTNULL(void *from), size_t size,
-        NOTNULL(const char *file), int line)
+        ARGIN(const char *file), int line)
 {
     void * const ptr = realloc(from, size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -278,7 +278,7 @@ mem_sys_free(NULLOK(void *from))
 /*
 
 =item C<void
-mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)>
+mem__internal_free(NULLOK(void *from), ARGIN(const char *file), int line)>
 
 RT#48260: Not yet documented!!!
 
@@ -287,7 +287,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)
+mem__internal_free(NULLOK(void *from), ARGIN(const char *file), int line)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);

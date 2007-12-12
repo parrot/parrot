@@ -36,14 +36,12 @@ typedef void (*compact_f) (Interp *, Memory_Pool *);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char * aligned_mem(NOTNULL(const Buffer *buffer), NOTNULL(char *mem))
-        __attribute__nonnull__(1)
+static char * aligned_mem(ARGIN(const Buffer *buffer), NOTNULL(char *mem))
         __attribute__nonnull__(2);
 
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-static size_t aligned_size(NOTNULL(const Buffer *buffer), size_t len)
-        __attribute__nonnull__(1);
+static size_t aligned_size(ARGIN(const Buffer *buffer), size_t len);
 
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
@@ -52,24 +50,21 @@ static size_t aligned_string_size(size_t len);
 static void alloc_new_block(PARROT_INTERP,
     size_t size,
     NOTNULL(Memory_Pool *pool),
-    NOTNULL(const char *why))
+    ARGIN(const char *why))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char* buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
+        __attribute__nonnull__(1);
 
 static void compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void debug_print_buf(PARROT_INTERP, NOTNULL(const PObj *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static void debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -98,7 +93,7 @@ static Memory_Pool * new_memory_pool(
 
 =item C<static void
 alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
-        NOTNULL(const char *why))>
+        ARGIN(const char *why))>
 
 Allocate a new memory block. We allocate the larger of the requested size or
 the default size.  The given text is used for debugging.
@@ -109,7 +104,7 @@ the default size.  The given text is used for debugging.
 
 static void
 alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
-        NOTNULL(const char *why))
+        ARGIN(const char *why))
 {
     Memory_Block *new_block;
 
@@ -258,7 +253,7 @@ mem_allocate(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool))
 =item C<PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char*
-buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))>
+buffer_location(PARROT_INTERP, ARGIN(const PObj *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -270,7 +265,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char*
-buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))
+buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
 {
     int i;
     static char reg[10];
@@ -291,7 +286,7 @@ buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))
 /*
 
 =item C<static void
-debug_print_buf(PARROT_INTERP, NOTNULL(const PObj *b))>
+debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -300,7 +295,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-debug_print_buf(PARROT_INTERP, NOTNULL(const PObj *b))
+debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
 {
     fprintf(stderr, "found %p, len %d, flags 0x%08x at %s\n",
             b, (int)PObj_buflen(b), (uint)PObj_get_FLAGS(b),
@@ -567,7 +562,7 @@ Parrot_go_collect(PARROT_INTERP)
 =item C<PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 static size_t
-aligned_size(NOTNULL(const Buffer *buffer), size_t len)>
+aligned_size(ARGIN(const Buffer *buffer), size_t len)>
 
 RT#48260: Not yet documented!!!
 
@@ -578,7 +573,7 @@ RT#48260: Not yet documented!!!
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 static size_t
-aligned_size(NOTNULL(const Buffer *buffer), size_t len)
+aligned_size(ARGIN(const Buffer *buffer), size_t len)
 {
     if (PObj_is_COWable_TEST(buffer))
         len += sizeof (void*);
@@ -594,7 +589,7 @@ aligned_size(NOTNULL(const Buffer *buffer), size_t len)
 =item C<PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static char *
-aligned_mem(NOTNULL(const Buffer *buffer), NOTNULL(char *mem))>
+aligned_mem(ARGIN(const Buffer *buffer), NOTNULL(char *mem))>
 
 RT#48260: Not yet documented!!!
 
@@ -605,7 +600,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static char *
-aligned_mem(NOTNULL(const Buffer *buffer), NOTNULL(char *mem))
+aligned_mem(ARGIN(const Buffer *buffer), NOTNULL(char *mem))
 {
     if (PObj_is_COWable_TEST(buffer))
         mem += sizeof (void*);

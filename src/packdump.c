@@ -41,7 +41,7 @@ static void PackFile_Constant_dump(PARROT_INTERP,
 
 =item C<PARROT_API
 void
-PackFile_ConstTable_dump(PARROT_INTERP, NOTNULL(const PackFile_ConstTable *self))>
+PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))>
 
 Dumps the constant table C<self>.
 
@@ -51,7 +51,7 @@ Dumps the constant table C<self>.
 
 PARROT_API
 void
-PackFile_ConstTable_dump(PARROT_INTERP, NOTNULL(const PackFile_ConstTable *self))
+PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 {
     opcode_t i;
 
@@ -287,7 +287,7 @@ PackFile_Constant_dump(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct),
 
 =item C<PARROT_API
 void
-PackFile_Fixup_dump(PARROT_INTERP, NOTNULL(const PackFile_FixupTable *ft))>
+PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))>
 
 Dumps the fix-up table C<ft>.
 
@@ -297,7 +297,7 @@ Dumps the fix-up table C<ft>.
 
 PARROT_API
 void
-PackFile_Fixup_dump(PARROT_INTERP, NOTNULL(const PackFile_FixupTable *ft))
+PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
 {
     opcode_t i;
 

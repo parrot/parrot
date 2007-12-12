@@ -33,27 +33,24 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 
 PARROT_API
 INTVAL Parrot_byte_index(SHIM_INTERP,
-    NOTNULL(const STRING *base),
-    NOTNULL(const STRING *search),
-    UINTVAL start_offset)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    ARGIN(const STRING *base),
+    ARGIN(const STRING *search),
+    UINTVAL start_offset);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_byte_rindex(SHIM_INTERP,
-    NOTNULL(const STRING *base),
-    NOTNULL(const STRING *search),
-    UINTVAL start_offset)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    ARGIN(const STRING *base),
+    ARGIN(const STRING *search),
+    UINTVAL start_offset);
 
 PARROT_API
-void Parrot_destroy_cpa(NOTNULL(char **array))
+void Parrot_destroy_cpa(ARGINOUT(char **array))
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_destroy_la(NULLOK(long *array));
+void Parrot_destroy_la(ARGINOUT(long *array))
+        __attribute__nonnull__(1);
 
 PARROT_API
 FLOATVAL Parrot_float_rand(INTVAL how_random);
@@ -81,15 +78,14 @@ INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 PARROT_API
 void Parrot_register_move(PARROT_INTERP,
     int n_regs,
-    NOTNULL(unsigned char *dest_regs),
-    NOTNULL(unsigned char *src_regs),
+    ARGOUT(unsigned char *dest_regs),
+    ARGIN(unsigned char *src_regs),
     unsigned char temp_reg,
     reg_move_func mov,
     reg_move_func mov_alt,
     NOTNULL(void *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         __attribute__nonnull__(8);
 
 PARROT_API
@@ -100,9 +96,8 @@ INTVAL Parrot_uint_rand(INTVAL how_random);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC* tm_to_array(PARROT_INTERP, NOTNULL(const struct tm *tm))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
+        __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
 FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);

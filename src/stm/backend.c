@@ -124,8 +124,7 @@ static int is_aborted(NOTNULL(STM_tx_log *log))
         __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION
-static int is_version(NOTNULL(const void *maybe_version))
-        __attribute__nonnull__(1);
+static int is_version(ARGIN(const void *maybe_version));
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -153,8 +152,7 @@ static int merge_transactions(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void * next_version(NOTNULL(const void *old_version))
-        __attribute__nonnull__(1);
+static void * next_version(ARGIN(const void *old_version));
 
 static void replay_writes(PARROT_INTERP,
     NOTNULL(STM_tx_log *log),
@@ -164,9 +162,8 @@ static void replay_writes(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int safe_to_clone(PARROT_INTERP, NOTNULL(const PMC * const original))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static int safe_to_clone(PARROT_INTERP, ARGIN(const PMC * const original))
+        __attribute__nonnull__(1);
 
 static int setup_wait(PARROT_INTERP, NOTNULL(STM_tx_log *log))
         __attribute__nonnull__(1)
@@ -416,7 +413,7 @@ alloc_read(PARROT_INTERP, NOTNULL(STM_tx_log *log))
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void *
-next_version(NOTNULL(const void *old_version))>
+next_version(ARGIN(const void *old_version))>
 
 RT#48260: Not yet documented!!!
 
@@ -427,7 +424,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void *
-next_version(NOTNULL(const void *old_version))
+next_version(ARGIN(const void *old_version))
 {
     const UINTVAL v = PTR2UINTVAL(old_version) + 2;
 
@@ -438,7 +435,7 @@ next_version(NOTNULL(const void *old_version))
 
 =item C<PARROT_PURE_FUNCTION
 static int
-is_version(NOTNULL(const void *maybe_version))>
+is_version(ARGIN(const void *maybe_version))>
 
 RT#48260: Not yet documented!!!
 
@@ -448,7 +445,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_PURE_FUNCTION
 static int
-is_version(NOTNULL(const void *maybe_version))
+is_version(ARGIN(const void *maybe_version))
 {
     const UINTVAL v = PTR2UINTVAL(maybe_version);
     return v & 1;
@@ -1510,7 +1507,7 @@ Parrot_STM_read(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-safe_to_clone(PARROT_INTERP, NOTNULL(const PMC * const original))>
+safe_to_clone(PARROT_INTERP, ARGIN(const PMC * const original))>
 
 RT#48260: Not yet documented!!!
 
@@ -1520,7 +1517,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-safe_to_clone(PARROT_INTERP, NOTNULL(const PMC * const original))
+safe_to_clone(PARROT_INTERP, ARGIN(const PMC * const original))
 {
     if (original->vtable->base_type == enum_class_Integer
         ||  original->vtable->base_type == enum_class_Float

@@ -149,9 +149,8 @@ PMC * Parrot_get_attrib_by_str(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-INTVAL Parrot_get_vtable_index(PARROT_INTERP, NOTNULL(const STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_instantiate_object(PARROT_INTERP, NOTNULL(PMC *object))
@@ -175,8 +174,7 @@ void Parrot_invalidate_method_cache(PARROT_INTERP,
 
 PARROT_API
 PARROT_PURE_FUNCTION
-INTVAL Parrot_MMD_method_idx(SHIM_INTERP, NOTNULL(const char *name))
-        __attribute__nonnull__(2);
+INTVAL Parrot_MMD_method_idx(SHIM_INTERP, ARGIN(const char *name));
 
 PARROT_API
 PARROT_PURE_FUNCTION

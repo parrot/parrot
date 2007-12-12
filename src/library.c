@@ -35,8 +35,7 @@ static PMC* get_search_paths(PARROT_INTERP, enum_lib_paths which)
         __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION
-static int is_abs_path(NOTNULL(const STRING *file))
-        __attribute__nonnull__(1);
+static int is_abs_path(ARGIN(const STRING *file));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -216,7 +215,7 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
 
 =item C<PARROT_PURE_FUNCTION
 static int
-is_abs_path(NOTNULL(const STRING *file))>
+is_abs_path(ARGIN(const STRING *file))>
 
 RT#48260: Not yet documented!!!
 
@@ -226,7 +225,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_PURE_FUNCTION
 static int
-is_abs_path(NOTNULL(const STRING *file))
+is_abs_path(ARGIN(const STRING *file))
 {
     const char * const file_name = file->strstart;
     if (file->strlen <= 1)
@@ -590,7 +589,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 char*
-Parrot_locate_runtime_file(PARROT_INTERP, NOTNULL(const char *file_name),
+Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
         enum_runtime_ft type)>
 
 RT#48260: Not yet documented!!!
@@ -603,7 +602,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 char*
-Parrot_locate_runtime_file(PARROT_INTERP, NOTNULL(const char *file_name),
+Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
         enum_runtime_ft type)
 {
     STRING * const file = string_from_cstring(interp, file_name, 0);

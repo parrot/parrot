@@ -31,7 +31,7 @@ appropriate arguments and return the value returned.
 PARROT_CAN_RETURN_NULL
 ParrotIO *
 PIO_open_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer),
-        NOTNULL(const char *name), INTVAL flags)>
+        ARGIN(const char *name), INTVAL flags)>
 
 Looks for the implementation of C<Open> and calls it if found, returning
 its return value.
@@ -46,7 +46,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIO *
 PIO_open_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer),
-        NOTNULL(const char *name), INTVAL flags)
+        ARGIN(const char *name), INTVAL flags)
 {
     while (layer) {
         if (layer->api->Open)
@@ -61,8 +61,8 @@ PIO_open_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer),
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIO *
-PIO_open_async_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), NOTNULL(const char *name),
-        NOTNULL(const char *mode), NOTNULL(DummyCodeRef *dummy))>
+PIO_open_async_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), ARGIN(const char *name),
+        ARGIN(const char *mode), NOTNULL(DummyCodeRef *dummy))>
 
 Looks for the implementation of C<Open_ASync> and calls it if found,
 returning its return value.
@@ -76,8 +76,8 @@ Returns C<NULL> if no implementation is found.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIO *
-PIO_open_async_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), NOTNULL(const char *name),
-        NOTNULL(const char *mode), NOTNULL(DummyCodeRef *dummy))
+PIO_open_async_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), ARGIN(const char *name),
+        ARGIN(const char *mode), NOTNULL(DummyCodeRef *dummy))
 {
     while (layer) {
         if (layer->api->Open_ASync)

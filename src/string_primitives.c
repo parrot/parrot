@@ -35,7 +35,7 @@ API.
 
 =item C<PARROT_API
 void
-string_set_data_directory(PARROT_INTERP, NOTNULL(const char *dir))>
+string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))>
 
 Set the directory where ICU finds its data files (encodings, locales,
 etc.).
@@ -46,7 +46,7 @@ etc.).
 
 PARROT_API
 void
-string_set_data_directory(PARROT_INTERP, NOTNULL(const char *dir))
+string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
 {
 #if PARROT_HAS_ICU
     u_setDataDirectory(dir);

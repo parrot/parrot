@@ -694,8 +694,8 @@ PIO_setlinebuf(PARROT_INTERP, NOTNULL(PMC *pmc))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-PIO_open(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), NOTNULL(const char *spath),
-         NOTNULL(const char *sflags))>
+PIO_open(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), ARGIN(const char *spath),
+         ARGIN(const char *sflags))>
 
 Creates and returns a C<ParrotIO> PMC for C<*spath>.
 
@@ -707,8 +707,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-PIO_open(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), NOTNULL(const char *spath),
-         NOTNULL(const char *sflags))
+PIO_open(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), ARGIN(const char *spath),
+         ARGIN(const char *sflags))
 {
     ParrotIO *io;
     const INTVAL flags = PIO_parse_open_flags(sflags);
@@ -735,7 +735,7 @@ PIO_open(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), NOTNULL(const char *spath)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-PIO_fdopen(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), PIOHANDLE fd, NOTNULL(const char *sflags))>
+PIO_fdopen(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), PIOHANDLE fd, ARGIN(const char *sflags))>
 
 Creates and returns a C<ParrotIO> PMC for C<*spath> on an existing, open
 file descriptor.
@@ -751,7 +751,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-PIO_fdopen(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), PIOHANDLE fd, NOTNULL(const char *sflags))
+PIO_fdopen(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), PIOHANDLE fd, ARGIN(const char *sflags))
 {
     ParrotIO *io;
     INTVAL flags;
@@ -909,7 +909,7 @@ PIO_read(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(char *buffer), size_t len)
 =item C<PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_write(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(const void *buffer), size_t len)>
+PIO_write(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const void *buffer), size_t len)>
 
 Writes C<len> bytes from C<*buffer> to C<*pmc>.
 
@@ -920,7 +920,7 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_write(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(const void *buffer), size_t len)
+PIO_write(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const void *buffer), size_t len)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -1030,7 +1030,7 @@ PIO_eof(SHIM_INTERP, NOTNULL(PMC *pmc))
 
 =item C<PARROT_API
 INTVAL
-PIO_puts(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(const char *s))>
+PIO_puts(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const char *s))>
 
 Writes C<*s> tp C<*pmc>. C string version.
 
@@ -1040,7 +1040,7 @@ Writes C<*s> tp C<*pmc>. C string version.
 
 PARROT_API
 INTVAL
-PIO_puts(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(const char *s))
+PIO_puts(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const char *s))
 {
     return PIO_write(interp, pmc, s, strlen(s));
 }
@@ -1080,7 +1080,7 @@ PIO_putps(PARROT_INTERP, NOTNULL(PMC *pmc), NULLOK(STRING *s))
 
 =item C<PARROT_API
 INTVAL
-PIO_fprintf(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(const char *s), ...)>
+PIO_fprintf(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const char *s), ...)>
 
 Writes a C string format with varargs to C<*pmc>.
 
@@ -1090,7 +1090,7 @@ Writes a C string format with varargs to C<*pmc>.
 
 PARROT_API
 INTVAL
-PIO_fprintf(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(const char *s), ...)
+PIO_fprintf(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const char *s), ...)
 {
     va_list args;
     INTVAL ret;
@@ -1108,7 +1108,7 @@ PIO_fprintf(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(const char *s), ...)
 
 =item C<PARROT_API
 INTVAL
-PIO_printf(PARROT_INTERP, NOTNULL(const char *s), ...)>
+PIO_printf(PARROT_INTERP, ARGIN(const char *s), ...)>
 
 Writes a C string format with varargs to C<stdout>.
 
@@ -1118,7 +1118,7 @@ Writes a C string format with varargs to C<stdout>.
 
 PARROT_API
 INTVAL
-PIO_printf(PARROT_INTERP, NOTNULL(const char *s), ...)
+PIO_printf(PARROT_INTERP, ARGIN(const char *s), ...)
 {
     va_list args;
     INTVAL ret;
@@ -1145,7 +1145,7 @@ PIO_printf(PARROT_INTERP, NOTNULL(const char *s), ...)
 
 =item C<PARROT_API
 INTVAL
-PIO_eprintf(NULLOK(PARROT_INTERP), NOTNULL(const char *s), ...)>
+PIO_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)>
 
 Writes a C string format with varargs to C<stderr>.
 
@@ -1155,7 +1155,7 @@ Writes a C string format with varargs to C<stderr>.
 
 PARROT_API
 INTVAL
-PIO_eprintf(NULLOK(PARROT_INTERP), NOTNULL(const char *s), ...)
+PIO_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 {
     va_list args;
     INTVAL ret;

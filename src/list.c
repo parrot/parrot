@@ -232,9 +232,7 @@ static void list_append(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void list_dump(NOTNULL(const List *list), INTVAL type)
-        __attribute__nonnull__(1);
-
+static void list_dump(ARGIN(const List *list), INTVAL type);
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void * list_item(PARROT_INTERP,
@@ -330,7 +328,7 @@ allocate_chunk(PARROT_INTERP, NOTNULL(List *list), UINTVAL items, UINTVAL size)
 /*
 
 =item C<static void
-list_dump(NOTNULL(const List *list), INTVAL type)>
+list_dump(ARGIN(const List *list), INTVAL type)>
 
 Only char and int are supported currently.
 
@@ -339,7 +337,7 @@ Only char and int are supported currently.
 */
 
 static void
-list_dump(NOTNULL(const List *list), INTVAL type)
+list_dump(ARGIN(const List *list), INTVAL type)
 {
     const List_chunk *chunk = list->first;
     UINTVAL idx = 0;
@@ -1438,7 +1436,7 @@ list_pmc_new_init(PARROT_INTERP, NOTNULL(PMC *container), NOTNULL(PMC *init))
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 List *
-list_clone(PARROT_INTERP, NOTNULL(const List *other))>
+list_clone(PARROT_INTERP, ARGIN(const List *other))>
 
 Return a clone of the list.
 
@@ -1452,7 +1450,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 List *
-list_clone(PARROT_INTERP, NOTNULL(const List *other))
+list_clone(PARROT_INTERP, ARGIN(const List *other))
 {
     List *l;
     List_chunk *chunk, *prev;
@@ -1600,7 +1598,7 @@ list_visit(PARROT_INTERP, NOTNULL(List *list), NOTNULL(void *pinfo))
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-list_length(SHIM_INTERP, NOTNULL(const List *list))>
+list_length(SHIM_INTERP, ARGIN(const List *list))>
 
 Returns the length of the list.
 
@@ -1612,7 +1610,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-list_length(SHIM_INTERP, NOTNULL(const List *list))
+list_length(SHIM_INTERP, ARGIN(const List *list))
 {
     return list->length;
 }

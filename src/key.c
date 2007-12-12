@@ -308,7 +308,7 @@ key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))
 =item C<PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-key_type(SHIM_INTERP, NOTNULL(const PMC *key))>
+key_type(SHIM_INTERP, ARGIN(const PMC *key))>
 
 Returns the type of C<key>.
 
@@ -319,7 +319,7 @@ Returns the type of C<key>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-key_type(SHIM_INTERP, NOTNULL(const PMC *key))
+key_type(SHIM_INTERP, ARGIN(const PMC *key))
 {
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }

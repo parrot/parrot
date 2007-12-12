@@ -213,22 +213,19 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIO * PIO_open_async_down(PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    NOTNULL(const char *name),
-    NOTNULL(const char *mode),
+    ARGIN(const char *name),
+    ARGIN(const char *mode),
     NOTNULL(DummyCodeRef *dummy))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIO * PIO_open_down(PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    NOTNULL(const char *name),
+    ARGIN(const char *name),
     INTVAL flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 size_t PIO_peek_down(PARROT_INTERP,

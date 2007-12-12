@@ -88,7 +88,7 @@ print_warning(PARROT_INTERP, NULLOK(STRING *msg))
 =item C<PARROT_API
 INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
-            NOTNULL(const char *message), ...)>
+            ARGIN(const char *message), ...)>
 
 The Parrot C string warning/error reporter.
 
@@ -103,7 +103,7 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 PARROT_API
 INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
-            NOTNULL(const char *message), ...)
+            ARGIN(const char *message), ...)
 {
     STRING *targ;
 

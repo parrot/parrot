@@ -213,7 +213,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 =item C<PARROT_API
 int
 PackFile_find_in_const(PARROT_INTERP,
-        NOTNULL(const PackFile_ConstTable *ct), NOTNULL(const PMC *key), int type)>
+        ARGIN(const PackFile_ConstTable *ct), ARGIN(const PMC *key), int type)>
 
 This is really ugly, we don't know where our C<PARROT_ARG_SC> key
 constant is in constant table, so we have to search for it.
@@ -225,7 +225,7 @@ constant is in constant table, so we have to search for it.
 PARROT_API
 int
 PackFile_find_in_const(PARROT_INTERP,
-        NOTNULL(const PackFile_ConstTable *ct), NOTNULL(const PMC *key), int type)
+        ARGIN(const PackFile_ConstTable *ct), ARGIN(const PMC *key), int type)
 {
     int i;
     for (i = 0; i < ct->const_count; i++)
@@ -246,8 +246,8 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 opcode_t *
 PackFile_Constant_pack(PARROT_INTERP,
-        NOTNULL(const PackFile_ConstTable *const_table),
-        NOTNULL(const PackFile_Constant *self), NOTNULL(opcode_t *cursor))>
+        ARGIN(const PackFile_ConstTable *const_table),
+        ARGIN(const PackFile_Constant *self), NOTNULL(opcode_t *cursor))>
 
 Pack a PackFile Constant into a contiguous region of memory.
 
@@ -269,8 +269,8 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 opcode_t *
 PackFile_Constant_pack(PARROT_INTERP,
-        NOTNULL(const PackFile_ConstTable *const_table),
-        NOTNULL(const PackFile_Constant *self), NOTNULL(opcode_t *cursor))
+        ARGIN(const PackFile_ConstTable *const_table),
+        ARGIN(const PackFile_Constant *self), NOTNULL(opcode_t *cursor))
 {
     PMC *key;
     size_t i;

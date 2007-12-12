@@ -52,13 +52,12 @@ PARROT_CAN_RETURN_NULL
 static Instruction * insINS(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction *ins),
-    NOTNULL(const char *name),
+    ARGIN(const char *name),
     NOTNULL(SymReg **regs),
     int n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
@@ -80,14 +79,13 @@ PARROT_CAN_RETURN_NULL
 static Instruction* pcc_get_args(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction *ins),
-    NOTNULL(const char *op_name),
+    ARGIN(const char *op_name),
     int n,
     NULLOK(SymReg **args),
     NULLOK(const int *arg_flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 static int pcc_reg_mov(PARROT_INTERP,
     unsigned char d,
@@ -117,7 +115,7 @@ static void unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
 PARROT_CAN_RETURN_NULL
 static Instruction *
 insINS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
-        NOTNULL(const char *name), NOTNULL(SymReg **regs), int n)>
+        ARGIN(const char *name), NOTNULL(SymReg **regs), int n)>
 
 Utility instruction routine. Creates and inserts an instruction
 into the current block in one call.
@@ -130,7 +128,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction *
 insINS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
-        NOTNULL(const char *name), NOTNULL(SymReg **regs), int n)
+        ARGIN(const char *name), NOTNULL(SymReg **regs), int n)
 {
     /* XXX INS can return NULL, but insert_ins() cannot take one */
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
@@ -143,7 +141,7 @@ insINS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg*
-get_pasm_reg(PARROT_INTERP, NOTNULL(const char *name))>
+get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))>
 
 get or create the SymReg
 
@@ -154,7 +152,7 @@ get or create the SymReg
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg*
-get_pasm_reg(PARROT_INTERP, NOTNULL(const char *name))
+get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * const r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 
@@ -169,7 +167,7 @@ get_pasm_reg(PARROT_INTERP, NOTNULL(const char *name))
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg*
-get_const(PARROT_INTERP, NOTNULL(const char *name), int type)>
+get_const(PARROT_INTERP, ARGIN(const char *name), int type)>
 
 get or create a constant
 
@@ -180,7 +178,7 @@ get or create a constant
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg*
-get_const(PARROT_INTERP, NOTNULL(const char *name), int type)
+get_const(PARROT_INTERP, ARGIN(const char *name), int type)
 {
     SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, name);
 
@@ -196,7 +194,7 @@ get_const(PARROT_INTERP, NOTNULL(const char *name), int type)
 PARROT_CAN_RETURN_NULL
 static Instruction*
 pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
-        NOTNULL(const char *op_name), int n,
+        ARGIN(const char *op_name), int n,
         NULLOK(SymReg **args), NULLOK(const int *arg_flags))>
 
 set arguments or return values
@@ -211,7 +209,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction*
 pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
-        NOTNULL(const char *op_name), int n,
+        ARGIN(const char *op_name), int n,
         NULLOK(SymReg **args), NULLOK(const int *arg_flags))
 {
     int i, flags;

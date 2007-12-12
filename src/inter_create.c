@@ -29,8 +29,7 @@ Create or destroy a Parrot interpreter
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static int is_env_var_set(NOTNULL(const char* var))
-        __attribute__nonnull__(1);
+static int is_env_var_set(ARGIN(const char* var));
 
 static void setup_default_compreg(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -51,7 +50,7 @@ Interp interpre;
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-is_env_var_set(NOTNULL(const char* var))>
+is_env_var_set(ARGIN(const char* var))>
 
 Checks whether the specified environment variable is set.
 
@@ -61,7 +60,7 @@ Checks whether the specified environment variable is set.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-is_env_var_set(NOTNULL(const char* var))
+is_env_var_set(ARGIN(const char* var))
 {
     int free_it, retval;
     char* const value = Parrot_getenv(var, &free_it);

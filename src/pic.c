@@ -562,7 +562,7 @@ pass_mixed(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-parrot_pic_check_sig(NOTNULL(const PMC *sig1), NOTNULL(const PMC *sig2),
+parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
         NOTNULL(int *type))>
 
 return argument count and type of the signature or -1 if not pic-able
@@ -574,7 +574,7 @@ the type PARROT_ARG_CONSTANT stands for mixed types or constants
 
 PARROT_WARN_UNUSED_RESULT
 int
-parrot_pic_check_sig(NOTNULL(const PMC *sig1), NOTNULL(const PMC *sig2),
+parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
         NOTNULL(int *type))
 {
     int i, n, t0, t1, t2;

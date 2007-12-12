@@ -39,9 +39,8 @@ static void analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
         __attribute__nonnull__(2);
 
 static void analyse_life_symbol(
-    NOTNULL(const struct _IMC_Unit *unit),
+    ARGIN(const struct _IMC_Unit *unit),
     NOTNULL(SymReg* r))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void bb_add_edge(
@@ -76,11 +75,9 @@ static void bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
 
 PARROT_WARN_UNUSED_RESULT
 static int check_invoke_type(PARROT_INTERP,
-    NOTNULL(const IMC_Unit * unit),
-    NOTNULL(const Instruction *ins))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    ARGIN(const IMC_Unit * unit),
+    ARGIN(const Instruction *ins))
+        __attribute__nonnull__(1);
 
 static void free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
@@ -108,10 +105,9 @@ static Basic_block* make_basic_block(PARROT_INTERP,
 
 static void mark_loop(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
-    NOTNULL(const Edge *e))
+    ARGIN(const Edge *e))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void propagate_need(
     NOTNULL(Basic_block *bb),
@@ -137,7 +133,7 @@ static void sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const Instruction *ins))>
+check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit * unit), ARGIN(const Instruction *ins))>
 
 RT#48260: Not yet documented!!!
 
@@ -147,7 +143,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const Instruction *ins))
+check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit * unit), ARGIN(const Instruction *ins))
 {
     /*
      * 1) pcc sub call or yield
@@ -496,7 +492,7 @@ bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block *to))>
+blocks_are_connected(ARGIN(const Basic_block *from), ARGIN(const Basic_block *to))>
 
 RT#48260: Not yet documented!!!
 
@@ -506,7 +502,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 int
-blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block *to))
+blocks_are_connected(ARGIN(const Basic_block *from), ARGIN(const Basic_block *to))
 {
     const Edge *pred = to->pred_list;
 
@@ -646,7 +642,7 @@ free_edge(NOTNULL(IMC_Unit *unit))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-edge_count(NOTNULL(const struct _IMC_Unit *unit))>
+edge_count(ARGIN(const struct _IMC_Unit *unit))>
 
 RT#48260: Not yet documented!!!
 
@@ -656,7 +652,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 int
-edge_count(NOTNULL(const struct _IMC_Unit *unit))
+edge_count(ARGIN(const struct _IMC_Unit *unit))
 {
     Edge *e = unit->edge_list;
     int i = 0;
@@ -671,7 +667,7 @@ edge_count(NOTNULL(const struct _IMC_Unit *unit))
 /*
 
 =item C<void
-life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))>
+life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))>
 
 RT#48260: Not yet documented!!!
 
@@ -680,7 +676,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
+life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
 {
     int i;
     SymReg** const reglist = unit->reglist;
@@ -693,7 +689,7 @@ life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
 /*
 
 =item C<static void
-analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
+analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit),
         NOTNULL(SymReg* r))>
 
 RT#48260: Not yet documented!!!
@@ -703,7 +699,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
+analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit),
         NOTNULL(SymReg* r))
 {
     int i;
@@ -761,7 +757,7 @@ analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
 /*
 
 =item C<void
-free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))>
+free_life_info(ARGIN(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))>
 
 RT#48260: Not yet documented!!!
 
@@ -770,7 +766,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
+free_life_info(ARGIN(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
 {
     int i;
 #if IMC_TRACE_HIGH
@@ -1297,7 +1293,7 @@ find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info* loop_info))>
+natural_preheader(ARGIN(const struct _IMC_Unit *unit), ARGIN(const Loop_info* loop_info))>
 
 For loop_info, finds the natural preheader of the loop, if any, and returns
 its index, otherwise returns -1.  A natural preheader exists if there is
@@ -1310,7 +1306,7 @@ always transfers control directly to the header.
 
 PARROT_WARN_UNUSED_RESULT
 int
-natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info* loop_info))
+natural_preheader(ARGIN(const struct _IMC_Unit *unit), ARGIN(const Loop_info* loop_info))
 {
     int preheader = -1;
     Edge* edge;
@@ -1337,7 +1333,7 @@ natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info
 /*
 
 =item C<static void
-mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))>
+mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const Edge *e))>
 
 Increases the loop_depth of all the nodes in a loop
 
@@ -1346,7 +1342,7 @@ Increases the loop_depth of all the nodes in a loop
 */
 
 static void
-mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))
+mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const Edge *e))
 {
     Set* loop;
     Set* exits;
@@ -1456,7 +1452,7 @@ free_loops(NOTNULL(IMC_Unit *unit))
 /*
 
 =item C<void
-search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))>
+search_predecessors_not_in(ARGIN(const Basic_block *node), NOTNULL(Set* s))>
 
 RT#48260: Not yet documented!!!
 
@@ -1465,7 +1461,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))
+search_predecessors_not_in(ARGIN(const Basic_block *node), NOTNULL(Set* s))
 {
    Edge *edge;
 

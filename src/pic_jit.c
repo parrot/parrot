@@ -40,18 +40,14 @@ TODO:
 
 PARROT_WARN_UNUSED_RESULT
 static int args_match_params(
-    NOTNULL(const PMC *sig_args),
+    ARGIN(const PMC *sig_args),
     NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *start))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static int call_is_safe(
-    NOTNULL(const PMC *sub),
-    NOTNULL(opcode_t **set_args))
-        __attribute__nonnull__(1)
+static int call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -62,14 +58,13 @@ static int jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
 PARROT_WARN_UNUSED_RESULT
 static int ops_jittable(PARROT_INTERP,
     NOTNULL(PMC *sub),
-    NOTNULL(const PMC *sig_results),
+    ARGIN(const PMC *sig_results),
     NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *pc),
     NOTNULL(opcode_t *end),
     NOTNULL(int *flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         __attribute__nonnull__(6)
@@ -85,10 +80,8 @@ static opcode_t * pic_test_func(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int returns_match_results(
-    NOTNULL(const PMC *sig_ret),
-    NOTNULL(const PMC *sig_result))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const PMC *sig_ret),
+    ARGIN(const PMC *sig_result));
 
 /* HEADERIZER END: static */
 
@@ -198,7 +191,7 @@ jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
+args_match_params(ARGIN(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *start))>
 
 RT#48260: Not yet documented!!!
@@ -209,7 +202,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
+args_match_params(ARGIN(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *start))
 {
     const PMC *sig_params;
@@ -249,7 +242,7 @@ args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result))>
+returns_match_results(ARGIN(const PMC *sig_ret), ARGIN(const PMC *sig_result))>
 
 RT#48260: Not yet documented!!!
 
@@ -259,7 +252,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result))
+returns_match_results(ARGIN(const PMC *sig_ret), ARGIN(const PMC *sig_result))
 {
     int type;
     const int n = parrot_pic_check_sig(sig_ret, sig_result, &type);
@@ -288,7 +281,7 @@ returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))>
+call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))>
 
 RT#48260: Not yet documented!!!
 
@@ -298,7 +291,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))
+call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))
 {
     PMC *called, *sig_results;
 
@@ -339,7 +332,7 @@ call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const PMC *sig_results),
+ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), ARGIN(const PMC *sig_results),
         NOTNULL(PackFile_ByteCode *seg), NOTNULL(opcode_t *pc),
         NOTNULL(opcode_t *end), NOTNULL(int *flags))>
 
@@ -351,7 +344,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const PMC *sig_results),
+ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), ARGIN(const PMC *sig_results),
         NOTNULL(PackFile_ByteCode *seg), NOTNULL(opcode_t *pc),
         NOTNULL(opcode_t *end), NOTNULL(int *flags))
 {

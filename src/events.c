@@ -43,8 +43,7 @@ static opcode_t * do_event(PARROT_INTERP,
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static QUEUE_ENTRY* dup_entry(NOTNULL(const QUEUE_ENTRY *entry))
-        __attribute__nonnull__(1);
+static QUEUE_ENTRY* dup_entry(ARGIN(const QUEUE_ENTRY *entry));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -59,9 +58,8 @@ static void* event_thread(NOTNULL(void *data))
         __attribute__nonnull__(1);
 
 static void event_to_exception(PARROT_INTERP,
-    NOTNULL(const parrot_event* event))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const parrot_event* event))
+        __attribute__nonnull__(1);
 
 static void init_events_all(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -1046,7 +1044,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
 =item C<PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static QUEUE_ENTRY*
-dup_entry(NOTNULL(const QUEUE_ENTRY *entry))>
+dup_entry(ARGIN(const QUEUE_ENTRY *entry))>
 
 Duplicate queue entry.
 
@@ -1057,7 +1055,7 @@ Duplicate queue entry.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static QUEUE_ENTRY*
-dup_entry(NOTNULL(const QUEUE_ENTRY *entry))
+dup_entry(ARGIN(const QUEUE_ENTRY *entry))
 {
     QUEUE_ENTRY * const new_entry = mem_allocate_typed(QUEUE_ENTRY);
 
@@ -1378,7 +1376,7 @@ Parrot_do_check_events(PARROT_INTERP, NULLOK(opcode_t *next))
 /*
 
 =item C<static void
-event_to_exception(PARROT_INTERP, NOTNULL(const parrot_event* event))>
+event_to_exception(PARROT_INTERP, ARGIN(const parrot_event* event))>
 
 Convert event to exception and throw it.
 
@@ -1387,7 +1385,7 @@ Convert event to exception and throw it.
 */
 
 static void
-event_to_exception(PARROT_INTERP, NOTNULL(const parrot_event* event))
+event_to_exception(PARROT_INTERP, ARGIN(const parrot_event* event))
 {
     const int exit_code = -event->u.signal;
 

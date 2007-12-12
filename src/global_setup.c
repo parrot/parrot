@@ -47,7 +47,7 @@ static void parrot_set_config_hash_interpreter(PARROT_INTERP)
 
 =item C<PARROT_API
 void
-Parrot_set_config_hash_internal(NOTNULL(const unsigned char* parrot_config),
+Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)>
 
 Called by Parrot_set_config_hash with the serialised hash which
@@ -59,7 +59,7 @@ will be used in subsequently created Interpreters.
 
 PARROT_API
 void
-Parrot_set_config_hash_internal(NOTNULL(const unsigned char* parrot_config),
+Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
 {
     parrot_config_stored      = parrot_config;

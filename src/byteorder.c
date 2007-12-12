@@ -205,7 +205,7 @@ out of a padded buffer.
 /*
 
 =item C<void
-fetch_buf_be_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_be_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -214,7 +214,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_be_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -229,7 +229,7 @@ fetch_buf_be_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 /*
 
 =item C<void
-fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_le_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -238,7 +238,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_le_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -253,7 +253,7 @@ fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 /*
 
 =item C<void
-fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_be_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -262,7 +262,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_be_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -281,7 +281,7 @@ fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 /*
 
 =item C<void
-fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_le_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -290,7 +290,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_le_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -309,7 +309,7 @@ fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 /*
 
 =item C<void
-fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_le_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -318,7 +318,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_le_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -341,7 +341,7 @@ fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 /*
 
 =item C<void
-fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_be_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -350,7 +350,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_be_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -373,7 +373,7 @@ fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 /*
 
 =item C<void
-fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_le_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -382,7 +382,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_le_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
@@ -409,7 +409,7 @@ fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 /*
 
 =item C<void
-fetch_buf_be_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))>
+fetch_buf_be_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
 
 RT#48260: Not yet documented!!!
 
@@ -418,7 +418,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
+fetch_buf_be_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);

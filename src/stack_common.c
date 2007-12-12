@@ -52,7 +52,7 @@ stack_system_init(SHIM_INTERP)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
-register_new_stack(PARROT_INTERP, NOTNULL(const char *name), size_t item_size)>
+register_new_stack(PARROT_INTERP, ARGIN(const char *name), size_t item_size)>
 
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
@@ -65,7 +65,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
-register_new_stack(PARROT_INTERP, NOTNULL(const char *name), size_t item_size)
+register_new_stack(PARROT_INTERP, ARGIN(const char *name), size_t item_size)
 {
     Stack_Chunk_t *chunk;
     Small_Object_Pool *ignored;
@@ -85,7 +85,7 @@ register_new_stack(PARROT_INTERP, NOTNULL(const char *name), size_t item_size)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
-cst_new_stack_chunk(PARROT_INTERP, NOTNULL(const Stack_Chunk_t *chunk))>
+cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))>
 
 Get a new chunk either from the freelist or allocate one.
 
@@ -97,7 +97,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
-cst_new_stack_chunk(PARROT_INTERP, NOTNULL(const Stack_Chunk_t *chunk))
+cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 {
     Small_Object_Pool * const pool =
         get_bufferlike_pool(interp, chunk->size);

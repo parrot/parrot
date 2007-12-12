@@ -120,9 +120,8 @@ static void pbc_merge_fixups(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_loadpbc(PARROT_INTERP,
-    NOTNULL(const char *fullname))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const char *fullname))
+        __attribute__nonnull__(1);
 
 static void pbc_merge_pic_index(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
@@ -136,15 +135,13 @@ static void pbc_merge_pic_index(PARROT_INTERP,
 
 static void pbc_merge_write(PARROT_INTERP,
     NOTNULL(PackFile *pf),
-    NOTNULL(const char *filename))
+    ARGIN(const char *filename))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static char * str_dup(NOTNULL(const char *old))
-        __attribute__nonnull__(1);
+static char * str_dup(ARGIN(const char *old));
 
 /* HEADERIZER END: static */
 
@@ -172,7 +169,7 @@ help(PARROT_INTERP)
 =item C<PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static char *
-str_dup(NOTNULL(const char *old))>
+str_dup(ARGIN(const char *old))>
 
 Duplicate a C string
 
@@ -183,7 +180,7 @@ Duplicate a C string
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static char *
-str_dup(NOTNULL(const char *old))
+str_dup(ARGIN(const char *old))
 {
     const size_t bytes = strlen(old) + 1;
     char * const copy = (char *)mem_sys_allocate(bytes);
@@ -199,7 +196,7 @@ str_dup(NOTNULL(const char *old))
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile*
-pbc_merge_loadpbc(PARROT_INTERP, NOTNULL(const char *fullname))>
+pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))>
 
 This function loads a PBC file and unpacks it. We can't
 use Parrot_readbc because that is specified to also
@@ -212,7 +209,7 @@ fixup the segments, which we don't want.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile*
-pbc_merge_loadpbc(PARROT_INTERP, NOTNULL(const char *fullname))
+pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
 {
     INTVAL program_size, wanted;
     char *program_code;
@@ -813,7 +810,7 @@ pbc_merge_begin(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs), int num_inputs
 /*
 
 =item C<static void
-pbc_merge_write(PARROT_INTERP, NOTNULL(PackFile *pf), NOTNULL(const char *filename))>
+pbc_merge_write(PARROT_INTERP, NOTNULL(PackFile *pf), ARGIN(const char *filename))>
 
 This functions writes out the merged packfile.
 
@@ -822,7 +819,7 @@ This functions writes out the merged packfile.
 */
 
 static void
-pbc_merge_write(PARROT_INTERP, NOTNULL(PackFile *pf), NOTNULL(const char *filename))
+pbc_merge_write(PARROT_INTERP, NOTNULL(PackFile *pf), ARGIN(const char *filename))
 {
     FILE     *fp;
 

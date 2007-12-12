@@ -540,7 +540,7 @@ Use this to destroy an array created with C<Parrot_make_la()>.
 
 PARROT_API
 void
-Parrot_destroy_la(NULLOK(long *array))
+Parrot_destroy_la(ARGINOUT(long *array))
 {
     mem_sys_free(array);
 }
@@ -609,7 +609,7 @@ Use this to destroy an array created with C<Parrot_make_cpa()>.
 
 PARROT_API
 void
-Parrot_destroy_cpa(NOTNULL(char **array))
+Parrot_destroy_cpa(ARGINOUT(char **array))
 {
     UINTVAL offset = 0;
     /* Free each piece */
@@ -639,7 +639,7 @@ typedef enum {
 =item C<PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC*
-tm_to_array(PARROT_INTERP, NOTNULL(const struct tm *tm))>
+tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))>
 
 Helper to convert a B<struct tm *> to an Array
 
@@ -650,7 +650,7 @@ Helper to convert a B<struct tm *> to an Array
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC*
-tm_to_array(PARROT_INTERP, NOTNULL(const struct tm *tm))
+tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 {
     PMC * const Array = pmc_new(interp, enum_class_Array);
 
@@ -674,8 +674,8 @@ tm_to_array(PARROT_INTERP, NOTNULL(const struct tm *tm))
 
 =item C<PARROT_API
 INTVAL
-Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
-        NOTNULL(const STRING *search), UINTVAL start_offset)>
+Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
+        ARGIN(const STRING *search), UINTVAL start_offset)>
 
 RT#48260: Not yet documented!!!
 
@@ -685,8 +685,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 INTVAL
-Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
-        NOTNULL(const STRING *search), UINTVAL start_offset)
+Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
+        ARGIN(const STRING *search), UINTVAL start_offset)
 {
     const char * const str_start  = base->strstart;
     const INTVAL       str_len    = base->strlen;
@@ -721,8 +721,8 @@ Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
 =item C<PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_byte_rindex(SHIM_INTERP, NOTNULL(const STRING *base),
-        NOTNULL(const STRING *search), UINTVAL start_offset)>
+Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
+        ARGIN(const STRING *search), UINTVAL start_offset)>
 
 RT#48260: Not yet documented!!!
 
@@ -733,8 +733,8 @@ RT#48260: Not yet documented!!!
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_byte_rindex(SHIM_INTERP, NOTNULL(const STRING *base),
-        NOTNULL(const STRING *search), UINTVAL start_offset)
+Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
+        ARGIN(const STRING *search), UINTVAL start_offset)
 {
     const INTVAL searchlen = search->strlen;
     const char * const search_start = search->strstart;
@@ -928,8 +928,8 @@ PARROT_API
 void
 Parrot_register_move(PARROT_INTERP,
         int n_regs,
-        NOTNULL(unsigned char *dest_regs),
-        NOTNULL(unsigned char *src_regs),
+        ARGOUT(unsigned char *dest_regs),
+        ARGIN(unsigned char *src_regs),
         unsigned char temp_reg,
         reg_move_func mov,
         reg_move_func mov_alt,

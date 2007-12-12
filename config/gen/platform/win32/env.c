@@ -83,7 +83,7 @@ Parrot_setenv(const char *name, const char *value)
 /*
 
 =item C<char *
-Parrot_getenv(NOTNULL(const char *name), NOTNULL(int *free_it))>
+Parrot_getenv(ARGIN(const char *name), NOTNULL(int *free_it))>
 
 RT#48260: Not yet documented!!!
 
@@ -92,7 +92,7 @@ RT#48260: Not yet documented!!!
 */
 
 char *
-Parrot_getenv(NOTNULL(const char *name), NOTNULL(int *free_it))
+Parrot_getenv(ARGIN(const char *name), NOTNULL(int *free_it))
 {
     const DWORD size = GetEnvironmentVariable(name, NULL, 0);
     char *buffer     = NULL;

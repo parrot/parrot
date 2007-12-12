@@ -30,7 +30,7 @@ where each chunk has room for one entry.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t *
-new_stack(PARROT_INTERP, NOTNULL(const char *name))>
+new_stack(PARROT_INTERP, ARGIN(const char *name))>
 
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
@@ -43,7 +43,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t *
-new_stack(PARROT_INTERP, NOTNULL(const char *name))
+new_stack(PARROT_INTERP, ARGIN(const char *name))
 {
     return register_new_stack(interp, name, sizeof (Stack_Entry_t));
 }
@@ -111,7 +111,7 @@ stack_destroy(SHIM(Stack_Chunk_t *top))
 =item C<PARROT_API
 PARROT_WARN_UNUSED_RESULT
 size_t
-stack_height(SHIM_INTERP, NOTNULL(const Stack_Chunk_t *chunk))>
+stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))>
 
 Returns the height of the stack. The maximum "depth" is height - 1.
 
@@ -122,7 +122,7 @@ Returns the height of the stack. The maximum "depth" is height - 1.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 size_t
-stack_height(SHIM_INTERP, NOTNULL(const Stack_Chunk_t *chunk))
+stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 {
     size_t height = 0;
 
@@ -433,7 +433,7 @@ stack_peek(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack_base),
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 Stack_entry_type
-get_entry_type(SHIM_INTERP, NOTNULL(const Stack_Entry_t *entry))>
+get_entry_type(SHIM_INTERP, ARGIN(const Stack_Entry_t *entry))>
 
 Returns the stack entry type of C<entry>.
 
@@ -445,7 +445,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 Stack_entry_type
-get_entry_type(SHIM_INTERP, NOTNULL(const Stack_Entry_t *entry))
+get_entry_type(SHIM_INTERP, ARGIN(const Stack_Entry_t *entry))
 {
     return entry->entry_type;
 }

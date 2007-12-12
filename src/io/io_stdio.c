@@ -59,10 +59,9 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_stdio_open(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(const char *spath),
+    ARGIN(const char *spath),
     INTVAL flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(1);
 
 static size_t PIO_stdio_peek(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
@@ -199,7 +198,7 @@ PIO_stdio_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 PARROT_CANNOT_RETURN_NULL
 static ParrotIO *
 PIO_stdio_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
-              NOTNULL(const char *spath), INTVAL flags)>
+              ARGIN(const char *spath), INTVAL flags)>
 
 Open modes (read, write, append, etc.) are done in pseudo-Perl style
 using C<< < >>, C<< > >>, etc.
@@ -212,7 +211,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static ParrotIO *
 PIO_stdio_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
-              NOTNULL(const char *spath), INTVAL flags)
+              ARGIN(const char *spath), INTVAL flags)
 {
     ParrotIO *io;
     const char *oflags;

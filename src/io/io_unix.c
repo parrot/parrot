@@ -104,20 +104,18 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_open(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(const char *spath),
+    ARGIN(const char *spath),
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_pipe(PARROT_INTERP,
     SHIM(ParrotIOLayer *l),
-    NOTNULL(const char *cmd),
+    ARGIN(const char *cmd),
     int flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(1);
 
 static INTVAL PIO_unix_poll(SHIM_INTERP,
     SHIM(ParrotIOLayer *l),
@@ -265,7 +263,7 @@ PIO_unix_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-              NOTNULL(const char *spath), INTVAL flags)>
+              ARGIN(const char *spath), INTVAL flags)>
 
 Opens C<*spath>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 values.
@@ -278,7 +276,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-              NOTNULL(const char *spath), INTVAL flags)
+              ARGIN(const char *spath), INTVAL flags)
 {
     INTVAL oflags;
     PIOHANDLE fd;
@@ -1116,7 +1114,7 @@ AGAIN:
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
-PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(const char *cmd), int flags)>
+PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), ARGIN(const char *cmd), int flags)>
 
 Very limited C<exec> for now.
 
@@ -1129,7 +1127,7 @@ XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
-PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(const char *cmd), int flags)
+PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), ARGIN(const char *cmd), int flags)
 {
     /*
      * pipe(), fork() should be defined, if this header is present

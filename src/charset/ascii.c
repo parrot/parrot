@@ -491,7 +491,7 @@ titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 INTVAL
-ascii_compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *rhs))>
+ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))>
 
 RT#48260: Not yet documented!!!
 
@@ -501,7 +501,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-ascii_compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *rhs))
+ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     const UINTVAL l_len = lhs->strlen;
     const UINTVAL r_len = rhs->strlen;
@@ -783,7 +783,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
 
 =item C<PARROT_PURE_FUNCTION
 size_t
-ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t seed)>
+ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *source_string), size_t seed)>
 
 RT#48260: Not yet documented!!!
 
@@ -796,7 +796,7 @@ RT#48260: Not yet documented!!!
  */
 PARROT_PURE_FUNCTION
 size_t
-ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t seed)
+ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *source_string), size_t seed)
 {
     size_t hashval = seed;
     const char *buffptr = (const char *)source_string->strstart;

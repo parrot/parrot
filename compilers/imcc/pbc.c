@@ -88,10 +88,9 @@ static void add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))
 static int add_const_key(PARROT_INTERP,
     NOTNULL(opcode_t key[]),
     int size,
-    NOTNULL(const char *s_key))
+    ARGIN(const char *s_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static int add_const_num(PARROT_INTERP, NULLOK(const char *buf))
@@ -105,9 +104,8 @@ static int add_const_pmc_sub(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static int add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
+        __attribute__nonnull__(1);
 
 static opcode_t build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
         __attribute__nonnull__(1)
@@ -130,11 +128,9 @@ static PMC* create_lexinfo(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static subs_t * find_global_label(
-    NOTNULL(const char *name),
-    NOTNULL(const subs_t *sym),
+    ARGIN(const char *name),
+    ARGIN(const subs_t *sym),
     NOTNULL(int *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -191,15 +187,12 @@ static void store_fixup(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void store_key_const(NOTNULL(const char *str), int idx)
-        __attribute__nonnull__(1);
-
+static void store_key_const(ARGIN(const char *str), int idx);
 static void store_sub_size(size_t size, size_t ins_line);
 static void verify_signature(PARROT_INTERP,
-    NOTNULL(const Instruction *ins),
+    ARGIN(const Instruction *ins),
     NOTNULL(opcode_t *pc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
@@ -493,7 +486,7 @@ store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)
 /*
 
 =item C<static void
-store_key_const(NOTNULL(const char *str), int idx)>
+store_key_const(ARGIN(const char *str), int idx)>
 
 RT#48260: Not yet documented!!!
 
@@ -502,7 +495,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-store_key_const(NOTNULL(const char *str), int idx)
+store_key_const(ARGIN(const char *str), int idx)
 {
     SymReg * const c = _mk_const(&globals.cs->key_consts, str_dup(str), 0);
     c->color = idx;
@@ -574,7 +567,7 @@ get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static subs_t *
-find_global_label(NOTNULL(const char *name), NOTNULL(const subs_t *sym), NOTNULL(int *pc))>
+find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), NOTNULL(int *pc))>
 
 get a global label, return the pc (absolute)
 
@@ -585,7 +578,7 @@ get a global label, return the pc (absolute)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static subs_t *
-find_global_label(NOTNULL(const char *name), NOTNULL(const subs_t *sym), NOTNULL(int *pc))
+find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), NOTNULL(int *pc))
 {
     subs_t *s;
 
@@ -714,7 +707,7 @@ fixup_globals(PARROT_INTERP)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))>
+IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))>
 
 RT#48260: Not yet documented!!!
 
@@ -725,7 +718,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
+IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     const char *buf = r->name;
     STRING *s;
@@ -771,7 +764,7 @@ IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))>
+add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))>
 
 add constant string to constant_table
 
@@ -781,7 +774,7 @@ add constant string to constant_table
 
 PARROT_WARN_UNUSED_RESULT
 static int
-add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
+add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     const int      k = PDB_extend_const_table(interp);
     STRING * const s = IMCC_string_from_reg(interp, r);
@@ -1184,7 +1177,7 @@ add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
 /*
 
 =item C<static int
-add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const char *s_key))>
+add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, ARGIN(const char *s_key))>
 
 add constant key to constant_table
 
@@ -1193,7 +1186,7 @@ add constant key to constant_table
 */
 
 static int
-add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const char *s_key))
+add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, ARGIN(const char *s_key))
 {
     int                k;
     opcode_t          *rc;
@@ -1406,7 +1399,7 @@ build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
 /*
 
 =item C<INTVAL
-IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))>
+IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))>
 
 RT#48260: Not yet documented!!!
 
@@ -1415,7 +1408,7 @@ RT#48260: Not yet documented!!!
 */
 
 INTVAL
-IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
+IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     INTVAL i;
 
@@ -1667,7 +1660,7 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 /*
 
 =item C<static void
-verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), NOTNULL(opcode_t *pc))>
+verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), NOTNULL(opcode_t *pc))>
 
  - check if any get_ argument contains constants
  - fill in type bits for argument types and constants, if missing
@@ -1677,7 +1670,7 @@ verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), NOTNULL(opcode_
 */
 
 static void
-verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), NOTNULL(opcode_t *pc))
+verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), NOTNULL(opcode_t *pc))
 {
     INTVAL  i, n;
     int     no_consts;
@@ -1748,7 +1741,7 @@ verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), NOTNULL(opcode_
 e_pbc_emit(PARROT_INTERP,
         SHIM(void *param),
         NOTNULL(IMC_Unit *unit),
-        NOTNULL(const Instruction *ins))>
+        ARGIN(const Instruction *ins))>
 
 now let the fun begin, actually emit code for one ins
 
@@ -1760,7 +1753,7 @@ int
 e_pbc_emit(PARROT_INTERP,
         SHIM(void *param),
         NOTNULL(IMC_Unit *unit),
-        NOTNULL(const Instruction *ins))
+        ARGIN(const Instruction *ins))
 {
     int        op, i;
     int        ok = 0;

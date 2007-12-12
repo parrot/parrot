@@ -861,7 +861,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void*
 Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub,
-                 NOTNULL(const char *signature), ...)>
+                 ARGIN(const char *signature), ...)>
 
 Call a parrot subroutine with the given function signature. The first char in
 C<signature> denotes the return value. Next chars are arguments.
@@ -885,7 +885,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void*
 Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub,
-                 NOTNULL(const char *signature), ...)
+                 ARGIN(const char *signature), ...)
 {
     va_list ap;
     void *result;
@@ -907,7 +907,7 @@ Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub,
 =item C<PARROT_API
 Parrot_Int
 Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub,
-                 NOTNULL(const char *signature), ...)>
+                 ARGIN(const char *signature), ...)>
 
 Like C<Parrot_call_sub>, with Parrot_Int return result.
 
@@ -918,7 +918,7 @@ Like C<Parrot_call_sub>, with Parrot_Int return result.
 PARROT_API
 Parrot_Int
 Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub,
-                 NOTNULL(const char *signature), ...)
+                 ARGIN(const char *signature), ...)
 {
     va_list ap;
     Parrot_Int result;
@@ -940,7 +940,7 @@ Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub,
 =item C<PARROT_API
 Parrot_Float
 Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub,
-                 NOTNULL(const char *signature), ...)>
+                 ARGIN(const char *signature), ...)>
 
 Like C<Parrot_call_sub>, with Parrot_Float return result.
 
@@ -951,7 +951,7 @@ Like C<Parrot_call_sub>, with Parrot_Float return result.
 PARROT_API
 Parrot_Float
 Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub,
-                 NOTNULL(const char *signature), ...)
+                 ARGIN(const char *signature), ...)
 {
     va_list ap;
     Parrot_Float result;
@@ -975,7 +975,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_call_method(PARROT_INTERP, Parrot_PMC sub, Parrot_PMC obj,
-                        Parrot_String method, NOTNULL(const char *signature), ...)>
+                        Parrot_String method, ARGIN(const char *signature), ...)>
 
 Call a parrot method for the given object.
 
@@ -988,7 +988,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_call_method(PARROT_INTERP, Parrot_PMC sub, Parrot_PMC obj,
-                        Parrot_String method, NOTNULL(const char *signature), ...)
+                        Parrot_String method, ARGIN(const char *signature), ...)
 {
     void *result;
     va_list ap;
@@ -1007,7 +1007,7 @@ Parrot_call_method(PARROT_INTERP, Parrot_PMC sub, Parrot_PMC obj,
 =item C<PARROT_API
 Parrot_Int
 Parrot_call_method_ret_int(PARROT_INTERP, Parrot_PMC sub,
-        Parrot_PMC obj, Parrot_String method, NOTNULL(const char *signature), ...)>
+        Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)>
 
 Call a parrot method for the given object.
 
@@ -1018,7 +1018,7 @@ Call a parrot method for the given object.
 PARROT_API
 Parrot_Int
 Parrot_call_method_ret_int(PARROT_INTERP, Parrot_PMC sub,
-        Parrot_PMC obj, Parrot_String method, NOTNULL(const char *signature), ...)
+        Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)
 {
     Parrot_Int result;
     va_list ap;
@@ -1037,7 +1037,7 @@ Parrot_call_method_ret_int(PARROT_INTERP, Parrot_PMC sub,
 =item C<PARROT_API
 Parrot_Float
 Parrot_call_method_ret_float(PARROT_INTERP, Parrot_PMC sub,
-        Parrot_PMC obj, Parrot_String method, NOTNULL(const char *signature), ...)>
+        Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)>
 
 Call a parrot method for the given object.
 
@@ -1048,7 +1048,7 @@ Call a parrot method for the given object.
 PARROT_API
 Parrot_Float
 Parrot_call_method_ret_float(PARROT_INTERP, Parrot_PMC sub,
-        Parrot_PMC obj, Parrot_String method, NOTNULL(const char *signature), ...)
+        Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)
 {
     Parrot_Float result;
     va_list ap;

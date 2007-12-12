@@ -76,10 +76,8 @@ PARROT_CANNOT_RETURN_NULL
 static unsigned int* ig_allocate(int N);
 
 static int ig_find_color(
-    NOTNULL(const IMC_Unit *unit),
-    NOTNULL(const char *avail))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const char *avail));
 
 PARROT_CANNOT_RETURN_NULL
 static unsigned int* ig_get_word(
@@ -130,10 +128,7 @@ static void print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 static void rebuild_reglist(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static int reg_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
+static int reg_sort_f(ARGIN(const void *a), ARGIN(const void *b));
 static void sort_reglist(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
@@ -503,7 +498,7 @@ print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 /*
 
 =item C<static int
-reg_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))>
+reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))>
 
 sort list by line  nr
 
@@ -512,7 +507,7 @@ sort list by line  nr
 */
 
 static int
-reg_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
+reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 {
     const SymReg * const ra = *(SymReg**) a;
     const SymReg * const rb = *(SymReg**) b;
@@ -885,7 +880,7 @@ interferes(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0), NOTNULL(
 /*
 
 =item C<static int
-ig_find_color(NOTNULL(const IMC_Unit *unit), NOTNULL(const char *avail))>
+ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))>
 
 find available color for register #x in available colors
 
@@ -894,7 +889,7 @@ find available color for register #x in available colors
 */
 
 static int
-ig_find_color(NOTNULL(const IMC_Unit *unit), NOTNULL(const char *avail))
+ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))
 {
     int c;
 
