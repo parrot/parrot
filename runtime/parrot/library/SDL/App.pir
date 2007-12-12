@@ -38,6 +38,10 @@ SDL::App - Parrot extension for SDL Applications
 
 =head1 DESCRIPTION
 
+The parrot SDL libraries require the C SDL library: See
+L<http://www.libsdl.org/> for information on how to obtain and install
+this library.
+
 SDL::App is the entry point for all SDL Applications.  It handles most of the
 other setup for you.  Trust me, there's a little bit -- if you care, it will
 initialize the SDL library.
