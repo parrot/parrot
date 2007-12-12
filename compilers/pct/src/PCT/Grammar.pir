@@ -64,6 +64,37 @@ throw an exception if a result object hasn't been set.
 .end
 
 
+=item ww()
+
+Special-purpose rule to return true if we're in the middle
+of a word -- i.e., if the previous and next character are
+both "word characters".  This is roughly equivalent to
+C<< <?after \w><?before \w> >> except it's much quicker.
+In particular, C<< <!ww> >> can be used by :sigspace rules
+to enforce whitespace between lexical words.
+
+=cut
+
+.include 'cclass.pasm'
+
+.sub 'ww' :method
+    .local pmc mob
+    .local int pos
+    .local string target
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(self)
+    if pos == 0 goto fail
+    $I0 = is_cclass .CCLASS_WORD, target, pos
+    unless $I0 goto fail
+    $I1 = pos - 1
+    $I0 = is_cclass .CCLASS_WORD, target, $I1
+    unless $I0 goto fail
+    mob.'to'(pos)
+  fail:
+    .return (mob)
+.end
+
+
 .sub 'string_literal' :method
     .param string stop
     .param pmc adverbs         :slurpy :named
