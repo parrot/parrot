@@ -85,8 +85,12 @@
       (char? expr)
       (and (list? expr) (= (length expr) 0 ))))
 
-; 
-(define (primcall expr)
+; is expr a primitive?
+(define (primitive? x)
+  (and (symbol? x) (getprop x '*is-prim*)))
+
+; is expr a call to a primitive? 
+(define (primcall? expr)
   (and (pair? expr) (primitive? (car expr))))
 
 (define (immediate-rep x)
@@ -158,7 +162,7 @@
 (define (emit-expr expr)
   (cond
     [(immediate? expr) (emit-immediate expr)]
-    [(primcall? expr)  (emit-immediate expr)])) 
+    [(primcall? expr)  (emit "#calling a primitive")])) 
 
 ; the actual compiler
 (define (compile-program x)
@@ -167,4 +171,3 @@
   (emit-builtins)
   (emit-function-header "scheme_entry")
   (emit-expr x)) 
-
