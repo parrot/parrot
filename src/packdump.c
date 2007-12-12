@@ -28,8 +28,8 @@ This is only used by the PBC dumper C<pdump>.
 /* HEADERIZER BEGIN: static */
 
 static void PackFile_Constant_dump(PARROT_INTERP,
-    NOTNULL(PackFile_ConstTable *ct),
-    NOTNULL(PackFile_Constant *self))
+    ARGIN(const PackFile_ConstTable *ct),
+    ARGIN(const PackFile_Constant *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -74,8 +74,8 @@ Dumps the constant C<self>.
 */
 
 static void
-PackFile_Constant_dump(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct),
-                       NOTNULL(PackFile_Constant *self))
+PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
+                       ARGIN(const PackFile_Constant *self))
 {
     PMC *key;
     size_t i;
@@ -197,7 +197,7 @@ PackFile_Constant_dump(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct),
         {
             PMC * const pmc = self->u.key;
             Parrot_sub *sub;
-            STRING *null = const_string(interp, "(null)");
+            STRING * const null = const_string(interp, "(null)");
             STRING *namespace_description;
 
             switch (pmc->vtable->base_type) {
@@ -212,7 +212,7 @@ PackFile_Constant_dump(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct),
                 case enum_class_ResizableStringArray:
                     {
                     const int n = VTABLE_get_integer(interp, pmc);
-                    STRING* out_buffer = VTABLE_get_repr(interp, pmc);
+                    STRING* const out_buffer = VTABLE_get_repr(interp, pmc);
                     PIO_printf(interp,
                             "\tclass => %Ss,\n"
                             "\telement count => %d,\n"

@@ -57,7 +57,7 @@ static PMC * find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void run_cleanup_action(PARROT_INTERP, NOTNULL(Stack_Entry_t *e))
+static void run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -201,7 +201,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-run_cleanup_action(PARROT_INTERP, NOTNULL(Stack_Entry_t *e))
+run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
 {
     /*
      * this is called during normal stack_pop of the control

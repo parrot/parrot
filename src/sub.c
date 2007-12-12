@@ -35,7 +35,7 @@ Marks the context C<*ctx>.
 */
 
 void
-mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
+mark_context(PARROT_INTERP, ARGINOUT(parrot_context_t* ctx))
 {
     PObj *obj;
     int   i;
@@ -275,7 +275,7 @@ Make true Continuations from all RetContinuations up the call chain.
 */
 
 void
-invalidate_retc_context(PARROT_INTERP, NOTNULL(PMC *cont))
+invalidate_retc_context(PARROT_INTERP, ARGINOUT(PMC *cont))
 {
     Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
 
@@ -361,8 +361,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 int
-Parrot_Context_get_info(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
-                    NOTNULL(Parrot_Context_info *info))
+Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
+                    ARGOUT(Parrot_Context_info *info))
 {
     Parrot_sub *sub;
     DECL_CONST_CAST;

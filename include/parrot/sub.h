@@ -217,8 +217,8 @@ PMC * new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
 
 PARROT_API
 int Parrot_Context_get_info(PARROT_INTERP,
-    NOTNULL(parrot_context_t *ctx),
-    NOTNULL(Parrot_Context_info *info))
+    ARGIN(const parrot_context_t *ctx),
+    ARGOUT(Parrot_Context_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -244,11 +244,11 @@ PMC* parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void invalidate_retc_context(PARROT_INTERP, NOTNULL(PMC *cont))
+void invalidate_retc_context(PARROT_INTERP, ARGINOUT(PMC *cont))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
+void mark_context(PARROT_INTERP, ARGINOUT(parrot_context_t* ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
