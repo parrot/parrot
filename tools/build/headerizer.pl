@@ -86,6 +86,10 @@ main();
 
 =head1 FUNCTIONS
 
+=head2 extract_function_declarations( $source_file_text )
+
+Rips apart a C file to get the function declarations.
+
 =cut
 
 sub extract_function_declarations {
@@ -139,6 +143,37 @@ sub extract_function_declarations {
     chomp @funcs;
 
     return @funcs;
+}
+
+=head2 extract_function_declaration_and_update_source( $cfile_name )
+
+Extract all the function declarations from the C file specified by
+I<$cfile_name>, and update the comment blocks within.
+
+=cut
+
+sub extract_function_declarations_and_update_source {
+    my $cfile_name = shift;
+
+    open( my $fhin, '<', $cfile_name ) or die "Can't open $cfile_name: $!";
+    my $text = join( '', <$fhin> );
+    close $fhin;
+
+    my @func_declarations = extract_function_declarations( $text );
+
+    for my $decl ( @func_declarations ) {
+        my $specs = function_components_from_declaration( $cfile_name, $decl );
+        my $name = $specs->{name};
+        my $return_type = $specs->{return_type};
+
+        $text =~ s/=item C<[^>]*$name[^>]*>\n/=item C<$return_type $name>\n/sm or
+            warn "Couldn't replace $name\n";
+    }
+    open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
+    print {$fhout} $text;
+    close $fhout;
+
+    return @func_declarations;
 }
 
 sub function_components_from_declaration {
@@ -385,12 +420,13 @@ sub main {
             die "'$hfile' not found (referenced from '$cfile')";
         }
 
+        my $experimental_file = 'src/tsq.c';
         my @decls;
-        if ( -f $pmcfile ) {
+        if ( -f $pmcfile || ( $cfile ne $experimental_file ) ) {
             @decls = extract_function_declarations( $csource );
         }
         else {
-            @decls = extract_function_declarations( $csource );
+            @decls = extract_function_declarations_and_update_source( $cfile );
         }
 
         for my $decl (@decls) {

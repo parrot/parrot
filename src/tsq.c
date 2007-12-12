@@ -22,9 +22,7 @@ src/tsq.c - Thread-safe queues
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-QUEUE_ENTRY *
-pop_entry(NOTNULL(QUEUE *queue))>
+=item C<QUEUE_ENTRY * pop_entry>
 
 Does a synchronized removal of the head entry off the queue and returns it.
 
@@ -45,10 +43,7 @@ pop_entry(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-QUEUE_ENTRY *
-peek_entry(NOTNULL(QUEUE *queue))>
+=item C<QUEUE_ENTRY * peek_entry>
 
 This does no locking, so the result might have changed by the time you
 get the entry, but a synchronized C<pop_entry()> will check again and
@@ -68,9 +63,7 @@ peek_entry(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-QUEUE_ENTRY *
-nosync_pop_entry(NOTNULL(QUEUE *queue))>
+=item C<QUEUE_ENTRY * nosync_pop_entry>
 
 Grab an entry off the queue with no synchronization. Internal only,
 because it's darned evil and shouldn't be used outside the module. It's
@@ -102,9 +95,7 @@ nosync_pop_entry(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-QUEUE_ENTRY *
-wait_for_entry(NOTNULL(QUEUE *queue))>
+=item C<QUEUE_ENTRY * wait_for_entry>
 
 Does a synchronized removal of the head entry off the queue, waiting if
 necessary until there is an entry, and then returns it.
@@ -131,7 +122,7 @@ wait_for_entry(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<void push_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))>
+=item C<void push_entry>
 
 Does a synchronized insertion of C<entry> onto the tail of the queue.
 
@@ -158,7 +149,7 @@ push_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void unshift_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))>
+=item C<void unshift_entry>
 
 Does a synchronized insertion of C<entry> into the head of the queue.
 
@@ -188,8 +179,7 @@ unshift_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void
-nosync_insert_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))>
+=item C<void insert_entry>
 
 Inserts a timed event according to C<abstime>. The caller has to hold the
 queue mutex.
@@ -260,7 +250,7 @@ insert_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void queue_lock(NOTNULL(QUEUE *queue))>
+=item C<void queue_lock>
 
 Locks the queue's mutex.
 
@@ -276,7 +266,7 @@ queue_lock(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<void queue_unlock(NOTNULL(QUEUE *queue))>
+=item C<void queue_unlock>
 
 Unlocks the queue's mutex.
 
@@ -292,7 +282,7 @@ queue_unlock(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<void queue_broadcast(NOTNULL(QUEUE *queue))>
+=item C<void queue_broadcast>
 
 This function wakes up I<every> thread waiting on the queue.
 
@@ -308,7 +298,7 @@ queue_broadcast(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<void queue_signal(NOTNULL(QUEUE *queue))>
+=item C<void queue_signal>
 
 XXX Needs a description
 
@@ -324,7 +314,7 @@ queue_signal(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<void queue_wait(NOTNULL(QUEUE *queue))>
+=item C<void queue_wait>
 
 Instructs the queue to wait.
 
@@ -340,8 +330,7 @@ queue_wait(ARGINOUT(QUEUE *queue))
 
 /*
 
-=item C<void
-queue_timedwait(NOTNULL(QUEUE *queue), NOTNULL(struct timespec *abs_time))>
+=item C<void queue_timedwait>
 
 Instructs the queue to wait for C<abs_time> seconds (?).
 
@@ -357,10 +346,7 @@ queue_timedwait(ARGINOUT(QUEUE *queue), ARGIN(const struct timespec *abs_time))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_MALLOC
-QUEUE*
-queue_init(UINTVAL prio)>
+=item C<QUEUE* queue_init>
 
 Initializes the queue, setting C<prio> as the queue's priority.
 
@@ -384,7 +370,7 @@ queue_init(UINTVAL prio)
 
 /*
 
-=item C<void queue_destroy(NOTNULL(QUEUE *queue))>
+=item C<void queue_destroy>
 
 Destroys the queue, raising an exception if it is not empty.
 
