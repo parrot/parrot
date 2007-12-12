@@ -66,11 +66,7 @@ Helper method to throw an exception (with a message).
 .sub 'panic' :method
     .param pmc args            :slurpy
     $S0 = join '', args
-    $P0 = new 'String'
-    $P0 = $S0
-    $P1 = new 'Exception'
-    setattribute $P1, 'message', $P0
-    throw $P1
+    die $S0
 .end
 
 

@@ -58,11 +58,7 @@ throw an exception if a result object hasn't been set.
     .local pmc obj
     obj = getattribute self, '$!result'
     unless null obj goto end
-    $P0 = new 'String'
-    $P0 = 'No result object'
-    $P1 = new 'Exception'
-    setattribute $P1, 'message', $P0
-    throw $P1
+    die "No result object"
   end:
     .return (obj)
 .end
