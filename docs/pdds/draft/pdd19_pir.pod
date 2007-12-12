@@ -329,9 +329,9 @@ For example, with this code snippet ...
   .sub <quoted string> [:<flag> ...]
 
 Define a compilation unit. All code in a PIR source file must be defined in a
-compilation unit. See L<PDD03|docs/pdds/pdd03_calling_conventions.pod> for
+compilation unit. See the section C<Subroutine flags> for
 available flags.  Optional flags are a list of I<flag>, separated by empty
-spaces, and empty spaces only.
+spaces.
 
 The name of the sub may be either a bare identifier or a quoted string
 constant. Bare identifiers must be valid PIR identifiers (see L<Identifiers>
@@ -355,6 +355,90 @@ End a compilation unit containing PASM code. Always paired with
 C<.emit>.
 
 =back
+
+=head3 Subroutine flags
+
+This is a list of zero or more items with the following meanings:
+
+=over 4
+
+=item :main
+
+Define "main" entry point to start execution. If multiple subroutines
+are marked as B<:main>, the B<last> marked subroutine is entered.
+
+=item :load
+
+Run this subroutine during the B<load_bytecode> opcode.
+If multiple subs have the B<:load> pragma, the subs are
+run in source code order.
+
+=item :init
+
+Run the subroutine when the program is run directly (that is, not loaded as a
+module). This is different from B<:load>, which runs a subroutine when a
+library is being loaded. To get both behaviours, use B<:init :load>.
+
+=item :anon
+
+Do not install this subroutine in the namespace. Allows the subroutine
+name to be reused.
+
+=item :multi(Type1, Type2...)
+
+Engage in multiple dispatch with the listed types.
+
+=item :immediate
+
+This subroutine is executed immediately after being compiled. (Analagous to
+C<BEGIN> in perl5.)
+
+=item :postcomp
+
+Same as C<:immediate>, except that the subroutine is B<not> executed when
+the compilation of the file that contains the subroutine is triggered by
+a C<load_bytecode> instruction in another file.
+
+An example. File C<main.pir> contains:
+
+ .sub main
+ load_bytecode "foo.pir"
+ .end
+
+The file C<foo.pir> contains:
+
+ .sub foo :immediate
+   print "42"
+ .end
+
+ .sub bar :postcomp
+   print "43"
+ .end
+
+When executing file C<foo.pir>, it will execute both C<foo> and C<bar>.
+However, when executing the file C<main.pir>, only C<foo> will be executed.
+
+=item :method
+
+The marked C<.sub> is a method. In the method body, the object PMC
+can be referred to with C<self>.
+
+=item :vtable
+
+The marked C<.sub> overrides a v-table method. By default, a sub with the same
+name as a v-table method does not override the v-table method. To specify that
+there should be no namespace entry (that is, it just overrides the v-table
+method but is callable as a normal method), use B<:vtable :anon>. To give the
+v-table method a different name, use B<:vtable("...")>. For example, to have
+the method B<ToString> also be the v-table method B<get_string>), use
+B<:vtable("get_string")>.
+
+=item :outer(subname)
+
+The marked C<.sub> is lexically nested within the sub known by B<subname>.
+
+=back
+
 
 =head3 Directives used for Parrot calling conventions.
 
