@@ -27,7 +27,7 @@ my ( $major, $minor );
 my $compat_file = 'PBC_COMPAT';
 open my $IN, '<', $compat_file or die "Can't read $compat_file";
 while (<$IN>) {
-    if (/^(\d+)\.(\d+)/) {
+    if (/^(\d+)\.0*(\d+)/) {
         ( $major, $minor ) = ( $1, $2 );
         last;
     }
