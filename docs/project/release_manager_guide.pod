@@ -261,23 +261,19 @@ parrot repository layout as of end of Apr 2005
 
 =head1 Appendix 2
 
-Planned releases in 2007.
+Planned releases in 2008.
 
 To make a monthly release schedule possible, we're spreading the burden
 of releases across multiple release managers.  Releases are scheduled for
-the 3rd Tuesday of the month.
+the 3rd Tuesday of each month. Version numbers for each release will be
+determined each month, and will depend on the features that will be in
+that release.
 
- - Jan 16th (0.4.8)  Jerry Gay (particle)
- - Feb 20th (0.4.9)  Patrick Michaud (pmichaud)
- - Mar 20th (0.4.10) Will Coleda (Coke)
- - Apr 17th (0.4.11) Matt Diephouse (mdiep)
- - May 15th (0.4.12) chromatic
- - Jun 19th (0.4.13) Allison Randal
- - Jul 17th (0.4.14) Jerry Gay (particle)
- - Aug 21st (0.4.15) Patrick Michaud (pmichaud)
- - Sep 18th (0.4.16) Jerry Gay (particle)
- - Oct 16th (0.4.17) Will Coleda (Coke)
- - Nov 20th (0.5.0)  chromatic
- - Dec 18th (0.5.1)  Will Coleda (Coke)
+ - Jan 15th (0.5.2) Bob Rogers
+ - Feb 19th (?)     Patrick Michaud
+ - Mar 18th (?)     Bernhard Schmalhofer
+ - Apr 15th (?)     Jerry Gay
+ - May 20th (?)     chromatic
+ - Jun 17th (?)     Will Coleda
 
 =cut
