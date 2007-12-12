@@ -1461,7 +1461,7 @@ do_event(PARROT_INTERP, NOTNULL(parrot_event* event), NULLOK(opcode_t *next))
             pt_suspend_self_for_gc(interp);
             break;
         default:
-            fprintf(stderr, "Unhandled event type %d\n", event->type);
+            fprintf(stderr, "Unhandled event type %d\n", (int)event->type);
             break;
     }
     mem_sys_free(event);
