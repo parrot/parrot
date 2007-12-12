@@ -117,12 +117,13 @@ current maximum.
 
         core_struct->max_tid++;
         VTABLE_set_integer_native(INTERP, task, core_struct->max_tid);
-
         task_id_str = string_from_int(INTERP, core_struct->max_tid);
-        VTABLE_set_pmc_keyed_str(INTERP, core_struct->task_list, task_id_str, task);
 
+        LOCK(core_struct->lock);
+        VTABLE_set_pmc_keyed_str(INTERP, core_struct->task_list, task_id_str, task);
         VTABLE_push_integer(INTERP, core_struct->task_index, core_struct->max_tid);
         Parrot_cx_runloop_wake(core_struct->interp, SELF);
+        UNLOCK(core_struct->lock);
     }
 
 /*
