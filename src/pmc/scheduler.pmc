@@ -10,7 +10,7 @@ src/pmc/scheduler.pmc - The concurrency scheduler
 
 Implements the core concurrency scheduler.
 
-=head2 Functions
+=head2 Vtable Functions
 
 =over 4
 
@@ -165,6 +165,7 @@ Retrieve the number of pending tasks in the scheduler's task list.
         Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
         return VTABLE_elements(INTERP, core_struct->task_index);
     }
+
 
 /*
 
@@ -338,6 +339,64 @@ Called after the scheduler has been thawed.
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
 
         /* TODO: Rebuild the task index. */
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<PCCMETHOD add_handler(PMC *handler)>
+
+Add a handler to the scheduler.
+
+=cut
+
+*/
+
+    PCCMETHOD add_handler(PMC *handler) {
+        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        VTABLE_push_pmc(INTERP, core_struct->handlers, handler);
+    }
+/*
+
+=item C<PCCMETHOD find_handler(PMC *task)>
+
+Search for a handler for the given task. If no handler is found, return
+PMCNULL.
+
+=cut
+
+*/
+
+    PCCMETHOD find_handler(PMC *task) {
+        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        INTVAL elements = VTABLE_elements(INTERP, core_struct->handlers);
+        INTVAL counter;
+
+        for (counter = 0; counter < elements; ++counter) {
+            PMC *handler = VTABLE_get_pmc_keyed_int(interp,
+                    core_struct->handlers, counter);
+            INTVAL valid_handler = 0;
+            if (!PMC_IS_NULL(handler)) {
+                (INTVAL valid_handler) = PCCINVOKE(interp, handler, "can_handle", PMC *task);
+                if (valid_handler) {
+                    PCCRETURN(PMC *handler);
+                }
+            }
+        }
+
+        PCCRETURN(PMC *PMCNULL);
+
     }
 
 }

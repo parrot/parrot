@@ -41,6 +41,7 @@ typedef struct Parrot_Task {
     int     priority;     /* The priority of the task. */
     int     birthtime;    /* A time stamp marking the creation of the task. */
     STRING *type;         /* The type of the task. */
+    STRING *subtype;      /* The subtype of the task. */
     STRING *status;       /* The status of the task. */
     PMC    *codeblock;    /* An (optional) codeblock for the task. */
     PMC    *interp;       /* An (optional) interpreter structure for the task. */

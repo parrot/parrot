@@ -23,6 +23,8 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
+#include "scheduler.str"
+
 #define CX_DEBUG 0
 
 /* HEADERIZER HFILE: include/parrot/scheduler.h */
@@ -125,9 +127,13 @@ scheduler_runloop(NOTNULL(PMC *scheduler))
             else {
                 /* Otherwise, the runloop sleeps until a task is pending */
 #if CX_DEBUG
-            fprintf(stderr, "sleeping in scheduler runloop\n");
+                fprintf(stderr, "sleeping in scheduler runloop\n");
 #endif
                 Parrot_cx_runloop_sleep(scheduler);
+#if CX_DEBUG
+                fprintf(stderr, "waking in scheduler runloop\n");
+#endif
+/*                LOCK(sched_struct->lock); */
             }
     } /* end runloop */
 
@@ -162,16 +168,27 @@ static int
 Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))
 {
     while (VTABLE_get_integer(interp, scheduler) > 0) {
+        PMC *handler;
         PMC *task = VTABLE_pop_pmc(interp, scheduler);
         const INTVAL tid = VTABLE_get_integer(interp, task);
 
+#if CX_DEBUG
+        fprintf(stderr, "Found task ID # %d\n", (int) tid);
+#endif
         /* When sent a terminate task, notify the scheduler */
         if (TASK_terminate_runloop_TEST(task)) {
             SCHEDULER_terminate_runloop_SET(scheduler);
         }
+        else {
+            handler = Parrot_cx_find_handler_for_task(interp, task);
+            if (!PMC_IS_NULL(handler)) {
 #if CX_DEBUG
-        fprintf(stderr, "Found task ID # %d\n", (int) tid);
+                fprintf(stderr, "Found a handler.\n");
 #endif
+/*                VTABLE_invoke(interp, handler); */
+            }
+        }
+
         VTABLE_delete_keyed_int(interp, scheduler, tid);
     } /* end of pending tasks */
 
@@ -270,8 +287,74 @@ PARROT_API
 void
 Parrot_cx_schedule_task(PARROT_INTERP, NOTNULL(PMC *task))
 {
-    VTABLE_push_pmc(interp, interp->scheduler, task);
+    if (interp->scheduler)
+        VTABLE_push_pmc(interp, interp->scheduler, task);
+    else
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Scheduler was not initialized for this interpreter.\n");
 }
+
+/*
+
+=item C<PARROT_API
+void
+Parrot_cx_add_handler(PARROT_INTERP, NOTNULL(PMC *handler))>
+
+Add a task handler to scheduler's list of handlers.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_cx_add_handler(PARROT_INTERP, NOTNULL(PMC *handler))
+{
+    if (interp->scheduler)
+        Parrot_PCCINVOKE(interp, interp->scheduler,
+                CONST_STRING(interp, "add_handler"), "P->", handler);
+    else
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Scheduler was not initialized for this interpreter.\n");
+    return;
+}
+
+/*
+
+=item C<PARROT_API
+PMC *
+Parrot_cx_find_handler_for_task(PARROT_INTERP, NOTNULL(PMC *task))>
+
+Retrieve a handler appropriate to a given task. If the scheduler has no
+appropriate handler, returns PMCNULL.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_cx_find_handler_for_task(PARROT_INTERP, NOTNULL(PMC *task))
+{
+    PMC *handler = PMCNULL;
+#if CX_DEBUG
+    fprintf(stderr, "searching for handler\n");
+#endif
+
+    if (interp->scheduler)
+        Parrot_PCCINVOKE(interp, interp->scheduler,
+                CONST_STRING(interp, "find_handler"), "P->P", task, &handler);
+    else
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Scheduler was not initialized for this interpreter.\n");
+
+#if CX_DEBUG
+    fprintf(stderr, "done searching for handler\n");
+#endif
+    return handler;
+}
+
 
 /*
  * Local variables:

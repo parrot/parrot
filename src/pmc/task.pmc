@@ -44,6 +44,7 @@ Initialize a concurrency task object.
         PMC_data(SELF)           = core_struct;
         core_struct->id          = 0;
         core_struct->type        = CONST_STRING(interp, "");
+        core_struct->subtype     = CONST_STRING(interp, "");
         core_struct->priority    = 0;
         core_struct->status      = CONST_STRING(interp, "created");
         core_struct->birthtime   = 0;
@@ -69,6 +70,11 @@ An C<Integer> representing the task's unique identifier.
 =item C<type>
 
 A C<String> representing the type of the task.
+
+=item C<subtype>
+
+A C<String> representing the subtype of the task. (Used mostly by events and
+exceptions to identify appropriate handlers.)
 
 =item C<priority>
 
@@ -169,6 +175,10 @@ Gets the value of an attribute for this task.
             value = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, value, core_struct->type);
         }
+        else if (string_equal(interp, name, CONST_STRING(interp, "subtype")) == 0) {
+            value = pmc_new(interp, enum_class_String);
+            VTABLE_set_string_native(interp, value, core_struct->subtype);
+        }
         else if (string_equal(interp, name, CONST_STRING(interp, "priority")) == 0) {
             value = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, value, core_struct->priority);
@@ -202,6 +212,9 @@ Sets the value of an attribute for this task.
         }
         else if (string_equal(interp, name, CONST_STRING(interp, "type")) == 0) {
             core_struct->type = VTABLE_get_string(interp, value);
+        }
+        else if (string_equal(interp, name, CONST_STRING(interp, "subtype")) == 0) {
+            core_struct->subtype = VTABLE_get_string(interp, value);
         }
         else if (string_equal(interp, name, CONST_STRING(interp, "priority")) == 0) {
             core_struct->priority = VTABLE_get_integer(interp, value);
@@ -329,7 +342,10 @@ Used to archive the task.
         /* 4) freeze task type */
         VTABLE_push_string(INTERP, io, core_struct->type);
 
-        /* 5) freeze task status */
+        /* 5) freeze task subtype */
+        VTABLE_push_string(INTERP, io, core_struct->subtype);
+
+        /* 6) freeze task status */
         VTABLE_push_string(INTERP, io, core_struct->status);
     }
 
@@ -358,7 +374,10 @@ Used to unarchive the task.
         /* 4. thaw task type */
         STRING * const type = VTABLE_shift_string(INTERP, io);
 
-        /* 5. thaw task status */
+        /* 5. thaw task subtype */
+        STRING * const subtype = VTABLE_shift_string(INTERP, io);
+
+        /* 6. thaw task status */
         STRING * const status = VTABLE_shift_string(INTERP, io);
 
         /* Allocate the task's core data struct and set custom flags. */
@@ -372,6 +391,9 @@ Used to unarchive the task.
 
         /* Set the task's type to the frozen type */
         PARROT_TASK(SELF)->type = type;
+
+        /* Set the task's subtype to the frozen subtype */
+        PARROT_TASK(SELF)->subtype = subtype;
 
         /* Set the task's priority to the frozen priority */
         PARROT_TASK(SELF)->priority = priority;
