@@ -36,7 +36,7 @@ static void clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 
 static void init_context(PARROT_INTERP,
     NOTNULL(parrot_context_t *ctx),
-    NULLOK(const parrot_context_t *old))
+    ARGIN_NULLOK(const parrot_context_t *old))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -283,7 +283,7 @@ clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 
 =item C<static void
 init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
-        NULLOK(const parrot_context_t *old))>
+        ARGIN_NULLOK(const parrot_context_t *old))>
 
 RT#48260: Not yet documented!!!
 
@@ -293,7 +293,7 @@ RT#48260: Not yet documented!!!
 
 static void
 init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
-        NULLOK(const parrot_context_t *old))
+        ARGIN_NULLOK(const parrot_context_t *old))
 {
     ctx->ref_count = 0;                 /* RT#46191 1 - Exceptions !!! */
     ctx->current_results = NULL;

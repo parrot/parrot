@@ -41,7 +41,7 @@ extern void imcc_init(PARROT_INTERP);
 
 /* HEADERIZER BEGIN: static */
 
-static void dump_string(PARROT_INTERP, NULLOK(const STRING *s))
+static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
 static int GDB_B(PARROT_INTERP, NOTNULL(char *s))
@@ -608,7 +608,7 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
 /*
 
 =item C<void
-PDB_next(PARROT_INTERP, NULLOK(const char *command))>
+PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))>
 
 Execute the next N operation(s).
 
@@ -619,7 +619,7 @@ Inits the program if needed, runs the next N >= 1 operations and stops.
 */
 
 void
-PDB_next(PARROT_INTERP, NULLOK(const char *command))
+PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     unsigned long  n   = 1;
     PDB_t  * const pdb = interp->pdb;
@@ -655,7 +655,7 @@ PDB_next(PARROT_INTERP, NULLOK(const char *command))
 /*
 
 =item C<void
-PDB_trace(PARROT_INTERP, NULLOK(const char *command))>
+PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))>
 
 Execute the next N operations; if no number is specified, it defaults to 1.
 
@@ -664,7 +664,7 @@ Execute the next N operations; if no number is specified, it defaults to 1.
 */
 
 void
-PDB_trace(PARROT_INTERP, NULLOK(const char *command))
+PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     unsigned long  n   = 1;
     PDB_t *  const pdb = interp->pdb;
@@ -1061,7 +1061,7 @@ PDB_init(PARROT_INTERP, SHIM(const char *command))
 /*
 
 =item C<void
-PDB_continue(PARROT_INTERP, NULLOK(const char *command))>
+PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))>
 
 Continue running the program. If a number is specified, skip that many
 breakpoints.
@@ -1071,7 +1071,7 @@ breakpoints.
 */
 
 void
-PDB_continue(PARROT_INTERP, NULLOK(const char *command))
+PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     PDB_t *pdb = interp->pdb;
 
@@ -2317,7 +2317,7 @@ PDB_extend_const_table(PARROT_INTERP)
 /*
 
 =item C<static void
-dump_string(PARROT_INTERP, NULLOK(const STRING *s))>
+dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))>
 
 Dumps the buflen, flags, bufused, strlen, and offset associated with a string
 and the string itself.
@@ -2327,7 +2327,7 @@ and the string itself.
 */
 
 static void
-dump_string(PARROT_INTERP, NULLOK(const STRING *s))
+dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     if (!s)
         return;

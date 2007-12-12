@@ -187,7 +187,9 @@ void parrot_new_pointer_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-int int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b));
+int int_compare(SHIM_INTERP,
+    ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION

@@ -263,7 +263,7 @@ check_builtin_sig(size_t i, ARGIN(const char *sig), int convert_pmcs)
 
 =item C<PARROT_WARN_UNUSED_RESULT
 int
-Parrot_is_builtin(ARGIN(const char *func), NULLOK(const char *sig))>
+Parrot_is_builtin(ARGIN(const char *func), ARGIN_NULLOK(const char *sig))>
 
 Return the index of the builtin or -1 on failure.
 
@@ -273,7 +273,7 @@ Return the index of the builtin or -1 on failure.
 
 PARROT_WARN_UNUSED_RESULT
 int
-Parrot_is_builtin(ARGIN(const char *func), NULLOK(const char *sig))
+Parrot_is_builtin(ARGIN(const char *func), ARGIN_NULLOK(const char *sig))
 {
     int bi, i, convert_pmcs;
 

@@ -547,7 +547,7 @@ var_arg_ins(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
 =item C<PARROT_CAN_RETURN_NULL
 Instruction *
 INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
-        NULLOK(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)>
+        ARGIN_NULLOK(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)>
 
 Make an instruction.
 
@@ -567,7 +567,7 @@ s. e.g. imc.c for usage
 PARROT_CAN_RETURN_NULL
 Instruction *
 INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
-        NULLOK(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)
+        ARGIN_NULLOK(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)
 {
     char fullname[64];
     int i;

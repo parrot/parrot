@@ -23,7 +23,7 @@ int trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
 void trace_op(PARROT_INTERP,
     ARGIN(const opcode_t *code_start),
     ARGIN(const opcode_t *code_end),
-    NULLOK(const opcode_t *pc))
+    ARGIN_NULLOK(const opcode_t *pc))
         __attribute__nonnull__(1);
 
 void trace_op_dump(PARROT_INTERP,

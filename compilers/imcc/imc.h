@@ -246,7 +246,7 @@ PARROT_CAN_RETURN_NULL
 Instruction * INS(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     ARGIN(const char *name),
-    NULLOK(const char *fmt),
+    ARGIN_NULLOK(const char *fmt),
     NOTNULL(SymReg **r),
     int n,
     int keyvec,

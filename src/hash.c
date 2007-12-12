@@ -92,8 +92,8 @@ static size_t key_hash_STRING(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int pointer_compare(SHIM_INTERP,
-    NULLOK(const void *a),
-    NULLOK(const void *b));
+    ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b));
 
 PARROT_WARN_UNUSED_RESULT
 static int STRING_compare(PARROT_INTERP,
@@ -155,7 +155,7 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const void *b
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-pointer_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))>
+pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))>
 
 Compares the two pointers, returning 0 if they are identical
 
@@ -166,7 +166,7 @@ Compares the two pointers, returning 0 if they are identical
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-pointer_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
+pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
     return a != b;
 }
@@ -267,7 +267,7 @@ key_hash_int(SHIM_INTERP, NULLOK(void *value), size_t seed)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int
-int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))>
+int_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))>
 
 Custom C<compare> function.
 
@@ -278,7 +278,7 @@ Custom C<compare> function.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int
-int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
+int_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
     return a != b;
 }

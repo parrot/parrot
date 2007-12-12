@@ -344,7 +344,7 @@ Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
 =item C<PARROT_API
 PARROT_CAN_RETURN_NULL
 PackFile *
-Parrot_readbc(PARROT_INTERP, NULLOK(const char *fullname))>
+Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))>
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
@@ -355,7 +355,7 @@ Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PackFile *
-Parrot_readbc(PARROT_INTERP, NULLOK(const char *fullname))
+Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
 {
     INTVAL program_size, wanted;
     char *program_code;

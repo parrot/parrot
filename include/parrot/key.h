@@ -68,7 +68,7 @@ PMC * key_new(PARROT_INTERP)
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * key_new_cstring(PARROT_INTERP, NULLOK(const char *value))
+PMC * key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
         __attribute__nonnull__(1);
 
 PARROT_API

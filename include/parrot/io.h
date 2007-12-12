@@ -269,7 +269,7 @@ PMC * PIO_open(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL PIO_parse_open_flags(NULLOK(const char *flagstr));
+INTVAL PIO_parse_open_flags(ARGIN_NULLOK(const char *flagstr));
 
 PARROT_API
 INTVAL PIO_peek(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING **buffer))

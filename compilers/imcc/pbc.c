@@ -93,7 +93,7 @@ static int add_const_key(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int add_const_num(PARROT_INTERP, NULLOK(const char *buf))
+static int add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
         __attribute__nonnull__(1);
 
 static int add_const_pmc_sub(PARROT_INTERP,
@@ -789,7 +789,7 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 
 =item C<PARROT_WARN_UNUSED_RESULT
 static int
-add_const_num(PARROT_INTERP, NULLOK(const char *buf))>
+add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))>
 
 RT#48260: Not yet documented!!!
 
@@ -799,7 +799,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-add_const_num(PARROT_INTERP, NULLOK(const char *buf))
+add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 {
     const int      k = PDB_extend_const_table(interp);
     STRING * const s = string_from_cstring(interp, buf, 0);

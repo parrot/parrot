@@ -614,7 +614,7 @@ Parrot_PMC_set_numval_intkey(PARROT_INTERP,
 
 =item C<PARROT_API
 void
-Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, NULLOK(const char *value))>
+Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, ARGIN_NULLOK(const char *value))>
 
 Assign the passed-in null-terminated C string to the passed-in PMC.
 
@@ -624,7 +624,7 @@ Assign the passed-in null-terminated C string to the passed-in PMC.
 
 PARROT_API
 void
-Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, NULLOK(const char *value))
+Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, ARGIN_NULLOK(const char *value))
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc,
@@ -637,7 +637,7 @@ Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, NULLOK(const char *value))
 =item C<PARROT_API
 void
 Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, NULLOK(const char *value))>
+        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value))>
 
 Assign the passed-in null-terminated C string to the passed-in PMC.
 
@@ -648,7 +648,7 @@ Assign the passed-in null-terminated C string to the passed-in PMC.
 PARROT_API
 void
 Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, NULLOK(const char *value))
+        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value))
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key,
@@ -661,7 +661,7 @@ Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
 =item C<PARROT_API
 void
 Parrot_PMC_set_cstringn(PARROT_INTERP,
-        Parrot_PMC pmc, NULLOK(const char *value), Parrot_Int length)>
+        Parrot_PMC pmc, ARGIN_NULLOK(const char *value), Parrot_Int length)>
 
 Assign the passed-in length-noted string to the passed-in PMC.
 
@@ -672,7 +672,7 @@ Assign the passed-in length-noted string to the passed-in PMC.
 PARROT_API
 void
 Parrot_PMC_set_cstringn(PARROT_INTERP,
-        Parrot_PMC pmc, NULLOK(const char *value), Parrot_Int length)
+        Parrot_PMC pmc, ARGIN_NULLOK(const char *value), Parrot_Int length)
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc,
@@ -750,7 +750,7 @@ Parrot_PMC_delete_pmckey(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC key)
 =item C<PARROT_API
 void
 Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, NULLOK(const char *value), Parrot_Int length)>
+        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value), Parrot_Int length)>
 
 Assign the passed-in length-noted string to the passed-in PMC.
 
@@ -761,7 +761,7 @@ Assign the passed-in length-noted string to the passed-in PMC.
 PARROT_API
 void
 Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, NULLOK(const char *value), Parrot_Int length)
+        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value), Parrot_Int length)
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key,
@@ -797,7 +797,7 @@ Parrot_PMC_new(PARROT_INTERP, Parrot_Int type)
 
 =item C<PARROT_API
 Parrot_Int
-Parrot_PMC_typenum(PARROT_INTERP, NULLOK(const char *_class))>
+Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))>
 
 Returns the internal identifier that represents the named class.
 
@@ -807,7 +807,7 @@ Returns the internal identifier that represents the named class.
 
 PARROT_API
 Parrot_Int
-Parrot_PMC_typenum(PARROT_INTERP, NULLOK(const char *_class))
+Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
 {
     Parrot_Int retval;
     PARROT_CALLIN_START(interp);
@@ -1230,7 +1230,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_String
 Parrot_new_string(PARROT_INTERP, NULLOK(char *buffer), int length,
-        NULLOK(const char * const encoding_name), Parrot_Int flags)>
+        ARGIN_NULLOK(const char * const encoding_name), Parrot_Int flags)>
 
 Create a new Parrot string from a passed-in buffer. Pass in a 0 for
 flags for right now.
@@ -1246,7 +1246,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_String
 Parrot_new_string(PARROT_INTERP, NULLOK(char *buffer), int length,
-        NULLOK(const char * const encoding_name), Parrot_Int flags)
+        ARGIN_NULLOK(const char * const encoding_name), Parrot_Int flags)
 {
     Parrot_String retval;
     PARROT_CALLIN_START(interp);

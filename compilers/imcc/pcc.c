@@ -82,7 +82,7 @@ static Instruction* pcc_get_args(PARROT_INTERP,
     ARGIN(const char *op_name),
     int n,
     NULLOK(SymReg **args),
-    NULLOK(const int *arg_flags))
+    ARGIN_NULLOK(const int *arg_flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -195,7 +195,7 @@ PARROT_CAN_RETURN_NULL
 static Instruction*
 pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
         ARGIN(const char *op_name), int n,
-        NULLOK(SymReg **args), NULLOK(const int *arg_flags))>
+        NULLOK(SymReg **args), ARGIN_NULLOK(const int *arg_flags))>
 
 set arguments or return values
 get params or results
@@ -210,7 +210,7 @@ PARROT_CAN_RETURN_NULL
 static Instruction*
 pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
         ARGIN(const char *op_name), int n,
-        NULLOK(SymReg **args), NULLOK(const int *arg_flags))
+        NULLOK(SymReg **args), ARGIN_NULLOK(const int *arg_flags))
 {
     int i, flags;
     char buf[1024], s[16];

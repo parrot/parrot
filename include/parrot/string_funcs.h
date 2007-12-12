@@ -175,8 +175,8 @@ STRING * string_chr(PARROT_INTERP, UINTVAL character)
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL string_compare(PARROT_INTERP,
-    NULLOK(const STRING *s1),
-    NULLOK(const STRING *s2))
+    ARGIN_NULLOK(const STRING *s1),
+    ARGIN_NULLOK(const STRING *s2))
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -227,19 +227,20 @@ void string_downcase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL string_equal(PARROT_INTERP,
-    NULLOK(const STRING *s1),
-    NULLOK(const STRING *s2))
+    ARGIN_NULLOK(const STRING *s1),
+    ARGIN_NULLOK(const STRING *s2))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-STRING * string_escape_string(PARROT_INTERP, NULLOK(const STRING *src))
+STRING * string_escape_string(PARROT_INTERP,
+    ARGIN_NULLOK(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 STRING * string_escape_string_delimited(PARROT_INTERP,
-    NULLOK(const STRING *src),
+    ARGIN_NULLOK(const STRING *src),
     UINTVAL limit)
         __attribute__nonnull__(1);
 
@@ -248,7 +249,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING * string_from_cstring(PARROT_INTERP,
-    NULLOK(const char * const buffer),
+    ARGIN_NULLOK(const char * const buffer),
     const UINTVAL len)
         __attribute__nonnull__(1);
 
@@ -306,9 +307,9 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * string_make(PARROT_INTERP,
-    NULLOK(const char *buffer),
+    ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
-    NULLOK(const char *charset_name),
+    ARGIN_NULLOK(const char *charset_name),
     UINTVAL flags)
         __attribute__nonnull__(1);
 
@@ -316,7 +317,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * string_make_direct(PARROT_INTERP,
-    NULLOK(const char *buffer),
+    ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
     ARGIN(const ENCODING *encoding),
     ARGIN(const CHARSET *charset),
@@ -458,7 +459,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_unescape_cstring(PARROT_INTERP,
     ARGIN(const char *cstring),
     char delimiter,
-    NULLOK(const char *enc_char))
+    ARGIN_NULLOK(const char *enc_char))
         __attribute__nonnull__(1);
 
 PARROT_API

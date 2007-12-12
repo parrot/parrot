@@ -149,7 +149,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_String Parrot_new_string(PARROT_INTERP,
     NULLOK(char *buffer),
     int length,
-    NULLOK(const char * const encoding_name),
+    ARGIN_NULLOK(const char * const encoding_name),
     Parrot_Int flags)
         __attribute__nonnull__(1);
 
@@ -256,20 +256,20 @@ void Parrot_PMC_push_numval(PARROT_INTERP,
 PARROT_API
 void Parrot_PMC_set_cstring(PARROT_INTERP,
     Parrot_PMC pmc,
-    NULLOK(const char *value))
+    ARGIN_NULLOK(const char *value))
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
     Parrot_PMC pmc,
     Parrot_Int key,
-    NULLOK(const char *value))
+    ARGIN_NULLOK(const char *value))
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_set_cstringn(PARROT_INTERP,
     Parrot_PMC pmc,
-    NULLOK(const char *value),
+    ARGIN_NULLOK(const char *value),
     Parrot_Int length)
         __attribute__nonnull__(1);
 
@@ -277,7 +277,7 @@ PARROT_API
 void Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
     Parrot_PMC pmc,
     Parrot_Int key,
-    NULLOK(const char *value),
+    ARGIN_NULLOK(const char *value),
     Parrot_Int length)
         __attribute__nonnull__(1);
 
@@ -345,7 +345,8 @@ void Parrot_PMC_set_vtable(SHIM_INTERP,
     Parrot_VTABLE vtable);
 
 PARROT_API
-Parrot_Int Parrot_PMC_typenum(PARROT_INTERP, NULLOK(const char *_class))
+Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
+    ARGIN_NULLOK(const char *_class))
         __attribute__nonnull__(1);
 
 PARROT_API

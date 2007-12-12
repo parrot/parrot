@@ -473,7 +473,7 @@ PIO_base_init(SHIM_INTERP, SHIM(ParrotIOLayer *l))
 =item C<PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_parse_open_flags(NULLOK(const char *flagstr))>
+PIO_parse_open_flags(ARGIN_NULLOK(const char *flagstr))>
 
 Parses C<*flagstr> for Perl-style file open mode flags (C<< < >>, C<< > >>,
 C<<< >> >>>, C<< +< >>, C<< +> >>) and returns the combined generic bit flags.
@@ -490,7 +490,7 @@ XXX BD Should this be static?
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_parse_open_flags(NULLOK(const char *flagstr))
+PIO_parse_open_flags(ARGIN_NULLOK(const char *flagstr))
 {
     INTVAL flags;
     const char *s;

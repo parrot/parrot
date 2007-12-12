@@ -217,7 +217,7 @@ static void mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile * PackFile_append_pbc(PARROT_INTERP,
-    NULLOK(const char *filename))
+    ARGIN_NULLOK(const char *filename))
         __attribute__nonnull__(1);
 
 static void PackFile_set_header(NOTNULL(PackFile *self))
@@ -3806,7 +3806,7 @@ PackFile_Constant_unpack_key(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt)
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile *
-PackFile_append_pbc(PARROT_INTERP, NULLOK(const char *filename))>
+PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))>
 
 Read a PBC and append it to the current directory
 Fixup sub addresses in newly loaded bytecode and run :load subs.
@@ -3818,7 +3818,7 @@ Fixup sub addresses in newly loaded bytecode and run :load subs.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile *
-PackFile_append_pbc(PARROT_INTERP, NULLOK(const char *filename))
+PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))
 {
     PackFile * const pf = Parrot_readbc(interp, filename);
     if (!pf)

@@ -453,7 +453,7 @@ done:
 trace_op(PARROT_INTERP,
         ARGIN(const opcode_t *code_start),
         ARGIN(const opcode_t *code_end),
-        NULLOK(const opcode_t *pc))>
+        ARGIN_NULLOK(const opcode_t *pc))>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
@@ -468,7 +468,7 @@ void
 trace_op(PARROT_INTERP,
         ARGIN(const opcode_t *code_start),
         ARGIN(const opcode_t *code_end),
-        NULLOK(const opcode_t *pc))
+        ARGIN_NULLOK(const opcode_t *pc))
 {
     if (!pc) {
         return;

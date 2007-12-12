@@ -120,7 +120,7 @@ struct _IMC_Unit;
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg * _find_sym(PARROT_INTERP,
-    NULLOK(const Namespace *nspace),
+    ARGIN_NULLOK(const Namespace *nspace),
     NOTNULL(SymHash *hsh),
     ARGIN(const char *name))
         __attribute__nonnull__(1)
@@ -147,7 +147,9 @@ SymReg * _mk_const(NOTNULL(SymHash *hsh), ARGIN(const char *name), int t)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-char * _mk_fullname(NULLOK(const Namespace *ns), ARGIN(const char *name));
+char * _mk_fullname(
+    ARGIN_NULLOK(const Namespace *ns),
+    ARGIN(const char *name));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

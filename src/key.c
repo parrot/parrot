@@ -139,7 +139,7 @@ key_new_string(PARROT_INTERP, NOTNULL(STRING *value))
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_new_cstring(PARROT_INTERP, NULLOK(const char *value))>
+key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))>
 
 Returns a new string C<Key> PMC with value C<value> converted to a
 C<STRING>.
@@ -152,7 +152,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_new_cstring(PARROT_INTERP, NULLOK(const char *value))
+key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
 {
     return key_new_string(interp,
             string_from_cstring(interp, value, 0));

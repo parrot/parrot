@@ -551,7 +551,7 @@ mk_pasm_reg(PARROT_INTERP, NOTNULL(char *name))
 =item C<PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 char *
-_mk_fullname(NULLOK(const Namespace *ns), ARGIN(const char *name))>
+_mk_fullname(ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))>
 
 RT#48260: Not yet documented!!!
 
@@ -562,7 +562,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 char *
-_mk_fullname(NULLOK(const Namespace *ns), ARGIN(const char *name))
+_mk_fullname(ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
 {
     char * result;
 
@@ -1438,7 +1438,7 @@ get_sym(PARROT_INTERP, ARGIN(const char *name))
 =item C<PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg *
-_find_sym(PARROT_INTERP, NULLOK(const Namespace *nspace),
+_find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
     NOTNULL(SymHash *hsh), ARGIN(const char *name))>
 
 find a symbol hash or ghash
@@ -1450,7 +1450,7 @@ find a symbol hash or ghash
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg *
-_find_sym(PARROT_INTERP, NULLOK(const Namespace *nspace),
+_find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
     NOTNULL(SymHash *hsh), ARGIN(const char *name))
 {
     const Namespace * ns;

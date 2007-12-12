@@ -246,8 +246,8 @@ void destroy_exception_list(PARROT_INTERP)
 PARROT_DOES_NOT_RETURN
 void do_panic(
     NULLOK_INTERP,
-    NULLOK(const char *message),
-    NULLOK(const char *file),
+    ARGIN_NULLOK(const char *message),
+    ARGIN_NULLOK(const char *file),
     unsigned int line);
 
 PARROT_WARN_UNUSED_RESULT

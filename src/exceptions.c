@@ -115,8 +115,8 @@ internal_exception(int exitcode, ARGIN(const char *format), ...)
 
 =item C<PARROT_DOES_NOT_RETURN
 void
-do_panic(NULLOK_INTERP, NULLOK(const char *message),
-         NULLOK(const char *file), unsigned int line)>
+do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
+         ARGIN_NULLOK(const char *file), unsigned int line)>
 
 Panic handler.
 
@@ -126,8 +126,8 @@ Panic handler.
 
 PARROT_DOES_NOT_RETURN
 void
-do_panic(NULLOK_INTERP, NULLOK(const char *message),
-         NULLOK(const char *file), unsigned int line)
+do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
+         ARGIN_NULLOK(const char *file), unsigned int line)
 {
     /* Note: we can't format any floats in here--Parrot_sprintf
     ** may panic because of floats.

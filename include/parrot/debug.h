@@ -198,7 +198,7 @@ PARROT_CAN_RETURN_NULL
 PDB_condition_t * PDB_cond(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1);
 
-void PDB_continue(PARROT_INTERP, NULLOK(const char *command))
+void PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
@@ -271,7 +271,7 @@ void PDB_list(PARROT_INTERP, ARGIN(const char *command))
 void PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1);
 
-void PDB_next(PARROT_INTERP, NULLOK(const char *command))
+void PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_print(PARROT_INTERP, ARGIN(const char *command))
@@ -296,7 +296,7 @@ void PDB_set_break(PARROT_INTERP, ARGIN(const char *command))
 void PDB_skip_breakpoint(PARROT_INTERP, long i)
         __attribute__nonnull__(1);
 
-void PDB_trace(PARROT_INTERP, NULLOK(const char *command))
+void PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 int PDB_unescape(NOTNULL(char *string))
