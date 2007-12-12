@@ -179,7 +179,7 @@ unshift_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void insert_entry>
+=item C<void nosync_insert_entry>
 
 Inserts a timed event according to C<abstime>. The caller has to hold the
 queue mutex.
@@ -231,7 +231,7 @@ nosync_insert_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void insert_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))>
+=item C<void insert_entry>
 
 Does a synchronized insert of C<entry>.
 

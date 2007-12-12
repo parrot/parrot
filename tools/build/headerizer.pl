@@ -166,7 +166,7 @@ sub extract_function_declarations_and_update_source {
         my $name = $specs->{name};
         my $return_type = $specs->{return_type};
 
-        $text =~ s/=item C<[^>]*$name[^>]*>\n/=item C<$return_type $name>\n/sm or
+        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n/=item C<$return_type $name>\n/sm or
             warn "Couldn't replace $name\n";
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
