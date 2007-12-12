@@ -1,4 +1,4 @@
-; $Id: empty_list.t 23756 2007-12-11 19:44:51Z bernhard $
+; $Id$
 
 (load "tests-driver.scm") ; this should come first
 (load "compiler.scm")
