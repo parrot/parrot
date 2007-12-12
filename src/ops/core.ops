@@ -692,6 +692,16 @@ inline op schedule(invar PMC) {
     goto NEXT();
 }
 
+=item B<addhandler>(invar PMC)
+
+Add an event or exception handler to the concurrency scheduler. Details about
+the handler are stored within the handler PMC.
+
+inline op addhandler(invar PMC) {
+    Parrot_cx_add_handler(interp, $1);
+    goto NEXT();
+}
+
 =back
 
 =cut

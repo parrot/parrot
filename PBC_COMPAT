@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+3.08	2007.12.12	allison	added addhandler_p opcode
 3.07	2007.12.12	tewk	added die_s die_sc die_p die_pc opcodes
 3.06	2007.11.28	coke	remove classname opcode
 3.05    2007.10.29      allison         add get_eh, get_all_eh, and count_eh opcodes
