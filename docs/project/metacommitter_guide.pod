@@ -32,9 +32,9 @@ eligible for parrot commit bit
 
 =item 3
 
-Login to L<https://auth.perl.org/> with the same bitcard id, select the
-"Your account" (L<https://auth.perl.org/auth/account>) link, and set a
-password. This will be the password used with svn.
+Go to L<https://svn.perl.org/accounts/> and follow the directions there to
+setup an svn password for your bitcard account; while the id is the same,
+the passwords are separate.
 
 =back
 
