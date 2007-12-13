@@ -833,7 +833,9 @@ Called from interrupt code. Does a C<longjmp> in front of the runloop,
 which calls C<handle_exception()>, returning the handler address where
 execution then resumes.
 
-=item
+=item C<void do_str_exception>
+
+=item C<void do_pmc_exception>
 
 */
 
