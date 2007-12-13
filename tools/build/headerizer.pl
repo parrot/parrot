@@ -8,7 +8,13 @@ use Carp qw( confess );
 
 # While I work on files individually to make sure headerizing and
 # rewriting doesn't stomp on them.
-my $experimental_file = 'src/utils.c';
+my @experimental_files = qw(
+    exceptions.c
+    string.c
+    tsq.c
+    utils.c
+);
+my %experimental_files = map { ("src/$_", 1) } @experimental_files;
 
 =head1 NAME
 
@@ -427,7 +433,7 @@ sub main {
         }
 
         my @decls;
-        if ( -f $pmcfile || ( $cfile ne $experimental_file ) ) {
+        if ( -f $pmcfile || !$experimental_files{$cfile} ) {
             @decls = extract_function_declarations( $csource );
         }
         else {

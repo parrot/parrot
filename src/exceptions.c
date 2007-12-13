@@ -183,7 +183,7 @@ push_exception(PARROT_INTERP, ARGIN(PMC *handler))
 
 /*
 
-=item C<void run_cleanup_action>
+=item C<static void run_cleanup_action>
 
 RT#48260: Not yet documented!!!
 
@@ -273,7 +273,7 @@ Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
 
 /*
 
-=item C<PMC * find_exception_handler>
+=item C<static PMC * find_exception_handler>
 
 Find the exception handler for C<exception>.
 
@@ -642,7 +642,7 @@ rethrow_c_exception(PARROT_INTERP)
 
 /*
 
-=item C<size_t dest2offset>
+=item C<static size_t dest2offset>
 
 Translate an absolute bytecode location to an offset used for resuming
 after an exception had occurred.
@@ -673,7 +673,7 @@ dest2offset(PARROT_INTERP, ARGIN(const opcode_t *dest))
 
 /*
 
-=item C<opcode_t * create_exception>
+=item C<static opcode_t * create_exception>
 
 Create an exception.
 
