@@ -109,6 +109,10 @@ by integer or string key, use C<getattribute> and C<setattribute> instead.
 
 =over 4
 
+=item * replace <.constant> with <.macro_const> [post 0.5.1]
+
+From PDD19.
+
 =item * C<.HLL_map INTC, INTC> [post ???]
 
 See RT #45453. This will become C<.HLL_map STRINGC, STRINGC> 
