@@ -883,7 +883,6 @@ token pir_directive {
     | '.const'
     | '.constant'
     | '.endm'
-    | '.endnamespace'
     | '.end'
     | '.get_results'
     | '.globalconst'
