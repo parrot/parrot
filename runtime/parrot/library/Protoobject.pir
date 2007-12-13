@@ -140,6 +140,14 @@ protoobject.
     .return ($P1)
 .end
 
+.sub 'WHAT' :method
+    $P0 = typeof self
+    $S0 = $P0.'name'()
+    $P0 = split '::', $S0
+    $S0 = pop $P0
+    .return ($S0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
