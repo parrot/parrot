@@ -93,12 +93,7 @@ L<http://www.lua.org/manual/5.1/manual.html#2.1>.
     $S0 .= $S1
     $S0 .= "'"
   L1:
-    .local pmc ex
-    new ex, 'Exception'
-    new $P0, 'String'
-    set $P0, $S0
-    setattribute ex, 'message', $P0
-    throw ex
+    die $S0
 .end
 
 

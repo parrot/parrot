@@ -176,12 +176,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .sub 'lua_error'
     .param pmc message :slurpy
     $S0 = join '', message
-    .local pmc ex
-    new ex, 'Exception'
-    new $P0, 'String'
-    set $P0, $S0
-    setattribute ex, 'message', $P0
-    throw ex
+    die $S0
 .end
 
 
@@ -652,12 +647,7 @@ Support variable number of arguments function call.
 =cut
 
 .sub 'not_implemented'
-    .local pmc ex
-    new ex, 'Exception'
-    new $P0, 'String'
-    set $P0, "not implemented"
-    setattribute ex, 'message', $P0
-    throw ex
+    die "not implemented"
 .end
 
 

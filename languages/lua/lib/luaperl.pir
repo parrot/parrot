@@ -108,12 +108,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     $P0 = getclass 'ParrotIO'
     $S0 = $P0.'slurp'(out)
     unlink(out)  # cleaning up the temporary file
-    .local pmc ex
-    new ex, 'Exception'
-    new $P0, 'String'
-    set $P0, $S0
-    setattribute ex, 'message', $P0
-    throw ex
+    die $S0
   L1:
     unlink(out)  # cleaning up the temporary file
     .local pmc pir_comp

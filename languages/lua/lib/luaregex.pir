@@ -321,8 +321,6 @@ Francois Perrad
     .param string message
     $P0 = getattribute mob, '$.pos'
     $P0 = pos
-    .local pmc ex
-    new ex, 'Exception'
     $S0 = 'luaregex parse error: '
     $S0 .= message
     $S0 .= ' at offset '
@@ -334,11 +332,7 @@ Francois Perrad
     $S1 = substr $S1, pos, 1
     $S0 .= $S1
     $S0 .= "'"
-    new $P0, 'String'
-    set $P0, $S0
-    setattribute ex, 'message', $P0
-    throw ex
-    .return ()
+    die $S0
 .end
 
 
