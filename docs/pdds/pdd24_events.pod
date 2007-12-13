@@ -206,12 +206,18 @@ Initializes the PMC, either with a single sub object for the core code, or with
 a hash object containing arguments for the code object, type, priority
 threshold, and interpreter object for the handler.
 
-=item set_string
+=item set_string_native
 
-    void set_string(STRING *)
+    void set_string_native(STRING *)
 
 Set the type of event this handler responds to. {{NOTE: These basic attribute
 setting operations could be set_attr_str and get_attr_str instead.}}
+
+=item get_string
+
+    STRING* get_string()
+
+Retrieve the type of event this handler responds to.
 
 =item set_integer_native
 
