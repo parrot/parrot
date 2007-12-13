@@ -229,6 +229,25 @@ handle the registered events.
 
 /*
 
+=item C<PMC *get_attr_str(STRING *name)>
+
+=cut
+
+*/
+
+    PMC *get_attr_str(STRING *name) {
+        Parrot_EventHandler *core_struct  = PMC_data_typed(SELF, Parrot_EventHandler *);
+        PMC *value = PMCNULL;
+
+        if (string_equal(interp, name, CONST_STRING(interp, "code")) == 0) {
+            value = core_struct->code;
+        }
+
+        return value;
+    }
+
+/*
+
 =item C<opcode_t *invoke(void *next)>
 
 Runs the contained code, if any; this is what handles the event.

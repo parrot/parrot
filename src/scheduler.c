@@ -182,10 +182,14 @@ Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))
         else {
             handler = Parrot_cx_find_handler_for_task(interp, task);
             if (!PMC_IS_NULL(handler)) {
+                PMC * handler_sub = VTABLE_get_attr_str(interp,
+                        handler, CONST_STRING(interp, "code"));
+
 #if CX_DEBUG
                 fprintf(stderr, "Found a handler.\n");
 #endif
-/*                VTABLE_invoke(interp, handler); */
+            Parrot_runops_fromc_args_event(interp, handler_sub,
+                    "vPP", handler, task);
             }
         }
 
