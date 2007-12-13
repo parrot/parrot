@@ -96,8 +96,7 @@ created
 Caught exception on bad initializer
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "add event handler and corresponding event to scheduler",
-    todo => 'hold events launch until after 0.5.1 release' );
+pir_output_is( <<'CODE', <<'OUT', "add event handler and corresponding event to scheduler", todo => 'hold events launch until after 0.5.1 release' );
 .sub main :main
     .local pmc handler, handler_init, handler_sub
     .local pmc event, event_init
