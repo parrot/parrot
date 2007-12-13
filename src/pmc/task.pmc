@@ -130,6 +130,12 @@ An interpreter in which to execute this task.
         else
             core_struct->type = CONST_STRING(INTERP, "");
 
+        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "subtype"));
+        if (! PMC_IS_NULL(elem))
+            core_struct->subtype = VTABLE_get_string(INTERP, elem);
+        else
+            core_struct->subtype = CONST_STRING(INTERP, "");
+
         elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "priority"));
         if (! PMC_IS_NULL(elem))
             core_struct->priority = VTABLE_get_integer(INTERP, elem);
