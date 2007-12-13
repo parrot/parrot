@@ -147,7 +147,7 @@ to the current context.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_cont *
-new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))
+new_continuation(PARROT_INTERP, ARGIN(const Parrot_cont *to))
 {
     Parrot_cont    * const cc     = mem_allocate_typed(Parrot_cont);
     Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
@@ -236,7 +236,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PMC *
-new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
+new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
 {
     PMC* const continuation = pmc_new(interp, enum_class_RetContinuation);
     VTABLE_set_pointer(interp, continuation, address);
@@ -294,7 +294,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_full_sub_name(PARROT_INTERP, NULLOK(PMC* sub))
+Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
 {
     if (sub && VTABLE_defined(interp, sub)) {
         Parrot_sub * const s = PMC_sub(sub);
@@ -426,24 +426,26 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_Context_infostr(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
+Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
 {
     Parrot_Context_info info;
     const char* const msg = (CONTEXT(interp->ctx) == ctx)
-        ?  "current instr.:"
+        ? "current instr.:"
         : "called from Sub";
     STRING *res;
 
     Parrot_block_DOD(interp);
     if (Parrot_Context_get_info(interp, ctx, &info)) {
+        static const char unknown_file[] = "(unknown file)";
         DECL_CONST_CAST;
         const char *file = info.file;
-        res        = Parrot_sprintf_c(interp,
+
+        res = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%s:%d)", msg,
             info.fullname, info.pc, file, info.line);
 
         /* free the non-constant string, but not the constant one */
-        if (strncmp("(unknown file)", file, 14) < 0)
+        if (strncmp(unknown_file, file, sizeof(unknown_file)-1) < 0)
             string_cstring_free((char *)const_cast(info.file));
         /* XXX This is probably a source of mis-freeing. */
     }
@@ -510,7 +512,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
-parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
+parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     PMC *cont;
 

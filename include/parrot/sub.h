@@ -212,7 +212,8 @@ typedef struct Parrot_Context_info {
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-PMC * new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
+PMC * new_ret_continuation_pmc(PARROT_INTERP,
+    ARGIN_NULLOK(opcode_t *address))
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -227,20 +228,20 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING* Parrot_Context_infostr(PARROT_INTERP,
-    NOTNULL(parrot_context_t *ctx))
+    ARGIN(const parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_full_sub_name(PARROT_INTERP, NULLOK(PMC* sub))
+STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
+PMC* parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -259,8 +260,9 @@ Parrot_sub * new_closure(PARROT_INTERP)
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_cont * new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))
-        __attribute__nonnull__(1);
+Parrot_cont * new_continuation(PARROT_INTERP, ARGIN(const Parrot_cont *to))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
