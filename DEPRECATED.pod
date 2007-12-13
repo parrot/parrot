@@ -10,7 +10,7 @@ of ??? are still deprecated, but a firm deadline for their removal has not
 yet been established.
 
 When deprecated items are removed, all usage of the feature in the
-repository should be updated or removed; including documentation. 
+repository should be updated or removed; including documentation.
 
 =head1 new object system [post 0.5.0]
 
@@ -83,7 +83,7 @@ See RT #48310.
 
 =item * Integer Type IDs [post 0.5.0]
 
-See RT #48024. Instead of C<$P0 = new Integer> or <$P0 = new .Integer>, 
+See RT #48024. Instead of C<$P0 = new Integer> or <$P0 = new .Integer>,
 use the following syntax, which works for both PMCs and objects.
 
   $P0 = new 'Integer'
@@ -100,8 +100,8 @@ See RT #48014. This will be removed once all core PMCs have been updated.
 
 =item * Keyed access to exception attributes [post 0.5.1]
 
-See RT #48012. Attributes on exception objects will no longer be accessible 
-by integer or string key, use C<getattribute> and C<setattribute> instead. 
+See RT #48012. Attributes on exception objects will no longer be accessible
+by integer or string key, use C<getattribute> and C<setattribute> instead.
 
 =back
 
@@ -113,25 +113,18 @@ by integer or string key, use C<getattribute> and C<setattribute> instead.
 
 From PDD19.
 
-=item * C<.HLL_map INTC, INTC> [post ???]
-
-See RT #45453. This will become C<.HLL_map STRINGC, STRINGC> 
-
-As the dot-prefix type notation (for instance, '.Integer') is disappearing, the
-C<.HLL_map> syntax will also be updated to take strings to indicate the types.
-
 =item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
 
 See RT #4671.
 
 =item * C<.emit> / C<.eom> [post 0.5.1]
 
-See RT #47846.  Any C<.emit>/C<.eom> blocks should be replaced with 
-Anonymous C<.sub>s 
+See RT #47846.  Any C<.emit>/C<.eom> blocks should be replaced with
+Anonymous C<.sub>s
 
 =item * Assignment syntax with opcodes [post ???]
 
-See RT #36283.  When the first argument of an opcode is C<OUT>, then 
+See RT #36283.  When the first argument of an opcode is C<OUT>, then
 the assignment syntax will be allowed, as it is today.
 
 In any other case (i.e. C<INOUT>, C<IN>), this will become
