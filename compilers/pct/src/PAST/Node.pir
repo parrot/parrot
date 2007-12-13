@@ -61,6 +61,20 @@ Accessor method -- sets/returns the return type for the invocant.
 .end
 
 
+=item arity([value])
+
+Accessor method -- sets/returns the arity (number of expected arguments)
+for the node.
+
+=cut
+
+.sub 'arity' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('arity', value, has_value)
+.end
+
+
 =item named([value])
 
 Accessor method -- for named arguments, sets/returns the name to be
