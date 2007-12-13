@@ -528,10 +528,7 @@ None (this function aborts the interpretation).
 
 .sub '_lang_abort' :anon
     .param pmc value
-    .local pmc ex
-    new ex, 'Exception'
-    setattribute ex, 'message', value
-    throw ex
+    die value
 .end
 
 

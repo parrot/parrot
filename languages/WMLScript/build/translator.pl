@@ -432,17 +432,12 @@ PIRCODE
     # Emit unknown instruction code.
     $pir .= <<'PIRCODE';
   BDISPATCH_NOT_FOUND:
-    .local pmc ex
     .local string msg
-    new ex, 'Exception'
     msg = "unknown instruction (code "
     $S0 = cur_ic
     msg = concat $S0
     msg = concat ")"
-    new $P0, 'String'
-    set $P0, msg
-    setattribute ex, 'message', $P0
-    throw ex
+    die msg
 
 PIRCODE
 
