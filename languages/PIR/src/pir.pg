@@ -25,10 +25,10 @@ token TOP {
 }
 
 rule program {
-    <?NL>*
+    <.NL>*
     <compilation_unit>
-    [ <?NL> <compilation_unit> ]*
-    [ <?NL> | <warning: no newline at end of file> ]
+    [ <.NL> <compilation_unit> ]*
+    [ <.NL> | <warning: no newline at end of file> ]
     {*}
 }
 
@@ -37,7 +37,6 @@ token compilation_unit {
     | <sub_def>    {*} #= sub_def
     | <const_def>  {*} #= const_def
     | <pragma>     {*} #= pragma
-    | <emit>       {*} #= emit
 }
 
 
@@ -46,7 +45,7 @@ token compilation_unit {
 =cut
 
 rule sub_def {
-    '.sub' <sub_id> <sub_pragma>* <?nl>
+    '.sub' <sub_id> <sub_pragma>* <.nl>
     <param_decl>*
     <labeled_pir_instr>*
     [ '.end' | <syntax_error: '.end' expected to close method/sub body> ]
@@ -84,12 +83,12 @@ rule vtable_pragma {
 rule parenthesized_string {
     '('
     <string_constant>
-    <?right_paren>
+    <.right_paren>
     {*}
 }
 
 rule multi_pragma {
-    ':multi' <?left_paren> <multi_types>? <?right_paren>
+    ':multi' <.left_paren> <multi_types>? <.right_paren>
     {*}
 }
 
@@ -103,9 +102,9 @@ rule right_paren {
 
 rule outer_pragma {
     ':outer'
-    <?left_paren>
+    <.left_paren>
     <sub_id>
-    <?right_paren>
+    <.right_paren>
     {*}
 }
 
@@ -122,7 +121,7 @@ rule multi_type {
 }
 
 rule param_decl {
-    '.param' <parameter> <parameter_flags> <?nl>
+    '.param' <parameter> <parameter_flags> <.nl>
     {*}
 }
 
@@ -145,7 +144,7 @@ rule labeled_pir_instr {
     [ <label> <instr>?
     | <instr>
     ]
-    <?nl>
+    <.nl>
     {*}
 }
 
@@ -153,7 +152,7 @@ rule labeled_pasm_instr {
     [ <label> <pasm_instr>?
     | <pasm_instr>
     ]
-    <?nl>
+    <.nl>
     {*}
 }
 
@@ -169,8 +168,6 @@ token pir_instr {
     | <globalconst_def>    {*} #= globalconst_def
     | <conditional_stat>   {*} #= conditional_stat
     | <assignment_stat>    {*} #= assignment_stat
-    | <open_namespace>     {*} #= open_namespace
-    | <close_namespace>    {*} #= close_namespace
     | <return_stat>        {*} #= return_stat
     | <sub_invocation>     {*} #= sub_invocation
     | <macro_invocation>   {*} #= macro_invocation
@@ -204,7 +201,7 @@ rule local_id {
 }
 
 rule lexical_decl {
-    '.lex' <string_constant> <?comma>
+    '.lex' <string_constant> <.comma>
     [ <target> | <syntax_error: register or identifier expected> ]
     {*}
 }
@@ -240,7 +237,7 @@ rule const_def_tail {
 }
 
 rule const_assign {
-    <id> <?assign_token>
+    <id> <.assign_token>
     {*}
 }
 
@@ -249,9 +246,7 @@ rule assign_token {
 }
 
 rule conditional_stat {
-    [ 'if' | 'unless' ]
-    <conditional_expr>
-    <?goto> <label_identifier>
+    [if|unless] <conditional_expr> <.goto> <label_identifier>
     {*}
 }
 
@@ -322,10 +317,7 @@ token separator {
 }
 
 rule key {
-    | <simple_expr> '..' <simple_expr>
-    | <simple_expr> '..'
-    | <simple_expr>
-    | '..' <simple_expr>
+    <simple_expr>
     {*}
 }
 
@@ -348,30 +340,8 @@ rule rhs {
 
 
 
-# pasm ops that take 1 argument
-#
-#rule pasm_op_1 {
-#    clone
-#  | compreg
-#  | defined
-#  | assign
-#  | addr
-#  | istrue
-#  | isfalse
-#  | isnull
-#  #| others
-#}
-#
-## pasm ops that take 2 arguments
-##
-#rule pasm_op_2 {
-#    issame
-#  | isntsame
-#}
-#
-
 rule heredoc {
-    '<<' <string_constant> <?nl>
+    '<<' <string_constant> <.nl>
     <heredoc_string>
     [ <heredoc_label> | <syntax_error: heredoc label expected> ]
 }
@@ -388,10 +358,10 @@ rule heredoc_string {
 }
 
 rule long_sub_call {
-    '.begin_call' <?nl>
+    '.begin_call' <.nl>
     <arguments>
-    <long_call_invocation> <?nl>
-    [ <local_decl> <?nl> ]*
+    <long_call_invocation> <.nl>
+    [ <local_decl> <.nl> ]*
     <result_values>
     [ '.end_call'  | <syntax_error: '.end_call' expected> ]
     {*}
@@ -409,7 +379,7 @@ rule non_method_invocation {
 }
 
 rule method_invocation {
-    '.invocant' <target> <?nl>
+    '.invocant' <target> <.nl>
     '.meth_call' <method>
     {*}
 }
@@ -504,7 +474,7 @@ rule arguments {
     [ '.arg'
       [ <simple_expr> | <syntax_error: argument expression expected> ]
       <set_flags>*
-      <?nl>
+      <.nl>
     ]*
     {*}
 }
@@ -513,7 +483,7 @@ rule result_values {
     [ '.result'
       [ <target> | <syntax_error: target expected to hold the result> ]
       <get_flags>*
-      <?nl>
+      <.nl>
     ]*
     {*}
 }
@@ -544,7 +514,7 @@ token return_stat {
 }
 
 rule long_return_stat {
-    '.begin_return' <?nl>
+    '.begin_return' <.nl>
     [ '.return' <return_value> ]*
     [ '.end_return' | <syntax_error: '.end_return' expected> ]
     {*}
@@ -556,7 +526,7 @@ rule short_return_stat {
 }
 
 rule long_yield_stat {
-    '.begin_yield' <?nl>
+    '.begin_yield' <.nl>
     [ '.yield' <return_value> ]*
     [ '.end_yield' | <syntax_error: '.end_yield' expected> ]
     {*}
@@ -566,7 +536,7 @@ rule long_yield_stat {
 rule return_value {
     [ <simple_expr> | <syntax_error: simple expression expected> ]
     <set_flags>*
-    <?nl>
+    <.nl>
 }
 
 rule short_yield_stat {
@@ -579,19 +549,8 @@ rule tail_call {
     {*}
 }
 
-rule open_namespace {
-    '.namespace' <id>
-    {*}
-}
-
-rule close_namespace {
-    '.endnamespace' <id>
-    {*}
-}
-
-
 rule macro_def {
-    '.macro' <id> <macro_parameters>? <?nl>
+    '.macro' <id> <macro_parameters>? <.nl>
     <macro_body>
     {*}
 }
@@ -674,7 +633,7 @@ rule namespace {
     '.namespace'
     [ '['
       [ <namespace_id> | <syntax_error: namespace identifier expected> ]
-      <?right_bracket>
+      <.right_bracket>
     ]?
     {*}
 }
@@ -684,12 +643,12 @@ rule right_bracket {
 }
 
 rule hll_specifier {
-    '.HLL' <string_constant> <?comma> <string_constant>
+    '.HLL' <string_constant> <.comma> <string_constant>
     {*}
 }
 
 rule hll_mapping {
-    '.HLL_map' <string_constant> <?comma> <string_constant>
+    '.HLL_map' <string_constant> <.comma> <string_constant>
     {*}
 }
 
@@ -859,7 +818,7 @@ token NUM_REG {
 token ws {
     [ [ \s & \N ]+
     | \# \N*
-    | ^^ <?pod_comment>
+    | ^^ <.pod_comment>
     ]*
 }
 
@@ -875,7 +834,7 @@ However, therefore it is also necessary to put the comments skipping here as wel
 
 
 token NL {
-    [ \n <?ws> ]+
+    [ \n <.ws> ]+
 }
 
 token nl {
