@@ -1,13 +1,34 @@
 # $Id$
 
-New in 0.5.1
-- Languages/Compilers
-  + compilers/pct: Parrot Compiler Toolkit redesigned and updated
-  + compilers/nqp: (was languages/nqp) major updates, including
-    support for namespaces, module/class declarations, methods
-  + compilers/imcc: remove .sym as alias for .local. Remove .pcc_
+New in 0.5.1 (through r23824)
+- Documentation
+  + PDD19 (PIR) - reflect state on the ground; incorporate old IMCC docs
+  + PDD25 (Concurrency) - launch out of draft
+  + Improve documentation of deprecated parrot features.
+- Compilers
+  + PCT: Parrot Compiler Toolkit redesigned and updated
+  + NQP: major updates, including support for namespaces, 
+    module/class declarations, methods
+  + PIR (imcc): remove .sym as alias for .local. Remove .pcc_
     prefix for calling directives (.pcc_begin became .begin_call).
-  + languages/abc: re-implemented using PCT and NQP
++ Languages
+  + perl6: <<pmichaud>>
+  + abc: re-implemented using PCT and NQP
+  + eclectus: initial implementation
+  + lua: use PCT
+  + plumhead: add PCT variant
+  + punie: re-implemented using PCT and NQP (passing more tests)
+  + pynie: <<pmichaud>>
+  + pirc: minor updates
+- Implementation
+  + new opcodes: 'die', 'addhandler'
+  + Initial implementation of Concurrency PDD
+  + Add 'arity' method to Subs
+- Miscellaneous
+  + Bug cleanup
+  + consting, attribute marking, warnings cleanup, memory leaks, GC...
+  + dead code removal (includes some defunct languages)
+
 
 New in 0.5.0
 - Implementation
