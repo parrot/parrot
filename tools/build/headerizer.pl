@@ -12,6 +12,7 @@ my @experimental_files = qw(
     exceptions.c
     string.c
     string_primitives.c
+    sub.c
     tsq.c
     utils.c
 );

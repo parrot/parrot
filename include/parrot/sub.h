@@ -277,11 +277,11 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_sub * new_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_find_pad(PARROT_INTERP,
-    NOTNULL(STRING *lex_name),
-    NOTNULL(parrot_context_t *ctx))
+    ARGIN(STRING *lex_name),
+    ARGIN(const parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

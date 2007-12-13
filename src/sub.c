@@ -25,8 +25,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 /*
 
-=item C<void
-mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))>
+=item C<void mark_context>
 
 Marks the context C<*ctx>.
 
@@ -93,10 +92,7 @@ mark_context(PARROT_INTERP, ARGINOUT(parrot_context_t* ctx))
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub *
-new_sub(PARROT_INTERP)>
+=item C<Parrot_sub * new_sub>
 
 Returns a new C<Parrot_sub>.
 
@@ -117,10 +113,7 @@ new_sub(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub *
-new_closure(PARROT_INTERP)>
+=item C<Parrot_sub * new_closure>
 
 Returns a new C<Parrot_sub> with its own sctatchpad.
 
@@ -141,10 +134,7 @@ new_closure(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_cont *
-new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))>
+=item C<Parrot_cont * new_continuation>
 
 Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
 current interpreter context.  If C<to> is C<NULL>, then the C<to_ctx> is set
@@ -181,10 +171,7 @@ new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_cont *
-new_ret_continuation(PARROT_INTERP)>
+=item C<Parrot_cont * new_ret_continuation>
 
 Returns a new C<Parrot_cont> pointing to the current context.
 
@@ -211,10 +198,7 @@ new_ret_continuation(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_coro *
-new_coroutine(PARROT_INTERP)>
+=item C<Parrot_coro * new_coroutine>
 
 Returns a new C<Parrot_coro>.
 
@@ -239,11 +223,7 @@ new_coroutine(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PMC *
-new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))>
+=item C<PMC * new_ret_continuation_pmc>
 
 Returns a new C<RetContinuation> PMC. Uses one from the cache,
 if possible; otherwise, creates a new one.
@@ -265,8 +245,7 @@ new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
 
 /*
 
-=item C<void
-invalidate_retc_context(PARROT_INTERP, NOTNULL(PMC *cont))>
+=item C<void invalidate_retc_context>
 
 Make true Continuations from all RetContinuations up the call chain.
 
@@ -303,11 +282,7 @@ extern PMC* Parrot_NameSpace_nci_get_name(PARROT_INTERP, PMC* pmc);
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING*
-Parrot_full_sub_name(PARROT_INTERP, NULLOK(PMC* sub))>
+=item C<STRING* Parrot_full_sub_name>
 
 Return namespace, name, and location of subroutine.
 
@@ -348,10 +323,7 @@ Parrot_full_sub_name(PARROT_INTERP, NULLOK(PMC* sub))
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_Context_get_info(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
-                    NOTNULL(Parrot_Context_info *info))>
+=item C<int Parrot_Context_get_info>
 
 RT#48260: Not yet documented!!!
 
@@ -442,11 +414,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING*
-Parrot_Context_infostr(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))>
+=item C<STRING* Parrot_Context_infostr>
 
 RT#48260: Not yet documented!!!
 
@@ -489,10 +457,7 @@ Parrot_Context_infostr(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC*
-Parrot_find_pad(PARROT_INTERP, NOTNULL(STRING *lex_name), NOTNULL(parrot_context_t *ctx))>
+=item C<PMC* Parrot_find_pad>
 
 Locate the LexPad containing the given name. Return NULL on failure.
 
@@ -500,14 +465,14 @@ Locate the LexPad containing the given name. Return NULL on failure.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
-Parrot_find_pad(PARROT_INTERP, NOTNULL(STRING *lex_name), NOTNULL(parrot_context_t *ctx))
+Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(const parrot_context_t *ctx))
 {
     while (1) {
         PMC * const lex_pad = ctx->lex_pad;
-        parrot_context_t * const outer = ctx->outer_ctx;
+        const parrot_context_t * const outer = ctx->outer_ctx;
 
         if (!outer)
             return lex_pad;
@@ -533,11 +498,7 @@ Parrot_find_pad(PARROT_INTERP, NOTNULL(STRING *lex_name), NOTNULL(parrot_context
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC*
-parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))>
+=item C<PMC* parrot_new_closure>
 
 RT#48260: Not yet documented!!!
 
