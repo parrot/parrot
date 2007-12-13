@@ -33,9 +33,7 @@ API.
 
 /*
 
-=item C<PARROT_API
-void
-string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))>
+=item C<void string_set_data_directory>
 
 Set the directory where ICU finds its data files (encodings, locales,
 etc.).
@@ -72,10 +70,7 @@ string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
 
 /*
 
-=item C<PARROT_API
-Parrot_UInt4
-string_unescape_one(PARROT_INTERP, NOTNULL(UINTVAL *offset),
-        NOTNULL(STRING *string))>
+=item C<Parrot_UInt4 string_unescape_one>
 
 Unescape a single character. We assume that we're at the start of a
 sequence, right after the \.
@@ -86,8 +81,8 @@ sequence, right after the \.
 
 PARROT_API
 Parrot_UInt4
-string_unescape_one(PARROT_INTERP, NOTNULL(UINTVAL *offset),
-        NOTNULL(STRING *string))
+string_unescape_one(PARROT_INTERP, ARGINOUT(UINTVAL *offset),
+        ARGINOUT(STRING *string))
 {
     UINTVAL workchar = 0;
     UINTVAL charcount = 0;
@@ -296,10 +291,7 @@ string_unescape_one(PARROT_INTERP, NOTNULL(UINTVAL *offset),
 
 =over 4
 
-=item C<PARROT_API
-PARROT_CONST_FUNCTION
-UINTVAL
-Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)>
+=item C<UINTVAL Parrot_char_digit_value>
 
 Returns the decimal digit value of the specified character if it is a decimal
 digit character. If not, then -1 is returned.

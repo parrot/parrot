@@ -11,6 +11,7 @@ use Carp qw( confess );
 my @experimental_files = qw(
     exceptions.c
     string.c
+    string_primitives.c
     tsq.c
     utils.c
 );
