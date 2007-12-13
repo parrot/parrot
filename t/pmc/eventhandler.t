@@ -50,6 +50,9 @@ pir_output_is( <<'CODE', <<'OUT', "create an event and set attributes" );
     $S0 = typeof eh
     say $S0
 
+    $S1 = eh
+    say $S1
+
     push_eh bad_args
         eh = new 'EventHandler', code
     pop_eh
@@ -67,6 +70,7 @@ pir_output_is( <<'CODE', <<'OUT', "create an event and set attributes" );
 CODE
 EventHandler
 EventHandler
+cool event
 All clear!
 OUT
 

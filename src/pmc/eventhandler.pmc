@@ -162,7 +162,7 @@ Frees any memory held by this PMC.
 
 =item C<void set_string(STRING *type)>
 
-Sets the C<type> parameter of this event handler to the passed-in string.
+Sets the C<type> attribute of this event handler to the passed-in string.
 
 =cut
 
@@ -173,6 +173,25 @@ Sets the C<type> parameter of this event handler to the passed-in string.
 
         if (e)
             e->type = type;
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Retrieves the C<type> attribute of this event handler.
+
+=cut
+
+*/
+
+    STRING *get_string() {
+        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+
+        if (e)
+            return string_copy(INTERP, e->type);
+
+        return CONST_STRING(INTERP, "");
     }
 
 /*
