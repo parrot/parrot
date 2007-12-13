@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: Actions.pir 22104 2007-10-15 19:15:32Z kjs $
+# $Id$
 
 class PIR::Grammar::Actions;
 
