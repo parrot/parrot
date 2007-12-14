@@ -237,7 +237,7 @@ dotnet.realclean:
 
 eclectus: eclectus.dummy
 eclectus.dummy:
-	- $(MAKE) eclectus test
+	- $(MAKE) eclectus
 eclectus.test :
 	- $(MAKE) eclectus test
 eclectus.clean :
