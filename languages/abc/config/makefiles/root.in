@@ -34,7 +34,7 @@ help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               perl6.pbc"
+	@echo "  all:               abc.pbc"
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
