@@ -764,13 +764,14 @@ name of the PIR file that is included.
 
 The C<.macro> directive starts the definition of a macro.
 
-=item * C<.macro_const>
+=item * C<.macro_const> (Not Implemented: See RT #48563)
 
 The C<.macro_const> directive is a special type of macro; it allows the user to
 use a symbolic name for a constant value. Like C<.macro>, the substitution
 occurs at compile time.
 
-{{ NOTE: C<.constant> is deprecated, replaced by C<.macro_const>. }}
+{{ NOTE: C<.constant> is deprecated, replaced by C<.macro_const>. 
+See RT #48561 }}
 
 =back
 

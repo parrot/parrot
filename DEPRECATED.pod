@@ -109,9 +109,9 @@ by integer or string key, use C<getattribute> and C<setattribute> instead.
 
 =over 4
 
-=item * replace <.constant> with <.macro_const> [post 0.5.1]
+=item * C<.constant> [post 0.5.1]
 
-From PDD19.
+See RT #48561. This will be replaced with <.macro_const>
 
 =item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
 
