@@ -18,7 +18,7 @@ use Data::Dumper;
 
 # 'petite' is Petite Chez Scheme
 # 7.3 is the current version
-my $petite_version = `petite --version 2>&1`;
+my $petite_version = `petite --version 2>&1` || q{};
 my $has_petite = $petite_version =~ m/7/xms;
 diag( Dumper( $petite_version, $has_petite ) );
 
