@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 15;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,7 +13,7 @@ use_ok('config::auto::ctags');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw| capture |;
 
 my $args = process_options(
     {
@@ -47,24 +47,22 @@ ok(! auto::ctags::_probe_for_ctags_output('alpha', 0),
     "Probe returned false when output matched");
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    ok(auto::ctags::_probe_for_ctags_output('Exuberant Ctags', 1),
-        "Probe returned true when output matched");
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+    my $stdout;
+    my $rv = capture(
+        sub { auto::ctags::_probe_for_ctags_output('Exuberant Ctags', 1) },
+        \$stdout
+    );
+    ok($rv, "Probe returned true when output matched");
 }
-untie *STDOUT;
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    ok(! auto::ctags::_probe_for_ctags_output('alpha', 1),
-        "Probe returned false when output matched");
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+    my $stdout;
+    my $rv = capture(
+        sub { auto::ctags::_probe_for_ctags_output('alpha', 1) },
+        \$stdout
+    );
+    ok(! $rv, "Probe returned false when output matched");
 }
-untie *STDOUT;
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");

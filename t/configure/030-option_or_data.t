@@ -12,7 +12,8 @@ use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
+
 use_ok(
     'Parrot::Configure::Step::List', qw|
         get_steps_list
@@ -41,20 +42,14 @@ my $description = 'Determining if your computer does foobar';
 
 $conf->add_steps($step);
 $conf->options->set( %{$args} );
-
-my $rv;
 {
-    my ( $tie, @lines );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $rv    = $conf->runsteps;
-    @lines = $tie->READLINE;
-    my $bigmsg = join q{}, @lines;
-    like( $bigmsg, qr/$description/s, "Got message expected upon running $step" );
+    my $rv;
+    my $stdout;
+    capture ( sub {$rv    = $conf->runsteps}, \$stdout );
+    like( $stdout, qr/$description/s, "Got message expected upon running $step" );
     ok( !defined( $conf->option_or_data($testopt) ),
         "option_or_data returned undef; neither option nor data had been defined" );
 }
-untie *STDOUT;
 
 pass("Completed all tests in $0");
 

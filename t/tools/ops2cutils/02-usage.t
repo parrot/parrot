@@ -19,24 +19,21 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 30;
+use Test::More tests => 29;
 use Carp;
 use Cwd;
-use_ok("Parrot::IO::Capture::Mini");
 use_ok( 'Parrot::Ops2c::Auxiliary', qw| Usage getoptions | );
+use IO::CaptureOutput qw | capture |;
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
 my ( $msg, $tie, @lines );
 {
-    $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    my $rv = Usage();
-    $msg = $tie->READLINE;
-    untie *STDERR or croak "Unable to untie";
+    my ($rv, $stdout, $stderr);
+    capture( sub { $rv = Usage(); }, \$stdout, \$stderr );
     is( $rv, 1, "Usage() returned" );
     like(
-        $msg,
+        $stderr,
         qr|^
             \s*%\sperl\stools\/build\/ops2c\.pl\strans.*
             trans\s:=.*

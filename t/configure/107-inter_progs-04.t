@@ -6,8 +6,7 @@
 use strict;
 use warnings;
 
-# Please leave as 'no_plan'; see 'BUG' in POD.
-use Test::More qw(no_plan);    # tests => 23;
+use Test::More tests => 23;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -18,6 +17,7 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use Tie::Filehandle::Preempt::Stdin;
+use IO::CaptureOutput qw| capture |;
 
 =for hints_for_testing Testing and refactoring of inter::progs should
 entail understanding of issues discussed in the following RT tickets:
@@ -78,9 +78,11 @@ can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
 {
-    open STDOUT, '>', "/dev/null" or croak "Unable to open to myout";
-    $ret = $step->runstep($conf);
-    close STDOUT or croak "Unable to close after myout";
+    my ($ret, $stdout);
+    capture(
+        sub { $ret = $step->runstep($conf); },
+        \$stdout,
+    );
     ok( !defined $ret, "$step_name runstep() returned defined value" );
 }
 

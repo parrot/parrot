@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,7 +13,7 @@ use_ok('config::auto::snprintf');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw| capture |;
 
 my $args = process_options( {
     argv            => [ q{--verbose} ],
@@ -38,17 +38,16 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
+    my $stdout;
     my $res = q{snprintf};
-    ok($step->_evaluate_snprintf($conf, $res),
-        "_evaluate_snprintf returned true value");
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+    my $ret = capture(
+        sub { $step->_evaluate_snprintf($conf, $res) },
+        \$stdout
+    );
+    ok($ret, "_evaluate_snprintf returned true value");
     ok($conf->data->get('HAS_SNPRINTF'),
         "Got expected value");
 }
-untie *STDOUT;
 
 pass("Completed all tests in $0");
 

@@ -12,7 +12,7 @@ use File::Basename qw(basename dirname);
 use File::Temp 0.13 qw/ tempfile /;
 use File::Spec;
 use lib qw( lib t/configure/testlib );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 use Tie::Filehandle::Preempt::Stdin;
 
 BEGIN { use_ok('Parrot::Configure::Step'); }
@@ -44,16 +44,15 @@ can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 $cc = q{gcc-3.3};
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    my $rv = prompt( "What C compiler do you want to use?", $cc );
-    my @lines = $tie_out->READLINE;
-    ok( @lines, "prompts were captured" );
+    my $rv;
+    my $stdout;
+       capture ( sub { $rv = prompt( "What C compiler do you want to use?", $cc ) },
+           \$stdout );
+    ok( $stdout, "prompts were captured" );
     is( $rv, $cc, "Empty response to prompt led to expected return value" );
 }
 $object = undef;
 untie *STDIN;
-untie *STDOUT;
 
 # file_checksum(), not exported
 
@@ -199,30 +198,23 @@ like(
     my $prog = basename($fname);
 
     my $verbose = 1;
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    is( check_progs( $prog, $verbose ), $prog, "check_progs() returns the proper program" );
-    my $line = $tie_out->READLINE;
-    like( $line, qr/checking for program/, "Got expected verbose output" );
+    my $stdout;
+    capture ( sub { is( check_progs( $prog, $verbose ), 
+                $prog, "check_progs() returns the proper program" ) }, \$stdout );
+    like( $stdout, qr/checking for program/, "Got expected verbose output" );
 }
-untie *STDOUT;
 
 {
     my $verbose = 1;
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    my $prog = check_progs( [ 'gmake', 'mingw32-make', 'nmake', 'make' ], $verbose, );
+    my $stdout;
+    my $prog ;
+    capture ( sub { $prog = check_progs( 
+             [ 'gmake', 'mingw32-make', 'nmake', 'make' ], $verbose) }, \$stdout );
     ok( defined($prog), "check_progs() returned a 'make' program" );
-    my @lines = $tie_out->READLINE;
-    my $line = join "\n", @lines;
-    like( $line, qr/checking for program/s, "Got expected verbose output" );
-    like(
-        $line,
-        qr/$prog(\.EXE)? is executable/s,
-        "Got expected verbose output for executable program"
-    );
+    like( $stdout, qr/checking for program/s, "Got expected verbose output" );
+    like( $stdout, qr/$prog(\.EXE)? is executable/s,
+        "Got expected verbose output for executable program" );
 }
-untie *STDOUT;
 
 # _slurp(), not exported
 

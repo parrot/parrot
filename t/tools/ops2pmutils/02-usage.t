@@ -19,22 +19,23 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 14;
+use Test::More tests => 13;
 use Carp;
 use Cwd;
-use_ok("Parrot::IO::Capture::Mini");
+use IO::CaptureOutput qw| capture |;
 use_ok( 'Parrot::Ops2pm::Auxiliary', qw| Usage getoptions | );
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
-my ( $msg, $tie, @lines );
 {
-    $tie = tie *STDERR, "Parrot::IO::Capture::Mini" or croak "Unable to tie";
-    Usage();
-    $msg = $tie->READLINE;
-    untie *STDERR or croak "Unable to untie";
+    my ($stdout, $stderr);
+    my $ret = capture(
+        sub { Usage(); },
+        \$stdout,
+        \$stderr
+    );
     like(
-        $msg,
+        $stderr,
 qr|^usage: tools/build/ops2pm\.pl \[--help\] \[--no-lines\] input\.ops \[input2\.ops \.\.\.\]|,
         "Got expected usage message"
     );

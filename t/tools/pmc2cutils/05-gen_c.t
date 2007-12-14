@@ -19,14 +19,14 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 45;
+use Test::More tests => 44;
 use Carp;
 use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
-use_ok('Parrot::IO::Capture::Mini');
+use IO::CaptureOutput qw| capture |;
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );
 
@@ -158,10 +158,11 @@ my ( $tie, $msg, @lines );
     ### $self->dump_pmc();
 
     {
-        $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        eval { $rv = $self->gen_c(); };
-        @lines = $tie->READLINE;
+        my $stdout;
+        capture(
+            sub { eval { $rv = $self->gen_c(); } },
+            \$stdout
+        );;
         like(
             $@,
             qr<^cannot find file '.*/src/pmc/default.dump' in path>,

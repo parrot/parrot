@@ -14,8 +14,8 @@ use_ok('config::init::install');
 use_ok('config::init::hints');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
 use Parrot::Configure::Test qw( test_step_thru_runstep);
+use IO::CaptureOutput qw | capture |;
 
 my $args = process_options(
     {
@@ -46,14 +46,12 @@ ok( $step->description(), "$step_name has description" );
 # need to capture the --verbose output, because the fact that it does not end
 # in a newline confuses Test::Harness
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $ret = $step->runstep($conf);
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output:  hints were captured" );
-    ok( defined $ret, "$step_name runstep() returned defined value" );
+    my $rv;
+    my $stdout;
+    capture ( sub {$rv = $step->runstep($conf)}, \$stdout);
+    ok( $stdout, "verbose output:  hints were captured" );
+    ok( defined $rv, "$step_name runstep() returned defined value" );
 }
-untie *STDOUT;
 
 pass("Completed all tests in $0");
 

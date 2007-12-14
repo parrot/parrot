@@ -13,7 +13,7 @@ use_ok('config::auto::env');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw| capture |;
 
 my $args = process_options( {
     argv            => [ q{--verbose} ],
@@ -40,48 +40,52 @@ ok($step->description(), "$step_name has description");
 my ($setenv, $unsetenv);
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
+    my $stdout;
     $setenv = 1;
     $unsetenv = 1;
-    $step->_evaluate_env($conf, $setenv, $unsetenv);
-    like($tie_out->READLINE, qr/both/, "Got expected verbose output");
+    capture(
+        sub { $step->_evaluate_env($conf, $setenv, $unsetenv) },
+        \$stdout
+    );
+    like($stdout, qr/both/, "Got expected verbose output");
     is($step->result(), q{both}, "Got expected result");
 }
-untie *STDOUT;
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
+    my $stdout;
     $setenv = 1;
     $unsetenv = 0;
-    $step->_evaluate_env($conf, $setenv, $unsetenv);
-    like($tie_out->READLINE, qr/setenv/, "Got expected verbose output");
+    capture(
+        sub { $step->_evaluate_env($conf, $setenv, $unsetenv) },
+        \$stdout
+    );
+    like($stdout, qr/setenv/, "Got expected verbose output");
     is($step->result(), q{setenv}, "Got expected result");
 }
-untie *STDOUT;
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
+    my $stdout;
     $setenv = 0;
     $unsetenv = 1;
-    $step->_evaluate_env($conf, $setenv, $unsetenv);
-    like($tie_out->READLINE, qr/unsetenv/, "Got expected verbose output");
+    capture(
+        sub { $step->_evaluate_env($conf, $setenv, $unsetenv) },
+        \$stdout
+    );
+    like($stdout, qr/unsetenv/, "Got expected verbose output");
     is($step->result(), q{unsetenv}, "Got expected result");
 }
-untie *STDOUT;
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
+    my $stdout;
     $setenv = 0;
     $unsetenv = 0;
-    $step->_evaluate_env($conf, $setenv, $unsetenv);
-    like($tie_out->READLINE, qr/no/, "Got expected verbose output");
+    capture(
+        sub { $step->_evaluate_env($conf, $setenv, $unsetenv) },
+        \$stdout
+    );
+    like($stdout, qr/no/, "Got expected verbose output");
     is($step->result(), q{no}, "Got expected result");
 }
-untie *STDOUT;
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");

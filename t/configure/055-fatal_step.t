@@ -6,12 +6,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -42,8 +42,6 @@ foreach my $k (@confsteps) {
 }
 is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
 is( $confsteps[0]->step, $step, "'step' element of Parrot::Configure::Task struct identified" );
-is( ref( $confsteps[0]->params ),
-    'ARRAY', "'params' element of Parrot::Configure::Task struct is array ref" );
 ok( !ref( $confsteps[0]->object ),
     "'object' element of Parrot::Configure::Task struct is not yet a ref" );
 
@@ -51,35 +49,19 @@ $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
-my $rv;
-my ( $tie, @lines );
-my ( $errtie, @errlines );
 {
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $errtie = tie *STDERR, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $rv    = $conf->runsteps;
-    @lines = $tie->READLINE;
-    @errlines = $errtie->READLINE;
-    $tie = undef;
-    $errtie = undef;
-}
-untie *STDOUT;
-untie *STDERR;
-ok(! defined $rv, 'runsteps() returned undef');
-my $bigmsg = join q{}, @lines;
-like(
-    $bigmsg,
+    my $rv;
+    my ($stdout, $stderr);
+    capture ( sub {$rv    = $conf->runsteps}, \$stdout, \$stderr );
+    ok(! defined $rv, 'runsteps() returned undef');
+    
+    like($stdout,
     qr/$description\.\.\./s,
-    "Got STDOUT message expected upon running $step"
-);
-my $errbigmsg = join q{}, @errlines;
-like(
-    $errbigmsg,
+    "Got STDOUT message expected upon running $step");
+    like($stderr,
     qr/step $step failed:/s,
-    "Got STDERR message expected upon running $step"
-);
+    "Got STDERR message expected upon running $step");
+}
 
 pass("Completed all tests in $0");
 

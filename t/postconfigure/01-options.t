@@ -12,7 +12,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 31;
+use Test::More tests => 29;
 use Carp;
 use_ok(
     'Parrot::Configure::Options', qw|
@@ -24,7 +24,7 @@ use_ok(
         @valid_options
         |
 );
-use_ok("Parrot::IO::Capture::Mini");
+use IO::CaptureOutput qw | capture |;
 
 my %valid;
 my $badoption = q{samsonanddelilah};
@@ -94,34 +94,26 @@ like(
 );
 
 {
-    my ( $tie, $rv, $msg );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $args = process_options(
-        {
-            argv => [q{--help}],
-            mode => q{reconfigure},
-        }
+    my ($rv, $stdout);
+    capture(
+        sub { $args = process_options(
+                { argv => [q{--help}], mode => q{reconfigure}, }
+            ); },
+        \$stdout,
     );
     ok( !defined $args, "process_options() returned undef after 'help' option" );
-    $msg = $tie->READLINE;
-    like( $msg, qr/--help/i, "got correct message after 'help' option" );
+    like( $stdout, qr/--help/i, "got correct message after 'help' option" );
 }
 
 {
-    my ( $tie, $rv, $msg );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $args = process_options(
-        {
-            argv => [q{--}],
-            mode => q{reconfigure},
-        }
+    my ($rv, $stdout);
+    capture(
+        sub { $args = process_options(
+                { argv => [q{--}], mode => q{reconfigure}, }
+            ); },
+        \$stdout,
     );
-    ok( !defined $args,
-        "process_options() returned undef after '--' option triggered help message" );
-    $msg = $tie->READLINE;
-    like( $msg, qr/--help/i, "got help message as expected" );
+    like( $stdout, qr/--help/i, "got help message as expected" );
 }
 
 $badoption = q{version};

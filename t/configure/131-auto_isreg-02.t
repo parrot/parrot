@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,7 +13,7 @@ use_ok('config::auto::isreg');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw| capture |;
 
 my $args = process_options( {
     argv            => [ q{--verbose} ],
@@ -38,17 +38,16 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
     my $anyerror;
-    ok($step->_evaluate_isreg($conf, $anyerror),
-        "_evaluate_isreg returned true value");
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+    my $stdout;
+    my $ret = capture(
+        sub { $step->_evaluate_isreg($conf, $anyerror) },
+        \$stdout
+    );
+    ok($ret, "_evaluate_isreg returned true value");
     is($conf->data->get('isreg'), 1, "'isreg' set to true value as expected");
     is($step->result, 'yes', "Got expected result");
 }
-untie *STDOUT;
 
 pass("Completed all tests in $0");
 

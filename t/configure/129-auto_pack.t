@@ -15,7 +15,7 @@ insufficient; please try to improve it.  Check latest reports of Parrot
 configuration tools testing coverage to see where your time available
 for writing tests is spent.  Try to write tests which will trigger the
 warnings in the package being tested.  They can probably be captured
-with Parrot::IO::Capture::Mini; see t/tools/ for examples of how to use
+with IO::CaptureOutput; see t/tools/ for examples of how to use
 this module.
 
 =cut

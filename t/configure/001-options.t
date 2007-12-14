@@ -12,19 +12,11 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 37;
+use Test::More tests => 34;
 use Carp;
-use_ok(
-    'Parrot::Configure::Options', qw|
-        process_options
-        |
-);
-use_ok(
-    "Parrot::Configure::Options::Conf", qw|
-        @valid_options
-        |
-);
-use_ok("Parrot::IO::Capture::Mini");
+use Parrot::Configure::Options qw| process_options |;
+use Parrot::Configure::Options::Conf qw| @valid_options |;
+use IO::CaptureOutput qw| capture |;
 
 my %valid;
 my $badoption = q{samsonanddelilah};
@@ -141,53 +133,41 @@ like(
 );
 
 {
-    my ( $tie, $rv, $msg );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $args = process_options(
+    my $stdout;
+    $args = capture( sub { process_options(
         {
             argv => [q{--help}],
             mode => q{configure},
         }
-    );
+    ) } , \$stdout);
     ok( !defined $args, "process_options() returned undef after 'help' option" );
-    $msg = $tie->READLINE;
-    like( $msg, qr/--help/i, "got correct message after 'help' option" );
+    like( $stdout, qr/--help/i, "got correct message after 'help' option" );
 }
-untie *STDOUT;
 
 {
-    my ( $tie, $rv, $msg );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $args = process_options(
+    my $stdout;
+    $args = capture( sub { process_options(
         {
             argv => [q{--}],
             mode => q{configure},
         }
-    );
+    ) } , \$stdout);
     ok( !defined $args,
         "process_options() returned undef after '--' option triggered help message" );
-    $msg = $tie->READLINE;
-    like( $msg, qr/--help/i, "got help message as expected" );
+    like( $stdout, qr/--help/i, "got help message as expected" );
 }
-untie *STDOUT;
 
 {
-    my ( $tie, $rv, $msg );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $args = process_options(
+    my $stdout;
+    $args = capture( sub { process_options(
         {
             argv => [q{--version}],
             mode => q{configure},
         }
-    );
+    ) } , \$stdout);
     ok( !defined $args, "process_options() returned undef after 'version' option" );
-    $msg = $tie->READLINE;
-    like( $msg, qr/Parrot Version/i, "got correct message after 'version' option" );
+    like( $stdout, qr/Parrot Version/i, "got correct message after 'version' option" );
 }
-untie *STDOUT;
 
 $args = process_options(
     {

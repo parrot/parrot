@@ -11,7 +11,7 @@ use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -54,29 +54,21 @@ is( $conf->options->{c}->{debugging},
 my $errstr;
 {
     my $rv;
-    my ( $tie, @lines );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    local $SIG{__WARN__} = \&_capture;
-    eval { $rv = $conf->runsteps; };
-    @lines = $tie->READLINE;
-    my $bigmsg = join q{}, @lines;
+    my ($stdout, $stderr); 
+    capture ( sub {eval {$rv    = $conf->runsteps } }, \$stdout, \$stderr );
     like(
-        $bigmsg,
+        $stdout,
         qr/$description/s,
         "Got message expected upon running $step"
     );
     like(
-        $errstr,
+        $stderr,
         qr/step $step died during execution: Dying gamma just to see what happens/,
         "Got expected error message"
     );
 }
-untie *STDOUT;
 
 pass("Completed all tests in $0");
-
-sub _capture { $errstr = $_[0]; }
 
 ################### DOCUMENTATION ###################
 

@@ -19,14 +19,14 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 56;
+use Test::More tests => 55;
 use Carp;
 use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
-use_ok('Parrot::IO::Capture::Mini');
+use IO::CaptureOutput qw| capture |;
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );
 
@@ -227,12 +227,12 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ### $self->dump_pmc();
-    my ( $tie, @lines );
     {
-        $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        eval { $self->print_tree(); };
-        @lines = $tie->READLINE;
+        my $stdout;
+        capture(
+            sub { eval { $self->print_tree(); } },
+            \$stdout
+        );
         like(
             $@,
             qr<cannot find file '.*/src/pmc/default.dump'>,
@@ -276,11 +276,12 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ### $self->dump_pmc();
-    my ( $tie, @lines );
     {
-        $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        eval { $self->print_tree(); };
+        my $stdout;
+        capture(
+            sub { eval { $self->print_tree(); } },
+            \$stdout
+        );
         like(
             $@,
             qr<^print_tree\(\) lacked files>,

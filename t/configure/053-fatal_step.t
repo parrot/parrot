@@ -6,12 +6,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -42,8 +41,6 @@ foreach my $k (@confsteps) {
 }
 is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
 is( $confsteps[0]->step, $step, "'step' element of Parrot::Configure::Task struct identified" );
-is( ref( $confsteps[0]->params ),
-    'ARRAY', "'params' element of Parrot::Configure::Task struct is array ref" );
 ok( !ref( $confsteps[0]->object ),
     "'object' element of Parrot::Configure::Task struct is not yet a ref" );
 

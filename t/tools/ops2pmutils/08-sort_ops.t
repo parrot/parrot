@@ -19,14 +19,14 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 91;
+use Test::More tests => 87;
 use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 
 use_ok('Parrot::Ops2pm::Utils');
-use_ok("Parrot::IO::Capture::Mini");
+use IO::CaptureOutput qw| capture |;
 
 use constant NUM_FILE  => "src/ops/ops.num";
 use constant SKIP_FILE => "src/ops/ops.skip";
@@ -166,18 +166,18 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( -f $num,                    "ops.num located after renumbering" );
         ok( -f $skip,                   "ops.skip located after renumbering" );
 
-        my $msg;
-        my $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        ok( defined $tie, "tie established for testing" );
-        ok( $self->sort_ops(), "sort_ops returned successfully" );
-        $msg = $tie->READLINE;
-        untie *STDERR;
+        my ($stdout, $stderr);
+        my $ret = capture(
+            sub { $self->sort_ops() },
+            \$stdout,
+            \$stderr
+        );
+        ok($ret, "sort_ops returned successfully" );
   TODO: {
              local $TODO = 'broken warning about experimental ops';
 
             like(
-                $msg,
+                $stderr,
                 qr|experimental, not in ops\.num|,
                 "Got expected warning about experimental ops"
             );
@@ -244,16 +244,16 @@ DUMMYOPS
         ok( -f $num,                    "ops.num located after renumbering" );
         ok( -f $skip,                   "ops.skip located after renumbering" );
 
-        my $msg;
-        my $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        ok( defined $tie, "tie established for testing" );
-        ok( $self->sort_ops(), "sort_ops returned successfully" );
-        $msg = $tie->READLINE;
-        untie *STDERR;
+        my ($stdout, $stderr);
+        my $ret = capture(
+            sub { $self->sort_ops() },
+            \$stdout,
+            \$stderr
+        );
+        ok($ret, "sort_ops returned successfully" );
 
         like(
-            $msg,
+            $stderr,
             qr|not in ops\.num nor ops\.skip|,
             "Got expected warning about ops in neither ops.num or ops.skip"
         );
@@ -306,14 +306,14 @@ DUMMYOPS
         ok( -f $num,                    "ops.num located after renumbering" );
         ok( -f $skip,                   "ops.skip located after renumbering" );
 
-        my $msg;
-        my $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        ok( defined $tie, "tie established for testing" );
-        ok( $self->sort_ops(), "sort_ops returned successfully" );
-        $msg = $tie->READLINE;
-        untie *STDERR;
-        ok( !defined $msg, "Got no warning, as expected" );
+        my ($stdout, $stderr);
+        my $ret = capture(
+            sub { $self->sort_ops() },
+            \$stdout,
+            \$stderr
+        );
+        ok($ret, "sort_ops returned successfully" );
+        ok( ! $stderr, "Got no warning, as expected" );
 
         # To do:  Test that the sorting was correct.
 

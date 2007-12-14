@@ -16,7 +16,7 @@ use_ok(
         get_steps_list
         |
 );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -95,12 +95,10 @@ REASON
 
     eval { $conf->data()->slurp_temp(); };
     ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::slurp_temp() succeeded" );
-
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    my $ret        = $conf->run_single_step( $args->{step} );
-    my @more_lines = $tie_out->READLINE;
-    ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::run_single_step() succeeded" );
+   my $rv;
+   my $stdout;
+   capture ( sub {$rv = $conf->run_single_step( $args->{step}) }, \$stdout);
+   ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::run_single_step() succeeded" );
 }
 
 pass("Completed all tests in $0");

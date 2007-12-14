@@ -19,15 +19,15 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 21;
+use Test::More tests => 20;
 use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use_ok('Parrot::Ops2pm::Utils');
-use_ok("Parrot::IO::Capture::Mini");
 use lib ("$main::topdir/t/tools/ops2cutils/testlib");
 use_ok( "GenerateCore", qw| generate_core | );
+use IO::CaptureOutput qw| capture |;
 
 my @srcopsfiles = qw( src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops
     src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
@@ -53,20 +53,21 @@ my ( $msg, $tie );
 
     {
         local @ARGV = qw();
-        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        my $self = Parrot::Ops2c::Utils->new(
-            {
-                argv => [@ARGV],
-                flag => {},
-            }
+        my $self;
+        my ($stdout, $stderr);
+        my $ret = capture(
+           sub { 
+                $self = Parrot::Ops2c::Utils->new(
+                    { argv => [@ARGV], flag => {} }
+                );
+            },
+            \$stdout,
+            \$stderr
         );
-        $msg = $tie->READLINE;
-        untie *STDERR or croak "Unable to untie";
         ok( !defined $self,
             "Constructor correctly returned undef due to lack of command-line arguments" );
         like(
-            $msg,
+            $stderr,
             qr/^Parrot::Ops2c::Utils::new\(\) requires 'trans' options/,
             "Error message is correct"
         );
@@ -74,20 +75,21 @@ my ( $msg, $tie );
 
     {
         local @ARGV = qw( gobbledygook );
-        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        my $self = Parrot::Ops2c::Utils->new(
-            {
-                argv => [@ARGV],
-                flag => {},
-            }
+        my $self;
+        my ($stdout, $stderr);
+        my $ret = capture(
+           sub { 
+                $self = Parrot::Ops2c::Utils->new(
+                    { argv => [@ARGV], flag => {}, }
+                );
+            },
+            \$stdout,
+            \$stderr
         );
-        $msg = $tie->READLINE;
-        untie *STDERR or croak "Unable to untie";
         ok( !defined $self,
             "Constructor correctly returned undef due to bad class name command-line argument" );
         like(
-            $msg,
+            $stderr,
             qr/Parrot::Ops2c::Utils::new\(\) requires C, CGoto, CGP, CSwitch and\/or  CPrederef/,
             "Got correct error message"
         );
@@ -102,10 +104,7 @@ my ( $msg, $tie );
     {
         local @ARGV = qw( C CGoto CGP CSwitch CPrederef );
         my $self = Parrot::Ops2c::Utils->new(
-            {
-                argv => [@ARGV],
-                flag => { core => 1 },
-            }
+            { argv => [@ARGV], flag => { core => 1 } }
         );
         ok( defined $self, "Constructor correctly returned when provided >= 1 arguments" );
     }
@@ -125,15 +124,19 @@ my ( $msg, $tie );
 
     {
         local @ARGV = qw( C );
-        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        my $self = Parrot::Ops2c::Utils->new( { argv => [@ARGV], } );
-        $msg = $tie->READLINE;
-        untie *STDERR or croak "Unable to untie";
+        my $self;
+        my ($stdout, $stderr);
+        my $ret = capture(
+           sub { 
+                $self = Parrot::Ops2c::Utils->new( { argv => [@ARGV], });
+            },
+            \$stdout,
+            \$stderr
+        );
         ok( !defined $self,
             "Constructor correctly returned undef when lacking reference to options" );
         like(
-            $msg,
+            $stderr,
             qr/^Parrot::Ops2c::Utils::new\(\) requires reference to hash of command-line options/,
             "Error message correctly returned"
         );
@@ -151,10 +154,7 @@ sub test_single_trans {
         unless $available{$trans};
 
     my $self = Parrot::Ops2c::Utils->new(
-        {
-            argv => [$trans],
-            flag => { core => 1 },
-        }
+        { argv => [$trans], flag => { core => 1 }, }
     );
     ok( defined $self, "Constructor correct when provided with single argument $trans" );
 }

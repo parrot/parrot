@@ -10,7 +10,7 @@ use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
 use lib qw( lib t/configure/testlib );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 BEGIN { use_ok('Parrot::Configure::Step'); }
 
@@ -92,17 +92,15 @@ like(
 if (@miniparrot@) { sprint "Hello world\n"; }
 END_DUMMY
     close $IN or croak "Unable to close temp file";
-    my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    eval { genfile( $dummy => 'CFLAGS', feature_file => 1, ); };
-    my @lines = $tie_err->READLINE;
-    ok( @lines, "Error message caught" );
+    my ($stdout, $stderr);
+    capture ( sub { eval { genfile( $dummy => 'CFLAGS', feature_file => 1, ) } },
+        \$stdout, \$stderr );
+    ok( $stderr, "Error message caught" );
     ok( $@,     "Bad Perl code caught by genfile()" );
 
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
 }
-untie *STDERR;
 
 {
     my $tdir = tempdir( CLEANUP => 1 );
@@ -111,16 +109,15 @@ untie *STDERR;
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN q{@foobar@\n};
     close $IN or croak "Unable to close temp file";
-    my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    ok( genfile( $dummy => 'CFLAGS' ), "genfile() returned true when warning expected" );
-    my $line = $tie_err->READLINE;
-    like( $line, qr/value for 'foobar'/, "got expected warning" );
+    my ($stdout, $stderr) ;
+    capture ( sub { ok( genfile( $dummy => 'CFLAGS' ), 
+                "genfile() returned true when warning expected" ) },
+                 \$stdout, \$stderr);
+    like( $stderr, qr/value for 'foobar'/, "got expected warning" );
 
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
 }
-untie *STDERR;
 
 {
     my $tdir = tempdir( CLEANUP => 1 );

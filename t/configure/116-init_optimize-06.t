@@ -13,7 +13,7 @@ use_ok('config::init::optimize');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 my $args = process_options(
     {
@@ -45,14 +45,12 @@ $conf->data->set('gccversion' => '4.1');
 # because the fact that it does not end
 # in a newline confuses Test::Harness
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $ret = $step->runstep($conf);
-    ok( defined $ret, "$step_name runstep() returned defined value" );
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+      my $rv;
+      my $stdout;
+      capture ( sub {$rv = $step->runstep($conf) }, \$stdout);
+      ok( defined $rv, "$step_name runstep() returned defined value" );
+      ok( $stdout, "verbose output captured" );
 }
-untie *STDOUT;
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");

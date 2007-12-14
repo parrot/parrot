@@ -11,7 +11,7 @@ use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -51,22 +51,17 @@ $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
-my $rv;
 {
-    my ( $tie, @lines );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $rv    = $conf->runsteps;
-    @lines = $tie->READLINE;
+    my $rv;
+    my $stdout;
+    capture ( sub {$rv    = $conf->runsteps}, \$stdout );
     ok( $rv, "runsteps successfully ran $step" );
-    my $bigmsg = join q{}, @lines;
     like(
-        $bigmsg,
-        qr/$description\.\.\..*done./s,
+        $stdout,
+       qr/$description\.\.\..*done\.(?!\s+Setting Configuration Data)/s, 
     "Got message expected upon running $step"
     );
 }
-untie *STDOUT;
 
 pass("Completed all tests in $0");
 

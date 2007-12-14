@@ -13,7 +13,7 @@ use_ok('config::auto::gcc');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 my $args = process_options( {
     argv            => [ q{--verbose} ],
@@ -38,19 +38,17 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
+    my $rv;
+    my $stdout;
     my $gnucref = {};
     $gnucref->{__GNUC__} = q{abc123};
-    ok($step->_evaluate_gcc($conf, $gnucref),
-        "_evaluate_gcc() returned true value");
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+    capture ( sub {$rv = $step->_evaluate_gcc($conf, $gnucref) }, \$stdout);
+    ok($rv, "_evaluate_gcc() returned true value");
+    ok( $stdout, "verbose output captured" );
     ok(! defined $conf->data->get( 'gccversion' ),
         "gccversion undef as expected");
     is($step->result(), q{no}, "Got expected result");
 }
-untie *STDOUT;
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");

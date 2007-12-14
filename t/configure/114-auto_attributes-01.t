@@ -13,6 +13,7 @@ use_ok('config::auto::attributes');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
+use IO::CaptureOutput qw | capture |;
 
 my $args = process_options( {
     argv            => [ ],
@@ -36,17 +37,19 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
-# Can't use Parrot::IO::Capture::Mini to tie STDOUT here because the C
-# programs inside runstep() are messing with STDOUT.
-# So we'll have to infer that verbose output was printed from the
-# coverage report.
-
-$ret = $step->runstep($conf);
-ok( defined $ret, "$step_name runstep() returned defined value" );
-unlike($conf->data->get('ccflags'),
-    qr/HASATTRIBUTE_NEVER_WORKS/,
-    "'ccflags' excludes bogus attribute as expected"
-);
+{
+    my $rv;
+    my $stdout;
+    capture(
+        sub { $rv = $step->runstep($conf); },
+        \$stdout,
+    );
+    ok( defined $rv, "$step_name runstep() returned defined value" );
+    unlike($conf->data->get('ccflags'),
+        qr/HASATTRIBUTE_NEVER_WORKS/,
+        "'ccflags' excludes bogus attribute as expected"
+    );
+}
 
 pass("Completed all tests in $0");
 

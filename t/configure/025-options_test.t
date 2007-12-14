@@ -9,9 +9,9 @@ use Carp;
 use Cwd;
 use Data::Dumper;
 use File::Temp qw( tempdir );
-use Test::More tests => 10;
+use Test::More tests =>  9;
 use lib qw( lib );
-use_ok('Parrot::IO::Capture::Mini');
+use IO::CaptureOutput qw| capture |;
 use_ok(
     'Parrot::Configure::Options', qw|
         process_options
@@ -60,25 +60,29 @@ TEST
 
     @Parrot::Configure::Options::Test::preconfiguration_tests = ($test);
     {
-        my $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
+        my ($rv, $stdout);
     SKIP: {
             skip $reason, 1 if $ENV{PERL5OPT};
-            ok( $opttest->run_configure_tests(), "Configuration tests are runnable" );
+            capture (
+                sub { $rv = $opttest->run_configure_tests(); },
+                \$stdout
+            );
+            ok( $rv, "Configuration tests are runnable" );
         }
     }
-    untie *STDOUT;
 
     @Parrot::Configure::Options::Test::postconfiguration_tests = ($test);
     {
-        my $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
+        my ($rv, $stdout);
     SKIP: {
             skip $reason, 1 if $ENV{PERL5OPT};
-            ok( $opttest->run_build_tests(), "Build tests are runnable" );
+            capture (
+                sub { $rv = $opttest->run_build_tests(); },
+                \$stdout
+            );
+            ok( $rv, "Build tests are runnable" );
         }
     }
-    untie *STDOUT;
     unlink $test or croak "Unable to delete $test";
     @Parrot::Configure::Options::Test::preconfiguration_tests = ();
     @Parrot::Configure::Options::Test::postconfiguration_tests = ();

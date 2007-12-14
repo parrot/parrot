@@ -11,7 +11,7 @@ use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -51,28 +51,17 @@ $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
-my $rv;
-my ( $tie, @lines, $errtie, @errlines );
 {
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $errtie = tie *STDERR, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $rv       = $conf->runsteps;
-    @lines    = $tie->READLINE;
-    @errlines = $errtie->READLINE;
-}
-untie *STDOUT;
-untie *STDERR;
-ok( $rv, "runsteps successfully ran $step" );
-my $bigmsg = join q{}, @lines;
-like( $bigmsg, qr/$description/s, "Got correct description for $step" );
-my $errmsg = join q{}, @errlines;
-like(
-    $errmsg,
+    my $rv;
+    my ($stdout, $stderr);
+    capture ( sub {$rv    = $conf->runsteps}, \$stdout, \$stderr );
+    ok( $rv, "runsteps successfully ran $step" );
+    like( $stdout, qr/$description/s, "Got correct description for $step" );
+    like(
+    $stderr,
     qr/step $step failed:\sGoodbye, cruel world/,
-    "Got error message expected upon running $step"
-);
+    "Got error message expected upon running $step");
+}
 
 pass("Completed all tests in $0");
 

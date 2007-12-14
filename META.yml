@@ -19,6 +19,7 @@ no_index:
         - t
         - tools
     file:
+        - lib/IO/CaptureOutput.pm
         - lib/SmartLink.pm
     package:
         - DB

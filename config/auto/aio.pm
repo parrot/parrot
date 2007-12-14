@@ -3,11 +3,22 @@
 
 =head1 NAME
 
-config/auto/aio.pm - Test for AIO
+config/auto/aio.pm - Test for AI/O
 
 =head1 DESCRIPTION
 
-Determines whether the platform supports AIO.
+Determines whether the platform supports asynchronous input/output.
+
+From the documentation to Marc Lehmann's CPAN module IO::AIO
+(L<http://search.cpan.org/dist/IO-AIO/AIO.pm>):
+
+I<"Asynchronous means that operations that can normally block your program
+(e.g. reading from disk) will be done asynchronously: the operation will
+still block, but you can do something else in the meantime. This is
+extremely useful for programs that need to stay interactive even when
+doing heavy I/O (GUI programs, high performance network servers etc.),
+but can also be used to easily do operations in parallel that are
+normally done sequentially ....">
 
 =cut
 
@@ -33,15 +44,13 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );
 
-    my $test;
     my $verbose = $conf->options->get('verbose');
     my $libs    = $conf->data->get('libs');
     $conf->data->add( ' ', libs => '-lrt' );
 
-    cc_gen('config/auto/aio/aio.in');
-    eval { cc_build(); };
-    if ( !$@ ) {
-        $test = cc_run(35);
+    my $errormsg = _first_probe_for_aio();
+    if ( ! $errormsg ) {
+        my $test = cc_run(35);
 
         # if the test is failing with sigaction err
         # we should repeat it with a different signal number
@@ -70,6 +79,14 @@ sub runstep {
     }
 
     return 1;
+}
+
+sub _first_probe_for_aio {
+    my $errormsg;
+    cc_gen('config/auto/aio/aio.in');
+    eval { cc_build(); };
+    $errormsg = 1 if  $@;
+    return $errormsg;
 }
 
 1;

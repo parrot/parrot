@@ -8,9 +8,9 @@ use warnings;
 use Carp;
 use Cwd;
 use Data::Dumper;
-use Test::More tests => 14;
+use Test::More tests => 13;
 use lib qw( lib );
-use_ok('Parrot::IO::Capture::Mini');
+use IO::CaptureOutput qw| capture |;
 use_ok(
     'Parrot::Configure::Options', qw|
         process_options
@@ -32,26 +32,24 @@ $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
 
 {
-    my ( $tie, @lines );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $opttest->run_configure_tests();
-    @lines = $tie->READLINE;
-    ok( !scalar(@lines),
+    my $stdout;
+    capture(
+        sub { $opttest->run_configure_tests(); },
+        \$stdout,
+    );
+    ok( ! $stdout,
         "Nothing captured because no pre-configuration tests were run." );
 }
-untie *STDOUT;
 
 {
-    my ( $tie, @lines );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $opttest->run_build_tests();
-    @lines = $tie->READLINE;
-    ok( !scalar(@lines),
+    my $stdout;
+    capture(
+        sub { $opttest->run_build_tests(); },
+        \$stdout,
+    );
+    ok( ! $stdout,
         "Nothing captured because no pre-build tests were run." );
 }
-untie *STDOUT;
 
 $args = process_options(
     {

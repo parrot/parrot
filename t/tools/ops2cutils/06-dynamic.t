@@ -19,15 +19,15 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 72;
+use Test::More tests => 71;
 use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use_ok('Parrot::Ops2pm::Utils');
-use_ok('Parrot::IO::Capture::Mini');
 use lib ("$main::topdir/t/tools/ops2cutils/testlib");
 use_ok( "GenerateCore", qw| generate_core | );
+use IO::CaptureOutput qw | capture |;
 
 my @srcopsfiles = qw( src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops
     src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
@@ -67,18 +67,19 @@ my ( $msg, $tie );
     test_dynops( [qw( CSwitch  dan.ops )] );
 
     {
-        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        my $self = Parrot::Ops2c::Utils->new(
-            {
-                argv => [qw( CSwitch  dan.ops dan.ops )],
-                flag => { dynamic => 1 },
-            }
+        my ($self, $stdout, $stderr);
+        capture(
+            sub { $self = Parrot::Ops2c::Utils->new( {
+                        argv => [qw( CSwitch  dan.ops dan.ops )],
+                        flag => { dynamic => 1 },
+                } ); },
+            \$stdout,
+            \$stderr,
         );
-        $msg = $tie->READLINE;
-        untie *STDERR or croak "Unable to untie";
-        ok( defined $self, "Constructor correctly returned when provided >= 1 arguments" );
-        like( $msg, qr/Ops file 'dan\.ops' mentioned more than once!/, "Error message is correct" );
+        ok( defined $self,
+            "Constructor correctly returned when provided >= 1 arguments" );
+        like( $stderr,
+            qr/Ops file 'dan\.ops' mentioned more than once!/, "Error message is correct" );
 
         my $c_header_file = $self->print_c_header_file();
         ok( -e $c_header_file, "$c_header_file created" );

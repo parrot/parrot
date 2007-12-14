@@ -19,14 +19,14 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 72;
+use Test::More tests => 70;
 use Carp;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use IO::File;
 
 use_ok('Parrot::Ops2pm::Utils');
-use_ok("Parrot::IO::Capture::Mini");
+use IO::CaptureOutput qw| capture |;
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 
@@ -110,15 +110,16 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
     );
     isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-    my $msg;
-    my $tie = tie *STDERR, "Parrot::IO::Capture::Mini" or croak "Unable to tie";
-    ok( defined $tie, "tie established for testing" );
-    ok( $self->prepare_ops, "prepare_ops() returned successfully" );
-    $msg = $tie->READLINE;
-    untie *STDERR;
+    my ($stdout, $stderr);
+    my $ret = capture(
+        sub { $self->prepare_ops },
+        \$stdout,
+        \$stderr
+    );
+    ok($ret, "prepare_ops() returned successfully" );
     ok( defined( $self->{ops} ), "'ops' key has been defined" );
     like(
-        $msg,
+        $stderr,
         qr|Ops file 'src/ops/bit.ops' mentioned more than once!|,
         "Got expected message about .ops file being mentioned twice"
     );

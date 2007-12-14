@@ -15,12 +15,7 @@ use lib qw( lib );
 use_ok('config::init::manifest');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
-
-=for hints_for_testing See if you can get the program to 'ack' when it
-thinks there are files missing from those listed in the MANIFEST.
-
-=cut
+use IO::CaptureOutput qw | capture |;
 
 my $pkg  = q{init::manifest};
 my $args = process_options(
@@ -51,19 +46,16 @@ my $cwd = cwd();
     copy( qq{$cwd/MANIFEST}, qq{$tdir/MANIFEST} )
         or croak "Unable to copy MANIFEST";
     {
-        my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        my $ret        = $step->runstep($conf);
-        my @lines      = $tie_err->READLINE;
-        my @more_lines = $tie_out->READLINE;
-        is( $ret, undef, "$step_name runstep returned undef" );
+        my ($rv, $stdout, $stderr);
+        capture(
+            sub { $rv = $step->runstep($conf); },
+            \$stdout,
+            \$stderr,
+        );
+        is( $rv, undef, "$step_name runstep returned undef" );
     }
     chdir $cwd or croak "Unable to change back";
 }
-untie *STDERR;
-untie *STDOUT;
 
 pass("Completed all tests in $0");
 

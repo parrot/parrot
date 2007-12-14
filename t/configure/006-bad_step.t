@@ -11,7 +11,6 @@ use Carp;
 use lib qw( lib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );

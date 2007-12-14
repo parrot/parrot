@@ -6,12 +6,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -43,8 +43,6 @@ foreach my $k (@confsteps) {
 }
 is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
 is( $confsteps[0]->step, $step, "'step' element of Parrot::Configure::Task struct identified" );
-is( ref( $confsteps[0]->params ),
-    'ARRAY', "'params' element of Parrot::Configure::Task struct is array ref" );
 ok( !ref( $confsteps[0]->object ),
     "'object' element of Parrot::Configure::Task struct is not yet a ref" );
 
@@ -53,7 +51,8 @@ is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
 my $rv;
-eval { $rv = $conf->runsteps; };
+my $stdout;
+capture ( sub { eval { $rv = $conf->runsteps; } }, \$stdout);
 like($@, qr/^No configuration step corresponding to $fatal_step_sequence_number/,
     "Got expected error message when value to --fatal-step option was misspecified");
 

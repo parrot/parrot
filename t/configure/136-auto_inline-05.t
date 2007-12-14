@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,7 +13,7 @@ use_ok('config::auto::inline');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw| capture |;
 
 my $args = process_options(
     {
@@ -41,32 +41,30 @@ isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
     my $test = 1;
-    ok($step->_evaluate_inline($conf, $test),
-        "_evaluate_inline() returned true value");
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+    my $stdout;
+    my $ret = capture(
+        sub { $step->_evaluate_inline($conf, $test) },
+        \$stdout
+    );
+    ok($ret, "_evaluate_inline() returned true value");
     is($step->result, q{yes}, "Got expected result");;
     is($conf->data->get( 'inline' ), 1,
         "'inline' attribute has expected value");
 }
-untie *STDOUT;
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
     my $test = 0;
-    ok($step->_evaluate_inline($conf, $test),
-        "_evaluate_inline() returned true value");
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
+    my $stdout;
+    my $ret = capture(
+        sub { $step->_evaluate_inline($conf, $test) },
+        \$stdout
+    );
+    ok($ret, "_evaluate_inline() returned true value");
     is($step->result, q{no}, "Got expected result");;
     is($conf->data->get( 'inline' ), q{},
         "'inline' attribute has expected value");
 }
-untie *STDOUT;
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");

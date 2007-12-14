@@ -10,7 +10,7 @@ use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 use Tie::Filehandle::Preempt::Stdin;
 
 $| = 1;
@@ -57,25 +57,16 @@ $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
-my $rv;
-my ( $tie, @lines );
 {
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $rv    = $conf->runsteps;
-    @lines = $tie->READLINE;
-    undef $tie;
+    my $rv;
+    my $stdout;
+    capture ( sub {$rv    = $conf->runsteps}, \$stdout );
+    ok($rv, "runsteps() returned true value");
+    like(
+        $stdout,
+        qr/$description\.\.\./s,
+        "Got STDOUT message expected upon running $step");
 }
-ok($rv, "runsteps() returned true value");
-my $bigmsg = join q{}, @lines;
-like(
-    $bigmsg,
-    qr/$description\.\.\./s,
-    "Got STDOUT message expected upon running $step"
-);
-
-$object = undef;
-untie *STDIN;
 
 pass("Completed all tests in $0");
 

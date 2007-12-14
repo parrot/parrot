@@ -13,9 +13,9 @@ use_ok('config::init::defaults');
 use_ok('config::inter::yacc');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use Tie::Filehandle::Preempt::Stdin;
+use IO::CaptureOutput qw | capture |;
 
 my $args = process_options(
     {
@@ -50,10 +50,9 @@ can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
 {
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $ret = $step->runstep($conf);
-    my @more_lines       = $tie_out->READLINE;
+    my $rv;
+    my $stdout;
+    capture ( sub {$rv = $step->runstep($conf)}, \$stdout);
     my $possible_results = qr/^(
         no\syacc\sprogram\swas\sfound
       | yacc\sprogram\sdoes\snot\sexist\sor\sdoes\snot\sunderstand\s--version
@@ -65,10 +64,10 @@ isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
     like( $step->result(), $possible_results,
         "Response to prompt led to acceptable result:  " . $dump_msg[0] );
     if ( $dump_msg[0] eq q{no yacc program was found} ) {
-        ok( !@more_lines, "No yacc program => no prompts" );
+        ok( !$stdout, "No yacc program => no prompts" );
     }
     else {
-        ok( @more_lines, "prompts were captured" );
+        ok( $stdout, "prompts were captured" );
     }
 }
 

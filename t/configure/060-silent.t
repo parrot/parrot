@@ -11,7 +11,7 @@ use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );
@@ -53,14 +53,10 @@ is( $conf->options->{c}->{debugging},
 
 {
     my $rv;
-    my ( $tie, @lines );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $rv = $conf->runsteps;
-    @lines = $tie->READLINE;
-    ok(! @lines, "silent option worked");
+    my ($stdout);
+    capture ( sub { eval { $rv = $conf->runsteps; } }, \$stdout);
+    ok(! $stdout, "silent option worked");
 }
-untie *STDOUT;
 
 pass("Completed all tests in $0");
 

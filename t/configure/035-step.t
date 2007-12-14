@@ -11,7 +11,7 @@ use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
 use IO::Handle;
 use lib qw( lib t/configure/testlib );
-use Parrot::IO::Capture::Mini;
+use IO::CaptureOutput qw| capture |;
 
 BEGIN { use_ok('Parrot::Configure::Step'); }
 
@@ -43,17 +43,17 @@ $command = q{echo Hello world};
     my $err     = q{err};
     my $verbose = 1;
 
-    #    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-    #        or croak "Unable to tie";
-    my $rv = Parrot::Configure::Step::_run_command( $command, $out, $err, $verbose );
+    my ($rv, $stdout);
+    capture(
+        sub { $rv = Parrot::Configure::Step::_run_command(
+                $command, $out, $err, $verbose ); },
+        \$stdout,
+    );
     is( $rv, 0, "Got expected exit code of 0" );
-
-    #    my @lines = $tie_out->READLINE;
-    #    ok(@lines, "verbose output was captured");
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
-untie *STDOUT;
+
 
 $command = q{echo Hello world};
 {
@@ -88,7 +88,13 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
     my $out     = undef;
     my $err     = q{err};
     my $verbose = 0;
-    my $rv      = Parrot::Configure::Step::_run_command( $command, $out, $err, $verbose );
+    my ($rv, $stdout);
+    capture(
+        sub { $rv = Parrot::Configure::Step::_run_command(
+                $command, $out, $err, $verbose );
+        },
+        \$stdout,
+    );
     is( $rv, 0, "Got expected exit code of 0" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
@@ -101,7 +107,14 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
     my $out     = undef;
     my $err     = q{err};
     my $verbose = 1;
-    my $rv      = Parrot::Configure::Step::_run_command( $command, $out, $err, $verbose );
+    my ($rv, $stdout, $stderr);
+    capture(
+        sub { $rv = Parrot::Configure::Step::_run_command(
+                $command, $out, $err, $verbose );
+        },
+        \$stdout,
+        \$stderr,
+    );
     is( $rv, 0, "Got expected exit code of 0" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
@@ -114,7 +127,14 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
     my $out     = q{out};
     my $err     = q{/dev/null};
     my $verbose = 1;
-    my $rv      = Parrot::Configure::Step::_run_command( $command, $out, $err, $verbose );
+    my ($rv, $stdout, $stderr);
+    capture(
+        sub { $rv = Parrot::Configure::Step::_run_command(
+                $command, $out, $err, $verbose );
+        },
+        \$stdout,
+        \$stderr,
+    );
     is( $rv, 0, "Got expected exit code of 0" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
@@ -127,7 +147,14 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
     my $out     = q{&go};
     my $err     = q{err};
     my $verbose = 1;
-    my $rv      = Parrot::Configure::Step::_run_command( $command, $out, $err, $verbose );
+    my ($rv, $stdout, $stderr);
+    capture(
+        sub { $rv = Parrot::Configure::Step::_run_command(
+                $command, $out, $err, $verbose );
+        },
+        \$stdout,
+        \$stderr,
+    );
     is( $rv, 0, "Got expected exit code of 0" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
