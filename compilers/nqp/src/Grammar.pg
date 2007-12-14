@@ -143,7 +143,7 @@ token MARK_STATEMENT_END {
 ##  'unless'.
 
 rule if_statement {
-    $<sym>:=['if']
+    $<sym>=['if']
     <EXPR> <block>
     [ 'elsif' <EXPR> <block> ]*
     [ 'else' $<else>=<block> ]?
@@ -151,35 +151,35 @@ rule if_statement {
 }
 
 rule unless_statement {
-    $<sym>:=['unless']
+    $<sym>=['unless']
     <EXPR> <block>
     {*}
 }
 
 rule while_statement {
-    $<sym>:=['while'|'until'] <EXPR> <block>
+    $<sym>=['while'|'until'] <EXPR> <block>
     {*}
 }
 
 rule repeat_statement {
-    'repeat' <block> $<sym>:=['while'|'until'] <EXPR>
+    'repeat' <block> $<sym>=['while'|'until'] <EXPR>
     {*}
 }
 
 rule for_statement {
-    $<sym>:=['for'] <EXPR> <block>
+    $<sym>=['for'] <EXPR> <block>
     {*}
 }
 
 
 rule return_statement {
-    $<sym>:=['return']
+    $<sym>=['return']
     [ <EXPR> || <panic: Unable to parse argument to 'return'> ]
     {*}
 }
 
 rule make_statement {
-    $<sym>:=['make']
+    $<sym>=['make']
     [ <EXPR> || <panic: Unable to parse argument to 'make'> ]
     {*}
 }
@@ -190,7 +190,7 @@ rule inline_pir_statement {
     | 'q:to:' [ \' (<-['\n]>+) \' | \" (<-["\n]>+) \" | \< (<-[\>\n]>+) \> ]
       [:sigspace(0):ratchet(0)
         ';' \h*: \n
-        $<text>:=[ [\N*:\n]*? ]
+        $<text>=[ [\N*:\n]*? ]
         ^^ \h*: $0 \h*: \n
         <.MARK_STATEMENT_END>
       ] {*}                                    #= heredoc
@@ -214,7 +214,7 @@ token block {
 #### Subroutine and method definitions ####
 
 rule routine_def {
-    $<declarator>:=['sub'|'method']
+    $<declarator>=['sub'|'method']
     <ident>
     '(' <signature> ')'
     <block>
@@ -289,7 +289,7 @@ token colonpair {
 
 
 rule package_declarator {
-    $<sym>:=[module|class]
+    $<sym>=[module|class]
     <name>
     [
     || ';' <statement_block> {*}                           #= statement_block
@@ -299,7 +299,7 @@ rule package_declarator {
 
 
 rule scope_declarator {
-    $<declarator>:=[my|our]
+    $<declarator>=[my|our]
     <variable>
     {*}
 }
