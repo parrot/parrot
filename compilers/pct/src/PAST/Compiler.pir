@@ -270,6 +270,11 @@ Return the POST representation of a C<PAST::Block>.
     set_global '$?SUB', bpost
   outer_done:
 
+    .local pmc compiler
+    compiler = node.'compiler'()
+    if compiler goto children_compiler
+
+  children_past:
     ##  all children but last can return anything, last returns PMC
     $P0 = node.'get_array'()
     $I0 = elements $P0
@@ -282,7 +287,16 @@ Return the POST representation of a C<PAST::Block>.
     ##  result of last child is return from block
     $P0 = ops[-1]
     bpost.'push_pirop'('return', $P0)
+    goto children_done
 
+  children_compiler:
+    ##  set the compiler to use for the POST::Sub node, and
+    ##  add this block's child to it.
+    bpost.'compiler'(compiler)
+    $P0 = node[0]
+    bpost.'push'($P0)
+
+  children_done:
     ##  restore previous outer scope
     set_global '$?SUB', outerpost
 

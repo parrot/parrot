@@ -202,6 +202,13 @@ Get/set the opcode type for this node.
 .end
 
 
+.sub 'compiler' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('compiler', value, has_value)
+.end
+
+
 .sub 'add_param' :method
     .param pmc pname
     .param pmc adverbs         :slurpy :named
@@ -234,7 +241,7 @@ Get/set the opcode type for this node.
     code = new 'CodeString'
     paramlist[paramseq] = code
   have_code:
-    
+
     .local pmc paramfmt
     paramfmt = get_hll_global ['POST::Sub'], '%!paramfmt'
     $S0 = paramfmt[paramseq]
