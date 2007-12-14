@@ -596,7 +596,7 @@ and a single integer argument for the command. It returns an integer
 indicating the success or failure of the command.
 
 This opcode has been replaced with methods on the ParrotIO object, but
-is kept here for reference.
+is kept here for reference. See RT #48589
 
 The following constants are defined for the commands that C<pioctl> can
 execute:
