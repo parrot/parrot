@@ -64,16 +64,26 @@ C<target> adverbs.
     if target == 'parse' goto return_exp
     if target == 'pge::exp' goto return_exp
 
-    .local string grammar
-    .local string nsformat
-    nsformat = '.namespace'
-    grammar = adverbs['grammar']
-    if grammar == '' goto pir
-    nsformat = ".namespace [ '%0' ]"
-  pir:
     .local pmc code
     code = new 'CodeString'
-    code.'emit'(nsformat, grammar)
+
+    .local pmc ns
+    ns = adverbs['namespace']
+    if null ns goto ns_grammar
+    unless ns goto ns_grammar
+    $P0 = code.'key'(ns)
+    code.'emit'('.namespace %0', $P0)
+    goto ns_done
+  ns_grammar:
+    .local string grammar
+    grammar = adverbs['grammar']
+    if grammar == '' goto ns_root
+    code.'emit'(".namespace [ '%0' ]", grammar)
+    goto ns_done
+  ns_root:
+    code.'emit'('.namespace')
+  ns_done:
+
     $P0 = self.'root_pir'(adverbs :flat :named)
     code .= $P0
     if target != 'pir' goto bytecode
@@ -136,18 +146,27 @@ tree as a PIR code object that can be compiled.
     explabel = 'R'
     exp.pir(expcode, explabel, 'succeed')
 
+    ##   generate a :method that invokes the sub
+    code.emit(<<"      CODE", name)
+      .sub %0 :method
+          .param pmc adverbs   :slurpy :named
+          $P0 = get_global %0
+          .return $P0(self, adverbs :flat :named)
+      .end
+      CODE
+
     if cutrule goto code_cutrule
     ##   Generate the initial PIR code for a backtracking (uncut) rule.
     .local string returnop
     returnop = '.yield'
     code.emit(<<"        CODE", name, namecorou, .INTERPINFO_CURRENT_SUB)
-      .sub %0 :method
+      .sub %0
+          .param pmc mob
           .param pmc adverbs   :slurpy :named
           .const .Sub corou = %1
-          .local pmc mob
           $P0 = corou
           $P0 = clone $P0
-          mob = $P0(self, adverbs)
+          mob = $P0(mob, adverbs)
           .return (mob)
       .end
       .sub %1
@@ -167,13 +186,14 @@ tree as a PIR code object that can be compiled.
     ##   Initial code for a rule that cannot be backtracked into.
     returnop = '.return'
     code.emit(<<"        CODE", name)
-      .sub %0 :method
+      .sub %0
+          .param pmc mob
           .param pmc adverbs      :unique_reg :slurpy :named
           .local string target    :unique_reg
-          .local pmc mob, mfrom, mpos  :unique_reg
+          .local pmc mfrom, mpos  :unique_reg
           .local int cpos, iscont :unique_reg
           $P0 = get_hll_global ['PGE'], 'Match'
-          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(self, adverbs :flat :named)
+          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
         CODE
 
   code_body:
