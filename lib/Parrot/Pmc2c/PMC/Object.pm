@@ -36,7 +36,6 @@ sub pre_method_gen {
             $new_default_method->signature;
         my $void_return  = $return_type_char eq 'v' ? 'return;'    : '';
         my $return       = $return_type_char eq 'v' ? ''           : $return_prefix;
-        my $super_return = $return_type_char eq 'v' ? $void_return : $null_return;
         my $superargs    = $args;
         $superargs       =~ s/^,//;
 
