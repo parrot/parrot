@@ -136,23 +136,6 @@ Find the method for C<*name> in the parent class of the bound object.
 }
 
 /*
-
-=back
-
-=head1 SEE ALSO
-
-F<src/pmc/parrotobject.pmc>
-
-=head1 HISTORY
-
-Initial revision by leo 2005.07.31.
-
-=cut
-
-*/
-
-
-/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
