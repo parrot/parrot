@@ -23,7 +23,7 @@ the is no 'petite 7.3' around.
 
 =head1 TODO
 
-- Add a proper check whether 'petite' is installed.
+- add the other unary function from the tutorial
 - In the longterm, Eclectus should become self-hosting
 
 =head1 AUTHOR

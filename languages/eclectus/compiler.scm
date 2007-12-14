@@ -10,6 +10,9 @@
 # EclectusBoolean is defined here
 .loadlib 'eclectus_group'
 
+# for devel
+.include 'library/dumper.pir'
+
 .namespace
 
 .sub '__onload' :init
@@ -27,9 +30,9 @@
 "
 .sub drive :main
 
-    .local pmc val_x
-    ( val_x ) = scheme_entry()
-    # _dumper( val_x, 'val_x' )
+    .local pmc val_ret
+    ( val_ret ) = scheme_entry()
+    # _dumper( val_ret, 'val_ret' )
 
     .local pmc var_last
     var_last = new 'PAST::Var'
@@ -37,7 +40,7 @@
                
     .local pmc op_bind
     op_bind = new 'PAST::Op'
-    op_bind.init( var_last, val_x, 'pasttype' => 'bind' )
+    op_bind.init( var_last, val_ret, 'pasttype' => 'bind' )
            
     .local pmc op_say
     op_say = new 'PAST::Op'
@@ -97,64 +100,75 @@
   (cond
      [(fixnum? x) (format
 "
-    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => ~a, 'returns' => 'Integer' )
-    .return ( val_x )
-.end
 " x )]
      [(char? x) (format
 "
-    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
-    .return ( val_x )
-.end
 " (char->integer x) )]
      [(and (list? x) (= (length x) 0 ))
 "
-    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
-    .return ( val_x )
-.end
 " ]
      [(boolean? x)
         (if x 
 "
-    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-    .return ( val_x )
-.end
 "
 "
-    .local pmc val_x
     val_x = new 'PAST::Val'
     val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-    .return ( val_x )
-.end
 " )]))
 
 ; a unary function is a symbol with the properties
 ; *is-prim*, *arg-count* and *emitter*
 (define-syntax define-primitive
   (syntax-rules ()
-    [(_ (prim-name arg) b)
+    [(_ (prim-name arg) b b* ...)
      (begin
         (putprop 'prim-name '*is-prim*
           #t)
         (putprop 'prim-name '*arg-count*
-          (length '(arg*)))
+          (length '(arg)))
         (putprop 'prim-name '*emitter*
-          (lambda (arg) b)))]))
+          (lambda (arg) b b* ...)))]))
 
 ; add implementation of functions
 (define-primitive (fxadd1 arg)
-  (emit-expr arg))
+  (emit-expr arg)
+  (emit "$P0 = val_x")
+  (emit-immediate 1)
+  (emit "$P1 = val_x")
+  (emit
+"
+  val_x = new 'PAST::Op'
+  val_x.init( $P0, $P1, 'name' => 'infix:+', 'pirop' => 'n_add' )
+  #_dumper( val_x, 'val_x' )
+"))
+
+; a getter of '*emitter*'
+(define (primitive-emitter x)
+  (getprop x '*emitter*))
 
 (define (emit-function-header function-name)
-  (emit (string-append ".sub " function-name)))
+  (emit (string-append ".sub " function-name))
+  (emit ".local pmc val_x"))
+
+(define (emit-function-footer)
+  (emit 
+"
+  .return( val_x )
+.end
+"))
+
+
+(define (emit-primcall expr)
+  (let ([prim (car expr)] [args (cdr expr)])
+    (apply (primitive-emitter prim) args)))
 
 (define (emit-immediate x)
   (emit (immediate-rep x)))
@@ -162,7 +176,7 @@
 (define (emit-expr expr)
   (cond
     [(immediate? expr) (emit-immediate expr)]
-    [(primcall? expr)  (emit "#calling a primitive")])) 
+    [(primcall? expr)  (emit-primcall expr)])) 
 
 ; the actual compiler
 (define (compile-program x)
@@ -170,4 +184,5 @@
   (emit-driver)
   (emit-builtins)
   (emit-function-header "scheme_entry")
-  (emit-expr x)) 
+  (emit-expr x) 
+  (emit-function-footer))

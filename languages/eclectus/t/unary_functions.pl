@@ -27,9 +27,8 @@ if ( ! $has_petite ) {
     plan skip_all => 'petite 7.3 is needed for running this test';
 }
 else {
-    plan skip_all => 'unary functions are not implemented yet';
-    #chdir 'eclectus';
-    #exec 'petite', '--script', "t/$t_fn";
+    chdir 'eclectus';
+    exec 'petite', '--script', "t/$t_fn";
 }
 
 # Local Variables:
