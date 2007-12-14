@@ -44,15 +44,15 @@ STRING * int_to_str(PARROT_INTERP,
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * Parrot_make_COW_reference(PARROT_INTERP, ARGIN(STRING *s))
+STRING * Parrot_make_COW_reference(PARROT_INTERP, ARGINOUT(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_reuse_COW_reference(SHIM_INTERP,
-    NOTNULL(STRING *s),
-    NOTNULL(STRING *d))
+    ARGINOUT(STRING *s),
+    ARGOUT(STRING *d))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -108,7 +108,7 @@ STRING* Parrot_string_trans_encoding(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_unmake_COW(PARROT_INTERP, ARGIN(STRING *s))
+void Parrot_unmake_COW(PARROT_INTERP, ARGINOUT(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -163,12 +163,12 @@ UINTVAL string_capacity(SHIM_INTERP, ARGIN(const STRING *s))
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-STRING * string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
+STRING * string_chopn(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void string_chopn_inplace(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
+void string_chopn_inplace(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -208,7 +208,7 @@ STRING * string_concat(PARROT_INTERP,
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * string_copy(PARROT_INTERP, NOTNULL(STRING *s))
+STRING * string_copy(PARROT_INTERP, ARGINOUT(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -416,7 +416,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING * string_set(PARROT_INTERP,
     ARGOUT(STRING *dest),
-    NOTNULL(STRING *src))
+    ARGINOUT(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

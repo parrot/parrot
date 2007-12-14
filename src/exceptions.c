@@ -214,7 +214,7 @@ Push an action handler onto the dynamic environment.
 
 PARROT_API
 void
-Parrot_push_action(PARROT_INTERP, NOTNULL(PMC *sub))
+Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
 {
     if (!VTABLE_isa(interp, sub,
                 const_string(interp, "Sub"))) {
@@ -499,8 +499,7 @@ pop_exception(PARROT_INTERP)
         real_exception(interp, NULL, E_RuntimeError,
                 "No exception to pop.");
     }
-    (void)stack_pop(interp, &interp->dynamic_env,
-                    NULL, STACK_ENTRY_PMC);
+    (void)stack_pop(interp, &interp->dynamic_env, NULL, STACK_ENTRY_PMC);
 }
 
 /*
@@ -900,7 +899,7 @@ C<throw_exception>, which calls the handler.
 PARROT_API
 PARROT_DOES_NOT_RETURN
 void
-real_exception(PARROT_INTERP, NULLOK(void *ret_addr),
+real_exception(PARROT_INTERP, ARGIN_NULLOK(void *ret_addr),
         int exitcode, ARGIN(const char *format), ...)
 {
     STRING *msg;

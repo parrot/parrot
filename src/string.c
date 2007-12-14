@@ -75,7 +75,7 @@ copied over and the copy-on-write flag is cleared.
 
 PARROT_API
 void
-Parrot_unmake_COW(PARROT_INTERP, ARGIN(STRING *s))
+Parrot_unmake_COW(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     PARROT_ASSERT(s);
 
@@ -129,7 +129,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, ARGIN(STRING *s))
+Parrot_make_COW_reference(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     STRING *d;
 
@@ -182,7 +182,7 @@ using the one passed in and returns it.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_reuse_COW_reference(SHIM_INTERP, NOTNULL(STRING *s), NOTNULL(STRING *d))
+Parrot_reuse_COW_reference(SHIM_INTERP, ARGINOUT(STRING *s), ARGOUT(STRING *d))
 {
     PARROT_ASSERT(s);
 
@@ -214,7 +214,7 @@ second.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_set(PARROT_INTERP, ARGOUT(STRING *dest), NOTNULL(STRING *src))
+string_set(PARROT_INTERP, ARGOUT(STRING *dest), ARGINOUT(STRING *src))
 {
     if (dest == src)
         return dest;
@@ -900,7 +900,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_copy(PARROT_INTERP, NOTNULL(STRING *s))
+string_copy(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     return Parrot_make_COW_reference(interp, s);
 }
@@ -1284,7 +1284,7 @@ string is a copy of the one passed in.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
+string_chopn(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL n)
 {
     STRING * const chopped = string_copy(interp, s);
     string_chopn_inplace(interp, chopped, n);
@@ -1305,7 +1305,7 @@ passed in is modified and returned.
 
 PARROT_API
 void
-string_chopn_inplace(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
+string_chopn_inplace(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL n)
 {
     UINTVAL new_length, uchar_size;
     String_iter iter;
