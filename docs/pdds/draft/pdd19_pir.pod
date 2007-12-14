@@ -755,20 +755,30 @@ the PIR compiler handles the following directives:
 
 =over 4
 
-=item * C<.include>
+=item * C<.include> "<filename>"
 
 The C<.include> directive takes a string argument that contains the
 name of the PIR file that is included.
 
-=item * C<.macro>
+=item * C<.macro> <identifier> [<parameters>]
 
-The C<.macro> directive starts the definition of a macro.
+The C<.macro> directive starts the definition of a macro named by the specified
+identifier. The optional parameter list is a comma-separated list of identifiers, 
+enclosed in parentheses.
+See C<.endm> for ending the macro definition.
 
-=item * C<.macro_const> (Not Implemented: See RT #48563)
+=item * <.endm>
+
+Closes a macro definition.
+
+=item * C<.macro_const> <identifier> (<literal>|<reg>)
+
+ .macro_const	PI	3.14
 
 The C<.macro_const> directive is a special type of macro; it allows the user to
 use a symbolic name for a constant value. Like C<.macro>, the substitution
-occurs at compile time.
+occurs at compile time. It takes two arguments (not comma separated), the first 
+is an identifier, the second a constant value or a register.
 
 {{ NOTE: C<.constant> is deprecated, replaced by C<.macro_const>. 
 See RT #48561 }}
