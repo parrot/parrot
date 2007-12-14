@@ -779,8 +779,8 @@ string_index(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
 
 Returns the character position of the second Parrot string in the first
 at or after C<start>. The return value is a (0 based) offset in
-characters, not bytes. If second string is not specified, then return
--1.
+characters, not bytes. If second string is not found in the first string,
+then return -1.
 
 =cut
 
