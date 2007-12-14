@@ -289,7 +289,7 @@ declaration with C<METHOD>.
   METHOD inspect(STRING *what :optional, int got_what :opt_flag) {...}
 
 [NOTE: There is an older C<METHOD> keyword, which is deprecated. The
-current C<PCCMETHOD> will be renamed to C<METHOD>.]
+current C<PCCMETHOD> will be renamed to C<METHOD>. See: RT#48565]
 
 =head2 PMCs and Namespaces
 
@@ -652,16 +652,15 @@ should not be NULL.
 
 Return the entire property hash for I<self>.
 
-=item type
+=item type [deprecated: See RT #48567]
 
   INTVAL type(INTERP, PMC* self)
 
 Return the type of the PMC. Type is a unique number associated with the PMC when
 the PMC's class is loaded. Negative numbers are considered
-interpreter-specific, non-public types. [NOTE: will be deprecated when type IDs
-are deprecated.]
+interpreter-specific, non-public types. 
 
-=item subtype [deprecated]
+=item subtype [deprecated: See RT #48569]
 
   UINTVAL subtype(INTERP, PMC* self, INTVAL type)
 
@@ -880,15 +879,15 @@ function.
 Return the string value for the element indexed by a PMC, integer, or string
 key. The key is guaranteed not to be NULL for this function.
 
-=item get_bool_keyed [deprecated]
+=item get_bool_keyed [deprecated: See RT #48571]
 
 Return the boolean value for the element indexed by a PMC key.
 
-=item get_bool_keyed_int [deprecated]
+=item get_bool_keyed_int [deprecated: See RT #48573]
 
 Return the boolean value for the element indexed by an integer key.
 
-=item get_bool_keyed_str [deprecated]
+=item get_bool_keyed_str [deprecated: See RT #48575]
 
 Return the boolean value for the element indexed by a string key.
 
@@ -955,15 +954,14 @@ copying the value of another PMC.
 
 Set the pointer value of the element indexed by a PMC, integer, or string key.
 
-=item type_keyed
+=item type_keyed [deprecated: see individual tickets below]
 
-  INTVAL type_keyed(INTERP, PMC* self, PMC* key)
-  INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key)
-  INTVAL type_keyed_str(INTERP, PMC* self, STRING* key)
+  INTVAL type_keyed(INTERP, PMC* self, PMC* key) [RT #48577]
+  INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key) [RT #48579]
+  INTVAL type_keyed_str(INTERP, PMC* self, STRING* key) [RT #48581]
 
 Return the type number of the PMC indexed by a PMC, integer, or string key.
-The I<key> parameter is guaranteed not to be NULL for this method. [NOTE: To be
-deprecated when type IDs are deprecated.]
+The I<key> parameter is guaranteed not to be NULL for this method.
 
 =item pop_integer
 
@@ -1538,23 +1536,17 @@ Return a true value if the PMC C<does> (composes) or C<performs>
 
 =item get_attr
 
-  PMC* get_attr(INTERP, PMC* self, INTVAL idx) [deprecated]
+  PMC* get_attr(INTERP, PMC* self, INTVAL idx) [deprecated: see RT #48583]
   PMC* get_attr_str(INTERP, PMC* self, STRING* idx)
 
 Retrieve an attribute value from the PMC (instance object).
 
-[NOTE: Integer index lookups for attributes are deprecated with the new
-object metamodel.]
-
 =item set_attr
 
-  void set_attr(INTERP, PMC* self, INTVAL idx, PMC* value) [deprecated]
+  void set_attr(INTERP, PMC* self, INTVAL idx, PMC* value) [deprecated: See RT #48585]
   void set_attr_str(INTERP, PMC* self, STRING* idx, PMC* value)
 
 Store an attribute value in the PMC (instance object).
-
-[NOTE: Integer index lookups for attributes are deprecated with the new
-object metamodel.]
 
 =item add_parent
 
@@ -1621,19 +1613,6 @@ Add a vtable override to the PMC (class object).
   void remove_vtable_override(INTERP, PMC* self, STRING* vtable_name)
 
 Remove a vtable override from the PMC (class object).
-
-=item subclass [deprecated]
-
-  PMC* subclass(INTERP, PMC* self, PMC* name)
-
-Create a subclass of a PMC (class object) with the name given in
-I<name>.
-
-[NOTE: this operation can be performed by creating a new class and
-adding a parent to it. We will keep the C<subclass> opcode, but
-implement it using this more direct route. (With the added advantage of
-increased abstraction, allowing multiple object metamodels more
-easily.)]
 
 =item find_method
 
@@ -1731,14 +1710,6 @@ The PMC wrapper for Parrot's low-level BigNum type.
 A complex number, consisting of a real part and an imaginary part.
 {{ NOTE: is this a complete and useful implementation of complex
 numbers? }}
-
-=item ParrotClass [deprecated]
-
-The PMC for Parrot's class. 
-
-=item ParrotObject [deprecated]
-
-The PMC for Parrot's base object type.
 
 =item Class
 

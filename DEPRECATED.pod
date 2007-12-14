@@ -12,14 +12,60 @@ yet been established.
 When deprecated items are removed, all usage of the feature in the
 repository should be updated or removed; including documentation.
 
-=head1 new object system [post 0.5.0]
+=head1 PMC syntax
 
-The object system of Parrot is being overhauled. This touches some opcode
-and PIR syntax. So some deprecation can be found in pdd17_pmc.pod.
+=over 4
+
+=item * C<METHOD> [post 0.5.2]
+
+The current C<METHOD> syntax will be deleted and the current C<PCCMETHOD>
+syntax will replace it under the name C<METHOD>. See RT #48565.
+
+=back
 
 =head1 vtable entries
 
 =over 4
+
+=item * C<get_attr> [post 0.5.2]
+
+See RT #48583
+
+=item * C<set_attr> [post 0.5.2]
+
+See RT #48585
+
+=item * C<type_keyed> [post 0.5.2]
+
+See RT #48577
+
+=item * C<type_keyed_int> [post 0.5.2]
+
+See RT #48579
+
+=item * C<type_keyed_str> [post 0.5.2]
+
+See RT #48581
+
+=item * C<get_bool_keyed> [post 0.5.2]
+
+See RT #48571
+
+=item * C<get_bool_keyed_int> [post 0.5.2]
+
+See RT #48573
+
+=item * C<get_bool_keyed_str> [post 0.5.2]
+
+See RT #48575
+
+=item * C<type> [post 0.5.2]
+
+See RT #48567
+
+=item * C<subtype> [post 0.5.2]
+
+See RT #48569
 
 =item * C<hash> [post 0.5.1]
 
