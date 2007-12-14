@@ -97,7 +97,7 @@ token integer {
 }
 
 token variable {
-    $<name>:=[ <[a..z]> <[_a..z0..9]>* ]
+    $<name>=[ <[a..z]> <[_a..z0..9]>* ]
     [ '(' <expression> ')' {*}                   #= call
     | <.null> {*}                                #= var
     ]
