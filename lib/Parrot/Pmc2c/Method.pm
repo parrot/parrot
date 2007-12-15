@@ -7,7 +7,7 @@ use constant VTABLE_ENTRY => 'VTABLE_ENTRY';
 use constant VTABLE       => 'VTABLE';
 use constant NON_VTABLE   => 'NON_VTABLE';
 use Carp;
-use Parrot::Pmc2c::UtilFunctions qw(count_newlines);
+use Parrot::Pmc2c::UtilFunctions qw(count_newlines args_from_parameter_list passable_args_from_parameter_list);
 
 sub new {
     my ( $class, $self_hash ) = @_;
@@ -99,17 +99,11 @@ Returns the method signature for the methods $parameters
 sub signature {
     my ($self) = @_;
 
-    my $return_type = $self->return_type;
-    my $n           = 0;
-    my ( @types, @args );
-
-    for my $x ( split / /, $self->parameters ) {
-        push @{ ( $n++ & 1 ) ? \@args : \@types }, $x;
-    }
-
-    my $args             = @args ? ", " . join( ' ', @args ) : '';
+    my $args             = passable_args_from_parameter_list( $self->parameters );
+    my ($types,$vars)    = args_from_parameter_list( $self->parameters );
+    my $return_type      = $self->return_type;
     my $return_type_char = $self->trans($return_type);
-    my $sig              = $self->trans($return_type) . join '', map { $self->trans($_) } @types;
+    my $sig              = $self->trans($return_type) . join '', map { $self->trans($_) } @{$types};
     my $return_prefix    = '';
     my $method_suffix    = '';
 

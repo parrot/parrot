@@ -6,9 +6,49 @@ use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw( count_newlines gen_ret dont_edit dynext_load_code
-    c_code_coda slurp spew splat open_file filename escape_filename );
+    c_code_coda slurp spew splat open_file filename escape_filename
+    args_from_parameter_list
+    passable_args_from_parameter_list
+);
 
 =over 4
+
+=item C<passable_args_from_parameter_list( $parms )>
+
+Given I<$parms> like C<const STRING *foo, int bar>, returns C<, foo, bar>.
+It's handy for passing into function calls.
+
+=cut
+
+sub passable_args_from_parameter_list {
+    my $parameters = shift;
+
+    my ($types,$vars) = args_from_parameter_list( $parameters );
+
+    return @{$vars} ? ', ' . join( ', ', @{$vars} ) : '';
+}
+
+=item C<args_from_parameter_list( $parms )>
+
+Returns two arrayrefs of arg types and var names.
+
+=cut
+
+sub args_from_parameter_list {
+    my $parameters = shift;
+
+    my @types;
+    my @vars;
+    my @parms = split /\s*,\s*/, $parameters;
+
+    for my $parm ( @parms ) {
+        $parm =~ /^(.+)\s+(\S+)$/ or die qq{Can't parse "$parm"};
+        push( @types, $1 );
+        push( @vars, $2 );
+    }
+    return \@types, \@vars;
+}
+
 
 =item C<count_newlines($string)>
 

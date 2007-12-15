@@ -11,7 +11,7 @@ package Parrot::Pmc2c::PMC::Ref;
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
+use Parrot::Pmc2c::UtilFunctions qw( gen_ret passable_args_from_parameter_list );
 
 =item C<prederef($method)>
 
@@ -70,10 +70,7 @@ sub pre_method_gen {
             }
         );
 
-        my $n    = 0;
-        my @args = grep { $n++ & 1 ? $_ : 0 } split / /, $method->parameters;
-        my $arg  = @args ? ", " . join( ' ', @args ) : '';
-
+        my $arg        = passable_args_from_parameter_list( $method->parameters );
         my $pre        = $self->prederef($method);
         my $post       = $self->postderef($method);
         my $deref      = $self->raw_deref($method);

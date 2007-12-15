@@ -6,7 +6,7 @@ package Parrot::Pmc2c::PMC::deleg_pmc;
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
+use Parrot::Pmc2c::UtilFunctions qw( gen_ret passable_args_from_parameter_list );
 
 =over 4
 
@@ -35,9 +35,7 @@ sub pre_method_gen {
             }
         );
 
-        my $n    = 0;
-        my @args = grep { $n++ & 1 ? $_ : 0 } split / /, $method->parameters;
-        my $arg  = @args ? ", " . join( ' ', @args ) : '';
+        my $arg  = passable_args_from_parameter_list( $method->parameters );
         my $ret  = gen_ret( $method, "VTABLE_$vt_method_name(interp, attr$arg)" );
         $new_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     PMC * const attr = get_attrib_num(PMC_data_typed(pmc, SLOTTYPE *), 0);
