@@ -23,6 +23,17 @@ The caller has to preserve registers if needed.
 */
 
 #include "parrot/parrot.h"
+
+/* NCI PMC's underlying struct. */
+typedef struct Parrot_NCI {
+    STRING *signature;    /* The signature. */
+    int arity;            /* Cached arity of the NCI. */
+	funcptr_t *func;      /* Function pointer to what we'll call. */
+} Parrot_NCI;
+
+/* Macro to access underlying structure of an NCI PMC. */
+#define PARROT_NCI(o) ((Parrot_NCI *) PMC_data(o))
+
 pmclass NCI need_ext {
 
 /*
@@ -67,6 +78,9 @@ Initializes the NCI with a C<NULL> function pointer.
     void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF)    = PMCNULL;
+		PMC_data(SELF)       = mem_sys_allocate_zeroed(sizeof(Parrot_NCI));
+        
+        /* Mark that we're not a raw NCI. */
         PObj_flag_CLEAR(private2, SELF);
     }
 
@@ -81,9 +95,17 @@ Sets the specified function pointer and signature (C<*key>).
 */
 
     void set_pointer_keyed_str(STRING *key, void *func) {
-        /* key = signature */
+        Parrot_NCI *nci_info = PARROT_NCI(SELF);
+
+		/* Store the original function and signature. */
         PMC_struct_val(SELF) = func;
-        PMC_data(SELF)       = build_call_func(INTERP, SELF, key);
+		nci_info->signature  = key;
+
+		/* Arity is length of that string minus one (the return type). */
+		nci_info->arity      = string_length(INTERP, key);
+
+		/* Build call function. */
+        nci_info->func       = build_call_func(INTERP, SELF, key);
     }
 
 /*
@@ -97,8 +119,12 @@ Destroys the NCI, freeing any allocated memory.
 */
 
     void destroy() {
-        if (PMC_data(SELF))
-            mem_free_executable(PMC_data(SELF));
+        if (PMC_data(SELF)) {
+			Parrot_NCI *nci_info = PARROT_NCI(SELF);
+			if (nci_info->func)
+				mem_free_executable(nci_info->func);
+			mem_sys_free(nci_info);
+		}
     }
 
 /*
@@ -112,15 +138,22 @@ Creates and returns a clone of the NCI.
 */
 
     PMC *clone() {
+        Parrot_NCI *nci_info_self = PARROT_NCI(SELF);
+        Parrot_NCI *nci_info_ret;
+        
         PMC * const ret     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret)    = PMCNULL;
+        PMC_data(ret)       = mem_sys_allocate_zeroed(sizeof(Parrot_NCI));
+        nci_info_ret = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need
          * the length of data here, to memcpy it
          * ManagedStruct or Buffer?
          */
-        PMC_data(ret)        = PMC_data(SELF);
+        nci_info_ret->func = nci_info_self->func;
+        nci_info_ret->signature = nci_info_self->signature;
+        nci_info_ret->arity = nci_info_self->arity;
         PObj_get_FLAGS(ret) |= (PObj_get_FLAGS(SELF) & 0x7);
 
         return ret;
@@ -137,7 +170,8 @@ Returns whether the NCI is defined.
 */
 
     INTVAL defined() {
-        return PMC_data(SELF) ? !PMC_IS_NULL(PMC_data(SELF)) : 0;
+		Parrot_NCI *nci_info = PARROT_NCI(SELF);
+        return nci_info->func != NULL;
     }
 
 /*
@@ -153,11 +187,13 @@ shifted down.
 */
 
     opcode_t *invoke(void *next) {
-        typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
+        Parrot_NCI *nci_info = PARROT_NCI(SELF);
+
+		typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
             ? (nci_sub_t) PMC_struct_val(SELF)
-            : PMC_data_typed(SELF, nci_sub_t);
+            : (nci_sub_t) D2FPTR(nci_info->func);
 
         PMC *cont;
 
@@ -195,7 +231,8 @@ Returns the function pointer as an integer.
 */
 
     INTVAL get_integer() {
-        return (INTVAL)PMC_data(SELF);
+		Parrot_NCI *nci_info = PARROT_NCI(SELF);
+        return (INTVAL)nci_info->func;
     }
 
 /*
@@ -209,7 +246,8 @@ Returns the boolean value of the pointer.
 */
 
     INTVAL get_bool() {
-        return (0 != (INTVAL)PMC_data(SELF));
+        Parrot_NCI *nci_info = PARROT_NCI(SELF);
+		return (0 != (INTVAL)nci_info->func);
     }
 
 }
