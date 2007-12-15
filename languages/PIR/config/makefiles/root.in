@@ -1,108 +1,165 @@
+# $Id$
 
+## arguments we want to run parrot with
+PARROT_ARGS =
 
-# Setup some commands
-LN_S     = @lns@
-PERL     = @perl@
-RM_F     = @rm_f@
-PARROT   = ../../parrot@exe@
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
-CP       = @cp@
+## configuration settings
+BUILD_DIR     = @build_dir@
+LOAD_EXT      = @load_ext@
+O             = @o@
 
-PGE_LIBRARY  = @build_dir@/runtime/parrot/library/PGE
+## Setup some commands
+LN_S          = @lns@
+PERL          = @perl@
+RM_RF         = @rm_rf@
+CP            = @cp@
+PARROT        = ../../parrot@exe@
+CAT           = $(PERL) -MExtUtils::Command -e cat
+BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
+RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+
+## places to look for things
+PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
+PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
+PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
+NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
+PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
+
+PMC_DIR       = src/pmc
+
+all: pirc.pbc 
+
+#PERL6_GROUP = $(PMC_DIR)/perl6_group$(LOAD_EXT)
+
+SOURCES = pirc.pir \
+  src/gen_grammar.pir \
+  src/gen_actions.pir \
+  src/pasm/gen_pasm.pir \
+  src/pasm/gen_pasm_args.pir \
+  src/pasm/gen_pasm_instr.pir \
+  src/pasm/gen_pasm_core.pir \
+  src/pasm/gen_pasm_io.pir \
+  src/pasm/gen_pasm_pmc.pir  
+
+PASMGRAMMAR = src/pasm/gen_pasm.pbc \
+  src/pasm/gen_pasm_instr.pbc \
+  src/pasm/gen_pasm_io.pbc \
+  src/pasm/gen_pasm_pmc.pbc \
+  src/pasm/gen_pasm_args.pbc \
+  src/pasm/gen_pasm_core.pbc
 
 # the default target
-all: pir.pbc
+pirc.pbc: $(PARROT) $(SOURCES) $(PASMGRAMMAR)
+	$(PARROT) $(PARROT_ARGS) -o pirc.pbc pirc.pir
 
-### split up grammar file for faster compiling:
+src/gen_grammar.pir: $(PERL6GRAMMAR) src/pir.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --output=src/gen_grammar.pir \
+	    src/pir.pg
 
-# PASM Grammar file
-lib/pasm_grammar_gen.pir: lib/pasm.pg
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/pasm_grammar_gen.pir lib/pasm.pg
+src/gen_actions.pir: $(NQP) $(PCT) src/actions.pm
+	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
+	    --target=pir src/actions.pm
 
-lib/pasm_grammar_gen.pbc: lib/pasm.pg lib/pasm_grammar_gen.pir
-	$(PARROT) -o lib/pasm_grammar_gen.pbc --output-pbc lib/pasm_grammar_gen.pir
+src/pasm/gen_pasm.pir: $(PERL6GRAMMAR) src/pasm/pasm.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --output=src/pasm/gen_pasm.pir \
+	    src/pasm/pasm.pg
 
+src/pasm/gen_pasm_args.pir: $(PERL6GRAMMAR) src/pasm/pasm_args.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --output=src/pasm/gen_pasm_args.pir \
+	    src/pasm/pasm_args.pg
 
-# PASM arguments file
-lib/pasm_args_gen.pir: lib/pasm_args.pg
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/pasm_args_gen.pir lib/pasm_args.pg
+src/pasm/gen_pasm_instr.pir: $(PERL6GRAMMAR) src/pasm/pasm_instr.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --output=src/pasm/gen_pasm_instr.pir \
+	    src/pasm/pasm_instr.pg
 
-lib/pasm_args_gen.pbc: lib/pasm_args.pg lib/pasm_args_gen.pir
-	$(PARROT) -o lib/pasm_args_gen.pbc --output-pbc lib/pasm_args_gen.pir
+src/pasm/gen_pasm_core.pir: $(PERL6GRAMMAR) src/pasm/pasm_core.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --output=src/pasm/gen_pasm_core.pir \
+	    src/pasm/pasm_core.pg
 
+src/pasm/gen_pasm_io.pir: $(PERL6GRAMMAR) src/pasm/pasm_io.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --output=src/pasm/gen_pasm_io.pir \
+	    src/pasm/pasm_io.pg
 
-# PASM instructions file
-lib/pasm_instr_gen.pir: lib/pasm_instr.pg
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/pasm_instr_gen.pir lib/pasm_instr.pg
+src/pasm/gen_pasm_pmc.pir: $(PERL6GRAMMAR) src/pasm/pasm_pmc.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --output=src/pasm/gen_pasm_pmc.pir \
+	    src/pasm/pasm_pmc.pg
 
-lib/pasm_instr_gen.pbc: lib/pasm_instr_gen.pir
-	$(PARROT) -o lib/pasm_instr_gen.pbc --output-pbc lib/pasm_instr_gen.pir
+src/pasm/gen_pasm.pbc: src/pasm/gen_pasm.pir
+	$(PARROT) --output-pbc -o src/pasm/gen_pasm.pbc src/pasm/gen_pasm.pir
 
-lib/pasm_io_gen.pir: lib/pasm_io.pg
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/pasm_io_gen.pir lib/pasm_io.pg
+src/pasm/gen_pasm_instr.pbc: src/pasm/gen_pasm_instr.pir
+	$(PARROT) --output-pbc -o src/pasm/gen_pasm_instr.pbc src/pasm/gen_pasm_instr.pir
 
-lib/pasm_io_gen.pbc: lib/pasm_io_gen.pir
-	$(PARROT) -o lib/pasm_io_gen.pbc --output-pbc lib/pasm_io_gen.pir
+src/pasm/gen_pasm_args.pbc: src/pasm/gen_pasm_args.pir
+	$(PARROT) --output-pbc -o src/pasm/gen_pasm_args.pbc src/pasm/gen_pasm_args.pir
+	
+src/pasm/gen_pasm_io.pbc: src/pasm/gen_pasm_io.pir
+	$(PARROT) --output-pbc -o src/pasm/gen_pasm_io.pbc src/pasm/gen_pasm_io.pir
 
-lib/pasm_pmc_gen.pir: lib/pasm_pmc.pg
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/pasm_pmc_gen.pir lib/pasm_pmc.pg
+src/pasm/gen_pasm_pmc.pbc: src/pasm/gen_pasm_pmc.pir
+	$(PARROT) --output-pbc -o src/pasm/gen_pasm_pmc.pbc src/pasm/gen_pasm_pmc.pir
 
-lib/pasm_pmc_gen.pbc: lib/pasm_pmc_gen.pir
-	$(PARROT) -o lib/pasm_pmc_gen.pbc --output-pbc lib/pasm_pmc_gen.pir
+src/pasm/gen_pasm_core.pbc: src/pasm/gen_pasm_core.pir
+	$(PARROT) --output-pbc -o src/pasm/gen_pasm_core.pbc src/pasm/gen_pasm_core.pir
+	
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=PIR
 
-
-lib/pasm_core_gen.pir: lib/pasm_core.pg
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/pasm_core_gen.pir lib/pasm_core.pg
-
-lib/pasm_core_gen.pbc: lib/pasm_core_gen.pir
-	$(PARROT) -o lib/pasm_core_gen.pbc --output-pbc lib/pasm_core_gen.pir
-
-# PIR Grammar file
-lib/pir_grammar_gen.pir: lib/pir.pg
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=lib/pir_grammar_gen.pir lib/pir.pg
-
-lib/pir_grammar_gen.pbc: lib/pir_grammar_gen.pir
-	$(PARROT) -o lib/pir_grammar_gen.pbc --output-pbc lib/pir_grammar_gen.pir
-
-
-# Main file
-pir.pbc: pirc.pir lib/pir_grammar_gen.pbc lib/pasm_grammar_gen.pbc lib/pasm_args_gen.pbc lib/pasm_instr_gen.pbc lib/pasm_io_gen.pbc lib/pasm_pmc_gen.pbc lib/pasm_core_gen.pbc lib/ASTGrammar.pbc lib/Grammar/Actions.pbc
-	$(PARROT) -o pir.pbc --output-pbc pirc.pir
-
-
-lib/ASTGrammar.pbc: lib/ASTGrammar.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/ASTGrammar.pir lib/ASTGrammar.tg
-	$(PARROT) -o lib/ASTGrammar.pbc --output-pbc lib/ASTGrammar.pir
-
-lib/Grammar/Actions.pbc: lib/Grammar/Actions.pir
-	$(PARROT) -o lib/Grammar/Actions.pbc --output-pbc lib/Grammar/Actions.pir
+# This is a listing of all targets, that are meant to be called by users
+help:
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  all:               perl6.pbc"
+	@echo "                     This is the default."
+	@echo "Testing:"
+	@echo "  test:              Run the test suite."
+	@echo "  testclean:         Clean up test results."
+	@echo "  spectest:          Run the official Perl 6 tests"
+	@echo ""
+	@echo "Cleaning:"
+	@echo "  clean:             Basic cleaning up."
+	@echo "  realclean:         Removes also files generated by 'Configure.pl'"
+	@echo "  distclean:         Removes also anything built, in theory"
+	@echo ""
+	@echo "Misc:"
+	@echo "  help:              Print this help message."
+	@echo ""
 
 test: all
-	$(PERL) -Ilib -I../../lib t/harness
+	$(PERL) t/harness t/00-parrot t/01-sanity
 
+# this target has nothing to do
+testclean:
+
+spectest: all t/spec
+# XXX when tests pass, run more here.
+	@echo "only running sanity tests..."
+	$(PERL) t/harness t/spec/01-sanity t/spec/operators t/spec/builtins \
+                          t/spec/builtins/math
+
+t/spec:
+	$(PERL) t/fetchspec
+
+CLEANUPS = \
+  pirc.pbc \
+  src/gen_grammar.pir \
+  src/gen_actions.pir \
+  src/gen_builtins.pir \
+  
 
 clean:
-	$(RM_F) pir.pbc \
-  lib/pir_grammar_gen.pir \
-  lib/pasm_ops_grammar_gen.pir \
-  lib/pasm_args_gen.pir \
-  lib/pasm_instr_gen.pir \
-  lib/pasm_ops_grammar_gen.pbc \
-  lib/pasm_args_gen.pbc \
-  lib/pasm_instr_gen.pbc \
-  lib/pasm_grammar_gen.pir \
-  lib/pasm_grammar_gen.pbc \
-  lib/pir_grammar_gen.pbc \
-  lib/pasm_io_gen.pir \
-  lib/pasm_io_gen.pbc \
-  lib/pasm_pmc_gen.pir \
-  lib/pasm_pmc_gen.pbc \
-  lib/pasm_core_gen.pir \
-  lib/pasm_core_gen.pbc \
-  lib/ASTGrammar.pir \
-  lib/ASTGrammar.pbc \
-  lib/Grammar/Actions.pbc
+	$(RM_RF) $(CLEANUPS)
 
 realclean: clean
-	$(RM_F) Makefile
+	$(RM_RF) Makefile
+
+distclean: realclean
