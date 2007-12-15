@@ -46,14 +46,13 @@ More? - FIXME
 
 =back
 
-PDDS B<should not> discuss the implementation details or trade-offs, unless
-they absolutely have to.  Such implementation documentation should go in the
-relevant F<docs/dev/*.pod> file.  On the other hand, PDDs B<should> document
-design trade-offs, i.e. the paths not chosen.
+PDDs don't generally discuss the implementation details.  Low-level
+implementation documentation, the maintainer's guides, should go in the
+relevant F<docs/dev/*.pod> file.
 
-These guidelines may seem fuzzy.  The line between "design" and
-"implementation" is a murky one.  Still, please try to adhere to this design
-for Parrot design documentation.  How you implement it is up to you.  :-)
+PDDs may document design trade-offs, i.e. the paths not chosen. In many cases
+they don't, just to keep the PDDs relatively short and readable. The history
+of Parrot's design is retrievable from the source repository.
 
 =head1 IMPLEMENTATION
 
