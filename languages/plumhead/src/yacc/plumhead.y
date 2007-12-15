@@ -120,12 +120,11 @@ program : HELLO
         printf("    # pir = past_root.'compile'( 'target' => 'pir' )              \n");
         printf("    # print pir                                                   \n");
         printf("                                                                  \n");
-        printf("    .local pmc pastcompiler, eval_past                            \n");
-        printf("    pastcompiler = new [ 'PCT::HLLCompiler' ]                     \n");
-        printf("    pastcompiler.'removestage'('parse')                           \n");
-        printf("    pastcompiler.'removestage'('past')                            \n");
-        printf("    eval_past = pastcompiler.'compile'(past_root)                 \n");
-        printf("    eval_past()                                                   \n");
+        printf("    .local pmc past_compiler                                      \n");
+        printf("    past_compiler = new [ 'PCT::HLLCompiler' ]                    \n");
+        printf("    $P0 = split ' ', 'post pir evalpmc'                           \n");
+        printf("    past_compiler.'stages'( $P0 )                                 \n");
+        printf("    past_compiler.'eval'(past_root)                               \n");
         printf("                                                                  \n");
         printf(".end                                                              \n");
    }

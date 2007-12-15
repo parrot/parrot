@@ -59,12 +59,11 @@ a PAST data structure and runs it with the help of a PCT::HLLCompiler.
     # pir = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'pir' )
     # print pir
                                                                   
-    .local pmc plumhead_compiler, eval_past
-    plumhead_compiler = new [ 'PCT::HLLCompiler' ]
-    plumhead_compiler.'removestage'('parse')
-    plumhead_compiler.'removestage'('past')
-    eval_past = plumhead_compiler.'compile'(past_node_<xsl:value-of select="generate-id(.)" />)
-    eval_past()
+    .local pmc past_compiler
+    past_compiler = new [ 'PCT::HLLCompiler' ]
+    $P0 = split ' ', 'post pir evalpmc'
+    past_compiler.'stages'( $P0 )
+    past_compiler.'eval'(past_node_<xsl:value-of select="generate-id(.)" />)
 
 .end                                                              
                                                                   

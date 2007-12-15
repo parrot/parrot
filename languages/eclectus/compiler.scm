@@ -50,13 +50,12 @@
     stmts = new 'PAST::Stmts'
     stmts.'init'( op_say, 'name'=>'stmts' )
 
-    # compile to PIR and display
-    .local pmc astcompiler
-    astcompiler = new [ 'PCT::HLLCompiler' ]
-    astcompiler.'removestage'('parse')
-    astcompiler.'removestage'('past')
-
-    astcompiler.'eval'(stmts)
+    # compile and evaluate
+    .local pmc past_compiler
+    past_compiler = new [ 'PCT::HLLCompiler' ]
+    $P0 = split ' ', 'post pir evalpmc'
+    past_compiler.'stages'( $P0 )
+    past_compiler.'eval'(stmts)
 
 .end
 " ))
