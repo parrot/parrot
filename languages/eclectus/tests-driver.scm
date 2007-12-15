@@ -128,8 +128,8 @@
    (build)
    (execute)
    (if (string=? expected-output (get-string))
-     (printf "ok ~s - ~s ~s\n" ( + test-id 1 ) test-id expr )
-     (printf "not ok ~s - ~s expected ~s, got ~s\n" ( + test-id 1 ) test-id expr (get-string) )))
+     (printf "ok ~s - ~s\n" ( + test-id 1 ) expr )
+     (printf "not ok ~s - expected ~s, got ~s\n" ( + test-id 1 ) expr (get-string) )))
 
 (define (emit . args)
   (apply fprintf (compile-port) args)
