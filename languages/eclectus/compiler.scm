@@ -35,21 +35,13 @@
     ( val_ret ) = scheme_entry()
     # _dumper( val_ret, 'val_ret' )
 
-    .local pmc var_last
-    var_last = new 'PAST::Var'
-    var_last.init( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
-               
-    .local pmc op_bind
-    op_bind = new 'PAST::Op'
-    op_bind.init( var_last, val_ret, 'pasttype' => 'bind' )
-           
     .local pmc op_say
     op_say = new 'PAST::Op'
-    op_say.init( op_bind, 'name' => 'say', 'pasttype' => 'call' )
+    op_say.init( val_ret, 'name' => 'say', 'pasttype' => 'call' )
 
     .local pmc stmts
     stmts = new 'PAST::Stmts'
-    stmts.'init'( op_say, 'name'=>'stmts' )
+    stmts.'init'( op_say, 'name' => 'stmts' )
 
     # compile and evaluate
     .local pmc past_compiler
