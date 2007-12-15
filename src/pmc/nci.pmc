@@ -102,7 +102,7 @@ Sets the specified function pointer and signature (C<*key>).
 		nci_info->signature  = key;
 
 		/* Arity is length of that string minus one (the return type). */
-		nci_info->arity      = string_length(INTERP, key);
+		nci_info->arity      = string_length(INTERP, key) - 1;
 
 		/* Build call function. */
         nci_info->func       = build_call_func(INTERP, SELF, key);
@@ -192,7 +192,7 @@ shifted down.
 		typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
-            ? (nci_sub_t) PMC_struct_val(SELF)
+            ? (nci_sub_t) D2FPTR(PMC_struct_val(SELF))
             : (nci_sub_t) D2FPTR(nci_info->func);
 
         PMC *cont;
@@ -249,6 +249,25 @@ Returns the boolean value of the pointer.
         Parrot_NCI *nci_info = PARROT_NCI(SELF);
 		return (0 != (INTVAL)nci_info->func);
     }
+
+/*
+
+=item C<METHOD INTVAL arity()>
+
+Return the arity of the NCI (the number of arugments).
+
+=cut
+
+*/
+	METHOD INTVAL arity() {
+		Parrot_NCI *nci_info = PARROT_NCI(SELF);
+		if (nci_info != NULL && nci_info->func != NULL)
+			return nci_info->arity;
+		else
+			real_exception(INTERP, NULL, INVALID_OPERATION,
+                "You cannot get the arity of an undefined NCI.");
+		return 0; /* Unreachable; avoids warning. */
+	}
 
 }
 

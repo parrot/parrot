@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 64;
+use Parrot::Test tests => 65;
 use Parrot::Config qw(%PConfig);
 
 =head1 NAME
@@ -2611,6 +2611,34 @@ X: 1
 Y: 100
 X: 1
 Y: 100
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    
+    .local pmc nci_c
+    nci_c = dlfunc libnci_test, "nci_c", "c"
+    $I0 = nci_c.arity()
+    say $I0
+
+    .local pmc multiply
+    multiply = dlfunc libnci_test, "nci_pii", "pii"
+    $I0 = multiply.arity()
+    say $I0
+
+    .local pmc nci_iiii
+    nci_iiii = dlfunc libnci_test, "nci_iiii", "iiii"
+    $I0 = nci_iiii.arity()
+    say $I0
+.end
+CODE
+0
+2
+3
 OUTPUT
 
 # Local Variables:
