@@ -10,10 +10,10 @@ use Parrot::Test tests => 6;
 # these tests are run with -O0 by TestCompiler and show
 # generated PASM code for various optimizations at level 0
 pir_2_pasm_like( <<'CODE', <<'OUT', "add_n_i_n" );
-.emit
+.sub _ :anon
    add N0, I0, N1
    mul N0, I0, N1
-.eom
+.end
 CODE
 /set (N\d+), I0
   add N0, \1, N1
@@ -23,15 +23,18 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "sub_n_ic_n" );
-.emit
+.sub _ :anon
    sub N0, 2, N1
    div N0, 2, N1
-.eom
+.end
 CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
+_:
   sub N0, 2, N1
   div N0, 2, N1
+  set_returns
+  returncc
 OUT
 
 ##############################

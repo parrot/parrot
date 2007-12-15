@@ -324,8 +324,8 @@ pir_output_is( <<'CODE', '', "empty sub" );
 .sub _foo
 .end
 
-.emit
-.eom
+.sub _foo :anon
+.end
 CODE
 
 pir_output_is( <<'CODE', <<'OUT', "if null X goto Y" );
