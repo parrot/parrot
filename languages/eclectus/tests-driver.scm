@@ -16,14 +16,13 @@
         [out  (caddr test)])
     (flush-output-port)
     (case type
-     [(string) (test-with-string-output test-id expr out)]
+     [(string) (test-with-string-output test-id expr out test-name)]
      [else (error 'test "invalid test type ~s" type)])))
  
 (define (test-plan num-tests)
   ( printf "~s..~s\n" 1 num-tests ))
 
 (define (test-all)
-  ;; there has to be an easy way of getting the number of tests
   (test-plan (length (cdar all-tests)))
 
   ;; run the tests
@@ -40,7 +39,6 @@
                 [else
                  (test-one i (car tests) test-name)
                  (g (add1 i) (cdr tests))])))))))
-
 
 (define compile-port
   (make-parameter
@@ -71,12 +69,12 @@
                [(eof-object? c) (void)]
                [else (display c) (f)]))))))))
 
-(define (test-with-string-output test-id expr expected-output)
+(define (test-with-string-output test-id expr expected-output test-name)
    (run-compile expr)
    (execute)
    (if (string=? expected-output (get-string))
-     (printf "ok ~s - ~s\n" ( + test-id 1 ) expr )
-     (printf "not ok ~s - expected ~s, got ~s\n" ( + test-id 1 ) expr (get-string) )))
+     (printf     "ok ~s - ~s: ~s\n" ( + test-id 1 ) test-name expr )
+     (printf "not ok ~s - ~s: expected ~s, got ~s\n" ( + test-id 1 ) test-name expr (get-string) )))
 
 (define (emit . args)
   (apply fprintf (compile-port) args)
