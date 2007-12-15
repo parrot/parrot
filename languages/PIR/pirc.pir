@@ -19,6 +19,8 @@
     $P1 = $P0.'command_line'(args)
 .end
 
+.include 'src/gen_actions.pir'
+.include 'src/gen_grammar.pir'
 
 .namespace [ 'PIR::Grammar' ]
 
@@ -28,13 +30,13 @@
     # for faster edit-compile-test cycles.
     # Compiling the file pasm_grammar takes ages
     # due to the large number of instructions.
-    load_bytecode 'languages/PIR/src/pasm/pir_grammar_gen.pbc'
-    load_bytecode 'languages/PIR/src/pasm/pasm_grammar_gen.pbc'
-    load_bytecode 'languages/PIR/src/pasm/pasm_args_gen.pbc'
-    load_bytecode 'languages/PIR/src/pasm/pasm_instr_gen.pbc'
-    load_bytecode 'languages/PIR/src/pasm/pasm_io_gen.pbc'
-    load_bytecode 'languages/PIR/src/pasm/pasm_pmc_gen.pbc'
-    load_bytecode 'languages/PIR/src/pasm/pasm_core_gen.pbc'
+
+    load_bytecode 'languages/PIR/src/pasm/gen_pasm.pbc'
+    load_bytecode 'languages/PIR/src/pasm/gen_pasm_args.pbc'
+    load_bytecode 'languages/PIR/src/pasm/gen_pasm_instr.pbc'
+    load_bytecode 'languages/PIR/src/pasm/gen_pasm_io.pbc'
+    load_bytecode 'languages/PIR/src/pasm/gen_pasm_pmc.pbc'
+    load_bytecode 'languages/PIR/src/pasm/gen_pasm_core.pbc'
 .end
 
 
