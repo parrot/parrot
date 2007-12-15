@@ -53,12 +53,12 @@
      [(string) (test-with-string-output test-id expr out)]
      [else (error 'test "invalid test type ~s" type)])))
  
-(define (plan all-tests)
-  ( printf "~s..~s\n" 1 ( length (cdar all-tests))))
+(define (test-plan num-tests)
+  ( printf "~s..~s\n" 1 num-tests ))
 
 (define (test-all)
   ;; there has to be an easy way of getting the number of tests
-  (plan all-tests)
+  (test-plan (length (cdar all-tests)))
 
   ;; run the tests
   (let f ([i 0] [ls (reverse all-tests)])
