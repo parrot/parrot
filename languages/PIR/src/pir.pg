@@ -246,12 +246,12 @@ rule assign_token {
 }
 
 rule conditional_stat {
-    [if|unless] <conditional_expr> <.goto> <label_identifier>
+    $<sym>=[if|unless] <conditional_expr> <.goto> <label_identifier>
     {*}
 }
 
 rule goto {
-    'goto' | <syntax_error: 'goto' expected>
+    goto | <syntax_error: 'goto' expected>
 }
 
 token label_identifier {
@@ -261,12 +261,12 @@ token label_identifier {
 }
 
 rule conditional_expr {
-    | 'null' <target>                                          {*} #= null_expr
+    | null <target>                                            {*} #= null_expr
     | <simple_expr> [ <relational_operator> <simple_expr> ]?   {*} #= rel_expr
 }
 
 rule goto_stat {
-    'goto' <label_identifier>
+    goto <label_identifier>
     {*}
 }
 
@@ -295,8 +295,19 @@ token unary_operator {
 }
 
 rule expression {
-    | <simple_expr> [ <binary_operator> <simple_expr> ]?  {*} #= binary_expr
-    | <unary_operator> <simple_expr>                      {*} #= unary_expr
+    | <binary_expr>   #= binary_expr
+    | <unary_expr>    #= unary_expr
+    | <simple_expr>   #= simple_expr
+}
+
+rule binary_expr {
+    <simple_expr> <binary_operator> <simple_expr>
+    {*}
+}
+
+rule unary_expr {
+    <unary_operator> <simple_expr>
+    {*}
 }
 
 token simple_expr {
