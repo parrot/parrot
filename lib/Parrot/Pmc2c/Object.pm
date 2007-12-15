@@ -115,7 +115,7 @@ $decl {
 
         /* If it's from this universe or the class doesn't inherit from
          * anything outside of it... */
-        if (all_in_universe || VTABLE_isa(interp, cur_class, string_from_literal(interp, "Class"))) {
+        if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
 EOC
 
     # We shouldn't allow overrides of get_pointer and friends,
@@ -123,11 +123,11 @@ EOC
     if ( $meth !~ /get_pointer/ ) {
         $generated .= <<EOC;
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
-            if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, string_from_literal(interp, "$meth"))) {
+            if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, CONST_STRING(interp, "$meth"))) {
                 /* Found it; call. */
                 PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
-                    class_info->vtable_overrides, string_from_literal(interp, "$meth"));
-                ${return}Parrot_run_meth_fromc_args$ret_type(interp, meth, pmc, string_from_literal(interp, "$meth"), "$sig"$arg);
+                    class_info->vtable_overrides, CONST_STRING(interp, "$meth"));
+                ${return}Parrot_run_meth_fromc_args$ret_type(interp, meth, pmc, CONST_STRING(interp, "$meth"), "$sig"$arg);
                 $void_return
             }
 EOC

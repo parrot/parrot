@@ -635,7 +635,7 @@ EOC
     foreach my $dynpmc (@$dyn_mmds) {
         next if $dynpmc eq $classname;
         $cout .= <<"EOC";
-            int my_enum_class_$dynpmc = pmc_type(interp, string_from_literal(interp, "$dynpmc"));
+            int my_enum_class_$dynpmc = pmc_type(interp, CONST_STRING(interp, "$dynpmc"));
 EOC
     }
 

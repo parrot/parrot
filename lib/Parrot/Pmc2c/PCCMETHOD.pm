@@ -183,7 +183,7 @@ sub gen_arg_accessor {
         return "    $name = CTX_REG_$tiss(ctx, $index);\n";
     }
     elsif ( 'name' eq $arg_type ) {
-        return "    CTX_REG_$tiss(ctx, $index) = string_from_literal(interp, $name);\n";
+        return "    CTX_REG_$tiss(ctx, $index) = CONST_STRING(interp, $name);\n";
     }
     else {                                           #$arg_type eq 'param' or $arg_type eq 'return'
         return "    CTX_REG_$tiss(ctx, $index) = $name;\n";
