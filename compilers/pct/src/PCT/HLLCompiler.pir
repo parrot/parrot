@@ -11,13 +11,11 @@ running compilers from a command line.
 
 =cut
 
-.namespace
-
-.sub '__onload' :load :init
+.sub 'onload' :anon :load :init
     load_bytecode 'Protoobject.pbc'
     load_bytecode 'Parrot/Exception.pbc'
     $P0 = get_hll_global 'Protomaker'
-    $P1 = split ' ', '$parsegrammar $parseactions $astgrammar $ostgrammar @stages $commandline_banner $commandline_prompt'
+    $P1 = split ' ', '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt'
     $P2 = $P0.'new_subclass'('Protoobject', 'PCT::HLLCompiler', $P1 :flat)
 .end
 
@@ -37,7 +35,7 @@ by C<attrname> based on C<has_value>.
 .include 'cclass.pasm'
 
 .sub 'init' :vtable :method
-    $P0 = split ' ', 'parse past post pir run'
+    $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 .end
 
@@ -83,6 +81,9 @@ C<compreg> opcode.
     .return ()
 .end
 
+=item stages([stages])
+
+Accessor for the C<stages> attribute.
 
 =item parsegrammar([string grammar])
 
@@ -96,11 +97,13 @@ Accessor for the C<parseactions> attribute.
 
 Accessor for the C<astgrammar> attribute.
 
-=item ostgrammar([string grammar])
-
-Accessor for the 'ostgrammar' attribute.
-
 =cut
+
+.sub 'stages' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('@stages', value, has_value)
+.end
 
 .sub 'parsegrammar' :method
     .param string value        :optional
@@ -108,24 +111,16 @@ Accessor for the 'ostgrammar' attribute.
     .return self.'attr'('$parsegrammar', value, has_value)
 .end
 
-
 .sub 'parseactions' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('$parseactions', value, has_value)
 .end
 
-
 .sub 'astgrammar' :method
     .param string value        :optional
     .param int has_value       :opt_flag
     .return self.'attr'('$astgrammar', value, has_value)
-.end
-
-.sub 'ostgrammar' :method
-    .param string value        :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('$ostgrammar', value, has_value)
 .end
 
 .sub 'commandline_banner' :method
@@ -287,7 +282,7 @@ to any options and return the resulting parse tree.
     unless parsegrammar_name goto err_no_parsegrammar
     top = get_hll_global parsegrammar_name, 'TOP'
     unless null top goto have_top
-    self.'panic'('Cannot find rule TOP in ', parsegrammar_name)
+    self.'panic'('Cannot find TOP regex in ', parsegrammar_name)
   have_top:
     .local pmc parseactions, action
     null action
@@ -329,7 +324,7 @@ to any options and return the resulting parse tree.
 
 =item past(source [, "option" => value, ...])
 
-Transform C<source> into an AST using the compiler's
+Transform C<source> into PAST using the compiler's
 C<astgrammar> according to any options, and return the
 resulting ast.
 
@@ -338,10 +333,6 @@ resulting ast.
 .sub 'past' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
-
-    $I0 = isa source, 'PAST::Node'
-    unless $I0 goto compile_astgrammar
-    .return (source)
 
   compile_astgrammar:
     .local string astgrammar_name
@@ -365,6 +356,41 @@ resulting ast.
     $S0 = typeof source
     .return self.'panic'('Unable to obtain PAST from ', $S0)
 .end
+
+
+=item post(source [, adverbs :slurpy :named])
+
+Transform PAST C<source> into POST.
+
+=cut
+
+.sub 'post' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+    $P0 = compreg 'PAST'
+    .return $P0.'to_post'(source, adverbs :flat :named)
+.end
+
+
+.sub 'pir' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    $P0 = compreg 'POST'
+    $P1 = $P0.'to_pir'(source, adverbs :flat :named)
+    .return ($P1)
+.end
+
+
+.sub 'evalpmc' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    $P0 = compreg 'PIR'
+    $P1 = $P0(source)
+    .return ($P1)
+.end
+
 
 
 =item eval(code [, "option" => value, ...])
@@ -624,50 +650,6 @@ based on double-colon separators.
     $P0 = split '::', name
     .return ($P0)
 .end
-
-=item post(source [, adverbs :slurpy :named])
-
-Transform C<source> using the compiler's C<ostgrammar>
-according to any options given by C<adverbs>, and return the
-resulting ost.
-
-=cut
-
-.sub 'post' :method
-    .param pmc source
-    .param pmc adverbs         :slurpy :named
-    .local string ostgrammar_name
-    .local pmc ostgrammar, ostbuilder
-    ostgrammar_name = self.'ostgrammar'()
-    unless ostgrammar_name goto default_ostgrammar
-    ostgrammar = new ostgrammar_name
-    ostbuilder = ostgrammar.'apply'(source)
-    .return ostbuilder.'get'('post')
-
-  default_ostgrammar:
-    $P0 = compreg 'PAST'
-    .return $P0.'compile'(source, adverbs :flat :named)
-.end
-
-
-.sub 'pir' :method
-    .param pmc source
-    .param pmc adverbs         :slurpy :named
-
-    $P0 = compreg 'POST'
-    $P1 = $P0.'compile'(source, adverbs :flat :named)
-    .return ($P1)
-.end
-
-.sub 'run' :method
-    .param pmc source
-    .param pmc adverbs         :slurpy :named
-
-    $P0 = compreg 'PIR'
-    $P1 = $P0(source)
-    .return ($P1)
-.end
-
 
 =back
 

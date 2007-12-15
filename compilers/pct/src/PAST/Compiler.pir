@@ -11,11 +11,15 @@ By default PAST::Compiler transforms a PAST tree into POST.
 
 .namespace [ 'PAST::Compiler' ]
 
-.sub '__onload' :load :init
+.sub 'onload' :anon :load :init
     load_bytecode 'PCT/HLLCompiler.pbc'
-    $P99 = subclass 'PCT::HLLCompiler', 'PAST::Compiler'
+    $P0 = get_hll_global 'Protomaker'
+    $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'PAST::Compiler')
+
     $P0 = new 'PAST::Compiler'
     $P0.'language'('PAST')
+    $P1 = split ' ', 'post pir code'
+    $P0.'stages'($P1)
 
     .local pmc piropsig
     piropsig = new 'Hash'
@@ -48,16 +52,13 @@ By default PAST::Compiler transforms a PAST tree into POST.
 
 =over 4
 
-=item compile(node, ['target'=>target, ...])
+=item to_post(node [, 'option'=>option, ...])
 
-Compile the abstract syntax tree given by C<past> into the form
-given by C<target>.  Current targets include "past", "post", "pir";
-if no C<target> is supplied then the abstract syntax tree is compiled
-to executable code (but not executed).
+Compile the abstract syntax tree given by C<past> into POST.
 
 =cut
 
-.sub 'compile' :method
+.sub 'to_post' :method
     .param pmc past
     .param pmc options         :slurpy :named
 

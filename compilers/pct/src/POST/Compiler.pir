@@ -5,7 +5,7 @@ POST::Compiler - Compiler for POST trees
 =head1 DESCRIPTION
 
 POST::Compiler defines a compiler that converts a POST tree into
-either PIR or executable bytecode.
+PIR or an Eval PMC (bytecode).
 
 =head1 METHODS
 
@@ -17,25 +17,30 @@ either PIR or executable bytecode.
 
 .sub '__onload' :load :init
     $P0 = get_hll_global 'Protomaker'
-    ($P1, $P2) = $P0.'new_subclass'('PCT::HLLCompiler', 'POST::Compiler', '$!code')
-    $P2.'language'('POST')
+    $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'POST::Compiler', '$!code')
+
+    $P0 = new 'POST::Compiler'
+    $P0.'language'('POST')
+    $P1 = split ' ', 'pir evalpmc'
+    $P0.'stages'($P1)
+
     $P0 = new 'String'
     set_global '$?NAMESPACE', $P0
     .return ()
 .end
 
 
-.sub 'compile' :method
+.sub 'to_pir' :method
     .param pmc post
     .param pmc adverbs         :slurpy :named
 
-    ##  create a separate instance for this compilation
-    $P0 = new 'POST::Compiler'
+    .local pmc newself
+    newself = new 'POST::Compiler'
 
     ##  start with empty code
     .local pmc code
     code = new 'CodeString'
-    self.'code'(code)
+    newself.'code'(code)
 
     ##  if the root node isn't a Sub, wrap it
     $I0 = isa post, 'POST::Sub'
@@ -45,11 +50,12 @@ either PIR or executable bytecode.
   have_sub:
 
     ##  now generate the pir
-    self.'pir'(post)
+    newself.'pir'(post)
 
     ##  and return whatever code was generated
-    .return self.'code'()
+    .return newself.'code'()
 .end
+
 
 =item code([str])
 
