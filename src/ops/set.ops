@@ -514,7 +514,6 @@ inline op set(out PMC, invar PMC, in KEY) :base_core {
     goto NEXT();
 }
 
-
 =item B<clone>(out PMC, invar PMC)
 
 Makes a copy of the PMC in $2 and puts it in $1.
@@ -526,7 +525,6 @@ inline op clone(out PMC, invar PMC) :base_mem {
   goto NEXT();
 }
 
-
 =item B<clone>(out PMC, invar PMC, in PMC)
 
 Makes a copy of the PMC in $2 and puts it in $1, using the arguments in $3.
@@ -535,6 +533,32 @@ Makes a copy of the PMC in $2 and puts it in $1, using the arguments in $3.
 
 inline op clone(out PMC, invar PMC, in PMC) :base_mem {
   $1 = VTABLE_clone_pmc(interp, $2, $3);
+  goto NEXT();
+}
+
+=item B<copy>(inout PMC, invar PMC)
+
+Morphs the PMC in $1 to the type of the PMC in $2, then assigns $2 to $1.
+
+=cut
+
+inline op copy(inout PMC, invar PMC) :base_mem {
+  PMC   * const clone = VTABLE_clone(interp, $2);
+  const INTVAL type   = VTABLE_type(interp, $2);
+
+  /* avoid leaks and unreachable memory by destroying the destination PMC */
+  if (PObj_active_destroy_TEST($1))
+      VTABLE_destroy(interp, $1);
+
+  VTABLE_morph(interp, $1, type);
+
+  /* the source PMC knows how to clone itself, but we must reuse the
+   destination header */
+  STRUCT_COPY($1, clone);
+
+  /* don't let the clone's destruction destroy the destination's data */
+  PObj_active_destroy_CLEAR(clone);
+
   goto NEXT();
 }
 
