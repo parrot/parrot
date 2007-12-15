@@ -33,6 +33,8 @@ By default PAST::Compiler transforms a PAST tree into POST.
     piropsig['n_mul']    = 'PP+'
     piropsig['n_neg']    = 'PP'
     piropsig['n_not']    = 'PP'
+    piropsig['n_shl']    = 'PP+'
+    piropsig['n_shr']    = 'PP+'
     piropsig['n_sub']    = 'PP+'
     piropsig['print']    = 'v*'
     piropsig['set']      = 'PP'
