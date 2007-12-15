@@ -20,12 +20,10 @@ typedef enum tokens {
                                         /* NULL,                      */
     T_ARG,                              /* ".arg",                    */
     T_CONST,                            /* ".const",                  */
-    T_CONSTANT,                         /* ".constant",               */
-    T_EMIT,                             /* ".emit",                   */
+    T_CONSTANT,                         /* ".constant",               */    
     T_END,                              /* ".end",                    */
     T_ENDNAMESPACE,                     /* ".endnamespace",           */
-    T_ENDM,                             /* ".endm",                   */
-    T_EOM,                              /* ".eom",                    */
+    T_ENDM,                             /* ".endm",                   */    
     T_GET_RESULTS,                      /* ".get_results",            */
     T_GLOBALCONST,                      /* ".globalconst",            */
     T_HLL,                              /* ".HLL",                    */

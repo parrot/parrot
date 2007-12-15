@@ -2072,29 +2072,6 @@ sub_definition(parser_state *p)
 
 }
 
-/*
-
-=item C<static void emit_block(parser_state *p)>
-
-  emit_block -> '.emit' '\n' { parrot_instruction '\n' } '.eom'
-
-=cut
-
-*/
-static void
-emit_block(parser_state *p)
-{
-    /* Note that a PASM instruction looks like an identifier. This is checked for in the lexer. */
-    match(p, T_EMIT);
-    match(p, T_NEWLINE);
-
-    while (p->curtoken == T_PARROT_OP) {
-        parrot_instruction(p);
-        match(p, T_NEWLINE);
-    }
-
-    match(p, T_EOM);
-}
 
 /*
 
@@ -2286,8 +2263,7 @@ loadlib(parser_state *p)
 =item C<static void compilation_unit(parser_state *p)>
 
   compilation_unit -> sub_definition
-                    | '.const' const_definition
-                    | emit_block
+                    | '.const' const_definition                    
                     | include
                     | macro_definition
                     | pragma
@@ -2309,10 +2285,7 @@ compilation_unit(parser_state *p)
         case T_CONST: /* compilation_unit -> '.const' const_definition */
             next(p);
             const_definition(p);
-            break;
-        case T_EMIT: /* compilation_unit -> emit_block */
-            emit_block(p);
-            break;
+            break;        
         case T_INCLUDE: /* compilation_unit -> '.include' STRINGC */
             include(p);
             break;

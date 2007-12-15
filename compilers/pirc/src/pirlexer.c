@@ -83,8 +83,8 @@ lexer.
 
 The following are PIR directives.
 
-  .arg               .const      .constant         .emit              .end
-  .endnamespace      .endm       .eom              .get_results       .globalconst
+  .arg               .const      .constant         .end
+  .endnamespace      .endm       .get_results      .globalconst
   .HLL               .HLL_map    .include          .invocant          .lex
   .loadlib           .local      .macro            .meth_call         .namespace
   .nci_call          .param      .begin_call       .begin_return      .begin_yield
@@ -141,12 +141,10 @@ static char const * dictionary[] = {
    /* NULL,  */                 /*                          */
     ".arg",                     /* T_ARG                    */
     ".const",                   /* T_CONST,                 */
-    ".constant",                /* T_CONSTANT,              */
-    ".emit",                    /* T_EMIT,                  */
+    ".constant",                /* T_CONSTANT,              */    
     ".end",                     /* T_END,                   */
     ".endnamespace",            /* T_ENDNAMESPACE,          */
-    ".endm",                    /* T_ENDM,                  */
-    ".eom",                     /* T_EOM,                   */
+    ".endm",                    /* T_ENDM,                  */    
     ".get_results",             /* T_GET_RESULTS            */
     ".globalconst",             /* T_GLOBALCONST            */
     ".HLL",                     /* T_HLL                    */
