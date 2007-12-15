@@ -40,7 +40,7 @@ sub pre_method_gen {
         my $arg  = @args ? ", " . join( ' ', @args ) : '';
         my $ret  = gen_ret( $method, "VTABLE_$vt_method_name(interp, attr$arg)" );
         $new_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
-    PMC *attr = get_attrib_num(PMC_data_typed(pmc, SLOTTYPE *), 0);
+    PMC * const attr = get_attrib_num(PMC_data_typed(pmc, SLOTTYPE *), 0);
     $ret
 EOC
         $self->add_method($new_method);
