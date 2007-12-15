@@ -142,8 +142,7 @@ static char const * dictionary[] = {
     ".arg",                     /* T_ARG                    */
     ".const",                   /* T_CONST,                 */
     ".constant",                /* T_CONSTANT,              */    
-    ".end",                     /* T_END,                   */
-    ".endnamespace",            /* T_ENDNAMESPACE,          */
+    ".end",                     /* T_END,                   */    
     ".endm",                    /* T_ENDM,                  */    
     ".get_results",             /* T_GET_RESULTS            */
     ".globalconst",             /* T_GLOBALCONST            */
@@ -1033,7 +1032,7 @@ token
 next_token(lexer_state *lexer)
 {
     int ok    = 1;
-    int count = 0;
+    /* int count = 0; */
 
     /* before reading a new token, first clear the buffer */
     clear_buffer(lexer);

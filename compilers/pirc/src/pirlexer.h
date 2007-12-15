@@ -21,8 +21,7 @@ typedef enum tokens {
     T_ARG,                              /* ".arg",                    */
     T_CONST,                            /* ".const",                  */
     T_CONSTANT,                         /* ".constant",               */    
-    T_END,                              /* ".end",                    */
-    T_ENDNAMESPACE,                     /* ".endnamespace",           */
+    T_END,                              /* ".end",                    */    
     T_ENDM,                             /* ".endm",                   */    
     T_GET_RESULTS,                      /* ".get_results",            */
     T_GLOBALCONST,                      /* ".globalconst",            */
