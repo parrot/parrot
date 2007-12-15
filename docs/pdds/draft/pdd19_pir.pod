@@ -896,10 +896,10 @@ the macro. When the macro C<.foo()> is called, the resulting code that is given
 to the parser will read as follows:
 
   .sub main
-    .local int local__foo__b
+    .local int local__foo__b__2
     ...
-    local__foo__b = 42
-    print local__foo__b
+    local__foo__b__2 = 42
+    print local__foo__b__2
 
   .end
 
@@ -940,16 +940,14 @@ multiple macros, like so:
 This will result in code for the parser as follows:
 
   .sub main
-    .local int local__foo__x
-    .local int local__bar__x
+    .local int local__foo__x__2
+    .local int local__bar__x__4
   .end
 
-
-{{ PROPOSAL: should C<.macro_local> also add a random value to the munged name,
-to allow multiple calls to the same macro from within the same compilation
-unit? May not be used often enough to be worth adding it. The same effect can
-be achieved by using a symbolic parameter name for the macro local, it's just
-slightly less convenient.  }}
+Each expansion is associated with a unique number; for labels declared with
+C<.macro_label> and locals declared with C<.macro_local> expansions, this 
+means that multiple expansions of a macro will not result in conflicting
+label or local names.
 
 =head3 Ordinary local variables
 
