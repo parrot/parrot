@@ -728,8 +728,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir uses no ops" );
     print "back\n"
 .end
 
-.emit
-.pcc_sub foo:
+.sub foo
     get_params "0, 0", I16, I17
     print I16
     print "\n"
@@ -737,7 +736,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir uses no ops" );
     print "\n"
     set_returns ""
     returncc
-.eom
+.end
 CODE
 42
 77
