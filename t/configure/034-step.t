@@ -109,10 +109,13 @@ END_DUMMY
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN q{@foobar@\n};
     close $IN or croak "Unable to close temp file";
-    my ($stdout, $stderr) ;
-    capture ( sub { ok( genfile( $dummy => 'CFLAGS' ), 
-                "genfile() returned true when warning expected" ) },
-                 \$stdout, \$stderr);
+    my ($rv, $stdout, $stderr) ;
+    capture (
+        sub { $rv = genfile( $dummy => 'CFLAGS' ) }, 
+        \$stdout,
+        \$stderr
+    );
+    ok($rv, "genfile() returned true when warning expected" );
     like( $stderr, qr/value for 'foobar'/, "got expected warning" );
 
     unlink $dummy or croak "Unable to delete file after testing";
