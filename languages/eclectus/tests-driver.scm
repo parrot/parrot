@@ -10,40 +10,6 @@
            '(test-name [expr string  output-string] ...)
             all-tests))]))
 
-(define (run-compile expr)
-  (let ([p (open-output-file "stst.pir" 'replace)])
-    (compile-program expr p)
-    (close-output-port p)))
-
-(define (build) () )
-
-(define (execute)
-  (unless (zero? (system "./stst > stst.out"))
-    (error 'make "produced program exited abnormally")))
-
-(define (build-program expr)
-   (run-compile expr)
-   (build))
-
-(define (get-string)
-  (with-output-to-string
-    (lambda ()
-      (with-input-from-file "stst.out"
-        (lambda ()
-          (let f ()
-            (let ([c (read-char)])
-              (cond
-               [(eof-object? c) (void)]
-               [else (display c) (f)]))))))))
-
-(define (test-with-string-output test-id expr expected-output)
-   (run-compile expr)
-   (build)
-   (execute)
-   (unless (string=? expected-output (get-string))
-     (error 'test "output mismatch for test ~s, expected ~s, got ~s"
-        test-id expected-output (get-string))))
-
 (define (test-one test-id test test-name)
   (let ([expr (car test)]
         [type (cadr test)]
@@ -76,21 +42,6 @@
                  (g (add1 i) (cdr tests))])))))))
 
 
-(define input-filter 
-  (make-parameter (lambda (x) x)
-    (lambda (x)
-      (unless (procedure? x)
-        (error 'input-filter "not a procedure ~s" x))
-      x)))
-
-(define runtime-file 
-  (make-parameter
-    "runtime.c"
-    (lambda (fname)
-      (unless (string? fname) (error 'runtime-file "not a string" fname))
-      fname)))
-
-
 (define compile-port
   (make-parameter
     (current-output-port)
@@ -99,14 +50,11 @@
          (error 'compile-port "not an output port ~s" p))
        p)))
 
-(define show-compiler-output (make-parameter #f))
-
 (define (run-compile expr)
   (let ([p (open-output-file "stst.pir" 'replace)])
     (parameterize ([compile-port p])
        (compile-program expr))
     (close-output-port p)))
-
 
 (define (execute)
   (unless (fxzero? (system "../../parrot stst.pir > stst.out"))
@@ -125,7 +73,6 @@
 
 (define (test-with-string-output test-id expr expected-output)
    (run-compile expr)
-   (build)
    (execute)
    (if (string=? expected-output (get-string))
      (printf "ok ~s - ~s\n" ( + test-id 1 ) expr )
