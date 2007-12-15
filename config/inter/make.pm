@@ -89,6 +89,13 @@ sub runstep {
     $self->set_result('yes');
 
     # setup make_C
+    _set_make_c($conf, $prog);
+
+    return 1;
+}
+
+sub _set_make_c {
+    my ($conf, $prog) = @_;
     if ( $conf->data->get('gmake_version') ) {
         $conf->data->set( make_c => "$prog -C" );
     }
@@ -104,8 +111,6 @@ sub runstep {
 
         $conf->data->set( make_c => $make_c );
     }
-
-    return 1;
 }
 
 1;

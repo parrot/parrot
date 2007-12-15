@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 108-inter_make.t
+# $Id: 108-inter_make-02.t 23890 2007-12-14 16:58:20Z jkeenan $
+# 108-inter_make-02.t
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,7 +13,6 @@ use_ok('config::inter::make');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Tie::Filehandle::Preempt::Stdin;
 
 my $args = process_options(
     {
@@ -40,17 +39,20 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my ( @prompts, $object );
-@prompts = (q{make});
-$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
-can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
-isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
+$conf->data->set('gmake_version' => '4.1');
+my $prog = 'gmake';
+inter::make::_set_make_c($conf, $prog);
+is($conf->data->get('make_c'), 'gmake -C',
+    "make_c correctly set when gmake");
 
-$ret = $step->runstep($conf);
-ok( defined $ret, "$step_name runstep() returned defined value" );
-
-$object = undef;
-untie *STDIN;
+$conf->data->set('gmake_version' => undef);
+my $str = q|$(PERL) -e 'chdir shift @ARGV; system q{$(MAKE)}, @ARGV; exit $$?  >> 8;'|;
+$conf->data->set(make_c => $str);
+$prog = 'make';
+inter::make::_set_make_c($conf, $prog);
+is($conf->data->get('make_c'),
+    q|$(PERL) -e 'chdir shift @ARGV; system q{make}, @ARGV; exit $$?  >> 8;'|,
+    "make_c correctly set when gmake");
 
 pass("Completed all tests in $0");
 
@@ -58,11 +60,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-108-inter_make.t - test config::inter::make
+108-inter_make-02.t - test config::inter::make
 
 =head1 SYNOPSIS
 
-    % prove t/configure/108-inter_make.t
+    % prove t/configure/108-inter_make-02.t
 
 =head1 DESCRIPTION
 
