@@ -23,7 +23,8 @@ the is no 'petite 7.3' around.
 
 =head1 TODO
 
-- add the other unary function from the tutorial
+- allow test-description per test case
+- add the other unary functions from the tutorial
 - In the longterm, Eclectus should become self-hosting
 
 =head1 AUTHOR

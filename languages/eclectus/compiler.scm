@@ -117,9 +117,11 @@
     val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
 " )]))
 
+; Support for primitve functions
+
 ; is expr a primitive?
-(define (primitive? x)
-  (and (symbol? x) (getprop x '*is-prim*)))
+(define (primitive? expr)
+  (and (symbol? expr) (getprop expr '*is-prim*)))
 
 ; is expr a call to a primitive? 
 (define (primcall? expr)
@@ -127,6 +129,8 @@
 
 ; a unary function is a symbol with the properties
 ; *is-prim*, *arg-count* and *emitter*
+; implementatus of primitive functions are added
+; with 'define-primitive'
 (define-syntax define-primitive
   (syntax-rules ()
     [(_ (prim-name arg) b b* ...)
@@ -138,7 +142,7 @@
         (putprop 'prim-name '*emitter*
           (lambda (arg) b b* ...)))]))
 
-; add implementation of functions
+; implementation of fxadd1
 (define-primitive (fxadd1 arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
@@ -148,7 +152,18 @@
 "
   val_x = new 'PAST::Op'
   val_x.init( $P0, $P1, 'name' => 'infix:+', 'pirop' => 'n_add' )
-  #_dumper( val_x, 'val_x' )
+"))
+
+; implementation of fxsub1
+(define-primitive (fxsub1 arg)
+  (emit-expr arg)
+  (emit "$P0 = val_x")
+  (emit-immediate 1)
+  (emit "$P1 = val_x")
+  (emit
+"
+  val_x = new 'PAST::Op'
+  val_x.init( $P0, $P1, 'name' => 'infix:-', 'pirop' => 'n_sub' )
 "))
 
 ; a getter of '*emitter*'
