@@ -81,11 +81,6 @@
 
 ##    method TOP($/, $key) {
 ##        my $past := $($<statement_block>);
-##        my $stmts := $past[1];
-##        #  if the top block is really only a single block, return it
-##        if (@($stmts) == 1 && $stmts[0].WHAT == 'PAST::Block') {
-##            $past := $stmts[0];
-##        }
 ##        $past.blocktype('declaration');
 ##        make $past;
 ##    }
@@ -94,16 +89,6 @@
     .local pmc past
     $P0 = match['statement_block']
     past = $P0.'get_scalar'()
-    .local pmc stmts
-    stmts = past[1]
-    $P0 = stmts.get_array()
-    $I0 = elements $P0
-    if $I0 != 1 goto have_past
-    $P0 = stmts[0]
-    $I0 = isa $P0, 'PAST::Block'
-    unless $I0 goto have_past
-    past = stmts[0]
-  have_past:
     past.'blocktype'('declaration')
     match.'result_object'(past)
 .end
