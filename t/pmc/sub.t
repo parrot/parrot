@@ -677,11 +677,10 @@ OUTPUT
 $temp = "temp.pir";
 open $S, '>', "$temp" or die "Can't write $temp";
 print $S <<'EOF';
-.emit
-  .pcc_sub :load _sub1:
+.sub _sub1 :load
   print "in sub1\n"
   returncc
-.eom
+.end
 EOF
 close $S;
 
@@ -699,17 +698,16 @@ OUTPUT
 
 open $S, '>', "$temp" or die "Can't write $temp";
 print $S <<'EOF';
-.emit
-  .pcc_sub _foo:
+.sub _foo
   print "error\n"
-.eom
-.emit
-# LOAD or other pragmas are only evaluated on the first
+.end
+
+# :load or other pragmas are only evaluated on the first
 # instruction of a compilation unit
-  .pcc_sub :load _sub1:
+.sub _sub1 :load
   print "in sub1\n"
   returncc
-.eom
+.end
 EOF
 close $S;
 
@@ -727,13 +725,13 @@ OUTPUT
 
 open $S, '>', "$temp" or die "Can't write $temp";
 print $S <<'EOF';
-.emit
-  .pcc_sub _foo:
+.sub _foo
   print "error\n"
-  .pcc_sub _sub1:
+.end
+.sub _sub1
   print "in sub1\n"
   returncc
-.eom
+.end
 EOF
 close $S;
 
