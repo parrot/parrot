@@ -10,9 +10,34 @@ method TOP($/) {
 }
 
 method program($/) {
-    make PAST::Block.new( :node($/), :blocktype('immediate') );
+    my $program := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my @compunits := $<compilation_unit>;
+    for @compunits {
+        $program.push( $($_) );
+    }
+    make $program;
 }
 
+method compilation_unit($/, $key) {
+    make $( $/{$key} );
+}
+
+method sub_def($/) {
+    my $sub := PAST::Block.new( :blocktype('declaration'),
+                                :node($/) );
+
+    my $subname := $($<sub_id>);
+    $sub.name($subname);
+    make $sub;
+}
+
+method sub_id($/, $key) {
+    make $( $/{$key} );
+}
+
+method IDENT($/) {
+    make PAST::Val.new( :value(~$/), :node($/) );
+}
 
 # Local Variables:
 #   mode: pir
