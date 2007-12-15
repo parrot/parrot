@@ -42,7 +42,7 @@ sub pre_method_gen {
         $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     Parrot_Object * const obj = PARROT_OBJECT(pmc);
     Parrot_Class * const _class = PARROT_CLASS(obj->_class);
-    STRING *meth_name = string_from_literal(interp, "$vt_method_name");
+    STRING * const meth_name = string_from_literal(interp, "$vt_method_name");
 
     /* Walk and search for the vtable method. */
     const int num_classes = VTABLE_elements(interp, _class->all_parents);
@@ -58,7 +58,6 @@ sub pre_method_gen {
         }
 
         if (cur_class->vtable->base_type == enum_class_PMCProxy) {
-            
             /* Get the PMC instance and call the vtable method on that. */
             PMC * const del_object = 
                 VTABLE_get_attr_keyed(interp, SELF, cur_class, CONST_STRING(interp, "proxy"));
@@ -67,7 +66,6 @@ sub pre_method_gen {
                 ${return}VTABLE_$vt_method_name(interp, del_object$args); 
                 $void_return
             }
-
         }
     }
     ${return}SUPER($superargs);
