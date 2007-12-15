@@ -15,9 +15,13 @@ Class is not derived from any other PMC.
 
 =head2 Structure
 
-The Role PMC structure (C<Parrot_Role>) consists of five items:
+The Class PMC structure (C<Parrot_Class>) consists of twelve items:
 
 =over 4
+
+=item C<id>
+
+The type number of the PMC. [To be deprecated]
 
 =item C<name>
 
@@ -74,6 +78,10 @@ A Null PMC is allocated during initialization.
 
 A cache of visible attribute names to attribute indexes.
 A Null PMC is allocated during initialization.
+
+=item C<vtable_cache>
+
+Cache of the vtable used for objects (only STM).
 
 =item C<resolve_method>
 
