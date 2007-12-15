@@ -19,7 +19,7 @@ PIR or an Eval PMC (bytecode).
     $P0 = get_hll_global 'Protomaker'
     $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'POST::Compiler', '$!code')
 
-    $P0 = new 'POST::Compiler'
+    $P0 = get_hll_global ['POST'], 'Compiler'
     $P0.'language'('POST')
     $P1 = split ' ', 'pir evalpmc'
     $P0.'stages'($P1)

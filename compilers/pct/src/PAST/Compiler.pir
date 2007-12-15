@@ -16,7 +16,7 @@ By default PAST::Compiler transforms a PAST tree into POST.
     $P0 = get_hll_global 'Protomaker'
     $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'PAST::Compiler')
 
-    $P0 = new 'PAST::Compiler'
+    $P0 = get_hll_global ['PAST'], 'Compiler'
     $P0.'language'('PAST')
     $P1 = split ' ', 'post pir code'
     $P0.'stages'($P1)
@@ -1093,7 +1093,9 @@ blocks to determine the scope.
     ops.'push'(vivilabel)
 
   param_required:
-    subpost.'add_param'(pname, 'named'=>named)
+    .local int slurpy
+    slurpy = node.'slurpy'()
+    subpost.'add_param'(pname, 'named'=>named, 'slurpy'=>slurpy)
     name = ops.'escape'(name)
     ops.'push_pirop'('.lex', name, ops)
     .return (ops)
