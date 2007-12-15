@@ -46,7 +46,7 @@ as a macro identifier. The PIR directives are:
   .get_results    .namespace         .return
   .globalconst    .nci_call          .result
   .HLL_map        .param             .sub
-  .HLL            .begin_return  .yield
+  .HLL            .begin_return      .yield
   .include        .begin_yield
 
 
@@ -126,8 +126,7 @@ document.
     | sub_def
     | const_def
     | expansion
-    | pragma
-    | emit
+    | pragma   
 
 =head2 Subroutine definitions
 
@@ -375,9 +374,7 @@ pasm_instr defines the syntax for pure PASM instructions.
     | const_def
     | globalconst_def
     | conditional_stat
-    | assignment_stat
-    | open_namespace
-    | close_namespace
+    | assignment_stat    
     | return_stat
     | sub_invocation
     | macro_invocation
@@ -627,10 +624,7 @@ As languages/PIR evolves, this will be completed.
 
   key:
       simple_expr
-    | simple_expr ".."
-    | ".." simple_expr
-    | simple_expr ".." simple_expr
-
+	  
   result_var_list:
     "(" result_vars? ")"
 
@@ -1004,37 +998,6 @@ call can also be a method call, like so:
   .return obj.'foo'()
 
 
-=head2 Symbol namespaces
-
-  open_namespace:
-    ".namespace" identifier
-
-  close_namespace:
-    ".endnamespace" identifier
-
-=head3 Example open/close namespaces
-
-  .sub main
-    .local int x
-    x = 42
-    say x
-    .namespace NESTED
-    .local int x
-    x = 43
-    say x
-    .endnamespace NESTED
-    say x
-  .end
-
-Will print:
-
-  42
-  43
-  42
-
-Please note that it is B<not> necessary to I<pair> these statements; it is
-acceptable to open a C<.namespace> without closing it.
-The scope of the C<.namespace> is limited to the subroutine.
 
 =head2 Expansions
 
@@ -1049,8 +1012,6 @@ The scope of the C<.namespace> is limited to the subroutine.
 
   pasm_constant:
     ".constant" identifier [ constant_value | register ]
-
-
 
 =head2 Macros
 
@@ -1076,7 +1037,7 @@ done using the C<.macro_local> directive. B<TODO: decide on keyword for this>.
 The C<.label> directive is available for declaring unique labels.
 
   macro_label:
-    ".label" "$"identifier":"
+    ".macrolabel" "$"identifier":"
 
 =head3 Example Macros
 
@@ -1284,15 +1245,26 @@ PDD20 - Lexically scoped variables in Parrot
 
 =item *
 
-docs/imcc/calling_conventions.pod - definition of sub flags (:init etc)
-
-=item *
-
-docs/imcc/syntax.pod - official syntax for IMCC/PIR.
+docs/pdds/draft/pdd19_pir.pod
 
 =back
 
 =head1 CHANGES
+
+0.3.1
+
+=over 4
+
+=item *
+
+Remove .namespace for scopes
+
+=item *
+
+Some clean-ups
+
+=back
+
 
 0.3.0
 
