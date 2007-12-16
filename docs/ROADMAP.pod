@@ -7,6 +7,8 @@ ROADMAP - A plan for Parrot
 
 =head1 PURPOSE
 
+Note: this file is outdated and (its future) must be reviewed. See [RT#48611].
+
 There is no single place in which all remaining parrot work is documented.
 There are various TODO files, the RT queue, comments in the source code and
 the documentation. This document is a first pass at unifying this information
