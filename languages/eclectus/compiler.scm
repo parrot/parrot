@@ -164,6 +164,16 @@
   val_x = new 'PAST::Op'
   val_x.init( $P0, 'pasttype' => 'inline', 'name' => 'infix:-', 'inline' => \"new %r, 'EclectusFixnum'\\nassign %r, %0\\n\" )
         "))
+;
+; implementation of fixnum->char
+(define-primitive (fixnum->char arg)
+  (emit-expr arg)
+  (emit "
+  $P0 = val_x
+  val_x = new 'PAST::Op'
+  val_x.init( $P0, 'pasttype' => 'inline', 'name' => 'infix:-', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
+        "))
+
 
 ; a getter of '*emitter*'
 (define (primitive-emitter x)
