@@ -1,6 +1,6 @@
 #! parrot
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: /mirror/trunk/t/op/say.t 20627 2007-08-14T23:50:55.898359Z chromatic  $
+# $Id$
 
 =head1 NAME
 
@@ -64,7 +64,7 @@ Tests various PMCs with copy.
 .end
 #! parrot
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: /mirror/trunk/t/op/say.t 20627 2007-08-14T23:50:55.898359Z chromatic  $
+# $Id$
 
 =head1 NAME
 

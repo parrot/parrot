@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 108-inter_make-02.t 23890 2007-12-14 16:58:20Z jkeenan $
+# $Id$
 # 108-inter_make-02.t
 
 use strict;
