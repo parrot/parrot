@@ -10,10 +10,6 @@ src/pmc/nci.pmc - Native Call Interface
 
 The vtable functions for the native C call functions.
 
-Invoking an NCI function changes some registers according to PDD 3.
-
-The caller has to preserve registers if needed.
-
 =head2 Methods
 
 =over 4
