@@ -93,7 +93,7 @@ Marks the namespace as live.
 
 */
     void mark() {
-        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
         SUPER();
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
@@ -133,7 +133,7 @@ Returns the class or role PMC that is associated with this namespace.
 
     PMC *get_class()
     {
-        Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
+        const Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
         return nsinfo->_class;
     }
 
@@ -179,9 +179,9 @@ really a public API.
 
         /* If it's a sub... */
         if (value->vtable->base_type == enum_class_Sub) {
-            Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
-            PMC           *vtable    = nsinfo->vtable;
-            Parrot_sub    *sub       = PMC_sub(value);
+            Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
+            PMC           *       vtable = nsinfo->vtable;
+            Parrot_sub    * const sub    = PMC_sub(value);
             PMC * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Handle vtable methods with two underscores at the start. */
@@ -237,7 +237,7 @@ really a public API.
 
         /* If it's an NCI method */
         if (value->vtable->base_type == enum_class_NCI) {
-            Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
+            Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
             PMC * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Insert it in class, if there is a class */
@@ -260,11 +260,11 @@ really a public API.
         if (value->vtable->base_type == enum_class_MultiSub) {
 
             if (VTABLE_elements(interp, value) > 0) {
-                Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
+                Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
                 PMC * const classobj = VTABLE_get_class(interp, SELF);
 
                 /* Extract the first alternate and check if it is a method */
-                Parrot_sub *sub = PMC_sub(VTABLE_get_pmc_keyed_int(interp, value, 0));
+                Parrot_sub * const sub = PMC_sub(VTABLE_get_pmc_keyed_int(interp, value, 0));
 
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
                     /* Insert it in class, if there is a class */
@@ -290,7 +290,7 @@ really a public API.
         if (!b)
             SUPER(key, value);
         else {
-            PMC *old = (PMC *)b->value;
+            PMC * const old = (PMC *)b->value;
 
             if ((old->vtable->base_type == enum_class_NameSpace) == val_is_NS) {
                 /* simple ns or simple var/sub changed */
