@@ -617,7 +617,7 @@ Returns the PMC value for the element at C<*key>.
 
 /*
 
-=item C<INTVAL is_same(PMC *other)>
+=item C<INTVAL is_same(const PMC *other)>
 
 Returns whether the hash is the same as C<*other>.
 
@@ -625,7 +625,7 @@ Returns whether the hash is the same as C<*other>.
 
 */
 
-    INTVAL is_same(PMC *other) {
+    INTVAL is_same(const PMC *other) {
         return (INTVAL)(other->vtable == SELF->vtable &&
             PMC_struct_val(other) == PMC_struct_val(SELF));
     }

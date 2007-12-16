@@ -260,9 +260,9 @@ Parrot_sub * new_closure(PARROT_INTERP)
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_cont * new_continuation(PARROT_INTERP, ARGIN(const Parrot_cont *to))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+Parrot_cont * new_continuation(PARROT_INTERP,
+    ARGIN_NULLOK(const Parrot_cont *to))
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL

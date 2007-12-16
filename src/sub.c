@@ -147,7 +147,7 @@ to the current context.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_cont *
-new_continuation(PARROT_INTERP, ARGIN(const Parrot_cont *to))
+new_continuation(PARROT_INTERP, ARGIN_NULLOK(const Parrot_cont *to))
 {
     Parrot_cont    * const cc     = mem_allocate_typed(Parrot_cont);
     Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
