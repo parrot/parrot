@@ -24,7 +24,6 @@ use Carp;
 use File::Basename;
 use File::Copy;
 use FindBin;
-use Data::Dumper;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
 use IO::CaptureOutput qw| capture |;
 use_ok('Cwd');
