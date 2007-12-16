@@ -22,11 +22,13 @@ ECLECTUS_GROUP  = $(PMC_DIR)/eclectus_group@load_ext@
 PMCS            = \
     eclectusboolean \
     eclectuscharacter \
-    eclectusemptylist
+    eclectusemptylist \
+    eclectusfixnum
 PMC_SOURCES     = \
     $(PMC_DIR)/eclectusboolean.pmc \
     $(PMC_DIR)/eclectuscharacter.pmc \
-    $(PMC_DIR)/eclectusemptylist.pmc
+    $(PMC_DIR)/eclectusemptylist.pmc \
+    $(PMC_DIR)/eclectusfixnum.pmc
 
 
 # The default target
@@ -36,8 +38,8 @@ help :
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  build:             Does nothing currently."
-	@echo "                     This is the default."
+	@echo "  build:             Builds the dynamic PMCSs needed by Eclectus."
+	@echo "                     This is the default target."
 	@echo ""
 	@echo "  test:              Run the test suite."
 	@echo ""

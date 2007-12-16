@@ -86,7 +86,7 @@
      [(fixnum? x) (format
 "
     val_x = new 'PAST::Val'
-    val_x.init( 'value' => ~a, 'returns' => 'Integer' )
+    val_x.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
 " x)]
      [(char? x) (format
 "
