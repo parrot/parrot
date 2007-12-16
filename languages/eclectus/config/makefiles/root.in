@@ -85,10 +85,6 @@ dynext-clean:
 realclean: clean
 	$(RM_F) Makefile
 
-over:
-	@$(MAKE) clean
-	@$(MAKE) all
-
 # testing
-test:
+test: build
 	$(PERL) t/harness
