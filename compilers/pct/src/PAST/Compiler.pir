@@ -558,7 +558,7 @@ a 'pasttype' of if/unless.
 
 =item until(PAST::Op node)
 
-Return the PAST representation of a C<while> or C<until> loop.
+Return the POST representation of a C<while> or C<until> loop.
 
 =cut
 
@@ -616,7 +616,7 @@ Return the PAST representation of a C<while> or C<until> loop.
 
 =item repeat_until(PAST::Op node)
 
-Return the PAST representation of a C<repeat_while> or C<repeat_until> loop.
+Return the POST representation of a C<repeat_while> or C<repeat_until> loop.
 
 =cut
 
@@ -668,7 +668,7 @@ Return the PAST representation of a C<repeat_while> or C<repeat_until> loop.
 
 =item for(PAST::Op node)
 
-Return the PAST representation of the C<for> loop given
+Return the POST representation of the C<for> loop given
 by C<node>.
 
 =cut
