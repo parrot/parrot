@@ -12,10 +12,6 @@ Each interpreter has a concurrency scheduler element in its core struct. The
 scheduler is responsible for receiveing, dispatching, and monitoring events,
 exceptions, async I/O, and concurrent tasks (threads).
 
-=head2 Functions
-
-=over 4
-
 =cut
 
 */
@@ -44,6 +40,12 @@ static void* scheduler_runloop(NOTNULL(PMC *scheduler))
 /* HEADERIZER END: static */
 
 /*
+
+=head2 Interface Functions
+
+Functions that are used to interface with the concurrency scheduler.
+
+=over 4
 
 =item C<void
 Parrot_cx_init_scheduler(PARROT_INTERP)>
@@ -83,70 +85,6 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
             (pt_start_routine_f *)scheduler_runloop, (void *) scheduler);
 
     }
-}
-
-/*
-
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static void*
-scheduler_runloop(NOTNULL(PMC *scheduler))>
-
-The scheduler runloop is started by the interpreter. It manages the flow of
-concurrent scheduling for the parent interpreter, and for lightweight
-concurrent tasks running within that interpreter. More complex concurrent tasks
-have their own runloop.
-
-Currently the runloop is implented as a mutex/lock thread.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static void*
-scheduler_runloop(NOTNULL(PMC *scheduler))
-{
-    Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
-    int running = 1;
-
-#if CX_DEBUG
-    fprintf(stderr, "started scheduler runloop\n");
-#endif
-    LOCK(sched_struct->lock);
-
-    while (running) {
-            /* Process pending tasks, if there are any */
-            if (VTABLE_get_integer(sched_struct->interp, scheduler) > 0) {
-#if CX_DEBUG
-            fprintf(stderr, "handling tasks in scheduler runloop\n");
-#endif
-                running = Parrot_cx_handle_tasks(sched_struct->interp, scheduler);
-            }
-            else {
-                /* Otherwise, the runloop sleeps until a task is pending */
-#if CX_DEBUG
-                fprintf(stderr, "sleeping in scheduler runloop\n");
-#endif
-                Parrot_cx_runloop_sleep(scheduler);
-#if CX_DEBUG
-                fprintf(stderr, "waking in scheduler runloop\n");
-#endif
-/*                LOCK(sched_struct->lock); */
-            }
-    } /* end runloop */
-
-#if CX_DEBUG
-    fprintf(stderr, "ended scheduler runloop\n");
-#endif
-
-    UNLOCK(sched_struct->lock);
-
-    COND_DESTROY(sched_struct->condition);
-    MUTEX_DESTROY(sched_struct->lock);
-
-    return NULL;
 }
 
 /*
@@ -358,6 +296,86 @@ Parrot_cx_find_handler_for_task(PARROT_INTERP, NOTNULL(PMC *task))
 #endif
     return handler;
 }
+
+/*
+
+=back
+
+=head2 Internal Functions
+
+Functions that are only used within the scheduler.
+
+=over 4
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static void*
+scheduler_runloop(NOTNULL(PMC *scheduler))>
+
+The scheduler runloop is started by the interpreter. It manages the flow of
+concurrent scheduling for the parent interpreter, and for lightweight
+concurrent tasks running within that interpreter. More complex concurrent tasks
+have their own runloop.
+
+Currently the runloop is implented as a mutex/lock thread.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static void*
+scheduler_runloop(NOTNULL(PMC *scheduler))
+{
+    Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
+    int running = 1;
+
+#if CX_DEBUG
+    fprintf(stderr, "started scheduler runloop\n");
+#endif
+    LOCK(sched_struct->lock);
+
+    while (running) {
+            /* Process pending tasks, if there are any */
+            if (VTABLE_get_integer(sched_struct->interp, scheduler) > 0) {
+#if CX_DEBUG
+            fprintf(stderr, "handling tasks in scheduler runloop\n");
+#endif
+                running = Parrot_cx_handle_tasks(sched_struct->interp, scheduler);
+            }
+            else {
+                /* Otherwise, the runloop sleeps until a task is pending */
+#if CX_DEBUG
+                fprintf(stderr, "sleeping in scheduler runloop\n");
+#endif
+                Parrot_cx_runloop_sleep(scheduler);
+#if CX_DEBUG
+                fprintf(stderr, "waking in scheduler runloop\n");
+#endif
+/*                LOCK(sched_struct->lock); */
+            }
+    } /* end runloop */
+
+#if CX_DEBUG
+    fprintf(stderr, "ended scheduler runloop\n");
+#endif
+
+    UNLOCK(sched_struct->lock);
+
+    COND_DESTROY(sched_struct->condition);
+    MUTEX_DESTROY(sched_struct->lock);
+
+    return NULL;
+}
+
+/*
+
+=back
+
+=cut
+
+*/
 
 
 /*
