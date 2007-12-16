@@ -18,6 +18,10 @@
   [(fixnum->char 65)                      => "#\\A\n" ]
   [(fixnum->char (fxsub1 66))             => "#\\A\n" ]
   [(fixnum->char (fxsub1 (fxsub1 67)))    => "#\\A\n" ]
+  [(fxzero? 0)                            => "#t\n" ]
+  [(fxzero? -1)                           => "#f\n" ]
+  [(fxzero? 1)                            => "#f\n" ]
+  [(fxzero? (char->fixnum #\A))           => "#f\n" ]
 )
 
 (test-all)
