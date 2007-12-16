@@ -26,7 +26,6 @@ use warnings;
 use Parrot::Pmc2c::Emitter;
 use Parrot::Pmc2c::UtilFunctions
     qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
-use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PCCMETHOD;
 
 =item C<body($method, $line, $out_name)>
