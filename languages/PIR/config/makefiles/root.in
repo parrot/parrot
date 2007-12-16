@@ -154,7 +154,18 @@ CLEANUPS = \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
-  
+  src/pasm/gen_pasm_pmc.pir \
+  src/pasm/gen_pasm.pir \
+  src/pasm/gen_pasm_io.pbc \
+  src/pasm/gen_pasm_core.pir \
+  src/pasm/gen_pasm_pmc.pbc \
+  src/pasm/gen_pasm.pbc \
+  src/pasm/gen_pasm_args.pir \
+  src/pasm/gen_pasm_instr.pir \
+  src/pasm/gen_pasm_core.pbc \
+  src/pasm/gen_pasm_args.pbc \
+  src/pasm/gen_pasm_io.pir \
+  src/pasm/gen_pasm_instr.pbc
 
 clean:
 	$(RM_RF) $(CLEANUPS)
