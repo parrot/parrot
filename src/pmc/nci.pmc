@@ -24,7 +24,7 @@ The vtable functions for the native C call functions.
 typedef struct Parrot_NCI {
     STRING *signature;    /* The signature. */
     int arity;            /* Cached arity of the NCI. */
-	funcptr_t *func;      /* Function pointer to what we'll call. */
+    funcptr_t *func;      /* Function pointer to what we'll call. */
 } Parrot_NCI;
 
 /* Macro to access underlying structure of an NCI PMC. */
@@ -74,8 +74,8 @@ Initializes the NCI with a C<NULL> function pointer.
     void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF)    = PMCNULL;
-		PMC_data(SELF)       = mem_sys_allocate_zeroed(sizeof(Parrot_NCI));
-        
+        PMC_data(SELF)       = mem_sys_allocate_zeroed(sizeof(Parrot_NCI));
+
         /* Mark that we're not a raw NCI. */
         PObj_flag_CLEAR(private2, SELF);
     }
@@ -91,16 +91,16 @@ Sets the specified function pointer and signature (C<*key>).
 */
 
     void set_pointer_keyed_str(STRING *key, void *func) {
-        Parrot_NCI *nci_info = PARROT_NCI(SELF);
+        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
 
-		/* Store the original function and signature. */
+        /* Store the original function and signature. */
         PMC_struct_val(SELF) = func;
-		nci_info->signature  = key;
+        nci_info->signature  = key;
 
-		/* Arity is length of that string minus one (the return type). */
-		nci_info->arity      = string_length(INTERP, key) - 1;
+        /* Arity is length of that string minus one (the return type). */
+        nci_info->arity      = string_length(INTERP, key) - 1;
 
-		/* Build call function. */
+        /* Build call function. */
         nci_info->func       = build_call_func(INTERP, SELF, key);
     }
 
@@ -116,11 +116,11 @@ Destroys the NCI, freeing any allocated memory.
 
     void destroy() {
         if (PMC_data(SELF)) {
-			Parrot_NCI *nci_info = PARROT_NCI(SELF);
-			if (nci_info->func)
-				mem_free_executable(nci_info->func);
-			mem_sys_free(nci_info);
-		}
+            Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+            if (nci_info->func)
+                mem_free_executable(nci_info->func);
+            mem_sys_free(nci_info);
+        }
     }
 
 /*
@@ -134,9 +134,9 @@ Creates and returns a clone of the NCI.
 */
 
     PMC *clone() {
-        Parrot_NCI *nci_info_self = PARROT_NCI(SELF);
+        Parrot_NCI * const nci_info_self = PARROT_NCI(SELF);
         Parrot_NCI *nci_info_ret;
-        
+
         PMC * const ret     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret)    = PMCNULL;
@@ -166,7 +166,7 @@ Returns whether the NCI is defined.
 */
 
     INTVAL defined() {
-		Parrot_NCI *nci_info = PARROT_NCI(SELF);
+        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
         return nci_info->func != NULL;
     }
 
@@ -183,9 +183,9 @@ shifted down.
 */
 
     opcode_t *invoke(void *next) {
-        Parrot_NCI *nci_info = PARROT_NCI(SELF);
+        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
 
-		typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
+        typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
             ? (nci_sub_t) D2FPTR(PMC_struct_val(SELF))
@@ -227,7 +227,7 @@ Returns the function pointer as an integer.
 */
 
     INTVAL get_integer() {
-		Parrot_NCI *nci_info = PARROT_NCI(SELF);
+        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
         return (INTVAL)nci_info->func;
     }
 
@@ -242,8 +242,8 @@ Returns the boolean value of the pointer.
 */
 
     INTVAL get_bool() {
-        Parrot_NCI *nci_info = PARROT_NCI(SELF);
-		return (0 != (INTVAL)nci_info->func);
+        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        return (0 != (INTVAL)nci_info->func);
     }
 
 /*
@@ -255,15 +255,15 @@ Return the arity of the NCI (the number of arugments).
 =cut
 
 */
-	METHOD INTVAL arity() {
-		Parrot_NCI *nci_info = PARROT_NCI(SELF);
-		if (nci_info != NULL && nci_info->func != NULL)
-			return nci_info->arity;
-		else
-			real_exception(INTERP, NULL, INVALID_OPERATION,
-                "You cannot get the arity of an undefined NCI.");
-		return 0; /* Unreachable; avoids warning. */
-	}
+    METHOD INTVAL arity() {
+        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        if (nci_info && nci_info->func)
+            return nci_info->arity;
+        else
+            real_exception(INTERP, NULL, INVALID_OPERATION,
+                    "You cannot get the arity of an undefined NCI.");
+        return 0; /* Unreachable; avoids warning. */
+    }
 
 }
 
