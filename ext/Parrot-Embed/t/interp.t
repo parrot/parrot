@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 26;
 use File::Spec;
 
 my $hello_pbc = File::Spec->catfile( 't', 'greet.pbc' );
@@ -18,19 +18,6 @@ can_ok( $module, 'new' );
 my $interp = $module->new();
 ok( $interp, 'new() should return a valid interpreter' );
 isa_ok( $interp, $module );
-
-my $interp2 = $module->new($interp);
-ok( $interp, 'new() should return a valid interpreter, given a parent interp' );
-isa_ok( $interp, $module );
-
-isnt( $$interp, $$interp2, '... but different interpreters' );
-
-{
-    local @Subclass::ISA = $module;
-    my $sc = Subclass->new($interp2);
-    isa_ok( $sc, $module );
-    isa_ok( $sc, 'Subclass' );
-}
 
 can_ok( $module, 'load_file' );
 my $result = eval { $interp->load_file('no file here') };

@@ -7,7 +7,9 @@ use warnings;
 
 our $VERSION = '0.02';
 
-use base 'DynaLoader';
+use base qw(DynaLoader Exporter);
+
+our @EXPORT_OK = qw(Parrot_revision);
 
 Parrot::Embed->bootstrap($VERSION);
 
@@ -25,12 +27,23 @@ Version 0.02
 
 =head1 SYNOPSIS
 
+  use Parrot::Embed qw(Parrot_revision);
+
+=head1 DESCRIPTION
+
 This module embeds libparrot in Perl 5 programs.  You can load Parrot bytecode,
 compile your own code, and call Parrot subroutines and send and receive values
 to them.
 
+It provides the core implementation used by the L<Parrot::Interpreter> module.
 Do consider using L<Parrot::Interpreter> first however.  See also
 L<Parrot::PMC>.
+
+The only useful interface provided by this module is Parrot_revision().
+
+=head2 Parrot_revision()
+
+Returns the integer revision number of the embedded libparrot.
 
 =head1 AUTHOR
 
