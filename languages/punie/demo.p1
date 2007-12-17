@@ -11,10 +11,10 @@ print 1 - 2 - 3;
 print "\n";
 print 1 + 2, "\n", 2 + 3, "\n";
 
-do { 
-	print "ok 15\n"; 
-	print "ok 16\n"; 
-	print "ok 17\n"; 
+do {
+    print "ok 15\n";
+    print "ok 16\n";
+    print "ok 17\n";
 };
 
 if (1) {
