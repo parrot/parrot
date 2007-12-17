@@ -74,7 +74,7 @@ Initializes the NCI with a C<NULL> function pointer.
     void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF)    = PMCNULL;
-        PMC_data(SELF)       = mem_sys_allocate_zeroed(sizeof(Parrot_NCI));
+        PMC_data(SELF)       = mem_allocate_zeroed_typed(Parrot_NCI);
 
         /* Mark that we're not a raw NCI. */
         PObj_flag_CLEAR(private2, SELF);
@@ -101,7 +101,8 @@ Sets the specified function pointer and signature (C<*key>).
         nci_info->arity      = string_length(INTERP, key) - 1;
 
         /* Build call function. */
-        nci_info->func       = build_call_func(INTERP, SELF, key);
+        nci_info->func       =
+            (void (**)(void))(build_call_func(INTERP, SELF, key));
     }
 
 /*
@@ -140,7 +141,7 @@ Creates and returns a clone of the NCI.
         PMC * const ret     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret)    = PMCNULL;
-        PMC_data(ret)       = mem_sys_allocate_zeroed(sizeof(Parrot_NCI));
+        PMC_data(ret)       = mem_allocate_zeroed_typed(Parrot_NCI);
         nci_info_ret = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need
