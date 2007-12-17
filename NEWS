@@ -7,22 +7,23 @@ New in 0.5.1 (through r23824)
   + Improve documentation of deprecated parrot features.
 - Compilers
   + PCT: Parrot Compiler Toolkit redesigned and updated
-  + NQP: major updates, including support for namespaces, 
+  + NQP: major updates, including support for namespaces,
     module/class declarations, methods
   + IMCC: remove .sym as alias for .local. Remove .pcc_
     prefix for calling directives (.pcc_begin became .begin_call).
   + PIRC: creates an AST during the parse.
-+ Languages
-  + perl6: <<pmichaud>>
+  + PGE: more updates to match S05 syntax.
+- Languages
+  + perl6: re-implemented using PCT and NQP, new object subsystem
   + abc: re-implemented using PCT and NQP
   + eclectus: initial implementation
   + lua: use PCT
   + plumhead: add PCT variant
   + punie: re-implemented using PCT and NQP (passing more tests)
-  + pynie: <<pmichaud>>
+  + pynie: re-implemented using PCT and NQP
   + PIR: start conversion to NQP (under construction)
 - Implementation
-  + new opcodes: 'die', 'addhandler'
+  + new opcodes: 'die', 'addhandler', 'copy'
   + Initial implementation of Concurrency PDD
   + Add 'arity' method to Subs
 - Miscellaneous
