@@ -17,7 +17,6 @@ New in 0.5.1 (through r23824)
   + perl6: re-implemented using PCT and NQP, new object subsystem
   + abc: re-implemented using PCT and NQP
   + eclectus: initial implementation
-  + lua: use PCT
   + plumhead: add PCT variant
   + punie: re-implemented using PCT and NQP (passing more tests)
   + pynie: re-implemented using PCT and NQP

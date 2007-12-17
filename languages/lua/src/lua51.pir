@@ -7,8 +7,8 @@ src/lua51.pir -- The compiler for Lua 5.1
 
 =head1 DESCRIPTION
 
-This compiler extends C<PCT::HLLCompiler>
-(see F<compilers/pct/src/HLLCompiler.pir>)
+This compiler extends C<HLLCompiler>
+(see F<runtime/parrot/library/Parrot/HLLCompiler.pir>)
 
 This compiler defines the following stages:
 
@@ -33,9 +33,9 @@ Used by F<languages/lua/lua.pir>.
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'PCT/HLLCompiler.pbc'
+    load_bytecode 'Parrot/HLLCompiler.pbc'
 
-    $P0 = subclass 'PCT::HLLCompiler', 'Lua::Compiler'
+    $P0 = subclass 'HLLCompiler', 'Lua::Compiler'
     new $P0, 'Lua::Compiler'
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
