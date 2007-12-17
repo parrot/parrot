@@ -10,6 +10,7 @@ use Carp qw( confess );
 # rewriting doesn't stomp on them.
 my @experimental_files = qw(
     exceptions.c
+    hll.c
     objects.c
     string.c
     string_primitives.c

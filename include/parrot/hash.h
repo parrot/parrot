@@ -139,12 +139,13 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket* parrot_hash_put(PARROT_INTERP,
-    NOTNULL(Hash *hash),
-    NOTNULL(void *key),
-    NULLOK(void *value))
+    ARGINOUT(Hash *hash),
+    ARGIN(void *key),
+    ARGIN(void *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
