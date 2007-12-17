@@ -2215,7 +2215,7 @@ loadlib(parser_state *p)
 =item C<static void compilation_unit(parser_state *p)>
 
   compilation_unit -> sub_definition
-                    | '.const' const_definition                    
+                    | '.const' const_definition
                     | include
                     | macro_definition
                     | pragma
@@ -2237,7 +2237,7 @@ compilation_unit(parser_state *p)
         case T_CONST: /* compilation_unit -> '.const' const_definition */
             next(p);
             const_definition(p);
-            break;        
+            break;
         case T_INCLUDE: /* compilation_unit -> '.include' STRINGC */
             include(p);
             break;

@@ -141,9 +141,9 @@ static char const * dictionary[] = {
    /* NULL,  */                 /*                          */
     ".arg",                     /* T_ARG                    */
     ".const",                   /* T_CONST,                 */
-    ".constant",                /* T_CONSTANT,              */    
-    ".end",                     /* T_END,                   */    
-    ".endm",                    /* T_ENDM,                  */    
+    ".constant",                /* T_CONSTANT,              */
+    ".end",                     /* T_END,                   */
+    ".endm",                    /* T_ENDM,                  */
     ".get_results",             /* T_GET_RESULTS            */
     ".globalconst",             /* T_GLOBALCONST            */
     ".HLL",                     /* T_HLL                    */
