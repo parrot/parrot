@@ -455,6 +455,7 @@ sub get_perl_exemption_regexp {
         lib/Class/
         lib/Digest/Perl/
         lib/File/
+        lib/IO/
         lib/Parse/
         lib/Pod/
         lib/SmartLink.pm

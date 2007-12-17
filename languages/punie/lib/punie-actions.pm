@@ -1,3 +1,6 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id $
+
 class Punie::Grammar::Actions;
 
 ##  The ast of the entire program is the ast of the
