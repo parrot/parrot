@@ -9,6 +9,7 @@ use Carp qw( confess );
 # While I work on files individually to make sure headerizing and
 # rewriting doesn't stomp on them.
 my @experimental_files = qw(
+    datatypes.c
     exceptions.c
     hash.c
     hll.c
