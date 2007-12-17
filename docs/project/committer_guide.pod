@@ -30,6 +30,10 @@ New files also need to have the appropriate svn properties set.  For most
 files this requires setting the C<svn:eol-style>, C<svn:keywords> and
 C<svn:mime-type> properties.
 
+You can check the svn properties by running:
+
+  % perl t/distro/file_metadata.t
+
 =head2 C<svn:eol-style>
 
 Most files in Parrot should have the file endings set to "native".  You do
