@@ -3,11 +3,21 @@
 
 =head1 NAME
 
-ROADMAP - A plan for Parrot
+ROADMAP - A plan for parrot 1.0.
 
 =head1 PURPOSE
 
-Note: this file is outdated and (its future) must be reviewed. See [RT#48611].
+Describe the work that is remaining to release parrot 1.0, including
+both user-visibile features and internals.
+
+This document is intended to be a high level overview of remaining areas
+of work. For more detailed information about remaining tasks, see
+L<https://rt.perl.org/rt3>.
+
+=head1 NOTE
+
+Note: the contents of this file are outdated and must be reviewed.
+See RT #48611. (Anything below this section still needs review)
 
 There is no single place in which all remaining parrot work is documented.
 There are various TODO files, the RT queue, comments in the source code and
@@ -306,7 +316,7 @@ Implement the Parrot equivalent of Perl 5's C<$0>, based on recent (January
 
 The debugger needs to clone the interpreter to "allow people to play into the
 debugger and then continue the normal execution of the program."
-L<src/ops/debug.ops> (DONE). TODO - rewrite debugger.
+L<src/ops/debug.ops >> (DONE). TODO - rewrite debugger.
 
 =back
 
