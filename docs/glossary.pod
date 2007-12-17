@@ -187,14 +187,6 @@ require you to get your own copy.
 
 L<http://oss.software.ibm.com/icu/index.html>
 
-=head2 IMC
-
-Parrot InterMediate Code, or another name for PIR.  A convention once arose to
-name input files to IMCC with the extension ".imc", so the name IMC became
-synonymous with PIR. This file extension has since been deprecated.
-
-See also L<"IMCC">, L<"PIR">.
-
 =head2 IMCC
 
 Parrot's Intermediate Code Compiler, which started its life as an improved
@@ -263,15 +255,14 @@ Pugs' Intermediate Language.
 
 Parrot Intermediate Representation. A medium-level assembly language for Parrot
 that hides messy details like register allocation so language compiler writers
-who target PIR don't have to roll their own.
-
-See also L<"IMC">.
+who target Parrot don't have to roll their own. Files have the 
+extension C<.pir>.
 
 =head2 PMC
 
-PMC is an acronym for Parrot Magic Cookie. (Or Cracker, your choice.)  PMC
-classes are the primitives that Parrot-based languages use to represent their
-fundamental types, such as Perl's scalar values.
+PMC is an acronym for Parrot Magic Cookie. PMC classes are the primitives that
+Parrot-based languages use to represent their fundamental types, such as Perl's
+scalar values.
 
 =head2 POD
 
