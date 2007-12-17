@@ -18,7 +18,7 @@
 
 /* Class PMC's underlying struct. */
 typedef struct Parrot_Class {
-    int id;                /* The type number of the PMC. [To be deprecated] */
+    int id;                /* The type number of the PMC. [deprecated: See RT #48024] */
     STRING *name;          /* The name of the class. */
     PMC *_namespace;       /* The namespace it's linked to, if any. */
     int instantiated;      /* Any instantiations since last modification? */

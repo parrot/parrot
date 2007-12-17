@@ -49,7 +49,7 @@ Instantiate a new object from a string PMC or key name, or from a class object.
 For strings and keys, first check the namespace for a class object, then fall
 back to the type ID if no class object is stored in the namespace.
 
-Creating a new PMC by type ID is deprecated.
+Creating a new PMC by type ID is deprecated. See RT #48014.
 
   new P0, 'ResizableBooleanArray'
 

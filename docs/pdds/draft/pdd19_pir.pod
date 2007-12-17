@@ -63,9 +63,9 @@ identifiers.
     A42
 
 Opcode names are not reserved words in PIR, and may be used as variable names.
-For example, you can define a local variable named C<print>.  [See #24251.]
+For example, you can define a local variable named C<print>.  [See RT #24251]
 
-NOTE: The use of C<::> in identifiers is deprecated.
+NOTE: The use of C<::> in identifiers is deprecated. [See RT #48735]
 
 =head3 Labels
 
@@ -243,7 +243,7 @@ bytecode file.
 
 As C<.const> above, but the defined constant is globally accessible.
 
-=item .namespace <identifier> [deprecated]
+=item .namespace <identifier> [deprecated: See RT #48737]
 
 Open a new scope block. This "namespace" is not the same as the
 .namespace [ <identifier> ] syntax, which is used for storing subroutines
@@ -265,7 +265,7 @@ that have nested scopes, can use this directive.
 They were a hackish attempt at implementing scopes in Parrot, but didn't
 actually turn out to be useful.}}
 
-=item .endnamespace <identifier> [deprecated]
+=item .endnamespace <identifier> [deprecated: See RT #48737]
 
 Closes the scope block that was opened with .namespace <identifier>.
 
@@ -652,8 +652,8 @@ var, 1> for string arguments and an integer key.
 =item <var> = <var> [ <key> ]
 
 {{ NOTE: keyed assignment is still valid in PIR, but the C<..> notation in keys
-is deprecated, so this syntactic sugar for slices is also deprecated. See the
-(currently experimental) C<slice> opcode instead. }}
+is deprecated [See RT #48561], so this syntactic sugar for slices is also
+deprecated. See the (currently experimental) C<slice> opcode instead. }}
 
 where C<key> is:
 

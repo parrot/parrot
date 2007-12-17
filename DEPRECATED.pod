@@ -2,12 +2,10 @@
 
 =head1 Deprecation in Parrot
 
-This is a list of currently deprecated features of Parrot.
-Every deprecation should have an associated RT ticket, but this
-is not the case yet (See [RT #41226]). Each item indicates indicates the
-last release it's guaranteed to appear in. Items marked with a release
-of ??? are still deprecated, but a firm deadline for their removal has not
-yet been established.
+This is a list of currently deprecated features of Parrot.  Every deprecation
+has an associated RT ticket.  Each item indicates the last release it's
+guaranteed to appear in.  Items marked with a release of ??? are still
+deprecated, but a firm deadline for their removal has not yet been established.
 
 When deprecated items are removed, all usage of the feature in the
 repository should be updated or removed; including documentation.
@@ -29,43 +27,43 @@ syntax will replace it under the name C<METHOD>. See RT #48565.
 
 =item * C<get_attr> [post 0.5.2]
 
-See RT #48583
+See RT #48583.
 
 =item * C<set_attr> [post 0.5.2]
 
-See RT #48585
+See RT #48585.
 
 =item * C<type_keyed> [post 0.5.2]
 
-See RT #48577
+See RT #48577.
 
 =item * C<type_keyed_int> [post 0.5.2]
 
-See RT #48579
+See RT #48579.
 
 =item * C<type_keyed_str> [post 0.5.2]
 
-See RT #48581
+See RT #48581.
 
 =item * C<get_bool_keyed> [post 0.5.2]
 
-See RT #48571
+See RT #48571.
 
 =item * C<get_bool_keyed_int> [post 0.5.2]
 
-See RT #48573
+See RT #48573.
 
 =item * C<get_bool_keyed_str> [post 0.5.2]
 
-See RT #48575
+See RT #48575.
 
 =item * C<type> [post 0.5.2]
 
-See RT #48567
+See RT #48567.
 
 =item * C<subtype> [post 0.5.2]
 
-See RT #48569
+See RT #48569.
 
 =item * C<hash> [post 0.5.1]
 
@@ -77,7 +75,7 @@ See RT #47011.
 
 =item * C<class_type> [post 0.5.1]
 
-See RT #48142
+See RT #48142.
 
 =item * C<pmc_namespace>  [post 0.5.1]
 
@@ -88,6 +86,14 @@ See RT# 48144. Replaced by C<get_namespace>.
 =head1 opcodes
 
 =over 4
+
+=item * C<getattribute_p_p_i>, C<setattribute_p_p_i> [post 0.5.1]
+
+See RT # 48729. These were already deprecated, but not fully removed.
+
+=item * C<classoffset> [post 0.5.1]
+
+See RT # 48727. This was already deprecated, but not fully removed.
 
 =item * C<pioctl> [post 0.5.1]
 
@@ -159,6 +165,14 @@ by integer or string key, use C<getattribute> and C<setattribute> instead.
 
 =over 4
 
+=item * C<<.namespace <identifier> >> syntax [post 0.5.1]
+
+See RT #48737.
+
+=item * Use of C<::> in identifiers [post 0.5.1]
+
+See RT #48735.
+
 =item * C<.constant> [post 0.5.1]
 
 See RT #48561. This will be replaced with <.macro_const>
@@ -191,7 +205,7 @@ Will have to be:
 
 =back
 
-=head1 Compiler tools
+=head1 Parrot Compiler tools
 
 =over 4
 
@@ -217,3 +231,14 @@ in favor of the new versions in the Parrot Compiler Toolkit
 PCT follows the specification given by pdd26 .
 
 =back
+
+=head1 Misc
+
+=over 4
+
+=item * 'v' NCI arg signature [post 0.5.1]
+
+See RT #48733. (Been removed for some time; nice warning is going away)
+
+=back
+

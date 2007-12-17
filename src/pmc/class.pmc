@@ -21,7 +21,7 @@ The Class PMC structure (C<Parrot_Class>) consists of twelve items:
 
 =item C<id>
 
-The type number of the PMC. [To be deprecated]
+The type number of the PMC. [deprecated: See RT #48024]
 
 =item C<name>
 
