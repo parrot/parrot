@@ -5,20 +5,6 @@
 
 IMCC and Parrot Programming for Compiler Developers - Frequently Asked Questions
 
-=head1 VERSION
-
-=over 4
-
-=item Revision 0.1 - 03 December 2001
-
-Initial creation as of Parrot version 0.0.13 by Melvin Smith
-
-=item Revision 0.2 - 10 May 2005
-
-Edited to specify the .pir extension rather than .pir
-
-=back
-
 =head1 GENERAL QUESTIONS
 
 =head2 What is Parrot?
@@ -33,8 +19,7 @@ The Parrot FAQ : http://www.parrotcode.org/faq/
 
 IMC stands for Intermediate Code; IMCC stands for Intermediate Code Compiler.
 You will also see the term PIR which is for Parrot Intermediate Representation
-and means the same thing as IMC. The extension C<.imc> is deprecated, instead
-you should use the C<.pir> extension for PIR files.
+and means the same thing as IMC. PIR files use the extension C<.pir>.
 
 It is an intermediate language that compiles either directly to Parrot Byte
 code, or translates to Parrot Assembly language. It is the preferred target
