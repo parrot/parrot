@@ -312,6 +312,14 @@ Avoid double negatives, e.g. C<#ifndef NO_FEATURE_FOO>.
 Do not compare directly against NULL, 0, or FALSE.  Instead, write a boolean
 test, e.g. C<if (!foo) ...>.
 
+However, the sense of the expression being checked must be a boolean.
+Specifically, C<strcmp()> and its brethren are three-state returns.
+
+    if ( !strcmp(x,y) )     # BAD, checks for if x and y match, but looks
+                            # like it is checking that they do NOT match.
+    if ( strcmp(x,y) == 0 ) # GOOD, checks proper return value
+    if ( STREQ(x,y) )       # GOOD, uses boolean wrapper macro
+
 (Note: C<PMC *> values should be checked for nullity with the C<PMC_IS_NULL>
 macro, unfortunately leading to violations of the double-negative rule.)
 
