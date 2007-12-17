@@ -280,7 +280,7 @@ STRING * string_grow(PARROT_INTERP, NOTNULL(STRING *s), INTVAL addlen)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-size_t string_hash(PARROT_INTERP, NULLOK(STRING *s), size_t seed)
+size_t string_hash(PARROT_INTERP, ARGINOUT_NULLOK(STRING *s), size_t seed)
         __attribute__nonnull__(1);
 
 PARROT_API

@@ -10,6 +10,7 @@ use Carp qw( confess );
 # rewriting doesn't stomp on them.
 my @experimental_files = qw(
     exceptions.c
+    hash.c
     hll.c
     objects.c
     string.c
@@ -128,7 +129,7 @@ sub extract_function_declarations {
     @funcs = grep /^\S/, @funcs;
 
     # Typedefs, enums and externs are no good
-    @funcs = grep !/^(typedef|enum|extern)\b/, @funcs;
+    @funcs = grep { !/^(typedef|enum|extern)\b/ } @funcs;
 
     # Structs are OK if they're not alone on the line
     @funcs = grep { !/^struct.+;\n/ } @funcs;
@@ -137,7 +138,7 @@ sub extract_function_declarations {
     @funcs = grep { !/^(static\s+)?struct.+{\n/ } @funcs;
 
     # Ignore magic function name YY_DECL
-    @funcs = grep !/YY_DECL/, @funcs;
+    @funcs = grep { !/YY_DECL/ } @funcs;
 
     # Ignore anything with magic words HEADERIZER SKIP
     @funcs = grep !m{/\*\s*HEADERIZER SKIP\s*\*/}, @funcs;
