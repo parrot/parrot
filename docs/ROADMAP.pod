@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-ROADMAP - A plan for parrot 1.0.
+ROADMAP - A plan for parrot 1.0 and beyond.
 
 =head1 PURPOSE
 
@@ -14,10 +14,39 @@ This document is intended to be a high level overview of remaining areas
 of work. For more detailed information about remaining tasks, see
 L<https://rt.perl.org/rt3>.
 
+It also contains information about future direction after 1.0.
+
+=head1 LAYOUT
+
+Each task is associated with a B<major> release of parrot. Additionally,
+each task will refer to its current state, and a link to any documentation
+regarding the task (i.e. something on Launchpad, RT, or in the repository,
+or on the wiki). Tasks with no supporting documentation will be marked
+[Unspecifed].
+
+=head1 1.0
+
+TBD.
+
+=head1 2.0
+
+=head2 Build System
+
+=over 4
+
+=item * Eliminate perl5 build requirement. [Unspecified]
+
+Parrot currently requires perl5 to build. Eventually we wish to
+eliminate this requirement.
+
+=back
+
 =head1 NOTE
 
-Note: the contents of this file are outdated and must be reviewed.
-See RT #48611. (Anything below this section still needs review)
+The contents of this file are outdated and must be reviewed.
+See RT #48611.
+
+=head1 UNREVIEWED CONTENT
 
 There is no single place in which all remaining parrot work is documented.
 There are various TODO files, the RT queue, comments in the source code and
@@ -316,7 +345,7 @@ Implement the Parrot equivalent of Perl 5's C<$0>, based on recent (January
 
 The debugger needs to clone the interpreter to "allow people to play into the
 debugger and then continue the normal execution of the program."
-L<src/ops/debug.ops >> (DONE). TODO - rewrite debugger.
+L<src/ops/debug.ops> (DONE). TODO - rewrite debugger.
 
 =back
 
