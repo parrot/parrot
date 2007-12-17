@@ -5,14 +5,14 @@
 
 .sub main
 
-.sym string _string
+.local string _string
 _string = "just another perl hacker"
 
 $I0 = 0
 
 loop0:
-	.sym pmc _str
-	.sym pmc _f
+	.local pmc _str
+	.local pmc _f
 	split _str, "", _string
 
        # you can't shift from the type of array that split returns. Do a

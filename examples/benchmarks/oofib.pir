@@ -2,16 +2,16 @@
 
 .sub bench :main
     .param pmc argv
-    .sym int argc
+    .local int argc
     argc = argv
-    .sym pmc N
+    .local pmc N
     N = new 'Integer'
     N = 28
     if argc <= 1 goto noarg
     $S0 = argv[1]
     N = $S0
 noarg:
-    .sym float start
+    .local num start
     time start
 
     .local pmc A
@@ -23,10 +23,10 @@ noarg:
 
     b = new "B"
 
-    .sym pmc r
+    .local pmc r
     r = b."fib"(N)
 
-    .sym float fin
+    .local num fin
     time fin
     print "fib("
     print N
@@ -48,10 +48,10 @@ noarg:
     .return n
     .end_return
 rec:
-    .sym pmc n1
-    .sym pmc n2
-    .sym pmc r1
-    .sym pmc r2
+    .local pmc n1
+    .local pmc n2
+    .local pmc r1
+    .local pmc r2
     n1 = new 'Integer'
     n2 = new 'Integer'
     n1 = n - 1
@@ -72,10 +72,10 @@ rec:
     .return n
     .end_return
 rec:
-    .sym pmc n1
-    .sym pmc n2
-    .sym pmc r1
-    .sym pmc r2
+    .local pmc n1
+    .local pmc n2
+    .local pmc r1
+    .local pmc r2
     n1 = new 'Integer'
     n2 = new 'Integer'
     n1 = n - 1
@@ -98,10 +98,10 @@ rec:
     .return n
     .end_return
 rec:
-    .sym pmc n1
-    .sym pmc n2
-    .sym pmc r1
-    .sym pmc r2
+    .local pmc n1
+    .local pmc n2
+    .local pmc r1
+    .local pmc r2
     n1 = new 'Integer'
     n2 = new 'Integer'
     n1 = n - 1

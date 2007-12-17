@@ -1,42 +1,37 @@
 # $Id$
 
+.namespace [ "Foo" ]
+
     newclass P1, "Foo"
-    find_global P2, "init"
-    store_global "Foo", "__init", P2
     addattribute P1, ".i"
     addattribute P1, ".j"
 
     set I10, 1
     set I11, 500000
-    P3 = new "Foo"
+    new P3, "Foo"
 loop:
-    classoffset I0, P3, "Foo"
     new P4, 'Integer'
     set P4, I10
-    setattribute P3, I0, P4
-    inc I0
+    setattribute P3, ".i", P4
     new P4, 'Integer'
     set P4, I10
-    setattribute P3, I0, P4
+    setattribute P3, ".j", P4
     inc I10
     le I10, I11, loop
 
-    classoffset I0, P3, "Foo"
-    getattribute P2, P3, I0
+    getattribute P2, P3, ".i"
     print P2
     print "\n"
     typeof I0, P3
     end
 
-.pcc_sub init:
+.pcc_sub __init:
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    classoffset I0, P2, "Foo"
     new P10, 'Integer'
     set P10, 10
-    setattribute P2, I0, P10
-    inc I0
+    setattribute P2, ".i", P10
     new P10, 'Integer'
     set P10, 20
-    setattribute P2, I0, P10
+    setattribute P2, ".j", P10
     returncc

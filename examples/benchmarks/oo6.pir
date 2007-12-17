@@ -26,47 +26,35 @@ loop:
 .end
 
 .namespace ["Foo"]
-.sub __init :method
-    .local int ofs
-    ofs = classoffset self, "Foo"
+.sub init :method :vtable
     new $P10, 'Integer'
     set $P10, 10
-    setattribute self, ofs, $P10
-    inc ofs
+    setattribute self, '.i', $P10
     new $P10, 'Integer'
     set $P10, 20
-    setattribute self, ofs, $P10
+    setattribute self, '.j', $P10
 .end
 
 .sub i :method
     .param pmc v     :optional
     .param int has_v :opt_flag
-    .local int ofs
-    ofs = classoffset self, "Foo"
     .local pmc r
-    r = getattribute self, ofs
+    r = getattribute self, '.i'
     unless has_v goto get
     assign r, v
 get:
-    .begin_return
-    .return r
-    .end_return
+    .return( r )
 .end
 
 .sub j :method
     .param pmc v     :optional
     .param int has_v :opt_flag
-    .local int ofs
-    ofs = classoffset self, "Foo"
-    inc ofs
     .local pmc r
-    r = getattribute self, ofs
+    r = getattribute self, '.j'
     unless has_v goto get
     assign r, v
 get:
-    .begin_return
-    .return r
-    .end_return
+    .return( r )
 .end
 
 # Local Variables:

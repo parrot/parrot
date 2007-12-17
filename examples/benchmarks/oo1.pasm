@@ -35,37 +35,34 @@
 #   RetCont out of loop                       0.57
 # parrot -j oo1-prop.pasm                     0.54
 
+.namespace [ "Foo" ]
+
     newclass P1, "Foo"
-    find_global P2, "init"
-    store_global "Foo", "__init", P2
     addattribute P1, ".i"
     addattribute P1, ".j"
 
     set I10, 0
     set I11, 100000
 loop:
-    P3 = new "Foo"
+    new P3, "Foo"
     inc I10
     #sleep 0.0001
     lt I10, I11, loop
 
-    P3 =new "Foo"
-    classoffset I0, P3, "Foo"
-    getattribute P2, P3, I0
+    new P3, "Foo"
+    getattribute P2, P3, ".i"
     print P2
     print "\n"
     typeof I0, P3
     end
 
-.pcc_sub init:
+.pcc_sub __init:
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    classoffset I0, P2, "Foo"
     new P10, 'Integer'
     set P10, 10
-    setattribute P2, I0, P10
-    inc I0
+    setattribute P2, ".i", P10
     new P10, 'Integer'
     set P10, 20
-    setattribute P2, I0, P10
+    setattribute P2, ".j", P10
     returncc
