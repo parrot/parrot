@@ -109,13 +109,6 @@ typedef struct Buffer_alloc_unit {
 #  define PObj_bufrefcountptr(b) ((INTVAL *)PObj_bufallocstart(b))
 #endif
 
-/* BEGIN DEPRECATED BUFFER ACCESSORS */
-/* macros for accessing old buffer members
- * #define bufstart obj.u._b._bufstart
- * #define buflen   obj.u._b._buflen
- * END DEPRECATED BUFFER ACCESSORS
- */
-
 typedef enum {
     enum_stringrep_unknown = 0,
     enum_stringrep_one     = 1,
@@ -288,7 +281,7 @@ typedef enum PObj_enum {
 
 /*
  * flag access macros:
- * directly using any flags is strongly deprecated, please use
+ * directly using any flags is STRONGLY discouraged, please use
  * these macros
  */
 
