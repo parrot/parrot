@@ -65,7 +65,7 @@ rule variable {
     | <special_variable> <key>? {*}
 }
 
-token special_variable { '$_' | '$#' | '$ ' }
+token special_variable { '$_' | '$#' | '$ ' '_' }
 
 token sigil { '$#' | <[$@%]> {*} }
 token key {

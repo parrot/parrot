@@ -31,9 +31,6 @@ CODE
 ok 10
 OUT
 
-TODO: {
-    local $TODO = 'unimplemented feature';
-
 language_output_is( 'punie', <<'CODE', <<'OUT', 'sub call with one argument' );
 sub foobar {
     $x = $_[0];
@@ -46,6 +43,9 @@ CODE
 5
 ok 11
 OUT
+
+TODO: {
+    local $TODO = 'unimplemented feature';
 
     language_output_is( 'punie', <<'EOC', <<'OUT', 'op.do' );
 #!./perl
