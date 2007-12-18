@@ -262,15 +262,6 @@ SP              [ ]
         return '\n';
     }
 
-^".emit"\n {
-    BEGIN(emit);
-    return EMIT;
-    }
-
-<emit>^".eom"\n {
-    BEGIN(INITIAL);
-    return EOM;
-    }
 
 <*>[ISNP]{DIGIT}{DIGIT}? {
     valp->s = str_dup(yytext);
