@@ -96,7 +96,7 @@ CODE
 /^ok 1
 ok 2
 ok 3
-Method 'nosuchmethod' not found
+Method 'nosuchmethod' not found for invocant of class 'Integer'
 current instr.: 'parrot;Test1;foo' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'parrot;Test1;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT

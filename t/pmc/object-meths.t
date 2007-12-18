@@ -29,7 +29,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
     print "should never reach here\n"
     end
 CODE
-/Method 'nada' not found/
+/Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method" );
@@ -39,7 +39,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method
     print "should never reach here\n"
     end
 CODE
-/Method 'nada' not found/
+/Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
@@ -49,7 +49,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
     print "should never reach here\n"
     end
 CODE
-/Method 'nada' not found/
+/Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method" );
@@ -59,7 +59,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown meth
     print "should never reach here\n"
     end
 CODE
-/Method 'nada' not found/
+/Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "callmethod 1" );
@@ -440,7 +440,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
     print "nope\n"
     end
 CODE
-/Method 'nada' not found/
+/Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - diamond parents" );

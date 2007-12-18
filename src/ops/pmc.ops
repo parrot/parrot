@@ -307,7 +307,8 @@ op find_method(out PMC, invar PMC, in STR) {
     $1 = $2->vtable->find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
         real_exception(interp, resume, METH_NOT_FOUND,
-            "Method '%Ss' not found", $3);
+            "Method '%Ss' not found for invocant of class '%Ss'", $3,
+            VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
     }
     restart ADDRESS(resume);
 }

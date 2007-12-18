@@ -169,7 +169,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', 'find_method' );
     find_method P0, P1, "no_such_meth"
     end
 CODE
-/Method 'no_such_meth' not found/
+/Method 'no_such_meth' not found for invocant of class 'Integer'/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type" );
