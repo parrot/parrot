@@ -18,7 +18,8 @@ New in 0.5.1
   + abc: re-implemented using PCT and NQP
   + eclectus: initial implementation
   + plumhead: add PCT variant
-  + punie: re-implemented using PCT and NQP (passing more tests)
+  + punie: re-implemented using PCT and NQP, extended to handle subroutines
+    Happy 20th Birthday, Perl!
   + pynie: re-implemented using PCT and NQP
   + PIR: start conversion to NQP (under construction)
 - Implementation
