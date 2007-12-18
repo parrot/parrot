@@ -52,6 +52,7 @@ sub new {
         $self->new_section( 'Cola',        'cola.html',       '', 'languages/cola' ),
         $self->new_section( 'Common Lisp', 'lisp.html',       '', 'languages/lisp' ),
         $self->new_section( '.Net',        'dotnet.html',     '', 'languages/dotnet' ),
+        $self->new_section( 'eclectus',    'eclectus.html',   '', 'languages/eclectus' ),
         $self->new_section( 'ecmascript',  'ecmascript.html', '', 'languages/ecmascript' ),
         $self->new_section( 'forth',       'forth.html',      '', 'languages/forth' ),
         $self->new_section( 'HQ9plus',     'hq9plus.html',    '', 'languages/HQ9plus' ),
