@@ -200,7 +200,7 @@ my @standard_tests = qw(
 
 # add metadata.t and coding standards tests only if we're DEVELOPING
 if ( -e "$Bin/../DEVELOPING" ) {
-    push @standard_tests, 't/distro/metadata.t';
+    push @standard_tests, 't/distro/file_metadata.t';
     push @standard_tests, map { "t/codingstd/$_" } qw(
         c_code_coda.t
         c_header_guards.t
