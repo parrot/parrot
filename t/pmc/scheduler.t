@@ -22,7 +22,12 @@ Tests the concurrency scheduler PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', "create a concurrency scheduler and set attributes" );
+my @TODO = ();
+if ($^O =~ /Win32/) {
+    @TODO = ( todo => 'Not working on Win32 yet.' );
+}
+
+pir_output_is( <<'CODE', <<'OUT', "create a concurrency scheduler and set attributes", @TODO );
   .sub main :main
     $P0 = new "Scheduler"
     $P1 = new "Task"
@@ -51,7 +56,7 @@ created
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "create a concurrency scheduler with initializer" );
+pir_output_is( <<'CODE', <<'OUT', "create a concurrency scheduler with initializer", @TODO );
   .sub main :main
     .local pmc data
     data       = new 'Hash'
