@@ -198,8 +198,8 @@ my @standard_tests = qw(
     t/distro/manifest.t
 );
 
-# add metadata.t and coding standards tests only if we're not DEVELOPING
-unless ( -e "$Bin/../DEVELOPING" ) {
+# add metadata.t and coding standards tests only if we're DEVELOPING
+if ( -e "$Bin/../DEVELOPING" ) {
     push @standard_tests, 't/distro/metadata.t';
     push @standard_tests, map { "t/codingstd/$_" } qw(
         c_code_coda.t
