@@ -55,7 +55,7 @@ token term {
     | <stringdouble> {*}                         #= stringdouble
     | <stringsingle> {*}                         #= stringsingle
     | <stringbacktick> {*}                       #= stringbacktick
-    | do <block> {*}                             #= block
+    | do <.ws> <block> {*}                       #= block
     | <opcall> {*}                               #= subcall
     | <subcall> {*}                              #= subcall
     | <variable> {*}                             #= variable
