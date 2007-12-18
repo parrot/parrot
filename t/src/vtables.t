@@ -136,7 +136,11 @@ ok
 OUTPUT
 
 # XXX why isn't parrot written with an upper case 'p' here?
-c_output_is( <<'CODE', <<'OUTPUT', "parrot_alloc_vtables", todo => 'Unresolved externals on Win32, and RT#48357' );
+my @TODO_4 = ();
+if ($^O =~ /Win32/) {
+    @TODO_4 = (todo => 'Unresolved externals on Win32, and RT#48357');
+}
+c_output_is( <<'CODE', <<'OUTPUT', "parrot_alloc_vtables", @TODO_4 );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
