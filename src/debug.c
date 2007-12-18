@@ -73,7 +73,7 @@ static const char * parse_int(ARGIN(const char *str), ARGOUT(int *intP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char* parse_key(PARROT_INTERP,
     ARGIN(const char *str),
@@ -283,7 +283,7 @@ after the key. Currently only string and integer keys are allowed.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char*
 parse_key(PARROT_INTERP, ARGIN(const char *str), ARGOUT(PMC **keyP))
