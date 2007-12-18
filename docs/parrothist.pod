@@ -15,7 +15,8 @@ Parrot history in brief...
 =head1 THE KEEPERS OF THE PUMPKIN
 
 Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
-Patrick Michaud, Will Coleda, Matt Diephouse, chromatic, Allison Randal.
+Patrick Michaud, Will Coleda, Matt Diephouse, chromatic, Allison Randal,
+Jonathan Worthington.
 
 =head2 PUMPKIN?
 
@@ -107,5 +108,7 @@ the strings?).
  Will      0.4.17         2007-Oct-17     "Two for Finching"
 
  chromatic 0.5.0          2007-Nov-20     "Caulked Snack"
+
+ Jonathan  0.5.1          2007-Dec-18     "Hatachi"
 
 =cut

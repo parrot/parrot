@@ -1,6 +1,6 @@
 # $Id$
 
-New in 0.5.1 (through r23824)
+New in 0.5.1
 - Documentation
   + PDD19 (PIR) - reflect state on the ground; incorporate old IMCC docs
   + PDD25 (Concurrency) - launch out of draft
@@ -24,7 +24,7 @@ New in 0.5.1 (through r23824)
 - Implementation
   + new opcodes: 'die', 'addhandler', 'copy'
   + Initial implementation of Concurrency PDD
-  + Add 'arity' method to Subs
+  + Add 'arity' method to Sub and NCI PMCs
 - Miscellaneous
   + Bug cleanup
   + consting, attribute marking, warnings cleanup, memory leaks, GC...
