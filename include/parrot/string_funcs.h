@@ -115,8 +115,10 @@ void Parrot_unmake_COW(PARROT_INTERP, ARGINOUT(STRING *s))
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * string_append(PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b))
-        __attribute__nonnull__(1);
+STRING * string_append(PARROT_INTERP, ARGINOUT(STRING *a), ARGIN(STRING *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
@@ -274,7 +276,7 @@ STRING * string_from_num(PARROT_INTERP, FLOATVAL f)
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-STRING * string_grow(PARROT_INTERP, NOTNULL(STRING *s), INTVAL addlen)
+STRING * string_grow(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL addlen)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

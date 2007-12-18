@@ -1031,7 +1031,7 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket*
-parrot_hash_put(PARROT_INTERP, ARGINOUT(Hash *hash), ARGIN(void *key), ARGIN(void *value))
+parrot_hash_put(PARROT_INTERP, ARGINOUT(Hash *hash), ARGIN(void *key), ARGIN_NULLOK(void *value))
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket   *bucket = hash->bi[hashval & hash->mask];
