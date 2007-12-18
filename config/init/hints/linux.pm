@@ -16,7 +16,7 @@ sub runstep {
     my $verbose;
 
     $verbose = $conf->options->get('verbose');
-    print $/ if $verbose;
+    print "\n" if $verbose;
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';
