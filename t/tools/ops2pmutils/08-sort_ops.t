@@ -19,11 +19,15 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 87;
+use Test::More;
 use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
+
+my $cwd = cwd();
+plan -e "$cwd/DEVELOPING" ? ( tests => 87 ) :
+                            ( skip_all => 'Requires DEVELOPING file' );
 
 use_ok('Parrot::Ops2pm::Utils');
 use IO::CaptureOutput qw| capture |;
