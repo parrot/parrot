@@ -117,9 +117,9 @@
 #define ARGIN(x)                    /*@notnull@*/ /*@in@*/ x
 #define ARGOUT(x)                   /*@notnull@*/ /*@out@*/ x
 #define ARGINOUT(x)                 /*@notnull@*/ /*@in@*/ /*@out@*/ x
-#define ARGIN_NULLOK(x)             /*@in@*/ x
-#define ARGOUT_NULLOK(x)            /*@out@*/ /*@null@*/ x
-#define ARGINOUT_NULLOK(x)          /*@notnull@*/ /*@in@*/ /*@out@*/ x
+#define ARGIN_NULLOK(x)             /*@null@*/ /*@in@*/ x
+#define ARGOUT_NULLOK(x)            /*@null@*/ /*@out@*/ x
+#define ARGINOUT_NULLOK(x)          /*@null@*/ /*@in@*/ /*@out@*/ x
 
 
 #endif /* PARROT_COMPILER_H_GUARD */
