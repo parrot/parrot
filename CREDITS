@@ -1,18 +1,18 @@
 ﻿# $Id$
 
-	Following in the steps of other open source projects that
-	eventually take over the world, here is the partial list
-	of people who have contributed to Parrot and its supporting
-	works.  It is sorted by name and formatted to allow easy
-	grepping and beautification by scripts.
-	The fields are: name (N), email (E), web-address (W),
-	description (D) and snail-mail address (S).
+    Following in the steps of other open source projects that
+    eventually take over the world, here is the partial list
+    of people who have contributed to Parrot and its supporting
+    works.  It is sorted by name and formatted to allow easy
+    grepping and beautification by scripts.
+    The fields are: name (N), email (E), web-address (W),
+    description (D) and snail-mail address (S).
 
         Thanks,
 
-		The Parrot Team
-		PS: Yes, this looks remarkably like the Linux CREDITS format
-		PPS: This file is encoded in UTF-8
+        The Parrot Team
+        PS: Yes, this looks remarkably like the Linux CREDITS format
+        PPS: This file is encoded in UTF-8
 
 ----------
 N: Aaron Sherman
@@ -361,9 +361,9 @@ D: Python PGE grammar, C99 PGE Grammar
 D: Various Config Fixes, Compiler Warnings, etc
 
 N: Klaas-Jan Stol
-D: dynpmc and doc updates
-D: Lua PMC
-E: vanderlay@home.nl
+D: clean-ups of compilers/imcc and its documentation.
+D: compilers/pirc and languages/PIR.
+E: parrotcode@gmail.com
 
 N: Lars Balker Rasmussen
 D: FreeBSD and other build fixes
