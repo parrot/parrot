@@ -11,6 +11,7 @@ use Carp qw( confess );
 my @experimental_files = qw(
     datatypes.c
     exceptions.c
+    gc/resources.c
     hash.c
     hll.c
     objects.c

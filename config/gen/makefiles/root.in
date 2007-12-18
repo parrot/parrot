@@ -1908,7 +1908,8 @@ splint-andy :
     +fcnpost \
     +showsourceloc \
     +partial \
-    src/debug.c \
+    src/hash.c \
+    src/string.c \
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 COVER_DIRS = \
