@@ -316,6 +316,7 @@ parse_key(PARROT_INTERP, ARGIN(const char *str), ARGOUT(PMC **keyP))
     }
 
     /* hm, but if this doesn't match, it's probably an error */
+    /* XXX str can be NULL from parse_string() */
     if (*str != ']')
         return NULL;
 
