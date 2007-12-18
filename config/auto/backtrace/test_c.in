@@ -2,6 +2,8 @@
  * test_c.c - figure out if libc has backtrace() & backtrace_symbols()
  */
 
+#include <execinfo.h>
+
 void backtrace();
 void backtrace_symbols();
 
