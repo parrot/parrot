@@ -94,7 +94,7 @@ Namespaces are noted with the C<.namespace> directive. It takes a
 single parameter, the name of the namespace, in the form of a
 multi-dimensional key.
 
-Constants can be declared with the C<.constant> directive. It takes two
+Constants can be declared with the C<.macro_const> directive. It takes two
 parameters: the name of the constant and the value.
 
 Subroutine names are noted with the C<.pcc_sub> directive. It takes a
@@ -136,7 +136,7 @@ Below is an overview of the grammar of a PASM file.
    identifier ":"
 
  constant_directive:
-   ".constant" identifier literal
+   ".macro_const" identifier literal
 
  namespace_directive:
    ".namespace" "[" multi_dimensional_key "]"
