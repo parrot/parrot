@@ -81,9 +81,9 @@ lexer.
 
 =head1 DIRECTIVES
 
-The following are PIR directives.
+The following are PIR directives. (this should be re-ordered)
 
-  .arg               .const      .constant         .end
+  .arg               .const      .macro_const      .end
   .endnamespace      .endm       .get_results      .globalconst
   .HLL               .HLL_map    .include          .invocant          .lex
   .loadlib           .local      .macro            .meth_call         .namespace
@@ -141,7 +141,7 @@ static char const * dictionary[] = {
    /* NULL,  */                 /*                          */
     ".arg",                     /* T_ARG                    */
     ".const",                   /* T_CONST,                 */
-    ".constant",                /* T_CONSTANT,              */
+    ".macro_const",             /* T_CONSTANT,              */
     ".end",                     /* T_END,                   */
     ".endm",                    /* T_ENDM,                  */
     ".get_results",             /* T_GET_RESULTS            */
