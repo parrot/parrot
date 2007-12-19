@@ -192,60 +192,44 @@
   (emit "$P0 = val_x")
   (emit-immediate 0)
   (emit "$P1 = val_x")
-  (emit-immediate #t)
-  (emit "$P2 = val_x")
-  (emit-immediate #f)
-  (emit "$P3 = val_x")
   (emit "
         $P4 = new 'PAST::Op'
         $P4.init( $P0, $P1, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
         val_x = new 'PAST::Op'
-        val_x.init( $P4, $P2, $P3, 'pasttype' => 'if', 'name' => 'infix:=='  )
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:=='  )
         "))
 
 ; implementation of null?
 (define-primitive (null? arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
-  (emit-immediate #t)
-  (emit "$P1 = val_x")
-  (emit-immediate #f)
-  (emit "$P2 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
         $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
 ; implementation of fixnum?
 (define-primitive (fixnum? arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
-  (emit-immediate #t)
-  (emit "$P1 = val_x")
-  (emit-immediate #f)
-  (emit "$P2 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
         $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
 ; implementation of boolean?
 (define-primitive (boolean? arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
-  (emit-immediate #t)
-  (emit "$P1 = val_x")
-  (emit-immediate #f)
-  (emit "$P2 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
         $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
 ; implementation of not?
@@ -253,32 +237,24 @@
 (define-primitive (not? arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
-  (emit-immediate #t)
-  (emit "$P1 = val_x")
-  (emit-immediate #f)
-  (emit "$P2 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
         $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
         $P4 = new 'PAST::Op'
-        $P4.init( $P0, $P2, $P1, 'pasttype' => 'if', 'name' => 'infix:==' )
+        $P4.init( $P0, val_false, val_true, 'pasttype' => 'if', 'name' => 'infix:==' )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, $P4, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, $P4, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
 ; implementation of char?
 (define-primitive (char? arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
-  (emit-immediate #t)
-  (emit "$P1 = val_x")
-  (emit-immediate #f)
-  (emit "$P2 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
         $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusCharacter'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
 ; a getter of '*emitter*'
@@ -287,7 +263,12 @@
 
 (define (emit-function-header function-name)
   (emit (string-append ".sub " function-name))
-  (emit ".local pmc val_x"))
+  (emit ".local pmc val_true, val_false, val_x")
+  (emit-immediate #t)
+  (emit "val_true = val_x")
+  (emit-immediate #f)
+  (emit "val_false = val_x")
+)
 
 (define (emit-function-footer)
   (emit "
