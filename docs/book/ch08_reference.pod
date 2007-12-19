@@ -3000,11 +3000,11 @@ X<.const directive>
 
 Define a named constant.
 
-=head2 .constant
+=head2 .macro_const
 
-X<.constant directive>
+X<.macro_const directive>
 
-  .constant R<NAME>R<VALUE>
+  .macro_const R<NAME>R<VALUE>
 
 Define a named macro that expands to a given value. Macros are called
 as directives, i.e. .R<NAME> (PASM code only).
