@@ -77,6 +77,16 @@
     .param pmc b
     $I0 = cmp_num a, b
     $I0 = iseq $I0, 0
+
+    .return ($I0)
+.end
+
+.sub 'infix:eq'
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_str a, b
+    $I0 = iseq $I0, 0
+
     .return ($I0)
 .end
 
@@ -121,7 +131,7 @@
      [(string? x)
       (format "
               val_x = new 'PAST::Val'
-              val_x.init( 'value' => '~a', 'returns' => 'EclectusString' )
+              val_x.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
               " x)]))
 
 ; Support for primitve functions
@@ -184,9 +194,9 @@
 (define-primitive (fixnum->char arg)
   (emit-expr arg)
   (emit "
-  $P0 = val_x
-  val_x = new 'PAST::Op'
-  val_x.init( $P0, 'pasttype' => 'inline', 'name' => 'infix:-', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
+        $P0 = val_x
+        val_x = new 'PAST::Op'
+        val_x.init( $P0, 'pasttype' => 'inline', 'name' => 'infix:-', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
         "))
 
 ; implementation of fxzero?
@@ -200,10 +210,31 @@
   (emit-immediate #f)
   (emit "$P3 = val_x")
   (emit "
-  $P4 = new 'PAST::Op'
-  $P4.init( $P0, $P1, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
-  val_x = new 'PAST::Op'
-  val_x.init( $P4, $P2, $P3, 'pasttype' => 'if', 'name' => 'infix:==', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
+        $P4 = new 'PAST::Op'
+        $P4.init( $P0, $P1, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, $P2, $P3, 'pasttype' => 'if', 'name' => 'infix:=='  )
+        "))
+
+; implementation of null?
+(define-primitive (null? arg)
+  (emit-expr arg)
+  (emit "$P0 = val_x")
+  (emit-immediate 0)
+  (emit "$P1 = val_x")
+  (emit-immediate #t)
+  (emit "$P2 = val_x")
+  (emit-immediate #f)
+  (emit "$P3 = val_x")
+  (emit-immediate "EclectusEmptyList")
+  (emit "$P4 = val_x")
+  (emit "
+        $P5 = new 'PAST::Op'
+        $P5.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusString'\\n typeof $S1, %0\\n%r = $S1\" )
+        $P6 = new 'PAST::Op'
+        $P6.init( $P4, $P5, 'pasttype' => 'chain', 'name' => 'infix:eq' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P6, $P2, $P3, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
 ; a getter of '*emitter*'

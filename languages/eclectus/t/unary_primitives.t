@@ -22,6 +22,12 @@
   [(fxzero? -1)                           => "#f\n" ]
   [(fxzero? 1)                            => "#f\n" ]
   [(fxzero? (char->fixnum #\A))           => "#f\n" ]
+  [(null? ())                             => "#t\n" ]
+  [(null? (fxsub1 1))                     => "#f\n" ]
+  [(null? (fxsub1 10))                    => "#f\n" ]
+  [(null? #\A)                            => "#f\n" ]
+  [(null? 65)                             => "#f\n" ]
+  [(null? (char->fixnum #\A))             => "#f\n" ]
 )
 
 (test-all)
