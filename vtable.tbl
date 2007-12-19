@@ -36,8 +36,6 @@ PMC* clone_pmc(PMC* args)
 
 PMC* find_method(STRING* method_name)
 
-INTVAL hash(size_t seed)
-
 [FETCH]
 INTVAL get_integer()
 INTVAL get_integer_keyed(PMC* key)

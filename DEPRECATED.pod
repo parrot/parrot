@@ -65,10 +65,6 @@ See RT #48567.
 
 See RT #48569.
 
-=item * C<hash> [post 0.5.1]
-
-See RT #42352.
-
 =item * C<new_from_string> [post 0.5.0]
 
 See RT #47011.
