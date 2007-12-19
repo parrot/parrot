@@ -93,31 +93,36 @@
 ; emit PIR for a scalar
 (define (immediate-rep x)
   (cond
-     [(fixnum? x) (format
-"
-    val_x = new 'PAST::Val'
-    val_x.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
-" x)]
-     [(char? x) (format
-"
-    val_x = new 'PAST::Val'
-    val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
-" (char->integer x) )]
+     [(fixnum? x)
+      (format "
+              val_x = new 'PAST::Val'
+              val_x.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
+              " x)]
+     [(char? x)
+      (format "
+              val_x = new 'PAST::Val'
+              val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
+              " (char->integer x) )]
      [(and (list? x) (= (length x) 0 ))
-"
-    val_x = new 'PAST::Val'
-    val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
-" ]
+      "
+      val_x = new 'PAST::Val'
+      val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
+      " ]
      [(boolean? x)
         (if x 
-"
-    val_x = new 'PAST::Val'
-    val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-"
-"
-    val_x = new 'PAST::Val'
-    val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-" )]))
+            "
+            val_x = new 'PAST::Val'
+            val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
+            "
+            "
+            val_x = new 'PAST::Val'
+            val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
+            ")]
+     [(string? x)
+      (format "
+              val_x = new 'PAST::Val'
+              val_x.init( 'value' => '~a', 'returns' => 'EclectusString' )
+              " x)]))
 
 ; Support for primitve functions
 
@@ -161,9 +166,9 @@
   (emit "$P0 = val_x")
   (emit-immediate 1)
   (emit "
-  $P1 = val_x
-  val_x = new 'PAST::Op'
-  val_x.init( $P0, $P1, 'name' => 'infix:-', 'pirop' => 'n_sub' )
+        $P1 = val_x
+        val_x = new 'PAST::Op'
+        val_x.init( $P0, $P1, 'name' => 'infix:-', 'pirop' => 'n_sub' )
         "))
 
 ; implementation of char->fixnum

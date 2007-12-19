@@ -23,12 +23,14 @@ PMCS            = \
     eclectusboolean \
     eclectuscharacter \
     eclectusemptylist \
-    eclectusfixnum
+    eclectusfixnum \
+    eclectusstring
 PMC_SOURCES     = \
     $(PMC_DIR)/eclectusboolean.pmc \
     $(PMC_DIR)/eclectuscharacter.pmc \
     $(PMC_DIR)/eclectusemptylist.pmc \
-    $(PMC_DIR)/eclectusfixnum.pmc
+    $(PMC_DIR)/eclectusfixnum.pmc \
+    $(PMC_DIR)/eclectusstring.pmc
 
 
 # The default target
