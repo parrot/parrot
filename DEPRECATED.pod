@@ -165,10 +165,6 @@ See RT #48737.
 
 See RT #48735.
 
-=item * C<.constant> [post 0.5.1]
-
-See RT #48561. This will be replaced with <.macro_const>
-
 =item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
 
 See RT #4671.
