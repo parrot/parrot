@@ -123,10 +123,6 @@ See RT #47972. Future use should use the C<get_class> opcode.
 
 See RT #47976.
 
-=item * C<print_newline> [post 0.5.1]
-
-See RT #48010.
-
 =item * C<getfd> [post 0.5.1]
 
 See RT #48310.
