@@ -41,6 +41,17 @@
   [(fixnum? #\A)                          => "#f\n" ]
   [(fixnum? 65)                           => "#t\n" ]
   [(fixnum? (char->fixnum #\A))           => "#t\n" ]
+
+  [(boolean? ())                          => "#f\n" ]
+  [(boolean? (fxsub1 1))                  => "#f\n" ]
+  [(boolean? (fxsub1 10))                 => "#f\n" ]
+  [(boolean? #\A)                         => "#f\n" ]
+  [(boolean? 65)                          => "#f\n" ]
+  [(boolean? (char->fixnum #\A))          => "#f\n" ]
+  [(boolean? #t)                          => "#t\n" ]
+  [(boolean? #f)                          => "#t\n" ]
+  [(boolean? (fixnum? #\A))               => "#t\n" ]
+  [(boolean? (fixnum? 65))                => "#t\n" ]
 )
 
 (test-all)
