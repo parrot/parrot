@@ -43,7 +43,7 @@ my $cwd;
             args    => [@args],
         }
     );
-    $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
+    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     is( dirname($dump_file), realpath($tdir1), "vtable.dump created in expected directory" );
@@ -77,7 +77,7 @@ When all of F<pmc2c.pl>'s functionality was contained within that program,
 C<dump_vtable()> was a subroutine named C<dump_default()>.  That name was
 confusing, because it suggested that what was being 'dumped' was
 F<src/pmc/default.pmc> -- which was not the case.  The file which this method
-takes as an argument is F<vtable.tbl>; hence, the method's renaming.
+takes as an argument is F<src/vtable.tbl>; hence, the method's renaming.
 
 So as not to pollute the Parrot build directories with files created
 during the testing process, all functions which create or modify

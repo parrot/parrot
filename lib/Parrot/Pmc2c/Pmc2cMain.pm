@@ -103,7 +103,7 @@ sub new {
 
 =head3 C<dump_vtable()>
 
-    $self->dump_vtable("$FindBin::Bin/../../vtable.tbl");
+    $self->dump_vtable("$FindBin::Bin/../../src/vtable.tbl");
 
 B<Purpose:>  Create a F<.dump> file for the default vtable (from which
 all PMCs inherit).

@@ -34,7 +34,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 use Parrot::Vtable;
 
-my $vtbl = parse_vtable("$FindBin::Bin/../../vtable.tbl");
+my $vtbl = parse_vtable("$FindBin::Bin/../../src/vtable.tbl");
 
 my $classname = shift
     or die "No classname given!\n";

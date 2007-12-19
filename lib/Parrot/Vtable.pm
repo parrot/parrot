@@ -69,13 +69,13 @@ Returns a reference to an array containing
   [ return_type method_name parameters section MMD_type attributes ]
 
 for each vtable method defined in C<$file>. If C<$file> is unspecified it
-defaults to F<vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
+defaults to F<src/vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
 
 =cut
 
 sub parse_vtable {
 
-    my $file    = defined $_[0] ? shift() : 'vtable.tbl';
+    my $file    = defined $_[0] ? shift() : 'src/vtable.tbl';
     my $vtable  = [];
     my $mmd     = [];
     my $fh      = FileHandle->new( $file, O_RDONLY ) or die "Can't open $file for reading: $!\n";

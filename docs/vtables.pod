@@ -159,7 +159,7 @@ numbers.
 
 =head2 Implementing methods
 
-The master list of vtable methods can be found in F<vtable.tbl> in the root
+The master list of vtable methods can be found in F<src/vtable.tbl> in the root
 directory of the Parrot source, with documentation in
 F<docs/pdds/pdd02_vtables.pod>. A few of these are very important, for
 instance:

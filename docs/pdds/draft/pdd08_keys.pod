@@ -109,7 +109,7 @@ code which indexes a non-aggregate shouldn't be generated.
 =head2 C<_keyed> vtable methods
 
 So what of these magical C<_keyed> vtable methods? They are generated when you
-add the C<keyed> tag to the appropriate entry in F<vtable.tbl>. They are
+add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They are
 constructed by following B<every> C<PMC> argument with a second C<PMC> argument
 which acts as the key for that argument; the name of the second C<PMC> argument
 is formed by adding C<_key> onto the end of the first C<PMC> argument.

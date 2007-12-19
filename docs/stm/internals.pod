@@ -50,7 +50,7 @@ in C<default.pmc> performs the switch.
 
 Methods which are considered read-only point to automatically generated
 versions that call C<internal_exception()> in the read-only vtable.
-The notion of read-onlyness is obtained first from C<vtable.tbl>'s
+The notion of read-onlyness is obtained first from C<src/vtable.tbl>'s
 marking of methods with C<:write>. For MMD methods, it is guessed when
 a method will write a value based on the signature of the method,
 and if it would, then the check 

@@ -43,7 +43,7 @@ my $self = Parrot::Pmc2c::Pmc2cMain->new(
 );
 
 if ( $action{default} ) {
-    $self->dump_vtable("$FindBin::Bin/../../vtable.tbl");
+    $self->dump_vtable("$FindBin::Bin/../../src/vtable.tbl");
     exit;
 }
 

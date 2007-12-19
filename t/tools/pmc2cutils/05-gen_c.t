@@ -68,7 +68,7 @@ my ( $tie, $msg, @lines );
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
+    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ok( $self->dump_pmc(), "dump_pmc succeeded" );
@@ -109,7 +109,7 @@ my ( $tie, $msg, @lines );
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
+    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
@@ -151,7 +151,7 @@ my ( $tie, $msg, @lines );
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
+    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ### $self->dump_pmc();
@@ -201,7 +201,7 @@ my ( $tie, $msg, @lines );
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
+    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
