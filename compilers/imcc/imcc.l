@@ -376,7 +376,7 @@ SP              [ ]
         return read_macro(valp, interp, yyscanner);
     }
 
-<emit>(".constant"|".macro_const") {
+<emit>".macro_const" {
     int c;
     int start_line;
 
