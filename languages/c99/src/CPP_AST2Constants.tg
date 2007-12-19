@@ -140,7 +140,7 @@ transform pir(C99::CPP::PAST::DEFINE) :language('PIR') {
     code = new 'CodeString'
     $S0 = node.'name'()
     $S1 = node.'line'()
-    code.'emit'("    .constant %0 %1", $S0, $S1)
+    code.'emit'("    .macro_const %0 %1", $S0, $S1)
     .return (code)
 }
 transform pir(C99::CPP::PAST::DEFINE_FUNCTION) :language('PIR') {
@@ -148,7 +148,7 @@ transform pir(C99::CPP::PAST::DEFINE_FUNCTION) :language('PIR') {
     code = new 'CodeString'
     $S0 = node.'name'()
     $S1 = node.'line'()
-    code.'emit'("    .constant %0 = %1", $S0, $S1)
+    code.'emit'("    .macro_const %0 = %1", $S0, $S1)
     .return (code)
 }
 transform pir(C99::CPP::PAST::INCLUDE) :language('PIR') {
