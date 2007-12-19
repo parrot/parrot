@@ -178,6 +178,24 @@ See RT #4671.
 See RT #47846.  Any C<.emit>/C<.eom> blocks should be replaced with
 Anonymous C<.sub>s
 
+=item * vtable name .constants
+
+From the list:
+
+Is the double__underscore thing still supposed to work and if so, is it
+deprecated?
+
+Deprecated, but not yet entirely removed from the code.
+
+Are the .constant definitions still needed? i.o.w., does updating that
+file make sense or can i save myself that trouble.
+
+Grepping for a few sample constants, they aren't used anywhere in the
+repository. So nuke them and the C defines that generated them (starting
+on line 666 of include/parrot/vtable.h), on the standard deprecation cycle.
+
+See [RT#48877].
+
 =item * Assignment syntax with opcodes [post ???]
 
 See RT #36283.  When the first argument of an opcode is C<OUT>, then
