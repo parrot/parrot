@@ -5,7 +5,7 @@
 #   before:     ... max
 #   after:      ... rand
 # 0 <= rand < max
-.constant RANDMAX 65536.0
+.macro_const RANDMAX 65536.0
 MATHS_RAND:
         restore I10
         mul N0, N0, 5.0
