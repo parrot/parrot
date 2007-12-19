@@ -87,7 +87,7 @@ EOF
     my ( $i, $name );
     $i = 0;
     foreach $name ( split( ' ', $conf->data->get_p5('sig_name') ) ) {
-        print {$O} ".constant SIG$name\t$i\n" if $i;
+        print {$O} ".macro_const SIG$name\t$i\n" if $i;
         $i++;
     }
     close $O;
