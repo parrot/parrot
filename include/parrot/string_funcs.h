@@ -114,11 +114,11 @@ void Parrot_unmake_COW(PARROT_INTERP, ARGINOUT(STRING *s))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * string_append(PARROT_INTERP, ARGINOUT(STRING *a), ARGIN(STRING *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+PARROT_CAN_RETURN_NULL
+STRING * string_append(PARROT_INTERP,
+    ARGINOUT_NULLOK(STRING *a),
+    ARGIN_NULLOK(STRING *b))
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
