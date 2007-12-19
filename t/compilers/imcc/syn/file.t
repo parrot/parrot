@@ -32,7 +32,7 @@ delete_temp_files();
 ##############################
 open my $FOO, '>', "temp.pasm" or die "Can't write temp.pasm\n";
 print $FOO <<'ENDF';
-  .constant BAR 42
+  .macro_const BAR 42
 ENDF
 close $FOO;
 

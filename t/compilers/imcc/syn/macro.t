@@ -148,7 +148,7 @@ pir_output_is( <<'CODE', 'foo', 'constant defined and used' );
 CODE
 
 pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
-.constant FOO S0
+.macro_const FOO S0
 .macro answer (bar)
   print .bar
 .endm
