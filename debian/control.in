@@ -1,7 +1,8 @@
 Source: parrot
 Section: interpreters
 Priority: optional
-Maintainer: Florian Ragwitz <rafl@debian.org>
+Maintainer: Parrot Porters <parrot-porters@perl.org>
+Uploaders: chromatic <chromatic@wgz.org>, Jonathan Worthington <jonathan@jnthn.net>
 Build-Depends: debhelper (>= 4.0.0), perl, perl-doc, libgmp3-dev, libgdbm-dev, python, libicu-dev, libreadline-dev
 Standards-Version: 3.6.2
 
