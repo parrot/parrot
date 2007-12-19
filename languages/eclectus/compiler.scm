@@ -248,6 +248,24 @@
         val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
+; implementation of not?
+; first check boolean? and then the inverse truthiness
+(define-primitive (not? arg)
+  (emit-expr arg)
+  (emit "$P0 = val_x")
+  (emit-immediate #t)
+  (emit "$P1 = val_x")
+  (emit-immediate #f)
+  (emit "$P2 = val_x")
+  (emit "
+        $P3 = new 'PAST::Op'
+        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
+        $P4 = new 'PAST::Op'
+        $P4.init( $P0, $P2, $P1, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x = new 'PAST::Op'
+        val_x.init( $P3, $P4, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
+        "))
+
 ; implementation of char?
 (define-primitive (char? arg)
   (emit-expr arg)

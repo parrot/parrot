@@ -7,7 +7,7 @@ It is based on Abdulaziz Ghuloums compiler tutorial.
 
 =head1 Status
 
-Still at step 1.
+Starting to work on section 1.4 Conditional Expressions
 
 =head1 Testing
 
@@ -24,7 +24,6 @@ the is no 'petite 7.3' around.
 =head1 TODO
 
 - allow test-description per test case
-- add the missing unary functions from the tutorial: not
 - In the longterm, Eclectus should become self-hosting
 
 =head1 AUTHOR
