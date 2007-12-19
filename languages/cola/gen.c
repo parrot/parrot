@@ -155,8 +155,8 @@ RT#48200: Not yet documented!!!
 
 void gen_constant_decl(AST * p)
 {
-    /* Just to generate the comment */ 
-	/* NOTE: the '=' should probably not be there... */
+    /* Just to generate the comment */
+    /* NOTE: the '=' should probably not be there... */
     printf("#.macro_const %s = %s\n", p->arg1->sym->name, p->arg1->sym->literal->name);
 }
 
