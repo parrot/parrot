@@ -32,7 +32,7 @@ sub _init {
 }
 
 sub const_to_parrot {
-    map ".constant $_->[0]\t$_->[1]", @_;
+    map ".macro_const $_->[0]\t$_->[1]", @_;
 }
 
 # refactor to generate 'use constant' statements, RT#42286
