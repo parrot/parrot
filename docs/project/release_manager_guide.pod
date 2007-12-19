@@ -274,6 +274,6 @@ that release.
  - Mar 18th (?)     Bernhard Schmalhofer
  - Apr 15th (?)     Jerry Gay
  - May 20th (?)     chromatic
- - Jun 17th (?)     Will Coleda
+ - Jun 17th (?)     Nuno Carvalho
 
 =cut
