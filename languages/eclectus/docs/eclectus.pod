@@ -24,7 +24,7 @@ the is no 'petite 7.3' around.
 =head1 TODO
 
 - allow test-description per test case
-- add the missing unary functions from the tutorial: null, not, fixnum?, boolean?, char?
+- add the missing unary functions from the tutorial: not, boolean?, char?
 - In the longterm, Eclectus should become self-hosting
 
 =head1 AUTHOR

@@ -218,6 +218,21 @@
         val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
+; implementation of fixnum?
+(define-primitive (fixnum? arg)
+  (emit-expr arg)
+  (emit "$P0 = val_x")
+  (emit-immediate #t)
+  (emit "$P1 = val_x")
+  (emit-immediate #f)
+  (emit "$P2 = val_x")
+  (emit "
+        $P3 = new 'PAST::Op'
+        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
+        val_x = new 'PAST::Op'
+        val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
+        "))
+
 ; a getter of '*emitter*'
 (define (primitive-emitter x)
   (getprop x '*emitter*))
