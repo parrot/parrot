@@ -14,7 +14,7 @@ This document describes the macro layer of IMCC.
 The macro support for IMCC was designed to be a drop in replacement for
 the original F<assemble.pl> macro layer.
 
-One exception is the B<.constant> macro, which is only usable in PASM mode.
+One exception is the B<.macro_const> macro, which is only usable in PASM mode.
 For PIR mode, please use the B<.const> directive instead.
 
 The addition of the '.' preface will hopefully make things easier to
@@ -48,18 +48,6 @@ given macro expansion. The syntax looks something like this:
 Include this macro as many times as you like; the branch statement should
 do the right thing every time. To use a global label, do just as you usually do.
 
-Constants are new and the syntax looks like:
-
-  .constant Hash 6 # Again, . marks the directive
-
-  new P0, .Hash # . marks the special variable for expansion.
-
-Several constants are predefined, namely the PMC classes, e.g.
-
-  .constant Array 0
-  .constant Undef 1
-  ...
-
 The ".include" statement is followed by a string literal. The file of
 this name is include literally in the assembly.
 
@@ -71,29 +59,22 @@ to be found is included.
 
 Constant definitions have the form
 
-  .constant name {register}
-  .constant name {signed_integer}
-  .constant name {signed_float}
-  .constant name {"string constant"}
-  .constant name {'string constant'}
+  .macro_const name {register}
+  .macro_const name {signed_integer}
+  .macro_const name {signed_float}
+  .macro_const name {"string constant"}
+  .macro_const name {'string constant'}
 
 They don't generate any code, but create a new macro directive .name
 
 Given the line:
 
-  '.constant HelloWorld "Hello, World!"'
+  '.macro_const HelloWorld "Hello, World!"'
 
 one can expand HelloWorld via:
 
   'print .HelloWorld' # Note the period to indicate a thing to expand.
 
-Some predefined constants exist for your convenience, namely:
-
-  .Array
-  .Hash
-  .ResizablePMCArray
-
-and the other PMC types.
 
 The contents of external files can be included by use of the C<.include>
 macro:
