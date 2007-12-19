@@ -81,16 +81,6 @@
     .return ($I0)
 .end
 
-.sub 'infix:eq'
-    .param pmc a
-    .param pmc b
-    $I0 = cmp_str a, b
-    $I0 = iseq $I0, 0
-
-    .return ($I0)
-.end
-
-
 "))
 
 ; forms represented by a scalar PMC
@@ -220,21 +210,15 @@
 (define-primitive (null? arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
-  (emit-immediate 0)
-  (emit "$P1 = val_x")
   (emit-immediate #t)
-  (emit "$P2 = val_x")
+  (emit "$P1 = val_x")
   (emit-immediate #f)
-  (emit "$P3 = val_x")
-  (emit-immediate "EclectusEmptyList")
-  (emit "$P4 = val_x")
+  (emit "$P2 = val_x")
   (emit "
-        $P5 = new 'PAST::Op'
-        $P5.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusString'\\n typeof $S1, %0\\n%r = $S1\" )
-        $P6 = new 'PAST::Op'
-        $P6.init( $P4, $P5, 'pasttype' => 'chain', 'name' => 'infix:eq' ) 
+        $P3 = new 'PAST::Op'
+        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P6, $P2, $P3, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, $P1, $P2, 'pasttype' => 'if', 'name' => 'infix:==' )
         "))
 
 ; a getter of '*emitter*'
