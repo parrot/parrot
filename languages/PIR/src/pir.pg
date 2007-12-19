@@ -594,7 +594,7 @@ token expansion {
 }
 
 rule pasm_constant {
-    '.constant' <IDENT>
+    '.macro_const' <IDENT>
     [ <pasm_register> | <constant> ]
     {*}
 }
@@ -892,7 +892,6 @@ TODO: put this in <%pir_directive> PIR directives
 token pir_directive {
     [ '.arg'
     | '.const'
-    | '.constant'
     | '.endm'
     | '.end'
     | '.get_results'
@@ -906,6 +905,7 @@ token pir_directive {
     | '.line'
     | '.loadlib'
     | '.local'
+    | '.macro_const'
     | '.meth_call'
     | '.namespace'
     | '.nci_call'

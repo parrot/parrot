@@ -126,7 +126,7 @@ document.
     | sub_def
     | const_def
     | expansion
-    | pragma   
+    | pragma
 
 =head2 Subroutine definitions
 
@@ -374,7 +374,7 @@ pasm_instr defines the syntax for pure PASM instructions.
     | const_def
     | globalconst_def
     | conditional_stat
-    | assignment_stat    
+    | assignment_stat
     | return_stat
     | sub_invocation
     | macro_invocation
@@ -624,7 +624,7 @@ As languages/PIR evolves, this will be completed.
 
   key:
       simple_expr
-	  
+
   result_var_list:
     "(" result_vars? ")"
 
@@ -1011,7 +1011,7 @@ call can also be a method call, like so:
     ".include" string_constant
 
   pasm_constant:
-    ".constant" identifier [ constant_value | register ]
+    ".macro_const" identifier [ constant_value | register ]
 
 =head2 Macros
 

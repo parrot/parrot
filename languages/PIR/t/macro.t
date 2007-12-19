@@ -12,30 +12,30 @@ use Test::More;
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'macro pasring' );
 
 .sub main
-	.local int i
+    .local int i
 .end
 
-.macro X(a, b)	
-	.a = .b
-	.label $a:		
+.macro X(a, b)
+    .a = .b
+    .label $a:
 .endm
 
 
 .sub main
-	.local int e,f
-	.X(e,f)	
+    .local int e,f
+    .X(e,f)
 .end
 
 .macro X(a,b)
-	.label $x: foo()
-	
-	.label $y:
-	.a = .b
+    .label $x: foo()
+
+    .label $y:
+    .a = .b
 
 .endm
 
 .sub main
-	.X(a,b)
+    .X(a,b)
 .end
 
 
@@ -55,16 +55,16 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'simple macro,
 
 CODE
 
-language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '.constant' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '.macro_const' );
 
-.constant answer 42
+.macro_const answer 42
 
-.constant name "Parrot"
+.macro_const name "Parrot"
 
-.constant x P0
-.constant y S1
-.constant a I10
-.constant b P20
+.macro_const x P0
+.macro_const y S1
+.macro_const a I10
+.macro_const b P20
 
 CODE
 
