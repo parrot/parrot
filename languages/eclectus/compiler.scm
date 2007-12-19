@@ -59,12 +59,12 @@
             if null args goto end
             .local pmc iter
             iter = new 'Iterator', args
-          loop:
+        loop:
             unless iter goto end
             $P0 = shift iter
             print $P0
             goto loop
-          end:
+        end:
             say ''
             .return ()
         .end
@@ -154,7 +154,7 @@
   (emit "
         $P1 = val_x
         val_x = new 'PAST::Op'
-        val_x.init( $P0, $P1, 'name' => 'infix:+', 'pirop' => 'n_add' )
+        val_x.init( $P0, $P1, 'pirop' => 'n_add' )
         "))
 
 ; implementation of fxsub1
@@ -165,7 +165,7 @@
   (emit "
         $P1 = val_x
         val_x = new 'PAST::Op'
-        val_x.init( $P0, $P1, 'name' => 'infix:-', 'pirop' => 'n_sub' )
+        val_x.init( $P0, $P1, 'pirop' => 'n_sub' )
         "))
 
 ; implementation of char->fixnum
@@ -174,7 +174,7 @@
   (emit "
         $P0 = val_x
         val_x = new 'PAST::Op'
-        val_x.init( $P0, 'pasttype' => 'inline', 'name' => 'infix:-', 'inline' => \"new %r, 'EclectusFixnum'\\nassign %r, %0\\n\" )
+        val_x.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusFixnum'\\nassign %r, %0\\n\" )
         "))
 
 ; implementation of fixnum->char
@@ -183,7 +183,7 @@
   (emit "
         $P0 = val_x
         val_x = new 'PAST::Op'
-        val_x.init( $P0, 'pasttype' => 'inline', 'name' => 'infix:-', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
+        val_x.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
         "))
 
 ; implementation of fxzero?
@@ -196,7 +196,7 @@
         $P4 = new 'PAST::Op'
         $P4.init( $P0, $P1, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
         val_x = new 'PAST::Op'
-        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:=='  )
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
         "))
 
 ; implementation of null?
@@ -205,9 +205,9 @@
   (emit "$P0 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
+        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
         "))
 
 ; implementation of fixnum?
@@ -216,9 +216,9 @@
   (emit "$P0 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
+        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
         "))
 
 ; implementation of boolean?
@@ -227,9 +227,9 @@
   (emit "$P0 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
+        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
         "))
 
 ; implementation of not?
@@ -239,11 +239,11 @@
   (emit "$P0 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
+        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
         $P4 = new 'PAST::Op'
-        $P4.init( $P0, val_false, val_true, 'pasttype' => 'if', 'name' => 'infix:==' )
+        $P4.init( $P0, val_false, val_true, 'pasttype' => 'if' )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, $P4, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, $P4, val_false, 'pasttype' => 'if' )
         "))
 
 ; implementation of char?
@@ -252,9 +252,9 @@
   (emit "$P0 = val_x")
   (emit "
         $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'name' => 'typeof', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusCharacter'\\n %r = $I1\" )
+        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusCharacter'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if', 'name' => 'infix:==' )
+        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
         "))
 
 ; a getter of '*emitter*'
