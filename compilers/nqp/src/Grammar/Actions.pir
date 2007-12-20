@@ -452,8 +452,16 @@
 
 ##    method parameter($/) {
 ##        my $past := $( $<param_var> );
-##        if $<quant>[0] eq '?' {
-##            $past.viviself('Undef');
+##        if $<named> eq ':' {            # named
+##            $past.named(~$<param_var><ident>);
+##            if $<quant> ne '!' {        #   required (optional is default)
+##                $past.viviself('Undef');
+##            }
+##        }
+##        else {                          # positional
+##            if $<quant> eq '?' {        #   optional (required is default)
+##                $past.viviself('Undef');
+##            }
 ##        }
 ##        make $past;
 ##    }
@@ -462,11 +470,18 @@
     .local pmc past
     past = match['param_var']
     past = past.'get_scalar'()
-    $P0 = match['quant']
-    $S0 = $P0[0]
-    if $S0 != '?' goto make_past
+    $S0 = match['named']
+    if $S0 != ':' goto not_named
+    $S0 = match['param_var';'ident']
+    past.'named'($S0)
+    $S0 = match['quant']
+    if $S0 == '!' goto not_named
     past.'viviself'('Undef')
-  make_past:
+  not_named:
+    $S0 = match['quant']
+    if $S0 != '?' goto not_optional
+    past.'viviself'('Undef')
+  not_optional:
     match.'result_object'(past)
 .end
 

@@ -227,7 +227,10 @@ rule signature {
 }
 
 token parameter {
-    <param_var> $<quant>=<[ ? ! ]>? {*}
+    $<named>=[':'?]
+    <param_var>
+    $<quant>=[ <[ ? ! ]>? ]
+    {*}
 }
 
 token param_var {
