@@ -30,15 +30,6 @@ Fortunately, the new design of S05 means that we don't really need
 return statements for developing action grammars, so this is no
 longer as much of a priority as it was.
 
-=item * Named argument (not param) support
-
-C<PAST> now supports named arguments in subroutines, we simply need
-to modify the grammar to parse named arguments in subroutine
-declarations and build the appropriate actions to fill in the
-C<PAST::Var> parameter nodes.
-
-=item * Optional arguments
-
 =back
 
 =head2 Tests
@@ -61,5 +52,9 @@ and exercise methods using that.
 =item * List context @( ... )
 
 =item * Variables with twigils
+
+=item * Optional arguments and parameters
+
+=item * Named arguments and parameters
 
 =back
