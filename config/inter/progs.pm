@@ -35,11 +35,37 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $verbose = _get_verbose($conf);
+
+    my $ask = _prepare_for_interactivity($conf);
+
+    my $cc;
+    ($conf, $cc) = _get_programs($conf, $verbose, $ask);
+
+    my $debug = _get_debug($conf, $ask);
+
+    my $debug_validity = _is_debug_setting_valid($debug);
+    return unless defined $debug_validity;
+
+    $conf = _set_debug_and_warn($conf, $debug);
+
+    # Beware!  Inside test_compiler(), cc_build() and cc_run() both silently
+    # reference the Parrot::Configure object ($conf) at its current state.
+    # Cage cleaner alert: cf RT .
+    test_compiler($cc);
+
+    return 1;
+}
+
+sub _get_verbose {
+    my $conf = shift;
     my $verbose = $conf->options->get('verbose');
     print "\n" if $verbose;
+    return $verbose;
+}
 
-    my ( $cc, $cxx, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex, $yacc );
-
+sub _prepare_for_interactivity {
+    my $conf = shift;
     my $ask = $conf->options->get('ask');
     if ($ask) {
         print <<'END';
@@ -53,10 +79,14 @@ sub runstep {
 
 END
     }
+    return $ask;
+}
 
+sub _get_programs {
+    my ($conf, $verbose, $ask) = @_;
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
-
+    my ( $cc, $cxx, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc );
     $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
@@ -106,15 +136,25 @@ END
     $cxx = integrate( $conf->data->get('cxx'), $conf->options->get('cxx') );
     $cxx = prompt( "What C++ compiler do you want to use?", $cxx ) if $ask;
     $conf->data->set( cxx => $cxx );
+    return ($conf, $cc);
+}
 
+sub _get_debug {
+    my ($conf, $ask) = @_;
     my $debug = 'n';
     $debug = 'y' if $conf->options->get('debugging');
     $debug = prompt( "Do you want a debugging build of Parrot?", $debug )
         if $ask;
-    unless ( $debug =~ /^[yn]$/i ) {
-        return;
-    }
+    return $debug;
+}
 
+sub _is_debug_setting_valid {
+    my $debug = shift;
+    ( $debug =~ /^[yn]$/i ) ? return 1 : return;
+}
+
+sub _set_debug_and_warn {
+    my ($conf, $debug) = @_;
     if ( $debug =~ /n/i ) {
         $conf->data->set(
             cc_debug   => '',
@@ -124,12 +164,9 @@ END
     }
 
     # This one isn't prompted for above.  I don't know why.
-    $ccwarn = integrate( $conf->data->get('ccwarn'), $conf->options->get('ccwarn') );
+    my $ccwarn = integrate( $conf->data->get('ccwarn'), $conf->options->get('ccwarn') );
     $conf->data->set( ccwarn => $ccwarn );
-
-    test_compiler($cc);
-
-    return 1;
+    return $conf;
 }
 
 sub test_compiler {

@@ -6,8 +6,7 @@
 use strict;
 use warnings;
 
-# Please leave as 'no_plan'; see 'BUG' in POD.
-use Test::More qw(no_plan);    # tests => 23;
+use Test::More tests => 24;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -18,6 +17,7 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use Tie::Filehandle::Preempt::Stdin;
+use IO::CaptureOutput qw| capture |;
 
 =for hints_for_testing Testing and refactoring of inter::progs should
 entail understanding of issues discussed in the following RT tickets:
@@ -55,17 +55,17 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my ( @prompts, $object );
+my @prompts;
 foreach my $p (
     qw|
-    cc
-    link
-    ld
-    ccflags
-    linkflags
-    ldflags
-    libs
-    cxx
+        cc
+        link
+        ld
+        ccflags
+        linkflags
+        ldflags
+        libs
+        cxx
     |
     )
 {
@@ -73,16 +73,25 @@ foreach my $p (
 }
 push @prompts, q{n};
 
-$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
+my $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
-{
-    open STDOUT, '>', "/dev/null" or croak "Unable to open to myout";
-    $ret = $step->runstep($conf);
-    close STDOUT or croak "Unable to close after myout";
-    ok( defined $ret, "$step_name runstep() returned defined value" );
-}
+my ($stdout, $debug, $debug_validity);
+capture( sub {
+    my $verbose = inter::progs::_get_verbose($conf);
+    my $ask = inter::progs::_prepare_for_interactivity($conf);
+    my $cc;
+    ($conf, $cc) = inter::progs::_get_programs($conf, $verbose, $ask);
+    $debug = inter::progs::_get_debug($conf, $ask);
+    $debug_validity = inter::progs::_is_debug_setting_valid($debug);
+}, \$stdout);
+ok( defined $debug_validity, "'debug_validity' set as expected" );
+
+capture( sub {
+    $conf = inter::progs::_set_debug_and_warn($conf, $debug);
+}, \$stdout);
+ok( defined $conf, "Components of $step_name runstep() tested okay" );
 
 $object = undef;
 untie *STDIN;
@@ -104,23 +113,6 @@ pass("Completed all tests in $0");
 The files in this directory test functionality used by F<Configure.pl>.
 
 The tests in this file test subroutines exported by config::inter::progs.
-
-=head1 BUG
-
-This file tests the case where the C<--ask> option is specified and,
-hence, the user must respond to a prompt.  The response to the prompt is
-supplied automatically via Tie::Filehandle::Preempt::Stdin.  But that
-response is made via C<STDOUT>.  A user generally would not like to see
-that output when running this test, say, via C<prove -v>.  So the data
-written to C<STDOUT> must be captured rather than displayed.
-
-In other test files we can do that with Parrot::IO::Capture::Mini.  We
-cannot do that here because there is extensive manipulation of C<STDOUT>
-deep inside the code being tested.  The solution employed in this test
-successfully disposes of information printed to C<STDOUT>, but it
-confuses Test::Harness's count of tests run.  This would cause the file
-as a whole to be reported as having failed, when in fact every single
-test passed.  As a compromise, we run the file with C<no_plan>.
 
 =head1 AUTHOR
 

@@ -55,17 +55,17 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my ( @prompts, $object );
+my @prompts;
 foreach my $p (
     qw|
-    cc
-    link
-    ld
-    ccflags
-    linkflags
-    ldflags
-    libs
-    cxx
+        cc
+        link
+        ld
+        ccflags
+        linkflags
+        ldflags
+        libs
+        cxx
     |
     )
 {
@@ -73,18 +73,15 @@ foreach my $p (
 }
 push @prompts, q{0};
 
-$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
+my $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
-{
-    my ($ret, $stdout);
-    capture(
-        sub { $ret = $step->runstep($conf); },
-        \$stdout,
-    );
-    ok( !defined $ret, "$step_name runstep() returned defined value" );
-}
+my ($stdout, $rv);
+capture( sub {
+    $rv = $step->runstep($conf);
+}, \$stdout);
+ok( ! defined $rv, "$step_name runstep returned undef as expected" );
 
 $object = undef;
 untie *STDIN;
@@ -105,24 +102,9 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::inter::progs.
-
-=head1 BUG
-
-This file tests the case where the C<--ask> option is specified and,
-hence, the user must respond to a prompt.  The response to the prompt is
-supplied automatically via Tie::Filehandle::Preempt::Stdin.  But that
-response is made via C<STDOUT>.  A user generally would not like to see
-that output when running this test, say, via C<prove -v>.  So the data
-written to C<STDOUT> must be captured rather than displayed.
-
-In other test files we can do that with Parrot::IO::Capture::Mini.  We
-cannot do that here because there is extensive manipulation of C<STDOUT>
-deep inside the code being tested.  The solution employed in this test
-successfully disposes of information printed to C<STDOUT>, but it
-confuses Test::Harness's count of tests run.  This would cause the file
-as a whole to be reported as having failed, when in fact every single
-test passed.  As a compromise, we run the file with C<no_plan>.
+The tests in this file test config::inter::progs in the case where interactive
+configuration is requested and an inappropriate response to the debugging
+prompt is provided.
 
 =head1 AUTHOR
 
