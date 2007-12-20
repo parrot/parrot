@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: pdd00_pdd.pod 18781 2007-06-03 14:38:04Z paultcochrane $
+# $Id$
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ This PDD defines Parrot's multiple dispatch system.
 
 =head1 VERSION
 
-$Revision: 18781 $
+$Revision$
 
 =head1 DEFINITIONS
 
