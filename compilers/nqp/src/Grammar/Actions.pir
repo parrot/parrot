@@ -409,9 +409,9 @@
 ##            $past.blocktype('method');
 ##        }
 ##        for $<signature>[0] {
-##            my $param_var := $($_<param_var>);
-##            $past.symbol($param_var.name(), :scope('lexical'));
-##            $params.push($param_var);
+##            my $parameter := $($_<parameter>);
+##            $past.symbol($parameter.name(), :scope('lexical'));
+##            $params.push($parameter);
 ##        }
 ##        make $past;
 ##    }
@@ -438,14 +438,35 @@
   param_loop:
     unless iter goto param_end
     $P1 = shift iter
-    .local pmc param_var
-    $P2 = $P1['param_var']
-    param_var = $P2.'get_scalar'()
-    $S0 = param_var['name']
+    .local pmc parameter
+    $P2 = $P1['parameter']
+    parameter = $P2.'get_scalar'()
+    $S0 = parameter.'name'()
     past.'symbol'($S0, 'scope'=>'lexical')
-    params.'push'(param_var)
+    params.'push'(parameter)
     goto param_loop
   param_end:
+    match.'result_object'(past)
+.end
+
+
+##    method parameter($/) {
+##        my $past := $( $<param_var> );
+##        if $<quant>[0] eq '?' {
+##            $past.viviself('Undef');
+##        }
+##        make $past;
+##    }
+.sub 'parameter' :method
+    .param pmc match
+    .local pmc past
+    past = match['param_var']
+    past = past.'get_scalar'()
+    $P0 = match['quant']
+    $S0 = $P0[0]
+    if $S0 != '?' goto make_past
+    past.'viviself'('Undef')
+  make_past:
     match.'result_object'(past)
 .end
 

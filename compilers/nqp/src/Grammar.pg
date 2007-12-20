@@ -222,9 +222,12 @@ rule routine_def {
 }
 
 rule signature {
-    ( <param_var> ( ',' | <?before ')'> ) )*
-    ( <colonpair> ( ',' | <?before ')'> ) )*
+    ( <parameter> ( ',' | <?before ')'> ) )*
     {*}
+}
+
+token parameter {
+    <param_var> $<quant>=<[ ? ! ]>? {*}
 }
 
 token param_var {
