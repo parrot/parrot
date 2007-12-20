@@ -10,7 +10,7 @@ No author information is given here. This is because maintainers
 should be tracked in the respective languages/*/MAINTAINER files, and we
 don't want to repeat ourselves.
 
-For current status of some languages see also 
+For current status of some languages see also
 L<http://smoke.parrotcode.org/smoke/>
 
 Languages that work with the unified languages test suite
@@ -63,7 +63,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -113,7 +113,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -139,7 +139,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -162,7 +162,7 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -260,7 +260,7 @@ has been commented out.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -308,7 +308,7 @@ Planned.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -354,7 +354,7 @@ Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -392,7 +392,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -447,7 +447,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -475,7 +475,7 @@ L<http://www.parrotcode.org/talks/LuaOnParrot.pdf>.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -537,7 +537,7 @@ Development is stalled. Takers are welcome.  Some tests fail.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -584,11 +584,11 @@ In progress.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
-C<languages/nqp>
+C<compilers/nqp>
 
 =back
 
@@ -608,7 +608,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -631,7 +631,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -674,7 +674,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -701,7 +701,7 @@ builtins.
 
 =item Last verified with Parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -779,7 +779,7 @@ Started.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -832,7 +832,7 @@ and logic ops.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -903,7 +903,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -953,7 +953,7 @@ use tcltest.tcl)
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -1026,7 +1026,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -1054,7 +1054,7 @@ See details in F<languages/WMLScript/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.1
 
 =item Location
 
@@ -1127,6 +1127,6 @@ located in C<languages/ruby>.
 Span can be most concisely described as Smalltalk for C++, C#, and Java
 programmers. It features an object system modeled on the Smalltalk object
 system and a language syntax designed to be easy to learn for developers of
-C-like languages. Last verified against parrot 0.1.11. 
+C-like languages. Last verified against parrot 0.1.11.
 L<http://homepage.mac.com/matt.kennedy/Span>
 
