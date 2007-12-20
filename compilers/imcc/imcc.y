@@ -742,7 +742,7 @@ pasm_args:
      vars
    ;
 
-emit:
+emit:              /* EMIT and EOM tokens are used when compiling a .pasm file. */
      EMIT          { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PASM); }
      opt_pasmcode
      EOM           { /*
