@@ -1091,6 +1091,7 @@ blocks to determine the scope.
     ops.'push'(vivipost)
     ops.'push_pirop'('set', ops, vivipost)
     ops.'push'(vivilabel)
+    .return (ops)
 
   param_required:
     .local int slurpy
