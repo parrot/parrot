@@ -2,6 +2,8 @@
 
 ; Generate driver and PAST for Eclectus
 
+;; Helpers that emit PIR
+
 ; Emit PIR that loads libs
 (define (emit-init)
   (emit "
@@ -80,13 +82,6 @@
         
         "))
 
-; forms represented by a scalar PMC
-(define (immediate? expr)
-  (or (fixnum? expr)
-      (boolean? expr)
-      (char? expr)
-      (and (list? expr) (= (length expr) 0 ))))
-
 ; emit PIR for a scalar
 (define (immediate-rep x)
   (cond
@@ -121,7 +116,37 @@
               val_x.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
               " x)]))
 
-; Support for primitve functions
+;; recognition of forms
+
+; forms represented by a scalar PMC
+(define (immediate? expr)
+  (or (fixnum? expr)
+      (boolean? expr)
+      (char? expr)
+      (and (list? expr) (= (length expr) 0 ))))
+
+(define make-combination-predicate
+  (lambda (name)
+    (lambda (form)
+      (and (pair? form)
+           (eq? name (car form))))))
+
+(define if?
+  (make-combination-predicate 'if))
+
+(define if-test
+  (lambda (form)
+    (car (cdr form))))
+
+(define if-conseq
+  (lambda (form)
+    (car (cdr (cdr form)))))
+
+(define if-altern
+  (lambda (form)
+    (car (cdr (cdr (cdr form))))))
+
+; Support for primitive functions
 
 ; is expr a primitive?
 (define (primitive? expr)
@@ -280,13 +305,26 @@
   (let ([prim (car expr)] [args (cdr expr)])
     (apply (primitive-emitter prim) args)))
 
-(define (emit-immediate x)
-  (emit (immediate-rep x)))
+(define (emit-immediate expr)
+  (emit (immediate-rep expr)))
+
+(define (emit-if expr)
+  (emit-expr (if-test expr))
+  (emit "$P0 = val_x")
+  (emit-expr (if-conseq expr))
+  (emit "$P1 = val_x")
+  (emit-expr (if-altern expr))
+  (emit "$P2 = val_x")
+  (emit "
+        val_x = new 'PAST::Op'
+        val_x.init( $P0, $P1, $P2, 'pasttype' => 'if'  )
+        "))
  
 ; emir PIR for an expression
 (define (emit-expr expr)
   (cond
     [(immediate? expr) (emit-immediate expr)]
+    [(if? expr)        (emit-if expr)]
     [(primcall? expr)  (emit-primcall expr)])) 
 
 ; the actual compiler

@@ -27,6 +27,11 @@ pmclass EclectusString
     hll Eclectus
     maps String {
 
+    /* all Strings are not #f, therefore evaluate to true */
+    INTVAL get_bool() {
+        return 1;
+    }
+
 }
 
 /*

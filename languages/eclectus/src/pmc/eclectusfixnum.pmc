@@ -27,6 +27,11 @@ pmclass EclectusFixnum
     hll Eclectus
     maps Integer {
 
+    /* all fixnums are not #f, therefore evaluate to true */
+    INTVAL get_bool() {
+        return 1;
+    }
+
 }
 
 /*
