@@ -169,11 +169,6 @@ See RT #48735.
 
 See RT #4671.
 
-=item * C<.emit> / C<.eom> [post 0.5.1]
-
-See RT #47846.  Any C<.emit>/C<.eom> blocks should be replaced with
-Anonymous C<.sub>s
-
 =item * vtable name .constants and __vtable overrides [post 0.5.2]
 
 See RT #48877.
