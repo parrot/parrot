@@ -7,8 +7,8 @@ src/lua51.pir -- The compiler for Lua 5.1
 
 =head1 DESCRIPTION
 
-This compiler extends C<HLLCompiler>
-(see F<runtime/parrot/library/Parrot/HLLCompiler.pir>)
+This compiler extends C<PCT::HLLCompiler>
+(see F<compilers/pct/src/PCT/HLLCompiler.pir>)
 
 This compiler defines the following stages:
 
@@ -33,9 +33,10 @@ Used by F<languages/lua/lua.pir>.
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
+    load_bytecode 'PCT/HLLCompiler.pbc'
 
-    $P0 = subclass 'HLLCompiler', 'Lua::Compiler'
+    $P0 = subclass 'PCT::HLLCompiler', 'Lua::Compiler'
+    addattribute $P0, '$ostgrammar'
     new $P0, 'Lua::Compiler'
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
@@ -43,6 +44,61 @@ Used by F<languages/lua/lua.pir>.
     $P0.'ostgrammar'('Lua::POST::Grammar')
 
     $P0.'commandline_prompt'('> ')
+.end
+
+
+.namespace [ 'Lua::Compiler' ]
+
+=head3 Overloaded methods
+
+=over 4
+
+=item C<ostgrammar([string grammar])>
+
+Accessor for the 'ostgrammar' attribute.
+
+=cut
+
+.sub 'ostgrammar' :method
+    .param string value        :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('$ostgrammar', value, has_value)
+.end
+
+
+=item C<post(source [, adverbs :slurpy :named])>
+
+Transform C<source> using the compiler's C<ostgrammar>
+according to any options given by C<adverbs>, and return the
+resulting ost.
+
+=back
+
+=cut
+
+.sub 'post' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+    .local string ostgrammar_name
+    .local pmc ostgrammar, ostbuilder
+    ostgrammar_name = self.'ostgrammar'()
+    unless ostgrammar_name goto default_ostgrammar
+    ostgrammar = new ostgrammar_name
+    ostbuilder = ostgrammar.'apply'(source)
+    .return ostbuilder.'get'('post')
+
+  default_ostgrammar:
+    $P0 = compreg 'PAST'
+    .return $P0.'compile'(source, adverbs :flat :named)
+.end
+
+
+.sub 'pir' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+    $P0 = compreg 'POST'
+    $P1 = $P0.'compile'(source, adverbs :flat :named)
+    .return ($P1)
 .end
 
 
