@@ -146,27 +146,18 @@ tree as a PIR code object that can be compiled.
     explabel = 'R'
     exp.pir(expcode, explabel, 'succeed')
 
-    ##   generate a :method that invokes the sub
-    code.emit(<<"      CODE", name)
-      .sub %0 :method
-          .param pmc adverbs   :slurpy :named
-          $P0 = get_global %0
-          .return $P0(self, adverbs :flat :named)
-      .end
-      CODE
-
     if cutrule goto code_cutrule
     ##   Generate the initial PIR code for a backtracking (uncut) rule.
     .local string returnop
     returnop = '.yield'
     code.emit(<<"        CODE", name, namecorou, .INTERPINFO_CURRENT_SUB)
-      .sub %0
-          .param pmc mob
+      .sub %0 :method
           .param pmc adverbs   :slurpy :named
+          .local pmc mob
           .const .Sub corou = %1
           $P0 = corou
           $P0 = clone $P0
-          mob = $P0(mob, adverbs)
+          mob = $P0(self, adverbs)
           .return (mob)
       .end
       .sub %1
@@ -186,14 +177,14 @@ tree as a PIR code object that can be compiled.
     ##   Initial code for a rule that cannot be backtracked into.
     returnop = '.return'
     code.emit(<<"        CODE", name)
-      .sub %0
-          .param pmc mob
+      .sub %0 :method
           .param pmc adverbs      :unique_reg :slurpy :named
+          .local pmc mob
           .local string target    :unique_reg
           .local pmc mfrom, mpos  :unique_reg
           .local int cpos, iscont :unique_reg
           $P0 = get_hll_global ['PGE'], 'Match'
-          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
+          (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(self, adverbs :flat :named)
         CODE
 
   code_body:
