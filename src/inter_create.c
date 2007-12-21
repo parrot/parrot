@@ -263,7 +263,7 @@ make_interpreter(NULLOK(Interp *parent), INTVAL flags)
     interp->thread_data = NULL;
 
     Parrot_init_events(interp);
-/*    Parrot_cx_init_scheduler(interp); */
+    Parrot_cx_init_scheduler(interp);
 
 #ifdef ATEXIT_DESTROY
     /*
@@ -327,7 +327,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      */
     if (!interp->parent_interpreter) {
         pt_join_threads(interp);
-/*        Parrot_cx_runloop_end(interp); */
+        Parrot_cx_runloop_end(interp);
     }
 
     /* if something needs destruction (e.g. closing PIOs)
