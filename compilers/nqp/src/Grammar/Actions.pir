@@ -450,26 +450,46 @@
 .end
 
 
-##    method parameter($/) {
+##    method parameter($/, $key) {
 ##        my $past := $( $<param_var> );
-##        if $<named> eq ':' {            # named
-##            $past.named(~$<param_var><ident>);
-##            if $<quant> ne '!' {        #   required (optional is default)
-##                $past.viviself('Undef');
-##            }
+##        my $sigil := $<param_var><sigil>;
+##        if $key eq 'slurp' {              # slurpy
+##            $past.slurpy( $sigil eq '@' || $sigil eq '%' );
+##            $past.named( $sigil eq '%' );
 ##        }
-##        else {                          # positional
-##            if $<quant> eq '?' {        #   optional (required is default)
-##                $past.viviself('Undef');
+##        else {
+##            if $<named> eq ':' {          # named
+##                $past.named(~$<param_var><ident>);
+##                if $<quant> ne '!' {      #  required (optional is default)
+##                    $past.viviself('Undef');
+##                }
+##            }
+##            else {                        # positional
+##                if $<quant> eq '?' {      #  optional (required is default)
+##                    $past.viviself('Undef');
+##                }
 ##            }
 ##        }
 ##        make $past;
 ##    }
 .sub 'parameter' :method
     .param pmc match
-    .local pmc past
+    .param pmc key
+    .local pmc past, sigil
     past = match['param_var']
     past = past.'get_scalar'()
+    sigil = match['param_var';'sigil']
+    if key != 'slurp' goto not_slurp
+    if sigil != '@' goto not_slurpy_array
+    past.'slurpy'(1)
+  not_slurpy_array:
+    if sigil != '%' goto not_slurpy_hash
+    past.'slurpy'(1)
+  not_slurpy_hash:
+    if sigil != '%' goto not_slurp
+    past.'named'(1)
+    goto make_past
+  not_slurp:
     $S0 = match['named']
     if $S0 != ':' goto not_named
     $S0 = match['param_var';'ident']
@@ -479,9 +499,9 @@
     past.'viviself'('Undef')
   not_named:
     $S0 = match['quant']
-    if $S0 != '?' goto not_optional
+    if $S0 != '?' goto make_past
     past.'viviself'('Undef')
-  not_optional:
+  make_past:
     match.'result_object'(past)
 .end
 

@@ -227,10 +227,12 @@ rule signature {
 }
 
 token parameter {
-    $<named>=[':'?]
-    <param_var>
-    $<quant>=[ <[ ? ! ]>? ]
-    {*}
+    | [
+        $<named>=[':'?]
+        <param_var>
+        $<quant>=[ <[ ? ! ]>? ]
+      ] {*}                                                #= non-slurp
+    | $<quant>=['*'?] <param_var> {*}                      #= slurp
 }
 
 token param_var {
