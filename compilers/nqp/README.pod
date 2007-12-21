@@ -31,9 +31,9 @@ language constructs that we explicitly know will be supported
 
 =item * lexical 'my', package 'our'
 
-=item * method calls (including named arguments)
+=item * method calls (including named, optional, and slurpy arguments)
 
-=item * subroutine calls (including named arguments)
+=item * subroutine calls (including named, optional, and slurpy arguments)
 
 =item * method definitions
 
