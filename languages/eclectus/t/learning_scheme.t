@@ -17,7 +17,7 @@
     ( printf "not ok ~s - ~s\n" test-num test-description)))
 
 ; set up TAP test plan
-(plan 15)
+(plan 17)
 
 (define test-num 1)
 (pass test-num "form definition")
@@ -59,6 +59,12 @@
     [(_ e)            e]
     [(_ e1 e2 e3 ...) ( if e1 (my-and e2 e3 ...) #f )]))
 
+(define-syntax my-or
+  (syntax-rules ()
+    [(_)              #f]
+    [(_ e)            e]
+    [(_ e1 e2 e3 ...) ( if e1 e1 (my-or e2 e3 ...) )]))
+
 ; and
 (define desc "my-and")
 
@@ -79,4 +85,10 @@
 (define test-num (add1 test-num))
 ( if (my-and (my-and #t #t) (my-and #t #t) ) (pass test-num desc) (fail test-num desc)) 
 ( if (my-and (my-and #t #t) (my-and #t #t) (my-and #f #t)) (fail test-num desc) (pass test-num desc)) 
+
+(define desc "my-and and my-or")
+
+(define test-num (add1 test-num))
+( if (my-and (my-and #t #t) (my-or  #f #t) ) (pass test-num desc) (fail test-num desc)) 
+( if (my-and (my-and #t #t) (my-or  #f #f) ) (fail test-num desc) (pass test-num desc)) 
 
