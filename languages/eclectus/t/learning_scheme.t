@@ -17,7 +17,7 @@
     ( printf "not ok ~s - ~s\n" test-num test-description)))
 
 ; set up TAP test plan
-(plan 3)
+(plan 11)
 
 (define test-num 1)
 (pass test-num "form definition")
@@ -32,3 +32,41 @@
 (define desc "getprop not equal")
 (define test-num (add1 test-num))
 (if (string=? (getprop 'parrot 'wing) "not a feather") (fail test-num desc) (pass test-num desc)) 
+
+; and
+(define desc "and")
+
+(define test-num (add1 test-num))
+( if (and #t #t) (pass test-num desc) (fail test-num desc)) 
+
+(define test-num (add1 test-num))
+( if (and #t #f) (fail test-num desc) (pass test-num desc)) 
+
+(define test-num (add1 test-num))
+( if (and #t #t #t) (pass test-num desc) (fail test-num desc)) 
+
+(define test-num (add1 test-num))
+( if (and #t #f #t) (fail test-num desc) (pass test-num desc)) 
+
+; play with tree transformation
+(define-syntax my-and
+  (syntax-rules ()
+    [(_)              #t]
+    [(_ e)            e]
+    [(_ e1 e2 e3 ...) ( if e1 (my-and e2 e3 ...) #f )]))
+
+; and
+(define desc "my-and")
+
+(define test-num (add1 test-num))
+( if (my-and #t #t) (pass test-num desc) (fail test-num desc)) 
+
+(define test-num (add1 test-num))
+( if (my-and #t #f) (fail test-num desc) (pass test-num desc)) 
+
+(define test-num (add1 test-num))
+( if (my-and #t #t #t) (pass test-num desc) (fail test-num desc)) 
+
+(define test-num (add1 test-num))
+( if (my-and #t #f #t) (fail test-num desc) (pass test-num desc)) 
+
