@@ -482,6 +482,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     '_dumper'($P0, target)
     goto interactive_loop
   target_pir:
+    say $P0
     goto interactive_loop
   interactive_trap:
     get_results '0,0', $P0, $S0
