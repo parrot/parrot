@@ -81,7 +81,7 @@ void * pop_dest(PARROT_INTERP)
 
 PARROT_API
 void rotate_entries(PARROT_INTERP,
-    NOTNULL(Stack_Chunk_t **stack_p),
+    ARGINOUT(Stack_Chunk_t **stack_p),
     INTVAL num_entries)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -116,17 +116,17 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 void * stack_pop(PARROT_INTERP,
     ARGINOUT(Stack_Chunk_t **stack_p),
-    NULLOK(void *where),
+    ARGOUT_NULLOK(void *where),
     Stack_entry_type type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 void stack_push(PARROT_INTERP,
-    NOTNULL(Stack_Chunk_t **stack_p),
-    NOTNULL(void *thing),
+    ARGINOUT(Stack_Chunk_t **stack_p),
+    ARGIN(void *thing),
     Stack_entry_type type,
-    NULLOK(Stack_cleanup_method cleanup))
+    ARGIN_NULLOK(Stack_cleanup_method cleanup))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

@@ -60,9 +60,9 @@ static void create_deleg_pmc_vtable(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void debug_trace_find_meth(PARROT_INTERP,
-    NOTNULL(PMC *_class),
-    NOTNULL(STRING *name),
-    NULLOK(PMC *sub))
+    ARGIN(const PMC *_class),
+    ARGIN(const STRING *name),
+    ARGIN_NULLOK(const PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -80,8 +80,8 @@ static void fail_if_exist(PARROT_INTERP, NOTNULL(PMC *name))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * find_method_direct_1(PARROT_INTERP,
-    NOTNULL(PMC *_class),
-    NOTNULL(STRING *method_name))
+    ARGIN(PMC *_class),
+    ARGIN(const STRING *method_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -1686,9 +1686,11 @@ RT#48260: Not yet documented!!!
 #ifdef NDEBUG
 #  define TRACE_FM(i, c, m, sub)
 #else
+#  define TRACE_FM(i, c, m, sub) \
+    debug_trace_find_meth(i, c, m, sub)
 static void
-debug_trace_find_meth(PARROT_INTERP, NOTNULL(PMC *_class),
-        NOTNULL(STRING *name), NULLOK(PMC *sub))
+debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
+        ARGIN(const STRING *name), ARGIN_NULLOK(const PMC *sub))
 {
     STRING *class_name;
     const char *result;
@@ -1711,15 +1713,12 @@ debug_trace_find_meth(PARROT_INTERP, NOTNULL(PMC *_class),
     }
     else
         result = "no";
-    tracer = interp->debugger ?
-        interp->debugger : interp;
+    tracer = interp->debugger ? interp->debugger : interp;
     PIO_eprintf(tracer,
             "# find_method class '%Ss' method '%Ss': %s\n",
             class_name, name, result);
 }
 
-#  define TRACE_FM(i, c, m, sub) \
-    debug_trace_find_meth(i, c, m, sub)
 #endif
 
 /*
@@ -1735,8 +1734,8 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-find_method_direct_1(PARROT_INTERP, NOTNULL(PMC *_class),
-                              NOTNULL(STRING *method_name))
+find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
+                              ARGIN(const STRING *method_name))
 {
     INTVAL i;
 

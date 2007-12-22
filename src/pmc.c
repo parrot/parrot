@@ -360,7 +360,7 @@ As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC *
-pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
+pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
 {
     PMC *pmc;
     PMC *const classobj = interp->vtables[base_type]->pmc_class;

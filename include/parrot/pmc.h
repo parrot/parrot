@@ -55,8 +55,9 @@ PMC * pmc_new(PARROT_INTERP, INTVAL base_type)
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC * pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
-        __attribute__nonnull__(1);
+PMC * pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL

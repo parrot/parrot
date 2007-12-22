@@ -19,6 +19,8 @@ my @experimental_files = qw(
     hll.c
     objects.c
     stacks.c
+    stm/backend.c
+    stm/waitlist.c
     string.c
     string_primitives.c
     sub.c

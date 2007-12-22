@@ -182,7 +182,7 @@ element.
 
 PARROT_API
 void
-rotate_entries(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),  INTVAL num_entries)
+rotate_entries(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p), INTVAL num_entries)
 {
     Stack_Chunk_t * const stack = *stack_p;
     INTVAL depth = num_entries - 1;
@@ -244,8 +244,8 @@ variable or something.
 
 PARROT_API
 void
-stack_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
-           NOTNULL(void *thing), Stack_entry_type type, NULLOK(Stack_cleanup_method cleanup))
+stack_push(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p),
+           ARGIN(void *thing), Stack_entry_type type, ARGIN_NULLOK(Stack_cleanup_method cleanup))
 {
     Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_push(interp, stack_p);
 
@@ -291,7 +291,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 void *
 stack_pop(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p),
-          NULLOK(void *where), Stack_entry_type type)
+          ARGOUT_NULLOK(void *where), Stack_entry_type type)
 {
     Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
 
