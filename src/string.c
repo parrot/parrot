@@ -926,7 +926,7 @@ string.
 PARROT_API
 PARROT_IGNORABLE_RESULT
 INTVAL
-string_compute_strlen(PARROT_INTERP, NOTNULL(STRING *s))
+string_compute_strlen(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     PARROT_ASSERT(s);
 
@@ -971,7 +971,8 @@ created and returned.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_concat(PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b), UINTVAL Uflags)
+string_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
+            ARGIN_NULLOK(STRING *b), UINTVAL Uflags)
 {
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
@@ -1063,7 +1064,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_substr(PARROT_INTERP, NOTNULL(STRING *src), INTVAL offset, INTVAL length,
+string_substr(PARROT_INTERP, ARGIN(STRING *src), INTVAL offset, INTVAL length,
         ARGOUT_NULLOK(STRING **d), int replace_dest)
 {
     STRING *dest;
@@ -1140,8 +1141,8 @@ A negative offset is allowed to replace from the end.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 STRING *
-string_replace(PARROT_INTERP, NOTNULL(STRING *src),
-    INTVAL offset, INTVAL length, NOTNULL(STRING *rep), ARGOUT_NULLOK(STRING **d))
+string_replace(PARROT_INTERP, ARGIN(STRING *src),
+    INTVAL offset, INTVAL length, ARGIN(STRING *rep), ARGOUT_NULLOK(STRING **d))
 {
     STRING *dest = NULL;
     UINTVAL start_byte, end_byte;
@@ -1470,8 +1471,8 @@ then it is reused, otherwise a new Parrot string is created.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_and(PARROT_INTERP, NULLOK(STRING *s1),
-        NULLOK(STRING *s2), ARGOUT_NULLOK(STRING **dest))
+string_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
+        ARGIN_NULLOK(const STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t minlen;
@@ -1586,8 +1587,8 @@ then it is reused, otherwise a new Parrot string is created.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
-        NULLOK(STRING *s2), ARGOUT_NULLOK(STRING **dest))
+string_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
+        ARGIN_NULLOK(const STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t  maxlen = 0;
@@ -1658,8 +1659,8 @@ then it is reused, otherwise a new Parrot string is created.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
-        NULLOK(STRING *s2), ARGOUT_NULLOK(STRING **dest))
+string_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
+        ARGIN_NULLOK(const STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t  maxlen = 0;
@@ -1743,7 +1744,7 @@ not C<NULL> then it is reused, otherwise a new Parrot string is created.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_not(PARROT_INTERP, NULLOK(STRING *s), ARGOUT_NULLOK(STRING **dest))
+string_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t  len;
@@ -1846,7 +1847,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_nprintf(PARROT_INTERP,
-    NULLOK(STRING *dest), INTVAL bytelen, ARGIN(const char *format), ...)
+    ARGOUT(STRING *dest), INTVAL bytelen, ARGIN(const char *format), ...)
 {
     STRING  *output;
     va_list  args;
@@ -2099,7 +2100,7 @@ sorts of leak potential otherwise.
 
 PARROT_API
 void
-string_cstring_free(NULLOK(char *p))
+string_cstring_free(ARGIN_NULLOK(char *p))
 {
     mem_sys_free((void *)p);
 }
@@ -2117,7 +2118,7 @@ memory.
 
 PARROT_API
 void
-string_pin(PARROT_INTERP, NOTNULL(STRING *s))
+string_pin(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     char  *memory;
     INTVAL size;
@@ -2152,7 +2153,7 @@ memory.
 
 PARROT_API
 void
-string_unpin(PARROT_INTERP, NOTNULL(STRING *s))
+string_unpin(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     void  *memory;
     INTVAL size;
@@ -2160,7 +2161,7 @@ string_unpin(PARROT_INTERP, NOTNULL(STRING *s))
     /* If this string is not marked using system memory,
      * we just don't do this
      */
-    if (!(PObj_sysmem_TEST(s)))
+    if (!PObj_sysmem_TEST(s))
         return;
 
     Parrot_unmake_COW(interp, s);
@@ -2519,7 +2520,7 @@ Converts the specified Parrot string to upper case.
 
 PARROT_API
 void
-string_upcase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
+string_upcase_inplace(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     Parrot_unmake_COW(interp, s);
     CHARSET_UPCASE(interp, s);
@@ -2560,7 +2561,7 @@ Converts the specified Parrot string to lower case.
 
 PARROT_API
 void
-string_downcase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
+string_downcase_inplace(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     /*
      * TODO get rid of all the inplace variants. We have for utf8:
@@ -2607,7 +2608,7 @@ Converts the specified Parrot string to title case.
 
 PARROT_API
 void
-string_titlecase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
+string_titlecase_inplace(PARROT_INTERP, ARGINOUT(STRING *s))
 {
     Parrot_unmake_COW(interp, s);
     CHARSET_TITLECASE(interp, s);
@@ -2685,10 +2686,8 @@ character classes. Returns 0 otherwise, or if the string is empty or NULL.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_string_is_cclass(PARROT_INTERP,
-        INTVAL flags,
-        NOTNULL(STRING *s),
-        UINTVAL offset)
+Parrot_string_is_cclass(PARROT_INTERP, INTVAL flags,
+        ARGIN(const STRING *s), UINTVAL offset)
 {
     if (!string_length(interp, s))
         return 0;
@@ -2731,7 +2730,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_string_find_not_cclass(PARROT_INTERP, INTVAL flags, NULLOK(STRING *s),
+Parrot_string_find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
                               UINTVAL offset, UINTVAL count)
 {
     if (!s)
@@ -2755,8 +2754,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_string_trans_charset(PARROT_INTERP, NULLOK(STRING *src),
-        INTVAL charset_nr, NULLOK(STRING *dest))
+Parrot_string_trans_charset(PARROT_INTERP, ARGINOUT_NULLOK(STRING *src),
+        INTVAL charset_nr, ARGOUT_NULLOK(STRING *dest))
 {
     const CHARSET *new_charset;
 
@@ -2885,7 +2884,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
-string_join(PARROT_INTERP, NULLOK(STRING *j), NOTNULL(PMC *ar))
+string_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 {
     STRING *res;
     STRING *s;
