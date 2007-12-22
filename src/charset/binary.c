@@ -75,7 +75,7 @@ static INTVAL find_not_cclass(PARROT_INTERP,
 
 static INTVAL is_cclass(PARROT_INTERP,
     INTVAL flags,
-    SHIM(STRING *source_string),
+    SHIM(const STRING *source_string),
     UINTVAL offset)
         __attribute__nonnull__(1);
 
@@ -395,7 +395,7 @@ RT#48260: Not yet documented!!!
 */
 
 static INTVAL
-is_cclass(PARROT_INTERP, INTVAL flags, SHIM(STRING *source_string), UINTVAL offset)
+is_cclass(PARROT_INTERP, INTVAL flags, SHIM(const STRING *source_string), UINTVAL offset)
 {
     return 0;
 }

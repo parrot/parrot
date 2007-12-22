@@ -98,7 +98,7 @@ static STRING * get_graphemes_inplace(PARROT_INTERP,
 
 static INTVAL is_cclass(PARROT_INTERP,
     INTVAL flags,
-    NOTNULL(STRING *source_string),
+    NOTNULL(const STRING *source_string),
     UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -760,7 +760,7 @@ RT#48260: Not yet documented!!!
 
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags,
-          NOTNULL(STRING *source_string), UINTVAL offset)
+          NOTNULL(const STRING *source_string), UINTVAL offset)
 {
     UINTVAL codepoint;
 

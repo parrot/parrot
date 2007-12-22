@@ -37,10 +37,8 @@ typedef STRING *(*charset_get_graphemes_t)(PARROT_INTERP, STRING *source_string,
 typedef STRING *(*charset_get_graphemes_inplace_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
 typedef void (*charset_set_graphemes_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 
-typedef STRING * (*charset_to_charset_t)(PARROT_INTERP, STRING *source_string,
-        STRING *dest);
-typedef STRING * (*charset_from_unicode_t)(PARROT_INTERP, STRING *source_string,
-        STRING *dest);
+typedef STRING * (*charset_to_charset_t)(PARROT_INTERP, STRING *source_string, STRING *dest);
+typedef STRING * (*charset_from_unicode_t)(PARROT_INTERP, STRING *source_string, STRING *dest);
 typedef STRING* (*charset_compose_t)(PARROT_INTERP, STRING *source_string);
 typedef STRING* (*charset_decompose_t)(PARROT_INTERP, STRING *source_string);
 typedef void (*charset_upcase_t)(PARROT_INTERP, STRING *source_string);
@@ -53,7 +51,7 @@ typedef INTVAL (*charset_compare_t)(PARROT_INTERP, const STRING *lhs, const STRI
 typedef INTVAL (*charset_index_t)(PARROT_INTERP, STRING *source_string, STRING *search_string, UINTVAL offset);
 typedef INTVAL (*charset_rindex_t)(PARROT_INTERP, STRING *source_string, STRING *search_string, UINTVAL offset);
 typedef UINTVAL (*charset_validate_t)(PARROT_INTERP, STRING *source_string);
-typedef INTVAL (*charset_is_cclass_t)(PARROT_INTERP, INTVAL, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_is_cclass_t)(PARROT_INTERP, INTVAL, const STRING *source_string, UINTVAL offset);
 typedef INTVAL (*charset_find_cclass_t)(PARROT_INTERP, INTVAL, STRING *source_string, UINTVAL offset, UINTVAL count);
 typedef INTVAL (*charset_find_not_cclass_t)(PARROT_INTERP, INTVAL, STRING *source_string, UINTVAL offset, UINTVAL count);
 typedef INTVAL (*charset_is_wordchar_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
