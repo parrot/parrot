@@ -26,11 +26,7 @@ where each chunk has room for one entry.
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-Stack_Chunk_t *
-new_stack(PARROT_INTERP, ARGIN(const char *name))>
+=item C<Stack_Chunk_t * new_stack>
 
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
@@ -51,9 +47,7 @@ new_stack(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<PARROT_API
-void
-mark_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t *chunk))>
+=item C<void mark_stack>
 
 Mark entries in a stack structure during DOD.
 
@@ -63,7 +57,7 @@ Mark entries in a stack structure during DOD.
 
 PARROT_API
 void
-mark_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t *chunk))
+mark_stack(PARROT_INTERP, ARGINOUT(Stack_Chunk_t *chunk))
 {
     for (; ; chunk = chunk->prev) {
         Stack_Entry_t *entry;
@@ -89,9 +83,7 @@ mark_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t *chunk))
 
 /*
 
-=item C<PARROT_API
-void
-stack_destroy(SHIM(Stack_Chunk_t *top))>
+=item C<void stack_destroy>
 
 stack_destroy() doesn't need to do anything, since GC does it all.
 
@@ -108,10 +100,7 @@ stack_destroy(SHIM(Stack_Chunk_t *top))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-size_t
-stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))>
+=item C<size_t stack_height>
 
 Returns the height of the stack. The maximum "depth" is height - 1.
 
@@ -138,11 +127,7 @@ stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-Stack_Entry_t *
-stack_entry(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack), INTVAL depth)>
+=item C<Stack_Entry_t * stack_entry>
 
 If C<< depth >= 0 >>, return the entry at that depth from the top of the
 stack, with 0 being the top entry. If C<depth < 0>, then return the
@@ -157,7 +142,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Entry_t *
-stack_entry(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack), INTVAL depth)
+stack_entry(PARROT_INTERP, ARGIN(Stack_Chunk_t *stack), INTVAL depth)
 {
     Stack_Chunk_t *chunk;
     Stack_Entry_t *entry;
@@ -186,9 +171,7 @@ stack_entry(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack), INTVAL depth)
 
 /*
 
-=item C<PARROT_API
-void
-rotate_entries(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),  INTVAL num_entries)>
+=item C<void rotate_entries>
 
 Rotate the top N entries by one.  If C<< N > 0 >>, the rotation is bubble
 up, so the top most element becomes the Nth element.  If C<< N < 0 >>, the
@@ -246,10 +229,7 @@ rotate_entries(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),  INTVAL num_entr
 
 /*
 
-=item C<PARROT_API
-void
-stack_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
-           NOTNULL(void *thing), Stack_entry_type type, NULLOK(Stack_cleanup_method cleanup))>
+=item C<void stack_push>
 
 Push something on the generic stack.
 
@@ -301,11 +281,7 @@ stack_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-void *
-stack_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
-          NULLOK(void *where), Stack_entry_type type)>
+=item C<void * stack_pop>
 
 Pop off an entry and return a pointer to the contents.
 
@@ -314,7 +290,7 @@ Pop off an entry and return a pointer to the contents.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 void *
-stack_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
+stack_pop(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p),
           NULLOK(void *where), Stack_entry_type type)
 {
     Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
@@ -363,11 +339,7 @@ stack_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-void *
-pop_dest(PARROT_INTERP)>
+=item C<void * pop_dest>
 
 Pop off a destination entry and return a pointer to the contents.
 
@@ -391,12 +363,7 @@ pop_dest(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-void *
-stack_peek(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack_base),
-           NULLOK(Stack_entry_type *type))>
+=item C<void * stack_peek>
 
 Peek at stack and return pointer to entry and the type of the entry.
 
@@ -408,8 +375,8 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void *
-stack_peek(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack_base),
-           NULLOK(Stack_entry_type *type))
+stack_peek(PARROT_INTERP, ARGIN(Stack_Chunk_t *stack_base),
+           ARGINOUT_NULLOK(Stack_entry_type *type))
 {
     const Stack_Entry_t * const entry = stack_entry(interp, stack_base, 0);
     if (entry == NULL)
@@ -429,11 +396,7 @@ stack_peek(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack_base),
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-Stack_entry_type
-get_entry_type(SHIM_INTERP, ARGIN(const Stack_Entry_t *entry))>
+=item C<Stack_entry_type get_entry_type>
 
 Returns the stack entry type of C<entry>.
 
@@ -452,9 +415,7 @@ get_entry_type(SHIM_INTERP, ARGIN(const Stack_Entry_t *entry))
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_dump_dynamic_environment(PARROT_INTERP, NOTNULL(Stack_Chunk_t *dynamic_env))>
+=item C<void Parrot_dump_dynamic_environment>
 
 Print a representation of the dynamic stack to the standard error (using
 C<PIO_eprintf>).  This is used only temporarily for debugging.
@@ -465,7 +426,7 @@ C<PIO_eprintf>).  This is used only temporarily for debugging.
 
 PARROT_API
 void
-Parrot_dump_dynamic_environment(PARROT_INTERP, NOTNULL(Stack_Chunk_t *dynamic_env))
+Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env))
 {
     int height = (int) stack_height(interp, dynamic_env);
 

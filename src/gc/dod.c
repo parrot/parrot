@@ -174,7 +174,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-pobject_lives(PARROT_INTERP, NOTNULL(PObj *obj))
+pobject_lives(PARROT_INTERP, ARGINOUT(PObj *obj))
 {
 #if PARROT_GC_GMS
     do {

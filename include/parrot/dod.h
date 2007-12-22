@@ -52,7 +52,7 @@
 /* HEADERIZER BEGIN: src/gc/dod.c */
 
 PARROT_API
-void pobject_lives(PARROT_INTERP, NOTNULL(PObj *obj))
+void pobject_lives(PARROT_INTERP, ARGINOUT(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

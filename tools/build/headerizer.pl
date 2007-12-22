@@ -9,12 +9,16 @@ use Carp qw( confess );
 # While I work on files individually to make sure headerizing and
 # rewriting doesn't stomp on them.
 my @experimental_files = qw(
+    builtin.c
+    byteorder.c
+    charset.c
     datatypes.c
     exceptions.c
     gc/resources.c
     hash.c
     hll.c
     objects.c
+    stacks.c
     string.c
     string_primitives.c
     sub.c

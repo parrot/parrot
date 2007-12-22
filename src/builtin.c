@@ -27,8 +27,8 @@ typedef struct _builtin {
     ARGIN(const char * const c_name);       /* short name 'cos' */
     ARGIN(const char * const signature);    /* e.g. PP */
     ARGIN(const char * const c_ns);         /* namespace */
-    NULLOK(STRING *meth_name);               /* internal name e.g. '__cos' */
-    NULLOK(STRING *_namespace);              /* same */
+    ARGIN_NULLOK(STRING *meth_name);        /* internal name e.g. '__cos' */
+    ARGIN_NULLOK(STRING *_namespace);       /* same */
 } Builtins;
 
 #define N_BUILTINS (int)(sizeof (builtins) / sizeof (builtins[0]))
@@ -107,8 +107,7 @@ static int find_builtin_s(PARROT_INTERP, ARGIN(const STRING *func))
 
 /*
 
-=item C<void
-Parrot_init_builtins(PARROT_INTERP)>
+=item C<void Parrot_init_builtins>
 
 Initialize the builtins structure.
 
@@ -129,9 +128,7 @@ Parrot_init_builtins(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-find_builtin(ARGIN(const char *func))>
+=item C<static int find_builtin>
 
 RT#48260: Not yet documented!!!
 
@@ -169,9 +166,7 @@ find_builtin(ARGIN(const char *func))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))>
+=item C<static int find_builtin_s>
 
 RT#48260: Not yet documented!!!
 
@@ -203,9 +198,7 @@ find_builtin_s(PARROT_INTERP, ARGIN(const STRING *func))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-check_builtin_sig(size_t i, ARGIN(const char *sig), int convert_pmcs)>
+=item C<static int check_builtin_sig>
 
 RT#48260: Not yet documented!!!
 
@@ -263,9 +256,7 @@ check_builtin_sig(size_t i, ARGIN(const char *sig), int convert_pmcs)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-Parrot_is_builtin(ARGIN(const char *func), ARGIN_NULLOK(const char *sig))>
+=item C<int Parrot_is_builtin>
 
 Return the index of the builtin or -1 on failure.
 
@@ -309,10 +300,7 @@ again:
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC*
-Parrot_find_builtin(PARROT_INTERP, NOTNULL(STRING *func))>
+=item C<PMC* Parrot_find_builtin>
 
 Return the NCI PMC of the builtin or NULL.
 
@@ -340,11 +328,7 @@ Parrot_find_builtin(PARROT_INTERP, NOTNULL(STRING *func))
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-const char *
-Parrot_builtin_get_c_namespace(int bi)>
+=item C<const char * Parrot_builtin_get_c_namespace>
 
 RT#48260: Not yet documented!!!
 
@@ -364,10 +348,7 @@ Parrot_builtin_get_c_namespace(int bi)
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-int
-Parrot_builtin_is_class_method(int bi)>
+=item C<int Parrot_builtin_is_class_method>
 
 RT#48260: Not yet documented!!!
 
@@ -386,10 +367,7 @@ Parrot_builtin_is_class_method(int bi)
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-int
-Parrot_builtin_is_void(int bi)>
+=item C<int Parrot_builtin_is_void>
 
 RT#48260: Not yet documented!!!
 

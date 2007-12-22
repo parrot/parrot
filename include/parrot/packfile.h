@@ -729,49 +729,49 @@ opcode_t* PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
 /* HEADERIZER BEGIN: src/byteorder.c */
 
 void fetch_buf_be_12(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_be_16(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_be_4(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_be_8(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_12(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_16(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_4(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_8(
-    NOTNULL(unsigned char *rb),
+    ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

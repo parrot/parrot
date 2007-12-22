@@ -64,7 +64,7 @@ static All_charsets *all_charsets;
 
 static INTVAL register_charset(PARROT_INTERP,
     ARGIN(const char *charsetname),
-    NOTNULL(CHARSET *charset))
+    ARGIN(CHARSET *charset))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -76,11 +76,7 @@ static void register_static_converters(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_MALLOC
-CHARSET *
-Parrot_new_charset(SHIM_INTERP)>
+=item C<CHARSET * Parrot_new_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -99,9 +95,7 @@ Parrot_new_charset(SHIM_INTERP)
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_charsets_encodings_deinit(SHIM_INTERP)>
+=item C<void Parrot_charsets_encodings_deinit>
 
 RT#48260: Not yet documented!!!
 
@@ -129,11 +123,7 @@ Parrot_charsets_encodings_deinit(SHIM_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-const CHARSET *
-Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))>
+=item C<const CHARSET * Parrot_find_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -160,11 +150,7 @@ Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-CHARSET *
-Parrot_load_charset(PARROT_INTERP, ARGIN(const char *charsetname))>
+=item C<CHARSET * Parrot_load_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -185,10 +171,7 @@ Parrot_load_charset(PARROT_INTERP, ARGIN(const char *charsetname))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_charset_number(PARROT_INTERP, NOTNULL(STRING *charsetname))>
+=item C<INTVAL Parrot_charset_number>
 
 Return the number of the charset or -1 if not found.
 
@@ -199,7 +182,7 @@ Return the number of the charset or -1 if not found.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_charset_number(PARROT_INTERP, NOTNULL(STRING *charsetname))
+Parrot_charset_number(PARROT_INTERP, ARGIN(const STRING *charsetname))
 {
     const int n = all_charsets->n_charsets;
     int i;
@@ -213,10 +196,7 @@ Parrot_charset_number(PARROT_INTERP, NOTNULL(STRING *charsetname))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_charset_number_of_str(SHIM_INTERP, NOTNULL(STRING *src))>
+=item C<INTVAL Parrot_charset_number_of_str>
 
 Return the number of the charset of the given string or -1 if not found.
 
@@ -227,7 +207,7 @@ Return the number of the charset of the given string or -1 if not found.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_charset_number_of_str(SHIM_INTERP, NOTNULL(STRING *src))
+Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 {
     int i;
     const int n = all_charsets->n_charsets;
@@ -241,11 +221,7 @@ Parrot_charset_number_of_str(SHIM_INTERP, NOTNULL(STRING *src))
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING*
-Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)>
+=item C<STRING* Parrot_charset_name>
 
 RT#48260: Not yet documented!!!
 
@@ -259,18 +235,14 @@ PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
 {
-    if (number_of_charset >= all_charsets->n_charsets)
+    if (number_of_charset < 0 || number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].name;
 }
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-const CHARSET *
-Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)>
+=item C<const CHARSET * Parrot_get_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -284,18 +256,14 @@ PARROT_WARN_UNUSED_RESULT
 const CHARSET *
 Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
 {
-    if (number_of_charset >= all_charsets->n_charsets)
+    if (number_of_charset < 0 || number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].charset;
 }
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-const char *
-Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)>
+=item C<const char * Parrot_charset_c_name>
 
 RT#48260: Not yet documented!!!
 
@@ -309,16 +277,14 @@ PARROT_WARN_UNUSED_RESULT
 const char *
 Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
 {
-    if (number_of_charset >= all_charsets->n_charsets)
+    if (number_of_charset < 0 || number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].charset->name;
 }
 
 /*
 
-=item C<static INTVAL
-register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
-        NOTNULL(CHARSET *charset))>
+=item C<static INTVAL register_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -328,7 +294,7 @@ RT#48260: Not yet documented!!!
 
 static INTVAL
 register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
-        NOTNULL(CHARSET *charset))
+        ARGIN(CHARSET *charset))
 {
     const int n = all_charsets->n_charsets;
     int i;
@@ -357,8 +323,7 @@ register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
 
 /*
 
-=item C<static void
-register_static_converters(PARROT_INTERP)>
+=item C<static void register_static_converters>
 
 RT#48260: Not yet documented!!!
 
@@ -386,10 +351,7 @@ register_static_converters(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-INTVAL
-Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
-        NOTNULL(CHARSET *charset))>
+=item C<INTVAL Parrot_register_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -400,7 +362,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 INTVAL
 Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
-        NOTNULL(CHARSET *charset))
+        ARGIN(CHARSET *charset))
 {
     if (!all_charsets) {
         all_charsets = mem_allocate_typed(All_charsets);
@@ -431,9 +393,7 @@ Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_charsets_encodings_init(PARROT_INTERP)>
+=item C<void Parrot_charsets_encodings_init>
 
 RT#48260: Not yet documented!!!
 
@@ -471,10 +431,7 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-INTVAL
-Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
-        NOTNULL(CHARSET *charset))>
+=item C<INTVAL Parrot_make_default_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -485,7 +442,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 INTVAL
 Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
-        NOTNULL(CHARSET *charset))
+        ARGIN(CHARSET *charset))
 {
     Parrot_default_charset_ptr = charset;
     return 1;
@@ -493,11 +450,7 @@ Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const CHARSET *
-Parrot_default_charset(SHIM_INTERP)>
+=item C<const CHARSET * Parrot_default_charset>
 
 RT#48260: Not yet documented!!!
 
@@ -516,12 +469,7 @@ Parrot_default_charset(SHIM_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-charset_converter_t
-Parrot_find_charset_converter(SHIM_INTERP,
-        ARGIN(const CHARSET *lhs), ARGIN(const CHARSET *rhs))>
+=item C<charset_converter_t Parrot_find_charset_converter>
 
 RT#48260: Not yet documented!!!
 
@@ -556,11 +504,7 @@ Parrot_find_charset_converter(SHIM_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_register_charset_converter(SHIM_INTERP,
-        ARGIN(const CHARSET *lhs), NOTNULL(CHARSET *rhs),
-        NOTNULL(charset_converter_t func))>
+=item C<void Parrot_register_charset_converter>
 
 RT#48260: Not yet documented!!!
 
@@ -571,8 +515,8 @@ RT#48260: Not yet documented!!!
 PARROT_API
 void
 Parrot_register_charset_converter(SHIM_INTERP,
-        ARGIN(const CHARSET *lhs), NOTNULL(CHARSET *rhs),
-        NOTNULL(charset_converter_t func))
+        ARGIN(const CHARSET *lhs), ARGIN(CHARSET *rhs),
+        ARGIN(charset_converter_t func))
 {
     const int n = all_charsets->n_charsets;
     int i;

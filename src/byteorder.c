@@ -32,10 +32,7 @@ Configure will have checked for supported word sizes.
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-INTVAL
-fetch_iv_le(INTVAL w)>
+=item C<INTVAL fetch_iv_le>
 
 This function converts a 4 or 8 byte C<INTVAL> into little endian
 format. If the native format is already little endian, then no
@@ -73,10 +70,7 @@ fetch_iv_le(INTVAL w)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-INTVAL
-fetch_iv_be(INTVAL w)>
+=item C<INTVAL fetch_iv_be>
 
 This function converts a 4 or 8 byte C<INTVAL> into big endian format.
 If the native format is already big endian, then no conversion is done.
@@ -112,10 +106,7 @@ fetch_iv_be(INTVAL w)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-opcode_t
-fetch_op_be(opcode_t w)>
+=item C<opcode_t fetch_op_be>
 
 Same as C<fetch_iv_be> for opcode_t
 
@@ -152,10 +143,7 @@ fetch_op_be(opcode_t w)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CONST_FUNCTION
-opcode_t
-fetch_op_le(opcode_t w)>
+=item C<opcode_t fetch_op_le>
 
 Same as C<fetch_iv_le> for opcode_t
 
@@ -204,8 +192,7 @@ out of a padded buffer.
 
 /*
 
-=item C<void
-fetch_buf_be_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_be_4>
 
 RT#48260: Not yet documented!!!
 
@@ -214,7 +201,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -228,8 +215,7 @@ fetch_buf_be_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void
-fetch_buf_le_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_le_4>
 
 RT#48260: Not yet documented!!!
 
@@ -238,7 +224,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -252,8 +238,7 @@ fetch_buf_le_4(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void
-fetch_buf_be_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_be_8>
 
 RT#48260: Not yet documented!!!
 
@@ -262,7 +247,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -280,8 +265,7 @@ fetch_buf_be_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void
-fetch_buf_le_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_le_8>
 
 RT#48260: Not yet documented!!!
 
@@ -290,7 +274,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -308,8 +292,7 @@ fetch_buf_le_8(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void
-fetch_buf_le_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_le_12>
 
 RT#48260: Not yet documented!!!
 
@@ -318,7 +301,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -340,8 +323,7 @@ fetch_buf_le_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void
-fetch_buf_be_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_be_12>
 
 RT#48260: Not yet documented!!!
 
@@ -350,7 +332,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -372,8 +354,7 @@ fetch_buf_be_12(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void
-fetch_buf_le_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_le_16>
 
 RT#48260: Not yet documented!!!
 
@@ -382,7 +363,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_le_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
@@ -408,8 +389,7 @@ fetch_buf_le_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
 
 /*
 
-=item C<void
-fetch_buf_be_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))>
+=item C<void fetch_buf_be_16>
 
 RT#48260: Not yet documented!!!
 
@@ -418,7 +398,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-fetch_buf_be_16(NOTNULL(unsigned char *rb), ARGIN(const unsigned char *b))
+fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
