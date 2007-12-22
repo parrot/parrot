@@ -240,9 +240,9 @@ static PMC* thaw_create_pmc(PARROT_INTERP,
 
 PARROT_INLINE
 static int thaw_pmc(PARROT_INTERP,
-    NOTNULL(visit_info *info),
-    NOTNULL(UINTVAL *id),
-    NOTNULL(INTVAL *type))
+    ARGINOUT(visit_info *info),
+    ARGOUT(UINTVAL *id),
+    ARGINOUT(INTVAL *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -1087,8 +1087,8 @@ set.
 
 PARROT_INLINE
 static int
-thaw_pmc(PARROT_INTERP, NOTNULL(visit_info *info),
-        NOTNULL(UINTVAL *id), NOTNULL(INTVAL *type))
+thaw_pmc(PARROT_INTERP, ARGINOUT(visit_info *info),
+        ARGOUT(UINTVAL *id), ARGINOUT(INTVAL *type))
 {
     PMC *n;
     IMAGE_IO * const io = info->image_io;

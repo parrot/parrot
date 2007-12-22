@@ -18,6 +18,8 @@ my @experimental_files = qw(
     hash.c
     hll.c
     objects.c
+    spf_render.c
+    spf_vtable.c
     stacks.c
     stm/backend.c
     stm/waitlist.c
