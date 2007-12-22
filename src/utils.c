@@ -48,18 +48,18 @@ static long _lrand48(void);
 static long _mrand48(void);
 static long _nrand48(_rand_buf buf);
 static void _srand48(long seed);
-static void move_reg(int from, int dest, NOTNULL(parrot_prm_context* c))
+static void move_reg(int from, int dest, ARGIN(const parrot_prm_context* c))
         __attribute__nonnull__(3);
 
 static void next_rand(_rand_buf X);
 static void process_cycle_without_exit(
     int node_index,
-    NOTNULL(parrot_prm_context* c))
+    ARGIN(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
 static void rec_climb_back_and_mark(
     int node_index,
-    NOTNULL(parrot_prm_context* c))
+    ARGIN(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
@@ -490,7 +490,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_make_la(PARROT_INTERP, NOTNULL(PMC *array))
+Parrot_make_la(PARROT_INTERP, ARGIN(PMC *array))
 {
     const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
@@ -547,7 +547,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_make_cpa(PARROT_INTERP, NOTNULL(PMC *array))
+Parrot_make_cpa(PARROT_INTERP, ARGIN(PMC *array))
 {
     const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
@@ -747,7 +747,7 @@ case marks it, and set node_index as its backup.
 */
 
 static void
-rec_climb_back_and_mark(int node_index, NOTNULL(parrot_prm_context* c))
+rec_climb_back_and_mark(int node_index, ARGIN(parrot_prm_context* c))
 {
     const int node = c->dest_regs[node_index];
     const int pred = c->src_regs[node_index];
@@ -788,7 +788,7 @@ For instance: 1-->2, 2-->3, 3-->1
 */
 
 static void
-process_cycle_without_exit(int node_index, NOTNULL(parrot_prm_context* c))
+process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
 {
     const int pred = c->src_regs[node_index];
 
@@ -819,7 +819,7 @@ should be self-speaking
  */
 
 static void
-move_reg(int from, int dest, NOTNULL(parrot_prm_context* c))
+move_reg(int from, int dest, ARGIN(const parrot_prm_context* c))
 {
    /* fprintf(stderr, "move %i ==> %i\n", from, dest);*/
     c->mov(c->interp, dest, from, c->info);
@@ -888,7 +888,7 @@ Parrot_register_move(PARROT_INTERP,
         unsigned char temp_reg,
         reg_move_func mov,
         reg_move_func mov_alt,
-        NOTNULL(void *info))
+        ARGIN(void *info))
 {
     int i;
     int max_reg = 0;

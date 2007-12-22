@@ -22,6 +22,7 @@ my @experimental_files = qw(
     string.c
     string_primitives.c
     sub.c
+    thread.c
     tsq.c
     utils.c
 );
