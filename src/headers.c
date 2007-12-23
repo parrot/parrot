@@ -79,10 +79,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
 
 =over 4
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static void *
-get_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))>
+=item C<static void * get_free_buffer>
 
 Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 
@@ -115,10 +112,7 @@ get_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 =over 4
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
-new_pmc_pool(PARROT_INTERP)>
+=item C<Small_Object_Pool * new_pmc_pool>
 
 Creates an new pool for PMCs and returns it.
 
@@ -144,10 +138,7 @@ new_pmc_pool(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
-new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)>
+=item C<Small_Object_Pool * new_bufferlike_pool>
 
 Creates a new pool for buffer-like structures. Usually you would need
 C<make_bufferlike_pool()>.
@@ -175,10 +166,7 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
-new_buffer_pool(PARROT_INTERP)>
+=item C<Small_Object_Pool * new_buffer_pool>
 
 Non-constant strings and plain Buffers are in the sized header pools.
 
@@ -204,10 +192,7 @@ new_buffer_pool(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
-new_string_pool(PARROT_INTERP, INTVAL constant)>
+=item C<Small_Object_Pool * new_string_pool>
 
 Creates a new pool for C<STRINGS> and returns it.
 
@@ -233,10 +218,7 @@ new_string_pool(PARROT_INTERP, INTVAL constant)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
-make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)>
+=item C<Small_Object_Pool * make_bufferlike_pool>
 
 Make and return a bufferlike header pool.
 
@@ -275,10 +257,7 @@ make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
-get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)>
+=item C<Small_Object_Pool * get_bufferlike_pool>
 
 Return a bufferlike header pool, it must exist.
 
@@ -299,10 +278,7 @@ get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-new_pmc_header(PARROT_INTERP, UINTVAL flags)>
+=item C<PMC * new_pmc_header>
 
 Get a header.
 
@@ -341,10 +317,7 @@ new_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC_EXT *
-new_pmc_ext(PARROT_INTERP)>
+=item C<static PMC_EXT * new_pmc_ext>
 
 Creates a new C<PMC_EXT> and returns it.
 
@@ -373,8 +346,7 @@ new_pmc_ext(PARROT_INTERP)
 
 /*
 
-=item C<void
-add_pmc_ext(PARROT_INTERP, NOTNULL(PMC *pmc))>
+=item C<void add_pmc_ext>
 
 Adds a new C<PMC_EXT> to C<pmc>.
 
@@ -401,8 +373,7 @@ add_pmc_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-=item C<void
-add_pmc_sync(PARROT_INTERP, NOTNULL(PMC *pmc))>
+=item C<void add_pmc_sync>
 
 Adds a PMC_sync field to C<pmc>.
 
@@ -423,10 +394,7 @@ add_pmc_sync(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-new_string_header(PARROT_INTERP, UINTVAL flags)>
+=item C<STRING * new_string_header>
 
 Returns a new C<STRING> header.
 
@@ -454,10 +422,7 @@ new_string_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-Buffer *
-new_buffer_header(PARROT_INTERP)>
+=item C<Buffer * new_buffer_header>
 
 Creates and returns a new C<Buffer>.
 
@@ -477,10 +442,7 @@ new_buffer_header(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-void *
-new_bufferlike_header(PARROT_INTERP, size_t size)>
+=item C<void * new_bufferlike_header>
 
 Creates and returns a new buffer-like header.
 
@@ -500,9 +462,7 @@ new_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-size_t
-get_max_buffer_address(PARROT_INTERP)>
+=item C<size_t get_max_buffer_address>
 
 Calculates the maximum buffer address and returns it.
 
@@ -530,9 +490,7 @@ get_max_buffer_address(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-size_t
-get_min_buffer_address(PARROT_INTERP)>
+=item C<size_t get_min_buffer_address>
 
 Calculates the minimum buffer address and returns it.
 
@@ -560,9 +518,7 @@ get_min_buffer_address(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-size_t
-get_max_pmc_address(PARROT_INTERP)>
+=item C<size_t get_max_pmc_address>
 
 Calculates the maximum PMC address and returns it.
 
@@ -579,9 +535,7 @@ get_max_pmc_address(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-size_t
-get_min_pmc_address(PARROT_INTERP)>
+=item C<size_t get_min_pmc_address>
 
 Calculates the maximum PMC address and returns it.
 
@@ -598,9 +552,7 @@ get_min_pmc_address(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))>
+=item C<int is_buffer_ptr>
 
 Checks that C<ptr> is actually a C<Buffer>.
 
@@ -626,9 +578,7 @@ is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))>
+=item C<int is_pmc_ptr>
 
 Checks that C<ptr> is actually a PMC.
 
@@ -646,8 +596,7 @@ is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
 /*
 
-=item C<void
-Parrot_initialize_header_pools(PARROT_INTERP)>
+=item C<void Parrot_initialize_header_pools>
 
 Initialize the pools for the tracked resources.
 
@@ -702,9 +651,7 @@ Parrot_initialize_header_pools(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-Parrot_forall_header_pools(PARROT_INTERP, int flag, NULLOK(void *arg), NOTNULL(pool_iter_fn func))>
+=item C<int Parrot_forall_header_pools>
 
 Iterate through all header pools by calling the passed function. Returns
 zero if the iteration didn't stop or the returned value.
@@ -774,8 +721,7 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, NULLOK(void *arg), NOTNULL(p
 
 /*
 
-=item C<static void
-free_pool(NOTNULL(Small_Object_Pool *pool))>
+=item C<static void free_pool>
 
 RT#48260: Not yet documented!!!
 
@@ -799,9 +745,7 @@ free_pool(NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<static int
-sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), SHIM(int flag),
-        NOTNULL(void *arg))>
+=item C<static int sweep_cb_buf>
 
 RT#48260: Not yet documented!!!
 
@@ -834,9 +778,7 @@ sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), SHIM(int flag),
 
 /*
 
-=item C<static int
-sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
-        NOTNULL(void *arg))>
+=item C<static int sweep_cb_pmc>
 
 RT#48260: Not yet documented!!!
 
@@ -858,8 +800,7 @@ sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
 
 /*
 
-=item C<void
-Parrot_destroy_header_pools(PARROT_INTERP)>
+=item C<void Parrot_destroy_header_pools>
 
 Destroys the header pools.
 
@@ -897,8 +838,7 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 
 /*
 
-=item C<static void
-fix_pmc_syncs(NOTNULL(Interp *dest_interp), NOTNULL(Small_Object_Pool *pool))>
+=item C<static void fix_pmc_syncs>
 
 RT#48260: Not yet documented!!!
 
@@ -942,8 +882,7 @@ fix_pmc_syncs(NOTNULL(Interp *dest_interp), NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<void
-Parrot_merge_header_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_interp))>
+=item C<void Parrot_merge_header_pools>
 
 Merge the header pools of C<source_interp> into those of C<dest_interp>.
 (Used to deal with shared objects left after interpreter destruction.)
@@ -998,7 +937,7 @@ Parrot_merge_header_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_i
 
 /*
 
-=item C<void Parrot_initialize_header_pool_names(PARROT_INTERP)>>
+=item C<void Parrot_initialize_header_pool_names>
 
 If we want these names, they must be added in DOD.
 

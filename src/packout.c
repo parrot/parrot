@@ -30,9 +30,7 @@ contiguous region of memory.
 
 /*
 
-=item C<PARROT_API
-opcode_t
-PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))>
+=item C<opcode_t PackFile_pack_size>
 
 RT#48260: Not yet documented!!!
 
@@ -65,11 +63,7 @@ PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))
 
 /*
 
-=item C<PARROT_API
-void
-PackFile_pack(PARROT_INTERP,
-        NOTNULL(PackFile *self),
-        NOTNULL(opcode_t *cursor))>
+=item C<void PackFile_pack>
 
 Pack the PackFile into a contiguous region of memory.
 
@@ -145,9 +139,7 @@ PackFile_pack(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-size_t
-PackFile_ConstTable_pack_size(PARROT_INTERP, NOTNULL(PackFile_Segment *seg))>
+=item C<size_t PackFile_ConstTable_pack_size>
 
 Determine the size of the buffer needed in order to pack the PackFile
 constant table into a contiguous region of memory.
@@ -171,12 +163,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, NOTNULL(PackFile_Segment *seg))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t *
-PackFile_ConstTable_pack(PARROT_INTERP,
-        NOTNULL(PackFile_Segment *seg), NOTNULL(opcode_t *cursor))>
+=item C<opcode_t * PackFile_ConstTable_pack>
 
 Pack the PackFile ConstTable into a contiguous region of memory.
 
@@ -210,10 +197,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-int
-PackFile_find_in_const(PARROT_INTERP,
-        ARGIN(const PackFile_ConstTable *ct), ARGIN(const PMC *key), int type)>
+=item C<int PackFile_find_in_const>
 
 This is really ugly, we don't know where our C<PARROT_ARG_SC> key
 constant is in constant table, so we have to search for it.
@@ -241,13 +225,7 @@ PackFile_find_in_const(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-opcode_t *
-PackFile_Constant_pack(PARROT_INTERP,
-        ARGIN(const PackFile_ConstTable *const_table),
-        ARGIN(const PackFile_Constant *self), NOTNULL(opcode_t *cursor))>
+=item C<opcode_t * PackFile_Constant_pack>
 
 Pack a PackFile Constant into a contiguous region of memory.
 

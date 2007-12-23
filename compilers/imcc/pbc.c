@@ -206,8 +206,7 @@ static void verify_signature(PARROT_INTERP,
 
 /*
 
-=item C<static void
-imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))>
+=item C<static void imcc_globals_destroy>
 
 RT#48260: Not yet documented!!!
 
@@ -243,8 +242,7 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
 
 /*
 
-=item C<int
-e_pbc_open(PARROT_INTERP, SHIM(void *param))>
+=item C<int e_pbc_open>
 
 RT#48260: Not yet documented!!!
 
@@ -312,9 +310,7 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-old_blocks(void)>
+=item C<static int old_blocks>
 
 get size/line of bytecode in ops till now
 
@@ -338,10 +334,7 @@ old_blocks(void)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t *
-make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<opcode_t * make_jit_info>
 
 RT#48260: Not yet documented!!!
 
@@ -383,8 +376,7 @@ make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-make_new_sub(NOTNULL(IMC_Unit *unit))>
+=item C<static void make_new_sub>
 
 allocate a new globals.cs->subs structure
 
@@ -415,9 +407,7 @@ make_new_sub(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))>
+=item C<static int get_old_size>
 
 get size/line of bytecode in ops till now
 
@@ -446,8 +436,7 @@ get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))
 
 /*
 
-=item C<static void
-store_sub_size(size_t size, size_t ins_line)>
+=item C<static void store_sub_size>
 
 RT#48260: Not yet documented!!!
 
@@ -464,8 +453,7 @@ store_sub_size(size_t size, size_t ins_line)
 
 /*
 
-=item C<static void
-store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)>
+=item C<static void store_fixup>
 
 RT#48260: Not yet documented!!!
 
@@ -492,8 +480,7 @@ store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)
 
 /*
 
-=item C<static void
-store_key_const(ARGIN(const char *str), int idx)>
+=item C<static void store_key_const>
 
 RT#48260: Not yet documented!!!
 
@@ -510,9 +497,7 @@ store_key_const(ARGIN(const char *str), int idx)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))>
+=item C<static int get_codesize>
 
 store globals for later fixup
 return size in ops
@@ -571,10 +556,7 @@ get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static subs_t *
-find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), NOTNULL(int *pc))>
+=item C<static subs_t * find_global_label>
 
 get a global label, return the pc (absolute)
 
@@ -611,8 +593,7 @@ find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), NOTNULL(int
 
 /*
 
-=item C<static void
-fixup_globals(PARROT_INTERP)>
+=item C<static void fixup_globals>
 
 fix global stuff
 
@@ -711,10 +692,7 @@ fixup_globals(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))>
+=item C<STRING * IMCC_string_from_reg>
 
 RT#48260: Not yet documented!!!
 
@@ -769,9 +747,7 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))>
+=item C<static int add_const_str>
 
 add constant string to constant_table
 
@@ -794,9 +770,7 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))>
+=item C<static int add_const_num>
 
 RT#48260: Not yet documented!!!
 
@@ -819,10 +793,7 @@ add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-static PMC*
-mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))>
+=item C<static PMC* mk_multi_sig>
 
 RT#48260: Not yet documented!!!
 
@@ -883,10 +854,7 @@ typedef void (*decl_func_t)(Interp *, PMC*, STRING *, INTVAL);
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC*
-create_lexinfo(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(PMC *sub), int need_lex)>
+=item C<static PMC* create_lexinfo>
 
 RT#48260: Not yet documented!!!
 
@@ -971,10 +939,7 @@ create_lexinfo(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(PMC *sub), int ne
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static PMC* find_outer>
 
 RT#48260: Not yet documented!!!
 
@@ -1034,8 +999,7 @@ find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static int
-add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)>
+=item C<static int add_const_pmc_sub>
 
 RT#48260: Not yet documented!!!
 
@@ -1183,8 +1147,7 @@ add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
 
 /*
 
-=item C<static int
-add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, ARGIN(const char *s_key))>
+=item C<static int add_const_key>
 
 add constant key to constant_table
 
@@ -1233,11 +1196,7 @@ add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, ARGIN(const char
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static const char *
-slice_deb(int bits)>
+=item C<static const char * slice_deb>
 
 RT#48260: Not yet documented!!!
 
@@ -1271,8 +1230,7 @@ slice_deb(int bits)
 
 /*
 
-=item C<static opcode_t
-build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))>
+=item C<static opcode_t build_key>
 
 color is a Parrot register number or a constant table index
 
@@ -1405,8 +1363,7 @@ build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
 
 /*
 
-=item C<INTVAL
-IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))>
+=item C<INTVAL IMCC_int_from_reg>
 
 RT#48260: Not yet documented!!!
 
@@ -1448,8 +1405,7 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<static void
-make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))>
+=item C<static void make_pmc_const>
 
 RT#48260: Not yet documented!!!
 
@@ -1486,8 +1442,7 @@ make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))
 
 /*
 
-=item C<static void
-add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))>
+=item C<static void add_1_const>
 
 RT#48260: Not yet documented!!!
 
@@ -1544,8 +1499,7 @@ add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))
 
 /*
 
-=item C<static void
-constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void constant_folding>
 
 store a constants idx for later reuse
 
@@ -1601,8 +1555,7 @@ constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<int
-e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))>
+=item C<int e_pbc_new_sub>
 
 RT#48260: Not yet documented!!!
 
@@ -1624,8 +1577,7 @@ e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<int
-e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))>
+=item C<int e_pbc_end_sub>
 
 RT#48260: Not yet documented!!!
 
@@ -1666,8 +1618,7 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), NOTNULL(opcode_t *pc))>
+=item C<static void verify_signature>
 
  - check if any get_ argument contains constants
  - fill in type bits for argument types and constants, if missing
@@ -1744,11 +1695,7 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), NOTNULL(opcode_t 
 
 /*
 
-=item C<int
-e_pbc_emit(PARROT_INTERP,
-        SHIM(void *param),
-        NOTNULL(IMC_Unit *unit),
-        ARGIN(const Instruction *ins))>
+=item C<int e_pbc_emit>
 
 now let the fun begin, actually emit code for one ins
 
@@ -1980,8 +1927,7 @@ e_pbc_emit(PARROT_INTERP,
 
 /*
 
-=item C<int
-e_pbc_close(PARROT_INTERP, SHIM(void *param))>
+=item C<int e_pbc_close>
 
 RT#48260: Not yet documented!!!
 

@@ -86,8 +86,7 @@ static STRING* try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
 
 /*
 
-=item C<void
-parrot_init_library_paths(PARROT_INTERP)>
+=item C<void parrot_init_library_paths>
 
 Create an array of StringArrays with library searchpaths and shared
 extension used for loading various files at runtime. The created
@@ -190,10 +189,7 @@ parrot_init_library_paths(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC*
-get_search_paths(PARROT_INTERP, enum_lib_paths which)>
+=item C<static PMC* get_search_paths>
 
 RT#48260: Not yet documented!!!
 
@@ -214,9 +210,7 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
 
 /*
 
-=item C<PARROT_PURE_FUNCTION
-static int
-is_abs_path(ARGIN(const STRING *file))>
+=item C<static int is_abs_path>
 
 RT#48260: Not yet documented!!!
 
@@ -255,8 +249,7 @@ static const char win32_path_separator = '\\';
 
 /*
 
-=item C<static void
-cnv_to_win32_filesep(NOTNULL(STRING *path))>
+=item C<static void cnv_to_win32_filesep>
 
 Converts a path with forward slashes to one with backward slashes.
 
@@ -281,10 +274,7 @@ cnv_to_win32_filesep(NOTNULL(STRING *path))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING*
-path_finalize(PARROT_INTERP, NOTNULL(STRING *path))>
+=item C<static STRING* path_finalize>
 
 RT#48260: Not yet documented!!!
 
@@ -318,10 +308,7 @@ path_finalize(PARROT_INTERP, NOTNULL(STRING *path))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING*
-path_guarantee_trailing_separator(PARROT_INTERP, NOTNULL(STRING *path))>
+=item C<static STRING* path_guarantee_trailing_separator>
 
 unary path argument. the path string will have a
 trailing path-separator appended if it is not
@@ -348,10 +335,7 @@ path_guarantee_trailing_separator(PARROT_INTERP, NOTNULL(STRING *path))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING*
-path_append(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))>
+=item C<static STRING* path_append>
 
 binary path arguments, the left arg is modified.
 a trailing separator is guaranteed for the left
@@ -374,10 +358,7 @@ path_append(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING*
-path_concat(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))>
+=item C<static STRING* path_concat>
 
 binary path arguments. A new string is created
 that is the concatenation of the two path components
@@ -415,10 +396,7 @@ static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static STRING*
-try_load_path(PARROT_INTERP, NOTNULL(STRING* path))>
+=item C<static STRING* try_load_path>
 
 RT#48260: Not yet documented!!!
 
@@ -446,10 +424,7 @@ try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static STRING*
-try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))>
+=item C<static STRING* try_bytecode_extensions>
 
 guess extensions, so that the user can drop the extensions
 leaving it up to the build process/install whether or not
@@ -500,12 +475,7 @@ try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-STRING*
-Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
-        enum_runtime_ft type)>
+=item C<STRING* Parrot_locate_runtime_file_str>
 
 Locate the full path for C<file_name> and the given file type(s). If
 successful, returns a C-string allocated with C<string_to_cstring> or
@@ -586,12 +556,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-char*
-Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
-        enum_runtime_ft type)>
+=item C<char* Parrot_locate_runtime_file>
 
 RT#48260: Not yet documented!!!
 
@@ -621,11 +586,7 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 /*
 
-=item C<PARROT_API
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char*
-Parrot_get_runtime_prefix(PARROT_INTERP, NULLOK(STRING **prefix_str))>
+=item C<char* Parrot_get_runtime_prefix>
 
 If C<prefix_str> is not NULL, set it to the prefix, else return a malloced
 c-string for the runtime prefix.  Remember to free the string with
@@ -691,11 +652,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP, NULLOK(STRING **prefix_str))
 
 /*
 
-=item C<PARROT_IGNORABLE_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-parrot_split_path_ext(PARROT_INTERP, NOTNULL(STRING *in),
-        NOTNULL(STRING **wo_ext), NOTNULL(STRING **ext))>
+=item C<STRING * parrot_split_path_ext>
 
 Split the pathstring C<in> into <path><filestem><ext>. Return the
 C<filestem> of the pathstring. Set C<wo_ext> to the part without

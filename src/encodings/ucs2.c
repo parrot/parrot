@@ -157,10 +157,7 @@ static void ucs2_set_position(SHIM_INTERP,
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))>
+=item C<static STRING * to_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -187,8 +184,7 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 
 /*
 
-=item C<static UINTVAL
-get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)>
+=item C<static UINTVAL get_codepoint>
 
 RT#48260: Not yet documented!!!
 
@@ -210,8 +206,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static void
-set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codepoint)>
+=item C<static void set_codepoint>
 
 RT#48260: Not yet documented!!!
 
@@ -234,8 +229,7 @@ set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codep
 
 /*
 
-=item C<static UINTVAL
-get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)>
+=item C<static UINTVAL get_byte>
 
 RT#48260: Not yet documented!!!
 
@@ -251,8 +245,7 @@ get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static void
-set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)>
+=item C<static void set_byte>
 
 RT#48260: Not yet documented!!!
 
@@ -268,10 +261,7 @@ set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)>
+=item C<static STRING * get_codepoints>
 
 RT#48260: Not yet documented!!!
 
@@ -308,10 +298,7 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL coun
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)>
+=item C<static STRING * get_bytes>
 
 RT#48260: Not yet documented!!!
 
@@ -330,11 +317,7 @@ get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *dest_string))>
+=item C<static STRING * get_codepoints_inplace>
 
 RT#48260: Not yet documented!!!
 
@@ -354,11 +337,7 @@ get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))>
+=item C<static STRING * get_bytes_inplace>
 
 RT#48260: Not yet documented!!!
 
@@ -377,9 +356,7 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void
-set_codepoints(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *new_codepoints))>
+=item C<static void set_codepoints>
 
 RT#48260: Not yet documented!!!
 
@@ -396,9 +373,7 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void
-set_bytes(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))>
+=item C<static void set_bytes>
 
 RT#48260: Not yet documented!!!
 
@@ -415,8 +390,7 @@ set_bytes(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void
-become_encoding(PARROT_INTERP, SHIM(STRING *src))>
+=item C<static void become_encoding>
 
 Unconditionally makes the string be in this encoding, if that's valid
 
@@ -433,9 +407,7 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static UINTVAL
-codepoints(PARROT_INTERP, NOTNULL(STRING *src))>
+=item C<static UINTVAL codepoints>
 
 RT#48260: Not yet documented!!!
 
@@ -457,9 +429,7 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static UINTVAL
-bytes(PARROT_INTERP, NOTNULL(STRING *src))>
+=item C<static UINTVAL bytes>
 
 RT#48260: Not yet documented!!!
 
@@ -476,8 +446,7 @@ bytes(PARROT_INTERP, NOTNULL(STRING *src))
 
 /*
 
-=item C<static UINTVAL
-ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))>
+=item C<static UINTVAL ucs2_decode_and_advance>
 
 RT#48260: Not yet documented!!!
 
@@ -503,8 +472,7 @@ ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
 
 /*
 
-=item C<static void
-ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)>
+=item C<static void ucs2_encode_and_advance>
 
 RT#48260: Not yet documented!!!
 
@@ -524,8 +492,7 @@ ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 
 /*
 
-=item C<static void
-ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)>
+=item C<static void ucs2_set_position>
 
 RT#48260: Not yet documented!!!
 
@@ -544,8 +511,7 @@ ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)
 
 /*
 
-=item C<static void
-iter_init(PARROT_INTERP, ARGIN(const STRING *src), NOTNULL(String_iter *iter))>
+=item C<static void iter_init>
 
 RT#48260: Not yet documented!!!
 
@@ -571,9 +537,7 @@ iter_init(PARROT_INTERP, ARGIN(const STRING *src), NOTNULL(String_iter *iter))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-ENCODING *
-Parrot_encoding_ucs2_init(PARROT_INTERP)>
+=item C<ENCODING * Parrot_encoding_ucs2_init>
 
 RT#48260: Not yet documented!!!
 

@@ -39,9 +39,7 @@ static void PackFile_Constant_dump(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))>
+=item C<void PackFile_ConstTable_dump>
 
 Dumps the constant table C<self>.
 
@@ -63,9 +61,7 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 
 /*
 
-=item C<static void
-PackFile_Constant_dump(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct),
-                       NOTNULL(PackFile_Constant *self))>
+=item C<static void PackFile_Constant_dump>
 
 Dumps the constant C<self>.
 
@@ -285,9 +281,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
 /*
 
-=item C<PARROT_API
-void
-PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))>
+=item C<void PackFile_Fixup_dump>
 
 Dumps the fix-up table C<ft>.
 

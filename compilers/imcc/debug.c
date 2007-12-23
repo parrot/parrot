@@ -29,10 +29,7 @@ handle info/error/warning messages from imcc
 
 /*
 
-=item C<PARROT_API
-PARROT_DOES_NOT_RETURN
-void
-IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)>
+=item C<void IMCC_fatal>
 
 RT#48260: Not yet documented!!!
 
@@ -55,10 +52,7 @@ IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<PARROT_API
-PARROT_DOES_NOT_RETURN
-void
-IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)>
+=item C<void IMCC_fataly>
 
 RT#48260: Not yet documented!!!
 
@@ -81,10 +75,7 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<PARROT_API
-PARROT_DOES_NOT_RETURN
-void
-IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)>
+=item C<void IMCC_fatal_standalone>
 
 RT#48260: Not yet documented!!!
 
@@ -107,10 +98,7 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<PARROT_API
-PARROT_DOES_NOT_RETURN
-void
-IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)>
+=item C<void IMCC_fataly_standalone>
 
 RT#48260: Not yet documented!!!
 
@@ -136,9 +124,7 @@ IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<PARROT_API
-void
-IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)>
+=item C<void IMCC_warning>
 
 RT#48260: Not yet documented!!!
 
@@ -161,9 +147,7 @@ IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<PARROT_API
-void
-IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)>
+=item C<void IMCC_info>
 
 RT#48260: Not yet documented!!!
 
@@ -187,9 +171,7 @@ IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<PARROT_API
-void
-IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)>
+=item C<void IMCC_debug>
 
 RT#48260: Not yet documented!!!
 
@@ -212,8 +194,7 @@ IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void
-dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))>
+=item C<void dump_instructions>
 
 RT#48260: Not yet documented!!!
 
@@ -253,8 +234,7 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_cfg(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_cfg>
 
 RT#48260: Not yet documented!!!
 
@@ -289,8 +269,7 @@ dump_cfg(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_loops(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_loops>
 
 RT#48260: Not yet documented!!!
 
@@ -330,8 +309,7 @@ dump_loops(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_labels(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_labels>
 
 RT#48260: Not yet documented!!!
 
@@ -364,8 +342,7 @@ dump_labels(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_symreg(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_symreg>
 
 RT#48260: Not yet documented!!!
 
@@ -410,8 +387,7 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_liveness_status(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_liveness_status>
 
 RT#48260: Not yet documented!!!
 
@@ -438,8 +414,7 @@ dump_liveness_status(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))>
+=item C<void dump_liveness_status_var>
 
 RT#48260: Not yet documented!!!
 
@@ -488,8 +463,7 @@ dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
 
 /*
 
-=item C<void
-dump_interference_graph(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_interference_graph>
 
 RT#48260: Not yet documented!!!
 
@@ -528,8 +502,7 @@ dump_interference_graph(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_dominators(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_dominators>
 
 RT#48260: Not yet documented!!!
 
@@ -562,8 +535,7 @@ dump_dominators(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))>
+=item C<void dump_dominance_frontiers>
 
 RT#48260: Not yet documented!!!
 

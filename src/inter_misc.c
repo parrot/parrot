@@ -30,10 +30,7 @@ void Parrot_NCI_nci_make_raw_nci(PARROT_INTERP, PMC *method, void *func);
 
 /*
 
-=item C<PARROT_API
-void
-register_nci_method(PARROT_INTERP, const int type, NOTNULL(void *func),
-                    ARGIN(const char *name), ARGIN(const char *proto))>
+=item C<void register_nci_method>
 
 Create an entry in the C<nci_method_table> for the given NCI method of PMC
 class C<type>.
@@ -64,10 +61,7 @@ register_nci_method(PARROT_INTERP, const int type, NOTNULL(void *func),
 
 /*
 
-=item C<PARROT_API
-void
-register_raw_nci_method_in_ns(PARROT_INTERP, const int type, NOTNULL(void *func),
-        ARGIN(const char *name))>
+=item C<void register_raw_nci_method_in_ns>
 
 RT#48260: Not yet documented!!!
 
@@ -94,9 +88,7 @@ register_raw_nci_method_in_ns(PARROT_INTERP, const int type, NOTNULL(void *func)
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))>
+=item C<void Parrot_mark_method_writes>
 
 Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
 
@@ -119,10 +111,7 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_compreg(PARROT_INTERP, NOTNULL(STRING *type),
-                    NOTNULL(Parrot_compiler_func_t func))>
+=item C<void Parrot_compreg>
 
 Register a parser/compiler function.
 
@@ -156,12 +145,7 @@ Parrot_compreg(PARROT_INTERP, NOTNULL(STRING *type),
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_compile_string(PARROT_INTERP, NOTNULL(STRING *type),
-        ARGIN(const char *code), NOTNULL(STRING **error))>
+=item C<PMC * Parrot_compile_string>
 
 Compile code string.
 
@@ -188,10 +172,7 @@ Parrot_compile_string(PARROT_INTERP, NOTNULL(STRING *type),
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), NOTNULL(STRING **error))>
+=item C<void * Parrot_compile_file>
 
 Compile code file.
 
@@ -228,9 +209,7 @@ extern struct mallinfo mallinfo(void);
 
 /*
 
-=item C<PARROT_API
-INTVAL
-interpinfo(PARROT_INTERP, INTVAL what)>
+=item C<INTVAL interpinfo>
 
 C<what> specifies the type of information you want about the
 interpreter.
@@ -315,11 +294,7 @@ interpinfo(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC*
-interpinfo_p(PARROT_INTERP, INTVAL what)>
+=item C<PMC* interpinfo_p>
 
 C<what> specifies the type of information you want about the
 interpreter.
@@ -357,11 +332,7 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING*
-interpinfo_s(PARROT_INTERP, INTVAL what)>
+=item C<STRING* interpinfo_s>
 
 RT#48260: Not yet documented!!!
 
@@ -413,9 +384,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-INTVAL
-sysinfo_i(SHIM_INTERP, INTVAL info_wanted)>
+=item C<INTVAL sysinfo_i>
 
 Returns the system info.
 
@@ -449,10 +418,7 @@ sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-sysinfo_s(PARROT_INTERP, INTVAL info_wanted)>
+=item C<STRING * sysinfo_s>
 
 Returns the system info string.
 

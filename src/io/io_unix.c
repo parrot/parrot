@@ -183,9 +183,7 @@ static size_t PIO_unix_write(SHIM_INTERP,
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-static INTVAL
-flags_to_unix(INTVAL flags)>
+=item C<static INTVAL flags_to_unix>
 
 Returns a UNIX-specific interpretation of C<flags> suitable for passing
 to C<open()> and C<fopen()> in C<PIO_unix_open()> and
@@ -222,8 +220,7 @@ flags_to_unix(INTVAL flags)
 
 /*
 
-=item C<static INTVAL
-PIO_unix_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))>
+=item C<static INTVAL PIO_unix_init>
 
 Sets up the interpreter's standard C<std*> IO handles. Returns C<0> on
 success and C<-1> on error.
@@ -261,11 +258,7 @@ PIO_unix_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static ParrotIO *
-PIO_unix_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-              ARGIN(const char *spath), INTVAL flags)>
+=item C<static ParrotIO * PIO_unix_open>
 
 Opens C<*spath>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 values.
@@ -362,8 +355,7 @@ PIO_unix_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-=item C<INTVAL
-PIO_unix_async(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), INTVAL b)>
+=item C<INTVAL PIO_unix_async>
 
 Experimental asynchronous IO.
 
@@ -399,10 +391,7 @@ PIO_unix_async(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *i
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static ParrotIO *
-PIO_unix_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)>
+=item C<static ParrotIO * PIO_unix_fdopen>
 
 Returns a new C<ParrotIO> with file descriptor C<fd>.
 
@@ -454,8 +443,7 @@ PIO_unix_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL 
 
 /*
 
-=item C<static INTVAL
-PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
+=item C<static INTVAL PIO_unix_close>
 
 Closes C<*io>'s file descriptor.
 
@@ -474,8 +462,7 @@ PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-=item C<static INTVAL
-PIO_unix_isatty(PIOHANDLE fd)>
+=item C<static INTVAL PIO_unix_isatty>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
 
@@ -491,8 +478,7 @@ PIO_unix_isatty(PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL
-PIO_unix_getblksize(PIOHANDLE fd)>
+=item C<INTVAL PIO_unix_getblksize>
 
 Various ways of determining block size.
 
@@ -537,8 +523,7 @@ PIO_unix_getblksize(PIOHANDLE fd)
 
 /*
 
-=item C<static INTVAL
-PIO_unix_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
+=item C<static INTVAL PIO_unix_flush>
 
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
@@ -557,9 +542,7 @@ PIO_unix_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-=item C<static size_t
-PIO_unix_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-              NOTNULL(STRING **buf))>
+=item C<static size_t PIO_unix_read>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -604,8 +587,7 @@ PIO_unix_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<static size_t
-PIO_unix_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))>
+=item C<static size_t PIO_unix_write>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -652,9 +634,7 @@ PIO_unix_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), N
 
 /*
 
-=item C<static PIOOFF_T
-PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-              PIOOFF_T offset, INTVAL whence)>
+=item C<static PIOOFF_T PIO_unix_seek>
 
 Hard seek.
 
@@ -697,8 +677,7 @@ PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<static PIOOFF_T
-PIO_unix_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
+=item C<static PIOOFF_T PIO_unix_tell>
 
 Returns the current read/write position on C<*io>'s file discriptor.
 
@@ -729,10 +708,7 @@ Very minimal stubs for now, maybe someone will run with these.
 
 =over 4
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))>
+=item C<STRING * PIO_sockaddr_in>
 
 C<PIO_sockaddr_in()> is not part of the layer and so must be C<extern>.
 
@@ -794,10 +770,7 @@ PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static ParrotIO *
-PIO_unix_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, int proto)>
+=item C<static ParrotIO * PIO_unix_socket>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -825,8 +798,7 @@ PIO_unix_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, in
 
 /*
 
-=item C<static INTVAL
-PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NULLOK(STRING *r))>
+=item C<static INTVAL PIO_unix_connect>
 
 Connects C<*io>'s socket to address C<*r>.
 
@@ -860,9 +832,7 @@ AGAIN:
 
 /*
 
-=item C<static INTVAL
-PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-        NOTNULL(STRING *l))>
+=item C<static INTVAL PIO_unix_bind>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
 
@@ -889,9 +859,7 @@ PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<static INTVAL
-PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-        INTVAL sec)>
+=item C<static INTVAL PIO_unix_listen>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
@@ -912,10 +880,7 @@ PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static ParrotIO *
-PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
+=item C<static ParrotIO * PIO_unix_accept>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 
@@ -953,9 +918,7 @@ PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io)
 
 /*
 
-=item C<static INTVAL
-PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-        NOTNULL(STRING *s))>
+=item C<static INTVAL PIO_unix_send>
 
 Send the message C<*s> to C<*io>'s connected socket.
 
@@ -1007,9 +970,7 @@ AGAIN:
 
 /*
 
-=item C<static INTVAL
-PIO_unix_recv(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io), NOTNULL(STRING **s))>
+=item C<static INTVAL PIO_unix_recv>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
 
@@ -1060,9 +1021,7 @@ AGAIN:
 
 /*
 
-=item C<static INTVAL
-PIO_unix_poll(SHIM_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(ParrotIO *io), int which,
-               int sec, int usec)>
+=item C<static INTVAL PIO_unix_poll>
 
 Utility function for polling a single IO stream with a timeout.
 
@@ -1113,10 +1072,7 @@ AGAIN:
 #  endif
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static ParrotIO *
-PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), ARGIN(const char *cmd), int flags)>
+=item C<static ParrotIO * PIO_unix_pipe>
 
 Very limited C<exec> for now.
 

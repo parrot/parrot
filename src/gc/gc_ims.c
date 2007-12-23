@@ -469,8 +469,7 @@ typedef struct Gc_ims_private {
 
 /*
 
-=item C<static void
-gc_ims_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(PObj *to_add))>
+=item C<static void gc_ims_add_free_object>
 
 Add object C<to_add> to the free_list in the given pool.
 C<pool->num_free_objects> has to be updated by the caller.
@@ -498,10 +497,7 @@ gc_ims_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PObj *
-gc_ims_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))>
+=item C<static PObj * gc_ims_get_free_object>
 
 Get a new object off the free_list in the given pool.
 
@@ -539,8 +535,7 @@ gc_ims_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void
-gc_ims_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))>
+=item C<static void gc_ims_alloc_objects>
 
 Allocate new objects for the given pool.
 
@@ -568,8 +563,7 @@ gc_ims_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void
-gc_ims_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))>
+=item C<static void gc_ims_pool_init>
 
 RT#48260: Not yet documented!!!
 
@@ -588,8 +582,7 @@ gc_ims_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void
-parrot_gc_ims_deinit(PARROT_INTERP)>
+=item C<static void parrot_gc_ims_deinit>
 
 RT#48260: Not yet documented!!!
 
@@ -608,8 +601,7 @@ parrot_gc_ims_deinit(PARROT_INTERP)
 
 /*
 
-=item C<void
-Parrot_gc_ims_init(PARROT_INTERP)>
+=item C<void Parrot_gc_ims_init>
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools. This function must set the function pointers
@@ -641,8 +633,7 @@ Parrot_gc_ims_init(PARROT_INTERP)
 
 /*
 
-=item C<static void
-parrot_gc_ims_reinit(PARROT_INTERP)>
+=item C<static void parrot_gc_ims_reinit>
 
 Reinitialize the collector for the next collection cycle.
 
@@ -671,8 +662,7 @@ parrot_gc_ims_reinit(PARROT_INTERP)
 
 /*
 
-=item C<static void
-parrot_gc_ims_mark(PARROT_INTERP)>
+=item C<static void parrot_gc_ims_mark>
 
 Mark a bunch of children.
 
@@ -714,8 +704,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
 
 /*
 
-=item C<static int
-sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
+=item C<static int sweep_cb>
 
 RT#48260: Not yet documented!!!
 
@@ -737,8 +726,7 @@ sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void
 
 /*
 
-=item C<static void
-parrot_gc_ims_sweep(PARROT_INTERP)>
+=item C<static void parrot_gc_ims_sweep>
 
 Free unused objects in all header pools.
 
@@ -785,8 +773,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 
 /*
 
-=item C<static int
-collect_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))>
+=item C<static int collect_cb>
 
 RT#48260: Not yet documented!!!
 
@@ -834,8 +821,7 @@ collect_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(vo
 
 /*
 
-=item C<static int
-parrot_gc_ims_collect(PARROT_INTERP, int check_only)>
+=item C<static int parrot_gc_ims_collect>
 
 Run the copying collector in memory pools, if it could yield some free
 memory.
@@ -873,8 +859,7 @@ parrot_gc_ims_collect(PARROT_INTERP, int check_only)
 
 /*
 
-=item C<static void
-parrot_gc_ims_run_increment(PARROT_INTERP)>
+=item C<static void parrot_gc_ims_run_increment>
 
 Run one increment of collection. This function is triggered by object
 allocation.
@@ -949,8 +934,7 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
 
 /*
 
-=item C<static void
-parrot_gc_ims_run(PARROT_INTERP, int flags)>
+=item C<static void parrot_gc_ims_run>
 
 Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
@@ -1041,8 +1025,7 @@ parrot_gc_ims_run(PARROT_INTERP, int flags)
 
 /*
 
-=item C<void
-Parrot_dod_ims_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(PMC *_new))>
+=item C<void Parrot_dod_ims_wb>
 
 Write barrier called by the DOD_WRITE_BARRIER macro. Always when storing
 a white object into a black aggregate, either the object must

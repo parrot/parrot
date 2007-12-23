@@ -44,10 +44,7 @@ static opcode_t * runops_trace_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-opcode_t *
-runops_fast_core(PARROT_INTERP, NOTNULL(opcode_t *pc))>
+=item C<opcode_t * runops_fast_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations.
@@ -71,10 +68,7 @@ runops_fast_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-opcode_t *
-runops_cgoto_core(PARROT_INTERP, NOTNULL(opcode_t *pc))>
+=item C<opcode_t * runops_cgoto_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the computed C<goto> core.
@@ -114,10 +108,7 @@ runops_cgoto_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static opcode_t *
-runops_trace_core(PARROT_INTERP, NOTNULL(opcode_t *pc))>
+=item C<static opcode_t * runops_trace_core>
 
 RT#48260: Not yet documented!!!
 
@@ -189,10 +180,7 @@ runops_trace_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-opcode_t *
-runops_slow_core(PARROT_INTERP, NOTNULL(opcode_t *pc))>
+=item C<opcode_t * runops_slow_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing and bounds checking enabled.
@@ -227,10 +215,7 @@ runops_slow_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-opcode_t *
-runops_gc_debug_core(PARROT_INTERP, NOTNULL(opcode_t *pc))>
+=item C<opcode_t * runops_gc_debug_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, performing a full GC run before each op.  This is very slow, but
@@ -264,10 +249,7 @@ runops_gc_debug_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-opcode_t *
-runops_profile_core(PARROT_INTERP, NOTNULL(opcode_t *pc))>
+=item C<opcode_t * runops_profile_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing, bounds checking and profiling enabled.

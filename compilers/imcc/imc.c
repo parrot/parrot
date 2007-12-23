@@ -48,9 +48,7 @@ extern FILE* yyin;
 
 /*
 
-=item C<PARROT_API
-void
-imc_compile_all_units(PARROT_INTERP)>
+=item C<void imc_compile_all_units>
 
 RT#48260: Not yet documented!!!
 
@@ -92,9 +90,7 @@ imc_compile_all_units(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-void
-imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<void imc_compile_unit>
 
 imc_compile_unit is the main loop of the IMC compiler for each unit. It
 operates on a single compilation unit at a time.
@@ -116,9 +112,7 @@ imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<PARROT_API
-void
-imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))>
+=item C<void imc_cleanup>
 
 Any activity required to cleanup the compiler state and be
 ready for a new compiler invocation goes here.
@@ -139,9 +133,7 @@ imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-static IMC_Unit *
-imc_new_unit(IMC_Unit_Type t)>
+=item C<static IMC_Unit * imc_new_unit>
 
 Create a new IMC_Unit.
 
@@ -161,9 +153,7 @@ imc_new_unit(IMC_Unit_Type t)
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-IMC_Unit *
-imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)>
+=item C<IMC_Unit * imc_open_unit>
 
 Create a new IMC_Unit and "open" it for construction.
 This sets the current state of the parser. The unit
@@ -197,8 +187,7 @@ imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 
 /*
 
-=item C<void
-imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))>
+=item C<void imc_close_unit>
 
 Close a unit from compilation.
 Does not destroy the unit, leaves it on the list.
@@ -221,8 +210,7 @@ imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void imc_free_unit>
 
 RT#48260: Not yet documented!!!
 

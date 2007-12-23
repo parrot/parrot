@@ -52,8 +52,7 @@ static All_encodings *all_encodings;
 
 /*
 
-=item C<void
-parrot_init_encodings_2(void)>
+=item C<void parrot_init_encodings_2>
 
 RT#48260: Not yet documented!!!
 
@@ -74,8 +73,7 @@ parrot_init_encodings_2(void)
 
 /*
 
-=item C<void
-parrot_deinit_encodings(void)>
+=item C<void parrot_deinit_encodings>
 
 RT#48260: Not yet documented!!!
 
@@ -99,11 +97,7 @@ parrot_deinit_encodings(void)
 
 /*
 
-=item C<PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-ENCODING *
-Parrot_new_encoding(SHIM_INTERP)>
+=item C<ENCODING * Parrot_new_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -122,11 +116,7 @@ Parrot_new_encoding(SHIM_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const ENCODING *
-Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))>
+=item C<const ENCODING * Parrot_find_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -151,11 +141,7 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-const ENCODING *
-Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))>
+=item C<const ENCODING * Parrot_load_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -179,10 +165,7 @@ Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))>
+=item C<INTVAL Parrot_encoding_number>
 
 Return the number of the encoding or -1 if not found.
 
@@ -208,10 +191,7 @@ Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))>
+=item C<INTVAL Parrot_encoding_number_of_str>
 
 Return the number of the encoding of the given string or -1 if not found.
 
@@ -236,11 +216,7 @@ Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-STRING*
-Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)>
+=item C<STRING* Parrot_encoding_name>
 
 RT#48260: Not yet documented!!!
 
@@ -261,11 +237,7 @@ Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const ENCODING*
-Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)>
+=item C<const ENCODING* Parrot_get_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -286,11 +258,7 @@ Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const char *
-Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)>
+=item C<const char * Parrot_encoding_c_name>
 
 RT#48260: Not yet documented!!!
 
@@ -311,9 +279,7 @@ Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<static INTVAL
-register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
-        NOTNULL(ENCODING *encoding))>
+=item C<static INTVAL register_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -351,10 +317,7 @@ register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
 
 /*
 
-=item C<PARROT_API
-INTVAL
-Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
-        NOTNULL(ENCODING *encoding))>
+=item C<INTVAL Parrot_register_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -397,10 +360,7 @@ Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
 
 /*
 
-=item C<PARROT_API
-INTVAL
-Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
-        NOTNULL(ENCODING *encoding))>
+=item C<INTVAL Parrot_make_default_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -419,11 +379,7 @@ Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PARROT_API
-const ENCODING *
-Parrot_default_encoding(SHIM_INTERP)>
+=item C<const ENCODING * Parrot_default_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -442,9 +398,7 @@ Parrot_default_encoding(SHIM_INTERP)
 
 /*
 
-=item C<PARROT_API
-encoding_converter_t
-Parrot_find_encoding_converter(PARROT_INTERP, NOTNULL(ENCODING *lhs), NOTNULL(ENCODING *rhs))>
+=item C<encoding_converter_t Parrot_find_encoding_converter>
 
 RT#48260: Not yet documented!!!
 

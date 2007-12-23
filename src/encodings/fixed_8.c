@@ -153,10 +153,7 @@ static STRING * to_encoding(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_DOES_NOT_RETURN
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-to_encoding(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *dest))>
+=item C<static STRING * to_encoding>
 
 RT#48260: Not yet documented!!!
 
@@ -175,10 +172,7 @@ to_encoding(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *dest))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static UINTVAL
-get_codepoint(PARROT_INTERP, ARGIN(const STRING *source_string),
-        UINTVAL offset)>
+=item C<static UINTVAL get_codepoint>
 
 codepoints are bytes, so delegate
 
@@ -196,9 +190,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *source_string),
 
 /*
 
-=item C<static void
-set_codepoint(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL codepoint)>
+=item C<static void set_codepoint>
 
 This is the same as set byte
 
@@ -215,9 +207,7 @@ set_codepoint(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static UINTVAL
-get_byte(PARROT_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)>
+=item C<static UINTVAL get_byte>
 
 RT#48260: Not yet documented!!!
 
@@ -241,9 +231,7 @@ get_byte(PARROT_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)
 
 /*
 
-=item C<static void
-set_byte(PARROT_INTERP, ARGIN(const STRING *source_string),
-        UINTVAL offset, UINTVAL byte)>
+=item C<static void set_byte>
 
 RT#48260: Not yet documented!!!
 
@@ -265,11 +253,7 @@ set_byte(PARROT_INTERP, ARGIN(const STRING *source_string),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL count)>
+=item C<static STRING * get_codepoints>
 
 Delegate to get_bytes
 
@@ -291,11 +275,7 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL count)>
+=item C<static STRING * get_bytes>
 
 RT#48260: Not yet documented!!!
 
@@ -326,11 +306,7 @@ get_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))>
+=item C<static STRING * get_codepoints_inplace>
 
 Delegate to get_bytes
 
@@ -351,11 +327,7 @@ get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-get_bytes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL count, NOTNULL(STRING *return_string))>
+=item C<static STRING * get_bytes_inplace>
 
 RT#48260: Not yet documented!!!
 
@@ -382,9 +354,7 @@ get_bytes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<static void
-set_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL count, NOTNULL(STRING *new_codepoints))>
+=item C<static void set_codepoints>
 
 Delegate to set_bytes
 
@@ -401,9 +371,7 @@ set_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<static void
-set_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL count, NOTNULL(STRING *new_bytes))>
+=item C<static void set_bytes>
 
 RT#48260: Not yet documented!!!
 
@@ -420,8 +388,7 @@ set_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<static void
-become_encoding(PARROT_INTERP, SHIM(STRING *source_string))>
+=item C<static void become_encoding>
 
 Unconditionally makes the string be in this encoding, if that's valid
 
@@ -438,8 +405,7 @@ become_encoding(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static UINTVAL
-codepoints(PARROT_INTERP, NOTNULL(STRING *source_string))>
+=item C<static UINTVAL codepoints>
 
 RT#48260: Not yet documented!!!
 
@@ -455,8 +421,7 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *source_string))
 
 /*
 
-=item C<static UINTVAL
-bytes(SHIM_INTERP, NOTNULL(STRING *source_string))>
+=item C<static UINTVAL bytes>
 
 RT#48260: Not yet documented!!!
 
@@ -476,8 +441,7 @@ bytes(SHIM_INTERP, NOTNULL(STRING *source_string))
 
 /*
 
-=item C<static UINTVAL
-fixed8_get_next(PARROT_INTERP, NOTNULL(String_iter *iter))>
+=item C<static UINTVAL fixed8_get_next>
 
 RT#48260: Not yet documented!!!
 
@@ -495,8 +459,7 @@ fixed8_get_next(PARROT_INTERP, NOTNULL(String_iter *iter))
 
 /*
 
-=item C<static void
-fixed8_set_next(PARROT_INTERP, NOTNULL(String_iter *iter), UINTVAL c)>
+=item C<static void fixed8_set_next>
 
 RT#48260: Not yet documented!!!
 
@@ -513,8 +476,7 @@ fixed8_set_next(PARROT_INTERP, NOTNULL(String_iter *iter), UINTVAL c)
 
 /*
 
-=item C<static void
-fixed8_set_position(SHIM_INTERP, NOTNULL(String_iter *iter), UINTVAL pos)>
+=item C<static void fixed8_set_position>
 
 RT#48260: Not yet documented!!!
 
@@ -532,8 +494,7 @@ fixed8_set_position(SHIM_INTERP, NOTNULL(String_iter *iter), UINTVAL pos)
 
 /*
 
-=item C<static void
-iter_init(SHIM_INTERP, ARGIN(const STRING *src), NOTNULL(String_iter *iter))>
+=item C<static void iter_init>
 
 RT#48260: Not yet documented!!!
 
@@ -553,9 +514,7 @@ iter_init(SHIM_INTERP, ARGIN(const STRING *src), NOTNULL(String_iter *iter))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-ENCODING *
-Parrot_encoding_fixed_8_init(PARROT_INTERP)>
+=item C<ENCODING * Parrot_encoding_fixed_8_init>
 
 RT#48260: Not yet documented!!!
 

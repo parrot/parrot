@@ -47,8 +47,7 @@ Functions that are used to interface with the concurrency scheduler.
 
 =over 4
 
-=item C<void
-Parrot_cx_init_scheduler(PARROT_INTERP)>
+=item C<void Parrot_cx_init_scheduler>
 
 Initalize the concurrency scheduler for the interpreter.
 
@@ -89,9 +88,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))>
+=item C<static int Parrot_cx_handle_tasks>
 
 Handle the pending tasks in the scheduler's task list. Returns when there are
 no more pending tasks. Returns 0 to terminate the scheduler runloop, or 1 to
@@ -145,7 +142,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, NOTNULL(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_runloop_sleep(NOTNULL(PMC *scheduler))>
+=item C<void Parrot_cx_runloop_sleep>
 
 Pause the scheduler runloop. Called when there are no more pending tasks in the
 scheduler's task list, to freeze the runloop until there are tasks to handle.
@@ -163,7 +160,7 @@ Parrot_cx_runloop_sleep(NOTNULL(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_runloop_wake(PARROT_INTERP, NOTNULL(PMC *scheduler))>
+=item C<void Parrot_cx_runloop_wake>
 
 Wake a sleeping scheduler runloop (generally called when new tasks are added to
 the scheduler's task list).
@@ -182,9 +179,7 @@ Parrot_cx_runloop_wake(PARROT_INTERP, NOTNULL(PMC *scheduler))
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_cx_runloop_end(PARROT_INTERP)>
+=item C<void Parrot_cx_runloop_end>
 
 Schedule an event to terminate the scheduler runloop.
 
@@ -215,9 +210,7 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_cx_schedule_task(PARROT_INTERP, NOTNULL(PMC *task))>
+=item C<void Parrot_cx_schedule_task>
 
 Add a task to scheduler's task list.
 
@@ -238,9 +231,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, NOTNULL(PMC *task))
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_cx_add_handler(PARROT_INTERP, NOTNULL(PMC *handler))>
+=item C<void Parrot_cx_add_handler>
 
 Add a task handler to scheduler's list of handlers.
 
@@ -263,9 +254,7 @@ Parrot_cx_add_handler(PARROT_INTERP, NOTNULL(PMC *handler))
 
 /*
 
-=item C<PARROT_API
-PMC *
-Parrot_cx_find_handler_for_task(PARROT_INTERP, NOTNULL(PMC *task))>
+=item C<PMC * Parrot_cx_find_handler_for_task>
 
 Retrieve a handler appropriate to a given task. If the scheduler has no
 appropriate handler, returns PMCNULL.
@@ -307,10 +296,7 @@ Functions that are only used within the scheduler.
 
 =over 4
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static void*
-scheduler_runloop(NOTNULL(PMC *scheduler))>
+=item C<static void* scheduler_runloop>
 
 The scheduler runloop is started by the interpreter. It manages the flow of
 concurrent scheduling for the parent interpreter, and for lightweight

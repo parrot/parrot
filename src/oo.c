@@ -29,8 +29,7 @@ Handles class and object manipulation.
 
 /*
 
-=item C<void
-Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, NOTNULL(PMC *self))>
+=item C<void Parrot_oo_extract_methods_from_namespace>
 
 Extract methods and vtable overrides from the given namespace and insert them
 into the class.
@@ -93,10 +92,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, NOTNULL(PMC *self))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_oo_get_namespace(PARROT_INTERP, NOTNULL(PMC *classobj))>
+=item C<PMC * Parrot_oo_get_namespace>
 
 Lookup a namespace object from a class PMC.
 
@@ -119,10 +115,7 @@ Parrot_oo_get_namespace(PARROT_INTERP, NOTNULL(PMC *classobj))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_oo_get_class(PARROT_INTERP, NOTNULL(PMC *key))>
+=item C<PMC * Parrot_oo_get_class>
 
 Lookup a class object from a namespace, string, or key PMC.
 
@@ -180,11 +173,7 @@ Parrot_oo_get_class(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_oo_get_class_str(PARROT_INTERP, NOTNULL(STRING *name))>
+=item C<PMC * Parrot_oo_get_class_str>
 
 Lookup a class object from a builtin string.
 
@@ -223,10 +212,7 @@ Parrot_oo_get_class_str(PARROT_INTERP, NOTNULL(STRING *name))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_oo_newclass_from_str(PARROT_INTERP, NOTNULL(STRING *name))>
+=item C<PMC * Parrot_oo_newclass_from_str>
 
 Create a new class object from a string name.
 
@@ -255,12 +241,7 @@ Parrot_oo_newclass_from_str(PARROT_INTERP, NOTNULL(STRING *name))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
-        NOTNULL(PMC *classobj),
-        NOTNULL(STRING *name))>
+=item C<PMC * Parrot_oo_find_vtable_override_for_class>
 
 Lookup a vtable override in a specific class object.
 
@@ -284,12 +265,7 @@ Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_oo_find_vtable_override(PARROT_INTERP,
-        NOTNULL(PMC *classobj),
-        NOTNULL(STRING *name))>
+=item C<PMC * Parrot_oo_find_vtable_override>
 
 Lookup a vtable override in a class, including any vtable overrides inherited
 from parents.

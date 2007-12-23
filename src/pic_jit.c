@@ -123,10 +123,7 @@ static int returns_match_results(
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static opcode_t *
-pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))>
+=item C<static opcode_t * pic_test_func>
 
 RT#48260: Not yet documented!!!
 
@@ -151,9 +148,7 @@ pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))>
+=item C<static int jit_can_compile_sub>
 
 RT#48260: Not yet documented!!!
 
@@ -194,10 +189,7 @@ jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-args_match_params(ARGIN(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
-    NOTNULL(opcode_t *start))>
+=item C<static int args_match_params>
 
 RT#48260: Not yet documented!!!
 
@@ -245,9 +237,7 @@ args_match_params(ARGIN(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-returns_match_results(ARGIN(const PMC *sig_ret), ARGIN(const PMC *sig_result))>
+=item C<static int returns_match_results>
 
 RT#48260: Not yet documented!!!
 
@@ -284,9 +274,7 @@ returns_match_results(ARGIN(const PMC *sig_ret), ARGIN(const PMC *sig_result))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))>
+=item C<static int call_is_safe>
 
 RT#48260: Not yet documented!!!
 
@@ -335,11 +323,7 @@ call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), ARGIN(const PMC *sig_results),
-        NOTNULL(PackFile_ByteCode *seg), NOTNULL(opcode_t *pc),
-        NOTNULL(opcode_t *end), NOTNULL(int *flags))>
+=item C<static int ops_jittable>
 
 RT#48260: Not yet documented!!!
 
@@ -414,10 +398,7 @@ op_is_ok:
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
-        NOTNULL(PMC *sig_args), NOTNULL(PMC *sig_results), NOTNULL(int *flags))>
+=item C<int parrot_pic_is_safe_to_jit>
 
 RT#48260: Not yet documented!!!
 
@@ -481,8 +462,7 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
 
 /*
 
-=item C<funcptr_t
-parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)>
+=item C<funcptr_t parrot_pic_JIT_sub>
 
 RT#48260: Not yet documented!!!
 

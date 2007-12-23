@@ -148,10 +148,7 @@ static void vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-static unsigned int*
-ig_get_word(int i, int j, int N, NOTNULL(unsigned int *graph),
-        NOTNULL(int* bit_ofs))>
+=item C<static unsigned int* ig_get_word>
 
 RT#48260: Not yet documented!!!
 
@@ -171,8 +168,7 @@ ig_get_word(int i, int j, int N, NOTNULL(unsigned int *graph),
 
 /*
 
-=item C<static void
-ig_set(int i, int j, int N, NOTNULL(unsigned int *graph))>
+=item C<static void ig_set>
 
 RT#48260: Not yet documented!!!
 
@@ -190,8 +186,7 @@ ig_set(int i, int j, int N, NOTNULL(unsigned int *graph))
 
 /*
 
-=item C<int
-ig_test(int i, int j, int N, NOTNULL(unsigned int *graph))>
+=item C<int ig_test>
 
 RT#48260: Not yet documented!!!
 
@@ -209,9 +204,7 @@ ig_test(int i, int j, int N, NOTNULL(unsigned int *graph))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-static unsigned int*
-ig_allocate(int N)>
+=item C<static unsigned int* ig_allocate>
 
 RT#48260: Not yet documented!!!
 
@@ -233,8 +226,7 @@ ig_allocate(int N)
 
 /*
 
-=item C<void
-imc_reg_alloc(PARROT_INTERP, NULLOK(IMC_Unit *unit))>
+=item C<void imc_reg_alloc>
 
 imc_reg_alloc is the main loop of the allocation algorithm. It operates
 on a single compilation unit at a time.
@@ -334,8 +326,7 @@ done:
 
 /*
 
-=item C<void
-free_reglist(NOTNULL(IMC_Unit *unit))>
+=item C<void free_reglist>
 
 RT#48260: Not yet documented!!!
 
@@ -365,8 +356,7 @@ free_reglist(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<void
-graph_coloring_reg_alloc(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<void graph_coloring_reg_alloc>
 
 RT#48260: Not yet documented!!!
 
@@ -385,8 +375,7 @@ graph_coloring_reg_alloc(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-make_stat(NOTNULL(IMC_Unit *unit), NULLOK(int *sets), NULLOK(int *cols))>
+=item C<static void make_stat>
 
 some statistics about register usage
 printed with --verbose --verbose
@@ -429,8 +418,7 @@ make_stat(NOTNULL(IMC_Unit *unit), NULLOK(int *sets), NULLOK(int *cols))
 
 /*
 
-=item C<static void
-imc_stat_init(NOTNULL(IMC_Unit *unit))>
+=item C<static void imc_stat_init>
 
 registes usage of .pir
 
@@ -454,8 +442,7 @@ imc_stat_init(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void print_stat>
 
 and final
 
@@ -502,8 +489,7 @@ print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static int
-reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))>
+=item C<static int reg_sort_f>
 
 sort list by line  nr
 
@@ -530,8 +516,7 @@ reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 
 /*
 
-=item C<static void
-sort_reglist(NOTNULL(IMC_Unit *unit))>
+=item C<static void sort_reglist>
 
 RT#48260: Not yet documented!!!
 
@@ -547,8 +532,7 @@ sort_reglist(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))>
+=item C<static void build_reglist>
 
 make a linear list of IDENTs and VARs, set n_symbols
 TODO
@@ -609,8 +593,7 @@ build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-rebuild_reglist(NOTNULL(IMC_Unit *unit))>
+=item C<static void rebuild_reglist>
 
 Exclude all already allocated registers (< first_avail)
 from reglist. This reduced the size of the interference graph
@@ -652,8 +635,7 @@ use_it:
 
 /*
 
-=item C<static void
-build_interference_graph(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void build_interference_graph>
 
 Creates the interference graph between the variables.
 
@@ -707,8 +689,7 @@ build_interference_graph(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-compute_du_chain(NOTNULL(IMC_Unit *unit))>
+=item C<static void compute_du_chain>
 
 Compute a DU-chain for each symbolic in a compilation unit
 
@@ -745,8 +726,7 @@ compute_du_chain(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-compute_one_du_chain(NOTNULL(SymReg *r), NOTNULL(IMC_Unit *unit))>
+=item C<static void compute_one_du_chain>
 
 RT#48260: Not yet documented!!!
 
@@ -791,8 +771,7 @@ compute_one_du_chain(NOTNULL(SymReg *r), NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static int
-interferes(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0), NOTNULL(SymReg *r1))>
+=item C<static int interferes>
 
 See if r0's chain interferes with r1.
 
@@ -884,8 +863,7 @@ interferes(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0), NOTNULL(
 
 /*
 
-=item C<static int
-ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))>
+=item C<static int ig_find_color>
 
 find available color for register #x in available colors
 
@@ -906,8 +884,7 @@ ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))
 
 /*
 
-=item C<static int
-try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static int try_allocate>
 
 Color the graph, assigning registers to each symbol:
 
@@ -978,9 +955,7 @@ try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-map_colors(NOTNULL(IMC_Unit* unit), int x, NOTNULL(unsigned int *graph), NOTNULL(char *avail),
-        int typ, int already_allocated)>
+=item C<static void map_colors>
 
 map_colors: calculates what colors can be assigned to the x-th symbol.
 
@@ -1010,8 +985,7 @@ map_colors(NOTNULL(IMC_Unit* unit), int x, NOTNULL(unsigned int *graph), NOTNULL
 
 /*
 
-=item C<static int
-first_avail(NOTNULL(IMC_Unit *unit), int reg_set, NULLOK(Set **avail))>
+=item C<static int first_avail>
 
 find first available register of the given reg_set
 
@@ -1055,8 +1029,7 @@ first_avail(NOTNULL(IMC_Unit *unit), int reg_set, NULLOK(Set **avail))
 
 /*
 
-=item C<static void
-allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)>
+=item C<static void allocate_uniq>
 
 allocate lexicals or non-volatile in ascending order
 
@@ -1108,8 +1081,7 @@ allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
 
 /*
 
-=item C<static void
-vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void vanilla_reg_alloc>
 
 RT#48260: Not yet documented!!!
 
@@ -1161,8 +1133,7 @@ vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-allocate_lexicals(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void allocate_lexicals>
 
 RT#48260: Not yet documented!!!
 
@@ -1179,8 +1150,7 @@ allocate_lexicals(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-allocate_non_volatile(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void allocate_non_volatile>
 
 RT#48260: Not yet documented!!!
 

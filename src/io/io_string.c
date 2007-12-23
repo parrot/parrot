@@ -87,10 +87,7 @@ ParrotIOLayer pio_string_layer = {
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-ParrotIOLayer *
-PIO_string_register_layer(void)>
+=item C<ParrotIOLayer * PIO_string_register_layer>
 
 RT#48260: Not yet documented!!!
 
@@ -108,8 +105,7 @@ PIO_string_register_layer(void)
 
 /*
 
-=item C<static size_t
-PIO_string_read(SHIM_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING **buf))>
+=item C<static size_t PIO_string_read>
 
 RT#48260: Not yet documented!!!
 
@@ -131,8 +127,7 @@ PIO_string_read(SHIM_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTN
 
 /*
 
-=item C<static size_t
-PIO_string_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING *s))>
+=item C<static size_t PIO_string_write>
 
 RT#48260: Not yet documented!!!
 

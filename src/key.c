@@ -26,11 +26,7 @@ The base vtable calling functions.
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_new(PARROT_INTERP)>
+=item C<PMC * key_new>
 
 Returns a new C<Key> PMC.
 
@@ -51,11 +47,7 @@ key_new(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_new_integer(PARROT_INTERP, INTVAL value)>
+=item C<PMC * key_new_integer>
 
 Returns a new integer C<Key> PMC with value C<value>.
 
@@ -79,11 +71,7 @@ key_new_integer(PARROT_INTERP, INTVAL value)
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_new_number(PARROT_INTERP, FLOATVAL value)>
+=item C<PMC * key_new_number>
 
 Returns a new number C<Key> PMC with value C<value>.
 
@@ -107,11 +95,7 @@ key_new_number(PARROT_INTERP, FLOATVAL value)
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_new_string(PARROT_INTERP, NOTNULL(STRING *value))>
+=item C<PMC * key_new_string>
 
 Returns a new string C<Key> PMC with value C<value>.
 
@@ -135,11 +119,7 @@ key_new_string(PARROT_INTERP, NOTNULL(STRING *value))
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))>
+=item C<PMC * key_new_cstring>
 
 Returns a new string C<Key> PMC with value C<value> converted to a
 C<STRING>.
@@ -160,11 +140,7 @@ key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_new_pmc(PARROT_INTERP, NOTNULL(PMC *value))>
+=item C<PMC * key_new_pmc>
 
 Returns a new PMC C<Key> PMC with value C<value>.
 
@@ -186,9 +162,7 @@ key_new_pmc(PARROT_INTERP, NOTNULL(PMC *value))
 
 /*
 
-=item C<PARROT_API
-void
-key_set_integer(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value)>
+=item C<void key_set_integer>
 
 Set the integer C<value> in C<key>.
 
@@ -209,10 +183,7 @@ key_set_integer(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value)
 
 /*
 
-=item C<PARROT_API
-void
-key_set_register(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value,
-                 INTVAL flag)>
+=item C<void key_set_register>
 
 Set the register C<value> in C<key>.
 
@@ -234,9 +205,7 @@ key_set_register(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value,
 
 /*
 
-=item C<PARROT_API
-void
-key_set_number(SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value)>
+=item C<void key_set_number>
 
 Set the number C<value> in C<key>.
 
@@ -257,9 +226,7 @@ key_set_number(SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value)
 
 /*
 
-=item C<PARROT_API
-void
-key_set_string(SHIM_INTERP, NOTNULL(PMC *key), NOTNULL(STRING *value))>
+=item C<void key_set_string>
 
 Set the string C<value> in C<key>.
 
@@ -280,9 +247,7 @@ key_set_string(SHIM_INTERP, NOTNULL(PMC *key), NOTNULL(STRING *value))
 
 /*
 
-=item C<PARROT_API
-void
-key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))>
+=item C<void key_set_pmc>
 
 Set the PMC C<value> in C<key>.
 
@@ -305,10 +270,7 @@ key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-key_type(SHIM_INTERP, ARGIN(const PMC *key))>
+=item C<INTVAL key_type>
 
 Returns the type of C<key>.
 
@@ -326,10 +288,7 @@ key_type(SHIM_INTERP, ARGIN(const PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-key_integer(PARROT_INTERP, NOTNULL(PMC *key))>
+=item C<INTVAL key_integer>
 
 RT#48260: Not yet documented!!!
 
@@ -368,10 +327,7 @@ key_integer(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-FLOATVAL
-key_number(PARROT_INTERP, NOTNULL(PMC *key))>
+=item C<FLOATVAL key_number>
 
 RT#48260: Not yet documented!!!
 
@@ -404,11 +360,7 @@ key_number(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-key_string(PARROT_INTERP, NOTNULL(PMC *key))>
+=item C<STRING * key_string>
 
 RT#48260: Not yet documented!!!
 
@@ -445,11 +397,7 @@ key_string(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_pmc(PARROT_INTERP, NOTNULL(PMC *key))>
+=item C<PMC * key_pmc>
 
 These functions return the integer/number/string/PMC values of C<key> if
 possible. Otherwise they throws an exceptions.
@@ -474,11 +422,7 @@ key_pmc(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-key_next(SHIM_INTERP, NOTNULL(PMC *key))>
+=item C<PMC * key_next>
 
 Returns the next key if C<key> is in a sequence of linked keys.
 
@@ -497,11 +441,7 @@ key_next(SHIM_INTERP, NOTNULL(PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_IGNORABLE_RESULT
-PMC *
-key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))>
+=item C<PMC * key_append>
 
 Appends C<key2> to C<key1>.
 
@@ -533,9 +473,7 @@ key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))
 
 /*
 
-=item C<PARROT_API
-void
-key_mark(PARROT_INTERP, NOTNULL(PMC *key))>
+=item C<void key_mark>
 
 Marks C<key> as live.
 
@@ -566,11 +504,7 @@ key_mark(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))>
+=item C<STRING * key_set_to_string>
 
 RT#48260: Not yet documented!!!
 

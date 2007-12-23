@@ -23,11 +23,7 @@ src/vtables.c - Functions to build and manipulate vtables
 
 /*
 
-=item C<PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-VTABLE *
-Parrot_new_vtable(SHIM_INTERP)>
+=item C<VTABLE * Parrot_new_vtable>
 
 Creates and returns a pointer to the new C<VTABLE>.
 
@@ -46,11 +42,7 @@ Parrot_new_vtable(SHIM_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-VTABLE *
-Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))>
+=item C<VTABLE * Parrot_clone_vtable>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
@@ -75,9 +67,7 @@ Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_destroy_vtable(SHIM_INTERP, NULLOK(VTABLE *vtable))>
+=item C<void Parrot_destroy_vtable>
 
 Destroys C<*vtable>.
 
@@ -101,8 +91,7 @@ Parrot_destroy_vtable(SHIM_INTERP, ARGINOUT(VTABLE *vtable))
 
 /*
 
-=item C<void
-parrot_alloc_vtables(PARROT_INTERP)>
+=item C<void parrot_alloc_vtables>
 
 RT#48260: Not yet documented!!!
 
@@ -122,8 +111,7 @@ parrot_alloc_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void
-parrot_realloc_vtables(PARROT_INTERP)>
+=item C<void parrot_realloc_vtables>
 
 RT#48260: Not yet documented!!!
 
@@ -149,8 +137,7 @@ parrot_realloc_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void
-parrot_free_vtables(PARROT_INTERP)>
+=item C<void parrot_free_vtables>
 
 RT#48260: Not yet documented!!!
 
@@ -171,8 +158,7 @@ parrot_free_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void
-mark_vtables(PARROT_INTERP)>
+=item C<void mark_vtables>
 
 RT#48260: Not yet documented!!!
 

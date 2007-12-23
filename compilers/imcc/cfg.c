@@ -135,9 +135,7 @@ static void sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit * unit), ARGIN(const Instruction *ins))>
+=item C<static int check_invoke_type>
 
 RT#48260: Not yet documented!!!
 
@@ -172,8 +170,7 @@ check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit * unit), ARGIN(const Instr
 
 /*
 
-=item C<void
-find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)>
+=item C<void find_basic_blocks>
 
 RT#48260: Not yet documented!!!
 
@@ -277,9 +274,7 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
 
 /*
 
-=item C<static void
-bb_check_set_addr(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
-        NOTNULL(Basic_block *bb), NOTNULL(SymReg *label))>
+=item C<static void bb_check_set_addr>
 
 RT#48260: Not yet documented!!!
 
@@ -313,8 +308,7 @@ bb_check_set_addr(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
 
 /*
 
-=item C<void
-build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+=item C<void build_cfg>
 
 Once the basic blocks have been computed, build_cfg computes
 the dependencies between them.
@@ -452,9 +446,7 @@ invok:
 
 /*
 
-=item C<static void
-bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
-        NOTNULL(Basic_block *from), NOTNULL(SymReg *label))>
+=item C<static void bb_findadd_edge>
 
 find the placement of the label, and link the two nodes
 
@@ -494,9 +486,7 @@ bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-blocks_are_connected(ARGIN(const Basic_block *from), ARGIN(const Basic_block *to))>
+=item C<int blocks_are_connected>
 
 RT#48260: Not yet documented!!!
 
@@ -521,8 +511,7 @@ blocks_are_connected(ARGIN(const Basic_block *from), ARGIN(const Basic_block *to
 
 /*
 
-=item C<static void
-bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_block *to))>
+=item C<static void bb_add_edge>
 
 RT#48260: Not yet documented!!!
 
@@ -564,8 +553,7 @@ bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_b
 
 /*
 
-=item C<static void
-bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))>
+=item C<static void bb_remove_edge>
 
 RT#48260: Not yet documented!!!
 
@@ -620,8 +608,7 @@ bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
 
 /*
 
-=item C<static void
-free_edge(NOTNULL(IMC_Unit *unit))>
+=item C<static void free_edge>
 
 RT#48260: Not yet documented!!!
 
@@ -644,9 +631,7 @@ free_edge(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-edge_count(ARGIN(const struct _IMC_Unit *unit))>
+=item C<int edge_count>
 
 RT#48260: Not yet documented!!!
 
@@ -670,8 +655,7 @@ edge_count(ARGIN(const struct _IMC_Unit *unit))
 
 /*
 
-=item C<void
-life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))>
+=item C<void life_analysis>
 
 RT#48260: Not yet documented!!!
 
@@ -692,9 +676,7 @@ life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
 
 /*
 
-=item C<static void
-analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit),
-        NOTNULL(SymReg* r))>
+=item C<static void analyse_life_symbol>
 
 RT#48260: Not yet documented!!!
 
@@ -760,8 +742,7 @@ analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit),
 
 /*
 
-=item C<void
-free_life_info(ARGIN(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))>
+=item C<void free_life_info>
 
 RT#48260: Not yet documented!!!
 
@@ -788,8 +769,7 @@ free_life_info(ARGIN(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
 
 /*
 
-=item C<static void
-analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))>
+=item C<static void analyse_life_block>
 
 analyse_life_block studies the state of the var r
 in the block bb.
@@ -877,8 +857,7 @@ analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 
 /*
 
-=item C<static void
-propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)>
+=item C<static void propagate_need>
 
 RT#48260: Not yet documented!!!
 
@@ -945,8 +924,7 @@ propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
 
 /*
 
-=item C<void
-compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+=item C<void compute_dominators>
 
 Computes the dominators tree of the CFG.
 Basic block A dominates B, if each path to B passes through A
@@ -1081,8 +1059,7 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 
 /*
 
-=item C<void
-compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+=item C<void compute_dominance_frontiers>
 
 Algorithm to find dominance frontiers described in paper
 "A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
@@ -1136,8 +1113,7 @@ compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 
 /*
 
-=item C<static void
-free_dominators(NOTNULL(IMC_Unit *unit))>
+=item C<static void free_dominators>
 
 RT#48260: Not yet documented!!!
 
@@ -1162,8 +1138,7 @@ free_dominators(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-free_dominance_frontiers(NOTNULL(IMC_Unit *unit))>
+=item C<static void free_dominance_frontiers>
 
 RT#48260: Not yet documented!!!
 
@@ -1188,8 +1163,7 @@ free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<static void
-sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+=item C<static void sort_loops>
 
 RT#48260: Not yet documented!!!
 
@@ -1258,8 +1232,7 @@ sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<void
-find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+=item C<void find_loops>
 
 Searches for loops in the CFG. We search for edges that
 go from a node to one of its dominators.
@@ -1295,9 +1268,7 @@ find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-int
-natural_preheader(ARGIN(const struct _IMC_Unit *unit), ARGIN(const Loop_info* loop_info))>
+=item C<int natural_preheader>
 
 For loop_info, finds the natural preheader of the loop, if any, and returns
 its index, otherwise returns -1.  A natural preheader exists if there is
@@ -1336,8 +1307,7 @@ natural_preheader(ARGIN(const struct _IMC_Unit *unit), ARGIN(const Loop_info* lo
 
 /*
 
-=item C<static void
-mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const Edge *e))>
+=item C<static void mark_loop>
 
 Increases the loop_depth of all the nodes in a loop
 
@@ -1429,8 +1399,7 @@ mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const Edge *e))
 
 /*
 
-=item C<static void
-free_loops(NOTNULL(IMC_Unit *unit))>
+=item C<static void free_loops>
 
 RT#48260: Not yet documented!!!
 
@@ -1455,8 +1424,7 @@ free_loops(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<void
-search_predecessors_not_in(ARGIN(const Basic_block *node), NOTNULL(Set* s))>
+=item C<void search_predecessors_not_in>
 
 RT#48260: Not yet documented!!!
 
@@ -1485,8 +1453,7 @@ search_predecessors_not_in(ARGIN(const Basic_block *node), NOTNULL(Set* s))
 
 /*
 
-=item C<static void
-init_basic_blocks(NOTNULL(IMC_Unit *unit))>
+=item C<static void init_basic_blocks>
 
 RT#48260: Not yet documented!!!
 
@@ -1509,8 +1476,7 @@ init_basic_blocks(NOTNULL(IMC_Unit *unit))
 
 /*
 
-=item C<void
-clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))>
+=item C<void clear_basic_blocks>
 
 RT#48260: Not yet documented!!!
 
@@ -1536,10 +1502,7 @@ clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static Basic_block*
-make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* ins))>
+=item C<static Basic_block* make_basic_block>
 
 RT#48260: Not yet documented!!!
 
@@ -1584,10 +1547,7 @@ make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* in
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Life_range *
-make_life_range(NOTNULL(SymReg *r), int idx)>
+=item C<Life_range * make_life_range>
 
 RT#48260: Not yet documented!!!
 

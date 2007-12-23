@@ -152,9 +152,7 @@ static void too_many(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_init_arg_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig))>
+=item C<int Parrot_init_arg_nci>
 
 Initialize the argument passing state C<call_state> for the given NCI signature.
 
@@ -178,9 +176,7 @@ Parrot_init_arg_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig))>
+=item C<int Parrot_init_ret_nci>
 
 Initialize the return value passing state C<call_state> for the given NCI signature.
 
@@ -209,10 +205,7 @@ Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_init_arg_indexes_and_sig_pmc(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
-        NOTNULL(opcode_t *indexes), NOTNULL(PMC* sig_pmc), NOTNULL(call_state_item *sti))>
+=item C<int Parrot_init_arg_indexes_and_sig_pmc>
 
 Initialize argument transfer with given context registers, register indexes, and
 a signature pmc.
@@ -263,10 +256,7 @@ Parrot_init_arg_indexes_and_sig_pmc(PARROT_INTERP, NOTNULL(parrot_context_t *ctx
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_init_arg_op(PARROT_INTERP, NOTNULL(parrot_context_t *ctx), NULLOK(opcode_t *pc),
-    NOTNULL(call_state_item *sti))>
+=item C<int Parrot_init_arg_op>
 
 Initialize argument transfer with given context registers, and opcode
 location of a get_ or set_ argument opcode.
@@ -293,10 +283,7 @@ Parrot_init_arg_op(PARROT_INTERP, NOTNULL(parrot_context_t *ctx), NULLOK(opcode_
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_init_arg_sig(SHIM_INTERP, NOTNULL(parrot_context_t *ctx), ARGIN(const char *sig),
-    NULLOK(void *ap), NOTNULL(call_state_item *sti))>
+=item C<int Parrot_init_arg_sig>
 
 Initialize argument transfer with given code segment (holding the
 const_table), registers, function signature, and arguments.
@@ -330,8 +317,7 @@ Parrot_init_arg_sig(SHIM_INTERP, NOTNULL(parrot_context_t *ctx), ARGIN(const cha
 
 /*
 
-=item C<static void
-start_flatten(PARROT_INTERP, NOTNULL(call_state *st), NOTNULL(PMC *p_arg))>
+=item C<static void start_flatten>
 
 mark the source state as flattening with the passed
 PMC being flattened, and fetch the first arg from the flattened set.
@@ -373,8 +359,7 @@ start_flatten(PARROT_INTERP, NOTNULL(call_state *st), NOTNULL(PMC *p_arg))
 
 /*
 
-=item C<static void
-next_arg_sig(NOTNULL(call_state_item *sti))>
+=item C<static void next_arg_sig>
 
 RT#48260: Not yet documented!!!
 
@@ -415,8 +400,7 @@ next_arg_sig(NOTNULL(call_state_item *sti))
 
 /*
 
-=item C<static int
-fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static int fetch_arg_sig>
 
 RT#48260: Not yet documented!!!
 
@@ -473,8 +457,7 @@ fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static int
-fetch_arg_op(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static int fetch_arg_op>
 
 RT#48260: Not yet documented!!!
 
@@ -532,9 +515,7 @@ fetch_arg_op(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<int Parrot_fetch_arg>
 
 RT#48260: Not yet documented!!!
 
@@ -604,9 +585,7 @@ Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<PARROT_API
-int
-Parrot_fetch_arg_nci(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<int Parrot_fetch_arg_nci>
 
 RT#48260: Not yet documented!!!
 
@@ -642,8 +621,7 @@ Parrot_fetch_arg_nci(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-convert_arg_from_int(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static void convert_arg_from_int>
 
 RT#48260: Not yet documented!!!
 
@@ -676,8 +654,7 @@ convert_arg_from_int(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-convert_arg_from_num(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static void convert_arg_from_num>
 
 RT#48260: Not yet documented!!!
 
@@ -710,8 +687,7 @@ convert_arg_from_num(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-convert_arg_from_str(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static void convert_arg_from_str>
 
 RT#48260: Not yet documented!!!
 
@@ -744,8 +720,7 @@ convert_arg_from_str(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-convert_arg_from_pmc(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static void convert_arg_from_pmc>
 
 RT#48260: Not yet documented!!!
 
@@ -773,8 +748,7 @@ convert_arg_from_pmc(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-check_for_opt_flag(NOTNULL(call_state *st), int has_arg)>
+=item C<static void check_for_opt_flag>
 
 RT#48260: Not yet documented!!!
 
@@ -812,8 +786,7 @@ check_for_opt_flag(NOTNULL(call_state *st), int has_arg)
 
 /*
 
-=item C<static void
-clone_key_arg(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static void clone_key_arg>
 
 replace any src register by their values (done inside clone)
 need a test for tailcalls too, but I think there is no syntax
@@ -846,8 +819,7 @@ clone_key_arg(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-init_first_dest_named(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static void init_first_dest_named>
 
 initializes dest calling state for recption of first named arg.
 
@@ -904,8 +876,7 @@ init_first_dest_named(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static int
-locate_named_named(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static int locate_named_named>
 
 locate destination name, return 0 if not found
 
@@ -948,8 +919,7 @@ locate_named_named(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-store_arg(NOTNULL(call_state *st), INTVAL idx)>
+=item C<static void store_arg>
 
 RT#48260: Not yet documented!!!
 
@@ -981,8 +951,7 @@ store_arg(NOTNULL(call_state *st), INTVAL idx)
 
 /*
 
-=item C<static int
-store_current_arg(NOTNULL(call_state *st))>
+=item C<static int store_current_arg>
 
 RT#48260: Not yet documented!!!
 
@@ -1007,8 +976,7 @@ store_current_arg(NOTNULL(call_state *st))
 
 /*
 
-=item C<int
-Parrot_store_arg(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<int Parrot_store_arg>
 
 RT#48260: Not yet documented!!!
 
@@ -1026,8 +994,7 @@ Parrot_store_arg(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-too_few(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))>
+=item C<static void too_few>
 
 RT#48260: Not yet documented!!!
 
@@ -1052,8 +1019,7 @@ too_few(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 
 /*
 
-=item C<static void
-too_many(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))>
+=item C<static void too_many>
 
 RT#48260: Not yet documented!!!
 
@@ -1078,8 +1044,7 @@ too_many(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 
 /*
 
-=item C<static void
-null_val(int sig, NOTNULL(call_state *st))>
+=item C<static void null_val>
 
 RT#48260: Not yet documented!!!
 
@@ -1106,8 +1071,7 @@ null_val(int sig, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-check_named(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<static void check_named>
 
 Makes sure that all required named args are set and that all optional
 args and flags are set to null and false if not present.
@@ -1186,8 +1150,7 @@ check_named(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<static void
-init_call_stats(NOTNULL(call_state *st))>
+=item C<static void init_call_stats>
 
 RT#48260: Not yet documented!!!
 
@@ -1208,9 +1171,7 @@ init_call_stats(NOTNULL(call_state *st))
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_result)>
+=item C<void Parrot_process_args>
 
 RT#48260: Not yet documented!!!
 
@@ -1399,9 +1360,7 @@ Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_convert_arg(PARROT_INTERP, NOTNULL(call_state *st))>
+=item C<void Parrot_convert_arg>
 
 RT#48260: Not yet documented!!!
 
@@ -1443,14 +1402,7 @@ Parrot_convert_arg(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-=item C<PARROT_API
-void
-parrot_pass_args(PARROT_INTERP,
-        NOTNULL(parrot_context_t *src_ctx),
-        NOTNULL(parrot_context_t *dest_ctx),
-        NOTNULL(opcode_t *src_indexes),
-        NOTNULL(opcode_t *dest_indexes),
-        arg_pass_t param_or_result)>
+=item C<void parrot_pass_args>
 
 Main argument passing routine.
 
@@ -1504,11 +1456,7 @@ parrot_pass_args(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-opcode_t *
-parrot_pass_args_fromc(PARROT_INTERP, ARGIN(const char *sig),
-        NOTNULL(opcode_t *dest), NOTNULL(parrot_context_t *old_ctxp), va_list ap)>
+=item C<opcode_t * parrot_pass_args_fromc>
 
 Pass arguments from C code with given signature to a Parrot Sub.
 Prerequisites are like above.
@@ -1533,9 +1481,7 @@ parrot_pass_args_fromc(PARROT_INTERP, ARGIN(const char *sig),
 
 /*
 
-=item C<static int
-set_retval_util(PARROT_INTERP, ARGIN(const char *sig), NOTNULL(parrot_context_t *ctx),
-        NOTNULL(call_state *st))>
+=item C<static int set_retval_util>
 
 RT#48260: Not yet documented!!!
 
@@ -1565,10 +1511,7 @@ set_retval_util(PARROT_INTERP, ARGIN(const char *sig), NOTNULL(parrot_context_t 
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void*
-set_retval(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))>
+=item C<void* set_retval>
 
 handle void, and pointer (PMC*, STRING*) return values
 
@@ -1600,8 +1543,7 @@ set_retval(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-=item C<INTVAL
-set_retval_i(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))>
+=item C<INTVAL set_retval_i>
 
 handle INTVAL return value
 
@@ -1625,8 +1567,7 @@ set_retval_i(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-=item C<FLOATVAL
-set_retval_f(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))>
+=item C<FLOATVAL set_retval_f>
 
 handle FLOATVAL return value
 
@@ -1650,10 +1591,7 @@ set_retval_f(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING*
-set_retval_s(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))>
+=item C<STRING* set_retval_s>
 
 handle STRING return value
 
@@ -1679,10 +1617,7 @@ set_retval_s(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC*
-set_retval_p(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))>
+=item C<PMC* set_retval_p>
 
 handle PMC return value
 
@@ -1708,10 +1643,7 @@ set_retval_p(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-=item C<static void
-commit_last_arg(PARROT_INTERP, int index, int cur, NOTNULL(opcode_t *n_regs_used),
-        int seen_arrow, NOTNULL(PMC **sigs), NOTNULL(opcode_t **indexes),
-        NOTNULL(parrot_context_t *ctx), NULLOK(PMC *pmc), NOTNULL(va_list *list))>
+=item C<static void commit_last_arg>
 
 commit_last_arg is called by Parrot_PCCINVOKE when it reaches the end of each arg
 in the arg signature.  see Parrot_PCCINVOKE for signature syntax.
@@ -1771,10 +1703,7 @@ commit_last_arg(PARROT_INTERP, int index, int cur, NOTNULL(opcode_t *n_regs_used
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
-        ARGIN(const char *signature), ...)>
+=item C<void Parrot_PCCINVOKE>
 
 pmc is the invocant.
 method_name is the method_name used in the find_method VTABLE call

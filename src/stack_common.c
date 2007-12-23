@@ -28,9 +28,7 @@ These stacks all differ only in the size of items.
 
 /*
 
-=item C<PARROT_API
-void
-stack_system_init(SHIM_INTERP)>
+=item C<void stack_system_init>
 
 Called from C<make_interpreter()> to initialize the interpreter's
 register stacks.
@@ -48,11 +46,7 @@ stack_system_init(SHIM_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Stack_Chunk_t *
-register_new_stack(PARROT_INTERP, ARGIN(const char *name), size_t item_size)>
+=item C<Stack_Chunk_t * register_new_stack>
 
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
@@ -81,11 +75,7 @@ register_new_stack(PARROT_INTERP, ARGIN(const char *name), size_t item_size)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Stack_Chunk_t *
-cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))>
+=item C<Stack_Chunk_t * cst_new_stack_chunk>
 
 Get a new chunk either from the freelist or allocate one.
 
@@ -113,11 +103,7 @@ cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-void*
-stack_prepare_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p))>
+=item C<void* stack_prepare_push>
 
 Return a pointer, where new entries go for push.
 
@@ -142,11 +128,7 @@ stack_prepare_push(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-void*
-stack_prepare_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p))>
+=item C<void* stack_prepare_pop>
 
 Return a pointer, where new entries are popped off.
 

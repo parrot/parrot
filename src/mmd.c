@@ -204,8 +204,7 @@ static void mmd_sort_candidates(PARROT_INTERP,
 #ifndef NDEBUG
 /*
 
-=item C<static void
-dump_mmd(PARROT_INTERP, INTVAL function)>
+=item C<static void dump_mmd>
 
 RT#48260: Not yet documented!!!
 
@@ -255,12 +254,7 @@ dump_mmd(PARROT_INTERP, INTVAL function)
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-funcptr_t
-get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
-        INTVAL right_type, NOTNULL(int *is_pmc))>
+=item C<funcptr_t get_mmd_dispatch_type>
 
 RT#48260: Not yet documented!!!
 
@@ -337,11 +331,7 @@ get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static funcptr_t
-get_mmd_dispatcher(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right),
-        INTVAL function, NOTNULL(int *is_pmc))>
+=item C<static funcptr_t get_mmd_dispatcher>
 
 RT#48260: Not yet documented!!!
 
@@ -363,9 +353,7 @@ get_mmd_dispatcher(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right),
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-static PMC *
-mmd_deref(PARROT_INTERP, NOTNULL(PMC *value))>
+=item C<static PMC * mmd_deref>
 
 If C<value> is a reference-like PMC, dereference it so we can make an MMD
 call on the 'real' value.
@@ -386,8 +374,7 @@ mmd_deref(PARROT_INTERP, NOTNULL(PMC *value))
 
 /*
 
-=item C<static void
-mmd_ensure_writable(PARROT_INTERP, INTVAL function, NULLOK(PMC *pmc))>
+=item C<static void mmd_ensure_writable>
 
 Make sure C<pmc> is writable enough for C<function>.
 
@@ -406,12 +393,7 @@ mmd_ensure_writable(PARROT_INTERP, INTVAL function, NULLOK(PMC *pmc))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC*
-mmd_dispatch_p_ppp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(PMC *right), NULLOK(PMC *dest), INTVAL func_nr)>
+=item C<PMC* mmd_dispatch_p_ppp>
 
 Dispatch to a multimethod that returns a PMC. C<left>, C<right>, and
 C<dest> are all PMC pointers, while C<func_num> is the MMD table that
@@ -459,11 +441,7 @@ mmd_dispatch_p_ppp(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PMC*
-mmd_dispatch_p_pip(PARROT_INTERP,
-        NOTNULL(PMC *left), INTVAL right, NULLOK(PMC *dest), INTVAL func_nr)>
+=item C<PMC* mmd_dispatch_p_pip>
 
 Like C<mmd_dispatch_p_ppp>, right argument is a native INTVAL.
 
@@ -507,11 +485,7 @@ mmd_dispatch_p_pip(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PMC*
-mmd_dispatch_p_pnp(PARROT_INTERP,
-        NOTNULL(PMC *left), FLOATVAL right, NULLOK(PMC *dest), INTVAL func_nr)>
+=item C<PMC* mmd_dispatch_p_pnp>
 
 Like C<mmd_dispatch_p_ppp>, right argument is a native FLOATVAL.
 
@@ -550,11 +524,7 @@ mmd_dispatch_p_pnp(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PMC*
-mmd_dispatch_p_psp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(STRING *right), NULLOK(PMC *dest), INTVAL func_nr)>
+=item C<PMC* mmd_dispatch_p_psp>
 
 Like C<mmd_dispatch_p_ppp>, right argument is a native STRING *.
 
@@ -590,10 +560,7 @@ mmd_dispatch_p_psp(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_dispatch_v_pp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(PMC *right), INTVAL func_nr)>
+=item C<void mmd_dispatch_v_pp>
 
 Inplace dispatch function for C<< left <op=> right >>.
 
@@ -628,10 +595,7 @@ mmd_dispatch_v_pp(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_dispatch_v_pi(PARROT_INTERP,
-        NOTNULL(PMC *left), INTVAL right, INTVAL func_nr)>
+=item C<void mmd_dispatch_v_pi>
 
 Inplace dispatch function for C<< left <op=> right >>.
 
@@ -665,10 +629,7 @@ mmd_dispatch_v_pi(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_dispatch_v_pn(PARROT_INTERP,
-        NOTNULL(PMC *left), FLOATVAL right, INTVAL func_nr)>
+=item C<void mmd_dispatch_v_pn>
 
 Inplace dispatch function for C<< left <op=> right >>.
 
@@ -702,10 +663,7 @@ mmd_dispatch_v_pn(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_dispatch_v_ps(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(STRING *right), INTVAL func_nr)>
+=item C<void mmd_dispatch_v_ps>
 
 Inplace dispatch function for C<< left <op=> right >>.
 
@@ -739,10 +697,7 @@ mmd_dispatch_v_ps(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-INTVAL
-mmd_dispatch_i_pp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(PMC *right), INTVAL func_nr)>
+=item C<INTVAL mmd_dispatch_i_pp>
 
 Like C<mmd_dispatch_p_ppp()>, only it returns an C<INTVAL>. This is used
 by MMD compare functions.
@@ -779,10 +734,7 @@ mmd_dispatch_i_pp(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_add_function(PARROT_INTERP,
-        INTVAL func_nr, SHIM(funcptr_t function))>
+=item C<void mmd_add_function>
 
 Add a new binary MMD function to the list of functions the MMD system knows
 of. C<func_num> is the number of the new function. C<function> is ignored.
@@ -823,8 +775,7 @@ mmd_add_function(PARROT_INTERP,
 
 /*
 
-=item C<static void
-mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)>
+=item C<static void mmd_expand_x>
 
 Expands the function table in the X dimension to include C<new_x>.
 
@@ -882,8 +833,7 @@ mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
 
 /*
 
-=item C<static void
-mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)>
+=item C<static void mmd_expand_y>
 
 Expands the function table in the Y direction.
 
@@ -913,12 +863,7 @@ mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
 
 /*
 
-=item C<PARROT_API
-void
-mmd_add_by_class(PARROT_INTERP,
-             INTVAL functype,
-             NOTNULL(STRING *left_class), NOTNULL(STRING *right_class),
-             NULLOK(funcptr_t funcptr))>
+=item C<void mmd_add_by_class>
 
 Add a function to the MMD table by class name, rather than class number.
 Handles the case where the named class isn't loaded yet.
@@ -967,12 +912,7 @@ mmd_add_by_class(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_register(PARROT_INTERP,
-             INTVAL func_nr,
-             INTVAL left_type, INTVAL right_type,
-             NULLOK(funcptr_t funcptr))>
+=item C<void mmd_register>
 
 Register a function C<funcptr> for MMD function table C<func_num> for classes
 C<left_type> and C<right_type>. The left and right types are C<INTVAL>s that
@@ -1032,12 +972,7 @@ mmd_register(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_register_sub(PARROT_INTERP,
-             INTVAL func_nr,
-             INTVAL left_type, INTVAL right_type,
-             NOTNULL(PMC *sub))>
+=item C<void mmd_register_sub>
 
 RT#48260: Not yet documented!!!
 
@@ -1065,9 +1000,7 @@ mmd_register_sub(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_API
-void
-mmd_destroy(PARROT_INTERP)>
+=item C<void mmd_destroy>
 
 Frees all the memory allocated used the MMD subsystem.
 
@@ -1094,11 +1027,7 @@ mmd_destroy(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-mmd_vtfind(PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right)>
+=item C<PMC * mmd_vtfind>
 
 Return an MMD PMC function for the given data types. The return result is
 either a Sub PMC (for PASM MMD functions) or a NCI PMC holding the
@@ -1131,12 +1060,7 @@ mmd_vtfind(PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right)
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_MMD_search_default_infix(PARROT_INTERP, NOTNULL(STRING *meth),
-        INTVAL left_type, INTVAL right_type)>
+=item C<PMC * Parrot_MMD_search_default_infix>
 
 RT#48260: Not yet documented!!!
 
@@ -1161,11 +1085,7 @@ Parrot_MMD_search_default_infix(PARROT_INTERP, NOTNULL(STRING *meth),
 
 /*
 
-=item C<PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_mmd_sort_candidate_list(PARROT_INTERP, NOTNULL(PMC *candidates))>
+=item C<PMC * Parrot_mmd_sort_candidate_list>
 
 Given an array PMC (usually a MultiSub) sort the mmd candidates by their
 manhatten distance to the current args.
@@ -1202,10 +1122,7 @@ Parrot_mmd_sort_candidate_list(PARROT_INTERP, NOTNULL(PMC *candidates))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_arg_tuple_inline(PARROT_INTERP, NOTNULL(STRING *signature), va_list args)>
+=item C<static PMC* mmd_arg_tuple_inline>
 
 Return a list of argument types. PMC arguments are specified as function
 arguments.
@@ -1261,10 +1178,7 @@ mmd_arg_tuple_inline(PARROT_INTERP, NOTNULL(STRING *signature), va_list args)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC*
-mmd_arg_tuple_func(PARROT_INTERP)>
+=item C<static PMC* mmd_arg_tuple_func>
 
 Return a list of argument types. PMC arguments are take from registers
 according to calling conventions.
@@ -1359,10 +1273,7 @@ mmd_arg_tuple_func(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_search_default(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *arg_tuple))>
+=item C<static PMC* mmd_search_default>
 
 Default implementation of MMD search. Search scopes for candidates, walk the
 class hierarchy, sort all candidates by their Manhattan distance, and return
@@ -1421,9 +1332,7 @@ mmd_search_default(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *arg_tuple)
 
 /*
 
-=item C<static void
-mmd_search_classes(PARROT_INTERP, NOTNULL(STRING *meth),
-        NOTNULL(PMC *arg_tuple), NOTNULL(PMC *cl), INTVAL start_at_parent)>
+=item C<static void mmd_search_classes>
 
 Search all the classes in all MultiSubs of the candidates C<cl> and return
 a list of all candidates. C<start_at_parent> is 0 to start at the class itself
@@ -1477,8 +1386,7 @@ mmd_search_classes(PARROT_INTERP, NOTNULL(STRING *meth),
 
 /*
 
-=item C<static INTVAL
-distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b)>
+=item C<static INTVAL distance_cmp>
 
 RT#48260: Not yet documented!!!
 
@@ -1506,10 +1414,7 @@ extern void Parrot_FixedPMCArray_nci_sort(Interp* , PMC* pmc, PMC *cmp_func);
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_cvt_to_types(PARROT_INTERP, NOTNULL(PMC *multi_sig))>
+=item C<static PMC* mmd_cvt_to_types>
 
 RT#48260: Not yet documented!!!
 
@@ -1551,8 +1456,7 @@ mmd_cvt_to_types(PARROT_INTERP, NOTNULL(PMC *multi_sig))
 
 /*
 
-=item C<static UINTVAL
-mmd_distance(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *arg_tuple))>
+=item C<static UINTVAL mmd_distance>
 
 Create Manhattan Distance of sub C<pmc> against given argument types.
 0xffff is the maximum distance
@@ -1662,8 +1566,7 @@ mmd_distance(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *arg_tuple))
 
 /*
 
-=item C<static void
-mmd_sort_candidates(PARROT_INTERP, NOTNULL(PMC *arg_tuple), NOTNULL(PMC *cl))>
+=item C<static void mmd_sort_candidates>
 
 Sort the candidate list C<cl> by Manhattan Distance
 
@@ -1729,10 +1632,7 @@ mmd_sort_candidates(PARROT_INTERP, NOTNULL(PMC *arg_tuple), NOTNULL(PMC *cl))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_search_scopes(PARROT_INTERP, NOTNULL(STRING *meth))>
+=item C<static PMC* mmd_search_scopes>
 
 Search all scopes for MMD candidates matching the arguments given in
 C<arg_tuple>.
@@ -1756,9 +1656,7 @@ mmd_search_scopes(PARROT_INTERP, NOTNULL(STRING *meth))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-static int
-mmd_is_hidden(PARROT_INTERP, NOTNULL(PMC *multi), NOTNULL(PMC *cl))>
+=item C<static int mmd_is_hidden>
 
 Check if the given multi sub is hidden by any inner multi sub (already in
 the candidate list C<cl>.
@@ -1785,8 +1683,7 @@ mmd_is_hidden(PARROT_INTERP, NOTNULL(PMC *multi), NOTNULL(PMC *cl))
 
 /*
 
-=item C<static int
-mmd_maybe_candidate(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *cl))>
+=item C<static int mmd_maybe_candidate>
 
 If the candidate C<pmc> is a Sub PMC, push it on the candidate list and
 return TRUE to stop further search.
@@ -1832,8 +1729,7 @@ mmd_maybe_candidate(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *cl))
 
 /*
 
-=item C<static int
-mmd_search_cur_namespace(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *cl))>
+=item C<static int mmd_search_cur_namespace>
 
 Search the current package namespace for matching candidates. Return
 TRUE if the MMD search should stop.
@@ -1852,10 +1748,7 @@ mmd_search_cur_namespace(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *cl))
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_get_ns(PARROT_INTERP)>
+=item C<static PMC* mmd_get_ns>
 
 RT#48260: Not yet documented!!!
 
@@ -1876,10 +1769,7 @@ mmd_get_ns(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_make_ns(PARROT_INTERP)>
+=item C<static PMC* mmd_make_ns>
 
 RT#48260: Not yet documented!!!
 
@@ -1900,8 +1790,7 @@ mmd_make_ns(PARROT_INTERP)
 
 /*
 
-=item C<static void
-mmd_search_builtin(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *cl))>
+=item C<static void mmd_search_builtin>
 
 Search the builtin namespace for matching candidates. This is the last
 search in all the namespaces.
@@ -1921,8 +1810,7 @@ mmd_search_builtin(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *cl))
 
 /*
 
-=item C<void
-mmd_create_builtin_multi_stub(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL func_nr)>
+=item C<void mmd_create_builtin_multi_stub>
 
 RT#48260: Not yet documented!!!
 
@@ -1944,9 +1832,7 @@ mmd_create_builtin_multi_stub(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL func_nr)
 
 /*
 
-=item C<static void
-mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
-        INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr)>
+=item C<static void mmd_create_builtin_multi_meth_2>
 
 RT#48260: Not yet documented!!!
 
@@ -2044,9 +1930,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
 
 /*
 
-=item C<static void
-mmd_create_builtin_multi_meth(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL type,
-        ARGIN(const MMD_init *entry))>
+=item C<static void mmd_create_builtin_multi_meth>
 
 RT#48260: Not yet documented!!!
 
@@ -2064,10 +1948,7 @@ mmd_create_builtin_multi_meth(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL type,
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
-        ARGIN(const MMD_init *mmd_table), INTVAL n)>
+=item C<void Parrot_mmd_register_table>
 
 Register MMD functions for this PMC type.
 
@@ -2112,9 +1993,7 @@ Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
 
 /*
 
-=item C<PARROT_API
-void
-Parrot_mmd_rebuild_table(PARROT_INTERP, INTVAL type, INTVAL func_nr)>
+=item C<void Parrot_mmd_rebuild_table>
 
 Rebuild the static MMD_table for the given class type and MMD function
 number. If C<type> is negative all classes are rebuilt. If C<func_nr> is

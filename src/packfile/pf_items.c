@@ -97,8 +97,7 @@ static opcode_t fetch_op_test(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<static void
-cvt_num12_num8(NOTNULL(unsigned char *dest), ARGIN(const unsigned char *src))>
+=item C<static void cvt_num12_num8>
 
 convert i386 LE 12 byte long double to IEEE 754 8 byte double
 
@@ -156,8 +155,7 @@ nul:
 
 /*
 
-=item C<static void
-cvt_num12_num8_be(NOTNULL(unsigned char *dest), ARGIN(const unsigned char *src))>
+=item C<static void cvt_num12_num8_be>
 
 RT#48260: Not yet documented!!!
 
@@ -175,8 +173,7 @@ cvt_num12_num8_be(NOTNULL(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void
-cvt_num12_num8_le(NOTNULL(unsigned char *dest), NOTNULL(unsigned char *src))>
+=item C<static void cvt_num12_num8_le>
 
 RT#48260: Not yet documented!!!
 
@@ -194,8 +191,7 @@ cvt_num12_num8_le(NOTNULL(unsigned char *dest), NOTNULL(unsigned char *src))
 
 /*
 
-=item C<static opcode_t
-fetch_op_test(NOTNULL(unsigned char *b))>
+=item C<static opcode_t fetch_op_test>
 
 RT#48260: Not yet documented!!!
 
@@ -216,8 +212,7 @@ fetch_op_test(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<static opcode_t
-fetch_op_mixed_le(NOTNULL(unsigned char *b))>
+=item C<static opcode_t fetch_op_mixed_le>
 
 opcode fetch helper function
 
@@ -255,8 +250,7 @@ fetch_op_mixed_le(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<static opcode_t
-fetch_op_mixed_be(NOTNULL(unsigned char *b))>
+=item C<static opcode_t fetch_op_mixed_be>
 
 Fetch an opcode and convert to BE
 
@@ -289,8 +283,7 @@ fetch_op_mixed_be(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<static opcode_t
-fetch_op_be_4(NOTNULL(unsigned char *b))>
+=item C<static opcode_t fetch_op_be_4>
 
 RT#48260: Not yet documented!!!
 
@@ -323,8 +316,7 @@ fetch_op_be_4(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<static opcode_t
-fetch_op_be_8(NOTNULL(unsigned char *b))>
+=item C<static opcode_t fetch_op_be_8>
 
 RT#48260: Not yet documented!!!
 
@@ -353,8 +345,7 @@ fetch_op_be_8(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<static opcode_t
-fetch_op_le_4(NOTNULL(unsigned char *b))>
+=item C<static opcode_t fetch_op_le_4>
 
 RT#48260: Not yet documented!!!
 
@@ -387,8 +378,7 @@ fetch_op_le_4(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<static opcode_t
-fetch_op_le_8(NOTNULL(unsigned char *b))>
+=item C<static opcode_t fetch_op_le_8>
 
 RT#48260: Not yet documented!!!
 
@@ -417,9 +407,7 @@ fetch_op_le_8(NOTNULL(unsigned char *b))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-opcode_t
-PF_fetch_opcode(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))>
+=item C<opcode_t PF_fetch_opcode>
 
 Fetch an C<opcode_t> from the stream, converting byteorder if needed.
 
@@ -444,10 +432,7 @@ PF_fetch_opcode(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t*
-PF_store_opcode(NOTNULL(opcode_t *cursor), opcode_t val)>
+=item C<opcode_t* PF_store_opcode>
 
 Store an C<opcode_t> to stream as is.
 
@@ -466,9 +451,7 @@ PF_store_opcode(NOTNULL(opcode_t *cursor), opcode_t val)
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-size_t
-PF_size_opcode(void)>
+=item C<size_t PF_size_opcode>
 
 Return size of an item in C<opcode_t> units, which is 1 I<per
 definitionem>.
@@ -486,9 +469,7 @@ PF_size_opcode(void)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-INTVAL
-PF_fetch_integer(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))>
+=item C<INTVAL PF_fetch_integer>
 
 Fetch an C<INTVAL> from the stream, converting byteorder if needed.
 
@@ -517,10 +498,7 @@ PF_fetch_integer(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t*
-PF_store_integer(NOTNULL(opcode_t *cursor), INTVAL val)>
+=item C<opcode_t* PF_store_integer>
 
 Store an C<INTVAL> to stream as is.
 
@@ -539,9 +517,7 @@ PF_store_integer(NOTNULL(opcode_t *cursor), INTVAL val)
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-size_t
-PF_size_integer(void)>
+=item C<size_t PF_size_integer>
 
 Return store size of C<INTVAL> in C<opcode_t> units.
 
@@ -559,9 +535,7 @@ PF_size_integer(void)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-FLOATVAL
-PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))>
+=item C<FLOATVAL PF_fetch_number>
 
 Fetch a C<FLOATVAL> from the stream, converting byteorder if needed.
 Then advance stream pointer by amount of packfile float size.
@@ -608,10 +582,7 @@ PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t*
-PF_store_number(NOTNULL(opcode_t *cursor), ARGIN(const FLOATVAL *val))>
+=item C<opcode_t* PF_store_number>
 
 Write a C<FLOATVAL> to the opcode stream as is.
 
@@ -633,9 +604,7 @@ PF_store_number(NOTNULL(opcode_t *cursor), ARGIN(const FLOATVAL *val))
 
 /*
 
-=item C<PARROT_CONST_FUNCTION
-size_t
-PF_size_number(void)>
+=item C<size_t PF_size_number>
 
 Return store size of FLOATVAL in opcode_t units.
 
@@ -652,10 +621,7 @@ PF_size_number(void)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-PF_fetch_string(PARROT_INTERP, NULLOK(PackFile *pf), NOTNULL(opcode_t **cursor))>
+=item C<STRING * PF_fetch_string>
 
 Fetch a C<STRING> from bytecode and return a new C<STRING>.
 
@@ -720,10 +686,7 @@ PF_fetch_string(PARROT_INTERP, NULLOK(PackFile *pf), NOTNULL(opcode_t **cursor))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t*
-PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))>
+=item C<opcode_t* PF_store_string>
 
 Write a STRING to the opcode stream.
 
@@ -781,9 +744,7 @@ PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
 
 /*
 
-=item C<PARROT_PURE_FUNCTION
-size_t
-PF_size_string(ARGIN(const STRING *s))>
+=item C<size_t PF_size_string>
 
 Report store size of C<STRING> in C<opcode_t> units.
 
@@ -807,10 +768,7 @@ PF_size_string(ARGIN(const STRING *s))
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char *
-PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))>
+=item C<char * PF_fetch_cstring>
 
 Fetch a cstring from bytecode and return an allocated copy
 
@@ -836,10 +794,7 @@ PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t*
-PF_store_cstring(NOTNULL(opcode_t *cursor), ARGIN(const char *s))>
+=item C<opcode_t* PF_store_cstring>
 
 Write a 0-terminated string to the stream.
 
@@ -858,9 +813,7 @@ PF_store_cstring(NOTNULL(opcode_t *cursor), ARGIN(const char *s))
 
 /*
 
-=item C<PARROT_PURE_FUNCTION
-size_t
-PF_size_cstring(ARGIN(const char *s))>
+=item C<size_t PF_size_cstring>
 
 Return store size of a C-string in C<opcode_t> units.
 
@@ -881,8 +834,7 @@ PF_size_cstring(ARGIN(const char *s))
 
 /*
 
-=item C<void
-PackFile_assign_transforms(NOTNULL(PackFile *pf))>
+=item C<void PackFile_assign_transforms>
 
 Assign transform functions to vtable.
 

@@ -39,10 +39,7 @@ static STRING* trace_class_name(ARGIN(const PMC* pmc))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING*
-trace_class_name(ARGIN(const PMC* pmc))>
+=item C<static STRING* trace_class_name>
 
 Obtains the class name of the PMC.
 
@@ -69,7 +66,7 @@ trace_class_name(ARGIN(const PMC* pmc))
 
 /*
 
-=item C<void trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))>
+=item C<void trace_pmc_dump>
 
 Prints a PMC to C<stderr>.
 
@@ -158,7 +155,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 
 /*
 
-=item C<int trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))>
+=item C<int trace_key_dump>
 
 Prints a key to C<stderr>, returns the length of the output.
 
@@ -236,10 +233,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
 
 /*
 
-=item C<void
-trace_op_dump(PARROT_INTERP,
-        ARGIN(const opcode_t *code_start),
-        ARGIN(const opcode_t *pc))>
+=item C<void trace_op_dump>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
@@ -450,11 +444,7 @@ done:
 
 /*
 
-=item C<void
-trace_op(PARROT_INTERP,
-        ARGIN(const opcode_t *code_start),
-        ARGIN(const opcode_t *code_end),
-        ARGIN_NULLOK(const opcode_t *pc))>
+=item C<void trace_op>
 
 TODO: This isn't really part of the API, but here's its documentation.
 

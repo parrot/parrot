@@ -95,9 +95,7 @@ static void store_lib_pmc(PARROT_INTERP,
 
 /*
 
-=item C<static void
-set_cstring_prop(PARROT_INTERP, NOTNULL(PMC *lib_pmc), ARGIN(const char *what),
-        NOTNULL(STRING *name))>
+=item C<static void set_cstring_prop>
 
 Set a property C<name> with value C<what> on the C<ParrotLibrary>
 C<lib_pmc>.
@@ -120,9 +118,7 @@ set_cstring_prop(PARROT_INTERP, NOTNULL(PMC *lib_pmc), ARGIN(const char *what),
 
 /*
 
-=item C<static void
-store_lib_pmc(PARROT_INTERP, NOTNULL(PMC *lib_pmc), NOTNULL(STRING *path),
-        NOTNULL(STRING *type), NOTNULL(STRING *lib_name))>
+=item C<static void store_lib_pmc>
 
 Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 
@@ -149,10 +145,7 @@ store_lib_pmc(PARROT_INTERP, NOTNULL(PMC *lib_pmc), NOTNULL(STRING *path),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-is_loaded(PARROT_INTERP, NOTNULL(STRING *path))>
+=item C<static PMC* is_loaded>
 
 Check if a C<ParrotLibrary> PMC with the filename path exists.
 If it does, return it. Otherwise, return NULL.
@@ -176,11 +169,7 @@ is_loaded(PARROT_INTERP, NOTNULL(STRING *path))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static STRING *
-get_path(PARROT_INTERP, NOTNULL(STRING *lib), NOTNULL(void **handle),
-        NOTNULL(STRING *wo_ext), NOTNULL(STRING *ext))>
+=item C<static STRING * get_path>
 
 Return path and handle of a dynamic lib, setting lib_name to just the filestem
 (i.e. without path or extension) as a freshly-allocated C string.
@@ -286,12 +275,7 @@ get_path(PARROT_INTERP, NOTNULL(STRING *lib), NOTNULL(void **handle),
 
 /*
 
-=item C<PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_init_lib(PARROT_INTERP,
-                NULLOK(PMC *(*load_func)(PARROT_INTERP)),
-                NULLOK(void (*init_func)(PARROT_INTERP, NULLOK(PMC *))))>
+=item C<PMC * Parrot_init_lib>
 
 RT#48260: Not yet documented!!!
 
@@ -332,10 +316,7 @@ Parrot_init_lib(PARROT_INTERP,
 
 /*
 
-=item C<PARROT_CANNOT_RETURN_NULL
-static PMC *
-run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
-            NOTNULL(STRING *lib_name), NOTNULL(STRING *wo_ext))>
+=item C<static PMC * run_init_lib>
 
 RT#48260: Not yet documented!!!
 
@@ -406,10 +387,7 @@ run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *value))>
+=item C<static STRING * clone_string_into>
 
 RT#48260: Not yet documented!!!
 
@@ -434,10 +412,7 @@ clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *value))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))>
+=item C<static PMC * make_string_pmc>
 
 RT#48260: Not yet documented!!!
 
@@ -458,11 +433,7 @@ make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_clone_lib_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *lib_pmc))>
+=item C<PMC * Parrot_clone_lib_into>
 
 RT#48260: Not yet documented!!!
 
@@ -524,11 +495,7 @@ Parrot_clone_lib_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *lib_p
 
 /*
 
-=item C<PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))>
+=item C<PMC * Parrot_load_lib>
 
 Dynamic library loader.
 

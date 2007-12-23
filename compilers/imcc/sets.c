@@ -38,10 +38,7 @@ RT#48264
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Set*
-set_make(int length)>
+=item C<Set* set_make>
 
 RT#48260: Not yet documented!!!
 
@@ -62,10 +59,7 @@ set_make(int length)
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Set*
-set_make_full(int length)>
+=item C<Set* set_make_full>
 
 RT#48260: Not yet documented!!!
 
@@ -89,8 +83,7 @@ set_make_full(int length)
 
 /*
 
-=item C<void
-set_free(NOTNULL(Set *s))>
+=item C<void set_free>
 
 RT#48260: Not yet documented!!!
 
@@ -108,8 +101,7 @@ set_free(NOTNULL(Set *s))
 
 /*
 
-=item C<void
-set_clear(NOTNULL(Set *s))>
+=item C<void set_clear>
 
 RT#48260: Not yet documented!!!
 
@@ -125,10 +117,7 @@ set_clear(NOTNULL(Set *s))
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Set*
-set_copy(NOTNULL(Set *s))>
+=item C<Set* set_copy>
 
 RT#48260: Not yet documented!!!
 
@@ -149,8 +138,7 @@ set_copy(NOTNULL(Set *s))
 
 /*
 
-=item C<int
-set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))>
+=item C<int set_equal>
 
 RT#48260: Not yet documented!!!
 
@@ -185,8 +173,7 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<void
-set_add(NOTNULL(Set *s), int element)>
+=item C<void set_add>
 
 RT#48260: Not yet documented!!!
 
@@ -211,10 +198,7 @@ set_add(NOTNULL(Set *s), int element)
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-int
-set_first_zero(ARGIN(const Set *s))>
+=item C<int set_first_zero>
 
 RT#48260: Not yet documented!!!
 
@@ -246,10 +230,7 @@ set_first_zero(ARGIN(const Set *s))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-int
-set_contains(ARGIN(const Set *s), int element)>
+=item C<int set_contains>
 
 RT#48260: Not yet documented!!!
 
@@ -274,10 +255,7 @@ set_contains(ARGIN(const Set *s), int element)
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Set *
-set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))>
+=item C<Set * set_union>
 
 RT#48260: Not yet documented!!!
 
@@ -306,10 +284,7 @@ set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Set *
-set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))>
+=item C<Set * set_intersec>
 
 RT#48260: Not yet documented!!!
 
@@ -338,8 +313,7 @@ set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<void
-set_intersec_inplace(NOTNULL(Set *s1), ARGIN(const Set *s2))>
+=item C<void set_intersec_inplace>
 
 RT#48260: Not yet documented!!!
 

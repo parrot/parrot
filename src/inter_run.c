@@ -49,8 +49,7 @@ runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 
 /*
 
-=item C<void
-runops(PARROT_INTERP, size_t offs)>
+=item C<void runops>
 
 Run parrot ops. Set exception handler and/or resume after exception.
 
@@ -129,11 +128,7 @@ runops(PARROT_INTERP, size_t offs)
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CANNOT_RETURN_NULL
-parrot_context_t *
-Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))>
+=item C<parrot_context_t * Parrot_runops_fromc>
 
 Runs the Parrot ops, called from C code. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
@@ -174,11 +169,7 @@ Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static parrot_context_t *
-runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
-        SHIM(STRING *meth), ARGIN(const char *sig), va_list ap)>
+=item C<static parrot_context_t * runops_args>
 
 RT#48260: Not yet documented!!!
 
@@ -244,11 +235,7 @@ runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-void *
-Parrot_run_meth_fromc(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj), SHIM(STRING *meth))>
+=item C<void * Parrot_run_meth_fromc>
 
 Run a method sub from C. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
@@ -282,11 +269,7 @@ Parrot_run_meth_fromc(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj), SHIM(
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), ARGIN(const char *sig), ...)>
+=item C<PMC * Parrot_runops_fromc_args>
 
 Run parrot ops, called from C code, function arguments are passed as
 C<va_args> according to the signature. The C<sub> argument is an
@@ -321,12 +304,7 @@ Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), ARGIN(const char *sig
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-void *
-Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(PMC *sub),
-        ARGIN(const char *sig), ...)>
+=item C<void * Parrot_runops_fromc_args_event>
 
 Run code from within event handlers. This variant deals with some reentrency
 issues. It also should do sanity checks, if e.g. the handler subroutine
@@ -370,11 +348,7 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(PMC *sub),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-INTVAL
-Parrot_runops_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub),
-        ARGIN(const char *sig), ...)>
+=item C<INTVAL Parrot_runops_fromc_args_reti>
 
 RT#48260: Not yet documented!!!
 
@@ -399,11 +373,7 @@ Parrot_runops_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-FLOATVAL
-Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
-        ARGIN(const char *sig), ...)>
+=item C<FLOATVAL Parrot_runops_fromc_args_retf>
 
 RT#48260: Not yet documented!!!
 
@@ -428,12 +398,7 @@ Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-void*
-Parrot_run_meth_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
-        NOTNULL(STRING *meth), ARGIN(const char *sig), ...)>
+=item C<void* Parrot_run_meth_fromc_args>
 
 RT#48260: Not yet documented!!!
 
@@ -459,11 +424,7 @@ Parrot_run_meth_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-INTVAL
-Parrot_run_meth_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
-        NOTNULL(STRING *meth), ARGIN(const char *sig), ...)>
+=item C<INTVAL Parrot_run_meth_fromc_args_reti>
 
 RT#48260: Not yet documented!!!
 
@@ -488,11 +449,7 @@ Parrot_run_meth_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *o
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-FLOATVAL
-Parrot_run_meth_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
-        NOTNULL(STRING *meth), ARGIN(const char *sig), ...)>
+=item C<FLOATVAL Parrot_run_meth_fromc_args_retf>
 
 RT#48260: Not yet documented!!!
 
@@ -517,12 +474,7 @@ Parrot_run_meth_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *o
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-void *
-Parrot_runops_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub),
-        ARGIN(const char *sig), va_list args)>
+=item C<void * Parrot_runops_fromc_arglist>
 
 RT#48260: Not yet documented!!!
 
@@ -544,11 +496,7 @@ Parrot_runops_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-INTVAL
-Parrot_runops_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub),
-        ARGIN(const char *sig), va_list args)>
+=item C<INTVAL Parrot_runops_fromc_arglist_reti>
 
 RT#48260: Not yet documented!!!
 
@@ -569,11 +517,7 @@ Parrot_runops_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-FLOATVAL
-Parrot_runops_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub),
-        ARGIN(const char *sig), va_list args)>
+=item C<FLOATVAL Parrot_runops_fromc_arglist_retf>
 
 RT#48260: Not yet documented!!!
 
@@ -594,12 +538,7 @@ Parrot_runops_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub),
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-void*
-Parrot_run_meth_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
-        NOTNULL(STRING *meth), ARGIN(const char *sig), va_list args)>
+=item C<void* Parrot_run_meth_fromc_arglist>
 
 RT#48260: Not yet documented!!!
 
@@ -622,12 +561,7 @@ Parrot_run_meth_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-INTVAL
-Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
-        NOTNULL(STRING *meth), ARGIN(const char *sig), va_list args)>
+=item C<INTVAL Parrot_run_meth_fromc_arglist_reti>
 
 RT#48260: Not yet documented!!!
 
@@ -649,11 +583,7 @@ Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC
 
 /*
 
-=item C<PARROT_API
-PARROT_IGNORABLE_RESULT
-FLOATVAL
-Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
-        NOTNULL(STRING *meth), ARGIN(const char *sig), va_list args)>
+=item C<FLOATVAL Parrot_run_meth_fromc_arglist_retf>
 
 RT#48260: Not yet documented!!!
 

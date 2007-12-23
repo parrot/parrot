@@ -150,7 +150,7 @@ static char * str_dup(ARGIN(const char *old))
 
 /*
 
-=item C<static void help(PARROT_INTERP)>
+=item C<static void help>
 
 Print out the user help info.
 
@@ -169,10 +169,7 @@ help(PARROT_INTERP)
 
 /*
 
-=item C<PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-static char *
-str_dup(ARGIN(const char *old))>
+=item C<static char * str_dup>
 
 Duplicate a C string
 
@@ -196,10 +193,7 @@ str_dup(ARGIN(const char *old))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile*
-pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))>
+=item C<static PackFile* pbc_merge_loadpbc>
 
 This function loads a PBC file and unpacks it. We can't
 use Parrot_readbc because that is specified to also
@@ -290,11 +284,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile_ByteCode*
-pbc_merge_bytecode(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
-                   int num_inputs, NOTNULL(PackFile *pf))>
+=item C<static PackFile_ByteCode* pbc_merge_bytecode>
 
 This function merges the bytecode from the input packfiles, storing the
 offsets that each bit of bytecode now exists at.
@@ -360,11 +350,7 @@ pbc_merge_bytecode(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile_ConstTable*
-pbc_merge_constants(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
-                    int num_inputs, NOTNULL(PackFile *pf), NOTNULL(PackFile_ByteCode *bc))>
+=item C<static PackFile_ConstTable* pbc_merge_constants>
 
 This function merges the constants tables from the input PBC files.
 
@@ -462,9 +448,7 @@ pbc_merge_constants(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-=item C<static void
-pbc_merge_fixups(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
-                 int num_inputs, NOTNULL(PackFile *pf), NOTNULL(PackFile_ByteCode *bc))>
+=item C<static void pbc_merge_fixups>
 
 This function merges the fixups tables from the input PBC files.
 
@@ -559,9 +543,7 @@ pbc_merge_fixups(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-=item C<static void
-pbc_merge_debugs(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
-                 int num_inputs, NOTNULL(PackFile *pf), NOTNULL(PackFile_ByteCode *bc))>
+=item C<static void pbc_merge_debugs>
 
 This function merges the debug segments from the input PBC files.
 
@@ -630,9 +612,7 @@ pbc_merge_debugs(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-=item C<static void
-pbc_merge_pic_index(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
-                 int num_inputs, NOTNULL(PackFile *pf), NOTNULL(PackFile_ByteCode *bc))>
+=item C<static void pbc_merge_pic_index>
 
 This function merges the pic_index segments from the input PBC files.
 
@@ -683,9 +663,7 @@ pbc_merge_pic_index(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-=item C<static void
-pbc_merge_ctpointers(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
-                     int num_inputs, NOTNULL(PackFile_ByteCode *bc))>
+=item C<static void pbc_merge_ctpointers>
 
 This function corrects the pointers into the constants table found in the
 bytecode.
@@ -768,10 +746,7 @@ pbc_merge_ctpointers(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile*
-pbc_merge_begin(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs), int num_inputs)>
+=item C<static PackFile* pbc_merge_begin>
 
 This is the function that drives PBC merging process.
 
@@ -812,8 +787,7 @@ pbc_merge_begin(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs), int num_inputs
 
 /*
 
-=item C<static void
-pbc_merge_write(PARROT_INTERP, NOTNULL(PackFile *pf), ARGIN(const char *filename))>
+=item C<static void pbc_merge_write>
 
 This functions writes out the merged packfile.
 
@@ -853,7 +827,7 @@ pbc_merge_write(PARROT_INTERP, NOTNULL(PackFile *pf), ARGIN(const char *filename
 
 /*
 
-=item C<int main(int argc, char **argv)>
+=item C<int main>
 
 The main function that grabs console input, reads in the packfiles
 provided they exist, hands them to another function that runs the
