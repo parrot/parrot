@@ -165,7 +165,7 @@ void parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
         __attribute__nonnull__(2);
 
 PARROT_API
-void parrot_new_cstring_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
+void parrot_new_cstring_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
         __attribute__nonnull__(2);
 
 PARROT_API

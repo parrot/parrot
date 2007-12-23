@@ -248,7 +248,7 @@ static int thaw_pmc(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void todo_list_init(PARROT_INTERP, NOTNULL(visit_info *info))
+static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

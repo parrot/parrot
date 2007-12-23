@@ -648,7 +648,7 @@ Returns a new C string hash in C<hptr>.
 
 PARROT_API
 void
-parrot_new_cstring_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
+parrot_new_cstring_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
 {
     parrot_new_hash_x(hptr,
             enum_type_PMC,
