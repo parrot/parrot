@@ -134,3 +134,10 @@ We could put C<PARROT_WARN_UNUSED_RESULT> on this function, but since
 all C<PARROT_PURE_FUNCTION>s and C<PARROT_CONST_FUNCTION>s get flagged
 that way anyway, there's no need.
 
+=head1 Splint to-do
+
+Annotate functions with /*@only@*/ and /*@keep@*/
+
+Figure out where /*@modifies@*/ is different from /*@out@*/
+
+
