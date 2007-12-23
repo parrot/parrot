@@ -1795,7 +1795,7 @@ SPLINTFLAGS  = \
     +linelen 120 \
     -message-stream-stdout \
     +showdeephistory \
-    -show-func \
+    -showfunc \
     -tmpdir $(SPLINT_TMP) \
     \
     -show-summary \
@@ -1856,7 +1856,8 @@ SPLINTFLAGS  = \
     +shadow \
     -shiftimplementation \
     -shiftnegative \
-    +showscan \
+    -showsourceloc \
+    +show-scan \
     -skipposixheaders \
     -type \
     \
@@ -1895,7 +1896,7 @@ SPLINTFLAGS  = \
 
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
-SPLINTFLAGS_TEST   =
+SPLINTFLAGS_TEST =
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
@@ -1906,10 +1907,80 @@ splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
     +fcnpost \
-    +showsourceloc \
     +partial \
+    -bufferoverflow \
+    +enumindex \
+    src/builtin.c \
+    src/byteorder.c \
+    src/charset.c \
+    src/core_pmcs.c \
+    src/cpu_dep.c \
+    src/datatypes.c \
+    src/debug.c \
+    src/dynext.c \
+    src/embed.c \
+    src/encoding.c \
+    src/events.c \
+    src/exceptions.c \
+    src/exit.c \
+    src/extend.c \
+    src/extend_vtable.c \
+    src/fingerprint.c \
+    src/global.c \
+    src/global_setup.c \
     src/hash.c \
+    src/headers.c \
+    src/hll.c \
+    src/inter_call.c \
+    src/inter_cb.c \
+    src/inter_create.c \
+    src/inter_misc.c \
+    src/interpreter.c \
+    src/inter_run.c \
+    src/intlist.c \
+    src/key.c \
+    src/library.c \
+    src/list.c \
+    src/longopt.c \
+    src/main.c \
+    src/malloc.c \
+    src/misc.c \
+    src/mmd.c \
+    src/nci.c \
+    src/nci_test.c \
+    src/null_config.c \
+    src/objects.c \
+    src/oo.c \
+    src/packdump.c \
+    src/packfile.c \
+    src/packout.c \
+    src/parrot.c \
+    src/parrot_config.c \
+    src/pbc_info.c \
+    src/pbc_merge.c \
+    src/pdb.c \
+    src/pdump.c \
+    src/pic.c \
+    src/pic_jit.c \
+    src/platform.c \
+    src/pmc.c \
+    src/pmc_freeze.c \
+    src/revision.c \
+    src/runops_cores.c \
+    src/scheduler.c \
+    src/spf_render.c \
+    src/spf_vtable.c \
+    src/stack_common.c \
+    src/stacks.c \
     src/string.c \
+    src/string_primitives.c \
+    src/sub.c \
+    src/thread.c \
+    src/trace.c \
+    src/tsq.c \
+    src/utils.c \
+    src/vtables.c \
+    src/warnings.c
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 COVER_DIRS = \
