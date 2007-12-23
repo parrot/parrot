@@ -117,7 +117,7 @@ parrot_alloc_vtables(PARROT_INTERP)
         sizeof (VTABLE *) * PARROT_MAX_CLASSES);
 
     interp->n_vtable_max     = enum_class_core_max;
-    interp->n_vtable_alloced = PARROT_MAX_CLASSES;
+    interp->n_vtable_alloced = PARROT_MAX_CLASSES - 1;
 }
 
 /*
@@ -140,7 +140,9 @@ parrot_realloc_vtables(PARROT_INTERP)
     const INTVAL new_max     = interp->n_vtable_alloced + 16;
     const INTVAL new_size    = new_max              * sizeof (VTABLE *);
     const INTVAL old_size    = interp->n_vtable_max * sizeof (VTABLE *);
-    interp->n_vtable_alloced = new_max;
+
+    /* arrays start at zero, but we compare type numbers starting at 1 */
+    interp->n_vtable_alloced = new_max - 1;
     interp->vtables          = (VTABLE **)mem_sys_realloc_zeroed(
         interp->vtables, new_size, old_size);
 }
