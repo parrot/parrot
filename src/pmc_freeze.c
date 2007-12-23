@@ -223,7 +223,7 @@ static STRING* shift_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
 static void str_append(PARROT_INTERP,
-    NOTNULL(STRING *s),
+    ARGINOUT(STRING *s),
     ARGIN(const void *b),
     size_t len)
         __attribute__nonnull__(1)
@@ -346,7 +346,7 @@ No encoding of strings, no transcoding.
 */
 
 static void
-str_append(PARROT_INTERP, NOTNULL(STRING *s), ARGIN(const void *b), size_t len)
+str_append(PARROT_INTERP, ARGINOUT(STRING *s), ARGIN(const void *b), size_t len)
 {
     const size_t used = s->bufused;
     const int need_free = (int)PObj_buflen(s) - used - len;
@@ -966,7 +966,7 @@ Initializes the C<*info> lists.
 */
 
 static void
-todo_list_init(PARROT_INTERP, NOTNULL(visit_info *info))
+todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
 {
     info->visit_pmc_now = visit_todo_list;
     info->visit_pmc_later = add_pmc_todo_list;

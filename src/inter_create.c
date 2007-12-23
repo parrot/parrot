@@ -106,7 +106,7 @@ Create the Parrot interpreter. Allocate memory and clear the registers.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
-make_interpreter(NULLOK(Interp *parent), INTVAL flags)
+make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     Interp *interp;
 

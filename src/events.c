@@ -49,7 +49,7 @@ static QUEUE_ENTRY* dup_entry(ARGIN(const QUEUE_ENTRY *entry))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static QUEUE_ENTRY* dup_entry_interval(
-    NOTNULL(QUEUE_ENTRY *entry),
+    ARGIN(QUEUE_ENTRY *entry),
     FLOATVAL now)
         __attribute__nonnull__(1);
 
@@ -79,7 +79,7 @@ static void io_thread_ready_rd(
 
 static void Parrot_sigaction(int sig, NULLOK(void (*handler)(int)));
 static void Parrot_unblock_signal(int sig);
-static int process_events(NOTNULL(QUEUE *event_q))
+static int process_events(ARGINOUT(QUEUE *event_q))
         __attribute__nonnull__(1);
 
 static void schedule_signal_event(int signum);
@@ -1044,7 +1044,7 @@ Duplicate timed entry and add interval to C<abs_time>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static QUEUE_ENTRY*
-dup_entry_interval(NOTNULL(QUEUE_ENTRY *entry), FLOATVAL now)
+dup_entry_interval(ARGIN(QUEUE_ENTRY *entry), FLOATVAL now)
 {
     QUEUE_ENTRY  * const new_entry       = dup_entry(entry);
     parrot_event * const event           = (parrot_event *)new_entry->data;
@@ -1066,7 +1066,7 @@ Do something, when an event arrived caller has locked the mutex returns
 */
 
 static int
-process_events(NOTNULL(QUEUE *event_q))
+process_events(ARGINOUT(QUEUE *event_q))
 {
     FLOATVAL      now;
     QUEUE_ENTRY  *entry;

@@ -77,8 +77,9 @@ to get destroyed.
 #endif
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
-Parrot_new(Parrot_Interp parent)
+Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
 {
     /* inter_create.c:make_interpreter builds a new Parrot_Interp. */
     return make_interpreter(parent, PARROT_NO_FLAGS);

@@ -489,7 +489,7 @@ typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interp,
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-Parrot_Interp make_interpreter(NULLOK(Interp *parent), INTVAL flags);
+Parrot_Interp make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags);
 
 PARROT_API
 void Parrot_destroy(PARROT_INTERP)
