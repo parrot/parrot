@@ -18,13 +18,13 @@
 /* HEADERIZER BEGIN: src/scheduler.c */
 
 PARROT_API
-void Parrot_cx_add_handler(PARROT_INTERP, NOTNULL(PMC *handler))
+void Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, NOTNULL(PMC *task))
+PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -33,17 +33,17 @@ void Parrot_cx_runloop_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_cx_schedule_task(PARROT_INTERP, NOTNULL(PMC *task))
+void Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_cx_runloop_sleep(NOTNULL(PMC *scheduler))
+void Parrot_cx_runloop_sleep(ARGINOUT(PMC *scheduler))
         __attribute__nonnull__(1);
 
-void Parrot_cx_runloop_wake(PARROT_INTERP, NOTNULL(PMC *scheduler))
+void Parrot_cx_runloop_wake(PARROT_INTERP, ARGINOUT(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

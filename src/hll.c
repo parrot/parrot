@@ -258,7 +258,7 @@ Return the ID of the given HLL name or -1 on error. C<parrot> has ID 0.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_get_HLL_id(PARROT_INTERP, NULLOK(STRING *hll_name))
+Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 {
     PMC * const hll_info = interp->HLL_info;
     INTVAL      i;

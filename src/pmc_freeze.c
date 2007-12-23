@@ -63,8 +63,8 @@ static void cleanup_next_for_GC_pool(NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1);
 
 static void create_image(PARROT_INTERP,
-    NULLOK(PMC *pmc),
-    NOTNULL(visit_info *info))
+    ARGIN_NULLOK(PMC *pmc),
+    ARGINOUT(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -1594,7 +1594,7 @@ Allocate image to some estimated size.
 */
 
 static void
-create_image(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info))
+create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGINOUT(visit_info *info))
 {
     INTVAL len;
     if (!PMC_IS_NULL(pmc) && (VTABLE_does(interp, pmc,

@@ -20,31 +20,31 @@
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * runops_cgoto_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
+opcode_t * runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * runops_fast_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
+opcode_t * runops_fast_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * runops_gc_debug_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
+opcode_t * runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * runops_profile_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
+opcode_t * runops_profile_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * runops_slow_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
+opcode_t * runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

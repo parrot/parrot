@@ -33,7 +33,7 @@ INTVAL Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_get_HLL_id(PARROT_INTERP, NULLOK(STRING *hll_name))
+INTVAL Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
