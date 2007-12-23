@@ -78,6 +78,7 @@ Initializes the NCI with a C<NULL> function pointer.
 
         /* Mark that we're not a raw NCI. */
         PObj_flag_CLEAR(private2, SELF);
+        PObj_active_destroy_SET(SELF);
     }
 
 /*
@@ -118,9 +119,13 @@ Destroys the NCI, freeing any allocated memory.
     void destroy() {
         if (PMC_data(SELF)) {
             Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+
+#if defined(CAN_BUILD_CALL_FRAMES)
             if (nci_info->func)
                 mem_free_executable(nci_info->func);
+#endif
             mem_sys_free(nci_info);
+            PMC_data(SELF) = NULL;
         }
     }
 
