@@ -1086,6 +1086,11 @@ Used to unarchive the hash.
              */
             if (k_type == Hash_key_type_int && v_type == enum_hash_int) {
                 PMC * const dummy     = Parrot_new_INTVAL_hash(INTERP, 0);
+
+                /* don't leak the hash if we're going to overwrite it anyway */
+                if (PMC_struct_val(SELF))
+                    parrot_hash_destroy(INTERP, (Hash *)PMC_struct_val(SELF));
+
                 PMC_struct_val(SELF)  = PMC_struct_val(dummy);
                 PMC_struct_val(dummy) = NULL;
             }
