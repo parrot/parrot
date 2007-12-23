@@ -32,7 +32,7 @@ Scripting language inspired by Eiffel and Ruby.
 Incomplete - but all examples and test cases are working.
 Estimated progress towards release 1.0: language constructs 47%,
 libraries 6%, documentation 4%, robustness 6%.
-See also http://xamber.org/history.html
+See also L<http://xamber.org/history.html>
 
 =item Last verified with parrot version
 
@@ -40,7 +40,7 @@ See also http://xamber.org/history.html
 
 =item Location
 
-http://xamber.org/.
+L<http://xamber.org/>
 
 The Amber PMCs are in C<languages/amber>.
 
@@ -101,7 +101,7 @@ C<languages/BASIC/compiler>
 
 =item Description
 
-Basic calculator. See http://en.wikipedia.org/wiki/Bc_%28Unix%29
+Basic calculator. See L<http://en.wikipedia.org/wiki/Bc_%28Unix%29>
 Implemented with the Parrot compiler tools PGE and TGE.
 
 =item Status
@@ -154,7 +154,7 @@ C<languages/befunge>
 
 =item Description
 
-bf. See http://en.wikipedia.org/wiki/Brainfuck.
+bf. See L<http://en.wikipedia.org/wiki/Brainfuck>.
 
 =item Status
 
@@ -408,7 +408,7 @@ C<languages/jako>
 =item Description
 
 Kea Common Lisp is an implementation of ANSI Common Lisp that is
-based on CMU Common Lisp (see http://www.cons.org/cmucl/).
+based on CMU Common Lisp (see L<http://www.cons.org/cmucl/>).
 The chief goal of the Kea Common Lisp project is
 to provide easy interoperability between Lisp and the other dynamic
 languages hosted on Parrot.
@@ -427,7 +427,7 @@ suddenly much more powerful, and Kea will be able to grow rapidly.
 
 =item Location
 
-http://rgrjr.dyndns.org/lisp/kea-cl/
+L<http://rgrjr.dyndns.org/lisp/kea-cl/>
 
 =back
 
@@ -439,7 +439,7 @@ http://rgrjr.dyndns.org/lisp/kea-cl/
 =item Description
 
 lazy-k is a pure functional programming language according to the SKI calculus.
-See also http://homepages.cwi.nl/~tromp/cl/lazy-k.html
+See also L<http://homepages.cwi.nl/~tromp/cl/lazy-k.html>
 
 =item Status
 
@@ -499,7 +499,7 @@ Flex. The Parser is built with Bison.  TreeCC is used to generate the
 code for creating the Abstract Syntax Tree.
 
 There is also a Lua bytecode to PIR compiler at
-http://kjs.home.fmf.nl/lua2pir/
+L<http://kjs.home.fmf.nl/lua2pir/>
 
 =item Status
 
@@ -511,7 +511,7 @@ Simple examples are working. The current version is 0.2.2.
 
 =item Location
 
-http://kjs.home.fmf.nl/parrot/
+L<http://kjs.home.fmf.nl/parrot/>
 
 The Lua PMCs are in C<languages/lua>.
 
@@ -665,7 +665,7 @@ This directory may be removed in a future release.
 This is a Perl 6 parser/compiler, an early version (no version numbers
 yet).  It's still very early, only simple expressions and functions are
 available.  If you're in a hurry to write "real Perl 6" programs,
-you might try looking at Pugs -- http://www.pugscode.org.  Or, you
+you might try looking at Pugs -- L<http://www.pugscode.org>.  Or, you
 can send patches and contributions to the one being built here!
 
 =item Status
@@ -810,7 +810,7 @@ Basic IO and control flow elements; mutable variables; assignment.
 
 =item Location
 
-http://pugscode.org/
+L<http://pugscode.org/>
 
 =back
 
@@ -883,7 +883,7 @@ parrot's svn tree.
 
 =item Location
 
-http://pirate.tangentcode.com/
+L<http://pirate.tangentcode.com/>
 
 =back
 
@@ -994,7 +994,7 @@ C<languages/tap>
 unlambda is a pure functional programming language with mostly eager
 evaluation following the SKI calculus (+ a few extensions)
 
-See also http://www.madore.org/~david/programs/unlambda/
+See also L<http://www.madore.org/~david/programs/unlambda/>
 
 =item Status
 
@@ -1069,7 +1069,7 @@ C<languages/WMLScript>
 
 =item Description
 
-Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
+Infocom's Z-machine. See also L<http://en.wikipedia.org/wiki/Z-machine>.
 
 =item Status
 
@@ -1109,7 +1109,7 @@ C<languages/BASIC/interpreter> prior to 0.5.1.
 
 =head2 Cardinal
 
-The version at <http://rubyforge.org/projects/cardinal/> has been superseded
+The version at L<http://rubyforge.org/projects/cardinal/> has been superseded
 by the one in the repository. (See above)
 
 =head2 Pint
