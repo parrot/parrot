@@ -140,4 +140,8 @@ Annotate functions with /*@only@*/ and /*@keep@*/
 
 Figure out where /*@modifies@*/ is different from /*@out@*/
 
+=head1 More safety stuff
 
+Look at snprintf instead of sprintf
+
+Use the return values from sprintf where we would be using strlen of the result

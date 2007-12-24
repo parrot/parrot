@@ -91,7 +91,7 @@ type.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC*
-pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
+pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
           SHIM(UINTVAL flags))
 {
     INTVAL has_ext, new_flags;
@@ -363,7 +363,7 @@ As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC *
-constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
+constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init_pmc(interp, pmc, init);
@@ -382,7 +382,7 @@ This segment handles PMC registration and such.
 
 PARROT_API
 INTVAL
-pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
+pmc_register(PARROT_INTERP, ARGIN(STRING *name))
 {
     INTVAL type;
     PMC *classname_hash;
@@ -430,7 +430,7 @@ Returns the PMC type for C<name>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-pmc_type(PARROT_INTERP, NOTNULL(STRING *name))
+pmc_type(PARROT_INTERP, ARGIN(STRING *name))
 {
     PMC * const classname_hash = interp->class_hash;
     PMC * const item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
@@ -456,7 +456,7 @@ Returns the PMC type for C<name>.
 
 PARROT_API
 INTVAL
-pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))
+pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
 {
     PMC * const classname_hash = interp->class_hash;
     PMC * const item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
@@ -595,7 +595,7 @@ Registers the PMC with the interpreter's DOD registery.
 
 PARROT_API
 void
-dod_register_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
+dod_register_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_DOD(interp);
@@ -618,7 +618,7 @@ Unregisters the PMC from the interpreter's DOD registry.
 */
 
 void
-dod_unregister_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
+dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
     if (!interp->DOD_registry)
         return; /* XXX or signal exception? */
