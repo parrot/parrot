@@ -40,6 +40,17 @@ sub runstep {
         eval { cc_build(); };
 
         if ( $@ || cc_run() !~ /OK/ ) {
+            _cast_void_pointers_msg();
+            exit(-1);
+        }
+        cc_clean();
+        $self->_set_positive_result($conf);
+    }
+
+    return 1;
+}
+
+sub _cast_void_pointers_msg {
             print <<"END";
 Although it is not required by the ANSI C standard,
 Parrot requires the ability to cast from void pointers to function
@@ -52,14 +63,12 @@ to use the JIT code.
 If you wish to continue without JIT support, please re-run this script
 With the '--jitcapable=0' argument.
 END
-            exit(-1);
-        }
-        cc_clean();
-        print " (yes) " if $conf->options->get('verbose');
-        $self->set_result('yes');
-    }
+}
 
-    return 1;
+sub _set_positive_result {
+    my ($self, $conf) = @_;
+    print " (yes) " if $conf->options->get('verbose');
+    $self->set_result('yes');
 }
 
 1;
