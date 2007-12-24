@@ -73,9 +73,7 @@ sub runstep {
 
     }
     else {
-        $conf->data->set( libs => $libs );
-        print " (no) " if $verbose;
-        $self->set_result('no');
+        $self->_handle_error_case($conf, $libs, $verbose);
     }
 
     return 1;
@@ -87,6 +85,13 @@ sub _first_probe_for_aio {
     eval { cc_build(); };
     $errormsg = 1 if  $@;
     return $errormsg;
+}
+
+sub _handle_error_case {
+    my ($self, $conf, $libs, $verbose) = @_;
+    $conf->data->set( libs => $libs );
+    print " (no) " if $verbose;
+    $self->set_result('no');
 }
 
 1;
