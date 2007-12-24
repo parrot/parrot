@@ -376,8 +376,8 @@ static void
 push_ascii_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 {
     char buffer[128];
-    sprintf(buffer, "%d ", (int) v);
-    str_append(interp, io->image, buffer, strlen(buffer));
+    const size_t len = sprintf(buffer, "%d ", (int) v);
+    str_append(interp, io->image, buffer, len);
 }
 
 /*
@@ -395,8 +395,8 @@ static void
 push_ascii_number(PARROT_INTERP, ARGIN(const IMAGE_IO *io), FLOATVAL v)
 {
     char buffer[128];
-    sprintf(buffer, "%g ", (double) v);
-    str_append(interp, io->image, buffer, strlen(buffer));
+    const size_t len = sprintf(buffer, "%g ", (double) v);
+    str_append(interp, io->image, buffer, len);
 }
 
 /*
@@ -448,8 +448,8 @@ static void
 push_ascii_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const PMC* v))
 {
     char buffer[128];
-    sprintf(buffer, "%p ", (const void *)v);
-    str_append(interp, io->image, buffer, strlen(buffer));
+    const size_t len = sprintf(buffer, "%p ", (const void *)v);
+    str_append(interp, io->image, buffer, len);
 }
 
 /*
