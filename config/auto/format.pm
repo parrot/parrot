@@ -33,9 +33,17 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $ivformat, $nvformat, $nvsize );
-    my ( $iv, $nv, $floatsize, $doublesize, $ldsize ) =
-        $conf->data->get(qw(iv nv floatsize doublesize hugefloatvalsize));
+    _set_intvalfmt($conf);
+
+    _set_floatvalfmt_nvsize($conf);
+
+    return 1;
+}
+
+sub _set_intvalfmt {
+    my $conf = shift;
+    my $ivformat;
+    my $iv = $conf->data->get(qw(iv));
 
     if ( $iv eq "int" ) {
         $ivformat = "%d";
@@ -47,9 +55,16 @@ sub runstep {
         $ivformat = "%lld";
     }
     else {
-        die "Configure.pl:  Can't find a printf-style format specifier for type \"$iv\"\n";
+        die qq{Configure.pl:  Can't find a printf-style format specifier for type '$iv'\n};
     }
+    $conf->data->set( intvalfmt   => $ivformat );
+}
 
+sub _set_floatvalfmt_nvsize {
+    my $conf = shift;
+    my ( $nv, $floatsize, $doublesize, $ldsize ) =
+        $conf->data->get(qw(nv floatsize doublesize hugefloatvalsize));
+    my ( $nvformat, $nvsize );
     $nvsize = $floatsize;
     if ( $nv eq "double" ) {
         $nvsize   = $doublesize;
@@ -63,16 +78,13 @@ sub runstep {
         $nvformat = "%Lf";
     }
     else {
-        die "Configure.pl:  Can't find a printf-style format specifier for type \"$nv\"\n";
+        die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
     }
 
     $conf->data->set(
-        intvalfmt   => $ivformat,
         floatvalfmt => $nvformat,
         nvsize      => $nvsize
     );
-
-    return 1;
 }
 
 1;
