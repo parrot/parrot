@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 129-auto_pack-01.t 23905 2007-12-15 01:50:08Z jkeenan $
+# $Id$
 # 129-auto_pack-01.t
 
 use strict;
