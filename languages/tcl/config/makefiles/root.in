@@ -2,6 +2,9 @@ RM_F    = @rm_f@
 PERL    = @perl@
 PARROT  = ../../parrot@exe@
 
+BUILD_DIR   = @build_dir@
+RECONFIGURE = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+
 C_BUILTIN = src/builtin
 TCL_LIB   = library
 PMCBUILD  = $(PERL) @build_dir@/tools/build/dynpmc.pl
@@ -337,3 +340,6 @@ realclean: clean
 
 distclean: realclean
 
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=tcl
