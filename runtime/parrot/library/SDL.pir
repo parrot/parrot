@@ -216,14 +216,17 @@ SDL::Font library anyway, which calls this for you.
     loadlib ttf_lib, 'libSDL_ttf'
     unless ttf_lib goto error
 
+  initialize:
     .local pmc nci_sub
     dlfunc nci_sub, ttf_lib, 'TTF_Init', 'iv'
-    store_global 'SDL::NCI::TTF', 'Init', nci_sub
     unless nci_sub goto error
 
+    store_global 'SDL::NCI::TTF', 'Init', nci_sub
+
+    # TTF_init() returns 0 if successful, -1 on error
     .local int initialized
     initialized = nci_sub()
-    if initialized goto success
+    unless initialized goto success
 
     # XXX: wow, this is unspectacular error handling!
   error:
