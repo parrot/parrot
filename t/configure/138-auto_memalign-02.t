@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 138-auto_memalign-01.t
+# 138-auto_memalign-02.t
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use Parrot::Configure::Test qw( test_step_thru_runstep);
 
 my $args = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -39,12 +39,13 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
+$conf->data->set( memalign => 'memalign');
 my $ret = $step->runstep($conf);
 ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
+is($step->result(), q{already set}, "Expected result was set");
 is($conf->data->get('memalign'),
-    q{},
-    "memalign set to empty string as expected"
+    q{memalign},
+    "memalign set as expected"
 );
 
 pass("Completed all tests in $0");
@@ -53,11 +54,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-138-auto_memalign-01.t - test config::auto::memalign
+138-auto_memalign-02.t - test config::auto::memalign
 
 =head1 SYNOPSIS
 
-    % prove t/configure/138-auto_memalign-01.t
+    % prove t/configure/138-auto_memalign-02.t
 
 =head1 DESCRIPTION
 

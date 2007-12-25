@@ -33,8 +33,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-
     if ( $conf->options->get('miniparrot') ) {
         $conf->data->set( memalign => '' );
         $self->set_result('skipped');
@@ -49,19 +47,9 @@ sub runstep {
     }
     my $test = 0;
 
-    if ( $conf->data->get('i_malloc') ) {
-        $conf->data->set( malloc_header => 'malloc.h' );
-    }
-    else {
-        $conf->data->set( malloc_header => 'stdlib.h' );
-    }
+    _set_malloc_header($conf);
 
-    if ( $conf->data->get('ptrsize') == $conf->data->get('intsize') ) {
-        $conf->data->set( ptrcast => 'int' );
-    }
-    else {
-        $conf->data->set( ptrcast => 'long' );
-    }
+    _set_ptrcast($conf);
 
     cc_gen('config/auto/memalign/test_c.in');
     eval { cc_build(); };
@@ -79,6 +67,34 @@ sub runstep {
     }
     cc_clean();
 
+    $self->_set_memalign($conf, $test, $test2);
+
+    return 1;
+}
+
+sub _set_malloc_header {
+    my $conf = shift;
+    if ( $conf->data->get('i_malloc') ) {
+        $conf->data->set( malloc_header => 'malloc.h' );
+    }
+    else {
+        $conf->data->set( malloc_header => 'stdlib.h' );
+    }
+}
+
+sub _set_ptrcast {
+    my $conf = shift;
+    if ( $conf->data->get('ptrsize') == $conf->data->get('intsize') ) {
+        $conf->data->set( ptrcast => 'int' );
+    }
+    else {
+        $conf->data->set( ptrcast => 'long' );
+    }
+}
+
+sub _set_memalign {
+    my $self = shift;
+    my ($conf, $test, $test2) = @_;
     $conf->data->set( malloc_header => undef );
 
     my $f =
@@ -86,10 +102,8 @@ sub runstep {
         : $test  ? 'memalign'
         :          '';
     $conf->data->set( memalign => $f );
-    print( $test ? " (Yep:$f) " : " (no) " ) if $verbose;
+    print( $test ? " (Yep:$f) " : " (no) " ) if $conf->options->get('verbose');
     $self->set_result( $test ? 'yes' : 'no' );
-
-    return 1;
 }
 
 1;
