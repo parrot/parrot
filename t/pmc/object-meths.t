@@ -176,7 +176,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
     subclass P3, P2, "Baz"
     new P3, "Baz"
     new P3, "Bar"
-    find_global P0, "_sub"
+    get_global P0, "_sub"
     invokecc P0
     print "done\n"
     end
@@ -1203,7 +1203,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading find_method vtable" );
 .sub find_method :method :vtable
     .param string methodname
     print "find_method was called\n"
-    $P0 = find_global "MyClass", methodname
+    $P0 = get_hll_global ["MyClass"], methodname
     .return($P0)
 .end
 

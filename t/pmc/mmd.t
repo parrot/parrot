@@ -279,7 +279,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
-    find_global P10, "Integer_bxor_Intval"
+    get_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
     new P1, 'Integer'
@@ -306,7 +306,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - existing result" );
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
-    find_global P10, "Integer_bxor_Intval"
+    get_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
     new P0, 'Integer'
@@ -333,7 +333,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
-    find_global P10, "Integer_bxor_Intval"
+    get_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
     new P0, 'Integer'
@@ -376,9 +376,9 @@ pir_output_is( <<'CODE', <<'OUT', "first dynamic MMD call" );
     b = new "Bar"
     # create a multi the hard way
     ## m = new MultiSub
-    ## s = find_global "Foo", "foo"
+    ## s = get_global "Foo", "foo"
     ## push m, s
-    ## s = find_global "Bar", "foo"
+    ## s = get_global "Bar", "foo"
     ## push m, s
     ## global "foo" = m
     print "calling foo(f, b)\n"
@@ -892,13 +892,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', "bound __add method" );
     r = new 'Float'
     l = 3
     r = 39.42
-    m = find_global 'Float', "__add"
+    m = get_global ['Float'], "__add"
     d = m(r, l)
     print d
     print "\n"
     r = new 'Integer'
     r = 39
-    m = find_global 'Integer', "__add"
+    m = get_global ['Integer'], "__add"
     d = m(r, l)
     print d
     print "\n"

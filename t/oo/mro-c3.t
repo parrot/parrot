@@ -27,13 +27,13 @@ pir_output_is( <<'CODE', <<'OUT', 'single parent' );
     .local pmc A, B
 
     A = new 'Class'
-    $P0 = find_global 'testA'
+    $P0 = get_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
 
     B = new 'Class'
     B.'add_parent'(A)
-    $P0 = find_global 'testB'
+    $P0 = get_global 'testB'
     B.'add_method'("foo", $P0)
 
     $P0 = B.'new'()
@@ -57,20 +57,20 @@ pir_output_is( <<'CODE', <<'OUT', 'grandparent' );
     .local pmc A, B, C
 
     A = new 'Class'
-    $P0 = find_global 'testA'
+    $P0 = get_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
     A.'add_method'("baz", $P0)
 
     B = new 'Class'
     B.'add_parent'(A)
-    $P0 = find_global 'testB'
+    $P0 = get_global 'testB'
     B.'add_method'("foo", $P0)
     B.'add_method'("bar", $P0)
 
     C = new 'Class'
     C.'add_parent'(B)
-    $P0 = find_global 'testC'
+    $P0 = get_global 'testC'
     C.'add_method'("foo", $P0)
 
     $P0 = C.'new'()
@@ -99,20 +99,20 @@ pir_output_is( <<'CODE', <<'OUT', 'multiple inheritance' );
     .local pmc A, B, C
 
     A = newclass 'A'
-    $P0 = find_global 'testA'
+    $P0 = get_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
     A.'add_method'("baz", $P0)
 
     B = newclass 'B'
-    $P0 = find_global 'testB'
+    $P0 = get_global 'testB'
     B.'add_method'("foo", $P0)
     B.'add_method'("bar", $P0)
 
     C = newclass 'C'
     C.'add_parent'(B)
     C.'add_parent'(A)
-    $P0 = find_global 'testC'
+    $P0 = get_global 'testC'
     C.'add_method'("foo", $P0)
 
     $P0 = C.'new'()
@@ -141,7 +141,7 @@ pir_output_is( <<'CODE', <<'OUT', 'diamond inheritance' );
     .local pmc A, B, C, D
 
     A = newclass 'A'
-    $P0 = find_global 'testA'
+    $P0 = get_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
     A.'add_method'("baz", $P0)
@@ -149,21 +149,21 @@ pir_output_is( <<'CODE', <<'OUT', 'diamond inheritance' );
 
     B = newclass 'B'
     B.'add_parent'(A)
-    $P0 = find_global 'testB'
+    $P0 = get_global 'testB'
     B.'add_method'("foo", $P0)
     B.'add_method'("bar", $P0)
     B.'add_method'("baz", $P0)
 
     C = newclass 'C'
     C.'add_parent'(A)
-    $P0 = find_global 'testC'
+    $P0 = get_global 'testC'
     C.'add_method'("foo", $P0)
     C.'add_method'("bar", $P0)
 
     D = newclass 'D'
     D.'add_parent'(C)
     D.'add_parent'(B)
-    $P0 = find_global 'testD'
+    $P0 = get_global 'testD'
     D.'add_method'("foo", $P0)
 
     $P0 = D.'new'()

@@ -241,7 +241,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Sub" );
-    find_global P1, "_foo"
+    get_global P1, "_foo"
     freeze S0, P1
 
     thaw P0, S0

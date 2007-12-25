@@ -107,7 +107,7 @@ SKIP: {
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.5
     set P1[2], .PARROT_TIMER_HANDLER
-    find_global P2, "_timer_sub"
+    get_global P2, "_timer_sub"
     set P1[3], P2
     set P1[4], .PARROT_TIMER_RUNNING
     set P1[5], 1
@@ -133,7 +133,7 @@ OUT
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.5
     set P1[2], .PARROT_TIMER_HANDLER
-    find_global P2, "_timer_sub"
+    get_global P2, "_timer_sub"
     set P1[3], P2
     set P1[4], .PARROT_TIMER_RUNNING
     set P1[5], 1
@@ -160,7 +160,7 @@ OUT
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.2
     set P1[2], .PARROT_TIMER_HANDLER
-    find_global P2, "_timer_sub"
+    get_global P2, "_timer_sub"
     set P1[3], P2
     set P1[4], .PARROT_TIMER_REPEAT
     set P1[5], 2
@@ -190,7 +190,7 @@ OUT
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.5
     set P1[2], .PARROT_TIMER_HANDLER
-    find_global P2, "_timer_sub"
+    get_global P2, "_timer_sub"
     set P1[3], P2
     set P1[4], .PARROT_TIMER_RUNNING
     set P1[5], 1
@@ -221,7 +221,7 @@ OUT
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.5
     set P1[2], .PARROT_TIMER_HANDLER
-    find_global P2, "_timer_sub"
+    get_global P2, "_timer_sub"
     set P1[3], P2
     set P1[4], .PARROT_TIMER_RUNNING
     set P1[5], 1

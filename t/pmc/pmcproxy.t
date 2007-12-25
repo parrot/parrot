@@ -182,7 +182,7 @@ pir_output_is( <<'CODE', <<'OUT', 'can call and override non-vtable methods of t
     print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
 
     # We'll override the add_role method.
-    $P2 = find_global 'no_add_role'
+    $P2 = get_global 'no_add_role'
     $P0.'add_method'('add_role', $P2)
 
     $P2 = $P0.'new'()
@@ -220,7 +220,7 @@ pir_output_is( <<'CODE', <<'OUT', 'can call and override vtable methods of the P
     print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
 
     # We will override the add_role vtable method.
-    $P2 = find_global 'no_add_role'
+    $P2 = get_global 'no_add_role'
     $P0.'add_method'('add_role', $P2, 'vtable' => 1)
     print "ok 4 - overridden a vtable method\n"
 
@@ -269,7 +269,7 @@ pir_output_is(
     print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
 
     # We will override the inspect_str vtable method.
-    $P2 = find_global 'always42'
+    $P2 = get_global 'always42'
     $P0.'add_method'('inspect_str', $P2, 'vtable' => 1)
     print "ok 4 - overridden inspect_str method\n"
 

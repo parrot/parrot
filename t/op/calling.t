@@ -980,10 +980,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     cl = newclass "Foo"
     o = new "Foo"
     o."bar"("ok 1\n")
-    f = find_global "Foo", "bar"
+    f = get_global ["Foo"], "bar"
     f(o, "ok 2\n")
     o."baz"("ok 3\n")
-    f = find_global "Foo", "baz"
+    f = get_global ["Foo"], "baz"
     f(o, "ok 4\n")
 .end
 .namespace ["Foo"]
@@ -1295,7 +1295,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "repeated calls to eval'd sub" );
     s .= ".end\n"
     $P0 = compreg "PIR"
     $P0(s)
-    outer = find_global "XYZ", "outer"
+    outer = get_global ["XYZ"], "outer"
     $I1 = 0
   loop:
     inc $I1
