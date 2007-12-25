@@ -28,7 +28,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
     .const .Sub P0 = "_coro"
     new P10, 'Integer'
     set P10, 2
-    store_global "i", P10
+    set_global "i", P10
 lp:
     invokecc P0
     print "back "
@@ -39,7 +39,7 @@ lp:
     end
 .pcc_sub _coro:
 loop:
-    find_global P11, "i"
+    get_global P11, "i"
     dec P11
     yield
     branch loop
@@ -113,14 +113,14 @@ _main:
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
-    store_global "i", P16
+    set_global "i", P16
 lp:
     invokecc P0
     print "back "
     print P16
     print "\n"
     null S0
-    find_global P17, S0
+    get_global P17, S0
     if P16, lp
     print "done\n"
     end
@@ -132,7 +132,7 @@ _catchm:
 .pcc_sub _coro:
     push_eh _catchc
 corolp:
-    find_global P17, "i"
+    get_global P17, "i"
     dec P17
     yield
     branch corolp
@@ -152,7 +152,7 @@ _main:
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
-    store_global "i", P16
+    set_global "i", P16
 lp:
     invokecc P0
     print "back "
@@ -169,11 +169,11 @@ _catchm:
 .pcc_sub _coro:
     push_eh _catchc
 corolp:
-    find_global P17, "i"
+    get_global P17, "i"
     dec P17
     yield
     null S0
-    find_global P17, S0
+    get_global P17, S0
     branch corolp
 _catchc:
     get_results '0, 0' , P5, S0
@@ -191,7 +191,7 @@ _main:
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
-    store_global "i", P16
+    set_global "i", P16
 lp:
     invokecc P0
     print "back "
@@ -206,11 +206,11 @@ _catchm:
     end
 .pcc_sub _coro:
 corolp:
-    find_global P17, "i"
+    get_global P17, "i"
     dec P17
     yield
     null S0
-    find_global P17, S0
+    get_global P17, S0
     branch corolp
 _catchc:
     print "catch coro\n"
@@ -227,7 +227,7 @@ _main:
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
-    store_global "i", P16
+    set_global "i", P16
 lp:
     invokecc P0
     print "back "
@@ -244,11 +244,11 @@ _catchm:
 .pcc_sub _coro:
     push_eh _catchc
 corolp:
-    find_global P17, "i"
+    get_global P17, "i"
     dec P17
     yield
     null S0
-    find_global P17, S0
+    get_global P17, S0
     branch corolp
 _catchc:
     get_results '0, 0' , P5, S0

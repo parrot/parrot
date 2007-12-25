@@ -75,12 +75,12 @@ pir_output_is( <<'CODE', <<'OUT', 'accessing PMCs from nested interp' );
 .sub 'main' :main
      $S0 = <<'PIR'
  .sub 'main' :main
- 	$P0 = find_global 'some_string'
+ 	$P0 = get_global 'some_string'
     $P0 = 'Accessing globals from other interpreters.'
  .end
 PIR
      $P3 = new 'String'
-	 store_global 'some_string', $P3
+     set_global 'some_string', $P3
 
      $P0 = new 'ParrotInterpreter'
      $P1 = compreg 'PIR'

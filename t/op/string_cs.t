@@ -458,9 +458,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "todo #34660 hash" );
 .sub main :main
     $P0 = new 'Integer'
     $P0 = 42
-    store_global "Foo", unicode:"Bar", $P0
+    set_global ['Foo'], unicode:"Bar", $P0
     print "ok 1\n"
-    $P1 = find_global "Foo", "Bar"
+    $P1 = get_global ['Foo'], "Bar"
     print "ok 2\n"
     print $P1
     print "\n"

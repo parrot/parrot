@@ -11,7 +11,7 @@
     $P0 = new 'Integer'
     $P0 = 0
   set_verbose:
-    store_global 'TEST_VERBOSE', $P0
+    set_global 'TEST_VERBOSE', $P0
 
   import:
     .include 'include/test_more.pir'

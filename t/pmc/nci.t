@@ -1375,7 +1375,7 @@ OUTPUT
 
   # we need a flag if the call_back is already done
   new P10, 'Integer'
-  store_global "cb_done", P10
+  set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
@@ -1397,7 +1397,7 @@ OUTPUT
 loop:
   inc I20
   sleep 0.01
-  find_global P11, "cb_done"
+  get_global P11, "cb_done"
   if P11, fin
   gt I20, 10, err
   branch loop
@@ -1417,7 +1417,7 @@ err:
   print "external data: "
   print S5
   print "\n"
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 
@@ -1438,7 +1438,7 @@ OUTPUT
     .local pmc cb_done
     cb_done = new 'Integer'
     cb_done = 0
-    store_global "cb_done", cb_done
+    set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
@@ -1468,7 +1468,7 @@ LOOP:
     sleep_cnt += 1
     sleep 0.01
     .local pmc callback_has_run
-    callback_has_run = find_global "cb_done"
+    callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
     if sleep_cnt > 10 goto ERROR
     goto LOOP
@@ -1490,7 +1490,7 @@ ERROR:
   print "external data: "
   print s
   print "\n"
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 .end
@@ -1507,7 +1507,7 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM" );
   # we need a flag if the call_back is already done
   new P10, 'Integer'
-  store_global "cb_done", P10
+  set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
@@ -1529,7 +1529,7 @@ OUTPUT
 loop:
   inc I20
   sleep 0.01
-  find_global P11, "cb_done"
+  get_global P11, "cb_done"
   if P11, fin
   gt I20, 10, err
   branch loop
@@ -1549,7 +1549,7 @@ err:
   print "external data: "
   print I5
   print "\n"
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 
@@ -1574,7 +1574,7 @@ OUTPUT
     .local pmc cb_done
     cb_done = new 'Integer'
     cb_done = 0
-    store_global "cb_done", cb_done
+    set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
@@ -1604,7 +1604,7 @@ LOOP:
     sleep_cnt += 1
     sleep 0.01
     .local pmc callback_has_run
-    callback_has_run = find_global "cb_done"
+    callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
     if sleep_cnt > 10 goto ERROR
     goto LOOP
@@ -1636,7 +1636,7 @@ ERROR:
   print I17
   print "\n"
 
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 .end
@@ -1654,7 +1654,7 @@ OUTPUT
 
   # we need a flag if the call_back is already done
   new P10, 'Integer'
-  store_global "cb_done", P10
+  set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
@@ -1676,7 +1676,7 @@ OUTPUT
 loop:
   inc I20
   sleep 0.01
-  find_global P11, "cb_done"
+  get_global P11, "cb_done"
   if P11, fin
   gt I20, 10, err
   branch loop
@@ -1696,7 +1696,7 @@ err:
   print "external data: "
   print S5
   print "\n"
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 
@@ -1712,7 +1712,7 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM" );
   # we need a flag if the call_back is already done
   new P10, 'Integer'
-  store_global "cb_done", P10
+  set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
@@ -1734,7 +1734,7 @@ OUTPUT
 loop:
   inc I20
   sleep 0.01
-  find_global P11, "cb_done"
+  get_global P11, "cb_done"
   if P11, fin
   gt I20, 10, err
   branch loop
@@ -1754,7 +1754,7 @@ err:
   print "external data: "
   print I5
   print "\n"
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 
@@ -1776,7 +1776,7 @@ OUTPUT
     .local pmc cb_done
     cb_done = new 'Integer'
     cb_done = 0
-    store_global "cb_done", cb_done
+    set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
@@ -1806,7 +1806,7 @@ LOOP:
     sleep_cnt += 1
     sleep 0.01
     .local pmc callback_has_run
-    callback_has_run = find_global "cb_done"
+    callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
     if sleep_cnt > 10 goto ERROR
     goto LOOP
@@ -1828,7 +1828,7 @@ ERROR:
   print "external data: "
   print i
   print "\n"
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 .end
@@ -1853,7 +1853,7 @@ OUTPUT
     .local pmc cb_done
     cb_done = new 'Integer'
     cb_done = 0
-    store_global "cb_done", cb_done
+    set_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
@@ -1883,7 +1883,7 @@ LOOP:
     sleep_cnt += 1
     sleep 0.01
     .local pmc callback_has_run
-    callback_has_run = find_global "cb_done"
+    callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
     if sleep_cnt > 10 goto ERROR
     goto LOOP
@@ -1916,7 +1916,7 @@ ERROR:
   print I17
   print "\n"
 
-  find_global P12, "cb_done"
+  get_global P12, "cb_done"
   inc P12
   returncc
 .end

@@ -67,7 +67,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
     new P5, 'Integer'
     set P5, 3
-    store_global "foo", P5
+    set_global "foo", P5
     new P1, 'Continuation'
     set_addr P1, endcont
 endcont:
@@ -77,7 +77,7 @@ endcont:
     print "\n"
     unless P4, done
     dec P4
-    store_global "foo", P4
+    set_global "foo", P4
     print "going to cont\n"
     clone P0, P1
     invokecc P0

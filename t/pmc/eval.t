@@ -43,7 +43,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
     compreg P1, "PASM"
     set_args "0", S5
     invokecc P1
-    find_global P0, "_foo"
+    get_global P0, "_foo"
     invokecc P0
     print "back\n"
     end
@@ -65,10 +65,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
     set_args "0", S5
     get_results "0", P6
     invokecc P1
-    find_global P2, "_foo"
+    get_global P2, "_foo"
     invokecc P2
     print "back\n"
-    find_global P2, "_bar"
+    get_global P2, "_bar"
     invokecc P2
     print "fin\n"
     end
@@ -83,7 +83,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub" );
 
 .sub test :main
     .local NCI compiler
-    find_global compiler, "xcompile"
+    get_global compiler, "xcompile"
     compreg "XPASM", compiler
     .local pmc my_compiler
     my_compiler = compreg "XPASM"
@@ -128,9 +128,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "bug #31467" );
      $P0 = $P2($S0)
      $P1['dynamic'] = $P0
 
-     store_global "funcs", $P1
+     set_global "funcs", $P1
 
-     $S0 = ".sub main\n$P1 = find_global\"funcs\"\n"
+     $S0 = ".sub main\n$P1 = get_global\"funcs\"\n"
      $S0 .= "$P0 = $P1['dynamic']\n$P0()\n"
      $S0 .= "$P0 = $P1['builtin']\n$P0()\n"
      $S0 .= ".end\n"
@@ -162,7 +162,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PASM" );
 .end
 
 .sub register_compiler
-  $P0 = find_global "puts"
+  $P0 = get_global "puts"
   compreg "PUTS", $P0
 .end
 
@@ -204,9 +204,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PIR" );
  .local pmc counter
  counter = new 'Integer'
  counter = 0
- store_global "counter", counter
+ set_global "counter", counter
 
-  $P0 = find_global "_puts"
+  $P0 = get_global "_puts"
   compreg "PUTS", $P0
 .end
 
@@ -217,7 +217,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PIR" );
   pir_compiler = compreg "PIR"
 
   .local pmc counter
-  counter = find_global "counter"
+  counter = get_global "counter"
   inc counter
 
   .local string code
@@ -396,7 +396,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "eval.thaw" );
     close io
     e = thaw $S0
     e()
-    e = find_global "foo_1"
+    e = get_global "foo_1"
     e()
 .end
 CODE
@@ -453,7 +453,7 @@ MORE
     close io
     e = thaw $S0
     e()
-    e = find_global "foo_1"
+    e = get_global "foo_1"
     e()
 .end
 CODE

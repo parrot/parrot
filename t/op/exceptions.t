@@ -401,10 +401,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  continuation' );
     .local pmc outer, cont
     outer = new 'String'
     outer = "Outer value\n"
-    store_global "Foo::Bar", "test", outer
+    set_global ['Foo'; 'Bar'], "test", outer
     new cont, 'Continuation'
     set_addr cont, endcont
-    store_global "Foo::Bar", "exit", cont
+    set_global ['Foo'; 'Bar'], "exit", cont
     show_value()
     test1()
     print "skipped.\n"
@@ -416,11 +416,11 @@ endcont:
     .lex "old_value", old_value
     test1_binding = new 'String'
     test1_binding = "Inner value\n"
-    old_value = find_global "Foo::Bar", "test"
+    old_value = get_global ['Foo'; 'Bar'], "test"
     .const .Sub test1_cleanup_sub = "test1_cleanup"
     cleanup = newclosure test1_cleanup_sub
     pushaction cleanup
-    store_global "Foo::Bar", "test", test1_binding
+    set_global ['Foo'; 'Bar'], "test", test1_binding
     show_value()
     test2()
     show_value()
@@ -429,20 +429,20 @@ endcont:
     .local pmc old_value
     print "[in test1_cleanup]\n"
     find_lex old_value, "old_value"
-    store_global "Foo::Bar", "test", old_value
+    set_global ['Foo'; 'Bar'], "test", old_value
 .end
 .sub test2
     .local pmc test2_binding, exit
     test2_binding = new 'String'
     test2_binding = "Innerer value\n"
-    store_global "Foo::Bar", "test", test2_binding
+    set_global ['Foo'; 'Bar'], "test", test2_binding
     show_value()
-    exit = find_global "Foo::Bar", "exit"
+    exit = get_global ['Foo'; 'Bar'], "exit"
     exit()
 .end
 .sub show_value
     .local pmc value
-    value = find_global "Foo::Bar", "test"
+    value = get_global ['Foo'; 'Bar'], "test"
     print value
 .end
 CODE
@@ -458,7 +458,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  throw' );
     .local pmc outer
     outer = new 'String'
     outer = "Outer value\n"
-    store_global "Foo::Bar", "test", outer
+    set_global ['Foo'; 'Bar'], "test", outer
     push_eh eh
     show_value()
     test1()
@@ -477,11 +477,11 @@ last:
     .lex "old_value", old_value
     test1_binding = new 'String'
     test1_binding = "Inner value\n"
-    old_value = find_global "Foo::Bar", "test"
+    old_value = get_global ['Foo'; 'Bar'], "test"
     .const .Sub test1_cleanup_sub = "test1_cleanup"
     cleanup = newclosure test1_cleanup_sub
     pushaction cleanup
-    store_global "Foo::Bar", "test", test1_binding
+    set_global ['Foo'; 'Bar'], "test", test1_binding
     show_value()
     test2()
     show_value()
@@ -490,13 +490,13 @@ last:
     .local pmc old_value
     print "[in test1_cleanup]\n"
     find_lex old_value, "old_value"
-    store_global "Foo::Bar", "test", old_value
+    set_global ['Foo'; 'Bar'], "test", old_value
 .end
 .sub test2
     .local pmc test2_binding, exit
     test2_binding = new 'String'
     test2_binding = "Innerer value\n"
-    store_global "Foo::Bar", "test", test2_binding
+    set_global ['Foo'; 'Bar'], "test", test2_binding
     show_value()
     exit = new 'Exception'
     exit["_message"] = "something happened"
@@ -504,7 +504,7 @@ last:
 .end
 .sub show_value
     .local pmc value
-    value = find_global "Foo::Bar", "test"
+    value = get_global ['Foo'; 'Bar'], "test"
     print value
 .end
 CODE
