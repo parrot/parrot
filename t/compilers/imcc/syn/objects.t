@@ -121,7 +121,7 @@ pir_output_is( <<'CODE', <<'OUT', "initializer" );
     subclass P2, P1, "Bar"
     subclass P3, P2, "Baz"
     P3 = new "Baz"
-    find_global P0, "_sub"
+    get_global P0, "_sub"
     invokecc P0
     print "done\n"
     end

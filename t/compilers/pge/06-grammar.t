@@ -26,7 +26,7 @@ Test some simple grammars.
     # avoid name clashes in grammars with fatal method redefinition
     test_num  = new 'Integer'
     test_num  = 0
-    store_global 'test_num', test_num
+    set_global 'test_num', test_num
 
     # the test builder
     test = new 'Test::Builder'
@@ -130,7 +130,7 @@ EOF_SIMPLE_GRAMMAR
                   compiler = '_compile_grammar'(grammar)
 
     .local pmc    test_num
-                  test_num  = find_global 'test_num'
+                  test_num  = get_global 'test_num'
 
     # it starts at zero
     inc test_num

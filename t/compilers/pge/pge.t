@@ -107,12 +107,12 @@ OUT
 for my $file ( sort keys %$ns_subs ) {
     for my $ns ( sort keys %{ $ns_subs->{$file} } ) {
         for my $sub ( sort @{ $ns_subs->{$file}{$ns} } ) {
-            ## find_global
-            pir_output_is( <<CODE. $POST, <<OUT, 'find_global $file: ($ns:: $sub)' );
+            ## get_global
+            pir_output_is( <<CODE. $POST, <<OUT, 'get_global $file: ($ns:: $sub)' );
 .sub 'main' :main
         load_bytecode 'PGE.pbc'
         .local pmc sub
-        sub = find_global '$ns', '$sub'
+        sub = get_global ['$ns'], '$sub'
 CODE
 ok
 OUT

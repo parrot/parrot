@@ -426,9 +426,9 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "\:anon doesn't install symbol 1" );
 .sub main :main
     .local pmc result
-    result = find_global 'anon'
+    result = get_global 'anon'
     unless null result goto callit
-    result = find_global 'ok'
+    result = get_global 'ok'
   callit:
     result()
 .end
@@ -447,7 +447,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "\:anon doesn't install symbol 2" );
 .sub main :main
     .local pmc result
-    result= find_global 'anon'
+    result= get_global 'anon'
     result()
 .end
 
@@ -465,9 +465,9 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "multiple \:anon subs with same name" );
 .sub main :main
     .local pmc result
-    result= find_global 'anon'
+    result= get_global 'anon'
     unless null result goto callit
-    result = find_global 'ok'
+    result = get_global 'ok'
   callit:
     result()
 .end
