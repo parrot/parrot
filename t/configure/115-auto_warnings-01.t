@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 115-auto_warnings.t
+# 115-auto_warnings-01.t
 
 use strict;
 use warnings;
@@ -45,17 +45,17 @@ TODO: {
 
 =head1 NAME
 
-115-auto_warnings.t - test config::auto::warnings
+115-auto_warnings-01.t - test config::auto::warnings
 
 =head1 SYNOPSIS
 
-    % prove t/configure/115-auto_warnings.t
+    % prove t/configure/115-auto_warnings-01.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::warnings.
+The tests in this file test aspects of config::auto::warnings.
 
 =head1 AUTHOR
 

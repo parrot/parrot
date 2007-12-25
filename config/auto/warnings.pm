@@ -34,116 +34,125 @@ sub _init {
     $data{description} = q{Detecting supported compiler warnings (-Wxxx)};
     $data{args}        = [ qw( cc verbose define  ) ];
     $data{result}      = q{};
+
+    # potential addition? -fvisibility=hidden
+    my @potential_warnings = qw(
+        -falign-functions=16
+        -mno-accumulate-outgoing-args
+        -W
+        -Wall
+        -Waggregate-return
+        -Wbad-function-cast
+        -Wc++-compat
+        -Wcast-align
+        -Wcast-qual
+        -Wchar-subscripts
+        -Wcomment
+        -Wdeclaration-after-statement
+        -Wdisabled-optimization
+        -Wextra
+        -Wformat-nonliteral
+        -Wformat-security
+        -Wformat-y2k
+        -Wimplicit
+        -Wimplicit-function-declaration
+        -Wimplicit-int
+        -Wimport
+        -Winit-self
+        -Winline
+        -Winvalid-pch
+        -Wlogical-op
+        -Wmain
+        -Wmissing-braces
+        -Wmissing-declarations
+        -Wmissing-field-initializers
+        -Wmissing-include-dirs
+        -Wmissing-prototypes
+        -Wnested-externs
+        -Wno-accumulate-outgoing-args
+        -Wno-endif-labels
+        -Wno-shadow
+        -Wno-unused
+        -Wnonnull
+        -Wold-style-definition
+        -Wpacked
+        -Wparentheses
+        -Wpointer-arith
+        -Wreturn-type
+        -Wsequence-point
+        -Wsign-compare
+        -Wstrict-aliasing
+        -Wstrict-aliasing=2
+        -Wstrict-prototypes
+        -Wswitch
+        -Wswitch-default
+        -Wtrigraphs
+        -Wundef
+        -Wunknown-pragmas
+        -Wvariadic-macros
+        -Wwrite-strings
+        -Wnot-a-real-warning
+    );
+    
+    my @cage_warnings = qw(
+        -std=c89
+        -Wconversion
+        -Werror-implicit-function-declaration
+        -Wformat=2
+        -Wlarger-than-4096
+        -Wlong-long
+        -Wmissing-format-attribute
+        -Wmissing-noreturn
+        -Wno-deprecated-declarations
+        -Wno-div-by-zero
+        -Wno-format-extra-args
+        -Wno-import
+        -Wno-multichar
+        -Wno-pointer-sign
+        -Wpadded
+        -Wredundant-decls
+        -Wswitch-enum
+        -Wsystem-headers
+        -Wunreachable-code
+        -Wunused-function
+        -Wunused-label
+        -Wunused-parameter
+        -Wunused-value
+        -Wunused-variable
+    );
+    
+    $data{potential_warnings} = \@potential_warnings;
+    $data{cage_warnings} = \@cage_warnings;
     return \%data;
 }
-
-# potential addition? -fvisibility=hidden
-
-our @potential_warnings = qw(
-    -falign-functions=16
-    -mno-accumulate-outgoing-args
-    -W
-    -Wall
-    -Waggregate-return
-    -Wbad-function-cast
-    -Wc++-compat
-    -Wcast-align
-    -Wcast-qual
-    -Wchar-subscripts
-    -Wcomment
-    -Wdeclaration-after-statement
-    -Wdisabled-optimization
-    -Wextra
-    -Wformat-nonliteral
-    -Wformat-security
-    -Wformat-y2k
-    -Wimplicit
-    -Wimplicit-function-declaration
-    -Wimplicit-int
-    -Wimport
-    -Winit-self
-    -Winline
-    -Winvalid-pch
-    -Wlogical-op
-    -Wmain
-    -Wmissing-braces
-    -Wmissing-declarations
-    -Wmissing-field-initializers
-    -Wmissing-include-dirs
-    -Wmissing-prototypes
-    -Wnested-externs
-    -Wno-accumulate-outgoing-args
-    -Wno-endif-labels
-    -Wno-shadow
-    -Wno-unused
-    -Wnonnull
-    -Wold-style-definition
-    -Wpacked
-    -Wparentheses
-    -Wpointer-arith
-    -Wreturn-type
-    -Wsequence-point
-    -Wsign-compare
-    -Wstrict-aliasing
-    -Wstrict-aliasing=2
-    -Wstrict-prototypes
-    -Wswitch
-    -Wswitch-default
-    -Wtrigraphs
-    -Wundef
-    -Wunknown-pragmas
-    -Wvariadic-macros
-    -Wwrite-strings
-    -Wnot-a-real-warning
-);
-
-our @cage_warnings = qw(
-    -std=c89
-    -Wconversion
-    -Werror-implicit-function-declaration
-    -Wformat=2
-    -Wlarger-than-4096
-    -Wlong-long
-    -Wmissing-format-attribute
-    -Wmissing-noreturn
-    -Wno-deprecated-declarations
-    -Wno-div-by-zero
-    -Wno-format-extra-args
-    -Wno-import
-    -Wno-multichar
-    -Wno-pointer-sign
-    -Wpadded
-    -Wredundant-decls
-    -Wswitch-enum
-    -Wsystem-headers
-    -Wunreachable-code
-    -Wunused-function
-    -Wunused-label
-    -Wunused-parameter
-    -Wunused-value
-    -Wunused-variable
-    );
-
-our $verbose;
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $verbose = $conf->options->get('verbose');
+    my $verbose = $conf->options->get('verbose');
     print "\n" if $verbose;
 
     # add on some extra warnings if requested
-    push @potential_warnings, @cage_warnings
-        if $conf->options->get('cage');
-
-    push @potential_warnings, '-Wlarger-than-4096'
-        if $conf->options->get('maintainer');
+    _add_cage_warnings($self, $conf);
+    _add_maintainer_warnings($self, $conf);
 
     # now try out our warnings
-    for my $maybe_warning (@potential_warnings) {
-        $self->try_warning( $conf, $maybe_warning );
+    for my $maybe_warning (@{ $self->{potential_warnings} }) {
+        $self->try_warning( $conf, $maybe_warning, $verbose );
     }
     return 1;
+}
+
+sub _add_cage_warnings {
+    my ($self, $conf) = @_;
+    push @{ $self->{potential_warnings} }, @{ $self->{cage_warnings} }
+        if $conf->options->get('cage');
+}
+
+sub _add_maintainer_warnings {
+    my ($self, $conf) = @_;
+    push @{ $self->{potential_warnings} }, '-Wlarger-than-4096'
+        if $conf->options->get('maintainer');
 }
 
 =item C<try_warning>
@@ -159,7 +168,7 @@ otherwise.
 =cut
 
 sub try_warning {
-    my ( $self, $conf, $warning ) = @_;
+    my ( $self, $conf, $warning, $verbose ) = @_;
 
     my $output_file = 'test.cco';
 
@@ -175,21 +184,30 @@ sub try_warning {
     $verbose and print "  ", $command_line, "\n";
 
     # Don't use cc_build, because failure is expected.
-    my $exit_code =
-        Parrot::Configure::Step::_run_command( $command_line, $output_file, $output_file );
-    $verbose and print "  exit code: $exit_code\n";
-
-    $conf->data->set( $warning => !$exit_code | 0 );
+    my $exit_code = Parrot::Configure::Step::_run_command(
+        $command_line, $output_file, $output_file
+    );
+    _set_warning($conf, $warning, $exit_code, $verbose);
 
     return if $exit_code;
 
     my $output = Parrot::BuildUtil::slurp_file($output_file);
+    return _set_ccflags($conf, $output, $tryflags, $verbose);
+}
+
+sub _set_warning {
+    my ($conf, $warning, $exit_code, $verbose) = @_;
+    $verbose and print "  exit code: $exit_code\n";
+    $conf->data->set( $warning => !$exit_code || 0 );
+}
+
+sub _set_ccflags {
+    my ($conf, $output, $tryflags, $verbose) = @_;
     $verbose and print "  output: $output\n";
 
     if ( $output !~ /error|warning|not supported/i ) {
         $conf->data->set( ccflags => $tryflags );
-        my $ccflags = $conf->data->get("ccflags");
-        $verbose and print "  ccflags: $ccflags\n";
+        $verbose and print "  ccflags: ", $conf->data->get("ccflags"), "\n";
         return 1;
     }
     else {
