@@ -15,12 +15,12 @@
 	.local pmc test_out
 	.local pmc test_diag
 	.local pmc test_test
-	plan      = find_global 'Test::Builder::Tester', 'plan'
-	test_pass = find_global 'Test::Builder::Tester', 'test_pass'
-	test_fail = find_global 'Test::Builder::Tester', 'test_fail'
-	test_out  = find_global 'Test::Builder::Tester', 'test_out'
-	test_diag = find_global 'Test::Builder::Tester', 'test_diag'
-	test_test = find_global 'Test::Builder::Tester', 'test_test'
+	plan      = get_global ['Test::Builder::Tester'], 'plan'
+	test_pass = get_global ['Test::Builder::Tester'], 'test_pass'
+	test_fail = get_global ['Test::Builder::Tester'], 'test_fail'
+	test_out  = get_global ['Test::Builder::Tester'], 'test_out'
+	test_diag = get_global ['Test::Builder::Tester'], 'test_diag'
+	test_test = get_global ['Test::Builder::Tester'], 'test_test'
 
 	plan( 12 )
 

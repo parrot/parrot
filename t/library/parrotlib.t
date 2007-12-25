@@ -46,7 +46,7 @@ END_CODE
 
 pir_output_is( << "END_CODE", << 'END_OUT', 'include_file_location' );
 $template_top
-  location_sub = find_global "_parrotlib", "include_file_location"
+  location_sub = get_global ["_parrotlib"], "include_file_location"
   location     = location_sub( 'datatypes.pasm' )
 $template_bottom
 END_CODE
@@ -55,7 +55,7 @@ END_OUT
 
 pir_output_is( << "END_CODE", << 'END_OUT', 'include_file_location, non-existent' );
 $template_top
-  location_sub = find_global "_parrotlib", "include_file_location"
+  location_sub = get_global ['_parrotlib'], "include_file_location"
   location     = location_sub( 'nonexistent.pasm' )
 $template_bottom
 END_CODE
@@ -66,7 +66,7 @@ END_OUT
 
 pir_output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location' );
 $template_top
-  location_sub = find_global "_parrotlib", "imcc_compile_file_location"
+  location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
   location     = location_sub( 'parrotlib.pbc' )
 $template_bottom
 END_CODE
@@ -75,7 +75,7 @@ END_OUT
 
 pir_output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location, non-existent' );
 $template_top
-  location_sub = find_global "_parrotlib", "imcc_compile_file_location"
+  location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
   location     = location_sub( 'nonexistent.pbc' )
 $template_bottom
 END_CODE
@@ -86,7 +86,7 @@ END_OUT
 
 pir_output_is( << "END_CODE", << "END_OUT", 'dynext_location' );
 $template_top
-  location_sub = find_global "_parrotlib", "dynext_location"
+  location_sub = get_global ['_parrotlib'], "dynext_location"
   location     = location_sub( 'libnci_test', '$PConfig{load_ext}' )
 $template_bottom
 END_CODE
@@ -95,7 +95,7 @@ END_OUT
 
 pir_output_is( << "END_CODE", << 'END_OUT', 'dynext_location, non-existent' );
 $template_top
-  location_sub = find_global "_parrotlib", "imcc_compile_file_location"
+  location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
   location     = location_sub( 'nonexistent' )
 $template_bottom
 END_CODE

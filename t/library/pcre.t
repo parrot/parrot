@@ -66,7 +66,7 @@ SKIP: {
     .local pmc lib
 
 
-    find_global func, 'PCRE', 'init'
+    get_global func, ['PCRE'], 'init'
     if_null func, NOK1
     branch OK1
 NOK1:
@@ -93,7 +93,7 @@ OK2:
     .local string error
     .local int errptr
 
-    func= find_global 'PCRE', 'compile'
+    func= get_global ['PCRE'], 'compile'
     ( code, error, errptr )= func( pat, 0 )
 
     .local int is_code_defined
@@ -106,7 +106,7 @@ OK3:
     .local int ok
     .local pmc result
 
-    func= find_global 'PCRE', 'match'
+    func= get_global ['PCRE'], 'match'
     ( ok, result )= func( code, s, 0, 0 )
 
     unless ok < 0 goto OK4
@@ -118,7 +118,7 @@ OK4:
     i= 0
     .local string match
 
-    func= find_global 'PCRE', 'dollar'
+    func= get_global ['PCRE'], 'dollar'
     match= func( s, ok, result, i )
     if 'a' == match goto OK5
     print 'not '

@@ -78,7 +78,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "one alarm" );
 .loadlib "myops_ops"
 
 .sub main :main
-    find_global P0, "_alarm"
+    get_global P0, "_alarm"
     alarm 2.0, P0
     sleep 1
     print "1\n"
@@ -111,11 +111,11 @@ SKIP: {
 
 .loadlib "myops_ops"
 .sub main :main
-    find_global P0, "_alarm3"
+    get_global P0, "_alarm3"
     alarm 3.3, 0.4, P0
-    find_global P0, "_alarm2"
+    get_global P0, "_alarm2"
     alarm 2.2, P0
-    find_global P0, "_alarm1"
+    get_global P0, "_alarm1"
     alarm 1.5, 2.0, P0
     set I0, 1
 loop:

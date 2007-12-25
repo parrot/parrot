@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting already sorted numbers" );
     push array, 8
     push array, 9
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
     i = 0
     j = array
@@ -90,7 +90,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted numbers" );
     push array, 1
     push array, 0
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
     i = 0
     j = array
@@ -136,7 +136,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted numbers (2)" );
     push array, 9
     push array, 0
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
 
     i = 0
@@ -181,7 +181,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting sorted strings" );
     push array, "golf"
     push array, "hotel"
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
 
     i = 0
@@ -224,7 +224,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
     push array, "bravo"
     push array, "echo"
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
 
     i = 0
@@ -279,7 +279,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting different types" );
     push array, 0
     push array, "echo"
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
 
     i = 0
@@ -330,7 +330,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting letters" );
     push array, "h"
     push array, "y"
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
 
     i = 0
@@ -376,7 +376,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting String letters" );
     set tmp, "y"
     push array, tmp
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
 
     i = 0
@@ -415,7 +415,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting strings" );
     push array, "bbbbbb"
     push array, "aaaa1"
 
-    sort = find_global "Data::Sort", "simple"
+    sort = get_global ['Data::Sort'], "simple"
     sort( array )
 
     i = 0

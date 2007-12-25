@@ -28,7 +28,7 @@ my $PRE = <<"PRE";
 
     .local pmc escape_string
 
-    escape_string = find_global "$ns", 'String'
+    escape_string = get_global ['$ns'], 'String'
 PRE
 
 my $POST = <<'POST';
@@ -57,13 +57,13 @@ CODE
 ok
 OUT
 
-## find_global tests
+## get_global tests
 for my $sub (@subs) {
-    pir_output_is( <<CODE, <<'OUT', "find_global '$sub'" );
+    pir_output_is( <<CODE, <<'OUT', "get_global ['$sub']" );
 .sub main :main
     load_bytecode "$lib"
     .local pmc sub
-    sub = find_global "$ns", "$sub"
+    sub = get_global ['$ns'], "$sub"
     goto OK
 NOK:
     print "not "
@@ -75,7 +75,7 @@ END:
 CODE
 ok
 OUT
-} ## end find_global tests
+} ## end get_global tests
 
 pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: empty string" );
     .local string str
