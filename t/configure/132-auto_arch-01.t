@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 132-auto_jit-01.t
+# 132-auto_arch-01.t
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::auto::jit');
+use_ok('config::auto::arch');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
@@ -25,14 +25,15 @@ my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my $pkg = q{auto::jit};
+my $pkg = q{auto::arch};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
+my ( $task, $step_name, @step_params, $step);
+$task        = $conf->steps->[1];
 $step_name   = $task->step;
+@step_params = @{ $task->params };
 
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
@@ -41,7 +42,7 @@ ok( $step->description(), "$step_name has description" );
 
 my $ret = $step->runstep($conf);
 ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
+is($step->result(), q{skipped}, "Got expected result");
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
@@ -50,18 +51,18 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-132-auto_jit-01.t - test config::auto::jit
+132-auto_arch-01.t - test config::auto::arch
 
 =head1 SYNOPSIS
 
-    % prove t/configure/132-auto_jit-01.t
+    % prove t/configure/132-auto_arch-01.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file tests config::auto::jit with the C<--miniparrot>
-option.
+The tests in this file test config::auto::arch when the C<--miniparrot>
+option is provided.
 
 =head1 AUTHOR
 
@@ -69,7 +70,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::auto::jit, F<Configure.pl>.
+config::auto::arch, F<Configure.pl>.
 
 =cut
 

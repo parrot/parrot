@@ -1,22 +1,22 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 132-auto_jit-01.t
+# 132-auto_arch-08.t
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 15;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::auto::jit');
+use_ok('config::auto::arch');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
 my $args = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -25,23 +25,30 @@ my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my $pkg = q{auto::jit};
+my $pkg = q{auto::arch};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
+my ( $task, $step_name, @step_params, $step);
+$task        = $conf->steps->[1];
 $step_name   = $task->step;
+@step_params = @{ $task->params };
 
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
+my $pseudoarch = q{MSWin32-i386};
+$conf->data->set('archname' => $pseudoarch);
 my $ret = $step->runstep($conf);
 ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
+is($step->result(), q{}, "Result was empty string as expected");
+is($conf->data->get('cpuarch'), q{i386},
+    "'cpuarch' was set as expected");
+is($conf->data->get('osname'), q{MSWin32},
+    "'osname' was set as expected");
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
@@ -50,18 +57,18 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-132-auto_jit-01.t - test config::auto::jit
+132-auto_arch-08.t - test config::auto::arch
 
 =head1 SYNOPSIS
 
-    % prove t/configure/132-auto_jit-01.t
+    % prove t/configure/132-auto_arch-08.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file tests config::auto::jit with the C<--miniparrot>
-option.
+The tests in this file test config::auto::arch in the case where
+your OS is MSWin32 and your architecture is something not matching C<x64>.
 
 =head1 AUTHOR
 
@@ -69,7 +76,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::auto::jit, F<Configure.pl>.
+config::auto::arch, F<Configure.pl>.
 
 =cut
 
