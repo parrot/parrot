@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More qw(no_plan); # tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -40,12 +40,34 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), q{}, "Result was empty string as expected");
+my $errstr;
+{
+    # As the t/configure/ test suite is currently (Dec 25 2007) constructed,
+    # an uninitialized value warning is generated when this test is run on
+    # Darwin because of a hack in config/auto/arch.pm.  We capture the warning
+    # and verify that we did so if on Darwin.  In the future, we will be able
+    # to eliminate this use of the signal handler because the
+    # Parrot::Configure object will have the same information available to it
+    # as it does during regular configuration.
+    local $SIG{__WARN__} = \&_capture;
+    my $ret = $step->runstep($conf);
+    ok( $ret, "$step_name runstep() returned true value" );
+    is($step->result(), q{}, "Result was empty string as expected");
+    if ($^O eq 'darwin') {
+        like(
+            $errstr,
+            qr/Uninitialized value/i,
+            "Caught uninitialized value warning as expected"
+        );
+    } else {
+        pass("Test not needed except on Darwin");
+    } 
+}
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
+
+sub _capture { $errstr = $_[0]; }
 
 ################### DOCUMENTATION ###################
 
