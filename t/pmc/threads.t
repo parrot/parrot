@@ -402,7 +402,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "sub name lookup in new thread" );
 .sub check
-    $P0 = find_global 'Foo', 'foo'
+    $P0 = get_global ['Foo'], 'foo'
     $I0 = isa $P0, 'Sub'
     if $I0 goto okay
     print "not "
@@ -414,7 +414,7 @@ okay:
     check()
     $P0 = new 'ParrotThread'
     .local pmc thread_main
-    thread_main = find_global 'thread_main'
+    thread_main = get_global 'thread_main'
     $P0.'run_clone'(thread_main)
     $P0.'join'() # RT#46813
 .end
@@ -453,7 +453,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE only" );
     print "ok 1\n"
     test2()
     .local pmc test3
-    test3 = find_global 'Test3', 'test3'
+    test3 = get_hll_global ['Test3'], 'test3'
     test3()
     .local pmc test4
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
@@ -469,11 +469,11 @@ okay:
     .local pmc test4
     .local pmc test2
 
-    test2 = find_global 'Test2', 'test2'
+    test2 = get_hll_global ['Test2'], 'test2'
 
     test4 = new 'Integer'
     test4 = 42
-    store_global 'test4', test4
+    set_global 'test4', test4
 
     .local pmc thread
     thread = new 'ParrotThread'
@@ -635,7 +635,7 @@ TODO: {
     .local pmc thread
     thread = new 'ParrotThread'
     .local pmc _thread_func
-    _thread_func = find_global 'main', 'thread_test_func'
+    _thread_func = get_global ['main'], 'thread_test_func'
     $I0 = .PARROT_CLONE_CODE
     bor $I0, $I0, .PARROT_CLONE_CLASSES
     print "in thread:\n"
@@ -720,7 +720,7 @@ OUTPUT
     .local pmc thread
     thread = new 'ParrotThread'
     .local pmc _thread_func
-    _thread_func = find_global 'main', 'thread_test_func'
+    _thread_func = get_global 'thread_test_func'
     $I0 = .PARROT_CLONE_CODE
     bor $I0, $I0, .PARROT_CLONE_CLASSES
     print "in thread:\n"
@@ -753,12 +753,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL" );
 .sub setup
     $P0 = new 'Integer'
     $P0 = 42
-    store_global 'x', $P0
+    set_global 'x', $P0
 .end
 
 .include 'interpinfo.pasm'
 .sub test
-    $P0 = find_global 'x'
+    $P0 = get_global 'x'
     if $P0 == 42 goto okay1
     print "not "
 okay1:
@@ -1111,7 +1111,7 @@ OUT
     push P10, P7
     set P6, P10
 
-    find_global P5, "_foo"
+    get_global P5, "_foo"
     new P2, 'ParrotThread'
     callmethod "thread3"
     set I5, P2
