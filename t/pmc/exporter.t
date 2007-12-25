@@ -392,7 +392,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals with destination' );
     exporter = new 'Exporter'
     exporter.'import'( src :named('source'), dest :named('destination'), globals :named('globals') )
 
-    $P0 = find_global ['foo'], 'bar'
+    $P0 = get_global ['foo'], 'bar'
     $P0()
 .end
 

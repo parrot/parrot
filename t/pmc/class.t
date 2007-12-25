@@ -422,7 +422,7 @@ Tests the Class PMC.
 
     # And a method.
     methods = new 'Hash'
-    meth_to_add = find_global 'add'
+    meth_to_add = get_global 'add'
     methods['add'] = meth_to_add
     init_hash['methods'] = methods
 

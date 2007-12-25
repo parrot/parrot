@@ -43,7 +43,7 @@ pir_output_is( <<'CODE', <<'OUT', "create an event and set attributes" );
     init['priority'] = priority
 
     .local pmc code
-    code         = find_global 'my_handler'
+    code         = get_global 'my_handler'
     init['code'] = code
 
     eh  = new 'EventHandler', init

@@ -670,17 +670,17 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     addattribute P1, "i"
     addattribute P1, "j"
     # define attrib access functions in Foo namespace
-    find_global P5, "Foo::set"
+    get_global P5, "Foo::set"
     addmethod P1, "Foo::set", P5
-    find_global P5, "Foo::get"
+    get_global P5, "Foo::get"
     addmethod P1, "Foo::get", P5
 
     subclass P2, P1, "Bar"
     addattribute P2, "k"
     addattribute P2, "l"
-    find_global P5, "Bar::set"
+    get_global P5, "Bar::set"
     addmethod P2, "Bar::set", P5
-    find_global P5, "Bar::get"
+    get_global P5, "Bar::get"
     addmethod P2, "Bar::get", P5
 
     # instantiate a Bar object
@@ -788,9 +788,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     addattribute P1, "i"
     addattribute P1, "j"
     # define attrib access functions
-    find_global P5, "set"
+    get_global P5, "set"
     addmethod P1, "set", P5
-    find_global P5, "get"
+    get_global P5, "get"
     addmethod P1, "get", P5
 
     subclass P2, P1, "Bar"
@@ -1594,7 +1594,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "namespace vs name" );
     Foo()
     f = global "Foo"
     f()
-    f = find_global "Foo", "Foo"
+    f = get_global ["Foo"], "Foo"
     f()
 .end
 .sub Foo
