@@ -393,7 +393,7 @@ opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_destroy(PARROT_INTERP, NULLOK(PackFile *pf))
+void PackFile_destroy(PARROT_INTERP, ARGINOUT_NULLOK(PackFile *pf))
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -419,12 +419,12 @@ PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
 PARROT_API
 void PackFile_fixup_subs(PARROT_INTERP,
     pbc_action_enum_t what,
-    NULLOK(PMC *eval))
+    ARGIN_NULLOK(PMC *eval))
         __attribute__nonnull__(1);
 
 PARROT_API
 void PackFile_FixupTable_clear(PARROT_INTERP,
-    NOTNULL(PackFile_FixupTable *self))
+    ARGINOUT(PackFile_FixupTable *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -565,7 +565,7 @@ void Parrot_destroy_constants(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_load_bytecode(PARROT_INTERP, NOTNULL(STRING *file_str))
+void Parrot_load_bytecode(PARROT_INTERP, ARGIN(STRING *file_str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

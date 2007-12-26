@@ -37,7 +37,7 @@ void * IMCC_compile_file(PARROT_INTERP, const char *s);
 
 /* HEADERIZER BEGIN: static */
 
-static void byte_code_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
+static void byte_code_destroy(SHIM_INTERP, ARGINOUT(PackFile_Segment *self))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -316,7 +316,7 @@ Delete a C<PackFile>.
 
 PARROT_API
 void
-PackFile_destroy(PARROT_INTERP, NULLOK(PackFile *pf))
+PackFile_destroy(PARROT_INTERP, ARGINOUT_NULLOK(PackFile *pf))
 {
     if (!pf) {
         PIO_eprintf(NULL, "PackFile_destroy: pf == NULL!\n");
@@ -2037,7 +2037,7 @@ Destroys the C<PackFile_ByteCode> segment C<self>.
 */
 
 static void
-byte_code_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
+byte_code_destroy(SHIM_INTERP, ARGINOUT(PackFile_Segment *self))
 {
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
 
@@ -2795,7 +2795,7 @@ Clear a PackFile FixupTable.
 
 PARROT_API
 void
-PackFile_FixupTable_clear(PARROT_INTERP, NOTNULL(PackFile_FixupTable *self))
+PackFile_FixupTable_clear(PARROT_INTERP, ARGINOUT(PackFile_FixupTable *self))
 {
     opcode_t i;
     if (!self) {
@@ -3646,7 +3646,7 @@ directory.
 
 PARROT_API
 void
-Parrot_load_bytecode(PARROT_INTERP, NOTNULL(STRING *file_str))
+Parrot_load_bytecode(PARROT_INTERP, ARGIN(STRING *file_str))
 {
     char *filename;
     STRING *wo_ext, *ext, *pbc, *path;
@@ -3711,7 +3711,7 @@ If C<eval> is given, set this is the owner of the subroutines.
 
 PARROT_API
 void
-PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, NULLOK(PMC *eval))
+PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
 {
     do_sub_pragmas(interp, interp->code, what, eval);
 }

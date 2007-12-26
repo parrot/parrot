@@ -52,7 +52,7 @@ funcptr_t get_mmd_dispatch_type(PARROT_INTERP,
     INTVAL func_nr,
     INTVAL left_type,
     INTVAL right_type,
-    NOTNULL(int *is_pmc))
+    ARGOUT(int *is_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(5);
 

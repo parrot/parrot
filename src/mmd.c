@@ -57,10 +57,10 @@ static void dump_mmd(PARROT_INTERP, INTVAL function)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static funcptr_t get_mmd_dispatcher(PARROT_INTERP,
-    NOTNULL(PMC *left),
-    NOTNULL(PMC *right),
+    ARGIN(PMC *left),
+    ARGIN(PMC *right),
     INTVAL function,
-    NOTNULL(int *is_pmc))
+    ARGOUT(int *is_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -103,13 +103,13 @@ static PMC* mmd_cvt_to_types(PARROT_INTERP, NOTNULL(PMC *multi_sig))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * mmd_deref(PARROT_INTERP, NOTNULL(PMC *value))
+static PMC * mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static UINTVAL mmd_distance(PARROT_INTERP,
-    NOTNULL(PMC *pmc),
-    NOTNULL(PMC *arg_tuple))
+    ARGIN(PMC *pmc),
+    ARGIN(PMC *arg_tuple))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -131,9 +131,7 @@ static PMC* mmd_get_ns(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static int mmd_is_hidden(PARROT_INTERP,
-    NOTNULL(PMC *multi),
-    NOTNULL(PMC *cl))
+static int mmd_is_hidden(PARROT_INTERP, ARGIN(PMC *multi), ARGIN(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -185,13 +183,13 @@ static PMC* mmd_search_default(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_search_scopes(PARROT_INTERP, NOTNULL(STRING *meth))
+static PMC* mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void mmd_sort_candidates(PARROT_INTERP,
-    NOTNULL(PMC *arg_tuple),
-    NOTNULL(PMC *cl))
+    ARGIN(PMC *arg_tuple),
+    ARGIN(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -267,7 +265,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 funcptr_t
 get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
-        INTVAL right_type, NOTNULL(int *is_pmc))
+        INTVAL right_type, ARGOUT(int *is_pmc))
 {
     funcptr_t func, func_;
     INTVAL r;
@@ -342,8 +340,8 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static funcptr_t
-get_mmd_dispatcher(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right),
-        INTVAL function, NOTNULL(int *is_pmc))
+get_mmd_dispatcher(PARROT_INTERP, ARGIN(PMC *left), ARGIN(PMC *right),
+        INTVAL function, ARGOUT(int *is_pmc))
 {
     const UINTVAL left_type = VTABLE_type(interp, left);
     const UINTVAL right_type = VTABLE_type(interp, right);
@@ -364,7 +362,7 @@ call on the 'real' value.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-mmd_deref(PARROT_INTERP, NOTNULL(PMC *value))
+mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
 {
     if (!PObj_is_object_TEST(value) && VTABLE_type(interp, value) != value->vtable->base_type)
         return VTABLE_get_pmc(interp, value);
@@ -1466,7 +1464,7 @@ Create Manhattan Distance of sub C<pmc> against given argument types.
 */
 
 static UINTVAL
-mmd_distance(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *arg_tuple))
+mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 {
     PMC *multi_sig, *mro;
     INTVAL i, n, args, dist, j, m;
@@ -1575,7 +1573,7 @@ Sort the candidate list C<cl> by Manhattan Distance
 */
 
 static void
-mmd_sort_candidates(PARROT_INTERP, NOTNULL(PMC *arg_tuple), NOTNULL(PMC *cl))
+mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 {
     INTVAL i;
     PMC *nci;
@@ -1644,7 +1642,7 @@ C<arg_tuple>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-mmd_search_scopes(PARROT_INTERP, NOTNULL(STRING *meth))
+mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
 {
     PMC * const candidate_list = pmc_new(interp, enum_class_ResizablePMCArray);
 
@@ -1667,7 +1665,7 @@ the candidate list C<cl>.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-mmd_is_hidden(PARROT_INTERP, NOTNULL(PMC *multi), NOTNULL(PMC *cl))
+mmd_is_hidden(PARROT_INTERP, ARGIN(PMC *multi), ARGIN(PMC *cl))
 {
     /*
      * if the candidate list already has the a sub with the same
