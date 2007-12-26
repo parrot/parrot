@@ -40,7 +40,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 opcode_t
-PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))
+PackFile_pack_size(PARROT_INTERP, ARGINOUT(PackFile *self))
 {
     size_t size;
     size_t header_size = 0;
@@ -81,9 +81,7 @@ Other pack routines are in F<src/packfile.c>.
 
 PARROT_API
 void
-PackFile_pack(PARROT_INTERP,
-        NOTNULL(PackFile *self),
-        NOTNULL(opcode_t *cursor))
+PackFile_pack(PARROT_INTERP, ARGINOUT(PackFile *self), ARGINOUT(opcode_t *cursor))
 {
     opcode_t *ret;
 
@@ -150,10 +148,10 @@ constant table into a contiguous region of memory.
 
 PARROT_API
 size_t
-PackFile_ConstTable_pack_size(PARROT_INTERP, NOTNULL(PackFile_Segment *seg))
+PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 {
     opcode_t i;
-    PackFile_ConstTable* const self = (PackFile_ConstTable *) seg;
+    const PackFile_ConstTable* const self = (const PackFile_ConstTable *) seg;
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; i++)
@@ -182,9 +180,9 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
 PackFile_ConstTable_pack(PARROT_INTERP,
-        NOTNULL(PackFile_Segment *seg), NOTNULL(opcode_t *cursor))
+        ARGIN(const PackFile_Segment *seg), ARGINOUT(opcode_t *cursor))
 {
-    PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
+    const PackFile_ConstTable * const self = (const PackFile_ConstTable *)seg;
     opcode_t i;
 
     *cursor++ = self->const_count;
@@ -248,7 +246,7 @@ PARROT_WARN_UNUSED_RESULT
 opcode_t *
 PackFile_Constant_pack(PARROT_INTERP,
         ARGIN(const PackFile_ConstTable *const_table),
-        ARGIN(const PackFile_Constant *self), NOTNULL(opcode_t *cursor))
+        ARGIN(const PackFile_Constant *self), ARGINOUT(opcode_t *cursor))
 {
     PMC *key;
     size_t i;

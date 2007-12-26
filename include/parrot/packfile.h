@@ -95,7 +95,7 @@ typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)
 typedef void (*PackFile_Segment_destroy_func_t)
     (PARROT_INTERP, struct PackFile_Segment *);
 typedef size_t (*PackFile_Segment_packed_size_func_t)
-    (PARROT_INTERP, struct PackFile_Segment *);
+    (PARROT_INTERP, const struct PackFile_Segment *);
 typedef opcode_t * (*PackFile_Segment_pack_func_t)
     (PARROT_INTERP, struct PackFile_Segment *, opcode_t *dest);
 typedef opcode_t * (*PackFile_Segment_unpack_func_t)
@@ -262,7 +262,7 @@ PARROT_WARN_UNUSED_RESULT
 opcode_t * PackFile_Constant_pack(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *const_table),
     ARGIN(const PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor))
+    ARGINOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -272,15 +272,15 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_ConstTable_pack(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *seg),
-    NOTNULL(opcode_t *cursor))
+    ARGIN(const PackFile_Segment *seg),
+    ARGINOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 size_t PackFile_ConstTable_pack_size(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *seg))
+    ARGIN(const PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -295,14 +295,14 @@ int PackFile_find_in_const(PARROT_INTERP,
 
 PARROT_API
 void PackFile_pack(PARROT_INTERP,
-    NOTNULL(PackFile *self),
-    NOTNULL(opcode_t *cursor))
+    ARGINOUT(PackFile *self),
+    ARGINOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-opcode_t PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))
+opcode_t PackFile_pack_size(PARROT_INTERP, ARGINOUT(PackFile *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -516,7 +516,7 @@ opcode_t * PackFile_Segment_pack(PARROT_INTERP,
 
 PARROT_API
 size_t PackFile_Segment_packed_size(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self))
+    ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

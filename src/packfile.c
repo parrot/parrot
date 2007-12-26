@@ -1456,7 +1456,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 size_t
-PackFile_Segment_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
+PackFile_Segment_packed_size(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     size_t size = default_packed_size(self);
     PackFile_Segment_packed_size_func_t f =
