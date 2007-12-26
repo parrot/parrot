@@ -39,7 +39,7 @@ into the class.
 */
 
 void
-Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, NOTNULL(PMC *self))
+Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self))
 {
     Parrot_Class * const _class = PARROT_CLASS(self);
     PMC * const ns = _class->_namespace;
@@ -103,7 +103,7 @@ Lookup a namespace object from a class PMC.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_get_namespace(PARROT_INTERP, NOTNULL(PMC *classobj))
+Parrot_oo_get_namespace(PARROT_INTERP, ARGIN(const PMC *classobj))
 {
     Parrot_Class * const _class     = PARROT_CLASS(classobj);
     PMC          * const _namespace = _class->_namespace;
@@ -126,7 +126,7 @@ Lookup a class object from a namespace, string, or key PMC.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_get_class(PARROT_INTERP, NOTNULL(PMC *key))
+Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 {
     PMC *classobj = PMCNULL;
     PMC *ns       = PMCNULL;
@@ -185,7 +185,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_get_class_str(PARROT_INTERP, NOTNULL(STRING *name))
+Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
 {
     PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
                            CONTEXT(interp->ctx)->current_HLL);
@@ -223,7 +223,7 @@ Create a new class object from a string name.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_newclass_from_str(PARROT_INTERP, NOTNULL(STRING *name))
+Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
 {
     PMC * const namearg = pmc_new(interp, enum_class_String);
     PMC *namehash, *classobj;
@@ -253,8 +253,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
-        NOTNULL(PMC *classobj),
-        NOTNULL(STRING *name))
+        ARGIN(PMC *classobj), ARGIN(STRING *name))
 {
     Parrot_Class *class_info;
     assert(PObj_is_class_TEST(classobj));
@@ -278,8 +277,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_find_vtable_override(PARROT_INTERP,
-        NOTNULL(PMC *classobj),
-        NOTNULL(STRING *name))
+        ARGIN(PMC *classobj), ARGIN(STRING *name))
 {
     Parrot_Class * const _class = PARROT_CLASS(classobj);
 

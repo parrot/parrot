@@ -40,7 +40,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 opcode_t
-PackFile_pack_size(PARROT_INTERP, ARGINOUT(PackFile *self))
+PackFile_pack_size(PARROT_INTERP, ARGIN(const PackFile *self))
 {
     size_t size;
     size_t header_size = 0;
