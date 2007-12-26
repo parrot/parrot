@@ -81,26 +81,26 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_PIC* parrot_PIC_alloc_pic(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void parrot_PIC_alloc_store(NOTNULL(struct PackFile_ByteCode *cs), size_t n)
+void parrot_PIC_alloc_store(ARGOUT(struct PackFile_ByteCode *cs), size_t n)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 int parrot_pic_check_sig(
     ARGIN(const PMC *sig1),
     ARGIN(const PMC *sig2),
-    NOTNULL(int *type))
+    ARGOUT(int *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void parrot_PIC_destroy(NOTNULL(struct PackFile_ByteCode *cs))
+void parrot_PIC_destroy(ARGINOUT(struct PackFile_ByteCode *cs))
         __attribute__nonnull__(1);
 
 void parrot_pic_find_infix_v_pp(PARROT_INTERP,
-    NOTNULL(PMC *left),
-    NOTNULL(PMC *right),
-    NOTNULL(Parrot_MIC *mic),
-    NOTNULL(opcode_t *cur_opcode))
+    ARGIN(PMC *left),
+    ARGIN(PMC *right),
+    ARGOUT(Parrot_MIC *mic),
+    ARGOUT(opcode_t *cur_opcode))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -117,7 +117,7 @@ void * parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 
 void parrot_PIC_prederef(PARROT_INTERP,
     opcode_t op,
-    NOTNULL(void **pc_pred),
+    ARGOUT(void **pc_pred),
     int core)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);

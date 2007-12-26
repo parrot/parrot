@@ -239,9 +239,9 @@ typedef struct PackFile {
 
     INTVAL    need_wordsize;
     INTVAL    need_endianize;
-    opcode_t (*fetch_op)(unsigned char *);
-    INTVAL (*fetch_iv)(unsigned char *);
-    void (*fetch_nv)(unsigned char *, const unsigned char *);
+    opcode_t  (*fetch_op)(ARGIN(const unsigned char *));
+    INTVAL    (*fetch_iv)(ARGIN(const unsigned char *));
+    void      (*fetch_nv)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
 } PackFile;
 
 
@@ -642,32 +642,38 @@ size_t PackFile_write_fingerprint(NOTNULL(void *cursor))
 
 /* HEADERIZER BEGIN: src/packfile/pf_items.c */
 
-void PackFile_assign_transforms(NOTNULL(PackFile *pf))
+void PackFile_assign_transforms(ARGINOUT(PackFile *pf))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-char * PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
+char * PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(opcode_t **cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL PF_fetch_integer(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
+INTVAL PF_fetch_integer(
+    ARGIN_NULLOK(PackFile *pf),
+    ARGIN(opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-FLOATVAL PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
+FLOATVAL PF_fetch_number(
+    ARGIN_NULLOK(PackFile *pf),
+    ARGIN(opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-opcode_t PF_fetch_opcode(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
+opcode_t PF_fetch_opcode(
+    ARGIN_NULLOK(const PackFile *pf),
+    ARGIN(opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * PF_fetch_string(PARROT_INTERP,
-    NULLOK(PackFile *pf),
-    NOTNULL(opcode_t **cursor))
+    ARGIN_NULLOK(PackFile *pf),
+    ARGIN(opcode_t **cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -690,31 +696,31 @@ size_t PF_size_string(ARGIN(const STRING *s))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t* PF_store_cstring(NOTNULL(opcode_t *cursor), ARGIN(const char *s))
+opcode_t* PF_store_cstring(ARGOUT(opcode_t *cursor), ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t* PF_store_integer(NOTNULL(opcode_t *cursor), INTVAL val)
+opcode_t* PF_store_integer(ARGOUT(opcode_t *cursor), INTVAL val)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t* PF_store_number(
-    NOTNULL(opcode_t *cursor),
+    ARGOUT(opcode_t *cursor),
     ARGIN(const FLOATVAL *val))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t* PF_store_opcode(NOTNULL(opcode_t *cursor), opcode_t val)
+opcode_t* PF_store_opcode(ARGOUT(opcode_t *cursor), opcode_t val)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t* PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
+opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

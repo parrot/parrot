@@ -104,22 +104,22 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 /* HEADERIZER BEGIN: static */
 
 static int is_pic_func(PARROT_INTERP,
-    NOTNULL(void **pc),
-    NOTNULL(Parrot_MIC *mic),
+    ARGIN(void **pc),
+    ARGOUT(Parrot_MIC *mic),
     int core_type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static int is_pic_param(PARROT_INTERP,
-    NOTNULL(void **pc),
-    NOTNULL(Parrot_MIC* const mic),
+    ARGIN(void **pc),
+    ARGOUT(Parrot_MIC *mic),
     opcode_t op)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void parrot_pic_move(PARROT_INTERP, NOTNULL(Parrot_MIC *mic))
+static void parrot_pic_move(PARROT_INTERP, ARGINOUT(Parrot_MIC *mic))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -205,7 +205,7 @@ of usable memory, PICs from the rear.
 */
 
 void
-parrot_PIC_alloc_store(NOTNULL(struct PackFile_ByteCode *cs), size_t n)
+parrot_PIC_alloc_store(ARGOUT(struct PackFile_ByteCode *cs), size_t n)
 {
     size_t size, poly;
     Parrot_PIC_store *store;
@@ -242,7 +242,7 @@ Free memory for the PIC storage.
 */
 
 void
-parrot_PIC_destroy(NOTNULL(struct PackFile_ByteCode *cs))
+parrot_PIC_destroy(ARGINOUT(struct PackFile_ByteCode *cs))
 {
     Parrot_PIC_store *store = cs->pic_store;
 
@@ -549,10 +549,9 @@ the type PARROT_ARG_CONSTANT stands for mixed types or constants
 PARROT_WARN_UNUSED_RESULT
 int
 parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
-        NOTNULL(int *type))
+        ARGOUT(int *type))
 {
-    int i, n, t0, t1, t2;
-    t0 = 0; /* silence compiler uninit warning */
+    int i, n, t0;
 
     ASSERT_SIG_PMC(sig1);
     ASSERT_SIG_PMC(sig2);
@@ -564,9 +563,13 @@ parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
         return 0;
     }
     for (i = 0; i < n; ++i) {
-        t1 = SIG_ITEM(sig1, i);
-        t2 = SIG_ITEM(sig2, i);
-        if (!i) {
+        int t1 = SIG_ITEM(sig1, i);
+        int t2 = SIG_ITEM(sig2, i);
+
+        if (i) {
+            t0 = 0;
+        }
+        else {
             t0 = t1 & PARROT_ARG_TYPE_MASK;
             *type = t0;
         }
@@ -601,7 +604,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-is_pic_param(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC* const mic), opcode_t op)
+is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t op)
 {
     PMC *sig2;
     int type;
@@ -677,7 +680,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-is_pic_func(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC *mic), int core_type)
+is_pic_func(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), int core_type)
 {
     /*
      * if we have these opcodes
@@ -745,7 +748,7 @@ this opcode function is available. Called from C<do_prederef>.
 */
 
 void
-parrot_PIC_prederef(PARROT_INTERP, opcode_t op, NOTNULL(void **pc_pred), int core)
+parrot_PIC_prederef(PARROT_INTERP, opcode_t op, ARGOUT(void **pc_pred), int core)
 {
     op_func_t * const prederef_op_func = interp->op_lib->op_func_table;
     opcode_t * const cur_opcode = (opcode_t*)pc_pred;
@@ -823,7 +826,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-parrot_pic_move(PARROT_INTERP, NOTNULL(Parrot_MIC *mic))
+parrot_pic_move(PARROT_INTERP, ARGINOUT(Parrot_MIC *mic))
 {
     /*
      * MIC slot is empty - use it
@@ -863,8 +866,8 @@ RT#48260: Not yet documented!!!
 */
 
 void
-parrot_pic_find_infix_v_pp(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right),
-                NOTNULL(Parrot_MIC *mic), NOTNULL(opcode_t *cur_opcode))
+parrot_pic_find_infix_v_pp(PARROT_INTERP, ARGIN(PMC *left), ARGIN(PMC *right),
+                ARGOUT(Parrot_MIC *mic), ARGOUT(opcode_t *cur_opcode))
 {
     funcptr_t func;
     int is_pmc;
@@ -893,7 +896,7 @@ parrot_pic_find_infix_v_pp(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right
             mic->m.func_nr, left_type, right_type, &is_pmc);
     if (is_pmc) {
         const size_t offs = cur_opcode - (opcode_t *)interp->code->prederef.code;
-        opcode_t* real_op = interp->code->base.data + offs + 1;
+        opcode_t* const real_op = interp->code->base.data + offs + 1;
         /* set prederef code address to orig slot for now
          */
         ((void**)cur_opcode)[0] =
