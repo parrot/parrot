@@ -41,30 +41,32 @@ TODO:
 PARROT_WARN_UNUSED_RESULT
 static int args_match_params(
     ARGIN(const PMC *sig_args),
-    NOTNULL(PackFile_ByteCode *seg),
-    NOTNULL(opcode_t *start))
+    ARGIN(const PackFile_ByteCode *seg),
+    ARGIN(const opcode_t *start))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static int call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))
+static int call_is_safe(
+    ARGIN(const PMC *sub),
+    ARGINOUT(opcode_t **set_args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
+static int jit_can_compile_sub(PARROT_INTERP, ARGIN(const PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static int ops_jittable(PARROT_INTERP,
-    NOTNULL(PMC *sub),
+    ARGIN(const PMC *sub),
     ARGIN(const PMC *sig_results),
-    NOTNULL(PackFile_ByteCode *seg),
-    NOTNULL(opcode_t *pc),
-    NOTNULL(opcode_t *end),
-    NOTNULL(int *flags))
+    ARGIN(const PackFile_ByteCode *seg),
+    ARGIN(opcode_t *pc),
+    ARGIN(const opcode_t *end),
+    ARGOUT(int *flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -77,7 +79,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * pic_test_func(PARROT_INTERP,
     SHIM(INTVAL *sig_bits),
-    NOTNULL(void **args))
+    ARGOUT(void **args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -134,7 +136,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
-pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))
+pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), ARGOUT(void **args))
 {
     INTVAL * const result = (INTVAL*) args[0];
     INTVAL   const i      = (INTVAL) args[1];
@@ -158,7 +160,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
+jit_can_compile_sub(PARROT_INTERP, ARGIN(const PMC *sub))
 {
     const jit_arch_info * const info = Parrot_jit_init(interp);
     const jit_arch_regs * const regs = info->regs + JIT_CODE_SUB_REGS_ONLY;
@@ -199,8 +201,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-args_match_params(ARGIN(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
-    NOTNULL(opcode_t *start))
+args_match_params(ARGIN(const PMC *sig_args), ARGIN(const PackFile_ByteCode *seg),
+    ARGIN(const opcode_t *start))
 {
     const PMC *sig_params;
     int n, type;
@@ -284,7 +286,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-call_is_safe(ARGIN(const PMC *sub), NOTNULL(opcode_t **set_args))
+call_is_safe(ARGIN(const PMC *sub), ARGINOUT(opcode_t **set_args))
 {
     PMC *called, *sig_results;
 
@@ -333,9 +335,9 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), ARGIN(const PMC *sig_results),
-        NOTNULL(PackFile_ByteCode *seg), NOTNULL(opcode_t *pc),
-        NOTNULL(opcode_t *end), NOTNULL(int *flags))
+ops_jittable(PARROT_INTERP, ARGIN(const PMC *sub), ARGIN(const PMC *sig_results),
+        ARGIN(const PackFile_ByteCode *seg), ARGIN(opcode_t *pc),
+        ARGIN(const opcode_t *end), ARGOUT(int *flags))
 {
     while (pc < end) {
         /* special opcodes which are handled, but not marked as JITtable */
@@ -408,8 +410,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 int
-parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
-        NOTNULL(PMC *sig_args), NOTNULL(PMC *sig_results), NOTNULL(int *flags))
+parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(const PMC *sub), ARGIN(const PMC *sig_args),
+        ARGIN(const PMC *sig_results), ARGOUT(int *flags))
 {
 #ifdef HAS_JIT
     opcode_t *base, *start, *end;
@@ -471,7 +473,7 @@ RT#48260: Not yet documented!!!
 */
 
 funcptr_t
-parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)
+parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(const PMC *sub), int flags)
 {
 #ifdef HAS_JIT
 #  ifdef PIC_TEST
