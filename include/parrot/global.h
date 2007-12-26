@@ -53,8 +53,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_find_global_s(PARROT_INTERP,
-    NULLOK(STRING *str_key),
-    NULLOK(STRING *globalname))
+    ARGIN_NULLOK(STRING *str_key),
+    ARGIN_NULLOK(STRING *globalname))
         __attribute__nonnull__(1);
 
 PARROT_API

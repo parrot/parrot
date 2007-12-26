@@ -13,10 +13,10 @@ typedef struct _Set {
 
 /* HEADERIZER BEGIN: compilers/imcc/sets.c */
 
-void set_add(NOTNULL(Set *s), int element)
+void set_add(ARGINOUT(Set *s), int element)
         __attribute__nonnull__(1);
 
-void set_clear(NOTNULL(Set *s))
+void set_clear(ARGINOUT(Set *s))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -26,7 +26,7 @@ int set_contains(ARGIN(const Set *s), int element)
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Set* set_copy(NOTNULL(Set *s))
+Set* set_copy(ARGIN(const Set *s))
         __attribute__nonnull__(1);
 
 int set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
@@ -38,7 +38,7 @@ PARROT_PURE_FUNCTION
 int set_first_zero(ARGIN(const Set *s))
         __attribute__nonnull__(1);
 
-void set_free(NOTNULL(Set *s))
+void set_free(ARGINOUT(Set *s))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
@@ -47,7 +47,7 @@ Set * set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void set_intersec_inplace(NOTNULL(Set *s1), ARGIN(const Set *s2))
+void set_intersec_inplace(ARGINOUT(Set *s1), ARGIN(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

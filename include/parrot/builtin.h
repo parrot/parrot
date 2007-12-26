@@ -32,7 +32,7 @@ int Parrot_builtin_is_void(int bi);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_find_builtin(PARROT_INTERP, NOTNULL(STRING *func))
+PMC* Parrot_find_builtin(PARROT_INTERP, ARGIN(STRING *func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -311,7 +311,7 @@ Return the NCI PMC of the builtin or NULL.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_find_builtin(PARROT_INTERP, NOTNULL(STRING *func))
+Parrot_find_builtin(PARROT_INTERP, ARGIN(STRING *func))
 {
     const int i = find_builtin_s(interp, func);
 

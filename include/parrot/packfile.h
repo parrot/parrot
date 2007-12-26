@@ -150,7 +150,7 @@ typedef INTVAL (*PackFile_map_segments_func_t)
 */
 typedef struct PackFile_FixupEntry {
     opcode_t                  type;     /* who knows what fixups we need? */
-    char                     *name;     /* name of the label */
+    const char               *name;     /* name of the label */
     opcode_t                  offset;   /* location of the item */
     struct PackFile_ByteCode *seg;
 } PackFile_FixupEntry;
@@ -312,16 +312,16 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGIN(const PackFile *self))
 
 PARROT_API
 void do_sub_pragmas(PARROT_INTERP,
-    NOTNULL(PackFile_ByteCode *self),
+    ARGIN(PackFile_ByteCode *self),
     int action,
-    NULLOK(PMC *eval_pmc))
+    ARGIN_NULLOK(PMC *eval_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 INTVAL PackFile_add_segment(SHIM_INTERP,
-    NOTNULL(PackFile_Directory *dir),
-    NOTNULL(PackFile_Segment *seg))
+    ARGINOUT(PackFile_Directory *dir),
+    ARGIN(PackFile_Segment *seg))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -401,7 +401,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry * PackFile_find_fixup_entry(PARROT_INTERP,
     INTVAL type,
-    NOTNULL(char *name))
+    ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -445,9 +445,9 @@ INTVAL PackFile_funcs_register(SHIM_INTERP,
 
 PARROT_API
 INTVAL PackFile_map_segments(PARROT_INTERP,
-    NOTNULL(PackFile_Directory *dir),
+    ARGIN(const PackFile_Directory *dir),
     PackFile_map_segments_func_t callback,
-    NULLOK(void *user_data))
+    ARGIN_NULLOK(void *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -533,8 +533,8 @@ opcode_t * PackFile_Segment_unpack(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t PackFile_unpack(PARROT_INTERP,
-    NOTNULL(PackFile *self),
-    NOTNULL(opcode_t *packed),
+    ARGINOUT(PackFile *self),
+    ARGIN(opcode_t *packed),
     size_t packed_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

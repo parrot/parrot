@@ -92,7 +92,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_free(NOTNULL(Set *s))
+set_free(ARGINOUT(Set *s))
 {
     if (s->bmp)
         mem_sys_free(s->bmp);
@@ -110,7 +110,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_clear(NOTNULL(Set *s))
+set_clear(ARGINOUT(Set *s))
 {
     memset(s->bmp, 0, NUM_BYTES(s->length));
 }
@@ -128,7 +128,7 @@ RT#48260: Not yet documented!!!
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_copy(NOTNULL(Set *s))
+set_copy(ARGIN(const Set *s))
 {
     Set * const d = set_make(s->length);
 
@@ -182,7 +182,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_add(NOTNULL(Set *s), int element)
+set_add(ARGINOUT(Set *s), int element)
 {
     const int elem_byte_in_set = BYTE_IN_SET(element);
     const int bytes_in_set     = BYTE_IN_SET(s->length);
@@ -322,7 +322,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_intersec_inplace(NOTNULL(Set *s1), ARGIN(const Set *s2))
+set_intersec_inplace(ARGINOUT(Set *s1), ARGIN(const Set *s2))
 {
     int i;
 

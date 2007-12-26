@@ -50,7 +50,7 @@ static PackFile_Segment * byte_code_new(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Constant * clone_constant(PARROT_INTERP,
-    NOTNULL(PackFile_Constant *old_const))
+    ARGIN(const PackFile_Constant *old_const))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -81,7 +81,7 @@ static PackFile_Segment * create_seg(PARROT_INTERP,
 static void default_destroy(NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1);
 
-static void default_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
+static void default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -105,11 +105,12 @@ static opcode_t * default_unpack(
         __attribute__nonnull__(2);
 
 static void directory_destroy(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self))
+    ARGINOUT(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void directory_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
+static void directory_dump(PARROT_INTERP,
+    ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -167,7 +168,7 @@ static PackFile_Constant ** find_constants(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile_FixupEntry * find_fixup(
-    NOTNULL(PackFile_FixupTable *ft),
+    ARGINOUT(PackFile_FixupTable *ft),
     INTVAL type,
     ARGIN(const char *name))
         __attribute__nonnull__(1)
@@ -271,19 +272,19 @@ static INTVAL pf_register_standard_funcs(PARROT_INTERP,
 
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* run_sub(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
+static PMC* run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void segment_init(
-    NOTNULL(PackFile_Segment *self),
-    NOTNULL(PackFile *pf),
+    ARGOUT(PackFile_Segment *self),
+    ARGIN(PackFile *pf),
     ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void sort_segs(NOTNULL(PackFile_Directory *dir))
+static void sort_segs(ARGINOUT(PackFile_Directory *dir))
         __attribute__nonnull__(1);
 
 static int sub_pragma(PARROT_INTERP, int action, ARGIN(const PMC *sub_pmc))
@@ -440,7 +441,7 @@ Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
-run_sub(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
+run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     const INTVAL old = interp->run_core;
     PMC *retval;
@@ -647,8 +648,8 @@ the eval PMC is kept alive be living subs.
 
 PARROT_API
 void
-do_sub_pragmas(PARROT_INTERP, NOTNULL(PackFile_ByteCode *self),
-        int action, NULLOK(PMC *eval_pmc))
+do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
+        int action, ARGIN_NULLOK(PMC *eval_pmc))
 {
     opcode_t i;
     PackFile_FixupTable * const ft = self->fixups;
@@ -720,7 +721,7 @@ Returns size of unpacked if everything is OK, else zero (0).
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t
-PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed),
+PackFile_unpack(PARROT_INTERP, ARGINOUT(PackFile *self), ARGIN(opcode_t *packed),
     size_t packed_size)
 {
     PackFile_Header * const header = self->header;
@@ -866,9 +867,9 @@ and this value is returned.
 
 PARROT_API
 INTVAL
-PackFile_map_segments(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
+PackFile_map_segments(PARROT_INTERP, ARGIN(const PackFile_Directory *dir),
                        PackFile_map_segments_func_t callback,
-                       NULLOK(void *user_data))
+                       ARGIN_NULLOK(void *user_data))
 {
     size_t i;
 
@@ -895,8 +896,8 @@ packfile gets destroyed.
 
 PARROT_API
 INTVAL
-PackFile_add_segment(SHIM_INTERP, NOTNULL(PackFile_Directory *dir),
-        NOTNULL(PackFile_Segment *seg))
+PackFile_add_segment(SHIM_INTERP, ARGINOUT(PackFile_Directory *dir),
+        ARGIN(PackFile_Segment *seg))
 {
     if (dir->segments) {
         dir->segments =
@@ -1237,7 +1238,7 @@ The default dump function.
 */
 
 static void
-default_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
+default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     size_t i;
 
@@ -1588,9 +1589,9 @@ Dumps the directory C<self>.
 */
 
 static void
-directory_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
+directory_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
-    PackFile_Directory * const dir = (PackFile_Directory *) self;
+    const PackFile_Directory * const dir = (PackFile_Directory *) self;
     size_t i;
 
     default_dump_header(interp, self);
@@ -1749,9 +1750,9 @@ Destroys the directory.
 */
 
 static void
-directory_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
+directory_destroy(PARROT_INTERP, ARGINOUT(PackFile_Segment *self))
 {
-    PackFile_Directory *dir = (PackFile_Directory *)self;
+    PackFile_Directory * const dir = (PackFile_Directory *)self;
     size_t i;
 
     for (i = 0; i < dir->num_segments; i++)
@@ -1774,7 +1775,7 @@ Sorts the segments in C<dir>.
 */
 
 static void
-sort_segs(NOTNULL(PackFile_Directory *dir))
+sort_segs(ARGINOUT(PackFile_Directory *dir))
 {
     const size_t num_segs = dir->num_segments;
 
@@ -1905,7 +1906,7 @@ Initializes the segment C<self>.
 */
 
 static void
-segment_init(NOTNULL(PackFile_Segment *self), NOTNULL(PackFile *pf),
+segment_init(ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
         ARGIN(const char *name))
 {
     self->pf          = pf;
@@ -2635,16 +2636,15 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Constant *
-clone_constant(PARROT_INTERP, NOTNULL(PackFile_Constant *old_const))
+clone_constant(PARROT_INTERP, ARGIN(const PackFile_Constant *old_const))
 {
     STRING * const _sub = interp->vtables[enum_class_Sub]->whoami;
 
     if (old_const->type == PFC_PMC
             && VTABLE_isa(interp, old_const->u.key, _sub)) {
-        PackFile_Constant *ret;
         PMC *old_sub;
         PMC *new_sub;
-        ret = mem_allocate_typed(PackFile_Constant);
+        PackFile_Constant * const ret = mem_allocate_typed(PackFile_Constant);
 
         ret->type = old_const->type;
 
@@ -3057,7 +3057,7 @@ Finds the fix-up entry for C<name> and returns it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile_FixupEntry *
-find_fixup(NOTNULL(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name))
+find_fixup(ARGINOUT(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name))
 {
     opcode_t i;
     for (i = 0; i < ft->fixup_count; i++) {
@@ -3118,7 +3118,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry *
-PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, NOTNULL(char *name))
+PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, ARGIN(const char *name))
 {
     /* TODO make a hash of all fixups */
     PackFile_Directory * const dir = interp->code->base.dir;
