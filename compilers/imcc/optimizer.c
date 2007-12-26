@@ -849,7 +849,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
 IMCC_subst_constants(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
-        NOTNULL(SymReg **r), int n, NOTNULL(int *ok))
+        NOTNULL(SymReg **r), int n, ARGOUT(int *ok))
 {
     Instruction *tmp;
     const char * const ops[] = {
@@ -1000,8 +1000,7 @@ IMCC_subst_constants(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *n
                 break;
         }
         r[1] = mk_const(interp, str_dup(b), r[0]->set);
-        tmp = INS(interp, unit, "set", "", r,
-                2, 0, 0);
+        tmp = INS(interp, unit, "set", "", r, 2, 0, 0);
     }
     if (tmp) {
         IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);

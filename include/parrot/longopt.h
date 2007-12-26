@@ -49,9 +49,9 @@ struct longopt_opt_info {
 PARROT_API
 int longopt_get(PARROT_INTERP,
     int argc,
-    NOTNULL(char* argv[]),
+    ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
-    NOTNULL(struct longopt_opt_info* info_buf))
+    ARGINOUT(struct longopt_opt_info* info_buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)

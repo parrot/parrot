@@ -138,7 +138,7 @@ static void rebuild_attrib_stuff(PARROT_INTERP, NOTNULL(PMC *_class))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL register_type(PARROT_INTERP, NOTNULL(PMC *name))
+static INTVAL register_type(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -763,7 +763,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
-register_type(PARROT_INTERP, NOTNULL(PMC *name))
+register_type(PARROT_INTERP, ARGIN(PMC *name))
 {
     INTVAL type;
     PMC   *classname_hash, *item;

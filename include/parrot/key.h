@@ -50,7 +50,7 @@ PMC * key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL key_integer(PARROT_INTERP, NOTNULL(PMC *key))
+INTVAL key_integer(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -86,7 +86,7 @@ PMC * key_new_number(PARROT_INTERP, FLOATVAL value)
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * key_new_pmc(PARROT_INTERP, NOTNULL(PMC *value))
+PMC * key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -105,40 +105,40 @@ PMC * key_next(SHIM_INTERP, NOTNULL(PMC *key))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-FLOATVAL key_number(PARROT_INTERP, NOTNULL(PMC *key))
+FLOATVAL key_number(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * key_pmc(PARROT_INTERP, NOTNULL(PMC *key))
+PMC * key_pmc(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_integer(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value)
+void key_set_integer(SHIM_INTERP, ARGINOUT(PMC *key), INTVAL value)
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_number(SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value)
+void key_set_number(SHIM_INTERP, ARGINOUT(PMC *key), FLOATVAL value)
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))
+void key_set_pmc(PARROT_INTERP, ARGINOUT(PMC *key), ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 void key_set_register(SHIM_INTERP,
-    NOTNULL(PMC *key),
+    ARGINOUT(PMC *key),
     INTVAL value,
     INTVAL flag)
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_string(SHIM_INTERP, NOTNULL(PMC *key), NOTNULL(STRING *value))
+void key_set_string(SHIM_INTERP, ARGINOUT(PMC *key), ARGIN(STRING *value))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -151,7 +151,7 @@ STRING * key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * key_string(PARROT_INTERP, NOTNULL(PMC *key))
+STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

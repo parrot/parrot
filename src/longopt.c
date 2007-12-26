@@ -27,9 +27,9 @@ This is used by C<parrot>.
 
 static int longopt_get_longopt(PARROT_INTERP,
     int argc,
-    NOTNULL(char* argv[]),
+    ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
-    NOTNULL(struct longopt_opt_info* info_buf))
+    ARGINOUT(struct longopt_opt_info* info_buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -70,9 +70,9 @@ Any other value is a valid option identifier.
 
 PARROT_API
 int
-longopt_get(PARROT_INTERP, int argc, NOTNULL(char* argv[]),
+longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
-            NOTNULL(struct longopt_opt_info* info_buf))
+            ARGINOUT(struct longopt_opt_info* info_buf))
 {
     const int dex = info_buf->opt_index;
 
@@ -118,9 +118,9 @@ characters and start with C<-->.
 */
 
 static int
-longopt_get_longopt(PARROT_INTERP, int argc, NOTNULL(char* argv[]),
+longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                     ARGIN(const struct longopt_opt_decl options[]),
-                    NOTNULL(struct longopt_opt_info* info_buf))
+                    ARGINOUT(struct longopt_opt_info* info_buf))
 {
     const int dex = info_buf->opt_index;
     int optlen = 0;

@@ -344,9 +344,9 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t * PackFile_Constant_unpack(PARROT_INTERP,
-    NOTNULL(PackFile_ConstTable *constt),
-    NOTNULL(PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor))
+    ARGIN(PackFile_ConstTable *constt),
+    ARGOUT(PackFile_Constant *self),
+    ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -378,7 +378,7 @@ opcode_t * PackFile_Constant_unpack_pmc(PARROT_INTERP,
 
 PARROT_API
 void PackFile_ConstTable_clear(PARROT_INTERP,
-    NOTNULL(PackFile_ConstTable *self))
+    ARGINOUT(PackFile_ConstTable *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -438,7 +438,7 @@ void PackFile_FixupTable_new_entry(PARROT_INTERP,
 
 PARROT_API
 INTVAL PackFile_funcs_register(SHIM_INTERP,
-    NOTNULL(PackFile *pf),
+    ARGOUT(PackFile *pf),
     UINTVAL type,
     PackFile_funcs funcs)
         __attribute__nonnull__(2);
@@ -480,7 +480,7 @@ void PackFile_Segment_destroy(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_Segment_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
+void PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -496,7 +496,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Segment_new_seg(PARROT_INTERP,
-    NOTNULL(PackFile_Directory *dir),
+    ARGINOUT(PackFile_Directory *dir),
     UINTVAL type,
     ARGIN(const char *name),
     int add)
@@ -508,8 +508,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_Segment_pack(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor))
+    ARGIN(PackFile_Segment *self),
+    ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

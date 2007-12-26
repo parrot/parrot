@@ -34,7 +34,7 @@ Instruction * IMCC_subst_constants(PARROT_INTERP,
     ARGIN(const char *name),
     NOTNULL(SymReg **r),
     int n,
-    NOTNULL(int *ok))
+    ARGOUT(int *ok))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

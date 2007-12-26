@@ -152,7 +152,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_new_pmc(PARROT_INTERP, NOTNULL(PMC *value))
+key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -172,7 +172,7 @@ Set the integer C<value> in C<key>.
 
 PARROT_API
 void
-key_set_integer(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value)
+key_set_integer(SHIM_INTERP, ARGINOUT(PMC *key), INTVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -193,8 +193,7 @@ Set the register C<value> in C<key>.
 
 PARROT_API
 void
-key_set_register(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value,
-                 INTVAL flag)
+key_set_register(SHIM_INTERP, ARGINOUT(PMC *key), INTVAL value, INTVAL flag)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_register_FLAG | flag;
@@ -215,7 +214,7 @@ Set the number C<value> in C<key>.
 
 PARROT_API
 void
-key_set_number(SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value)
+key_set_number(SHIM_INTERP, ARGINOUT(PMC *key), FLOATVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
@@ -236,7 +235,7 @@ Set the string C<value> in C<key>.
 
 PARROT_API
 void
-key_set_string(SHIM_INTERP, NOTNULL(PMC *key), NOTNULL(STRING *value))
+key_set_string(SHIM_INTERP, ARGINOUT(PMC *key), ARGIN(STRING *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
@@ -257,7 +256,7 @@ Set the PMC C<value> in C<key>.
 
 PARROT_API
 void
-key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))
+key_set_pmc(PARROT_INTERP, ARGINOUT(PMC *key), ARGIN(PMC *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
@@ -299,7 +298,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-key_integer(PARROT_INTERP, NOTNULL(PMC *key))
+key_integer(PARROT_INTERP, ARGIN(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_hash_iterator_FLAGS:
@@ -338,7 +337,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-key_number(PARROT_INTERP, NOTNULL(PMC *key))
+key_number(PARROT_INTERP, ARGIN(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
@@ -372,7 +371,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-key_string(PARROT_INTERP, NOTNULL(PMC *key))
+key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_string_FLAG:
@@ -410,7 +409,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_pmc(PARROT_INTERP, NOTNULL(PMC *key))
+key_pmc(PARROT_INTERP, ARGIN(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG | KEY_register_FLAG:
