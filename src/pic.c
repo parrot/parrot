@@ -124,11 +124,11 @@ static void parrot_pic_move(PARROT_INTERP, ARGINOUT(Parrot_MIC *mic))
         __attribute__nonnull__(2);
 
 static int pass_int(PARROT_INTERP,
-    NOTNULL(PMC *sig),
-    NOTNULL(char *src_base),
-    NOTNULL(void **src),
-    NOTNULL(char *dest_base),
-    NOTNULL(void **dest))
+    ARGIN(const PMC *sig),
+    ARGIN(const char *src_base),
+    ARGIN(const void **src),
+    ARGOUT(char *dest_base),
+    ARGIN(void * const *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -137,11 +137,11 @@ static int pass_int(PARROT_INTERP,
         __attribute__nonnull__(6);
 
 static int pass_mixed(PARROT_INTERP,
-    NOTNULL(PMC *sig),
-    NOTNULL(char *src_base),
-    NOTNULL(void **src),
-    NOTNULL(char *dest_base),
-    NOTNULL(void **dest))
+    ARGIN(const PMC *sig),
+    ARGIN(const char *src_base),
+    ARGIN(void * const *src),
+    ARGOUT(char *dest_base),
+    ARGIN(void * const *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -150,11 +150,11 @@ static int pass_mixed(PARROT_INTERP,
         __attribute__nonnull__(6);
 
 static int pass_num(PARROT_INTERP,
-    NOTNULL(PMC *sig),
-    NOTNULL(char *src_base),
-    NOTNULL(void **src),
-    NOTNULL(char *dest_base),
-    NOTNULL(void **dest))
+    ARGIN(const PMC *sig),
+    ARGIN(const char *src_base),
+    ARGIN(const void **src),
+    ARGOUT(char *dest_base),
+    ARGIN(void * const *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -163,11 +163,11 @@ static int pass_num(PARROT_INTERP,
         __attribute__nonnull__(6);
 
 static int pass_pmc(PARROT_INTERP,
-    NOTNULL(PMC *sig),
-    NOTNULL(char *src_base),
-    NOTNULL(void **src),
-    NOTNULL(char *dest_base),
-    NOTNULL(void **dest))
+    ARGIN(const PMC *sig),
+    ARGIN(const char *src_base),
+    ARGIN(const void **src),
+    ARGOUT(char *dest_base),
+    ARGIN(void * const *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -176,11 +176,11 @@ static int pass_pmc(PARROT_INTERP,
         __attribute__nonnull__(6);
 
 static int pass_str(PARROT_INTERP,
-    NOTNULL(PMC *sig),
-    NOTNULL(char *src_base),
-    NOTNULL(void **src),
-    NOTNULL(char *dest_base),
-    NOTNULL(void **dest))
+    ARGIN(const PMC *sig),
+    ARGIN(const char *src_base),
+    ARGIN(const void **src),
+    ARGOUT(char *dest_base),
+    ARGIN(void * const *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -384,15 +384,15 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_int(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
-        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
+pass_int(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+        ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
 
     for (i = 2 ; n; ++i, --n) {
-        const INTVAL arg = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
-        *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
+        const INTVAL arg = *(const INTVAL *)(src_base + ((const opcode_t*)src)[i]);
+        *(INTVAL *)(dest_base + ((const opcode_t*)dest)[i]) = arg;
     }
     return i;
 }
@@ -408,15 +408,15 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_num(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
-        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
+pass_num(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+        ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
 
     for (i = 2 ; n; ++i, --n) {
-        const FLOATVAL arg = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
-        *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
+        const FLOATVAL arg = *(const FLOATVAL *)(src_base + ((const opcode_t*)src)[i]);
+        *(FLOATVAL *)(dest_base + ((const opcode_t*)dest)[i]) = arg;
     }
     return i;
 }
@@ -432,15 +432,15 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_str(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
-        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
+pass_str(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+        ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
 
     for (i = 2 ; n; ++i, --n) {
-        STRING * const arg = *(STRING* *)(src_base + ((opcode_t*)src)[i]);
-        *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= arg;
+        STRING * const arg = *(STRING* const *)(src_base + ((const opcode_t*)src)[i]);
+        *(STRING* *)(dest_base + ((const opcode_t*)dest)[i])= arg;
     }
     return i;
 }
@@ -456,15 +456,15 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_pmc(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
-        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
+pass_pmc(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+        ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
 
     for (i = 2 ; n; ++i, --n) {
-        PMC * const arg = *(PMC* *)(src_base + ((opcode_t*)src)[i]);
-        *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= arg;
+        PMC * const arg = *(PMC* const *)(src_base + ((const opcode_t*)src)[i]);
+        *(PMC* *)(dest_base + ((const opcode_t*)dest)[i])= arg;
     }
     return i;
 }
@@ -480,15 +480,12 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_mixed(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
-        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
+pass_mixed(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+        ARGIN(void * const *src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
-    PMC* argP;
-    int i, n = SIG_ELEMS(sig);
+    int n = SIG_ELEMS(sig);
+    int i;
     INTVAL *bitp;
-    INTVAL argI;
-    FLOATVAL argN;
-    STRING *argS;
 
     ASSERT_SIG_PMC(sig);
     bitp = SIG_ARRAY(sig);
@@ -496,36 +493,49 @@ pass_mixed(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
         const INTVAL bits = *bitp++;
         switch (bits) {
             case PARROT_ARG_INTVAL:
-                argI = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
-                *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= argI;
+                {
+                const INTVAL argI = *(const INTVAL *)(src_base + ((const opcode_t*)src)[i]);
+                *(INTVAL *)(dest_base + ((const opcode_t*)dest)[i])= argI;
+                }
                 break;
             case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
-                argI = (INTVAL)(src)[i];
-                *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= argI;
+                *(INTVAL *)(dest_base + ((const opcode_t*)dest)[i]) = (INTVAL)(src)[i];
                 break;
             case PARROT_ARG_FLOATVAL:
-                argN = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
-                *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= argN;
+                {
+                const FLOATVAL argN = *(const FLOATVAL *)(src_base + ((const opcode_t*)src)[i]);
+                *(FLOATVAL *)(dest_base + ((const opcode_t*)dest)[i])= argN;
+                }
                 break;
             case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
-                argN = *(FLOATVAL*)(src)[i];
-                *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= argN;
+                {
+                const FLOATVAL argN = *(const FLOATVAL*)(src)[i];
+                *(FLOATVAL *)(dest_base + ((const opcode_t*)dest)[i])= argN;
+                }
                 break;
             case PARROT_ARG_STRING:
-                argS = *(STRING **)(src_base + ((opcode_t*)src)[i]);
-                *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= argS;
+                {
+                STRING * const argS = *(STRING * const *)(src_base + ((const opcode_t*)src)[i]);
+                *(STRING* *)(dest_base + ((const opcode_t*)dest)[i])= argS;
+                }
                 break;
             case PARROT_ARG_STRING|PARROT_ARG_CONSTANT:
-                argS = (STRING*)(src)[i];
-                *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= argS;
+                {
+                STRING * const argS = (STRING*)(src)[i];
+                *(STRING* *)(dest_base + ((const opcode_t*)dest)[i])= argS;
+                }
                 break;
             case PARROT_ARG_PMC:
-                argP = *(PMC **)(src_base + ((opcode_t*)src)[i]);
-                *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= argP;
+                {
+                PMC* const argP = *(PMC * const *)(src_base + ((const opcode_t*)src)[i]);
+                *(PMC* *)(dest_base + ((const opcode_t*)dest)[i])= argP;
+                }
                 break;
             case PARROT_ARG_PMC|PARROT_ARG_CONSTANT:
-                argP = (PMC*)(src)[i];
-                *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= argP;
+                {
+                PMC* const argP = (PMC*)(src)[i];
+                *(PMC* *)(dest_base + ((const opcode_t*)dest)[i])= argP;
+                }
                 break;
             default:
                 real_exception(interp, NULL, 1, "bogus signature 0x%x", bits);
