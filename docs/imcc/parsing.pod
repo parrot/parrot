@@ -7,7 +7,11 @@ IMCC - parsing
 
 =head1 OVERVIEW
 
-This document describes the basic parsing functionality of IMCC.
+This document describes the basic parsing functionality of IMCC, the
+current compiler for Parrot Intermediate Representation (PIR).
+
+Note: some information in this file is out of date. Please refer to
+the PIR PDD (pdd19_pir.pod).
 
 =head1 DESCRIPTION
 
@@ -17,27 +21,12 @@ are self-contained blocks of code very similar to subroutines.
 Code for a compilation unit is created as soon (or not earlier) as the
 end of the unit is reached.
 
-=head1 General imcc syntax
+{{ Is this true? one sub calling another not-yet compiled sub would
+   not work in that case. }}
 
-	program: subs
+=head1 General PIR syntax
 
-	subs: statements ...
-
-=head2 Comments
-
-Comments start with C<#>, which may appear at any point on a line, and end at 
-the end of the line. 
-
-=head2 POD sections
-
-Everything enclosed in POD markers is ignored.
-
-	=some_pod_marker in col 1
-	...
-	=cut
-
-A POD section starts with a B<=> in column 1 and ends with a B<=cut> on a line
-on its own.
+See L<pdd19_pir.pod> for an overview of PIR syntax.
 
 =head1 Compilation units
 
@@ -45,39 +34,15 @@ on its own.
 
 This code:
 
-	.sub name
-		statements
-		...
-	.end
+    .sub name
+        statements
+        ...
+    .end
 
 
-Defines a subroutine with the entry point C<_name>, 
+Defines a subroutine with the entry point C<_name>,
 using the Parrot calling conventions. See
 F<docs/calling_conventions.pod> for more details.
-
-=head2 Assembly blocks .emit ... .eom
-
-This code:
-
-	.emit
-	_sub1:
-		pasm_statements
-		...
-		ret
-	...
-	.eom
-
-defines a compilation unit containing PASM statements only. Typical
-usage is for language initialization and builtins code.
-
-=head2 Code outside compilation units
-
-Any code appearing outside of a compilation unit will be ignored 
-(if not now, then in the near future).
-
-=head2 Nested subs
-
-Nested subroutines are not supported.
 
 =head1 Symbols, constants and labels
 
@@ -85,13 +50,13 @@ I<Compilation units> maintain their own symbol table containing local
 labels and variable symbols. This symbol table, C<hash>, is not visible
 to code in different units.
 
-If you need global variables, please use the B<global> opcode.
+If you need global variables, please use the B<get_{hll,root}_global> opcodes.
 
 Global labels and constants are kept in the global symbol table
 C<ghash>. This allows for global constant folding beyond the scope
 of individual subroutines.
 
-This also means that you currently can't use the same global symbol (e.g. 
+This also means that you currently can't use the same global symbol (e.g.
 subroutine name) in different namespaces. The following creates invalid code:
 
   .sub main
@@ -105,12 +70,13 @@ subroutine name) in different namespaces. The following creates invalid code:
 
 Local labels in different I<compilation units> with the same name are
 allowed, though assembling the generated PASM doesn't work. However,
-running this code inside imcc is ok. This will probably change in the 
+running this code inside imcc is ok. This will probably change in the
 future so that local labels are mangled to be unique.
 
 =head1 SEE ALSO
 
 F<docs/calling_conventions.pod>
+F<docs/pdds/draft/pdd19_pir.pod>
 
 =head1 FILES
 
