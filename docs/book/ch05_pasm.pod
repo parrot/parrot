@@ -293,7 +293,7 @@ X<PMCs (Parrot Magic Cookies);types;generating list of>
 You can generate a complete and current list of valid PMC types by
 running this command within the main Parrot source directory:
 
-  $ perl classes/pmc2c2.pl --tree classes/*.pmc
+  $ perl tools/build/pmc2c.pl --tree src/pmc/*.pmc
 
 which produces output like:
 
