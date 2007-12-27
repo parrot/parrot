@@ -65,7 +65,7 @@ identifiers.
 Opcode names are not reserved words in PIR, and may be used as variable names.
 For example, you can define a local variable named C<print>.  [See RT #24251]
 
-NOTE: The use of C<::> in identifiers is deprecated. [See RT #48735]
+{{ NOTE: The use of C<::> in identifiers is deprecated. [See RT #48735] }}
 
 =head3 Labels
 
@@ -761,12 +761,14 @@ the PIR compiler handles the following directives:
 =item * C<.include> "<filename>"
 
 The C<.include> directive takes a string argument that contains the
-name of the PIR file that is included.
+name of the PIR file that is included. The contents of the included
+file are inserted as if they were written at the point where the
+C<.include> directive occurs.
 
 =item * C<.macro> <identifier> [<parameters>]
 
 The C<.macro> directive starts the definition of a macro named by the specified
-identifier. The optional parameter list is a comma-separated list of identifiers, 
+identifier. The optional parameter list is a comma-separated list of identifiers,
 enclosed in parentheses.
 See C<.endm> for ending the macro definition.
 
@@ -776,15 +778,12 @@ Closes a macro definition.
 
 =item * C<.macro_const> <identifier> (<literal>|<reg>)
 
- .macro_const	PI	3.14
+ .macro_const   PI  3.14
 
 The C<.macro_const> directive is a special type of macro; it allows the user to
 use a symbolic name for a constant value. Like C<.macro>, the substitution
-occurs at compile time. It takes two arguments (not comma separated), the first 
+occurs at compile time. It takes two arguments (not comma separated), the first
 is an identifier, the second a constant value or a register.
-
-{{ NOTE: C<.constant> is deprecated, replaced by C<.macro_const>. 
-See RT #48561 }}
 
 =back
 
@@ -948,7 +947,7 @@ This will result in code for the parser as follows:
   .end
 
 Each expansion is associated with a unique number; for labels declared with
-C<.macro_label> and locals declared with C<.macro_local> expansions, this 
+C<.macro_label> and locals declared with C<.macro_local> expansions, this
 means that multiple expansions of a macro will not result in conflicting
 label or local names.
 
