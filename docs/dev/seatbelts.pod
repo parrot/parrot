@@ -147,3 +147,5 @@ Look at snprintf instead of sprintf
 Use the return values from sprintf where we would be using strlen of the result
 
 Make the VTABLE_type func take a const PMC, because hey, your type should never change, right?
+
+Sync the specs in F<docs/pdds/pdd17_pmc.pod> with the function headers.
