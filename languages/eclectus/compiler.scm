@@ -322,6 +322,7 @@
  
 ; emir PIR for an expression
 (define (emit-expr expr)
+  ;(write expr) (newline)
   (cond
     [(immediate? expr) (emit-immediate expr)]
     [(if? expr)        (emit-if expr)]
@@ -339,7 +340,11 @@
           [(eqv? (car tree) 'and) 
             ( cond [(null? (cdr tree)) #t]
                    [(= (length (cdr tree)) 1) (transform-and (cadr tree))]
-                   [else (list ( map transform-and tree))] )]
+                   [else (quasiquote
+                           (if
+                            (unquote (transform-and (cadr tree)))
+                            (unquote (transform-and (quasiquote (and (unquote-splicing (cddr tree))))))
+                            #f))])]
           [else  (map transform-and tree)]))) 
 
 ; the actual compiler
