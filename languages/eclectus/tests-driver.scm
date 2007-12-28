@@ -2,6 +2,9 @@
 
 (define all-tests '())
 
+(define run-with-petite #f)
+;(define run-with-petite #t)
+
 (define-syntax add-tests-with-string-output
   (syntax-rules (=>)
     [(_ test-name [expr => output-string] ...)
@@ -49,14 +52,19 @@
        p)))
 
 (define (run-compile expr)
-  (let ([p (open-output-file "stst.pir" 'replace)])
-    (parameterize ([compile-port p])
-       (compile-program expr))
-    (close-output-port p)))
+  (if run-with-petite
+    (with-output-to-file "stst.scm" (lambda () (write expr)))
+    (let ([p (open-output-file "stst.pir" 'replace)])
+      (parameterize ([compile-port p])
+         (compile-program expr))
+      (close-output-port p))))
 
 (define (execute)
-  (unless (fxzero? (system "../../parrot stst.pir > stst.out"))
-    (error 'execute "produced program exited abnormally")))
+  (if run-with-petite
+    (unless (fxzero? (system "petite --script stst.scm > stst.out"))
+      (error 'execute "produced program exited abnormally"))
+    (unless (fxzero? (system "../../parrot stst.pir > stst.out"))
+      (error 'execute "produced program exited abnormally"))))
 
 (define (get-string)
   (with-output-to-string
