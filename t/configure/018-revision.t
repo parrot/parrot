@@ -18,7 +18,7 @@ my ( $current, $config );
 
 # Case 1:  DEVELOPING exists; Parrot::Config not yet available.
 my $reason =
-'Either file DEVELOPING does not exist or configuration has completed (as evidenced by existence of Parrot::Config::Generated';
+'Either file DEVELOPING does not exist, or configuration has completed (because Parrot::Config::Generated exists).';
 SKIP: {
     skip $reason, 3 if ( ( not -e 'DEVELOPING' )
         or ( -e q{lib/Parrot/Config/Generated.pm} ) );
