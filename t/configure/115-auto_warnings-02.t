@@ -45,7 +45,7 @@ ok( $step->description(), "$step_name has description" );
 
 my %potential_warnings_seen;
 $conf->options->set(cage => 1);
-auto::warnings::_add_cage_warnings($step, $conf);
+$step->_add_cage_warnings($conf);
 %potential_warnings_seen = map { $_, 1 } @{ $step->{potential_warnings} };
 ok($potential_warnings_seen{'-std=c89'}, "Cage warning added");
 

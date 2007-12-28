@@ -133,8 +133,8 @@ sub runstep {
     print "\n" if $verbose;
 
     # add on some extra warnings if requested
-    _add_cage_warnings($self, $conf);
-    _add_maintainer_warnings($self, $conf);
+    $self->_add_cage_warnings($conf);
+    $self->_add_maintainer_warnings($conf);
 
     # now try out our warnings
     for my $maybe_warning (@{ $self->{potential_warnings} }) {

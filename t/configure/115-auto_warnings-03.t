@@ -45,7 +45,7 @@ ok( $step->description(), "$step_name has description" );
 
 my %potential_warnings_seen;
 $conf->options->set(maintainer => 1);
-auto::warnings::_add_maintainer_warnings($step, $conf);
+$step->_add_maintainer_warnings($conf);
 %potential_warnings_seen = map { $_, 1 } @{ $step->{potential_warnings} };
 ok($potential_warnings_seen{'-Wlarger-than-4096'}, "Maintainer warning added");
 
