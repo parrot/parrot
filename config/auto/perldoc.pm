@@ -7,7 +7,8 @@ config/auto/perldoc - Check whether perldoc works
 
 =head1 DESCRIPTION
 
-Determines whether perldoc exists on the system.
+Determines whether F<perldoc> exists on the system and, if so, which
+version of F<perldoc> it is.
 
 =cut
 
@@ -33,17 +34,48 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $version = 0;
-    my $content = capture_output('perldoc -ud c99da7c4.tmp perldoc') || undef;
+    my $cmd = $conf->data->get_p5('scriptdir') . q{/perldoc};
+    my $tmpfile = q{c99da7c4.tmp};
+    my $content = capture_output("$cmd -ud $tmpfile perldoc") || undef;
 
+    my $rv = _initial_content_check($conf, $content);
+    return 1 if $rv;
+
+    my $version = $self->_analyze_perldoc($cmd, $tmpfile, $content);
+
+    $conf->data->set(
+        has_perldoc => $version != 0 ? 1 : 0,
+        new_perldoc => $version == 2 ? 1 : 0
+    );
+
+    return 1;
+}
+
+sub _initial_content_check {
+    my ($conf, $content) = @_;
+    if (! defined $content) {
+        $conf->data->set(
+            has_perldoc => 0,
+            new_perldoc => 0,
+        );
+        return 1;
+    } else {
+        return;
+    }
+}
+
+sub _analyze_perldoc {
+    my $self = shift;
+    my ($cmd, $tmpfile, $content) = @_;
+    my $version = 0;
     if ( defined $content ) {
         if ( $content =~ m/^Unknown option:/ ) {
-            $content = capture_output('perldoc perldoc') || '';
+            $content = capture_output("$cmd perldoc") || '';
             $version = 1;
             $self->set_result('yes, old version');
         }
         else {
-            if ( open my $FH, '<', 'c99da7c4.tmp' ) {
+            if ( open my $FH, '<', $tmpfile ) {
                 local $/;
                 $content = <$FH>;
                 close $FH;
@@ -62,14 +94,8 @@ sub runstep {
     else {
         $self->set_result('no');
     }
-    unlink 'c99da7c4.tmp';
-
-    $conf->data->set(
-        has_perldoc => $version != 0 ? 1 : 0,
-        new_perldoc => $version == 2 ? 1 : 0
-    );
-
-    return 1;
+    unlink $tmpfile;
+    return $version;
 }
 
 1;
