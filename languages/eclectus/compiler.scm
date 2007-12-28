@@ -334,18 +334,28 @@
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling
 ; So "and" is implemented if terms of "if"
-(define transform-and
+;
+; Currently a new S-expression is generated,
+; as I don't know how to manipulate S-expressions while traversing it
+(define transform-and-or
   (lambda (tree)
     (cond [(atom? tree) tree]
           [(eqv? (car tree) 'and) 
             ( cond [(null? (cdr tree)) #t]
-                   [(= (length (cdr tree)) 1) (transform-and (cadr tree))]
+                   [(= (length (cdr tree)) 1) (transform-and-or (cadr tree))]
                    [else (quasiquote
                            (if
-                            (unquote (transform-and (cadr tree)))
-                            (unquote (transform-and (quasiquote (and (unquote-splicing (cddr tree))))))
+                            (unquote (transform-and-or (cadr tree)))
+                            (unquote (transform-and-or (quasiquote (and (unquote-splicing (cddr tree))))))
                             #f))])]
-          [else  (map transform-and tree)]))) 
+          [(eqv? (car tree) 'or) 
+            ( cond [(null? (cdr tree)) #f]
+                   [(= (length (cdr tree)) 1) (transform-and-or (cadr tree))]
+                   [else (quasiquote
+                           (if
+                            (unquote (transform-and-or (cadr tree)))
+                            (unquote (transform-and-or (cadr tree)))
+                            (unquote (transform-and-or (quasiquote (or (unquote-splicing (cddr tree))))))))])][else  (map transform-and-or tree)]))) 
 
 ; the actual compiler
 (define (compile-program program)
@@ -353,5 +363,5 @@
   (emit-driver)
   (emit-builtins)
   (emit-function-header "scheme_entry")
-  (emit-expr (transform-and program)) 
+  (emit-expr (transform-and-or program)) 
   (emit-function-footer))

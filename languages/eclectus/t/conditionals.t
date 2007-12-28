@@ -18,6 +18,23 @@
   [(if (and #f) 1 0)                      => "0\n" ]
   [(if (and #t #f) 1 0)                   => "0\n" ]
   [(if (and #t #t) 1 0)                   => "1\n" ]
+  [(if (or) 1 0)                          => "0\n" ]
+  [(if (or #t) 1 0)                       => "1\n" ]
+  [(if (or #f) 1 0)                       => "0\n" ]
+  [(if (or #t #f) 1 0)                    => "1\n" ]
+  [(if (or #t #t) 1 0)                    => "1\n" ]
+  [(if (or (and #t #f) #t) 1 0)           => "1\n" ]
+  [(if (or (and #t #t) #t) 1 0)           => "1\n" ]
+  [(if (or (and #f #f) #t) 1 0)           => "1\n" ]
+  [(if (or (and #t #f) #f) 1 0)           => "0\n" ]
+  [(if (or (and #t #t) #f) 1 0)           => "1\n" ]
+  [(if (or (and #f #f) #f) 1 0)           => "0\n" ]
+  [(if (and (or #t #f) #t) 1 0)           => "1\n" ]
+  [(if (and (or #t #t) #t) 1 0)           => "1\n" ]
+  [(if (and (or #f #f) #t) 1 0)           => "0\n" ]
+  [(if (and (or #t #f) #f) 1 0)           => "0\n" ]
+  [(if (and (or #t #t) #f) 1 0)           => "0\n" ]
+  [(if (and (or #f #f) #f) 1 0)           => "0\n" ]
 )
 
 (test-all)
