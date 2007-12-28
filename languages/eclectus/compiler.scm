@@ -339,8 +339,7 @@
 ; transverse the program and rewrite and
 (define transform-and
   (lambda (tree)
-    (cond [(null? tree) tree ]
-          [(not (list? tree)) tree]
+    (cond [(atom? tree) tree]
           [(eqv? (car tree) 'and) 
             ( cond [(null? (cdr tree)) #t]
                    [else (list ( map transform-and tree))] )]
