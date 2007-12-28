@@ -10,7 +10,7 @@ config/auto/gc.pm - Garbage Collection
 Checks whether the C<--gc> command-line option was passed to F<Configure.pl>
 and sets the memory allocator accordingly.
 
-C<--gc> can take the values:
+Eventually, C<--gc> will be able to take any of the following values:
 
 =over
 
@@ -21,20 +21,22 @@ The default. Use the memory allocator in F<src/recources.c>.
 =item C<libc>
 
 Use the C library C<malloc> along with F<src/gc/res_lea.c>.
-This doesn't work.  See [perl #42774].
+This doesn't currently work.  See [perl #42774].
 
 =item C<malloc>
 
 Use the malloc in F<src/malloc.c> along with F<src/gc/res_lea.c>.
-Since this uses res_lea.c, it doesn't work either.  See [perl #42774].
+Since this uses res_lea.c, it doesn't currently work either.  See [perl #42774].
 
 =item C<malloc-trace>
 
 Use the malloc in F<src/malloc-trace.c> with tracing enabled, along
 with F<src/gc/res_lea.c>.
-Since this uses res_lea.c, it doesn't work either.  See [perl #42774].
+Since this uses res_lea.c, it doesn't work currently either.  See [perl #42774].
 
 =back
+
+So, for the time being, only the default value works.
 
 =cut
 
@@ -63,21 +65,8 @@ sub runstep {
 
     my $gc = $conf->options->get('gc');
 
-    if ( !defined($gc) ) {
-
-        # default is GC in resources.c
-        $gc = 'gc';
-    }
-    elsif ( $gc eq 'libc' ) {
-
-        # tests mallinfo after allocation of 128 bytes
-        if ( $conf->data->get('i_malloc') ) {
-            $conf->data->set( malloc_header => 'malloc.h' );
-        }
-        else {
-            $conf->data->set( malloc_header => 'stdlib.h' );
-        }
-    }
+    # default is GC in resources.c
+    $gc = 'gc' unless defined $gc;
 
     if ( $gc =~ /^malloc(?:-trace)?$/ ) {
         $conf->data->set(
@@ -97,6 +86,13 @@ EOF
             TEMP_gc_o => "\$(SRC_DIR)/gc/res_lea\$(O)",
             gc_flag   => '-DGC_IS_MALLOC',
         );
+        # tests mallinfo after allocation of 128 bytes
+        if ( $conf->data->get('i_malloc') ) {
+            $conf->data->set( malloc_header => 'malloc.h' );
+        }
+        else {
+            $conf->data->set( malloc_header => 'stdlib.h' );
+        }
     }
     else {
         $gc = 'gc';
