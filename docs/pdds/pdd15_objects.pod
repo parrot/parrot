@@ -161,7 +161,7 @@ Object PMCs. It isn't necessary to create a brand new low-level PMC
 class for each OO class, and they all share the Class or Object vtable,
 respectively.
 
-An instance of the Class PMC has ten internal attributes, which are:
+An instance of the Class PMC has eleven internal attributes, which are:
 
 =over 4
 
