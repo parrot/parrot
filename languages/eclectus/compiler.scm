@@ -327,21 +327,18 @@
     [(if? expr)        (emit-if expr)]
     [(primcall? expr)  (emit-primcall expr)])) 
 
-; "and" can be supported by transformation before compiling
-; So "and" is implemented if terms of "if"
-; (define-syntax my_and
-;   (syntax-rules ()
-;     [(_) #t]
-;     [(_ e) e]
 ;     [(_ e1 e2 e3 ...)
 ;      (if e1 (and e2 e3 ...) #f)]))
 
-; transverse the program and rewrite and
+; transverse the program and rewrite
+; "and" can be supported by transformation before compiling
+; So "and" is implemented if terms of "if"
 (define transform-and
   (lambda (tree)
     (cond [(atom? tree) tree]
           [(eqv? (car tree) 'and) 
             ( cond [(null? (cdr tree)) #t]
+                   [(= (length (cdr tree)) 1) (transform-and (cadr tree))]
                    [else (list ( map transform-and tree))] )]
           [else  (map transform-and tree)]))) 
 
