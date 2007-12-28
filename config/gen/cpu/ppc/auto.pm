@@ -3,15 +3,15 @@
 
 =head1 NAME
 
-config/auto/cpu/i386/auto.pm
+config/gen/cpu/ppc/auto.pm
 
 =head1 DESCRIPTION
 
-Test
+Power PC-specific configuration hints.
 
 =cut
 
-package auto::cpu::ppc::auto;
+package gen::cpu::ppc::auto;
 
 use strict;
 use warnings;
@@ -27,8 +27,8 @@ sub runstep {
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;
-        $f = "config/auto/cpu/ppc/$f";
-        cc_gen($f);
+        my $path_f = "config/gen/cpu/ppc/$f";
+        cc_gen($path_f);
         eval { cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {
             print " $@ " if $verbose;
@@ -40,7 +40,7 @@ sub runstep {
                     "HAS_PPC_$suffix" => '1',
                 );
                 print " (\U$suffix) " if ($verbose);
-                $conf->data->add( ' ', TEMP_generated => $f );
+                $conf->data->add( ' ', TEMP_generated => $path_f );
             }
         }
         cc_clean();
