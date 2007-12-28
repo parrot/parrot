@@ -118,7 +118,6 @@ sub runstep {
             || ( $jitcpuarch eq 'ppc' )
             || ( $jitcpuarch eq 'arm' ) )
         {
-#        if ( $jitcpuarch =~ /^(i386|ppc|arm)$/ ) {
             $execcapable = 1;
             unless ( ( $osname eq 'openbsd' )
                 || ( $osname eq 'freebsd' )
@@ -132,22 +131,7 @@ sub runstep {
         }
         $execcapable = $conf->options->get('execcapable')
             if defined $conf->options->get('execcapable');
-        if ($execcapable) {
-            $conf->data->set(
-                TEMP_exec_h =>
-'$(SRC_DIR)/jit.h $(INC_DIR)/exec.h $(SRC_DIR)/exec_dep.h $(SRC_DIR)/exec_save.h',
-                TEMP_exec_o =>
-                    '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
-                execcapable => 1
-            );
-        }
-        else {
-            $conf->data->set(
-                TEMP_exec_h => '',
-                TEMP_exec_o => '',
-                execcapable => 0
-            );
-        }
+        _handle_execcapable($conf, $execcapable);
 
         # test for executable malloced memory
         if ( -e "config/auto/jit/test_exec_$osname.in" ) {
@@ -196,6 +180,27 @@ sub runstep {
         );
     }
 
+    return 1;
+}
+
+sub _handle_execcapable {
+    my ($conf, $execcapable) = @_;
+    if ($execcapable) {
+        $conf->data->set(
+            TEMP_exec_h =>
+'$(SRC_DIR)/jit.h $(INC_DIR)/exec.h $(SRC_DIR)/exec_dep.h $(SRC_DIR)/exec_save.h',
+            TEMP_exec_o =>
+                '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
+            execcapable => 1
+        );
+    }
+    else {
+        $conf->data->set(
+            TEMP_exec_h => '',
+            TEMP_exec_o => '',
+            execcapable => 0
+        );
+    }
     return 1;
 }
 
