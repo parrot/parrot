@@ -49,7 +49,10 @@ sub runstep {
     my $libs      = $conf->data->get('libs');
     my $linkflags = $conf->data->get('linkflags');
     my $ccflags   = $conf->data->get('ccflags');
-    if ( $conf->data->get_p5('OSNAME') =~ /mswin32/i ) {
+
+    my $osname    = $conf->data->get_p5('OSNAME');
+
+    if ( $osname =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
             $conf->data->add( ' ', libs => '-lgmp' );
         }
@@ -60,8 +63,6 @@ sub runstep {
     else {
         $conf->data->add( ' ', libs => '-lgmp' );
     }
-
-    my $osname = $conf->data->get_p5('OSNAME');
 
     # On OS X check the presence of the gmp header in the standard
     # Fink location.
