@@ -3,6 +3,9 @@
 PARROT = ../../parrot@exe@
 PERL   = @perl@
 RM_RF  = @rm_rf@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+
+BUILD_DIR     = @build_dir@
 
 DEPENDENCIES = \
     forth.pbc \
@@ -12,6 +15,10 @@ DEPENDENCIES = \
 
 
 all: $(DEPENDENCIES)
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=forth
 
 prompt: all
 	$(PARROT) forth.pbc
