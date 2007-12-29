@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/cpu/x86_64/auto.pm
+config/auto/cpu/x86_64/auto.pm
 
 =head1 DESCRIPTION
 
@@ -12,7 +12,7 @@ cmpxchg.
 
 =cut
 
-package gen::cpu::x86_64::auto;
+package auto::cpu::x86_64::auto;
 
 use strict;
 use warnings;

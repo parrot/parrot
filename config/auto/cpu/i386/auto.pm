@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/cpu/i386/auto.pm
+config/auto/cpu/i386/auto.pm
 
 =head1 DESCRIPTION
 
@@ -14,7 +14,7 @@ Test for MMX/SSE functionality. Creates these Config entries
 
 =cut
 
-package gen::cpu::i386::auto;
+package auto::cpu::i386::auto;
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ sub runstep {
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /memcpy_(\w+)/;
-        my $path_f = "config/gen/cpu/i386/$f";
+        my $path_f = "config/auto/cpu/i386/$f";
         cc_gen($path_f);
         eval( cc_build("-DPARROT_CONFIG_TEST") );
         if ($@) {
@@ -48,7 +48,7 @@ sub runstep {
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;
-        my $path_f = "config/gen/cpu/i386/$f";
+        my $path_f = "config/auto/cpu/i386/$f";
         cc_gen($path_f);
         eval { cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {

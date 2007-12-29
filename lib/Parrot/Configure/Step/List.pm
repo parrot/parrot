@@ -41,7 +41,7 @@ my @steps = qw(
     auto::isreg
     auto::arch
     auto::jit
-    gen::cpu
+    auto::cpu
     auto::funcptr
     auto::cgoto
     auto::inline

@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 133-gen_cpu-02.t
+# 133-auto_cpu-02.t
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Test::More tests => 14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::gen::cpu');
+use_ok('config::auto::cpu');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
@@ -26,7 +26,7 @@ my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my $pkg = q{gen::cpu};
+my $pkg = q{auto::cpu};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
@@ -50,7 +50,7 @@ ok( $step->description(), "$step_name has description" );
     );
     ok($ret, "$step_name runstep() returned true value" );
     ok(! $step->result(), "Got (default) false result as expected");
-    like($stdout, qr/cpu hints = 'gen::cpu::foobar::auto'/s,
+    like($stdout, qr/cpu hints = 'auto::cpu::foobar::auto'/s,
         "Got expected verbose output");
     like($stdout, qr/no cpu specific hints/s,
         "Got expected verbose output");
@@ -62,17 +62,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-133-gen_cpu-02.t - test config::gen::cpu
+133-auto_cpu-02.t - test config::auto::cpu
 
 =head1 SYNOPSIS
 
-    % prove t/configure/133-gen_cpu-02.t
+    % prove t/configure/133-auto_cpu-02.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test config::gen::cpu in the case where no hints
+The tests in this file test config::auto::cpu in the case where no hints
 file exists corresponding to the CPU architecture.
 
 =head1 AUTHOR
@@ -81,7 +81,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::gen::cpu, F<Configure.pl>.
+config::auto::cpu, F<Configure.pl>.
 
 =cut
 

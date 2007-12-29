@@ -3,15 +3,15 @@
 
 =head1 NAME
 
-config/gen/cpu.pm - CPU specific Files
+config/auto/cpu.pm - CPU specific Files
 
 =head1 DESCRIPTION
 
-Runs C<runstep()> in F<config/gen/cpu/${cpuarch}/auto.pm> if it exists.
+Runs C<runstep()> in F<config/auto/cpu/${cpuarch}/auto.pm> if it exists.
 
 =cut
 
-package gen::cpu;
+package auto::cpu;
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ sub runstep {
 
     $conf->data->add( ' ', TEMP_atomic_o => '' );    # assure a default
 
-    my $hints = "gen::cpu::" . $conf->data->get('cpuarch') . "::auto";
+    my $hints = "auto::cpu::" . $conf->data->get('cpuarch') . "::auto";
 
     print "\t(cpu hints = '$hints') " if $verbose;
 

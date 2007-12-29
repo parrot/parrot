@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/cpu/ppc/auto.pm
+config/auto/cpu/ppc/auto.pm
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ Power PC-specific configuration hints.
 
 =cut
 
-package gen::cpu::ppc::auto;
+package auto::cpu::ppc::auto;
 
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ sub runstep {
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;
-        my $path_f = "config/gen/cpu/ppc/$f";
+        my $path_f = "config/auto/cpu/ppc/$f";
         cc_gen($path_f);
         eval { cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {
