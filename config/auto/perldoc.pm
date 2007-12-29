@@ -10,6 +10,9 @@ config/auto/perldoc - Check whether perldoc works
 Determines whether F<perldoc> exists on the system and, if so, which
 version of F<perldoc> it is.
 
+More specifically, we look for the F<perldoc> associated with the
+instance of F<perl> with which F<Configure.pl> was invoked.
+
 =cut
 
 package auto::perldoc;
