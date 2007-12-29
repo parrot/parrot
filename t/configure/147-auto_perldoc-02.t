@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>  2;
+use Test::More tests => 25;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -39,8 +39,43 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
 my $content = undef;
-my $rv = auto::perldoc::_initial_content_check($conf, $content);
-is($rv, 1, "Got expected return value when content was undefined");
+my $rv = $step->_initial_content_check($conf, $content);
+ok(! defined $rv, "Got expected return value when content was undefined");
+is($step->result(),
+    q{no}, "Got expected result when content was undefined");
+
+my $version;
+$version = 0;
+ok(auto::perldoc::_handle_version($conf, $version),
+    "_handle_version() returned true value");
+is($conf->data->get('has_perldoc'), 0,
+    "Got expected value for 'has_perldoc'");
+is($conf->data->get('new_perldoc'), 0,
+    "Got expected value for 'new_perldoc'");
+
+$version = 1;
+ok(auto::perldoc::_handle_version($conf, $version),
+    "_handle_version() returned true value");
+is($conf->data->get('has_perldoc'), 1,
+    "Got expected value for 'has_perldoc'");
+is($conf->data->get('new_perldoc'), 0,
+    "Got expected value for 'new_perldoc'");
+
+$version = 2;
+ok(auto::perldoc::_handle_version($conf, $version),
+    "_handle_version() returned true value");
+is($conf->data->get('has_perldoc'), 1,
+    "Got expected value for 'has_perldoc'");
+is($conf->data->get('new_perldoc'), 1,
+    "Got expected value for 'new_perldoc'");
+
+$version = $step->_handle_old_perldoc();
+is($version, 1, "Got expected version setting for old perldoc");
+is($step->result(), q{yes, old version}, "Got expected result when old perldoc");
+
+$version = $step->_handle_no_perldoc();
+is($version, 0, "Got expected version setting for no perldoc");
+is($step->result(), q{failed}, "Got expected result when no perldoc");
 
 pass("Completed all tests in $0");
 
