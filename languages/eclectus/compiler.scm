@@ -322,14 +322,11 @@
  
 ; emir PIR for an expression
 (define (emit-expr expr)
-  ;(write expr) (newline)
+  ; (display "# ")(write expr) (newline)
   (cond
     [(immediate? expr) (emit-immediate expr)]
     [(if? expr)        (emit-if expr)]
     [(primcall? expr)  (emit-primcall expr)])) 
-
-;     [(_ e1 e2 e3 ...)
-;      (if e1 (and e2 e3 ...) #f)]))
 
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling
