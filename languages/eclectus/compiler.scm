@@ -162,20 +162,20 @@
 (define (primcall? expr)
   (and (pair? expr) (primitive? (car expr))))
 
-; a unary function is a symbol with the properties
+; a primitive function is a symbol with the properties
 ; *is-prim*, *arg-count* and *emitter*
 ; implementatus of primitive functions are added
 ; with 'define-primitive'
 (define-syntax define-primitive
   (syntax-rules ()
-    [(_ (prim-name arg) b b* ...)
+    [(_ (prim-name arg* ...) b b* ...)
      (begin
         (putprop 'prim-name '*is-prim*
           #t)
         (putprop 'prim-name '*arg-count*
-          (length '(arg)))
+          (length '(arg* ...)))
         (putprop 'prim-name '*emitter*
-          (lambda (arg) b b* ...)))]))
+          (lambda (arg* ...) b b* ...)))]))
 
 ; implementation of fxadd1
 (define-primitive (fxadd1 arg)

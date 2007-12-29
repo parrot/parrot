@@ -23,6 +23,8 @@ the is no 'petite 7.3' around.
 
 =head1 TODO
 
+- binary primitives: fx+, fx-, fxlogand, fxlogor, fx=, fx<, fx<=, fx>, fx>=, char=, char<, char<=
+- local variables
 - allow running the tests with 'petite' itself
 - allow test-description per test case
 - In the longterm, Eclectus should become self-hosting
