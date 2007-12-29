@@ -95,6 +95,8 @@ shared-interpreter concurrency.
 The following are a few of the concurrency models Parrot intends to
 support. The biggest differences between them are in how they handle
 variables shared across concurrent tasks.  But the design is such that
+each of the different models can run simultaneously, coordinated through the
+central concurrency scheduler.
 
 =head3 Mutex/Lock Concurrency
 
