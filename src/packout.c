@@ -40,7 +40,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 opcode_t
-PackFile_pack_size(PARROT_INTERP, ARGIN(const PackFile *self))
+PackFile_pack_size(PARROT_INTERP, ARGINOUT(PackFile *self))
 {
     size_t size;
     size_t header_size = 0;
@@ -56,7 +56,7 @@ PackFile_pack_size(PARROT_INTERP, ARGIN(const PackFile *self))
     size += 4; /* directory type + 3 padding zeros */
 
     dir->base.file_offset = size;
-    size += PackFile_Segment_packed_size(interp, (PackFile_Segment *) dir);
+    size += PackFile_Segment_packed_size(interp, (const PackFile_Segment *) dir);
 
     return size;
 }

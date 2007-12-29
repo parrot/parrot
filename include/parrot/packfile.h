@@ -302,7 +302,7 @@ void PackFile_pack(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-opcode_t PackFile_pack_size(PARROT_INTERP, ARGIN(const PackFile *self))
+opcode_t PackFile_pack_size(PARROT_INTERP, ARGINOUT(PackFile *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
