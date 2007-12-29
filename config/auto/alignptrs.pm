@@ -57,21 +57,39 @@ sub runstep {
         cc_build();
         for my $try_align ( 64, 32, 16, 8, 4, 2, 1 ) {
             my $results = cc_run_capture($try_align);
-            if ( $results =~ /OK/ && $results !~ /align/i ) {
-                $align = $try_align;
-            }
+            $align = _evaluate_results($results, $try_align);
         }
         cc_clean();
 
-        die "Can't determine alignment!\n" unless defined $align;
-        $conf->data->set( ptr_alignment => $align );
+        _evaluate_ptr_alignment($conf, $align);
     }
 
+    $self->_finalize_result_str($align, $result_str);
+
+    return 1;
+}
+
+sub _evaluate_results {
+    my ($results, $try_align) = @_;
+    my $align;
+    if ( $results =~ /OK/ && $results !~ /align/i ) {
+        $align = $try_align;
+    }
+    return $align;
+}
+
+sub _evaluate_ptr_alignment {
+    my ($conf, $align) = @_;
+    die "Can't determine alignment!\n" unless defined $align;
+    $conf->data->set( ptr_alignment => $align );
+}
+
+sub _finalize_result_str {
+    my $self = shift;
+    my ($align, $result_str) = @_;
     $result_str .= " $align byte";
     $result_str .= "s" unless $align == 1;
     $self->set_result($result_str);
-
-    return 1;
 }
 
 1;

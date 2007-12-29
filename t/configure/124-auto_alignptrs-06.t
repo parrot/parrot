@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 124-auto_alignptrs-05.t
+# 124-auto_alignptrs-06.t
 
 use strict;
 use warnings;
@@ -43,10 +43,10 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my $align = 2;
-auto::alignptrs::_evaluate_ptr_alignment($conf, $align);
-is($conf->data->get( 'ptr_alignment' ), 2,
-    "Got expected pointer alignment");
+my $align;
+eval { auto::alignptrs::_evaluate_ptr_alignment($conf, $align); };
+like($@, qr/Can't determine alignment!/,
+    "Got expected 'die' message");
 
 pass("Completed all tests in $0");
 
@@ -54,11 +54,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-124-auto_alignptrs-05.t - test config::auto::alignptrs
+124-auto_alignptrs-06.t - test config::auto::alignptrs
 
 =head1 SYNOPSIS
 
-    % prove t/configure/124-auto_alignptrs-05.t
+    % prove t/configure/124-auto_alignptrs-06.t
 
 =head1 DESCRIPTION
 

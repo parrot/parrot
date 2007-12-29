@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 124-auto_alignptrs-05.t
+# 124-auto_alignptrs-07.t
 
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -43,10 +43,13 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my $align = 2;
-auto::alignptrs::_evaluate_ptr_alignment($conf, $align);
-is($conf->data->get( 'ptr_alignment' ), 2,
-    "Got expected pointer alignment");
+my ($results, $try_align, $align);
+is(auto::alignptrs::_evaluate_results(q{OK}, 2), 2,
+    "Got expected alignment");
+is(auto::alignptrs::_evaluate_results(q{OK align}, 2), undef,
+    "Got undef as expected");
+is(auto::alignptrs::_evaluate_results(q{foobar}, 2), undef,
+    "Got undef as expected");
 
 pass("Completed all tests in $0");
 
@@ -54,11 +57,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-124-auto_alignptrs-05.t - test config::auto::alignptrs
+124-auto_alignptrs-07.t - test config::auto::alignptrs
 
 =head1 SYNOPSIS
 
-    % prove t/configure/124-auto_alignptrs-05.t
+    % prove t/configure/124-auto_alignptrs-07.t
 
 =head1 DESCRIPTION
 
