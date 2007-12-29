@@ -1,20 +1,9 @@
 ; $Id$
-; $Id$
+
+(load "tap_helpers.scm")
 
 ; This test script has nothing to do with implementing Scheme.
 ; It is just a playgroud for trying out Scheme syntax
-
-(define plan
-  (lambda (num-tests)
-    ( printf "~s..~s\n" 1 num-tests)))
-
-(define pass
-  (lambda (test-num test-description)
-    ( printf "ok ~s - ~s\n" test-num test-description)))
-
-(define fail
-  (lambda (test-num test-description)
-    ( printf "not ok ~s - ~s\n" test-num test-description)))
 
 ; set up TAP test plan
 (plan 17)

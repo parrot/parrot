@@ -1,5 +1,7 @@
 ; $Id$
 
+(load "tap_helpers.scm")
+
 (define all-tests '())
 
 (define run-with-petite #f)
@@ -22,11 +24,8 @@
      [(string) (test-with-string-output test-id expr out test-name)]
      [else (error 'test "invalid test type ~s" type)])))
  
-(define (test-plan num-tests)
-  ( printf "~s..~s\n" 1 num-tests ))
-
 (define (test-all)
-  (test-plan (length (cdar all-tests)))
+  (plan (length (cdar all-tests)))
 
   ;; run the tests
   (let f ([i 0] [ls (reverse all-tests)])
@@ -81,8 +80,8 @@
    (run-compile expr)
    (execute)
    (if (string=? expected-output (get-string))
-     (printf     "ok ~s - ~s: ~s\n" ( + test-id 1 ) test-name expr )
-     (printf "not ok ~s - ~s: expected ~s, got ~s\n" ( + test-id 1 ) test-name expr (get-string) )))
+     (pass ( + test-id 1 ) (format "~s: ~s\n" test-name expr))
+     (fail ( + test-id 1 ) (format "~s: expected ~s, got ~s\n" test-name expr (get-string) ))))
 
 (define (emit . args)
   (apply fprintf (compile-port) args)
