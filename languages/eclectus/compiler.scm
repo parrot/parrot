@@ -4,6 +4,12 @@
 
 ;; Helpers that emit PIR
 
+; unique ids for registers
+(define counter 1000)
+(define (gen-unique-id)
+  (set! counter (+ 1 counter))
+  counter)
+
 ; Emit PIR that loads libs
 (define (emit-init)
   (emit "
@@ -288,11 +294,11 @@
 
 (define (emit-function-header function-name)
   (emit (string-append ".sub " function-name))
-  (emit ".local pmc val_true, val_false, val_x")
+  (emit "    .local pmc val_true, val_false, val_x")
   (emit-immediate #t)
-  (emit "val_true = val_x")
+  (emit "    val_true = val_x")
   (emit-immediate #f)
-  (emit "val_false = val_x")
+  (emit "    val_false = val_x")
 )
 
 (define (emit-function-footer)
@@ -308,25 +314,27 @@
 (define (emit-immediate expr)
   (emit (immediate-rep expr)))
 
-(define (emit-if expr)
+(define (emit-if expr uid)
+  (emit "    .local pmc tmp_if_test_~a, tmp_if_conseq_~a, tmp_if_altern_~a" uid uid uid)
   (emit-expr (if-test expr))
-  (emit "$P0 = val_x")
+  (emit "tmp_if_test_~a = val_x" uid)
   (emit-expr (if-conseq expr))
-  (emit "$P1 = val_x")
+  (emit "tmp_if_conseq_~a = val_x" uid)
   (emit-expr (if-altern expr))
-  (emit "$P2 = val_x")
+  (emit "tmp_if_altern_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( $P0, $P1, $P2, 'pasttype' => 'if'  )
-        "))
+        val_x.init( tmp_if_test_~a, tmp_if_conseq_~a, tmp_if_altern_~a, 'pasttype' => 'if'  )
+        " uid uid uid))
  
 ; emir PIR for an expression
 (define (emit-expr expr)
   ; (display "# ")(write expr) (newline)
   (cond
     [(immediate? expr) (emit-immediate expr)]
-    [(if? expr)        (emit-if expr)]
-    [(primcall? expr)  (emit-primcall expr)])) 
+    [(if? expr)        (emit-if expr (gen-unique-id))]
+    [(primcall? expr)  (emit-primcall expr)]
+  )) 
 
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling
