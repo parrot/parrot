@@ -1594,8 +1594,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             /* If the opcode jumps and this is the last argument,
                that means this is a label */
             if ((j == info->op_count - 1) &&
-                (info->jump & PARROT_JUMP_RELATIVE))
-            {
+                (info->jump & PARROT_JUMP_RELATIVE)) {
                 if (file) {
                     dest[size++] = 'L';
                     i            = PDB_add_label(file, op, op[j]);
@@ -1757,6 +1756,79 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             dest[size++] = ',';
     }
 
+    /* Special decoding for the signature used in args/returns.  Such ops have
+       one fixed parameter (the signature vector), plus a varying number of
+       registers/constants.  For each arg/return, we show the register and its
+       flags using PIR syntax. */
+    if (*(op) == PARROT_OP_set_args_pc ||
+            *(op) == PARROT_OP_get_results_pc ||
+            *(op) == PARROT_OP_get_params_pc ||
+            *(op) == PARROT_OP_set_returns_pc) {
+        char buf[1000];
+        PMC * const sig = interp->code->const_table->constants[op[1]]->u.key;
+        int n_values = SIG_ELEMS(sig);
+        /* The flag_names strings come from Call_bits_enum_t (with which it
+           should probably be colocated); they name the bits from LSB to MSB.
+           The two least significant bits are not flags; they are the register
+           type, which is decoded elsewhere.  We also want to show unused bits,
+           which could indicate problems.
+        */
+        const char *flag_names[] = { "",
+                                     "",
+                                     " :unused004",
+                                     " :unused008",
+                                     " :const",
+                                     " :flat",	/* should be :slurpy for args */
+                                     " :unused040",
+                                     " :optional",
+                                     " :opt_flag",
+                                     " :named",
+                                     NULL
+        };
+        /* Register decoding.  It would be good to abstract this, too. */
+        const char *regs = "ISPN";
+
+        for (j = 0; j < n_values; j++) {
+            unsigned int idx = 0;
+            int sig_value = VTABLE_get_integer_keyed_int(interp, sig, j);
+
+            /* Print the register name, e.g. P37. */
+            buf[idx++] = ',';
+            buf[idx++] = ' ';
+            buf[idx++] = regs[sig_value & PARROT_ARG_TYPE_MASK];
+            Parrot_snprintf(interp, &buf[idx], sizeof(buf)-idx,
+                            INTVAL_FMT, op[j+2]);
+            idx = strlen(buf);
+
+            /* Add flags, if we have any. */
+            {
+                int flag_idx = 0;
+                int flag_p = 0;
+                int flags = sig_value;
+
+                /* End when we run out of flags, off the end of flag_names, or
+                   get too close to the end of buf. */
+                while (flags && idx < sizeof(buf)-100) {
+                    const char *flag_string = flag_names[flag_idx];
+                    if (! flag_string)
+                        break;
+                    if (flags & 1 && *flag_string) {
+                        int n = strlen(flag_string);
+                        strcpy(&buf[idx], flag_string);
+                        idx += n;
+                    }
+                    flags >>= 1;
+                    flag_idx++;
+                }
+            }
+
+            /* Add it to dest. */
+            buf[idx++] = '\0';
+            strcpy(&dest[size], buf);
+            size += strlen(buf);
+        }
+    }
+
     dest[size] = '\0';
     return ++size;
 }
@@ -1793,6 +1865,7 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         PDB_free_file(interp);
 
     pline->number        = 1;
+    pline->label         = NULL;
     pfile->line          = pline;
     pfile->label         = NULL;
     pfile->size          = 0;
