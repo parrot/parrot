@@ -30,6 +30,13 @@ F<config/gen/cflags/root.in>.
 use strict;
 use warnings;
 
+my $return_only;
+
+if ($ARGV[0] eq '--return-only') {
+    $return_only = 1;
+    shift;
+}
+
 my $cflags = shift;
 
 open my $F, '<', $cflags or die "open $cflags: $!\n";
@@ -126,6 +133,12 @@ if ($cfile) {
         print "$cfile\n";
     }
 }
+
+if ($return_only) {
+    print join ' ', @ARGV;
+    exit;
+}
+
 exit system(@ARGV) / 256;
 
 # Local Variables:

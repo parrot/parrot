@@ -759,6 +759,13 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC) \
     $(SRC_DIR)/parrot_config$(O)
+
+pbc_to_c.pir : $(PARROT) tools/dev/pbc_to_c_gen.pl
+	$(PERL) pbc_to_c_gen.pl \
+    '$(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@ \
+	@ld_out@ @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)' \
+    > pbc_to_c.pir
+
 #
 # TODO build the real miniparrot
 #
