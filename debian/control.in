@@ -1,21 +1,21 @@
 Source: parrot
 Section: interpreters
 Priority: optional
-Maintainer: Parrot Porters <parrot-porters@perl.org>
-Uploaders: chromatic <chromatic@wgz.org>, Jonathan Worthington <jonathan@jnthn.net>
-Build-Depends: debhelper (>= 4.0.0), perl, perl-doc, libgmp3-dev, libgdbm-dev, python, libicu-dev, libreadline-dev
-Standards-Version: 3.6.2
+Maintainer: Allison Randal <allison@perl.org>
+Uploaders: Nuno Carvalho <mestre.smash@gmail.com>, Patrick Michaud <pmichaud@pobox.com>
+Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libgmp3-dev, libgdbm-dev, python, libicu-dev, libreadline-dev
+Standards-Version: 3.7.2
 
 Package: parrot
 Architecture: any
 Depends: ${shlibs:Depends}
 Suggests: parrot-doc
 Recommends: perl
-Description: virtual machine to execute bytecode for interpreted languages
- Parrot is a virtual machine designed to execute bytecode for interpreted
- languages efficiently. Parrot will be the target for the Perl 6 compiler.
- There is already a partial Perl 6 compiler as well as compilers in various
- stages of completion for a wide range of other languages.
+Description: Virtual machine for dynamic languages
+ Parrot is a virtual machine designed to efficiently compile and execute
+ bytecode for dynamic languages. Parrot currently hosts a variety of language
+ implementations in various stages of completion, including Tcl, Javascript,
+ Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
 
 Package: libparrot%SOVERSION%
 Architecture: any
@@ -23,23 +23,23 @@ Section: libs
 Depends: ${shlibs:Depends}
 Provides: libparrot
 Conflicts: libparrot
-Description: virtual machine to execute bytecode for interpreted languages
- Parrot is a virtual machine designed to execute bytecode for interpreted
- languages efficiently. Parrot will be the target for the Perl 6 compiler.
- There is already a partial Perl 6 compiler as well as compilers in various
- stages of completion for a wide range of other languages.
+Description: Virtual machine for dynamic languages
+ Parrot is a virtual machine designed to efficiently compile and execute
+ bytecode for dynamic languages. Parrot currently hosts a variety of language
+ implementations in various stages of completion, including Tcl, Javascript,
+ Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
  .
- This package contains the parrot shared library.
+ This package contains the Parrot shared library.
  
 Package: libparrot-dev
 Architecture: any
 Section: libdevel
 Depends: libparrot%SOVERSION% (= ${Source-Version}), parrot, libicu-dev
-Description: virtual machine to execute bytecode for interpreted languages
- Parrot is a virtual machine designed to execute bytecode for interpreted
- languages efficiently. Parrot will be the target for the Perl 6 compiler.
- There is already a partial Perl 6 compiler as well as compilers in various
- stages of completion for a wide range of other languages.
+Description: Virtual machine for dynamic languages
+ Parrot is a virtual machine designed to efficiently compile and execute
+ bytecode for dynamic languages. Parrot currently hosts a variety of language
+ implementations in various stages of completion, including Tcl, Javascript,
+ Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
  .
  This package contains files needed to develop applications which embed Parrot.
 
@@ -47,10 +47,10 @@ Package: parrot-doc
 Architecture: all
 Section: doc
 Suggests: perl-doc
-Description: virtual machine to execute bytecode for interpreted languages
- Parrot is a virtual machine designed to execute bytecode for interpreted
- languages efficiently. Parrot will be the target for the Perl 6 compiler.
- There is already a partial Perl 6 compiler as well as compilers in various
- stages of completion for a wide range of other languages.
+Description: Virtual machine for dynamic languages
+ Parrot is a virtual machine designed to efficiently compile and execute
+ bytecode for dynamic languages. Parrot currently hosts a variety of language
+ implementations in various stages of completion, including Tcl, Javascript,
+ Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
  .
- This package contains various documentation for parrot.
+ This package contains various documentation for Parrot.

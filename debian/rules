@@ -36,7 +36,7 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/nci_test.o
+	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/nci_test.o src/main.o ext/Parrot-Embed/Makefile.PL languages/PIR/Makefile languages/perl5/Makefile languages/pynie/Makefile runtime/parrot/include/signal.pasm test.c test.ldo
 	-$(MAKE) realclean
 	dh_clean 
 
@@ -47,9 +47,14 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_testdir
 	dh_testroot
 	dh_clean -k 
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+	$(MAKE) reallyinstall DESTDIR=$(CURDIR)/debian/tmp
+	dh_installdirs
+	find $(CURDIR)/debian/tmp -type f
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
+	install -m644 src/null_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
+	install -m644 src/parrot_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
+	install -m644 src/install_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
 
 # Build architecture-independent files here.
 binary-indep: build install

@@ -1,3 +1,59 @@
+parrot (0.5.1-1) unstable; urgency=low
+
+  * New upstream release (Closes: #444707).
+  * debian/control.in:
+    - Maintainer: Allison Randal <allison@perl.org>
+      (Closes: #444708)
+    - Uploaders: Nuno Carvalho <mestre.smash@gmail.com>,
+      Patrick Michaud <pmichaud@pobox.com>
+    - Updated long and short package descriptions.
+  * debian/copyright:
+    - Updated license information: Artistic License 2.0.
+    - Updated license link.
+    - Updated copyright years.
+    - Removed copyright info for files no longer in distribution
+
+ -- Allison Randal <allison@perl.org>  Sun, 30 Dec 2007 17:21:45 +0000
+
+parrot (0.4.13-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Wed, 20 Jun 2007 22:43:49 +0200
+
+parrot (0.4.12-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon, 18 Jun 2007 20:08:49 +0200
+
+parrot (0.4.6-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Thu, 10 Aug 2006 04:48:00 +0200
+
+parrot (0.4.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * Use DH_COMPAT 5.
+  * Bump up Standards-Version to 3.7.2 (no changes).
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon,  3 Jul 2006 16:47:52 +0200
+
+parrot (0.4.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump Standards-Version to 3.7.2 (no changes).
+  * Clean up Makefiles in languages/{APL,pheme,perl6,pugs}.
+  * Clean up object/temp files in languages/{pugs,perl6} while running
+    realclean.
+  * Install src/*_config.o into /usr/lib/parrot/config/.
+    + Yes, that's ugly, but I don't see any other possibility for other
+      programs, like pugs, to link against parrot properly.
+
+ -- Florian Ragwitz <rafl@debian.org>  Tue, 16 May 2006 17:17:02 +0200
+
 parrot (0.4.3-1) unstable; urgency=low
 
   * New upstream release.
