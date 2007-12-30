@@ -1790,7 +1790,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
 
         for (j = 0; j < n_values; j++) {
             unsigned int idx = 0;
-            int sig_value = VTABLE_get_integer_keyed_int(interp, sig, j);
+            const int sig_value = VTABLE_get_integer_keyed_int(interp, sig, j);
 
             /* Print the register name, e.g. P37. */
             buf[idx++] = ',';
@@ -1803,17 +1803,16 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             /* Add flags, if we have any. */
             {
                 int flag_idx = 0;
-                int flag_p = 0;
                 int flags = sig_value;
 
                 /* End when we run out of flags, off the end of flag_names, or
                    get too close to the end of buf. */
                 while (flags && idx < sizeof (buf)-100) {
-                    const char *flag_string = flag_names[flag_idx];
+                    const char * const flag_string = flag_names[flag_idx];
                     if (! flag_string)
                         break;
                     if (flags & 1 && *flag_string) {
-                        int n = strlen(flag_string);
+                        const size_t n = strlen(flag_string);
                         strcpy(&buf[idx], flag_string);
                         idx += n;
                     }
