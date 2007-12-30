@@ -6,8 +6,11 @@
 (add-tests-with-string-output "unary primitives"      
   [(fxadd1 -2)                            => "-1\n" ]
   [(fxadd1 -1)                            => "0\n" ]
+  [(fxadd1 0)                             => "1\n" ]
   [(fxadd1 1)                             => "2\n" ]
   [(fxadd1 2)                             => "3\n" ]
+  [(fxadd1 (fxadd1 2))                    => "4\n" ]
+  [(fxadd1 (fxadd1 (fxadd1 2)))           => "5\n" ]
 
   [(fxsub1 -2)                            => "-3\n" ]
   [(fxsub1 -1)                            => "-2\n" ]

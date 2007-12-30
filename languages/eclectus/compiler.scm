@@ -168,17 +168,17 @@
 ; with 'define-primitive'
 (define-syntax define-primitive
   (syntax-rules ()
-    [(_ (prim-name arg* ...) b b* ...)
+    [(_ (prim-name uid arg* ...) b b* ...)
      (begin
         (putprop 'prim-name '*is-prim*
           #t)
         (putprop 'prim-name '*arg-count*
           (length '(arg* ...)))
         (putprop 'prim-name '*emitter*
-          (lambda (arg* ...) b b* ...)))]))
+          (lambda (uid arg* ...) b b* ...)))]))
 
 ; implementation of fxadd1
-(define-primitive (fxadd1 arg)
+(define-primitive (fxadd1 uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit-immediate 1)
@@ -188,8 +188,20 @@
         val_x.init( $P0, $P1, 'pirop' => 'n_add' )
         "))
 
+; implementation of fx+
+(define-primitive (fx+ uid arg1 arg2)
+  (emit "    .local pmc tmp_fx_plus1_~a, tmp_fx_plus2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "tmp_fx_plus1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "tmp_fx_plus2_~a = val_x" uid)
+  (emit "
+        val_x = new 'PAST::Op'
+        val_x.init( tmp_fx_plus1_~a, tmp_fx_plus2_~a, 'pirop' => 'n_add' )
+        " uid uid))
+
 ; implementation of fxsub1
-(define-primitive (fxsub1 arg)
+(define-primitive (fxsub1 uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit-immediate 1)
@@ -200,7 +212,7 @@
         "))
 
 ; implementation of char->fixnum
-(define-primitive (char->fixnum arg)
+(define-primitive (char->fixnum uid arg)
   (emit-expr arg)
   (emit "
         $P0 = val_x
@@ -209,7 +221,7 @@
         "))
 
 ; implementation of fixnum->char
-(define-primitive (fixnum->char arg)
+(define-primitive (fixnum->char uid arg)
   (emit-expr arg)
   (emit "
         $P0 = val_x
@@ -218,7 +230,7 @@
         "))
 
 ; implementation of fxzero?
-(define-primitive (fxzero? arg)
+(define-primitive (fxzero? uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit-immediate 0)
@@ -231,7 +243,7 @@
         "))
 
 ; implementation of null?
-(define-primitive (null? arg)
+(define-primitive (null? uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit "
@@ -242,7 +254,7 @@
         "))
 
 ; implementation of fixnum?
-(define-primitive (fixnum? arg)
+(define-primitive (fixnum? uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit "
@@ -253,7 +265,7 @@
         "))
 
 ; implementation of boolean?
-(define-primitive (boolean? arg)
+(define-primitive (boolean? uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit "
@@ -265,7 +277,7 @@
 
 ; implementation of not?
 ; first check boolean? and then the inverse truthiness
-(define-primitive (not? arg)
+(define-primitive (not? uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit "
@@ -278,7 +290,7 @@
         "))
 
 ; implementation of char?
-(define-primitive (char? arg)
+(define-primitive (char? uid arg)
   (emit-expr arg)
   (emit "$P0 = val_x")
   (emit "
@@ -309,7 +321,7 @@
 
 (define (emit-primcall expr)
   (let ([prim (car expr)] [args (cdr expr)])
-    (apply (primitive-emitter prim) args)))
+    (apply (primitive-emitter prim) (gen-unique-id) args)))
 
 (define (emit-immediate expr)
   (emit (immediate-rep expr)))
