@@ -354,7 +354,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_n(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname))
+Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), NULLOK(STRING *globalname))
 {
     PMC *res;
 
@@ -393,7 +393,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_cur(PARROT_INTERP, NULLOK(STRING *globalname))
+Parrot_find_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 {
     PMC * const ns = CONTEXT(interp->ctx)->current_namespace;
     return Parrot_find_global_n(interp, ns, globalname);
@@ -418,7 +418,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_k(PARROT_INTERP, NULLOK(PMC *pmc_key), NOTNULL(STRING *globalname))
+Parrot_find_global_k(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc_key), ARGIN(STRING *globalname))
 {
     PMC * const ns =
         Parrot_get_namespace_keyed(interp,
@@ -519,7 +519,7 @@ entirely use the untyped interface.
 
 PARROT_API
 void
-Parrot_store_global_k(PARROT_INTERP, NOTNULL(PMC *pmc_key),
+Parrot_store_global_k(PARROT_INTERP, ARGIN(PMC *pmc_key),
                       NULLOK(STRING *globalname), NULLOK(PMC *val))
 {
     PMC *ns;
@@ -586,8 +586,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_find_global_op(PARROT_INTERP, NOTNULL(PMC *ns),
-        NOTNULL(STRING *globalname), NULLOK(void *next))
+Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
+        ARGIN(STRING *globalname), NULLOK(void *next))
 {
     PMC *res;
 
@@ -621,7 +621,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_name_op(PARROT_INTERP, NOTNULL(STRING *name), SHIM(void *next))
+Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 {
     parrot_context_t * const ctx = CONTEXT(interp->ctx);
     PMC * const lex_pad = Parrot_find_pad(interp, name, ctx);

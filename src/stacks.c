@@ -245,7 +245,7 @@ variable or something.
 PARROT_API
 void
 stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
-           ARGIN(void *thing), Stack_entry_type type, ARGIN_NULLOK(Stack_cleanup_method cleanup))
+           ARGIN(void *thing), Stack_entry_type type, NULLOK(Stack_cleanup_method cleanup))
 {
     Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_push(interp, stack_p);
 

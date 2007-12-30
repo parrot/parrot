@@ -74,13 +74,13 @@ static PMC* mmd_arg_tuple_func(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* mmd_arg_tuple_inline(PARROT_INTERP,
-    NOTNULL(STRING *signature),
+    ARGIN(STRING *signature),
     va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void mmd_create_builtin_multi_meth(PARROT_INTERP,
-    NOTNULL(PMC *ns),
+    ARGIN(PMC *ns),
     INTVAL type,
     ARGIN(const MMD_init *entry))
         __attribute__nonnull__(1)
@@ -88,7 +88,7 @@ static void mmd_create_builtin_multi_meth(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static void mmd_create_builtin_multi_meth_2(PARROT_INTERP,
-    NOTNULL(PMC *ns),
+    ARGIN(PMC *ns),
     INTVAL func_nr,
     INTVAL type,
     INTVAL right,
@@ -116,7 +116,7 @@ static UINTVAL mmd_distance(PARROT_INTERP,
 
 static void mmd_ensure_writable(PARROT_INTERP,
     INTVAL function,
-    NULLOK(PMC *pmc))
+    ARGIN_NULLOK(const PMC *pmc))
         __attribute__nonnull__(1);
 
 static void mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
@@ -142,23 +142,23 @@ static PMC* mmd_make_ns(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static int mmd_maybe_candidate(PARROT_INTERP,
-    NOTNULL(PMC *pmc),
-    NOTNULL(PMC *cl))
+    ARGIN(PMC *pmc),
+    ARGIN(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void mmd_search_builtin(PARROT_INTERP,
-    NOTNULL(STRING *meth),
-    NOTNULL(PMC *cl))
+    ARGIN(STRING *meth),
+    ARGIN(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void mmd_search_classes(PARROT_INTERP,
-    NOTNULL(STRING *meth),
-    NOTNULL(PMC *arg_tuple),
-    NOTNULL(PMC *cl),
+    ARGIN(STRING *meth),
+    ARGIN(PMC *arg_tuple),
+    ARGIN(PMC *cl),
     INTVAL start_at_parent)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -166,8 +166,8 @@ static void mmd_search_classes(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static int mmd_search_cur_namespace(PARROT_INTERP,
-    NOTNULL(STRING *meth),
-    NOTNULL(PMC *cl))
+    ARGIN(STRING *meth),
+    ARGIN(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -175,8 +175,8 @@ static int mmd_search_cur_namespace(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* mmd_search_default(PARROT_INTERP,
-    NOTNULL(STRING *meth),
-    NOTNULL(PMC *arg_tuple))
+    ARGIN(STRING *meth),
+    ARGIN(PMC *arg_tuple))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -381,7 +381,7 @@ Make sure C<pmc> is writable enough for C<function>.
 */
 
 static void
-mmd_ensure_writable(PARROT_INTERP, INTVAL function, NULLOK(PMC *pmc))
+mmd_ensure_writable(PARROT_INTERP, INTVAL function, ARGIN_NULLOK(const PMC *pmc))
 {
     if (!PMC_IS_NULL(pmc) && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG))
         real_exception(interp, 0, 1, "%s applied to read-only argument",
@@ -411,8 +411,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-mmd_dispatch_p_ppp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(PMC *right), NULLOK(PMC *dest), INTVAL func_nr)
+mmd_dispatch_p_ppp(PARROT_INTERP, ARGIN(PMC *left), ARGIN(PMC *right),
+        ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
 {
     mmd_f_p_ppp real_function;
     int is_pmc;
@@ -451,7 +451,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PMC*
 mmd_dispatch_p_pip(PARROT_INTERP,
-        NOTNULL(PMC *left), INTVAL right, NULLOK(PMC *dest), INTVAL func_nr)
+        ARGIN(PMC *left), INTVAL right, ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
 {
     int is_pmc;
 
@@ -495,7 +495,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PMC*
 mmd_dispatch_p_pnp(PARROT_INTERP,
-        NOTNULL(PMC *left), FLOATVAL right, NULLOK(PMC *dest), INTVAL func_nr)
+        ARGIN(PMC *left), FLOATVAL right, ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
 {
     mmd_f_p_pnp real_function;
     int is_pmc;
@@ -533,14 +533,13 @@ Like C<mmd_dispatch_p_ppp>, right argument is a native STRING *.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PMC*
-mmd_dispatch_p_psp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(STRING *right), NULLOK(PMC *dest), INTVAL func_nr)
+mmd_dispatch_p_psp(PARROT_INTERP, ARGIN(PMC *left), ARGIN(STRING *right),
+        ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
 {
-    mmd_f_p_psp real_function;
     int is_pmc;
     const UINTVAL left_type = VTABLE_type(interp, left);
-
-    real_function = (mmd_f_p_psp)get_mmd_dispatch_type(interp,
+    const mmd_f_p_psp real_function =
+        (mmd_f_p_psp)get_mmd_dispatch_type(interp,
             func_nr, left_type, enum_type_STRING, &is_pmc);
     if (is_pmc) {
         PMC * const sub = (PMC*)real_function;
@@ -569,7 +568,7 @@ Inplace dispatch function for C<< left <op=> right >>.
 PARROT_API
 void
 mmd_dispatch_v_pp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(PMC *right), INTVAL func_nr)
+        ARGIN(PMC *left), ARGIN(PMC *right), INTVAL func_nr)
 {
     mmd_f_v_pp real_function;
     int is_pmc;
@@ -604,7 +603,7 @@ Inplace dispatch function for C<< left <op=> right >>.
 PARROT_API
 void
 mmd_dispatch_v_pi(PARROT_INTERP,
-        NOTNULL(PMC *left), INTVAL right, INTVAL func_nr)
+        ARGIN(PMC *left), INTVAL right, INTVAL func_nr)
 {
     mmd_f_v_pi real_function;
     int is_pmc;
@@ -638,7 +637,7 @@ Inplace dispatch function for C<< left <op=> right >>.
 PARROT_API
 void
 mmd_dispatch_v_pn(PARROT_INTERP,
-        NOTNULL(PMC *left), FLOATVAL right, INTVAL func_nr)
+        ARGIN(PMC *left), FLOATVAL right, INTVAL func_nr)
 {
     mmd_f_v_pn real_function;
     int is_pmc;
@@ -672,7 +671,7 @@ Inplace dispatch function for C<< left <op=> right >>.
 PARROT_API
 void
 mmd_dispatch_v_ps(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(STRING *right), INTVAL func_nr)
+        ARGIN(PMC *left), ARGIN(STRING *right), INTVAL func_nr)
 {
     mmd_f_v_ps real_function;
     int is_pmc;
@@ -707,7 +706,7 @@ by MMD compare functions.
 PARROT_API
 INTVAL
 mmd_dispatch_i_pp(PARROT_INTERP,
-        NOTNULL(PMC *left), NOTNULL(PMC *right), INTVAL func_nr)
+        ARGIN(PMC *left), ARGIN(PMC *right), INTVAL func_nr)
 {
     mmd_f_i_pp real_function;
     int is_pmc;
@@ -891,7 +890,7 @@ PARROT_API
 void
 mmd_add_by_class(PARROT_INTERP,
              INTVAL functype,
-             NOTNULL(STRING *left_class), NOTNULL(STRING *right_class),
+             ARGIN(STRING *left_class), ARGIN(STRING *right_class),
              NULLOK(funcptr_t funcptr))
 {
     INTVAL left_type = pmc_type(interp, left_class);
@@ -983,7 +982,7 @@ void
 mmd_register_sub(PARROT_INTERP,
              INTVAL func_nr,
              INTVAL left_type, INTVAL right_type,
-             NOTNULL(PMC *sub))
+             ARGIN(const PMC *sub))
 {
     if (sub->vtable->base_type == enum_class_NCI) {
         /* returned from mmdvt_find */
@@ -1070,7 +1069,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_MMD_search_default_infix(PARROT_INTERP, NOTNULL(STRING *meth),
+Parrot_MMD_search_default_infix(PARROT_INTERP, ARGIN(STRING *meth),
         INTVAL left_type, INTVAL right_type)
 {
     PMC* const arg_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
@@ -1096,7 +1095,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_mmd_sort_candidate_list(PARROT_INTERP, NOTNULL(PMC *candidates))
+Parrot_mmd_sort_candidate_list(PARROT_INTERP, ARGIN(PMC *candidates))
 {
     PMC *arg_tuple;
     INTVAL n;
@@ -1131,7 +1130,7 @@ arguments.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-mmd_arg_tuple_inline(PARROT_INTERP, NOTNULL(STRING *signature), va_list args)
+mmd_arg_tuple_inline(PARROT_INTERP, ARGIN(STRING *signature), va_list args)
 {
     INTVAL i;
     PMC *arg;
@@ -1284,7 +1283,7 @@ result
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-mmd_search_default(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *arg_tuple))
+mmd_search_default(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *arg_tuple))
 {
     INTVAL n;
 
@@ -1341,8 +1340,8 @@ or 1 to search from the first parent class.
 */
 
 static void
-mmd_search_classes(PARROT_INTERP, NOTNULL(STRING *meth),
-        NOTNULL(PMC *arg_tuple), NOTNULL(PMC *cl), INTVAL start_at_parent)
+mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
+        ARGIN(PMC *arg_tuple), ARGIN(PMC *cl), INTVAL start_at_parent)
 {
     INTVAL type1;
 
@@ -1694,7 +1693,7 @@ to continue searching outer scopes.
 */
 
 static int
-mmd_maybe_candidate(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *cl))
+mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
 {
     INTVAL i, n;
 
@@ -1737,7 +1736,7 @@ TRUE if the MMD search should stop.
 */
 
 static int
-mmd_search_cur_namespace(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *cl))
+mmd_search_cur_namespace(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *cl))
 {
     PMC * const pmc = Parrot_find_global_cur(interp, meth);
 
@@ -1798,7 +1797,7 @@ search in all the namespaces.
 */
 
 static void
-mmd_search_builtin(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *cl))
+mmd_search_builtin(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *cl))
 {
     PMC * const ns = mmd_get_ns(interp);
     PMC * const pmc = Parrot_find_global_n(interp, ns, meth);
@@ -1817,7 +1816,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-mmd_create_builtin_multi_stub(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL func_nr)
+mmd_create_builtin_multi_stub(PARROT_INTERP, ARGIN(PMC *ns), INTVAL func_nr)
 {
     const char * name    = Parrot_MMD_method_name(interp, func_nr);
 
@@ -1839,7 +1838,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
+mmd_create_builtin_multi_meth_2(PARROT_INTERP, ARGIN(PMC *ns),
         INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr)
 {
     const char *short_name;
@@ -1937,7 +1936,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-mmd_create_builtin_multi_meth(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL type,
+mmd_create_builtin_multi_meth(PARROT_INTERP, ARGIN(PMC *ns), INTVAL type,
         ARGIN(const MMD_init *entry))
 {
     mmd_create_builtin_multi_meth_2(interp, ns,

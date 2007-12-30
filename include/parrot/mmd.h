@@ -59,8 +59,8 @@ funcptr_t get_mmd_dispatch_type(PARROT_INTERP,
 PARROT_API
 void mmd_add_by_class(PARROT_INTERP,
     INTVAL functype,
-    NOTNULL(STRING *left_class),
-    NOTNULL(STRING *right_class),
+    ARGIN(STRING *left_class),
+    ARGIN(STRING *right_class),
     NULLOK(funcptr_t funcptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -78,8 +78,8 @@ void mmd_destroy(PARROT_INTERP)
 
 PARROT_API
 INTVAL mmd_dispatch_i_pp(PARROT_INTERP,
-    NOTNULL(PMC *left),
-    NOTNULL(PMC *right),
+    ARGIN(PMC *left),
+    ARGIN(PMC *right),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -88,9 +88,9 @@ INTVAL mmd_dispatch_i_pp(PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PMC* mmd_dispatch_p_pip(PARROT_INTERP,
-    NOTNULL(PMC *left),
+    ARGIN(PMC *left),
     INTVAL right,
-    NULLOK(PMC *dest),
+    ARGIN_NULLOK(PMC *dest),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -98,9 +98,9 @@ PMC* mmd_dispatch_p_pip(PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PMC* mmd_dispatch_p_pnp(PARROT_INTERP,
-    NOTNULL(PMC *left),
+    ARGIN(PMC *left),
     FLOATVAL right,
-    NULLOK(PMC *dest),
+    ARGIN_NULLOK(PMC *dest),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -109,9 +109,9 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC* mmd_dispatch_p_ppp(PARROT_INTERP,
-    NOTNULL(PMC *left),
-    NOTNULL(PMC *right),
-    NULLOK(PMC *dest),
+    ARGIN(PMC *left),
+    ARGIN(PMC *right),
+    ARGIN_NULLOK(PMC *dest),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -120,9 +120,9 @@ PMC* mmd_dispatch_p_ppp(PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PMC* mmd_dispatch_p_psp(PARROT_INTERP,
-    NOTNULL(PMC *left),
-    NOTNULL(STRING *right),
-    NULLOK(PMC *dest),
+    ARGIN(PMC *left),
+    ARGIN(STRING *right),
+    ARGIN_NULLOK(PMC *dest),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -130,7 +130,7 @@ PMC* mmd_dispatch_p_psp(PARROT_INTERP,
 
 PARROT_API
 void mmd_dispatch_v_pi(PARROT_INTERP,
-    NOTNULL(PMC *left),
+    ARGIN(PMC *left),
     INTVAL right,
     INTVAL func_nr)
         __attribute__nonnull__(1)
@@ -138,7 +138,7 @@ void mmd_dispatch_v_pi(PARROT_INTERP,
 
 PARROT_API
 void mmd_dispatch_v_pn(PARROT_INTERP,
-    NOTNULL(PMC *left),
+    ARGIN(PMC *left),
     FLOATVAL right,
     INTVAL func_nr)
         __attribute__nonnull__(1)
@@ -146,8 +146,8 @@ void mmd_dispatch_v_pn(PARROT_INTERP,
 
 PARROT_API
 void mmd_dispatch_v_pp(PARROT_INTERP,
-    NOTNULL(PMC *left),
-    NOTNULL(PMC *right),
+    ARGIN(PMC *left),
+    ARGIN(PMC *right),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -155,8 +155,8 @@ void mmd_dispatch_v_pp(PARROT_INTERP,
 
 PARROT_API
 void mmd_dispatch_v_ps(PARROT_INTERP,
-    NOTNULL(PMC *left),
-    NOTNULL(STRING *right),
+    ARGIN(PMC *left),
+    ARGIN(STRING *right),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -175,7 +175,7 @@ void mmd_register_sub(PARROT_INTERP,
     INTVAL func_nr,
     INTVAL left_type,
     INTVAL right_type,
-    NOTNULL(PMC *sub))
+    ARGIN(const PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(5);
 
@@ -201,7 +201,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_MMD_search_default_infix(PARROT_INTERP,
-    NOTNULL(STRING *meth),
+    ARGIN(STRING *meth),
     INTVAL left_type,
     INTVAL right_type)
         __attribute__nonnull__(1)
@@ -210,13 +210,12 @@ PMC * Parrot_MMD_search_default_infix(PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_mmd_sort_candidate_list(PARROT_INTERP,
-    NOTNULL(PMC *candidates))
+PMC * Parrot_mmd_sort_candidate_list(PARROT_INTERP, ARGIN(PMC *candidates))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void mmd_create_builtin_multi_stub(PARROT_INTERP,
-    NOTNULL(PMC *ns),
+    ARGIN(PMC *ns),
     INTVAL func_nr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

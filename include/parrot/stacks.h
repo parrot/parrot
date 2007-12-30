@@ -129,7 +129,7 @@ void stack_push(PARROT_INTERP,
     ARGMOD(Stack_Chunk_t **stack_p),
     ARGIN(void *thing),
     Stack_entry_type type,
-    ARGIN_NULLOK(Stack_cleanup_method cleanup))
+    NULLOK(Stack_cleanup_method cleanup))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

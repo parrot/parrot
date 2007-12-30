@@ -110,8 +110,10 @@ void list_delete(PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-void * list_get(PARROT_INTERP, ARGINOUT(List *list), INTVAL idx, int type)
-        __attribute__nonnull__(1);
+void * list_get(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, int type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 void list_insert(PARROT_INTERP,
@@ -127,8 +129,10 @@ INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_mark(PARROT_INTERP, ARGINOUT(List *list))
-        __attribute__nonnull__(1);
+void list_mark(PARROT_INTERP, ARGMOD(List *list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 PARROT_MALLOC
@@ -156,8 +160,10 @@ void list_pmc_new_init(PARROT_INTERP,
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-void * list_pop(PARROT_INTERP, ARGINOUT(List *list), int type)
-        __attribute__nonnull__(1);
+void * list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 void list_push(PARROT_INTERP,
@@ -172,8 +178,10 @@ void list_set_length(PARROT_INTERP, ARGINOUT(List *list), INTVAL len)
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-void * list_shift(PARROT_INTERP, ARGINOUT(List *list), int type)
-        __attribute__nonnull__(1);
+void * list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 void list_splice(PARROT_INTERP,
@@ -185,10 +193,12 @@ void list_splice(PARROT_INTERP,
 
 PARROT_API
 void list_unshift(PARROT_INTERP,
-    ARGINOUT(List *list),
+    ARGMOD(List *list),
     ARGIN_NULLOK(void *item),
     int type)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 void list_visit(PARROT_INTERP, ARGIN(List *list), ARGINOUT(void *pinfo))

@@ -644,7 +644,7 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_runops_fromc_args(PARROT_INTERP,
-    NOTNULL(PMC *sub),
+    ARGIN(PMC *sub),
     ARGIN(const char *sig),
     ...)
         __attribute__nonnull__(1)

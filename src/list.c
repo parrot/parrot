@@ -233,10 +233,12 @@ static void list_dump(ARGIN(const List *list), INTVAL type)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void * list_item(PARROT_INTERP,
-    ARGINOUT(List *list),
+    ARGMOD(List *list),
     int type,
     INTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 static void list_set(PARROT_INTERP,
     ARGINOUT(List *list),
@@ -255,10 +257,14 @@ static void rebuild_other(PARROT_INTERP, ARGINOUT(List *list))
 
 static void rebuild_sparse(ARGINOUT(List *list));
 static void split_chunk(PARROT_INTERP,
-    ARGINOUT(List *list),
-    ARGINOUT(List_chunk *chunk),
+    ARGMOD(List *list),
+    ARGMOD(List_chunk *chunk),
     UINTVAL ix)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list)
+        FUNC_MODIFIES(*chunk);
 
 /* HEADERIZER END: static */
 
@@ -993,7 +999,7 @@ would make C<MAX_ITEMS> sized real chunks.
 */
 
 static void
-split_chunk(PARROT_INTERP, ARGINOUT(List *list), ARGINOUT(List_chunk *chunk), UINTVAL ix)
+split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVAL ix)
 {
     /* allocate space at idx */
     if (chunk->items <= MAX_ITEMS) {
@@ -1125,7 +1131,7 @@ Get the pointer to the item of type C<type> in the chunk at C<idx>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void *
-list_item(PARROT_INTERP, ARGINOUT(List *list), int type, INTVAL idx)
+list_item(PARROT_INTERP, ARGMOD(List *list), int type, INTVAL idx)
 {
     List_chunk * const chunk = get_chunk(interp, list, (UINTVAL *)&idx);
     /* if this is a sparse chunk return -1, the caller may decide to return 0
@@ -1467,7 +1473,7 @@ Mark the list and its contents as live.
 
 PARROT_API
 void
-list_mark(PARROT_INTERP, ARGINOUT(List *list))
+list_mark(PARROT_INTERP, ARGMOD(List *list))
 {
     List_chunk *chunk;
 
@@ -1775,7 +1781,7 @@ Pushes C<item> of type C<type> on to the start of the list.
 
 PARROT_API
 void
-list_unshift(PARROT_INTERP, ARGINOUT(List *list), ARGIN_NULLOK(void *item), int type)
+list_unshift(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int type)
 {
     List_chunk *chunk;
 
@@ -1802,7 +1808,7 @@ Removes and returns the last item of type C<type> from the end of the list.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 void *
-list_pop(PARROT_INTERP, ARGINOUT(List *list), int type)
+list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
 {
     UINTVAL idx;
     void *ret;
@@ -1840,7 +1846,7 @@ Removes and returns the first item of type C<type> from the start of the list.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 void *
-list_shift(PARROT_INTERP, ARGINOUT(List *list), int type)
+list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 {
     void *ret;
     UINTVAL idx = list->start++;
@@ -1907,7 +1913,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void *
-list_get(PARROT_INTERP, ARGINOUT(List *list), INTVAL idx, int type)
+list_get(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, int type)
 {
     const INTVAL length = list->length;
 

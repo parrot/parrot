@@ -29,14 +29,13 @@ Various functions that call the run loop.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static parrot_context_t * runops_args(PARROT_INTERP,
-    NOTNULL(PMC *sub),
-    NOTNULL(PMC *obj),
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
     SHIM(STRING *meth),
     ARGIN(const char *sig),
     va_list ap)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
 /* HEADERIZER END: static */
@@ -180,7 +179,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static parrot_context_t *
-runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
         SHIM(STRING *meth), ARGIN(const char *sig), va_list ap)
 {
     opcode_t offset, *dest;
@@ -291,7 +290,7 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), ARGIN(const char *sig), ...)
+Parrot_runops_fromc_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const char *sig), ...)
 {
     va_list args;
     parrot_context_t *ctx;
