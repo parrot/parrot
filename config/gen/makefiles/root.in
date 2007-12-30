@@ -766,6 +766,11 @@ pbc_to_c.pir : $(PARROT) tools/dev/pbc_to_c_gen.pl
 	@ld_out@ @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)' \
     > pbc_to_c.pir
 
+pbc_to_c : pbc_to_c.pir
+	$(PARROT) -o pbc_to_c.pbc pbc_to_c.pir
+	$(PARROT) pbc_to_c.pir pbc_to_c.pbc
+
+
 #
 # TODO build the real miniparrot
 #
