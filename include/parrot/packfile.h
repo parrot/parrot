@@ -323,12 +323,15 @@ void do_sub_pragmas(PARROT_INTERP,
 
 PARROT_API
 INTVAL PackFile_add_segment(SHIM_INTERP,
-    ARGINOUT(PackFile_Directory *dir),
+    ARGMOD(PackFile_Directory *dir),
     ARGIN(PackFile_Segment *seg))
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dir);
 
 PARROT_API
-void PackFile_Constant_destroy(SHIM_INTERP, NULLOK(PackFile_Constant *self));
+void PackFile_Constant_destroy(SHIM_INTERP,
+    ARGMOD_NULLOK(PackFile_Constant *self));
 
 PARROT_API
 PARROT_MALLOC
@@ -338,7 +341,7 @@ PackFile_Constant * PackFile_Constant_new(SHIM_INTERP);
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 size_t PackFile_Constant_pack_size(PARROT_INTERP,
-    NOTNULL(PackFile_Constant *self))
+    ARGIN(const PackFile_Constant *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -358,43 +361,47 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_Constant_unpack_key(PARROT_INTERP,
-    NOTNULL(PackFile_ConstTable *constt),
-    NOTNULL(PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor))
+    ARGIN(PackFile_ConstTable *constt),
+    ARGMOD(PackFile_Constant *self),
+    ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*self);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_Constant_unpack_pmc(PARROT_INTERP,
-    NOTNULL(PackFile_ConstTable *constt),
-    NOTNULL(PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor))
+    ARGIN(PackFile_ConstTable *constt),
+    ARGMOD(PackFile_Constant *self),
+    ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*self);
 
 PARROT_API
 void PackFile_ConstTable_clear(PARROT_INTERP,
-    ARGINOUT(PackFile_ConstTable *self))
-        __attribute__nonnull__(1);
+    ARGMOD(PackFile_ConstTable *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *seg),
-    NOTNULL(opcode_t *cursor))
+    ARGOUT(PackFile_Segment *seg),
+    ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_destroy(PARROT_INTERP, ARGINOUT_NULLOK(PackFile *pf))
+void PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -410,11 +417,10 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
-    NOTNULL(PackFile_Directory *dir),
+    ARGIN_NULLOK(PackFile_Directory *dir),
     ARGIN(const char *name),
     int sub_dir)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -425,8 +431,10 @@ void PackFile_fixup_subs(PARROT_INTERP,
 
 PARROT_API
 void PackFile_FixupTable_clear(PARROT_INTERP,
-    ARGINOUT(PackFile_FixupTable *self))
-        __attribute__nonnull__(1);
+    ARGMOD(PackFile_FixupTable *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 PARROT_API
 void PackFile_FixupTable_new_entry(PARROT_INTERP,
@@ -468,16 +476,17 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment * PackFile_remove_segment_by_name(SHIM_INTERP,
-    NOTNULL(PackFile_Directory *dir),
+    ARGMOD(PackFile_Directory *dir),
     ARGIN(const char *name))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dir);
 
 PARROT_API
-void PackFile_Segment_destroy(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self))
+void PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 PARROT_API
 void PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
@@ -496,12 +505,14 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Segment_new_seg(PARROT_INTERP,
-    ARGINOUT(PackFile_Directory *dir),
+    ARGMOD(PackFile_Directory *dir),
     UINTVAL type,
     ARGIN(const char *name),
     int add)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*dir);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -523,37 +534,41 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t * PackFile_Segment_unpack(PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor))
+    ARGMOD(PackFile_Segment *self),
+    ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t PackFile_unpack(PARROT_INTERP,
-    ARGINOUT(PackFile *self),
+    ARGMOD(PackFile *self),
     ARGIN(opcode_t *packed),
     size_t packed_size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
 
 PARROT_API
 void Parrot_debug_add_mapping(PARROT_INTERP,
-    NOTNULL(PackFile_Debug *debug),
+    ARGMOD(PackFile_Debug *debug),
     opcode_t offset,
     int mapping_type,
     ARGIN(const char *filename),
     int source_seg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*debug);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
-    NOTNULL(PackFile_Debug *debug),
+    ARGIN(const PackFile_Debug *debug),
     opcode_t pc)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -571,16 +586,17 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP,
-    NOTNULL(PackFile_ByteCode *cs),
+    ARGMOD(PackFile_ByteCode *cs),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*cs);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
-    NOTNULL(PackFile_ByteCode *new_cs),
+    ARGIN(PackFile_ByteCode *new_cs),
     int really)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
