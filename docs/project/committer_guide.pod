@@ -3,7 +3,7 @@
 
 =head1 Committer Guide
 
-From F<docs/roles_responsibilities.pod>:
+From F<docs/project/roles_responsibilities.pod>:
 
   Contributors who submit numerous, high-quality patches may be considered
   to become a Committer. Committers have commit access to the full Parrot
@@ -183,6 +183,6 @@ Paul Cochrane <paultcochrane at gmail dot com>
 
 =head1 SEE ALSO
 
-F<docs/roles_responsibilities.pod>, F<RESPONSIBLE_PARTIES>
+F<docs/project/roles_responsibilities.pod>, F<RESPONSIBLE_PARTIES>
 
 =cut

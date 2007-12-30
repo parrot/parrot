@@ -3,7 +3,7 @@
 
 =head1 Metacommitter Guide
 
-From F<docs/roles_responsibilities.pod>:
+From F<docs/project/roles_responsibilities.pod>:
 
  All Metacommitters are responsible for managing commit access to the Parrot
  repository. Once the Architect or Pumpking approves a request for a
@@ -97,6 +97,6 @@ Jerry Gay a.k.a. particle
 
 =head1 SEE ALSO
 
-F<docs/roles_responsibilities.pod>, F<RESPONSIBLE_PARTIES>
+F<docs/project/roles_responsibilities.pod>, F<RESPONSIBLE_PARTIES>
 
 =cut
