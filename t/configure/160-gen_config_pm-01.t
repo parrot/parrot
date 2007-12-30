@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 160-gen_config_pm.t
+# 160-gen_config_pm-01.t
 
 use strict;
 use warnings;
@@ -46,11 +46,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-160-gen_config_pm.t - test config::gen::config_pm
+160-gen_config_pm-01.t - test config::gen::config_pm
 
 =head1 SYNOPSIS
 
-    % prove t/configure/160-gen_config_pm.t
+    % prove t/configure/160-gen_config_pm-01.t
 
 =head1 DESCRIPTION
 
