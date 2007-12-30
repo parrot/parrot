@@ -641,6 +641,7 @@ help :
 	@echo "  $(PINFO):          Information about Parrot Byte Code"
 	@echo "  $(PDB):               Parrot Debugger"
 	@echo "  $(PBCMERGE):         Merge bytecode files"
+	@echo "  pbc_to_exe:        Generate C, compile and link bytecode files"
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '$(PREFIX)' on Unix systems"
