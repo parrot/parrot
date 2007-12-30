@@ -345,20 +345,6 @@ Always paired with C<.end>.
 
 End a compilation unit. Always paired with C<.sub>.
 
-=item .emit
-
-Define a compilation unit containing PASM code (only opcodes and a limited
-subset of directives). Always paired with C<.eom>.
-
-{{ DEPRECATED. See RT#47846 }}
-
-=item .eom
-
-End a compilation unit containing PASM code. Always paired with
-C<.emit>.
-
-{{ DEPRECATED. See RT#47846 }}
-
 =item #line <integer> <string>
 
 Set the line number and filename to the value specified. This is useful in
