@@ -554,7 +554,7 @@ inline op copy(inout PMC, invar PMC) :base_mem {
 
   /* the source PMC knows how to clone itself, but we must reuse the
    destination header */
-  memmove($1, clone, sizeof (PMC) );
+  memmove($1, clone, sizeof (PMC));
 
   /* don't let the clone's destruction destroy the destination's data */
   PObj_active_destroy_CLEAR(clone);

@@ -1796,7 +1796,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             buf[idx++] = ',';
             buf[idx++] = ' ';
             buf[idx++] = regs[sig_value & PARROT_ARG_TYPE_MASK];
-            Parrot_snprintf(interp, &buf[idx], sizeof(buf)-idx,
+            Parrot_snprintf(interp, &buf[idx], sizeof (buf)-idx,
                             INTVAL_FMT, op[j+2]);
             idx = strlen(buf);
 
@@ -1808,7 +1808,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
 
                 /* End when we run out of flags, off the end of flag_names, or
                    get too close to the end of buf. */
-                while (flags && idx < sizeof(buf)-100) {
+                while (flags && idx < sizeof (buf)-100) {
                     const char *flag_string = flag_names[flag_idx];
                     if (! flag_string)
                         break;
