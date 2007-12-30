@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 156-gen_parrot_include.t
+# 156-gen_parrot_include-01.t
 
 use strict;
 use warnings;
@@ -21,11 +21,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-156-gen_parrot_include.t - test config::gen::parrot_include
+156-gen_parrot_include-01.t - test config::gen::parrot_include
 
 =head1 SYNOPSIS
 
-    % prove t/configure/156-gen_parrot_include.t
+    % prove t/configure/156-gen_parrot_include-01.t
 
 =head1 DESCRIPTION
 

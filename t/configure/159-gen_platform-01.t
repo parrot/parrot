@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 159-gen_platform.t
+# 159-gen_platform-01.t
 
 use strict;
 use warnings;
@@ -22,11 +22,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-159-gen_platform.t - test config::gen::platform
+159-gen_platform-01.t - test config::gen::platform
 
 =head1 SYNOPSIS
 
-    % prove t/configure/159-gen_platform.t
+    % prove t/configure/159-gen_platform-01.t
 
 =head1 DESCRIPTION
 

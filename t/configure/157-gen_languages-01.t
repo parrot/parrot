@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 157-gen_languages.t
+# 157-gen_languages-01.t
 
 use strict;
 use warnings;
@@ -21,11 +21,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-157-gen_languages.t - test config::gen::languages
+157-gen_languages-01.t - test config::gen::languages
 
 =head1 SYNOPSIS
 
-    % prove t/configure/157-gen_languages.t
+    % prove t/configure/157-gen_languages-01.t
 
 =head1 DESCRIPTION
 

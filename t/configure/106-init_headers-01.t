@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 106-init_headers.t
+# 106-init_headers-01.t
 
 use strict;
 use warnings;
@@ -63,11 +63,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-106-init_headers.t - test config::init::headers
+106-init_headers-01.t - test config::init::headers
 
 =head1 SYNOPSIS
 
-    % prove t/configure/106-init_headers.t
+    % prove t/configure/106-init_headers-01.t
 
 =head1 DESCRIPTION
 
