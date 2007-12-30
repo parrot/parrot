@@ -232,7 +232,7 @@
   (emit "tmp_fx_plus2_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( tmp_fx_plus1_~a, tmp_fx_plus2_~a, 'pirop' => 'band' )
+        val_x.init( tmp_fx_plus1_~a, tmp_fx_plus2_~a, 'pirop' => 'n_band' )
         " uid uid))
 
 ; implementation of char->fixnum
