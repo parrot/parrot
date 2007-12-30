@@ -109,7 +109,8 @@ static void instantiate_object(PARROT_INTERP,
     ARGINOUT(PMC *object),
     ARGIN_NULLOK(PMC *init))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*object);
 
 static void invalidate_all_caches(PARROT_INTERP)
         __attribute__nonnull__(1);

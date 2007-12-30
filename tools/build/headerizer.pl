@@ -261,10 +261,18 @@ sub attrs_from_args {
     my @args = @_;
 
     my @attrs = ();
+    my @mods  = ();
 
     my $n = 0;
     for my $arg (@args) {
         ++$n;
+        if ( $arg =~ m{ARGINOUT(?:_NOTNULL)?\((.+?)\)} ) {
+            my $modified = $1;
+            $modified =~ s/ //g;
+            $modified =~ s/[^*]+//;
+            $modified =~ s/\*+/*/;
+            push( @mods, "FUNC_MODIFIES($modified)" );
+        }
         if ( $arg =~ m{(ARGIN|ARGOUT|ARGINOUT|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
@@ -275,7 +283,7 @@ sub attrs_from_args {
         }
     }
 
-    return @attrs;
+    return (@attrs,@mods);
 }
 
 sub make_function_decls {

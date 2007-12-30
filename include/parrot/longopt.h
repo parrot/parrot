@@ -55,7 +55,8 @@ int longopt_get(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*info_buf);
 
 /* HEADERIZER END: src/longopt.c */
 

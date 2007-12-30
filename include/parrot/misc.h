@@ -50,11 +50,13 @@ INTVAL Parrot_byte_rindex(SHIM_INTERP,
 
 PARROT_API
 void Parrot_destroy_cpa(ARGINOUT(char **array))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*array);
 
 PARROT_API
 void Parrot_destroy_la(ARGINOUT(long *array))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*array);
 
 PARROT_API
 FLOATVAL Parrot_float_rand(INTVAL how_random);

@@ -21,7 +21,8 @@ void Parrot_freeze_STM_PMC_handle(PARROT_INTERP,
     ARGIN(Parrot_STM_PMC_handle handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 void Parrot_STM_abort(PARROT_INTERP)
         __attribute__nonnull__(1);

@@ -61,7 +61,8 @@ static void gen_sprintf_call(
     ARGINOUT(SpfInfo *info),
     int thingy)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*info);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * handle_flags(PARROT_INTERP,
@@ -71,7 +72,8 @@ static STRING * handle_flags(PARROT_INTERP,
     ARGIN_NULLOK(STRING* prefix))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*str);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* str_append_w_flags(PARROT_INTERP,

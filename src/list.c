@@ -195,7 +195,8 @@ static List_chunk * add_chunk(PARROT_INTERP,
     int where,
     UINTVAL idx)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -204,7 +205,8 @@ static List_chunk * alloc_next_size(PARROT_INTERP,
     int where,
     UINTVAL idx)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -222,7 +224,9 @@ static List_chunk * get_chunk(PARROT_INTERP,
     ARGINOUT(UINTVAL *idx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list)
+        FUNC_MODIFIES(*idx);
 
 static void list_append(PARROT_INTERP,
     ARGINOUT(List *list),
@@ -230,7 +234,8 @@ static void list_append(PARROT_INTERP,
     int type,
     UINTVAL idx)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 static void list_dump(ARGIN(const List *list), INTVAL type)
         __attribute__nonnull__(1);
@@ -242,7 +247,8 @@ static void * list_item(PARROT_INTERP,
     int type,
     INTVAL idx)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 static void list_set(PARROT_INTERP,
     ARGINOUT(List *list),
@@ -250,24 +256,30 @@ static void list_set(PARROT_INTERP,
     INTVAL type,
     INTVAL idx)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 static UINTVAL rebuild_chunk_list(PARROT_INTERP, ARGINOUT(List *list))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 static void rebuild_chunk_ptrs(ARGINOUT(List *list), int cut)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*list);
 
 static void rebuild_fix_ends(ARGINOUT(List *list))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*list);
 
 static void rebuild_other(PARROT_INTERP, ARGINOUT(List *list))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 static void rebuild_sparse(ARGINOUT(List *list))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*list);
 
 static void split_chunk(PARROT_INTERP,
     ARGINOUT(List *list),
@@ -275,7 +287,9 @@ static void split_chunk(PARROT_INTERP,
     UINTVAL ix)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list)
+        FUNC_MODIFIES(*chunk);
 
 /* HEADERIZER END: static */
 

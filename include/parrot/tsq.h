@@ -44,64 +44,79 @@ struct QUEUE {
 
 void insert_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*queue);
 
 void nosync_insert_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*queue);
 
 PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY * nosync_pop_entry(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 QUEUE_ENTRY * peek_entry(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY * pop_entry(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 void push_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*queue);
 
 void queue_broadcast(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 void queue_destroy(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
 QUEUE* queue_init(UINTVAL prio);
 
 void queue_lock(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 void queue_signal(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 void queue_timedwait(
     ARGINOUT(QUEUE *queue),
     ARGIN(const struct timespec *abs_time))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*queue);
 
 void queue_unlock(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 void queue_wait(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 void unshift_entry(ARGINOUT(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*queue);
 
 PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY * wait_for_entry(ARGINOUT(QUEUE *queue))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*queue);
 
 /* HEADERIZER END: src/tsq.c */
 

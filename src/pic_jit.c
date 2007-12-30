@@ -52,7 +52,8 @@ static int call_is_safe(
     ARGIN(const PMC *sub),
     ARGINOUT(opcode_t **set_args))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*set_args);
 
 PARROT_WARN_UNUSED_RESULT
 static int jit_can_compile_sub(PARROT_INTERP, ARGIN(const PMC *sub))

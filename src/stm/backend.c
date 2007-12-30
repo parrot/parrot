@@ -54,14 +54,16 @@ PARROT_CANNOT_RETURN_NULL
 static STM_read_record * alloc_read(PARROT_INTERP,
     ARGINOUT(STM_tx_log *log))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*log);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STM_write_record * alloc_write(PARROT_INTERP,
     ARGINOUT(STM_tx_log *log))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*log);
 
 static void do_partial_abort(PARROT_INTERP,
     ARGIN(STM_tx_log *log),
@@ -75,7 +77,8 @@ static void do_real_abort(PARROT_INTERP,
     ARGIN(STM_tx_log_sub *inner))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*log);
 
 static int do_real_commit(PARROT_INTERP, ARGIN(STM_tx_log *log))
         __attribute__nonnull__(1)
@@ -133,12 +136,14 @@ static PMC * local_pmc_copy(PARROT_INTERP, ARGIN_NULLOK(PMC *original))
 
 static void mark_read_record(PARROT_INTERP, ARGINOUT(STM_read_record *read))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*read);
 
 static void mark_write_record(PARROT_INTERP,
     ARGINOUT(STM_write_record *write))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*write);
 
 static int merge_transactions(PARROT_INTERP,
     ARGINOUT(STM_tx_log *log),
@@ -148,7 +153,8 @@ static int merge_transactions(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*log);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -169,7 +175,8 @@ static int safe_to_clone(PARROT_INTERP, ARGIN(const PMC * const original))
 
 static int setup_wait(PARROT_INTERP, ARGINOUT(STM_tx_log *log))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*log);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -177,7 +184,8 @@ static void * wait_for_version(PARROT_INTERP,
     ARGINOUT(STM_tx_log *log),
     Parrot_STM_PMC_handle handle)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*log);
 
 /* HEADERIZER END: static */
 

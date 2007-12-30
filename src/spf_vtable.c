@@ -36,7 +36,8 @@ static STRING * getchr_pmc(PARROT_INTERP,
     INTVAL size,
     ARGINOUT(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*obj);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT

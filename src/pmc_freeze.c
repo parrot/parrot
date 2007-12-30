@@ -66,7 +66,8 @@ static void create_image(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGINOUT(visit_info *info))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
 
 PARROT_INLINE
 static void do_action(PARROT_INTERP,
@@ -224,7 +225,8 @@ static void str_append(PARROT_INTERP,
     size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*s);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
@@ -242,7 +244,9 @@ static int thaw_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*info)
+        FUNC_MODIFIES(*type);
 
 static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
         __attribute__nonnull__(1)
@@ -256,7 +260,8 @@ static int todo_list_seen(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*info);
 
 static void visit_loop_next_for_GC(PARROT_INTERP,
     ARGIN(PMC *current),

@@ -30,12 +30,14 @@ exceptions, async I/O, and concurrent tasks (threads).
 PARROT_WARN_UNUSED_RESULT
 static int Parrot_cx_handle_tasks(PARROT_INTERP, ARGINOUT(PMC *scheduler))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*scheduler);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void* scheduler_runloop(ARGINOUT(PMC *scheduler))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*scheduler);
 
 /* HEADERIZER END: static */
 

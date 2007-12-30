@@ -55,7 +55,8 @@ static void alloc_new_block(PARROT_INTERP,
     ARGIN(const char *why))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -65,7 +66,8 @@ static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
 
 static void compact_pool(PARROT_INTERP, ARGINOUT(Memory_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 static void debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
@@ -77,13 +79,16 @@ static void * mem_allocate(PARROT_INTERP,
     size_t size,
     ARGINOUT(Memory_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
 
 static void merge_pools(
     ARGINOUT(Memory_Pool *dest),
     ARGINOUT(Memory_Pool *source))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest)
+        FUNC_MODIFIES(*source);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL

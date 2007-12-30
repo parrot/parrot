@@ -94,7 +94,8 @@ int parrot_pic_check_sig(
         __attribute__nonnull__(3);
 
 void parrot_PIC_destroy(ARGINOUT(struct PackFile_ByteCode *cs))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*cs);
 
 void parrot_pic_find_infix_v_pp(PARROT_INTERP,
     ARGIN(PMC *left),

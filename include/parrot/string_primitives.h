@@ -32,7 +32,9 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
     ARGINOUT(STRING *string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*offset)
+        FUNC_MODIFIES(*string);
 
 /* HEADERIZER END: src/string_primitives.c */
 

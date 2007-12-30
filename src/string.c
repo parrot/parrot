@@ -57,7 +57,8 @@ static void make_writable(PARROT_INTERP,
     const size_t len,
     parrot_string_representation_t representation)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*s);
 
 /* HEADERIZER END: static */
 

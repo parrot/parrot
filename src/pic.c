@@ -121,7 +121,8 @@ static int is_pic_param(PARROT_INTERP,
 
 static void parrot_pic_move(PARROT_INTERP, ARGINOUT(Parrot_MIC *mic))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mic);
 
 static int pass_int(PARROT_INTERP,
     ARGIN(const PMC *sig),

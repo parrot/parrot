@@ -118,29 +118,34 @@ PMC * key_pmc(PARROT_INTERP, ARGIN(PMC *key))
 
 PARROT_API
 void key_set_integer(SHIM_INTERP, ARGINOUT(PMC *key), INTVAL value)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
 void key_set_number(SHIM_INTERP, ARGINOUT(PMC *key), FLOATVAL value)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
 void key_set_pmc(PARROT_INTERP, ARGINOUT(PMC *key), ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
 void key_set_register(SHIM_INTERP,
     ARGINOUT(PMC *key),
     INTVAL value,
     INTVAL flag)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
 void key_set_string(SHIM_INTERP, ARGINOUT(PMC *key), ARGIN(STRING *value))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL

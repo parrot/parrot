@@ -33,7 +33,8 @@ static void add_entry(
     ARGINOUT(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *entry))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*waitlist);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -58,7 +59,8 @@ static int remove_first(
     ARGINOUT(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *expect_first))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*waitlist);
 
 static void waitlist_remove(
     ARGINOUT_NULLOK(STM_waitlist *waitlist),
@@ -71,10 +73,12 @@ static void waitlist_remove_check(
         __attribute__nonnull__(2);
 
 static void waitlist_signal_all(ARGINOUT(STM_waitlist *list))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*list);
 
 static void waitlist_signal_one(ARGINOUT(struct waitlist_entry *who))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*who);
 
 /* HEADERIZER END: static */
 

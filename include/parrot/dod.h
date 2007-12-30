@@ -54,7 +54,8 @@
 PARROT_API
 void pobject_lives(PARROT_INTERP, ARGINOUT(PObj *obj))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*obj);
 
 void clear_cow(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int cleanup)
         __attribute__nonnull__(1)

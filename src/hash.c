@@ -49,21 +49,25 @@ static int cstring_compare(SHIM_INTERP,
 
 static void expand_hash(PARROT_INTERP, ARGINOUT(Hash *hash))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hash);
 
 static void hash_freeze(PARROT_INTERP,
     ARGIN(const Hash * const hash),
     ARGINOUT(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
 
 static void hash_thaw(PARROT_INTERP,
     ARGINOUT(Hash *hash),
     ARGINOUT(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*hash)
+        FUNC_MODIFIES(*info);
 
 static void init_hash(
     ARGOUT(Hash *hash),
@@ -90,7 +94,8 @@ static size_t key_hash_STRING(PARROT_INTERP,
     ARGINOUT(STRING *value),
     size_t seed)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*value);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION

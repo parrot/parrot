@@ -56,7 +56,8 @@ static QUEUE_ENTRY* dup_entry_interval(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void* event_thread(ARGINOUT(void *data))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*data);
 
 static void event_to_exception(PARROT_INTERP,
     ARGIN(const parrot_event* event))
@@ -75,14 +76,16 @@ static void* io_thread(SHIM(void *data));
 static void io_thread_ready_rd(
     ARGINOUT(pending_io_events *ios),
     int ready_rd)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*ios);
 
 static void Parrot_sigaction(int sig, ARGIN(void (*handler)(int)))
         __attribute__nonnull__(2);
 
 static void Parrot_unblock_signal(int sig);
 static int process_events(ARGINOUT(QUEUE *event_q))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*event_q);
 
 static void schedule_signal_event(int signum);
 static void sig_handler(int signum);
@@ -91,7 +94,8 @@ static void store_io_event(
     ARGINOUT(pending_io_events *ios),
     ARGIN(parrot_event *ev))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ios);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL

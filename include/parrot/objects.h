@@ -156,7 +156,8 @@ INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 PARROT_API
 void Parrot_instantiate_object(PARROT_INTERP, ARGINOUT(PMC *object))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*object);
 
 PARROT_API
 void Parrot_instantiate_object_init(PARROT_INTERP,
