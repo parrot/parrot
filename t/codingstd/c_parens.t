@@ -113,7 +113,7 @@ sub check_parens {
             . " instances:\n@keyword_paren" );
 
 ## L<PDD07/Code Formatting/"There should be no space between a function name and the following open parenthesis">
-    ok( !scalar(@non_keyword_paren), 'Spacing between function name and following open parethesis' )
+    ok( !scalar(@non_keyword_paren), 'Spacing between function name and following open parenthesis' )
         or diag( "incorrect spacing between function name and following open parenthesis found in "
             . scalar @non_keyword_paren
             . " instances:\n@non_keyword_paren" );
