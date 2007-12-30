@@ -65,7 +65,7 @@ static STRING* path_finalize(PARROT_INTERP, NOTNULL(STRING *path))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING* path_guarantee_trailing_separator(PARROT_INTERP,
-    NOTNULL(STRING *path))
+    ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -321,7 +321,7 @@ there already.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-path_guarantee_trailing_separator(PARROT_INTERP, NOTNULL(STRING *path))
+path_guarantee_trailing_separator(PARROT_INTERP, ARGIN(STRING *path))
 {
     STRING * const path_separator_string = string_chr(interp, path_separator);
 
@@ -603,7 +603,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 char*
-Parrot_get_runtime_prefix(PARROT_INTERP, NULLOK(STRING **prefix_str))
+Parrot_get_runtime_prefix(PARROT_INTERP, ARGOUT_NULLOK(STRING **prefix_str))
 {
     STRING *s, *key;
     PMC    *config_hash;
@@ -665,8 +665,8 @@ extension and C<ext> to the extension or NULL.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-parrot_split_path_ext(PARROT_INTERP, NOTNULL(STRING *in),
-        NOTNULL(STRING **wo_ext), NOTNULL(STRING **ext))
+parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
+        ARGOUT(STRING **wo_ext), ARGOUT(STRING **ext))
 {
     STRING * const slash1 = CONST_STRING(interp, "/");
     STRING * const slash2 = CONST_STRING(interp, "\\");

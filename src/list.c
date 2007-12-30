@@ -191,18 +191,22 @@ Also all array usage depends on list.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk * add_chunk(PARROT_INTERP,
-    ARGINOUT(List *list),
+    ARGMOD(List *list),
     int where,
     UINTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk * alloc_next_size(PARROT_INTERP,
-    ARGINOUT(List *list),
+    ARGMOD(List *list),
     int where,
     UINTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -216,16 +220,23 @@ static List_chunk * allocate_chunk(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk * get_chunk(PARROT_INTERP,
-    ARGINOUT(List *list),
-    ARGINOUT(UINTVAL *idx))
-        __attribute__nonnull__(1);
+    ARGMOD(List *list),
+    ARGMOD(UINTVAL *idx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list)
+        FUNC_MODIFIES(*idx);
 
 static void list_append(PARROT_INTERP,
-    ARGINOUT(List *list),
-    ARGINOUT_NULLOK(void *item),
+    ARGMOD(List *list),
+    ARGIN(void *item),
     int type,
     UINTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list);
 
 static void list_dump(ARGIN(const List *list), INTVAL type)
         __attribute__nonnull__(1);
@@ -241,21 +252,37 @@ static void * list_item(PARROT_INTERP,
         FUNC_MODIFIES(*list);
 
 static void list_set(PARROT_INTERP,
-    ARGINOUT(List *list),
-    ARGIN_NULLOK(void *item),
+    ARGMOD(List *list),
+    ARGIN(void *item),
     INTVAL type,
     INTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list);
 
-static UINTVAL rebuild_chunk_list(PARROT_INTERP, ARGINOUT(List *list))
-        __attribute__nonnull__(1);
+static UINTVAL rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
-static void rebuild_chunk_ptrs(ARGINOUT(List *list), int cut);
-static void rebuild_fix_ends(ARGINOUT(List *list));
-static void rebuild_other(PARROT_INTERP, ARGINOUT(List *list))
-        __attribute__nonnull__(1);
+static void rebuild_chunk_ptrs(ARGMOD(List *list), int cut)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*list);
 
-static void rebuild_sparse(ARGINOUT(List *list));
+static void rebuild_fix_ends(ARGMOD(List *list))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*list);
+
+static void rebuild_other(PARROT_INTERP, ARGMOD(List *list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
+
+static void rebuild_sparse(ARGMOD(List *list))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*list);
+
 static void split_chunk(PARROT_INTERP,
     ARGMOD(List *list),
     ARGMOD(List_chunk *chunk),
@@ -374,7 +401,7 @@ Delete empty chunks, count chunks and fix prev pointers.
 */
 
 static void
-rebuild_chunk_ptrs(ARGINOUT(List *list), int cut)
+rebuild_chunk_ptrs(ARGMOD(List *list), int cut)
 {
     List_chunk *chunk, *prev;
     UINTVAL len = 0, start = list->start;
@@ -423,7 +450,7 @@ Coalesce adjacent sparse chunks.
 */
 
 static void
-rebuild_sparse(ARGINOUT(List *list))
+rebuild_sparse(ARGMOD(List *list))
 {
     List_chunk *chunk = list->first;
     List_chunk *prev = NULL;
@@ -454,7 +481,7 @@ Coalesce adjacent irregular chunks.
 */
 
 static void
-rebuild_other(PARROT_INTERP, ARGINOUT(List *list))
+rebuild_other(PARROT_INTERP, ARGMOD(List *list))
 {
     List_chunk *chunk = list->first;
     List_chunk *prev = NULL;
@@ -521,7 +548,7 @@ Called by C<rebuild_chunk_list()>.
 */
 
 static void
-rebuild_fix_ends(ARGINOUT(List *list))
+rebuild_fix_ends(ARGMOD(List *list))
 {
     List_chunk * const chunk = list->first;
 
@@ -549,7 +576,7 @@ Called to optimise the list when modifying it in some way.
 */
 
 static UINTVAL
-rebuild_chunk_list(PARROT_INTERP, ARGINOUT(List *list))
+rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
 {
     List_chunk *chunk, *prev, *first;
     UINTVAL len;
@@ -662,7 +689,7 @@ Calculate size and items for next chunk and allocate it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk *
-alloc_next_size(PARROT_INTERP, ARGINOUT(List *list), int where, UINTVAL idx)
+alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 {
     UINTVAL items, size;
     List_chunk *new_chunk;
@@ -761,7 +788,7 @@ Add chunk at start or end.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk *
-add_chunk(PARROT_INTERP, ARGINOUT(List *list), int where, UINTVAL idx)
+add_chunk(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 {
     List_chunk * const chunk = where ? list->last : list->first;
     List_chunk * const new_chunk = alloc_next_size(interp, list, where, idx);
@@ -892,7 +919,7 @@ sized, when this would improve performance.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk *
-get_chunk(PARROT_INTERP, ARGINOUT(List *list), ARGINOUT(UINTVAL *idx))
+get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
 {
     List_chunk *chunk;
     UINTVAL i;
@@ -1063,7 +1090,7 @@ Set C<item> of type C<type> in chunk at C<idx>.
 */
 
 static void
-list_set(PARROT_INTERP, ARGINOUT(List *list), ARGIN_NULLOK(void *item), INTVAL type, INTVAL idx)
+list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), INTVAL type, INTVAL idx)
 {
     const INTVAL oidx = idx;
     List_chunk *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
@@ -1180,7 +1207,7 @@ Add one or more chunks to end of list.
 */
 
 static void
-list_append(PARROT_INTERP, ARGINOUT(List *list), ARGINOUT_NULLOK(void *item), int type, UINTVAL idx)
+list_append(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type, UINTVAL idx)
 {
     /* initially, list may be empty, also used by assign */
     while (idx >= list->cap)
@@ -1258,7 +1285,7 @@ Create a new list containing PMC* values in PMC_data(container).
 
 PARROT_API
 void
-list_pmc_new(PARROT_INTERP, ARGINOUT(PMC *container))
+list_pmc_new(PARROT_INTERP, ARGMOD(PMC *container))
 {
     List * const l = list_new(interp, enum_type_PMC);
     l->container = container;
@@ -1372,7 +1399,7 @@ Create a new list containing PMC* values in PMC_data(container).
 
 PARROT_API
 void
-list_pmc_new_init(PARROT_INTERP, ARGINOUT(PMC *container), ARGIN(PMC *init))
+list_pmc_new_init(PARROT_INTERP, ARGMOD(PMC *container), ARGIN(PMC *init))
 {
     List * const l = list_new_init(interp, enum_type_PMC, init);
     l->container = container;
@@ -1512,7 +1539,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 PARROT_API
 void
-list_visit(PARROT_INTERP, ARGIN(List *list), ARGINOUT(void *pinfo))
+list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
 {
     List_chunk *chunk;
     visit_info * const info = (visit_info*) pinfo;
@@ -1568,7 +1595,7 @@ Sets the length of the list to C<len>.
 
 PARROT_API
 void
-list_set_length(PARROT_INTERP, ARGINOUT(List *list), INTVAL len)
+list_set_length(PARROT_INTERP, ARGMOD(List *list), INTVAL len)
 {
     if (len < 0)
         len += list->length;
@@ -1607,7 +1634,7 @@ Make room for C<n_items> at C<idx>.
 
 PARROT_API
 void
-list_insert(PARROT_INTERP, ARGINOUT(List *list), INTVAL idx, INTVAL n_items)
+list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 {
     List_chunk *chunk;
 
@@ -1680,7 +1707,7 @@ Delete C<n_items> at C<idx>.
 
 PARROT_API
 void
-list_delete(PARROT_INTERP, ARGINOUT(List *list), INTVAL idx, INTVAL n_items)
+list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 {
     List_chunk *chunk;
 
@@ -1762,7 +1789,7 @@ Pushes C<item> of type C<type> on to the end of the list.
 
 PARROT_API
 void
-list_push(PARROT_INTERP, ARGINOUT(List *list), ARGIN_NULLOK(void *item), int type)
+list_push(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
 {
     const INTVAL idx = list->start + list->length++;
 
@@ -1781,7 +1808,7 @@ Pushes C<item> of type C<type> on to the start of the list.
 
 PARROT_API
 void
-list_unshift(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int type)
+list_unshift(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
 {
     List_chunk *chunk;
 
@@ -1882,7 +1909,7 @@ Assigns C<item> of type C<type> to index C<idx>.
 
 PARROT_API
 void
-list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN_NULLOK(void *item), int type)
+list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN(void *item), int type)
 {
     const INTVAL length = list->length;
 
@@ -1941,7 +1968,7 @@ If C<count> is 0 then the items in C<value> will be inserted after C<offset>.
 
 PARROT_API
 void
-list_splice(PARROT_INTERP, ARGINOUT(List *list), ARGIN_NULLOK(List *value_list),
+list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
         INTVAL offset, INTVAL count)
 {
     const INTVAL value_length = value_list ? value_list->length : 0;

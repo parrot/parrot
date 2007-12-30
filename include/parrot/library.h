@@ -38,7 +38,8 @@ typedef enum {
 PARROT_API
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-char* Parrot_get_runtime_prefix(PARROT_INTERP, NULLOK(STRING **prefix_str))
+char* Parrot_get_runtime_prefix(PARROT_INTERP,
+    ARGOUT_NULLOK(STRING **prefix_str))
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -65,13 +66,14 @@ void parrot_init_library_paths(PARROT_INTERP)
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * parrot_split_path_ext(PARROT_INTERP,
-    NOTNULL(STRING *in),
-    NOTNULL(STRING **wo_ext),
-    NOTNULL(STRING **ext))
+    ARGMOD(STRING *in),
+    ARGOUT(STRING **wo_ext),
+    ARGOUT(STRING **ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*in);
 
 /* HEADERIZER END: src/library.c */
 

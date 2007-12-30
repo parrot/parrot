@@ -36,9 +36,9 @@ Win32 System Programming, 2nd Edition.
 
 static INTVAL flags_to_win32(
     INTVAL flags,
-    NOTNULL(DWORD * fdwAccess),
-    NOTNULL(DWORD * fdwShareMode),
-    NOTNULL(DWORD * fdwCreate))
+    ARGOUT(DWORD * fdwAccess),
+    ARGOUT(DWORD * fdwShareMode),
+    ARGOUT(DWORD * fdwCreate))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
@@ -183,8 +183,8 @@ Convert to platform-specific bit open flags.
 */
 
 static INTVAL
-flags_to_win32(INTVAL flags, NOTNULL(DWORD * fdwAccess),
-               NOTNULL(DWORD * fdwShareMode), NOTNULL(DWORD * fdwCreate))
+flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
+               ARGOUT(DWORD * fdwShareMode), ARGOUT(DWORD * fdwCreate))
 {
     static DWORD dwDefaultShareMode;
     if (!dwDefaultShareMode) {

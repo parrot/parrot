@@ -87,10 +87,11 @@ PARROT_API
 void list_assign(PARROT_INTERP,
     ARGMOD(List *list),
     INTVAL idx,
-    ARGIN_NULLOK(void *item),
+    ARGIN(void *item),
     int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*list);
 
 PARROT_API
@@ -102,10 +103,12 @@ List * list_clone(PARROT_INTERP, ARGIN(const List *other))
 
 PARROT_API
 void list_delete(PARROT_INTERP,
-    ARGINOUT(List *list),
+    ARGMOD(List *list),
     INTVAL idx,
     INTVAL n_items)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
@@ -117,10 +120,12 @@ void * list_get(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, int type)
 
 PARROT_API
 void list_insert(PARROT_INTERP,
-    ARGINOUT(List *list),
+    ARGMOD(List *list),
     INTVAL idx,
     INTVAL n_items)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -148,15 +153,19 @@ List * list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init))
         __attribute__nonnull__(3);
 
 PARROT_API
-void list_pmc_new(PARROT_INTERP, ARGINOUT(PMC *container))
-        __attribute__nonnull__(1);
+void list_pmc_new(PARROT_INTERP, ARGMOD(PMC *container))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*container);
 
 PARROT_API
 void list_pmc_new_init(PARROT_INTERP,
-    ARGINOUT(PMC *container),
+    ARGMOD(PMC *container),
     ARGIN(PMC *init))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*container);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
@@ -167,14 +176,19 @@ void * list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
 
 PARROT_API
 void list_push(PARROT_INTERP,
-    ARGINOUT(List *list),
-    ARGIN_NULLOK(void *item),
+    ARGMOD(List *list),
+    ARGIN(void *item),
     int type)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
-void list_set_length(PARROT_INTERP, ARGINOUT(List *list), INTVAL len)
-        __attribute__nonnull__(1);
+void list_set_length(PARROT_INTERP, ARGMOD(List *list), INTVAL len)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
@@ -185,25 +199,30 @@ void * list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 
 PARROT_API
 void list_splice(PARROT_INTERP,
-    ARGINOUT(List *list),
+    ARGMOD(List *list),
     ARGIN_NULLOK(List *value_list),
     INTVAL offset,
     INTVAL count)
-        __attribute__nonnull__(1);
-
-PARROT_API
-void list_unshift(PARROT_INTERP,
-    ARGMOD(List *list),
-    ARGIN_NULLOK(void *item),
-    int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*list);
 
 PARROT_API
-void list_visit(PARROT_INTERP, ARGIN(List *list), ARGINOUT(void *pinfo))
+void list_unshift(PARROT_INTERP,
+    ARGMOD(List *list),
+    ARGIN(void *item),
+    int type)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*list);
+
+PARROT_API
+void list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pinfo);
 
 /* HEADERIZER END: src/list.c */
 

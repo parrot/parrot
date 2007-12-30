@@ -55,7 +55,7 @@ INTVAL key_integer(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_mark(PARROT_INTERP, NOTNULL(PMC *key))
+void key_mark(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

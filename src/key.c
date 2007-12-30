@@ -482,7 +482,7 @@ Marks C<key> as live.
 
 PARROT_API
 void
-key_mark(PARROT_INTERP, NOTNULL(PMC *key))
+key_mark(PARROT_INTERP, ARGIN(PMC *key))
 {
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
 
