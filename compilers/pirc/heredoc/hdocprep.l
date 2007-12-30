@@ -201,12 +201,12 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 NEWLINE        {EOL}({WS}|{EOL})*
 
-LINECOMMENT    [#].*\n
+LINECOMMENT    [#].*{EOL}
 
 
 %%
 
-
+<*>{LINECOMMENT}       { /* ignore line comments */ }
 
 ^"=".*{EOL}            { yy_push_state(POD, yyscanner); }
 
