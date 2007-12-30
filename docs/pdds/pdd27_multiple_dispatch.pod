@@ -20,7 +20,7 @@ alternate implementations. It selects the alternate to execute for a
 particular call at runtime, based on the types of the arguments passed into
 the call. The selection process compares the arguments of the call and the
 types declared in the signatures of the alternates, as well as their inherited
-or composed parents, to find the best match. 
+or composed parents, to find the best match.
 
 A similar selection of alternates based on types at compile time is generally
 called overloading.
@@ -122,8 +122,9 @@ multiple dispatch.
 
 Not all elements of a multi-sub's signature are relevant for the purposes of
 multiple dispatch. The subroutine parameters that participate in dispatch are
-marked with the attribute C<:invocant>. Subs that are not marked with
-C<:multi> may not mark parameters with C<:invocant>.
+marked with the attribute C<:invocant>, and must be contiguous.
+Subs that are not marked with C<:multi> may not mark parameters with
+C<:invocant>.
 
 {{NOTE: I'm open to other names for the attribute. An English form of the
 Latin I<invocare>, "to call upon", is pretty appropriate to the act of using
