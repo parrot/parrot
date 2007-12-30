@@ -383,6 +383,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ":slurpy"     { return TK_FLAG_SLURPY; }
 ":named"      { return TK_FLAG_NAMED; }
 ":flat"       { return TK_FLAG_FLAT; }
+":invocant"   { return TK_FLAG_INVOCANT; }
 
 
 {Q_STRING}   { /* copy the string, remove the quotes. */

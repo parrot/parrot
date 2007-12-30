@@ -58,7 +58,8 @@ typedef enum target_flags {
     TARGET_FLAG_OPTIONAL    = 0x004,
     TARGET_FLAG_OPT_FLAG    = 0x008,
     TARGET_FLAG_UNIQUE_REG  = 0x010,
-    TARGET_FLAG_IS_PASM_REG = 0x020
+    TARGET_FLAG_IS_PASM_REG = 0x020,
+    TARGET_FLAG_INVOCANT    = 0x040
 
 } target_flag;
 

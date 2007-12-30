@@ -135,7 +135,8 @@
      TK_FLAG_SLURPY = 351,
      TK_FLAG_FLAT = 352,
      TK_FLAG_OPTIONAL = 353,
-     TK_FLAG_OPT_FLAG = 354
+     TK_FLAG_OPT_FLAG = 354,
+     TK_FLAG_INVOCANT = 355
    };
 #endif
 /* Tokens.  */
@@ -236,6 +237,7 @@
 #define TK_FLAG_FLAT 352
 #define TK_FLAG_OPTIONAL 353
 #define TK_FLAG_OPT_FLAG 354
+#define TK_FLAG_INVOCANT 355
 
 
 
@@ -257,7 +259,7 @@ typedef union YYSTYPE
     void *fixme;
 }
 /* Line 1489 of yacc.c.  */
-#line 261 "pirparser.h"
+#line 263 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
