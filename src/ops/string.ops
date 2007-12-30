@@ -238,6 +238,8 @@ character).
 The third form is optimized for replace only, ignoring the replaced
 substring and does not waste a register to do the string replace.
 
+=cut
+
 inline op substr(out STR, in STR, in INT) :base_core {
   const INTVAL len = string_length(interp, $2);
   $1 = string_substr(interp, $2, $3, len, &$1, 0);
@@ -294,12 +296,6 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 =item B<sprintf>(out STR, in STR, invar PMC)
 
 =item B<sprintf>(out PMC, invar PMC, invar PMC)
-
-#=item B<sprintf>(out STR, in STR) [unimplemented] [[what is this op
-# supposed to do? --jrieks]]
-
-#=item B<sprintf>(out PMC, invar PMC) [unimplemented] [[what is this
-# op supposed to do? --jrieks]]
 
 Sets $1 to the result of calling C<Parrot_psprintf> with the
 given format ($2) and arguments ($3, which should be an ordered

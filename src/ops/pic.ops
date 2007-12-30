@@ -21,13 +21,9 @@ During predereferencing opcodes that allow caching are rewritten so that
 equivalent opcodes in this file are used. User code MUST never emit these
 opcodes directly.
 
-###############################################################################
-
 =head2 General infix operations
 
 These operations take an infix operation number and PMC arguments.
-
-########################################
 
 =cut
 
@@ -307,7 +303,7 @@ inline op pic_callr__(inconst PMC) :pic {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 
 =head1 LICENSE
 

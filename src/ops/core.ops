@@ -627,8 +627,6 @@ inline op result_info(out PMC) {
 
 =for clarity
 
-########################################
-
 =cut
 
 =over 4
@@ -1232,8 +1230,6 @@ op needs_destroy(invar PMC) {
 
 =back
 
-###############################################################################
-
 =head2 Native Call Interface
 
 Opcodes for interfacing with C functions in shared libraries.
@@ -1357,7 +1353,7 @@ op new_callback(out PMC, invar PMC, invar PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 
 =head1 LICENSE
 
