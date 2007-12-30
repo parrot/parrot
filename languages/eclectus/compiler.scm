@@ -211,6 +211,18 @@
         val_x.init( $P0, $P1, 'pirop' => 'n_sub' )
         "))
 
+; implementation of fx-
+(define-primitive (fx- uid arg1 arg2)
+  (emit "    .local pmc tmp_fx_plus1_~a, tmp_fx_plus2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "tmp_fx_plus1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "tmp_fx_plus2_~a = val_x" uid)
+  (emit "
+        val_x = new 'PAST::Op'
+        val_x.init( tmp_fx_plus1_~a, tmp_fx_plus2_~a, 'pirop' => 'n_sub' )
+        " uid uid))
+
 ; implementation of char->fixnum
 (define-primitive (char->fixnum uid arg)
   (emit-expr arg)
