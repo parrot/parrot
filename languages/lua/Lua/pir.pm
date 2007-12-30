@@ -22,6 +22,7 @@ package pirVisitor;
 .sub '__start' :anon :main
     .param pmc args
 #    print "start Lua\n"
+    sweepoff
     load_bytecode 'languages/lua/lib/luaaux.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
     load_bytecode 'languages/lua/lib/luacoroutine.pbc'
@@ -35,9 +36,7 @@ package pirVisitor;
     load_bytecode 'languages/lua/lib/luaos.pbc'
     load_bytecode 'languages/lua/lib/luadebug.pbc'
     load_bytecode 'languages/lua/lib/luaperl.pbc'
-    collectoff
     lua_openlibs()
-    collecton
     .local pmc env
     env = get_hll_global '_G'
     .local pmc vararg

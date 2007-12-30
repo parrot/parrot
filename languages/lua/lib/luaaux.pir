@@ -230,14 +230,17 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     res = 0
   L_stop:
     unless what == 'stop' goto L_restart
+    sweepoff
     collectoff
     goto L_end
   L_restart:
     unless what == 'restart' goto L_collect
+    sweepon
     collecton
     goto L_end
   L_collect:
     unless what == 'collect' goto L_count
+    sweep 1
     collect
     goto L_end
   L_count:
@@ -416,6 +419,8 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $P0()
     $P0 = get_hll_global ['Lua'; 'debug'], 'luaopen_debug'
     $P0()
+    sweepon
+    sweep 1
 .end
 
 

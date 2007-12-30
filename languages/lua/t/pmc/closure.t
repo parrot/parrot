@@ -251,14 +251,10 @@ CODE
 f1()
 OUTPUT
 
-TODO: {
-local $TODO = 'works only with --no-gc';
-
 pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     load_bytecode 'languages/lua/lua.pbc'
-    collectoff
     lua_openlibs()
     .local pmc tmp_0
     tmp_0 = get_hll_global '_G'
@@ -270,7 +266,6 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 CODE
 /^function: [0-9A-Fa-f]{8}/
 OUTPUT
-}
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from pir' );
 .HLL 'Lua', 'lua_group'

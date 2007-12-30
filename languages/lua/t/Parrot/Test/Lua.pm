@@ -71,13 +71,13 @@ foreach my $func ( keys %language_test_map ) {
         elsif ( $lua_test eq 'luac.pl' ) {
             @test_prog = (
                 "perl -Ilanguages/lua languages/lua/luac.pl $src",
-                "$self->{parrot} --no-gc languages/${pir_fn} $params",
+                "$self->{parrot} languages/${pir_fn} $params",
             );
         }
         elsif ( $lua_test eq 'luap.pir' ) {
             @test_prog = (
                 "$self->{parrot} languages/lua/luap.pir -o languages/${pir_fn} --target=pir $src",
-                "$self->{parrot} --no-gc languages/${pir_fn} $params",
+                "$self->{parrot} languages/${pir_fn} $params",
             );
         }
         elsif ( $lua_test eq 'lua.pbc' ) {

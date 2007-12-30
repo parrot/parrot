@@ -85,6 +85,10 @@ show version information.
 
 =cut
 
+.sub '__gcstop' :load :init
+    sweepoff  # stop collector during initialization
+.end
+
 .include 'languages/lua/src/lua51.pir'
 .include 'languages/lua/lib/luaregex.pir'
 
@@ -93,10 +97,7 @@ show version information.
 
 .sub 'main' :main
     .param pmc args
-    collectoff  # stop collector during initialization
     lua_openlibs()
-    # collecton
-    # collect
     .local int status
     status = handle_luainit()
     if status goto L1
