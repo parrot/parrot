@@ -58,10 +58,10 @@ sub runstep {
         return 1;
     }
 
-    cc_gen('config/auto/sizes/test_c.in');
-    cc_build();
-    my %results = eval cc_run();
-    cc_clean();
+    $conf->cc_gen('config/auto/sizes/test_c.in');
+    $conf->cc_build();
+    my %results = eval $conf->cc_run();
+    $conf->cc_clean();
 
     for ( keys %results ) {
         $conf->data->set( $_ => $results{$_} );
@@ -87,10 +87,10 @@ sub runstep {
 
         $conf->data->set( int8_t => $type );
         eval {
-            cc_gen('config/auto/sizes/test2_c.in');
-            cc_build();
-            %hugeintval = eval cc_run();
-            cc_clean();
+            $conf->cc_gen('config/auto/sizes/test2_c.in');
+            $conf->cc_build();
+            %hugeintval = eval $conf->cc_run();
+            $conf->cc_clean();
         };
 
         # clear int8_t on error
@@ -117,7 +117,7 @@ sub runstep {
         );
     }
 
-    cc_clean();
+    $conf->cc_clean();
 
     #get HUGEFLOATVAL
     if (
@@ -134,8 +134,8 @@ int main() {
 END
             close $TEST;
 
-            cc_build();
-            cc_run();
+            $conf->cc_build();
+            $conf->cc_run();
         }
         )
     {
@@ -151,7 +151,7 @@ END
         );
     }
 
-    cc_clean();
+    $conf->cc_clean();
 
     return 1;
 }

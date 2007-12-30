@@ -53,13 +53,13 @@ sub runstep {
     else {
 
         # Now really test by compiling some code
-        cc_gen('config/auto/alignptrs/test_c.in');
-        cc_build();
+        $conf->cc_gen('config/auto/alignptrs/test_c.in');
+        $conf->cc_build();
         for my $try_align ( 64, 32, 16, 8, 4, 2, 1 ) {
-            my $results = cc_run_capture($try_align);
+            my $results = $conf->cc_run_capture($try_align);
             $align = _evaluate_results($results, $try_align);
         }
-        cc_clean();
+        $conf->cc_clean();
 
         _evaluate_ptr_alignment($conf, $align);
     }

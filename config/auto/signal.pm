@@ -46,26 +46,26 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose');
 
-    cc_gen('config/auto/signal/test_1.in');
-    eval { cc_build(); };
-    unless ( $@ || cc_run() !~ /ok/ ) {
+    $conf->cc_gen('config/auto/signal/test_1.in');
+    eval { $conf->cc_build(); };
+    unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         _handle__sighandler_t($conf, $verbose);
     }
-    cc_clean();
+    $conf->cc_clean();
 
-    cc_gen('config/auto/signal/test_2.in');
-    eval { cc_build(); };
-    unless ( $@ || cc_run() !~ /ok/ ) {
+    $conf->cc_gen('config/auto/signal/test_2.in');
+    eval { $conf->cc_build(); };
+    unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         _handle_sigaction($conf, $verbose);
     }
-    cc_clean();
+    $conf->cc_clean();
 
-    cc_gen('config/auto/signal/test_itimer.in');
-    eval { cc_build(); };
-    unless ( $@ || cc_run() !~ /ok/ ) {
+    $conf->cc_gen('config/auto/signal/test_itimer.in');
+    eval { $conf->cc_build(); };
+    unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         _handle_setitimer($conf, $verbose);
     }
-    cc_clean();
+    $conf->cc_clean();
 
     # now generate signal constants
     my $signalpasm = "runtime/parrot/include/signal.pasm";

@@ -25,7 +25,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step qw(copy_if_diff cc_gen cc_clean cc_build cc_run);
+use Parrot::Configure::Step qw(copy_if_diff);
 
 sub _init {
     my $self = shift;
@@ -136,13 +136,13 @@ sub runstep {
         # test for executable malloced memory
         if ( -e "config/auto/jit/test_exec_$osname.in" ) {
             print " (has_exec_protect " if $verbose;
-            cc_gen("config/auto/jit/test_exec_$osname.in");
-            eval { cc_build(); };
+            $conf->cc_gen("config/auto/jit/test_exec_$osname.in");
+            eval { $conf->cc_build(); };
             if ($@) {
                 print " $@) " if $verbose;
             }
             else {
-                if ( cc_run(0) !~ /ok/ && cc_run(1) =~ /ok/ ) {
+                if ( $conf->cc_run(0) !~ /ok/ && $conf->cc_run(1) =~ /ok/ ) {
                     $conf->data->set( has_exec_protect => 1 );
                     print "yes) " if $verbose;
                 }
@@ -150,19 +150,19 @@ sub runstep {
                     print "no) " if $verbose;
                 }
             }
-            cc_clean();
+            $conf->cc_clean();
         }
 
         # RT#43146 use executable memory for this test if needed
         #
         # test for some instructions
         if ( $jitcpuarch eq 'i386' ) {
-            cc_gen('config/auto/jit/test_c.in');
-            eval { cc_build(); };
-            unless ( $@ || cc_run() !~ /ok/ ) {
+            $conf->cc_gen('config/auto/jit/test_c.in');
+            eval { $conf->cc_build(); };
+            unless ( $@ || $conf->cc_run() !~ /ok/ ) {
                 $conf->data->set( jit_i386 => 'fcomip' );
             }
-            cc_clean();
+            $conf->cc_clean();
         }
     }
     else {

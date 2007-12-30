@@ -48,9 +48,9 @@ sub runstep {
     my $libs    = $conf->data->get('libs');
     $conf->data->add( ' ', libs => '-lrt' );
 
-    my $errormsg = _first_probe_for_aio();
+    my $errormsg = _first_probe_for_aio($conf);
     if ( ! $errormsg ) {
-        my $test = cc_run(35);
+        my $test = $conf->cc_run(35);
 
         # if the test is failing with sigaction err
         # we should repeat it with a different signal number
@@ -80,9 +80,10 @@ sub runstep {
 }
 
 sub _first_probe_for_aio {
+    my $conf = shift;
     my $errormsg;
-    cc_gen('config/auto/aio/aio.in');
-    eval { cc_build(); };
+    $conf->cc_gen('config/auto/aio/aio.in');
+    eval { $conf->cc_build(); };
     $errormsg = 1 if  $@;
     return $errormsg;
 }

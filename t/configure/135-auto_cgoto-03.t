@@ -40,13 +40,13 @@ isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
 $conf->options->set(cgoto => 1);
-is(auto::cgoto::_probe_for_cgoto($conf->options->get('cgoto')), 1,
+is(auto::cgoto::_probe_for_cgoto($conf), 1,
     "Got expected return value");
 $conf->options->set(cgoto => 0);
-is(auto::cgoto::_probe_for_cgoto($conf->options->get('cgoto')), 0,
+is(auto::cgoto::_probe_for_cgoto($conf), 0,
     "Got expected return value");
 $conf->options->set(cgoto => undef);
-ok(defined(auto::cgoto::_probe_for_cgoto($conf->options->get('cgoto'))),
+ok(defined(auto::cgoto::_probe_for_cgoto($conf)),
     "Probe returned a defined value");
 
 $step->_evaluate_cgoto($conf, 1);

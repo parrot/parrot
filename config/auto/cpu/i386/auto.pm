@@ -19,8 +19,6 @@ package auto::cpu::i386::auto;
 use strict;
 use warnings;
 
-use Parrot::Configure::Step qw(cc_gen cc_build cc_run cc_clean);
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
@@ -31,17 +29,17 @@ sub runstep {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /memcpy_(\w+)/;
         my $path_f = "config/auto/cpu/i386/$f";
-        cc_gen($path_f);
-        eval( cc_build("-DPARROT_CONFIG_TEST") );
+        $conf->cc_gen($path_f);
+        eval( $conf->cc_build("-DPARROT_CONFIG_TEST") );
         if ($@) {
             print " $@ " if $verbose;
         }
         else {
-            if ( cc_run() =~ /ok/ ) {
+            if ( $conf->cc_run() =~ /ok/ ) {
                 _handle_cc_run_ok($conf, $suffix, $path_f, $verbose);
             }
         }
-        cc_clean();
+        $conf->cc_clean();
     }
 
     @files = qw( test_gcc_cmpxchg.in );
@@ -49,17 +47,17 @@ sub runstep {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;
         my $path_f = "config/auto/cpu/i386/$f";
-        cc_gen($path_f);
-        eval { cc_build("-DPARROT_CONFIG_TEST") };
+        $conf->cc_gen($path_f);
+        eval { $conf->cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {
             print " $@ " if $verbose;
         }
         else {
-            if ( cc_run() =~ /ok/ ) {
+            if ( $conf->cc_run() =~ /ok/ ) {
                 _handle_cc_run_ok($conf, $suffix, $path_f, $verbose);
             }
         }
-        cc_clean();
+        $conf->cc_clean();
     }
     return;
 }

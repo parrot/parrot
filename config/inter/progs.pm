@@ -52,7 +52,7 @@ sub runstep {
     # Beware!  Inside test_compiler(), cc_build() and cc_run() both silently
     # reference the Parrot::Configure object ($conf) at its current state.
     # Cage cleaner alert: cf RT .
-    test_compiler($cc);
+    test_compiler($conf, $cc);
 
     return 1;
 }
@@ -170,7 +170,7 @@ sub _set_debug_and_warn {
 }
 
 sub test_compiler {
-    my $cc = shift;
+    my ($conf, $cc) = @_;
 
     open( my $out_fh, '>', 'test.c' ) or die "Unable to open 'test.c': $@\n";
     print {$out_fh} <<END_C;
@@ -180,12 +180,12 @@ int main() {
 END_C
     close $out_fh;
 
-    unless ( eval { cc_build(); 1 } ) {
+    unless ( eval { $conf->cc_build(); 1 } ) {
         warn "Compilation failed with '$cc'\n";
         exit 1;
     }
 
-    unless ( eval { cc_run(); 1 } ) {
+    unless ( eval { $conf->cc_run(); 1 } ) {
         warn $@ if $@;
         exit 1;
     }

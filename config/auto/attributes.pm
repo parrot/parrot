@@ -19,9 +19,8 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step ':auto';
+use Parrot::Configure::Step ();
 use Parrot::BuildUtil;
-
 
 sub _init {
     my $self = shift;
@@ -65,7 +64,7 @@ sub try_attr {
     $verbose and print "trying attribute '$attr'\n";
 
     my $cc = $conf->option_or_data('cc');
-    cc_gen('config/auto/attributes/test_c.in');
+    $conf->cc_gen('config/auto/attributes/test_c.in');
 
     my $disable_warnings = '';
 

@@ -5,19 +5,16 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests =>  9;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
-use IO::Handle;
 use lib qw( lib t/configure/testlib );
 use IO::CaptureOutput qw| capture |;
 
-BEGIN { use_ok('Parrot::Configure::Step'); }
-
-Parrot::Configure::Step->import(@Parrot::Configure::Step::EXPORT_OK);
-
-can_ok( __PACKAGE__, @Parrot::Configure::Step::EXPORT_OK );
+BEGIN {
+    use_ok('Parrot::Configure::Step');
+}
 
 my $cwd = cwd();
 my $command;
@@ -173,7 +170,7 @@ t/configure/035-step.t - tests Parrot::Configure::Step
 =head1 DESCRIPTION
 
 Regression tests for the L<Parrot::Configure::Step> module.  This file holds
-tests for Parrot::Configure::Step::_run_command() (a non-exported subroutine).
+tests for Parrot::Configure::Step::_run_command().
 
 =cut
 

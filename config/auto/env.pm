@@ -38,18 +38,18 @@ sub runstep {
 
     my ( $setenv, $unsetenv ) = ( 0, 0 );
 
-    cc_gen('config/auto/env/test_setenv.in');
-    eval { cc_build(); };
-    unless ( $@ || cc_run() !~ /ok/ ) {
+    $conf->cc_gen('config/auto/env/test_setenv.in');
+    eval { $conf->cc_build(); };
+    unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         $setenv = 1;
     }
-    cc_clean();
-    cc_gen('config/auto/env/test_unsetenv.in');
-    eval { cc_build(); };
-    unless ( $@ || cc_run() !~ /ok/ ) {
+    $conf->cc_clean();
+    $conf->cc_gen('config/auto/env/test_unsetenv.in');
+    eval { $conf->cc_build(); };
+    unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         $unsetenv = 1;
     }
-    cc_clean();
+    $conf->cc_clean();
 
     $self->_evaluate_env($conf, $setenv, $unsetenv);
 

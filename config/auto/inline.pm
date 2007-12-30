@@ -39,9 +39,9 @@ sub runstep {
         return 1;
     }
 
-    my $test = $self->_first_probe_for_inline();
+    my $test = $self->_first_probe_for_inline($conf);
     unless ($test) {
-        $test = $self->_second_probe_for_inline($test);
+        $test = $self->_second_probe_for_inline($conf, $test);
     }
 
     $self->_evaluate_inline($conf, $test);
@@ -50,28 +50,30 @@ sub runstep {
 
 sub _first_probe_for_inline {
     my $self = shift;
+    my $conf = shift;
     my $test;
-    cc_gen('config/auto/inline/test_1.in');
-    eval { cc_build(); };
+    $conf->cc_gen('config/auto/inline/test_1.in');
+    eval { $conf->cc_build(); };
     if ( !$@ ) {
-        $test = cc_run();
+        $test = $conf->cc_run();
         chomp $test if $test;
     }
-    cc_clean();
+    $conf->cc_clean();
     return $test;
 }
 
 sub _second_probe_for_inline {
     my $self = shift;
+    my $conf = shift;
     my $test = shift;
     if ( !$test ) {
-        cc_gen('config/auto/inline/test_2.in');
-        eval { cc_build(); };
+        $conf->cc_gen('config/auto/inline/test_2.in');
+        eval { $conf->cc_build(); };
         if ( !$@ ) {
-            $test = cc_run();
+            $test = $conf->cc_run();
             chomp $test if $test;
         }
-        cc_clean();
+        $conf->cc_clean();
     }
     return $test;
 }

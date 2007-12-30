@@ -7,14 +7,13 @@ config/gen/languages.pm - Build files for language implementations
 
 =head1 DESCRIPTION
 
-Config step for languages.
-Builds C<languages/Makefile> and loops over list of languages.
-Special support for C<languages/tcl> and C<languages/dotnet>.
+Config step for languages.  Builds C<languages/Makefile> and loops over
+list of languages.  Special support for C<languages/tcl> and
+C<languages/dotnet>.
 
-A space seperated list of languages can be passed in with
-the option 'languages'.
-An empty list of languages is OK. This means that only C<languages/Makefile>
-will be regenerated.
+A space separated list of languages can be passed in with the option
+'languages'.  An empty list of languages is OK. This means that only
+C<languages/Makefile> will be regenerated.
 
 =head1 TODO
 
@@ -45,7 +44,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    genfile( 'config/gen/makefiles/languages.in' => 'languages/Makefile' );
+    $conf->genfile('config/gen/makefiles/languages.in' => 'languages/Makefile' );
 
     my $languages = $conf->options->get('languages');
     $languages = qq{
@@ -76,17 +75,14 @@ sub runstep {
         elsif ( $language eq 'tcl' ) {
             # tcl has more than one Makefile
             # currently this is handled as a special case
-            genfile(
-                "languages/$language/config/makefiles/examples.in" => "languages/$language/examples/Makefile"
+            $conf->genfile("languages/$language/config/makefiles/examples.in" => "languages/$language/examples/Makefile"
             );
-            genfile(
-                "languages/$language/config/makefiles/root.in"     => "languages/$language/Makefile",
+            $conf->genfile("languages/$language/config/makefiles/root.in"     => "languages/$language/Makefile",
                 expand_gmake_syntax                                => 1,
             );
         }
         else {
-            genfile(
-                "languages/$language/config/makefiles/root.in"     => "languages/$language/Makefile"
+            $conf->genfile("languages/$language/config/makefiles/root.in"     => "languages/$language/Makefile"
             );
         }
     }

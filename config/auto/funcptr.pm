@@ -36,14 +36,14 @@ sub runstep {
     my $jitcapable = $conf->data->get('jitcapable');
 
     if ($jitcapable) {
-        cc_gen('config/auto/funcptr/test_c.in');
-        eval { cc_build(); };
+        $conf->cc_gen('config/auto/funcptr/test_c.in');
+        eval { $conf->cc_build(); };
 
-        if ( $@ || cc_run() !~ /OK/ ) {
+        if ( $@ || $conf->cc_run() !~ /OK/ ) {
             _cast_void_pointers_msg();
             exit(-1);
         }
-        cc_clean();
+        $conf->cc_clean();
         $self->_set_positive_result($conf);
     }
 

@@ -18,9 +18,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step qw(cc_gen cc_build cc_clean cc_run);
-
-
 sub _init {
     my $self = shift;
     my %data;
@@ -33,7 +30,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $res = _probe_for_snprintf();
+    my $res = _probe_for_snprintf($conf);
 
     $self->_evaluate_snprintf($conf, $res);
 
@@ -41,10 +38,11 @@ sub runstep {
 }
 
 sub _probe_for_snprintf {
-    cc_gen('config/auto/snprintf/test.in');
-    cc_build();
-    my $res = cc_run() or die "Can't run the snprintf testing program: $!";
-    cc_clean();
+    my $conf = shift;
+    $conf->cc_gen('config/auto/snprintf/test.in');
+    $conf->cc_build();
+    my $res = $conf->cc_run() or die "Can't run the snprintf testing program: $!";
+    $conf->cc_clean();
     return $res;
 }
 

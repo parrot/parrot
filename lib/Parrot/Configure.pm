@@ -41,6 +41,7 @@ use lib qw(config);
 use Carp qw(carp);
 use Storable qw(nstore retrieve);
 use Parrot::Configure::Data;
+use base qw(Parrot::Configure::Compiler);
 
 use Class::Struct;
 
@@ -54,7 +55,7 @@ struct(
 
 =head2 Methods
 
-=head3 Constructors
+=head3 Constructor
 
 =over 4
 
@@ -62,7 +63,7 @@ struct(
 
 Basic constructor.
 
-Accepts no arguments and returns a L<Parrot::Configure> object.
+Accepts no arguments and returns a Parrot::Configure object.
 
 =cut
 
@@ -90,10 +91,10 @@ sub new {
 
 =item * C<data()>
 
-Provides access to a L<Parrot::Configure::Data> object intended to contain
+Provides access to a Parrot::Configure::Data object intended to contain
 initial and discovered configuration data.
 
-Accepts no arguments and returns a L<Parrot::Configure::Data> object.
+Accepts no arguments and returns a Parrot::Configure::Data object.
 
 =cut
 
@@ -105,10 +106,10 @@ sub data {
 
 =item * C<options()>
 
-Provides access to a L<Parrot::Configure::Data> object intended to contain CLI
+Provides access to a Parrot::Configure::Data object intended to contain CLI
 option data.
 
-Accepts no arguments and returns a L<Parrot::Configure::Data> object.
+Accepts no arguments and returns a Parrot::Configure::Data object.
 
 =cut
 
@@ -121,7 +122,7 @@ sub options {
 =item * C<steps()>
 
 Provides a list of registered steps, where each step is represented by an
-L<Parrot::Configure::Task> object.  Steps are returned in the order in which
+Parrot::Configure::Task object.  Steps are returned in the order in which
 they were registered.
 
 Accepts no arguments and returns a list in list context or an arrayref in
@@ -168,7 +169,8 @@ first parameter passed is the class name of the step being registered.  All
 other parameters are saved and passed to the registered class's C<runstep()>
 method.
 
-Accepts a list and modifies the data structure within the L<Parrot::Configure> object.
+Accepts a list and modifies the data structure within the
+Parrot::Configure object.
 
 =cut
 
@@ -188,7 +190,8 @@ sub add_step {
 
 Registers new steps to be run at the end of the execution queue.
 
-Accepts a list of new steps and modifies the data structure within the L<Parrot::Configure> object.
+Accepts a list of new steps and modifies the data structure within the
+Parrot::Configure object.
 
 =cut
 
@@ -208,12 +211,12 @@ sub add_steps {
 =item * C<runsteps()>
 
 Sequentially executes steps in the order they were registered.  The invoking
-L<Parrot::Configure> object is passed as the first argument to each step's
+Parrot::Configure object is passed as the first argument to each step's
 C<runstep()> method, followed by any parameters that were registered for that
 step.
 
 Accepts no arguments and modifies the data structure within the
-L<Parrot::Configure> object.
+Parrot::Configure object.
 
 =cut
 
@@ -313,11 +316,12 @@ sub _handle_fatal_step_option {
 
 =item * C<run_single_step()>
 
-The invoking L<Parrot::Configure> object is passed as the first argument to
+The invoking Parrot::Configure object is passed as the first argument to
 each step's C<runstep()> method, followed by any parameters that were
 registered for that step.
 
-Accepts no arguments and modifies the data structure within the L<Parrot::Configure> object.
+Accepts no arguments and modifies the data structure within the
+Parrot::Configure object.
 
 =cut
 

@@ -37,7 +37,7 @@ sub runstep {
         return 1;
     }
 
-    my $test = _probe_for_cgoto( $conf->options->get('cgoto') );
+    my $test = _probe_for_cgoto( $conf );
 
     $self->_evaluate_cgoto($conf, $test);
 
@@ -45,15 +45,16 @@ sub runstep {
 }
 
 sub _probe_for_cgoto {
-    my $cgoto = shift;
+    my $conf = shift;
+    my $cgoto = $conf->options->get('cgoto');
     my $test;
     if ( defined $cgoto ) {
         $test = $cgoto;
     }
     else {
-        cc_gen('config/auto/cgoto/test_c.in');
-        $test = eval { cc_build(); 1; } || 0;
-        cc_clean();
+        $conf->cc_gen('config/auto/cgoto/test_c.in');
+        $test = eval { $conf->cc_build(); 1; } || 0;
+        $conf->cc_clean();
     }
     return $test;
 }

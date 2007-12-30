@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-config/auto/cpu/ppc/auto.pm
+config/auto/cpu/i386/auto.pm
 
 =head1 DESCRIPTION
 
-Power PC-specific configuration hints.
+Test
 
 =cut
 
@@ -15,8 +15,6 @@ package auto::cpu::ppc::auto;
 
 use strict;
 use warnings;
-
-use Parrot::Configure::Step qw(cc_gen cc_build cc_run cc_clean);
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -27,23 +25,23 @@ sub runstep {
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;
-        my $path_f = "config/auto/cpu/ppc/$f";
-        cc_gen($path_f);
-        eval { cc_build("-DPARROT_CONFIG_TEST") };
+        $f = "config/auto/cpu/ppc/$f";
+        $conf->cc_gen($f);
+        eval { $conf->cc_build("-DPARROT_CONFIG_TEST") };
         if ($@) {
             print " $@ " if $verbose;
         }
         else {
-            if ( cc_run() =~ /ok/ ) {
+            if ( $conf->cc_run() =~ /ok/ ) {
                 $conf->data->set(
                     "ppc_has_$suffix" => '1',
                     "HAS_PPC_$suffix" => '1',
                 );
                 print " (\U$suffix) " if ($verbose);
-                $conf->data->add( ' ', TEMP_generated => $path_f );
+                $conf->data->add( ' ', TEMP_generated => $f );
             }
         }
-        cc_clean();
+        $conf->cc_clean();
     }
 }
 

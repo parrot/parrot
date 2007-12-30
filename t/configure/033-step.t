@@ -140,20 +140,6 @@ like(
     close *OLDERR;
 }
 
-# cc_gen()
-
-# cc_build()
-
-# cc_run()
-
-# cc_run_capture()
-
-# cc_clean()
-
-# capture_output()
-
-# check_progs()
-
 {
     my %tf_params = ( UNLINK => 1, );
     $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;

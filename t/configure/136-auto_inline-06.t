@@ -40,7 +40,7 @@ isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
 my $test = 0;
-$test = $step->_second_probe_for_inline($test);
+$test = $step->_second_probe_for_inline($conf, $test);
 ok($step->_evaluate_inline($conf, $test),
     "_evaluate_inline() returned true value");
 

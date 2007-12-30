@@ -25,7 +25,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step ':auto';
+use Parrot::Configure::Step ();
 use Parrot::BuildUtil;
 
 sub _init {
@@ -175,7 +175,7 @@ sub try_warning {
     $verbose and print "trying attribute '$warning'\n";
 
     my $cc = $conf->option_or_data('cc');
-    cc_gen('config/auto/warnings/test_c.in');
+    $conf->cc_gen('config/auto/warnings/test_c.in');
 
     my $ccflags  = $conf->data->get('ccflags');
     my $tryflags = "$ccflags $warning";

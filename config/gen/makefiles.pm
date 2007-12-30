@@ -85,8 +85,7 @@ sub runstep {
 sub cflags {
     my ( $self, $conf ) = @_;
 
-    genfile(
-        'config/gen/makefiles/CFLAGS.in' => 'CFLAGS',
+    $conf->genfile('config/gen/makefiles/CFLAGS.in' => 'CFLAGS',
         comment_type                     => '#'
     );
 
@@ -122,7 +121,7 @@ sub makefiles {
         my $source = delete $args->{SOURCE};
 
         if ( $target ne 'docs/Makefile' ) {
-            genfile( $source => $target, %$args );
+            $conf->genfile($source => $target, %$args );
         }
         else {
 
@@ -138,7 +137,7 @@ sub makefiles {
 
                 $conf->data->set( pod => $pod );
 
-                genfile( $source => $target, %$args );
+                $conf->genfile($source => $target, %$args );
 
                 $conf->data->set( pod => undef );
 

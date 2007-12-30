@@ -7,8 +7,7 @@ config/auto/cpu/x86_64/auto.pm
 
 =head1 DESCRIPTION
 
-Adds -fPIC to x86_64 (AMD64) ccflags, if necessary.  Also handles
-cmpxchg.
+Test
 
 =cut
 
@@ -20,11 +19,13 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $ccflags = $conf->data->get('ccflags');
-    $conf->data->add( ' ', ccflags => "-fPIC" ) unless $ccflags =~ /-fPIC/;
+    # x86_64 is recently new and has cmpxchg
 
-    # when running on gcc, we just define the config item
-    if ( defined( $conf->data->get('gccversion') ) ) {
+    my $verbose = $conf->options->get('verbose');
+    my $gcc     = $conf->data->get('gccversion');
+
+    # whenn running on gcc, we just define the config item
+    if ( defined $gcc ) {
 
         # HAS_foo defines PARROT_HAS_`uc foo`
         $conf->data->set(
