@@ -760,15 +760,15 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
     $(SRC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC) \
     $(SRC_DIR)/parrot_config$(O)
 
-pbc_to_c.pir : $(PARROT) tools/dev/pbc_to_c_gen.pl
-	$(PERL) tools/dev/pbc_to_c_gen.pl \
+pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
+	$(PERL) tools/dev/pbc_to_exe_gen.pl \
     '$(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@ \
 	@ld_out@ @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)' \
-    > pbc_to_c.pir
+    > pbc_to_exe.pir
 
-pbc_to_c : pbc_to_c.pir
-	$(PARROT) -o pbc_to_c.pbc pbc_to_c.pir
-	$(PARROT) pbc_to_c.pir pbc_to_c.pbc
+pbc_to_exe : pbc_to_exe.pir
+	$(PARROT) -o pbc_to_exe.pbc pbc_to_exe.pir
+	$(PARROT) pbc_to_exe.pir pbc_to_exe.pbc
 
 
 #
