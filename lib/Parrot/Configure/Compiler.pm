@@ -159,8 +159,6 @@ sub cc_clean {    ## no critic Subroutines::RequireFinalReturn
     unlink map "test$_", qw( .c .cco .ldo .out), $conf->data->get(qw( o exe ));
 }
 
-=back
-
 =item C<genfile()>
 
     $conf->genfile($source, $target, %options);
@@ -246,6 +244,8 @@ syntax works ok.
 =item wildcard
 
 =item notdir
+
+=back
 
 =back
 
