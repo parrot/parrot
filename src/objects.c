@@ -106,7 +106,7 @@ static PMC* get_init_meth(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static void instantiate_object(PARROT_INTERP,
-    ARGINOUT(PMC *object),
+    ARGMOD(PMC *object),
     ARGIN_NULLOK(PMC *init))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -1094,7 +1094,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-Parrot_instantiate_object(PARROT_INTERP, ARGINOUT(PMC *object))
+Parrot_instantiate_object(PARROT_INTERP, ARGMOD(PMC *object))
 {
     instantiate_object(interp, object, NULL);
 }
@@ -1110,7 +1110,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-instantiate_object(PARROT_INTERP, ARGINOUT(PMC *object), ARGIN_NULLOK(PMC *init))
+instantiate_object(PARROT_INTERP, ARGMOD(PMC *object), ARGIN_NULLOK(PMC *init))
 {
     SLOTTYPE *new_object_array;
     INTVAL    attrib_count, i;

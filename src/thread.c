@@ -49,7 +49,7 @@ static PMC * make_local_copy(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mutex_unlock(ARGINOUT(void *arg))
+static void mutex_unlock(ARGMOD(void *arg))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*arg);
 
@@ -239,7 +239,7 @@ interpreter.
 
 PARROT_CAN_RETURN_NULL
 PMC *
-pt_shared_fixup(PARROT_INTERP, ARGINOUT(PMC *pmc))
+pt_shared_fixup(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     /* TODO this will need to change for thread pools
      * XXX should we have a separate interpreter for this?
@@ -312,7 +312,7 @@ this function, then a spurious wakeup may occur.
 */
 
 void
-pt_thread_wait_with(PARROT_INTERP, ARGINOUT(Parrot_mutex *mutex))
+pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
 {
     LOCK(interpreter_array_mutex);
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
@@ -820,7 +820,7 @@ Unlocks the mutex C<*arg>.
 */
 
 static void
-mutex_unlock(ARGINOUT(void *arg))
+mutex_unlock(ARGMOD(void *arg))
 {
     UNLOCK(*(Parrot_mutex *) arg);
 }

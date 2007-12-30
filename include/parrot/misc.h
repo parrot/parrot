@@ -49,12 +49,12 @@ INTVAL Parrot_byte_rindex(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_destroy_cpa(ARGINOUT(char **array))
+void Parrot_destroy_cpa(ARGMOD(char **array))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*array);
 
 PARROT_API
-void Parrot_destroy_la(ARGINOUT(long *array))
+void Parrot_destroy_la(ARGMOD(long *array))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*array);
 

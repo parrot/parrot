@@ -111,17 +111,37 @@
 #define PARROT_DOES_NOT_RETURN      /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_MALLOC               __attribute__malloc__ __attribute__warn_unused_result__
 
-#define NOTNULL(x)                  /*@notnull@*/ x
-#define NULLOK(x)                   /*@null@*/ x
 
-#define ARGIN(x)                    /*@notnull@*/ /*@in@*/ x
-#define ARGOUT(x)                   /*@notnull@*/ /*@out@*/ x
+/* Function argument instrumentation */
+/* For explanations of the annotations, see http://www.splint.org/manual/manual.html */
+
+#define NOTNULL(x)                  /*@notnull@*/ x
+    /* The pointer passed may not be NULL */
+
+#define NULLOK(x)                   /*@null@*/ x
+    /* The pointer passed may be NULL */
+
+#define ARGIN(x)                    /*@in@*/ /*@notnull@*/ x
+#define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ x
+    /* The pointer target must be completely defined before being passed */
+    /* to the function. */
+
+#define ARGOUT(x)                   /*@out@*/ /*@notnull@*/ x
+#define ARGOUT_NULLOK(x)            /*@out@*/ /*@null@*/ x
+    /* The pointer target will be defined by the function */
+
+#define ARGMOD(x)                   /*@in@*/ /*@notnull@*/ x
+#define ARGMOD_NULLOK(x)            /*@in@*/ /*@null@*/ x
+    /* The pointer target must be completely defined before being passed, */
+    /* and MAY be modified by the function. */
+
 /* Needs to be become ARGMOD */
-#define ARGINOUT(x)                 /*@notnull@*/ /*@in@*/ x
-#define ARGIN_NULLOK(x)             /*@null@*/ /*@in@*/ x
-#define ARGOUT_NULLOK(x)            /*@null@*/ /*@out@*/ x
+#define ARGINOUT(x)                 /*@notnull@*/ /*@in@*/ /*@out@*/ x
 #define ARGINOUT_NULLOK(x)          /*@null@*/ /*@in@*/ /*@out@*/ x
+    /* Old versions that have been upgraded to ARGMOD */
+
 #define FUNC_MODIFIES(x)            /*@modifies x@*/
+    /* Never applied by a human, only by the headerizer. */
 
 
 #endif /* PARROT_COMPILER_H_GUARD */

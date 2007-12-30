@@ -48,9 +48,7 @@ static int args_match_params(
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static int call_is_safe(
-    ARGIN(const PMC *sub),
-    ARGINOUT(opcode_t **set_args))
+static int call_is_safe(ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*set_args);
@@ -287,7 +285,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-call_is_safe(ARGIN(const PMC *sub), ARGINOUT(opcode_t **set_args))
+call_is_safe(ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
 {
     PMC *called, *sig_results;
 

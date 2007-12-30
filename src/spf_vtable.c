@@ -34,7 +34,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING * getchr_pmc(PARROT_INTERP,
     INTVAL size,
-    ARGINOUT(SPRINTF_OBJ *obj))
+    ARGMOD(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*obj);
@@ -394,7 +394,7 @@ from C<obj>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING *
-getchr_pmc(PARROT_INTERP, INTVAL size, ARGINOUT(SPRINTF_OBJ *obj))
+getchr_pmc(PARROT_INTERP, INTVAL size, ARGMOD(SPRINTF_OBJ *obj))
 {
     STRING *s;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,

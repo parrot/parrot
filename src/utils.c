@@ -522,7 +522,7 @@ Use this to destroy an array created with C<Parrot_make_la()>.
 
 PARROT_API
 void
-Parrot_destroy_la(ARGINOUT(long *array))
+Parrot_destroy_la(ARGMOD(long *array))
 {
     mem_sys_free(array);
 }
@@ -585,7 +585,7 @@ Use this to destroy an array created with C<Parrot_make_cpa()>.
 
 PARROT_API
 void
-Parrot_destroy_cpa(ARGINOUT(char **array))
+Parrot_destroy_cpa(ARGMOD(char **array))
 {
     UINTVAL offset = 0;
     /* Free each piece */

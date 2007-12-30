@@ -245,12 +245,12 @@ PMC* parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void invalidate_retc_context(PARROT_INTERP, ARGINOUT(PMC *cont))
+void invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*cont);
 
-void mark_context(PARROT_INTERP, ARGINOUT(parrot_context_t* ctx))
+void mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctx);

@@ -64,7 +64,7 @@ static void cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
 
 static void create_image(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
-    ARGINOUT(visit_info *info))
+    ARGMOD(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*info);
@@ -220,7 +220,7 @@ static STRING* shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
 static void str_append(PARROT_INTERP,
-    ARGINOUT(STRING *s),
+    ARGMOD(STRING *s),
     ARGIN(const void *b),
     size_t len)
         __attribute__nonnull__(1)
@@ -238,15 +238,14 @@ static PMC* thaw_create_pmc(PARROT_INTERP,
 
 PARROT_INLINE
 static int thaw_pmc(PARROT_INTERP,
-    ARGINOUT(visit_info *info),
+    ARGMOD(visit_info *info),
     ARGOUT(UINTVAL *id),
-    ARGINOUT(INTVAL *type))
+    ARGOUT(INTVAL *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*info)
-        FUNC_MODIFIES(*type);
+        FUNC_MODIFIES(*info);
 
 static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
         __attribute__nonnull__(1)
@@ -255,7 +254,7 @@ static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
 PARROT_INLINE
 static int todo_list_seen(PARROT_INTERP,
     ARGIN(PMC *pmc),
-    ARGINOUT(visit_info *info),
+    ARGMOD(visit_info *info),
     ARGOUT(UINTVAL *id))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -347,7 +346,7 @@ No encoding of strings, no transcoding.
 */
 
 static void
-str_append(PARROT_INTERP, ARGINOUT(STRING *s), ARGIN(const void *b), size_t len)
+str_append(PARROT_INTERP, ARGMOD(STRING *s), ARGIN(const void *b), size_t len)
 {
     const size_t used = s->bufused;
     const int need_free = (int)PObj_buflen(s) - used - len;
@@ -1049,8 +1048,8 @@ set.
 
 PARROT_INLINE
 static int
-thaw_pmc(PARROT_INTERP, ARGINOUT(visit_info *info),
-        ARGOUT(UINTVAL *id), ARGINOUT(INTVAL *type))
+thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
+        ARGOUT(UINTVAL *id), ARGOUT(INTVAL *type))
 {
     PMC *n;
     IMAGE_IO * const io = info->image_io;
@@ -1069,7 +1068,8 @@ thaw_pmc(PARROT_INTERP, ARGINOUT(visit_info *info),
         *type = info->last_type;
     }
     else {                       /* type follows */
-        info->last_type = *type = VTABLE_shift_integer(interp, io);
+        *type = VTABLE_shift_integer(interp, io);
+        info->last_type = *type;
         if (*type <= 0)
             real_exception(interp, NULL, 1, "Unknown PMC type to thaw %d", (int) *type);
         if (*type >= interp->n_vtable_max ||
@@ -1380,7 +1380,7 @@ are flags.
 
 PARROT_INLINE
 static int
-todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGINOUT(visit_info *info),
+todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
         ARGOUT(UINTVAL *id))
 {
     HashBucket * const b =
@@ -1599,7 +1599,7 @@ Allocate image to some estimated size.
 */
 
 static void
-create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGINOUT(visit_info *info))
+create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 {
     INTVAL len;
     if (!PMC_IS_NULL(pmc) && (VTABLE_does(interp, pmc,

@@ -60,7 +60,7 @@ STM_tx_log * Parrot_STM_tx_log_get(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_STM_waitlist_add_self(PARROT_INTERP,
-    ARGINOUT(STM_waitlist *waitlist))
+    ARGMOD(STM_waitlist *waitlist))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*waitlist);
@@ -68,8 +68,7 @@ void Parrot_STM_waitlist_add_self(PARROT_INTERP,
 void Parrot_STM_waitlist_destroy_thread(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_STM_waitlist_init(PARROT_INTERP,
-    ARGINOUT(STM_waitlist *waitlist))
+void Parrot_STM_waitlist_init(PARROT_INTERP, ARGMOD(STM_waitlist *waitlist))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*waitlist);
@@ -78,7 +77,7 @@ void Parrot_STM_waitlist_remove_all(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_STM_waitlist_signal(PARROT_INTERP,
-    ARGINOUT(STM_waitlist *waitlist))
+    ARGMOD(STM_waitlist *waitlist))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*waitlist);

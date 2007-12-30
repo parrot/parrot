@@ -40,11 +40,11 @@ void Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_cx_runloop_sleep(ARGINOUT(PMC *scheduler))
+void Parrot_cx_runloop_sleep(ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*scheduler);
 
-void Parrot_cx_runloop_wake(PARROT_INTERP, ARGINOUT(PMC *scheduler))
+void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);

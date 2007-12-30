@@ -56,7 +56,7 @@ Stack_entry_type get_entry_type(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-void mark_stack(PARROT_INTERP, ARGINOUT(Stack_Chunk_t *chunk))
+void mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*chunk);
@@ -82,7 +82,7 @@ void * pop_dest(PARROT_INTERP)
 
 PARROT_API
 void rotate_entries(PARROT_INTERP,
-    ARGINOUT(Stack_Chunk_t **stack_p),
+    ARGMOD(Stack_Chunk_t **stack_p),
     INTVAL num_entries)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -110,14 +110,14 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void * stack_peek(PARROT_INTERP,
     ARGIN(Stack_Chunk_t *stack_base),
-    ARGINOUT_NULLOK(Stack_entry_type *type))
+    ARGMOD_NULLOK(Stack_entry_type *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 void * stack_pop(PARROT_INTERP,
-    ARGINOUT(Stack_Chunk_t **stack_p),
+    ARGMOD(Stack_Chunk_t **stack_p),
     ARGOUT_NULLOK(void *where),
     Stack_entry_type type)
         __attribute__nonnull__(1)
@@ -126,7 +126,7 @@ void * stack_pop(PARROT_INTERP,
 
 PARROT_API
 void stack_push(PARROT_INTERP,
-    ARGINOUT(Stack_Chunk_t **stack_p),
+    ARGMOD(Stack_Chunk_t **stack_p),
     ARGIN(void *thing),
     Stack_entry_type type,
     ARGIN_NULLOK(Stack_cleanup_method cleanup))
@@ -158,7 +158,7 @@ Stack_Chunk_t * register_new_stack(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-void* stack_prepare_pop(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p))
+void* stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stack_p);
@@ -166,7 +166,7 @@ void* stack_prepare_pop(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p))
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-void* stack_prepare_push(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p))
+void* stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stack_p);

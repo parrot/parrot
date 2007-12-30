@@ -47,14 +47,14 @@ static int cstring_compare(SHIM_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void expand_hash(PARROT_INTERP, ARGINOUT(Hash *hash))
+static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
 static void hash_freeze(PARROT_INTERP,
     ARGIN(const Hash * const hash),
-    ARGINOUT(visit_info* info))
+    ARGMOD(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -63,11 +63,7 @@ static void hash_freeze(PARROT_INTERP,
 static void hash_thaw(PARROT_INTERP,
     ARGINOUT(Hash *hash),
     ARGINOUT(visit_info* info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*hash)
-        FUNC_MODIFIES(*info);
+        __attribute__nonnull__(1);
 
 static void init_hash(
     ARGOUT(Hash *hash),
@@ -93,9 +89,7 @@ PARROT_WARN_UNUSED_RESULT
 static size_t key_hash_STRING(PARROT_INTERP,
     ARGINOUT(STRING *value),
     size_t seed)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*value);
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -405,7 +399,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGINOUT(visit_info* info))
+hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info* info))
 {
     size_t i;
     IMAGE_IO * const io = info->image_io;
@@ -503,7 +497,7 @@ pointers, and they'll be all over memory.)
 */
 
 static void
-expand_hash(PARROT_INTERP, ARGINOUT(Hash *hash))
+expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 {
     const UINTVAL old_size = hash->mask + 1;
     const UINTVAL new_size = old_size << 1;
@@ -735,7 +729,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-parrot_hash_destroy(SHIM_INTERP, ARGINOUT(Hash *hash))
+parrot_hash_destroy(SHIM_INTERP, ARGMOD(Hash *hash))
 {
     mem_sys_free(hash->bs);
     mem_sys_free(hash);
@@ -752,7 +746,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-parrot_chash_destroy(PARROT_INTERP, ARGINOUT(Hash *hash))
+parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
 {
     UINTVAL i;
 
@@ -907,7 +901,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
-parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), ARGINOUT(PMC *key))
+parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
 {
     INTVAL i = PMC_int_val(key);
     const BucketIndex bi = (BucketIndex)PMC_data(key);

@@ -93,7 +93,7 @@ int parrot_pic_check_sig(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void parrot_PIC_destroy(ARGINOUT(struct PackFile_ByteCode *cs))
+void parrot_PIC_destroy(ARGMOD(struct PackFile_ByteCode *cs))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*cs);
 

@@ -17,7 +17,7 @@ typedef struct Parrot_STM_PMC_handle_data *Parrot_STM_PMC_handle;
 /* HEADERIZER BEGIN: src/stm/backend.c */
 
 void Parrot_freeze_STM_PMC_handle(PARROT_INTERP,
-    ARGINOUT(IMAGE_IO *io),
+    ARGMOD(IMAGE_IO *io),
     ARGIN(Parrot_STM_PMC_handle handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -43,7 +43,7 @@ void Parrot_STM_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_STM_destroy_extracted(PARROT_INTERP,
-    ARGINOUT_NULLOK(void *saved_log_data))
+    ARGMOD_NULLOK(void *saved_log_data))
         __attribute__nonnull__(1);
 
 void Parrot_STM_dump_profile(PARROT_INTERP)
@@ -55,7 +55,7 @@ void * Parrot_STM_extract(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_STM_mark_extracted(PARROT_INTERP,
-    ARGINOUT_NULLOK(void *saved_log_data))
+    ARGMOD_NULLOK(void *saved_log_data))
         __attribute__nonnull__(1);
 
 void Parrot_STM_mark_pmc_handle(PARROT_INTERP, Parrot_STM_PMC_handle handle)
@@ -74,7 +74,7 @@ PMC * Parrot_STM_read(PARROT_INTERP, Parrot_STM_PMC_handle handle)
         __attribute__nonnull__(1);
 
 void Parrot_STM_replay_extracted(PARROT_INTERP,
-    ARGINOUT_NULLOK(void *saved_log_data))
+    ARGMOD_NULLOK(void *saved_log_data))
         __attribute__nonnull__(1);
 
 void Parrot_STM_start_transaction(PARROT_INTERP)

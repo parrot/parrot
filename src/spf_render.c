@@ -58,7 +58,7 @@ enum {
 
 static void gen_sprintf_call(
     ARGOUT(char *out),
-    ARGINOUT(SpfInfo *info),
+    ARGMOD(SpfInfo *info),
     int thingy)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -67,7 +67,7 @@ static void gen_sprintf_call(
 PARROT_CANNOT_RETURN_NULL
 static STRING * handle_flags(PARROT_INTERP,
     ARGIN(const SpfInfo *info),
-    ARGINOUT(STRING *str),
+    ARGMOD(STRING *str),
     INTVAL is_int_type,
     ARGIN_NULLOK(STRING* prefix))
         __attribute__nonnull__(1)
@@ -108,7 +108,7 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGINOUT(STRING *str),
+handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
         INTVAL is_int_type, ARGIN_NULLOK(STRING* prefix))
 {
     UINTVAL len = string_length(interp, str);
@@ -232,7 +232,7 @@ a float.
 */
 
 static void
-gen_sprintf_call(ARGOUT(char *out), ARGINOUT(SpfInfo *info), int thingy)
+gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 {
     int i = 0;
 

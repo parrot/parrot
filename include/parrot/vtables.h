@@ -23,7 +23,7 @@ VTABLE * Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_destroy_vtable(SHIM_INTERP, ARGINOUT(VTABLE *vtable))
+void Parrot_destroy_vtable(SHIM_INTERP, ARGMOD(VTABLE *vtable))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*vtable);
 

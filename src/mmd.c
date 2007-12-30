@@ -98,7 +98,7 @@ static void mmd_create_builtin_multi_meth_2(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_cvt_to_types(PARROT_INTERP, NOTNULL(PMC *multi_sig))
+static PMC* mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -1423,7 +1423,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-mmd_cvt_to_types(PARROT_INTERP, NOTNULL(PMC *multi_sig))
+mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 {
     const INTVAL n = VTABLE_elements(interp, multi_sig);
     INTVAL i;

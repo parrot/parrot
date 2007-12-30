@@ -53,7 +53,7 @@ strings.
 /* HEADERIZER BEGIN: static */
 
 static void make_writable(PARROT_INTERP,
-    ARGINOUT(STRING **s),
+    ARGMOD(STRING **s),
     const size_t len,
     parrot_string_representation_t representation)
         __attribute__nonnull__(1)
@@ -76,7 +76,7 @@ copied over and the copy-on-write flag is cleared.
 
 PARROT_API
 void
-Parrot_unmake_COW(PARROT_INTERP, ARGINOUT(STRING *s))
+Parrot_unmake_COW(PARROT_INTERP, ARGMOD(STRING *s))
 {
     PARROT_ASSERT(s);
 
@@ -130,7 +130,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, ARGINOUT(STRING *s))
+Parrot_make_COW_reference(PARROT_INTERP, ARGMOD(STRING *s))
 {
     STRING *d;
 
@@ -183,7 +183,7 @@ using the one passed in and returns it.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_reuse_COW_reference(SHIM_INTERP, ARGINOUT(STRING *s), ARGOUT(STRING *d))
+Parrot_reuse_COW_reference(SHIM_INTERP, ARGMOD(STRING *s), ARGOUT(STRING *d))
 {
     PARROT_ASSERT(s);
 
@@ -215,7 +215,7 @@ second.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_set(PARROT_INTERP, ARGOUT(STRING *dest), ARGINOUT(STRING *src))
+string_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
 {
     if (dest == src)
         return dest;
@@ -451,7 +451,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_append(PARROT_INTERP, ARGINOUT_NULLOK(STRING *a), ARGIN_NULLOK(STRING *b))
+string_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *b))
 {
     UINTVAL a_capacity;
     UINTVAL total_length;
@@ -713,7 +713,7 @@ Grows the Parrot string's buffer by the specified number of characters.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_grow(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL addlen)
+string_grow(PARROT_INTERP, ARGMOD(STRING *s), INTVAL addlen)
 {
     Parrot_unmake_COW(interp, s);
 
@@ -901,7 +901,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_copy(PARROT_INTERP, ARGINOUT(STRING *s))
+string_copy(PARROT_INTERP, ARGMOD(STRING *s))
 {
     return Parrot_make_COW_reference(interp, s);
 }
@@ -927,7 +927,7 @@ string.
 PARROT_API
 PARROT_IGNORABLE_RESULT
 INTVAL
-string_compute_strlen(PARROT_INTERP, ARGINOUT(STRING *s))
+string_compute_strlen(PARROT_INTERP, ARGMOD(STRING *s))
 {
     PARROT_ASSERT(s);
 
@@ -1286,7 +1286,7 @@ string is a copy of the one passed in.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_chopn(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL n)
+string_chopn(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
 {
     STRING * const chopped = string_copy(interp, s);
     string_chopn_inplace(interp, chopped, n);
@@ -1307,7 +1307,7 @@ passed in is modified and returned.
 
 PARROT_API
 void
-string_chopn_inplace(PARROT_INTERP, ARGINOUT(STRING *s), INTVAL n)
+string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
 {
     UINTVAL new_length, uchar_size;
     String_iter iter;
@@ -1446,7 +1446,7 @@ has to be created.
 */
 
 static void
-make_writable(PARROT_INTERP, ARGINOUT(STRING **s),
+make_writable(PARROT_INTERP, ARGMOD(STRING **s),
     const size_t len, parrot_string_representation_t representation)
 {
     if (!*s)
@@ -2119,7 +2119,7 @@ memory.
 
 PARROT_API
 void
-string_pin(PARROT_INTERP, ARGINOUT(STRING *s))
+string_pin(PARROT_INTERP, ARGMOD(STRING *s))
 {
     char  *memory;
     INTVAL size;
@@ -2154,7 +2154,7 @@ memory.
 
 PARROT_API
 void
-string_unpin(PARROT_INTERP, ARGINOUT(STRING *s))
+string_unpin(PARROT_INTERP, ARGMOD(STRING *s))
 {
     void  *memory;
     INTVAL size;
@@ -2203,7 +2203,7 @@ C<< s->hashval >>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 size_t
-string_hash(PARROT_INTERP, ARGINOUT_NULLOK(STRING *s), size_t seed)
+string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s), size_t seed)
 {
     register size_t h;
 
@@ -2521,7 +2521,7 @@ Converts the specified Parrot string to upper case.
 
 PARROT_API
 void
-string_upcase_inplace(PARROT_INTERP, ARGINOUT(STRING *s))
+string_upcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
 {
     Parrot_unmake_COW(interp, s);
     CHARSET_UPCASE(interp, s);
@@ -2562,7 +2562,7 @@ Converts the specified Parrot string to lower case.
 
 PARROT_API
 void
-string_downcase_inplace(PARROT_INTERP, ARGINOUT(STRING *s))
+string_downcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
 {
     /*
      * TODO get rid of all the inplace variants. We have for utf8:
@@ -2609,7 +2609,7 @@ Converts the specified Parrot string to title case.
 
 PARROT_API
 void
-string_titlecase_inplace(PARROT_INTERP, ARGINOUT(STRING *s))
+string_titlecase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
 {
     Parrot_unmake_COW(interp, s);
     CHARSET_TITLECASE(interp, s);
@@ -2629,7 +2629,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_increment(PARROT_INTERP, ARGINOUT(const STRING *s))
+string_increment(PARROT_INTERP, ARGMOD(const STRING *s))
 {
     INTVAL o;
 
@@ -2755,7 +2755,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_string_trans_charset(PARROT_INTERP, ARGINOUT_NULLOK(STRING *src),
+Parrot_string_trans_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
         INTVAL charset_nr, ARGOUT_NULLOK(STRING *dest))
 {
     const CHARSET *new_charset;

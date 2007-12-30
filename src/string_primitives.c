@@ -81,8 +81,8 @@ sequence, right after the \.
 
 PARROT_API
 Parrot_UInt4
-string_unescape_one(PARROT_INTERP, ARGINOUT(UINTVAL *offset),
-        ARGINOUT(STRING *string))
+string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
+        ARGMOD(STRING *string))
 {
     UINTVAL workchar = 0;
     UINTVAL charcount = 0;

@@ -28,8 +28,8 @@ void string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
 
 PARROT_API
 Parrot_UInt4 string_unescape_one(PARROT_INTERP,
-    ARGINOUT(UINTVAL *offset),
-    ARGINOUT(STRING *string))
+    ARGMOD(UINTVAL *offset),
+    ARGMOD(STRING *string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

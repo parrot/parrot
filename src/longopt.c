@@ -29,7 +29,7 @@ static int longopt_get_longopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
-    ARGINOUT(struct longopt_opt_info* info_buf))
+    ARGMOD(struct longopt_opt_info* info_buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -40,7 +40,7 @@ static int longopt_get_shortopt(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
-    ARGINOUT(struct longopt_opt_info* info_buf))
+    ARGMOD(struct longopt_opt_info* info_buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -74,7 +74,7 @@ PARROT_API
 int
 longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
-            ARGINOUT(struct longopt_opt_info* info_buf))
+            ARGMOD(struct longopt_opt_info* info_buf))
 {
     const int dex = info_buf->opt_index;
 
@@ -122,7 +122,7 @@ characters and start with C<-->.
 static int
 longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                     ARGIN(const struct longopt_opt_decl options[]),
-                    ARGINOUT(struct longopt_opt_info* info_buf))
+                    ARGMOD(struct longopt_opt_info* info_buf))
 {
     const int dex = info_buf->opt_index;
     int optlen = 0;
@@ -216,7 +216,7 @@ characters long and start with a dash.
 static int
 longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                      ARGIN(const struct longopt_opt_decl options[]),
-                     ARGINOUT(struct longopt_opt_info* info_buf))
+                     ARGMOD(struct longopt_opt_info* info_buf))
 {
     const int dex = info_buf->opt_index;
     const struct longopt_opt_decl* dptr;

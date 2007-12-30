@@ -154,9 +154,7 @@ void Parrot_new_timer_event(PARROT_INTERP,
 
 PARROT_API
 void Parrot_schedule_event(PARROT_INTERP, ARGINOUT(parrot_event* ev))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*ev);
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_schedule_interp_qentry(PARROT_INTERP,

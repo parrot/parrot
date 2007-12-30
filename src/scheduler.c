@@ -28,14 +28,14 @@ exceptions, async I/O, and concurrent tasks (threads).
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static int Parrot_cx_handle_tasks(PARROT_INTERP, ARGINOUT(PMC *scheduler))
+static int Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static void* scheduler_runloop(ARGINOUT(PMC *scheduler))
+static void* scheduler_runloop(ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*scheduler);
 
@@ -102,7 +102,7 @@ continue the runloop.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-Parrot_cx_handle_tasks(PARROT_INTERP, ARGINOUT(PMC *scheduler))
+Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     while (VTABLE_get_integer(interp, scheduler) > 0) {
         PMC * const task = VTABLE_pop_pmc(interp, scheduler);
@@ -152,7 +152,7 @@ scheduler's task list, to freeze the runloop until there are tasks to handle.
 */
 
 void
-Parrot_cx_runloop_sleep(ARGINOUT(PMC *scheduler))
+Parrot_cx_runloop_sleep(ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
     COND_WAIT(sched_struct->condition, sched_struct->lock);
@@ -170,7 +170,7 @@ the scheduler's task list).
 */
 
 void
-Parrot_cx_runloop_wake(PARROT_INTERP, ARGINOUT(PMC *scheduler))
+Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
     COND_SIGNAL(sched_struct->condition);
@@ -312,7 +312,7 @@ Currently the runloop is implented as a mutex/lock thread.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void*
-scheduler_runloop(ARGINOUT(PMC *scheduler))
+scheduler_runloop(ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
     int running = 1;

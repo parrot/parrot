@@ -417,7 +417,7 @@ Fetch an C<opcode_t> from the stream, converting byteorder if needed.
 
 PARROT_WARN_UNUSED_RESULT
 opcode_t
-PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGIN(opcode_t **stream))
+PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(opcode_t **stream))
 {
     opcode_t o;
     if (!pf || !pf->fetch_op)
@@ -843,7 +843,7 @@ Assign transform functions to vtable.
 */
 
 void
-PackFile_assign_transforms(ARGINOUT(PackFile *pf))
+PackFile_assign_transforms(ARGMOD(PackFile *pf))
 {
     const int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
     const int need_wordsize  = pf->header->wordsize != sizeof (opcode_t);

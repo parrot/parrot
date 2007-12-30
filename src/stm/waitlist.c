@@ -30,7 +30,7 @@ RT#48260: Not yet documented!!!
 /* HEADERIZER BEGIN: static */
 
 static void add_entry(
-    ARGINOUT(STM_waitlist *waitlist),
+    ARGMOD(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *entry))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -56,27 +56,27 @@ static STM_tx_log * Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 static int remove_first(
-    ARGINOUT(STM_waitlist *waitlist),
+    ARGMOD(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *expect_first))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*waitlist);
 
 static void waitlist_remove(
-    ARGINOUT_NULLOK(STM_waitlist *waitlist),
+    ARGMOD_NULLOK(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *what))
         __attribute__nonnull__(2);
 
 static void waitlist_remove_check(
-    ARGINOUT_NULLOK(STM_waitlist *waitlist),
+    ARGMOD_NULLOK(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *what))
         __attribute__nonnull__(2);
 
-static void waitlist_signal_all(ARGINOUT(STM_waitlist *list))
+static void waitlist_signal_all(ARGMOD(STM_waitlist *list))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*list);
 
-static void waitlist_signal_one(ARGINOUT(struct waitlist_entry *who))
+static void waitlist_signal_one(ARGMOD(struct waitlist_entry *who))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*who);
 
@@ -187,7 +187,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-add_entry(ARGINOUT(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *entry))
+add_entry(ARGMOD(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *entry))
 {
     int successp = -1;
     void *result;
@@ -216,7 +216,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-remove_first(ARGINOUT(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *expect_first))
+remove_first(ARGMOD(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *expect_first))
 {
     int successp;
     PARROT_ATOMIC_PTR_CAS(successp, waitlist->first, expect_first,
@@ -241,7 +241,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-waitlist_remove(ARGINOUT_NULLOK(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *what))
+waitlist_remove(ARGMOD_NULLOK(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *what))
 {
     struct waitlist_entry *cur;
     void *result;
@@ -299,7 +299,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-waitlist_remove_check(ARGINOUT_NULLOK(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *what))
+waitlist_remove_check(ARGMOD_NULLOK(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *what))
 {
     struct waitlist_entry *cur;
 
@@ -327,7 +327,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-waitlist_signal_one(ARGINOUT(struct waitlist_entry *who))
+waitlist_signal_one(ARGMOD(struct waitlist_entry *who))
 {
     struct waitlist_thread_data *thread;
 
@@ -355,7 +355,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-waitlist_signal_all(ARGINOUT(STM_waitlist *list))
+waitlist_signal_all(ARGMOD(STM_waitlist *list))
 {
     int successp;
     struct waitlist_entry *cur;
@@ -401,7 +401,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_STM_waitlist_add_self(PARROT_INTERP, ARGINOUT(STM_waitlist *waitlist))
+Parrot_STM_waitlist_add_self(PARROT_INTERP, ARGMOD(STM_waitlist *waitlist))
 {
     struct waitlist_entry * const entry = alloc_entry(interp);
 
@@ -424,7 +424,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_STM_waitlist_signal(PARROT_INTERP, ARGINOUT(STM_waitlist *waitlist))
+Parrot_STM_waitlist_signal(PARROT_INTERP, ARGMOD(STM_waitlist *waitlist))
 {
 #if WAITLIST_DEBUG
     fprintf(stderr, "%p: signal %p\n", interp, waitlist);
@@ -512,7 +512,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_STM_waitlist_init(PARROT_INTERP, ARGINOUT(STM_waitlist *waitlist))
+Parrot_STM_waitlist_init(PARROT_INTERP, ARGMOD(STM_waitlist *waitlist))
 {
     PARROT_ATOMIC_PTR_INIT(waitlist->first);
     PARROT_ATOMIC_PTR_SET(waitlist->first, NULL);

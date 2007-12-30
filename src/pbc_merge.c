@@ -64,9 +64,7 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_begin(PARROT_INTERP,
     ARGINOUT(pbc_merge_input **inputs),
     int num_inputs)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*inputs);
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -74,11 +72,7 @@ static PackFile_ByteCode* pbc_merge_bytecode(PARROT_INTERP,
     ARGINOUT(pbc_merge_input **inputs),
     int num_inputs,
     ARGINOUT(PackFile *pf))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf);
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -87,49 +81,27 @@ static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
     int num_inputs,
     ARGINOUT(PackFile *pf),
     ARGINOUT(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
+        __attribute__nonnull__(1);
 
 static void pbc_merge_ctpointers(PARROT_INTERP,
     ARGINOUT(pbc_merge_input **inputs),
     int num_inputs,
     ARGINOUT(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*bc);
+        __attribute__nonnull__(1);
 
 static void pbc_merge_debugs(PARROT_INTERP,
     ARGINOUT(pbc_merge_input **inputs),
     int num_inputs,
     ARGINOUT(PackFile *pf),
     ARGINOUT(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
+        __attribute__nonnull__(1);
 
 static void pbc_merge_fixups(PARROT_INTERP,
     ARGINOUT(pbc_merge_input **inputs),
     int num_inputs,
     ARGINOUT(PackFile *pf),
     ARGINOUT(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -143,21 +115,13 @@ static void pbc_merge_pic_index(PARROT_INTERP,
     int num_inputs,
     ARGINOUT(PackFile *pf),
     ARGINOUT(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
+        __attribute__nonnull__(1);
 
 static void pbc_merge_write(PARROT_INTERP,
     ARGINOUT(PackFile *pf),
     ARGIN(const char *filename))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pf);
+        __attribute__nonnull__(3);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL

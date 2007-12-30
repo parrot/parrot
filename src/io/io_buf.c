@@ -130,11 +130,7 @@ static size_t PIO_buf_write(PARROT_INTERP,
     ARGINOUT(ParrotIO *io),
     ARGIN(STRING *s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*layer)
-        FUNC_MODIFIES(*io);
+        __attribute__nonnull__(4);
 
 /* HEADERIZER END: static */
 

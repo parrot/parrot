@@ -119,7 +119,7 @@ static int is_pic_param(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void parrot_pic_move(PARROT_INTERP, ARGINOUT(Parrot_MIC *mic))
+static void parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mic);
@@ -243,7 +243,7 @@ Free memory for the PIC storage.
 */
 
 void
-parrot_PIC_destroy(ARGINOUT(struct PackFile_ByteCode *cs))
+parrot_PIC_destroy(ARGMOD(struct PackFile_ByteCode *cs))
 {
     Parrot_PIC_store *store = cs->pic_store;
 
@@ -837,7 +837,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-parrot_pic_move(PARROT_INTERP, ARGINOUT(Parrot_MIC *mic))
+parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
 {
     /*
      * MIC slot is empty - use it

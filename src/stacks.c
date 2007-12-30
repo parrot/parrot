@@ -57,7 +57,7 @@ Mark entries in a stack structure during DOD.
 
 PARROT_API
 void
-mark_stack(PARROT_INTERP, ARGINOUT(Stack_Chunk_t *chunk))
+mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
 {
     for (; ; chunk = chunk->prev) {
         Stack_Entry_t *entry;
@@ -182,7 +182,7 @@ element.
 
 PARROT_API
 void
-rotate_entries(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p), INTVAL num_entries)
+rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entries)
 {
     Stack_Chunk_t * const stack = *stack_p;
     INTVAL depth = num_entries - 1;
@@ -244,7 +244,7 @@ variable or something.
 
 PARROT_API
 void
-stack_push(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p),
+stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
            ARGIN(void *thing), Stack_entry_type type, ARGIN_NULLOK(Stack_cleanup_method cleanup))
 {
     Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_push(interp, stack_p);
@@ -290,7 +290,7 @@ Pop off an entry and return a pointer to the contents.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 void *
-stack_pop(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p),
+stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
           ARGOUT_NULLOK(void *where), Stack_entry_type type)
 {
     Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
@@ -376,7 +376,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void *
 stack_peek(PARROT_INTERP, ARGIN(Stack_Chunk_t *stack_base),
-           ARGINOUT_NULLOK(Stack_entry_type *type))
+           ARGMOD_NULLOK(Stack_entry_type *type))
 {
     const Stack_Entry_t * const entry = stack_entry(interp, stack_base, 0);
     if (entry == NULL)

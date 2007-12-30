@@ -115,7 +115,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 void*
-stack_prepare_push(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p))
+stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 {
     Stack_Chunk_t * const chunk = *stack_p;
     Stack_Chunk_t * const new_chunk = cst_new_stack_chunk(interp, chunk);
@@ -140,7 +140,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 void*
-stack_prepare_pop(PARROT_INTERP, ARGINOUT(Stack_Chunk_t **stack_p))
+stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 {
     Stack_Chunk_t * const chunk = *stack_p;
 

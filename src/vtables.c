@@ -77,7 +77,7 @@ Destroys C<*vtable>.
 
 PARROT_API
 void
-Parrot_destroy_vtable(SHIM_INTERP, ARGINOUT(VTABLE *vtable))
+Parrot_destroy_vtable(SHIM_INTERP, ARGMOD(VTABLE *vtable))
 {
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */

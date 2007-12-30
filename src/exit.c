@@ -38,7 +38,7 @@ Register the specified function to be called on exit.
 
 PARROT_API
 void
-Parrot_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(void *arg))
+Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), ARGIN_NULLOK(void *arg))
 {
     /* RT#46403  we might want locking around the list access.   I'm sure this
      * will be the least of the threading issues. */

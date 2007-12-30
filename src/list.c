@@ -194,9 +194,7 @@ static List_chunk * add_chunk(PARROT_INTERP,
     ARGINOUT(List *list),
     int where,
     UINTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -204,9 +202,7 @@ static List_chunk * alloc_next_size(PARROT_INTERP,
     ARGINOUT(List *list),
     int where,
     UINTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -222,20 +218,14 @@ PARROT_CANNOT_RETURN_NULL
 static List_chunk * get_chunk(PARROT_INTERP,
     ARGINOUT(List *list),
     ARGINOUT(UINTVAL *idx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*list)
-        FUNC_MODIFIES(*idx);
+        __attribute__nonnull__(1);
 
 static void list_append(PARROT_INTERP,
     ARGINOUT(List *list),
     ARGINOUT_NULLOK(void *item),
     int type,
     UINTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        __attribute__nonnull__(1);
 
 static void list_dump(ARGIN(const List *list), INTVAL type)
         __attribute__nonnull__(1);
@@ -246,50 +236,29 @@ static void * list_item(PARROT_INTERP,
     ARGINOUT(List *list),
     int type,
     INTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        __attribute__nonnull__(1);
 
 static void list_set(PARROT_INTERP,
     ARGINOUT(List *list),
     ARGIN_NULLOK(void *item),
     INTVAL type,
     INTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        __attribute__nonnull__(1);
 
 static UINTVAL rebuild_chunk_list(PARROT_INTERP, ARGINOUT(List *list))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        __attribute__nonnull__(1);
 
-static void rebuild_chunk_ptrs(ARGINOUT(List *list), int cut)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*list);
-
-static void rebuild_fix_ends(ARGINOUT(List *list))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*list);
-
+static void rebuild_chunk_ptrs(ARGINOUT(List *list), int cut);
+static void rebuild_fix_ends(ARGINOUT(List *list));
 static void rebuild_other(PARROT_INTERP, ARGINOUT(List *list))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        __attribute__nonnull__(1);
 
-static void rebuild_sparse(ARGINOUT(List *list))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*list);
-
+static void rebuild_sparse(ARGINOUT(List *list));
 static void split_chunk(PARROT_INTERP,
     ARGINOUT(List *list),
     ARGINOUT(List_chunk *chunk),
     UINTVAL ix)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*list)
-        FUNC_MODIFIES(*chunk);
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -1907,7 +1876,7 @@ Assigns C<item> of type C<type> to index C<idx>.
 
 PARROT_API
 void
-list_assign(PARROT_INTERP, ARGINOUT(List *list), INTVAL idx, NULLOK(void *item), int type)
+list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN_NULLOK(void *item), int type)
 {
     const INTVAL length = list->length;
 

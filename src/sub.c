@@ -34,7 +34,7 @@ Marks the context C<*ctx>.
 */
 
 void
-mark_context(PARROT_INTERP, ARGINOUT(parrot_context_t* ctx))
+mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
 {
     PObj *obj;
     int   i;
@@ -254,7 +254,7 @@ Make true Continuations from all RetContinuations up the call chain.
 */
 
 void
-invalidate_retc_context(PARROT_INTERP, ARGINOUT(PMC *cont))
+invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
 {
     Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
 
