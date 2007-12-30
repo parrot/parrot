@@ -15,13 +15,12 @@ Project Team
 
 Architect                       Allison Randal
 
-Release Manager                 Jerry Gay
+Release Manager                 Bob Rogers
                                 Patrick Michaud
-                                Matt Diephouse
-                                Will Coleda
+                                Bernhard Schmalhofer
+                                Jerry Gay
                                 chromatic
-                                Allison Randal
-                                Jonathan Worthington
+                                Will Coleda
 
 Metacommitter                   Allison Randal
                                 Jerry Gay
@@ -45,21 +44,21 @@ Core Developer                  -
 
 Compiler Developer              -
                                 Vishal Soni (BCG, IMCC)
-                                Patrick Michaud (PGE, PAST-pm, TGE)
+                                Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
 
 High Level Language Developer   Patrick Michaud (Perl 6, NQP)
                                 Matt Diephouse (Tcl)
                                 Will Coleda (Tcl)
                                 Francois Perrad (Lua)
-                                Bernhard Schmalhofer (Plumhead (PHP))
+                                Bernhard Schmalhofer (Plumhead (PHP), Eclectus (Scheme))
                                 Kevin Tew (Cardinal (Ruby))
 
 Build Manager                   Joshua Hoblitt
 
 Lead Tester                     Jerry Gay
 
-Platform Porter                 Florian Ragwitz (Debian)
+Platform Porter                 Allison Randal (Debian)
                                 Aldo Calpini (PocketPC)
                                 Francois Perrad (MinGW32)
 
@@ -84,4 +83,3 @@ Cage Cleaner                    James Keenan
                                 Andy Lester
 
 General Contributor             See CREDITS
-
