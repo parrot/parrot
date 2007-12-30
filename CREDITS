@@ -465,6 +465,9 @@ E: mestre.smash@gmail.com
 N: OOLLEY kj
 D: Miscellaneous cleanup and PDD07-conformance
 
+N: Ovid
+D: Rename 'pbc_to_c' to 'pbc_to_exe'
+
 N: Pancake
 D: Fixes for pdb, the Parrot debugger
 
