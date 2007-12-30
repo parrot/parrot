@@ -60,10 +60,25 @@ Raises an exception. Use C<init_pmc()>.
                                      const_string(INTERP, "initial_sub"), sub);
             PMC_pmc_val(SELF) = VTABLE_instantiate(INTERP,
                                                    classobj, init_args);
+            PObj_custom_mark_SET(SELF);
         }
         else
             real_exception(INTERP, NULL, E_Exception,
                            "Parrot::Coroutine not found");
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the Parrot::Coroutine as live.
+
+=cut
+
+*/
+    void mark() {
+        if (PMC_struct_val(SELF))
+            pobject_lives(INTERP, PMC_struct_val(SELF));
     }
 
 /*
