@@ -390,6 +390,8 @@ name to be reused.
 =item :multi(Type1, Type2...)
 
 Engage in multiple dispatch with the listed types.
+See L<docs/pdds/pdd27_multi_dispatch.pod> for more information on the
+multiple dispatch system.
 
 =item :immediate
 
