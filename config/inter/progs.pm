@@ -51,7 +51,6 @@ sub runstep {
 
     # Beware!  Inside test_compiler(), cc_build() and cc_run() both silently
     # reference the Parrot::Configure object ($conf) at its current state.
-    # Cage cleaner alert: cf RT .
     test_compiler($conf, $cc);
 
     return 1;
