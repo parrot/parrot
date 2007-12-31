@@ -34,8 +34,10 @@ sub new {
         my $filename = $line_info[-1];
         $filename =~ s/\\/\//g;
 
-        # ignore the debian directory
-        next if $filename =~ m[/\.svn|blib|debian];
+        # ignore .svn, blib directories;
+        # ignore ports/ directories, as that information does not need to be
+        # in tarball releases
+        next if $filename =~ m[/\.svn|blib|ports];
         if ( -d $filename ) {
             push @dirs, $filename;
         }
