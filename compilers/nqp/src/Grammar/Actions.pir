@@ -894,8 +894,18 @@
     .return ()
   past_var:
     $S0 = match
+    $S1 = match['sigil']
+    $S2 = 'Undef'
+    if $S1 != '%' goto past_sigil_is_array
+    $S2 = 'Hash'
+    goto past_sigil
+  past_sigil_is_array:
+    if $S1 != '@' goto past_sigil
+    $S2 = 'ResizablePMCArray'
+    goto past_sigil
+  past_sigil:
     $P0 = get_hll_global ['PAST'], 'Var'
-    $P1 = $P0.'new'('node'=>match, 'name'=>$S0, 'viviself'=>'Undef')
+    $P1 = $P0.'new'('node'=>match, 'name'=>$S0, 'viviself'=>$S2)
     match.'result_object'($P1)
 .end
 
