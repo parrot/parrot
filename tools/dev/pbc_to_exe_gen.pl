@@ -103,7 +103,7 @@ proper_args:
     buffer_size = $P0['longsize']  # sizeof (opcode_t)
 
     .local string bytecode
-                  bytecode = ''
+                  bytecode = '    '
     .local int    size
                   size = 0
     .local pmc    data
@@ -126,22 +126,14 @@ proper_args:
 
     # convert byte to integer
     byte = ord byte_string
-
     # convert integer to string
-    $P0 = new 'ResizablePMCArray'
-    push $P0, byte
-    byte_string = sprintf '%%d', $P0
-
-    # add the string for the byte
-    push all_bytes, byte_string
+    $S0 = byte
+    # add string for the byte
+    bytecode .= $S0
+    bytecode .= ",\n    "
     size += 1
     goto loop
   end_loop:
-
-    # format for c file
-    bytecode  = '    '
-    $S0       = join ",\n    ", all_bytes
-    bytecode .= $S0
 
     data['BYTECODE'] = bytecode
     data['SIZE']     = size
