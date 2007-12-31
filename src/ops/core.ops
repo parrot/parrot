@@ -116,13 +116,14 @@ inline op cpu_ret() {
 
 inline op check_events() :base_core {
     opcode_t *next = expr NEXT();
-    next = CHECK_EVENTS(interp, next);
+    Parrot_cx_runloop_wake(interp, interp->scheduler);
+/*    next = CHECK_TASKS(interp, next); */
     goto ADDRESS(next);   /* force this being a branch op */
 }
 
 inline op check_events__() :internal {
     opcode_t *_this = CUR_OPCODE;
-    _this = HANDLE_EVENTS(interp, _this);
+/*    _this = HANDLE_EVENTS(interp, _this); */
     goto ADDRESS(_this);   /* force this being a branch op */
 }
 
@@ -136,7 +137,8 @@ inline op prederef__() :internal {
     opcode_t *_this = CUR_OPCODE;
     if (interp->run_core & PARROT_CGOTO_CORE) {
         /* must be CGP then - check for events in not yet prederefed code */
-        _this = CHECK_EVENTS(interp, _this);
+        Parrot_cx_runloop_wake(interp, interp->scheduler);
+    /*    _this = CHECK_EVENTS(interp, _this); */
     }
     do_prederef((void**)cur_opcode, interp, op_lib.core_type);
     goto ADDRESS(_this); /* force this being a branch op */

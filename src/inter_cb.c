@@ -235,7 +235,7 @@ callback_CD(PARROT_INTERP, NOTNULL(char *external_data), NOTNULL(PMC *user_data)
      * 4) check if the call_back is synchronous:
      *    - if yes we are inside the NCI call
      *      we could run the Sub immediately now (I think)
-     *    - if no, and that's always safe, post a CALLBACK_EVENT
+     *    - if no, and that's always safe, post a callback event
      */
 
     if (synchronous) {
@@ -253,7 +253,7 @@ callback_CD(PARROT_INTERP, NOTNULL(char *external_data), NOTNULL(PMC *user_data)
          * then wait for the CB_EVENT_xx to finish and return the
          * result
          */
-        Parrot_new_cb_event(interp, user_data, external_data);
+        Parrot_cx_schedule_callback(interp, user_data, external_data);
     }
 }
 

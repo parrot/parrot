@@ -45,6 +45,9 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
 {
     /* we block DOD runs while cloning since C<d> is not yet running */
     Parrot_block_DOD(d);
+
+    d->scheduler = s->scheduler;
+
     if (flags & PARROT_CLONE_RUNOPS)
         d->run_core = s->run_core;
 

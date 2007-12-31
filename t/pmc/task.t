@@ -61,8 +61,8 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
     print $P3
     print "\n"
 
-    $P2 = new "Integer"
-    $P2 = 100000000
+    $P2 = new "Float"
+    $P2 = 1.1
     setattribute $P0, 'birthtime', $P2
 
     $P3 = getattribute $P0, 'birthtime'
@@ -76,7 +76,7 @@ inprocess
 event
 10
 7405
-100000000
+1.1
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
@@ -100,8 +100,8 @@ pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
     $P2 = 7405
     data['id'] = $P2
 
-    $P2 = new 'Integer'
-    $P2 = 100000000
+    $P2 = new 'Float'
+    $P2 = 1.1
     data['birthtime'] = $P2
 
     $P0 = new 'Task', data
@@ -127,7 +127,7 @@ inprocess
 event
 10
 7405
-100000000
+1.1
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "freeze and thaw a task" );
@@ -150,8 +150,8 @@ pir_output_is( <<'CODE', <<'OUT', "freeze and thaw a task" );
     $P2 = 7405
     setattribute $P0, 'id', $P2
 
-    $P2 = new "Integer"
-    $P2 = 100000000
+    $P2 = new "Float"
+    $P2 = 1.1
     setattribute $P0, 'birthtime', $P2
 
     $S0  = freeze $P0
@@ -183,7 +183,7 @@ inprocess
 event
 10
 7405
-100000000
+1.1
 OUT
 
 # Local Variables:

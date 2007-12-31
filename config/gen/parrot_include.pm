@@ -125,6 +125,7 @@ my @files = qw(
     include/parrot/datatypes.h
     include/parrot/enums.h
     include/parrot/events.h
+    include/parrot/scheduler.h
     include/parrot/exceptions.h
     include/parrot/interpreter.h
     include/parrot/io.h

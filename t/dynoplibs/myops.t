@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 =head1 NAME
@@ -79,13 +79,13 @@ pir_output_is( << 'CODE', << 'OUTPUT', "one alarm" );
 
 .sub main :main
     get_global P0, "_alarm"
-    alarm 2.0, P0
-    sleep 1
+    alarm 0.1, P0
     print "1\n"
 
     # alarm should be triggered half-way
     # during this sleep
-    sleep 2
+    sleep 1
+    sleep 1
     print "2\n"
 
     sleep 1
@@ -105,27 +105,26 @@ done.
 OUTPUT
 
 SKIP: {
-    skip "three alarms, infinite loop under mingw32", 1 if $is_mingw;
+    skip "three alarms, infinite loop under mingw32", 2 if $is_mingw;
 
-    pir_output_is( << 'CODE', << 'OUTPUT', "three alarm" );
+    pir_output_like( << 'CODE', << 'OUTPUT', "three alarm" );
 
 .loadlib "myops_ops"
 .sub main :main
     get_global P0, "_alarm3"
-    alarm 3.3, 0.4, P0
+    alarm 3.3, P0
     get_global P0, "_alarm2"
     alarm 2.2, P0
     get_global P0, "_alarm1"
-    alarm 1.5, 2.0, P0
+    alarm 1.5, P0
+
     set I0, 1
 loop:
     sleep 1
-    print I0
-    print "\n"
     inc I0
     # check_events
-    le I0, 5, loop
-    print "done.\n"
+    le I0, 4, loop
+
 .end
 
 .sub _alarm1
@@ -141,20 +140,33 @@ loop:
 .end
 
 CODE
-1
-alarm1
-2
+/alarm1
 alarm2
-3
-alarm3
-alarm1
-alarm3
-4
-alarm3
-alarm3
-alarm3
-5
-done.
+alarm3/
+OUTPUT
+
+    pir_output_like( << 'CODE', << 'OUTPUT', "repeating alarm" );
+
+.loadlib "myops_ops"
+.sub main :main
+    get_global P0, "_alarm"
+    alarm 0.5, 0.4, P0
+    set I0, 1
+loop:
+    sleep 1
+    inc I0
+    # check_events
+    le I0, 4, loop
+.end
+
+.sub _alarm
+    print "alarm\n"
+.end
+
+CODE
+/alarm
+alarm
+alarm/
 OUTPUT
 }
 

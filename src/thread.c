@@ -1047,7 +1047,7 @@ pt_suspend_one_for_gc(PARROT_INTERP)
     else {
         DEBUG_ONLY(fprintf(stderr, "queuing event"));
         interp->thread_data->state |= THREAD_STATE_SUSPEND_GC_REQUESTED;
-        Parrot_new_suspend_for_gc_event(interp);
+        Parrot_cx_schedule_suspend_for_gc(interp);
     }
 }
 
@@ -1073,7 +1073,7 @@ pt_suspend_all_for_gc(PARROT_INTERP)
 
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
         DEBUG_ONLY(fprintf(stderr, "found while suspending all\n"));
-        remove_queued_suspend_gc(interp);
+        Parrot_cx_delete_suspend_for_gc(interp);
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
         UNLOCK(interpreter_array_mutex);
         return;
@@ -1090,14 +1090,14 @@ pt_suspend_all_for_gc(PARROT_INTERP)
             other_interp != interp &&
             (other_interp->thread_data->state & THREAD_STATE_SUSPENDED_GC))
         {
-            QUEUE_ENTRY *successp;
+            PMC *successp;
             /* this means that someone else already got this far,
              * so we have a suspend event in our queue to ignore
              */
             /* XXX still reachable? */
             DEBUG_ONLY(fprintf(stderr, "apparently someone else is doing it [%p]", other_interp));
             fprintf(stderr, "??? found later (%p)\n", other_interp);
-            successp = remove_queued_suspend_gc(interp);
+            successp = Parrot_cx_delete_suspend_for_gc(interp);
             PARROT_ASSERT(successp);
             UNLOCK(interpreter_array_mutex);
             return;
@@ -1150,7 +1150,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
 
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
         DEBUG_ONLY(fprintf(stderr, "remove queued request"));
-        while (remove_queued_suspend_gc(interp));
+        while (!PMC_IS_NULL(Parrot_cx_delete_suspend_for_gc(interp)));
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
     }
     if (!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC)) {
@@ -1408,7 +1408,7 @@ pt_thread_kill(UINTVAL tid)
 
     /* schedule a terminate event for that interpreter */
     if (interp)
-        Parrot_new_terminate_event(interp);
+        Parrot_cx_runloop_end(interp);
 }
 
 /*
@@ -1553,7 +1553,7 @@ pt_DOD_start_mark(PARROT_INTERP)
     }
     else if (interp->thread_data->state &
                THREAD_STATE_SUSPEND_GC_REQUESTED) {
-        while (remove_queued_suspend_gc(interp));
+        while (!PMC_IS_NULL(Parrot_cx_delete_suspend_for_gc(interp)));
 
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
@@ -1634,7 +1634,7 @@ pt_DOD_stop_mark(PARROT_INTERP)
              THREAD_STATE_SUSPEND_GC_REQUESTED));
     interp->thread_data->state &= ~THREAD_STATE_SUSPENDED_GC;
 
-    while (remove_queued_suspend_gc(interp)) {
+    while (!PMC_IS_NULL(Parrot_cx_delete_suspend_for_gc(interp))) {
         /* XXX FIXME make this message never trigger */
         fprintf(stderr, "%p: extraneous suspend_gc event\n", (void *)interp);
     }
