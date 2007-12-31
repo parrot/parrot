@@ -77,15 +77,6 @@
             .return ()
         .end
         
-        .sub 'infix:=='
-            .param pmc a
-            .param pmc b
-            $I0 = cmp_num a, b
-            $I0 = iseq $I0, 0
-        
-            .return ($I0)
-        .end
-
         .sub 'infix:<'
             .param num a
             .param num b
@@ -98,6 +89,23 @@
             .param num a
             .param num b
             $I0 = isle a, b
+
+            .return ($I0)
+        .end
+
+        .sub 'infix:=='
+            .param pmc a
+            .param pmc b
+            $I0 = cmp_num a, b
+            $I0 = iseq $I0, 0
+        
+            .return ($I0)
+        .end
+
+        .sub 'infix:>='
+            .param num a
+            .param num b
+            $I0 = isge a, b
 
             .return ($I0)
         .end
@@ -345,6 +353,20 @@
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid))
 
+; implementation of fx>=
+(define-primitive (fx>= uid arg1 arg2)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "uniq_reg_1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "uniq_reg_2_~a = val_x" uid)
+  (emit "
+        $P4 = new 'PAST::Op'
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>=' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
+        " uid uid))
+
 ; implementation of fx>
 (define-primitive (fx> uid arg1 arg2)
   (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
@@ -358,7 +380,6 @@
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid))
-
 
 ; implementation of null?
 (define-primitive (null? uid arg)
