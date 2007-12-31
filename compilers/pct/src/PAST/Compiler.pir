@@ -1240,6 +1240,7 @@ blocks to determine the scope.
     storeop = $P0.'new'(name, ops, 'pirop'=>'set')
     .return self.'vivify'(node, ops, fetchop, storeop)
   keyed_bind:
+    ops.'result'(bindpost)
     ops.'push_pirop'('set', name, ops)
     .return (ops)
 .end
