@@ -54,27 +54,32 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_accept(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
+    ARGMOD(ParrotIO *io))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static INTVAL PIO_unix_bind(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *l))
+    ARGMOD(ParrotIO *io),
+    ARGMOD(STRING *l))
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*l);
 
 static INTVAL PIO_unix_close(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
-        __attribute__nonnull__(3);
+    ARGMOD(ParrotIO *io))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static INTVAL PIO_unix_connect(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NULLOK(STRING *r))
-        __attribute__nonnull__(3);
+    ARGMOD(ParrotIO *io),
+    ARGIN_NULLOK(STRING *r))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -86,24 +91,25 @@ static ParrotIO * PIO_unix_fdopen(PARROT_INTERP,
 
 static INTVAL PIO_unix_flush(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
-        __attribute__nonnull__(3);
+    ARGMOD(ParrotIO *io))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
-static INTVAL PIO_unix_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
+static INTVAL PIO_unix_init(PARROT_INTERP, ARGIN(ParrotIOLayer *layer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static INTVAL PIO_unix_isatty(PIOHANDLE fd);
 static INTVAL PIO_unix_listen(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
+    ARGIN(ParrotIO *io),
     INTVAL sec)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_open(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
+    ARGIN(ParrotIOLayer *layer),
     ARGIN(const char *spath),
     INTVAL flags)
         __attribute__nonnull__(1)
@@ -121,41 +127,47 @@ static ParrotIO * PIO_unix_pipe(PARROT_INTERP,
 
 static INTVAL PIO_unix_poll(SHIM_INTERP,
     SHIM(ParrotIOLayer *l),
-    NOTNULL(ParrotIO *io),
+    ARGMOD(ParrotIO *io),
     int which,
     int sec,
     int usec)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static size_t PIO_unix_read(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf))
+    ARGMOD(ParrotIO *io),
+    ARGIN(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io);
 
 static INTVAL PIO_unix_recv(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **s))
+    ARGMOD(ParrotIO *io),
+    ARGOUT(STRING **s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io);
 
 static PIOOFF_T PIO_unix_seek(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
+    ARGMOD(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static INTVAL PIO_unix_send(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s))
+    ARGMOD(ParrotIO *io),
+    ARGMOD(STRING *s))
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*s);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -168,15 +180,18 @@ static ParrotIO * PIO_unix_socket(PARROT_INTERP,
 
 static PIOOFF_T PIO_unix_tell(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
-        __attribute__nonnull__(3);
+    ARGMOD(ParrotIO *io))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static size_t PIO_unix_write(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s))
+    ARGMOD(ParrotIO *io),
+    ARGMOD(STRING *s))
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*s);
 
 /* HEADERIZER END: static */
 
@@ -230,7 +245,7 @@ success and C<-1> on error.
 */
 
 static INTVAL
-PIO_unix_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
+PIO_unix_init(PARROT_INTERP, ARGIN(ParrotIOLayer *layer))
 {
     ParrotIOData * const d = interp->piodata;
     if (d != NULL && d->table != NULL) {
@@ -270,7 +285,7 @@ values.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
-PIO_unix_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
+PIO_unix_open(PARROT_INTERP, ARGIN(ParrotIOLayer *layer),
               ARGIN(const char *spath), INTVAL flags)
 {
     INTVAL oflags;
@@ -370,7 +385,7 @@ Toggles the C<O_ASYNC> flag on the IO file descriptor.
 */
 
 INTVAL
-PIO_unix_async(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), INTVAL b)
+PIO_unix_async(PARROT_INTERP, ARGMOD(ParrotIOLayer *layer), ARGMOD(ParrotIO *io), INTVAL b)
 {
     int rflags;
 #    if defined(linux)
@@ -452,7 +467,7 @@ Closes C<*io>'s file descriptor.
 */
 
 static INTVAL
-PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
     if (io->fd >= 0)
         close(io->fd);
@@ -535,7 +550,7 @@ XXX: Is it necessary to C<sync()> here?
 */
 
 static INTVAL
-PIO_unix_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_unix_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
     return fsync(io->fd);
 }
@@ -552,8 +567,8 @@ C<buffer>.
 */
 
 static size_t
-PIO_unix_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-              NOTNULL(STRING **buf))
+PIO_unix_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
+              ARGIN(STRING **buf))
 {
     STRING * const s = PIO_make_io_string(interp, buf, 2048);
 
@@ -597,7 +612,7 @@ C<buffer> to the file descriptor in C<*io>.
 */
 
 static size_t
-PIO_unix_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))
+PIO_unix_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io), ARGMOD(STRING *s))
 {
     int err;
     size_t bytes;
@@ -646,7 +661,7 @@ descriptor to C<offset> bytes from the location indicated by C<whence>.
 */
 
 static PIOOFF_T
-PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
               PIOOFF_T offset, INTVAL whence)
 {
     const PIOOFF_T pos = lseek(io->fd, offset, whence);
@@ -686,7 +701,7 @@ Returns the current read/write position on C<*io>'s file discriptor.
 */
 
 static PIOOFF_T
-PIO_unix_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_unix_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
     const PIOOFF_T pos = lseek(io->fd, (PIOOFF_T)0, SEEK_CUR);
 
@@ -722,7 +737,7 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
+PIO_sockaddr_in(PARROT_INTERP, unsigned short port, ARGIN(STRING *addr))
 {
     struct sockaddr_in sa;
     /* Hard coded to IPv4 for now */
@@ -807,7 +822,8 @@ Connects C<*io>'s socket to address C<*r>.
 */
 
 static INTVAL
-PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NULLOK(STRING *r))
+PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
+        ARGIN_NULLOK(STRING *r))
 {
     if (r) {
         memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
@@ -841,8 +857,8 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 static INTVAL
-PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-        NOTNULL(STRING *l))
+PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
+        ARGMOD(STRING *l))
 {
     if (!l)
         return -1;
@@ -869,7 +885,7 @@ C<SEQ> sockets.
 */
 
 static INTVAL
-PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGIN(ParrotIO *io),
         INTVAL sec)
 {
     if ((listen(io->fd, sec)) == -1) {
@@ -891,7 +907,7 @@ Accept a new connection and return a newly created C<ParrotIO> socket.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
-PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
     ParrotIO * const newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
@@ -927,8 +943,8 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 static INTVAL
-PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-        NOTNULL(STRING *s))
+PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
+        ARGMOD(STRING *s))
 {
     int error, bytes, byteswrote;
 
@@ -980,7 +996,7 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 
 static INTVAL
 PIO_unix_recv(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io), NOTNULL(STRING **s))
+        ARGMOD(ParrotIO *io), ARGOUT(STRING **s))
 {
     int error;
     unsigned int bytesread = 0;
@@ -1040,7 +1056,7 @@ the read buffer.
 */
 
 static INTVAL
-PIO_unix_poll(SHIM_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(ParrotIO *io), int which,
+PIO_unix_poll(SHIM_INTERP, SHIM(ParrotIOLayer *l), ARGMOD(ParrotIO *io), int which,
                int sec, int usec)
 {
     int n;

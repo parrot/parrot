@@ -26,16 +26,17 @@ Open mmaps the file.
 /* HEADERIZER BEGIN: static */
 
 static INTVAL PIO_mmap_close(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
+    ARGIN(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_mmap_open(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
+    ARGIN(ParrotIOLayer *layer),
     ARGIN(const char *path),
     INTVAL flags)
         __attribute__nonnull__(1)
@@ -43,13 +44,14 @@ static ParrotIO * PIO_mmap_open(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static size_t PIO_mmap_read(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf))
+    ARGIN(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io),
+    ARGOUT(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io);
 
 /* HEADERIZER END: static */
 
@@ -128,7 +130,7 @@ The buffer layer's C<Open> function.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
-PIO_mmap_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
+PIO_mmap_open(PARROT_INTERP, ARGIN(ParrotIOLayer *layer),
                ARGIN(const char *path), INTVAL flags)
 {
     ParrotIO *io;
@@ -177,8 +179,8 @@ C<buffer>.
 */
 
 static size_t
-PIO_mmap_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-              NOTNULL(STRING **buf))
+PIO_mmap_read(PARROT_INTERP, ARGIN(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io), ARGOUT(STRING **buf))
 {
     STRING *s;
     UINTVAL len;
@@ -213,12 +215,15 @@ Closes C<*io>'s file descriptor.
 */
 
 static INTVAL
-PIO_mmap_close(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_mmap_close(PARROT_INTERP, ARGIN(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
-    INTVAL ret = -1;
+    INTVAL ret;
 
     if (io->fd >= 0)
         ret = PIO_close_down(interp, PIO_DOWNLAYER(layer), io);
+    else
+        ret = -1;
+
     return ret;
 }
 

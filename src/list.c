@@ -230,12 +230,11 @@ static List_chunk * get_chunk(PARROT_INTERP,
 
 static void list_append(PARROT_INTERP,
     ARGMOD(List *list),
-    ARGIN(void *item),
+    ARGIN_NULLOK(void *item),
     int type,
     UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*list);
 
 static void list_dump(ARGIN(const List *list), INTVAL type)
@@ -1207,7 +1206,7 @@ Add one or more chunks to end of list.
 */
 
 static void
-list_append(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type, UINTVAL idx)
+list_append(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int type, UINTVAL idx)
 {
     /* initially, list may be empty, also used by assign */
     while (idx >= list->cap)

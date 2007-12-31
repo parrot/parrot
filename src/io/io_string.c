@@ -26,19 +26,22 @@ Capture output to a string PMC.
 /* HEADERIZER BEGIN: static */
 
 static size_t PIO_string_read(SHIM_INTERP,
-    NOTNULL(ParrotIOLayer *l),
+    ARGMOD(ParrotIOLayer *l),
     SHIM(ParrotIO *io),
-    NOTNULL(STRING **buf))
+    ARGOUT(STRING **buf))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*l);
 
 static size_t PIO_string_write(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *l),
+    ARGMOD(ParrotIOLayer *l),
     SHIM(ParrotIO *io),
-    NOTNULL(STRING *s))
+    ARGMOD(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*l)
+        FUNC_MODIFIES(*s);
 
 /* HEADERIZER END: static */
 
@@ -114,13 +117,13 @@ RT#48260: Not yet documented!!!
 */
 
 static size_t
-PIO_string_read(SHIM_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING **buf))
+PIO_string_read(SHIM_INTERP, ARGMOD(ParrotIOLayer *l), SHIM(ParrotIO *io), ARGOUT(STRING **buf))
 {
-    if (l->self == 0)
+    if (!l->self)
         return 0;
 
     *buf    = (STRING *)l->self;
-    l->self = 0;
+    l->self = NULL;
 
     return (*buf)->strlen;
 }
@@ -136,7 +139,7 @@ RT#48260: Not yet documented!!!
 */
 
 static size_t
-PIO_string_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING *s))
+PIO_string_write(PARROT_INTERP, ARGMOD(ParrotIOLayer *l), SHIM(ParrotIO *io), ARGMOD(STRING *s))
 {
     STRING * const old_string = (STRING *)l->self;
 

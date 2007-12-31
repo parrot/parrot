@@ -66,7 +66,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-new_io_pmc(PARROT_INTERP, NULLOK(ParrotIO *io))
+new_io_pmc(PARROT_INTERP, ARGIN_NULLOK(ParrotIO *io))
 {
     PMC * const new_pmc = pmc_new(interp, enum_class_ParrotIO);
     PMC_data(new_pmc) = io;
@@ -109,7 +109,7 @@ allocate the STRING memory.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-PIO_make_io_string(PARROT_INTERP, NOTNULL(STRING **buf), size_t len)
+PIO_make_io_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
 {
     STRING *s;
     /*
@@ -173,7 +173,7 @@ the pointers from the PMC.
 
 PARROT_API
 void
-PIO_destroy(SHIM_INTERP, NOTNULL(PMC *pmc))
+PIO_destroy(SHIM_INTERP, ARGMOD(PMC *pmc))
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
 
@@ -540,7 +540,7 @@ Iterates down the stack to the first layer implementing "Peek" API.
 
 PARROT_API
 INTVAL
-PIO_peek(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING **buffer))
+PIO_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -570,7 +570,7 @@ limited, but we will see. --Melvin
 
 PARROT_API
 INTVAL
-PIO_pioctl(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL cmd, INTVAL arg)
+PIO_pioctl(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL cmd, INTVAL arg)
 {
 
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -621,7 +621,7 @@ buffering was enabled.
 
 PARROT_API
 INTVAL
-PIO_setbuf(PARROT_INTERP, NOTNULL(PMC *pmc), size_t bufsize)
+PIO_setbuf(PARROT_INTERP, ARGMOD(PMC *pmc), size_t bufsize)
 {
     ParrotIOLayer * const layer = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -644,7 +644,7 @@ successfully set, or already enabled.
 
 PARROT_API
 INTVAL
-PIO_setlinebuf(PARROT_INTERP, NOTNULL(PMC *pmc))
+PIO_setlinebuf(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -668,8 +668,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-PIO_open(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), ARGIN(const char *spath),
-         ARGIN(const char *sflags))
+PIO_open(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer),
+        ARGIN(const char *spath), ARGIN(const char *sflags))
 {
     ParrotIO *io;
     const INTVAL flags = PIO_parse_open_flags(sflags);
@@ -708,7 +708,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-PIO_fdopen(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), PIOHANDLE fd, ARGIN(const char *sflags))
+PIO_fdopen(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer), PIOHANDLE fd,
+        ARGIN(const char *sflags))
 {
     ParrotIO *io;
     INTVAL flags;
@@ -745,7 +746,7 @@ Flushes, closes, and destroys the C<ParrotIO> PMC C<*pmc>.
 
 PARROT_API
 INTVAL
-PIO_close(PARROT_INTERP, NULLOK(PMC *pmc))
+PIO_close(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     INTVAL res;
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
@@ -771,7 +772,7 @@ Flushes the C<ParrotIO> PMC C<*pmc>.
 
 PARROT_API
 void
-PIO_flush(PARROT_INTERP, NOTNULL(PMC *pmc))
+PIO_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ParrotIOLayer * const l  = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO      * const io = (ParrotIO *)PMC_data0(pmc);
@@ -799,9 +800,9 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-PIO_reads(PARROT_INTERP, NOTNULL(PMC *pmc), size_t len)
+PIO_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
 {
-    STRING               *res = NULL;
+    STRING               *res;
     ParrotIOLayer * const l   = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO      * const io  = (ParrotIO *)PMC_data0(pmc);
     INTVAL                ignored;
@@ -814,8 +815,10 @@ PIO_reads(PARROT_INTERP, NOTNULL(PMC *pmc), size_t len)
         res->charset  = Parrot_iso_8859_1_charset_ptr;   /* XXX binary */
         res->encoding = Parrot_fixed_8_encoding_ptr;
     }
-    else
+    else {
+        res = NULL;
         res = PIO_make_io_string(interp, &res, len);
+    }
 
     res->bufused = len;
     ignored      = PIO_read_down(interp, l, io, &res);
@@ -837,7 +840,7 @@ Reads up to C<len> bytes from C<*pmc> and copies them into C<*buffer>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_read(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(char *buffer), size_t len)
+PIO_read(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(char *buffer), size_t len)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -863,7 +866,7 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_write(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const void *buffer), size_t len)
+PIO_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t len)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -900,7 +903,7 @@ the file, C<1> for the current position, and C<2> for the end.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
-PIO_seek(PARROT_INTERP, NOTNULL(PMC *pmc), PIOOFF_T offset, INTVAL w)
+PIO_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -923,7 +926,7 @@ Returns the current read/write position of C<*pmc>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
-PIO_tell(PARROT_INTERP, NOTNULL(PMC *pmc))
+PIO_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -947,7 +950,7 @@ position is C<EOF>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_eof(SHIM_INTERP, NOTNULL(PMC *pmc))
+PIO_eof(SHIM_INTERP, ARGMOD(PMC *pmc))
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
 
@@ -972,7 +975,7 @@ Writes C<*s> tp C<*pmc>. C string version.
 
 PARROT_API
 INTVAL
-PIO_puts(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const char *s))
+PIO_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 {
     return PIO_write(interp, pmc, s, strlen(s));
 }
@@ -989,7 +992,7 @@ Writes C<*s> to C<*pmc>. Parrot string version.
 
 PARROT_API
 INTVAL
-PIO_putps(PARROT_INTERP, NOTNULL(PMC *pmc), NULLOK(STRING *s))
+PIO_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -1018,7 +1021,7 @@ Writes a C string format with varargs to C<*pmc>.
 
 PARROT_API
 INTVAL
-PIO_fprintf(PARROT_INTERP, NOTNULL(PMC *pmc), ARGIN(const char *s), ...)
+PIO_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 {
     va_list args;
     INTVAL ret;
@@ -1116,7 +1119,7 @@ Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-PIO_getfd(SHIM_INTERP, NOTNULL(PMC *pmc))
+PIO_getfd(SHIM_INTERP, ARGMOD(PMC *pmc))
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
 
@@ -1207,7 +1210,7 @@ Called from C<trace_active_PMCs()> to mark the IO data live.
 
 PARROT_API
 void
-Parrot_IOData_mark(PARROT_INTERP, NOTNULL(ParrotIOData *piodata))
+Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 {
     INTVAL i;
     ParrotIOTable table = piodata->table;
@@ -1274,7 +1277,7 @@ Returns the return value of the C<get_integer> vtable method on C<*pmc>.
 */
 
 PIOOFF_T
-PIO_make_offset_pmc(PARROT_INTERP, NOTNULL(PMC *pmc))
+PIO_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     /* XXX: Maybe use bignums here */
     return VTABLE_get_integer(interp, pmc);
@@ -1299,7 +1302,7 @@ microseconds.
 
 PARROT_API
 INTVAL
-PIO_poll(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
+PIO_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
 {
     ParrotIOLayer *l;
     ParrotIO *io;
@@ -1354,7 +1357,7 @@ if it fails.
 
 PARROT_API
 INTVAL
-PIO_recv(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING **buf))
+PIO_recv(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buf))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1378,7 +1381,7 @@ C<-1> if it cannot send the message.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_send(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING *buf))
+PIO_send(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1400,7 +1403,7 @@ Connects C<*pmc> to C<*address>.  Returns C<-1> on failure.
 
 PARROT_API
 INTVAL
-PIO_connect(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING *address))
+PIO_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *address))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1423,7 +1426,7 @@ C<*address>.  Returns C<-1> on failure.
 
 PARROT_API
 INTVAL
-PIO_bind(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING *address))
+PIO_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *address))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1446,7 +1449,7 @@ Listens for new connections on socket C<*pmc>.  Returns C<-1> on failure.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_listen(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL backlog)
+PIO_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1471,7 +1474,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-PIO_accept(PARROT_INTERP, NOTNULL(PMC *pmc))
+PIO_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ParrotIO *io2;
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
@@ -1498,9 +1501,9 @@ Returns a boolean value indicating whether C<*pmc> is a console/tty.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PIO_isatty(SHIM_INTERP, NOTNULL(PMC *pmc))
+PIO_isatty(SHIM_INTERP, ARGMOD(PMC *pmc))
 {
-    ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
+    const ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
 
     if (!io)
         return 0;

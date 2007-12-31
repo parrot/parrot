@@ -91,9 +91,11 @@ static size_t key_hash_pointer(SHIM_INTERP, ARGIN(void *value), size_t seed)
 
 PARROT_WARN_UNUSED_RESULT
 static size_t key_hash_STRING(PARROT_INTERP,
-    ARGINOUT(STRING *value),
+    ARGMOD(STRING *value),
     size_t seed)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*value);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -126,7 +128,7 @@ Return the hashed value of the key C<value>.  See also string.c.
 
 PARROT_WARN_UNUSED_RESULT
 static size_t
-key_hash_STRING(PARROT_INTERP, ARGINOUT(STRING *value), size_t seed)
+key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *value), size_t seed)
 {
     STRING * const s = value;
 

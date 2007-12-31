@@ -44,7 +44,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
-PIO_base_new_layer(NULLOK(ParrotIOLayer *proto))
+PIO_base_new_layer(ARGIN_NULLOK(const ParrotIOLayer *proto))
 {
     ParrotIOLayer * const new_layer = mem_allocate_typed(ParrotIOLayer);
 
@@ -81,7 +81,7 @@ C<*layer>.
 
 PARROT_API
 void
-PIO_base_delete_layer(NULLOK(ParrotIOLayer *layer))
+PIO_base_delete_layer(ARGIN_NULLOK(ParrotIOLayer *layer))
 {
     if (layer != NULL)
         mem_sys_free(layer);
@@ -99,7 +99,7 @@ Push a layer onto an IO object (C<*pmc>) or the default stack.
 
 PARROT_API
 INTVAL
-PIO_push_layer(PARROT_INTERP, NULLOK(PMC *pmc), NULLOK(ParrotIOLayer *layer))
+PIO_push_layer(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(ParrotIOLayer *layer))
 {
     if (layer == NULL)
         return -1;
@@ -198,7 +198,7 @@ Push a layer onto an IO object (C<*pmc>).
 */
 
 void
-PIO_push_layer_str(PARROT_INTERP, NOTNULL(PMC *pmc), NULLOK(STRING *ls))
+PIO_push_layer_str(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN_NULLOK(const STRING *ls))
 {
     char * const cls = string_to_cstring(interp, ls);
     ParrotIOLayer * const l = PIO_get_layer(interp, cls);
@@ -228,7 +228,7 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIOLayer *
-PIO_pop_layer(PARROT_INTERP, NULLOK(PMC *pmc))
+PIO_pop_layer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     ParrotIO * const io = PMC_data_typed(pmc, ParrotIO *);
 
@@ -291,7 +291,7 @@ popped layer. The layer gets freed.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-PIO_pop_layer_str(PARROT_INTERP, NOTNULL(PMC *pmc))
+PIO_pop_layer_str(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     ParrotIOLayer * const layer = PIO_pop_layer(interp, pmc);
     STRING * const ls = string_make(interp, layer->name,
@@ -315,7 +315,7 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
-PIO_copy_stack(NULLOK(ParrotIOLayer *stack))
+PIO_copy_stack(ARGIN_NULLOK(ParrotIOLayer *stack))
 {
     ParrotIOLayer *ptr_new = NULL;
     ParrotIOLayer *ptr_last = NULL;

@@ -25,112 +25,118 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 /* HEADERIZER BEGIN: static */
 
 static INTVAL PIO_buf_close(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static ParrotIO * PIO_buf_fdopen(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
+    ARGIN_NULLOK(ParrotIOLayer *layer),
     PIOHANDLE fd,
     INTVAL flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 static size_t PIO_buf_fill_readbuf(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(ParrotIOBuf *b))
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io),
+    ARGMOD(ParrotIOBuf *b))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*b);
 
 static INTVAL PIO_buf_flush(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
+
+static INTVAL PIO_buf_init(PARROT_INTERP, ARGMOD(ParrotIOLayer *layer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-static INTVAL PIO_buf_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        FUNC_MODIFIES(*layer);
 
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_buf_open(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
+    ARGMOD(ParrotIOLayer *layer),
     ARGIN(const char *path),
     INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*layer);
 
 static size_t PIO_buf_peek(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf))
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io),
+    ARGOUT(STRING **buf))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io);
 
 static size_t PIO_buf_read(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf))
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io),
+    ARGOUT(STRING **buf))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io);
 
 static size_t PIO_buf_readline(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf))
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io),
+    ARGOUT(STRING **buf))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*io);
 
 static PIOOFF_T PIO_buf_seek(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *l),
-    NOTNULL(ParrotIO *io),
+    ARGIN_NULLOK(ParrotIOLayer *l),
+    ARGMOD(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static INTVAL PIO_buf_setbuf(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io),
     size_t bufsize)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static INTVAL PIO_buf_setlinebuf(PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
+    ARGIN_NULLOK(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 static PIOOFF_T PIO_buf_tell(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io))
+    ARGIN(ParrotIO *io))
         __attribute__nonnull__(3);
 
 static size_t PIO_buf_write(PARROT_INTERP,
-    ARGINOUT(ParrotIOLayer *layer),
-    ARGINOUT(ParrotIO *io),
+    ARGMOD(ParrotIOLayer *layer),
+    ARGMOD(ParrotIO *io),
     ARGIN(STRING *s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*layer)
+        FUNC_MODIFIES(*io);
 
 /* HEADERIZER END: static */
 
@@ -165,7 +171,7 @@ The buffer layer's C<Init> function. Initializes buffering.
 */
 
 static INTVAL
-PIO_buf_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
+PIO_buf_init(PARROT_INTERP, ARGMOD(ParrotIOLayer *layer))
 {
     if (PIO_STDOUT(interp))
         PIO_buf_setlinebuf(interp, layer,
@@ -190,7 +196,7 @@ The buffer layer's C<Open> function.
 
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
-PIO_buf_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
+PIO_buf_open(PARROT_INTERP, ARGMOD(ParrotIOLayer *layer),
         ARGIN(const char *path), INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
@@ -225,8 +231,8 @@ not implement C<SetBuf>.
 */
 
 static INTVAL
-PIO_buf_setbuf(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io), size_t bufsize)
+PIO_buf_setbuf(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io), size_t bufsize)
 {
     ParrotIOLayer * const l = layer ? layer : io->stack;
     ParrotIOBuf   * const b = &io->b;
@@ -283,8 +289,8 @@ The buffer layer's C<SetLineBuf> function.
 */
 
 static INTVAL
-PIO_buf_setlinebuf(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io))
+PIO_buf_setlinebuf(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io))
 {
     int err;
     ParrotIOLayer * const l = layer ? layer : io->stack;
@@ -317,7 +323,7 @@ The buffer layer's C<FDOpen> function.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static ParrotIO *
-PIO_buf_fdopen(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)
+PIO_buf_fdopen(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
     ParrotIO * const io = PIO_fdopen_down(interp, l, fd, flags);
@@ -343,7 +349,7 @@ The buffer layer's C<Close> function.
 */
 
 static INTVAL
-PIO_buf_close(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_buf_close(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
     PIO_buf_flush(interp, layer, io);
@@ -362,7 +368,7 @@ The buffer layer's C<Flush> function.
 */
 
 static INTVAL
-PIO_buf_flush(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_buf_flush(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
     long wrote;
     size_t to_write;
@@ -416,8 +422,8 @@ The buffer layer's C<Fill> function.
 */
 
 static size_t
-PIO_buf_fill_readbuf(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io), NOTNULL(ParrotIOBuf *b))
+PIO_buf_fill_readbuf(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io), ARGMOD(ParrotIOBuf *b))
 {
     size_t got;
     PIOOFF_T pos = io->fpos;
@@ -454,8 +460,8 @@ The buffer layer's C<Read> function.
 */
 
 static size_t
-PIO_buf_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
-        NOTNULL(STRING **buf))
+PIO_buf_read(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io), ARGOUT(STRING **buf))
 {
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b;
@@ -561,8 +567,8 @@ RT#48260: Not yet documented!!!
 */
 
 static size_t
-PIO_buf_peek(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))
+PIO_buf_peek(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io), ARGOUT(STRING **buf))
 {
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b;
@@ -618,8 +624,8 @@ that is what is required.
 */
 
 static size_t
-PIO_buf_readline(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
-        NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))
+PIO_buf_readline(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io), ARGOUT(STRING **buf))
 {
     size_t l;
     unsigned char *out_buf;
@@ -704,8 +710,8 @@ The buffer layer's C<Write> function.
 */
 
 static size_t
-PIO_buf_write(PARROT_INTERP, ARGINOUT(ParrotIOLayer *layer),
-        ARGINOUT(ParrotIO *io), ARGIN(STRING *s))
+PIO_buf_write(PARROT_INTERP, ARGMOD(ParrotIOLayer *layer),
+        ARGMOD(ParrotIO *io), ARGIN(STRING *s))
 {
     size_t avail;
     void * const buffer = s->strstart;
@@ -793,8 +799,8 @@ The buffer layer's C<Seek> function.
 */
 
 static PIOOFF_T
-PIO_buf_seek(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), NOTNULL(ParrotIO *io),
-               PIOOFF_T offset, INTVAL whence)
+PIO_buf_seek(PARROT_INTERP, ARGIN_NULLOK(ParrotIOLayer *l),
+        ARGMOD(ParrotIO *io), PIOOFF_T offset, INTVAL whence)
 {
     PIOOFF_T newpos;
 
@@ -843,7 +849,7 @@ The buffer layer's C<Tell> function.
 */
 
 static PIOOFF_T
-PIO_buf_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
+PIO_buf_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGIN(ParrotIO *io))
 {
     return io->fpos;
 }
