@@ -86,6 +86,14 @@
             .return ($I0)
         .end
 
+        .sub 'infix:<'
+            .param num a
+            .param num b
+            $I0 = islt a, b
+
+            .return ($I0)
+        .end
+
         .sub 'infix:>'
             .param num a
             .param num b
@@ -297,6 +305,20 @@
   (emit "
         $P4 = new 'PAST::Op'
         $P4.init( tmp_fx_equals1_~a, tmp_fx_equals2_~a, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
+        " uid uid))
+
+; implementation of fx<
+(define-primitive (fx< uid arg1 arg2)
+  (emit "    .local pmc tmp_fx_eq1_~a, tmp_fx_eq2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "tmp_fx_eq1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "tmp_fx_eq2_~a = val_x" uid)
+  (emit "
+        $P4 = new 'PAST::Op'
+        $P4.init( tmp_fx_eq1_~a, tmp_fx_eq2_~a, 'pasttype' => 'chain', 'name' => 'infix:<' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid))
