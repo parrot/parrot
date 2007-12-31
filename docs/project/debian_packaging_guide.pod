@@ -1,0 +1,165 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id: release_manager_guide.pod 24083 2007-12-19 18:10:37Z coke $
+
+=head1 Debian Packaging Guide
+
+This is a quick set of instructions for packaging Parrot for Debian. See the
+Debian New Maintainer's Guide (http://www.debian.org/doc/maint-guide) for more
+information. The Ubuntu Packaging Guide is also a good resource
+(http://doc.ubuntu.com/ubuntu/packagingguide/C/).
+
+To package Parrot for Debian:
+
+=over 4
+
+=item 0.
+
+Download the latest tarball.
+
+=item 1.
+
+Compile it and run the tests, just to be sure the tarball is sound (especially
+useful if you're running in a chroot environment different than your usual dev
+environment).
+
+=item 2.
+
+Create a new directory. (The name is irrelevant, but we'll use ~/deb/parrot for
+the sake of illustration.)
+
+Create a fresh extract of the tarball in the ~/deb/parrot directory. The
+directory should be named "parrot-<version>" (it will be by default).
+
+Copy the debian/ directory from the Parrot source tree into the fresh tarball
+extract.
+
+  cp -r <path/to/parrot/svn>/debian ~/deb/parrot/parrot-<version>/.
+
+Copy the original tarball into ~/deb/parrot, naming it
+"parrot_<version>.orig.tar.gz" (note the "_" in place of dash).
+
+=item 3.
+
+Update the debian/changelog file in ~/deb/parrot/parrot-<version>/. The format
+of the changelog file is strict (automatically parsed). The first line of the
+log entry gives the package version and categorization. For a new version
+upload, the version number is the Parrot version number followed by -1. For
+example:
+
+  parrot (0.5.1-1) unstable; urgency=low
+
+The next few lines are the changelog record entries. These record changes in
+the Debian packaging of Parrot, not changes in Parrot itself. New package
+versions should include the line:
+
+  * New upstream release.
+
+Please note any closed bugs related to the Parrot packages with an entry that
+includes the text "(Closes: #<bugnum>)".
+
+The final line gives the maintainer's name, email address, and the date. The
+date must be in RFC822 format, and can be generated with the 822-date program.
+(Note that two spaces are required between the email and the date.)
+
+   -- Your Name <you@example.org>  Sun, 30 Dec 2007 17:21:45 +0000
+
+=item 4.
+
+Update the debian/control.in file in ~/deb/parrot/parrot-<version>/. List your
+name and email as the "Maintainer", and other release managers involved in
+Debian packaging of Parrot as "Uploaders". (Note, this may change. Ideally we'd
+like to list the maintainer as "Parrot Release Managers
+<debian-parrot@debian.org>" or something similarly generic, since we hand off
+release manager duties every month.)
+
+=item 5.
+
+Update the debian/copyright file in ~/deb/parrot/parrot-<version>/. In the first
+line change to your name, email, and the current date.
+
+=item 6.
+
+Regenerate the debian/control file from ~/deb/parrot/parrot-<version>/:
+
+  $ fakeroot debian/rules debian/control DEB_AUTO_UPDATE_DEBIAN_CONTROL:=yes
+
+=item 7.
+
+Install all dependencies:
+
+  $ sudo /usr/lib/pbuilder/pbuilder-satisfydepends
+
+=item 8.
+
+Build the packages. From ~/deb/parrot/, run:
+
+  $ sudo pbuilder create # when rerunning, use 'pbuilder update'
+
+From ~/deb/parrot/parrot_<version>/, run:
+
+  $ export DEBSIGN_KEYID="<gpg key id>"
+  $ export DEBUILD_DPKG_BUILDPACKAGE_OPTS="-i -I.svn"
+  $ debuild
+
+or
+
+  $ pdebuild
+
+(For pdebuild, the newly built packages will be in /var/cache/pbuilder/result/.)
+
+=item 9.
+
+Check the package for errors. From ~/deb/parrot, run:
+
+  $ lintian -i parrot_<version>.changes
+  $ linda -i parrot_<version>.changes
+
+=item 10.
+
+Commit all changes made to the files in the debian/ directory to the Parrot
+repository. (Skip the generated debian/control file.)
+
+=back
+
+=head1 SEE ALSO
+
+F<README>, F<RESPONSIBLE_PARTIES>.
+
+=head1 Appendix 1
+
+Parrot Debian Release Managers
+
+ - Allison Randal
+ - Nuno Carvalho
+ - Patrick Michaud
+
+Parrot Debian Sponsors
+
+ - Colin Watson
+ - Jeff Bailey
+ - Benjamin Mako Hill
+
+=head1 Appendix 2
+
+Set up instructions for new Debian Parrot release managers.
+
+=over 4
+
+=item 0.
+
+Create an account on http://alioth.debian.org and request to join the group
+pkg-parrot.
+
+=item 1.
+
+If you will be uploading through a sponsor, create an account on
+http://mentors.debian.net.
+
+=item 2.
+
+Set up a chroot environment for building packages. See
+<http://www.perlfoundation.org/parrot/index.cgi?debian_chroot_setup>.
+
+=back
+
+=cut
