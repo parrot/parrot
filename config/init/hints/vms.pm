@@ -18,13 +18,15 @@ sub runstep {
     {
         local $^W;    # no warnings on redefinition
 
-        *Parrot::Configure::Step::cc_build = sub {
+        *Parrot::Configure::Compiler::cc_build = sub {
+            my $conf = shift;
             my ( $cc, $ccflags ) = $conf->data->get(qw(cc ccflags));
             system("$cc $ccflags test.c") and die "C compiler died!";
             system("link/exe=test test")  and die "Link failed!";
         };
 
-        *Parrot::Configure::Step::cc_run = sub {
+        *Parrot::Configure::Compiler::cc_run = sub {
+            my $conf = shift;
             `mcr []test`;
         };
     }
