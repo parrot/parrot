@@ -41,11 +41,12 @@ typedef IntList_Chunk IntList;
 /* HEADERIZER BEGIN: src/intlist.c */
 
 void intlist_assign(PARROT_INTERP,
-    NOTNULL(IntList *l),
+    ARGMOD(IntList *l),
     INTVAL idx,
     INTVAL val)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*l);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -53,44 +54,52 @@ IntList * intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void intlist_dump(NOTNULL(FILE *fp), NOTNULL(IntList *list), int verbose)
+void intlist_dump(ARGMOD(FILE *fp), ARGMOD(IntList *list), int verbose)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*fp)
+        FUNC_MODIFIES(*list);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL intlist_get(PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx)
+INTVAL intlist_get(PARROT_INTERP, ARGMOD(IntList *list), INTVAL idx)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL intlist_length(SHIM_INTERP, ARGIN(const IntList *list))
         __attribute__nonnull__(2);
 
-void intlist_mark(PARROT_INTERP, NOTNULL(IntList *l))
+void intlist_mark(PARROT_INTERP, ARGMOD(IntList *l))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*l);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 IntList * intlist_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-INTVAL intlist_pop(PARROT_INTERP, NOTNULL(IntList *l))
+INTVAL intlist_pop(PARROT_INTERP, ARGMOD(IntList *l))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*l);
 
-void intlist_push(PARROT_INTERP, NOTNULL(IntList *l), INTVAL val)
+void intlist_push(PARROT_INTERP, ARGMOD(IntList *l), INTVAL val)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*l);
 
-INTVAL intlist_shift(PARROT_INTERP, NOTNULL(IntList **l))
+INTVAL intlist_shift(PARROT_INTERP, ARGMOD(IntList **l))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*l);
 
-void intlist_unshift(PARROT_INTERP, NOTNULL(IntList **l), INTVAL val)
+void intlist_unshift(PARROT_INTERP, ARGMOD(IntList **l), INTVAL val)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*l);
 
 /* HEADERIZER END: src/intlist.c */
 

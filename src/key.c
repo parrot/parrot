@@ -107,7 +107,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_new_string(PARROT_INTERP, NOTNULL(STRING *value))
+key_new_string(PARROT_INTERP, ARGIN(STRING *value))
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -172,7 +172,7 @@ Set the integer C<value> in C<key>.
 
 PARROT_API
 void
-key_set_integer(SHIM_INTERP, ARGINOUT(PMC *key), INTVAL value)
+key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -193,7 +193,7 @@ Set the register C<value> in C<key>.
 
 PARROT_API
 void
-key_set_register(SHIM_INTERP, ARGINOUT(PMC *key), INTVAL value, INTVAL flag)
+key_set_register(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_register_FLAG | flag;
@@ -214,7 +214,7 @@ Set the number C<value> in C<key>.
 
 PARROT_API
 void
-key_set_number(SHIM_INTERP, ARGINOUT(PMC *key), FLOATVAL value)
+key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
@@ -235,7 +235,7 @@ Set the string C<value> in C<key>.
 
 PARROT_API
 void
-key_set_string(SHIM_INTERP, ARGINOUT(PMC *key), ARGIN(STRING *value))
+key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
@@ -256,7 +256,7 @@ Set the PMC C<value> in C<key>.
 
 PARROT_API
 void
-key_set_pmc(PARROT_INTERP, ARGINOUT(PMC *key), ARGIN(PMC *value))
+key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
@@ -433,7 +433,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_next(SHIM_INTERP, NOTNULL(PMC *key))
+key_next(SHIM_INTERP, ARGIN(const PMC *key))
 {
     return key->pmc_ext ? (PMC *)PMC_data(key) : NULL;
 }
@@ -457,7 +457,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))
+key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
 {
     PMC *tail = key1;
 
@@ -515,7 +515,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
+key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
     STRING * const semicolon = string_from_cstring(interp, " ; ", 3);
     STRING * const quote = string_from_cstring(interp, "'", 1);

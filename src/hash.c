@@ -61,9 +61,13 @@ static void hash_freeze(PARROT_INTERP,
         FUNC_MODIFIES(*info);
 
 static void hash_thaw(PARROT_INTERP,
-    ARGINOUT(Hash *hash),
-    ARGINOUT(visit_info* info))
-        __attribute__nonnull__(1);
+    ARGMOD(Hash *hash),
+    ARGMOD(visit_info* info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*hash)
+        FUNC_MODIFIES(*info);
 
 static void init_hash(
     ARGOUT(Hash *hash),
@@ -341,7 +345,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 */
 
 static void
-hash_thaw(PARROT_INTERP, ARGINOUT(Hash *hash), ARGINOUT(visit_info* info))
+hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info* info))
 {
     size_t           entry_index;
     IMAGE_IO * const io = info->image_io;
@@ -447,7 +451,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-parrot_hash_visit(PARROT_INTERP, ARGINOUT(Hash *hash), ARGINOUT(void *pinfo))
+parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
 {
     visit_info* const info = (visit_info*) pinfo;
 
@@ -1030,7 +1034,7 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket*
-parrot_hash_put(PARROT_INTERP, ARGINOUT(Hash *hash), ARGIN(void *key), ARGIN_NULLOK(void *value))
+parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLOK(void *value))
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket   *bucket = hash->bi[hashval & hash->mask];
@@ -1085,7 +1089,7 @@ Deletes the key from the hash.
 
 PARROT_API
 void
-parrot_hash_delete(PARROT_INTERP, ARGINOUT(Hash *hash), ARGIN(void *key))
+parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
     HashBucket *bucket;
     HashBucket *prev = NULL;

@@ -86,11 +86,11 @@ void parrot_hash_clone(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void parrot_hash_delete(PARROT_INTERP,
-    ARGINOUT(Hash *hash),
-    ARGIN(void *key))
+void parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*hash);
 
 PARROT_API
 void parrot_hash_destroy(SHIM_INTERP, ARGMOD(Hash *hash))
@@ -138,11 +138,13 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket* parrot_hash_put(PARROT_INTERP,
-    ARGINOUT(Hash *hash),
+    ARGMOD(Hash *hash),
     ARGIN(void *key),
     ARGIN_NULLOK(void *value))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*hash);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -153,9 +155,13 @@ INTVAL parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
 
 PARROT_API
 void parrot_hash_visit(PARROT_INTERP,
-    ARGINOUT(Hash *hash),
-    ARGINOUT(void *pinfo))
-        __attribute__nonnull__(1);
+    ARGMOD(Hash *hash),
+    ARGMOD(void *pinfo))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*hash)
+        FUNC_MODIFIES(*pinfo);
 
 PARROT_API
 void parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))

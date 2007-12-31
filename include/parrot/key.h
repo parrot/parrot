@@ -44,9 +44,10 @@ typedef enum {
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
-PMC * key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))
+PMC * key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*key1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -93,14 +94,14 @@ PMC * key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * key_new_string(PARROT_INTERP, NOTNULL(STRING *value))
+PMC * key_new_string(PARROT_INTERP, ARGIN(STRING *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * key_next(SHIM_INTERP, NOTNULL(PMC *key))
+PMC * key_next(SHIM_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -117,30 +118,40 @@ PMC * key_pmc(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_integer(SHIM_INTERP, ARGINOUT(PMC *key), INTVAL value);
+void key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
-void key_set_number(SHIM_INTERP, ARGINOUT(PMC *key), FLOATVAL value);
+void key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
-void key_set_pmc(PARROT_INTERP, ARGINOUT(PMC *key), ARGIN(PMC *value))
+void key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
 void key_set_register(SHIM_INTERP,
-    ARGINOUT(PMC *key),
+    ARGMOD(PMC *key),
     INTVAL value,
-    INTVAL flag);
+    INTVAL flag)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
-void key_set_string(SHIM_INTERP, ARGINOUT(PMC *key), ARGIN(STRING *value))
-        __attribute__nonnull__(3);
+void key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*key);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
+STRING * key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
         __attribute__nonnull__(1);
 
 PARROT_API

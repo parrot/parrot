@@ -55,10 +55,11 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_locate_runtime_file_str(PARROT_INTERP,
-    NOTNULL(STRING *file),
+    ARGMOD(STRING *file),
     enum_runtime_ft type)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*file);
 
 void parrot_init_library_paths(PARROT_INTERP)
         __attribute__nonnull__(1);

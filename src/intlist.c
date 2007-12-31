@@ -149,7 +149,7 @@ Marks the list as live.
 */
 
 void
-intlist_mark(PARROT_INTERP, NOTNULL(IntList *l))
+intlist_mark(PARROT_INTERP, ARGMOD(IntList *l))
 {
     list_mark(interp, (List *)l);
 }
@@ -219,7 +219,7 @@ Assigns <val> to the item at C<idx>.
 */
 
 void
-intlist_assign(PARROT_INTERP, NOTNULL(IntList *l), INTVAL idx, INTVAL val)
+intlist_assign(PARROT_INTERP, ARGMOD(IntList *l), INTVAL idx, INTVAL val)
 {
     list_assign(interp, (List *)l, idx, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
@@ -235,7 +235,7 @@ Pushes C<val> on the end of the list.
 */
 
 void
-intlist_push(PARROT_INTERP, NOTNULL(IntList *l), INTVAL val)
+intlist_push(PARROT_INTERP, ARGMOD(IntList *l), INTVAL val)
 {
     list_push(interp, (List *)l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
@@ -251,7 +251,7 @@ Pushes C<val> on the front of the list.
 */
 
 void
-intlist_unshift(PARROT_INTERP, NOTNULL(IntList **l), INTVAL val)
+intlist_unshift(PARROT_INTERP, ARGMOD(IntList **l), INTVAL val)
 {
     list_unshift(interp, (List *)*l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
@@ -267,7 +267,7 @@ Popping/shifting into a sparse hole returns 0.
 */
 
 INTVAL
-intlist_pop(PARROT_INTERP, NOTNULL(IntList *l))
+intlist_pop(PARROT_INTERP, ARGMOD(IntList *l))
 {
     void * const ret = list_pop(interp, (List *)l, enum_type_INTVAL);
     const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
@@ -285,7 +285,7 @@ Removes and returns the first item on the list.
 */
 
 INTVAL
-intlist_shift(PARROT_INTERP, NOTNULL(IntList **l))
+intlist_shift(PARROT_INTERP, ARGMOD(IntList **l))
 {
     void * const ret = list_shift(interp, (List *)*l, enum_type_INTVAL);
     const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
@@ -304,7 +304,7 @@ Returns the item at C<idx>.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-intlist_get(PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx)
+intlist_get(PARROT_INTERP, ARGMOD(IntList *list), INTVAL idx)
 {
     /* XXX list_get can return NULL RT #48367 */
     void * const ret = list_get(interp, (List *)list, idx, enum_type_INTVAL);
@@ -323,7 +323,7 @@ Prints out the list in human-readable form.
 */
 
 void
-intlist_dump(NOTNULL(FILE *fp), NOTNULL(IntList *list), int verbose)
+intlist_dump(ARGMOD(FILE *fp), ARGMOD(IntList *list), int verbose)
 {
 #ifdef LIST_DEBUG
     list_dump(fp, (List *)list, verbose);

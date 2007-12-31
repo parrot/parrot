@@ -26,8 +26,9 @@ This file contains a C function to access Parrot's bytecode library functions.
 
 /* HEADERIZER BEGIN: static */
 
-static void cnv_to_win32_filesep(NOTNULL(STRING *path))
-        __attribute__nonnull__(1);
+static void cnv_to_win32_filesep(ARGMOD(STRING *path))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*path);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -41,45 +42,53 @@ static int is_abs_path(ARGIN(const STRING *file))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING* path_append(PARROT_INTERP,
-    NOTNULL(STRING *l_path),
-    NOTNULL(STRING *r_path))
+    ARGMOD(STRING *l_path),
+    ARGMOD(STRING *r_path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*l_path)
+        FUNC_MODIFIES(*r_path);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING* path_concat(PARROT_INTERP,
-    NOTNULL(STRING *l_path),
-    NOTNULL(STRING *r_path))
+    ARGMOD(STRING *l_path),
+    ARGMOD(STRING *r_path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*l_path)
+        FUNC_MODIFIES(*r_path);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* path_finalize(PARROT_INTERP, NOTNULL(STRING *path))
+static STRING* path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*path);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING* path_guarantee_trailing_separator(PARROT_INTERP,
-    ARGIN(STRING *path))
+    ARGMOD(STRING *path))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*path);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static STRING* try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
+static STRING* try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*path);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static STRING* try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
+static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*path);
 
 /* HEADERIZER END: static */
 
@@ -258,7 +267,7 @@ Converts a path with forward slashes to one with backward slashes.
 */
 
 static void
-cnv_to_win32_filesep(NOTNULL(STRING *path))
+cnv_to_win32_filesep(ARGMOD(STRING *path))
 {
     char* cnv;
 
@@ -285,7 +294,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-path_finalize(PARROT_INTERP, NOTNULL(STRING *path))
+path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
 {
 
     /* TODO create a string API that just does that
@@ -321,7 +330,7 @@ there already.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-path_guarantee_trailing_separator(PARROT_INTERP, ARGIN(STRING *path))
+path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 {
     STRING * const path_separator_string = string_chr(interp, path_separator);
 
@@ -348,7 +357,7 @@ argument and the right argument is appended
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-path_append(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))
+path_append(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 {
     l_path = path_guarantee_trailing_separator(interp, l_path);
     l_path = string_append(interp, l_path, r_path);
@@ -371,7 +380,7 @@ with a path-separator.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-path_concat(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))
+path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 {
     STRING* join;
 
@@ -407,7 +416,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING*
-try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
+try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 {
     STRING *final;
 
@@ -437,7 +446,7 @@ a .pbc or a .pir file is used.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING*
-try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
+try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 {
     STRING *with_ext, *result;
 
@@ -499,7 +508,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
+Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
         enum_runtime_ft type)
 {
     STRING *prefix;
