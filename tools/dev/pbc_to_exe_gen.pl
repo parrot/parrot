@@ -41,6 +41,7 @@ __END__
     data = 'generate_data'(infile)
     out  = 'program_code'(data)
     print outfh, out
+    close outfh
 
     compile_file(cfile, exefile)
 .end
@@ -189,9 +190,7 @@ END_PC
 #include "parrot/embed.h"
 
 #ifdef _MSC_VER
-#   define p_int32_t __int32
-#else
-#   define p_int32_t int32_t
+#   define int8_t signed__int8
 #endif
 
 END_HEADER

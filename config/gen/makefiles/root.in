@@ -763,8 +763,8 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
 
 pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
 	$(PERL) tools/dev/pbc_to_exe_gen.pl \
-    '$(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@ \
-	@ld_out@ @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)' \
+    "$(CUR_DIR)/CFLAGS $(CC) \"\" $(CFLAGS) -I$(@D) @cc_o_out@ \
+	@ld_out@ @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)" \
     > pbc_to_exe.pir
 
 pbc_to_exe : pbc_to_exe.pir
