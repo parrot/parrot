@@ -52,6 +52,13 @@ __END__
     .local pmc args
     args   = argv
 
+    .local int argc
+    argc = args
+
+    if argc == 2 goto proper_args
+    .return
+
+proper_args:
     .local string infile, cfile, exefile
 
     $P0    = shift args
