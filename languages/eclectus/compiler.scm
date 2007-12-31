@@ -206,14 +206,14 @@
 
 ; implementation of fx+
 (define-primitive (fx+ uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_plus1_~a, tmp_fx_plus2_~a " uid uid)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_plus1_~a = val_x" uid)
+  (emit "uniq_reg_1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_plus2_~a = val_x" uid)
+  (emit "uniq_reg_2_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( tmp_fx_plus1_~a, tmp_fx_plus2_~a, 'pirop' => 'n_add' )
+        val_x.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pirop' => 'n_add' )
         " uid uid))
 
 ; implementation of fxsub1
@@ -229,38 +229,38 @@
 
 ; implementation of fx-
 (define-primitive (fx- uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_plus1_~a, tmp_fx_plus2_~a " uid uid)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_plus1_~a = val_x" uid)
+  (emit "uniq_reg_1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_plus2_~a = val_x" uid)
+  (emit "uniq_reg_2_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( tmp_fx_plus1_~a, tmp_fx_plus2_~a, 'pirop' => 'n_sub' )
+        val_x.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pirop' => 'n_sub' )
         " uid uid))
 
 ; implementation of fxlogand
 (define-primitive (fxlogand uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_logand1_~a, tmp_fx_logand2_~a " uid uid)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_logand1_~a = val_x" uid)
+  (emit "uniq_reg_1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_logand2_~a = val_x" uid)
+  (emit "uniq_reg_2_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( tmp_fx_logand1_~a, tmp_fx_logand2_~a, 'pirop' => 'n_band' )
+        val_x.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pirop' => 'n_band' )
         " uid uid))
 
 ; implementation of fxlogor
 (define-primitive (fxlogor uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_logor1_~a, tmp_fx_logor2_~a " uid uid)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_logor1_~a = val_x" uid)
+  (emit "uniq_reg_1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_logor2_~a = val_x" uid)
+  (emit "uniq_reg_2_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( tmp_fx_logor1_~a, tmp_fx_logor2_~a, 'pirop' => 'n_bor' )
+        val_x.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pirop' => 'n_bor' )
         " uid uid))
 
 
@@ -297,42 +297,42 @@
 
 ; implementation of fx=
 (define-primitive (fx= uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_equals1_~a, tmp_fx_equals2_~a " uid uid)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_equals1_~a = val_x" uid)
+  (emit "uniq_reg_1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_equals2_~a = val_x" uid)
+  (emit "uniq_reg_2_~a = val_x" uid)
   (emit "
         $P4 = new 'PAST::Op'
-        $P4.init( tmp_fx_equals1_~a, tmp_fx_equals2_~a, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid))
 
 ; implementation of fx<
 (define-primitive (fx< uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_eq1_~a, tmp_fx_eq2_~a " uid uid)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_eq1_~a = val_x" uid)
+  (emit "uniq_reg_1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_eq2_~a = val_x" uid)
+  (emit "uniq_reg_2_~a = val_x" uid)
   (emit "
         $P4 = new 'PAST::Op'
-        $P4.init( tmp_fx_eq1_~a, tmp_fx_eq2_~a, 'pasttype' => 'chain', 'name' => 'infix:<' ) 
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:<' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid))
 
 ; implementation of fx>
 (define-primitive (fx> uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_eq1_~a, tmp_fx_eq2_~a " uid uid)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_eq1_~a = val_x" uid)
+  (emit "uniq_reg_1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_eq2_~a = val_x" uid)
+  (emit "uniq_reg_2_~a = val_x" uid)
   (emit "
         $P4 = new 'PAST::Op'
-        $P4.init( tmp_fx_eq1_~a, tmp_fx_eq2_~a, 'pasttype' => 'chain', 'name' => 'infix:>' ) 
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid))
@@ -423,16 +423,16 @@
   (emit (immediate-rep expr)))
 
 (define (emit-if expr uid)
-  (emit "    .local pmc tmp_if_test_~a, tmp_if_conseq_~a, tmp_if_altern_~a" uid uid uid)
+  (emit "    .local pmc uniq_reg_if_test_~a, uniq_reg_if_conseq_~a, uniq_reg_if_altern_~a" uid uid uid)
   (emit-expr (if-test expr))
-  (emit "tmp_if_test_~a = val_x" uid)
+  (emit "uniq_reg_if_test_~a = val_x" uid)
   (emit-expr (if-conseq expr))
-  (emit "tmp_if_conseq_~a = val_x" uid)
+  (emit "uniq_reg_if_conseq_~a = val_x" uid)
   (emit-expr (if-altern expr))
-  (emit "tmp_if_altern_~a = val_x" uid)
+  (emit "uniq_reg_if_altern_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( tmp_if_test_~a, tmp_if_conseq_~a, tmp_if_altern_~a, 'pasttype' => 'if'  )
+        val_x.init( uniq_reg_if_test_~a, uniq_reg_if_conseq_~a, uniq_reg_if_altern_~a, 'pasttype' => 'if'  )
         " uid uid uid))
  
 ; emir PIR for an expression
