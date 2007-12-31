@@ -28,13 +28,13 @@ __END__
     (infile, cfile, exefile) = 'handle_args'(argv)
     $I0                      = length infile
     if $I0 goto open_outfile
-    '_throw'("infile not specified\n")
+    die "infile not specified"
 
   open_outfile:
     .local pmc outfh
     outfh = open cfile, '>'
     if outfh goto args_handled
-    '_throw'("infile not specified\n")
+    die "infile not specified"
 
   args_handled:
     .local pmc data
@@ -56,7 +56,7 @@ __END__
     argc = args
 
     if argc == 2 goto proper_args
-    .return
+    .return ()
 
 proper_args:
     .local string infile, cfile, exefile
@@ -89,7 +89,7 @@ proper_args:
                infh = open infile, '<'
 
     if infh goto file_open
-    '_throw'("cannot open infile\n")
+    die "cannot open infile"
 
   file_open:
     # read the file one opcode at a time -- for simplicity. optimize later
@@ -266,13 +266,6 @@ END_BODY
 
 
 # util functions
-.sub '_throw'
-    .param string message
-    $P0 = new 'Exception'
-    $P0['_message'] = message
-    throw $P0
-.end
-
 .sub 'compile_file'
     .param string cfile
     .param string exefile
@@ -288,7 +281,7 @@ END_BODY
     unless status goto compiled
 
     say compile
-    '_throw'("compilation failed\n")
+    die "compilation failed"
 
   compiled:
     print "Compiled: "
