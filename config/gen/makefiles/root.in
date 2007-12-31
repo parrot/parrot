@@ -40,6 +40,9 @@ DOC_DIR         = @doc_dir@
 #
 ###############################################################################
 
+# where we're building parrot from (needed for pbc_to_exe)
+BUILD_DIR = @build_dir@
+
 # directory for build tools
 BUILD_TOOLS_DIR = tools/build
 
@@ -763,8 +766,9 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
 
 pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
 	$(PERL) tools/dev/pbc_to_exe_gen.pl \
-    "$(CUR_DIR)/CFLAGS $(CC) \"\" $(CFLAGS) -I$(@D) @cc_o_out@ \
-	@ld_out@ @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)" \
+    "$(BUILD_DIR)/CFLAGS $(CC) \"\" $(CFLAGS) -I$(BUILD_DIR)/include \
+    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) \
+    $(BUILD_DIR)/src/parrot_config$(O)" \
     > pbc_to_exe.pir
 
 pbc_to_exe : pbc_to_exe.pir

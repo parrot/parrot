@@ -195,8 +195,11 @@ END_HEADER
 int main(int argc, const char *argv[])
 {
     PackFile *pf;
+    Parrot_Interp interp;
 
-    Parrot_Interp interp = Parrot_new( NULL );
+    Parrot_set_config_hash();
+
+    interp = Parrot_new( NULL );
 
     if (!interp)
         return 1;
