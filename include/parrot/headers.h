@@ -47,13 +47,15 @@ typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void
 
 /* HEADERIZER BEGIN: src/headers.c */
 
-void add_pmc_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
+void add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
-void add_pmc_sync(PARROT_INTERP, NOTNULL(PMC *pmc))
+void add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -138,7 +140,7 @@ void Parrot_destroy_header_pools(PARROT_INTERP)
 PARROT_WARN_UNUSED_RESULT
 int Parrot_forall_header_pools(PARROT_INTERP,
     int flag,
-    NULLOK(void *arg),
+    ARGIN_NULLOK(void *arg),
     NOTNULL(pool_iter_fn func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
@@ -150,10 +152,11 @@ void Parrot_initialize_header_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_merge_header_pools(
-    NOTNULL(Interp *dest_interp),
-    NOTNULL(Interp *source_interp))
+    ARGMOD(Interp *dest_interp),
+    ARGIN(Interp *source_interp))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest_interp);
 
 /* HEADERIZER END: src/headers.c */
 

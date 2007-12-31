@@ -26,10 +26,11 @@ Handles the accessing of small object pools (header pools).
 /* HEADERIZER BEGIN: static */
 
 static void gc_ms_add_free_object(SHIM_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *to_add))
+    ARGMOD(Small_Object_Pool *pool),
+    ARGIN(PObj *to_add))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool))
@@ -47,9 +48,10 @@ static void gc_ms_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(2);
 
 static void more_traceable_objects(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+    ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 /* HEADERIZER END: static */
 
@@ -128,7 +130,7 @@ We're out of traceable objects. Try a DOD, then get some more if needed.
 */
 
 static void
-more_traceable_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     if (pool->skip)
         pool->skip = 0;
@@ -160,7 +162,7 @@ Add an unused object back to the free pool for later reuse.
 */
 
 static void
-gc_ms_add_free_object(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(PObj *to_add))
+gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(PObj *to_add))
 {
     PObj_flags_SETTO(to_add, PObj_on_free_list_FLAG);
     PMC_struct_val(to_add) = pool->free_list;

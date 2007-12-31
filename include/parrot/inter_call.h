@@ -71,31 +71,33 @@ typedef enum arg_pass_t {
 /* HEADERIZER BEGIN: src/inter_call.c */
 
 PARROT_API
-void Parrot_convert_arg(PARROT_INTERP, NOTNULL(call_state *st))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
-int Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
-int Parrot_fetch_arg_nci(PARROT_INTERP, NOTNULL(call_state *st))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
-int Parrot_init_arg_indexes_and_sig_pmc(PARROT_INTERP,
-    NOTNULL(parrot_context_t *ctx),
-    NOTNULL(opcode_t *indexes),
-    NOTNULL(PMC* sig_pmc),
-    NOTNULL(call_state_item *sti))
+void Parrot_convert_arg(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
+
+PARROT_API
+int Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
+
+PARROT_API
+int Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
+
+PARROT_API
+int Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP,
+    ARGIN(parrot_context_t *ctx),
+    ARGIN(opcode_t *indexes),
+    ARGIN_NULLOK(PMC* sig_pmc),
+    ARGMOD(call_state_item *sti))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*sti);
 
 PARROT_API
 int Parrot_init_arg_nci(PARROT_INTERP,
@@ -107,22 +109,23 @@ int Parrot_init_arg_nci(PARROT_INTERP,
 
 PARROT_API
 int Parrot_init_arg_op(PARROT_INTERP,
-    NOTNULL(parrot_context_t *ctx),
-    NULLOK(opcode_t *pc),
-    NOTNULL(call_state_item *sti))
+    ARGIN(parrot_context_t *ctx),
+    ARGIN_NULLOK(opcode_t *pc),
+    ARGIN(call_state_item *sti))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 PARROT_API
 int Parrot_init_arg_sig(SHIM_INTERP,
-    NOTNULL(parrot_context_t *ctx),
+    ARGIN(parrot_context_t *ctx),
     ARGIN(const char *sig),
-    NULLOK(void *ap),
-    NOTNULL(call_state_item *sti))
+    ARGIN_NULLOK(void *ap),
+    ARGMOD(call_state_item *sti))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*sti);
 
 PARROT_API
 int Parrot_init_ret_nci(PARROT_INTERP,
@@ -134,73 +137,79 @@ int Parrot_init_ret_nci(PARROT_INTERP,
 
 PARROT_API
 void parrot_pass_args(PARROT_INTERP,
-    NOTNULL(parrot_context_t *src_ctx),
-    NOTNULL(parrot_context_t *dest_ctx),
-    NOTNULL(opcode_t *src_indexes),
-    NOTNULL(opcode_t *dest_indexes),
+    ARGMOD(parrot_context_t *src_ctx),
+    ARGMOD(parrot_context_t *dest_ctx),
+    ARGMOD(opcode_t *src_indexes),
+    ARGMOD(opcode_t *dest_indexes),
     arg_pass_t param_or_result)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*src_ctx)
+        FUNC_MODIFIES(*dest_ctx)
+        FUNC_MODIFIES(*src_indexes)
+        FUNC_MODIFIES(*dest_indexes);
 
 PARROT_API
 void Parrot_PCCINVOKE(PARROT_INTERP,
-    NULLOK(PMC* pmc),
-    NOTNULL(STRING *method_name),
+    ARGIN(PMC* pmc),
+    ARGMOD(STRING *method_name),
     ARGIN(const char *signature),
     ...)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*method_name);
 
 PARROT_API
 void Parrot_process_args(PARROT_INTERP,
-    NOTNULL(call_state *st),
+    ARGMOD(call_state *st),
     arg_pass_t param_or_result)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 opcode_t * parrot_pass_args_fromc(PARROT_INTERP,
     ARGIN(const char *sig),
-    NOTNULL(opcode_t *dest),
-    NOTNULL(parrot_context_t *old_ctxp),
+    ARGMOD(opcode_t *dest),
+    ARGIN(parrot_context_t *old_ctxp),
     va_list ap)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*dest);
 
-int Parrot_store_arg(PARROT_INTERP, NOTNULL(call_state *st))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+int Parrot_store_arg(SHIM_INTERP, ARGMOD(call_state *st))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void* set_retval(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
+void* set_retval(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 FLOATVAL set_retval_f(PARROT_INTERP,
     int sig_ret,
-    NOTNULL(parrot_context_t *ctx))
+    ARGIN(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 INTVAL set_retval_i(PARROT_INTERP,
     int sig_ret,
-    NOTNULL(parrot_context_t *ctx))
+    ARGIN(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* set_retval_p(PARROT_INTERP,
-    int sig_ret,
-    NOTNULL(parrot_context_t *ctx))
+PMC* set_retval_p(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -208,7 +217,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING* set_retval_s(PARROT_INTERP,
     int sig_ret,
-    NOTNULL(parrot_context_t *ctx))
+    ARGIN(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 

@@ -22,18 +22,19 @@ Handles getting of various headers, and pool creation.
 /* HEADERIZER BEGIN: static */
 
 static void fix_pmc_syncs(
-    NOTNULL(Interp *dest_interp),
-    NOTNULL(Small_Object_Pool *pool))
+    ARGMOD(Interp *dest_interp),
+    ARGIN(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest_interp);
 
-static void free_pool(NOTNULL(Small_Object_Pool *pool))
-        __attribute__nonnull__(1);
+static void free_pool(ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pool);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void * get_free_buffer(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+static void * get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -43,20 +44,20 @@ static PMC_EXT * new_pmc_ext(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static int sweep_cb_buf(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     SHIM(int flag),
-    NOTNULL(void *arg))
+    SHIM(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        FUNC_MODIFIES(*pool);
 
 static int sweep_cb_pmc(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
-    int flag,
-    NOTNULL(void *arg))
+    ARGMOD(Small_Object_Pool *pool),
+    SHIM(int flag),
+    SHIM(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        FUNC_MODIFIES(*pool);
 
 /* HEADERIZER END: static */
 
@@ -90,7 +91,7 @@ Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void *
-get_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
 {
     PObj * const buffer = (PObj *)pool->get_free_object(interp, pool);
 
@@ -98,7 +99,7 @@ get_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
     PObj_bufstart(buffer) = NULL;
     PObj_buflen(buffer) = 0;
 
-    if (pool->object_size  - GC_HEADER_SIZE > sizeof (PObj))
+    if (pool->object_size - GC_HEADER_SIZE > sizeof (PObj))
         memset(buffer + 1, 0,
                 pool->object_size - sizeof (PObj) - GC_HEADER_SIZE);
     return buffer;
@@ -355,7 +356,7 @@ Adds a new C<PMC_EXT> to C<pmc>.
 */
 
 void
-add_pmc_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
+add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     pmc->pmc_ext = new_pmc_ext(interp);
     PObj_is_PMC_EXT_SET(pmc);
@@ -382,7 +383,7 @@ Adds a PMC_sync field to C<pmc>.
 */
 
 void
-add_pmc_sync(PARROT_INTERP, NOTNULL(PMC *pmc))
+add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
         add_pmc_ext(interp, pmc);
@@ -684,7 +685,8 @@ If the function returns a non-zero value iteration will stop.
 
 PARROT_WARN_UNUSED_RESULT
 int
-Parrot_forall_header_pools(PARROT_INTERP, int flag, NULLOK(void *arg), NOTNULL(pool_iter_fn func))
+Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
+        NOTNULL(pool_iter_fn func))
 {
     Arenas * const arena_base = interp->arena_base;
     int i;
@@ -730,7 +732,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-free_pool(NOTNULL(Small_Object_Pool *pool))
+free_pool(ARGMOD(Small_Object_Pool *pool))
 {
     Small_Object_Arena *cur_arena;
 
@@ -754,8 +756,8 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), SHIM(int flag),
-        NOTNULL(void *arg))
+sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
+        SHIM(void *arg))
 {
 #ifdef GC_IS_MALLOC
     const int pass = (int)(INTVAL)arg;
@@ -767,8 +769,6 @@ sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), SHIM(int flag),
     else
 #endif
     {
-        UNUSED(arg);
-
         Parrot_dod_sweep(interp, pool);
         free_pool(pool);
     }
@@ -787,12 +787,9 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
-        NOTNULL(void *arg))
+sweep_cb_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        SHIM(int flag), SHIM(void *arg))
 {
-    UNUSED(flag);
-    UNUSED(arg);
-
     Parrot_dod_sweep(interp, pool);
     free_pool(pool);
     return 0;
@@ -847,7 +844,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-fix_pmc_syncs(NOTNULL(Interp *dest_interp), NOTNULL(Small_Object_Pool *pool))
+fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
 {
     /* XXX largely copied from dod_sweep */
     Small_Object_Arena *cur_arena;
@@ -892,7 +889,7 @@ Merge the header pools of C<source_interp> into those of C<dest_interp>.
 */
 
 void
-Parrot_merge_header_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_interp))
+Parrot_merge_header_pools(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_interp))
 {
     UINTVAL i;
 

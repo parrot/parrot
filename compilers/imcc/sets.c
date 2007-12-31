@@ -92,7 +92,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_free(ARGINOUT(Set *s))
+set_free(ARGMOD(Set *s))
 {
     if (s->bmp)
         mem_sys_free(s->bmp);
@@ -110,7 +110,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_clear(ARGINOUT(Set *s))
+set_clear(ARGMOD(Set *s))
 {
     memset(s->bmp, 0, NUM_BYTES(s->length));
 }
@@ -182,7 +182,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_add(ARGINOUT(Set *s), int element)
+set_add(ARGMOD(Set *s), int element)
 {
     const int elem_byte_in_set = BYTE_IN_SET(element);
     const int bytes_in_set     = BYTE_IN_SET(s->length);
@@ -322,7 +322,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-set_intersec_inplace(ARGINOUT(Set *s1), ARGIN(const Set *s2))
+set_intersec_inplace(ARGMOD(Set *s1), ARGIN(const Set *s2))
 {
     int i;
 
