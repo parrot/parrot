@@ -41,7 +41,7 @@ class C<type>.
 
 PARROT_API
 void
-register_nci_method(PARROT_INTERP, const int type, NOTNULL(void *func),
+register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
                     ARGIN(const char *name), ARGIN(const char *proto))
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
@@ -71,7 +71,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-register_raw_nci_method_in_ns(PARROT_INTERP, const int type, NOTNULL(void *func),
+register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
         ARGIN(const char *name))
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
@@ -121,7 +121,7 @@ Register a parser/compiler function.
 
 PARROT_API
 void
-Parrot_compreg(PARROT_INTERP, NOTNULL(STRING *type),
+Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
                     NOTNULL(Parrot_compiler_func_t func))
 {
     PMC* const iglobals = interp->iglobals;
@@ -157,8 +157,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_compile_string(PARROT_INTERP, NOTNULL(STRING *type),
-        ARGIN(const char *code), NOTNULL(STRING **error))
+Parrot_compile_string(PARROT_INTERP, ARGIN(STRING *type),
+        ARGIN(const char *code), ARGOUT(STRING **error))
 {
     if (string_compare(interp, const_string(interp, "PIR"), type) == 0)
         return IMCC_compile_pir_s(interp, code, error);
@@ -183,7 +183,7 @@ Compile code file.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), NOTNULL(STRING **error))
+Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
 {
     return IMCC_compile_file_s(interp, fullname, error);
 }

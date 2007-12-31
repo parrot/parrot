@@ -33,15 +33,17 @@ the C-library.
 /* HEADERIZER BEGIN: static */
 
 static void callback_CD(PARROT_INTERP,
-    NOTNULL(char *external_data),
-    NOTNULL(PMC *user_data))
+    ARGIN(char *external_data),
+    ARGMOD(PMC *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*user_data);
 
-static void verify_CD(NOTNULL(char *external_data), NOTNULL(PMC *user_data))
+static void verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*user_data);
 
 /* HEADERIZER END: static */
 
@@ -59,8 +61,8 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
-Parrot_make_cb(PARROT_INTERP, NOTNULL(PMC* sub), NOTNULL(PMC* user_data),
-        NOTNULL(STRING *cb_signature))
+Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
+        ARGIN(STRING *cb_signature))
 {
     PMC *cb, *cb_sig;
     int type;
@@ -147,7 +149,7 @@ Verify user_data PMC then continue with callback_CD
 */
 
 static void
-verify_CD(NOTNULL(char *external_data), NOTNULL(PMC *user_data))
+verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
     PARROT_INTERP = NULL;
     size_t i;
@@ -209,7 +211,7 @@ Common callback function handler. See pdd16.
 */
 
 static void
-callback_CD(PARROT_INTERP, NOTNULL(char *external_data), NOTNULL(PMC *user_data))
+callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
 
     PMC *passed_interp;       /* the interp that originated the CB */
@@ -271,7 +273,7 @@ necessary items in its properties.
 PARROT_API
 void
 Parrot_run_callback(PARROT_INTERP,
-        NOTNULL(PMC* user_data), NOTNULL(char* external_data))
+        ARGMOD(PMC* user_data), ARGIN(char* external_data))
 {
     PMC *    signature;
     PMC *    sub;
@@ -366,14 +368,14 @@ NCI callback functions. See pdd16.
 
 PARROT_API
 void
-Parrot_callback_C(NOTNULL(char *external_data), NOTNULL(PMC *user_data))
+Parrot_callback_C(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
     verify_CD(external_data, user_data);
 }
 
 PARROT_API
 void
-Parrot_callback_D(NOTNULL(PMC *user_data), NOTNULL(char *external_data))
+Parrot_callback_D(ARGMOD(PMC *user_data), ARGIN(char *external_data))
 {
     verify_CD(external_data, user_data);
 }

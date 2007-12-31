@@ -836,7 +836,8 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 static INTVAL
-PIO_win32_bind(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io), ARGIN_NULLOK(STRING *l))
+PIO_win32_bind(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
+        ARGIN_NULLOK(STRING *l))
 {
     struct sockaddr_in sa;
 

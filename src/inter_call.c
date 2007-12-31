@@ -28,16 +28,18 @@ subroutines.
 
 /* HEADERIZER BEGIN: static */
 
-static void check_for_opt_flag(NOTNULL(call_state *st), int has_arg)
-        __attribute__nonnull__(1);
+static void check_for_opt_flag(ARGMOD(call_state *st), int has_arg)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*st);
 
 static void check_named(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void clone_key_arg(PARROT_INTERP, NOTNULL(call_state *st))
+static void clone_key_arg(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
 
 static void commit_last_arg(PARROT_INTERP,
     int index,
@@ -83,13 +85,15 @@ static int fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))
 static void init_call_stats(NOTNULL(call_state *st))
         __attribute__nonnull__(1);
 
-static void init_first_dest_named(PARROT_INTERP, NOTNULL(call_state *st))
+static void init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
 
-static int locate_named_named(PARROT_INTERP, NOTNULL(call_state *st))
+static int locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*st);
 
 static void next_arg_sig(NOTNULL(call_state_item *sti))
         __attribute__nonnull__(1);
@@ -113,7 +117,7 @@ static void start_flatten(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void store_arg(NOTNULL(call_state *st), INTVAL idx)
+static void store_arg(ARGIN(const call_state *st), INTVAL idx)
         __attribute__nonnull__(1);
 
 static int store_current_arg(NOTNULL(call_state *st))
@@ -757,7 +761,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-check_for_opt_flag(NOTNULL(call_state *st), int has_arg)
+check_for_opt_flag(ARGMOD(call_state *st), int has_arg)
 {
     INTVAL idx;
     call_state_item * const dest = &st->dest;
@@ -797,7 +801,7 @@ to pass a key to a tailcalled function or method
 */
 
 static void
-clone_key_arg(PARROT_INTERP, NOTNULL(call_state *st))
+clone_key_arg(PARROT_INTERP, ARGMOD(call_state *st))
 {
     PMC *key = UVal_pmc(st->val);
 
@@ -828,7 +832,7 @@ initializes dest calling state for recption of first named arg.
 */
 
 static void
-init_first_dest_named(PARROT_INTERP, NOTNULL(call_state *st))
+init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
 {
     int i, n_named;
 
@@ -885,7 +889,7 @@ locate destination name, return 0 if not found
 */
 
 static int
-locate_named_named(PARROT_INTERP, NOTNULL(call_state *st))
+locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
 {
     int i, n_named, idx;
     STRING *param;
@@ -928,7 +932,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-store_arg(NOTNULL(call_state *st), INTVAL idx)
+store_arg(ARGIN(const call_state *st), INTVAL idx)
 {
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:

@@ -48,7 +48,7 @@ static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char ** argv))
+static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -526,7 +526,7 @@ Creates and returns C<ARGS> array PMC.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-setup_argv(PARROT_INTERP, int argc, ARGIN(char ** argv))
+setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
     INTVAL i;
     PMC *userargv;
@@ -805,7 +805,7 @@ Sets up C<ARGV> and runs the ops.
 
 PARROT_API
 void
-Parrot_runcode(PARROT_INTERP, int argc, char *argv[])
+Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
     PMC *userargv, *main_sub;
 
