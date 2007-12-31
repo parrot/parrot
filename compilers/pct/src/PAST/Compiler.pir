@@ -25,8 +25,8 @@ By default PAST::Compiler transforms a PAST tree into POST.
     piropsig = new 'Hash'
     piropsig['n_abs']    = 'PP'
     piropsig['n_add']    = 'PP+'
-    piropsig['n_bnot']   = 'PP'
     piropsig['n_band']   = 'PPP'
+    piropsig['n_bnot']   = 'PP'
     piropsig['n_bor']    = 'PPP'
     piropsig['n_concat'] = 'PP~'
     piropsig['n_div']    = 'PP+'
@@ -825,6 +825,48 @@ $x < $y and $y < $z, but $y only gets evaluated once.
     apost = bpost
     goto clist_loop
   clist_end:
+    ops.'push'(endlabel)
+    .return (ops)
+.end
+
+
+=item def_or(PAST::Op node)
+
+The short-circuiting default operator (e.g., Perl 6's C<< infix:<//> >>).
+Returns its first child if its defined, otherwise it evaluates and returns
+the second child.  (N.B.: This particular pasttype is a candidate for
+being refactored out using thunks of some sort.)
+
+=cut
+
+.sub 'def_or' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    $S0 = $P0.'unique'('$P')
+    ops = $P0.'new'('node'=>node, 'result'=>$S0)
+
+    .local pmc lpast, lpost
+    lpast = node[0]
+    lpost = self.'as_post'(lpast, 'rtype'=>'P')
+    ops.'push'(lpost)
+    ops.'push_pirop'('set', ops, lpost)
+
+    .local pmc endlabel
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = ops.'unique'('default_')
+    endlabel = $P0.'new'('result'=>$S0)
+
+    $S0 = ops.'unique'('$I')
+    ops.'push_pirop'('defined', $S0, ops)
+    ops.'push_pirop'('if', $S0, endlabel)
+    .local pmc rpast, rpost
+    rpast = node[1]
+    rpost = self.'as_post'(rpast, 'rtype'=>'P')
+    ops.'push'(rpost)
+    ops.'push_pirop'('set', ops, rpost)
     ops.'push'(endlabel)
     .return (ops)
 .end
