@@ -59,7 +59,10 @@ __END__
     .return ()
 
 proper_args:
-    .local string infile, cfile, exefile
+    .local string infile, cfile, exefile, exe
+
+    $P0    = '_config'()
+    exe    = $P0['exe']
 
     $P0    = shift args
     infile = shift args
@@ -73,6 +76,7 @@ proper_args:
 
     dec infile_len
     exefile     = substr infile, 0, infile_len
+    exefile    .= exe
 
     # substitute .c for .pbc
     # remove .c for executable
