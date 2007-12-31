@@ -200,7 +200,7 @@ END_HEADER
 
 .sub 'body'
     $S0 = <<'END_BODY'
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
     PackFile *pf;
 
