@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: release_manager_guide.pod 24083 2007-12-19 18:10:37Z coke $
+# $Id: $
 
 =head1 Debian Packaging Guide
 
