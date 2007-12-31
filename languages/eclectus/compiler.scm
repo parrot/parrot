@@ -225,15 +225,28 @@
 
 ; implementation of fxlogand
 (define-primitive (fxlogand uid arg1 arg2)
-  (emit "    .local pmc tmp_fx_plus1_~a, tmp_fx_plus2_~a " uid uid)
+  (emit "    .local pmc tmp_fx_logand1_~a, tmp_fx_logand2_~a " uid uid)
   (emit-expr arg1)
-  (emit "tmp_fx_plus1_~a = val_x" uid)
+  (emit "tmp_fx_logand1_~a = val_x" uid)
   (emit-expr arg2)
-  (emit "tmp_fx_plus2_~a = val_x" uid)
+  (emit "tmp_fx_logand2_~a = val_x" uid)
   (emit "
         val_x = new 'PAST::Op'
-        val_x.init( tmp_fx_plus1_~a, tmp_fx_plus2_~a, 'pirop' => 'n_band' )
+        val_x.init( tmp_fx_logand1_~a, tmp_fx_logand2_~a, 'pirop' => 'n_band' )
         " uid uid))
+
+; implementation of fxlogor
+(define-primitive (fxlogor uid arg1 arg2)
+  (emit "    .local pmc tmp_fx_logor1_~a, tmp_fx_logor2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "tmp_fx_logor1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "tmp_fx_logor2_~a = val_x" uid)
+  (emit "
+        val_x = new 'PAST::Op'
+        val_x.init( tmp_fx_logor1_~a, tmp_fx_logor2_~a, 'pirop' => 'n_bor' )
+        " uid uid))
+
 
 ; implementation of char->fixnum
 (define-primitive (char->fixnum uid arg)

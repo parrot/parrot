@@ -39,6 +39,20 @@
   [(fxlogand (fx+ 4 1) 1)                       => "1\n" ]
   [(fxlogand (fx+ 4 1) 2)                       => "0\n" ]
   [(fxlogand (fx+ 4 1) 4)                       => "4\n" ]
+
+  [(fxlogor 0 0)                                => "0\n" ]
+  [(fxlogor 0 1)                                => "1\n" ]
+  [(fxlogor 1 0)                                => "1\n" ]
+  [(fxlogor 1 1)                                => "1\n" ]
+  [(fxlogor (fx+ 2 1) 0)                        => "3\n" ]
+  [(fxlogor (fx+ 2 1) 1)                        => "3\n" ]
+  [(fxlogor (fx+ 2 1) 2)                        => "3\n" ]
+  [(fxlogor (fx+ 2 1) 4)                        => "7\n" ]
+  [(fxlogor (fx+ 4 1) 0)                        => "5\n" ]
+  [(fxlogor (fx+ 4 1) 1)                        => "5\n" ]
+  [(fxlogor (fx+ 4 1) 2)                        => "7\n" ]
+  [(fxlogor (fx+ 4 1) 4)                        => "5\n" ]
+  [(fxlogor 0 1)                                => "1\n" ]
 )
 
 (test-all)

@@ -27,6 +27,7 @@ By default PAST::Compiler transforms a PAST tree into POST.
     piropsig['n_add']    = 'PP+'
     piropsig['n_bnot']   = 'PP'
     piropsig['n_band']   = 'PPP'
+    piropsig['n_bor']    = 'PPP'
     piropsig['n_concat'] = 'PP~'
     piropsig['n_div']    = 'PP+'
     piropsig['n_fdiv']   = 'PP+'
