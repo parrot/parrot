@@ -1679,8 +1679,12 @@ test-clean :
     "t/src/*.pdb" \
     "t/src/*.manifest"
 	$(RM_F) \
-    test$(EXE) \
-    test.*
+     "t/tools/pmc2c.t_*" \
+     "t/tools/pmc2c.pmc_t_*" \
+     "t/tools/pdb.t.*"
+	$(RM_F) \
+     "test$(EXE)" \
+     "test.*"
 
 imcc-clean:
 	$(RM_F) \
