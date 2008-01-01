@@ -177,15 +177,15 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
             \$stderr
         );
         ok($ret, "sort_ops returned successfully" );
-  TODO: {
-             local $TODO = 'broken warning about experimental ops';
+#  TODO: {
+#             local $TODO = 'broken warning about experimental ops';
 
             like(
                 $stderr,
                 qr|experimental, not in ops\.num|,
                 "Got expected warning about experimental ops"
             );
-        }
+#        }
 
         # To do:  Test that the sorting was correct.
 
