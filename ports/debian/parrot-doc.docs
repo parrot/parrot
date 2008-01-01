@@ -101,11 +101,9 @@ docs/pmc/subs.pod
 docs/porting_intro.pod
 docs/project/cage_cleaners_guide.pod
 docs/project/committer_guide.pod
-docs/project/debian_packaging_guide.pod
 docs/project/metacommitter_guide.pod
 docs/project/pause_guide.pod
 docs/project/release_manager_guide.pod
-docs/project/roles_responsibilities.pod
 docs/project/ticket_wrangler_guide.pod
 docs/req/model_users.pod
 docs/resources/favicon.ico
@@ -113,6 +111,7 @@ docs/resources/parrot.small.png
 docs/resources/perl.css
 docs/resources/up.gif
 docs/ROADMAP.pod
+docs/roles_responsibilities.pod
 docs/running.pod
 docs/stability.pod
 docs/stm/atomic.pod

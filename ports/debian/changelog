@@ -19,8 +19,6 @@ parrot (0.5.1-1) unstable; urgency=low
     - Updated copyright years.
     - Removed copyright info for files no longer in distribution
   * debian/parrot.docs
-    - Updated for new file docs/project/debian_packaging_guide.pod
-    - Updated for relocated file docs/roles_responsibilities.pod
     - Updated for deleted file docs/BROKEN.pod.
   * debian/rules
     - Updated to skip *_config.o files.
