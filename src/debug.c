@@ -44,7 +44,7 @@ extern void imcc_init(PARROT_INTERP);
 static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
-static int GDB_B(PARROT_INTERP, NOTNULL(char *s))
+static int GDB_B(PARROT_INTERP, ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -54,16 +54,16 @@ static const char* GDB_P(PARROT_INTERP, ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char const * nextarg(NOTNULL(char const *command))
+static const char * nextarg(ARGIN(const char *command))
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * parse_command(
     ARGIN(const char *command),
-    NOTNULL(unsigned long *cmdP))
+    ARGOUT(unsigned long *cmdP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -105,7 +105,7 @@ static const char * skip_ws(ARGIN(const char *str))
 
 /*
 
-=item C<static char const * nextarg>
+=item C<static const char * nextarg>
 
 Returns the position just past the current argument in the PASM instruction
 C<command>. This is not the same as C<skip_command()>, which is intended for
@@ -115,18 +115,17 @@ debugger commands. This function is used for C<eval>.
 
 */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char const *
-nextarg(NOTNULL(char const *command))
+static const char *
+nextarg(ARGIN(const char *command))
 {
     /* as long as the character pointed to by command is not NULL,
      * and it is either alphanumeric, a comma or a closing bracket,
      * continue looking for the next argument.
      */
-    while (*command && (isalnum((unsigned char) *command) || *command == ',' ||
-        *command == ']'))
-            command++;
+    while (*command && (isalnum((unsigned char) *command) || *command == ',' || *command == ']'))
+        command++;
 
     /* eat as much space as possible */
     while (*command && isspace((unsigned char) *command))
@@ -321,7 +320,7 @@ that can be used as a switch key for fast lookup.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-parse_command(ARGIN(const char *command), NOTNULL(unsigned long *cmdP))
+parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
 {
     int           i;
     unsigned long c = 0;
@@ -1211,7 +1210,7 @@ Delete a condition associated with a breakpoint.
 */
 
 void
-PDB_delete_condition(SHIM_INTERP, NOTNULL(PDB_breakpoint_t *breakpoint))
+PDB_delete_condition(SHIM_INTERP, ARGMOD(PDB_breakpoint_t *breakpoint))
 {
     if (breakpoint->condition->value) {
         if (breakpoint->condition->type & PDB_cond_str) {
@@ -1282,7 +1281,7 @@ Returns true if the condition was met.
 
 PARROT_WARN_UNUSED_RESULT
 char
-PDB_check_condition(PARROT_INTERP, NOTNULL(PDB_condition_t *condition))
+PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 {
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
@@ -1500,7 +1499,7 @@ Do inplace unescape of C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
 */
 
 int
-PDB_unescape(NOTNULL(char *string))
+PDB_unescape(ARGMOD(char *string))
 {
     int l = 0;
 
@@ -1555,8 +1554,9 @@ Disassembles C<op>.
 
 size_t
 PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
-                   NOTNULL(op_info_t *info), NOTNULL(opcode_t *op),
-                   NULLOK(PDB_file_t *file), NULLOK(opcode_t *code_start), int full_name)
+        ARGIN(const op_info_t *info), ARGIN(const opcode_t *op),
+        ARGMOD_NULLOK(PDB_file_t *file), ARGIN_NULLOK(const opcode_t *code_start),
+        int full_name)
 {
     int         j;
     int         size = 0;
@@ -1942,7 +1942,8 @@ Add a label to the label list.
 */
 
 long
-PDB_add_label(NOTNULL(PDB_file_t *file), NOTNULL(opcode_t *cur_opcode), opcode_t offset)
+PDB_add_label(ARGMOD(PDB_file_t *file), ARGIN(const opcode_t *cur_opcode),
+        opcode_t offset)
 {
     PDB_label_t *_new;
     PDB_label_t *label = file->label;
@@ -2766,7 +2767,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-GDB_B(PARROT_INTERP, NOTNULL(char *s)) {
+GDB_B(PARROT_INTERP, ARGIN(const char *s)) {
     int               nr;
     opcode_t         *pc;
     PDB_breakpoint_t *bp, *newbreak;

@@ -72,7 +72,7 @@ typedef struct PDB_condition {
 typedef struct PDB_label *PDB_label_ptr;
 
 typedef struct PDB_label {
-    opcode_t                *opcode;
+    const opcode_t         *opcode;
     long                    number;
     PDB_label_ptr           next;
 } PDB_label_t;
@@ -172,11 +172,12 @@ typedef struct PDB {
 /* HEADERIZER BEGIN: src/debug.c */
 
 long PDB_add_label(
-    NOTNULL(PDB_file_t *file),
-    NOTNULL(opcode_t *cur_opcode),
+    ARGMOD(PDB_file_t *file),
+    ARGIN(const opcode_t *cur_opcode),
     opcode_t offset)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*file);
 
 void PDB_backtrace(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -186,7 +187,8 @@ char PDB_break(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-char PDB_check_condition(PARROT_INTERP, NOTNULL(PDB_condition_t *condition))
+char PDB_check_condition(PARROT_INTERP,
+    ARGIN(const PDB_condition_t *condition))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -207,9 +209,9 @@ void PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_delete_condition(SHIM_INTERP,
-    NOTNULL(PDB_breakpoint_t *breakpoint))
-        __attribute__nonnull__(2);
+void PDB_delete_condition(SHIM_INTERP, ARGMOD(PDB_breakpoint_t *breakpoint))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*breakpoint);
 
 void PDB_disable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
@@ -221,10 +223,10 @@ void PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
 size_t PDB_disassemble_op(PARROT_INTERP,
     ARGOUT(char *dest),
     int space,
-    NOTNULL(op_info_t *info),
-    NOTNULL(opcode_t *op),
-    NULLOK(PDB_file_t *file),
-    NULLOK(opcode_t *code_start),
+    ARGIN(const op_info_t *info),
+    ARGIN(const opcode_t *op),
+    ARGMOD_NULLOK(PDB_file_t *file),
+    ARGIN_NULLOK(const opcode_t *code_start),
     int full_name)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -316,8 +318,9 @@ void PDB_skip_breakpoint(PARROT_INTERP, long i)
 void PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
-int PDB_unescape(NOTNULL(char *string))
-        __attribute__nonnull__(1);
+int PDB_unescape(ARGMOD(char *string))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*string);
 
 void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
