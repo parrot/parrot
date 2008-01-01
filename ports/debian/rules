@@ -52,6 +52,9 @@ install: build debian/libparrot$(SOVERSION).install
 	find $(CURDIR)/debian/tmp -type f
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 	install -m755 $(CURDIR)/debian/tmp/usr/bin/pdb $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
+	install -m644 src/null_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
+	install -m644 src/parrot_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
+
 
 # Build architecture-independent files here.
 binary-indep: build install
