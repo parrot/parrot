@@ -10,7 +10,7 @@ use Test::More tests =>  9;
 
 =head1 NAME
 
-t/configure/031-base.t - tests Parrot::Configure::Step::Base
+t/configure/031-base.t - tests Parrot::Configure::Step
 
 =head1 SYNOPSIS
 
@@ -18,16 +18,16 @@ t/configure/031-base.t - tests Parrot::Configure::Step::Base
 
 =head1 DESCRIPTION
 
-Regressions tests for the L<Parrote::Configure::Step::Base> abstract base
+Regressions tests for the L<Parrot::Configure::Step> abstract base
 class.
 
 =cut
 
-BEGIN { use_ok('Parrot::Configure::Step::Base'); }
+BEGIN { use_ok('Parrot::Configure::Step'); }
 
-package Test::Parrot::Configure::Step::Base;
+package Test::Parrot::Configure::Step;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 sub _init {
     my $self = shift;
@@ -40,7 +40,7 @@ sub _init {
 
 package main;
 
-my $testpkg = 'Test::Parrot::Configure::Step::Base';
+my $testpkg = 'Test::Parrot::Configure::Step';
 
 can_ok( $testpkg, qw(new description args result set_result) );
 isa_ok( $testpkg->new, $testpkg );

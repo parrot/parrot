@@ -15,7 +15,7 @@ use_ok('config::init::defaults');
 use Parrot::Configure;
 use Parrot::Configure::Step;
 use Parrot::Configure::Options qw( process_options );
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 # DEVELOPING non-existence is faked by working in a tempdir which lacks it
 

@@ -18,9 +18,9 @@ package inter::progs;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Step ':inter', ':auto';
+use Parrot::Configure::Utils ':inter', ':auto';
 
 
 sub _init {

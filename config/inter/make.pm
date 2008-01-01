@@ -16,9 +16,9 @@ package inter::make;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Step qw( :inter capture_output check_progs );
+use Parrot::Configure::Utils qw( :inter capture_output check_progs );
 
 sub _init {
     my $self = shift;

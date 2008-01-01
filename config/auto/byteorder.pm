@@ -17,7 +17,7 @@ use strict;
 use warnings;
 
 use Parrot::Configure::Step qw(:auto);
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 
 sub _init {

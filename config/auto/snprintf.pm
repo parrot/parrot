@@ -16,7 +16,7 @@ package auto::snprintf;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 sub _init {
     my $self = shift;

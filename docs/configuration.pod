@@ -92,7 +92,7 @@ F<config> prefix.  For example, the step F<config/init/defaults.pm> uses the
 C<init::defaults> namespace.
 
 Each step inherits its constructor and some other methods from
-F<lib/Parrot/Configure/Step/Base.pm>.  Each step needs to define only
+F<lib/Parrot/Configure/Step.pm>.  Each step needs to define only
 two methods:  C<_init()> and C<runstep()>.
 
 The C<_init()> method should follow the following example, defining three
@@ -170,7 +170,7 @@ Steps are run in the order in which that are registered with the
 L<Parrot::Configure> object.
 
 Various utility functions for configuration steps are provided by the
-L<Parrot::Configure::Step> module.
+L<Parrot::Configure::Utils> module.
 
 A template for a new step might look like this:
 
@@ -180,9 +180,9 @@ A template for a new step might look like this:
     use warnings;
     use vars qw($description $result @args);
 
-    use base qw(Parrot::Configure::Step::Base);
+    use base qw(Parrot::Configure::Step);
 
-    use Parrot::Configure::Step;
+    use Parrot::Configure::Utils;
 
     sub _init {
         my $self = shift;
@@ -319,7 +319,7 @@ mangled by Joshua Hoblitt.
 =head1 SEE ALSO
 
 L<Parrot::Configure>, L<Parrot::Configure::Data>,
-L<Parrot::Configure::Step>, L<Parrot::Configure::Step::Base>
+L<Parrot::Configure::Utils>, L<Parrot::Configure::Step>
 
 =cut
 

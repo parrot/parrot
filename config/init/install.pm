@@ -16,9 +16,7 @@ package init::install;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
-
-use Parrot::Configure::Step;
+use base qw(Parrot::Configure::Step);
 
 sub _init {
     my $self = shift;

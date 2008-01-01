@@ -17,9 +17,9 @@ use strict;
 use warnings;
 
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Step qw(copy_if_diff);
+use Parrot::Configure::Utils qw(copy_if_diff);
 
 sub _init {
     my $self = shift;

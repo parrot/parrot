@@ -23,7 +23,7 @@ use strict;
 use warnings;
 
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 use Parrot::Configure::Step qw(copy_if_diff);
 

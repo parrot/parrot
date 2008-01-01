@@ -16,7 +16,7 @@ package init::defaults;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 use Config;
 use FindBin;    # see build_dir

@@ -16,11 +16,11 @@ package gen::icu;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 use Cwd qw(cwd);
 use File::Basename;
-use Parrot::Configure::Step qw(capture_output);
+use Parrot::Configure::Utils qw(capture_output);
 
 
 sub _init {

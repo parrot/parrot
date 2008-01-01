@@ -16,11 +16,11 @@ package inter::encoding;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 use File::Basename qw/basename/;
 
-use Parrot::Configure::Step ':inter';
+use Parrot::Configure::Utils ':inter';
 
 
 sub _init {

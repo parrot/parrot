@@ -16,8 +16,8 @@ package auto::headers;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
-use Parrot::Configure::Step ':auto';
+use base qw(Parrot::Configure::Step);
+use Parrot::Configure::Utils ':auto';
 
 sub _init {
     my $self = shift;

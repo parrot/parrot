@@ -15,11 +15,10 @@ use lib qw( lib t/configure/testlib );
 use IO::CaptureOutput qw | capture |;
 use Tie::Filehandle::Preempt::Stdin;
 
-BEGIN { use_ok('Parrot::Configure::Step'); }
+BEGIN { use_ok('Parrot::Configure::Utils') }
 
-Parrot::Configure::Step->import(@Parrot::Configure::Step::EXPORT_OK);
-
-can_ok( __PACKAGE__, @Parrot::Configure::Step::EXPORT_OK );
+Parrot::Configure::Utils->import(@Parrot::Configure::Utils::EXPORT_OK);
+can_ok( __PACKAGE__, @Parrot::Configure::Utils::EXPORT_OK );
 
 # RT#44455 add verbose tests with some Test::Warn like mechanism
 
@@ -57,7 +56,7 @@ untie *STDIN;
 # file_checksum(), not exported
 
 $nonexistent = q{foobar};
-eval { my $sum = Parrot::Configure::Step::file_checksum($nonexistent); };
+eval { my $sum = Parrot::Configure::Utils::file_checksum($nonexistent); };
 like(
     $@, qr/Can't open $nonexistent/,    #'
     "Got expected error message when trying to get checksum on non-existent file"
@@ -67,7 +66,7 @@ like(
     my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
     print $tmpfile "foo" x 1000;
     $tmpfile->flush;
-    is( Parrot::Configure::Step::file_checksum($fname),
+    is( Parrot::Configure::Utils::file_checksum($fname),
         '324000', "file_checksum() returns correct checksum" );
 }
 
@@ -80,7 +79,7 @@ like(
     print $tmpfile "foo" x 500;
     $tmpfile->flush;
     my $ignore_pattern = qr/$str/;
-    my $csum = Parrot::Configure::Step::file_checksum( $fname, $ignore_pattern );
+    my $csum = Parrot::Configure::Utils::file_checksum( $fname, $ignore_pattern );
     is( $csum, '324010', "file_checksum() returns correct checksum" );
 }
 
@@ -93,7 +92,7 @@ like(
     $fromfile->flush;
 
     ok( copy_if_diff( $fromfname, $tofname ), "copy_if_diff() true return status" );
-    is( Parrot::Configure::Step::file_checksum($tofname),
+    is( Parrot::Configure::Utils::file_checksum($tofname),
         '324000', "copy_if_diff() copied differing files" );
 }
 
@@ -185,7 +184,7 @@ like(
 
     my $verbose = 1;
     my $stdout;
-    capture ( sub { is( check_progs( $prog, $verbose ), 
+    capture ( sub { is( check_progs( $prog, $verbose ),
                 $prog, "check_progs() returns the proper program" ) }, \$stdout );
     like( $stdout, qr/checking for program/, "Got expected verbose output" );
 }
@@ -194,7 +193,7 @@ like(
     my $verbose = 1;
     my $stdout;
     my $prog ;
-    capture ( sub { $prog = check_progs( 
+    capture ( sub { $prog = check_progs(
              [ 'gmake', 'mingw32-make', 'nmake', 'make' ], $verbose) }, \$stdout );
     ok( defined($prog), "check_progs() returned a 'make' program" );
     like( $stdout, qr/checking for program/s, "Got expected verbose output" );
@@ -208,14 +207,14 @@ like(
     my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
     print $tmpfile "foo" x 1000;
     $tmpfile->flush;
-    is( Parrot::Configure::Step::_slurp($fname), "foo" x 1000, "_slurp() slurped the file" );
+    is( Parrot::Configure::Utils::_slurp($fname), "foo" x 1000, "_slurp() slurped the file" );
 }
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-t/configure/033-step.t - tests Parrot::Configure::Step
+t/configure/033-step.t - tests Parrot::Configure::Utils
 
 =head1 SYNOPSIS
 
@@ -223,7 +222,7 @@ t/configure/033-step.t - tests Parrot::Configure::Step
 
 =head1 DESCRIPTION
 
-Regression tests for the L<Parrot::Configure::Step> module.
+Regression tests for the L<Parrot::Configure::Utils> module.
 
 =cut
 

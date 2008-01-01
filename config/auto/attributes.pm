@@ -17,9 +17,9 @@ package auto::attributes;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Step ();
+use Parrot::Configure::Utils ();
 use Parrot::BuildUtil;
 
 sub _init {
@@ -76,12 +76,12 @@ sub try_attr {
     my $ccflags  = $conf->data->get('ccflags');
     my $tryflags = "$ccflags -D$attr $disable_warnings";
 
-    my $command_line = Parrot::Configure::Step::_build_compile_command( $cc, $tryflags );
+    my $command_line = Parrot::Configure::Utils::_build_compile_command( $cc, $tryflags );
     $verbose and print "  ", $command_line, "\n";
 
     # Don't use cc_build, because failure is expected.
     my $exit_code =
-        Parrot::Configure::Step::_run_command( $command_line, $output_file, $output_file );
+        Parrot::Configure::Utils::_run_command( $command_line, $output_file, $output_file );
     $verbose and print "  exit code: $exit_code\n";
 
     $conf->data->set( $attr => !$exit_code | 0 );

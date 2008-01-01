@@ -27,10 +27,11 @@ use base qw( Exporter );
 use Carp;
 use File::Spec;
 use lib ("lib");
-use Parrot::Configure::Step qw(
+use Parrot::Configure::Utils qw(
     prompt copy_if_diff move_if_diff integrate
     capture_output check_progs _slurp
     _run_command _build_compile_command
+    move_if_diff
 );
 
 =item C<cc_gen()>

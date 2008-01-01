@@ -17,9 +17,9 @@ package inter::types;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Step ':inter';
+use Parrot::Configure::Utils ':inter';
 
 
 sub _init {

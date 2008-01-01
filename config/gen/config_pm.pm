@@ -18,7 +18,7 @@ package gen::config_pm;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
 use Cwd qw(cwd);
 use File::Spec::Functions qw(catdir);

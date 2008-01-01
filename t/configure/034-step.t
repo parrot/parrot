@@ -217,7 +217,7 @@ END_DUMMY
 
 =head1 NAME
 
-t/configure/034-step.t - tests Parrot::Configure::Step
+t/configure/034-step.t - tests Parrot::Configure::Compiler
 
 =head1 SYNOPSIS
 
@@ -225,8 +225,8 @@ t/configure/034-step.t - tests Parrot::Configure::Step
 
 =head1 DESCRIPTION
 
-Regression tests for the L<Parrot::Configure::Step> module.  This file holds
-tests for Parrot::Configure::Step::genfile().
+Regression tests for the L<Parrot::Configure::Compiler> module.  This file holds
+tests for Parrot::Configure::Compiler::genfile().
 
 Thanks to http://start.it.uts.edu.au/w/doc/solaris/gmake/make_8.html for
 instruction in using F<gmake> functions.

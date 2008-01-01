@@ -684,7 +684,7 @@ Joshua Hoblitt C<jhoblitt@cpan.org>
 =head1 SEE ALSO
 
 F<docs/configuration.pod>, L<Parrot::Configure>, L<Parrot::Configure::Step>,
-L<Parrot::Configure::Step::Base>
+L<Parrot::Configure::Step>
 
 =cut
 

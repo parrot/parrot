@@ -45,9 +45,9 @@ package auto::gc;
 use strict;
 use warnings;
 
-use base qw(Parrot::Configure::Step::Base);
+use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Step ':auto';
+use Parrot::Configure::Utils ':auto';
 
 
 # valid libc/malloc/malloc-trace/gc
