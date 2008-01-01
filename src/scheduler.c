@@ -624,7 +624,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     Parrot_cond condition;
     Parrot_mutex lock;
     FLOATVAL timer_end = time + Parrot_floatval_time();
-    struct timespec *time_struct;
+    struct timespec time_struct;
 
     /* Tell the scheduler runloop to wake, this is a good time to process
      * pending tasks. */
@@ -634,9 +634,9 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     COND_INIT(condition);
     MUTEX_INIT(lock);
     LOCK(lock);
-    time_struct->tv_sec = (time_t) timer_end;
-    time_struct->tv_nsec = (long)((timer_end - time_struct->tv_sec)*1000.0f) *1000L*1000L;
-    COND_TIMED_WAIT(condition, lock, time_struct);
+    time_struct.tv_sec = (time_t) timer_end;
+    time_struct.tv_nsec = (long)((timer_end - time_struct.tv_sec)*1000.0f) *1000L*1000L;
+    COND_TIMED_WAIT(condition, lock, &time_struct);
     UNLOCK(lock);
     COND_DESTROY(condition);
     MUTEX_DESTROY(lock);
