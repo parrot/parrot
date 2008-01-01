@@ -298,6 +298,76 @@
         val_x.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
         "))
 
+; implementation of char<
+(define-primitive (char< uid arg1 arg2)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "uniq_reg_1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "uniq_reg_2_~a = val_x" uid)
+  (emit "
+        $P4 = new 'PAST::Op'
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:<' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
+        " uid uid))
+
+; implementation of char<=
+(define-primitive (char<= uid arg1 arg2)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "uniq_reg_1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "uniq_reg_2_~a = val_x" uid)
+  (emit "
+        $P4 = new 'PAST::Op'
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:<=' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
+        " uid uid))
+
+; implementation of char=
+(define-primitive (char= uid arg1 arg2)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "uniq_reg_1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "uniq_reg_2_~a = val_x" uid)
+  (emit "
+        $P4 = new 'PAST::Op'
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
+        " uid uid))
+
+; implementation of char>
+(define-primitive (char> uid arg1 arg2)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "uniq_reg_1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "uniq_reg_2_~a = val_x" uid)
+  (emit "
+        $P4 = new 'PAST::Op'
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
+        " uid uid))
+
+; implementation of char>=
+(define-primitive (char>= uid arg1 arg2)
+  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
+  (emit-expr arg1)
+  (emit "uniq_reg_1_~a = val_x" uid)
+  (emit-expr arg2)
+  (emit "uniq_reg_2_~a = val_x" uid)
+  (emit "
+        $P4 = new 'PAST::Op'
+        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>=' ) 
+        val_x = new 'PAST::Op'
+        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
+        " uid uid))
+
 ; implementation of fxzero?
 (define-primitive (fxzero? uid arg)
   (emit-expr arg)
@@ -313,20 +383,6 @@
 
 ; implementation of fx=
 (define-primitive (fx= uid arg1 arg2)
-  (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
-  (emit-expr arg1)
-  (emit "uniq_reg_1_~a = val_x" uid)
-  (emit-expr arg2)
-  (emit "uniq_reg_2_~a = val_x" uid)
-  (emit "
-        $P4 = new 'PAST::Op'
-        $P4.init( uniq_reg_1_~a, uniq_reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
-        val_x = new 'PAST::Op'
-        val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
-
-; implementation of char=
-(define-primitive (char= uid arg1 arg2)
   (emit "    .local pmc uniq_reg_1_~a, uniq_reg_2_~a " uid uid)
   (emit-expr arg1)
   (emit "uniq_reg_1_~a = val_x" uid)

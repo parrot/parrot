@@ -23,7 +23,6 @@ the is no 'petite 7.3' around.
 
 =head1 TODO
 
-- binary primitives: char<, char<=
 - local variables
 - allow running the tests with 'petite' itself
 - allow test-description per test case
