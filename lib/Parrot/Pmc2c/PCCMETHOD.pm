@@ -381,6 +381,7 @@ sub rewrite_pccmethod {
     PMC *ccont                   = PMCNULL;
 
 $set_params
+    UNUSED(return_indexes);
 
     if (caller_ctx) {
         ccont = caller_ctx->current_cont;
