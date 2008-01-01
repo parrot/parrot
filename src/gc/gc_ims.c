@@ -343,7 +343,7 @@ a sleep opcode.
 static int collect_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     int flag,
-    ARGIN(const void *arg))
+    ARGIN(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
@@ -399,7 +399,7 @@ static void parrot_gc_ims_sweep(PARROT_INTERP)
 static int sweep_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     int flag,
-    ARGIN(const void *arg))
+    ARGIN(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
@@ -719,7 +719,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(const void *arg))
+sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
     int * const n_obj = (int *) arg;
 
@@ -789,7 +789,7 @@ RT#48260: Not yet documented!!!
 
 #if !defined(GC_IS_MALLOC) || !GC_IS_MALLOC
 static int
-collect_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(const void *arg))
+collect_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
     const int check_only = (int)(INTVAL)arg;
     Memory_Pool * const mem_pool = pool->mem_pool;
