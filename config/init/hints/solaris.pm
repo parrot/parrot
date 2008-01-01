@@ -34,7 +34,7 @@ sub runstep {
         # Can't call cc_build since we haven't set all the flags yet.
         # This should suffice for this test.
         my $cc_inc = $conf->data->get('cc_inc');
-        Parrot::Configure::Step::_run_command( "$cc -o test test.c $cc_inc",
+        Parrot::Configure::Utils::_run_command( "$cc -o test test.c $cc_inc",
             'test.cco', 'test.cco' )
             and confess "C compiler failed (see test.cco)";
         %gnuc = eval $conf->cc_run() or die "Can't run the test program: $!";

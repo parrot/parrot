@@ -26,7 +26,7 @@ sub build_asm {
         $conf->data->get(qw(cc ccflags ld_out o link linkflags cc_exe_out exe libs));
 
     $successp =
-        Parrot::Configure::Step::_run_command( "$cc -c $ccflags -I./include -o sparcasm$o $file",
+        Parrot::Configure::Utils::_run_command( "$cc -c $ccflags -I./include -o sparcasm$o $file",
         'test.cco', 'test.cco', $conf->options->get('verbose') );
 
     return $successp;
