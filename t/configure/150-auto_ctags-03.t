@@ -52,7 +52,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-t/configure/150-auto_ctags-03.t - tests Parrot::Configure::Step::auto::ctags
+t/configure/150-auto_ctags-03.t - tests Parrot::Configure step auto::ctags
 
 =head1 SYNOPSIS
 
@@ -60,9 +60,7 @@ t/configure/150-auto_ctags-03.t - tests Parrot::Configure::Step::auto::ctags
 
 =head1 DESCRIPTION
 
-Regression tests for the L<Parrot::Configure::Step::auto::ctags> module.
-This file holds tests for Parrot::Configure::Step::auto::ctags::runstep()
-(a non-exported subroutine).
+Regression tests for the L<Parrot::Configure step auto::ctags> module.
 
 =head1 AUTHOR
 
