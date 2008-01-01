@@ -672,10 +672,10 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *p))
+Parrot_dod_free_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        ARGMOD(PObj *p))
 {
-    PMC           *pmc        = (PMC *)p;
+    PMC    * const pmc        = (PMC *)p;
     Arenas * const arena_base = interp->arena_base;
 
     /* TODO collect objects with finalizers */
@@ -709,7 +709,7 @@ Frees the PMC_EXT structure attached to a PMC, if it exists.
 */
 
 void
-Parrot_free_pmc_ext(PARROT_INTERP, NOTNULL(PMC *p))
+Parrot_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
 {
     /* if the PMC has a PMC_EXT structure, return it to the pool/arena */
     Arenas            * const arena_base = interp->arena_base;
@@ -738,8 +738,8 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_sysmem(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *b))
+Parrot_dod_free_sysmem(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        ARGMOD(PObj *b))
 {
     /* has sysmem allocated, e.g. string_pin */
     if (PObj_sysmem_TEST(b) && PObj_bufstart(b))
@@ -760,8 +760,8 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *b))
+Parrot_dod_free_buffer_malloc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool),
+        ARGMOD(PObj *b))
 {
 
     /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
@@ -772,11 +772,10 @@ Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
         return;
 
     if (PObj_COW_TEST(b)) {
-        INTVAL *refcount = PObj_bufrefcountptr(b);
+        INTVAL * const refcount = PObj_bufrefcountptr(b);
 
-        if (!--(*refcount)) {
+        if (--(*refcount) == 0) {
             free(refcount); /* the actual bufstart */
-            refcount = NULL;
         }
     }
     else
@@ -794,10 +793,10 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *b))
+Parrot_dod_free_buffer(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        ARGMOD(PObj *b))
 {
-    Memory_Pool *mem_pool = (Memory_Pool *)pool->mem_pool;
+    Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
 
     /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
      * shouldn't happen */

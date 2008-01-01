@@ -124,12 +124,12 @@ typedef struct Gc_gms_private {
 /* HEADERIZER BEGIN: static */
 
 static int end_cycle_cb(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    SHIM(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        FUNC_MODIFIES(*pool);
 
 static void gc_gms_add_free_object(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
@@ -194,12 +194,12 @@ static void gc_gms_init_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void gc_gms_merge_gen(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(Gc_gms_plan *plan))
+    SHIM(Gc_gms_plan *plan))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        FUNC_MODIFIES(*pool);
 
 static void gc_gms_more_objects(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool))
@@ -253,12 +253,13 @@ static int gc_gms_trace_root(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
 
 static void gc_gms_use_gen(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(Gc_gms_plan *plan))
+    ARGIN(const Gc_gms_plan *plan))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pool);
 
 static void gms_debug_verify(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
@@ -283,9 +284,9 @@ static void parrot_gc_gms_run(PARROT_INTERP, int flags)
 
 PARROT_WARN_UNUSED_RESULT
 static int set_gen_cb(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGIN(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    ARGIN(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
@@ -1008,8 +1009,8 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_gms_merge_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-        int flag, NOTNULL(Gc_gms_plan *plan))
+gc_gms_merge_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        int flag, SHIM(Gc_gms_plan *plan))
 {
     Gc_gms_hdr *h;
 
@@ -1042,8 +1043,8 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_gms_use_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-        int flag, NOTNULL(Gc_gms_plan *plan))
+gc_gms_use_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        int flag, ARGIN(const Gc_gms_plan *plan))
 {
     Gc_gms_gen *gen, *prev;
     UINTVAL next_gen;
@@ -1079,7 +1080,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-set_gen_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+set_gen_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
     Gc_gms_plan * const plan = (Gc_gms_plan *)arg;
 
@@ -1662,7 +1663,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-end_cycle_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+end_cycle_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
     Gc_gms_hdr *h;
     /*

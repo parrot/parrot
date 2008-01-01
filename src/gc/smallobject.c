@@ -33,19 +33,22 @@ static void gc_ms_add_free_object(SHIM_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+    ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PObj * gc_ms_get_free_object(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+    ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
-static void gc_ms_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
-        __attribute__nonnull__(2);
+static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 static void more_traceable_objects(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool))
@@ -107,7 +110,7 @@ Returns whether C<*pmc> is a constant PMC.
 */
 
 int
-Parrot_is_const_pmc(PARROT_INTERP, NOTNULL(PMC *pmc))
+Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
     Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
     const               int   c    = contained_in_pool(pool, pmc);
@@ -182,7 +185,7 @@ Get a new object from the free pool and return it.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PObj *
-gc_ms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     PObj *ptr;
     PObj *free_list = (PObj *)pool->free_list;
@@ -215,8 +218,8 @@ Adds the objects in the newly allocated C<arena> to the free list.
 
 void
 Parrot_add_to_free_list(PARROT_INTERP,
-        NOTNULL(Small_Object_Pool  *pool),
-        NOTNULL(Small_Object_Arena *arena))
+        ARGMOD(Small_Object_Pool  *pool),
+        ARGMOD(Small_Object_Arena *arena))
 {
     UINTVAL  i;
     PObj    *object;
@@ -253,8 +256,8 @@ insert the new arena into the pool's structure, update stats
 */
 void
 Parrot_append_arena_in_pool(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(Small_Object_Arena *new_arena), size_t size)
+    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Arena *new_arena), size_t size)
 {
 
     /* Maintain the *_arena_memory invariant for stack walking code. Set it
@@ -290,7 +293,7 @@ and put them on.
 */
 
 static void
-gc_ms_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     size_t  size;
 
@@ -369,7 +372,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-gc_pmc_ext_pool_init(NOTNULL(Small_Object_Pool *pool))
+gc_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
 {
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
@@ -388,7 +391,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_ms_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
@@ -431,7 +434,7 @@ Merge C<source> into C<dest>.
 
 void
 Parrot_small_object_pool_merge(PARROT_INTERP,
-        NOTNULL(Small_Object_Pool *dest), NOTNULL(Small_Object_Pool *source))
+        ARGMOD(Small_Object_Pool *dest), ARGMOD(Small_Object_Pool *source))
 {
     Small_Object_Arena  *cur_arena;
     void               **free_list_end;

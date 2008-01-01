@@ -30,15 +30,17 @@ to the previous values and the allocated register memory is discarded.
 
 /* HEADERIZER BEGIN: static */
 
-static void clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
+static void clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ctx);
 
 static void init_context(PARROT_INTERP,
-    NOTNULL(parrot_context_t *ctx),
+    ARGMOD(parrot_context_t *ctx),
     ARGIN_NULLOK(const parrot_context_t *old))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ctx);
 
 /* HEADERIZER END: static */
 
@@ -236,7 +238,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
+clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
 {
     int i;
 
@@ -285,7 +287,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
+init_context(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
         ARGIN_NULLOK(const parrot_context_t *old))
 {
     ctx->ref_count = 0;                 /* RT#46191 1 - Exceptions !!! */
@@ -375,7 +377,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 struct Parrot_Context *
-Parrot_push_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))
+Parrot_push_context(PARROT_INTERP, ARGMOD(INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp->ctx);
     Parrot_Context * const ctx = Parrot_alloc_context(interp, n_regs_used);
@@ -430,7 +432,7 @@ register usage C<n_regs_used> is copied.  The function returns the new context.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 struct Parrot_Context *
-Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
+Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
 {
     Parrot_Context *old, *ctx;
     void *ptr, *p;
@@ -535,7 +537,7 @@ return continuation invoke, else from the destructor of a continuation.
 
 PARROT_API
 void
-Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_use)
+Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_use)
 {
     /*
      * The context structure has a reference count, initially 0.  This field is
@@ -595,10 +597,8 @@ Mark the context as possible threshold.
 
 PARROT_API
 void
-Parrot_set_context_threshold(PARROT_INTERP, NULLOK(struct Parrot_Context *ctxp))
+Parrot_set_context_threshold(SHIM_INTERP, SHIM(struct Parrot_Context *ctxp))
 {
-    UNUSED(interp);
-    UNUSED(ctxp);
     /* nothing to do */
 }
 
@@ -726,7 +726,7 @@ Marks the register stack and its registers as live.
 */
 
 void
-mark_register_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk))
+mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t* chunk))
 {
     for (; ; chunk = chunk->prev) {
         int i;

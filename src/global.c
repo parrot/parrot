@@ -24,23 +24,24 @@ src/global.c - Access to global PMCs
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC * get_namespace_pmc(PARROT_INTERP, NOTNULL(PMC *sub))
+static PMC * get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * internal_ns_keyed(PARROT_INTERP,
-    NOTNULL(PMC *base_ns),
-    NULLOK(PMC *pmc_key),
-    NULLOK(STRING *str_key),
+    ARGIN(PMC *base_ns),
+    ARGIN(PMC *pmc_key),
+    ARGIN_NULLOK(STRING *str_key),
     int flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void store_sub_in_multi(PARROT_INTERP,
-    NOTNULL(PMC *sub),
-    NOTNULL(PMC *ns))
+    ARGIN(PMC *sub),
+    ARGIN(PMC *ns))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -67,8 +68,8 @@ Key pmcs, and array PMCs containing strings.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-internal_ns_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key),
-                               NULLOK(STRING *str_key), int flags)
+internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key),
+                               ARGIN_NULLOK(STRING *str_key), int flags)
 {
     PMC *ns, *sub_ns;
     INTVAL i, n;
@@ -149,7 +150,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key))
+Parrot_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN_NULLOK(PMC *pmc_key))
 {
     return internal_ns_keyed(interp, base_ns, pmc_key, NULL, 0);
 }
@@ -169,7 +170,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_keyed_str(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(STRING *str_key))
+Parrot_get_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
+        ARGIN_NULLOK(STRING *str_key))
 {
     return internal_ns_keyed(interp, base_ns, PMCNULL, str_key, 0);
 }
@@ -190,7 +192,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key))
+Parrot_make_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns),
+        ARGIN_NULLOK(PMC *pmc_key))
 {
     return internal_ns_keyed(interp, base_ns, pmc_key, NULL, INTERN_NS_CREAT);
 }
@@ -211,7 +214,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_keyed_str(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(STRING *str_key))
+Parrot_make_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
+        ARGIN_NULLOK(STRING *str_key))
 {
     return internal_ns_keyed(interp, base_ns, NULL, str_key, INTERN_NS_CREAT);
 }
@@ -234,7 +238,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_autobase(PARROT_INTERP, NULLOK(PMC *key))
+Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
@@ -262,7 +266,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_autobase(PARROT_INTERP, NULLOK(PMC *key))
+Parrot_get_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
@@ -310,7 +314,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_global(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname))
+Parrot_get_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
 {
     if (PMC_IS_NULL(ns))
         return PMCNULL;
@@ -330,7 +334,8 @@ Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
 PARROT_API
 void
-Parrot_set_global(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname), NULLOK(PMC *val))
+Parrot_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
+        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
     VTABLE_set_pmc_keyed_str(interp, ns, globalname, val);
 }
@@ -354,7 +359,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), NULLOK(STRING *globalname))
+Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
 {
     PMC *res;
 
@@ -446,7 +451,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key), ARGIN_NULLOK(STRING *globalname))
+Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
+        ARGIN_NULLOK(STRING *globalname))
 {
     PMC *const ns =
         Parrot_get_namespace_keyed_str(interp,
@@ -467,8 +473,8 @@ Store the PMC C<val> into the namespace PMC C<ns> with name C<globalname>.
 
 PARROT_API
 void
-Parrot_store_global_n(PARROT_INTERP, NULLOK(PMC *ns),
-                      NULLOK(STRING *globalname), NULLOK(PMC *val))
+Parrot_store_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
+        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
 #if DEBUG_GLOBAL
     if (globalname)
@@ -493,7 +499,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-Parrot_store_global_cur(PARROT_INTERP, NULLOK(STRING *globalname), NULLOK(PMC *val))
+Parrot_store_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname),
+        ARGIN_NULLOK(PMC *val))
 {
     Parrot_store_global_n(interp,
                           CONTEXT(interp->ctx)->current_namespace,
@@ -520,7 +527,7 @@ entirely use the untyped interface.
 PARROT_API
 void
 Parrot_store_global_k(PARROT_INTERP, ARGIN(PMC *pmc_key),
-                      NULLOK(STRING *globalname), NULLOK(PMC *val))
+        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
     PMC *ns;
 
@@ -557,8 +564,8 @@ the HLL root if C<str_key> is NULL, with the name C<globalname>.
 
 PARROT_API
 void
-Parrot_store_global_s(PARROT_INTERP, NULLOK(STRING *str_key),
-                      NULLOK(STRING *globalname), NULLOK(PMC *val))
+Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
+        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
     PMC * const ns = Parrot_make_namespace_keyed_str(interp,
                                          Parrot_get_ctx_HLL_namespace(interp),
@@ -587,7 +594,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
-        ARGIN(STRING *globalname), NULLOK(void *next))
+        ARGIN(STRING *globalname), ARGIN_NULLOK(void *next))
 {
     PMC *res;
 
@@ -664,7 +671,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-get_namespace_pmc(PARROT_INTERP, NOTNULL(PMC *sub))
+get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub))
 {
     PMC * const nsname = PMC_sub(sub)->namespace_name;
     PMC * const nsroot = Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
@@ -691,11 +698,11 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-store_sub_in_multi(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *ns))
+store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *ns))
 {
     INTVAL func_nr;
     char *c_meth;
-    STRING *subname = PMC_sub(sub)->name;
+    STRING * const subname = PMC_sub(sub)->name;
     PMC   *multisub = VTABLE_get_pmc_keyed_str(interp, ns, subname);
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
@@ -728,7 +735,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-Parrot_store_sub_in_namespace(PARROT_INTERP, NOTNULL(PMC *sub))
+Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
 {
     const INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
 

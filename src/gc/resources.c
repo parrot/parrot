@@ -51,10 +51,12 @@ static size_t aligned_string_size(size_t len);
 
 static void alloc_new_block(PARROT_INTERP,
     size_t size,
-    ARGINOUT(Memory_Pool *pool),
+    ARGMOD(Memory_Pool *pool),
     ARGIN(const char *why))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -62,8 +64,10 @@ static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void compact_pool(PARROT_INTERP, ARGINOUT(Memory_Pool *pool))
-        __attribute__nonnull__(1);
+static void compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 static void debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
@@ -73,12 +77,18 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void * mem_allocate(PARROT_INTERP,
     size_t size,
-    ARGINOUT(Memory_Pool *pool))
-        __attribute__nonnull__(1);
+    ARGMOD(Memory_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
 
 static void merge_pools(
-    ARGINOUT(Memory_Pool *dest),
-    ARGINOUT(Memory_Pool *source));
+    ARGMOD(Memory_Pool *dest),
+    ARGMOD(Memory_Pool *source))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest)
+        FUNC_MODIFIES(*source);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -101,7 +111,7 @@ the default size.  The given text is used for debugging.
 */
 
 static void
-alloc_new_block(PARROT_INTERP, size_t size, ARGINOUT(Memory_Pool *pool),
+alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
         ARGIN(const char *why))
 {
     Memory_Block *new_block;
@@ -186,7 +196,7 @@ Buffer memory layout:
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void *
-mem_allocate(PARROT_INTERP, size_t size, ARGINOUT(Memory_Pool *pool))
+mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
 {
     void *return_val;
 
@@ -311,7 +321,7 @@ Compact the buffer pool.
 */
 
 static void
-compact_pool(PARROT_INTERP, ARGINOUT(Memory_Pool *pool))
+compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 {
     INTVAL        j;
     UINTVAL       object_size;
@@ -666,7 +676,7 @@ memory is not cleared.
 */
 
 void
-Parrot_reallocate(PARROT_INTERP, ARGINOUT(Buffer *buffer), size_t tosize)
+Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t tosize)
 {
     size_t copysize;
     char  *mem;
@@ -978,7 +988,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-merge_pools(ARGINOUT(Memory_Pool *dest), ARGINOUT(Memory_Pool *source))
+merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 {
     Memory_Block *cur_block;
 

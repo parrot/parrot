@@ -80,10 +80,11 @@ void Parrot_clear_s(PARROT_INTERP)
 
 PARROT_API
 void Parrot_free_context(PARROT_INTERP,
-    NOTNULL(struct Parrot_Context *ctxp),
+    ARGMOD(struct Parrot_Context *ctxp),
     int re_use)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ctxp);
 
 PARROT_API
 void parrot_gc_context(PARROT_INTERP)
@@ -101,18 +102,18 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 struct Parrot_Context * Parrot_push_context(PARROT_INTERP,
-    NOTNULL(INTVAL *n_regs_used))
+    ARGMOD(INTVAL *n_regs_used))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*n_regs_used);
 
 PARROT_API
 void Parrot_push_regs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_set_context_threshold(PARROT_INTERP,
-    NULLOK(struct Parrot_Context *ctxp))
-        __attribute__nonnull__(1);
+void Parrot_set_context_threshold(SHIM_INTERP,
+    SHIM(struct Parrot_Context *ctxp));
 
 void create_initial_context(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -120,16 +121,18 @@ void create_initial_context(PARROT_INTERP)
 void destroy_context(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void mark_register_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk))
+void mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t* chunk))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*chunk);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 struct Parrot_Context * Parrot_alloc_context(PARROT_INTERP,
-    NOTNULL(INTVAL *number_regs_used))
+    ARGMOD(INTVAL *number_regs_used))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*number_regs_used);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

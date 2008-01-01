@@ -72,10 +72,10 @@ void Parrot_merge_memory_pools(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_reallocate(PARROT_INTERP,
-    ARGINOUT(Buffer *buffer),
-    size_t tosize)
-        __attribute__nonnull__(1);
+void Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t tosize)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*buffer);
 
 void Parrot_reallocate_string(PARROT_INTERP,
     ARGMOD(STRING *str),

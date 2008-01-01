@@ -143,8 +143,9 @@ INTVAL contained_in_pool(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void gc_pmc_ext_pool_init(NOTNULL(Small_Object_Pool *pool))
-        __attribute__nonnull__(1);
+void gc_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pool);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -153,33 +154,39 @@ Small_Object_Pool * new_small_object_pool(
     size_t objects_per_alloc);
 
 void Parrot_add_to_free_list(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(Small_Object_Arena *arena))
+    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Arena *arena))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*arena);
 
 void Parrot_append_arena_in_pool(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(Small_Object_Arena *new_arena),
+    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Arena *new_arena),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*new_arena);
 
 void Parrot_gc_ms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-int Parrot_is_const_pmc(PARROT_INTERP, NOTNULL(PMC *pmc))
+int Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void Parrot_small_object_pool_merge(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *dest),
-    NOTNULL(Small_Object_Pool *source))
+    ARGMOD(Small_Object_Pool *dest),
+    ARGMOD(Small_Object_Pool *source))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest)
+        FUNC_MODIFIES(*source);
 
 /* HEADERIZER END: src/gc/smallobject.c */
 
