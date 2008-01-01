@@ -615,12 +615,6 @@ opcode_t *
 Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *next))
 {
 #if PARROT_HAS_THREADS
-#  ifdef _WIN32
-    /* until we have a better implementation of threads on windows,
-     * we'll use the non-threaded form of sleep */
-    Parrot_cx_runloop_wake(interp, interp->scheduler);
-    Parrot_sleep((UINTVAL) ceil(time));
-#  else
     Parrot_cond condition;
     Parrot_mutex lock;
     FLOATVAL timer_end = time + Parrot_floatval_time();
@@ -640,7 +634,6 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     UNLOCK(lock);
     COND_DESTROY(condition);
     MUTEX_DESTROY(lock);
-#  endif
 #else
     /* A more primitive, platform-specific, non-threaded form of sleep. */
     Parrot_sleep((UINTVAL) ceil(time));

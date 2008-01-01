@@ -61,11 +61,11 @@ typedef HANDLE Parrot_thread;
        now = Parrot_floatval_time(); \
        sec = (time_t)now; \
        nsec = (LONG)((now - sec)*1000.0f)*1000000L; \
-       if (t->tv_sec > sec || (t->tv_sec == sec && t->tv_nsec > nsec)) \
+       if ((t)->tv_sec > sec || ((t)->tv_sec == sec && (t)->tv_nsec > nsec)) \
        { \
          ++(c).m_lWaiters; \
          UNLOCK(m); \
-         diff = (DWORD)((t->tv_sec - sec)*1000L + (t->tv_nsec - nsec)/1000000L); \
+         diff = (DWORD)(((t)->tv_sec - sec)*1000L + ((t)->tv_nsec - nsec)/1000000L); \
          WaitForSingleObject((c).m_hSema, diff); \
          LOCK(m); \
          --(c).m_lWaiters; \
