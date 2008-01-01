@@ -32,12 +32,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * internal_ns_keyed(PARROT_INTERP,
     ARGIN(PMC *base_ns),
-    ARGIN(PMC *pmc_key),
+    ARGIN_NULLOK(PMC *pmc_key),
     ARGIN_NULLOK(STRING *str_key),
     int flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void store_sub_in_multi(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -68,8 +67,8 @@ Key pmcs, and array PMCs containing strings.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key),
-                               ARGIN_NULLOK(STRING *str_key), int flags)
+internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN_NULLOK(PMC *pmc_key),
+        ARGIN_NULLOK(STRING *str_key), int flags)
 {
     PMC *ns, *sub_ns;
     INTVAL i, n;
@@ -634,28 +633,30 @@ Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
     PMC * const lex_pad = Parrot_find_pad(interp, name, ctx);
     PMC *g;
 
-    if (!PMC_IS_NULL(lex_pad))
-        g = VTABLE_get_pmc_keyed_str(interp, lex_pad, name);
-    else
+    if (PMC_IS_NULL(lex_pad))
         g = PMCNULL;
+    else
+        g = VTABLE_get_pmc_keyed_str(interp, lex_pad, name);
 
     /* RT#46171 - walk up the scopes!  duh!! */
 
-    if (PMC_IS_NULL(g))
+    if (PMC_IS_NULL(g)) {
         g = Parrot_find_global_cur(interp, name);
 
-    if (PMC_IS_NULL(g))
-        g = Parrot_find_global_n(interp,
-                                 Parrot_get_ctx_HLL_namespace(interp),
-                                 name);
+        if (PMC_IS_NULL(g)) {
+            g = Parrot_find_global_n(interp,
+                    Parrot_get_ctx_HLL_namespace(interp), name);
+
+            if (PMC_IS_NULL(g)) {
+                g = Parrot_find_builtin(interp, name);
+            }
+        }
+    }
 
     if (PMC_IS_NULL(g))
-        g = Parrot_find_builtin(interp, name);
-
-    if (! PMC_IS_NULL(g))
-        return g;
-    else
         return PMCNULL;
+    else
+        return g;
 }
 
 /*
