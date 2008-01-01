@@ -9,6 +9,7 @@ use warnings;
 (my $compile  = shift) =~ s/\\\n/ /gm;
 
 $compile = `$^X tools/dev/cc_flags.pl --return-only $compile`;
+$compile =~ s/\s-I\.\S+//g;
 my $template = do { local $/; <DATA> };
 
 printf( $template, $compile );
