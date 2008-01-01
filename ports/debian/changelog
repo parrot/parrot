@@ -2,16 +2,26 @@ parrot (0.5.1-1) unstable; urgency=low
 
   * New upstream release (Closes: #444707).
   * debian/control.in:
-    - Maintainer: Allison Randal <allison@perl.org>
+    - Maintainer: Parrot Debian Maintainers
+      <pkg-parrot-devel@lists.alioth.debian.org>
       (Closes: #444708)
-    - Uploaders: Nuno Carvalho <mestre.smash@gmail.com>,
+    - Uploaders: Allison Randal <allison@perl.org>,
+      Nuno Carvalho <mestre.smash@gmail.com>,
       Patrick Michaud <pmichaud@pobox.com>
     - Updated long and short package descriptions.
+    - Build-Depends updated to libicu-dev from libicu36-dev
+      (Closes: #456835).
+    - Depends for libparrot-dev updated to libicu-dev from
+      libicu34-dev (Closes: #431289).
   * debian/copyright:
     - Updated license information: Artistic License 2.0.
     - Updated license link.
     - Updated copyright years.
     - Removed copyright info for files no longer in distribution
+  * debian/parrot.docs
+    - Updated for deleted file docs/BROKEN.pod.
+  * debian/rules
+    - Updated to skip *_config.o files.
 
  -- Allison Randal <allison@perl.org>  Sun, 30 Dec 2007 17:21:45 +0000
 
