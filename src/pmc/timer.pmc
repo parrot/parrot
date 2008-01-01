@@ -86,7 +86,7 @@ Initializes the timer.
         core_struct->status      = CONST_STRING(interp, "created");
         core_struct->birthtime   = 0.0;
         core_struct->codeblock   = PMCNULL;
-        core_struct->interp      = PMCNULL;
+        core_struct->interp      = INTERP;
         core_struct->duration    = 0.0;
         core_struct->interval    = 0.0;
         core_struct->repeat      = 0;
