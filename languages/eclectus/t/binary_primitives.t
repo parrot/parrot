@@ -119,6 +119,22 @@
   [(fx> -123456789 (fxadd1 -123456790 ))         => "#f\n" ]
   [(fx> -123456789 (fxadd -123456791 2 ))        => "#f\n" ]
 
+  [(char= #\A #\A)                               => "#t\n" ]
+  [(char= #\A #\B)                               => "#f\n" ]
+  [(char= #\A #\a)                               => "#f\n" ]
+  [(char= #\A #\b)                               => "#f\n" ]
+  [(char= #\B #\A)                               => "#f\n" ]
+  [(char= #\B #\B)                               => "#t\n" ]
+  [(char= #\B #\a)                               => "#f\n" ]
+  [(char= #\B #\b)                               => "#f\n" ]
+  [(char= #\a #\A)                               => "#f\n" ]
+  [(char= #\a #\B)                               => "#f\n" ]
+  [(char= #\a #\a)                               => "#t\n" ]
+  [(char= #\a #\b)                               => "#f\n" ]
+  [(char= #\b #\A)                               => "#f\n" ]
+  [(char= #\b #\B)                               => "#f\n" ]
+  [(char= #\b #\a)                               => "#f\n" ]
+  [(char= #\b #\b)                               => "#t\n" ]
 )
 
 (test-all)
