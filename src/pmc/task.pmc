@@ -406,11 +406,6 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
         pos            = &core_struct->codeblock;
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
-
-        /* 2) visit the interpreter structure  */
-        pos            = &core_struct->interp;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
     }
 
 /*
