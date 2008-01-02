@@ -318,8 +318,8 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 char *
-Parrot_PMC_get_cstringn(PARROT_INTERP,
-        Parrot_PMC pmc, NOTNULL(Parrot_Int *length))
+Parrot_PMC_get_cstringn(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
+        ARGOUT(Parrot_Int *length))
 {
     char *retval;
 
@@ -350,8 +350,8 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 char *
-Parrot_PMC_get_cstringn_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, NOTNULL(Parrot_Int *length), Parrot_Int key)
+Parrot_PMC_get_cstringn_intkey(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
+        ARGOUT(Parrot_Int *length), Parrot_Int key)
 {
     char *retval;
 
@@ -457,7 +457,7 @@ Assign the passed-in pointer to the passed-in PMC.
 PARROT_API
 void
 Parrot_PMC_set_pointer_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, NULLOK(void *value))
+        ARGIN(Parrot_PMC pmc), Parrot_Int key, ARGIN_NULLOK(void *value))
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_pointer_keyed_int(interp, pmc, key, value);
@@ -755,7 +755,7 @@ Deallocate a C string that the interpreter has handed to you.
 
 PARROT_API
 void
-Parrot_free_cstring(NULLOK(char *string))
+Parrot_free_cstring(ARGIN_NULLOK(char *string))
 {
     string_cstring_free(string);
 }
@@ -1104,7 +1104,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_String
-Parrot_new_string(PARROT_INTERP, NULLOK(char *buffer), int length,
+Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), int length,
         ARGIN_NULLOK(const char * const encoding_name), Parrot_Int flags)
 {
     Parrot_String retval;
@@ -1127,7 +1127,7 @@ Find the magic language token for a language, by language name.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language
-Parrot_find_language(PARROT_INTERP, NOTNULL(char *language))
+Parrot_find_language(PARROT_INTERP, SHIM(char *language))
 {
     return 0;
 }

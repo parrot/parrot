@@ -32,24 +32,26 @@ There's also a verbose mode for garbage collection.
 
 /* HEADERIZER BEGIN: static */
 
-static void clear_live_bits(NOTNULL(Small_Object_Pool *pool))
-        __attribute__nonnull__(1);
+static void clear_live_bits(ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pool);
 
 PARROT_CONST_FUNCTION
 static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
         __attribute__nonnull__(1);
 
-static void mark_special(PARROT_INTERP, NOTNULL(PMC *obj))
+static void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int sweep_cb(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    ARGIN(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pool);
 
 static int trace_active_PMCs(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
@@ -82,7 +84,7 @@ be better if it were a macro.
 */
 
 static void
-mark_special(PARROT_INTERP, NOTNULL(PMC *obj))
+mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 {
     int     hi_prio;
     Arenas *arena_base;
@@ -171,7 +173,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-pobject_lives(PARROT_INTERP, ARGINOUT(PObj *obj))
+pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {
 #if PARROT_GC_GMS
     do {
@@ -468,18 +470,16 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_trace_pmc_data(PARROT_INTERP, NOTNULL(PMC * const p))
+Parrot_dod_trace_pmc_data(PARROT_INTERP, ARGIN(PMC *p))
 {
     /* malloced array of PMCs */
     PMC ** const data = PMC_data_typed(p, PMC **);
-    INTVAL i;
 
-    if (!data)
-        return;
-
-    for (i = 0; i < PMC_int_val(p); i++) {
-        if (data[i])
-            pobject_lives(interp, (PObj *)data[i]);
+    if (data) {
+        INTVAL i;
+        for (i = 0; i < PMC_int_val(p); i++)
+            if (data[i])
+                pobject_lives(interp, (PObj *)data[i]);
     }
 }
 
@@ -496,9 +496,9 @@ Clear the COW ref count.
 */
 
 void
-clear_cow(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int cleanup)
+clear_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
 {
-    const UINTVAL       object_size = pool->object_size;
+    const UINTVAL object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
 
     /* clear refcount for COWable objects. */
@@ -541,9 +541,9 @@ Find other users of COW's C<bufstart>.
 */
 
 void
-used_cow(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int cleanup)
+used_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
 {
-    UINTVAL             object_size = pool->object_size;
+    const UINTVAL object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
 
     for (cur_arena = pool->last_Arena;
@@ -585,18 +585,18 @@ are immune from collection (i.e. constant).
 */
 
 void
-Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     UINTVAL i;
-    UINTVAL total_used    = 0;
-    UINTVAL object_size   = pool->object_size;
+    UINTVAL total_used        = 0;
+    const UINTVAL object_size = pool->object_size;
 
     Small_Object_Arena *cur_arena;
     dod_object_fn_type dod_object = pool->dod_object;
 
 #if GC_VERBOSE
     if (Interp_trace_TEST(interp, 1)) {
-        Interp *tracer = interp->debugger;
+        Interp * const tracer = interp->debugger;
         PMC *pio       = PIO_STDERR(interp);
 
         PIO_flush(interp, pio);
@@ -929,10 +929,10 @@ Run through all PMC arenas and clear live bits.
 */
 
 static void
-clear_live_bits(NOTNULL(Small_Object_Pool *pool))
+clear_live_bits(ARGMOD(Small_Object_Pool *pool))
 {
     Small_Object_Arena *arena;
-    const UINTVAL       object_size = pool->object_size;
+    const UINTVAL object_size = pool->object_size;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         Buffer *b = (Buffer *)arena->start_objects;
@@ -1046,8 +1046,8 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
-    NOTNULL(void *arg))
+sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
+    ARGIN(void *arg))
 {
     int * const total_free = (int *) arg;
 

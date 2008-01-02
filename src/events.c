@@ -55,7 +55,9 @@ static QUEUE_ENTRY* dup_entry_interval(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static void* event_thread(ARGINOUT(void *data));
+static void* event_thread(ARGMOD(void *data))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*data);
 
 static void event_to_exception(PARROT_INTERP,
     ARGIN(const parrot_event* event))
@@ -71,22 +73,27 @@ static void init_events_first(PARROT_INTERP)
 PARROT_CAN_RETURN_NULL
 static void* io_thread(SHIM(void *data));
 
-static void io_thread_ready_rd(
-    ARGINOUT(pending_io_events *ios),
-    int ready_rd);
+static void io_thread_ready_rd(ARGMOD(pending_io_events *ios), int ready_rd)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*ios);
 
 static void Parrot_sigaction(int sig, ARGIN(void (*handler)(int)))
         __attribute__nonnull__(2);
 
 static void Parrot_unblock_signal(int sig);
-static int process_events(ARGINOUT(QUEUE *event_q));
+static int process_events(ARGMOD(QUEUE *event_q))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*event_q);
+
 static void schedule_signal_event(int signum);
 static void sig_handler(int signum);
 static void stop_io_thread(void);
 static void store_io_event(
-    ARGINOUT(pending_io_events *ios),
+    ARGMOD(pending_io_events *ios),
     ARGIN(parrot_event *ev))
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ios);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -419,7 +426,7 @@ Create queue entry and insert event into task queue.
 
 PARROT_API
 void
-Parrot_schedule_event(PARROT_INTERP, ARGINOUT(parrot_event* ev))
+Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
 {
     QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
     entry->next = NULL;
@@ -761,7 +768,7 @@ Stores an event in the event stack.  Allocates memory if necessary.
 */
 
 static void
-store_io_event(ARGINOUT(pending_io_events *ios), ARGIN(parrot_event *ev))
+store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
 {
     if (!ios->alloced) {
         ios->alloced = 16;
@@ -785,7 +792,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-io_thread_ready_rd(ARGINOUT(pending_io_events *ios), int ready_rd)
+io_thread_ready_rd(ARGMOD(pending_io_events *ios), int ready_rd)
 {
     int i;
 
@@ -1065,7 +1072,7 @@ Do something, when an event arrived caller has locked the mutex returns
 */
 
 static int
-process_events(ARGINOUT(QUEUE *event_q))
+process_events(ARGMOD(QUEUE *event_q))
 {
     FLOATVAL      now;
     QUEUE_ENTRY  *entry;
@@ -1149,7 +1156,7 @@ events for all interpreters.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void*
-event_thread(ARGINOUT(void *data))
+event_thread(ARGMOD(void *data))
 {
     QUEUE * const event_q = (QUEUE *) data;
     int running = 1;

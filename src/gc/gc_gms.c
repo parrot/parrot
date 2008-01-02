@@ -132,41 +132,42 @@ static int end_cycle_cb(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gc_gms_add_free_object(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *to_add))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    SHIM(Small_Object_Pool *pool),
+    SHIM(PObj *to_add))
+        __attribute__nonnull__(1);
 
 static void gc_gms_alloc_objects(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+    ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 static void gc_gms_chain_objects(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(Small_Object_Arena *new_arena),
+    ARGMOD(Small_Object_Pool *pool),
+    ARGIN(Small_Object_Arena *new_arena),
     size_t real_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
 
-static void gc_gms_clear_hdr_list(PARROT_INTERP,
-    NOTNULL(Gc_gms_hdr_list *l))
+static void gc_gms_clear_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*l);
 
-static void gc_gms_clear_igp(PARROT_INTERP, NOTNULL(Gc_gms_gen *gen))
+static void gc_gms_clear_igp(PARROT_INTERP, ARGIN(Gc_gms_gen *gen))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen * gc_gms_create_gen(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     size_t gen_no)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 static void gc_gms_end_cycle(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -174,7 +175,7 @@ static void gc_gms_end_cycle(PARROT_INTERP)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen * gc_gms_find_gen(PARROT_INTERP,
-    NOTNULL(Gc_gms_hdr *h),
+    ARGIN(const Gc_gms_hdr *h),
     UINTVAL gen_no)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -182,13 +183,15 @@ static Gc_gms_gen * gc_gms_find_gen(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PObj * gc_gms_get_free_object(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+    ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
-static void gc_gms_init_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+static void gc_gms_init_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 static void gc_gms_init_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -202,17 +205,18 @@ static void gc_gms_merge_gen(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gc_gms_more_objects(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+    ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
-static void gc_gms_pool_init(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool))
+static void gc_gms_pool_init(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
 
 static void gc_gms_promote(PARROT_INTERP,
-    NOTNULL(Gc_gms_hdr *h),
+    ARGIN(Gc_gms_hdr *h),
     UINTVAL gen_no)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -221,25 +225,27 @@ static void gc_gms_set_gen(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void gc_gms_setto_black(PARROT_INTERP,
-    NOTNULL(Gc_gms_hdr *h),
+    ARGMOD(Gc_gms_hdr *h),
     int priority)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*h);
 
 static void gc_gms_setto_gray(PARROT_INTERP,
-    NOTNULL(Gc_gms_hdr *h),
+    ARGIN(Gc_gms_hdr *h),
     int priority)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void gc_gms_store_hdr_list(PARROT_INTERP,
-    NOTNULL(Gc_gms_hdr_list *l),
-    NOTNULL(Gc_gms_hdr *h))
+    ARGMOD(Gc_gms_hdr_list *l),
+    ARGIN(Gc_gms_hdr *h))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*l);
 
-static void gc_gms_store_igp(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h))
+static void gc_gms_store_igp(PARROT_INTERP, ARGIN(Gc_gms_hdr *h))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -262,19 +268,21 @@ static void gc_gms_use_gen(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gms_debug_verify(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     ARGIN(const char *action))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
 
 static int init_mark_cb(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    ARGIN(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pool);
 
 static void parrot_gc_gms_deinit(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -292,36 +300,33 @@ static int set_gen_cb(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static int sweep_cb_buf(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGMOD(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    SHIM(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        FUNC_MODIFIES(*pool);
 
 static int sweep_cb_pmc(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGIN(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    SHIM(void *arg))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
 static int trace_children_cb(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGIN(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    SHIM(void *arg))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
 static int trace_igp_cb(PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool),
+    ARGIN(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg))
+    SHIM(void *arg))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -424,7 +429,7 @@ C<more_objects>.
 */
 
 static void
-gc_gms_pool_init(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_gms_pool_init(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     pool->add_free_object = gc_gms_add_free_object;
     pool->get_free_object = gc_gms_get_free_object;
@@ -483,8 +488,8 @@ Unused. White (dead) objects are added in a bunch to the free_list.
 */
 
 static void
-gc_gms_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-        NOTNULL(PObj *to_add))
+gc_gms_add_free_object(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
+        SHIM(PObj *to_add))
 {
     real_exception(interp, NULL, 1, "gms abuse");
 }
@@ -532,16 +537,15 @@ Header chain layout:
 */
 
 static void
-gc_gms_chain_objects(PARROT_INTERP,
-        NOTNULL(Small_Object_Pool *pool),
-        NOTNULL(Small_Object_Arena *new_arena),
-        size_t real_size)
+gc_gms_chain_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        ARGIN(Small_Object_Arena *new_arena), size_t real_size)
 {
-    Gc_gms_hdr *p, *next, *prev, *marker;
+    Gc_gms_hdr *next, *prev;
     size_t i, n;
 
-    p = new_arena->start_objects;
-    marker = &pool->marker;
+    Gc_gms_hdr *p = new_arena->start_objects;
+    Gc_gms_hdr * const marker = &pool->marker;
+
     PARROT_ASSERT(pool->free_list == marker);
 
     /* update pool statistics */
@@ -591,7 +595,7 @@ Allocate new objects for the given pool.
 */
 
 static void
-gc_gms_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_gms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     const size_t real_size = pool->object_size;
     Small_Object_Arena * const new_arena = mem_internal_allocate(sizeof (Small_Object_Arena));
@@ -623,7 +627,7 @@ Run a GC cycle or allocate new objects for the given pool.
 */
 
 static void
-gc_gms_more_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_gms_more_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     if (pool->skip)
         pool->skip = 0;
@@ -654,7 +658,7 @@ Get a new object off the free_list in the given pool.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PObj *
-gc_gms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_gms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     PObj *ptr;
     Gc_gms_hdr *hdr;
@@ -706,7 +710,7 @@ Create a generation structure for the given generation number.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen *
-gc_gms_create_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), size_t gen_no)
+gc_gms_create_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), size_t gen_no)
 {
     Gc_gms_gen * const gen = mem_sys_allocate(sizeof (*gen));
 
@@ -734,7 +738,7 @@ Initalize the generation system by creating the first two generations.
 */
 
 static void
-gc_gms_init_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
+gc_gms_init_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     Gc_gms_private *gmsp;
     /*
@@ -765,10 +769,10 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen *
-gc_gms_find_gen(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
+gc_gms_find_gen(PARROT_INTERP, ARGIN(const Gc_gms_hdr *h), UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
-    Small_Object_Pool * const pool = h->gen->pool;
+    const Small_Object_Pool * const pool = h->gen->pool;
 
     PARROT_ASSERT(pool);
 
@@ -800,7 +804,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_gms_promote(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
+gc_gms_promote(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     Gc_gms_hdr *prev, *next;
@@ -847,7 +851,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_gms_store_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l), NOTNULL(Gc_gms_hdr *h))
+gc_gms_store_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l), ARGIN(Gc_gms_hdr *h))
 {
     Gc_gms_hdr_store * const s = l->last;
 
@@ -880,7 +884,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_gms_clear_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l))
+gc_gms_clear_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l))
 {
     Gc_gms_hdr_store *s, *next;
 
@@ -902,7 +906,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_gms_store_igp(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h))
+gc_gms_store_igp(PARROT_INTERP, ARGIN(Gc_gms_hdr *h))
 {
     Gc_gms_gen * const gen = h->gen;
     Gc_gms_hdr_list * const igp = &gen->igp;
@@ -921,7 +925,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-gc_gms_clear_igp(PARROT_INTERP, NOTNULL(Gc_gms_gen *gen))
+gc_gms_clear_igp(PARROT_INTERP, ARGIN(Gc_gms_gen *gen))
 {
     Gc_gms_hdr_list * const igp = &gen->igp;
 
@@ -942,7 +946,7 @@ to other items, and promote it to the old generation.
 */
 
 void
-parrot_gc_gms_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(void *old), NOTNULL(void *new))
+parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old), ARGIN(void *new))
 {
     Gc_gms_hdr * const nh = PObj_to_GMSH(new);
     Gc_gms_hdr * const ah = PObj_to_GMSH(agg);
@@ -974,8 +978,8 @@ RT#48260: Not yet documented!!!
 */
 
 void
-parrot_gc_gms_wb_key(PARROT_INTERP, NOTNULL(PMC *agg),
-        NOTNULL(void *old), NOTNULL(void *old_key), NOTNULL(void *new), NOTNULL(void *new_key))
+parrot_gc_gms_wb_key(PARROT_INTERP, ARGIN(PMC *agg),
+        ARGIN(void *old), ARGIN(void *old_key), ARGIN(void *new), ARGIN(void *new_key))
 {
     Gc_gms_hdr *nh, *ah;
 
@@ -1218,7 +1222,7 @@ Set the white header C<h> to gray.
 */
 
 static void
-gc_gms_setto_gray(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
+gc_gms_setto_gray(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), int priority)
 {
     Small_Object_Pool * const pool = h->gen->pool;
     /*
@@ -1280,7 +1284,7 @@ Set the white header C<h> to black.
 */
 
 static void
-gc_gms_setto_black(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
+gc_gms_setto_black(PARROT_INTERP, ARGMOD(Gc_gms_hdr *h), int priority)
 {
     Small_Object_Pool * const pool = h->gen->pool;
 
@@ -1340,7 +1344,7 @@ Set the object live - called by the pobject_lives macro
 
 PARROT_API
 void
-parrot_gc_gms_pobject_lives(PARROT_INTERP, NOTNULL(PObj *obj))
+parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {
     Gc_gms_hdr *h;
     int priority;
@@ -1368,7 +1372,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-init_mark_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+init_mark_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
     pool->gray = pool->black = pool->black_fin = pool->white;
 #  if GC_GMS_DEBUG
@@ -1411,14 +1415,14 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-trace_igp_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+trace_igp_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
     Gc_gms_hdr_store *s;
     Gc_gms_gen * const gen = pool->last_gen;
     Gc_gms_hdr_list * const igp = &gen->igp;
 
     for (s = igp->first; s; s = s->next) {
-        Gc_gms_hdr **p;
+        const Gc_gms_hdr **p;
         for (p = s->store; p < s->ptr; ++p) {
             Gc_gms_hdr * const h = *p;
             pobject_lives(interp, GMSH_to_PObj(h));
@@ -1459,7 +1463,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-trace_children_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
     Arenas * const arena_base = interp->arena_base;
     const int lazy_dod = arena_base->lazy_dod;
@@ -1542,7 +1546,7 @@ TODO put these in front of the pool at pool->white_fin
 */
 
 static int
-sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
     Gc_gms_hdr *h;
     Arenas * const arena_base = interp->arena_base;
@@ -1579,7 +1583,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
     Gc_gms_hdr *h;
 
@@ -1767,7 +1771,7 @@ RT#48260: Not yet documented!!!
 
 #  if GC_GMS_DEBUG
 static void
-gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), ARGIN(const char *action))
+gms_debug_verify(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(const char *action))
 {
     Gc_gms_hdr *h;
     int bf, gf, wf, ff;

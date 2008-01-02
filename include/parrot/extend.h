@@ -117,12 +117,11 @@ Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-Parrot_Language Parrot_find_language(PARROT_INTERP, NOTNULL(char *language))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+Parrot_Language Parrot_find_language(PARROT_INTERP, SHIM(char *language))
+        __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_free_cstring(NULLOK(char *string));
+void Parrot_free_cstring(ARGIN_NULLOK(char *string));
 
 PARROT_API
 Parrot_PMC Parrot_get_dod_registry(PARROT_INTERP)
@@ -153,7 +152,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_String Parrot_new_string(PARROT_INTERP,
-    NULLOK(char *buffer),
+    ARGIN_NULLOK(const char *buffer),
     int length,
     ARGIN_NULLOK(const char * const encoding_name),
     Parrot_Int flags)
@@ -181,19 +180,21 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 char * Parrot_PMC_get_cstringn(PARROT_INTERP,
-    Parrot_PMC pmc,
-    NOTNULL(Parrot_Int *length))
+    ARGIN(Parrot_PMC pmc),
+    ARGOUT(Parrot_Int *length))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 char * Parrot_PMC_get_cstringn_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    NOTNULL(Parrot_Int *length),
+    ARGIN(Parrot_PMC pmc),
+    ARGOUT(Parrot_Int *length),
     Parrot_Int key)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -327,10 +328,11 @@ void Parrot_PMC_set_pmc_pmckey(PARROT_INTERP,
 
 PARROT_API
 void Parrot_PMC_set_pointer_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
+    ARGIN(Parrot_PMC pmc),
     Parrot_Int key,
-    NULLOK(void *value))
-        __attribute__nonnull__(1);
+    ARGIN_NULLOK(void *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_PMC_set_string(PARROT_INTERP,
