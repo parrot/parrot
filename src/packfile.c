@@ -51,7 +51,7 @@ static PackFile_Segment * byte_code_new(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Constant * clone_constant(PARROT_INTERP,
-    ARGIN(const PackFile_Constant *old_const))
+    ARGIN(PackFile_Constant *old_const))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -129,7 +129,7 @@ static PackFile_Segment * directory_new(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t * directory_pack(PARROT_INTERP,
-    ARGIN(const PackFile_Segment *self),
+    ARGIN(PackFile_Segment *self),
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -268,7 +268,7 @@ static opcode_t * pf_debug_pack(SHIM_INTERP,
         FUNC_MODIFIES(*self);
 
 static size_t pf_debug_packed_size(SHIM_INTERP,
-    ARGIN(const PackFile_Segment *self))
+    ARGIN(PackFile_Segment *self))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -1117,8 +1117,8 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     pf->directory = *pf->dirp;
 
     /* XXX These function pointers should be typedeffed */
-    pf->fetch_op = (opcode_t (*)(unsigned char*)) NULLfunc;
-    pf->fetch_iv = (INTVAL (*)(unsigned char*)) NULLfunc;
+    pf->fetch_op = (opcode_t (*)(const unsigned char*)) NULLfunc;
+    pf->fetch_iv = (INTVAL (*)(const unsigned char*)) NULLfunc;
     pf->fetch_nv = (void (*)(unsigned char *, const unsigned char *)) NULLfunc;
     return pf;
 }
@@ -1476,7 +1476,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 size_t
-PackFile_Segment_packed_size(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
+PackFile_Segment_packed_size(PARROT_INTERP, ARGIN(PackFile_Segment *self))
 {
     size_t size = default_packed_size(self);
     PackFile_Segment_packed_size_func_t f =
@@ -1876,7 +1876,7 @@ Packs the directory C<self>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t *
-directory_pack(PARROT_INTERP, ARGIN(const PackFile_Segment *self), ARGOUT(opcode_t *cursor))
+directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
 {
     PackFile_Directory * const dir = (PackFile_Directory *)self;
     size_t i;
@@ -2166,9 +2166,9 @@ C<opcode_t> units.
 */
 
 static size_t
-pf_debug_packed_size(SHIM_INTERP, ARGIN(const PackFile_Segment *self))
+pf_debug_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
 {
-    const PackFile_Debug * const debug = (const PackFile_Debug *)self;
+    PackFile_Debug * const debug = (PackFile_Debug *)self;
     int size = 0;
     int i;
 
@@ -2331,7 +2331,7 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     opcode_t i;
     size_t   j;
-    PackFile_Debug * const debug = (const PackFile_Debug *)self;
+    const PackFile_Debug * const debug = (const PackFile_Debug *)self;
 
     default_dump_header(interp, self);
 
@@ -2657,7 +2657,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Constant *
-clone_constant(PARROT_INTERP, ARGIN(const PackFile_Constant *old_const))
+clone_constant(PARROT_INTERP, ARGIN(PackFile_Constant *old_const))
 {
     STRING * const _sub = interp->vtables[enum_class_Sub]->whoami;
 
@@ -3139,7 +3139,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry *
-PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, ARGIN(const char *name))
+PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, ARGIN(char *name))
 {
     /* TODO make a hash of all fixups */
     PackFile_Directory * const dir = interp->code->base.dir;

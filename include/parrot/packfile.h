@@ -92,14 +92,19 @@ typedef struct PackFile_DebugMapping {
 
 typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)
     (PARROT_INTERP, struct PackFile *, const char *, int add);
+
 typedef void (*PackFile_Segment_destroy_func_t)
     (PARROT_INTERP, struct PackFile_Segment *);
+
 typedef size_t (*PackFile_Segment_packed_size_func_t)
-    (PARROT_INTERP, const struct PackFile_Segment *);
+    (PARROT_INTERP, struct PackFile_Segment *);
+
 typedef opcode_t * (*PackFile_Segment_pack_func_t)
-    (PARROT_INTERP, const struct PackFile_Segment *, opcode_t *dest);
+    (PARROT_INTERP, struct PackFile_Segment *, opcode_t *dest);
+
 typedef opcode_t * (*PackFile_Segment_unpack_func_t)
     (PARROT_INTERP, struct PackFile_Segment *, opcode_t *packed);
+
 typedef void (*PackFile_Segment_dump_func_t)
     (PARROT_INTERP, const struct PackFile_Segment *);
 
@@ -272,7 +277,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_ConstTable_pack(PARROT_INTERP,
-    ARGIN(const PackFile_Segment *seg),
+    ARGIN(PackFile_Segment *seg),
     ARGMOD(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -281,7 +286,7 @@ opcode_t * PackFile_ConstTable_pack(PARROT_INTERP,
 
 PARROT_API
 size_t PackFile_ConstTable_pack_size(PARROT_INTERP,
-    ARGIN(const PackFile_Segment *seg))
+    ARGIN(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -409,7 +414,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry * PackFile_find_fixup_entry(PARROT_INTERP,
     INTVAL type,
-    ARGIN(const char *name))
+    ARGIN(char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -526,7 +531,7 @@ opcode_t * PackFile_Segment_pack(PARROT_INTERP,
 
 PARROT_API
 size_t PackFile_Segment_packed_size(PARROT_INTERP,
-    ARGIN(const PackFile_Segment *self))
+    ARGIN(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
