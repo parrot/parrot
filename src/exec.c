@@ -33,16 +33,17 @@ src/exec.c - Generate an object file
 /* HEADERIZER BEGIN: static */
 
 static void add_data_member(
-    NOTNULL(Parrot_exec_objfile_t *obj),
-    NULLOK(void *src),
+    ARGMOD(Parrot_exec_objfile_t *obj),
+    ARGIN_NULLOK(void *src),
     size_t len)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*obj);
 
-static void exec_init(NOTNULL(Parrot_exec_objfile_t *obj))
+static void exec_init(ARGIN(Parrot_exec_objfile_t *obj))
         __attribute__nonnull__(1);
 
 static int symbol_list_find(
-    NOTNULL(Parrot_exec_objfile_t *obj),
+    ARGIN(const Parrot_exec_objfile_t *obj),
     ARGIN(const char *symbol))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -75,8 +76,8 @@ section. And emits the executable.
 */
 
 void
-Parrot_exec(PARROT_INTERP, NOTNULL(opcode_t *pc),
-        NOTNULL(opcode_t *code_start), NOTNULL(opcode_t *code_end))
+Parrot_exec(PARROT_INTERP, ARGIN(opcode_t *pc),
+        ARGIN(opcode_t *code_start), ARGIN(opcode_t *code_end))
 {
 #ifdef JIT_CGP
     int i, j *k;
@@ -145,7 +146,7 @@ C<< obj->data_size[N] >>.
 */
 
 static void
-add_data_member(NOTNULL(Parrot_exec_objfile_t *obj), NULLOK(void *src), size_t len)
+add_data_member(ARGMOD(Parrot_exec_objfile_t *obj), ARGIN_NULLOK(void *src), size_t len)
 {
     char *cp;
 
@@ -182,7 +183,7 @@ Initialize the obj structure.
 */
 
 static void
-exec_init(NOTNULL(Parrot_exec_objfile_t *obj))
+exec_init(ARGIN(Parrot_exec_objfile_t *obj))
 {
     obj->text_rellocation_table = (Parrot_exec_rellocation_t *)
         mem_sys_allocate_zeroed(sizeof (Parrot_exec_rellocation_t));
@@ -220,8 +221,8 @@ Adds a symbol to the object file.
 */
 
 int
-Parrot_exec_add_symbol(NOTNULL(Parrot_exec_objfile_t *obj),
-                       ARGIN(const char *symbol), int stype)
+Parrot_exec_add_symbol(ARGMOD(Parrot_exec_objfile_t *obj),
+        ARGIN(const char *symbol), int stype)
 {
 
     int symbol_number = symbol_list_find(obj, symbol);
@@ -268,9 +269,8 @@ RT#48260: Not yet documented!!!
 PARROT_API
 PARROT_CAN_RETURN_NULL
 int *
-Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
-                                     NOTNULL(char *nptr), ARGIN(const char *var),
-                                     int offset, int disp)
+Parrot_exec_add_text_rellocation_reg(ARGIN(Parrot_exec_objfile_t *obj),
+        ARGIN(char *nptr), ARGIN(const char *var), int offset, int disp)
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_COM, var, disp);
     return (int *)offset;
@@ -288,8 +288,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 void
-Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
-                                      NOTNULL(char *nptr), ARGIN(const char *func_name))
+Parrot_exec_add_text_rellocation_func(ARGIN(Parrot_exec_objfile_t *obj),
+        ARGIN(char *nptr), ARGIN(const char *func_name))
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_FUNC, func_name, 1);
 }
@@ -306,7 +306,7 @@ Adds a text rellocation to the object file.
 
 PARROT_API
 void
-Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), NOTNULL(char *nptr),
+Parrot_exec_add_text_rellocation(ARGIN(Parrot_exec_objfile_t *obj), ARGIN(char *nptr),
     int type, ARGIN(const char *symbol), int disp)
 {
     int symbol_number;
@@ -358,7 +358,7 @@ Used by C<Parrot_exec_add_symbol()>.
 */
 
 static int
-symbol_list_find(NOTNULL(Parrot_exec_objfile_t *obj), ARGIN(const char *symbol))
+symbol_list_find(ARGIN(const Parrot_exec_objfile_t *obj), ARGIN(const char *symbol))
 {
     int i;
 

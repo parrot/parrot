@@ -26,12 +26,13 @@ src/dynext.c - Dynamic extensions to Parrot
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * clone_string_into(
-    NOTNULL(Interp *d),
-    NOTNULL(Interp *s),
-    NOTNULL(PMC *value))
+    ARGMOD(Interp *d),
+    ARGIN(Interp *s),
+    ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*d);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -60,9 +61,9 @@ static PMC * make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))
 
 PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
-    NOTNULL(void *handle),
-    NOTNULL(STRING *lib_name),
-    NOTNULL(STRING *wo_ext))
+    ARGIN(void *handle),
+    ARGIN(STRING *lib_name),
+    ARGIN(STRING *wo_ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -287,10 +288,10 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_init_lib(PARROT_INTERP,
-                NULLOK(PMC *(*load_func)(PARROT_INTERP)),
-                NULLOK(void (*init_func)(PARROT_INTERP, NULLOK(PMC *))))
+                ARGIN(PMC *(*load_func)(PARROT_INTERP)),
+                ARGIN(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
 {
-    NOTNULL(PMC *lib_pmc) = NULL;
+    PMC *lib_pmc = NULL;
 
     if (load_func)
         lib_pmc = (*load_func)(interp);
@@ -326,14 +327,14 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
-            NOTNULL(STRING *lib_name), NOTNULL(STRING *wo_ext))
+run_init_lib(PARROT_INTERP, ARGIN(void *handle),
+        ARGIN(STRING *lib_name), ARGIN(STRING *wo_ext))
 {
     STRING *type;
     PMC *(*load_func)(PARROT_INTERP);
     void (*init_func)(PARROT_INTERP, PMC *);
     char *cinit_func_name;
-    NOTNULL(PMC *lib_pmc);
+    PMC *lib_pmc;
 
     /*
      * work around gcc 3.3.3 and other problem with dynpmcs
@@ -398,7 +399,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *value))
+clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
     STRING * const orig = VTABLE_get_string(s, value);
     char * const raw_str = string_to_cstring(s, orig);
@@ -445,7 +446,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_clone_lib_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *lib_pmc))
+Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
 {
     STRING * const wo_ext = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
         const_string(s, "_filename")));
@@ -455,7 +456,7 @@ Parrot_clone_lib_into(NOTNULL(Interp *d), NOTNULL(Interp *s), NOTNULL(PMC *lib_p
     STRING * const type = VTABLE_get_string(s,
         VTABLE_getprop(s, lib_pmc, const_string(s, "_type")));
 
-    if (0 == string_equal(s, type, const_string(s, "Ops"))) {
+    if (!string_equal(s, type, const_string(s, "Ops"))) {
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.

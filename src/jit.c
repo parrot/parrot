@@ -393,8 +393,7 @@ subroutines to registers only
 */
 
 static void
-init_regusage(PARROT_INTERP,
-        Parrot_jit_optimizer_section_ptr cur_section)
+init_regusage(PARROT_INTERP, Parrot_jit_optimizer_section_ptr cur_section)
 {
     int typ, j;
 
@@ -411,8 +410,7 @@ init_regusage(PARROT_INTERP,
 
 /*
 
-=item C<static void
-make_sections(PARROT_INTERP,
+=item C<static void make_sections(PARROT_INTERP,
         Parrot_jit_info_t *jit_info,
         opcode_t *code_start, opcode_t *code_end)>
 
@@ -1347,8 +1345,8 @@ file.
 */
 
 Parrot_jit_info_t *
-parrot_build_asm(PARROT_INTERP, opcode_t *code_start, opcode_t *code_end,
-          void *objfile, INTVAL jit_type)
+parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *code_end),
+          ARGIN(void *objfile), INTVAL jit_type)
 {
     int                   n;
     UINTVAL               i;

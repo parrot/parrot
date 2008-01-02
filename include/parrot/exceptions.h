@@ -182,7 +182,7 @@ void internal_exception(int exitcode, ARGIN(const char *format), ...)
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC* new_c_exception_handler(PARROT_INTERP, NOTNULL(Parrot_exception *jb))
+PMC* new_c_exception_handler(PARROT_INTERP, ARGIN(Parrot_exception *jb))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -223,7 +223,7 @@ void push_exception(PARROT_INTERP, ARGIN(PMC *handler))
 
 PARROT_API
 void push_new_c_exception_handler(PARROT_INTERP,
-    NOTNULL(Parrot_exception *jb))
+    ARGIN(Parrot_exception *jb))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -240,14 +240,14 @@ void real_exception(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
+opcode_t * rethrow_exception(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 opcode_t * throw_exception(PARROT_INTERP,
-    NOTNULL(PMC *exception),
+    ARGIN(PMC *exception),
     SHIM(void *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -280,7 +280,9 @@ void Parrot_init_exceptions(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_print_backtrace(void);
-void really_destroy_exception_list(NULLOK(Parrot_exception *e));
+void really_destroy_exception_list(ARGIN(Parrot_exception *e))
+        __attribute__nonnull__(1);
+
 PARROT_DOES_NOT_RETURN
 void rethrow_c_exception(PARROT_INTERP)
         __attribute__nonnull__(1);

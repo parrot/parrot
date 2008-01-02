@@ -53,7 +53,7 @@ static size_t dest2offset(PARROT_INTERP, ARGIN(const opcode_t *dest))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC * find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
+static PMC * find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -284,7 +284,7 @@ Find the exception handler for C<exception>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
+find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
 {
     char *m;
     int exit_status, print_location;
@@ -518,7 +518,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-new_c_exception_handler(PARROT_INTERP, NOTNULL(Parrot_exception *jb))
+new_c_exception_handler(PARROT_INTERP, ARGIN(Parrot_exception *jb))
 {
     PMC * const handler = pmc_new(interp, enum_class_Exception_Handler);
     /*
@@ -541,7 +541,7 @@ Pushes an new C exception handler onto the stack.
 
 PARROT_API
 void
-push_new_c_exception_handler(PARROT_INTERP, NOTNULL(Parrot_exception *jb))
+push_new_c_exception_handler(PARROT_INTERP, ARGIN(Parrot_exception *jb))
 {
     push_exception(interp, new_c_exception_handler(interp, jb));
 }
@@ -559,7 +559,7 @@ Throw the exception.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 opcode_t *
-throw_exception(PARROT_INTERP, NOTNULL(PMC *exception), SHIM(void *dest))
+throw_exception(PARROT_INTERP, ARGIN(PMC *exception), SHIM(void *dest))
 {
     opcode_t *address;
     PMC * const handler = find_exception_handler(interp, exception);
@@ -592,7 +592,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t *
-rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
+rethrow_exception(PARROT_INTERP, ARGIN(PMC *exception))
 {
     PMC *handler;
     opcode_t *address;
@@ -815,7 +815,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-really_destroy_exception_list(NULLOK(Parrot_exception *e))
+really_destroy_exception_list(ARGIN(Parrot_exception *e))
 {
     while (e != NULL) {
         Parrot_exception * const prev = e->prev;

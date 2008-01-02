@@ -18,20 +18,24 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_clone_lib_into(
-    NOTNULL(Interp *d),
-    NOTNULL(Interp *s),
-    NOTNULL(PMC *lib_pmc))
+    ARGMOD(Interp *d),
+    ARGMOD(Interp *s),
+    ARGIN(PMC *lib_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*d)
+        FUNC_MODIFIES(*s);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_init_lib(PARROT_INTERP,
-    NULLOK(PMC *(*load_func)(PARROT_INTERP)),
-    NULLOK(void (*init_func)(PARROT_INTERP,
-    NULLOK(PMC *))))
-        __attribute__nonnull__(1);
+    ARGIN(PMC *(*load_func)(PARROT_INTERP)),
+    ARGIN(void (*init_func)(PARROT_INTERP,
+    ARGIN_NULLOK(PMC *))))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

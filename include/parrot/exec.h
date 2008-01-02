@@ -101,8 +101,8 @@ typedef struct Parrot_exec_objfile_t {
 
 PARROT_API
 void Parrot_exec_add_text_rellocation(
-    NOTNULL(Parrot_exec_objfile_t *obj),
-    NOTNULL(char *nptr),
+    ARGIN(Parrot_exec_objfile_t *obj),
+    ARGIN(char *nptr),
     int type,
     ARGIN(const char *symbol),
     int disp)
@@ -112,8 +112,8 @@ void Parrot_exec_add_text_rellocation(
 
 PARROT_API
 void Parrot_exec_add_text_rellocation_func(
-    NOTNULL(Parrot_exec_objfile_t *obj),
-    NOTNULL(char *nptr),
+    ARGIN(Parrot_exec_objfile_t *obj),
+    ARGIN(char *nptr),
     ARGIN(const char *func_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -122,8 +122,8 @@ void Parrot_exec_add_text_rellocation_func(
 PARROT_API
 PARROT_CAN_RETURN_NULL
 int * Parrot_exec_add_text_rellocation_reg(
-    NOTNULL(Parrot_exec_objfile_t *obj),
-    NOTNULL(char *nptr),
+    ARGIN(Parrot_exec_objfile_t *obj),
+    ARGIN(char *nptr),
     ARGIN(const char *var),
     int offset,
     int disp)
@@ -132,20 +132,21 @@ int * Parrot_exec_add_text_rellocation_reg(
         __attribute__nonnull__(3);
 
 void Parrot_exec(PARROT_INTERP,
-    NOTNULL(opcode_t *pc),
-    NOTNULL(opcode_t *code_start),
-    NOTNULL(opcode_t *code_end))
+    ARGIN(opcode_t *pc),
+    ARGIN(opcode_t *code_start),
+    ARGIN(opcode_t *code_end))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 int Parrot_exec_add_symbol(
-    NOTNULL(Parrot_exec_objfile_t *obj),
+    ARGMOD(Parrot_exec_objfile_t *obj),
     ARGIN(const char *symbol),
     int stype)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*obj);
 
 /* HEADERIZER END: src/exec.c */
 
