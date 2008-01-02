@@ -70,7 +70,6 @@ sub runstep {
     }
     else {
 
-        #    $prog = check_progs( [ 'bison -v -y', 'yacc', 'byacc' ], $verbose );
         $prog = check_progs( [@yacc_defaults], $verbose );
         if ( !$prog ) {
             $self->set_result('no yacc program was found');
@@ -115,8 +114,6 @@ sub runstep {
                         return;
                     }
                     elsif (
-
-                        #                            $prog_major >= $rmajor
                         $prog_major < $rmajor
                         or (    $prog_major == $rmajor
                             and $prog_minor < $rminor )
