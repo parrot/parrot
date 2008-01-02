@@ -50,6 +50,7 @@ sub runstep {
 
         # override perl's warnings level
         $ccflags =~ s/-W\d/-W4/;
+        $ccflags .= " -Wp64 ";
 
         my $ccwarn = '';
 
