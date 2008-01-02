@@ -161,7 +161,7 @@ proper_args:
     out = 'header'()
 
     $S0 = <<'END_PC'
-const int8_t const program_code[] = {
+const unsigned char const program_code[] = {
 @BYTECODE@
 };
 
@@ -181,10 +181,6 @@ END_PC
     $S0 = <<'END_HEADER'
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-
-#ifdef _MSC_VER
-#   define int8_t signed__int8
-#endif
 
 END_HEADER
     .return ($S0)
