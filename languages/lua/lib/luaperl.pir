@@ -32,12 +32,12 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
 .namespace
 
 .sub '__onload' :anon :load :init
-    $P0 = newclass [ 'Lua'; 'PerlCompiler' ]
+    $P0 = newclass [ 'Lua::PerlCompiler' ]
     new $P1, $P0
     compreg 'Lua', $P1
 .end
 
-.namespace [ 'Lua'; 'PerlCompiler' ]
+.namespace [ 'Lua::PerlCompiler' ]
 
 .sub 'unlink' :anon
     .param string filename

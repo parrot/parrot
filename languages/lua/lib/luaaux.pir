@@ -26,9 +26,6 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $S1 = narg
     new $P0, 'Lua'
     $S0 = $P0.'caller'()
-    $I0 = index $S0, ':'
-    inc $I0
-    $S0 = substr $S0, $I0
     lua_error("bad argument #", $S1, " to '", $S0, "' (", extramsg :flat, ")")
 .end
 
@@ -401,23 +398,23 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 =cut
 
 .sub 'lua_openlibs'
-    $P0 = get_hll_global ['Lua'; 'basic'], 'luaopen_basic'
+    $P0 = get_hll_global ['Lua::basic'], 'luaopen_basic'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'coroutine'], 'luaopen_coroutine'
+    $P0 = get_hll_global ['Lua::coroutine'], 'luaopen_coroutine'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'package'], 'luaopen_package'
+    $P0 = get_hll_global ['Lua::package'], 'luaopen_package'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'table'], 'luaopen_table'
+    $P0 = get_hll_global ['Lua::table'], 'luaopen_table'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'io'], 'luaopen_io'
+    $P0 = get_hll_global ['Lua::io'], 'luaopen_io'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'os'], 'luaopen_os'
+    $P0 = get_hll_global ['Lua::os'], 'luaopen_os'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'string'], 'luaopen_string'
+    $P0 = get_hll_global ['Lua::string'], 'luaopen_string'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'math'], 'luaopen_math'
+    $P0 = get_hll_global ['Lua::math'], 'luaopen_math'
     $P0()
-    $P0 = get_hll_global ['Lua'; 'debug'], 'luaopen_debug'
+    $P0 = get_hll_global ['Lua::debug'], 'luaopen_debug'
     $P0()
     sweepon
     sweep 1

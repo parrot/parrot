@@ -29,7 +29,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.9>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'debug' ]
+.namespace [ 'Lua::debug' ]
 
 .sub 'luaopen_debug'
 #    print "init Lua Debug\n"

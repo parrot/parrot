@@ -22,7 +22,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'lfs' ]
+.namespace [ 'Lua::lfs'; 'Lua' ]
 
 .sub '__onload' :anon :load
 #    print "__onload lfs\n"

@@ -19,7 +19,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.8>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'os' ]
+.namespace [ 'Lua::os' ]
 
 .sub 'luaopen_os'
 #    print "init Lua OS\n"

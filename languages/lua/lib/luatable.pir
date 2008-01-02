@@ -24,7 +24,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.5>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'table' ]
+.namespace [ 'Lua::table' ]
 
 .sub 'luaopen_table'
 #    print "init Lua Table\n"
