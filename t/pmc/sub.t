@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 62;
+use Parrot::Test tests => 63;
 use Parrot::Config;
 
 =head1 NAME
@@ -1444,6 +1444,29 @@ CODE
 2
 3
 2
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'set_outer' );
+.sub main :main
+    $P0 = find_global "example_outer"
+    $P1 = find_global "example_inner"
+    $P1.set_outer($P0)
+    $P0()
+    $P1()
+.end
+
+.sub example_outer
+    .lex "Foo", $P0
+    $P0 = new 'String'
+    $P0 = 'I can has outer?'
+.end
+
+.sub example_inner
+    $P0 = find_lex "Foo"
+    say $P0
+.end
+CODE
+I can has outer?
 OUTPUT
 
 # Local Variables:

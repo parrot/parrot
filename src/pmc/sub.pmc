@@ -559,6 +559,14 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 Return the MMD signature PMC, if any or a Null PMC.
 
+=item C<METHOD PMC *get_outer()>
+
+Gets the sub that is the outer of this one, if any or a Null PMC.
+
+=item C<METHOD void set_outer(PMC *outer)>
+
+Sets the sub that is the outer of this one.
+
 =item C<METHOD INTVAL arity()>
 
 Return the arity of the Sub (the number of arugments, excluding optional and
@@ -604,6 +612,26 @@ slurpy arguments).
     METHOD PMC *get_outer() {
         const Parrot_sub * const sub = PMC_sub(SELF);
         return sub->outer_sub ? sub->outer_sub : PMCNULL;
+    }
+
+    METHOD void set_outer(PMC *outer) {
+        /* Set outer sub. */
+        Parrot_sub * const sub = PMC_sub(SELF);
+        sub->outer_sub = outer;
+
+        /* Make sure outer flag of that sub is set. */
+        PObj_get_FLAGS(outer) |= SUB_FLAG_IS_OUTER;
+
+        /* Ensure we have lex info. */
+        if (PMC_IS_NULL(sub->lex_info)) {
+            const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(interp,
+                                           enum_class_LexInfo);
+            sub->lex_info = pmc_new_init(interp, lex_info_id, SELF);
+        }
+
+        /* Finally, this sub needs to become a closure. Safe since
+         * they both use the same underlying structure. */
+        SELF->vtable = interp->vtables[enum_class_Closure];
     }
 
     METHOD PMC *get_multisig() {
