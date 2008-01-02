@@ -163,7 +163,10 @@
       (char? expr)
       (and (list? expr) (= (length expr) 0 ))))
 (define variable?
-  (lambda (x) #f))
+  (lambda (x) 
+    (and (atom? x)
+         (or (eq? x 'var-a)
+             (eq? x 'var-b)))))
 
 (define make-combination-predicate
   (lambda (name)
@@ -548,6 +551,14 @@
 (define body
   (lambda (x)
     (caddr x)))
+
+(define emit-variable
+  (lambda (x)
+    ;(write bindings)
+    ;(newline)
+    ;(write body)
+    ;(newline)
+    (emit-expr 13)))
 
 (define emit-let
   (lambda (bindings body)
