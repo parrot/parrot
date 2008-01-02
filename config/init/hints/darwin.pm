@@ -45,7 +45,7 @@ sub runstep {
 
         # RT#43147 when built against a dynamic libparrot installable_parrot records
         # the path to the blib version of the library
-        parrot_is_shared       => 0,
+        parrot_is_shared       => 1,
         libparrot_shared       => 'libparrot.$(SOVERSION)$(SHARE_EXT)',
         libparrot_shared_alias => 'libparrot$(SHARE_EXT)',
         rpath                  => "-L",
