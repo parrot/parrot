@@ -329,6 +329,13 @@ rule TOP {
     {*}
 }
 
+##  this <ws> rule treats # as "comment to eol"
+##  you may want to replace it with something appropriate
+token ws {
+    <!ww>
+    [ '#' \N* \n? | \s+ ]*
+}
+
 rule statement {
     'say' <value> [ ',' <value> ]* ';'
     {*}
@@ -448,6 +455,7 @@ use lib qw( . lib ../lib ../../lib );
 use Parrot::Test::Harness language => '@lang@', compiler => '@lclang@.pbc';
 
 __t/00-sanity.t__
+# This just checks that the basic parsing and call to builtin say() works.
 say '1..2';
 say 'ok 1';
 say 'ok ', 2;
