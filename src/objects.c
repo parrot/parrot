@@ -1574,7 +1574,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(const STRING *method_name))
+Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *method_name))
 {
     PMC * const found = find_method_direct_1(interp, _class, method_name);
     STRING *s1, *s2;
@@ -1611,7 +1611,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(const STRING *method_name))
+Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *method_name))
 {
     UINTVAL type, bits;
 

@@ -105,7 +105,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_find_method_direct(PARROT_INTERP,
     ARGIN(PMC *_class),
-    ARGIN(const STRING *method_name))
+    ARGIN(STRING *method_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -115,7 +115,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_find_method_with_cache(PARROT_INTERP,
     ARGIN(PMC *_class),
-    ARGIN(const STRING *method_name))
+    ARGIN(STRING *method_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
