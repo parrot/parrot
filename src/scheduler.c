@@ -28,12 +28,6 @@ exceptions, async I/O, and concurrent tasks (threads).
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static int Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*scheduler);
-
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void* scheduler_runloop(ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
@@ -67,33 +61,26 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 #endif
     if (!interp->parent_interpreter) {
         PMC *scheduler;
-        Parrot_Scheduler *sched_struct;
 
         /* Add the very first interpreter to the list of interps. */
         pt_add_to_interpreters(interp, NULL);
 
-#if CX_DEBUG
-        fprintf(stderr, "initializing scheduler runloop\n");
-#endif
-
         scheduler = pmc_new(interp, enum_class_Scheduler);
         scheduler = VTABLE_share_ro(interp, scheduler);
-        sched_struct = PARROT_SCHEDULER(scheduler);
-        COND_INIT(sched_struct->condition);
-        MUTEX_INIT(sched_struct->lock);
 
         interp->scheduler = scheduler;
 
         /* Start the scheduler runloop */
-        THREAD_CREATE_JOINABLE(sched_struct->runloop_handle,
-            (pt_start_routine_f *)scheduler_runloop, (void *) scheduler);
+/*        THREAD_CREATE_JOINABLE(sched_struct->runloop_handle,
+ *            (pt_start_routine_f *)scheduler_runloop, (void *) scheduler);
+ */
 
     }
 }
 
 /*
 
-=item C<static int Parrot_cx_handle_tasks>
+=item C<void Parrot_cx_handle_tasks>
 
 Handle the pending tasks in the scheduler's task list. Returns when there are
 no more pending tasks. Returns 0 to terminate the scheduler runloop, or 1 to
@@ -103,8 +90,7 @@ continue the runloop.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
-static int
+void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
 #if CX_DEBUG
@@ -118,10 +104,6 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         PMC *type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
         STRING *type = VTABLE_get_string(interp, type_pmc);
 
-#if CX_DEBUG
-        const INTVAL tid = VTABLE_get_integer(interp, task);
-        fprintf(stderr, "Found task ID # %d\n", (int) tid);
-#endif
         if (string_equal(interp, type, CONST_STRING(interp, "suspend_for_gc")) == 0) {
             Parrot_Task *task_struct = PARROT_TASK(task);
             pt_suspend_self_for_gc(task_struct->interp);
@@ -130,9 +112,6 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
             Parrot_cx_invoke_callback(interp, task);
         }
         else if (string_equal(interp, type, CONST_STRING(interp, "timer")) == 0) {
-#if CX_DEBUG
-            fprintf(stderr, "have a timer event\n");
-#endif
             Parrot_cx_timer_invoke(interp, task);
         }
         else if (string_equal(interp, type, CONST_STRING(interp, "event")) == 0) {
@@ -151,18 +130,13 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         Parrot_cx_delete_task(interp, task);
         }
 
+        /* If the scheduler was flagged to terminate, make sure you process all
+         * tasks. */
+        if (SCHEDULER_terminate_runloop_TEST(scheduler))
+            Parrot_cx_refresh_task_list(interp);
+
     } /* end of pending tasks */
 
-    Parrot_cx_refresh_task_list(interp);
-
-    /* When there are no more pending tasks, if the scheduler received a
-     * terminate event, end the scheduler runloop. */
-    if (SCHEDULER_terminate_runloop_TEST(scheduler)
-            && (VTABLE_get_integer(interp, scheduler) <= 0)) {
-        return 0;
-    }
-
-    return 1;
 }
 
 /*
@@ -230,6 +204,7 @@ void
 Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
+    enable_event_checking(interp);
     SCHEDULER_wake_flag_SET(scheduler);
     COND_SIGNAL(sched_struct->condition);
 }
@@ -256,22 +231,16 @@ Parrot_cx_runloop_end(PARROT_INTERP)
         Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(interp->scheduler);
         void *raw_retval = NULL;
 
-
-        /*
-        PMC * const term_event = pmc_new(interp, enum_class_Task);
-#if CX_DEBUG
-        fprintf(stderr, "terminating scheduler runloop\n");
-#endif
-        TASK_terminate_runloop_SET(term_event);
-        Parrot_cx_schedule_task(interp, term_event);
-        */
-
-        LOCK(sched_struct->lock);
         SCHEDULER_terminate_runloop_SET(interp->scheduler);
-        Parrot_cx_runloop_wake(interp, interp->scheduler);
-        UNLOCK(sched_struct->lock);
+        Parrot_cx_handle_tasks(interp, interp->scheduler);
 
-        JOIN(sched_struct->runloop_handle, raw_retval);
+/*      LOCK(sched_struct->lock);
+ *      SCHEDULER_terminate_runloop_SET(interp->scheduler);
+ *      Parrot_cx_runloop_wake(interp, interp->scheduler);
+ *      UNLOCK(sched_struct->lock);
+ *
+ *      JOIN(sched_struct->runloop_handle, raw_retval);
+ */
     }
 }
 
@@ -689,7 +658,7 @@ scheduler_runloop(ARGMOD(PMC *scheduler))
         fprintf(stderr, "After sleep, before handling tasks\n");
 #endif
         /* Process pending tasks, if there are any */
-        running = Parrot_cx_handle_tasks(sched_struct->interp, scheduler);
+/*        running = Parrot_cx_handle_tasks(sched_struct->interp, scheduler);*/
 #if CX_DEBUG
         fprintf(stderr, "After handling tasks\n");
 #endif
@@ -702,8 +671,10 @@ scheduler_runloop(ARGMOD(PMC *scheduler))
 
     UNLOCK(sched_struct->lock);
 
+    /*
     COND_DESTROY(sched_struct->condition);
     MUTEX_DESTROY(sched_struct->lock);
+    */
 
     return NULL;
 }

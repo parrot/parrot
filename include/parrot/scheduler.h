@@ -81,6 +81,11 @@ void Parrot_cx_schedule_timer(PARROT_INTERP,
     ARGIN_NULLOK(PMC *sub))
         __attribute__nonnull__(1);
 
+void Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*scheduler);
+
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
