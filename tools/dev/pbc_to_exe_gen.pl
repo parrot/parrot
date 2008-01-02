@@ -161,7 +161,7 @@ proper_args:
     out = 'header'()
 
     $S0 = <<'END_PC'
-const unsigned char const program_code[] = {
+unsigned char program_code[] = {
 @BYTECODE@
 };
 
