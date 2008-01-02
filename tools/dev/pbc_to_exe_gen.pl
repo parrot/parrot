@@ -161,7 +161,7 @@ proper_args:
     out = 'header'()
 
     $S0 = <<'END_PC'
-int8_t program_code[] = {
+const int8_t const program_code[] = {
 @BYTECODE@
 };
 
