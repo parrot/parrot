@@ -218,6 +218,32 @@ C<languages/cardinal>
 
 =back
 
+=head2 Scheme to PIR with Chicken
+
+=over 4
+
+=item Description
+
+Patching Chicken so that PIR is generated.
+
+=item Status
+
+Last modified in 2005. The website says:
+
+    The compiler dumps out code, but I have not yet tried running the code yet.
+    There are a few design issues left before the code can start running,
+    and I am discussing these issues on the
+    chicken-users and parrot-internals mailing lists.
+
+=item Last verified with parrot version
+
+Unknown
+
+=item Location
+
+L<http://pages.cs.wisc.edu/~lenz/parrot/>
+
+=back
 
 =head2 Cola
 
