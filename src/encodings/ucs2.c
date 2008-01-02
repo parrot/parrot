@@ -29,12 +29,12 @@ static void become_encoding(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL bytes(PARROT_INTERP, NOTNULL(STRING *src))
+static UINTVAL bytes(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL codepoints(PARROT_INTERP, NOTNULL(STRING *src))
+static UINTVAL codepoints(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -69,7 +69,7 @@ static UINTVAL get_codepoint(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_codepoints(PARROT_INTERP,
-    NOTNULL(STRING *src),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -86,7 +86,7 @@ static STRING * get_codepoints_inplace(PARROT_INTERP,
 
 static void iter_init(PARROT_INTERP,
     ARGIN(const STRING *src),
-    NOTNULL(String_iter *iter))
+    ARGOUT(String_iter *iter))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -105,7 +105,7 @@ static void set_bytes(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static void set_codepoint(PARROT_INTERP,
-    NOTNULL(STRING *src),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL codepoint)
         __attribute__nonnull__(1)
@@ -121,27 +121,31 @@ static void set_codepoints(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * to_encoding(PARROT_INTERP,
-    NOTNULL(STRING *src),
-    NOTNULL(STRING *dest))
+    ARGIN(STRING *src),
+    ARGMOD(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest);
 
 static UINTVAL ucs2_decode_and_advance(PARROT_INTERP,
-    NOTNULL(String_iter *i))
+    ARGMOD(String_iter *i))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*i);
 
 static void ucs2_encode_and_advance(PARROT_INTERP,
-    NOTNULL(String_iter *i),
+    ARGMOD(String_iter *i),
     UINTVAL c)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*i);
 
 static void ucs2_set_position(SHIM_INTERP,
-    NOTNULL(String_iter *i),
+    ARGMOD(String_iter *i),
     UINTVAL n)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*i);
 
 /* HEADERIZER END: static */
 
@@ -168,7 +172,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
+to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
 {
     STRING * const result =
         Parrot_utf16_encoding_ptr->to_encoding(interp, src, dest);
@@ -215,7 +219,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codepoint)
+set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoint)
 {
 #if PARROT_HAS_ICU
     UChar * const s = (UChar*) src->strstart;
@@ -272,7 +276,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)
+get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
     STRING * const return_string = Parrot_make_COW_reference(interp, src);
 #if PARROT_HAS_ICU
@@ -417,7 +421,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
-codepoints(PARROT_INTERP, NOTNULL(STRING *src))
+codepoints(PARROT_INTERP, ARGIN(STRING *src))
 {
 #if PARROT_HAS_ICU
     return src->bufused / sizeof (UChar);
@@ -439,7 +443,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
-bytes(PARROT_INTERP, NOTNULL(STRING *src))
+bytes(PARROT_INTERP, ARGIN(STRING *src))
 {
     return src->bufused;
 }
@@ -456,7 +460,7 @@ RT#48260: Not yet documented!!!
 
 #if PARROT_HAS_ICU
 static UINTVAL
-ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
+ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
     UChar * const s = (UChar*) i->str->strstart;
     size_t pos = i->bytepos / sizeof (UChar);
@@ -481,7 +485,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
+ucs2_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     UChar * const s = (UChar*) i->str->strstart;
     UINTVAL pos = i->bytepos / sizeof (UChar);
@@ -501,7 +505,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)
+ucs2_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 {
     i->charpos = n;
     i->bytepos = n * sizeof (UChar);
@@ -520,7 +524,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-iter_init(PARROT_INTERP, ARGIN(const STRING *src), NOTNULL(String_iter *iter))
+iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 {
 #if PARROT_HAS_ICU
     iter->str = src;

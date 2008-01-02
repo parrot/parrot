@@ -25,7 +25,7 @@ These are parrot's generic encoding handling functions
 
 static INTVAL register_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname),
-    NOTNULL(ENCODING *encoding))
+    ARGIN(ENCODING *encoding))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -289,7 +289,7 @@ RT#48260: Not yet documented!!!
 
 static INTVAL
 register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
-        NOTNULL(ENCODING *encoding))
+        ARGIN(ENCODING *encoding))
 {
     const int n = all_encodings->n_encodings;
     int i;
@@ -328,7 +328,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 INTVAL
 Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
-        NOTNULL(ENCODING *encoding))
+        ARGIN(ENCODING *encoding))
 {
     if (!all_encodings) {
         all_encodings = mem_allocate_typed(All_encodings);
@@ -371,7 +371,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 INTVAL
 Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
-        NOTNULL(ENCODING *encoding))
+        ARGIN(ENCODING *encoding))
 {
     Parrot_default_encoding_ptr = encoding;
     return 1;
@@ -408,7 +408,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 encoding_converter_t
-Parrot_find_encoding_converter(PARROT_INTERP, NOTNULL(ENCODING *lhs), NOTNULL(ENCODING *rhs))
+Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODING *rhs))
 {
     UNUSED(interp);
     UNUSED(lhs);

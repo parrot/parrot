@@ -113,8 +113,8 @@ const ENCODING * Parrot_find_encoding(SHIM_INTERP,
 
 PARROT_API
 encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
-    NOTNULL(ENCODING *lhs),
-    NOTNULL(ENCODING *rhs))
+    ARGIN(ENCODING *lhs),
+    ARGIN(ENCODING *rhs))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -137,7 +137,7 @@ const ENCODING * Parrot_load_encoding(PARROT_INTERP,
 PARROT_API
 INTVAL Parrot_make_default_encoding(SHIM_INTERP,
     SHIM(const char *encodingname),
-    NOTNULL(ENCODING *encoding))
+    ARGIN(ENCODING *encoding))
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -148,7 +148,7 @@ ENCODING * Parrot_new_encoding(SHIM_INTERP);
 PARROT_API
 INTVAL Parrot_register_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname),
-    NOTNULL(ENCODING *encoding))
+    ARGIN(ENCODING *encoding))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

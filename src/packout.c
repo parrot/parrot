@@ -56,7 +56,7 @@ PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
     size += 4; /* directory type + 3 padding zeros */
 
     dir->base.file_offset = size;
-    size += PackFile_Segment_packed_size(interp, (const PackFile_Segment *) dir);
+    size += PackFile_Segment_packed_size(interp, (PackFile_Segment *) dir);
 
     return size;
 }
