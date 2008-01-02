@@ -317,7 +317,7 @@ struct parrot_interp_t {
     size_t     op_count;                      /* The number of ops */
     op_info_t *op_info_table;                 /* Opcode info table (name, nargs, arg types) */
 
-    const op_func_t *op_func_table;           /* opcode dispatch table (functions, labels,
+    op_func_t *op_func_table;                 /* opcode dispatch table (functions, labels,
                                                * or nothing (e.g. switched core), which
                                                * the interpreter is currently running */
     op_func_t *evc_func_table;                /* opcode dispatch for event checking */
