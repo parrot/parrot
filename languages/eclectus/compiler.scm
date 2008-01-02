@@ -162,6 +162,8 @@
       (boolean? expr)
       (char? expr)
       (and (list? expr) (= (length expr) 0 ))))
+(define variable?
+  (lambda (x) #f))
 
 (define make-combination-predicate
   (lambda (name)
@@ -171,6 +173,10 @@
 
 (define if?
   (make-combination-predicate 'if))
+
+(define let?
+  (make-combination-predicate 'let))
+
 
 (define if-test
   (lambda (form)
@@ -535,6 +541,23 @@
 (define (emit-immediate expr)
   (emit (immediate-rep expr)))
 
+(define bindings
+  (lambda (x)
+    (cadr x)))
+
+(define body
+  (lambda (x)
+    (caddr x)))
+
+(define emit-let
+  (lambda (bindings body)
+    ;(write bindings)
+    ;(newline)
+    ;(write body)
+    ;(newline)
+    (emit-expr body)))
+
+
 (define (emit-if expr uid)
   (emit "    .local pmc uniq_reg_if_test_~a, uniq_reg_if_conseq_~a, uniq_reg_if_altern_~a" uid uid uid)
   (emit-expr (if-test expr))
@@ -549,12 +572,14 @@
         " uid uid uid))
  
 ; emir PIR for an expression
-(define (emit-expr expr)
-  ; (display "# ")(write expr) (newline)
+(define (emit-expr x)
+  ; (display "# ")(write x) (newline)
   (cond
-    [(immediate? expr) (emit-immediate expr)]
-    [(if? expr)        (emit-if expr (gen-unique-id))]
-    [(primcall? expr)  (emit-primcall expr)]
+    [(immediate? x) (emit-immediate x)]
+    [(variable? x)  (emit-variable x)]
+    [(let? x)       (emit-let (bindings x) (body x))]
+    [(if? x)        (emit-if x (gen-unique-id))]
+    [(primcall? x)  (emit-primcall x)]
   )) 
 
 ; transverse the program and rewrite

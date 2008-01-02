@@ -2,9 +2,8 @@
 
 (load "tests-driver.scm") ; this should come first
 
-(skip-all "local variables are not supported yet")
-
-(add-tests-with-string-output "local variables"      
+(add-tests-with-string-output "local variables"
+  [(let() 13)      => "13\n"]     
 )
 
 (load "compiler.scm")
