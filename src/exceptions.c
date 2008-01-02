@@ -132,7 +132,7 @@ do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
     fprintf(stderr, "Parrot VM: PANIC: %s!\n",
                message ? message : "(no message available)");
 
-    fprintf(stderr, "C file %s, line %ud\n",
+    fprintf(stderr, "C file %s, line %u\n",
                file ? file : "(not available)", line);
 
     fprintf(stderr, "Parrot file (not available), ");
