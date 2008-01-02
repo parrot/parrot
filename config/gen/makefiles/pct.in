@@ -59,7 +59,7 @@ help:
 	@echo ""
 
 test: all 
-	cd $(TOOL_DIR); prove -r t/compilers/pct
+	cd $(TOOL_DIR) && prove -r t/compilers/pct
 
 testclean:
 	$(RM_F) $(TEST_DIR)/*.pir \
