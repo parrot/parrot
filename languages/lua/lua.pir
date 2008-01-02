@@ -85,7 +85,7 @@ show version information.
 
 =cut
 
-.sub '__gcstop' :load :init
+.sub '__gcstop' :anon :load :init
     sweepoff  # stop collector during initialization
 .end
 
@@ -95,7 +95,7 @@ show version information.
 
 .HLL 'Lua', 'lua_group'
 
-.sub 'main' :main
+.sub 'main' :anon :main
     .param pmc args
     lua_openlibs()
     .local int status

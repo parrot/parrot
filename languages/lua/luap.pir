@@ -19,7 +19,7 @@ C<luap> is a compiler for Lua 5.1 on Parrot.
 
 =cut
 
-.sub 'main' :main
+.sub 'main' :anon :main
     .param pmc args
     load_bytecode 'languages/lua/lua.pbc'
     $P0 = compreg 'Lua'

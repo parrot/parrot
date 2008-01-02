@@ -248,7 +248,7 @@ Francois Perrad
 .include 'cclass.pasm'
 
 
-.sub '__onload' :load :init
+.sub '__onload' :anon :load :init
     .local pmc optable
     new optable, 'PGE::OPTable'
     set_hll_global ['PGE::LuaRegex'], '$optable', optable

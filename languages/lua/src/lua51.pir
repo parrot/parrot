@@ -28,7 +28,7 @@ Used by F<languages/lua/lua.pir>.
 
 .namespace [ 'Lua' ]
 
-.sub '__onload' :load :init
+.sub '__onload' :anon :load :init
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'PGE/Text.pbc'
@@ -741,7 +741,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 
 .namespace [ 'Lua::POST::Chunk' ]
 
-.sub '__onload' :load :init
+.sub '__onload' :anon :load :init
     $P0 = subclass 'POST::Sub', 'Lua::POST::Chunk'
 .end
 
@@ -803,7 +803,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 
 .namespace [ 'Lua::Symbtab' ]
 
-.sub '__onload' :load :init
+.sub '__onload' :anon :load :init
     $P0 = subclass 'ResizablePMCArray', 'Lua::Symbtab'
     new $P0, 'Integer'
     set $P0, 0

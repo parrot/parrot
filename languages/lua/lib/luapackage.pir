@@ -253,7 +253,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     .return ($S0)
 .end
 
-.sub 'loadfunc'
+.sub 'loadfunc' :anon
     .param string path
     .param string sym
     load_bytecode path

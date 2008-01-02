@@ -33,7 +33,7 @@ and imports many definitions from the full Lua compiler
 
 =cut
 
-.sub '__onload' :load :init
+.sub '__onload' :anon :load :init
     load_bytecode 'languages/lua/lua.pbc'
 
     new $P0, 'Lua::Compiler'
@@ -71,7 +71,7 @@ and imports many definitions from the full Lua compiler
     set_hll_global ['Lua::DumpLex'], 'internal_error', $P0
 .end
 
-.sub 'main' :main
+.sub 'main' :anon :main
     .param pmc args
     $P0 = compreg 'LuaTestLex'
     $P0.'command_line'(args)
