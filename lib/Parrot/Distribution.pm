@@ -34,7 +34,6 @@ use warnings;
 
 use ExtUtils::Manifest;
 use File::Spec;
-use Parrot::Configure::Step qw(capture_output);
 
 use Parrot::Docs::Directory;
 use base qw(Parrot::Docs::Directory);
