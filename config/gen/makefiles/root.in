@@ -316,13 +316,15 @@ GEN_LIBRARY = \
 
 # the dependencies of $(SRC_DIR)/jit_emit.h are done explicitely
 # including this file in GEN_HEADERS causes unnecessary recompile of all
-FLUID_FILES = \
+FLUID_FILES_1 = \
     $(GEN_OPSFILES) \
     $(GEN_HEADERS) \
     $(GEN_SOURCES) \
     $(GEN_MODULES) \
+    $(SRC_DIR)/jit_emit.h
+
+FLUID_FILES_2 = \
     $(GEN_LIBRARY) \
-    $(SRC_DIR)/jit_emit.h \
     runtime/parrot/include/parrotlib.pbc \
     .configure_trace.sto
 
@@ -1574,7 +1576,9 @@ clean : \
 #INVERSE_CONDITIONED_LINE(win32):    cover-clean \
     editor-clean
 	@TEMP_cg_r@
-	$(RM_F) chartypes "*.s" "*~" $(FLUID_FILES)
+	$(RM_F) chartypes "*.s" "*~"
+	$(RM_F) $(FLUID_FILES_1)
+	$(RM_F) $(FLUID_FILES_2)
 
 prog-clean :
 	$(RM_F) \
@@ -2210,7 +2214,7 @@ tags.dummy:
 
 # This target will eventually create all the headers automatically.
 # If you are having problems with linkage in Win32 (or elsewhere), because something
-# is not PARROT_API, but should be, then put PARROT_API in the C file and 
+# is not PARROT_API, but should be, then put PARROT_API in the C file and
 # run "make headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES = \
