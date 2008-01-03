@@ -43,7 +43,7 @@ method visible($/) {
 
 method declare($/) {
     $($<variable>).isdecl(1);
-    if ($<value>) { 
+    if ($<value>) {
         # XXX Someone clever needs to refactor this into C<assign>
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
         $past.push( $( $<variable> ) );
@@ -55,10 +55,40 @@ method declare($/) {
 }
 
 method assign($/) {
-        my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
-        $past.push( $( $<variable> ) );
-        $past.push( $( $<value> ) );
-        make $past;
+    my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+    $past.push( $( $<variable> ) );
+    $past.push( $( $<value> ) );
+    make $past;
+}
+
+method function($/) {
+    my $past := $( $<block> );
+
+    # get the function name and set it on the block
+    my $funname := $( $<variable> ).name();
+    $past.name($funname);
+
+    # if there are any parameters, get the PAST for each of them and
+    # adjust the scope to parameter.
+    if $<parameters> {
+        my @params := $<parameters>[0]<variable>;
+        for @params {
+            my $param := $($_);
+            $param.scope('parameter');
+            $past.push($param);
+        }
+    }
+
+    make $past;
+}
+
+method block($/) {
+    # XXX this is a copy/paste from TOP. A refactor would be neat.
+    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
+    for $<statement> {
+        $past.push( $( $_ ) );
+    }
+    make $past;
 }
 
 method value($/, $key) {

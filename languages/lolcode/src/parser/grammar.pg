@@ -20,6 +20,7 @@ rule statement {
     | <visible> {*}   #= visible
     | <declare> {*}   #= declare
     | <assign>  {*}   #= assign
+    | <function> {*}  #= function
 }
 
 token statement_terminator { [ ',' | \n | $ ] }
@@ -30,12 +31,27 @@ rule visible {
 }
 
 rule declare {
-    'I HAS A' <variable> [ 'ITZ' <value> ]? 
+    'I HAS A' <variable> [ 'ITZ' <value> ]?
     {*}
 }
 
 rule assign {
     <variable> 'R' <value> {*}
+}
+
+rule function {
+    'HOW' 'DUZ' 'I' <variable> <statement_terminator>
+    <block>
+    'IF' 'U' 'SAY' 'SO'
+    {*}
+}
+
+rule block {
+    [<statement> <statement_terminator>]* {*}
+}
+
+rule parameters {
+    'YR' <variable> [ 'AN' 'YR' <variable> ]*
 }
 
 rule value {
@@ -44,7 +60,11 @@ rule value {
     | <variable> {*}                             #= variable
 }
 
-token variable { $<name>=( <[a..zA..Z]> \w+ ) {*} }
+token variable { <!keyword> $<name>=( <[a..zA..Z]> \w+ ) {*} }
+
+token keyword {
+    'HOW' | 'I' | 'SAY' | 'SO' | 'U' | 'YR' | 'R' | 'AN'  | 'IF'
+}
 
 rule integer { \d+ {*} }
 
