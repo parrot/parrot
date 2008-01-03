@@ -506,20 +506,22 @@
     (emit "    val_false = val_x")))
 
 (define emit-function-footer
-  (lambda ()
+  (lambda (reg)
     (emit "
-            .return( val_x )
+            .return( ~a )
           .end
-          ")))
+          " reg)))
 
 (define emit-primcall
   (lambda (expr)
     (let ([prim (car expr)] [args (cdr expr)])
-      (apply (primitive-emitter prim) (gen-unique-id) args))))
+      (apply (primitive-emitter prim) (gen-unique-id) args))
+    "val_x"))
 
 (define emit-immediate
   (lambda (expr)
-    (emit (immediate-rep expr))))
+    (emit (immediate-rep expr))
+    "val_x"))
 
 (define bindings
   (lambda (x)
@@ -544,8 +546,7 @@
                reg_let_var_~a = new 'PAST::Var'
                reg_let_var_~a.init( 'name' => '~a', 'scope' => 'lexical', 'viviself' => 'Undef', 'isdecl' => 1 )
                " uid uid (caar binds))
-         (emit-expr (cadar binds))
-         (emit "reg_let_val_~a = ~a" uid (emit-expr body))
+         (emit "reg_let_val_~a = ~a" uid (emit-expr (cadar binds)))
          (emit "
                reg_let_copy_~a = new 'PAST::Op'
                reg_let_copy_~a.init( reg_let_var_~a, reg_let_val_~a,  'pasttype' => 'copy', 'lvalue' => 1 )
@@ -554,7 +555,8 @@
          (emit "
                val_x = new 'PAST::Stmts'
                val_x.init( reg_let_copy_~a, reg_let_body_~a )
-               " uid uid)))))
+               " uid uid)))
+       "val_x"))
 
 (define emit-if
   (lambda (expr uid)
@@ -565,7 +567,8 @@
     (emit "
           val_x = new 'PAST::Op'
           val_x.init( reg_if_test_~a, reg_if_conseq_~a, reg_if_altern_~a, 'pasttype' => 'if'  )
-          " uid uid uid)))
+          " uid uid uid)
+    "val_x"))
  
 ; emir PIR for an expression
 (define emit-expr
@@ -577,8 +580,7 @@
       [(let? x)       (emit-let (bindings x) (body x) (gen-unique-id))]
       [(if? x)        (emit-if x (gen-unique-id))]
       [(primcall? x)  (emit-primcall x)]
-    )
-    "val_x")) 
+    ))) 
 
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling
@@ -613,5 +615,4 @@
     (emit-driver)
     (emit-builtins)
     (emit-function-header "scheme_entry")
-    (emit-expr (transform-and-or program)) 
-    (emit-function-footer)))
+    (emit-function-footer (emit-expr (transform-and-or program)))))
