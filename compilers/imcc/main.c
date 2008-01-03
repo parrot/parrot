@@ -897,6 +897,7 @@ determine_output_file_type(PARROT_INTERP,
             *obj_file = 1;
             Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
+            UNUSED(obj_file);
             IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
 #endif
         }
@@ -991,7 +992,8 @@ RT#48260: Not yet documented!!!
 */
 
 int
-imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
+imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
+        ARGIN(const char **argv))
 {
     int              obj_file;
     yyscan_t        yyscanner   = IMCC_INFO(interp)->yyscanner;

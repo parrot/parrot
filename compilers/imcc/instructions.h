@@ -139,8 +139,8 @@ Instruction * delete_ins(
 
 PARROT_CAN_RETURN_NULL
 Instruction * emitb(PARROT_INTERP,
-    NULLOK(struct _IMC_Unit *unit),
-    NULLOK(Instruction *i))
+    ARGMOD_NULLOK(struct _IMC_Unit *unit),
+    ARGIN_NULLOK(Instruction *i))
         __attribute__nonnull__(1);
 
 void free_ins(NOTNULL(Instruction *ins))

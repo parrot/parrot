@@ -103,15 +103,16 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Instruction * var_arg_ins(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
+    ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name),
-    NOTNULL(SymReg **r),
+    ARGIN(SymReg **r),
     int n,
     int emit)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*unit);
 
 /* HEADERIZER END: static */
 
@@ -498,8 +499,8 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Instruction *
-var_arg_ins(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
-        NOTNULL(SymReg **r), int n, int emit)
+var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+        ARGIN(SymReg **r), int n, int emit)
 {
     int op;
     Instruction *ins;
@@ -544,7 +545,7 @@ s. e.g. imc.c for usage
 PARROT_CAN_RETURN_NULL
 Instruction *
 INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
-        ARGIN_NULLOK(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)
+        ARGIN_NULLOK(const char *fmt), ARGIN(SymReg **r), int n, int keyvec, int emit)
 {
     char fullname[64];
     int i;

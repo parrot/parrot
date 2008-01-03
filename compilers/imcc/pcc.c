@@ -38,14 +38,17 @@ PCC Implementation by Leopold Toetsch
 /* HEADERIZER BEGIN: static */
 
 static void insert_tail_call(PARROT_INTERP,
-    NOTNULL(IMC_Unit * unit),
-    NOTNULL(NOTNULL(Instruction *ins)),
-    NOTNULL(SymReg *sub),
-    NULLOK(SymReg *meth))
+    ARGIN(IMC_Unit *unit),
+    ARGMOD(Instruction *ins),
+    ARGMOD(SymReg *sub),
+    ARGIN(SymReg *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*ins)
+        FUNC_MODIFIES(*sub);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -97,9 +100,9 @@ static int pcc_reg_mov(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static int recursive_tail_call(PARROT_INTERP,
-    NOTNULL(NOTNULL(IMC_Unit *unit)),
-    NOTNULL(NOTNULL(Instruction *ins)),
-    NOTNULL(SymReg *sub))
+    ARGIN(IMC_Unit *unit),
+    ARGIN(Instruction *ins),
+    ARGIN(SymReg *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -548,8 +551,8 @@ convert a recursive tailcall into a loop
 */
 
 static int
-recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
-        NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub))
+recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
+        ARGIN(Instruction *ins), ARGIN(SymReg *sub))
 {
     SymReg *called_sub, *this_sub, *label;
     SymReg *regs[2];
@@ -612,8 +615,8 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-insert_tail_call(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
-        NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub), NULLOK(SymReg *meth))
+insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
+        ARGMOD(SymReg *sub), ARGIN(SymReg *meth))
 {
     SymReg *regs[2];
 
@@ -686,7 +689,7 @@ expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction 
     get_name = NULL;
 
     if (ins->type & ITCALL) {
-        SymReg * the_sub = sub->pcc_sub->sub;
+        SymReg * const the_sub = sub->pcc_sub->sub;
 
         if (!meth_call && (the_sub->type & VTADDRESS)) {
             /*

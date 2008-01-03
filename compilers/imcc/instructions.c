@@ -95,6 +95,7 @@ PARROT_CANNOT_RETURN_NULL
 Instruction *
 _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         SymReg **r, int flags)
+/* XXX The r option cannot get an ARGIN for some reason */
 {
     int i, reg_space;
     Instruction * ins;
@@ -574,7 +575,7 @@ Emit a single instruction into the current unit buffer.
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-emitb(PARROT_INTERP, NULLOK(struct _IMC_Unit *unit), NULLOK(Instruction *i))
+emitb(PARROT_INTERP, ARGMOD_NULLOK(struct _IMC_Unit *unit), ARGIN_NULLOK(Instruction *i))
 {
 
     if (!unit || !i)
