@@ -554,20 +554,31 @@
 
 (define emit-variable
   (lambda (x)
-    ;(write bindings)
-    ;(newline)
-    ;(write body)
-    ;(newline)
     (emit-expr 13)))
 
 (define emit-let
-  (lambda (bindings body)
-    ;(write bindings)
-    ;(newline)
-    ;(write body)
-    ;(newline)
-    (emit-expr body)))
-
+  (lambda (binds body uid )
+     (if (null? binds)
+       (emit-expr body)
+       (begin
+         ;(write (list "dump:emit-let" binds (caar binds)(cadar binds)body uid))(newline)
+         (emit "    .local pmc uniq_reg_let_var_~a, uniq_reg_let_val_~a, uniq_reg_let_copy_~a, uniq_reg_let_body_~a" uid uid uid uid)
+        (emit "
+              uniq_reg_let_var_~a = new 'PAST::Var'
+              uniq_reg_let_var_~a.init( 'name' => '~a', 'scope' => 'lexical', 'viviself' => 'Undef', 'isdecl' => 1 )
+              " uid uid (caar binds))
+        (emit-expr (cadar binds))
+        (emit "uniq_reg_let_val_~a = val_x" uid)
+        (emit "
+              uniq_reg_let_copy_~a = new 'PAST::Op'
+              uniq_reg_let_copy_~a.init( uniq_reg_let_var_~a, uniq_reg_let_val_~a,  'pasttype' => 'copy', 'lvalue' => 1 )
+              " uid uid uid uid )
+        (emit-expr body)
+        (emit "uniq_reg_let_body_~a = val_x" uid)
+        (emit "
+              val_x = new 'PAST::Stmts'
+              val_x.init( uniq_reg_let_copy_~a, uniq_reg_let_body_~a )
+              " uid uid)))))
 
 (define (emit-if expr uid)
   (emit "    .local pmc uniq_reg_if_test_~a, uniq_reg_if_conseq_~a, uniq_reg_if_altern_~a" uid uid uid)
@@ -584,11 +595,11 @@
  
 ; emir PIR for an expression
 (define (emit-expr x)
-  ; (display "# ")(write x) (newline)
+  ;(display "# ")(write x) (newline)
   (cond
     [(immediate? x) (emit-immediate x)]
     [(variable? x)  (emit-variable x)]
-    [(let? x)       (emit-let (bindings x) (body x))]
+    [(let? x)       (emit-let (bindings x) (body x) (gen-unique-id))]
     [(if? x)        (emit-if x (gen-unique-id))]
     [(primcall? x)  (emit-primcall x)]
   )) 
