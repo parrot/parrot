@@ -29,6 +29,7 @@ method statement ($/, $key) {
     make $( $/{$key} ); # For now
 }
 
+
 method visible($/) {
     my $past := PAST::Op.new( :name('VISIBLE'), :pasttype('call'), :node( $/ ) );
     if ( $<no_newline> ) {
@@ -40,6 +41,25 @@ method visible($/) {
     make $past;
 }
 
+method declare($/) {
+    $($<variable>).isdecl(1);
+    if ($<value>) { 
+        # XXX Someone clever needs to refactor this into C<assign>
+        my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+        $past.push( $( $<variable> ) );
+        $past.push( $( $<value>[0] ) );
+        make $past;
+    } else {
+        make $( $<variable> );
+    }
+}
+
+method assign($/) {
+        my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+        $past.push( $( $<variable> ) );
+        $past.push( $( $<value> ) );
+        make $past;
+}
 
 method value($/, $key) {
     make $( $/{$key} );
@@ -53,6 +73,15 @@ method integer($/) {
 
 method quote($/) {
     make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );
+}
+
+
+method variable($/) {
+    make PAST::Var.new( :name( ~$<name> ),
+                        :scope('lexical'),
+                        :viviself('Undef'),
+                        :node( $/ )
+                      );
 }
 
 

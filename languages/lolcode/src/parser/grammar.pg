@@ -9,24 +9,40 @@ This is the grammar for lolcode written as a sequence of Perl 6 rules.
 grammar lolcode::Grammar is PCT::Grammar;
 
 rule TOP {
-    <statement>*
+    [<statement> <statement_terminator>]*
     [ $ || <panic: Syntax error> ]
     {*}
 }
 
 rule statement {
-    <visible> {*} #= visible
+    | <visible> {*}   #= visible
+    | <declare> {*}   #= declare
+    | <assign> {*}    #= assign
 }
 
+token statement_terminator { [ ',' | \n | $ ] }
+
 rule visible {
-    'VISIBLE' <value> [ <value> ]* [$<no_newline>='!']? [ ',' | \n | $ ]
+    'VISIBLE' <value> [ <value> ]* [$<no_newline>='!']?
     {*}
+}
+
+rule declare {
+    'I HAS A' <variable> [ 'ITZ' <value> ]? 
+    {*}
+}
+
+rule assign {
+    <variable> 'R' <value> {*}
 }
 
 rule value {
     | <integer> {*}                              #= integer
     | <quote> {*}                                #= quote
+    | <variable> {*}                             #= variable
 }
+
+token variable { $<name>=( <[a..zA..Z]> \w+ ) {*} }
 
 rule integer { \d+ {*} }
 
