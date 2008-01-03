@@ -5,12 +5,12 @@
 
 use strict;
 use warnings;
-use Test::More tests => 26;
+use Test::More tests => 25;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::init::hints');
-use_ok('config::inter::progs');
+# use_ok('config::inter::progs');
 use_ok('config::auto::attributes');
 use_ok('config::auto::aio');
 use_ok('config::auto::snprintf');
