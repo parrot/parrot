@@ -50,9 +50,10 @@ static void allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void build_interference_graph(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static void build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static void build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(2);
@@ -107,10 +108,11 @@ static int interferes(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static void make_stat(
-    NOTNULL(IMC_Unit *unit),
-    NULLOK(int *sets),
-    NULLOK(int *cols))
-        __attribute__nonnull__(1);
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD_NULLOK(int *sets),
+    ARGMOD_NULLOK(int *cols))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*unit);
 
 static void map_colors(
     NOTNULL(IMC_Unit* unit),
@@ -236,7 +238,7 @@ on a single compilation unit at a time.
 */
 
 void
-imc_reg_alloc(PARROT_INTERP, NULLOK(IMC_Unit *unit))
+imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 {
     char *function;
 
@@ -335,7 +337,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-free_reglist(NOTNULL(IMC_Unit *unit))
+free_reglist(ARGMOD(IMC_Unit *unit))
 {
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: free_reglist\n");
@@ -365,7 +367,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-graph_coloring_reg_alloc(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     build_interference_graph(interp, unit);
 
@@ -385,7 +387,7 @@ printed with --verbose --verbose
 */
 
 static void
-make_stat(NOTNULL(IMC_Unit *unit), NULLOK(int *sets), NULLOK(int *cols))
+make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *cols))
 {
     /* register usage summary */
     const char type[] = "INSP";
@@ -650,7 +652,7 @@ Two variables interfere when they are alive at the same time.
 */
 
 static void
-build_interference_graph(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     int x;
     unsigned int* interference_graph;

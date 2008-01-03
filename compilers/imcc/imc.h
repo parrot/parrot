@@ -75,7 +75,7 @@
 /* HEADERIZER BEGIN: compilers/imcc/imc.c */
 
 PARROT_API
-void imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))
+void imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -83,11 +83,11 @@ void imc_compile_all_units(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+void imc_compile_unit(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
+void imc_close_unit(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -99,17 +99,19 @@ IMC_Unit * imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 
 /* HEADERIZER BEGIN: compilers/imcc/reg_alloc.c */
 
-void free_reglist(NOTNULL(IMC_Unit *unit))
-        __attribute__nonnull__(1);
-
-void graph_coloring_reg_alloc(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+void free_reglist(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        FUNC_MODIFIES(*unit);
+
+void graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 int ig_test(int i, int j, int N, NOTNULL(unsigned int *graph))
         __attribute__nonnull__(4);
 
-void imc_reg_alloc(PARROT_INTERP, NULLOK(IMC_Unit *unit))
+void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/reg_alloc.c */

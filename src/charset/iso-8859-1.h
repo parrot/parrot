@@ -18,8 +18,8 @@
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP,
-    NOTNULL(STRING *src),
-    NULLOK(STRING *dest))
+    ARGIN(STRING *src),
+    ARGMOD_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

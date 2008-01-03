@@ -37,10 +37,10 @@ static STRING * clone_string_into(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
-    NOTNULL(STRING *lib),
-    NOTNULL(void **handle),
-    NOTNULL(STRING *wo_ext),
-    NOTNULL(STRING *ext))
+    ARGIN(STRING *lib),
+    ARGOUT(void **handle),
+    ARGIN(STRING *wo_ext),
+    ARGIN(STRING *ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -49,13 +49,13 @@ static STRING * get_path(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* is_loaded(PARROT_INTERP, NOTNULL(STRING *path))
+static PMC* is_loaded(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC * make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))
+static PMC * make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -70,19 +70,20 @@ static PMC * run_init_lib(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static void set_cstring_prop(PARROT_INTERP,
-    NOTNULL(PMC *lib_pmc),
+    ARGMOD(PMC *lib_pmc),
     ARGIN(const char *what),
-    NOTNULL(STRING *name))
+    ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*lib_pmc);
 
 static void store_lib_pmc(PARROT_INTERP,
-    NOTNULL(PMC *lib_pmc),
-    NOTNULL(STRING *path),
-    NOTNULL(STRING *type),
-    NOTNULL(STRING *lib_name))
+    ARGIN(PMC *lib_pmc),
+    ARGIN(STRING *path),
+    ARGIN(STRING *type),
+    ARGIN(STRING *lib_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -106,8 +107,8 @@ C<lib_pmc>.
 */
 
 static void
-set_cstring_prop(PARROT_INTERP, NOTNULL(PMC *lib_pmc), ARGIN(const char *what),
-        NOTNULL(STRING *name))
+set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
+        ARGIN(STRING *name))
 {
     STRING *key;
 
@@ -128,8 +129,8 @@ Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 */
 
 static void
-store_lib_pmc(PARROT_INTERP, NOTNULL(PMC *lib_pmc), NOTNULL(STRING *path),
-        NOTNULL(STRING *type), NOTNULL(STRING *lib_name))
+store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
+        ARGIN(STRING *type), ARGIN(STRING *lib_name))
 {
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
@@ -158,7 +159,7 @@ If it does, return it. Otherwise, return NULL.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
-is_loaded(PARROT_INTERP, NOTNULL(STRING *path))
+is_loaded(PARROT_INTERP, ARGIN(STRING *path))
 {
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
@@ -182,8 +183,8 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING *
-get_path(PARROT_INTERP, NOTNULL(STRING *lib), NOTNULL(void **handle),
-        NOTNULL(STRING *wo_ext), NOTNULL(STRING *ext))
+get_path(PARROT_INTERP, ARGIN(STRING *lib), ARGOUT(void **handle),
+        ARGIN(STRING *wo_ext), ARGIN(STRING *ext))
 {
     STRING *path, *full_name;
     const char *err = NULL;    /* buffer returned from Parrot_dlerror */
@@ -424,7 +425,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))
+make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 {
     PMC * const ret = VTABLE_new_from_string(interp,
         interp->vtables[enum_class_String]->pmc_class,
@@ -523,7 +524,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))
+Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), SHIM(PMC *initializer))
 {
     void   *handle;
     PMC    *lib_pmc;

@@ -54,11 +54,12 @@ static void determine_input_file_type(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void determine_output_file_type(PARROT_INTERP,
-    NOTNULL(int *obj_file),
+    ARGMOD(int *obj_file),
     ARGIN(const char *output_file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*obj_file);
 
 static void do_pre_process(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -68,14 +69,15 @@ static void help_debug(void);
 static void imcc_get_optimization_description(
     const PARROT_INTERP,
     int opt_level,
-    NOTNULL(char *opt_desc))
-        __attribute__nonnull__(3);
+    ARGMOD(char *opt_desc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*opt_desc);
 
 static void imcc_run_pbc(PARROT_INTERP,
     int obj_file,
     ARGIN(const char *output_file),
     int argc,
-    NOTNULL(char *argv[]))
+    ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
@@ -92,8 +94,9 @@ static int is_all_hex_digits(ARGIN(const char *s))
 static void Parrot_version(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void usage(NOTNULL(FILE* fp))
-        __attribute__nonnull__(1);
+static void usage(ARGMOD(FILE* fp))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*fp);
 
 /* HEADERIZER END: static */
 
@@ -111,7 +114,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-usage(NOTNULL(FILE* fp))
+usage(ARGMOD(FILE* fp))
 {
     fprintf(fp,
             "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
@@ -692,7 +695,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-imcc_get_optimization_description(const PARROT_INTERP, int opt_level, NOTNULL(char *opt_desc))
+imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(char *opt_desc))
 {
     int i = 0;
 
@@ -764,7 +767,7 @@ RT#48260: Not yet documented!!!
 
 static void
 imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN(const char *output_file),
-             int argc, NOTNULL(char *argv[]))
+        int argc, ARGIN(const char **argv))
 {
     if (IMCC_INFO(interp)->imcc_warn)
         PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
@@ -878,7 +881,7 @@ RT#48260: Not yet documented!!!
 
 static void
 determine_output_file_type(PARROT_INTERP,
-    NOTNULL(int *obj_file), ARGIN(const char *output_file))
+    ARGMOD(int *obj_file), ARGIN(const char *output_file))
 {
     const char * const ext = strrchr(output_file, '.');
 

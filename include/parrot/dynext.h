@@ -41,7 +41,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_load_lib(PARROT_INTERP,
-    NULLOK(STRING *lib),
+    ARGIN_NULLOK(STRING *lib),
     SHIM(PMC *initializer))
         __attribute__nonnull__(1);
 

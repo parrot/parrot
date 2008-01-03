@@ -31,9 +31,10 @@ Moved all register allocation and spill code to reg_alloc.c
 
 /* HEADERIZER BEGIN: static */
 
-static void imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static void imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 PARROT_CANNOT_RETURN_NULL
 static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
@@ -101,7 +102,7 @@ operates on a single compilation unit at a time.
 
 PARROT_API
 void
-imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+imc_compile_unit(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
     /* Not much here for now except the allocator */
     IMCC_INFO(interp)->cur_unit = unit;
@@ -123,7 +124,7 @@ ready for a new compiler invocation goes here.
 
 PARROT_API
 void
-imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))
+imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
 {
     IMCC_pop_parser_state(interp, yyscanner);
     clear_globals(interp);
@@ -197,7 +198,7 @@ Does not destroy the unit, leaves it on the list.
 */
 
 void
-imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
+imc_close_unit(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 {
 #if COMPILE_IMMEDIATE
     if (unit) {
@@ -219,7 +220,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     imc_info_t * const imc = IMCC_INFO(interp);
 

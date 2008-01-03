@@ -59,7 +59,7 @@ static void downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 static INTVAL find_cclass(PARROT_INTERP,
     INTVAL flags,
-    NOTNULL(STRING *source_string),
+    ARGIN(STRING *source_string),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -67,7 +67,7 @@ static INTVAL find_cclass(PARROT_INTERP,
 
 static INTVAL find_not_cclass(PARROT_INTERP,
     INTVAL flags,
-    NOTNULL(STRING *source_string),
+    ARGIN(STRING *source_string),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -80,13 +80,14 @@ static INTVAL is_cclass(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static void set_graphemes(PARROT_INTERP,
-    NOTNULL(STRING *source_string),
+    ARGIN(STRING *source_string),
     UINTVAL offset,
     UINTVAL replace_count,
-    NOTNULL(STRING *insert_string))
+    ARGMOD(STRING *insert_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*insert_string);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
@@ -100,11 +101,12 @@ static void titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* to_charset(PARROT_INTERP,
-    NOTNULL(STRING *src),
-    NOTNULL(STRING *dest))
+    ARGIN(STRING *src),
+    ARGMOD(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest);
 
 static void upcase(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
@@ -135,8 +137,8 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))
+set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
+        UINTVAL offset, UINTVAL replace_count, ARGMOD(STRING *insert_string))
 {
     ENCODING_SET_BYTES(interp, source_string, offset,
             replace_count, insert_string);
@@ -154,7 +156,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
+to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
 {
     charset_converter_t conversion_func =
         Parrot_find_charset_converter(interp, src->charset, Parrot_binary_charset_ptr);
@@ -391,7 +393,7 @@ RT#48260: Not yet documented!!!
 
 static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags,
-            NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)
+            ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }
@@ -408,7 +410,7 @@ RT#48260: Not yet documented!!!
 
 static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags,
-                NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)
+                ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }

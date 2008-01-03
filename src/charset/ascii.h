@@ -35,8 +35,8 @@ size_t ascii_compute_hash(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL ascii_cs_index(PARROT_INTERP,
-    NOTNULL(STRING *source_string),
-    NOTNULL(STRING *search_string),
+    ARGIN(STRING *source_string),
+    ARGIN(STRING *search_string),
     UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -44,8 +44,8 @@ INTVAL ascii_cs_index(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL ascii_cs_rindex(PARROT_INTERP,
-    NOTNULL(STRING *source_string),
-    NOTNULL(STRING *search_string),
+    ARGIN(STRING *source_string),
+    ARGIN(STRING *search_string),
     UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -54,7 +54,7 @@ INTVAL ascii_cs_rindex(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * ascii_get_graphemes(PARROT_INTERP,
-    NOTNULL(STRING *source_string),
+    ARGIN(STRING *source_string),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -63,32 +63,33 @@ STRING * ascii_get_graphemes(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * ascii_get_graphemes_inplace(PARROT_INTERP,
-    NOTNULL(STRING *source_string),
+    ARGIN(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
-    NOTNULL(STRING *dest_string))
+    ARGMOD(STRING *dest_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*dest_string);
 
 PARROT_CANNOT_RETURN_NULL
 STRING * charset_cvt_ascii_to_binary(PARROT_INTERP,
-    NOTNULL(STRING *src),
-    NULLOK(STRING *dest))
+    ARGIN(STRING *src),
+    ARGIN_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 STRING * charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP,
-    NOTNULL(STRING *src),
-    NULLOK(STRING *dest))
+    ARGIN(STRING *src),
+    ARGIN_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL mixed_cs_index(PARROT_INTERP,
-    NOTNULL(STRING *src),
-    NOTNULL(STRING *search),
+    ARGIN(STRING *src),
+    ARGIN(STRING *search),
     UINTVAL offs)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
