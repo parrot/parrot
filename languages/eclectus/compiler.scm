@@ -162,11 +162,11 @@
 
 ; forms represented by a scalar PMC
 (define immediate?
-  (lambda (expr)
-    (or (fixnum? expr)
-      (boolean? expr)
-      (char? expr)
-      (and (list? expr) (= (length expr) 0)))))
+  (lambda (x)
+    (or (fixnum? x)
+      (boolean? x)
+      (char? x)
+      (and (list? x) (= (length x) 0)))))
 
 (define variable?
   (lambda (x) 
@@ -201,15 +201,15 @@
 
 ; Support for primitive functions
 
-; is expr a primitive?
+; is x a primitive?
 (define primitive?
-  (lambda (expr)
-    (and (symbol? expr) (getprop expr '*is-prim*))))
+  (lambda (x)
+    (and (symbol? x) (getprop x '*is-prim*))))
 
-; is expr a call to a primitive? 
+; is x a call to a primitive? 
 (define primcall?
-  (lambda (expr)
-    (and (pair? expr) (primitive? (car expr)))))
+  (lambda (x)
+    (and (pair? x) (primitive? (car x)))))
 
 ; a primitive function is a symbol with the properties
 ; *is-prim*, *arg-count* and *emitter*
@@ -513,14 +513,14 @@
           " reg)))
 
 (define emit-primcall
-  (lambda (expr)
-    (let ([prim (car expr)] [args (cdr expr)])
+  (lambda (x)
+    (let ([prim (car x)] [args (cdr x)])
       (apply (primitive-emitter prim) (gen-unique-id) args))
     "val_x"))
 
 (define emit-immediate
-  (lambda (expr)
-    (emit (immediate-rep expr))
+  (lambda (x)
+    (emit (immediate-rep x))
     "val_x"))
 
 (define bindings
@@ -559,11 +559,11 @@
        "val_x"))
 
 (define emit-if
-  (lambda (expr uid)
+  (lambda (x uid)
     (emit "    .local pmc reg_if_test_~a, reg_if_conseq_~a, reg_if_altern_~a" uid uid uid)
-    (emit "reg_if_test_~a = ~a" uid (emit-expr (if-test expr)))
-    (emit "reg_if_conseq_~a = ~a" uid (emit-expr (if-conseq expr)))
-    (emit "reg_if_altern_~a = ~a" uid (emit-expr (if-altern expr)))
+    (emit "reg_if_test_~a = ~a" uid (emit-expr (if-test x)))
+    (emit "reg_if_conseq_~a = ~a" uid (emit-expr (if-conseq x)))
+    (emit "reg_if_altern_~a = ~a" uid (emit-expr (if-altern x)))
     (emit "
           val_x = new 'PAST::Op'
           val_x.init( reg_if_test_~a, reg_if_conseq_~a, reg_if_altern_~a, 'pasttype' => 'if'  )
