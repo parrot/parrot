@@ -70,12 +70,24 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
         interp->scheduler = scheduler;
 
-        /* Start the scheduler runloop */
-/*        THREAD_CREATE_JOINABLE(sched_struct->runloop_handle,
- *            (pt_start_routine_f *)scheduler_runloop, (void *) scheduler);
- */
-
     }
+}
+
+/*
+
+=item C<void Parrot_cx_check_tasks>
+
+If a wake request has been received, handle tasks.
+
+=cut
+
+*/
+
+void
+Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
+{
+    if (SCHEDULER_wake_requested_TEST(scheduler))
+        Parrot_cx_handle_tasks(interp, interp->scheduler);
 }
 
 /*
@@ -93,9 +105,7 @@ continue the runloop.
 void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-#if CX_DEBUG
-    fprintf(stderr, "Handling tasks\n");
-#endif
+    SCHEDULER_wake_requested_CLEAR(scheduler);
     Parrot_cx_refresh_task_list(interp);
 
     while (VTABLE_get_integer(interp, scheduler) > 0) {
@@ -132,7 +142,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
         /* If the scheduler was flagged to terminate, make sure you process all
          * tasks. */
-        if (SCHEDULER_terminate_runloop_TEST(scheduler))
+        if (SCHEDULER_terminate_requested_TEST(scheduler))
             Parrot_cx_refresh_task_list(interp);
 
     } /* end of pending tasks */
@@ -181,12 +191,12 @@ void
 Parrot_cx_runloop_sleep(ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
-    if (SCHEDULER_terminate_runloop_TEST(scheduler))
+    if (SCHEDULER_terminate_requested_TEST(scheduler))
         return;
 
-    if (!SCHEDULER_wake_flag_TEST(scheduler))
+    if (!SCHEDULER_wake_requested_TEST(scheduler))
         COND_WAIT(sched_struct->condition, sched_struct->lock);
-    SCHEDULER_wake_flag_CLEAR(scheduler);
+    SCHEDULER_wake_requested_CLEAR(scheduler);
 }
 
 /*
@@ -205,7 +215,7 @@ Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(scheduler);
     enable_event_checking(interp);
-    SCHEDULER_wake_flag_SET(scheduler);
+    SCHEDULER_wake_requested_SET(scheduler);
     COND_SIGNAL(sched_struct->condition);
 }
 
@@ -231,11 +241,11 @@ Parrot_cx_runloop_end(PARROT_INTERP)
         Parrot_Scheduler * const sched_struct = PARROT_SCHEDULER(interp->scheduler);
         void *raw_retval = NULL;
 
-        SCHEDULER_terminate_runloop_SET(interp->scheduler);
+        SCHEDULER_terminate_requested_SET(interp->scheduler);
         Parrot_cx_handle_tasks(interp, interp->scheduler);
 
 /*      LOCK(sched_struct->lock);
- *      SCHEDULER_terminate_runloop_SET(interp->scheduler);
+ *      SCHEDULER_terminate_requested_SET(interp->scheduler);
  *      Parrot_cx_runloop_wake(interp, interp->scheduler);
  *      UNLOCK(sched_struct->lock);
  *
