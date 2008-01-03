@@ -60,7 +60,7 @@ rule value {
     | <variable> {*}                             #= variable
 }
 
-token variable { <!keyword> $<name>=( <[a..zA..Z]> \w+ ) {*} }
+token variable { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
     'HOW' | 'I' | 'SAY' | 'SO' | 'U' | 'YR' | 'R' | 'AN'  | 'IF'
