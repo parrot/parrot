@@ -19,7 +19,7 @@ rule TOP {
 rule statement {
     | <visible> {*}   #= visible
     | <declare> {*}   #= declare
-    | <assign> {*}    #= assign
+    | <assign>  {*}   #= assign
 }
 
 token statement_terminator { [ ',' | \n | $ ] }
@@ -39,8 +39,8 @@ rule assign {
 }
 
 rule value {
-    | <integer> {*}                              #= integer
-    | <quote> {*}                                #= quote
+    | <integer>  {*}                             #= integer
+    | <quote>    {*}                             #= quote
     | <variable> {*}                             #= variable
 }
 
@@ -56,8 +56,8 @@ rule quote {
 }
 
 token ws { <!ww> [
-    | ^^ BTW \h \N* \n
-    | ^^ OBTW .*? ^^ TLDR \n
+    | ^^ \h* BTW \h \N* \n
+    | ^^ \h* OBTW .*? ^^ \h* TLDR \n
     | \h+
     ]*
 }
