@@ -54,7 +54,7 @@ sub runstep {
         eclectus ecmascript
         forth
         HQ9plus jako
-        lisp lua
+        lisp lolcode lua
         m4
         ook
         parrot_compiler perl5 perl6 pheme PIR plumhead pugs punie pynie

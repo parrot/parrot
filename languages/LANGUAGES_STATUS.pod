@@ -482,6 +482,30 @@ C<languages/lazy-k>
 =back
 
 
+=head2 lolcode
+
+=over 4
+
+=item Description
+
+Beginnings of an LOLCODE compiler, based on the spec described at
+L<http://lolcode.com/specs/1.2>
+
+=item Status
+
+VISIBLE and BTW "work"
+
+=item Last verified with parrot version
+
+0.5.1
+
+=item Location
+
+C<languages/lolcode>
+
+=back
+
+
 =head2 Lua
 
 =over 4
