@@ -6,6 +6,7 @@
 PARROT        = ../../parrot@exe@
 PERL          = @perl@
 RM_RF         = @rm_rf@
+TOUCH         = $(PERL) -MExtUtils::Command -e touch
 BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
@@ -47,7 +48,7 @@ m4.pbc: src/m4.pir
 	$(PARROT) -o m4.pbc src/m4.pir 
 
 src/m4.pir: src/builtin.pir src/freeze.pir src/input.pir src/macro.pir src/output.pir 
-	touch $@ 
+	$(TOUCH) $@ 
 
 html: 
 	mkdir docs/html 
