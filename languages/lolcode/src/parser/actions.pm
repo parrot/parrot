@@ -25,7 +25,11 @@ method TOP($/) {
 }
 
 
-method statement($/) {
+method statement ($/, $key) {
+    make $( $/{$key} ); # For now
+}
+
+method visible($/) {
     my $past := PAST::Op.new( :name('VISIBLE'), :pasttype('call'), :node( $/ ) );
     if ( $<no_newline> ) {
         $past.push( PAST::Val.new( :value( 1 ), :named( PAST::Val.new( :value('no_newline') ) ) ) );

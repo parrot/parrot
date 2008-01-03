@@ -15,6 +15,10 @@ rule TOP {
 }
 
 rule statement {
+    <visible> {*} #= visible
+}
+
+rule visible {
     'VISIBLE' <value> [ <value> ]* [$<no_newline>='!']? [ ',' | \n | $ ]
     {*}
 }
