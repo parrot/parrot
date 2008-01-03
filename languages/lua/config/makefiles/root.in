@@ -9,6 +9,7 @@ PBC_MERGE = ../../pbc_merge@exe@
 PGE      = $(PARROT) ../../runtime/parrot/library/PGE/Perl6Grammar.pir
 TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 PBC_TO_EXE = $(BUILD_DIR)/pbc_to_exe@exe@
+RECONFIGURE = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 LIBPATH  = lib
@@ -173,6 +174,10 @@ $(LIBPATH)/lfs.pbc: $(LIBPATH)/lfs.pir
 
 Lua/parser.pm: Lua/lua51.yp
 	yapp -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=lua
 
 help:
 	@echo ""
