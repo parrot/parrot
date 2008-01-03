@@ -76,8 +76,8 @@ rule quote {
 }
 
 token ws { <!ww> [
-    | ^^ \h* BTW \h \N* \n
-    | ^^ \h* OBTW .*? ^^ \h* TLDR \n
+    | ^^ \h* BTW \h \N* \n+
+    | ^^ \h* OBTW .*? ^^ \h* TLDR \n+
     | \h+
     ]*
 }

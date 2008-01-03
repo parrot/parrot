@@ -10,7 +10,6 @@ HAI 1.2
     more.
     VISIBLE "nok 3"
   TLDR
-
   VISIBLE "ok 3"
 
   VISIBLE "o" !
