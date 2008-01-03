@@ -17,10 +17,11 @@ rule TOP {
 }
 
 rule statement {
-    | <visible> {*}   #= visible
-    | <declare> {*}   #= declare
-    | <assign>  {*}   #= assign
-    | <function> {*}  #= function
+    | <visible>    {*}   #= visible
+    | <declare>    {*}   #= declare
+    | <assign>     {*}   #= assign
+    | <function>   {*}   #= function
+    | <expression> {*}   #= bare_expression
 }
 
 token statement_terminator { [ ',' | \n+ | $ ] }
@@ -51,23 +52,25 @@ rule block {
 }
 
 rule parameters {
-    'YR' <variable> [ 'AN' 'YR' <variable> ]*
+    'YR' <identifier> [ 'AN' 'YR' <identifier> ]*
 }
 
 rule expression {
-    <value> {*} #= value
+    <variable> {*} #= var_or_function
+    | <value> {*} #= value
 }
 
 rule value {
     | <integer>  {*}                             #= integer
     | <quote>    {*}                             #= quote
-    | <variable> {*}                             #= variable
 }
 
-token variable { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
+rule variable { <identifier> {*} }
+
+token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
-    'HOW' | 'I' | 'SAY' | 'SO' | 'U' | 'YR' | 'R' | 'AN'  | 'IF'
+    'HOW' | 'I' | 'SAY' | 'SO' | 'U' | 'YR' | 'R' | 'AN'  | 'IF' | 'KTHXBYE'
 }
 
 rule integer { \d+ {*} }

@@ -27,7 +27,15 @@ method TOP($/) {
 
 
 method statement ($/, $key) {
-    make $( $/{$key} ); # For now
+    if ($key eq 'bare_expression') {
+        my $it := PAST::Var.new( :name( 'IT' ), :scope('package'), :viviself('Undef'));
+        my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+        $past.push( $it );
+        $past.push( $( $<expression> ) );
+        make $past;
+    } else {
+        make $( $/{$key} ); # For now
+    }
 }
 
 
@@ -63,23 +71,24 @@ method assign($/) {
 }
 
 method function($/) {
-    my $past := $( $<block> );
-
-    # get the function name and set it on the block
-    my $funname := $( $<variable> ).name();
-    $past.name($funname);
+    my $block := $( $<block> );
+    $block.blocktype('declaration');
 
     # if there are any parameters, get the PAST for each of them and
     # adjust the scope to parameter.
     if $<parameters> {
-        my @params := $<parameters>[0]<variable>;
+        my @params := $<parameters>[0]<identifier>;
         for @params {
             my $param := $($_);
             $param.scope('parameter');
-            $past.push($param);
+            $block.push($param);
         }
     }
 
+    my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+    $($<variable>).isdecl(1);
+    $past.push( $( $<variable> ) );
+    $past.push( $block );
     make $past;
 }
 
@@ -97,7 +106,13 @@ method value($/, $key) {
 }
 
 method expression($/, $key) {
-    make $( $/{$key} );
+    if ($key eq 'var_or_function') {
+        my $past := PAST::Op.new( :name('var_or_function'), :pasttype('call'), :node( $/ ) );
+        $past.push( $( $<variable> ) );
+        make $past;
+    } else {
+        make $( $/{$key} );
+    }
 }
 
 method integer($/) {
@@ -110,8 +125,12 @@ method quote($/) {
 }
 
 
-method variable($/) {
-    make PAST::Var.new( :name( ~$<name> ),
+method identifier($/) {
+    make PAST::Val.new( :value( ~$/ ), :node($/) );
+}
+
+method variable ($/) {
+    make PAST::Var.new( :name( ~$<identifier><name> ),
                         :scope('lexical'),
                         :viviself('Undef'),
                         :node( $/ )
