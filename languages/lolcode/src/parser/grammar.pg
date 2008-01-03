@@ -27,7 +27,7 @@ rule value {
 rule integer { \d+ {*} }
 
 rule quote {
-    [ \' <string_literal: '> \' | \" <string_literal: "> \" ]
+    [ \" <string_literal: "> \" ]
     {*}
 }
 
