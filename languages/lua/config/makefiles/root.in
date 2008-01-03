@@ -1,18 +1,21 @@
 # Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
+MAKE    = @make_c@
 RM_F    = @rm_f@
 PERL    = @perl@
 PARROT  = ../../parrot@exe@
 PBC_MERGE = ../../pbc_merge@exe@
 PGE      = $(PARROT) ../../runtime/parrot/library/PGE/Perl6Grammar.pir
 TGE      = $(PARROT) ../../compilers/tge/tgc.pir
+PBC_TO_EXE = $(BUILD_DIR)/pbc_to_exe@exe@
 
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 LIBPATH  = lib
 PMCDIR   = pmc
 O        = @o@
 LOAD_EXT = @load_ext@
+BUILD_DIR     = @build_dir@
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 PMCS = \
@@ -108,6 +111,12 @@ src/POSTGrammar_gen.pir: src/POSTGrammar.tg
 lua.pbc: lua.pir src/lua51.pir src/lua51_gen.pir src/PASTGrammar_gen.pir src/POSTGrammar_gen.pir $(LIB_SRCS)
 	$(PARROT) -o lua.pbc --output-pbc lua.pir
 
+$(PBC_TO_EXE):
+	$(MAKE) $(BUILD_DIR) pbc_to_exe
+
+lua@exe@: lua.pbc $(PBC_TO_EXE)
+	$(PBC_TO_EXE) lua.pbc
+
 $(LIBPATH)/lualibs.pbc: $(LIB_PBCS)
 	$(PBC_MERGE) -o $(LIBPATH)/lualibs.pbc $(LIB_PBCS)
 
@@ -199,8 +208,9 @@ testclean:
 	$(RM_F) $(TEST_CLEANERS)
 
 BUILD_CLEANERS = \
- $(GEN_PIR) \
+ lua@exe@ \
  "*.pbc" \
+ $(GEN_PIR) \
  "$(PMCDIR)/*.dump" \
  "$(PMCDIR)/*.c" \
  "$(PMCDIR)/pmc_*.h" \
