@@ -123,41 +123,6 @@
 
           ")))
 
-; emit PIR for a scalar
-(define immediate-rep 
-  (lambda (x)
-    (cond
-      [(fixnum? x)
-       (format "
-               val_x = new 'PAST::Val'
-               val_x.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
-               " x)]
-      [(char? x)
-       (format "
-               val_x = new 'PAST::Val'
-               val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
-               " (char->integer x) )]
-      [(and (list? x) (= (length x) 0 ))
-       "
-       val_x = new 'PAST::Val'
-       val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
-       " ]
-      [(boolean? x)
-         (if x 
-             "
-             val_x = new 'PAST::Val'
-             val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-             "
-             "
-             val_x = new 'PAST::Val'
-             val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-             ")]
-      [(string? x)
-       (format "
-               val_x = new 'PAST::Val'
-               val_x.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
-               " x)])))
-
 ;; recognition of forms
 
 ; forms represented by a scalar PMC
@@ -518,10 +483,41 @@
       (apply (primitive-emitter prim) (gen-unique-id) args))
     "val_x"))
 
+; emit PIR for a scalar
 (define emit-immediate
   (lambda (x)
-    (emit (immediate-rep x))
-    "val_x"))
+    (cond
+      [(fixnum? x)
+       (emit "
+             val_x = new 'PAST::Val'
+             val_x.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
+             " x)]
+      [(char? x)
+       (emit "
+             val_x = new 'PAST::Val'
+             val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
+             " (char->integer x) )]
+      [(and (list? x) (= (length x) 0 ))
+       (emit "
+             val_x = new 'PAST::Val'
+             val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
+             ") ]
+      [(boolean? x)
+         (if x 
+           (emit "
+                 val_x = new 'PAST::Val'
+                 val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
+                 ")
+           (emit "
+                 val_x = new 'PAST::Val'
+                 val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
+                 "))]
+      [(string? x)
+       (emit "
+             val_x = new 'PAST::Val'
+             val_x.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
+             " x)])
+      "val_x"))
 
 (define bindings
   (lambda (x)
