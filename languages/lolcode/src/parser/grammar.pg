@@ -26,17 +26,17 @@ rule statement {
 token statement_terminator { [ ',' | \n+ | $ ] }
 
 rule visible {
-    'VISIBLE' <value> [ <value> ]* [$<no_newline>='!']?
+    'VISIBLE' <expression> [ <expression> ]* [$<no_newline>='!']?
     {*}
 }
 
 rule declare {
-    'I HAS A' <variable> [ 'ITZ' <value> ]?
+    'I HAS A' <variable> [ 'ITZ' <expression> ]?
     {*}
 }
 
 rule assign {
-    <variable> 'R' <value> {*}
+    <variable> 'R' <expression> {*}
 }
 
 rule function {
@@ -52,6 +52,10 @@ rule block {
 
 rule parameters {
     'YR' <variable> [ 'AN' 'YR' <variable> ]*
+}
+
+rule expression {
+    <value> {*} #= value
 }
 
 rule value {

@@ -36,7 +36,7 @@ method visible($/) {
     if ( $<no_newline> ) {
         $past.push( PAST::Val.new( :value( 1 ), :named( PAST::Val.new( :value('no_newline') ) ) ) );
     }
-    for $<value> {
+    for $<expression> {
         $past.push( $( $_ ) );
     }
     make $past;
@@ -44,11 +44,11 @@ method visible($/) {
 
 method declare($/) {
     $($<variable>).isdecl(1);
-    if ($<value>) {
+    if ($<expression>) {
         # XXX Someone clever needs to refactor this into C<assign>
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
         $past.push( $( $<variable> ) );
-        $past.push( $( $<value>[0] ) );
+        $past.push( $( $<expression>[0] ) );
         make $past;
     } else {
         make $( $<variable> );
@@ -58,7 +58,7 @@ method declare($/) {
 method assign($/) {
     my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
     $past.push( $( $<variable> ) );
-    $past.push( $( $<value> ) );
+    $past.push( $( $<expression> ) );
     make $past;
 }
 
@@ -96,6 +96,9 @@ method value($/, $key) {
     make $( $/{$key} );
 }
 
+method expression($/, $key) {
+    make $( $/{$key} );
+}
 
 method integer($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
