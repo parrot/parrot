@@ -51,7 +51,6 @@ Initialize a concurrency scheduler object.
         core_struct->interp      = INTERP;
         COND_INIT(core_struct->condition);
         MUTEX_INIT(core_struct->lock);
-
     }
 
 /*
@@ -242,7 +241,7 @@ Free the scheduler's underlying struct.
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
         COND_DESTROY(core_struct->condition);
         MUTEX_DESTROY(core_struct->lock);
-        mem_sys_free(PMC_data(SELF));
+        mem_sys_free(core_struct);
     }
 
 /*

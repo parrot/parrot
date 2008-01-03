@@ -311,7 +311,6 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     if (interp->scheduler)
         pobject_lives(interp, (PObj *)interp->scheduler);
 
-
     /* s. packfile.c */
     mark_const_subs(interp);
 
@@ -1108,8 +1107,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
      * the live bits are cleared
      */
     if (flags & DOD_finish_FLAG) {
-        /* XXX */
-        Parrot_dod_clear_live_bits(interp);
+        clear_live_bits(interp->arena_base->pmc_pool);
         clear_live_bits(interp->arena_base->constant_pmc_pool);
 
         Parrot_dod_sweep(interp, interp->arena_base->pmc_pool);
