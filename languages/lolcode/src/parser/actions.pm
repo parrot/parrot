@@ -27,6 +27,9 @@ method TOP($/) {
 
 method statement($/) {
     my $past := PAST::Op.new( :name('VISIBLE'), :pasttype('call'), :node( $/ ) );
+    if ( $<no_newline> ) {
+        $past.push( PAST::Val.new( :value( 1 ), :named( PAST::Val.new( :value('no_newline') ) ) ) );
+    }
     for $<value> {
         $past.push( $( $_ ) );
     }

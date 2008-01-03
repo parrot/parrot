@@ -10,6 +10,7 @@ say.pir -- simple implementation of a say function
 
 .sub 'VISIBLE'
     .param pmc args            :slurpy
+    .param int no_newline      :optional :named('no_newline')
     .local pmc iter
     iter = new 'Iterator', args
   iter_loop:
@@ -18,7 +19,9 @@ say.pir -- simple implementation of a say function
     print $P0
     goto iter_loop
   iter_end:
+    if no_newline goto done
     print "\n"
+  done:
     .return ()
 .end
 
