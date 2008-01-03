@@ -9,7 +9,9 @@ This is the grammar for lolcode written as a sequence of Perl 6 rules.
 grammar lolcode::Grammar is PCT::Grammar;
 
 rule TOP {
+    'HAI' <float> <statement_terminator>
     [<statement> <statement_terminator>]*
+    'KTHXBYE' <statement_terminator>
     [ $ || <panic: Syntax error> ]
     {*}
 }
@@ -45,6 +47,8 @@ rule value {
 token variable { $<name>=( <[a..zA..Z]> \w+ ) {*} }
 
 rule integer { \d+ {*} }
+
+token float { \d+ [ '.' \d+ ]? }
 
 rule quote {
     [ \" <string_literal: "> \" ]
