@@ -194,12 +194,11 @@
 ; implementation of fxadd1
 (define-primitive (fxadd1 uid arg)
   (emit "$P0 = ~a" (emit-expr arg))
-  (emit-immediate 1)
   (emit "
-        $P1 = val_x
+        $P1 = ~a
         val_x = new 'PAST::Op'
         val_x.init( $P0, $P1, 'pirop' => 'n_add' )
-        "))
+        " (emit-immediate 1)))
 
 ; implementation of fx+
 (define-primitive (fx+ uid arg1 arg2)
@@ -217,12 +216,11 @@
 ; implementation of fxsub1
 (define-primitive (fxsub1 uid arg)
   (emit "$P0 = ~a" (emit-expr arg))
-  (emit-immediate 1)
   (emit "
-        $P1 = val_x
+        $P1 = ~a
         val_x = new 'PAST::Op'
         val_x.init( $P0, $P1, 'pirop' => 'n_sub' )
-        "))
+        " (emit-immediate 1)))
 
 ; implementation of fx-
 (define-primitive (fx- uid arg1 arg2)
@@ -334,8 +332,7 @@
 ; implementation of fxzero?
 (define-primitive (fxzero? uid arg)
   (emit "$P0 = ~a" (emit-expr arg))
-  (emit-immediate 0)
-  (emit "$P1 = val_x")
+  (emit "$P1 = ~a" (emit-immediate 0))
   (emit "
         $P4 = new 'PAST::Op'
         $P4.init( $P0, $P1, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
@@ -465,10 +462,8 @@
   (lambda (function-name)
     (emit (string-append ".sub " function-name))
     (emit "    .local pmc val_true, val_false, val_x, reg_tmp_1, reg_tmp_2")
-    (emit-immediate #t)
-    (emit "    val_true = val_x")
-    (emit-immediate #f)
-    (emit "    val_false = val_x")))
+    (emit "    val_true = ~a" (emit-immediate #t))
+    (emit "    val_false = ~a" (emit-immediate #f))))
 
 (define emit-function-footer
   (lambda (reg)
