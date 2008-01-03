@@ -5,11 +5,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 16;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::inter::progs');
 use_ok('config::auto::attributes');
 use_ok('config::auto::alignptrs');
 use Parrot::Configure;
@@ -26,7 +25,7 @@ my $args = process_options(
 my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
-test_step_thru_runstep( $conf, q{inter::progs}, $args );
+# test_step_thru_runstep( $conf, q{inter::progs}, $args );
 test_step_thru_runstep( $conf, q{auto::attributes}, $args );
 
 my $pkg = q{auto::alignptrs};
