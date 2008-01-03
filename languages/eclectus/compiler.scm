@@ -198,7 +198,8 @@
         $P1 = ~a
         val_x = new 'PAST::Op'
         val_x.init( $P0, $P1, 'pirop' => 'n_add' )
-        " (emit-immediate 1)))
+        " (emit-immediate 1))
+  "val_x")
 
 ; implementation of fx+
 (define-primitive (fx+ uid arg1 arg2)
@@ -220,7 +221,8 @@
         $P1 = ~a
         val_x = new 'PAST::Op'
         val_x.init( $P0, $P1, 'pirop' => 'n_sub' )
-        " (emit-immediate 1)))
+        " (emit-immediate 1))
+  "val_x")
 
 ; implementation of fx-
 (define-primitive (fx- uid arg1 arg2)
@@ -230,7 +232,8 @@
   (emit "
         val_x = new 'PAST::Op'
         val_x.init( reg_1_~a, reg_2_~a, 'pirop' => 'n_sub' )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of fxlogand
 (define-primitive (fxlogand uid arg1 arg2)
@@ -240,7 +243,8 @@
   (emit "
         val_x = new 'PAST::Op'
         val_x.init( reg_1_~a, reg_2_~a, 'pirop' => 'n_band' )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of fxlogor
 (define-primitive (fxlogor uid arg1 arg2)
@@ -250,7 +254,8 @@
   (emit "
         val_x = new 'PAST::Op'
         val_x.init( reg_1_~a, reg_2_~a, 'pirop' => 'n_bor' )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 
 ; implementation of char->fixnum
@@ -259,7 +264,8 @@
         $P0 = ~a
         val_x = new 'PAST::Op'
         val_x.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusFixnum'\\nassign %r, %0\\n\" )
-        " (emit-expr arg)))
+        " (emit-expr arg))
+  "val_x")
 
 ; implementation of fixnum->char
 (define-primitive (fixnum->char uid arg)
@@ -267,7 +273,8 @@
         $P0 = ~a
         val_x = new 'PAST::Op'
         val_x.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
-        " (emit-expr arg)))
+        " (emit-expr arg))
+  "val_x")
 
 ; implementation of char<
 (define-primitive (char< uid arg1 arg2)
@@ -279,7 +286,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:<' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of char<=
 (define-primitive (char<= uid arg1 arg2)
@@ -291,7 +299,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:<=' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of char=
 (define-primitive (char= uid arg1 arg2)
@@ -303,7 +312,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of char>
 (define-primitive (char> uid arg1 arg2)
@@ -315,7 +325,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of char>=
 (define-primitive (char>= uid arg1 arg2)
@@ -327,7 +338,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>=' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of fxzero?
 (define-primitive (fxzero? uid arg)
@@ -338,7 +350,8 @@
         $P4.init( $P0, $P1, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        "))
+        ")
+  "val_x")
 
 ; implementation of fx=
 (define-primitive (fx= uid arg1 arg2)
@@ -350,7 +363,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:==' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of fx<
 (define-primitive (fx< uid arg1 arg2)
@@ -362,7 +376,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:<' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of fx<=
 (define-primitive (fx<= uid arg1 arg2)
@@ -374,7 +389,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:<=' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of fx>=
 (define-primitive (fx>= uid arg1 arg2)
@@ -386,7 +402,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>=' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of fx>
 (define-primitive (fx> uid arg1 arg2)
@@ -398,7 +415,8 @@
         $P4.init( reg_1_~a, reg_2_~a, 'pasttype' => 'chain', 'name' => 'infix:>' ) 
         val_x = new 'PAST::Op'
         val_x.init( $P4, val_true, val_false, 'pasttype' => 'if'  )
-        " uid uid))
+        " uid uid)
+  "val_x")
 
 ; implementation of null?
 (define-primitive (null? uid arg)
@@ -408,7 +426,8 @@
         $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
         val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        "))
+        ")
+  "val_x")
 
 ; implementation of fixnum?
 (define-primitive (fixnum? uid arg)
@@ -418,7 +437,8 @@
         $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
         val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        "))
+        ")
+  "val_x")
 
 ; implementation of boolean?
 (define-primitive (boolean? uid arg)
@@ -428,7 +448,8 @@
         $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
         val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        "))
+        ")
+  "val_x")
 
 ; implementation of not?
 ; first check boolean? and then the inverse truthiness
@@ -441,7 +462,8 @@
         $P4.init( $P0, val_false, val_true, 'pasttype' => 'if' )
         val_x = new 'PAST::Op'
         val_x.init( $P3, $P4, val_false, 'pasttype' => 'if' )
-        "))
+        ")
+  "val_x")
 
 ; implementation of char?
 (define-primitive (char? uid arg)
@@ -451,7 +473,8 @@
         $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusCharacter'\\n %r = $I1\" )
         val_x = new 'PAST::Op'
         val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        "))
+        ")
+  "val_x")
 
 ; a getter of '*emitter*'
 (define primitive-emitter
@@ -475,8 +498,7 @@
 (define emit-primcall
   (lambda (x)
     (let ([prim (car x)] [args (cdr x)])
-      (apply (primitive-emitter prim) (gen-unique-id) args))
-    "val_x"))
+      (apply (primitive-emitter prim) (gen-unique-id) args))))
 
 ; emit PIR for a scalar
 (define emit-immediate
