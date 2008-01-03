@@ -23,7 +23,7 @@ rule statement {
     | <function> {*}  #= function
 }
 
-token statement_terminator { [ ',' | \n | $ ] }
+token statement_terminator { [ ',' | \n+ | $ ] }
 
 rule visible {
     'VISIBLE' <value> [ <value> ]* [$<no_newline>='!']?
