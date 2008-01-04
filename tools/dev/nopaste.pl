@@ -1,4 +1,8 @@
 #!/usr/bin/perl
+
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
 use 5.008;
 use strict;
 use warnings;
@@ -61,3 +65,9 @@ USAGE
     exit 0;
 }
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
