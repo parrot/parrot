@@ -130,11 +130,15 @@ method identifier($/) {
 }
 
 method variable ($/) {
-    make PAST::Var.new( :name( ~$<identifier><name> ),
-                        :scope('lexical'),
-                        :viviself('Undef'),
-                        :node( $/ )
-                      );
+    if ($<identifier><name> eq 'IT') {
+        make PAST::Var.new( :name( 'IT' ), :scope('package'), :viviself('Undef'));
+    } else {
+        make PAST::Var.new( :name( ~$<identifier><name> ),
+                            :scope('lexical'),
+                            :viviself('Undef'),
+                            :node( $/ )
+                          );
+    }
 }
 
 
