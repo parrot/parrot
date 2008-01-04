@@ -56,8 +56,8 @@ rule parameters {
 }
 
 rule expression {
-    <variable> {*} #= var_or_function
-    | <value> {*} #= value
+    | <variable> {*}                             #= var_or_function
+    | <value> {*}                                #= value
 }
 
 rule value {
@@ -70,7 +70,7 @@ rule variable { <identifier> {*} }
 token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
-    'HOW' | 'SAY' | 'SO' | 'U' | 'YR' | 'R' | 'AN'  | 'IF' | 'KTHXBYE'
+    [ 'HOW' | 'SAY' | 'SO' | 'U' | 'YR' | 'R' | 'AN'  | 'IF' | 'KTHXBYE' ] >>
 }
 
 rule integer { \d+ {*} }
