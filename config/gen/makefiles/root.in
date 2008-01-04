@@ -496,10 +496,6 @@ PDUMP               = $(CUR_DIR)/pdump$(EXE)
 PINFO               = $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE            = $(CUR_DIR)/pbc_merge$(EXE)
 PDB                 = $(CUR_DIR)/pdb$(EXE)
-PBC_TO_EXE          = $(CUR_DIR)/pbc_to_exe$(EXE)
-
-# HLL Executables
-PERL6               = $(CUR_DIR)/perl6$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT   = $(CUR_DIR)/installable_parrot$(EXE)
@@ -645,28 +641,18 @@ help :
 	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
 	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB) and $(PBCMERGE)"
-	@echo "  $(PDUMP):"
-	@echo "                     Parrot Dumper"
-	@echo "  $(DIS):"
-	@echo "                     Parrot Disassembler"
-	@echo "  $(PINFO):"
-	@echo "                     Information about Parrot Byte Code"
-	@echo "  $(PDB):"
-	@echo "                     Parrot Debugger"
-	@echo "  $(PBCMERGE):"
-	@echo "                     Merge bytecode files"
-	@echo "  $(PBC_TO_EXE):"
-	@echo "                     Generate C, compile and link bytecode files"
-	@echo ""
-	@echo "HLL Executables:"
-	@echo "  $(PERL6):"
-	@echo "                     Perl 6 Compiler"
+	@echo "  $(PDUMP):             Parrot Dumper"
+	@echo "  $(DIS):       Parrot Disassembler"
+	@echo "  $(PINFO):          Information about Parrot Byte Code"
+	@echo "  $(PDB):               Parrot Debugger"
+	@echo "  $(PBCMERGE):         Merge bytecode files"
+	@echo "  pbc_to_exe:        Generate C, compile and link bytecode files"
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '$(PREFIX)' on Unix systems"
-	@echo "            WARNING: Installing Parrot may interfere with"
-	@echo "                     developing Parrot on the same machine."
-	@echo "                     This flaw will be fixed eventually."
+	@echo "                      WARNING: Installing Parrot may interfere with"
+	@echo "                               developing Parrot on the same machine."
+	@echo "                               This flaw will be fixed eventually."
 	@echo "  reallyinstall:     Install under '$(PREFIX)' on Unix systems"
 	@echo "               NOTE: This actually does the install.  Since"
 	@echo "                     there are currently issues with the Parrot"
@@ -749,7 +735,7 @@ help :
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
 	@echo "  rpm:               Create RPMs."
-	@echo "  win32-inno-installer:  Create MSWin32 setup."
+	@echo "  win32-inno-installer:      Create MSWin32 setup."
 	@echo ""
 	@echo "Examples:"
 	@echo "  hello:             'Hello World' as an executable."
@@ -787,14 +773,13 @@ pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
     $(BUILD_DIR)/src/parrot_config$(O)" \
     > pbc_to_exe.pir
 
-$(PBC_TO_EXE) : pbc_to_exe.pir
+pbc_to_exe : pbc_to_exe.pir
 	$(PARROT) -o pbc_to_exe.pbc pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pir pbc_to_exe.pbc
 
-# HLL executable targets
-$(PERL6) : all $(PBC_TO_EXE)
+perl6 : all pbc_to_exe
 	$(MAKE) languages/perl6
-	$(CUR_DIR)/$(PBC_TO_EXE) languages/perl6/perl6.pbc
+	$(CUR_DIR)/pbc_to_exe($EXE) languages/perl6/perl6.pbc
 
 #
 # TODO build the real miniparrot
@@ -1592,8 +1577,7 @@ prog-clean :
     $(INSTALLABLEPINFO) \
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPDB) \
-    pbc_to_exe.pir pbc_to_exe.pbc pbc_to_exe.c $(PBC_TO_EXE) \
-    $(PERL6) \
+    pbc_to_exe.pir pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(EXE) \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
@@ -2253,4 +2237,5 @@ smoke-clean :
 # ex: ft=make
 # End:
 #
+
 
