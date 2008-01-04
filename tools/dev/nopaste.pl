@@ -1,4 +1,4 @@
-#! perl
+#!/usr/bin/perl
 use 5.008;
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use Getopt::Std;
 my $server  = 'nopaste.snit.ch';
 my $url     = "http://$server:8001/paste";
 my $opt     = {
-    c => '#parrot',                              # channel
+    c => undef,                                  # channel
     n => getlogin || getpwuid($<) || 'someone',  # name
     t => undef,                                  # title
 };
@@ -28,21 +28,23 @@ my $mech  = WWW::Mechanize->new(
 );
 
 $mech->get( $url );
-$mech->success
-    or die "Can't find $url";
 
 $mech->submit_form(
     form_name => 'pasteForm',
     fields    => {
-        channel => $opt->{c},
+        (defined $opt->{c} ?
+        (channel => $opt->{c}) :
+        ()
+        ),
         nick    => $opt->{n},
         summary => $opt->{t},
         paste   => $text,
     },
     button    => 'Paste it',
 );
-$mech->success
-    or die "Can't submit to $server";
+
+my @link = $mech->links;
+print "Your paste can be found at ", $link[0]->url, "\n";
 
 
 sub usage {
@@ -52,9 +54,10 @@ nopaste.pl - paste the contents of a file via $server
   nopaste.pl -t "TITLE" [ -c CHANNEL ] [ -n NAME ] [ FILENAME ]
 
     TITLE     the title of the paste
-    CHANNEL   the irc channel (defaults to '#parrot')
+    CHANNEL   the irc channel (defaults to undef)
     NAME      the username (defaults to username or 'someone')
     FILENAME  the name of the file to paste (defaults to STDIN)
 USAGE
     exit 0;
 }
+
