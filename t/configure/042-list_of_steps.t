@@ -18,7 +18,6 @@ my $args = process_options( {
     mode    => q{configure},
 } );
 ok(defined $args, "process_options returned successfully");
-my %args = %$args;
 
 my $conf = Parrot::Configure->new;
 ok(defined $conf, "Parrot::Configure->new() returned okay");
