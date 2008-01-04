@@ -44,7 +44,7 @@ rule expr    {
     | <oexpr> {*}                                #= oexpr
 }
 
-rule gprint  { (print) $<handle>=<word>? <expr> {*} }
+rule gprint  { (print) <expr> {*} }
 
 rule 'oexpr' is optable { ... }
 
@@ -55,7 +55,6 @@ token term {
     | <stringdouble> {*}                         #= stringdouble
     | <stringsingle> {*}                         #= stringsingle
     | <stringbacktick> {*}                       #= stringbacktick
-    | <regex> {*}                                #= regex
     | do <.ws> <block> {*}                       #= block
     | <opcall> {*}                               #= subcall
     | <subcall> {*}                              #= subcall
@@ -75,18 +74,16 @@ token key {
     {*}
 }
 token integer { \d+ {*} }
-token number  { \d+\.\d+ {*} }
-token stringdouble   { '"' <string_literal: "> '"' {*} }
-token stringsingle   { \' <string_literal: '> \' {*} }
+token number { \d+\.\d+ {*} }
+token stringdouble { '"' <string_literal: "> '"' {*} }
+token stringsingle { \' <string_literal: '> \' {*} }
 token stringbacktick { \` <string_literal: `> \` {*} }
-token regex          { \/ <string_literal: \/> \/ {*} }
-rule subcall  { do $<sym>=<word> \( <expr>? \) {*} }
-rule opcall   { $<sym>=<op> \( <expr>? \) {*} }
+rule subcall { do $<sym>=<word> \( <expr>? \) {*} }
+rule opcall  { $<sym>=<op> \( <expr>? \) {*} }
 
 token op {
     | open
     | die
-    | shift
 }
 
 token ws {
@@ -96,9 +93,7 @@ token ws {
     {*}
 }
 
-proto prefix:<!> is precedence('=') {...}
-
-proto infix:<+> is looser(prefix:<!>)
+proto infix:<+> is precedence('=')
     is pirop('n_add')
     {...}
 
@@ -141,7 +136,6 @@ proto infix:<lt> is equiv(infix:«<»)   is assoc('non') {...}
 proto infix:<gt> is equiv(infix:«<»)   is assoc('non') {...}
 proto infix:<le> is equiv(infix:«<»)   is assoc('non') {...}
 proto infix:<ge> is equiv(infix:«<»)   is assoc('non') {...}
-proto infix:<=~> is equiv(infix:«<»)   is assoc('non') {...}
 
 proto infix:<==> is looser(infix:«<») is assoc('non') {...}
 proto infix:<!=> is equiv(infix:<==>) is assoc('non') {...}
