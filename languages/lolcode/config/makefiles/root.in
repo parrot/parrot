@@ -39,6 +39,7 @@ SOURCES = lolcode.pir \
 
 BUILTINS_PIR = \
   src/builtins/say.pir \
+  src/builtins/var_or_function.pir
 
 # PMCS = lolcode
 # PMC_SOURCES = $(PMC_DIR)/lolcode.pmc
