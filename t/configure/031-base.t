@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( lib );
-use Test::More tests =>  9;
+use Test::More tests =>  6;
 
 =head1 NAME
 
@@ -33,7 +33,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{foo};
-    $data{args}        = [ qw( foo bar baz ) ];
     $data{result}      = q{};
     return \%data;
 }
@@ -42,24 +41,8 @@ package main;
 
 my $testpkg = 'Test::Parrot::Configure::Step';
 
-can_ok( $testpkg, qw(new description args result set_result) );
+can_ok( $testpkg, qw(new description result set_result) );
 isa_ok( $testpkg->new, $testpkg );
-
-# ->description() & ->args() work as object methods too
-{
-    my $teststep = $testpkg->new;
-
-    is( $teststep->description, 'foo', "->description() returns the proper value" );
-    is_deeply( [ $teststep->args ], [qw(foo bar baz)], "->args() returns the proper value" );
-}
-
-{
-    my $teststep = $testpkg->new();
-    my @listcontext = $teststep->args();
-    my $scalarcontext = $teststep->args();
-    is_deeply( $scalarcontext, [ @listcontext ],
-        "->args() finds same elements in both scalar and list contexts" );
-}
 
 {
     my $teststep = $testpkg->new;
