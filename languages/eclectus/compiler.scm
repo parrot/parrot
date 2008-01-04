@@ -545,8 +545,8 @@
   (lambda (function-name)
     (emit (string-append ".sub " function-name))
     (emit "    .local pmc val_true, val_false")
-    (emit "    val_true  = ~a" (emit-immediate #t (gen-unique-id)))
-    (emit "    val_false = ~a" (emit-immediate #f (gen-unique-id)))))
+    (emit "    val_true  = ~a" (car (emit-immediate #t)))
+    (emit "    val_false = ~a" (car (emit-immediate #f)))))
 
 (define emit-function-footer
   (lambda (reg)
@@ -562,40 +562,41 @@
 
 ; emit PIR for a scalar
 (define emit-immediate
-  (lambda (x uid)
-    (emit ".local pmc reg_~a" uid)
-    (cond
-      [(fixnum? x)
-       (emit "
-             reg_~a = new 'PAST::Val'
-             reg_~a.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
-             " uid uid x)]
-      [(char? x)
-       (emit "
-             reg_~a = new 'PAST::Val'
-             reg_~a.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
-             " uid uid (char->integer x) )]
-      [(and (list? x) (= (length x) 0 ))
-       (emit "
-             reg_~a = new 'PAST::Val'
-             reg_~a.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
-             " uid uid) ]
-      [(boolean? x)
-         (if x 
-           (emit "
-                 reg_~a = new 'PAST::Val'
-                 reg_~a.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-                 " uid uid)
-           (emit "
-                 reg_~a = new 'PAST::Val'
-                 reg_~a.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-                 " uid uid))]
-      [(string? x)
-       (emit "
-             reg_~a = new 'PAST::Val'
-             reg_~a.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
-             " uid uid x)])
-      (format "reg_~a" uid)))
+  (lambda (x)
+    (let ([uid (gen-unique-id)])
+      (emit ".local pmc reg_~a" uid)
+      (cond
+        [(fixnum? x)
+         (emit "
+               reg_~a = new 'PAST::Val'
+               reg_~a.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
+               " uid uid x)]
+        [(char? x)
+         (emit "
+               reg_~a = new 'PAST::Val'
+               reg_~a.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
+               " uid uid (char->integer x) )]
+        [(and (list? x) (= (length x) 0 ))
+         (emit "
+               reg_~a = new 'PAST::Val'
+               reg_~a.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
+               " uid uid) ]
+        [(boolean? x)
+           (if x 
+             (emit "
+                   reg_~a = new 'PAST::Val'
+                   reg_~a.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
+                   " uid uid)
+             (emit "
+                   reg_~a = new 'PAST::Val'
+                   reg_~a.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
+                   " uid uid))]
+        [(string? x)
+         (emit "
+               reg_~a = new 'PAST::Val'
+               reg_~a.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
+               " uid uid x)])
+        (list (format "reg_~a" uid)))))
 
 (define bindings
   (lambda (x)
@@ -650,7 +651,7 @@
   (lambda (x)
     ;(display "# ")(write x) (newline)
     (cond
-      [(immediate? x) (emit-immediate x (gen-unique-id))]
+      [(immediate? x) (car (emit-immediate x))]
       [(variable? x)  (emit-variable x (gen-unique-id))]
       [(let? x)       (emit-let (bindings x) (body x) (gen-unique-id))]
       [(if? x)        (emit-if x (gen-unique-id))]
@@ -683,6 +684,13 @@
                             (unquote (transform-and-or (cadr tree)))
                             (unquote (transform-and-or (quasiquote (or (unquote-splicing (cddr tree))))))))])][else  (map transform-and-or tree)]))) 
 
+; eventually this will become a PIR generator
+; for PAST as SXML
+; currently it only handles the pushes
+(define emit-pushes
+  (lambda (reg)
+    (if (list? reg) (car reg) reg)))
+
 ; the actual compiler
 (define compile-program
   (lambda (program)
@@ -690,4 +698,7 @@
     (emit-driver)
     (emit-builtins)
     (emit-function-header "scheme_entry")
-    (emit-function-footer (emit-expr (transform-and-or program)))))
+    (emit-function-footer
+      (emit-pushes
+        (emit-expr
+          (transform-and-or program))))))
