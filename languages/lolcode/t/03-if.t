@@ -14,7 +14,7 @@ HAI 1.2
     YA RLY
       VISIBLE "nok 2"
     NO WAI
-      VISIBLE "ok 1"
+      VISIBLE "ok 2"
   OIC
 
 KTHXBYE
