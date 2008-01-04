@@ -15,7 +15,7 @@ running compilers from a command line.
     load_bytecode 'Protoobject.pbc'
     load_bytecode 'Parrot/Exception.pbc'
     $P0 = get_hll_global 'Protomaker'
-    $P1 = split ' ', '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt'
+    $P1 = split ' ', '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage'
     $P2 = $P0.'new_subclass'('Protoobject', 'PCT::HLLCompiler', $P1 :flat)
 .end
 
@@ -37,6 +37,28 @@ by C<attrname> based on C<has_value>.
 .sub 'init' :vtable :method
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
+
+    $P0 = split ' ', 'help|h target=s trace|t=s encoding|e=s output|o=s combine each'
+    setattribute self, '@cmdoptions', $P0
+
+    $P1 = new String
+    $P1 = <<'    USAGE'
+  This compiler is based on PCT::HLLCompiler.
+
+  Options:
+    USAGE
+
+    .local pmc iter
+    iter = new Iterator, $P0
+  options_loop:
+    unless iter goto options_end
+    $P3  = shift iter
+    $P1 .= "    "
+    $P1 .= $P3
+    $P1 .= "\n"
+    goto options_loop
+  options_end:
+    setattribute self, '$usage', $P1
 .end
 
 .sub 'attr' :method
@@ -578,12 +600,15 @@ Generic method for compilers invoked from a shell command line.
     .local pmc getopts, opts
     getopts = new 'Getopt::Obj'
     getopts.'notOptStop'(1)
-    push getopts, 'target=s'
-    push getopts, 'trace|t=s'
-    push getopts, 'encoding|e=s'
-    push getopts, 'output|o=s'
-    push getopts, 'combine'
-    push getopts, 'each'
+    $P0 = getattribute self, '@cmdoptions'
+    .local pmc iter
+    iter = new 'Iterator', $P0
+  getopts_loop:
+    unless iter goto getopts_end
+    $S0 = shift iter
+    push getopts, $S0
+    goto getopts_loop
+  getopts_end:
     opts = getopts.'get_options'(args)
 
     ##   merge command-line args with defaults passed in from caller
@@ -596,6 +621,9 @@ Generic method for compilers invoked from a shell command line.
     adverbs[$S0] = $P0
     goto mergeopts_loop
   mergeopts_end:
+
+    $I0 = adverbs['help']
+    if $I0 goto usage
 
     .local pmc result
     result = new 'String'
@@ -635,6 +663,8 @@ Generic method for compilers invoked from a shell command line.
 
   err_output:
     .return self.'panic'('Error: file cannot be written: ', output)
+  usage:
+    self.'usage'(arg0)
 .end
 
 
@@ -651,6 +681,26 @@ based on double-colon separators.
     $P0 = split '::', name
     .return ($P0)
 .end
+
+
+=item usage()
+
+A usage method.
+
+=cut
+
+.sub 'usage' :method
+    .param string name     :optional
+    .param int    has_name :opt_flag
+
+    unless has_name goto no_name
+    say name
+  no_name:
+    $P0 = getattribute self, '$usage'
+    say $P0
+    exit 0
+.end
+
 
 =back
 
