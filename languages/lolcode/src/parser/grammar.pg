@@ -87,8 +87,8 @@ rule variable { <identifier> {*} }
 token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
-    [ 'AN' | 'HOW' | 'IF' | 'KTHXBYE' | 'MEBBE' | 'NO' | 'O' | 'OIC' | 'R'
-    | 'RLY?' | 'SAY' | 'SO' | 'U' | 'WAI' | 'YR' ] >>
+    [ 'AN' | 'FAIL' | 'FOUND' | 'HOW' | 'IF' | 'KTHXBYE' | 'MEBBE' | 'NO'
+    | 'O' | 'OIC' | 'R' | 'RLY?' | 'SAY' | 'SO' | 'U' | 'WAI' | 'WIN' | 'YR' ] >>
 }
 
 rule integer { \d+ {*} }
