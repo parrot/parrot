@@ -55,13 +55,13 @@ sub runstep {
 
     # On OS X check the presence of the readline header in the standard
     # Fink/macports location.
-    # RT#43134: Need a more generalized way for finding
-    # where Fink lives.
     if ( $osname =~ /darwin/ ) {
-        if ( -f "/sw/include/readline/readline.h" ) {
-            $conf->data->add( ' ', linkflags => '-L/sw/lib' );
-            $conf->data->add( ' ', ldflags   => '-L/sw/lib' );
-            $conf->data->add( ' ', ccflags   => '-I/sw/include' );
+        my $fink_lib_dir        = $conf->data->get('fink_lib_dir');
+        my $fink_include_dir    = $conf->data->get('fink_include_dir');
+        if ( -f "$fink_include_dir/readline/readline.h" ) {
+            $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
+            $conf->data->add( ' ', ldflags   => "-L$fink_lib_dir" );
+            $conf->data->add( ' ', ccflags   => "-I$fink_include_dir" );
         }
         if ( -f "/opt/local/include/readline/readline.h" ) {
             $conf->data->add( ' ', linkflags => '-L/opt/local/lib' );

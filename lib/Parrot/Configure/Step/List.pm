@@ -20,6 +20,7 @@ my @steps = qw(
     inter::yacc
     auto::gcc
     auto::backtrace
+    auto::fink
     auto::msvc
     auto::attributes
     auto::warnings

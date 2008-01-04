@@ -56,13 +56,13 @@ sub runstep {
 
     # On OS X check the presence of the gdbm header in the standard
     # Fink location.
-    # RT#43134: Need a more generalized way for finding
-    # where Fink lives.
     if ( $osname =~ /darwin/ ) {
-        if ( -f "/sw/include/gdbm.h" ) {
-            $conf->data->add( ' ', linkflags => '-L/sw/lib' );
-            $conf->data->add( ' ', dflags    => '-L/sw/lib' );
-            $conf->data->add( ' ', cflags    => '-I/sw/include' );
+        my $fink_lib_dir        = $conf->data->get('fink_lib_dir');
+        my $fink_include_dir    = $conf->data->get('fink_include_dir');
+        if ( -f "$fink_include_dir/gdbm.h" ) {
+            $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
+            $conf->data->add( ' ', dflags    => "-L$fink_lib_dir" );
+            $conf->data->add( ' ', cflags    => "-I$fink_include_dir" );
         }
     }
 
