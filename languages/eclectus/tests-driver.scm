@@ -80,8 +80,8 @@
    (run-compile expr)
    (execute)
    (if (string=? expected-output (get-string))
-     (pass ( + test-id 1 ) (format "~s: ~s\n" test-name expr))
-     (fail ( + test-id 1 ) (format "~s: expected ~s, got ~s\n" test-name expr (get-string) ))))
+     (pass ( + test-id 1 ) (format "~a: ~a" test-name expr))
+     (fail ( + test-id 1 ) (format "~a: expected ~s, got ~a" test-name expr (get-string) ))))
 
 (define (emit . args)
   (apply fprintf (compile-port) args)
