@@ -215,13 +215,14 @@
 
 ; implementation of fxsub1
 (define-primitive (fxsub1 uid arg)
-  (emit "$P0 = ~a" (emit-expr arg))
   (emit "
-        $P1 = ~a
-        val_x = new 'PAST::Op'
-        val_x.init( $P0, $P1, 'pirop' => 'n_sub' )
-        " (emit-immediate 1))
-  "val_x")
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( 'pirop' => 'n_sub' )
+        " uid uid uid)
+  (emit "reg_~a.push( ~a )" uid (emit-expr arg))
+  (emit "reg_~a.push( ~a )" uid (emit-expr 1))
+  (format "reg_~a" uid))
 
 ; implementation of fx-
 (define-primitive (fx- uid arg1 arg2)
@@ -286,11 +287,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of char<=
 (define-primitive (char<= uid arg1 arg2)
@@ -302,11 +303,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of char=
 (define-primitive (char= uid arg1 arg2)
@@ -318,11 +319,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of char>
 (define-primitive (char> uid arg1 arg2)
@@ -334,11 +335,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of char>=
 (define-primitive (char>= uid arg1 arg2)
@@ -350,11 +351,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of fxzero?
 (define-primitive (fxzero? uid arg)
@@ -366,11 +367,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr 0))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of fx=
 (define-primitive (fx= uid arg1 arg2)
@@ -382,11 +383,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of fx<
 (define-primitive (fx< uid arg1 arg2)
@@ -398,11 +399,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of fx<=
 (define-primitive (fx<= uid arg1 arg2)
@@ -414,11 +415,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of fx>=
 (define-primitive (fx>= uid arg1 arg2)
@@ -430,11 +431,11 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of fx>
 (define-primitive (fx> uid arg1 arg2)
@@ -446,69 +447,94 @@
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg1))
   (emit "reg_cmp_~a.push( ~a )" uid (emit-expr arg2))
   (emit "
-        .local pmc reg_if_~a
-        reg_if_~a = new 'PAST::Op'
-        reg_if_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_cmp_~a, val_true, val_false, 'pasttype' => 'if'  )
         " uid uid uid uid)
-  (format "reg_if_~a" uid))
+  (format "reg_~a" uid))
 
 ; implementation of null?
 (define-primitive (null? uid arg)
-  (emit "$P0 = ~a" (emit-expr arg))
   (emit "
-        $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
-        val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        ")
-  "val_x")
+        .local pmc reg_inline_~a
+        reg_inline_~a = new 'PAST::Op'
+        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
+        " uid uid uid)
+  (emit "reg_inline_~a.push( ~a )" uid (emit-expr arg))
+  (emit "
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_inline_~a, val_true, val_false, 'pasttype' => 'if' )
+        " uid uid uid uid)
+  (format "reg_~a" uid))
 
 ; implementation of fixnum?
 (define-primitive (fixnum? uid arg)
-  (emit "$P0 = ~a" (emit-expr arg))
   (emit "
-        $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
-        val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        ")
-  "val_x")
+        .local pmc reg_inline_~a
+        reg_inline_~a = new 'PAST::Op'
+        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
+        " uid uid uid)
+  (emit "reg_inline_~a.push( ~a )" uid (emit-expr arg))
+  (emit "
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_inline_~a, val_true, val_false, 'pasttype' => 'if' )
+        " uid uid uid uid)
+  (format "reg_~a" uid))
 
 ; implementation of boolean?
 (define-primitive (boolean? uid arg)
-  (emit "$P0 = ~a" (emit-expr arg))
   (emit "
-        $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
-        val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        ")
-  "val_x")
+        .local pmc reg_inline_~a
+        reg_inline_~a = new 'PAST::Op'
+        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
+        " uid uid uid)
+  (emit "reg_inline_~a.push( ~a )" uid (emit-expr arg))
+  (emit "
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_inline_~a, val_true, val_false, 'pasttype' => 'if' )
+        " uid uid uid uid)
+  (format "reg_~a" uid))
+
+; implementation of char?
+(define-primitive (char? uid arg)
+  (emit "
+        .local pmc reg_inline_~a
+        reg_inline_~a = new 'PAST::Op'
+        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusCharacter'\\n %r = $I1\" )
+        " uid uid uid)
+  (emit "reg_inline_~a.push( ~a )" uid (emit-expr arg))
+  (emit "
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_inline_~a, val_true, val_false, 'pasttype' => 'if' )
+        " uid uid uid uid)
+  (format "reg_~a" uid))
 
 ; implementation of not?
 ; first check boolean? and then the inverse truthiness
 (define-primitive (not? uid arg)
-  (emit "$P0 = ~a" (emit-expr arg))
   (emit "
-        $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
-        $P4 = new 'PAST::Op'
-        $P4.init( $P0, val_false, val_true, 'pasttype' => 'if' )
-        val_x = new 'PAST::Op'
-        val_x.init( $P3, $P4, val_false, 'pasttype' => 'if' )
-        ")
-  "val_x")
-
-; implementation of char?
-(define-primitive (char? uid arg)
-  (emit "$P0 = ~a" (emit-expr arg))
+        .local pmc reg_inline_~a
+        .local pmc reg_arg_~a
+        reg_arg_~a = ~a
+        reg_inline_~a = new 'PAST::Op'
+        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
+        " uid uid uid (emit-expr arg) uid uid)
+  (emit "reg_inline_~a.push( reg_arg_~a )" uid uid)
   (emit "
-        $P3 = new 'PAST::Op'
-        $P3.init( $P0, 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusCharacter'\\n %r = $I1\" )
-        val_x = new 'PAST::Op'
-        val_x.init( $P3, val_true, val_false, 'pasttype' => 'if' )
-        ")
-  "val_x")
+        .local pmc reg_negate_1_~a
+        reg_negate_1_~a = new 'PAST::Op'
+        reg_negate_1_~a.init( reg_arg_~a, val_false, val_true, 'pasttype' => 'if' )
+        " uid uid uid uid)
+  (emit "
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        reg_~a.init( reg_inline_~a, reg_negate_1_~a, val_false, 'pasttype' => 'if' )
+        " uid uid uid uid uid)
+  (format "reg_~a" uid))
 
 ; a getter of '*emitter*'
 (define primitive-emitter
@@ -518,9 +544,9 @@
 (define emit-function-header
   (lambda (function-name)
     (emit (string-append ".sub " function-name))
-    (emit "    .local pmc val_true, val_false, val_x, reg_tmp_1, reg_tmp_2")
-    (emit "    val_true = ~a" (emit-immediate #t))
-    (emit "    val_false = ~a" (emit-immediate #f))))
+    (emit "    .local pmc val_true, val_false")
+    (emit "    val_true  = ~a" (emit-immediate #t (gen-unique-id)))
+    (emit "    val_false = ~a" (emit-immediate #f (gen-unique-id)))))
 
 (define emit-function-footer
   (lambda (reg)
@@ -536,39 +562,40 @@
 
 ; emit PIR for a scalar
 (define emit-immediate
-  (lambda (x)
+  (lambda (x uid)
+    (emit ".local pmc reg_~a" uid)
     (cond
       [(fixnum? x)
        (emit "
-             val_x = new 'PAST::Val'
-             val_x.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
-             " x)]
+             reg_~a = new 'PAST::Val'
+             reg_~a.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
+             " uid uid x)]
       [(char? x)
        (emit "
-             val_x = new 'PAST::Val'
-             val_x.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
-             " (char->integer x) )]
+             reg_~a = new 'PAST::Val'
+             reg_~a.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
+             " uid uid (char->integer x) )]
       [(and (list? x) (= (length x) 0 ))
        (emit "
-             val_x = new 'PAST::Val'
-             val_x.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
-             ") ]
+             reg_~a = new 'PAST::Val'
+             reg_~a.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
+             " uid uid) ]
       [(boolean? x)
          (if x 
            (emit "
-                 val_x = new 'PAST::Val'
-                 val_x.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-                 ")
+                 reg_~a = new 'PAST::Val'
+                 reg_~a.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
+                 " uid uid)
            (emit "
-                 val_x = new 'PAST::Val'
-                 val_x.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-                 "))]
+                 reg_~a = new 'PAST::Val'
+                 reg_~a.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
+                 " uid uid))]
       [(string? x)
        (emit "
-             val_x = new 'PAST::Val'
-             val_x.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
-             " x)])
-      "val_x"))
+             reg_~a = new 'PAST::Val'
+             reg_~a.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
+             " uid uid x)])
+      (format "reg_~a" uid)))
 
 (define bindings
   (lambda (x)
@@ -579,7 +606,7 @@
     (caddr x)))
 
 (define emit-variable
-  (lambda (x)
+  (lambda (x uid)
     (emit-expr 13)))
 
 (define emit-let
@@ -587,43 +614,44 @@
      (if (null? binds)
        (emit-expr body)
        (begin
-         ;(write (list "dump:emit-let" binds (caar binds)(cadar binds)body uid))(newline)
-         (emit "    .local pmc reg_let_var_~a, reg_let_val_~a, reg_let_copy_~a, reg_let_body_~a" uid uid uid uid)
          (emit "
+               .local pmc reg_let_var_~a
                reg_let_var_~a = new 'PAST::Var'
                reg_let_var_~a.init( 'name' => '~a', 'scope' => 'lexical', 'viviself' => 'Undef', 'isdecl' => 1 )
-               " uid uid (caar binds))
-         (emit "reg_let_val_~a = ~a" uid (emit-expr (cadar binds)))
-         (emit "
+
+               .local pmc reg_let_copy_~a 
                reg_let_copy_~a = new 'PAST::Op'
-               reg_let_copy_~a.init( reg_let_var_~a, reg_let_val_~a,  'pasttype' => 'copy', 'lvalue' => 1 )
-               " uid uid uid uid )
-         (emit "reg_let_body_~a = ~a" uid (emit-expr body))
+               reg_let_copy_~a.init( 'pasttype' => 'copy', 'lvalue' => 1 )
+               " uid uid uid (caar binds) uid uid uid)
+         (emit "reg_let_copy_~a.push( ~a )" uid (format "reg_let_var_~a" uid ))
+         (emit "reg_let_copy_~a.push( ~a )" uid (emit-expr (cadar binds)))
          (emit "
-               val_x = new 'PAST::Stmts'
-               val_x.init( reg_let_copy_~a, reg_let_body_~a )
-               " uid uid)))
-       "val_x"))
+               .local pmc reg_~a
+               reg_~a = new 'PAST::Stmts'
+               reg_~a.init( reg_let_copy_~a )
+               " uid uid uid uid)
+         (emit "reg_~a.push( ~a )" uid (emit-expr body))
+         (format "reg_~a" uid)))))
 
 (define emit-if
   (lambda (x uid)
-    (emit "    .local pmc reg_if_test_~a, reg_if_conseq_~a, reg_if_altern_~a" uid uid uid)
-    (emit "reg_if_test_~a = ~a" uid (emit-expr (if-test x)))
-    (emit "reg_if_conseq_~a = ~a" uid (emit-expr (if-conseq x)))
-    (emit "reg_if_altern_~a = ~a" uid (emit-expr (if-altern x)))
     (emit "
-          val_x = new 'PAST::Op'
-          val_x.init( reg_if_test_~a, reg_if_conseq_~a, reg_if_altern_~a, 'pasttype' => 'if'  )
-          " uid uid uid)
-    "val_x"))
+          .local pmc reg_~a
+          reg_~a = new 'PAST::Op'
+          reg_~a.init( 'pasttype' => 'if'  )
+          " uid uid uid )
+    (emit "reg_~a.push( ~a )" uid (emit-expr (if-test x)))
+    (emit "reg_~a.push( ~a )" uid (emit-expr (if-conseq x)))
+    (emit "reg_~a.push( ~a )" uid (emit-expr (if-altern x)))
+    (format "reg_~a" uid)))
  
 ; emir PIR for an expression
 (define emit-expr
   (lambda (x)
     ;(display "# ")(write x) (newline)
     (cond
-      [(immediate? x) (emit-immediate x)]
-      [(variable? x)  (emit-variable x)]
+      [(immediate? x) (emit-immediate x (gen-unique-id))]
+      [(variable? x)  (emit-variable x (gen-unique-id))]
       [(let? x)       (emit-let (bindings x) (body x) (gen-unique-id))]
       [(if? x)        (emit-if x (gen-unique-id))]
       [(primcall? x)  (emit-primcall x)]
