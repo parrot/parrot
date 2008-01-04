@@ -53,15 +53,29 @@ rule ifthen {
     'YA' 'RLY' <statement_terminator>
     <block>
     [
-     'MEBBE' <expression> <statement_terminator>
-     <block>
+      'MEBBE' <expression> <statement_terminator>
+      <block>
     ]*
     [
-     'NO' 'WAI' <statement_terminator>
-     <block>
+      'NO' 'WAI' <statement_terminator>
+      <block>
     ]?
     'OIC'
     {*}
+}
+
+rule switch {
+    <expression> <statement_terminator>
+    'WTF?' <statement_terminator>
+    [
+      'OMG' <value> <statement_terminator>
+      <block>
+    ]+
+    [
+      'OMGWTF' <statement_terminator>
+      <block>
+    ]?
+    'OIC'
 }
 
 rule block {
@@ -87,8 +101,9 @@ rule variable { <identifier> {*} }
 token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
-    [ 'AN' | 'FAIL' | 'FOUND' | 'HOW' | 'IF' | 'KTHXBYE' | 'MEBBE' | 'NO'
-    | 'O' | 'OIC' | 'R' | 'RLY?' | 'SAY' | 'SO' | 'U' | 'WAI' | 'WIN' | 'YR' ] >>
+    [ 'AN' | 'FAIL' | 'FOUND' | 'GTFO' | 'HOW' | 'IF' | 'KTHXBYE' | 'MEBBE' | 'NO'
+    | 'O' | 'OIC' | 'OMG' | 'OMGWTF' | 'R' | 'RLY?' | 'SAY' | 'SO' | 'U' | 'WAI'
+    | 'WIN' | 'WTF?' | 'YR' ] >>
 }
 
 rule integer { \d+ {*} }
