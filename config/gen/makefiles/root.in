@@ -779,7 +779,7 @@ pbc_to_exe : pbc_to_exe.pir
 
 perl6 : all pbc_to_exe
 	$(MAKE) languages/perl6
-	$(CUR_DIR)/pbc_to_exe($EXE) languages/perl6/perl6.pbc
+	$(CUR_DIR)/pbc_to_exe$(EXE) languages/perl6/perl6.pbc
 
 #
 # TODO build the real miniparrot
