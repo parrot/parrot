@@ -102,8 +102,8 @@ token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
     [ 'AN' | 'FAIL' | 'FOUND' | 'GTFO' | 'HOW' | 'IF' | 'KTHXBYE' | 'MEBBE' | 'NO'
-    | 'O' | 'OIC' | 'OMG' | 'OMGWTF' | 'R' | 'RLY?' | 'SAY' | 'SO' | 'U' | 'WAI'
-    | 'WIN' | 'WTF?' | 'YR' ] >>
+    | 'O' | 'OIC' | 'OMG' | 'OMGWTF' | 'R' | 'RLY' | 'RLY?' | 'SAY' | 'SO' | 'U' | 'WAI'
+    | 'WIN' | 'WTF?' | 'YA' | 'YR' ] >>
 }
 
 rule integer { \d+ {*} }
