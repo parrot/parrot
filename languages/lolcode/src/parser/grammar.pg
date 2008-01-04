@@ -47,6 +47,23 @@ rule function {
     {*}
 }
 
+rule ifthen {
+    <expression> <statement_terminator>
+    'O' 'RLY?' <statement_terminator>
+    'YA' 'RLY' <statement_terminator>
+    <block>
+    [
+     'MEBBE' <expression> <statement_terminator>
+     <block>
+    ]*
+    [
+     'NO' 'WAI' <statement_terminator>
+     <block>
+    ]?
+    'OIC'
+    {*}
+}
+
 rule block {
     [<statement> <statement_terminator>]* {*}
 }
@@ -70,7 +87,8 @@ rule variable { <identifier> {*} }
 token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
-    [ 'HOW' | 'SAY' | 'SO' | 'U' | 'YR' | 'R' | 'AN'  | 'IF' | 'KTHXBYE' ] >>
+    [ 'AN' | 'HOW' | 'IF' | 'KTHXBYE' | 'MEBBE' | 'NO' | 'O' | 'OIC' | 'R'
+    | 'RLY?' | 'SAY' | 'SO' | 'U' | 'WAI' | 'YR' ] >>
 }
 
 rule integer { \d+ {*} }
