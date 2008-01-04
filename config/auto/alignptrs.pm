@@ -55,13 +55,25 @@ sub runstep {
         # Now really test by compiling some code
         $conf->cc_gen('config/auto/alignptrs/test_c.in');
         $conf->cc_build();
-        for my $try_align ( 64, 32, 16, 8, 4, 2, 1 ) {
+        my $minimum_valid_align;
+        my @aligns = (1, 2, 4, 8, 16, 32, 64);
+        TRY_ALIGN: while ( defined( my $try_align = shift(@aligns) ) ) {
             my $results = $conf->cc_run_capture($try_align);
             $align = _evaluate_results($results, $try_align);
+            if (defined $align) {
+                $minimum_valid_align = $align;
+                last TRY_ALIGN;
+            } else {
+                next TRY_ALIGN;
+            }
         }
         $conf->cc_clean();
 
-        _evaluate_ptr_alignment($conf, $align);
+        _evaluate_ptr_alignment($conf, $minimum_valid_align);
+
+        # If at this point we haven't died, then we can assign
+        # $minimum_valid_align to $align.
+        $align = $minimum_valid_align;
     }
 
     $self->_finalize_result_str($align, $result_str);
@@ -79,9 +91,9 @@ sub _evaluate_results {
 }
 
 sub _evaluate_ptr_alignment {
-    my ($conf, $align) = @_;
-    die "Can't determine alignment!\n" unless defined $align;
-    $conf->data->set( ptr_alignment => $align );
+    my ($conf, $minimum_valid_align) = @_;
+    die "Can't determine alignment!\n" unless defined $minimum_valid_align;
+    $conf->data->set( ptr_alignment => $minimum_valid_align );
 }
 
 sub _finalize_result_str {
