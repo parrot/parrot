@@ -286,16 +286,19 @@
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:<' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
-    (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2)) 
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:<")))
+      (emit-expr arg1)
+      (emit-expr arg2)) 
     (list "val_true")
     (list "val_false")))
 
@@ -304,61 +307,82 @@
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:<=' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
-  (list uid
-        (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2))
-        (list "val_true")
-        (list "val_false")))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:<=")))
+      (emit-expr arg1)
+      (emit-expr arg2))
+    (list "val_true")
+    (list "val_false")))
 
 ; implementation of char=
 (define-primitive (char= uid arg1 arg2)
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:==' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
-  (list uid (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2)) (list "val_true") (list "val_false")))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:==")))
+      (emit-expr arg1)
+      (emit-expr arg2))
+    (list "val_true")
+    (list "val_false")))
 
 ; implementation of char>
 (define-primitive (char> uid arg1 arg2)
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:>' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
-  (list uid (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2)) (list "val_true") (list "val_false")))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:>")))
+      (emit-expr arg1)
+      (emit-expr arg2))
+    (list "val_true")
+    (list "val_false")))
 
 ; implementation of char>=
 (define-primitive (char>= uid arg1 arg2)
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:>=' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
-    (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2))
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:>=")))
+      (emit-expr arg1)
+      (emit-expr arg2))
     (list "val_true")
     (list "val_false")))
 
@@ -367,16 +391,19 @@
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:==' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
-    (list (format "cmp_~a" uid) (emit-expr arg) (emit-expr 0))
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:==")))
+      (emit-expr arg)
+      (emit-expr 0))
     (list "val_true")
     (list "val_false")))
 
@@ -385,16 +412,19 @@
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:<' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if' )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
-    (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2))
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:<")))
+      (emit-expr arg1)
+      (emit-expr arg2))
     (list "val_true")
     (list "val_false")))
 
@@ -403,56 +433,84 @@
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:<=' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
-  (list uid (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2)) (list "val_true") (list "val_false")))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:<=")))
+      (emit-expr arg1)
+      (emit-expr arg2))
+    (list "val_true")
+    (list "val_false")))
 
 ; implementation of fx=
 (define-primitive (fx= uid arg1 arg2)
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-	reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:==' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
-  (list uid (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2)) (list "val_true") (list "val_false")))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:==")))
+      (emit-expr arg1)
+      (emit-expr arg2))
+    (list "val_true")
+    (list "val_false")))
 
 ; implementation of fx>=
 (define-primitive (fx>= uid arg1 arg2)
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:>=' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
-  (list uid (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2)) (list "val_true") (list "val_false")))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:>=")))
+      (emit-expr arg1)
+      (emit-expr arg2))
+    (list "val_true")
+    (list "val_false")))
 
 ; implementation of fx>
 (define-primitive (fx> uid arg1 arg2)
   (emit "
         .local pmc reg_cmp_~a
         reg_cmp_~a = new 'PAST::Op'
-        reg_cmp_~a.init( 'pasttype' => 'chain', 'name' => 'infix:>' ) 
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if'  )
-        " uid uid uid)
-  (list uid (list (format "cmp_~a" uid) (emit-expr arg1) (emit-expr arg2)) (list "val_true") (list "val_false")))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "cmp_~a" uid)
+      (quasiquote (@ (pasttype "chain") (name "infix:>")))
+      (emit-expr arg1)
+      (emit-expr arg2))
+    (list "val_true")
+    (list "val_false")))
 
 ; implementation of null?
 (define-primitive (null? uid arg)
@@ -464,10 +522,10 @@
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if' )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
+    (quasiquote (@ (pasttype "if")))
     (list (format "inline_~a" uid) (emit-expr arg))
     (list "val_true")
     (list "val_false")))
@@ -482,11 +540,13 @@
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if' )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
-    (list (format "inline_~a" uid) (emit-expr arg))
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "inline_~a" uid)
+      (emit-expr arg))
     (list "val_true")
     (list "val_false")))
 
@@ -500,10 +560,10 @@
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if' )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
+    (quasiquote (@ (pasttype "if")))
     (list (format "inline_~a" uid) (emit-expr arg))
     (list "val_true")
     (list "val_false")))
@@ -518,10 +578,10 @@
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'if' )
-        " uid uid uid)
+        " uid uid)
   (list
     uid
+    (quasiquote (@ (pasttype "if")))
     (list (format "inline_~a" uid) (emit-expr arg))
     (list "val_true")
     (list "val_false")))
@@ -560,17 +620,20 @@
          (emit "
                reg_~a = new 'PAST::Val'
                reg_~a.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
-               " uid uid x)]
+               " uid uid x)
+         (list uid)]
         [(char? x)
          (emit "
                reg_~a = new 'PAST::Val'
                reg_~a.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
-               " uid uid (char->integer x) )]
+               " uid uid (char->integer x) )
+         (list uid)]
         [(and (list? x) (= (length x) 0 ))
          (emit "
                reg_~a = new 'PAST::Val'
                reg_~a.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
-               " uid uid) ]
+               " uid uid)
+         (list uid)]
         [(boolean? x)
            (if x 
              (emit "
@@ -580,13 +643,15 @@
              (emit "
                    reg_~a = new 'PAST::Val'
                    reg_~a.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-                   " uid uid))]
+                   " uid uid))
+         (list uid)]
         [(string? x)
          (emit "
                reg_~a = new 'PAST::Val'
                reg_~a.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
-               " uid uid x)])
-        (list uid))))
+               " uid uid x)
+         (list uid)])
+        )))
 
 (define bindings
   (lambda (x)
@@ -612,8 +677,7 @@
 
                .local pmc reg_let_copy_~a 
                reg_let_copy_~a = new 'PAST::Op'
-               reg_let_copy_~a.init( 'pasttype' => 'copy', 'lvalue' => 1 )
-               " uid uid uid (caar binds) uid uid uid)
+               " uid uid uid (caar binds) uid uid )
          (emit "
                .local pmc reg_~a
                reg_~a = new 'PAST::Stmts'
@@ -622,7 +686,9 @@
            uid
            (list
              (format "let_copy_~a" uid)
-             (list (format "let_var_~a" uid))
+             (quasiquote (@ (pasttype "copy") (lvalue "1")))
+             (list
+               (format "let_var_~a" uid))
              (emit-expr (cadar binds)))
            (emit-expr body))))))
 
@@ -631,9 +697,13 @@
     (emit "
           .local pmc reg_~a
           reg_~a = new 'PAST::Op'
-          reg_~a.init( 'pasttype' => 'if'  )
-          " uid uid uid )
-    (list uid (emit-expr (if-test x)) (emit-expr (if-conseq x)) (emit-expr (if-altern x)))))
+          " uid uid )
+    (list
+      uid
+      (quasiquote (@ (pasttype "if")))
+      (emit-expr (if-test x))
+      (emit-expr (if-conseq x))
+      (emit-expr (if-altern x)))))
  
 ; emir PIR for an expression
 (define emit-expr
@@ -688,11 +758,13 @@
      (for-each
        (lambda (daughter)
          (if (eq? '@ (car daughter))
-           (let ()
-             ;(write (list "emit-pushes3:" daughter (cadr daughter) (caadr daughter)(cadadr daughter)))(newline)
-             (emit "
-                   reg_~a.init( '~a' => '~a' )
-                   " (car past) (caadr daughter) (cadadr daughter)))
+           (for-each
+             (lambda (key_val)
+               ;(write (list "emit-pushes3:" daughter (cadr daughter) (caadr daughter)(cadadr daughter)))(newline)
+               (emit "
+                     reg_~a.init( '~a' => '~a' )
+                     " (car past) (car key_val) (cadr key_val)))
+               (cdr daughter))
              (emit "
                    reg_~a.push( reg_~a )
                    " (car past) (past-sxml->past-pir daughter))))
