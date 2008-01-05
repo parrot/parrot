@@ -629,9 +629,11 @@ static UINTVAL
 validate(PARROT_INTERP, ARGIN(STRING *src))
 {
     UINTVAL offset;
+    String_iter iter;
 
+    ENCODING_ITER_INIT(interp, src, &iter);
     for (offset = 0; offset < string_length(interp, src); ++offset) {
-        const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
+        const UINTVAL codepoint = iter.get_and_advance(interp, &iter);
         /* Check for Unicode non-characters */
         if (codepoint >= 0xfdd0 &&
             (codepoint <= 0xfdef || (codepoint & 0xfffe) == 0xfffe) &&
@@ -762,11 +764,14 @@ find_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
     UINTVAL codepoint;
+    String_iter iter;
 
     PARROT_ASSERT(source_string != 0);
+    ENCODING_ITER_INIT(interp, source_string, &iter);
+    iter.set_position(interp, &iter, pos);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-        codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
+        codepoint = iter.get_and_advance(interp, &iter);
         if (codepoint >= 256) {
             if (u_iscclass(interp, codepoint, flags))
                     return pos;
@@ -798,11 +803,14 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL end = offset + count;
     UINTVAL codepoint;
     int bit;
+    String_iter iter;
 
     PARROT_ASSERT(source_string);
+    ENCODING_ITER_INIT(interp, source_string, &iter);
+    iter.set_position(interp, &iter, pos);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-        codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
+        codepoint = iter.get_and_advance(interp, &iter);
         if (codepoint >= 256) {
             for (bit = enum_cclass_uppercase;
                     bit <= enum_cclass_word ; bit <<= 1) {
