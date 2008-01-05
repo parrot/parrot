@@ -52,7 +52,6 @@
   [(fxlogor (fx+ 4 1) 1)                        => "5\n" ]
   [(fxlogor (fx+ 4 1) 2)                        => "7\n" ]
   [(fxlogor (fx+ 4 1) 4)                        => "5\n" ]
-  [(fxlogor 0 1)                                => "1\n" ]
 
   [(fx< 0 0 )                                   => "#f\n" ]
   [(fx< -0 0 )                                  => "#f\n" ]

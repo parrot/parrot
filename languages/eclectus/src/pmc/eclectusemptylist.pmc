@@ -30,6 +30,11 @@ pmclass EclectusEmptyList
     STRING* get_string() {
         return const_string(INTERP, "()");
     }
+
+    /* the empty list is not #f, therefore evaluates to true */
+    INTVAL get_bool() {
+        return 1;
+    }
 }
 
 /*

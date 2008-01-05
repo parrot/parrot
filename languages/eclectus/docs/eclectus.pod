@@ -7,7 +7,7 @@ It is based on Abdulaziz Ghuloums compiler tutorial.
 
 =head1 Status
 
-Starting to work on section 1.4 Conditional Expressions
+Going through the tutorial.
 
 =head1 Testing
 
@@ -43,3 +43,5 @@ L<http://scheme2006.cs.uchicago.edu/11-ghuloum.pdf>
 L<http://www.cs.indiana.edu/%7Eaghuloum/ikarus/index.html>
 
 L<http://www-pu.informatik.uni-tuebingen.de/users/sperber/info-i-9900/material/konstruktion/konstruktion-10.ps>
+
+L<http://okmij.org/ftp/Scheme/SXML.html>

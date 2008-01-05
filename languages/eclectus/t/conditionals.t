@@ -43,6 +43,7 @@
   [(if (if #f #f #t) 1 0)                        => "1\n" ]
   [(if (if #t #f #f) 1 0)                        => "0\n" ]
   [(if #f (if #t #f #f) #t)                      => "#t\n" ]
+  [(if () #f #t)                                 => "#f\n" ]
 )
 
 (test-all)
