@@ -442,12 +442,11 @@ function.
 
 */
 
-/* XXX Should use quickest direction */
 static void
 utf8_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL pos)
 {
     UINTVAL charpos     = 0;
-    const utf8_t *u8ptr = i->str->strstart;
+    const utf8_t *u8ptr = (const utf8_t *)i->str->strstart;
 
     /* start from last known charpos, if we can */
     if (i->charpos <= pos) {
