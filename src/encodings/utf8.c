@@ -446,12 +446,20 @@ function.
 static void
 utf8_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL pos)
 {
-    const utf8_t *u8ptr = (const utf8_t *)i->str->strstart;
+    UINTVAL charpos     = 0;
+    const utf8_t *u8ptr = i->str->strstart;
 
-    i->charpos = pos;
-    while (pos-- > 0) {
-        u8ptr += UTF8SKIP(u8ptr);
+    /* start from last known charpos, if we can */
+    if (i->charpos <= pos) {
+        charpos = i->charpos;
+        u8ptr += i->bytepos;
     }
+
+    while (charpos < pos) {
+        u8ptr += UTF8SKIP(u8ptr);
+        charpos++;
+    }
+    i->charpos = pos;
     i->bytepos = (const char *)u8ptr - (const char *)i->str->strstart;
 }
 
