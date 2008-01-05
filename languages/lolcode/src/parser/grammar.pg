@@ -32,7 +32,7 @@ rule visible {
 }
 
 rule declare {
-    'I HAS A' <variable> [ 'ITZ' <expression> ]?
+    'I' 'HAS' 'A' <variable> [ 'ITZ' <expression> ]?
     {*}
 }
 
