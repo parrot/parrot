@@ -16,8 +16,7 @@ use Parrot::Configure::Test qw( test_step_thru_runstep);
 
 =for hints_for_testing The documentation for this package is skimpy;
 please try to improve it, e.g., by providing a link to an introduction
-to the GNU MP library. Please consider the issues raised in
-http://rt.perl.org/rt3/Ticket/Display.html?id=43134.
+to the GNU MP library.
 
 =cut
 
@@ -38,7 +37,7 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
 my ( $task, $step_name, $step);
-$task        = $conf->steps->[1];
+$task        = $conf->steps->[-1];
 $step_name   = $task->step;
 
 $step = $step_name->new();

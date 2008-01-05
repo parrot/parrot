@@ -36,7 +36,7 @@ sub runstep {
         qw|
             verbose
             without-gmp
-            |
+        |
     );
 
     if ($without) {
@@ -52,29 +52,11 @@ sub runstep {
 
     my $osname    = $conf->data->get_p5('OSNAME');
 
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lgmp' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'gmp.lib' );
-        }
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lgmp' );
-    }
+    _handle_mswin32($conf, $osname, $cc);
 
     # On OS X check the presence of the gmp header in the standard
     # Fink location.
-    if ( $osname =~ /darwin/ ) {
-        my $fink_lib_dir        = $conf->data->get('fink_lib_dir');
-        my $fink_include_dir    = $conf->data->get('fink_include_dir');
-        if ( -f "$fink_include_dir/gmp.h" ) {
-            $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', ldflags   => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', ccflags   => "-I$fink_include_dir" );
-        }
-    }
+    _handle_darwin($conf, $osname);
 
     $conf->cc_gen('config/auto/gmp/gmp.in');
     eval { $conf->cc_build(); };
@@ -105,6 +87,36 @@ sub runstep {
         $self->set_result('no');
     }
 
+    return 1;
+}
+
+sub _handle_mswin32 {
+    my ($conf, $osname, $cc) = @_;
+    if ( $osname =~ /mswin32/i ) {
+        if ( $cc =~ /^gcc/i ) {
+            $conf->data->add( ' ', libs => '-lgmp' );
+        }
+        else {
+            $conf->data->add( ' ', libs => 'gmp.lib' );
+        }
+    }
+    else {
+        $conf->data->add( ' ', libs => '-lgmp' );
+    }
+    return 1;
+}
+
+sub _handle_darwin {
+    my ($conf, $osname) = @_;
+    if ( $osname =~ /darwin/ ) {
+        my $fink_lib_dir        = $conf->data->get('fink_lib_dir');
+        my $fink_include_dir    = $conf->data->get('fink_include_dir');
+        if ( -f "$fink_include_dir/gmp.h" ) {
+            $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
+            $conf->data->add( ' ', ldflags   => "-L$fink_lib_dir" );
+            $conf->data->add( ' ', ccflags   => "-I$fink_include_dir" );
+        }
+    }
     return 1;
 }
 
