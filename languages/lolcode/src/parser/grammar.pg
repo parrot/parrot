@@ -101,7 +101,7 @@ rule variable { <identifier> {*} }
 token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
 token keyword {
-    [ 'A' | 'AN' | 'FAIL' | 'FOUND' | 'GTFO' | 'HAS' | 'HOW' | 'I' | 'IF'
+    [ 'A' | 'AN' | 'FAIL' | 'FOUND' | 'GTFO' | 'HAS' | 'HOW' | 'I' | 'IF' | 'ITZ'
     | 'KTHXBYE' | 'MEBBE' | 'NO' | 'O' | 'OIC' | 'OMG' | 'OMGWTF' | 'R'
     | 'RLY' | 'RLY?' | 'SAY' | 'SO' | 'U' | 'VISIBLE' | 'WAI' | 'WIN' | 'WTF?' | 'YA'
     | 'YR' ] >>
