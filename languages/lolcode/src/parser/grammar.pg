@@ -10,7 +10,7 @@ grammar lolcode::Grammar is PCT::Grammar;
 
 rule TOP {
     'HAI' <float> <statement_terminator>
-    [<statement> <statement_terminator>]*
+    <block>
     'KTHXBYE' <statement_terminator>
     [ $ || <panic: Syntax error> ]
     {*}

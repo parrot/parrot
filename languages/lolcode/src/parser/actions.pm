@@ -18,11 +18,7 @@ value of the comment is passed as the second argument to the method.
 class lolcode::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    for $<statement> {
-        $past.push( $( $_ ) );
-    }
-    make $past;
+    make $( $<block> );
 }
 
 
@@ -93,7 +89,6 @@ method function($/) {
 }
 
 method block($/) {
-    # XXX this is a copy/paste from TOP. A refactor would be neat.
     my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
     for $<statement> {
         $past.push( $( $_ ) );
