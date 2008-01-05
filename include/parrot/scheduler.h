@@ -23,6 +23,13 @@ void Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
         __attribute__nonnull__(2);
 
 PARROT_API
+void Parrot_cx_broadcast_message(PARROT_INTERP,
+    ARGIN(STRING *messagetype),
+    ARGIN_NULLOK(PMC *data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -37,6 +44,10 @@ PARROT_CAN_RETURN_NULL
 PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_API
+void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_cx_runloop_end(PARROT_INTERP)
@@ -64,10 +75,6 @@ opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_cx_schedule_suspend_for_gc(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
 void Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -81,6 +88,18 @@ void Parrot_cx_schedule_timer(PARROT_INTERP,
     ARGIN_NULLOK(PMC *sub))
         __attribute__nonnull__(1);
 
+PARROT_API
+void Parrot_cx_send_message(PARROT_INTERP,
+    ARGIN(STRING *messagetype),
+    ARGIN_NULLOK(PMC *payload))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*scheduler);
+
 void Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -93,11 +112,9 @@ void Parrot_cx_invoke_callback(PARROT_INTERP, ARGIN(PMC *callback))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_cx_refresh_task_list(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void Parrot_cx_runloop_sleep(ARGMOD(PMC *scheduler))
+void Parrot_cx_refresh_task_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
 void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))

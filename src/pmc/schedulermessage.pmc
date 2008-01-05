@@ -1,0 +1,309 @@
+/*
+Copyright (C) 2001-2007, The Perl Foundation.
+$Id: $
+
+=head1 NAME
+
+src/pmc/schedulermessage.pmc - The concurrency scheduler
+
+=head1 DESCRIPTION
+
+Implements a message passed between concurrency schedulers.
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/scheduler_private.h"
+
+pmclass SchedulerMessage need_ext {
+
+/*
+
+=item C<void init()>
+
+Initialize a concurrency scheduler message object.
+
+=cut
+
+*/
+
+    void init() {
+        Parrot_SchedulerMessage * const core_struct
+            = mem_allocate_zeroed_typed(Parrot_SchedulerMessage);
+
+        /* Set flags for custom DOD mark and destroy. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        /* Set up the core struct. */
+        PMC_data(SELF)           = core_struct;
+        core_struct->id          = 0;
+        core_struct->type        = CONST_STRING(INTERP, "");
+        core_struct->data        = PMCNULL;
+    }
+
+/*
+
+=item C<void init_pmc(PMC *data)>
+
+Initializes a new SchedulerMessage with a C<Hash> PMC with any or all of the keys:
+
+=over 4
+
+=item C<id>
+
+An C<Integer> representing the unique identifier for this scheduler message.
+
+=item C<type>
+
+A C<String> representing the unique type for this scheduler message.
+
+=item C<data>
+
+An C<PMC> representing the data passed in this scheduler message.
+
+=back
+
+*/
+
+    void init_pmc(PMC *data) {
+        PMC              *elem;
+        Parrot_SchedulerMessage *core_struct;
+
+        if (! VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
+            real_exception(INTERP, NULL, INVALID_OPERATION,
+                "message initializer must be a Hash");
+
+        SELF.init();
+        core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+
+        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "id"));
+        if (! PMC_IS_NULL(elem))
+            core_struct->id = VTABLE_get_integer(INTERP, elem);
+
+        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "type"));
+        if (! PMC_IS_NULL(elem))
+            core_struct->type = VTABLE_get_string(INTERP, elem);
+
+        elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
+        if (! PMC_IS_NULL(elem))
+            core_struct->data = elem;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Retrieve the message ID.
+
+=cut
+
+*/
+
+    INTVAL get_integer() {
+        Parrot_SchedulerMessage * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        return core_struct->id;
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Set the message ID.
+
+=cut
+
+*/
+
+    void set_integer_native(INTVAL value) {
+        Parrot_SchedulerMessage * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        core_struct->id = value;
+    }
+
+
+/*
+
+=item C<STRING * get_string()>
+
+Retrieve the message type.
+
+=cut
+
+*/
+
+    STRING *  get_string() {
+        Parrot_SchedulerMessage * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        return core_struct->type;
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Set the message type.
+
+=cut
+
+*/
+
+    void set_string_native(STRING *value) {
+        Parrot_SchedulerMessage * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        core_struct->type = value;
+    }
+
+
+/*
+
+=item C<PMC *share_ro()>
+
+Set this PMC as shared.
+
+=cut
+
+*/
+
+    PMC *share_ro() {
+        PMC *shared_self;
+        Parrot_SchedulerMessage *shared_struct;
+
+        if (PObj_is_PMC_shared_TEST(SELF))
+            return SELF;
+
+        shared_self = pt_shared_fixup(INTERP, SELF);
+        shared_struct = PARROT_SCHEDULERMESSAGE(shared_self);
+
+        shared_struct->data  = pt_shared_fixup(INTERP, shared_struct->data);
+
+        return shared_self;
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free the scheduler's underlying struct.
+
+=cut
+
+*/
+    void destroy() {
+        mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    void mark() {
+        if (PARROT_SCHEDULERMESSAGE(SELF)) {
+            Parrot_SchedulerMessage * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+
+            if (core_struct->data)
+                pobject_lives(interp, (PObj*)core_struct->data);
+        }
+    }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+This is used by freeze/thaw to visit the contents of the scheduler message.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        Parrot_SchedulerMessage * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        PMC **pos;
+
+        /* 1) visit message data */
+        pos            = &core_struct->data;
+        info->thaw_ptr = pos;
+        (info->visit_pmc_now)(INTERP, *pos, info);
+
+    }
+
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the scheduler message.
+
+=cut
+
+*/
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        Parrot_SchedulerMessage * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+
+        /* 1) freeze message id */
+        VTABLE_push_integer(INTERP, io, core_struct->id);
+
+        /* 2) freeze message type */
+        VTABLE_push_string(INTERP, io, core_struct->type);
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the scheduler message.
+
+=cut
+
+*/
+
+    void thaw(visit_info *info) {
+        IMAGE_IO * const io = info->image_io;
+
+        /* 1. thaw message id */
+        const INTVAL id = VTABLE_shift_integer(INTERP, io);
+
+        /* 2. thaw message type */
+        STRING * const type = VTABLE_shift_string(INTERP, io);
+
+        /* Allocate the message's core data struct and set custom flags. */
+        SELF.init();
+
+        /* Set the message's id to the frozen id */
+        PARROT_SCHEDULERMESSAGE(SELF)->id = id;
+
+        /* Set the message's type to the frozen type */
+        PARROT_SCHEDULERMESSAGE(SELF)->type = type;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd25_concurrency.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

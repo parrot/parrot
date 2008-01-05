@@ -46,11 +46,11 @@ Initialize a concurrency scheduler object.
         core_struct->max_tid     = 0;
         core_struct->task_list   = pmc_new(interp, enum_class_Hash);
         core_struct->task_index  = pmc_new(interp, enum_class_ResizableIntegerArray);
-        core_struct->handlers    = pmc_new(interp, enum_class_ResizablePMCArray);
         core_struct->wait_index  = pmc_new(interp, enum_class_ResizablePMCArray);
+        core_struct->handlers    = pmc_new(interp, enum_class_ResizablePMCArray);
+        core_struct->messages    = pmc_new(interp, enum_class_ResizablePMCArray);
         core_struct->interp      = INTERP;
-        COND_INIT(core_struct->condition);
-        MUTEX_INIT(core_struct->lock);
+        MUTEX_INIT(core_struct->msg_lock);
     }
 
 /*
@@ -75,30 +75,15 @@ An C<Integer> representing the unique identifier for this scheduler.
 
         if (! VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
             real_exception(INTERP, NULL, INVALID_OPERATION,
-                "Task initializer must be a Hash");
+                "Scheduler initializer must be a Hash");
 
-        core_struct = mem_allocate_zeroed_typed(Parrot_Scheduler);
-
-        /* Set flags for custom DOD mark and destroy. */
-        PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
-
-        /* Set up the core struct. */
-        PMC_data(SELF)           = core_struct;
+        SELF.init();
+        core_struct = PARROT_SCHEDULER(SELF);
 
         elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "id"));
 
         if (! PMC_IS_NULL(elem))
             core_struct->id      = VTABLE_get_integer(INTERP, elem);
-        else
-            core_struct->id      = 0;
-
-        core_struct->max_tid     = 0;
-        core_struct->task_list   = pmc_new(interp, enum_class_Hash);
-        core_struct->task_index  = pmc_new(interp, enum_class_ResizableIntegerArray);
-        core_struct->handlers    = pmc_new(interp, enum_class_ResizablePMCArray);
-        core_struct->wait_index  = pmc_new(interp, enum_class_ResizablePMCArray);
-        core_struct->interp      = INTERP;
     }
 
 /*
@@ -136,9 +121,7 @@ current maximum, and a birthtime of the current time.
 
 
         SCHEDULER_cache_valid_CLEAR(SELF);
-/*        LOCK(core_struct->lock); */
         Parrot_cx_runloop_wake(core_struct->interp, SELF);
-/*        UNLOCK(core_struct->lock); */
     }
 
 /*
@@ -224,6 +207,7 @@ Set this PMC as shared.
         shared_struct->task_index = pt_shared_fixup(INTERP, shared_struct->task_index);
         shared_struct->wait_index = pt_shared_fixup(INTERP, shared_struct->wait_index);
         shared_struct->handlers   = pt_shared_fixup(INTERP, shared_struct->handlers);
+        shared_struct->messages   = pt_shared_fixup(INTERP, shared_struct->messages);
 
         return shared_self;
     }
@@ -239,8 +223,7 @@ Free the scheduler's underlying struct.
 */
     void destroy() {
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
-        COND_DESTROY(core_struct->condition);
-        MUTEX_DESTROY(core_struct->lock);
+        MUTEX_DESTROY(core_struct->msg_lock);
         mem_sys_free(core_struct);
     }
 
@@ -265,6 +248,8 @@ Mark any referenced strings and PMCs.
                 pobject_lives(interp, (PObj*)core_struct->wait_index);
             if (core_struct->handlers)
                 pobject_lives(interp, (PObj*)core_struct->handlers);
+            if (core_struct->messages)
+                pobject_lives(interp, (PObj*)core_struct->messages);
         }
     }
 
@@ -356,9 +341,7 @@ Called after the scheduler has been thawed.
 */
 
     void thawfinish(visit_info *info) {
-        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
-
-        /* TODO: Rebuild the task index. */
+        Parrot_cx_refresh_task_list(INTERP, SELF);
     }
 
 /*
@@ -419,50 +402,6 @@ PMCNULL.
         PCCRETURN(PMC *PMCNULL);
     }
 
-/*
-
-=item C<PCCMETHOD refresh_task_list()>
-
-Perform maintenance on the scheduler's list of active tasks, checking for
-completed timers or sleep events, sorting for priority, etc.
-
-=cut
-
-*/
-
-    PCCMETHOD refresh_task_list() {
-        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
-        INTVAL num_tasks, index;
-
-        /* Sweep the wait list for completed timers */
-        num_tasks = VTABLE_elements(interp, core_struct->wait_index);
-        for (index = 0; index < num_tasks; index++) {
-            INTVAL tid = VTABLE_get_integer_keyed_int(interp, core_struct->wait_index, index);
-            if (tid > 0) {
-                PMC *task = VTABLE_get_pmc_keyed_int(interp, core_struct->task_list, tid);
-                if (PMC_IS_NULL(task)) {
-                    /* Cleanup expired tasks. */
-                    VTABLE_set_integer_keyed_int(INTERP, core_struct->wait_index, index, 0);
-                }
-                else {
-                    /* Move the timer to the active task list if the timer has
-                     * completed. */
-                    FLOATVAL timer_end_time = VTABLE_get_number_keyed_int(interp,
-                            task, PARROT_TIMER_NSEC);
-                    if (timer_end_time <= Parrot_floatval_time()) {
-                        VTABLE_push_integer(INTERP, core_struct->task_index, tid);
-                        VTABLE_set_integer_keyed_int(INTERP, core_struct->wait_index, index, 0);
-                        Parrot_cx_schedule_repeat(interp, task);
-                        SCHEDULER_cache_valid_CLEAR(SELF);
-                    }
-                }
-            }
-        }
-
-        /* Sort the task list index */
-
-        SCHEDULER_cache_valid_SET(SELF);
-    }
 
 }
 
@@ -472,7 +411,7 @@ completed timers or sleep events, sorting for priority, etc.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd15_objects.pod>.
+F<docs/pdds/pdd25_concurrency.pod>.
 
 =cut
 

@@ -17,24 +17,33 @@
 
 /* Scheduler PMC's underlying struct. */
 typedef struct Parrot_Scheduler {
-    int           id;             /* The scheduler's ID. */
-    int           max_tid;        /* The highest assigned task ID. */
-    int           pending;        /* A count of pending tasks (cached for fast
+    INTVAL        id;             /* The scheduler's ID. */
+    INTVAL        max_tid;        /* The highest assigned task ID. */
+    INTVAL        pending;        /* A count of pending tasks (cached for fast
                                      lookup). */
     PMC          *task_list;      /* The current list of tasks. */
     PMC          *task_index;     /* An index into the current list of tasks,
                                      ordered by priority. */
     PMC          *wait_index;     /* An unordered index of inactive tasks. */
     PMC          *handlers;       /* The list of currently active handlers. */
-    Parrot_cond   condition;      /* Flag used by scheduler runloop */
-    Parrot_mutex  lock;           /* Flag used by scheduler runloop */
+    PMC          *messages;       /* A message queue used for communication
+                                     between schedulers. */
+    Parrot_mutex  msg_lock;       /* Lock to synchronize use of the message queue. */
     Parrot_Interp interp;         /* A link back to the scheduler's interpreter. */
-    Parrot_thread runloop_handle; /* A handle for the scheduler's runloop
-                                     thread, if any. */
 } Parrot_Scheduler;
 
 /* Macro to access underlying structure of a Scheduler PMC. */
 #define PARROT_SCHEDULER(s) ((Parrot_Scheduler *) PMC_data(s))
+
+/* SchedulerMessage PMC's underlying struct. */
+typedef struct Parrot_SchedulerMessage {
+    INTVAL        id;        /* The message's ID. */
+    STRING       *type;      /* The message's type. */
+    PMC          *data;      /* Additional data for the message. */
+} Parrot_SchedulerMessage;
+
+/* Macro to access underlying structure of a Scheduler PMC. */
+#define PARROT_SCHEDULERMESSAGE(s) ((Parrot_SchedulerMessage *) PMC_data(s))
 
 /* Task PMC's underlying struct. */
 typedef struct Parrot_Task {

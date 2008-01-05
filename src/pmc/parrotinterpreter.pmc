@@ -47,6 +47,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     Parrot_block_DOD(d);
 
     d->scheduler = pmc_new(d, enum_class_Scheduler);
+    d->scheduler = VTABLE_share_ro(d, d->scheduler);
 
     if (flags & PARROT_CLONE_RUNOPS)
         d->run_core = s->run_core;
