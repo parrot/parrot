@@ -90,6 +90,9 @@ CODE
 okay
 OUTPUT
 
+SKIP: {
+    skip( "Intermittent failures on all platforms", 2 );
+
 pir_output_is( <<'CODE', <<'OUTPUT', "wait (simple, strings)" );
 .const int N = 1000
 .sub waiter
@@ -159,11 +162,6 @@ OUTPUT
 # the other. Because of deadlock detection, exactly one of the two
 # threads should quickly be aborted and the other should succeed.
 # Without deadlock detection, the test will not complete quickly.
-SKIP: {
-    skip( "Intermittent x86_64 failure (RT#44865)", 1 )
-        if $PConfig{cpuarch} eq 'x86_64'
-            || $PConfig{cpuarch} eq 'amd64'
-            || $PConfig{cpuarch} eq 'sparc64';
 
     pir_output_like( <<'CODE', <<'OUTPUT', "get deadlock" );
 .const int N = 10000

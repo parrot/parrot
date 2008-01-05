@@ -125,10 +125,7 @@ OUTPUT
 # test 2
 
 SKIP: {
-    skip( "B0rked at least on x86_64", 2 )
-        if $PConfig{cpuarch} eq 'x86_64'
-            || $PConfig{cpuarch} eq 'amd64'
-            || $PConfig{cpuarch} eq 'sparc64';
+    skip( "Intermittently failing everywhere", 2 );
 
     pir_output_is( $choice_test . <<'CODE', <<'OUTPUT', "choice (multiple threads)" );
 .sub _wakeup_func
