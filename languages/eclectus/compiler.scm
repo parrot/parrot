@@ -196,54 +196,72 @@
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pirop' => 'n_add' )
-        " uid uid uid)
-  (list uid (emit-expr arg) (emit-expr 1)))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pirop "n_add")))
+    (emit-expr arg)
+    (emit-expr 1)))
 
 ; implementation of fx+
 (define-primitive (fx+ uid arg1 arg2)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pirop' => 'n_add' )
-        " uid uid uid)
-  (list uid (emit-expr arg1) (emit-expr arg2)))
+        " uid uid)
+  (list
+    uid 
+    (quasiquote (@ (pirop "n_add")))
+    (emit-expr arg1)
+    (emit-expr arg2)))
 
 ; implementation of fxsub1
 (define-primitive (fxsub1 uid arg)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pirop' => 'n_sub' )
-        " uid uid uid)
-  (list uid (emit-expr arg) (emit-expr 1)))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pirop "n_sub")))
+    (emit-expr arg)
+    (emit-expr 1)))
 
 ; implementation of fx-
 (define-primitive (fx- uid arg1 arg2)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pirop' => 'n_sub' )
-        " uid uid uid)
-  (list uid (emit-expr arg1) (emit-expr arg2)))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pirop "n_sub")))
+    (emit-expr arg1)
+    (emit-expr arg2)))
 
 ; implementation of fxlogand
 (define-primitive (fxlogand uid arg1 arg2)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pirop' => 'n_band' )
-        " uid uid uid)
-  (list uid (emit-expr arg1) (emit-expr arg2)))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pirop "n_band")))
+    (emit-expr arg1)
+    (emit-expr arg2)))
 
 ; implementation of fxlogor
 (define-primitive (fxlogor uid arg1 arg2)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pirop' => 'n_bor' )
-        " uid uid uid)
-  (list uid (emit-expr arg1) (emit-expr arg2)))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pirop "n_bor")))
+    (emit-expr arg1)
+    (emit-expr arg2)))
 
 ; implementation of char->fixnum
 (define-primitive (char->fixnum uid arg)
@@ -663,15 +681,21 @@
 ; eventually this will become a PIR generator
 ; for PAST as SXML
 ; currently it only handles the pushes
-(define emit-pushes
+(define past-sxml->past-pir
   (lambda (past)
     ;(write (list "emit-pushes1:" past))(newline)
     ;(write (list "emit-pushes2:" (cdr past)))(newline)
      (for-each
        (lambda (daughter)
-          (emit "
-                reg_~a.push( reg_~a )
-                " (car past) (emit-pushes daughter)))
+         (if (eq? '@ (car daughter))
+           (let ()
+             ;(write (list "emit-pushes3:" daughter (cadr daughter) (caadr daughter)(cadadr daughter)))(newline)
+             (emit "
+                   reg_~a.init( '~a' => '~a' )
+                   " (car past) (caadr daughter) (cadadr daughter)))
+             (emit "
+                   reg_~a.push( reg_~a )
+                   " (car past) (past-sxml->past-pir daughter))))
        (cdr past))
      (car past)))
 
@@ -683,6 +707,6 @@
     (emit-builtins)
     (emit-function-header "scheme_entry")
     (emit-function-footer
-      (emit-pushes
+      (past-sxml->past-pir
         (emit-expr
           (transform-and-or program))))))
