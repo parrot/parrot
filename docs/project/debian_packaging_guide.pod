@@ -8,6 +8,11 @@ Debian New Maintainer's Guide (http://www.debian.org/doc/maint-guide) for more
 information. The Ubuntu Packaging Guide is also a good resource
 (http://doc.ubuntu.com/ubuntu/packagingguide/C/).
 
+This guide assumes that you're running in a chroot environment set up as in:
+L<http://www.perlfoundation.org/parrot/index.cgi?debian_chroot_setup>.  For
+other configurations, see that page for a list of Debian packages you will need
+to install before building the Parrot packages.
+
 To package Parrot for Debian:
 
 =over 4
@@ -86,11 +91,6 @@ Regenerate the debian/control file from ~/deb/parrot/parrot-<version>/:
 Install all dependencies:
 
   $ sudo /usr/lib/pbuilder/pbuilder-satisfydepends
-
-If you don't have pbuilder/pbuilder-satisfydepends installed, you may 
-need too:
-
-  $ sudo aptitude install pbuilder
 
 =item 8.
 
