@@ -317,6 +317,7 @@ SP              [ ]
 ":opt_flag"     return ADV_OPT_FLAG;
 ":named"        return ADV_NAMED;
 "=>"            return ADV_ARROW;
+":invocant"     return ADV_INVOCANT;
 
 <emit,INITIAL>".namespace"    return NAMESPACE;
 <emit,INITIAL>".HLL"          return HLL;
