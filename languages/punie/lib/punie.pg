@@ -31,7 +31,7 @@ token line {
 }
 
 rule sideff {
-    <expr> [<condmod>|<loopmod>]?
+    <expr> [$<modifier>=<condmod>|<loopmod>]?
     {*}
 }
 

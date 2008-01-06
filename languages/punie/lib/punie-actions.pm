@@ -50,13 +50,9 @@ method line ($/, $key) {
 
 method sideff($/) {
     my $expr := $( $<expr> );
-    if $<loopmod> {    # while/until
-        my $mod := $( $<loopmod>[0] );
-        $mod.push($expr);
-        make $mod;
-    }
-    elsif $<condmod> {  # if/unless
-        my $mod := $( $<condmod>[0] );
+
+    if $<modifier> {
+        my $mod := $( $<modifier>[0] );
         $mod.push($expr);
         make $mod;
     }
