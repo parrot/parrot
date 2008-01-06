@@ -146,31 +146,32 @@ method until_loop($/) {
 }
 
 method for_loop($/) {
-    my $past := PAST::Stmts.new( :node($/) );
-    # initialization step (first item of for loop)
-
-    if $<init> {
-        $past.push( $( $<init>[0] ) );
-    }
-
-    # create the loop node and add it to the stmts list
-    my $loop := PAST::Op.new( :pasttype('while'), :node($/) );
-
-    # create a new loop block, which is the original block
-    # and the step, executed after each iteration
-    my $body := PAST::Stmts.new( :node($/) );
-    $body.push( $( $<block> ) );
-
+    # if there's a step statement, create a new loop body,
+    # which is the original block and the step, executed
+    # after each iteration. Otherwise the body is just the
+    # for's <block> node.
+    my $body := $( $<block> );
     if $<step> {
-        $body.push( $( $<step>[0] ) );
+        my $step := $( $<step>[0] );
+        $body := PAST::Stmts.new( $body, $step, :node($/) );
     }
 
-    # add the loop condition and the new body to the loop
-    $loop.push( $( $<texpr> ) );
-    $loop.push($body);
+    my $loop := PAST::Op.new( $( $<texpr> ),
+                              $body,
+                              :pasttype('while'),
+                              :node($/) );
 
-    $past.push($loop);
-    make $past;
+    # if there's an init. step, create a new Stmts node, which has
+    # 2 statements: the init. step, and the loop statement. If no
+    # step, then the loop is all there is, and no need for a Stmts node.
+    if $<init> {
+        my $init := $( $<init>[0] );
+        my $past := PAST::Stmts.new( $init, $loop, :node($/) );
+        make $past;
+    }
+    else {
+        make $loop;
+    }
 }
 
 method texpr($/) {
