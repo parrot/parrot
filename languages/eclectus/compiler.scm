@@ -41,7 +41,7 @@
           
               .local pmc stmts
               ( stmts ) = scheme_entry()
-              # _dumper( stmts 'stmts' )
+              # _dumper( stmts, 'stmts' )
           
               # compile and evaluate
               .local pmc past_compiler
@@ -540,7 +540,7 @@
 ; emir PIR for an expression
 (define emit-expr
   (lambda (x)
-    ;(display "# ")(write x) (newline)
+    ;(diag (format "~s" x))
     (cond
       [(immediate? x) (emit-immediate x)]
       [(variable? x)  (emit-variable x)]
@@ -585,7 +585,7 @@
 (define past-sxml->past-pir
   (lambda (past)
     (let ([uid (gen-unique-id)])
-      ; (display "# ")(write (list "past-sxml->past-pir:" past))(newline)
+      ;(diag (format "~a" past))
       (emit "
             .local pmc reg_~a
             reg_~a = new '~a'

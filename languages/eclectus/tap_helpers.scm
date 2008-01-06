@@ -19,3 +19,9 @@
   (lambda (test-num test-description)
     ( printf "not ok ~a - ~a\n" test-num test-description)))
 
+(define diag
+  (lambda (msg)
+    (write "# ")
+    (write msg)
+    (newline)))
+
