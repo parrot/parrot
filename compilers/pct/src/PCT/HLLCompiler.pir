@@ -19,17 +19,6 @@ running compilers from a command line.
     $P2 = $P0.'new_subclass'('Protoobject', 'PCT::HLLCompiler', $P1 :flat)
 .end
 
-=head2 Methods
-
-=over 4
-
-=item attr(string attrname, pmc value, int has_value)
-
-Helper method for accessors -- gets/sets an attribute given
-by C<attrname> based on C<has_value>.
-
-=cut
-
 .namespace [ 'PCT::HLLCompiler' ]
 
 .include 'cclass.pasm'
@@ -60,6 +49,18 @@ by C<attrname> based on C<has_value>.
   options_end:
     setattribute self, '$usage', $P1
 .end
+
+
+=head2 Methods
+
+=over 4
+
+=item attr(string attrname, pmc value, int has_value)
+
+Helper method for accessors -- gets/sets an attribute given
+by C<attrname> based on C<has_value>.
+
+=cut
 
 .sub 'attr' :method
     .param string attrname
