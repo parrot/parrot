@@ -18,11 +18,13 @@ rule lineseq {
 }
 
 token line {
-    <label>
-    [ <cond> {*}                                 #= cond
-    | <subroutine> {*}                           #= subroutine
-    | <expr> ';' {*}                             #= expr
-    ] \s*
+    | <loop> {*}                                   #= loop
+    | <label>
+      [ <cond> {*}                                 #= cond
+      | <subroutine> {*}                           #= subroutine
+      | <expr> ';' {*}                             #= expr
+      ] \s*
+
 }
 
 rule label { [<word>\:]? {*} }
@@ -36,6 +38,23 @@ rule cond {
     \( <expr> \) <block>
     [ 'elsif' \( <expr> \) <block> ]*
     [ 'else' $<else>=<block> ]?
+    {*}
+}
+
+rule loop {
+    <label>
+    [ <while_loop> {*}                          #= while_loop
+    | <until_loop> {*}                          #= until_loop
+    ]
+}
+
+rule while_loop {
+    while \( <expr>? \) <block>
+    {*}
+}
+
+rule until_loop {
+    until \( <expr> \) <block>
     {*}
 }
 

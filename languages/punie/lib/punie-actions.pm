@@ -95,6 +95,40 @@ method cond($/) {
     make $past;
 }
 
+method loop($/, $key) {
+    # TODO: handle $<label>
+    my $past := $( $/{$key} );
+    make $past
+}
+
+method while_loop($/) {
+    my $past := PAST::Op.new( :pasttype( 'while' ), :node($/) );
+    my $cond;
+
+    if $<expr> {
+        $cond := $( $<expr>[0] );
+    }
+    else {
+        # no condition means true; make the condition true.
+        $cond := PAST::Val.new( :value('1'), :returns('Integer'), :node($/) );
+    }
+
+    my $block := $( $<block> );
+    $past.push($cond);
+    $past.push($block);
+
+    make $past;
+}
+
+method until_loop($/) {
+    my $past := PAST::Op.new( :pasttype( 'until' ), :node($/) );
+    my $cond := $( $<expr> );
+    my $block := $( $<block> );
+    $past.push($cond);
+    $past.push($block);
+    make $past;
+}
+
 method integer($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node( $/ ) );
 }
