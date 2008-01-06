@@ -1,3 +1,6 @@
+# Copyright (C) 2005-2008, The Perl Foundation.
+# $Id$
+
 grammar Punie::Grammar is PCT::Grammar;
 
 token TOP    {
@@ -218,3 +221,7 @@ proto infix:<,> is looser(infix:<=>) is assoc('list')
     { ... }
 
 proto term: is tighter(infix:<+>) is parsed(&term) { ... }
+
+
+
+
