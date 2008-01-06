@@ -193,424 +193,272 @@
 
 ; implementation of fxadd1
 (define-primitive (fxadd1 uid arg)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_add")))
     (emit-expr arg)
     (emit-expr 1)))
 
 ; implementation of fx+
 (define-primitive (fx+ uid arg1 arg2)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid 
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_add")))
     (emit-expr arg1)
     (emit-expr arg2)))
 
 ; implementation of fxsub1
 (define-primitive (fxsub1 uid arg)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_sub")))
     (emit-expr arg)
     (emit-expr 1)))
 
 ; implementation of fx-
 (define-primitive (fx- uid arg1 arg2)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_sub")))
     (emit-expr arg1)
     (emit-expr arg2)))
 
 ; implementation of fxlogand
 (define-primitive (fxlogand uid arg1 arg2)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_band")))
     (emit-expr arg1)
     (emit-expr arg2)))
 
 ; implementation of fxlogor
 (define-primitive (fxlogor uid arg1 arg2)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_bor")))
     (emit-expr arg1)
     (emit-expr arg2)))
 
 ; implementation of char->fixnum
 (define-primitive (char->fixnum uid arg)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "inline")
                    (inline "new %r, 'EclectusFixnum'\\nassign %r, %0\\n")))
     (emit-expr arg)))
 
 ; implementation of fixnum->char
 (define-primitive (fixnum->char uid arg)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "inline")
                    (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n")))
     (emit-expr arg)))
 
 ; implementation of char<
 (define-primitive (char< uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain") (name "infix:<")))
       (emit-expr arg1)
       (emit-expr arg2)) 
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of char<=
 (define-primitive (char<= uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:<=")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of char=
 (define-primitive (char= uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:==")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of char>
 (define-primitive (char> uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:>")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of char>=
 (define-primitive (char>= uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:>=")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of fxzero?
 (define-primitive (fxzero? uid arg)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:==")))
       (emit-expr arg)
       (emit-expr 0))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of fx<
 (define-primitive (fx< uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:<")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of fx<=
 (define-primitive (fx<= uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:<=")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of fx=
 (define-primitive (fx= uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:==")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of fx>=
 (define-primitive (fx>= uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:>=")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of fx>
 (define-primitive (fx> uid arg1 arg2)
-  (emit "
-        .local pmc reg_cmp_~a
-        reg_cmp_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "cmp_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "chain")
                      (name "infix:>")))
       (emit-expr arg1)
       (emit-expr arg2))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of null?
 (define-primitive (null? uid arg)
-  (emit "
-        .local pmc reg_inline_~a
-        reg_inline_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "inline_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "inline")
                      (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusEmptyList'\\n %r = $I1")))
       (emit-expr arg))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of fixnum?
 (define-primitive (fixnum? uid arg)
-  (emit "
-        .local pmc reg_inline_~a
-        reg_inline_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "inline_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "inline")
                      (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusFixnum'\\n %r = $I1")))
       (emit-expr arg))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of boolean?
 (define-primitive (boolean? uid arg)
-  (emit "
-        .local pmc reg_inline_~a
-        reg_inline_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "inline_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "inline")
                      (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusBoolean'\\n %r = $I1")))
           (emit-expr arg))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; implementation of char?
 (define-primitive (char? uid arg)
-  (emit "
-        .local pmc reg_inline_~a
-        reg_inline_~a = new 'PAST::Op'
-        " uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
-        " uid uid)
   (list
-    uid
+    (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
-      (format "inline_~a" uid)
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "inline")
                      (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusCharacter'\\n %r = $I1")))
       (emit-expr arg))
-    (list "val_true")
-    (list "val_false")))
+    (emit-expr #t)
+    (emit-expr #f)))
 
 ; a getter of '*emitter*'
 (define primitive-emitter
@@ -619,17 +467,7 @@
 
 (define emit-function-header
   (lambda (function-name)
-    (emit (string-append ".sub " function-name))
-    (emit "
-          .local pmc reg_val_true
-          reg_val_true = new 'PAST::Val'
-          reg_val_true.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-                 
-          .local pmc reg_val_false
-          reg_val_false = new 'PAST::Val'
-          reg_val_false.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-          " )))
-                 
+    (emit (string-append ".sub " function-name))))
 
 (define emit-function-footer
   (lambda (reg)
@@ -646,29 +484,24 @@
 ; emit PIR for a scalar
 (define emit-immediate
   (lambda (x)
-    (let ([uid (gen-unique-id)])
-      (emit "
-            .local pmc reg_~a
-            reg_~a = new 'PAST::Val'
-            " uid uid)
-      (list
-        uid
-        (cond
-          [(fixnum? x)
-           (quasiquote (@ (value (unquote x))
-                          (returns "EclectusFixnum")))]
-          [(char? x)
-           (quasiquote (@ (value (unquote (char->integer x)))
-                          (returns "EclectusCharacter")))]
-          [(and (list? x) (= (length x) 0 ))
-           (quasiquote (@ (value 0)
-                          (returns "EclectusEmptyList")))]
-          [(boolean? x)
-           (quasiquote (@ (value (unquote (if x 1 0)))
-                          (returns "EclectusBoolean")))]
-          [(string? x)
-           (quasiquote (@ (value (unquote (format "\"'~a'\"" x)))
-                            (returns "EclectusString")))])))))
+    (list
+      (string->symbol "PAST::Val")
+      (cond
+        [(fixnum? x)
+         (quasiquote (@ (value (unquote x))
+                        (returns "EclectusFixnum")))]
+        [(char? x)
+         (quasiquote (@ (value (unquote (char->integer x)))
+                        (returns "EclectusCharacter")))]
+        [(and (list? x) (= (length x) 0 ))
+         (quasiquote (@ (value 0)
+                        (returns "EclectusEmptyList")))]
+        [(boolean? x)
+         (quasiquote (@ (value (unquote (if x 1 0)))
+                        (returns "EclectusBoolean")))]
+        [(string? x)
+         (quasiquote (@ (value (unquote (format "\"'~a'\"" x)))
+                          (returns "EclectusString")))]))))
 
 (define bindings
   (lambda (x)
@@ -687,25 +520,14 @@
      (if (null? binds)
        (emit-expr body)
        (begin
-         (emit "
-               .local pmc reg_let_var_~a
-               reg_let_var_~a = new 'PAST::Var'
-
-               .local pmc reg_let_copy_~a 
-               reg_let_copy_~a = new 'PAST::Op'
-               " uid uid uid uid )
-         (emit "
-               .local pmc reg_~a
-               reg_~a = new 'PAST::Stmts'
-               " uid uid)
          (list
-           uid
+           (string->symbol "PAST::Stmts")
            (list
-             (format "let_copy_~a" uid)
+             (string->symbol "PAST::Op")
              (quasiquote (@ (pasttype "copy")
                             (lvalue "1")))
              (list
-               (format "let_var_~a" uid)
+               (string->symbol "PAST::Var")
                (quasiquote (@ (name (unquote (caar binds)))
                               (scope "lexical")
                               (viviself "Undef")
@@ -715,12 +537,8 @@
 
 (define emit-if
   (lambda (x uid)
-    (emit "
-          .local pmc reg_~a
-          reg_~a = new 'PAST::Op'
-          " uid uid )
     (list
-      uid
+      (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "if")))
       (emit-expr (if-test x))
       (emit-expr (if-conseq x))
@@ -774,23 +592,27 @@
 ; currently it only handles the pushes
 (define past-sxml->past-pir
   (lambda (past)
-    ;(write (list "emit-pushes1:" past))(newline)
-    ;(write (list "emit-pushes2:" (cdr past)))(newline)
-     (for-each
-       (lambda (daughter)
-         (if (eq? '@ (car daughter))
-           (for-each
-             (lambda (key_val)
-               ;(write (list "emit-pushes3:" daughter (cadr daughter) (caadr daughter)(cadadr daughter)))(newline)
-               (emit "
-                     reg_~a.init( '~a' => \"~a\" )
-                     " (car past) (car key_val) (cadr key_val)))
-               (cdr daughter))
-             (emit "
-                   reg_~a.push( reg_~a )
-                   " (car past) (past-sxml->past-pir daughter))))
-       (cdr past))
-     (car past)))
+    (let ([uid (gen-unique-id)])
+      ; (display "# ")(write (list "past-sxml->past-pir:" past))(newline)
+      (emit "
+            .local pmc reg_~a
+            reg_~a = new '~a'
+            " uid uid (car past))
+      (for-each
+        (lambda (daughter)
+          (if (eq? '@ (car daughter))
+            (for-each
+              (lambda (key_val)
+                ;(write (list "emit-pushes3:" daughter (cadr daughter) (caadr daughter)(cadadr daughter)))(newline)
+                (emit "
+                      reg_~a.init( '~a' => \"~a\" )
+                      " uid (car key_val) (cadr key_val)))
+                (cdr daughter))
+              (emit "
+                    reg_~a.push( reg_~a )
+                    " uid (past-sxml->past-pir daughter))))
+        (cdr past))
+      uid)))
 
 ; the actual compiler
 (define compile-program
