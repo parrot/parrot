@@ -83,6 +83,7 @@ method loopmod($/) {
 
 method condmod($/) {
     my $past := PAST::Op.new( :pasttype( ~$<sym> ), :node($/) );
+    $past.push( $( $<expr> ) );
     make $past;
 }
 

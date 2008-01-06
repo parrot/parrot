@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'punie', <<'CODE', <<'OUT', 'simple conditionals' );
@@ -83,6 +83,16 @@ if ($x ne $x) { print "not ok 2\n"; } else { print "ok 2\n";}
 
 EOC
 1..2
+ok 1
+ok 2
+OUT
+
+language_output_is( 'punie', <<'CODE', <<'OUT', 'simple conditionals' );
+print "ok 1\n" if 1;
+print "nok 1\n" if 0;
+print "ok 2\n" unless 0;
+print "nok 2\n" unless 1;
+CODE
 ok 1
 ok 2
 OUT
