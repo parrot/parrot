@@ -31,7 +31,7 @@
               load_bytecode 'PGE/Dumper.pbc'
               load_bytecode 'PCT.pbc'
           .end
-          " )))
+          ")))
 
 ; Emit PIR that prints the value returned by scheme_entry()
 (define emit-driver
@@ -39,17 +39,9 @@
     (emit "
           .sub drive :main
           
-              .local pmc val_ret
-              ( val_ret ) = scheme_entry()
-              # _dumper( val_ret, 'val_ret' )
-          
-              .local pmc op_say
-              op_say = new 'PAST::Op'
-              op_say.init( val_ret, 'name' => 'say', 'pasttype' => 'call' )
-          
               .local pmc stmts
-              stmts = new 'PAST::Stmts'
-              stmts.'init'( op_say, 'name' => 'stmts' )
+              ( stmts ) = scheme_entry()
+              # _dumper( stmts 'stmts' )
           
               # compile and evaluate
               .local pmc past_compiler
@@ -182,17 +174,17 @@
 ; with 'define-primitive'
 (define-syntax define-primitive
   (syntax-rules ()
-    [(_ (prim-name uid arg* ...) b b* ...)
+    [(_ (prim-name arg* ...) b b* ...)
      (begin
         (putprop 'prim-name '*is-prim*
           #t)
         (putprop 'prim-name '*arg-count*
           (length '(arg* ...)))
         (putprop 'prim-name '*emitter*
-          (lambda (uid arg* ...) b b* ...)))]))
+          (lambda (arg* ...) b b* ...)))]))
 
 ; implementation of fxadd1
-(define-primitive (fxadd1 uid arg)
+(define-primitive (fxadd1 arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_add")))
@@ -200,7 +192,7 @@
     (emit-expr 1)))
 
 ; implementation of fx+
-(define-primitive (fx+ uid arg1 arg2)
+(define-primitive (fx+ arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_add")))
@@ -208,7 +200,7 @@
     (emit-expr arg2)))
 
 ; implementation of fxsub1
-(define-primitive (fxsub1 uid arg)
+(define-primitive (fxsub1 arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_sub")))
@@ -216,7 +208,7 @@
     (emit-expr 1)))
 
 ; implementation of fx-
-(define-primitive (fx- uid arg1 arg2)
+(define-primitive (fx- arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_sub")))
@@ -224,7 +216,7 @@
     (emit-expr arg2)))
 
 ; implementation of fxlogand
-(define-primitive (fxlogand uid arg1 arg2)
+(define-primitive (fxlogand arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_band")))
@@ -232,7 +224,7 @@
     (emit-expr arg2)))
 
 ; implementation of fxlogor
-(define-primitive (fxlogor uid arg1 arg2)
+(define-primitive (fxlogor arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pirop "n_bor")))
@@ -240,7 +232,7 @@
     (emit-expr arg2)))
 
 ; implementation of char->fixnum
-(define-primitive (char->fixnum uid arg)
+(define-primitive (char->fixnum arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "inline")
@@ -248,7 +240,7 @@
     (emit-expr arg)))
 
 ; implementation of fixnum->char
-(define-primitive (fixnum->char uid arg)
+(define-primitive (fixnum->char arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "inline")
@@ -256,20 +248,21 @@
     (emit-expr arg)))
 
 ; implementation of char<
-(define-primitive (char< uid arg1 arg2)
+(define-primitive (char< arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
     (list
       (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain") (name "infix:<")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:<")))
       (emit-expr arg1)
       (emit-expr arg2)) 
     (emit-expr #t)
     (emit-expr #f)))
 
 ; implementation of char<=
-(define-primitive (char<= uid arg1 arg2)
+(define-primitive (char<= arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -283,7 +276,7 @@
     (emit-expr #f)))
 
 ; implementation of char=
-(define-primitive (char= uid arg1 arg2)
+(define-primitive (char= arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -297,7 +290,7 @@
     (emit-expr #f)))
 
 ; implementation of char>
-(define-primitive (char> uid arg1 arg2)
+(define-primitive (char> arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -311,7 +304,7 @@
     (emit-expr #f)))
 
 ; implementation of char>=
-(define-primitive (char>= uid arg1 arg2)
+(define-primitive (char>= arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -325,7 +318,7 @@
     (emit-expr #f)))
 
 ; implementation of fxzero?
-(define-primitive (fxzero? uid arg)
+(define-primitive (fxzero? arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -339,7 +332,7 @@
     (emit-expr #f)))
 
 ; implementation of fx<
-(define-primitive (fx< uid arg1 arg2)
+(define-primitive (fx< arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -353,7 +346,7 @@
     (emit-expr #f)))
 
 ; implementation of fx<=
-(define-primitive (fx<= uid arg1 arg2)
+(define-primitive (fx<= arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -367,7 +360,7 @@
     (emit-expr #f)))
 
 ; implementation of fx=
-(define-primitive (fx= uid arg1 arg2)
+(define-primitive (fx= arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -381,7 +374,7 @@
     (emit-expr #f)))
 
 ; implementation of fx>=
-(define-primitive (fx>= uid arg1 arg2)
+(define-primitive (fx>= arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -395,7 +388,7 @@
     (emit-expr #f)))
 
 ; implementation of fx>
-(define-primitive (fx> uid arg1 arg2)
+(define-primitive (fx> arg1 arg2)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -409,7 +402,7 @@
     (emit-expr #f)))
 
 ; implementation of null?
-(define-primitive (null? uid arg)
+(define-primitive (null? arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -422,7 +415,7 @@
     (emit-expr #f)))
 
 ; implementation of fixnum?
-(define-primitive (fixnum? uid arg)
+(define-primitive (fixnum? arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -435,7 +428,7 @@
     (emit-expr #f)))
 
 ; implementation of boolean?
-(define-primitive (boolean? uid arg)
+(define-primitive (boolean? arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -448,7 +441,7 @@
     (emit-expr #f)))
 
 ; implementation of char?
-(define-primitive (char? uid arg)
+(define-primitive (char? arg)
   (list
     (string->symbol "PAST::Op")
     (quasiquote (@ (pasttype "if")))
@@ -479,7 +472,7 @@
 (define emit-primcall
   (lambda (x)
     (let ([prim (car x)] [args (cdr x)])
-      (apply (primitive-emitter prim) (gen-unique-id) args))))
+      (apply (primitive-emitter prim) args))))
 
 ; emit PIR for a scalar
 (define emit-immediate
@@ -493,7 +486,7 @@
         [(char? x)
          (quasiquote (@ (value (unquote (char->integer x)))
                         (returns "EclectusCharacter")))]
-        [(and (list? x) (= (length x) 0 ))
+        [(and (list? x) (= (length x) 0))
          (quasiquote (@ (value 0)
                         (returns "EclectusEmptyList")))]
         [(boolean? x)
@@ -512,11 +505,11 @@
     (caddr x)))
 
 (define emit-variable
-  (lambda (x uid)
+  (lambda (x)
     (emit-expr 13)))
 
 (define emit-let
-  (lambda (binds body uid )
+  (lambda (binds body)
      (if (null? binds)
        (emit-expr body)
        (begin
@@ -536,7 +529,7 @@
            (emit-expr body))))))
 
 (define emit-if
-  (lambda (x uid)
+  (lambda (x)
     (list
       (string->symbol "PAST::Op")
       (quasiquote (@ (pasttype "if")))
@@ -550,11 +543,10 @@
     ;(display "# ")(write x) (newline)
     (cond
       [(immediate? x) (emit-immediate x)]
-      [(variable? x)  (emit-variable x (gen-unique-id))]
-      [(let? x)       (emit-let (bindings x) (body x) (gen-unique-id))]
-      [(if? x)        (emit-if x (gen-unique-id))]
-      [(primcall? x)  (emit-primcall x)]
-    ))) 
+      [(variable? x)  (emit-variable x)]
+      [(let? x)       (emit-let (bindings x) (body x))]
+      [(if? x)        (emit-if x)]
+      [(primcall? x)  (emit-primcall x)]))) 
 
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling
@@ -614,6 +606,17 @@
         (cdr past))
       uid)))
 
+; print the result of the evaluation
+(define wrap-say
+  (lambda (past)
+    (list
+      (string->symbol "PAST::Stmts")
+      (list
+        (string->symbol "PAST::Op")
+        (quasiquote (@ (pasttype "call")
+                       (name "say")))
+        past))))
+
 ; the actual compiler
 (define compile-program
   (lambda (program)
@@ -623,5 +626,6 @@
     (emit-function-header "scheme_entry")
     (emit-function-footer
       (past-sxml->past-pir
-        (emit-expr
-          (transform-and-or program))))))
+        (wrap-say
+          (emit-expr
+            (transform-and-or program)))))))
