@@ -1180,10 +1180,10 @@ ln(+-i) = +- (pi i)/2
             im = 0.0;
 
         RE(d) = log(sqrt(re*re + im*im));
-	if (re == 0.0 && im == 0.0) /* atan2(0, 0) not portable */
-	    IM(d) = 0.0;
-	else
-	    IM(d) = atan2(im, re);
+        if (re == 0.0 && im == 0.0) /* atan2(0, 0) not portable */
+            IM(d) = 0.0;
+        else
+            IM(d) = atan2(im, re);
 
         return d;
     }
