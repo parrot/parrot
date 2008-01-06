@@ -26,6 +26,9 @@ sub _init {
     $data{description} = q{Determining if your platform supports GMP};
     $data{args}        = [ qw( verbose without-gmp ) ];
     $data{result}      = q{};
+    $data{cc_run_expected} =
+"6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151 0\n";
+
     return \%data;
 }
 
@@ -63,19 +66,17 @@ sub runstep {
     my $has_gmp = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        if ( $test eq
-"6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151 0\n"
-            )
-        {
-            $has_gmp = 1;
-            print " (yes) " if $verbose;
-            $self->set_result('yes');
-
-            $conf->data->set(
-                gmp     => 'define',
-                HAS_GMP => $has_gmp,
-            );
-        }
+#        if ( $test eq $self->{cc_run_expected}) {
+#            $has_gmp = 1;
+#            print " (yes) " if $verbose;
+#            $self->set_result('yes');
+#
+#            $conf->data->set(
+#                gmp     => 'define',
+#                HAS_GMP => $has_gmp,
+#            );
+#        }
+        $has_gmp = $self->_evaluate_cc_run( $conf, $test, $has_gmp, $verbose );
     }
     unless ($has_gmp) {
 
@@ -118,6 +119,21 @@ sub _handle_darwin {
         }
     }
     return 1;
+}
+
+sub _evaluate_cc_run {
+    my ($self, $conf, $test, $has_gmp, $verbose) = @_;
+    if ( $test eq $self->{cc_run_expected} ) {
+        $has_gmp = 1;
+        print " (yes) " if $verbose;
+        $self->set_result('yes');
+
+        $conf->data->set(
+            gmp     => 'define',
+            HAS_GMP => $has_gmp,
+        );
+    }
+    return $has_gmp;
 }
 
 1;
