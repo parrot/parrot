@@ -40,10 +40,8 @@ OUT
 
 language_output_is( 'punie', <<'CODE', <<'OUT', 'for loop' );
 
-$x = 1;
-for (; $x <= 5; ) {
+for ($x = 1; $x <= 5; $x = $x + 1) {
     print "ok "; print $x; print "\n";
-    $x = $x + 1;
 }
 CODE
 ok 1
