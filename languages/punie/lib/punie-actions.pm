@@ -50,7 +50,6 @@ method line ($/, $key) {
 
 method sideff($/) {
     my $expr := $( $<expr> );
-
     if $<modifier> {
         my $mod := $( $<modifier>[0] );
         $mod.push($expr);
@@ -62,18 +61,10 @@ method sideff($/) {
 }
 
 method loopmod($/) {
-    my $past := PAST::Op.new( :node($/) );
-    $past.push( $( $<expr> ) );
-
-    if $<sym> eq 'while' {
-        $past.pasttype('repeat_while');
-    }
-    elsif $<sym> eq 'until' {
-        $past.pasttype('repeat_until');
-    }
-    else {
-        print("Unknown loop modifier\n");
-    }
+    my $past := PAST::Op.new( $( $<expr> ), :node($/) );
+    # pasttype is "repeat_while" or "repeat_until"
+    my $pasttype := "repeat_" ~ ~$<sym>;
+    $past.pasttype($pasttype);
     make $past;
 }
 
