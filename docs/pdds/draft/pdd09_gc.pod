@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,6 +8,11 @@ docs/pdds/pdd09_gc.pod - Garbage Collection Subsystems
 =head1 ABSTRACT
 
 This PDD describes how DOD/GC systems work, and what's required of PMC classes.
+
+=head1 VERSION
+
+$Revision$
+
 
 =head1 DESCRIPTION
 
@@ -351,59 +356,6 @@ None.
 =head1 FOOTNOTES
 
 None.
-
-=head1 REFERENCES
-
-None.
-
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 9
-    Version: 1.2
-    Status: Developing
-    Last Modified: 26 August 2004
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 1.2
-
-26 August 2004
-
-=item Version 1.1
-
-26 February 2002
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.2
-
-Removed old flags. Documented GC schemes and subsystem interface.
-
-=item Version 1.1
-
-Started documenting the internal routines
-
-=item Version 1.0
-
-None. First version
-
-=back
 
 =head1 REFERENCES
 
