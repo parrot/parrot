@@ -738,8 +738,8 @@ Returns size of unpacked if everything is OK, else zero (0).
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t
-PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self), ARGIN(opcode_t *packed),
-    size_t packed_size)
+PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
+    ARGIN(const opcode_t * const packed), size_t packed_size)
 {
     PackFile_Header * const header = self->header;
     opcode_t *cursor;
