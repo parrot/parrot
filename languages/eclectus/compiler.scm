@@ -323,7 +323,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:<=")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:<=")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -344,7 +345,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:==")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:==")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -365,7 +367,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:>")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:>")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -386,7 +389,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:>=")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:>=")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -407,7 +411,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:==")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:==")))
       (emit-expr arg)
       (emit-expr 0))
     (list "val_true")
@@ -428,7 +433,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:<")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:<")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -449,7 +455,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:<=")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:<=")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -470,7 +477,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:==")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:==")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -491,7 +499,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:>=")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:>=")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -512,7 +521,8 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "cmp_~a" uid)
-      (quasiquote (@ (pasttype "chain") (name "infix:>")))
+      (quasiquote (@ (pasttype "chain")
+                     (name "infix:>")))
       (emit-expr arg1)
       (emit-expr arg2))
     (list "val_true")
@@ -610,9 +620,16 @@
 (define emit-function-header
   (lambda (function-name)
     (emit (string-append ".sub " function-name))
-    (emit "    .local pmc reg_val_true, reg_val_false")
-    (emit "    reg_val_true  = reg_~a" (car (emit-expr #t)))
-    (emit "    reg_val_false = reg_~a" (car (emit-expr #f)))))
+    (emit "
+          .local pmc reg_val_true
+          reg_val_true = new 'PAST::Val'
+          reg_val_true.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
+                 
+          .local pmc reg_val_false
+          reg_val_false = new 'PAST::Val'
+          reg_val_false.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
+          " )))
+                 
 
 (define emit-function-footer
   (lambda (reg)
@@ -630,44 +647,28 @@
 (define emit-immediate
   (lambda (x)
     (let ([uid (gen-unique-id)])
-      (emit ".local pmc reg_~a" uid)
-      (cond
-        [(fixnum? x)
-         (emit "
-               reg_~a = new 'PAST::Val'
-               reg_~a.init( 'value' => ~a, 'returns' => 'EclectusFixnum' )
-               " uid uid x)
-         (list uid)]
-        [(char? x)
-         (emit "
-               reg_~a = new 'PAST::Val'
-               reg_~a.init( 'value' => ~a, 'returns' => 'EclectusCharacter' )
-               " uid uid (char->integer x) )
-         (list uid)]
-        [(and (list? x) (= (length x) 0 ))
-         (emit "
-               reg_~a = new 'PAST::Val'
-               reg_~a.init( 'value' => 0, 'returns' => 'EclectusEmptyList' )
-               " uid uid)
-         (list uid)]
-        [(boolean? x)
-           (if x 
-             (emit "
-                   reg_~a = new 'PAST::Val'
-                   reg_~a.init( 'value' => 1, 'returns' => 'EclectusBoolean' )
-                   " uid uid)
-             (emit "
-                   reg_~a = new 'PAST::Val'
-                   reg_~a.init( 'value' => 0, 'returns' => 'EclectusBoolean' )
-                   " uid uid))
-         (list uid)]
-        [(string? x)
-         (emit "
-               reg_~a = new 'PAST::Val'
-               reg_~a.init( 'value' => \"'~a'\", 'returns' => 'EclectusString' )
-               " uid uid x)
-         (list uid)])
-        )))
+      (emit "
+            .local pmc reg_~a
+            reg_~a = new 'PAST::Val'
+            " uid uid)
+      (list
+        uid
+        (cond
+          [(fixnum? x)
+           (quasiquote (@ (value (unquote x))
+                          (returns "EclectusFixnum")))]
+          [(char? x)
+           (quasiquote (@ (value (unquote (char->integer x)))
+                          (returns "EclectusCharacter")))]
+          [(and (list? x) (= (length x) 0 ))
+           (quasiquote (@ (value 0)
+                          (returns "EclectusEmptyList")))]
+          [(boolean? x)
+           (quasiquote (@ (value (unquote (if x 1 0)))
+                          (returns "EclectusBoolean")))]
+          [(string? x)
+           (quasiquote (@ (value (unquote (format "\"'~a'\"" x)))
+                            (returns "EclectusString")))])))))
 
 (define bindings
   (lambda (x)
@@ -702,7 +703,8 @@
            uid
            (list
              (format "let_copy_~a" uid)
-             (quasiquote (@ (pasttype "copy") (lvalue "1")))
+             (quasiquote (@ (pasttype "copy")
+                            (lvalue "1")))
              (list
                (format "let_var_~a" uid))
              (emit-expr (cadar binds)))
