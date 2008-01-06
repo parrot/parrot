@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 language_output_is( 'punie', <<'CODE', <<'OUT', 'simple loops' );
@@ -38,3 +38,17 @@ ok 2
 ok 3
 OUT
 
+language_output_is( 'punie', <<'CODE', <<'OUT', 'for loop' );
+
+$x = 1;
+for (; $x <= 5; ) {
+    print "ok "; print $x; print "\n";
+    $x = $x + 1;
+}
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUT

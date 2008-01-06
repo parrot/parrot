@@ -142,20 +142,10 @@ method loop($/, $key) {
 
 method while_loop($/) {
     my $past := PAST::Op.new( :pasttype( 'while' ), :node($/) );
-    my $cond;
-
-    if $<expr> {
-        $cond := $( $<expr>[0] );
-    }
-    else {
-        # no condition means true; make the condition true.
-        $cond := PAST::Val.new( :value('1'), :returns('Integer'), :node($/) );
-    }
-
+    my $cond := $( $<texpr> );
     my $block := $( $<block> );
     $past.push($cond);
     $past.push($block);
-
     make $past;
 }
 
@@ -166,6 +156,45 @@ method until_loop($/) {
     $past.push($cond);
     $past.push($block);
     make $past;
+}
+
+method for_loop($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+    # initialization step (first item of for loop)
+
+    ### TODO: fix init and step parts.
+
+    #if $<init> {
+    #    $past.push( $( $<init> ) );
+    #}
+
+    # create the loop node and add it to the stmts list
+    my $loop := PAST::Op.new( :pasttype('while'), :node($/) );
+
+    # create a new loop block, which is the original block
+    # and the step, executed after each iteration
+    my $body := PAST::Stmts.new( :node($/) );
+    $body.push( $( $<block> ) );
+
+    #if $<step> {
+    #    $body.push( $( $<step> ) );
+    #}
+
+    # add the loop condition and the new body to the loop
+    $loop.push( $( $<texpr> ) );
+    $loop.push($body);
+
+    $past.push($loop);
+    make $past;
+}
+
+method texpr($/) {
+    if $<expr> {
+        make $( $<expr>[0] );
+    }
+    else {
+        make PAST::Val.new( :value('1'), :returns('Integer'), :node($/) );
+    }
 }
 
 method integer($/) {

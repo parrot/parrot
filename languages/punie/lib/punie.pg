@@ -60,17 +60,28 @@ rule loop {
     <label>
     [ <while_loop> {*}                          #= while_loop
     | <until_loop> {*}                          #= until_loop
+    | <for_loop> {*}                            #= for_loop
     ]
 }
 
 rule while_loop {
-    while \( <expr>? \) <block>
+    while \( <texpr> \) <block>
     {*}
 }
 
 rule until_loop {
     until \( <expr> \) <block>
     {*}
+}
+
+rule for_loop {
+    for \( $<init>=<sideff>? ';' <texpr> ';' $<step>=<sideff>? \)
+    <block>
+    {*}
+}
+
+rule texpr {
+    <expr>? {*}
 }
 
 rule expr    {
