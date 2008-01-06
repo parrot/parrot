@@ -162,11 +162,9 @@ method for_loop($/) {
     my $past := PAST::Stmts.new( :node($/) );
     # initialization step (first item of for loop)
 
-    ### TODO: fix init and step parts.
-
-    #if $<init> {
-    #    $past.push( $( $<init> ) );
-    #}
+    if $<init> {
+        $past.push( $( $<init>[0] ) );
+    }
 
     # create the loop node and add it to the stmts list
     my $loop := PAST::Op.new( :pasttype('while'), :node($/) );
@@ -176,9 +174,9 @@ method for_loop($/) {
     my $body := PAST::Stmts.new( :node($/) );
     $body.push( $( $<block> ) );
 
-    #if $<step> {
-    #    $body.push( $( $<step> ) );
-    #}
+    if $<step> {
+        $body.push( $( $<step>[0] ) );
+    }
 
     # add the loop condition and the new body to the loop
     $loop.push( $( $<texpr> ) );

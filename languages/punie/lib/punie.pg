@@ -78,7 +78,7 @@ rule until_loop {
 }
 
 rule for_loop {
-    for \( $<init>=<sideff>? ';' <texpr> ';' $<step>=<sideff>? \)
+    for \( [$<init>=<sideff>]? ';' <texpr> ';' [$<step>=<sideff>]? \)
     <block>
     {*}
 }
