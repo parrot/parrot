@@ -690,11 +690,10 @@
          (emit "
                .local pmc reg_let_var_~a
                reg_let_var_~a = new 'PAST::Var'
-               reg_let_var_~a.init( 'name' => '~a', 'scope' => 'lexical', 'viviself' => 'Undef', 'isdecl' => 1 )
 
                .local pmc reg_let_copy_~a 
                reg_let_copy_~a = new 'PAST::Op'
-               " uid uid uid (caar binds) uid uid )
+               " uid uid uid uid )
          (emit "
                .local pmc reg_~a
                reg_~a = new 'PAST::Stmts'
@@ -706,7 +705,11 @@
              (quasiquote (@ (pasttype "copy")
                             (lvalue "1")))
              (list
-               (format "let_var_~a" uid))
+               (format "let_var_~a" uid)
+               (quasiquote (@ (name (unquote (caar binds)))
+                              (scope "lexical")
+                              (viviself "Undef")
+                              (isdecl 1))))
              (emit-expr (cadar binds)))
            (emit-expr body))))))
 
