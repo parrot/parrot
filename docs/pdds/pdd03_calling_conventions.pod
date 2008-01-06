@@ -218,19 +218,26 @@ constant specifying the name of the next argument (or returned value).
 
 =back
 
-=head3 Overflow
+=head3 Overflow and underflow
 
-If too many values are provided to fit into the given target registers, Parrot
-will throw an exception.  Note that if the final target is a P register with
-FLAT set, then this exception can never occur.
+If too many or too few values are provided for the given target registers,
+Parrot by default will throw an exception for C<get_params>, but not for
+C<get_results>.  This error behavior can be controlled via the C<errorson> and
+C<errorsoff> opcodes using C<PARROT_ERRORS_PARAM_COUNT_FLAG> for C<get_params>
+and C<PARROT_ERRORS_RESULT_COUNT_FLAG> for C<get_results>.  (It is not
+possible to control underflow behavior separately from overflow.)
+
+Note that if the final target is a P register with FLAT set, then overflow can
+never occur.  Similarly, if all target registers are marked B<OPTIONAL>, then
+underflow is impossible.
+
+Note also that when these errors are off, any excess destination registers in
+the case of underflow are left untouched, rather than being reset to zero or
+null.  Excess registers explicitly marked B<OPTIONAL> are always reset,
+regardless of the error flag settings.
 
 RT#45357 - which exception?  We really could use an exception subsystem. 
 Oh, wait, that's my job.  Never mind.  --Chip
-
-=head3 Underflow
-
-If too few values are provided so that some target registers are left unset,
-this too results in an exception.
 
 =head3 Ordering of named values (outgoing)
 
