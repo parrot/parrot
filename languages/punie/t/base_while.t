@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
 
 language_output_is( 'punie', <<'CODE', <<'OUT', 'simple loops' );
@@ -24,3 +24,17 @@ CODE
 ok 1
 ok 2
 OUT
+
+language_output_is( 'punie', <<'CODE', <<'OUT', 'expr modifiers' );
+print "ok 1\n" while 0;
+
+print "ok 2\n";
+
+print "ok 3\n" until 1;
+
+CODE
+ok 1
+ok 2
+ok 3
+OUT
+

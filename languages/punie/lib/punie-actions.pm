@@ -48,6 +48,44 @@ method line ($/, $key) {
     make $( $/{$key} );
 }
 
+method sideff($/) {
+    my $expr := $( $<expr> );
+    if $<loopmod> {    # while/until
+        my $mod := $( $<loopmod>[0] );
+        $mod.push($expr);
+        make $mod;
+    }
+    elsif $<condmod> {  # if/unless
+        my $mod := $( $<condmod>[0] );
+        $mod.push($expr);
+        make $mod;
+    }
+    else { # no modifier
+        make $expr;
+    }
+}
+
+method loopmod($/) {
+    my $past := PAST::Op.new( :node($/) );
+    $past.push( $( $<expr> ) );
+
+    if $<sym> eq 'while' {
+        $past.pasttype('repeat_while');
+    }
+    elsif $<sym> eq 'until' {
+        $past.pasttype('repeat_until');
+    }
+    else {
+        print("Unknown loop modifier\n");
+    }
+    make $past;
+}
+
+method condmod($/) {
+    my $past := PAST::Op.new( :pasttype( ~$<sym> ), :node($/) );
+    make $past;
+}
+
 method subroutine($/) {
     my $past := $($<block>);
     $past.name( ~$<word> );

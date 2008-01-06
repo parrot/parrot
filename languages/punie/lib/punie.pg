@@ -22,9 +22,24 @@ token line {
     | <label>
       [ <cond> {*}                                 #= cond
       | <subroutine> {*}                           #= subroutine
-      | <expr> ';' {*}                             #= expr
+      | <sideff> ';' {*}                           #= sideff
       ] \s*
 
+}
+
+rule sideff {
+    <expr> [<condmod>|<loopmod>]?
+    {*}
+}
+
+rule condmod {
+    $<sym>=[if|unless] <expr>
+    {*}
+}
+
+rule loopmod {
+    $<sym>=[while|until] <expr>
+    {*}
 }
 
 rule label { [<word>\:]? {*} }
