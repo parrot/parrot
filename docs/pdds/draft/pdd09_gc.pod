@@ -408,3 +408,5 @@ None. First version
 =head1 REFERENCES
 
 "A unified theory of garbage collection" <http://portal.acm.org/citation.cfm?id=1028982>
+
+"Scalable Locality-Conscious Multithreaded Memory Allocation" http://people.cs.vt.edu/~scschnei/papers/ismm06.pdf
