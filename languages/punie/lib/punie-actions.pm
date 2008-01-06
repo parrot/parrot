@@ -69,9 +69,7 @@ method loopmod($/) {
 }
 
 method condmod($/) {
-    my $past := PAST::Op.new( :pasttype( ~$<sym> ), :node($/) );
-    $past.push( $( $<expr> ) );
-    make $past;
+    make PAST::Op.new( $( $<expr> ), :pasttype( ~$<sym> ), :node($/) );
 }
 
 method subroutine($/) {
@@ -165,6 +163,17 @@ method for_loop($/) {
     else {
         make $loop;
     }
+}
+
+method atom($/, $key) {
+    make $( $/{$key} );
+}
+
+method ternary($/) {
+    my $cond := $( $<cond> );
+    my $then := $( $<then> );
+    my $else := $( $<else> );
+    make PAST::Op.new( $cond, $then, $else, :pasttype('if'), :node($/) );
 }
 
 method texpr($/) {

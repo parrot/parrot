@@ -97,6 +97,11 @@ rule gprint  { (print) <expr> {*} }
 rule 'oexpr' is optable { ... }
 
 token term {
+    | <ternary> {*}                              #= ternary
+    | <atom> {*}                                 #= atom
+}
+
+token atom {
     | \( <expr> \) {*}                           #= expr
     | <number> {*}                               #= number
     | <integer> {*}                              #= integer
@@ -108,6 +113,12 @@ token term {
     | <subcall> {*}                              #= subcall
     | <variable> {*}                             #= variable
 }
+
+rule ternary {
+    $<cond>=<atom> '?' $<then>=<atom> ':' $<else>=<atom>
+    {*}
+}
+
 rule variable {
     | <sigil>? <word> <key>? {*}
     | <special_variable> <key>? {*}
