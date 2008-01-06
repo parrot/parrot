@@ -128,21 +128,15 @@ method loop($/, $key) {
 }
 
 method while_loop($/) {
-    my $past := PAST::Op.new( :pasttype( 'while' ), :node($/) );
     my $cond := $( $<texpr> );
     my $block := $( $<block> );
-    $past.push($cond);
-    $past.push($block);
-    make $past;
+    make PAST::Op.new( $cond, $block, :pasttype( 'while' ), :node($/) );
 }
 
 method until_loop($/) {
-    my $past := PAST::Op.new( :pasttype( 'until' ), :node($/) );
-    my $cond := $( $<expr> );
+    my $cond  := $( $<expr> );
     my $block := $( $<block> );
-    $past.push($cond);
-    $past.push($block);
-    make $past;
+    make PAST::Op.new( $cond, $block, :pasttype( 'until' ), :node($/) );
 }
 
 method for_loop($/) {
@@ -166,8 +160,7 @@ method for_loop($/) {
     # step, then the loop is all there is, and no need for a Stmts node.
     if $<init> {
         my $init := $( $<init>[0] );
-        my $past := PAST::Stmts.new( $init, $loop, :node($/) );
-        make $past;
+        make PAST::Stmts.new( $init, $loop, :node($/) );
     }
     else {
         make $loop;
