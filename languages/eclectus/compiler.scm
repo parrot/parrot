@@ -268,18 +268,24 @@
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusFixnum'\\nassign %r, %0\\n\" )
-        " uid uid uid)
-  (list uid (emit-expr arg)))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "inline")
+                   (inline "new %r, 'EclectusFixnum'\\nassign %r, %0\\n")))
+    (emit-expr arg)))
 
 ; implementation of fixnum->char
 (define-primitive (fixnum->char uid arg)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
-        reg_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusCharacter'\\nassign %r, %0\\n\" )
-        " uid uid uid)
-  (list uid (emit-expr arg)))
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "inline")
+                   (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n")))
+    (emit-expr arg)))
 
 ; implementation of char<
 (define-primitive (char< uid arg1 arg2)
@@ -517,26 +523,7 @@
   (emit "
         .local pmc reg_inline_~a
         reg_inline_~a = new 'PAST::Op'
-        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusEmptyList'\\n %r = $I1\" )
-        " uid uid uid)
-  (emit "
-        .local pmc reg_~a
-        reg_~a = new 'PAST::Op'
         " uid uid)
-  (list
-    uid
-    (quasiquote (@ (pasttype "if")))
-    (list (format "inline_~a" uid) (emit-expr arg))
-    (list "val_true")
-    (list "val_false")))
-
-; implementation of fixnum?
-(define-primitive (fixnum? uid arg)
-  (emit "
-        .local pmc reg_inline_~a
-        reg_inline_~a = new 'PAST::Op'
-        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusFixnum'\\n %r = $I1\" )
-        " uid uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
@@ -546,6 +533,29 @@
     (quasiquote (@ (pasttype "if")))
     (list
       (format "inline_~a" uid)
+      (quasiquote (@ (pasttype "inline")
+                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusEmptyList'\\n %r = $I1")))
+      (emit-expr arg))
+    (list "val_true")
+    (list "val_false")))
+
+; implementation of fixnum?
+(define-primitive (fixnum? uid arg)
+  (emit "
+        .local pmc reg_inline_~a
+        reg_inline_~a = new 'PAST::Op'
+        " uid uid)
+  (emit "
+        .local pmc reg_~a
+        reg_~a = new 'PAST::Op'
+        " uid uid)
+  (list
+    uid
+    (quasiquote (@ (pasttype "if")))
+    (list
+      (format "inline_~a" uid)
+      (quasiquote (@ (pasttype "inline")
+                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusFixnum'\\n %r = $I1")))
       (emit-expr arg))
     (list "val_true")
     (list "val_false")))
@@ -555,8 +565,7 @@
   (emit "
         .local pmc reg_inline_~a
         reg_inline_~a = new 'PAST::Op'
-        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusBoolean'\\n %r = $I1\" )
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
@@ -564,7 +573,11 @@
   (list
     uid
     (quasiquote (@ (pasttype "if")))
-    (list (format "inline_~a" uid) (emit-expr arg))
+    (list
+      (format "inline_~a" uid)
+      (quasiquote (@ (pasttype "inline")
+                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusBoolean'\\n %r = $I1")))
+          (emit-expr arg))
     (list "val_true")
     (list "val_false")))
 
@@ -573,8 +586,7 @@
   (emit "
         .local pmc reg_inline_~a
         reg_inline_~a = new 'PAST::Op'
-        reg_inline_~a.init( 'pasttype' => 'inline', 'inline' => \"new %r, 'EclectusBoolean'\\n isa $I1, %0, 'EclectusCharacter'\\n %r = $I1\" )
-        " uid uid uid)
+        " uid uid)
   (emit "
         .local pmc reg_~a
         reg_~a = new 'PAST::Op'
@@ -582,7 +594,11 @@
   (list
     uid
     (quasiquote (@ (pasttype "if")))
-    (list (format "inline_~a" uid) (emit-expr arg))
+    (list
+      (format "inline_~a" uid)
+      (quasiquote (@ (pasttype "inline")
+                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusCharacter'\\n %r = $I1")))
+      (emit-expr arg))
     (list "val_true")
     (list "val_false")))
 
@@ -762,7 +778,7 @@
              (lambda (key_val)
                ;(write (list "emit-pushes3:" daughter (cadr daughter) (caadr daughter)(cadadr daughter)))(newline)
                (emit "
-                     reg_~a.init( '~a' => '~a' )
+                     reg_~a.init( '~a' => \"~a\" )
                      " (car past) (car key_val) (cadr key_val)))
                (cdr daughter))
              (emit "
