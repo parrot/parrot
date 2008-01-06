@@ -36,7 +36,7 @@ debugging can also be turned off with:
 You could, and should, also run the tests with a memory checker such as
 C<valgrind>.  You can enable C<valgrind>, by running:
 
-  shell> make test VALGRIND="valgrind --logfile=/tmp/grind"
+  shell> make test VALGRIND="valgrind --log-file=/tmp/grind"
 
 Another possibility is to use Electric Fence, or ...
 
