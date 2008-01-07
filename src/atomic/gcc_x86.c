@@ -44,7 +44,6 @@ RT#48260: Not yet documented!!!
 
 
 PARROT_API
-PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 void *
 parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
@@ -76,7 +75,6 @@ RT#48260: Not yet documented!!!
 
 
 PARROT_API
-PARROT_INLINE
 long
 parrot_i386_xadd(volatile long *l, long amount)
 {

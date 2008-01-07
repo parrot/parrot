@@ -17,11 +17,11 @@
 
 /* HEADERIZER BEGIN: src/atomic/gcc_x86.c */
 
-PARROT_INLINE
+PARROT_API
 PARROT_CANNOT_RETURN_NULL
 void * parrot_i386_cmpxchg(void *volatile *ptr, void *expect, void *update);
 
-PARROT_INLINE
+PARROT_API
 long parrot_i386_xadd(volatile long *l, long amount);
 
 /* HEADERIZER END: src/atomic/gcc_x86.c */
