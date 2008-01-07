@@ -247,159 +247,63 @@
                    (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n")))
     (emit-expr arg)))
 
-; implementation of char<
-(define-primitive (char< arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
+(define emit-comparison
+  (lambda (builtin arg1 arg2)
     (list
       (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:<")))
-      (emit-expr arg1)
-      (emit-expr arg2)) 
-    (emit-expr #t)
-    (emit-expr #f)))
+      (quasiquote (@ (pasttype "if")))
+      (list
+        (string->symbol "PAST::Op")
+        (quasiquote (@ (pasttype "chain")
+                       (name (unquote builtin))))
+        (emit-expr arg1)
+        (emit-expr arg2))
+      (emit-expr #t)
+      (emit-expr #f))))
+
+; implementation of char<
+(define-primitive (char< arg1 arg2)
+  (emit-comparison "infix:<" arg1 arg2))
 
 ; implementation of char<=
 (define-primitive (char<= arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:<=")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:<=" arg1 arg2))
 
 ; implementation of char=
 (define-primitive (char= arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:==")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:==" arg1 arg2))
 
 ; implementation of char>
 (define-primitive (char> arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:>")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:>" arg1 arg2))
 
 ; implementation of char>=
 (define-primitive (char>= arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:>=")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:>=" arg1 arg2))
 
 ; implementation of fxzero?
 (define-primitive (fxzero? arg)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:==")))
-      (emit-expr arg)
-      (emit-expr 0))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:==" arg 0))
 
 ; implementation of fx<
 (define-primitive (fx< arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:<")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:<" arg1 arg2))
 
 ; implementation of fx<=
 (define-primitive (fx<= arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:<=")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:<=" arg1 arg2))
 
 ; implementation of fx=
 (define-primitive (fx= arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:==")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:==" arg1 arg2))
 
 ; implementation of fx>=
 (define-primitive (fx>= arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:>=")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:>=" arg1 arg2))
 
 ; implementation of fx>
 (define-primitive (fx> arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "chain")
-                     (name "infix:>")))
-      (emit-expr arg1)
-      (emit-expr arg2))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-comparison "infix:>" arg1 arg2))
 
 ; implementation of null?
 (define-primitive (null? arg)
