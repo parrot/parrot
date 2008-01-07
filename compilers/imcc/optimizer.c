@@ -91,9 +91,10 @@ static int _is_ins_save(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static int branch_branch(PARROT_INTERP, NOTNULL(IMC_Unit * unit))
+static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static int branch_cond_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -112,9 +113,10 @@ static int branch_cond_loop_swap(PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
-static int branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static int branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static int constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -1030,27 +1032,26 @@ FALSE.
 */
 
 static int
-branch_branch(PARROT_INTERP, NOTNULL(IMC_Unit * unit))
+branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    Instruction *ins, *next;
-    SymReg * r;
+    Instruction *ins;
     int changed = 0;
 
     IMCC_info(interp, 2, "\tbranch_branch\n");
     /* reset statistic globals */
     for (ins = unit->instructions; ins; ins = ins->next) {
-          if (get_branch_regno(ins) >= 0) {
-              r = get_sym(interp, get_branch_reg(ins)->name);
+        if (get_branch_regno(ins) >= 0) {
+            SymReg * const r = get_sym(interp, get_branch_reg(ins)->name);
 
             if (r && (r->type & VTADDRESS) && r->first_ins) {
-                next = r->first_ins->next;
-/*                if (!next ||
-                      STREQ(next->r[0]->name, get_branch_reg(ins)->name))
-                    break;*/
+                Instruction * const next = r->first_ins->next;
+                /*                if (!next ||
+                                  STREQ(next->r[0]->name, get_branch_reg(ins)->name))
+                                  break;*/
                 if (next &&
-                      (next->type & IF_goto) &&
-                      STREQ(next->op, "branch") &&
-                      !STREQ(next->r[0]->name, get_branch_reg(ins)->name)) {
+                        (next->type & IF_goto) &&
+                        STREQ(next->op, "branch") &&
+                        !STREQ(next->r[0]->name, get_branch_reg(ins)->name)) {
                     const int regno = get_branch_regno(ins);
                     IMCC_debug(interp, DEBUG_OPT1,
                             "found branch to branch '%s' %I\n",
@@ -1091,11 +1092,9 @@ FALSE.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    Instruction *end;
-    SymReg * r;
-    int changed = 0, i, found;
+    int changed = 0, i;
 
     IMCC_info(interp, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -1103,13 +1102,13 @@ branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
         /* if basic block ends with unconditional jump */
         if ((ins->type & IF_goto) && STREQ(ins->op, "branch")) {
-            r = get_sym(interp, ins->r[0]->name);
+            SymReg * const r = get_sym(interp, ins->r[0]->name);
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 Edge *edge;
                 Instruction * const start = r->first_ins;
-                found = 0;
+                int found = 0;
                 for (edge = unit->bb_list[start->bbindex]->pred_list;
-                     edge; edge = edge->pred_next)
+                        edge; edge = edge->pred_next)
                 {
                     if (edge->from->index == start->bbindex - 1) {
                         found = 1;
@@ -1119,12 +1118,13 @@ branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
                 /* if target block is not reached by falling into it
                  * from another block */
                 if (!found) {
+                    Instruction *end;
                     /* move target block and its positional successors
                      * to follow block with unconditional jump
                      * (this could actually be in another block) */
                     for (end = start; end->next; end = end->next) {
                         if ((end->type & IF_goto) &&
-                            STREQ(end->op, "branch")) {
+                                STREQ(end->op, "branch")) {
                             break;
                         }
                     }
