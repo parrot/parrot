@@ -81,12 +81,13 @@ static struct globals {
 
 /* HEADERIZER BEGIN: static */
 
-static void add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))
+static void add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*r);
 
 static int add_const_key(PARROT_INTERP,
-    NOTNULL(opcode_t key[]),
+    ARGIN(opcode_t *key),
     int size,
     ARGIN(const char *s_key))
         __attribute__nonnull__(1)
@@ -98,48 +99,50 @@ static int add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
         __attribute__nonnull__(1);
 
 static int add_const_pmc_sub(PARROT_INTERP,
-    NOTNULL(SymReg *r),
+    ARGMOD(SymReg *r),
     int offs,
     int end)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*r);
 
 PARROT_WARN_UNUSED_RESULT
 static int add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static opcode_t build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
+static opcode_t build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static void constant_folding(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC* create_lexinfo(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(PMC *sub),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(PMC *sub),
     int need_lex)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static subs_t * find_global_label(
     ARGIN(const char *name),
     ARGIN(const subs_t *sym),
-    NOTNULL(int *pc))
+    ARGOUT(int *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static PMC* find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -148,14 +151,14 @@ static void fixup_globals(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 static int get_codesize(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(int *src_lines))
+    ARGIN(const IMC_Unit *unit),
+    ARGOUT(int *src_lines))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static int get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))
+static int get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -163,16 +166,17 @@ static void imcc_globals_destroy(SHIM_INTERP,
     SHIM(int ex),
     SHIM(void *param));
 
-static void make_new_sub(NOTNULL(IMC_Unit *unit))
+static void make_new_sub(ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static void make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))
+static void make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*r);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-static PMC* mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))
+static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -185,7 +189,7 @@ PARROT_CANNOT_RETURN_NULL
 static const char * slice_deb(int bits);
 
 static void store_fixup(PARROT_INTERP,
-    NOTNULL(SymReg *r),
+    ARGIN(const SymReg *r),
     int pc,
     int offset)
         __attribute__nonnull__(1)
@@ -197,7 +201,7 @@ static void store_key_const(ARGIN(const char *str), int idx)
 static void store_sub_size(size_t size, size_t ins_line);
 static void verify_signature(PARROT_INTERP,
     ARGIN(const Instruction *ins),
-    NOTNULL(opcode_t *pc))
+    ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -345,7 +349,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
-make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     size_t size, old;
 
@@ -385,7 +389,7 @@ allocate a new globals.cs->subs structure
 */
 
 static void
-make_new_sub(NOTNULL(IMC_Unit *unit))
+make_new_sub(ARGIN(IMC_Unit *unit))
 {
     subs_t * const s = mem_allocate_zeroed_typed(subs_t);
 
@@ -417,7 +421,7 @@ get size/line of bytecode in ops till now
 
 PARROT_WARN_UNUSED_RESULT
 static int
-get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))
+get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
 {
     subs_t *s;
     size_t  size = 0;
@@ -462,7 +466,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)
+store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
 {
     SymReg * const fixup = _mk_address(interp, &globals.cs->subs->fixup,
             str_dup(r->name), U_add_all);
@@ -508,9 +512,9 @@ return size in ops
 
 PARROT_WARN_UNUSED_RESULT
 static int
-get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
+get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(int *src_lines))
 {
-    Instruction *ins;
+    const Instruction *ins;
     int          code_size;
 
     /* run through instructions:
@@ -565,9 +569,9 @@ get a global label, return the pc (absolute)
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static subs_t *
-find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), NOTNULL(int *pc))
+find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
     subs_t *s;
 
@@ -804,7 +808,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 static PMC*
-mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))
+mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     PMC       * const multi_sig = pmc_new(interp, enum_class_FixedPMCArray);
     pcc_sub_t * const pcc_sub   = r->pcc_sub;
@@ -865,7 +869,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-create_lexinfo(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(PMC *sub), int need_lex)
+create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub), int need_lex)
 {
     int                 i;
     STRING             *lex_name;
@@ -950,7 +954,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
-find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     subs_t *s;
     size_t  len;
@@ -974,7 +978,7 @@ find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     for (s = globals.cs->first; s; s = s->next) {
         SymReg * const sub = s->unit->instructions->r[0];
 
-        if (!strcmp(sub->name, unit->outer->name)) {
+        if (strcmp(sub->name, unit->outer->name) == 0) {
             PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
         }
@@ -991,7 +995,7 @@ find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     cur_name = PMC_sub(current)->name;
 
     if (cur_name->strlen == len &&
-            !memcmp((char*)cur_name->strstart, unit->outer->name, len))
+            (memcmp((char*)cur_name->strstart, unit->outer->name, len) == 0))
         return current;
 
     return NULL;
@@ -1008,7 +1012,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
+add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
 {
     int                  i, k;
     int                  ns_const = -1;
@@ -1109,6 +1113,7 @@ add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
         /* Check this is a valid vtable method to override. */
         vtable_index = Parrot_get_vtable_index(interp, vtable_name);
         c_name       = string_to_cstring(interp, vtable_name);
+        /* XXX CAGE Looks like c_name could get moved inside the block below */
 
         if (vtable_index == -1) {
             IMCC_fatal(interp, 1,
@@ -1156,7 +1161,7 @@ add constant key to constant_table
 */
 
 static int
-add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, ARGIN(const char *s_key))
+add_const_key(PARROT_INTERP, ARGIN(opcode_t *key), int size, ARGIN(const char *s_key))
 {
     int                k;
     opcode_t          *rc;
@@ -1244,7 +1249,7 @@ which gets cached in the globals.keys
 */
 
 static opcode_t
-build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
+build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 {
 #define KEYLEN 21
     char      s_key[KEYLEN * 10];
@@ -1252,7 +1257,7 @@ build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
     opcode_t  size;
     int       key_length;     /* P0["hi;there"; S0; 2] has length 3 */
     int       k;
-    SymReg *reg;
+    const SymReg *reg;
 
     /* 0 is length */
     opcode_t *pc = key + 1;
@@ -1414,7 +1419,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))
+make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
 {
     STRING *s;
     PMC    *p, *_class;
@@ -1451,7 +1456,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))
+add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
 {
     if (r->color >= 0)
         return;
@@ -1508,7 +1513,7 @@ store a constants idx for later reuse
 */
 
 static void
-constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+constant_folding(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     int      i;
     SymHash *hsh = &IMCC_INFO(interp)->ghash;
@@ -1564,7 +1569,7 @@ RT#48260: Not yet documented!!!
 */
 
 int
-e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
+e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 {
     if (!unit->instructions)
         return 0;
@@ -1586,7 +1591,7 @@ RT#48260: Not yet documented!!!
 */
 
 int
-e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
+e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 {
     Instruction *ins;
     int          pragma;
@@ -1628,7 +1633,7 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 */
 
 static void
-verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), NOTNULL(opcode_t *pc))
+verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *pc))
 {
     INTVAL  i, n;
     int     no_consts;
@@ -1704,9 +1709,7 @@ now let the fun begin, actually emit code for one ins
 */
 
 int
-e_pbc_emit(PARROT_INTERP,
-        SHIM(void *param),
-        NOTNULL(IMC_Unit *unit),
+e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         ARGIN(const Instruction *ins))
 {
     int        op, i;

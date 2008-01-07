@@ -53,25 +53,26 @@ static void insert_tail_call(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction * insINS(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction *ins),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(Instruction *ins),
     ARGIN(const char *name),
-    NOTNULL(SymReg **regs),
+    ARGIN(SymReg **regs),
     int n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction * move_regs(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction *ins),
+    ARGIN(IMC_Unit *unit),
+    ARGIN(Instruction *ins),
     int n,
-    NOTNULL(SymReg **dest),
-    NOTNULL(SymReg **src))
+    ARGIN(SymReg **dest),
+    ARGIN(SymReg **src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -81,23 +82,25 @@ static Instruction * move_regs(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction* pcc_get_args(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction *ins),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(Instruction *ins),
     ARGIN(const char *op_name),
     int n,
-    NULLOK(SymReg **args),
+    ARGIN_NULLOK(const SymReg **args),
     ARGIN_NULLOK(const int *arg_flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*unit);
 
 static int pcc_reg_mov(PARROT_INTERP,
     unsigned char d,
     unsigned char s,
-    NOTNULL(void *vinfo))
+    ARGMOD(void *vinfo))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*vinfo);
 
 static int recursive_tail_call(PARROT_INTERP,
     ARGIN(IMC_Unit *unit),
@@ -108,7 +111,7 @@ static int recursive_tail_call(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
+static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -128,8 +131,8 @@ into the current block in one call.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction *
-insINS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
-        ARGIN(const char *name), NOTNULL(SymReg **regs), int n)
+insINS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
+        ARGIN(const char *name), ARGIN(SymReg **regs), int n)
 {
     /* XXX INS can return NULL, but insert_ins() cannot take one */
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
@@ -198,9 +201,9 @@ used by expand_pcc_sub_call and expand_pcc_sub
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction*
-pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
+pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         ARGIN(const char *op_name), int n,
-        NULLOK(SymReg **args), ARGIN_NULLOK(const int *arg_flags))
+        ARGIN_NULLOK(const SymReg **args), ARGIN_NULLOK(const int *arg_flags))
 {
     int i, flags;
     char buf[1024], s[16];
@@ -208,7 +211,7 @@ pcc_get_args(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
 
     strcpy(buf, "\"(");
     for (i = 0; i < n; i++) {
-        SymReg *arg = args[i];
+        const SymReg *arg = args[i];
 
         if (arg->type & VT_CONSTP)
             arg = arg->reg;
@@ -264,7 +267,7 @@ prepend the object to args or self to params
 */
 
 static void
-unshift_self(NOTNULL(SymReg *sub), NOTNULL(SymReg *obj))
+unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 {
     struct pcc_sub_t * const pcc_sub = sub->pcc_sub;
     const int n = pcc_sub->nargs;
@@ -296,7 +299,7 @@ for parameter passing/returning.
 */
 
 void
-expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(Instruction *ins)))
+expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
     int          nargs;
     SymReg      *sub = ins->r[0];
@@ -378,7 +381,7 @@ Expand a PCC sub return directive into its PASM instructions
 */
 
 void
-expand_pcc_sub_ret(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
+expand_pcc_sub_ret(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
     const int is_yield = ins->type & ITPCCYIELD;
     SymReg * const sub = ins->r[0];
@@ -425,7 +428,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo))
+pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo))
 {
     struct move_info_t *info = (struct move_info_t *)vinfo;
     SymReg *regs[2], *src, *dest;
@@ -498,8 +501,8 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction *
-move_regs(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins),
-        int n, NOTNULL(SymReg **dest), NOTNULL(SymReg **src))
+move_regs(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGIN(Instruction *ins),
+        int n, ARGIN(SymReg **dest), ARGIN(SymReg **src))
 {
     unsigned char *move_list;
     int i;
@@ -647,16 +650,16 @@ This is the nuts and bolts of pdd03 routine call style
 */
 
 void
-expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
+expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
-    SymReg *arg, *sub, *reg, *regs[3];
+    SymReg *arg, *reg, *regs[3];
     int          n;
     int          tail_call;
     int          meth_call = 0;
     SymReg      *meth      = NULL;
     Instruction *get_name;
 
-    sub = ins->r[0];
+    SymReg * const sub = ins->r[0];
 
     if (ins->type & ITRESULT) {
         const int n = sub->pcc_sub->nret;

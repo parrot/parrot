@@ -38,25 +38,29 @@ The following parts are just missing:
 
 /* HEADERIZER BEGIN: static */
 
-static void allocate_lexicals(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static void allocate_lexicals(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
-static void allocate_non_volatile(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static void allocate_non_volatile(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
-static void allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
+static void allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static void build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-static void build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
-        __attribute__nonnull__(2);
+static void build_reglist(Parrot_Interp interp, ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static void compute_du_chain(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -149,8 +153,9 @@ static int try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
-        __attribute__nonnull__(2);
+static void vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 /* HEADERIZER END: static */
 
@@ -558,7 +563,7 @@ Run through them and allocate all that don't overlap in one bunch.
 */
 
 static void
-build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
+build_reglist(Parrot_Interp interp, ARGMOD(IMC_Unit *unit))
 {
     int i, count, unused, n_symbols;
     SymHash  const *hsh = &unit->hash;
@@ -1045,7 +1050,7 @@ allocate lexicals or non-volatile in ascending order
 */
 
 static void
-allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
+allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
 {
     char type[] = "INSP";
     int j, first_reg;
@@ -1097,7 +1102,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
+vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
 {
     int i, j, reg_set, first_reg;
     char     type[] = "INSP";
@@ -1149,7 +1154,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-allocate_lexicals(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+allocate_lexicals(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     IMCC_debug(interp, DEBUG_IMC, "allocate lexicals\n");
     allocate_uniq(interp, unit, U_LEXICAL);
@@ -1166,7 +1171,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-allocate_non_volatile(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+allocate_non_volatile(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     IMCC_debug(interp, DEBUG_IMC, "allocate non_volatile\n");
     allocate_uniq(interp, unit, U_NON_VOLATILE);

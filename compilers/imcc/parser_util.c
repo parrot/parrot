@@ -65,7 +65,7 @@ static void * imcc_compile_file(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static int is_infix(ARGIN(const char *name), int n, NOTNULL(SymReg **r))
+static int is_infix(ARGIN(const char *name), int n, ARGIN(SymReg **r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -83,13 +83,15 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char * to_infix(PARROT_INTERP,
     ARGIN(const char *name),
-    NOTNULL(SymReg **r),
-    NOTNULL(int *n),
+    ARGMOD(SymReg **r),
+    ARGMOD(int *n),
     int mmd_op)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*r)
+        FUNC_MODIFIES(*n);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -150,7 +152,7 @@ static INTVAL eval_nr = 0;
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-iNEW(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0),
+iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
         NOTNULL(char *type), NULLOK(SymReg *init), int emit)
 {
     char fmt[256];
@@ -202,7 +204,7 @@ if you don't like the looks of it, stay out, but please don't remove it. :)
 
  */
 void
-op_fullname(NOTNULL(char *dest), ARGIN(const char *name), NOTNULL(SymReg *args[]),
+op_fullname(ARGOUT(char *dest), ARGIN(const char *name), ARGIN(SymReg * const *args),
         int narg, int keyvec)
 {
     int i;
@@ -269,7 +271,7 @@ Return opcode value for op name
 
 PARROT_WARN_UNUSED_RESULT
 int
-check_op(PARROT_INTERP, NOTNULL(char *fullname),
+check_op(PARROT_INTERP, ARGOUT(char *fullname),
         ARGIN(const char *name), NOTNULL(SymReg *r[]), int narg, int keyvec)
 {
     int op;
@@ -381,8 +383,8 @@ sub x, y, z  => infix .MMD_SUBTRACT, x, y, z
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char *
-to_infix(PARROT_INTERP, ARGIN(const char *name), NOTNULL(SymReg **r),
-        NOTNULL(int *n), int mmd_op)
+to_infix(PARROT_INTERP, ARGIN(const char *name), ARGMOD(SymReg **r),
+        ARGMOD(int *n), int mmd_op)
 {
     SymReg *mmd;
     int is_n;
@@ -424,7 +426,7 @@ TODO: Needs to be documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-is_infix(ARGIN(const char *name), int n, NOTNULL(SymReg **r))
+is_infix(ARGIN(const char *name), int n, ARGIN(SymReg **r))
 {
     if (n < 2 || r[0]->set != 'P')
         return -1;
@@ -544,7 +546,7 @@ s. e.g. imc.c for usage
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
+INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGIN_NULLOK(const char *fmt), ARGIN(SymReg **r), int n, int keyvec, int emit)
 {
     char fullname[64];
@@ -1379,8 +1381,8 @@ TODO: Needs to be documented!!!
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
-            NOTNULL(SymReg **r), int nr, int keyvec, int emit)
+multi_keyed(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+            ARGIN(SymReg **r), int nr, int keyvec, int emit)
 {
     int i, keyf, kv, n;
     static int p = 0;

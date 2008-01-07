@@ -116,9 +116,10 @@ static int branch_reorg(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static int constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static int dead_code_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -620,13 +621,11 @@ even though sometimes it may be safe.
 */
 
 static int
-constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     Instruction *ins, *ins2, *tmp, *prev;
-    int op;
     int i;
-    char fullname[128];
-    SymReg *c, *old, *o;
+    SymReg *c, *o;
     int any = 0;
 
     o = c = NULL; /* silence compiler uninit warning */
@@ -663,6 +662,7 @@ constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
                         if (instruction_writes(ins2, ins2->r[i]))
                             goto next_constant;
                         else if (instruction_reads(ins2, ins2->r[i])) {
+                            SymReg *old;
                             IMCC_debug(interp, DEBUG_OPT2,
                                     "\tpropagating into %I register %i",
                                     ins2, i);
@@ -683,7 +683,8 @@ constant_propagation(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
                                 }
                             }
                             else {
-                                op = check_op(interp, fullname, ins2->op,
+                                char fullname[128];
+                                const int op = check_op(interp, fullname, ins2->op,
                                     ins2->r, ins2->n_r, ins2->keys);
                                 if (op < 0) {
                                     ins2->r[i] = old;
@@ -1702,7 +1703,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Basic_block *
-find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))
+find_outer(ARGIN(const IMC_Unit *unit), ARGIN(const Basic_block *blk))
 {
     const int bb = blk->index;
     int i;
@@ -1710,7 +1711,7 @@ find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))
     Loop_info ** const loop_info = unit->loop_info;
 
     /* loops are sorted depth last */
-    for (i = n_loops-1; i >= 0; i--)
+    for (i = n_loops-1; i >= 0; i--) /* XXX Optimize away repeated loop_info[i] and ->preheader */
         if (set_contains(loop_info[i]->loop, bb))
             if (loop_info[i]->preheader >= 0)
                 return unit->bb_list[loop_info[i]->preheader];

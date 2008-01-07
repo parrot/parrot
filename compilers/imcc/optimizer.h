@@ -17,7 +17,9 @@ int cfg_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-Basic_block * find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))
+Basic_block * find_outer(
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Basic_block *blk))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
