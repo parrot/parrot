@@ -88,6 +88,33 @@ method function($/) {
     make $past;
 }
 
+method ifthen($/) {
+    my $count := +$<expression> - 1;
+    my $expr  := $( $<expression>[$count] );
+    my $then  := $( $<block>[$count] );
+    $then.blocktype('immediate');
+    my $past := PAST::Op.new( $expr, $then,
+                              :pasttype('if'),
+                              :node( $/ )
+                            );
+    if ( $<else> ) {
+        my $else := $( $<else>[0] );
+        $else.blocktype('immediate');
+        $past.push( $else );
+    }
+    while ($count != 0) {
+        $count := $count - 1;
+        $expr  := $( $<expression>[$count] );
+        $then  := $( $<block>[$count] );
+        $then.blocktype('immediate');
+        $past  := PAST::Op.new( $expr, $then, $past,
+                               :pasttype('if'),
+                               :node( $/ )
+                             );
+    }
+    make $past;
+}
+
 method block($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
     for $<statement> {
@@ -114,6 +141,14 @@ method integer($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
 }
 
+
+method boolean($/) {
+    if (~$/ eq 'FAIL' ) {
+        make PAST::Val.new( :value( 0 ), :returns('Boolean'), :node($/) );
+    } else {
+        make PAST::Val.new( :value( 1 ), :returns('Boolean'), :node($/) );
+    }
+}
 
 method quote($/) {
     make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );

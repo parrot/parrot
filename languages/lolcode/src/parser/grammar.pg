@@ -21,6 +21,7 @@ rule statement {
     | <declare>    {*}   #= declare
     | <assign>     {*}   #= assign
     | <function>   {*}   #= function
+    | <ifthen>     {*}   #= ifthen
     | <expression> {*}   #= bare_expression
 }
 
@@ -58,7 +59,7 @@ rule ifthen {
     ]*
     [
       'NO' 'WAI' <statement_terminator>
-      <block>
+      $<else>=<block>
     ]?
     'OIC'
     {*}
@@ -93,6 +94,7 @@ rule expression {
 
 rule value {
     | <integer>  {*}                             #= integer
+    | <boolean>  {*}                             #= boolean
     | <quote>    {*}                             #= quote
 }
 
@@ -100,16 +102,21 @@ rule variable { <identifier> {*} }
 
 token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
+# Because PGE doesn't yet know how to do longest token matching,
+# order all tokens in reverse alpha order to avoid a parsing bug.
 token keyword {
-    [ 'A' | 'AN' | 'FAIL' | 'FOUND' | 'GTFO' | 'HAS' | 'HOW' | 'I' | 'IF' | 'ITZ'
-    | 'KTHXBYE' | 'MEBBE' | 'NO' | 'O' | 'OIC' | 'OMG' | 'OMGWTF' | 'R'
-    | 'RLY' | 'RLY?' | 'SAY' | 'SO' | 'U' | 'VISIBLE' | 'WAI' | 'WIN' | 'WTF?' | 'YA'
-    | 'YR' ] >>
+    [ 'YR' | 'YA' | 'WTF?' | 'WIN' | 'WAI' | 'VISIBLE' | 'U' | 'SUM' | 'SO'
+    | 'SMALLR' | 'SAY' | 'RLY?' | 'RLY' | 'R' | 'QUOSHUNT' | 'PRODUKT'
+    | 'OMGWTF' | 'OMG' | 'OIC' | 'O' | 'NO' | 'MOD' | 'MEBBE' | 'KTHXBYE'
+    | 'ITZ' | 'IF' | 'I' | 'HOW' | 'HAS' | 'GTFO' | 'FOUND' | 'FAIL' | 'DIFF'
+    | 'BIGGR' | 'AN' | 'A' ] >>
 }
 
 rule integer { \d+ {*} }
 
 token float { \d+ [ '.' \d+ ]? }
+
+rule boolean { [ 'WIN' | 'FAIL' ] {*} }
 
 rule quote {
     [ \" <string_literal: "> \" ]
