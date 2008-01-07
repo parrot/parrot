@@ -508,7 +508,7 @@ Called after the task has been thawed.
     void thawfinish(visit_info *info) {
         Parrot_Task * core_struct = PARROT_TASK(SELF);
 
-        /* TODO: Rebuild the task index. */
+        UNUSED(core_struct); /* TODO: Rebuild the task index. */
     }
 
 }
