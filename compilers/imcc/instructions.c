@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  */
 
 #include <stdlib.h>
@@ -57,7 +57,7 @@ static int e_file_emit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open(SHIM_INTERP, NOTNULL(void *param))
+static int e_file_open(SHIM_INTERP, ARGIN(void *param))
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
@@ -416,7 +416,7 @@ The instruction following ins is returned.
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-delete_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), int needs_freeing)
+delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins), int needs_freeing)
 {
     Instruction * const next = ins->next;
     Instruction * const prev = ins->prev;
@@ -445,7 +445,8 @@ insert tmp after ins
 */
 
 void
-insert_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(Instruction *tmp))
+insert_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
+        ARGMOD(Instruction *tmp))
 {
     if (!ins) {
         Instruction * const next = unit->instructions;
@@ -486,7 +487,8 @@ insert tmp before ins
 */
 
 void
-prepend_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(Instruction *tmp))
+prepend_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
+        ARGMOD(Instruction *tmp))
 {
     if (!ins) {
         Instruction * const next = unit->instructions;
@@ -520,8 +522,8 @@ Substitute tmp for ins. Free ins if needs_freeing is true.
 */
 
 void
-subst_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins),
-          NOTNULL(Instruction *tmp), int needs_freeing)
+subst_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins),
+          ARGMOD(Instruction *tmp), int needs_freeing)
 {
     Instruction * const prev = ins->prev;
 
@@ -555,7 +557,7 @@ initial position of ins.
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-move_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), NOTNULL(Instruction *to))
+move_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins), ARGMOD(Instruction *to))
 {
     Instruction * const next = delete_ins(unit, ins, 0);
     insert_ins(unit, to, ins);
@@ -602,7 +604,7 @@ Free the Instruction structure ins.
 */
 
 void
-free_ins(NOTNULL(Instruction *ins))
+free_ins(ARGMOD(Instruction *ins))
 {
     free(ins->fmt);
     free(ins->op);
@@ -620,7 +622,7 @@ Print details of instruction ins in file fd.
 */
 
 int
-ins_print(PARROT_INTERP, NOTNULL(FILE *fd), ARGIN(const Instruction *ins))
+ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
 {
     char regb[IMCC_MAX_FIX_REGS][256];      /* XXX */
     /* only long key constants can overflow */
@@ -728,7 +730,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-e_file_open(SHIM_INTERP, NOTNULL(void *param))
+e_file_open(SHIM_INTERP, ARGIN(void *param))
 {
     char * const file = (char *) param;
 
@@ -799,7 +801,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 int
-emit_open(PARROT_INTERP, int type, NULLOK(void *param))
+emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 {
     emitter = type;
     IMCC_INFO(interp)->has_compile = 0;
@@ -819,7 +821,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 int
-emit_flush(PARROT_INTERP, NULLOK(void *param), NOTNULL(struct _IMC_Unit *unit))
+emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(struct _IMC_Unit *unit))
 {
     Instruction * ins;
 
@@ -846,7 +848,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 int
-emit_close(PARROT_INTERP, NULLOK(void *param))
+emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
 {
     return (emitters[emitter]).close(interp, param);
 }
@@ -865,5 +867,3 @@ emit_close(PARROT_INTERP, NULLOK(void *param))
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
-

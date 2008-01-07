@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_IMCC_INSTRUCTIONS_H_GUARD
@@ -104,18 +104,18 @@ enum Emitter_type { EMIT_FILE, EMIT_PBC };
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
 
 PARROT_API
-int emit_close(PARROT_INTERP, NULLOK(void *param))
+int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
         __attribute__nonnull__(1);
 
 PARROT_API
 int emit_flush(PARROT_INTERP,
-    NULLOK(void *param),
-    NOTNULL(struct _IMC_Unit *unit))
+    ARGIN_NULLOK(void *param),
+    ARGIN(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-int emit_open(PARROT_INTERP, int type, NULLOK(void *param))
+int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
@@ -131,11 +131,13 @@ Instruction * _mk_instruction(
 
 PARROT_CAN_RETURN_NULL
 Instruction * delete_ins(
-    NOTNULL(struct _IMC_Unit *unit),
-    NOTNULL(Instruction *ins),
+    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD(Instruction *ins),
     int needs_freeing)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins);
 
 PARROT_CAN_RETURN_NULL
 Instruction * emitb(PARROT_INTERP,
@@ -143,8 +145,9 @@ Instruction * emitb(PARROT_INTERP,
     ARGIN_NULLOK(Instruction *i))
         __attribute__nonnull__(1);
 
-void free_ins(NOTNULL(Instruction *ins))
-        __attribute__nonnull__(1);
+void free_ins(ARGMOD(Instruction *ins))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*ins);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -158,11 +161,12 @@ void imcc_init_tables(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 int ins_print(PARROT_INTERP,
-    NOTNULL(FILE *fd),
+    ARGMOD(FILE *fd),
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*fd);
 
 int ins_reads2(ARGIN(const Instruction *ins), int t)
         __attribute__nonnull__(1);
@@ -171,11 +175,13 @@ int ins_writes2(ARGIN(const Instruction *ins), int t)
         __attribute__nonnull__(1);
 
 void insert_ins(
-    NOTNULL(struct _IMC_Unit *unit),
-    NULLOK(Instruction *ins),
-    NOTNULL(Instruction *tmp))
+    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD_NULLOK(Instruction *ins),
+    ARGMOD(Instruction *tmp))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*tmp);
 
 int instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
@@ -189,28 +195,36 @@ int instruction_writes(
 
 PARROT_CAN_RETURN_NULL
 Instruction * move_ins(
-    NOTNULL(struct _IMC_Unit *unit),
-    NOTNULL(Instruction *ins),
-    NOTNULL(Instruction *to))
+    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD(Instruction *ins),
+    ARGMOD(Instruction *to))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins)
+        FUNC_MODIFIES(*to);
 
 void prepend_ins(
-    NOTNULL(struct _IMC_Unit *unit),
-    NULLOK(Instruction *ins),
-    NOTNULL(Instruction *tmp))
+    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD_NULLOK(Instruction *ins),
+    ARGMOD(Instruction *tmp))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*tmp);
 
 void subst_ins(
-    NOTNULL(struct _IMC_Unit *unit),
-    NOTNULL(Instruction *ins),
-    NOTNULL(Instruction *tmp),
+    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD(Instruction *ins),
+    ARGMOD(Instruction *tmp),
     int needs_freeing)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins)
+        FUNC_MODIFIES(*tmp);
 
 /* HEADERIZER END: compilers/imcc/instructions.c */
 
