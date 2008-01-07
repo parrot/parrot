@@ -550,7 +550,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t PackFile_unpack(PARROT_INTERP,
     ARGMOD(PackFile *self),
-    ARGIN(const opcode_t *packed),
+    ARGIN(const opcode_t * const packed),
     size_t packed_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
