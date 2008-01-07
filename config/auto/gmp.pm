@@ -9,6 +9,15 @@ config/auto/gmp.pm - Test for GNU MP (GMP) Math library
 
 Determines whether the platform supports GMP.
 
+From L<http://gmplib.org/>:  "GMP is a free library for arbitrary precision
+arithmetic, operating on signed integers, rational numbers, and floating point
+numbers. There is no practical limit to the precision except the ones implied
+by the available memory in the machine GMP runs on. ..."
+
+"The main target applications for GMP are cryptography applications and
+research, Internet security applications, algebra systems, computational
+algebra research, etc."
+
 =cut
 
 package auto::gmp;
@@ -66,26 +75,11 @@ sub runstep {
     my $has_gmp = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-#        if ( $test eq $self->{cc_run_expected}) {
-#            $has_gmp = 1;
-#            print " (yes) " if $verbose;
-#            $self->set_result('yes');
-#
-#            $conf->data->set(
-#                gmp     => 'define',
-#                HAS_GMP => $has_gmp,
-#            );
-#        }
         $has_gmp = $self->_evaluate_cc_run( $conf, $test, $has_gmp, $verbose );
     }
     unless ($has_gmp) {
-
-        # The Config::Data settings might have changed for the test
-        $conf->data->set( 'libs',      $libs );
-        $conf->data->set( 'ccflags',   $ccflags );
-        $conf->data->set( 'linkflags', $linkflags );
-        print " (no) " if $verbose;
-        $self->set_result('no');
+        # The Parrot::Configure settings might have changed while class ran
+        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
 
     return 1;
@@ -134,6 +128,15 @@ sub _evaluate_cc_run {
         );
     }
     return $has_gmp;
+}
+
+sub _recheck_settings {
+    my ($self, $conf, $libs, $ccflags, $linkflags, $verbose) = @_;
+    $conf->data->set( 'libs',      $libs );
+    $conf->data->set( 'ccflags',   $ccflags );
+    $conf->data->set( 'linkflags', $linkflags );
+    print " (no) " if $verbose;
+    $self->set_result('no');
 }
 
 1;

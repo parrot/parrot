@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 28;
 use Carp;
 use Cwd;
 use File::Temp qw( tempdir );
@@ -81,6 +81,42 @@ is($has_gmp, 0, "gmp status unchanged");
     $conf->data->set('gmp' => undef);
     $conf->data->set('HAS_GMP' => undef);
     $step->set_result(undef); 
+}
+
+my ($libs, $ccflags, $linkflags);
+
+$libs = q{-lalpha};
+$ccflags = q{-Ibeta};
+$linkflags = q{-Lgamma};
+$verbose = undef;
+$step->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
+like($conf->data->get('libs'), qr/$libs/,
+    "Got expected value for 'libs'");
+like($conf->data->get('ccflags'), qr/$ccflags/,
+    "Got expected value for 'ccflags'");
+like($conf->data->get('linkflags'), qr/$linkflags/,
+    "Got expected value for 'linkflags'");
+is($step->result, 'no', "Expected result was set");
+
+{
+    my $stdout;
+    $libs = q{-lalpha};
+    $ccflags = q{-Ibeta};
+    $linkflags = q{-Lgamma};
+    $verbose = 1;
+    capture(
+        sub { $step->_recheck_settings(
+            $conf, $libs, $ccflags, $linkflags, $verbose); },
+        \$stdout,
+    );
+    like($conf->data->get('libs'), qr/$libs/,
+        "Got expected value for 'libs'");
+    like($conf->data->get('ccflags'), qr/$ccflags/,
+        "Got expected value for 'ccflags'");
+    like($conf->data->get('linkflags'), qr/$linkflags/,
+        "Got expected value for 'linkflags'");
+    is($step->result, 'no', "Expected result was set");
+    like($stdout, qr/\(no\)/, "Got expected verbose output");
 }
 
 pass("Completed all tests in $0");
