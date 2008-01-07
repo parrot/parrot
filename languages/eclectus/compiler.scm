@@ -305,57 +305,34 @@
 (define-primitive (fx> arg1 arg2)
   (emit-comparison "infix:>" arg1 arg2))
 
-; implementation of null?
-(define-primitive (null? arg)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
+(define emit-typequery
+  (lambda (typename arg)
     (list
       (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "inline")
-                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusEmptyList'\\n %r = $I1")))
-      (emit-expr arg))
-    (emit-expr #t)
-    (emit-expr #f)))
+      (quasiquote (@ (pasttype "if")))
+      (list
+        (string->symbol "PAST::Op")
+        (quasiquote (@ (pasttype "inline")
+                       (inline (unquote (format "new %r, 'EclectusBoolean'\\nisa $I1, %0, '~a'\\n %r = $I1" typename)))))
+        (emit-expr arg))
+      (emit-expr #t)
+      (emit-expr #f))))
+   
+; implementation of null?
+(define-primitive (null? arg)
+  (emit-typequery "EclectusEmptyList" arg))
 
 ; implementation of fixnum?
 (define-primitive (fixnum? arg)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "inline")
-                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusFixnum'\\n %r = $I1")))
-      (emit-expr arg))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-typequery "EclectusFixnum" arg))
 
 ; implementation of boolean?
 (define-primitive (boolean? arg)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "inline")
-                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusBoolean'\\n %r = $I1")))
-          (emit-expr arg))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-typequery "EclectusBoolean" arg))
 
 ; implementation of char?
 (define-primitive (char? arg)
-  (list
-    (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "if")))
-    (list
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "inline")
-                     (inline "new %r, 'EclectusBoolean'\\nisa $I1, %0, 'EclectusCharacter'\\n %r = $I1")))
-      (emit-expr arg))
-    (emit-expr #t)
-    (emit-expr #f)))
+  (emit-typequery "EclectusCharacter" arg))
 
 ; a getter of '*emitter*'
 (define primitive-emitter
