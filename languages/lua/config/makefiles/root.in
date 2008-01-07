@@ -113,7 +113,7 @@ lua.pbc: lua.pir src/lua51.pir src/lua51_gen.pir src/PASTGrammar_gen.pir src/POS
 	$(PARROT) -o lua.pbc --output-pbc lua.pir
 
 $(PBC_TO_EXE):
-	$(MAKE) $(BUILD_DIR) pbc_to_exe
+	$(MAKE) $(BUILD_DIR) ./pbc_to_exe@exe@
 
 lua@exe@: lua.pbc $(PBC_TO_EXE)
 	$(PBC_TO_EXE) lua.pbc
