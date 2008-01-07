@@ -164,6 +164,7 @@ typedef enum {
     IMPATIENT_PMCS,
     LAZY_DOD_RUNS,
     EXTENDED_PMCS,
+    CURRENT_RUNCORE,
 
     /* interpinfo_p constants */
     CURRENT_SUB,

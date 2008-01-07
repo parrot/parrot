@@ -285,6 +285,9 @@ interpinfo(PARROT_INTERP, INTVAL what)
         case EXTENDED_PMCS:
             ret = arena_base->num_extended_PMCs;
             break;
+        case CURRENT_RUNCORE:
+            ret = interp->run_core;
+            break;
         default:        /* or a warning only? */
             real_exception(interp, NULL, UNIMPLEMENTED,
                     "illegal argument in interpinfo");

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -195,6 +195,40 @@ CODE
 before
 after
 OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', "interpinfo & getinterp: current runcore" );
+.include 'interpinfo.pasm'
+.include 'interpcores.pasm'
+
+.sub 'test' :main
+    $I0 = interpinfo .INTERPINFO_CURRENT_RUNCORE
+    if $I0 == .PARROT_FUNCTION_CORE   goto ok1
+    if $I0 == .PARROT_FAST_CORE       goto ok1
+    if $I0 == .PARROT_SWITCH_CORE     goto ok1
+    if $I0 == .PARROT_CGOTO_CORE      goto ok1
+    if $I0 == .PARROT_CGP_CORE        goto ok1
+    if $I0 == .PARROT_JIT_CORE        goto ok1
+    if $I0 == .PARROT_SWITCH_JIT_CORE goto ok1
+    if $I0 == .PARROT_CGP_JIT_CORE    goto ok1
+    if $I0 == .PARROT_EXEC_CORE       goto ok1
+    if $I0 == .PARROT_GC_DEBUG_CORE   goto ok1
+    print 'not '
+  ok1:
+    say 'ok 1'
+
+    $P0 = getinterp
+    $I1 = $P0[.INTERPINFO_CURRENT_RUNCORE]
+    if $I0 == $I1 goto ok2
+    print 'not '
+  ok2:
+    say 'ok 2'
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
