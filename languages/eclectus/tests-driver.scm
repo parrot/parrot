@@ -60,7 +60,7 @@
 
 ; TODO: can I use (directory-separator) in petite?
 (define *path-to-parrot*
-  (if (fxzero? (system "uname"))
+  (if (fxzero? (system "uname > /dev/null"))
     "../../parrot"
     "..\\..\\parrot"))
 
