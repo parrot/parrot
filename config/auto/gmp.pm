@@ -68,7 +68,7 @@ sub runstep {
 
     # On OS X check the presence of the gmp header in the standard
     # Fink location.
-    _handle_darwin($conf, $osname);
+    $self->_handle_darwin_for_fink($conf, $osname, 'gmp.h');
 
     $conf->cc_gen('config/auto/gmp/gmp.in');
     eval { $conf->cc_build(); };
@@ -101,20 +101,6 @@ sub _handle_mswin32 {
     return 1;
 }
 
-sub _handle_darwin {
-    my ($conf, $osname) = @_;
-    if ( $osname =~ /darwin/ ) {
-        my $fink_lib_dir        = $conf->data->get('fink_lib_dir');
-        my $fink_include_dir    = $conf->data->get('fink_include_dir');
-        if ( -f "$fink_include_dir/gmp.h" ) {
-            $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', ldflags   => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', ccflags   => "-I$fink_include_dir" );
-        }
-    }
-    return 1;
-}
-
 sub _evaluate_cc_run {
     my ($self, $conf, $test, $has_gmp, $verbose) = @_;
     if ( $test eq $self->{cc_run_expected} ) {
@@ -128,15 +114,6 @@ sub _evaluate_cc_run {
         );
     }
     return $has_gmp;
-}
-
-sub _recheck_settings {
-    my ($self, $conf, $libs, $ccflags, $linkflags, $verbose) = @_;
-    $conf->data->set( 'libs',      $libs );
-    $conf->data->set( 'ccflags',   $ccflags );
-    $conf->data->set( 'linkflags', $linkflags );
-    print " (no) " if $verbose;
-    $self->set_result('no');
 }
 
 1;

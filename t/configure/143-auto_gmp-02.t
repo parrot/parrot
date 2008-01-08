@@ -67,8 +67,8 @@ like($conf->data->get( 'libs' ), qr/-lgmp/,
 my ($flagsbefore, $flagsafter);
 $osname = 'foobar';
 $flagsbefore = $conf->data->get( 'linkflags' );
-ok(auto::gmp::_handle_darwin($conf, $osname),
-    "handle_darwin() returned true value");
+ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
+    "handle_darwin_for_fink() returned true value");
 $flagsafter = $conf->data->get( 'linkflags' );
 is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
 
@@ -82,8 +82,8 @@ my $cwd = cwd();
     $conf->data->set('fink_include_dir' => qq{$tdir/include});
     $osname = 'darwin';
     $flagsbefore = $conf->data->get( 'linkflags' );
-    ok(auto::gmp::_handle_darwin($conf, $osname),
-        "handle_darwin() returned true value");
+    ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
+        "handle_darwin_for_fink() returned true value");
     $flagsafter = $conf->data->get( 'linkflags' );
     is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
 
@@ -106,8 +106,8 @@ my $cwd = cwd();
     
     $osname = 'darwin';
     $flagsbefore = $conf->data->get( 'linkflags' );
-    ok(auto::gmp::_handle_darwin($conf, $osname),
-        "handle_darwin() returned true value");
+    ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
+        "handle_darwin_for_fink() returned true value");
     $flagsafter = $conf->data->get( 'linkflags' );
     isnt($flagsbefore, $flagsafter, "Change in linkflags, as expected");
     like($conf->data->get( 'linkflags' ), qr/-L$libdir/,

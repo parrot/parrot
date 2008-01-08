@@ -89,13 +89,13 @@ sub runstep {
         }
     }
     unless ($has_gdbm) {
-
-        # The Config::Data settings might have changed for the test
-        $conf->data->set( libs      => $libs );
-        $conf->data->set( ccflags   => $ccflags );
-        $conf->data->set( linkflags => $linkflags );
-        print " (no) " if $verbose;
-        $self->set_result('no');
+        # The Parrot::Configure settings might have changed while class ran
+#        $conf->data->set( libs      => $libs );
+#        $conf->data->set( ccflags   => $ccflags );
+#        $conf->data->set( linkflags => $linkflags );
+#        print " (no) " if $verbose;
+#        $self->set_result('no');
+        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
     $conf->data->set( has_gdbm => $has_gdbm );    # for gdbmhash.t and dynpmc.in
 

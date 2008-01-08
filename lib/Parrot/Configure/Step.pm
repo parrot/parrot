@@ -24,6 +24,7 @@ package Parrot::Configure::Step;
 
 use strict;
 use warnings;
+use base qw( Parrot::Configure::Step::Methods );
 
 =head2 Methods
 
