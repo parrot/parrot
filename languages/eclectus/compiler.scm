@@ -128,8 +128,8 @@
 (define variable?
   (lambda (x) 
     (and (atom? x)
-         (or (eq? x 'var-a)
-             (eq? x 'var-b)))))
+         (or (eq? x '$var_a)
+             (eq? x '$var_b)))))
 
 (define make-combination-predicate
   (lambda (name)
@@ -386,8 +386,12 @@
     (caddr x)))
 
 (define emit-variable
-  (lambda (x)
-    (emit-expr 13)))
+  (lambda (x)(list
+               (string->symbol "PAST::Var")
+               (quasiquote (@ (name (unquote x))
+                              (scope "lexical")
+                              (viviself "Undef")
+                              )))))
 
 (define emit-let
   (lambda (binds body)
@@ -490,13 +494,11 @@
 ; print the result of the evaluation
 (define wrap-say
   (lambda (past)
-    (list
-      (string->symbol "PAST::Stmts")
       (list
         (string->symbol "PAST::Op")
         (quasiquote (@ (pasttype "call")
                        (name "say")))
-        past))))
+        past)))
 
 ; the actual compiler
 (define compile-program
