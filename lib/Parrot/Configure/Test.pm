@@ -23,14 +23,13 @@ sub stepnum {
 
 sub test_step_thru_runstep {
     my ( $conf, $pkg, $args ) = @_;
-    my ( $task, $step_name, @step_params, $step, $ret );
+    my ( $task, $step_name, $step, $ret );
 
     $conf->add_steps($pkg);
     $conf->options->set( %{$args} );
 
     $task        = $conf->steps->[ stepnum() ];
     $step_name   = $task->step;
-    @step_params = @{ $task->params };
 
     $step = $step_name->new();
     ok( defined $step, "$step_name constructor returned defined value" );

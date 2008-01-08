@@ -69,20 +69,6 @@ sub description {
     return $self->{description};
 }
 
-=item * C<args()>
-
-Accepts no arguments.  In list context, returns a list of elements held in the
-C<args> attribute set in the C<_init()> initializer in the inheriting class's
-namespace.  In scalar context, returns a reference to an array holding that
-same list.
-
-=cut
-
-sub args {
-    my $self = shift;
-    return wantarray ? @{$self->{args}} : $self->{args};
-}
-
 =item * C<set_result()>
 
 Accepts a scalar value and assigns it to the inheriting class's C<$result>
@@ -117,7 +103,7 @@ Joshua Hoblitt C<jhoblitt@cpan.org>
 =head1 SEE ALSO
 
 F<docs/configuration.pod>, L<Parrot::Configure>, L<Parrot::Configure::Data>,
-L<Parrot::Configure::Step>
+L<Parrot::Configure::Compiler>
 
 =cut
 

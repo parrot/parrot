@@ -102,7 +102,6 @@ elements within an internal hash:
         my $self = shift;
         my %data;
         $data{description} = q{This is the step description};
-        $data{args}        = [ qw( optional arguments ) ];
         $data{result}      = q{};
         return \%data;
     }
@@ -137,16 +136,6 @@ description when the step finishes executing; for example, the user will see:
 
     Determining if your compiler supports computed goto...done.
 
-=item C<args>
-
-Returns a list of the names of any command-line arguments the step cares about.
-Command-line arguments are standardized in F<Configure.pl>; this will be
-described L<later|/"Command-line Arguments"> in more detail.
-
-I<XXX> Note that this method is currently unused but will be used in the futher
-to register acceptable CLI parameters.  New steps should continue to define
-this method.
-
 =item C<result>
 
 The C<result> is initialized to an empty string mainly to quiet
@@ -159,8 +148,6 @@ This method is called to actually execute the step.  The return
 value should be C<1> if the step accomplishes what it is intended to do.
 Otherwise, the step should simply C<return>, I<i.e.>, return an
 undefined value.
-
-I<XXX> In the near future there will be a means of passing additional parameters.
 
 =back
 
@@ -178,7 +165,7 @@ A template for a new step might look like this:
 
     use strict;
     use warnings;
-    use vars qw($description $result @args);
+    use vars qw($description $result);
 
     use base qw(Parrot::Configure::Step);
 
@@ -188,7 +175,6 @@ A template for a new step might look like this:
         my $self = shift;
         my %data;
         $data{description} = q{This is the step description};
-        $data{args}        = [ qw( optional arguments ) ];
         $data{result}      = q{};
         return \%data;
     }
@@ -237,9 +223,6 @@ C<Parrot::Configure::Options::print_help()>.
 Arguments passed to F<Configure.pl> are held in a L<Parrot::Configure::Data>
 object stored inside the L<Parrot::Configure> object.  The options data object
 may be accessed via the L<Parrot::Configure/options> method.
-
-Steps use the C<args> method to list any options they're interested in.  They
-should be listed without the dashes.
 
 =head2 Building Up Configuration Data
 
