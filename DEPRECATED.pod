@@ -77,6 +77,10 @@ See RT #48142.
 
 See RT# 48144. Replaced by C<get_namespace>.
 
+=item * C<DYNSELF> [post 0.5.2]
+
+Replaced by C<SELF>. (Old behavior of C<SELF> changes to C<STATICSELF>.)
+
 =back
 
 =head1 opcodes
