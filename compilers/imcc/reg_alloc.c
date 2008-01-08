@@ -1013,7 +1013,7 @@ first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail)
     int      n         = unit->n_symbols > unit->max_color ?
                          unit->n_symbols : unit->max_color;
     Set     *allocated = set_make(n + 1);
-    SymHash *hsh       = &unit->hash;
+    const SymHash * const hsh = &unit->hash;
 
     int i, first;
 

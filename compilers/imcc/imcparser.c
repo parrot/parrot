@@ -348,10 +348,12 @@
 
 static void add_pcc_named_arg(PARROT_INTERP,
     NOTNULL(SymReg *cur_call),
-    const char *name,
-    SymReg *value)
+    ARGIN(const char *name),
+    ARGIN(SymReg *value))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static void add_pcc_named_param(PARROT_INTERP,
     SymReg *cur_call,
@@ -432,9 +434,13 @@ static SymReg * mk_sub_address_fromc(PARROT_INTERP, char * name)
 static SymReg * mk_sub_address_u(PARROT_INTERP, char * name)
         __attribute__nonnull__(1);
 
-static void set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
+static void set_lexical(PARROT_INTERP,
+    ARGMOD(SymReg *r),
+    ARGIN(const char *name))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*r);
 
 /* HEADERIZER END: static */
 
@@ -735,9 +741,9 @@ begin_return_or_yield(PARROT_INTERP, int yield)
 }
 
 static void
-set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
+set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN(const char *name))
 {
-    SymReg *n = mk_const(interp, name, 'S');
+    SymReg * const n = mk_const(interp, name, 'S');
 
     r->usage |= U_LEXICAL;
 
@@ -751,10 +757,10 @@ set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
 }
 
 static void
-add_pcc_named_arg(PARROT_INTERP, NOTNULL(SymReg *cur_call), const char *name,
-                  SymReg *value)
+add_pcc_named_arg(PARROT_INTERP, NOTNULL(SymReg *cur_call), ARGIN(const char *name),
+        ARGIN(SymReg *value))
 {
-    SymReg *r = mk_const(interp, name, 'S');
+    SymReg * const r = mk_const(interp, name, 'S');
     r->type  |= VT_NAMED;
 
     add_pcc_arg(cur_call, r);

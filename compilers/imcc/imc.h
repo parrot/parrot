@@ -154,7 +154,7 @@ PARROT_WARN_UNUSED_RESULT
 int check_op(PARROT_INTERP,
     ARGOUT(char *fullname),
     ARGIN(const char *name),
-    NOTNULL(SymReg *r[]),
+    ARGIN(SymReg * const * r),
     int narg,
     int keyvec)
         __attribute__nonnull__(1)
@@ -180,7 +180,7 @@ void * IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 PARROT_CANNOT_RETURN_NULL
 void * IMCC_compile_file_s(PARROT_INTERP,
     ARGIN(const char *s),
-    NOTNULL(STRING **error_message))
+    ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

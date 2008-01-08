@@ -59,7 +59,7 @@ static int change_op(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 static void * imcc_compile_file(PARROT_INTERP,
     ARGIN(const char *fullname),
-    NOTNULL(STRING **error_message))
+    ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -271,8 +271,8 @@ Return opcode value for op name
 
 PARROT_WARN_UNUSED_RESULT
 int
-check_op(PARROT_INTERP, ARGOUT(char *fullname),
-        ARGIN(const char *name), NOTNULL(SymReg *r[]), int narg, int keyvec)
+check_op(PARROT_INTERP, ARGOUT(char *fullname), ARGIN(const char *name),
+        ARGIN(SymReg * const * r), int narg, int keyvec)
 {
     int op;
 
@@ -1033,7 +1033,7 @@ Compile a file by filename (can be either PASM or IMCC code)
 PARROT_CANNOT_RETURN_NULL
 static void *
 imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
-                   NOTNULL(STRING **error_message))
+        ARGOUT(STRING **error_message))
 {
     PackFile_ByteCode * const cs_save = interp->code;
     PackFile_ByteCode *cs=NULL;
@@ -1160,9 +1160,9 @@ TODO: Needs to be documented!!!
 PARROT_CANNOT_RETURN_NULL
 void *
 IMCC_compile_file_s(PARROT_INTERP, ARGIN(const char *s),
-                   NOTNULL(STRING **error_message))
+        ARGOUT(STRING **error_message))
 {
-    return imcc_compile_file(interp, s , error_message);
+    return imcc_compile_file(interp, s, error_message);
 }
 
 /*

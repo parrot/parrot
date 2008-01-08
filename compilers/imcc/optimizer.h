@@ -56,21 +56,23 @@ Instruction * IMCC_subst_constants_umix(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 int is_invariant(PARROT_INTERP,
-    NOTNULL(IMC_Unit * unit),
-    NOTNULL(Instruction *ins))
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-int loop_one(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr)
+int loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 int loop_optimization(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int max_loop_depth(NOTNULL(IMC_Unit *unit))
+PARROT_WARN_UNUSED_RESULT
+int max_loop_depth(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 int move_ins_out(PARROT_INTERP,
