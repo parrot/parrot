@@ -38,7 +38,7 @@ sub runstep {
         qw|
             verbose
             without-gdbm
-            |
+        |
     );
 
     if ($without) {
@@ -56,15 +56,7 @@ sub runstep {
 
     # On OS X check the presence of the gdbm header in the standard
     # Fink location.
-    if ( $osname =~ /darwin/ ) {
-        my $fink_lib_dir        = $conf->data->get('fink_lib_dir');
-        my $fink_include_dir    = $conf->data->get('fink_include_dir');
-        if ( -f "$fink_include_dir/gdbm.h" ) {
-            $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', dflags    => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', cflags    => "-I$fink_include_dir" );
-        }
-    }
+    $self->_handle_darwin_for_fink($conf, $osname, 'gdbm.h');
 
     $conf->cc_gen('config/auto/gdbm/gdbm.in');
     if ( $osname =~ /mswin32/i ) {
@@ -90,11 +82,6 @@ sub runstep {
     }
     unless ($has_gdbm) {
         # The Parrot::Configure settings might have changed while class ran
-#        $conf->data->set( libs      => $libs );
-#        $conf->data->set( ccflags   => $ccflags );
-#        $conf->data->set( linkflags => $linkflags );
-#        print " (no) " if $verbose;
-#        $self->set_result('no');
         $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
     $conf->data->set( has_gdbm => $has_gdbm );    # for gdbmhash.t and dynpmc.in
