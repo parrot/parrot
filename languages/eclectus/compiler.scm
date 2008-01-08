@@ -398,20 +398,25 @@
     (if (null? binds)
       (emit-expr body)
       (begin
-        (list
-          (string->symbol "PAST::Stmts")
+        (append
           (list
-            (string->symbol "PAST::Op")
-            (quasiquote (@ (pasttype "copy")
-                           (lvalue "1")))
-            (list
-              (string->symbol "PAST::Var")
-              (quasiquote (@ (name (unquote (caar binds)))
-                             (scope "lexical")
-                             (viviself "Undef")
-                             (isdecl 1))))
-            (emit-expr (cadar binds)))
-          (emit-expr body))))))
+            (string->symbol "PAST::Stmts"))
+          (map 
+            (lambda (decl)
+              (list
+                (string->symbol "PAST::Op")
+                (quasiquote (@ (pasttype "copy")
+                               (lvalue "1")))
+                (list
+                  (string->symbol "PAST::Var")
+                  (quasiquote (@ (name (unquote (car decl)))
+                                 (scope "lexical")
+                                 (viviself "Undef")
+                                 (isdecl 1))))
+                (emit-expr (cadr decl))))
+            binds)
+          (list
+            (emit-expr body)))))))
 
 (define emit-if
   (lambda (x)
