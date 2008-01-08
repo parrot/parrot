@@ -386,32 +386,32 @@
     (caddr x)))
 
 (define emit-variable
-  (lambda (x)(list
-               (string->symbol "PAST::Var")
-               (quasiquote (@ (name (unquote x))
-                              (scope "lexical")
-                              (viviself "Undef")
-                              )))))
+  (lambda (x)
+    (list
+      (string->symbol "PAST::Var")
+      (quasiquote (@ (name (unquote x))
+                     (scope "lexical")
+                     (viviself "Undef"))))))
 
 (define emit-let
   (lambda (binds body)
-     (if (null? binds)
-       (emit-expr body)
-       (begin
-         (list
-           (string->symbol "PAST::Stmts")
-           (list
-             (string->symbol "PAST::Op")
-             (quasiquote (@ (pasttype "copy")
-                            (lvalue "1")))
-             (list
-               (string->symbol "PAST::Var")
-               (quasiquote (@ (name (unquote (caar binds)))
-                              (scope "lexical")
-                              (viviself "Undef")
-                              (isdecl 1))))
-             (emit-expr (cadar binds)))
-           (emit-expr body))))))
+    (if (null? binds)
+      (emit-expr body)
+      (begin
+        (list
+          (string->symbol "PAST::Stmts")
+          (list
+            (string->symbol "PAST::Op")
+            (quasiquote (@ (pasttype "copy")
+                           (lvalue "1")))
+            (list
+              (string->symbol "PAST::Var")
+              (quasiquote (@ (name (unquote (caar binds)))
+                             (scope "lexical")
+                             (viviself "Undef")
+                             (isdecl 1))))
+            (emit-expr (cadar binds)))
+          (emit-expr body))))))
 
 (define emit-if
   (lambda (x)
@@ -494,11 +494,11 @@
 ; print the result of the evaluation
 (define wrap-say
   (lambda (past)
-      (list
-        (string->symbol "PAST::Op")
-        (quasiquote (@ (pasttype "call")
-                       (name "say")))
-        past)))
+    (list
+      (string->symbol "PAST::Op")
+      (quasiquote (@ (pasttype "call")
+                     (name "say")))
+      past)))
 
 ; the actual compiler
 (define compile-program
