@@ -29,13 +29,17 @@ has 'section' => (
 
 has 'keyphrases' => (
     is => 'ro', isa => 'Keyphrase',
-    default => sub{
-        ($_)= shift->link =~ m|^L<.*?/.*?/([^>]+)>|;
-        defined $_ ? Keyphrase->new( string => $_ ) : undef;
-    },
     predicate => 'has_keyphrases',
 );
 
+sub BUILD { # Set a value for keyphrases *only* if there is any
+    my $self = shift;
+    my ($keyphrase)= $self->link =~ m|^L<.*?/.*?/([^>]+)>|;
+    $self->meta->find_attribute_by_name("keyphrases")->set_value(
+        $self, Keyphrase->new(string => $keyphrase),
+    ) if defined $keyphrase;
+    return;
+}
 
 package Doc;
 use Moose;

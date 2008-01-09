@@ -215,6 +215,9 @@ W: http://eric.lubow.org/
 N: Felix Gallo
 D: delegate.pmc patch
 
+N: Flavio Poletti
+D: SmartLink patch for Moose after 0.43
+
 N: Florian Ragwitz
 E: rafl@debianforum.de
 W: http://www.tu-chemnitz.de/~rafl/
