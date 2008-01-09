@@ -135,11 +135,6 @@
     /* The pointer target must be completely defined before being passed, */
     /* and MAY be modified by the function. */
 
-/* Needs to be become ARGMOD */
-#define ARGINOUT(x)                 /*@notnull@*/ /*@in@*/ /*@out@*/ x
-#define ARGINOUT_NULLOK(x)          /*@null@*/ /*@in@*/ /*@out@*/ x
-    /* Old versions that have been upgraded to ARGMOD */
-
 #define FUNC_MODIFIES(x)            /*@modifies x@*/
     /* Never applied by a human, only by the headerizer. */
 
