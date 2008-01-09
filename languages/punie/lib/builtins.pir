@@ -184,6 +184,37 @@
     .return ($P0)
 .end
 
+## autoincrement
+.sub 'postfix:++'
+    .param pmc a
+    $P0 = clone a
+    inc a
+    .return ($P0)
+.end
+
+.sub 'postfix:--'
+    .param pmc a
+    $P0 = clone a
+    dec a
+    .return ($P0)
+.end
+
+
+.sub 'prefix:++'
+    .param pmc a
+    inc a
+    .return (a)
+.end
+
+
+.sub 'prefix:--'
+    .param pmc a
+    dec a
+    .return (a)
+.end
+
+
+
 .sub 'print'
     .param pmc list            :slurpy
     .local pmc iter

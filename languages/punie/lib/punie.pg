@@ -152,6 +152,8 @@ token ws {
     {*}
 }
 
+
+
 proto infix:<+> is precedence('=')
     is pirop('n_add')
     {...}
@@ -178,6 +180,12 @@ proto infix:<%> is equiv(infix:<*>)
 
 proto infix:<x> is equiv(infix:<*>)
     {...}
+
+proto postfix:<++> is tighter(infix:<*>) is lvalue(1) { ... }
+proto postfix:<--> is equiv(postfix:<++>) is lvalue(1) { ... }
+proto prefix:<++> is equiv(postfix:<++>) is lvalue(1) { ... }
+proto prefix:<--> is equiv(postfix:<++>) is lvalue(1) { ... }
+
 
 proto infix:«<<» is looser(infix:<+>)
 #    is pirop('shl') # XXX pirop()s with non PREG destinations don't work yet
