@@ -8,6 +8,7 @@ use warnings;
 use Test::More tests => 31;
 use Carp;
 use Cwd;
+use File::Spec;
 use File::Temp qw( tempdir );
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -78,8 +79,10 @@ my $cwd = cwd();
     ok(chdir $tdir, "Able to change to temporary directory");
     ok( (mkdir 'lib'), "Able to make lib directory");
     ok( (mkdir 'include'), "Able to make include directory");
-    $conf->data->set('fink_lib_dir' => qq{$tdir/lib});
-    $conf->data->set('fink_include_dir' => qq{$tdir/include});
+    my $libdir = File::Spec->catdir( $tdir, 'lib' );
+    my $includedir = File::Spec->catdir( $tdir, 'include' );
+    $conf->data->set('fink_lib_dir' => $libdir);
+    $conf->data->set('fink_include_dir' => $includedir);
     $osname = 'darwin';
     $flagsbefore = $conf->data->get( 'linkflags' );
     ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
@@ -95,11 +98,11 @@ my $cwd = cwd();
     ok(chdir $tdir2, "Able to change to temporary directory");
     ok( (mkdir 'lib'), "Able to make lib directory");
     ok( (mkdir 'include'), "Able to make include directory");
-    my $libdir = qq{$tdir2/lib};
-    my $includedir = qq{$tdir2/include};
+    my $libdir = File::Spec->catdir( $tdir2, 'lib' );
+    my $includedir = File::Spec->catdir( $tdir2, 'include' );
     $conf->data->set('fink_lib_dir' => $libdir);
     $conf->data->set('fink_include_dir' => $includedir);
-    my $foo = qq{$includedir/gmp.h};
+    my $foo = File::Spec->catfile( $includedir, 'gmp.h' );
     open my $FH, ">", $foo or croak "Could not open for writing";
     print $FH "Hello world\n";
     close $FH or croak "Could not close after writing";
@@ -110,7 +113,7 @@ my $cwd = cwd();
         "handle_darwin_for_fink() returned true value");
     $flagsafter = $conf->data->get( 'linkflags' );
     isnt($flagsbefore, $flagsafter, "Change in linkflags, as expected");
-    like($conf->data->get( 'linkflags' ), qr/-L$libdir/,
+    like($conf->data->get( 'linkflags' ), qr/-L\Q$libdir\E/,
         "'linkflags' modified as expected");
 
     ok(chdir $cwd, "Able to change back to original directory after testing");

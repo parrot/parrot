@@ -8,6 +8,7 @@ use warnings;
 use Test::More tests => 35;
 use Carp;
 use Cwd;
+use File::Spec;
 use File::Temp qw( tempdir );
 use lib qw( lib );
 use_ok('config::init::defaults');
@@ -15,14 +16,6 @@ use_ok('config::auto::readline');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-
-=for hints_for_testing The documentation for this package is skimpy;
-please try to improve it, e.g., by providing a short description of what
-the 'readline' function is.  Some branches are compiler- or OS-specific.
-As noted in a comment in the module, please consider the issues raised
-in http://rt.perl.org/rt3/Ticket/Display.html?id=43134.
-
-=cut
 
 my $args = process_options(
     {
@@ -87,8 +80,10 @@ my $cwd = cwd();
     ok(chdir $tdir, "Able to change to temporary directory");
     ok( (mkdir 'lib'), "Able to make lib directory");
     ok( (mkdir 'include'), "Able to make include directory");
-    $conf->data->set('fink_lib_dir' => qq{$tdir/lib});
-    $conf->data->set('fink_include_dir' => qq{$tdir/include});
+    my $libdir = File::Spec->catdir( $tdir, 'lib' );
+    my $includedir = File::Spec->catdir( $tdir, 'include' );
+    $conf->data->set('fink_lib_dir' => $libdir);
+    $conf->data->set('fink_include_dir' => $includedir);
     $osname = 'darwin';
     $flagsbefore = $conf->data->get( 'linkflags' );
     ok($step->_handle_darwin_for_fink($conf, $osname, 'readline/readline.h'),
@@ -105,11 +100,11 @@ my $cwd = cwd();
     ok( (mkdir 'lib'), "Able to make lib directory");
     ok( (mkdir 'include'), "Able to make include directory");
     ok( (mkdir 'include/readline'), "Able to make include/readline directory");
-    my $libdir = qq{$tdir2/lib};
-    my $includedir = qq{$tdir2/include};
+    my $libdir = File::Spec->catdir( $tdir2, 'lib' );
+    my $includedir = File::Spec->catdir( $tdir2, 'include' );
     $conf->data->set('fink_lib_dir' => $libdir);
     $conf->data->set('fink_include_dir' => $includedir);
-    my $foo = qq{$includedir/readline/readline.h};
+    my $foo = File::Spec->catfile( $includedir, 'readline', 'readline.h' );
     open my $FH, ">", $foo or croak "Could not open for writing";
     print $FH "Hello world\n";
     close $FH or croak "Could not close after writing";
@@ -120,7 +115,7 @@ my $cwd = cwd();
         "handle_darwin_for_fink() returned true value");
     $flagsafter = $conf->data->get( 'linkflags' );
     isnt($flagsbefore, $flagsafter, "Change in linkflags, as expected");
-    like($conf->data->get( 'linkflags' ), qr/-L$libdir/,
+    like($conf->data->get( 'linkflags' ), qr/-L\Q$libdir\E/,
         "'linkflags' modified as expected");
 
     ok(chdir $cwd, "Able to change back to original directory after testing");
