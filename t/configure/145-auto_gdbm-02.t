@@ -94,6 +94,7 @@ my $cwd = cwd();
 
     ok(chdir $cwd, "Able to change back to original directory after testing");
 }
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

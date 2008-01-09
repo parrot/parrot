@@ -74,11 +74,7 @@ sub runstep {
     if ( !$@ ) {
         my $test = $conf->cc_run();
         unlink "gdbm_test_db";
-        if ( $test eq "gdbm is working.\n" ) {
-            $has_gdbm = 1;
-            print " (yes) " if $verbose;
-            $self->set_result('yes');
-        }
+        $has_gdbm = $self->_evaluate_cc_run($test, $has_gdbm, $verbose);
     }
     unless ($has_gdbm) {
         # The Parrot::Configure settings might have changed while class ran
@@ -87,6 +83,17 @@ sub runstep {
     $conf->data->set( has_gdbm => $has_gdbm );    # for gdbmhash.t and dynpmc.in
 
     return 1;
+}
+
+sub _evaluate_cc_run {
+    my $self = shift;
+    my ($test, $has_gdbm, $verbose) = @_;
+    if ( $test eq "gdbm is working.\n" ) {
+        $has_gdbm = 1;
+        print " (yes) " if $verbose;
+        $self->set_result('yes');
+    }
+    return $has_gdbm;
 }
 
 1;
