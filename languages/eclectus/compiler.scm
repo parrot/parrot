@@ -121,9 +121,10 @@
 (define immediate?
   (lambda (x)
     (or (fixnum? x)
-      (boolean? x)
-      (char? x)
-      (and (list? x) (= (length x) 0)))))
+        (boolean? x)
+        (char? x)
+        (and (list? x)
+             (= (length x) 0)))))
 
 (define variable?
   (lambda (x) 
@@ -161,12 +162,14 @@
 ; is x a primitive?
 (define primitive?
   (lambda (x)
-    (and (symbol? x) (getprop x '*is-prim*))))
+    (and (symbol? x)
+         (getprop x '*is-prim*))))
 
 ; is x a call to a primitive? 
 (define primcall?
   (lambda (x)
-    (and (pair? x) (primitive? (car x)))))
+    (and (pair? x)
+         (primitive? (car x)))))
 
 ; a primitive function is a symbol with the properties
 ; *is-prim*, *arg-count* and *emitter*
@@ -367,7 +370,8 @@
         [(char? x)
          (quasiquote (@ (value (unquote (char->integer x)))
                         (returns "EclectusCharacter")))]
-        [(and (list? x) (= (length x) 0))
+        [(and (list? x)
+              (= (length x) 0))
          (quasiquote (@ (value 0)
                         (returns "EclectusEmptyList")))]
         [(boolean? x)
@@ -453,9 +457,9 @@
                   [(= (length (cdr tree)) 1) (transform-and-or (cadr tree))]
                   [else (quasiquote
                           (if
-                           (unquote (transform-and-or (cadr tree)))
-                           (unquote (transform-and-or (quasiquote (and (unquote-splicing (cddr tree))))))
-                           #f))])]
+                            (unquote (transform-and-or (cadr tree)))
+                            (unquote (transform-and-or (quasiquote (and (unquote-splicing (cddr tree))))))
+                            #f))])]
           [(eqv? (car tree) 'or) 
            ( cond [(null? (cdr tree)) #f]
                   [(= (length (cdr tree)) 1) (transform-and-or (cadr tree))]
