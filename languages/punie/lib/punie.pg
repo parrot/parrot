@@ -154,44 +154,48 @@ token ws {
 
 
 
-proto infix:<+> is precedence('=')
+proto infix:<+> is assoc('left') is precedence('=')
     is pirop('n_add')
     {...}
 
-proto infix:<-> is equiv(infix:<+>)
+proto infix:<-> is assoc('left') is equiv(infix:<+>)
     is pirop('n_sub')
     {...}
 
-proto infix:<.> is equiv(infix:<+>)
+proto infix:<.> is assoc('left')  is equiv(infix:<+>)
     is pirop('n_concat')
     {...}
 
-proto infix:<*> is tighter(infix:<+>)
+proto infix:<*> is assoc('left') is tighter(infix:<+>)
     is pirop('n_mul')
     {...}
 
-proto infix:</> is equiv(infix:<*>)
+proto infix:</> is assoc('left') is equiv(infix:<*>)
     is pirop('n_div')
     {...}
 
-proto infix:<%> is equiv(infix:<*>)
+proto infix:<%> is assoc('left') is equiv(infix:<*>)
     is pirop('n_mod')
     {...}
 
-proto infix:<x> is equiv(infix:<*>)
+proto infix:<x> is assoc('left') is equiv(infix:<*>)
     {...}
 
-proto postfix:<++> is tighter(infix:<*>) is lvalue(1) { ... }
-proto postfix:<--> is equiv(postfix:<++>) is lvalue(1) { ... }
-proto prefix:<++> is equiv(postfix:<++>) is lvalue(1) { ... }
-proto prefix:<--> is equiv(postfix:<++>) is lvalue(1) { ... }
+proto prefix:<-> is tighter(infix:<*>) is assoc('right') { ... }
+proto prefix:<~> is equiv(prefix:<->) is assoc('right') { ... }
+proto prefix:<!> is equiv(prefix:<->) is assoc('right') { ... }
+
+proto postfix:<++> is tighter(prefix:<->) is assoc('non') is lvalue(1) { ... }
+proto postfix:<--> is equiv(postfix:<++>)is assoc('non') is lvalue(1) { ... }
+proto prefix:<++> is equiv(postfix:<++>) is assoc('non') is lvalue(1) { ... }
+proto prefix:<--> is equiv(postfix:<++>) is assoc('non') is lvalue(1) { ... }
 
 
-proto infix:«<<» is looser(infix:<+>)
+proto infix:«<<» is looser(infix:<+>) is assoc('left')
 #    is pirop('shl') # XXX pirop()s with non PREG destinations don't work yet
     {...}
 
-proto infix:«>>» is equiv(infix:«<<»)
+proto infix:«>>» is equiv(infix:«<<») is assoc('left')
 #    is pirop('shr') # XXX pirop()s with non PREG destinations don't work yet
     {...}
 

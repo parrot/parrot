@@ -213,7 +213,24 @@
     .return (a)
 .end
 
+.sub 'prefix:-'
+    .param pmc a
+    $N0 = a
+    $N0 = neg $N0
+    .return ($N0)
+.end
 
+## not implemented yet!
+.sub 'prefix:~'
+    .param pmc a
+    .return (a)
+.end
+
+.sub 'prefix:!'
+    .param pmc a
+    $P0 = a
+    .return ($P0)
+.end
 
 .sub 'print'
     .param pmc list            :slurpy
