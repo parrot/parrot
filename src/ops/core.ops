@@ -730,6 +730,15 @@ Pop the most recently placed exception off the handler stack.
 
 Throw the exception in $1.
 
+=item B<throwcc>(invar PMC)
+
+Throw the exception in $1 with current continuation. Identical to
+B<throw> in its one-argument form.
+
+=item B<throwcc>(invar PMC, invar PMC)
+
+Throw the exception in $1 with continuation from $2.
+
 =item B<rethrow>(invar PMC)
 
 Only valid inside an exception handler. Rethrow the exception $1.

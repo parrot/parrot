@@ -401,7 +401,7 @@ sub sort_ops {
             $el->{CODE} = $n;
         }
         else {
-            warn sprintf( "%-25s %-10s SKIPPED: not in ops.num nor ops.skip\n", $el->full_name, "" )
+            die sprintf( "%-25s %-10s FATAL: not in ops.num nor ops.skip\n", $el->full_name, "" )
                 if -e "DEVELOPING";
             $el->{CODE} = -1;
         }
