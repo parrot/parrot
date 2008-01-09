@@ -96,12 +96,8 @@ rule gprint  { (print) <expr> {*} }
 
 rule 'oexpr' is optable { ... }
 
-token term {
-    | <ternary> {*}                              #= ternary
-    | <atom> {*}                                 #= atom
-}
 
-token atom {
+token term {
     | \( <expr> \) {*}                           #= expr
     | <number> {*}                               #= number
     | <integer> {*}                              #= integer
@@ -114,10 +110,6 @@ token atom {
     | <variable> {*}                             #= variable
 }
 
-rule ternary {
-    $<cond>=<atom> '?' $<then>=<atom> ':' $<else>=<atom>
-    {*}
-}
 
 rule variable {
     | <sigil>? <word> <key>? {*}
@@ -235,7 +227,14 @@ proto infix:<||> is looser(infix:<&&>) is assoc('left')
     is pasttype('unless')
     {...}
 
-proto infix:<=> is looser(infix:<||>)
+proto infix:<..> is looser(infix:<||>) is assoc('non')
+    {...}
+
+proto ternary:<? :> is looser(infix:<..>) is assoc('right')
+    is pasttype('if')
+    {...}
+
+proto infix:<=> is looser(ternary:<? :>)
     is pirop('assign')
     is lvalue(1)
     {...}

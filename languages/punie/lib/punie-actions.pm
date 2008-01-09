@@ -165,16 +165,7 @@ method for_loop($/) {
     }
 }
 
-method atom($/, $key) {
-    make $( $/{$key} );
-}
 
-method ternary($/) {
-    my $cond := $( $<cond> );
-    my $then := $( $<then> );
-    my $else := $( $<else> );
-    make PAST::Op.new( $cond, $then, $else, :pasttype('if'), :node($/) );
-}
 
 method texpr($/) {
     if $<expr> {
