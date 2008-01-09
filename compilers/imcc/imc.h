@@ -133,11 +133,14 @@ void IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Instruction * INS_LABEL(PARROT_INTERP,
     ARGMOD_NULLOK(IMC_Unit *unit),
-    SymReg *r0,
+    ARGIN(SymReg *r0),
     int emit)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: compilers/imcc/imcparser.c */
 

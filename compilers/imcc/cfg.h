@@ -58,9 +58,10 @@ int blocks_are_connected(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
+void build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 void clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1);

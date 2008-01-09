@@ -114,13 +114,14 @@ static void mark_loop(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void propagate_need(
-    NOTNULL(Basic_block *bb),
-    NOTNULL(SymReg* r),
+    ARGMOD(Basic_block *bb),
+    ARGIN(const SymReg* r),
     int i)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*bb);
 
-static void sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -318,16 +319,16 @@ the dependencies between them.
 */
 
 void
-build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
+build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 {
     int i, changes;
-    SymReg * addr;
-    Basic_block *last = NULL, *bb;
-    Edge *pred;
+    Basic_block *last = NULL;
 
     IMCC_info(interp, 2, "build_cfg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-        bb = unit->bb_list[i];
+        Edge *pred;
+        SymReg *addr;
+        Basic_block * const bb = unit->bb_list[i];
 
         /* if the block can fall-through */
         if (i > 0 && ! (last->end->type & IF_goto))
@@ -425,9 +426,10 @@ invok:
      * predecessors) from the CFG
      */
     do {
+        int i;
         changes = 0;
         for (i = 1; i < unit->n_basic_blocks; i++) {
-            bb = unit->bb_list[i];
+            Basic_block * const bb = unit->bb_list[i];
             if (!bb->pred_list) {
                 /* Remove all successor edges of block bb */
                 while (bb->succ_list) {
@@ -866,7 +868,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
+propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg* r), int i)
 {
     Edge *edge;
     Basic_block *pred;
@@ -1172,7 +1174,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
     int i, j, changed;
     Loop_info *li;

@@ -1257,7 +1257,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     opcode_t  size;
     int       key_length;     /* P0["hi;there"; S0; 2] has length 3 */
     int       k;
-    const SymReg *reg;
+    SymReg *reg;
 
     /* 0 is length */
     opcode_t *pc = key + 1;
@@ -1516,7 +1516,7 @@ static void
 constant_folding(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     int      i;
-    SymHash *hsh = &IMCC_INFO(interp)->ghash;
+    const SymHash *hsh = &IMCC_INFO(interp)->ghash;
 
     /* go through all consts of current sub */
     for (i = 0; i < hsh->size; i++) {

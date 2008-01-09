@@ -730,8 +730,8 @@ rewrite e.g. add_n_ic => add_n_nc
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-IMCC_subst_constants_umix(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
-        NOTNULL(SymReg **r), int n)
+IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+        ARGMOD(SymReg **r), int n)
 {
     Instruction *tmp;
     const char * const ops[] = {

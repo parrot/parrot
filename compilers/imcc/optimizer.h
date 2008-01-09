@@ -46,14 +46,16 @@ Instruction * IMCC_subst_constants(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction * IMCC_subst_constants_umix(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
+    ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name),
-    NOTNULL(SymReg **r),
+    ARGMOD(SymReg **r),
     int n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
 
 int is_invariant(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
