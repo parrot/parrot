@@ -60,7 +60,7 @@
 
 ; TODO: can I use (directory-separator) in petite?
 (define *path-to-parrot*
-  (if (fxzero? (system "perl -MEnglish -e 'exit \\$OSNAME =~ m/Win/ ? 1 : 0;'"))
+  (if (fxzero? (system "perl -e \"exit($^O eq q{MSWin32} ? 1 : 0)\""))
     "../../parrot"
     "..\\..\\parrot"))
 
