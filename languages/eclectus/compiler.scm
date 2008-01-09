@@ -128,9 +128,7 @@
 
 (define variable?
   (lambda (x) 
-    (and (atom? x)
-         (or (eq? x '$var_a)
-             (eq? x '$var_b)))))
+    (symbol? x)))
 
 (define make-combination-predicate
   (lambda (name)
