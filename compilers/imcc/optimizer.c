@@ -133,7 +133,7 @@ PARROT_WARN_UNUSED_RESULT
 static int eval_ins(PARROT_INTERP,
     ARGIN(const char *op),
     size_t ops,
-    NOTNULL(SymReg **r))
+    ARGIN(SymReg **r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
@@ -186,7 +186,7 @@ Handles optimizations occuring before the construction of the CFG.
 */
 
 int
-pre_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     int changed = 0;
 
@@ -275,9 +275,9 @@ Get negated form of operator. If no negated form is known, return NULL.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const char *
-get_neg_op(ARGIN(const char *op), NOTNULL(int *n))
+get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
 {
-    static struct br_pairs {
+    static const struct br_pairs {
         const char * const op;
         const char * const nop;
         int n;
@@ -771,12 +771,11 @@ core evaluates the constants.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, NOTNULL(SymReg **r))
+eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 {
     opcode_t eval[4], *pc;
     int opnum;
     int i;
-    STRING *s;
     op_info_t *op_info;
 
     opnum = interp->op_lib->op_code(op, 1);
@@ -799,18 +798,16 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, NOTNULL(SymReg **r))
                 if (ops <= 2 || i) { /* fill source regs */
                     switch (r[i]->set) {
                         case 'I':
-                            REG_INT(interp, i) =
-                                IMCC_int_from_reg(interp, r[i]);
+                            REG_INT(interp, i) = IMCC_int_from_reg(interp, r[i]);
                             break;
                         case 'N':
-                            s = string_from_cstring(interp,
-                                    r[i]->name, 0);
-                            REG_NUM(interp, i) =
-                                string_to_num(interp, s);
+                            {
+                            STRING * const s = string_from_cstring(interp, r[i]->name, 0);
+                            REG_NUM(interp, i) = string_to_num(interp, s);
+                            }
                             break;
                         case 'S':
-                            REG_STR(interp, i) =
-                                IMCC_string_from_reg(interp, r[i]);
+                            REG_STR(interp, i) = IMCC_string_from_reg(interp, r[i]);
                             break;
                         default:
                             break;

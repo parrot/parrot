@@ -379,21 +379,30 @@ static void begin_return_or_yield(PARROT_INTERP, int yield)
 static void clear_state(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
+static void do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction* func_ins(PARROT_INTERP,
-    IMC_Unit *unit,
-    SymReg *lhs,
-    const char *op,
-    SymReg ** r,
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(SymReg *lhs),
+    ARGIN(const char *op),
+    ARGMOD(SymReg **r),
     int n,
     int keyv,
     int emit)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction * iINDEXFETCH(PARROT_INTERP,
     IMC_Unit *unit,
     SymReg *r0,
@@ -401,6 +410,8 @@ static Instruction * iINDEXFETCH(PARROT_INTERP,
     SymReg *r2)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction * iINDEXSET(PARROT_INTERP,
     IMC_Unit * unit,
     SymReg * r0,
@@ -408,7 +419,13 @@ static Instruction * iINDEXSET(PARROT_INTERP,
     SymReg * r2)
         __attribute__nonnull__(1);
 
-static const char * inv_op(const char *op);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const char * inv_op(ARGIN(const char *op))
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction * MK_I(PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(const char *fmt),
@@ -418,21 +435,32 @@ static Instruction * MK_I(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction* mk_pmc_const(PARROT_INTERP,
-    IMC_Unit *unit,
-    NOTNULL(const char *type),
-    NOTNULL(SymReg *left),
-    NOTNULL(char *constant))
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(const char *type),
+    ARGMOD(SymReg *left),
+    ARGMOD(char *constant))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*left)
+        FUNC_MODIFIES(*constant);
 
-static SymReg * mk_sub_address_fromc(PARROT_INTERP, char * name)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static SymReg * mk_sub_address_fromc(PARROT_INTERP, ARGIN(char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static SymReg * mk_sub_address_u(PARROT_INTERP, char * name)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static SymReg * mk_sub_address_u(PARROT_INTERP, ARGIN(char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void set_lexical(PARROT_INTERP,
     ARGMOD(SymReg *r),
@@ -474,6 +502,9 @@ static void set_lexical(PARROT_INTERP,
  *        exceptions. Thus, we can't easily factorize that piece of
  *        code.
  */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction *
 MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
 {
@@ -500,14 +531,14 @@ MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
         r[i] = va_arg(ap, SymReg *);
     }
     va_end(ap);
-    return INS(interp, unit, opname, fmt, r, n,
-               IMCC_INFO(interp)->keyvec, 1);
+    return INS(interp, unit, opname, fmt, r, n, IMCC_INFO(interp)->keyvec, 1);
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction*
-mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
-             NOTNULL(SymReg *left), NOTNULL(char *constant))
+mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
+        ARGMOD(SymReg *left), ARGMOD(char *constant))
 {
     const   int type_enum = atoi(type);
     SymReg *rhs;
@@ -561,9 +592,10 @@ mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction*
-func_ins(PARROT_INTERP, IMC_Unit *unit, SymReg *lhs, const char *op,
-         SymReg ** r, int n, int keyv, int emit)
+func_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *lhs), ARGIN(const char *op),
+        ARGMOD(SymReg **r), int n, int keyv, int emit)
 {
     int i;
     /* shift regs up by 1 */
@@ -588,7 +620,7 @@ clear_state(PARROT_INTERP)
 }
 
 Instruction *
-INS_LABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, int emit)
+INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), SymReg *r0, int emit)
 {
 
     Instruction * const ins = _mk_instruction("", "%s:", 1, &r0, 0);
@@ -609,6 +641,8 @@ static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0) {
     return i;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static Instruction *
 iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r)) {
     Instruction * const i =iLABEL(interp, unit, r);
@@ -626,6 +660,9 @@ iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r)) {
 /*
  * substr or X = P[key]
  */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction *
 iINDEXFETCH(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, SymReg *r1, SymReg *r2)
 {
@@ -642,12 +679,14 @@ iINDEXFETCH(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, SymReg *r1, SymReg *r2)
  * substr or P[key] = X
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction *
 iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
           SymReg * r0, SymReg * r1, SymReg * r2)
 {
     if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
         MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1, r3, r2);
     }
     else if (r0->set == 'P') {
@@ -658,15 +697,21 @@ iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
         IMCC_fataly(interp, E_SyntaxError,
             "unsupported indexed set op\n");
     }
-    return 0;
+    return NULL;
 }
 
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static const char *
-inv_op(const char *op) {
+inv_op(ARGIN(const char *op)) {
     int n;
     return get_neg_op(op, &n);
 }
 
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction *
 IMCC_create_itcall_label(PARROT_INTERP)
 {
@@ -683,8 +728,10 @@ IMCC_create_itcall_label(PARROT_INTERP)
 }
 
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static SymReg *
-mk_sub_address_fromc(PARROT_INTERP, char * name)
+mk_sub_address_fromc(PARROT_INTERP, ARGIN(char *name))
 {
     /* name is a quoted sub name */
     SymReg *r;
@@ -695,8 +742,11 @@ mk_sub_address_fromc(PARROT_INTERP, char * name)
     return r;
 }
 
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static SymReg *
-mk_sub_address_u(PARROT_INTERP, char * name)
+mk_sub_address_u(PARROT_INTERP, ARGIN(char *name))
 {
     SymReg * const r = mk_sub_address(interp, name);
     r->type         |= VT_ENCODED;
@@ -705,7 +755,7 @@ mk_sub_address_u(PARROT_INTERP, char * name)
 }
 
 void
-IMCC_itcall_sub(PARROT_INTERP, SymReg *sub)
+IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
 {
     IMCC_INFO(interp)->cur_call->pcc_sub->sub = sub;
     if (IMCC_INFO(interp)->cur_obj) {
@@ -810,7 +860,7 @@ adv_named_set(PARROT_INTERP, char *name) {
 }
 
 static void
-do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
+do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 {
     PMC *ignored;
     STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);

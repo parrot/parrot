@@ -124,13 +124,19 @@ typedef void* yyscan_t;
 
 /* HEADERIZER BEGIN: compilers/imcc/imcparser.c */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction * IMCC_create_itcall_label(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void IMCC_itcall_sub(PARROT_INTERP, SymReg *sub)
-        __attribute__nonnull__(1);
+void IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-Instruction * INS_LABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, int emit)
+Instruction * INS_LABEL(PARROT_INTERP,
+    ARGMOD_NULLOK(IMC_Unit *unit),
+    SymReg *r0,
+    int emit)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/imcparser.c */
@@ -167,11 +173,10 @@ PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile(PARROT_INTERP,
     ARGIN(const char *s),
     int pasm_file,
-    ARGMOD(STRING **error_message))
+    ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*error_message);
+        __attribute__nonnull__(4);
 
 PARROT_CANNOT_RETURN_NULL
 void * IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
@@ -202,7 +207,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * IMCC_compile_pasm_s(PARROT_INTERP,
     ARGIN(const char *s),
-    NOTNULL(STRING **error_message))
+    ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -223,7 +228,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * IMCC_compile_pir_s(PARROT_INTERP,
     ARGIN(const char *s),
-    NOTNULL(STRING **error_message))
+    ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -252,7 +257,7 @@ Instruction * iNEW(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGMOD(SymReg *r0),
     ARGMOD(char *type),
-    NULLOK(SymReg *init),
+    ARGIN_NULLOK(SymReg *init),
     int emit)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -262,6 +267,7 @@ Instruction * iNEW(PARROT_INTERP,
         FUNC_MODIFIES(*r0)
         FUNC_MODIFIES(*type);
 
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction * INS(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),

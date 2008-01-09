@@ -97,11 +97,10 @@ static const char * to_infix(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static const char * try_rev_cmp(
-    ARGIN(const char *name),
-    NOTNULL(SymReg **r))
+static const char * try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*r);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -155,7 +154,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
 iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
-        ARGMOD(char *type), NULLOK(SymReg *init), int emit)
+        ARGMOD(char *type), ARGIN_NULLOK(SymReg *init), int emit)
 {
     char fmt[256];
     SymReg *regs[3];
@@ -546,6 +545,7 @@ s. e.g. imc.c for usage
 
 */
 
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
 INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
@@ -782,7 +782,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
-        ARGMOD(STRING **error_message))
+        ARGOUT(STRING **error_message))
 {
     /* imcc always compiles to interp->code
      * save old cs, make new
@@ -948,7 +948,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
-                   NOTNULL(STRING **error_message))
+        ARGOUT(STRING **error_message))
 {
     return imcc_compile(interp, s, 0, error_message);
 }
@@ -967,7 +967,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
-                    NOTNULL(STRING **error_message))
+        ARGOUT(STRING **error_message))
 {
     return imcc_compile(interp, s, 1, error_message);
 }
@@ -1341,7 +1341,7 @@ TODO: Needs to be documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const char *
-try_rev_cmp(ARGIN(const char *name), NOTNULL(SymReg **r))
+try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 {
     static struct br_pairs {
         ARGIN(const char * const op);

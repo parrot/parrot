@@ -25,7 +25,7 @@ Basic_block * find_outer(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const char * get_neg_op(ARGIN(const char *op), NOTNULL(int *n))
+const char * get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -88,9 +88,10 @@ int optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int pre_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+int pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 /* HEADERIZER END: compilers/imcc/optimizer.c */
 
