@@ -3,11 +3,15 @@
 
 =head1 NAME
 
-config/auto/readline.pm - Test for readline lib
+config/auto/readline.pm - Probe for readline library
 
 =head1 DESCRIPTION
 
-Determines whether the platform supports readline.
+Determines whether the platform supports readline.  The GNU Project describes
+its version of the readline library as providing "... a set of functions for
+use by applications that allow users to edit command lines as they are typed
+in" (L<http://directory.fsf.org/project/readline/>).  Other readline libraries
+are, however, available and usable with Parrot.
 
 =cut
 
