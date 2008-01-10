@@ -47,8 +47,8 @@ method visible($/) {
 }
 
 method declare($/) {
-    $($<variable>).isdecl(1);
     if ($<expression>) {
+        $($<variable>).isdecl(1);
         # XXX Someone clever needs to refactor this into C<assign>
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
         $past.push( $( $<variable> ) );
