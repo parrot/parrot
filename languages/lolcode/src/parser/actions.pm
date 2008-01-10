@@ -112,6 +112,11 @@ method ifthen($/) {
                                :node( $/ )
                              );
     }
+    my $it := PAST::Var.new( :name( 'IT' ), :scope('package'), :viviself('Undef'));
+    my $bind := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+    $bind.push( $it );
+    $bind.push( $expr );
+    my $past := PAST::Stmts.new( $bind, $past, :node( $/ ) );
     make $past;
 }
 

@@ -589,6 +589,9 @@ S: Winterthur, Switzerland
 N: Stig Brautaset
 D: Patch to repair 'make clean'
 
+N: Stuart Jansen
+D: lolcode patches
+
 N: Thilo Planz
 D: partcl tests and inspiration
 
