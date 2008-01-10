@@ -141,6 +141,9 @@ method integer($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
 }
 
+method float($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node($/) );
+}
 
 method boolean($/) {
     if (~$/ eq 'FAIL' ) {

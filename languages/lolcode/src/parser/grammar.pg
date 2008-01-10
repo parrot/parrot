@@ -9,12 +9,14 @@ This is the grammar for lolcode written as a sequence of Perl 6 rules.
 grammar lolcode::Grammar is PCT::Grammar;
 
 rule TOP {
-    'HAI' <float> <statement_terminator>
+    'HAI' <version> <statement_terminator>
     <block>
     'KTHXBYE' <statement_terminator>
     [ $ || <panic: Syntax error> ]
     {*}
 }
+
+token version { \d+ [ '.' \d+ ]? }
 
 rule statement {
     | <visible>    {*}   #= visible
@@ -93,6 +95,7 @@ rule expression {
 }
 
 rule value {
+    | <float>    {*}                             #= float
     | <integer>  {*}                             #= integer
     | <boolean>  {*}                             #= boolean
     | <quote>    {*}                             #= quote
@@ -112,9 +115,9 @@ token keyword {
     | 'BIGGR' | 'AN' | 'A' ] >>
 }
 
-rule integer { \d+ {*} }
+token integer { '-'? \d+ {*} }
 
-token float { \d+ [ '.' \d+ ]? }
+token float { '-'? \d+ '.' \d+ {*} }
 
 rule boolean { [ 'WIN' | 'FAIL' ] {*} }
 
