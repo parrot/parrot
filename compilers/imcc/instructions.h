@@ -79,16 +79,6 @@ struct _IMC_Unit;
 
 
 /* Functions */
-/*
- * _mk_instruction and iANY are not intended for outside usage
- * please use INS
- */
-#ifdef _PARSER
-Instruction * _mk_instruction(const char *, const char *, int n, SymReg **, int);
-#else
-#  define _mk_instruction(a, b, n, c, d) dont_use(a, b)
-#endif
-
 /* Globals */
 
 typedef struct _emittert {
@@ -124,10 +114,11 @@ Instruction * _mk_instruction(
     ARGIN(const char *op),
     ARGIN(const char *fmt),
     int n,
-    SymReg **r,
+    ARGIN(SymReg * const *r),
     int flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_CAN_RETURN_NULL
 Instruction * delete_ins(
@@ -227,6 +218,15 @@ void subst_ins(
         FUNC_MODIFIES(*tmp);
 
 /* HEADERIZER END: compilers/imcc/instructions.c */
+
+/*
+ * _mk_instruction and iANY are not intended for outside usage
+ * please use INS
+ */
+#ifndef _PARSER
+#  define _mk_instruction(a, b, n, c, d) dont_use_this_function(a, b)
+#endif
+/* This macro must come after the declaration of _mk_instruction() */
 
 #endif /* PARROT_IMCC_INSTRUCTIONS_H_GUARD */
 

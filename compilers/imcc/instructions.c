@@ -94,8 +94,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Instruction *
 _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
-        SymReg **r, int flags)
-/* XXX The r option cannot get an ARGIN for some reason */
+        ARGIN(SymReg * const *r), int flags)
 {
     int i, reg_space;
     Instruction * ins;

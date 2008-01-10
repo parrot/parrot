@@ -97,21 +97,26 @@ static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-static int branch_cond_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static int branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
 static int branch_cond_loop_swap(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction *branch),
-    NOTNULL(Instruction *start),
-    NOTNULL(Instruction *cond))
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD(Instruction *branch),
+    ARGMOD(Instruction *start),
+    ARGMOD(Instruction *cond))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*branch)
+        FUNC_MODIFIES(*start)
+        FUNC_MODIFIES(*cond);
 
 PARROT_WARN_UNUSED_RESULT
 static int branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
@@ -154,14 +159,16 @@ static int is_ins_save(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static int strength_reduce(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
-static int unused_label(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+static int unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -214,7 +221,7 @@ FALSE.
 
 PARROT_WARN_UNUSED_RESULT
 int
-cfg_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     if (IMCC_INFO(interp)->dont_optimize)
         return 0;
@@ -246,7 +253,7 @@ RT#48260: Not yet documented!!!
 */
 
 int
-optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     int any = 0;
     if (IMCC_INFO(interp)->optimizer_level & OPT_CFG) {
@@ -384,7 +391,7 @@ guaranteed that one operand is non constant if opsize == 4
 */
 
 static int
-strength_reduce(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     Instruction *ins, *tmp;
     SymReg *r;
@@ -852,8 +859,8 @@ rewrite e.g. add_n_nc_nc => set_n_nc
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-IMCC_subst_constants(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *name),
-        NOTNULL(SymReg **r), int n, ARGOUT(int *ok))
+IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+        ARGMOD(SymReg **r), int n, ARGOUT(int *ok))
 {
     Instruction *tmp;
     const char * const ops[] = {
@@ -982,8 +989,7 @@ IMCC_subst_constants(PARROT_INTERP, NOTNULL(IMC_Unit *unit), ARGIN(const char *n
          */
         if (branched) {
             r[0] = r[found];
-            tmp = INS(interp, unit, "branch", "", r,
-                    1, 0, 0);
+            tmp = INS(interp, unit, "branch", "", r, 1, 0, 0);
         }
         else {
             IMCC_debug(interp, DEBUG_OPT1, "deleted\n");
@@ -1166,8 +1172,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-branch_cond_loop_swap(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *branch),
-        NOTNULL(Instruction *start), NOTNULL(Instruction *cond))
+branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *branch),
+        ARGMOD(Instruction *start), ARGMOD(Instruction *cond))
 {
     int changed = 0;
     int args;
@@ -1219,8 +1225,8 @@ branch_cond_loop_swap(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instructio
             tmp = INS(interp, unit, (const char*)neg_op, "", regs, args, 0, 0);
 
             IMCC_debug(interp, DEBUG_OPT1,
-            "loop %s -> %s converted to post-test, added label %s\n",
-            branch->r[0]->name, get_branch_reg(cond)->name, label);
+                "loop %s -> %s converted to post-test, added label %s\n",
+                branch->r[0]->name, get_branch_reg(cond)->name, label);
 
             subst_ins(unit, branch, tmp, 1);
             unit->ostat.branch_cond_loop++;
@@ -1256,7 +1262,7 @@ FALSE.
 */
 
 static int
-branch_cond_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     Instruction *ins, *cond, *start, *prev;
     int changed = 0, found;
@@ -1328,7 +1334,7 @@ FALSE.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-unused_label(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     Instruction *ins;
     int used;
@@ -1337,7 +1343,7 @@ unused_label(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
     IMCC_info(interp, 2, "\tunused_label\n");
     for (i=1; i < unit->n_basic_blocks; i++) {
-        ins = unit->bb_list[i]->start;
+        Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
             SymReg * lab = ins->r[0];
             used = 0;
@@ -1732,8 +1738,8 @@ move the instruction ins before loop in bb
 */
 
 int
-move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
-        NOTNULL(Instruction **ins), NOTNULL(Basic_block *bb))
+move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
+        ARGMOD(Instruction **ins), ARGIN(const Basic_block *bb))
 {
     Basic_block *pred;
     Instruction * next, *out;
@@ -1743,6 +1749,7 @@ move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
 #  ifdef MOVE_INS_1_BL
     pred = find_outer(unit, bb);
 #  else
+    UNUSED(bb);
     pred = unit->bb_list[0];
 #  endif
     if (!pred) {

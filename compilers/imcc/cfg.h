@@ -73,9 +73,10 @@ void compute_dominance_frontiers(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-void compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
+void compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
 int edge_count(ARGIN(const struct _IMC_Unit *unit))
@@ -117,9 +118,10 @@ int natural_preheader(
 
 void search_predecessors_not_in(
     ARGIN(const Basic_block *node),
-    NOTNULL(Set* s))
+    ARGMOD(Set* s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*s);
 
 /* HEADERIZER END: compilers/imcc/cfg.c */
 

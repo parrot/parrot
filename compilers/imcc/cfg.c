@@ -34,23 +34,29 @@ flow of execution between blocks.
 
 /* HEADERIZER BEGIN: static */
 
-static void analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
+static void analyse_life_block(
+    ARGIN(const Basic_block* bb),
+    ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*r);
 
 static void analyse_life_symbol(
     ARGIN(const struct _IMC_Unit *unit),
-    NOTNULL(SymReg* r))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void bb_add_edge(
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Basic_block *from),
-    NOTNULL(Basic_block *to))
+    ARGMOD(SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        FUNC_MODIFIES(*r);
+
+static void bb_add_edge(
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(Basic_block *from),
+    ARGMOD(Basic_block *to))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*to);
 
 static void bb_check_set_addr(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
@@ -64,17 +70,20 @@ static void bb_check_set_addr(PARROT_INTERP,
         FUNC_MODIFIES(*bb);
 
 static void bb_findadd_edge(PARROT_INTERP,
-    NOTNULL(IMC_Unit * unit),
-    NOTNULL(Basic_block *from),
-    NOTNULL(SymReg *label))
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(Basic_block *from),
+    ARGIN(const SymReg *label))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*unit);
 
-static void bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
+static void bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*edge);
 
 PARROT_WARN_UNUSED_RESULT
 static int check_invoke_type(PARROT_INTERP,
@@ -107,11 +116,13 @@ static void init_basic_blocks(ARGMOD(IMC_Unit *unit))
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Basic_block* make_basic_block(PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction* ins))
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD(Instruction* ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins);
 
 static void mark_loop(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
@@ -465,8 +476,8 @@ find the placement of the label, and link the two nodes
 */
 
 static void
-bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
-        NOTNULL(Basic_block *from), NOTNULL(SymReg *label))
+bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
+        ARGIN(const SymReg *label))
 {
     Instruction *ins;
     const SymReg * const r = find_sym(interp, label->name);
@@ -475,8 +486,7 @@ bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
         bb_add_edge(unit, from,
                 unit->bb_list[r->first_ins->bbindex]);
     else {
-        IMCC_debug(interp, DEBUG_CFG, "register branch %I ",
-                from->end);
+        IMCC_debug(interp, DEBUG_CFG, "register branch %I ", from->end);
         /* RT#48282 is probably only ok, if the invoke is "near" the
          *     set_addr ins
          */
@@ -530,7 +540,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_block *to))
+bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from), ARGMOD(Basic_block *to))
 {
     Edge *e;
     if (blocks_are_connected(from, to))
@@ -551,7 +561,7 @@ bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_b
     to->pred_list = from->succ_list = e;
 
     /* memory housekeeping */
-    e->next = 0;
+    e->next = NULL;
 
     if (unit->edge_list == 0)
         unit->edge_list = e;
@@ -572,7 +582,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
+bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
 {
     if (edge->from->succ_list == edge) {
         edge->from->succ_list = edge->succ_next;
@@ -695,8 +705,7 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit),
-        NOTNULL(SymReg* r))
+analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
 {
     int i;
 
@@ -793,7 +802,7 @@ the var is alive.
 */
 
 static void
-analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
+analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
 {
     Life_range* const l = make_life_range(r, bb->index);
 
@@ -946,7 +955,7 @@ s. gcc:flow.c compute_dominators
 */
 
 void
-compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
+compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 {
 #define USE_BFS 0
 
@@ -1440,7 +1449,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-search_predecessors_not_in(ARGIN(const Basic_block *node), NOTNULL(Set* s))
+search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set* s))
 {
    Edge *edge;
 
@@ -1521,7 +1530,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Basic_block*
-make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* ins))
+make_basic_block(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins))
 {
     int n;
     Basic_block * const bb = mem_allocate_typed(Basic_block);
