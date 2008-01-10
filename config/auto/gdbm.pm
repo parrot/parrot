@@ -10,6 +10,10 @@ config/auto/gdbm.pm - Test for GNU dbm (gdbm) library
 Determines whether the platform supports gdbm. This is needed for the dynamic
 GDBMHash PMC.
 
+From L<http://www.gnu.org/software/gdbm/>:  "GNU dbm is a set of database
+routines that use extensible hashing. It works similar to the standard Unix
+dbm routines."
+
 =cut
 
 package auto::gdbm;
