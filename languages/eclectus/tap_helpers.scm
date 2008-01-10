@@ -21,7 +21,7 @@
 
 (define diag
   (lambda (msg)
-    (write "# ")
-    (write msg)
+    (display "# ")
+    (display msg)
     (newline)))
 
