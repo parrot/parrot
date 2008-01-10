@@ -405,22 +405,22 @@
       (emit-expr body)
       (begin
         (append
-          (list
-            (string->symbol "PAST::Stmts"))
-          (map 
-            (lambda (decl)
-              (list
-                (string->symbol "PAST::Op")
-                (quasiquote (@ (pasttype "copy")
-                               (lvalue "1")))
+          (cons
+            (string->symbol "PAST::Stmts")
+            (map 
+              (lambda (decl)
                 (list
-                  (string->symbol "PAST::Var")
-                  (quasiquote (@ (name (unquote (car decl)))
-                                 (scope "lexical")
-                                 (viviself "Undef")
-                                 (isdecl 1))))
-                (emit-expr (cadr decl))))
-            binds)
+                  (string->symbol "PAST::Op")
+                  (quasiquote (@ (pasttype "copy")
+                                 (lvalue "1")))
+                  (list
+                    (string->symbol "PAST::Var")
+                    (quasiquote (@ (name (unquote (car decl)))
+                                   (scope "lexical")
+                                   (viviself "Undef")
+                                   (isdecl 1))))
+                  (emit-expr (cadr decl))))
+              binds))
           (list
             (emit-expr body)))))))
 
@@ -443,8 +443,8 @@
           (string->symbol "PAST::Block")
           (quasiquote (@ (blocktype "declaration")
                          (arity (unquote (length (cadar x))))))
-          (append
-            (list (string->symbol "PAST::Stmts"))
+          (cons
+            (string->symbol "PAST::Stmts")
             (map
               (lambda (decl)
                 (list
@@ -452,18 +452,16 @@
                   (quasiquote (@ (name (unquote decl))
                                  (scope "parameter")))))
               (cadar x)))
-          (append
-            (list (string->symbol "PAST::Stmts"))
+          (cons
+            (string->symbol "PAST::Stmts")
             (map
               (lambda (stmt)
                 (emit-expr stmt))
-              (cddar x))))
-       )
-         (map
-           (lambda (arg)
-             (emit-expr arg))
-           (cdr x))
-)))
+              (cddar x)))))
+       (map
+         (lambda (arg)
+           (emit-expr arg))
+         (cdr x)))))
  
 ; emir PIR for an expression
 (define emit-expr
