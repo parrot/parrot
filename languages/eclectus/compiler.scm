@@ -142,6 +142,10 @@
 (define let?
   (make-combination-predicate 'let))
 
+(define lambda?
+  (lambda (x)
+    (and (pair? x)
+         (pair? (car x)))))
 
 (define if-test
   (lambda (form)
@@ -428,6 +432,23 @@
       (emit-expr (if-test x))
       (emit-expr (if-conseq x))
       (emit-expr (if-altern x)))))
+
+(define emit-lambda
+  (lambda (x)
+    ;(write (cddar x))(newline)
+    (list  
+      (string->symbol "PAST::Op")
+      (quasiquote (@ (pasttype "call")))
+      (list
+        (string->symbol "PAST::Block")
+        (append
+          (list
+            (string->symbol "PAST::Stmts"))
+          (map
+            (lambda (stmt)
+              ;(write stmt)
+              (emit-expr stmt))
+            (cddar x)))))))
  
 ; emir PIR for an expression
 (define emit-expr
@@ -438,6 +459,7 @@
       [(variable? x)  (emit-variable x)]
       [(let? x)       (emit-let (bindings x) (body x))]
       [(if? x)        (emit-if x)]
+      [(lambda? x)    (emit-lambda x)]
       [(primcall? x)  (emit-primcall x)]))) 
 
 ; transverse the program and rewrite
