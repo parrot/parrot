@@ -435,20 +435,35 @@
 
 (define emit-lambda
   (lambda (x)
-    ;(write (cddar x))(newline)
-    (list  
-      (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "call")))
-      (list
-        (string->symbol "PAST::Block")
-        (append
-          (list
-            (string->symbol "PAST::Stmts"))
-          (map
-            (lambda (stmt)
-              ;(write stmt)
-              (emit-expr stmt))
-            (cddar x)))))))
+    (append
+      (list  
+        (string->symbol "PAST::Op")
+        (quasiquote (@ (pasttype "call")))
+        (list
+          (string->symbol "PAST::Block")
+          (quasiquote (@ (blocktype "declaration")
+                         (arity (unquote (length (cadar x))))))
+          (append
+            (list (string->symbol "PAST::Stmts"))
+            (map
+              (lambda (decl)
+                (list
+                  (string->symbol "PAST::Var")
+                  (quasiquote (@ (name (unquote decl))
+                                 (scope "parameter")))))
+              (cadar x)))
+          (append
+            (list (string->symbol "PAST::Stmts"))
+            (map
+              (lambda (stmt)
+                (emit-expr stmt))
+              (cddar x))))
+       )
+         (map
+           (lambda (arg)
+             (emit-expr arg))
+           (cdr x))
+)))
  
 ; emir PIR for an expression
 (define emit-expr
@@ -509,7 +524,6 @@
           (if (eq? '@ (car daughter))
             (for-each
               (lambda (key_val)
-                ;(write (list "emit-pushes3:" daughter (cadr daughter) (caadr daughter)(cadadr daughter)))(newline)
                 (emit "
                       reg_~a.init( '~a' => \"~a\" )
                       " uid (car key_val) (cadr key_val)))
