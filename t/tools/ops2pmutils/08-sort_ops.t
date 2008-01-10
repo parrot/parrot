@@ -26,7 +26,7 @@ use File::Copy;
 use File::Temp (qw| tempdir |);
 
 my $cwd = cwd();
-plan -e "$cwd/DEVELOPING" ? ( tests => 87 ) :
+plan -e "$cwd/DEVELOPING" ? ( tests => 86 ) :
                             ( skip_all => 'Requires DEVELOPING file' );
 
 use_ok('Parrot::Ops2pm::Utils');
@@ -249,17 +249,11 @@ DUMMYOPS
         ok( -f $skip,                   "ops.skip located after renumbering" );
 
         my ($stdout, $stderr);
-        my $ret = capture(
-            sub { $self->sort_ops() },
-            \$stdout,
-            \$stderr
-        );
-        ok($ret, "sort_ops returned successfully" );
-
+        eval { $self->sort_ops() };
         like(
-            $stderr,
+            $@,
             qr|not in ops\.num nor ops\.skip|,
-            "Got expected warning about ops in neither ops.num or ops.skip"
+            "Got expected failure about ops in neither ops.num or ops.skip"
         );
 
         # To do:  Test that the sorting was correct.
