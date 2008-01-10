@@ -20,4 +20,5 @@ HAI 1.2
   I HAS A ANY ITZ "ok 4"
   VISIBLE ANY
 
+  BTW vim: set filetype=lolcode :
 KTHXBYE

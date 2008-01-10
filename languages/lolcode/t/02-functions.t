@@ -6,4 +6,6 @@ HAI 1.2
   IF U SAY SO
 
   foo
+
+  BTW vim: set filetype=lolcode :
 KTHXBYE

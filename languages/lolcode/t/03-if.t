@@ -29,4 +29,5 @@ HAI 1.2
       VISIBLE "nok 3"
   OIC
 
+  BTW vim: set filetype=lolcode :
 KTHXBYE

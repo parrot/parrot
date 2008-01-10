@@ -14,4 +14,6 @@ HAI 1.2
 
   VISIBLE "o" !
   VISIBLE "k 4"
+
+  BTW vim: set filetype=lolcode :
 KTHXBYE
