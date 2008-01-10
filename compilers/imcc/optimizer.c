@@ -1821,16 +1821,19 @@ RT#48260: Not yet documented!!!
 */
 
 int
-loop_optimization(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
+loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int l, bb, loop_depth;
+    int l;
     int changed = 0;
     static int prev_depth;
 
-    loop_depth = prev_depth ? prev_depth : max_loop_depth(unit);
+    const int loop_depth = prev_depth ? prev_depth : max_loop_depth(unit);
+
     /* work from inside out */
     IMCC_debug(interp, DEBUG_OPT2, "loop_optimization\n");
     for (l = loop_depth; l > 0; l--) {
+        int bb;
+
         IMCC_debug(interp, DEBUG_OPT2, "loop_depth %d\n", l);
         for (bb = 0; bb < unit->n_basic_blocks; bb++)
             if (unit->bb_list[bb]->loop_depth == l) {
