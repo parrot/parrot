@@ -169,7 +169,7 @@ sub extract_function_declarations_and_update_source {
         $heading = "static $heading" if $specs->{is_static};
 
         $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n/=item C<$heading>\n/sm or
-            warn "Couldn't replace $name\n";
+            warn "$name has no POD\n";
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
     print {$fhout} $text;
