@@ -105,7 +105,7 @@ rule variable { <identifier> {*} }
 
 token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
 
-# Because PGE doesn't yet know how to do longest token matching,
+# RT #46213 : Because PGE doesn't yet know how to do longest token matching,
 # order all tokens in reverse alpha order to avoid a parsing bug.
 token keyword {
     [ 'YR' | 'YA' | 'WTF?' | 'WIN' | 'WAI' | 'VISIBLE' | 'U' | 'SUM' | 'SO'
