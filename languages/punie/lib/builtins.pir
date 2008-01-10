@@ -228,8 +228,13 @@
 
 .sub 'prefix:!'
     .param pmc a
-    $P0 = a
+    $P0 = !a
     .return ($P0)
+.end
+
+.sub 'infix:,'
+    .param pmc args            :slurpy
+    .return (args)
 .end
 
 .sub 'print'
@@ -246,9 +251,12 @@
     .return (1)
 .end
 
-.sub 'infix:,'
-    .param pmc args            :slurpy
-    .return (args)
+
+.sub 'chop'
+    .param pmc expr
+    $S0 = expr
+    chopn $S0, 1
+    .return ($S0)
 .end
 
 # Local Variables:

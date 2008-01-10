@@ -242,6 +242,22 @@ method term($/, $key) {
     make $( $/{$key} );
 }
 
+method list($/) {
+    make PAST::Op.new( :inline("    new %r, 'ResizablePMCArray'"), :node($/) );
+}
+
+method do_chop($/) {
+    my $past := PAST::Op.new( :name('chop'), :pasttype('call'), :node($/) );
+
+    if $<expr> {
+        $past.push( $( $<expr>[0] ) );
+    }
+    else { # XXX not sure if this scope should be package
+        $past.push( PAST::Var.new( :name('$_'), :scope('package') ) );
+    }
+    make $past;
+}
+
 method variable($/) {
     my $viviself := 'Undef';
     my $sigil := ~$<sigil>[0];

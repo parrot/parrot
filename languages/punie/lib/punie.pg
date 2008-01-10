@@ -98,6 +98,7 @@ rule 'oexpr' is optable { ... }
 
 
 token term {
+    | <list> {*}                                  #= list
     | \( <expr> \) {*}                           #= expr
     | <number> {*}                               #= number
     | <integer> {*}                              #= integer
@@ -107,7 +108,32 @@ token term {
     | do <.ws> <block> {*}                       #= block
     | <opcall> {*}                               #= subcall
     | <subcall> {*}                              #= subcall
+    | <do_chop> {*}                              #= do_chop
     | <variable> {*}                             #= variable
+
+    #| <split> {*}                                #= split
+    #| <join> {*}                                 #= join
+}
+
+
+rule list {
+    \( \)
+    {*}
+}
+
+## XXX add "pattern" to lexical rules.
+##rule split {
+##    split [\( <variable> [',' <variable> [',' <expr>]? ]? \)]?
+##}
+
+## XXX complete this and implement
+##rule join {
+##    join [\( <oexpr> ',' <expr> \)]?
+##}
+
+rule do_chop {
+    'chop' [\( <expr> \)]?
+    {*}
 }
 
 
