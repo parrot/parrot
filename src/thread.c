@@ -560,7 +560,7 @@ pt_ns_clone(ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
 
 =item C<void pt_clone_globals>
 
-RT#48260: Not yet documented!!!
+Copy global namespace when cloning new interpreter
 
 =cut
 
@@ -857,9 +857,8 @@ is_suspended_for_gc(PARROT_INTERP)
 
 =item C<static QUEUE_ENTRY * remove_queued_suspend_gc>
 
-XXX should this function be in a different file?
-
-RT#48260: Not yet documented!!!
+Remove an event requesting that the interpreter suspend itself for a
+garbage-collection run from the event queue.
 
 =cut
 
