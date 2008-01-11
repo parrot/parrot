@@ -167,6 +167,9 @@ F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
 Lua PMC have problems with the Parrot garbage collector : used objects are
 released by the GC (infant mortality ?).
 
+And Parrot has some problem,
+see L<http://rt.perl.org/rt3/Ticket/Display.html?id=49328>.
+
 So, use the option C<--no-gc>.
 
 =head2 TODO
@@ -233,6 +236,11 @@ These libraries are loaded dynamically with the Lua function C<require>.
 Debugging & stabilisation.
 
 Add a Lua bytecode translator as a package loader.
+
+=head2 FEEDBACK
+
+I try to summarize all my feedback, here :
+L<http://www.nntp.perl.org/group/perl.perl6.internals/2007/10/msg40493.html>.
 
 =head1 Related Projects
 
