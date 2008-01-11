@@ -470,7 +470,7 @@
 ; emir PIR for an expression
 (define emit-expr
   (lambda (x)
-    ;(diag (format "~s" x))
+    ;(diag (format "emit-expr: ~s" x))
     (cond
       [(immediate? x) (emit-immediate x)]
       [(variable? x)  (emit-variable x)]
@@ -486,30 +486,32 @@
 ;
 ; Currently a new S-expression is generated,
 ; as I don't know how to manipulate S-expressions while traversing it
-(define transform-and-or
+(define preprocess
   (lambda (tree)
     (cond [(atom? tree)
            tree]
           [(eqv? (car tree) 'and) 
            ( cond [(null? (cdr tree)) #t]
-                  [(= (length (cdr tree)) 1) (transform-and-or (cadr tree))]
+                  [(= (length (cdr tree)) 1) (preprocess (cadr tree))]
                   [else (quasiquote
                           (if
-                            (unquote (transform-and-or (cadr tree)))
-                            (unquote (transform-and-or (quasiquote (and (unquote-splicing (cddr tree))))))
+                            (unquote (preprocess (cadr tree)))
+                            (unquote (preprocess (quasiquote (and (unquote-splicing (cddr tree))))))
                             #f))])]
           [(eqv? (car tree) 'or) 
            ( cond [(null? (cdr tree)) #f]
-                  [(= (length (cdr tree)) 1) (transform-and-or (cadr tree))]
+                  [(= (length (cdr tree)) 1) (preprocess (cadr tree))]
                   [else (quasiquote
                           (if
-                           (unquote (transform-and-or (cadr tree)))
-                           (unquote (transform-and-or (cadr tree)))
-                           (unquote (transform-and-or (quasiquote (or (unquote-splicing (cddr tree))))))))])]
+                           (unquote (preprocess (cadr tree)))
+                           (unquote (preprocess (cadr tree)))
+                           (unquote (preprocess (quasiquote (or (unquote-splicing (cddr tree))))))))])]
           [(eqv? (car tree) 'not) 
-           (quasiquote (if (unquote (transform-and-or (cadr tree))) #f #t))]
+           (quasiquote (if (unquote (preprocess (cadr tree))) #f #t))]
+          [(eqv? (car tree) 'let*) 
+           (cons 'let (preprocess (cdr tree)))]
           [else
-           (map transform-and-or tree)]))) 
+           (map preprocess tree)]))) 
 
 ; eventually this will become a PIR generator
 ; for PAST as SXML
@@ -517,7 +519,7 @@
 (define past-sxml->past-pir
   (lambda (past)
     (let ([uid (gen-unique-id)])
-      ;(diag (format "~a" past))
+      ;(diag (format "to_pir: ~a" past))
       (emit "
             .local pmc reg_~a
             reg_~a = new '~a'
@@ -557,4 +559,4 @@
       (past-sxml->past-pir
         (wrap-say
           (emit-expr
-            (transform-and-or program)))))))
+            (preprocess program)))))))
