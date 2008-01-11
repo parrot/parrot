@@ -52,7 +52,7 @@ is( $conf->options->{c}->{debugging},
 my $errstr;
 {
     my $rv;
-    my ($stdout, $stderr); 
+    my ($stdout, $stderr);
     capture ( sub {eval {$rv    = $conf->runsteps } }, \$stdout, \$stderr );
     like(
         $stdout,

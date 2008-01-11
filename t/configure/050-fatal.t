@@ -40,7 +40,7 @@ is($conf->options->{c}->{debugging}, 1,
     my $rv;
     my ($stdout, $stderr);
     capture ( sub {$rv    = $conf->runsteps}, \$stdout, \$stderr );
-    
+
     ok(! defined $rv, "runsteps returned undefined value as expected");
 }
 

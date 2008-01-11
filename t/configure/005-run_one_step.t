@@ -69,7 +69,7 @@ is( $conf->options->{c}->{debugging},
 {
     my $rv ;
     my ($stdout, $stderr);
-    capture( sub {$rv = $conf->runsteps }, \$stdout, \$stderr ); 
+    capture( sub {$rv = $conf->runsteps }, \$stdout, \$stderr );
     ok( $rv, "runsteps successfully ran $step" );
     like( $stdout, qr/$description/, "Got message expected upon running $step" );
 }

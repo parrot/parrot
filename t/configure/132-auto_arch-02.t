@@ -60,7 +60,7 @@ my $errstr;
         );
     } else {
         pass("Test not needed except on Darwin");
-    } 
+    }
 }
 
 pass("Keep Devel::Cover happy");

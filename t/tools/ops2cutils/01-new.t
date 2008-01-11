@@ -56,7 +56,7 @@ my ( $msg, $tie );
         my $self;
         my ($stdout, $stderr);
         my $ret = capture(
-           sub { 
+           sub {
                 $self = Parrot::Ops2c::Utils->new(
                     { argv => [@ARGV], flag => {} }
                 );
@@ -78,7 +78,7 @@ my ( $msg, $tie );
         my $self;
         my ($stdout, $stderr);
         my $ret = capture(
-           sub { 
+           sub {
                 $self = Parrot::Ops2c::Utils->new(
                     { argv => [@ARGV], flag => {}, }
                 );
@@ -127,7 +127,7 @@ my ( $msg, $tie );
         my $self;
         my ($stdout, $stderr);
         my $ret = capture(
-           sub { 
+           sub {
                 $self = Parrot::Ops2c::Utils->new( { argv => [@ARGV], });
             },
             \$stdout,

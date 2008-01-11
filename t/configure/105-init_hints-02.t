@@ -66,7 +66,7 @@ END
     # need to capture the --verbose output,
     # because the fact that it does not end
     # in a newline confuses Test::Harness
-    { 
+    {
      my $rv;
      my $stdout;
      capture ( sub {$rv = $step->runstep($conf)}, \$stdout);

@@ -54,7 +54,7 @@ $verbose = 1;
     is($step->result, q{no}, "Got expected 'no' result");
     like($stdout, qr/no/, "Got expected verbose output");
 }
-    
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
@@ -71,7 +71,7 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test methods found in configuration step class 
+The tests in this file test methods found in configuration step class
 config::auto::aio.
 
 =head1 AUTHOR

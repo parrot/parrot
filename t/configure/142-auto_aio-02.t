@@ -73,7 +73,7 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test methods found in configuration step class 
+The tests in this file test methods found in configuration step class
 config::auto::aio in the case where C<--verbose> is selected.
 
 =head1 AUTHOR

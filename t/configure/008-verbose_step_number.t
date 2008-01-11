@@ -51,7 +51,7 @@ is( $conf->options->{c}->{debugging},
 
 {
     my $rv;
-    my $stdout; 
+    my $stdout;
     capture ( sub {$rv    = $conf->runsteps}, \$stdout );
     ok( $rv, "runsteps successfully ran $step" );
     like(

@@ -106,7 +106,7 @@ my $cwd = cwd();
     open my $FH, ">", $foo or croak "Could not open for writing";
     print $FH "Hello world\n";
     close $FH or croak "Could not close after writing";
-    
+
     $osname = 'darwin';
     $flagsbefore = $conf->data->get( 'linkflags' );
     ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),

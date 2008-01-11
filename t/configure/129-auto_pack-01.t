@@ -47,7 +47,7 @@ ok($step->description(), "$step_name has description");
         "Got expected value for packtype_b");
     is($conf->data->get('packtype_n'), 'D',
         "Got expected value for packtype_n");
-        
+
     # prepare for next test
     $conf->data->set( numvalsize => $current_numvalsize );
     $conf->data->set( packtype_b => undef );
@@ -62,7 +62,7 @@ ok($step->description(), "$step_name has description");
         "Got expected value for packtype_b");
     is($conf->data->get('packtype_n'), 'd',
         "Got expected value for packtype_n");
-        
+
     # prepare for next test
     $conf->data->set( numvalsize => $current_numvalsize );
     $conf->data->set( packtype_b => undef );

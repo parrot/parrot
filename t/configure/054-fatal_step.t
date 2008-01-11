@@ -52,7 +52,7 @@ is( $conf->options->{c}->{debugging},
    my $rv;
    my $stdout;
    capture ( sub {$rv    = $conf->runsteps}, \$stdout);
-   ok($rv, "runsteps() returned true value"); 
+   ok($rv, "runsteps() returned true value");
    like($stdout,
    qr/$description\.\.\./s,
    "Got STDOUT message expected upon running $step");

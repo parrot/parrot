@@ -31,7 +31,7 @@ like(
     print $IN qq{Hello world\n};
     close $IN or croak "Unable to close temp file";
     ok(
-        $conf->genfile( 
+        $conf->genfile(
             $dummy   => 'CFLAGS',
             makefile => 1,
         ),
@@ -66,7 +66,7 @@ like(
     print $IN qq{#perl Hello world\n};
     close $IN or croak "Unable to close temp file";
     ok(
-        $conf->genfile( 
+        $conf->genfile(
             $dummy       => 'CFLAGS',
             makefile     => 1,
             feature_file => 0,
@@ -107,7 +107,7 @@ END_DUMMY
     close $IN or croak "Unable to close temp file";
     my ($rv, $stdout, $stderr) ;
     capture (
-        sub { $rv = $conf->genfile( $dummy => 'CFLAGS' ) }, 
+        sub { $rv = $conf->genfile( $dummy => 'CFLAGS' ) },
         \$stdout,
         \$stderr
     );
@@ -143,7 +143,7 @@ END_DUMMY
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
     ok(
-        $conf->genfile( 
+        $conf->genfile(
             $dummy              => 'CFLAGS',
             expand_gmake_syntax => 1,
         ),
@@ -163,7 +163,7 @@ END_DUMMY
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
     ok(
-        $conf->genfile( 
+        $conf->genfile(
             $dummy              => 'CFLAGS',
             expand_gmake_syntax => 1,
         ),
@@ -183,7 +183,7 @@ END_DUMMY
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
     ok(
-        $conf->genfile( 
+        $conf->genfile(
             $dummy              => 'CFLAGS',
             expand_gmake_syntax => 1,
         ),
@@ -203,7 +203,7 @@ END_DUMMY
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
     ok(
-        $conf->genfile( 
+        $conf->genfile(
             $dummy              => 'CFLAGS',
             expand_gmake_syntax => 1,
         ),

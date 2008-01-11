@@ -54,7 +54,7 @@ is( $conf->options->{c}->{debugging},
     my ($stdout, $stderr);
     capture ( sub {$rv    = $conf->runsteps}, \$stdout, \$stderr );
     ok(! defined $rv, 'runsteps() returned undef');
-    
+
     like($stdout,
     qr/$description\.\.\./s,
     "Got STDOUT message expected upon running $step");

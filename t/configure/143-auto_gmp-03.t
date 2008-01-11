@@ -54,7 +54,7 @@ is($conf->data->get('HAS_GMP'), 1, "Expected value set for 'HAS_GMP'");
 # prepare for next test
 $conf->data->set('gmp' => undef);
 $conf->data->set('HAS_GMP' => undef);
-$step->set_result(undef); 
+$step->set_result(undef);
 
 $test = '12345';
 $has_gmp = 0;
@@ -80,7 +80,7 @@ is($has_gmp, 0, "gmp status unchanged");
     # prepare for next test
     $conf->data->set('gmp' => undef);
     $conf->data->set('HAS_GMP' => undef);
-    $step->set_result(undef); 
+    $step->set_result(undef);
 }
 
 my ($libs, $ccflags, $linkflags);
