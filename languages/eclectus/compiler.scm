@@ -190,7 +190,7 @@
 (define-primitive (fxadd1 arg)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pirop "n_add")))
+    '(@ (pirop "n_add"))
     (emit-expr arg)
     (emit-expr 1)))
 
@@ -198,7 +198,7 @@
 (define-primitive (fx+ arg1 arg2)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pirop "n_add")))
+    '(@ (pirop "n_add"))
     (emit-expr arg1)
     (emit-expr arg2)))
 
@@ -206,7 +206,7 @@
 (define-primitive (fxsub1 arg)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pirop "n_sub")))
+    '(@ (pirop "n_sub"))
     (emit-expr arg)
     (emit-expr 1)))
 
@@ -214,7 +214,7 @@
 (define-primitive (fx- arg1 arg2)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pirop "n_sub")))
+    '(@ (pirop "n_sub"))
     (emit-expr arg1)
     (emit-expr arg2)))
 
@@ -222,7 +222,7 @@
 (define-primitive (fxlogand arg1 arg2)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pirop "n_band")))
+    '(@ (pirop "n_band"))
     (emit-expr arg1)
     (emit-expr arg2)))
 
@@ -230,7 +230,7 @@
 (define-primitive (fxlogor arg1 arg2)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pirop "n_bor")))
+    '(@ (pirop "n_bor"))
     (emit-expr arg1)
     (emit-expr arg2)))
 
@@ -238,23 +238,23 @@
 (define-primitive (char->fixnum arg)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "inline")
-                   (inline "new %r, 'EclectusFixnum'\\nassign %r, %0\\n")))
+    '(@ (pasttype "inline")
+                   (inline "new %r, 'EclectusFixnum'\\nassign %r, %0\\n"))
     (emit-expr arg)))
 
 ; implementation of fixnum->char
 (define-primitive (fixnum->char arg)
   (list
     (string->symbol "PAST::Op")
-    (quasiquote (@ (pasttype "inline")
-                   (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n")))
+    '(@ (pasttype "inline")
+                   (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n"))
     (emit-expr arg)))
 
 (define emit-comparison
   (lambda (builtin arg1 arg2)
     (list
       (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "if")))
+      '(@ (pasttype "if"))
       (list
         (string->symbol "PAST::Op")
         (quasiquote (@ (pasttype "chain")
@@ -312,7 +312,7 @@
   (lambda (typename arg)
     (list
       (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "if")))
+      '(@ (pasttype "if"))
       (list
         (string->symbol "PAST::Op")
         (quasiquote (@ (pasttype "inline")
@@ -363,7 +363,7 @@
     (append
       (list  
         (string->symbol "PAST::Op")
-        (quasiquote (@ (pasttype "call")))
+        '(@ (pasttype "call"))
         (emit-expr (car x)))
       (map
         (lambda (arg)
@@ -385,8 +385,8 @@
                         (returns "EclectusCharacter")))]
         [(and (list? x)
               (= (length x) 0))
-         (quasiquote (@ (value 0)
-                        (returns "EclectusEmptyList")))]
+         '(@ (value 0)
+             (returns "EclectusEmptyList"))]
         [(boolean? x)
          (quasiquote (@ (value (unquote (if x 1 0)))
                         (returns "EclectusBoolean")))]
@@ -422,8 +422,8 @@
               (lambda (decl)
                 (list
                   (string->symbol "PAST::Op")
-                  (quasiquote (@ (pasttype "copy")
-                                 (lvalue "1")))
+                  '(@ (pasttype "copy")
+                      (lvalue "1"))
                   (list
                     (string->symbol "PAST::Var")
                     (quasiquote (@ (name (unquote (car decl)))
@@ -439,7 +439,7 @@
   (lambda (x)
     (list
       (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "if")))
+      '(@ (pasttype "if"))
       (emit-expr (if-test x))
       (emit-expr (if-conseq x))
       (emit-expr (if-altern x)))))
@@ -544,8 +544,8 @@
   (lambda (past)
     (list
       (string->symbol "PAST::Op")
-      (quasiquote (@ (pasttype "call")
-                     (name "say")))
+      '(@ (pasttype "call")
+          (name "say"))
       past)))
 
 ; the actual compiler
