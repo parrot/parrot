@@ -435,6 +435,7 @@
 
 (define emit-lambda
   (lambda (x)
+    ;(write (list "all" x "decl" (cadar x) "stmts" (cddar x) "params" (cdr x)))(newline)
     (append
       (list  
         (string->symbol "PAST::Op")
