@@ -342,6 +342,27 @@
 #  define YYLTYPE_IS_TRIVIAL 0
 #endif
 
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+compilers/mcc/imcparser.c - XXX What does this do?
+src/string.c - Parrot Strings
+
+=head1 DESCRIPTION
+
+XXX Fill this in
+
+=head1 FUNCTIONS
+
+=over 4
+
+=cut
+
+*/
+
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
@@ -518,18 +539,26 @@ static void set_lexical(PARROT_INTERP,
 
 
 /*
- * MK_I: build and emitb instruction by INS
- *
- * fmt may contain:
- *   op %s, %s # comment
- * or just
- *   op
- *
- *
- *  NOTE: Most usage of this function is with
- *        IMCC_INFO(interp)->cur_unit, but there are some
- *        exceptions. Thus, we can't easily factorize that piece of
- *        code.
+
+=item C<static Instruction * MK_I>
+
+build and emitb instruction by INS
+
+fmt may contain:
+
+  op %s, %s # comment
+
+or just
+
+  op
+
+
+NOTE: Most usage of this function is with C<< IMCC_INFO(interp)->cur_unit >>,
+but there are some exceptions. Thus, we can't easily factorize that
+piece of code.
+
+=cut
+
  */
 
 PARROT_IGNORABLE_RESULT
@@ -4771,7 +4800,7 @@ char *yyget_text(yyscan_t yyscanner);
  */
 /* int yyholds_char(yyscan_t yyscanner ); */
 
-int yyerror(void *yyscanner, PARROT_INTERP, char * s)
+int yyerror(void *yyscanner, PARROT_INTERP, const char *s)
 {
     /* If the error occurr in the end of the buffer (I mean, the last
      * token was already read), yyget_text will return a pointer
@@ -4814,10 +4843,21 @@ int yyerror(void *yyscanner, PARROT_INTERP, char * s)
     return 0;
 }
 
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+=cut
+
+*/
+
+
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
