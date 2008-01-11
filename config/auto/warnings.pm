@@ -93,7 +93,7 @@ sub _init {
         -Wwrite-strings
         -Wnot-a-real-warning
     );
-    
+
     my @cage_warnings = qw(
         -std=c89
         -Wconversion
@@ -120,7 +120,7 @@ sub _init {
         -Wunused-value
         -Wunused-variable
     );
-    
+
     $data{potential_warnings} = \@potential_warnings;
     $data{cage_warnings} = \@cage_warnings;
     return \%data;
