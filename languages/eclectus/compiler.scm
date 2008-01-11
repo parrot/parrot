@@ -143,9 +143,7 @@
   (make-combination-predicate 'let))
 
 (define lambda?
-  (lambda (x)
-    (and (pair? x)
-         (pair? (car x)))))
+  (make-combination-predicate 'lambda))
 
 (define if-test
   (lambda (form)
@@ -360,6 +358,19 @@
     (let ([prim (car x)] [args (cdr x)])
       (apply (primitive-emitter prim) args))))
 
+(define emit-functional-application
+  (lambda (x)
+    (append
+      (list  
+        (string->symbol "PAST::Op")
+        (quasiquote (@ (pasttype "call")))
+        (emit-expr (car x)))
+      (map
+        (lambda (arg)
+          (emit-expr arg))
+        (cdr x)))))
+
+
 ; emit PIR for a scalar
 (define emit-immediate
   (lambda (x)
@@ -434,36 +445,28 @@
       (emit-expr (if-altern x)))))
 
 (define emit-lambda
-  (lambda (x)
-    ;(write (list "all" x "decl" (cadar x) "stmts" (cddar x) "params" (cdr x)))(newline)
-    (append
-      (list  
-        (string->symbol "PAST::Op")
-        (quasiquote (@ (pasttype "call")))
-        (list
-          (string->symbol "PAST::Block")
-          (quasiquote (@ (blocktype "declaration")
-                         (arity (unquote (length (cadar x))))))
-          (cons
-            (string->symbol "PAST::Stmts")
-            (map
-              (lambda (decl)
-                (list
-                  (string->symbol "PAST::Var")
-                  (quasiquote (@ (name (unquote decl))
-                                 (scope "parameter")))))
-              (cadar x)))
-          (cons
-            (string->symbol "PAST::Stmts")
-            (map
-              (lambda (stmt)
-                (emit-expr stmt))
-              (cddar x)))))
-       (map
-         (lambda (arg)
-           (emit-expr arg))
-         (cdr x)))))
- 
+  (lambda (x)  
+    ; (write (list "all" x "decl" (cadr x) "stmts" (cddr x) ))(newline)
+    (list
+      (string->symbol "PAST::Block")
+      (quasiquote (@ (blocktype "declaration")
+                     (arity (unquote (length (cadr x))))))
+      (cons
+        (string->symbol "PAST::Stmts")
+        (map
+          (lambda (decl)
+            (list
+              (string->symbol "PAST::Var")
+              (quasiquote (@ (name (unquote decl))
+                             (scope "parameter")))))
+          (cadr x)))
+      (cons
+        (string->symbol "PAST::Stmts")
+        (map
+          (lambda (stmt)
+            (emit-expr stmt))
+          (cddr x))))))
+
 ; emir PIR for an expression
 (define emit-expr
   (lambda (x)
@@ -474,7 +477,8 @@
       [(let? x)       (emit-let (bindings x) (body x))]
       [(if? x)        (emit-if x)]
       [(lambda? x)    (emit-lambda x)]
-      [(primcall? x)  (emit-primcall x)]))) 
+      [(primcall? x)  (emit-primcall x)]
+      [else           (emit-functional-application x)]))) 
 
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling
