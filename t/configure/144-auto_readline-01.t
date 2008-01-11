@@ -132,7 +132,7 @@ $conf->data->set( 'linkflags' => undef );
 
 $cwd = cwd();
 {
-    my $tdir3 = tempdir( CLEANUP => 1 );
+    my $tdir3 = File::Spec->canonpath( tempdir( CLEANUP => 1 ) );
     ok(chdir $tdir3, "Able to change to temporary directory");
     $step->{macports_root} = $tdir3;
     ok( (mkdir 'lib'), "Able to make lib directory");
@@ -148,7 +148,9 @@ $cwd = cwd();
     ok($step->_handle_darwin_for_macports(
         $conf, $osname, 'readline/readline.h'),
         "handle_darwin_for_macports() returned true value");
-    like($conf->data->get( 'linkflags' ), qr/-L\Q$libdir\E/,
+    like(
+        File::Spec->canonpath( $conf->data->get( 'linkflags' ) ),
+        qr/\Q$libdir\E/,
         "Linkflags modified as expected" );
     chdir $cwd or croak "Unable to change back to original directory";
 }
