@@ -225,6 +225,7 @@ D: Debian packaging
 S: Chemnitz, Germany
 
 N: François Perrad
+W: http://fperrad.googlepages.com/home
 D: build fixes for MinGW
 D: a patch to remove slash_exec from config
 D: language Lua
