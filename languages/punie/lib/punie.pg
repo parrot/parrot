@@ -15,6 +15,18 @@ token ws {
 
 token block { \{ <lineseq> \} {*} }
 
+rule compblock {
+    <block>
+    [ 'continue' <block>
+    | $<else>=<else>?
+    ]
+}
+
+rule else {
+    | 'else' <block>
+    | 'elsif' \( <expr> \) <compblock>
+}
+
 rule lineseq {
     <line>*
     {*}
@@ -26,6 +38,7 @@ token line {
       [ <cond> {*}                                 #= cond
       | <subroutine> {*}                           #= subroutine
       | <sideff> ';' {*}                           #= sideff
+      | ';' {*}                                    #= label
       ] \s*
 
 }
@@ -109,6 +122,9 @@ token term {
     | <opcall> {*}                               #= subcall
     | <subcall> {*}                              #= subcall
     | <do_chop> {*}                              #= do_chop
+    | <do_pop> {*}                               #= do_pop
+    | <do_push> {*}                              #= do_push
+    | <do_shift> {*}                             #= do_shift
     | <variable> {*}                             #= variable
 
     #| <split> {*}                                #= split
@@ -136,10 +152,32 @@ rule do_chop {
     {*}
 }
 
+rule do_pop {
+    [
+    | 'pop' [\( <arrayvar> \) | <arrayvar> ]
+    | 'pop' [\( <word> \) | <word> ]
+    ]
+    {*}
+}
+
+rule do_push {
+    'push' \( <arrayvar> ',' <expr> \)
+    {*}
+}
+
+rule do_shift {
+    'shift' [\( <arrayvar> \) | <arrayvar> ]?
+    {*}
+}
 
 rule variable {
     | <sigil>? <word> <key>? {*}
     | <special_variable> <key>? {*}
+}
+
+token arrayvar {
+    '@' <word>
+    {*}
 }
 
 token special_variable { '$_' | '$#' | '$ ' '_' }

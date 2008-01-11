@@ -45,7 +45,12 @@ method lineseq ($/) {
 }
 
 method line ($/, $key) {
-    make $( $/{$key} );
+    if $key eq 'label' {
+        # make a label thingy
+    }
+    else {
+        make $( $/{$key} );
+    }
 }
 
 method sideff($/) {
@@ -256,6 +261,34 @@ method do_chop($/) {
         $past.push( PAST::Var.new( :name('$_'), :scope('package') ) );
     }
     make $past;
+}
+
+method do_pop($/) {
+    my $past := PAST::Op.new( :name('pop'), :pasttype('call'), :node($/) );
+    $past.push( $( $<arrayvar> ) );
+    make $past;
+}
+
+method do_push($/) {
+    my $past := PAST::Op.new( :name('push'), :pasttype('call'), :node($/) );
+    $past.push( $( $<arrayvar> ) );
+    $past.push( $( $<expr> ) );
+    make $past;
+}
+
+method do_shift($/) {
+    my $past := PAST::Op.new( :name('shift'), :pasttype('call'), :node($/) );
+    if $<arrayvar> {
+        $past.push( $( $<arrayvar>[0] ) );
+    }
+    else {
+        $past.push( PAST::Var.new( :name('$_'), :scope('package') ) );
+    }
+    make $past;
+}
+
+method arrayvar($/) {
+    make PAST::Var.new( :node($/), :name(~$/), :scope('package') );
 }
 
 method variable($/) {

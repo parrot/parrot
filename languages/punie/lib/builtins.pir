@@ -228,7 +228,7 @@
 
 .sub 'prefix:!'
     .param pmc a
-    $P0 = !a
+    not $P0, a
     .return ($P0)
 .end
 
@@ -258,6 +258,25 @@
     chopn $S0, 1
     .return ($S0)
 .end
+
+.sub 'pop'
+    .param pmc arr
+    $P0 = pop arr
+    .return ($P0)
+.end
+
+.sub 'push'
+    .param pmc arr
+    .param pmc exp
+    push arr, exp
+.end
+
+.sub 'shift'
+    .param pmc arr
+    $P0 = shift arr
+    .return ($P0)
+.end
+
 
 # Local Variables:
 #   mode: pir
