@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 package Parrot::Pmc2c::Method;
 use strict;
@@ -6,7 +6,6 @@ use warnings;
 use constant VTABLE_ENTRY => 'VTABLE_ENTRY';
 use constant VTABLE       => 'VTABLE';
 use constant NON_VTABLE   => 'NON_VTABLE';
-use Carp;
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines args_from_parameter_list passable_args_from_parameter_list);
 
 sub new {
@@ -56,7 +55,7 @@ EOC
         eval $code;
     }
 
-    sub is_vtable {
+sub is_vtable {
     my ($self) = @_;
     my $type = $self->type;
     return $type eq VTABLE || $type eq VTABLE_ENTRY;
