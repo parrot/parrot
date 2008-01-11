@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 40;
+use Test::More tests => 46;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -151,7 +151,29 @@ $cwd = cwd();
     like(
         File::Spec->canonpath( $conf->data->get( 'linkflags' ) ),
         qr/\Q$libdir\E/,
-        "Linkflags modified as expected" );
+        "'linkflags' modified as expected" );
+    chdir $cwd or croak "Unable to change back to original directory";
+}
+
+$cwd = cwd();
+{
+    my $tdir3 = File::Spec->canonpath( tempdir( CLEANUP => 1 ) );
+    ok(chdir $tdir3, "Able to change to temporary directory");
+    $step->{macports_root} = $tdir3;
+    ok( (mkdir 'lib'), "Able to make lib directory");
+    ok( (mkdir 'include'), "Able to make include directory");
+    ok( (mkdir 'include/readline'), "Able to make include/readline directory");
+    my $libdir = File::Spec->catdir( $tdir3, 'lib' );
+    my $includedir = File::Spec->catdir( $tdir3, 'include' );
+    my $file = qq{$includedir/readline/readline.h};
+    $osname = 'darwin';
+    $flagsbefore = $conf->data->get( 'linkflags' );
+    ok($step->_handle_darwin_for_macports(
+        $conf, $osname, 'readline/readline.h'),
+        "handle_darwin_for_macports() returned true value");
+    $flagsafter = $conf->data->get( 'linkflags' );
+    is($flagsbefore, $flagsafter, "As expected, no change in 'linkflags'");
+
     chdir $cwd or croak "Unable to change back to original directory";
 }
 
