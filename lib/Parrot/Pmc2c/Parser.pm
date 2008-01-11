@@ -1,13 +1,13 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 package Parrot::Pmc2c::Parser;
 use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
-use Parrot::Pmc2c::PMC;
-use Parrot::Pmc2c::Method;
-use Parrot::Pmc2c::Emitter;
+use Parrot::Pmc2c::PMC ();
+use Parrot::Pmc2c::Method ();
+use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
 use Text::Balanced 'extract_bracketed';
 
