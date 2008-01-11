@@ -42,7 +42,7 @@ use lib ("lib");
 our @EXPORT    = ();
 our @EXPORT_OK = qw(
     prompt copy_if_diff move_if_diff integrate
-    capture_output check_progs _slurp 
+    capture_output check_progs _slurp
     _run_command _build_compile_command
 );
 our %EXPORT_TAGS = (
