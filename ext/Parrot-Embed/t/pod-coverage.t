@@ -2,6 +2,8 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
+use warnings;
+use strict;
 
 use Test::More;
 sub Pod::Coverage::TRACE_ALL () { 1 }
