@@ -318,7 +318,7 @@ static int sub_pragma(PARROT_INTERP, int action, ARGIN(const PMC *sub_pmc))
 
 #define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
 #define ALIGN_16(st, cursor) \
-    (cursor) += ROUND_16((char *)(cursor) - (char *)(st))/sizeof (opcode_t)
+    (cursor) += ROUND_16((const char *)(cursor) - (const char *)(st))/sizeof (opcode_t)
 
 /*
 
