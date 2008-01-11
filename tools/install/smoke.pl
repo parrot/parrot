@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 23;
 
 =head1 NAME
 
@@ -44,6 +44,10 @@ $out = `$exe`;
 ok($out =~ /^pdump/, "check pdump");
 
 ok(system("$parrot -V") == 0, "display parrot version");
+
+$exe = catfile('bin', 'perl6');
+$out = `$exe -v`;
+ok($out =~ /perl6/, "check perl6");
 
 #
 # some compiler tools

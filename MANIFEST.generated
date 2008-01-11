@@ -77,10 +77,14 @@ pbc_info                                          [main]bin
 pbc_info.exe                                      [main]bin
 pbc_merge                                         [main]bin
 pbc_merge.exe                                     [main]bin
+pbc_to_exe                                        [main]bin
+pbc_to_exe.exe                                    [main]bin
 pdb                                               [main]bin
 pdb.exe                                           [main]bin
 pdump                                             [main]bin
 pdump.exe                                         [main]bin
+perl6                                             [main]bin
+perl6.exe                                         [main]bin
 runtime/parrot/dynext/amber_kernel.bundle         [library]
 runtime/parrot/dynext/amber_kernel.dll            [library]
 runtime/parrot/dynext/amber_kernel.dylib          [library]

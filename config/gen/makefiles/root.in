@@ -797,6 +797,7 @@ $(PBC_TO_EXE) : pbc_to_exe.pir
 $(PERL6) : all $(PBC_TO_EXE)
 	$(MAKE) languages/perl6
 	$(PBC_TO_EXE) languages/perl6/perl6.pbc
+	$(CP) languages/perl6/perl6$(EXE) $(PERL6)
 
 
 # TODO build the real miniparrot
