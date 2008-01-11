@@ -19,6 +19,7 @@ package auto::readline;
 
 use strict;
 use warnings;
+use File::Spec;
 
 use base qw(Parrot::Configure::Step);
 
@@ -30,6 +31,7 @@ sub _init {
     $data{description} = q{Determining if your platform supports readline};
     $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
+    $data{macports_root} = File::Spec->catdir( '/', 'opt', 'local' );
     return \%data;
 }
 
@@ -55,7 +57,7 @@ sub runstep {
     # 'auto::macports' config step and do not yet have enough basis to extract
     # this code into a Parrot::Configure::Step::Methods method analogous to
     # _handle_darwin_for_fink().
-    _handle_darwin_for_macports($conf, $osname);
+    $self->_handle_darwin_for_macports($conf, $osname, q{readline/readline.h});
 
     $conf->cc_gen('config/auto/readline/readline.in');
     my $has_readline = 0;
@@ -92,12 +94,16 @@ sub _handle_mswin32 {
 }
 
 sub _handle_darwin_for_macports {
-    my ($conf, $osname) = @_;
+    my $self = shift;
+    my ($conf, $osname, $file) = @_;
     if ( $osname =~ /darwin/ ) {
-        if ( -f "/opt/local/include/readline/readline.h" ) {
-            $conf->data->add( ' ', linkflags => '-L/opt/local/lib' );
-            $conf->data->add( ' ', ldflags   => '-L/opt/local/lib' );
-            $conf->data->add( ' ', ccflags   => '-I/opt/local/include' );
+        my $macports_root = $self->{macports_root};
+        my $macports_lib_dir = qq{$macports_root/lib};
+        my $macports_include_dir = qq{$macports_root/include};
+        if ( -f qq{$macports_include_dir/$file} ) {
+            $conf->data->add( ' ', linkflags => "-L$macports_lib_dir" );
+            $conf->data->add( ' ', ldflags   => "-L$macports_lib_dir" );
+            $conf->data->add( ' ', ccflags   => "-I$macports_include_dir" );
         }
     }
     return 1;

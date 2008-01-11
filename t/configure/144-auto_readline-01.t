@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 35;
+use Test::More qw(no_plan); # tests => 40;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -123,16 +123,35 @@ my $cwd = cwd();
 
 $osname = 'foobar';
 $flagsbefore = $conf->data->get( 'linkflags' );
-ok(auto::readline::_handle_darwin_for_macports($conf, $osname, 'readline/readline.h'),
+ok($step->_handle_darwin_for_macports($conf, $osname, 'readline/readline.h'),
     "handle_darwin_for_macports() returned true value");
 $flagsafter = $conf->data->get( 'linkflags' );
 is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
+# Get ready for the next test
+$conf->data->set( 'linkflags' => undef );
 
-$osname = 'darwin';
-ok(auto::readline::_handle_darwin_for_macports($conf, $osname, 'readline/readline.h'),
-    "handle_darwin_for_macports() returned true value");
-# Cannot yet do more specific tests for macports, because path to
-# readline/readline.h in sub is an absolute path.
+$cwd = cwd();
+{
+    my $tdir3 = tempdir( CLEANUP => 1 );
+    ok(chdir $tdir3, "Able to change to temporary directory");
+    $step->{macports_root} = $tdir3;
+    ok( (mkdir 'lib'), "Able to make lib directory");
+    ok( (mkdir 'include'), "Able to make include directory");
+    ok( (mkdir 'include/readline'), "Able to make include/readline directory");
+    my $libdir = File::Spec->catdir( $tdir3, 'lib' );
+    my $includedir = File::Spec->catdir( $tdir3, 'include' );
+    my $file = qq{$includedir/readline/readline.h};
+    open my $FH, ">", $file or croak "Unable to open $file for writing";
+    print $FH qq{Hello Darwin\n};
+    close $FH or croak "Unable to close $file after writing";
+    $osname = 'darwin';
+    ok($step->_handle_darwin_for_macports(
+        $conf, $osname, 'readline/readline.h'),
+        "handle_darwin_for_macports() returned true value");
+    like($conf->data->get( 'linkflags' ), qr/-L\Q$libdir\E/,
+        "Linkflags modified as expected" );
+    chdir $cwd or croak "Unable to change back to original directory";
+}
 
 pass("Completed all tests in $0");
 

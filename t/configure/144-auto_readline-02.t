@@ -17,14 +17,6 @@ use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use IO::CaptureOutput qw| capture |;
 
-=for hints_for_testing The documentation for this package is skimpy;
-please try to improve it, e.g., by providing a short description of what
-the 'readline' function is.  Some branches are compiler- or OS-specific.
-As noted in a comment in the module, please consider the issues raised
-in http://rt.perl.org/rt3/Ticket/Display.html?id=43134.
-
-=cut
-
 my $args = process_options(
     {
         argv => [ ],
