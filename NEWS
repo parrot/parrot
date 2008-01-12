@@ -1,5 +1,38 @@
 # $Id$
 
+New in 0.5.2
+- Documentation
+  + New multiple dispatch PDD (PDD27).
+  + Numerous small updates to glossary.pod, etc
+- Compilers
+  + IMCC: started support of new :invocant flag
+  + NQP: optional, named, and named/required parameters
+  + PIRC: cleanups
+  + PAST: "defined-or"
+- Languages
+  + New mk_language_shell.pl script creates language stubs
+  + lolcode: new
+  + Lua: various
+  + Eclectus: numerous
+  + Perl6: list ops, compiler directives, command-line options, etc.
+  + punie: more ops, control structures, code refactoring
+- Implementation
+  + New "pbc_to_exe" utility turns bytecode to executables
+  + New set_outer method for subs
+  + Further configuration refactoring for testability
+  + All functions now completely headerized
+  + Concurrency: interpreter schedulers
+- Deprecations
+  + DYNSELF (changes to SELF; SELF to STATICSELF)
+  + METHOD (replaced by renaming PCCMETHOD)
+  + pmcinfo op (superseded by 'inspect')
+  + get_attr, set_attr, and 8 other vtable methods
+  + See DEPRECATED.pod for details
+- Miscellaneous
+  + Many bug fixes
+  + Debian packaging
+  + consting, attribute marking, warnings cleanup, ...
+
 New in 0.5.1
 - Documentation
   + PDD19 (PIR) - reflect state on the ground; incorporate old IMCC docs
@@ -30,7 +63,6 @@ New in 0.5.1
   + Bug cleanup
   + consting, attribute marking, warnings cleanup, memory leaks, GC...
   + dead code removal (includes some defunct languages)
-
 
 New in 0.5.0
 - Implementation
