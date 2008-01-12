@@ -69,9 +69,7 @@ sub _evaluate_msvc {
     my $status = $self->_handle_not_msvc($conf, $major, $minor, $verbose);
     return 1 if $status;
 
-    my $msvcversion = "$major.$minor";
-    print " (yep: $msvcversion )" if $verbose;
-    $self->set_result('yes');
+    my $msvcversion = $self->_compose_msvcversion($major, $minor, $verbose);
 
     $conf->data->set( msvcversion => $msvcversion );
 
@@ -100,6 +98,15 @@ sub _handle_not_msvc {
         $status++;
     }
     return $status;
+}
+
+sub _compose_msvcversion {
+    my $self = shift;
+    my ($major, $minor, $verbose) = @_;
+    my $msvcversion = "$major.$minor";
+    print " (yep: $msvcversion )" if $verbose;
+    $self->set_result('yes');
+    return $msvcversion;
 }
 
 1;

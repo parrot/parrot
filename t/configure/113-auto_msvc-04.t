@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 27;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -79,8 +79,36 @@ ok(! defined ($conf->data->get( 'msvcversion' )),
     ok(! defined ($conf->data->get( 'msvcversion' )),
         'msvcversion is undef, as expected');
     like($stdout, qr/\(no\)/, "Got expected verbose output");
+    # Prepare for the next test.
+    $step->set_result(undef);
 }
 
+my $msvcversion;
+
+$major = 13;
+$minor = 99;
+$verbose = undef;
+$msvcversion = $step->_compose_msvcversion($major, $minor, $verbose);
+is($msvcversion, '13.99', "Got expected MSVC version");
+is($step->result(), 'yes', "Got expected result");
+$step->set_result(undef);
+
+{
+    my $stdout;
+    $major = 13;
+    $minor = 99;
+    $verbose = 1;
+    capture(
+        sub { $msvcversion =
+            $step->_compose_msvcversion($major, $minor, $verbose); },
+        \$stdout,
+    );
+    is($msvcversion, '13.99', "Got expected MSVC version");
+    is($step->result(), 'yes', "Got expected result");
+    like($stdout, qr/yep:\s+$major\.$minor/, "Got expected verbose output");
+    $step->set_result(undef);
+}
+    
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
