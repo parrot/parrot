@@ -134,11 +134,11 @@ token term {
     | <do_pop> {*}                               #= do_pop
     | <do_push> {*}                              #= do_push
     | <do_shift> {*}                             #= do_shift
-    | <variable> {*}                             #= variable
     | <func0> {*}                                #= func0
     | <func1> {*}                                #= func1
     | <func2> {*}                                #= func2
     | <func3> {*}                                #= func3
+    | <variable> {*}                             #= variable
     #| <split> {*}                                #= split
     #| <join> {*}                                 #= join
 }

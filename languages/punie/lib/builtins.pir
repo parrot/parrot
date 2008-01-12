@@ -367,8 +367,9 @@
 .end
 
 .sub 'sqrt'
-    .param pmc arg
-
+    .param num arg
+    sqrt $N0, arg
+    .return ($N0)
 .end
 
 .sub 'umask'
