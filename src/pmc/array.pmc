@@ -189,7 +189,7 @@ Copy the contents of other to self.
 
 =item C<void set_pmc(PMC *other)>
 
-Currently, an alias to C<assign_pmc>.  Expected to go away soon.
+Implemented as an alias to C<assign_pmc> since the behavior is the same.
 
 =cut
 
