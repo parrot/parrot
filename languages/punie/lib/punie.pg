@@ -28,9 +28,7 @@ rule else {
     | 'elsif' \( <expr> \) <compblock>
 }
 
-rule lineseq {
-    <line>*  {*}
-}
+rule lineseq { <line>*  {*} }
 
 token line {
     | <loop> {*}                                   #= loop
@@ -40,20 +38,15 @@ token line {
       | <sideff> ';' {*}                           #= sideff
       | ';' {*}                                    #= label
       ] \s*
-
 }
 
 rule sideff {
     <expr> [$<modifier>=<condmod>|<loopmod>]? {*}
 }
 
-rule condmod {
-    $<sym>=[if|unless] <expr> {*}
-}
+rule condmod { $<sym>=[if|unless] <expr> {*} }
 
-rule loopmod {
-    $<sym>=[while|until] <expr> {*}
-}
+rule loopmod { $<sym>=[while|until] <expr> {*} }
 
 rule label { [<word>\:]? {*} }
 

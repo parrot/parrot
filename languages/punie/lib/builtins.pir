@@ -349,7 +349,9 @@
 .end
 
 .sub 'length'
-    .param pmc arg
+    .param string arg
+    length $I0, arg
+    .return ($I0)
 .end
 
 .sub 'localtime'
