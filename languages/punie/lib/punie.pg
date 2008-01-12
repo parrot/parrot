@@ -79,6 +79,7 @@ rule loop {
     [ <while_loop> {*}                          #= while_loop
     | <until_loop> {*}                          #= until_loop
     | <for_loop> {*}                            #= for_loop
+    | <compblock> {*}                           #= compblock
     ]
 }
 
@@ -115,7 +116,7 @@ rule expr    {
     | <oexpr> {*}                                #= oexpr
 }
 
-rule gprint  { $<op>=['print'|'unlink'] <expr> {*} }
+rule gprint  { $<op>=['print'|'printf'|'system'|'unlink'|'exec'|'kill'] <expr> {*} }
 
 rule 'oexpr' is optable { ... }
 
@@ -136,15 +137,32 @@ token term {
     | <do_push> {*}                              #= do_push
     | <do_shift> {*}                             #= do_shift
     | <variable> {*}                             #= variable
-
+    | <func0> {*}                                #= func0
+    | <func1> {*}                                #= func1
+    | <func2> {*}                                #= func2
+    | <func3> {*}                                #= func3
     #| <split> {*}                                #= split
     #| <join> {*}                                 #= join
 }
 
+rule func0 { <fun0> {*} }
+
+token fun0 { 'fork'|'time'|'times' }
+
+rule func1 { <fun1>  \( <expr> \) {*} }
+
+token fun1 { 'exp'|'gmtime'|'hex'|'int'|'length'|'localtime'|'log'|'ord'|'oct'|'sqrt'|'umask' }
+
+rule func2 { <fun2>  \( <oexpr> ',' <expr> \) {*} }
+
+token fun2 { 'crypt'|'index'|'link'|'rename' }
+
+rule func3 { <fun3>  \( <oexpr> ',' <oexpr> ',' <expr> \) {*} }
+
+token fun3 { 'substr' }
 
 rule list {
-    \( \)
-    {*}
+    \( \)  {*}
 }
 
 ## XXX add "pattern" to lexical rules.
@@ -186,10 +204,7 @@ rule variable {
     | <special_variable> <key>? {*}
 }
 
-token arrayvar {
-    '@' <word>
-    {*}
-}
+token arrayvar { '@' <word>  {*}  }
 
 token special_variable { '$_' | '$#' | '$ ' '_' }
 

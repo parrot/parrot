@@ -325,6 +325,32 @@ method do_shift($/) {
     make $past;
 }
 
+method func0($/) {
+    make PAST::Op.new( :pasttype('call'), :name(~$<fun0>), :node($/) );
+}
+
+method func1($/) {
+    my $arg1 := $( $<expr> );
+    make PAST::Op.new( $arg1, :pasttype('call'), :name(~$<fun1>), :node($/) );
+}
+
+method func2($/) {
+    my $arg1 := $( $<oexpr> );
+    my $arg2 := $( $<expr> );
+    make PAST::Op.new( $arg1, $arg2, :pasttype('call'),
+                                     :name(~$<fun2>),
+                                     :node($/) );
+}
+
+method func3($/) {
+    my $arg1 := $( $<oexpr>[0] );
+    my $arg2 := $( $<oexpr>[1] );
+    my $arg3 := $( $<expr> );
+    make PAST::Op.new( $arg1, $arg2, $arg3, :pasttype('call'),
+                                            :name(~$<fun3>),
+                                            :node($/) );
+}
+
 ## figure out the scope:
 method wordarg($/) {
     make PAST::Var.new( :name(~$<word>), :scope('package'), :node($/) );
