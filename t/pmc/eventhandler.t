@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2007, The Perl Foundation.
+#! parrot
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id $
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -22,12 +16,19 @@ Tests the EventHandler PMC used by the event system.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', "create an event and set attributes" );
-  .sub main :main
+.sub main :main
+    .include 'include/test_more.pir'
+
+    plan(4)
+
+    create_an_event_and_set_attributes()
+.end
+
+.sub create_an_event_and_set_attributes
     .local pmc eh
     eh  = new 'EventHandler'
     $S0 = typeof eh
-    say $S0
+    is( $S0, 'EventHandler', 'Created EventHandler' )
 
     .local pmc init
     init = new 'Hash'
@@ -48,35 +49,29 @@ pir_output_is( <<'CODE', <<'OUT', "create an event and set attributes" );
 
     eh  = new 'EventHandler', init
     $S0 = typeof eh
-    say $S0
+    is( $S0, 'EventHandler', 'Created EventHandler with args' )
 
     $S1 = eh
-    say $S1
+    is( $S1, 'cool event', 'Event type confirmed' )
 
     push_eh bad_args
         eh = new 'EventHandler', code
     pop_eh
 
-    say "All clear!"
-    end
+    ok( 1, 'No exception from initializer' )
+    .return()
 
   bad_args:
-    say "No exception with bad initializer"
-    end
-  .end
+    ok( 0, 'Exception with bad initializer' )
 
-  .sub my_handler
-  .end
-CODE
-EventHandler
-EventHandler
-cool event
-All clear!
-OUT
+.end
+
+.sub my_handler
+.end
+
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
