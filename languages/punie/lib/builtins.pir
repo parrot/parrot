@@ -284,6 +284,12 @@
     .return ($P0)
 .end
 
+.sub 'die'
+    .param pmc exp
+    die exp
+.end
+
+
 
 # Local Variables:
 #   mode: pir

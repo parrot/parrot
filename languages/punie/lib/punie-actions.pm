@@ -36,6 +36,15 @@ method block ($/) {
     make $past;
 }
 
+method compblock($/) {
+    my $past := $( $<block> );
+    if $<continue> {
+        my $contblock := $( $<continue> );
+        $past := PAST::Stmts.new( $past, $contblock, :node($/) );
+    }
+    make $past;
+}
+
 method lineseq ($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<line> {
@@ -136,13 +145,13 @@ method loop($/, $key) {
 
 method while_loop($/) {
     my $cond := $( $<texpr> );
-    my $block := $( $<block> );
+    my $block := $( $<compblock> );
     make PAST::Op.new( $cond, $block, :pasttype( 'while' ), :node($/) );
 }
 
 method until_loop($/) {
     my $cond  := $( $<expr> );
-    my $block := $( $<block> );
+    my $block := $( $<compblock> );
     make PAST::Op.new( $cond, $block, :pasttype( 'until' ), :node($/) );
 }
 
@@ -206,9 +215,10 @@ method stringbacktick($/) {
 }
 
 method subcall($/) {
-    my $past := PAST::Op.new( :node($/) );
+    my $past := PAST::Op.new( :node($/), :pasttype('call') );
     if $<expr> {
         my $expr := $($<expr>[0]);
+        # if it's a list of expressions, handle all of them:
         if ~$expr.name() eq 'infix:,' {
             for @($expr) {
                 $past.push( $_ );
@@ -219,8 +229,24 @@ method subcall($/) {
         }
     }
     $past.name( ~$<sym> );
-    $past.pasttype('call');
-    $past.node($/);
+    make $past;
+}
+
+method opcall($/) {
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    if $<expr> {
+        my $expr := $($<expr>[0]);
+        # if it's a list of expressions, handle all of them:
+        if ~$expr.name() eq 'infix:,' {
+            for @($expr) {
+                $past.push( $_ );
+            }
+        }
+        else {
+            $past.push( $expr );
+        }
+    }
+    $past.name( ~$<sym> );
     make $past;
 }
 

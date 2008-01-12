@@ -15,14 +15,37 @@ while (0) {
 }
 print "ok 1\n";
 
-until (1) {
-    print "nok 2\n";
+$x = 2;
+while($x < 5) {
+    print "ok " . $x . "\n";
 }
-print "ok 2\n";
+continue {
+    $x++;
+}
+
+until (1) {
+    print "nok 5\n";
+}
+print "ok " . $x++ . "\n";
+
+until ($x > 10) {
+    print "ok " . $x . "\n";
+}
+continue {
+    ++$x;
+}
 
 CODE
 ok 1
 ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
 OUT
 
 language_output_is( 'punie', <<'CODE', <<'OUT', 'expr modifiers' );

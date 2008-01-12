@@ -16,10 +16,11 @@ token ws {
 token block { \{ <lineseq> \} {*} }
 
 rule compblock {
-    <block>
-    [ 'continue' <block>
+    $<block>=<block>
+    [ 'continue' $<continue>=<block>
     | <else>?
     ]
+    {*}
 }
 
 rule else {
@@ -86,12 +87,12 @@ rule loop {
 }
 
 rule while_loop {
-    while \( <texpr> \) <block>
+    while \( <texpr> \) <compblock>
     {*}
 }
 
 rule until_loop {
-    until \( <expr> \) <block>
+    until \( <expr> \) <compblock>
     {*}
 }
 
@@ -124,7 +125,7 @@ token term {
     | <stringsingle> {*}                         #= stringsingle
     | <stringbacktick> {*}                       #= stringbacktick
     | do <.ws> <block> {*}                       #= block
-    | <opcall> {*}                               #= subcall
+    | <opcall> {*}                               #= opcall
     | <subcall> {*}                              #= subcall
     | <do_chop> {*}                              #= do_chop
     | <do_pop> {*}                               #= do_pop
@@ -222,8 +223,6 @@ token ws {
     ]*
     {*}
 }
-
-
 
 proto infix:<+> is assoc('left') is precedence('=')
     is pirop('n_add')
