@@ -592,6 +592,16 @@ MK_I(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *fmt), int n, ...)
     return INS(interp, unit, opname, fmt, r, n, IMCC_INFO(interp)->keyvec, 1);
 }
 
+/*
+
+=item C<static Instruction* mk_pmc_const>
+
+XXX document me
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction*
@@ -649,6 +659,14 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
     return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
 }
 
+/*
+
+=item C<static Instruction* func_ins>
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction*
@@ -664,11 +682,14 @@ func_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *lhs), ARGIN(const 
     keyv <<= 1;
     return INS(interp, unit, op, "", r, n+1, keyv, emit);
 }
+
 /*
- * special instructions
- *
- * labels and such
- */
+
+=item C<static void clear_state>
+
+=cut
+
+*/
 
 static void
 clear_state(PARROT_INTERP)
@@ -676,6 +697,16 @@ clear_state(PARROT_INTERP)
     IMCC_INFO(interp) -> nargs = 0;
     IMCC_INFO(interp) -> keyvec = 0;
 }
+
+/*
+
+=item C<Instruction * INS_LABEL>
+
+XXX Document me.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -693,6 +724,16 @@ INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGIN(SymReg *r0), int e
     return ins;
 }
 
+/*
+
+=item C<>
+
+XXX Document me.
+
+=cut
+
+*/
+
 static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0) {
     Instruction * const i = INS_LABEL(interp, unit, r0, 1);
     i->line               = IMCC_INFO(interp)->line;
@@ -700,6 +741,17 @@ static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0) {
     clear_state(interp);
     return i;
 }
+
+
+/*
+
+=item C<iSUBROUTINE>
+
+XXX Document me.
+
+=cut
+
+*/
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -718,8 +770,17 @@ iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r)) {
 }
 
 /*
- * substr or X = P[key]
- */
+
+=item C<static Instruction * iINDEXFETCH>
+
+XXX Document me.
+
+substr or X = P[key]
+
+=cut
+
+*/
+
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -737,8 +798,16 @@ iINDEXFETCH(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const SymReg *r0),
 }
 
 /*
- * substr or P[key] = X
- */
+
+=item C<static Instruction * iINDEXSET>
+
+XXX Document me.
+
+substr or P[key] = X
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -762,6 +831,16 @@ iINDEXSET(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const SymReg *r0),
 }
 
 
+/*
+
+=item C<static const char * inv_op>
+
+XXX Document me.
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const char *
@@ -770,6 +849,17 @@ inv_op(ARGIN(const char *op)) {
     return get_neg_op(op, &n);
 }
 
+
+
+/*
+
+=item C<Instruction * IMCC_create_itcall_label>
+
+XXX Document me.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -789,6 +879,17 @@ IMCC_create_itcall_label(PARROT_INTERP)
 }
 
 
+
+/*
+
+=item C<static SymReg * mk_sub_address_fromc>
+
+XXX Document me.
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
@@ -804,6 +905,16 @@ mk_sub_address_fromc(PARROT_INTERP, ARGIN(char *name))
 }
 
 
+/*
+
+=item C<static SymReg * mk_sub_address_u>
+
+XXX Document me.
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
@@ -815,6 +926,16 @@ mk_sub_address_u(PARROT_INTERP, ARGIN(char *name))
     return r;
 }
 
+
+/*
+
+=item C<void IMCC_itcall_sub>
+
+XXX Document me.
+
+=cut
+
+*/
 void
 IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
 {
@@ -830,6 +951,17 @@ IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
     if (IMCC_INFO(interp)->cur_unit->type == IMC_PCCSUB)
         IMCC_INFO(interp)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
 }
+
+
+/*
+
+=item C<static void begin_return_or_yield>
+
+XXX Document me.
+
+=cut
+
+*/
 
 static void
 begin_return_or_yield(PARROT_INTERP, int yield)
@@ -851,6 +983,16 @@ begin_return_or_yield(PARROT_INTERP, int yield)
     interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
 }
 
+/*
+
+=item C<static void set_lexical>
+
+XXX Document me.
+
+=cut
+
+*/
+
 static void
 set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN(const char *name))
 {
@@ -867,6 +1009,17 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN(const char *name))
     r->reg = n;
 }
 
+
+/*
+
+=item C<static void add_pcc_named_arg>
+
+XXX Document me.
+
+=cut
+
+*/
+
 static void
 add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
         ARGMOD(SymReg *value))
@@ -877,6 +1030,16 @@ add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *nam
     add_pcc_arg(cur_call, r);
     add_pcc_arg(cur_call, value);
 }
+
+/*
+
+=item C<static void add_pcc_named_result>
+
+XXX Document me.
+
+=cut
+
+*/
 
 static void
 add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
@@ -889,6 +1052,16 @@ add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *
     add_pcc_result(cur_call, value);
 }
 
+/*
+
+=item C<static void add_pcc_named_param>
+
+XXX Document me.
+
+=cut
+
+*/
+
 static void
 add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
         ARGMOD(SymReg *value))
@@ -899,6 +1072,16 @@ add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *n
     add_pcc_param(cur_call, r);
     add_pcc_param(cur_call, value);
 }
+
+/*
+
+=item C<static void add_pcc_named_return>
+
+XXX document me
+
+=cut
+
+*/
 
 static void
 add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
@@ -911,6 +1094,16 @@ add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *
     add_pcc_return(cur_call, value);
 }
 
+/*
+
+=item c<do_loadlib>
+
+xxx document me
+
+=cut
+
+*/
+
 static void
 adv_named_set(PARROT_INTERP, ARGIN(char *name)) {
     if (IMCC_INFO(interp)->adv_named_id) {
@@ -919,6 +1112,16 @@ adv_named_set(PARROT_INTERP, ARGIN(char *name)) {
     }
     IMCC_INFO(interp)->adv_named_id = name;
 }
+
+/*
+
+=item C<static void do_loadlib>
+
+XXX document me
+
+=cut
+
+*/
 
 static void
 do_loadlib(PARROT_INTERP, ARGIN(const char *lib))

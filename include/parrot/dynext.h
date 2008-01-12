@@ -34,7 +34,8 @@ PMC * Parrot_init_lib(PARROT_INTERP,
     ARGIN(void (*init_func)(PARROT_INTERP,
     ARGIN_NULLOK(PMC *))))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

@@ -52,7 +52,7 @@ static int e_file_close(PARROT_INTERP, SHIM(void *param))
 
 static int e_file_emit(PARROT_INTERP,
     SHIM(void *param),
-    SHIM(IMC_Unit *unit),
+    SHIM(const IMC_Unit *unit),
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
@@ -773,7 +773,7 @@ RT#48260: Not yet documented!!!
 static int
 e_file_emit(PARROT_INTERP,
         SHIM(void *param),
-        SHIM(IMC_Unit *unit),
+        SHIM(const IMC_Unit *unit),
         ARGIN(const Instruction *ins))
 {
 #if IMC_TRACE
