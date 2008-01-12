@@ -290,6 +290,94 @@
 .end
 
 
+## func0 built-in functions
+
+.sub 'fork'
+.end
+
+.sub 'time'
+.end
+
+.sub 'times'
+.end
+
+## func1 built-in functions
+
+.sub 'exp'
+    .param num arg
+    exp $N0, arg
+    .return ($N0)
+.end
+
+.sub 'gmtime'
+    .param pmc arg
+.end
+
+.sub 'hex'
+    .param pmc arg
+.end
+
+.sub 'int'
+    .param pmc arg
+.end
+
+.sub 'length'
+    .param pmc arg
+.end
+
+.sub 'localtime'
+    .param pmc arg
+.end
+
+.sub 'log'
+    .param pmc arg
+.end
+
+.sub 'ord'
+    .param pmc arg
+.end
+
+.sub 'oct'
+    .param pmc arg
+.end
+
+.sub 'sqrt'
+    .param pmc arg
+.end
+
+.sub 'umask'
+    .param pmc arg
+.end
+
+## func2 built-in functions
+
+.sub 'crypt'
+    .param pmc arg1
+    .param pmc arg2
+.end
+
+.sub 'index'
+    .param pmc arg1
+    .param pmc arg2
+.end
+
+.sub 'link'
+    .param pmc arg1
+    .param pmc arg2
+.end
+
+.sub 'rename'
+    .param pmc arg1
+    .param pmc arg2
+.end
+
+## func3 built-in functions
+
+.sub 'substr'
+    .param pmc arg1
+    .param pmc arg2
+    .param pmc arg3
+.end
 
 # Local Variables:
 #   mode: pir
