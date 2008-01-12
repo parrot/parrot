@@ -27,7 +27,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining whether ICU is installed};
-    $data{args}        = [ qw( verbose icushared icuheaders icu-config without-icu ) ];
     $data{result}      = q{};
     return \%data;
 }

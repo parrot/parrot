@@ -28,7 +28,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining what pmc files should be compiled in};
-    $data{args}        = [ qw( ask pmc ) ];
     $data{result}      = q{};
     $data{PMC_PARENTS} = {};
     $data{srcpmc} = [ sort map { basename($_) } glob "./src/pmc/*.pmc" ];

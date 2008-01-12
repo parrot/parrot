@@ -36,7 +36,6 @@ sub _init {
 
     return
         { description => q{Configuring languages},
-          args        => [ qw( languages ) ],
           result      => q{},
         };
 }

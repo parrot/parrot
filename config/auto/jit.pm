@@ -31,7 +31,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining architecture, OS and JIT capability};
-    $data{args}        = [ qw( jitcapable miniparrot execcapable verbose ) ];
     $data{result}      = q{};
     $data{jit_is_working} = {
         i386 => 1,

@@ -26,7 +26,6 @@ sub _init {
 
     return {
         description  => q{Generating runtime/parrot/include},
-        args         => [ qw( verbose ) ],
         result       => q{},
     }
 }

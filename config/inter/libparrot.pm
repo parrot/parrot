@@ -26,7 +26,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determine if parrot should be linked against a shared library};
-    $data{args}        = [ qw( ask parrot_is_shared ) ];
     $data{result}      = q{};
     return \%data;
 }

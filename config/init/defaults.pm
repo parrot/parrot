@@ -30,7 +30,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Setting up Configure's default values};
-    $data{args}        = [ qw( debugging optimize profile verbose m ) ];
     $data{result}      = q{};
     return \%data;
 }

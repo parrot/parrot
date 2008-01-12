@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Generating makefiles and other build files};
-    $data{args}        = [ qw( target ) ];
     $data{result}      = q{};
     return \%data;
 }

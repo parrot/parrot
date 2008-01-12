@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining whether there is socklen_t};
-    $data{args}        = [ qw(  ) ];
     $data{result}      = q{};
     return \%data;
 }

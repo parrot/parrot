@@ -29,7 +29,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining whether perldoc is installed};
-    $data{args}        = [ qw(  ) ];
     $data{result}      = q{};
     return \%data;
 }

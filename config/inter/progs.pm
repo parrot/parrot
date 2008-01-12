@@ -27,7 +27,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining what C compiler and linker to use};
-    $data{args}        = [ qw( ask cc cxx link ld ccflags ccwarn linkflags ldflags libs debugging lex yacc maintainer ) ];
     $data{result}      = q{};
     return \%data;
 }

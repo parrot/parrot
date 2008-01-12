@@ -28,7 +28,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining whether (exuberant) ctags is installed};
-    $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

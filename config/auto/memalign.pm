@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining if your C library supports memalign};
-    $data{args}        = [ qw( miniparrot verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

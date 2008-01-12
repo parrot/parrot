@@ -29,7 +29,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining if your platform supports readline};
-    $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
     $data{macports_root} = File::Spec->catdir( '/', 'opt', 'local' );
     return \%data;

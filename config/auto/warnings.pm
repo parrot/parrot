@@ -32,7 +32,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Detecting supported compiler warnings (-Wxxx)};
-    $data{args}        = [ qw( cc verbose define  ) ];
     $data{result}      = q{};
 
     # potential addition? -fvisibility=hidden

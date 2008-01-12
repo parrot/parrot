@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Generating core pmc list};
-    $data{args}        = [ qw(  ) ];
     $data{result}      = q{};
     return \%data;
 }

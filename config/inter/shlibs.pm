@@ -30,7 +30,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining flags for building shared libraries};
-    $data{args}        = [ qw( ask verbose cc_shared ) ];
     $data{result}      = q{};
     return \%data;
 }

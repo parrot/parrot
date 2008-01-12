@@ -22,7 +22,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Setting up installation paths};
-    $data{args}        = [ qw( prefix exec-prefix bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir ) ];
     $data{result}      = q{};
     return \%data;
 }

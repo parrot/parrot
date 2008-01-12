@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining Parrot's revision};
-    $data{args}        = [ qw(  ) ];
     $data{result}      = q{};
     return \%data;
 }

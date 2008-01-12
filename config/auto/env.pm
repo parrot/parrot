@@ -28,7 +28,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining if your C library has setenv / unsetenv};
-    $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

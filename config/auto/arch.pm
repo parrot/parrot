@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining CPU architecture and OS};
-    $data{args}        = [ ];
     $data{result}      = q{};
     return \%data;
 }

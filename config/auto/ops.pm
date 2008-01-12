@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining what opcode files should be compiled in};
-    $data{args}        = [ qw( ask ops ) ];
     $data{result}      = q{};
     return \%data;
 }

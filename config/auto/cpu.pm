@@ -26,7 +26,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Generating CPU specific stuff};
-    $data{args}        = [ qw( miniparrot verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

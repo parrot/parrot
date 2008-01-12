@@ -27,7 +27,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Tweaking settings for miniparrot};
-    $data{args}        = [ qw( miniparrot ) ];
     $data{result}      = q{};
     return \%data;
 }

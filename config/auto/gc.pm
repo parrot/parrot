@@ -55,7 +55,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining what allocator to use};
-    $data{args}        = [ qw( gc verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

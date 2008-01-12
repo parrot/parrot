@@ -22,7 +22,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Figuring out how to pack() Parrot's types};
-    $data{args}        = [ qw(  ) ];
     $data{result}      = q{};
     return \%data;
 }

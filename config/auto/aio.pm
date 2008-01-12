@@ -36,7 +36,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining if your platform supports AIO};
-    $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

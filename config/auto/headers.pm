@@ -23,7 +23,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Probing for C headers};
-    $data{args}        = [ qw( miniparrot verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

@@ -24,7 +24,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining whether your compiler supports computed goto};
-    $data{args}        = [ qw( cgoto miniparrot verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

@@ -27,7 +27,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Finding header files distributed with Parrot};
-    $data{args}        = [ qw(  ) ];
     $data{result}      = q{};
     return \%data;
 }

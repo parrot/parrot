@@ -26,7 +26,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining what types Parrot should use};
-    $data{args}        = [ qw( ask intval opcode floatval ) ];
     $data{result}      = q{};
     return \%data;
 }

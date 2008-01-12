@@ -26,7 +26,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining whether yacc is installed};
-    $data{args}        = [ qw( yacc ask maintainer ) ];
     $data{result}      = q{};
     return \%data;
 }

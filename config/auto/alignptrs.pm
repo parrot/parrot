@@ -24,7 +24,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining your minimum pointer alignment};
-    $data{args}        = [ qw( miniparrot ) ];
     $data{result}      = q{};
     return \%data;
 }

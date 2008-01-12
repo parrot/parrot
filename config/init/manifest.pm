@@ -26,7 +26,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Checking MANIFEST};
-    $data{args}        = [ qw( nomanicheck ) ];
     $data{result}      = q{};
     return \%data;
 }

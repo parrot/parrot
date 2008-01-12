@@ -27,7 +27,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining what encoding files should be compiled in};
-    $data{args}        = [ qw( ask encoding ) ];
     $data{result}      = q{};
     return \%data;
 }

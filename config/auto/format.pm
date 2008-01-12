@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Figuring out what formats should be used for sprintf};
-    $data{args}        = [ qw(  ) ];
     $data{result}      = q{};
     return \%data;
 }

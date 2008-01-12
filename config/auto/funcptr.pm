@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Verifying that the compiler supports function pointer casts};
-    $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
     return \%data;
 }

@@ -28,7 +28,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Generating C headers};
-    $data{args}        = [ qw( define ) ];
     $data{result}      = q{};
     return \%data;
 }

@@ -26,7 +26,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Detecting compiler attributes (-DHASATTRIBUTE_xxx)};
-    $data{args}        = [ qw( cc verbose define ) ];
     $data{result}      = q{};
     return \%data;
 }

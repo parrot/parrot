@@ -23,7 +23,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Loading platform and local hints files};
-    $data{args}        = [ qw( cc verbose define ) ];
     $data{result}      = q{};
     return \%data;
 }
