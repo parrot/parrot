@@ -1,6 +1,6 @@
 #!./parrot
 
-print '1..12'
+print '1..14'
 
 # basic math operators
 
@@ -20,3 +20,7 @@ print 'ok', 3**2
 print 'ok', 0**0+9
 print 'ok', 0**1+11
 print 'ok', 1**0+11
+
+# unary + and -
+print 'ok', +13
+print 'ok', -10 + 24
