@@ -271,6 +271,13 @@
     push arr, exp
 .end
 
+.sub 'unshift'
+    .param pmc arr
+    .param pmc exp
+    unshift arr, exp
+.end
+
+
 .sub 'shift'
     .param pmc arr
     $P0 = shift arr

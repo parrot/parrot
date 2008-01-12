@@ -18,7 +18,7 @@ token block { \{ <lineseq> \} {*} }
 rule compblock {
     <block>
     [ 'continue' <block>
-    | $<else>=<else>?
+    | <else>?
     ]
 }
 
@@ -36,7 +36,7 @@ token line {
     | <loop> {*}                                   #= loop
     | <label>
       [ <cond> {*}                                 #= cond
-      | <subroutine> {*}                           #= subroutine
+      | <decl> {*}                                 #= decl
       | <sideff> ';' {*}                           #= sideff
       | ';' {*}                                    #= label
       ] \s*
@@ -61,6 +61,11 @@ rule loopmod {
 rule label { [<word>\:]? {*} }
 
 token word { [\w|_][\w|\d|_]* }
+
+rule decl {
+    | <subroutine> {*} #= subroutine
+    #| <format> {*}     #= format
+}
 
 rule subroutine { sub <word> <block> {*} }
 
@@ -105,13 +110,13 @@ rule expr    {
     | <oexpr> {*}                                #= oexpr
 }
 
-rule gprint  { (print) <expr> {*} }
+rule gprint  { $<op>=['print'|'unlink'] <expr> {*} }
 
 rule 'oexpr' is optable { ... }
 
 
 token term {
-    | <list> {*}                                  #= list
+    | <list> {*}                                 #= list
     | \( <expr> \) {*}                           #= expr
     | <number> {*}                               #= number
     | <integer> {*}                              #= integer
@@ -153,20 +158,30 @@ rule do_chop {
 }
 
 rule do_pop {
+    'pop'
     [
-    | 'pop' [\( <arrayvar> \) | <arrayvar> ]
-    | 'pop' [\( <word> \) | <word> ]
+    | <arrayarg>
+    | <wordarg>
     ]
     {*}
 }
 
 rule do_push {
-    'push' \( <arrayvar> ',' <expr> \)
+    $<op>=['push'|'unshift'] \( <arrayvar> ',' <expr> \)
     {*}
 }
 
 rule do_shift {
-    'shift' [\( <arrayvar> \) | <arrayvar> ]?
+    'shift' [$<arg>=<arrayarg>|<wordarg>]?
+    {*}
+}
+
+rule wordarg {
+    \( <word> \) | <word>
+}
+
+rule arrayarg {
+    \( <arrayvar> \) | <arrayvar>
     {*}
 }
 

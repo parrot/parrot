@@ -77,6 +77,10 @@ method condmod($/) {
     make PAST::Op.new( $( $<expr> ), :pasttype( ~$<sym> ), :node($/) );
 }
 
+method decl($/,$key) {
+    make $( $/{$key} );
+}
+
 method subroutine($/) {
     my $past := $($<block>);
     $past.name( ~$<word> );
@@ -96,7 +100,7 @@ method gprint ($/) {
     else {
         $past.push( $expr );
     }
-    $past.name('print');
+    $past.name(~$<op>);
     $past.pasttype('call');
     make $past;
 }
@@ -265,12 +269,12 @@ method do_chop($/) {
 
 method do_pop($/) {
     my $past := PAST::Op.new( :name('pop'), :pasttype('call'), :node($/) );
-    $past.push( $( $<arrayvar> ) );
+    $past.push( $( $<arrayarg> ) );
     make $past;
 }
 
 method do_push($/) {
-    my $past := PAST::Op.new( :name('push'), :pasttype('call'), :node($/) );
+    my $past := PAST::Op.new( :name(~$<op>), :pasttype('call'), :node($/) );
     $past.push( $( $<arrayvar> ) );
     $past.push( $( $<expr> ) );
     make $past;
@@ -278,13 +282,17 @@ method do_push($/) {
 
 method do_shift($/) {
     my $past := PAST::Op.new( :name('shift'), :pasttype('call'), :node($/) );
-    if $<arrayvar> {
-        $past.push( $( $<arrayvar>[0] ) );
+    if $<arg> {
+        $past.push( $( $<arg>[0] ) );
     }
     else {
         $past.push( PAST::Var.new( :name('$_'), :scope('package') ) );
     }
     make $past;
+}
+
+method arrayarg($/) {
+    make $( $<arrayvar> );
 }
 
 method arrayvar($/) {
