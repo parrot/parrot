@@ -109,12 +109,12 @@ rule for_loop {
 
 rule texpr { <expr>? {*}  }
 
-rule expr    {
+rule expr {
     | <gprint> {*}                               #= gprint
     | <oexpr> {*}                                #= oexpr
 }
 
-rule gprint  { $<op>=['print'|'printf'|'system'|'unlink'|'exec'|'kill'] <expr> {*} }
+rule gprint { $<op>=['print'|'printf'|'chown'|'system'|'unlink'|'exec'|'kill'] <expr> {*} }
 
 rule 'oexpr' is optable { ... }
 
@@ -138,9 +138,10 @@ token term {
     | <func1> {*}                                #= func1
     | <func2> {*}                                #= func2
     | <func3> {*}                                #= func3
+    | <stabfun> {*}                              #= stabfun
     | <variable> {*}                             #= variable
-    #| <split> {*}                                #= split
-    #| <join> {*}                                 #= join
+    | <do_split> {*}                             #= split
+    | <do_join> {*}                              #= join
 }
 
 rule func0 { <fun0> {*} }
@@ -159,19 +160,23 @@ rule func3 { <fun3>  \( <oexpr> ',' <oexpr> ',' <expr> \) {*} }
 
 token fun3 { 'substr' }
 
+rule stabfun { <sfun> \( <word> \) {*} }
+
+token sfun { 'each'|'keys'|'values' }
+
 rule list {
     \( \)  {*}
 }
 
 ## XXX add "pattern" to lexical rules.
-##rule split {
-##    split [\( <variable> [',' <variable> [',' <expr>]? ]? \)]?
-##}
+rule do_split {
+    'split' [\( <variable> [',' <variable> [',' <expr>]? ]? \)]?
+}
 
 ## XXX complete this and implement
-##rule join {
-##    join [\( <oexpr> ',' <expr> \)]?
-##}
+rule do_join {
+    'join' [\( <oexpr> ',' <expr> \)]?
+}
 
 rule do_chop {
     'chop' [\( <expr> \)]?   {*}

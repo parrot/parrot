@@ -343,7 +343,9 @@
 .end
 
 .sub 'int'
-    .param pmc arg
+    .param num arg
+    floor $I0, arg
+    .return ($I0)
 .end
 
 .sub 'length'
@@ -355,7 +357,9 @@
 .end
 
 .sub 'log'
-    .param pmc arg
+    .param num arg
+    ln $N0, arg
+    .return ($N0)
 .end
 
 .sub 'ord'

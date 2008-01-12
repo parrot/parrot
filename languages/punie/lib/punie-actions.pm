@@ -351,6 +351,10 @@ method func3($/) {
                                             :node($/) );
 }
 
+method stabfun($/) {
+    make PAST::Op.new( :pasttype('call'), :name(~$<sfun>), :node($/) );
+}
+
 ## figure out the scope:
 method wordarg($/) {
     make PAST::Var.new( :name(~$<word>), :scope('package'), :node($/) );
