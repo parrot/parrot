@@ -19,6 +19,11 @@ repository should be updated or removed; including documentation.
 The current C<METHOD> syntax will be deleted and the current C<PCCMETHOD>
 syntax will replace it under the name C<METHOD>. See RT #48565.
 
+=item * C<PCCINVOKE> [post 0.5.2]
+
+The syntax for passing named arguments to C<PCCINVOKE> will change from
+:named['key'] to :named('key') to better match PDD 3. See RT #42292.
+
 =back
 
 =head1 vtable entries
