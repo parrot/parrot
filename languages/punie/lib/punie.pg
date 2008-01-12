@@ -18,7 +18,7 @@ token block { \{ <lineseq> \} {*} }
 rule compblock {
     $<block>=<block>
     [ 'continue' $<continue>=<block>
-    | <else>?
+    | $<else>=<else>?
     ]
     {*}
 }
@@ -29,8 +29,7 @@ rule else {
 }
 
 rule lineseq {
-    <line>*
-    {*}
+    <line>*  {*}
 }
 
 token line {
@@ -45,18 +44,15 @@ token line {
 }
 
 rule sideff {
-    <expr> [$<modifier>=<condmod>|<loopmod>]?
-    {*}
+    <expr> [$<modifier>=<condmod>|<loopmod>]? {*}
 }
 
 rule condmod {
-    $<sym>=[if|unless] <expr>
-    {*}
+    $<sym>=[if|unless] <expr> {*}
 }
 
 rule loopmod {
-    $<sym>=[while|until] <expr>
-    {*}
+    $<sym>=[while|until] <expr> {*}
 }
 
 rule label { [<word>\:]? {*} }
@@ -87,13 +83,21 @@ rule loop {
 }
 
 rule while_loop {
-    while \( <texpr> \) <compblock>
-    {*}
+    while <while_cond> <compblock> {*}
+}
+
+rule while_cond {
+    | \( <texpr> \) {*}         #= texpr
+    | <block> {*}               #= block
 }
 
 rule until_loop {
-    until \( <expr> \) <compblock>
-    {*}
+    until <until_cond> <compblock> {*}
+}
+
+rule until_cond {
+    | \( <expr> \) {*}          #= expr
+    | <block> {*}               #= block
 }
 
 rule for_loop {
@@ -154,37 +158,28 @@ rule list {
 ##}
 
 rule do_chop {
-    'chop' [\( <expr> \)]?
-    {*}
+    'chop' [\( <expr> \)]?   {*}
 }
 
 rule do_pop {
     'pop'
-    [
-    | <arrayarg>
+    [ <arrayarg>
     | <wordarg>
     ]
     {*}
 }
 
 rule do_push {
-    $<op>=['push'|'unshift'] \( <arrayvar> ',' <expr> \)
-    {*}
+    $<op>=['push'|'unshift'] \( <arrayvar> ',' <expr> \)  {*}
 }
 
 rule do_shift {
-    'shift' [$<arg>=<arrayarg>|<wordarg>]?
-    {*}
+    'shift' [$<arg>=<arrayarg>|<wordarg>]?  {*}
 }
 
-rule wordarg {
-    \( <word> \) | <word>
-}
+rule wordarg { \( <word> \) | <word>  {*} }
 
-rule arrayarg {
-    \( <arrayvar> \) | <arrayvar>
-    {*}
-}
+rule arrayarg { \( <arrayvar> \) | <arrayvar>  {*}  }
 
 rule variable {
     | <sigil>? <word> <key>? {*}

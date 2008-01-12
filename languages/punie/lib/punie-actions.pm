@@ -144,15 +144,23 @@ method loop($/, $key) {
 }
 
 method while_loop($/) {
-    my $cond := $( $<texpr> );
+    my $cond := $( $<while_cond> );
     my $block := $( $<compblock> );
     make PAST::Op.new( $cond, $block, :pasttype( 'while' ), :node($/) );
 }
 
+method while_cond($/,$key) {
+    make $( $/{$key} );
+}
+
 method until_loop($/) {
-    my $cond  := $( $<expr> );
+    my $cond  := $( $<until_cond> );
     my $block := $( $<compblock> );
     make PAST::Op.new( $cond, $block, :pasttype( 'until' ), :node($/) );
+}
+
+method until_cond($/,$key) {
+    make $( $/{$key} );
 }
 
 method for_loop($/) {
@@ -317,12 +325,17 @@ method do_shift($/) {
     make $past;
 }
 
+## figure out the scope:
+method wordarg($/) {
+    make PAST::Var.new( :name(~$<word>), :scope('package'), :node($/) );
+}
+
 method arrayarg($/) {
     make $( $<arrayvar> );
 }
 
 method arrayvar($/) {
-    make PAST::Var.new( :node($/), :name(~$/), :scope('package') );
+    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
 }
 
 method variable($/) {
