@@ -798,6 +798,7 @@ $(PERL6) : all $(PBC_TO_EXE)
 	$(MAKE) languages/perl6
 	$(PBC_TO_EXE) languages/perl6/perl6.pbc
 	$(CP) languages/perl6/perl6$(EXE) $(PERL6)
+	languages/perl6/perl6$(EXE) -e'say "Hello, world!"'
 
 
 # TODO build the real miniparrot
