@@ -7,7 +7,7 @@ config/auto/msvc.pm - Microsoft Visual C++ Compiler
 
 =head1 DESCRIPTION
 
-Determines whether the C compiler is actually C<Visual C++>.
+Determines whether the C compiler is actually Visual C++.
 
 =cut
 
@@ -25,7 +25,6 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining if your C compiler is actually Visual C++};
-    $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
     return \%data;
 }
@@ -67,12 +66,8 @@ sub _evaluate_msvc {
 
     my $major = int( $msvcref->{_MSC_VER} / 100 );
     my $minor = $msvcref->{_MSC_VER} % 100;
-    unless ( defined $major && defined $minor ) {
-        print " (no) " if $verbose;
-        $self->set_result('no');
-        $conf->data->set( msvcversion => undef );
-        return 1;
-    }
+    my $status = $self->_handle_not_msvc($conf, $major, $minor, $verbose);
+    return 1 if $status;
 
     my $msvcversion = "$major.$minor";
     print " (yep: $msvcversion )" if $verbose;
@@ -92,6 +87,19 @@ sub _evaluate_msvc {
         $conf->data->add( " ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE" );
     }
     return 1;
+}
+
+sub _handle_not_msvc {
+    my $self = shift;
+    my ($conf, $major, $minor, $verbose) = @_;
+    my $status;
+    unless ( defined $major && defined $minor ) {
+        print " (no) " if $verbose;
+        $self->set_result('no');
+        $conf->data->set( msvcversion => undef );
+        $status++;
+    }
+    return $status;
 }
 
 1;
