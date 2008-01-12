@@ -14,8 +14,10 @@ sub runstep {
     if ( $ccflags !~ /-pthread/ ) {
         $ccflags .= ' -pthread';
     }
+    if ( $ccflags !~ /-D_REENTRANT/ ) {
+        $ccflags .= ' -D_REENTRANT';
+    }
     if ( $ccflags !~ /-D_XOPEN_SOURCE=/ ) {
-
         # Request all POSIX visible (not automatic for cxx, as it is for cc)
         $ccflags .= ' -D_XOPEN_SOURCE=500';
     }
@@ -43,8 +45,9 @@ sub runstep {
         $conf->data->set( linkflags => $linkflags );
     }
 
-    # Required because of ICU using c++.
-    $conf->data->set( link => "cxx" );
+    unless ( $conf->data->get("gccversion") ) {
+	$conf->data->set( link => "cxx" );
+    }
 
     # Perl 5 hasn't been compiled with this visible.
     $conf->data->set( has_socklen_t => 1 );
