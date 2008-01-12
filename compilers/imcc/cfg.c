@@ -891,9 +891,6 @@ propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg* r), int i)
     Basic_block *pred;
     Life_range *l;
 
-    l = r->life_info[bb->index]; /* RT#48284 Will never get used */
-    /* l->last_ins = bb->end; RT#48284:leo why? */
-
     /* every predecessor of a LF_lv_in block must be in LF_lv_out
        and, unless itself is LV_def, this should be propagated to
        its predecessors themselves */
