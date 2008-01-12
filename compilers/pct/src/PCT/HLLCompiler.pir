@@ -29,7 +29,7 @@ running compilers from a command line.
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
-    $P0 = split ' ', 'help|h target=s trace|t=s encoding|e=s output|o=s combine each version|v'
+    $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine each version|v'
     setattribute self, '@cmdoptions', $P0
 
     $P1 = new String
@@ -591,21 +591,17 @@ options are passed to the evaluator.
 .end
 
 
-=item command_line(PMC args)
+=item process_args(PMC args)
 
-Generic method for compilers invoked from a shell command line.
+Performs option processing of command-line args
 
 =cut
 
-.sub 'command_line' :method
+.sub 'process_args' :method
     .param pmc args
-    .param pmc adverbs         :slurpy :named
 
     load_bytecode 'Getopt/Obj.pbc'
-    load_bytecode 'dumper.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
 
-    ##   perform option processing of command-line args
     .local string arg0
     arg0 = shift args
     .local pmc getopts, opts
@@ -621,6 +617,31 @@ Generic method for compilers invoked from a shell command line.
     goto getopts_loop
   getopts_end:
     opts = getopts.'get_options'(args)
+
+    .return (opts)
+.end
+
+
+=item command_line(PMC args)
+
+Generic method for compilers invoked from a shell command line.
+
+=cut
+
+.sub 'command_line' :method
+    .param pmc args
+    .param pmc adverbs         :slurpy :named
+
+    load_bytecode 'dumper.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+
+    ##  get the name of the program
+    .local string arg0
+    arg0 = args[0]
+
+    ##   perform option processing of command-line args
+    .local pmc opts
+    opts = self.'process_args'(args)
 
     ##   merge command-line args with defaults passed in from caller
     .local pmc iter
@@ -638,6 +659,9 @@ Generic method for compilers invoked from a shell command line.
 
     $I0 = adverbs['version']
     if $I0 goto version
+
+    $S0 = adverbs['e']
+    if $S0 goto eval_line
 
     .local pmc result
     result = new 'String'
@@ -683,6 +707,8 @@ Generic method for compilers invoked from a shell command line.
   version:
     self.'version'()
     goto end
+  eval_line:
+    self.'eval'($S0, adverbs :flat :named)
 .end
 
 
