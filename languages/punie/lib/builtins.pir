@@ -251,6 +251,21 @@
     .return (1)
 .end
 
+.sub 'printf'
+.end
+
+.sub 'system'
+.end
+
+.sub'unlink'
+.end
+
+.sub 'kill'
+.end
+
+.sub 'exec'
+.end
+
 
 .sub 'chop'
     .param pmc expr
@@ -285,8 +300,18 @@
 .end
 
 .sub 'die'
-    .param pmc exp
-    die exp
+    .param pmc expr
+    die expr
+.end
+
+.sub 'exit'
+    .param int expr
+    exit expr
+.end
+
+.sub 'eval'
+    .param pmc expr
+
 .end
 
 
@@ -343,6 +368,7 @@
 
 .sub 'sqrt'
     .param pmc arg
+
 .end
 
 .sub 'umask'
