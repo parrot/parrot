@@ -1966,7 +1966,6 @@ splint-andy :
     src/datatypes.c \
     src/debug.c \
     src/dynext.c \
-    src/embed.c \
     src/encoding.c \
     src/events.c \
     src/exceptions.c \
