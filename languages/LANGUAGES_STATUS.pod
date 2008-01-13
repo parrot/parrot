@@ -1172,6 +1172,12 @@ L<http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__db
 Removed from trunk of Parrot subversion repository. Up to revision 12805,
 located in C<languages/ruby>.
 
+=head2 SFL
+
+Simple functional language.
+A quickly abandoned attempt.
+See L<http://www.acooke.org/andrew/writing/parrot/sfl.html>
+
 =head2 Span
 
 Span can be most concisely described as Smalltalk for C++, C#, and Java
