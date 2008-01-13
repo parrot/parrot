@@ -190,7 +190,7 @@ my @core_tests = qw(
 # configure tests are tests to be run at the beginning of 'make test';
 # standard tests are other tests run by default with no core options
 # present
-my @configure_tests = qw( t/configure/*.t t/postconfigure/*.t );
+my @configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
 my @standard_tests = qw(
     t/compilers/json/*.t
     t/examples/*.t

@@ -3,10 +3,47 @@
 package Parrot::Configure::Options::Test;
 use strict;
 use warnings;
+use Carp;
 use Test::Harness;
+use lib qw(lib);
+use Parrot::Configure::Step::List qw( get_steps_list );
+
+my @framework_tests;
+my $config_dir = q{t/configure};
+opendir my $DIRH, $config_dir or croak "Unable to open $config_dir";
+for my $t (sort grep { /\d{3}-\w+\.t$/ } readdir $DIRH) {
+    push @framework_tests, qq{$config_dir/$t};
+}
+closedir $DIRH or croak "Unable to close $config_dir";
+
+my $steps_dir = q{t/steps};
+my %steps_tests;
+my @steps_tests;
+opendir my $DIRH2, $steps_dir or croak "Unable to open $steps_dir";
+for my $t (grep { /\.t$/ } readdir $DIRH2) {
+    my ($type, $class, $num);
+    if ($t =~ m/(init|inter|auto|gen)_(\w+)-(\d{2})\.t$/) {
+        ($type, $class, $num) = ($1,$2,$3);
+        $steps_tests{$type}{$class}{$num}++;
+    } else {
+        carp "Unable to match $t";
+    }
+}
+closedir $DIRH2 or croak "Unable to close $steps_dir";
+
+my @steps = get_steps_list();
+
+foreach my $step (@steps) {
+    my @temp = split /::/, $step;
+    my %these_tests = %{ $steps_tests{$temp[0]}{$temp[1]} };
+    foreach my $k (sort keys %these_tests) {
+        push @steps_tests, qq{$steps_dir/$temp[0]_$temp[1]-$k.t};
+    }
+}
 
 our @preconfiguration_tests = (
-    glob("t/configure/*.t")
+    @framework_tests,
+    @steps_tests,
 );
 
 our @postconfiguration_tests = (
@@ -19,28 +56,80 @@ our @postconfiguration_tests = (
 sub new {
     my ( $class, $argsref ) = @_;
     my $self = {};
+    bless $self, $class;
     my ( $run_configure_tests, $run_build_tests );
     if ( defined $argsref->{test} ) {
         if ( $argsref->{test} eq '1' ) {
-            $self->{run_configure_tests} = 1;
-            $self->{run_build_tests}     = 1;
+            $self->set_run('run_configure_tests', 1);
+            $self->set_run('run_build_tests', 1);
         }
         elsif ( $argsref->{test} eq 'configure' ) {
-            $self->{run_configure_tests} = 1;
+            $self->set_run('run_configure_tests', 1);
         }
         elsif ( $argsref->{test} eq 'build' ) {
-            $self->{run_build_tests} = 1;
+            $self->set_run('run_build_tests', 1);
         }
         else {
             die "'$argsref->{test}' is a bad value for command-line option 'test'";
         }
     }
-    return bless $self, $class;
+    my %excluded_options = map {$_ => 1} qw|
+        ask
+        configure_trace
+        debugging
+        fatal
+        fatal-step
+        help
+        silent
+        verbose
+        verbose-step
+    |;
+    for my $k (grep { ! $excluded_options{$_} } keys %{$argsref}) {
+        $self->set($k, $argsref->{$k});
+    }
+    my $sto = '.configure_parallel.sto';
+    if (-e $sto) {
+        unlink $sto or die "Unable to unlink $sto: $!";
+    }
+    return $self;
 }
+
+sub set {
+    my $self = shift;
+    die "Need 2 arguments to Parrot::Configure::Options::Test::set()"
+        unless @_ == 2;
+    my ($option, $value) = @_;
+    $self->{options}{$option} = $value;
+}
+
+sub get {
+    my $self = shift;
+    die "Need 1 argument to Parrot::Configure::Options::Test::get()"
+        unless @_ == 1;
+    my $option = shift;
+    return $self->{options}{$option} || undef;
+}
+
+sub set_run {
+    my $self = shift;
+    die "Need 2 arguments to Parrot::Configure::Options::Test::set_run()"
+        unless @_ == 2;
+    my ($option, $value) = @_;
+    $self->{run}{$option} = $value;
+}
+
+sub get_run {
+    my $self = shift;
+    die "Need 1 argument to Parrot::Configure::Options::Test::get_run()"
+        unless @_ == 1;
+    my $option = shift;
+    return $self->{run}{$option} || undef;
+}
+
 
 sub run_configure_tests {
     my $self = shift;
-    if ( $self->{run_configure_tests} ) {
+    if ( $self->get_run('run_configure_tests') ) {
         print "As you requested, we'll start with some tests of the configuration tools.\n\n";
 
         runtests(@preconfiguration_tests) or die
@@ -57,7 +146,7 @@ TEST
 
 sub run_build_tests {
     my $self = shift;
-    if ( $self->{run_build_tests} ) {
+    if ( $self->get_run('run_build_tests') ) {
         print "\n\n";
         print "As you requested, I will now run some tests of the build tools.\n\n";
         runtests(@postconfiguration_tests) or die
