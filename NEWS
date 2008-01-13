@@ -1,6 +1,7 @@
 # $Id$
 
 New in 0.5.2
+- "make perl6" now builds a Perl6 executable
 - Documentation
   + New multiple dispatch PDD (PDD27).
   + Numerous small updates to glossary.pod, etc
