@@ -139,7 +139,7 @@ or at least a detection if the referred PMC is already destroyed.
     void destroy() {
         PMC * const ref = PMC_pmc_val(SELF);
 
-        if (PObj_active_destroy_TEST(ref))
+        if (ref && PObj_active_destroy_TEST(ref))
             VTABLE_destroy(INTERP, ref);
 
         if (PMC_sync(SELF)->owner != INTERP)

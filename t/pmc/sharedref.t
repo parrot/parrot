@@ -22,7 +22,7 @@ Tests the SharedRef PMC.
     plan(1)
 
     new P0, 'SharedRef'
-    ok(1, 'Instantiated .SharedRef')
+    ok(1, 'Instantiated SharedRef PMC')
 .end
 
 # Local Variables:
