@@ -77,17 +77,6 @@ sub defines {
 /* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   (op ? \\
      (opcode_t*) (op   - CONTEXT(i->ctx)->pred_offset) : (opcode_t*)NULL)
-/*
- * if we are using CHECK_EVENTS elsewhere this macro should (again)
- * be in includes/parrot/event.h
- *
- * This gives +50 % performance
- */
-
-#undef  CHECK_EVENTS
-#define CHECK_EVENTS(i, n)   \\
-        interp->task_queue->head ?  \\
-                (opcode_t*)Parrot_do_check_events(i, n) : n
 END
 }
 
@@ -164,7 +153,7 @@ SWITCH_RELOAD:
     _reg_base = (char*)interp->ctx.bp.regs_i;
     do {
 SWITCH_AGAIN:
-    cur_opcode = CHECK_EVENTS(interp, cur_opcode);
+    Parrot_cx_handle_tasks(interp, interp->scheduler);
     if (!cur_opcode)
         break;
     switch (*(opcode_t*)cur_opcode) {
