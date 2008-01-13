@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# auto_warnings-07.t
+# auto_warnings-06.t
 
 use strict;
 use warnings;
@@ -64,11 +64,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_warnings-07.t - test config::auto::warnings
+auto_warnings-06.t - test config::auto::warnings
 
 =head1 SYNOPSIS
 
-    % prove t/steps/auto_warnings-07.t
+    % prove t/steps/auto_warnings-06.t
 
 =head1 DESCRIPTION
 
