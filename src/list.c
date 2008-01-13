@@ -1876,7 +1876,7 @@ list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 {
     void *ret;
     UINTVAL idx = list->start++;
-    List_chunk *chunk = list->first;
+    List_chunk * const chunk = list->first;
 
     if (list->length == 0)
         return NULL;
@@ -1887,7 +1887,6 @@ list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
     ret = list_item(interp, list, type, idx);
     if (list->start >= chunk->items) {
         list->cap -= chunk->items;
-        chunk = list->first = chunk->next ? chunk->next : list->last;
         list->start = 0;
         rebuild_chunk_list(interp, list);
         if (list->n_chunks == 1)
@@ -1994,8 +1993,11 @@ list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
     for (i = j = 0; i < count && j < value_length; i++, j++) {
         void *val = list_get(interp, value_list, j, type);
 
-        /* no clone here, if the HL want's to reuse the values, the HL has to
-         * clone the values */
+        /* no clone here, if the HL wants to reuse the values, the HL has to */
+        /* clone the values */
+
+        /* XXX We don't know that val is non-NULL coming back from list_get. */
+        /* We need to check that we're not dereferencing NULL. */
         if (type == enum_type_PMC)
             val = *(PMC **)val;
         else if (type == enum_type_STRING)
@@ -2009,6 +2011,8 @@ list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
         for (; j < value_length; i++, j++) {
             void *val = list_get(interp, value_list, j, type);
 
+            /* XXX We don't know that val is non-NULL coming back from list_get. */
+            /* We need to check that we're not dereferencing NULL. */
             if (type == enum_type_PMC)
                 val = *(PMC **)val;
             else if (type == enum_type_STRING)
