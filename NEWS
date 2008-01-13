@@ -14,7 +14,8 @@ New in 0.5.2
   + New mk_language_shell.pl script creates language stubs
   + lolcode: new
   + Lua: various
-  + Eclectus: numerous
+  + Eclectus: start with support for local variables and procedures,
+    use SXML as intermediate representation
   + Perl6: list ops, compiler directives, command-line options, etc.
   + punie: more ops, control structures, code refactoring
 - Implementation
