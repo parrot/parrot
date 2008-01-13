@@ -1,12 +1,11 @@
 # $Id$
 
 New in 0.5.2
-- "make perl6" now builds a Perl6 executable
+- "make perl6" now builds a Perl 6 executable
 - Documentation
   + New multiple dispatch PDD (PDD27).
   + Numerous small updates to glossary.pod, etc
 - Compilers
-  + IMCC: started support of new :invocant flag
   + NQP: optional, named, and named/required parameters
   + PIRC: cleanups
   + PAST: "defined-or"
@@ -16,7 +15,7 @@ New in 0.5.2
   + Lua: various
   + Eclectus: start with support for local variables and procedures,
     use SXML as intermediate representation
-  + Perl6: list ops, compiler directives, command-line options, etc.
+  + Perl 6: list ops, compiler directives, command-line options, etc.
   + punie: more ops, control structures, code refactoring
 - Implementation
   + New "pbc_to_exe" utility turns bytecode to executables
@@ -32,8 +31,9 @@ New in 0.5.2
   + See DEPRECATED.pod for details
 - Miscellaneous
   + Many bug fixes
+  + Minor speed enhancements with UTF-8 string handling
   + Debian packaging
-  + consting, attribute marking, warnings cleanup, ...
+  + consting, attribute marking, warnings cleanup, memory leaks plugged ...
 
 New in 0.5.1
 - Documentation
@@ -190,7 +190,7 @@ New in 0.4.14
  + PDD15 "Objects" - details added to 'new' and 'getattribute' opcodes
  + PDD17 "PMCs" - notes added on instantiation and dynamic extention in PIR
 - Documentation:
- + added Parrot-related text from "Perl6 and Parrot Essentials" book,
+ + added Parrot-related text from "Perl 6 and Parrot Essentials" book,
    tutorial examples from "Learning PIR" talk, and PDD15 metamodel diagrams
 - Implementation:
  + reduced memory footprint when using named registers
@@ -371,7 +371,7 @@ New in 0.4.7
   language code is hosted at http://pirate.tangentcode.com
 - Compilers:
    + PGE updated with more expressions, latest changes to S05
-   + new Perl6 grammar compiler
+   + new Perl 6 grammar compiler
 - Integration:
    + Perl 5 module "Parrot::Embed" allows easy embedding of a Parrot
      runtime into a Perl 5 program
@@ -451,9 +451,9 @@ New in 0.4.4
 New in 0.4.3
 
 - namespaces partially implemented
-- rulec, Perl6 rule compiler
+- rulec, Perl 6 rule compiler
 - PGE improvements including return values for closure
-- parts of a Perl6 parser based on PGE
+- parts of a Perl 6 parser based on PGE
 - complex trigonometric methods
 - type of Sub PMC is now overridable by HLL
 - NetBSD support
@@ -533,7 +533,7 @@ New in 0.2.3
 
 - Dynamic classes now compile on Windows (including ParTcl)
 - New Super PMC allows easy access to superclass methods
-- Implement C3 method resolution order (just like Perl6 & Python)
+- Implement C3 method resolution order (just like Perl 6 & Python)
 - ParTcl has new PIR-based parser and passes more Tcl tests
 - added character class support in Globs to PGE
 - added language implementations of unlambda, Lazy-k
@@ -618,7 +618,7 @@ New in 0.1.0
  - Support for JIT, where malloced memory isn't executable
  - Priority DOD scheme for objects that need timely destruction
  - Improved byte code loading (e.g. onLoad functions)
- - Language updates: forth, Perl6/P6C, m4
+ - Language updates: forth, Perl 6/P6C, m4
  - Libraries: Getopt_Long, SDL, Dumper, Sort
  - new JAPH examples
  - Unified imcc and parrot test handling
@@ -711,7 +711,7 @@ New in 0.0.9
 New in 0.0.8
 
 - Several new grammars and a BNF -> perl5 and perl6 converter (Jeff)
-- Working Perl6 REs (Sean)
+- Working Perl 6 REs (Sean)
 - Keyed Access (Tom Hughes et al)
 - New PMCs (Alberto et al)
 - Better Documentation
