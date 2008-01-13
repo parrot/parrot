@@ -735,6 +735,9 @@ handle_exception(PARROT_INTERP)
     /* absolute address of handler */
     const opcode_t * const dest = create_exception(interp);
 
+    /* XXX We don't know that dest will be non-NULL, and it's not legal */
+    /* to pass NULL to dest2offset. */
+
     return dest2offset(interp, dest);
 }
 
