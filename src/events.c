@@ -794,17 +794,20 @@ RT#48260: Not yet documented!!!
 static void
 io_thread_ready_rd(ARGMOD(pending_io_events *ios), int ready_rd)
 {
-    int i;
+    size_t i;
 
     for (i = 0; i < ios->n; ++i) {
-        parrot_event * const ev = ios->events[i];
-        PMC * const pio = ev->u.io_event.pio;
-        const int fd = PIO_getfd(NULL, pio);
+        parrot_event * const ev  = ios->events[i];
+        PMC          * const pio = ev->u.io_event.pio;
+        const int            fd  = PIO_getfd(NULL, pio);
+
         if (fd == ready_rd) {
             /* remove from event list */
             --ios->n;
+
             for (; i < ios->n; ++i)
                 ios->events[i] = ios->events[i+1];
+
             Parrot_schedule_event(ev->interp, ev);
             break;
         }
