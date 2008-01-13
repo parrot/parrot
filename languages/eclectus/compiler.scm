@@ -494,23 +494,23 @@
            (preprocess
              (cond [(null? (cdr tree)) #t]
                    [(= (length (cdr tree)) 1) (cadr tree)]
-                   [else (quasiquote
-                           (if
-                             (unquote (cadr tree))
-                             (unquote (quasiquote (and (unquote-splicing (cddr tree)))))
-                             #f))]))]
+                   [else (list
+                           'if
+                           (cadr tree)
+                           (cons 'and (cddr tree))
+                            #f)]))]
           [(eqv? (car tree) 'or) 
            (preprocess
              (cond [(null? (cdr tree)) #f]
                    [(= (length (cdr tree)) 1) (cadr tree)]
-                   [else (quasiquote
-                           (if
-                            (unquote (cadr tree))
-                            (unquote (cadr tree))
-                            (unquote (quasiquote (or (unquote-splicing (cddr tree)))))))]))]
+                   [else (list
+                           'if
+                           (cadr tree)
+                           (cadr tree)
+                           (cons 'or (cddr tree)))]))]
           [(eqv? (car tree) 'not) 
            (preprocess
-             (quasiquote (if (unquote (cadr tree)) #f #t)))]
+             (list 'if (cadr tree) #f #t))]
           [(eqv? (car tree) 'let*) 
            (preprocess
              (if (null? (cadr tree))
