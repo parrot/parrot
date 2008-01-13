@@ -171,7 +171,8 @@ PARROT_API
 void Parrot_shared_DOD_unblock(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void pt_add_to_interpreters(PARROT_INTERP, Parrot_Interp new_interp)
+void pt_add_to_interpreters(PARROT_INTERP,
+    ARGIN_NULLOK(Parrot_Interp new_interp))
         __attribute__nonnull__(1);
 
 void pt_clone_code(Parrot_Interp d, Parrot_Interp s);

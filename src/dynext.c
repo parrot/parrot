@@ -289,8 +289,8 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_init_lib(PARROT_INTERP,
-                ARGIN(PMC *(*load_func)(PARROT_INTERP)),
-                ARGIN(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
+                ARGIN_NULLOK(PMC *(*load_func)(PARROT_INTERP)),
+                ARGIN_NULLOK(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
 {
     PMC *lib_pmc = NULL;
 

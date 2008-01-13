@@ -1429,7 +1429,7 @@ holds LOCK.
 */
 
 void
-pt_add_to_interpreters(PARROT_INTERP, Parrot_Interp new_interp)
+pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
 {
     size_t i;
     DEBUG_ONLY(fprintf(stderr, "interp = %p\n", interp));
