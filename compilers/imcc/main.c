@@ -347,7 +347,8 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
     }
     run_pbc = 1;
 
-    while ((status = longopt_get(interp, *argc, *argv, options, &opt)) > 0) {
+    while ((status = longopt_get(interp, *argc, (const char **)*argv, options,
+            &opt)) > 0) {
         switch (opt.opt_id) {
             case 'R':
                 if (!strcmp(opt.opt_arg, "slow")
