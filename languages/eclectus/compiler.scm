@@ -509,7 +509,15 @@
           [(eqv? (car tree) 'not) 
            (quasiquote (if (unquote (preprocess (cadr tree))) #f #t))]
           [(eqv? (car tree) 'let*) 
-           (cons 'let (preprocess (cdr tree)))]
+           (preprocess
+             (if (null? (cadr tree))
+                 (cons 'let (cdr tree))
+                 (list
+                   'let
+                   (list (caadr tree))
+                   (append
+                     (list 'let* (cdadr tree))
+                     (cddr tree)))))]
           [else
            (map preprocess tree)]))) 
 
