@@ -491,23 +491,26 @@
     (cond [(atom? tree)
            tree]
           [(eqv? (car tree) 'and) 
-           ( cond [(null? (cdr tree)) #t]
-                  [(= (length (cdr tree)) 1) (preprocess (cadr tree))]
-                  [else (quasiquote
-                          (if
-                            (unquote (preprocess (cadr tree)))
-                            (unquote (preprocess (quasiquote (and (unquote-splicing (cddr tree))))))
-                            #f))])]
+           (preprocess
+             (cond [(null? (cdr tree)) #t]
+                   [(= (length (cdr tree)) 1) (cadr tree)]
+                   [else (quasiquote
+                           (if
+                             (unquote (cadr tree))
+                             (unquote (quasiquote (and (unquote-splicing (cddr tree)))))
+                             #f))]))]
           [(eqv? (car tree) 'or) 
-           ( cond [(null? (cdr tree)) #f]
-                  [(= (length (cdr tree)) 1) (preprocess (cadr tree))]
-                  [else (quasiquote
-                          (if
-                           (unquote (preprocess (cadr tree)))
-                           (unquote (preprocess (cadr tree)))
-                           (unquote (preprocess (quasiquote (or (unquote-splicing (cddr tree))))))))])]
+           (preprocess
+             (cond [(null? (cdr tree)) #f]
+                   [(= (length (cdr tree)) 1) (cadr tree)]
+                   [else (quasiquote
+                           (if
+                            (unquote (cadr tree))
+                            (unquote (cadr tree))
+                            (unquote (quasiquote (or (unquote-splicing (cddr tree)))))))]))]
           [(eqv? (car tree) 'not) 
-           (quasiquote (if (unquote (preprocess (cadr tree))) #f #t))]
+           (preprocess
+             (quasiquote (if (unquote (cadr tree)) #f #t)))]
           [(eqv? (car tree) 'let*) 
            (preprocess
              (if (null? (cadr tree))
