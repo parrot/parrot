@@ -785,8 +785,8 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
 pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
 	$(PERL) tools/dev/pbc_to_exe_gen.pl \
     "$(BUILD_DIR)/CFLAGS $(CC) \"\" $(CFLAGS) -I$(BUILD_DIR)/include \
-    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) \
-    $(BUILD_DIR)/src/parrot_config$(O)" \
+    $(BUILD_DIR)/src/parrot_config$(O) \
+    $(LINKFLAGS) @rpath_blib@ $(ALL_PARROT_LIBS)" \
     > pbc_to_exe.pir
 
 $(PBC_TO_EXE) : pbc_to_exe.pir
