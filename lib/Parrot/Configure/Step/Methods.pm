@@ -63,10 +63,12 @@ sub _handle_darwin_for_fink {
     if ( $osname =~ /darwin/ ) {
         my $fink_lib_dir        = $conf->data->get('fink_lib_dir');
         my $fink_include_dir    = $conf->data->get('fink_include_dir');
-        if ( -f "$fink_include_dir/$file" ) {
-            $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', ldflags   => "-L$fink_lib_dir" );
-            $conf->data->add( ' ', ccflags   => "-I$fink_include_dir" );
+        if ( (defined $fink_lib_dir) && (defined $fink_include_dir) ) {
+            if ( -f "$fink_include_dir/$file" ) {
+                $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
+                $conf->data->add( ' ', ldflags   => "-L$fink_lib_dir" );
+                $conf->data->add( ' ', ccflags   => "-I$fink_include_dir" );
+            }
         }
     }
     return 1;
