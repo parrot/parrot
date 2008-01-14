@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -143,8 +143,7 @@ C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
 void
 init_world(PARROT_INTERP)
 {
-    PMC *iglobals;
-    PMC *self, *pmc;
+    PMC *iglobals, *self, *pmc;
 
 #ifdef PARROT_HAS_PLATFORM_INIT_CODE
     Parrot_platform_init_code();
@@ -158,26 +157,24 @@ init_world(PARROT_INTERP)
     iglobals = interp->iglobals;
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             (INTVAL)IGLOBALS_CLASSNAME_HASH, interp->class_hash);
-    self = pmc_new_noinit(interp, enum_class_ParrotInterpreter);
+
+    self           = pmc_new_noinit(interp, enum_class_ParrotInterpreter);
     PMC_data(self) = interp;
+
     VTABLE_set_pmc_keyed_int(interp, iglobals,
-            (INTVAL) IGLOBALS_INTERPRETER, self);
+            (INTVAL)IGLOBALS_INTERPRETER, self);
 
     parrot_set_config_hash_interpreter(interp);
 
-    /*
-     * lib search paths
-     */
+    /* lib search paths */
     parrot_init_library_paths(interp);
-    /*
-     * load_bytecode and dynlib loaded hash
-     */
+
+    /* load_bytecode and dynlib loaded hash */
     pmc = pmc_new(interp, enum_class_Hash);
-    VTABLE_set_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_PBC_LIBS, pmc);
+    VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_PBC_LIBS, pmc);
+
     pmc = pmc_new(interp, enum_class_Hash);
-    VTABLE_set_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_DYN_LIBS, pmc);
+    VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_DYN_LIBS, pmc);
 }
 
 /*
