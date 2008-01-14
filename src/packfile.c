@@ -1116,10 +1116,9 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
             PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
     pf->directory = *pf->dirp;
 
-    /* XXX These function pointers should be typedeffed */
-    pf->fetch_op = (opcode_t (*)(const unsigned char*)) NULLfunc;
-    pf->fetch_iv = (INTVAL (*)(const unsigned char*)) NULLfunc;
-    pf->fetch_nv = (void (*)(unsigned char *, const unsigned char *)) NULLfunc;
+    pf->fetch_op = (packfile_fetch_op_t)NULL;
+    pf->fetch_iv = (packfile_fetch_iv_t)NULL;
+    pf->fetch_nv = (packfile_fetch_nv_t)NULL;
     return pf;
 }
 

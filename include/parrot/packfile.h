@@ -227,9 +227,10 @@ typedef struct PackFile_Directory {
 } PackFile_Directory;
 
 
-typedef opcode_t (*fetch_op)(ARGIN(const unsigned char *));
-typedef INTVAL   (*fetch_iv)(ARGIN(const unsigned char *));
-typedef void     (*fetch_nv)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
+typedef opcode_t (*packfile_fetch_op_t)(ARGIN(const unsigned char *));
+typedef INTVAL   (*packfile_fetch_iv_t)(ARGIN(const unsigned char *));
+typedef void     (*packfile_fetch_nv_t)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
+
 typedef struct PackFile {
     /* the packfile is its own directory */
     PackFile_Directory   directory;
@@ -248,9 +249,10 @@ typedef struct PackFile {
 
     INTVAL    need_wordsize;
     INTVAL    need_endianize;
-    opcode_t (*fetch_op)(ARGIN(const unsigned char *));
-    INTVAL (*fetch_iv)(ARGIN(const unsigned char *));
-    void (*fetch_nv)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
+
+    packfile_fetch_op_t fetch_op;
+    packfile_fetch_iv_t fetch_iv;
+    packfile_fetch_nv_t fetch_nv;
 } PackFile;
 
 
