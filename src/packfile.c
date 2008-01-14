@@ -3684,11 +3684,9 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN(STRING *file_str))
         file_type = PARROT_RUNTIME_FT_SOURCE;
 
     path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
-    if (!path) {
+    if (!path)
         real_exception(interp, NULL, E_LibraryNotLoadedError,
                 "\"load_bytecode\" couldn't find file '%Ss'", file_str);
-        return;
-    }
     /* remember wo_ext => full_path mapping */
     VTABLE_set_string_keyed_str(interp, is_loaded_hash,
             wo_ext, path);
