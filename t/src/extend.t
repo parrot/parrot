@@ -10,7 +10,7 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-plan tests => 16;
+plan tests => 17;
 
 =head1 NAME
 
@@ -695,6 +695,56 @@ main(int argc, char* argv[])
 }
 CODE
 Result is 300.
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "multiple Parrot_new/Parrot_exit cycles" );
+
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+
+/* this is Parrot_exit without the exit()
+ * it will call Parrot_really_destroy() as an exit handler
+ */
+void interp_cleanup(Parrot_Interp, int);
+
+void interp_cleanup(Parrot_Interp interp, int status)
+{
+    handler_node_t *node = interp->exit_handler_list;
+
+    Parrot_block_DOD(interp);
+    Parrot_block_GC(interp);
+
+    while (node) {
+        handler_node_t * const next = node->next;
+        (node->function)(interp, status, node->arg);
+        mem_sys_free(node);
+        node = next;
+    }
+}
+
+int
+main(int argc, char* argv[]) {
+    Parrot_Interp interp;
+    int i, niter = 2;
+
+    for (i = 1; i <= niter; i++) {
+        printf("Starting interp %d\n", i);
+        interp = Parrot_new(NULL);
+        Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
+        if ( interp == NULL ) return 1;
+        printf("Destroying interp %d\n", i);
+        interp_cleanup(interp, 0);
+    }
+
+    return 0;
+}
+
+CODE
+Starting interp 1
+Destroying interp 1
+Starting interp 2
+Destroying interp 2
 OUTPUT
 
 unlink "$temp.pasm", "$temp.pir", "$temp.pbc" unless $ENV{POSTMORTEM};

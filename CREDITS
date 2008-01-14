@@ -633,3 +633,7 @@ D: Bug fixes in IMCC, ECMAScript
 N: Alek Storm
 E: alek.storm@gmail.com
 D: Fixed object vtable method overrides in PIR
+
+N: Jeff Horwitz
+E: jeff@smashing.org
+D: Various bug fixes and tests
