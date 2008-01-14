@@ -739,7 +739,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t
 PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
-    ARGIN(const opcode_t * const packed), size_t packed_size)
+    ARGIN(opcode_t *packed), size_t packed_size)
 {
     PackFile_Header * const header = self->header;
     opcode_t *cursor;
@@ -3547,7 +3547,7 @@ Returns cursor if everything is OK, else zero (0).
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t *
 PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
         ARGMOD(PackFile_Constant *self), ARGIN(opcode_t *cursor))
@@ -3603,7 +3603,7 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
             key_set_register(interp, tail, op, KEY_pmc_FLAG);
             break;
         default:
-            return 0;
+            return NULL;
         }
         if (slice_bits) {
             if (slice_bits & PF_VT_START_SLICE)
