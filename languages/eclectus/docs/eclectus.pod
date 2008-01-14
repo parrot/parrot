@@ -23,7 +23,9 @@ the is no 'petite 7.3' around.
 
 =head1 TODO
 
-- procedures
+- support for strings
+- support for pairs
+- support for 'letrec
 - allow running the tests with 'petite' itself
 - allow test-description per test case
 - In the longterm, Eclectus should become self-hosting

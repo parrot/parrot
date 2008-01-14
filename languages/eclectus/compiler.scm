@@ -308,6 +308,9 @@
 (define-primitive (fx> arg1 arg2)
   (emit-comparison "infix:>" arg1 arg2))
 
+
+
+; asking for the type of an object
 (define emit-typequery
   (lambda (typename arg)
     (list
@@ -321,21 +324,22 @@
       (emit-expr #t)
       (emit-expr #f))))
    
-; implementation of null?
-(define-primitive (null? arg)
-  (emit-typequery "EclectusEmptyList" arg))
-
-; implementation of fixnum?
-(define-primitive (fixnum? arg)
-  (emit-typequery "EclectusFixnum" arg))
-
-; implementation of boolean?
 (define-primitive (boolean? arg)
   (emit-typequery "EclectusBoolean" arg))
 
-; implementation of char?
 (define-primitive (char? arg)
   (emit-typequery "EclectusCharacter" arg))
+
+(define-primitive (null? arg)
+  (emit-typequery "EclectusEmptyList" arg))
+
+(define-primitive (fixnum? arg)
+  (emit-typequery "EclectusFixnum" arg))
+
+(define-primitive (pair? arg)
+  (emit-typequery "EclectusPair" arg))
+
+
 
 ; a getter of '*emitter*'
 (define primitive-emitter
