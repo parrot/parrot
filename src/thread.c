@@ -186,6 +186,28 @@ get_pool(PARROT_INTERP)
 
 /*
 
+=item C<void pt_free_pool>
+
+Frees the shared gc information.  This clears any global data hen joining all
+threads at parent interpreter destruction.
+
+=cut
+
+*/
+
+void
+pt_free_pool(PARROT_INTERP)
+{
+    if (shared_gc_info) {
+        COND_DESTROY(shared_gc_info->gc_cond);
+        PARROT_ATOMIC_INT_DESTROY(shared_gc_info->gc_block_level);
+        mem_sys_free(shared_gc_info);
+        shared_gc_info = NULL;
+    }
+}
+
+/*
+
 =item C<static PMC * make_local_args_copy>
 
 Make a local copy of the corresponding array of arguments.
@@ -1008,6 +1030,10 @@ pt_gc_wakeup_check(PARROT_INTERP)
     Shared_gc_info *info = shared_gc_info;
     int             thread_count;
 
+    /* XXX: maybe a little hack; see RT #49532 */
+    if (!info)
+        return;
+
     thread_count = pt_gc_count_threads(interp);
 
     if (info->num_reached == thread_count) {
@@ -1295,19 +1321,14 @@ void
 pt_join_threads(PARROT_INTERP)
 {
     size_t          i;
-    Shared_gc_info *info = get_pool(interp);
-
-    if (info) {
-        COND_DESTROY(info->gc_cond);
-        PARROT_ATOMIC_INT_DESTROY(shared_gc_info->gc_block_level);
-        mem_sys_free(info);
-    }
+    pt_free_pool(interp);
 
     /*
      * if no threads were started - fine
      */
     LOCK(interpreter_array_mutex);
     if (n_interpreters <= 1) {
+        n_interpreters = 0;
         UNLOCK(interpreter_array_mutex);
         return;
     }

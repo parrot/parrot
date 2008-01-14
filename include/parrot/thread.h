@@ -186,6 +186,9 @@ void pt_DOD_start_mark(PARROT_INTERP)
 void pt_DOD_stop_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void pt_free_pool(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void pt_join_threads(PARROT_INTERP)
         __attribute__nonnull__(1);
 
