@@ -46,6 +46,12 @@ PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
         __attribute__nonnull__(2);
 
 PARROT_API
+void Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*scheduler);
+
+PARROT_API
 void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -96,11 +102,6 @@ void Parrot_cx_send_message(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 void Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*scheduler);
-
-void Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);

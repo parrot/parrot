@@ -103,6 +103,7 @@ continue the runloop.
 
 */
 
+PARROT_API
 void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
