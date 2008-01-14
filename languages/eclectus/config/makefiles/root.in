@@ -25,14 +25,16 @@ PMCS            = \
     eclectusemptylist \
     eclectusfixnum \
     eclectuspair \
-    eclectusstring
+    eclectusstring \
+    eclectusvector
 PMC_SOURCES     = \
     $(PMC_DIR)/eclectusboolean.pmc \
     $(PMC_DIR)/eclectuscharacter.pmc \
     $(PMC_DIR)/eclectusemptylist.pmc \
     $(PMC_DIR)/eclectusfixnum.pmc \
     $(PMC_DIR)/eclectuspair.pmc \
-    $(PMC_DIR)/eclectusstring.pmc
+    $(PMC_DIR)/eclectusstring.pmc \
+    $(PMC_DIR)/eclectusvector.pmc
 
 
 # The default target
