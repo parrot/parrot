@@ -42,6 +42,9 @@ information see F<src/pmc.c>.
 =cut
 
 */
+    void class_init() {
+        File_PMC = NULL;
+    }
 
     void *get_pointer() {
         return File_PMC;

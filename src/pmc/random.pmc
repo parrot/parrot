@@ -28,6 +28,20 @@ pmclass Random singleton {
 
 /*
 
+=item C<void class_init()>
+
+Class initialization.  Clears the singleton PMC.
+
+=cut
+
+*/
+
+    void class_init() {
+        Rand_PMC = NULL;
+    }
+
+/*
+
 =item C<void *get_pointer()>
 
 =cut

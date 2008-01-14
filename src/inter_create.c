@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -128,13 +128,16 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     }
     else {
         interp->parent_interpreter = NULL;
+        PMCNULL                    = NULL;
         /*
          * we need a global mutex to protect the interpreter array
          */
         MUTEX_INIT(interpreter_array_mutex);
     }
+
     create_initial_context(interp);
     interp->resume_flag = RESUME_INITIAL;
+
     /* main is called as a Sub too - this will get depth 0 then */
     CONTEXT(interp->ctx)->recursion_depth = (UINTVAL)-1;
     interp->recursion_limit = RECURSION_LIMIT;
@@ -186,10 +189,13 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
     /* same with errors */
     PARROT_ERRORS_off(interp, PARROT_ERRORS_ALL_FLAG);
+
     /* undefined globals are errors by default */
     PARROT_ERRORS_on(interp, PARROT_ERRORS_GLOBALS_FLAG);
+
     /* param count mismatch is an error by default */
     PARROT_ERRORS_on(interp, PARROT_ERRORS_PARAM_COUNT_FLAG);
+
 #if 0
     /* TODO not yet - too many test failures */
     PARROT_ERRORS_on(interp, PARROT_ERRORS_RESULT_COUNT_FLAG);
@@ -197,6 +203,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
     /* allocate stack chunk cache */
     stack_system_init(interp);
+
     /* Set up the initial register chunks */
     setup_register_stacks(interp);
 
@@ -207,28 +214,27 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->dynamic_env = new_stack(interp, "DynamicEnv");
 
     /* clear context introspection vars */
-    CONTEXT(interp->ctx)->current_sub = NULL;
-    CONTEXT(interp->ctx)->current_cont = NULL;
+    CONTEXT(interp->ctx)->current_sub    = NULL;
+    CONTEXT(interp->ctx)->current_cont   = NULL;
     CONTEXT(interp->ctx)->current_object = NULL;
 
     /* Load the core op func and info tables */
-    interp->op_lib = PARROT_CORE_OPLIB_INIT(1);
-    interp->op_count = interp->op_lib->op_count;
-    interp->op_func_table = interp->op_lib->op_func_table;
-    interp->op_info_table = interp->op_lib->op_info_table;
-    interp->all_op_libs = NULL;
-    interp->evc_func_table = NULL;
+    interp->op_lib          = PARROT_CORE_OPLIB_INIT(1);
+    interp->op_count        = interp->op_lib->op_count;
+    interp->op_func_table   = interp->op_lib->op_func_table;
+    interp->op_info_table   = interp->op_lib->op_info_table;
+    interp->all_op_libs     = NULL;
+    interp->evc_func_table  = NULL;
     interp->save_func_table = NULL;
-
-    interp->code = NULL;
-    interp->profile = NULL;
+    interp->code            = NULL;
+    interp->profile         = NULL;
 
     /* null out the root set registry */
-    interp->DOD_registry = NULL;
+    interp->DOD_registry    = NULL;
 
     /* create exceptions list */
+    interp->current_runloop_id    = 0;
     interp->current_runloop_level = 0;
-    interp->current_runloop_id = 0;
     Parrot_init_exceptions(interp);
 
     /* register assembler/compilers */
@@ -236,8 +242,10 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
     /* setup stdio PMCs */
     PIO_init(interp);
+
     /* init builtin function struct */
     Parrot_init_builtins(interp);
+
     /* init IMCC compiler */
     imcc_init(interp);
 
@@ -253,10 +261,9 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* all sys running, init the event and signal stuff
      * the first or "master" interpreter is handling events and signals
      */
-    interp->task_queue = NULL;
+    interp->task_queue  = NULL;
     interp->thread_data = NULL;
 
-/*    Parrot_init_events(interp); */
     Parrot_cx_init_scheduler(interp);
 
 #ifdef ATEXIT_DESTROY
@@ -414,11 +421,14 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     /* buffer headers, PMCs */
     Parrot_destroy_header_pools(interp);
+
     /* memory pools in resources */
     Parrot_destroy_memory_pools(interp);
+
     /* mem subsystem is dead now */
     mem_sys_free(interp->arena_base);
     interp->arena_base = NULL;
+
     /* cache structure */
     destroy_object_cache(interp);
 

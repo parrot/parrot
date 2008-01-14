@@ -50,6 +50,10 @@ information see F<src/pmc.c>.
 
 */
 
+    void class_init() {
+        OS_PMC = NULL;
+    }
+
     void *get_pointer() {
         return OS_PMC;
     }
