@@ -184,6 +184,13 @@
     .return ($P0)
 .end
 
+.sub 'infix:..'
+    .param pmc a
+    .param pmc b
+    $P0 = a
+    .return ($P0)
+.end
+
 ## autoincrement
 .sub 'postfix:++'
     .param pmc a

@@ -37,9 +37,9 @@ method block ($/) {
 }
 
 method compblock($/) {
-    my $past := $( $<block> );
+    my $past := $( $<block>[0] );
     if $<continue> {
-        my $contblock := $( $<continue> );
+        my $contblock := $( $<continue>[0] );
         $past := PAST::Stmts.new( $past, $contblock, :node($/) );
     }
     make $past;

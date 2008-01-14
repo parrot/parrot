@@ -15,17 +15,12 @@ token ws {
 
 token block { \{ <lineseq> \} {*} }
 
+
 rule compblock {
     $<block>=<block>
-    [ 'continue' $<continue>=<block>
-    | [$<else>=<else>]?
-    ]
+    ['elsif' \( <expr> \) <block> ]*
+    [['continue'|'else'] $<continue>=<block>]?
     {*}
-}
-
-rule else {
-    | 'else' <block>
-    | 'elsif' \( <expr> \) <compblock>
 }
 
 rule lineseq { <line>*  {*} }
