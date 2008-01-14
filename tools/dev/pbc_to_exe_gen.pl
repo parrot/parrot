@@ -214,8 +214,6 @@ int main(int argc, const char *argv[])
     Parrot_runcode(interp, argc, argv);
     Parrot_destroy(interp);
     Parrot_exit(interp, 0);
-
-    return 0;
 }
 END_BODY
     .return ($S0)
