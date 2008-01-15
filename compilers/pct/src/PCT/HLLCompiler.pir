@@ -51,8 +51,11 @@ running compilers from a command line.
   options_end:
     setattribute self, '$usage', $P1
 
-    $P0  = _config()
+    $S0  = '???'
+    push_eh _handler
+    $P0  = _config()    # currently works in the build tree, but not in the install tree
     $S0  = $P0['revision']
+  _handler:
     $P2 = new 'String'
     $P2  = 'This compiler is built with the Parrot Compiler Toolkit, parrot revision '
     $P2 .= $S0
