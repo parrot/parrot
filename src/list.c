@@ -1880,11 +1880,12 @@ list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 
     if (list->length == 0)
         return NULL;
-    idx = list->start++;
-    list->length--;
+    idx = list->start;
     /* optimize push + shift on empty lists */
-    if (list->length == 0)
+    if (--list->length == 0)
         list->start = 0;
+    else
+        list->start++;
     ret = list_item(interp, list, type, idx);
     if (list->start >= chunk->items) {
         list->cap -= chunk->items;
