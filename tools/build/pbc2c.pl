@@ -1,5 +1,5 @@
 #! perl
-# RT#46907: Resolve copyright. See ADDITIONAL section at end of file.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -350,25 +350,6 @@ foreach (@ARGV) {
 exit 0;
 
 __END__
-
-=begin ADDITIONAL
-
-=head1 AUTHOR
-
-Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
-
-=head1 COPYRIGHT
-
-Copyright (C) 2001-2005, The Perl Foundation.
-This program is free software. It is subject to the same license
-as the Parrot interpreter.
-
-=head1 LICENSE
-
-This program is free software. It is subject to the same license
-as the Parrot interpreter.
-
-=end ADDITIONAL
 
 # Local Variables:
 #   mode: cperl
