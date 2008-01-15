@@ -43,8 +43,8 @@ cygwin1.5.24-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20071016
 win32-x86-mingw_gcc3.4.2          Y    Y    -     -   -   Y    Y/5   Y  20071218
 win32-x86-mingw_gcc4.2.1          Y    Y    -     -   -   Y    Y/8   ?  20071016
 win32-x86-msvc_7.1                -    Y    -     -   -   Y    Y/8   ?  20071218
-win32-x86-msvc_8.0                -    Y    -     -   -   Y    Y*2   ?  20071016
-win32-x86_64-msvc_8.0             -    N    -     -   -   N    N     ?  20071016
+win32-x86-msvc_8.0                -    Y    -     -   -   Y    Y*2   ?  20080114
+win32-x86_64-msvc_8.0             -    N    -     -   -   N    N     ?  20080114
 win32-x86-msvc_9.0                -    Y    -     -   -   Y    Y     ?  20071016
 
 ?   ... unknown or untested
