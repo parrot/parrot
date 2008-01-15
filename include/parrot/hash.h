@@ -83,7 +83,8 @@ void parrot_hash_clone(PARROT_INTERP,
     ARGOUT(Hash *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest);
 
 PARROT_API
 void parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
@@ -170,11 +171,13 @@ void parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 
 PARROT_API
 void parrot_new_cstring_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hptr);
 
 PARROT_API
 void parrot_new_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hptr);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -185,11 +188,13 @@ PMC* Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 PARROT_API
 void parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*container);
 
 PARROT_API
 void parrot_new_pointer_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hptr);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -213,7 +218,8 @@ void parrot_new_hash_x(
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*hptr);
 
 void parrot_new_pmc_hash_x(SHIM_INTERP,
     ARGOUT(PMC *container),
@@ -221,7 +227,8 @@ void parrot_new_pmc_hash_x(SHIM_INTERP,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*container);
 
 /* HEADERIZER END: src/hash.c */
 

@@ -66,7 +66,9 @@ void Parrot_STM_mark_transaction(PARROT_INTERP)
 
 void Parrot_STM_merge_profile(ARGOUT(Interp *d), ARGOUT(Interp *s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*d)
+        FUNC_MODIFIES(*s);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

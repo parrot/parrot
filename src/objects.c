@@ -103,7 +103,8 @@ static PMC* get_init_meth(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*meth_str);
 
 static void instantiate_object(PARROT_INTERP,
     ARGMOD(PMC *object),

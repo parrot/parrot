@@ -223,7 +223,8 @@ void clear_sym_hash(ARGMOD(SymHash *hsh))
         FUNC_MODIFIES(*hsh);
 
 void create_symhash(ARGOUT(SymHash *hash))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*hash);
 
 void debug_dump_sym_hash(ARGIN(const SymHash *hsh))
         __attribute__nonnull__(1);

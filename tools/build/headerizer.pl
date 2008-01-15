@@ -266,11 +266,14 @@ sub attrs_from_args {
     my $n = 0;
     for my $arg (@args) {
         ++$n;
-        if ( $arg =~ m{ARGMOD(?:_NOTNULL)?\((.+?)\)} ) {
+        if ( $arg =~ m{ARG(?:MOD|OUT)(?:_NOTNULL)?\((.+?)\)} ) {
             my $modified = $1;
-            $modified =~ s/ //g;
-            $modified =~ s/[^*]+//;
-            $modified =~ s/\*+/*/;
+            if ( $modified =~ s/.*\*/*/ ) {
+                # We're OK
+            }
+            else {
+                $modified =~ s/.* (\w+)$/$1/ or die qq{Unable to figure out the modified parm out of "$modified"};
+            }
             push( @mods, "FUNC_MODIFIES($modified)" );
         }
         if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {

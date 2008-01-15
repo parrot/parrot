@@ -40,17 +40,20 @@ typedef struct Memory_Pool {
 
 void Parrot_allocate(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*buffer);
 
 void Parrot_allocate_aligned(PARROT_INTERP,
     ARGOUT(Buffer *buffer),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*buffer);
 
 void Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 void Parrot_destroy_memory_pools(PARROT_INTERP)
         __attribute__nonnull__(1);

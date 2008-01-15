@@ -231,7 +231,8 @@ size_t PDB_disassemble_op(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*dest);
 
 void PDB_enable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)

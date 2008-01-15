@@ -81,14 +81,14 @@ PARROT_CAN_RETURN_NULL
 static STRING* try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*path);
+        FUNC_MODIFIES(* path);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*path);
+        FUNC_MODIFIES(* path);
 
 /* HEADERIZER END: static */
 

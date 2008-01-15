@@ -156,7 +156,7 @@ PARROT_API
 void Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*ev);
+        FUNC_MODIFIES(* ev);
 
 PARROT_API
 void Parrot_schedule_interp_qentry(PARROT_INTERP,

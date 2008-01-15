@@ -138,7 +138,8 @@ static subs_t * find_global_label(
     ARGOUT(int *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -155,12 +156,14 @@ static int get_codesize(PARROT_INTERP,
     ARGOUT(int *src_lines))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*src_lines);
 
 PARROT_WARN_UNUSED_RESULT
 static int get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ins_line);
 
 static void imcc_globals_destroy(SHIM_INTERP,
     SHIM(int ex),

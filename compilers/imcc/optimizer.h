@@ -28,7 +28,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const char * get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*n);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -44,7 +45,8 @@ Instruction * IMCC_subst_constants(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*unit)
-        FUNC_MODIFIES(*r);
+        FUNC_MODIFIES(*r)
+        FUNC_MODIFIES(*ok);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL

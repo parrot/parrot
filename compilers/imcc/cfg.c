@@ -46,7 +46,7 @@ static void analyse_life_symbol(
     ARGMOD(SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*r);
+        FUNC_MODIFIES(* r);
 
 static void bb_add_edge(
     ARGMOD(IMC_Unit *unit),
@@ -122,7 +122,7 @@ static Basic_block* make_basic_block(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*unit)
-        FUNC_MODIFIES(*ins);
+        FUNC_MODIFIES(* ins);
 
 static void mark_loop(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),

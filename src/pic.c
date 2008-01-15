@@ -109,7 +109,8 @@ static int is_pic_func(PARROT_INTERP,
     int core_type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mic);
 
 static int is_pic_param(PARROT_INTERP,
     ARGIN(void **pc),
@@ -117,7 +118,8 @@ static int is_pic_param(PARROT_INTERP,
     opcode_t op)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mic);
 
 static void parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
         __attribute__nonnull__(1)
@@ -135,7 +137,8 @@ static int pass_int(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        __attribute__nonnull__(6);
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(*dest_base);
 
 static int pass_mixed(PARROT_INTERP,
     ARGIN(const PMC *sig),
@@ -148,7 +151,8 @@ static int pass_mixed(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        __attribute__nonnull__(6);
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(*dest_base);
 
 static int pass_num(PARROT_INTERP,
     ARGIN(const PMC *sig),
@@ -161,7 +165,8 @@ static int pass_num(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        __attribute__nonnull__(6);
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(*dest_base);
 
 static int pass_pmc(PARROT_INTERP,
     ARGIN(const PMC *sig),
@@ -174,7 +179,8 @@ static int pass_pmc(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        __attribute__nonnull__(6);
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(*dest_base);
 
 static int pass_str(PARROT_INTERP,
     ARGIN(const PMC *sig),
@@ -187,7 +193,8 @@ static int pass_str(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        __attribute__nonnull__(6);
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(*dest_base);
 
 /* HEADERIZER END: static */
 

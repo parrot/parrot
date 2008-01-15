@@ -705,7 +705,7 @@ PMC* Parrot_make_cb(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*sub);
+        FUNC_MODIFIES(* sub);
 
 PARROT_API
 void Parrot_run_callback(PARROT_INTERP,
@@ -714,7 +714,7 @@ void Parrot_run_callback(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*user_data);
+        FUNC_MODIFIES(* user_data);
 
 /* HEADERIZER END: src/inter_cb.c */
 
@@ -743,7 +743,8 @@ void * Parrot_compile_file(PARROT_INTERP,
     ARGOUT(STRING **error))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -755,7 +756,8 @@ PMC * Parrot_compile_string(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*error);
 
 PARROT_API
 void Parrot_compreg(PARROT_INTERP,

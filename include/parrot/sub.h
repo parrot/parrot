@@ -222,7 +222,8 @@ int Parrot_Context_get_info(PARROT_INTERP,
     ARGOUT(Parrot_Context_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
@@ -253,7 +254,7 @@ void invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
 void mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*ctx);
+        FUNC_MODIFIES(* ctx);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL

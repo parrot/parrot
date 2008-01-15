@@ -93,7 +93,8 @@ void Parrot_register_move(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(8);
+        __attribute__nonnull__(8)
+        FUNC_MODIFIES(*dest_regs);
 
 PARROT_API
 void Parrot_srand(INTVAL seed);
@@ -126,7 +127,8 @@ STRING * Parrot_psprintf(PARROT_INTERP,
     ARGOUT(PMC *ary))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*ary);
 
 PARROT_API
 void Parrot_snprintf(PARROT_INTERP,
@@ -136,7 +138,8 @@ void Parrot_snprintf(PARROT_INTERP,
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*targ);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -160,7 +163,8 @@ void Parrot_vsnprintf(PARROT_INTERP,
     va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*targ);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL

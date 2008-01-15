@@ -293,7 +293,8 @@ INTVAL PIO_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pmc);
+        FUNC_MODIFIES(*pmc)
+        FUNC_MODIFIES(*buffer);
 
 PARROT_API
 INTVAL PIO_pioctl(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL cmd, INTVAL arg)
@@ -353,7 +354,8 @@ INTVAL PIO_recv(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pmc);
+        FUNC_MODIFIES(*pmc)
+        FUNC_MODIFIES(*buf);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

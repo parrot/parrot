@@ -184,7 +184,8 @@ char * Parrot_PMC_get_cstringn(PARROT_INTERP,
     ARGOUT(Parrot_Int *length))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*length);
 
 PARROT_API
 PARROT_MALLOC
@@ -195,7 +196,8 @@ char * Parrot_PMC_get_cstringn_intkey(PARROT_INTERP,
     Parrot_Int key)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*length);
 
 PARROT_API
 Parrot_Int Parrot_PMC_get_intval(PARROT_INTERP, Parrot_PMC pmc)

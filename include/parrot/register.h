@@ -124,7 +124,7 @@ void destroy_context(PARROT_INTERP)
 void mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t* chunk))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*chunk);
+        FUNC_MODIFIES(* chunk);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT

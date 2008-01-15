@@ -58,7 +58,7 @@ static void hash_freeze(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*info);
+        FUNC_MODIFIES(* info);
 
 static void hash_thaw(PARROT_INTERP,
     ARGMOD(Hash *hash),
@@ -67,7 +67,7 @@ static void hash_thaw(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash)
-        FUNC_MODIFIES(*info);
+        FUNC_MODIFIES(* info);
 
 static void init_hash(
     ARGOUT(Hash *hash),
@@ -75,7 +75,8 @@ static void init_hash(
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*hash);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION

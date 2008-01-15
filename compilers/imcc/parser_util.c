@@ -64,7 +64,8 @@ static void * imcc_compile_file(PARROT_INTERP,
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error_message);
 
 PARROT_WARN_UNUSED_RESULT
 static int is_infix(ARGIN(const char *name), int n, ARGIN(SymReg **r))

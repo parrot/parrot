@@ -31,7 +31,8 @@ static size_t PIO_string_read(SHIM_INTERP,
     ARGOUT(STRING **buf))
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*l);
+        FUNC_MODIFIES(*l)
+        FUNC_MODIFIES(*buf);
 
 static size_t PIO_string_write(PARROT_INTERP,
     ARGMOD(ParrotIOLayer *l),

@@ -39,19 +39,22 @@ static void cvt_num12_num8(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
 
 static void cvt_num12_num8_be(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
 
 static void cvt_num12_num8_le(
     ARGOUT(unsigned char *dest),
     ARGIN(unsigned char *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
 
 static opcode_t fetch_op_be_4(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);

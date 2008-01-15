@@ -149,7 +149,8 @@ Instruction * INS_LABEL(PARROT_INTERP,
 PARROT_API
 int do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* yyscanner);
 
 PARROT_API
 void imcc_destroy(PARROT_INTERP)
@@ -169,7 +170,8 @@ int check_op(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*fullname);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -179,7 +181,8 @@ PMC * imcc_compile(PARROT_INTERP,
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*error_message);
 
 PARROT_CANNOT_RETURN_NULL
 void * IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
@@ -192,7 +195,8 @@ void * IMCC_compile_file_s(PARROT_INTERP,
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error_message);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -213,7 +217,8 @@ PMC * IMCC_compile_pasm_s(PARROT_INTERP,
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error_message);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -234,7 +239,8 @@ PMC * IMCC_compile_pir_s(PARROT_INTERP,
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error_message);
 
 int imcc_fprintf(PARROT_INTERP,
     ARGMOD(FILE *fd),
@@ -313,7 +319,8 @@ void op_fullname(
     int keyvec)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest);
 
 void register_compilers(PARROT_INTERP)
         __attribute__nonnull__(1);

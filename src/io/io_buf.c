@@ -78,7 +78,8 @@ static size_t PIO_buf_peek(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 static size_t PIO_buf_read(PARROT_INTERP,
     ARGIN_NULLOK(ParrotIOLayer *layer),
@@ -87,7 +88,8 @@ static size_t PIO_buf_read(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 static size_t PIO_buf_readline(PARROT_INTERP,
     ARGIN_NULLOK(ParrotIOLayer *layer),
@@ -96,7 +98,8 @@ static size_t PIO_buf_readline(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 static PIOOFF_T PIO_buf_seek(PARROT_INTERP,
     ARGIN_NULLOK(ParrotIOLayer *l),

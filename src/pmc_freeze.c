@@ -48,7 +48,8 @@ static void add_pmc_next_for_GC(SHIM_INTERP,
     ARGIN(PMC *pmc),
     ARGOUT(visit_info *info))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
 
 static void add_pmc_todo_list(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
@@ -108,7 +109,8 @@ static int next_for_GC_seen(PARROT_INTERP,
     ARGOUT(UINTVAL *id))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*id);
 
 static void op_append(PARROT_INTERP,
     ARGIN(STRING *s),
@@ -245,11 +247,14 @@ static int thaw_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*info);
+        FUNC_MODIFIES(*info)
+        FUNC_MODIFIES(*id)
+        FUNC_MODIFIES(*type);
 
 static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*info);
 
 PARROT_INLINE
 static int todo_list_seen(PARROT_INTERP,
@@ -260,7 +265,8 @@ static int todo_list_seen(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*info);
+        FUNC_MODIFIES(*info)
+        FUNC_MODIFIES(*id);
 
 static void visit_loop_next_for_GC(PARROT_INTERP,
     ARGIN(PMC *current),

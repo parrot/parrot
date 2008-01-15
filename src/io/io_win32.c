@@ -41,7 +41,10 @@ static INTVAL flags_to_win32(
     ARGOUT(DWORD * fdwCreate))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* fdwAccess)
+        FUNC_MODIFIES(* fdwShareMode)
+        FUNC_MODIFIES(* fdwCreate);
 
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_win32_accept(PARROT_INTERP,
@@ -114,7 +117,8 @@ static size_t PIO_win32_read(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 static INTVAL PIO_win32_recv(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
@@ -123,7 +127,8 @@ static INTVAL PIO_win32_recv(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*s);
 
 static PIOOFF_T PIO_win32_seek(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),

@@ -111,7 +111,8 @@ static void iter_init(SHIM_INTERP,
     ARGIN(const STRING *src),
     ARGOUT(String_iter *iter))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*iter);
 
 static void set_byte(PARROT_INTERP,
     ARGIN(const STRING *source_string),

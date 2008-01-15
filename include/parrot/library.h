@@ -74,7 +74,9 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*in);
+        FUNC_MODIFIES(*in)
+        FUNC_MODIFIES(*wo_ext)
+        FUNC_MODIFIES(*ext);
 
 /* HEADERIZER END: src/library.c */
 

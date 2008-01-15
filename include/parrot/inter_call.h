@@ -105,7 +105,8 @@ int Parrot_init_arg_nci(PARROT_INTERP,
     ARGIN(const char *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*st);
 
 PARROT_API
 int Parrot_init_arg_op(PARROT_INTERP,
@@ -133,7 +134,8 @@ int Parrot_init_ret_nci(PARROT_INTERP,
     ARGIN(const char *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*st);
 
 PARROT_API
 void parrot_pass_args(PARROT_INTERP,

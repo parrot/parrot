@@ -243,7 +243,8 @@ size_t PIO_peek_down(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_poll_down(PARROT_INTERP,
@@ -266,7 +267,8 @@ size_t PIO_read_async_down(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 PARROT_WARN_UNUSED_RESULT
 size_t PIO_read_down(PARROT_INTERP,
@@ -276,7 +278,8 @@ size_t PIO_read_down(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_recv_down(PARROT_INTERP,
@@ -286,7 +289,8 @@ INTVAL PIO_recv_down(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T PIO_seek_down(PARROT_INTERP,

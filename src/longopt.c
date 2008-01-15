@@ -34,7 +34,7 @@ static int longopt_get_longopt(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        FUNC_MODIFIES(*info_buf);
+        FUNC_MODIFIES(* info_buf);
 
 static int longopt_get_shortopt(PARROT_INTERP,
     int argc,
@@ -45,7 +45,7 @@ static int longopt_get_shortopt(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        FUNC_MODIFIES(*info_buf);
+        FUNC_MODIFIES(* info_buf);
 
 /* HEADERIZER END: static */
 

@@ -45,7 +45,8 @@ static STRING * get_path(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*handle);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL

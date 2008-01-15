@@ -95,7 +95,8 @@ static opcode_t * default_pack(
     ARGIN(const PackFile_Segment *self),
     ARGOUT(opcode_t *dest))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
 
 static size_t default_packed_size(ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1);
@@ -133,7 +134,8 @@ static opcode_t * directory_pack(PARROT_INTERP,
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*cursor);
 
 static size_t directory_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
@@ -207,7 +209,8 @@ static opcode_t * fixup_pack(PARROT_INTERP,
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*cursor);
 
 static size_t fixup_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
@@ -222,7 +225,8 @@ static opcode_t * fixup_unpack(PARROT_INTERP,
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*cursor);
 
 static void make_code_pointers(ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
@@ -240,7 +244,8 @@ static PackFile * PackFile_append_pbc(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static void PackFile_set_header(ARGOUT(PackFile_Header *header))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*header);
 
 static void pf_debug_destroy(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(2)
@@ -265,7 +270,8 @@ static opcode_t * pf_debug_pack(SHIM_INTERP,
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*self);
+        FUNC_MODIFIES(*self)
+        FUNC_MODIFIES(*cursor);
 
 static size_t pf_debug_packed_size(SHIM_INTERP,
     ARGIN(PackFile_Segment *self))
@@ -278,7 +284,8 @@ static opcode_t * pf_debug_unpack(PARROT_INTERP,
     ARGIN(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
 
 static INTVAL pf_register_standard_funcs(PARROT_INTERP,
     ARGMOD(PackFile *pf))
@@ -298,7 +305,8 @@ static void segment_init(
     ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
 
 static void sort_segs(ARGMOD(PackFile_Directory *dir))
         __attribute__nonnull__(1)

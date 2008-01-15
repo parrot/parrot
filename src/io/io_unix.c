@@ -150,7 +150,8 @@ static INTVAL PIO_unix_recv(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*s);
 
 static PIOOFF_T PIO_unix_seek(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),

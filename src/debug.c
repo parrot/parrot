@@ -65,13 +65,15 @@ static const char * parse_command(
     ARGIN(const char *command),
     ARGOUT(unsigned long *cmdP))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*cmdP);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * parse_int(ARGIN(const char *str), ARGOUT(int *intP))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*intP);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -80,7 +82,8 @@ static const char* parse_key(PARROT_INTERP,
     ARGOUT(PMC **keyP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*keyP);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -89,7 +92,8 @@ static const char * parse_string(PARROT_INTERP,
     ARGOUT(STRING **strP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*strP);
 
 PARROT_CANNOT_RETURN_NULL
 static const char * skip_command(ARGIN(const char *str))

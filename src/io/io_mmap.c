@@ -51,7 +51,8 @@ static size_t PIO_mmap_read(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*io);
+        FUNC_MODIFIES(*io)
+        FUNC_MODIFIES(*buf);
 
 /* HEADERIZER END: static */
 

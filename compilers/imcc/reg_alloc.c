@@ -92,7 +92,7 @@ static unsigned int* ig_get_word(
     int j,
     int N,
     ARGIN(unsigned int *graph),
-    ARGMOD(int* bit_ofs))
+    ARGMOD(int *bit_ofs))
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*bit_ofs);
@@ -171,8 +171,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static unsigned int*
-ig_get_word(int i, int j, int N, ARGIN(unsigned int *graph),
-        ARGMOD(int* bit_ofs))
+ig_get_word(int i, int j, int N, ARGIN(unsigned int *graph), ARGMOD(int *bit_ofs))
 {
     unsigned int bit = i * N + j;
     *bit_ofs = bit % sizeof (*graph);

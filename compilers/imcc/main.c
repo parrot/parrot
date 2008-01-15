@@ -96,7 +96,7 @@ static void Parrot_version(PARROT_INTERP)
 
 static void usage(ARGMOD(FILE* fp))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(*fp);
+        FUNC_MODIFIES(* fp);
 
 /* HEADERIZER END: static */
 

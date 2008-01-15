@@ -89,7 +89,8 @@ static void iter_init(PARROT_INTERP,
     ARGOUT(String_iter *iter))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*iter);
 
 static void set_byte(PARROT_INTERP,
     SHIM(const STRING *src),

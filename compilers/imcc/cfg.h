@@ -121,7 +121,7 @@ void search_predecessors_not_in(
     ARGMOD(Set* s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
+        FUNC_MODIFIES(* s);
 
 /* HEADERIZER END: compilers/imcc/cfg.c */
 

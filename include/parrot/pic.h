@@ -82,7 +82,8 @@ Parrot_PIC* parrot_PIC_alloc_pic(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void parrot_PIC_alloc_store(ARGOUT(struct PackFile_ByteCode *cs), size_t n)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*cs);
 
 PARROT_WARN_UNUSED_RESULT
 int parrot_pic_check_sig(
@@ -91,7 +92,8 @@ int parrot_pic_check_sig(
     ARGOUT(int *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*type);
 
 void parrot_PIC_destroy(ARGMOD(struct PackFile_ByteCode *cs))
         __attribute__nonnull__(1)
@@ -106,7 +108,9 @@ void parrot_pic_find_infix_v_pp(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*mic)
+        FUNC_MODIFIES(*cur_opcode);
 
 PARROT_CONST_FUNCTION
 int parrot_PIC_op_is_cached(int op_code);
@@ -121,7 +125,8 @@ void parrot_PIC_prederef(PARROT_INTERP,
     ARGOUT(void **pc_pred),
     int core)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pc_pred);
 
 /* HEADERIZER END: src/pic.c */
 
@@ -138,7 +143,8 @@ int parrot_pic_is_safe_to_jit(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*flags);
 
 funcptr_t parrot_pic_JIT_sub(PARROT_INTERP,
     ARGIN(const PMC *sub),

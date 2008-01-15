@@ -62,6 +62,7 @@ static void gen_sprintf_call(
     int thingy)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(*out)
         FUNC_MODIFIES(*info);
 
 PARROT_CANNOT_RETURN_NULL
@@ -77,14 +78,15 @@ static STRING * handle_flags(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* str_append_w_flags(PARROT_INTERP,
-    ARGOUT(STRING* dest),
+    ARGOUT(STRING *dest),
     ARGIN(const SpfInfo *info),
-    ARGIN(STRING* src),
+    ARGIN(STRING *src),
     ARGIN_NULLOK(STRING *prefix))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*dest);
 
 /* HEADERIZER END: static */
 
@@ -211,8 +213,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-str_append_w_flags(PARROT_INTERP, ARGOUT(STRING* dest), ARGIN(const SpfInfo *info),
-        ARGIN(STRING* src), ARGIN_NULLOK(STRING *prefix))
+str_append_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *info),
+        ARGIN(STRING *src), ARGIN_NULLOK(STRING *prefix))
 {
     src = handle_flags(interp, info, src, 1, prefix);
     dest = string_append(interp, dest, src);

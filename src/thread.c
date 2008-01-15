@@ -75,7 +75,9 @@ static void pt_ns_clone(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(d)
+        FUNC_MODIFIES(*dest_ns);
 
 static void pt_suspend_all_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);

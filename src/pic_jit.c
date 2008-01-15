@@ -72,7 +72,8 @@ static int ops_jittable(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         __attribute__nonnull__(6)
-        __attribute__nonnull__(7);
+        __attribute__nonnull__(7)
+        FUNC_MODIFIES(*flags);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -80,7 +81,8 @@ static opcode_t * pic_test_func(PARROT_INTERP,
     SHIM(INTVAL *sig_bits),
     ARGOUT(void **args))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*args);
 
 PARROT_WARN_UNUSED_RESULT
 static int returns_match_results(
