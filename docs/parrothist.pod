@@ -44,11 +44,8 @@ the strings?).
 
 =head1 THE RECORDS
 
- Pump-  Release         Date            Notes
- king                                   (by no means
-                                         comprehensive,
-                                         see Changes*
-                                         for details)
+ Pump-  Release         Date            Release name
+ king
  ===========================================================================
 
  Simon     0.0.1          2001-Sep-10     n/a
@@ -110,5 +107,7 @@ the strings?).
  chromatic 0.5.0          2007-Nov-20     "Caulked Snack"
 
  Jonathan  0.5.1          2007-Dec-18     "Hatachi"
+
+ Bob       0.5.2          2008-Jan-15     "P.e. nipalensis"
 
 =cut

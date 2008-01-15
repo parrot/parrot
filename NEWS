@@ -1,22 +1,23 @@
 # $Id$
 
 New in 0.5.2
-- "make perl6" now builds a Perl 6 executable
 - Documentation
-  + New multiple dispatch PDD (PDD27).
+  + PDD27 (multiple dispatch) - debut of new design
   + Numerous small updates to glossary.pod, etc
-- Compilers
+- Compiler Toolkit
   + NQP: optional, named, and named/required parameters
   + PIRC: cleanups
   + PAST: "defined-or"
 - Languages
   + New mk_language_shell.pl script creates language stubs
-  + lolcode: new
+  + LOLCODE: new
   + Lua: various
   + Eclectus: start with support for local variables and procedures,
     use SXML as intermediate representation
-  + Perl 6: list ops, compiler directives, command-line options, etc.
-  + punie: more ops, control structures, code refactoring
+  + Perl 6: list builtins, compiler directives, command-line options, etc.
+  + "make perl6" now builds a Perl 6 executable
+  + punie: more builtins, control structures, code refactoring
+  + pynie: builtin stubs, more tests
 - Implementation
   + New "pbc_to_exe" utility turns bytecode to executables
   + New set_outer method for subs
