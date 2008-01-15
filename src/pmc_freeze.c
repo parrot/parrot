@@ -1522,6 +1522,7 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
 {
     List * const todo = (List *)PMC_data(info->todo);
     PMC *finish_list_pmc;
+    PMC **list_item;
     int i, n;
     List *finish_list = NULL;   /* gcc -O3 warning */
     int finished_first = 0;
@@ -1543,9 +1544,9 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
      * can't cache upper limit, visit may append items
      */
 again:
-    while (list_length(interp, todo)) {
+    while ((list_item = (PMC**)list_shift(interp, todo, enum_type_PMC))) {
         /* XXX list_shift can return NULL and we're dereferencing it without checking */
-        current = *(PMC**)list_shift(interp, todo, enum_type_PMC);
+        current = *list_item;
         if (!current) {
             real_exception(interp, NULL, 1,
                     "NULL current PMC in visit_loop_todo_list");

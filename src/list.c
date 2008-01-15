@@ -1875,11 +1875,12 @@ void *
 list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 {
     void *ret;
-    UINTVAL idx = list->start++;
+    UINTVAL idx;
     List_chunk * const chunk = list->first;
 
     if (list->length == 0)
         return NULL;
+    idx = list->start++;
     list->length--;
     /* optimize push + shift on empty lists */
     if (list->length == 0)
