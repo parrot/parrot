@@ -120,10 +120,11 @@
 ; forms represented by a scalar PMC
 (define immediate?
   (lambda (x)
-    (or (fixnum? x)
-        (boolean? x)
-        (char? x)
-        (null? x))))
+    (or [boolean? x]
+        [char? x]
+        [fixnum? x]
+        [null? x]
+        [string? x])))
 
 (define variable?
   (lambda (x) 
@@ -394,8 +395,8 @@
          (quasiquote (@ (value (unquote (if x 1 0)))
                         (returns "EclectusBoolean")))]
         [(string? x)
-         (quasiquote (@ (value (unquote (format "\"'~a'\"" x)))
-                          (returns "EclectusString")))]))))
+         (quasiquote (@ (value (unquote (format "'~a'" x)))
+                        (returns "EclectusString")))]))))
 
 (define bindings
   (lambda (x)
