@@ -1543,7 +1543,8 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
      * can't cache upper limit, visit may append items
      */
 again:
-    for (; (int)list_length(interp, todo);) {
+    while (list_length(interp, todo)) {
+        /* XXX list_shift can return NULL and we're dereferencing it without checking */
         current = *(PMC**)list_shift(interp, todo, enum_type_PMC);
         if (!current) {
             real_exception(interp, NULL, 1,
