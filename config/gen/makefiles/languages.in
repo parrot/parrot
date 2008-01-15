@@ -29,6 +29,7 @@ LANGUAGES = \
     forth \
     jako \
     lisp \
+    lolcode \
     lua \
     m4 \
     ook \
@@ -108,6 +109,7 @@ clean: \
     forth.clean \
     jako.clean \
     lisp.clean \
+    lolcode.clean \
     lua.clean \
     m4.clean \
     ook.clean \
@@ -286,6 +288,14 @@ lisp.test:
 	- $(MAKE) lisp test
 lisp.clean:
 	- $(MAKE) lisp clean
+
+lolcode: lolcode.dummy
+lolcode.dummy:
+	- $(MAKE) lolcode
+lolcode.test:
+	- $(MAKE) lolcode test
+lolcode.clean:
+	- $(MAKE) lolcode clean
 
 lua: lua.dummy
 lua.dummy:
