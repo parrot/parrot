@@ -22,11 +22,9 @@ Make sure you're up to date:
  $ svn update
 
 You may want to ask the developer base to stop committing big changes;
-it will avoid complications. Or you could create a release branch before
-releasing, rather than after. Then you could fold the release-oriented
-changes into the trunk once the release is done.
-
-TODO: explain how to do this
+it will avoid complications.  Or you could create a release branch,
+make release-related changes there, and fold them back into the trunk
+once the release is done.  This process is explained in L<Appendix 1>.
 
 =item 2.
 
@@ -258,6 +256,51 @@ parrot repository layout as of end of Apr 2005
  file_move_031023/
  help/
  ponie-PRE-P5_592/
+
+=head2 Releasing from a branch
+
+Instead of step 1, create a new branch, and get a working copy of it:
+
+   $ export SVNPARROT=https://svn.perl.org/parrot
+   $ svn copy -m"Starting release a.b.c" \
+              $SVNPARROT/trunk $SVNPARROT/branches/RELEASE_a_b_c
+   $ svn checkout $SVNPARROT/branches/RELEASE_a_b_c parrot-release
+   $ cd parrot-release
+
+Make a note of the revision number produced by C<svn copy> so that you
+know which changes were made on the branch.
+
+This new C<parrot-release> working copy will be "on" the branch,
+insulated from trunk commits, so you should feel free to announce the
+end of any "code slush" that may be in effect.
+
+Then, do steps 3 through 7 using your branch working copy, so that
+commits go to the branch.  When you are sure that the tarball is all
+that it should be, tag the release as a copy from the branch (instead
+of the trunk):
+
+   $ svn copy -m"Release a.b.c" \
+           $SVNPARROT/branches/RELEASE_a_b_c $SVNPARROT/tags/RELEASE_a_b_c
+
+Upload your shiny new tarball, announce the release, and close tickets
+(steps 9 through 11) as described above.
+
+Finally (don't get your celebratory drink yet!), you need to merge the
+branch changes back into the trunk.  To do this, you need an
+up-to-date working copy on the trunk.  You can reuse the
+C<parrot-release> working copy via C<svn switch> by switching it back
+to the trunk (assuming C<parrot-release> is the current directory):
+
+   $ svn switch $SVNPARROT/trunk
+
+Then, merge the branch changes back into it:
+
+   $ svn merge -r 12345:HEAD $SVNPARROT/branches/RELEASE_a_b_c
+
+where "12345" is the revision number of the C<svn copy> operation that
+created the branch.  Check that the merge was clean, "make test" if
+there were any code changes on the branch, and commit.  I<Then> go get
+that beer!
 
 =head1 Appendix 2
 
