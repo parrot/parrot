@@ -101,6 +101,8 @@ An interpreter in which to execute this task.
 
 =back
 
+=cut
+
 */
 
     void init_pmc(PMC *data) {
