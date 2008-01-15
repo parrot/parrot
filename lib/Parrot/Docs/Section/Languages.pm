@@ -58,6 +58,7 @@ sub new {
         $self->new_section( 'HQ9plus',     'hq9plus.html',    '', 'languages/HQ9plus' ),
         $self->new_section( 'Jako',        'jako.html',       '', 'languages/jako' ),
         $self->new_section( 'lazy-k',      'lazy-k.html',     '', 'languages/lazy-k' ),
+        $self->new_section( 'lolcode',     'lolcode.html',    '', 'languages/lolcode' ),
         $self->new_section( 'Lua',         'lua.html',        '', 'languages/lua' ),
         $self->new_section( 'M4',          'm4.html',         '', 'languages/m4' ),
         $self->new_section( 'Ook!',        'ook.html',        '', 'languages/ook' ),
