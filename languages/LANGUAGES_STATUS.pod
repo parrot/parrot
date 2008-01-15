@@ -63,7 +63,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -113,7 +113,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -139,7 +139,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -162,7 +162,7 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -286,7 +286,7 @@ has been commented out.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -334,7 +334,7 @@ Planned.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -380,7 +380,7 @@ Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -418,7 +418,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -473,7 +473,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -497,7 +497,7 @@ VISIBLE and BTW "work"
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -525,7 +525,7 @@ L<http://www.parrotcode.org/talks/LuaOnParrot.pdf>.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -587,7 +587,7 @@ Development is stalled. Takers are welcome.  Some tests fail.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -634,7 +634,7 @@ In progress.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -681,7 +681,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -724,7 +724,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -751,7 +751,7 @@ builtins.
 
 =item Last verified with Parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -829,7 +829,7 @@ Started.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -882,7 +882,7 @@ and logic ops.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -1003,7 +1003,7 @@ use tcltest.tcl)
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -1052,7 +1052,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.0
+0.5.2
 
 =item Location
 
@@ -1076,7 +1076,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
@@ -1104,7 +1104,7 @@ See details in F<languages/WMLScript/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.5.1
+0.5.2
 
 =item Location
 
