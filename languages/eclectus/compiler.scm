@@ -123,8 +123,7 @@
     (or (fixnum? x)
         (boolean? x)
         (char? x)
-        (and (list? x)
-             (= (length x) 0)))))
+        (null? x))))
 
 (define variable?
   (lambda (x) 
