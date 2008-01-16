@@ -206,6 +206,7 @@ sub runstep {
         as           => 'as',    # assembler
 
         cp    => '$(PERL) -MExtUtils::Command -e cp',
+        mv    => '$(PERL) -MExtUtils::Command -e mv',
         lns   => $Config{lns},                          # soft link
         slash => '/',
 
