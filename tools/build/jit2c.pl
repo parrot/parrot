@@ -241,7 +241,7 @@ print $JITCPU <<"END_C";
 /* HEADERIZER STOP */
 
 #include<parrot/parrot.h>
-#if HAVE_COMPUTED_GOTO
+#ifdef HAVE_COMPUTED_GOTO
 #  include<parrot/oplib/core_ops_cgp.h>
 #endif
 #include"parrot/exec.h"

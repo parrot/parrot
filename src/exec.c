@@ -17,7 +17,7 @@ src/exec.c - Generate an object file
 */
 
 #include <parrot/parrot.h>
-#if HAVE_COMPUTED_GOTO
+#ifdef HAVE_COMPUTED_GOTO
 #  include <parrot/oplib/core_ops_cgp.h>
 #endif /* HAVE_COMPUTED_GOTO */
 #include "parrot/exec.h"

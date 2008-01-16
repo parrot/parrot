@@ -1040,11 +1040,9 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
     core->op_count = interp->op_count = n_tot;
     core->flags = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
     /* done for plain core */
-#if defined HAVE_COMPUTED_GOTO
-    dynop_register_xx(interp, n_old, n_new,
-            PARROT_CORE_CGP_OPLIB_INIT);
-    dynop_register_xx(interp, n_old, n_new,
-            PARROT_CORE_CG_OPLIB_INIT);
+#ifdef HAVE_COMPUTED_GOTO
+    dynop_register_xx(interp, n_old, n_new, PARROT_CORE_CGP_OPLIB_INIT);
+    dynop_register_xx(interp, n_old, n_new, PARROT_CORE_CG_OPLIB_INIT);
 #endif
     dynop_register_switch(n_old, n_new);
 }
