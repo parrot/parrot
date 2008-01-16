@@ -387,8 +387,7 @@
         [(char? x)
          (quasiquote (@ (value (unquote (char->integer x)))
                         (returns "EclectusCharacter")))]
-        [(and (list? x)
-              (= (length x) 0))
+        [(null? x)
          '(@ (value 0)
              (returns "EclectusEmptyList"))]
         [(boolean? x)
