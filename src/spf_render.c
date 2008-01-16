@@ -80,13 +80,14 @@ PARROT_CANNOT_RETURN_NULL
 static STRING* str_append_w_flags(PARROT_INTERP,
     ARGOUT(STRING *dest),
     ARGIN(const SpfInfo *info),
-    ARGIN(STRING *src),
+    ARGMOD(STRING *src),
     ARGIN_NULLOK(STRING *prefix))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*dest);
+        FUNC_MODIFIES(*dest)
+        FUNC_MODIFIES(*src);
 
 /* HEADERIZER END: static */
 
@@ -214,7 +215,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 static STRING*
 str_append_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *info),
-        ARGIN(STRING *src), ARGIN_NULLOK(STRING *prefix))
+        ARGMOD(STRING *src), ARGIN_NULLOK(STRING *prefix))
 {
     src = handle_flags(interp, info, src, 1, prefix);
     dest = string_append(interp, dest, src);
