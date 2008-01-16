@@ -4,6 +4,7 @@ PARROT  = ../../parrot@exe@
 
 BUILD_DIR   = @build_dir@
 RECONFIGURE = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+PBC_TO_EXE    = $(BUILD_DIR)/pbc_to_exe@exe@
 
 C_BUILTIN = src/builtin
 TCL_LIB   = library
@@ -15,6 +16,8 @@ PMCDIR    = src/pmc
 OPSDIR    = src/ops
 CLASSDIR  = src/class
 LOAD_EXT  = @load_ext@
+COPY      = @cp@
+RENAME    = @mv@
 
 CC_INC     = @cc_inc@
 CC_SHARED  = @cc_shared@
@@ -131,8 +134,14 @@ runtime/builtins.pir: $(GENERATED_INLINES) $(DEPS) tools/gen_builtins.pl
 runtime/tcllib.pbc: $(PARROT) runtime/tcllib.pir runtime/builtins.pir $(CLASSES)
 	$(PARROT) --output=runtime/tcllib.pbc runtime/tcllib.pir
 
-tclsh: $(PARROT) tcl.pbc
-	$(PARROT) -G tcl.pbc
+# targets for building a standalone tclsh
+# (We're not quite ready to make this a default target.)
+tclsh@exe@: tcl.pbc $(PBC_TO_EXE)
+	$(PBC_TO_EXE) tcl.pbc
+	$(RENAME) tcl@exe@ tclsh@exe@
+
+$(PBC_TO_EXE):
+	$(MAKE) $(BUILD_DIR) ./pbc_to_exe@exe@
 
 test: tcl.pbc
 	prove -r t
@@ -343,3 +352,4 @@ distclean: realclean
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=tcl
+
