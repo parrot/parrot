@@ -115,17 +115,7 @@
 
           ")))
 
-;; recognition of forms
-
-; forms represented by a scalar PMC
-(define immediate?
-  (lambda (x)
-    (or [boolean? x]
-        [char? x]
-        [fixnum? x]
-        [null? x]
-        [string? x])))
-
+; recognition of forms
 (define make-combination-predicate
   (lambda (name)
     (lambda (form)
@@ -375,7 +365,7 @@
 (define emit-atom
   (lambda (x)
     (list
-      (string->symbol "PAST::Val")
+      (string->symbol (if (symbol? x) "PAST::Var" "PAST::Val"))
       (cond
         [(fixnum? x)
          (quasiquote (@ (value (unquote x))
@@ -390,10 +380,9 @@
          (quasiquote (@ (value (unquote (if x 1 0)))
                         (returns "EclectusBoolean")))]
         [(symbol? x)
-         (list (string->symbol "PAST::Var")
-               (quasiquote (@ (name (unquote x))
-                              (scope "lexical")
-                              (viviself "Undef"))))]
+         (quasiquote (@ (name (unquote x))
+                        (scope "lexical")
+                        (viviself "Undef")))]
         [(string? x)
          (quasiquote (@ (value (unquote (format "'~a'" x)))
                         (returns "EclectusString")))]))))
@@ -476,8 +465,7 @@
   (lambda (x)
     ;(diag (format "emit-expr: ~s" x))
     (cond
-      [(immediate? x) (emit-atom x)]
-      [(symbol? x)    (emit-variable x)]
+      [(atom? x)      (emit-atom x)]
       [(let? x)       (emit-let (bindings x) (body x))]
       [(if? x)        (emit-if x)]
       [(lambda? x)    (emit-lambda x)]
