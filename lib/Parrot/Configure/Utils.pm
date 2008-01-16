@@ -3,17 +3,12 @@
 
 =head1 NAME
 
-Parrot::Configure::Step - Configuration Step Utilities
+Parrot::Configure::Utils - Configuration Step Utilities
 
 =head1 DESCRIPTION
 
-The C<Parrot::Configure::Step> module contains utility functions for use by
+The C<Parrot::Configure::Utils> module contains utility functions for use by
 the configuration step classes found under F<config/>.
-
-Note that the actual configuration step itself is NOT an instance of this
-class, rather it is defined to be in the C<package> C<Configure::Step>. See
-F<docs/configuration.pod> for more information on how to create new
-configuration steps.
 
 The subroutines found in this module do B<not> require the Parrot::Configure
 object as an argument.  Those subroutines formerly found in this module which
@@ -321,9 +316,11 @@ sub _slurp {
 
 =over 4
 
-=item C<Parrot::Configure::RunSteps>
+=item C<Parrot::Configure::runsteps()>
 
 =item F<docs/configuration.pod>
+
+=item F<lib/Parrot/Configure/Compiler.pm>
 
 =back
 
