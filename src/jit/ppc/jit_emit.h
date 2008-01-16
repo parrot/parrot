@@ -706,7 +706,7 @@ static char *
 div_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
 {
     char *jmp_ptr, *sav_ptr;
-    static const char* div_by_zero = "Divide by zero";
+    static const char div_by_zero[] = "Divide by zero";
     char *pc = jit_info->native_ptr;
 
     jit_emit_cmp_ri(pc, B, 0);
@@ -735,7 +735,7 @@ static char *
 fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
 {
     char *jmp_ptr, *sav_ptr;
-    static const char* div_by_zero = "Divide by zero";
+    static const char div_by_zero[] = "Divide by zero";
     char *pc = jit_info->native_ptr;
     static const double zero = 0.0;
 

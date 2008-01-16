@@ -1710,7 +1710,7 @@ static char *
 div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
 {
     char *L1;
-    static const char* div_by_zero = "Divide by zero";
+    static const char div_by_zero[] = "Divide by zero";
     char *pc = jit_info->native_ptr;
 
     jit_emit_test_r_n(pc, (char)0);   /* TOS */
@@ -1749,7 +1749,7 @@ static char *
 mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
 {
     char *L1;
-    static const char* div_by_zero = "Divide by zero";
+    static const char div_by_zero[] = "Divide by zero";
     char *pc = jit_info->native_ptr;
 
     jit_emit_test_r_n(pc, (char)0);   /* TOS */
@@ -1884,7 +1884,7 @@ opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is
     int saved = 0;
     int div_ecx = 0;
     char *L1, *L2, *L3;
-    static const char* div_by_zero = "Divide by zero";
+    static const char div_by_zero[] = "Divide by zero";
 
     assert(src != emit_EAX);
 
