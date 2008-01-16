@@ -385,6 +385,9 @@
                         (viviself "Undef")))]
         [(string? x)
          (quasiquote (@ (value (unquote (format "'~a'" x)))
+                        (returns "EclectusString")))]
+        [(vector? x)
+         (quasiquote (@ (value "'#0()'")
                         (returns "EclectusString")))]))))
 
 (define bindings

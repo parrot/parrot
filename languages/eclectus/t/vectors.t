@@ -2,9 +2,8 @@
 
 (load "tests-driver.scm") ; this should come first
 
-(skip-all "vectors are not supported yet")
-
-(add-tests-with-string-output "vectors"      
+(add-tests-with-string-output "vectors"
+  [#()                   => "#0()\n"]                    
 )
 
 (load "compiler.scm")
