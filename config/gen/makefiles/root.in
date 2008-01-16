@@ -501,7 +501,7 @@ PDB                 = $(CUR_DIR)/pdb$(EXE)
 PBC_TO_EXE          = $(CUR_DIR)/pbc_to_exe$(EXE)
 
 # HLL Executables
-PERL6               = perl6$(EXE)
+PERL6               = $(CUR_DIR)/perl6$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT   = $(CUR_DIR)/installable_parrot$(EXE)
@@ -795,12 +795,13 @@ $(PBC_TO_EXE) : pbc_to_exe.pir
 
 
 # HLL Executable targets
-$(PERL6) : all $(PBC_TO_EXE)
-	$(MAKE) languages/perl6
-	$(PBC_TO_EXE) languages/perl6/perl6.pbc
+perl6 : $(PERL6)
+
+$(PERL6) : compilers $(PBC_TO_EXE)
+	$(MAKE) languages/perl6 perl6$(EXE)
 	$(CP) languages/perl6/perl6$(EXE) $(PERL6)
 	$(CHMOD) 0755 $(PERL6)
-	$(CUR_DIR)/$(PERL6) -e"say 'Hello, world.'"
+	$(PERL6) -e"say 'Hello, world.'"
 
 
 # TODO build the real miniparrot
@@ -1315,7 +1316,7 @@ dynoplibs-clean :
 #
 ###############################################################################
 
-compilers : compilers.dummy
+compilers : $(GEN_LIBRARY) compilers.dummy
 
 compilers.dummy : $(PARROT)
 	$(MAKE) compilers/pge
