@@ -88,7 +88,7 @@ RBP, RBX, and R12->R15 are preserved
 #include <limits.h>
 
 void Parrot_jit_begin(Parrot_jit_info_t *, Interp *);
-static const char* div_by_zero = "Divide by zero";
+static const char div_by_zero[] = "Divide by zero";
 static const int mxcsr = 0x7fa0; /* Add 6000 to mxcsr */
 
 
@@ -395,7 +395,7 @@ The REX prefix, only emitted if using an extended register.
 #  define emit_div_check_zero(pc) { \
     char *sav_ptr; \
     emit_jcc(pc, jcc_jnz, 0x00); \
-    sav_ptr = (void *)(pc - 1); \
+    sav_ptr = (char *)(pc - 1); \
     emit_mov_r_r(pc, RDI, INTERP); \
     emit_mov_r_i(pc, RSI, 0); \
     emit_mov_r_i(pc, RDX, E_ZeroDivisionError); \
@@ -1009,7 +1009,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 
     /* Quick fixup, but we know it's 12, anyway it needs to be a byte */
     emit_jcc(jit_info->native_ptr, jcc_jnz, 0x00);
-    sav_ptr = (void *)(jit_info->native_ptr - 1);
+    sav_ptr = (char *)(jit_info->native_ptr - 1);
     Parrot_end_jit(jit_info, interp);
     *sav_ptr = (char)(jit_info->native_ptr - sav_ptr - 1);
 
