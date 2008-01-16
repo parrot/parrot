@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# auto_warnings-01.t
+# auto_warnings-08.t
 
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 23;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -15,6 +15,7 @@ use_ok('config::auto::warnings');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
+use IO::CaptureOutput qw | capture |;
 
 my $args = process_options(
     {
@@ -43,31 +44,41 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my %potential_warnings_seen;
-$conf->options->set(cage => 1);
-$step->_add_cage_warnings($conf);
-%potential_warnings_seen = map { $_, 1 } @{ $step->{potential_warnings} };
-ok($potential_warnings_seen{'-std=c89'}, "Cage warning added");
+{
+    my ($stdout, $rv);
+    # Mock case where C compiler is not gcc.
+    $conf->data->set( gccversion => undef );
+    $conf->options->set( verbose => 1 );
+    capture(
+        sub { $rv = $step->runstep($conf); },
+        \$stdout,
+    );
+    ok($rv, "runstep() returned true value");
+    is($step->result(), q{skipped}, "Got expected result");
+    like($stdout,
+        qr/Currently we only set warnings/,
+        "Got expected verbose output"
+    );
+}
 
-
-pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-auto_warnings-01.t - test config::auto::warnings
+auto_warnings-08.t - test config::auto::warnings
 
 =head1 SYNOPSIS
 
-    % prove t/steps/auto_warnings-01.t
+    % prove t/steps/auto_warnings-08.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test aspects of config::auto::warnings.
+The tests in this file test config::auto::warnings when the C compiler
+being used is not I<gcc> and when C<--verbose> option has been selected.
 
 =head1 AUTHOR
 

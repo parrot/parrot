@@ -130,14 +130,22 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose');
     print "\n" if $verbose;
+    if ( defined $conf->data->get('gccversion') ) {
 
-    # add on some extra warnings if requested
-    $self->_add_cage_warnings($conf);
-    $self->_add_maintainer_warnings($conf);
-
-    # now try out our warnings
-    for my $maybe_warning (@{ $self->{potential_warnings} }) {
-        $self->try_warning( $conf, $maybe_warning, $verbose );
+        # add on some extra warnings if requested
+        $self->_add_cage_warnings($conf);
+        $self->_add_maintainer_warnings($conf);
+    
+        # now try out our warnings
+        for my $maybe_warning (@{ $self->{potential_warnings} }) {
+            $self->try_warning( $conf, $maybe_warning, $verbose );
+        }
+        $self->set_result("set for gcc");
+    }
+    else {
+        print "Currently we only set warnings if using gcc as C compiler\n"
+            if $verbose;
+        $self->set_result("skipped");
     }
     return 1;
 }
