@@ -52,10 +52,14 @@ monthly release.
 =item c
 
 Update release-related information in F<tools/util/release.json>. This will be
-used later when making release announcements.  There are a few interesting
-fields:
+used later when making release announcements.  There are a few essential
+fields that must be updated at each release:
 
 =over 4
+
+=item C<release.*>
+
+The date of the next release is in L<Appendix 2>.
 
 =item C<rt.tracking>
 
@@ -203,7 +207,10 @@ Add a release announcement to news/[year]/Parrot-[release].html.
 Update C</index.html> (The old mini-announcement may be commented out).
 Update C</.htredirects> to point to the proper CPAN URL. 
 
-Test locally in combust before pushing update out.
+If your name is Allison, Will, or chromatic, you will be able to
+commit these changes yourself; be sure to test locally in combust
+before pushing the update out.  Otherwise, prepare the changes and
+send a patch to one of the anointed.
 
 =back
 
