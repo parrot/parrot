@@ -203,7 +203,7 @@ int main(int argc, const char *argv[])
 
     pf = PackFile_new(interp, 0);
 
-    if (!PackFile_unpack(interp, pf, (const char *)program_code, bytecode_size))
+    if (!PackFile_unpack(interp, pf, (const opcode_t *)program_code, bytecode_size))
         return 1;
 
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);

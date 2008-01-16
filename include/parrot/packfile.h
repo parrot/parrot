@@ -102,8 +102,8 @@ typedef size_t (*PackFile_Segment_packed_size_func_t)
 typedef opcode_t * (*PackFile_Segment_pack_func_t)
     (PARROT_INTERP, struct PackFile_Segment *, opcode_t *dest);
 
-typedef opcode_t * (*PackFile_Segment_unpack_func_t)
-    (PARROT_INTERP, struct PackFile_Segment *, opcode_t *packed);
+typedef const opcode_t * (*PackFile_Segment_unpack_func_t)
+    (PARROT_INTERP, struct PackFile_Segment *, const opcode_t *packed);
 
 typedef void (*PackFile_Segment_dump_func_t)
     (PARROT_INTERP, const struct PackFile_Segment *);
@@ -144,7 +144,7 @@ typedef struct PackFile_Segment {
     opcode_t            itype;          /* internal type/version */
     opcode_t            id;             /* internal id */
     size_t              size;           /* internal oparray size */
-    opcode_t            *data;         /* oparray e.g. bytecode */
+    opcode_t            *data;          /* oparray e.g. bytecode */
 } PackFile_Segment;
 
 typedef INTVAL (*PackFile_map_segments_func_t)
@@ -361,10 +361,10 @@ size_t PackFile_Constant_pack_size(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * PackFile_Constant_unpack(PARROT_INTERP,
+const opcode_t * PackFile_Constant_unpack(PARROT_INTERP,
     ARGIN(PackFile_ConstTable *constt),
     ARGOUT(PackFile_Constant *self),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -374,10 +374,10 @@ opcode_t * PackFile_Constant_unpack(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * PackFile_Constant_unpack_key(PARROT_INTERP,
+const opcode_t * PackFile_Constant_unpack_key(PARROT_INTERP,
     ARGIN(PackFile_ConstTable *constt),
     ARGMOD(PackFile_Constant *self),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -387,10 +387,10 @@ opcode_t * PackFile_Constant_unpack_key(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_Constant_unpack_pmc(PARROT_INTERP,
+const opcode_t * PackFile_Constant_unpack_pmc(PARROT_INTERP,
     ARGIN(PackFile_ConstTable *constt),
     ARGMOD(PackFile_Constant *self),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -407,9 +407,9 @@ void PackFile_ConstTable_clear(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
+const opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
     ARGOUT(PackFile_Segment *seg),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -549,9 +549,9 @@ size_t PackFile_Segment_packed_size(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * PackFile_Segment_unpack(PARROT_INTERP,
+const opcode_t * PackFile_Segment_unpack(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -678,7 +678,7 @@ void PackFile_assign_transforms(ARGMOD(PackFile *pf))
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-char * PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(opcode_t **cursor))
+char * PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -691,13 +691,13 @@ INTVAL PF_fetch_integer(
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL PF_fetch_number(
     ARGIN_NULLOK(PackFile *pf),
-    ARGIN(opcode_t **stream))
+    ARGIN(const opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 opcode_t PF_fetch_opcode(
     ARGIN_NULLOK(const PackFile *pf),
-    ARGMOD(opcode_t **stream))
+    ARGMOD(const opcode_t **stream))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stream);
 
@@ -705,7 +705,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * PF_fetch_string(PARROT_INTERP,
     ARGIN_NULLOK(PackFile *pf),
-    ARGIN(opcode_t **cursor))
+    ARGIN(const opcode_t **cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 

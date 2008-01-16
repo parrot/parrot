@@ -103,9 +103,9 @@ static size_t default_packed_size(ARGIN(const PackFile_Segment *self))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * default_unpack(
+static const opcode_t * default_unpack(
     ARGMOD(PackFile_Segment *self),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
@@ -145,9 +145,9 @@ static size_t directory_packed_size(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * directory_unpack(PARROT_INTERP,
+static const opcode_t * directory_unpack(PARROT_INTERP,
     ARGMOD(PackFile_Segment *segp),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -220,9 +220,9 @@ static size_t fixup_packed_size(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * fixup_unpack(PARROT_INTERP,
+static const opcode_t * fixup_unpack(PARROT_INTERP,
     ARGIN(PackFile_Segment *seg),
-    ARGOUT(opcode_t *cursor))
+    ARGOUT(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -279,9 +279,9 @@ static size_t pf_debug_packed_size(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * pf_debug_unpack(PARROT_INTERP,
+static const opcode_t * pf_debug_unpack(PARROT_INTERP,
     ARGOUT(PackFile_Segment *self),
-    ARGIN(opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -1178,7 +1178,7 @@ PackFile_funcs_register(SHIM_INTERP, ARGOUT(PackFile *pf), UINTVAL type,
 
 /*
 
-=item C<static opcode_t * default_unpack>
+=item C<static const opcode_t * default_unpack>
 
 The default unpack function.
 
@@ -1188,8 +1188,8 @@ The default unpack function.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t *
-default_unpack(ARGMOD(PackFile_Segment *self), ARGIN(opcode_t *cursor))
+static const opcode_t *
+default_unpack(ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
 {
     self->op_count = PF_fetch_opcode(self->pf, &cursor);
     self->itype = PF_fetch_opcode(self->pf, &cursor);
@@ -1527,7 +1527,7 @@ PackFile_Segment_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self),
 
 /*
 
-=item C<opcode_t * PackFile_Segment_unpack>
+=item C<const opcode_t * PackFile_Segment_unpack>
 
 All all these functions call the related C<default_*> function.
 
@@ -1540,9 +1540,9 @@ If a special is defined this gets called after.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t *
+const opcode_t *
 PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
-        ARGIN(opcode_t *cursor))
+        ARGIN(const opcode_t *cursor))
 {
     PackFile_Segment_unpack_func_t f =
         self->pf->PackFuncs[self->type].unpack;
@@ -1640,7 +1640,7 @@ directory_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
 /*
 
-=item C<static opcode_t * directory_unpack>
+=item C<static const opcode_t * directory_unpack>
 
 Unpacks the directory.
 
@@ -1650,13 +1650,13 @@ Unpacks the directory.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t *
-directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(opcode_t *cursor))
+static const opcode_t *
+directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opcode_t *cursor))
 {
     size_t i;
     PackFile_Directory * const dir = (PackFile_Directory *) segp;
     PackFile * const pf = dir->base.pf;
-    opcode_t *pos;
+    const opcode_t *pos;
 
     dir->num_segments = PF_fetch_opcode(pf, &cursor);
     if (dir->segments) {
@@ -1729,7 +1729,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(opcode_t *
     ALIGN_16(pf->src, cursor);
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
-        opcode_t * const csave = cursor;
+        const opcode_t * const csave = cursor;
         size_t tmp = PF_fetch_opcode(pf, &cursor); /* check len again */
         size_t delta = 0;       /* keep gcc -O silent */
 
@@ -2249,7 +2249,7 @@ pf_debug_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *curs
 
 /*
 
-=item C<static opcode_t * pf_debug_unpack>
+=item C<static const opcode_t * pf_debug_unpack>
 
 Unpack a debug segment into a PackFile_Debug structure.
 
@@ -2259,8 +2259,8 @@ Unpack a debug segment into a PackFile_Debug structure.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t *
-pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(opcode_t *cursor))
+static const opcode_t *
+pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
 {
     PackFile_Debug * const debug = (PackFile_Debug *)self;
     PackFile_ByteCode *code;
@@ -2961,7 +2961,7 @@ fixup_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add)
 
 /*
 
-=item C<static opcode_t * fixup_unpack>
+=item C<static const opcode_t * fixup_unpack>
 
 Unpack a PackFile FixupTable from a block of memory.
 
@@ -2973,8 +2973,8 @@ Returns one (1) if everything is OK, else zero (0).
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t *
-fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGOUT(opcode_t *cursor))
+static const opcode_t *
+fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *cursor))
 {
     opcode_t i;
     PackFile *pf;
@@ -3202,7 +3202,7 @@ PackFile_Constant *exec_const_table;
 
 /*
 
-=item C<opcode_t * PackFile_ConstTable_unpack>
+=item C<const opcode_t * PackFile_ConstTable_unpack>
 
 Unpack a PackFile ConstTable from a block of memory. The format is:
 
@@ -3218,9 +3218,9 @@ Returns cursor if everything is OK, else zero (0).
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t *
+const opcode_t *
 PackFile_ConstTable_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
-        ARGIN(opcode_t *cursor))
+        ARGIN(const opcode_t *cursor))
 {
     opcode_t i;
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
@@ -3422,7 +3422,7 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
 
 /*
 
-=item C<opcode_t * PackFile_Constant_unpack>
+=item C<const opcode_t * PackFile_Constant_unpack>
 
 Unpack a PackFile Constant from a block of memory. The format is:
 
@@ -3438,9 +3438,9 @@ Returns cursor if everything is OK, else zero (0).
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t *
+const opcode_t *
 PackFile_Constant_unpack(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
-        ARGOUT(PackFile_Constant *self), ARGIN(opcode_t *cursor))
+        ARGOUT(PackFile_Constant *self), ARGIN(const opcode_t *cursor))
 {
     PackFile * const pf = constt->base.pf;
     const opcode_t type = PF_fetch_opcode(pf, &cursor);
@@ -3482,7 +3482,7 @@ PackFile_Constant_unpack(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
 
 /*
 
-=item C<opcode_t * PackFile_Constant_unpack_pmc>
+=item C<const opcode_t * PackFile_Constant_unpack_pmc>
 
 Unpack a constant PMC.
 
@@ -3493,9 +3493,9 @@ Unpack a constant PMC.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t *
+const opcode_t *
 PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
-        ARGMOD(PackFile_Constant *self), ARGIN(opcode_t *cursor))
+        ARGMOD(PackFile_Constant *self), ARGIN(const opcode_t *cursor))
 {
     PackFile * const pf = constt->base.pf;
     STRING *image, *_sub;
@@ -3538,7 +3538,7 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
 
 /*
 
-=item C<opcode_t * PackFile_Constant_unpack_key>
+=item C<const opcode_t * PackFile_Constant_unpack_key>
 
 Unpack a PackFile Constant from a block of memory. The format consists
 of a sequence of key atoms, each with the following format:
@@ -3555,9 +3555,9 @@ Returns cursor if everything is OK, else zero (0).
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t *
+const opcode_t *
 PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
-        ARGMOD(PackFile_Constant *self), ARGIN(opcode_t *cursor))
+        ARGMOD(PackFile_Constant *self), ARGIN(const opcode_t *cursor))
 {
     PackFile * const pf = constt->base.pf;
     int pmc_enum = enum_class_Key;
