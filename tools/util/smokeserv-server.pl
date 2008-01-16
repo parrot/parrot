@@ -1,13 +1,8 @@
 #! perl
-
 # Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
-
 use strict;
 use warnings;
-
-#HSS use base qw/HTTP::Server::Simple::CGI/;
-#HSS use HTTP::Server::Simple::Static;
 
 use CGI;
 use CGI::Carp qw<fatalsToBrowser>;
@@ -40,9 +35,6 @@ my $t = do { local $/; <DATA> };
 
 my $CGI = new CGI;
 
-#sub handle_request {
-#my ($self, $CGI) = @_;
-
 if ( $CGI->url( -path => 1 ) =~ /html$/ ) {
     print $CGI->header;
     my $file = $CGI->url( -absolute => 1, -path => 1 );
@@ -54,7 +46,6 @@ if ( $CGI->url( -path => 1 ) =~ /html$/ ) {
         open my $f, "<", BASEDIR . "/" . $file or die $!;
         print do { local $/; <$f> };
     }
-
 }
 else {
     if ( $CGI->param("upload") ) {
@@ -65,15 +56,11 @@ else {
     }
 }
 
-#HSS }
-#HSS __PACKAGE__->new->run(host => "192.168.2.249");
-
 exit;
 
 sub process_upload {
     my $CGI = shift;
 
-    #print "HTTP/1.0 200 OK\n";
     print $CGI->header;
 
     limit_rate();
@@ -173,7 +160,8 @@ sub add_smoke {
 
 sub clean_obsolete_smokes {
     my $category = sub {
-        return join "-", ( map { $_[0]->{$_} } qw<branch cpuarch osname cc runcore harness_args> ),
+        return join "-", ( map { $_[0]->{$_} }
+            qw<branch cpuarch osname cc runcore harness_args> ),
             $_[0]->{DEVEL} eq "devel" ? "dev" : "release",;
     };
 
@@ -203,7 +191,6 @@ sub process_list {
     my $CGI = shift;
     my $tmpl = HTML::Template->new( scalarref => \$t, die_on_bad_params => 0 );
 
-    #print "HTTP/1.0 200 OK\n";
     print $CGI->header;
 
     my $category = sub {
@@ -249,8 +236,8 @@ sub process_list {
 sub pack_smoke {
     my %smoke = @_;
 
-    my $summary =
-        join( "-", map { $smoke{summary}{$_} } qw<total ok failed todo skipped unexpect> );
+    my $summary = join( "-", map { $smoke{summary}{$_} }
+        qw<total ok failed todo skipped unexpect> );
     my $args = unpack( "H*", $smoke{harness_args} );
 
 #                           1       2          3        4         5        6         7      8           9        10          ...
@@ -265,7 +252,7 @@ sub pack_smoke {
 sub unpack_smoke {
     my $name = shift;
 
-    /^parrot-smoke-([\d\.]+)      #  1 VERSION
+    /^parrot-smoke-([\d\.]+)    #  1 VERSION
                 -(\w+)          #  2 DEVEL
                 -r(\d+)         #  3 revision
                 -([\w\-]+)      #  4 branch
@@ -299,12 +286,13 @@ sub unpack_smoke {
                 my $str = localtime($9)->strftime("%d %b %Y %H:%M %a");
                 $str =~ s/ /&nbsp;/g;
 
-                # hack, to make the timestamps not break so the smoke reports look
-                # good even on 640x480
+                # hack, to make the timestamps not break so the 
+                # smoke reports look good even on 640x480
                 $str;
             },
         ],
-        duration => sprintf( "%.02f", Time::Seconds->new($10)->minutes ) . "&nbsp;min",
+        duration => sprintf( "%.02f",
+            Time::Seconds->new($10)->minutes ) . "&nbsp;min",
         summary => [
             {
                 total    => $11,
@@ -315,11 +303,11 @@ sub unpack_smoke {
                 unexpect => $16,
             }
         ],
-        percentage => sprintf( "%.02f", $12 / ( $11 || 1 ) * 100 ),
+        percentage   => sprintf( "%.02f", $12 / ( $11 || 1 ) * 100 ),
         harness_args => pack( "H*", $17 ),
         id           => $18,
         filename     => $name,
-        link => BASEHTTPDIR . $name,
+        link         => BASEHTTPDIR . $name,
         };
     return ();
 }
