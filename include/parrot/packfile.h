@@ -235,7 +235,7 @@ typedef struct PackFile {
     /* the packfile is its own directory */
     PackFile_Directory   directory;
     PackFile_Directory   *dirp;  /* for freeing */
-    opcode_t             *src;   /* the possible mmap()ed start of the PF */
+    const opcode_t       *src;   /* the possible mmap()ed start of the PF */
     size_t   size;               /* size in bytes */
     INTVAL is_mmap_ped;          /* don't free it, munmap it at destroy */
 
@@ -561,7 +561,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t PackFile_unpack(PARROT_INTERP,
     ARGMOD(PackFile *self),
-    ARGIN(opcode_t *packed),
+    ARGIN(const opcode_t *packed),
     size_t packed_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

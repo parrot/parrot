@@ -747,10 +747,10 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 opcode_t
 PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
-    ARGIN(opcode_t *packed), size_t packed_size)
+    ARGIN(const opcode_t *packed), size_t packed_size)
 {
     PackFile_Header * const header = self->header;
-    opcode_t *cursor;
+    const opcode_t *cursor;
     int header_read_length;
     opcode_t padding;
 

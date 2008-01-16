@@ -161,11 +161,11 @@ proper_args:
     out = 'header'()
 
     $S0 = <<'END_PC'
-Parrot_UInt1 program_code[] = {
+const Parrot_UInt1 program_code[] = {
 @BYTECODE@
 };
 
-int bytecode_size = @SIZE@;
+const int bytecode_size = @SIZE@;
 
 END_PC
 
@@ -203,7 +203,7 @@ int main(int argc, const char *argv[])
 
     pf = PackFile_new(interp, 0);
 
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, bytecode_size))
+    if (!PackFile_unpack(interp, pf, (const char *)program_code, bytecode_size))
         return 1;
 
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
