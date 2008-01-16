@@ -126,10 +126,6 @@
         [null? x]
         [string? x])))
 
-(define variable?
-  (lambda (x) 
-    (symbol? x)))
-
 (define make-combination-predicate
   (lambda (name)
     (lambda (form)
@@ -376,7 +372,7 @@
 
 
 ; emit PIR for a scalar
-(define emit-immediate
+(define emit-atom
   (lambda (x)
     (list
       (string->symbol "PAST::Val")
@@ -393,6 +389,11 @@
         [(boolean? x)
          (quasiquote (@ (value (unquote (if x 1 0)))
                         (returns "EclectusBoolean")))]
+        [(symbol? x)
+         (list (string->symbol "PAST::Var")
+               (quasiquote (@ (name (unquote x))
+                              (scope "lexical")
+                              (viviself "Undef"))))]
         [(string? x)
          (quasiquote (@ (value (unquote (format "'~a'" x)))
                         (returns "EclectusString")))]))))
@@ -475,8 +476,8 @@
   (lambda (x)
     ;(diag (format "emit-expr: ~s" x))
     (cond
-      [(immediate? x) (emit-immediate x)]
-      [(variable? x)  (emit-variable x)]
+      [(immediate? x) (emit-atom x)]
+      [(symbol? x)    (emit-variable x)]
       [(let? x)       (emit-let (bindings x) (body x))]
       [(if? x)        (emit-if x)]
       [(lambda? x)    (emit-lambda x)]
