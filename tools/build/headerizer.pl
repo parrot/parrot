@@ -263,6 +263,8 @@ sub attrs_from_args {
     my @attrs = ();
     my @mods  = ();
 
+    my $name = $func->{name};
+    my $file = $func->{file};
     my $n = 0;
     for my $arg (@args) {
         ++$n;
@@ -280,9 +282,10 @@ sub attrs_from_args {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
         if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|((ARGIN|ARGOUT|ARGMOD)(_NULLOK)?))\b/ ) ) {
-            my $name = $func->{name};
-            my $file = $func->{file};
             squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant)} );
+        }
+        if ( ($arg =~ /\bconst\b/) && ($arg =~ /\*/) && ($arg !~ /\*\*/) && ($arg =~ /\b(ARG(MOD|OUT))\b/) ) {
+            squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );
         }
     }
 
