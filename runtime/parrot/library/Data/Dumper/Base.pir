@@ -188,6 +188,10 @@ NOTFOUND:
     .local string func
     .local string name
 
+    # Don't cache undef...
+    $I0 = defined _dump
+    unless $I0 goto NOT_IN_CACHE
+
     (type, name) = self."cache"( paramName, _dump )
 
     if type == -1 goto NOT_IN_CACHE
