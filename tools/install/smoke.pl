@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 
 =head1 NAME
 
@@ -136,6 +136,19 @@ $out = `$parrot languages/lisp/lisp.pbc $filename`;
 ok($out eq "Hello, World!\n", "check lisp");
 unlink($filename);
 }
+
+$filename = 'test.lolcode';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH q{
+HAI 1.2
+    VISIBLE "HAI WORLD!"
+KTHXBYE
+};
+close $FH;
+$out = `$parrot languages/lolcode/lolcode.pbc $filename`;
+ok($out eq "HAI WORLD!\n", "check lolcode");
+unlink($filename);
 
 $out = `$parrot --no-gc languages/lua/lua.pbc -e "print(nil)"`;
 ok($out eq "nil\n", "check lua");
