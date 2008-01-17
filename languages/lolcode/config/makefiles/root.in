@@ -24,6 +24,7 @@ PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
 PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
 NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
 PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
+PBC_TO_EXE    = $(BUILD_DIR)/pbc_to_exe@exe@
 
 PMC_DIR       = src/pmc
 
@@ -43,6 +44,9 @@ BUILTINS_PIR = \
 
 # PMCS = lolcode
 # PMC_SOURCES = $(PMC_DIR)/lolcode.pmc
+
+lolcode@exe@: lolcode.pbc
+	$(PBC_TO_EXE) lolcode.pbc
 
 # the default target
 lolcode.pbc: $(PARROT) $(SOURCES)
