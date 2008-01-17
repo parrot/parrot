@@ -297,12 +297,11 @@ size_t string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s), size_t seed)
         __attribute__nonnull__(1);
 
 PARROT_API
-PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * string_increment(PARROT_INTERP, ARGMOD(const STRING *s))
+PARROT_CANNOT_RETURN_NULL
+STRING * string_increment(PARROT_INTERP, ARGIN(const STRING *s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

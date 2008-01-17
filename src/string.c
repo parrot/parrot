@@ -2626,10 +2626,10 @@ Perl5ish increment the string. Currently single char only.
 */
 
 PARROT_API
-PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
-string_increment(PARROT_INTERP, ARGMOD(const STRING *s))
+string_increment(PARROT_INTERP, ARGIN(const STRING *s))
 {
     INTVAL o;
 
