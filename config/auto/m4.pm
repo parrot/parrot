@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -21,13 +21,13 @@ use base qw(Parrot::Configure::Step);
 
 use Parrot::Configure::Utils ':auto';
 
-
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Determining whether GNU m4 is installed};
-    $data{result}      = q{};
-    return \%data;
+
+    return {
+        description => q{Determining whether GNU m4 is installed},
+        result      => q{},
+    };
 }
 
 our $verbose;
@@ -35,30 +35,15 @@ our $verbose;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $verbose = $conf->options->get( 'verbose' );
+    $verbose = $conf->options->get('verbose');
     print "\n" if $verbose;
 
-    my $archname = $conf->data->get_p5('archname');
-    my ( $cpuarch, $osname ) = split m/-/, $archname, 2;
-    if ( !defined $osname ) {
-        ( $osname, $cpuarch ) = ( $cpuarch, "" );
-    }
-
-    my $has_gnu_m4;
-
-    # Calling 'm4 --version' hangs under FreeBSD
-    my %m4_hangs = ( freebsd => 1 );
-
-    if ( $m4_hangs{$osname} ) {
-        $has_gnu_m4 = 0;
-    }
-    else {
-
-        # This seems to work for GNU m4 1.4.2
-        my $output = capture_output( 'm4', '--version' ) || '';
-        print $output, "\n" if $verbose;
-        $has_gnu_m4 = ( $output =~ m/GNU\s+[mM]4/ ) ? 1 : 0;
-    }
+    # This seems to work for GNU m4 1.4.2
+    # Under FreeBSD 'm4 --version' waits eternally for input,
+    # so pipe some input to it-
+    my $output = capture_output('echo "foo" | m4 --version') || '';
+    print $output, "\n" if $verbose;
+    my $has_gnu_m4 = ( $output =~ m/GNU\s+[mM]4/ ) ? 1 : 0;
 
     $conf->data->set( has_gnu_m4 => $has_gnu_m4 );
     $self->set_result( $has_gnu_m4 ? 'yes' : 'no' );
