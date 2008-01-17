@@ -586,6 +586,7 @@ all : \
     dynpmc \
     dynoplibs \
     compilers \
+    $(PBC_TO_EXE) \
     $(PBCMERGE)
 
 $(GEN_LIBRARY) : $(PARROT)
@@ -646,7 +647,7 @@ help :
 	@echo "  world:             'all' and 'parrot_utils'."
 	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
-	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB) and $(PBCMERGE)"
+	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB), $(PBCMERGE) and $(PBC_TO_EXE)"
 	@echo " $(PDUMP):"
 	@echo "                     Parrot Dumper"
 	@echo " $(DIS):"
@@ -759,7 +760,7 @@ help :
 
 world : all parrot_utils
 
-parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
+parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE)
 
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
 
