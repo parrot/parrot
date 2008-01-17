@@ -87,7 +87,7 @@ static void add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
         FUNC_MODIFIES(*r);
 
 static int add_const_key(PARROT_INTERP,
-    ARGIN(opcode_t *key),
+    ARGIN(const opcode_t *key),
     int size,
     ARGIN(const char *s_key))
         __attribute__nonnull__(1)
@@ -1164,7 +1164,7 @@ add constant key to constant_table
 */
 
 static int
-add_const_key(PARROT_INTERP, ARGIN(opcode_t *key), int size, ARGIN(const char *s_key))
+add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const char *s_key))
 {
     int                k;
     opcode_t          *rc;

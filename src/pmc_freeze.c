@@ -775,7 +775,7 @@ shift_opcode_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
     const char * const start = (const char*)io->image->strstart;
     const FLOATVAL f =
-        PF_fetch_number(io->pf, (opcode_t**) &io->image->strstart);
+        PF_fetch_number(io->pf, (const opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
     PARROT_ASSERT((int)io->image->bufused >= 0);
@@ -799,7 +799,7 @@ shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 {
     char * const start = (char*)io->image->strstart;
     STRING * const s =
-        PF_fetch_string(interp, io->pf, (opcode_t**) &io->image->strstart);
+        PF_fetch_string(interp, io->pf, (const opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
     PARROT_ASSERT((int)io->image->bufused >= 0);

@@ -428,8 +428,8 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
 #if TRACE_PACKFILE == 2
     PIO_eprintf(NULL, "PF_fetch_opcode: Reordering.\n");
 #endif
-    o = (pf->fetch_op)(*((unsigned char **)stream));
-    *((unsigned char **) (stream)) += pf->header->wordsize;
+    o = (pf->fetch_op)(*((const unsigned char **)stream));
+    *((const unsigned char **) (stream)) += pf->header->wordsize;
     return o;
 }
 
@@ -561,7 +561,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
         PIO_eprintf(NULL, "PF_fetch_number: Native [%d bytes]\n",
                 sizeof (FLOATVAL));
 #endif
-        memcpy(&f, (char*)*stream, sizeof (FLOATVAL));
+        memcpy(&f, (const char*)*stream, sizeof (FLOATVAL));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
         return f;
@@ -572,12 +572,12 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 #endif
     /* Here is where the size transforms get messy */
     if (NUMVAL_SIZE == 8 && pf->header->floattype == 1) {
-        (pf->fetch_nv)((unsigned char *)&f, (unsigned char *) *stream);
-        *((unsigned char **) (stream)) += 12;
+        (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
+        *((const unsigned char **) (stream)) += 12;
     }
     else {
-        (pf->fetch_nv)((unsigned char *)&d, (unsigned char *) *stream);
-        *((unsigned char **) (stream)) += 8;
+        (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
+        *((const unsigned char **) (stream)) += 8;
         f = d;
     }
     return f;
@@ -670,7 +670,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
 
     charset_name = Parrot_charset_c_name(interp, charset_nr);
-    s = string_make(interp, (char *)*cursor, size, charset_name, flags);
+    s = string_make(interp, (const char *)*cursor, size, charset_name, flags);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PF_fetch_string(): string is: ");
@@ -683,7 +683,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
                                flags); */
 
     size = ROUND_UP_B(size, wordsize);
-    *((unsigned char **) (cursor)) += size;
+    *((const unsigned char **) (cursor)) += size;
     return s;
 }
 
@@ -784,13 +784,13 @@ PARROT_CANNOT_RETURN_NULL
 char *
 PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
 {
-    const size_t str_len = strlen((char *)(*cursor)) + 1;
+    const size_t str_len = strlen((const char *)(*cursor)) + 1;
     char * const p = (char *)mem_sys_allocate(str_len);
 
     const int wordsize = pf->header->wordsize;
 
-    strcpy(p, (char*) (*cursor));
-    *((unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
+    strcpy(p, (const char*) (*cursor));
+    *((const unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
 
     return p;
 }
