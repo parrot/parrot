@@ -291,11 +291,11 @@ END_BODY
     compile .= ' -c '
     compile .= cfile
 
+    say compile
     .local int status
     status = spawnw compile
     unless status goto compiled
 
-    say compile
     die "compilation failed"
 
   compiled:
@@ -355,11 +355,11 @@ END_BODY
     link .= ' '
     link .= config
 
+    say link
     .local int status
     status = spawnw link
     unless status goto linked
 
-    say link
     die "linking failed"
 
   linked:
