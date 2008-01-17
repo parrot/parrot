@@ -1167,10 +1167,10 @@ static int
 add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const char *s_key))
 {
     int                k;
-    opcode_t          *rc;
+    const opcode_t    *rc;
     PackFile_Constant *pfc;
 
-    SymReg * const r = _get_sym(&globals.cs->key_consts, s_key);
+    const SymReg * const r = _get_sym(&globals.cs->key_consts, s_key);
 
     if (r)
         return r->color;
