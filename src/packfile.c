@@ -222,11 +222,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const opcode_t * fixup_unpack(PARROT_INTERP,
     ARGIN(PackFile_Segment *seg),
-    ARGOUT(const opcode_t *cursor))
+    ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*cursor);
+        __attribute__nonnull__(3);
 
 static void make_code_pointers(ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)

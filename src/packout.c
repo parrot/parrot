@@ -23,16 +23,15 @@ src/packout.c - Functions for writing out packfiles
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
-/***************************************
-Determine the size of the buffer needed in order to pack the PackFile into a
-contiguous region of memory.
-***************************************/
-
 /*
 
 =item C<opcode_t PackFile_pack_size>
 
-RT#48260: Not yet documented!!!
+Determine the size of the buffer needed in order to pack the PackFile
+into a contiguous region of memory.
+
+Must be run before C<PackFile_pack()>, so it will allocate an adequate
+buffer.
 
 =cut
 
@@ -48,8 +47,10 @@ PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 
     header_size = PACKFILE_HEADER_BYTES;
     header_size += self->header->uuid_size;
-    header_size += header_size % 16 ?
-        16 - header_size % 16 : 0;
+    header_size +=
+        header_size % 16
+            ? 16 - header_size % 16
+            : 0;
 
     size = header_size / sizeof (opcode_t);
 
