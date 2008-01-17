@@ -309,7 +309,7 @@ END_BODY
     .param string exefile
 
     $P0 = '_config'()
-    .local string cc, ld, linkflags, ld_out, libparrot, libs, o
+    .local string cc, ld, linkflags, ld_out, libparrot, libs, o, rpath
     .local string osname, build_dir, slash
     cc        = $P0['cc']
     ld        = $P0['ld']
@@ -318,6 +318,7 @@ END_BODY
     libparrot = $P0['libparrot_ldflags']
     libs      = $P0['libs']
     o         = $P0['o']
+    rpath     = $P0['rpath_blib']
     osname    = $P0['osname']
     build_dir = $P0['build_dir']
     slash     = $P0['slash']
@@ -347,11 +348,13 @@ END_BODY
     link .= objfile
     link .= pathquote
     link .= ' '
+    link .= linkflags
+    link .= ' '
     link .= libparrot
     link .= ' '
-    link .= libs
+    link .= rpath
     link .= ' '
-    link .= linkflags
+    link .= libs
     link .= ' '
     link .= config
 
