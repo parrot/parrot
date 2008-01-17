@@ -51,6 +51,10 @@ sub runstep {
         # override perl's warnings level
         $ccflags =~ s/-W\d/-W4/;
         $ccflags .= " -Wp64 " if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
+        
+        # if we want pbc_to_exe to work, need to let some versions of the
+        # compiler use more memory than they normally would
+        $ccflags .= " -Zm400 " if $cc_output =~ m/Version (\d+)/ && $1 == 12;
 
         my $ccwarn = '';
 
