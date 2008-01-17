@@ -135,9 +135,8 @@ static void start_flatten(PARROT_INTERP,
 static void store_arg(ARGIN(const call_state *st), INTVAL idx)
         __attribute__nonnull__(1);
 
-static int store_current_arg(ARGMOD(const call_state *st))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*st);
+static int store_current_arg(ARGIN(const call_state *st))
+        __attribute__nonnull__(1);
 
 static void too_few(PARROT_INTERP,
     ARGIN(const call_state *st),
@@ -978,7 +977,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-store_current_arg(ARGMOD(const call_state *st))
+store_current_arg(ARGIN(const call_state *st))
 {
     INTVAL idx;
     if (st->dest.i >= st->dest.n)
