@@ -324,7 +324,9 @@ END_BODY
     slash     = $P0['slash']
 
     .local string config, pathquote
-    config     = concat 'src', slash
+    config     = concat build_dir, slash
+    config    .= 'src'
+    config    .= slash
     config    .= 'parrot_config'
     config    .= o
     pathquote  = ''
@@ -332,8 +334,6 @@ END_BODY
     pathquote  = '"'
     $I0 = index cc, 'gcc'
     if $I0 > -1 goto not_windows
-    config     = concat slash, config
-    config     = concat build_dir, config
     libparrot  = concat slash, libparrot
     libparrot  = concat build_dir, libparrot
   not_windows:
