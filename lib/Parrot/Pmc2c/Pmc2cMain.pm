@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use FindBin;
 use Storable;
-use Parrot::Vtable;
 use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
 use Parrot::Pmc2c::Dumper;
@@ -20,8 +19,6 @@ use Parrot::Pmc2c::PMC::Ref ();
 use Parrot::Pmc2c::PMC::SharedRef ();
 use Parrot::Pmc2c::PMC::STMRef ();
 use Parrot::Pmc2c::PMC::Object ();
-use Cwd qw(cwd realpath);
-use File::Basename;
 use Carp;
 
 $SIG{'__WARN__'} = sub { use Carp; warn $_[0]; Carp::confess; };
