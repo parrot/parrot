@@ -22,12 +22,21 @@ sub get_out_fn {
 
 sub get_test_prog {
     my $self = shift;
-    my ( $path_to_parrot, $path_to_language, $count ) = @_;
+    my ( $count, $options ) = @_;
+
+    my $lang_fn = Parrot::Test::per_test( '.m4', $count );
+    ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+    if ( $current_dir eq 'm4' ) {
+        $lang_fn = File::Spec->catdir( 'm4', $lang_fn );
+    }
 
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
-    my $lang_fn = Parrot::Test::per_test( '.m4', $count );
 
-    return ("$ENV{PARROT_M4_TEST_PROG} $test_prog_args ${lang_fn}");
+    return 
+        join( ' ',
+              $ENV{PARROT_M4_TEST_PROG},
+              $test_prog_args,
+              File::Spec->join( 'languages', $lang_fn ) );
 }
 
 1;
