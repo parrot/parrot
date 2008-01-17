@@ -6,13 +6,7 @@
 use strict;
 use warnings;
 
-(my $compile  = shift) =~ s/\\\n/ /gm;
-
-$compile = `$^X tools/dev/cc_flags.pl --return-only $compile`;
-$compile =~ s/\s-I\.\S+//g;
-my $template = do { local $/; <DATA> };
-
-printf( $template, $compile );
+print do { local $/; <DATA> };
 
 __END__
 #! parrot
@@ -23,11 +17,12 @@ __END__
     .param pmc    argv
     .local string infile
     .local string cfile
+    .local string objfile
     .local string exefile
     .local string out
 
-    (infile, cfile, exefile) = 'handle_args'(argv)
-    $I0                      = length infile
+    (infile, cfile, objfile, exefile) = 'handle_args'(argv)
+    $I0                               = length infile
     if $I0 goto open_outfile
     die "infile not specified"
 
@@ -44,7 +39,8 @@ __END__
     print outfh, out
     close outfh
 
-    compile_file(cfile, exefile)
+    'compile_file'(cfile, objfile)
+    'link_file'(objfile, exefile)
 .end
 
 
@@ -61,9 +57,10 @@ __END__
     .return ()
 
 proper_args:
-    .local string infile, cfile, exefile, exe
+    .local string infile, cfile, objfile, obj, exefile, exe
 
     $P0    = '_config'()
+    obj    = $P0['o']
     exe    = $P0['exe']
 
     $P0    = shift args
@@ -77,6 +74,8 @@ proper_args:
     cfile      .= 'c'
 
     dec infile_len
+    objfile     = substr infile, 0, infile_len
+    objfile    .= obj
     exefile     = substr infile, 0, infile_len
     exefile    .= exe
 
@@ -84,7 +83,7 @@ proper_args:
     # remove .c for executable
 
     # TODO this should complain about results/returns mismatch
-    .return(infile, cfile, exefile)
+    .return(infile, cfile, objfile, exefile)
 .end
 
 
@@ -261,13 +260,36 @@ END_BODY
 # util functions
 .sub 'compile_file'
     .param string cfile
-    .param string exefile
+    .param string objfile
+
+    $P0 = '_config'()
+    .local string cc, ccflags, osname, build_dir, slash
+    cc        = $P0['cc']
+    ccflags   = $P0['ccflags']
+    osname    = $P0['osname']
+    build_dir = $P0['build_dir']
+    slash     = $P0['slash']
+
+    .local string includedir, pathquote
+    includedir = concat build_dir, slash
+    includedir = concat includedir, 'include'
+    pathquote  = ''
+    unless osname == 'MSWin32' goto not_windows
+    pathquote  = '"'
+  not_windows:
 
     .local string compile
-    compile  = '%s '
+    compile  = cc
+    compile .= ' -Fo'
+    compile .= objfile
+    compile .= ' -I'
+    compile .= pathquote
+    compile .= includedir
+    compile .= pathquote
+    compile .= ' '
+    compile .= ccflags
+    compile .= ' -c '
     compile .= cfile
-    compile .= ' -o '
-    compile .= exefile
 
     .local int status
     status = spawnw compile
@@ -278,9 +300,72 @@ END_BODY
 
   compiled:
     print "Compiled: "
+    say objfile
+    .return()
+.end
+
+.sub 'link_file'
+    .param string objfile
+    .param string exefile
+
+    $P0 = '_config'()
+    .local string cc, ld, linkflags, libparrot, libs, o
+    .local string osname, build_dir, slash
+    cc        = $P0['cc']
+    ld        = $P0['ld']
+    linkflags = $P0['linkflags']
+    libparrot = $P0['libparrot_ldflags']
+    libs      = $P0['libs']
+    o         = $P0['o']
+    osname    = $P0['osname']
+    build_dir = $P0['build_dir']
+    slash     = $P0['slash']
+
+    .local string config, pathquote
+    config     = concat 'src', slash
+    config    .= 'parrot_config'
+    config    .= o
+    pathquote  = ''
+    unless osname == 'MSWin32' goto not_windows
+    pathquote  = '"'
+    $I0 = index cc, 'gcc'
+    if $I0 > -1 goto not_windows
+    config     = concat slash, config
+    config     = concat build_dir, config
+    libparrot  = concat slash, libparrot
+    libparrot  = concat build_dir, libparrot
+  not_windows:
+
+    .local string link
+    link  = ld
+    link .= ' -out:'
+    link .= exefile
+    link .= ' '
+    link .= pathquote
+    link .= objfile
+    link .= pathquote
+    link .= ' '
+    link .= libparrot
+    link .= ' '
+    link .= libs
+    link .= ' '
+    link .= linkflags
+    link .= ' '
+    link .= config
+
+    .local int status
+    status = spawnw link
+    unless status goto linked
+
+    say link
+    die "linking failed"
+
+  linked:
+    print "Linked: "
     say exefile
     .return()
 .end
+
 
 # Local Variables:
 #   mode: cperl
