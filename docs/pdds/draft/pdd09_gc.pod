@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -362,3 +362,5 @@ None.
 "A unified theory of garbage collection" <http://portal.acm.org/citation.cfm?id=1028982>
 
 "Scalable Locality-Conscious Multithreaded Memory Allocation" http://people.cs.vt.edu/~scschnei/papers/ismm06.pdf
+
+"Parallel and concurrent garbage collectors" <http://chaoticjava.com/posts/parallel-and-concurrent-garbage-collectors/>
