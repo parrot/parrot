@@ -1789,6 +1789,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
                                      " :named",
                                      NULL
         };
+
         /* Register decoding.  It would be good to abstract this, too. */
         const char *regs = "ISPN";
 
@@ -1810,8 +1811,10 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
                 int flags = sig_value;
 
                 /* End when we run out of flags, off the end of flag_names, or
-                   get too close to the end of buf. */
-                while (flags && idx < sizeof (buf)-100) {
+                 * get too close to the end of buf.
+                 * 100 is just an estimate of all buf lengths added together.
+                 */
+                while (flags && idx < sizeof (buf) - 100) {
                     const char * const flag_string = flag_names[flag_idx];
                     if (! flag_string)
                         break;
