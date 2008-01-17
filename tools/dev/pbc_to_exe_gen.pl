@@ -309,11 +309,12 @@ END_BODY
     .param string exefile
 
     $P0 = '_config'()
-    .local string cc, ld, linkflags, libparrot, libs, o
+    .local string cc, ld, linkflags, ld_out, libparrot, libs, o
     .local string osname, build_dir, slash
     cc        = $P0['cc']
     ld        = $P0['ld']
     linkflags = $P0['linkflags']
+    ld_out    = $P0['ld_out']
     libparrot = $P0['libparrot_ldflags']
     libs      = $P0['libs']
     o         = $P0['o']
@@ -338,7 +339,8 @@ END_BODY
 
     .local string link
     link  = ld
-    link .= ' -out:'
+    link .= ' '
+    link .= ld_out
     link .= exefile
     link .= ' '
     link .= pathquote
