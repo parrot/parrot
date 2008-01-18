@@ -152,8 +152,8 @@ Create a copy of the timer, resetting status, id, and birthtime.
 */
 
     PMC *clone() {
-        PMC *copy = SUPER();
-        Parrot_Timer *new_struct        = PARROT_TIMER(copy);
+        PMC          * const copy       = SUPER();
+        Parrot_Timer * const new_struct = PARROT_TIMER(copy);
         Parrot_Timer * const old_struct = PARROT_TIMER(SELF);
 
         new_struct->duration  = old_struct->duration;
@@ -190,7 +190,7 @@ Returns the timer info for C<key>.
 
     INTVAL get_integer_keyed_int(INTVAL key) {
         Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
-        FLOATVAL absolute_time = core_struct->birthtime + core_struct->duration;
+        const FLOATVAL absolute_time = core_struct->birthtime + core_struct->duration;
 
         switch (key) {
             case PARROT_TIMER_SEC:
@@ -219,7 +219,7 @@ Returns the PMC associated with C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
+        const Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
 
         if (key == PARROT_TIMER_HANDLER)
             return core_struct->codeblock;
@@ -238,7 +238,7 @@ Returns the number associated with C<key>.
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
+        const Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {
             case PARROT_TIMER_NSEC:
