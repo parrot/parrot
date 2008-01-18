@@ -4,7 +4,7 @@ package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
 use FindBin;
-use Storable;
+use Storable ();
 use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
 use Parrot::Pmc2c::Dumper;
@@ -193,10 +193,8 @@ sub print_tree {
         # constructor.
     }
     else {
-        if ( @{ $self->{args} } ) {
-            @files = @{ $self->{args} };
-        }
-        else {
+        @files = @{ $self->{args} };
+        if ( !@files ) {
             die "print_tree() lacked files to print; nothing in constructor's 'args' key";
         }
     }
@@ -245,7 +243,7 @@ sub read_dump {
     $filename = $self->find_file( filename( $filename, '.dump' ), 1 );
 
     return unless -f $filename;
-    return retrieve($filename);
+    return Storable::retrieve($filename);
 }
 
 =head3 C<gen_c()>

@@ -4,7 +4,7 @@ package Parrot::Pmc2c::VTable;
 use strict;
 use warnings;
 
-use Storable;
+use Storable ();
 use Parrot::Vtable;
 use Parrot::Pmc2c::Method;
 use Parrot::Pmc2c::UtilFunctions qw(spew);
@@ -74,7 +74,7 @@ sub dump {
     my $dump_filename =
           cwd() . q{/}
         . basename( Parrot::Pmc2c::UtilFunctions::filename( $self->filename, '.dump' ) );
-    store( $self, $dump_filename );
+    Storable::store( $self, $dump_filename );
     return $dump_filename;
 }
 
