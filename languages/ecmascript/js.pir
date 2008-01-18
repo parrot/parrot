@@ -15,23 +15,44 @@ tree transformations using TGE: from match tree to abstract syntax tree
 bytecode (actually to PIR, at first).
 
 =cut
-.HLL 'js', 'js_group'
-.include 'errors.pasm'
-.include 'library/dumper.pir'
 
-.sub _main :main
-    .param pmc args
-    
-    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'dumper.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
-    load_bytecode 'PGE/Text.pbc'
-    load_bytecode 'Getopt/Obj.pbc'
-    
-    print "Hello World from JS\n"
+
+#.include 'src/gen_builtins.pir'
+
+
+.namespace ['JS::Compiler']
+
+.loadlib 'js_group'
+
+
+.sub 'onload' :load :init :anon
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'Protoobject.pbc'
+
+    $P0 = get_hll_global 'Protomaker'
+    $P1 = get_class ['PCT::HLLCompiler']
+    $P0.'new_subclass'($P1, 'JS::Compiler')
 .end
+
+
+.sub 'init' :vtable :method
+    self.'language'('JS')
+    self.'parsegrammar'('JS::Grammar')
+    self.'parseactions'('JS::Grammar::Actions')
+.end
+
+
+.sub 'main' :main
+    .param pmc args
+
+    $P0 = compreg 'JS'
+    $P1 = $P0.'command_line'(args)
+.end
+
+
+.include 'src/gen_grammar.pir'
+.include 'src/gen_actions.pir'
+
 
 # Local Variables:
 #   mode: pir
