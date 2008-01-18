@@ -8,7 +8,13 @@ languages/eclectus/t/harness - A harness for Eclectus
 
   cd languages/eclectus && perl t/harness
 
+  cd languages && perl -I../lib eclectus/t/harness --files
+
 =head1 DESCRIPTION
+
+If I'm called with a single
+argument of "--files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run the complete suite.
 

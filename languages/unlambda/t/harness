@@ -6,6 +6,8 @@ languages/unlambda/t/harness - A harness for unlambda
 
 =head1 SYNOPSIS
 
+  cd languages/unlambda && perl t/harness
+
   cd languages && perl -I../lib unlambda/t/harness --files
 
 =head1 DESCRIPTION
@@ -14,35 +16,25 @@ If I'm called with a single
 argument of "--files", I just return a list of files to process.
 This list is one per line, and is relative to the languages dir.
 
+If I'm called with no args, I run the complete suite.
+
+Otherwise I run the tests that were passed on the command line.
+
 =cut
 
+# pragmata
 use strict;
-use lib '..';
+use warnings;
+use 5.008;
+use lib qw( ../lib ../../lib ../../lib );
 
-use Cwd();
-use Data::Dumper;
-use File::Spec;
-use Test::Harness();
-
-my $language = 'unlambda';
-
-if ( grep { m/^--files$/ } @ARGV ) {
-    # Only the Makefile in 'parrot/languages' uses --files
-    my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
-    print join( "\n", @files );
-    print "\n" if scalar(@files);
-} else {
-    die "Only '--files' is supported"; 
-}
-
-=head1 HISTORY
-
-Mostly taken from regex/t/harness.
+use Parrot::Test::Harness language => 'unlambda';
 
 =head1 SEE ALSO
 
-  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+  F<languages/perl6/t/harness>
+  F<languages/t/harness>
+  F<lib/Parrot/Test/Harness>
 
 =head1 AUTHOR
 
