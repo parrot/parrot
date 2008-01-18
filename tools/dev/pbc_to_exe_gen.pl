@@ -103,7 +103,7 @@ proper_args:
     buffer_size = $P0['longsize']  # sizeof (opcode_t)
 
     .local string bytecode
-                  bytecode = '    '
+                  bytecode = ''
     .local int    size
                   size = 0
     .local pmc    data
@@ -114,6 +114,9 @@ proper_args:
     .local int    string_length
     .local string byte_string
     .local int    byte
+    .local int    bytes_per_line
+                  bytes_per_line=64
+
 
   loop:
     at_eof = infh.'eof'()
@@ -130,8 +133,11 @@ proper_args:
     $S0 = byte
     # add string for the byte
     bytecode .= $S0
-    bytecode .= ",\n    "
+    bytecode .= ','
     size += 1
+    $I0 = size % bytes_per_line
+    if $I0 != 0 goto loop
+    bytecode .= "\n"
     goto loop
   end_loop:
 
