@@ -47,7 +47,7 @@ ok(system("$parrot -V") == 0, "display parrot version");
 
 $exe = catfile('bin', 'perl6');
 $out = `$exe -v`;
-ok($out =~ /perl6/, "check perl6");
+ok($out =~ /Rakudo/, "check rakudo");
 
 #
 # some compiler tools
@@ -159,14 +159,8 @@ ok($out =~ /^Usage/, "check m4");
 $out = `$parrot languages/ook/ook.pbc`;
 ok($out eq q{}, "check ook");
 
-$filename = 'test.p6';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH "say 'hello world!'\n";
-close $FH;
-$out = `$parrot languages/perl6/perl6.pbc $filename`;
-ok($out eq "hello world!\n", "check perl6");
-unlink($filename);
+$out = `$parrot --no-gc languages/perl6/perl6.pbc -e "say 'hello world'"`;
+ok($out eq "hello world\n", "check rakudo");
 
 TODO: {
     local $TODO = "couldn't find file 'lib/PhemeObjects.pir'";
