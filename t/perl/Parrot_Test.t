@@ -34,7 +34,6 @@ BEGIN {
     my $pre_env = exists $ENV{PARROT_TEST} ? $ENV{PARROT_TEST} : undef;
     use_ok('Parrot::Test') or die;
 
-    # RT#46889 Shouldn't this be in an END block
     my $post_env = exists $ENV{PARROT_TEST} ? $ENV{PARROT_TEST} : undef;
     if ( defined $pre_env ) {
         is( $post_env, $pre_env, 'PARROT_TEST env unchanged' );
