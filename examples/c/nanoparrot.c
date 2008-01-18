@@ -174,7 +174,7 @@ run(Interp *interp, opcode_t *pc)
 #    define NEXT            continue;
 #    define DONE            return;
 #    define ENDDISPATCH     default : printf("illegal instruction"); \
-                                  exit(EXIT_FAILURE)                 \
+                                  exit(EXIT_FAILURE);                \
                         }}
 #  else  /* CGOTO */
 
@@ -270,6 +270,7 @@ init(Interp *interp, opcode_t *prog)
     DEF_OP(set_i_ic);
     DEF_OP(if_i_ic);
     DEF_OP(sub_i_i_i);
+    DEF_OP(MAX);
 
     /*
      * the "packfile"

@@ -234,6 +234,9 @@ D: language WMLScript (PIR translator)
 N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
 
+N: Geoff Broadwell
+D: examples fixes
+
 N: Gerard Goossen
 D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
