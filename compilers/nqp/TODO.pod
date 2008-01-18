@@ -43,9 +43,9 @@ and exercise methods using that.
 
 =item * Match variable access C<$/>
 
-=item * Scalar context $( ... )
+=item * More tests for scalar context $( ... )
 
-=item * List context @( ... )
+=item * More tests for list context @( ... )
 
 =item * Variables with twigils
 
