@@ -1,3 +1,5 @@
+#   Copyright (C) 2008, The Perl Foundation.
+# $Id$
 class JS::Grammar::Actions;
 
 method TOP($/) {
