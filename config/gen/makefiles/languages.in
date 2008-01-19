@@ -131,6 +131,7 @@ clean: \
 realclean: \
     dotnet.realclean \
     eclectus.realclean \
+    unlambda.realclean \
     jako.realclean
 
 #
@@ -409,6 +410,16 @@ tcl.test:
 	- $(MAKE) tcl test
 tcl.clean:
 	- $(MAKE) tcl clean
+
+unlambda: unlambda.dummy
+unlambda.dummy:
+	- $(MAKE) unlambda
+unlambda.test :
+	- $(MAKE) unlambda test
+unlambda.clean :
+	- $(MAKE) unlambda clean
+unlambda.realclean :
+	- $(MAKE) unlambda realclean
 
 urm: urm.dummy
 urm.dummy:
