@@ -18,13 +18,16 @@ value of the comment is passed as the second argument to the method.
 class lolcode::Grammar::Actions;
 
 method TOP($/) {
-    make $( $<block> );
+    my $block := $( $<block> );
+    my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
+    $block.unshift($it);
+    make $block;
 }
 
 
 method statement ($/, $key) {
     if ($key eq 'bare_expression') {
-        my $it := PAST::Var.new( :name( 'IT' ), :scope('package'), :viviself('Undef'));
+        my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
         $past.push( $it );
         $past.push( $( $<expression> ) );
@@ -81,6 +84,12 @@ method function($/) {
         }
     }
 
+    my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
+    $block.unshift($it);
+
+    $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
+    $block.push($it);
+
     my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
     $($<variable>).isdecl(1);
     $past.push( $( $<variable> ) );
@@ -116,7 +125,7 @@ method ifthen($/) {
                                :node( $/ )
                              );
     }
-    my $it := PAST::Var.new( :name( 'IT' ), :scope('package'), :viviself('Undef'));
+    my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
     $past.unshift( $it );
     my $bind := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
     $bind.push( $it );
@@ -174,7 +183,7 @@ method identifier($/) {
 
 method variable ($/) {
     if ($<identifier><name> eq 'IT') {
-        make PAST::Var.new( :name( 'IT' ), :scope('package'), :viviself('Undef'));
+        make PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
     } else {
         make PAST::Var.new( :name( ~$<identifier><name> ),
                             :scope('lexical'),
