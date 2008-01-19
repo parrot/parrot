@@ -44,6 +44,7 @@ LANGUAGES = \
     scheme \
     tap \
     tcl \
+    unlambda \
     urm
 
 # the default target
