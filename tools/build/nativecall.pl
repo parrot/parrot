@@ -334,6 +334,8 @@ get_nci_N(PARROT_INTERP, NOTNULL(call_state *st), int n)
     return UVal_num(st->val);
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 get_nci_S(PARROT_INTERP, NOTNULL(call_state *st), int n)
 {
@@ -347,6 +349,8 @@ get_nci_S(PARROT_INTERP, NOTNULL(call_state *st), int n)
     return UVal_str(st->val);
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 get_nci_P(PARROT_INTERP, NOTNULL(call_state *st), int n)
 {
