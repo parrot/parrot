@@ -123,7 +123,7 @@ my @harnesses
 my @tests;
 foreach my $harness (@harnesses) {
     my $perl = "$^X -I" . File::Spec->join(File::Spec->updir(), 'lib');
-    open(FILES, "$perl $harness --files |");  
+    open(FILES, "$perl $harness --files --master |");  
     push @tests, <FILES>;
     close(FILES);
 }

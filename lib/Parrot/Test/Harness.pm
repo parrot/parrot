@@ -22,7 +22,11 @@ you want to use in a file called F<t/harness>:
 
   # or
 
-  use Parrot::Test::Harness language => 'eclectus', exec => [ 'petite', '--script' ], files => [ 't/*.pl' ];
+  use Parrot::Test::Harness
+      language => 'eclectus',
+      exec => [ 'petite', '--script' ],
+      arguments => [ '--files' ],
+      files     => [ 't/*.pl' ];
 
 That's it. Seriously.
 
@@ -110,7 +114,11 @@ Nothing is printed. An array of file pathes is returned to the caller.
                     :
                     ( 't/*.t', 't/*/*.t' );
             foreach ( @file_patterns ) {
-                push @files, glob( File::Spec->catfile( $options{language}, $_  ) ),
+                # if --master is passed, add the language dir as a prefix
+                my $prefix = ( grep { /^--master$/ } @{ $options{arguments} } )
+                    ? $options{language}
+                    : '';
+                push @files, glob( File::Spec->catfile( $prefix . $_  ) ),
             }
         }
         print join( "\n", @files );
