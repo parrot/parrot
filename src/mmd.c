@@ -745,9 +745,9 @@ RT#45941 change this to a MMD register interface that takes a function *name*.
 
 PARROT_API
 void
-mmd_add_function(PARROT_INTERP,
-        INTVAL func_nr, SHIM(funcptr_t function))
+mmd_add_function(PARROT_INTERP, INTVAL func_nr, SHIM(funcptr_t function))
 {
+    /* XXX Something looks wrong here.  n_binop_mmd_funcs gets incremented, but the function doesn't get saved */
     if (func_nr >= (INTVAL)interp->n_binop_mmd_funcs) {
         INTVAL i;
         const size_t bytes = (func_nr + 1) * sizeof (MMD_table);

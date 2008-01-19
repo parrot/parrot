@@ -174,7 +174,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->binop_mmd_funcs = NULL;
 
     /* Go and init the MMD tables */
-    mmd_add_function(interp, MMD_USER_FIRST - 1, (funcptr_t)0);
+    mmd_add_function(interp, MMD_USER_FIRST - 1, (funcptr_t)NULL);
 
     /* create caches structure */
     init_object_cache(interp);
