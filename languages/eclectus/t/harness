@@ -28,7 +28,10 @@ use warnings;
 use 5.008;
 use lib qw( ../lib ../../lib ../../lib );
 
-use Parrot::Test::Harness language => 'eclectus', exec => [ 'petite', '--script' ], files => [ 't/*.pl' ];
+use Parrot::Test::Harness
+    language => 'eclectus',
+    exec     => [ 'petite', '--script' ],
+    files    => [ 't/*.pl' ];
 
 =head1 SEE ALSO
 
