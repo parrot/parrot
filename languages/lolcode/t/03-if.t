@@ -1,5 +1,5 @@
 HAI 1.2
-  VISIBLE "1..14"
+  VISIBLE "1..16"
 
   BTW SANITY CHECK
   WIN
@@ -149,6 +149,20 @@ HAI 1.2
         NO WAI
           VISIBLE "nok 14"
       OIC
+  OIC
+
+  BTW O RLY? SHOULD ONLY CALL A FUNCTION ONCE WHEN SETTING IT
+  HOW DUZ I ReturnWin
+    VISIBLE "ok 15"
+    "ok 16"
+  IF U SAY SO
+
+  ReturnWin
+  O RLY?
+    YA RLY
+      VISIBLE IT
+    NO WAI
+      VISIBLE "nok 16"
   OIC
 
   BTW vim: set filetype=lolcode :
