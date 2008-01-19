@@ -38,6 +38,11 @@ token newline {
 #?    | \PS
 }
 
+token comment {
+    | <multilinecomment>
+    | <singlelinecomment>
+}
+
 ## comments
 rule multilinecomment {
     <PGE::Text::Bracketed: /* */>
@@ -49,20 +54,22 @@ rule singlelinecomment {
 
 ## keywords
 token keyword {
-    | break | case | catch | continue | default
+    [ break | case | catch | continue | default
     | delete | do | else | finally | for | function | if
     | in | instance | new | return | this | throw | try | typeof
     | var | void | while | with
+    ] >>
 }
 
 token future_reserved_word {
-    | abstract | enum | int | short
+    [ abstract | enum | int | short
     | boolean | export | interface | static
     | byte | extends | long | super
     | char | final | native | synchronized
     | class | float | package | throws
     | const | goto | private | transient
     | debugger | implements | protected | volatile
+    ] >>
 }
 
 token reserved_word {
@@ -183,7 +190,7 @@ rule left_hand_side_expression { <new_expression> | <call_expression> }
 ##statements
 rule statement {
     {*} # temporary while i'm building the generator
-    | <block>
+    | <block> {*}                       #= block
     | <variable_statement>
     | <empyt_statement>
     | <expression_statement>
@@ -199,9 +206,9 @@ rule statement {
     | <try_statement>
 }
 
-rule block { '{' <statement_list>? '}' }
+rule block { '{' <statement_list>? '}' {*} }
 
-rule statement_list { <statement>+ }
+rule statement_list { <statement>+  {*} }
 
 rule variable_statement { var <variable_declaration_list> ';' }
 
