@@ -21,7 +21,7 @@
     self = new $I0
 
     .local pmc pos
-    pos = new .Integer
+    pos = new 'Integer'
     pos = 0
 
     setattribute self, '$code', str
@@ -85,7 +85,7 @@ false:
 
 numeric:
     $I0 = str
-    token = new .Integer
+    token = new 'Integer'
     token = $I0
     
 return:

@@ -13,7 +13,7 @@
 .sub init :vtable :method
     .local pmc stack, cell
     stack = new .ResizableIntegerArray
-    cell  = new .Integer
+    cell  = new 'Integer'
     cell  = 0
 
     setattribute self, '@stack', stack

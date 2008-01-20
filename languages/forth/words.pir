@@ -15,7 +15,7 @@
     variables = get_hll_global ' variables'
     vstack    = get_hll_global ' vstack'
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $I0 = vstack
     $P0 = $I0
 
@@ -385,7 +385,7 @@ error:
     code.emit(<<"END_PIR", a, $S0)
     $I0 = %0
     $I0 = islt $I0, 0
-    %1  = new .Integer
+    %1  = new 'Integer'
     %1  = $I0
 END_PIR
     push stack, $S0
