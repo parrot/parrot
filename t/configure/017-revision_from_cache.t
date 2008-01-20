@@ -1,14 +1,14 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 04-revision.t
+# 017-revision_from_cache.t
 
 use strict;
 use warnings;
 
 use Test::More;
-plan( skip_all => "Relevant only when working in checkout from repository and after  configuration" )
-    unless (-e 'DEVELOPING' and -e 'Makefile');
+plan( skip_all => "\nRelevant only when working in checkout from repository and during configuration" )
+    unless (-e 'DEVELOPING' and ! -e 'Makefile');
 plan( tests =>  7 );
 use Carp;
 use Cwd;
@@ -19,26 +19,26 @@ use lib qw( lib );
 
 my $cwd = cwd();
 {
-    my $tdir2 = tempdir( CLEANUP => 1 );
-    ok( chdir $tdir2, "Changed to temporary directory for testing" );
-    my $libdir = qq{$tdir2/lib};
+    my $rev = 16000;
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, "Changed to temporary directory for testing" );
+    my $libdir = qq{$tdir/lib};
     ok( (File::Path::mkpath( $libdir )), "Able to make libdir");
     local @INC;
     unshift @INC, $libdir;
     ok( (File::Path::mkpath( qq{$libdir/Parrot} )), "Able to make Parrot dir");
     ok( (copy qq{$cwd/lib/Parrot/Revision.pm},
             qq{$libdir/Parrot}), "Able to copy Parrot::Revision");
-    my $mkfl = 'Makefile';
-    open my $MK, ">", $mkfl
-        or croak "Unable to open $mkfl for writing";
-    print $MK qq{'make' is your friend\n};
-    close $MK or croak "Unable to close $mkfl after writing";
+    my $cache = q{.parrot_current_rev};
+    open my $FH, ">", $cache
+        or croak "Unable to open $cache for writing";
+    print $FH qq{$rev\n};
+    close $FH or croak "Unable to close $cache after writing";
     require Parrot::Revision;
     no warnings 'once';
-    like($Parrot::Revision::current, qr/^\d+$/,
-        "Got numeric value for reversion number");
+    is($Parrot::Revision::current, $rev,
+        "Got expected revision number from cache");
     use warnings;
-
     ok( chdir $cwd, "Able to change back to starting directory");
 }
 
@@ -48,11 +48,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-04-revision.t - test Parrot::Revision
+017-revision_from_cache.t - test Parrot::Revision
 
 =head1 SYNOPSIS
 
-    % prove t/configure/04-revision.t
+    % prove t/configure/017-revision_from_cache.t
 
 =head1 DESCRIPTION
 

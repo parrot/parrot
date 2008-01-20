@@ -328,7 +328,8 @@ FLUID_FILES_1 = \
 FLUID_FILES_2 = \
     $(GEN_LIBRARY) \
     runtime/parrot/include/parrotlib.pbc \
-    .configure_trace.sto
+    .configure_trace.sto \
+	.parrot_current_rev
 
 
 ###############################################################################
@@ -1395,36 +1396,12 @@ TOOLS_TEST_FILES = \
 PMC2CUTILS_DIR = t/tools/pmc2cutils
 OPS2PMUTILS_DIR = t/tools/ops2pmutils
 OPS2CUTILS_DIR = t/tools/ops2cutils
+REVISIONUTILS_DIR = t/tools/revision
 BUILDTOOLS_TEST_FILES = \
-        $(PMC2CUTILS_DIR)/00-qualify.t \
-        $(PMC2CUTILS_DIR)/01-pmc2cutils.t \
-        $(PMC2CUTILS_DIR)/02-find_file.t \
-        $(PMC2CUTILS_DIR)/03-dump_vtable.t \
-        $(PMC2CUTILS_DIR)/04-dump_pmc.t \
-        $(PMC2CUTILS_DIR)/05-gen_c.t \
-        $(PMC2CUTILS_DIR)/06-print_tree.t \
-        $(PMC2CUTILS_DIR)/07-open_file.t \
-        $(OPS2PMUTILS_DIR)/00-qualify.t \
-        $(OPS2PMUTILS_DIR)/01-ops2pmutils.t \
-        $(OPS2PMUTILS_DIR)/02-usage.t \
-        $(OPS2PMUTILS_DIR)/03-new.t \
-        $(OPS2PMUTILS_DIR)/04-prepare_ops.t \
-        $(OPS2PMUTILS_DIR)/05-renum_op_map_file.t \
-        $(OPS2PMUTILS_DIR)/06-load_op_map_files.t \
-        $(OPS2PMUTILS_DIR)/07-no_ops_skip.t \
-        $(OPS2PMUTILS_DIR)/08-sort_ops.t \
-        $(OPS2PMUTILS_DIR)/09-prepare_real_ops.t \
-        $(OPS2PMUTILS_DIR)/10-print_module.t \
-        $(OPS2PMUTILS_DIR)/11-print_h.t \
-        $(OPS2CUTILS_DIR)/01-new.t \
-        $(OPS2CUTILS_DIR)/02-usage.t \
-        $(OPS2CUTILS_DIR)/03-print_c_header_file.t \
-        $(OPS2CUTILS_DIR)/04-print_c_source_top.t \
-        $(OPS2CUTILS_DIR)/05-print_c_source_bottom.t \
-        $(OPS2CUTILS_DIR)/06-dynamic.t \
-        $(OPS2CUTILS_DIR)/07-make_incdir.t \
-        $(OPS2CUTILS_DIR)/08-nolines.t \
-        $(OPS2CUTILS_DIR)/09-dynamic_nolines.t
+        $(PMC2CUTILS_DIR)/*.t \
+        $(OPS2PMUTILS_DIR)/*.t \
+        $(OPS2CUTILS_DIR)/*.t \
+        $(REVISIONUTILS_DIR)/*.t
 MANIFEST_DIR = t/manifest
 MANIFEST_TEST_FILES = \
         $(MANIFEST_DIR)/01-basic.t \

@@ -10,7 +10,6 @@ Parrot::Revision - SVN Revision
     use Parrot::Revision;
 
     print $Parrot::Revision::current;
-    print $Parrot::Revision::config;
 
 =head1 DESCRIPTION
 
@@ -24,11 +23,35 @@ use strict;
 use warnings;
 use File::Spec;
 
-sub __get_revision {
-    return 0 unless ( -e 'DEVELOPING' );
+our $cache = q{.parrot_current_rev};
 
+our $current = _get_revision();
+
+sub _get_revision {
     my $revision;
+    if (-f $cache and ! -f 'Makefile') {
+        eval {
+            open my $FH, "<", $cache;
+            chomp($revision = <$FH>);
+            close $FH;
+        };
+        return $revision unless $@;
+    }
 
+    $revision = _analyze_sandbox();
+
+    if (! -f $cache and ! -f 'Makefile') {
+        eval {
+            open my $FH, ">", $cache;
+            print $FH "$revision\n";
+            close $FH;
+        };
+    }
+    return $revision;
+}
+
+sub _analyze_sandbox {
+    my $revision = 0;
     # code taken from pugs/util/version_h.pl rev 14410
     my $nul = File::Spec->devnull;
     if ( my @svn_info = qx/svn --xml info 2>$nul/ and $? == 0 ) {
@@ -58,14 +81,8 @@ sub __get_revision {
             }
         }
     }
-    return ( $revision || 0 );
+    return $revision;
 }
-
-our $current = __get_revision();
-our $config  = $current;
-
-# check if Parrot::Config is available
-eval 'use Parrot::Config; $config = $PConfig{revision};';
 
 1;
 

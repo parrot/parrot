@@ -51,6 +51,7 @@ our @postconfiguration_tests = (
     glob("t/tools/pmc2cutils/*.t"),
     glob("t/tools/ops2cutils/*.t"),
     glob("t/tools/ops2pmutils/*.t"),
+    glob("t/tools/revision/*.t"),
 );
 
 sub new {

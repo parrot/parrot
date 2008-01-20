@@ -8,7 +8,6 @@ use warnings;
 use Test::More;
 plan( skip_all => 'Fink is Darwin only' ) unless $^O =~ /darwin/;
 plan( tests => 13 );
-# plan( 'no_plan' );
 use Carp;
 use File::Temp;
 use lib qw( lib t/configure/testlib );

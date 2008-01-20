@@ -1,15 +1,15 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 04-revision.t
+# 018-revision_to_cache.t
 
 use strict;
 use warnings;
 
 use Test::More;
-plan( skip_all => "Relevant only when working in checkout from repository and after  configuration" )
-    unless (-e 'DEVELOPING' and -e 'Makefile');
-plan( tests =>  7 );
+plan( skip_all => "\nRelevant only when working in checkout from repository and during configuration" )
+    unless (-e 'DEVELOPING' and ! -e 'Makefile');
+plan( tests =>  8 );
 use Carp;
 use Cwd;
 use File::Copy;
@@ -19,26 +19,22 @@ use lib qw( lib );
 
 my $cwd = cwd();
 {
-    my $tdir2 = tempdir( CLEANUP => 1 );
-    ok( chdir $tdir2, "Changed to temporary directory for testing" );
-    my $libdir = qq{$tdir2/lib};
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, "Changed to temporary directory for testing" );
+    my $libdir = qq{$tdir/lib};
     ok( (File::Path::mkpath( $libdir )), "Able to make libdir");
     local @INC;
     unshift @INC, $libdir;
     ok( (File::Path::mkpath( qq{$libdir/Parrot} )), "Able to make Parrot dir");
     ok( (copy qq{$cwd/lib/Parrot/Revision.pm},
             qq{$libdir/Parrot}), "Able to copy Parrot::Revision");
-    my $mkfl = 'Makefile';
-    open my $MK, ">", $mkfl
-        or croak "Unable to open $mkfl for writing";
-    print $MK qq{'make' is your friend\n};
-    close $MK or croak "Unable to close $mkfl after writing";
     require Parrot::Revision;
     no warnings 'once';
     like($Parrot::Revision::current, qr/^\d+$/,
         "Got numeric value for reversion number");
     use warnings;
-
+    my $cache = q{.parrot_current_rev};
+    ok( ( -e $cache ), "Cache for revision number was created");
     ok( chdir $cwd, "Able to change back to starting directory");
 }
 
@@ -48,11 +44,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-04-revision.t - test Parrot::Revision
+018-revision_to_cache.t - test Parrot::Revision
 
 =head1 SYNOPSIS
 
-    % prove t/configure/04-revision.t
+    % prove t/configure/018-revision_to_cache.t
 
 =head1 DESCRIPTION
 
