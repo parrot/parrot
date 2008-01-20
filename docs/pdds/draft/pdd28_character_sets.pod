@@ -1,0 +1,98 @@
+# Copyright (C) 2001-2005, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+docs/pdds/pdd28_character_sets.pod - Strings and character sets
+
+=head1 ABSTRACT
+
+This PDD describes the conventions expected for users of Parrot strings,
+including but not limited to support for multiple character sets,
+encodings and languages.
+
+=head1 VERSION
+
+$Revision$
+
+=head1 DESCRIPTION
+
+Here is a summary of the design decisions described in this PDD.
+
+=over 3
+
+=item *
+
+Parrot supports multiple string formats, and so users of Parrot strings
+must be aware at all times of string encoding issues and how these
+relate to the string interface.
+
+=item *
+
+The native Parrot string format is an array of 32-bit Unicode codepoints
+in B<grapheme normalization form>. (NFG)
+
+=item * 
+
+NFG is defined as a normalization which allocates at most one codepoint
+to each visible character.
+
+=item *
+
+An interface is defined for interacting with Parrot strings and converting 
+between character sets and encodings.
+
+=back
+
+=head2 Encoding awareness
+
+Parrot was designed from the outset to support multiple string formats.
+Unlike other such projects, we don't standardize on Unicode internally.
+This is because for the majority of use cases, it's still far more
+efficient to deal with whatever input data the user sends us, which,
+equally in the majority of use cases, is something like ASCII - or at
+least, some kind of byte-based rather than character-based encoding.
+
+So internally, consumers of Parrot strings have to be aware that there
+is a plurality of string encodings going on inside Parrot. (Producers of
+Parrot strings can do whatever is most efficient for them.) The
+implications of this for the internal API will be detailed in the
+implementation section below, but to put it in simple terms: if you find
+yourself writing C<*s++> or any other C string idioms, you need to stop
+and think if that's what you really mean. Not everything is byte-based
+any more. 
+
+However, we're going to try to make it as easy for C<*s++>-minded people
+as possible, and part of that is the declaration of a Parrot native
+string format. You don't have to use it, but if you do all your dreams
+will come true.
+
+=head2 Native string format
+
+Dealing with variable-byte encodings is not fun; for instance, you need
+to do a bunch of computations every time you traverse a string. In order
+to make programming a lot easier, we define a Parrot native string
+format to be an array of unsigned 32-bit Unicode codepoints. 
+
+=head2 Grapheme normalization form
+
+=head1 IMPLEMENTATION
+
+=head2 Changes required to current string implementation
+
+=head2 String access API
+
+=head2 Normalization form
+
+=head2 String encoding API
+
+=head1 REFERENCES
+
+List of references.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
