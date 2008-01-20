@@ -656,7 +656,7 @@ TEMPLATE
 
 my $code = repeat(
     $template2, 18,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param Integer a<index>',
@@ -670,7 +670,7 @@ OUT
 
 $code = repeat(
     $template2, 22,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param Integer a<index>',
@@ -684,7 +684,7 @@ OUT
 
 $code = repeat(
     $template2, 40,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param Integer a<index>',
@@ -698,7 +698,7 @@ OUT
 
 $code = repeat(
     $template2, 60,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param Integer a<index>',
