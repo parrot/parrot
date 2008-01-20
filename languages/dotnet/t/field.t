@@ -49,7 +49,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'set_x' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
 	obj.set_x(28)
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = getattribute obj, "x"
 	print $P0
 	print "\n"
@@ -64,7 +64,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'set_y' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
 	obj.set_y(14)
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = getattribute obj, "y"
 	print $P0
 	print "\n"

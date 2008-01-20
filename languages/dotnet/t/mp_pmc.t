@@ -107,7 +107,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc reg' );
     # Get register's value indirectly, increment it and store back indirectly.
     tmp = ptr.load_pmc()
     tmp2 = tmp
-    tmp = new Integer
+    tmp = new 'Integer'
     tmp = tmp2
     ptr.store_pmc(tmp)
 .end
@@ -234,7 +234,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'int field' );
     $P0 = newclass "monkey"
     addattribute $P0, "age"
     obj = new "monkey"
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = 20
     setattribute obj, "age", $P1
 

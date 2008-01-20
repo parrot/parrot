@@ -593,7 +593,7 @@ PIR
 .sub __set_integer_native
     .param pmc s
     .param int i
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = i
     setattribute s, "value__", $P0
 .end

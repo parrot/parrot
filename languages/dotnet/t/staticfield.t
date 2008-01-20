@@ -50,7 +50,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'set_x' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
 	obj.set_x(26)
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = get_hll_global [ "Testing" ; "Test" ], "x"
 	print $P0
 	print "\n"
@@ -66,7 +66,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'set_y' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
 	obj.set_y(16)
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = get_hll_global [ "Testing" ; "Test" ], "y"
 	print $P0
 	print "\n"
