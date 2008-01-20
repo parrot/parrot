@@ -196,7 +196,9 @@ END_HEADER
     $S0 = <<'END_BODY'
 int main(int argc, const char *argv[])
 {
-    PackFile *pf;
+    PackFile     *pf;
+    STRING       *executable_name;
+    PMC          *executable_name_pmc;
     Parrot_Interp interp;
 
     Parrot_set_config_hash();
@@ -205,6 +207,12 @@ int main(int argc, const char *argv[])
 
     if (!interp)
         return 1;
+
+    executable_name     = string_from_cstring(interp, argv[0], 0);
+    executable_name_pmc = pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, executable_name_pmc, executable_name);
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
+        executable_name_pmc);
 
     pf = PackFile_new(interp, 0);
 
