@@ -64,7 +64,7 @@ static int e_file_open(SHIM_INTERP, ARGIN(void *param))
 
 static const char types[] = "INPS";
 
-Emitter emitters[2] = {
+const Emitter emitters[] = {
     {e_file_open,
      e_file_emit,
      NULL,
