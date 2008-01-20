@@ -31,7 +31,7 @@ for compiling programs in Parrot.
     $P0 = subclass base, 'PAST::Block'
     $P0 = subclass base, 'PAST::VarList'
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 10
     set_hll_global ['PAST::Node'], '$!serno', $P0
 
