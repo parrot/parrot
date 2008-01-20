@@ -257,7 +257,7 @@ Please note that this method isn't catching any failures yet.
 Usage as class method:
 
   .local pmc cl
-  cl = getclass 'ParrotIO'
+  cl = get_class 'ParrotIO'
   $S0 = cl.'slurp'('the_file')
 
 The file will be opened, read, and closed.
