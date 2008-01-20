@@ -144,7 +144,7 @@ See RT #42375.
 
 =item * Integer Type IDs [post 0.5.0]
 
-See RT #48024. Instead of C<$P0 = new Integer> or <$P0 = new .Integer>,
+See RT #48024. Instead of C<$P0 = new Integer> or C<$P0 = new .Integer>,
 use the following syntax, which works for both PMCs and objects.
 
   $P0 = new 'Integer'
