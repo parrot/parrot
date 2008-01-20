@@ -275,7 +275,7 @@ to any options and return the resulting parse tree.
     unless null top goto have_top
     top = get_hll_global parsegrammar_name, 'apply'    # FIXME: deprecated
     unless null top goto have_top                      # FIXME: deprecated
-    $P0 = getclass 'Exception'
+    $P0 = get_class 'Exception'
     $P1 = $P0.'new'('Cannot find rule "TOP" in ', parsegrammar_name)
     throw $P1
   have_top:                                            # FIXME: deprecated

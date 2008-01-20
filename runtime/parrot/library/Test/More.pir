@@ -40,7 +40,7 @@ Test::More - Parrot extension for testing modules
     skip(1, 'reason for skipping')
     todo(0, 'this is a failed test', 'reason for todo')
 
-    $P0 = getclass "Squirrel"
+    $P0 = get_class "Squirrel"
     $P0.new()
 
     isa_ok($P0, "Squirrel", "new Squirrel")

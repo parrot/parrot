@@ -15,7 +15,7 @@ SDL::EventHandler - base class for application-specific SDL event handlers
     .local pmc parent_class
     .local pmc class_type
 
-    getclass parent_class, 'SDL::EventHandler'
+    get_class parent_class, 'SDL::EventHandler'
     subclass class_type, parent_class, 'My::Event::Handler'
 
     # define your overridden methods

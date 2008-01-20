@@ -11,7 +11,7 @@ Parrot::Exception - Auxiliary methods for Exceptions
         load_bytecode 'Parrot/Exception.pbc'
         # ...
         $S0 = 'XYZ'
-        $P0 = getclass 'Exception'
+        $P0 = get_class 'Exception'
         $P1 = $P0.'new'('Error in "', $S0, '" module')
         throw $P1
 
