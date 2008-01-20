@@ -102,8 +102,9 @@ But please note that dynamic libs will not be found for non-standard
 locations unless you set LD_LIBRARY_PATH or similar.
 
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.  If you
-have any problems, see the section "Reporting Problems" in docs/intro.pod.
-These documents are in POD format. You can view these files with:
+have any problems, see the section "How To Submit A Bug Report" in 
+docs/submissions.pod These documents are in POD format. You can view these 
+files with the command:
 
     perldoc -F docs/intro.pod
 
