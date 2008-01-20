@@ -316,21 +316,6 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
     goto NEXT();
 }
 
-=item op B<getclass>(out PMC, in INT)
-
-Return the class PMC of the type $2.
-
-=cut
-
-op getclass(out PMC, in INT) {
-    int typ = $2;
-    if (typ < 1 || typ >= interp->n_vtable_max)
-        real_exception(interp, NULL, E_ValueError,
-                "type number out of range");
-    $1 = interp->vtables[typ]->pmc_class;
-    goto NEXT();
-}
-
 =item B<new>(out PMC, in INT, in STR)
 
 Create a new PMC of the type $2 according to the PMCs string representation
@@ -357,7 +342,7 @@ op new(out PMC, in INT, in STR) {
 Create a new PMC of the type of class ARGS[0]. This is a classmethod.
 Arguments are passed according to the calling conventions in
 F<docs/pdds/pdd03_calling_conventions.pod> with the C<set_args> opcode.
-See also the I<getclass> opcode to get a class PMC.
+See also the I<get_class> opcode to get a class PMC.
 BUT SINCE INSTANTIATE WILL PROBABLY DIE, DON'T USE IT;
 OR IF YOU NEED IT, TELL CHIP
 
