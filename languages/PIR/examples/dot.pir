@@ -2,8 +2,8 @@
 .sub x :main
 
     .local int x, y
-    P0 = new .Integer
-    #new P0, .Integer
+    P0 = new 'Integer'
+    #new P0, 'Integer'
 
 
     .begin_call
