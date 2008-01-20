@@ -7,205 +7,406 @@ docs/pdds/pdd09_gc.pod - Garbage Collection Subsystems
 
 =head1 ABSTRACT
 
-This PDD describes how DOD/GC systems work, and what's required of PMC classes.
+This PDD specifies Parrot's garbage collection subsystems.
 
 =head1 VERSION
 
 $Revision$
 
+=head1 DEFINITIONS
 
-=head1 DESCRIPTION
+=head2 Garbage collection (GC)
 
-Doing DOD takes a bit of work--we need to make sure that everything is
-findable from the root set, and that we don't go messing up data shared
-between interpreters.
+Garbage collection is a process of freeing up memory that is no longer used by
+the interpreter, by determining which objects will not be referenced again and
+can be reclaimed.
 
-=head1 GC TERMS
+=head2 Simple mark
 
-=head2 GC Schemes
+All reachable objects are marked as alive, first marking a root set, and then
+recursively marking objects reachable from other reachable objects. Objects
+not reached are considered dead. After collection, all objects are reset to
+unmarked, and the process starts again.
 
-There are basically three general schemes to achieve garbage collection.
+=head2 Tri-color mark
 
-=over 4
+Instead of a simple separation of marked (as live) and unmarked (dead), the
+object set is divided into three parts: white, gray, and black. The white
+objects are presumed dead. The gray objects have been marked as live by some
+other object, but haven't yet marked the objects they refer to. The black
+objects are live, and have marked all objects they directly refer to. 
 
-=item Reference counting
+In the initial run, all objects start as white and the root set is marked gray.
+The marking process changes white objects to gray (marking them from another
+gray object), and gray objects to black (when all object they refer to are
+marked). When the gray set is empty, all live objects have been marked, and
+the white set can be collected. After a collection run, all black objects are
+reset to white, the root set to gray, and the process begins again.
 
-All objects have a count, how often they are refered to by other objects. If
-that count reaches zero, the object's space can be reclaimed. This scheme
-can't cope with reference loops, i.e, a loop of dead objects, all
-referencing one another but not reachable from elsewhere, never gets
-collected.
+The advantage of a tri-color mark over a simple mark is that it can be broken
+into smaller stages.
 
-=item Mark and Sweep
+=head2 Mark-and-sweep
 
-Starting from the root set (Parrot registers, stacks, internal structures)
-all reachable objects (and objects reachable from these) are marked being
-alive.
+In this GC scheme, after all reachable objects are marked as live, a sweep
+through the object arenas collects all unmarked objects.
 
-Objects not reached are considered dead and get collected by a sweep through
-the objects arenas.
+=head2 Mark-and-don't-sweep
 
-=item Copying collection
+In this scheme, all objects are marked black (live) when created. White objects
+are free memory available for allocation. When no white objects remain (out of
+memory), the black objects are all changed to white, and a marking process runs
+to mark all reachable objects as live. Any unreachable objects are left white,
+and available for allocation.
 
-Live objects are copied into a new memory region. The old memory space can
-then be reclaimed.
+In some implementations, the change from black to white is made by simply
+changing the interpretation of the mark bit, for example, from 1 == black to 1
+== white.
 
-=back
+=head2 Copying collection
 
-=head2 GC Variants
+In this scheme, live objects are copied into a new memory region. The entire
+old memory region can then be reclaimed.
 
-There are several variants possible with the preceding schemes.  These
-variants achieve different goals:
+=head2 Compacting collection
 
-=over 4
+In this scheme, live objects are moved closer together, eliminating fragments
+of free space between live objects. This compaction makes later allocation of
+new objects faster, since the allocator doesn't have to scan for fragments of
+free space.
 
-=item stop-the-world
+=head2 Reference counting
 
-During a GC cycle the processing of user code is stopped. Normal operation
-continues only after the whole GC cycle is performed. This can lead to
-arbitrary long pauses during program execution.
+In this scheme, all objects have a count of how often they are refered to by
+other objects. If that count reaches zero, the object's memory can be
+reclaimed. This scheme doesn't cope well with reference loops--loops of dead
+objects, all referencing one another but not reachable from elsewhere, never
+get collected.
 
-=item incremental
+=head2 Stop-the-world
 
-GC is done in small increments intermittent with normal program operation.
+A common disadvantage of a simple mark implemenation is that the entire system
+(including all threads that use the same memory pools) must be suspended while
+the whole memory set is examined during marking and collection.  Normal
+operation continues only after the whole GC cycle is performed. This can lead
+to arbitrary long pauses during program execution.
 
-=item real-time
+=head2 Incremental
+
+Rather than suspending the system for marking and collection, GC is done in
+small increments intermittent with normal program operation. Some
+implementations perform the marking as part of ordinary object access.
+
+=head2 Real-time
 
 The pauses caused by GC don't exceed a certain limit.
 
-=item concurrent
-
-The GC system runs as a separate thread and really concurrently on a
-multi-processor machine.
-
-=item parallel
-
-Multiple threads participate in GC.
-
-=item generational
+=head2 Generational
 
 The object space is divided between a young generation (short-lived
-temporaries) and one or more old generations. Not scanning the old
-generation repeatedly can considerably speed up GC.
+temporaries) and one or more old generations. Only young generations are reset
+to white (presumed dead). Avoiding scanning the old generations repeatedly can
+considerably speed up GC.
+
+Generational collection does not guarantee that all unreachable objects will be
+reclaimed, so in large systems it is sometimes combined with a mark-and-sweep
+or copying collection scheme, one for light collection runs performed
+frequently, and the other for more complete runs performed rarely.
+
+=head2 Concurrent
+
+GC marking and collection runs as a separate thread, sometimes with multiple
+threads participating in GC. On a multi-processor machine, concurrent GC may be
+truly parallel.
+
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item - Parrot provides swappable garbage collection schemes. The GC scheme can
+be selected at configure/compile time.  The GC scheme cannot be changed
+on-the-fly at runtime, but in the future may be selected with a command-line
+option at execution time. 
+
+=item - All live PMCs must be reachable from the root set of objects in the
+interpreter.
+
+=item - Garbage collection must be safe for objects shared across multiple
+interpreters/threads.
+
+=item - The phrase "dead object detection" and abbreviation "DOD" are
+deprecated.
 
 =back
 
-=head1 GC SUBSYSTEMS
+=head1 IMPLEMENTATION
 
-=head2 Fix-sized Headers
+Parrot supports pluggable garbage collection cores, so ultimately any garbage
+collection model devised can run on it. But, different GC models are more or
+less appropriate for different application areas. The current default
+stop-the-world mark-and-sweep model is not well suited for concurrent/parallel
+execution. We will keep the simple mark-and-sweep implementation, but it will
+no longer be primary.
 
-All managed objects (PMCs, Strings, Buffers) inside Parrot are subject to
-garbage collection. As these objects aren't allowed to move after creation,
-garbage collection is done by a non-copying scheme. Further: as we have to
-cope with pointers to objects on the C stack and in CPU registers, the
-garbage collection scheme is a conservative one.
+Parrot really has two independent GC models, one used for objects (PMCs) and
+the other used for buffers (including strings). The core difference is that
+buffers cannot contain other buffers, so incremental marking is unnecessary.
+Currently, PMCs are not allowed to move after creation, so the GC model used
+there is not copying nor compacting.
 
-DOD/GC is normally triggered by allocation of new objects, which happens
-usually from some stack nesting below the run-loop. There is a small chance
-that an integer on the C stack is misinterpreted as a pointer to an object.
-This object would kept alive in such a case.
+The primary GC model for PMCs, at least for the 1.0 release, will use a
+tri-color incremental marking scheme, combined with a concurrent sweep scheme.
 
-The live-ness information gained by dead object detection (DOD) is also the
-base for collecting variable sized-data that may hang off buffers.
+=head2 Initial Marking
 
-=head2 Variable-sized Buffer Memory
+Each PMC has a C<flags> member which, among other things, is used to facilitate
+garbage collection. At the beginning of the mark phase, the C<PObj_is_live_FLAG>
+and C<PObj_is_fully_marked_FLAG> are both unset, which flags the PMC as presumed
+dead (white). The initial mark phase of the collection cycle goes through each
+PMC in the root set and sets the C<PObj_is_live_FLAG> bit in the C<flags> member
+(the PMC is gray).  It does not set the C<PObj_is_fully_marked_FLAG> bit
+(changing the PMC to black), because in the initial mark, the PMCs or buffers
+contained by a PMC are not marked. It also appends the PMC to the end of a list
+used for further marking. However, if the PMC has already been marked as black,
+the current end of list is returned (instead of appending the already processed
+PMC) to prevent endless looping.
 
-Variable-sized memory like string memory gets collected, when the associated
-header isn't found to be alive during DOD. While a copying collection could
-basically[1] be done at any time, it's inefficient to copy buffers of
-objects that are non yet detected being dead. This implies that before a
-collection in the memory pools is run, a DOD run for fixed-sized headers is
-triggered.
+The fourth combination of the two flags, where C<PObj_is_live_FLAG> is unset and
+C<PObj_is_fully_marked_FLAG> is set, is reserved for PMCs of an older
+generation, not actively participating in the GC run.
 
-[1] Dead objects stay dead, there is no possibility of a reusal of dead
-objects.
+The root set for the initial marking phase includes the following core storage
+locations:
 
-=head1 IMPLEMENTATION OF FIXED-SIZED HEADER GC
+=over 4
 
-=head2 General Notes
+=item Global stash
 
-GC subsystems are rather independent. The goal for Parrot is just to provide
-new object headers in the fastest possible way. How that is achieved can be
-considered as an implementation detail.
+=item System stack
 
-While GC subsystems are independent they may share some code to reduce
-Parrot memory footprint. E.g. stop-the-world mark and sweep and incremental
-mark and sweep use the same arena structures and share arena creation and
-DOD routines.
+=item Current PMC register set
 
-=head2 Initialization
+=item Stashes
 
-Currently only one GC system is active (selected at configure or compile
-time).  But future versions might support switching GC systems during
-runtime to accommodate for different work loads.
+=item PMC register stack
+
+=item General/User stack
+
+=back
+
+=head2 Incremental Marking
+
+After the root set of PMCs have been marked, a series of incremental mark runs
+are performed. These may be performed frequently, between other operations. The
+incremental mark runs work to move gray PMCs to black. They taking a PMC from
+the list for further marking, mark any PMCs or buffers it contains as gray (the
+C<PObj_is_live_FLAG> is set and the C<PObj_is_fully_marked_FLAG> is left unset),
+and add the contained PMCs or buffers to the list for further marking. If the
+PMC has a custom mark function in its vtable, it is called at this point.
+
+After all contained PMCs or buffers have been marked, the PMC itself is marked
+as black (the C<PObj_is_live_FLAG> and C<PObj_is_fully_marked_FLAG> are both
+set). A limit may be placed on the number of PMCs handled in each incremental
+mark run.
+
+=head2 Buffer Marking 
+
+The initial marking phase also marks the root set of buffers. Because buffers
+cannot contain other buffers, they are immediately marked as black and not
+added to the list for further marking. But, since PMCs may contain buffers, the
+buffer collection phase can't run until the incremental marking of PMCs is
+completed.
+
+The root set for buffers includes the following locations:
+
+=over 4
+
+=item Current String register set
+
+=item String register set stack
+
+=item General/User stack
+
+=item Control stack
+
+=back
+
+Once a buffer is found to be live, the C<flags> member of the buffer structure
+has the C<PObj_live_FLAG> and C<PObj_is_fully_marked_FLAG> bits set.
+
+=head2 Collection
+
+When the list for further marking is empty (all gray PMCs have changed to
+black), the collection stage is started. First, PMCs are collected, followed by
+buffers. In both cases (PMC and buffer), the "live" and "fully_marked" flags
+are reset after examination for reclamation.
+
+=head3 Collecting PMCs
+
+To collect PMCs, each PMC arena is examined, from the most recently created
+backwards.  Each PMC is examined to see if it is live, already on the free
+list, or constant.  If it is not, then it is added to the free list and marked
+as being on the free list with the C<PObj_on_free_list_FLAG>.
+
+=head3 Collecting buffers
+
+To collect buffers, each Buffer arena is examined from the most recently
+created backwards.  If the buffer is not live, not already on the free list and
+it is not a constant or copy on write, then it is added to the free pool for
+reuse and marked with the C<PObj_on_free_list_FLAG>.
+
+=head3 Concurrent collection
+
+For the most part, the variable sets between concurrent tasks don't interact.
+They have independent root sets, and don't require information on memory usage
+from other tasks before performing a collection phase. In Parrot, tasks tend to
+be short-lived, and their variables can be considered young generations from a
+generational GC perspective. Because of this, a full heavyweight task will
+maintain its own small memory pools, quickly born and quickly dying.
+
+Shared variables, on the other hand, do require information from multiple
+concurrent tasks before they can be collected. Because of this, they live in
+the parent interpreter's global pools, and can only be collected after all
+concurrent tasks have completed a full mark phase without marking the shared
+variable as live. Since GC in the concurrent tasks happens incrementally
+between operations, a full collection of the shared variables can happen
+lazily, and does not require a stop-the-world sweep through all concurrent
+tasks simultaneously.
+
+=head2 Internal Structures
+
+The different GC cores are independent, but they share some code and resources.
+The arena structures and arena creation routines are common across most GC
+cores, and some GC cores also share mark routines.
+
+The main interpreter structure has an arena_base member, which is a pointer to
+an Arenas struct.
+
+=head3 The Arenas structure
+
+The Arenas structure contains pointers to a variety of memory pools, each used
+for a specific purpose. Two are Memory_Pool pointers (memory_pool,
+constant_string_pool), and six are Small_Object_Pool structures (pmc_pool,
+pmc_ext_pool, constant_pmc_pool, buffer_header_pool,
+constant_string_header_pool).
+
+The Arenas structure holds function pointers for the core defined interface of
+the currently active GC subsystem: C<init_pool>, C<do_gc_mark>,
+C<finalize_gc_system>. It holds various accounting information for the GC
+subsystem, including how many GC runs have been completed, amount of memory
+allocated since the last run, and total memory allocated. This accounting
+information is updated by the GC system. The current block level for GC mark
+and sweep phases is stored in the Arenas structure. (See L<Blocking GC> below.)
+
+The pointer C<void *gc_private> is reserved for use by the currently active GC
+subsystem (with freedom for variation between GC implementations).
+
+=head3 The Memory_Pool structure
+
+The Memory_Pool structure is a simple memory pool. It contains a pointer to the
+top block of the allocated pool, the total allocated size of the pool, the
+block size, and some details on the reclamation characteristics of the pool.
+
+=head3 The Small_Object_Pool structure
+
+The Small_Object_Pool structure is a richer memory pool for object allocation.
+It tracks details like the number of allocated and free objects in the pool, a
+list of free objects, and for the generational GC implementation maintains
+linked lists of white, black, and gray PMCs. It contains a pointer to a simple
+Memory_Pool (the base storage of the pool). It holds function pointers for
+adding and retrieving free objects in the pool, and for allocating objects.
+
+=head2 Internal API
+
+Currently only one GC system is active at a time, selected at configure or
+compile time. Future versions will support switching GC systems at
+execution-time to accommodate different work loads.
+
+Each GC core provides a standard interface for interaction with the core.
+
+=head3 Initialization
+
+Each GC core declares an initialization routine, which is called from
+F<src/memory.c:mem_setup_allocator()> after creating C<arena_base> in the
+interpreter struct.
 
 =over 4
 
 =item C<void Parrot_gc_XXX_init(Interp *)>
 
-Initialize GC system named C<XXX>.
+A routine to initialize the GC system named C<XXX>.
 
-Called from F<src/memory.c:mem_setup_allocator()> after creating
-C<arena_base>.  The initialization code is responsible for the creation of
-the header pools and has to fill the following function pointer slots in
-C<arena_base>:
+The initialization code is responsible for the creation of the header pools and
+fills the function pointer slots in the interpreter's C<arena_base> member.
 
 =back
 
-=head2 Arena_base function pointers
+=head3 Arenas structure function pointers
+
+Each GC system declares 3 function pointers, stored in the Arenas structure.
 
 =over 4
 
-=item C<void (*do_dod_run) (Interp *, int flags)>
+=item C<void (*do_gc_mark) (Interp *, int flags)>
 
-Trigger or perform a DOD/GC run.
+Trigger or perform a GC run. With an incremental GC core, this may only
+start/continue a partial mark phase, rather than marking the entire tree of
+live objects.
+
+{{DEPRECATION NOTE: do_gc_mark used to be do_dod_run.}}.
 
 Flags is one of:
 
 =over 4
 
-=item DOD_trace_normal | DOD_trace_stack_FLAG
+=item GC_trace_normal | GC_trace_stack_FLAG
 
 Run a normal GC cycle. This is normally called by resource shortage in the
 buffer memory pools before a collection is run. The bit named
-C<DOD_trace_stack_FLAG> indicates that the C-stack (and other system areas
+C<GC_trace_stack_FLAG> indicates that the C-stack (and other system areas
 like the processor registers) have to be traced too.
 
-The implementation might or might not actually run a full GC cycle. If e.g
-an incremental GC system just has finished the mark phase, it would do
-nothing.  OTOH if no objects are currently marked live, the implementation
-should run the mark phase, so that copying of dead objects is avoided.
+The implementation might or might not actually run a full GC cycle. If an
+incremental GC system just finished the mark phase, it would do nothing.  OTOH
+if no objects are currently marked live, the implementation should run the mark
+phase, so that copying of dead objects is avoided.
 
-=item DOD_lazy_FLAG
+{{DEPRECATION NOTE: GC_trace_normal used to be DOD_trace_normal.
+GC_trace_stack_FLAG used to be DOD_trace_stack_FLAG.}}
+
+=item GC_lazy_FLAG
 
 Do a timely destruction run. The goal is to either detect all objects that
 need timely destruction or to do a full collection. In the former case the
 collection can be interrupted or postponed. This is called from the Parrot
 run-loop. No system areas have to be traced.
 
-=item DOD_finish_FLAG
+{{DEPRECATION NOTE: GC_lazy_FLAG used to be DOD_lazy_FLAG.}}
+
+=item GC_finish_FLAG
 
 Called during interpreter destruction. The GC subsystem must clear the live
 state of all objects and perform a sweep in the PMC header pool, so that
 destructors and finalizers get called.
 
-=item DOD_no_trace_volatile_roots
+{{DEPRECATION NOTE: GC_finish_FLAG used to be DOD_finish_FLAG.}}
+
+=item GC_no_trace_volatile_roots
 
 Trace root set except volatile roots. That is skip e.g. registers.
 
+{{DEPRECATION NOTE: GC_no_trace_volatile_roots used to be
+DOD_no_trace_volatile_roots.}}
+
 =back
 
-=item C<void (*de_init_gc_system) (Interp *)>
+=item C<void (*finalize_gc_system) (Interp *)>
 
 Called during interpreter destruction. Free used resources and memory pools.
 
-=item C<void (*mark_object) (Interp *, Pobj*)>
-
-Mark the object being live. This function gets invoked by the function:
-
-=item C<pobject_lives(Interp *, PObj *)>
-
-... which might do nothing if the object is already marked live.
+{{DEPRECATION NOTE: finalize_gc_system used to be
+de_init_gc_system.}}
 
 =item C<void (*init_pool) (Interp *, struct Small_Object_Pool *)>
 
@@ -214,86 +415,107 @@ following object allocation functions for the given pool.
 
 =back
 
-=head2 Object allocation
+=head3 Small_Object_Pool function pointers
 
-Each header pool provides one function pointer to get a new object from that
-pool.
+Each GC core defines 4 function pointers stored in the Small_Object_Pool
+structures.
 
 =over 4
 
 =item C<PObj * (*get_free_object) (Interp *, struct Small_Object_Pool*)>
 
-It should return one free object from the given pool. Object flags are
-returned clear, except flags that are used by the garbage collector itself.
-If the pool is a buffer header pool, all other object memory is zeroed.
+Each header pool provides one function pointer to get a new object from that
+pool. It should return one free object from the given pool (removing it from
+the pool's free list). Object flags are returned clear, except flags that are
+used by the garbage collector itself.  If the pool is a buffer header pool, all
+other object memory is zeroed.
+
+=item C<void (*add_free_object) (Interp *, struct Small_Object_Pool *, PObj *);>
+
+Add a freed object to the pool's free list.
+
+=item C<void (*alloc_objects) (Interp *, struct Small_Object_Pool *);>
+
+Initial allocation of objects for the pool.
+
+=item C<void (*more_objects) (Interp *, struct Small_Object_Pool *);>
+
+Reallocation for additional objects. It has the same signature as
+C<alloc_objects>, and in some GC cores the same function pointer is used for
+both. In some GC cores, C<more_objects> may do a GC run.
 
 =back
 
-=head2 Write Barrier
+=head3 Write Barrier
 
-The GC subsystem has to provide these (possibly empty) macros:
+Each GC core has to provide these (possibly empty) macros:
 
 =over 4
 
-=item C<DOD_WRITE_BARRIER(Interp *, PMC *agg, PMC *old, PMC *new)>
+=item C<GC_WRITE_BARRIER(Interp *, PMC *agg, PMC *old, PMC *new)>
 
 This macro is invoked when in aggregate C<agg> the element C<old> is getting
 overritten by C<new>. Both C<old> and C<new> may be NULL.
 
-=item C<DOD_WRITE_BARRIER_KEY(Interp *, PMC *agg, PMC *old, PObj
+{{DEPRECATION NOTE: used to be DOD_WRITE_BARRIER.}}
+
+=item C<GC_WRITE_BARRIER_KEY(Interp *, PMC *agg, PMC *old, PObj
 *old_key, PMC *new, PObj *new_key)>
 
 Like above. Invoked when a hash key is inserted, possibly replacing an old
 key.
 
+{{DEPRECATION NOTE: used to be DOD_WRITE_BARRIER_KEY.}}
+
 =back
-
-=head2 The Arena_base structure
-
-The C<arena_base> holds the mentioned function pointers, pointers to the
-header pools, some statistic counters, and a pointer C<void *gc_private>
-reserved for the GC subsystem.
-
-The GC subsystem is responsible for updating the appropriate statistic
-fields of the structure.
 
 =head2 Blocking GC
 
-Being able to block GC and DOD is important--you'd hate to have the newly
-allocated Buffers or PMCs you've got yanked out from underneath you. That'd
-be no fun. Use the following routines to control GC:
+Being able to block GC is important, so newly allocated Buffers or PMCs won't
+be collected before they're attached to the live tree. The following
+routines control GC:
 
 =over 4
 
-=item Parrot_block_DOD(Interp *interpreter)
+=item Parrot_block_GC_mark(Interp *interpreter)
 
-Block DOD for the passed interpreter. (But B<not> GC)
+Block the GC mark phase for the passed interpreter. (But not the sweep phase)
 
-=item Parrot_block_GC(Interp *interpreter)
+{{DEPRECATION NOTE: used to be Parrot_block_DOD.}}
 
-Block GC for the passed interpreter. (But B<not> DOD)
+=item Parrot_block_GC_sweep(Interp *interpreter)
 
-=item Parrot_unblock_DOD(Interp *interpreter)
+Block the GC sweep phase for the passed interpreter. (But not the mark phase)
 
-Unblock DOD for the passed interpreter. (But not GC)
+{{DEPRECATION NOTE: used to be Parrot_block_GC.}}
 
-=item Parrot_unblock_GC(Interp *interpreter)
+=item Parrot_unblock_GC_mark(Interp *interpreter)
 
-Unblock GC for the passed interpreter. (But not DOD)
+Unblock the GC mark phase for the passed interpreter. (But not the sweep phase)
+
+{{DEPRECATION NOTE: used to be Parrot_unblock_DOD.}}
+
+=item Parrot_unblock_GC_sweep(Interp *interpreter)
+
+Unblock the GC sweep phase for the passed interpreter. (But not the mark phase)
+
+{{DEPRECATION NOTE: used to be Parrot_unblock_GC.}}
 
 =back
 
-Note that the blocking is recursive--if you call Parrot_block_DOD() three
-times in succession, you need to call Parrot_unblock_DOD() three times to
-re-enable DOD.
+Note that the blocking is recursive--if you call Parrot_block_GC_sweep() three
+times in succession, you need to call Parrot_unblock_GC_sweep() three times to
+re-enable the GC sweep phase.
 
-=head2 Important flags
+=head2 PMC/Buffer API
 
-For PMCs and Buffers to be collected properly, you B<must> get the flags set
-on them properly. Otherwise Bad Things Will Happen.
+=head3 Flags
 
-Note: don't manipulate these flags directly. Always use the macros defined
-in F<include/parrot/pobj.h>.
+For PMCs and Buffers to be collected properly, you must set the appropriate
+flags on them.
+
+Directly manipulating these flags is not recommended. Always use the macros
+defined in F<include/parrot/pobj.h>.
 
 =over 4
 
@@ -304,8 +526,9 @@ called when the PMC is destroyed.
 
 =item PObj_custom_mark_FLAG
 
-The C<mark> vtable slot will be called during DOD. The mark function must
-call C<pobject_lives> for all non-NULL objects that PMC refers to.
+The C<mark> vtable slot will be called during the GC mark phase. The mark
+function must call C<pobject_lives> for all non-NULL objects that PMC refers
+to.
 
 Please note that C<pobject_lives> may be a macro.
 
@@ -345,9 +568,10 @@ The object is unused, and on the free list for later allocation.
 
 =item PObj_custom_GC_FLAG
 
-DWIM.
+Mark the buffer as needing GC.
 
 =back
+
 
 =head1 ATTACHMENTS
 
@@ -359,8 +583,14 @@ None.
 
 =head1 REFERENCES
 
-"A unified theory of garbage collection" <http://portal.acm.org/citation.cfm?id=1028982>
+"A unified theory of garbage collection": http://portal.acm.org/citation.cfm?id=1028982
 
-"Scalable Locality-Conscious Multithreaded Memory Allocation" http://people.cs.vt.edu/~scschnei/papers/ismm06.pdf
+"Scalable Locality-Conscious Multithreaded Memory Allocation": http://people.cs.vt.edu/~scschnei/papers/ismm06.pdf
 
-"Parallel and concurrent garbage collectors" <http://chaoticjava.com/posts/parallel-and-concurrent-garbage-collectors/>
+"Parallel and concurrent garbage collectors": http://chaoticjava.com/posts/parallel-and-concurrent-garbage-collectors/
+
+"Region-Based Memory Management": http://www.irisa.fr/prive/talpin/papers/ic97.pdf
+
+Dan's first musings on the GC subsystem: http://www.mail-archive.com/perl6-all@perl.org/msg14072.html
+
+Semi-timely and ordered destruction: http://www.sidhe.org/~dan/blog/archives/000199.html
