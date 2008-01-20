@@ -208,11 +208,7 @@ int main(int argc, const char *argv[])
     if (!interp)
         return 1;
 
-    executable_name     = string_from_cstring(interp, argv[0], 0);
-    executable_name_pmc = pmc_new(interp, enum_class_String);
-    VTABLE_set_string_native(interp, executable_name_pmc, executable_name);
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
-        executable_name_pmc);
+    Parrot_set_executable_name(interp, string_from_cstring(interp, argv[0], 0));
 
     pf = PackFile_new(interp, 0);
 
