@@ -35,6 +35,8 @@ main program
 #include "pbc.h"
 #include "parser.h"
 
+#define STREQ(x, y) (strcmp((x), (y))==0)
+
 extern int yydebug;
 
 /* HEADERIZER HFILE: none */
@@ -246,7 +248,7 @@ Parrot_version(PARROT_INTERP)
     if (PARROT_REVISION != rev) {
         printf("Warning: used Configure.pl revision %d!\n", rev);
     }
-    printf("Copyright (C) 2001-2007, The Perl Foundation.\n\
+    printf("Copyright (C) 2001-2008, The Perl Foundation.\n\
 \n\
 This code is distributed under the terms of the Artistic License 2.0.\
 \n\
@@ -351,27 +353,25 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
             &opt)) > 0) {
         switch (opt.opt_id) {
             case 'R':
-                if (!strcmp(opt.opt_arg, "slow")
-                        || !strcmp(opt.opt_arg, "bounds"))
+                if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))
                     SET_CORE(PARROT_SLOW_CORE);
-                else if (!strcmp(opt.opt_arg, "fast")
-                        || !strcmp(opt.opt_arg, "function"))
+                else if (STREQ(opt.opt_arg, "fast") || STREQ(opt.opt_arg, "function"))
                     SET_CORE(PARROT_FAST_CORE);
-                else if (!strcmp(opt.opt_arg, "switch"))
+                else if (STREQ(opt.opt_arg, "switch"))
                     SET_CORE(PARROT_SWITCH_CORE);
-                else if (!strcmp(opt.opt_arg, "cgp"))
+                else if (STREQ(opt.opt_arg, "cgp"))
                     SET_CORE(PARROT_CGP_CORE);
-                else if (!strcmp(opt.opt_arg, "cgoto"))
+                else if (STREQ(opt.opt_arg, "cgoto"))
                     SET_CORE(PARROT_CGOTO_CORE);
-                else if (!strcmp(opt.opt_arg, "jit"))
+                else if (STREQ(opt.opt_arg, "jit"))
                     SET_CORE(PARROT_JIT_CORE);
-                else if (!strcmp(opt.opt_arg, "cgp-jit"))
+                else if (STREQ(opt.opt_arg, "cgp-jit"))
                     SET_CORE(PARROT_CGP_JIT_CORE);
-                else if (!strcmp(opt.opt_arg, "switch-jit"))
+                else if (STREQ(opt.opt_arg, "switch-jit"))
                     SET_CORE(PARROT_SWITCH_JIT_CORE);
-                else if (!strcmp(opt.opt_arg, "exec"))
+                else if (STREQ(opt.opt_arg, "exec"))
                     SET_CORE(PARROT_EXEC_CORE);
-                else if (!strcmp(opt.opt_arg, "trace")) {
+                else if (STREQ(opt.opt_arg, "trace")) {
                     SET_CORE(PARROT_SLOW_CORE);
 #ifdef HAVE_COMPUTED_GOTO
                     SET_CORE(PARROT_CGP_CORE);
@@ -380,7 +380,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     SET_CORE(PARROT_JIT_CORE);
 #endif
                 }
-                else if (!strcmp(opt.opt_arg, "gcdebug"))
+                else if (STREQ(opt.opt_arg, "gcdebug"))
                     SET_CORE(PARROT_GC_DEBUG_CORE);
                 else
                     real_exception(interp, NULL, 1,
@@ -816,7 +816,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
     IMCC_info(interp, 1, "packed code %d bytes\n", size);
     packed = (opcode_t*) mem_sys_allocate(size);
     PackFile_pack(interp, interp->code->base.pf, packed);
-    if (strcmp(output_file, "-") == 0)
+    if (STREQ(output_file, "-"))
         fp = stdout;
     else if ((fp = fopen(output_file, "wb")) == 0)
         IMCC_fatal_standalone(interp, E_IOError,
@@ -847,13 +847,13 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 
     /* Read in the source and determine whether it's Parrot bytecode
        or PASM. If it either of these, then we assume that it is PIR. */
-    if (strcmp(sourcefile, "-") == 0) {
+    if (STREQ(sourcefile, "-")) {
         imc_yyin_set(stdin, yyscanner);
     }
     else {
         const char * const ext = strrchr(sourcefile, '.');
 
-        if (ext && (strcmp(ext, ".pbc") == 0)) {
+        if (ext && (STREQ(ext, ".pbc"))) {
             load_pbc  = 1;
             write_pbc = 0;
         }
@@ -863,7 +863,7 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
                                       "Error reading source file %s.\n",
                                       sourcefile);
             }
-            if (ext && strcmp(ext, ".pasm") == 0) {
+            if (ext && STREQ(ext, ".pasm")) {
                 pasm_file = 1;
             }
         }
@@ -887,10 +887,10 @@ determine_output_file_type(PARROT_INTERP,
     const char * const ext = strrchr(output_file, '.');
 
     if (ext) {
-        if (strcmp(ext, ".pbc") == 0) {
+        if (STREQ(ext, ".pbc")) {
             write_pbc = 1;
         }
-        else if (strcmp(ext, PARROT_OBJ_EXT) == 0) {
+        else if (STREQ(ext, PARROT_OBJ_EXT)) {
 #if EXEC_CAPABLE
             load_pbc  = 1;
             write_pbc = 0;
@@ -1023,9 +1023,8 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     if (output_file) {
         determine_output_file_type(interp, &obj_file, output_file);
 
-        if (!strcmp(sourcefile, output_file) && strcmp(sourcefile, "-"))
-            IMCC_fatal_standalone(interp, 1,
-                "main: outputfile is sourcefile\n");
+        if (STREQ(sourcefile, output_file) && !STREQ(sourcefile, "-"))
+            IMCC_fatal_standalone(interp, 1, "main: outputfile is sourcefile\n");
     }
 
     IMCC_INFO(interp)->write_pbc = write_pbc;
@@ -1057,14 +1056,13 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         imcc_write_pbc(interp, output_file);
 
         /* If necessary, load the file written above */
-        if (run_pbc == 2 && strcmp(output_file, "-")) {
+        if (run_pbc == 2 && !STREQ(output_file, "-")) {
             PackFile *pf;
 
             IMCC_info(interp, 1, "Loading %s\n", output_file);
             pf = Parrot_readbc(interp, output_file);
             if (!pf)
-                IMCC_fatal_standalone(interp, 1,
-                "Packfile loading failed\n");
+                IMCC_fatal_standalone(interp, 1, "Packfile loading failed\n");
             Parrot_loadbc(interp, pf);
             load_pbc = 1;
         }
