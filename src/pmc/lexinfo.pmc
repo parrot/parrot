@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007, The Perl Foundation.
+Copyright (C) 2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -68,6 +68,23 @@ subroutine.
             Hash_key_type_STRING,
             (hash_comp_fn)string_equal,     /* STRING compare */
             (hash_hash_key_fn)string_hash); /*        hash    */
+
+        PObj_active_destroy_SET(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Frees any malloced memory held by this PMC.
+
+=cut
+
+*/
+
+    void destroy () {
+        if (PMC_struct_val(SELF))
+            parrot_hash_destroy(INTERP, (Hash *)PMC_struct_val(SELF));
     }
 
 /*
@@ -132,6 +149,7 @@ The implementation of the Hash PMC is called.
             /* TODO make a better interface for hash creation
              * TODO create hash with needed types in the first place
              */
+
             SELF.init_pmc(NULL);
             hash          = (Hash *)PMC_struct_val(SELF);
             hash->entries = elems;
