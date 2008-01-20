@@ -622,7 +622,7 @@ Returns whether the PMC is numerically equal to C<value>.
 
 */
 
-    INTVAL is_same(const PMC *value) {
+    INTVAL is_same(PMC *value) {
         return SELF == value;
     }
 

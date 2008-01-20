@@ -278,7 +278,7 @@ INTVAL is_equal(PMC* value)                  MMD_EQ
 INTVAL is_equal_num(PMC* value)              MMD_NUMEQ
 INTVAL is_equal_string(PMC* value)           MMD_STREQ
 
-INTVAL is_same(const PMC* value)
+INTVAL is_same(PMC* value)
 
 INTVAL cmp(PMC* value)                       MMD_CMP
 INTVAL cmp_num(PMC* value)                   MMD_NUMCMP

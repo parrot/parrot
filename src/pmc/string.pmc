@@ -498,7 +498,7 @@ class and their strings are aliases of the same internal string.
 =cut
 
 */
-    INTVAL is_same(const PMC *value) {
+    INTVAL is_same(PMC *value) {
         const STRING * const s = VTABLE_get_string(INTERP, SELF);
         const STRING * const v = VTABLE_get_string(INTERP, value);
         return (INTVAL)(value->vtable == SELF->vtable && s == v);
