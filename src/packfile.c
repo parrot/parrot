@@ -1400,11 +1400,11 @@ create_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir), pack_file_types t,
     PackFile_Segment *seg;
 
     const size_t len = strlen(name) + strlen(file_name) + 2;
-    char * const buf = (char *)malloc(len);
+    char * const buf = (char *)mem_sys_allocate(len);
 
     sprintf(buf, "%s_%s", name, file_name);
     seg = PackFile_Segment_new_seg(interp, dir, t, buf, add);
-    free(buf);
+    mem_sys_free(buf);
     return seg;
 }
 
