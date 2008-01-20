@@ -8,13 +8,13 @@ src/gc/register.c - Register handling routines
 
 =head1 DESCRIPTION
 
-Parrot has 4 register sets, one for each of its basic types. The amount
-of registers in each set varies depending on the use counts of the
-respective subroutine and is determined by the PASM/PIR compiler in
-the register allocation pass (F<imcc/reg_alloc.c>).
+Parrot has 4 register sets, one for each of its basic types. The
+number of registers in each set varies depending on the use counts of
+the subroutine and is determined by the PASM/PIR compiler in the
+register allocation pass (F<imcc/reg_alloc.c>).
 
 There is one register stack to support the C<saveall> and
-C<restoreall> opcodes. The former copies all registers to a newly
+C<restoreall> opcodes. The former copies all registers to newly
 allocated storage and points the register base pointers to this
 storage. In C<Parrot_pop_regs> the register base pointers are restored
 to the previous values and the allocated register memory is discarded.
