@@ -72,7 +72,7 @@ needed for Ruby 1.9.  The currently defined ast nodes:
     addattribute $P0, 'try_stmt'
     addattribute $P0, 'rescue_stmt'
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 10
     set_hll_global ['Cardinal::PAST'], 'serial_number', $P0
     .return ()
