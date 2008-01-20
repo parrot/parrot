@@ -670,7 +670,7 @@ SKIP: {
     set I4, 0
     set I5, 10
     set I6, 20
-    getclass P2, "Complex"
+    get_class P2, "Complex"
     instantiate P1
     print P1
     print "\n"
@@ -682,7 +682,7 @@ OUTPUT
     pir_output_is( << 'CODE', << 'OUTPUT', "instantiate, PIR, N" );
 
 .sub main
-    $P0 = getclass "Complex"
+    $P0 = get_class "Complex"
     $P1 = $P0."instantiate"(2.0, 3.0)
     print $P1
     print "\n"
@@ -695,7 +695,7 @@ OUTPUT
     pir_output_is( << 'CODE', << 'OUTPUT', "instantiate, PIR, P" );
 
 .sub main
-    $P0 = getclass "Complex"
+    $P0 = get_class "Complex"
     $P1 = new 'Float'
     $P1 = 2.0
     $P2 = new 'Float'
@@ -712,7 +712,7 @@ OUTPUT
     pir_output_is( << 'CODE', << 'OUTPUT', "instantiate, PIR, S" );
 
 .sub main
-    $P0 = getclass "Complex"
+    $P0 = get_class "Complex"
     $P1 = $P0."instantiate"("2 + 3i")
     print $P1
     print "\n"

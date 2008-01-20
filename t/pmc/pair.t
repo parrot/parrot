@@ -76,7 +76,7 @@ SKIP: {
     k = "key"
     v = new 'String'
     v = "value"
-    cl = getclass "Pair"
+    cl = get_class "Pair"
     p = cl."instantiate"(k, v)
 
     $P0 = p."key"()

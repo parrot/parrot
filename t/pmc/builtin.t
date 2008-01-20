@@ -89,7 +89,7 @@ SKIP: {
     print y
     print "\n"
     # same as class method
-    cl = getclass "Float"
+    cl = get_class "Float"
     print "class method  "
     y = cl."cos"(x)
     print y
@@ -116,7 +116,7 @@ OUT
     $I0 = "puts"(o, "ok 3\n")
     m = getattribute o, "puts"
     $I0 = m("ok 4\n")
-    cl = getclass "ParrotIO"
+    cl = get_class "ParrotIO"
     $I0 = cl."puts"(o, "ok 5\n")
 .end
 CODE
