@@ -13,7 +13,7 @@ src/builtins/inplace.pir - Inplace assignments
 .include 'cclass.pasm'
 
 .sub 'onload' :load :init
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 1
     set_global '$isbol', $P0
     .return ()

@@ -41,7 +41,7 @@ Return True if all elements of the iterable are true.
     .param pmc iterable
     .local pmc iter, result, obj
     iter = new .Iterator, iterable
-    result = new .Integer # should be boolean or whatever
+    result = new 'Integer' # should be boolean or whatever
 
     .local int bool
   loop_check:
@@ -71,7 +71,7 @@ Return True if any element of the iterable is true.
     .param pmc iterable
     .local pmc iter, result, obj
     iter = new .Iterator, iterable
-    result = new .Integer # should be bool
+    result = new 'Integer' # should be bool
     .local int bool
 
  loop_check:
@@ -117,7 +117,7 @@ subclassed further. Its only instances are False and True.
     .param int has_x :opt_flag
 
     .local pmc result
-    result = new .Integer # should be bool or whatever
+    result = new 'Integer' # should be bool or whatever
 
     if has_x == 0 goto fail
     $I0 = x
