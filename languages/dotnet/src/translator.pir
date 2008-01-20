@@ -537,7 +537,7 @@ ILOOP:
     goto OBJ_TYPE
 
 INT_TYPE:
-    init_body = concat "$P0 = new .Integer\n$P0 = 0\nsetattribute self, \""
+    init_body = concat "$P0 = new 'Integer'\n$P0 = 0\nsetattribute self, \""
     init_body = concat name
     init_body = concat "\", $P0\n"
     goto DONE_INIT
