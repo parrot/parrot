@@ -1824,6 +1824,9 @@ SPLINTFLAGS  = \
     -showfunc \
     -tmpdir $(SPLINT_TMP) \
     \
+    +posixstrictlib \
+    -skipposixheaders \
+    \
     -show-summary \
     +show-scan \
     +time-dist \
@@ -1869,7 +1872,6 @@ SPLINTFLAGS  = \
     +nullpass \
     +nullstate \
     -paramuse \
-    +posixstrictlib \
     -predboolint \
     -predboolothers \
     -predboolptr \
@@ -1883,8 +1885,6 @@ SPLINTFLAGS  = \
     -shiftimplementation \
     -shiftnegative \
     -showsourceloc \
-    +show-scan \
-    -skipposixheaders \
     -type \
     \
     -branchstate \
