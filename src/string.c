@@ -257,6 +257,7 @@ void
 string_init(PARROT_INTERP)
 {
     size_t i;
+    const size_t n_parrot_cstrings = sizeof(parrot_cstrings) / sizeof(parrot_cstrings[0]);
 
     /*
      * when string_init is called, the config hash isn't created
@@ -278,11 +279,9 @@ string_init(PARROT_INTERP)
             interp->parent_interpreter->const_cstring_table;
         return;
     }
-    interp->const_cstring_table = (STRING**)mem_sys_allocate(sizeof (STRING*) *
-        sizeof (parrot_cstrings)/sizeof (parrot_cstrings[0]));
-    for (i = 0; i < sizeof (parrot_cstrings)/sizeof (parrot_cstrings[0]); ++i) {
-        interp->const_cstring_table[i] =
-            const_string(interp, parrot_cstrings[i].string);
+    interp->const_cstring_table = (STRING**)mem_sys_allocate(n_parrot_cstrings * sizeof(STRING*));
+    for (i = 0; i < n_parrot_cstrings; ++i) {
+        interp->const_cstring_table[i] = const_string(interp, parrot_cstrings[i].string);
         /* TODO construct string here and valid hashval */
     }
 
