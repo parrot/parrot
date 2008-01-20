@@ -47,7 +47,7 @@ needed for C99.  The currently defined ast nodes:
     $P0 = subclass base, 'C99::CPP::PAST::WSNWS'
 
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 10
     set_hll_global ['C99::CPP::PAST'], 'serial_number', $P0
     .return ()
