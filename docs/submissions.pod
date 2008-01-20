@@ -285,14 +285,13 @@ Obtain a perl.org account at https://auth.perl.org/auth/account
 
 =item 3
 
-The pumpkin or architect must put in a request to have your perl.org account 
-granted svn commit privileges.
-
-The two best ways to let us know you're interested in becoming a committer
-are via the parrot-porters mailing list, or via IRC (#parrot on irc.perl.org).
-Thanks for your help!
+Request commit access via the C<parrot-porters> mailing list, or via
+IRC (#parrot on irc.perl.org).  The people who can do this are called
+"metacommitters"; see C<RESPONSIBLE_PARTIES> for the current list.
 
 =back
+
+Thanks for your help!
 
 =head1 HISTORY
 
