@@ -812,7 +812,7 @@ Execute a shell command and don't return the return code.
 
   # Store it as a global for m4_sysval
   .local pmc exit_status_as_pmc
-  exit_status_as_pmc = new .Integer
+  exit_status_as_pmc = new 'Integer'
   exit_status_as_pmc  = exit_status
   store_global 'exit_status', exit_status_as_pmc
 
