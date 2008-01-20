@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -160,6 +160,27 @@ void
 Parrot_set_debug(PARROT_INTERP, UINTVAL flag)
 {
     interp->debug_flags |= flag;
+}
+
+/*
+
+=item C<void Parrot_set_executable_name>
+
+Sets the name of the executable launching Parrot (see C<pbc_to_exe> and the
+C<parrot> binary).
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)
+{
+    PMC *name_pmc = pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, name_pmc, name);
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
+        name_pmc);
 }
 
 /*

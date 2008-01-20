@@ -16,11 +16,17 @@ embed.pod - Parrot embedding system
 
         argc--; argv++; /* skip the program name */
 
-        interp=Parrot_new(NULL);
+        interp = Parrot_new(NULL);
+        if (!interp)
+            return 1;
 
-        if(PARROT_JIT_CAPABLE) {
-            Parrot_set_run_core(interp, PARROT_JIT_CORE);  /* activate JIT */
-        }
+        /* set the name of the executable embedding Parrot */
+        Parrot_set_executable_name(interp,
+            string_from_cstring(interp, argv[0], 0));
+
+        /* activate JIT */
+        if(PARROT_JIT_CAPABLE)
+            Parrot_set_run_core(interp, PARROT_JIT_CORE);
 
         pf = Parrot_readbc(interp, bcfile);
         Parrot_loadbc(interp, pf);
@@ -208,6 +214,11 @@ Parrot_Interp_flag_val)>
 
 Sets a flag in the Parrot interpreter.
 
+=item C<void Parrot_set_executable_name(Parrot_Interp, Parrot_String)>
+
+Sets the name of the executable embedding Parrot; some Parrot code (and
+languages) rely on this.
+
 =item C<Parrot_PackFile Parrot_readbc(Parrot_Interp, char *filename)>
 
 Reads in a bytecode file and returns a packfile structure for it.
@@ -224,8 +235,6 @@ are the parameters the bytecode should receive.
 =item C<void Parrot_destroy(Parrot_Interp)>
 
 Deallocates all memory associated with a Parrot interpreter.
-
-B<XXX> At the moment, it just leaks most of it.
 
 =back
 
