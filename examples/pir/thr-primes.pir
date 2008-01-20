@@ -80,7 +80,7 @@ no_arg:
 #       10 my $kid    = new threads(\&check_num, $stream, 2);
     Check_num = global "_check_num"
     kid = new ParrotThread
-    $P2 = new Integer
+    $P2 = new 'Integer'
     $P2 = 2
     kid.'run_clone'(Check_num, Check_num, stream, $P2)
 
@@ -89,7 +89,7 @@ no_arg:
     i = 3
 lp:
 #       13     $stream->enqueue($i);
-    $P3 = new Integer
+    $P3 = new 'Integer'
     $P3 = i
     push stream, $P3
     inc i
@@ -125,7 +125,7 @@ lp:
     $I0 = defined Num
     unless $I0 goto ewhile
 #       24         next unless $num % $cur_prime;
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = Num % cur_prime
     unless $P0 goto lp
 #       25         if ($kid) {

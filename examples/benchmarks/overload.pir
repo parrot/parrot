@@ -10,9 +10,9 @@
    .local pmc r
    .local pmc a
    .local pmc b
-   a = new Integer
-   b = new Integer
-   r = new Integer
+   a = new 'Integer'
+   b = new 'Integer'
+   r = new 'Integer'
    a = 7
    b = 6
    i = 1
