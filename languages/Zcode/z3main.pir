@@ -241,7 +241,7 @@ vers_ok:
   setattribute self, "ZComp\0ops", ops
   $P0 = new String
   setattribute self, "ZComp\0code", $P0
-  $P0 = new Integer
+  $P0 = new 'Integer'
   setattribute self, "ZComp\0temp", $P0
 .end
 
