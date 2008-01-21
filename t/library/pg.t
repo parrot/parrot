@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -249,3 +249,9 @@ no_pg:
     $I1 = iseq $I0, PGRES_COMMAND_OK
     test.'todo'($I1, 'notice result is still ok')
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
