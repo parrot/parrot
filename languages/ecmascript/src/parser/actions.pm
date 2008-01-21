@@ -22,7 +22,7 @@ method function_declaration($/) {
 }
 
 method statement($/, $key) {
-   make $( $/{$key} );
+    make $( $/{$key} );
 }
 
 method block($/) {
@@ -43,6 +43,16 @@ method if_statement($/) {
         $past.push( $( $<else> ) );
     }
     make $past;
+}
+
+method while_statement($/) {
+    my $cond := $( $<expression> );
+    my $block := $( $<statement> );
+    make PAST::Op.new( $cond, $block, :pasttype('while'), :node($/) );
+}
+
+method empty_statement($/) {
+    make PAST::Op.new( :node($/), :inline('    # no-op') );
 }
 
 method primary_expression($/, $key) {

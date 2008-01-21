@@ -33,8 +33,10 @@ rule formal_parameter_list {
 ##
 
 rule statement {
-    | <block> {*}              #= block
-    | <if_statement> {*}       #= if_statement
+    | <block> {*}               #= block
+    | <if_statement> {*}        #= if_statement
+    | <while_statement> {*}     #= while_statement
+    | <empty_statement> {*}     #= empty_statement
 }
 
 rule block {
@@ -45,6 +47,15 @@ rule block {
 rule if_statement {
     'if' '(' <expression> ')' <statement> ['else' $<else>=<statement>]?
     {*}
+}
+
+rule while_statement {
+    'while' '(' <expression> ')' <statement>
+    {*}
+}
+
+rule empty_statement {
+    ';' {*}
 }
 
 ##
