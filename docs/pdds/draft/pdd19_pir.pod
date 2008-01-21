@@ -345,33 +345,15 @@ Always paired with C<.end>.
 
 End a compilation unit. Always paired with C<.sub>.
 
-=item #line <integer> <string>
-
-Set the line number and filename to the value specified. This is useful in
-case the PIR code is generated from some source file, and any error messages
-should print the source file's location, not the line number and filename of
-the generated file.
-
-{{ PROPOSAL: Change this to:
-
- .line <integer> ',' <string>
-
-which is more consistent, and not as confusing as #line, which looks as a comment.
-Also, the #line directive must be at the beginning of the line. See [RT#45857]. }}
-
-=item #line <integer> <string>
+=item .line <integer>, <string>
 
 Set the line number and filename to the value specified. This is useful in
 case the PIR code is generated from some source file, and any error messages
 should print the source file, not the line number and filename of the generated
 file.
 
-{{ PROPOSAL: Change this to:
-
- .line <integer> ',' <string>
-
-which is more consistent, and not as confusing as #line, which looks as a comment.
-Also, the #line directive must be at the beginning of the line. See [RT#45857]. }}
+{{ DEPRECATION NOTE: was C<<#line <integer> <string>>>. See [RT#45857],
+[RT#43269], and [RT#47141]. }}
 
 =back
 
