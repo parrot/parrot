@@ -1,46 +1,29 @@
-#! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+#! parrot
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 3;
+.const int NUM_OF_TESTS = 8
 
-=head1 NAME
+.sub main :main
+    load_bytecode 'library/Test/More.pir'
 
-t/pmc/pair.t - pair tests
+    .local pmc plan, is, ok
+    plan = get_hll_global [ 'Test'; 'More' ], 'plan'
+    is   = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok   = get_hll_global [ 'Test'; 'More' ], 'ok'
 
-=head1 SYNOPSIS
+    # set a test plan
+    plan(NUM_OF_TESTS)
 
-    % prove t/pmc/pair.t
-
-=head1 DESCRIPTION
-
-Tests the C<Pair> PMC.
-
-=cut
-
-pasm_output_is( <<'CODE', <<'OUT', 'create' );
     new P0, 'Pair'
-    print "ok 1\n"
+    ok(1, "still alive")
     new P1, 'Integer'
     set P1, 42
     set P0["key"], P1
-    print "ok 2\n"
+    ok(1, "still alive")
     set P2, P0["key"]
-    print P2
-    print "\n"
-    end
-CODE
-ok 1
-ok 2
-42
-OUT
+    is(P2, 42, "fetching value")
 
-pir_output_is( <<'CODE', <<'OUT', 'methods' );
-.sub main :main
     .local pmc p, kv
     new p, 'Pair'
     new $P1, 'Integer'
@@ -48,24 +31,19 @@ pir_output_is( <<'CODE', <<'OUT', 'methods' );
     set p["key"], $P1
 
     $P0 = p."key"()
-    print $P0
-    print ' '
+    is( $P0, 'key', 'get key' )
     $P0 = p."value"()
-    print $P0
-    print ' '
+    is( $P0, 42, 'get key' )
     kv = p."kv"()
     $I0 = elements kv
-    print $I0
-    print ' '
+    is( $I0, 2, 'number of elements returned from "kv"' )
     $P0 = kv[0]
-    print $P0
-    print ' '
+    is( $P0, 'key', 'first element returned from "kv"' )
     $P0 = kv[1]
-    say $P0
+    is( $P0, 42, 'third element returned from "kv"' )
 .end
-CODE
-key 42 2 key 42
-OUT
+
+=for get it
 
 SKIP: {
     skip( "instantiate disabled", 1 );
@@ -96,6 +74,8 @@ CODE
 key value 77
 OUT
 }
+
+=cut
 
 # Local Variables:
 #   mode: cperl
