@@ -157,6 +157,8 @@ preprocessor, the same way that it generates all the other oploop variants.
 
 "Exploring the Broken Web": http://talks.php.net/show/osdc07
 
+"Safe ERB": http://agilewebdevelopment.com/plugins/safe_erb
+
 =cut
 
 __END__
