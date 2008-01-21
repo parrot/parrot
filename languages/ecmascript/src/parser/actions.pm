@@ -7,8 +7,6 @@ method TOP($/) {
     for $<source_element> {
         $past.push( $( $_ ) );
     }
-    #my $past := $( $<source_element> );
-    #$past.blocktype('declaration');
     make $past;
 }
 
@@ -47,8 +45,14 @@ method if_statement($/) {
     make $past;
 }
 
-method expression($/, $key) {
-   make $( $/{$key} );
+method primary_expression($/, $key) {
+    make $( $/{$key} );
+}
+
+
+method expression($/) {
+   #make $( $<oexpr> );
+   make $( $<primary_expression> );
 }
 
 method identifier($/) {
@@ -71,11 +75,29 @@ method integer_number($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node( $/ ) );
 }
 
-method numeric_literal($/) {
-    make $( $<decimal_literal> );
+method hex_integer_literal($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node( $/ ) );
 }
 
 method decimal_literal($/, $key) {
     make $( $/{$key} );
 }
 
+method oexpr($/, $key) {
+    if ($key eq 'end') {
+        make $($<expr>);
+    }
+    else {
+        my $past := PAST::Op.new( :name($<type>),
+                                  :pasttype($<top><pasttype>),
+                                  :pirop($<top><pirop>),
+                                  :lvalue($<top><lvalue>),
+                                  :node($/)
+                                );
+        for @($/) {
+            $past.push( $($_) );
+        }
+        make $past;
+    }
+
+}

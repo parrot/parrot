@@ -14,6 +14,9 @@ rule source_element {
     | <function_declaration> {*}   #= function_declaration
 }
 
+##
+## functions
+##
 
 rule function_declaration {
     'function' <identifier> '(' <formal_parameter_list>? ')' <block>
@@ -24,6 +27,10 @@ rule formal_parameter_list {
     <identifier> [',' <identifier>]*
     {*}
 }
+
+##
+## statements
+##
 
 rule statement {
     | <block> {*}              #= block
@@ -40,7 +47,19 @@ rule if_statement {
     {*}
 }
 
+##
+## expressions
+##
+
 rule expression {
+    <primary_expression>
+    {*}
+}
+
+rule 'oexpr' is optable { ... }
+
+
+rule primary_expression {
     | <literal> {*}      #= literal
     | <identifier> {*}   #= identifier
 }
@@ -49,18 +68,16 @@ token identifier {
     <!reserved_word>
     <alpha> [<alpha>|<digit>|_]*
     {*}
-##[<alpha> | $ | _ | <unicode_escape_sequeces> ]
-##[ <alphanum> | $ | _ | <unicode_escape_sequence> ]*
 }
 
 token literal {
-    | <string_literal> {*}  #= string_literal
-    | <numeric_literal> {*} #= numeric_literal
+    | <string_literal> {*}         #= string_literal
+    | <decimal_literal> {*}        #= decimal_literal
+    | <hex_integer_literal> {*}    #= hex_integer_literal
 }
 
-token numeric_literal {
-    <decimal_literal>
-    {*}
+token hex_integer_literal {
+    0<[xX]><hex_digits>+ {*}
 }
 
 token decimal_literal {
@@ -118,6 +135,10 @@ token reserved_word {
     | <keyword>
     | <future_reserved_word>
 }
+
+
+##proto term: is tighter(infix:<+>) is parsed(&primary_expression) { ... }
+
 
 
 #### whitespace
