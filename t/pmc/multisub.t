@@ -96,4 +96,4 @@ Tests the creation and invocation of Perl6 multi subs.
 #   mode: pir
 #   fill-column: 70
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

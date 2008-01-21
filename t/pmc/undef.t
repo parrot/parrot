@@ -128,7 +128,7 @@ Tests mainly morphing undef to other types.
 
     pmc1_is_a = isa pmc1, "Default"
     is( pmc1_is_a, 0, 'PMC Undef is not Default' )
-    
+
     pmc1_is_a = isa pmc1, "scalar"
     is( pmc1_is_a, 0, 'PMC Undef is not scalar' )
 
@@ -169,4 +169,4 @@ Tests mainly morphing undef to other types.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
