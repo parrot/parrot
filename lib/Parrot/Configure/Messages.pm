@@ -15,7 +15,7 @@ sub print_introduction {
     my $parrot_version = shift;
     print <<"END";
 Parrot Version $parrot_version Configure 2.0
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 Hello, I'm Configure. My job is to poke and prod your system to figure out
 how to build Parrot. The process is completely automated, unless you passed in
