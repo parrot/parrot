@@ -1,15 +1,19 @@
 =head1 NAME
 
-docs/pdds/pdd18_security.pod - Parrot's security infrastructure
+docs/pdds/pdd18_security.pod - Parrot's security model
 
 =head1 ABSTRACT
 
-This PDD describes the safety, security, and quota infrastructure of Parrot.
+This PDD describes the security infrastructure of Parrot.
+
+=head1 VERSION
+
+$Revision$
+
+=head1 DESCRIPTION
 
 {{ NOTE: This PDD is inadequate. We want to provide a much more
 extensive level of sandboxing. }}
-
-=head1 DESCRIPTION
 
 There are three basic subsystems in Parrot's security system. They are:
 
@@ -151,38 +155,11 @@ preprocessor, the same way that it generates all the other oploop variants.
 
 =head1 REFERENCES
 
+"Exploring the Broken Web": http://talks.php.net/show/osdc07
 
+=cut
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Internal
-    PDD Number: 18
-    Version: 1.0
-    Status: Developing
-    Last Modified: 29 Aug 2004
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.0
-
-None. First version
-
-=back
-
+__END__
+Local Variables:
+  fill-column:78
+End:
