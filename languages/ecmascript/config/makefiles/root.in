@@ -79,7 +79,7 @@ SOURCES = \
 
 # target for building a standalone javascript compiler
 js@exe@: js.pbc
-    $(PBC_TO_EXE) js.pbc
+	$(PBC_TO_EXE) js.pbc
 
 # the default target
 js.pbc: $(PARROT) $(SOURCES)
