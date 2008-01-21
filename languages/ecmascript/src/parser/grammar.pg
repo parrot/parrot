@@ -41,8 +41,8 @@ rule if_statement {
 }
 
 rule expression {
-    | <identifier> {*}   #= identifier
     | <literal> {*}      #= literal
+    | <identifier> {*}   #= identifier
 }
 
 token identifier {
@@ -64,23 +64,32 @@ token numeric_literal {
 }
 
 token decimal_literal {
+    | <integer_number> {*}         #= integer_number
+    | <floating_point_number> {*}  #= floating_point_number
+}
+
+token floating_point_number {
     [ <decimal_integer_literal> '.' <digit>+? <exponent_part>?
     | '.' <digit>+ <exponent_part>?
-    | <decimal_integer_literal> <exponent_part>?
     ]
+    {*}
+}
+
+token integer_number {
+    <decimal_integer_literal> <exponent_part>?
     {*}
 }
 
 token decimal_integer_literal {
     | 0
-    | <[1..9]> <digit>+
+    | <[1..9]> <digit>*
 }
 
 token exponent_part { <[eE]> <[+\-]> <digit>+ }
 
 token string_literal {
-    [ <PGE::Text::Bracketed: ">
-    | <PGE::Text::Bracketed: '>
+    [ '"' <string_literal: "> '"'
+    | \' <string_literal: '> \'
     ]
     {*}
 }

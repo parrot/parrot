@@ -63,11 +63,19 @@ method string_literal($/) {
     make PAST::Val.new( :value( ~$<string_literal> ), :node($/) );
 }
 
+method floating_point_number($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node( $/ ) );
+}
+
+method integer_number($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node( $/ ) );
+}
+
 method numeric_literal($/) {
     make $( $<decimal_literal> );
 }
 
-method decimal_literal($/) {
-    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node( $/ ) );
+method decimal_literal($/, $key) {
+    make $( $/{$key} );
 }
 
