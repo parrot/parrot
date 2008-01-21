@@ -49,7 +49,7 @@ pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p' );
     print "ok 1 - inspect_p_p op executed\n"
 
     $I0 = elements $P1
-    if $I0 == 6 goto ok_2
+    if $I0 == 7 goto ok_2
     print "not "
 ok_2:
     print "ok 2 - returned hash had correct number of elements\n"
@@ -69,17 +69,28 @@ pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p_s' );
     say $P1
     print "ok 1 - inspect_p_p_s with $3='name'\n"
 
+    $P1 = inspect $P0, 'flags'
+    $I0 = $P1
+    $I1 = 1 << 29 # flag 29 is PObj_is_class_FLAG
+    
+    $I2 = $I0 & $I1
+    if $I2 goto flags_ok
+      print "not "
+    flags_ok:
+    print "ok 2 - inspect_p_p_s with $3='flags'\n"
+
     $P1 = inspect $P0, 'attributes'
     $I0 = elements $P1
     if $I0 == 1 goto ok_2
     print "not "
 ok_2:
-    print "ok 2 - inspect_p_p_s with $3='attributes'\n"
+    print "ok 3 - inspect_p_p_s with $3='attributes'\n"
 .end
 CODE
 foo
 ok 1 - inspect_p_p_s with $3='name'
-ok 2 - inspect_p_p_s with $3='attributes'
+ok 2 - inspect_p_p_s with $3='flags'
+ok 3 - inspect_p_p_s with $3='attributes'
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'get_class_p_s' );
