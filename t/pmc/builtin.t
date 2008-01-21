@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+#! parrot
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -22,93 +16,78 @@ Tests builtin opcode-like methods.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', "three ways to call a method" );
 .sub main :main
+    .include 'include/test_more.pir'
+
+    plan(10)
+
+    three_ways_to_call_a_method()
+
+    ## XXX skip() fails: Null PMC access in invoke()
+    # skip( 1, 'bound methods - n/y' )
+    # bound_methods()
+    # parrot_io_puts()
+
+    ## This should be last; it outputs TAP directly, so Test::More
+    ## loses track of the index.
+    ## XXX any changes will require the indices to be updated
+    builtin_say()
+.end
+
+.sub three_ways_to_call_a_method
     .local pmc x, y, cl, m
     x = new 'Float'
     x = 1.0
     # opcode syntax
-    print "opcode        "
     y = cos x
-    print y
-    print "\n"
+    is( y, 0.540302, 'opcode syntax' )
     # function call syntax
-    print "function      "
     y = "cos"(x)
-    print y
-    print "\n"
+    is( y, 0.540302, 'function call syntax' )
     # method call
-    print "method        "
     y = x."cos"()
-    print y
-    print "\n"
+    is( y, 0.540302, 'method call syntax' )
 .end
-CODE
-opcode        0.540302
-function      0.540302
-method        0.540302
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "say" );
-.sub main :main
+.sub builtin_say
     .local pmc io
-    $I0 = say "ok 1"
+    $I0 = say "ok 4 - say in scalar context"
     io = getstdout
-    $I0 = say io, "ok 2"
-    say "ok 3"
-    say io, "ok 4"
-    "say"(io, "ok 5")
+    $I0 = say io, "ok 5 - say in scalar context with io pmc"
+    say "ok 6 - say in void context"
+    say io, "ok 7 - say in voide context with io pmc"
+    "say"(io, "ok 8 - say in function call syntax with io pmc")
     .local pmc s
     s = new 'String'
-    s = "ok 6"
+    s = "ok 9 - say a String with io pmc"
     say io, s
-    s = "ok 7"
+    s = "ok 10 - say a String"
     say s
 .end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-OUT
 
-SKIP: {
-    skip( "bound methods - n/y", 2 );
-    pir_output_is( <<'CODE', <<'OUT', "bound methods" );
-.sub main :main
+## skip bound methods - n/y
+.sub bound_methods
     .local pmc x, y, cl, m
     x = new 'Float'
     x = 1.0
-    # bound object nethod
+
+    # bound object method
     m = getattribute x, "cos"	# m = x.cos
-    print "bound obj met "
     y = m()
-    print y
-    print "\n"
-    # same as class method
+    is( y, 0.540302, 'bound obj method' )
+
     cl = get_class "Float"
-    print "class method  "
     y = cl."cos"(x)
-    print y
-    print "\n"
-    # bound class nethod
-    print "bound class m "
+    is( y, 0.540302, 'class method' )
+
+    # bound class method
     m = getattribute cl, "cos"	# m = Float.cos
     y = m(x)
-    print y
-    print "\n"
+    is( y, 0.540302, 'bound class method' )
 .end
-CODE
-bound obj met 0.540302
-class method  0.540302
-bound class m 0.540302
-OUT
 
-    pir_output_is( <<'CODE', <<'OUT', "ParrotIO.puts" );
-.sub main :main
+## skip bound methods - n/y
+.sub parrot_io_puts
     .local pmc o, m, cl
     o = getstdout
     $I0 = o."puts"("ok 1\n")
@@ -119,19 +98,9 @@ OUT
     cl = get_class "ParrotIO"
     $I0 = cl."puts"(o, "ok 5\n")
 .end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUT
-
-}
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
