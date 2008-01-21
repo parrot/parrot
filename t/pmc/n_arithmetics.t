@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+#! parrot
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 20;
 
 =head1 NAME
 
@@ -23,74 +17,87 @@ various combinations of Parrot integer and number types.
 
 =cut
 
+
+.sub main :main
+    .include 'include/test_more.pir'
+
+    plan(73)
+
+    take_the_negative_of_an_integer()
+    take_the_absolute_value_of_an_integer()
+    add_integer_to_integer()
+    subtract_integer_from_integer()
+    multiply_integer_by_integer()
+    divide_integer_by_integer()
+    negate_a_float()
+    take_the_absolute_value_of_a_float()
+    add_integer_to_float()
+    subtract_integer_from_float()
+    multiply_float_by_integer()
+    divide_float_by_integer()
+    add_float_to_float()
+    add_sub_mul_div_of_float_with_constants()
+    subtract_float_from_float()
+    multiply_float_by_float()
+    divide_float_by_float()
+    verify_new_pmc()
+.end
+
 ###
 ### Operations on a single INTVAL
 ###
-pir_output_is( <<'CODE', <<OUTPUT, "take the negative of an Integer" );
-.sub _main :main
+.sub take_the_negative_of_an_integer
     P0 = new 'Integer'
     ## negate zero.
     set P0, 0
     n_neg P1, P0
-    print P1
-    print "\n"
+    is( P1, 0, 'negavite of zero is zero' )
     P30 = P1
     ## negate a positive number.
     set P0, 1234567890
     n_neg P1, P0
-    print P1
-    print "\n"
+    is( P1, -1234567890, 'negavite of positive' )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P1' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P1' )
+  not_broken__done:
     ## negate a negative number.
     set P0, -1234567890
     P1 = n_neg P0
-    print P1
-    print "\n"
+    is( P1, 1234567890, 'negative of negative' )
 .end
-CODE
-0
--1234567890
-1234567890
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "take the absolute value of an Integer" );
-.sub _main :main
+.sub take_the_absolute_value_of_an_integer
     P0 = new 'Integer'
     ## find absolute zero (so to speak).
     set P0, 0
     P1 = n_abs P0
-    print P1
-    print "\n"
+    is( P1, 0, 'abs of zero' )
     P30 = P1
     ## find the absolute value of a positive Integer.
     set P0, 1234567890
     n_abs P1, P0
-    print P1
-    print "\n"
+    is( P1, 1234567890, 'abs of positive' )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P1' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P1' )
+  not_broken__done:
     ## find the absolute value of a negative number.
     set P0, -1234567890
     n_abs P1, P0
-    print P1
-    print "\n"
+    is( P1, 1234567890, 'abs of negative' )
 .end
-CODE
-0
-1234567890
-1234567890
-OUTPUT
-
+ 
 ###
 ### first arg is Integer, second arg is Integer
 ###
-pir_output_is( <<'CODE', <<OUTPUT, "add Integer to Integer" );
-.sub _main :main
+.sub add_integer_to_integer
     P0 = new 'Integer'
     set P0, 4000
     P1 = new 'Integer'
@@ -98,33 +105,25 @@ pir_output_is( <<'CODE', <<OUTPUT, "add Integer to Integer" );
     P2 = new 'Integer'
     set P2, 666
     n_add P2, P0, P1
-    print P2
-    print "\n"
+    is( P2, 3877, 'add integer to integer' )
     P30 = P2
     P2 = n_add P0, P1
-    print P2
-    print "\n"
+    is( P2, 3877, 'add integer to integer in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P2' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P2' )
+  not_broken__done:
     ## check adding constants.
     P2 = n_add P0, 11
-    print P2
-    print "\n"
+    is( P2, 4011, 'adding integer and constant' )
     P0 = n_add P0, 11
-    print P0
-    print "\n"
+    is( P0, 4011, 'adding integer and constant and assign to Int arg' )
 .end
-CODE
-3877
-3877
-4011
-4011
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "subtract Integer from Integer" );
-.sub _main :main
+.sub subtract_integer_from_integer
     P0 = new 'Integer'
     set P0, 4000
     P1 = new 'Integer'
@@ -132,33 +131,25 @@ pir_output_is( <<'CODE', <<OUTPUT, "subtract Integer from Integer" );
     P2 = new 'Integer'
     set P2, 666
     n_sub P2, P0, P1
-    print P2
-    print "\n"
+    is( P2, 4123, 'subtract Integer from Integer' )
     P30 = P2
     P2 = n_sub P0, P1
-    print P2
-    print "\n"
+    is( P2, 4123, 'subtract Integer from Integer in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P2' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P2' )
+  not_broken__done:
     ## check subtracting constants.
     P2 = n_sub P0, 11
-    print P2
-    print "\n"
+    is( P2, 3989, 'subtract constant from Integer' )
     P0 = n_sub P0, 11
-    print P0
-    print "\n"
+    is( P2, 3989, 'subtract constant from Integer and assign to Int arg' )
 .end
-CODE
-4123
-4123
-3989
-3989
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "multiply Integer with Integer" );
-.sub _main :main
+ 
+.sub multiply_integer_by_integer
     P0 = new 'Integer'
     set P0, 4000
     P1 = new 'Integer'
@@ -166,28 +157,17 @@ pir_output_is( <<'CODE', <<OUTPUT, "multiply Integer with Integer" );
     P2 = new 'Integer'
     set P2, 666
     n_mul P2, P0, P1
-    print P2
-    print "\n"
+    is( P2, -492000, 'multiply Integer by Integer' )
     P3 = n_mul P0, P1
-    print P3
-    print "\n"
+    is( P3, -492000, 'multiply Integer by Integer in assginment' )
     ## check multiplying constants.
     P2 = n_mul P0, 11
-    print P2
-    print "\n"
+    is( P2, 44000, 'multiply Integer by constant' )
     P0 = n_mul P0, 11
-    print P0
-    print "\n"
+    is( P0, 44000, 'multiply Integer by constant and assign to Int arg' )
 .end
-CODE
--492000
--492000
-44000
-44000
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "divide Integer by Integer" );
-.sub _main :main
+.sub divide_integer_by_integer
     P0 = new 'Integer'
     set P0, 4000
     P1 = new 'Integer'
@@ -195,220 +175,157 @@ pir_output_is( <<'CODE', <<OUTPUT, "divide Integer by Integer" );
     P2 = new 'Integer'
     set P2, 666
     n_div P2, P0, P1
-    print P2
-    print "\n"
+    is( P2, -32.5203, 'divide Integer by Integer' )
     P3 = n_div P0, P1
-    print P3
-    print "\n"
+    is( P3, -32.5203, 'divide Integer by Integer in assignment' )
     ## check dividing by constants.
     P2 = n_div P0, 11
-    print P2
-    print "\n"
+    is( P2, 363.636, 'divide Integer by constant' )
     P0 = n_div P0, 11
-    print P0
-    print "\n"
+    is( P0, 363.636, 'divide Integer by constant and assign to Int arg' )
 .end
-CODE
--32.5203
--32.5203
-363.636
-363.636
-OUTPUT
 
 ###
 ### Operations on a single NUMVAL
 ###
-pir_output_is( <<'CODE', <<OUTPUT, "negate a Float" );
-.sub _main :main
+.sub negate_a_float
     P0 = new 'Float'
     set P0, 0
     P1 = n_neg P0
-    print P1
-    print "\n"
+    is( P1, 0, 'neg of Float 0 is 0' )
     set P0, -0.0
     n_neg P1, P0
-    print P1
-    print "\n"
+    is( P1, 0, 'neg of Float -0.0 is 0' )
     set P0, 123.4567890
     P1 = n_neg P0
-    print P1
-    print "\n"
+    is( P1, -123.4567890, 'neg of positive Float is negative' )
     set P0, -123.4567890
     n_neg P1, P0
-    print P1
-    print "\n"
+    is( P1, 123.4567890, 'neg of negavite Float is positive' )
 .end
-CODE
-0
-0
--123.457
-123.457
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "take the absolute value of a Float" );
-.sub _main :main
+ 
+.sub take_the_absolute_value_of_a_float
     P0 = new 'Integer'
     set P0, 0
     P1 = n_abs P0
-    print P1
-    print "\n"
+    is( P1, 0, 'abs value of float 0 is zero' )
     set P0, -0.0
     n_abs P1, P0
-    print P1
-    print "\n"
+    is( P1, 0, 'abs value of float -0.0 is zero' )
     set P0, 123.45678901
     n_abs P1, P0
-    print P1
-    print "\n"
+    is( P1, 123.45678901, 'abs value of positive float is positive' )
     set P0, -123.45678901
     P1 = n_abs P0
-    print P1
-    print "\n"
+    is( P1, 123.45678901, 'abs value of negative float is positive' )
 .end
-CODE
-0
-0
-123.457
-123.457
-OUTPUT
 
 ###
 ### FLOATVAL and INTVAL tests
 ###
-pir_output_is( <<'CODE', <<OUTPUT, "add Integer to Float" );
-.sub _main :main
+.sub add_integer_to_float
     P10 = new 'Integer'
     set P10, 4000
     P0 = new 'Float'
     set P0, -123.123
     n_add P1, P0, P10
-    print P1
-    print "\n"
+    is( P1, 3876.877, 'add Float and Int' )
     P30 = P1
     P1 = n_add P0, P10
-    print P1
-    print "\n"
+    is( P1, 3876.877, 'add Float and Int in assignment' )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P1' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P1' )
+  not_broken__done:
+    ##
     P2 = n_add P10, P0
-    print P2
-    print "\n"
-        P1 = n_add P1, P10
-    print P1
-    print "\n"
+    is( P2, 3876.877, 'add Int and Float' )
+    P1 = n_add P1, P10
+    is( P1, 7876.877, 'add Float and Int and assign to Float arg' )
 .end
-CODE
-3876.88
-3876.88
-3876.88
-7876.88
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "subtract Integer from Float" );
-.sub _main :main
+ 
+.sub subtract_integer_from_float
     P10 = new 'Integer'
     set P10, 4000
     P0 = new 'Float'
     set P0, -123.123
     n_sub P1, P0, P10
-    print P1
-    print "\n"
+    is( P1, -4123.123, 'subtract Int from Float' )
     P30 = P1
     P1 = n_sub P0, P10
-    print P1
-    print "\n"
+    is( P1, -4123.123, 'subtract Int from Float in assignment' )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P1' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P1' )
+  not_broken__done:
+    ##
     P2 = n_sub P10, P0
-    print P2
-    print "\n"
-        P1 = n_sub P1, P10
-    print P1
-    print "\n"
+    is( P2, 4123.123, 'subtract Float from Int in assignment' )
+    P1 = n_sub P1, P10
+    is( P1, -8123.123, 'subtract Float from Int and assign to Float arg' )
 .end
-CODE
--4123.12
--4123.12
-4123.12
--8123.12
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "multiply Float with Integer" );
-.sub _main :main
+ 
+.sub multiply_float_by_integer
     P10 = new 'Integer'
     set P10, 4000
     P0 = new 'Float'
     set P0, -123.123
     n_mul P1, P0, P10
-    print P1
-    print "\n"
+    is( P1, -492492, 'multiply Float by Int' )
     P30 = P1
     P1 = n_mul P0, P10
-    print P1
-    print "\n"
+    is( P1, -492492, 'multiply Float by Int in assignment' )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P1' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P1' )
+  not_broken__done:
+    ##
     P1 = n_mul P10, P0
-    print P1
-    print "\n"
-        P1 = n_mul P1, -2
-    print P1
-    print "\n"
+    is( P1, -492492, 'multiply Int by Float in assignment' )
+    P1 = n_mul P1, -2
+    is( P1, 984984, 'multiply Float by const int and assign to Float arg' )
 .end
-CODE
--492492
--492492
--492492
-984984
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "divide Float by Integer" );
-.sub _main :main
+ 
+.sub divide_float_by_integer
     P10 = new 'Integer'
     set P10, 4000
     P0 = new 'Float'
     set P0, -123.123
     n_div P1, P0, P10
-    print P1
-    print "\n"
+    is( P1, -0.0307808, 'divide Float by Int' )
     P30 = P1
     P1 = n_div P0, P10
-    print P1
-    print "\n"
+    is( P1, -0.0307808, 'divide Float by Int in assignment' )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
-    print "Broken!\n"
-not_broken:
-        P1 = n_div P0, 1
-    print P1
-    print "\n"
-        set P0, 100.000
-        P1 = n_div P0, 100
-    print P1
-    print "\n"
-        P1 = n_div P1, 0.01
-    print P1
-    print "\n"
+    ok( 0, 'not reusing P1' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P1' )
+  not_broken__done:
+    ##
+    P1 = n_div P0, 1
+    is( P1, -123.123, 'divide Float by constant Int 1' )
+    set P0, 100.000
+    P1 = n_div P0, 100
+    is( P1, 1, 'divide Float by constant Int' )
+    P1 = n_div P1, 0.01
+    is( P1, 100, 'divide Float by constant Float' )
 .end
-CODE
--0.0307808
--0.0307808
--123.123
-1
-100
-OUTPUT
 
 ###
 ### FLOATVAL and FLOATVAL tests
 ###
-pir_output_is( <<'CODE', <<OUTPUT, "add Float to Float" );
-.sub _main :main
+.sub add_float_to_float
     P0 = new 'Float'
     set P0, 4000.246
     P1 = new 'Float'
@@ -416,52 +333,38 @@ pir_output_is( <<'CODE', <<OUTPUT, "add Float to Float" );
     P2 = new 'Float'
     set P2, 6.66
     n_add P2, P0, P1
-    print P2
-    print "\n"
+    is( P2, 3877.123, 'add Float to Float' )
     P30 = P2
     P2 = n_add P0, P1
-    print P2
-    print "\n"
+    is( P2, 3877.123, 'add Float to Float in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P2' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P2' )
+  not_broken__done:
+    ##
 .end
-CODE
-3877.12
-3877.12
-OUTPUT
-
+# 
 ## This tests n_infix_ic_p_p_nc for n_add, n_sub, n_mul, and n_div.  Note that
 ## there is no n_infix_ic_p_nc_p op; the PMC argument always comes first.
-pir_output_is( <<'CODE', <<OUTPUT, "add/sub/mul/div of Float with constants" );
-.sub _main :main
+.sub add_sub_mul_div_of_float_with_constants
     P0 = new 'Float'
     set P0, 4000.246
     P1 = new 'Float'
     set P1, -123.123
     P2 = n_add P1, 6.78
-    print P2
-    print "\n"
+    is( P2, -116.343, 'add neg Float to constant Float' )
     P2 = n_add P0, 6.78
-    print P2
-    print "\n"
+    is( P2,  4007.03, 'add pos Float to constant Float' )
     P2 = n_mul P1, 6.78
-    print P2
-    print "\n"
+    is( P2, -834.774, 'multily Float by constant Float' )
     P2 = n_div P0, 6.78
-    print P2
-    print "\n"
+    is( P2,  590.007, 'divide Float by constant Float' )
 .end
-CODE
--116.343
-4007.03
--834.774
-590.007
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "subtract Float from Float" );
-.sub _main :main
+ 
+.sub subtract_float_from_float
     P0 = new 'Float'
     set P0, 4000.246
     P1 = new 'Float'
@@ -469,24 +372,21 @@ pir_output_is( <<'CODE', <<OUTPUT, "subtract Float from Float" );
     P2 = new 'Float'
     set P2, 6.66
     n_sub P2, P0, P1
-    print P2
-    print "\n"
+    is( P2, 4123.369, 'subtract Float from Float' )
     P30 = P2
     P2 = n_sub P1, P0
-    print P2
-    print "\n"
+    is( P2, 4123.369, 'subtract Float from Float in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P2' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P2' )
+  not_broken__done:
+    ##
 .end
-CODE
-4123.37
--4123.37
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "multiply Float with Float" );
-.sub _main :main
+ 
+.sub multiply_float_by_float
     P0 = new 'Float'
     set P0, 400.0246
     P1 = new 'Float'
@@ -494,24 +394,21 @@ pir_output_is( <<'CODE', <<OUTPUT, "multiply Float with Float" );
     P2 = new 'Float'
     set P2, 6.66
     n_mul P2, P0, P1
-    print P2
-    print "\n"
+    is( P2, -49252.229, 'multiply Float from Float' )
     P30 = P2
     P2 = n_mul P0, P1
-    print P2
-    print "\n"
+    is( P2, -49252.229, 'muliply Float from Float in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P2' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P2' )
+  not_broken__done:
+    ##
 .end
-CODE
--49252.2
--49252.2
-OUTPUT
-
-pir_output_is( <<'CODE', <<OUTPUT, "divide Float by Float" );
-.sub _main :main
+ 
+.sub divide_float_by_float
     P0 = new 'Float'
     set P0, 4000.246
     P1 = new 'Float'
@@ -519,77 +416,36 @@ pir_output_is( <<'CODE', <<OUTPUT, "divide Float by Float" );
     P2 = new 'Float'
     set P2, 6.66
     n_div P2, P1, P0
-    print P2
-    print "\n"
+    is( P2, -0.0307789, 'divide neg Float by pos Float' )
     P30 = P2
     P2 = n_div P0, P1
-    print P2
-    print "\n"
+    is( P2, -32.4898, 'divide pos Float by neg Float in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
-    print "Broken!\n"
-not_broken:
+    ok( 0, 'not reusing P2' )
+    goto not_broken__done
+  not_broken:
+    ok( 1, 'not reusing P2' )
+  not_broken__done:
+    ##
 .end
-CODE
--0.0307789
--32.4898
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "verify new PMC" );
-.sub main :main
+.sub verify_new_pmc
     P0 = new 'Integer'
     P1 = P0
     P0 = n_add P0, 1
-    print P0
-    print "\n"
+    is( P0, 1, 'add constant to new (unassigned) PMC' )
     eq_addr P0, P1, nok
-    print "ok\n"
-    end
-nok:
-    print "not ok\n"
+      ok( 1, 'variables have different addresses' )
+      .return() 
+  nok:
+    ok( 0, 'variables have different addresses' )
 .end
-CODE
-1
-ok
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', ".pragma n_operators" );
-.pragma n_operators 1
-
-.sub main :main
-    P0 = new 'Integer'
-    P1 = P0
-    P0 = P0 + 1
-    print P0
-    print "\n"
-    eq_addr P0, P1, nok
-    print "ok\n"
-    end
-nok:
-    print "not ok\n"
-.end
-CODE
-1
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', ".pragma n_operators - inplace" );
-.pragma n_operators 1
-.sub main :main
-    .local pmc p
-    p = new 'Integer'
-    p = 10
-    p += 4
-    print p
-    print "\n"
-.end
-CODE
-14
-OUTPUT
+### Tests of ".pragma n_operators 1" moved to n_operators.t
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

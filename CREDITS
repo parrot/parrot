@@ -640,3 +640,7 @@ D: Fixed object vtable method overrides in PIR
 N: Jeff Horwitz
 E: jeff@smashing.org
 D: Various bug fixes and tests
+ 
+N: Mark Grimes
+E: mgrimes@cpan.org
+D: Clean up some tests

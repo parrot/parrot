@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+#! parrot
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -23,38 +17,40 @@ Tests the Closure PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'new' );
-.sub 'test' :main
-    new P0, 'Closure'
-    print "ok 1\n"
-.end
-CODE
-ok 1
-OUT
+.sub main :main
+    .include 'include/test_more.pir'
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'Make sure we can sweep closures.' );
+    plan(3)
+
+    new_closure()
+    sweep_closures()
+.end
+
+.sub new_closure
+    new P0, 'Closure'
+    ok( 1, 'Created new Closure' )
+    isa_ok( P0, 'Closure' )
+.end
+
+.sub sweep_closures
 ## This is a regression test for a bug in which Closure:mark expected
 ## sub->outer_ctx to be initialized, regardless of whether the closure
 ## had ever been called.
-.sub _test_1 :main
     .lex "X", $P40
     $P40 = new 'Integer'
     $P40 = 22
     .const .Sub $P43 = "___internal_test_1_0_"
     newclosure $P44, $P43
     sweep 1
-        print "We lived.\n"
+    ok( 1, 'we lived' )
 .end
-.sub ___internal_test_1_0_ :outer('_test_1')
-    print "This is never actually run.\n"
+
+.sub ___internal_test_1_0_ :outer('sweep_closures')
+    ok( 0, 'we should never get here' )
 .end
-CODE
-We lived.
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

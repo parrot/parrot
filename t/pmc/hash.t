@@ -1,13 +1,6 @@
-#!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+#! parrot
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -25,7 +18,54 @@ well.
 
 =cut
 
-pasm_output_is( <<CODE, <<OUTPUT, "Initial Hash tests" );
+.sub main :main
+    .include 'include/test_more.pir'
+
+    plan(147)
+
+    initial_hash_tests()
+    more_than_one_hash()
+    hash_keys_with_nulls_in_them()
+    nearly_the_same_hash_keys()
+    the_same_hash_keys()
+    key_that_hashes_to_zero()
+    size_of_the_hash()
+    stress_test_loop_set_check()
+    stress_test_lots_of_keys()
+    stress_test_loop_set_loop_check()
+    testing_two_hash_indices_with_integers_at_a_time()
+    testing_two_hash_indices_with_numbers_at_a_time()
+    testing_two_hash_indices_with_strings_at_a_time()
+    setting_and_getting_scalar_pmcs()
+    setting_scalar_pmcs_and_getting_scalar_values()
+    getting_values_from_undefined_keys()
+    setting_and_getting_non_scalar_pmcs()
+    testing_clone()
+    compound_keys()
+    getting_pmcs_from_compound_keys()
+    getting_pmcs_from_string_int_compound_keys()
+    if_hash()
+    unless_hash()
+    defined_hash()
+    exists_hash_key()
+    delete_hash_key()
+    cloning_keys()
+    cloning_pmc_vals()
+    entry_types_type_keyed()
+    delete_and_free_list()
+    exists_with_constant_string_key()
+    hash_in_pir()
+    setting_with_compound_keys()
+    mutating_the_lookup_string()
+    check_whether_interface_is_done()
+    iter_over_hash()
+    broken_delete()
+    unicode_keys_register_rt_39249()
+    unicode_keys_literal_rt_39249()
+
+.end
+
+.sub initial_hash_tests
     new	P0, 'Hash'
 
     set	P0["foo"], -7
@@ -36,19 +76,13 @@ pasm_output_is( <<CODE, <<OUTPUT, "Initial Hash tests" );
     set	N0, P0["bar"]
     set	S0, P0["baz"]
 
-    eq	I0,-7,OK_1
-    print	"not "
-OK_1:    print	"ok 1\\n"
-    eq	N0,3.500000,OK_2
-    print	N0
-OK_2:    print	"ok 2\\n"
-    eq	S0,"value",OK_3
-    print	S0
-OK_3:    print	"ok 3\\n"
+    is( I0, -7,       'lookup Int in hash' )
+    is( N0, 3.500000, 'lookup Num in hash' )
+    is( S0, "value",  'lookup Str in hash' )
 
-        set     S1, "oof"
-        set     S2, "rab"
-        set     S3, "zab"
+    set S1, "oof"
+    set S2, "rab"
+    set S3, "zab"
 
     set	P0[S1], 7
     set	P0[S2], -3.5
@@ -58,49 +92,29 @@ OK_3:    print	"ok 3\\n"
     set	N0, P0[S2]
     set	S0, P0[S3]
 
-    eq	I0,7,OK_4
-    print	"not "
-OK_4:    print	"ok 4\\n"
-    eq	N0,-3.500000,OK_5
-    print	N0
-OK_5:    print	"ok 5\\n"
-    eq	S0,"VALUE",OK_6
-    print	S0
-OK_6:    print	"ok 6\\n"
+    is( I0, 7,         'lookup Int in hash via Str' )
+    is( N0, -3.500000, 'lookup Num in hash via Str' )
+    is( S0, "VALUE",   'lookup Str in hash via Str' )
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-OUTPUT
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "more than one Hash" );
+.sub more_than_one_hash
     new P0, 'Hash'
     set S0, "key"
     set P0[S0], 1
 
-        new P1, 'Hash'
-        set S1, "another_key"
-        set P1[S1], 2
+    new P1, 'Hash'
+    set S1, "another_key"
+    set P1[S1], 2
 
     set I0, P0[S0]
     set I1, P1[S1]
 
-    print I0
-    print "\n"
-    print I1
-    print "\n"
-        end
-CODE
-1
-2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "hash keys with nulls in them" );
+    is( I0, 1, 'two hashes: lookup Int from hash via Str' )
+    is( I1, 2, 'two hashes: lookup Int from hash via Str in second' )
+.end
+ 
+.sub hash_keys_with_nulls_in_them
     new P0, 'Hash'
     set S0, "parp\0me"
     set S1, "parp\0you"
@@ -111,17 +125,11 @@ pasm_output_is( <<'CODE', <<OUTPUT, "hash keys with nulls in them" );
     set I0, P0[S0]
     set I1, P0[S1]
 
-    print I0
-    print "\n"
-    print I1
-    print "\n"
-    end
-CODE
-1
-2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "nearly the same hash keys" );
+    is( I0, 1, 'hash key with null 1' )
+    is( I1, 2, 'hash key will null 2' )
+.end
+ 
+.sub nearly_the_same_hash_keys
     new P0, 'Hash'
     set S0, "a\0"
     set S1, "\0a"
@@ -132,80 +140,55 @@ pasm_output_is( <<'CODE', <<OUTPUT, "nearly the same hash keys" );
     set I0, P0[S0]
     set I1, P0[S1]
 
-    print I0
-    print "\n"
-    print I1
-    print "\n"
-
-    end
-CODE
-1
-2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "The same hash keys" );
+    is( I0, 1, 'hash key with null' )
+    is( I1, 2, 'almost identical hash key with null' )
+.end
+ 
+.sub the_same_hash_keys
     new P0, 'Hash'
     set S0, "Happy"
     set S1, "Happy"
 
     set P0[S0], 1
     set I0, P0[S0]
-    print I0
-    print "\n"
+    is( I0, 1, 'lookup by S0' )
 
     set P0[S1], 2
     set I1, P0[S1]
 
-    print I1
-    print "\n"
-
-    end
-CODE
-1
-2
-OUTPUT
-
+    is( I1, 2, 'set and lookup by S1 (identical to S0)' )
+.end
+ 
 # NB Next test depends on "key2" hashing to zero, which it does with
 # the current algorithm; if the algorithm changes, change the test!
+# XXX - really? 
 
-pasm_output_is( <<'CODE', <<OUTPUT, "key that hashes to zero" );
+.sub key_that_hashes_to_zero
         new P0, 'Hash'
         set S0, "key2"
         set P0[S0], 1
         set I0, P0[S0]
-    print I0
-    print "\n"
-    end
-CODE
-1
-OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "size of the hash" );
+        is( I0, 1, 'key that hashes to zero XXX' )
+.end
+ 
+.sub size_of_the_hash
     new P0, 'Hash'
 
     set P0["0"], 1
     set I0, P0
-    print I0
-    print "\n"
+    is( I0, 1, 'hash size of 1' )
 
     set P0["1"], 1
     set I0, P0
-    print I0
-    print "\n"
+    is( I0, 2, 'hash size of 2' )
 
     set P0["0"], 1
     set I0, P0
-    print I0
-    print "\n"
-
-    end
-CODE
-1
-2
-2
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "stress test: loop(set, check)" );
+    is( I0, 2, 'hash size of 2' )
+.end
+ 
+.sub stress_test_loop_set_check
     new	P0, 'Hash'
 
         set I0, 200
@@ -217,14 +200,11 @@ pasm_output_is( <<CODE, <<OUTPUT, "stress test: loop(set, check)" );
         concat S1, S0, S2
         set P0[S1], "start"
         set S3, P0["mikey"]
-        print S3
-        print "\\n"
+        is( S3, 'base',  'setup: lookup mikey' )
         set S3, P0["mikeys"]
-        print S3
-        print "\\n"
+        is( S3, 'bases', 'setup: lookup mikeys' )
         set S3, P0["mikey200"]
-        print S3
-        print "\\n"
+        is( S3, 'start', 'setup: lookup mikey200' )
 LOOP:
         eq I0, 0, DONE
         sub I0, I0, 1
@@ -232,56 +212,36 @@ LOOP:
         concat S1, S0, S2
         concat S4, S0, S2
         eq S1, S4, L1
-        print "concat mismatch: "
-        print S1
-        print " vs "
-        print S4
-        print "\\n"
+        ##  this should be fail(), but it is not implemented yet
+        ok( 0, 'concat mismatch' )
 L1:
         set P0[S1], I0
         set I1, P0[S1]
         eq I0, I1, L2
-        print "lookup mismatch: "
-        print I0
-        print " vs "
-        print I1
-        print "\\n"
+        ##  this should be fail(), but it is not implemented yet
+        ok( 0, 'lookup mismatch' )
 L2:
         branch LOOP
 DONE:
         set I0, P0["mikey199"]
-        print I0
-        print "\\n"
+        is( I0, 199, 'lookup: mikey199' )
         set I0, P0["mikey117"]
-        print I0
-        print "\\n"
+        is( I0, 117, 'lookup: mikey117' )
         set I0, P0["mikey1"]
-        print I0
-        print "\\n"
+        is( I0, 1, 'lookup: mikey1' )
         set I0, P0["mikey23"]
-        print I0
-        print "\\n"
+        is( I0, 23, 'lookup: miky23' )
         set I0, P0["mikey832"]
-        print I0
-        print "\\n"
-        end
-CODE
-base
-bases
-start
-199
-117
-1
-23
-0
-OUTPUT
-
+        is( I0, 0, 'lookup: mikey832 (never set)' )
+.end
+ 
 ## stuff them in, and check periodically that we can pull selected ones out.
-pir_output_is( <<'CODE', <<OUTPUT, "stress test: lots of keys" );
+##   *_multiple_keys are used by stress_test_lots_of_keys
+
 .sub set_multiple_keys
     .param pmc hash
-        .param int key_index
-        .param int step
+    .param int key_index
+    .param int step
     .param int count
 
 again:
@@ -290,33 +250,6 @@ again:
     S1 = concat "key", S0
     S2 = concat "value", S0
     hash[S1] = S2
-    key_index = key_index + step
-    count = count - 1
-    goto again
-ret:
-.end
-
-.sub print_multiple_keys
-    .param pmc hash
-        .param int key_index
-        .param int step
-    .param int count
-
-again:
-    if count <= 0 goto ret
-    S0 = key_index
-    S1 = concat "key", S0
-    print S1
-    print " => "
-    I2 = exists hash[S1]
-    if I2 goto print_value
-    print "(undef)"
-    goto print_end
-print_value:
-    S2 = hash[S1]
-    print S2
-print_end:
-    print "\n"
     key_index = key_index + step
     count = count - 1
     goto again
@@ -340,62 +273,65 @@ again:
 ret:
 .end
 
-.sub _main :main
+.sub check_key
+    .param pmc hash
+    .param int index
+
+    S10 = index
+    S0 = concat "key", S10
+    S1 = concat "value", S10
+
+    S2 = hash[S0]
+    S3 = concat "correct value for key ", S10
+    is( S2, S1, S3 )
+.end
+
+.sub stress_test_lots_of_keys
     new	P30, 'Hash'
-    print "round 1\n"
     I29 = 1
     I30 = 1000
     I31 = 1000
+
+    # round 1
     set_multiple_keys(P30, I29, I30, I31)
-    I20 = 3
-    print_multiple_keys(P30, I29, I30, I20)
-    print "round 2\n"
+    check_key( P30, 1 )
+    check_key( P30, 1001 )
+    check_key( P30, 2001 )
+
+    # round 2
     I21 = 100000
     set_multiple_keys(P30, I21, I30, I31)
-    print_multiple_keys(P30, I29, I30, I20)
-    print_multiple_keys(P30, I21, I30, I20)
-    print "round 3\n"
+    check_key( P30, 1 )
+    check_key( P30, 1001 )
+    check_key( P30, 2001 )
+    check_key( P30, 100000 )
+    check_key( P30, 101000 )
+    check_key( P30, 102000 )
+
+    # round 3
     I22 = 50000
     set_multiple_keys(P30, I22, I29, I22)
-    print_multiple_keys(P30, I29, I30, I20)
-    print_multiple_keys(P30, I22, I30, I20)
-    print "round 4\n"
-    delete_multiple_keys(P30, I22, I29, I22)
-    print_multiple_keys(P30, I29, I30, I20)
-    print_multiple_keys(P30, I22, I30, I20)
-    print "done.\n"
-.end
-CODE
-round 1
-key1 => value1
-key1001 => value1001
-key2001 => value2001
-round 2
-key1 => value1
-key1001 => value1001
-key2001 => value2001
-key100000 => value100000
-key101000 => value101000
-key102000 => value102000
-round 3
-key1 => value1
-key1001 => value1001
-key2001 => value2001
-key50000 => value50000
-key51000 => value51000
-key52000 => value52000
-round 4
-key1 => value1
-key1001 => value1001
-key2001 => value2001
-key50000 => (undef)
-key51000 => (undef)
-key52000 => (undef)
-done.
-OUTPUT
+    check_key( P30, 1 )
+    check_key( P30, 1001 )
+    check_key( P30, 2001 )
+    check_key( P30, 500000 )
+    check_key( P30, 510000 )
+    check_key( P30, 520000 )
 
+    # round 4
+    delete_multiple_keys(P30, I22, I29, I22)
+    check_key( P30, 1001 )
+    check_key( P30, 2001 )
+    I50 = exists P30['key50000']
+    I51 = exists P30['key51000']
+    I52 = exists P30['key52000']
+    is( I50, 0, 'key50000 does not exist after delete' )
+    is( I51, 0, 'key51000 does not exist after delete' )
+    is( I52, 0, 'key52000 does not exist after delete' )
+.end
+ 
 # Check all values after setting all of them
-pasm_output_is( <<CODE, <<OUTPUT, "stress test: loop(set), loop(check)" );
+.sub stress_test_loop_set_loop_check
     new	P0, 'Hash'
 
         set I0, 200
@@ -416,133 +352,83 @@ GETLOOP:
         concat S1, S0, S2
         set I1, P0[S1]
         eq I0, I1, L2
-        print "lookup mismatch: "
-        print I0
-        print " vs "
-        print I1
-        print "\\n"
+          is( I0, I1, 'lookup mismatch in stress test loop' )
+          .return()
 L2:
         branch GETLOOP
-
 DONE:
-        print "done\\n"
-        end
-CODE
-done
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Testing two hash indices with integers at a time" );
+        ok( 1, 'stress test: loop set with loop check' )
+.end
+ 
+.sub testing_two_hash_indices_with_integers_at_a_time
       new P0, 'Hash'
 
       set P0["foo"],37
       set P0["bar"],-15
 
       set I0,P0["foo"]
-      eq I0,37,OK_1
-      print "not "
-OK_1: print "ok 1\n"
+      is( I0, 37, 'lookup int in foo' )
 
       set I0,P0["bar"]
-      eq I0,-15,OK_2
-      print "not "
-OK_2: print "ok 2\n"
+      is( I0, -15, 'lookup int in bar' )
 
       set S1,"foo"
       set I0,P0[S1]
-      eq I0,37,OK_3
-      print "not "
-OK_3: print "ok 3\n"
+      is( I0,37, 'lookup int in foo via var' )
 
       set S1,"bar"
       set I0,P0[S1]
-      eq I0,-15,OK_4
-      print "not "
-OK_4: print "ok 4\n"
-
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Testing two hash indices with numbers at a time" );
+      is( I0,-15, 'lookup int in bar via var' )
+.end
+ 
+.sub testing_two_hash_indices_with_numbers_at_a_time
       new P0, 'Hash'
 
       set P0["foo"],37.100000
       set P0["bar"],-15.100000
 
       set N0,P0["foo"]
-      eq N0,37.100000,OK_1
-      print "not "
-OK_1: print "ok 1\n"
+      is( N0,37.100000, 'lookup num in foo' )
 
       set N0,P0["bar"]
-      eq N0,-15.100000,OK_2
-      print "not "
-OK_2: print "ok 2\n"
+      is( N0,-15.100000, 'lookup num in bar' )
 
       set S1,"foo"
       set N0,P0[S1]
-      eq N0,37.100000,OK_3
-      print "not "
-OK_3: print "ok 3\n"
+      is( N0,37.100000, 'lookup num in foo via var' )
 
       set S1,"bar"
       set N0,P0[S1]
-      eq N0,-15.100000,OK_4
-      print "not "
-OK_4: print "ok 4\n"
+      is( N0,-15.100000, 'lookup num in bar via var' )
 
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Testing two hash indices with strings at a time" );
+.end
+ 
+.sub testing_two_hash_indices_with_strings_at_a_time
       new P0, 'Hash'
 
       set P0["foo"],"baz"
       set P0["bar"],"qux"
 
       set S0,P0["foo"]
-      eq S0,"baz",OK_1
-      print "not "
-OK_1: print "ok 1\n"
+      is( S0,"baz", 'lookup str in foo' )
 
       set S0,P0["bar"]
-      eq S0,"qux",OK_2
-      print "not "
-OK_2: print "ok 2\n"
+      is( S0,"qux", 'lookup str in bar' )
 
       set S1,"foo"
       set S0,P0[S1]
-      eq S0,"baz",OK_3
-      print "not "
-OK_3: print "ok 3\n"
+      is( S0,"baz", 'lookup str in foo via var' )
 
       set S1,"bar"
       set S0,P0[S1]
-      eq S0,"qux",OK_4
-      print "not "
-OK_4: print "ok 4\n"
+      is( S0,"qux", 'lookup str in bar via var' )
 
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-# So far, we've only used INTVALs, FLOATVALs and STRINGs as values
+.end
+ 
+# So far, we have only used INTVALs, FLOATVALs and STRINGs as values
 # and/or keys. Now we try PMCs.
 
-pasm_output_is( <<'CODE', <<OUTPUT, "Setting & getting scalar PMCs" );
+.sub setting_and_getting_scalar_pmcs
       new P0, 'Hash'
       new P1, 'Integer'
       new P2, 'Integer'
@@ -552,41 +438,27 @@ pasm_output_is( <<'CODE', <<OUTPUT, "Setting & getting scalar PMCs" );
       set P1, 10
       set P0[S0], P1
       set P2, P0[S0]
-      eq P2, P1, OK1
-      print "not "
-OK1:  print "ok 1\n"
+      is( P2, P1, 'lookup PMC Integer' )
 
       set P1, -1234.000000
       set P0[S0], P1
       set P2, P0[S0]
-      eq P2, P1, OK2
-      print "not "
-OK2:  print "ok 2\n"
+      is( P2, P1, 'lookup num after PMC Integer in slot' )
 
       set P1, "abcdefghijklmnopq"
       set P0[S0], P1
       set P2, P0[S0]
-      eq P2, P1, OK3
-      print "not "
-OK3:  print "ok 3\n"
+      is( P2, P1, 'lookup string' )
 
       new P1, 'Undef'
       set P0[S0], P1
       set P2, P0[S0]
       typeof S1, P2
-      eq S1, "Undef", OK4
-      print "not "
-OK4:  print "ok 4\n"
+      is( S1, "Undef", 'lookup Undef PMC' )
 
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Setting scalar PMCs & getting scalar values" );
+.end
+ 
+.sub setting_scalar_pmcs_and_getting_scalar_values
       new P0, 'Hash'
       new P1, 'Integer'
 
@@ -596,34 +468,23 @@ pasm_output_is( <<'CODE', <<OUTPUT, "Setting scalar PMCs & getting scalar values
       set P1, I0
       set P0[S0], P1
       set I1, P0[S0]
-      eq I1, I0, OK1
-      print "not "
-OK1:  print "ok 1\n"
+      is( I1, I0, 'lookup PMC and get scalar Int' )
 
       set N0, -1234.000000
       set P1, N0
       set P0[S0], P1
       set N1, P0[S0]
-      eq N1, N0, OK2
-      print "not "
-OK2:  print "ok 2\n"
+      is( N1, N0, 'lookup PMC and get scalar Num' )
 
       set S1, "abcdefghijklmnopq"
       set P1, S1
       set P0[S0], P1
       set S2, P0[S0]
-      eq S2, S1, OK3
-      print "not "
-OK3:  print "ok 3\n"
+      is( S2, S1, 'lookup PMC and get scalar Str' )
 
-      end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Getting values from undefined keys" );
+.end
+ 
+.sub getting_values_from_undefined_keys
       new P2, 'Hash'
 
       set I0, P2["qwerty"]
@@ -631,30 +492,18 @@ pasm_output_is( <<'CODE', <<OUTPUT, "Getting values from undefined keys" );
       set S0, P2["zxcvbn"]
       set P0, P2["123456"]
 
-      eq I0, 0, OK1
-      print "not "
-OK1:  print "ok 1\n"
+      is( I0,   0, 'undefined key returns Int 0' )
+      is( N0, 0.0, 'undefined key returns Num 0.0' )
+      is( S0,  "", 'undefined key returns Str ""' )
 
-      eq N0, 0.0, OK2
-      print "not "
-OK2:  print "ok 2\n"
-
-      eq S0, "", OK3
-      print "not "
-OK3:  print "ok 3\n"
-
-      if_null P0, OK4
-      print "not "
-OK4:  print "ok 4\n"
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "Setting & getting non-scalar PMCs" );
+      I1 = 1
+      if_null P0, P0_is_null
+        I1 = 0
+    P0_is_null:
+      ok( I1, 'undefined key returns null PMC' )
+.end
+ 
+.sub setting_and_getting_non_scalar_pmcs
         new P0,'Hash'
         new P1,'ResizablePMCArray'
         new P2,'ResizablePMCArray'
@@ -662,14 +511,10 @@ pasm_output_is( <<CODE, <<OUTPUT, "Setting & getting non-scalar PMCs" );
         set P0["one"],P1
         set P2,P0["one"]
         set S0,P2[4]
-        print S0
-        print "\\n"
-        end
-CODE
-string
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Testing clone" );
+        is( S0, 'string', 'set and get non-scalar PMCs' )
+.end
+ 
+.sub testing_clone
     new P0, 'Hash'
     set S0, "a"
     set P0[S0], S0
@@ -690,38 +535,21 @@ pasm_output_is( <<'CODE', <<OUTPUT, "Testing clone" );
     # P1 = { a => "A", b => [undef, undef] }
 
     set S0, P0["a"]
-    eq S0, "a", ok1
-    print "not "
-ok1:
-    print "ok 1\n"
+    is( S0, "a", 'original hash lookup pre-clone value' )
 
     set P5, P0["b"]
     set I0, P5
-    eq I0, 3, ok2
-    print "not "
-ok2:
-    print "ok 2\n"
+    is( I0, 3, 'original hash lookup post-clone value' )
 
     set I0, P0["c"]
-    eq I0, 4, ok3
-    print "not "
-ok3:
-    print "ok 3\n"
+    is( I0, 4, 'original hash lookup post-clone value in new slot' )
 
     set S0, P1["a"]
-    eq S0, "A", ok4
-    print "not "
-ok4:
-    print "ok 4\n"
+    is( S0, "A", 'cloned hash lookup post-clone value' )
 
     set P5, P1["b"]
     set I0, P5
-    eq I0, 2, ok5
-    print "not ("
-    print I0
-    print ") "
-ok5:
-    print "ok 5\n"
+    is( I0, 2, 'cloned hash lookup pre-clone complex value' )
 
 # XXX: this should return undef or something, but it dies instead.
 #     set P3, P0["c"]
@@ -729,73 +557,45 @@ ok5:
 #     print "not "
 # ok6:
 #     print "ok 6\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Compound keys" );
+.end
+ 
+.sub compound_keys
     new P0, 'Hash'
     new P1, 'Hash'
     new P2, 'ResizablePMCArray'
     set P1["b"], "ab"
     set P0["a"], P1
     set S0, P0["a";"b"]
-    eq S0, "ab", ok1
-    print "not "
-ok1:
-    print "ok 1\n"
+    is( S0, "ab", 'Str from compound key' )
+    
     set P2[20], 77
     set P1["n"], P2
     set I0, P0["a";"n";20]
-    eq I0, 77, ok2
-    print "not "
-ok2:
-    print "ok 2\n"
+    is( I0, 77, 'Int from compound key^2' )
+    
     set S0, "a"
     set S1, "n"
     set I0, 20
     set I0, P0[S0;S1;I0]
-    eq I0, 77, ok3
-    print "not "
-ok3:
-    print "ok 3\n"
+    is( I0, 77, 'Int from indirect compound key^2' )
+    
     set P0["c"], P2
     set P2[33], P1
     set S0, P0["c";33;"b"]
-    eq S0, "ab", ok4
-    print "not "
-ok4:
-    print "ok 4\n"
+    is( S0, "ab", 'Str from indirect/direct compound key^2' )
+    
     set S0, "c"
     set I1, 33
     set S2, "b"
     set S0, P0[S0;I1;S2]
-    eq S0, "ab", ok5
-    print "not "
-ok5:
-    print "ok 5\n"
+    is( S0, "ab", 'Str from indirect compound key^2' )
+    
     set P1["b"], 47.11
     set N0, P0["c";I1;S2]
-    eq N0, 47.11, ok6
-    print "not "
-ok6:
-    print "ok 6\n"
-    end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Getting PMCs from compound keys" );
+    is( N0, 47.11, 'Num from indirect compound key^2' )
+.end
+ 
+.sub getting_pmcs_from_compound_keys
     new P0, 'Hash'
     new P1, 'Hash'
     new P2, 'Integer'
@@ -803,259 +603,219 @@ pasm_output_is( <<'CODE', <<OUTPUT, "Getting PMCs from compound keys" );
     set P1["b"], P2
     set P0["a"], P1
     set P3, P0["a";"b"]
-    print P3
-    print "\n"
-    end
-CODE
-12
-OUTPUT
-
-pasm_output_is( << 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys" );
+    set S0, P3
+    is( S0, "12", "lookup PMC from compound key" )
+.end
+# 12
+ 
+.sub getting_pmcs_from_string_int_compound_keys
     new P0, 'Hash'
     new P1, 'Hash'
     new P2, 'Integer'
     set P2, 4
     set P1[9], P2
     set I0, P1[9]
-    print I0
-    print "\n"
+    is( I0, 4, 'lookup Int PMC from hash' )
+
     set P0["a"], P1
     set I0, P0["a";9]
-    print "Four is "
-    print I0
-    print "\n"
-    end
-CODE
-4
-Four is 4
-OUTPUT
-
+    is( I0, 4, 'lookup Inc PMC from compound hash' )
+.end
+ 
 # A hash is only false if it has size 0
 
-pasm_output_is( <<'CODE', <<OUTPUT, "if (Hash)" );
-      new P0, 'Hash'
-
-      if P0, BAD1
-      print "ok 1\n"
-      branch OK1
-BAD1: print "not ok 1\n"
-OK1:
-
-      set P0["key"], "value"
-      if P0, OK2
-      print "not "
-OK2:  print "ok 2\n"
-
-      set P0["key"], ""
-      if P0, OK3
-      print "not "
-OK3:  print "ok 3\n"
-
-      new P1, 'Undef'
-      set P0["key"], P1
-      if P0, OK4
-      print "not "
-OK4:  print "ok 4\n"
-
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "unless (Hash)" );
-      new P0, 'Hash'
-
-      unless P0, OK1
-      print "not "
-OK1:  print "ok 1\n"
-
-      set P0["key"], "value"
-      unless P0, BAD2
-      print "ok 2\n"
-      branch OK2
-BAD2: print "not ok 2"
-OK2:
-
-      set P0["key"], "\0"
-      unless P0, BAD3
-      print "ok 3\n"
-      branch OK3
-BAD3: print "not ok 3"
-OK3:
-
-      new P1, 'Undef'
-      set P0["key"], P1
-      unless P0, BAD4
-      print "ok 4\n"
-      branch OK4
-BAD4: print "not ok 4"
-OK4:
-
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "defined" );
+.sub if_hash
     new P0, 'Hash'
+ 
+    ## Could just use Test::More tests directly, but then we are really 
+    ## checking casting to Int then testing value (I think)
+    ## ie. ok( P0, '...' )
+
+    I1 = 0
+    if P0, L1
+      I1 = 1
+  L1:
+    ok( I1, 'Empty hash is false' )
+
+    set P0["key"], "value"
+    I1 = 1
+    if P0, L2
+      I1 = 0
+  L2:
+    ok( I1, 'Hash with one slot is true' )
+
+    set P0["key"], ""
+    I1 = 1
+    if P0, L3
+      I1 = 0
+  L3:
+    ok( I1, 'Hash with one value ("") is true' )
+
+    new P1, 'Undef'
+    set P0["key"], P1
+    I1 = 1
+    if P0, L4
+      I1 = 0
+  L4:
+    ok( P0, 'Hash with one value (Undef PMC) is true' )
+
+.end
+ 
+.sub unless_hash
+    new P0, 'Hash'
+
+    I0 = 1
+    unless P0, L1
+      I0 = 0
+  L1:
+    ok( I0, 'Empty hash is false in unless' )
+
+    I0 = 0
+    set P0["key"], "value"
+    unless P0, L2
+      I0 = 1
+  L2:
+    ok( I0, 'Hash with one value is true' )
+
+    I0 = 0
+    set P0["key"], "\0"
+    unless P0, L3
+      I0 = 1
+  L3:
+    ok( I0, 'Hash with one value ("\0") is true' )
+
+    I0 = 0
+    new P1, 'Undef'
+    set P0["key"], P1
+    unless P0, L4
+      I0 = 1
+  L4:
+    ok( I0, 'Hash with one value (Undef PMC) is true' )
+
+.end
+ 
+.sub defined_hash
+    new P0, 'Hash'
+
     defined I0, P0
-    print I0
-    print "\n"
+    ok( I0, 'Empty has is defined' )
+
+    ## nok() had not been (correctly) implemented when this test was written
+
     defined I0, P1
-    print I0
-    print "\n"
+    I0 = not I0
+    ok( I1, 'Unassigned var is undefined' )
+
     set P0["a"], 1
     defined I0, P0["a"]
-    print I0
-    print "\n"
+    ok( I0, 'Int in hash value is defined' )
+
     defined I0, P0["b"]
-    print I0
-    print "\n"
+    I0 = not I0
+    ok( I0, 'Unassigned hash slot is undefined' )
+
     new P1, 'Undef'
     set P0["c"], P1
     defined I0, P0["c"]
-    print I0
-    print "\n"
-    end
-
-CODE
-1
-0
-1
-0
-0
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "exists" );
+    I0 = not I0
+    ok( I0, 'Undef PMC in hash slot is undefined' )
+.end
+ 
+.sub exists_hash_key
     new P0, 'Hash'
+
     set P0["a"], 1
     exists I0, P0["a"]
-    print I0
-    print "\n"
+    ok( I0, 'assigned hash key exists' )
+    
     exists I0, P0["b"]
-    print I0
-    print "\n"
+    I0 = not I0
+    ok( I0, 'unassigned hash key does not exist' )
+    
     new P1, 'Undef'
     set P0["c"], P1
     exists I0, P0["c"]
-    print I0
-    print "\n"
-    end
-
-CODE
-1
-0
-1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "delete" );
+    ok( I0, 'hash key assigned Undef PMC exists' )
+.end
+ 
+.sub delete_hash_key
     new P0, 'Hash'
+
     set P0["a"], 1
     exists I0, P0["a"]
-    print I0
-    print "\n"
+    ok( I0, 'assigned hash key exists' )
+   
     delete P0["a"]
     exists I0, P0["a"]
-    print I0
-    print "\n"
-    end
-CODE
-1
-0
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Cloning keys" );
+    I0 = not I0
+    ok( I0, 'delete hash key does not exist' )
+.end
+ 
+.sub cloning_keys
     new P10, 'Hash'
     new P1, 'Key'
 
     set P1, "Bar"
-    set P10[P1], "Food\n"
+    set P10[P1], "Food"
     clone P2, P1
     set S0, P10[P2]
-    print S0
+    is( S0, "Food", 'cloned key looks up same value' )
 
     set S1, "Baa"
-    set P10[S1], "Sheep\n"
+    set P10[S1], "Sheep"
     clone S2, S1
     set S0, P10[S2]
-    print S0
-
-    end
-CODE
-Food
-Sheep
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "Cloning PMC vals" );
+    is( S0, "Sheep", 'cloned key again look up same value' )
+.end
+ 
+.sub cloning_pmc_vals
     new P10, 'Hash'
+
     new P1, 'Undef'
-    set P1, "value\n"
+    set P1, "value"
     set P10["str"], P1
+
     new P1, 'Undef'
     set P1, 42
     set P10["int"], P1
+
     clone P2, P10
     set P0, P2["int"]
-    print P0
+    is( P0, 42, 'cloned hash contained pre-clone set int' )
     set P0, P2["str"]
-    print P0
-    end
-CODE
-42value
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "entry types - type_keyed" );
-.include "pmctypes.pasm"
+    is( P0, 'value', 'cloned hash contains pre-clone set str' )
+.end
+ 
+.sub entry_types_type_keyed
+    ## XXX is there any concern that including this will impact other tests?
+    .include "pmctypes.pasm"
     new P1, 'Hash'
 
     new P2, 'Integer'
     set P1["Integer"], P2
     typeof I0, P1["Integer"]
-    eq I0, .Integer, ok1
-    print "not "
-ok1:print "Integer\n"
+    is( I0, .Integer, 'entry type is Integer' )
 
     new P3, 'Integer'
     set P1["Integer"], P3
     typeof I0, P1["Integer"]
-    eq I0, .Integer, ok2
-    print "not "
-ok2:print "Integer\n"
+    is( I0, .Integer, 'entry type is Integer' )
 
     set P1["native int"], -123456
     typeof I0, P1["native int"]
-    eq I0, .Integer, ok3
-    print "not "
-ok3:print "Integer\n"
+    is( I0, .Integer, 'entry type is Integer' )
 
     set P1["native float"], -123.456
     typeof I0, P1["native float"]
-    eq I0, .Float, ok4
-    print "not "
-ok4:print "Float\n"
+    is( I0, .Float, 'entry type is Float' )
 
     set P1["native string"], "hello world\n"
     typeof I0, P1["native string"]
-    eq I0, .String, ok5
-    print "not "
-ok5:print "String\n"
+    is( I0, .String, 'entry type is String' )
 
-    end
-CODE
-Integer
-Integer
-Integer
-Float
-String
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "delete and free_list" );
+.end
+ 
+.sub delete_and_free_list
     set I2, 10
     set I1, 1
     new P0, 'SArray'
@@ -1065,6 +825,8 @@ outer:
     set P0[0], I1
     sprintf S0, "ok %vd\n", P0
     set P1[S0], S0
+
+    ## set P1[key]=1 then delete it 100 times
     set I0, 100
 lp:
     set P1["key"], 1
@@ -1073,70 +835,40 @@ lp:
     if I0, lp
 
     set S1, P1[S0]
-    print S1
+    # print S1
     inc I1
     le I1, I2, outer
+
     set I0, P1
-    print I0
-    print "\n"
-    end
+    is( I0, 10, 'hash has size 10' )
+.end
 
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-ok 8
-ok 9
-ok 10
-10
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "exists with constant string key" );
+## XXX already tested?
+.sub exists_with_constant_string_key
     new P16, 'Hash'
-    set P16["key1"], "value for key1\n"
+
+    set P16["key1"], "value for key1"
     set S16, P16["key1"]
-    print S16
-    set I16, 777777777
-    print I16
-    print "\n"
+    is( S16, "value for key1" , 'set and lookup value for const str key' )
+
     exists I17, P16["key1"]
-    print I17
-    print "\n"
+    ok( I17, 'exists with constant string key' )
+
     exists I17, P16["no such"]
-    print I17
-    print "\n"
-    end
+    I17 = not I17
+    ok( I17, 'does not exist with unassigned const string key' )
+.end
 
-CODE
-value for key1
-777777777
-1
-0
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "Hash in PIR" );
-
-.sub _main
+.sub hash_in_pir
     .local pmc hash1
     hash1 = new 'Hash'
     hash1['X'] = 'U'
     .local string val1
     val1 = hash1['X']
-    print val1
-    print "\n"
-    end
+    is( val1, "U", 'hash in PIR' )
 .end
-CODE
-U
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "Setting with compound keys" );
-
-.sub _main
+ 
+.sub setting_with_compound_keys
     .local pmc outer_hash
     outer_hash = new 'Hash'
     .local pmc inner_hash
@@ -1152,45 +884,37 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Setting with compound keys" );
     inner_array[128] = 'inner_array:128'
     outer_hash['inner_array'] = inner_array
     elem_string = outer_hash['inner_array';128]
-    print elem_string
-    print "\n"
+    is( elem_string, 'inner_array:128', 'string in inner ResizeablePMCArray' )
     outer_hash['inner_array';128] = 'changed inner_array:128'
     elem_string = outer_hash['inner_array';128]
-    print elem_string
-    print "\n"
+    is( elem_string, 'changed inner_array:128', 'string in inner ResizeablePMCArray' )
 
     # setting and retrieving strings in an inner Hash
     inner_hash['129'] = 'inner_hash:129'
     outer_hash['inner_hash'] = inner_hash
     elem_string = outer_hash['inner_hash';'129']
-    print elem_string
-    print "\n"
+    is( elem_string, 'inner_hash:129', 'string in inner Hash' )
     outer_hash['inner_hash';'129'] = 'changed inner_hash:129'
     elem_string = outer_hash['inner_hash';'129']
-    print elem_string
-    print "\n"
+    is( elem_string, 'changed inner_hash:129', 'string in inner Hash' )
 
     # setting and retrieving integer in an inner ResizablePMCArray
     inner_array[130] = 130
     outer_hash['inner_array'] = inner_array
     elem_int = outer_hash['inner_array';130]
-    print elem_int
-    print "\n"
+    is( elem_int, 130, 'int in inner ResizablePMCArray' )
     outer_hash['inner_array';130] = -130
     elem_int = outer_hash['inner_array';130]
-    print elem_int
-    print "\n"
+    is( elem_int, -130, 'int in inner ResizablePMCArray' )
 
     # setting and retrieving integer in an inner Hash
     inner_hash['131'] = 131
     outer_hash['inner_hash'] = inner_hash
     elem_int = outer_hash['inner_hash';'131']
-    print elem_int
-    print "\n"
+    is( elem_int, 131, 'int in inner Hash' )
     outer_hash['inner_hash';'131'] = -131
     elem_int = outer_hash['inner_hash';'131']
-    print elem_int
-    print "\n"
+    is( elem_int, -131, 'int in inner Hash' )
 
     # setting and retrieving a PMC in an inner ResizablePMCArray
     .local pmc in_pmc
@@ -1199,71 +923,44 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Setting with compound keys" );
     inner_array[132] = in_pmc
     outer_hash['inner_array'] = inner_array
     elem_pmc = outer_hash['inner_array';132]
-    print elem_pmc
-    print "\n"
+    is( elem_pmc, 'inner_array:132', 'PMC in inner ResizablePMCArray' )
     in_pmc = 'changed inner_array:132'
     outer_hash['inner_array';132] = in_pmc
     elem_pmc = outer_hash['inner_array';132]
-    print elem_pmc
-    print "\n"
+    is( elem_pmc, 'changed inner_array:132', 'PMC in inner ResizablePMCArray' )
 
     # setting and retrieving a PMC in an inner Hash
     in_pmc = 'inner_array:133'
     inner_hash['133'] = in_pmc
     outer_hash['inner_hash'] = inner_hash
     elem_string = outer_hash['inner_hash';'133']
-    print elem_string
-    print "\n"
+    is( elem_string, 'inner_array:133', 'PMC in inner Hash' )
     in_pmc = 'changed inner_hash:133'
     outer_hash['inner_hash';'133'] = in_pmc
     elem_string = outer_hash['inner_hash';'133']
-    print elem_string
-    print "\n"
+    is( elem_string, 'changed inner_hash:133', 'PMC in inner Hash' )
 
     # setting and retrieving a float in an inner ResizablePMCArray
     inner_array[134] = 134.134
     outer_hash['inner_array'] = inner_array
     elem_num = outer_hash['inner_array';134]
-    print elem_num
-    print "\n"
+    is( elem_num, 134.134000, 'float in inner ResizablePMCArray' )
     outer_hash['inner_array';134] = -134.134
     elem_num = outer_hash['inner_array';134]
-    print elem_num
-    print "\n"
+    is( elem_num, -134.134000, 'float in inner ResizablePMCArray' )
 
     # setting and retrieving a float in an inner Hash
     inner_hash['135'] = 135.135
     outer_hash['inner_hash'] = inner_hash
     elem_num = outer_hash['inner_hash';'135']
-    print elem_num
-    print "\n"
+    is( elem_num, 135.135000, 'float in inner Hash' )
     outer_hash['inner_hash';'135'] = -135.135
     elem_num = outer_hash['inner_hash';'135']
-    print elem_num
-    print "\n"
+    is( elem_num, -135.135000, 'float in inner Hash' )
 
-    end
 .end
-CODE
-inner_array:128
-changed inner_array:128
-inner_hash:129
-changed inner_hash:129
-130
--130
-131
--131
-inner_array:132
-changed inner_array:132
-inner_array:133
-changed inner_hash:133
-134.134000
--134.134000
-135.135000
--135.135000
-OUTPUT
-
-pasm_output_is( << 'CODE', << 'OUTPUT', "mutating the lookup string" );
+ 
+.sub mutating_the_lookup_string
     new P0, 'Hash'
     set P0["a"], "one"
     set P0["ab"], "two"
@@ -1271,78 +968,61 @@ pasm_output_is( << 'CODE', << 'OUTPUT', "mutating the lookup string" );
 
     set S0, "a"
     set S1, P0[S0]
-    print S1
-    print "\n"
+    is( S1, "one", 'lookup via str in reg' )
 
     concat S0, "b"
     set S1, P0[S0]
-    print S1
-    print "\n"
+    is( S1, "two", 'lookup via concated str in reg' )
 
     concat S0, "c"
     set S1, P0[S0]
-    print S1
-    print "\n"
-
-    end
-CODE
-one
-two
-three
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub _main
+    is( S1, "three", 'lookup via concated^2 str in reg' )
+.end
+ 
+.sub check_whether_interface_is_done
     .local pmc pmc1
     pmc1 = new 'Hash'
     .local int bool1
+
     does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
+    bool1 = not bool1
+    ok( bool1, 'Hash PMC does not do scalar' )
+
     does bool1, pmc1, "hash"
-    print bool1
-    print "\n"
+    ok( bool1, 'Hash PMC does hash' )
+    
     does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    bool1 = not bool1
+    ok( bool1, 'Hash PMC does not do no_interface' )
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "iter" );
-
-.sub __main__ :main
+.sub iter_over_hash
     new P0, 'Hash'
     set P0['a'], 'x'
+
     iter P1, P0
-    if P1 goto ok1
-    print "Not empty?\n"
+    I0 = 1
+    if P1 goto L1
+      I0 = 0
+  L1:
+    ok( I0, 'iterator is true' )
+
     shift P2, P1
-    print P2
-    print "\n"
-ok1:
-    iter P1, P0
-    shift P2, P1
-    print P2
-    print "\n"
-    unless P1 goto ok2
-    print "Surprise!\n"
-ok2:
-    end
+    is( P2, 'a', 'shifting iterator give the key' )
+
+    I0 = 0
+    if P1 goto L2
+      I0 = 1
+  L2:
+    ok( I0, 'iterator is now false' )
 .end
-CODE
-a
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "broken delete, thx to azuroth on irc" );
-.include "iterator.pasm"
+## thx to azuroth on irc
+.sub broken_delete
+  .include "iterator.pasm"
+  .local string result
+  result = ""
 
-.sub main :main
   .local pmc thash
 
   # just put in some dummy data...
@@ -1362,16 +1042,18 @@ preit_loop:
   unless iter goto preit_end
 
   key = shift iter
-  print key
-  print "\n"
+  result .= key
 
   branch preit_loop
 preit_end:
 
+  is( result, 'ace', 'iterated through keys successfully' )
+
   # get rid of the c element?
   delete thash["c"]
 
-  print "after deletion\n"
+  # what do we have after deletion?
+  result = ""
 
   iter = new 'Iterator', thash
   iter = .ITERATE_FROM_START
@@ -1382,52 +1064,37 @@ postit_loop:
   unless iter goto postit_end
 
   key = shift iter
-  print key
-  print "\n"
+  result .= key
 
   branch postit_loop
 postit_end:
 
+  is( result, 'ae', 'the c key was no longer iterated over' )
 .end
-CODE
-a
-c
-e
-after deletion
-a
-e
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "unicode keys (register) (RT #39249)" );
-.sub test
+ 
+.sub unicode_keys_register_rt_39249
   $P1 = new 'Hash'
+
   $S99 = unicode:"\u7777"
   $P1[$S99] = "ok"
   $S1 = $P1[$S99]
-  say $S1
+  is( $S1, 'ok', 'unicode key' )
 .end
-CODE
-ok
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "unicode keys (literal) (RT ##39249)" );
-.sub test
+.sub unicode_keys_literal_rt_39249
   $P1 = new 'Hash'
+
   $P1[unicode:"\u7777"] = "ok"
   $S1 = $P1[unicode:"\u7777"]
-  say $S1
+  is( $S1, 'ok', 'literal unicode key' )
+
   $S2 = unicode:"\u7777"
   $S1 = $P1[$S2]
-  say $S1
+  is( $S1, 'ok', 'literal unicode key lookup via var' )
 .end
-CODE
-ok
-ok
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

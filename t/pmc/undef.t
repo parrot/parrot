@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+#! parrot
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -22,87 +16,76 @@ Tests mainly morphing undef to other types.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "morph to string" );
+.sub main :main
+    .include 'include/test_more.pir'
+
+    plan(19)
+
+    morph_to_string()
+    undef_pmc_is_false()
+    undef_pmc_is_not_defined()
+    undef_pmc_morph_to_string()
+    undef_pmc_morph_to_integer()
+    undef_pmc_morph_to_float()
+    string_pmc_morph_to_undef()
+    undef_pmc_set_to_integer_native()
+    undef_pmc_isa_after_assignment()
+    check_whether_interface_is_done()
+    verify_clone_works()
+    undef_equals_undef()
+.end
+
+.sub morph_to_string
         new P0, 'String'
         new P1, 'Undef'
         set P0, "foo"
         concat  P1, P0, P0
-    print P1
-    print "\n"
-        end
-CODE
-foofoo
-OUTPUT
+        is( P1, 'foofoo', 'morphed to string' )
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_bool" );
-
-.sub _main
+.sub undef_pmc_is_false
     .local pmc pmc1
     pmc1 = new 'Undef'
-    print "A PMC Undef created by new is"
     if pmc1 goto PMC1_IS
-      print " not"
+      ok( 1, 'PMC Undef created by new is false' )
+      .return()
     PMC1_IS:
-    print "\n"
-    end
+    ok( 0, 'PMC Undef created by new is false' )
 .end
-CODE
-A PMC Undef created by new is not
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
-
-.sub _main
+.sub undef_pmc_is_not_defined
     .local pmc pmc1
     pmc1 = new 'Undef'
     .local int is_defined
     is_defined = defined pmc1
-    print "A PMC Undef is"
     if is_defined goto PMC1_IS_DEFINED
-      print " not"
+      ok( 1, 'PMC Undef created by new is not defined' )
+      .return()
     PMC1_IS_DEFINED:
-    print " defined.\n"
-    end
+    ok( 0, 'PMC Undef created by new is not defined' )
 .end
-CODE
-A PMC Undef is not defined.
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_string" );
-
-.sub _main
+.sub undef_pmc_morph_to_string
     .local pmc pmc1
     pmc1 = new 'Undef'
-    print "before"
-    print pmc1
-    print "after\n"
-    end
+    $S1 = pmc1
+    is( $S1, '', 'PMC Undef is empty string' )
 .end
-CODE
-beforeafter
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "morph to integer" );
-
-.sub _main
+.sub undef_pmc_morph_to_integer
     .local pmc pmc1
     pmc1 = new 'Undef'
     .local int int1
     int1 = pmc1
+    is( int1, 0, 'PMC Undef as integer is zero' )
+
     .local int int2
     int2 = -7777777
     int2 += int1
-    print int2
-    print "\n"
-    end
+    is( int2, -7777777, 'PMC Undef in addition is zero' )
 .end
-CODE
--7777777
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
-
-.sub _main
+.sub undef_pmc_morph_to_float
     .local pmc pmc1
     pmc1 = new 'Undef'
     .local int int1
@@ -110,170 +93,80 @@ pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
     .local num float1
     float1 = -7777777e-3
     float1 += int1
-    print float1
-    print "\n"
-    end
+    is( float1, -7777.777000, 'PMC Undef morph to int then float' )
 .end
-CODE
--7777.777000
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
-
-.sub _main
-    .local pmc pmc1
-    pmc1 = new 'Undef'
-    .local int int1
-    int1 = pmc1
-    .local num float1
-    float1 = -7777777e-3
-    float1 += int1
-    print float1
-    print "\n"
-    end
-.end
-CODE
--7777.777000
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "morph to undef" );
-.sub _main
+.sub string_pmc_morph_to_undef
     .local pmc pmc1
     pmc1 = new 'String'
     morph pmc1, 'Undef'
     $S1 = typeof pmc1
-    print $S1
-    print "\n"
+    is( $S1, 'Undef', 'PMC String morph to undef' )
 .end
-CODE
-Undef
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "set_integer_native" );
-
-.sub _main
+ 
+.sub undef_pmc_set_to_integer_native
     .local pmc pmc1
     pmc1 = new 'Undef'
     pmc1 = -88888888
-    print pmc1
-    print "\n"
+    is( pmc1, -88888888, 'PMC Undef set to int gives int' )
 
     .local int pmc1_is_a
     pmc1_is_a = isa pmc1, "Integer"
-    print "After assignment pmc1 is "
-    if pmc1_is_a goto PMC1_IS_A_INTEGER
-      print "not "
-    PMC1_IS_A_INTEGER:
-    print "an Integer.\n"
-
-    end
+    ok( pmc1_is_a, 'PMC Undef set to int isa Integer' )
 .end
-CODE
--88888888
-After assignment pmc1 is an Integer.
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "isa" );
-
-.sub _main
+ 
+.sub undef_pmc_isa_after_assignment
     .local pmc pmc1
     pmc1 = new 'Undef'
     .local int pmc1_is_a
 
     pmc1_is_a = isa pmc1, "Undef"
-    print "A Undef PMC is "
-    if pmc1_is_a goto PMC1_IS_A_Undef
-      print "not "
-    PMC1_IS_A_Undef:
-    print "a Undef.\n"
+    ok( pmc1_is_a, 'PMC Undef isa Undef' )
 
     pmc1_is_a = isa pmc1, "default"
-    print "A Undef PMC is "
-    if pmc1_is_a goto PMC1_IS_A_default
-      print "not "
-    PMC1_IS_A_default:
-    print "a default.\n"
+    is( pmc1_is_a, 0, 'PMC Undef is not default' )
 
     pmc1_is_a = isa pmc1, "Default"
-    print "A Undef PMC is "
-    if pmc1_is_a goto PMC1_IS_A_Default
-      print "not "
-    PMC1_IS_A_Default:
-    print "a Default.\n"
-
+    is( pmc1_is_a, 0, 'PMC Undef is not Default' )
+    
     pmc1_is_a = isa pmc1, "scalar"
-    print "A Undef PMC is "
-    if pmc1_is_a goto PMC1_IS_A_scalar
-      print "not "
-    PMC1_IS_A_scalar:
-    print "a scalar.\n"
+    is( pmc1_is_a, 0, 'PMC Undef is not scalar' )
 
     pmc1_is_a = isa pmc1, "Scalar"
-    print "A Undef PMC is "
-    if pmc1_is_a goto PMC1_IS_A_Scalar
-      print "not "
-    PMC1_IS_A_Scalar:
-    print "a Scalar.\n"
-
-    end
+    is( pmc1_is_a, 0, 'PMC Undef is not Scalar' )
 .end
-CODE
-A Undef PMC is a Undef.
-A Undef PMC is not a default.
-A Undef PMC is not a Default.
-A Undef PMC is not a scalar.
-A Undef PMC is not a Scalar.
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub _main
+.sub check_whether_interface_is_done
     .local pmc pmc1
     pmc1 = new 'Undef'
     .local int bool1
+
     does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
+    is( bool1, 1, 'PMC Undef does scalar' )
+
     does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    is( bool1, 0, 'PMC Undef does not do no_interface' ) 
 .end
-CODE
-1
-0
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "verify clone works." );
-
-.sub _main
+ 
+.sub verify_clone_works
     $P1 = new 'Undef'
     $P2 = clone $P1
     $S0 = typeof $P2
-    print $S0
-    print "\n"
+    is( $S0, 'Undef', 'PMC Undef clone is an Undef' )
 .end
-CODE
-Undef
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "Undef == Undef (RT#33603)" );
-
-.sub _main
+.sub undef_equals_undef
     $P1 = new 'Undef'
     $P2 = new 'Undef'
     if $P1 == $P2 goto ok
-    print "not "
+        ok( 0, 'Undef == Undef (RT#33603)' )
+        .return()
   ok:
-    print "ok\n"
+    ok( 1, 'Undef == Undef (RT#33603)' )
 .end
-CODE
-ok
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
