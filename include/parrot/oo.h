@@ -15,6 +15,55 @@
 
 #include "parrot/parrot.h"
 
+#define PARROT_NAMESPACE_SEPARATOR "\0"
+#define PARROT_NAMESPACE_SEPARATOR_LENGTH 1
+
+typedef enum {
+    PCD_PARENTS,            /* An array of immediate parents */
+    PCD_CLASS_NAME,         /* A String PMC */
+    PCD_ATTRIBUTES,         /* class::attrib => offset hash */
+    PCD_CLASS_ATTRIBUTES,   /* Class attribute array */
+    PCD_OBJECT_VTABLE,      /* Vtable PMC that holds the vtable for objects of this class */
+    PCD_MAX
+} PARROT_CLASS_DATA_ENUM;
+
+
+/* Objects, classes and PMCarrays all use the same data scheme:
+ * PMC_data() holds a malloced array, PMC_int_val() is the size of it
+ * this simplifies DOD mark a lot
+ *
+ * The active destroy flag is necessary to free the malloced array.
+ */
+#define SLOTTYPE PMC*
+#define get_attrib_num(x, y)    ((PMC **)x)[y]
+#define set_attrib_num(o, x, y, z) \
+    do { \
+        DOD_WRITE_BARRIER(interp, o, ((PMC **)x)[y], z); \
+        ((PMC **)x)[y] = z; \
+    } while (0)
+#define get_attrib_count(x)     PMC_int_val2(x)
+#define new_attrib_array() Dont_use
+#define set_attrib_flags(x) do { \
+        PObj_data_is_PMC_array_SET(x); \
+        PObj_active_destroy_SET(x); \
+    } while (0)
+#define set_attrib_array_size(o, y) do { \
+    PMC_data(o) = mem_sys_allocate_zeroed((sizeof (PMC *)*(y))); \
+    PMC_int_val(o) = y; \
+} while (0)
+
+#define resize_attrib_array(o, y) do { \
+    PMC_data(o) = mem_sys_realloc(PMC_data(o), (sizeof (PMC *)*(y))); \
+    PMC_int_val(o) = y; \
+} while (0)
+
+/*
+ * class macros
+ */
+
+#define CLASS_ATTRIB_COUNT(cl) PMC_int_val2(cl)
+#define GET_CLASS(arr, obj)     (obj)->vtable->pmc_class
+
 /* HEADERIZER BEGIN: src/oo.c */
 
 PARROT_API
