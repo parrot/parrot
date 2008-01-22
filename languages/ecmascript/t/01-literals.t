@@ -25,4 +25,5 @@ while (0) {
 
 print("ok 5\n")
 
+var x = 6, y;
 

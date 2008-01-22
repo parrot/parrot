@@ -67,8 +67,8 @@ method try_statement($/) {
 
 method catch($/) {
    my $past := $( $<block> );
-   # todo: unshift a statement with .get_results to catch the identifier
-   # onto this block.
+   # todo: unshift a statement with a .get_results statement
+   # to catch the identifier onto this block.
    make $past;
 }
 
@@ -79,6 +79,28 @@ method finally($/) {
 method throw_statement($/) {
     my $expr := $( $<expression> );
     make PAST::Op.new( $expr, :inline('    throw %0'), :node($/) );
+}
+
+method variable_statement($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<variable_declaration> {
+        $past.push( $($_) );
+    }
+    make $past;
+}
+
+method variable_declaration($/) {
+    my $var := $( $<identifier> );
+    $var.isdecl(1);
+    $var.scope('package'); # fix this; change into lexical should we add this to a symbol table?
+    if $<assignment_expression> {
+        my $initval := $( $<assignment_expression>[0] );
+        $var.viviself($initval);
+    }
+    else {
+        $var.viviself('Undef');
+    }
+    make $var;
 }
 
 method empty_statement($/) {

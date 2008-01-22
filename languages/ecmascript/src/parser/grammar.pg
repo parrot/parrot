@@ -39,6 +39,7 @@ rule statement {
     | <empty_statement> {*}     #= empty_statement
     | <try_statement> {*}       #= try_statement
     | <throw_statement> {*}     #= throw_statement
+    | <variable_statement> {*}  #= variable_statement
     | <call_expression> {*}     #= call_expression
 }
 
@@ -77,6 +78,16 @@ rule finally {
 
 rule throw_statement {
     'throw' \N <expression> ';'
+    {*}
+}
+
+rule variable_statement {
+    'var' <variable_declaration> [',' <variable_declaration>]* ';'
+    {*}
+}
+
+rule variable_declaration {
+    <identifier> ['=' <assignment_expression>]?
     {*}
 }
 
@@ -127,7 +138,7 @@ token identifier {
 }
 
 token literal {
-    | <str_literal> {*}         #= str_literal
+    | <str_literal> {*}            #= str_literal
     | <numeric_literal> {*}        #= numeric_literal
     | <object_literal> {*}         #= object_literal
 }
