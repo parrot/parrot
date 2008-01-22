@@ -44,11 +44,25 @@ version until the Capture PMC is working properly.
 .end
 
 
+.sub 'shift_pmc' :vtable :method
+    $P0 = self.'get_array'()
+    $P0 = shift $P0
+    .return ($P0)
+.end
+
+
 .sub 'push_pmc' :vtable :method
     .param pmc val
     $P0 = self.'get_array'()
     push $P0, val
     .return ()
+.end
+
+
+.sub 'pop_pmc' :vtable :method
+    $P0 = self.'get_array'()
+    $P0 = pop $P0
+    .return ($P0)
 .end
 
 

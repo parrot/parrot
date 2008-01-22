@@ -106,9 +106,19 @@ children and attributes.  Returns the newly created node.
 
 Add C<child> to the beginning of the invocant's list of children.
 
+=item shift()
+
+Remove the first child from the invocant's list of children.
+Returns the child.
+
 =item push(child)
 
 Add C<child> to the end of the invocant's list of children.
+
+=item pop()
+
+Remove the last child from the invocant's list of children.
+Returns the child.
 
 =cut
 
@@ -117,9 +127,19 @@ Add C<child> to the end of the invocant's list of children.
     unshift self, value
 .end
 
+.sub 'shift' :method
+    $P0 = shift self
+    .return ($P0)
+.end
+
 .sub 'push' :method
     .param pmc value
     push self, value
+.end
+
+.sub 'pop' :method
+    $P0 = pop self
+    .return ($P0)
 .end
 
 
