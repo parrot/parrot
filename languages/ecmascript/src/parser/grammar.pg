@@ -38,6 +38,7 @@ rule statement {
     | <while_statement> {*}     #= while_statement
     | <empty_statement> {*}     #= empty_statement
     | <try_statement> {*}       #= try_statement
+    | <throw_statement> {*}     #= throw_statement
     | <call_expression> {*}     #= call_expression
 }
 
@@ -72,6 +73,11 @@ rule catch {
 
 rule finally {
     'finally' <block> {*}
+}
+
+rule throw_statement {
+    'throw' \N <expression> ';'
+    {*}
 }
 
 rule empty_statement {
@@ -208,7 +214,6 @@ token reserved_word {
 
 
 ##proto term: is tighter(infix:<+>) is parsed(&primary_expression) { ... }
-
 
 
 #### whitespace

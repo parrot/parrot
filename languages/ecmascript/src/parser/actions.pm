@@ -76,6 +76,11 @@ method finally($/) {
     make $( $<block> );
 }
 
+method throw_statement($/) {
+    my $expr := $( $<expression> );
+    make PAST::Op.new( $expr, :inline('    throw %0'), :node($/) );
+}
+
 method empty_statement($/) {
     make PAST::Op.new( :node($/), :inline('    # no-op') );
 }
