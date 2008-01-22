@@ -97,15 +97,12 @@ method function($/) {
     make $past;
 }
 
-# Because we must bind the first <expression> to IT, we can't immediately
-# add $expr to $past. The code would probably be more clear if PAST::Node
-# supported shift() in addition to unshift().
 method ifthen($/) {
     my $count := +$<expression> - 1;
     my $expr  := $( $<expression>[$count] );
     my $then  := $( $<block>[$count] );
     $then.blocktype('immediate');
-    my $past := PAST::Op.new( $then,
+    my $past := PAST::Op.new( $expr, $then,
                               :pasttype('if'),
                               :node( $/ )
                             );
@@ -115,21 +112,21 @@ method ifthen($/) {
         $past.push( $else );
     }
     while ($count != 0) {
-        $past.unshift( $expr );
         $count := $count - 1;
         $expr  := $( $<expression>[$count] );
         $then  := $( $<block>[$count] );
         $then.blocktype('immediate');
-        $past  := PAST::Op.new( $then, $past,
+        $past  := PAST::Op.new( $expr, $then, $past,
                                :pasttype('if'),
                                :node( $/ )
                              );
     }
+    $expr := $past.shift();
     my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
-    $past.unshift( $it );
     my $bind := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
     $bind.push( $it );
     $bind.push( $expr );
+    $past.unshift( $it );
     my $past := PAST::Stmts.new( $bind, $past, :node( $/ ) );
     make $past;
 }
