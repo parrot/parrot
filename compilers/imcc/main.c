@@ -226,8 +226,9 @@ help(void)
 
 =item C<static void Parrot_version>
 
-Print out parrot version number and copyright message.
-Include warning if Configure's version # doesn't match.
+Print out parrot version number and copyright message.  Include warning if
+configuration and build were done at different revision numbers (applies only
+when working from repository -- not from release versions).
 
 =cut
 
@@ -762,8 +763,8 @@ imcc_initialize(PARROT_INTERP)
 
 =item C<static void imcc_run_pbc>
 
-Write out or run Parrot bytecode. 
- RT#46149 no return value :-( 
+Write out or run Parrot bytecode.
+ RT#46149 no return value :-(
 
 =cut
 
@@ -799,7 +800,7 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN(const char *output_file),
 
 =item C<static void imcc_write_pbc>
 
-Output Packed bytecode file.
+Output packed bytecode file.
 
 =cut
 
@@ -877,7 +878,7 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 
 =item C<static void determine_output_file_type>
 
-Decide what kind of file we are to outout.
+Decide what kind of file we are to output.
 
 =cut
 
