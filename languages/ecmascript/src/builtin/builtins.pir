@@ -21,3 +21,9 @@
     .param pmc fields :slurpy :named
     .return (fields)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
