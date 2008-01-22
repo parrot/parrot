@@ -37,6 +37,7 @@
 
 #define mem_allocate_typed(type)    (type *)mem_sys_allocate(sizeof (type))
 #define mem_allocate_zeroed_typed(type) (type *)mem_sys_allocate_zeroed(sizeof (type))
+#define mem_allocate_n_zeroed_typed(n,type) (type *)mem_sys_allocate_zeroed((n) * sizeof(type))
 
 /* HEADERIZER BEGIN: src/gc/memory.c */
 

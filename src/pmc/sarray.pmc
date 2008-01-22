@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -335,15 +335,14 @@ Creates and returns a copy of the array.
         HashEntry *e, *d;
         int i, start, end;
         INTVAL size;
-        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         if (!PMC_data(SELF))
             return dest;
 
         size              = PMC_int_val(SELF);
         PMC_int_val(dest) = size;
-        PMC_data(dest)    = mem_sys_allocate_zeroed((2 + size) *
-            sizeof (HashEntry));
+        PMC_data(dest)    = mem_allocate_n_zeroed_typed(2 + size, HashEntry);
 
         e     = (HashEntry *)PMC_data(SELF);
         d     = (HashEntry *)PMC_data(dest);
@@ -648,8 +647,7 @@ Resizes the array to C<size> elements.
         if (PMC_data(SELF))
           mem_sys_free(PMC_data(SELF));
 
-        PMC_data(SELF) = mem_sys_allocate_zeroed((2 + size) *
-            sizeof (HashEntry));
+        PMC_data(SELF) = mem_allocate_n_zeroed_typed(2 + size, HashEntry);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -667,8 +665,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError,
-                    "SArray index out of bounds!");
+            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
 
         e                = (HashEntry *)PMC_data(SELF) + (2 + key);
         e->type          = enum_hash_int;
@@ -694,8 +691,7 @@ Adds an element with integer value C<value> to the end of the array.
         INTVAL     nextix;
 
         if (!PMC_data(SELF))
-            real_exception(interp, NULL, E_IndexError,
-                    "SArray index out of bounds!");
+            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
 
         e      = (HashEntry *)PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
@@ -718,8 +714,7 @@ C<value>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError,
-                    "SArray index out of bounds!");
+            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
 
         e                = (HashEntry *)PMC_data(SELF) + (2 + key);
         e->type          = enum_hash_num;
@@ -745,8 +740,7 @@ Adds an element with floating-point value C<value> to the end of the array.
         INTVAL     nextix;
 
         if (!PMC_data(SELF))
-            real_exception(interp, NULL, E_IndexError,
-                    "SArray index out of bounds!");
+            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
 
         e      = (HashEntry *) PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
@@ -768,8 +762,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError,
-                    "SArray index out of bounds!");
+            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
 
         e                = (HashEntry *)PMC_data(SELF) + (2 + key);
         e->type          = enum_hash_string;
@@ -819,8 +812,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError,
-                    "SArray index out of bounds!");
+            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
 
         e       = (HashEntry *) PMC_data(SELF) + (2 + key);
         e->type = enum_hash_pmc;

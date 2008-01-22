@@ -279,7 +279,7 @@ string_init(PARROT_INTERP)
             interp->parent_interpreter->const_cstring_table;
         return;
     }
-    interp->const_cstring_table = (STRING**)mem_sys_allocate(n_parrot_cstrings * sizeof(STRING*));
+    interp->const_cstring_table = mem_allocate_n_zeroed_typed(n_parrot_cstrings, STRING*);
     for (i = 0; i < n_parrot_cstrings; ++i) {
         interp->const_cstring_table[i] = const_string(interp, parrot_cstrings[i].string);
         /* TODO construct string here and valid hashval */
