@@ -39,6 +39,17 @@ don't apply.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+static Hash * create_hash(
+    PARROT_DATA_TYPE val_type,
+    Hash_key_type hkey_type,
+    ARGIN(hash_comp_fn compare),
+    ARGIN(hash_hash_key_fn keyhash))
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int cstring_compare(SHIM_INTERP,
@@ -68,15 +79,6 @@ static void hash_thaw(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash)
         FUNC_MODIFIES(* info);
-
-static void init_hash(
-    ARGOUT(Hash *hash),
-    PARROT_DATA_TYPE val_type,
-    Hash_key_type hkey_type,
-    hash_comp_fn compare,
-    hash_hash_key_fn keyhash)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*hash);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -633,7 +635,7 @@ PARROT_API
 void
 parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
 {
-    parrot_new_pmc_hash_x(interp, container,
+    parrot_new_pmc_hash_x(container,
             enum_type_PMC,
             Hash_key_type_STRING,
             STRING_compare,     /* STRING compare */
@@ -663,22 +665,29 @@ parrot_new_cstring_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
 
 /*
 
-=item C<static void init_hash>
+=item C<static Hash * create_hash>
 
-RT#48260: Not yet documented!!!
+Creates and initializes a hash.  Function pointers determine its
+behaviors.  The container passed in is the address of the hash PMC that
+is using it.  The hash and the PMC point to each other.
+
+Memory from this function must be freed.
 
 =cut
 
 */
 
-static void
-init_hash(ARGOUT(Hash *hash),
-        PARROT_DATA_TYPE val_type,
-        Hash_key_type hkey_type,
-        hash_comp_fn compare, hash_hash_key_fn keyhash)
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+static Hash *
+create_hash(PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
+        ARGIN(hash_comp_fn compare), ARGIN(hash_hash_key_fn keyhash))
 {
     size_t      i;
-    HashBucket *bp = NULL;
+    HashBucket *bp;
+
+    Hash * const hash = mem_allocate_zeroed_typed(Hash);
 
     hash->compare    = compare;
     hash->hash_val   = keyhash;
@@ -720,6 +729,8 @@ init_hash(ARGOUT(Hash *hash),
     for (i = 0; i < INITIAL_BUCKETS; ++i) {
         hash->bi[i] = NULL;
     }
+
+    return hash;
 }
 
 /*
@@ -791,12 +802,10 @@ void
 parrot_new_hash_x(ARGOUT(Hash **hptr),
         PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
-        hash_comp_fn compare, hash_hash_key_fn keyhash)
+        ARGIN(hash_comp_fn compare),
+        ARGIN(hash_hash_key_fn keyhash))
 {
-    Hash * const hash = mem_allocate_typed(Hash);
-    hash->container = NULL;
-    *hptr = hash;
-    init_hash(hash, val_type, hkey_type, compare, keyhash);
+    *hptr = create_hash(val_type, hkey_type, compare, keyhash);
 }
 
 /*
@@ -812,16 +821,15 @@ in PMC_struct_val(container).
 */
 
 void
-parrot_new_pmc_hash_x(SHIM_INTERP, ARGOUT(PMC *container),
+parrot_new_pmc_hash_x(ARGMOD(PMC *container),
         PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
-        hash_comp_fn compare, hash_hash_key_fn keyhash)
+        ARGIN(hash_comp_fn compare),
+        ARGIN(hash_hash_key_fn keyhash))
 {
-    Hash * const hash = mem_allocate_typed(Hash);
-
+    Hash * const hash = create_hash(val_type, hkey_type, compare, keyhash);
     PMC_struct_val(container) = hash;
     hash->container = container;
-    init_hash(hash, val_type, hkey_type, compare, keyhash);
 }
 
 /*
@@ -865,8 +873,7 @@ Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
         h = constant_pmc_new_noinit(interp, enum_class_Hash);
     else
         h = pmc_new_noinit(interp, enum_class_Hash);
-    parrot_new_pmc_hash_x(interp, h, enum_type_INTVAL, Hash_key_type_int,
-            int_compare, key_hash_int);
+    parrot_new_pmc_hash_x(h, enum_type_INTVAL, Hash_key_type_int, int_compare, key_hash_int);
     PObj_active_destroy_SET(h);
     return h;
 }
