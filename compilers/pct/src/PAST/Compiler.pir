@@ -1298,6 +1298,43 @@ blocks to determine the scope.
 .end
 
 
+.sub 'attribute' :method :multi(_, ['PAST::Var'])
+    .param pmc node
+    .param pmc bindpost        :optional
+    .param int has_bindpost    :opt_flag
+
+    .local string name
+    $P0 = get_hll_global ['POST'], 'Ops'
+    name = node.'name'()
+    name = $P0.'escape'(name)
+
+    .local int isdecl
+    isdecl = node.'isdecl'()
+
+    if has_bindpost goto attribute_bind
+
+  attribute_post:
+    if isdecl goto attribute_decl
+    .local pmc ops, fetchop, storeop
+    ops = $P0.'new'('node'=>node)
+    $P0 = get_hll_global ['POST'], 'Op'
+    fetchop = $P0.'new'(ops, 'self', name, 'pirop'=>'getattribute')
+    storeop = $P0.'new'('self', name, ops, 'pirop'=>'setattribute')
+    .return self.'vivify'(node, ops, fetchop, storeop)
+
+  attribute_decl:
+    ops = $P0.'new'('node'=>node)
+    .return (ops)
+
+  attribute_bind:
+    $P0 = get_hll_global ['POST'], 'Op'
+    if isdecl goto attribute_bind_decl
+    .return $P0.'new'('self', name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+  attribute_bind_decl:
+    .return $P0.'new'('self', name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+.end
+
+
 =back
 
 =head3 C<PAST::Val>
