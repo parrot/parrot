@@ -59,6 +59,28 @@ method primary_expression($/, $key) {
     make $( $/{$key} );
 }
 
+method member_expression($/) {
+    make $( $<primary_expression> );
+}
+
+method call_expression($/) {
+    my $invocant := $( $<member_expression> );
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    $past.push($invocant);
+
+    my @args := $<arguments><assignment_expression>;
+    for @args {
+        $past.push( $($_) );
+    }
+    make $past;
+}
+
+
+
+method assignment_expression($/) {
+    make $( $<primary_expression> );
+}
+
 
 method expression($/) {
    #make $( $<oexpr> );

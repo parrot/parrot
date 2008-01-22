@@ -37,6 +37,7 @@ rule statement {
     | <if_statement> {*}        #= if_statement
     | <while_statement> {*}     #= while_statement
     | <empty_statement> {*}     #= empty_statement
+    | <call_expression> {*}     #= call_expression
 }
 
 rule block {
@@ -61,6 +62,25 @@ rule empty_statement {
 ##
 ## expressions
 ##
+
+rule call_expression {
+    <member_expression> <arguments>
+    {*}
+}
+
+rule arguments {
+    '(' [ <assignment_expression> [',' <assignment_expression>]* ]? ')'
+}
+
+rule member_expression {
+    <primary_expression>
+    {*}
+}
+
+rule assignment_expression {
+    <primary_expression>
+    {*}
+}
 
 rule expression {
     <primary_expression>
