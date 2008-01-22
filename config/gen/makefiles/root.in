@@ -1576,6 +1576,7 @@ prog-clean :
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPDB) \
     pbc_to_exe.pir pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(EXE) \
+    $(PERL6) \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
