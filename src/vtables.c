@@ -58,8 +58,7 @@ Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))
 {
     VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
 
-    if (new_vtable)
-        STRUCT_COPY(new_vtable, base_vtable);
+    STRUCT_COPY(new_vtable, base_vtable);
 
     return new_vtable;
 }
