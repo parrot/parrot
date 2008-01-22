@@ -124,7 +124,7 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Isrc -I../../src t/harness
+	$(PERL) t/harness t
 
 testclean:
 	$(RM_F) "t/*.js" "t/*.out"
