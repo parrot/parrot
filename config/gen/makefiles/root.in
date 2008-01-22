@@ -439,7 +439,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/mmd$(O) \
     $(SRC_DIR)/nci$(O) \
     $(SRC_DIR)/oo$(O) \
-    $(SRC_DIR)/objects$(O) \
     $(SRC_DIR)/packfile$(O) \
     $(SRC_DIR)/packout$(O) \
     $(SRC_DIR)/pic_jit$(O) \
@@ -610,7 +609,6 @@ STR_FILES = \
     $(SRC_DIR)/pmc.str \
     $(SRC_DIR)/oo.str \
     $(SRC_DIR)/scheduler.str \
-    $(SRC_DIR)/objects.str \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \
     $(CLASS_STR_FILES)
@@ -1127,8 +1125,6 @@ $(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/mmd.str
 
 $(SRC_DIR)/builtin$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/builtin.str
-
-$(SRC_DIR)/objects$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/objects.str
 
 $(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES)
 
@@ -1975,7 +1971,6 @@ splint-andy :
     src/nci.c \
     src/nci_test.c \
     src/null_config.c \
-    src/objects.c \
     src/oo.c \
     src/packdump.c \
     src/packfile.c \

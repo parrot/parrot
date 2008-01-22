@@ -882,7 +882,6 @@ include/parrot/memory.h                                     [main]include
 include/parrot/misc.h                                       [main]include
 include/parrot/mmd.h                                        [main]include
 include/parrot/nci.h                                        [main]include
-include/parrot/objects.h                                    [main]include
 include/parrot/oo.h                                         [main]include
 include/parrot/oo_private.h                                 [main]include
 include/parrot/op.h                                         [main]include
@@ -2773,7 +2772,6 @@ src/malloc.c                                                []
 src/misc.c                                                  []
 src/mmd.c                                                   []
 src/nci_test.c                                              []
-src/objects.c                                               []
 src/oo.c                                                    []
 src/ops/bit.ops                                             []
 src/ops/cmp.ops                                             []
