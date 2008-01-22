@@ -102,7 +102,7 @@ token identifier {
 }
 
 token literal {
-    | <string_literal> {*}         #= string_literal
+    | <str_literal> {*}         #= str_literal
     | <numeric_literal> {*}        #= numeric_literal
     | <object_literal> {*}         #= object_literal
 }
@@ -118,7 +118,7 @@ rule property {
 
 token property_name {
     | <identifier> {*}       #= identifier
-    | <string_literal> {*}   #= string_literal
+    | <str_literal> {*}      #= str_literal
     | <numeric_literal> {*}  #= numeric_literal
 }
 
@@ -155,7 +155,7 @@ token decimal_integer_literal {
 
 token exponent_part { <[eE]> <[+\-]> <digit>+ }
 
-token string_literal {
+token str_literal {
     [ '"' <string_literal: "> '"'
     | \' <string_literal: '> \'
     ]

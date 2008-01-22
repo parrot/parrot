@@ -106,7 +106,7 @@ method property_name($/, $key) {
     make $( $/{$key} );
 }
 
-method string_literal($/) {
+method str_literal($/) {
     make PAST::Val.new( :value( ~$<string_literal> ), :node($/) );
 }
 
