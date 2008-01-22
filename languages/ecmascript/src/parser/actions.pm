@@ -3,7 +3,7 @@
 class JS::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Stmts.new( :node($/) );
+    my $past := PAST::Block.new( :node($/), :blocktype('declaration') );
     for $<source_element> {
         $past.push( $( $_ ) );
     }
@@ -26,12 +26,10 @@ method statement($/, $key) {
 }
 
 method block($/) {
-    my $past := PAST::Block.new( :node($/) );
-    my $stmt := PAST::Stmts.new( :node($/) );
+    my $past := PAST::Block.new( :node($/), :blocktype('immediate') );
     for $<statement> {
-        $stmt.push( $( $_ ) );
+        $past.push( $($_) );
     }
-    $past.push($stmt);
     make $past;
 }
 
@@ -49,6 +47,33 @@ method while_statement($/) {
     my $cond := $( $<expression> );
     my $block := $( $<statement> );
     make PAST::Op.new( $cond, $block, :pasttype('while'), :node($/) );
+}
+
+method try_statement($/) {
+    my $past := PAST::Op.new( :pasttype('try'), :node($/) );
+    my $tryblock := $( $<block> );
+    $past.push($tryblock);
+
+    if $<catch> {
+        my $catchblock := $( $<catch> );
+        $past.push($catchblock);
+    }
+    if $<finally> {
+        my $finallyblock := $( $<finally> );
+        # what to do with this?
+    }
+    make $past;
+}
+
+method catch($/) {
+   my $past := $( $<block> );
+   # todo: unshift a statement with .get_results to catch the identifier
+   # onto this block.
+   make $past;
+}
+
+method finally($/) {
+    make $( $<block> );
 }
 
 method empty_statement($/) {

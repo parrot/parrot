@@ -37,6 +37,7 @@ rule statement {
     | <if_statement> {*}        #= if_statement
     | <while_statement> {*}     #= while_statement
     | <empty_statement> {*}     #= empty_statement
+    | <try_statement> {*}       #= try_statement
     | <call_expression> {*}     #= call_expression
 }
 
@@ -53,6 +54,24 @@ rule if_statement {
 rule while_statement {
     'while' '(' <expression> ')' <statement>
     {*}
+}
+
+rule try_statement {
+    'try' <block>
+    [ <catch>
+    | <finally>
+    | <catch> <finally>
+    ]
+    {*}
+}
+
+rule catch {
+    'catch' '(' <identifier> ')' <block>
+    {*}
+}
+
+rule finally {
+    'finally' <block> {*}
 }
 
 rule empty_statement {
@@ -193,40 +212,38 @@ token reserved_word {
 
 
 #### whitespace
-##token ws {
-##    | <?whitespace>
-##    | <?newline>
-##    | <?comment>
-##}
-##
-##
-##token whitespace {
-##    | <[ \t \f \  ]>
-###?    | \verttab
-###?    | \nbsp
-###?    | \usp #unicode sp
-##}
-##
-##token newline {
-##    | <[ \n \r ]>
-###?    | \LS
-###?    | \PS
-##}
-##
-##token comment {
-##    | <multilinecomment>
-##    | <singlelinecomment>
-##}
+#token ws {
+#    | <.whitespace>
+#    | <.newline>
+#    | <.comment>
+#}
+
+#token whitespace {
+#    | <[\t\v\f\ ]>
+#    | \nbsp
+#    | \usp #unicode sp
+#}
+
+#token newline {
+#    | \r?\n
+#    | \LS
+#    | \PS
+#}
+
+#token comment {
+#    <.singlelinecomment>
+#}
+
 ##
 #### comments
 ##rule multilinecomment {
 ##    <PGE::Text::Bracketed: /* */>
 ##}
 ##
-##rule singlelinecomment {
-##    '//' <!newline>* <newline>
-##}
-##
+token singlelinecomment {
+    '//' \N* <newline>
+}
+
 #### keywords
 
 ##    | <null_literal>
