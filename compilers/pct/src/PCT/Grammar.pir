@@ -164,7 +164,7 @@ to enforce whitespace between lexical words.
     ##  follow to compute the integer value of the codepoint,
     ##  and add that codepoint to our literal.
     .local int base, codepoint, isbracketed
-    base = index '        o d     x', $S0
+    base = index '        o d     x', litchar
     codepoint = 0
     $S0 = substr target, pos, 1
     isbracketed = iseq $S0, '['
@@ -180,6 +180,13 @@ to enforce whitespace between lexical words.
     goto literal_xdo_char_loop
   literal_xdo_char_end:
     $S1 = chr codepoint
+    ##  FIXME: RT#50092 -- codepoints 128-255 default to iso-8859-1
+    ##  encoding, we explicitly convert them into a unicode encoding
+    ##  before concatenating.  Needed for systems w/o ICU (RT#39930).
+    if codepoint < 128 goto literal_xdo_char_end_1
+    $I0 = find_charset 'unicode'
+    trans_charset $S1, $I0
+  literal_xdo_char_end_1:
     concat literal, $S1
     unless isbracketed goto literal_xdo_end
     if $S0 == ']' goto literal_xdo_end
