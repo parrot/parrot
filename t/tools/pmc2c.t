@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -34,14 +34,11 @@ use Parrot::Config;
 my $pmc2c = join $PConfig{slash}, qw(. tools build pmc2c.pl);
 
 sub pmc2c_output_like {
-    my ($pmc)  = shift;
-    my ($c)    = shift;
-    my ($name) = shift;
-
-    my $c_file = pmc_to_c($pmc);
+    my ($pmc, $c, $name)  = @_;
+    my $c_file            = pmc_to_c($pmc);
 
     open my $c_fh, '<', $c_file;
-    my $c_output = do { local $/ = undef; <$c_fh> };
+    my $c_output = do { local $/; <$c_fh> };
     close $c_fh;
 
     unless ( ref $c ) {
@@ -68,8 +65,7 @@ sub pmc2c_output_like {
         system("$^X $pmc2c --dump $pmc_file");
         system("$^X $pmc2c -c $pmc_file");
 
-        my $c_file = $pmc_file;
-        $c_file =~ s/\.pmc$/\.c/;
+        (my $c_file = $pmc_file) =~ s/\.pmc$/\.c/;
 
         return $c_file;
     }
@@ -142,7 +138,7 @@ END_C
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'maps' );
 pmclass a hll dale maps Integer { }
 END_PMC
-            INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "dale")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "dale")
             );
             if (pmc_id > 0) {
                 Parrot_register_HLL_type( interp, pmc_id, enum_class_Integer, entry);
@@ -152,7 +148,7 @@ END_C
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'maps, more than one.' );
 pmclass a hll dale maps Integer maps Float { }
 END_PMC
-            INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "dale")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "dale")
             );
             if (pmc_id > 0) {
                 Parrot_register_HLL_type( interp, pmc_id, enum_class_Float, entry);
