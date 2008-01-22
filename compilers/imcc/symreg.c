@@ -1068,12 +1068,13 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
     char *key_str;
 
     /* namespace keys are global consts - no cur_unit */
-    SymHash * const h = IMCC_INFO(interp)->cur_unit ?
-        &IMCC_INFO(interp)->cur_unit->hash : &IMCC_INFO(interp)->ghash;
+    SymHash * const h =
+        IMCC_INFO(interp)->cur_unit
+            ? &IMCC_INFO(interp)->cur_unit->hash
+            : &IMCC_INFO(interp)->ghash;
 
     if (nargs == 0)
-        IMCC_fataly(interp, E_SyntaxError,
-            "link_keys: hu? no keys\n");
+        IMCC_fataly(interp, E_SyntaxError, "link_keys: hu? no keys\n");
 
     /* short-circuit simple key unless we've been told not to */
     if (nargs == 1 && !force && !(keys[0]->type & VT_SLICE_BITS))
@@ -1103,7 +1104,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
             strcat(key_str, ";");
     }
 
-    if (!any_slice && (keychain = _get_sym(h, key_str)) != 0) {
+    if (!any_slice && ((keychain = _get_sym(h, key_str)) != NULL)) {
         free(key_str);
         return keychain;
     }
@@ -1318,7 +1319,7 @@ _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 #if IMC_TRACE_HIGH
         printf("   [%s]\n", p->name);
 #endif
-        if (!strcmp(name, p->name))
+        if (STREQ(name, p->name))
             return p;
     }
 

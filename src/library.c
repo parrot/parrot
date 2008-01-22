@@ -186,7 +186,7 @@ parrot_init_library_paths(PARROT_INTERP)
     entry = const_string(interp, PARROT_LOAD_EXT);
     VTABLE_push_string(interp, paths, entry);
     /* OS/X has .dylib and .bundle */
-    if (strcmp(PARROT_LOAD_EXT, PARROT_SHARE_EXT)) {
+    if (!STREQ(PARROT_LOAD_EXT, PARROT_SHARE_EXT)) {
         entry = const_string(interp, PARROT_SHARE_EXT);
         VTABLE_push_string(interp, paths, entry);
     }

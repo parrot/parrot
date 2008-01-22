@@ -35,8 +35,6 @@ main program
 #include "pbc.h"
 #include "parser.h"
 
-#define STREQ(x, y) (strcmp((x), (y))==0)
-
 extern int yydebug;
 
 /* HEADERIZER HFILE: none */

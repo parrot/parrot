@@ -451,7 +451,7 @@ Parrot_small_object_pool_merge(PARROT_INTERP,
     /* PARROT_ASSERT(source->total_objects); */
     PARROT_ASSERT(dest->object_size == source->object_size);
     PARROT_ASSERT((dest->name == NULL && source->name == NULL) ||
-        0 == strcmp(dest->name, source->name));
+        STREQ(dest->name, source->name));
 
     dest->total_objects += source->total_objects;
 

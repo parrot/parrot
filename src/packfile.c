@@ -965,7 +965,7 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
         for (i=0; i < dir->num_segments; i++) {
             PackFile_Segment *seg = dir->segments[i];
             if (seg) {
-                if (strcmp(seg->name, name) == 0)
+                if (STREQ(seg->name, name))
                     return seg;
                 if (sub_dir && seg->type == PF_DIR_SEG) {
                     seg = PackFile_find_segment(interp, (PackFile_Directory *)seg, name, sub_dir);
@@ -1002,7 +1002,7 @@ PackFile_remove_segment_by_name(SHIM_INTERP, ARGMOD(PackFile_Directory *dir),
 
     for (i=0; i < dir->num_segments; i++) {
         PackFile_Segment * const seg = dir->segments[i];
-        if (strcmp(seg->name, name) == 0) {
+        if (STREQ(seg->name, name)) {
             dir->num_segments--;
             if (i != dir->num_segments) {
                 /* We're not the last segment, so we need to move things */
@@ -3089,7 +3089,7 @@ find_fixup(ARGMOD(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name)
     opcode_t i;
     for (i = 0; i < ft->fixup_count; i++) {
         if ((INTVAL)((enum_fixup_t)ft->fixups[i]->type) == type &&
-                (strcmp(ft->fixups[i]->name, name) == 0)) {
+                STREQ(ft->fixups[i]->name, name)) {
             ft->fixups[i]->seg = ft->code;
             return ft->fixups[i];
         }
@@ -3114,7 +3114,7 @@ find_fixup_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(void *user_da
 {
     if (seg->type == PF_DIR_SEG) {
         if (PackFile_map_segments(interp, (PackFile_Directory *)seg,
-                find_fixup_iter, user_data))
+                    find_fixup_iter, user_data))
             return 1;
     }
     else if (seg->type == PF_FIXUP_SEG) {

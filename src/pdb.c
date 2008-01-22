@@ -160,8 +160,7 @@ main(int argc, char *argv[])
 
     filename = argv[1];
     ext = strrchr(filename, '.');
-    if (ext && strcmp(ext, ".pbc") == 0) {
-
+    if (ext && STREQ(ext, ".pbc")) {
         pf = Parrot_readbc(interp, filename);
 
         if (!pf) {
@@ -183,7 +182,7 @@ main(int argc, char *argv[])
                     filename);
         }
         pasm_file = 0;
-        if (ext && strcmp(ext, ".pasm") == 0)
+        if (ext && STREQ(ext, ".pasm"))
             pasm_file = 1;
         emit_open(interp, 1, NULL);
         IMCC_INFO(interp)->state->pasm_file = pasm_file;

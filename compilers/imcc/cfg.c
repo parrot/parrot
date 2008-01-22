@@ -153,8 +153,6 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 #define INVOKE_SUB_LOOP 3
 #define INVOKE_SUB_OTHER 4
 
-#define STREQ(x, y) (strcmp((x), (y))==0)
-
 /*
 
 =item C<static int check_invoke_type>

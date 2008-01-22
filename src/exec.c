@@ -363,7 +363,7 @@ symbol_list_find(ARGIN(const Parrot_exec_objfile_t *obj), ARGIN(const char *symb
     int i;
 
     for (i = 0; i < obj->symbol_count; i++)
-        if (strcmp(symbol, obj->symbol_table[i].symbol) == 0)
+        if (STREQ(symbol, obj->symbol_table[i].symbol))
             return i;
     return -1;
 }

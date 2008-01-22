@@ -270,7 +270,7 @@ main(int argc, char **argv)
             exit(EXIT_FAILURE);
         }
         PackFile_pack(interp, interp->code->base.pf, pack);
-        if (strcmp(file, "-") == 0)
+        if (STREQ(file, "-"))
             fp = stdout;
         else if ((fp = fopen(file, "wb")) == 0) {
             printf("Couldn't open %s\n", file);

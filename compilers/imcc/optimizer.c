@@ -180,8 +180,6 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 int loop_optimization(Interp *, IMC_Unit *);
 #endif
 
-#define STREQ(x, y) (strcmp((x), (y))==0)
-
 /*
 
 =item C<int pre_optimize>
