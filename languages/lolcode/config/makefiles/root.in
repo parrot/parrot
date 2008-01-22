@@ -36,6 +36,7 @@ SOURCES = lolcode.pir \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
+  src/parser/yarn_literal.pir \
 #  $(LOLCODE_GROUP)
 
 BUILTINS_PIR = \

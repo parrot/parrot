@@ -52,6 +52,7 @@ to the lolcode compiler.
 
 .include 'src/gen_builtins.pir'
 .include 'src/gen_grammar.pir'
+.include 'src/parser/yarn_literal.pir'
 .include 'src/gen_actions.pir'
 
 =back

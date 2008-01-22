@@ -170,7 +170,7 @@ method boolean($/) {
 }
 
 method quote($/) {
-    make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );
+    make PAST::Val.new( :value( $($<yarn_literal>) ), :node($/) );
 }
 
 
