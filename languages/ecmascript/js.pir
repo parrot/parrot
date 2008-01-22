@@ -54,6 +54,11 @@ bytecode (actually to PIR, at first).
 .include 'src/gen_actions.pir'
 
 
+.namespace
+
+.include 'src/builtin/builtins.pir'
+
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
