@@ -171,7 +171,7 @@ Return pir for an operation node.
   pirop_emit:
     .local pmc code
     code = new 'CodeString'
-    code.'emit'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant)
+    code.'emit'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
     .return (code)
 .end
 

@@ -1011,9 +1011,16 @@ node with a 'pasttype' of inline.
 
     .local string result
     result = ''
+    $I0 = index inline, '%t'
+    if $I0 >= 0 goto result_new
     $I0 = index inline, '%r'
-    unless $I0 goto have_result
+    unless $I0 >= 0 goto have_result
     result = ops.'unique'('$P')
+    ops.'result'(result)
+    goto have_result
+  result_new:
+    result = ops.'unique'('$P')
+    ops.'push_pirop'('new', result, "'Undef'")
     ops.'result'(result)
   have_result:
 
