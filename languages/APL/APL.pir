@@ -1,133 +1,64 @@
-=head1 NAME
+=head1 TITLE
 
-APL -- APL compiler/interpreter
+apl.pir - A APL compiler.
 
-=head1 SYNOPSIS
+=head2 Description
 
-Run from the command line:
+This is the base file for the APL compiler.
 
-    $ parrot APL.pbc file.apl                      # execute stmts in file.apl
-    $ parrot APL.pbc                               # interactive mode
+This file includes the parsing and grammar rules from
+the src/ directory, loads the relevant PGE libraries,
+and registers the compiler under the name 'APL'.
 
-    $ parrot APL.pbc --target=parse [file.apl]     # display parse tree
-    $ parrot APL.pbc --target=PAST  [file.apl]     # display AST
-
-Run from another Parrot program:
-
-    .sub main :main
-        # load the compiler
-        load_bytecode 'APL.pbc'
-
-        # get the compiler
-        .local pmc apl
-        apl = compreg 'APL'
-
-        # APL source code
-        source = unicode:"FOO←1 2"
-
-        # compile source
-        $P0 = apl(source)
-        # execute code
-        $P0()
-
-        # other compile options:
-        $P0 = apl(source, target=>'parse')         # get parse tree
-        $P0 = apl(source, target=>'PAST')          # get abstract syn tree
-        $P0 = apl(source, target=>'PIR')           # get PIR code
-    .end
-
-=head1 Description
-
-APL.pbc is an interpreter for the APL language.  Its
-parser is implemented using a PGE grammar (src/APLGrammar.pg),
-and compilation is performed as a TGE tree transformation from 
-the match object returned by the grammar into an abstract syntax tree.
-Then the abstract syntax tree is converted to PIR code, and the
-PIR code is compiled to return an executable Eval PMC.
-
-=head1 Functions
-
-=head2 APL Namespace
-
-=cut
-
-.namespace [ 'APL' ]
+=head2 Functions
 
 =over 4
 
-=item C<__onload()>
+=item onload()
 
-Initializes the compiling subsystem.
+Creates the APL compiler using a C<PCT::HLLCompiler>
+object.
 
 =cut
 
-.sub __onload :load :init
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'TGE.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-    load_bytecode 'PAST-pm.pbc'
+.namespace [ 'APL::Compiler' ]
 
-    $P0 = get_class 'TGE::Grammar'
-    $P1 = subclass $P0, 'APL::PAST::Grammar'
+.loadlib 'apl_group'
 
-    $P0 = new [ 'HLLCompiler' ]
-    $P0.'language'('APL')
-    $P0.'parsegrammar'('APL::Grammar')
-    $P0.'astgrammar'('APL::PAST::Grammar')
+.sub 'onload' :anon :load :init
+    load_bytecode 'PCT.pbc'
+
+    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+    $P1 = $P0.'new'()
+    $P1.'language'('APL')
+    $P1.'parsegrammar'('APL::Grammar')
+    $P1.'parseactions'('APL::Grammar::Actions')
+
+    ##  tell PCT to always generate pmcs for Float constants
+    $P0 = get_hll_global ['PAST::Compiler'], '%valflags'
+    $P0['Float'] = ''
 .end
 
-=item C<main(PMC args)>
+=item main(args :slurpy)  :main
 
-Handles program control when the AST.pbc file is executed
-directly from the Parrot command line.  It calls all of
-the submodule :load routines, then processes commands from
-the file specified on the command line or standard input.
-
-The --target= command line option allows the compilation
-to display a parse tree or abstract syntax tree in lieu of
-executing program statements.
+Start compilation by passing any command line C<args>
+to the APL compiler.
 
 =cut
 
 .sub 'main' :main
     .param pmc args
 
-    # Load the pmc library
-    $P1 = loadlib 'apl_group'
-    if $P1 goto pmcs_ok
-    $P2 = new 'Exception'
-    $P2[0] = "unable to load APL's dynpmc library"
-    throw $P2
-pmcs_ok:
-
-    load_bytecode 'dumper.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
-    load_bytecode 'Getopt/Obj.pbc'
-
     $P0 = compreg 'APL'
-    .return $P0.'command_line'(args, 'encoding'=>'utf8')
+    $P1 = $P0.'command_line'(args, 'encoding'=>'utf8')
 .end
 
-# Load the APL grammar
-.namespace [ 'APL::Grammar' ]
-.include 'src/APLGrammar.pir'
 
-.namespace [ 'APL::PAST::Grammar' ]
-.include 'src/parse2past.pir'
-
-# include the built-in functions and operators
-.include 'src/APLFunctions.pir'
+.include 'src/gen_builtins.pir'
+.include 'src/gen_grammar.pir'
+.include 'src/gen_actions.pir'
 
 =back
-
-=head1 LICENSE
-
-Copyright (C) 2006, The Perl Foundation.
-
-This is free software; you may redistribute it and/or modify
-it under the same terms as Parrot.
 
 =cut
 
@@ -136,3 +67,4 @@ it under the same terms as Parrot.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
+

@@ -1,57 +1,71 @@
-# Commands
-LN_S   = @lns@
-PERL   = @perl@
-RM_F   = @rm_f@
-CP     = @cp@
-PARROT = ../../parrot@exe@
-BUILD  = $(PERL) @build_dir@/tools/build/dynpmc.pl
+## $Id$
 
-# Directories
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
-PMC_DIR   = src/pmc
-GROUP_DIR = @build_dir@/runtime/parrot/dynext
+## arguments we want to run parrot with
+PARROT_ARGS =
 
-# Files
-APL_GROUP = $(GROUP_DIR)/apl_group$(LOAD_EXT)
-PMC_NAMES = aplvector
-PMC_FILES = $(PMC_DIR)/aplvector.pmc
+## configuration settings
+BUILD_DIR     = @build_dir@
+LOAD_EXT      = @load_ext@
+O             = @o@
 
-# Extensions
-O        = @o@
-LOAD_EXT = @load_ext@
+## Setup some commands
+LN_S          = @lns@
+PERL          = @perl@
+RM_RF         = @rm_rf@
+CP            = @cp@
+PARROT        = ../../parrot@exe@
+CAT           = $(PERL) -MExtUtils::Command -e cat
+BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
+RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 
+## places to look for things
+PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
+PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
+PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
+NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
+PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
+
+PMC_DIR       = src/pmc
 
 all: APL.pbc
 
-$(PARROT):
-	@echo "You must first configure and build parrot. See ../../README"
-	@$(PERL) -e "exit 1"
+APL_GROUP = $(PMC_DIR)/apl_group$(LOAD_EXT)
 
 SOURCES = APL.pir \
-  src/APLGrammar.pir \
-  src/parse2past.pir \
-  src/APLFunctions.pir
+  src/gen_grammar.pir \
+  src/gen_actions.pir \
+  src/gen_builtins.pir \
+  $(APL_GROUP)
 
-APL.pbc: $(PARROT) $(APL_GROUP) $(SOURCES) 
-	$(PARROT) --output=APL.pbc APL.pir
+PMCS = aplvector
+PMC_SOURCES = $(PMC_DIR)/aplvector.pmc
 
-interactive: APL.pbc
-	$(PARROT) APL.pbc
+# the default target
+APL.pbc: $(PARROT) $(SOURCES) $(APL_GROUP)
+	$(PARROT) $(PARROT_ARGS) -o APL.pbc APL.pir
 
-.SUFFIXES : .pir .pbc .tg .pg
+src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
+	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+	    --encoding=utf8 \
+	    --output=src/gen_grammar.pir \
+	    src/parser/grammar.pg
 
-.pir.pbc :
-	$(PARROT) -o $@ $<
+src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
+	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
+	    --target=pir src/parser/actions.pm
 
-.tg.pir :
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
+src/gen_builtins.pir: tools/gen_operator_defs.pl
+	$(PERL) tools/gen_operator_defs.pl >src/gen_builtins.pir
 
-.pg.pir :
-	$(PARROT) $(PGE_DIR)/pgc.pir --encoding=utf8 --output=$@ $<
+$(APL_GROUP): $(PARROT) $(PMC_SOURCES)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) generate $(PMCS)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) compile $(PMCS)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) linklibs $(PMCS)
+	cd $(PMC_DIR) && $(BUILD_DYNPMC) copy --destination=$(PARROT_DYNEXT) $(PMCS)
 
-src/APLFunctions.pir: tools/gen_operator_defs.pl
-	$(PERL) tools/gen_operator_defs.pl > src/APLFunctions.pir
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=APL
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -60,12 +74,8 @@ help:
 	@echo ""
 	@echo "  all:               APL.pbc"
 	@echo "                     This is the default."
-	@echo "Running:"
-	@echo "  interactive:       Run the interative APL shell"
-	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
-	@echo "  devtest:           Run the test suite, using TODO not SKIP"
 	@echo "  testclean:         Clean up test results."
 	@echo ""
 	@echo "Cleaning:"
@@ -78,40 +88,34 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) -Ilib t/harness
+	$(PERL) t/harness
 
-devtest: all
-	APLDEV=1 $(PERL) -Ilib t/harness
-
+# this target has nothing to do
 testclean:
-	$(RM_F) "t/*.apl" "t/*.pir" "t/*.out"
 
-clean: testclean
-	$(RM_F) \
+CLEANUPS = \
   APL.pbc \
-  src/parse2past.pir \
-  lib/pge2past.pir \
-  lib/past2pir.pir \
-  lib/pasteval.pir \
-  src/APLGrammar.pir \
-  src/APLFunctions.pir \
+  src/gen_grammar.pir \
+  src/gen_actions.pir \
+  src/gen_builtins.pir \
   $(PMC_DIR)/*.h \
   $(PMC_DIR)/*.c \
   $(PMC_DIR)/*.dump \
-  $(PMC_DIR)/*$(LOAD_EXT) \
   $(PMC_DIR)/*$(O) \
-  $(APL_GROUP)
+  $(PMC_DIR)/*$(LOAD_EXT) \
+  $(PMC_DIR)/*.exp \
+  $(PMC_DIR)/*.ilk \
+  $(PMC_DIR)/*.manifest \
+  $(PMC_DIR)/*.pdb \
+  $(PMC_DIR)/*.lib \
+
+
+clean:
+	$(RM_RF) $(CLEANUPS)
 
 realclean: clean
-	$(RM_F) Makefile "EVAL_*"
+	$(RM_RF) Makefile
 
 distclean: realclean
 
-# XXX Really dislike this setup - the build script should be giving us the make
-# targets so we can let make do its job, not forcing us to call it in 
-# this manner.
-$(APL_GROUP): $(PMC_FILES)
-	cd $(PMC_DIR) && $(BUILD) generate $(PMC_NAMES)
-	cd $(PMC_DIR) && $(BUILD) compile  $(PMC_NAMES)
-	cd $(PMC_DIR) && $(BUILD) linklibs $(PMC_NAMES)
-	cd $(PMC_DIR) && $(BUILD) copy "--destination=$(GROUP_DIR)"  $(PMC_NAMES)
+

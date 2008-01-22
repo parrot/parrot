@@ -14,10 +14,7 @@ END_OF_HEADER
 
 my %macros;
 $macros{DOMAIN_ERROR} = <<'END_OF_PIR';
-    .local pmc throwable
-    throwable = new 'Exception'
-    throwable[0] = "DOMAIN ERROR\n"
-    throw throwable
+    die "DOMAIN ERROR\n"
 END_OF_PIR
 
 my %scalar = (
@@ -63,7 +60,7 @@ my $template = <<'END_OF_TEMPLATE';
     store_global "APL", "%pirtable", $P0
     .local pmc itable
     itable = new 'Hash'
-    set_hll_global ['APL'], '%inlinetable', itable
+    set_hll_global ['APL';'Grammar';'Actions'], '%inlinetable', itable
 
     # special-purpose parrot ops here
     itable['dyadic:<']         =  <<'END_PIR'
@@ -126,7 +123,7 @@ END_PIR
     %t = $I1
 END_PIR
 
-    itable['monadic:+']      =  "    noop # %v"        # conjugate
+    itable['monadic:+']      =  "    %r = %0"          # conjugate
     itable['monadic:|']      =  "    %t = abs %0"      # magnitude
     itable['monadic:!']      =  <<'END_PIR'
     $I1 = %0                   # monadic:! (factorial)
