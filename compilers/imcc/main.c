@@ -109,7 +109,7 @@ static int load_pbc, run_pbc, write_pbc, pre_process_only, pasm_file;
 
 =item C<static void usage>
 
-RT#48260: Not yet documented!!!
+Outputs usage error message.
 
 =cut
 
@@ -127,7 +127,7 @@ usage(ARGMOD(FILE* fp))
 
 =item C<static void help_debug>
 
-RT#48260: Not yet documented!!!
+Print out list of debugging flag values.
 
 =cut
 
@@ -171,7 +171,7 @@ help_debug(void)
 
 =item C<static void help>
 
-RT#48260: Not yet documented!!!
+Print out "help" list of options.
 
 =cut
 
@@ -226,7 +226,8 @@ help(void)
 
 =item C<static void Parrot_version>
 
-RT#48260: Not yet documented!!!
+Print out parrot version number and copyright message.
+Include warning if Configure's version # doesn't match.
 
 =cut
 
@@ -308,7 +309,8 @@ static struct longopt_opt_decl options[] = {
 
 =item C<static int is_all_hex_digits>
 
-RT#48260: Not yet documented!!!
+Tests all characters in a string are hexadecimal digits.
+Returns 1 if true, 0 as soon as a non-hex found
 
 =cut
 
@@ -330,7 +332,7 @@ is_all_hex_digits(ARGIN(const char *s))
 
 =item C<char * parseflags>
 
-RT#48260: Not yet documented!!!
+Parse Parrot's command line for options and set appropriate flags.
 
 =cut
 
@@ -565,7 +567,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
 
 =item C<static void do_pre_process>
 
-RT#48260: Not yet documented!!!
+Pre-processor step.  Turn parser's output codes into Parrot instructions.
 
 =cut
 
@@ -689,7 +691,7 @@ do_pre_process(PARROT_INTERP)
 
 =item C<static void imcc_get_optimization_description>
 
-RT#48260: Not yet documented!!!
+Create list (opt_desc[]) describing optimisation flags.
 
 =cut
 
@@ -725,7 +727,7 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
 
 =item C<void imcc_initialize>
 
-RT#48260: Not yet documented!!!
+Initialise interpreter and set optimisation level.
 
 =cut
 
@@ -760,7 +762,8 @@ imcc_initialize(PARROT_INTERP)
 
 =item C<static void imcc_run_pbc>
 
-RT#48260: Not yet documented!!!
+Write out or run Parrot bytecode. 
+ RT#46149 no return value :-( 
 
 =cut
 
@@ -796,7 +799,7 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN(const char *output_file),
 
 =item C<static void imcc_write_pbc>
 
-RT#48260: Not yet documented!!!
+Output Packed bytecode file.
 
 =cut
 
@@ -834,7 +837,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
 
 =item C<static void determine_input_file_type>
 
-RT#48260: Not yet documented!!!
+Read in the source and determine whether it's Parrot bytecode or PASM
 
 =cut
 
@@ -874,7 +877,7 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 
 =item C<static void determine_output_file_type>
 
-RT#48260: Not yet documented!!!
+Decide what kind of file we are to outout.
 
 =cut
 
@@ -909,7 +912,7 @@ determine_output_file_type(PARROT_INTERP,
 
 =item C<static void compile_to_bytecode>
 
-RT#48260: Not yet documented!!!
+Compile source code into bytecode (or die trying).
 
 =cut
 
@@ -986,7 +989,8 @@ compile_to_bytecode(PARROT_INTERP,
 
 =item C<int imcc_run>
 
-RT#48260: Not yet documented!!!
+Compile source code (if required), write bytecode file (if required)
+and run.
 
 =cut
 
