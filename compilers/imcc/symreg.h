@@ -158,13 +158,6 @@ char * _mk_fullname(
     ARGIN(const char *name))
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * _mk_symreg(ARGMOD(SymHash *hsh), ARGIN(char *name), int t)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*hsh);
-
 void _store_symreg(ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

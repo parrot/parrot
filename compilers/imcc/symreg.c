@@ -47,6 +47,14 @@ static SymReg * _get_sym_typed(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+static SymReg * _mk_symreg(ARGMOD(SymHash *hsh), ARGMOD(char *name), int t)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hsh)
+        FUNC_MODIFIES(*name);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static char * add_ns(PARROT_INTERP, ARGIN(char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -83,7 +91,7 @@ RT#48260: Not yet documented!!!
 void
 push_namespace(ARGIN(char *name))
 {
-    Namespace * const ns = (Namespace *) mem_sys_allocate(sizeof (*ns));
+    Namespace * const ns = mem_allocate_zeroed_typed(Namespace);
 
     ns->parent = _namespace;
     ns->name   = name;
@@ -157,7 +165,7 @@ _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
 
 /*
 
-=item C<SymReg * _mk_symreg>
+=item C<static SymReg * _mk_symreg>
 
 Makes a new SymReg from its varname and type
 
@@ -173,8 +181,8 @@ should be changed.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg *
-_mk_symreg(ARGMOD(SymHash *hsh), ARGIN(char *name), int t)
+static SymReg *
+_mk_symreg(ARGMOD(SymHash *hsh), ARGMOD(char *name), int t)
 {
     SymReg * r = _get_sym_typed(hsh, name, t);
 
@@ -183,13 +191,7 @@ _mk_symreg(ARGMOD(SymHash *hsh), ARGIN(char *name), int t)
         return r;
     }
 
-    r = (SymReg *)calloc(1, sizeof (SymReg));
-
-    if (!r) {
-        fprintf(stderr, "Memory error at mk_symreg\n");
-        abort();
-    }
-
+    r = mem_allocate_zeroed_typed(SymReg);
     r->set        = t;
     r->type       = VTREG;
     r->name       = name;
@@ -237,9 +239,8 @@ char *
 symreg_to_str(ARGIN(const SymReg *s))
 {
     /* NOTE: the below magic number encompasses all the quoted strings which
-     * may be included in the sprintf output */
-    /* XXX This needs to check for NULL */
-    char * const buf = (char *) malloc(250 + strlen(s->name));
+     * may be included in the sprintf output (for now) */
+    char * const buf = (char *)mem_sys_allocate(250 + strlen(s->name));
     const int    t   = s->type;
 
     sprintf(buf, "symbol [%s]  set [%c]  color [" INTVAL_FMT "]  type [",
@@ -302,7 +303,7 @@ mk_pcc_sub(PARROT_INTERP, ARGIN(char *name), int proto)
     SymReg   * const r    = _mk_symreg(&unit->hash, name, proto);
 
     r->type    = VT_PCC_SUB;
-    r->pcc_sub = (pcc_sub_t*)calloc(1, sizeof (struct pcc_sub_t));
+    r->pcc_sub = mem_allocate_zeroed_typed(struct pcc_sub_t);
 
     return r;
 }
@@ -578,12 +579,11 @@ PARROT_WARN_UNUSED_RESULT
 SymReg *
 mk_ident(PARROT_INTERP, ARGIN(char *name), int t)
 {
-    char   *fullname = _mk_fullname(_namespace, name);
+    char   * const fullname = _mk_fullname(_namespace, name);
     SymReg *r;
 
     if (_namespace) {
-        Identifier * const ident = (Identifier *)calloc(1,
-            sizeof (struct ident_t));
+        Identifier * const ident = mem_allocate_zeroed_typed(Identifier);
 
         ident->name        = fullname;
         ident->next        = _namespace->idents;
@@ -849,7 +849,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(char *name), int uniq)
     SymReg * r;
 
     if (uniq == U_add_all) {
-        r = (SymReg *)calloc(1, sizeof (SymReg));
+        r = mem_allocate_zeroed_typed(SymReg);
         r->type = VTADDRESS;
         r->name = name;
         _store_symreg(hsh, r);
@@ -1191,9 +1191,9 @@ RT#48260: Not yet documented!!!
 void
 create_symhash(ARGOUT(SymHash *hash))
 {
-   hash->data    = (SymReg**)mem_sys_allocate_zeroed(16 * sizeof (SymReg*));
-   hash->size    = 16;
-   hash->entries = 0;
+    hash->data    = (SymReg**)mem_sys_allocate_zeroed(16 * sizeof (SymReg*));
+    hash->size    = 16;
+    hash->entries = 0;
 }
 
 /*
@@ -1231,8 +1231,7 @@ resize_symhash(ARGMOD(SymHash *hsh))
              */
             if (j >= n_next) {
                 n_next <<= 1;
-                next_r = (SymReg **)mem_sys_realloc(next_r,
-                    n_next * sizeof (SymReg*));
+                next_r = (SymReg **)mem_sys_realloc(next_r, n_next * sizeof (SymReg*));
             }
 
             r->next = NULL;

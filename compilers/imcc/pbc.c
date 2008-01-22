@@ -1796,7 +1796,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             /* need a dummy to hold register usage */
             SymReg * const r = mk_sub_label(interp, str_dup("(null)"));
             r->type          = VT_PCC_SUB;
-            r->pcc_sub       = (pcc_sub_t *)calloc(1, sizeof (pcc_sub_t));
+            r->pcc_sub       = mem_allocate_zeroed_typed(pcc_sub_t);
 
             add_const_pmc_sub(interp, r, oldsize, oldsize + code_size);
         }
