@@ -1204,7 +1204,7 @@ PARROT_API
 void
 Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_result)
 {
-    int has_arg, n_named;
+    int n_named;
     int err_check = 1;
     call_state_item *src, *dest;
 
@@ -1231,6 +1231,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
      */
     for (; dest->i < dest->n; dest->i++) {
         INTVAL idx;
+        int has_arg;
 
         /* check if the next dest arg is :slurpy */
         next_arg_sig(dest);
@@ -1243,8 +1244,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
         has_arg = Parrot_fetch_arg(interp, st);
 
         /* if the src arg is named, we're done here */
-        if (st->name)
-        {
+        if (st->name) {
             /* but first, take care of any :optional arguments */
             while (dest->sig & PARROT_ARG_OPTIONAL) {
                 null_val(st->dest.sig, st);
@@ -1785,9 +1785,9 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     opcode_t arg_indexes[PCC_ARG_MAX];
     opcode_t result_indexes[PCC_ARG_MAX];
 
-    PMC* args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC* results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC* ret_cont    = new_ret_continuation_pmc(interp, NULL);
+    PMC* const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC* const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC* const ret_cont    = new_ret_continuation_pmc(interp, NULL);
 
     parrot_context_t *ctx;
     PMC              *pccinvoke_meth;
