@@ -38,7 +38,7 @@ method if_statement($/) {
     $past.push( $( $<expression> ) );
     $past.push( $( $<statement> ) );
     if $<else> {
-        $past.push( $( $<else> ) );
+        $past.push( $( $<else>[0] ) );
     }
     make $past;
 }
