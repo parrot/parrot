@@ -29,13 +29,6 @@ Handles class and object manipulation.
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL attr_str_2_num(PARROT_INTERP,
-    ARGIN(PMC *object),
-    ARGIN(STRING *attr))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC* C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
@@ -74,6 +67,14 @@ static PMC * find_method_direct_1(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC* find_vtable_meth_ns(PARROT_INTERP,
+    ARGIN(PMC *ns),
+    INTVAL vtable_index)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -223,8 +224,6 @@ PMC *
 Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 {
     PMC *classobj = PMCNULL;
-    PMC *ns       = PMCNULL;
-    PMC *hll_ns;
 
     if (PObj_is_class_TEST(key))
         classobj = key;
@@ -238,12 +237,14 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         case enum_class_String:
         case enum_class_Key:
         case enum_class_ResizableStringArray:
-            hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-                    CONTEXT(interp->ctx)->current_HLL);
-            ns     = Parrot_get_namespace_keyed(interp, hll_ns, key);
+            {
+            PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
+                                    CONTEXT(interp->ctx)->current_HLL);
+            PMC * const ns     = Parrot_get_namespace_keyed(interp, hll_ns, key);
 
             if (!PMC_IS_NULL(ns))
                 classobj = VTABLE_get_class(interp, ns);
+            }
         default:
             break;
     }
@@ -1451,8 +1452,8 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
         return;
 
     for (i = 0; i < TBL_SIZE; ++i) {
-        Meth_cache_entry *e;
-        for (e = mc->idx[type][i]; e;) {
+        Meth_cache_entry *e = mc->idx[type][i];
+        while (e) {
             Meth_cache_entry * const next = e->next;
             mem_sys_free(e);
             e = next;
@@ -1513,15 +1514,12 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class), ARGI
 
     type = pmc_type(interp, _class);
 
-    if (type < 0)
-        return;
-
-    if (type == 0) {
-        invalidate_all_caches(interp);
-        return;
+    if (type >= 0) {
+        if (type == 0)
+            invalidate_all_caches(interp);
+        else
+            invalidate_type_caches(interp, (UINTVAL)type);
     }
-
-    invalidate_type_caches(interp, (UINTVAL)type);
 }
 
 /*
@@ -1922,8 +1920,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
     /* Otherwise, need to do merge. For that, need linearizations of all of
      * our parents added to the merge list. */
     for (i = 0; i < parent_count; i++) {
-        PMC *lin;
-        lin = Parrot_ComputeMRO_C3(interp,
+        PMC * const lin = Parrot_ComputeMRO_C3(interp,
             VTABLE_get_pmc_keyed_int(interp, immediate_parents, i));
 
         if (PMC_IS_NULL(lin))
