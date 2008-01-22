@@ -298,7 +298,7 @@ t       pt
 v       p
 v       pit
 v       ptt
-v       tiiiptt
+v       Jtiiipt
 
 # PyBuiltins
 P	JOPP
