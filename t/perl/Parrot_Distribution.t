@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 38;
+use Test::More tests => 37;
 use File::Spec;
 
 =head1 NAME
@@ -51,18 +51,19 @@ ok( !$d->file_for_perl_module('Parrot::Dummy'), 'Perl module file not there' );
 my %pmc_source_file_directories = map { $_->path => 1 } $d->pmc_source_file_directories();
 
 my @old_directory_list = (
-    'compilers/bcg/src/pmc',      'languages/APL/src/pmc',
-    'languages/WMLScript/pmc',    'languages/amber/lib/kernel/pmc',
-    'languages/cardinal/src/pmc', 'languages/dotnet/pmc',
-    'languages/lua/pmc',          'languages/perl6/src/pmc',
-    'languages/pugs/pmc',         'languages/tcl/src/pmc',
+    'compilers/bcg/src/pmc',   'languages/APL/src/pmc',
+    'languages/WMLScript/pmc', 'languages/amber/lib/kernel/pmc',
+    'languages/dotnet/pmc',    'languages/lua/pmc',
+    'languages/perl6/src/pmc', 'languages/pugs/pmc',
+    'languages/tcl/src/pmc',
     map { File::Spec->catdir( 'src', $_ ) } qw(dynpmc pmc)
 );
 
 for my $dir (@old_directory_list) {
     my $path = $d->directory_with_name($dir)->path();
     ok( exists $pmc_source_file_directories{$path},
-        "Directory from hardcoded list $dir found through MANIFEST" );
+        "Directory from hardcoded list $dir found through MANIFEST" )
+        or diag( "Missing $dir\n" );
 }
 
 ## perl files and exemptions
