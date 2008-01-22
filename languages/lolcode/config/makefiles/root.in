@@ -101,6 +101,8 @@ test: all
 testclean:
 
 CLEANUPS = \
+  lolcode@exe@ \
+  lolcode.c \
   lolcode.pbc \
   src/gen_grammar.pir \
   src/gen_actions.pir \
