@@ -18,6 +18,15 @@ method function_declaration($/) {
     my $past := $( $<block> );
     $past.blocktype('declaration');
     $past.name( $( $<identifier> ).name() );
+
+    if $<formal_parameter_list> {
+        my @params := $<formal_parameter_list>[0]<identifier>;
+        for @params {
+            my $param := $( $_ );
+            $param.scope('parameter');
+            $past.push($param);
+        }
+    }
     make $past;
 }
 
@@ -133,8 +142,6 @@ method call_expression($/) {
     make $past;
 }
 
-
-
 method assignment_expression($/) {
     make $( $<primary_expression> );
 }
@@ -156,7 +163,24 @@ method literal($/, $key) {
 method object_literal($/) {
     my $past := PAST::Op.new( :pasttype('call'), :node($/) );
     $past.name('ctor');
+    for $<property> {
+        $past.push( $($_) );
+    }
     make $past;
+}
+
+method property($/) {
+    ## TODO: a property is a key/value pair. The value must be passed as a parameter
+    ## and passed as a :named parameter using the key as a name.
+    ## How to solve this, as property_name can be a value and a variable (but I think this is
+    ## is supposed to be an auto-quoted identifier). Check manual.
+    ## For now: this is broken, but it's a start.
+    my $prop := $( $<property_name> );
+    my $key := PAST::Val.new( $prop.value(), :returns('String'), :node($/) );
+    my $val := $( $<expression> );
+
+    $val.named($key);
+    make $val;
 }
 
 

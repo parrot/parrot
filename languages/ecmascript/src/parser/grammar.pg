@@ -25,7 +25,6 @@ rule function_declaration {
 
 rule formal_parameter_list {
     <identifier> [',' <identifier>]*
-    {*}
 }
 
 ##
@@ -155,6 +154,7 @@ rule object_literal {
 
 rule property {
     <property_name> ':' <expression>
+    {*}
 }
 
 token property_name {
