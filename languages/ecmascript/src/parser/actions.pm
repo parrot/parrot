@@ -73,12 +73,27 @@ method literal($/, $key) {
     make $( $/{$key} );
 }
 
+method object_literal($/) {
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    $past.name('ctor');
+    make $past;
+}
+
+
+method property_name($/, $key) {
+    make $( $/{$key} );
+}
+
 method string_literal($/) {
     make PAST::Val.new( :value( ~$<string_literal> ), :node($/) );
 }
 
 method floating_point_number($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node( $/ ) );
+}
+
+method numeric_literal($/,$key) {
+    make $( $/{$key} );
 }
 
 method integer_number($/) {

@@ -83,6 +83,26 @@ token identifier {
 
 token literal {
     | <string_literal> {*}         #= string_literal
+    | <numeric_literal> {*}        #= numeric_literal
+    | <object_literal> {*}         #= object_literal
+}
+
+rule object_literal {
+    '{' [<property> [',' <property>]* ]? '}'
+    {*}
+}
+
+rule property {
+    <property_name> ':' <expression>
+}
+
+token property_name {
+    | <identifier> {*}       #= identifier
+    | <string_literal> {*}   #= string_literal
+    | <numeric_literal> {*}  #= numeric_literal
+}
+
+token numeric_literal {
     | <decimal_literal> {*}        #= decimal_literal
     | <hex_integer_literal> {*}    #= hex_integer_literal
 }
