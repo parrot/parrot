@@ -513,11 +513,11 @@ EOC
 EOC
     $cout .= <<"EOC";
         /* create vtable - clone it - we have to set a few items */
-        VTABLE *vt_clone = Parrot_clone_vtable(interp, &temp_base_vtable);
+        VTABLE * const vt_clone = Parrot_clone_vtable(interp, &temp_base_vtable);
 EOC
     for my $k ( keys %extra_vt ) {
         $cout .= <<"EOC";
-        VTABLE *vt_${k}_clone = Parrot_clone_vtable(interp, &temp_${k}_vtable);
+        VTABLE * const vt_${k}_clone = Parrot_clone_vtable(interp, &temp_${k}_vtable);
 EOC
     }
 
@@ -572,7 +572,7 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "$hll")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "$hll")
             );
             if (pmc_id > 0) {
 EOC
@@ -635,7 +635,7 @@ EOC
     foreach my $dynpmc (@$dyn_mmds) {
         next if $dynpmc eq $classname;
         $cout .= <<"EOC";
-            int my_enum_class_$dynpmc = pmc_type(interp, string_from_literal(interp, "$dynpmc"));
+            const int my_enum_class_$dynpmc = pmc_type(interp, string_from_literal(interp, "$dynpmc"));
 EOC
     }
 
