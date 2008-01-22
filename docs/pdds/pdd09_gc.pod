@@ -250,11 +250,8 @@ list, or constant.  If it is not, then it is added to the free list and marked
 as being on the free list with the C<PObj_on_free_list_FLAG>.
 
 =for question
-
 Are the PMCs in the arena examined back-to-front as well?  How about Buffers?
 Order of destruction can be important.
-
-=end for
 
 =head3 Collecting buffers
 
@@ -331,11 +328,8 @@ compile time. Future versions will support switching GC systems at
 execution-time to accommodate different work loads.
 
 =for question
-
 Does "execution-time" mean "before starting a runcore" or "at some point after
 starting a runcore"?
-
-=end question
 
 Each GC core provides a standard interface for interaction with the core.
 
