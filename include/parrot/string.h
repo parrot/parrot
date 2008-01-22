@@ -38,7 +38,7 @@ typedef struct string_iterator_t {
     void (*set_position)(PARROT_INTERP, struct string_iterator_t *i, UINTVAL pos);
 } String_iter;
 
-void string_iter_init(PARROT_INTERP, const STRING *str, String_iter *);
+#define STREQ(x,y) (strcmp((x),(y))==0)
 
 /* stringinfo parameters */
 
