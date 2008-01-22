@@ -42,11 +42,37 @@
 
     ##  interpolate escaped
     escaped = substr target, pos, 1
-    $I0 = index ':)>o"', escaped
+    $I0 = index ':)>o"(', escaped
     if $I0 < 0 goto add_litchar
     inc pos
+    if $I0 == 5 goto scan_hexchar
 
     litchar = substr ":\n\t\a\"", $I0, 1
+    goto add_litchar
+
+  scan_hexchar:
+    .local int decnum
+    decnum = 0
+
+  scan_hexchar_loop:
+    if pos > lastpos goto fail
+    $S0 = substr target, pos, 1
+    inc pos
+    if $S0 == ')' goto add_hexchar
+    $I0 = index '0123456789abcdefABCDEF', $S0
+    if $I0 < 0 goto fail_hexchar
+    if $I0 < 16 goto shift_hexchar
+    $I0 -= 6
+  shift_hexchar:
+    decnum *= 16
+    decnum += $I0
+    goto scan_hexchar_loop
+
+  fail_hexchar:
+    self.'panic'('Invalid character in hex escape.')
+
+  add_hexchar:
+    litchar = chr decnum
     goto add_litchar
 
   add_litchar:
