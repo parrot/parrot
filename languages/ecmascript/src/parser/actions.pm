@@ -1,4 +1,4 @@
-#   Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 class JS::Grammar::Actions;
 
@@ -41,6 +41,12 @@ method if_statement($/) {
         $past.push( $( $<else>[0] ) );
     }
     make $past;
+}
+
+method do_while_statement($/) {
+    my $cond := $( $<expression> );
+    my $block := $( $<statement> );
+    make PAST::Op.new( $cond, $block, :pasttype('repeat_while'), :node($/) );
 }
 
 method while_statement($/) {

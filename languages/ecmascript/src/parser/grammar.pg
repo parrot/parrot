@@ -1,5 +1,5 @@
-# Copyright (C) 2007, The Perl Foundation.
-# $Id $
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
 
 grammar JS::Grammar is PCT::Grammar;
 
@@ -36,6 +36,7 @@ rule statement {
     | <block> {*}               #= block
     | <if_statement> {*}        #= if_statement
     | <while_statement> {*}     #= while_statement
+    | <do_while_statement> {*}  #= do_while_statement
     | <empty_statement> {*}     #= empty_statement
     | <try_statement> {*}       #= try_statement
     | <throw_statement> {*}     #= throw_statement
@@ -44,12 +45,16 @@ rule statement {
 }
 
 rule block {
-    '{' <statement>* '}'
-    {*}
+    '{' <statement>* '}' {*}
 }
 
 rule if_statement {
     'if' '(' <expression> ')' <statement> ['else' $<else>=<statement>]?
+    {*}
+}
+
+rule do_while_statement {
+    'do' <statement> 'while' '(' <expression> ')' ';'
     {*}
 }
 
@@ -167,6 +172,8 @@ token hex_integer_literal {
     0<[xX]><hex_digits>+ {*}
 }
 
+token hex_digits { <[0..9 a..f A..F]> }
+
 token decimal_literal {
     | <integer_number> {*}         #= integer_number
     | <floating_point_number> {*}  #= floating_point_number
@@ -278,30 +285,6 @@ token singlelinecomment {
 ##
 ##token boolean_literal {true|false}
 ##
-##token numeric_lliteral { <decimal_literal> | <hex_integer_literal> }
-##
-##
-##token decimal_literal {
-##    | <decimal_integer_literal> '.' <digit>+? <exponent_part>?
-##    | '.' <digit>+ <exponent_part>?
-##    | <decimal_integer_literal> <exponent_part>?
-##}
-##
-##token decimal_integer_literal {
-##    | 0
-##    | <[1..9]> <digit>+
-##}
-##
-
-##
-##token hex_integer_literal { 0<[xX]><hex_digits>+ }
-##
-##token hex_digits { <[0..9 a..f A..F]> }
-##
-##token string_literal {
-##    | <PGE::Text::Bracketed: ">
-##    | <PGE::Text::Bracketed: '>
-##}
 ##
 ##token source_character { <alphanum> }
 ##
@@ -346,12 +329,6 @@ token singlelinecomment {
 ##      [ ',' [',']* ]?
 ##}
 ##
-##rule object_literal { '{' <property_name_and_value_list>? '}' }
-##
-##rule property_name_and_value_list {
-##    <property_name> ':' <assignment_expression>
-##    [ ',' <property_name> ':' <assignment_expression> ]*
-##}
 ##
 ##token property_name {
 ##    <identifier> | <string_literal> | <numeric_literal>
@@ -393,26 +370,15 @@ token singlelinecomment {
 ##    | <try_statement>
 ##}
 ##
-##rule block { '{' <statement_list>? '}' {*} }
-##
-##rule statement_list { <statement>+  {*} }
-##
-##rule variable_statement { var <variable_declaration_list> ';' }
-##
-##rule variable_declaration { <identifier> <initializer>? }
 ##rule variable_declaration_no_in { <identifier> <initializer_no_in>? }
 ##
-##rule variable_declaration_list { <variable_declaration> [ ',' <variable_declaration> ]* }
 ##rule variable_declaration_list_no_in { <variable_declaration_no_in> [ ',' <variable_declaration_no_in> ]* }
 ##
-##rule initializer { '=' <assignment_expression> }
 ##rule initializer_no_in { '=' <assignment_expression_no_in> }
 ##
-##rule empyt_statement { ';' }
 ##
 ##rule expression_statement { <expression> ';' }  ##lookahead not e ({, function}) see pdf
 ##
-##rule if_statement { if '(' <expression> ')' <statement> [ else <statement> ]? }
 ##
 ##rule iteration_statement {
 ##    | do <statement> while '(' <expression> ')' ';'
@@ -439,14 +405,6 @@ token singlelinecomment {
 ##
 ##rule labelled_statement { <identifier> ':' <statement> }
 ##
-##token throw_statement { throw <ws> '-' <newline> <expression> <?ws> ';' }
-##
-##rule try_statement { try <block> [ <catch> | <finally> | <catch> <finally> ] }
-##
-##rule catch { catch '(' <identifier> ')' <block> }
-##
-##rule finally { finally <block> }
-##
 ##rule expression { }
 ##rule expression_no_in { }
 #### function expressions
@@ -460,10 +418,6 @@ token singlelinecomment {
 ##
 ##rule function_common { '(' [<identifier> [',' <identifier>]* ]? ')' '{' <source_element>+ '}' }
 ##
-#### programs
-##rule program { <source_element>+ }
-##
-##rule source_element { <statement> | <function_declaration> }
 ##
 #### class
 ##token class_def     { class <identifier> <inheritance> <block> }
