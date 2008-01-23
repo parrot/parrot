@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 25;
 
 =head1 NAME
 
@@ -109,11 +109,20 @@ ok($out =~ /^usage/, "check bfc");
 $out = `$parrot languages/bf/bfco.pbc`;
 ok($out =~ /^usage/, "check bfco");
 
+$out = `$parrot --no-gc languages/cardinal/cardinal.pbc -e "say 'hello world';"`;
+ok($out eq "hello world\n", "check cardinal");
+
 $out = `$parrot languages/dotnet/net2pbc.pbc`;
 ok($out =~ /^Usage/, "check dotnet");
 
-$out = `$parrot languages/ecmascript/js.pbc`;
+$filename = 'test.js';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "print(\"Hello World from JS\\n\")";
+close $FH;
+$out = `$parrot languages/ecmascript/js.pbc $filename`;
 ok($out eq "Hello World from JS\n", "check ecmascript");
+unlink($filename);
 
 $filename = 'test.HQ9Plus';
 open $FH, '>', $filename
