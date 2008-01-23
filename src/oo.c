@@ -481,7 +481,7 @@ Parrot_find_vtable_meth(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *meth))
 
     /* Get class. */
     if (PObj_is_object_TEST(pmc))
-        _class = GET_CLASS(PMC_data_typed(pmc, Buffer), pmc);
+        _class = GET_CLASS(pmc);
 
     /* Get MRO and iterate over it to find method with a matching
        vtable index or double-underscored name. */

@@ -40,8 +40,7 @@ vtable_meth_not_found(PARROT_INTERP, PMC *pmc, const char *meth)
     if (PObj_is_class_TEST(pmc))
         _class = string_to_cstring(interp, PMC_str_val(
             get_attrib_num(
-                (SLOTTYPE *)PMC_data(GET_CLASS(PMC_data(pmc), pmc)),
-                    PCD_CLASS_NAME)));
+                (SLOTTYPE *)PMC_data(GET_CLASS(pmc)), PCD_CLASS_NAME)));
     else
         _class = string_to_cstring(interp, pmc->vtable->whoami);
 
