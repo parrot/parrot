@@ -72,9 +72,85 @@ will come true.
 Dealing with variable-byte encodings is not fun; for instance, you need
 to do a bunch of computations every time you traverse a string. In order
 to make programming a lot easier, we define a Parrot native string
-format to be an array of unsigned 32-bit Unicode codepoints. 
+format to be an array of unsigned 32-bit Unicode codepoints. This is
+equivalent to UCS-4 except for the normalization form semantics
+described below.
+
+This means that B<if> you've done the necessary checks, and hence you
+know you're dealing with a Parrot native string, then you can continue to
+program in the usual C idioms - for the most part. Of course you'll need
+to be careful with your comparisons, since what you'll be getting back
+will be a C<Parrot_UInt4> instead of a C<char>.
 
 =head2 Grapheme normalization form
+
+Unicode characters can be expressed in a number of different ways
+according to the Unicode Standard. This is partly to do with maintaining
+compatibility with existing character encodings. For instance, in
+Serbo-Croatian and Slovenian, there's a letter which looks like an C<i>
+without the dot but with two grave (C<`>) accents. If you have an
+especially good POD renderer, you can see it here: E<0x209>. 
+
+There are two ways you can represent this in Unicode. You can use
+character 0x209, also known as C<LATIN SMALL LETTER I WITH DOUBLE GRAVE>, 
+which does the job all in one go. This is called a "composed" character,
+as opposed to its equivalent decomposed sequence: 
+C<LATIN SMALL LETTER I> (0x69) followd by C<COMBINING DOUBLE GRAVE ACCENT> 
+(0x30F). 
+
+Unicode standardises in a number of "normalization forms" which
+repesentation you should use. We're using an extension of Normalization
+Form C, which says basically, decompose everything, then re-compose as
+much as you can. So if you see the integer stream C<0x69 0x30F>, it
+needs to be replaced by C<0x30F>. This means that Parrot string data
+structures need to keep track of what normalization form a given string
+is in, and Parrot must provide functions to convert between
+normalization forms. 
+
+Now, Serbo-Croat is sometimes also written with Cyrillic letters rather
+than Latin letters. The Cyrillic equivalent of the above character is
+not part of Unicode, but would be specified as a decomposed pair
+C<CYRILLIC SMALL LETTER I> (0x438) C<COMBINING DOUBLE GRAVE ACCENT>
+(0x30F). (This PDD does not require Parrot to convert strings between
+differing political sensibilities.) However, it is still visible as one
+character and despite being expressed even in NFC as two characters, 
+is still a single character as far as a human reader is concerned.
+
+Hence we introduce the the distinction between a "character" and a
+"grapheme". This is a Parrot distinction - it does not exist in the
+Unicode Standard. 
+
+When Parrot target languages' regular expression engines wish to match
+a grapheme, then NFC is clearly not normalized enough. This is why we
+have defined a further normalization stage, NFG - Normalization Form 
+for Graphemes.
+
+NFG uses out-of-band signalling in the string to refer the conforming
+implementation to a decomposition table. UCS-4 specifies an encoding for
+Unicode codepoints from 0 to 0x7FFFFFFF. In other words, any codepoints
+with the first bit set are undefined. We define these out-of-band
+codepoints as indexes into a lookup table, which maps between a
+temporary ID and its associated decomposition.
+
+In practice, this goes as follows: Assuming our Russified Serbo-Croat
+string is the first string that Parrot sees, when it is converted to
+Parrot's default format, it would be normalized to a single character
+having the codepoint C<0x80000000>. At the same time, Parrot would
+insert an entry into a temporary array at array index 0, consisting of
+the bytestream C<0x00000438 0x000000030F> - that is, the Unicode
+decomposition of the grapheme.
+
+This has one big advantage: applications which don't care about
+graphemes can just pass the codepoint around as if it's any other number
+- uh, character. Only applications which care about the specific
+properties of Unicode characters need to take the overload of peeking
+inside the array and reading the decomposition.
+
+Individual languages may need to think carefully about their concept of,
+for instance, "the length of a string" to determine whether or not they
+need to visit the lookup table for these strings. At any rate,
+Parrot should provide both grapheme-aware and character-aware iterators
+for string traversal. 
 
 =head1 IMPLEMENTATION
 
@@ -86,9 +162,19 @@ format to be an array of unsigned 32-bit Unicode codepoints.
 
 =head2 String encoding API
 
+=head2 String programming checklist 
+
 =head1 REFERENCES
 
-List of references.
+http://plan9.bell-labs.com/sys/doc/utf.html - Plan 9's Runes are not
+dissimilar to Parrot's integer codepoints, and this is a good
+introduction to the Unicode world.
+
+http://www.unicode.org/reports/tr15/ - The Unicode Consortium's
+explanation of different normalization forms.
+
+"Unicode: A Primer", Tony Graham - Arguably the most readable book on
+how Unicode works.
 
 =cut
 
