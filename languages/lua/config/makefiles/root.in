@@ -177,7 +177,7 @@ Lua/parser.pm: Lua/lua51.yp
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=lua
+	cd ../.. && $(RECONFIGURE) --step=gen::languages --languages=lua
 
 help:
 	@echo ""
@@ -214,6 +214,8 @@ testclean:
 
 BUILD_CLEANERS = \
  lua@exe@ \
+ lua$(O) \
+ lua.c \
  "*.pbc" \
  $(GEN_PIR) \
  "$(PMCDIR)/*.dump" \
