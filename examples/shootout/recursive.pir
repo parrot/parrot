@@ -90,13 +90,13 @@ endif:
 
 .sub FibNum
 	.param num n
-	unless n < 2.0 goto endif
+	unless n < 2 goto endif
 	.return(1.0)
 endif:
 	.local num tmp
-	tmp = n - 2.0
+	tmp = n - 2
 	$N0 = FibNum(tmp)
-	tmp = n - 1.0
+	tmp = n - 1
 	$N1 = FibNum(tmp)
 	$N0 += $N1
 	.return($N0)
