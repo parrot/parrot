@@ -48,6 +48,7 @@ rule statement {
     | <for1_statement> {*}        #= for1_statement
     | <call_expression> {*}       #= call_expression
     | <expression_statement> {*}  #= expression_statement
+    | <return_statement> {*}      #= return_statement
 }
 
 rule block {
@@ -77,9 +78,9 @@ rule for1_statement {
 
 rule try_statement {
     'try' <block>
-    [ <catch>
+    [ <catch> <finally>
     | <finally>
-    | <catch> <finally>
+    | <catch>
     ]
     {*}
 }
@@ -115,6 +116,11 @@ rule empty_statement {
 rule expression_statement {
     ##<!['{'|'function']> ## is this necessary? isn't this fixed automatically by PGE?
     <expression> ';'
+    {*}
+}
+
+rule return_statement {
+    'return' \N <expression>? ';'
     {*}
 }
 

@@ -119,16 +119,20 @@ method try_statement($/) {
         $past.push($catchblock);
     }
     if $<finally> {
+        # the finally block, if present, is always executed. # what about scope?
         my $finallyblock := $( $<finally> );
-        # what to do with this?
+        $past := PAST::Stmts.new( $past, $finallyblock, :node($/) );
     }
     make $past;
 }
 
 method catch($/) {
    my $past := $( $<block> );
-   # todo: unshift a statement with a .get_results statement
-   # to catch the identifier onto this block.
+   my $exid := $( $<identifier> );
+   ##
+   # HOW to use $exid.name() as a literal argument to .get_results ?
+   ##my $getexc := PAST::Op.new( $exid, :inline('    .get_results (%0)'), :node($/) );
+   $past.unshift($getexc);
    make $past;
 }
 
@@ -139,6 +143,16 @@ method finally($/) {
 method throw_statement($/) {
     my $expr := $( $<expression> );
     make PAST::Op.new( $expr, :inline('    throw %0'), :node($/) );
+}
+
+method return_statement($/) {
+    if $<expression> {
+        my $expr := $( $<expression>[0] );
+        make PAST::Op.new( $expr, :inline('    .return (%0)'), :node($/) );
+    }
+    else {
+        make PAST::Op.new( :inline('    .return ()'), :node($/) );
+    }
 }
 
 method variable_statement($/) {
