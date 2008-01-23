@@ -90,13 +90,13 @@ endif:
 
 .sub FibNum
 	.param num n
-	unless n < 2 goto endif
-	.return(1)
+	unless n < 2.0 goto endif
+	.return(1.0)
 endif:
 	.local num tmp
-	tmp = n - 2
+	tmp = n - 2.0
 	$N0 = FibNum(tmp)
-	tmp = n - 1
+	tmp = n - 1.0
 	$N1 = FibNum(tmp)
 	$N0 += $N1
 	.return($N0)
@@ -110,11 +110,11 @@ endif:
 	.return(z)
 endif:
 	.local num tmp
-	tmp = x - 1
+	tmp = x - 1.0
 	$N0 = TakNum(tmp, y, z)
-	tmp = y - 1
+	tmp = y - 1.0
 	$N1 = TakNum(tmp, z, x)
-	tmp = z - 1
+	tmp = z - 1.0
 	$N2 = TakNum(tmp, x, y)
 	.return TakNum($N0, $N1, $N2)
 .end
@@ -130,10 +130,10 @@ endif:
 	tmp = x - 1
 	$I0 = TakInt(tmp, y, z)
 	tmp = y - 1
-	$I1 = TakInt(tmp, z, x)
-	tmp = z - 1
-	$I2 = TakInt(tmp, x, y)
-	.return TakInt($I0, $I1, $I2)
+	tmp = TakInt(tmp, z, x)
+	dec z
+	z = TakInt(tmp, x, y)
+	.return TakInt($I0, tmp, z)
 .end
 
 
