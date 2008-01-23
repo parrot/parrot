@@ -30,7 +30,7 @@ is not subclassed further.
     $P0 = get_class "Tetris::Block"
     unless null $P0 goto END
     load_bytecode "examples/sdl/tetris/blockdata.pir"
-    getclass $P0, "Tetris::BlockData"
+    get_class $P0, "Tetris::BlockData"
     subclass $P0, $P0, "Tetris::Block"
 
     addattribute $P0, "xpos"

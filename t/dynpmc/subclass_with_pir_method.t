@@ -30,7 +30,7 @@ pir_output_is(
 .sub main :main
   new $P0, 'PerlString'
   $P0.'perl_printhi'()
-  getclass $P2, 'PerlString'
+  get_class $P2, 'PerlString'
   subclass $P0, $P2, 'NewPerlString'
   $P0.'perl_printhi'()
   new $P1, 'NewPerlString'
@@ -55,7 +55,7 @@ pir_output_is(
 .sub main :main
   new $P0, 'PerlString'
   $P0.'perl_printhi'()
-  getclass $P2, 'PerlString'
+  get_class $P2, 'PerlString'
   subclass $P0, $P2, 'NewPerlString'
   $P0.'perl_printhi'()
   new $P1, 'NewPerlString'

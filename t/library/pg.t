@@ -43,7 +43,7 @@ table, which should be created by your sysadmin.
     test.'ok'(1, 'load_bytecode Pg')
 
     .local pmc cl, con, res
-    cl = getclass 'Pg'
+    cl = get_class 'Pg'
     test.'ok'(1, 'Pg class exists')
     con = cl.'connectdb'('')           # assume table = user is present
     $I0 = isa con, ['Pg'; 'Conn']

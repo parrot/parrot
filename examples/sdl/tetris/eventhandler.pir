@@ -10,8 +10,8 @@ eventhandler.pir - a tetris event handler class
     $P0 = get_class "Tetris::EventHandler"
     unless null $P0 goto END
     load_bytecode "library/SDL/EventHandler.pir"
-    
-    getclass $P0, "SDL::EventHandler"
+
+    get_class $P0, "SDL::EventHandler"
     subclass $P0, $P0, "Tetris::EventHandler"
     $P1 = new 'String'
     $P1 = "BUILD"

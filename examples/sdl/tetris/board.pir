@@ -25,7 +25,7 @@ board.pir - a tetris board class.
 
     load_bytecode "examples/sdl/tetris/boarddata.pir"
     load_bytecode "examples/sdl/tetris/blocks.pir"
-    getclass $P0, "Tetris::BoardData"
+    get_class $P0, "Tetris::BoardData"
     subclass $P0, $P0, "Tetris::Board"
 
     # set the BUILD method name

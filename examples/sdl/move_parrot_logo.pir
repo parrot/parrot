@@ -56,7 +56,7 @@ To run this file, run the following command from the Parrot directory:
 
 	.local pmc parent_class
 	.local pmc class_type
-	getclass parent_class, 'SDL::EventHandler'
+	get_class parent_class, 'SDL::EventHandler'
 	subclass class_type, parent_class, 'MoveLogo::EventHandler'
 
 	.local pmc event_handler

@@ -12,7 +12,7 @@ blocks.pir - tetris block classes
 
     load_bytecode "examples/sdl/tetris/block.pir"
 
-    getclass $P1, "Tetris::Block"
+    get_class $P1, "Tetris::Block"
 
     $P2 = new 'String'
     $P2 = "__init"

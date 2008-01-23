@@ -10,7 +10,7 @@ rule pmc_op {
 | isa                 <arg_hack> #
 | newclass            <arg_hack> #
 | subclass            <arg_hack> #
-| getclass            <arg_hack> #
+| get_class            <arg_hack> #
 | class               <arg_hack> #
 | classname           <arg_hack> #
 | addparent           <arg_hack> #

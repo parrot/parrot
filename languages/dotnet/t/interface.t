@@ -125,7 +125,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'abstract method call' );
 .sub main
 	.local pmc prt, cls, obj
 	load_bytecode "t.pbc"
-    prt = getclass [ "Testing" ; "Kickable" ]
+    prt = get_class [ "Testing" ; "Kickable" ]
     cls = newclass "badness"
     addparent cls, prt
 	obj = new "badness"

@@ -50,7 +50,7 @@ NO_IMPORTS:
 .sub __CREATE_DOTNET_MMDBOXES :load
     .local pmc class
 
-    $P0 = getclass "Integer"
+    $P0 = get_class "Integer"
     class = get_class "@@DOTNET_MMDBOX_I1"
     unless null class goto EXISTS_I1
     subclass $P1, $P0, "@@DOTNET_MMDBOX_I1"
@@ -71,7 +71,7 @@ EXISTS_U2:
     unless null class goto EXISTS_U4
     subclass $P1, $P0, "@@DOTNET_MMDBOX_U4"
 EXISTS_U4:
-    $P0 = getclass "Float"
+    $P0 = get_class "Float"
     class = get_class "@@DOTNET_MMDBOX_R4"
     unless null class goto EXISTS_R4
     subclass $P1, $P0, "@@DOTNET_MMDBOX_R4"
@@ -409,7 +409,7 @@ MEND:
     .local string pclass_ns, pir_output, tmp
 
     # Find out what type of parent we have.
-    pir_output = "    parent = getclass "
+    pir_output = "    parent = get_class "
     if parent_type == 0 goto PARENT_DEF
     if parent_type == 1 goto PARENT_REF
     ex = new .Exception

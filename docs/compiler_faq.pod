@@ -348,9 +348,9 @@ don't fit into the class's hierarchy, you could use properties.
 
 You first have to get the class PMC of the class you want to subclass.
 Either you use the PMC returned by the C<newclass> op if you created
-the class, or use the C<getclass> op:
+the class, or use the C<get_class> op:
 
-    getclass $P0, 'Animal'
+    get_class $P0, 'Animal'
 
 Then you can use the C<subclass> op to create a new class that is a
 subclass of this class:
@@ -371,9 +371,9 @@ example.
 If you have a class PMC (created with C<newclass> or by C<subclass>),
 you can add more parent classes to it with the C<addparent> op:
 
-    getclass $P1, 'Dog'
+    get_class $P1, 'Dog'
     subclass $P2, $P1, 'SmallDog'
-    getclass $P3, 'Pet'
+    get_class $P3, 'Pet'
     addparent $P2, $P3  # make "SmallDog" also a "Pet"
 
 =head2 How can I specify the constructor of a class?

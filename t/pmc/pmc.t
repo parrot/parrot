@@ -261,7 +261,7 @@ OUTPUT
 SKIP: {
     skip( "no instantiate", 1 );
     pasm_output_is( <<'CODE', <<'OUTPUT', "instantiate - no args" );
-    getclass P2, "Integer"
+    get_class P2, "Integer"
     set I0, 0   # unproto
     set I3, 0   # no P args
     instantiate P3

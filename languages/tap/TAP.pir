@@ -8,7 +8,7 @@
     load_bytecode 'PGE/Util.pir'
 #    load_bytecode 'TGE.pbc'
 
-    $P0 = getclass 'PGE::Grammar'
+    $P0 = get_class 'PGE::Grammar'
     $P1 = subclass $P0, 'TAP::Grammar'
 
     $P0 = find_global 'TAP', 'compile'

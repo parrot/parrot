@@ -1102,11 +1102,11 @@ I<Arguments: P, P, I>
 
 See also: C<setattribute>, C<classoffset>.
 
-=head2 getclass
+=head2 get_class
 
-X<getclass opcode (PASM)>
+X<get_class opcode (PASM)>
 
-  getclass R<DEST>, R<NAME>
+  get_class R<DEST>, R<NAME>
 
 Return the class PMC of the given name.
 
