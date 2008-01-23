@@ -19,7 +19,12 @@ rule source_element {
 ##
 
 rule function_declaration {
-    'function' <identifier> '(' <formal_parameter_list>? ')' <block>
+    'function' <identifier> <function_common>
+    {*}
+}
+
+rule function_common {
+    '(' <formal_parameter_list>? ')' <block>
     {*}
 }
 
@@ -70,7 +75,6 @@ rule for1_statement {
     {*}
 }
 
-
 rule try_statement {
     'try' <block>
     [ <catch>
@@ -117,6 +121,11 @@ rule expression_statement {
 ##
 ## expressions
 ##
+
+rule function_expression {
+    'function' <identifier>? <function_common>
+    {*}
+}
 
 rule call_expression {
     <member_expression> <arguments>
@@ -422,16 +431,7 @@ token singlelinecomment {
 ##
 ##rule expression { }
 ##rule expression_no_in { }
-#### function expressions
 ##
-##
-#### function
-###token function_def  { function <function_name> <function_common> }
-###rule function_name  { <identifier> | get <identifier>
-##token function_declaration  { function <identifier> <function_common> }
-##rule function_expression { function <identifier>? <function_common> }
-##
-##rule function_common { '(' [<identifier> [',' <identifier>]* ]? ')' '{' <source_element>+ '}' }
 ##
 ##
 #### class

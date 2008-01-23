@@ -14,10 +14,9 @@ method source_element($/, $key) {
     make $( $/{$key} );
 }
 
-method function_declaration($/) {
+method function_common($/) {
     my $past := $( $<block> );
     $past.blocktype('declaration');
-    $past.name( $( $<identifier> ).name() );
 
     if $<formal_parameter_list> {
         my @params := $<formal_parameter_list>[0]<identifier>;
@@ -26,6 +25,23 @@ method function_declaration($/) {
             $param.scope('parameter');
             $past.push($param);
         }
+    }
+    make $past;
+}
+
+method function_declaration($/) {
+    my $past := $( $<function_common> );
+    $past.name( $( $<identifier> ).name() );
+    make $past
+}
+
+method function_expression($/) {
+    my $past := $( $<function_common> );
+    if $<identifier> {
+        my $id := $( $<identifier>[0] );
+        # set id as a property
+
+        # set attributes DontDelete and ReadOnly; see ref.pdf, p.83.
     }
     make $past;
 }
