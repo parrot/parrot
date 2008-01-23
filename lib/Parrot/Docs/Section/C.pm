@@ -177,7 +177,7 @@ sub new {
             $self->c_header_item( '', 'pobj' ),
             $self->c_pair_item( '', 'pmc_freeze' ),
         ),
-        $self->new_group( 'Objects', '', $self->c_pair_item( '', 'objects' ), ),
+        $self->new_group( 'Objects', '', $self->c_pair_item( '', 'oo' ), ),
         $self->new_group(
             'Strings',
             '',
