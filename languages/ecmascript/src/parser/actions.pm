@@ -64,6 +64,35 @@ method while_statement($/) {
     make PAST::Op.new( $cond, $block, :pasttype('while'), :node($/) );
 }
 
+method for1_statement($/) {
+    my $body := $( $<statement> );
+    if $<step> {
+        my $step := $( $<step>[0] );
+        $body := PAST::Stmts.new( $body, $step, :node($/) );
+    }
+
+    my $cond;
+    if $<cond> {
+        $cond := $( $<cond>[0] );
+    }
+    else {
+        $cond := PAST::Val.new( :value('1'), :returns('Integer'), :node($/) );
+    }
+
+    my $loop := PAST::Op.new( $cond,
+                              $body,
+                              :pasttype('while'),
+                              :node($/) );
+
+    if $<init> {
+        my $init := $( $<init>[0] );
+        make PAST::Stmts.new( $init, $loop, :node($/) );
+    }
+    else {
+        make $loop;
+    }
+}
+
 method try_statement($/) {
     my $past := PAST::Op.new( :pasttype('try'), :node($/) );
     my $tryblock := $( $<block> );
@@ -120,6 +149,10 @@ method variable_declaration($/) {
 
 method empty_statement($/) {
     make PAST::Op.new( :node($/), :inline('    # no-op') );
+}
+
+method expression_statement($/) {
+    make $( $<expression> );
 }
 
 method primary_expression($/, $key) {

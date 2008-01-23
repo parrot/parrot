@@ -32,15 +32,17 @@ rule formal_parameter_list {
 ##
 
 rule statement {
-    | <block> {*}               #= block
-    | <if_statement> {*}        #= if_statement
-    | <while_statement> {*}     #= while_statement
-    | <do_while_statement> {*}  #= do_while_statement
-    | <empty_statement> {*}     #= empty_statement
-    | <try_statement> {*}       #= try_statement
-    | <throw_statement> {*}     #= throw_statement
-    | <variable_statement> {*}  #= variable_statement
-    | <call_expression> {*}     #= call_expression
+    | <block> {*}                 #= block
+    | <if_statement> {*}          #= if_statement
+    | <while_statement> {*}       #= while_statement
+    | <do_while_statement> {*}    #= do_while_statement
+    | <empty_statement> {*}       #= empty_statement
+    | <try_statement> {*}         #= try_statement
+    | <throw_statement> {*}       #= throw_statement
+    | <variable_statement> {*}    #= variable_statement
+    | <for1_statement> {*}        #= for1_statement
+    | <call_expression> {*}       #= call_expression
+    | <expression_statement> {*}  #= expression_statement
 }
 
 rule block {
@@ -61,6 +63,13 @@ rule while_statement {
     'while' '(' <expression> ')' <statement>
     {*}
 }
+
+rule for1_statement {
+    'for' '(' [$<init>=<expression>]? ';' [$<cond>=<expression>]? ';' [$<step>=<expression>]? ')'
+    <statement>
+    {*}
+}
+
 
 rule try_statement {
     'try' <block>
@@ -97,6 +106,12 @@ rule variable_declaration {
 
 rule empty_statement {
     ';' {*}
+}
+
+rule expression_statement {
+    ##<!['{'|'function']> ## is this necessary? isn't this fixed automatically by PGE?
+    <expression> ';'
+    {*}
 }
 
 ##
