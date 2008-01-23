@@ -1698,6 +1698,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
     }
     PackFile_destroy(interp, info.image_io->pf);
     mem_sys_free(info.image_io);
+    info.image_io = NULL;
     return info.thaw_result;
 }
 
