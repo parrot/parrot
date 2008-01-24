@@ -286,8 +286,7 @@ static const opcode_t * pf_debug_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*self);
 
-static INTVAL pf_register_standard_funcs(PARROT_INTERP,
-    ARGMOD(PackFile *pf))
+static void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pf);
@@ -1126,6 +1125,7 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     pf->fetch_op = (packfile_fetch_op_t)NULL;
     pf->fetch_iv = (packfile_fetch_iv_t)NULL;
     pf->fetch_nv = (packfile_fetch_nv_t)NULL;
+
     return pf;
 }
 
@@ -1285,7 +1285,7 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
 /*
 
-=item C<static INTVAL pf_register_standard_funcs>
+=item C<static void pf_register_standard_funcs>
 
 Called from within C<PackFile_new()> register the standard functions.
 
@@ -1293,7 +1293,7 @@ Called from within C<PackFile_new()> register the standard functions.
 
 */
 
-static INTVAL
+static void
 pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     PackFile_funcs dirf = {
@@ -1350,7 +1350,8 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
     PackFile_funcs_register(interp, pf, PF_CONST_SEG, constf);
     PackFile_funcs_register(interp, pf, PF_BYTEC_SEG, bytef);
     PackFile_funcs_register(interp, pf, PF_DEBUG_SEG, debugf);
-    return 1;
+
+    return;
 }
 
 /*
