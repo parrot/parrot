@@ -3185,11 +3185,11 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
         self->constants[i] = NULL;
     }
 
-    if (self->const_count) {
+    if (self->constants) {
         mem_sys_free(self->constants);
+        self->constants = NULL;
     }
 
-    self->constants = NULL;
     self->const_count = 0;
 
     return;
