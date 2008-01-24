@@ -240,6 +240,7 @@ void PDB_enable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_MALLOC
 char * PDB_escape(ARGIN(const char *string), INTVAL length)
         __attribute__nonnull__(1);
 

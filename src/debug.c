@@ -1436,6 +1436,7 @@ Escapes C<">, C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_MALLOC
 char *
 PDB_escape(ARGIN(const char *string), INTVAL length)
 {
@@ -1577,7 +1578,6 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
         char      buf[256];
         INTVAL    i = 0;
         FLOATVAL  f;
-        PMC      *k;
 
         PARROT_ASSERT(size + 2 < space);
 
@@ -1646,9 +1646,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             break;
         case PARROT_ARG_SC:
             dest[size++] = '"';
-            if (interp->code->const_table->constants[op[j]]->
-                    u.string->strlen)
-            {
+            if (interp->code->const_table->constants[op[j]]-> u.string->strlen) {
                 char * const escaped =
                     PDB_escape(interp->code->const_table->
                            constants[op[j]]->u.string->strstart,
@@ -1675,6 +1673,9 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             dest[size++] = ']';
             break;
         case PARROT_ARG_KC:
+            {
+            PMC *k;
+
             dest[size-1] = '[';
             k            = interp->code->const_table->constants[op[j]]->u.key;
             while (k) {
@@ -1737,6 +1738,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
                     dest[size++] = ';';
             }
             dest[size++] = ']';
+            }
             break;
         case PARROT_ARG_KI:
             dest[size - 1] = '[';
