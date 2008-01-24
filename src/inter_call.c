@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -444,8 +444,10 @@ fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
         case PARROT_ARG_PMC:
             if (st->src.u.sig.sig[st->src.i] == 'O')
                 UVal_pmc(st->val) = CONTEXT(interp->ctx)->current_object;
-            else
+            else {
                 UVal_pmc(st->val) = va_arg(*ap, PMC*);
+                dod_register_pmc(interp, UVal_pmc(st->val));
+            }
 
             if (st->src.sig & PARROT_ARG_FLATTEN) {
                 int retval;
@@ -1561,8 +1563,11 @@ set_retval(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
             if (set_retval_util(interp, "S", ctx, &st))
                 return UVal_str(st.val);
         case 'P':
-            if (set_retval_util(interp, "P", ctx, &st))
-                return UVal_pmc(st.val);
+            if (set_retval_util(interp, "P", ctx, &st)) {
+                PMC *retval = UVal_pmc(st.val);
+                dod_unregister_pmc(interp, retval);
+                return (void *)retval;
+            }
         default:
             return NULL;
     }

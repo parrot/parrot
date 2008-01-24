@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -9,7 +9,7 @@ src/pmc/addrregistry.pmc - A DOD Registry PMC
 =head1 DESCRIPTION
 
 The AddrRegistry class provides the equivalence of reference counts
-mainly for extenders and embeders of Parrot. The hash keys are the
+mainly for extenders and embedders of Parrot. The hash keys are the
 addresses of the key PMC, values are reference counts, i.e. the
 difference of (set_pmc_keyed - delete_pmc_keyed). If the reference
 goes to zero, the entry is deleted physically.
