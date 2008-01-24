@@ -225,6 +225,11 @@ method literal($/, $key) {
     make $( $/{$key} );
 }
 
+method builtin_literal($/) {
+    my $past;
+    make $past;
+}
+
 method object_literal($/) {
     my $past := PAST::Op.new( :pasttype('call'), :node($/) );
     $past.name('ctor');

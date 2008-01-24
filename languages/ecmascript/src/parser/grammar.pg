@@ -175,6 +175,12 @@ token literal {
     | <str_literal> {*}            #= str_literal
     | <numeric_literal> {*}        #= numeric_literal
     | <object_literal> {*}         #= object_literal
+    | <builtin_literal> {*}        #= builtin_literal
+}
+
+token builtin_literal {
+    $<sym>=[true|false|null]
+    {*}
 }
 
 rule object_literal {
@@ -303,18 +309,6 @@ token singlelinecomment {
 ##    | <boolean_literal>
 ##}
 ##
-#### literals
-##rule literal {
-##    | <null_literal>
-##    | <boolean_literal>
-##    | <numeric_literal>
-##    | <string_literal>
-##}
-##
-##token null_literal {null}
-##
-##token boolean_literal {true|false}
-##
 ##
 ##token source_character { <alphanum> }
 ##
@@ -360,10 +354,6 @@ token singlelinecomment {
 ##}
 ##
 ##
-##token property_name {
-##    <identifier> | <string_literal> | <numeric_literal>
-##}
-##
 #### member expression
 ##rule member_expression {
 ##    | <primary_expression>
@@ -376,8 +366,6 @@ token singlelinecomment {
 ##rule new_expression { [new]* <member_expression> }
 ##
 ##rule call_expression { <member_expression> <arguments> [<arguments>| '[' <expression> ']' | '.' <identifier>]* }
-##
-##rule arguments { '(' [<assignment_expression> [ ',' <assignment_expression>]*]? ')' }
 ##
 ##rule left_hand_side_expression { <new_expression> | <call_expression> }
 ##
