@@ -133,9 +133,6 @@ $out = `$parrot languages/HQ9Plus/HQ9Plus.pbc $filename`;
 ok($out eq "Hello, world!\n", "check HQ9Plus");
 unlink($filename);
 
-TODO: {
-    local $TODO = "Class 'Rational' doesn't exist";
-
 $filename = 'test.l';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
@@ -144,7 +141,6 @@ close $FH;
 $out = `$parrot languages/lisp/lisp.pbc $filename`;
 ok($out eq "Hello, World!\n", "check lisp");
 unlink($filename);
-}
 
 $filename = 'test.lolcode';
 open $FH, '>', $filename
