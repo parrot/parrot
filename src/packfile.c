@@ -1372,7 +1372,7 @@ PackFile_Segment_new_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
         UINTVAL type, ARGIN(const char *name), int add)
 {
     PackFile * const pf = dir->base.pf;
-    PackFile_Segment_new_func_t f = pf->PackFuncs[type].new_seg;
+    const PackFile_Segment_new_func_t f = pf->PackFuncs[type].new_seg;
     PackFile_Segment * const seg = (f)(interp, pf, name, add);
 
     segment_init(seg, pf, name);
@@ -1941,9 +1941,7 @@ segment_init(ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
     self->size        = 0;
     self->data        = NULL;
     self->id          = 0;
-    self->name        = (char *)mem_sys_allocate(strlen(name) + 1);
-
-    strcpy(self->name, name);
+    self->name        = str_dup(name);
 }
 
 /*
