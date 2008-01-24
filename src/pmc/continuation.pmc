@@ -100,7 +100,7 @@ Destroys the continuation.
 */
 
     void destroy() {
-        Parrot_cont *cc = PMC_cont(SELF);
+        Parrot_cont * const cc = PMC_cont(SELF);
         if (cc) {
 #if CTX_LEAK_DEBUG
             if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
@@ -126,9 +126,9 @@ Creates and returns a clone of the continuation.
 */
 
     PMC *clone() {
-        Parrot_cont *cc_self = PMC_cont(SELF);
-        Parrot_cont *cc      = new_continuation(INTERP, cc_self);
-        PMC         *ret     = pmc_new_noinit(INTERP, enum_class_Continuation);
+        Parrot_cont * const cc_self = PMC_cont(SELF);
+        Parrot_cont * const cc      = new_continuation(INTERP, cc_self);
+        PMC         * const ret     = pmc_new_noinit(INTERP, enum_class_Continuation);
 
         PObj_custom_mark_destroy_SETALL(ret);
         cc->runloop_id       = cc_self->runloop_id;
@@ -167,14 +167,14 @@ dynamic state, and the descriptor address for any returned values.
 */
 
     void set_pointer(void *value) {
-        opcode_t    *pos  = (opcode_t *)value;
-        Parrot_cont *cc   = PMC_cont(SELF);
+        opcode_t    * const pos = (opcode_t *)value;
+        Parrot_cont * const cc  = PMC_cont(SELF);
 
         cc->address       = (opcode_t *)value;
         cc->dynamic_state = INTERP->dynamic_env;
         cc->runloop_id    = INTERP->current_runloop_id;
 
-        if (pos && *pos == PARROT_OP_get_results_pc)
+        if (pos && (*pos == PARROT_OP_get_results_pc))
             cc->current_results = pos;
         else
             cc->current_results = NULL;

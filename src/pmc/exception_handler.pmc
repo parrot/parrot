@@ -70,7 +70,7 @@ Initializes the exception handler.
      */
 
     void destroy() {
-        Parrot_cont *cc = PMC_cont(SELF);
+        Parrot_cont * const cc = PMC_cont(SELF);
 
         if (cc) {
             mem_sys_free(cc);
@@ -79,7 +79,7 @@ Initializes the exception handler.
     }
 
     PMC *clone() {
-        PMC *result = SUPER();
+        PMC * const result = SUPER();
         PObj_custom_mark_CLEAR(result);
         return result;
     }
