@@ -246,33 +246,31 @@ proto term: is tighter(infix:<=>) is parsed(&primary_expression) { ... }
 
 
 rule primary_expression {
-    #| <this> {*}                #= this
+    #| 'this' {*}                #= this
     | <literal> {*}             #= literal
-    #| <array_literal> {*}       #= array_literal
+    | <array_literal> {*}       #= array_literal
     | <identifier> {*}          #= identifier
     | <object_literal> {*}      #= object_literal
     | '(' <expression> ')' {*}  #= expression
 }
 
-token this {
-    'this' {*}
-}
 
 rule array_literal {
     '['
-    [ <elision>
-    | <element_list> [',' <elision>]?
-    ]
+    #[ <elision>
+    #| <element_list> [',' <elision>]?
+    #]
     ']'
     {*}
 }
 
 rule element_list {
     <elision> <assignment_expression> [',' <elision> <assignment_expression>]*
+    #{*}
 }
 
 rule elision {
-    [',']*
+    [$<comma>=',']* {*}
 }
 
 token identifier {

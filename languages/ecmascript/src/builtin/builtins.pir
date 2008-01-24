@@ -30,6 +30,13 @@
 .end
 
 
+.sub 'Array'
+    .param pmc args :slurpy
+    $P0 = new 'Array'
+    .return ($P0)
+.end
+
+
 ## built-in functions
 ##
 

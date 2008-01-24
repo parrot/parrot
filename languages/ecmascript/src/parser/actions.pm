@@ -258,7 +258,11 @@ method statements($/) {
 }
 
 method primary_expression($/, $key) {
-    make $( $/{$key} );
+    #if $key eq 'this' {
+    #}
+    #else {
+        make $( $/{$key} );
+    #}
 }
 
 method member_expression($/) {
@@ -328,6 +332,23 @@ method property_name($/, $key) {
     my $past := PAST::Op.new( :inline('    $S0 = %0'), :node($/) );
     $past.push($propname);
     make $past;
+}
+
+method array_literal($/) {
+    my $past := PAST::Op.new( :pasttype('call'), :name('Array'), :node($/) );
+
+    make $past;
+}
+
+method element_list($/) {
+
+}
+
+method elision($/) {
+    # return number of commas.
+    my $value := +$<comma>;
+    # print($value);
+    make PAST::Val.new( :value($value), :returns('Integer'), :node($/) );
 }
 
 method str_literal($/) {
