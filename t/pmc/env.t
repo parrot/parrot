@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Parrot::Config;
 
 =head1 NAME
@@ -217,6 +217,19 @@ pasm_output_is( <<'CODE', <<OUT, "getenv - null key" );
     print "not "
 OK: print "ok\n"
     end
+CODE
+ok
+OUT
+
+# RT#50186
+pir_output_is( <<'CODE', <<OUT, 'out of bounds query should not segfault' );
+.sub main :main
+    new P0, 'Env'
+    set S0, P0[999]
+    eq S0, "", OK
+    print "not "
+OK: print "ok\n"
+.end
 CODE
 ok
 OUT
