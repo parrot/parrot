@@ -283,8 +283,8 @@ method assignment_expression($/) {
 
 
 method expression($/) {
-   #make $( $<oexpr> );
-   make $( $<primary_expression> );
+   make $( $<oexpr> );
+   #make $( $<primary_expression> );
 }
 
 method identifier($/) {

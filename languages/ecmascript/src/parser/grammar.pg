@@ -179,11 +179,70 @@ rule assignment_expression {
 }
 
 rule expression {
-    <primary_expression>
+    #<primary_expression>
+    <oexpr>
     {*}
 }
 
 rule 'oexpr' is optable { ... }
+
+
+proto 'infix:=' is precedence('1') { ... }
+proto 'infix:*=' is equiv('infix:=') { ... }
+proto 'infix:/=' is equiv('infix:=') { ... }
+proto 'infix:%=' is equiv('infix:=') { ... }
+proto 'infix:+=' is equiv('infix:=') { ... }
+proto 'infix:-=' is equiv('infix:=') { ... }
+proto 'infix:<<=' is equiv('infix:=') { ...
+proto 'infix:>>=' is equiv('infix:=') { ...
+proto 'infix:>>>=' is equiv('infix:=') { ...
+proto 'infix:&=' is equiv('infix:=') { ... }
+proto 'infix:^=' is equiv('infix:=') { ... }
+proto 'infix:|=' is equiv('infix:=') { ... }
+
+proto 'postfix:++' is precedence('13') { ... }
+proto 'postfix:--' is equiv('postfix:++') { ... }
+
+proto 'prefix:delete' is precedence('12') { ... }
+proto 'prefix:void' is equiv('infix:delete') { ...
+proto 'prefix:typeof' is equiv('infix:delete') { ..
+proto 'prefix:++' is equiv('infix:delete') { ... }
+proto 'prefix:--' is equiv('infix:delete') { ... }
+proto 'prefix:+' is equiv('infix:delete') { ... }
+proto 'prefix:-' is equiv('infix:delete') { ... }
+proto 'prefix:~' is equiv('infix:delete') { ... }
+proto 'prefix:!' is equiv('infix:delete') { ... }
+
+proto 'infix:*' is precedence('11') { ... }
+proto 'infix:/' is equiv('infix:*') { ... }
+proto 'infix:%' is equiv('infix:*') { ... }
+
+proto 'infix:+' is precedence('10') { ... }
+proto 'infix:-' is equiv('infix:+') { ... }
+
+proto 'infix:<<' is precedence('9') { ... }
+proto 'infix:>>' is equiv('infix:<<') { ... }
+proto 'infix:>>>' is equiv('infix:<<') { ... }
+
+proto 'infix:<' is precedence('8') { ... }
+proto 'infix:>' is equiv('infix:<') { ... }
+proto 'infix:<=' is equiv('infix:<') { ... }
+proto 'infix:>=' is equiv('infix:<') { ... }
+proto 'infix:instanceof' is equiv('infix:<') { ...
+proto 'infix:in' is equiv('infix:<') { ... }
+
+proto 'infix:==' is precedence('7') { ... }
+proto 'infix:!=' is equiv('infix:==') { ... }
+proto 'infix:===' is equiv('infix:==') { ... }
+proto 'infix:!==' is equiv('infix:==') { ... }
+
+proto 'infix:&' is precedence('6') { ... }
+proto 'infix:^' is precedence('5') { ... }
+proto 'infix:|' is precedence('4') { ... }
+proto 'infix:||' is precedence('3') { ... }
+proto 'ternary:? :' is precedence('2') { ... }
+
+proto term: is tighter(infix:<=>) is parsed(&primary_expression) { ... }
 
 
 rule primary_expression {
@@ -204,6 +263,9 @@ token literal {
     | <builtin_literal> {*}        #= builtin_literal
 }
 
+
+## TODO: handle 'true', 'false' and 'null'
+##
 token builtin_literal {
     $<sym>=[true|false|null]
     {*}
@@ -329,11 +391,6 @@ token singlelinecomment {
     '//' \N* <newline>
 }
 
-#### keywords
-
-##    | <null_literal>
-##    | <boolean_literal>
-##}
 ##
 ##
 ##token source_character { <alphanum> }
@@ -421,12 +478,7 @@ token singlelinecomment {
 ##rule initializer_no_in { '=' <assignment_expression_no_in> }
 ##
 ##
-##rule expression_statement { <expression> ';' }  ##lookahead not e ({, function}) see pdf
-##
-##
 ##rule iteration_statement {
-##    | do <statement> while '(' <expression> ')' ';'
-##    | while '(' <expression> ')' <statement>
 ##    | for '(' <expression_no_in>? ';' <expression>? ';' <expression>? ')' <statement>
 ##    | for '(' var <variable_declaration_list_no_in> ';' <expression>? ';' <expression>? ')' <statement>
 ##    | for '(' <left_hand_side_expression> in <expression> ')' <statement>
@@ -439,13 +491,6 @@ token singlelinecomment {
 ##
 ##rule with_statement { with '(' <expression> ')' <statement> }
 ##
-##rule switch_statement { '(' <expression> ')' <case_block> }
-##
-##rule case_block { '{' <case_clause>* <default_clause>? <case_clause>* '}' }
-##
-##rule case_clause { case <expression> ':' <statement_list>? }
-##
-##rule default_clause { default ':' <statement_list>? }
 ##
 ##rule labelled_statement { <identifier> ':' <statement> }
 ##
