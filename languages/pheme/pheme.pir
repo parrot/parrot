@@ -28,7 +28,7 @@ object.
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pir'
+    load_bytecode 'Parrot/HLLCompiler.pbc'
     load_bytecode 'PAST-pm.pbc'
 
     $P0 = subclass 'PGE::Match', 'Match'
@@ -50,7 +50,7 @@ Start compilation by passing any command line C<args> to the Pheme compiler.
 
 .const int SEVERITY_SLOT = 2 # _severity
 
-.sub 'main' :main
+.sub 'main' :anon :main
     .param pmc args
 
     $P0 = compreg 'Pheme'

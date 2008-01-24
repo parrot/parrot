@@ -5,17 +5,6 @@ transform past (ROOT) :language('PIR') {
     result = new 'PAST::Block'
     result.'namespace'( 'Pheme' )
 
-    .local pmc load_op, lib_name
-    load_op  = new 'PAST::Op'
-    load_op.'init'( 'pasttype' => 'inline', 'inline' => "    load_bytecode 'lib/PhemeObjects.pir' #%r" )
-
-    result.'push'( load_op )
-
-    load_op  = new 'PAST::Op'
-    load_op.'init'( 'pasttype' => 'inline', 'inline' => "    load_bytecode 'lib/PhemeSymbols.pir' #%r" )
-
-    result.'push'( load_op )
-
     .local pmc lists
     lists = node['list']
 

@@ -1,6 +1,6 @@
 .namespace [ 'Pheme'; 'Cons' ]
 
-.sub _initialize :anon :load
+.sub _initialize :anon :load :init
 	.local pmc cons_class
 	newclass cons_class, [ 'Pheme'; 'Cons' ]
 
@@ -91,7 +91,7 @@
 
 .namespace [ 'Pheme'; 'Atom' ]
 
-.sub _initialize :anon :load
+.sub _initialize :anon :load :init
 	.local pmc atom_class
 	newclass atom_class, [ 'Pheme'; 'Atom' ]
 
@@ -100,7 +100,7 @@
 
 .namespace [ 'Pheme'; 'Atom'; 'Symbol' ]
 
-.sub _initialize :anon :load
+.sub _initialize :anon :load :init
 	.local pmc symbol_class
 	subclass symbol_class, [ 'Pheme'; 'Atom' ], [ 'Pheme'; 'Atom'; 'Symbol' ]
 .end

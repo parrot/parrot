@@ -1,6 +1,6 @@
 .namespace [ 'PhemeCompiler' ]
 
-.sub __onload :load :init
+.sub __onload :anon :load :init
 	.local pmc symbols
 	symbols = new 'Hash'
 

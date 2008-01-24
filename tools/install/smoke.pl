@@ -167,18 +167,14 @@ ok($out eq q{}, "check ook");
 $out = `$parrot --no-gc languages/perl6/perl6.pbc -e "say 'hello world'"`;
 ok($out eq "hello world\n", "check rakudo");
 
-TODO: {
-    local $TODO = "couldn't find file 'lib/PhemeObjects.pir'";
-
 $filename = 'test.l';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "( print \"Hello, World!\" )\n";
+print $FH "( write \"Hello, World!\\n\" )\n";
 close $FH;
 $out = `$parrot languages/pheme/pheme.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pheme");
 unlink($filename);
-}
 
 $out = `$parrot languages/plumhead/plumhead.pbc`;
 ok($out =~ /^usage/, "check plumhead");
