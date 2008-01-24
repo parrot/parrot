@@ -17,18 +17,31 @@
   end_print_loop:
 .end
 
-## TODO: change this name into something obscure.
-##
 ## constructor for a object literals. It takes advantages of
 ## the Parrot Calling Conventions using :slurpy and :named flags,
 ## meaning that the parameter C<fields> is a hash, which is kinda
 ## what we want. For now.
 ##
-.sub 'ctor'
+.sub 'Object'
     .param pmc fields :slurpy :named
     .return (fields)
 .end
 
+# start of methods Put and CanPut.
+# lots of work to do in JS' object model.
+#.sub 'Put' :method
+#    .param pmc P
+#    .param pmc V
+#    $I0 = self.'CanPut'(P)
+#    unless $I0 goto stop
+#
+#  stop:
+#    .return()
+#.end
+#
+#.sub 'CanPut' :method
+#
+#.end
 
 .sub 'Array'
     .param pmc args :slurpy

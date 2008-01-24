@@ -51,10 +51,9 @@ method statement($/, $key) {
 }
 
 method block($/) {
+    # XXX is a different block needed here? check JS scope rules.
     my $past := PAST::Block.new( :node($/), :blocktype('immediate') );
-    for $<statement> {
-        $past.push( $($_) );
-    }
+    $past.push( $( $<statements> ) );
     make $past;
 }
 
@@ -257,7 +256,27 @@ method statements($/) {
     make $past;
 }
 
+method with_statement($/) {
+    ## XXX incomplete
+    my $past;
+
+    my $expr := $( $<expression> );
+    # call GetValue on $expr (ecmascript reference p.68)
+    my $val  := PAST::Op.new( $expr, :name('GetValue'), :pasttype('call'), :node($/) );
+    # call ToObject on this result
+    my $obj  :=PAST::Op.new( $val, :name('ToObject'), :pasttype('call'), :node($/) );
+
+    # XXX how to add this obj to the "scope chain"??
+    my $stat := $( $<statement> );
+
+    # XXX for now, set past just to stat.
+    $past := $stat;
+
+    make $past;
+}
+
 method primary_expression($/, $key) {
+    # XXX handle "this"
     #if $key eq 'this' {
     #}
     #else {
@@ -299,13 +318,14 @@ method literal($/, $key) {
 }
 
 method builtin_literal($/) {
+    # XXX handle "true", "false" and "null"
     my $past;
     make $past;
 }
 
 method object_literal($/) {
     my $past := PAST::Op.new( :pasttype('call'), :node($/) );
-    $past.name('ctor');
+    $past.name('Object');
     for $<property> {
         $past.push( $($_) );
     }
@@ -315,6 +335,10 @@ method object_literal($/) {
 method property($/) {
     ## TODO: a property is a key/value pair. The value must be passed as a parameter
     ## and passed as a :named parameter using the key as a name.
+    ##
+    ## XXX figure out whether this is the way to go, or to use "setattribute", so use
+    ## parrot's actual object system instead of hashtables.
+    ##
     ## How to solve this, as property_name can be a value and a variable (but I think this is
     ## is supposed to be an auto-quoted identifier). Check manual.
     ## For now: this is broken, but it's a start.

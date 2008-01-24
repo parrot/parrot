@@ -50,10 +50,11 @@ rule statement {
     | <expression_statement> {*}  #= expression_statement
     | <return_statement> {*}      #= return_statement
     | <switch_statement> {*}      #= switch_statement
+    | <with_statement> {*}        #= with_statement
 }
 
 rule block {
-    '{' <statement>* '}' {*}
+    '{' <statements> '}' {*}
 }
 
 rule if_statement {
@@ -149,6 +150,12 @@ rule statements {
     <statement>*
     {*}
 }
+
+rule with_statement {
+    'with' '(' <expression> ')' <statement>
+    {*}
+}
+
 
 ##
 ## expressions
