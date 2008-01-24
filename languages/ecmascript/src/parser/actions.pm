@@ -129,10 +129,12 @@ method try_statement($/) {
 method catch($/) {
    my $past := $( $<block> );
    my $exid := $( $<identifier> );
-   ##
-   # HOW to use $exid.name() as a literal argument to .get_results ?
-   ##my $getexc := PAST::Op.new( $exid, :inline('    .get_results (%0)'), :node($/) );
-   $past.unshift($getexc);
+
+   ##  Add a catch node to the try op that captures the
+   ##  exception object into the declared identifier. Thanks to Rakudo for this trick.
+   my $catchpir := "    .get_results (%r, $S0)\n    store_lex '" ~ $exid.name() ~ "', %r";
+   $past.unshift( PAST::Op.new( :inline( $catchpir ) ) );
+
    make $past;
 }
 
