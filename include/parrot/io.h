@@ -450,7 +450,7 @@ PIOOFF_T PIO_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 /* HEADERIZER BEGIN: src/io/io_layers.c */
 
 PARROT_API
-void PIO_base_delete_layer(ARGIN_NULLOK(ParrotIOLayer *layer));
+void PIO_base_delete_layer(ARGMOD_NULLOK(ParrotIOLayer *layer));
 
 PARROT_API
 PARROT_MALLOC

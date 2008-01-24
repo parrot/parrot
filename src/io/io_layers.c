@@ -81,7 +81,7 @@ C<*layer>.
 
 PARROT_API
 void
-PIO_base_delete_layer(ARGIN_NULLOK(ParrotIOLayer *layer))
+PIO_base_delete_layer(ARGMOD_NULLOK(ParrotIOLayer *layer))
 {
     if (layer != NULL)
         mem_sys_free(layer);
