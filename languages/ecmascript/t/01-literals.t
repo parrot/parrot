@@ -1,4 +1,4 @@
-print("1..5\n")
+print("1..9\n")
 print("ok 1\n")
 
 try {
@@ -25,5 +25,13 @@ while (0) {
 
 print("ok 5\n")
 
-var x = 6, y;
-
+print("ok ")
+print(1+1+1+3)
+print("\n")
+print("ok ")
+print(10-3)
+print("\nok ")
+print(1*8)
+print("\nok ")
+print(18/2)
+print("\n")
