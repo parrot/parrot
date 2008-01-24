@@ -174,7 +174,7 @@ rule member_expression {
 }
 
 rule assignment_expression {
-    <primary_expression>
+    <expression>
     {*}
 }
 
@@ -213,9 +213,9 @@ proto 'prefix:-' is equiv('infix:delete') { ... }
 proto 'prefix:~' is equiv('infix:delete') { ... }
 proto 'prefix:!' is equiv('infix:delete') { ... }
 
-proto 'infix:*' is precedence('11') { ... }
-proto 'infix:/' is equiv('infix:*') { ... }
-proto 'infix:%' is equiv('infix:*') { ... }
+proto 'infix:*' is precedence('11') is pirop('n_mul') { ... }
+proto 'infix:/' is equiv('infix:*') is pirop('n_div') { ... }
+proto 'infix:%' is equiv('infix:*') is pirop('n_mod') { ... }
 
 proto 'infix:+' is precedence('10') is pirop('n_add') { ... }
 proto 'infix:-' is equiv('infix:+') is pirop('n_sub') { ... }
@@ -246,8 +246,33 @@ proto term: is tighter(infix:<=>) is parsed(&primary_expression) { ... }
 
 
 rule primary_expression {
-    | <literal> {*}      #= literal
-    | <identifier> {*}   #= identifier
+    #| <this> {*}                #= this
+    | <literal> {*}             #= literal
+    #| <array_literal> {*}       #= array_literal
+    | <identifier> {*}          #= identifier
+    | <object_literal> {*}      #= object_literal
+    | '(' <expression> ')' {*}  #= expression
+}
+
+token this {
+    'this' {*}
+}
+
+rule array_literal {
+    '['
+    [ <elision>
+    | <element_list> [',' <elision>]?
+    ]
+    ']'
+    {*}
+}
+
+rule element_list {
+    <elision> <assignment_expression> [',' <elision> <assignment_expression>]*
+}
+
+rule elision {
+    [',']*
 }
 
 token identifier {
@@ -259,7 +284,6 @@ token identifier {
 token literal {
     | <str_literal> {*}            #= str_literal
     | <numeric_literal> {*}        #= numeric_literal
-    | <object_literal> {*}         #= object_literal
     | <builtin_literal> {*}        #= builtin_literal
 }
 

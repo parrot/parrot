@@ -278,7 +278,7 @@ method call_expression($/) {
 }
 
 method assignment_expression($/) {
-    make $( $<primary_expression> );
+    make $( $<expression> );
 }
 
 
@@ -314,8 +314,8 @@ method property($/) {
     ## How to solve this, as property_name can be a value and a variable (but I think this is
     ## is supposed to be an auto-quoted identifier). Check manual.
     ## For now: this is broken, but it's a start.
-    my $prop := $( $<property_name> );
-    my $key  := PAST::Val.new( $prop.value(), :returns('String'), :node($/) );
+    my $key  := $( $<property_name> );
+    #my $key  := PAST::Val.new( $prop, :returns('String'), :node($/) );
     my $val  := $( $<expression> );
 
     $val.named($key);
@@ -324,7 +324,10 @@ method property($/) {
 
 
 method property_name($/, $key) {
-    make $( $/{$key} );
+    my $propname := $( $/{$key} );
+    my $past := PAST::Op.new( :inline('    $S0 = %0'), :node($/) );
+    $past.push($propname);
+    make $past;
 }
 
 method str_literal($/) {

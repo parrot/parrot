@@ -30,6 +30,38 @@
 .end
 
 
+## built-in functions
+##
+
+## probably add :vtable flag to these:
+##
+##.sub 'ToString' :multi(num)
+##    .param num arg
+##    #$P0 = new 'String'
+##    $S0 = arg
+##    .return ($S0)
+##.end
+##
+##.sub 'ToString' :multi(int)
+##    .param int arg
+##    #$P0 = new 'String'
+##    $S0 = arg
+##    .return ($S0)
+##.end
+##
+##.sub 'ToString' :multi(string)
+##    .param string arg
+##    .return (arg)
+##.end
+##
+##.sub 'ToString' :multi(_)
+##    .param pmc arg
+##    $S0 = arg
+##    .return ($S0)
+##.end
+
+
+
 ## built-in operators
 ##
 
