@@ -454,8 +454,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* predefined exceptions */
     mem_sys_free(interp->exception_list);
     destroy_exception_list(interp);
-    if (interp->evc_func_table)
+    if (interp->evc_func_table) {
         mem_sys_free(interp->evc_func_table);
+        interp->evc_func_table = NULL;
+    }
     /* strings, charsets, encodings - only once */
     string_deinit(interp);
     if (!interp->parent_interpreter) {
