@@ -37,7 +37,7 @@ SOURCES = \
   js.pir \
   src/gen_grammar.pir \
   src/gen_actions.pir \
-#  src/gen_builtins.pir \
+  src/builtin/builtins.pir \
 
 #PMCS = \
 #  jsobject \

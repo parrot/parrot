@@ -217,8 +217,8 @@ proto 'infix:*' is precedence('11') { ... }
 proto 'infix:/' is equiv('infix:*') { ... }
 proto 'infix:%' is equiv('infix:*') { ... }
 
-proto 'infix:+' is precedence('10') { ... }
-proto 'infix:-' is equiv('infix:+') { ... }
+proto 'infix:+' is precedence('10') is pirop('n_add') { ... }
+proto 'infix:-' is equiv('infix:+') is pirop('n_sub') { ... }
 
 proto 'infix:<<' is precedence('9') { ... }
 proto 'infix:>>' is equiv('infix:<<') { ... }

@@ -267,7 +267,7 @@ method member_expression($/) {
 
 method call_expression($/) {
     my $invocant := $( $<member_expression> );
-    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    my $past     := PAST::Op.new( :pasttype('call'), :node($/) );
     $past.push($invocant);
 
     my @args := $<arguments><assignment_expression>;
@@ -284,11 +284,10 @@ method assignment_expression($/) {
 
 method expression($/) {
    make $( $<oexpr> );
-   #make $( $<primary_expression> );
 }
 
 method identifier($/) {
-    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
+    make PAST::Var.new( :name(~$/), :scope('package'), :viviself('Undef'), :node($/) );
 }
 
 method literal($/, $key) {
@@ -316,8 +315,8 @@ method property($/) {
     ## is supposed to be an auto-quoted identifier). Check manual.
     ## For now: this is broken, but it's a start.
     my $prop := $( $<property_name> );
-    my $key := PAST::Val.new( $prop.value(), :returns('String'), :node($/) );
-    my $val := $( $<expression> );
+    my $key  := PAST::Val.new( $prop.value(), :returns('String'), :node($/) );
+    my $val  := $( $<expression> );
 
     $val.named($key);
     make $val;
