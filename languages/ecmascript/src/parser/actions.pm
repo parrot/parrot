@@ -129,12 +129,10 @@ method try_statement($/) {
 method catch($/) {
    my $past := $( $<block> );
    my $exid := $( $<identifier> );
-
    ##  Add a catch node to the try op that captures the
    ##  exception object into the declared identifier. Thanks to Rakudo for this trick.
    my $catchpir := "    .get_results (%r, $S0)\n    store_lex '" ~ $exid.name() ~ "', %r";
    $past.unshift( PAST::Op.new( :inline( $catchpir ) ) );
-
    make $past;
 }
 
@@ -185,6 +183,78 @@ method empty_statement($/) {
 
 method expression_statement($/) {
     make $( $<expression> );
+}
+
+
+method switch_statement($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+    my $expr := $( $<expression> );
+
+    for $<case_block><case_clause> {
+        # get the 'if' statement that implements the case semantics
+        my $case := $($_);
+        # set the switch expression as the second child of the
+        # condition of the 'if' statement, which is the first child
+        # at index 0.
+        $case[0].push($expr);
+
+        # add this case to the list of statements
+        $past.push($case);
+    }
+
+    if $<case_block><default_clause> {
+        my $defaultcase := $( $<case_block><default_clause>[0] );
+
+        # XXX what to do with it? How to execute this only if the other
+        # cases failed?
+        $past.push($defaultcase);
+    }
+
+    make $past;
+}
+
+
+method case_clause($/) {
+    ## XXX this needs rework.
+    ## How to fall through the cases?
+    ## How to exit when a "break" statement is parsed?
+    ##
+    my $expr := $( $<expression> );
+    my $past := PAST::Op.new( :pasttype('if'), :node($/) );
+
+    ## this is taken from rakudo:
+    my $match_past := PAST::Op.new( :name('infix:~~'),
+                                    :pasttype('call'),
+                                    :node($/)
+                                  );
+
+    # set the "case" expression as the first child of the infix:~~
+    # operator; the expression that is "matched" is available in
+    # the method "switch_statement".
+    $match_past.push($expr);
+
+    # set the (incomplete) match_past as the condition for the
+    # if statement. this will be completed in the top-level rule.
+    $past.push($match_past);
+
+    my $stmts := $( $<statements> );
+
+    # set this block of statements as the 'if' block.
+    $past.push($stmts);
+
+    make $past;
+}
+
+method default_clause($/) {
+    make $( $<statements> );
+}
+
+method statements($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<statement> {
+        $past.push( $($_) );
+    }
+    make $past;
 }
 
 method primary_expression($/, $key) {

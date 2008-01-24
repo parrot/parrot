@@ -49,6 +49,7 @@ rule statement {
     | <call_expression> {*}       #= call_expression
     | <expression_statement> {*}  #= expression_statement
     | <return_statement> {*}      #= return_statement
+    | <switch_statement> {*}      #= switch_statement
 }
 
 rule block {
@@ -86,8 +87,7 @@ rule try_statement {
 }
 
 rule catch {
-    'catch' '(' <identifier> ')' <block>
-    {*}
+    'catch' '(' <identifier> ')' <block> {*}
 }
 
 rule finally {
@@ -95,8 +95,7 @@ rule finally {
 }
 
 rule throw_statement {
-    'throw' \N <expression> ';'
-    {*}
+    'throw' \N <expression> ';' {*}
 }
 
 rule variable_statement {
@@ -115,12 +114,39 @@ rule empty_statement {
 
 rule expression_statement {
     ##<!['{'|'function']> ## is this necessary? isn't this fixed automatically by PGE?
-    <expression> ';'
-    {*}
+    <expression> ';' {*}
 }
 
 rule return_statement {
-    'return' \N <expression>? ';'
+    'return' \N <expression>? ';' {*}
+}
+
+rule switch_statement {
+    'switch' '(' <expression> ')' <case_block>
+    {*}
+}
+
+rule case_block {
+    '{'
+    <case_clause>*
+    [ <default_clause>
+      <case_clause>*
+    ]?
+    '}'
+}
+
+rule case_clause {
+    'case' <expression> ':' <statements>
+    {*}
+}
+
+rule default_clause {
+    'default' ':' <statements>
+    {*}
+}
+
+rule statements {
+    <statement>*
     {*}
 }
 
@@ -245,8 +271,8 @@ token str_literal {
 token keyword {
     [ break | case | catch | continue | default
     | delete | do | else | finally | for | function | if
-    | in | instance | new | return | this | throw | try | typeof
-    | var | void | while | with
+    | in | instance | new | return | switch | this | throw
+    | try | typeof | var | void | while | with
     ] >>
 }
 
