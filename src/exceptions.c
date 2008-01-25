@@ -47,11 +47,6 @@ static opcode_t * create_exception(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t dest2offset(PARROT_INTERP, ARGIN(const opcode_t *dest))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
@@ -643,39 +638,6 @@ rethrow_c_exception(PARROT_INTERP)
 
 /*
 
-=item C<static size_t dest2offset>
-
-Translate an absolute bytecode location to an offset used for resuming
-after an exception had occurred.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static size_t
-dest2offset(PARROT_INTERP, ARGIN(const opcode_t *dest))
-{
-    size_t offset;
-    /* translate an absolute location in byte_code to an offset
-     * used for resuming after an exception had occurred
-     */
-    switch (interp->run_core) {
-        case PARROT_SWITCH_CORE:
-        case PARROT_SWITCH_JIT_CORE:
-        case PARROT_CGP_CORE:
-        case PARROT_CGP_JIT_CORE:
-            offset = dest - (const opcode_t *)interp->code->prederef.code;
-            break;
-        default:
-            offset = dest - interp->code->base.data;
-            break;
-    }
-    return offset;
-}
-
-/*
-
 =item C<static opcode_t * create_exception>
 
 Create an exception.
@@ -742,7 +704,8 @@ handle_exception(PARROT_INTERP)
     if (!dest)
         PANIC(interp,"Unable to create exception");
 
-    return dest2offset(interp, dest);
+    /* return the *offset* of the handler */
+    return dest - interp->code->base.data;
 }
 
 /*
