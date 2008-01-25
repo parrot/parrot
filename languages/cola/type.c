@@ -66,7 +66,7 @@ void init_builtin_types() {
     t_uint64    = store_type("ulong", 8);
     t_short     = store_type("short", 2);
     t_ushort    = store_type("ushort", 2);
-    t_float     = store_type("float", 4);
+    t_float     = store_type("num", 4);
     t_double    = store_type("double", 8);
     t_decimal   = store_type("decimal", 8);
 }

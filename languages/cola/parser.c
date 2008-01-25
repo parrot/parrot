@@ -2380,7 +2380,7 @@ yyreduce:
 
   case 93:
 #line 646 "cola.y"
-    { (yyval.sym) = new_type_symbol("float"); }
+    { (yyval.sym) = new_type_symbol("num"); }
     break;
 
   case 95:

@@ -643,7 +643,7 @@ predefined_type:
     |   STRING
         { $$ = new_type_symbol("string"); }
     |   FLOAT
-        { $$ = new_type_symbol("float"); }
+        { $$ = new_type_symbol("num"); }
     |   integral_type
     ;
 
