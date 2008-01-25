@@ -72,12 +72,12 @@ nogen : gen$(O) semant$(O) sym$(O) type$(O)
 
 clean :
 	$(RM_F) \
-    core \
-    "*.obj" "*.pdb" "*.ilk" \
-    "*$(O)" \
-    parser.output \
-    colacc$(EXE) \
-    a.pir a.pasm
+  core \
+  "*.obj" "*.pdb" "*.ilk" \
+  "*$(O)" \
+  parser.output \
+  colacc$(EXE) \
+  a.pir a.pbc a.pasm
 
 # Don't run this target unless you have bison and flex installed.
 # These programs are needed for regenerating the removed files.
