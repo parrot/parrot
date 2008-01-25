@@ -18,13 +18,9 @@ you want to use in a file called F<t/harness>:
 
   # or
 
-  use Parrot::Test::Harness language => 'perl6', compiler => 'perl6.pbc';
-
-  # or
-
   use Parrot::Test::Harness
-      language => 'eclectus',
-      exec => [ 'petite', '--script' ],
+      language  => 'eclectus',
+      exec      => [ 'petite', '--script' ],
       arguments => [ '--files' ],
       files     => [ 't/*.pl' ];
 
@@ -68,9 +64,11 @@ use warnings;
 use Carp;
 use File::Spec;
 use Test::Harness;
+use List::Util;
 
 sub set_flags {
     my %options = @_;
+
     $ENV{HARNESS_VERBOSE} = 1;
     if ( $options{exec} ) {
         $ENV{HARNESS_PERL} ||= join q{ }, @{$options{exec}};
@@ -103,26 +101,29 @@ Nothing is printed. An array of file pathes is returned to the caller.
 
     if ( grep { /^--files$/ } @{ $options{arguments} } ) {
 
-        # --files indicates the 'languages/t/harness' wants a list of test files
+        # --files indicates that 'languages/t/harness' wants a list of test files
         my @files;
         {
             # file patterns are either passed from a <language>/t/harness,
-            # or a default is used
+            # or the default is used
             my @file_patterns =
                 ( $options{files} && ref $options{files} eq 'ARRAY' ) ?
                     @{ $options{files} }
                     :
                     ( 't/*.t', 't/*/*.t' );
-            foreach ( @file_patterns ) {
+            if ( List::Util::first { $_ eq '--master' } @{ $options{arguments} } ) {
                 # if --master is passed, add the language dir as a prefix
-                my $prefix = ( grep { /^--master$/ } @{ $options{arguments} } )
-                    ? $options{language}
-                    : '';
-                push @files, glob( File::Spec->catfile( $prefix . $_  ) ),
+                @files = map { glob( File::Spec->catfile( $options{language}, $_  ) ) 
+                             }
+                             @file_patterns;
+            }
+            else {
+                @files = map { glob( $_ ) 
+                             }
+                             @file_patterns;
             }
         }
-        print join( "\n", @files );
-        print "\n" if @files;
+        print map { $_ . "\n" } @files;
 
         exit;
     }
