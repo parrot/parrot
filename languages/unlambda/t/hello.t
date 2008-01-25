@@ -9,7 +9,7 @@ unlambda/t/hello.t - testing hello.unl
 
 	% cd languages && perl unlambda/t/hello.t
 
-	% cd languages && perl unlambda/t/hello.t
+	% cd languages/unlambda && perl t/hello.t
 
 =head1 DESCRIPTION
 
@@ -41,4 +41,4 @@ my $unlamba   = $parrot . q{ } . File::Spec->catfile( $FindBin::Bin,
 my $hello_unl = File::Spec->catfile( $FindBin::Bin,
                                      File::Spec->updir(),
                                      'hello.unl' ); 
-is ( `$unlamba $hello_unl`, "Hello world\n", 'hello.unl' );
+is( `$unlamba $hello_unl`, "Hello world\n", 'hello.unl' );

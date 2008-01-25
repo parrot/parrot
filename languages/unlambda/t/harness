@@ -1,43 +1,12 @@
+#! perl
+
 # $Id$
 
-=head1 NAME
-
-languages/unlambda/t/harness - A harness for unlambda 
-
-=head1 SYNOPSIS
-
-  cd languages/unlambda && perl t/harness
-
-  cd languages && perl -I../lib unlambda/t/harness --files
-
-=head1 DESCRIPTION
-
-If I'm called with a single
-argument of "--files", I just return a list of files to process.
-This list is one per line, and is relative to the languages dir.
-
-If I'm called with no args, I run the complete suite.
-
-Otherwise I run the tests that were passed on the command line.
-
-=cut
-
-# pragmata
 use strict;
 use warnings;
 use 5.008;
-use lib qw( ../lib ../../lib ../../lib );
+
+use FindBin ();
+use lib "$FindBin::Bin/../../../lib";
 
 use Parrot::Test::Harness language => 'unlambda';
-
-=head1 SEE ALSO
-
-  F<languages/perl6/t/harness>
-  F<languages/t/harness>
-  F<lib/Parrot/Test/Harness>
-
-=head1 AUTHOR
-
-Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
-
-=cut
