@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -92,7 +92,7 @@ runops(PARROT_INTERP, size_t offs)
             /* update profile for exception execution time */
             if (interp->profile &&
                     Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
-                RunProfile *profile = interp->profile;
+                RunProfile * const profile = interp->profile;
                 if (profile->cur_op == PARROT_PROF_EXCEPTION) {
                     profile->data[PARROT_PROF_EXCEPTION].time +=
                         Parrot_floatval_time() - profile->starttime;
