@@ -46,6 +46,21 @@ default :
 	$(MAKE) colacc$(EXE)
 	-$(CHMOD) 775 colacc$(EXE)
 
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  default  :         build 'colacc'"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
+	@echo ""
+	@echo "  help:              print this help message"
+
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=cola
@@ -102,4 +117,7 @@ gen$(O) : gen.c $(HEADERS)
 
 colacc$(EXE) : parser$(O) lexer$(O) gen$(O) semant$(O) sym$(O) type$(O)
 	$(CC) $(DEBUG) -o colacc$(EXE) parser$(O) lexer$(O) gen$(O) semant$(O) sym$(O) type$(O) $(LIBS)
+
+test: default
+	cd .. && $(PERL) t/harness --languages=cola
 
