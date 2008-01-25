@@ -249,7 +249,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const ENCODING*
-Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
+Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding)
 {
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
@@ -270,7 +270,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const char *
-Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
+Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;

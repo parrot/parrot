@@ -293,6 +293,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
     dest->strlen = dest_len;
     return dest;
 #else
+    UNUSED(src);
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
@@ -392,6 +393,7 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
         src->strlen = dest_len;
     }
 #else
+    UNUSED(src);
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
@@ -449,6 +451,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
     if (dest_len == (int)src->strlen)
         src->encoding = Parrot_ucs2_encoding_ptr;
 #else
+    UNUSED(src);
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
@@ -507,6 +510,7 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
     if (dest_len == (int)src->strlen)
         src->encoding = Parrot_ucs2_encoding_ptr;
 #else
+    UNUSED(src);
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif

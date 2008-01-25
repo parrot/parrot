@@ -1127,7 +1127,7 @@ Find the magic language token for a language, by language name.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language
-Parrot_find_language(PARROT_INTERP, SHIM(char *language))
+Parrot_find_language(SHIM_INTERP, SHIM(char *language))
 {
     return 0;
 }

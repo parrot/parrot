@@ -186,8 +186,7 @@ PMC* Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 PARROT_API
-void parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
-        __attribute__nonnull__(1)
+void parrot_new_pmc_hash(SHIM_INTERP, ARGOUT(PMC *container))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*container);
 

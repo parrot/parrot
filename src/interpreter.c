@@ -68,9 +68,8 @@ static oplib_init_f get_core_op_lib_init(PARROT_INTERP, int which)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static oplib_init_f get_dynamic_op_lib_init(PARROT_INTERP,
+static oplib_init_f get_dynamic_op_lib_init(SHIM_INTERP,
     ARGIN(const PMC *lib))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void init_prederef(PARROT_INTERP, int which)
@@ -397,7 +396,7 @@ C<lib> will be a C<ParrotLibrary> PMC.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
-get_dynamic_op_lib_init(PARROT_INTERP, ARGIN(const PMC *lib))
+get_dynamic_op_lib_init(SHIM_INTERP, ARGIN(const PMC *lib))
 {
     return (oplib_init_f) D2FPTR(PMC_struct_val(lib));
 }
@@ -556,7 +555,7 @@ Initializes JIT function for the specified opcode and returns it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
-init_jit(PARROT_INTERP, NULLOK(opcode_t *pc))
+init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
 {
 #if JIT_CAPABLE
     opcode_t *code_start;
@@ -586,7 +585,6 @@ init_jit(PARROT_INTERP, NULLOK(opcode_t *pc))
     return jit_info->arena.start;
 #else
     UNUSED(interp);
-    UNUSED(pc);
     return NULL;
 #endif
 }
@@ -739,6 +737,7 @@ runops_cgp(PARROT_INTERP, ARGIN(opcode_t *pc))
     pc = cgp_core(pc_prederef, interp);
     return pc;
 #else
+    UNUSED(pc);
     PIO_eprintf(interp,
             "Computed goto unavailable in this configuration.\n");
     Parrot_exit(interp, 1);

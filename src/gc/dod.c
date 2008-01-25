@@ -671,7 +671,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+Parrot_dod_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *p))
 {
     PMC    * const pmc        = (PMC *)p;
@@ -737,7 +737,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_sysmem(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+Parrot_dod_free_sysmem(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
     /* has sysmem allocated, e.g. string_pin */
@@ -759,7 +759,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_buffer_malloc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool),
+Parrot_dod_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
 
@@ -792,8 +792,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_buffer(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
-        ARGMOD(PObj *b))
+Parrot_dod_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
 {
     Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
 

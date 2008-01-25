@@ -238,8 +238,7 @@ PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_oo_get_namespace(PARROT_INTERP, ARGIN(const PMC *classobj))
-        __attribute__nonnull__(1)
+PMC * Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL

@@ -342,7 +342,7 @@ a sleep opcode.
 
 static int collect_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
-    int flag,
+    SHIM(int flag),
     ARGIN(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -789,7 +789,7 @@ RT#48260: Not yet documented!!!
 
 #if !defined(GC_IS_MALLOC) || !GC_IS_MALLOC
 static int
-collect_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
+collect_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag), ARGIN(void *arg))
 {
     const int check_only = (int)(INTVAL)arg;
     Memory_Pool * const mem_pool = pool->mem_pool;

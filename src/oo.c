@@ -198,7 +198,7 @@ Lookup a namespace object from a class PMC.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_get_namespace(PARROT_INTERP, ARGIN(const PMC *classobj))
+Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
 {
     Parrot_Class * const _class     = PARROT_CLASS(classobj);
     PMC          * const _namespace = _class->_namespace;
@@ -1659,6 +1659,7 @@ RT#48260: Not yet documented!!!
 #else
 #  define TRACE_FM(i, c, m, sub) \
     debug_trace_find_meth(i, c, m, sub)
+
 static void
 debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
         ARGIN(const STRING *name), ARGIN_NULLOK(const PMC *sub))

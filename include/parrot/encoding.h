@@ -83,9 +83,7 @@ const ENCODING * Parrot_default_encoding(SHIM_INTERP);
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const char * Parrot_encoding_c_name(PARROT_INTERP,
-    INTVAL number_of_encoding)
-        __attribute__nonnull__(1);
+const char * Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -122,9 +120,7 @@ encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const ENCODING* Parrot_get_encoding(PARROT_INTERP,
-    INTVAL number_of_encoding)
-        __attribute__nonnull__(1);
+const ENCODING* Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

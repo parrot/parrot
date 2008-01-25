@@ -236,7 +236,7 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
     };
 
     extern SPRINTF_OBJ pmc_core;
-    extern SPRINTF_OBJ va_core;
+    extern const SPRINTF_OBJ va_core;
 
 /* HEADERIZER BEGIN: src/spf_render.c */
 

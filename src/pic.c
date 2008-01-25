@@ -126,13 +126,12 @@ static void parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mic);
 
-static int pass_int(PARROT_INTERP,
+static int pass_int(SHIM_INTERP,
     ARGIN(const PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -154,13 +153,12 @@ static int pass_mixed(PARROT_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
-static int pass_num(PARROT_INTERP,
+static int pass_num(SHIM_INTERP,
     ARGIN(const PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -168,13 +166,12 @@ static int pass_num(PARROT_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
-static int pass_pmc(PARROT_INTERP,
+static int pass_pmc(SHIM_INTERP,
     ARGIN(const PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -182,13 +179,12 @@ static int pass_pmc(PARROT_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
-static int pass_str(PARROT_INTERP,
+static int pass_str(SHIM_INTERP,
     ARGIN(const PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -392,7 +388,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_int(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_int(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);
@@ -416,7 +412,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_num(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_num(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);
@@ -440,7 +436,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_str(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_str(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);
@@ -464,7 +460,7 @@ RT#48260: Not yet documented!!!
 */
 
 static int
-pass_pmc(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_pmc(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int n = SIG_ELEMS(sig);

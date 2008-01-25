@@ -117,8 +117,7 @@ Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-Parrot_Language Parrot_find_language(PARROT_INTERP, SHIM(char *language))
-        __attribute__nonnull__(1);
+Parrot_Language Parrot_find_language(SHIM_INTERP, SHIM(char *language));
 
 PARROT_API
 void Parrot_free_cstring(ARGIN_NULLOK(char *string));

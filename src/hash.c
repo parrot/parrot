@@ -633,7 +633,7 @@ Create a new Parrot STRING hash in PMC_struct_val(container)
 
 PARROT_API
 void
-parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
+parrot_new_pmc_hash(SHIM_INTERP, ARGOUT(PMC *container))
 {
     parrot_new_pmc_hash_x(container,
             enum_type_PMC,

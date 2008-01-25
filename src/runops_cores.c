@@ -90,6 +90,7 @@ runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     pc = cg_core(pc, interp);
     return pc;
 #else
+    UNUSED(pc);
     PIO_eprintf(interp,
             "Computed goto unavailable in this configuration.\n");
     Parrot_exit(interp, 1);

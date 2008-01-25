@@ -68,39 +68,31 @@ void Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
 void Parrot_dod_clear_live_bits(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_dod_free_buffer(PARROT_INTERP,
+void Parrot_dod_free_buffer(SHIM_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     ARGMOD(PObj *b))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*b);
 
-void Parrot_dod_free_buffer_malloc(PARROT_INTERP,
-    ARGIN(Small_Object_Pool *pool),
+void Parrot_dod_free_buffer_malloc(SHIM_INTERP,
+    SHIM(Small_Object_Pool *pool),
     ARGMOD(PObj *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*b);
 
 void Parrot_dod_free_pmc(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    SHIM(Small_Object_Pool *pool),
     ARGMOD(PObj *p))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*p);
 
-void Parrot_dod_free_sysmem(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+void Parrot_dod_free_sysmem(SHIM_INTERP,
+    SHIM(Small_Object_Pool *pool),
     ARGMOD(PObj *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*b);
 
 void Parrot_dod_ms_run(PARROT_INTERP, int flags)

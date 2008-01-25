@@ -26,26 +26,23 @@ This file implements the charset functions for binary data
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL compare(PARROT_INTERP,
+static INTVAL compare(SHIM_INTERP,
     SHIM(const STRING *lhs),
-    SHIM(const STRING *rhs))
-        __attribute__nonnull__(1);
+    SHIM(const STRING *rhs));
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
-static INTVAL cs_index(PARROT_INTERP,
+static INTVAL cs_index(SHIM_INTERP,
     SHIM(STRING *source_string),
     SHIM(STRING *search_string),
-    UINTVAL offset)
-        __attribute__nonnull__(1);
+    SHIM(UINTVAL offset));
 
-static INTVAL cs_rindex(PARROT_INTERP,
+static INTVAL cs_rindex(SHIM_INTERP,
     SHIM(STRING *source_string),
     SHIM(STRING *search_string),
-    UINTVAL offset)
-        __attribute__nonnull__(1);
+    SHIM(UINTVAL offset));
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* decompose(PARROT_INTERP, SHIM(STRING *source_string))
@@ -57,27 +54,22 @@ static void downcase(PARROT_INTERP, SHIM(STRING *source_string))
 static void downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
-static INTVAL find_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(STRING *source_string),
+static INTVAL find_cclass(SHIM_INTERP,
+    SHIM(INTVAL flags),
+    SHIM(STRING *source_string),
     UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+    UINTVAL count);
 
-static INTVAL find_not_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(STRING *source_string),
+static INTVAL find_not_cclass(SHIM_INTERP,
+    SHIM(INTVAL flags),
+    SHIM(STRING *source_string),
     UINTVAL offset,
-    UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+    UINTVAL count);
 
-static INTVAL is_cclass(PARROT_INTERP,
-    INTVAL flags,
+static INTVAL is_cclass(SHIM_INTERP,
+    SHIM(INTVAL flags),
     SHIM(const STRING *source_string),
-    UINTVAL offset)
-        __attribute__nonnull__(1);
+    SHIM(UINTVAL offset));
 
 static void set_graphemes(PARROT_INTERP,
     ARGIN(STRING *source_string),
@@ -114,9 +106,7 @@ static void upcase(PARROT_INTERP, SHIM(STRING *source_string))
 static void upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
-static UINTVAL validate(PARROT_INTERP, SHIM(STRING *source_string))
-        __attribute__nonnull__(1);
-
+static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 /* HEADERIZER END: static */
 
 #ifdef EXCEPTION
@@ -309,7 +299,7 @@ RT#48260: Not yet documented!!!
 */
 
 static INTVAL
-compare(PARROT_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))
+compare(SHIM_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))
 {
     return 0;
 }
@@ -325,8 +315,8 @@ RT#48260: Not yet documented!!!
 */
 
 static INTVAL
-cs_index(PARROT_INTERP, SHIM(STRING *source_string),
-        SHIM(STRING *search_string), UINTVAL offset)
+cs_index(SHIM_INTERP, SHIM(STRING *source_string),
+        SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
     return -1;
 }
@@ -342,8 +332,8 @@ RT#48260: Not yet documented!!!
 */
 
 static INTVAL
-cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
-        SHIM(STRING *search_string), UINTVAL offset)
+cs_rindex(SHIM_INTERP, SHIM(STRING *source_string),
+        SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
     return -1;
 }
@@ -360,7 +350,7 @@ RT#48260: Not yet documented!!!
 
 /* Binary's always valid */
 static UINTVAL
-validate(PARROT_INTERP, SHIM(STRING *source_string))
+validate(SHIM_INTERP, SHIM(STRING *source_string))
 {
     return 1;
 }
@@ -376,7 +366,8 @@ RT#48260: Not yet documented!!!
 */
 
 static INTVAL
-is_cclass(PARROT_INTERP, INTVAL flags, SHIM(const STRING *source_string), UINTVAL offset)
+is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
+        SHIM(UINTVAL offset))
 {
     return 0;
 }
@@ -392,8 +383,8 @@ RT#48260: Not yet documented!!!
 */
 
 static INTVAL
-find_cclass(PARROT_INTERP, INTVAL flags,
-            ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
+find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
+            SHIM(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }
@@ -409,8 +400,8 @@ RT#48260: Not yet documented!!!
 */
 
 static INTVAL
-find_not_cclass(PARROT_INTERP, INTVAL flags,
-                ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
+find_not_cclass(SHIM_INTERP, SHIM(INTVAL flags),
+               SHIM(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }

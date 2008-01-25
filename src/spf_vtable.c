@@ -33,7 +33,7 @@ retrieve arguments.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING * getchr_pmc(PARROT_INTERP,
-    INTVAL size,
+    SHIM(INTVAL size),
     ARGMOD(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -42,7 +42,7 @@ static STRING * getchr_pmc(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING * getchr_va(PARROT_INTERP,
-    INTVAL size,
+    SHIM(INTVAL size),
     ARGIN(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -78,23 +78,22 @@ static HUGEINTVAL getint_va(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void * getptr_pmc(PARROT_INTERP,
-    INTVAL size,
-    ARGIN(SPRINTF_OBJ *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static void * getptr_va(PARROT_INTERP,
     SHIM(INTVAL size),
     ARGIN(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static void * getptr_va(SHIM_INTERP,
+    SHIM(INTVAL size),
+    ARGIN(SPRINTF_OBJ *obj))
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * getstring_pmc(PARROT_INTERP,
-    INTVAL size,
+    SHIM(INTVAL size),
     ARGIN(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -139,7 +138,7 @@ C<size> is unused.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING *
-getchr_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
+getchr_va(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -362,14 +361,14 @@ C<size> is unused.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void *
-getptr_va(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
+getptr_va(SHIM_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
     va_list * const arg = (va_list *)(obj->data);
 
     return (void *)va_arg(*arg, void *);
 }
 
-SPRINTF_OBJ va_core = {
+const SPRINTF_OBJ va_core = {
     NULL, 0, getchr_va, getint_va, getuint_va,
     getfloat_va, getstring_va, getptr_va
 };
@@ -394,7 +393,7 @@ from C<obj>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING *
-getchr_pmc(PARROT_INTERP, INTVAL size, ARGMOD(SPRINTF_OBJ *obj))
+getchr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGMOD(SPRINTF_OBJ *obj))
 {
     STRING *s;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
@@ -532,7 +531,7 @@ from C<obj>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-getstring_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
+getstring_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
     STRING *s;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
@@ -558,7 +557,7 @@ from C<obj>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void *
-getptr_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
+getptr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data), (obj->index));
