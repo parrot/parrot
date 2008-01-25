@@ -600,6 +600,8 @@ rethrow_exception(PARROT_INTERP, ARGIN(PMC *exception))
     if (exception->vtable->base_type != enum_class_Exception)
         PANIC(interp, "Illegal rethrow");
     handler = find_exception_handler(interp, exception);
+    if (!handler)
+        PANIC(interp, "No exception handler found");
     address = VTABLE_invoke(interp, handler, exception);
     /* return the address of the handler */
     return address;
@@ -664,8 +666,10 @@ dest2offset(PARROT_INTERP, ARGIN(const opcode_t *dest))
         case PARROT_CGP_CORE:
         case PARROT_CGP_JIT_CORE:
             offset = dest - (const opcode_t *)interp->code->prederef.code;
+            break;
         default:
             offset = dest - interp->code->base.data;
+            break;
     }
     return offset;
 }
@@ -735,8 +739,8 @@ handle_exception(PARROT_INTERP)
     /* absolute address of handler */
     const opcode_t * const dest = create_exception(interp);
 
-    /* XXX We don't know that dest will be non-NULL, and it's not legal */
-    /* to pass NULL to dest2offset. */
+    if (!dest)
+        PANIC(interp,"Unable to create exception");
 
     return dest2offset(interp, dest);
 }
