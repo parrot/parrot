@@ -2,6 +2,7 @@
 
 # $Id$
 
-use FindBin;
 use lib qw( . lib ../lib ../../lib ../../lib );
-use Parrot::Test::Harness language => 'abc', compiler => 'abc.pbc';
+
+use Parrot::Test::Harness language => 'abc',
+                          compiler => 'abc.pbc';
