@@ -2,7 +2,12 @@
 
 # $Id$
 
-use lib qw( . lib ../lib ../../lib ../../lib );
+# pragmata
+use strict;
+use warnings;
+use 5.008;
+
+use lib qw( ../lib ../../lib );
 
 use Parrot::Test::Harness language => 'abc',
                           compiler => 'abc.pbc';
