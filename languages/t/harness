@@ -88,28 +88,20 @@ my @unified_testable_languages
     = defined $languages_list ?
           split( /\s*,\s*/, $languages_list )
           : 
-          qw( abc
-              APL
-              befunge
-              bf
+          qw( abc APL
+              befunge bf
               dotnet
               eclectus
               HQ9plus
               jako
-              lazy-k
-              lisp
-              lua
+              lazy-k lisp lua
               m4
               ook
-              parrot_compiler
-              PIR
-              plumhead
-              punie
+              parrot_compiler PIR plumhead punie
               regex
               scheme
               tcl
-              unlambda
-              urm
+              unlambda urm
               WMLScript
               Zcode
             );
