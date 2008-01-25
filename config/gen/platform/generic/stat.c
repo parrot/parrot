@@ -154,14 +154,12 @@ INTVAL
 Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 {
     struct stat statbuf;
-    char *filename;
-    int status;
 
     /* Get the name of the file as something we can use */
-    filename = string_to_cstring(interp, file);
+    char * const filename = string_to_cstring(interp, file);
 
     /* Everything needs the result of stat, so just go do it */
-    status = stat(filename, &statbuf);
+    const int status = stat(filename, &statbuf);
     string_cstring_free(filename);
     return stat_common(interp, &statbuf, thing, status);
 }
