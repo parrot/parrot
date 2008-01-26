@@ -35,7 +35,7 @@ method function_declaration($/) {
     make $past
 }
 
-method function_expression($/) {
+method function_expression( $/) {
     my $past := $( $<function_common> );
     if $<identifier> {
         my $id := $( $<identifier>[0] );
@@ -58,9 +58,9 @@ method block($/) {
 }
 
 method if_statement($/) {
-    my $past := PAST::Op.new( :pasttype('if'), :node($/) );
-    $past.push( $( $<expression> ) );
-    $past.push( $( $<statement> ) );
+    my $cond := $( $<expression> );
+    my $then := $( $<statement> );
+    my $past := PAST::Op.new( $cond, $then, :pasttype('if'), :node($/) );
     if $<else> {
         $past.push( $( $<else>[0] ) );
     }
@@ -211,6 +211,7 @@ method expression_statement($/) {
 
 
 method switch_statement($/) {
+    # XXX fix this.
     my $past := PAST::Stmts.new( :node($/) );
     my $expr := $( $<expression> );
 
