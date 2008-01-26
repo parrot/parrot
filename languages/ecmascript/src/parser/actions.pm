@@ -350,7 +350,15 @@ method assignment_expression($/) {
 }
 
 method conditional_expression($/) {
-    make $( $<logical_or_expression> );
+    my $past := $( $<logical_or_expression> );
+    if $<then> {
+        $past := PAST::Op.new(  $past,
+                                $( $<then>[0] ),
+                                $( $<else>[0] ),
+                                :pasttype('if'),
+                                :node($/) );
+    }
+    make $past;
 }
 
 method unary_expression($/) {
@@ -416,12 +424,6 @@ method lhs_expression($/, $key) {
 method member_expression($/) {
     my $member := $( $<member> );
     if $<arguments> {
-        # $<member> is the invocant
-        ##my $past := PAST::Op.new( $member, :pasttype('call'), :node($/) );
-        ##my @args := $<arguments><assignment_expression>;
-        ##for @args {
-        ##    $past.push( $($_) );
-        ##}
         my $past := $( $<arguments> );
         # set $member as the first child which implies it's the invocant.
         $past.unshift($member);
@@ -484,10 +486,23 @@ method literal($/, $key) {
     make $( $/{$key} );
 }
 
-method builtin_literal($/) {
-    # XXX handle "true", "false" and "null"
-    my $past;
-    make $past;
+method builtin_literal($/, $key) {
+    make $( $/{$key} );
+}
+
+method true($/) {
+    # change this into type 'Boolean' or whatever
+    make PAST::Val.new( :returns('Integer'), :value('1'), :node($/) );
+}
+
+method false($/) {
+    # change this into type 'Boolean' or whatever
+    make PAST::Val.new( :returns('Integer'), :value('0'), :node($/) );
+}
+
+method null($/) {
+    # would this work?
+    make PAST::Var.new( :name('null'), :scope('package'), :node($/) );
 }
 
 method object_literal($/) {
@@ -538,7 +553,6 @@ method element_list($/) {
 method elision($/) {
     # return number of commas.
     my $value := +$<comma>;
-    # print($value);
     make PAST::Val.new( :value($value), :returns('Integer'), :node($/) );
 }
 

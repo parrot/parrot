@@ -261,12 +261,15 @@ token literal {
 }
 
 
-## TODO: handle 'true', 'false' and 'null'
-##
 token builtin_literal {
-    $<sym>=[true|false|null]
-    {*}
+    | <true> {*}   #= true
+    | <false> {*}  #= false
+    | <null> {*}   #= null
 }
+
+token true { 'true' {*} }
+token false { 'false' {*} }
+token null { 'null' {*} }
 
 rule object_literal {
     '{' [<property> [',' <property>]* ]? '}'
@@ -313,8 +316,7 @@ token integer_number {
 }
 
 token decimal_integer_literal {
-    | 0
-    | <[1..9]> <digit>*
+    0 | <[1..9]> <digit>*
 }
 
 token exponent_part { <[eE]> <[+\-]> <digit>+ }
@@ -347,8 +349,7 @@ token future_reserved_word {
 }
 
 token reserved_word {
-    | <keyword>
-    | <future_reserved_word>
+    <keyword> | <future_reserved_word>
 }
 
 
@@ -404,7 +405,9 @@ rule assignop {
 }
 
 rule conditional_expression {
-    <logical_or_expression> ['?' <assignment_expression> ':' <assignment_expression>]?
+    <logical_or_expression>
+    ['?' $<then>=<assignment_expression>
+     ':' $<else>=<assignment_expression>]?
     {*}
 }
 
