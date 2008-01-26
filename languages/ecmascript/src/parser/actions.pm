@@ -442,7 +442,6 @@ method member($/) {
     }
 
     for $<index> {
-        # XXX check this.
         my $idx := $( $_ );
         $idx.unshift($past);
         $past := $idx;
@@ -452,7 +451,21 @@ method member($/) {
 }
 
 method index($/, $key) {
-    make $( $/{$key} );
+    # get the index expression
+    my $idx := $( $/{$key} );
+    # create a keyed access operation, setting the expression as a child
+    # the object to be indexed will be unshifted on this node, effectively
+    # acting as the container (the first child). Neat huh?
+    my $past := PAST::Var.new( $idx, :scope('keyed'), :node($/) );
+
+    # XXX Maybe an index should be handled by an operation, so that the
+    # past must become a PAST::Op( :pasttype('call') ... ). Think of this later.
+    make $past;
+}
+
+method identifier_field($/) {
+    my $id := $( $<identifier> );
+    make PAST::Val.new( :returns('String'), :value($id.name()), :node($/) );
 }
 
 method new_expression($/) {

@@ -521,7 +521,11 @@ rule member_expression {
 
 rule index {
     | '[' <expression> ']' {*} #= expression
-    | '.' <identifier> {*}     #= identifier
+    | <identifier_field> {*}   #= identifier_field
+}
+
+rule identifier_field {
+    '.' <identifier> {*}
 }
 
 rule member {
