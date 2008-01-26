@@ -34,7 +34,6 @@ LANGUAGES = \
     m4 \
     ook \
     parrot_compiler \
-    perl5 \
     perl6 \
     pheme \
     plumhead \
@@ -115,7 +114,6 @@ clean: \
     m4.clean \
     ook.clean \
     parrot_compiler.clean \
-    perl5.clean \
     perl6.clean \
     pheme.clean \
     plumhead.clean \
@@ -330,14 +328,6 @@ parrot_compiler.test:
 	- $(MAKE) parrot_compiler test
 parrot_compiler.clean:
 	- $(MAKE) parrot_compiler clean
-
-perl5 : perl5.dummy
-perl5.dummy:
-	- $(MAKE) perl5
-perl5.test:
-	- $(MAKE) perl5 test
-perl5.clean:
-	- $(MAKE) perl5 clean
 
 perl6 : perl6.dummy
 perl6.dummy:

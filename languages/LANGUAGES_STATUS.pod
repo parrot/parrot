@@ -690,21 +690,6 @@ C<languages/parrot_compiler>
 =back
 
 
-=head2 Perl 5
-
-=over 4
-
-=item Description
-
-Primarily a repository for some perl5-specific functionality that was
-heavily used in early parrot development. This code is not slated for use
-with the Perl 6 implementation, and core parrot PMCs exist that provide
-much of the functionality here.
-
-This directory may be removed in a future release.
-
-=back
-
 
 =head2 Perl 6 parser/compiler
 
@@ -1161,6 +1146,11 @@ C<languages/BASIC/interpreter> prior to 0.5.1.
 
 The version at L<http://rubyforge.org/projects/cardinal/> has been superseded
 by the one in the repository. (See above)
+
+=head2 Perl 5
+
+From r16836 up to r25231 F<languages/perl5> served as a repository 
+for some Perl 5 - specific functionality that was heavily used in early parrot development.
 
 =head2 Pint
 
