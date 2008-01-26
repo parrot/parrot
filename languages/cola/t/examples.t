@@ -30,7 +30,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More        tests => 1;
+use Test::More        tests => 2;
 use Parrot::Config;
 use File::Spec        ();
 
@@ -69,6 +69,33 @@ my %expected = (
 ...........::::::::::::::::::::::::::::::::::::::::::::::::::::::..........
 END_EXPECTED
 
+    'fib' => << 'END_EXPECTED',
+Algorithm F2 (Fibonacci's function)
+  Calculating fib(24) = ...
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+  ... = 46368
+END_EXPECTED
 );
 
 my $cola_dir  = File::Spec->catfile( $FindBin::Bin,
