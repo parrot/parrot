@@ -1,11 +1,7 @@
 #! perl
+
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 1;
 
 =head1 NAME
 
@@ -28,6 +24,15 @@ F<languages/jako/t/examples.t>
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../lib";
+
+use Test::More        tests => 1;
+use Parrot::Config;
+use File::Spec        ();
 
 # Set up expected output for examples
 my %expected = (
@@ -66,9 +71,15 @@ END_EXPECTED
 
 );
 
+my $cola_dir  = File::Spec->catfile( $FindBin::Bin,
+                                     File::Spec->updir() );
+my $parrot    = File::Spec->catfile( File::Spec->updir(),
+                                     File::Spec->updir(),
+                                     $PConfig{test_prog} );
+
 while ( my ( $example, $expected ) = each %expected ) {
-    system( "cd cola ; ./colacc examples/$example.cola" );
-    is( `cd cola; ../../parrot a.pir`, $expected );
+    system( "cd $cola_dir; ./colacc examples/$example.cola" );
+    is( `cd $cola_dir; $parrot a.pir`, $expected );
 }
 
 # Local Variables:
