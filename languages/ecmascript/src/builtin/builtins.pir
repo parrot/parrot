@@ -92,6 +92,19 @@
     .return (lhs)
 .end
 
+.sub 'postfix:++'
+    .param pmc a
+    $P0 = clone a
+    inc a
+    .return ($P0)
+.end
+
+.sub 'postfix:--'
+    .param pmc a
+    $P0 = clone a
+    dec a
+    .return ($P0)
+.end
 
 # Local Variables:
 #   mode: pir

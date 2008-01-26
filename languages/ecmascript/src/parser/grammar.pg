@@ -501,7 +501,8 @@ rule unop { $<op>=['delete'|'void'|'typeof'|'+'|'-'|'++'|'--'|'~'|'!']>> {*} }
 proto term: is tighter(infix:<||>) is parsed(&unary_expression) { ... }
 
 rule postfix_expression {
-    <lhs_expression> [\N $<postfixop>=['++'|'--'] ]?
+    # how to handle the requirement of NO linebreak? \N doesn't seem to work.
+    <lhs_expression> [ $<postfixop>=['++'|'--'] ]?
     {*}
 }
 
