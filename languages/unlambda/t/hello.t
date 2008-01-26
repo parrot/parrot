@@ -40,5 +40,6 @@ my $unlamba   = $parrot . q{ } . File::Spec->catfile( $FindBin::Bin,
 
 my $hello_unl = File::Spec->catfile( $FindBin::Bin,
                                      File::Spec->updir(),
+                                     'examples',
                                      'hello.unl' ); 
 is( `$unlamba $hello_unl`, "Hello world\n", 'hello.unl' );
