@@ -43,10 +43,10 @@ rule formal_parameter_list {
 ##
 
 rule statement {
+    | <expression_statement> {*}  #= expression_statement
     | <block> {*}                 #= block
     | <variable_statement> {*}    #= variable_statement
     | <empty_statement> {*}       #= empty_statement
-    | <expression_statement> {*}  #= expression_statement
     | <if_statement> {*}          #= if_statement
     | <while_statement> {*}       #= while_statement
     | <do_while_statement> {*}    #= do_while_statement
@@ -397,7 +397,7 @@ rule assignment_expression {
     {*}
 }
 
-token assignop {
+rule assignop {
     $<op>=['='|'*='|'/='|'%='|'+='|'-='|'<<='|'>>='|'>>>='|'&='|'^='|'|=']
 }
 

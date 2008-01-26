@@ -309,9 +309,6 @@ method primary_expression($/, $key) {
     #}
 }
 
-#method member_expression($/) {
-#    make $( $<primary_expression> );
-#}
 
 method call_expression($/) {
     my $invocant := $( $<member_expression> );
@@ -336,10 +333,22 @@ method post_call_expr($/, $key) {
 }
 
 method assignment_expression($/) {
-   # make $( $<expression> );
-   my $past;
-   $past := $( $<conditional_expression> );
-   make $past;
+    my $past := $( $<conditional_expression> );
+
+    # get number of lhs_expressions
+    my $lhsexpr := +$<lhs_expression>;
+
+    # assignments such as 'a=b=c' are evaluated from right to left
+    # first c is assigned to b, that result (b) is assigned to a.
+    # therefore, loop through the array backwards.
+    while $lhsexpr != 0 {
+        # generate the name of the assignment operator
+        my $op  := 'infix:' ~ ~$<assignop>[$lhsexpr - 1];
+        my $lhs := $( $<lhs_expression>[$lhsexpr - 1] );
+        $past := PAST::Op.new( $lhs, $past, :name($op), :pasttype('call'), :node($/) );
+        $lhsexpr := $lhsexpr - 1;
+    }
+    make $past;
 }
 
 method conditional_expression($/) {
@@ -363,6 +372,7 @@ method unary_expression($/) {
 }
 
 method unop($/) {
+    # create a call op to invoke the specified unary operand.
     my $operator := 'prefix:' ~ ~$<op>;
     make PAST::Op.new( :name($operator), :pasttype('call'), :node($/) );
 }
@@ -370,31 +380,49 @@ method unop($/) {
 method postfix_expression($/) {
     my $past := $( $<lhs_expression> );
     if $<postfixop> {
-        if $<postfixop>[0] eq '++' {
-
-        }
-        elsif $<postfixop>[0] eq '--' {
-
-        }
+        # create a string "postfix:++" or "postfix:--"
+        my $postfixop := 'postfix:' ~ ~$<postfixop>[0];
+        # create an invocation of this operator, providing
+        # the <lhs_expression> as its operand
+        $past := PAST::Op.new( $past,
+                               :pasttype('call'),
+                               :name($postfixop),
+                               :node($/)
+                             );
     }
     make $past;
 }
 
 method expression($/) {
-   # XXX handle comma operator and other assignment_expressions
-   # for $<assignment_expression {
-   #   $( $_ );
-   # }
-   make $( $<assignment_expression>[0] );
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<assignment_expression> {
+        $past.push( $( $_ ) );
+    }
+    make $past;
 }
 
+#######
 method lhs_expression($/, $key) {
     make $( $/{$key} );
 }
 
 method member_expression($/) {
-    make $( $<member> );
+    my $member := $( $<member> );
+    if $<arguments> {
+        # $<member> is the invocant
+        my $past := PAST::Op.new( $member, :pasttype('call'), :node($/) );
+        my @args := $<arguments><assignment_expression>;
+        for @args {
+            $past.push( $($_) );
+        }
+        make $past;
+    }
+    else {
+        make $member;
+    }
 }
+
+
 
 method member($/) {
     my $past;
@@ -527,5 +555,5 @@ method logical_or_expression($/, $key) {
         }
         make $past;
     }
-
 }
+
