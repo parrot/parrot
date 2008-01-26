@@ -10,9 +10,10 @@
 grammar JS::Grammar is PCT::Grammar;
 
 token TOP {
+    {*}                            #= open
     <source_element>*
     [ $ || <panic: Syntax error> ]
-    {*}
+    {*}                            #= close
 }
 
 rule source_element {

@@ -2,12 +2,24 @@
 # $Id$
 class JS::Grammar::Actions;
 
-method TOP($/) {
-    my $past := PAST::Block.new( :node($/), :blocktype('declaration') );
-    for $<source_element> {
-        $past.push( $( $_ ) );
+method TOP($/, $key) {
+    our $?BLOCK;
+    our @?BLOCK;
+
+    if $key eq 'open' {
+        # create a 'global' block and stuff it into a 'stack' of blocks.
+        $?BLOCK := PAST::Block.new( :node($/) );
+
+        # XXX unshift doesn't work?
+        #@?BLOCK.unshift($?BLOCK);
     }
-    make $past;
+    elsif $key eq 'close' {
+        my $past := PAST::Block.new( :node($/), :blocktype('declaration') );
+        for $<source_element> {
+            $past.push( $( $_ ) );
+        }
+        make $past;
+    }
 }
 
 method source_element($/, $key) {
@@ -182,21 +194,35 @@ method return_statement($/) {
 method variable_statement($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<variable_declaration> {
-        $past.push( $($_) );
+        my $var := $($_);
+        $past.push( $var );
     }
     make $past;
 }
 
 method variable_declaration($/) {
+    our $?BLOCK;
     my $var := $( $<identifier> );
     $var.isdecl(1);
-    $var.scope('package'); # fix this; change into lexical should we add this to a symbol table?
+    $var.scope('lexical');
+    my $name := $var.name();
+
+    # enter the symbol into the current block's symbol table
+    if $?BLOCK.symbol( $name ) {
+        # already exists; warning/error? XXX check ref. manual.
+        print("Warning: symbol '" ~ $name ~ "' already exists!\n");
+    }
+    else {
+        $?BLOCK.symbol( $name, :scope('lexical') );
+    }
+
+    # handle initialization value
     if $<assignment_expression> {
         my $initval := $( $<assignment_expression>[0] );
         $var.viviself($initval);
     }
     else {
-        $var.viviself('Undef');
+        $var.viviself('Undef'); # should be JavaScript undefined.
     }
     make $var;
 }
