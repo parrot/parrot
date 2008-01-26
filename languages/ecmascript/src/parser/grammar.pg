@@ -216,10 +216,11 @@ rule function_expression {
 
 rule arguments {
     '(' [ <assignment_expression> [',' <assignment_expression>]* ]? ')'
+    {*}
 }
 
 rule primary_expression {
-    #| 'this' {*}                #= this
+    | <this> {*}                #= this
     | <literal> {*}             #= literal
     | <array_literal> {*}       #= array_literal
     | <identifier> {*}          #= identifier
@@ -227,6 +228,7 @@ rule primary_expression {
     | '(' <expression> ')' {*}  #= expression
 }
 
+token this { 'this' {*} }
 
 rule array_literal {
     '['
@@ -501,18 +503,18 @@ rule postfix_expression {
 }
 
 rule lhs_expression {
-    | <new_expression> {*}  #= new_expression
     | <call_expression> {*} #= call_expression
+    | <new_expression> {*}  #= new_expression
 }
 
 rule new_expression {
-    [new]* <member_expression>
+    [$<sym>='new']* <member_expression>
     {*}
 }
 
 rule member_expression {
-    [ <member>  {*}
-    | 'new' <member> <arguments>
+    [ 'new' <member> <arguments>
+    | <member>
     ]
     {*}
 }

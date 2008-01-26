@@ -301,28 +301,26 @@ method with_statement($/) {
 }
 
 method primary_expression($/, $key) {
-    # XXX handle "this"
-    #if $key eq 'this' {
-    #}
-    #else {
-        make $( $/{$key} );
-    #}
+    make $( $/{$key} );
 }
 
+method this($/) {
+    make PAST::Op.new( :inline('    %r = self'), :node($/) );
+}
 
 method call_expression($/) {
     my $invocant := $( $<member_expression> );
-    my $past     := PAST::Op.new( :pasttype('call'), :node($/) );
-    $past.push($invocant);
 
-    my @args := $<arguments><assignment_expression>;
-    for @args {
-        $past.push( $($_) );
-    }
+    # the $<arguments> rule already creates a :pasttype('call') node.
+    my $past := $( $<arguments> );
+    $past.unshift($invocant);
 
     for $<post_call_expr> {
         my $postexpr := $( $_ );
-        # XXX apply postexpr on $past
+        # the $invocant of this $postexpr is $past
+        $postexpr.unshift($past);
+        # make it work in a chain, like foo()()()()
+        $past := $postexpr;
     }
 
     make $past;
@@ -393,6 +391,16 @@ method postfix_expression($/) {
     make $past;
 }
 
+method arguments($/) {
+    # an arguments node always implies a function call;
+    # create it here; unshift the invocant later if it's available.
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    for $<assignment_expression> {
+        $past.push( $($_) );
+    }
+    make $past;
+}
+
 method expression($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<assignment_expression> {
@@ -401,7 +409,6 @@ method expression($/) {
     make $past;
 }
 
-#######
 method lhs_expression($/, $key) {
     make $( $/{$key} );
 }
@@ -410,19 +417,20 @@ method member_expression($/) {
     my $member := $( $<member> );
     if $<arguments> {
         # $<member> is the invocant
-        my $past := PAST::Op.new( $member, :pasttype('call'), :node($/) );
-        my @args := $<arguments><assignment_expression>;
-        for @args {
-            $past.push( $($_) );
-        }
+        ##my $past := PAST::Op.new( $member, :pasttype('call'), :node($/) );
+        ##my @args := $<arguments><assignment_expression>;
+        ##for @args {
+        ##    $past.push( $($_) );
+        ##}
+        my $past := $( $<arguments> );
+        # set $member as the first child which implies it's the invocant.
+        $past.unshift($member);
         make $past;
     }
     else {
         make $member;
     }
 }
-
-
 
 method member($/) {
     my $past;
@@ -434,8 +442,10 @@ method member($/) {
     }
 
     for $<index> {
+        # XXX check this.
         my $idx := $( $_ );
-        # XXX apply index on current $past
+        $idx.unshift($past);
+        $past := $idx;
     }
 
     make $past;
@@ -446,7 +456,11 @@ method index($/, $key) {
 }
 
 method new_expression($/) {
-    make $( $<member_expression> );
+    my $past := $( $<member_expression> );
+    for $<sym> {
+        $past := PAST::Op.new( $past, :name('new'), :pasttype('call'), :node($/) );
+    }
+    make $past;
 }
 
 method identifier($/) {
