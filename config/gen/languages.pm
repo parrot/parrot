@@ -56,7 +56,7 @@ sub runstep {
         lisp lolcode lua
         m4
         ook
-        parrot_compiler perl5 perl6 pheme PIR plumhead pugs punie pynie
+        parrot_compiler perl6 pheme PIR plumhead pugs punie pynie
         regex
         scheme
         tap tcl
