@@ -108,6 +108,31 @@ method for1_statement($/) {
     }
 }
 
+method for2_statement($/) {
+    my $past;
+    my $body := $( $<statement> );
+    $past := $body;
+    make $past;
+}
+
+method for3_statement($/) {
+    my $past;
+    my $body := $( $<statement> );
+    $past := $body;
+    make $past;
+}
+
+method for4_statement($/) {
+    my $past;
+    my $body := $( $<statement> );
+    $past := $body;
+    make $past;
+}
+method labelled_statement($/) {
+    ## XXX handle the label in $<identifier>
+    make $( $<statement> );
+}
+
 method try_statement($/) {
     my $past := PAST::Op.new( :pasttype('try'), :node($/) );
     my $tryblock := $( $<block> );
@@ -297,6 +322,12 @@ method call_expression($/) {
     for @args {
         $past.push( $($_) );
     }
+
+    for $<post_call_expr> {
+        my $postexpr := $( $_ );
+        # XXX apply postexpr on $past
+    }
+
     make $past;
 }
 
@@ -316,15 +347,44 @@ method conditional_expression($/) {
 }
 
 method unary_expression($/) {
-    make $( $<postfix_expression> );
+    my $past := $( $<postfix_expression> );
+    my $unop := +$<unop> + 0;
+    while $unop != 0 {
+        # get the operators in reverse order, that is closest to
+        # the operand (postfix_expression)
+        my $op := $( $<unop>[$unop - 1] );
+        # set the current $past as the operand for that operation
+        $op.push($past);
+        # and update $past for the next one (or for the make statement)
+        $past := $op;
+        $unop := $unop - 1;
+    }
+    make $past;
+}
+
+method unop($/) {
+    my $operator := 'prefix:' ~ ~$<op>;
+    make PAST::Op.new( :name($operator), :pasttype('call'), :node($/) );
 }
 
 method postfix_expression($/) {
-    make $( $<lhs_expression> );
+    my $past := $( $<lhs_expression> );
+    if $<postfixop> {
+        if $<postfixop>[0] eq '++' {
+
+        }
+        elsif $<postfixop>[0] eq '--' {
+
+        }
+    }
+    make $past;
 }
 
 method expression($/) {
-   #make $( $<oexpr> );
+   # XXX handle comma operator and other assignment_expressions
+   # for $<assignment_expression {
+   #   $( $_ );
+   # }
    make $( $<assignment_expression>[0] );
 }
 
@@ -337,12 +397,24 @@ method member_expression($/) {
 }
 
 method member($/) {
+    my $past;
     if $<primary_expression> {
-        make $( $<primary_expression> );
+        $past := $( $<primary_expression> );
     }
     elsif $<function_expression> {
-        make $( $<function_expression> );
+        $past := $( $<function_expression> );
     }
+
+    for $<index> {
+        my $idx := $( $_ );
+        # XXX apply index on current $past
+    }
+
+    make $past;
+}
+
+method index($/, $key) {
+    make $( $/{$key} );
 }
 
 method new_expression($/) {
