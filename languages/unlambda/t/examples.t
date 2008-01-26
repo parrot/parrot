@@ -5,17 +5,17 @@
 
 =head1 NAME
 
-unlambda/t/hello.t - testing hello.unl
+unlambda/t/examples.t - testing the examples
 
 =head1 SYNOPSIS
 
-	% cd languages && perl unlambda/t/hello.t
+	% cd languages && perl unlambda/t/examples.t
 
-	% cd languages/unlambda && perl t/hello.t
+	% cd languages/unlambda && perl t/examples.t
 
 =head1 DESCRIPTION
 
-Test hello.unl.
+Test the examples.
 
 =head1 AUTHOR
 
@@ -28,7 +28,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More        tests => 1;
+use Test::More        tests => 3;
 use Parrot::Config;
 use File::Spec        ();
 
@@ -40,9 +40,16 @@ my $parrot    = File::Spec->catfile( $FindBin::Bin,
 my $unlamba   = $parrot . q{ } . File::Spec->catfile( $FindBin::Bin,
                                                       File::Spec->updir(), 
                                                       'unl.pir' );
+my %expected = (
+  newline  => "\n",
+  h        => "h\n",
+  hello    => "Hello world\n",
+);
 
-my $hello_unl = File::Spec->catfile( $FindBin::Bin,
-                                     File::Spec->updir(),
-                                     'examples',
-                                     'hello.unl' ); 
-is( `$unlamba $hello_unl`, "Hello world\n", 'hello.unl' );
+while ( my ( $example, $out ) = each %expected ) {
+    my $prog = File::Spec->catfile( $FindBin::Bin,
+                                    File::Spec->updir(),
+                                    'examples',
+                                    "$example.unl" ); 
+    is( `$unlamba $prog`, $out, "example $example" );
+}
