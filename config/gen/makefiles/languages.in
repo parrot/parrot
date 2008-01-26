@@ -28,6 +28,7 @@ LANGUAGES = \
     eclectus \
     forth \
     jako \
+    lazy-k \
     lisp \
     lolcode \
     lua \
@@ -280,6 +281,14 @@ jako.clean:
 	- $(MAKE) jako clean
 jako.realclean:
 	- $(MAKE) jako realclean
+
+lazy-k: lazy-k.dummy
+lazy-k.dummy:
+	- $(MAKE) lazy-k
+lazy-k.test:
+	- $(MAKE) lazy-k test
+lazy-k.clean:
+	- $(MAKE) lazy-k clean
 
 lisp: lisp.dummy
 lisp.dummy:

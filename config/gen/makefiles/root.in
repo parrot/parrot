@@ -165,6 +165,7 @@ GEN_MAKEFILES = \
     languages/forth/Makefile \
     languages/HQ9plus/Makefile \
     languages/jako/Makefile \
+    languages/lazy-k/Makefile \
     languages/lisp/Makefile \
     languages/lolcode/Makefile \
     languages/lua/Makefile \
