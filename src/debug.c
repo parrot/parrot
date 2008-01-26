@@ -329,6 +329,10 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
     int           i;
     unsigned long c = 0;
 
+    /* Skip leading whitespace. */
+    while (*command && isspace(*command))
+        command++;
+
     if (*command == '\0') {
         *cmdP = c;
         return NULL;
@@ -2491,9 +2495,11 @@ void
 PDB_help(PARROT_INTERP, ARGIN(const char *command))
 {
     unsigned long c;
-    const char   *temp = command;
 
-    command = parse_command(command, &c);
+    /* Extract the command after leading whitespace (for error messages). */
+    while (*command && isspace(*command))
+        command++;
+    (void) parse_command(command, &c);
 
     switch (c) {
         case c_disassemble:
@@ -2578,7 +2584,9 @@ This is the same as the information you get when running Parrot with\n\
 the -t option.\n");
             break;
         case c_print:
-            PIO_eprintf(interp, "Print register: e.g. p I2\n");
+            PIO_eprintf(interp, "Print register: e.g. \"p i2\"\n\
+Note that the register type is case-insensitive.  If no digits appear\n\
+after the register type, all registers of that type are printed.\n");
             break;
         case c_info:
             PIO_eprintf(interp,
@@ -2617,7 +2625,7 @@ List of commands:\n\
 Type \"help\" followed by a command name for full documentation.\n\n");
             break;
         default:
-            PIO_eprintf(interp, "Unknown command: \"%s\".", temp);
+            PIO_eprintf(interp, "Unknown command: \"%s\".", command);
             break;
     }
 }
@@ -2717,20 +2725,8 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char*
-GDB_P(PARROT_INTERP, ARGIN(const char *s))
+GDB_print_reg(PARROT_INTERP, ARGIN(int t), ARGIN(int n))
 {
-    int t, n;
-    switch (*s) {
-        case 'I': t = REGNO_INT; break;
-        case 'N': t = REGNO_NUM; break;
-        case 'S': t = REGNO_STR; break;
-        case 'P': t = REGNO_PMC; break;
-        default: return "no such reg";
-    }
-    if (s[1] && isdigit((unsigned char)s[1]))
-        n = atoi(s + 1);
-    else
-        return "no such reg";
 
     if (n >= 0 && n < CONTEXT(interp->ctx)->n_regs_used[t]) {
         switch (t) {
@@ -2749,6 +2745,47 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
         }
     }
     return "no such reg";
+}
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static const char*
+GDB_P(PARROT_INTERP, ARGIN(const char *s))
+{
+    int t, n;
+    char reg_type;
+
+    /* Skip leading whitespace. */
+    while (*s && isspace(*s))
+        s++;
+
+    reg_type = (unsigned char) toupper(*s);
+    switch (reg_type) {
+        case 'I': t = REGNO_INT; break;
+        case 'N': t = REGNO_NUM; break;
+        case 'S': t = REGNO_STR; break;
+        case 'P': t = REGNO_PMC; break;
+        default: return "Need a register.";
+    }
+    if (! s[1]) {
+        /* Print all registers of this type. */
+        int max_reg = CONTEXT(interp->ctx)->n_regs_used[t];
+        int n;
+
+        for (n = 0; n < max_reg; n++) {
+            /* this must be done in two chunks because PMC's print directly. */
+            PIO_eprintf(interp, "\n  %c%d = ", reg_type, n);
+            PIO_eprintf(interp, "%s", GDB_print_reg(interp, t, n));
+        }
+        return "";
+    }
+    else if (s[1] && isdigit((unsigned char)s[1])) {
+        n = atoi(s + 1);
+        return GDB_print_reg(interp, t, n);
+    }
+    else
+        return "no such reg";
+
 }
 
 /* RT#46141 move these to debugger interpreter
