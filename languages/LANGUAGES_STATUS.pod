@@ -693,17 +693,14 @@ C<languages/parrot_compiler>
 
 
 
-=head2 Perl 6 parser/compiler
+=head2 Rakudo
 
 =over 4
 
 =item Description
 
-This is a Perl 6 parser/compiler, an early version (no version numbers
-yet).  It's still very early, only simple expressions and functions are
-available.  If you're in a hurry to write "real Perl 6" programs,
-you might try looking at Pugs -- L<http://www.pugscode.org>.  Or, you
-can send patches and contributions to the one being built here!
+This is a PCT based implementation of Perl 6.
+Actively developed,
 
 =item Status
 
@@ -716,6 +713,7 @@ Part of languages smoke testing.
 =item Location
 
 C<languages/perl6>
+L<http://rakudo.org>
 
 =back
 
