@@ -1,19 +1,12 @@
+#! perl
+
 # $Id$
 
-=head1 NAME
+use strict;
+use warnings;
+use 5.008;
 
-languages/lazy-k/t/harness - A harness for Lazy K
-
-=head1 SYNOPSIS
-
-  cd languages && perl -I../lib lazy-k/t/harness --files
-
-=head1 DESCRIPTION
-
-If I'm called with a single
-argument of "--files", I just return a list of files to process.
-This list is one per line, and is relative to the languages dir.
-
-=cut
+use FindBin ();
+use lib "$FindBin::Bin/../../../lib";
 
 use Parrot::Test::Harness language => 'lazy-k';
