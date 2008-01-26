@@ -1,6 +1,12 @@
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
+## ECMAscript grammar, based on the grammar as defined in the
+## reference manual.
+##
+## See "ECMAScript Language Specification"
+## Standard ECMA-262, 3rd edition, December 1999
+
 grammar JS::Grammar is PCT::Grammar;
 
 token TOP {
@@ -573,3 +579,117 @@ token singlelinecomment {
 ##
 ##
 ##
+
+## Grammar rules converted directly from the ECMA-script reference manual, 3rd edition.
+## This makes converting the whole thing to an optable easier.
+
+#rule expression {
+#    <assignment_expression> [',' <assignment_expression>]*
+#}
+#
+#rule assignment_expression {
+#    [<lhs_expression> <assignop>]* <conditional_expression>
+#}
+#
+#rule conditional_expression {
+#    <logical_or_expression> ['?' <assignment_expression> ':' <assignment_expression>]?
+#}
+#
+#rule logical_or_expression {
+#    <logical_and_expression> ['||' <logical_and_expression>]*
+#}
+#
+#rule logical_and_expression {
+#    <bitwise_or_expression> ['&&' <bitwise_or_expression>]*
+#}
+#
+#rule bitwise_or_expression {
+#    <bitwise_xor_expression> ['|' <bitwise_xor_expression>]*
+#}
+#
+#rule bitwise_xor_expression {
+#    <bitwise_and_expression> ['^' <bitwise_and_expression>]*
+#}
+#
+#rule bitwise_and_expression {
+#    <equality_expression> ['&' <equality_expression>]*
+#}
+#
+#rule equality_expression {
+#    <relational_expression> [<eqop> <relational_expression>]*
+#}
+#
+#token eqop { '==' | '!=' | '===' | '!==' }
+#
+#rule relational_expression {
+#    <shift_expression> [<relop> <shift_expression>]*
+#}
+#
+#token relop { '<' | '>' | '<=' | '>=' | 'instanceof' }
+#
+#rule shift_expression {
+#    <additive_expression> [<shiftop> <additive_expression>]*
+#}
+#
+#token shiftop { '<<' | '>>' | '>>>' }
+#
+#rule additive_expression {
+#    <multiplicative_expression> [<addop> <multiplicative_expression>]*
+#}
+#
+#token addop { '+' | '-' }
+#
+#rule multiplicative_expression {
+#    <unary_expression> [<mulop> <unary_expression>]*
+#}
+#
+#token mulop { '*' | '/' | '%' }
+#
+#rule unary_expression {
+#    <postfix_expression> [<unop> <postfix_expression>]*
+#}
+#
+#token unop { 'delete' | 'void' | 'typeof' | '++' | '--' | '+' | '-' | '~' | '!' }
+#
+#rule postfix_expression {
+#    <lhs_expression> [\N <postfixop>]?
+#}
+#
+#token postfixop { '++' | '--' }
+#
+#rule lhs_expression {
+#    | <new_expression>
+#    | <call_expression>
+#}
+#
+#rule new_expression {
+#    [new]* <member_expression>
+#}
+#
+#rule member_expression {
+#    | <member>
+#    | 'new' <member> <arguments>
+#}
+#
+#rule index {
+#    | '[' <expression> ']'
+#    | '.' <identifier>
+#}
+#
+#rule member {
+#    [ <primary_expression>
+#    | <function_expression>
+#    ]
+#    <index>*
+#}
+#
+#rule call_expression {
+#    <member_expression> <arguments> <post_call_expr>*
+#}
+#
+#rule post_call_expr {
+#    | <arguments>
+#    | <index>
+#}
+#
+#
