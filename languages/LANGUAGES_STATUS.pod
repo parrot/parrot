@@ -257,11 +257,13 @@ See also L<http://en.wikipedia.org/wiki/Cola_programming_language>.
 
 =item Status
 
-Functioning, all samples working, lacks IO routines
+Somewhat functioning, some samples working, lacks IO routines.
+Not longer actively developed.
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.0.11
+0.5.2
 
 =item Location
 

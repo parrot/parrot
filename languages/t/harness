@@ -76,7 +76,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # Various languages are not yet in smoke testing, some will never be.
 #
 # BASIC                No t/harness, two implementations
-# cola                 not maintained
 # ecmascript           No t/harness
 # forth                No t/harness
 # perl6                test scripts are written in Perl 6, not Perl 5
@@ -90,6 +89,7 @@ my @unified_testable_languages
           : 
           qw( abc APL
               befunge bf
+              cola
               dotnet
               eclectus
               HQ9plus
