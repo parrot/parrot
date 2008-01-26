@@ -283,7 +283,7 @@ sub unpack_smoke {
         timestamp => [
             $9,
             do {
-                my $str = localtime($9)->strftime("%d %b %Y %H:%M %a");
+                my $str = gmtime($9)->strftime("%d %b %Y %H:%M %a");
                 $str =~ s/ /&nbsp;/g;
 
                 # hack, to make the timestamps not break so the 
