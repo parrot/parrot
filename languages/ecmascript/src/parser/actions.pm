@@ -284,9 +284,9 @@ method primary_expression($/, $key) {
     #}
 }
 
-method member_expression($/) {
-    make $( $<primary_expression> );
-}
+#method member_expression($/) {
+#    make $( $<primary_expression> );
+#}
 
 method call_expression($/) {
     my $invocant := $( $<member_expression> );
@@ -300,13 +300,53 @@ method call_expression($/) {
     make $past;
 }
 
-method assignment_expression($/) {
-    make $( $<expression> );
+method post_call_expr($/, $key) {
+    make $( $/{$key} );
 }
 
+method assignment_expression($/) {
+   # make $( $<expression> );
+   my $past;
+   $past := $( $<conditional_expression> );
+   make $past;
+}
+
+method conditional_expression($/) {
+    make $( $<logical_or_expression> );
+}
+
+method unary_expression($/) {
+    make $( $<postfix_expression> );
+}
+
+method postfix_expression($/) {
+    make $( $<lhs_expression> );
+}
 
 method expression($/) {
-   make $( $<oexpr> );
+   #make $( $<oexpr> );
+   make $( $<assignment_expression>[0] );
+}
+
+method lhs_expression($/, $key) {
+    make $( $/{$key} );
+}
+
+method member_expression($/) {
+    make $( $<member> );
+}
+
+method member($/) {
+    if $<primary_expression> {
+        make $( $<primary_expression> );
+    }
+    elsif $<function_expression> {
+        make $( $<function_expression> );
+    }
+}
+
+method new_expression($/) {
+    make $( $<member_expression> );
 }
 
 method identifier($/) {
@@ -399,7 +439,7 @@ method decimal_literal($/, $key) {
     make $( $/{$key} );
 }
 
-method oexpr($/, $key) {
+method logical_or_expression($/, $key) {
     if ($key eq 'end') {
         make $($<expr>);
     }

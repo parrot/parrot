@@ -52,7 +52,6 @@ rule statement {
     | <throw_statement> {*}       #= throw_statement
     | <variable_statement> {*}    #= variable_statement
     | <for1_statement> {*}        #= for1_statement
-    | <call_expression> {*}       #= call_expression
     | <expression_statement> {*}  #= expression_statement
     | <return_statement> {*}      #= return_statement
     | <switch_statement> {*}      #= switch_statement
@@ -172,91 +171,9 @@ rule function_expression {
     {*}
 }
 
-rule call_expression {
-    <member_expression> <arguments>
-    {*}
-}
-
 rule arguments {
     '(' [ <assignment_expression> [',' <assignment_expression>]* ]? ')'
 }
-
-rule member_expression {
-    <primary_expression>
-    {*}
-}
-
-rule assignment_expression {
-    <expression>
-    {*}
-}
-
-rule expression {
-    #<primary_expression>
-    <oexpr>
-    {*}
-}
-
-rule 'oexpr' is optable { ... }
-
-
-proto 'infix:=' is precedence('1') { ... }
-proto 'infix:*=' is equiv('infix:=') { ... }
-proto 'infix:/=' is equiv('infix:=') { ... }
-proto 'infix:%=' is equiv('infix:=') { ... }
-proto 'infix:+=' is equiv('infix:=') { ... }
-proto 'infix:-=' is equiv('infix:=') { ... }
-proto 'infix:<<=' is equiv('infix:=') { ...
-proto 'infix:>>=' is equiv('infix:=') { ...
-proto 'infix:>>>=' is equiv('infix:=') { ...
-proto 'infix:&=' is equiv('infix:=') { ... }
-proto 'infix:^=' is equiv('infix:=') { ... }
-proto 'infix:|=' is equiv('infix:=') { ... }
-
-proto 'postfix:++' is precedence('13') { ... }
-proto 'postfix:--' is equiv('postfix:++') { ... }
-
-proto 'prefix:delete' is precedence('12') { ... }
-proto 'prefix:void' is equiv('infix:delete') { ...
-proto 'prefix:typeof' is equiv('infix:delete') { ..
-proto 'prefix:++' is equiv('infix:delete') { ... }
-proto 'prefix:--' is equiv('infix:delete') { ... }
-proto 'prefix:+' is equiv('infix:delete') { ... }
-proto 'prefix:-' is equiv('infix:delete') { ... }
-proto 'prefix:~' is equiv('infix:delete') { ... }
-proto 'prefix:!' is equiv('infix:delete') { ... }
-
-proto 'infix:*' is precedence('11') is pirop('n_mul') { ... }
-proto 'infix:/' is equiv('infix:*') is pirop('n_div') { ... }
-proto 'infix:%' is equiv('infix:*') is pirop('n_mod') { ... }
-
-proto 'infix:+' is precedence('10') is pirop('n_add') { ... }
-proto 'infix:-' is equiv('infix:+') is pirop('n_sub') { ... }
-
-proto 'infix:<<' is precedence('9') { ... }
-proto 'infix:>>' is equiv('infix:<<') { ... }
-proto 'infix:>>>' is equiv('infix:<<') { ... }
-
-proto 'infix:<' is precedence('8') { ... }
-proto 'infix:>' is equiv('infix:<') { ... }
-proto 'infix:<=' is equiv('infix:<') { ... }
-proto 'infix:>=' is equiv('infix:<') { ... }
-proto 'infix:instanceof' is equiv('infix:<') { ...
-proto 'infix:in' is equiv('infix:<') { ... }
-
-proto 'infix:==' is precedence('7') { ... }
-proto 'infix:!=' is equiv('infix:==') { ... }
-proto 'infix:===' is equiv('infix:==') { ... }
-proto 'infix:!==' is equiv('infix:==') { ... }
-
-proto 'infix:&' is precedence('6') { ... }
-proto 'infix:^' is precedence('5') { ... }
-proto 'infix:|' is precedence('4') { ... }
-proto 'infix:||' is precedence('3') { ... }
-proto 'ternary:? :' is precedence('2') { ... }
-
-proto term: is tighter(infix:<=>) is parsed(&primary_expression) { ... }
-
 
 rule primary_expression {
     #| 'this' {*}                #= this
@@ -390,9 +307,6 @@ token reserved_word {
 }
 
 
-##proto term: is tighter(infix:<+>) is parsed(&primary_expression) { ... }
-
-
 #### whitespace
 #token ws {
 #    | <.whitespace>
@@ -426,175 +340,58 @@ token singlelinecomment {
     '//' \N* <newline>
 }
 
-##
-##
-##token source_character { <alphanum> }
-##
-##token string_escape_sequence {
-##    [ <['"bfnrtv]> | x <hex_digits>+ | u <hex_digits>**{4} ]
-##}
-##
-##
-##token unicode_escape_sequence { '\\' u <hex_digits>**{4} }
-##
-###token regular_expression_literal {
-###}
-##
-#### identifiers
-####token identifier  { <ident> | get | set | include }
-##token identifier {
-##    <!reserved_word>
-##    [<alpha> | $ | _ | <unicode_escape_sequeces> ]
-##    [ <alphanum> | $ | _ | <unicode_escape_sequence> ]*
-##}
-###token sim_qual_ident  {
-###    [ [ <identifier> | <reserved_ns> ] '::' ]? <identifier>
-###}
-###token exp_qual_ident { <paren_exp> '::' <identifier> }
-###token qual_ident { <sim_qual_ident> | qual_ident> }
-##
-##
-#### primary expressions
-##rule primary_expression {
-##    | this
-##    | <identifier>
-##    | <literal>
-##    | <array_literal>
-##    | <object_literal>
-##    | '(' <expression> ')'
-##}
-##
-##rule array_literal {
-##    | '[' [',']* ']'
-##    | [',']* <assignment_expression>
-##      [ ',' [',']* <assignment_expression> ]
-##      [ ',' [',']* ]?
-##}
-##
-##
-#### member expression
-##rule member_expression {
-##    | <primary_expression>
-##    | <function_expression>
-##    | <member_expression> '[' <expression> ']'
-##    | <member_expression> '.' <identifier>
-##    | 'new' <member_expression> <arguments>
-##}
-##
-##rule new_expression { [new]* <member_expression> }
-##
-##rule call_expression { <member_expression> <arguments> [<arguments>| '[' <expression> ']' | '.' <identifier>]* }
-##
-##rule left_hand_side_expression { <new_expression> | <call_expression> }
-##
-####statements
-##rule statement {
-##    {*}
-##    | <block>
-##    | <variable_statement>
-##    | <empyt_statement>
-##    | <expression_statement>
-##    | <if_statement>
-##    | <iteration_statement>
-##    | <continue_statement>
-##    | <break_statement>
-##    | <return_statement>
-##    | <with_statement>
-##    | <labelled_statement>
-##    | <switch_statement>
-##    | <throw_statement>
-##    | <try_statement>
-##}
-##
-##rule variable_declaration_no_in { <identifier> <initializer_no_in>? }
-##
-##rule variable_declaration_list_no_in { <variable_declaration_no_in> [ ',' <variable_declaration_no_in> ]* }
-##
-##rule initializer_no_in { '=' <assignment_expression_no_in> }
-##
-##
-##rule iteration_statement {
-##    | for '(' <expression_no_in>? ';' <expression>? ';' <expression>? ')' <statement>
-##    | for '(' var <variable_declaration_list_no_in> ';' <expression>? ';' <expression>? ')' <statement>
-##    | for '(' <left_hand_side_expression> in <expression> ')' <statement>
-##    | for '(' var <variable_declaration_no_in> in <expression> ')' <statement>
-##}
-##
-##token continue_statement { continue <ws> '-' <newline><identifier>? <?ws> ';' }
-##token break_statement { continue <ws> '-' <newline><identifier>? <?ws> ';' }
-##token return_statement { continue <ws> '-' <newline><identifier>? <?ws> ';' }
-##
-##rule with_statement { with '(' <expression> ')' <statement> }
-##
-##
-##rule labelled_statement { <identifier> ':' <statement> }
-##
-##rule expression { }
-##rule expression_no_in { }
-##
-##
-##
-#### class
-##token class_def     { class <identifier> <inheritance> <block> }
-##token inheritance   { <?null> | extends <type_expression> } # allowln
-##
-##
-#### namespace
-##token namespace_def { namespace <identifier> }
-##
-#### package definition
-##token package_def   { package <package_name>? <block> }
-##token package_name  { [ <string> | <package_ident> ] }
-##token package_ident { <identifier> [ . <identifier> ]? }
-##
-##
-#### regular expressions
-##token pattern     { <disjunction> }
-##token disjunction { <term> [ '|' <term> ]+ }
-##token term        { <assertion> | <atom> <quantifier>? }
-##token assertion   { <[^$]> | \b | \B }
-##token quantifier  { <[*+?]> '{' \d+ ','? \d+? '}' }
-##token atom        {
-##    | <pat_char>
-##    | '.'
-##    | '\\' <atom_escape>
-##    | <char_class>
-##    | '(' [ '?:' | '?=' | '?!' ]? <disjunction> ')'
-##}
-##token pat_char    { <source_character> '-' [ <[^$.*+?()\[\\\]|]> | '{' | '}' ] }
-##token atom_escape { <decimal_esc> | <char_esc> | <char_class_esc> }
-##token char_esc    {
-##    | <cntl_esc>
-##    | <cntl_let>
-##    | <hex_esc_seq>
-##    | <uni_esc_seq>
-##    | <ident_esc>
-##}
-##token cntl_esc    { <[fnrtv]> }
-##token cntl_let    { <[a..zA..Z]> }
-##token ident_esc   { <source_character> '-' <identifier_part> } ## need to look these up and see if they're defined
-##token dec_esc     { <decimal_integer_literal> <before \d> }
-##token char_class_esc { <[dDsSwW]> }
-###token char_class  { } #( whole bunch of weird stuff here )
-##
-##
-##
 
 ## Grammar rules converted directly from the ECMA-script reference manual, 3rd edition.
 ## This makes converting the whole thing to an optable easier.
 
-#rule expression {
-#    <assignment_expression> [',' <assignment_expression>]*
-#}
-#
-#rule assignment_expression {
-#    [<lhs_expression> <assignop>]* <conditional_expression>
-#}
-#
-#rule conditional_expression {
-#    <logical_or_expression> ['?' <assignment_expression> ':' <assignment_expression>]?
-#}
-#
+rule expression {
+    <assignment_expression> [',' <assignment_expression>]*
+    {*}
+}
+
+rule assignment_expression {
+    [<lhs_expression> <assignop>]* <conditional_expression>
+    {*}
+}
+
+token assignop {
+    $<op>=['='|'*='|'/='|'%='|'+='|'-='|'<<='|'>>='|'>>>='|'&='|'^='|'|=']
+}
+
+rule conditional_expression {
+    <logical_or_expression> ['?' <assignment_expression> ':' <assignment_expression>]?
+    {*}
+}
+
+rule 'logical_or_expression' is optable { ... }
+
+proto 'infix:||'  is precedence('1') { ... }
+proto 'infix:&&'  is tighter('infix:||') { ... }
+proto 'infix:|'   is tighter('infix:&&') { ... }
+proto 'infix:^'   is tighter('infix:|') { ... }
+proto 'infix:&'   is tighter('infix:^') { ... }
+proto 'infix:=='  is tighter('infix:&') { ... }
+proto 'infix:!='  is equiv('infix:==') { ... }
+proto 'infix:===' is equiv('infix:==') { ... }
+proto 'infix:!==' is equiv('infix:==') { ... }
+proto 'infix:<'   is tighter('infix:==') { ... }
+proto 'infix:>'   is equiv('infix:<') { ... }
+proto 'infix:<='  is equiv('infix:<') { ... }
+proto 'infix:>='  is equiv('infix:<') { ... }
+proto 'infix:instanceof' is equiv('infix:<') { ... }
+proto 'infix:in' is equiv('infix:<') { ... }
+
+proto 'infix:<<' is tighter('infix:<') { ... }
+proto 'infix:>>' is equiv('infix:<<') { ... }
+proto 'infix:>>>' is equiv('infix:<<') { ... }
+
+proto 'infix:+' is tighter('infix:<<') { ... }
+proto 'infix:-' is equiv('infix:+') { ... }
+
+proto 'infix:*' is tighter('infix:+') { ... }
+proto 'infix:/' is equiv('infix:*') { ... }
+proto 'infix:%' is equiv('infix:*') { ... }
+
 #rule logical_or_expression {
 #    <logical_and_expression> ['||' <logical_and_expression>]*
 #}
@@ -645,51 +442,60 @@ token singlelinecomment {
 #
 #token mulop { '*' | '/' | '%' }
 #
-#rule unary_expression {
-#    <postfix_expression> [<unop> <postfix_expression>]*
-#}
-#
-#token unop { 'delete' | 'void' | 'typeof' | '++' | '--' | '+' | '-' | '~' | '!' }
-#
-#rule postfix_expression {
-#    <lhs_expression> [\N <postfixop>]?
-#}
-#
-#token postfixop { '++' | '--' }
-#
-#rule lhs_expression {
-#    | <new_expression>
-#    | <call_expression>
-#}
-#
-#rule new_expression {
-#    [new]* <member_expression>
-#}
-#
-#rule member_expression {
-#    | <member>
-#    | 'new' <member> <arguments>
-#}
-#
-#rule index {
-#    | '[' <expression> ']'
-#    | '.' <identifier>
-#}
-#
-#rule member {
-#    [ <primary_expression>
-#    | <function_expression>
-#    ]
-#    <index>*
-#}
-#
-#rule call_expression {
-#    <member_expression> <arguments> <post_call_expr>*
-#}
-#
-#rule post_call_expr {
-#    | <arguments>
-#    | <index>
-#}
-#
-#
+
+rule unary_expression {
+    <unop>* <postfix_expression>
+    {*}
+}
+
+token unop { $<op>=['delete'|'void'|'typeof'|'++'|'--'|'+'|'-'|'~'|'!'] }
+
+proto term: is tighter(infix:<||>) is parsed(&unary_expression) { ... }
+
+rule postfix_expression {
+    <lhs_expression> [\N <postfixop>]?
+    {*}
+}
+
+token postfixop { '++' | '--' }
+
+rule lhs_expression {
+    | <new_expression> {*}  #= new_expression
+    | <call_expression> {*} #= call_expression
+}
+
+rule new_expression {
+    [new]* <member_expression>
+    {*}
+}
+
+rule member_expression {
+    [ <member>  {*}
+    | 'new' <member> <arguments>
+    ]
+    {*}
+}
+
+rule index {
+    | '[' <expression> ']'
+    | '.' <identifier>
+}
+
+rule member {
+    [ <primary_expression>
+    | <function_expression>
+    ]
+    <index>*
+    {*}
+}
+
+rule call_expression {
+    <member_expression> <arguments> <post_call_expr>*
+    {*}
+}
+
+rule post_call_expr {
+    | <arguments> {*}   #= arguments
+    | <index> {*}       #= index
+}
+
