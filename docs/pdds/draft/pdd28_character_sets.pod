@@ -95,14 +95,14 @@ There are two ways you can represent this in Unicode. You can use
 character 0x209, also known as C<LATIN SMALL LETTER I WITH DOUBLE GRAVE>, 
 which does the job all in one go. This is called a "composed" character,
 as opposed to its equivalent decomposed sequence: 
-C<LATIN SMALL LETTER I> (0x69) followd by C<COMBINING DOUBLE GRAVE ACCENT> 
+C<LATIN SMALL LETTER I> (0x69) followed by C<COMBINING DOUBLE GRAVE ACCENT> 
 (0x30F). 
 
 Unicode standardises in a number of "normalization forms" which
 repesentation you should use. We're using an extension of Normalization
 Form C, which says basically, decompose everything, then re-compose as
 much as you can. So if you see the integer stream C<0x69 0x30F>, it
-needs to be replaced by C<0x30F>. This means that Parrot string data
+needs to be replaced by C<0x209>. This means that Parrot string data
 structures need to keep track of what normalization form a given string
 is in, and Parrot must provide functions to convert between
 normalization forms. 
@@ -116,14 +116,14 @@ differing political sensibilities.) However, it is still visible as one
 character and despite being expressed even in NFC as two characters, 
 is still a single character as far as a human reader is concerned.
 
-Hence we introduce the the distinction between a "character" and a
+Hence we introduce the distinction between a "character" and a
 "grapheme". This is a Parrot distinction - it does not exist in the
 Unicode Standard. 
 
-When Parrot target languages' regular expression engines wish to match
-a grapheme, then NFC is clearly not normalized enough. This is why we
-have defined a further normalization stage, NFG - Normalization Form 
-for Graphemes.
+When a regular expression engine from one of Parrot's target languages
+wishes to match a grapheme, then NFC is clearly not normalized enough.
+This is why we have defined a further normalization stage, NFG -
+Normalization Form for Graphemes.
 
 NFG uses out-of-band signalling in the string to refer the conforming
 implementation to a decomposition table. UCS-4 specifies an encoding for
@@ -149,7 +149,7 @@ inside the array and reading the decomposition.
 Individual languages may need to think carefully about their concept of,
 for instance, "the length of a string" to determine whether or not they
 need to visit the lookup table for these strings. At any rate,
-Parrot should provide both grapheme-aware and character-aware iterators
+Parrot should provide both grapheme-aware and codepoint-aware iterators
 for string traversal. 
 
 =head1 IMPLEMENTATION
