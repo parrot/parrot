@@ -11,7 +11,7 @@ O             = @o@
 ## Setup some commands
 LN_S          = @lns@
 PERL          = @perl@
-RM_RF         = @rm_rf@
+RM_F          = @rm_f@
 CP            = @cp@
 PARROT        = ../../parrot@exe@
 CAT           = $(PERL) -MExtUtils::Command -e cat
@@ -90,8 +90,8 @@ help:
 test: all
 	$(PERL) t/harness
 
-# this target has nothing to do
 testclean:
+	$(RM_F) t/*.pir
 
 CLEANUPS = \
   APL.pbc \
@@ -110,11 +110,11 @@ CLEANUPS = \
   $(PMC_DIR)/*.lib \
 
 
-clean:
-	$(RM_RF) $(CLEANUPS)
+clean: testclean
+	$(RM_F) $(CLEANUPS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean
 
