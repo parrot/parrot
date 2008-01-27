@@ -262,10 +262,6 @@ elsif (!$html) {
     die "You must have Test::TAP::HTMLMatrix installed.\n\n$@"
         if $@;
 
-    ## FIXME: ###
-    # This is a temporary solution until Test::TAP::Model version
-    # 0.05.  At that point, this function should be removed, and the
-    # verbose line below should be uncommented.
     {
       no warnings qw/redefine once/;
       *Test::TAP::Model::run_tests = sub {
@@ -294,7 +290,6 @@ elsif (!$html) {
 
       my $start = time();
       my $model = Test::TAP::Model::Visual->new();
-      # $model->set_verbose();
       $model->run_tests(@tests);
 
       my $end = time();
