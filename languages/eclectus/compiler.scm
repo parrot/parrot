@@ -236,6 +236,15 @@
                    (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n"))
     (emit-expr arg)))
 
+; implementation of cons
+(define-primitive (cons arg1 arg2)
+  (list
+    (string->symbol "PAST::Op")
+    '(@ (pasttype "inline")
+                   (inline "new %r, 'EclectusPair'\\n"))
+    ))
+
+
 (define emit-comparison
   (lambda (builtin arg1 arg2)
     (list
