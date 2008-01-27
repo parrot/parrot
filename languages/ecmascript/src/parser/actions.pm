@@ -9,9 +9,7 @@ method TOP($/, $key) {
     if $key eq 'open' {
         # create a 'global' block and stuff it into a 'stack' of blocks.
         $?BLOCK := PAST::Block.new( :node($/) );
-
-        # XXX unshift doesn't work?
-        #@?BLOCK.unshift($?BLOCK);
+        @?BLOCK.unshift($?BLOCK);
     }
     elsif $key eq 'close' {
         my $past := PAST::Block.new( :node($/), :blocktype('declaration') );
