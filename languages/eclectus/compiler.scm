@@ -250,6 +250,20 @@
       (emit-expr arg1)
       (emit-expr arg2))))
 
+; implementation of car
+(define-primitive (car arg)
+  (list
+    (string->symbol "PAST::Val")
+    '(@ (value 30)
+        (returns "EclectusFixnum"))))
+
+; implementation of cdr
+(define-primitive (cdr arg)
+  (list
+    (string->symbol "PAST::Val")
+    '(@ (value 31)
+        (returns "EclectusFixnum"))))
+
 (define emit-comparison
   (lambda (builtin arg1 arg2)
     (list
