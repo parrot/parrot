@@ -27,7 +27,7 @@ method source_element($/, $key) {
 }
 
 method function_common($/) {
-    my $past := $( $<block> );
+    my $past := PAST::Block.new( $( $<block> ), :node($/) );
     $past.blocktype('declaration');
 
     if $<formal_parameter_list> {
@@ -63,8 +63,7 @@ method statement($/, $key) {
 }
 
 method block($/) {
-    # XXX is a different block needed here? check JS scope rules.
-    my $past := PAST::Block.new( :node($/), :blocktype('immediate') );
+    my $past := PAST::Stmts.new( :node($/) );
     $past.push( $( $<statements> ) );
     make $past;
 }
