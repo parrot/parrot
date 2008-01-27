@@ -614,7 +614,7 @@ Returns the address of the PMC.
 
 /*
 
-=item C<INTVAL is_same(const PMC *value)>
+=item C<INTVAL is_same(PMC *value)>
 
 Returns whether the PMC is numerically equal to C<value>.
 

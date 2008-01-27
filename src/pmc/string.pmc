@@ -487,7 +487,7 @@ Compares the string with C<value>; returns FALSE if they match.
 
 /*
 
-=item C<INTVAL is_same(const PMC *value)>
+=item C<INTVAL is_same(PMC *value)>
 
 Compares the string in this PMC with the one in the C<value> PMC.
 Returns true if this PMC and the one in C<value> are of the same PMC
