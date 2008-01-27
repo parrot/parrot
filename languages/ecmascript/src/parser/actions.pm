@@ -236,22 +236,10 @@ method variable_statement($/) {
 }
 
 method variable_declaration($/) {
-    our $?BLOCK;
-
     my $var  := $( $<identifier> );
-    my $name := $var.name();
 
     $var.isdecl(1);
     $var.scope('lexical');
-
-    ## enter the symbol into the current block's symbol table
-    if $?BLOCK.symbol( $name ) {
-        # already exists; warning/error? XXX check ref. manual.
-        print("Warning: symbol '" ~ $name ~ "' already exists!\n");
-    }
-    else { ## symbol not defined yet, enter it into the symbol table.
-        $?BLOCK.symbol( $name, :scope('lexical') );
-    }
 
     ## handle initialization value
     if $<assignment_expression> {
@@ -484,6 +472,10 @@ method arguments($/) {
 }
 
 method expression($/) {
+    ## and expression is a comma-separated list of assignment_expressions;
+    ## in other words, just a list of statements. Coincidentally, the
+    ## result of the last assignment_expression is returned, which is
+    ## exactly what is specified by ECMAScript.
     my $past := PAST::Stmts.new( :node($/) );
     for $<assignment_expression> {
         $past.push( $( $_ ) );
@@ -538,8 +530,8 @@ method member($/) {
 
 method index($/, $key) {
     ## get the index expression
-
     my $idx := $( $/{$key} );
+
     ## create a keyed access operation, setting the expression as a child
     ## the object to be indexed will be unshifted on this node, effectively
     ## acting as the container (the first child). Neat huh?
