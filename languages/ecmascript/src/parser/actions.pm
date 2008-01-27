@@ -24,45 +24,41 @@ method source_element($/, $key) {
     make $( $/{$key} );
 }
 
-method function_common($/, $key) {
+method function_common($/) {
     our @?BLOCK;
     our $?BLOCK;
 
-    if $key eq 'open' {
-        ## the formal parameter list method already creates a function block;
-        ## retrieve it, stuff the function statements onto it, and change
-        ## the :blocktype.
-        my $past := $( $<formal_parameter_list> );
-        $past.blocktype('declaration');
+    my $past := $( $<formal_parameter_list> );
+    $past.blocktype('declaration');
 
-        ## set the 'current' block to this $past, and stuff it onto the
-        ## scope stack (in case of nested functions).
-        $?BLOCK := $past;
-        @?BLOCK.unshift($past);
+    ## only after having parsed the block can we get its PAST;
+    ## this is just a Stmts node, the function body.
+    $past.push( $( $<block> ) );
 
-    }
-    elsif $key eq 'close' {
-        ## retrieve the block from the scope stack; restore the "current"
-        ## scope, and 'make' this $past.
-        my $past := @?BLOCK.shift();
-        $?BLOCK  := @?BLOCK[0];
+    @?BLOCK.shift();
+    $?BLOCK  := @?BLOCK[0];
 
-        ## only after having parsed the block can we get its PAST;
-        ## this is just a Stmts node, the function body.
-        $past.push( $( $<block> ) );
-
-        make $past;
-    }
+    make $past;
 }
 
 method formal_parameter_list($/) {
+    our $?BLOCK;
+    our @?BLOCK;
+
     ## the only place for formal parameters to live is in a function
     ## block object, so create it here already. It can be decorated
     ## with other function stuff when handling function_common.
     my $past := PAST::Block.new( :node($/) );
+
+    ## set the 'current' block to this $past, and stuff it onto the
+    ## scope stack (in case of nested functions).
+    $?BLOCK := $past;
+    @?BLOCK.unshift($past);
+
     for $<identifier> {
         my $parameter := $( $_ );
         $parameter.scope('parameter');
+        $?BLOCK.symbol( $parameter.name(), :scope('lexical') );
         $past.push($parameter);
     }
     make $past;
@@ -594,7 +590,11 @@ method identifier($/) {
     else {
         $scope := 'package';
     }
-    make PAST::Var.new( :name($name), :scope($scope), :viviself('Undef'), :node($/) );
+    make PAST::Var.new( :name($name),
+                        :scope($scope),
+                        :node($/)
+                      );
+                      #,:viviself('Undef') );
 }
 
 method literal($/, $key) {

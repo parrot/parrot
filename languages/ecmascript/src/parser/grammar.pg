@@ -37,9 +37,8 @@ rule function_expression {
 
 rule function_common {
     '(' <formal_parameter_list> ')'
-    {*}                                  #= open
     <block>
-    {*}                                  #= close
+    {*}
 }
 
 rule formal_parameter_list {
