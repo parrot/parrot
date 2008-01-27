@@ -92,6 +92,8 @@
     .return (lhs)
 .end
 
+## postfix operators
+##
 .sub 'postfix:++'
     .param pmc a
     $P0 = clone a
@@ -104,6 +106,151 @@
     $P0 = clone a
     dec a
     .return ($P0)
+.end
+
+## infix operators
+##
+
+.sub 'infix:||'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:&&'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:|'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:^'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:&'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:=='
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:!='
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:==='
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:!=='
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:<'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:>'
+    .param pmc left
+    .param pmc right
+.end
+
+.sub 'infix:<='
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:>='
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:instanceof'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:in'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:<<'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:>>'
+    .param pmc left
+    .param pmc right
+.end
+
+
+.sub 'infix:>>>'
+    .param pmc left
+    .param pmc right
+.end
+
+
+## prefix operators
+##
+.sub 'prefix:delete'
+    .param pmc op
+.end
+
+
+.sub 'prefix:void'
+    .param pmc op
+.end
+
+.sub 'prefix:+'
+    .param pmc op
+.end
+
+.sub 'prefix:-'
+    .param pmc op
+.end
+
+.sub 'prefix:++'
+    .param pmc op
+.end
+
+.sub 'prefix:--'
+    .param pmc op
+.end
+
+.sub 'prefix:~'
+    .param pmc op
+.end
+
+.sub 'prefix:!'
+    .param pmc op
 .end
 
 # Local Variables:
