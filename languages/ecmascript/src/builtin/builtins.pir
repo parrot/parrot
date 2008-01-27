@@ -229,20 +229,33 @@
     .param pmc op
 .end
 
+.sub 'prefix:typeof'
+    .param pmc op
+.end
+
 .sub 'prefix:+'
     .param pmc op
+    $N0 = op
+    .return ($N0)
 .end
 
 .sub 'prefix:-'
     .param pmc op
+    $N0 = op
+    neg $N0
+    .return ($N0)
 .end
 
 .sub 'prefix:++'
     .param pmc op
+    inc op
+    .return (op)
 .end
 
 .sub 'prefix:--'
     .param pmc op
+    dec op
+    .return (op)
 .end
 
 .sub 'prefix:~'

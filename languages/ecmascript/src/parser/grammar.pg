@@ -462,7 +462,7 @@ rule unary_expression {
     {*}
 }
 
-rule unop { $<op>=['delete'|'void'|'typeof'|'+'|'-'|'++'|'--'|'~'|'!']>> {*} }
+rule unop { $<op>=['delete'|'void'|'typeof'|'++'|'--'|'+'|'-'|'~'|'!'] {*} }
 
 
 proto term: is tighter(infix:<||>) is parsed(&unary_expression) { ... }
