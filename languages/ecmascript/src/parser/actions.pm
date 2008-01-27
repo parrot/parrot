@@ -24,14 +24,35 @@ method source_element($/, $key) {
     make $( $/{$key} );
 }
 
-method function_common($/) {
-    ## the formal parameter list method already creates a function block;
-    ## retrieve it, stuff the function statements onto it, and change
-    ## the :blocktype.
-    my $past := $( $<formal_parameter_list> );
-    $past.push( $( $<block> ) );
-    $past.blocktype('declaration');
-    make $past;
+method function_common($/, $key) {
+    our @?BLOCK;
+    our $?BLOCK;
+
+    if $key eq 'open' {
+        ## the formal parameter list method already creates a function block;
+        ## retrieve it, stuff the function statements onto it, and change
+        ## the :blocktype.
+        my $past := $( $<formal_parameter_list> );
+        $past.blocktype('declaration');
+
+        ## set the 'current' block to this $past, and stuff it onto the
+        ## scope stack (in case of nested functions).
+        $?BLOCK := $past;
+        @?BLOCK.unshift($past);
+
+    }
+    elsif $key eq 'close' {
+        ## retrieve the block from the scope stack; restore the "current"
+        ## scope, and 'make' this $past.
+        my $past := @?BLOCK.shift();
+        $?BLOCK  := @?BLOCK[0];
+
+        ## only after having parsed the block can we get its PAST;
+        ## this is just a Stmts node, the function body.
+        $past.push( $( $<block> ) );
+
+        make $past;
+    }
 }
 
 method formal_parameter_list($/) {

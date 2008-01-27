@@ -30,9 +30,16 @@ rule function_declaration {
     {*}
 }
 
-rule function_common {
-    '(' <formal_parameter_list> ')' <block>
+rule function_expression {
+    'function' <identifier>? <function_common>
     {*}
+}
+
+rule function_common {
+    '(' <formal_parameter_list> ')'
+    {*}                                  #= open
+    <block>
+    {*}                                  #= close
 }
 
 rule formal_parameter_list {
@@ -218,10 +225,7 @@ rule with_statement {
 ## expressions
 ##
 
-rule function_expression {
-    'function' <identifier>? <function_common>
-    {*}
-}
+
 
 rule arguments {
     '(' [ <assignment_expression> [',' <assignment_expression>]* ]? ')'
