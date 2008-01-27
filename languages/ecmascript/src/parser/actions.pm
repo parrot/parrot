@@ -60,10 +60,16 @@ method statement($/, $key) {
     make $( $/{$key} );
 }
 
-method block($/) {
+method statements($/) {
     my $past := PAST::Stmts.new( :node($/) );
-    $past.push( $( $<statements> ) );
+    for $<statement> {
+        $past.push( $($_) );
+    }
     make $past;
+}
+
+method block($/) {
+    make $( $<statements> );
 }
 
 method if_statement($/) {
@@ -304,13 +310,6 @@ method default_clause($/) {
     make $( $<statements> );
 }
 
-method statements($/) {
-    my $past := PAST::Stmts.new( :node($/) );
-    for $<statement> {
-        $past.push( $($_) );
-    }
-    make $past;
-}
 
 method with_statement($/) {
     ## XXX incomplete

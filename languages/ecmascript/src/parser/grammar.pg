@@ -65,6 +65,12 @@ rule statement {
     | <try_statement> {*}         #= try_statement
 }
 
+
+rule statements {
+    <statement>*
+    {*}
+}
+
 rule block {
     '{' <statements> '}' {*}
 }
@@ -192,11 +198,6 @@ rule case_clause {
 
 rule default_clause {
     'default' ':' <statements>
-    {*}
-}
-
-rule statements {
-    <statement>*
     {*}
 }
 
