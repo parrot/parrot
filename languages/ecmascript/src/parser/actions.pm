@@ -29,7 +29,6 @@ method function_common($/) {
     our $?BLOCK;
 
     my $past := $( $<formal_parameter_list> );
-    $past.blocktype('declaration');
 
     ## only after having parsed the block can we get its PAST;
     ## this is just a Stmts node, the function body.
@@ -48,7 +47,7 @@ method formal_parameter_list($/) {
     ## the only place for formal parameters to live is in a function
     ## block object, so create it here already. It can be decorated
     ## with other function stuff when handling function_common.
-    my $past := PAST::Block.new( :node($/) );
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
 
     ## set the 'current' block to this $past, and stuff it onto the
     ## scope stack (in case of nested functions).
