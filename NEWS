@@ -1,5 +1,15 @@
 # $Id$
 
+
+New up to r25293.
+- Documentation
+- Compiler Toolkit
+- Languages
+  + ECMAScript: reimplemented using PCT.
+- Implementation
+- Deprecations
+- Miscellaneous
+
 New in 0.5.2
 - Documentation
   + PDD27 (multiple dispatch) - debut of new design
