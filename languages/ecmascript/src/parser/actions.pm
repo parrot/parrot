@@ -131,6 +131,7 @@ method for1_statement($/) {
 }
 
 method for2_statement($/) {
+    # XXX todo
     my $past;
     my $body := $( $<statement> );
     $past := $body;
@@ -138,6 +139,7 @@ method for2_statement($/) {
 }
 
 method for3_statement($/) {
+    # XXX todo
     my $past;
     my $body := $( $<statement> );
     $past := $body;
@@ -145,6 +147,7 @@ method for3_statement($/) {
 }
 
 method for4_statement($/) {
+    # XXX todo
     my $past;
     my $body := $( $<statement> );
     $past := $body;
@@ -165,7 +168,8 @@ method try_statement($/) {
         $past.push($catchblock);
     }
     if $<finally> {
-        # the finally block, if present, is always executed. # what about scope?
+        # the finally block, if present, is always executed.
+        # XXX what about scope?
         my $finallyblock := $( $<finally> );
         $past := PAST::Stmts.new( $past, $finallyblock, :node($/) );
     }
@@ -202,49 +206,53 @@ method return_statement($/) {
 }
 
 method variable_statement($/) {
+    ## each variable declared in this statement becomes a separate PIR
+    ## statement; therefore create a Stmts node.
     my $past := PAST::Stmts.new( :node($/) );
     for $<variable_declaration> {
-        my $var := $($_);
-        $past.push( $var );
+        $past.push( $( $_ ) );
     }
     make $past;
 }
 
 method variable_declaration($/) {
     our $?BLOCK;
-    my $var := $( $<identifier> );
-    $var.isdecl(1);
-    $var.scope('lexical');
+
+    my $var  := $( $<identifier> );
     my $name := $var.name();
 
-    # enter the symbol into the current block's symbol table
+    $var.isdecl(1);
+    $var.scope('lexical');
+
+    ## enter the symbol into the current block's symbol table
     if $?BLOCK.symbol( $name ) {
         # already exists; warning/error? XXX check ref. manual.
         print("Warning: symbol '" ~ $name ~ "' already exists!\n");
     }
-    else {
+    else { ## symbol not defined yet, enter it into the symbol table.
         $?BLOCK.symbol( $name, :scope('lexical') );
     }
 
-    # handle initialization value
+    ## handle initialization value
     if $<assignment_expression> {
         my $initval := $( $<assignment_expression>[0] );
         $var.viviself($initval);
     }
     else {
-        $var.viviself('Undef'); # should be JavaScript undefined.
+        $var.viviself('Undef'); # XXX should be JavaScript undefined.
     }
+
     make $var;
 }
 
 method empty_statement($/) {
+    ## to prevent special cases for the empty statement, just create a comment.
     make PAST::Op.new( :node($/), :inline('    # no-op') );
 }
 
 method expression_statement($/) {
     make $( $<expression> );
 }
-
 
 method switch_statement($/) {
     # XXX fix this.
@@ -310,7 +318,6 @@ method default_clause($/) {
     make $( $<statements> );
 }
 
-
 method with_statement($/) {
     ## XXX incomplete
     my $past;
@@ -341,18 +348,20 @@ method this($/) {
 method call_expression($/) {
     my $invocant := $( $<member_expression> );
 
-    # the $<arguments> rule already creates a :pasttype('call') node.
+    ## the $<arguments> rule already creates a :pasttype('call') node.
     my $past := $( $<arguments> );
     $past.unshift($invocant);
 
     for $<post_call_expr> {
         my $postexpr := $( $_ );
-        # the $invocant of this $postexpr is $past; set it as the first
-        # child, so that it is evaluated first, and then invoked.
+
+        ## the $invocant of this $postexpr is $past; set it as the first
+        ## child, so that it is evaluated first, and then invoked.
         $postexpr.unshift($past);
-        # make it work in a chain, like foo()()()(); In case the loop ends
-        # here, $postexpr is the argument to "make"; otherwise, it's unshifted
-        # onto the next $postexpr as the first child.
+
+        ## make it work in a chain, like foo()()()(); In case the loop ends
+        ## here, $postexpr is the argument to "make"; otherwise, it's unshifted
+        ## onto the next $postexpr as the first child.
         $past := $postexpr;
     }
 
@@ -366,17 +375,20 @@ method post_call_expr($/, $key) {
 method assignment_expression($/) {
     my $past := $( $<conditional_expression> );
 
-    # get number of lhs_expressions
+    ## get number of lhs_expressions
     my $lhsexpr := +$<lhs_expression>;
 
-    # assignments such as 'a=b=c' are evaluated from right to left
-    # first c is assigned to b, that result (b) is assigned to a.
-    # therefore, loop through the array backwards.
+    ## assignments such as 'a=b=c' are evaluated from right to left
+    ## first c is assigned to b, that result (b) is assigned to a.
+    ## therefore, loop through the array backwards.
     while $lhsexpr != 0 {
         $lhsexpr := $lhsexpr - 1;
-        # generate the name of the assignment operator
+
+        ## generate the name of the assignment operator: 'infix:<operator>'
         my $op  := 'infix:' ~ ~$<assignop>[$lhsexpr];
         my $lhs := $( $<lhs_expression>[$lhsexpr] );
+
+        ## invoke this operator-sub, with $lhs and the $past so far as left/right operands.
         $past   := PAST::Op.new( $lhs, $past, :name($op), :pasttype('call'), :node($/) );
     }
     make $past;
@@ -384,6 +396,8 @@ method assignment_expression($/) {
 
 method conditional_expression($/) {
     my $past  := $( $<logical_or_expression> );
+
+    ## handle the ? : ternary operator if present
     if $<then> {
         $past := PAST::Op.new(  $past,
                                 $( $<then>[0] ),
@@ -397,22 +411,25 @@ method conditional_expression($/) {
 method unary_expression($/) {
     my $past := $( $<postfix_expression> );
     my $unop := +$<unop>;
+
     while $unop != 0 {
-        # get the operators in reverse order, that is closest to
-        # the operand (postfix_expression)
+        ## get the operators in reverse order, that is closest to
+        ## the operand (postfix_expression)
         $unop  := $unop - 1;
         my $op := $( $<unop>[$unop] );
-        # set the current $past as the operand for that operation
-        $op.push($past);
-        # and update $past for the next one (or for the make statement)
-        $past := $op;
 
+        ## set the current $past as the operand for that operation
+        $op.push($past);
+
+        ## and update $past for the next one (or for the make statement)
+        $past := $op;
     }
     make $past;
 }
 
 method unop($/) {
-    # create a call op to invoke the specified unary operand.
+    ## create a call op to invoke the specified unary operand.
+    ## this unary operator is named 'prefix:<operator>'.
     my $operator := 'prefix:' ~ ~$<op>;
     make PAST::Op.new( :name($operator), :pasttype('call'), :node($/) );
 }
@@ -420,10 +437,11 @@ method unop($/) {
 method postfix_expression($/) {
     my $past := $( $<lhs_expression> );
     if $<postfixop> {
-        # create a string "postfix:++" or "postfix:--"
+        ## create a string "postfix:++" or "postfix:--"
         my $postfixop := 'postfix:' ~ ~$<postfixop>[0];
-        # create an invocation of this operator, providing
-        # the <lhs_expression> as its operand
+
+        ## create an invocation of this operator, providing
+        ## the <lhs_expression> as its operand
         $past := PAST::Op.new( $past,
                                :pasttype('call'),
                                :name($postfixop),
@@ -434,9 +452,11 @@ method postfix_expression($/) {
 }
 
 method arguments($/) {
-    # an arguments node always implies a function call;
-    # create it here; unshift the invocant later if it's available.
+    ## an arguments node always implies a function call;
+    ## create it here; unshift the invocant later when it's available.
     my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+
+    ## push all arguments onto this 'call' op.
     for $<assignment_expression> {
         $past.push( $($_) );
     }
@@ -457,9 +477,13 @@ method lhs_expression($/, $key) {
 
 method member_expression($/) {
     my $member := $( $<member> );
+
+    ## if there are any arguments, $member is invoked with these arguments.
     if $<arguments> {
+        ## the <arguments> node creates the :pasttype('call') op
         my $past := $( $<arguments> );
-        # set $member as the first child which implies it's the invocant.
+
+        ## set $member as the first child which implies it's the invocant.
         $past.unshift($member);
         make $past;
     }
@@ -470,6 +494,8 @@ method member_expression($/) {
 
 method member($/) {
     my $past;
+
+    ## get the first part of the member rule, 2 options:
     if $<primary_expression> {
         $past := $( $<primary_expression> );
     }
@@ -477,6 +503,10 @@ method member($/) {
         $past := $( $<function_expression> );
     }
 
+    ## for each index, $past acts as the invocant or main object on
+    ## which some operation is executed; therefore $past must be the
+    ## first child, so unshift it. Then, $past is assigned this result
+    ## preparing for either the next index or as argument for 'make'.
     for $<index> {
         my $idx := $( $_ );
         $idx.unshift($past);
@@ -487,25 +517,34 @@ method member($/) {
 }
 
 method index($/, $key) {
-    # get the index expression
+    ## get the index expression
+
     my $idx := $( $/{$key} );
-    # create a keyed access operation, setting the expression as a child
-    # the object to be indexed will be unshifted on this node, effectively
-    # acting as the container (the first child). Neat huh?
+    ## create a keyed access operation, setting the expression as a child
+    ## the object to be indexed will be unshifted on this node, effectively
+    ## acting as the container (the first child). Neat huh?
     my $past := PAST::Var.new( $idx, :scope('keyed'), :node($/) );
 
-    # XXX Maybe an index should be handled by an operation, so that the
-    # past must become a PAST::Op( :pasttype('call') ... ). Think of this later.
+    ## XXX Maybe an index should be handled by an operation, so that the
+    ## past must become a PAST::Op( :pasttype('call') ... ). Think of this later.
     make $past;
 }
 
 method identifier_field($/) {
+    ## an identifier field is an identifier that is auto-quoted; it's a field
+    ## as in: foo.bar, which means foo["bar"]. Therefore, make a string from
+    ## this identifier.
     my $id := $( $<identifier> );
     make PAST::Val.new( :returns('String'), :value($id.name()), :node($/) );
 }
 
 method new_expression($/) {
+    ## get the invocant of 'new'
     my $past := $( $<member_expression> );
+
+    ## for each occurrence of 'new', create a 'call' op, giving the current
+    ## past as argument. This is done 'inside out', so the last 'new' is invoked
+    ## first, so to say.
     for $<sym> {
         $past := PAST::Op.new( $past, :name('new'), :pasttype('call'), :node($/) );
     }
@@ -513,7 +552,16 @@ method new_expression($/) {
 }
 
 method identifier($/) {
-    make PAST::Var.new( :name(~$/), :scope('package'), :viviself('Undef'), :node($/) );
+    our $?BLOCK;
+    my $name := ~$/;
+    my $scope;
+    if $?BLOCK.symbol( $name ) {
+        $scope := 'lexical';
+    }
+    else {
+        $scope := 'package';
+    }
+    make PAST::Var.new( :name($name), :scope($scope), :viviself('Undef'), :node($/) );
 }
 
 method literal($/, $key) {
@@ -525,17 +573,17 @@ method builtin_literal($/, $key) {
 }
 
 method true($/) {
-    # change this into type 'Boolean' or whatever
+    # XXX change this into type a ECMAScript type, 'Boolean' or whatever
     make PAST::Val.new( :returns('Integer'), :value('1'), :node($/) );
 }
 
 method false($/) {
-    # change this into type 'Boolean' or whatever
+    # XXX change this into type 'Boolean' or whatever
     make PAST::Val.new( :returns('Integer'), :value('0'), :node($/) );
 }
 
 method null($/) {
-    # would this work?
+    # XXX would this work?
     make PAST::Var.new( :name('null'), :scope('package'), :node($/) );
 }
 
@@ -559,7 +607,8 @@ method property($/) {
     ## is supposed to be an auto-quoted identifier). Check manual.
     ## For now: this is broken, but it's a start.
     my $key  := $( $<property_name> );
-    #my $key  := PAST::Val.new( $prop, :returns('String'), :node($/) );
+
+    ## XXX my $key  := PAST::Val.new( $prop, :returns('String'), :node($/) );
     my $val  := $( $<expression> );
 
     $val.named($key);
@@ -568,6 +617,7 @@ method property($/) {
 
 
 method property_name($/, $key) {
+    ## XXX
     my $propname := $( $/{$key} );
     my $past := PAST::Op.new( :inline('    $S0 = %0'), :node($/) );
     $past.push($propname);
@@ -575,17 +625,18 @@ method property_name($/, $key) {
 }
 
 method array_literal($/) {
+    ## XXX todo
     my $past := PAST::Op.new( :pasttype('call'), :name('Array'), :node($/) );
 
     make $past;
 }
 
 method element_list($/) {
-
+    ## XXX todo
 }
 
 method elision($/) {
-    # return number of commas.
+    ## return number of commas.
     my $value := +$<comma>;
     make PAST::Val.new( :value($value), :returns('Integer'), :node($/) );
 }
@@ -615,6 +666,8 @@ method decimal_literal($/, $key) {
 }
 
 method logical_or_expression($/, $key) {
+    ## Handle the operator table
+    ##
     if ($key eq 'end') {
         make $($<expr>);
     }

@@ -72,7 +72,8 @@ rule statements {
 }
 
 rule block {
-    '{' <statements> '}' {*}
+    '{' <statements> '}'
+    {*}
 }
 
 rule if_statement {
@@ -143,15 +144,18 @@ rule try_statement {
 }
 
 rule catch {
-    'catch' '(' <identifier> ')' <block> {*}
+    'catch' '(' <identifier> ')' <block>
+    {*}
 }
 
 rule finally {
-    'finally' <block> {*}
+    'finally' <block>
+    {*}
 }
 
 rule throw_statement {
-    'throw' \N <expression> ';' {*}
+    'throw' \N <expression> ';'
+    {*}
 }
 
 rule variable_statement {
@@ -170,11 +174,13 @@ rule empty_statement {
 
 rule expression_statement {
     ##<!['{'|'function']> ## is this necessary? isn't this fixed automatically by PGE?
-    <expression> ';' {*}
+    <expression> ';'
+    {*}
 }
 
 rule return_statement {
-    'return' \N <expression>? ';' {*}
+    'return' \N <expression>? ';'
+    {*}
 }
 
 rule switch_statement {
@@ -234,16 +240,16 @@ token this { 'this' {*} }
 
 rule array_literal {
     '['
-    #[ <elision>
-    #| <element_list> [',' <elision>]?
-    #]
+    [ <elision>
+    | <element_list> [',' <elision>]?
+    ]
     ']'
     {*}
 }
 
 rule element_list {
     <elision> <assignment_expression> [',' <elision> <assignment_expression>]*
-    #{*}
+    {*}
 }
 
 rule elision {
