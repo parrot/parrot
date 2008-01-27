@@ -389,8 +389,6 @@ token singlelinecomment {
 }
 
 
-## Grammar rules converted directly from the ECMA-script reference manual, 3rd edition.
-## This makes converting the whole thing to an optable easier.
 
 rule expression {
     <assignment_expression> [',' <assignment_expression>]*
@@ -416,14 +414,20 @@ rule conditional_expression {
 rule 'logical_or_expression' is optable { ... }
 
 proto 'infix:||'  is precedence('1') { ... }
+
 proto 'infix:&&'  is tighter('infix:||') { ... }
+
 proto 'infix:|'   is tighter('infix:&&') { ... }
+
 proto 'infix:^'   is tighter('infix:|') { ... }
+
 proto 'infix:&'   is tighter('infix:^') { ... }
+
 proto 'infix:=='  is tighter('infix:&') { ... }
 proto 'infix:!='  is equiv('infix:==') { ... }
 proto 'infix:===' is equiv('infix:==') { ... }
 proto 'infix:!==' is equiv('infix:==') { ... }
+
 proto 'infix:<'   is tighter('infix:==') { ... }
 proto 'infix:>'   is equiv('infix:<') { ... }
 proto 'infix:<='  is equiv('infix:<') { ... }
@@ -442,56 +446,6 @@ proto 'infix:*' is tighter('infix:+') is pirop('n_mul') { ... }
 proto 'infix:/' is equiv('infix:*') is pirop('n_div') { ... }
 proto 'infix:%' is equiv('infix:*') is pirop('n_mod') { ... }
 
-#rule logical_or_expression {
-#    <logical_and_expression> ['||' <logical_and_expression>]*
-#}
-#
-#rule logical_and_expression {
-#    <bitwise_or_expression> ['&&' <bitwise_or_expression>]*
-#}
-#
-#rule bitwise_or_expression {
-#    <bitwise_xor_expression> ['|' <bitwise_xor_expression>]*
-#}
-#
-#rule bitwise_xor_expression {
-#    <bitwise_and_expression> ['^' <bitwise_and_expression>]*
-#}
-#
-#rule bitwise_and_expression {
-#    <equality_expression> ['&' <equality_expression>]*
-#}
-#
-#rule equality_expression {
-#    <relational_expression> [<eqop> <relational_expression>]*
-#}
-#
-#token eqop { '==' | '!=' | '===' | '!==' }
-#
-#rule relational_expression {
-#    <shift_expression> [<relop> <shift_expression>]*
-#}
-#
-#token relop { '<' | '>' | '<=' | '>=' | 'instanceof' }
-#
-#rule shift_expression {
-#    <additive_expression> [<shiftop> <additive_expression>]*
-#}
-#
-#token shiftop { '<<' | '>>' | '>>>' }
-#
-#rule additive_expression {
-#    <multiplicative_expression> [<addop> <multiplicative_expression>]*
-#}
-#
-#token addop { '+' | '-' }
-#
-#rule multiplicative_expression {
-#    <unary_expression> [<mulop> <unary_expression>]*
-#}
-#
-#token mulop { '*' | '/' | '%' }
-#
 
 rule unary_expression {
     <unop>* <postfix_expression>
@@ -499,6 +453,7 @@ rule unary_expression {
 }
 
 rule unop { $<op>=['delete'|'void'|'typeof'|'+'|'-'|'++'|'--'|'~'|'!']>> {*} }
+
 
 proto term: is tighter(infix:<||>) is parsed(&unary_expression) { ... }
 
@@ -552,3 +507,60 @@ rule post_call_expr {
     | <index> {*}       #= index
 }
 
+
+## Grammar rules converted directly from the ECMA-script reference manual, 3rd edition.
+## This makes converting the whole thing to an optable easier.
+##
+## These rules are handled by the operator table (bottom-up parsing method).
+##
+#
+#rule logical_or_expression {
+#    <logical_and_expression> ['||' <logical_and_expression>]*
+#}
+#
+#rule logical_and_expression {
+#    <bitwise_or_expression> ['&&' <bitwise_or_expression>]*
+#}
+#
+#rule bitwise_or_expression {
+#    <bitwise_xor_expression> ['|' <bitwise_xor_expression>]*
+#}
+#
+#rule bitwise_xor_expression {
+#    <bitwise_and_expression> ['^' <bitwise_and_expression>]*
+#}
+#
+#rule bitwise_and_expression {
+#    <equality_expression> ['&' <equality_expression>]*
+#}
+#
+#rule equality_expression {
+#    <relational_expression> [<eqop> <relational_expression>]*
+#}
+#
+#token eqop { '==' | '!=' | '===' | '!==' }
+#
+#rule relational_expression {
+#    <shift_expression> [<relop> <shift_expression>]*
+#}
+#
+#token relop { '<' | '>' | '<=' | '>=' | 'instanceof' }
+#
+#rule shift_expression {
+#    <additive_expression> [<shiftop> <additive_expression>]*
+#}
+#
+#token shiftop { '<<' | '>>' | '>>>' }
+#
+#rule additive_expression {
+#    <multiplicative_expression> [<addop> <multiplicative_expression>]*
+#}
+#
+#token addop { '+' | '-' }
+#
+#rule multiplicative_expression {
+#    <unary_expression> [<mulop> <unary_expression>]*
+#}
+#
+#token mulop { '*' | '/' | '%' }
+#
