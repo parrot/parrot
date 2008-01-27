@@ -239,11 +239,16 @@
 ; implementation of cons
 (define-primitive (cons arg1 arg2)
   (list
-    (string->symbol "PAST::Op")
-    '(@ (pasttype "inline")
-                   (inline "new %r, 'EclectusPair'\\n"))
-    ))
-
+    (string->symbol "PAST::Var")
+    '(@ (viviself "EclectusPair")
+        (name "%dummy")
+        (isdecl 1)
+        (scope "lexical"))
+    (list
+      (string->symbol "PAST::Op")
+      '(@ (name "infix:,"))
+      (emit-expr arg1)
+      (emit-expr arg2))))
 
 (define emit-comparison
   (lambda (builtin arg1 arg2)
