@@ -90,6 +90,16 @@ method while_statement($/) {
     make PAST::Op.new( $cond, $block, :pasttype('while'), :node($/) );
 }
 
+## for1_statement: for ( <init>? ; <cond>? ; <step>? ) <statement>
+##
+## translates to:
+##
+## <init>
+## while (<cond>) {
+##   <statement>
+##   <step>
+## }
+##
 method for1_statement($/) {
     my $body := $( $<statement> );
     if $<step> {
@@ -105,10 +115,7 @@ method for1_statement($/) {
         $cond := PAST::Val.new( :value('1'), :returns('Integer'), :node($/) );
     }
 
-    my $loop := PAST::Op.new( $cond,
-                              $body,
-                              :pasttype('while'),
-                              :node($/) );
+    my $loop := PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
 
     if $<init> {
         my $init := $( $<init>[0] );
@@ -343,9 +350,12 @@ method call_expression($/) {
 
     for $<post_call_expr> {
         my $postexpr := $( $_ );
-        # the $invocant of this $postexpr is $past
+        # the $invocant of this $postexpr is $past; set it as the first
+        # child, so that it is evaluated first, and then invoked.
         $postexpr.unshift($past);
-        # make it work in a chain, like foo()()()()
+        # make it work in a chain, like foo()()()(); In case the loop ends
+        # here, $postexpr is the argument to "make"; otherwise, it's unshifted
+        # onto the next $postexpr as the first child.
         $past := $postexpr;
     }
 
@@ -366,17 +376,17 @@ method assignment_expression($/) {
     # first c is assigned to b, that result (b) is assigned to a.
     # therefore, loop through the array backwards.
     while $lhsexpr != 0 {
-        # generate the name of the assignment operator
-        my $op  := 'infix:' ~ ~$<assignop>[$lhsexpr - 1];
-        my $lhs := $( $<lhs_expression>[$lhsexpr - 1] );
-        $past := PAST::Op.new( $lhs, $past, :name($op), :pasttype('call'), :node($/) );
         $lhsexpr := $lhsexpr - 1;
+        # generate the name of the assignment operator
+        my $op  := 'infix:' ~ ~$<assignop>[$lhsexpr];
+        my $lhs := $( $<lhs_expression>[$lhsexpr] );
+        $past   := PAST::Op.new( $lhs, $past, :name($op), :pasttype('call'), :node($/) );
     }
     make $past;
 }
 
 method conditional_expression($/) {
-    my $past := $( $<logical_or_expression> );
+    my $past  := $( $<logical_or_expression> );
     if $<then> {
         $past := PAST::Op.new(  $past,
                                 $( $<then>[0] ),
@@ -389,16 +399,17 @@ method conditional_expression($/) {
 
 method unary_expression($/) {
     my $past := $( $<postfix_expression> );
-    my $unop := +$<unop> + 0;
+    my $unop := +$<unop>;
     while $unop != 0 {
         # get the operators in reverse order, that is closest to
         # the operand (postfix_expression)
-        my $op := $( $<unop>[$unop - 1] );
+        $unop  := $unop - 1;
+        my $op := $( $<unop>[$unop] );
         # set the current $past as the operand for that operation
         $op.push($past);
         # and update $past for the next one (or for the make statement)
         $past := $op;
-        $unop := $unop - 1;
+
     }
     make $past;
 }
