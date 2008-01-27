@@ -8,11 +8,7 @@ js -- A compiler for js ECMAScript-262
 
 =head1 DESCRIPTION
 
-js is a compiler for ECMAScript-262, running on Parrot. Its parser is
-a PGE grammar (a subclass of PGE::Grammar). The compilation is a series of
-tree transformations using TGE: from match tree to abstract syntax tree
-(AST), from AST to opcode syntax tree (OST), and finally from OST to
-bytecode (actually to PIR, at first).
+js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 
 =cut
 
