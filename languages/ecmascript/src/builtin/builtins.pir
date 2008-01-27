@@ -111,45 +111,61 @@
 ## infix operators
 ##
 
-.sub 'infix:||'
-    .param pmc left
-    .param pmc right
-.end
-
-
-.sub 'infix:&&'
-    .param pmc left
-    .param pmc right
-.end
+#.sub 'infix:||'
+#    .param pmc left
+#    .param pmc right
+#.end
+#
+#
+#.sub 'infix:&&'
+#    .param pmc left
+#    .param pmc right
+#.end
 
 
 .sub 'infix:|'
     .param pmc left
     .param pmc right
+    $I1 = left
+    $I2 = right
+    bor $I0, $I1, $I2
+    .return ($I0)
 .end
 
 
 .sub 'infix:^'
     .param pmc left
     .param pmc right
+    $I1 = left
+    $I2 = right
+    bxor $I0, $I1, $I2
+    .return ($I0)
 .end
 
 
 .sub 'infix:&'
     .param pmc left
     .param pmc right
+    $I1 = left
+    $I2 = right
+    band $I0, $I1, $I2
+    .return ($I0)
 .end
 
 
 .sub 'infix:=='
     .param pmc left
     .param pmc right
+    iseq $I0, left, right
+    .return ($I0)
 .end
 
 
 .sub 'infix:!='
     .param pmc left
     .param pmc right
+    isne $I0, left, right
+    .return ($I0)
 .end
 
 
@@ -260,10 +276,15 @@
 
 .sub 'prefix:~'
     .param pmc op
+    bnot $P0, op
+    .return ($P0)
 .end
 
 .sub 'prefix:!'
     .param pmc op
+    istrue $I0, op
+    not $I0
+    .return ($I0)
 .end
 
 # Local Variables:

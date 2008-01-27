@@ -410,7 +410,7 @@ rule assignment_expression {
     {*}
 }
 
-rule assignop {
+token assignop {
     $<op>=['='|'*='|'/='|'%='|'+='|'-='|'<<='|'>>='|'>>>='|'&='|'^='|'|=']
 }
 
@@ -423,9 +423,9 @@ rule conditional_expression {
 
 rule 'logical_or_expression' is optable { ... }
 
-proto 'infix:||'  is precedence('1') { ... }
+proto 'infix:||'  is precedence('1') is pasttype('unless') { ... }
 
-proto 'infix:&&'  is tighter('infix:||') { ... }
+proto 'infix:&&'  is tighter('infix:||') is pasttype('if') { ... }
 
 proto 'infix:|'   is tighter('infix:&&') { ... }
 

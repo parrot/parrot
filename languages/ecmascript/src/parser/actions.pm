@@ -592,8 +592,7 @@ method identifier($/) {
     make PAST::Var.new( :name($name),
                         :scope($scope),
                         :node($/)
-                      );
-                      #,:viviself('Undef') );
+                        ,:viviself('Undef') );
 }
 
 method literal($/, $key) {
