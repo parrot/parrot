@@ -25,16 +25,24 @@ method source_element($/, $key) {
 }
 
 method function_common($/) {
-    my $past := PAST::Block.new( $( $<block> ), :node($/) );
+    ## the formal parameter list method already creates a function block;
+    ## retrieve it, stuff the function statements onto it, and change
+    ## the :blocktype.
+    my $past := $( $<formal_parameter_list> );
+    $past.push( $( $<block> ) );
     $past.blocktype('declaration');
+    make $past;
+}
 
-    if $<formal_parameter_list> {
-        my @params := $<formal_parameter_list>[0]<identifier>;
-        for @params {
-            my $param := $( $_ );
-            $param.scope('parameter');
-            $past.push($param);
-        }
+method formal_parameter_list($/) {
+    ## the only place for formal parameters to live is in a function
+    ## block object, so create it here already. It can be decorated
+    ## with other function stuff when handling function_common.
+    my $past := PAST::Block.new( :node($/) );
+    for $<identifier> {
+        my $parameter := $( $_ );
+        $parameter.scope('parameter');
+        $past.push($parameter);
     }
     make $past;
 }
@@ -69,6 +77,9 @@ method statements($/) {
 }
 
 method block($/) {
+    ## Just any block does not define a different scope, so don't
+    ## create a PAST::Block. In cases where this is needed (functions)
+    ## a block can be wrapped around this Stmts node.
     make $( $<statements> );
 }
 
@@ -106,11 +117,17 @@ method while_statement($/) {
 ##
 method for1_statement($/) {
     my $body := $( $<statement> );
+
+    ## if there's a step, create a new compound statement node,
+    ## which consists of the pair ($body, $step).
     if $<step> {
         my $step := $( $<step>[0] );
         $body := PAST::Stmts.new( $body, $step, :node($/) );
     }
 
+    ## if there's a condition, get that expression; if there is none,
+    ## a 'true' condition is implicit, so create this value, in this
+    ## case the number '1'.
     my $cond;
     if $<cond> {
         $cond := $( $<cond>[0] );
@@ -119,8 +136,11 @@ method for1_statement($/) {
         $cond := PAST::Val.new( :value('1'), :returns('Integer'), :node($/) );
     }
 
+    ## now create a while loop, giving it the condition and body.
     my $loop := PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
 
+    ## if there's an init step, it is evaluated before the loop, so
+    ## create a compound statement node ($init, $loop).
     if $<init> {
         my $init := $( $<init>[0] );
         make PAST::Stmts.new( $init, $loop, :node($/) );

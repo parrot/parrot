@@ -31,12 +31,13 @@ rule function_declaration {
 }
 
 rule function_common {
-    '(' <formal_parameter_list>? ')' <block>
+    '(' <formal_parameter_list> ')' <block>
     {*}
 }
 
 rule formal_parameter_list {
-    <identifier> [',' <identifier>]*
+    [ <identifier> [',' <identifier>]* ]?
+    {*}
 }
 
 ##
