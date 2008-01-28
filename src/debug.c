@@ -2774,7 +2774,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     while (isspace(*s))
         s++;
 
-    reg_type = (unsigned char) toupper(*s);
+    reg_type = (unsigned char) toupper((unsigned char)*s);
     switch (reg_type) {
         case 'I': t = REGNO_INT; break;
         case 'N': t = REGNO_NUM; break;
