@@ -725,7 +725,6 @@ static void
 scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler * sched_struct = PARROT_SCHEDULER(scheduler);
-    INTVAL num_messages, index;
     PMC *message;
 
 #if CX_DEBUG
