@@ -207,11 +207,11 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 {
     int i, flags;
     char buf[1024], s[16];
-    SymReg ** const regs  = (SymReg **)mem_sys_allocate((n + 1) * sizeof (SymReg *));
+    SymReg ** const regs  = mem_allocate_n_zeroed_typed(n+1, SymReg *);
 
     strcpy(buf, "\"(");
     for (i = 0; i < n; i++) {
-        const SymReg *arg = args[i];
+        SymReg *arg = args[i];
 
         if (arg->type & VT_CONSTP)
             arg = arg->reg;
