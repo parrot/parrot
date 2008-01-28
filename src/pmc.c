@@ -66,7 +66,7 @@ pmc_new(PARROT_INTERP, INTVAL base_type)
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
         return VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        PMC *pmc = get_new_pmc_header(interp, base_type, 0);
+        PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
         VTABLE_init(interp, pmc);
         return pmc;
     }
@@ -343,7 +343,7 @@ pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
         return VTABLE_instantiate(interp, classobj, init);
     else {
-        PMC *pmc = get_new_pmc_header(interp, base_type, 0);
+        PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
         VTABLE_init_pmc(interp, pmc, init);
         return pmc;
     }

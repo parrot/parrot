@@ -97,7 +97,7 @@ Evaluates the number as a boolean, i.e. it's true if it's not zero.
 */
 
     INTVAL get_bool() {
-        FLOATVAL f = PMC_num_val(SELF);
+        const FLOATVAL f = PMC_num_val(SELF);
         return !FLOAT_IS_ZERO(f);
     }
 
@@ -118,9 +118,9 @@ Returns a Parrot string representation of the number.
     }
 
     STRING *get_repr() {
-        double d                = (double)PMC_num_val(SELF);
-        const char * const sign = signbit(PMC_num_val(SELF)) ? "-" : "";
-        d                       = fabs(d);
+        const FLOATVAL val      = PMC_num_val(SELF);
+        const double d          = fabs((double)val);
+        const char * const sign = signbit(val) ? "-" : "";
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
     }
 

@@ -49,7 +49,7 @@ Initializes the continuation.
      */
 
     void destroy() {
-        Parrot_cont *cc = PMC_cont(SELF);
+        Parrot_cont * const cc = PMC_cont(SELF);
 
         if (cc)
             mem_sys_free(cc);
