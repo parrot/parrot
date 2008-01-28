@@ -541,8 +541,9 @@ Used to archive the object.
 */
 
     void freeze(visit_info *info) {
+        /*
         IMAGE_IO *io = info->image_io;
-/*        INTVAL num_attributes = VTABLE_elements(interp, SELF);
+        INTVAL num_attributes = VTABLE_elements(interp, SELF);
         PMC_int_val(SELF) = num_attributes;
         VTABLE_push_integer(INTERP, io, num_attributes);
         */
@@ -579,8 +580,6 @@ Called after the object has been thawed.
 */
 
     void thawfinish(visit_info *info) {
-        Parrot_Object * const obj_data = PARROT_OBJECT(SELF);
-
         /* Set custom DOD mark and destroy on the object. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
@@ -603,7 +602,6 @@ Used to mark a PMC as read-only shared.
         INTVAL i, n;
         PMC *classobj;
         Parrot_Interp  master;
-        Parrot_Object *obj;
         INTVAL         type_num;
         PMC           *vtable_cache = PMCNULL;
 
@@ -657,11 +655,8 @@ Used to mark a PMC as read-only shared.
          * need to ensure that the class object won't go away when
          * this interpreter dies.
          */
-        {
-            PMC * const new_class = ret->vtable->pmc_class;
-            PARROT_ASSERT(new_class);
-            PARROT_ASSERT(ret->vtable->share_ro == Parrot_Object_share_ro);
-        }
+        PARROT_ASSERT(ret->vtable->pmc_class);
+        PARROT_ASSERT(ret->vtable->share_ro == Parrot_Object_share_ro);
 
         return ret;
     }
