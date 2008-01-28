@@ -42,9 +42,8 @@ int Parrot_STM_commit(PARROT_INTERP)
 void Parrot_STM_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_STM_destroy_extracted(PARROT_INTERP,
-    ARGMOD_NULLOK(void *saved_log_data))
-        __attribute__nonnull__(1);
+void Parrot_STM_destroy_extracted(SHIM_INTERP,
+    ARGMOD_NULLOK(void *saved_log_data));
 
 void Parrot_STM_dump_profile(PARROT_INTERP)
         __attribute__nonnull__(1);

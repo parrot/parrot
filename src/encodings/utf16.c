@@ -29,8 +29,7 @@ static void become_encoding(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL bytes(PARROT_INTERP, ARGIN(STRING *src))
-        __attribute__nonnull__(1)
+static UINTVAL bytes(SHIM_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -38,28 +37,30 @@ static UINTVAL codepoints(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL get_byte(PARROT_INTERP,
+static UINTVAL get_byte(SHIM_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes(PARROT_INTERP,
-    SHIM(STRING *src),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL count)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes_inplace(PARROT_INTERP,
-    SHIM(STRING *src),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    SHIM(STRING *return_string))
-        __attribute__nonnull__(1);
+    ARGIN(STRING *return_string))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 static UINTVAL get_codepoint(PARROT_INTERP,
     ARGIN(const STRING *src),
@@ -111,17 +112,20 @@ static void set_bytes(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static void set_codepoint(PARROT_INTERP,
-    SHIM(STRING *src),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL codepoint)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void set_codepoints(PARROT_INTERP,
-    SHIM(STRING *src),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    SHIM(STRING *new_codepoints))
-        __attribute__nonnull__(1);
+    ARGIN(STRING *new_codepoints))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

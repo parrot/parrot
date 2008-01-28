@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation
+ * Copyright (C) 2006-2008, The Perl Foundation
  */
 
 #include <parrot/parrot.h>
@@ -39,9 +39,11 @@ the low-level synchronization.
 #else
 static void STM_TRACE(const char *x, ...) /* HEADERIZER SKIP */
 {
+    UNUSED(x);
 }
 static void STM_TRACE_SAFE(const char *x, ...) /* HEADERIZER SKIP */
 {
+    UNUSED(x);
 }
 #endif
 
@@ -97,10 +99,9 @@ static PMC * force_sharing(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STM_read_record * get_read(PARROT_INTERP,
+static STM_read_record * get_read(SHIM_INTERP,
     ARGIN(STM_tx_log *log),
     int i)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int get_read_valid_depth(PARROT_INTERP, ARGIN(STM_tx_log *log))
@@ -114,10 +115,9 @@ static STM_tx_log_sub * get_sublog(ARGIN(STM_tx_log *log), int i)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STM_write_record * get_write(PARROT_INTERP,
+static STM_write_record * get_write(SHIM_INTERP,
     ARGIN(STM_tx_log *log),
     int i)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -168,8 +168,7 @@ static void replay_writes(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int safe_to_clone(PARROT_INTERP, ARGIN(const PMC * const original))
-        __attribute__nonnull__(1)
+static int safe_to_clone(SHIM_INTERP, ARGIN(const PMC *original))
         __attribute__nonnull__(2);
 
 static int setup_wait(PARROT_INTERP, ARGMOD(STM_tx_log *log))
@@ -307,7 +306,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STM_write_record *
-get_write(PARROT_INTERP, ARGIN(STM_tx_log *log), int i)
+get_write(SHIM_INTERP, ARGIN(STM_tx_log *log), int i)
 {
     PARROT_ASSERT(i >= 0);
     PARROT_ASSERT(i <= log->last_write);
@@ -327,7 +326,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STM_read_record *
-get_read(PARROT_INTERP, ARGIN(STM_tx_log *log), int i)
+get_read(SHIM_INTERP, ARGIN(STM_tx_log *log), int i)
 {
     PARROT_ASSERT(i >= 0);
     PARROT_ASSERT(i <= log->last_read);
@@ -1467,7 +1466,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-safe_to_clone(PARROT_INTERP, ARGIN(const PMC * const original))
+safe_to_clone(SHIM_INTERP, ARGIN(const PMC *original))
 {
     if (original->vtable->base_type == enum_class_Integer
         ||  original->vtable->base_type == enum_class_Float
@@ -1835,7 +1834,7 @@ Free memory associated with an extracted transaction log.
 */
 
 void
-Parrot_STM_destroy_extracted(PARROT_INTERP, ARGMOD_NULLOK(void *saved_log_data))
+Parrot_STM_destroy_extracted(SHIM_INTERP, ARGMOD_NULLOK(void *saved_log_data))
 {
     if (saved_log_data) {
         STM_saved_tx_log * const saved = (STM_saved_tx_log *)saved_log_data;

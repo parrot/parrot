@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -54,13 +54,18 @@ static const char* GDB_P(PARROT_INTERP, ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static const char* GDB_print_reg(PARROT_INTERP, int t, int n)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * nextarg(ARGIN(const char *command))
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 static const char * parse_command(
     ARGIN(const char *command),
     ARGOUT(unsigned long *cmdP))
@@ -322,7 +327,7 @@ that can be used as a switch key for fast lookup.
 */
 
 PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 static const char *
 parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
 {
@@ -330,7 +335,7 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
     unsigned long c = 0;
 
     /* Skip leading whitespace. */
-    while (*command && isspace(*command))
+    while (isspace(*command))
         command++;
 
     if (*command == '\0') {
@@ -2499,7 +2504,7 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     /* Extract the command after leading whitespace (for error messages). */
     while (*command && isspace(*command))
         command++;
-    (void) parse_command(command, &c);
+    parse_command(command, &c);
 
     switch (c) {
         case c_disassemble:
@@ -2714,7 +2719,7 @@ PDB_backtrace(PARROT_INTERP)
 
 /*
 
-=item C<static const char* GDB_P>
+=item C<static const char* GDB_print_reg>
 
 RT#48260: Not yet documented!!!
 
@@ -2725,7 +2730,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char*
-GDB_print_reg(PARROT_INTERP, ARGIN(int t), ARGIN(int n))
+GDB_print_reg(PARROT_INTERP, int t, int n)
 {
 
     if (n >= 0 && n < CONTEXT(interp->ctx)->n_regs_used[t]) {
@@ -2747,16 +2752,26 @@ GDB_print_reg(PARROT_INTERP, ARGIN(int t), ARGIN(int n))
     return "no such reg";
 }
 
+/*
+
+=item C<static const char* GDB_P>
+
+RT#48260: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char*
 GDB_P(PARROT_INTERP, ARGIN(const char *s))
 {
-    int t, n;
+    int t;
     char reg_type;
 
     /* Skip leading whitespace. */
-    while (*s && isspace(*s))
+    while (isspace(*s))
         s++;
 
     reg_type = (unsigned char) toupper(*s);
@@ -2769,7 +2784,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     }
     if (! s[1]) {
         /* Print all registers of this type. */
-        int max_reg = CONTEXT(interp->ctx)->n_regs_used[t];
+        const int max_reg = CONTEXT(interp->ctx)->n_regs_used[t];
         int n;
 
         for (n = 0; n < max_reg; n++) {
@@ -2780,7 +2795,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
         return "";
     }
     else if (s[1] && isdigit((unsigned char)s[1])) {
-        n = atoi(s + 1);
+        const int n = atoi(s + 1);
         return GDB_print_reg(interp, t, n);
     }
     else
