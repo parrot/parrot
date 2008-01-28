@@ -114,11 +114,6 @@ my $html = grep { $_ eq '--html' } @ARGV;
 my $run_exec = grep { $_ eq '--run-exec' } @ARGV;
 @ARGV = grep { $_ ne '--run-exec' } @ARGV;
 
-my $use_test_run = grep { $_ eq '--tr' } @ARGV;
-@ARGV = grep { $_ ne '--tr' } @ARGV;
-
-$use_test_run ||= $ENV{'PARROT_USE_TEST_RUN'};
-
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
 getopts('wgjPCSefbvdr?hO:D:', \%opts);
@@ -143,7 +138,6 @@ perl t/harness [options] [testfiles]
     --core-tests
     --runcore-tests
     --html
-    --tr       ... run using Test::Run
 EOF
     exit;
 }
@@ -236,19 +230,7 @@ unless ($runcore_tests_only) {
 # line or from @default tests
 my @tests = map { glob( $_ ) } (@ARGV ? @ARGV : @default_tests);
 
-if ($use_test_run) {
-    require Test::Run::CmdLine::Iface;
-    my $test_run =
-        Test::Run::CmdLine::Iface->new(
-            {
-                'test_files' => [@tests],
-            }   
-            # 'backend_params' => $self->_get_backend_params(),
-        );
-
-    $test_run->run();
-}
-elsif (!$html) {
+if (!$html) {
     Test::Harness::runtests(@tests);
 } else {
     my @smoke_config_vars = qw(
