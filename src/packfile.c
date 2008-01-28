@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -2588,7 +2588,7 @@ PARROT_API
 void
 Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
 {
-    PackFile_Directory * const dir = interp->code->base.dir;
+    const PackFile_Directory * const dir = interp->code->base.dir;
     const size_t num_segs = dir->num_segments;
     size_t i;
     opcode_t n;
