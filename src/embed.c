@@ -353,7 +353,7 @@ PARROT_CAN_RETURN_NULL
 PackFile *
 Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
 {
-    INTVAL program_size, wanted;
+    INTVAL program_size;
     char *program_code;
     PackFile *pf;
     FILE * io = NULL;
@@ -362,7 +362,7 @@ Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
     int fd = -1;
 #endif
 
-    if (fullname == NULL || strcmp(fullname, "-") == 0) {
+    if (fullname == NULL || STREQ(fullname, "-")) {
         /* read from STDIN */
         io = stdin;
         /* read 1k at a time */
@@ -400,6 +400,7 @@ again:
         size_t chunk_size;
         char *cursor;
         INTVAL read_result;
+        INTVAL wanted;
 
         chunk_size = program_size > 0 ? program_size : 1024;
         program_code = (char *)mem_sys_allocate(chunk_size);
@@ -407,8 +408,7 @@ again:
         program_size = 0;
         cursor = (char *)program_code;
 
-        while ((read_result =
-                fread(cursor, 1, chunk_size, io)) > 0) {
+        while ((read_result = fread(cursor, 1, chunk_size, io)) > 0) {
             program_size += read_result;
             if (program_size == wanted)
                 break;
@@ -501,7 +501,6 @@ again:
      */
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
-
     if (fd >= 0) {
         close(fd);   /* the man page states, it's ok to close a mmaped file */
     }
