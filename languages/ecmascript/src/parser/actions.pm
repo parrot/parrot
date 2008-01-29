@@ -252,10 +252,19 @@ method variable_statement($/) {
 }
 
 method variable_declaration($/) {
-    my $var  := $( $<identifier> );
+    our $?BLOCK;
 
+    my $var  := $( $<identifier> );
+    my $name := $var.name();
     $var.isdecl(1);
     $var.scope('lexical');
+
+    if $?BLOCK.symbol( $name ) {
+        ## XXX warning of duplicate declaration?
+    }
+    else { ## enter it if it's not there yet
+        $?BLOCK.symbol( $name, :scope('lexical') );
+    }
 
     ## handle initialization value
     if $<assignment_expression> {
@@ -579,6 +588,8 @@ method identifier($/) {
     our $?BLOCK;
     my $name := ~$/;
     my $scope;
+    ## try to find the current identifier in the current block's symbol table;
+    ## if present, the scope is lexical, otherwise it's 'package'.
     if $?BLOCK.symbol( $name ) {
         $scope := 'lexical';
     }
