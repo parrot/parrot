@@ -62,11 +62,11 @@ rule statement {
     #| <for2_statement> {*}        #= for2_statement
     #| <for3_statement> {*}        #= for3_statement
     #| <for4_statement> {*}        #= for4_statement
-    #| <continue_statement> {*}    #= continue_statement
-    #| <break_statement> {*}       #= break_statement
+    | <continue_statement> {*}    #= continue_statement
+    | <break_statement> {*}       #= break_statement
     #| <return_statement> {*}      #= return_statement
     #| <with_statement> {*}        #= with_statement
-    #| <labelled_statement> {*}    #= labelled_statement
+    | <labelled_statement> {*}    #= labelled_statement
     #| <switch_statement> {*}      #= switch_statement
     | <throw_statement> {*}       #= throw_statement
     | <try_statement> {*}         #= try_statement

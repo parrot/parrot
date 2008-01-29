@@ -196,9 +196,24 @@ method for4_statement($/) {
     $past := $body;
     make $past;
 }
+
 method labelled_statement($/) {
-    ## XXX handle the label in $<identifier>
-    make $( $<statement> );
+    my $label   := $( $<identifier> ).name() ~ ':' ;
+    my $labelop := PAST::Op.new( :inline($label), :node($/) );
+    my $stat    := $( $<statement> );
+    make PAST::Stmts.new( $labelop, $stat, :node($/) );
+}
+
+method continue_statement($/) {
+    # XXX todo
+    my $jumpop := '    goto LXXX';
+    make PAST::Op.new( :inline($jumpop), :node($/) );
+}
+
+method break_statement($/) {
+    # XXX todo
+    my $jumpop := '    goto LXXX';
+    make PAST::Op.new( :inline($jumpop), :node($/) );
 }
 
 method try_statement($/) {
