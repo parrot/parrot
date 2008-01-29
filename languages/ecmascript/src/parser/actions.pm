@@ -521,15 +521,7 @@ method member_expression($/) {
 }
 
 method member($/) {
-    my $past;
-
-    ## get the first part of the member rule, 2 options:
-    if $<primary_expression> {
-        $past := $( $<primary_expression> );
-    }
-    elsif $<function_expression> {
-        $past := $( $<function_expression> );
-    }
+    my $past := $( $<member_prefix> );
 
     ## for each index, $past acts as the invocant or main object on
     ## which some operation is executed; therefore $past must be the
@@ -542,6 +534,10 @@ method member($/) {
     }
 
     make $past;
+}
+
+method member_prefix($/, $key) {
+    make $( $/{$key} );
 }
 
 method index($/, $key) {

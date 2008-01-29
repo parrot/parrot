@@ -500,11 +500,13 @@ rule identifier_field {
 }
 
 rule member {
-    [ <primary_expression>
-    | <function_expression>
-    ]
-    <index>*
+    <member_prefix> <index>*
     {*}
+}
+
+rule member_prefix {
+    | <primary_expression> {*}      #= primary_expression
+    | <function_expression> {*}     #= function_expression
 }
 
 rule call_expression {

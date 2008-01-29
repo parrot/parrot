@@ -27,21 +27,6 @@
     .return (fields)
 .end
 
-# start of methods Put and CanPut.
-# lots of work to do in JS' object model.
-#.sub 'Put' :method
-#    .param pmc P
-#    .param pmc V
-#    $I0 = self.'CanPut'(P)
-#    unless $I0 goto stop
-#
-#  stop:
-#    .return()
-#.end
-#
-#.sub 'CanPut' :method
-#
-#.end
 
 .sub 'Array'
     .param pmc args :slurpy
@@ -49,6 +34,36 @@
     .return ($P0)
 .end
 
+.sub __load :init :anon
+    newclass $P0, ['ECMAScript';'Object']
+    newclass $P1, ['ECMAScript';'Array']
+.end
+
+.namespace ['ECMAScript';'Object']
+
+
+
+.namespace ['ECMAScript';'Array']
+
+.sub 'Put' :method
+   .param pmc propname
+   .param pmc value
+   $I0 = self.'CanPut'(propname)
+   unless $I0 goto stop
+
+ stop:
+   .return()
+.end
+
+.sub 'CanPut' :method
+    .param pmc propname
+.end
+
+.sub 'Get' :method
+    .param pmc propname
+.end
+
+.namespace
 
 ## built-in functions
 ##
