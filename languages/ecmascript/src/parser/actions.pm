@@ -7,7 +7,7 @@ method TOP($/, $key) {
     our @?BLOCK;
 
     if $key eq 'open' {
-        # create a 'global' block and stuff it into a 'stack' of blocks.
+        ## create a 'global' block and stuff it into a 'stack' of blocks.
         $?BLOCK := PAST::Block.new( :node($/) );
         @?BLOCK.unshift($?BLOCK);
     }
@@ -17,6 +17,9 @@ method TOP($/, $key) {
             $past.push( $( $_ ) );
         }
         make $past;
+
+        ## this is the end of the input; no need to shift the current block
+        ## from the scope stack; there's no use for it anymore.
     }
 }
 
@@ -34,6 +37,9 @@ method function_common($/) {
     ## this is just a Stmts node, the function body.
     $past.push( $( $<block> ) );
 
+    ## remove the current block from the scope stack; restore
+    ## the current block to the "previous" block, at the top of
+    ## the stack (position 0).
     @?BLOCK.shift();
     $?BLOCK  := @?BLOCK[0];
 
@@ -57,6 +63,7 @@ method formal_parameter_list($/) {
     for $<identifier> {
         my $parameter := $( $_ );
         $parameter.scope('parameter');
+        ## register the parameter as a local variable.
         $?BLOCK.symbol( $parameter.name(), :scope('lexical') );
         $past.push($parameter);
     }
@@ -204,8 +211,7 @@ method try_statement($/) {
         $past.push($catchblock);
     }
     if $<finally> {
-        # the finally block, if present, is always executed.
-        # XXX what about scope?
+        ## the finally block, if present, is always executed.
         my $finallyblock := $( $<finally> );
         $past := PAST::Stmts.new( $past, $finallyblock, :node($/) );
     }
@@ -375,6 +381,9 @@ method primary_expression($/, $key) {
 }
 
 method this($/) {
+    ## load 'self' into a register; when this PAST node is used as a child somewhere
+    ## this register will be used. This step is superfluous, but PAST does not support
+    ## PIR's 'self' special variable.
     make PAST::Op.new( :inline('    %r = self'), :node($/) );
 }
 
@@ -430,7 +439,7 @@ method assignment_expression($/) {
 method conditional_expression($/) {
     my $past  := $( $<logical_or_expression> );
 
-    ## handle the ? : ternary operator if present
+    ## handle the "? :" ternary operator if present
     if $<then> {
         $past := PAST::Op.new(  $past,
                                 $( $<then>[0] ),
