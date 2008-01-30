@@ -6,6 +6,7 @@ New up to r25293.
 - Compiler Toolkit
 - Languages
   + ECMAScript: reimplemented using PCT.
+  + pynie (Python for Parrot): add functions.
 - Implementation
 - Deprecations
 - Miscellaneous
