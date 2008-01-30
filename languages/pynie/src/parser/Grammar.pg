@@ -13,7 +13,6 @@
 
 grammar Pynie::Grammar is PCT::Grammar;
 
-## C<TOP> defines the top level rule to the HLLCompiler.
 token TOP {
     <.indent_zero>
     <file_input>
@@ -33,8 +32,8 @@ token file_input {
 token suite {
     | <stmt_list> <.newline> {*}                 #= stmt_list
     | <.newline> <.indent> <statement>
-        [ <.indent_same> <statement> ]*
-        [ <.dedent> | <.panic: IndentationError: unindent does not match any outer indentation level> ]
+      [ <.indent_same> <statement> ]*
+      [ <.dedent> | <.panic: IndentationError: unindent does not match any outer indentation level> ]
       {*}                                        #= indent
 }
 
@@ -185,7 +184,7 @@ token simple_stmt {
     | <assignment_stmt> {*}                      #= assignment_stmt
     | <augmented_assignment_stmt>
     | <expression_list> {*}                      #= expression_list
-    | <pass_stmt>
+    | <pass_stmt>                                #= pass_stmt
     | <del_stmt>
     | <print_stmt> {*}                           #= print_stmt
     | <return_stmt>
@@ -282,7 +281,7 @@ rule print_stmt {
 }
 
 rule pass_stmt {
-    'pass'
+    'pass' {*}
 }
 
 rule del_stmt {

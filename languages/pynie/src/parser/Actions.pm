@@ -83,6 +83,12 @@ method while_stmt($/) {
     make $past;
 }
 
+method pass_stmt($/) {
+    ## pass statement doesn't do anything, but do create a PAST
+    ## node to prevent special case code.
+    make PAST::Op.new( :inline('    # pass'), :node($/) );
+}
+
 method simple_stmt($/, $key) {
     make $( $/{$key} );
 }
