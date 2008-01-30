@@ -219,6 +219,33 @@ method keyword_item($/) {
     make $past;
 }
 
+method classname($/) {
+    make $( $<identifier> );
+}
+
+method classdef($/) {
+    ## a class definition is a set of statements
+    my $past := PAST::Stmts.new( :node($/) );
+
+    ## create an anonymous sub that generates the class
+    my $cdef := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $cname := $( $<classname> );
+    $cdef.pirflags(':init :anon');
+    my $pir := '    $P0 = newclass "' ~ $cname.name() ~ '"';
+    $cdef.push( PAST::Op.new( :inline($pir) ) );
+    $past.push($cdef);
+
+    ## handle parents, if available
+    if $<inheritance> {
+        my $parent := $( $<inheritance>[0] );
+    }
+
+    ## handle class contents
+    my $suite := $( $<suite> );
+
+    make $past;
+}
+
 method pass_stmt($/) {
     ## pass statement doesn't do anything, but do create a PAST
     ## node to prevent special case code.

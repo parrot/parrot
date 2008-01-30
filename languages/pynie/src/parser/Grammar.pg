@@ -62,7 +62,7 @@ token compound_stmt {
     | <try_stmt>
     | <with_stmt>
     | <funcdef> {*}                              #= funcdef
-    | <classdef>
+    | <classdef> {*}                             #= classdef
 }
 
 rule if_stmt {
@@ -205,10 +205,11 @@ rule parameter {
 
 rule classdef {
     'class' <classname> <inheritance>? ':' <suite>
+    {*}
 }
 
 rule classname {
-    <identifier>
+    <identifier> {*}
 }
 
 rule inheritance {
