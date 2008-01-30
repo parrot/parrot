@@ -176,6 +176,33 @@ method funcname($/) {
     make $( $<identifier> );
 }
 
+method argument_list($/) {
+    my $past;
+
+    if $<positional_arguments> {
+        $past := $( $<positional_arguments>[0] );
+    }
+    else {
+        PAST::Op.new( :pasttype('call'), :node($/) );
+    }
+    make $past;
+}
+
+method positional_arguments($/) {
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    for $<expression> {
+        $past.push($($_));
+    }
+    make $past;
+}
+
+method keyword_item($/) {
+    my $name := $( $<identifier> );
+    my $past := $( $<expression> );
+    $past.named($name);
+    make $past;
+}
+
 method pass_stmt($/) {
     ## pass statement doesn't do anything, but do create a PAST
     ## node to prevent special case code.

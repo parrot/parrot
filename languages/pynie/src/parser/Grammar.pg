@@ -118,35 +118,45 @@ rule decorator {
 }
 
 rule argument_list {
-    | <positional_arguments> [ ',' <keyword_arguments> ]?
-        [ ',' <excess_positional_arguments> ]?
-        [ ',' <excess_keyword_arguments> ]?
+    [ <positional_arguments> [ ',' <keyword_arguments> ]?
+        [ ',' <excess_positional_argument> ]?
+        [ ',' <excess_keyword_argument> ]?
     | <keyword_arguments>
-        [ ',' <excess_positional_arguments> ]?
-        [ ',' <excess_keyword_arguments> ]?
-    | <excess_positional_arguments>
-        [ ',' <excess_keyword_arguments> ]?
-    | <excess_keyword_arguments>
+        [ ',' <excess_positional_argument> ]?
+        [ ',' <excess_keyword_argument> ]?
+    | <excess_positional_argument>
+        [ ',' <excess_keyword_argument> ]?
+    | <excess_keyword_argument>
+    ]
+    {*}
 }
 
-rule excess_keyword_arguments {
+##<positional_arguments> ',' <keyword_arguments>
+##
+##<positional_arguments>
+##
+
+rule excess_keyword_argument {
     '**' <expression>
 }
 
-rule excess_positional_arguments {
+rule excess_positional_argument {
     '*' <expression>
 }
 
 rule positional_arguments {
     <expression> [ ',' <expression> ]*
+    {*}
 }
 
 rule keyword_arguments {
     <keyword_item> [ ',' <keyword_item> ]*
+    {*}
 }
 
 rule keyword_item {
     <identifier> '=' <expression>
+    {*}
 }
 
 rule dotted_name {
