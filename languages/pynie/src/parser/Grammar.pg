@@ -109,7 +109,6 @@ rule funcdef {
     {*}
 }
 
-
 rule decorators {
     <decorator>+
 }
@@ -156,6 +155,7 @@ rule parameter_list {
     | '**' <identifier>
     | <defparameter> ','?
     ]
+    {*}
 }
 
 rule defparameter {
@@ -186,13 +186,14 @@ rule inheritance {
 
 rule lambda_form {
     'lambda' <parameter_list>? ':' <expression>
+    {*}
 }
 
 token simple_stmt {
     | <assert_stmt>
     | <assignment_stmt> {*}                      #= assignment_stmt
     | <augmented_assignment_stmt>
-    | <expression_list> {*}                      #= expression_list
+    | <expression_stmt> {*}                      #= expression_stmt
     | <pass_stmt>                                #= pass_stmt
     | <del_stmt>
     | <print_stmt> {*}                           #= print_stmt
@@ -206,9 +207,9 @@ token simple_stmt {
     | <exec_stmt>
 }
 
-#rule expression_stmt {
-#    <expression_list>
-#}
+rule expression_stmt {
+    <expression_list> {*}
+}
 
 rule assert_stmt {
     'assert' <expression> [ ',' <expression> ]?
@@ -314,8 +315,11 @@ rule continue_stmt {
 }
 
 rule raise_stmt {
-    'raise' [ <expression> [ ',' <expression>
-    [ ',' <expression> ]? ]? ]?
+    'raise' [ <expression>
+              [ ',' <expression>
+                [ ',' <expression> ]?
+              ]?
+            ]?
 }
 
 rule global_stmt {
@@ -525,17 +529,16 @@ rule and_test {
 }
 
 rule not_test {
-    | 'not' <not_test> {*}                       #= not_test
-    | <in_test> {*}                              #= in_test
+    [$<nots>='not']* <in_test> {*}
 }
 
 rule in_test {
-    <is_test> [ ('not')? 'in' <is_test> ]*
+    <is_test> [ ['not']? 'in' <is_test> ]*
     {*}
 }
 
 rule is_test {
-    <comparison> [ 'is' ('not')? <comparison> ]*
+    <comparison> [ 'is' ['not']? <comparison> ]*
     {*}
 }
 

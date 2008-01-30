@@ -85,8 +85,33 @@ method while_stmt($/) {
     make $past;
 }
 
-method funcdef($/) {
+method parameter_list($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    make $past;
+}
+
+method lambda_form($/) {
+    my $past;
+    if $<parameter_list> {
+        $past := $( $<parameter_list>[0] );
+    }
+    else {
+        $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    }
+    my $expr := $( $<expression> );
+    $past.push($expr);
+    make $past;
+}
+
+method funcdef($/) {
+    my $past;
+
+    if $<parameter_list> {
+        $past := $( $<parameter_list>[0] );
+    }
+    else {
+        $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    }
     my $name := $( $<funcname> );
     $past.name( $name.name() );
     my $suite := $( $<suite> );
@@ -106,6 +131,10 @@ method pass_stmt($/) {
 
 method simple_stmt($/, $key) {
     make $( $/{$key} );
+}
+
+method expression_stmt($/) {
+    make $( $<expression_list> );
 }
 
 method expression_list($/) {
@@ -174,8 +203,12 @@ method and_test($/) {
 }
 
 
-method not_test($/, $key) {
-    make $( $<in_test> );
+method not_test($/) {
+    my $past := $( $<in_test> );
+    for $<nots> {
+        $past := PAST::Op.new( $past, :pirop('not'), :node($/) );
+    }
+    make $past;
 }
 
 
