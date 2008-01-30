@@ -372,7 +372,7 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     globals.cs->subs->n_basic_blocks = unit->n_basic_blocks;
 
     /* offset of block start and end, 4 * registers_used */
-    globals.cs->jit_info->data = (opcode_t *)realloc(globals.cs->jit_info->data,
+    globals.cs->jit_info->data = (opcode_t *)mem_sys_realloc(globals.cs->jit_info->data,
             size * sizeof (opcode_t) * 6);
 
     globals.cs->jit_info->size = size * 6;

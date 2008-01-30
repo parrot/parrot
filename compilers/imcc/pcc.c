@@ -273,8 +273,8 @@ unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
     const int n = pcc_sub->nargs;
     int i;
 
-    pcc_sub->args      = (SymReg **)realloc(pcc_sub->args, (n + 1) * sizeof (SymReg *));
-    pcc_sub->arg_flags = (int *)realloc(pcc_sub->arg_flags, (n + 1) * sizeof (int));
+    pcc_sub->args      = (SymReg **)mem_sys_realloc(pcc_sub->args, (n + 1) * sizeof (SymReg *));
+    pcc_sub->arg_flags = (int *)mem_sys_realloc(pcc_sub->arg_flags, (n + 1) * sizeof (int));
 
     for (i = n; i; --i) {
         pcc_sub->args[i]      = pcc_sub->args[i - 1];

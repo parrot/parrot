@@ -333,7 +333,7 @@ add_namespace(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
         unit->_namespace = ns;
     else {
         SymReg * const g = dup_sym(ns);
-        SymReg        *r = _get_sym(&IMCC_INFO(interp)->ghash, g->name);
+        SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, g->name);
 
         unit->_namespace = g;
         g->reg           = ns;
@@ -359,10 +359,10 @@ add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     const int n      = r->pcc_sub->nargs;
 
-    r->pcc_sub->args = (SymReg **)realloc(r->pcc_sub->args,
+    r->pcc_sub->args = (SymReg **)mem_sys_realloc(r->pcc_sub->args,
         (n + 1) * sizeof (SymReg *));
     r->pcc_sub->args[n]   = arg;
-    r->pcc_sub->arg_flags = (int *)realloc(r->pcc_sub->arg_flags,
+    r->pcc_sub->arg_flags = (int *)mem_sys_realloc(r->pcc_sub->arg_flags,
         (n+1) * sizeof (int));
     r->pcc_sub->arg_flags[n] = arg->type;
 
@@ -403,14 +403,14 @@ add_pcc_result(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     const int n     = r->pcc_sub->nret;
 
-    r->pcc_sub->ret = (SymReg **)realloc(r->pcc_sub->ret,
+    r->pcc_sub->ret = (SymReg **)mem_sys_realloc(r->pcc_sub->ret,
         (n + 1) * sizeof (SymReg *));
 
     r->pcc_sub->ret[n] = arg;
 
     /* we can't keep the flags in the SymReg as the SymReg
      * maybe used with different flags for different calls */
-    r->pcc_sub->ret_flags = (int *)realloc(r->pcc_sub->ret_flags,
+    r->pcc_sub->ret_flags = (int *)mem_sys_realloc(r->pcc_sub->ret_flags,
         (n + 1) * sizeof (int));
 
     r->pcc_sub->ret_flags[n] = arg->type;
@@ -435,7 +435,7 @@ add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
 {
     const int n       = r->pcc_sub->nmulti;
 
-    r->pcc_sub->multi = (SymReg **)realloc(r->pcc_sub->multi,
+    r->pcc_sub->multi = (SymReg **)mem_sys_realloc(r->pcc_sub->multi,
         (n + 1) * sizeof (SymReg *));
 
     r->pcc_sub->multi[n] = arg;
