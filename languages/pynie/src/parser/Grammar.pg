@@ -344,7 +344,7 @@ rule module {
 token literal {
     | <stringliteral> {*}                        #= stringliteral
     | <imagnumber>
-    | <floatnumber>
+    | <floatnumber> {*}                          #= floatnumber
     | <longinteger>
     | <integer> {*}                              #= integer
 }
@@ -365,9 +365,11 @@ token longinteger { <integer> <[lL]> }
 token imagnumber { [ <floatnumber> | <intpart> ] <[jJ]> }
 
 token floatnumber {
-    | \d* '.' \d+ [ <[eE]> <[+\-]>? \d+ ]?
+    [ \d* '.' \d+ [ <[eE]> <[+\-]>? \d+ ]?
     | \d+ '.' [ <[eE]> <[+\-]>? \d+ ]?
     | \d+ <[eE]> <[+\-]>? \d+
+    ]
+    {*}
 }
 
 token stringliteral {
@@ -392,7 +394,7 @@ regex longstring {
 
 
 token stringprefix {
-    'r' | 'u' | 'ur' | 'R' | 'U' | 'UR' | 'Ur' | 'uR'
+    $<prefix>=['r'|'u'|'ur'|'R'|'U'|'UR'|'Ur'|'uR']
 }
 
 rule expression_list {
@@ -431,8 +433,7 @@ rule list_if {
 }
 
 token augop {
-    | '+='  | '-='  | '*=' | '/=' | '\%=' | '**='
-    | '>>=' | '<<=' | '&=' | '^=' | '|='
+    $<op>=['+='|'-='|'*='|'/='|'\%='|'**='|'>>='|'<<='|'&='|'^='|'|=']
 }
 
 rule primary {

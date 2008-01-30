@@ -198,7 +198,11 @@ method literal($/, $key) {
 }
 
 method integer($/) {
-    make PAST::Val.new( :value( ~$/ ), :returns("Integer"), :node($/) );
+    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
+}
+
+method floatnumber($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node($/) );
 }
 
 method stringliteral($/, $key) {
