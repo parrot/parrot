@@ -118,7 +118,7 @@ ok($out =~ /^Usage/, "check dotnet");
 $filename = 'test.js';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "print(\"Hello World from JS\\n\")";
+print $FH "print(\"Hello World from JS\\n\");";
 close $FH;
 $out = `$parrot languages/ecmascript/js.pbc $filename`;
 ok($out eq "Hello World from JS\n", "check ecmascript");
