@@ -85,6 +85,19 @@ method while_stmt($/) {
     make $past;
 }
 
+method funcdef($/) {
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $name := $( $<funcname> );
+    $past.name( $name.name() );
+    my $suite := $( $<suite> );
+    $past.push($suite);
+    make $past;
+}
+
+method funcname($/) {
+    make $( $<identifier> );
+}
+
 method pass_stmt($/) {
     ## pass statement doesn't do anything, but do create a PAST
     ## node to prevent special case code.

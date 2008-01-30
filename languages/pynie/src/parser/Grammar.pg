@@ -61,7 +61,7 @@ token compound_stmt {
     | <for_stmt>
     | <try_stmt>
     | <with_stmt>
-    | <funcdef>
+    | <funcdef> {*}                              #= funcdef
     | <classdef>
 }
 
@@ -106,6 +106,7 @@ rule with_stmt {
 rule funcdef {
     <decorators>? 'def' <funcname> '(' <parameter_list>? ')'
     ':' <suite>
+    {*}
 }
 
 
@@ -146,7 +147,7 @@ rule dotted_name {
 }
 
 rule funcname {
-    <identifier>
+    <identifier> {*}
 }
 
 rule parameter_list {
