@@ -112,7 +112,7 @@ method defparameter($/) {
     my $past := $( $<parameter> );
     $past.scope('parameter');
 
-    ## add the default value for this parameter
+    ## add the default value for this parameter, if any
     if $<expression> {
         my $defaultvalue := $( $<expression>[0] );
         $past.viviself( $defaultvalue );
@@ -129,6 +129,7 @@ method sublist($/) {
 }
 
 method excess_positional_parameter($/) {
+    ## a :slurpy argument
     my $past := $( $<identifier> );
     $past.scope('parameter');
     $past.slurpy(1);
@@ -136,6 +137,7 @@ method excess_positional_parameter($/) {
 }
 
 method excess_keyword_parameter($/) {
+    ## a :named, :slurpy argument
     my $past := $( $<identifier> );
     $past.scope('parameter');
     $past.slurpy(1);
@@ -148,9 +150,10 @@ method lambda_form($/) {
     if $<parameter_list> {
         $past := $( $<parameter_list>[0] );
     }
-    else {
+    else { # if no parameters, create a block here:
         $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
     }
+    ## handle the function body XXX must this be a /return/ <expr> statement?
     my $expr := $( $<expression> );
     $past.push($expr);
     make $past;
@@ -188,6 +191,7 @@ method argument_list($/) {
 
     if $<keyword_arguments> {
         for $( $<keyword_arguments> ) {
+        ## XXX should this be: for @( $<keyword_arguments> )??
             $past.push( $_ );
         }
     }
@@ -214,6 +218,8 @@ method keyword_arguments($/) {
 method keyword_item($/) {
     my $past := $( $<expression> );
     my $name := $( $<identifier> );
+
+    ## XXX why doesn't this work??
     #$past.named( $name.name() );
     #make PAST::Val.new( :value('100'), :named('x'), :node($/) );
     make $past;
@@ -228,17 +234,20 @@ method classdef($/) {
     my $past := PAST::Stmts.new( :node($/) );
 
     ## create an anonymous sub that generates the class
-    my $cdef := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $cdef  := PAST::Block.new( :blocktype('declaration'), :node($/) );
     my $cname := $( $<classname> );
-    $cdef.pirflags(':init :anon');
-    my $pir := '    $P0 = newclass "' ~ $cname.name() ~ '"';
+    my $pir   := '    $P0 = newclass "' ~ $cname.name() ~ '"';
     $cdef.push( PAST::Op.new( :inline($pir) ) );
-    $past.push($cdef);
+    $cdef.pirflags(':init :anon');
 
     ## handle parents, if available
     if $<inheritance> {
-        my $parent := $( $<inheritance>[0] );
+        my $parent    := $( $<inheritance>[0] );
+        my $pir       := '    addparent $P0, %0';
+        my $addparent := PAST::Op.new( $parent, :inline($pir), :node($/) );
+        $cdef.push($addparent);
     }
+    $past.push($cdef);
 
     ## handle class contents
     my $suite := $( $<suite> );
@@ -407,7 +416,8 @@ method list_if($/) {
 
 method primary($/) {
     my $past := $( $<atom> );
-    ## XXX check this out:
+    ## $past is the first child of each <postop>, so unshift it
+    ## so it ends up at the front of the list.
     for $<postop> {
         my $postop := $($_);
         $postop.unshift($past);
@@ -421,6 +431,7 @@ method postop($/, $key) {
 }
 
 method call($/, $key) {
+    # XXX fix this.
     #make $( $/{$key} );
     if $<argument_list> {
         make $( $<argument_list>[0] );
@@ -460,11 +471,9 @@ method parenth_form($/) {
 }
 
 method assignment_stmt($/) {
-    make PAST::Op.new( $($<target_list>),
-                       $($<expression_list>),
-                       :pasttype('bind'),
-                       :node($/)
-                     );
+    my $lhs := $($<target_list>);
+    my $rhs := $($<expression_list>);
+    make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
 }
 
 method target_list($/) {
