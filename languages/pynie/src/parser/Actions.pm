@@ -212,9 +212,10 @@ method keyword_arguments($/) {
 }
 
 method keyword_item($/) {
-    my $name := $( $<identifier> );
     my $past := $( $<expression> );
-    $past.named($name);
+    my $name := $( $<identifier> );
+    #$past.named( $name.name() );
+    #make PAST::Val.new( :value('100'), :named('x'), :node($/) );
     make $past;
 }
 
@@ -238,7 +239,7 @@ method expression_list($/) {
         $past := $( $<expression>[0] );
     }
     else {
-        my $past := PAST::Op.new( :name('listmaker'), :node($/) );
+        $past := PAST::Op.new( :name('listmaker'), :node($/) );
         for $<expression> {
             $past.push( $($_) );
         }

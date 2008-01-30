@@ -12,6 +12,6 @@ print 'ok 1'
 def y(a,b,c):
  pass
 
-y()
+y(1,2,3)
 
 print 'ok 2'

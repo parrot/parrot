@@ -119,9 +119,9 @@ rule decorator {
 
 rule argument_list {
     [
-      [ <positional_arguments> ',' <keyword_arguments>
+      [ <keyword_arguments>
+      | <positional_arguments> ',' <keyword_arguments>
       | <positional_arguments>
-      | <keyword_arguments>
       ]
         [ ',' <excess_positional_argument> ]?
         [ ',' <excess_keyword_argument> ]?
