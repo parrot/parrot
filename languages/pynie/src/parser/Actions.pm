@@ -87,6 +87,36 @@ method while_stmt($/) {
 
 method parameter_list($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    ## handle normal parameters
+    #for $<defparameter> {
+    #
+    #}
+
+    ## handle '*' <identifier>
+    if $<excess_positional_parameter> {
+        my $slurpparam := $( $<excess_positional_parameter> );
+        $past.push( $slurpparam );
+    }
+    ## handle '**' <identifier>
+    if $<excess_keyword_parameter> {
+        my $dictparam := $( $<excess_keyword_parameter> );
+        $past.push( $dictparam );
+    }
+    make $past;
+}
+
+method excess_positional_parameter($/) {
+    my $past := $( $<identifier> );
+    $past.scope('parameter');
+    $past.slurpy(1);
+    make $past;
+}
+
+method excess_keyword_parameter($/) {
+    my $past := $( $<identifier> );
+    $past.scope('parameter');
+    $past.slurpy(1);
+    $past.named(1);
     make $past;
 }
 

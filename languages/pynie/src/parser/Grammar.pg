@@ -159,7 +159,8 @@ rule funcname {
 
 rule parameter_list {
     [ <defparameter> ',' ]*
-    [ <excess_positional_parameter> [ ',' <excess_keyword_parameter> ]?
+    [ <excess_positional_parameter> ',' <excess_keyword_parameter>
+    | <excess_positional_parameter>
     | <excess_keyword_parameter>
     | <defparameter> ','?
     ]
@@ -168,14 +169,17 @@ rule parameter_list {
 
 rule excess_positional_parameter {
     '*' <identifier>
+    {*}
 }
 
 rule excess_keyword_parameter {
     '**' <identifier>
+    {*}
 }
 
 rule defparameter {
     <parameter> [ '=' <expression> ]?
+
 }
 
 rule sublist {
