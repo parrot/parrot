@@ -179,6 +179,7 @@ rule excess_keyword_parameter {
 
 rule defparameter {
     <parameter> [ '=' <expression> ]?
+    {*}
 
 }
 
@@ -187,7 +188,8 @@ rule sublist {
 }
 
 rule parameter {
-    <identifier> | '(' <sublist> ')'
+    | <identifier> {*}             #= identifier
+    | '(' <sublist> ')'            #= sublist
 }
 
 

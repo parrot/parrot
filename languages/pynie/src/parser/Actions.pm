@@ -86,11 +86,14 @@ method while_stmt($/) {
 }
 
 method parameter_list($/) {
+    ## the only place for parameters to live is in a function block;
+    ## create that here already.
     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+
     ## handle normal parameters
-    #for $<defparameter> {
-    #
-    #}
+    for $<defparameter> {
+        $past.push( $($_) );
+    }
 
     ## handle '*' <identifier>
     if $<excess_positional_parameter> {
@@ -103,6 +106,26 @@ method parameter_list($/) {
         $past.push( $dictparam );
     }
     make $past;
+}
+
+method defparameter($/) {
+    my $past := $( $<parameter> );
+    $past.scope('parameter');
+
+    ## add the default value for this parameter
+    if $<expression> {
+        my $defaultvalue := $( $<expression>[0] );
+        $past.viviself( $defaultvalue );
+    }
+    make $past;
+}
+
+method parameter($/, $key) {
+    make $( $/{$key} )
+}
+
+method sublist($/) {
+    ## XXX
 }
 
 method excess_positional_parameter($/) {
