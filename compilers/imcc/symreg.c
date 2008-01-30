@@ -359,12 +359,21 @@ add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     const int n      = r->pcc_sub->nargs;
 
-    r->pcc_sub->args = (SymReg **)mem_sys_realloc(r->pcc_sub->args,
-        (n + 1) * sizeof (SymReg *));
-    r->pcc_sub->args[n]   = arg;
-    r->pcc_sub->arg_flags = (int *)mem_sys_realloc(r->pcc_sub->arg_flags,
-        (n+1) * sizeof (int));
-    r->pcc_sub->arg_flags[n] = arg->type;
+    struct pcc_sub_t * const sub = r->pcc_sub;
+
+    if (sub->args)
+        sub->args = (SymReg **)mem_sys_realloc(sub->args,
+            (n+1) * sizeof (SymReg *));
+    else
+        sub->args = mem_allocate_n_zeroed_typed(n+1, SymReg *);
+    sub->args[n]   = arg;
+
+    if (sub->arg_flags)
+        sub->arg_flags = (int *)mem_sys_realloc(sub->arg_flags,
+            (n+1) * sizeof (int));
+    else
+        sub->arg_flags = mem_allocate_n_zeroed_typed(n+1,int);
+    sub->arg_flags[n] = arg->type;
 
     arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
 
