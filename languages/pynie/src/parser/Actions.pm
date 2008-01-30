@@ -16,15 +16,17 @@ method file_input($/) {
 }
 
 method suite($/, $key) {
-    my $past;
-    if $key eq 'stmt_list' {
-        $past := $( $<stmt_list> );
-    }
-    if $key eq 'indent' {
-        $past := PAST::Stmts.new( :node($/) );
-        for $<statement> {
-            $past.push($($_));
-        }
+    make $( $/{$key} );
+}
+
+method suite1($/) {
+    make $( $<stmt_list> );
+}
+
+method suite2($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<statement> {
+        $past.push($($_));
     }
     make $past;
 }

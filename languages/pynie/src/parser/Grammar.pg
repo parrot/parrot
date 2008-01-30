@@ -30,11 +30,19 @@ token file_input {
 }
 
 token suite {
-    | <stmt_list> <.newline> {*}                 #= stmt_list
-    | <.newline> <.indent> <statement>
-      [ <.indent_same> <statement> ]*
-      [ <.dedent> | <.panic: IndentationError: unindent does not match any outer indentation level> ]
-      {*}                                        #= indent
+    | <suite1> {*}               #= suite1
+    | <suite2> {*}               #= suite2
+}
+
+token suite1 {
+    <stmt_list> <.newline> {*}
+}
+
+token suite2 {
+    <.newline> <.indent> <statement>
+    [ <.indent_same> <statement> ]*
+    [ <.dedent> | <.panic: IndentationError: unindent does not match any outer indentation level> ]
+    {*}
 }
 
 token statement {
