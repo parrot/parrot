@@ -180,17 +180,32 @@ method argument_list($/) {
     my $past;
 
     if $<positional_arguments> {
-        $past := $( $<positional_arguments>[0] );
+        $past := $( $<positional_arguments> );
     }
     else {
-        PAST::Op.new( :pasttype('call'), :node($/) );
+        $past := PAST::Op.new( :pasttype('call'), :node($/) );
     }
+
+    if $<keyword_arguments> {
+        for $( $<keyword_arguments> ) {
+            $past.push( $_ );
+        }
+    }
+
     make $past;
 }
 
 method positional_arguments($/) {
     my $past := PAST::Op.new( :pasttype('call'), :node($/) );
     for $<expression> {
+        $past.push($($_));
+    }
+    make $past;
+}
+
+method keyword_arguments($/) {
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    for $<keyword_item> {
         $past.push($($_));
     }
     make $past;
@@ -338,11 +353,27 @@ method list_if($/) {
 method primary($/) {
     my $past := $( $<atom> );
     ## XXX check this out:
-    #for $<postop> {
-    #    my $postop := $($_);
-    #    $postop.push($past);
-    #}
+    for $<postop> {
+        my $postop := $($_);
+        $postop.unshift($past);
+        $past := $postop;
+    }
     make $past;
+}
+
+method postop($/, $key) {
+    make $( $/{$key} );
+}
+
+method call($/, $key) {
+    #make $( $/{$key} );
+    if $<argument_list> {
+        make $( $<argument_list>[0] );
+    }
+    else {
+        make PAST::Op.new( :pasttype('call'), :node($/) );
+    }
+
 }
 
 method atom($/, $key) {

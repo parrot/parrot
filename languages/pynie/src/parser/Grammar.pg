@@ -118,7 +118,11 @@ rule decorator {
 }
 
 rule argument_list {
-    [ <positional_arguments> [ ',' <keyword_arguments> ]?
+    [
+      [ <positional_arguments> ',' <keyword_arguments>
+      | <positional_arguments>
+      | <keyword_arguments>
+      ]
         [ ',' <excess_positional_argument> ]?
         [ ',' <excess_keyword_argument> ]?
     | <keyword_arguments>
@@ -131,10 +135,6 @@ rule argument_list {
     {*}
 }
 
-##<positional_arguments> ',' <keyword_arguments>
-##
-##<positional_arguments>
-##
 
 rule excess_keyword_argument {
     '**' <expression>
@@ -269,8 +269,9 @@ rule target {
 }
 
 rule call {
-    | '(' [ <argument_list>? ','? ]? ')'
-    | '(' [ <argument_list> ','? | <test> <genexpr_for> ] ')'
+    '(' <argument_list>? ')' {*}                                  #= argument_list
+    #| '(' [ <argument_list>? ','? ]? ')' {*}
+    #| '(' [ <argument_list> ','? | <test> <genexpr_for> ] ')'
 }
 
 rule attributeref {
@@ -489,10 +490,10 @@ rule primary {
 }
 
 rule postop {
-    | <attributeref>
-    | <subscription>
-    | <slicing>
-    | <call>
+    #| <attributeref>
+    #| <subscription>
+    #| <slicing>
+    | <call> {*}               #= call
 }
 
 
