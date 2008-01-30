@@ -252,6 +252,33 @@ method pass_stmt($/) {
     make PAST::Op.new( :inline('    # pass'), :node($/) );
 }
 
+method raise_stmt($/) {
+    ## XXX finish this
+    my $numexpr := +$<expression>;
+
+    ## think of better structure to handle this:
+    if $numexpr == 0 {
+
+    }
+    elsif $numexpr == 1 {
+
+    }
+    elsif $numexpr == 2 {
+        #my $exctype  := $( $<expression> );
+        #my $excvalue := $( $<expression> );
+    }
+    elsif $numexpr == 3 {
+
+    } # else will never happen.
+
+    ## XXX for now this'll do:
+    my $exc  := PAST::Op.new( :inline('    %r = new "Exception"'), :node($/) );
+    my $pir  := '    throw %0';
+    my $past := PAST::Op.new( $exc, :inline($pir), :node($/) );
+
+    make $past;
+}
+
 method simple_stmt($/, $key) {
     make $( $/{$key} );
 }

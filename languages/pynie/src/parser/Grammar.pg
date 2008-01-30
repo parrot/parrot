@@ -232,7 +232,7 @@ token simple_stmt {
     | <print_stmt> {*}                           #= print_stmt
     | <return_stmt>
     | <yield_stmt>
-    | <raise_stmt>
+    | <raise_stmt> {*}                           #= raise_stmt
     | <break_stmt>
     | <continue_stmt>
     | <import_stmt>
@@ -354,6 +354,7 @@ rule raise_stmt {
                 [ ',' <expression> ]?
               ]?
             ]?
+    {*}
 }
 
 rule global_stmt {
