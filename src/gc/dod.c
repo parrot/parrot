@@ -189,8 +189,7 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 #  if ! DISABLE_GC_DEBUG
 #    if GC_VERBOSE
     if (CONSERVATIVE_POINTER_CHASING) {
-        fprintf(stderr, "GC Warning! Unanchored %s %p "
-                " found in system areas \n",
+        fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
                 PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
     }
 #    endif
@@ -386,7 +385,6 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
     Arenas * const arena_base = interp->arena_base;
     const int      lazy_dod   = arena_base->lazy_dod;
     PMC           *current    = arena_base->dod_mark_start;
-    PMC           *next       = PMCNULL;
 
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
 
@@ -404,8 +402,9 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
 
     pt_DOD_mark_root_finished(interp);
 
-    for (; ; current = next) {
+    while (1) {
         const UINTVAL bits = PObj_get_FLAGS(current) & mask;
+        PMC *next;
 
         if (lazy_dod && arena_base->num_early_PMCs_seen >=
                 arena_base->num_early_DOD_PMCs) {
@@ -443,11 +442,10 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
         if (!PMC_IS_NULL(next) && next == current)
             break;
 
-        if (--how_many == 0) {
-            current = next;
+        current = next;
+        if (--how_many == 0)
             break;
-        }
-    }
+    } /* endless while */
 
     arena_base->dod_mark_start = current;
     arena_base->dod_trace_ptr  = NULL;
