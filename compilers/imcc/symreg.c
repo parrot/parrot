@@ -411,22 +411,29 @@ void
 add_pcc_result(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     const int n     = r->pcc_sub->nret;
+    struct pcc_sub_t * const sub = r->pcc_sub;
 
-    r->pcc_sub->ret = (SymReg **)mem_sys_realloc(r->pcc_sub->ret,
-        (n + 1) * sizeof (SymReg *));
+    if (sub->ret)
+        sub->ret = (SymReg **)mem_sys_realloc(sub->ret,
+            (n + 1) * sizeof (SymReg *));
+    else
+        sub->ret = mem_allocate_n_zeroed_typed(n+1, SymReg*);
 
-    r->pcc_sub->ret[n] = arg;
+    sub->ret[n] = arg;
 
     /* we can't keep the flags in the SymReg as the SymReg
      * maybe used with different flags for different calls */
-    r->pcc_sub->ret_flags = (int *)mem_sys_realloc(r->pcc_sub->ret_flags,
-        (n + 1) * sizeof (int));
+    if (sub->ret_flags)
+        sub->ret_flags = (int *)mem_sys_realloc(sub->ret_flags,
+                (n + 1) * sizeof (int));
+    else
+        sub->ret_flags = mem_allocate_n_zeroed_typed(n+1, int);
 
-    r->pcc_sub->ret_flags[n] = arg->type;
+    sub->ret_flags[n] = arg->type;
 
     arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
 
-    r->pcc_sub->nret++;
+    sub->nret++;
 }
 
 /*
@@ -443,12 +450,16 @@ void
 add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
 {
     const int n       = r->pcc_sub->nmulti;
+    struct pcc_sub_t * const sub = r->pcc_sub;
 
-    r->pcc_sub->multi = (SymReg **)mem_sys_realloc(r->pcc_sub->multi,
-        (n + 1) * sizeof (SymReg *));
+    if (sub->multi)
+        sub->multi = (SymReg **)mem_sys_realloc(sub->multi,
+            (n + 1) * sizeof (SymReg *));
+    else
+        sub->multi = mem_allocate_n_zeroed_typed(n+1,SymReg *);
 
-    r->pcc_sub->multi[n] = arg;
-    r->pcc_sub->nmulti++;
+    sub->multi[n] = arg;
+    sub->nmulti++;
 }
 
 /*
@@ -1223,16 +1234,17 @@ resize_symhash(ARGMOD(SymHash *hsh))
     const int new_size = hsh->size << 1;
     int i;
     SymReg ** next_r;
-    int n_next, k;
+    int n_next;
 
-    nh.data = (SymReg**)mem_sys_allocate_zeroed(new_size * sizeof (SymReg*));
+    nh.data = mem_allocate_n_zeroed_typed(new_size, SymReg*);
     n_next  = 16;
-    next_r  =  (SymReg**)mem_sys_allocate_zeroed(n_next  * sizeof (SymReg*));
+    next_r  = mem_allocate_n_zeroed_typed(n_next, SymReg*);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r;
         SymReg *next;
         int j = 0;
+        int k;
         for (r = hsh->data[i]; r; r = next) {
             next = r->next;
             /*
