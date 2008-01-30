@@ -119,14 +119,22 @@ rule decorator {
 
 rule argument_list {
     | <positional_arguments> [ ',' <keyword_arguments> ]?
-        [ ',' '*' <expression> ]?
-        [ ',' '**' <expression> ]?
+        [ ',' <excess_positional_arguments> ]?
+        [ ',' <excess_keyword_arguments> ]?
     | <keyword_arguments>
-        [ ',' '*' <expression> ]?
-        [ ',' '**' <expression> ]?
-    | '*' <expression>
-        [ ',' '**' <expression> ]?
-    | '**' <expression>
+        [ ',' <excess_positional_arguments> ]?
+        [ ',' <excess_keyword_arguments> ]?
+    | <excess_positional_arguments>
+        [ ',' <excess_keyword_arguments> ]?
+    | <excess_keyword_arguments>
+}
+
+rule excess_keyword_arguments {
+    '**' <expression>
+}
+
+rule excess_positional_arguments {
+    '*' <expression>
 }
 
 rule positional_arguments {
@@ -151,11 +159,19 @@ rule funcname {
 
 rule parameter_list {
     [ <defparameter> ',' ]*
-    [ '*' <identifier> [ ',' '**' <identifier> ]?
-    | '**' <identifier>
+    [ <excess_positional_parameter> [ ',' <excess_keyword_parameter> ]?
+    | <excess_keyword_parameter>
     | <defparameter> ','?
     ]
     {*}
+}
+
+rule excess_positional_parameter {
+    '*' <identifier>
+}
+
+rule excess_keyword_parameter {
+    '**' <identifier>
 }
 
 rule defparameter {
