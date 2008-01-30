@@ -176,6 +176,10 @@ method expression($/, $key) {
     make $( $<or_test>[0] );
 }
 
+method test($/, $key) {
+    make $( $/{$key} );
+}
+
 method or_test($/) {
     my $count := +$<and_test> - 1;
     my $past := $( $<and_test>[$count] );
@@ -239,8 +243,26 @@ method comparison($/, $key) {
     }
 }
 
+method list_iter($/, $key) {
+    make $( $/{$key} );
+}
+
+method list_for($/) {
+    ## XXX
+}
+
+method list_if($/) {
+    ## XXX
+}
+
 method primary($/) {
-    make $( $<atom> );
+    my $past := $( $<atom> );
+    ## XXX check this out:
+    #for $<postop> {
+    #    my $postop := $($_);
+    #    $postop.push($past);
+    #}
+    make $past;
 }
 
 method atom($/, $key) {

@@ -194,7 +194,7 @@ token simple_stmt {
     | <assignment_stmt> {*}                      #= assignment_stmt
     | <augmented_assignment_stmt>
     | <expression_stmt> {*}                      #= expression_stmt
-    | <pass_stmt>                                #= pass_stmt
+    | <pass_stmt> {*}                            #= pass_stmt
     | <del_stmt>
     | <print_stmt> {*}                           #= print_stmt
     | <return_stmt>
@@ -274,7 +274,7 @@ rule proper_slice {
 }
 
 rule short_slice {
-    <expression>? ':' <expression>?
+    [$<start>=<expression>]? ':' [$<end>=<expression>]?
 }
 
 rule long_slice {
@@ -424,7 +424,8 @@ rule listmaker {
 }
 
 rule list_iter {
-    <list_for> | <list_if>
+    | <list_for> {*}           #= list_for
+    | <list_if> {*}            #= list_if
 }
 
 rule list_for {
@@ -432,16 +433,18 @@ rule list_for {
     <list_iter>?
 }
 
+rule list_if {
+    'if' <test>
+    <list_iter>?
+}
+
 rule test {
-    <or_test> | <lambda_form>
+    | <or_test> {*}             #= or_test
+    | <lambda_form> {*}         #= lambda_form
 }
 
 rule testlist {
     <test> [ ',' <test> ]* ','?
-}
-
-rule list_if {
-    'if' <test> <list_iter>?
 }
 
 token augop {
@@ -486,7 +489,8 @@ rule genexpr_for {
 }
 
 rule genexpr_iter {
-    <genexpr_for> | <genexpr_if>
+    | <genexpr_for>
+    | <genexpr_if>
 }
 
 rule genexpr_if {
