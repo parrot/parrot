@@ -31,7 +31,7 @@ all: pynie.pbc
 
 SOURCES = pynie.pir \
   src/parser/Grammar.pg \
-  src/parser/Actions.pct \
+  src/parser/Actions.pm \
   src/builtins/io.pir \
   src/builtins/lists.pir \
   src/builtins/oper.pir \
@@ -41,7 +41,7 @@ pynie.pbc: $(PARROT) $(PERL6GRAMMAR) $(NQP) $(PCT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
 	    --output=src/gen_grammar.pir src/parser/Grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(NQP) --target=pir \
-	    --output=src/gen_actions.pir src/parser/Actions.pct
+	    --output=src/gen_actions.pir src/parser/Actions.pm
 	$(PARROT) $(PARROT_ARGS) -o pynie.pbc pynie.pir
 
 # regenerate the Makefile
