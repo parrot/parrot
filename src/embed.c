@@ -766,10 +766,11 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 =item C<static PMC* set_current_sub>
 
-Search the fixup table for a PMC matching the argument.
-On a match, set up the appropriate context
-If no match, set up a dummy PMC entry
-In either case, return a pointer to the PMC
+Search the fixup table for a PMC matching the argument.  On a match,
+set up the appropriate context.
+
+If no match, set up a dummy PMC entry.  In either case, return a
+pointer to the PMC.
 
 =cut
 
@@ -779,10 +780,8 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 set_current_sub(PARROT_INTERP)
 {
-    opcode_t i, ci;
-    Parrot_sub *sub;
+    opcode_t i;
     PMC *sub_pmc;
-    size_t offs;
 
     PackFile_ByteCode * const cur_cs = interp->code;
     PackFile_FixupTable * const ft = cur_cs->fixups;
@@ -795,18 +794,20 @@ set_current_sub(PARROT_INTERP)
 
     for (i = 0; i < ft->fixup_count; i++) {
         if (ft->fixups[i]->type == enum_fixup_sub) {
-            ci = ft->fixups[i]->offset;
+            const opcode_t ci = ft->fixups[i]->offset;
+            Parrot_sub *sub;
+
             sub_pmc = ct->constants[ci]->u.key;
             sub = PMC_sub(sub_pmc);
-            if (sub->seg != cur_cs)
-                continue;
-            offs = sub->start_offs;
-            if (offs == interp->resume_offset) {
-                CONTEXT(interp->ctx)->current_sub = sub_pmc;
-                CONTEXT(interp->ctx)->current_HLL = sub->HLL_id;
-                return sub_pmc;
+            if (sub->seg == cur_cs) {
+                const size_t offs = sub->start_offs;
+                if (offs == interp->resume_offset) {
+                    CONTEXT(interp->ctx)->current_sub = sub_pmc;
+                    CONTEXT(interp->ctx)->current_HLL = sub->HLL_id;
+                    return sub_pmc;
+                }
+                break;
             }
-            break;
         }
     }
     /*
