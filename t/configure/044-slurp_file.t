@@ -13,7 +13,7 @@ use lib qw( lib );
 use Parrot::BuildUtil;
 
 {
-    my ( $fh, $tempfile ) = tempfile();
+    my ( $fh, $tempfile ) = tempfile( UNLINK => 1 );
     open $fh, ">", $tempfile
         or croak "Unable to open tempfile for writing";
     print $fh "Testing Parrot::BuildUtil::slurp_file()\n";
@@ -30,7 +30,7 @@ use Parrot::BuildUtil;
 }
 
 {
-    my ( $fh, $tempfile ) = tempfile();
+    my ( $fh, $tempfile ) = tempfile( UNLINK => 1 );
     open $fh, ">", $tempfile
         or croak "Unable to open tempfile for writing";
     print $fh "Testing Parrot::BuildUtil::slurp_file()\cM\cJ\n";
