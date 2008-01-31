@@ -236,7 +236,7 @@ fetch_op_mixed_le(ARGIN(const unsigned char *b))
         opcode_t o[2];
     } u;
     /* wordsize = 8 then */
-    fetch_buf_le_8(u.buf, (unsigned char *) b);
+    fetch_buf_le_8(u.buf, (const unsigned char *) b);
     return u.o[0]; /* or u.o[1] */
 #else
     union {
@@ -270,7 +270,7 @@ fetch_op_mixed_be(ARGIN(const unsigned char *b))
         opcode_t o[2];
     } u;
     /* wordsize = 8 then */
-    fetch_buf_be_8(u.buf, (unsigned char *) b);
+    fetch_buf_be_8(u.buf, (const unsigned char *) b);
     return u.o[1]; /* or u.o[0] */
 #else
     union {
