@@ -53,6 +53,8 @@ my $cwd = cwd();
 qq{Header added to MANIFEST for testing purposes correctly detected in Parrot::Configure object data structure}
     );
 
+    unlink qq{$tdir/MANIFEST}
+        or croak "Unable to delete file after testing";
     chdir $cwd
         or croak "Unable to change back to starting directory after testing";
 }

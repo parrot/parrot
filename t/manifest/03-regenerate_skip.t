@@ -37,6 +37,7 @@ ok( $print_str, "prepare_manifest_skip() returned" );
     ok( -f $sk, "$sk found in tempdir" );
     my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
     ok( !$need_for_skip, "No need to regenerate $sk" );
+    unlink qq{$tdir/$sk} or croak "Unable to delete file from tempdir";
     chdir $cwd
         or croak "Unable to change back from temporary directory after testing";
 }
@@ -65,6 +66,7 @@ ok( $print_str, "prepare_manifest_skip() returned" );
     ok( $need_for_skip,                         "Need to regenerate $sk" );
     ok( $mani->print_manifest_skip($print_str), "print_manifest_skip() returned true" );
     ok( -f $sk,                                 "$sk has been created in tempdir" );
+    unlink qq{$tdir/$sk} or croak "Unable to delete file from tempdir";
     chdir $cwd
         or croak "Unable to change back from temporary directory after testing";
 }
