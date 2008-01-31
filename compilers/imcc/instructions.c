@@ -96,17 +96,10 @@ Instruction *
 _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         ARGIN(SymReg * const *r), int flags)
 {
-    int i, reg_space;
-    Instruction * ins;
-
-    reg_space = 0;
-    if (n > 1)
-        reg_space = sizeof (SymReg *) * (n - 1);
-    ins = (Instruction*)calloc(sizeof (Instruction) + reg_space, 1);
-    if (ins == NULL) {
-        fprintf(stderr, "Memory error at mk_instruction\n");
-        abort();
-    }
+    const size_t reg_space = (n>1) ? (sizeof (SymReg *) * (n - 1)) : 0;
+    Instruction * const ins =
+        (Instruction*)mem_sys_allocate_zeroed(sizeof (Instruction) + reg_space);
+    int i;
 
     ins->op = str_dup(op);
     ins->fmt = str_dup(fmt);

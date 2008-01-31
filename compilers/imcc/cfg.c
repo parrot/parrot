@@ -1479,8 +1479,8 @@ init_basic_blocks(ARGMOD(IMC_Unit *unit))
     if (unit->bb_list != NULL)
         clear_basic_blocks(unit);
 
-    unit->bb_list = (Basic_block **)calloc(unit->bb_list_size = 256,
-            sizeof (Basic_block *));
+    unit->bb_list_size = 256;
+    unit->bb_list = mem_allocate_n_zeroed_typed(unit->bb_list_size, Basic_block *);
 
     unit->n_basic_blocks = 0;
     unit->edge_list      = NULL;

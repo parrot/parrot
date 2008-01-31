@@ -37,6 +37,7 @@ static void imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         FUNC_MODIFIES(*unit);
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
 
 /* HEADERIZER END: static */
@@ -143,10 +144,11 @@ Create a new IMC_Unit.
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
-    IMC_Unit * const unit = (IMC_Unit *)calloc(1, sizeof (IMC_Unit));
+    IMC_Unit * const unit = mem_allocate_zeroed_typed(IMC_Unit);
     create_symhash(&unit->hash);
     unit->type = t;
     return unit;
