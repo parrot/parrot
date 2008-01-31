@@ -39,6 +39,8 @@ my $cwd = cwd();
         "Got numeric value for reversion number");
     use warnings;
 
+    unlink qq{$libdir/Parrot/Revision.pm}
+        or croak "Unable to delete file after testing";
     ok( chdir $cwd, "Able to change back to starting directory");
 }
 

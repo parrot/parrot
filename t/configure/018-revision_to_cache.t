@@ -35,6 +35,8 @@ my $cwd = cwd();
     use warnings;
     my $cache = q{.parrot_current_rev};
     ok( ( -e $cache ), "Cache for revision number was created");
+    unlink qq{$libdir/Parrot/Revision.pm}
+        or croak "Unable to delete file after testing";
     ok( chdir $cwd, "Able to change back to starting directory");
 }
 

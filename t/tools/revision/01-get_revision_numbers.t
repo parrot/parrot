@@ -63,6 +63,14 @@ EOF
     is($current, $testvals[0], "Got expected value for current");
     is($config, $testvals[1], "Got expected value for config");
 
+    foreach my $f (
+        q{DEVELOPING},
+        qq{$libdir/Parrot/Revision.pm},
+        qq{$libdir/Parrot/Config.pm},
+    ) {
+        unlink $f
+            or croak "Unable to unlink $f from tempdir after testing";
+    }
     ok( (chdir $cwd), "Able to change back to starting directory");
 }
 

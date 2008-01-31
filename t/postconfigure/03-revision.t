@@ -49,6 +49,8 @@ my $cwd = cwd();
     is($mtime_before, $mtime_after,
         "Revision number cache file correctly untouched");
 
+    unlink qq{$libdir/Parrot/Revision.pm}
+        or croak "Unable to delete file after testing";
     ok( chdir $cwd, "Able to change back to starting directory");
 }
 
