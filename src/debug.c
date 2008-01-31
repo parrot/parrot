@@ -59,10 +59,9 @@ PARROT_CANNOT_RETURN_NULL
 static const char* GDB_print_reg(PARROT_INTERP, int t, int n)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * nextarg(ARGIN(const char *command))
-        __attribute__nonnull__(1);
+static const char * nextarg(ARGIN_NULLOK(const char *command));
 
 PARROT_CAN_RETURN_NULL
 PARROT_IGNORABLE_RESULT
@@ -124,21 +123,23 @@ debugger commands. This function is used for C<eval>.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-nextarg(ARGIN(const char *command))
+nextarg(ARGIN_NULLOK(const char *command))
 {
     /* as long as the character pointed to by command is not NULL,
      * and it is either alphanumeric, a comma or a closing bracket,
      * continue looking for the next argument.
      */
-    while (*command && (isalnum((unsigned char) *command) || *command == ',' || *command == ']'))
-        command++;
+    if (command) {
+        while (isalnum((unsigned char) *command) || *command == ',' || *command == ']')
+            command++;
 
-    /* eat as much space as possible */
-    while (*command && isspace((unsigned char) *command))
-        command++;
+        /* eat as much space as possible */
+        while (isspace((unsigned char) *command))
+            command++;
+    }
 
     return command;
 }
@@ -925,10 +926,10 @@ Set a break point, the source code file must be loaded.
 */
 
 void
-PDB_set_break(PARROT_INTERP, ARGIN(const char *command))
+PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     PDB_t            * const pdb      = interp->pdb;
-    PDB_breakpoint_t *newbreak = NULL;
+    PDB_breakpoint_t *newbreak;
     PDB_breakpoint_t *sbreak;
     PDB_condition_t  *condition;
     PDB_line_t       *line;
@@ -938,6 +939,7 @@ PDB_set_break(PARROT_INTERP, ARGIN(const char *command))
     /* If no line number was specified, set it at the current line */
     if (command && *command) {
         const long ln = atol(command);
+        int i;
 
         /* Move to the line where we will set the break point */
         line = pdb->file->line;
