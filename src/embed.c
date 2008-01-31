@@ -117,12 +117,14 @@ Parrot_init_stacktop(PARROT_INTERP, void *stack_top)
 
 =item C<void Parrot_set_flag>
 
-Sets a flag in the interpreter specified by C<flag>, any of
-C<PARROT_BOUNDS_FLAG>, or C<PARROT_PROFILE_FLAG> to enable profiling, and
-bounds checking respectively or C<PARROT_THR_TYPE_1>, C<PARROT_THR_TYPE_2>, or
-C<PARROT_THR_TYPE_3> to disable thread communication and variable sharing,
-disable variable sharing but enable thread communication, or to enable variable
-sharing.
+Sets on any of the following flags, specified by C<flag>, in the interpreter:
+
+Flag                    Effect
+C<PARROT_BOUNDS_FLAG>   enable bounds checking
+C<PARROT_PROFILE_FLAG>  enable profiling, 
+C<PARROT_THR_TYPE_1>    disable variable sharing and thread communication 
+C<PARROT_THR_TYPE_2>    disable variable sharing but enable thread communication 
+C<PARROT_THR_TYPE_3>    enable variable sharing.
 
 =cut
 
@@ -764,7 +766,10 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 =item C<static PMC* set_current_sub>
 
-RT#48260: Not yet documented!!!
+Search the fixup table for a PMC matching the argument. 
+On a match, set up the appropriate context
+If no match, set up a dummy PMC entry
+In either case, return a pointer to the PMC
 
 =cut
 

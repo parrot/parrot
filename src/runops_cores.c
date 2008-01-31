@@ -111,7 +111,8 @@ runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 =item C<static opcode_t * runops_trace_core>
 
-RT#48260: Not yet documented!!!
+Runs the Parrot operations starting at C<pc> until there are no more
+operations, using the tracing interpreter.
 
 =cut
 
