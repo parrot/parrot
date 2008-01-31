@@ -32,6 +32,8 @@ my $errstr;
         "Correctly detected too many components in version number"
     );
 
+    unlink q{VERSION}
+        or croak "Unable to delete file from tempdir after testing";
     ok( chdir $cwd, "Able to change back to directory after testing" );
 }
 pass("Completed all tests in $0");

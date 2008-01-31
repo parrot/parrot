@@ -29,6 +29,8 @@ my $errstr;
     $pv = Parrot::BuildUtil::parrot_version();
     is( $pv, q{0.4.11}, "Correct version number returned in scalar context" );
 
+    unlink q{VERSION}
+        or croak "Unable to delete file from tempdir after testing";
     ok( chdir $cwd, "Able to change back to directory after testing" );
 }
 

@@ -48,6 +48,8 @@ my $cwd = cwd();
     my $ret = $step->runstep($conf);
     ok( defined $ret, "$step_name runstep() returned defined value" );
 
+    unlink "$tdir/VERSION"
+        or croak "Unable to unlink file from tempdir after testing";
     ok( chdir $cwd, "Able to change back to directory after testing" );
 }
 
