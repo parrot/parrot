@@ -9,7 +9,6 @@ use Test::More tests => 16;
 use Carp;
 use Cwd;
 use File::Path ();
-use File::Temp qw(tempdir);
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::init::install');

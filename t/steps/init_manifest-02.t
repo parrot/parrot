@@ -41,7 +41,7 @@ ok( $step->description(), "$step_name has description" );
 # files.
 my $cwd = cwd();
 {
-    my $tdir = tempdir();
+    my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to change to tempdir";
     copy( qq{$cwd/MANIFEST}, qq{$tdir/MANIFEST} )
         or croak "Unable to copy MANIFEST";

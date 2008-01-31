@@ -18,10 +18,10 @@ use Parrot::Configure::Test qw( test_step_thru_runstep);
 
 my $cwd = cwd();
 {
-    my $tdir      = tempdir();
+    my $tdir      = tempdir( CLEANUP => 1 );
     my $tdir_orig = $tdir;
     $tdir .= q{/};
-    my $tdir1 = tempdir();
+    my $tdir1 = tempdir( CLEANUP => 1 );
     my $args  = process_options(
         {
             argv => [

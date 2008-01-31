@@ -8,7 +8,6 @@ use warnings;
 use Test::More tests => 30;
 use Carp;
 use Cwd;
-use File::Temp qw( tempdir );
 use lib qw( lib );
 use_ok('config::init::defaults');
 use_ok('config::auto::readline');

@@ -19,7 +19,7 @@ use Parrot::Revision::Utils qw(
 my $cwd = cwd();
 {
     my @testvals = (7399, 7390);
-    my $tdir1 = tempdir();
+    my $tdir1 = tempdir( CLEANUP => 1 );
     ok( (chdir $tdir1), "Changed to temporary directory");
     my $libdir = qq{$tdir1/lib};
     ok( (File::Path::mkpath( $libdir )), "Able to make libdir");
@@ -75,7 +75,7 @@ EOF
 }
 
 {
-    my $tdir2 = tempdir();
+    my $tdir2 = tempdir( CLEANUP => 1 );
     ok( (chdir $tdir2), "Changed to temporary directory");
 
     my ($current, $config) = get_revision_numbers();
