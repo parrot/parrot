@@ -65,9 +65,18 @@ sub _handle_darwin_for_fink {
         my $fink_include_dir    = $conf->data->get('fink_include_dir');
         if ( (defined $fink_lib_dir) && (defined $fink_include_dir) ) {
             if ( -f "$fink_include_dir/$file" ) {
-                $conf->data->add( ' ', linkflags => "-L$fink_lib_dir" );
-                $conf->data->add( ' ', ldflags   => "-L$fink_lib_dir" );
-                $conf->data->add( ' ', ccflags   => "-I$fink_include_dir" );
+                my %intended = (
+                    linkflags => "-L$fink_lib_dir",
+                    ldflags   => "-L$fink_lib_dir",
+                    ccflags   => "-I$fink_include_dir",
+                );
+                foreach my $flag (keys %intended) {
+                    my $flagstr = $conf->data->get($flag);
+                    my @elements = split /\s+/, $flagstr;
+                    my %seen = map {$_, 1} @elements;
+                    $conf->data->add( ' ', $flag => $intended{$flag} )
+                        unless $seen{$intended{$flag}};
+                }
             }
         }
     }
