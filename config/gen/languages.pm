@@ -81,6 +81,10 @@ sub runstep {
                 expand_gmake_syntax                                => 1,
             );
         }
+        elsif ( $language eq 'perl6' ) {
+            $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");
+            $conf->genfile("$langdir/config/makefiles/utils.in"    => "$langdir/src/utils/Makefile");
+        }
         else {
             $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile"
             );
