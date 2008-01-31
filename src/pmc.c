@@ -471,8 +471,9 @@ pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
 /*
 
 =item C<static PMC* create_class_pmc>
-
-RT#48260: Not yet documented!!!
+ 
+Create a class object for this interpreter.  Takes an interpreter
+name and type as arguments.  Returns a pointer to the class object.
 
 =cut
 
@@ -499,20 +500,20 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
     if ((interp->vtables[type]->flags & VTABLE_PMC_IS_SINGLETON)
         && (_class == _class->vtable->pmc_class)) {
         interp->vtables[type]->pmc_class = _class;
-        return _class;
     }
+    else {
+        if (PObj_is_PMC_EXT_TEST(_class))
+            Parrot_free_pmc_ext(interp, _class);
 
-    if (PObj_is_PMC_EXT_TEST(_class))
-        Parrot_free_pmc_ext(interp, _class);
+        DOD_flag_CLEAR(is_special_PMC, _class);
 
-    DOD_flag_CLEAR(is_special_PMC, _class);
+        PMC_pmc_val(_class)    = (PMC  *)0xdeadbeef;
+        PMC_struct_val(_class) = (void *)0xdeadbeef;
 
-    PMC_pmc_val(_class)    = (PMC  *)0xdeadbeef;
-    PMC_struct_val(_class) = (void *)0xdeadbeef;
+        PObj_is_PMC_shared_CLEAR(_class);
 
-    PObj_is_PMC_shared_CLEAR(_class);
-
-    interp->vtables[type]->pmc_class = _class;
+        interp->vtables[type]->pmc_class = _class;
+    }
 
     return _class;
 }
