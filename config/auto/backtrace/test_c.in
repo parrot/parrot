@@ -3,16 +3,18 @@
  */
 
 #include <execinfo.h>
-
-void backtrace();
-void backtrace_symbols();
+#include <stdlib.h>
 
 int
 main(int argc, char **argv)
 {
-    backtrace();
-    backtrace_symbols();
-    return 0;
+    void *array[10];
+    size_t size;
+    char **strings;
+    size = backtrace(array, 10);
+    strings = backtrace_symbols(array, size);
+    free(strings);
+    return EXIT_SUCCESS;
 }
 
 /*
