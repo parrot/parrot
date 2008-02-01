@@ -51,15 +51,13 @@ Make a tailcall to method $2 with invocant $1.
 =cut
 
 op callmethodcc(invar PMC, in STR) :object_base {
-  opcode_t *dest;
-  PMC *method_pmc, *object;
-  opcode_t *next;
-  STRING *meth;
+  PMC      * const object     = $1;
+  STRING   * const meth       = $2;
+  opcode_t * const next       = expr NEXT();
+  PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
 
-  object = $1;
-  meth = $2;
-  next = expr NEXT();
-  method_pmc = VTABLE_find_method(interp, object, meth);
+  opcode_t *dest;
+
   if (PMC_IS_NULL(method_pmc)) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
@@ -72,15 +70,13 @@ op callmethodcc(invar PMC, in STR) :object_base {
 }
 
 op callmethodcc(invar PMC, invar PMC) :object_base {
-  opcode_t *dest;
-  PMC *method_pmc, *object;
-  opcode_t *next;
-
-  object = $1;
-  method_pmc = $2;
+  PMC      * const object     = $1;
+  PMC      * const method_pmc = $2;
+  opcode_t * const next       = expr NEXT();
   /* RT#42371 should we check if object.can(method) */
 
-  next = expr NEXT();
+  opcode_t *dest;
+
   interp->current_object = object;
   interp->current_cont = NEED_CONTINUATION;
   dest = VTABLE_invoke(interp, method_pmc, next);
@@ -88,15 +84,13 @@ op callmethodcc(invar PMC, invar PMC) :object_base {
 }
 
 op callmethod(invar PMC, in STR, invar PMC) :object_base {
-  opcode_t *dest;
-  PMC *method_pmc, *object;
-  opcode_t *next;
-  STRING *meth;
+  PMC      * const object     = $1;
+  STRING   * const meth       = $2;
+  opcode_t * const next       = expr NEXT();
+  PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
 
-  object = $1;
-  meth = $2;
-  next = expr NEXT();
-  method_pmc = VTABLE_find_method(interp, object, meth);
+  opcode_t *dest;
+
   if (PMC_IS_NULL(method_pmc)) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
@@ -109,14 +103,12 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base {
 }
 
 op callmethod(invar PMC, invar PMC, invar PMC) :object_base {
+  PMC      * const object     = $1;
+  PMC      * const method_pmc = $2;
+  opcode_t * const next       = expr NEXT();
+
   opcode_t *dest;
-  PMC *method_pmc, *object;
-  opcode_t *next;
 
-  object = $1;
-  method_pmc = $2;
-
-  next = expr NEXT();
   interp->current_object = object;
   interp->current_cont = $3;
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
@@ -124,14 +116,13 @@ op callmethod(invar PMC, invar PMC, invar PMC) :object_base {
 }
 
 op tailcallmethod(invar PMC, in STR) :object_base {
-  opcode_t *dest;
-  PMC *method_pmc, *object;
-  opcode_t *next = expr NEXT();
-  STRING *meth;
+  opcode_t * const next       = expr NEXT();
+  PMC      * const object     = $1;
+  STRING   * const meth       = $2;
+  PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
 
-  object = $1;
-  meth = $2;
-  method_pmc = VTABLE_find_method(interp, object, meth);
+  opcode_t *dest;
+
   if (PMC_IS_NULL(method_pmc)) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
@@ -145,12 +136,12 @@ op tailcallmethod(invar PMC, in STR) :object_base {
 }
 
 op tailcallmethod(invar PMC, invar PMC) :object_base {
-  opcode_t *dest;
-  PMC *method_pmc, *object;
-  opcode_t *next = expr NEXT();
+  opcode_t * const next       = expr NEXT();
+  PMC      * const object     = $1;
+  PMC      * const method_pmc = $2;
 
-  object = $1;
-  method_pmc = $2;
+  opcode_t *dest;
+
   interp->current_cont = CONTEXT(interp->ctx)->current_cont;
   PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
   interp->current_object = object;
@@ -230,7 +221,7 @@ namespace, or string PMC.
 =cut
 
 inline op newclass(out PMC, in STR) :object_classes {
-  PMC *name = pmc_new(interp, enum_class_String);
+  PMC * const name = pmc_new(interp, enum_class_String);
   VTABLE_set_string_native(interp, name, $2);
   $1 = pmc_new_init(interp, enum_class_Class, name);
   goto NEXT();
@@ -254,8 +245,9 @@ anonymous subclass.
 =cut
 
 inline op subclass(out PMC, in PMC) :object_classes {
-    PMC *parent_class = Parrot_oo_get_class(interp, $2);
-    opcode_t *next = expr NEXT();
+    PMC      * const parent_class = Parrot_oo_get_class(interp, $2);
+    opcode_t * const next         = expr NEXT();
+
     if (PMC_IS_NULL(parent_class)) {
       real_exception(interp, next, NO_CLASS,
                   "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
@@ -266,8 +258,9 @@ inline op subclass(out PMC, in PMC) :object_classes {
 }
 
 inline op subclass(out PMC, in PMC, in STR) :object_classes {
-    PMC *parent_class = Parrot_oo_get_class(interp, $2);
-    opcode_t *next = expr NEXT();
+    PMC      * const parent_class = Parrot_oo_get_class(interp, $2);
+    opcode_t * const next         = expr NEXT();
+
     if (PMC_IS_NULL(parent_class)) {
       real_exception(interp, next, NO_CLASS,
                   "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
@@ -278,8 +271,9 @@ inline op subclass(out PMC, in PMC, in STR) :object_classes {
 }
 
 inline op subclass(out PMC, in PMC, in PMC) :object_classes {
-    PMC *parent_class = Parrot_oo_get_class(interp, $2);
-    opcode_t *next = expr NEXT();
+    PMC      * const parent_class = Parrot_oo_get_class(interp, $2);
+    opcode_t * const next         = expr NEXT();
+
     if (PMC_IS_NULL(parent_class)) {
       real_exception(interp, next, NO_CLASS,
                   "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
@@ -303,8 +297,9 @@ subclass is an anonymous subclass.
 
 
 op subclass(out PMC, in STR) :object_classes {
-    PMC *parent_class = Parrot_oo_get_class_str(interp, $2);
-    opcode_t *next = expr NEXT();
+    PMC      * const parent_class = Parrot_oo_get_class_str(interp, $2);
+    opcode_t * const next         = expr NEXT();
+
     if (PMC_IS_NULL(parent_class)) {
       real_exception(interp, next, NO_CLASS,
                   "Class '%Ss' doesn't exist", $2);
@@ -316,8 +311,8 @@ op subclass(out PMC, in STR) :object_classes {
 }
 
 op subclass(out PMC, in STR, in STR) :object_classes {
-    PMC *parent_class = Parrot_oo_get_class_str(interp, $2);
-    opcode_t *next = expr NEXT();
+    PMC      * const parent_class = Parrot_oo_get_class_str(interp, $2);
+    opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
       real_exception(interp, next, NO_CLASS,
@@ -330,8 +325,8 @@ op subclass(out PMC, in STR, in STR) :object_classes {
 }
 
 op subclass(out PMC, in STR, in PMC) :object_classes {
-    PMC *parent_class = Parrot_oo_get_class_str(interp, $2);
-    opcode_t *next   = expr NEXT();
+    PMC      * const parent_class = Parrot_oo_get_class_str(interp, $2);
+    opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
       real_exception(interp, next, NO_CLASS,
@@ -355,11 +350,11 @@ system.
 =cut
 
 inline op getclass(out PMC, in STR) :object_classes {
-    PMC      *_class = Parrot_class_lookup(interp, $2);
-    opcode_t *next   = expr NEXT();
+    PMC      * const _class = Parrot_class_lookup(interp, $2);
+    opcode_t * const next   = expr NEXT();
 
     if (PMC_IS_NULL(_class)) {
-        char *class_name = string_to_cstring(interp, $2);
+        const char * const class_name = string_to_cstring(interp, $2);
         real_exception(interp, next, NO_CLASS, "Class '%s' doesn't exist",
                 class_name);
     }
@@ -372,12 +367,12 @@ inline op getclass(out PMC, in STR) :object_classes {
 }
 
 inline op getclass(out PMC, in PMC) :object_classes {
-  PMC *_class = Parrot_class_lookup_p(interp, $2);
-  opcode_t *next = expr NEXT();
+  PMC      * const _class = Parrot_class_lookup_p(interp, $2);
+  opcode_t * const next   = expr NEXT();
+
   if (PMC_IS_NULL(_class)) {
-    STRING *name = readable_name(interp, $2);
-    real_exception(interp, next, NO_CLASS,
-         "Class '%Ss' doesn't exist", name);
+    STRING * const name = readable_name(interp, $2);
+    real_exception(interp, next, NO_CLASS, "Class '%Ss' doesn't exist", name);
   }
   else
     $1 = _class;
@@ -462,8 +457,8 @@ Add the attribute named $2 to the class $1.
 =cut
 
 inline op addattribute(invar PMC, in STR) :object_classes {
-    STRING *class_name  = string_from_literal(interp, "Class");
-    STRING *pclass_name = string_from_literal(interp, "ParrotClass");
+    STRING * const class_name  = string_from_literal(interp, "Class");
+    STRING * const pclass_name = string_from_literal(interp, "ParrotClass");
 
     if (VTABLE_isa(interp, $1, class_name))
         VTABLE_add_attribute(interp, $1, $2, PMCNULL);
