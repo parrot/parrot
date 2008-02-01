@@ -1340,9 +1340,9 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     IMCC_info(interp, 2, "\tunused_label\n");
     for (i=1; i < unit->n_basic_blocks; i++) {
-        Instruction *ins = unit->bb_list[i]->start;
+        const Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
-            SymReg * lab = ins->r[0];
+            const SymReg * const lab = ins->r[0];
             used = 0;
             if (IMCC_INFO(interp)->has_compile)
                 used = 1;
