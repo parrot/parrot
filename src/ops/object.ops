@@ -55,17 +55,23 @@ op callmethodcc(invar PMC, in STR) :object_base {
   STRING   * const meth       = $2;
   opcode_t * const next       = expr NEXT();
   PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
-
-  opcode_t *dest;
+  opcode_t *dest              = NULL;
 
   if (PMC_IS_NULL(method_pmc)) {
-    real_exception(interp, next, METH_NOT_FOUND,
-        "Method '%Ss' not found for invocant of class '%Ss'", meth,
-        VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
+    PMC * const _class = VTABLE_get_class(interp, object);
+
+    if (PMC_IS_NULL(_class))
+        real_exception(interp, next, METH_NOT_FOUND,
+            "Method '%Ss' not found for non-object", meth);
+    else
+        real_exception(interp, next, METH_NOT_FOUND,
+            "Method '%Ss' not found for invocant of class '%Ss'", meth,
+            VTABLE_get_string(interp, _class));
   }
+
   interp->current_object = object;
-  interp->current_cont = NEED_CONTINUATION;
-  dest = VTABLE_invoke(interp, method_pmc, next);
+  interp->current_cont   = NEED_CONTINUATION;
+  dest                   = VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
 
