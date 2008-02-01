@@ -1334,7 +1334,6 @@ PARROT_WARN_UNUSED_RESULT
 static int
 unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    Instruction *ins;
     int used;
     int i;
     int changed = 0;

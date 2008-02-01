@@ -439,6 +439,9 @@ D: HTML documentation for Parrot
 E: michael_scott@mac.com
 W: http://xrl.us/sml
 
+N: Michael Stevens
+D: Remove an unused variable in C-land
+
 N: Michal J Wallace
 D: Pie-thon hammering PIR
 
