@@ -647,9 +647,11 @@ tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 
 =item C<INTVAL Parrot_byte_index>
 
-RT#48260: Not yet documented!!!
+Looks for the location of a substring within a longer string.  Takes
+pointers to the strings and the offset within the string at which
+to start searching as arguments.
 
-=cut
+Returns an offset value if it is found, or -1 if no match.
 
 */
 
@@ -690,7 +692,10 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
 
 =item C<INTVAL Parrot_byte_rindex>
 
-RT#48260: Not yet documented!!!
+Substring search (like Parrot_byte_index), but works backwards,
+from the rightmost end of the string.
+
+Returns offset value or -1 (if no match).
 
 =cut
 

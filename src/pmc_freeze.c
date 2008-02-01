@@ -988,7 +988,8 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
 
 =item C<static void freeze_pmc>
 
-RT#48260: Not yet documented!!!
+Freeze PMC, setting type, seen, and "same-as-last" indicators as
+appropriate.
 
 =cut
 
@@ -1249,7 +1250,10 @@ do_thaw(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info *info))
 
 =item C<static UINTVAL id_from_pmc>
 
-RT#48260: Not yet documented!!!
+Find a PMC in an arena, and return an id (left-shifted 2 bits),
+based on its position.
+
+If not found, throw an exception.
 
 =cut
 
@@ -1261,12 +1265,11 @@ id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
     UINTVAL id = 1;     /* first PMC in first arena */
     Small_Object_Arena *arena;
     Small_Object_Pool *pool;
-    ptrdiff_t ptr_diff;
 
     pmc = (PMC*)PObj_to_ARENA(pmc);
     pool = interp->arena_base->pmc_pool;
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
+        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
         if (ptr_diff >= 0 && ptr_diff <
                 (ptrdiff_t)(arena->used * pool->object_size)) {
             PARROT_ASSERT(ptr_diff % pool->object_size == 0);
@@ -1278,7 +1281,7 @@ id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 
     pool = interp->arena_base->constant_pmc_pool;
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
+        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
         if (ptr_diff >= 0 && ptr_diff <
                 (ptrdiff_t)(arena->used * pool->object_size)) {
             PARROT_ASSERT(ptr_diff % pool->object_size == 0);
