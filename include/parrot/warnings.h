@@ -71,6 +71,7 @@ INTVAL Parrot_warn_s(
     ...)
         __attribute__nonnull__(3);
 
+PARROT_API
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 

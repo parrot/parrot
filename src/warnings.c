@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -40,6 +40,7 @@ Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 
 */
 
+PARROT_API
 void
 print_pbc_location(PARROT_INTERP)
 {
