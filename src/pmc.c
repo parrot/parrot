@@ -471,7 +471,7 @@ pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
 /*
 
 =item C<static PMC* create_class_pmc>
- 
+
 Create a class object for this interpreter.  Takes an interpreter
 name and type as arguments.  Returns a pointer to the class object.
 

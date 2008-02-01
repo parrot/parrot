@@ -263,7 +263,7 @@ Parrot_exec_add_symbol(ARGMOD(Parrot_exec_objfile_t *obj),
 Adds a register's text rellocation to the object file.  Wrapper
 around C<Parrot_exec_add_text_rellocation>.
 
-Returns pointer to offset. 
+Returns pointer to offset.
 
 =cut
 
