@@ -39,9 +39,10 @@ Parrot's LexPad throws an exception for unknown names.
 =cut
 
 op store_lex(in STR, invar PMC) {
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
-    STRING * const lex_name = $1;
-    PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
+    parrot_context_t * const ctx      = CONTEXT(interp->ctx);
+    STRING           * const lex_name = $1;
+    PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+
     if (PMC_IS_NULL(lex_pad)) {
         real_exception(interp, NULL, LEX_NOT_FOUND,
                 "Lexical '%Ss' not found", lex_name);
@@ -62,12 +63,15 @@ standard LexPad throws and exception for non-existing names.
 =cut
 
 op find_lex(out PMC, in STR) {
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
-    STRING * const lex_name = $2;
-    PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
-    PMC *result = NULL;
+    parrot_context_t * const ctx      = CONTEXT(interp->ctx);
+    STRING           * const lex_name = $2;
+    PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 
-    if (!PMC_IS_NULL(lex_pad))
+    PMC *result;
+
+    if (PMC_IS_NULL(lex_pad))
+        result = NULL;
+    else
         result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
     if (!result) {
         real_exception(interp, NULL, LEX_NOT_FOUND,
@@ -106,7 +110,8 @@ op get_namespace(out PMC) {
 
 op get_namespace(out PMC, in PMC) {
     PMC * const cur_ns = CONTEXT(interp->ctx)->current_namespace;
-    PMC * const ns = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+    PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, $2);
+
     $1 = PMC_IS_NULL(ns) ? PMCNULL : ns;
     goto NEXT();
 }
@@ -312,7 +317,8 @@ op set_global(in STR, invar PMC) {
 
 op set_global(in PMC, in STR, invar PMC) {
     PMC * const cur_ns = CONTEXT(interp->ctx)->current_namespace;
-    PMC *ns = Parrot_make_namespace_keyed(interp, cur_ns, $1);
+    PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, $1);
+
     Parrot_set_global(interp, ns, $2, $3);
     goto NEXT();
 }
@@ -337,7 +343,8 @@ op set_hll_global(in STR, invar PMC) {
 
 op set_hll_global(in PMC, in STR, invar PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    PMC *ns = Parrot_make_namespace_keyed(interp, hll_ns, $1);
+    PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, $1);
+
     Parrot_set_global(interp, ns, $2, $3);
     goto NEXT();
 }
@@ -362,7 +369,8 @@ op set_root_global(in STR, invar PMC) {
 
 op set_root_global(in PMC, in STR, invar PMC) {
     PMC * const root_ns = interp->root_namespace;
-    PMC *ns = Parrot_make_namespace_keyed(interp, root_ns, $1);
+    PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, $1);
+
     Parrot_set_global(interp, ns, $2, $3);
     goto NEXT();
 }
@@ -481,7 +489,7 @@ op find_name(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 
