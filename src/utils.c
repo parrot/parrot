@@ -64,6 +64,8 @@ static void rec_climb_back_and_mark(
 
 /* HEADERIZER END: static */
 
+#define move_reg(from,dest,c) (c)->mov((c)->interp, (dest), (from), (c)->info)
+
 /*
 
 =item C<INTVAL intval_mod>
@@ -812,24 +814,6 @@ process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
 
     rec_climb_back_and_mark(node_index, c);
 }
-
-/*
-
-=item C<static void move_reg>
-
-should be self-speaking
-
-=cut
-
- */
-
-static void
-move_reg(int from, int dest, ARGIN(const parrot_prm_context* c))
-{
-   /* fprintf(stderr, "move %i ==> %i\n", from, dest);*/
-    c->mov(c->interp, dest, from, c->info);
-}
-
 
 /*
 
