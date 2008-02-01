@@ -36,6 +36,12 @@ method block($/, $key) {
     }
     elsif $key eq 'close' {
 
+        #### Test for empty PAST::Stmts node.
+        ##$?BLOCK.push( PAST::Op.new(
+        ##PAST::Val.new( :returns('Integer'), :value('1')),
+        ##PAST::Stmts.new( :node($/)),
+        ##:pasttype('if'), :node($/) ));
+
         for $<statement> {
             $?BLOCK.push( $($_) );
         }
@@ -179,7 +185,7 @@ method break_stat($/) {
 }
 
 method return_stat($/) {
-    my $past := PAST::Op.new( :node($/) ); # XXX do what?
+    my $past := PAST::Op.new( :node($/) ); # XXX return? wait for PCT support
     if $<expression_list> {
         my $retvals := $( $<expression_list> );
         for @($retvals) {
@@ -218,20 +224,40 @@ method local_declaration($/) {
     our $?BLOCK;
     my $past := PAST::Stmts.new( :node($/) );
 
-    # XXX handle initialization using :viviself.
-    if $<expression_list> {
-        my $expr := $( $<expression_list>[0] );
+    ## get number of names and experssions
+    my $numnames := +$<Name>;
+    my $expressions := $($<expression_list>[0]);
+
+    my $numexprs := +@($expressions); ##+$<expression_list>[0]<expression>;
+    my $index := 0;
+
+    ## while there are enough names and expressions, use the expressions
+    ## to initialize the names.
+    while (($index != $numnames) && ($index != $numexprs)) {
+
+        my $name := $( $<Name>[$index] );
+        ## XXX why doesn't @($expressions)[$index] work?
+        my $expr := $( $<expression_list>[0]<expression>[$index] );
+
+        $name.isdecl(1);
+        $name.scope('lexical');
+        $name.viviself($expr);
+        $past.push($name);
+        $?BLOCK.symbol( $name.name(), :scope('lexical') );
+        $index := $index + 1;
     }
 
-    for $<Name> {
-        my $name := $( $_ );
+    ## we may have run out of expressions, initialize rest of names
+    ## to 'nil' and declare them.
+    while ($index != $numnames)  {
+        my $name := $( $<Name>[$index] );
         $name.isdecl(1);
         $name.scope('lexical');
         $past.push($name);
-
-        ## enter this name into symbol table
         $?BLOCK.symbol( $name.name(), :scope('lexical') );
+        $index := $index + 1;
     }
+
     make $past;
 }
 
