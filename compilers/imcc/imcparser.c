@@ -473,6 +473,17 @@ static const char * inv_op(ARGIN(const char *op))
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Instruction * iSUBROUTINE(PARROT_INTERP,
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD(SymReg *r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
+
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction * MK_I(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
@@ -745,7 +756,7 @@ static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0) {
 
 /*
 
-=item C<iSUBROUTINE>
+=item C<static Instruction * iSUBROUTINE>
 
 XXX Document me.
 
@@ -756,7 +767,8 @@ XXX Document me.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction *
-iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r)) {
+iSUBROUTINE(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r))
+{
     Instruction * const i =iLABEL(interp, unit, r);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
