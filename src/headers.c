@@ -830,7 +830,10 @@ Parrot_destroy_header_pools(PARROT_INTERP)
     }
 
     free_pool(interp->arena_base->pmc_ext_pool);
+    interp->arena_base->pmc_ext_pool = NULL;
+
     mem_internal_free(interp->arena_base->sized_header_pools);
+    interp->arena_base->sized_header_pools = NULL;
 }
 
 /*
