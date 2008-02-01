@@ -35,9 +35,12 @@ sub _init {
     $data{result}      = q{};
 
     # potential addition? -fvisibility=hidden
+    # Please keep these sorted by flag name, such that "-Wno-foo" is
+    # sorted as "-Wfoo", so we can turn off/on as needed.
     my @potential_warnings = qw(
         -falign-functions=16
-        -mno-accumulate-outgoing-args
+        -fvisibility=hidden
+        -maccumulate-outgoing-args
         -W
         -Wall
         -Waggregate-return
@@ -49,7 +52,10 @@ sub _init {
         -Wcomment
         -Wdeclaration-after-statement
         -Wdisabled-optimization
+        -Wendif-labels
         -Wextra
+        -Wformat
+        -Wformat-extra-args
         -Wformat-nonliteral
         -Wformat-security
         -Wformat-y2k
@@ -65,13 +71,10 @@ sub _init {
         -Wmissing-braces
         -Wmissing-declarations
         -Wmissing-field-initializers
+        -Wno-missing-format-attribute
         -Wmissing-include-dirs
         -Wmissing-prototypes
         -Wnested-externs
-        -Wno-accumulate-outgoing-args
-        -Wno-endif-labels
-        -Wno-shadow
-        -Wno-unused
         -Wnonnull
         -Wold-style-definition
         -Wpacked
@@ -79,6 +82,7 @@ sub _init {
         -Wpointer-arith
         -Wreturn-type
         -Wsequence-point
+        -Wno-shadow
         -Wsign-compare
         -Wstrict-aliasing
         -Wstrict-aliasing=2
@@ -88,6 +92,8 @@ sub _init {
         -Wtrigraphs
         -Wundef
         -Wunknown-pragmas
+        -Wunreachable-code
+        -Wno-unused
         -Wvariadic-macros
         -Wwrite-strings
         -Wnot-a-real-warning
@@ -112,12 +118,18 @@ sub _init {
         -Wredundant-decls
         -Wswitch-enum
         -Wsystem-headers
-        -Wunreachable-code
         -Wunused-function
         -Wunused-label
         -Wunused-parameter
         -Wunused-value
         -Wunused-variable
+    );
+
+    my @nice_to_have_but_too_noisy_for_now = qw(
+        -pedantic
+        -Wint-to-pointer-cast
+        -Wshadow
+        -Wunused-macros
     );
 
     $data{potential_warnings} = \@potential_warnings;
@@ -135,7 +147,7 @@ sub runstep {
         # add on some extra warnings if requested
         $self->_add_cage_warnings($conf);
         $self->_add_maintainer_warnings($conf);
-    
+
         # now try out our warnings
         for my $maybe_warning (@{ $self->{potential_warnings} }) {
             $self->try_warning( $conf, $maybe_warning, $verbose );
