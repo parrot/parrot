@@ -48,9 +48,6 @@ static long _lrand48(void);
 static long _mrand48(void);
 static long _nrand48(_rand_buf buf);
 static void _srand48(long seed);
-static void move_reg(int from, int dest, ARGIN(const parrot_prm_context* c))
-        __attribute__nonnull__(3);
-
 static void next_rand(_rand_buf X);
 static void process_cycle_without_exit(
     int node_index,
