@@ -24,14 +24,20 @@ method TOP($/) {
 }
 
 method compound_stmt($/) {
-    make $( $<stmt> );
+    my $past := PAST::Stmts.new( :node($/) );
+    $past.push( $( $<stmt> ) );
+    make $past;
 }
 
 method stmt($/, $key) {
     make $( $/{$key} );
 }
 
-method expr($/) {
+method expr($/, $key) {
+    make $( $/{$key} );
+}
+
+method assignment($/) {
     my $lhs := $( $<mlhs> );
     my $rhs := $( $<mrhs> );
     make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
@@ -54,6 +60,21 @@ method variable($/) {
 }
 
 method varname($/) {
+    make $( $<identifier> );
+}
+
+
+method functiondef($/) {
+    my $name := $( $<fname> );
+    my $past := PAST::Block.new( :name($name.name()), :blocktype('declaration'), :node($/) );
+    make $past;
+}
+
+method fname($/, $key) {
+    make $( $/{$key} );
+}
+
+method identifier($/) {
     make PAST::Var.new( :name(~$<ident>), :scope('package'), :node($/) );
 }
 

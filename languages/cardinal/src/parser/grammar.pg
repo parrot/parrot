@@ -23,7 +23,7 @@ token compound_stmt {
 }
 
 token term {
-    | \n+
+    | \n+   ## it's perfectly fine to have multiple whitelines
     | ';'
 }
 
@@ -32,7 +32,12 @@ rule stmt {
 }
 
 rule expr {
-    | <mlhs> ['='|'+'] <mrhs> {*}
+    | <assignment> {*}      #= assignment
+}
+
+rule assignment {
+    <mlhs> '=' <mrhs>
+    {*}
 }
 
 rule mlhs {
@@ -55,7 +60,7 @@ rule variable {
 }
 
 rule varname {
-    <!reserved_word> <ident> {*}
+    <!reserved_word> <identifier> {*}
 }
 
 rule mrhs {
@@ -70,7 +75,9 @@ rule args {
 rule 'arg' is optable { ... }
 
 proto 'infix:=' is precedence('1')      { ... }
+
 proto 'infix:+' is tighter('infix:=')   { ... }
+
 proto 'term:'   is tighter('infix:+')
                 is parsed(&primary)     { ... }
 
@@ -78,9 +85,27 @@ proto 'term:'   is tighter('infix:+')
 rule primary {
     | <literal> {*}        #= literal
     | <variable> {*}       #= variable
+    | <functiondef> {*}    #= functiondef
 }
 
-rule literal {
+rule functiondef {
+    'def' <fname> <argdecl> <compound_stmt>? 'end'
+    {*}
+}
+
+rule argdecl {
+    '(' ')'
+}
+
+rule fname {
+    | <identifier> {*}          #= identifier
+}
+
+token identifier {
+    <ident> {*}
+}
+
+token literal {
     | <numeric> {*}        #= numeric
     | <string> {*}         #= string
 }
