@@ -46,7 +46,8 @@ method stmt($/) {
 }
 
 method stmt_mod($/) {
-    if $<sym> eq 'until {
+    my $op;
+    if $<sym> eq 'until' {
         ## there is no :pasttype('until'); this is called repeat_until
         $op := 'repeat_until';
     }
