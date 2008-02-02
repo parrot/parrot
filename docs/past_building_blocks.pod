@@ -43,7 +43,7 @@ A block represents a lexical C<scope>. The most common use for a block
 is subroutines (or functions or procedures or whatever name Your Language
 gives to invokable objects). Usually, C<nested> blocks define a new scope
 as well, which can also be represented by a block. A typical example is
-the common C<if> statement:
+the common C<if> statement (the example here uses Lua syntax):
 
  if <expr> then
    <block1>
@@ -191,7 +191,16 @@ Defines the variable as a parameter (but is stored as a lexical).
 
 =item 'keyed'
 
-{{ XXX todo }}
+ my $idx := PAST::Var.new( :name('foo'), :scope('package') );
+ my $agg := PAST::Var.new( :name('bar'), :scope('package') );
+ make PAST::Var.new( $agg, $idx, :scope('keyed') );
+
+results in:
+
+ get_global $P10, "foo"    # get index, a package-scoped variable "foo"
+ get_global $P11, "bar"    # get aggregate, a package-scoped variable "bar"
+ set $P12, $P11[$P10]      # get the contents at bar[foo]
+
 
 =back
 
