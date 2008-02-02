@@ -67,9 +67,13 @@ rule args {
     {*}
 }
 
-rule arg {
-    <primary> {*}
-}
+rule 'arg' is optable { ... }
+
+proto 'infix:=' is precedence('1')      { ... }
+proto 'infix:+' is tighter('infix:=')   { ... }
+proto 'term:'   is tighter('infix:+')
+                is parsed(&primary)     { ... }
+
 
 rule primary {
     | <literal> {*}        #= literal
@@ -100,9 +104,6 @@ token reserved_word {
     |while|yield]>>
 }
 
-
-##  this <ws> rule treats # as "comment to eol"
-##  you may want to replace it with something appropriate
 token ws {
     | <after '='> \n
     | <after '+'> \n

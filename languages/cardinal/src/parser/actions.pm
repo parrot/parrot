@@ -65,10 +65,6 @@ method args($/) {
     make $( $<arg>[0] );
 }
 
-method arg($/) {
-    make $( $<primary> );
-}
-
 method primary($/, $key) {
     make $( $/{$key} );
 }
@@ -83,6 +79,27 @@ method numeric($/) {
 
 method string($/) {
     make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );
+}
+
+
+method arg($/, $key) {
+    ## Handle the operator table
+    ##
+    if ($key eq 'end') {
+        make $($<expr>);
+    }
+    else {
+        my $past := PAST::Op.new( :name($<type>),
+                                  :pasttype($<top><pasttype>),
+                                  :pirop($<top><pirop>),
+                                  :lvalue($<top><lvalue>),
+                                  :node($/)
+                                );
+        for @($/) {
+            $past.push( $($_) );
+        }
+        make $past;
+    }
 }
 
 
