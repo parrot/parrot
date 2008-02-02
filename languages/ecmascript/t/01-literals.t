@@ -1,4 +1,4 @@
-print("1..9\n");
+print("1..10\n");
 print("ok 1\n");
 
 try {
@@ -35,3 +35,10 @@ print(1*8);
 print("\nok ");
 print(18/2);
 print("\n");
+
+var x = 1;
+x += 9;
+print("ok ");
+print(x);
+print("\n");
+
