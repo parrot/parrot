@@ -253,9 +253,10 @@
 ; implementation of car
 (define-primitive (car arg)
   (list
-    (string->symbol "PAST::Val")
-    '(@ (value 30)
-        (returns "EclectusFixnum"))))
+    (string->symbol "PAST::Op")
+    '(@ (pasttype "inline")
+        (inline "%r = %0.'key'()\\n"))
+    (emit-expr arg)))
 
 ; implementation of cdr
 (define-primitive (cdr arg)
