@@ -376,7 +376,7 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
     }
 
     /* Extract any methods from the namespace */
-    Parrot_oo_extract_methods_from_namespace(interp, self);
+    Parrot_oo_extract_methods_from_namespace(interp, self, _class->_namespace);
 }
 
 static void

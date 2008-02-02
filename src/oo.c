@@ -134,11 +134,8 @@ into the class.
 */
 
 void
-Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self))
+Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *ns))
 {
-    Parrot_Class * const _class = PARROT_CLASS(self);
-    PMC * const ns = _class->_namespace;
-
     /* Pull in methods from the namespace, if any. */
     if (!PMC_IS_NULL(ns)) {
         PMC *methods, *vtable_overrides;

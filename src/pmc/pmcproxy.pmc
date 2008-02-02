@@ -141,7 +141,7 @@ Initializes a PMCProxy PMC.
                 CONST_STRING(interp, "set_class"), "P->", SELF);
 
             /* Extract any methods from the namespace */
-            Parrot_oo_extract_methods_from_namespace(interp, SELF);
+            Parrot_oo_extract_methods_from_namespace(interp, SELF, proxy_info->_namespace);
         }
     }
 

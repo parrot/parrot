@@ -191,6 +191,9 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
             VTABLE_add_method(interp, self, method_name, method_pmc);
         }
     }
+
+    /* Extract any methods from the namespace */
+    Parrot_oo_extract_methods_from_namespace(interp, self, role->_namespace);
 }
 
 /*
