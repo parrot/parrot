@@ -27,17 +27,27 @@ token term {
     | ';'
 }
 
+#rule stmt {
+#    <basic_stmt>+ {*}
+#}
+#
+#rule basic_stmt {
+#    | <expr> {*}            #= expr
+#}
+
 rule stmt {
-    <basic_stmt> {*}
+    <expr> {*}
 }
 
-rule basic_stmt {
-    | <expr> {*}            #= expr
+rule stmt_mod {
+    $<sym>=[if|while|unless|until] <expr>
+    {*}
 }
 
 rule expr {
-    | <assignment> {*}      #= assignment
+    | <command> {*}         #= command
     | <arg> {*}             #= arg
+    | <assignment> {*}      #= assignment
 }
 
 rule assignment {
@@ -58,6 +68,19 @@ rule mlhs_item {
 rule lhs {
     <variable>
     {*}
+}
+
+rule command {
+    | <operation> <call_args> {*}
+}
+
+rule operation {
+    <identifier>
+    {*}
+}
+
+rule call_args {
+    | <args> {*}
 }
 
 rule variable {

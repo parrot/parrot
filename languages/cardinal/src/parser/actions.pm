@@ -29,12 +29,33 @@ method comp_stmt($/) {
     make $past;
 }
 
+#method stmt($/) {
+#    my $past := PAST::Stmts.new( :node($/) );
+#    for $<basic_stmt> {
+#        $past.push( $($_) );
+#    }
+#    make $past;
+#}
+#
+#method basic_stmt($/, $key) {
+#    make $( $/{$key} );
+#}
+
 method stmt($/) {
-    make $( $<basic_stmt> );
+    make $( $<expr> );
 }
 
-method basic_stmt($/, $key) {
-    make $( $/{$key} );
+method stmt_mod($/) {
+    if $<sym> eq 'until {
+        ## there is no :pasttype('until'); this is called repeat_until
+        $op := 'repeat_until';
+    }
+    else {
+        ## if, while and unless are valid :pasttypes.
+        $op := ~$<sym>;
+    }
+    make PAST::Op.new( $( $<expr> ), :pasttype($op), :node($/) );
+
 }
 
 method expr($/, $key) {
@@ -107,6 +128,24 @@ method identifier($/) {
 
 method mrhs($/) {
     make $( $<args> );
+}
+
+method command($/) {
+    my $op := $( $<operation> );
+    my $past := $( $<call_args> );
+    $past.unshift($op);
+    make $past;
+}
+
+method operation($/) {
+    make $( $<identifier> );
+}
+
+method call_args($/) {
+    my $past := PAST::Op.new( :node($/) );
+    my $args := $( $<args> );
+    $past.push($args);
+    make $past;
 }
 
 method args($/) {

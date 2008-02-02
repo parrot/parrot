@@ -8,7 +8,7 @@ say.pir -- simple implementation of a say function
 
 .namespace
 
-.sub 'say'
+.sub 'print'
     .param pmc args            :slurpy
     .local pmc iter
     iter = new 'Iterator', args
