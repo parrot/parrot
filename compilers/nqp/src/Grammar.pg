@@ -430,6 +430,9 @@ proto infix:<eq> is equiv(infix:<==>)
 proto infix:<ne> is equiv(infix:<==>)
     is pasttype('inline')
     { ... }
+proto infix:<=:=> is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
 
 ## Tight logical operators
 proto infix:<&&> is looser(infix:<==>)

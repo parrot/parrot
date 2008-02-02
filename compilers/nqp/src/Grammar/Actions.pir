@@ -59,6 +59,13 @@
         %r = $I0
         END
 
+    optable['infix:=:='; 'inline'] = <<"        END"
+        ##  inline infix:=:=
+        $I0 = issame %0, %1
+        %r = new 'Integer'
+        %r = $I0
+        END
+
     optable['prefix:!'; 'inline'] = <<"        END"
         ##  inline prefix:!
         $I0 = isfalse %0
