@@ -452,6 +452,7 @@ Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 /*
 
 =item C<void Parrot_srand>
+
 Seeds the random number generator with C<seed>.
 
 =cut
@@ -465,78 +466,6 @@ Parrot_srand(INTVAL seed)
     _srand48(seed);
 }
 
-/*
-
-=back
-
-=head2 Array Functions
-
-=item C<void * Parrot_make_cpa>
-
-Creates a C array of C<char *>s with one more element than the number of
-elements in C<*array>. The elements are then copied from C<*array> to
-the new array, and the last (extra) element is set to 0.
-
-Currently unused.
-
-Note that you need to free this array with C<Parrot_destroy_cpa()>.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_make_cpa(PARROT_INTERP, ARGIN(PMC *array))
-{
-    const INTVAL arraylen = VTABLE_elements(interp, array);
-    INTVAL cur;
-
-    /* Allocate the array and set the last element to 0. Since we
-       always allocate one element more than we use we're guaranteed
-       to actually have an array, even if the inbound array is
-       completely empty
-    */
-    char ** const out_array = (char **)mem_sys_allocate((sizeof (char *))
-                                               * (arraylen + 1));
-    out_array[arraylen] = 0;
-
-    /*    printf("String array has %i elements\n", arraylen);*/
-    for (cur = 0; cur < arraylen; cur++) {
-        out_array[cur] =
-            string_to_cstring(interp,
-                              VTABLE_get_string_keyed_int(interp,
-                                                          array, cur));
-        /*        printf("Offset %i is %s\n", cur, out_array[cur]);*/
-    }
-
-    return out_array;
-}
-
-/*
-
-=item C<void Parrot_destroy_cpa>
-
-Use this to destroy an array created with C<Parrot_make_cpa()>.
-
-=cut
-
-*/
-
-PARROT_API
-void
-Parrot_destroy_cpa(ARGMOD(char **array))
-{
-    UINTVAL offset = 0;
-    /* Free each piece */
-    while (array[offset] != NULL) {
-        string_cstring_free(array[offset++]);
-    }
-    /* And then the holding array */
-    mem_sys_free(array);
-}
 
 /* &gen_from_enum(tm.pasm) */
 typedef enum {
@@ -595,6 +524,8 @@ to start searching as arguments.
 
 Returns an offset value if it is found, or -1 if no match.
 
+=cut
+
 */
 
 PARROT_API
@@ -608,11 +539,11 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
     const INTVAL       search_len = search->strlen;
     const char        *str_pos    = str_start + start_offset;
     INTVAL             len_remain = str_len   - start_offset;
-    char              *search_pos;
+    const char        *search_pos;
 
     /* find the next position of the first character in the search string
      * Parrot strings can have NULLs, so strchr() won't work here */
-    while ((search_pos = (char *)memchr(str_pos, *search_str, len_remain))) {
+    while ((search_pos = (const char *)memchr(str_pos, *search_str, len_remain))) {
         const INTVAL offset = search_pos - str_start;
 
         /* now look for the entire string */
@@ -649,9 +580,9 @@ INTVAL
 Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
 {
-    const INTVAL searchlen = search->strlen;
+    const INTVAL searchlen          = search->strlen;
     const char * const search_start = search->strstart;
-    UINTVAL max_possible_offset = (base->strlen - search->strlen);
+    UINTVAL max_possible_offset     = (base->strlen - search->strlen);
     INTVAL current_offset;
 
     if (start_offset && start_offset < max_possible_offset)

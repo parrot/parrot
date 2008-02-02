@@ -49,22 +49,10 @@ INTVAL Parrot_byte_rindex(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_destroy_cpa(ARGMOD(char **array))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*array);
-
-PARROT_API
 FLOATVAL Parrot_float_rand(INTVAL how_random);
 
 PARROT_API
 INTVAL Parrot_int_rand(INTVAL how_random);
-
-PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void * Parrot_make_cpa(PARROT_INTERP, ARGIN(PMC *array))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_API
 INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
