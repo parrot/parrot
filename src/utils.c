@@ -471,63 +471,6 @@ Parrot_srand(INTVAL seed)
 
 =head2 Array Functions
 
-=over 4
-
-=item C<void * Parrot_make_la>
-
-Creates a C array of C<long>s with one more element than the number of
-elements in C<*array>. The elements are then copied from C<*array> to
-the new array, and the last (extra) element is set to 0.
-
-Used in C<src/nci.c>.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_make_la(PARROT_INTERP, ARGIN(PMC *array))
-{
-    const INTVAL arraylen = VTABLE_elements(interp, array);
-    INTVAL cur;
-
-    /* Allocate the array and set the last element to 0. Since we
-       always allocate one element more than we use we're guaranteed
-       to actually have an array, even if the inbound array is
-       completely empty
-    */
-    long * const out_array = (long *)mem_sys_allocate((sizeof (long)) * (arraylen + 1));
-    out_array[arraylen] = 0;
-    /*    printf("Long array has %i elements\n", arraylen);*/
-    for (cur = 0; cur < arraylen; cur++) {
-        out_array[cur] = VTABLE_get_integer_keyed_int(interp, array, cur);
-    }
-
-    return out_array;
-}
-
-/*
-
-=item C<void Parrot_destroy_la>
-
-Use this to destroy an array created with C<Parrot_make_la()>.
-
-=cut
-
-*/
-
-PARROT_API
-void
-Parrot_destroy_la(ARGMOD(long *array))
-{
-    mem_sys_free(array);
-}
-
-/*
-
 =item C<void * Parrot_make_cpa>
 
 Creates a C array of C<char *>s with one more element than the number of
