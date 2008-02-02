@@ -64,6 +64,10 @@ method expr($/, $key) {
     make $( $/{$key} );
 }
 
+method not_expr($/) {
+    make PAST::Op.new( $( $<expr> ), :pirop('not'), :node($/) );
+}
+
 ## not entirely sure what alias does, but this is a guess...
 method alias($/) {
     my $fname := $( $<fname>[0] );
