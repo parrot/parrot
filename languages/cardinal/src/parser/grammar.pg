@@ -17,13 +17,13 @@ rule TOP {
     {*}
 }
 
-rule compound_stmt {
-    <stmt> [ <term> <expr> ]* <.term>?
+token compound_stmt {
+    <stmt> [ <.term> <expr> ]* <.term>?
     {*}
 }
 
 token term {
-    | \n
+    | \n+
     | ';'
 }
 
@@ -32,7 +32,7 @@ rule stmt {
 }
 
 rule expr {
-    | <mlhs> '=' <mrhs> {*}
+    | <mlhs> ['='|'+'] <mrhs> {*}
 }
 
 rule mlhs {
@@ -55,7 +55,7 @@ rule variable {
 }
 
 rule varname {
-    <ident> {*}
+    <!reserved_word> <ident> {*}
 }
 
 rule mrhs {
@@ -85,15 +85,26 @@ token numeric {
     \d+ {*}
 }
 
-rule string {
+token string {
     [ \' <string_literal: '> \' | \" <string_literal: "> \" ]
     {*}
+}
+
+token reserved_word {
+    [alias|and|BEGIN|begin|break|case
+    |class|def|defined|do|else|elsif
+    |END|end|ensure|false|for|if
+    |in|module|next|nil|not|or
+    |redo|rescue|retry|return|self|super
+    |then|true|undef|unless|until|when
+    |while|yield]>>
 }
 
 
 ##  this <ws> rule treats # as "comment to eol"
 ##  you may want to replace it with something appropriate
 token ws {
-    <!ww>
-    [ '#' \N* \n? | \s+ ]*
+    | <after '='> \n
+    | <after '+'> \n
+    | \h* ['#' \N* \n*]?
 }
