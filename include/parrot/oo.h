@@ -208,9 +208,11 @@ PMC * Parrot_class_lookup_p(PARROT_INTERP, ARGIN(PMC *class_name))
         __attribute__nonnull__(2);
 
 void Parrot_oo_extract_methods_from_namespace(PARROT_INTERP,
-    ARGIN(PMC *self))
+    ARGIN(PMC *self),
+    ARGIN(PMC *ns))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
