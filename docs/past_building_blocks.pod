@@ -1,3 +1,6 @@
+# Copyright (C) 2001-2004, The Perl Foundation.
+# $Id$
+
 =head1 NAME
 
 PAST Building Blocks - A catalogue of PAST nodes and how to use them.
@@ -213,7 +216,9 @@ Adding this attribute will result in the following generated code:
 
 =head3 C<:vivibase>
 
-{{XXX todo}}
+Similar to C<:viviself>, but the value of this attribute yields the
+initialization code for an aggregate object. See L<pdd26_ast.pod> for
+more details.
 
 =head1 PAST::Val
 
@@ -392,7 +397,7 @@ method easier. Consider the following example.
  }
 
  method primary_expr($/) {
-     my $past
+     my $past;
      if $<prefix> {
          $past := $( $<prefix> );
      }
@@ -438,7 +443,7 @@ longer the conditional statement, which itself is more efficient.
 
 =head3 Scenario 2
 
-Consider a language that uses an index notation to indicate fiels (attributes),
+Consider a language that uses an index notation to indicate fields (attributes),
 like so:
 
  foo["bar"] = 42
@@ -467,7 +472,6 @@ A naive implementation could look like this:
      if $<index> {
          my $idx := $( $<index>[0] );
          # do something with $idx
-
      }
      # ...
  }
@@ -588,10 +592,12 @@ The result could look like this:
         my $param := $($_);
         $param.scope('parameter');
         $past.push( $param );
+    }
     make $past;
  }
 
 The same principle can be applied in several scenarios.
+More tips will be added later.
 
 =head1 SEE ALSO
 
