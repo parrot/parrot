@@ -12,6 +12,7 @@ http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
 grammar cardinal::Grammar is PCT::Grammar;
 
 rule TOP {
+    <.nl>?
     <comp_stmt>
     [ $ || <panic: Syntax error> ]
     {*}
@@ -27,16 +28,19 @@ token term {
     | ';'
 }
 
-#rule stmt {
-#    <basic_stmt>+ {*}
-#}
-#
-#rule basic_stmt {
-#    | <expr> {*}            #= expr
-#}
+rule basic_stmt {
+    | <alias> {*}           #= alias
+    | <expr> {*}            #= expr
+}
+
+rule alias {
+    'alias' <fname> <fname>
+    {*}
+}
 
 rule stmt {
-    <expr> {*}
+    <basic_stmt> <stmt_mod>*
+    {*}
 }
 
 rule stmt_mod {

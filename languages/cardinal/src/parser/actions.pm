@@ -32,20 +32,18 @@ method comp_stmt($/) {
     make $past;
 }
 
-#method stmt($/) {
-#    my $past := PAST::Stmts.new( :node($/) );
-#    for $<basic_stmt> {
-#        $past.push( $($_) );
-#    }
-#    make $past;
-#}
-#
-#method basic_stmt($/, $key) {
-#    make $( $/{$key} );
-#}
+method basic_stmt($/, $key) {
+    make $( $/{$key} );
+}
 
 method stmt($/) {
-    make $( $<expr> );
+    my $past := $( $<basic_stmt> );
+    for $<stmt_mod> {
+        my $modifier := $( $_ );
+        $modifier.push($past);
+        $past := $modifier;
+    }
+    make $past;
 }
 
 method stmt_mod($/) {
@@ -64,6 +62,13 @@ method stmt_mod($/) {
 
 method expr($/, $key) {
     make $( $/{$key} );
+}
+
+## not entirely sure what alias does, but this is a guess...
+method alias($/) {
+    my $fname := $( $<fname>[0] );
+    my $alias := $( $<fname>[1] );
+    make PAST::Op.new( $alias, $fname, :pasttype('bind'), :node($/) );
 }
 
 method assignment($/) {
