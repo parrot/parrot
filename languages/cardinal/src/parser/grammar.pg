@@ -4,15 +4,92 @@
 
 This is the grammar for cardinal written as a sequence of Perl 6 rules.
 
+Currently taken (partly) from:
+http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
+
 =end overview
 
 grammar cardinal::Grammar is PCT::Grammar;
 
 rule TOP {
-    <statement>*
+    <compound_stmt>
     [ $ || <panic: Syntax error> ]
     {*}
 }
+
+rule compound_stmt {
+    <stmt> [ <term> <expr> ]* <.term>?
+    {*}
+}
+
+token term {
+    | \n
+    | ';'
+}
+
+rule stmt {
+    | <expr> {*}            #= expr
+}
+
+rule expr {
+    | <mlhs> '=' <mrhs> {*}
+}
+
+rule mlhs {
+    <mlhs_item>
+    {*}
+}
+
+rule mlhs_item {
+    | <lhs> {*}               #= lhs
+    | '(' <mlhs> ')' {*}      #= mlhs
+}
+
+rule lhs {
+    <variable>
+    {*}
+}
+
+rule variable {
+    <varname> {*}
+}
+
+rule varname {
+    <ident> {*}
+}
+
+rule mrhs {
+    <args> {*}
+}
+
+rule args {
+    <arg> [',' <arg>]*
+    {*}
+}
+
+rule arg {
+    <primary> {*}
+}
+
+rule primary {
+    | <literal> {*}        #= literal
+    | <variable> {*}       #= variable
+}
+
+rule literal {
+    | <numeric> {*}        #= numeric
+    | <string> {*}         #= string
+}
+
+token numeric {
+    \d+ {*}
+}
+
+rule string {
+    [ \' <string_literal: '> \' | \" <string_literal: "> \" ]
+    {*}
+}
+
 
 ##  this <ws> rule treats # as "comment to eol"
 ##  you may want to replace it with something appropriate
@@ -20,22 +97,3 @@ token ws {
     <!ww>
     [ '#' \N* \n? | \s+ ]*
 }
-
-rule statement {
-    'say' <value> [ ',' <value> ]* ';'
-    {*}
-}
-
-rule value {
-    | <integer> {*}                              #= integer
-    | <quote> {*}                                #= quote
-}
-
-rule integer { \d+ {*} }
-
-rule quote {
-    [ \' <string_literal: '> \' | \" <string_literal: "> \" ]
-    {*}
-}
-
-

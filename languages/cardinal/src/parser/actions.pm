@@ -19,33 +19,69 @@ class cardinal::Grammar::Actions;
 
 method TOP($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    for $<statement> {
-        $past.push( $( $_ ) );
-    }
+    $past.push( $( $<compound_stmt> ) );
     make $past;
 }
 
-
-method statement($/) {
-    my $past := PAST::Op.new( :name('say'), :pasttype('call'), :node( $/ ) );
-    for $<value> {
-        $past.push( $( $_ ) );
-    }
-    make $past;
+method compound_stmt($/) {
+    make $( $<stmt> );
 }
 
-
-method value($/, $key) {
+method stmt($/, $key) {
     make $( $/{$key} );
 }
 
-
-method integer($/) {
-    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
+method expr($/) {
+    my $lhs := $( $<mlhs> );
+    my $rhs := $( $<mrhs> );
+    make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
 }
 
+method mlhs($/) {
+    make $( $<mlhs_item> );
+}
 
-method quote($/) {
+method mlhs_item($/, $key) {
+    make $( $/{$key} );
+}
+
+method lhs($/) {
+    make $( $<variable> );
+}
+
+method variable($/) {
+    make $( $<varname> );
+}
+
+method varname($/) {
+    make PAST::Var.new( :name(~$<ident>), :scope('package'), :node($/) );
+}
+
+method mrhs($/) {
+    make $( $<args> );
+}
+
+method args($/) {
+    make $( $<arg>[0] );
+}
+
+method arg($/) {
+    make $( $<primary> );
+}
+
+method primary($/, $key) {
+    make $( $/{$key} );
+}
+
+method literal($/, $key) {
+    make $( $/{$key} );
+}
+
+method numeric($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node($/) );
+}
+
+method string($/) {
     make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );
 }
 
