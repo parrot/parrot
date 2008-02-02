@@ -107,6 +107,49 @@
     .return (lhs)
 .end
 
+.sub 'infix:+='
+    .param pmc lhs
+    .param pmc rhs
+    add lhs, rhs
+    .return (lhs)
+.end
+
+.sub 'infix:-='
+    .param pmc lhs
+    .param pmc rhs
+    sub lhs, rhs
+    .return (lhs)
+.end
+
+.sub 'infix:*='
+    .param pmc lhs
+    .param pmc rhs
+    mul lhs, rhs
+    .return (lhs)
+.end
+
+.sub 'infix:/='
+    .param pmc lhs
+    .param pmc rhs
+    div lhs, rhs
+    .return (lhs)
+.end
+
+.sub 'infix:%='
+    .param pmc lhs
+    .param pmc rhs
+    mod lhs, rhs
+    .return (lhs)
+.end
+
+
+
+
+
+
+
+
+
 ## postfix operators
 ##
 .sub 'postfix:++'

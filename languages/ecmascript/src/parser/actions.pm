@@ -446,7 +446,16 @@ method assignment_expression($/) {
         my $lhs := $( $<lhs_expression>[$lhsexpr] );
 
         ## invoke this operator-sub, with $lhs and the $past so far as left/right operands.
-        $past   := PAST::Op.new( $lhs, $past, :name($op), :pasttype('call'), :node($/) );
+
+        if $op eq 'infix:=' {          # XXX += and friends won't work this way; solve that
+            $past   := PAST::Op.new( $lhs, $past, :pasttype('bind'), :node($/) );
+        }
+        else {
+            $past   := PAST::Op.new( $lhs, $past, :name($op), :pasttype('call'), :node($/) );
+        }
+
+        ## maybe a lookup table, mapping "+=" to "add" etc.
+
     }
     make $past;
 }
