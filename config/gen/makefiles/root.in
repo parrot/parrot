@@ -744,8 +744,8 @@ help :
 	@echo "  bsdlint:           Code checking with bsdlint."
 	@echo "  sunlint:           Code checking with Sun Studio's sunlint."
 	@echo "  splint:            Code checking with splint."
-	@echo "  headerizer:        Recreate header files for appropriate"
-	@echo "                     C-source files"
+	@echo "  headerizer:        Recreate header files for C-source files"
+	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  cover:             Run test suite coverage analysis."
 	@echo ""
 	@echo "Release:"
@@ -2202,6 +2202,9 @@ HEADERIZER_O_FILES = \
 
 headerizer : $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES)
+
+apilist: $(SRC_DIR)/core_pmcs.c
+	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --apilist $(HEADERIZER_O_FILES)
 
 ###############################################################################
 #
