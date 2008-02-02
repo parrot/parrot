@@ -164,7 +164,7 @@ source language, this can be represented by a PAST::Var node.
 
 Sets the name of the variable. This attribute is required.
 
-=head3 C<:scope(STR)> (required)
+=head3 C<:scope> (required)
 
 Set the scope of this PAST::Var node. Available values:
 
@@ -191,7 +191,7 @@ Defines the variable as a parameter (but is stored as a lexical).
 
 =item 'keyed'
 
-
+{{ XXX todo }}
 
 =back
 
@@ -582,8 +582,8 @@ The result could look like this:
     else { # no parameters, create the function block here
         $past := PAST::Block.new( :node($/) );
     }
-    $past.name( $( $<ident> );
-    $past.push( $( $<block> );
+    $past.name( $( $<ident> ).name() );
+    $past.push( $( $<block> ) );
  }
 
  method parameters($/) {
@@ -595,6 +595,39 @@ The result could look like this:
     }
     make $past;
  }
+
+A further refactor could result in even simpler code:
+
+ rule function_def {
+     'function' <ident> '(' <parameters> ')' <block> 'end'
+     {*}
+ }
+
+ rule parameters {
+     [ <ident> [',' <ident>]* ]?
+ }
+
+ method function_def($/) {
+    my $past := $( $<parameters> );
+    $past.name( $( $<ident> ).name() );
+    $past.push( $( $<block> ) );
+    make $past;
+ }
+
+ method parameters($/) {
+    my $past := PAST::Block.new( :node($/) );
+    for $<ident> {
+        my $param := $( $<ident> );
+        $param.scope('parameter');
+        $past.push($param);
+    }
+    make $past;
+ }
+
+Note that the rule C<parameters> is change slightly. For indexing
+the C<ident> nodes, this makes no difference, as they already lived
+in an array. Making all of them optional doesn't change the way they
+are stored in the parse tree.
 
 The same principle can be applied in several scenarios.
 More tips will be added later.
