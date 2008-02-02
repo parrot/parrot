@@ -44,9 +44,9 @@ disappears, it's block is "orphaned" and will remain there.
 
 =over 4
 
-=item C<--verbose>
+=item C<--apilist>
 
-Verbose status along the way.
+Print a list of PARROT_API functions instead of updating source.
 
 =back
 
@@ -405,7 +405,10 @@ sub api_first_then_alpha {
 }
 
 sub main {
-    GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
+    my $apilist;
+    GetOptions(
+        apilist => \$apilist,
+    ) or exit(1);
 
     my %ofiles;
     ++$ofiles{$_} for @ARGV;
@@ -415,6 +418,7 @@ sub main {
     }
     my %cfiles;
     my %cfiles_with_statics;
+    my %api;
 
     # Walk the object files and find corresponding source (either .c or .pmc)
     for my $ofile (@ofiles) {
@@ -437,7 +441,7 @@ sub main {
         }
 
         my @decls;
-        if ( -f $pmcfile ) {
+        if ( $apilist || -f $pmcfile ) {
             @decls = extract_function_declarations( $csource );
         }
         else {
@@ -448,33 +452,45 @@ sub main {
             my $components = function_components_from_declaration( $cfile, $decl );
             push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
             push( @{ $cfiles_with_statics{$cfile} }, $components ) if $components->{is_static};
+            push( @{ $api{$cfile} }, $components ) if $components->{is_api};
         }
     }    # for @cfiles
 
-    # Update all the .h files
-    for my $hfile ( sort keys %cfiles ) {
-        my $cfiles = $cfiles{$hfile};
+    if ( $apilist ) {
+        for my $cfile ( sort keys %api ) {
+            my @funcs = sort { $a->{name} cmp $b->{name} } @{$api{$cfile}};
+            print "$cfile\n";
+            for my $func ( @funcs ) {
+                print "    $func->{name}\n";
+            }
+        }
+    }
+    else { # Normal headerization and updating
+        # Update all the .h files
+        for my $hfile ( sort keys %cfiles ) {
+            my $cfiles = $cfiles{$hfile};
 
-        my $header = read_file($hfile);
+            my $header = read_file($hfile);
 
-        for my $cfile ( sort keys %{$cfiles} ) {
-            my @funcs = @{ $cfiles->{$cfile} };
-            @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
-            $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
+            for my $cfile ( sort keys %{$cfiles} ) {
+                my @funcs = @{ $cfiles->{$cfile} };
+                @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
+                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
+            }
+
+            write_file( $hfile, $header );
         }
 
-        write_file( $hfile, $header );
-    }
+        # Update all the .c files in place
+        for my $cfile ( sort keys %cfiles_with_statics ) {
+            my @funcs = @{ $cfiles_with_statics{$cfile} };
+            @funcs = grep { $_->{is_static} } @funcs;
 
-    # Update all the .c files in place
-    for my $cfile ( sort keys %cfiles_with_statics ) {
-        my @funcs = @{ $cfiles_with_statics{$cfile} };
-        @funcs = grep { $_->{is_static} } @funcs;
+            my $source = read_file($cfile);
+            $source = replace_headerized_declarations( $source, 'static', $cfile, @funcs );
 
-        my $source = read_file($cfile);
-        $source = replace_headerized_declarations( $source, 'static', $cfile, @funcs );
-
-        write_file( $cfile, $source );
+            write_file( $cfile, $source );
+        }
     }
 
     print "Headerization complete.\n";
