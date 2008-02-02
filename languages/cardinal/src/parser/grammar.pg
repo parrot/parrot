@@ -12,12 +12,12 @@ http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
 grammar cardinal::Grammar is PCT::Grammar;
 
 rule TOP {
-    <compound_stmt>
+    <comp_stmt>
     [ $ || <panic: Syntax error> ]
     {*}
 }
 
-token compound_stmt {
+token comp_stmt {
     <stmt> [ <.term> <expr> ]* <.term>?
     {*}
 }
@@ -28,11 +28,16 @@ token term {
 }
 
 rule stmt {
+    <basic_stmt> {*}
+}
+
+rule basic_stmt {
     | <expr> {*}            #= expr
 }
 
 rule expr {
     | <assignment> {*}      #= assignment
+    | <arg> {*}             #= arg
 }
 
 rule assignment {
@@ -86,11 +91,28 @@ rule primary {
     | <literal> {*}        #= literal
     | <variable> {*}       #= variable
     | <functiondef> {*}    #= functiondef
+    | <if_stmt> {*}        #= if_stmt
+}
+
+rule if_stmt {
+    'if' <expr> 'then' <.nl>
+    <comp_stmt>
+    ['elsif' <expr> 'then' <.nl>
+    <comp_stmt>]*
+    ['else' <.nl> $<else>=<comp_stmt>]?
+    'end'
+    {*}
 }
 
 rule functiondef {
-    'def' <fname> <argdecl> <compound_stmt>? 'end'
+    'def' <fname> <argdecl> <.nl>
+    <comp_stmt>
+    'end'
     {*}
+}
+
+token nl {
+    \n+
 }
 
 rule argdecl {

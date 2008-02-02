@@ -19,17 +19,21 @@ class cardinal::Grammar::Actions;
 
 method TOP($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    $past.push( $( $<compound_stmt> ) );
+    $past.push( $( $<comp_stmt> ) );
     make $past;
 }
 
-method compound_stmt($/) {
+method comp_stmt($/) {
     my $past := PAST::Stmts.new( :node($/) );
     $past.push( $( $<stmt> ) );
     make $past;
 }
 
-method stmt($/, $key) {
+method stmt($/) {
+    make $( $<basic_stmt> );
+}
+
+method basic_stmt($/, $key) {
     make $( $/{$key} );
 }
 
@@ -63,10 +67,33 @@ method varname($/) {
     make $( $<identifier> );
 }
 
+method if_stmt($/) {
+    my $cond := +$<expr> - 1;
+    my $past := PAST::Op.new( $( $<expr>[$cond] ),
+                              $( $<comp_stmt>[$cond] ),
+                              :pasttype('if'),
+                              :node( $/ )
+                            );
+    if ( $<else> ) {
+        $past.push( $( $<else>[0] ) );
+    }
+    while ($cond != 0) {
+        $cond := $cond - 1;
+        $past := PAST::Op.new( $( $<expr>[$cond] ),
+                               $( $<comp_stmt>[$cond] ),
+                               $past,
+                               :pasttype('if'),
+                               :node( $/ )
+                             );
+    }
+    make $past;
+}
 
 method functiondef($/) {
     my $name := $( $<fname> );
     my $past := PAST::Block.new( :name($name.name()), :blocktype('declaration'), :node($/) );
+    my $body := $( $<comp_stmt> );
+    $past.push($body);
     make $past;
 }
 
