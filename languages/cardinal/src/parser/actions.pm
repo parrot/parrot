@@ -26,6 +26,9 @@ method TOP($/) {
 method comp_stmt($/) {
     my $past := PAST::Stmts.new( :node($/) );
     $past.push( $( $<stmt> ) );
+    for $<expr> {
+        $past.push( $($_) );
+    }
     make $past;
 }
 
