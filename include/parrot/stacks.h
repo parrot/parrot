@@ -49,13 +49,6 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 /* HEADERIZER BEGIN: src/stacks.c */
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-Stack_entry_type get_entry_type(SHIM_INTERP,
-    ARGIN(const Stack_Entry_t *entry))
-        __attribute__nonnull__(2);
-
-PARROT_API
 void mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -134,6 +127,12 @@ void stack_push(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*stack_p);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+Stack_entry_type get_entry_type(SHIM_INTERP,
+    ARGIN(const Stack_Entry_t *entry))
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/stacks.c */
 /* HEADERIZER BEGIN: src/stack_common.c */

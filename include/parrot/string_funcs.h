@@ -32,17 +32,6 @@ STRING * const_string(PARROT_INTERP, ARGIN(const char *buffer))
         __attribute__nonnull__(2);
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * int_to_str(PARROT_INTERP,
-    ARGOUT(char *tc),
-    HUGEINTVAL num,
-    char base)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*tc);
-
-PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_make_COW_reference(PARROT_INTERP, ARGMOD(STRING *s))
@@ -526,7 +515,16 @@ void string_upcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
-PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * int_to_str(PARROT_INTERP,
+    ARGOUT(char *tc),
+    HUGEINTVAL num,
+    char base)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*tc);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING* uint_to_str(PARROT_INTERP,

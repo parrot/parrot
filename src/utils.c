@@ -491,7 +491,7 @@ Helper to convert a B<struct tm *> to an Array
 
 */
 
-PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
 tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))

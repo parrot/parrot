@@ -404,7 +404,6 @@ Returns the stack entry type of C<entry>.
 
 */
 
-PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 Stack_entry_type

@@ -78,17 +78,17 @@ void Parrot_srand(INTVAL seed);
 PARROT_API
 INTVAL Parrot_uint_rand(INTVAL how_random);
 
-PARROT_API
-PARROT_CANNOT_RETURN_NULL
-PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CONST_FUNCTION
 FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
 
 PARROT_CONST_FUNCTION
 INTVAL intval_mod(INTVAL i2, INTVAL i3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/utils.c */
 
