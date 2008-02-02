@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -407,7 +407,7 @@ Returns the stack entry type of C<entry>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 Stack_entry_type
-get_entry_type(SHIM_INTERP, ARGIN(const Stack_Entry_t *entry))
+get_entry_type(ARGIN(const Stack_Entry_t *entry))
 {
     return entry->entry_type;
 }

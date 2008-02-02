@@ -130,9 +130,8 @@ void stack_push(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-Stack_entry_type get_entry_type(SHIM_INTERP,
-    ARGIN(const Stack_Entry_t *entry))
-        __attribute__nonnull__(2);
+Stack_entry_type get_entry_type(ARGIN(const Stack_Entry_t *entry))
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/stacks.c */
 /* HEADERIZER BEGIN: src/stack_common.c */

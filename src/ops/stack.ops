@@ -83,7 +83,7 @@ op entrytype(out INT, in INT) :base_core {
   if (!entry) {
     real_exception(interp, NULL, 99, "Stack Depth wrong");
   }
-  $1 = get_entry_type(interp, entry);
+  $1 = get_entry_type(entry);
   goto NEXT();
 }
 
@@ -292,7 +292,7 @@ inline op rotate_up(in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 
