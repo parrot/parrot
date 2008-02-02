@@ -470,7 +470,7 @@ PMC*
 Parrot_find_vtable_meth(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *meth))
 {
     INTVAL i, n;
-    PMC   *ns, *mro;
+    PMC   *mro;
     PMC   *_class       = pmc;
 
     /* Get index in Parrot_vtable_slot_names[]. */
@@ -489,6 +489,8 @@ Parrot_find_vtable_meth(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *meth))
     n   = VTABLE_elements(interp, mro);
 
     for (i = 0; i < n; ++i) {
+        PMC *ns;
+
         _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
         ns     = VTABLE_pmc_namespace(interp, _class);
 
@@ -1010,10 +1012,10 @@ parrot_class_register(PARROT_INTERP, ARGIN(PMC *name),
      * The child class PMC gets the vtable of its parent class or
      * a ParrotClass vtable
      */
-    if (parent && PObj_is_class_TEST(parent))
-        parent_vtable = parent->vtable;
-    else
-        parent_vtable = new_class->vtable;
+    parent_vtable =
+        (parent && PObj_is_class_TEST(parent))
+            ? parent->vtable
+            : new_class->vtable;
 
     new_vtable = Parrot_clone_vtable(interp, parent_vtable);
 
@@ -1125,8 +1127,7 @@ get_init_meth(PARROT_INTERP, ARGIN(PMC *_class),
 
     *meth_str = NULL;
 #if 0
-    PMC *prop;
-    prop = VTABLE_getprop(interp, _class, prop_str);
+    PMC * const prop = VTABLE_getprop(interp, _class, prop_str);
     if (!VTABLE_defined(interp, prop))
         return PMCNULL;
     meth = VTABLE_get_string(interp, prop);
@@ -1752,8 +1753,7 @@ Parrot_add_attribute(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *attr))
     SLOTTYPE * const class_array = (SLOTTYPE *)PMC_data(_class);
     STRING   * const class_name  = VTABLE_get_string(interp,
             get_attrib_num(class_array, PCD_CLASS_NAME));
-    PMC      * const attr_array  = get_attrib_num(class_array,
-            PCD_CLASS_ATTRIBUTES);
+    PMC      * const attr_array  = get_attrib_num(class_array, PCD_CLASS_ATTRIBUTES);
     PMC      * const attr_hash   = get_attrib_num(class_array, PCD_ATTRIBUTES);
     INTVAL           idx         = VTABLE_elements(interp, attr_array);
 
