@@ -137,7 +137,7 @@ Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
 void Parrot_destroy_header_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 int Parrot_forall_header_pools(PARROT_INTERP,
     int flag,
     ARGIN_NULLOK(void *arg),

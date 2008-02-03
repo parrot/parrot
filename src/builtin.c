@@ -88,6 +88,7 @@ static Builtins builtins[] = {
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int check_builtin_sig(
     size_t i,
     ARGIN(const char *sig),
@@ -99,6 +100,7 @@ static int find_builtin(ARGIN(const char *func))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int find_builtin_s(PARROT_INTERP, ARGIN(const STRING *func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -175,6 +177,7 @@ RT#48260: Not yet documented!!!
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int
 find_builtin_s(PARROT_INTERP, ARGIN(const STRING *func))
 {
@@ -207,6 +210,7 @@ RT#48260: Not yet documented!!!
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int
 check_builtin_sig(size_t i, ARGIN(const char *sig), int convert_pmcs)
 {
@@ -265,6 +269,7 @@ Return the index of the builtin or -1 on failure.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 Parrot_is_builtin(ARGIN(const char *func), ARGIN_NULLOK(const char *sig))
 {
@@ -290,7 +295,7 @@ again:
             /* try next with same name */
             ++i;
             /* if the name of the next builtin matches, check its signature */
-            if (strcmp(func, builtins[i].c_name) == 0)
+            if (STREQ(func, builtins[i].c_name))
                 goto again;
         }
     }

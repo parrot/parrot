@@ -683,7 +683,7 @@ If the function returns a non-zero value iteration will stop.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 int
 Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
         NOTNULL(pool_iter_fn func))
@@ -808,7 +808,7 @@ Destroys the header pools.
 void
 Parrot_destroy_header_pools(PARROT_INTERP)
 {
-    INTVAL pass, start, ignored;
+    INTVAL pass;
 
     /* const/non const COW strings life in different pools
      * so in first pass
@@ -816,16 +816,15 @@ Parrot_destroy_header_pools(PARROT_INTERP)
      * in 3rd freeing
      */
 #ifdef GC_IS_MALLOC
-    start = 0;
+    const INTVAL start = 0;
 #else
-    start = 2;
+    const INTVAL start = 2;
 #endif
-    ignored = Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
+    Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
-    UNUSED(ignored);
 
     for (pass = start; pass <= 2; pass++) {
-        ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
+        Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
                 (void *)pass, sweep_cb_buf);
     }
 
