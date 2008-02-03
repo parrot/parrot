@@ -105,12 +105,18 @@ method varname($/, $key) {
 }
 
 method global($/) {
-    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
+    make PAST::Var.new( :name(~$/), :scope('package'), :viviself('Undef'), :node($/) );
 }
 
 method instance_variable($/) {
-    make PAST::Var.new( :name(~$/), :scope('lexical'), :node($/) ); ## need for scope('attribute')?
+    make PAST::Var.new( :name(~$/), :scope('lexical'), :viviself('Undef'), :node($/) );
+    ## need for scope('attribute')?
 }
+
+method local_variable($/) {
+    make PAST::Var.new( :name(~$/), :scope('lexical'), :node($/) );
+}
+
 
 method if_stmt($/) {
     my $cond := +$<expr> - 1;
@@ -132,6 +138,22 @@ method if_stmt($/) {
                              );
     }
     make $past;
+}
+
+method unless_stmt($/) {
+    my $cond := $( $<expr> );
+    my $body := $( $<comp_stmt> );
+    my $past := PAST::Op.new( $cond, $body, :pasttype('unless'), :node($/) );
+    if $<else> {
+        $past.push( $( $<else>[0] ) );
+    }
+    make $past;
+}
+
+method while_stmt($/) {
+    my $cond := $( $<expr> );
+    my $body := $( $<comp_stmt> );
+    make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
 }
 
 method functiondef($/) {

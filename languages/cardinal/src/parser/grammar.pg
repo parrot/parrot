@@ -104,7 +104,7 @@ rule varname {
     <!reserved_word>
     [ <global> {*}             #= global
     | <instance_variable> {*}  #= instance_variable
-    | <identifier> {*}         #= identifier
+    | <local_variable> {*}     #= local_variable
     ]
 }
 
@@ -143,14 +143,32 @@ rule primary {
     | <array> {*}          #= array
     | <functiondef> {*}    #= functiondef
     | <if_stmt> {*}        #= if_stmt
+    | <while_stmt> {*}     #= while_stmt
+    | <unless_stmt> {*}    #= unless_stmt
 }
 
 rule if_stmt {
-    'if' <expr> 'then' <.nl>
+    'if' <expr> <.then>
     <comp_stmt>
-    ['elsif' <expr> 'then' <.nl>
+    ['elsif' <expr> <.then>
     <comp_stmt>]*
     ['else' <.nl> $<else>=<comp_stmt>]?
+    'end'
+    {*}
+}
+
+rule then { 'then' | <term> ['then']? }
+
+rule while_stmt {
+    'while' <expr> <.do> <comp_stmt> 'end'
+    {*}
+}
+
+rule do { 'do' | <term> ['do']? }
+
+rule unless_stmt {
+    'unless' <expr> <.then> <comp_stmt>
+    ['else' $<else>=<comp_stmt>]?
     'end'
     {*}
 }
