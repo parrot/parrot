@@ -166,14 +166,15 @@ method operation($/) {
 }
 
 method call_args($/) {
-    my $past := PAST::Op.new( :node($/) );
-    my $args := $( $<args> );
-    $past.push($args);
-    make $past;
+    make $( $<args> );
 }
 
 method args($/) {
-    make $( $<arg>[0] );
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    for $<arg> {
+        $past.push( $($_) );
+    }
+    make $past;
 }
 
 method primary($/, $key) {
@@ -182,6 +183,23 @@ method primary($/, $key) {
 
 method literal($/, $key) {
     make $( $/{$key} );
+}
+
+method array($/) {
+    my $past;
+    ## XXX the "new" method should be invoked on the "Array" class (use get_class)
+    ## but that doesn't work yet.
+    my $getclass := PAST::Op.new( :inline('    %r = new "Array"'), :node($/) );
+    if $<args> {
+        $past := $( $<args>[0] );
+        $past.unshift( $getclass );
+        $past.name('new');
+        $past.pasttype('callmethod');
+    }
+    else {
+        $past := PAST::Op.new( $getclass, :name('new'), :pasttype('callmethod'), :node($/) );
+    }
+    make $past;
 }
 
 method float($/) {

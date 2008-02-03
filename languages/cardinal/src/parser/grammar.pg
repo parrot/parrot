@@ -102,11 +102,10 @@ rule variable {
 
 rule varname {
     <!reserved_word>
-    [ <global>
-    | <instance_variable>
-    | <identifier>
+    [ <global> {*}             #= global
+    | <instance_variable> {*}  #= instance_variable
+    | <identifier> {*}         #= identifier
     ]
-    {*}
 }
 
 rule mrhs {
@@ -141,6 +140,7 @@ proto 'term:'   is tighter('infix:+')
 rule primary {
     | <literal> {*}        #= literal
     | <variable> {*}       #= variable
+    | <array> {*}          #= array
     | <functiondef> {*}    #= functiondef
     | <if_stmt> {*}        #= if_stmt
 }
@@ -176,6 +176,11 @@ rule argdecl {
 
 rule fname {
     | <identifier> {*}          #= identifier
+}
+
+rule array {
+    '[' [ <args> [',']? ]? ']'
+    {*}
 }
 
 token identifier {

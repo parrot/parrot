@@ -22,6 +22,15 @@ say.pir -- simple implementation of a say function
     .return ()
 .end
 
+.namespace ["Array"]
+
+.sub 'new' :method
+    .param pmc self
+    .param pmc values :slurpy
+    $P0 = new 'Array'
+    .return ($P0)
+.end
+
 
 # Local Variables:
 #   mode: pir
