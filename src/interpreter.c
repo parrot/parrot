@@ -851,16 +851,18 @@ runops_int(PARROT_INTERP, size_t offset)
                 real_exception(interp, NULL, JIT_UNAVAILABLE,
                         "Error: PARROT_JIT_FLAG is set, "
                         "but interpreter is not JIT_CAPABLE!\n");
-#endif
+#else
                 core = runops_jit;
+#endif
                 break;
             case PARROT_EXEC_CORE:
 #if !EXEC_CAPABLE
                 real_exception(interp, NULL, EXEC_UNAVAILABLE,
                         "Error: PARROT_EXEC_FLAG is set, "
                         "but interpreter is not EXEC_CAPABLE!\n");
-#endif
+#else
                 core = runops_exec;
+#endif
                 break;
             case PARROT_GC_DEBUG_CORE:
                 core = runops_gc_debug_core;
