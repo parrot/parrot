@@ -18,17 +18,18 @@ rule TOP {
     {*}
 }
 
+## XXX figure out if this \n* thing is good here.
 token comp_stmt {
-    <stmts> <.term>*
+    \n* <stmts> <.term>*
     {*}
 }
 
-token stmts {
+rule stmts {
     <stmt> [ <.term>+ <stmt> ]*
     {*}
 }
 
-token term { \n | ';' }
+rule term { \n | ';' }
 
 rule basic_stmt {
     | <alias> {*}           #= alias
@@ -152,7 +153,7 @@ rule if_stmt {
     <comp_stmt>
     ['elsif' <expr> <.then>
     <comp_stmt>]*
-    ['else' <.nl> $<else>=<comp_stmt>]?
+    ['else' $<else>=<comp_stmt>]?
     'end'
     {*}
 }

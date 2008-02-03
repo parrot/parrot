@@ -15,11 +15,12 @@ unless 0
 print "ok 7\n"
 end
 
-if 1
+if 1 then
   print "ok 8\n"
+else
+  print "nok 8\n"
 end
 
-while 0 do print "nok 9\n" end
 
-print "ok 9\n"
+print "ok 9\n"; ;
 print "ok 10\n"
