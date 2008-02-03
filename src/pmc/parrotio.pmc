@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -42,10 +42,10 @@ class method.
 */
 
     METHOD INTVAL say(STRING *s) {
-        PMC *out = SELF == interp->vtables[enum_class_ParrotIO]->pmc_class ?
+        PMC * const out = SELF == interp->vtables[enum_class_ParrotIO]->pmc_class ?
             PIO_STDOUT(INTERP) : SELF;
-        INTVAL r = PIO_putps(INTERP, out, s) +
-                   PIO_puts(INTERP, out, "\n");
+        const INTVAL r = PIO_putps(INTERP, out, s) +
+                         PIO_puts(INTERP, out, "\n");
         return r;
     }
 /*
@@ -59,11 +59,11 @@ Opens the file with the given mode, using the given IO layer.
 */
 
     METHOD PMC *open(STRING *file, STRING *mode, STRING *layer) {
-        char          *c_file  = string_to_cstring(INTERP, file);
-        char          *c_mode  = string_to_cstring(INTERP, mode);
-        char          *c_layer = string_to_cstring(INTERP, layer);
-        ParrotIOLayer *l       = PIO_get_layer(INTERP, c_layer);
-        PMC           *pio     = PIO_open(INTERP, l, c_file, c_mode);
+        char          * const c_file  = string_to_cstring(INTERP, file);
+        char          * const c_mode  = string_to_cstring(INTERP, mode);
+        char          * const c_layer = string_to_cstring(INTERP, layer);
+        ParrotIOLayer *       l       = PIO_get_layer(INTERP, c_layer);
+        PMC           * const pio     = PIO_open(INTERP, l, c_file, c_mode);
 
         string_cstring_free(c_file);
         string_cstring_free(c_mode);
@@ -75,13 +75,13 @@ Opens the file with the given mode, using the given IO layer.
 
         if (l) {
             ParrotIO * const io = (ParrotIO *)PMC_data(pio);
-            const int is_mmap   = strcmp(c_layer, "mmap") == 0;
+            const int is_mmap   = STREQ(c_layer, "mmap");
 
             /* RT#46079 move this into the layer */
             if ((is_mmap && (io->b.flags & PIO_BF_MMAP)) || !is_mmap) {
                 l = interp->piodata->default_stack;
 
-                if (strcmp(l->name, "buf") == 0)
+                if (STREQ(l->name, "buf"))
                     l = l->down;
 
                 /* RT#46081 layer is stored twice - which is used when */
@@ -112,7 +112,7 @@ Opens the file with the given mode, using the given IO layer.
 
 */
     METHOD INTVAL isatty() {
-        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
+        const ParrotIO * const io = (ParrotIO *)PMC_data(SELF);
         return (io->flags & PIO_F_CONSOLE) == PIO_F_CONSOLE;
     }
 
@@ -168,7 +168,7 @@ SYNOPSIS
 */
 
     METHOD INTVAL set_readline_interactive(INTVAL on) {
-        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
+        ParrotIO * const io = (ParrotIO *)PMC_data(SELF);
 #ifdef PARROT_HAS_READLINE
         INTVAL flag;
 #endif
@@ -204,9 +204,8 @@ SYNOPSIS
 
 #ifdef PARROT_HAS_READLINE
         if (io->flags & PIO_F_READLINE) {
-            char *r;
+            char * const r = readline(prompt ? prompt->strstart : NULL);
 
-            r = readline(prompt ? prompt->strstart : NULL);
             if (r) {
                 if (*r)
                     add_history(r);
@@ -279,9 +278,8 @@ This does B<not> close the file.
         if (!PMC_data0(SELF)) {
             /* called as class method - open, slurp, close file */
             char * const path = string_to_cstring(interp, name);
-            PMC         *pio  = PIO_open(INTERP, NULL, path, "<");
-            INTVAL       size = Parrot_stat_info_intval(INTERP, name,
-                                    STAT_FILESIZE);
+            PMC  * const pio  = PIO_open(INTERP, NULL, path, "<");
+            const INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
 
             string_cstring_free(path);
 
@@ -290,24 +288,21 @@ This does B<not> close the file.
             PIO_close(INTERP, pio);
             return result;
         }
-        else {
-            /* slurp open file */
-            STRING *part;
 
-            if (!PMC_data(SELF))
-                real_exception(interp, NULL, PIO_ERROR,
-                        "Cannot slurp from empty filehandle");
+        /* slurp open file */
+        if (!PMC_data(SELF))
+            real_exception(interp, NULL, PIO_ERROR,
+                    "Cannot slurp from empty filehandle");
 
-            result = NULL;
+        result = NULL;
 
-            do {
-                part   = PIO_reads(INTERP, SELF, 4096);
+        do {
+            STRING * const part = PIO_reads(INTERP, SELF, 4096);
 
-                if (string_length(INTERP, part) == 0)
-                    break;
-                result = string_append(INTERP, result, part);
-            } while (1);
-        }
+            if (string_length(INTERP, part) == 0)
+                break;
+            result = string_append(INTERP, result, part);
+        } while (1);
 
         return result;
     }
@@ -378,7 +373,7 @@ Destroys the IO PMC, flushing and closing as necessary.
 */
 
     void destroy() {
-        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
+        ParrotIO * const io = (ParrotIO *)PMC_data(SELF);
 
         if (!io)
             return;
@@ -406,7 +401,7 @@ IO layers, we might copy C<data> and C<struct_val>.
 */
 
     PMC *clone() {
-        PMC *dest            = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest     = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_data(dest)       = PMC_data(SELF);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
         return dest;
@@ -439,7 +434,7 @@ non-existent layers, returns an empty string.
 */
 
     STRING *get_string_keyed_int(INTVAL n) {
-        ParrotIO      *io = (ParrotIO *)PMC_data(SELF);
+        ParrotIO      * const io = (ParrotIO *)PMC_data(SELF);
         ParrotIOLayer *layer;
 
         if (!io)
@@ -496,10 +491,6 @@ Pops a layer off the PIO's layer stack and returns its name.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial version by leo 2003/06/23.
 
 =cut
 

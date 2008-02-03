@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -326,7 +326,7 @@ This is used for implementing Pythons xrange()
     }
 
     INTVAL elements() {
-        parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
+        const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
         /* only start .. end supported so:
          * TODO check flags somewhere
          * */
@@ -334,7 +334,7 @@ This is used for implementing Pythons xrange()
     }
 
     INTVAL get_integer_keyed(PMC *key) {
-        parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
+        const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
         return RVal_int(r->cur);
     }
 
@@ -344,7 +344,7 @@ This is used for implementing Pythons xrange()
     }
 
     PMC *get_pmc_keyed(PMC *key) {
-        parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
+        const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
         PMC * const res   = PMC_pmc_val(SELF);
         PMC_int_val(res)  = RVal_int(r->cur);
 
