@@ -344,7 +344,7 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
         return NULL;
     }
 
-    for (i = 0; *command && isalpha((unsigned char) *command); command++, i++)
+    for (i = 0; isalpha((unsigned char) *command); command++, i++)
         c += (tolower((unsigned char) *command) + (i + 1)) * ((i + 1) * 255);
 
     /* Nonempty and did not start with a letter */
@@ -1588,7 +1588,6 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
     for (j = 1; j < info->op_count; j++) {
         char      buf[256];
         INTVAL    i = 0;
-        FLOATVAL  f;
 
         PARROT_ASSERT(size + 2 < space);
 
@@ -1648,11 +1647,13 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             }
             break;
         case PARROT_ARG_NC:
+            {
             /* Convert the float to a string */
-            f = interp->code->const_table->constants[op[j]]->u.number;
+            const FLOATVAL f = interp->code->const_table->constants[op[j]]->u.number;
             Parrot_snprintf(interp, buf, sizeof (buf), FLOATVAL_FMT, f);
             strcpy(&dest[size], buf);
             size += strlen(buf);
+            }
             break;
         case PARROT_ARG_SC:
             dest[size++] = '"';
@@ -1707,8 +1708,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
                 case KEY_string_FLAG:
                     dest[size++] = '"';
                     {
-                        char *temp;
-                        temp = string_to_cstring(interp, PMC_str_val(k));
+                        char * const temp = string_to_cstring(interp, PMC_str_val(k));
                         strcpy(&dest[size], temp);
                         string_cstring_free(temp);
                     }
@@ -1803,7 +1803,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
         };
 
         /* Register decoding.  It would be good to abstract this, too. */
-        const char *regs = "ISPN";
+        static const char regs[] = "ISPN";
 
         for (j = 0; j < n_values; j++) {
             unsigned int idx = 0;
@@ -1864,12 +1864,13 @@ Disassemble the bytecode.
 void
 PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
 {
-    PDB_t       *pdb = interp->pdb;
+    PDB_t    * const pdb = interp->pdb;
+    opcode_t * pc        = interp->code->base.data;
+
     PDB_file_t  *pfile;
     PDB_line_t  *pline, *newline;
     PDB_label_t *label;
     opcode_t    *code_end;
-    opcode_t    *pc = interp->code->base.data;
 
     const unsigned int default_size = 32768;
     size_t space;  /* How much space do we have? */
@@ -1934,7 +1935,7 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         while (pline && pline->opcode != label->opcode)
             pline = pline->next;
 
-        if (!(pline)) {
+        if (!pline) {
             PIO_eprintf(interp,
                         "Label number %li out of bounds.\n", label->number);
             /* RT#46127: free allocated memory */
