@@ -25,10 +25,8 @@ say.pir -- simple implementation of a say function
 .namespace ["Array"]
 
 .sub 'new' :method
-    .param pmc self
     .param pmc values :slurpy
-    $P0 = new 'Array'
-    .return ($P0)
+    .return (values)
 .end
 
 
