@@ -192,7 +192,7 @@ token reserved_word {
 }
 
 token ws {
-    | <after '='> \n
-    | <after '+'> \n
+    | '\\' \n                      ## a backslash at end of line
+    | <after [','|'='|'+']> \n     ## a newline after a comma or operator is ignored
     | \h* ['#' \N* \n*]?
 }
