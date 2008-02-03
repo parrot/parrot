@@ -68,7 +68,7 @@ is_env_var_set(ARGIN(const char* var))
     else if (*value == '\0')
         retval = 0;
     else
-        retval = ! (strcmp(value, "0") == 0);
+        retval = !STREQ(value, "0");
     if (free_it)
         mem_sys_free(value);
     return retval;
