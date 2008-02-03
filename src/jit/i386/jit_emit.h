@@ -59,7 +59,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr);
  */
 #undef EXEC_SHARED
 
-extern PARROT_API UINTVAL ld(UINTVAL);
+extern UINTVAL ld(UINTVAL);
 
 #define NEG_MINUS_ZERO
 /* #define NEG_ZERO_SUB */
