@@ -36,15 +36,15 @@ static STRING* compose(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* decompose(PARROT_INTERP, ARGIN(STRING *src))
+static STRING* decompose(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 static void downcase(SHIM_INTERP, ARGIN(STRING *source_string))
         __attribute__nonnull__(2);
 
-static void downcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
-        __attribute__nonnull__(1)
+static void downcase_first(SHIM_INTERP, ARGIN(STRING *source_string))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -110,13 +110,13 @@ static STRING * to_charset(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * to_unicode(PARROT_INTERP,
-    ARGIN(STRING *src),
+    ARGMOD(STRING *src),
     ARGMOD_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
-static void upcase(PARROT_INTERP, ARGIN(STRING *source_string))
-        __attribute__nonnull__(1)
+static void upcase(SHIM_INTERP, ARGIN(STRING *source_string))
         __attribute__nonnull__(2);
 
 static void upcase_first(SHIM_INTERP, ARGIN(STRING *source_string))
@@ -241,7 +241,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-to_unicode(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
+to_unicode(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
 {
     if (dest) {
         dest->charset = Parrot_unicode_charset_ptr;
@@ -312,7 +312,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-decompose(PARROT_INTERP, ARGIN(STRING *src))
+decompose(PARROT_INTERP, ARGMOD(STRING *src))
 {
     return string_copy(interp, src);
 }
@@ -328,10 +328,9 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-upcase(PARROT_INTERP, ARGIN(STRING *source_string))
+upcase(SHIM_INTERP, ARGIN(STRING *source_string))
 {
     const UINTVAL n = source_string->strlen;
-    UNUSED(interp);
 
     if (n) {
         char * const buffer = source_string->strstart;
@@ -424,10 +423,8 @@ RT#48260: Not yet documented!!!
 */
 
 static void
-downcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
+downcase_first(SHIM_INTERP, ARGIN(STRING *source_string))
 {
-    UNUSED(interp);
-
     if (source_string->strlen) {
         char * const buffer = source_string->strstart;
         buffer[0] = (char)tolower((unsigned char)buffer[0]);
@@ -557,8 +554,7 @@ ascii_cs_index(PARROT_INTERP, ARGIN(STRING *source_string),
 {
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
-        return mixed_cs_index(interp, source_string, search_string,
-                offset);
+        return mixed_cs_index(interp, source_string, search_string, offset);
     }
 
     PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
