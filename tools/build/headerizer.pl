@@ -457,13 +457,16 @@ sub main {
     }    # for @cfiles
 
     if ( $apilist ) {
+        my $nfuncs = 0;
         for my $cfile ( sort keys %api ) {
             my @funcs = sort { $a->{name} cmp $b->{name} } @{$api{$cfile}};
             print "$cfile\n";
             for my $func ( @funcs ) {
                 print "    $func->{name}\n";
+                ++$nfuncs;
             }
         }
+        print "$nfuncs PARROT_API functions\n";
     }
     else { # Normal headerization and updating
         # Update all the .h files
@@ -491,9 +494,9 @@ sub main {
 
             write_file( $cfile, $source );
         }
+        print "Headerization complete.\n";
     }
 
-    print "Headerization complete.\n";
     if ( keys %warnings ) {
         my $nwarnings     = 0;
         my $nwarningfuncs = 0;
