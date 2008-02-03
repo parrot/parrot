@@ -194,6 +194,18 @@ the key or index.  The C<vivibase> attribute below may be used
 to specify how to generate the aggregate if it doesn't already
 exist.
 
+=item "attribute"
+
+Attribute variables represent object attributes (in some languages
+they're called "member variables"). The attribute's name is given
+by the node's C<name> attribute. Nodes representing attribute
+variables have an optional child, representing the object to which
+the attribute belongs. If this child is not present, the attribute
+is assumed to belong to the current invocant, indicated by the
+special variable C<self> (which is implicitly passed to all subs
+that are flagged as a C<:method>.
+
+
 =back
 
 If C<scope> is not explicitly provided in the node, then PAST will
@@ -309,7 +321,7 @@ The C<unless> type can be used to implement "short-circuit or"
 semantics; simply set the first child to the left operand and
 the second child to the right operand, leaving the third
 child empty or uninitialized.  If the first child evaluates to
-true it is returned as the result of the operation, otherwise the 
+true it is returned as the result of the operation, otherwise the
 second child is evaluated and returned as the result.
 
 =item while
