@@ -19,14 +19,16 @@ rule TOP {
 }
 
 token comp_stmt {
-    <stmt> [ <.term> <expr> ]* <.term>?
+    <stmts> <.term>*
     {*}
 }
 
-token term {
-    | \n+   ## it's perfectly fine to have multiple whitelines
-    | ';'
+token stmts {
+    <stmt> [ <.term>+ <stmt> ]*
+    {*}
 }
+
+token term { \n | ';' }
 
 rule basic_stmt {
     | <alias> {*}           #= alias
@@ -139,10 +141,14 @@ rule if_stmt {
 }
 
 rule functiondef {
-    'def' <fname> <argdecl> <.nl>
+    'def' <fname> <argdecl>
     <comp_stmt>
     'end'
     {*}
+}
+
+rule bodystmt {
+    <comp_stmt>
 }
 
 token nl {

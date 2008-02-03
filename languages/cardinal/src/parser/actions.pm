@@ -24,10 +24,13 @@ method TOP($/) {
 }
 
 method comp_stmt($/) {
+    make $( $<stmts> );
+}
+
+method stmts($/) {
     my $past := PAST::Stmts.new( :node($/) );
-    $past.push( $( $<stmt> ) );
-    for $<expr> {
-        $past.push( $($_) );
+    for $<stmt> {
+        $past.push($($_));
     }
     make $past;
 }
