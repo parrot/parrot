@@ -101,7 +101,12 @@ rule variable {
 }
 
 rule varname {
-    <!reserved_word> <identifier> {*}
+    <!reserved_word>
+    [ <global>
+    | <instance_variable>
+    | <identifier>
+    ]
+    {*}
 }
 
 rule mrhs {
@@ -117,7 +122,17 @@ rule 'arg' is optable { ... }
 
 proto 'infix:=' is precedence('1')      { ... }
 
-proto 'infix:+' is tighter('infix:=')   { ... }
+proto 'infix:+' is tighter('infix:=')
+                is pirop('n_add')       { ... }
+
+proto 'infix:-' is equal('infix:+')
+                is pirop('n_sub')       { ... }
+
+proto 'infix:*' is tighter('infix:+')
+                is pirop('n_mul')       { ... }
+
+proto 'infix:/' is equal('infix:*')
+                is pirop('n_div')       { ... }
 
 proto 'term:'   is tighter('infix:+')
                 is parsed(&primary)     { ... }
@@ -167,13 +182,40 @@ token identifier {
     <!reserved_word> <ident> {*}
 }
 
+token global {
+    '$' <ident>
+    {*}
+}
+
+token instance_variable {
+    '@' <ident>
+    {*}
+}
+
+token local_variable {
+    <[a..z_]> <ident>
+    {*}
+}
+
+token constant_variable {
+    <[A..Z]> <ident>
+    {*}
+}
+
 token literal {
-    | <numeric> {*}        #= numeric
+    | <float> {*}          #= float
+    | <integer> {*}        #= integer
     | <string> {*}         #= string
 }
 
-token numeric {
-    \d+ {*}
+token float {
+    \d* '.' \d+
+    {*}
+}
+
+token integer {
+    \d+
+    {*}
 }
 
 token string {

@@ -100,8 +100,16 @@ method variable($/) {
     make $( $<varname> );
 }
 
-method varname($/) {
-    make $( $<identifier> );
+method varname($/, $key) {
+    make $( $/{$key} );
+}
+
+method global($/) {
+    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
+}
+
+method instance_variable($/) {
+    make PAST::Var.new( :name(~$/), :scope('lexical'), :node($/) ); ## need for scope('attribute')?
 }
 
 method if_stmt($/) {
@@ -176,8 +184,12 @@ method literal($/, $key) {
     make $( $/{$key} );
 }
 
-method numeric($/) {
+method float($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node($/) );
+}
+
+method integer($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
 }
 
 method string($/) {
