@@ -1292,7 +1292,6 @@ id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
     }
 
     real_exception(interp, NULL, 1, "Couldn't find PMC in arenas");
-    return -1;
 }
 
 /*
@@ -1530,10 +1529,9 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
         ARGIN(visit_info *info))
 {
     List * const todo = (List *)PMC_data(info->todo);
-    PMC *finish_list_pmc;
     PMC **list_item;
-    int i, n;
-    List *finish_list = NULL;   /* gcc -O3 warning */
+    int i;
+    List *finish_list;
     int finished_first = 0;
 
     const int thawing =
@@ -1544,9 +1542,11 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
         /*
          * create a list that contains PMCs that need thawfinish
          */
-        finish_list_pmc = pmc_new(interp, enum_class_Array);
+        PMC * const finish_list_pmc = pmc_new(interp, enum_class_Array);
         finish_list = (List *)PMC_data(finish_list_pmc);
     }
+    else
+        finish_list = NULL;
 
     (info->visit_pmc_now)(interp, current, info);
     /*
@@ -1571,6 +1571,7 @@ again:
     }
 
     if (thawing) {
+        INTVAL n;
         /*
          * if image isn't consumed, there are some extra data to thaw
          */
@@ -1586,13 +1587,11 @@ again:
              * the first create PMC might not be in the list,
              * if it has no pmc_ext
              */
-            list_unshift(interp, finish_list,
-                    info->thaw_result, enum_type_PMC);
+            list_unshift(interp, finish_list, info->thaw_result, enum_type_PMC);
         }
-        n = (int)list_length(interp, finish_list);
+        n = list_length(interp, finish_list);
         for (i = 0; i < n ; ++i) {
-            current = *(PMC**)list_get(interp, finish_list, i,
-                    enum_type_PMC);
+            current = *(PMC**)list_get(interp, finish_list, i, enum_type_PMC);
             if (!PMC_IS_NULL(current))
                 VTABLE_thawfinish(interp, current, info);
         }

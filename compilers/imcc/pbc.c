@@ -224,12 +224,11 @@ RT#48260: Not yet documented!!!
 static void
 imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
 {
-    cs_t   *cs, *prev_cs;
-
-    cs = globals.cs;
+    cs_t *cs = globals.cs;
 
     while (cs) {
         subs_t *s = cs->subs;
+        cs_t *prev_cs;
 
         while (s) {
             subs_t * const prev_s = s->prev;
@@ -426,16 +425,16 @@ PARROT_WARN_UNUSED_RESULT
 static int
 get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
 {
-    subs_t *s;
-    size_t  size = 0;
-    *ins_line    = 0;
+    size_t size = 0;
 
-    if (!globals.cs || interp->code->base.data == NULL)
-        return 0;
+    *ins_line   = 0;
 
-    for (s = globals.cs->subs; s; s = s->prev) {
-        size      += s->size;
-        *ins_line += s->ins_line;
+    if (globals.cs && interp->code->base.data) {
+        subs_t *s;
+        for (s = globals.cs->subs; s; s = s->prev) {
+            size      += s->size;
+            *ins_line += s->ins_line;
+        }
     }
 
     return size;
