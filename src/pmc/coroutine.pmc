@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -36,8 +36,8 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 static void
 print_sub_name(PARROT_INTERP, PMC *sub)
 {
-    Parrot_coro *co     = PMC_coro(sub);
-    Interp      *tracer = interp->debugger ? interp->debugger : interp;
+    Parrot_coro * const co     = PMC_coro(sub);
+    Interp      * const tracer = interp->debugger ? interp->debugger : interp;
 
     PIO_eprintf(tracer, "# %s coro '%Ss'",
         !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ?
@@ -82,10 +82,12 @@ Clone the couroutine.
 
 Destroys the coroutine.
 
+=cut
+
 */
 
     void destroy() {
-        Parrot_coro *sub = PMC_coro(SELF);
+        Parrot_coro * const sub = PMC_coro(SELF);
 
         if (sub->ctx)
             Parrot_free_context(interp, sub->ctx, 0);
@@ -94,8 +96,8 @@ Destroys the coroutine.
     }
 
     PMC *clone() {
-        Parrot_coro *sub    = mem_allocate_typed(Parrot_coro);
-        PMC         *ret    = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        Parrot_coro * const sub = mem_allocate_typed(Parrot_coro);
+        PMC         * const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 
         PObj_custom_mark_destroy_SETALL(ret);
 
@@ -120,18 +122,18 @@ Swaps the "context".
 */
 
     opcode_t *invoke(void *next) {
-        parrot_context_t   *caller_ctx;
         PackFile_ByteCode  *wanted_seg;
-        struct Stack_Chunk *state;
-        parrot_context_t   *ctx;
-        PMC                *ccont;
-        Parrot_coro        *co   = PMC_coro(SELF);
-        opcode_t           *dest = co->address;
+        Parrot_coro * const co = PMC_coro(SELF);
+        opcode_t    * dest     = co->address;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
 
         if (!co->ctx) {
+            parrot_context_t *caller_ctx;
+            parrot_context_t *ctx;
+            PMC *ccont;
+
             /* RT#46699 factor out common code with Sub.invoke and inherit it */
             ccont = INTERP->current_cont;
 
@@ -175,6 +177,10 @@ Swaps the "context".
 
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
+            PMC *ccont;
+            struct Stack_Chunk *state;
+            parrot_context_t *ctx;
+
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg            = co->seg;
 
@@ -196,6 +202,10 @@ Swaps the "context".
             INTERP->ctx.bp_ps     = ctx->bp_ps;
         }
         else {
+            PMC *ccont;
+            struct Stack_Chunk *state;
+            parrot_context_t *ctx;
+
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             /* switch back to last remembered code seg and context */
 
@@ -242,12 +252,14 @@ Marks the coroutine as live.
 */
 
     void mark() {
-        Parrot_coro *c = PMC_coro(SELF);
+        Parrot_coro * const c = PMC_coro(SELF);
 
-        if (c && c->ctx)
-            mark_context(INTERP, c->ctx);
-        if (c && c->dynamic_state)
-            mark_stack(INTERP, c->dynamic_state);
+        if (c) {
+            if (c->ctx)
+                mark_context(INTERP, c->ctx);
+            if (c->dynamic_state)
+                mark_stack(INTERP, c->dynamic_state);
+        }
 
         SUPER();
     }
@@ -256,10 +268,6 @@ Marks the coroutine as live.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial version by Melvin on 2002/06/6.
 
 =cut
 
