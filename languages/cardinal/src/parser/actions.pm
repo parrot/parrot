@@ -109,8 +109,7 @@ method global($/) {
 }
 
 method instance_variable($/) {
-    make PAST::Var.new( :name(~$/), :scope('lexical'), :viviself('Undef'), :node($/) );
-    ## need for scope('attribute')?
+    make PAST::Var.new(  :name(~$/), :scope('attribute'), :viviself('Undef'), :node($/) );
 }
 
 method local_variable($/) {

@@ -12,7 +12,6 @@ http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
 grammar cardinal::Grammar is PCT::Grammar;
 
 rule TOP {
-    <.nl>?
     <comp_stmt>
     [ $ || <panic: Syntax error> ]
     {*}
@@ -183,10 +182,6 @@ rule functiondef {
 
 rule bodystmt {
     <comp_stmt>
-}
-
-token nl {
-    \n+
 }
 
 rule argdecl {
