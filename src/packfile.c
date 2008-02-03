@@ -1043,10 +1043,11 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
     header->patch       = PARROT_PATCH_VERSION;
     header->bc_major    = PARROT_PBC_MAJOR;
     header->bc_minor    = PARROT_PBC_MINOR;
-    if (NUMVAL_SIZE == 8)
-        header->floattype = 0;
-    else /* if XXX */
-        header->floattype = 1;
+#if NUMVAL_SIZE == 8
+    header->floattype = 0;
+#else /* if XXX */
+    header->floattype = 1;
+#endif
 }
 
 /*
