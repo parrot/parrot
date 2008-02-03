@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -219,10 +219,10 @@ Returns the PMC associated with C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        const Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
-
-        if (key == PARROT_TIMER_HANDLER)
+        if (key == PARROT_TIMER_HANDLER) {
+            const Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
             return core_struct->codeblock;
+        }
 
         return PMCNULL;
     }
@@ -302,10 +302,10 @@ Sets the PMC associated with C<key> to C<*value>.
 */
 
     void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
-
-        if (key == PARROT_TIMER_HANDLER)
+        if (key == PARROT_TIMER_HANDLER) {
+            Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
             core_struct->codeblock = value;
+        }
     }
 
 /*
@@ -345,8 +345,7 @@ Sets the floating-point value associated with C<key> to C<value>.
                 break;
             default:
                 real_exception(INTERP, NULL, INVALID_OPERATION,
-                    "Unknown timer attribute in Timer.set_number_keyed_int: %d",
-                    key);
+                    "Unknown timer attribute in Timer.set_number_keyed_int: %d", key);
         }
     }
 }
