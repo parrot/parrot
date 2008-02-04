@@ -1,5 +1,5 @@
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: pct_for_dummies.pod 25502 2008-02-04 14:49:22Z coke $
+# $Id$
 
 =head1 NAME
 

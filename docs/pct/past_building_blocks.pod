@@ -1,5 +1,5 @@
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: past_building_blocks.pod 25476 2008-02-03 17:59:45Z kjs $
+# $Id$
 
 =head1 NAME
 
