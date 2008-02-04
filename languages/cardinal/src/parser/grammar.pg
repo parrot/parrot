@@ -7,6 +7,8 @@ This is the grammar for cardinal written as a sequence of Perl 6 rules.
 Currently taken (partly) from:
 http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
 
+But adapted here and there; it's not entirely correct, it seems.
+
 =end overview
 
 grammar cardinal::Grammar is PCT::Grammar;
@@ -269,6 +271,7 @@ rule basic_primary {
     | <literal> {*}                         #= literal
     | <variable> {*}                        #= variable
     | <array> {*}                           #= array
+    | <hash> {*}                            #= hash
     | <functiondef> {*}                     #= functiondef
     | <if_stmt> {*}                         #= if_stmt
     | <while_stmt> {*}                      #= while_stmt
@@ -382,6 +385,21 @@ rule fname {
 
 rule array {
     '[' [ <args> [',']? ]? ']'
+    {*}
+}
+
+rule hash {
+    '{' [ [ <args> | <assocs> ] [',']? ]? '}'
+    {*}
+}
+
+rule assocs {
+    <assoc> [',' <assoc>]*
+    {*}
+}
+
+rule assoc {
+    <arg> '=>' <arg>
     {*}
 }
 

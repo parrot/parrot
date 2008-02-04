@@ -360,6 +360,25 @@ method array($/) {
     make $past;
 }
 
+method hash($/) {
+    # XXX handle class stuff
+    my $past;
+    my $getclass := PAST::Op.new( :inline('    %r = new "Hash"'), :node($/) );
+    $past := PAST::Op.new( $getclass, :name('new'), :pasttype('callmethod'), :node($/) );
+    make $past;
+}
+
+method assocs($/) {
+    for $<assoc> {
+
+    }
+    # XXX
+}
+
+method assoc($/) {
+    # XXX
+}
+
 method float($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node($/) );
 }
