@@ -363,7 +363,7 @@ if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
                     /* delete branch */
                     unit->ostat.deleted_ins++;
-                    ins = delete_ins(unit, ins, 1);
+                    ins = delete_ins(unit, ins);
                     unit->ostat.if_branch++;
                     changed = 1;
                 }
@@ -483,7 +483,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 ins->opnum == PARROT_OP_fdiv_n_nc) &&
                       atof(ins->r[1]->name) == 1.0)) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
-            ins = delete_ins(unit, ins, 1);
+            ins = delete_ins(unit, ins);
             if (ins)
                 ins = ins->prev ? ins->prev : unit->instructions;
             else
@@ -1148,7 +1148,7 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                                 r->first_ins->r[0]->name, ins);
                         /* unconditional jump can be eliminated */
                         unit->ostat.deleted_ins++;
-                        ins = delete_ins(unit, ins, 1);
+                        ins = delete_ins(unit, ins);
                         return 1;
                     }
                 }
@@ -1340,7 +1340,7 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     IMCC_info(interp, 2, "\tunused_label\n");
     for (i=1; i < unit->n_basic_blocks; i++) {
-        const Instruction *ins = unit->bb_list[i]->start;
+        Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
             const SymReg * const lab = ins->r[0];
             used = 0;
@@ -1385,7 +1385,7 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 IMCC_debug(interp, DEBUG_OPT1,
                            "block %d label %s deleted\n", i, lab->name);
                 unit->ostat.deleted_ins++;
-                ins = delete_ins(unit, ins, 1);
+                ins = delete_ins(unit, ins);
                 changed = 1;
             }
 
@@ -1431,7 +1431,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             for (ins = bb->start; ins && ins->bbindex == bbi;) {
                 IMCC_debug(interp, DEBUG_OPT1,
                         "\tins deleted (dead block) %I\n", ins);
-                ins = delete_ins(unit, ins, 1);
+                ins = delete_ins(unit, ins);
                 unit->ostat.deleted_ins++;
                 changed++;
             }
@@ -1447,7 +1447,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             STREQ(last->op, "branch")) {
             IMCC_debug(interp, DEBUG_OPT1,
                     "unreachable ins deleted (after branch) %I\n", ins);
-            ins = delete_ins(unit, ins, 1);
+            ins = delete_ins(unit, ins);
             unit->ostat.deleted_ins++;
             changed++;
         }
@@ -1458,9 +1458,8 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 STREQ(last->op, "branch") &&
                 STREQ(last->r[0]->name, ins->r[0]->name)) {
-            IMCC_debug(interp, DEBUG_OPT1,
-                       "dead branch deleted %I\n", ins);
-            ins = delete_ins(unit, last, 1);
+            IMCC_debug(interp, DEBUG_OPT1, "dead branch deleted %I\n", ins);
+            ins = delete_ins(unit, last);
             unit->ostat.deleted_ins++;
             changed++;
         }
@@ -1492,9 +1491,8 @@ used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if (ins->r) {
             SymReg * const r = ins->r[0];
             if (r && (r->use_count == 1 && r->lhs_use_count == 1)) {
-                IMCC_debug(interp, DEBUG_OPT2,
-                        "used once '%I' deleted\n", ins);
-                ins = delete_ins(unit, ins, 1);
+                IMCC_debug(interp, DEBUG_OPT2, "used once '%I' deleted\n", ins);
+                ins = delete_ins(unit, ins);
                 ins = ins->prev ? ins->prev : unit->instructions;
                 unit->ostat.deleted_ins++;
                 unit->ostat.used_once++;
