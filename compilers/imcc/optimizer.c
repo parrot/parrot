@@ -586,7 +586,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 ins->opnum == PARROT_OP_mul_n_nc) &&
                 (f = atof(ins->r[1]->name), FLOAT_IS_ZERO(f)))) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
-            r = mk_const(interp, str_dup("0"), ins->r[0]->set);
+            r = mk_const(interp, "0", ins->r[0]->set);
             --ins->r[1]->use_count;
             if (ins->opsize == 4)
                 --ins->r[2]->use_count;
@@ -653,7 +653,7 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             o = ins->r[0];
         } else if (STREQ(ins->op, "null") && ins->r[0]->set == 'I') {
             found = 1;
-            c = mk_const(interp, str_dup("0"), 'I');
+            c = mk_const(interp, "0", 'I');
             o = ins->r[0];
         } /* this would be good because 'set I0, 0' is reduced to 'null I0'
                before it gets to us */
@@ -754,7 +754,7 @@ IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const cha
                 STREQ(name, ops[i])) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %s_nc_ic => ", name);
             strcpy(b, r[1]->name);
-            r[1] = mk_const(interp, str_dup(b), 'N');
+            r[1] = mk_const(interp, b, 'N');
             tmp = INS(interp, unit, name, "", r, 2, 0, 0);
             IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
         }
@@ -1007,7 +1007,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
             default:
                 break;
         }
-        r[1] = mk_const(interp, str_dup(b), r[0]->set);
+        r[1] = mk_const(interp, b, r[0]->set);
         tmp = INS(interp, unit, "set", "", r, 2, 0, 0);
     }
     if (tmp) {
@@ -1198,7 +1198,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
             /* cond_op has 2 or 3 args */
             PARROT_ASSERT(args <= 3);
 
-            r = mk_local_label(interp, str_dup(label));
+            r = mk_local_label(interp, label);
             tmp = INS_LABEL(interp, unit, r, 0);
             insert_ins(unit, cond, tmp);
 
@@ -1219,7 +1219,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
                 real_exception(interp, NULL, 1,
                         "Negative branch register address detected");
             }
-            regs[reg_index] = mk_label_address(interp, str_dup(label));
+            regs[reg_index] = mk_label_address(interp, label);
             tmp = INS(interp, unit, (const char*)neg_op, "", regs, args, 0, 0);
 
             IMCC_debug(interp, DEBUG_OPT1,

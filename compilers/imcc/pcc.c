@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2003-2007, The Perl Foundation.
+ * Copyright (C) 2003-2008, The Perl Foundation.
  *
  * pcc.c
  *
@@ -160,7 +160,7 @@ get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
     if (r)
         return r;
 
-    return mk_pasm_reg(interp, str_dup(name));
+    return mk_pasm_reg(interp, name);
 }
 
 /*
@@ -183,7 +183,7 @@ get_const(PARROT_INTERP, ARGIN(const char *name), int type)
     if (r && r->set == type)
         return r;
 
-    return mk_const(interp, str_dup(name), type);
+    return mk_const(interp, name, type);
 }
 
 /*
@@ -249,7 +249,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
     strcat(buf, ")\"");
 
-    regs[0] = mk_const(interp, str_dup(buf), 'S');
+    regs[0] = mk_const(interp, buf, 'S');
     ins     = insINS(interp, unit, ins, op_name, regs, n + 1);
 
     mem_sys_free(regs);
@@ -318,7 +318,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
     if (sub->pcc_sub->pragma & P_METHOD) {
         SymReg *self = get_sym(interp, "self");
         if (!self) {
-            self       = mk_symreg(interp, str_dup("self"), 'P');
+            self       = mk_symreg(interp, "self", 'P');
             self->type = VTIDENTIFIER;
         }
         unshift_self(sub, self);
@@ -596,8 +596,8 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     buf = (char *)malloc(strlen(this_sub->name) + 3);
     sprintf(buf, "%s@0", this_sub->name);
 
-    if ((label = find_sym(interp, buf)) == NULL) {
-        label = mk_local_label(interp, str_dup(buf));
+    if (!(label = find_sym(interp, buf))) {
+        label = mk_local_label(interp, buf);
         tmp_ins = INS_LABEL(interp, unit, label, 0);
         insert_ins(unit, get_params, tmp_ins);
     }
@@ -754,7 +754,7 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *in
             if (!(arg->type == VTIDENTIFIER ||
                         arg->type == VTPASM ||
                         arg->type == VTREG))
-                meth = mk_const(interp, str_dup(arg->name), 'S');
+                meth = mk_const(interp, arg->name, 'S');
         }
     }
 

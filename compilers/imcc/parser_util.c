@@ -4,7 +4,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  *
  * parser support functions
  *
@@ -163,7 +163,7 @@ iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
             string_from_cstring(interp, *type == '.' ?type+1:type, 0));
 
     sprintf(fmt, "%d", pmc_num);
-    pmc = mk_const(interp, str_dup(fmt), 'I');
+    pmc = mk_const(interp, fmt, 'I');
 
     if (pmc_num <= 0)
         IMCC_fataly(interp, E_SyntaxError,
@@ -318,10 +318,10 @@ maybe_builtin(PARROT_INTERP, ARGIN(const char *name),
      */
     is_class_meth = Parrot_builtin_is_class_method(bi);
     is_void = Parrot_builtin_is_void(bi);
-    meth = mk_sub_address(interp, str_dup(name)); /* XXX Memory leak on name! */
+    meth = mk_sub_address(interp, name);
     if (is_class_meth) {    /* ParrotIO.open() */
         const char * const ns = Parrot_builtin_get_c_namespace(bi);
-        SymReg * const ns_sym = mk_const(interp, str_dup(ns), 'S');
+        SymReg * const ns_sym = mk_const(interp, ns, 'S');
 
         ins = IMCC_create_itcall_label(interp);
         sub = ins->r[0];
@@ -396,7 +396,7 @@ to_infix(PARROT_INTERP, ARGIN(const char *name), ARGMOD(SymReg **r),
     if (*n == 3 && r[0] == r[1] && !is_n) {       /* cvt to inplace */
         char buf[10];
         sprintf(buf, "%d", mmd_op + 1);  /* XXX */
-        mmd = mk_const(interp, str_dup(buf), 'I');
+        mmd = mk_const(interp, buf, 'I');
     }
     else {
         char buf[10];
@@ -404,7 +404,7 @@ to_infix(PARROT_INTERP, ARGIN(const char *name), ARGMOD(SymReg **r),
         for (i = *n; i > 0; --i)
             r[i] = r[i - 1];
         sprintf(buf, "%d", *n == 2 ? (mmd_op + 1) : mmd_op);  /* XXX */
-        mmd = mk_const(interp, str_dup(buf), 'I');
+        mmd = mk_const(interp, buf, 'I');
         (*n)++;
     }
     r[0] = mmd;
@@ -509,7 +509,7 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     int dirs;
     char fullname[64];
 
-    r[0] = mk_const(interp, str_dup(r[0]->name), 'P');
+    r[0] = mk_const(interp, r[0]->name, 'P');
     r[0]->pmc_type = enum_class_FixedIntegerArray;
     dirs = 1;           /* in constant */
     op_fullname(fullname, name, r, 1, 0);
@@ -1210,7 +1210,7 @@ change_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), int num, in
         SymReg *s;
         if (c->type & VT_CONSTP)
             c = c->reg;
-        s = mk_const(interp, str_dup(c->name), 'N');
+        s = mk_const(interp, c->name, 'N');
         r[num] = s;
         changed = 1;
     }
@@ -1423,13 +1423,12 @@ multi_keyed(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             if (!get_sym(interp, buf))
                 break;
         }
-        preg[n] = mk_symreg(interp, str_dup(buf), 'P');
+        preg[n] = mk_symreg(interp, buf, 'P');
         kv >>= 1;
         if (kv & 1) {
             /* we have a keyed operand */
             if (r[i]->set != 'P') {
-                IMCC_fataly(interp, E_SyntaxError,
-                    "not an aggregate\n");
+                IMCC_fataly(interp, E_SyntaxError, "not an aggregate\n");
             }
             /* don't emit LHS yet */
             if (i == 0) {
@@ -1437,16 +1436,14 @@ multi_keyed(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
                 nreg[1] = r[i+1];
                 nreg[2] = preg[n];
                 /* set p_k px */
-                ins = INS(interp, unit, str_dup("set"),
-                          0, nreg, 3, KEY_BIT(1), 0);
+                ins = INS(interp, unit, "set", 0, nreg, 3, KEY_BIT(1), 0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 nreg[2] = r[i+1];
                 /* set py|z p_k */
-                INS(interp, unit, str_dup("set"),
-                    0, nreg, 3, KEY_BIT(2), 1);
+                INS(interp, unit, "set", 0, nreg, 3, KEY_BIT(2), 1);
             }
             i++;
         }
@@ -1456,15 +1453,13 @@ multi_keyed(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
                 nreg[0] = r[i];
                 nreg[1] = preg[n];
                 /* set n, px */
-                ins = INS(interp, unit, str_dup("set"),
-                          0, nreg, 2, 0, 0);
+                ins = INS(interp, unit, "set", 0, nreg, 2, 0, 0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 /* set px, n */
-                INS(interp, unit, str_dup("set"),
-                    0, nreg, 2, 0, 1);
+                INS(interp, unit, "set", 0, nreg, 2, 0, 1);
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  * $Id$
  */
 
@@ -471,7 +471,7 @@ static void
 store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
 {
     SymReg * const fixup = _mk_address(interp, &globals.cs->subs->fixup,
-            str_dup(r->name), U_add_all);
+            r->name, U_add_all);
 
     if (r->set == 'p')
         fixup->set = 'p';
@@ -497,7 +497,7 @@ RT#48260: Not yet documented!!!
 static void
 store_key_const(ARGIN(const char *str), int idx)
 {
-    SymReg * const c = _mk_const(&globals.cs->key_consts, str_dup(str), 0);
+    SymReg * const c = _mk_const(&globals.cs->key_consts, str, 0);
     c->color = idx;
 }
 
@@ -654,7 +654,7 @@ fixup_globals(PARROT_INTERP)
                 }
                 if (!s1) {
                     int op, col;
-                    SymReg *nam = mk_const(interp, str_dup(fixup->name),
+                    SymReg * const nam = mk_const(interp, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
                     op = interp->op_lib->op_code("find_name_p_sc", 1);
@@ -1793,7 +1793,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         }
         else {
             /* need a dummy to hold register usage */
-            SymReg * const r = mk_sub_label(interp, str_dup("(null)"));
+            SymReg * const r = mk_sub_label(interp, "(null)");
             r->type          = VT_PCC_SUB;
             r->pcc_sub       = mem_allocate_zeroed_typed(pcc_sub_t);
 

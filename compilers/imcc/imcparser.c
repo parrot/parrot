@@ -513,13 +513,13 @@ static Instruction* mk_pmc_const(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static SymReg * mk_sub_address_fromc(PARROT_INTERP, ARGIN(char *name))
+static SymReg * mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static SymReg * mk_sub_address_u(PARROT_INTERP, ARGIN(char *name))
+static SymReg * mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -801,7 +801,7 @@ iINDEXFETCH(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const SymReg *r0),
         ARGIN(const SymReg *r1), ARGIN(const SymReg *r2))
 {
     if (r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * const r3 = mk_const(interp, "1", 'I');
         return MK_I(interp, unit, "substr %s, %s, %s, 1", 4, r0, r1, r2, r3);
     }
 
@@ -828,7 +828,7 @@ iINDEXSET(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const SymReg *r0),
             ARGIN(const SymReg *r1), ARGIN(const SymReg *r2))
 {
     if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * const r3 = mk_const(interp, "1", 'I');
         MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1, r3, r2);
     }
     else if (r0->set == 'P') {
@@ -883,7 +883,7 @@ IMCC_create_itcall_label(PARROT_INTERP)
     Instruction *i;
 
     sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-    r = mk_pcc_sub(interp, str_dup(name), 0);
+    r = mk_pcc_sub(interp, name, 0);
     i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
     IMCC_INFO(interp)->cur_call = r;
     i->type = ITCALL | ITPCCSUB;
@@ -905,14 +905,16 @@ XXX Document me.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
-mk_sub_address_fromc(PARROT_INTERP, ARGIN(char *name))
+mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
 {
     /* name is a quoted sub name */
     SymReg *r;
 
-    name[strlen(name) - 1] = '\0';
-    r = mk_sub_address(interp, str_dup(name + 1));
-    mem_sys_free(name);
+    char *unquoted = str_dup(name+1);
+    unquoted[strlen(unquoted) - 1] = '\0';
+
+    r = mk_sub_address(interp, unquoted);
+    mem_sys_free(unquoted);
     return r;
 }
 
@@ -930,7 +932,7 @@ XXX Document me.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
-mk_sub_address_u(PARROT_INTERP, ARGIN(char *name))
+mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * const r = mk_sub_address(interp, name);
     r->type         |= VT_ENCODED;
@@ -989,7 +991,7 @@ begin_return_or_yield(PARROT_INTERP, int yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-    interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
+    interp->imc_info->sr_return = mk_pcc_sub(interp, name, 0);
     i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, interp->imc_info->sr_return);
     i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
     interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
@@ -3362,22 +3364,22 @@ yyreduce:
 
   case 67:
 #line 857 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("INTVAL"), 'S'); ;}
+    { (yyval.sr) = mk_const(interp, "INTVAL", 'S'); ;}
     break;
 
   case 68:
 #line 858 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("FLOATVAL"), 'S'); ;}
+    { (yyval.sr) = mk_const(interp, "FLOATVAL", 'S'); ;}
     break;
 
   case 69:
 #line 859 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("PMC"), 'S'); ;}
+    { (yyval.sr) = mk_const(interp, "PMC", 'S'); ;}
     break;
 
   case 70:
 #line 860 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("STRING"), 'S'); ;}
+    { (yyval.sr) = mk_const(interp, "STRING", 'S'); ;}
     break;
 
   case 71:
@@ -3388,7 +3390,7 @@ yyreduce:
                               r = mk_const(interp, (yyvsp[(1) - (1)].s), 'S');
                           else {
                               free((yyvsp[(1) - (1)].s)),
-                              r = mk_const(interp, str_dup("PMC"), 'S');
+                              r = mk_const(interp, "PMC", 'S');
                            }
                            (yyval.sr) = r;
                       ;}
@@ -3402,7 +3404,7 @@ yyreduce:
                               r = mk_const(interp, (yyvsp[(1) - (1)].s), 'S');
                           else {
                               free((yyvsp[(1) - (1)].s)),
-                              r = mk_const(interp, str_dup("PMC"), 'S');
+                              r = mk_const(interp, "PMC", 'S');
                            }
                            (yyval.sr) = r;
                       ;}
@@ -3422,7 +3424,7 @@ yyreduce:
 
             sprintf(name, "%cpcc_sub_call_%d",
                     IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-            (yyval.sr) = r = mk_pcc_sub(interp, str_dup(name), 0);
+            (yyval.sr) = r = mk_pcc_sub(interp, name, 0);
             /* this mid rule action has the semantic value of the
              * sub SymReg.
              * This is used below to append args & results
