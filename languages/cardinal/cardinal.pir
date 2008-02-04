@@ -46,6 +46,9 @@ object.
     $P1.'parsegrammar'('cardinal::Grammar')
     $P1.'parseactions'('cardinal::Grammar::Actions')
 
+    $P1.'commandline_banner'("Cardinal - Ruby for the Parrot VM\n\n")
+    $P1.'commandline_prompt'('irb(main):001:0>')
+
      ##  create a list of END blocks to be run
     $P0 = new 'List'
     set_hll_global ['cardinal'], '@?END_BLOCKS', $P0

@@ -63,7 +63,20 @@ method stmt_mod($/) {
 
 }
 
-method expr($/, $key) {
+method expr($/) {
+    my $past := $( $<basic_expr> );
+    if $<expr> {
+        my $op;
+        if ~$<op>[0] eq 'and' { $op := 'if'; }
+        else { $op := 'unless'; }
+        make PAST::Op.new( $past, $( $<expr>[0] ), :pasttype($op), :node($/) );
+    }
+    else {
+        make $past;
+    }
+}
+
+method basic_expr($/, $key) {
     make $( $/{$key} );
 }
 

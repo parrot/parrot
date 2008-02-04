@@ -52,7 +52,14 @@ rule stmt_mod {
     {*}
 }
 
+
 rule expr {
+    <basic_expr> [$<op>=['and'|'or'] <expr>]?
+    {*}
+}
+
+
+rule basic_expr {
     | <command> {*}         #= command
     | <arg> {*}             #= arg
     | <assignment> {*}      #= assignment
