@@ -223,12 +223,8 @@ mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
     ascii = (*constant == '\'' || *constant == '"');
     if (ascii) {
         /* strip delimiters */
-        const size_t len  = strlen(constant);
-        name              = (char *)mem_sys_allocate(len);
-        constant[len - 1] = '\0';
-
-        strcpy(name, constant + 1);
-        free(constant);
+        name                   = str_dup(constant + 1);
+        name[strlen(name) - 1] = '\0';
     }
     else {
         name = constant;
@@ -251,6 +247,9 @@ mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
 
     r[1]          = rhs;
     rhs->pmc_type = type_enum;
+
+    if (ascii)
+        mem_sys_free(name);
 
     return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
 }
@@ -383,10 +382,12 @@ mk_sub_address_fromc(PARROT_INTERP, char * name)
 {
     /* name is a quoted sub name */
     SymReg *r;
+    char *name_copy                  = str_dup(name + 1);
+    name_copy[strlen(name_copy) - 1] = '\0';
 
-    name[strlen(name) - 1] = '\0';
-    r = mk_sub_address(interp, str_dup(name + 1));
-    mem_sys_free(name);
+    r = mk_sub_address(interp, name_copy);
+    mem_sys_free(name_copy);
+
     return r;
 }
 
@@ -507,9 +508,8 @@ adv_named_set(PARROT_INTERP, char *name) {
 static void
 do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 {
-    PMC *ignored;
     STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);
-    ignored = Parrot_load_lib(interp, s, NULL);
+    PMC    *ignored  = Parrot_load_lib(interp, s, NULL);
     UNUSED(ignored);
     Parrot_register_HLL_lib(interp, s);
 }
@@ -647,8 +647,10 @@ pragma_1:  N_OPERATORS INTC
 
 hll_def: HLL STRINGC COMMA STRINGC
          {
-            STRING *hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
-            STRING *hll_lib  = string_unescape_cstring(interp, $4 + 1, '"', NULL);
+            STRING *hll_name = string_unescape_cstring(interp, str_dup($2 + 1),
+                '"', NULL);
+            STRING *hll_lib  = string_unescape_cstring(interp, str_dup($4 + 1),
+                '"', NULL);
             PMC    *ignored;
             CONTEXT(((Interp*)interp)->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name);
@@ -663,8 +665,10 @@ hll_def: HLL STRINGC COMMA STRINGC
             int built_in_type = 0;
             int language_type = 0;
 
-            STRING *built_in_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
-            STRING *language_name = string_unescape_cstring(interp, $4 + 1, '"', NULL);
+            STRING *built_in_name = string_unescape_cstring(interp,
+                str_dup($2 + 1), '"', NULL);
+            STRING *language_name = string_unescape_cstring(interp,
+                str_dup($4 + 1), '"', NULL);
             built_in_type = pmc_type(interp, built_in_name);
             language_type = pmc_type(interp, language_name);
 
@@ -843,7 +847,7 @@ vtable: VTABLE_METHOD
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     |   VTABLE_METHOD '(' STRINGC ')'
                      { $$ = 0;
-                       IMCC_INFO(interp)->cur_unit->vtable_name = strdup($3);
+                       IMCC_INFO(interp)->cur_unit->vtable_name = str_dup($3);
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     ;
 
@@ -874,7 +878,7 @@ multi_type:
                               r = mk_const(interp, $1, 'S');
                           else {
                               free($1),
-                              r = mk_const(interp, str_dup("PMC"), 'S');
+                              r = mk_const(interp, "PMC", 'S');
                            }
                            $$ = r;
                       }
