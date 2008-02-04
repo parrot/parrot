@@ -92,7 +92,6 @@ sub _init {
         -Wtrigraphs
         -Wundef
         -Wunknown-pragmas
-        -Wunreachable-code
         -Wno-unused
         -Wvariadic-macros
         -Wwrite-strings
@@ -118,6 +117,7 @@ sub _init {
         -Wredundant-decls
         -Wswitch-enum
         -Wsystem-headers
+        -Wunreachable-code
         -Wunused-function
         -Wunused-label
         -Wunused-parameter
