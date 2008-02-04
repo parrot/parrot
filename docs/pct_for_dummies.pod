@@ -129,6 +129,29 @@ compile your language, type this:
 Yes, that's right, there's even a test file already created for you. This makes
 setting up the tests for your language very easy!
 
+The generated directories and files have the following structure:
+
+ foo/
+    /config/makefiles/root.in  # input for the Makefile generator
+                               # as long as you don't add source files,
+                               # there's no need to update this file.
+    /src/
+        /parser/
+               /actions.pm     # the language's grammar rules
+               /grammar.pm     # a file containing the parse actions
+                               # these files should be updated to change your
+                               # language
+        /builtins/
+                 /say.pir      # a file containing a built-in function
+                               # add more "standard library" routines here
+    /t/
+      /00-sanity.t             # a test file
+      /harness                 # file to set up the test framework
+                               # more tests can be added here
+
+    /foo.pir                   # file containing the main routine
+
+
 When you want to run a script through your language's compiler, (assuming you're
 located in your language's directory, in this example's case C<languages/foo>) type:
 
@@ -177,11 +200,11 @@ The following documents might be useful to learn more:
 
 =over 4
 
-=item * L<docs/past_building_blocks.pod>
+=item * L<docs\past_building_blocks.pod>
 
-=item * L<docs/pdds/pdd26_past.pod>
+=item * L<docs\pdds\pdd26_past.pod>
 
-=item * L<docs/pdds/draft/pdd19_pir.pod>
+=item * L<docs\pdds\draft\pdd19_pir.pod>
 
 =item * F<http://dev.perl.org/perl6/doc/design/syn/S05.html>
 
@@ -202,7 +225,7 @@ You're welcome to ask questions.
 
 =head1 SUGGESTIONS
 
-If you have suggestions, tips or complaints about this document, please send an
-email to C<perl6-internals@perl.org>.
+If you have suggestions, improvements, tips or complaints about this document,
+please send an email to C<perl6-internals@perl.org>.
 
 =cut
