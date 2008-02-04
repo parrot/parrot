@@ -72,7 +72,7 @@ start with a number.
 
 =item -h, --help
 
-Print commandline option summary.
+Print command line option summary.
 
 =item --help-debug
 
@@ -117,7 +117,7 @@ Optimize
  -O  same
  -O2 optimizations with life info
  -Op rewrite I and N PASM registers most used first
- -Ot select fastest run core (default with -O1 and -O2)
+ -Ot select fastest runcore (default with -O1 and -O2)
  -Oc turns on the optional/experimental tail call optimizations
 
 See F<docs/imcc/operation.pod> for more information on the optimizer.  NB.
@@ -132,7 +132,10 @@ Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
 
 =back
 
-=head2 Run Core Options
+=head2 Runcore Options
+
+These options select the runcore, which is useful for performance
+tuning and debugging.  See L<About runcores> below for details.
 
 =over 4
 
@@ -226,7 +229,7 @@ Print the runtime prefix path and exit.
 
 =back
 
-=head1 <file>
+=head2 <file>
 
 If the file ends in B<.pbc> it will be interpreted immediately.
 
@@ -236,7 +239,12 @@ was given.
 
 If the B<file> is a single dash, input from B<stdin> is read.
 
-=head2 Generated files
+=head2 [arguments ...]
+
+Optional arguments passed to the running program as ARGV. The program is
+assumed to know what to do with these.
+
+=head1 Generated files
 
 If debugging is enabled these files are generated:
 
@@ -246,10 +254,67 @@ If debugging is enabled these files are generated:
   EVAL_n.stabs.s ... stabsfile for this block
   EVAL_n.o ... object file with debug information
 
-=head1 [arguments ...]
+=head1 About runcores
 
-Optional arguments passed to the running program as ARGV. The program is
-assumed to know what to do with these.
+The runcore (or runloop) tells Parrot how to find the C code that
+implements each instruction.  Parrot provides more than one way to do
+this, partly because it is expected that no one runcore will perform
+optimally on all architectures (or even for all problems on a given
+architecture), and partly because some of the runcores are specialized
+for debugging.
+
+In the default "slow" runcore, each opcode is a separate C function.
+That's pretty easy in pseudocode:
+
+	slow_runcore( op ):
+		while ( op ):
+			op = op_function( op )
+			check_for_events()
+
+The GC debugging runcore is similar:
+
+	gcdebug_runcore( op ):
+		while ( op ):
+			perform_full_gc_run()
+			op = op_function( op )
+			check_for_events()
+
+Of course, this is much slower, but is extremely helpful for pinning
+memory corruption problems that affect GC down to single-instruction
+resolution.  See
+L<http://www.oreillynet.com/onlamp/blog/2007/10/debugging_gc_problems_in_parro.html>
+for more information.
+
+The trace and profile cores are also based on the "slow" core, doing
+full bounds checking, and also printing runtime information to stderr.
+
+The switched core eschews a bunch of tiny op functions in favor of
+cases in a large switch statement:
+
+	switch_runcore( op ):
+		while ( op ):
+			switch *op:
+				case NOP:
+					...
+				case STORE:
+					...
+				...
+
+Depending on the C compiler implementation, this may be faster than
+function calling.  On older systems, it may fail to compile
+altogether.
+
+The computed-goto ("cgoto") runcore avoids the overhead of function
+calls by jumping directly to the address where each opcode's function
+starts.  The computed-goto-prederef ("CGP") core takes this one step
+further by replacing opcode numbers in the bytecode with those opfunc
+addresses.  See "Predereferencing" in F<docs/glossary.pod> for a
+fuller explanation.
+
+Finally, the JIT runcore uses the "slow" core, but also creates and
+jumps to JIT-compiled native code for supported opcodes.  "cgp-jit"
+and "switched-jit" are variations that use the CGP or switched core
+but run JIT code when possible.
 
 =head1 Operation table
 

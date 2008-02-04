@@ -345,10 +345,8 @@ L<http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html>
 =head2 run core
 
 aka run loop, aka runcore. The way Parrot executes Parrot Byte Code.
-See L<running.pod> on how to tell parrot which run core should be used.
-
-=for TODO
-  Add a list of available run cores, or provide pointer to documentation.
+See L<running.pod> for a list of available runcores, and how to tell
+parrot which one to use.
 
 =head2 SMOP
 
