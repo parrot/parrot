@@ -26,7 +26,7 @@
  * Intermediate Code Compiler for Parrot
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2006, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  *
  * The tokenizer.
  *
@@ -212,8 +212,8 @@ SP              [ ]
         if (strcmp(IMCC_INFO(interp)->heredoc_end, yytext) == 0)
         {
             /* End of the heredoc. */
-            yyguts_t *yyg = (yyguts_t *)yyscanner;
-            int       len = strlen(IMCC_INFO(interp)->heredoc_content);
+            yyguts_t * const yyg = (yyguts_t *)yyscanner;
+            const int len        = strlen(IMCC_INFO(interp)->heredoc_content);
 
             /* delim */
             IMCC_INFO(interp)->heredoc_content[len] =
@@ -462,7 +462,7 @@ SP              [ ]
     }
 
 <emit,INITIAL>".include" {
-        int c = yylex(valp, yyscanner, interp);
+        const int c = yylex(valp, yyscanner, interp);
         if (c != STRINGC)
             return c;
 
@@ -525,7 +525,7 @@ SP              [ ]
             string_from_cstring(interp, macro_name, 0));
 
         if (type > 0) {
-            char *buf = (char *)malloc(16);
+            char *buf = (char *)mem_sys_allocate(16);
             sprintf(buf, "%d", type);
 
             /* XXX: free valp->s if already used? */
@@ -560,7 +560,7 @@ SP              [ ]
             {
                 if ((r->pcc_sub->pragma & P_METHOD) &&
                     !strcmp(yytext, "self")) {
-                    valp->sr = mk_ident(interp, str_dup("self"), 'P');
+                    valp->sr = mk_ident(interp, "self", 'P');
                     IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
                     return VAR;
                 }
