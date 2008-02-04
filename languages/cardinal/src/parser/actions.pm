@@ -183,7 +183,7 @@ method unless_stmt($/) {
 method while_stmt($/) {
     my $cond := $( $<expr> );
     my $body := $( $<comp_stmt> );
-    make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
+    make PAST::Op.new( $cond, $body, :pasttype(~$<sym>), :node($/) );
 }
 
 method module($/) {
@@ -223,6 +223,10 @@ method command($/) {
     my $past := $( $<call_args> );
     $past.unshift($op);
     make $past;
+}
+
+method not_command($/) {
+    make PAST::Op.new( $( $<command> ), :pirop('not'), :node($/) );
 }
 
 method operation($/) {

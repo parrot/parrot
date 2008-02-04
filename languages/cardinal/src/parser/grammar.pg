@@ -61,6 +61,7 @@ rule expr {
 
 rule basic_expr {
     | <command> {*}         #= command
+    | <not_command> {*}     #= not_command
     | <arg> {*}             #= arg
     | <assignment> {*}      #= assignment
     | <not_expr> {*}        #= not_expr
@@ -105,6 +106,11 @@ rule command {
     | <operation> <call_args> {*}
 }
 
+rule not_command {
+    '!' <command>
+    {*}
+}
+
 rule operation {
     <identifier>
     {*}
@@ -139,7 +145,78 @@ rule 'arg' is optable { ... }
 
 proto 'infix:=' is precedence('1')      { ... }
 
-proto 'infix:+' is tighter('infix:=')
+proto 'prefix:defined?' is looser('infix:=') { ... }
+
+proto 'infix:+=' is equal('infix:=')
+                 is pirop('add')        { ... }
+
+proto 'infix:-=' is equal('infix:=')
+                 is pirop('sub')        { ... }
+
+proto 'infix:/=' is equal('infix:=')
+                 is pirop('div')        { ... }
+
+proto 'infix:*=' is equal('infix:=')
+                 is pirop('mul')        { ... }
+
+proto 'infix:%=' is equal('infix:=')
+                 is pirop('mul')        { ... }
+
+proto 'infix:|=' is equal('infix:=')    { ... }
+
+proto 'infix:&=' is equal('infix:=')    { ... }
+
+proto 'infix:~=' is equal('infix:=')    { ... }
+
+proto infix:«>>=» is equal('infix:=')
+                  is pirop('rsh')       { ... }
+
+proto infix:«<<=» is equal('infix:=')
+                  is pirop('lsh')       { ... }
+
+proto 'infix:&&=' is equal('infix:=')
+                  is pirop('and')       { ... }
+
+proto 'infix:**=' is equal('infix:=')
+                  is pirop('pow')       { ... }
+
+proto 'ternary:? :' is tighter('infix:=')
+                    is pirop('if')      { ... }
+
+proto 'infix:..' is tighter('ternary:? :')
+                 is pirop('n_add')      { ... }
+
+proto 'infix:...' is equal('infix:...') { ... }
+
+proto 'infix:||' is tighter('infix:..')
+                 is past('unless')      { ... }
+
+proto 'infix:&&' is tighter('infix:||')
+                 is past('if')          { ... }
+
+
+proto 'infix:=='      is tighter('infix:&&') { ... }
+proto 'infix:!='      is equiv('infix:==') { ... }
+proto 'infix:=~'      is equiv('infix:==') { ... }
+proto 'infix:!~'      is equiv('infix:==') { ... }
+proto 'infix:==='     is equiv('infix:==') { ... }
+proto infix:«<=>» is equiv('infix:==') { ... }
+
+
+proto 'infix:«<=»' is tighter('infix:=') { ... }
+proto infix:«=>» is equiv(infix:«<=») { ... }
+proto infix:«>»  is equiv(infix:«<=») { ... }
+proto infix:«<»  is equiv(infix:«<=») { ... }
+
+proto 'infix:|' is tighter('infix:«<=»')  { ... }
+proto 'infix:^' is equiv('infix:|')  { ... }
+
+proto 'infix:&' is tighter('infix:|')  { ... }
+
+proto infix:«<<»  is tighter('infix:&') { ... }
+proto infix:«>>»  is equiv(infix:«<<») { ... }
+
+proto 'infix:+' is tighter(infix:«<<»)
                 is pirop('n_add')       { ... }
 
 proto 'infix:-' is equal('infix:+')
@@ -151,7 +228,10 @@ proto 'infix:*' is tighter('infix:+')
 proto 'infix:/' is equal('infix:*')
                 is pirop('n_div')       { ... }
 
-proto 'term:'   is tighter('infix:+')
+proto 'infix:%' is equal('infix:*')
+                is pirop('n_mod')       { ... }
+
+proto 'term:'   is tighter('infix:*')
                 is parsed(&primary)     { ... }
 
 
@@ -179,7 +259,9 @@ rule if_stmt {
 rule then { 'then' | <term> ['then']? }
 
 rule while_stmt {
-    'while' <expr> <.do> <comp_stmt> 'end'
+    $<sym>=['while'|'until'] <expr> <.do>
+    <comp_stmt>
+    'end'
     {*}
 }
 
@@ -242,6 +324,11 @@ token instance_variable {
     {*}
 }
 
+token class_variable {
+    '@@' <ident>
+    {*}
+}
+
 token local_variable {
     <[a..z_]> <ident>
     {*}
@@ -280,7 +367,7 @@ token reserved_word {
     |in|module|next|nil|not|or
     |redo|rescue|retry|return|self|super
     |then|true|undef|unless|until|when
-    |while|yield]>>
+    |while|yield|__FILE__|__LINE__]>>
 }
 
 token ws {
