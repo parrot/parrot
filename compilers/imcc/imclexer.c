@@ -55,7 +55,7 @@
 #if __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types.
+ * if you want the limit (max/min) macros for int types. 
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -72,7 +72,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t;
+typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 #endif /* ! C99 */
@@ -113,14 +113,14 @@ typedef unsigned int flex_uint32_t;
 /* The "const" storage-class-modifier is valid. */
 #define YY_USE_CONST
 
-#else   /* ! __cplusplus */
+#else	/* ! __cplusplus */
 
 #if __STDC__
 
 #define YY_USE_CONST
 
-#endif  /* __STDC__ */
-#endif  /* ! __cplusplus */
+#endif	/* __STDC__ */
+#endif	/* ! __cplusplus */
 
 #ifdef YY_USE_CONST
 #define yyconst const
@@ -197,20 +197,20 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
-
+    
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
-    do \
-        { \
-        /* Undo effects of setting up yytext. */ \
+	do \
+		{ \
+		/* Undo effects of setting up yytext. */ \
         int yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
-        *yy_cp = yyg->yy_hold_char; \
-        YY_RESTORE_YY_MORE_OFFSET \
-        yyg->yy_c_buf_p = yy_cp = yy_bp + yyless_macro_arg - YY_MORE_ADJ; \
-        YY_DO_BEFORE_ACTION; /* set up yytext again */ \
-        } \
-    while ( 0 )
+		*yy_cp = yyg->yy_hold_char; \
+		YY_RESTORE_YY_MORE_OFFSET \
+		yyg->yy_c_buf_p = yy_cp = yy_bp + yyless_macro_arg - YY_MORE_ADJ; \
+		YY_DO_BEFORE_ACTION; /* set up yytext again */ \
+		} \
+	while ( 0 )
 
 #define unput(c) yyunput( c, yyg->yytext_ptr , yyscanner )
 
@@ -227,66 +227,66 @@ typedef unsigned int yy_size_t;
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
-    {
-    FILE *yy_input_file;
+	{
+	FILE *yy_input_file;
 
-    char *yy_ch_buf;        /* input buffer */
-    char *yy_buf_pos;       /* current position in input buffer */
+	char *yy_ch_buf;		/* input buffer */
+	char *yy_buf_pos;		/* current position in input buffer */
 
-    /* Size of input buffer in bytes, not including room for EOB
-     * characters.
-     */
-    yy_size_t yy_buf_size;
+	/* Size of input buffer in bytes, not including room for EOB
+	 * characters.
+	 */
+	yy_size_t yy_buf_size;
 
-    /* Number of characters read into yy_ch_buf, not including EOB
-     * characters.
-     */
-    int yy_n_chars;
+	/* Number of characters read into yy_ch_buf, not including EOB
+	 * characters.
+	 */
+	int yy_n_chars;
 
-    /* Whether we "own" the buffer - i.e., we know we created it,
-     * and can realloc() it to grow it, and should free() it to
-     * delete it.
-     */
-    int yy_is_our_buffer;
+	/* Whether we "own" the buffer - i.e., we know we created it,
+	 * and can realloc() it to grow it, and should free() it to
+	 * delete it.
+	 */
+	int yy_is_our_buffer;
 
-    /* Whether this is an "interactive" input source; if so, and
-     * if we're using stdio for input, then we want to use getc()
-     * instead of fread(), to make sure we stop fetching input after
-     * each newline.
-     */
-    int yy_is_interactive;
+	/* Whether this is an "interactive" input source; if so, and
+	 * if we're using stdio for input, then we want to use getc()
+	 * instead of fread(), to make sure we stop fetching input after
+	 * each newline.
+	 */
+	int yy_is_interactive;
 
-    /* Whether we're considered to be at the beginning of a line.
-     * If so, '^' rules will be active on the next match, otherwise
-     * not.
-     */
-    int yy_at_bol;
+	/* Whether we're considered to be at the beginning of a line.
+	 * If so, '^' rules will be active on the next match, otherwise
+	 * not.
+	 */
+	int yy_at_bol;
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
+    
+	/* Whether to try to fill the input buffer when we reach the
+	 * end of it.
+	 */
+	int yy_fill_buffer;
 
-    /* Whether to try to fill the input buffer when we reach the
-     * end of it.
-     */
-    int yy_fill_buffer;
-
-    int yy_buffer_status;
+	int yy_buffer_status;
 
 #define YY_BUFFER_NEW 0
 #define YY_BUFFER_NORMAL 1
-    /* When an EOF's been seen but there's still some text to process
-     * then we mark the buffer as YY_EOF_PENDING, to indicate that we
-     * shouldn't try reading from the input source any more.  We might
-     * still have a bunch of tokens to match, though, because of
-     * possible backing-up.
-     *
-     * When we actually see the EOF, we change the status to "new"
-     * (via yyrestart()), so that the user can continue scanning by
-     * just pointing yyin at a new input file.
-     */
+	/* When an EOF's been seen but there's still some text to process
+	 * then we mark the buffer as YY_EOF_PENDING, to indicate that we
+	 * shouldn't try reading from the input source any more.  We might
+	 * still have a bunch of tokens to match, though, because of
+	 * possible backing-up.
+	 *
+	 * When we actually see the EOF, we change the status to "new"
+	 * (via yyrestart()), so that the user can continue scanning by
+	 * just pointing yyin at a new input file.
+	 */
 #define YY_BUFFER_EOF_PENDING 2
 
-    };
+	};
 #endif /* !YY_STRUCT_YY_BUFFER_STATE */
 
 /* We provide macros for accessing buffer states in case in the
@@ -329,24 +329,24 @@ void yyfree (void * ,yyscan_t yyscanner );
 #define yy_new_buffer yy_create_buffer
 
 #define yy_set_interactive(is_interactive) \
-    { \
-    if ( ! YY_CURRENT_BUFFER ){ \
+	{ \
+	if ( ! YY_CURRENT_BUFFER ){ \
         yyensure_buffer_stack (yyscanner); \
-        YY_CURRENT_BUFFER_LVALUE =    \
+		YY_CURRENT_BUFFER_LVALUE =    \
             yy_create_buffer(yyin,YY_BUF_SIZE ,yyscanner); \
-    } \
-    YY_CURRENT_BUFFER_LVALUE->yy_is_interactive = is_interactive; \
-    }
+	} \
+	YY_CURRENT_BUFFER_LVALUE->yy_is_interactive = is_interactive; \
+	}
 
 #define yy_set_bol(at_bol) \
-    { \
-    if ( ! YY_CURRENT_BUFFER ){\
+	{ \
+	if ( ! YY_CURRENT_BUFFER ){\
         yyensure_buffer_stack (yyscanner); \
-        YY_CURRENT_BUFFER_LVALUE =    \
+		YY_CURRENT_BUFFER_LVALUE =    \
             yy_create_buffer(yyin,YY_BUF_SIZE ,yyscanner); \
-    } \
-    YY_CURRENT_BUFFER_LVALUE->yy_at_bol = at_bol; \
-    }
+	} \
+	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = at_bol; \
+	}
 
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
@@ -367,21 +367,21 @@ static void yy_fatal_error (yyconst char msg[] ,yyscan_t yyscanner );
  * corresponding action - sets up yytext.
  */
 #define YY_DO_BEFORE_ACTION \
-    yyg->yytext_ptr = yy_bp; \
-    yyleng = (size_t) (yy_cp - yy_bp); \
-    yyg->yy_hold_char = *yy_cp; \
-    *yy_cp = '\0'; \
-    yyg->yy_c_buf_p = yy_cp;
+	yyg->yytext_ptr = yy_bp; \
+	yyleng = (size_t) (yy_cp - yy_bp); \
+	yyg->yy_hold_char = *yy_cp; \
+	*yy_cp = '\0'; \
+	yyg->yy_c_buf_p = yy_cp;
 
 #define YY_NUM_RULES 145
 #define YY_END_OF_BUFFER 146
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
-    {
-    flex_int32_t yy_verify;
-    flex_int32_t yy_nxt;
-    };
+	{
+	flex_int32_t yy_verify;
+	flex_int32_t yy_nxt;
+	};
 static yyconst flex_int16_t yy_accept[1206] =
     {   0,
         0,    0,    0,    0,    0,    0,   17,   17,    0,    0,
@@ -2685,15 +2685,18 @@ static yyconst flex_int16_t yy_chk[8062] =
 
 #define MAX_PARAM 16
 
+typedef struct yyguts_t       yyguts_t;
+typedef struct parser_state_t parser_state_t;
+
 typedef struct params_t {
     char *name[MAX_PARAM];
-    int num_param;
+    int   num_param;
 } params_t;
 
 typedef struct macro_t {
+    char    *expansion;
+    int      line;
     params_t params;
-    char *expansion;
-    int line;
 } macro_t;
 
 /* parser state structure
@@ -2704,32 +2707,47 @@ typedef struct macro_frame_t {
     struct parser_state_t s;
 
     /* macro stuff */
+    params_t       *params;
+    char           *heredoc_rest;
+
+    params_t        expansion;
+    int             label;
+    int             is_macro;
     YY_BUFFER_STATE buffer;
-    params_t *params;
-    params_t expansion;
-    int label;
-    int is_macro;
-    char *heredoc_rest;
 } macro_frame_t;
 
 /* static function declariations */
 static void pop_parser_state(Interp* interp, void *yyscanner);
+
 static struct macro_frame_t *new_frame(Interp*);
+
 static void define_macro(Interp *interp, char *name, params_t *params,
                          char *expansion, int start_line);
+
 static macro_t *find_macro(Interp *interp, const char *name);
-static void scan_string(struct macro_frame_t *frame, const char *expansion, void *yyscanner);
-static void scan_file(Interp* interp, struct macro_frame_t *frame, FILE *, void *yyscanner);
-static int destroy_frame(struct macro_frame_t *frame, void *yyscanner);
-static int yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip, void *yyscanner);
+
+static void scan_string(macro_frame_t *frame, const char *expansion,
+                        void *yyscanner);
+
+static void scan_file(Interp* interp, struct macro_frame_t *frame, FILE *,
+                      void *yyscanner);
+
+static int destroy_frame(macro_frame_t *frame, void *yyscanner);
+
+static int yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip,
+                      void *yyscanner);
 
 static int read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner);
-static int expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner);
-static void include_file(Interp* interp, char *file_name, void *yyscanner);
+
+static int expand_macro(YYSTYPE *valp, Interp *interp, const char *name,
+                        void *yyscanner);
+
+static void include_file(Interp *interp, char *file_name, void *yyscanner);
 
 #define YY_DECL int yylex(YYSTYPE *valp,yyscan_t yyscanner,Interp *interp)
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
+
 #define DUP_AND_RET(valp, token)             \
   do {                                       \
       if (valp) (valp)->s = str_dup(yytext); \
@@ -2756,7 +2774,7 @@ static void include_file(Interp* interp, char *file_name, void *yyscanner);
 
 
 
-#line 2760 "compilers/imcc/imclexer.c"
+#line 2778 "compilers/imcc/imclexer.c"
 
 #define INITIAL 0
 #define emit 1
@@ -2860,7 +2878,7 @@ extern int yywrap (yyscan_t yyscanner );
 #endif
 
     static void yyunput (int c,char *buf_ptr  ,yyscan_t yyscanner);
-
+    
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int ,yyscan_t yyscanner);
 #endif
@@ -2880,11 +2898,11 @@ static int input (yyscan_t yyscanner );
 #endif
 
     static void yy_push_state (int new_state ,yyscan_t yyscanner);
-
+    
     static void yy_pop_state (yyscan_t yyscanner );
-
+    
     static int yy_top_state (yyscan_t yyscanner );
-
+    
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
 #define YY_READ_BUF_SIZE 8192
@@ -2903,33 +2921,33 @@ static int input (yyscan_t yyscanner );
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-    if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
-        { \
-        int c = '*'; \
-        size_t n; \
-        for ( n = 0; n < max_size && \
-                 (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
-            buf[n] = (char) c; \
-        if ( c == '\n' ) \
-            buf[n++] = (char) c; \
-        if ( c == EOF && ferror( yyin ) ) \
-            YY_FATAL_ERROR( "input in flex scanner failed" ); \
-        result = n; \
-        } \
-    else \
-        { \
-        errno=0; \
-        while ( (result = fread(buf, 1, max_size, yyin))==0 && ferror(yyin)) \
-            { \
-            if( errno != EINTR) \
-                { \
-                YY_FATAL_ERROR( "input in flex scanner failed" ); \
-                break; \
-                } \
-            errno=0; \
-            clearerr(yyin); \
-            } \
-        }\
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
+		{ \
+		int c = '*'; \
+		size_t n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( yyin ) ) \
+			YY_FATAL_ERROR( "input in flex scanner failed" ); \
+		result = n; \
+		} \
+	else \
+		{ \
+		errno=0; \
+		while ( (result = fread(buf, 1, max_size, yyin))==0 && ferror(yyin)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(yyin); \
+			} \
+		}\
 \
 
 #endif
@@ -2978,132 +2996,136 @@ extern int yylex (yyscan_t yyscanner);
 #endif
 
 #define YY_RULE_SETUP \
-    if ( yyleng > 0 ) \
-        YY_CURRENT_BUFFER_LVALUE->yy_at_bol = \
-                (yytext[yyleng - 1] == '\n'); \
-    YY_USER_ACTION
+	if ( yyleng > 0 ) \
+		YY_CURRENT_BUFFER_LVALUE->yy_at_bol = \
+				(yytext[yyleng - 1] == '\n'); \
+	YY_USER_ACTION
 
 /** The main scanner function which does all the work.
  */
 YY_DECL
 {
-    register yy_state_type yy_current_state;
-    register char *yy_cp, *yy_bp;
-    register int yy_act;
+	register yy_state_type yy_current_state;
+	register char *yy_cp, *yy_bp;
+	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-#line 150 "compilers/imcc/imcc.l"
+#line 168 "compilers/imcc/imcc.l"
 
         /* for emacs "*/
         if (IMCC_INFO(interp)->expect_pasm == 1 && !IMCC_INFO(interp)->in_pod) {
             IMCC_INFO(interp)->expect_pasm = 2;
             BEGIN(emit);
         }
+
         if (IMCC_INFO(interp)->frames->s.pasm_file && YYSTATE == INITIAL &&
             !IMCC_INFO(interp)->in_pod)
         {
+            /* silent warning */
             if (0)
-                yy_top_state(yyscanner); /* silent warning */
+                yy_top_state(yyscanner);
+
             if (IMCC_INFO(interp)->frames->s.pasm_file == 1) {
                 BEGIN(emit);
                 return EMIT;
-        }
+            }
+
             return 0;
         }
 
-#line 3015 "compilers/imcc/imclexer.c"
+#line 3037 "compilers/imcc/imclexer.c"
 
-    if ( !yyg->yy_init )
-        {
-        yyg->yy_init = 1;
+	if ( !yyg->yy_init )
+		{
+		yyg->yy_init = 1;
 
 #ifdef YY_USER_INIT
-        YY_USER_INIT;
+		YY_USER_INIT;
 #endif
 
-        if ( ! yyg->yy_start )
-            yyg->yy_start = 1;  /* first start state */
+		if ( ! yyg->yy_start )
+			yyg->yy_start = 1;	/* first start state */
 
-        if ( ! yyin )
-            yyin = stdin;
+		if ( ! yyin )
+			yyin = stdin;
 
-        if ( ! yyout )
-            yyout = stdout;
+		if ( ! yyout )
+			yyout = stdout;
 
-        if ( ! YY_CURRENT_BUFFER ) {
-            yyensure_buffer_stack (yyscanner);
-            YY_CURRENT_BUFFER_LVALUE =
-                yy_create_buffer(yyin,YY_BUF_SIZE ,yyscanner);
-        }
+		if ( ! YY_CURRENT_BUFFER ) {
+			yyensure_buffer_stack (yyscanner);
+			YY_CURRENT_BUFFER_LVALUE =
+				yy_create_buffer(yyin,YY_BUF_SIZE ,yyscanner);
+		}
 
-        yy_load_buffer_state(yyscanner );
-        }
+		yy_load_buffer_state(yyscanner );
+		}
 
-    while ( 1 )     /* loops until end-of-file is reached */
-        {
-        yy_cp = yyg->yy_c_buf_p;
+	while ( 1 )		/* loops until end-of-file is reached */
+		{
+		yy_cp = yyg->yy_c_buf_p;
 
-        /* Support of yytext. */
-        *yy_cp = yyg->yy_hold_char;
+		/* Support of yytext. */
+		*yy_cp = yyg->yy_hold_char;
 
-        /* yy_bp points to the position in yy_ch_buf of the start of
-         * the current run.
-         */
-        yy_bp = yy_cp;
+		/* yy_bp points to the position in yy_ch_buf of the start of
+		 * the current run.
+		 */
+		yy_bp = yy_cp;
 
-        yy_current_state = yyg->yy_start;
-        yy_current_state += YY_AT_BOL();
+		yy_current_state = yyg->yy_start;
+		yy_current_state += YY_AT_BOL();
 yy_match:
-        do
-            {
-            register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
-            if ( yy_accept[yy_current_state] )
-                {
-                yyg->yy_last_accepting_state = yy_current_state;
-                yyg->yy_last_accepting_cpos = yy_cp;
-                }
-            while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-                {
-                yy_current_state = (int) yy_def[yy_current_state];
-                if ( yy_current_state >= 1206 )
-                    yy_c = yy_meta[(unsigned int) yy_c];
-                }
-            yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-            ++yy_cp;
-            }
-        while ( yy_current_state != 1205 );
-        yy_cp = yyg->yy_last_accepting_cpos;
-        yy_current_state = yyg->yy_last_accepting_state;
+		do
+			{
+			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			if ( yy_accept[yy_current_state] )
+				{
+				yyg->yy_last_accepting_state = yy_current_state;
+				yyg->yy_last_accepting_cpos = yy_cp;
+				}
+			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+				{
+				yy_current_state = (int) yy_def[yy_current_state];
+				if ( yy_current_state >= 1206 )
+					yy_c = yy_meta[(unsigned int) yy_c];
+				}
+			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+			++yy_cp;
+			}
+		while ( yy_current_state != 1205 );
+		yy_cp = yyg->yy_last_accepting_cpos;
+		yy_current_state = yyg->yy_last_accepting_state;
 
 yy_find_action:
-        yy_act = yy_accept[yy_current_state];
+		yy_act = yy_accept[yy_current_state];
 
-        YY_DO_BEFORE_ACTION;
+		YY_DO_BEFORE_ACTION;
 
-do_action:  /* This label is used only to access EOF actions. */
+do_action:	/* This label is used only to access EOF actions. */
 
-        switch ( yy_act )
-    { /* beginning of action switch */
-            case 0: /* must back up */
-            /* undo the effects of YY_DO_BEFORE_ACTION */
-            *yy_cp = yyg->yy_hold_char;
-            yy_cp = yyg->yy_last_accepting_cpos;
-            yy_current_state = yyg->yy_last_accepting_state;
-            goto yy_find_action;
+		switch ( yy_act )
+	{ /* beginning of action switch */
+			case 0: /* must back up */
+			/* undo the effects of YY_DO_BEFORE_ACTION */
+			*yy_cp = yyg->yy_hold_char;
+			yy_cp = yyg->yy_last_accepting_cpos;
+			yy_current_state = yyg->yy_last_accepting_state;
+			goto yy_find_action;
 
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 168 "compilers/imcc/imcc.l"
+#line 190 "compilers/imcc/imcc.l"
 {
             IMCC_INFO(interp)->frames->heredoc_rest = str_dup(yytext);
             BEGIN(heredoc2);
-        }
-    YY_BREAK
+    }
+	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 173 "compilers/imcc/imcc.l"
+#line 195 "compilers/imcc/imcc.l"
 {
         /* heredocs have highest priority
          * arrange them befor all wildcard state matches
@@ -3118,731 +3140,763 @@ YY_RULE_SETUP
         strcpy(IMCC_INFO(interp)->heredoc_content +
                strlen(IMCC_INFO(interp)->heredoc_content), yytext);
     }
-    YY_BREAK
+	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 188 "compilers/imcc/imcc.l"
+#line 210 "compilers/imcc/imcc.l"
 {
         /* Are we at the end of the heredoc? */
         if (strcmp(IMCC_INFO(interp)->heredoc_end, yytext) == 0)
         {
             /* End of the heredoc. */
-            struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-            int len = strlen(IMCC_INFO(interp)->heredoc_content);
-            IMCC_INFO(interp)->heredoc_content[len] = IMCC_INFO(interp)->heredoc_content[0];  /* delim */
-            IMCC_INFO(interp)->heredoc_content[len+1] = 0;
+            yyguts_t *yyg = (yyguts_t *)yyscanner;
+            int       len = strlen(IMCC_INFO(interp)->heredoc_content);
+
+            /* delim */
+            IMCC_INFO(interp)->heredoc_content[len] =
+                IMCC_INFO(interp)->heredoc_content[0];
+
+            IMCC_INFO(interp)->heredoc_content[len + 1] = 0;
+
             mem_sys_free(IMCC_INFO(interp)->heredoc_end);
+
             IMCC_INFO(interp)->frames->buffer = YY_CURRENT_BUFFER;
-            valp->s = IMCC_INFO(interp)->heredoc_content;
+            valp->s                           =
+                IMCC_INFO(interp)->heredoc_content;
+
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest,yyscanner);
-            return STRINGC; /* RT#42382 delete quotes, -> emit, pbc */
+
+            /* RT #42382 delete quotes, -> emit, pbc */
+            return STRINGC;
         }
         else
         {
             /* Part of the heredoc. Realloc and cat the line on. */
             IMCC_INFO(interp)->heredoc_content =
-                (char*)mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
+                (char *)mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
                                 strlen(IMCC_INFO(interp)->heredoc_content) +
                                 strlen(yytext) + 2);
             strcpy(IMCC_INFO(interp)->heredoc_content +
                    strlen(IMCC_INFO(interp)->heredoc_content), yytext);
         }
     }
-    YY_BREAK
+	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 217 "compilers/imcc/imcc.l"
+#line 249 "compilers/imcc/imcc.l"
 {
         yy_push_state(cmt2, yyscanner);
         IMCC_INFO(interp)->line = atoi(yytext+6);
         return LINECOMMENT;
     }
-    YY_BREAK
+	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 222 "compilers/imcc/imcc.l"
+#line 255 "compilers/imcc/imcc.l"
 {
         yy_pop_state(yyscanner);
         yy_push_state(cmt3, yyscanner);
+
         IMCC_INFO(interp)->frames->s.file = str_dup(yytext);
         IMCC_INFO(interp)->cur_unit->file = str_dup(yytext);
+
         return FILECOMMENT;
     }
-    YY_BREAK
+	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 229 "compilers/imcc/imcc.l"
+#line 265 "compilers/imcc/imcc.l"
 {
         yy_pop_state(yyscanner);
         yy_push_state(cmt4, yyscanner);
-}
-    YY_BREAK
+    }
+	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 233 "compilers/imcc/imcc.l"
+#line 270 "compilers/imcc/imcc.l"
 { yy_push_state(cmt2, yyscanner); }
-    YY_BREAK
+	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 234 "compilers/imcc/imcc.l"
+#line 272 "compilers/imcc/imcc.l"
 { yy_push_state(cmt1, yyscanner);  }
-    YY_BREAK
+	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 235 "compilers/imcc/imcc.l"
+#line 274 "compilers/imcc/imcc.l"
 {
         IMCC_INFO(interp)->line = atoi(yytext);
         yy_pop_state(yyscanner);
         yy_push_state(cmt4, yyscanner);
         return LINECOMMENT;
     }
-    YY_BREAK
+	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 241 "compilers/imcc/imcc.l"
+#line 281 "compilers/imcc/imcc.l"
 {
         yy_pop_state(yyscanner);
         IMCC_INFO(interp)->line++;
     }
-    YY_BREAK
+	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 245 "compilers/imcc/imcc.l"
+#line 286 "compilers/imcc/imcc.l"
 {
         if (IMCC_INFO(interp)->expect_pasm == 2)
             BEGIN(INITIAL);
+
         IMCC_INFO(interp)->expect_pasm = 0;
         IMCC_INFO(interp)->line++;
+
         return '\n';
     }
-    YY_BREAK
+	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 252 "compilers/imcc/imcc.l"
+#line 296 "compilers/imcc/imcc.l"
 {
         yy_push_state(cmt5, yyscanner);
     }
-    YY_BREAK
+	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 255 "compilers/imcc/imcc.l"
+#line 300 "compilers/imcc/imcc.l"
 {
         if (IMCC_INFO(interp)->expect_pasm == 2)
             BEGIN(INITIAL);
         else
             yy_pop_state(yyscanner);
+
         IMCC_INFO(interp)->expect_pasm = 0;
         IMCC_INFO(interp)->line++;
+
         return '\n';
     }
-    YY_BREAK
+	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 266 "compilers/imcc/imcc.l"
+#line 313 "compilers/imcc/imcc.l"
 {
-    valp->s = str_dup(yytext);
-    return REG;
+        valp->s = str_dup(yytext);
+        return REG;
     }
-    YY_BREAK
+	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 271 "compilers/imcc/imcc.l"
-{ IMCC_INFO(interp)->in_pod = 1;
-                               yy_push_state(pod, yyscanner); }
-    YY_BREAK
+#line 318 "compilers/imcc/imcc.l"
+{
+        IMCC_INFO(interp)->in_pod = 1;
+        yy_push_state(pod, yyscanner);
+    }
+	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 273 "compilers/imcc/imcc.l"
-{ IMCC_INFO(interp)->in_pod = 0;
-                               yy_pop_state(yyscanner); IMCC_INFO(interp)->line++; }
-    YY_BREAK
+#line 323 "compilers/imcc/imcc.l"
+{
+        IMCC_INFO(interp)->in_pod = 0;
+        yy_pop_state(yyscanner);
+        IMCC_INFO(interp)->line++;
+    }
+	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 275 "compilers/imcc/imcc.l"
+#line 329 "compilers/imcc/imcc.l"
 { /*ignore*/ }
-    YY_BREAK
+	YY_BREAK
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 276 "compilers/imcc/imcc.l"
+#line 331 "compilers/imcc/imcc.l"
 { IMCC_INFO(interp)->line++; }
-    YY_BREAK
+	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 279 "compilers/imcc/imcc.l"
+#line 333 "compilers/imcc/imcc.l"
 return LEXICAL;
-    YY_BREAK
+	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 280 "compilers/imcc/imcc.l"
+#line 334 "compilers/imcc/imcc.l"
 return ARG;
-    YY_BREAK
+	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 281 "compilers/imcc/imcc.l"
+#line 335 "compilers/imcc/imcc.l"
 return SUB;
-    YY_BREAK
+	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 282 "compilers/imcc/imcc.l"
+#line 336 "compilers/imcc/imcc.l"
 return ESUB;
-    YY_BREAK
+	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 283 "compilers/imcc/imcc.l"
+#line 337 "compilers/imcc/imcc.l"
 return PCC_BEGIN;
-    YY_BREAK
+	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 284 "compilers/imcc/imcc.l"
+#line 338 "compilers/imcc/imcc.l"
 return PCC_END;
-    YY_BREAK
+	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 285 "compilers/imcc/imcc.l"
+#line 339 "compilers/imcc/imcc.l"
 return PCC_CALL;
-    YY_BREAK
+	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 286 "compilers/imcc/imcc.l"
+#line 340 "compilers/imcc/imcc.l"
 return NCI_CALL;
-    YY_BREAK
+	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 287 "compilers/imcc/imcc.l"
+#line 341 "compilers/imcc/imcc.l"
 return METH_CALL;
-    YY_BREAK
+	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 288 "compilers/imcc/imcc.l"
+#line 342 "compilers/imcc/imcc.l"
 return INVOCANT;
-    YY_BREAK
+	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 289 "compilers/imcc/imcc.l"
+#line 343 "compilers/imcc/imcc.l"
 return PCC_SUB;
-    YY_BREAK
+	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 290 "compilers/imcc/imcc.l"
+#line 344 "compilers/imcc/imcc.l"
 return PCC_BEGIN_RETURN;
-    YY_BREAK
+	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 291 "compilers/imcc/imcc.l"
+#line 345 "compilers/imcc/imcc.l"
 return PCC_END_RETURN;
-    YY_BREAK
+	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 292 "compilers/imcc/imcc.l"
+#line 346 "compilers/imcc/imcc.l"
 return PCC_BEGIN_YIELD;
-    YY_BREAK
+	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 293 "compilers/imcc/imcc.l"
+#line 347 "compilers/imcc/imcc.l"
 return PCC_END_YIELD;
-    YY_BREAK
+	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 295 "compilers/imcc/imcc.l"
+#line 349 "compilers/imcc/imcc.l"
 return METHOD;
-    YY_BREAK
+	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 296 "compilers/imcc/imcc.l"
+#line 350 "compilers/imcc/imcc.l"
 return MULTI;
-    YY_BREAK
+	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 297 "compilers/imcc/imcc.l"
+#line 351 "compilers/imcc/imcc.l"
 return MAIN;
-    YY_BREAK
+	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 298 "compilers/imcc/imcc.l"
+#line 352 "compilers/imcc/imcc.l"
 return LOAD;
-    YY_BREAK
+	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 299 "compilers/imcc/imcc.l"
+#line 353 "compilers/imcc/imcc.l"
 return INIT;
-    YY_BREAK
+	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 300 "compilers/imcc/imcc.l"
+#line 354 "compilers/imcc/imcc.l"
 return IMMEDIATE;
-    YY_BREAK
+	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 301 "compilers/imcc/imcc.l"
+#line 355 "compilers/imcc/imcc.l"
 return POSTCOMP;
-    YY_BREAK
+	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 302 "compilers/imcc/imcc.l"
+#line 356 "compilers/imcc/imcc.l"
 return ANON;
-    YY_BREAK
+	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 303 "compilers/imcc/imcc.l"
+#line 357 "compilers/imcc/imcc.l"
 return OUTER;
-    YY_BREAK
+	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 304 "compilers/imcc/imcc.l"
+#line 358 "compilers/imcc/imcc.l"
 return NEED_LEX;
-    YY_BREAK
+	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 305 "compilers/imcc/imcc.l"
+#line 359 "compilers/imcc/imcc.l"
 return VTABLE_METHOD;
-    YY_BREAK
+	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 306 "compilers/imcc/imcc.l"
+#line 360 "compilers/imcc/imcc.l"
 return UNIQUE_REG;
-    YY_BREAK
+	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 308 "compilers/imcc/imcc.l"
+#line 362 "compilers/imcc/imcc.l"
 return RESULT;
-    YY_BREAK
+	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 309 "compilers/imcc/imcc.l"
+#line 363 "compilers/imcc/imcc.l"
 return GET_RESULTS;
-    YY_BREAK
+	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 310 "compilers/imcc/imcc.l"
+#line 364 "compilers/imcc/imcc.l"
 return YIELDT;
-    YY_BREAK
+	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 311 "compilers/imcc/imcc.l"
+#line 365 "compilers/imcc/imcc.l"
 return RETURN;
-    YY_BREAK
+	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 312 "compilers/imcc/imcc.l"
+#line 366 "compilers/imcc/imcc.l"
 return LOADLIB;
-    YY_BREAK
+	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 314 "compilers/imcc/imcc.l"
+#line 368 "compilers/imcc/imcc.l"
 return ADV_FLAT;
-    YY_BREAK
+	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 315 "compilers/imcc/imcc.l"
+#line 369 "compilers/imcc/imcc.l"
 return ADV_SLURPY;
-    YY_BREAK
+	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 316 "compilers/imcc/imcc.l"
+#line 370 "compilers/imcc/imcc.l"
 return ADV_OPTIONAL;
-    YY_BREAK
+	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 317 "compilers/imcc/imcc.l"
+#line 371 "compilers/imcc/imcc.l"
 return ADV_OPT_FLAG;
-    YY_BREAK
+	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 318 "compilers/imcc/imcc.l"
+#line 372 "compilers/imcc/imcc.l"
 return ADV_NAMED;
-    YY_BREAK
+	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 319 "compilers/imcc/imcc.l"
+#line 373 "compilers/imcc/imcc.l"
 return ADV_ARROW;
-    YY_BREAK
+	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 320 "compilers/imcc/imcc.l"
+#line 374 "compilers/imcc/imcc.l"
 return ADV_INVOCANT;
-    YY_BREAK
+	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 322 "compilers/imcc/imcc.l"
+#line 376 "compilers/imcc/imcc.l"
 return NAMESPACE;
-    YY_BREAK
+	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 323 "compilers/imcc/imcc.l"
+#line 377 "compilers/imcc/imcc.l"
 return HLL;
-    YY_BREAK
+	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 324 "compilers/imcc/imcc.l"
+#line 378 "compilers/imcc/imcc.l"
 return HLL_MAP;
-    YY_BREAK
+	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 325 "compilers/imcc/imcc.l"
+#line 379 "compilers/imcc/imcc.l"
 return ENDNAMESPACE;
-    YY_BREAK
+	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 326 "compilers/imcc/imcc.l"
+#line 380 "compilers/imcc/imcc.l"
 return LOCAL;
-    YY_BREAK
+	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 327 "compilers/imcc/imcc.l"
+#line 381 "compilers/imcc/imcc.l"
 return GLOBAL;
-    YY_BREAK
+	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 328 "compilers/imcc/imcc.l"
+#line 382 "compilers/imcc/imcc.l"
 return CONST;
-    YY_BREAK
+	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 329 "compilers/imcc/imcc.l"
+#line 383 "compilers/imcc/imcc.l"
 return GLOBAL_CONST;
-    YY_BREAK
+	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 330 "compilers/imcc/imcc.l"
+#line 384 "compilers/imcc/imcc.l"
 return PARAM;
-    YY_BREAK
+	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 331 "compilers/imcc/imcc.l"
+#line 385 "compilers/imcc/imcc.l"
 return PRAGMA;
-    YY_BREAK
+	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 332 "compilers/imcc/imcc.l"
+#line 386 "compilers/imcc/imcc.l"
 return N_OPERATORS;
-    YY_BREAK
+	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 333 "compilers/imcc/imcc.l"
+#line 387 "compilers/imcc/imcc.l"
 return GOTO;
-    YY_BREAK
+	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 334 "compilers/imcc/imcc.l"
+#line 388 "compilers/imcc/imcc.l"
 return IF;
-    YY_BREAK
+	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 335 "compilers/imcc/imcc.l"
+#line 389 "compilers/imcc/imcc.l"
 return UNLESS;
-    YY_BREAK
+	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 336 "compilers/imcc/imcc.l"
+#line 390 "compilers/imcc/imcc.l"
 return PNULL;
-    YY_BREAK
+	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 337 "compilers/imcc/imcc.l"
+#line 391 "compilers/imcc/imcc.l"
 return INTV;
-    YY_BREAK
+	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 338 "compilers/imcc/imcc.l"
+#line 392 "compilers/imcc/imcc.l"
 return FLOATV;
-    YY_BREAK
+	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 339 "compilers/imcc/imcc.l"
+#line 393 "compilers/imcc/imcc.l"
 return NEW;
-    YY_BREAK
+	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 340 "compilers/imcc/imcc.l"
+#line 394 "compilers/imcc/imcc.l"
 return ADDR;
-    YY_BREAK
+	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 341 "compilers/imcc/imcc.l"
+#line 395 "compilers/imcc/imcc.l"
 return GLOBALOP;
-    YY_BREAK
+	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 342 "compilers/imcc/imcc.l"
+#line 396 "compilers/imcc/imcc.l"
 return PMCV;
-    YY_BREAK
+	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 343 "compilers/imcc/imcc.l"
+#line 397 "compilers/imcc/imcc.l"
 return STRINGV;
-    YY_BREAK
+	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 344 "compilers/imcc/imcc.l"
+#line 398 "compilers/imcc/imcc.l"
 return SHIFT_LEFT;
-    YY_BREAK
+	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 345 "compilers/imcc/imcc.l"
+#line 399 "compilers/imcc/imcc.l"
 return SHIFT_RIGHT;
-    YY_BREAK
+	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 346 "compilers/imcc/imcc.l"
+#line 400 "compilers/imcc/imcc.l"
 return SHIFT_RIGHT_U;
-    YY_BREAK
+	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 347 "compilers/imcc/imcc.l"
+#line 401 "compilers/imcc/imcc.l"
 return LOG_AND;
-    YY_BREAK
+	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 348 "compilers/imcc/imcc.l"
+#line 402 "compilers/imcc/imcc.l"
 return LOG_OR;
-    YY_BREAK
+	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 349 "compilers/imcc/imcc.l"
+#line 403 "compilers/imcc/imcc.l"
 return LOG_XOR;
-    YY_BREAK
+	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 350 "compilers/imcc/imcc.l"
+#line 404 "compilers/imcc/imcc.l"
 return RELOP_LT;
-    YY_BREAK
+	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 351 "compilers/imcc/imcc.l"
+#line 405 "compilers/imcc/imcc.l"
 return RELOP_LTE;
-    YY_BREAK
+	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 352 "compilers/imcc/imcc.l"
+#line 406 "compilers/imcc/imcc.l"
 return RELOP_GT;
-    YY_BREAK
+	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 353 "compilers/imcc/imcc.l"
+#line 407 "compilers/imcc/imcc.l"
 return RELOP_GTE;
-    YY_BREAK
+	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 354 "compilers/imcc/imcc.l"
+#line 408 "compilers/imcc/imcc.l"
 return RELOP_EQ;
-    YY_BREAK
+	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 355 "compilers/imcc/imcc.l"
+#line 409 "compilers/imcc/imcc.l"
 return RELOP_NE;
-    YY_BREAK
+	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 356 "compilers/imcc/imcc.l"
+#line 410 "compilers/imcc/imcc.l"
 return POW;
-    YY_BREAK
+	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 358 "compilers/imcc/imcc.l"
+#line 412 "compilers/imcc/imcc.l"
 return CONCAT;
-    YY_BREAK
+	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 359 "compilers/imcc/imcc.l"
+#line 413 "compilers/imcc/imcc.l"
 return DOT;
-    YY_BREAK
+	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 360 "compilers/imcc/imcc.l"
+#line 414 "compilers/imcc/imcc.l"
 return DOTDOT;
-    YY_BREAK
+	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 361 "compilers/imcc/imcc.l"
+#line 415 "compilers/imcc/imcc.l"
 return PLUS_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 362 "compilers/imcc/imcc.l"
+#line 416 "compilers/imcc/imcc.l"
 return MINUS_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 363 "compilers/imcc/imcc.l"
+#line 417 "compilers/imcc/imcc.l"
 return MUL_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 364 "compilers/imcc/imcc.l"
+#line 418 "compilers/imcc/imcc.l"
 return DIV_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 365 "compilers/imcc/imcc.l"
+#line 419 "compilers/imcc/imcc.l"
 return MOD_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 366 "compilers/imcc/imcc.l"
+#line 420 "compilers/imcc/imcc.l"
 return FDIV;
-    YY_BREAK
+	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 367 "compilers/imcc/imcc.l"
+#line 421 "compilers/imcc/imcc.l"
 return FDIV_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 368 "compilers/imcc/imcc.l"
+#line 422 "compilers/imcc/imcc.l"
 return BAND_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 369 "compilers/imcc/imcc.l"
+#line 423 "compilers/imcc/imcc.l"
 return BOR_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 370 "compilers/imcc/imcc.l"
+#line 424 "compilers/imcc/imcc.l"
 return BXOR_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 371 "compilers/imcc/imcc.l"
+#line 425 "compilers/imcc/imcc.l"
 return SHR_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 372 "compilers/imcc/imcc.l"
+#line 426 "compilers/imcc/imcc.l"
 return SHL_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 373 "compilers/imcc/imcc.l"
+#line 427 "compilers/imcc/imcc.l"
 return SHR_U_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 374 "compilers/imcc/imcc.l"
+#line 428 "compilers/imcc/imcc.l"
 return CONCAT_ASSIGN;
-    YY_BREAK
+	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 376 "compilers/imcc/imcc.l"
+#line 430 "compilers/imcc/imcc.l"
 {
         return read_macro(valp, interp, yyscanner);
     }
-    YY_BREAK
+	YY_BREAK
 case 111:
-YY_RULE_SETUP
-#line 380 "compilers/imcc/imcc.l"
-{
-    int c;
-    int start_line;
-
-    BEGIN(macro);
-    c = yylex_skip(valp, interp, " ", yyscanner);
-    if (c != IDENTIFIER)
-        IMCC_fataly(interp, E_SyntaxError,
-           "Constant names must be identifiers");
-
-    IMCC_INFO(interp)->cur_macro_name = valp->s;
-    start_line = IMCC_INFO(interp)->line;
-
-    c = yylex_skip(valp, interp, " ", yyscanner);
-        if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
-        IMCC_fataly(interp, E_SyntaxError,
-            "Constant '%s' value must be a number, "
-            "stringliteral or register", IMCC_INFO(interp)->cur_macro_name);
-
-    define_macro(interp, IMCC_INFO(interp)->cur_macro_name, NULL, valp->s, start_line);
-    IMCC_INFO(interp)->cur_macro_name = NULL;
-
-    BEGIN(emit);
-    return MACRO;
-    }
-    YY_BREAK
-case 112:
-YY_RULE_SETUP
-#line 406 "compilers/imcc/imcc.l"
-{
-    int c;
-
-    c = yylex(valp,yyscanner,interp);
-    if (c != STRINGC) return c;
-
-    YYCHOP();
-    include_file(interp, str_dup(yytext + 1), yyscanner);
-    }
-    YY_BREAK
-case 113:
-YY_RULE_SETUP
-#line 416 "compilers/imcc/imcc.l"
-{
-        char *label;
-
-    if (valp) {
-        YYCHOP();
-            YYCHOP();
-
-            if (!IMCC_INFO(interp)->frames || !IMCC_INFO(interp)->frames->label)
-                IMCC_fataly(interp, E_SyntaxError, "missing space?");
-        label = (char*)mem_sys_allocate(yyleng+10);
-        sprintf(label, "%s%d", yytext, IMCC_INFO(interp)->frames->label);
-
-        valp->s = label;
-    }
-
-        return LABEL;
-    }
-    YY_BREAK
-case 114:
 YY_RULE_SETUP
 #line 434 "compilers/imcc/imcc.l"
 {
-        char *label;
+        int c;
+        int start_line;
 
+        BEGIN(macro);
+        c = yylex_skip(valp, interp, " ", yyscanner);
+
+        if (c != IDENTIFIER)
+            IMCC_fataly(interp, E_SyntaxError,
+               "Constant names must be identifiers");
+
+        IMCC_INFO(interp)->cur_macro_name = valp->s;
+        start_line                        = IMCC_INFO(interp)->line;
+
+        c = yylex_skip(valp, interp, " ", yyscanner);
+
+        if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
+            IMCC_fataly(interp, E_SyntaxError,
+                "Constant '%s' value must be a number, "
+                "stringliteral or register", IMCC_INFO(interp)->cur_macro_name);
+
+        define_macro(interp, IMCC_INFO(interp)->cur_macro_name, NULL,
+            valp->s, start_line);
+
+        IMCC_INFO(interp)->cur_macro_name = NULL;
+
+        BEGIN(emit);
+        return MACRO;
+    }
+	YY_BREAK
+case 112:
+YY_RULE_SETUP
+#line 464 "compilers/imcc/imcc.l"
+{
+        int c = yylex(valp,yyscanner,interp);
+        if (c != STRINGC)
+            return c;
+
+        YYCHOP();
+        include_file(interp, str_dup(yytext + 1), yyscanner);
+    }
+	YY_BREAK
+case 113:
+YY_RULE_SETUP
+#line 473 "compilers/imcc/imcc.l"
+{
         if (valp) {
+            char *label;
+
+            YYCHOP();
             YYCHOP();
 
-            /* #32421   if$I0 is parsed as if$ I0 */
+            if (!IMCC_INFO(interp)->frames || !IMCC_INFO(interp)->frames->label)
+                    IMCC_fataly(interp, E_SyntaxError, "missing space?");
+
+            label = (char *)mem_sys_allocate(yyleng + 10);
+            sprintf(label, "%s%d", yytext, IMCC_INFO(interp)->frames->label);
+
+            /* XXX: free valp->s if it exists? */
+            valp->s = label;
+        }
+
+        return LABEL;
+    }
+	YY_BREAK
+case 114:
+YY_RULE_SETUP
+#line 493 "compilers/imcc/imcc.l"
+{
+
+        if (valp) {
+            char *label;
+            YYCHOP();
+
+            /* RT #32421   if$I0 is parsed as if$ I0 */
             if (!IMCC_INFO(interp)->frames || !IMCC_INFO(interp)->frames->label)
                 IMCC_fataly(interp, E_SyntaxError, "missing space?");
 
-            label = (char*)mem_sys_allocate(yyleng+10);
+            label = (char *)mem_sys_allocate(yyleng + 10);
             sprintf(label, "%s%d", yytext, IMCC_INFO(interp)->frames->label);
 
+            /* XXX: free valp->s if it exists? */
             valp->s = label;
         }
 
         return IDENTIFIER;
      }
-    YY_BREAK
+	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 453 "compilers/imcc/imcc.l"
+#line 513 "compilers/imcc/imcc.l"
 return COMMA;
-    YY_BREAK
+	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 455 "compilers/imcc/imcc.l"
+#line 515 "compilers/imcc/imcc.l"
 {
-    YYCHOP();  /* trim last ':' */
-    DUP_AND_RET(valp,LABEL);
+        /* trim last ':' */
+        YYCHOP();
+
+        DUP_AND_RET(valp,LABEL);
     }
-    YY_BREAK
+	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 460 "compilers/imcc/imcc.l"
+#line 522 "compilers/imcc/imcc.l"
 {
-        char *macro_name = str_dup(yytext+1);
-        int type = pmc_type(interp, string_from_cstring(interp, macro_name, 0));
+        char *macro_name = str_dup(yytext + 1);
+        int   type       = pmc_type(interp,
+            string_from_cstring(interp, macro_name, 0));
 
         if (type > 0) {
-            char *buf = (char*)malloc(16);
+            char *buf = (char *)malloc(16);
             sprintf(buf, "%d", type);
+
+            /* XXX: free valp->s if already used? */
             valp->s = str_dup(buf);
             mem_sys_free(buf);
             free(macro_name);
@@ -3857,80 +3911,91 @@ YY_RULE_SETUP
 
         free(macro_name);
     }
-    YY_BREAK
+	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 482 "compilers/imcc/imcc.l"
+#line 547 "compilers/imcc/imcc.l"
 {
-    if (!is_def) {
-        SymReg *r = find_sym(interp, yytext);
-        if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
-            valp->sr = r;
-            return VAR;
-        }
-        if (IMCC_INFO(interp)->cur_unit &&
-            IMCC_INFO(interp)->cur_unit->instructions &&
-            (r = IMCC_INFO(interp)->cur_unit->instructions->r[0]) &&
-            r->pcc_sub)
-        {
-            if ((r->pcc_sub->pragma & P_METHOD) && !strcmp(yytext, "self")) {
-                valp->sr  = mk_ident(interp, str_dup("self"), 'P');
-                IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
+        if (!is_def) {
+            SymReg *r = find_sym(interp, yytext);
+
+            if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
+                valp->sr = r;
                 return VAR;
             }
+
+            if (IMCC_INFO(interp)->cur_unit &&
+                IMCC_INFO(interp)->cur_unit->instructions &&
+                (r = IMCC_INFO(interp)->cur_unit->instructions->r[0]) &&
+                r->pcc_sub)
+            {
+                if ((r->pcc_sub->pragma & P_METHOD) &&
+                    !strcmp(yytext, "self")) {
+                    valp->sr = mk_ident(interp, str_dup("self"), 'P');
+                    IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
+                    return VAR;
+                }
+            }
         }
+
+        valp->s = str_dup(yytext);
+        return (!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
     }
-    valp->s = str_dup(yytext);
-    return (!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
-    }
-    YY_BREAK
+	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 505 "compilers/imcc/imcc.l"
+#line 574 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, FLOATC);
-    YY_BREAK
+	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 506 "compilers/imcc/imcc.l"
+#line 575 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
-    YY_BREAK
+	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 507 "compilers/imcc/imcc.l"
+#line 576 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
-    YY_BREAK
+	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 508 "compilers/imcc/imcc.l"
+#line 577 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
-    YY_BREAK
+	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 509 "compilers/imcc/imcc.l"
+#line 578 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
-    YY_BREAK
+	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 511 "compilers/imcc/imcc.l"
+#line 580 "compilers/imcc/imcc.l"
 {
-    valp->s = str_dup(yytext);
-        valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
-        return STRINGC; /* no BIGINT native format yet */
+        valp->s = str_dup(yytext);
+
+        /* trailing 'L' */
+        valp->s[strlen(valp->s) - 1] = '\0';
+
+        /* no BIGINT native format yet */
+        return STRINGC;
     }
-    YY_BREAK
+	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 517 "compilers/imcc/imcc.l"
+#line 590 "compilers/imcc/imcc.l"
 {
-    valp->s = str_dup(yytext);
-        return STRINGC; /* RT#42382 delete quotes, -> emit, pbc */
+        valp->s = str_dup(yytext);
+
+        /* RT #42382 delete quotes, -> emit, pbc */
+        return STRINGC;
     }
-    YY_BREAK
+	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 522 "compilers/imcc/imcc.l"
+#line 597 "compilers/imcc/imcc.l"
 {
-        struct macro_frame_t *frame;
+        macro_frame_t *frame;
+
         /* Save the string we want to mark the end of the heredoc and snip
            off newline and quote. */
         if (IMCC_INFO(interp)->frames->heredoc_rest)
@@ -3938,174 +4003,192 @@ YY_RULE_SETUP
             "nested heredoc not supported");
         IMCC_INFO(interp)->heredoc_end = str_dup(yytext + 3);
         IMCC_INFO(interp)->heredoc_end[strlen(IMCC_INFO(interp)->heredoc_end) - 1] = 0;
+
         if (!strlen(IMCC_INFO(interp)->heredoc_end))
             IMCC_fataly(interp, E_SyntaxError, "empty heredoc delimiter");
-        frame = new_frame(interp);
-        frame->s.next = (struct parser_state_t*) IMCC_INFO(interp)->frames;
+
+        frame                     = new_frame(interp);
+        frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
         IMCC_INFO(interp)->frames = frame;
+
         /* Start slurping up the heredoc. */
-        IMCC_INFO(interp)->heredoc_content = (char*)mem_sys_allocate(2);
-        IMCC_INFO(interp)->heredoc_content[0] = yytext[2];        /* preserve delim */
-        IMCC_INFO(interp)->heredoc_content[1] = 0;                /* eos */
+        IMCC_INFO(interp)->heredoc_content    = (char *)mem_sys_allocate(2);
+
+        /* preserve delim */
+        IMCC_INFO(interp)->heredoc_content[0] = yytext[2];
+
+        /* eos */
+        IMCC_INFO(interp)->heredoc_content[1] = 0;
         yy_push_state(heredoc1, yyscanner);
     }
-    YY_BREAK
+	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 543 "compilers/imcc/imcc.l"
+#line 626 "compilers/imcc/imcc.l"
 {
-    valp->s = str_dup(yytext);    /* charset:"..." */
+        /* charset:"..." */
+        valp->s = str_dup(yytext);
+
         /* this is actually not unicode but a string with a charset */
         return USTRINGC;
     }
-    YY_BREAK
+	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 550 "compilers/imcc/imcc.l"
+#line 635 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, IREG);
-    YY_BREAK
+	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 551 "compilers/imcc/imcc.l"
+#line 636 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, NREG);
-    YY_BREAK
+	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 552 "compilers/imcc/imcc.l"
+#line 637 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, SREG);
-    YY_BREAK
+	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 553 "compilers/imcc/imcc.l"
+#line 638 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, PREG);
-    YY_BREAK
+	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 554 "compilers/imcc/imcc.l"
+#line 640 "compilers/imcc/imcc.l"
 {
-    IMCC_fataly(interp, E_SyntaxError, "'%s' is not a valid register name", yytext);
+        IMCC_fataly(interp, E_SyntaxError,
+            "'%s' is not a valid register name", yytext);
     }
-    YY_BREAK
+	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 559 "compilers/imcc/imcc.l"
+#line 646 "compilers/imcc/imcc.l"
 /* skip */;
-    YY_BREAK
+	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 561 "compilers/imcc/imcc.l"
+#line 648 "compilers/imcc/imcc.l"
 {
         /* catch all except for state macro */
         return yytext[0];
     }
-    YY_BREAK
+	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 566 "compilers/imcc/imcc.l"
+#line 653 "compilers/imcc/imcc.l"
 {
         BEGIN(INITIAL);
+
         if (IMCC_INFO(interp)->frames->s.pasm_file) {
             IMCC_INFO(interp)->frames->s.pasm_file = 2;
             return EOM;
         }
+
         return 0;
     }
-    YY_BREAK
+	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 575 "compilers/imcc/imcc.l"
+#line 664 "compilers/imcc/imcc.l"
 yyterminate();
-    YY_BREAK
+	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 577 "compilers/imcc/imcc.l"
+#line 666 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ENDM);
-    YY_BREAK
+	YY_BREAK
 case 136:
 /* rule 136 can match eol */
 YY_RULE_SETUP
-#line 579 "compilers/imcc/imcc.l"
+#line 668 "compilers/imcc/imcc.l"
 {
         IMCC_INFO(interp)->line++;
         DUP_AND_RET(valp, '\n');
     }
-    YY_BREAK
+	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 584 "compilers/imcc/imcc.l"
+#line 673 "compilers/imcc/imcc.l"
 return LABEL;
-    YY_BREAK
+	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 586 "compilers/imcc/imcc.l"
+#line 675 "compilers/imcc/imcc.l"
 {
-    char *label;
 
-    if (yylex(valp,yyscanner,interp) != LABEL)
-            IMCC_fataly(interp, E_SyntaxError, "LABEL expected");
+        if (yylex(valp,yyscanner,interp) != LABEL)
+                IMCC_fataly(interp, E_SyntaxError, "LABEL expected");
 
-    if (valp) {
-        YYCHOP();
+        if (valp) {
+            char *label;
+            YYCHOP();
 
-        label = (char*)mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
-        sprintf(label, "local__%s__%s__$:", IMCC_INFO(interp)->cur_macro_name, yytext+1);
+            label = (char *)mem_sys_allocate(
+                strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
 
-        valp->s = label;
+            sprintf(label, "local__%s__%s__$:",
+                IMCC_INFO(interp)->cur_macro_name, yytext+1);
+
+            /* XXX: free valp->s if it exists? */
+            valp->s = label;
+        }
+
+        return LABEL;
     }
-
-    return LABEL;
-    }
-    YY_BREAK
+	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 605 "compilers/imcc/imcc.l"
+#line 697 "compilers/imcc/imcc.l"
 {
-    char *label;
+        if (valp) {
+            char *label = (char *)mem_sys_allocate(
+                strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
 
-    if (valp) {
-        label = (char*)mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
-        sprintf(label, "local__%s__%s__$", IMCC_INFO(interp)->cur_macro_name, yytext+2);
+            sprintf(label, "local__%s__%s__$",
+                IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
-        valp->s = str_dup(label);
-        mem_sys_free(label);
+            /* XXX: why dup this? */
+            valp->s = str_dup(label);
+            mem_sys_free(label);
+        }
+
+        return IDENTIFIER;
     }
-
-    return IDENTIFIER;
-    }
-    YY_BREAK
+	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 619 "compilers/imcc/imcc.l"
+#line 713 "compilers/imcc/imcc.l"
 /* skip leading ws */;
-    YY_BREAK
+	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 620 "compilers/imcc/imcc.l"
+#line 714 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
-    YY_BREAK
+	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 621 "compilers/imcc/imcc.l"
+#line 715 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
-    YY_BREAK
+	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 622 "compilers/imcc/imcc.l"
+#line 716 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
-    YY_BREAK
+	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 623 "compilers/imcc/imcc.l"
+#line 717 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
-    YY_BREAK
+	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 624 "compilers/imcc/imcc.l"
+#line 718 "compilers/imcc/imcc.l"
 yyterminate();
-    YY_BREAK
+	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 626 "compilers/imcc/imcc.l"
+#line 720 "compilers/imcc/imcc.l"
 ECHO;
-    YY_BREAK
-#line 4109 "compilers/imcc/imclexer.c"
+	YY_BREAK
+#line 4192 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -4114,366 +4197,366 @@ case YY_STATE_EOF(cmt4):
 case YY_STATE_EOF(cmt5):
 case YY_STATE_EOF(heredoc1):
 case YY_STATE_EOF(heredoc2):
-    yyterminate();
+	yyterminate();
 
-    case YY_END_OF_BUFFER:
-        {
-        /* Amount of text matched not including the EOB char. */
-        int yy_amount_of_matched_text = (int) (yy_cp - yyg->yytext_ptr) - 1;
+	case YY_END_OF_BUFFER:
+		{
+		/* Amount of text matched not including the EOB char. */
+		int yy_amount_of_matched_text = (int) (yy_cp - yyg->yytext_ptr) - 1;
 
-        /* Undo the effects of YY_DO_BEFORE_ACTION. */
-        *yy_cp = yyg->yy_hold_char;
-        YY_RESTORE_YY_MORE_OFFSET
+		/* Undo the effects of YY_DO_BEFORE_ACTION. */
+		*yy_cp = yyg->yy_hold_char;
+		YY_RESTORE_YY_MORE_OFFSET
 
-        if ( YY_CURRENT_BUFFER_LVALUE->yy_buffer_status == YY_BUFFER_NEW )
-            {
-            /* We're scanning a new file or input source.  It's
-             * possible that this happened because the user
-             * just pointed yyin at a new source and called
-             * yylex().  If so, then we have to assure
-             * consistency between YY_CURRENT_BUFFER and our
-             * globals.  Here is the right place to do so, because
-             * this is the first action (other than possibly a
-             * back-up) that will match for the new input source.
-             */
-            yyg->yy_n_chars = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
-            YY_CURRENT_BUFFER_LVALUE->yy_input_file = yyin;
-            YY_CURRENT_BUFFER_LVALUE->yy_buffer_status = YY_BUFFER_NORMAL;
-            }
+		if ( YY_CURRENT_BUFFER_LVALUE->yy_buffer_status == YY_BUFFER_NEW )
+			{
+			/* We're scanning a new file or input source.  It's
+			 * possible that this happened because the user
+			 * just pointed yyin at a new source and called
+			 * yylex().  If so, then we have to assure
+			 * consistency between YY_CURRENT_BUFFER and our
+			 * globals.  Here is the right place to do so, because
+			 * this is the first action (other than possibly a
+			 * back-up) that will match for the new input source.
+			 */
+			yyg->yy_n_chars = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
+			YY_CURRENT_BUFFER_LVALUE->yy_input_file = yyin;
+			YY_CURRENT_BUFFER_LVALUE->yy_buffer_status = YY_BUFFER_NORMAL;
+			}
 
-        /* Note that here we test for yy_c_buf_p "<=" to the position
-         * of the first EOB in the buffer, since yy_c_buf_p will
-         * already have been incremented past the NUL character
-         * (since all states make transitions on EOB to the
-         * end-of-buffer state).  Contrast this with the test
-         * in input().
-         */
-        if ( yyg->yy_c_buf_p <= &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars] )
-            { /* This was really a NUL. */
-            yy_state_type yy_next_state;
+		/* Note that here we test for yy_c_buf_p "<=" to the position
+		 * of the first EOB in the buffer, since yy_c_buf_p will
+		 * already have been incremented past the NUL character
+		 * (since all states make transitions on EOB to the
+		 * end-of-buffer state).  Contrast this with the test
+		 * in input().
+		 */
+		if ( yyg->yy_c_buf_p <= &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars] )
+			{ /* This was really a NUL. */
+			yy_state_type yy_next_state;
 
-            yyg->yy_c_buf_p = yyg->yytext_ptr + yy_amount_of_matched_text;
+			yyg->yy_c_buf_p = yyg->yytext_ptr + yy_amount_of_matched_text;
 
-            yy_current_state = yy_get_previous_state( yyscanner );
+			yy_current_state = yy_get_previous_state( yyscanner );
 
-            /* Okay, we're now positioned to make the NUL
-             * transition.  We couldn't have
-             * yy_get_previous_state() go ahead and do it
-             * for us because it doesn't know how to deal
-             * with the possibility of jamming (and we don't
-             * want to build jamming into it because then it
-             * will run more slowly).
-             */
+			/* Okay, we're now positioned to make the NUL
+			 * transition.  We couldn't have
+			 * yy_get_previous_state() go ahead and do it
+			 * for us because it doesn't know how to deal
+			 * with the possibility of jamming (and we don't
+			 * want to build jamming into it because then it
+			 * will run more slowly).
+			 */
 
-            yy_next_state = yy_try_NUL_trans( yy_current_state , yyscanner);
+			yy_next_state = yy_try_NUL_trans( yy_current_state , yyscanner);
 
-            yy_bp = yyg->yytext_ptr + YY_MORE_ADJ;
+			yy_bp = yyg->yytext_ptr + YY_MORE_ADJ;
 
-            if ( yy_next_state )
-                {
-                /* Consume the NUL. */
-                yy_cp = ++yyg->yy_c_buf_p;
-                yy_current_state = yy_next_state;
-                goto yy_match;
-                }
+			if ( yy_next_state )
+				{
+				/* Consume the NUL. */
+				yy_cp = ++yyg->yy_c_buf_p;
+				yy_current_state = yy_next_state;
+				goto yy_match;
+				}
 
-            else
-                {
-                yy_cp = yyg->yy_last_accepting_cpos;
-                yy_current_state = yyg->yy_last_accepting_state;
-                goto yy_find_action;
-                }
-            }
+			else
+				{
+				yy_cp = yyg->yy_last_accepting_cpos;
+				yy_current_state = yyg->yy_last_accepting_state;
+				goto yy_find_action;
+				}
+			}
 
-        else switch ( yy_get_next_buffer( yyscanner ) )
-            {
-            case EOB_ACT_END_OF_FILE:
-                {
-                yyg->yy_did_buffer_switch_on_eof = 0;
+		else switch ( yy_get_next_buffer( yyscanner ) )
+			{
+			case EOB_ACT_END_OF_FILE:
+				{
+				yyg->yy_did_buffer_switch_on_eof = 0;
 
-                if ( yywrap(yyscanner ) )
-                    {
-                    /* Note: because we've taken care in
-                     * yy_get_next_buffer() to have set up
-                     * yytext, we can now set up
-                     * yy_c_buf_p so that if some total
-                     * hoser (like flex itself) wants to
-                     * call the scanner after we return the
-                     * YY_NULL, it'll still work - another
-                     * YY_NULL will get returned.
-                     */
-                    yyg->yy_c_buf_p = yyg->yytext_ptr + YY_MORE_ADJ;
+				if ( yywrap(yyscanner ) )
+					{
+					/* Note: because we've taken care in
+					 * yy_get_next_buffer() to have set up
+					 * yytext, we can now set up
+					 * yy_c_buf_p so that if some total
+					 * hoser (like flex itself) wants to
+					 * call the scanner after we return the
+					 * YY_NULL, it'll still work - another
+					 * YY_NULL will get returned.
+					 */
+					yyg->yy_c_buf_p = yyg->yytext_ptr + YY_MORE_ADJ;
 
-                    yy_act = YY_STATE_EOF(YY_START);
-                    goto do_action;
-                    }
+					yy_act = YY_STATE_EOF(YY_START);
+					goto do_action;
+					}
 
-                else
-                    {
-                    if ( ! yyg->yy_did_buffer_switch_on_eof )
-                        YY_NEW_FILE;
-                    }
-                break;
-                }
+				else
+					{
+					if ( ! yyg->yy_did_buffer_switch_on_eof )
+						YY_NEW_FILE;
+					}
+				break;
+				}
 
-            case EOB_ACT_CONTINUE_SCAN:
-                yyg->yy_c_buf_p =
-                    yyg->yytext_ptr + yy_amount_of_matched_text;
+			case EOB_ACT_CONTINUE_SCAN:
+				yyg->yy_c_buf_p =
+					yyg->yytext_ptr + yy_amount_of_matched_text;
 
-                yy_current_state = yy_get_previous_state( yyscanner );
+				yy_current_state = yy_get_previous_state( yyscanner );
 
-                yy_cp = yyg->yy_c_buf_p;
-                yy_bp = yyg->yytext_ptr + YY_MORE_ADJ;
-                goto yy_match;
+				yy_cp = yyg->yy_c_buf_p;
+				yy_bp = yyg->yytext_ptr + YY_MORE_ADJ;
+				goto yy_match;
 
-            case EOB_ACT_LAST_MATCH:
-                yyg->yy_c_buf_p =
-                &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars];
+			case EOB_ACT_LAST_MATCH:
+				yyg->yy_c_buf_p =
+				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars];
 
-                yy_current_state = yy_get_previous_state( yyscanner );
+				yy_current_state = yy_get_previous_state( yyscanner );
 
-                yy_cp = yyg->yy_c_buf_p;
-                yy_bp = yyg->yytext_ptr + YY_MORE_ADJ;
-                goto yy_find_action;
-            }
-        break;
-        }
+				yy_cp = yyg->yy_c_buf_p;
+				yy_bp = yyg->yytext_ptr + YY_MORE_ADJ;
+				goto yy_find_action;
+			}
+		break;
+		}
 
-    default:
-        YY_FATAL_ERROR(
-            "fatal flex scanner internal error--no action found" );
-    } /* end of action switch */
-        } /* end of scanning one token */
+	default:
+		YY_FATAL_ERROR(
+			"fatal flex scanner internal error--no action found" );
+	} /* end of action switch */
+		} /* end of scanning one token */
 } /* end of yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
  *
  * Returns a code representing an action:
- *  EOB_ACT_LAST_MATCH -
- *  EOB_ACT_CONTINUE_SCAN - continue scanning from current position
- *  EOB_ACT_END_OF_FILE - end of file
+ *	EOB_ACT_LAST_MATCH -
+ *	EOB_ACT_CONTINUE_SCAN - continue scanning from current position
+ *	EOB_ACT_END_OF_FILE - end of file
  */
 static int yy_get_next_buffer (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
-    register char *source = yyg->yytext_ptr;
-    register int number_to_move, i;
-    int ret_val;
+	register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
+	register char *source = yyg->yytext_ptr;
+	register int number_to_move, i;
+	int ret_val;
 
-    if ( yyg->yy_c_buf_p > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars + 1] )
-        YY_FATAL_ERROR(
-        "fatal flex scanner internal error--end of buffer missed" );
+	if ( yyg->yy_c_buf_p > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars + 1] )
+		YY_FATAL_ERROR(
+		"fatal flex scanner internal error--end of buffer missed" );
 
-    if ( YY_CURRENT_BUFFER_LVALUE->yy_fill_buffer == 0 )
-        { /* Don't try to fill the buffer, so this is an EOF. */
-        if ( yyg->yy_c_buf_p - yyg->yytext_ptr - YY_MORE_ADJ == 1 )
-            {
-            /* We matched a single character, the EOB, so
-             * treat this as a final EOF.
-             */
-            return EOB_ACT_END_OF_FILE;
-            }
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_fill_buffer == 0 )
+		{ /* Don't try to fill the buffer, so this is an EOF. */
+		if ( yyg->yy_c_buf_p - yyg->yytext_ptr - YY_MORE_ADJ == 1 )
+			{
+			/* We matched a single character, the EOB, so
+			 * treat this as a final EOF.
+			 */
+			return EOB_ACT_END_OF_FILE;
+			}
 
-        else
-            {
-            /* We matched some text prior to the EOB, first
-             * process it.
-             */
-            return EOB_ACT_LAST_MATCH;
-            }
-        }
+		else
+			{
+			/* We matched some text prior to the EOB, first
+			 * process it.
+			 */
+			return EOB_ACT_LAST_MATCH;
+			}
+		}
 
-    /* Try to read more data. */
+	/* Try to read more data. */
 
-    /* First move last chars to start of buffer. */
-    number_to_move = (int) (yyg->yy_c_buf_p - yyg->yytext_ptr) - 1;
+	/* First move last chars to start of buffer. */
+	number_to_move = (int) (yyg->yy_c_buf_p - yyg->yytext_ptr) - 1;
 
-    for ( i = 0; i < number_to_move; ++i )
-        *(dest++) = *(source++);
+	for ( i = 0; i < number_to_move; ++i )
+		*(dest++) = *(source++);
 
-    if ( YY_CURRENT_BUFFER_LVALUE->yy_buffer_status == YY_BUFFER_EOF_PENDING )
-        /* don't do the read, it's not guaranteed to return an EOF,
-         * just force an EOF
-         */
-        YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars = 0;
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_buffer_status == YY_BUFFER_EOF_PENDING )
+		/* don't do the read, it's not guaranteed to return an EOF,
+		 * just force an EOF
+		 */
+		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars = 0;
 
-    else
-        {
-            int num_to_read =
-            YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
+	else
+		{
+			int num_to_read =
+			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
-        while ( num_to_read <= 0 )
-            { /* Not enough room in the buffer - grow it. */
+		while ( num_to_read <= 0 )
+			{ /* Not enough room in the buffer - grow it. */
 
-            /* just a shorter name for the current buffer */
-            YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			/* just a shorter name for the current buffer */
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
 
-            int yy_c_buf_p_offset =
-                (int) (yyg->yy_c_buf_p - b->yy_ch_buf);
+			int yy_c_buf_p_offset =
+				(int) (yyg->yy_c_buf_p - b->yy_ch_buf);
 
-            if ( b->yy_is_our_buffer )
-                {
-                int new_size = b->yy_buf_size * 2;
+			if ( b->yy_is_our_buffer )
+				{
+				int new_size = b->yy_buf_size * 2;
 
-                if ( new_size <= 0 )
-                    b->yy_buf_size += b->yy_buf_size / 8;
-                else
-                    b->yy_buf_size *= 2;
+				if ( new_size <= 0 )
+					b->yy_buf_size += b->yy_buf_size / 8;
+				else
+					b->yy_buf_size *= 2;
 
-                b->yy_ch_buf = (char *)
-                    /* Include room in for 2 EOB chars. */
-                    yyrealloc((void *) b->yy_ch_buf,b->yy_buf_size + 2 ,yyscanner );
-                }
-            else
-                /* Can't grow it, we don't own it. */
-                b->yy_ch_buf = 0;
+				b->yy_ch_buf = (char *)
+					/* Include room in for 2 EOB chars. */
+					yyrealloc((void *) b->yy_ch_buf,b->yy_buf_size + 2 ,yyscanner );
+				}
+			else
+				/* Can't grow it, we don't own it. */
+				b->yy_ch_buf = 0;
 
-            if ( ! b->yy_ch_buf )
-                YY_FATAL_ERROR(
-                "fatal error - scanner input buffer overflow" );
+			if ( ! b->yy_ch_buf )
+				YY_FATAL_ERROR(
+				"fatal error - scanner input buffer overflow" );
 
-            yyg->yy_c_buf_p = &b->yy_ch_buf[yy_c_buf_p_offset];
+			yyg->yy_c_buf_p = &b->yy_ch_buf[yy_c_buf_p_offset];
 
-            num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size -
-                        number_to_move - 1;
+			num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size -
+						number_to_move - 1;
 
-            }
+			}
 
-        if ( num_to_read > YY_READ_BUF_SIZE )
-            num_to_read = YY_READ_BUF_SIZE;
+		if ( num_to_read > YY_READ_BUF_SIZE )
+			num_to_read = YY_READ_BUF_SIZE;
 
-        /* Read in more data. */
-        YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-            yyg->yy_n_chars, num_to_read );
+		/* Read in more data. */
+		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
+			yyg->yy_n_chars, (size_t) num_to_read );
 
-        YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
-        }
+		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
+		}
 
-    if ( yyg->yy_n_chars == 0 )
-        {
-        if ( number_to_move == YY_MORE_ADJ )
-            {
-            ret_val = EOB_ACT_END_OF_FILE;
-            yyrestart(yyin  ,yyscanner);
-            }
+	if ( yyg->yy_n_chars == 0 )
+		{
+		if ( number_to_move == YY_MORE_ADJ )
+			{
+			ret_val = EOB_ACT_END_OF_FILE;
+			yyrestart(yyin  ,yyscanner);
+			}
 
-        else
-            {
-            ret_val = EOB_ACT_LAST_MATCH;
-            YY_CURRENT_BUFFER_LVALUE->yy_buffer_status =
-                YY_BUFFER_EOF_PENDING;
-            }
-        }
+		else
+			{
+			ret_val = EOB_ACT_LAST_MATCH;
+			YY_CURRENT_BUFFER_LVALUE->yy_buffer_status =
+				YY_BUFFER_EOF_PENDING;
+			}
+		}
 
-    else
-        ret_val = EOB_ACT_CONTINUE_SCAN;
+	else
+		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-    yyg->yy_n_chars += number_to_move;
-    YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars] = YY_END_OF_BUFFER_CHAR;
-    YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars + 1] = YY_END_OF_BUFFER_CHAR;
+	yyg->yy_n_chars += number_to_move;
+	YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars] = YY_END_OF_BUFFER_CHAR;
+	YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars + 1] = YY_END_OF_BUFFER_CHAR;
 
-    yyg->yytext_ptr = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[0];
+	yyg->yytext_ptr = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[0];
 
-    return ret_val;
+	return ret_val;
 }
 
 /* yy_get_previous_state - get the state just before the EOB char was reached */
 
     static yy_state_type yy_get_previous_state (yyscan_t yyscanner)
 {
-    register yy_state_type yy_current_state;
-    register char *yy_cp;
+	register yy_state_type yy_current_state;
+	register char *yy_cp;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-    yy_current_state = yyg->yy_start;
-    yy_current_state += YY_AT_BOL();
+	yy_current_state = yyg->yy_start;
+	yy_current_state += YY_AT_BOL();
 
-    for ( yy_cp = yyg->yytext_ptr + YY_MORE_ADJ; yy_cp < yyg->yy_c_buf_p; ++yy_cp )
-        {
-        register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
-        if ( yy_accept[yy_current_state] )
-            {
-            yyg->yy_last_accepting_state = yy_current_state;
-            yyg->yy_last_accepting_cpos = yy_cp;
-            }
-        while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-            {
-            yy_current_state = (int) yy_def[yy_current_state];
-            if ( yy_current_state >= 1206 )
-                yy_c = yy_meta[(unsigned int) yy_c];
-            }
-        yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-        }
+	for ( yy_cp = yyg->yytext_ptr + YY_MORE_ADJ; yy_cp < yyg->yy_c_buf_p; ++yy_cp )
+		{
+		register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
+		if ( yy_accept[yy_current_state] )
+			{
+			yyg->yy_last_accepting_state = yy_current_state;
+			yyg->yy_last_accepting_cpos = yy_cp;
+			}
+		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+			{
+			yy_current_state = (int) yy_def[yy_current_state];
+			if ( yy_current_state >= 1206 )
+				yy_c = yy_meta[(unsigned int) yy_c];
+			}
+		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+		}
 
-    return yy_current_state;
+	return yy_current_state;
 }
 
 /* yy_try_NUL_trans - try to make a transition on the NUL character
  *
  * synopsis
- *  next_state = yy_try_NUL_trans( current_state );
+ *	next_state = yy_try_NUL_trans( current_state );
  */
     static yy_state_type yy_try_NUL_trans  (yy_state_type yy_current_state , yyscan_t yyscanner)
 {
-    register int yy_is_jam;
+	register int yy_is_jam;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner; /* This var may be unused depending upon options. */
-    register char *yy_cp = yyg->yy_c_buf_p;
+	register char *yy_cp = yyg->yy_c_buf_p;
 
-    register YY_CHAR yy_c = 1;
-    if ( yy_accept[yy_current_state] )
-        {
-        yyg->yy_last_accepting_state = yy_current_state;
-        yyg->yy_last_accepting_cpos = yy_cp;
-        }
-    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-        {
-        yy_current_state = (int) yy_def[yy_current_state];
-        if ( yy_current_state >= 1206 )
-            yy_c = yy_meta[(unsigned int) yy_c];
-        }
-    yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-    yy_is_jam = (yy_current_state == 1205);
+	register YY_CHAR yy_c = 1;
+	if ( yy_accept[yy_current_state] )
+		{
+		yyg->yy_last_accepting_state = yy_current_state;
+		yyg->yy_last_accepting_cpos = yy_cp;
+		}
+	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+		{
+		yy_current_state = (int) yy_def[yy_current_state];
+		if ( yy_current_state >= 1206 )
+			yy_c = yy_meta[(unsigned int) yy_c];
+		}
+	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+	yy_is_jam = (yy_current_state == 1205);
 
-    return yy_is_jam ? 0 : yy_current_state;
+	return yy_is_jam ? 0 : yy_current_state;
 }
 
     static void yyunput (int c, register char * yy_bp , yyscan_t yyscanner)
 {
-    register char *yy_cp;
+	register char *yy_cp;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
     yy_cp = yyg->yy_c_buf_p;
 
-    /* undo effects of setting up yytext */
-    *yy_cp = yyg->yy_hold_char;
+	/* undo effects of setting up yytext */
+	*yy_cp = yyg->yy_hold_char;
 
-    if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-        { /* need to shift things up to make room */
-        /* +2 for EOB chars. */
-        register int number_to_move = yyg->yy_n_chars + 2;
-        register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
-                    YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-        register char *source =
-                &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
+	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
+		{ /* need to shift things up to make room */
+		/* +2 for EOB chars. */
+		register int number_to_move = yyg->yy_n_chars + 2;
+		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
+					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
+		register char *source =
+				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
 
-        while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
-            *--dest = *--source;
+		while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
+			*--dest = *--source;
 
-        yy_cp += (int) (dest - source);
-        yy_bp += (int) (dest - source);
-        YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
-            yyg->yy_n_chars = YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
+		yy_cp += (int) (dest - source);
+		yy_bp += (int) (dest - source);
+		YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
+			yyg->yy_n_chars = YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
 
-        if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-            YY_FATAL_ERROR( "flex scanner push-back overflow" );
-        }
+		if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
+			YY_FATAL_ERROR( "flex scanner push-back overflow" );
+		}
 
-    *--yy_cp = (char) c;
+	*--yy_cp = (char) c;
 
-    yyg->yytext_ptr = yy_bp;
-    yyg->yy_hold_char = *yy_cp;
-    yyg->yy_c_buf_p = yy_cp;
+	yyg->yytext_ptr = yy_bp;
+	yyg->yy_hold_char = *yy_cp;
+	yyg->yy_c_buf_p = yy_cp;
 }
 
 #ifndef YY_NO_INPUT
@@ -4484,74 +4567,74 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 #endif
 
 {
-    int c;
+	int c;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-    *yyg->yy_c_buf_p = yyg->yy_hold_char;
+	*yyg->yy_c_buf_p = yyg->yy_hold_char;
 
-    if ( *yyg->yy_c_buf_p == YY_END_OF_BUFFER_CHAR )
-        {
-        /* yy_c_buf_p now points to the character we want to return.
-         * If this occurs *before* the EOB characters, then it's a
-         * valid NUL; if not, then we've hit the end of the buffer.
-         */
-        if ( yyg->yy_c_buf_p < &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars] )
-            /* This was really a NUL. */
-            *yyg->yy_c_buf_p = '\0';
+	if ( *yyg->yy_c_buf_p == YY_END_OF_BUFFER_CHAR )
+		{
+		/* yy_c_buf_p now points to the character we want to return.
+		 * If this occurs *before* the EOB characters, then it's a
+		 * valid NUL; if not, then we've hit the end of the buffer.
+		 */
+		if ( yyg->yy_c_buf_p < &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars] )
+			/* This was really a NUL. */
+			*yyg->yy_c_buf_p = '\0';
 
-        else
-            { /* need more input */
-            int offset = yyg->yy_c_buf_p - yyg->yytext_ptr;
-            ++yyg->yy_c_buf_p;
+		else
+			{ /* need more input */
+			int offset = yyg->yy_c_buf_p - yyg->yytext_ptr;
+			++yyg->yy_c_buf_p;
 
-            switch ( yy_get_next_buffer( yyscanner ) )
-                {
-                case EOB_ACT_LAST_MATCH:
-                    /* This happens because yy_g_n_b()
-                     * sees that we've accumulated a
-                     * token and flags that we need to
-                     * try matching the token before
-                     * proceeding.  But for input(),
-                     * there's no matching to consider.
-                     * So convert the EOB_ACT_LAST_MATCH
-                     * to EOB_ACT_END_OF_FILE.
-                     */
+			switch ( yy_get_next_buffer( yyscanner ) )
+				{
+				case EOB_ACT_LAST_MATCH:
+					/* This happens because yy_g_n_b()
+					 * sees that we've accumulated a
+					 * token and flags that we need to
+					 * try matching the token before
+					 * proceeding.  But for input(),
+					 * there's no matching to consider.
+					 * So convert the EOB_ACT_LAST_MATCH
+					 * to EOB_ACT_END_OF_FILE.
+					 */
 
-                    /* Reset buffer status. */
-                    yyrestart(yyin ,yyscanner);
+					/* Reset buffer status. */
+					yyrestart(yyin ,yyscanner);
 
-                    /*FALLTHROUGH*/
+					/*FALLTHROUGH*/
 
-                case EOB_ACT_END_OF_FILE:
-                    {
-                    if ( yywrap(yyscanner ) )
-                        return EOF;
+				case EOB_ACT_END_OF_FILE:
+					{
+					if ( yywrap(yyscanner ) )
+						return EOF;
 
-                    if ( ! yyg->yy_did_buffer_switch_on_eof )
-                        YY_NEW_FILE;
+					if ( ! yyg->yy_did_buffer_switch_on_eof )
+						YY_NEW_FILE;
 #ifdef __cplusplus
-                    return yyinput(yyscanner);
+					return yyinput(yyscanner);
 #else
-                    return input(yyscanner);
+					return input(yyscanner);
 #endif
-                    }
+					}
 
-                case EOB_ACT_CONTINUE_SCAN:
-                    yyg->yy_c_buf_p = yyg->yytext_ptr + offset;
-                    break;
-                }
-            }
-        }
+				case EOB_ACT_CONTINUE_SCAN:
+					yyg->yy_c_buf_p = yyg->yytext_ptr + offset;
+					break;
+				}
+			}
+		}
 
-    c = *(unsigned char *) yyg->yy_c_buf_p; /* cast for 8-bit char's */
-    *yyg->yy_c_buf_p = '\0';    /* preserve yytext */
-    yyg->yy_hold_char = *++yyg->yy_c_buf_p;
+	c = *(unsigned char *) yyg->yy_c_buf_p;	/* cast for 8-bit char's */
+	*yyg->yy_c_buf_p = '\0';	/* preserve yytext */
+	yyg->yy_hold_char = *++yyg->yy_c_buf_p;
 
-    YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
+	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
 
-    return c;
+	return c;
 }
-#endif  /* ifndef YY_NO_INPUT */
+#endif	/* ifndef YY_NO_INPUT */
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
@@ -4562,14 +4645,14 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-    if ( ! YY_CURRENT_BUFFER ){
+	if ( ! YY_CURRENT_BUFFER ){
         yyensure_buffer_stack (yyscanner);
-        YY_CURRENT_BUFFER_LVALUE =
+		YY_CURRENT_BUFFER_LVALUE =
             yy_create_buffer(yyin,YY_BUF_SIZE ,yyscanner);
-    }
+	}
 
-    yy_init_buffer(YY_CURRENT_BUFFER,input_file ,yyscanner);
-    yy_load_buffer_state(yyscanner );
+	yy_init_buffer(YY_CURRENT_BUFFER,input_file ,yyscanner);
+	yy_load_buffer_state(yyscanner );
 }
 
 /** Switch to a different input buffer.
@@ -4580,41 +4663,41 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-    /* TODO. We should be able to replace this entire function body
-     * with
-     *      yypop_buffer_state();
-     *      yypush_buffer_state(new_buffer);
+	/* TODO. We should be able to replace this entire function body
+	 * with
+	 *		yypop_buffer_state();
+	 *		yypush_buffer_state(new_buffer);
      */
-    yyensure_buffer_stack (yyscanner);
-    if ( YY_CURRENT_BUFFER == new_buffer )
-        return;
+	yyensure_buffer_stack (yyscanner);
+	if ( YY_CURRENT_BUFFER == new_buffer )
+		return;
 
-    if ( YY_CURRENT_BUFFER )
-        {
-        /* Flush out information for old buffer. */
-        *yyg->yy_c_buf_p = yyg->yy_hold_char;
-        YY_CURRENT_BUFFER_LVALUE->yy_buf_pos = yyg->yy_c_buf_p;
-        YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
-        }
+	if ( YY_CURRENT_BUFFER )
+		{
+		/* Flush out information for old buffer. */
+		*yyg->yy_c_buf_p = yyg->yy_hold_char;
+		YY_CURRENT_BUFFER_LVALUE->yy_buf_pos = yyg->yy_c_buf_p;
+		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
+		}
 
-    YY_CURRENT_BUFFER_LVALUE = new_buffer;
-    yy_load_buffer_state(yyscanner );
+	YY_CURRENT_BUFFER_LVALUE = new_buffer;
+	yy_load_buffer_state(yyscanner );
 
-    /* We don't actually know whether we did this switch during
-     * EOF (yywrap()) processing, but the only time this flag
-     * is looked at is after yywrap() is called, so it's safe
-     * to go ahead and always set it.
-     */
-    yyg->yy_did_buffer_switch_on_eof = 1;
+	/* We don't actually know whether we did this switch during
+	 * EOF (yywrap()) processing, but the only time this flag
+	 * is looked at is after yywrap() is called, so it's safe
+	 * to go ahead and always set it.
+	 */
+	yyg->yy_did_buffer_switch_on_eof = 1;
 }
 
 static void yy_load_buffer_state  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    yyg->yy_n_chars = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
-    yyg->yytext_ptr = yyg->yy_c_buf_p = YY_CURRENT_BUFFER_LVALUE->yy_buf_pos;
-    yyin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
-    yyg->yy_hold_char = *yyg->yy_c_buf_p;
+	yyg->yy_n_chars = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
+	yyg->yytext_ptr = yyg->yy_c_buf_p = YY_CURRENT_BUFFER_LVALUE->yy_buf_pos;
+	yyin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
+	yyg->yy_hold_char = *yyg->yy_c_buf_p;
 }
 
 /** Allocate and initialize an input buffer state.
@@ -4625,26 +4708,26 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
  */
     YY_BUFFER_STATE yy_create_buffer  (FILE * file, int  size , yyscan_t yyscanner)
 {
-    YY_BUFFER_STATE b;
+	YY_BUFFER_STATE b;
+    
+	b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state ) ,yyscanner );
+	if ( ! b )
+		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-    b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state ) ,yyscanner );
-    if ( ! b )
-        YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
+	b->yy_buf_size = size;
 
-    b->yy_buf_size = size;
+	/* yy_ch_buf has to be 2 characters longer than the size given because
+	 * we need to put in 2 end-of-buffer characters.
+	 */
+	b->yy_ch_buf = (char *) yyalloc(b->yy_buf_size + 2 ,yyscanner );
+	if ( ! b->yy_ch_buf )
+		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-    /* yy_ch_buf has to be 2 characters longer than the size given because
-     * we need to put in 2 end-of-buffer characters.
-     */
-    b->yy_ch_buf = (char *) yyalloc(b->yy_buf_size + 2 ,yyscanner );
-    if ( ! b->yy_ch_buf )
-        YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
+	b->yy_is_our_buffer = 1;
 
-    b->yy_is_our_buffer = 1;
+	yy_init_buffer(b,file ,yyscanner);
 
-    yy_init_buffer(b,file ,yyscanner);
-
-    return b;
+	return b;
 }
 
 /** Destroy the buffer.
@@ -4655,16 +4738,16 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-    if ( ! b )
-        return;
+	if ( ! b )
+		return;
 
-    if ( b == YY_CURRENT_BUFFER ) /* Not sure if we should pop here. */
-        YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE) 0;
+	if ( b == YY_CURRENT_BUFFER ) /* Not sure if we should pop here. */
+		YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE) 0;
 
-    if ( b->yy_is_our_buffer )
-        yyfree((void *) b->yy_ch_buf ,yyscanner );
+	if ( b->yy_is_our_buffer )
+		yyfree((void *) b->yy_ch_buf ,yyscanner );
 
-    yyfree((void *) b ,yyscanner );
+	yyfree((void *) b ,yyscanner );
 }
 
 /* Initializes or reinitializes a buffer.
@@ -4674,13 +4757,13 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
     static void yy_init_buffer  (YY_BUFFER_STATE  b, FILE * file , yyscan_t yyscanner)
 
 {
-    int oerrno = errno;
+	int oerrno = errno;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-    yy_flush_buffer(b ,yyscanner);
+	yy_flush_buffer(b ,yyscanner);
 
-    b->yy_input_file = file;
-    b->yy_fill_buffer = 1;
+	b->yy_input_file = file;
+	b->yy_fill_buffer = 1;
 
     /* If b is the current buffer, then yy_init_buffer was _probably_
      * called from yyrestart() or through yy_get_next_buffer.
@@ -4692,8 +4775,8 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
     }
 
         b->yy_is_interactive = 0;
-
-    errno = oerrno;
+    
+	errno = oerrno;
 }
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
@@ -4703,25 +4786,25 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
     void yy_flush_buffer (YY_BUFFER_STATE  b , yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    if ( ! b )
-        return;
+	if ( ! b )
+		return;
 
-    b->yy_n_chars = 0;
+	b->yy_n_chars = 0;
 
-    /* We always need two end-of-buffer characters.  The first causes
-     * a transition to the end-of-buffer state.  The second causes
-     * a jam in that state.
-     */
-    b->yy_ch_buf[0] = YY_END_OF_BUFFER_CHAR;
-    b->yy_ch_buf[1] = YY_END_OF_BUFFER_CHAR;
+	/* We always need two end-of-buffer characters.  The first causes
+	 * a transition to the end-of-buffer state.  The second causes
+	 * a jam in that state.
+	 */
+	b->yy_ch_buf[0] = YY_END_OF_BUFFER_CHAR;
+	b->yy_ch_buf[1] = YY_END_OF_BUFFER_CHAR;
 
-    b->yy_buf_pos = &b->yy_ch_buf[0];
+	b->yy_buf_pos = &b->yy_ch_buf[0];
 
-    b->yy_at_bol = 1;
-    b->yy_buffer_status = YY_BUFFER_NEW;
+	b->yy_at_bol = 1;
+	b->yy_buffer_status = YY_BUFFER_NEW;
 
-    if ( b == YY_CURRENT_BUFFER )
-        yy_load_buffer_state(yyscanner );
+	if ( b == YY_CURRENT_BUFFER )
+		yy_load_buffer_state(yyscanner );
 }
 
 /** Pushes the new state onto the stack. The new state becomes
@@ -4733,28 +4816,28 @@ static void yy_load_buffer_state  (yyscan_t yyscanner)
 void yypush_buffer_state (YY_BUFFER_STATE new_buffer , yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    if (new_buffer == NULL)
-        return;
+	if (new_buffer == NULL)
+		return;
 
-    yyensure_buffer_stack(yyscanner);
+	yyensure_buffer_stack(yyscanner);
 
-    /* This block is copied from yy_switch_to_buffer. */
-    if ( YY_CURRENT_BUFFER )
-        {
-        /* Flush out information for old buffer. */
-        *yyg->yy_c_buf_p = yyg->yy_hold_char;
-        YY_CURRENT_BUFFER_LVALUE->yy_buf_pos = yyg->yy_c_buf_p;
-        YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
-        }
+	/* This block is copied from yy_switch_to_buffer. */
+	if ( YY_CURRENT_BUFFER )
+		{
+		/* Flush out information for old buffer. */
+		*yyg->yy_c_buf_p = yyg->yy_hold_char;
+		YY_CURRENT_BUFFER_LVALUE->yy_buf_pos = yyg->yy_c_buf_p;
+		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
+		}
 
-    /* Only push if top exists. Otherwise, replace top. */
-    if (YY_CURRENT_BUFFER)
-        yyg->yy_buffer_stack_top++;
-    YY_CURRENT_BUFFER_LVALUE = new_buffer;
+	/* Only push if top exists. Otherwise, replace top. */
+	if (YY_CURRENT_BUFFER)
+		yyg->yy_buffer_stack_top++;
+	YY_CURRENT_BUFFER_LVALUE = new_buffer;
 
-    /* copied from yy_switch_to_buffer. */
-    yy_load_buffer_state(yyscanner );
-    yyg->yy_did_buffer_switch_on_eof = 1;
+	/* copied from yy_switch_to_buffer. */
+	yy_load_buffer_state(yyscanner );
+	yyg->yy_did_buffer_switch_on_eof = 1;
 }
 
 /** Removes and deletes the top of the stack, if present.
@@ -4764,18 +4847,18 @@ void yypush_buffer_state (YY_BUFFER_STATE new_buffer , yyscan_t yyscanner)
 void yypop_buffer_state (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    if (!YY_CURRENT_BUFFER)
-        return;
+	if (!YY_CURRENT_BUFFER)
+		return;
 
-    yy_delete_buffer(YY_CURRENT_BUFFER ,yyscanner);
-    YY_CURRENT_BUFFER_LVALUE = NULL;
-    if (yyg->yy_buffer_stack_top > 0)
-        --yyg->yy_buffer_stack_top;
+	yy_delete_buffer(YY_CURRENT_BUFFER ,yyscanner);
+	YY_CURRENT_BUFFER_LVALUE = NULL;
+	if (yyg->yy_buffer_stack_top > 0)
+		--yyg->yy_buffer_stack_top;
 
-    if (YY_CURRENT_BUFFER) {
-        yy_load_buffer_state(yyscanner );
-        yyg->yy_did_buffer_switch_on_eof = 1;
-    }
+	if (YY_CURRENT_BUFFER) {
+		yy_load_buffer_state(yyscanner );
+		yyg->yy_did_buffer_switch_on_eof = 1;
+	}
 }
 
 /* Allocates the stack if it does not exist.
@@ -4783,82 +4866,82 @@ void yypop_buffer_state (yyscan_t yyscanner)
  */
 static void yyensure_buffer_stack (yyscan_t yyscanner)
 {
-    int num_to_alloc;
+	int num_to_alloc;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-    if (!yyg->yy_buffer_stack) {
+	if (!yyg->yy_buffer_stack) {
 
-        /* First allocation is just for 2 elements, since we don't know if this
-         * scanner will even need a stack. We use 2 instead of 1 to avoid an
-         * immediate realloc on the next call.
+		/* First allocation is just for 2 elements, since we don't know if this
+		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
+		 * immediate realloc on the next call.
          */
-        num_to_alloc = 1;
-        yyg->yy_buffer_stack = (struct yy_buffer_state**)yyalloc
-                                (num_to_alloc * sizeof(struct yy_buffer_state*)
-                                , yyscanner);
+		num_to_alloc = 1;
+		yyg->yy_buffer_stack = (struct yy_buffer_state**)yyalloc
+								(num_to_alloc * sizeof(struct yy_buffer_state*)
+								, yyscanner);
+		
+		memset(yyg->yy_buffer_stack, 0, num_to_alloc * sizeof(struct yy_buffer_state*));
+				
+		yyg->yy_buffer_stack_max = num_to_alloc;
+		yyg->yy_buffer_stack_top = 0;
+		return;
+	}
 
-        memset(yyg->yy_buffer_stack, 0, num_to_alloc * sizeof(struct yy_buffer_state*));
+	if (yyg->yy_buffer_stack_top >= (yyg->yy_buffer_stack_max) - 1){
 
-        yyg->yy_buffer_stack_max = num_to_alloc;
-        yyg->yy_buffer_stack_top = 0;
-        return;
-    }
+		/* Increase the buffer to prepare for a possible push. */
+		int grow_size = 8 /* arbitrary grow size */;
 
-    if (yyg->yy_buffer_stack_top >= (yyg->yy_buffer_stack_max) - 1){
+		num_to_alloc = yyg->yy_buffer_stack_max + grow_size;
+		yyg->yy_buffer_stack = (struct yy_buffer_state**)yyrealloc
+								(yyg->yy_buffer_stack,
+								num_to_alloc * sizeof(struct yy_buffer_state*)
+								, yyscanner);
 
-        /* Increase the buffer to prepare for a possible push. */
-        int grow_size = 8 /* arbitrary grow size */;
-
-        num_to_alloc = yyg->yy_buffer_stack_max + grow_size;
-        yyg->yy_buffer_stack = (struct yy_buffer_state**)yyrealloc
-                                (yyg->yy_buffer_stack,
-                                num_to_alloc * sizeof(struct yy_buffer_state*)
-                                , yyscanner);
-
-        /* zero only the new slots.*/
-        memset(yyg->yy_buffer_stack + yyg->yy_buffer_stack_max, 0, grow_size * sizeof(struct yy_buffer_state*));
-        yyg->yy_buffer_stack_max = num_to_alloc;
-    }
+		/* zero only the new slots.*/
+		memset(yyg->yy_buffer_stack + yyg->yy_buffer_stack_max, 0, grow_size * sizeof(struct yy_buffer_state*));
+		yyg->yy_buffer_stack_max = num_to_alloc;
+	}
 }
 
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
  * @param yyscanner The scanner object.
- * @return the newly allocated buffer state object.
+ * @return the newly allocated buffer state object. 
  */
 YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscanner)
 {
-    YY_BUFFER_STATE b;
+	YY_BUFFER_STATE b;
+    
+	if ( size < 2 ||
+	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
+	     base[size-1] != YY_END_OF_BUFFER_CHAR )
+		/* They forgot to leave room for the EOB's. */
+		return 0;
 
-    if ( size < 2 ||
-         base[size-2] != YY_END_OF_BUFFER_CHAR ||
-         base[size-1] != YY_END_OF_BUFFER_CHAR )
-        /* They forgot to leave room for the EOB's. */
-        return 0;
+	b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state ) ,yyscanner );
+	if ( ! b )
+		YY_FATAL_ERROR( "out of dynamic memory in yy_scan_buffer()" );
 
-    b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state ) ,yyscanner );
-    if ( ! b )
-        YY_FATAL_ERROR( "out of dynamic memory in yy_scan_buffer()" );
+	b->yy_buf_size = size - 2;	/* "- 2" to take care of EOB's */
+	b->yy_buf_pos = b->yy_ch_buf = base;
+	b->yy_is_our_buffer = 0;
+	b->yy_input_file = 0;
+	b->yy_n_chars = b->yy_buf_size;
+	b->yy_is_interactive = 0;
+	b->yy_at_bol = 1;
+	b->yy_fill_buffer = 0;
+	b->yy_buffer_status = YY_BUFFER_NEW;
 
-    b->yy_buf_size = size - 2;  /* "- 2" to take care of EOB's */
-    b->yy_buf_pos = b->yy_ch_buf = base;
-    b->yy_is_our_buffer = 0;
-    b->yy_input_file = 0;
-    b->yy_n_chars = b->yy_buf_size;
-    b->yy_is_interactive = 0;
-    b->yy_at_bol = 1;
-    b->yy_fill_buffer = 0;
-    b->yy_buffer_status = YY_BUFFER_NEW;
+	yy_switch_to_buffer(b ,yyscanner );
 
-    yy_switch_to_buffer(b ,yyscanner );
-
-    return b;
+	return b;
 }
 
 /** Setup the input buffer state to scan a string. The next call to yylex() will
  * scan from a @e copy of @a str.
- * @param str a NUL-terminated string to scan
+ * @param yystr a NUL-terminated string to scan
  * @param yyscanner The scanner object.
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
@@ -4866,8 +4949,8 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscann
  */
 YY_BUFFER_STATE yy_scan_string (yyconst char * yystr , yyscan_t yyscanner)
 {
-
-    return yy_scan_bytes(yystr,strlen(yystr) ,yyscanner);
+    
+	return yy_scan_bytes(yystr,strlen(yystr) ,yyscanner);
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
@@ -4879,73 +4962,73 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr , yyscan_t yyscanner)
  */
 YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len , yyscan_t yyscanner)
 {
-    YY_BUFFER_STATE b;
-    char *buf;
-    yy_size_t n;
-    int i;
+	YY_BUFFER_STATE b;
+	char *buf;
+	yy_size_t n;
+	int i;
+    
+	/* Get memory for full buffer, including space for trailing EOB's. */
+	n = _yybytes_len + 2;
+	buf = (char *) yyalloc(n ,yyscanner );
+	if ( ! buf )
+		YY_FATAL_ERROR( "out of dynamic memory in yy_scan_bytes()" );
 
-    /* Get memory for full buffer, including space for trailing EOB's. */
-    n = _yybytes_len + 2;
-    buf = (char *) yyalloc(n ,yyscanner );
-    if ( ! buf )
-        YY_FATAL_ERROR( "out of dynamic memory in yy_scan_bytes()" );
+	for ( i = 0; i < _yybytes_len; ++i )
+		buf[i] = yybytes[i];
 
-    for ( i = 0; i < _yybytes_len; ++i )
-        buf[i] = yybytes[i];
+	buf[_yybytes_len] = buf[_yybytes_len+1] = YY_END_OF_BUFFER_CHAR;
 
-    buf[_yybytes_len] = buf[_yybytes_len+1] = YY_END_OF_BUFFER_CHAR;
+	b = yy_scan_buffer(buf,n ,yyscanner);
+	if ( ! b )
+		YY_FATAL_ERROR( "bad buffer in yy_scan_bytes()" );
 
-    b = yy_scan_buffer(buf,n ,yyscanner);
-    if ( ! b )
-        YY_FATAL_ERROR( "bad buffer in yy_scan_bytes()" );
+	/* It's okay to grow etc. this buffer, and we should throw it
+	 * away when we're done.
+	 */
+	b->yy_is_our_buffer = 1;
 
-    /* It's okay to grow etc. this buffer, and we should throw it
-     * away when we're done.
-     */
-    b->yy_is_our_buffer = 1;
-
-    return b;
+	return b;
 }
 
     static void yy_push_state (int  new_state , yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    if ( yyg->yy_start_stack_ptr >= yyg->yy_start_stack_depth )
-        {
-        yy_size_t new_size;
+	if ( yyg->yy_start_stack_ptr >= yyg->yy_start_stack_depth )
+		{
+		yy_size_t new_size;
 
-        yyg->yy_start_stack_depth += YY_START_STACK_INCR;
-        new_size = yyg->yy_start_stack_depth * sizeof( int );
+		yyg->yy_start_stack_depth += YY_START_STACK_INCR;
+		new_size = yyg->yy_start_stack_depth * sizeof( int );
 
-        if ( ! yyg->yy_start_stack )
-            yyg->yy_start_stack = (int *) yyalloc(new_size ,yyscanner );
+		if ( ! yyg->yy_start_stack )
+			yyg->yy_start_stack = (int *) yyalloc(new_size ,yyscanner );
 
-        else
-            yyg->yy_start_stack = (int *) yyrealloc((void *) yyg->yy_start_stack,new_size ,yyscanner );
+		else
+			yyg->yy_start_stack = (int *) yyrealloc((void *) yyg->yy_start_stack,new_size ,yyscanner );
 
-        if ( ! yyg->yy_start_stack )
-            YY_FATAL_ERROR(
-            "out of memory expanding start-condition stack" );
-        }
+		if ( ! yyg->yy_start_stack )
+			YY_FATAL_ERROR(
+			"out of memory expanding start-condition stack" );
+		}
 
-    yyg->yy_start_stack[yyg->yy_start_stack_ptr++] = YY_START;
+	yyg->yy_start_stack[yyg->yy_start_stack_ptr++] = YY_START;
 
-    BEGIN(new_state);
+	BEGIN(new_state);
 }
 
     static void yy_pop_state  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    if ( --yyg->yy_start_stack_ptr < 0 )
-        YY_FATAL_ERROR( "start-condition stack underflow" );
+	if ( --yyg->yy_start_stack_ptr < 0 )
+		YY_FATAL_ERROR( "start-condition stack underflow" );
 
-    BEGIN(yyg->yy_start_stack[yyg->yy_start_stack_ptr]);
+	BEGIN(yyg->yy_start_stack[yyg->yy_start_stack_ptr]);
 }
 
     static int yy_top_state  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    return yyg->yy_start_stack[yyg->yy_start_stack_ptr - 1];
+	return yyg->yy_start_stack[yyg->yy_start_stack_ptr - 1];
 }
 
 #ifndef YY_EXIT_FAILURE
@@ -4954,26 +5037,26 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len , yysc
 
 static void yy_fatal_error (yyconst char* msg , yyscan_t yyscanner)
 {
-        (void) fprintf( stderr, "%s\n", msg );
-    exit( YY_EXIT_FAILURE );
+    	(void) fprintf( stderr, "%s\n", msg );
+	exit( YY_EXIT_FAILURE );
 }
 
 /* Redefine yyless() so it works in section 3 code. */
 
 #undef yyless
 #define yyless(n) \
-    do \
-        { \
-        /* Undo effects of setting up yytext. */ \
+	do \
+		{ \
+		/* Undo effects of setting up yytext. */ \
         int yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
-        yytext[yyleng] = yyg->yy_hold_char; \
-        yyg->yy_c_buf_p = yytext + yyless_macro_arg; \
-        yyg->yy_hold_char = *yyg->yy_c_buf_p; \
-        *yyg->yy_c_buf_p = '\0'; \
-        yyleng = yyless_macro_arg; \
-        } \
-    while ( 0 )
+		yytext[yyleng] = yyg->yy_hold_char; \
+		yyg->yy_c_buf_p = yytext + yyless_macro_arg; \
+		yyg->yy_hold_char = *yyg->yy_c_buf_p; \
+		*yyg->yy_c_buf_p = '\0'; \
+		yyleng = yyless_macro_arg; \
+		} \
+	while ( 0 )
 
 /* Accessor  methods (get/set functions) to struct members. */
 
@@ -4992,10 +5075,10 @@ YY_EXTRA_TYPE yyget_extra  (yyscan_t yyscanner)
 int yyget_lineno  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-
+    
         if (! YY_CURRENT_BUFFER)
             return 0;
-
+    
     return yylineno;
 }
 
@@ -5005,10 +5088,10 @@ int yyget_lineno  (yyscan_t yyscanner)
 int yyget_column  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-
+    
         if (! YY_CURRENT_BUFFER)
             return 0;
-
+    
     return yycolumn;
 }
 
@@ -5069,8 +5152,8 @@ void yyset_lineno (int  line_number , yyscan_t yyscanner)
 
         /* lineno is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yyset_lineno called with no buffer" , yyscanner);
-
+           yy_fatal_error( "yyset_lineno called with no buffer" , yyscanner); 
+    
     yylineno = line_number;
 }
 
@@ -5084,8 +5167,8 @@ void yyset_column (int  column_no , yyscan_t yyscanner)
 
         /* column is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yyset_column called with no buffer" , yyscanner);
-
+           yy_fatal_error( "yyset_column called with no buffer" , yyscanner); 
+    
     yycolumn = column_no;
 }
 
@@ -5188,15 +5271,15 @@ int yylex_destroy  (yyscan_t yyscanner)
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
     /* Pop the buffer stack, destroying each element. */
-    while(YY_CURRENT_BUFFER){
-        yy_delete_buffer(YY_CURRENT_BUFFER ,yyscanner );
-        YY_CURRENT_BUFFER_LVALUE = NULL;
-        yypop_buffer_state(yyscanner);
-    }
+	while(YY_CURRENT_BUFFER){
+		yy_delete_buffer(YY_CURRENT_BUFFER ,yyscanner );
+		YY_CURRENT_BUFFER_LVALUE = NULL;
+		yypop_buffer_state(yyscanner);
+	}
 
-    /* Destroy the stack itself. */
-    yyfree(yyg->yy_buffer_stack ,yyscanner);
-    yyg->yy_buffer_stack = NULL;
+	/* Destroy the stack itself. */
+	yyfree(yyg->yy_buffer_stack ,yyscanner);
+	yyg->yy_buffer_stack = NULL;
 
     /* Destroy the start condition stack. */
         yyfree(yyg->yy_start_stack ,yyscanner );
@@ -5219,48 +5302,48 @@ int yylex_destroy  (yyscan_t yyscanner)
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char* s1, yyconst char * s2, int n , yyscan_t yyscanner)
 {
-    register int i;
-    for ( i = 0; i < n; ++i )
-        s1[i] = s2[i];
+	register int i;
+	for ( i = 0; i < n; ++i )
+		s1[i] = s2[i];
 }
 #endif
 
 #ifdef YY_NEED_STRLEN
 static int yy_flex_strlen (yyconst char * s , yyscan_t yyscanner)
 {
-    register int n;
-    for ( n = 0; s[n]; ++n )
-        ;
+	register int n;
+	for ( n = 0; s[n]; ++n )
+		;
 
-    return n;
+	return n;
 }
 #endif
 
 void *yyalloc (yy_size_t  size , yyscan_t yyscanner)
 {
-    return (void *) malloc( size );
+	return (void *) malloc( size );
 }
 
 void *yyrealloc  (void * ptr, yy_size_t  size , yyscan_t yyscanner)
 {
-    /* The cast to (char *) in the following accommodates both
-     * implementations that use char* generic pointers, and those
-     * that use void* generic pointers.  It works with the latter
-     * because both ANSI C and C++ allow castless assignment from
-     * any pointer type to void*, and deal with argument conversions
-     * as though doing an assignment.
-     */
-    return (void *) realloc( (char *) ptr, size );
+	/* The cast to (char *) in the following accommodates both
+	 * implementations that use char* generic pointers, and those
+	 * that use void* generic pointers.  It works with the latter
+	 * because both ANSI C and C++ allow castless assignment from
+	 * any pointer type to void*, and deal with argument conversions
+	 * as though doing an assignment.
+	 */
+	return (void *) realloc( (char *) ptr, size );
 }
 
 void yyfree (void * ptr , yyscan_t yyscanner)
 {
-    free( (char *) ptr );   /* see yyrealloc() for (char *) cast */
+	free( (char *) ptr );	/* see yyrealloc() for (char *) cast */
 }
 
 #define YYTABLES_NAME "yytables"
 
-#line 626 "compilers/imcc/imcc.l"
+#line 720 "compilers/imcc/imcc.l"
 
 
 
@@ -5270,10 +5353,9 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 int yywrap(void* yyscanner) {
     /* Add code here to open next source file and start scanning
-     * yywrap returns 0 if scanning is to continue
-     */
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    Interp* interp = yyget_extra(yyscanner);
+     * yywrap returns 0 if scanning is to continue */
+    yyguts_t *yyg    = (yyguts_t *)yyscanner;
+    Interp   *interp = yyget_extra(yyscanner);
 
     if (!interp) {
         fprintf(stderr, "Argh, interp not found\n");
@@ -5293,8 +5375,8 @@ int yywrap(void* yyscanner) {
     return 1;
 }
 
-static struct macro_frame_t *
-new_frame(Interp* interp) {
+static macro_frame_t *
+new_frame(Interp *interp) {
     static int label   = 0;
     macro_frame_t *tmp = mem_allocate_zeroed_typed(macro_frame_t);
 
@@ -5314,13 +5396,13 @@ new_frame(Interp* interp) {
 }
 
 static void
-scan_string(struct macro_frame_t *frame, const char *expansion, void *yyscanner)
+scan_string(macro_frame_t *frame, const char *expansion, void *yyscanner)
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    Interp *interp = yyget_extra(yyscanner);
+    yyguts_t *yyg             = (yyguts_t *)yyscanner;
+    Interp   *interp          = yyget_extra(yyscanner);
 
-    frame->buffer = YY_CURRENT_BUFFER;
-    frame->s.next = (struct parser_state_t*) IMCC_INFO(interp)->frames;
+    frame->buffer             = YY_CURRENT_BUFFER;
+    frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
     IMCC_INFO(interp)->frames = frame;
 
     yy_scan_string(expansion,yyscanner);
@@ -5329,10 +5411,10 @@ scan_string(struct macro_frame_t *frame, const char *expansion, void *yyscanner)
 static int
 destroy_frame(struct macro_frame_t *frame, void *yyscanner)
 {
-    YY_BUFFER_STATE buffer;
-    int i, ret = 0;
+    YY_BUFFER_STATE buffer = frame->buffer;
+    int             ret    = 0;
+    int             i;
 
-    buffer = frame->buffer;
 
     for (i = 0; i < frame->expansion.num_param; i++) {
         free(frame->expansion.name[i]);
@@ -5342,8 +5424,8 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
         mem_sys_free(frame->heredoc_rest);
     else
         ret = frame->s.line;
-    /* RT#42383 if frame->s.file was allocated free it */
 
+    /* RT #42383 if frame->s.file was allocated free it */
     mem_sys_free(frame);
 
     if (buffer != NULL)
@@ -5355,9 +5437,9 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
 static int
 yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip, void *yyscanner)
 {
-    int c;
+    int         c;
     const char *p;
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
+    yyguts_t   *yyg = (yyguts_t *)yyscanner;
 
     do {
         c = yylex(valp,yyscanner,interp);
@@ -5365,6 +5447,7 @@ yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip, void *yyscanner)
 
         while (*p && c != *p)
             p++;
+
     } while (*p != '\0');
 
     if (c)
@@ -5377,15 +5460,18 @@ static char*
 read_braced(YYSTYPE *valp, Interp *interp, const char *macro_name,
              char *current, void *yyscanner)
 {
-    int c, count, len;
     YYSTYPE val;
+    int     len   = strlen(current);
+    int     c     = yylex(&val,yyscanner,interp);
+    int     count = 0;
 
-    len = strlen(current);
-    c = yylex(&val,yyscanner,interp);
-    count = 0;
     while (c != '}' || count > 0) {
-        if (c == '}')      count--;
-        else if (c == '{') count++;
+
+        if (c == '}')
+            count--;
+        else if (c == '{')
+            count++;
+
         if (c <= 0)
             IMCC_fataly(interp, E_SyntaxError,
                         "End of file reached while reading arguments in '%s'",
@@ -5411,20 +5497,19 @@ static int
 read_params(YYSTYPE *valp, Interp *interp, params_t *params,
              const char *macro_name, int need_id, void *yyscanner)
 {
-    int c;
-    YYSTYPE val;
-    char *current = str_dup("");
-    int len = 0;
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
+    YYSTYPE  val;
+    int      len      = 0;
+    char    *current  = str_dup("");
+    yyguts_t *yyg     = (yyguts_t *)yyscanner;
+    int      c        = yylex_skip(&val, interp, " \n", yyscanner);
 
     params->num_param = 0;
-    c = yylex_skip(&val, interp, " \n", yyscanner);
 
     while (c != ')') {
         if (YYSTATE == heredoc2)
             IMCC_fataly(interp, E_SyntaxError,
-                        "Heredoc in macro '%s' not allowed",
-                        macro_name);
+                        "Heredoc in macro '%s' not allowed", macro_name);
+
         if (c <= 0)
             IMCC_fataly(interp, E_SyntaxError,
                         "End of file reached while reading arguments in '%s'",
@@ -5434,9 +5519,11 @@ read_params(YYSTYPE *valp, Interp *interp, params_t *params,
                 IMCC_fataly(interp, E_SyntaxError,
                             "More then %d params in '%s'",
                             MAX_PARAM, macro_name);
+
             params->name[params->num_param++] = current;
-            current = str_dup("");
-            len = 0;
+            current                           = str_dup("");
+            len                               = 0;
+
             c = yylex_skip(&val, interp, " \n", yyscanner);
         }
         else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
@@ -5446,7 +5533,7 @@ read_params(YYSTYPE *valp, Interp *interp, params_t *params,
         }
         else if (c == '{') {
             current = read_braced(&val, interp, macro_name, current, yyscanner);
-            c = yylex_skip(&val, interp, " \n", yyscanner);
+            c       = yylex_skip(&val, interp, " \n", yyscanner);
         }
         else {
             if (!need_id || c != ' ') {
@@ -5454,10 +5541,12 @@ read_params(YYSTYPE *valp, Interp *interp, params_t *params,
                 current  = (char *)realloc(current, len + 1);
                 strcat(current, val.s);
             }
+
             free(val.s);
             c = yylex(&val,yyscanner,interp);
         }
     }
+
     params->name[params->num_param++] = current;
 
     if (valp)
@@ -5471,23 +5560,23 @@ read_params(YYSTYPE *valp, Interp *interp, params_t *params,
 static int
 read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
 {
-    int c;
-    int start_cond, start_line;
-    params_t params;
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
+    int       c, start_line;
+    params_t  params;
+    yyguts_t *yyg        = (yyguts_t *)yyscanner;
+    int       start_cond = YY_START;
 
-    IMCC_INFO(interp)->temp_buffer[0]='\0';
+    IMCC_INFO(interp)->temp_buffer[0] = '\0';
 
-    start_cond = YY_START;
     BEGIN(macro);
 
     c = yylex_skip(valp, interp, " ", yyscanner);
+
     if (c != IDENTIFIER)
-        IMCC_fataly(interp, E_SyntaxError,
-                    "Macro names must be identifiers");
+        IMCC_fataly(interp, E_SyntaxError, "Macro names must be identifiers");
 
     IMCC_INFO(interp)->cur_macro_name = valp->s;
-    start_line = IMCC_INFO(interp)->line++;
+    start_line                        = IMCC_INFO(interp)->line++;
+
     memset(&params, 0, sizeof (params_t));
 
     /* white space is allowed between macro and opening paren) */
@@ -5519,12 +5608,14 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
 
         c = yylex(valp,yyscanner,interp);
     }
+
     free(valp->s);
 
     BEGIN(start_cond);
 
     define_macro(interp, IMCC_INFO(interp)->cur_macro_name,
                  &params, str_dup(IMCC_INFO(interp)->temp_buffer), start_line);
+
     IMCC_INFO(interp)->cur_macro_name = NULL;
 
     return MACRO;
@@ -5533,15 +5624,14 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
 static char *
 find_macro_param(Interp *interp, const char *name)
 {
-    struct macro_frame_t *f;
-    int i;
+    macro_frame_t *f;
 
-    for (f = IMCC_INFO(interp)->frames; f; f = (struct macro_frame_t*)f->s.next) {
+    for (f = IMCC_INFO(interp)->frames; f; f = (macro_frame_t *)f->s.next) {
         if (f->params) {
+            int i;
             for (i = 0; i < f->params->num_param; i++) {
-                if (strcmp(f->params->name[i], name) == 0) {
+                if (strcmp(f->params->name[i], name) == 0)
                     return f->expansion.name[i];
-                }
             }
         }
     }
@@ -5553,9 +5643,7 @@ static void
 define_macro(Interp *interp, char *name, params_t *params,
              char *expansion, int start_line)
 {
-    macro_t *m;
-
-    m = find_macro(interp, name);
+    macro_t *m = find_macro(interp, name);
 
     if (m) {
         mem_sys_free(name);
@@ -5574,8 +5662,9 @@ define_macro(Interp *interp, char *name, params_t *params,
         m->params = *params;
     else
         memset(&m->params, 0, sizeof (params_t));
+
     m->expansion = expansion;
-    m->line = start_line;
+    m->line      = start_line;
 }
 
 static macro_t *
@@ -5593,22 +5682,15 @@ find_macro(Interp *interp, const char *name)
 static int
 expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
 {
-    int c;
-    struct macro_frame_t *frame;
-    macro_t *m;
-    const char *expansion;
-    int start_cond;
-    int i;
-    char *current;
-    char *s;
-    int len;
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
+    yyguts_t   *yyg       = (yyguts_t *)yyscanner;
+    const char *expansion = find_macro_param(interp, name);
+    macro_t    *m;
 
     UNUSED(valp);
 
-    expansion = find_macro_param(interp, name);
     if (expansion) {
-        frame = new_frame(interp);
+        macro_frame_t *frame = new_frame(interp);
+
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
         scan_string(frame, expansion, yyscanner);
@@ -5617,15 +5699,20 @@ expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
 
     m = find_macro(interp, name);
     if (m) {
-        frame = new_frame(interp);
-        frame->params = &m->params;
+        int            c;
+        int            start_cond;
+        int            i;
+        macro_frame_t *frame = new_frame(interp);
+        frame->params        = &m->params;
+
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
+
         /* remember macro name for error reporting
-        RT#42384 check that all the .file text is malloced / freed
-        */
+        RT #42384 check that all the .file text is malloced / freed */
         frame->s.file = str_dup(name);
-        /* whitespace can be savely ignored */
+
+        /* whitespace can be safely ignored */
         do {
             c = input(yyscanner);
         } while (c == ' ' || c == '\t');
@@ -5659,21 +5746,29 @@ expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
         }
 
         /* expand arguments */
-        for (i = 0; i < frame->expansion.num_param; i ++) {
-            current = frame->expansion.name[i];
-            if (current[0] == '.') { /* parameter of outer macro */
-                s = find_macro_param(interp, current + 1);
+        for (i = 0; i < frame->expansion.num_param; i++) {
+            char *current = frame->expansion.name[i];
+
+            /* parameter of outer macro */
+            if (current[0] == '.') {
+                char *s = find_macro_param(interp, current + 1);
+
                 if (s) {
                     frame->expansion.name[i] = str_dup(s);
                     free(current);
                 }
+
             }
             else {
-                len = strlen(current) - 1;
+                int len = strlen(current) - 1;
+
                 if (len >= 0 && current[len] == '$') { /* local label */
+                    char *s      = (char *)mem_sys_allocate(len + 1 + 10);
                     current[len] = '\0';
-                    s            = (char *)mem_sys_allocate(len + 1 + 10);
-                    sprintf(s, "%s%d", current, IMCC_INFO(interp)->frames->label);
+
+                    sprintf(s, "%s%d", current,
+                        IMCC_INFO(interp)->frames->label);
+
                     frame->expansion.name[i] = s;
                     free(current);
                 }
@@ -5691,27 +5786,26 @@ expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
 static void
 include_file(Interp* interp, char *file_name, void *yyscanner)
 {
-    struct macro_frame_t *frame;
-    FILE *file = 0;
-    char *ext, *s;
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-
-    frame = new_frame(interp);
-    s = Parrot_locate_runtime_file(interp, file_name,
+    char          *ext;
+    FILE          *file  = 0;
+    yyguts_t      *yyg   = (yyguts_t *)yyscanner;
+    macro_frame_t *frame = new_frame(interp);
+    char *s              = Parrot_locate_runtime_file(interp, file_name,
                                    PARROT_RUNTIME_FT_INCLUDE);
-    if (s) {
-        file = fopen(s, "r");
-        mem_sys_free(s);
-        if (!file)
-            IMCC_fataly(interp, E_IOError, strerror(errno));
-    }
-    else
+
+    if (!s)
         IMCC_fataly(interp, E_IOError, strerror(errno));
 
-    frame->s.file = file_name;
-    frame->s.handle = file;
+    file = fopen(s, "r");
+    mem_sys_free(s);
 
-    ext = strrchr(file_name, '.');
+    if (!file)
+        IMCC_fataly(interp, E_IOError, strerror(errno));
+
+    frame->s.file   = file_name;
+    frame->s.handle = file;
+    ext             = strrchr(file_name, '.');
+
     if (ext) {
         if (strcmp(ext, ".pasm") == 0) {
             frame->s.pasm_file = 1;
@@ -5727,50 +5821,53 @@ include_file(Interp* interp, char *file_name, void *yyscanner)
 }
 
 static void
-scan_file(Interp* interp, struct macro_frame_t *frame, FILE *file, void *yyscanner)
+scan_file(Interp *interp, macro_frame_t *frame, FILE *file, void *yyscanner)
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    frame->buffer = YY_CURRENT_BUFFER;
-    frame->s.next = (struct parser_state_t*)IMCC_INFO(interp)->frames;
+    yyguts_t *yyg             = (yyguts_t *)yyscanner;
+    frame->buffer             = YY_CURRENT_BUFFER;
+    frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
     IMCC_INFO(interp)->frames = frame;
-    IMCC_INFO(interp)->state = (struct parser_state_t *) IMCC_INFO(interp)->frames;
+    IMCC_INFO(interp)->state  = (parser_state_t *)IMCC_INFO(interp)->frames;
 
-    IMCC_INFO(interp)->line = 1;
+    IMCC_INFO(interp)->line   = 1;
 
     yy_switch_to_buffer(yy_create_buffer(file,YY_BUF_SIZE,yyscanner),yyscanner);
 }
 
 void
-IMCC_push_parser_state(Interp* interp)
+IMCC_push_parser_state(Interp *interp)
 {
-    struct macro_frame_t *frame;
-
-    frame = new_frame(interp);
-    frame->s.next = (struct parser_state_t*)IMCC_INFO(interp)->frames;
+    macro_frame_t *frame      = new_frame(interp);
+    frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
     IMCC_INFO(interp)->frames = frame;
-    frame->s.line = IMCC_INFO(interp)->line = 1;
-    IMCC_INFO(interp)->state = (struct parser_state_t *) IMCC_INFO(interp)->frames;
+    frame->s.line             = IMCC_INFO(interp)->line
+                              = 1;
+    IMCC_INFO(interp)->state  = (parser_state_t *)IMCC_INFO(interp)->frames;
 }
 
 static void
-pop_parser_state(Interp* interp, void *yyscanner)
+pop_parser_state(Interp *interp, void *yyscanner)
 {
-    int l;
-    struct macro_frame_t *tmp;
-    tmp = IMCC_INFO(interp)->frames;
+    macro_frame_t *tmp = IMCC_INFO(interp)->frames;
     if (tmp) {
+        int l;
         if (tmp->s.handle)
             fclose(tmp->s.handle);
-        IMCC_INFO(interp)->frames = (struct macro_frame_t*) IMCC_INFO(interp)->frames->s.next;
+
+        IMCC_INFO(interp)->frames =
+            (macro_frame_t *)IMCC_INFO(interp)->frames->s.next;
+
         l = destroy_frame(tmp, yyscanner);
+
         if (l)
             IMCC_INFO(interp)->line = l;
     }
-    IMCC_INFO(interp)->state = (struct parser_state_t *) IMCC_INFO(interp)->frames;
+
+    IMCC_INFO(interp)->state = (parser_state_t *)IMCC_INFO(interp)->frames;
 }
 
 void
-IMCC_pop_parser_state(Interp* interp, void *yyscanner)
+IMCC_pop_parser_state(Interp *interp, void *yyscanner)
 {
     pop_parser_state(interp, yyscanner);
 }
@@ -5778,11 +5875,12 @@ IMCC_pop_parser_state(Interp* interp, void *yyscanner)
 void
 compile_file(Interp *interp, FILE *file, void *yyscanner)
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    YY_BUFFER_STATE buffer;
+    yyguts_t        *yyg = (yyguts_t *)yyscanner;
+    YY_BUFFER_STATE  buffer;
 
     IMCC_INFO(interp)->frames->s.next = NULL;
-    buffer = YY_CURRENT_BUFFER;
+    buffer                            = YY_CURRENT_BUFFER;
+
     yy_switch_to_buffer(yy_create_buffer(file,YY_BUF_SIZE,yyscanner),yyscanner);
 
     emit_open(interp, 1, NULL);
@@ -5791,27 +5889,29 @@ compile_file(Interp *interp, FILE *file, void *yyscanner)
         yyparse(yyscanner, interp);
         imc_compile_all_units(interp);
     }
+
     IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
-        IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
+        IMCC_INFO(interp)->error_code = IMCC_FATAL_EXCEPTION;
     }
+
     IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
-        IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
+        IMCC_INFO(interp)->error_code = IMCC_FATALY_EXCEPTION;
     }
+
     IMCC_END_TRY;
 
-    if (buffer != NULL) {
+    if (buffer)
         yy_switch_to_buffer(buffer,yyscanner);
-    }
 }
 
 void
 compile_string(Interp *interp, char *s, void *yyscanner)
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    YY_BUFFER_STATE buffer;
+    yyguts_t        *yyg = (yyguts_t *)yyscanner;
+    YY_BUFFER_STATE  buffer;
 
     IMCC_INFO(interp)->frames->s.next = NULL;
-    buffer = YY_CURRENT_BUFFER;
+    buffer                            = YY_CURRENT_BUFFER;
 
     yy_scan_string(s,yyscanner);
     emit_open(interp, 1, NULL);
@@ -5820,24 +5920,26 @@ compile_string(Interp *interp, char *s, void *yyscanner)
         yyparse(yyscanner, interp);
         imc_compile_all_units(interp);
     }
+
     IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
-        IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
+        IMCC_INFO(interp)->error_code = IMCC_FATAL_EXCEPTION;
     }
+
     IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
-        IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
+        IMCC_INFO(interp)->error_code = IMCC_FATALY_EXCEPTION;
     }
+
     IMCC_END_TRY;
 
-    if (buffer != NULL) {
+    if (buffer)
         yy_switch_to_buffer(buffer,yyscanner);
-    }
 }
 
 void
 IMCC_print_inc(Interp *interp)
 {
-    struct macro_frame_t *f;
-    const char *old;
+    macro_frame_t *f;
+    const char    *old = IMCC_INFO(interp)->frames->s.file;
 
     if (IMCC_INFO(interp)->frames && IMCC_INFO(interp)->frames->is_macro)
         fprintf(stderr, "\n\tin macro '.%s' line %d\n",
@@ -5845,12 +5947,14 @@ IMCC_print_inc(Interp *interp)
     else
         fprintf(stderr, "\n\tin file '%s' line %d\n",
                 IMCC_INFO(interp)->frames->s.file, IMCC_INFO(interp)->line);
-    old = IMCC_INFO(interp)->frames->s.file;
-    for (f = IMCC_INFO(interp)->frames; f; f = (struct macro_frame_t *)f->s.next) {
+
+
+    for (f = IMCC_INFO(interp)->frames; f; f = (macro_frame_t *)f->s.next) {
         if (strcmp(f->s.file, old)) {
             fprintf(stderr, "\tincluded from '%s' line %d\n",
                     f->s.file, f->s.line);
         }
+
         old = f->s.file;
     }
 }
@@ -5859,21 +5963,22 @@ IMCC_print_inc(Interp *interp)
    (since it is defined in a file generated by yacc/bison). */
 FILE* imc_yyin_set(FILE* new_yyin, void *yyscanner)
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    yyg->yyin_r = new_yyin;
+    yyguts_t *yyg = (yyguts_t *)yyscanner;
+    yyg->yyin_r   = new_yyin;
+
     return yyg->yyin_r;
 }
 
 FILE* imc_yyin_get(void *yyscanner)
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
+    yyguts_t *yyg = (yyguts_t *)yyscanner;
     return yyg->yyin_r;
 }
 
 /* return true if scanner is at EOF */
 int at_eof(yyscan_t yyscanner)
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
+    yyguts_t *yyg = (yyguts_t *)yyscanner;
     return yyg->yy_hold_char == '\0';
 }
 
