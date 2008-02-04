@@ -24,3 +24,9 @@ end
 
 print "ok 9\n"; ;
 print "ok 10\n"
+
+module Foo
+    def bar ()
+      print "ok 11\n"
+    end
+end

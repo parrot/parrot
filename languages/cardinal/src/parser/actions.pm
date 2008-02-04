@@ -173,6 +173,14 @@ method while_stmt($/) {
     make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
 }
 
+method module($/) {
+    my $past := PAST::Block.new( $( $<comp_stmt> ), :node($/) );
+    my $name := $( $<module_identifier> );
+    $past.namespace( $name.name() );
+    $past.blocktype('declaration');
+    make $past;
+}
+
 method functiondef($/) {
     my $name := $( $<fname> );
     my $past := PAST::Block.new( :name($name.name()), :blocktype('declaration'), :node($/) );
@@ -187,6 +195,10 @@ method fname($/, $key) {
 
 method identifier($/) {
     make PAST::Var.new( :name(~$<ident>), :scope('package'), :node($/) );
+}
+
+method module_identifier($/) {
+    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
 }
 
 method mrhs($/) {

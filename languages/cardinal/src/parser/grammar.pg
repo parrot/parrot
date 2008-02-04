@@ -156,6 +156,7 @@ rule primary {
     | <if_stmt> {*}        #= if_stmt
     | <while_stmt> {*}     #= while_stmt
     | <unless_stmt> {*}    #= unless_stmt
+    | <module> {*}         #= module
 }
 
 rule if_stmt {
@@ -180,6 +181,13 @@ rule do { 'do' | <term> ['do']? }
 rule unless_stmt {
     'unless' <expr> <.then> <comp_stmt>
     ['else' $<else>=<comp_stmt>]?
+    'end'
+    {*}
+}
+
+rule module {
+    'module' <module_identifier>
+    <comp_stmt>
     'end'
     {*}
 }
@@ -210,6 +218,11 @@ rule array {
 
 token identifier {
     <!reserved_word> <ident> {*}
+}
+
+token module_identifier {
+    <[A..Z]> <ident>
+    {*}
 }
 
 token global {
