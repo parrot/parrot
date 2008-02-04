@@ -183,7 +183,7 @@ The following documents might be useful to learn more:
 
 =item * L<docs/pdds/draft/pdd19_pir.pod>
 
-=item * L<http://dev.perl.org/perl6/doc/design/syn/S05.html>
+=item * F<http://dev.perl.org/perl6/doc/design/syn/S05.html>
 
 =back
 
@@ -191,7 +191,7 @@ The following documents might be useful to learn more:
 
 You can also have a look at some existing languages that are being developed
 using the PCT, all located in the C<languages> subdirectory of Parrot. These
-are: perl6 (commonly referred to as C<Rakudo>), lua (see the C<pct> directory),
+are: perl6 (commonly referred to as C<Rakudo>), lua (see the L<lua/pct> directory),
 ecmascript (a standardized C<JavaScript>), punie (Perl 1 on Parrot), pynie
 (python on Parrot) and cardinal (Ruby on Parrot).
 
