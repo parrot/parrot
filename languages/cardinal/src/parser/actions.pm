@@ -196,9 +196,40 @@ method module($/) {
 
 method functiondef($/) {
     my $name := $( $<fname> );
-    my $past := PAST::Block.new( :name($name.name()), :blocktype('declaration'), :node($/) );
+    my $past := $( $<argdecl> );
+    $past.name($name.name());
     my $body := $( $<comp_stmt> );
     $past.push($body);
+    make $past;
+}
+
+method argdecl($/) {
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    for $<identifier> {
+        my $param := $( $_ );
+        $param.scope('parameter');
+        $past.push($param);
+    }
+    if $<slurpy_param> {
+        $past.push( $( $<slurpy_param>[0] ) );
+    }
+
+    if $<block_param> {
+
+    }
+    make $past;
+}
+
+method slurpy_param($/) {
+    my $past := $( $<identifier> );
+    $past.slurpy(1);
+    $past.scope('parameter');
+    make $past;
+}
+
+method block_param($/) {
+    my $past := $( $<identifier> );
+    # XXX
     make $past;
 }
 

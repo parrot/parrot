@@ -2,7 +2,7 @@
 
 =head1
 
-say.pir -- simple implementation of a say function
+builtin functions for Ruby.
 
 =cut
 
@@ -26,6 +26,14 @@ say.pir -- simple implementation of a say function
 
 .sub 'new' :method
     .param pmc values :slurpy
+    .return (values)
+.end
+
+
+.namespace ["Hash"]
+
+.sub 'new' :method
+    .param pmc values :slurpy :named
     .return (values)
 .end
 

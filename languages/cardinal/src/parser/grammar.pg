@@ -231,7 +231,12 @@ proto 'infix:/' is equal('infix:*')
 proto 'infix:%' is equal('infix:*')
                 is pirop('n_mod')       { ... }
 
-proto 'term:'   is tighter('infix:*')
+proto 'prefix:+' is tighter('infix:*')  { ... }
+proto 'prefix:-' is equal('prefix:+')  { ... }
+proto 'prefix:!' is equal('prefix:+')  { ... }
+proto 'prefix:~' is equal('prefix:+')  { ... }
+
+proto 'term:'   is tighter('prefix:+')
                 is parsed(&primary)     { ... }
 
 
@@ -293,7 +298,23 @@ rule bodystmt {
 }
 
 rule argdecl {
-    '(' ')'
+    ['('
+    [ <identifier> [',' <identifier>]* [',' <slurpy_param>]? [',' <block_param>]?
+    | <slurpy_param> [',' <block_param>]?
+    | <block_param>?
+    ]
+    ')']?
+    {*}
+}
+
+token slurpy_param {
+    '*' <identifier>
+    {*}
+}
+
+token block_param {
+    '&' <identifier>
+    {*}
 }
 
 rule fname {
