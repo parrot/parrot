@@ -33,6 +33,8 @@ rule term { \n | ';' }
 rule basic_stmt {
     | <alias> {*}           #= alias
     | <expr> {*}            #= expr
+    | <begin> {*}           #= begin
+    | <end> {*}             #= end
 }
 
 rule alias {
@@ -62,6 +64,15 @@ rule not_expr {
     {*}
 }
 
+rule begin {
+    'BEGIN' '{' <comp_stmt> '}'
+    {*}
+}
+
+rule end {
+    'END' '{' <comp_stmt> '}'
+    {*}
+}
 
 rule assignment {
     <mlhs> '=' <mrhs>

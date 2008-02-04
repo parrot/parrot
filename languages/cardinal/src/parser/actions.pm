@@ -78,6 +78,24 @@ method alias($/) {
     make PAST::Op.new( $alias, $fname, :pasttype('bind'), :node($/) );
 }
 
+method begin($/) {
+    my $past := $( $<comp_stmt> );
+    my $sub := PAST::Compiler.compile( $past );
+    $sub();
+    ## XXX what to do here? empty block? stolen from rakudo.
+    make PAST::Block.new( :node($/) );
+}
+
+method end($/) {
+    my $past := PAST::Block.new( $( $<comp_stmt> ), :node($/) );
+    $past.blocktype('declaration');
+    my $sub := PAST::Compiler.compile( $past );
+    PIR q<  $P0 = get_hll_global ['cardinal'], '@?END_BLOCKS' >;
+    PIR q<  $P1 = find_lex '$sub' >;
+    PIR q<  push $P0, $P1 >;
+    make $past;
+}
+
 method assignment($/) {
     my $lhs := $( $<mlhs> );
     my $rhs := $( $<mrhs> );
