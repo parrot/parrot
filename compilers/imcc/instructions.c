@@ -397,18 +397,21 @@ get_branch_reg(ARGIN(const Instruction *ins))
 
 /*
 
-=item C<Instruction * delete_ins>
+=item C<Instruction * _delete_ins>
 
-Delete instruction ins. Also free it if needs_freeing is true.
+Delete instruction ins. It's up to the caller to actually free the memory
+of ins, if appropriate.
+
 The instruction following ins is returned.
 
 =cut
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins), int needs_freeing)
+_delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGIN(Instruction *ins))
 {
     Instruction * const next = ins->next;
     Instruction * const prev = ins->prev;
@@ -421,8 +424,31 @@ delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins), int needs_f
         next->prev = prev;
     else
         unit->last_ins = prev;
-    if (needs_freeing)
-        free_ins(ins);
+
+    return next;
+}
+
+/*
+
+=item C<Instruction * delete_ins>
+
+Delete instruction ins, and then free it.
+
+The instruction following ins is returned.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+Instruction *
+delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins))
+{
+    Instruction * next = _delete_ins(unit,ins);
+
+    free_ins(ins);
+
     return next;
 }
 
@@ -551,7 +577,7 @@ PARROT_CAN_RETURN_NULL
 Instruction *
 move_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins), ARGMOD(Instruction *to))
 {
-    Instruction * const next = delete_ins(unit, ins, 0);
+    Instruction * const next = _delete_ins(unit, ins);
     insert_ins(unit, to, ins);
     return next;
 }

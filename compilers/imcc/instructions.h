@@ -108,6 +108,15 @@ PARROT_API
 int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+Instruction * _delete_ins(
+    ARGMOD(struct _IMC_Unit *unit),
+    ARGIN(Instruction *ins))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Instruction * _mk_instruction(
@@ -120,11 +129,11 @@ Instruction * _mk_instruction(
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction * delete_ins(
     ARGMOD(struct _IMC_Unit *unit),
-    ARGMOD(Instruction *ins),
-    int needs_freeing)
+    ARGMOD(Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit)
