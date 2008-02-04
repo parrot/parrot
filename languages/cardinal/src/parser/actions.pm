@@ -123,12 +123,22 @@ method mlhs_item($/, $key) {
     make $( $/{$key} );
 }
 
-method lhs($/) {
-    make $( $<variable> );
+method lhs($/, $key) {
+    make $( $/{$key} );
 }
 
-method variable($/) {
-    make $( $<varname> );
+method member_variable($/) {
+    make $( $<primary> );
+    # XXX fix field.
+}
+
+method indexed_variable($/) {
+    make $( $<primary> );
+    # XXX fix index
+}
+
+method variable($/, $key) {
+    make $( $/{$key} );
 }
 
 method varname($/, $key) {

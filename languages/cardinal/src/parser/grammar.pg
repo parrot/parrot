@@ -98,7 +98,18 @@ rule mlhs_item {
 }
 
 rule lhs {
-    <variable>
+    | <variable> {*}            #= variable
+    | <indexed_variable> {*}    #= indexed_variable
+    | <member_variable> {*}     #= member_variable
+}
+
+rule indexed_variable {
+    <primary> '[' <args>? ']'
+    {*}
+}
+
+rule member_variable {
+    <primary> '.' <identifier>
     {*}
 }
 
@@ -124,7 +135,7 @@ rule not_command {
 }
 
 rule operation {
-    <identifier>
+    <identifier> ['!'|'?']?
     {*}
 }
 
@@ -133,7 +144,9 @@ rule call_args {
 }
 
 rule variable {
-    <varname> {*}
+    | <varname> {*}      #= varname
+    | 'nil'              #= nil
+    | 'self'             #= self
 }
 
 rule varname {
