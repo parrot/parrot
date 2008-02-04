@@ -310,12 +310,37 @@ method args($/) {
     make $past;
 }
 
-method primary($/, $key) {
+method basic_primary($/, $key) {
     make $( $/{$key} );
+}
+
+method primary($/) {
+    my $past := $( $<basic_primary> );
+
+    # XXX check this out:
+    for $<post_primary_expr> {
+        my $postexpr := $( $_ );
+        $postexpr.unshift($past);
+        $past := $postexpr;
+    }
+    make $past;
+}
+
+method post_primary_expr($/, $key) {
+    make $( $/{$key} );
+}
+
+method scope_identifier($/) {
+    make $( $<identifier> );
+    # XXX handle :: operator.
 }
 
 method literal($/, $key) {
     make $( $/{$key} );
+}
+
+method pcomp_stmt($/) {
+    make $( $<comp_stmt> );
 }
 
 method array($/) {

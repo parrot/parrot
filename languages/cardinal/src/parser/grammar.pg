@@ -11,7 +11,7 @@ http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
 
 grammar cardinal::Grammar is PCT::Grammar;
 
-rule TOP {
+token TOP {
     <comp_stmt>
     [ $ || <panic: Syntax error> ]
     {*}
@@ -265,17 +265,40 @@ proto 'term:'   is tighter('prefix:+')
                 is parsed(&primary)     { ... }
 
 
-rule primary {
-    | <literal> {*}        #= literal
-    | <variable> {*}       #= variable
-    | <array> {*}          #= array
-    | <functiondef> {*}    #= functiondef
-    | <if_stmt> {*}        #= if_stmt
-    | <while_stmt> {*}     #= while_stmt
-    | <unless_stmt> {*}    #= unless_stmt
-    | <module> {*}         #= module
-    | <begin_end> {*}      #= begin_end
+rule basic_primary {
+    | <literal> {*}                         #= literal
+    | <variable> {*}                        #= variable
+    | <array> {*}                           #= array
+    | <functiondef> {*}                     #= functiondef
+    | <if_stmt> {*}                         #= if_stmt
+    | <while_stmt> {*}                      #= while_stmt
+    | <unless_stmt> {*}                     #= unless_stmt
+    | <module> {*}                          #= module
+    | <begin_end> {*}                       #= begin_end
+    | <pcomp_stmt> {*}                      #= pcomp_stmt
+    | <scope_identifier> {*}                #= scope_identifier
 }
+
+rule primary {
+    <basic_primary> <post_primary_expr>*
+    {*}
+}
+
+rule post_primary_expr {
+    | <scope_identifier> {*}   #= scope_identifier
+    | '[' <args>? ']' {*}      #= args
+}
+
+rule scope_identifier {
+    '::' <identifier>
+    {*}
+}
+
+rule pcomp_stmt {
+    '(' <comp_stmt> ')'
+    {*}
+}
+
 
 rule if_stmt {
     'if' <expr> <.then>
