@@ -516,7 +516,10 @@ SP              [ ]
         /* trim last ':' */
         YYCHOP();
 
-        DUP_AND_RET(valp,LABEL);
+        if (valp)
+            valp->s = yytext;
+
+        return LABEL;
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
