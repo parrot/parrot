@@ -46,29 +46,17 @@ Assume PASM input on stdin.
 
 Assume PBC file on stdin, run it.
 
-=item -d, --debug [hexbits]
+=item -d, --imcc-debug [hexbits]
 
 The B<-d> switch takes an optional argument which is considered to hold a hex
 value of debug bits. Without a value, debug is set to 1.
 
-The individual bits are:
+The individual bits can be listed on the command line by use of the
+B<--help-debug> switch.
 
- DEBUG_PARROT         0001
- DEBUG_LEXER          0002
- DEBUG_PARSER         0004
- DEBUG_IMC            0008
- DEBUG_CFG            0010
- DEBUG_OPT1           0020
- DEBUG_OPT2           0040
- DEBUG_PBC            1000
- DEBUG_PBC_CONST      2000
- DEBUG_PBC_FIXUP      4000
-
-These can be listed on the command line by use of the B<--help-debug> switch.
-
-To produce really huge output on F<stderr> run "imcc B<-d 0ffff> ...".  Note:
-if the argument is separated by whitespace from the B<-d> switch, it has to
-start with a number.
+To produce really huge output on F<stderr> run C<"parrot B<-d 0ffff> ...">.
+Note: If the argument is separated by whitespace from the B<-d>
+switch, it has to start with a number.
 
 =item -h, --help
 
@@ -100,13 +88,15 @@ disc and run. This is mainly needed for tests.
 
 One B<-v> shows which files are worked on and prints a summary over register
 usage and optimization stats per I<compilation unit>.  With two B<-v> switches,
-IMCC prints a line per individual processing step too.
+C<parrot> prints a line per individual processing step too.
 
 =item -y, --yydebug
 
 Turn on yydebug in F<yacc>/F<bison>.
 
 =item -V, --version
+
+Print version information and exit.
 
 =item -Ox
 
@@ -246,13 +236,16 @@ assumed to know what to do with these.
 
 =head1 Generated files
 
-If debugging is enabled these files are generated:
+If JIT debugging is enabled (e.g. via C<--parrot-debug 04>), the
+following additional output files are generated:
 
   file.stabs.s ... stabsfile for the program
   file.o ... object file with debug information
   EVAL_n ... source of B<compile> op number I<n>
   EVAL_n.stabs.s ... stabsfile for this block
   EVAL_n.o ... object file with debug information
+
+See F<docs/jit.pod> for further information.
 
 =head1 About runcores
 
