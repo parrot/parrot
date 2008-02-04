@@ -226,6 +226,6 @@ You're welcome to ask questions.
 =head1 SUGGESTIONS
 
 If you have suggestions, improvements, tips or complaints about this document,
-please send an email to C<perl6-internals@perl.org>.
+please send an email to C<parrot-porters@perl.org>.
 
 =cut
