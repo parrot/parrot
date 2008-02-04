@@ -867,12 +867,11 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 {
-    PMC *h;
+    PMC * const h =
+        (flags & PObj_constant_FLAG)
+            ? constant_pmc_new_noinit(interp, enum_class_Hash)
+            : pmc_new_noinit(interp, enum_class_Hash);
 
-    if (flags & PObj_constant_FLAG)
-        h = constant_pmc_new_noinit(interp, enum_class_Hash);
-    else
-        h = pmc_new_noinit(interp, enum_class_Hash);
     parrot_new_pmc_hash_x(h, enum_type_INTVAL, Hash_key_type_int, int_compare, key_hash_int);
     PObj_active_destroy_SET(h);
     return h;
