@@ -1,0 +1,687 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id: past_building_blocks.pod 25476 2008-02-03 17:59:45Z kjs $
+
+=head1 NAME
+
+PAST Building Blocks - A catalogue of PAST nodes and how to use them.
+
+=head1 DESCRIPTION
+
+This document describes the PIR output for each type of Parrot Abstract Syntax
+Tree (PAST) node, and all available attributes.
+
+=head1 PAST::Node
+
+PAST::Node is the base class of all other PAST classes.
+
+=head2 Attributes
+
+=head3 C<:node>
+
+{{XXX why do all nodes need this?}}
+
+=head2 Methods
+
+See L<docs/pdd26_ast.pod>.
+
+=head1 PAST::Block
+
+=head2 Synopsis
+
+ PAST::Block.new()
+
+Without any attributes, a PAST::Block translates to the following:
+
+ .namespace
+ .sub "_block10"
+     .return ()
+ .end
+
+=head2 Typical use
+
+A block represents a lexical C<scope>. The most common use for a block
+is subroutines (or functions or procedures or whatever name Your Language
+gives to invokable objects). Usually, C<nested> blocks define a new scope
+as well, which can also be represented by a block. A typical example is
+the common C<if> statement (the example here uses Lua syntax):
+
+ if <expr> then
+   <block1>
+ else
+   <block2>
+ end
+
+A variable in C<block1> is (depending on the language) usually not visible
+in C<block2>. If the statements in the body of the C<if> statement are not
+in a different scope, use a PAST::Stmts node instead.
+
+As a block defines a new scope, a PAST::Block object has a symbol table,
+which can be used to store and look up symbols. See PDD26 for more details.
+
+=head2 Attributes
+
+=head3 C<:namespace>
+
+Sets the namespace of the block to the specified value.
+
+ :namespace('foo')
+
+will result in a directive:
+
+ .namespace ["foo"]
+
+{{XXX how to specify nested namespaces? what kind of string array?}}
+
+=head3 C<:blocktype>
+
+Available options:
+
+=over 4
+
+=item 'declaration'
+
+Default value. The block is created, but not invoked. This is typically used
+for creating functions.
+
+=item 'immediate'
+
+The block is invoked immediately. When the :blocktype attribute is set to this
+value, the generated PIR becomes:
+
+ .namespace
+ .sub "anon"
+     get_global $P11, "_block10"
+     newclosure $P11, $P11
+     $P11()
+ .end
+
+ .namespace
+ .sub "_block10"
+     .return ()
+ .end
+
+The sub C<anon> is the I<main> function, which is the entry point of the
+whole program. It looks for the sub that we declared, creates a new closure
+from that block (more on that later), and invokes that closure.
+
+=back
+
+=head3 C<:name>
+
+Gives a name to the block. The generated PIR subroutine is named by the
+value of this attribute. Example:
+
+ PAST::Block.new( :name('foo') )
+
+translates to:
+
+ .sub "foo"
+     .return ()
+ .end
+
+
+=head1 PAST::Stmts
+
+=head2 Synopsis
+
+ PAST::Stmts.new()
+
+=head2 Typical use
+
+The common use of a PAST::Stmts node is to group a set of statements. Most
+programming languages have a grammar rule that similar to this:
+
+ rule statements {
+     [<statement> ';']*
+     {*}
+ }
+
+In order to move around the PAST nodes representing these individual statements,
+it is useful to group them and store them in one node. This can be done by
+storing all PAST nodes in a PAST::Stmts node.
+Note that PAST does not define a C<statement>; any PAST node can be considered
+a statement.
+
+=head1 PAST::Var
+
+=head2 Synopsis
+
+ PAST::Var.new( :name('foo'), :scope('lexical') )
+
+results in:
+
+ find_lex $P10, "foo"
+
+=head2 Typical use
+
+Nodes of type PAST::Var are used to represent variables and their declarations
+(based on the C<:isdecl> flag, see below). Whereever a variable is used in the
+source language, this can be represented by a PAST::Var node.
+
+=head2 Attributes
+
+=head3 C<:name> (required)
+
+Sets the name of the variable. This attribute is required.
+
+=head3 C<:scope> (required)
+
+Set the scope of this PAST::Var node. Available values:
+
+=over 4
+
+=item 'lexical'
+
+When the C<:scope> attribute is set to C<lexical>, then the identifier
+specified in the C<:name> attribute is handled as a lexical:
+
+ find_lex $P10, "foo"
+
+=item 'package'
+
+Defines the variable as a C<package> variable. This is handled by the
+C<get_global> and C<set_global> ops.
+
+=item 'parameter'
+
+Defines the variable as a parameter (but is stored as a lexical).
+
+ .param pmc param_10
+ .lex "foo", param_10
+
+=item 'keyed'
+
+ my $idx := PAST::Var.new( :name('foo'), :scope('package') );
+ my $agg := PAST::Var.new( :name('bar'), :scope('package') );
+ make PAST::Var.new( $agg, $idx, :scope('keyed') );
+
+results in:
+
+ get_global $P10, "foo"    # get index, a package-scoped variable "foo"
+ get_global $P11, "bar"    # get aggregate, a package-scoped variable "bar"
+ set $P12, $P11[$P10]      # get the contents at bar[foo]
+
+=item 'attribute'
+
+Defines the variable as an attribute of an object. The first child of
+the PAST::Var node evaluates to the object from which the attribute is
+requested. If there is no such child, the object defaults to C<self>,
+meaning the current invocant.
+
+ make PAST::Var.new( PAST::Var.new( :name('foo'), :scope('package') ),
+                     :name('bar'),
+                     :scope('attribute')
+                   );
+
+translates to:
+
+ get_global $P10, "foo"
+ get_attribute $P11, $P10, "bar"
+
+Note: currently, no child nodes are evaluated, so you can only get
+attributes on C<self> for now.
+
+=back
+
+=head3 C<:isdecl(INT)>
+
+If this flag is set, the variable represented by this PAST::Var node is
+declared at this point. This flag is cleared by default.
+
+ .lex "foo", $P10
+
+=head3 C<:viviself>
+
+When this attribute is set, the variable is initialized with the value
+represented by the PAST subtree given as this attribute's argument.
+Adding this attribute will result in the following generated code:
+
+    <code for PAST::Var, leaving the variable in $P10>
+    unless_null $P10, vivify_11
+    <evaluate the child PAST node, leaving result in $P12>
+    assign $P10, $P12
+  vivify_11:
+
+=head3 C<:vivibase>
+
+Similar to C<:viviself>, but the value of this attribute yields the
+initialization code for an aggregate object. See L<pdd26_ast.pod> for
+more details.
+
+=head1 PAST::Val
+
+=head2 Synopsis
+
+ PAST::Val.new( :value(42) )
+
+results in:
+
+ new $P10, "Integer"
+ assign $P10, 42
+
+=head2 Typical use
+
+All literal values in your source language can be represented by
+PAST::Val nodes.
+
+=head2 Attributes
+
+=head3 C<:value> (required)
+
+Specifies the literal value that is represented by this PAST::Val node.
+
+=head3 C<:returns>
+
+Specifies the type of the value. If this is not specified, then some
+defaults are used. For integer values, this is C<Integer>, for quoted
+strings this is C<String>; for floating point values, this is C<Float>.
+
+=head1 PAST::VarList
+
+=head2 Synopsis
+
+ PAST::VarList.new()
+
+=head2 Typical use
+
+Used to group a number of PAST::Var nodes.
+
+
+=head1 PAST::Op
+
+=head2 Synopsis
+
+ PAST::Op.new( :pasttype('if') )
+
+=head2 Typical use
+
+PAST::Op nodes are used to represent common operations, such as an
+C<if> statement, a sub C<call>. They can also be used to generate
+custom PIR instructions, using the C<:inline> attribute.
+
+=head2 Attributes
+
+=head3 C<:pasttype>
+
+
+=over 4
+
+=item C<if>
+
+Requires at least 1 child node, which is evaluated as the conditional
+expression.
+
+    <evaluate 1st child, result stored in $P11>
+    if $P11, if_10
+    <else part (3rd child); optional>
+    goto if_10_end
+ if_10:
+    <then part (2nd child); optional>
+ if_10_end:
+
+=item C<unless>
+
+Same as C<if>, except that the C<if> op is replaced by the C<unless> op.
+
+=item C<while>
+
+Requires 2 children; the first is the loop condition, the second is the
+loop body.
+
+ while_10:
+    <evaluate 1st child, result stored in $P11>
+    unless $P11, while_10_end
+    <evaluate 2nd child>
+    goto while_10
+ while_10_end:
+
+=item C<until>
+
+Same as C<while>, except the loop is executed while the condition evaluates
+to false.
+
+=item C<call> (default)
+
+ PAST::Op.new( :name('foo'), :pasttype('call') );
+
+results in:
+
+ "foo"()
+
+while
+
+ my $fun := PAST::Var.new( :name('foo'), :scope('package'));
+ PAST::Op.new( $fun, :pasttype('call') );
+
+generates:
+
+ get_global $P10, "foo"
+ $P10()
+
+Children of a :pasttype('call') node are evaluated and passed as arguments.
+If the node does not receive a C<:name> attribute, then the first child
+is evaluated as the subroutine to be invoked.
+
+=item C<callmethod>
+
+=item C<bind>
+
+Binds the variable represented by the first child to the value
+represented by the second child.
+
+ my $lhs := PAST::Var.new( :name('foo'), :scope('package') );
+ my $rhs := PAST::Val.new( :value(42) );
+ make PAST::Op.new($lhs, $rhs, :pasttype('bind') );
+
+results in:
+
+ new $P10, "Integer"       # code for evaluating $rhs
+ assign $P10, 42
+ set_global "foo", $P10    # code for the :pasttype('bind') op
+
+when the scope is set to C<lexical>, the last line becomes:
+
+ store_lex "foo", $P10
+
+=back
+
+=head3 C<:inline>
+
+If this attribute is specified, C<:pasttype> is implicitly set
+to the value of C<inline>. The specified string is emitted in the
+code generator. The string may contain special fields: %n where n
+is an integer value between (0,9); %r, %t and %u. See the PDD for
+details.
+
+Example:
+
+ my $var := PAST::Var.new( :name('foo'), :scope('lexical') );
+ PAST::Op.new( $var, :inline('    %r = %0') );
+
+is transformed to:
+
+ find_lex $P10, "foo" # generated for $var
+ $P11 = $P10          # inline '%r = %0'
+
+
+=head1 TIPS AND TRICKS
+
+Once you have experience in using PAST nodes, generating code for
+Your Favorite Language becomes rather straightforward. However, it
+is sometimes tricky to get started. Therefore, this section presents
+some tips 'n' tricks to get you started.
+
+=head2 Refactor Grammar Rules
+
+=head3 Scenario 1
+
+Sometimes it is useful to refactor the grammar of your language in
+order to make code generation somewhat easier or to make the action
+method easier. Consider the following example.
+
+ rule primary_expr {
+     [ <prefix> | <functioncall> ] <expression>
+     {*}
+ }
+
+ method primary_expr($/) {
+     my $past;
+     if $<prefix> {
+         $past := $( $<prefix> );
+     }
+     else {
+         $past := $( $<functioncall> );
+     }
+     my $expr := $( $<expression> );
+
+     # do something with $past and $expr
+     # ...
+ }
+
+while this solution is straightforward, the code in the action method
+contains a conditional statement. The more branches you have in your
+code, the more you need to think when you re-read this in 6 months time.
+An alternative solution would be this:
+
+ rule primary_expr {
+     <prefix_expr> <expression>
+     {*}
+ }
+
+ rule prefix_expr {
+     | <prefix> {*}        #= prefix
+     | <functioncall> {*}  #= functioncall
+ }
+
+ method primary_expr($/) {
+     my $past := $( $<prefix_expr> );
+     my $expr := $( $<expression> );
+
+     # do something with $past and $expr
+     # ...
+ }
+
+ method prefix_expr($/, $key) {
+     make $( $/{$key} );
+ }
+
+While you have to write a bit more code, this code is more straightforward.
+While there might be a small cost in function call overhead, there is no
+longer the conditional statement, which itself is more efficient.
+
+=head3 Scenario 2
+
+Consider a language that uses an index notation to indicate fields (attributes),
+like so:
+
+ foo["bar"] = 42
+
+this language also has some syntactic sugar for this, using a dot notation:
+
+ foo.bar = 42
+
+This can be expressed in the following grammar rules:
+
+ rule target {
+     | <ident> <index>?
+     | ...
+ }
+
+ rule index {
+     | '.' <ident> {*}      #= ident
+     | '[' <quote> ']' {*}  #= quote
+ }
+
+A naive implementation could look like this:
+
+ method target($/) {
+     my $name := $( $<ident> );
+
+     if $<index> {
+         my $idx := $( $<index>[0] );
+         # do something with $idx
+     }
+     # ...
+ }
+
+ method index($/, $key) {
+     my $indexexpr := $( $/{$key} );
+
+     # if $indexexpr is an identifier, stringify it
+     if $key eq 'ident' {
+        $indexexpr := PAST::Val.new( :returns('String'), :value($indexexpr) );
+     }
+     make $indexexpr;
+ }
+
+Somewhere you have to check the type of index. Not only does this
+result in more complex code (more conditional statements), it is
+less efficient, as an extra PAST node must be created.
+
+A more elegant solution is to refactor the grammar slightly, like so:
+
+ rule index {
+     | <dot_field> {*}     #= dot_field
+     | '[' <quote> ']' {*} #= quote
+ }
+
+ rule dot_field {
+     '.' <ident>
+     {*}
+ }
+
+ method index($/, $key) {
+     make $( $/{$key} );
+ }
+
+ method dot_field($/) {
+     my $field := $( $<ident> );
+     make PAST.Val.new( :returns('String'), :value($field) );
+ }
+
+There is no more conditional code, it's just a matter of computations;
+based on the type of index, do the right thing automatically.
+
+
+=head2 Create PAST nodes I<deep> in the parse tree
+
+Consider a grammar fragment such as this:
+
+ rule function_def {
+     'function' <ident> '(' <parameters>? ')' <block> 'end'
+     {*}
+ }
+
+ rule parameters {
+     <ident> [',' <ident>]*
+     {*}
+ }
+
+You could write the action methods for these rules as follows:
+
+ method function_def($/) {
+    my $past := PAST::Block.new( :node($/) );
+
+    if $<parameters> {
+        # get the PAST::VarList that contains all parameters
+        my $params := $( $<parameters>[0] );
+
+        # put all of them into the PAST::Block node
+        for @($params) {
+            $past.push($_);
+        }
+    }
+
+    $past.name( $( $<ident> ) );
+    $past.push( $( $<block> ) );
+    make $past;
+ }
+
+ method parameters($/) {
+    my $past := PAST::VarList.new( :node($/) );
+    for $<ident> {
+        my $param := $($_);
+        $param.scope('parameter');
+        $past.push( $param );
+    }
+    make $past;
+ }
+
+While this solution works well, this is suboptimal. In the
+action method for <parameters>, a PAST::VarList node is created,
+which is only used to move around the parameter identifiers, and
+then discarded.
+An alternative solution would be to create the PAST::Block node
+that represents the function in the action method for <parameters>.
+This makes perfect sense, as the only place where the parameters
+should live is in that function block. Then, in the action method
+for C<function_def>, this PAST::Block node is retrieved and
+I<decorated> with other values (such as a function name, for instance)
+and the PAST node for the function body. Only if there are no parameters
+should the action method for C<function_def> create a PAST::Block node.
+
+The result could look like this:
+
+ method function_def($/) {
+    my $past;
+    if $<parameters> {
+        $past := $( $<parameters>[0] );
+    }
+    else { # no parameters, create the function block here
+        $past := PAST::Block.new( :node($/) );
+    }
+    $past.name( $( $<ident> ).name() );
+    $past.push( $( $<block> ) );
+ }
+
+ method parameters($/) {
+    my $past := PAST::Block.new( :node($/) );
+    for $<ident> {
+        my $param := $($_);
+        $param.scope('parameter');
+        $past.push( $param );
+    }
+    make $past;
+ }
+
+A further refactor could result in even simpler code:
+
+ rule function_def {
+     'function' <ident> '(' <parameters> ')' <block> 'end'
+     {*}
+ }
+
+ rule parameters {
+     [ <ident> [',' <ident>]* ]?
+ }
+
+ method function_def($/) {
+    my $past := $( $<parameters> );
+    $past.name( $( $<ident> ).name() );
+    $past.push( $( $<block> ) );
+    make $past;
+ }
+
+ method parameters($/) {
+    my $past := PAST::Block.new( :node($/) );
+    for $<ident> {
+        my $param := $( $<ident> );
+        $param.scope('parameter');
+        $past.push($param);
+    }
+    make $past;
+ }
+
+Note that the rule C<parameters> is change slightly. For indexing
+the C<ident> nodes, this makes no difference, as they already lived
+in an array. Making all of them optional doesn't change the way they
+are stored in the parse tree.
+
+The same principle can be applied in several scenarios.
+More tips will be added later.
+
+=head2 Steal from Perl 6
+
+You are implementing a language and you want to find out which PAST nodes
+you should generate for your language construct. Often Perl 6 has the same
+language construct. This means that you can write a quick example script
+in Perl 6 and look at the PAST generated by Radoku:
+
+  ./perl6 --target=PAST t.pl
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * docs/pdds/pdd26_ast.pod
+
+=back
+
+=head1 BUGS AND IMPROVEMENTS
+
+Bug reports and improvements on this document may be sent to
+C<parrotbug@parrotcode.org>.
+
+Initial version by kjs.
+
+=cut
