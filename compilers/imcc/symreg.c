@@ -47,15 +47,18 @@ static SymReg * _get_sym_typed(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static SymReg * _mk_symreg(ARGMOD(SymHash *hsh), ARGMOD(char *name), int t)
+static SymReg * _mk_symreg(
+    ARGMOD(SymHash *hsh),
+    ARGIN(const char *name),
+    int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*hsh)
-        FUNC_MODIFIES(*name);
+        FUNC_MODIFIES(*hsh);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static char * add_ns(PARROT_INTERP, ARGIN(char *name))
+PARROT_MALLOC
+static char * add_ns(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -89,12 +92,12 @@ RT#48260: Not yet documented!!!
 */
 
 void
-push_namespace(ARGIN(char *name))
+push_namespace(ARGIN(const char *name))
 {
     Namespace * const ns = mem_allocate_zeroed_typed(Namespace);
 
     ns->parent = _namespace;
-    ns->name   = name;
+    ns->name   = str_dup(name);
     ns->idents = NULL;
     _namespace = ns;
 }
@@ -119,7 +122,7 @@ pop_namespace(ARGIN(const char *name))
         abort();
     }
 
-    if (name && strcmp(name, ns->name) != 0) {
+    if (name && !STREQ(name, ns->name)) {
         fprintf(stderr, "tried to pop namespace(%s), "
                 "but top of stack is namespace(%s)\n", name, ns->name);
         abort();
@@ -128,11 +131,11 @@ pop_namespace(ARGIN(const char *name))
     while (ns->idents) {
         Identifier * const ident = ns->idents;
         ns->idents               = ident->next;
-        free(ident);
+        mem_sys_free(ident);
     }
 
     _namespace = ns->parent;
-    free(ns);
+    mem_sys_free(ns);
 }
 
 /*
@@ -154,7 +157,7 @@ _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
     SymReg   *p;
 
     for (p = hsh->data[i]; p; p = p->next) {
-        if (!strcmp(name, p->name) && t == p->set)
+        if (STREQ(name, p->name) && (t == p->set))
             return p;
     }
 
@@ -167,13 +170,7 @@ _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
 
 =item C<static SymReg * _mk_symreg>
 
-Makes a new SymReg from its varname and type
-
-char * name is a malloced string that will
-be used if the symbol needs to be created, or
-freed if an old symbol is found.
-This is a potentially dangerous semantic that
-should be changed.
+Makes a new SymReg from its varname and type.
 
 =cut
 
@@ -182,23 +179,20 @@ should be changed.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
-_mk_symreg(ARGMOD(SymHash *hsh), ARGMOD(char *name), int t)
+_mk_symreg(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 {
     SymReg * r = _get_sym_typed(hsh, name, t);
 
-    if (r) {
-        free(name);
-        return r;
+    if (!r) {
+        r = mem_allocate_zeroed_typed(SymReg);
+        r->set        = t;
+        r->type       = VTREG;
+        r->name       = str_dup(name);
+        r->color      = -1;
+        r->want_regno = -1;
+
+        _store_symreg(hsh, r);
     }
-
-    r = mem_allocate_zeroed_typed(SymReg);
-    r->set        = t;
-    r->type       = VTREG;
-    r->name       = name;
-    r->color      = -1;
-    r->want_regno = -1;
-
-    _store_symreg(hsh, r);
 
     return r;
 }
@@ -216,7 +210,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_symreg(PARROT_INTERP, ARGIN(char *name), int t)
+mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
     return _mk_symreg(&unit->hash, name, t);
@@ -281,7 +275,7 @@ mk_temp_reg(PARROT_INTERP, int t)
     char buf[128];
     static int temp;
     sprintf(buf, "__imcc_temp_%d", ++temp);
-    return mk_symreg(interp, str_dup(buf), t);
+    return mk_symreg(interp, buf, t);
 }
 
 /*
@@ -297,7 +291,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_pcc_sub(PARROT_INTERP, ARGIN(char *name), int proto)
+mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
     SymReg   * const r    = _mk_symreg(&unit->hash, name, proto);
@@ -523,7 +517,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_pasm_reg(PARROT_INTERP, ARGIN(char *name))
+mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 
@@ -552,16 +546,18 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 char *
 _mk_fullname(ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
 {
-    char * result;
+    char *result;
 
-    if (!ns)
-        return str_dup(name);
-
-    result = (char *) malloc(strlen(name) + strlen(ns->name) + 3);
-    sprintf(result, "%s::%s", ns->name, name);
+    if (ns) {
+        result = (char *) mem_sys_allocate(strlen(name) + strlen(ns->name) + 3);
+        sprintf(result, "%s::%s", ns->name, name);
+    }
+    else
+        result = str_dup(name);
 
     return result;
 }
@@ -578,6 +574,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 char *
 mk_fullname(ARGIN(const char *name))
 {
@@ -588,7 +585,7 @@ mk_fullname(ARGIN(const char *name))
 
 =item C<SymReg * mk_ident>
 
-Makes a new identifier
+Makes a new identifier.
 
 =cut
 
@@ -597,7 +594,7 @@ Makes a new identifier
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg *
-mk_ident(PARROT_INTERP, ARGIN(char *name), int t)
+mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     char   * const fullname = _mk_fullname(_namespace, name);
     SymReg *r;
@@ -612,8 +609,6 @@ mk_ident(PARROT_INTERP, ARGIN(char *name), int t)
 
     r       = mk_symreg(interp, fullname, t);
     r->type = VTIDENTIFIER;
-
-    free(name);
 
     if (t == 'P') {
         r->pmc_type = IMCC_INFO(interp)->cur_pmc_type;
@@ -636,7 +631,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg*
-mk_ident_ur(PARROT_INTERP, ARGIN(char *name), int t)
+mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     SymReg * const r = mk_ident(interp, name, t);
     r->usage        |= U_NON_VOLATILE;
@@ -678,7 +673,7 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
     len           = strlen(name);
     name[len - 1] = '\0';
 
-    free(rhs->name);
+    mem_sys_free(rhs->name);
 
     rhs->name     = name;
     rhs->set      = 'P';
@@ -714,7 +709,7 @@ Makes a new identifier constant with value val
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_const_ident(PARROT_INTERP, ARGIN(char *name), int t,
+mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
         ARGMOD(SymReg *val), int global)
 {
     SymReg *r;
@@ -768,8 +763,7 @@ PARROT_CANNOT_RETURN_NULL
 SymReg *
 _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 {
-    DECL_CONST_CAST;
-    SymReg * const r = _mk_symreg(hsh, (char *)const_cast(name), t);
+    SymReg * const r = _mk_symreg(hsh, name, t);
     r->type          = VTCONST;
 
     if (t == 'U') {
@@ -818,15 +812,16 @@ add namespace to sub if any
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 static char *
-add_ns(PARROT_INTERP, ARGIN(char *name))
+add_ns(PARROT_INTERP, ARGIN(const char *name))
 {
     int len, l;
     char *ns_name, *p;
 
     if (!IMCC_INFO(interp)->cur_namespace ||
        (l = strlen(IMCC_INFO(interp)->cur_namespace->name)) <= 2)
-        return name;
+        return str_dup(name);
 
     /* TODO keyed syntax */
     len     = strlen(name) + l  + 4;
@@ -837,7 +832,6 @@ add_ns(PARROT_INTERP, ARGIN(char *name))
     ns_name[l - 1] = '\0';
     strcat(ns_name, "@@@");
     strcat(ns_name, name);
-    mem_sys_free(name);
 
     p = strstr(ns_name, "\";\"");   /* Foo";"Bar  -> Foo@@@Bar */
 
@@ -864,14 +858,14 @@ Makes a new address
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-_mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(char *name), int uniq)
+_mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int uniq)
 {
     SymReg * r;
 
     if (uniq == U_add_all) {
         r = mem_allocate_zeroed_typed(SymReg);
         r->type = VTADDRESS;
-        r->name = name;
+        r->name = str_dup(name);
         _store_symreg(hsh, r);
         return r;
     }
@@ -913,7 +907,7 @@ Eventually make mk_address static
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_address(PARROT_INTERP, ARGIN(char *name), int uniq)
+mk_address(PARROT_INTERP, ARGIN(const char *name), int uniq)
 {
     const int begins_with_underscore = (*name == '_');
     SymHash * const h = begins_with_underscore
@@ -940,7 +934,7 @@ Label gets a fixup entry.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_sub_label(PARROT_INTERP, ARGIN(char *name))
+mk_sub_label(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
             name, U_add_uniq_sub);
@@ -963,7 +957,7 @@ Make a symbol for a label, symbol gets a fixup entry.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_sub_address(PARROT_INTERP, ARGIN(char *name))
+mk_sub_address(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
             name, U_add_all);
@@ -986,7 +980,7 @@ Make a local symbol, no fixup entry.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_local_label(PARROT_INTERP, ARGIN(char *name))
+mk_local_label(PARROT_INTERP, ARGIN(const char *name))
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
     return _mk_address(interp, &unit->hash, name, U_add_uniq_label);
@@ -1005,7 +999,7 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_label_address(PARROT_INTERP, ARGIN(char *name))
+mk_label_address(PARROT_INTERP, ARGIN(const char *name))
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
     return _mk_address(interp, &unit->hash, name, U_add_once);

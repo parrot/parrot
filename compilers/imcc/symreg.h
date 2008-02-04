@@ -137,7 +137,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg * _mk_address(PARROT_INTERP,
     ARGMOD(SymHash *hsh),
-    ARGIN(char *name),
+    ARGIN(const char *name),
     int uniq)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -153,6 +153,7 @@ SymReg * _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 char * _mk_fullname(
     ARGIN_NULLOK(const Namespace *ns),
     ARGIN(const char *name))
@@ -258,7 +259,7 @@ SymReg * link_keys(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_address(PARROT_INTERP, ARGIN(char *name), int uniq)
+SymReg * mk_address(PARROT_INTERP, ARGIN(const char *name), int uniq)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -271,7 +272,7 @@ SymReg * mk_const(PARROT_INTERP, ARGIN(const char *name), int t)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg * mk_const_ident(PARROT_INTERP,
-    ARGIN(char *name),
+    ARGIN(const char *name),
     int t,
     ARGMOD(SymReg *val),
     int global)
@@ -282,60 +283,61 @@ SymReg * mk_const_ident(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 char * mk_fullname(ARGIN(const char *name))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-SymReg * mk_ident(PARROT_INTERP, ARGIN(char *name), int t)
+SymReg * mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-SymReg* mk_ident_ur(PARROT_INTERP, ARGIN(char *name), int t)
+SymReg* mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_label_address(PARROT_INTERP, ARGIN(char *name))
+SymReg * mk_label_address(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_local_label(PARROT_INTERP, ARGIN(char *name))
+SymReg * mk_local_label(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_pasm_reg(PARROT_INTERP, ARGIN(char *name))
+SymReg * mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_pcc_sub(PARROT_INTERP, ARGIN(char *name), int proto)
+SymReg * mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_sub_address(PARROT_INTERP, ARGIN(char *name))
+SymReg * mk_sub_address(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_sub_label(PARROT_INTERP, ARGIN(char *name))
+SymReg * mk_sub_label(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_symreg(PARROT_INTERP, ARGIN(char *name), int t)
+SymReg * mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -347,7 +349,7 @@ SymReg * mk_temp_reg(PARROT_INTERP, int t)
 void pop_namespace(ARGIN(const char *name))
         __attribute__nonnull__(1);
 
-void push_namespace(ARGIN(char *name))
+void push_namespace(ARGIN(const char *name))
         __attribute__nonnull__(1);
 
 void store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
