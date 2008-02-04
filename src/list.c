@@ -1980,15 +1980,17 @@ list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
     }
 
     /* start from end */
-    if (offset < 0)
+    if (offset < 0) {
         offset += length;
-    if (offset < 0)
-        real_exception(interp, NULL, OUT_OF_BOUNDS, "illegal splice offset\n");
+        if (offset < 0)
+            real_exception(interp, NULL, OUT_OF_BOUNDS, "illegal splice offset\n");
+    }
     /* "leave that many elements off the end of the array" */
-    if (count < 0)
+    if (count < 0) {
         count += length - offset + 1;
-    if (count < 0)
-        count = 0;
+        if (count < 0)
+            count = 0;
+    }
 
     /* replace count items at offset with values */
     for (i = j = 0; i < count && j < value_length; i++, j++) {
