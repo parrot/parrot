@@ -667,7 +667,7 @@ edge_count(ARGIN(const struct _IMC_Unit *unit))
 
     while (e) {
         i++;
-        e = e->next++;
+        e = e->next;
     }
     return i;
 }
