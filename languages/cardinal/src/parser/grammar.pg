@@ -24,7 +24,7 @@ token comp_stmt {
 }
 
 rule stmts {
-    <stmt> [ <.term>+ <stmt> ]*
+    [ <stmt> [ <.term>+ <stmt> ]* ]?
     {*}
 }
 
@@ -103,7 +103,19 @@ rule lhs {
 }
 
 rule command {
-    | <operation> <call_args> {*}
+    | <call> {*}         #= call
+    | <super_call> {*}   #= super_call
+}
+
+rule call {
+    [ <primary> $<dot>=['.'|'::'] ]?
+    <operation> <call_args>
+    {*}
+}
+
+rule super_call {
+    'super' <call_args>
+    {*}
 }
 
 rule not_command {
@@ -249,6 +261,7 @@ rule primary {
     | <while_stmt> {*}     #= while_stmt
     | <unless_stmt> {*}    #= unless_stmt
     | <module> {*}         #= module
+    | <begin_end> {*}      #= begin_end
 }
 
 rule if_stmt {
@@ -314,6 +327,16 @@ token slurpy_param {
 
 token block_param {
     '&' <identifier>
+    {*}
+}
+
+rule begin_end {
+    'begin'
+    <comp_stmt>
+    ['rescue' <args>? <.do> <comp_stmt>]+
+    ['else' <comp_stmt>]?
+    ['ensure' <comp_stmt>]?
+    'end'
     {*}
 }
 

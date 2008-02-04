@@ -144,7 +144,7 @@ method instance_variable($/) {
 }
 
 method local_variable($/) {
-    make PAST::Var.new( :name(~$/), :scope('lexical'), :node($/) );
+    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
 }
 
 
@@ -191,6 +191,13 @@ method module($/) {
     my $name := $( $<module_identifier> );
     $past.namespace( $name.name() );
     $past.blocktype('declaration');
+    make $past;
+}
+
+method begin_end($/) {
+    my $past := $( $<comp_stmt> );
+    $past := PAST::Block.new( $past, :node($/) );
+    # XXX handle resque and ensure clauses
     make $past;
 }
 
@@ -249,10 +256,27 @@ method mrhs($/) {
     make $( $<args> );
 }
 
-method command($/) {
+method command($/, $key) {
+    make $( $/{$key} );
+}
+
+method call($/) {
     my $op := $( $<operation> );
     my $past := $( $<call_args> );
+
+    if $<primary> {
+        my $invocant := $( $<primary>[0] );
+        # XXX what's the diff. between "." and "::", in $<op>[0] ?
+        $past.unshift($invocant);
+    }
+
     $past.unshift($op);
+    make $past;
+}
+
+method super_call($/) {
+    my $past := $( $<call_args> );
+    ## how to invoke super.xxx ?
     make $past;
 }
 
