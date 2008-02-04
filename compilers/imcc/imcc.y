@@ -364,15 +364,19 @@ inv_op(const char *op) {
 Instruction *
 IMCC_create_itcall_label(PARROT_INTERP)
 {
-    char name[128];
-    SymReg * r;
+    char         name[128];
+    SymReg      *r;
     Instruction *i;
 
-    sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-    r = mk_pcc_sub(interp, str_dup(name), 0);
-    i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
-    IMCC_INFO(interp)->cur_call = r;
+    sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR,
+        IMCC_INFO(interp)->cnr++);
+
+    r       = mk_pcc_sub(interp, name, 0);
+    i       = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
     i->type = ITCALL | ITPCCSUB;
+
+    IMCC_INFO(interp)->cur_call = r;
+
     return i;
 }
 
