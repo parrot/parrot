@@ -1649,7 +1649,7 @@ char *yyget_text(yyscan_t yyscanner);
  */
 /* int yyholds_char(yyscan_t yyscanner ); */
 
-int yyerror(void *yyscanner, PARROT_INTERP, char * s)
+int yyerror(void *yyscanner, PARROT_INTERP, const char *s)
 {
     /* If the error occurr in the end of the buffer (I mean, the last
      * token was already read), yyget_text will return a pointer
