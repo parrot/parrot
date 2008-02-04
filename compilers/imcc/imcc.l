@@ -635,7 +635,10 @@ SP              [ ]
 <emit,INITIAL>\$I[0-9]+          DUP_AND_RET(valp, IREG);
 <emit,INITIAL>\$N[0-9]+          DUP_AND_RET(valp, NREG);
 <emit,INITIAL>\$S[0-9]+          DUP_AND_RET(valp, SREG);
-<emit,INITIAL>\$P[0-9]+          DUP_AND_RET(valp, PREG);
+<emit,INITIAL>\$P[0-9]+ {
+      if (valp) (valp)->s = yytext;
+      return PREG;
+  };
 
 <emit,INITIAL>\$[a-zA-Z0-9]+ {
         IMCC_fataly(interp, E_SyntaxError,

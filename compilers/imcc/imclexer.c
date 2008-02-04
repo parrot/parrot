@@ -30,7 +30,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 34
+#define YY_FLEX_SUBMINOR_VERSION 33
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -52,7 +52,7 @@
 
 /* C99 systems have <inttypes.h>. Non-C99 systems may or may not. */
 
-#if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
  * if you want the limit (max/min) macros for int types. 
@@ -115,12 +115,11 @@ typedef unsigned int flex_uint32_t;
 
 #else	/* ! __cplusplus */
 
-/* C99 requires __STDC__ to be defined as 1. */
-#if defined (__STDC__)
+#if __STDC__
 
 #define YY_USE_CONST
 
-#endif	/* defined (__STDC__) */
+#endif	/* __STDC__ */
 #endif	/* ! __cplusplus */
 
 #ifdef YY_USE_CONST
@@ -155,6 +154,8 @@ typedef void* yyscan_t;
 #define yylineno (YY_CURRENT_BUFFER_LVALUE->yy_bs_lineno)
 #define yycolumn (YY_CURRENT_BUFFER_LVALUE->yy_bs_column)
 #define yy_flex_debug yyg->yy_flex_debug_r
+
+int yylex_init (yyscan_t* scanner);
 
 /* Enter a start condition.  This macro really ought to take a parameter,
  * but we do it the disgusting crufty way forced on us by the ()-less
@@ -2773,7 +2774,7 @@ static void include_file(Interp *interp, char *file_name, void *yyscanner);
 
 
 
-#line 2777 "compilers/imcc/imclexer.c"
+#line 2778 "compilers/imcc/imclexer.c"
 
 #define INITIAL 0
 #define emit 1
@@ -2834,10 +2835,6 @@ struct yyguts_t
     }; /* end struct yyguts_t */
 
 static int yy_init_globals (yyscan_t yyscanner );
-
-int yylex_init (yyscan_t* scanner);
-
-int yylex_init_extra (YY_EXTRA_TYPE user_defined,yyscan_t* scanner);
 
 /* Accessor methods to globals.
    These are made visible to non-reentrant scanners for convenience. */
@@ -2916,7 +2913,7 @@ static int input (yyscan_t yyscanner );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO fwrite( yytext, yyleng, 1, yyout )
+#define ECHO (void) fwrite( yytext, yyleng, 1, yyout )
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -2927,7 +2924,7 @@ static int input (yyscan_t yyscanner );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		int n; \
+		size_t n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -3036,7 +3033,7 @@ YY_DECL
             return 0;
         }
 
-#line 3040 "compilers/imcc/imclexer.c"
+#line 3037 "compilers/imcc/imclexer.c"
 
 	if ( !yyg->yy_init )
 		{
@@ -4054,11 +4051,14 @@ DUP_AND_RET(valp, SREG);
 case 131:
 YY_RULE_SETUP
 #line 638 "compilers/imcc/imcc.l"
-DUP_AND_RET(valp, PREG);
+{
+      if (valp) (valp)->s = yytext;
+      return PREG;
+  };
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 640 "compilers/imcc/imcc.l"
+#line 643 "compilers/imcc/imcc.l"
 {
         IMCC_fataly(interp, E_SyntaxError,
             "'%s' is not a valid register name", yytext);
@@ -4066,19 +4066,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 646 "compilers/imcc/imcc.l"
+#line 649 "compilers/imcc/imcc.l"
 /* skip */;
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 648 "compilers/imcc/imcc.l"
+#line 651 "compilers/imcc/imcc.l"
 {
         /* catch all except for state macro */
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 653 "compilers/imcc/imcc.l"
+#line 656 "compilers/imcc/imcc.l"
 {
         BEGIN(INITIAL);
 
@@ -4091,18 +4091,18 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 664 "compilers/imcc/imcc.l"
+#line 667 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 666 "compilers/imcc/imcc.l"
+#line 669 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ENDM);
 	YY_BREAK
 case 136:
 /* rule 136 can match eol */
 YY_RULE_SETUP
-#line 668 "compilers/imcc/imcc.l"
+#line 671 "compilers/imcc/imcc.l"
 {
         IMCC_INFO(interp)->line++;
         DUP_AND_RET(valp, '\n');
@@ -4110,12 +4110,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 673 "compilers/imcc/imcc.l"
+#line 676 "compilers/imcc/imcc.l"
 return LABEL;
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 675 "compilers/imcc/imcc.l"
+#line 678 "compilers/imcc/imcc.l"
 {
 
         if (yylex(valp,yyscanner,interp) != LABEL)
@@ -4140,7 +4140,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 697 "compilers/imcc/imcc.l"
+#line 700 "compilers/imcc/imcc.l"
 {
         if (valp) {
             char *label = (char *)mem_sys_allocate(
@@ -4159,36 +4159,36 @@ YY_RULE_SETUP
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 713 "compilers/imcc/imcc.l"
+#line 716 "compilers/imcc/imcc.l"
 /* skip leading ws */;
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 714 "compilers/imcc/imcc.l"
+#line 717 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 715 "compilers/imcc/imcc.l"
+#line 718 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 716 "compilers/imcc/imcc.l"
+#line 719 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 717 "compilers/imcc/imcc.l"
+#line 720 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 718 "compilers/imcc/imcc.l"
+#line 721 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 720 "compilers/imcc/imcc.l"
+#line 723 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
 #line 4195 "compilers/imcc/imclexer.c"
@@ -4454,14 +4454,6 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
-
-	if ((yy_size_t) (yyg->yy_n_chars + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
-		/* Extend the array by 50%, plus the number we really need. */
-		yy_size_t new_size = yyg->yy_n_chars + number_to_move + (yyg->yy_n_chars >> 1);
-		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size ,yyscanner );
-		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
-			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
-	}
 
 	yyg->yy_n_chars += number_to_move;
 	YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[yyg->yy_n_chars] = YY_END_OF_BUFFER_CHAR;
@@ -4890,9 +4882,7 @@ static void yyensure_buffer_stack (yyscan_t yyscanner)
 		yyg->yy_buffer_stack = (struct yy_buffer_state**)yyalloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								, yyscanner);
-		if ( ! yyg->yy_buffer_stack )
-			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
-								  
+		
 		memset(yyg->yy_buffer_stack, 0, num_to_alloc * sizeof(struct yy_buffer_state*));
 				
 		yyg->yy_buffer_stack_max = num_to_alloc;
@@ -4910,8 +4900,6 @@ static void yyensure_buffer_stack (yyscan_t yyscanner)
 								(yyg->yy_buffer_stack,
 								num_to_alloc * sizeof(struct yy_buffer_state*)
 								, yyscanner);
-		if ( ! yyg->yy_buffer_stack )
-			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
 
 		/* zero only the new slots.*/
 		memset(yyg->yy_buffer_stack + yyg->yy_buffer_stack_max, 0, grow_size * sizeof(struct yy_buffer_state*));
@@ -5022,7 +5010,8 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len , yysc
 			yyg->yy_start_stack = (int *) yyrealloc((void *) yyg->yy_start_stack,new_size ,yyscanner );
 
 		if ( ! yyg->yy_start_stack )
-			YY_FATAL_ERROR( "out of memory expanding start-condition stack" );
+			YY_FATAL_ERROR(
+			"out of memory expanding start-condition stack" );
 		}
 
 	yyg->yy_start_stack[yyg->yy_start_stack_ptr++] = YY_START;
@@ -5246,42 +5235,6 @@ int yylex_init(yyscan_t* ptr_yy_globals)
     return yy_init_globals ( *ptr_yy_globals );
 }
 
-/* yylex_init_extra has the same functionality as yylex_init, but follows the
- * convention of taking the scanner as the last argument. Note however, that
- * this is a *pointer* to a scanner, as it will be allocated by this call (and
- * is the reason, too, why this function also must handle its own declaration).
- * The user defined value in the first argument will be available to yyalloc in
- * the yyextra field.
- */
-
-int yylex_init_extra(YY_EXTRA_TYPE yy_user_defined,yyscan_t* ptr_yy_globals )
-
-{
-    struct yyguts_t dummy_yyguts;
-
-    yyset_extra (yy_user_defined, &dummy_yyguts);
-
-    if (ptr_yy_globals == NULL){
-        errno = EINVAL;
-        return 1;
-    }
-	
-    *ptr_yy_globals = (yyscan_t) yyalloc ( sizeof( struct yyguts_t ), &dummy_yyguts );
-	
-    if (*ptr_yy_globals == NULL){
-        errno = ENOMEM;
-        return 1;
-    }
-    
-    /* By setting to 0xAA, we expose bugs in
-    yy_init_globals. Leave at 0x00 for releases. */
-    memset(*ptr_yy_globals,0x00,sizeof(struct yyguts_t));
-    
-    yyset_extra (yy_user_defined, *ptr_yy_globals);
-    
-    return yy_init_globals ( *ptr_yy_globals );
-}
-
 static int yy_init_globals (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
@@ -5393,7 +5346,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 720 "compilers/imcc/imcc.l"
+#line 723 "compilers/imcc/imcc.l"
 
 
 
