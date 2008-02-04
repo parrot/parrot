@@ -615,22 +615,19 @@ C<buffer> to the file descriptor in C<*io>.
 static size_t
 PIO_unix_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io), ARGMOD(STRING *s))
 {
-    int err;
-    size_t bytes;
-    size_t to_write;
-    char * const buffer = s->strstart;
-    const size_t len = s->bufused;
-    const char *ptr = buffer;
+    const char * const buffer = s->strstart;
+    const char * ptr          = buffer;
 
-    to_write = len;
-    bytes = 0;
+    size_t to_write = s->bufused;
+    size_t written  = 0;
 
   write_through:
     while (to_write > 0) {
-        if ((err = write(io->fd, ptr, to_write)) >= 0) {
+        const int err = write(io->fd, ptr, to_write);
+        if (err >= 0) {
             ptr += err;
             to_write -= err;
-            bytes += err;
+            written += err;
         }
         else {
             switch (errno) {
@@ -638,14 +635,14 @@ PIO_unix_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io), AR
                 goto write_through;
 #  ifdef EAGAIN
             case EAGAIN:
-                return bytes;
+                return written;
 #  endif
             default:
                 return (size_t)-1;
             }
         }
     }
-    return bytes;
+    return written;
 }
 
 /*
@@ -742,7 +739,7 @@ PIO_sockaddr_in(PARROT_INTERP, unsigned short port, ARGIN(STRING *addr))
 {
     struct sockaddr_in sa;
     /* Hard coded to IPv4 for now */
-    int family = AF_INET;
+    const int family = AF_INET;
 
     char * const s = string_to_cstring(interp, addr);
     /*
