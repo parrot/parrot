@@ -1063,7 +1063,7 @@ breakpoints.
 void
 PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
-    PDB_t *pdb = interp->pdb;
+    PDB_t * const pdb = interp->pdb;
 
     /* Skip any breakpoint? */
     if (command && *command) {
@@ -1182,7 +1182,7 @@ PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
     if (breakpoint) {
-        PDB_line_t *line = interp->pdb->file->line;
+        const PDB_line_t *line = interp->pdb->file->line;
 
         while (line->opcode != breakpoint->pc)
             line = line->next;
@@ -1677,18 +1677,16 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             size += strlen(buf);
             break;
         case PARROT_ARG_K:
-            dest[size-1] = '['; Parrot_snprintf(interp, buf, sizeof (buf),
-                            "P" INTVAL_FMT, op[j]);
+            dest[size-1] = '[';
+            Parrot_snprintf(interp, buf, sizeof (buf), "P" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             dest[size++] = ']';
             break;
         case PARROT_ARG_KC:
             {
-            PMC *k;
-
+            PMC * k      = interp->code->const_table->constants[op[j]]->u.key;
             dest[size-1] = '[';
-            k            = interp->code->const_table->constants[op[j]]->u.key;
             while (k) {
                 switch (PObj_get_FLAGS(k)) {
                 case 0:
@@ -1789,7 +1787,8 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
            type, which is decoded elsewhere.  We also want to show unused bits,
            which could indicate problems.
         */
-        const char *flag_names[] = { "",
+        const char * const flag_names[] = {
+                                     "",
                                      "",
                                      " :unused004",
                                      " :unused008",
@@ -2066,9 +2065,9 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
     char           f[255];
     int            i, c;
     PDB_file_t    *pfile;
-    PDB_line_t    *pline, *newline;
-    PDB_t         *pdb  = interp->pdb;
-    opcode_t      *pc   = pdb->cur_opcode;
+    PDB_line_t    *pline;
+    PDB_t         * const pdb = interp->pdb;
+    opcode_t      *pc         = pdb->cur_opcode;
     unsigned long  size = 0;
 
     /* If there was a file already loaded or the bytecode was
@@ -2112,6 +2111,7 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         if (c == '\n') {
             /* If the line has an opcode move to the next one,
                otherwise leave it with NULL to skip it. */
+            PDB_line_t *newline;
             if (PDB_hasinstruction(pfile->source + pline->source_offset)) {
                 size_t n;
                 pline->opcode = pc;
