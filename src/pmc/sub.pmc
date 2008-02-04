@@ -57,10 +57,10 @@ Initializes the subroutine.
      *                as some other sub has :outer(this)
      * - private2 ... tailcall invoked this Sub
      * - private3 ... pythonic coroutine generator flag
-     * - private4 ... :main (see @MAIN)
-     * - private5 ... :load (see @LOAD)
-     * - private6 ... :immediate (see @IMMEDIATE)
-     * - private7 ... :postcomp (see @POSTCOMP)
+     * - private4 ... :main (originally @MAIN)
+     * - private5 ... :load (originally @LOAD)
+     * - private6 ... :immediate (originally @IMMEDIATE)
+     * - private7 ... :postcomp (originally @POSTCOMP)
      *
      * see also the enum in include/parrot/sub.h
      *
