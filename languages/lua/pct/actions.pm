@@ -1,6 +1,7 @@
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
+
 =begin comments
 
 Lua::Grammar::Actions - ast transformations for Lua
@@ -227,18 +228,27 @@ method local_declaration($/) {
 
     ## get number of names and experssions
     my $numnames := +$<Name>;
-    my $expressions := $($<expression_list>[0]);
 
-    my $numexprs := +@($expressions); ##+$<expression_list>[0]<expression>;
-    my $index := 0;
+    my $expressions;
+    my $numexprs;
+    if $<expression_list> {
+        $expressions := $($<expression_list>[0]);
+        $numexprs    := +@($expressions); ##+$<expression_list>[0]<expression>;
+    }
+    else {
+        $numexprs    := 0;
+    }
 
     ## while there are enough names and expressions, use the expressions
     ## to initialize the names.
+    my $index := 0;
     while (($index != $numnames) && ($index != $numexprs)) {
 
         my $name := $( $<Name>[$index] );
         ## XXX why doesn't @($expressions)[$index] work?
         my $expr := $( $<expression_list>[0]<expression>[$index] );
+        #my $expr := $expressions[$index];
+
 
         $name.isdecl(1);
         $name.scope('lexical');
@@ -408,7 +418,7 @@ method field_name($/) {
     $field := PAST::Val.new( :returns('String'), :value($field.name()), :node($/) );
     ## XXX __index meta-method should be invoked from the "mt" table...
     ## Read more lua reference stuff.
-    make PAST::Op.new( $field, :name('__index'), :pasttype('call'), :node($/) );
+    make PAST::Op.new( $field, :name('__index'), :pasttype('callmethod'), :node($/) );
 }
 
 method method_call($/) {
@@ -436,13 +446,16 @@ method tablefieldlist($/) {
     my $ctor := PAST::Op.new( :inline('    %r = new "Hash"'), :node($/) );
     $past.push($ctor);
 
+
     ## XXX think a bit more about how to initialize tables and the indexing
     ## mechanism; use __index meta-method?
     ## Currently it doesn't work correctly.
     ##
     for $<tablefield> {
         my $field := $($_);
-        #$field.unshift($ctor);
+
+        ## how to reuse this %r generated in $ctor?
+        $field.unshift($ctor);
         $past.push( $field );
     }
     make $past;
@@ -452,16 +465,32 @@ method tablefield($/, $key) {
     make $( $/{$key} );
 }
 
+method expr_field($/) {
+    # XXX get index somehwere; keep track.
+    my $index := PAST::Val.new( :returns('Integer'),
+                                :value('0'),
+                                :node($/) );
+
+    my $expr := $( $<expression> );
+    make PAST::Op.new( $index,
+                       $expr,
+                       :pasttype('callmethod'),
+                       :name('__index'),
+                       :node($/) );
+}
+
 method record_field($/) {
     my $field := $( $<field> );
     my $expr  := $( $<expression> );
     ## should this be "rawset"? See Lua ref.man.
-    make PAST::Op.new( $field, $expr, :pasttype('call'), :name('__index'), :node($/) );
+    ## <field> already creates a call to '__index', add the 2nd operand to it here:
+    $field.push($expr);
+    make $field;
 }
 
 method index($/) {
     my $expr := $( $<expression> );
-    make PAST::Op.new( $expr, :name('__index'), :pasttype('call'), :node($/) );
+    make PAST::Op.new( $expr, :name('__index'), :pasttype('callmethod'), :node($/) );
 }
 
 method prefix_expression($/, $key) {
@@ -531,6 +560,9 @@ method expression($/, $key) {
         make $past;
     }
 }
+
+
+
 
 # Local Variables:
 #   mode: cperl
