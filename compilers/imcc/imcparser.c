@@ -644,7 +644,7 @@ static Instruction *
 iINDEXFETCH(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, SymReg *r1, SymReg *r2)
 {
     if (r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * const r3 = mk_const(interp, "1", 'I');
         return MK_I(interp, unit, "substr %s, %s, %s, 1", 4, r0, r1, r2, r3);
     }
 
@@ -661,7 +661,7 @@ iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
           SymReg * r0, SymReg * r1, SymReg * r2)
 {
     if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * r3 = mk_const(interp, "1", 'I');
         MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1, r3, r2);
     }
     else if (r0->set == 'P') {
@@ -754,7 +754,7 @@ begin_return_or_yield(PARROT_INTERP, int yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-    interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
+    interp->imc_info->sr_return = mk_pcc_sub(interp, name, 0);
     i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, interp->imc_info->sr_return);
     i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
     interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
@@ -3059,22 +3059,22 @@ yyreduce:
 
   case 67:
 #line 865 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("INTVAL"), 'S'); }
+    { (yyval.sr) = mk_const(interp, "INTVAL",   'S'); }
     break;
 
   case 68:
 #line 866 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("FLOATVAL"), 'S'); }
+    { (yyval.sr) = mk_const(interp, "FLOATVAL", 'S'); }
     break;
 
   case 69:
 #line 867 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("PMC"), 'S'); }
+    { (yyval.sr) = mk_const(interp, "PMC",      'S'); }
     break;
 
   case 70:
 #line 868 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_const(interp, str_dup("STRING"), 'S'); }
+    { (yyval.sr) = mk_const(interp, "STRING",   'S'); }
     break;
 
   case 71:
@@ -3085,7 +3085,7 @@ yyreduce:
                               r = mk_const(interp, (yyvsp[(1) - (1)].s), 'S');
                           else {
                               free((yyvsp[(1) - (1)].s)),
-                              r = mk_const(interp, str_dup("PMC"), 'S');
+                              r = mk_const(interp, "PMC", 'S');
                            }
                            (yyval.sr) = r;
                       }
@@ -3119,7 +3119,7 @@ yyreduce:
 
             sprintf(name, "%cpcc_sub_call_%d",
                     IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-            (yyval.sr) = r = mk_pcc_sub(interp, str_dup(name), 0);
+            (yyval.sr) = r = mk_pcc_sub(interp, name, 0);
             /* this mid rule action has the semantic value of the
              * sub SymReg.
              * This is used below to append args & results

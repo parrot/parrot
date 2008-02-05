@@ -324,7 +324,7 @@ static Instruction *
 iINDEXFETCH(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, SymReg *r1, SymReg *r2)
 {
     if (r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * const r3 = mk_const(interp, "1", 'I');
         return MK_I(interp, unit, "substr %s, %s, %s, 1", 4, r0, r1, r2, r3);
     }
 
@@ -341,7 +341,7 @@ iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
           SymReg * r0, SymReg * r1, SymReg * r2)
 {
     if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * r3 = mk_const(interp, "1", 'I');
         MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1, r3, r2);
     }
     else if (r0->set == 'P') {
@@ -434,7 +434,7 @@ begin_return_or_yield(PARROT_INTERP, int yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-    interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
+    interp->imc_info->sr_return = mk_pcc_sub(interp, name, 0);
     i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, interp->imc_info->sr_return);
     i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
     interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
@@ -862,17 +862,17 @@ multi_types:
    ;
 
 multi_type:
-     INTV             { $$ = mk_const(interp, str_dup("INTVAL"), 'S'); }
-   | FLOATV           { $$ = mk_const(interp, str_dup("FLOATVAL"), 'S'); }
-   | PMCV             { $$ = mk_const(interp, str_dup("PMC"), 'S'); }
-   | STRINGV          { $$ = mk_const(interp, str_dup("STRING"), 'S'); }
+     INTV             { $$ = mk_const(interp, "INTVAL",   'S'); }
+   | FLOATV           { $$ = mk_const(interp, "FLOATVAL", 'S'); }
+   | PMCV             { $$ = mk_const(interp, "PMC",      'S'); }
+   | STRINGV          { $$ = mk_const(interp, "STRING",   'S'); }
    | IDENTIFIER       {
                           SymReg *r;
                           if (strcmp($1, "_"))
                               r = mk_const(interp, $1, 'S');
                           else {
                               free($1),
-                              r = mk_const(interp, str_dup("PMC"), 'S');
+                              r = mk_const(interp, "PMC", 'S');
                            }
                            $$ = r;
                       }
@@ -903,7 +903,7 @@ pcc_sub_call:
 
             sprintf(name, "%cpcc_sub_call_%d",
                     IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
-            $<sr>$ = r = mk_pcc_sub(interp, str_dup(name), 0);
+            $<sr>$ = r = mk_pcc_sub(interp, name, 0);
             /* this mid rule action has the semantic value of the
              * sub SymReg.
              * This is used below to append args & results
