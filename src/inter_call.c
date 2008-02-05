@@ -505,7 +505,7 @@ fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
                                       : CTX_REG_NUM(st->src.ctx, idx);
             break;
         case PARROT_ARG_PMC:
-                UVal_pmc(st->val) = constant ? st->src.ctx->constants[idx]->u.key
+            UVal_pmc(st->val) = constant ? st->src.ctx->constants[idx]->u.key
                                       : CTX_REG_PMC(st->src.ctx, idx);
 
             if (st->src.sig & PARROT_ARG_FLATTEN) {
@@ -1787,6 +1787,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     /* args INSP, returns INSP */
     INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
+    /* Each of these is 8K. Do we want 16K on the stack? */
     opcode_t arg_indexes[PCC_ARG_MAX];
     opcode_t result_indexes[PCC_ARG_MAX];
 
