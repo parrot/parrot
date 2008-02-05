@@ -452,8 +452,7 @@ SP              [ ]
                 "Constant '%s' value must be a number, "
                 "stringliteral or register", IMCC_INFO(interp)->cur_macro_name);
 
-        define_macro(interp, IMCC_INFO(interp)->cur_macro_name, NULL,
-            valp->s, start_line);
+        define_macro(interp, IMCC_INFO(interp)->cur_macro_name, NULL, valp->s, start_line);
 
         IMCC_INFO(interp)->cur_macro_name = NULL;
 
@@ -708,15 +707,13 @@ SP              [ ]
 
 <macro>".$"{ID} {
         if (valp) {
-            char *label = (char *)mem_sys_allocate(
-                strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
+            const size_t len = strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 12;
+            char * const label = (char *)mem_sys_allocate(len);
 
-            sprintf(label, "local__%s__%s__$",
+            snprintf(label, len, "local__%s__%s__$",
                 IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
-            /* XXX: why dup this? */
-            valp->s = str_dup(label);
-            mem_sys_free(label);
+            valp->s = label;
         }
 
         return IDENTIFIER;
@@ -998,7 +995,7 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
     BEGIN(start_cond);
 
     define_macro(interp, IMCC_INFO(interp)->cur_macro_name,
-                 &params, str_dup(IMCC_INFO(interp)->temp_buffer), start_line);
+                 &params, IMCC_INFO(interp)->temp_buffer, start_line);
 
     IMCC_INFO(interp)->cur_macro_name = NULL;
 
