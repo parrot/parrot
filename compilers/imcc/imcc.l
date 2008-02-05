@@ -225,7 +225,7 @@ SP              [ ]
 
             IMCC_INFO(interp)->frames->buffer = YY_CURRENT_BUFFER;
             valp->s                           =
-                IMCC_INFO(interp)->heredoc_content;
+                str_dup(IMCC_INFO(interp)->heredoc_content);
 
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);

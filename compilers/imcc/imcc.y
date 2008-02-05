@@ -682,12 +682,13 @@ hll_def: HLL STRINGC COMMA STRINGC
    ;
 
 constdef:
-     CONST { is_def=1; } type IDENTIFIER '=' const
+     CONST { is_def = 1; } type IDENTIFIER '=' const
                 {
                     SymReg *ignored;
                     ignored = mk_const_ident(interp, $4, $3, $6, 1);
                     UNUSED(ignored);
-                    is_def=0;
+                    mem_sys_free($4);
+                    is_def = 0;
                 }
    ;
 
@@ -818,14 +819,16 @@ sub_param_type_def:
                                              $$ = mk_ident_ur(interp, $2, $1);
                                          else
                                              $$ = mk_ident(interp, $2, $1);
-                                         $$->type |= $3; }
+                                         $$->type |= $3;
+                                         mem_sys_free($2); }
    | type STRINGC ADV_ARROW IDENTIFIER paramtype_list {
                                          if ($5 & VT_UNIQUE_REG)
                                              $$ = mk_ident_ur(interp, $4, $1);
                                          else
                                              $$ = mk_ident(interp, $4, $1);
                                          $$->type |= $5;
-                                         adv_named_set(interp, $2);}
+                                         adv_named_set(interp, $2);
+                                         mem_sys_free($4); }
    ;
 
 
@@ -838,7 +841,8 @@ outer: OUTER '(' STRINGC ')'
                      mk_sub_address_fromc(interp, $3); }
     | OUTER '(' IDENTIFIER ')'
                      { $$ = 0; IMCC_INFO(interp)->cur_unit->outer =
-                     mk_const(interp, $3, 'S'); }
+                     mk_const(interp, $3, 'S');
+                     mem_sys_free($3); }
    ;
 
 vtable: VTABLE_METHOD
@@ -867,9 +871,9 @@ multi_type:
                           if (strcmp($1, "_") != 0)
                               r = mk_const(interp, $1, 'S');
                           else {
-                              mem_sys_free($1);
                               r = mk_const(interp, "PMC", 'S');
                            }
+                           mem_sys_free($1);
                            $$ = r;
                       }
    | STRINGC          {
@@ -1176,7 +1180,7 @@ id_list_id :
      IDENTIFIER opt_unique_reg
      {
          IdList* l = (IdList*)malloc(sizeof (IdList));
-         l->id = $1;
+         l->id         = str_dup($1);
          l->unique_reg = $2;
          $$ = l;
      }
@@ -1262,7 +1266,7 @@ classname:
    IDENTIFIER
          {
              if ((IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
-                  string_from_cstring(interp, $1, 0))) <= 0) {
+                  string_from_cstring(interp, str_dup($1), 0))) <= 0) {
                 IMCC_fataly(interp, E_SyntaxError,
                    "Unknown PMC type '%s'\n", $1);
             }
@@ -1404,16 +1408,16 @@ func_assign:
                    }
    ;
 
-the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); }
-       | STRINGC  { $$ = mk_sub_address_fromc(interp, $1); }
-       | USTRINGC  { $$ = mk_sub_address_u(interp, $1); }
+the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); mem_sys_free($1); }
+       | STRINGC     { $$ = mk_sub_address_fromc(interp, $1); mem_sys_free($1); }
+       | USTRINGC    { $$ = mk_sub_address_u(interp, $1); mem_sys_free($1); }
        | target   { $$ = $1;
                        if ($1->set != 'P')
                             IMCC_fataly(interp, E_SyntaxError,
                                   "Sub isn't a PMC");
                      }
        | target DOT sub_label_op  { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
-       | target DOT STRINGC    { IMCC_INFO(interp)->cur_obj = $1; $$ = mk_const(interp, $3, 'S'); }
+       | target DOT STRINGC    { IMCC_INFO(interp)->cur_obj = $1; $$ = mk_const(interp, $3, 'S'); mem_sys_free($3); }
        | target DOT target     { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
    ;
 
@@ -1557,18 +1561,18 @@ _var_or_i:
    ;
 sub_label_op_c:
      sub_label_op
-   | STRINGC       { $$ = mk_sub_address_fromc(interp, $1); }
-   | USTRINGC      { $$ = mk_sub_address_u(interp, $1); }
+   | STRINGC       { $$ = mk_sub_address_fromc(interp, $1); mem_sys_free($1); }
+   | USTRINGC      { $$ = mk_sub_address_u(interp, $1); mem_sys_free($1); }
    ;
 
 sub_label_op:
-     IDENTIFIER    { $$ = mk_sub_address(interp, $1); free($1); }
-   | PARROT_OP     { $$ = mk_sub_address(interp, $1); free($1); }
+     IDENTIFIER    { $$ = mk_sub_address(interp, $1); mem_sys_free($1); }
+   | PARROT_OP     { $$ = mk_sub_address(interp, $1); mem_sys_free($1); }
    ;
 
 label_op:
-     IDENTIFIER    { $$ = mk_label_address(interp, $1); }
-   | PARROT_OP     { $$ = mk_label_address(interp, $1); }
+     IDENTIFIER    { $$ = mk_label_address(interp, $1); mem_sys_free($1); }
+   | PARROT_OP     { $$ = mk_label_address(interp, $1); mem_sys_free($1); }
    ;
 
 var_or_i:
