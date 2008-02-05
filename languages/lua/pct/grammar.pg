@@ -306,9 +306,9 @@ proto 'infix:>='    is equiv('infix:<')         { ... }
 proto 'infix:~='    is equiv('infix:<')         { ... }
 proto 'infix:=='    is equiv('infix:<')         { ... }
 
-proto 'infix:and'   is looser('infix:<')    is past('and')      { ... }
+proto 'infix:and'   is looser('infix:<')    is pasttype('if')      { ... }
 
-proto 'infix:or'    is looser('infix:and')  is past('or')       { ... }
+proto 'infix:or'    is looser('infix:and')  is pasttype('unless')       { ... }
 
 
 
