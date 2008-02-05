@@ -1,4 +1,4 @@
-print "1..10" if 1
+print "1..6" if 1
 
 print "ok 1\n"
 
@@ -11,14 +11,5 @@ print "ok "; print 1 + 4; print "\n"
 
 print "ok "; print 2 * 3
 
-unless 0
-print "ok 7\n"
-end
-
-
-
-print "ok 8\n"
-print "ok 9\n"; ;
-print "ok 10\n"
 
 

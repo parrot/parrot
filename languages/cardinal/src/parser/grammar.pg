@@ -64,10 +64,10 @@ rule expr {
 
 
 rule basic_expr {
-    | <command> {*}         #= command
-    | <not_command> {*}     #= not_command
-    | <arg> {*}             #= arg
     | <assignment> {*}      #= assignment
+    | <command> {*}         #= command
+    | <arg> {*}             #= arg
+    | <not_command> {*}     #= not_command
     | <not_expr> {*}        #= not_expr
 }
 
@@ -172,101 +172,7 @@ rule args {
 
 rule 'arg' is optable { ... }
 
-proto 'infix:=' is precedence('1')      { ... }
 
-proto 'prefix:defined?' is looser('infix:=') { ... }
-
-proto 'infix:+=' is equal('infix:=')
-                 is pirop('add')        { ... }
-
-proto 'infix:-=' is equal('infix:=')
-                 is pirop('sub')        { ... }
-
-proto 'infix:/=' is equal('infix:=')
-                 is pirop('div')        { ... }
-
-proto 'infix:*=' is equal('infix:=')
-                 is pirop('mul')        { ... }
-
-proto 'infix:%=' is equal('infix:=')
-                 is pirop('mul')        { ... }
-
-proto 'infix:|=' is equal('infix:=')    { ... }
-
-proto 'infix:&=' is equal('infix:=')    { ... }
-
-proto 'infix:~=' is equal('infix:=')    { ... }
-
-proto infix:«>>=» is equal('infix:=')
-                  is pirop('rsh')       { ... }
-
-proto infix:«<<=» is equal('infix:=')
-                  is pirop('lsh')       { ... }
-
-proto 'infix:&&=' is equal('infix:=')
-                  is pirop('and')       { ... }
-
-proto 'infix:**=' is equal('infix:=')
-                  is pirop('pow')       { ... }
-
-proto 'ternary:? :' is tighter('infix:=')
-                    is pirop('if')      { ... }
-
-proto 'infix:..' is tighter('ternary:? :')
-                 is pirop('n_add')      { ... }
-
-proto 'infix:...' is equal('infix:...') { ... }
-
-proto 'infix:||' is tighter('infix:..')
-                 is past('unless')      { ... }
-
-proto 'infix:&&' is tighter('infix:||')
-                 is past('if')          { ... }
-
-
-proto 'infix:=='      is tighter('infix:&&') { ... }
-proto 'infix:!='      is equiv('infix:==') { ... }
-proto 'infix:=~'      is equiv('infix:==') { ... }
-proto 'infix:!~'      is equiv('infix:==') { ... }
-proto 'infix:==='     is equiv('infix:==') { ... }
-proto infix:«<=>» is equiv('infix:==') { ... }
-
-
-proto 'infix:«<=»' is tighter('infix:=') { ... }
-proto infix:«=>» is equiv(infix:«<=») { ... }
-proto infix:«>»  is equiv(infix:«<=») { ... }
-proto infix:«<»  is equiv(infix:«<=») { ... }
-
-proto 'infix:|' is tighter('infix:«<=»')  { ... }
-proto 'infix:^' is equiv('infix:|')  { ... }
-
-proto 'infix:&' is tighter('infix:|')  { ... }
-
-proto infix:«<<»  is tighter('infix:&') { ... }
-proto infix:«>>»  is equiv(infix:«<<») { ... }
-
-proto 'infix:+' is tighter(infix:«<<»)
-                is pirop('n_add')       { ... }
-
-proto 'infix:-' is equal('infix:+')
-                is pirop('n_sub')       { ... }
-
-proto 'infix:*' is tighter('infix:+')
-                is pirop('n_mul')       { ... }
-
-proto 'infix:/' is equal('infix:*')
-                is pirop('n_div')       { ... }
-
-proto 'infix:%' is equal('infix:*')
-                is pirop('n_mod')       { ... }
-
-proto 'prefix:+' is tighter('infix:*')  { ... }
-proto 'prefix:-' is equal('prefix:+')  { ... }
-proto 'prefix:!' is equal('prefix:+')  { ... }
-proto 'prefix:~' is equal('prefix:+')  { ... }
-
-proto 'term:'   is tighter('prefix:+')
-                is parsed(&primary)     { ... }
 
 
 rule basic_primary {
@@ -494,3 +400,100 @@ token ws {
     | <after [','|'='|'+']> \n     ## a newline after a comma or operator is ignored
     | \h* ['#' \N* \n*]?
 }
+
+
+proto 'infix:=' is precedence('1')      { ... }
+
+proto 'prefix:defined?' is looser('infix:=') { ... }
+
+proto 'infix:+=' is equal('infix:=')
+                 is pirop('add')        { ... }
+
+proto 'infix:-=' is equal('infix:=')
+                 is pirop('sub')        { ... }
+
+proto 'infix:/=' is equal('infix:=')
+                 is pirop('div')        { ... }
+
+proto 'infix:*=' is equal('infix:=')
+                 is pirop('mul')        { ... }
+
+proto 'infix:%=' is equal('infix:=')
+                 is pirop('mul')        { ... }
+
+proto 'infix:|=' is equal('infix:=')    { ... }
+
+proto 'infix:&=' is equal('infix:=')    { ... }
+
+proto 'infix:~=' is equal('infix:=')    { ... }
+
+proto infix:«>>=» is equal('infix:=')
+                  is pirop('rsh')       { ... }
+
+proto infix:«<<=» is equal('infix:=')
+                  is pirop('lsh')       { ... }
+
+proto 'infix:&&=' is equal('infix:=')
+                  is pirop('and')       { ... }
+
+proto 'infix:**=' is equal('infix:=')
+                  is pirop('pow')       { ... }
+
+proto 'ternary:? :' is tighter('infix:=')
+                    is pirop('if')      { ... }
+
+proto 'infix:..' is tighter('ternary:? :')
+                 is pirop('n_add')      { ... }
+
+proto 'infix:...' is equal('infix:...') { ... }
+
+proto 'infix:||' is tighter('infix:..')
+                 is past('unless')      { ... }
+
+proto 'infix:&&' is tighter('infix:||')
+                 is past('if')          { ... }
+
+
+proto 'infix:=='      is tighter('infix:&&') { ... }
+proto 'infix:!='      is equiv('infix:==') { ... }
+proto 'infix:=~'      is equiv('infix:==') { ... }
+proto 'infix:!~'      is equiv('infix:==') { ... }
+proto 'infix:==='     is equiv('infix:==') { ... }
+proto infix:«<=>» is equiv('infix:==') { ... }
+
+
+proto 'infix:«<=»' is tighter('infix:=') { ... }
+proto infix:«=>» is equiv(infix:«<=») { ... }
+proto infix:«>»  is equiv(infix:«<=») { ... }
+proto infix:«<»  is equiv(infix:«<=») { ... }
+
+proto 'infix:|' is tighter('infix:«<=»')  { ... }
+proto 'infix:^' is equiv('infix:|')  { ... }
+
+proto 'infix:&' is tighter('infix:|')  { ... }
+
+proto infix:«<<»  is tighter('infix:&') { ... }
+proto infix:«>>»  is equiv(infix:«<<») { ... }
+
+proto 'infix:+' is tighter(infix:«<<»)
+                is pirop('n_add')       { ... }
+
+proto 'infix:-' is equal('infix:+')
+                is pirop('n_sub')       { ... }
+
+proto 'infix:*' is tighter('infix:+')
+                is pirop('n_mul')       { ... }
+
+proto 'infix:/' is equal('infix:*')
+                is pirop('n_div')       { ... }
+
+proto 'infix:%' is equal('infix:*')
+                is pirop('n_mod')       { ... }
+
+proto 'prefix:+' is tighter('infix:*')  { ... }
+proto 'prefix:-' is equal('prefix:+')  { ... }
+proto 'prefix:!' is equal('prefix:+')  { ... }
+proto 'prefix:~' is equal('prefix:+')  { ... }
+
+proto 'term:'   is tighter('prefix:+')
+                is parsed(&primary)     { ... }
