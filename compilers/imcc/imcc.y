@@ -127,13 +127,13 @@ static Instruction* mk_pmc_const(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static SymReg * mk_sub_address_fromc(PARROT_INTERP, char *name)
+static SymReg * mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1);
 
-static SymReg * mk_sub_address_u(PARROT_INTERP, char *name)
+static SymReg * mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1);
 
-static void set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
+static void set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -256,8 +256,8 @@ mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
 
 PARROT_WARN_UNUSED_RESULT
 static Instruction*
-func_ins(PARROT_INTERP, IMC_Unit *unit, SymReg *lhs, const char *op,
-         SymReg ** r, int n, int keyv, int emit)
+func_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), SymReg *lhs, ARGIN(const char *op),
+         ARGMOD(SymReg **r), int n, int keyv, int emit)
 {
     int i;
     /* shift regs up by 1 */
@@ -282,7 +282,7 @@ clear_state(PARROT_INTERP)
 }
 
 Instruction *
-INS_LABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, int emit)
+INS_LABEL(PARROT_INTERP, IMC_Unit *unit, ARGMOD(SymReg *r0), int emit)
 {
 
     Instruction * const ins = _mk_instruction("", "%s:", 1, &r0, 0);
@@ -382,7 +382,7 @@ IMCC_create_itcall_label(PARROT_INTERP)
 
 
 static SymReg *
-mk_sub_address_fromc(PARROT_INTERP, char * name)
+mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
 {
     /* name is a quoted sub name */
     SymReg *r;
@@ -396,7 +396,7 @@ mk_sub_address_fromc(PARROT_INTERP, char * name)
 }
 
 static SymReg *
-mk_sub_address_u(PARROT_INTERP, char * name)
+mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * const r = mk_sub_address(interp, name);
     r->type         |= VT_ENCODED;
@@ -441,7 +441,7 @@ begin_return_or_yield(PARROT_INTERP, int yield)
 }
 
 static void
-set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
+set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), ARGIN(const char *name))
 {
     SymReg *n = mk_const(interp, name, 'S');
 
@@ -651,10 +651,8 @@ pragma_1:  N_OPERATORS INTC
 
 hll_def: HLL STRINGC COMMA STRINGC
          {
-            STRING *hll_name = string_unescape_cstring(interp, str_dup($2 + 1),
-                '"', NULL);
-            STRING *hll_lib  = string_unescape_cstring(interp, str_dup($4 + 1),
-                '"', NULL);
+            STRING * const hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            STRING * const hll_lib  = string_unescape_cstring(interp, $4 + 1, '"', NULL);
             PMC    *ignored;
             CONTEXT(((Interp*)interp)->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name);
@@ -669,10 +667,8 @@ hll_def: HLL STRINGC COMMA STRINGC
             int built_in_type = 0;
             int language_type = 0;
 
-            STRING *built_in_name = string_unescape_cstring(interp,
-                str_dup($2 + 1), '"', NULL);
-            STRING *language_name = string_unescape_cstring(interp,
-                str_dup($4 + 1), '"', NULL);
+            STRING * const built_in_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            STRING * const language_name = string_unescape_cstring(interp, $4 + 1, '"', NULL);
             built_in_type = pmc_type(interp, built_in_name);
             language_type = pmc_type(interp, language_name);
 
@@ -868,20 +864,20 @@ multi_type:
    | STRINGV          { $$ = mk_const(interp, "STRING",   'S'); }
    | IDENTIFIER       {
                           SymReg *r;
-                          if (strcmp($1, "_"))
+                          if (strcmp($1, "_") != 0)
                               r = mk_const(interp, $1, 'S');
                           else {
-                              free($1),
+                              mem_sys_free($1);
                               r = mk_const(interp, "PMC", 'S');
                            }
                            $$ = r;
                       }
    | STRINGC          {
                           SymReg *r;
-                          if (strcmp($1, "_"))
+                          if (strcmp($1, "_") != 0)
                               r = mk_const(interp, $1, 'S');
                           else {
-                              free($1),
+                              mem_sys_free($1);
                               r = mk_const(interp, "PMC", 'S');
                            }
                            $$ = r;
