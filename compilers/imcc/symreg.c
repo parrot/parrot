@@ -596,8 +596,9 @@ PARROT_WARN_UNUSED_RESULT
 SymReg *
 mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
-    char   * const fullname = _mk_fullname(_namespace, name);
-    SymReg *r;
+    char   * const  fullname = _mk_fullname(_namespace, name);
+    SymReg         *r        = mk_symreg(interp, fullname, t);
+    r->type                  = VTIDENTIFIER;
 
     if (_namespace) {
         Identifier * const ident = mem_allocate_zeroed_typed(Identifier);
@@ -606,12 +607,11 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
         ident->next        = _namespace->idents;
         _namespace->idents = ident;
     }
-
-    r       = mk_symreg(interp, fullname, t);
-    r->type = VTIDENTIFIER;
+    else
+        mem_sys_free(fullname);
 
     if (t == 'P') {
-        r->pmc_type = IMCC_INFO(interp)->cur_pmc_type;
+        r->pmc_type                     = IMCC_INFO(interp)->cur_pmc_type;
         IMCC_INFO(interp)->cur_pmc_type = 0;
     }
 
@@ -719,10 +719,9 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
      * or PMC constant
      */
     if (t == 'N' || t == 'I') {
-        if (val->set == 'S') {
-            IMCC_fataly(interp, E_TypeError,
-                    "bad const initialisation");
-        }
+        if (val->set == 'S')
+            IMCC_fataly(interp, E_TypeError, "bad const initialisation");
+
         /* Cast value to const type */
         val->set = t;
     }
@@ -735,11 +734,10 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
         r = _mk_symreg(&IMCC_INFO(interp)->ghash, name, t);
     }
     else {
-        if (t == 'P') {
-            r = mk_ident(interp, name, t);
-            return mk_pmc_const_2(interp, IMCC_INFO(interp)->cur_unit, r, val);
-        }
         r = mk_ident(interp, name, t);
+
+        if (t == 'P')
+            return mk_pmc_const_2(interp, IMCC_INFO(interp)->cur_unit, r, val);
     }
 
     r->type = VT_CONSTP;
@@ -863,7 +861,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
     SymReg * r;
 
     if (uniq == U_add_all) {
-        r = mem_allocate_zeroed_typed(SymReg);
+        r       = mem_allocate_zeroed_typed(SymReg);
         r->type = VTADDRESS;
         r->name = str_dup(name);
         _store_symreg(hsh, r);
@@ -874,6 +872,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         name = add_ns(interp, name);
 
     r = _get_sym(hsh, name);
+
     if (uniq && r && r->type == VTADDRESS &&
             r->lhs_use_count) {      /* we use this for labels/subs */
         if (uniq == U_add_uniq_label) {
