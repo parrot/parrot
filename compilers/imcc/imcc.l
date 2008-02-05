@@ -79,10 +79,10 @@ static void pop_parser_state(Interp* interp, void *yyscanner);
 
 static struct macro_frame_t *new_frame(Interp*);
 
-static void define_macro(Interp *interp, char *name, params_t *params,
-                         char *expansion, int start_line);
+static void define_macro(Interp *interp, ARGIN(const char *name), ARGIN(const params_t *params),
+             ARGIN(const char *expansion), int start_line);
 
-static macro_t *find_macro(Interp *interp, const char *name);
+static macro_t *find_macro(Interp *interp, ARGIN(const char *name));
 
 static void scan_string(macro_frame_t *frame, const char *expansion,
                         void *yyscanner);
@@ -523,28 +523,23 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        char *macro_name = str_dup(yytext + 1);
-        int   type       = pmc_type(interp,
+        char *macro_name = yytext + 1;
+        const int type   = pmc_type(interp,
             string_from_cstring(interp, macro_name, 0));
 
         if (type > 0) {
-            char *buf = (char *)mem_sys_allocate(16);
+            char * const buf = (char *)mem_sys_allocate(16);
             sprintf(buf, "%d", type);
 
-            /* XXX: free valp->s if already used? */
-            valp->s = str_dup(buf);
-            mem_sys_free(buf);
-            free(macro_name);
+            /* XXX: free valp->s if already used? Sounds like a good idea, but big segfaults if you do. */
+            valp->s = buf;
             return INTC;
         }
 
         if (!expand_macro(valp, interp, macro_name, yyscanner)) {
             yyless(1);
-            free(macro_name);
             return DOT;
         }
-
-        free(macro_name);
     }
 
 <emit,INITIAL>{ID} {
@@ -1029,8 +1024,8 @@ find_macro_param(Interp *interp, const char *name)
 }
 
 static void
-define_macro(Interp *interp, char *name, params_t *params,
-             char *expansion, int start_line)
+define_macro(Interp *interp, ARGIN(const char *name), ARGIN(const params_t *params),
+             ARGIN(const char *expansion), int start_line)
 {
     macro_t *m = find_macro(interp, name);
 
@@ -1038,8 +1033,7 @@ define_macro(Interp *interp, char *name, params_t *params,
         mem_sys_free(m->expansion);
     }
     else {
-        m = mem_allocate_typed(macro_t);
-        memset(m, 0, sizeof (macro_t));
+        m = mem_allocate_zeroed_typed(macro_t);
 
         if (!IMCC_INFO(interp)->macros)
             parrot_new_cstring_hash(interp, &IMCC_INFO(interp)->macros);
