@@ -710,7 +710,7 @@ SP              [ ]
             const size_t len = strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 12;
             char * const label = (char *)mem_sys_allocate(len);
 
-            snprintf(label, len, "local__%s__%s__$",
+            sprintf(label, "local__%s__%s__$",
                 IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
             valp->s = label;
