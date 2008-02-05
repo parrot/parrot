@@ -274,9 +274,31 @@ method function_stat($/) {
 }
 
 method function_name($/) {
-    ## XXX fix this
+    ## XXX improve this
     ## how to handle method name (the part after ":")?
-    make $( $<Name>[0] );
+    ## how to implement Lua's "object model"? Lua doesn't have really an object model,
+    ## but maybe it's nice to cheat and use OO-like model anyhow.
+
+    my $count := +$<Name>;
+    my $past := $( $<Name>[0] );
+    my $idx  := 1;
+
+    while ($idx != $count) {
+
+        my $name := $( $<Name>[$idx] );
+        $name.scope('keyed');
+        my $field := PAST::Val.new( :value($name.name()), :returns('String') );
+
+        ## XXX viviself should not be here; you have to create the tables yourself
+        ## but for now this is nice.
+        $past.viviself('Hash');
+
+        $past := PAST::Var.new( $past, $field, :scope('keyed'), :node($/) );
+
+        $idx := $idx + 1;
+    }
+
+    make $past;
 }
 
 method function_body($/) {
