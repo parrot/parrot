@@ -7,6 +7,8 @@ This is the grammar for cardinal written as a sequence of Perl 6 rules.
 Currently taken (partly) from:
 http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
 
+and parse.y from the ruby source
+
 But adapted here and there; it's not entirely correct, it seems.
 
 =end overview
@@ -308,12 +310,12 @@ rule if_stmt {
     <comp_stmt>
     ['elsif' <expr> <.then>
     <comp_stmt>]*
-    ['else' $<else>=<comp_stmt>]?
+    <else>?
     'end'
     {*}
 }
 
-rule then { 'then' | <term> ['then']? }
+rule then { ':' | 'then' | <term> ['then']? }
 
 rule while_stmt {
     $<sym>=['while'|'until'] <expr> <.do>
@@ -322,12 +324,28 @@ rule while_stmt {
     {*}
 }
 
-rule do { 'do' | <term> ['do']? }
+rule do { ':' | 'do' | <term> ['do']? }
 
 rule unless_stmt {
     'unless' <expr> <.then> <comp_stmt>
-    ['else' $<else>=<comp_stmt>]?
+    <else>?
     'end'
+    {*}
+}
+
+rule else {
+    'else' <comp_stmt>
+    {*}
+}
+
+rule ensure {
+    'ensure' <comp_stmt>
+    {*}
+}
+
+rule rescue {
+    # XXX check <args>
+    ['rescue' <args> <.then> <comp_stmt>]+
     {*}
 }
 
@@ -347,6 +365,9 @@ rule functiondef {
 
 rule bodystmt {
     <comp_stmt>
+    <rescue>?
+    <else>?
+    <ensure>?
 }
 
 rule argdecl {

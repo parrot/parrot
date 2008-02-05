@@ -190,6 +190,14 @@ method unless_stmt($/) {
     make $past;
 }
 
+method else($/) {
+    make $( $<comp_stmt> );
+}
+
+method ensure($/) {
+    make $( $<comp_stmt> );
+}
+
 method while_stmt($/) {
     my $cond := $( $<expr> );
     my $body := $( $<comp_stmt> );
