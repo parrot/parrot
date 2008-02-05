@@ -634,14 +634,25 @@ SP              [ ]
         return USTRINGC;
     }
 
+<emit,INITIAL>\$I[0-9]+ {
+        if (valp) (valp)->s = yytext;
+        return IREG;
+    }
 
-<emit,INITIAL>\$I[0-9]+          DUP_AND_RET(valp, IREG);
-<emit,INITIAL>\$N[0-9]+          DUP_AND_RET(valp, NREG);
-<emit,INITIAL>\$S[0-9]+          DUP_AND_RET(valp, SREG);
+<emit,INITIAL>\$N[0-9]+ {
+        if (valp) (valp)->s = yytext;
+        return NREG;
+    }
+
+<emit,INITIAL>\$S[0-9]+ {
+        if (valp) (valp)->s = yytext;
+        return SREG;
+    }
+
 <emit,INITIAL>\$P[0-9]+ {
-      if (valp) (valp)->s = yytext;
-      return PREG;
-  };
+        if (valp) (valp)->s = yytext;
+        return PREG;
+    }
 
 <emit,INITIAL>\$[a-zA-Z0-9]+ {
         IMCC_fataly(interp, E_SyntaxError,
@@ -1024,7 +1035,6 @@ define_macro(Interp *interp, char *name, params_t *params,
     macro_t *m = find_macro(interp, name);
 
     if (m) {
-        mem_sys_free(name);
         mem_sys_free(m->expansion);
     }
     else {
@@ -1033,7 +1043,7 @@ define_macro(Interp *interp, char *name, params_t *params,
 
         if (!IMCC_INFO(interp)->macros)
             parrot_new_cstring_hash(interp, &IMCC_INFO(interp)->macros);
-        parrot_hash_put(interp, IMCC_INFO(interp)->macros, name, m);
+        parrot_hash_put(interp, IMCC_INFO(interp)->macros, str_dup(name), m);
     }
 
     if (params)
@@ -1041,7 +1051,7 @@ define_macro(Interp *interp, char *name, params_t *params,
     else
         memset(&m->params, 0, sizeof (params_t));
 
-    m->expansion = expansion;
+    m->expansion = str_dup(expansion);
     m->line      = start_line;
 }
 
