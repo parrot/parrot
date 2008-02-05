@@ -870,7 +870,7 @@ typedef union YYSTYPE
     SymReg * sr;
     Instruction *i;
 }
-/* Line 193 of yacc.c.  */
+/* Line 187 of yacc.c.  */
 #line 864 "compilers/imcc/imcparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -4332,12 +4332,12 @@ yyreduce:
 
   case 306:
 #line 1565 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_sub_address(interp, (yyvsp[(1) - (1)].s)); }
+    { (yyval.sr) = mk_sub_address(interp, (yyvsp[(1) - (1)].s)); free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 307:
 #line 1566 "compilers/imcc/imcc.y"
-    { (yyval.sr) = mk_sub_address(interp, (yyvsp[(1) - (1)].s)); }
+    { (yyval.sr) = mk_sub_address(interp, (yyvsp[(1) - (1)].s)); free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 308:

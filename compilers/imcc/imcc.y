@@ -1562,8 +1562,8 @@ sub_label_op_c:
    ;
 
 sub_label_op:
-     IDENTIFIER    { $$ = mk_sub_address(interp, $1); }
-   | PARROT_OP     { $$ = mk_sub_address(interp, $1); }
+     IDENTIFIER    { $$ = mk_sub_address(interp, $1); free($1); }
+   | PARROT_OP     { $$ = mk_sub_address(interp, $1); free($1); }
    ;
 
 label_op:
