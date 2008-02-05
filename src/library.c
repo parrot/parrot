@@ -576,6 +576,7 @@ RT#48260: Not yet documented!!!
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_MALLOC
 char*
 Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
         enum_runtime_ft type)
