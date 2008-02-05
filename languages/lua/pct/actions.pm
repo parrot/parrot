@@ -38,12 +38,6 @@ method block($/, $key) {
     }
     elsif $key eq 'close' {
 
-        #### Test for empty PAST::Stmts node.
-        ##$?BLOCK.push( PAST::Op.new(
-        ##PAST::Val.new( :returns('Integer'), :value('1')),
-        ##PAST::Stmts.new( :node($/)),
-        ##:pasttype('if'), :node($/) ));
-
         for $<statement> {
             $?BLOCK.push( $($_) );
         }
@@ -218,6 +212,7 @@ method local_function($/) {
     my $bind := PAST::Op.new( $name, $func, :pasttype('bind'), :node($/) );
     $past.push($bind);
 
+    ## register the name as a local in the current block's symbol table.
     $?BLOCK.symbol( $name.name(), :scope('lexical') );
     make $past;
 }
