@@ -15,19 +15,10 @@ unless 0
 print "ok 7\n"
 end
 
-if 1 then
-  print "ok 8\n"
-else
-  print "nok 8\n"
-end
 
 
+print "ok 8\n"
 print "ok 9\n"; ;
 print "ok 10\n"
 
 
-module Foo
-    def bar ()
-      print "ok 11\n"
-    end
-end
