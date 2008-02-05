@@ -323,7 +323,8 @@ sub get_c_language_files {
 
     return @c_language_files;
 
-    # RT#43691: lex_source_files() collects lisp files as well...  how to fix ???
+    # RT #43691: lex_source_files() collects lisp files as well.
+    # RT #50046: pir_source_files() fails to collect PIR .t files.
 }
 
 =item C<is_c_exemption()>
