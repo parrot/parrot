@@ -638,7 +638,7 @@ compilation_unit:
 
 pragma: PRAGMA pragma_1 '\n'   { $$ = 0; }
    | hll_def            '\n'   { $$ = 0; }
-   | LOADLIB STRINGC    '\n'   { $$ = 0; do_loadlib(interp, $2); }
+   | LOADLIB STRINGC    '\n'   { $$ = 0; do_loadlib(interp, $2); mem_sys_free($2); }
    ;
 
 pragma_1:  N_OPERATORS INTC
@@ -718,10 +718,12 @@ pasmline:
 
 pasm_inst:         { clear_state(interp); }
      PARROT_OP pasm_args
-                   { $$ = INS(interp, IMCC_INFO(interp)->cur_unit,
+                   {
+                       $$ = INS(interp, IMCC_INFO(interp)->cur_unit,
                               $2, 0, IMCC_INFO(interp)->regs,
                               IMCC_INFO(interp)->nargs, IMCC_INFO(interp) -> keyvec, 1);
-                     free($2); }
+                       /* XXX: can't seem to mem_sys_free($1) here */
+                      }
    | PCC_SUB
                    {
                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
@@ -739,6 +741,7 @@ pasm_inst:         { clear_state(interp); }
                    {
                        SymReg *r = mk_pasm_reg(interp, $4);
                        set_lexical(interp, r, $2); $$ = 0;
+                       mem_sys_free($2);
                    }
    | /* none */    { $$ = 0;}
    ;
@@ -821,6 +824,8 @@ sub_param_type_def:
                                              $$ = mk_ident(interp, $2, $1);
                                          $$->type |= $3;
                                          mem_sys_free($2); }
+
+   /* don't free $2 here; adv_named_set uses the pointer directly */
    | type STRINGC ADV_ARROW IDENTIFIER paramtype_list {
                                          if ($5 & VT_UNIQUE_REG)
                                              $$ = mk_ident_ur(interp, $4, $1);
@@ -838,7 +843,9 @@ multi: MULTI '(' multi_types ')'  { $$ = 0; }
 
 outer: OUTER '(' STRINGC ')'
                      { $$ = 0; IMCC_INFO(interp)->cur_unit->outer =
-                     mk_sub_address_fromc(interp, $3); }
+                     mk_sub_address_fromc(interp, $3);
+                     mem_sys_free($3);
+                     }
     | OUTER '(' IDENTIFIER ')'
                      { $$ = 0; IMCC_INFO(interp)->cur_unit->outer =
                      mk_const(interp, $3, 'S');
@@ -851,7 +858,7 @@ vtable: VTABLE_METHOD
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     |   VTABLE_METHOD '(' STRINGC ')'
                      { $$ = 0;
-                       IMCC_INFO(interp)->cur_unit->vtable_name = str_dup($3);
+                       IMCC_INFO(interp)->cur_unit->vtable_name = $3;
                        IMCC_INFO(interp)->cur_unit->is_vtable_method = 1; }
     ;
 
@@ -870,7 +877,7 @@ multi_type:
                           SymReg *r;
                           if (strcmp($1, "_") != 0)
                               r = mk_const(interp, $1, 'S');
-                          else {
+                           else {
                               r = mk_const(interp, "PMC", 'S');
                            }
                            mem_sys_free($1);
@@ -881,10 +888,10 @@ multi_type:
                           if (strcmp($1, "_") != 0)
                               r = mk_const(interp, $1, 'S');
                           else {
-                              mem_sys_free($1);
                               r = mk_const(interp, "PMC", 'S');
-                           }
-                           $$ = r;
+                          }
+                          mem_sys_free($1);
+                          $$ = r;
                       }
    | '[' keylist ']'  { $$ = $2; }
    ;
@@ -1009,7 +1016,7 @@ pcc_result:
      RESULT target paramtype_list      {  $$ = $2; $$->type |= $3; }
    | LOCAL { is_def=1; } type id_list_id
      {
-         IdList* l = $4;
+         IdList *l = $4;
          SymReg *ignored;
          if (l->unique_reg)
                  ignored = mk_ident_ur(interp, l->id, $3);
@@ -1180,7 +1187,7 @@ id_list_id :
      IDENTIFIER opt_unique_reg
      {
          IdList* l = (IdList*)malloc(sizeof (IdList));
-         l->id         = str_dup($1);
+         l->id         = $1;
          l->unique_reg = $2;
          $$ = l;
      }
@@ -1195,13 +1202,13 @@ opt_unique_reg:
 labeled_inst:
      assignment
    | conditional_statement
-   | NAMESPACE IDENTIFIER            { push_namespace($2); }
-   | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
+   | NAMESPACE IDENTIFIER            { push_namespace($2); mem_sys_free($2); }
+   | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); mem_sys_free($2); }
    | LOCAL           { is_def=1; } type id_list
      {
-         IdList* l = $4;
+         IdList *l = $4;
          while (l) {
-             IdList* l1;
+             IdList *l1;
              SymReg *ignored;
              if (l->unique_reg)
                  ignored = mk_ident_ur(interp, l->id, $3);
@@ -1209,8 +1216,9 @@ labeled_inst:
                  ignored = mk_ident(interp, l->id, $3);
              UNUSED(ignored);
              l1 = l;
-             l = l->next;
-             free(l1);
+             l  = l->next;
+             mem_sys_free(l1->id);
+             mem_sys_free(l1);
          }
          is_def=0; $$=0;
      }
@@ -1224,6 +1232,7 @@ labeled_inst:
                         ignored = mk_const_ident(interp, $4, $3, $6, 0);
                         UNUSED(ignored);
                         is_def=0;
+                        mem_sys_free($4);
                     }
 
    | pmc_const
@@ -1233,6 +1242,7 @@ labeled_inst:
                         ignored = mk_const_ident(interp, $4, $3, $6, 1);
                         UNUSED(ignored);
                         is_def=0;
+                        mem_sys_free($4);
                     }
    | RETURN  sub_call   { $$ = NULL;
                            IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
@@ -1244,7 +1254,7 @@ labeled_inst:
                               IMCC_INFO(interp) -> regs,
                               IMCC_INFO(interp) -> nargs,
                               IMCC_INFO(interp) -> keyvec, 1);
-                       free($1); }
+                    mem_sys_free($1); }
    | PNULL var
                    {  $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, $2); }
    | sub_call      {  $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
@@ -1259,14 +1269,16 @@ type:
    | FLOATV { $$ = 'N'; }
    | STRINGV { $$ = 'S'; }
    | PMCV { $$ = 'P'; }
-   | classname { $$ = 'P'; free($1); }
+   | classname { $$ = 'P';  }
    ;
 
 classname:
    IDENTIFIER
          {
+             /* there'd normally be a str_dup() here, but the lexer already
+              * copied the string, so it's safe to use directly */
              if ((IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
-                  string_from_cstring(interp, str_dup($1), 0))) <= 0) {
+                  string_from_cstring(interp, $1, 0))) <= 0) {
                 IMCC_fataly(interp, E_SyntaxError,
                    "Unknown PMC type '%s'\n", $1);
             }
@@ -1300,7 +1312,7 @@ assignment:
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
    | target '=' ADDR IDENTIFIER
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set_addr",
-                        2, $1, mk_label_address(interp, $4)); }
+                        2, $1, mk_label_address(interp, $4)); mem_sys_free($4); }
    | target '=' GLOBALOP string
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "find_global", 2, $1, $4);}
    | GLOBALOP string '=' var
@@ -1404,11 +1416,11 @@ func_assign:
                                    IMCC_INFO(interp) -> regs,
                                    IMCC_INFO(interp) -> nargs,
                                    IMCC_INFO(interp) -> keyvec, 1);
-                     free($3);
+                     mem_sys_free($3);
                    }
    ;
 
-the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); mem_sys_free($1); }
+the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1);  mem_sys_free($1); }
        | STRINGC     { $$ = mk_sub_address_fromc(interp, $1); mem_sys_free($1); }
        | USTRINGC    { $$ = mk_sub_address_u(interp, $1); mem_sys_free($1); }
        | target   { $$ = $1;
@@ -1449,8 +1461,8 @@ arglist:
        else add_pcc_arg(IMCC_INFO(interp)->cur_call, $1);
    }
    | arglist COMMA STRINGC ADV_ARROW var { $$ = 0;
-                                     add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $3, $5);}
-   | STRINGC ADV_ARROW var { $$ = 0; add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $1, $3);}
+                                     add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $3, $5); mem_sys_free($3); }
+   | STRINGC ADV_ARROW var { $$ = 0; add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $1, $3); mem_sys_free($1); }
    ;
 
 arg:
@@ -1465,6 +1477,8 @@ argtype_list:
 argtype:
      ADV_FLAT                  { $$ = VT_FLAT; }
    | ADV_NAMED                 { $$ = VT_NAMED; }
+
+   /* don't free $3 here; adv_named_set uses the pointer directly */
    | ADV_NAMED '(' STRINGC ')' { adv_named_set(interp, $3); $$ = 0; }
    ;
 
@@ -1480,7 +1494,7 @@ targetlist:
          }
          else add_pcc_result(IMCC_INFO(interp)->cur_call, $3); }
    | targetlist COMMA STRINGC ADV_ARROW target {
-        add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $3, $5); }
+        add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $3, $5); mem_sys_free($3); }
    | result                  {
        $$ = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
@@ -1488,7 +1502,7 @@ targetlist:
            IMCC_INFO(interp)->adv_named_id = NULL;
        }
        else add_pcc_result(IMCC_INFO(interp)->cur_call, $1); }
-   | STRINGC ADV_ARROW target { add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $1, $3); }
+   | STRINGC ADV_ARROW target { add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $1, $3); mem_sys_free($1); }
    | /* empty */             {  $$ = 0; }
    ;
 
@@ -1562,7 +1576,7 @@ _var_or_i:
 sub_label_op_c:
      sub_label_op
    | STRINGC       { $$ = mk_sub_address_fromc(interp, $1); mem_sys_free($1); }
-   | USTRINGC      { $$ = mk_sub_address_u(interp, $1); mem_sys_free($1); }
+   | USTRINGC      { $$ = mk_sub_address_u(interp, $1);  mem_sys_free($1); }
    ;
 
 sub_label_op:
@@ -1633,15 +1647,15 @@ reg:
    ;
 
 const:
-     INTC          {  $$ = mk_const(interp, $1, 'I'); }
-   | FLOATC        {  $$ = mk_const(interp, $1, 'N'); }
-   | STRINGC       {  $$ = mk_const(interp, $1, 'S'); }
-   | USTRINGC      {  $$ = mk_const(interp, $1, 'U'); }
+     INTC          {  $$ = mk_const(interp, $1, 'I'); mem_sys_free($1); }
+   | FLOATC        {  $$ = mk_const(interp, $1, 'N'); mem_sys_free($1); }
+   | STRINGC       {  $$ = mk_const(interp, $1, 'S'); mem_sys_free($1); }
+   | USTRINGC      {  $$ = mk_const(interp, $1, 'U'); mem_sys_free($1); }
    ;
 
 string:
-     SREG          {  $$ = mk_symreg(interp, $1, 'S'); }
-   | STRINGC       {  $$ = mk_const(interp, $1, 'S');  }
+     SREG          {  $$ = mk_symreg(interp, $1, 'S'); mem_sys_free($1); }
+   | STRINGC       {  $$ = mk_const(interp, $1, 'S');  mem_sys_free($1); }
    ;
 
 
