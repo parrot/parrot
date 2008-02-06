@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -620,9 +620,9 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
        with merged ones we have created. */
     debug_seg = Parrot_new_debug_seg(interp, bc, num_lines);
     PackFile_add_segment(interp, &pf->directory, (PackFile_Segment*)debug_seg);
-    free(debug_seg->base.data);
+    mem_sys_free(debug_seg->base.data);
     debug_seg->base.data    = lines;
-    free(debug_seg->mappings);
+    mem_sys_free(debug_seg->mappings);
 
     debug_seg->mappings     = mappings;
     debug_seg->num_mappings = num_mappings;
