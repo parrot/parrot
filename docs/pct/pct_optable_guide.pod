@@ -1,0 +1,21 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+pct_optable_guide.pod - A Guide to Using an Operator Parsing Table in PGE-based grammars.
+
+=head1 DESCRIPTION
+
+This document describes how to use an operator parsing table in grammars
+written for the Parrot Grammar Engine.
+
+=head1 WHY AN OPTABLE?
+
+{{explain why you should want that}}
+
+=head1 HOW TO USE AN OPTABLE?
+
+
+
+=cut
