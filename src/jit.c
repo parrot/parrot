@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1259,22 +1259,22 @@ Parrot_destroy_jit(void *ptr)
     cur_section = optimizer->sections;
     while (cur_section) {
         next = cur_section->next;
-        free(cur_section);
+        mem_sys_free(cur_section);
         cur_section = next;
     }
     /* arena stuff */
-    free(jit_info->arena.op_map);
+    mem_sys_free(jit_info->arena.op_map);
     mem_free_executable(jit_info->arena.start);
     fixup = jit_info->arena.fixups;
     while (fixup) {
         next_f = fixup->next;
-        free(fixup);
+        mem_sys_free(fixup);
         fixup = next_f;
     }
     /* optimizer stuff */
-    free(optimizer->map_branch);
-    free(optimizer->branch_list);
-    free(optimizer);
+    mem_sys_free(optimizer->map_branch);
+    mem_sys_free(optimizer->branch_list);
+    mem_sys_free(optimizer);
 
     free(jit_info);
 }

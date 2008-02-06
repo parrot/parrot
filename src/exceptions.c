@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1037,7 +1037,7 @@ Parrot_print_backtrace(void)
         fprintf(stderr, "%s\n", strings[i]);
 #  endif
 
-    free(strings);
+    mem_sys_free(strings);
 
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_GLIBC_BACKTRACE */
