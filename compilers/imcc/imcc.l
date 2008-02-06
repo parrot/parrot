@@ -175,10 +175,6 @@ SP              [ ]
         if (IMCC_INFO(interp)->frames->s.pasm_file && YYSTATE == INITIAL &&
             !IMCC_INFO(interp)->in_pod)
         {
-            /* silent warning */
-            if (0)
-                yy_top_state(yyscanner);
-
             if (IMCC_INFO(interp)->frames->s.pasm_file == 1) {
                 BEGIN(emit);
                 return EMIT;
@@ -985,7 +981,7 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
         if (buffer_used) {
             if (buffer_used + elem_len > buffer_size) {
                 buffer_size += elem_len;
-                buffer_size << 1;
+                buffer_size <<= 1;
 
                 IMCC_INFO(interp)->macro_buffer =
                     (char *)mem_sys_realloc(IMCC_INFO(interp)->macro_buffer,
@@ -999,7 +995,7 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
             buffer_size = (elem_len << 1) > 1024 ? elem_len << 1 : 1024;
 
             IMCC_INFO(interp)->macro_buffer =
-                mem_sys_allocate_zeroed(buffer_size);
+                (char *)mem_sys_allocate_zeroed(buffer_size);
             strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
             buffer_used = elem_len;
         }
