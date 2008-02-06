@@ -1714,9 +1714,7 @@ PARROT_CANNOT_RETURN_NULL
 char *
 str_dup(ARGIN(const char *old))
 {
-    const size_t bytes = strlen(old) + 1;
-    char * const copy  = (char *)mem_sys_allocate(bytes);
-    memcpy(copy, old, bytes);
+    char * const copy  = strdup(old);
 
 #ifdef MEMDEBUG
     debug(interp, 1, "line %d str_dup %s [%x]\n", line, old, copy);
