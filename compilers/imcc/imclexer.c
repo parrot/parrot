@@ -2742,7 +2742,7 @@ static int read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner);
 static int expand_macro(YYSTYPE *valp, Interp *interp, const char *name,
                         void *yyscanner);
 
-static void include_file(Interp *interp, char *file_name, void *yyscanner);
+static void include_file(Interp* interp, ARGIN(const char *filename), void *yyscanner);
 
 #define YY_DECL int yylex(YYSTYPE *valp,yyscan_t yyscanner,Interp *interp)
 
@@ -5805,14 +5805,15 @@ expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
 }
 
 static void
-include_file(Interp* interp, char *file_name, void *yyscanner)
+include_file(Interp* interp, ARGIN(const char *filename), void *yyscanner)
 {
     char          *ext;
     FILE          *file  = 0;
     yyguts_t      *yyg   = (yyguts_t *)yyscanner;
     macro_frame_t *frame = new_frame(interp);
-    char *s              = Parrot_locate_runtime_file(interp, file_name,
+    char *s              = Parrot_locate_runtime_file(interp, filename,
                                    PARROT_RUNTIME_FT_INCLUDE);
+    char *duped_filename = str_dup(filename);
 
     if (!s)
         IMCC_fataly(interp, E_IOError, strerror(errno));
@@ -5823,9 +5824,9 @@ include_file(Interp* interp, char *file_name, void *yyscanner)
     if (!file)
         IMCC_fataly(interp, E_IOError, strerror(errno));
 
-    frame->s.file   = file_name;
+    frame->s.file   = duped_filename;
     frame->s.handle = file;
-    ext             = strrchr(file_name, '.');
+    ext             = strrchr(duped_filename, '.');
 
     if (ext) {
         if (strcmp(ext, ".pasm") == 0) {

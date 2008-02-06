@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2002-2008, The Perl Foundation.
  * $Id$
- * Copyright (C) 2002-2007, The Perl Foundation.
  */
 
 /*
@@ -612,14 +612,14 @@ bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
 
     if (unit->edge_list == edge) {
         unit->edge_list = edge->next;
-        free(edge);
+        mem_sys_free(edge);
     }
     else {
         Edge *prev;
         for (prev = unit->edge_list; prev; prev = prev->next) {
             if (prev->next == edge) {
                 prev->next = edge->next;
-                free(edge);
+                mem_sys_free(edge);
                 break;
             }
         }
@@ -643,7 +643,7 @@ free_edge(ARGMOD(IMC_Unit *unit))
 
     for (e = unit->edge_list; e;) {
         Edge * const next = e->next;
-        free(e);
+        mem_sys_free(e);
         e = next;
     }
     unit->edge_list = NULL;
@@ -715,8 +715,7 @@ analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
 
     if (r->life_info)
         free_life_info(unit, r);
-    r->life_info = (Life_range **)mem_sys_allocate_zeroed(unit->n_basic_blocks *
-            sizeof (Life_range *));
+    r->life_info = mem_allocate_n_zeroed_typed(unit->n_basic_blocks, Life_range *);
 
     /* First we make a pass to each block to gather the information
      * that can be obtained locally */
@@ -772,16 +771,16 @@ RT#48260: Not yet documented!!!
 void
 free_life_info(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg *r))
 {
-    int i;
 #if IMC_TRACE_HIGH
     fprintf(stderr, "free_life_into(%s)\n", r->name);
 #endif
     if (r->life_info) {
+        int i;
         for (i=0; i < unit->n_basic_blocks; i++) {
             if (r->life_info[i])
-                free(r->life_info[i]);
+                mem_sys_free(r->life_info[i]);
         }
-        free(r->life_info);
+        mem_sys_free(r->life_info);
         r->life_info = NULL;
     }
 }
@@ -1014,7 +1013,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 
         /* TODO: This 'for' should be a breadth-first search for speed */
         for (i = 1; i < n; i++) {
-            Set  *s = set_copy(dominators[i]);
+            Set  * const s = set_copy(dominators[i]);
             Edge *edge;
 
             for (edge = unit->bb_list[i]->pred_list;
@@ -1068,7 +1067,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
     if (IMCC_INFO(interp)->debug & DEBUG_CFG)
         dump_dominators(unit);
 #if USE_BFS
-    free(q);
+    mem_sys_free(q);
     set_free(visited);
 #endif
 }
@@ -1146,9 +1145,9 @@ free_dominators(ARGMOD(IMC_Unit *unit))
         for (i=0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominators[i]);
         }
-        free(unit->dominators);
-        unit->dominators = 0;
-        free(unit->idoms);
+        mem_sys_free(unit->dominators);
+        unit->dominators = NULL;
+        mem_sys_free(unit->idoms);
     }
 }
 
@@ -1171,7 +1170,7 @@ free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
         for (i=0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominance_frontiers[i]);
         }
-        free(unit->dominance_frontiers);
+        mem_sys_free(unit->dominance_frontiers);
         unit->dominance_frontiers = NULL;
     }
 }
@@ -1427,10 +1426,9 @@ free_loops(ARGMOD(IMC_Unit *unit))
     for (i = 0; i < unit->n_loops; i++) {
         set_free(unit->loop_info[i]->loop);
         set_free(unit->loop_info[i]->exits);
-        free(unit->loop_info[i]);
+        mem_sys_free(unit->loop_info[i]);
     }
-    if (unit->loop_info)
-        free(unit->loop_info);
+    mem_sys_free(unit->loop_info);
     unit->n_loops = 0;
     unit->loop_info = 0;
 }
@@ -1504,8 +1502,8 @@ clear_basic_blocks(ARGMOD(struct _IMC_Unit *unit))
         int i;
 
         for (i=0; i < unit->n_basic_blocks; i++)
-            free(unit->bb_list[i]);
-        free(unit->bb_list);
+            mem_sys_free(unit->bb_list[i]);
+        mem_sys_free(unit->bb_list);
         unit->bb_list = NULL;
     }
     free_edge(unit);

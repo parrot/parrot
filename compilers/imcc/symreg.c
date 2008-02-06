@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2002-2008, The Perl Foundation.
  * $Id$
- * Copyright (C) 2002-2007, The Perl Foundation.
  */
 
 /*
@@ -43,6 +43,14 @@ static SymReg * _get_sym_typed(
     ARGIN(const char *name),
     int t)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+static char * _mk_fullname(
+    ARGIN_NULLOK(const Namespace *ns),
+    ARGIN(const char *name))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -272,9 +280,9 @@ PARROT_CANNOT_RETURN_NULL
 SymReg *
 mk_temp_reg(PARROT_INTERP, int t)
 {
-    char buf[128];
+    char buf[30];
     static int temp;
-    sprintf(buf, "__imcc_temp_%d", ++temp);
+    snprintf(buf, sizeof(buf), "__imcc_temp_%d", ++temp);
     return mk_symreg(interp, buf, t);
 }
 
@@ -536,9 +544,12 @@ mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<char * _mk_fullname>
+=item C<static char * _mk_fullname>
 
-RT#48260: Not yet documented!!!
+Combines the namespace and name together, separated by a C<::>.
+If there's no namespace, the name is returned on its own.
+
+The returned string must be free()d.
 
 =cut
 
@@ -547,38 +558,20 @@ RT#48260: Not yet documented!!!
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-char *
+static char *
 _mk_fullname(ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
 {
     char *result;
 
     if (ns) {
-        result = (char *) mem_sys_allocate(strlen(name) + strlen(ns->name) + 3);
-        sprintf(result, "%s::%s", ns->name, name);
+        const size_t len = strlen(name) + strlen(ns->name) + 3;
+        result = (char *) mem_sys_allocate(len);
+        snprintf(result, len, "%s::%s", ns->name, name);
     }
     else
         result = str_dup(name);
 
     return result;
-}
-
-/*
-
-=item C<char * mk_fullname>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-char *
-mk_fullname(ARGIN(const char *name))
-{
-    return _mk_fullname(_namespace, name);
 }
 
 /*
@@ -596,9 +589,10 @@ PARROT_WARN_UNUSED_RESULT
 SymReg *
 mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
-    char   * const  fullname = _mk_fullname(_namespace, name);
-    SymReg         *r        = mk_symreg(interp, fullname, t);
-    r->type                  = VTIDENTIFIER;
+    char   * const fullname = _mk_fullname(_namespace, name);
+    SymReg * r              = mk_symreg(interp, fullname, t);
+
+    r->type = VTIDENTIFIER;
 
     if (_namespace) {
         Identifier * const ident = mem_allocate_zeroed_typed(Identifier);
@@ -1170,20 +1164,16 @@ void
 free_sym(ARGMOD(SymReg *r))
 {
     if (r->pcc_sub) {
-        if (r->pcc_sub->args)
-            free(r->pcc_sub->args);
-        if (r->pcc_sub->arg_flags)
-            free(r->pcc_sub->arg_flags);
-        if (r->pcc_sub->ret)
-            free(r->pcc_sub->ret);
-        if (r->pcc_sub->ret_flags)
-            free(r->pcc_sub->ret_flags);
-        free(r->pcc_sub);
+        mem_sys_free(r->pcc_sub->args);
+        mem_sys_free(r->pcc_sub->arg_flags);
+        mem_sys_free(r->pcc_sub->ret);
+        mem_sys_free(r->pcc_sub->ret_flags);
+        mem_sys_free(r->pcc_sub);
     }
 
     /* TODO free keychain */
-    free(r->name);
-    free(r);
+    mem_sys_free(r->name);
+    mem_sys_free(r);
 }
 
 /*
@@ -1381,7 +1371,7 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
         char * const fullname = _mk_fullname(ns, name);
         p                     = _get_sym(hsh, fullname);
 
-        free(fullname);
+        mem_sys_free(fullname);
 
         if (p)
             return p;

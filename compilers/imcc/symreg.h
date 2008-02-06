@@ -151,14 +151,6 @@ SymReg * _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hsh);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-char * _mk_fullname(
-    ARGIN_NULLOK(const Namespace *ns),
-    ARGIN(const char *name))
-        __attribute__nonnull__(2);
-
 void _store_symreg(ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -280,12 +272,6 @@ SymReg * mk_const_ident(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*val);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-char * mk_fullname(ARGIN(const char *name))
-        __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
