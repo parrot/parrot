@@ -14,7 +14,46 @@ written for the Parrot Grammar Engine.
 
 {{explain why you should want that}}
 
+=head1 HOW DOES AN OPTABLE WORK?
+
+{{explain how this works}}
+
 =head1 HOW TO USE AN OPTABLE?
+
+Perl 6 rules are run as ordinary subroutines, and parsing will be done
+by invoking a rule's subrules. A subrule can also contain subrules.
+Therefore, the generated parser is a top-down parser, starting at the
+C<TOP> rule, and invoking rules that represent I<lower> parts of the
+grammar.
+
+An optable parses operators bottom-up, which is the other well-known
+parsing approach, implemented popular parser generators such as Yacc.
+At some point, when using an optable, your parser must switch from
+top-down parsing to bottom-up, and after parsing the operators (and
+related operands), the parser switches back from bottom-up to top-down
+again.
+
+{{explain a bit how to decide when to enter bottom-up parsing}}
+
+{{explain how to decide what an operand is}}
+
+In order to define the entry point of the bottom-up, operator parsing
+table, you should define a rule. Below is an example that states that
+an C<expression> is parsed by the operator parser:
+
+ rule expression is optable { ... }
+
+The C<...> indicates that this rule is a C<prototype>.
+
+{{ explain what this is }}
+
+
+In order to define what an operand is, a special rule is define, named
+C<term:>.
+
+{{ is this always called "term:" or can it be named anything? not sure }}
+
+ proto 'term:' is precedence('=') is parsed(&simple_expression) { ... }
 
 
 
