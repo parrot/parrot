@@ -531,9 +531,9 @@ get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(int *src_lines))
 
     for (code_size = 0, ins = unit->instructions; ins ; ins = ins->next) {
         if (ins->type & ITLABEL)
-            ins->r[0]->color = code_size;
+            ins->symregs[0]->color = code_size;
 
-        if (ins->op && *ins->op) {
+        if (ins->opname && *ins->opname) {
             (*src_lines)++;
             if (ins->opnum < 0)
                 IMCC_fatal(interp, 1, "get_codesize: "
@@ -543,10 +543,10 @@ get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(int *src_lines))
             if (ins->opnum == PARROT_OP_set_p_pc) {
                 /* set_p_pc opcode */
                 IMCC_debug(interp, DEBUG_PBC_FIXUP, "PMC constant %s\n",
-                        ins->r[1]->name);
+                        ins->symregs[1]->name);
 
-                if (ins->r[1]->usage & U_FIXUP)
-                    store_fixup(interp, ins->r[1], code_size, 2);
+                if (ins->symregs[1]->usage & U_FIXUP)
+                    store_fixup(interp, ins->symregs[1], code_size, 2);
             }
 
             code_size += ins->opsize;
@@ -580,7 +580,7 @@ find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), ARGOUT(int 
     *pc = 0;
 
     for (s = globals.cs->first; s; s = s->next) {
-        SymReg * const r = s->unit->instructions->r[0];
+        SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if names and namespaces are matching - ok */
         if (r && !strcmp(r->name, name) &&
@@ -641,7 +641,7 @@ fixup_globals(PARROT_INTERP)
                         ins     = s1->unit->instructions;
                         PARROT_ASSERT(ins);
 
-                        r1      = ins->r[0];
+                        r1      = ins->symregs[0];
                         PARROT_ASSERT(r1);
 
                         pcc_sub = r1->pcc_sub;
@@ -978,7 +978,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         return NULL;
 
     for (s = globals.cs->first; s; s = s->next) {
-        SymReg * const sub = s->unit->instructions->r[0];
+        SymReg * const sub = s->unit->instructions->symregs[0];
 
         if (strcmp(sub->name, unit->outer->name) == 0) {
             PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
@@ -1609,14 +1609,14 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
     ins   = unit->instructions;
 
     /* we run only PCC subs */
-    if (!ins->r[0] || !ins->r[0]->pcc_sub)
+    if (!ins->symregs[0] || !ins->symregs[0]->pcc_sub)
         return 0;
 
-    pragma = ins->r[0]->pcc_sub->pragma;
+    pragma = ins->symregs[0]->pcc_sub->pragma;
 
     if (pragma & P_IMMEDIATE) {
         IMCC_debug(interp, DEBUG_PBC, "immediate sub '%s'",
-                ins->r[0]->name);
+                ins->symregs[0]->name);
         PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
     }
 
@@ -1653,7 +1653,7 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
     n = VTABLE_elements(interp, sig_arr);
 
     for (i = 0; i < n; ++i) {
-        SymReg * const r = ins->r[i + 1];
+        SymReg * const r = ins->symregs[i + 1];
         INTVAL sig = VTABLE_get_integer_keyed_int(interp, sig_arr, i);
 
         if (! (sig & PARROT_ARG_NAME) &&
@@ -1784,12 +1784,12 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             debug_seg = NULL;
 
         /* if item is a PCC_SUB entry then store it constants */
-        if (ins->r[0] && ins->r[0]->pcc_sub) {
+        if (ins->symregs[0] && ins->symregs[0]->pcc_sub) {
 #if IMC_TRACE
             PIO_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n",
-                        ins->r[0]->name);
+                        ins->symregs[0]->name);
 #endif
-            add_const_pmc_sub(interp, ins->r[0], oldsize, oldsize + code_size);
+            add_const_pmc_sub(interp, ins->symregs[0], oldsize, oldsize + code_size);
         }
         else {
             /* need a dummy to hold register usage */
@@ -1802,17 +1802,17 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     }
 
     /* if this is not the first sub then store the sub */
-    if (npc && unit->pasm_file && ins->r[0] && ins->r[0]->pcc_sub) {
+    if (npc && unit->pasm_file && ins->symregs[0] && ins->symregs[0]->pcc_sub) {
         /* we can only set the offset for PASM code */
-        add_const_pmc_sub(interp, ins->r[0], npc, npc);
+        add_const_pmc_sub(interp, ins->symregs[0], npc, npc);
     }
 
-    if (ins->op && *ins->op) {
+    if (ins->opname && *ins->opname) {
         SymReg *addr, *r;
         opcode_t last_label;
         last_label = 1;
 #if IMC_TRACE_HIGH
-        PIO_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->op);
+        PIO_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->opname);
 #endif
         if ((ins->type & ITBRANCH) &&
                 (addr = get_branch_reg(ins)) != 0 &&
@@ -1879,7 +1879,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                 case PARROT_ARG_SC:
                 case PARROT_ARG_NC:
                 case PARROT_ARG_PC:
-                    r     = ins->r[i];
+                    r     = ins->symregs[i];
 
                     if (r->type & VT_CONSTP)
                         r = r->reg;
@@ -1888,7 +1888,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                     IMCC_debug(interp, DEBUG_PBC, " %d", r->color);
                     break;
                 case PARROT_ARG_KC:
-                    r = ins->r[i];
+                    r = ins->symregs[i];
                     if (r->set == 'K') {
                         PARROT_ASSERT(r->color >= 0);
                         *pc++ = r->color;
@@ -1915,7 +1915,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
             /* emit var_args part */
             for (; i < ins->opsize - 1; ++i) {
-                r = ins->r[i];
+                r = ins->symregs[i];
                 if (r->type & VT_CONSTP)
                     r = r->reg;
                 *pc++ = (opcode_t) r->color;

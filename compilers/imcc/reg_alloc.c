@@ -272,8 +272,8 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
     }
 #endif
 
-    if (unit->instructions->n_r)
-      function = unit->instructions->r[0]->name;
+    if (unit->instructions->symreg_count)
+      function = unit->instructions->symregs[0]->name;
     else
       function = "(not a sub)";
     IMCC_debug(interp, DEBUG_IMC, "\n------------------------\n");
@@ -468,8 +468,8 @@ print_stat(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     int sets[4] = {0, 0, 0, 0};
 
     const char * const function =
-        unit->instructions->n_r
-            ? unit->instructions->r[0]->name
+        unit->instructions->symreg_count
+            ? unit->instructions->symregs[0]->name
             : "(not a function)";
 
     make_stat(unit, sets, unit->n_regs_used);

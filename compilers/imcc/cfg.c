@@ -176,7 +176,7 @@ check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit * unit), ARGIN(const Instr
      * inside another pcc_sub
      * 2) invoke = loop to begin
      */
-    if (unit->instructions->r[0] && unit->instructions->r[0]->pcc_sub)
+    if (unit->instructions->symregs[0] && unit->instructions->symregs[0]->pcc_sub)
         return INVOKE_SUB_LOOP;
     /* 3) invoke P1 returns */
     if (ins->opsize == 2)
@@ -221,9 +221,9 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
 
     /* RT#48280: Now the way to check for a sub is unit->type */
     ins = unit->instructions;
-    if (first && ins->type == ITLABEL && (ins->r[0]->type & VT_PCC_SUB)) {
+    if (first && ins->type == ITLABEL && (ins->symregs[0]->type & VT_PCC_SUB)) {
         IMCC_debug(interp, DEBUG_CFG, "pcc_sub %s nparams %d\n",
-                ins->r[0]->name, ins->r[0]->pcc_sub->nargs);
+                ins->symregs[0]->name, ins->symregs[0]->pcc_sub->nargs);
         expand_pcc_sub(interp, unit, ins);
     }
     ins->index = i = 0;
@@ -256,7 +256,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
         }
         else if (ins->type & ITLABEL) {
             /* set the labels address (ins) */
-            ins->r[0]->first_ins = ins;
+            ins->symregs[0]->first_ins = ins;
         }
 
         /* a LABEL starts a new basic block, but not, if we already have
@@ -278,7 +278,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
             /*
              * ignore set_addr - no new basic block
              */
-            if (STREQ(ins->op, "set_addr"))
+            if (STREQ(ins->opname, "set_addr"))
                 continue;
             if (ins->next)
                 bb = make_basic_block(interp, unit, ins->next);
@@ -310,9 +310,9 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
 
     for (ins = unit->instructions; ins; ins = ins->next) {
         if ((ins->opnum == PARROT_OP_set_addr_p_ic) &&
-                STREQ(label->name, ins->r[1]->name)) {
+                STREQ(label->name, ins->symregs[1]->name)) {
             IMCC_debug(interp, DEBUG_CFG, "set_addr %s\n",
-                    ins->r[1]->name);
+                    ins->symregs[1]->name);
 
             /*
              * connect this block with first and last block
@@ -354,18 +354,19 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
             bb_add_edge(unit, last, bb);
         /* check first ins, if label try to find a set_addr op */
         if (bb->start->type & ITLABEL) {
-            bb_check_set_addr(interp, unit, bb, bb->start->r[0]);
+            bb_check_set_addr(interp, unit, bb, bb->start->symregs[0]);
         }
         /* look if last instruction is a branch */
         addr = get_branch_reg(bb->end);
         if (addr)
             bb_findadd_edge(interp, unit, bb, addr);
-        else if (STREQ(bb->start->op, "invoke") || STREQ(bb->start->op, "invokecc")) {
+        else if (STREQ(bb->start->opname, "invoke")
+              || STREQ(bb->start->opname, "invokecc")) {
             if (check_invoke_type(interp, unit, bb->start) ==
                     INVOKE_SUB_LOOP)
                 bb_add_edge(unit, bb, unit->bb_list[0]);
         }
-        if (STREQ(bb->end->op, "ret")) {
+        if (STREQ(bb->end->opname, "ret")) {
             Instruction * sub;
             IMCC_debug(interp, DEBUG_CFG, "found ret in bb %d\n", i);
             /* now go back, find labels and connect these with
@@ -382,7 +383,7 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
                 for (j = i; j < unit->n_basic_blocks; j++) {
                     Basic_block * const b_bsr = unit->bb_list[j];
 
-                    if (STREQ(b_bsr->end->op, "bsr")) {
+                    if (STREQ(b_bsr->end->opname, "bsr")) {
                         addr = get_branch_reg(b_bsr->end);
                         if (addr)
                             bb_findadd_edge(interp, unit, b_bsr, addr);
@@ -393,13 +394,13 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 
             for (pred = bb->pred_list; pred; pred = pred->next) {
                 int found = 0;
-                if (STREQ(pred->from->end->op, "bsr")) {
-                    SymReg * const r = pred->from->end->r[0];
+                if (STREQ(pred->from->end->opname, "bsr")) {
+                    SymReg * const r = pred->from->end->symregs[0];
                     int j;
 
                     sub = pred->to->start;
                     if ((sub->type & ITLABEL) &&
-                            STREQ(sub->r[0]->name, r->name))
+                            STREQ(sub->symregs[0]->name, r->name))
                         found = 1;
 invok:
                     j = pred->from->index;
@@ -409,11 +410,11 @@ invok:
                                 "\tcalled from bb %d '%I'\n",
                                 j, pred->from->end);
                         for (; sub && sub != bb->end; sub = sub->next) {
-                            if (STREQ(sub->op, "saveall"))
+                            if (STREQ(sub->opname, "saveall"))
                                 if (!(sub->type & ITSAVES))
                                     break;
                             unit->bb_list[sub->bbindex]->flag |= BB_IS_SUB;
-                            if (STREQ(sub->op, "restoreall")) {
+                            if (STREQ(sub->opname, "restoreall")) {
                                 sub->type |= ITSAVES;
                                 saves = 1;
                             }
@@ -426,7 +427,7 @@ invok:
                                    saves ? "yes" : "no");
                     }
                 }
-                else if (STREQ(pred->from->end->op, "invoke")) {
+                else if (STREQ(pred->from->end->opname, "invoke")) {
                     found = 1;
                     sub = pred->to->start;
                     goto invok;
@@ -490,11 +491,11 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
          *     set_addr ins
          */
         for (ins = from->end; ins; ins = ins->prev) {
-            if ((ins->type & ITBRANCH) && STREQ(ins->op, "set_addr") &&
-                    ins->r[1]->first_ins) {
+            if ((ins->type & ITBRANCH) && STREQ(ins->opname, "set_addr") &&
+                    ins->symregs[1]->first_ins) {
                 bb_add_edge(unit, from, unit->
-                                bb_list[ins->r[1]->first_ins->bbindex]);
-                IMCC_debug(interp, DEBUG_CFG, "(%s) ", ins->r[1]->name);
+                                bb_list[ins->symregs[1]->first_ins->bbindex]);
+                IMCC_debug(interp, DEBUG_CFG, "(%s) ", ins->symregs[1]->name);
                 break;
             }
         }
@@ -827,7 +828,7 @@ analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
          *
          * TODO live range coalescing
          */
-        is_alias = (ins->type & ITALIAS) && ins->r[0] == r;
+        is_alias = (ins->type & ITALIAS) && ins->symregs[0] == r;
 
         if (instruction_reads(ins, r) || is_alias) {
             /* if instruction gets read after a special, consider

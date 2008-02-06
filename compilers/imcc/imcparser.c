@@ -737,7 +737,7 @@ IMCC_itcall_sub(PARROT_INTERP, SymReg *sub)
     if (IMCC_INFO(interp)->cur_call->pcc_sub->sub->pmc_type == enum_class_NCI)
         IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isNCI;
     if (IMCC_INFO(interp)->cur_unit->type == IMC_PCCSUB)
-        IMCC_INFO(interp)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
+        IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
 }
 
 static void
@@ -747,11 +747,11 @@ begin_return_or_yield(PARROT_INTERP, int yield)
     Instruction * const ins = IMCC_INFO(interp)->cur_unit->instructions;
     char                name[128];
 
-    if (!ins || !ins->r[0] || !(ins->r[0]->type & VT_PCC_SUB))
+    if (!ins || !ins->symregs[0] || !(ins->symregs[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, E_SyntaxError,
                     "yield or return directive outside pcc subroutine\n");
     if (yield)
-       ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
+       ins->symregs[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, name, 0);
@@ -3131,7 +3131,7 @@ yyreduce:
              * if we are inside a pcc_sub mark the sub as doing a
              * sub call; the sub is in r[0] of the first ins
              */
-            r1 = IMCC_INFO(interp)->cur_unit->instructions->r[0];
+            r1 = IMCC_INFO(interp)->cur_unit->instructions->symregs[0];
             if (r1 && r1->pcc_sub)
                 r1->pcc_sub->calls_a_sub |= 1;
          }
@@ -3796,7 +3796,7 @@ yyreduce:
   case 202:
 #line 1318 "compilers/imcc/imcc.y"
     {
-            add_pcc_result((yyvsp[(3) - (3)].i)->r[0], (yyvsp[(1) - (3)].sr));
+            add_pcc_result((yyvsp[(3) - (3)].i)->symregs[0], (yyvsp[(1) - (3)].sr));
             IMCC_INFO(interp)->cur_call = NULL;
             (yyval.i) = 0;
          }

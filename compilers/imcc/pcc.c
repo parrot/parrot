@@ -309,7 +309,7 @@ void
 expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
     int          nargs;
-    SymReg      *sub = ins->r[0];
+    SymReg      *sub = ins->symregs[0];
     SymReg      *regs[2];
 
     /*
@@ -338,20 +338,20 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
      * check if there is a return
      */
     if (unit->last_ins->type & (ITPCCSUB) &&
-            unit->last_ins->n_r == 1 &&
-            (sub = unit->last_ins->r[0]) &&
+            unit->last_ins->symreg_count == 1 &&
+            (sub = unit->last_ins->symregs[0]) &&
             sub->pcc_sub &&
             !sub->pcc_sub->object && /* s. src/inter_call.c:119 */
             (sub->pcc_sub->flags & isTAIL_CALL))
         return;
 
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
-            strcmp(unit->last_ins->op, "ret") &&
-            strcmp(unit->last_ins->op, "exit") &&
-            strcmp(unit->last_ins->op, "end") &&
-            strcmp(unit->last_ins->op, "branch") &&
+            strcmp(unit->last_ins->opname, "ret") &&
+            strcmp(unit->last_ins->opname, "exit") &&
+            strcmp(unit->last_ins->opname, "end") &&
+            strcmp(unit->last_ins->opname, "branch") &&
             /* was adding rets multiple times... */
-            strcmp(unit->last_ins->op, "returncc")) {
+            strcmp(unit->last_ins->opname, "returncc")) {
         Instruction *tmp;
 
         /* check to make sure the sub is ok before we try to use it */
@@ -391,7 +391,7 @@ void
 expand_pcc_sub_ret(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
     const int is_yield = ins->type & ITPCCYIELD;
-    SymReg * const sub = ins->r[0];
+    SymReg * const sub = ins->symregs[0];
     const int n        = sub->pcc_sub->nret;
 
     /* TODO implement return conventions */
@@ -572,7 +572,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     if (!(unit->instructions->type & ITLABEL))
         return 0;
 
-    this_sub = unit->instructions->r[0];
+    this_sub = unit->instructions->symregs[0];
 
     if (!this_sub)
         return 0;
@@ -666,7 +666,7 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *in
     SymReg      *meth      = NULL;
     Instruction *get_name;
 
-    SymReg * const sub = ins->r[0];
+    SymReg * const sub = ins->symregs[0];
 
     if (ins->type & ITRESULT) {
         const int n = sub->pcc_sub->nret;

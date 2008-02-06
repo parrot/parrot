@@ -3926,7 +3926,7 @@ YY_RULE_SETUP
 
             if (IMCC_INFO(interp)->cur_unit &&
                 IMCC_INFO(interp)->cur_unit->instructions &&
-                (r = IMCC_INFO(interp)->cur_unit->instructions->r[0]) &&
+                (r = IMCC_INFO(interp)->cur_unit->instructions->symregs[0]) &&
                 r->pcc_sub)
             {
                 if ((r->pcc_sub->pragma & P_METHOD) &&

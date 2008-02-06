@@ -336,7 +336,7 @@ maybe_builtin(PARROT_INTERP, ARGIN(const char *name),
         SymReg * const ns_sym = mk_const(interp, ns, 'S');
 
         ins                   = IMCC_create_itcall_label(interp);
-        sub                   = ins->r[0];
+        sub                   = ins->symregs[0];
 
         IMCC_itcall_sub(interp, meth);
 
@@ -346,7 +346,7 @@ maybe_builtin(PARROT_INTERP, ARGIN(const char *name),
     /* method y = x."cos"() */
     else {
         ins                   = IMCC_create_itcall_label(interp);
-        sub                   = ins->r[0];
+        sub                   = ins->symregs[0];
 
         IMCC_itcall_sub(interp, meth);
 
@@ -745,13 +745,13 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
     }
     else if (STREQ(name, "yield")) {
-        IMCC_INFO(interp)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub
+        IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub
             |= 1 | ITPCCYIELD;
     }
     else if (!strncmp(name, "invoke", 6) ||
              !strncmp(name, "callmethod", 10)) {
         if (IMCC_INFO(interp)->cur_unit->type & IMC_PCCSUB)
-            IMCC_INFO(interp)->cur_unit->instructions->r[0]->pcc_sub->calls_a_sub |= 1;
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
     }
 
     /* set up branch flags
@@ -1684,7 +1684,7 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const char *format), va_lis
             case 'I':
                 {
                 Instruction * const _ins = va_arg(ap, Instruction *);
-                len += fprintf(fd, "%s ", _ins->op);
+                len += fprintf(fd, "%s ", _ins->opname);
                 len += ins_print(interp, fd, _ins);
                 }
                 break;
