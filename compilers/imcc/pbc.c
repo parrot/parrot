@@ -356,13 +356,13 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     size_t size, old;
 
     if (!globals.cs->jit_info) {
-        char * const name = (char *)
-            mem_sys_allocate(strlen(globals.cs->seg->base.name) + 5);
-        sprintf(name, "%s_JIT", globals.cs->seg->base.name);
+        const size_t len = strlen(globals.cs->seg->base.name) + 5;
+        char * const name = (char *)mem_sys_allocate(len);
+        snprintf(name, len, "%s_JIT", globals.cs->seg->base.name);
         globals.cs->jit_info =
             PackFile_Segment_new_seg(interp,
                     interp->code->base.dir, PF_UNKNOWN_SEG, name, 1);
-        free(name);
+        mem_sys_free(name);
     }
 
     size = unit->n_basic_blocks + (old = old_blocks());
