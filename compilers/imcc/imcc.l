@@ -943,10 +943,10 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
 {
     int       c, start_line;
     params_t  params;
-    yyguts_t *yyg        = (yyguts_t *)yyscanner;
-    int       start_cond = YY_START;
-
-    IMCC_INFO(interp)->temp_buffer[0] = '\0';
+    yyguts_t *yyg         = (yyguts_t *)yyscanner;
+    int       start_cond  = YY_START;
+    int       buffer_size = 0;
+    int       buffer_used = 0;
 
     BEGIN(macro);
 
@@ -973,18 +973,37 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
     }
 
     while (c != ENDM) {
+        int elem_len = 0;
+
         if (c <= 0)
             IMCC_fataly(interp, E_SyntaxError,
                         "File ended before macro '%s' was complete",
                         IMCC_INFO(interp)->cur_macro_name);
 
-        if (strlen(IMCC_INFO(interp)->temp_buffer) + strlen(valp->s) >=
-            sizeof (IMCC_INFO(interp)->temp_buffer))
-            IMCC_fataly(interp, E_SyntaxError,
-                        "Macro '%s' is too big",
-                        IMCC_INFO(interp)->cur_macro_name);
+        elem_len = strlen(valp->s);
 
-        strcat(IMCC_INFO(interp)->temp_buffer, valp->s);
+        if (buffer_used) {
+            if (buffer_used + elem_len > buffer_size) {
+                buffer_size += elem_len;
+                buffer_size << 1;
+
+                IMCC_INFO(interp)->macro_buffer =
+                    (char *)mem_sys_realloc(IMCC_INFO(interp)->macro_buffer,
+                        buffer_size);
+            }
+
+            buffer_used += elem_len;
+            strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
+        }
+        else {
+            buffer_size = (elem_len << 1) > 1024 ? elem_len << 1 : 1024;
+
+            IMCC_INFO(interp)->macro_buffer =
+                mem_sys_allocate_zeroed(buffer_size);
+            strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
+            buffer_used = elem_len;
+        }
+
         free(valp->s);
 
         c = yylex(valp, yyscanner, interp);
@@ -995,8 +1014,9 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
     BEGIN(start_cond);
 
     define_macro(interp, IMCC_INFO(interp)->cur_macro_name,
-                 &params, IMCC_INFO(interp)->temp_buffer, start_line);
+                 &params, IMCC_INFO(interp)->macro_buffer, start_line);
 
+    mem_sys_free(IMCC_INFO(interp)->macro_buffer);
     IMCC_INFO(interp)->cur_macro_name = NULL;
 
     return MACRO;

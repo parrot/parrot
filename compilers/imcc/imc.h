@@ -483,15 +483,7 @@ typedef struct _imc_info_t {
     int expect_pasm;
     struct macro_frame_t *frames;
 
-    /* this is just a sign that we suck.  that's all. */
-    char temp_buffer[4096];
-    /* I really do not like this temporary buffer. It makes the
-     * structure big. -- ambs */
-
-    /*
-     * XXX: The use of a cstring hash is good, pretty much.  But we're never
-     * clearing the hash, ever, which is bad, pretty much.
-     */
+    char *macro_buffer;
     Hash *macros;
 
     /*
