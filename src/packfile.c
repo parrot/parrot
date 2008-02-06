@@ -2306,7 +2306,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
      * find seg e.g. CODE_DB => CODE
      * and attach it
      */
-    code_name = strdup(debug->base.name);
+    code_name = str_dup(debug->base.name);
     str_len = strlen(code_name);
     code_name[str_len - 3] = 0;
     code = (PackFile_ByteCode *)PackFile_find_segment(interp,
@@ -2317,7 +2317,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
     }
     code->debugs = debug;
     debug->code = code;
-    free(code_name);
+    mem_sys_free(code_name);
     return cursor;
 }
 
