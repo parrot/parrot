@@ -1404,7 +1404,7 @@ create_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir), pack_file_types t,
     const size_t len = strlen(name) + strlen(file_name) + 2;
     char * const buf = (char *)mem_sys_allocate(len);
 
-    sprintf(buf, "%s_%s", name, file_name);
+    snprintf(buf, len, "%s_%s", name, file_name);
     seg = PackFile_Segment_new_seg(interp, dir, t, buf, add);
     mem_sys_free(buf);
     return seg;
@@ -2416,7 +2416,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
         const size_t len = strlen(cs->base.name) + 4;
         char * const name = (char *)mem_sys_allocate(len);
 
-        sprintf(name, "%s_DB", cs->base.name);
+        snprintf(name, len, "%s_DB", cs->base.name);
         if (interp->code && interp->code->base.dir) {
             debug = (PackFile_Debug *)
                 PackFile_Segment_new_seg(interp,

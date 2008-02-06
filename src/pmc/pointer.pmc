@@ -65,13 +65,8 @@ Marks the pointer as live.
         void (*mark_function)(Interp *, void *) =
             (void (*)(Interp *, void *))D2FPTR(PMC_struct_val(SELF));
 
-        if (PMC_data(SELF) == NULL)
-            return;
-
-        if (PMC_struct_val(SELF) == NULL)
-            return;
-
-        (*mark_function)(INTERP, PMC_data(SELF));
+        if (PMC_data(SELF) && PMC_struct_val(SELF))
+            (*mark_function)(INTERP, PMC_data(SELF));
     }
 
 /*
@@ -85,7 +80,7 @@ Creates and returns a clone of the pointer.
 */
 
     PMC *clone() {
-        PMC *dest      = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = PMC_data(SELF);
         return dest;
@@ -130,16 +125,10 @@ Returns the pointer value as a Parrot string.
 */
 
     STRING *get_string() {
-        STRING *ret;
-        char   *target = (char *)mem_sys_allocate(64);
+        char buffer[64];
+        const size_t len   = snprintf(buffer, sizeof(buffer), "Pointer = 0x%p", PMC_data(SELF));
+        STRING * const ret = string_make(INTERP, buffer, len, "iso-8859-1", 0);
 
-        /* XXX Dangerous if you have a 196-bit system or above
-        (and if you do, you have too comfortable a life and
-        deserve to be tormented by coredumps). */
-        const size_t len = sprintf(target, "Pointer=0x%p", PMC_data(SELF));
-        ret = string_make(INTERP, target, len, "iso-8859-1", 0);
-
-        mem_sys_free(target);
         return ret;
     }
 

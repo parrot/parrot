@@ -385,8 +385,8 @@ Pushes an ASCII version of the integer C<v> onto the end of the C<*io>
 static void
 push_ascii_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 {
-    char buffer[128];
-    const size_t len = sprintf(buffer, "%d ", (int) v);
+    char buffer[20];
+    const size_t len = snprintf(buffer, sizeof(buffer), "%d ", (int) v);
     str_append(interp, io->image, buffer, len);
 }
 
@@ -404,8 +404,8 @@ Pushes an ASCII version of the number C<v> onto the end of the C<*io>
 static void
 push_ascii_number(PARROT_INTERP, ARGIN(const IMAGE_IO *io), FLOATVAL v)
 {
-    char buffer[128];
-    const size_t len = sprintf(buffer, "%g ", (double) v);
+    char buffer[40];
+    const size_t len = snprintf(buffer, sizeof(buffer), "%g ", (double) v);
     str_append(interp, io->image, buffer, len);
 }
 
@@ -457,8 +457,8 @@ Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
 static void
 push_ascii_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const PMC* v))
 {
-    char buffer[128];
-    const size_t len = sprintf(buffer, "%p ", (const void *)v);
+    char buffer[20];
+    const size_t len = snprintf(buffer, sizeof(buffer), "%p ", (const void *)v);
     str_append(interp, io->image, buffer, len);
 }
 

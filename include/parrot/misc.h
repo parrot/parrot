@@ -1,5 +1,5 @@
 /* misc.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -24,9 +24,10 @@
 
 #define FLOAT_IS_ZERO(f) ((f) == 0.0)
 
-/*
- * utils.c
- */
+#ifndef PARROT_HAS_C99_SNPRINTF
+#  define snprintf Parrot_secret_snprintf
+#endif
+
 typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, void *);
 
 /* HEADERIZER BEGIN: src/utils.c */
@@ -105,6 +106,16 @@ STRING * Parrot_psprintf(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*ary);
+
+PARROT_API
+int Parrot_secret_snprintf(
+    ARGOUT(char *buffer),
+    const size_t len,
+    ARGIN(const char *format),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buffer);
 
 PARROT_API
 void Parrot_snprintf(PARROT_INTERP,

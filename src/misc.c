@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -227,6 +227,35 @@ Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))
 
     return Parrot_sprintf_format(interp, pat, &obj);
 }
+
+/*
+
+=item C<int Parrot_secret_snprintf>
+
+A simulation of C<snprintf> for systems that do not support it.
+
+=cut
+
+*/
+
+
+PARROT_API
+int
+Parrot_secret_snprintf(ARGOUT(char *buffer), const size_t len, ARGIN(const char *format), ...)
+{
+    int retval;
+    va_list ap;
+    va_start(ap, format);
+#ifdef BLAHBLAHBLAH_WAS_A_CHECK_FOR_VNSNPRINTF
+    retval = vsnprintf(buffer, len, format, ap);
+#else
+    retval = vsprintf(buffer, format, ap);
+#endif
+    va_end(ap);
+
+    return retval;
+}
+
 
 /*
 
