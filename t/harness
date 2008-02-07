@@ -202,8 +202,8 @@ if ( -e "$Bin/../DEVELOPING" ) {
         c_struct.t
         check_toxxx.t
         copyright.t
-        cppcomments.t
-        cuddled_else.t
+        c_cppcomments.t
+        c_cuddled_else.t
         filenames.t
         gmt_utc.t
         linelength.t
