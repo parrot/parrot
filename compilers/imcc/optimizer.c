@@ -1698,7 +1698,7 @@ is_invariant(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction
 
 =item C<Basic_block * find_outer>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1709,16 +1709,20 @@ PARROT_CAN_RETURN_NULL
 Basic_block *
 find_outer(ARGIN(const IMC_Unit *unit), ARGIN(const Basic_block *blk))
 {
-    const int bb = blk->index;
     int i;
-    const int n_loops = unit->n_loops;
     Loop_info ** const loop_info = unit->loop_info;
+    const int          bb        = blk->index;
+    int                i         = unit->n_loops - 1;
 
     /* loops are sorted depth last */
-    for (i = n_loops-1; i >= 0; i--) /* XXX Optimize away repeated loop_info[i] and ->preheader */
-        if (set_contains(loop_info[i]->loop, bb))
-            if (loop_info[i]->preheader >= 0)
-                return unit->bb_list[loop_info[i]->preheader];
+    for (; i >= 0; i--) {
+        Loop_info * const info = loop_info[i];
+        if (set_contains(info->loop, bb)) {
+            const int preheader = info->preheader;
+            if (preheader >= 0)
+                return unit->bb_list[preheader];
+        }
+    }
     return NULL;
 }
 #  endif

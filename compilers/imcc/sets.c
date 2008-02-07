@@ -243,14 +243,16 @@ PARROT_PURE_FUNCTION
 int
 set_contains(ARGIN(const Set *s), int element)
 {
-    /* workaround for another lcc bug.. */
-    const int byte_in_set = element >> 3;
-    const int pos_in_byte = BIT_IN_BYTE(element);
-
     if (element > s->length)
         return 0;
+    else {
+        /* workaround for another lcc bug.. */
+        const int byte_in_set = element >> 3;
+        const int pos_in_byte = BIT_IN_BYTE(element);
 
-    return s->bmp[byte_in_set] & pos_in_byte;
+
+        return s->bmp[byte_in_set] & pos_in_byte;
+    }
 }
 
 /*
