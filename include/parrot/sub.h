@@ -116,6 +116,20 @@ typedef enum {
 
 #define RECURSION_LIMIT 1000
 
+
+/*
+ * Counts and flags describing the arguments.
+ */
+typedef struct Parrot_sub_arginfo {
+    Parrot_UInt2 pos_required;
+    Parrot_UInt2 pos_optional;
+    Parrot_UInt2 named_required;
+    Parrot_UInt2 named_optional;
+    Parrot_UInt1 pos_slurpy;
+    Parrot_UInt1 named_slurpy;
+} Parrot_sub_arginfo;
+
+
 /*
  * Sub and Closure share a Parrot_sub structure.
  * Closures have additionally an 'outer_ctx'
@@ -141,6 +155,7 @@ typedef struct Parrot_sub {
     PMC      *eval_pmc;          /* eval container / NULL */
     parrot_context_t *ctx;       /* the context this sub is in */
     UINTVAL  comp_flags;         /* compile time and additional flags */
+    Parrot_sub_arginfo *arg_info;/* Argument counts and flags. */
 
     /* - end common */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
@@ -172,6 +187,7 @@ typedef struct Parrot_coro {
     PMC      *eval_pmc;          /* eval container / NULL */
     struct Parrot_Context  *ctx; /* coroutine context */
     UINTVAL  comp_flags;         /* compile time and additional flags */
+    Parrot_sub_arginfo arg_info; /* Argument counts and flags. */
 
     /* - end common */
 
