@@ -73,6 +73,20 @@ This defines the symbol C<+> as an C<infix> operator.
 
 {{ how to express "looser"/"tighter" in words }}
 
+=head3 Operator precedence
+
+Operator precedence can be expressed using the following {{ ehm. what are they called? }}
+
+=over 4
+
+=item * looser
+
+=item * equal
+
+=item * tighter
+
+=back
+
 =head3 Where's the operator?
 
 When operators such as C<infix:+> are defined, the bottom-up parser will
@@ -89,8 +103,8 @@ you define. The subroutine for the C<infix:+> operator could look like this:
 
 Whenever an expression such as C<42 + 1> is parsed, this will result in a
 call to C<infix:+> with the operands C<42> and C<1>. The C<infix:+> sub
-will create a new object, and assign the result of 42 + 1 to it, after which
-this new object is returned. Note that the C<n_> prefix of the C<add>
+will create a new object, and assign the result of C<42 + 1> to it, after
+which this new object is returned. Note that the C<n_> prefix of the C<add>
 instruction implies that a new object is created.
 
 You might think that it's somewhat overkill to write and call a subroutine
@@ -101,7 +115,8 @@ This can be accomplished using a the C<pirop> trait, discussed below.
 
 =head3 Infix, prefix, postfix
 
-
+{{ explain that any word after a "***ix:" can be an operator, for instance
+   "infix:defined" }}
 
 =head3 Ternary operators
 
@@ -110,7 +125,11 @@ below:
 
  $income > 100000 ? print("I'm rich!") : print("I'll keep my job for now")
 
+To declare a ternary operator, you write:
 
+ proto ternary:<? :> is looser('infix:+') { ... }
+
+{{ note about automatically knowing about ? and : as two separate tokens }}
 
 =head3 The C<assoc> trait
 
@@ -126,5 +145,29 @@ below:
 
 {{ french quotes for << and such }}
 
+
+=head1 FAQ
+
+=over 4
+
+=item * Why are some operators quoted and some not?
+
+=item * I get an error message saying: XXX
+
+=item * How many operator tables can I use in my language?
+
+{{ I think one only? }}
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<docs\pct\gettingstarted.pod>
+
+=item * L<docs\pct\past_building_blocks.pod>
+
+=back
 
 =cut
