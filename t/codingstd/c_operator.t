@@ -60,7 +60,7 @@ sub strip_pod {
 }
 
 sub check_operators {
-    my @comma_space;
+    my %comma_space;
 
     foreach my $file (@_) {
         my $path = @ARGV ? $file : $file->path();
@@ -87,13 +87,13 @@ sub check_operators {
         for my $line (@lines) {
             # after a comma there should be one space or a newline
             if ( $line =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
-                push @comma_space => $path;
+                $comma_space{$path} = undef;
             }
         }
     }
 
 ## L<PDD07/Code Formatting"there should be one space or a newline after a comma">/
-    is( join("\n",@comma_space), "", "there should be one space or a newline after a comma" );
+    is( join("\n", keys %comma_space), "", "there should be one space or a newline after a comma" );
 }
 
 # Local Variables:
