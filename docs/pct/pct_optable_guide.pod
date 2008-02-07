@@ -26,6 +26,8 @@ Therefore, the generated parser is a top-down parser, starting at the
 C<TOP> rule, and invoking rules that represent I<lower> parts of the
 grammar.
 
+=head2 Switching Top-down and Bottom-up parsing
+
 An optable parses operators bottom-up, which is the other well-known
 parsing approach, implemented popular parser generators such as Yacc.
 At some point, when using an optable, your parser must switch from
@@ -55,6 +57,34 @@ C<term:>.
 
  proto 'term:' is precedence('=') is parsed(&simple_expression) { ... }
 
+This rule states that whenever an operand is expected, it is parsed by
+the rule named C<simple_expression>. In other words, this is the point
+where the parser switches back from bottom-up to top-down.
 
+=head2 Defining operators
+
+In between these two rules defining the entry point and the I<exit> point
+of the operator parser, operators are declared, along with their
+precedence. This typically look as follows:
+
+ proto 'infix:+' is looser('term:') { ... }
+
+This defines the symbol C<+> as an C<infix> operator.
+
+{{ how to express "looser"/"tighter" in words }}
+
+=head3 Infix, prefix, postfix
+
+=head3 Ternary operators
+
+=head3 The C<assoc> trait
+
+=head3 The C<pirop> trait
+
+=head3 The C<pasttype> trait
+
+=head3 Special characters
+
+{{ french quotes for << and such }}
 
 =cut
