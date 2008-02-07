@@ -77,9 +77,9 @@ Initializes a PMCProxy PMC.
 */
 
     void init() {
-        Parrot_Class *_pmc = mem_allocate_zeroed_typed(Parrot_Class);
-        PMC * const new_attribute = pmc_new(interp, enum_class_Hash);
-        STRING *name = CONST_STRING(interp, "proxy");
+        Parrot_Class * const _pmc          = mem_allocate_zeroed_typed(Parrot_Class);
+        PMC          * const new_attribute = pmc_new(interp, enum_class_Hash);
+        STRING       * const name          = CONST_STRING(interp, "proxy");
         PMC_data(SELF)        = _pmc;
 
         /* Set flags for custom DOD mark and destroy. */
@@ -112,7 +112,7 @@ Initializes a PMCProxy PMC.
     }
 
     void init_pmc(PMC *init_data) {
-        INTVAL type_num = VTABLE_get_integer(interp, init_data);
+        const INTVAL type_num = VTABLE_get_integer(interp, init_data);
         Parrot_Class *proxy_info;
 
         /* Ensure that it's a valid type number. */
@@ -155,7 +155,7 @@ Creates an instance of the PMC.
 
 */
     PMC *instantiate(PMC *init) {
-        Parrot_Class *_pmc = PARROT_CLASS(SELF);
+        Parrot_Class * const _pmc = PARROT_CLASS(SELF);
 
         if (!PMC_IS_NULL(init))
             return pmc_new_init(interp, _pmc->id, init);
@@ -228,7 +228,7 @@ Returns whether the class is or inherits from C<*classname>.
         Parrot_Class * const _proxy = PARROT_CLASS(SELF);
         INTVAL        i, num_classes;
         STRING       *classname;
-        PMC          *classobj = PMCNULL;
+        PMC          *classobj;
 
         if (PMC_IS_NULL(lookup))
             return 0;
@@ -260,7 +260,7 @@ Returns whether the class is or inherits from C<*classname>.
          */
         num_classes = VTABLE_elements(interp, _proxy->parents);
         for (i = 0; i < num_classes; i++) {
-            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, _proxy->parents, i);
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _proxy->parents, i);
             if (VTABLE_isa_pmc(interp, cur_class, lookup))
                 return 1;
         }
@@ -280,7 +280,7 @@ Returns the integer type of the class.
 
 
     INTVAL type() {
-        Parrot_Class *_class    = PARROT_CLASS(SELF);
+        const Parrot_Class * const _class = PARROT_CLASS(SELF);
         return _class->id;
     }
 
@@ -298,7 +298,8 @@ inspect_str.
     {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        PMC *metadata = pmc_new(interp, enum_class_Hash);
+        PMC * const metadata = pmc_new(interp, enum_class_Hash);
+
         VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "name"),
             VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "name")));
         VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "namespace"),
@@ -320,8 +321,8 @@ Gets the name of the PMC.
 
 */
     PCCMETHOD name() {
-        Parrot_Class *_pmc     = PARROT_CLASS(SELF);
-        STRING          *ret_name = _pmc->name;
+        Parrot_Class * const _pmc     = PARROT_CLASS(SELF);
+        STRING       * const ret_name = _pmc->name;
         PCCRETURN(STRING *ret_name);
     }
 
@@ -335,8 +336,8 @@ Gets the namespace that this class is attached to.
 
 */
     PCCMETHOD pmc_namespace() {
-        Parrot_Class *_pmc          = PARROT_CLASS(SELF);
-        PMC             *ret_namespace = _pmc->_namespace;
+        Parrot_Class * const _pmc          = PARROT_CLASS(SELF);
+        PMC          * const ret_namespace = _pmc->_namespace;
         PCCRETURN(PMC *ret_namespace);
     }
 
@@ -350,7 +351,7 @@ Creates an instance of the PMC.
 
 */
     PCCMETHOD new(PMC *args :optional, int got_args :opt_flag) {
-        PMC *obj = VTABLE_instantiate(interp, SELF, args);
+        PMC * const obj = VTABLE_instantiate(interp, SELF, args);
         UNUSED(got_args);
         PCCRETURN(PMC *obj);
     }
@@ -365,7 +366,7 @@ Return a hash where the keys are method names and the values are methods.
 
 */
     PCCMETHOD methods() {
-        PMC *ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
+        PMC * const ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
         PCCRETURN(PMC *ret_methods);
     }
 
@@ -379,7 +380,7 @@ Return the parents array PMC.
 
 */
     PCCMETHOD parents() {
-        PMC *ret_parents = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents"));
+        PMC * const ret_parents = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents"));
         PCCRETURN(PMC *ret_parents);
     }
 
@@ -394,13 +395,11 @@ parameter is supplied, a particular item of introspection data.
 
 */
     PCCMETHOD inspect(STRING *what :optional, int got_what :opt_flag) {
-        PMC *found;
-
         /* Just delegate to the appropriate vtable method. */
-        if (got_what)
-            found = VTABLE_inspect_str(interp, SELF, what);
-        else
-            found = VTABLE_inspect(interp, SELF);
+        PMC * const found =
+            got_what
+                ? VTABLE_inspect_str(interp, SELF, what)
+                : VTABLE_inspect(interp, SELF);
 
         PCCRETURN(PMC *found);
     }
