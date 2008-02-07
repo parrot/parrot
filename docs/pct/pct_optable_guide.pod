@@ -57,10 +57,6 @@ In order to prevent very big parse trees (which is rather inefficient),
 it's much better to do bottom-up parsing for expressions such as these.
 
 
-=head1 HOW DOES AN OPTABLE WORK?
-
-{{explain how this works; is this needed? }}
-
 =head1 HOW TO USE AN OPTABLE?
 
 Perl 6 rules are run as ordinary subroutines (well, in fact, they are
@@ -79,9 +75,8 @@ top-down parsing to bottom-up, and after parsing the operators (and
 related operands), the parser switches back from bottom-up to top-down
 again.
 
-{{explain a bit how to decide when to enter bottom-up parsing}}
-
-{{explain how to decide what an operand is}}
+Buttom up parsing is very well suited for expressions that consist of
+terms, unary and binary operators with no two terms in a row.
 
 In order to define the entry point of the bottom-up, operator parsing
 table, you should define a rule. Below is an example that states that
@@ -205,50 +200,42 @@ is usually said to be C<left> associated, while the exponential operator
 (often written as C<^>) is usually C<right> associated. Consider this
 example:
 
- 1 + 2 ^ 3 * 4
-
-According to standard mathematical rules, C<+> has lowest precedence,
-then comes the multiply operator, and the power operator has the highest
-precedence. Still, there are two ways to parse this (assuming C<+> and
-C<*> are left associated, which they are):
-
- (1 + (2 ^ (3 * 4))
-
-and:
-
- (1 + (2 ^ 3) * 4)
-
-which yields a complete different result. The latter option is the correct
-one, according to what you learnt in high school. The power operator takes
-its right operand and applies that to its left operand.
-
-Another common example is:
-
  10 - 5 - 2
 
-Is this:
+Should this be parsed as:
 
  ((10 - 5) - 2)  # 5-2=3
 
-or:
+or as:
 
  (10 - (5 - 2))  # 10-3=7
 
-In other words, does the C<-> operator first evaluate its right operand or
-first its left operand. According to standard rules, the C<-> operator
-is C<left> associated, which means the first option is correct.
+In other words, does the C<-> I<associate> with the left or right operand?
+According to standard rules, the C<-> operator is C<left> associated,
+which means the first option is correct.
 
 This associecity is expressed using the C<assoc> trait, like so:
 
  proto 'infix:-' is assoc('left') ...
 
-If you don't specify the association, it defaults to C<'left'>. Other
-possible values are: C<'right'> and C<'none'>.
+If you don't specify the association, it defaults to C<'left'>. C<right>
+association works the other way around. In mathematics, the power operator
+is right associated.
 
-{{ explain what 'none' implies }}
+There is a third associacity in Perl 6. Generally a list (using the comma
+operator) is not nested at all:
 
-{{ check whether I explained this correctly. This is how I understood
-   it. kinda. }}
+ 1, 2, 3, 4
+
+should neither be parsed as
+
+ (((1, 2), 3), 4
+
+nor as
+
+ 1, (2, (3, 4))
+
+You can achieve that with the C<is assoc('none')> trait.
 
 =head3 The C<pirop> trait
 
@@ -328,11 +315,20 @@ Therefore, use so-called French quotes to do this. This looks as follows:
 
 =item * Why are some operators quoted and some not?
 
+{{ answer this }}
+
 =item * I get an error message saying: XXX
+
+{{ answer this }}
 
 =item * How many operator tables can I use in my language?
 
 {{ I think one only? }}
+
+=item * How does an optable parser work?
+
+If you really want to know, check out compiler literature.
+It's something with a stack.
 
 =back
 
