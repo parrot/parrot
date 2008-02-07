@@ -73,18 +73,58 @@ This defines the symbol C<+> as an C<infix> operator.
 
 {{ how to express "looser"/"tighter" in words }}
 
+=head3 Where's the operator?
+
+When operators such as C<infix:+> are defined, the bottom-up parser will
+generate a C<call> instruction to a subroutine with the same name, that is,
+C<infix:+>. Therefore, you need to write a subroutine for each operator
+you define. The subroutine for the C<infix:+> operator could look like this:
+
+ .sub 'infix:+'
+    .param pmc a      # left operand
+    .param pmc b      # right operand
+    n_add $P0, a, b   # create a new PMC object with the value a+b
+    .return ($P0)
+ .end
+
+Whenever an expression such as C<42 + 1> is parsed, this will result in a
+call to C<infix:+> with the operands C<42> and C<1>. The C<infix:+> sub
+will create a new object, and assign the result of 42 + 1 to it, after which
+this new object is returned. Note that the C<n_> prefix of the C<add>
+instruction implies that a new object is created.
+
+You might think that it's somewhat overkill to write and call a subroutine
+for such a simple operation, and that this could be done simpler. Well,
+you're right. If the implementation of the C<+> operator is as simple as
+in this case, there's a simpler way to implement the exact same behavior.
+This can be accomplished using a the C<pirop> trait, discussed below.
+
 =head3 Infix, prefix, postfix
 
+
+
 =head3 Ternary operators
+
+Most languages only have one ternary operator: C<? :>. An example is shown
+below:
+
+ $income > 100000 ? print("I'm rich!") : print("I'll keep my job for now")
+
+
 
 =head3 The C<assoc> trait
 
 =head3 The C<pirop> trait
 
+{{ make a note about "iseq" not working due to PCT not using $I0 registers }}
+
 =head3 The C<pasttype> trait
+
+{{ implement "and" with pasttype('if') and "or" with pasttype('unless') }}
 
 =head3 Special characters
 
 {{ french quotes for << and such }}
+
 
 =cut
