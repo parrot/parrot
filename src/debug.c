@@ -2724,7 +2724,11 @@ PDB_backtrace(PARROT_INTERP)
 
 =item C<static const char* GDB_print_reg>
 
-RT#48260: Not yet documented!!!
+Used by GDB_P to convert register values for display.  Takes register
+type and number as arguments.
+
+Returns a pointer to the start of the string, (except for PMCs, which
+print directly and return "").
 
 =cut
 
@@ -2759,7 +2763,10 @@ GDB_print_reg(PARROT_INTERP, int t, int n)
 
 =item C<static const char* GDB_P>
 
-RT#48260: Not yet documented!!!
+Used by PDB_print to print register values.  Takes a pointer to the
+register name(s).
+
+Returns "" or error message.
 
 =cut
 
@@ -2823,7 +2830,12 @@ static PDB_breakpoint_t *gdb_bps;
 
 =item C<static int GDB_B>
 
-RT#48260: Not yet documented!!!
+Inserts a break-point into a table (which it creates if necessary).
+Takes an instruction counter (?).
+
+Currently unused.
+
+Returns break-point count, or -1 if point is out of bounds.
 
 =cut
 
@@ -2831,14 +2843,12 @@ RT#48260: Not yet documented!!!
 
 static int
 GDB_B(PARROT_INTERP, ARGIN(const char *s)) {
-    int               nr;
-    opcode_t         *pc;
-    PDB_breakpoint_t *bp, *newbreak;
-
     if ((unsigned long)s < 0x10000) {
         /* HACK alarm  pb 45 is passed as the integer not a string */
         /* RT#46145 check if in bounds */
-        pc = interp->code->base.data + (unsigned long)s;
+        opcode_t * const pc = interp->code->base.data + (unsigned long)s;
+        PDB_breakpoint_t *bp, *newbreak;
+        int nr;
 
         if (!gdb_bps) {
             nr             = 0;

@@ -1158,7 +1158,9 @@ dynop_register_xx(PARROT_INTERP,
 
 =item C<static void dynop_register_switch>
 
-RT#48260: Not yet documented!!!
+Used only at the end of dynop_register.  Sums the old and new op_counts
+storing the result into the operations count field of the interpreter
+object.
 
 =cut
 

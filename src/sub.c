@@ -325,7 +325,9 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
 
 =item C<int Parrot_Context_get_info>
 
-RT#48260: Not yet documented!!!
+Takes pointers to a context and its information table.
+Populates the table and returns 0 or 1. XXX needs explanation
+Used by Parrot_Context_infostr.
 
 =cut
 
@@ -416,7 +418,8 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
 
 =item C<STRING* Parrot_Context_infostr>
 
-RT#48260: Not yet documented!!!
+Formats context information for display.  Takes a context pointer and
+returns a pointer to the text.  Used in debug.c and warnings.c
 
 =cut
 
@@ -502,7 +505,12 @@ Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(const parrot_conte
 
 =item C<PMC* parrot_new_closure>
 
-RT#48260: Not yet documented!!!
+Used where? XXX
+
+Creates a new closure, saving the context information.  Takes a pointer
+to a subroutine.
+
+Returns a pointer to the closure, (or throws exceptions if invalid).
 
 =cut
 

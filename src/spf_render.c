@@ -206,7 +206,10 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
 
 =item C<static STRING* str_append_w_flags>
 
-RT#48260: Not yet documented!!!
+Used by Parrot_sprintf_format.  Prepends supplied prefix for numeric
+values. (e.g. 0x for hex.)
+
+Returns the pointer to the modified string.
 
 =cut
 
