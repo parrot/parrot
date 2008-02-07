@@ -628,7 +628,7 @@ The number of optional named arguments
             opcode_t *pc;
 
             /* Allocate structure to store argument information in. */
-            sub->arg_info = mem_sys_allocate_zeroed(sizeof(Parrot_sub_arginfo));
+            sub->arg_info = mem_allocate_zeroed_typed(Parrot_sub_arginfo);
 
             /* Get pointer into the bytecode where this sub starts. */
             pc = sub->seg->base.data + sub->start_offs;
