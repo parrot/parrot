@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -95,34 +95,36 @@ sub check_parens {
 
                 # ops use the same names as some C keywords, so skip
                 next if $line =~ m{^op};
-                push @keyword_paren => "$path: $1\n";
+                push @keyword_paren => "$path: $1";
             }
             if ( $line =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }x ) {
-                push @non_keyword_paren => "$path: $1\n";
+                push @non_keyword_paren => "$path: $1";
             }
             if ( $line =~ m{ ( \( [ \t]+ [^\n] | [^\n] [ \t]+ \) ) }x ) {
-                push @space_between_parens => "$path: $1\n";
+                push @space_between_parens => "$path: $1";
             }
         }
     }
 
 ## L<PDD07/Code Formatting/"there should be at least one space between a C keyword and any subsequent open parenthesis">
-    ok( !scalar(@keyword_paren), 'Spacing between C keyword and following open parenthesis' )
-        or diag( "incorrect spacing between C keyword and following open parenthesis found in "
-            . scalar @keyword_paren
-            . " instances:\n@keyword_paren" );
+    is( join("\n",@keyword_paren), "", <<END_DESCRIPTION);
+there should be at least one space between a C
+keyword and any subsequent open parenthesis
+END_DESCRIPTION
 
 ## L<PDD07/Code Formatting/"There should be no space between a function name and the following open parenthesis">
-    ok( !scalar(@non_keyword_paren), 'Spacing between function name and following open parenthesis' )
-        or diag( "incorrect spacing between function name and following open parenthesis found in "
-            . scalar @non_keyword_paren
-            . " instances:\n@non_keyword_paren" );
+    is( join("\n",@non_keyword_paren), "", <<END_DESCRIPTION);
+There should be no space between a function name
+and the following open parenthesis
+END_DESCRIPTION
 
 ## L<PDD07/Code Formatting/"parentheses should not have space immediately after the opening parenthesis nor immediately before the closing parenthesis">
-    ok( !scalar(@space_between_parens), 'Spacing between parentheses' )
-        or diag( "incorrect spacing between parentheses found in "
-            . scalar @space_between_parens
-            . " instances:\n@space_between_parens" );
+    is( join("\n",@space_between_parens), "", <<END_DESCRIPTION);
+parentheses should not have space immediately
+after the opening parenthesis nor immediately
+before the closing parenthesis
+END_DESCRIPTION
+
 }
 
 # Local Variables:
