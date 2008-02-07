@@ -87,16 +87,13 @@ sub check_operators {
         for my $line (@lines) {
             # after a comma there should be one space or a newline
             if ( $line =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
-                push @comma_space => "$path $1\n";
+                push @comma_space => $path;
             }
         }
     }
 
-## L<PDD07/Code Formatting/"there should be one space or a newline after a comma">
-    ok( !@comma_space, 'Spacing after commas' )
-        or diag( "incorrect spacing following a comma found in "
-            . @comma_space
-            . " instances:\n@comma_space" );
+## L<PDD07/Code Formatting"there should be one space or a newline after a comma">/
+    is( join("\n",@comma_space), "", "there should be one space or a newline after a comma" );
 }
 
 # Local Variables:
