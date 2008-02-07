@@ -14,9 +14,50 @@ written for the Parrot Grammar Engine.
 
 {{explain why you should want that}}
 
+Even in simple languages such as C<abc>, parse trees can become very
+big for even very simple expressions.
+
+Consider the following example grammar:
+
+ token addop { '+' | '-' }
+ token mulop { '*' | '/' }
+
+ rule expression {
+    <mulexpr> [<addop> <mulexpr>]*
+ }
+
+ rule mulexpr {
+    <primary> [<mulop> <primary>]*
+ }
+
+ rule primary {
+    | <integer>
+    ...
+ }
+
+
+ An expresson such as C<1 + 2> will result in a parse tree like this:
+
+ expression
+   mulexpr
+      primary
+         integer
+            1
+   addop
+      +
+   mulexpr
+      primary
+         integer
+            2
+
+This may not seem very big, but remember it's only for C<1 + 2>!
+In order to preven very big parse trees (which is rather inefficient),
+it's much better to do bottom-up parsing for expressions such as these.
+
+
 =head1 HOW DOES AN OPTABLE WORK?
 
-{{explain how this works}}
+{{explain how this works; is this needed? }}
 
 =head1 HOW TO USE AN OPTABLE?
 
@@ -71,19 +112,27 @@ precedence. This typically look as follows:
 
 This defines the symbol C<+> as an C<infix> operator.
 
-{{ how to express "looser"/"tighter" in words }}
 
 =head3 Operator precedence
 
-Operator precedence can be expressed using the following {{ ehm. what are they called? }}
+Operator precedence can be expressed using the following traits:
 
 =over 4
 
-=item * looser
+=item * looser( OP )
 
-=item * equal
+States that the precedence of the current operator being defined is looser
+than C<op>.
 
-=item * tighter
+=item * equal( OP )
+
+States that the precedence of the current operator being defined is equal
+to the precedence of operator C<OP>.
+
+=item * tighter( OP )
+
+States that the precedence of the current operator being defined is
+tighter than the precedence of the operator C<OP>.
 
 =back
 
@@ -115,8 +164,24 @@ This can be accomplished using a the C<pirop> trait, discussed below.
 
 =head3 Infix, prefix, postfix
 
-{{ explain that any word after a "***ix:" can be an operator, for instance
-   "infix:defined" }}
+Besides C<infix> operators, operators can be C<prefix> or C<postfix>
+Operators can even be declared to be both C<prefix> and C<infix>. A common
+example is the C<-> operator. This is fine, because each operator has
+a certain precedence, which is kept track of by the bottom-up parser.
+
+In order to define a prefix C<++> operator, you could write this:
+
+ proto 'prefix:++' ... # specify precedence
+
+Besides these well-known mathematical operators, some languages have
+built-in operators with C<normal> names. For instance, Ruby defines
+an operator called C<defined?>, which queries its operand whether it
+is defined. Defining such special operators are not special in any way,
+just declared them as any other operator:
+
+ proto 'prefix:defined?' ...
+
+Note that C<defined?> is a prefix operator.
 
 =head3 Ternary operators
 
@@ -131,6 +196,51 @@ To declare a ternary operator, you write:
 
 
 =head3 The C<assoc> trait
+
+Operators have a certain associacity. For instance, the C<+> operator
+is usually said to be C<left> associated, while the exponential operator
+(often written as C<^>) is usually C<right> associated. Consider this
+example:
+
+ 1 + 2 ^ 3 * 4
+
+According to standard mathematical rules, C<+> has lowest precedence,
+then comes the multiply operator, and the power operator has the highest
+precedence. Still, there are two ways to parse this (assuming C<+> and
+C<*> are left associated, which they are):
+
+ (1 + (2 ^ (3 * 4))
+
+and:
+
+ (1 + (2 ^ 3) * 4)
+
+which yields a complete different result. The latter option is the correct
+one, according to what you learnt in high school. The power operator takes
+its right operand and applies that to its left operand.
+
+Another common example is:
+
+ 10 - 5 - 2
+
+Is this:
+
+ ((10 - 5) - 2)  # 5-2=3
+
+or:
+
+ (10 - (5 - 2))  # 10-3=7
+
+In other words, does the C<-> operator first evaluate its right operand or
+first its left operand. According to standard rules, the C<-> operator
+is C<left> associated, which means the first option is correct.
+
+This associecity is expressed using the C<assoc> trait, like so:
+
+ proto 'infix:-' is assoc('left') ...
+
+{{ check whether I explained this correctly. This is how I understood
+   it. kinda. }}
 
 =head3 The C<pirop> trait
 
