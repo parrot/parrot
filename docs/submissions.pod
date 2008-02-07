@@ -43,7 +43,7 @@ for whatever the distribution's parent directory is called on your machine.
         |
         +--> parrot
                 |
-                +--> LICENSES
+                +--> LICENSE
                 |
                 +--> src 
                 |

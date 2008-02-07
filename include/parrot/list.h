@@ -1,7 +1,7 @@
 /*
  * list.h
- *  Copyright (C) 2002, The Perl Foundation.
- *  License:  Artistic 2.0, see README and LICENSES for details
+ *  Copyright (C) 2002-2008, The Perl Foundation.
+ *  License:  Artistic 2.0, see README and LICENSE for details
  *  SVN Info
  *     $Id$
  *  Overview:

@@ -1,6 +1,6 @@
 /*
-Copyright (C) 2002-2007, The Perl Foundation.
-License:  Artistic 2.0, see README and LICENSES for details
+Copyright (C) 2002-2008, The Perl Foundation.
+License:  Artistic 2.0, see README and LICENSE for details
 $Id$
 
 =head1 NAME
