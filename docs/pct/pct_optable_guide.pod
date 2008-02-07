@@ -129,21 +129,79 @@ To declare a ternary operator, you write:
 
  proto ternary:<? :> is looser('infix:+') { ... }
 
-{{ note about automatically knowing about ? and : as two separate tokens }}
 
 =head3 The C<assoc> trait
 
 =head3 The C<pirop> trait
 
-{{ make a note about "iseq" not working due to PCT not using $I0 registers }}
+Some operators can be perfectly mapped to a specific Parrot instruction,
+for instance the C<n_add> op that we introduced earlier. By default, an
+operator is implemented as a subroutine call, which is obviously not as
+efficient as a single Parrot instruction. Therefore, you can specify the
+Parrot instruction using the C<pirop> trait. You can do this as follows:
+
+ proto 'infix:+' ... is pirop('n_add') { ... }
+
+This will not work for all Parrot ops, though. Certain instructions
+leave their result in an C<I> register (one of the four types of Parrot
+registers). PCT currently only supports PMC registers (C<P> registers).
+Operators such as C<==> and C<!=> must therefore be implemented as
+subroutine calls.
 
 =head3 The C<pasttype> trait
 
-{{ implement "and" with pasttype('if') and "or" with pasttype('unless') }}
+Some operators have behavior that can be implemented by certain PAST
+nodes. For instance, many languages define the semantics of the C<and>
+operator to be the following:
+
+ A and B
+
+ 1 evaluate A
+ 2 if result(1) is false return false
+ 3 evaluate B
+ 4 return result(3)
+
+As soon as the result of A is found to be false, there is no need to
+evaluate B, as the final result can never be true (as this is the C<and>
+operator). So, C<B> is evaluated only if C<A> is true.
+
+This is very similar to the PAST::Op node with the C<if> C<:pasttype>:
+
+ if (A) {
+   B
+ }
+
+Therefore, an operator such as C<and> can be implemented as an C<if>
+statement. In order to specify that the C<and> operator must be handled
+as a PAST::Op( :pasttype('if') ) node, you can use the C<pasttype> trait,
+like so:
+
+ proto 'infix:and' ... is pasttype('if') { ... }
+
+The C<or> operator is similar to the semantics of a
+PAST::Op( :pasttype('unless') node:
+
+ A or B
+
+ 1 evaluate A
+ 2 if result(1) is true return true
+ 3 evaluate B
+ 4 return result(3)
+
+So, C<unless> A is true, evaluate B. Hence, the C<or> operator could
+be implemented like so:
+
+ proto 'infix:or' ... is pasttype('unless') { ... }
 
 =head3 Special characters
 
-{{ french quotes for << and such }}
+Some operators, such as the shift operators contain the "<" or ">" character.
+As operators can be specified as, for instance, infix:<+>, defining an operator
+such as "<<" will make the rule parser (the parser generator) confused.
+
+Therefore, use so-called French quotes to do this. This looks as follows:
+
+ proto infix:«>>»  is equiv(infix:«<<») { ... }
 
 
 =head1 FAQ
