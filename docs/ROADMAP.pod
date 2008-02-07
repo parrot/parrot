@@ -7,14 +7,16 @@ ROADMAP - A plan for parrot 1.0 and beyond.
 
 =head1 PURPOSE
 
-Describe the work that is remaining to release parrot 1.0, including
-both user-visibile features and internals.
+A high level overview of the work that is remaining to release parrot 1.0,
+including both user-visibile features and internals.
 
-This document is intended to be a high level overview of remaining areas
-of work. For more detailed information about remaining tasks, see
+For detailed information regarding specific tasks, we will refer to
 L<https://rt.perl.org/rt3>.
 
-It also contains information about future direction after 1.0.
+For a high level overview of funded parrot milestones for 1.0, please see:
+L<http://www.perlfoundation.org/parrot_grant_from_nlnet>
+
+This document also contains information about future direction after 1.0.
 
 =head1 LAYOUT
 
@@ -26,7 +28,33 @@ or on the wiki). Tasks with no supporting documentation will be marked
 
 =head1 1.0
 
-TBD.
+=head2 Features
+
+I<TBD>
+
+=head2 Quality
+
+While the 1.0 release must pass all of these quality goals, future releases
+will of course adhere to these standards as well.
+
+=over 4
+
+=item * All known GC bugs must be resolved
+
+=item * All known segfaults must be resolved
+
+=item * All features must have comprehensive tests
+
+=item * All features must have comprehensive documentation
+
+=item * All tests must pass on all core platforms
+
+=item * Remove obsolete code/documentation.
+
+Eliminate dead documentation.  Let historians dig through our subversion
+history.  We look forward toward successful deployment. -Chip
+
+=back
 
 =head1 2.0
 
@@ -41,114 +69,19 @@ eliminate this requirement.
 
 =back
 
-=head1 NOTE
-
-The contents of this file are outdated and must be reviewed.
-See RT #48611.
-
 =head1 UNREVIEWED CONTENT
 
-There is no single place in which all remaining parrot work is documented.
-There are various TODO files, the RT queue, comments in the source code and
-the documentation. This document is a first pass at unifying this information
-and providing a single point of reference for anyone interested in the current
-state of the parrot, whether they are developers looking for items to work on,
-or external users looking for an idea of when they can expect a release.
-
-This document is not meant to contain all the metadata regarding particular
-tasks, but merely provide a summary of the tasks.
-
-For a high level overview of parrot milestones, please see:
-L<http://www.perlfoundation.org/parrot_grant_from_nlnet>
-
-=head1 RELEASE POLICIES
-
-The following conditions must be met in order to release a new Parrot version:
-
-=over 4
-
-=item All bugs which cause Parrot to dump core must be addressed
-
-This is the B<highest> priority.
-
-=item Fix all bugs tied to the given milestone
-
-=back
-
-=head1 RELEASE HISTORY
-
-For a list of previous releases see F<parrothist.pod>.
-For a list of new and fixed features in each release see F<../NEWS>.
+The contents of this file are outdated and must be reviewed.
+See RT #48611.  All content beyond this point needs to be validated.
 
 =head1 OVERVIEW
 
 The remaining tasks are broken down into the following categories, roughly
 listed in the order through which a task might progress.
 
-=head2 METADATA
-
-Each task has certain metadata associated with it which must be tracked.
-Eventually all metadata should be stored in RT at L<https://rt.perl.org/rt3/>
-
-=head2 DESIGN
-
-These are pending design decisions which must be made before any code can be
-written to implement them. Note - DESIGN I<is> a special kind of documentation
-task, but due to the nature of this kind of documentation, it deserves to be
-broken out into its own category.
-
-=head2 TODO
-
-Any item, whether visible to parrot users or hidden behind an API, that has
-already been designed (but not implemented) belongs here.
-
-=head2 BUGFIX
-
-Any items which have been implemented but don't work as expected.
-
-=head2 PORTABILITY
-
-Any items which are specific to a particular platform or require special
-attention for cross-platform compatibility.
-
-=head2 DOCUMENTATION
-
-Any items pertaining to source, API, or user level documentation.
-
-=head2 HIGH LEVEL LANGUAGES
-
-Parrot currently ships with several partial language implementations. Any tasks
-which are specific to those languages, or affect cross-language compatibility
-will be listed here.
-
-=head1 ISSUES
-
-=head2 METADATA
-
-=over 4
-
-=item *
-
-To be included: docs/pmc, docs/resources, docs/*.pod, anything in SVN not in
-docs, RT. (That is, quite a bit.)
-
-[[What does this item mean, exactly?  --Chip]]
-
-The intention was to comb through the various sources of things to be done and
-collate them in some fashion. At the time of that writing, none of the tasks
-documented in those directories were documented in a central area.  Something a
-little nicer than grep -r 'XXX', but that would certainly do for a start.
-
-=back
-
 =head2 DOCUMENTATION
 
 =over 4
-
-=item *
-
-Eliminate dead documentation.  Let historians dig through our subversion
-history.  We look forward toward successful deployment.
 
 =item *
 
@@ -239,14 +172,6 @@ Parrot API for extension writers.
 
 =item *
 
- requester: leo
-
-Ok. In the long run I expect a multi-stage config system. First is to get
-miniparrot built and running, then Parrot core. Extensions like gdbm could be
-configured at that point or even in a third step.
-
-=item *
-
 IO: Add IO tables, right now IO's just float around.
 
 =item *
@@ -317,10 +242,6 @@ Configuration - duplication, e.g. nvsize/numvalsize
 
 =item *
 
-Tests - ~1/3 of opcodes are uncovered by tests
-
-=item *
-
 IO - Async core isn't there yet, even though it is rumoured to be.
 
 =item *
@@ -338,14 +259,7 @@ from floating point types, sprintf output of bignumbers. L<PDD14>
 
 =item *
 
-Implement the Parrot equivalent of Perl 5's C<$0>, based on recent (January
-2005) mailing list activity. [[ 33923 ]]
-
-=item *
-
-The debugger needs to clone the interpreter to "allow people to play into the
-debugger and then continue the normal execution of the program."
-L<src/ops/debug.ops> (DONE). TODO - rewrite debugger.
+TODO - rewrite debugger.
 
 =back
 
@@ -415,7 +329,7 @@ Portable fcntl() replacement for platforms without it
 
 =item *
 
-See L<pdds/draft/pdd01_overview.pod>. Test suite should have no
+See F<pdds/draft/pdd01_overview.pod>. Test suite should have no
 failure on supported platforms.
 
 =item *
@@ -425,7 +339,7 @@ Tests - src/tests are not supported on all platforms
 =item *
 
 ParrotIO uses integral file descriptors, which may not be portable.
-L<src/ops/io.ops>
+F<src/ops/io.ops>
 
 =item *
 
@@ -440,29 +354,5 @@ conversion ops for machines without 1/2/4 byte integer data types
 dynamic library loading
 
 =back
-
-=head2 HIGH LEVEL LANGUAGES
-
-=over 4
-
-=item *
-
-Items in languages/tcl/TODO must be completed.
-
-=back
-
-=head1 FUTURE
-
-This document should eventually be obsoleted by use of the RT ticketing system,
-except to the extent that it documents things that show promise but have not
-yet been committed to.  Every task that is actually ready to be done should be
-documented in RT, and reports generated based on that information.
-
-=head1 BUGS (in this document)
-
-As for the future development, it has been pointed out that RT is not the best
-system for handling such things (though it does have the advantage of being
-available). The main point is to have single point of contact to help
-volunteers check (and update) the status of issues important to them.
 
 =cut
