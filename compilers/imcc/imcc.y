@@ -308,7 +308,7 @@ iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r)) {
     Instruction * const i =iLABEL(interp, unit, r);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
-    r->pcc_sub = (pcc_sub_t*)calloc(1, sizeof (struct pcc_sub_t));
+    r->pcc_sub = mem_allocate_zeroed_typed(pcc_sub_t);
 
     IMCC_INFO(interp)->cur_call = r;
     i->line                     = IMCC_INFO(interp)->line;

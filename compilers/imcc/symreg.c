@@ -305,7 +305,7 @@ mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
     SymReg   * const r    = _mk_symreg(&unit->hash, name, proto);
 
     r->type    = VT_PCC_SUB;
-    r->pcc_sub = mem_allocate_zeroed_typed(struct pcc_sub_t);
+    r->pcc_sub = mem_allocate_zeroed_typed(pcc_sub_t);
 
     return r;
 }
@@ -359,9 +359,8 @@ Add a register or constant to the function arg list
 void
 add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
-    const int n      = r->pcc_sub->nargs;
-
-    struct pcc_sub_t * const sub = r->pcc_sub;
+    const int         n   =    r->pcc_sub->nargs;
+    pcc_sub_t * const sub = r->pcc_sub;
 
     if (sub->args)
         sub->args = (SymReg **)mem_sys_realloc(sub->args,
@@ -412,8 +411,8 @@ RT#48260: Not yet documented!!!
 void
 add_pcc_result(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
-    const int n     = r->pcc_sub->nret;
-    struct pcc_sub_t * const sub = r->pcc_sub;
+    const int         n   = r->pcc_sub->nret;
+    pcc_sub_t * const sub = r->pcc_sub;
 
     if (sub->ret)
         sub->ret = (SymReg **)mem_sys_realloc(sub->ret,
@@ -451,8 +450,8 @@ RT#48260: Not yet documented!!!
 void
 add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
 {
-    const int n       = r->pcc_sub->nmulti;
-    struct pcc_sub_t * const sub = r->pcc_sub;
+    const int n           = r->pcc_sub->nmulti;
+    pcc_sub_t * const sub = r->pcc_sub;
 
     if (sub->multi)
         sub->multi = (SymReg **)mem_sys_realloc(sub->multi,
@@ -1163,12 +1162,15 @@ RT#48260: Not yet documented!!!
 void
 free_sym(ARGMOD(SymReg *r))
 {
-    if (r->pcc_sub) {
-        mem_sys_free(r->pcc_sub->args);
-        mem_sys_free(r->pcc_sub->arg_flags);
-        mem_sys_free(r->pcc_sub->ret);
-        mem_sys_free(r->pcc_sub->ret_flags);
-        mem_sys_free(r->pcc_sub);
+    pcc_sub_t * const sub = r->pcc_sub;
+
+    if (sub) {
+        mem_sys_free(sub->multi);
+        mem_sys_free(sub->args);
+        mem_sys_free(sub->arg_flags);
+        mem_sys_free(sub->ret);
+        mem_sys_free(sub->ret_flags);
+        mem_sys_free(sub);
     }
 
     /* TODO free keychain */
