@@ -257,7 +257,8 @@ void
 string_init(PARROT_INTERP)
 {
     size_t i;
-    const size_t n_parrot_cstrings = sizeof(parrot_cstrings) / sizeof(parrot_cstrings[0]);
+    const size_t n_parrot_cstrings =
+        sizeof (parrot_cstrings) / sizeof (parrot_cstrings[0]);
 
     /*
      * when string_init is called, the config hash isn't created

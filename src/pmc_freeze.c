@@ -386,7 +386,7 @@ static void
 push_ascii_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 {
     char buffer[20];
-    const size_t len = snprintf(buffer, sizeof(buffer), "%d ", (int) v);
+    const size_t len = snprintf(buffer, sizeof (buffer), "%d ", (int) v);
     str_append(interp, io->image, buffer, len);
 }
 
@@ -405,7 +405,7 @@ static void
 push_ascii_number(PARROT_INTERP, ARGIN(const IMAGE_IO *io), FLOATVAL v)
 {
     char buffer[40];
-    const size_t len = snprintf(buffer, sizeof(buffer), "%g ", (double) v);
+    const size_t len = snprintf(buffer, sizeof (buffer), "%g ", (double) v);
     str_append(interp, io->image, buffer, len);
 }
 
@@ -458,7 +458,7 @@ static void
 push_ascii_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const PMC* v))
 {
     char buffer[20];
-    const size_t len = snprintf(buffer, sizeof(buffer), "%p ", (const void *)v);
+    const size_t len = snprintf(buffer, sizeof (buffer), "%p ", (const void *)v);
     str_append(interp, io->image, buffer, len);
 }
 

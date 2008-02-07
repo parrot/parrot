@@ -82,7 +82,7 @@ Frees any malloced memory held by this PMC.
 
 */
 
-    void destroy () {
+    void destroy() {
         if (PMC_struct_val(SELF))
             parrot_hash_destroy(INTERP, (Hash *)PMC_struct_val(SELF));
     }

@@ -463,7 +463,7 @@ PARROT_API
 void
 Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(PMC *payload))
 {
-    if(interp->scheduler) {
+    if (interp->scheduler) {
         Parrot_Scheduler * sched_struct = PARROT_SCHEDULER(interp->scheduler);
         PMC *message = pmc_new(interp, enum_class_SchedulerMessage);
         VTABLE_set_string_native(interp, message, messagetype);

@@ -282,7 +282,7 @@ mk_temp_reg(PARROT_INTERP, int t)
 {
     char buf[30];
     static int temp;
-    snprintf(buf, sizeof(buf), "__imcc_temp_%d", ++temp);
+    snprintf(buf, sizeof (buf), "__imcc_temp_%d", ++temp);
     return mk_symreg(interp, buf, t);
 }
 

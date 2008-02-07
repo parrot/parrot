@@ -179,7 +179,7 @@ Creates and returns a copy of the array.
     PMC *clone() {
         PMC * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
         const INTVAL size  = PMC_int_val(SELF);
-        const INTVAL bytes = size * sizeof(PMC*);
+        const INTVAL bytes = size * sizeof (PMC*);
 
         if (bytes) {
             PMC_int_val(dest) = size;

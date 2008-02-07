@@ -126,7 +126,7 @@ Returns the pointer value as a Parrot string.
 
     STRING *get_string() {
         char buffer[64];
-        const size_t len   = snprintf(buffer, sizeof(buffer), "Pointer = 0x%p", PMC_data(SELF));
+        const size_t len   = snprintf(buffer, sizeof (buffer), "Pointer = 0x%p", PMC_data(SELF));
         STRING * const ret = string_make(INTERP, buffer, len, "iso-8859-1", 0);
 
         return ret;
