@@ -12,8 +12,6 @@ written for the Parrot Grammar Engine.
 
 =head1 WHY AN OPTABLE?
 
-{{explain why you should want that}}
-
 Even in simple languages such as C<abc>, parse trees can become very
 big for even very simple expressions.
 
@@ -88,7 +86,7 @@ an C<expression> is parsed by the operator parser:
 
 The C<...> indicates that this rule is a C<prototype>.
 
-{{ explain what this is }}
+{{ explain what a proto is }}
 
 
 In order to define what an operand is, a special rule is define, named
@@ -238,6 +236,11 @@ is C<left> associated, which means the first option is correct.
 This associecity is expressed using the C<assoc> trait, like so:
 
  proto 'infix:-' is assoc('left') ...
+
+If you don't specify the association, it defaults to C<'left'>. Other
+possible values are: C<'right'> and C<'none'>.
+
+{{ explain what 'none' implies }}
 
 {{ check whether I explained this correctly. This is how I understood
    it. kinda. }}
