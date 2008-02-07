@@ -115,8 +115,7 @@ static void include_file(Interp *interp, char *file_name, void *yyscanner);
 #define DUP_AND_RET_FREE(valp, token)        \
   do {                                       \
       if (valp) {                            \
-          if ((valp)->s)                     \
-              mem_sys_free((valp)->s);       \
+          mem_sys_free((valp)->s);           \
           (valp)->s = str_dup(yytext);       \
           return token;                      \
       }                                      \
@@ -205,8 +204,7 @@ SP              [ ]
 
 <heredoc2>.* {
         /* Are we at the end of the heredoc? */
-        if (strcmp(IMCC_INFO(interp)->heredoc_end, yytext) == 0)
-        {
+        if (STREQ(IMCC_INFO(interp)->heredoc_end, yytext)) {
             /* End of the heredoc. */
             yyguts_t * const yyg = (yyguts_t *)yyscanner;
             const int len        = strlen(IMCC_INFO(interp)->heredoc_content);
@@ -218,6 +216,7 @@ SP              [ ]
             IMCC_INFO(interp)->heredoc_content[len + 1] = 0;
 
             mem_sys_free(IMCC_INFO(interp)->heredoc_end);
+            IMCC_INFO(interp)->heredoc_end = NULL;
 
             IMCC_INFO(interp)->frames->buffer = YY_CURRENT_BUFFER;
             valp->s                           =
@@ -229,8 +228,7 @@ SP              [ ]
             /* RT #42382 delete quotes, -> emit, pbc */
             return STRINGC;
         }
-        else
-        {
+        else {
             /* Part of the heredoc. Realloc and cat the line on. */
             IMCC_INFO(interp)->heredoc_content =
                 (char *)mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
@@ -491,14 +489,16 @@ SP              [ ]
 
         if (valp) {
             char *label;
+            size_t len;
             YYCHOP();
 
             /* RT #32421   if$I0 is parsed as if$ I0 */
             if (!IMCC_INFO(interp)->frames || !IMCC_INFO(interp)->frames->label)
                 IMCC_fataly(interp, E_SyntaxError, "missing space?");
 
-            label = (char *)mem_sys_allocate(yyleng + 10);
-            sprintf(label, "%s%d", yytext, IMCC_INFO(interp)->frames->label);
+            len = yyleng + 10;
+            label = (char *)mem_sys_allocate(len);
+            snprintf(label, len, "%s%d", yytext, IMCC_INFO(interp)->frames->label);
 
             /* XXX: free valp->s if it exists? */
             valp->s = label;
@@ -525,8 +525,9 @@ SP              [ ]
             string_from_cstring(interp, macro_name, 0));
 
         if (type > 0) {
-            char * const buf = (char *)mem_sys_allocate(16);
-            sprintf(buf, "%d", type);
+            const size_t len = 16;
+            char * const buf = (char *)mem_sys_allocate(len);
+            snprintf(buf, len, "%d", type);
 
             /* XXX: free valp->s if already used? Sounds like a good idea, but big segfaults if you do. */
             valp->s = buf;
@@ -688,12 +689,13 @@ SP              [ ]
 
         if (valp) {
             char *label;
+            size_t len;
             YYCHOP();
 
-            label = (char *)mem_sys_allocate(
-                strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
+            len = strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15;
+            label = (char *)mem_sys_allocate(len);
 
-            sprintf(label, "local__%s__%s__$:",
+            snprintf(label, len, "local__%s__%s__$:",
                 IMCC_INFO(interp)->cur_macro_name, yytext+1);
 
             /* XXX: free valp->s if it exists? */
@@ -708,7 +710,7 @@ SP              [ ]
             const size_t len = strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 12;
             char * const label = (char *)mem_sys_allocate(len);
 
-            sprintf(label, "local__%s__%s__$",
+            snprintf(label, len, "local__%s__%s__$",
                 IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
             valp->s = label;
@@ -799,9 +801,10 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
         free(frame->expansion.name[i]);
     }
 
-    if (frame->heredoc_rest)
+    if (frame->heredoc_rest) {
         mem_sys_free(frame->heredoc_rest);
-    else
+        frame->heredoc_rest = NULL;
+    } else
         ret = frame->s.line;
 
     /* RT #42383 if frame->s.file was allocated free it */
@@ -922,6 +925,7 @@ read_params(YYSTYPE *valp, Interp *interp, params_t *params,
             }
 
             mem_sys_free(val.s);
+            val.s = NULL;
             c = yylex(&val, yyscanner, interp);
         }
     }
@@ -963,7 +967,7 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
 
     if (c == '(') {
         mem_sys_free(valp->s);
-        valp->s;
+        valp->s = NULL;
 
         c = read_params(NULL, interp, &params,
                         IMCC_INFO(interp)->cur_macro_name, 1, yyscanner);
@@ -1004,11 +1008,13 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
         }
 
         mem_sys_free(valp->s);
+        valp->s = NULL;
 
         c = yylex(valp, yyscanner, interp);
     }
 
     mem_sys_free(valp->s);
+    valp->s = NULL;
 
     BEGIN(start_cond);
 
@@ -1047,6 +1053,7 @@ define_macro(Interp *interp, ARGIN(const char *name), ARGIN(const params_t *para
 
     if (m) {
         mem_sys_free(m->expansion);
+        m->expansion = NULL;
     }
     else {
         m = mem_allocate_zeroed_typed(macro_t);
@@ -1145,7 +1152,7 @@ expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
 
         /* expand arguments */
         for (i = 0; i < frame->expansion.num_param; i++) {
-            char *current = frame->expansion.name[i];
+            char * const current = frame->expansion.name[i];
 
             /* parameter of outer macro */
             if (current[0] == '.') {
@@ -1158,14 +1165,15 @@ expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
 
             }
             else {
-                int len = strlen(current) - 1;
+                const int len = strlen(current) - 1;
 
                 if (len >= 0 && current[len] == '$') { /* local label */
-                    char *s      = (char *)mem_sys_allocate(len + 1 + 10);
+                    const size_t slen = len + 1 + 10;
+                    char * const s    = (char *)mem_sys_allocate(slen);
+
                     current[len] = '\0';
 
-                    sprintf(s, "%s%d", current,
-                        IMCC_INFO(interp)->frames->label);
+                    snprintf(s, slen, "%s%d", current, IMCC_INFO(interp)->frames->label);
 
                     frame->expansion.name[i] = s;
                     mem_sys_free(current);
@@ -1205,11 +1213,11 @@ include_file(Interp* interp, char *file_name, void *yyscanner)
     ext             = strrchr(file_name, '.');
 
     if (ext) {
-        if (strcmp(ext, ".pasm") == 0) {
+        if (STREQ(ext, ".pasm")) {
             frame->s.pasm_file = 1;
             BEGIN(emit);
         }
-        else if (strcmp(ext, ".pir") == 0) {
+        else if (STREQ(ext, ".pir")) {
             frame->s.pasm_file = 0;
             BEGIN(INITIAL);
         }
