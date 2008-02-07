@@ -3305,7 +3305,7 @@ yyreduce:
   case 111:
 #line 1018 "compilers/imcc/imcc.y"
     {
-         IdList* l = (yyvsp[(4) - (4)].idlist);
+         IdList *l = (yyvsp[(4) - (4)].idlist);
          SymReg *ignored;
          if (l->unique_reg)
                  ignored = mk_ident_ur(interp, l->id, (yyvsp[(3) - (4)].t));
