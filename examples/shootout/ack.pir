@@ -15,7 +15,7 @@
     argc = elements argv
     .local int x, y, r
     x = 3
-    y = 9
+    y = 7
     if argc == 1 goto go
     $S0 = argv[1]
     if argc == 2 goto xdefault
