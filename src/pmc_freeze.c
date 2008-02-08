@@ -428,7 +428,7 @@ static void
 push_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const STRING *s))
 {
     const UINTVAL length = string_length(interp, s);
-    char * const buffer = (char *)malloc(4*length);
+    char * const buffer = (char *)malloc(4*length); /* XXX Why 4?  What does that mean? */
     char *cursor = buffer;
     UINTVAL idx = 0;
 
@@ -440,7 +440,7 @@ push_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const STRING *s))
     str_append(interp, io->image, buffer, cursor - buffer);
     str_append(interp, io->image, " ", 1);
 
-    free(buffer);
+    mem_sys_free(buffer);
 }
 
 /*
