@@ -212,18 +212,22 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
         CLASS_is_anon_CLEAR(self);
 
         /* Register a type number for the class. */
-        type_num = Parrot_oo_register_type(interp, name_arg);
+        type_num   = Parrot_oo_register_type(interp, name_arg);
 
         /* Link the type number with the class's vtable. */
         new_vtable = Parrot_clone_vtable(interp, self->vtable);
-        new_vtable->base_type     = type_num;
-        new_vtable->pmc_class     = self;
-        new_vtable->whoami        = VTABLE_get_string(interp, self);
-        new_vtable->mro           = _class->all_parents;
-        _class->id                = type_num;
+
+        new_vtable->base_type         = type_num;
+        new_vtable->pmc_class         = self;
+        new_vtable->whoami            = VTABLE_get_string(interp, self);
+        new_vtable->mro               = _class->all_parents;
+        new_vtable->ro_variant_vtable =
+                Parrot_clone_vtable(interp, self->vtable->ro_variant_vtable);
 
         /* Store the class's vtable in the global table */
-        interp->vtables[type_num] = new_vtable;
+        interp->vtables[type_num]     = new_vtable;
+
+        _class->id                    = type_num;
     }
 
     /* If we were attached to a namespace and are now attached to a new one,
