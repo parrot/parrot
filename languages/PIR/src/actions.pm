@@ -11,8 +11,7 @@ method TOP($/) {
 
 method program($/) {
     my $program := PAST::Block.new( :blocktype('declaration'), :node($/) );
-    my @compunits := $<compilation_unit>;
-    for @compunits {
+    for $<compilation_unit> {
         $program.push( $($_) );
     }
     make $program;
@@ -24,35 +23,38 @@ method compilation_unit($/, $key) {
 
 method sub_def($/) {
     my $sub := PAST::Block.new( :blocktype('declaration'), :node($/) );
-    my $subname := $($<sub_id>);
+    my $subname := $( $<sub_id> );
     $sub.name($subname);
 
     if $<param_decl> {
-        my @params := $<param_decl>;
-        for @params {
+        for $<param_decl> {
             $sub.push( $($_) );
         }
     }
 
     if $<labeled_pir_instr> {
-        my @instructions := $<labeled_pir_instr>;
-        my $statements := PAST::Stmts.new( :node($/) );
-        for @instructions {
-            $statements.push( $($_) );
+        my $stmts := PAST::Stmts.new( :node($/) );
+        for $<labeled_pir_instr> {
+            $stmts.push( $($_) );
         }
-        $sub.push($statements);
+        $sub.push($stmts);
     }
     make $sub;
 }
 
 method labeled_pir_instr($/) {
     my $instr;
+
     if $<instr> {
         $instr := $($<instr>);
     }
 
     if $<label> {
-
+        my $pir := ~$<label>;
+        my $label := PAST::Op.new( :inline($pir), :node($/) );
+        if $<instr> {
+            $instr := PAST::Stmts.new( $label, $instr, :node($/) );
+        }
     }
     make $instr;
 }
@@ -66,14 +68,24 @@ method pir_instr($/, $key) {
 }
 
 method local_decl($/) {
-    my $declarations := PAST::Stmts.new( :node($/) );
+    my $stmts := PAST::Stmts.new( :node($/) );
     my $type := $( $<pir_type> );
-    my @ids := $<local_id>;
 
-    for @ids {
-        $($_);
+    for $<local_id> {
+        my $local := $($_);
+        my $pir := '.local ' ~ $type.value() ~ ' ' ~ $local.name();
+        $stmts.push( PAST::Op.new( :inline($pir), :node($/) ) );
     }
-    make $declarations;
+    make $stmts;
+}
+
+method local_id($/) {
+    my $past := $( $<id> );
+    if $<unique> {
+        ## does this work?
+        #$past.pirflags(':unique_reg');
+    }
+    make $past;
 }
 
 method sub_id($/, $key) {
@@ -86,7 +98,7 @@ method param_decl($/) {
 }
 
 method parameter($/) {
-    my $parameter := $($<IDENT>);
+    my $parameter := $($<id>);
     my $type := $($<pir_type>);
     $parameter.type($type);
     $parameter.scope('parameter');
@@ -94,7 +106,7 @@ method parameter($/) {
 }
 
 method pir_type($/) {
-    make PAST::Val.new( :type('string'), :value(~$/), :node($/) );
+    make PAST::Val.new( :type('string'), :value(~$<type>), :node($/) );
 }
 
 method expression($/, $key) {
@@ -125,9 +137,7 @@ method key($/) {
     make $( $<simple_expr> );
 }
 
-method IDENT($/) {
-    print("IDENT");
-    print(~$/);
+method id($/) {
     make PAST::Var.new( :name($<name>), :node($/) );
 }
 
