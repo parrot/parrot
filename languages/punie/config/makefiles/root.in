@@ -18,14 +18,14 @@ PGE_LIBRARY   = ../../runtime/parrot/library/PGE
 all: punie.pbc
 
 SOURCES = punie.pir \
-  src/grammar.pg \
-  src/actions.pm \
-  src/builtins.pir \
+  src/parser/grammar.pg \
+  src/parser/actions.pm \
+  src/builtins/builtins.pir \
 
 # the default target
 punie.pbc: $(PARROT) $(NQP_DIR)/nqp.pbc $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=src/gen_punie.pir src/grammar.pg
-	$(PARROT) $(NQP_DIR)/nqp.pbc --target=pir --output=src/gen_punie-actions.pir src/actions.pm
+	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=src/gen_punie.pir src/parser/grammar.pg
+	$(PARROT) $(NQP_DIR)/nqp.pbc --target=pir --output=src/gen_punie-actions.pir src/parser/actions.pm
 	$(PARROT) -o punie.pbc punie.pir
 
 # This is a listing of all targets, that are meant to be called by users
