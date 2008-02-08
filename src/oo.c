@@ -547,6 +547,8 @@ Throws an exception if a PMC or class with the same name already exists.
 
 RT#45969 uses global class registry
 
+RT#50644: this function seems to be the same as fail_if_type_exists in this file.
+
 =cut
 
 */
@@ -1124,7 +1126,7 @@ parrot_class_register(PARROT_INTERP, ARGIN(PMC *name),
 
     new_vtable->base_type = new_type;
     new_vtable->mro       = mro;
-    new_vtable->pmc_class =  new_class;
+    new_vtable->pmc_class = new_class;
 
     set_attrib_num(new_class, (SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interp, enum_class_VtableCache));
@@ -1386,6 +1388,7 @@ instantiate_object(PARROT_INTERP, ARGMOD(PMC *object), ARGIN_NULLOK(PMC *init))
 =item C<PMC * Parrot_remove_parent>
 
 This currently does nothing but return C<PMCNULL>.
+RT#50646
 
 =cut
 
@@ -1410,6 +1413,8 @@ Parrot_remove_parent(PARROT_INTERP, ARGIN(PMC *removed_class),
 =item C<void mark_object_cache>
 
 RT#48260: Not yet documented!!!
+
+RT#50648: Not implemented.
 
 =cut
 
