@@ -1,3 +1,5 @@
+# Copyright (C) 2007-2008, The Perl Foundation.
+# $Id$
 
 .namespace [ 'PIR::Compiler' ]
 

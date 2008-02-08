@@ -1,10 +1,8 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 class PIR::Grammar::Actions;
 
-## rule TOP { <statements> }
-##
 method TOP($/) {
     make $( $<program> );
 }
