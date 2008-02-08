@@ -525,39 +525,39 @@ EOC
     if ( $self->is_dynamic ) {
         $cout .= <<"EOC";
         vt_clone->base_type = entry;
-        vt_clone->whoami = string_make(interp, "$classname", @{[length($classname)]}, "ascii",
+        vt_clone->whoami    = string_make(interp, "$classname", @{[length($classname)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
-        vt_clone->isa_str = string_make(interp, "$isa", @{[length($isa)]}, "ascii",
+        vt_clone->isa_str   = string_make(interp, "$isa", @{[length($isa)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
-        vt_clone->does_str = string_make(interp, "$does", @{[length($does)]}, "ascii",
+        vt_clone->does_str  = string_make(interp, "$does", @{[length($does)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
 EOC
     }
     else {
         $cout .= <<"EOC";
-        vt_clone->whoami = CONST_STRING(interp, "$classname");
-        vt_clone->isa_str = CONST_STRING(interp, "$isa");
+        vt_clone->whoami   = CONST_STRING(interp, "$classname");
+        vt_clone->isa_str  = CONST_STRING(interp, "$isa");
         vt_clone->does_str = CONST_STRING(interp, "$does");
 EOC
     }
     for my $k ( keys %extra_vt ) {
         $cout .= <<"EOC";
-        vt_${k}_clone->base_type = entry;
-        vt_${k}_clone->whoami = vt_clone->whoami;
-        vt_${k}_clone->isa_str = vt_clone->isa_str;
-        vt_${k}_clone->does_str = vt_clone->does_str;
+        vt_${k}_clone->base_type       = entry;
+        vt_${k}_clone->whoami          = vt_clone->whoami;
+        vt_${k}_clone->isa_str         = vt_clone->isa_str;
+        vt_${k}_clone->does_str        = vt_clone->does_str;
 EOC
     }
 
     if ( $extra_vt{ro} ) {
         $cout .= <<"EOC";
-        vt_clone->ro_variant_vtable = vt_ro_clone;
+        vt_clone->ro_variant_vtable    = vt_ro_clone;
         vt_ro_clone->ro_variant_vtable = vt_clone;
 EOC
     }
 
     $cout .= <<"EOC";
-        interp->vtables[entry] = vt_clone;
+        interp->vtables[entry]         = vt_clone;
 EOC
     $cout .= <<"EOC";
     }
@@ -700,4 +700,3 @@ sub vtable {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
