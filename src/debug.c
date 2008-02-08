@@ -44,10 +44,6 @@ extern void imcc_init(PARROT_INTERP);
 static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
-static int GDB_B(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char* GDB_P(PARROT_INTERP, ARGIN(const char *s))

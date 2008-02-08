@@ -59,8 +59,9 @@ static void fail_if_exist(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void fail_if_type_exists(PARROT_INTERP, PMC *name)
-        __attribute__nonnull__(1);
+static void fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -945,11 +946,16 @@ Parrot_class_lookup_p(PARROT_INTERP, ARGIN(PMC *class_name))
 }
 
 /*
-  * This function throws an exception if a PMC or class with the same name *
-  * already exists in the global type registry. The global type registry will
-  * go away eventually, but this allows the new object metamodel to interact
-  * with the old one until it does.
-  *
+
+=item C<static void fail_if_type_exists>
+
+This function throws an exception if a PMC or class with the same name *
+already exists in the global type registry. The global type registry
+will go away eventually, but this allows the new object metamodel to
+interact with the old one until it does.
+
+=cut
+
 */
 
 static void
