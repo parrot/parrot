@@ -17,8 +17,6 @@
 /* Use these macros instead of calling the functions listed below. */
 /* They protect against things like passing null to mem__sys_realloc, */
 /* which is not portable. */
-#define mem_sys_realloc(x, y) (assert(x!=NULL), mem__sys_realloc(x, y))
-#define mem_sys_realloc_zeroed(x, y, z) (assert(x!=NULL), mem__sys_realloc_zeroed(x, y, z))
 #define mem_internal_allocate(x) mem__internal_allocate(x, __FILE__, __LINE__)
 #define mem_internal_allocate_typed(t) \
     (t *)mem__internal_allocate(sizeof (t), __FILE__, __LINE__)
@@ -35,24 +33,12 @@
 #define mem_sys_memcopy memcpy
 #define mem_sys_memmove memmove
 
-#define mem_allocate_typed(type)    (type *)mem_sys_allocate(sizeof (type))
-#define mem_allocate_zeroed_typed(type) (type *)mem_sys_allocate_zeroed(sizeof (type))
+#define mem_allocate_typed(type)            (type *)mem_sys_allocate(sizeof (type))
+#define mem_allocate_zeroed_typed(type)     (type *)mem_sys_allocate_zeroed(sizeof (type))
 #define mem_allocate_n_zeroed_typed(n,type) (type *)mem_sys_allocate_zeroed((n) * sizeof(type))
+#define mem_realloc_n_typed(p,n,type)       (type *)mem_sys_realloc((p),(n)*sizeof(type))
 
 /* HEADERIZER BEGIN: src/gc/memory.c */
-
-PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void * mem__sys_realloc(ARGIN_NULLOK(void *from), size_t size);
-
-PARROT_API
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-void * mem__sys_realloc_zeroed(
-    ARGIN_NULLOK(void *from),
-    size_t size,
-    size_t old_size);
 
 PARROT_API
 PARROT_MALLOC
@@ -66,6 +52,19 @@ void * mem_sys_allocate_zeroed(size_t size);
 
 PARROT_API
 void mem_sys_free(ARGIN_NULLOK(void *from));
+
+PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void * mem_sys_realloc(ARGIN_NULLOK(void *from), size_t size);
+
+PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void * mem_sys_realloc_zeroed(
+    ARGIN_NULLOK(void *from),
+    size_t size,
+    size_t old_size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL

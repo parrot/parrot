@@ -134,9 +134,10 @@ mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)
 
 /*
 
-=item C<void * mem__sys_realloc>
+=item C<void * mem_sys_realloc>
 
-Resize a chunk of system memory.
+Resize a chunk of system memory.  Unlike realloc(), it can handle a
+NULL pointer, in which case you get a malloc back.
 
 =cut
 
@@ -146,13 +147,16 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem__sys_realloc(ARGIN_NULLOK(void *from), size_t size)
+mem_sys_realloc(ARGIN_NULLOK(void *from), size_t size)
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
 #endif
-    ptr = realloc(from, size);
+    if (from)
+        ptr = realloc(from, size);
+    else
+        ptr = malloc(size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
@@ -164,7 +168,7 @@ mem__sys_realloc(ARGIN_NULLOK(void *from), size_t size)
 
 /*
 
-=item C<void * mem__sys_realloc_zeroed>
+=item C<void * mem_sys_realloc_zeroed>
 
 Resize a chunk of system memory. Fill the newly allocated space with zeroes.
 
@@ -176,13 +180,13 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem__sys_realloc_zeroed(ARGIN_NULLOK(void *from), size_t size, size_t old_size)
+mem_sys_realloc_zeroed(ARGIN_NULLOK(void *from), size_t size, size_t old_size)
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
 #endif
-    ptr = realloc(from, size);
+    ptr = from ? realloc(from,size) : malloc(size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif

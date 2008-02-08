@@ -922,16 +922,8 @@ INTVAL
 PackFile_add_segment(SHIM_INTERP, ARGMOD(PackFile_Directory *dir),
         ARGIN(PackFile_Segment *seg))
 {
-    if (dir->segments) {
-        dir->segments =
-            (PackFile_Segment **)mem_sys_realloc(dir->segments,
-                    sizeof (PackFile_Segment *) *
-                    (dir->num_segments+1));
-    }
-    else {
-        dir->segments = (PackFile_Segment **)mem_sys_allocate(
-                sizeof (PackFile_Segment *) * (dir->num_segments+1));
-    }
+    dir->segments = mem_realloc_n_typed(
+            dir->segments, dir->num_segments+1, PackFile_Segment *);
     dir->segments[dir->num_segments] = seg;
     dir->num_segments++;
     seg->dir = dir;

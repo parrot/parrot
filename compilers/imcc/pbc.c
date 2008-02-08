@@ -1751,17 +1751,11 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
          * is at least two opcodes wide - see below how to further decrease
          * this storage
          */
-        if (interp->code->base.data) {
-            interp->code->base.data       = (opcode_t *)
-                mem_sys_realloc(interp->code->base.data, bytes);
-            interp->code->pic_index->data = (opcode_t *)
-                mem_sys_realloc(interp->code->pic_index->data, bytes/2);
-        }
-        else {
-            interp->code->base.data       = (opcode_t *)mem_sys_allocate(bytes);
-            interp->code->pic_index->data =
-                (opcode_t *)mem_sys_allocate(bytes/2);
-        }
+        interp->code->base.data       = (opcode_t *)
+            mem_sys_realloc(interp->code->base.data, bytes);
+        interp->code->pic_index->data = (opcode_t *)
+            mem_sys_realloc(interp->code->pic_index->data, bytes/2);
+
         interp->code->base.size       = oldsize + code_size;
         interp->code->pic_index->size = (oldsize + code_size) / 2;
 

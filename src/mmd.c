@@ -753,13 +753,8 @@ mmd_add_function(PARROT_INTERP, INTVAL func_nr, SHIM(funcptr_t function))
         INTVAL i;
         const size_t bytes = (func_nr + 1) * sizeof (MMD_table);
 
-        if (interp->binop_mmd_funcs) {
-            interp->binop_mmd_funcs =
-                (MMD_table *)mem_sys_realloc(interp->binop_mmd_funcs, bytes);
-        }
-        else {
-            interp->binop_mmd_funcs = (MMD_table *)mem_sys_allocate(bytes);
-        }
+        interp->binop_mmd_funcs =
+            (MMD_table *)mem_sys_realloc(interp->binop_mmd_funcs, bytes);
 
         for (i = interp->n_binop_mmd_funcs; i <= func_nr; ++i)  {
             MMD_table * const table = interp->binop_mmd_funcs + i;

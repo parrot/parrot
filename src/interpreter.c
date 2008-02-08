@@ -997,7 +997,7 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
     core = PARROT_CORE_OPLIB_INIT(1);
 
     PARROT_ASSERT(interp->op_count == core->op_count);
-    new_evc_func_table = (op_func_t *)mem__sys_realloc(interp->evc_func_table,
+    new_evc_func_table = (op_func_t *)mem_sys_realloc(interp->evc_func_table,
             sizeof (op_func_t) * n_tot);
     if (core->flags & OP_FUNC_IS_ALLOCATED) {
         new_func_table = (op_func_t *)mem_sys_realloc(core->op_func_table,
