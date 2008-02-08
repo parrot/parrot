@@ -968,8 +968,9 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
     const int n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
 
-    dominators  = unit->dominators = (Set **)malloc(sizeof (Set*) * n);
-    unit->idoms = (int *)malloc(sizeof (int) * n);
+    unit->idoms      = mem_allocate_n_zeroed_typed(n, int);
+    dominators       = mem_allocate_n_zeroed_typed(n, Set*);
+    unit->dominators = dominators;
 
     dominators[0] = set_make(n);
     set_add(dominators[0], 0);
