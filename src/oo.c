@@ -59,6 +59,9 @@ static void fail_if_exist(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void fail_if_type_exists(PARROT_INTERP, PMC *name)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * find_method_direct_1(PARROT_INTERP,
@@ -112,11 +115,6 @@ static void parrot_class_register(PARROT_INTERP,
         __attribute__nonnull__(5);
 
 static void rebuild_attrib_stuff(PARROT_INTERP, ARGIN(PMC *_class))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL register_type(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -947,21 +945,58 @@ Parrot_class_lookup_p(PARROT_INTERP, ARGIN(PMC *class_name))
 }
 
 /*
+  * This function throws an exception if a PMC or class with the same name *
+  * already exists in the global type registry. The global type registry will
+  * go away eventually, but this allows the new object metamodel to interact
+  * with the old one until it does.
+  *
+*/
 
-=item C<static INTVAL register_type>
+static void
+fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
+{
+    INTVAL      type;
 
-RT#48260: Not yet documented!!!
+    PMC * const classname_hash = interp->class_hash;
+    PMC * const type_pmc       = (PMC *)VTABLE_get_pointer_keyed(interp,
+                                        classname_hash, name);
+    if (PMC_IS_NULL(type_pmc) ||
+            type_pmc->vtable->base_type == enum_class_NameSpace)
+        type = 0;
+    else
+        type = VTABLE_get_integer(interp, type_pmc);
+
+    if (type > enum_type_undef) {
+        /* RT#46091 get printable name */
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Class %Ss already registered!\n",
+                VTABLE_get_string(interp, name));
+    }
+
+    if (type < enum_type_undef)
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "native type with name '%s' already exists - "
+                "can't register Class", data_types[type].name);
+}
+
+/*
+
+=item C<INTVAL Parrot_oo_register_type>
+
+RT #48260: Not yet documented!!!
 
 =cut
 
 */
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL
-register_type(PARROT_INTERP, ARGIN(PMC *name))
+INTVAL
+Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name))
 {
     INTVAL type;
     PMC   *classname_hash, *item;
+
+    fail_if_type_exists(interp, name);
 
     /* so pt_shared_fixup() can safely do a type lookup */
     LOCK_INTERPRETER(interp);
@@ -1003,7 +1038,7 @@ parrot_class_register(PARROT_INTERP, ARGIN(PMC *name),
 {
     VTABLE *new_vtable, *parent_vtable;
     PMC    *vtable_pmc, *ns, *top;
-    const INTVAL new_type = register_type(interp, name);
+    const INTVAL new_type = Parrot_oo_register_type(interp, name);
 
     /* Build a new vtable for this class
      * The child class PMC gets the vtable of its parent class or

@@ -249,6 +249,11 @@ PMC * Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/oo.c */
 
 #endif /* PARROT_OO_H_GUARD */
