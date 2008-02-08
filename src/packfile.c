@@ -1652,14 +1652,8 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
     const opcode_t *pos;
 
     dir->num_segments = PF_fetch_opcode(pf, &cursor);
-    if (dir->segments) {
-        dir->segments = (PackFile_Segment **)mem_sys_realloc(dir->segments,
-                             sizeof (PackFile_Segment *) * dir->num_segments);
-    }
-    else {
-        dir->segments = (PackFile_Segment **)mem_sys_allocate(
-                sizeof (PackFile_Segment *) * dir->num_segments);
-    }
+    dir->segments = mem_realloc_n_typed(
+            dir->segments, dir->num_segments, PackFile_Segment *);
 
     for (i=0; i < dir->num_segments; i++) {
         PackFile_Segment *seg;
@@ -2401,8 +2395,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
 
     if (cs->debugs) {    /* it exists already, resize it */
         debug = cs->debugs;
-        debug->base.data = (opcode_t *)mem_sys_realloc(debug->base.data, size *
-                sizeof (opcode_t));
+        debug->base.data = mem_realloc_n_typed(debug->base.data, size, opcode_t);
     }
     else {              /* create one */
         const size_t len = strlen(cs->base.name) + 4;
@@ -2424,8 +2417,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
         }
         mem_sys_free(name);
 
-        debug->base.data    = (opcode_t *)mem_sys_allocate(size *
-            sizeof (opcode_t));
+        debug->base.data = mem_allocate_n_zeroed_typed(size, opcode_t);
         debug->code = cs;
         cs->debugs = debug;
     }
@@ -2458,8 +2450,8 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     int insert_pos = 0;
 
     /* Allocate space for the extra entry. */
-    debug->mappings = (PackFile_DebugMapping **)mem_sys_realloc(debug->mappings,
-        sizeof (PackFile_DebugMapping *) * (debug->num_mappings + 1));
+    debug->mappings = mem_realloc_n_typed(
+            debug->mappings, debug->num_mappings+1, PackFile_DebugMapping *);
 
     /* Can it just go on the end? */
     if (debug->num_mappings == 0 ||
@@ -2492,13 +2484,8 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
             /* Need to put filename in constants table. */
             ct->const_count = ct->const_count + 1;
-            if (ct->constants)
-                ct->constants = (PackFile_Constant **)mem_sys_realloc(
-                    ct->constants, ct->const_count *
-                        sizeof (PackFile_Constant *));
-            else
-                ct->constants = (PackFile_Constant **)mem_sys_allocate(
-                    ct->const_count * sizeof (PackFile_Constant *));
+            ct->constants = mem_realloc_n_typed(
+                ct->constants, ct->const_count, PackFile_Constant *);
             fnconst = PackFile_Constant_new(interp);
             fnconst->type = PFC_STRING;
             fnconst->u.string = string_make_direct(interp, filename,
@@ -3048,12 +3035,8 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
     }
     i = self->fixup_count;
     self->fixup_count++;
-    if (self->fixups) {
-        self->fixups = (PackFile_FixupEntry **)mem_sys_realloc(
-            self->fixups, self->fixup_count * sizeof (PackFile_FixupEntry *));
-    }
-    else
-        self->fixups = mem_allocate_typed(PackFile_FixupEntry *);
+    self->fixups = mem_realloc_n_typed(
+        self->fixups, self->fixup_count, PackFile_FixupEntry *);
 
     self->fixups[i]       = mem_allocate_typed(PackFile_FixupEntry);
     self->fixups[i]->type = type;
