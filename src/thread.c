@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -966,7 +966,9 @@ pt_gc_count_threads(PARROT_INTERP)
 
 =item C<static void pt_gc_wait_for_stage>
 
-RT#48260: Not yet documented!!!
+Waits until all threads have reached the desired stage.  Takes an
+interpreter, starting stage and ending stage as arguments.  Updates the
+thread information.  Used in pt_DOD_start_mark and pt_DOD_stop_mark.
 
 =cut
 
@@ -976,7 +978,7 @@ static void
 pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum from_stage,
             thread_gc_stage_enum to_stage)
 {
-    Shared_gc_info *info = shared_gc_info;
+    Shared_gc_info * const info = shared_gc_info;
     int             thread_count;
 
     DEBUG_ONLY(fprintf(stderr, "%p: gc_wait_for_stage: %d->%d\n", interp, from_stage, to_stage));
@@ -1029,7 +1031,7 @@ interpreter_array_mutex is assumed held.
 static void
 pt_gc_wakeup_check(PARROT_INTERP)
 {
-    Shared_gc_info *info = shared_gc_info;
+    Shared_gc_info * const info = shared_gc_info;
     int             thread_count;
 
     /* XXX: maybe a little hack; see RT #49532 */
