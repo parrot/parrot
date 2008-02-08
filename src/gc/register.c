@@ -540,7 +540,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_u
 {
     /*
      * The context structure has a reference count, initially 0.  This field is
-     * incrementented when a continuation that points to it is created -- either
+     * incremented when a continuation that points to it is created -- either
      * directly, or when a continuation is cloned, or when a retcontinuation is
      * converted to a full continuation in invalidate_retc.  To check for leaks,
      * (a) disable NDEBUG, (b) enable CTX_LEAK_DEBUG in interpreter.h, and (c)
