@@ -394,7 +394,7 @@ composed into this role.
         Parrot_Role * const role  = PARROT_ROLE(SELF);
 
         /* What should we return? */
-        PMC         *found = PMCNULL;
+        PMC         *found;
 
         if (string_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
             found = pmc_new(interp, enum_class_String);
