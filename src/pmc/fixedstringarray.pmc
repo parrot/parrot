@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -88,19 +88,17 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        PMC * const dest     = pmc_new(INTERP, SELF->vtable->base_type);
-        INTVAL      mem_size, size;
+        PMC * const dest          = pmc_new(INTERP, SELF->vtable->base_type);
 
-        if (!PMC_data(SELF))
-            return dest;
+        if (PMC_data(SELF)) {
+            const INTVAL size     = PMC_int_val(SELF);
+            const INTVAL mem_size = size * sizeof (STRING *);
 
-        size              = PMC_int_val(SELF);
-        PMC_int_val(dest) = size;
-        mem_size          = size * sizeof (STRING *);
-
-        PMC_data(dest)    = mem_sys_allocate(mem_size);
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), mem_size);
-        PObj_custom_mark_destroy_SETALL(dest);
+            PMC_int_val(dest)     = size;
+            PMC_data(dest)        = mem_sys_allocate(mem_size);
+            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), mem_size);
+            PObj_custom_mark_destroy_SETALL(dest);
+        }
 
         return dest;
     }
@@ -116,18 +114,15 @@ Marks the array as live.
 */
 
     void mark() {
-        int      i, end;
-        STRING **data;
+        STRING * const * data = (STRING **) PMC_data(SELF);
+        if (data) {
+            const int end  = PMC_int_val(SELF);
+            int i;
 
-        if (!PMC_data(SELF))
-            return;
-
-        data = (STRING **) PMC_data(SELF);
-        end  = PMC_int_val(SELF);
-
-        for (i = 0; i < end; i++) {
-            if (data[i])
-                pobject_lives(INTERP, (PObj *) data[i]);
+            for (i = 0; i < end; i++) {
+                if (data[i])
+                    pobject_lives(INTERP, (PObj *) data[i]);
+            }
         }
     }
 
@@ -220,7 +215,7 @@ Returns the floating-point value of the element at index C<key>.
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
+        PMC * const tempPMC = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_number(INTERP, tempPMC);
     }
 
@@ -534,10 +529,6 @@ Used to unarchive the string.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.
-
-=head1 HISTORY
-
-Initial version 2004.06.11 by Matt Fowles
 
 =cut
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -53,9 +53,9 @@ COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)
 static void
 quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)
 {
-    UINTVAL i, j, ln, rn;
-
     while (n > 1) {
+        UINTVAL i, j, ln, rn;
+
         swap(&data[0], &data[n/2]);
 
         for (i = 0, j = n; ;) {
@@ -299,7 +299,7 @@ Returns the integer value of the element at index C<key>.
     INTVAL get_integer_keyed_int(INTVAL key) {
         PMC * const tempPMC = DYNSELF.get_pmc_keyed_int(key);
         if (PMC_IS_NULL(tempPMC))
-                return 0;
+            return 0;
         return VTABLE_get_integer(INTERP, tempPMC);
     }
 
@@ -637,7 +637,7 @@ Sets the PMC at index C<key> to C<value>.
 */
 
     void set_pmc_keyed(PMC *key, PMC *value) {
-        INTVAL k       = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         PMC   *nextkey = key_next(INTERP, key);
 
         if (!nextkey) {
@@ -828,10 +828,6 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.
-
-=head1 HISTORY
-
-Initial version 2004.06.11 by Matt Fowles
 
 =cut
 

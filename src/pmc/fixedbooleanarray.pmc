@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -100,12 +100,12 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        PMC *dest          = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_int_val(dest)  = PMC_int_val(SELF);
         PMC_int_val2(dest) = PMC_int_val2(SELF);
 
         if (PMC_data(SELF)) {
-            PMC_data(dest) = malloc(PMC_int_val2(SELF) / BITS_PER_CHAR);
+            PMC_data(dest) = mem_sys_allocate(PMC_int_val2(SELF) / BITS_PER_CHAR);
             mem_sys_memcopy(PMC_data(dest),
                         PMC_data(SELF), PMC_int_val2(SELF) / BITS_PER_CHAR);
         }
@@ -167,7 +167,7 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        Parrot_UInt1 *sd = PMC_data_typed(SELF, Parrot_UInt1 *);
+        const Parrot_UInt1 * const sd = PMC_data_typed(SELF, Parrot_UInt1 *);
 
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
@@ -188,7 +188,7 @@ Returns the integer value of the element at index C<*key>.
 
     INTVAL get_integer_keyed(PMC *key) {
         /* simple int keys only */
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return SELF.get_integer_keyed_int(k);
     }
 
@@ -204,7 +204,7 @@ Returns the floating-point value of the element at index C<key>.
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        INTVAL i = DYNSELF.get_integer_keyed_int(key);
+        const INTVAL i = DYNSELF.get_integer_keyed_int(key);
         return (FLOATVAL)i;
     }
 
@@ -219,7 +219,7 @@ Returns the floating-point value of the element at index C<*key>.
 */
 
     FLOATVAL get_number_keyed(PMC *key) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_number_keyed_int(k);
     }
 
@@ -234,7 +234,7 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     STRING *get_string_keyed_int(INTVAL key) {
-        PMC *val = DYNSELF.get_pmc_keyed_int(key);
+        PMC * const val = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_string(INTERP, val);
     }
 
@@ -249,7 +249,7 @@ Returns the Parrot string value of the element at index C<*key>.
 */
 
     STRING *get_string_keyed(PMC *key) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_string_keyed_int(k);
     }
 
@@ -265,8 +265,8 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC   *ret = pmc_new(INTERP, enum_class_Boolean);
-        INTVAL val = DYNSELF.get_integer_keyed_int(key);
+        PMC  * const ret = pmc_new(INTERP, enum_class_Boolean);
+        const INTVAL val = DYNSELF.get_integer_keyed_int(key);
         VTABLE_set_integer_native(INTERP, ret, val);
         return ret;
     }
@@ -282,7 +282,7 @@ Returns the PMC value of the element at index C<*key>.
 */
 
     PMC *get_pmc_keyed(PMC *key) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_pmc_keyed_int(k);
     }
 
@@ -318,7 +318,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        Parrot_UInt1 *sd = PMC_data_typed(SELF, Parrot_UInt1 *);
+        Parrot_UInt1 * const sd = PMC_data_typed(SELF, Parrot_UInt1 *);
 
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
@@ -341,7 +341,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed(PMC *key, INTVAL value) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_integer_keyed_int(k, value);
     }
 
@@ -372,7 +372,7 @@ C<value>.
 */
 
     void set_number_keyed(PMC *key, FLOATVAL value) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
 
@@ -388,7 +388,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     void set_string_keyed_int(INTVAL key, STRING *value) {
         INTVAL tempInt;
-        PMC   *tempPMC = pmc_new(INTERP, enum_class_Boolean);
+        PMC * const tempPMC = pmc_new(INTERP, enum_class_Boolean);
 
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempInt = VTABLE_get_integer(INTERP, tempPMC);
@@ -408,7 +408,7 @@ C<value>.
 */
 
     void set_string_keyed(PMC *key, STRING *value) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_string_keyed_int(k, value);
     }
 
@@ -423,7 +423,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 */
 
     void set_pmc_keyed_int(INTVAL key, PMC *src) {
-        INTVAL tempInt = VTABLE_get_integer(INTERP, src);
+        const INTVAL tempInt = VTABLE_get_integer(INTERP, src);
         DYNSELF.set_integer_keyed_int(key, tempInt);
     }
 
@@ -439,7 +439,7 @@ C<value>.
 */
 
     void set_pmc_keyed(PMC *key, PMC *value) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_pmc_keyed_int(k, value);
     }
 
@@ -455,7 +455,7 @@ the array.
 */
 
     void push_integer(INTVAL value) {
-        INTVAL nextix = DYNSELF.elements();
+        const INTVAL nextix = DYNSELF.elements();
         DYNSELF.set_integer_keyed_int(nextix, value);
     }
 
@@ -475,8 +475,8 @@ Used to archive the string.
 
 */
     void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        STRING   *s  = string_from_cstring(INTERP,
+        IMAGE_IO * const io = info->image_io;
+        STRING   * const s  = string_from_cstring(INTERP,
                                 PMC_data_typed(SELF, char *),
                                 PMC_int_val2(SELF) / BITS_PER_CHAR);
 
@@ -494,12 +494,13 @@ Used to unarchive the string.
 
 */
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            INTVAL size       = VTABLE_shift_integer(INTERP, io);
-            STRING *s         = VTABLE_shift_string(INTERP, io);
+            const INTVAL size = VTABLE_shift_integer(INTERP, io);
+            STRING * const s  = VTABLE_shift_string(INTERP, io);
+
             PMC_int_val(SELF) = size;
             PMC_int_val2(pmc) = s->bufused * BITS_PER_CHAR;
             PMC_data(pmc)     = mem_sys_allocate_zeroed(s->bufused);
@@ -519,8 +520,8 @@ sets them all to false.
 */
 
     METHOD void fill(INTVAL fill) {
-        Parrot_UInt1 *sd = PMC_data_typed(SELF, Parrot_UInt1 *);
-        INTVAL        j  = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
+        Parrot_UInt1 * const sd = PMC_data_typed(SELF, Parrot_UInt1 *);
+        const INTVAL         j  = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
 
         if (fill)
             memset(sd, 0xff, j);
@@ -536,10 +537,6 @@ sets them all to false.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.
-
-=head1 HISTORY
-
-Initial version 2004.06.11 by Matt Fowles
 
 =cut
 
