@@ -32,9 +32,8 @@ There's also a verbose mode for garbage collection.
 
 /* HEADERIZER BEGIN: static */
 
-static void clear_live_bits(ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*pool);
+static void clear_live_bits(ARGIN(const Small_Object_Pool *pool))
+        __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
 static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
@@ -772,11 +771,11 @@ Parrot_dod_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         INTVAL * const refcount = PObj_bufrefcountptr(b);
 
         if (--(*refcount) == 0) {
-            free(refcount); /* the actual bufstart */
+            mem_sys_free(refcount); /* the actual bufstart */
         }
     }
     else
-        free(PObj_bufrefcountptr(b));
+        mem_sys_free(PObj_bufrefcountptr(b));
 }
 
 /*
@@ -925,7 +924,7 @@ Run through all PMC arenas and clear live bits.
 */
 
 static void
-clear_live_bits(ARGMOD(Small_Object_Pool *pool))
+clear_live_bits(ARGIN(const Small_Object_Pool *pool))
 {
     Small_Object_Arena *arena;
     const UINTVAL object_size = pool->object_size;
