@@ -1119,6 +1119,9 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
     pt_DOD_start_mark(interp);
     Parrot_dod_ms_run_init(interp);
 
+    /* compact STRING pools to collect free headers and allocated buffers */
+    Parrot_go_collect(interp);
+
     /* Now go trace the PMCs */
     if (trace_active_PMCs(interp, flags & DOD_trace_stack_FLAG)) {
         int ignored;
