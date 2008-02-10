@@ -351,6 +351,7 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
          */
         return NULL;
     }
+
     /*
      * only main should run the destroy functions - exit handler chain
      * is freed during Parrot_exit

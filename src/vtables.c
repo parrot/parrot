@@ -82,8 +82,10 @@ Parrot_destroy_vtable(SHIM_INTERP, ARGMOD(VTABLE *vtable))
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
     assert(vtable);
 
-    if (vtable->ro_variant_vtable)
+    if (vtable->ro_variant_vtable) {
         mem_sys_free(vtable->ro_variant_vtable);
+        vtable->ro_variant_vtable = NULL;
+    }
 
     mem_sys_free(vtable);
 }

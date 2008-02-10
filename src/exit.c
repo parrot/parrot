@@ -90,6 +90,7 @@ Parrot_exit(PARROT_INTERP, int status)
         mem_sys_free(node);
         node = next;
     }
+
     exit(status);
 }
 

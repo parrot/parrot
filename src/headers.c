@@ -302,9 +302,9 @@ new_pmc_header(PARROT_INTERP, UINTVAL flags)
     if (flags & PObj_is_PMC_EXT_FLAG) {
         flags |= PObj_is_special_PMC_FLAG;
         pmc->pmc_ext = new_pmc_ext(interp);
-        if (flags & PObj_is_PMC_shared_FLAG) {
+
+        if (flags & PObj_is_PMC_shared_FLAG)
             add_pmc_sync(interp, pmc);
-        }
     }
     else
         pmc->pmc_ext = NULL;
@@ -707,6 +707,7 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
         if (ret_val)
             return ret_val;
     }
+
     if (flag & POOL_BUFFER) {
         int i;
         for (i = 0; i < (INTVAL)interp->arena_base->num_sized; i++) {

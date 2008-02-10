@@ -383,11 +383,11 @@ PARROT_API
 INTVAL
 pmc_register(PARROT_INTERP, ARGIN(STRING *name))
 {
-    INTVAL type;
     PMC *classname_hash;
+
     /* If they're looking to register an existing class, return that
        class' type number */
-    type = pmc_type(interp, name);
+    INTVAL type = pmc_type(interp, name);
 
     if (type > enum_type_undef)
         return type;
