@@ -1111,7 +1111,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
     }
 
     if (!any_slice && ((keychain = _get_sym(h, key_str)) != NULL)) {
-        free(key_str);
+        mem_sys_free(key_str);
         return keychain;
     }
 
@@ -1238,7 +1238,7 @@ resize_symhash(ARGMOD(SymHash *hsh))
              */
             if (j >= n_next) {
                 n_next <<= 1;
-                next_r = (SymReg **)mem_sys_realloc(next_r, n_next * sizeof (SymReg*));
+                next_r = mem_realloc_n_typed(next_r, n_next, SymReg*);
             }
 
             r->next = NULL;
