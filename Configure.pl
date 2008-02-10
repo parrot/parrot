@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use 5.008_000;
@@ -48,7 +48,7 @@ my $parrot_version = $Parrot::Configure::Options::Conf::parrot_version;
 # from Parrot::Configure::Messages
 print_introduction($parrot_version);
 
-my $conf = Parrot::Configure->new;
+my $conf = Parrot::Configure->new();
 
 # from Parrot::Configure::Step::List
 $conf->add_steps( get_steps_list() );
