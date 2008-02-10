@@ -16,6 +16,17 @@
  * ./Configure time.  For now, you'll have to do it by hand.
  */
 
+/*
+ * Microsoft provides two annotations mechanisms.  __declspec, which has been
+ * around for a while, and Microsoft's standard source code annotation
+ * language (SAL), introduced with Visual C++ 8.0.
+ * See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
+ * <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
+ */
+#if _MSC_VER > 1300
+#  include <sal.h>
+#endif
+
 #ifdef HASATTRIBUTE_NEVER_WORKS
  #  error This attribute can never succeed.  Something has mis-sniffed your configuration.
 #endif
@@ -98,8 +109,13 @@
  */
 #define UNUSED(a) if (0) (void)(a);
 
-#define PARROT_CAN_RETURN_NULL      /*@null@*/
-#define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
+#if _MSC_VER > 1300
+#  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull
+#  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __notnull
+#else
+#  define PARROT_CAN_RETURN_NULL      /*@null@*/
+#  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
+#endif
 
 #define PARROT_DEPRECATED           __attribute__deprecated__
 
@@ -115,29 +131,56 @@
 /* Function argument instrumentation */
 /* For explanations of the annotations, see http://www.splint.org/manual/manual.html */
 
-#define NOTNULL(x)                  /*@notnull@*/ x
+#if _MSC_VER > 1300
+#  define NOTNULL(x)                  /*@notnull@*/ __notnull x
     /* The pointer passed may not be NULL */
 
-#define NULLOK(x)                   /*@null@*/ x
+#  define NULLOK(x)                   /*@null@*/ __maybenull x
     /* The pointer passed may be NULL */
 
-#define ARGIN(x)                    /*@in@*/ /*@notnull@*/ x
-#define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ x
+#  define ARGIN(x)                    /*@in@*/ /*@notnull@*/ __in x
+#  define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ __in_opt x
     /* The pointer target must be completely defined before being passed */
     /* to the function. */
 
-#define ARGOUT(x)                   /*@out@*/ /*@notnull@*/ x
-#define ARGOUT_NULLOK(x)            /*@out@*/ /*@null@*/ x
+#  define ARGOUT(x)                   /*@out@*/ /*@notnull@*/ __out x
+#  define ARGOUT_NULLOK(x)            /*@out@*/ /*@null@*/ __out_opt x
     /* The pointer target will be defined by the function */
 
-#define ARGMOD(x)                   /*@in@*/ /*@notnull@*/ x
-#define ARGMOD_NULLOK(x)            /*@in@*/ /*@null@*/ x
+#  define ARGMOD(x)                   /*@in@*/ /*@notnull@*/ __inout x
+#  define ARGMOD_NULLOK(x)            /*@in@*/ /*@null@*/ __inout_opt x
     /* The pointer target must be completely defined before being passed, */
     /* and MAY be modified by the function. */
 
-#define FUNC_MODIFIES(x)            /*@modifies x@*/
+#  define FUNC_MODIFIES(x)            /*@modifies x@*/
     /* Never applied by a human, only by the headerizer. */
 
+#else
+
+#  define NOTNULL(x)                  /*@notnull@*/ x
+    /* The pointer passed may not be NULL */
+
+#  define NULLOK(x)                   /*@null@*/ x
+    /* The pointer passed may be NULL */
+
+#  define ARGIN(x)                    /*@in@*/ /*@notnull@*/ x
+#  define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ x
+    /* The pointer target must be completely defined before being passed */
+    /* to the function. */
+
+#  define ARGOUT(x)                   /*@out@*/ /*@notnull@*/ x
+#  define ARGOUT_NULLOK(x)            /*@out@*/ /*@null@*/ x
+    /* The pointer target will be defined by the function */
+
+#  define ARGMOD(x)                   /*@in@*/ /*@notnull@*/ x
+#  define ARGMOD_NULLOK(x)            /*@in@*/ /*@null@*/ x
+    /* The pointer target must be completely defined before being passed, */
+    /* and MAY be modified by the function. */
+
+#  define FUNC_MODIFIES(x)            /*@modifies x@*/
+    /* Never applied by a human, only by the headerizer. */
+
+#endif
 
 #endif /* PARROT_COMPILER_H_GUARD */
 
