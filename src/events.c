@@ -428,9 +428,9 @@ PARROT_API
 void
 Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
 {
-    QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
+    QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
     entry->next = NULL;
-    ev->interp = interp;
+    ev->interp  = interp;
     entry->data = ev;
     switch (ev->type) {
         case EVENT_TYPE_TIMER:
@@ -464,14 +464,14 @@ create and schedule a signal event
 static void
 schedule_signal_event(int signum)
 {
-    parrot_event* const ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev    = mem_allocate_typed(parrot_event);
     QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
 
-    entry->next = NULL;
-    entry->type = QUEUE_ENTRY_TYPE_EVENT;
-    ev->type = EVENT_TYPE_SIGNAL;
+    entry->next  = NULL;
+    entry->type  = QUEUE_ENTRY_TYPE_EVENT;
+    ev->type     = EVENT_TYPE_SIGNAL;
     ev->u.signal = signum;
-    entry->data = ev;
+    entry->data  = ev;
     /*
      * deliver to all interpreters
      */
@@ -525,14 +525,14 @@ PARROT_API
 void
 Parrot_new_cb_event(PARROT_INTERP, ARGIN(PMC *cbi), ARGIN(char *ext))
 {
-    parrot_event* const ev = mem_allocate_typed(parrot_event);
-    QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
+    parrot_event* const ev    = mem_allocate_typed(parrot_event);
+    QUEUE_ENTRY*  const entry = mem_allocate_typed(QUEUE_ENTRY);
 
     entry->next = NULL;
     entry->data = ev;
-    ev->interp = interp;
-    ev->type = EVENT_TYPE_CALL_BACK;
-    ev->u.call_back.cbi = cbi;
+    ev->interp  = interp;
+    ev->type    = EVENT_TYPE_CALL_BACK;
+    ev->u.call_back.cbi           = cbi;
     ev->u.call_back.external_data = ext;
     Parrot_schedule_interp_qentry(interp, entry);
 }
@@ -551,7 +551,7 @@ PARROT_API
 void
 Parrot_del_timer_event(PARROT_INTERP, ARGIN(const PMC *timer))
 {
-    QUEUE_ENTRY  *entry;
+    QUEUE_ENTRY *entry;
 
     LOCK(event_queue->queue_mutex);
 
@@ -772,11 +772,11 @@ store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
 {
     if (!ios->alloced) {
         ios->alloced = 16;
-        ios->events = (parrot_event **)mem_sys_allocate(ios->alloced * sizeof (ev));
+        ios->events  = (parrot_event **)mem_sys_allocate(ios->alloced * sizeof (ev));
     }
     else if (ios->n >= ios->alloced) {
         ios->alloced *= 2;
-        ios->events = (parrot_event **)mem_sys_realloc(ios->events, (ios->alloced * sizeof (ev)));
+        ios->events   = (parrot_event **)mem_sys_realloc(ios->events, (ios->alloced * sizeof (ev)));
     }
     ios->events[ios->n++] = ev;
 }
@@ -988,8 +988,8 @@ Parrot_event_add_io_event(PARROT_INTERP,
     io_thread_msg buf;
     parrot_event * const event = mem_allocate_typed(parrot_event);
 
-    event->type        = EVENT_TYPE_IO;
-    event->interp      = interp;
+    event->type   = EVENT_TYPE_IO;
+    event->interp = interp;
     /*
      * TODO dod_register these PMCs as long as the event system
      *      owns these 3
@@ -1055,10 +1055,10 @@ PARROT_CANNOT_RETURN_NULL
 static QUEUE_ENTRY*
 dup_entry_interval(ARGIN(QUEUE_ENTRY *entry), FLOATVAL now)
 {
-    QUEUE_ENTRY  * const new_entry       = dup_entry(entry);
-    parrot_event * const event           = (parrot_event *)new_entry->data;
+    QUEUE_ENTRY  * const new_entry = dup_entry(entry);
+    parrot_event * const event     = (parrot_event *)new_entry->data;
 
-    event->u.timer_event.abs_time = now + event->u.timer_event.interval;
+    event->u.timer_event.abs_time  = now + event->u.timer_event.interval;
 
     return new_entry;
 }
@@ -1077,8 +1077,8 @@ Do something, when an event arrived caller has locked the mutex returns
 static int
 process_events(ARGMOD(QUEUE *event_q))
 {
-    FLOATVAL      now;
-    QUEUE_ENTRY  *entry;
+    FLOATVAL     now;
+    QUEUE_ENTRY *entry;
 
     while ((entry = peek_entry(event_q)) != NULL) {
         /*
@@ -1183,7 +1183,7 @@ event_thread(ARGMOD(void *data))
             parrot_event * const event = (parrot_event*)entry->data;
             const FLOATVAL when = event->u.timer_event.abs_time;
 
-            abs_time.tv_sec = (time_t) when;
+            abs_time.tv_sec  = (time_t) when;
             abs_time.tv_nsec = (long)((when - abs_time.tv_sec)*1000.0f)
                 *1000L*1000L;
             queue_timedwait(event_q, &abs_time);
@@ -1233,7 +1233,7 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 wait_for_wakeup(PARROT_INTERP, ARGIN_NULLOK(opcode_t *next))
 {
-    QUEUE        * const tq = interp->task_queue;
+    QUEUE * const tq = interp->task_queue;
 
     interp->sleeping = 1;
 
@@ -1252,7 +1252,7 @@ wait_for_wakeup(PARROT_INTERP, ARGIN_NULLOK(opcode_t *next))
      */
 
     while (interp->sleeping) {
-        QUEUE_ENTRY * const entry = wait_for_entry(tq);
+        QUEUE_ENTRY  * const entry = wait_for_entry(tq);
         parrot_event * const event = (parrot_event*)entry->data;
 
         mem_sys_free(entry);
@@ -1437,7 +1437,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_do_handle_events(PARROT_INTERP, int restore, ARGIN_NULLOK(opcode_t *next))
 {
-    QUEUE        * const tq = interp->task_queue;
+    QUEUE * const tq = interp->task_queue;
 
     if (restore)
         disable_event_checking(interp);
@@ -1446,7 +1446,7 @@ Parrot_do_handle_events(PARROT_INTERP, int restore, ARGIN_NULLOK(opcode_t *next)
         return next;
 
     while (peek_entry(tq)) {
-        QUEUE_ENTRY * const  entry = pop_entry(tq);
+        QUEUE_ENTRY  * const entry = pop_entry(tq);
         parrot_event * const event = (parrot_event*)entry->data;
 
         mem_sys_free(entry);
