@@ -188,13 +188,6 @@ subrule's action didn't set a result object using the C<make> command. Check whe
 there's an action invocation token "{*}" in the subrule and whether that subrule's
 action has a C<make> command.
 
-=item * Can only replace inside string or index after end of string
-
-This error occurs if the operator table contains a misspelling somewhere. Make sure
-that operators containing the character "<" or ">" are quoted using French quotes
-(« and »). The best solution to solve this is to comment out the whole table
-except for a single operator, and try to find the error using a binary search.
-
 =back
 
 =head1 WHERE TO GO FROM HERE?

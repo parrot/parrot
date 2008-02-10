@@ -84,15 +84,11 @@ an C<expression> is parsed by the operator parser:
 
  rule expression is optable { ... }
 
-The C<...> indicates that this rule is a C<prototype>.
-
-{{ explain what a proto is }}
-
+The C<{ ... }> is legal Perl 6 syntax. See C<Synopsis 6: subroutines>
+for details.
 
 In order to define what an operand is, a special rule is define, named
 C<term:>.
-
-{{ is this always called "term:" or can it be named anything? not sure }}
 
  proto 'term:' is precedence('=') is parsed(&simple_expression) { ... }
 
@@ -135,6 +131,9 @@ tighter than the precedence of the operator C<OP>.
 =back
 
 =head3 Where's the operator?
+
+In Perl 6, operators are just subroutines with special names and scoping
+(see C<Synopsis 6: subroutines>).
 
 When operators such as C<infix:+> are defined, the bottom-up parser will
 generate a C<call> instruction to a subroutine with the same name, that is,
@@ -179,7 +178,10 @@ just declared them as any other operator:
 
  proto 'prefix:defined?' ...
 
-Note that C<defined?> is a prefix operator.
+Note that C<defined?> is a prefix operator, which would look like this
+in code:
+
+ defined? $x
 
 =head3 Ternary operators
 
@@ -192,6 +194,67 @@ To declare a ternary operator, you write:
 
  proto ternary:<? :> is looser('infix:+') { ... }
 
+=head3 Circumfix operators
+
+Brackets can be considered operators as well. There are two types:
+
+=over 4
+
+=item * circumfix
+
+C<circumfix> operators can enclose other terms and operators. For instance
+many languages define a rule C<expression> similar to the following:
+
+ expression: literal
+           | identifier
+           | '(' expression ')'
+           | expression ['+'|'-'|...] expression
+
+When defining an operator table, the third alternative specifying a
+parenthesized expression can be expressed as follows:
+
+ proto circumfix:<( )> ...
+
+This means that operands (which are parsed through the special C<term:> rule)
+can be enclosed in parenthesis, like so:
+
+ (1 + 2) * 3
+
+This is legal, because the C<( )> is just another operator handled by the
+operator table.
+
+=item * postcircumfix
+
+Postcircumfix brackets are useful for subroutine invocation or indexing. Of
+course, this fully depends on the specification of your language. Sometimes,
+you need a different rule to define subroutine invocation syntax. This is the
+case when arguments can be other objects than operands of normal operators
+(which, again, are defined by the c<term:> rule).
+
+An example to handle indexing (assuming the index is an operand as any other
+operator's operand) is this:
+
+ proto postcircumfix:<[ ]> ...
+
+which, given the following rules:
+
+ rule expression is optable { ... }
+
+ rule 'term:' (...) is parsed(&simple_expression) { ... }
+
+ rule simple_expression {
+    | <literal>
+    | <ident>
+ }
+
+allows us to write this:
+
+ foo["hello"]
+
+Here, C<"hello"> is a literal and C<foo> is an identifier.
+
+
+=back
 
 =head3 The C<assoc> trait
 
@@ -229,11 +292,11 @@ operator) is not nested at all:
 
 should neither be parsed as
 
- (((1, 2), 3), 4
+ (((1, 2), 3), 4)
 
 nor as
 
- 1, (2, (3, 4))
+ (1, (2, (3, 4)))
 
 You can achieve that with the C<is assoc('none')> trait.
 
@@ -315,11 +378,24 @@ Therefore, use so-called French quotes to do this. This looks as follows:
 
 =item * Why are some operators quoted and some not?
 
-{{ answer this }}
+That's a matter of taste. You can define the operator C<+> in various ways:
 
-=item * I get an error message saying: XXX
+ proto infix:+
+ proto infix:<+>
+ proto 'infix:+'
 
-{{ answer this }}
+Note that C<< 'infix:<+>' >> is not allowed.
+
+=item * I get an error message saying:
+
+ "Can only replace inside string or index after end of string"
+
+This error occurs if the operator table contains a misspelling somewhere. Make sure
+that operators containing the character "<" or ">" are quoted using French quotes
+(« and »), or quote the proto name, as in C<< 'infix:<' >>.
+The best solution to solve this is to comment out the whole table except for a
+single operator, and try to find the error using a binary search. Or, better yet,
+set up your operator table incrementally, while keeping tests passing.
 
 =item * How many operator tables can I use in my language?
 
@@ -328,7 +404,8 @@ Therefore, use so-called French quotes to do this. This looks as follows:
 =item * How does an optable parser work?
 
 If you really want to know, check out compiler literature.
-It's something with a stack.
+It's something with stacks and emitting instructions for operators with C<tighter>
+precedence (and their operands) first.
 
 =back
 
@@ -339,6 +416,8 @@ It's something with a stack.
 =item * L<docs\pct\gettingstarted.pod>
 
 =item * L<docs\pct\past_building_blocks.pod>
+
+=item * L<http://dev.perl.org/perl6/doc/design/syn/S06.html>
 
 =back
 
