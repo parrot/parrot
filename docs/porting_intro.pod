@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -71,7 +71,7 @@ OS X/i386 vs. Linux/i386; OS X/i386 doesn't currently work.)
 
 =item * F<docs/jit.pod>
 
-=item * F<jit/$arch/*>
+=item * F<src/jit/$arch/*>
 
 =item * I<make testj>
 
