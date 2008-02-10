@@ -301,8 +301,8 @@ PARROT_API
 void
 parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 {
-    UINTVAL found = 0;
-    int mark_key = 0;
+    UINTVAL found  = 0;
+    int mark_key   = 0;
     int mark_value = 0;
     size_t i;
 
@@ -917,7 +917,7 @@ parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
     INTVAL i = PMC_int_val(key);
     const BucketIndex bi = (BucketIndex)PMC_data(key);
     HashBucket *b;
-    void *res;
+    void       *res;
 
     /* idx directly in the bucket store, which is at negative
      * address from the data pointer

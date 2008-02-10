@@ -275,23 +275,23 @@ void
 Parrot_run_callback(PARROT_INTERP,
         ARGMOD(PMC* user_data), ARGIN(char* external_data))
 {
-    PMC *    signature;
-    PMC *    sub;
-    STRING * sig_str;
-    char *   p;
+    PMC     *signature;
+    PMC     *sub;
+    STRING  *sig_str;
+    char    *p;
     char     pasm_sig[4];
     INTVAL   i_param;
-    PMC *    p_param;
-    void*    param = NULL;      /* avoid -Ox warning */
-    STRING * sc;
+    PMC     *p_param;
+    void    *param = NULL;      /* avoid -Ox warning */
+    STRING  *sc;
 
-    sc = CONST_STRING(interp, "_sub");
-    sub = VTABLE_getprop(interp, user_data, sc);
-    sc = CONST_STRING(interp, "_signature");
+    sc        = CONST_STRING(interp, "_sub");
+    sub       = VTABLE_getprop(interp, user_data, sc);
+    sc        = CONST_STRING(interp, "_signature");
     signature = VTABLE_getprop(interp, user_data, sc);
 
-    sig_str = VTABLE_get_string(interp, signature);
-    p = sig_str->strstart;
+    sig_str   = VTABLE_get_string(interp, signature);
+    p         = sig_str->strstart;
     ++p;     /* Skip return type */
 
     pasm_sig[0] = 'v';  /* no return value supported yet */

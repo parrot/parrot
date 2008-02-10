@@ -317,11 +317,11 @@ Parrot_init_arg_sig(SHIM_INTERP, ARGIN(parrot_context_t *ctx), ARGIN(const char 
     ARGIN_NULLOK(void *ap), ARGMOD(call_state_item *sti))
 {
     sti->used = 1;
-    sti->i = 0;
-    sti->n = 0;
+    sti->i    = 0;
+    sti->n    = 0;
     sti->mode = CALL_STATE_SIG;
-    sti->ctx = ctx;
-    sti->sig = 0;
+    sti->ctx  = ctx;
+    sti->sig  = 0;
 
     if (*sig) {
         sti->u.sig.sig = sig;
@@ -498,15 +498,15 @@ fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
             break;
         case PARROT_ARG_STRING:
             UVal_str(st->val) = constant ? st->src.ctx->constants[idx]->u.string
-                                      : CTX_REG_STR(st->src.ctx, idx);
+                                         : CTX_REG_STR(st->src.ctx, idx);
             break;
         case PARROT_ARG_FLOATVAL:
             UVal_num(st->val) = constant ? st->src.ctx->constants[idx]->u.number
-                                      : CTX_REG_NUM(st->src.ctx, idx);
+                                         : CTX_REG_NUM(st->src.ctx, idx);
             break;
         case PARROT_ARG_PMC:
             UVal_pmc(st->val) = constant ? st->src.ctx->constants[idx]->u.key
-                                      : CTX_REG_PMC(st->src.ctx, idx);
+                                         : CTX_REG_PMC(st->src.ctx, idx);
 
             if (st->src.sig & PARROT_ARG_FLATTEN) {
                 int retval;
@@ -1819,8 +1819,8 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
 
     const char *x;
     const char *ret_x  = NULL;
-    int         index = -1;
-    int         cur   =  0;
+    int         index  = -1;
+    int         cur    =  0;
 
     va_list list;
     va_start(list, signature);

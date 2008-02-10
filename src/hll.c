@@ -141,7 +141,7 @@ PARROT_API
 INTVAL
 Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
-    PMC *entry, *name, *type_hash, *ns_hash, *hll_info;
+    PMC   *entry, *name, *type_hash, *ns_hash, *hll_info;
     INTVAL idx;
 
     /* TODO LOCK or disallow in threads */
