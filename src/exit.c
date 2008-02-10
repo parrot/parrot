@@ -43,11 +43,11 @@ Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), ARGIN_NULLOK(voi
     /* RT#46403  we might want locking around the list access.   I'm sure this
      * will be the least of the threading issues. */
 
-    handler_node_t* const new_node = mem_allocate_typed(handler_node_t);
+    handler_node_t * const new_node = mem_allocate_typed(handler_node_t);
 
-    new_node->function = function;
-    new_node->arg = arg;
-    new_node->next = interp->exit_handler_list;
+    new_node->function        = function;
+    new_node->arg             = arg;
+    new_node->next            = interp->exit_handler_list;
     interp->exit_handler_list = new_node;
 }
 

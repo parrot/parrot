@@ -213,7 +213,7 @@ Parrot_PMC_get_numval(PARROT_INTERP, Parrot_PMC pmc)
 {
     Parrot_Float retval;
     PARROT_CALLIN_START(interp);
-    retval =  VTABLE_get_number(interp, pmc);
+    retval = VTABLE_get_number(interp, pmc);
     PARROT_CALLIN_END(interp);
     return retval;
 }
@@ -235,7 +235,7 @@ Parrot_PMC_get_numval_intkey(PARROT_INTERP,
 {
     Parrot_Float retval;
     PARROT_CALLIN_START(interp);
-    retval =  VTABLE_get_number_keyed_int(interp, pmc, key);
+    retval = VTABLE_get_number_keyed_int(interp, pmc, key);
     PARROT_CALLIN_END(interp);
     return retval;
 }
@@ -848,7 +848,7 @@ Parrot_Float
 Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub,
                  ARGIN(const char *signature), ...)
 {
-    va_list ap;
+    va_list      ap;
     Parrot_Float result;
 
     PARROT_CALLIN_START(interp);
@@ -880,7 +880,7 @@ void *
 Parrot_call_method(PARROT_INTERP, Parrot_PMC sub, Parrot_PMC obj,
                         Parrot_String method, ARGIN(const char *signature), ...)
 {
-    void *result;
+    void    *result;
     va_list ap;
 
     PARROT_CALLIN_START(interp);
@@ -908,7 +908,7 @@ Parrot_call_method_ret_int(PARROT_INTERP, Parrot_PMC sub,
         Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)
 {
     Parrot_Int result;
-    va_list ap;
+    va_list    ap;
 
     PARROT_CALLIN_START(interp);
     va_start(ap, signature);
@@ -935,7 +935,7 @@ Parrot_call_method_ret_float(PARROT_INTERP, Parrot_PMC sub,
         Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)
 {
     Parrot_Float result;
-    va_list ap;
+    va_list      ap;
 
     PARROT_CALLIN_START(interp);
     va_start(ap, signature);
