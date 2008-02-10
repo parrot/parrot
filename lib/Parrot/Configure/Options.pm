@@ -1,6 +1,8 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
+
 package Parrot::Configure::Options;
+
 use strict;
 use warnings;
 use base qw( Exporter );
@@ -14,13 +16,14 @@ use Parrot::Configure::Options::Reconf ();
 
 sub process_options {
     my $argsref = shift;
+
     my %options_components;
     croak "'mode' argument not provided to process_options()"
         unless defined $argsref->{mode};
-    if ( $argsref->{mode} =~ /^reconfigure$/i ) {
+    if ( $argsref->{mode} =~ m/^reconfigure$/i ) {
         %options_components = %Parrot::Configure::Options::Reconf::options_components;
     }
-    elsif ( $argsref->{mode} =~ /^configure$/i ) {
+    elsif ( $argsref->{mode} =~ m/^configure$/i ) {
         %options_components = %Parrot::Configure::Options::Conf::options_components;
     }
     else {
@@ -80,10 +83,9 @@ Parrot::Configure::Options - Process command-line options to F<Configure.pl>
 
 =head1 DESCRIPTION
 
-Parrot::Configure::Options exports on demand two subroutines:
+Parrot::Configure::Options exports on demand the subroutine
 C<process_options()>, which processes the command-line options provided to
-F<Configure.pl>; and C<get_valid_options()>, which returns the list of
-currently valid options.
+F<Configure.pl>.
 
 If you provide F<Configure.pl> with either C<--help> or C<--version>,
 C<process_options()>  will print out the appropriate message and perform a
@@ -130,26 +132,6 @@ Bare return (C<undef>).
 Reference to a hash of option names and values.
 
 =back
-
-=item * Comment
-
-=back
-
-=head2 C<get_valid_options()>
-
-=over 4
-
-=item * Purpose
-
-Get a list of options currently valid for F<Configure.pl>.
-
-=item * Arguments
-
-None.
-
-=item * Return Value
-
-List of currently valid options.
 
 =item * Comment
 

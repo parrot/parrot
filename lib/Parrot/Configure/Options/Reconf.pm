@@ -1,10 +1,16 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
+
 package Parrot::Configure::Options::Reconf;
+
 use strict;
 use warnings;
 use base qw( Exporter );
-our @EXPORT_OK = qw( @valid_options $script %options_components );
+our @EXPORT_OK = qw(
+    @valid_options
+    $script
+    %options_components
+);
 
 our @valid_options = qw{
     ask

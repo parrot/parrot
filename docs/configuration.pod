@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 =pod
@@ -204,19 +204,19 @@ defined by steps.
 Command-line arguments are now processed by C<process_options()>, a subroutine
 exported by L<Parrot::Configure::Options>.  If you add a new option, don't
 forget to add it to this documentation and to two locations in
-F<lib/Parrot/Configure/Options.pm>:
+F<lib/Parrot/Configure/Options/Conf.pm> and F<lib/Parrot/Configure/Options/ReConf.pm>:
 
 =over 4
 
 =item *
 
-the list of valid command-line arguments in
-C<Parrot::Configure::Options::get_valid_options()>; and
+the list of valid command-line arguments in the array
+C<@valid_options> and
 
 =item *
 
 the description of command-line arguments found in
-C<Parrot::Configure::Options::print_help()>.
+C<print_help()>.
 
 =back
 
@@ -297,7 +297,8 @@ F<config/init/defaults.pm> and F<lib/Parrot/Configure/Data.pm>.
 =head1 HISTORY
 
 The Parrot configuration system was created by Brent Dax and has been heavily
-mangled by Joshua Hoblitt.
+mangled by Joshua Hoblitt. 
+James Keenan refactored the configuration system. 
 
 =head1 SEE ALSO
 
@@ -305,4 +306,3 @@ L<Parrot::Configure>, L<Parrot::Configure::Data>,
 L<Parrot::Configure::Utils>, L<Parrot::Configure::Step>
 
 =cut
-
