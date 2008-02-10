@@ -702,9 +702,9 @@ static void
 store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *ns))
 {
     INTVAL func_nr;
-    char *c_meth;
+    char   *c_meth;
     STRING * const subname = PMC_sub(sub)->name;
-    PMC   *multisub = VTABLE_get_pmc_keyed_str(interp, ns, subname);
+    PMC    *multisub = VTABLE_get_pmc_keyed_str(interp, ns, subname);
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
     if (PMC_IS_NULL(multisub)) {
@@ -717,7 +717,7 @@ store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *ns))
     else
         VTABLE_push_pmc(interp, multisub, sub);
 
-    c_meth = string_to_cstring(interp, subname);
+    c_meth  = string_to_cstring(interp, subname);
     func_nr = Parrot_MMD_method_idx(interp, c_meth);
     if (func_nr >= 0)
         Parrot_mmd_rebuild_table(interp, -1, func_nr);
