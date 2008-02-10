@@ -44,7 +44,7 @@ void
 register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
                     ARGIN(const char *name), ARGIN(const char *proto))
 {
-    PMC * const method = pmc_new(interp, enum_class_NCI);
+    PMC    * const method      = pmc_new(interp, enum_class_NCI);
     STRING * const method_name = string_make(interp, name, strlen(name),
         NULL, PObj_constant_FLAG|PObj_external_FLAG);
 
@@ -74,7 +74,7 @@ void
 register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
         ARGIN(const char *name))
 {
-    PMC * const method = pmc_new(interp, enum_class_NCI);
+    PMC    * const method      = pmc_new(interp, enum_class_NCI);
     STRING * const method_name = string_make(interp, name, strlen(name),
         NULL, PObj_constant_FLAG|PObj_external_FLAG);
 
@@ -101,8 +101,8 @@ void
 Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 {
     STRING *const str_name = const_string(interp, name);
-    PMC *const pmc_true = pmc_new(interp, enum_class_Integer);
-    PMC *const method = VTABLE_get_pmc_keyed_str(
+    PMC    *const pmc_true = pmc_new(interp, enum_class_Integer);
+    PMC    *const method   = VTABLE_get_pmc_keyed_str(
         interp, interp->vtables[type]->_namespace, str_name);
     VTABLE_set_integer_native(interp, pmc_true, 1);
     VTABLE_setprop(interp, method, const_string(interp, "write"),
@@ -350,8 +350,8 @@ STRING*
 interpinfo_s(PARROT_INTERP, INTVAL what)
 {
     STRING *fullname, *basename;
-    char *fullname_c;
-    int pos;
+    char   *fullname_c;
+    int     pos;
 
     switch (what) {
         case EXECUTABLE_FULLNAME:
@@ -408,14 +408,14 @@ INTVAL
 sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 {
     switch (info_wanted) {
-    case PARROT_INTSIZE:
-        return sizeof (INTVAL);
-    case PARROT_FLOATSIZE:
-        return sizeof (FLOATVAL);
-    case PARROT_POINTERSIZE:
-        return sizeof (void *);
-    default:
-        return -1;
+        case PARROT_INTSIZE:
+            return sizeof (INTVAL);
+        case PARROT_FLOATSIZE:
+            return sizeof (FLOATVAL);
+        case PARROT_POINTERSIZE:
+            return sizeof (void *);
+        default:
+            return -1;
     }
 }
 
@@ -445,15 +445,15 @@ STRING *
 sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 {
     switch (info_wanted) {
-    case PARROT_OS:
-        /*  XXX Can't use CONST_STRING here yet, as it needs literal strings*/
-        return string_from_literal(interp, BUILD_OS_NAME);
-    case PARROT_OS_VERSION:
-    case PARROT_OS_VERSION_NUMBER:
-    case CPU_ARCH:
-    case CPU_TYPE:
-    default:
-        return CONST_STRING(interp, "");
+        case PARROT_OS:
+            /*  XXX Can't use CONST_STRING here yet, as it needs literal strings*/
+            return string_from_literal(interp, BUILD_OS_NAME);
+        case PARROT_OS_VERSION:
+        case PARROT_OS_VERSION_NUMBER:
+        case CPU_ARCH:
+        case CPU_TYPE:
+        default:
+            return CONST_STRING(interp, "");
     }
 }
 
