@@ -348,7 +348,7 @@ Parrot_dup_context(PARROT_INTERP, ARGIN(const struct Parrot_Context *old))
     CONTEXT(interp->ctx) = ctx;
 
     ctx->regs_mem_size          = reg_alloc;
-    ctx->n_regs_used            = mem_allocate_n_zeroed_typed(4,INTVAL);
+    ctx->n_regs_used            = mem_allocate_n_zeroed_typed(4, INTVAL);
     ctx->n_regs_used[REGNO_INT] = old->n_regs_used[REGNO_INT];
     ctx->n_regs_used[REGNO_NUM] = old->n_regs_used[REGNO_NUM];
     ctx->n_regs_used[REGNO_STR] = old->n_regs_used[REGNO_STR];
@@ -451,7 +451,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
     const int    slot          = CALCULATE_SLOT_NUM(reg_alloc);
 
     /* this gets attached to the context, which should free it */
-    INTVAL * const n_regs_used = mem_allocate_n_zeroed_typed(4,INTVAL);
+    INTVAL * const n_regs_used = mem_allocate_n_zeroed_typed(4, INTVAL);
     n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
     n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
     n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];

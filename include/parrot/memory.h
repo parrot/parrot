@@ -34,10 +34,10 @@
 #define mem_sys_memmove memmove
 
 #define mem_allocate_typed(type)            (type *)mem_sys_allocate(sizeof (type))
-#define mem_allocate_n_typed(n,type)        (type *)mem_sys_allocate((n) * sizeof(type))
+#define mem_allocate_n_typed(n, type)       (type *)mem_sys_allocate((n) * sizeof(type))
 #define mem_allocate_zeroed_typed(type)     (type *)mem_sys_allocate_zeroed(sizeof (type))
-#define mem_allocate_n_zeroed_typed(n,type) (type *)mem_sys_allocate_zeroed((n) * sizeof(type))
-#define mem_realloc_n_typed(p,n,type)       (type *)mem_sys_realloc((p),(n)*sizeof(type))
+#define mem_allocate_n_zeroed_typed(n, type) (type *)mem_sys_allocate_zeroed((n) * sizeof(type))
+#define mem_realloc_n_typed(p, n, type)     (type *)mem_sys_realloc((p), (n)*sizeof(type))
 
 /* HEADERIZER BEGIN: src/gc/memory.c */
 

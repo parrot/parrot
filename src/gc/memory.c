@@ -186,7 +186,7 @@ mem_sys_realloc_zeroed(ARGIN_NULLOK(void *from), size_t size, size_t old_size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
 #endif
-    ptr = from ? realloc(from,size) : malloc(size);
+    ptr = from ? realloc(from, size) : malloc(size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif

@@ -445,7 +445,7 @@ PARROT_CAN_RETURN_NULL
 Instruction *
 delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
-    Instruction * next = _delete_ins(unit,ins);
+    Instruction * next = _delete_ins(unit, ins);
 
     free_ins(ins);
 

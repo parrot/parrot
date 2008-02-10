@@ -702,7 +702,7 @@ handle_exception(PARROT_INTERP)
     const opcode_t * const dest = create_exception(interp);
 
     if (!dest)
-        PANIC(interp,"Unable to create exception");
+        PANIC(interp, "Unable to create exception");
 
     /* return the *offset* of the handler */
     return dest - interp->code->base.data;

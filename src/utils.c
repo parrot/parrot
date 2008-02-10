@@ -61,7 +61,7 @@ static void rec_climb_back_and_mark(
 
 /* HEADERIZER END: static */
 
-#define move_reg(from,dest,c) (c)->mov((c)->interp, (dest), (from), (c)->info)
+#define move_reg(from, dest, c) (c)->mov((c)->interp, (dest), (from), (c)->info)
 
 /*
 

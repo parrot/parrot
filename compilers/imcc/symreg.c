@@ -373,7 +373,7 @@ add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
         sub->arg_flags = (int *)mem_sys_realloc(sub->arg_flags,
             (n+1) * sizeof (int));
     else
-        sub->arg_flags = mem_allocate_n_zeroed_typed(n+1,int);
+        sub->arg_flags = mem_allocate_n_zeroed_typed(n+1, int);
     sub->arg_flags[n] = arg->type;
 
     arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
@@ -457,7 +457,7 @@ add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
         sub->multi = (SymReg **)mem_sys_realloc(sub->multi,
             (n + 1) * sizeof (SymReg *));
     else
-        sub->multi = mem_allocate_n_zeroed_typed(n+1,SymReg *);
+        sub->multi = mem_allocate_n_zeroed_typed(n+1, SymReg *);
 
     sub->multi[n] = arg;
     sub->nmulti++;
