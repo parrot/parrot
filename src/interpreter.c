@@ -558,9 +558,9 @@ void *
 init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
 {
 #if JIT_CAPABLE
-    opcode_t *code_start;
-    UINTVAL code_size;          /* in opcodes */
-    opcode_t *code_end;
+    opcode_t          *code_start;
+    UINTVAL            code_size;          /* in opcodes */
+    opcode_t          *code_end;
     Parrot_jit_info_t *jit_info;
 
     if (interp->code->jit_info)
@@ -679,7 +679,7 @@ runops_exec(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
 #if EXEC_CAPABLE
     opcode_t *code_start;
-    UINTVAL code_size;          /* in opcodes */
+    UINTVAL   code_size;          /* in opcodes */
     opcode_t *code_end;
 
     code_start = interp->code->base.data;
@@ -994,7 +994,7 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
     n_old = interp->op_count;
     n_new = lib->op_count;
     n_tot = n_old + n_new;
-    core = PARROT_CORE_OPLIB_INIT(1);
+    core  = PARROT_CORE_OPLIB_INIT(1);
 
     PARROT_ASSERT(interp->op_count == core->op_count);
     new_evc_func_table = (op_func_t *)mem_sys_realloc(interp->evc_func_table,
@@ -1038,8 +1038,8 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
     /* set table */
     core->op_func_table = interp->op_func_table = new_func_table;
     core->op_info_table = interp->op_info_table = new_info_table;
-    core->op_count = interp->op_count = n_tot;
-    core->flags = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
+    core->op_count      = interp->op_count = n_tot;
+    core->flags         = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
     /* done for plain core */
 #ifdef HAVE_COMPUTED_GOTO
     dynop_register_xx(interp, n_old, n_new, PARROT_CORE_CGP_OPLIB_INIT);
@@ -1062,7 +1062,7 @@ static void
 dynop_register_xx(PARROT_INTERP,
         size_t n_old, size_t n_new, oplib_init_f init_func)
 {
-    op_lib_t *cg_lib, *new_lib;
+    op_lib_t  *cg_lib, *new_lib;
     op_func_t *ops_addr = NULL;
     size_t n_tot;
 #if 0
@@ -1150,7 +1150,7 @@ dynop_register_xx(PARROT_INTERP,
      * tell the cg_core about the new jump table
      */
     cg_lib->op_func_table = ops_addr;
-    cg_lib->op_count = n_tot;
+    cg_lib->op_count      = n_tot;
     init_func((long) ops_addr);
 }
 
