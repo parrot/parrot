@@ -234,10 +234,10 @@ Parrot_exec_add_symbol(ARGMOD(Parrot_exec_objfile_t *obj),
             (size_t)(obj->symbol_count + 1) * sizeof (Parrot_exec_symbol_t));
         obj->symbol_table = new_symbol;
 
-        new_symbol = &obj->symbol_table[obj->symbol_count++];
+        new_symbol              = &obj->symbol_table[obj->symbol_count++];
         new_symbol->offset_list = obj->symbol_list_size;
-        new_symbol->symbol = symbol;
-        obj->symbol_list_size += strlen(symbol);
+        new_symbol->symbol      = symbol;
+        obj->symbol_list_size  += strlen(symbol);
 #if defined(EXEC_A_OUT) || defined(EXEC_COFF)
         /* for the trailing "_" */
         obj->symbol_list_size++;
@@ -343,9 +343,9 @@ Parrot_exec_add_text_rellocation(ARGIN(Parrot_exec_objfile_t *obj), ARGIN(char *
         addr = Parrot_exec_rel_addr[--Parrot_exec_rel_count];
     else
         addr = nptr + disp;
-    new_relloc->offset = (int)(addr - obj->text.code);
+    new_relloc->offset        = (int)(addr - obj->text.code);
     new_relloc->symbol_number = symbol_number;
-    new_relloc->type = type;
+    new_relloc->type          = type;
 }
 
 /*
