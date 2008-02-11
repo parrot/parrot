@@ -1045,7 +1045,7 @@ RT#48260: Not yet documented!!!
 
 static int
 sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
-    ARGIN(void *arg))
+    ARGMOD(void *arg))
 {
     int * const total_free = (int *) arg;
 
