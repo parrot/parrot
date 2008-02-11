@@ -103,9 +103,7 @@ RT#48260: Not yet documented!!!
 void
 parrot_alloc_vtables(PARROT_INTERP)
 {
-    interp->vtables          = (VTABLE **)mem_sys_allocate_zeroed(
-        sizeof (VTABLE *) * PARROT_MAX_CLASSES);
-
+    interp->vtables          = mem_allocate_n_zeroed_typed(PARROT_MAX_CLASSES, VTABLE *);
     interp->n_vtable_max     = enum_class_core_max;
     interp->n_vtable_alloced = PARROT_MAX_CLASSES - 1;
 }

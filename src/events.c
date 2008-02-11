@@ -773,11 +773,11 @@ store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
 {
     if (!ios->alloced) {
         ios->alloced = 16;
-        ios->events  = (parrot_event **)mem_sys_allocate(ios->alloced * sizeof (ev));
+        ios->events  = mem_allocate_n_zeroed_typed(ios->alloced, parrot_event *);
     }
     else if (ios->n >= ios->alloced) {
         ios->alloced *= 2;
-        ios->events   = (parrot_event **)mem_sys_realloc(ios->events, (ios->alloced * sizeof (ev)));
+        ios->events   = mem_realloc_n_typed(ios->events, ios->alloced, parrot_event *);
     }
     ios->events[ios->n++] = ev;
 }
