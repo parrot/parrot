@@ -163,14 +163,9 @@ Otherwise the string will be true.
 
 To format output into a string, use
 
-    STRING* string_nprintf(Interp*,
-                           STRING*   dest,
-                           INTVAL    len,
-                           char*     format,
-                           ...)
-
-C<dest> may be a null pointer, in which case a new string will be created. If
-C<len> is zero, the behaviour becomes more C<sprintf>ish than C<snprintf>-like.
+    STRING* Parrot_sprintf_s(Interp *,
+                             char   *format,
+                             ...)
 
 =head1 Notes for Implementers
 
