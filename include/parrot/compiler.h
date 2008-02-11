@@ -23,8 +23,11 @@
  * See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
  * <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
  */
-#if _MSC_VER > 1300
+#if defined(_MSC_VER) && (_MSC_VER > 1300)
+#  define PARROT_HAS_SAL 1
 #  include <sal.h>
+#else
+#  define PARROT_HAS_SAL 0
 #endif
 
 #ifdef HASATTRIBUTE_NEVER_WORKS
@@ -109,7 +112,7 @@
  */
 #define UNUSED(a) if (0) (void)(a);
 
-#if _MSC_VER > 1300
+#if PARROT_HAS_SAL
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull
 #  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __notnull
 #else
@@ -131,7 +134,7 @@
 /* Function argument instrumentation */
 /* For explanations of the annotations, see http://www.splint.org/manual/manual.html */
 
-#if _MSC_VER > 1300
+#if PARROT_HAS_SAL
 #  define NOTNULL(x)                  /*@notnull@*/ __notnull x
     /* The pointer passed may not be NULL */
 
