@@ -191,6 +191,16 @@ void new_internal_exception(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_DOES_NOT_RETURN_WHEN_FALSE
+void Parrot_assert(
+    int condition,
+    ARGIN(const char *condition_string),
+    ARGIN(const char *file),
+    unsigned int line)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API
 PARROT_DOES_NOT_RETURN
 void Parrot_confess(
     ARGIN(const char *cond),
@@ -294,7 +304,7 @@ void rethrow_c_exception(PARROT_INTERP)
 #ifdef NDEBUG
 #  define PARROT_ASSERT(x) ((void)0)
 #else
-#  define PARROT_ASSERT(x) (((x) ? (void)0 : (void)Parrot_confess(#x, __FILE__, __LINE__)))
+#  define PARROT_ASSERT(x) Parrot_assert(x, #x, __FILE__, __LINE__)
 #endif
 
 

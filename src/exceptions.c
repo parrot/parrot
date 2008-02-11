@@ -958,9 +958,29 @@ Parrot_init_exceptions(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_assert>
+
+A better version of assert() that gives a backtrace.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_DOES_NOT_RETURN_WHEN_FALSE
+void
+Parrot_assert(int condition, ARGIN(const char *condition_string),
+        ARGIN(const char *file), unsigned int line)
+{
+    if ( !condition )
+        Parrot_confess(condition_string, file, line );
+}
+
+/*
+
 =item C<void Parrot_confess>
 
-A better version of assert() that gives a backtrace if possible.
+Prints a backtrace and message for a failed assertion.
 
 =cut
 
