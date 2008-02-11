@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 27;
 
 =head1 NAME
 
@@ -178,6 +178,24 @@ unlink($filename);
 
 $out = `$parrot languages/plumhead/plumhead.pbc`;
 ok($out =~ /^usage/, "check plumhead");
+
+$filename = 'test.p1';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "print \"Hello, World!\\n\";\n";
+close $FH;
+$out = `$parrot languages/punie/punie.pbc $filename`;
+ok($out eq "Hello, World!\n", "check punie");
+unlink($filename);
+
+$filename = 'test.py';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "print 'Hello, World!'\n";
+close $FH;
+$out = `$parrot languages/pynie/pynie.pbc $filename`;
+ok($out eq "Hello, World!\n", "check pynie");
+unlink($filename);
 
 TODO: {
     local $TODO = 'missing file ?';
