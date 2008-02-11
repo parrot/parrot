@@ -177,14 +177,13 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        PMC * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
-        const INTVAL size  = PMC_int_val(SELF);
-        const INTVAL bytes = size * sizeof (PMC*);
+        PMC * const dest  = pmc_new(INTERP, SELF->vtable->base_type);
+        const INTVAL size = PMC_int_val(SELF);
 
-        if (bytes) {
+        if (size) {
             PMC_int_val(dest) = size;
-            PMC_data(dest)    = mem_sys_allocate(bytes);
-            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), bytes);
+            PMC_data(dest)    = mem_allocate_n_typed(size, PMC *);
+            mem_copy_n_typed(PMC_data(dest), PMC_data(SELF), size, PMC *);
             PObj_data_is_PMC_array_SET(dest);
         }
 
@@ -451,7 +450,7 @@ array.
             return;
 
         PMC_int_val(SELF) = size;
-        data              = (PMC **)mem_sys_allocate(size * sizeof (PMC *));
+        data              = mem_allocate_n_zeroed_typed(size, PMC *);
 
         for (i = 0; i < size; i++)
             data[i] = PMCNULL;
@@ -473,7 +472,7 @@ array.
             mem_sys_free(PMC_data(SELF));
 
         size           = PMC_int_val(SELF) = PMC_int_val(value);
-        PMC_data(SELF) = mem_sys_allocate(size * sizeof (PMC *));
+        PMC_data(SELF) = mem_allocate_n_zeroed_typed(size, PMC *);
 
         mem_sys_memcopy(PMC_data(SELF), PMC_data(value), size * sizeof (PMC *));
         PMC_int_val2(SELF) = size;
