@@ -193,7 +193,6 @@ number of bytes memory required.
 void
 Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t tosize)
 {
-    const size_t oldlen = PObj_buflen(str);
     Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(str)) {
