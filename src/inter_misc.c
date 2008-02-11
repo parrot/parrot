@@ -63,7 +63,7 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 
 =item C<void register_raw_nci_method_in_ns>
 
-Create an entry in the C<nci_method_table> for the given raw NCI method 
+Create an entry in the C<nci_method_table> for the given raw NCI method
 of PMC class C<type>.
 
 =cut
