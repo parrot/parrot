@@ -26,7 +26,6 @@ used and not per subroutine or even opcode, it works per bytecode segment.
 /* HEADERIZER STOP */
 
 #include <parrot/parrot.h>
-#include <assert.h>
 #if PARROT_EXEC_CAPABLE
 #  include "parrot/exec.h"
 #endif
