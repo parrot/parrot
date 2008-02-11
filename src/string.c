@@ -1829,50 +1829,6 @@ string_bool(PARROT_INTERP, ARGIN(const STRING *s))
 
 /*
 
-=item C<STRING * string_nprintf>
-
-This is like C<Parrot_snprintf()> except that it writes to and returns a
-Parrot string.
-
-Note that C<bytelen> does I<not> include space for a (non-existent)
-trailing C<'\0'>. C<dest> may be a C<NULL> pointer, in which case a new
-native string will be created. If C<bytelen> is 0, the behaviour becomes
-more C<sprintf>-ish than C<snprintf>-like. C<bytelen> is measured in the
-encoding of C<*dest>.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_CANNOT_RETURN_NULL
-STRING *
-string_nprintf(PARROT_INTERP,
-    ARGOUT(STRING *dest), INTVAL bytelen, ARGIN(const char *format), ...)
-{
-    STRING  *output;
-    va_list  args;
-
-    va_start(args, format);
-    output = Parrot_vsprintf_c(interp, format, args);
-    va_end(args);
-
-    /*
-     * XXX -leo: bytelen with strlen compare
-     */
-    if (bytelen > 0 && bytelen < (INTVAL)string_length(interp, output))
-        output = string_substr(interp, output, 0, bytelen, &output, 1);
-
-    if (dest == NULL)
-        return output;
-    else {
-        string_set(interp, dest, output);
-        return dest;
-    }
-}
-
-/*
-
 =item C<STRING * string_printf>
 
 Writes and returns a Parrot string.
