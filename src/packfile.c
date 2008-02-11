@@ -922,8 +922,7 @@ INTVAL
 PackFile_add_segment(SHIM_INTERP, ARGMOD(PackFile_Directory *dir),
         ARGIN(PackFile_Segment *seg))
 {
-    dir->segments = mem_realloc_n_typed(
-            dir->segments, dir->num_segments+1, PackFile_Segment *);
+    mem_realloc_n_typed(dir->segments, dir->num_segments+1, PackFile_Segment *);
     dir->segments[dir->num_segments] = seg;
     dir->num_segments++;
     seg->dir = dir;
@@ -1652,8 +1651,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
     const opcode_t *pos;
 
     dir->num_segments = PF_fetch_opcode(pf, &cursor);
-    dir->segments = mem_realloc_n_typed(
-            dir->segments, dir->num_segments, PackFile_Segment *);
+    mem_realloc_n_typed(dir->segments, dir->num_segments, PackFile_Segment *);
 
     for (i=0; i < dir->num_segments; i++) {
         PackFile_Segment *seg;
@@ -2395,7 +2393,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
 
     if (cs->debugs) {    /* it exists already, resize it */
         debug = cs->debugs;
-        debug->base.data = mem_realloc_n_typed(debug->base.data, size, opcode_t);
+        mem_realloc_n_typed(debug->base.data, size, opcode_t);
     }
     else {              /* create one */
         const size_t len = strlen(cs->base.name) + 4;
@@ -2450,8 +2448,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     int insert_pos = 0;
 
     /* Allocate space for the extra entry. */
-    debug->mappings = mem_realloc_n_typed(
-            debug->mappings, debug->num_mappings+1, PackFile_DebugMapping *);
+    mem_realloc_n_typed(debug->mappings, debug->num_mappings+1, PackFile_DebugMapping *);
 
     /* Can it just go on the end? */
     if (debug->num_mappings == 0 ||
@@ -2484,8 +2481,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
             /* Need to put filename in constants table. */
             ct->const_count = ct->const_count + 1;
-            ct->constants = mem_realloc_n_typed(
-                ct->constants, ct->const_count, PackFile_Constant *);
+            mem_realloc_n_typed(ct->constants, ct->const_count, PackFile_Constant *);
             fnconst = PackFile_Constant_new(interp);
             fnconst->type = PFC_STRING;
             fnconst->u.string = string_make_direct(interp, filename,
@@ -3035,8 +3031,7 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
     }
     i = self->fixup_count;
     self->fixup_count++;
-    self->fixups = mem_realloc_n_typed(
-        self->fixups, self->fixup_count, PackFile_FixupEntry *);
+    mem_realloc_n_typed(self->fixups, self->fixup_count, PackFile_FixupEntry *);
 
     self->fixups[i]       = mem_allocate_typed(PackFile_FixupEntry);
     self->fixups[i]->type = type;

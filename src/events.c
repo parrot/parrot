@@ -777,7 +777,7 @@ store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
     }
     else if (ios->n >= ios->alloced) {
         ios->alloced *= 2;
-        ios->events   = mem_realloc_n_typed(ios->events, ios->alloced, parrot_event *);
+        mem_realloc_n_typed(ios->events, ios->alloced, parrot_event *);
     }
     ios->events[ios->n++] = ev;
 }

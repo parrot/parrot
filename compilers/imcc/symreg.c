@@ -1238,7 +1238,7 @@ resize_symhash(ARGMOD(SymHash *hsh))
              */
             if (j >= n_next) {
                 n_next <<= 1;
-                next_r = mem_realloc_n_typed(next_r, n_next, SymReg*);
+                mem_realloc_n_typed(next_r, n_next, SymReg*);
             }
 
             r->next = NULL;

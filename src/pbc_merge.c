@@ -342,8 +342,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         }
 
         /* Re-allocate the current buffer. */
-        bc = (opcode_t *)mem_sys_realloc(bc,
-            (cursor + in_seg->base.size) * sizeof (opcode_t));
+        mem_realloc_n_typed(bc, cursor + in_seg->base.size, opcode_t);
         if (bc == NULL) {
             PIO_eprintf(interp, "PBC Merge: Cannot reallocate memory\n");
             Parrot_exit(interp, 1);

@@ -751,8 +751,7 @@ mmd_add_function(PARROT_INTERP, INTVAL func_nr, SHIM(funcptr_t function))
      * but the function doesn't get saved */
     if (func_nr >= (INTVAL)interp->n_binop_mmd_funcs) {
         INTVAL i;
-        interp->binop_mmd_funcs =
-            mem_realloc_n_typed(interp->binop_mmd_funcs, func_nr+1, MMD_table);
+        mem_realloc_n_typed(interp->binop_mmd_funcs, func_nr+1, MMD_table);
 
         for (i = interp->n_binop_mmd_funcs; i <= func_nr; ++i)  {
             MMD_table * const table = interp->binop_mmd_funcs + i;
