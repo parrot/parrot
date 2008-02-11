@@ -46,11 +46,12 @@ static void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 static int sweep_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     int flag,
-    ARGIN(void *arg))
+    ARGMOD(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*pool);
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*arg);
 
 static int trace_active_PMCs(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
