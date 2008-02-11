@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -333,24 +333,27 @@ table C<t>.
     lua_checktype(1, table, 'table')
     e = table.'len'()
     ipos = lua_optint(2, pos, e)
-    unless e <= 0 goto L1
-    # table is `empty'
+    # position is outside bounds?
+    unless 1 <= ipos goto L1
+    if ipos <= e goto L2
+  L1:
+    # nothing to remove
     new res, 'LuaNil'
     .return (res)
-  L1:
+  L2:
     new idx, 'LuaNumber'
     set idx, ipos
     res = table.'rawget'(idx)
-  L2:
-    unless ipos < e goto L3
+  L3:
+    unless ipos < e goto L4
     $I2 = ipos + 1
     set idx, $I2
     $P0 = table.'rawget'(idx)
     set idx, ipos
     table.'rawset'(idx, $P0)
     ipos = $I2
-    goto L2
-  L3:
+    goto L3
+  L4:
     new $P0, 'LuaNil'
     set idx, e
     table.'rawset'(idx, $P0)

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -73,6 +73,12 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 
 .end
 
+.const int CO_RUN = 0   # running
+.const int CO_SUS = 1   # suspended
+.const int CO_NOR = 2   # 'normal' (it resumed another coroutine)
+.const int CO_DEAD = 3
+.const string statnames = 'running suspended normal dead'
+
 =item C<coroutine.create (f)>
 
 Creates a new coroutine, with body C<f>. C<f> must be a Lua function.
@@ -128,17 +134,23 @@ C<resume> returns B<false> plus the error message.
 .end
 
 .sub 'auxresume' :anon
-    .param pmc co :optional
+    .param pmc co
     .param pmc argv :slurpy
     .local pmc res
     .local pmc co_stack
+    .local int status
     co_stack = get_hll_global '_COROUTINE_STACK'
     push co_stack, co
     $P0 = getattribute co, 'co'
-    $P1 = getattribute $P0, 'state'
-    if $P1 goto L1
+    status = costatus($P0)
+    if status == CO_SUS goto L1
     $P0 = pop co_stack
-    .return (0, "cannot resume dead coroutine")
+    $P0 = split ' ', statnames
+    $S0 = $P0[status]
+    $S1 = "cannot resume "
+    $S1 .= $S0
+    $S1 .= " coroutine"
+    .return (0, $S1)
   L1:
     push_eh _handler
     (res :slurpy) = $P0.'resume'(argv :flat)
@@ -192,16 +204,23 @@ STILL INCOMPLETE.
     .param pmc extra :slurpy
     .local pmc res
     lua_checktype(1, co, 'thread')
-    new res, 'LuaString'
     $P0 = getattribute co, 'co'
-    $P1 = getattribute $P0, 'state'
-    if $P1 goto L1
-    set res, 'dead'
-    goto L2
-  L1:
-    set res, 'suspended'
-  L2:
+    $I0 = costatus($P0)
+    $P0 = split ' ', statnames
+    $S0 = $P0[$I0]
+    new res, 'LuaString'
+    set res, $S0
     .return (res)
+.end
+
+
+.sub 'costatus' :anon
+    .param pmc coro
+    $P0 = getattribute coro, 'state'
+    if $P0 goto L1
+    .return (CO_DEAD)
+  L1:
+    .return (CO_SUS)
 .end
 
 =item C<coroutine.wrap (f)>

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -712,12 +712,24 @@ is replaced.
     $S2 = lua_checkstring(2, pat)
     $I0 = $I1 + 1
     $I4 = lua_optint(4, max, $I0)
+    $I0 = isa repl, 'LuaNumber'
+    if $I0 goto L1
+    $I0 = isa repl, 'LuaString'
+    if $I0 goto L1
+    $I0 = isa repl, 'LuaClosure'
+    if $I0 goto L1
+    $I0 = isa repl, 'LuaFunction'
+    if $I0 goto L1
+    $I0 = isa repl, 'LuaTable'
+    if $I0 goto L1
+    lua_argerror(3, "string/function/table expected")
+  L1:
     .local int anchor
     anchor = 0
     $S0 = substr $S2, 0, 1
-    unless $S0 == '^' goto L1
+    unless $S0 == '^' goto L2
     anchor = 1
-  L1:
+  L2:
     .local int n
     n = 0
     .local pmc regex_comp
@@ -726,18 +738,18 @@ is replaced.
     rulesub = regex_comp($S2)
     .local pmc b
     new b, 'LuaString'
-  L2:
-    unless n < $I4 goto L3
+  L3:
+    unless n < $I4 goto L4
     .local pmc match
     match = rulesub(src)
-    unless match goto L3
+    unless match goto L4
     inc n
     add_value(b, src, match, repl)
     $I0 = match.'to'()
     src = substr src, $I0
-    if anchor goto L3
-    goto L2
-  L3:
+    if anchor goto L4
+    goto L3
+  L4:
     $S0 = b
     $S0 .= src
     set b, $S0
@@ -770,13 +782,9 @@ is replaced.
     ($P1) = repl($P0 :flat)
     goto L5
   L4:
-    $I0 = isa repl, 'LuaTable'
-    unless $I0 goto L6
+    # isa 'LuaTable'
     $P0 = onecapture(match, 0)
     $P1 = repl[$P0]
-    goto L5
-  L6:
-    lua_argerror(3, "string/function/table expected")
   L5:
     if $P1 goto L7  # nil or false?
     # keep original text

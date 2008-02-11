@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 use Test::More;
 use Parrot::Test::Lua;
 
@@ -61,10 +61,10 @@ CODE
 /^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.close' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.close (std)' );
 print(io.close(io.stderr))
 CODE
-true
+nil	cannot close standard file
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.flush' );
@@ -97,23 +97,23 @@ OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.open / close' );
 f = io.open("file.txt")
-print(f:close())
+print(io.close(f))
 CODE
 true
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.close (closed)' );
 f = io.open("file.txt")
-f:close()
-f:close()
+io.close(f)
+io.close(f)
 CODE
 /^[^:]+: [^:]+:\d+: attempt to use a closed file\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.flush (closed)' );
 f = io.open("file.txt")
-f:close()
-f:flush()
+io.close(f)
+f:flush()   -- io.flush(f)
 CODE
 /^[^:]+: [^:]+:\d+: attempt to use a closed file\nstack traceback:\n/
 OUTPUT
@@ -122,7 +122,7 @@ language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.type' );
 print(io.type("not a file"))
 f = io.open("file.txt")
 print(io.type(f))
-f:close()
+io.close(f)
 print(io.type(f))
 CODE
 nil
@@ -158,7 +158,7 @@ language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.popen' );
 f = io.popen("perl -e \"print 'standard output'\"")
 print(io.type(f))
 print(f:read())
-f:close()
+io.close(f)
 CODE
 file
 standard output
@@ -229,8 +229,15 @@ CODE
 text12
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:close' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:close (std)' );
 print(io.stderr:close())
+CODE
+nil	cannot close standard file
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:close' );
+f = io.open("file.txt")
+print(f:close())
 CODE
 true
 OUTPUT

@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -478,7 +478,7 @@ show version information.
 
 
 .sub 'print_version' :anon
-    l_message('', "Lua 5.1 on Parrot  Copyright (C) 2005-2007, The Perl Foundation.")
+    l_message('', "Lua 5.1 on Parrot  Copyright (C) 2005-2008, The Perl Foundation.")
 .end
 
 

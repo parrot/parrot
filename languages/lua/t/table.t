@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -155,20 +155,20 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function remove' );
 t = {}
 a = table.remove(t)
-print(a)
+print(a)                        -- nil
 t = {"a","b","c","d","e"}
 a = table.remove(t)
-print(a)
-print(table.concat(t,","))
+print(a)                        -- e
+print(table.concat(t,","))      -- a,b,c,d
 a = table.remove(t,3)
-print(a)
-print(table.concat(t,","))
+print(a)                        -- c
+print(table.concat(t,","))      -- a,b,d
 a = table.remove(t,1)
-print(a)
-print(table.concat(t,","))
+print(a)                        -- a
+print(table.concat(t,","))      -- b,d
 a = table.remove(t,7)
-print(a)
-print(table.concat(t,","))
+print(a)                        -- nil
+print(table.concat(t,","))      -- b,d
 CODE
 nil
 e
@@ -178,7 +178,7 @@ a,b,d
 a
 b,d
 nil
-b
+b,d
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function setn' );

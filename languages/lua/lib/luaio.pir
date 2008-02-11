@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -333,7 +333,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 .end
 
 
-.sub 'topfile'
+.sub 'tofilep'
     .param pmc file
     .local pmc mt
     .local pmc mt_file
@@ -356,7 +356,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 .sub 'tofile'
     .param pmc file
     .local pmc f
-    f = topfile(file)
+    f = tofilep(file)
     if null f goto L1
     .return (f)
   L1:
@@ -759,11 +759,24 @@ Equivalent to C<io.output():write>.
 .end
 
 
+# function to (not) close the standard files stdin, stdout, and stderr
+.sub 'noclose' :anon
+    .param pmc file
+    .local pmc f
+    .local pmc res
+    new $P1, 'LuaNil'
+    new $P2, 'LuaString'
+    set $P2, "cannot close standard file"
+    .return ($P1, $P2)
+.end
+
+
+# function to close regular files
 .sub 'fclose' :anon
     .param pmc file
     .local pmc f
     .local pmc res
-    f = topfile(file)
+    f = tofilep(file)
     close f
     null f
     setattribute file, 'data', f

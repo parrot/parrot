@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -395,7 +395,7 @@ or C<string.format> before write.
 
 .sub '__gc' :method :anon
     .local pmc f
-    $P0 = get_hll_global ['Lua::io'], 'topfile'
+    $P0 = get_hll_global ['Lua::io'], 'tofilep'
     f = $P0(self)
     # ignore closed files and standard files
     if null f goto L1
@@ -419,7 +419,7 @@ or C<string.format> before write.
 .sub '__tostring' :method :anon
     .local pmc f
     .local pmc res
-    $P0 = get_hll_global ['Lua::io'], 'topfile'
+    $P0 = get_hll_global ['Lua::io'], 'tofilep'
     f = $P0(self)
     new res, 'LuaString'
     if f goto L1
