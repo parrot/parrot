@@ -284,7 +284,8 @@ Parrot_unblock_signal(int sig)
 
 =item C<void Parrot_init_signals>
 
-RT#48260: Not yet documented!!!
+Set up actions to handle signals.
+Only SIGHUP handled at the moment.
 
 =cut
 
@@ -785,7 +786,9 @@ store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
 
 =item C<static void io_thread_ready_rd>
 
-RT#48260: Not yet documented!!!
+Takes a list of pending i/o events and a file descriptor.
+If the fd is ready to read, the event is removed from the
+"pending" list and moved to the "scheduled" task queue.
 
 =cut
 
@@ -974,7 +977,7 @@ stop_io_thread(void)
 
 =item C<void Parrot_event_add_io_event>
 
-RT#48260: Not yet documented!!!
+Create new i/o event.
 
 =cut
 

@@ -63,7 +63,8 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 
 =item C<void register_raw_nci_method_in_ns>
 
-RT#48260: Not yet documented!!!
+Create an entry in the C<nci_method_table> for the given raw NCI method 
+of PMC class C<type>.
 
 =cut
 
@@ -337,7 +338,12 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 
 =item C<STRING* interpinfo_s>
 
-RT#48260: Not yet documented!!!
+Takes an interpreter name and an information type as arguments.
+Returns corresponding information strings about the interpreter:
+the full pathname, executable name, or the file stem,
+(or throws an error exception, if the type is not recognised).
+Valid types are EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME,
+and RUNTIME_PREFIX.
 
 =cut
 
