@@ -166,6 +166,8 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
 RT#48260: Not yet documented!!!
 
+Marks the object to live.
+
 =cut
 
 */
