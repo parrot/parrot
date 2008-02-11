@@ -176,6 +176,7 @@ PARROT_API
 void
 pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {
+    PARROT_ASSERT(obj);
 #if PARROT_GC_GMS
     do {
         if (!PObj_live_TEST(obj) && \
@@ -646,7 +647,7 @@ Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
                     }
                 }
 
-                assert(dod_object);
+                PARROT_ASSERT(dod_object);
                 dod_object(interp, pool, b);
 
                 pool->add_free_object(interp, pool, b);

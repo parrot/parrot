@@ -990,7 +990,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
      * return value
      */
     result = CUR_OPCODE + 2 + n + 3; /* set_args, set_p_pc */
-    assert(*result == PARROT_OP_get_results_pc);
+    PARROT_ASSERT(*result == PARROT_OP_get_results_pc);
     sig_result = constants[result[1]]->u.key;
     ASSERT_SIG_PMC(sig_result);
 

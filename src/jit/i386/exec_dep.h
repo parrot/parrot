@@ -31,7 +31,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
     extern PARROT_API char **Parrot_exec_rel_addr;
     extern PARROT_API int Parrot_exec_rel_count;
 
-    assert(op_jit[*jit_info->cur_op].extcall == 1);
+    PARROT_ASSERT(op_jit[*jit_info->cur_op].extcall == 1);
     if (cur_section->done == 1)
         return;
     else if (cur_section->done == -1 && --cur_section->ins_count > 0)
