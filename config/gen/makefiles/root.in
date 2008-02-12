@@ -2000,8 +2000,8 @@ splint-andy :
     src/tsq.c \
     src/utils.c \
     src/vtables.c \
-    src/warnings.c
-    | grep -v ': Source code error generation point'
+    src/warnings.c \
+    | grep -v 'Source code error generation point'
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 COVER_DIRS = \
