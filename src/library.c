@@ -616,15 +616,13 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
         PMC    * const config_hash =
             VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
 
-        STRING * const key         =
-            CONST_STRING(interp, "prefix");
-
-        if (!VTABLE_elements(interp, config_hash))
-            return str_dup( '.' );
-        else {
-            STRING * const s = VTABLE_get_string_keyed_str(interp, config_hash, key);
+        if (VTABLE_elements(interp, config_hash)) {
+            STRING * const key = CONST_STRING(interp, "prefix");
+            STRING * const s   = VTABLE_get_string_keyed_str(interp, config_hash, key);
             return string_to_cstring(interp, s);
         }
+        else
+            return str_dup( "." );
     }
 }
 

@@ -83,7 +83,7 @@ mem__internal_allocate(size_t size, ARGIN(const char *file), int line)
 
 =item C<void * mem_sys_allocate_zeroed>
 
-Uses C<calloc> to allocate system memory.
+Uses C<calloc> to allocate system memory.  Guaranteed to succeed.
 
 =cut
 
