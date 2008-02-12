@@ -514,8 +514,8 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     STRING *prefix;
     STRING *full_name;
     PMC    *paths;
-    char   *ignored;
     INTVAL  i, n;
+    char   *prefix_c;
 
     /* if this is an absolute path return it as is */
     if (is_abs_path(file))
@@ -528,39 +528,35 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     else
         paths = get_search_paths(interp, PARROT_LIB_PATH_INCLUDE);
 
-    ignored = Parrot_get_runtime_prefix(interp, &prefix);
-    n       = VTABLE_elements(interp, paths);
-
-    UNUSED(ignored);
+    prefix_c = Parrot_get_runtime_prefix(interp);
+    prefix   = string_from_cstring(interp, prefix_c, 0);
+    n        = VTABLE_elements(interp, paths);
 
     for (i = 0; i < n; ++i) {
         STRING * const path = VTABLE_get_string_keyed_int(interp, paths, i);
 
-        if (string_length(interp, prefix) &&
-           !is_abs_path(path)) {
-            full_name = path_concat(interp, prefix , path);
-        }
+        if (string_length(interp, prefix) && !is_abs_path(path))
+            full_name = path_concat(interp, prefix, path);
         else
             full_name = string_copy(interp, path);
 
-        full_name = path_append(interp, full_name , file);
+        full_name = path_append(interp, full_name, file);
 
-        full_name = (type & PARROT_RUNTIME_FT_DYNEXT)
-            ? try_load_path(interp, full_name)
-            : try_bytecode_extensions(interp, full_name);
+        full_name =
+            (type & PARROT_RUNTIME_FT_DYNEXT)
+                ? try_load_path(interp, full_name)
+                : try_bytecode_extensions(interp, full_name);
 
         if (full_name)
             return full_name;
     }
 
-     full_name = (type & PARROT_RUNTIME_FT_DYNEXT)
-        ? try_load_path(interp, file)
-        : try_bytecode_extensions(interp, file);
+    full_name =
+        (type & PARROT_RUNTIME_FT_DYNEXT)
+            ? try_load_path(interp, file)
+            : try_bytecode_extensions(interp, file);
 
-     if (full_name)
-         return full_name;
-
-    return NULL;
+    return full_name;
 }
 
 /*
@@ -598,12 +594,8 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 =item C<char* Parrot_get_runtime_prefix>
 
-If C<prefix_str> is not NULL, set it to the prefix, else return a malloced
-c-string for the runtime prefix.  Remember to free the string with
-C<string_cstring_free()>.
-
-XXX This is suboptimal.  We should have two funcs, so it's explicit
-whether we're searching for a STRING or a cstring.
+Return a malloced C-string for the runtime prefix.  The calling function
+must free it.
 
 =cut
 
@@ -611,53 +603,29 @@ whether we're searching for a STRING or a cstring.
 
 PARROT_API
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 char*
-Parrot_get_runtime_prefix(PARROT_INTERP, ARGOUT_NULLOK(STRING **prefix_str))
+Parrot_get_runtime_prefix(PARROT_INTERP)
 {
-    STRING *s, *key;
-    PMC    *config_hash;
     int     free_it;
-    char   *env;
+    char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
 
-    env = Parrot_getenv("PARROT_RUNTIME", &free_it);
-    if (env) {
-        if (prefix_str) {
-            *prefix_str = string_from_cstring(interp, env, 0);
-            if (free_it)
-                mem_sys_free(env);
-            return NULL;
+    if (env)
+        return free_it ? env : str_dup(env);
+    else {
+        PMC    * const config_hash =
+            VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
+
+        STRING * const key         =
+            CONST_STRING(interp, "prefix");
+
+        if (!VTABLE_elements(interp, config_hash))
+            return str_dup( '.' );
+        else {
+            STRING * const s = VTABLE_get_string_keyed_str(interp, config_hash, key);
+            return string_to_cstring(interp, s);
         }
-        if (!free_it)
-            env = strdup(env);
-        return env;
     }
-
-    config_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-            (INTVAL) IGLOBALS_CONFIG_HASH);
-    key         = CONST_STRING(interp, "prefix");
-
-    if (!VTABLE_elements(interp, config_hash)) {
-        const char *pwd = ".";
-        char *ret;
-
-        if (prefix_str) {
-            *prefix_str = const_string(interp, pwd);
-            return NULL;
-        }
-        ret = (char *)mem_sys_allocate(3);
-        strcpy(ret, pwd);
-        return ret;
-    }
-
-    s = VTABLE_get_string_keyed_str(interp, config_hash, key);
-
-    if (prefix_str) {
-        *prefix_str = s;
-        return NULL;
-    }
-
-    return string_to_cstring(interp, s);
 }
 
 /*

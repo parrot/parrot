@@ -355,16 +355,18 @@ PARROT_CANNOT_RETURN_NULL
 STRING*
 interpinfo_s(PARROT_INTERP, INTVAL what)
 {
-    STRING *fullname, *basename;
-    char   *fullname_c;
-    int     pos;
-
     switch (what) {
         case EXECUTABLE_FULLNAME:
             return VTABLE_get_string(interp,
                 VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                     IGLOBALS_EXECUTABLE));
         case EXECUTABLE_BASENAME:
+            {
+            char   *fullname_c;
+            STRING *fullname;
+            STRING *basename;
+            int     pos;
+
             /* Need to strip back to what follows the final / or \. */
             fullname = VTABLE_get_string(interp,
                 VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
@@ -378,17 +380,21 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             basename = string_from_cstring(interp, fullname_c + pos, 0);
             mem_sys_free(fullname_c);
             return basename;
+            }
 
         case RUNTIME_PREFIX:
-            fullname_c = Parrot_get_runtime_prefix(interp, NULL);
-            fullname = string_from_cstring(interp, fullname_c, 0);
+            {
+            char   * const fullname_c = Parrot_get_runtime_prefix(interp);
+            STRING * const fullname   = string_from_cstring(interp, fullname_c, 0);
+
             mem_sys_free(fullname_c);
             return fullname;
+            }
 
         default:
             real_exception(interp, NULL, UNIMPLEMENTED,
                 "illegal argument in interpinfo");
-    }
+    } /* switch */
 }
 
 /*

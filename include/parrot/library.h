@@ -37,9 +37,8 @@ typedef enum {
 
 PARROT_API
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char* Parrot_get_runtime_prefix(PARROT_INTERP,
-    ARGOUT_NULLOK(STRING **prefix_str))
+PARROT_CANNOT_RETURN_NULL
+char* Parrot_get_runtime_prefix(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API

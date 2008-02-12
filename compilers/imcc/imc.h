@@ -325,12 +325,6 @@ void op_fullname(
 void register_compilers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-char * str_dup(ARGIN(const char *old))
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 int try_find_op(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),

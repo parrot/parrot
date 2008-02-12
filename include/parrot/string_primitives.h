@@ -36,6 +36,11 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
         FUNC_MODIFIES(*offset)
         FUNC_MODIFIES(*string);
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char * str_dup(ARGIN(const char *old))
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: src/string_primitives.c */
 
 #endif /* PARROT_IN_CORE */

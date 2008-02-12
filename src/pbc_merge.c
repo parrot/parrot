@@ -159,11 +159,6 @@ static void pbc_merge_write(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pf);
 
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-static char * str_dup(ARGIN(const char *old))
-        __attribute__nonnull__(1);
-
 /* HEADERIZER END: static */
 
 /*
@@ -183,30 +178,6 @@ help(PARROT_INTERP)
     printf("Usage:\n");
     printf("   pbc_merge -o out.pbc file1.pbc file2.pbc ...\n\n");
     Parrot_exit(interp, 0);
-}
-
-/*
-
-=item C<static char * str_dup>
-
-Duplicate a C string
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-static char *
-str_dup(ARGIN(const char *old))
-{
-    const size_t bytes = strlen(old) + 1;
-    char * const copy = (char *)mem_sys_allocate(bytes);
-    memcpy(copy, old, bytes);
-#ifdef MEMDEBUG
-    debug(interp, 1, "line %d str_dup %s [%x]\n", line, old, copy);
-#endif
-    return copy;
 }
 
 /*

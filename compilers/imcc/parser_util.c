@@ -1700,31 +1700,6 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const char *format), va_lis
 
 /*
 
-=item C<char * str_dup>
-
-TODO: Needs to be documented!!!
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-char *
-str_dup(ARGIN(const char *old))
-{
-    char * const copy  = strdup(old);
-
-#ifdef MEMDEBUG
-    debug(interp, 1, "line %d str_dup %s [%x]\n", line, old, copy);
-#endif
-
-    return copy;
-}
-
-/*
-
 =item C<void imcc_init>
 
 TODO: Needs to be documented!!!

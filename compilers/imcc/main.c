@@ -455,7 +455,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 break;
             case OPT_RUNTIME_PREFIX:
                 {
-                char *prefix = Parrot_get_runtime_prefix(interp, NULL);
+                char *prefix = Parrot_get_runtime_prefix(interp);
                 printf("%s\n", prefix);
                 free(prefix);
                 exit(EXIT_SUCCESS);
