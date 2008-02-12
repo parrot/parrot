@@ -531,6 +531,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     prefix_c = Parrot_get_runtime_prefix(interp);
     prefix   = string_from_cstring(interp, prefix_c, 0);
     n        = VTABLE_elements(interp, paths);
+    mem_sys_free(prefix_c);
 
     for (i = 0; i < n; ++i) {
         STRING * const path = VTABLE_get_string_keyed_int(interp, paths, i);
