@@ -7,33 +7,23 @@ embed.pod - Parrot embedding system
 
 =head1 SYNOPSIS
 
-    #include "parrot/embed.h"
+    #include <parrot.h>
+    #include <parrot/embed.h>
+    #include <parrot/extend.h>
 
-    int main(int argc, char *argv[]) {
-        Parrot_Interp    interp;
-        Parrot_PackFile  pf;
-        char            *bcfile = "program.pbc";
-
-        /* skip the program name */
-        argc--; argv++;
+    int main(int argc, char* argv[])
+    {
+        Parrot_Interp interp;
+        Parrot_PackFile pf;
 
         interp = Parrot_new(NULL);
-        if (!interp)
+        if (!interp) {
             return 1;
+        }
 
-        /* set the name of the executable embedding Parrot */
-        Parrot_set_executable_name(interp,
-            string_from_cstring(interp, argv[0], 0));
-
-        /* activate JIT */
-        if(PARROT_JIT_CAPABLE)
-            Parrot_set_run_core(interp, PARROT_JIT_CORE);
-
-        pf = Parrot_readbc(interp, bcfile);
+        pf = Parrot_readbc(interp, "foo.pbc");
         Parrot_loadbc(interp, pf);
-
-        /* argc and argv as seen by the bytecode file */
-        Parrot_runcode(interp, argc, argv);
+        Parrot_runcode(pf, argc, argv);
 
         Parrot_destroy(interp);
 
@@ -44,198 +34,398 @@ embed.pod - Parrot embedding system
 
 =over 4
 
+=item F<include/parrot.h>
+
 =item F<include/parrot/embed.h>
 
-=item F<embed.c>
+=item F<include/parrot/extend.h>
 
 =back
 
 =head1 DESCRIPTION
 
-Parrot's embedding system is designed with one guiding principle in mind:
-encapsulation.  Users of Parrot shouldn't have to know what the insides of a
-C<Parrot_Interp> structure look like or how to load a packfile.  They should
-just know a few functions and constants.  The embedding system is designed to
-do just that.
+This is the documentation for Parrot's embedding API.
 
-=head2 Data Structures
+=head2 Data structures
 
 =over 4
 
 =item C<Parrot_Interp>
 
-This typedef represents (a pointer to) an actual Parrot interpreter.
+The topmost data structure in Parrot is C<Parrot_Interp>, which represents
+a Parrot interpreter.  It is a required argument to almost every Parrot API
+function.  The structure is opaque in an embedded environment, so you cannot
+directly access any of its members.
 
 =item C<Parrot_PackFile>
 
-This structure represents (a pointer to) a 'packfile'--a Parrot bytecode file.
+A Parrot packfile, the internal structure containing Parrot bytecode.
 
-=item C<Parrot_Interp_flag>
+=item C<Parrot_String>
 
-An interpreter flag.
+Parrot's internal string type, which contains character encoding information.
 
-=item C<Parrot_Interp_flag_val>
+=item C<Parrot_PMC>
 
-The value passed in with an interpreter flag.  Unused at the moment--just pass
-in C<NULL>.
+A Parrot Magic Cookie.  This is the opaque external type for (PMC *).  Note
+that this is a macro, so there can be only one C<Parrot_PMC> declaration per
+line.
+
+=item C<Parrot_Int>
+
+=item C<Parrot_Float>
 
 =item C<Parrot_Int>
 
 =item C<Parrot_UInt>
 
-=item C<Parrot_Float>
-
-=item C<Parrot_Opcode>
-
-Various Parrot internal types; most are chosen at Configure time.
+Parrot's numeric types.
 
 =back
 
 =head2 Constants
 
-B<interpreter core setting> is done by a call of C<Parrot_set_run_core()> like:
+Not documented yet.
 
-  Parrot_set_run_core(interp, PARROT_JIT_CORE);
+=head2 Type signatures
 
-See F</include/parrot/interpreter.h> for a list of available cores beside
-PARROT_PREDEREF_CORE, PARROT_JIT_CORE.
-
-=over
-
-=item C<PARROT_PREDEREF_CORE>
-
-This flag turns on predereferencing.  Parrot will transform many offsets in the
-opcode stream to absolute pointers.
-
-=item C<PARROT_JIT_CORE>
-
-This flag turns on just-in-time compilation.  Parrot will convert the bytecode
-file into native machine code and run it, usually resulting in substantial
-speedup.
-
-=back
-
-B<Interpreter flags setting> is done by a call of C<Parrot_set_flag()> like>:
-
-    Parrot_set_flag(interp, PARROT_TRACE_FLAG);
-
-See F</include/parrot/interpreter.h> for an up to date list.
+These are used with the Parrot_call_sub family of functions.
 
 =over 4
 
-=item C<PARROT_DEBUG_FLAG>
+=item v - void (return only)
 
-This flag turns on debugging mode.  Debugging mode basically means that
-Parrot's core prints out diagnostic messages.  This flag does not take any
-parameters.
+=item I - integer (return or argument)
 
-=item C<PARROT_TRACE_FLAG>
+=item N - float (return or argument)
 
-This flag turns on opcode tracing.  Parrot will print out each opcode and the
-parameters passed to it as it is called.  This flag does not take any
-parameters.
+=item S - string (return or argument)
 
-=item C<PARROT_BOUNDS_FLAG>
-
-This flag turns on bounds checking.  Parrot will make sure that all addresses
-returned by an opcode function are within the boundaries of the bytecode block.
-This flag does not take any parameters.
-
-=item C<PARROT_PROFILE_FLAG>
-
-This flag turns on profiling.  Parrot will print out a list of each opcode
-called, the number of times it was called, the average time it took to run, and
-the total time it took over the life of the program.  This flag does not take
-any parameters.
+=item P - PMC (return or argument)
 
 =back
 
-B<Other constants:>
+=head2 Interpreter initialization and destruction
 
 =over 4
 
-=item C<PARROT_VERSION>
+=item C<Parrot_Interp Parrot_Interp Parrot_new(Parrot_Interp parent)>
 
-This constant contains a string representation of Parrot's version number.
+Creates a new interpreter, inheriting some data structures from a parent
+interpreter, if supplied.  The first interpreter in any process should be
+created with a NULL parent, and all subsequent interpreters in the same
+process should use the first interpreter as their parent.  Failure to do so
+may result in unpredictable errors.
 
-=item C<PARROT_MAJOR_VERSION>
+=item C<Parrot_set_flag(Parrot_Interp interp, Parrot_int flags)>
 
-This constant contains the first part of Parrot's version number.
-
-=item C<PARROT_MINOR_VERSION>
-
-This constant contains the second part of Parrot's version number.
-
-=item C<PARROT_PATCH_VERSION>
-
-This constant contains the third part of Parrot's version number.
-
-=item C<PARROT_CONFIG_DATE>
-
-This constant contains the date that Configure was run to generate config.h.
-
-=item C<PARROT_JIT_CAPABLE>
-
-This constant is true if Parrot supports JIT on this platform, false otherwise.
-
-=item C<PARROT_ARCHNAME>
-
-This constant contains a string representation of the Parrot JIT's name for the
-current architecture.
-
-=item C<PARROT_CPU_ARCH>
-
-This constant contains the name of your processor (as the JIT sees it).
-
-=item C<PARROT_OS_NAME>
-
-This constant contains the name of your operating system (as the JIT sees it).
-
-=back
-
-=head2 Functions
+Sets or unsets interpreter flags.  Flags should be OR'd together.  Valid
+flags include:
 
 =over 4
 
-=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
+=item PARROT_NO_FLAGS
 
-Allocates and returns a new Parrot interpreter. C<parent> is NULL for the main
-interpreter that will be destroyed last.  You can only have one main
-interpreter at a time.
+=item PARROT_BOUNDS_FLAG
 
-=item C<void Parrot_setflags(Parrot_Interp, Parrot_Interp_flag,
-Parrot_Interp_flag_val)>
+=item PARROT_GC_DEBUG_FLAG
 
-Sets a flag in the Parrot interpreter.
+=item PARROT_EXTERN_CODE_FLAG
 
-=item C<void Parrot_set_executable_name(Parrot_Interp, Parrot_String)>
+=item PARROT_DESTROY_FLAG
 
-Sets the name of the executable embedding Parrot; some Parrot code (and
-languages) rely on this.
+=item PARROT_IS_THREAD
 
-=item C<Parrot_PackFile Parrot_readbc(Parrot_Interp, char *filename)>
+=item PARROT_THR_COPY_INTERP
 
-Reads in a bytecode file and returns a packfile structure for it.
+=item PARROT_THR_THREAD_POOL
 
-=item C<void Parrot_loadbc(Parrot_Interp, Parrot_PackFile)>
+=item PARROT_THR_TYPE_1
 
-Loads a packfile into a Parrot interpreter.
+=item PARROT_THR_TYPE_2
 
-=item C<void Parrot_runcode(Parrot_Interp, int argc, char *argv[])>
-
-Runs the bytecode associated with a Parrot interpreter.  C<argc> and C<argv>
-are the parameters the bytecode should receive.
-
-=item C<void Parrot_destroy(Parrot_Interp)>
-
-Deallocates all memory associated with a Parrot interpreter.
+=item PARROT_THR_TYPE_3
 
 =back
+
+See F<interpreter.h> for the definition of these flags (TODO: document flag
+definitions here).
+
+=item C<void Parrot_set_run_core(Parrot_Interp interp, Parrot_Run_core_t core)>
+
+Sets the runcore for the interpreter.  Must be called before executing any
+bytecode.  Valid runcores include:
+
+=over 4
+
+=item PARROT_SLOW_CORE
+
+=item PARROT_FUNCTION_CORE
+
+=item PARROT_FAST_CORE
+
+=item PARROT_SWITCH_CORE
+
+=item PARROT_CGP_CORE
+
+=item PARROT_CGOTO_CORE
+
+=item PARROT_JIT_CORE
+
+=item PARROT_CGP_JIT_CORE
+
+=item PARROT_SWITCH_JIT_CORE
+
+=item PARROT_EXEC_CORE
+
+=item PARROT_GC_DEBUG_CORE
+
+=back
+
+See F<interpreter.h> for the definitive list.  If you're not sure which runcore
+to use, don't call this function.  The default will be fine for most cases.
+(TODO: document runcores here).
+
+=item C<Parrot_set_trace(Parrot_Interp, Parrot_UInt flags)>
+
+Sets the interpreter's trace flags.  Flags should be OR'd together.  Valid
+flags are:
+
+=over 4
+
+=item PARROT_NO_TRACE
+
+=item PARROT_TRACE_OPS_FLAG
+
+=item PARROT_TRACE_FIND_METH_FLAG
+
+=item PARROT_TRACE_SUB_CALL_FLAG
+
+=item PARROT_ALL_TRACE_FLAGS
+
+Z<>
+
+=back
+
+=item C<void Parrot_set_executable_name(Parrot_Interp interp, Parrot_string name)>
+
+Sets the executable name of the calling process.  Note that the name is a
+Parrot string, not a C string.
+
+=item C<void Parrot_destroy(Parrot_Interp interp)>
+
+Destroys an interpreter.  At the time of this writing, this is a no-op.
+See <Parrot_really_destroy()>.
+
+=item C<void Parrot_really_destroy(Parrot_Interp interp, int exit_code)>
+
+Destroys an interpreter, regardless of the environment.  The exit code is
+currently unused.
+
+=item C<void Parrot_exit(Parrot_Interp interp, int status)>
+
+Destroys the interpreter and exits with an exit code of C<status>.  Before
+exiting, the function calls all registered exit handlers in LIFO order.
+C<Parrot_really_destroy()> is usually called as the last exit handler.
+
+=item C<void Parrot_on_exit(Parrot_Interp interp, void (*handler)(Parrot_Interp, int, void *), void *arg)>
+
+Registers an exit handler to be called from C<Parrot_exit()> in LIFO order.
+The handler function should accept as arguments an interpreter, an integer
+exit code, and an argument (which can be NULL).
+
+=item C<void imcc_init(Parrot_Interp interp)>
+
+Initializes the IMCC subsystem.  Required for compiling PIR.
+
+=back
+
+=head2 Loading and running bytecode
+
+=over 4
+
+=item C<Parrot_PackFile Parrot_readbc(Parrot_Interp interp, const char *path)>
+
+Reads Parrot bytecode or PIR from the file referenced by C<path>.  Returns
+a packfile structure for use by C<Parrot_loadbc()>.
+
+=item C<void Parrot_loadbc(Parrot_Interp interp, Parrot_PackFile pf)>
+
+Loads a packfile into the interpreter.  After this operation the interpreter
+is ready to run the bytecode in the packfile.
+
+=item C<void Parrot_runcode(Parrot_Interp interp, int argc, char *argv[])>
+
+Runs the bytecode associated with the interpreter.  Use C<argc> and C<argv[]>
+to pass arguments to the bytecode.
+
+=item C<Parrot_PackFile PackFile_new_dummy(Parrot_Interp interp, char *name)>
+
+Creates a "dummy" packfile in lieu of actually creating one from a bytecode
+file on disk.
+
+=item C<void Parrot_load_bytecode(Parrot_Interp interp, const char *path)>
+
+Reads and load Parrot bytecode or PIR from the file referenced by C<path>.
+You should create a dummy packfile beforehand; see C<PackFile_new_dummy> for
+details.  Due to the void return type, the behavior of this function on error
+is unclear.
+
+=back
+
+=head2 Data manipulation
+
+=head3 Native types
+
+=over 4
+
+=item C<int Parrot_PMC_typenum(Parrot_Interp interp, const char *type)>
+
+Returns the internal type number corresponding to C<type>.  Useful for
+instantiating various Parrot data types.
+
+=item C<char *string_to_cstring(Parrot_Interp interp)>
+
+XXX needs to be a formal Parrot_* API.
+Returns the C string representation of a Parrot string.
+
+=item C<STRING *string_from_cstring(Parrot_Interp interp, const char *string, int len)>
+
+XXX needs to be a formal Parrot_* API.
+Returns the Parrot string representation of a C string.
+
+=item C<string_from_literal(Parrot_Interp interp, const char *string)>
+
+XXX needs to be a formal Parrot_* API.
+A macro for simplifying calls to C<string_from_cstring>.
+
+=back
+
+=head3 PMCs
+
+=over 4
+
+=item C<Parrot_PMC Parrot_PMC_new(Parrot_Interp interp, int typenum)>
+
+Creates a new PMC of the type identified by C<typenum>.  Use
+C<Parrot_PMC_typenum> to obtain the correct type number.
+
+=item C<void Parrot_register_pmc(Parrot_PMC pmc)>
+
+Registers an externally created PMC with the garbage collector.  You MUST call
+this for any PMCs you create outside of Parrot bytecode, otherwise your PMC
+may be garbage collected before you are finished using it.
+
+=item C<void Parrot_unregister_pmc(Parrot_PMC pmc)>
+
+Unegisters an externally created PMC from the garbage collector.  You MUST call
+this after you are finished using PMCs you create outside of Parrot bytecode,
+or risk memory leaks.
+
+=back
+
+=head3 Globals
+
+=over 4
+
+=item C<Parrot_PMC Parrot_find_global_cur(Parrot_Interp interp, Parrot_String name)>
+
+Find and return a global called C<name> in the current namespace.  Returns
+C<PMCNULL> if not found.
+
+=item C<Parrot_PMC Parrot_find_global_n(Parrot_Interp interp, Parrot_String namespace, Parrot_String name)>
+
+Not documented yet.
+
+=item C<Parrot_PMC Parrot_find_global_s(Parrot_Interp interp, Parrot_String namespace, Parrot_String name)>
+
+Find and return a global called C<name> in the namespace C<namespace>.  Returns
+C<PMCNULL> if not found.
+
+=item C<void Parrot_store_global_cur(Parrot_Interp interp, Parrot_String name, Parrot_PMC val)>
+
+Sets the value of a global called C<name> in the current namespace.  Does
+nothing if the global is not found.
+
+=item C<void Parrot_store_global_n(Parrot_Interp interp, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
+
+Not documented yet.
+
+=item C<void Parrot_store_global_s(Parrot_Interp interp, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
+
+Sets the value of a global called C<name> in the namespace C<namespace>.  Does
+nothing if the global is not found.
+
+=item C<Parrot_PMC Parrot_find_global_k(Parrot_Interp interp, Parrot_PMC namespace_key, Parrot_String name)>
+
+Find and return a global called C<name> in the keyed namespace C<namespace>.
+Returns C<PMCNULL> if not found.
+
+=item C<void Parrot_store_global_k(Parrot_Interp interp, Parrot_PMC namespace_key, Parrot_String name, Parrot_PMC val)>
+
+Sets the value of a global called C<name> in the keyed namespace C<namespace>.
+Does nothing if the global is not found.
+
+=back
+
+=head3 Lexicals
+
+Not documented yet.
+
+=head2 Calling subroutines
+
+=over 4
+
+=item C<void *Parrot_call_sub(Parrot_Interp interp, Parrot_PMC sub, const_char *signature)>
+ 
+Call a Parrot subroutine that returns a pointer using the supplied signature.
+
+=item C<Parrot_Int Parrot_call_sub_ret_int(Parrot_Interp interp, Parrot_PMC sub, const_char *signature)>
+ 
+Call a Parrot subroutine that returns an integer using the supplied signature.
+
+=item C<Parrot_Float Parrot_call_sub_ret_float(Parrot_Interp interp, Parrot_PMC sub, const_char *signature)>
+
+Call a Parrot subroutine that returns an float using the supplied signature.
+
+=back
+
+=head2 Objects
+
+=head3 Creating and destroying objects
+
+=over 4
+
+=item C<Parrot_PMC Parrot_oo_get_class(Parrot_Interp interp, Parrot_PMC namespace)>
+
+Returns the class corresponding to the supplied namespace.
+
+=item C<Parrot_PMC Parrot_Class_instantiate(Parrot_Interp interp, Parrot_PMC the_class Parrot_PMC arg)>
+
+Instantiates a new object of class C<the_class>, which can be obtained from
+C<Parrot_oo_get_class()>.  Passes an optional PMC argument C<arg> to the
+constructor (see init versus init_pmc).  Use C<PMCNULL> if you are not
+supplying an argument.
+
+=back 
+
+=head3 Calling methods
+
+Not documented yet.
 
 =head1 COMPILING
 
 Note: This section is aimed at you if you are writing an application
 external to parrot which links against an installed parrot library.
+
+=head2 Caveats
+
+Several API functions are missing prototypes in Parrot's header files.  This
+means you may receive type warnings during compilation even though the types
+of your arguments and return variables are correct.  In this case it is safe
+to cast to the correct type; not doing so may cause undesired behavior.
+
+=head2 Compiler and linker flags
 
 Your application will need to include the appropriate header files and
 link against parrot and its dependencies.
@@ -303,9 +493,43 @@ The last part of the variable will almost certainly be F<.../lib/pkgconfig>.
 Set this variable in your login scripts if you need it to be available in
 future.
 
-=head1 SEE ALSO
+=head1 EXAMPLES
 
-F<embed.c> and F<embed.h> for the implementation.
+=head2 Load bytecode as a library and run a single subroutine
+
+    #include <parrot/parrot.h>
+    #include <parrot/embed.h>
+    #include <parrot/extend.h>
+
+    int main(int argc, char *argv[])
+    {
+        Parrot_Interp interp;
+        Parrot_PackFile pf;
+        Parrot_PMC sub;
+        Parrot_String pstr;
+
+        interp = Parrot_new(NULL);
+        imcc_init(interp);
+
+        /* create a new packfile -- any name will do */
+        pf = PackFile_new_dummy(interp, "my-parrot-code");
+
+        pstr = string_from_literal(interp, "foo.pir");
+        Parrot_load_bytecode(interp, pstr);
+
+        /* find the subroutine named "foo" in the global namespace */
+        pstr = string_from_literal(interp, "foo");
+        sub = Parrot_find_global_cur(interp, pstr);
+
+        /* run foo(), which returns nothing */
+        Parrot_call_sub(interp, sub, "v");
+
+        Parrot_destroy(interp);
+
+        return(0);
+    }
+
+=head1 SEE ALSO
 
 F<src/main.c> and F<t/src/*.t> for Parrot's use of the embedding system.
 
