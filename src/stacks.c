@@ -185,7 +185,6 @@ void
 rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entries)
 {
     Stack_Chunk_t * const stack = *stack_p;
-    INTVAL depth = num_entries - 1;
 
     if (num_entries >= -1 && num_entries <= 1) {
         return;
@@ -194,6 +193,7 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
     if (num_entries < 0) {
         INTVAL i;
         Stack_Entry_t temp;
+        INTVAL depth;
 
         num_entries = -num_entries;
         depth = num_entries - 1;
@@ -202,6 +202,7 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
             real_exception(interp, NULL, ERROR_STACK_SHALLOW, "Stack too shallow!");
         }
 
+        /* XXX Dereferencing stack_entry here is a cavalcade of danger */
         temp = *stack_entry(interp, stack, depth);
         for (i = depth; i > 0; i--) {
             *stack_entry(interp, stack, i) =
@@ -213,10 +214,12 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
     else {
         INTVAL i;
         Stack_Entry_t temp;
+        INTVAL depth = num_entries - 1;
 
         if (stack_height(interp, stack) < (size_t)num_entries) {
             real_exception(interp, NULL, ERROR_STACK_SHALLOW, "Stack too shallow!");
         }
+        /* XXX Dereferencing stack_entry here is a cavalcade of danger */
         temp = *stack_entry(interp, stack, 0);
         for (i = 0; i < depth; i++) {
             *stack_entry(interp, stack, i) =
