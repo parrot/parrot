@@ -38,7 +38,7 @@
 #define mem_allocate_zeroed_typed(type)     (type *)mem_sys_allocate_zeroed(sizeof (type))
 #define mem_allocate_n_zeroed_typed(n, type) (type *)mem_sys_allocate_zeroed((n) * sizeof(type))
 #define mem_realloc_n_typed(p, n, type)     (p) = (type *)mem_sys_realloc((p), (n)*sizeof(type))
-#define mem_copy_n_typed(dest,src,n,type)   memcpy((dest),(src),(n)*sizeof(type))
+#define mem_copy_n_typed(dest, src, n, type) memcpy((dest), (src), (n)*sizeof(type))
 
 /* HEADERIZER BEGIN: src/gc/memory.c */
 
