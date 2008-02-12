@@ -329,6 +329,7 @@ out of memory.
 
 */
 
+PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char *

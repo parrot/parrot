@@ -22,6 +22,12 @@ PARROT_CONST_FUNCTION
 UINTVAL Parrot_char_digit_value(SHIM_INTERP, UINTVAL character);
 
 PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char * str_dup(ARGIN(const char *old))
+        __attribute__nonnull__(1);
+
+PARROT_API
 void string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -35,11 +41,6 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*offset)
         FUNC_MODIFIES(*string);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char * str_dup(ARGIN(const char *old))
-        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/string_primitives.c */
 
