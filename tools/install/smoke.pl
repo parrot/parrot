@@ -109,7 +109,7 @@ ok($out =~ /^usage/, "check bfc");
 $out = `$parrot languages/bf/bfco.pbc`;
 ok($out =~ /^usage/, "check bfco");
 
-$out = `$parrot --no-gc languages/cardinal/cardinal.pbc -e "say 'hello world';"`;
+$out = `$parrot --no-gc languages/cardinal/cardinal.pbc -e "print 'hello world';"`;
 ok($out eq "hello world\n", "check cardinal");
 
 $out = `$parrot languages/dotnet/net2pbc.pbc`;
