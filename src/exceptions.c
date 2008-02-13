@@ -1015,12 +1015,6 @@ Parrot_print_backtrace(void)
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     size_t i;
-#  ifndef BACKTRACE_VERBOSE
-    int ident;
-    char *caller;
-    size_t callerLength;
-    size_t j;
-#  endif
 
     const size_t size = backtrace(array, BACKTRACE_DEPTH);
     char ** const strings = backtrace_symbols(array, size);
@@ -1030,15 +1024,17 @@ Parrot_print_backtrace(void)
             size, BACKTRACE_DEPTH);
 #  ifndef BACKTRACE_VERBOSE
     for (i = 0; i < size; i++) {
-        /* always ident */
-        ident = 2;  /* initial indent */
-        ident += 2 * i; /* nesting depth */
-        fprintf(stderr, "%*s", ident, "");
+        /* always indent */
+        const int indent = 2 + (2*i);
+        const char *caller = strchr(strings[i], '(');
+
+        fprintf(stderr, "%*s", indent, "");
 
         /* if the caller was an anon function then strchr won't
         find a '(' in the string and will return NULL */
-        caller = strchr(strings[i], '(');
         if (caller) {
+            size_t callerLength;
+            size_t j;
             /* skip over the '(' */
             caller++;
             /* find the end of the symbol name */
