@@ -51,9 +51,9 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_make(int length)
 {
-    Set * const s = mem_allocate_typed(Set);
+    Set * const s = mem_allocate_zeroed_typed(Set);
     s->length     = length;
-    s->bmp        = (unsigned char *)mem_sys_allocate_zeroed(NUM_BYTES(length));
+    s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length), unsigned char);
     return s;
 }
 
@@ -214,7 +214,7 @@ set_first_zero(ARGIN(const Set *s))
     int i, j;
 
     for (i = 0; i < NUM_BYTES(s->length); ++i) {
-        int set_byte = s->bmp[i];
+        const int set_byte = s->bmp[i];
         if (set_byte == 0xFF)
             continue;
 
