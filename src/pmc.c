@@ -57,7 +57,7 @@ method to perform any other necessary initialization.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PMC *
 pmc_new(PARROT_INTERP, INTVAL base_type)
 {

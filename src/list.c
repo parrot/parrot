@@ -208,8 +208,8 @@ static List_chunk * alloc_next_size(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*list);
 
-PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static List_chunk * allocate_chunk(PARROT_INTERP,
     ARGIN(List *list),
     UINTVAL items,
@@ -311,8 +311,8 @@ Make a new chunk, size bytes big, holding items items.
 
 */
 
-PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static List_chunk *
 allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
 {
@@ -1234,7 +1234,7 @@ Returns a new list of type C<type>.
 */
 
 PARROT_API
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 List *
 list_new(PARROT_INTERP, PARROT_DATA_TYPE type)
@@ -1422,7 +1422,7 @@ TODO - Barely tested. Optimize new array structure, fixed if big.
 */
 
 PARROT_API
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 List *
 list_clone(PARROT_INTERP, ARGIN(const List *other))

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -164,7 +164,7 @@ Returns a clone of the list.
 
 */
 
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IntList *
 intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))
@@ -182,7 +182,7 @@ Returns a new list.
 
 */
 
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IntList *
 intlist_new(PARROT_INTERP)

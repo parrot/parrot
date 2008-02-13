@@ -1199,9 +1199,6 @@ include_file(Interp* interp, char *file_name, void *yyscanner)
     char *s              = Parrot_locate_runtime_file(interp, file_name,
                                    PARROT_RUNTIME_FT_INCLUDE);
 
-    if (!s)
-        IMCC_fataly(interp, E_IOError, strerror(errno));
-
     file = fopen(s, "r");
     mem_sys_free(s);
 

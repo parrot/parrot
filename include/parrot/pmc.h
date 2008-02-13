@@ -49,7 +49,7 @@ void Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PMC * pmc_new(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 

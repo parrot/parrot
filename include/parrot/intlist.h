@@ -48,7 +48,7 @@ void intlist_assign(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*l);
 
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IntList * intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))
         __attribute__nonnull__(1)
@@ -76,7 +76,7 @@ void intlist_mark(PARROT_INTERP, ARGMOD(IntList *l))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*l);
 
-PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IntList * intlist_new(PARROT_INTERP)
         __attribute__nonnull__(1);

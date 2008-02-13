@@ -1437,6 +1437,8 @@ PDB_break(PARROT_INTERP)
 
 Escapes C<">, C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
 
+The returned string must be freed.
+
 =cut
 
 */
