@@ -761,7 +761,9 @@ no conflicts.
         Parrot_Class * const _class = PARROT_CLASS(SELF);
 
         /* Do the composition. */
-        Parrot_ComposeRole(interp, role, PMCNULL, 0, PMCNULL, 0,
+        Parrot_ComposeRole(interp, role,
+                           _class->resolve_method, !PMC_IS_NULL(_class->resolve_method),
+                           PMCNULL, 0,
                            _class->methods, _class->roles);
     }
 
