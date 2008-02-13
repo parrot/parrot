@@ -436,6 +436,59 @@ string_rep_compatible(SHIM_INTERP,
 
 /*
 
+=item C<STRING * string_concat>
+
+Concatenates two Parrot strings. If necessary, converts the second
+string's encoding and/or type to match those of the first string. If
+either string is C<NULL>, then a copy of the non-C<NULL> string is
+returned. If both strings are C<NULL>, then a new zero-length string is
+created and returned.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_CANNOT_RETURN_NULL
+STRING *
+string_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
+            ARGIN_NULLOK(STRING *b), UINTVAL Uflags)
+{
+    if (a != NULL && a->strlen != 0) {
+        if (b != NULL && b->strlen != 0) {
+            const CHARSET *cs;
+            const ENCODING *enc;
+            STRING *result;
+
+            cs = string_rep_compatible(interp, a, b, &enc);
+            if (!cs) {
+                cs = a->charset;
+                enc = a->encoding;
+            }
+            result =
+                string_make_direct(interp, NULL,
+                        a->bufused + b->bufused,
+                        enc, cs, 0);
+
+            result = string_append(interp, result, a);
+            result = string_append(interp, result, b);
+
+            return result;
+        }
+        else {
+            return string_copy(interp, a);
+        }
+    }
+    else {
+        return b
+            ? string_copy(interp, b)
+            : string_make(interp, NULL, 0, NULL, Uflags);
+    }
+}
+
+
+/*
+
 =item C<STRING * string_append>
 
 Take in two Parrot strings and append the second to the first.
@@ -953,58 +1006,6 @@ string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), INTVAL nchars)
 {
     PARROT_ASSERT(s->encoding);
     return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
-}
-
-/*
-
-=item C<STRING * string_concat>
-
-Concatenates two Parrot strings. If necessary, converts the second
-string's encoding and/or type to match those of the first string. If
-either string is C<NULL>, then a copy of the non-C<NULL> string is
-returned. If both strings are C<NULL>, then a new zero-length string is
-created and returned.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_CANNOT_RETURN_NULL
-STRING *
-string_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
-            ARGIN_NULLOK(STRING *b), UINTVAL Uflags)
-{
-    if (a != NULL && a->strlen != 0) {
-        if (b != NULL && b->strlen != 0) {
-            const CHARSET *cs;
-            const ENCODING *enc;
-            STRING *result;
-
-            cs = string_rep_compatible(interp, a, b, &enc);
-            if (!cs) {
-                cs = a->charset;
-                enc = a->encoding;
-            }
-            result =
-                string_make_direct(interp, NULL,
-                        a->bufused + b->bufused,
-                        enc, cs, 0);
-
-            result = string_append(interp, result, a);
-            result = string_append(interp, result, b);
-
-            return result;
-        }
-        else {
-            return string_copy(interp, a);
-        }
-    }
-    else {
-        return b
-            ? string_copy(interp, b)
-            : string_make(interp, NULL, 0, NULL, Uflags);
-    }
 }
 
 /*
