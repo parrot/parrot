@@ -623,7 +623,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
             return string_to_cstring(interp, s);
         }
         else
-            return str_dup( "." );
+            return str_dup(".");
     }
 }
 

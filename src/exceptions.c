@@ -972,8 +972,8 @@ void
 Parrot_assert(int condition, ARGIN(const char *condition_string),
         ARGIN(const char *file), unsigned int line)
 {
-    if ( !condition )
-        Parrot_confess(condition_string, file, line );
+    if (!condition)
+        Parrot_confess(condition_string, file, line);
 }
 
 /*
