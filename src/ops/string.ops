@@ -57,8 +57,7 @@ is returned in string $1.
 =cut
 
 inline op chr(out STR, in INT) :base_core {
-  STRING *s;
-  s = string_chr(interp, (UINTVAL)$2);
+  STRING * const s = string_chr(interp, (UINTVAL)$2);
   $1 = s;
   goto NEXT();
 }
@@ -543,7 +542,7 @@ op charsetname(out STR, in INT) :base_core {
 }
 
 op find_charset(out INT, in STR) :base_core {
-  INTVAL n = Parrot_charset_number(interp, $2);
+  const INTVAL n = Parrot_charset_number(interp, $2);
   if (n < 0)
     real_exception(interp, NULL, 1,
         "charset '%Ss' not found", $2);
@@ -601,7 +600,7 @@ op encodingname(out STR, in INT) :base_core {
 }
 
 op find_encoding(out INT, in STR) :base_core {
-  INTVAL n = Parrot_encoding_number(interp, $2);
+  const INTVAL n = Parrot_encoding_number(interp, $2);
   if (n < 0)
     real_exception(interp, NULL, 1,
         "encoding '%Ss' not found", $2);
@@ -615,7 +614,7 @@ op trans_encoding(inout STR, in INT) {
 }
 
 op trans_encoding(out STR, in STR, in INT) {
-  STRING *dest = new_string_header(interp, 0);
+  STRING * const dest = new_string_header(interp, 0);
   $1 = Parrot_string_trans_encoding(interp, $2, $3, dest);
   goto NEXT();
 }
@@ -659,7 +658,7 @@ consists entirely of matching characters, set $1 to (offset + count).
 =cut
 
 inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
-$1 = Parrot_string_find_not_cclass(interp, $2, $3, $4, $5);
+  $1 = Parrot_string_find_not_cclass(interp, $2, $3, $4, $5);
   goto NEXT();
 }
 
@@ -690,7 +689,7 @@ op compose(out STR, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 
