@@ -181,7 +181,7 @@ BEGIN {
         source => {
             c   => { file_exts => ['c'] },
             pmc => { file_exts => ['pmc'] },
-            pir => { file_exts => ['pir'] },
+            pir => { file_exts => ['pir', 't'] },
             ops => { file_exts => ['ops'] },
             lex => {
                 file_exts   => ['l'],
@@ -520,9 +520,58 @@ returns a Parrot::Docs::File object
 sub get_pir_language_files {
     my $self = shift;
 
-    my @pir_files = ( $self->pir_source_files, );
+    # make sure we're picking up pir files (i.e. look for the shebang line)
+    my @pir_files;
+    for my $file ( $self->pir_source_files ) {
+        push @pir_files, $file
+            if $self->is_pir( $file->path );
+    }
 
     return @pir_files;
+}
+
+=item C<is_pir()>
+
+Determines if the given filename is PIR source
+
+=cut
+
+# Since .t files might be written in any language, we can't *just* check the
+# filename to see if something should be treated as PIR.
+sub is_pir {
+    my $self     = shift;
+    my $filename = shift;
+
+    if ( !-f $filename ) {
+        return 0;
+    }
+
+    # .pir files should always be tested
+    if ( $filename =~ /\.pir$/ ) {
+        return 1;
+    }
+
+    # test files (.t) files might need testing.
+    # ignore everything else.
+    if ( $filename !~ /\.t$/ ) {
+        return 0;
+    }
+
+    # Now let's check to see if there's a plain parrot shebang.
+    open my $file_handle, '<', $filename
+        or $self->_croak("Could not open $filename for reading");
+    my $line = <$file_handle>;
+    close $file_handle;
+
+    if ( $line && $line =~ /^#!.*parrot/ ) {
+        # something that specifies a pir or pbc is probably a HLL, skip it
+        if ($line =~ /\.(?:pir|pbc)/) {
+          return 0;
+        }
+        return 1;
+    }
+
+    return 0;
 }
 
 =item C<file_for_perl_module($module)>

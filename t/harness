@@ -207,7 +207,6 @@ if ( -e "$Bin/../DEVELOPING" ) {
         gmt_utc.t
         linelength.t
         pccmethod_deps.t
-        pir_code_coda.t
         svn_id.t
         tabs.t
         trailing_space.t
