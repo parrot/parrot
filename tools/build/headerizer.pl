@@ -44,9 +44,9 @@ disappears, it's block is "orphaned" and will remain there.
 
 =over 4
 
-=item C<--apilist>
+=item C<--macro=X>
 
-Print a list of PARROT_API functions instead of updating source.
+Print a list of all functions that have macro X.  For example, --macro=PARROT_API.
 
 =back
 
@@ -406,11 +406,12 @@ sub api_first_then_alpha {
 }
 
 sub main {
-    my $apilist;
+    my $macro_match;
     GetOptions(
-        apilist => \$apilist,
+        'macro=s' => \$macro_match,
     ) or exit(1);
 
+    die "No files specified.\n" unless @ARGV;
     my %ofiles;
     ++$ofiles{$_} for @ARGV;
     my @ofiles = sort keys %ofiles;
@@ -442,7 +443,7 @@ sub main {
         }
 
         my @decls;
-        if ( $apilist || -f $pmcfile ) {
+        if ( $macro_match || -f $pmcfile ) {
             @decls = extract_function_declarations( $csource );
         }
         else {
@@ -453,11 +454,15 @@ sub main {
             my $components = function_components_from_declaration( $cfile, $decl );
             push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
             push( @{ $cfiles_with_statics{$cfile} }, $components ) if $components->{is_static};
-            push( @{ $api{$cfile} }, $components ) if $components->{is_api};
+            if ( $macro_match ) {
+                if ( grep { $_ eq $macro_match } @{$components->{macros}} ) {
+                    push( @{ $api{$cfile} }, $components );
+                }
+            }
         }
     }    # for @cfiles
 
-    if ( $apilist ) {
+    if ( $macro_match ) {
         my $nfuncs = 0;
         for my $cfile ( sort keys %api ) {
             my @funcs = sort { $a->{name} cmp $b->{name} } @{$api{$cfile}};
@@ -467,7 +472,8 @@ sub main {
                 ++$nfuncs;
             }
         }
-        print "$nfuncs PARROT_API functions\n";
+        my $s = $nfuncs == 1 ? '' : 's';
+        print "$nfuncs $macro_match function$s\n";
     }
     else { # Normal headerization and updating
         # Update all the .h files

@@ -745,6 +745,7 @@ help :
 	@echo "  splint:            Code checking with splint."
 	@echo "  headerizer:        Recreate header files for C-source files"
 	@echo "  apilist:           Show list of PARROT_API functions"
+	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
 	@echo "  cover:             Run test suite coverage analysis."
 	@echo ""
 	@echo "Release:"
@@ -2205,7 +2206,10 @@ headerizer : $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES)
 
 apilist: $(SRC_DIR)/core_pmcs.c
-	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --apilist $(HEADERIZER_O_FILES)
+	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_API $(HEADERIZER_O_FILES)
+
+malloclist: $(SRC_DIR)/core_pmcs.c
+	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
 
 ###############################################################################
 #
