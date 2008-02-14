@@ -197,8 +197,6 @@ END_HEADER
 int main(int argc, const char *argv[])
 {
     PackFile     *pf;
-    STRING       *executable_name;
-    PMC          *executable_name_pmc;
     Parrot_Interp interp;
 
     Parrot_set_config_hash();
