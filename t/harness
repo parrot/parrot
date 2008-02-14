@@ -2,6 +2,64 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Test::Harness();
+use lib qw( lib );
+use Parrot::Harness::DefaultTests;
+use Parrot::Harness::Options qw(
+    handle_long_options
+    get_test_prog_args
+    Usage
+);
+use Parrot::Harness::Smoke qw(
+    generate_html_smoke_report
+);
+
+local @ARGV = @ARGV;
+my $longopts;
+($longopts, @ARGV) = handle_long_options(@ARGV);
+
+$ENV{RUNNING_MAKE_TEST} = $longopts->{running_make_test};
+
+# Suck the short options into the TEST_PROG_ARGS 
+# environmental variable.
+my %opts;
+getopts('wgjPCSefbvdr?hO:D:', \%opts);
+
+if ($opts{'?'} || $opts{h} || $longopts->{help}) {
+    Usage();
+    exit;
+}
+
+# add -D40;  merge it with any existing -D argument
+$opts{D} = sprintf( '%x', hex(40) | (exists $opts{D} ? hex($opts{D}) : 0));
+
+my $args = get_test_prog_args(
+    \%opts, $longopts->{gc_debug}, $longopts->{run_exec});
+$ENV{TEST_PROG_ARGS} = $args;
+
+# now build the list of tests to run, either from the command
+# line or from @default tests
+my @default_tests = get_default_tests(
+    $longopts->{core_tests_only},
+    $longopts->{runcore_tests_only}
+);
+
+my @tests = map { glob( $_ ) } (@ARGV ? @ARGV : @default_tests);
+
+if (!$longopts->{html}) {
+    Test::Harness::runtests(@tests);
+} else {
+    generate_html_smoke_report ( {
+        tests       => \@tests,
+        args        => $args,
+        file        => 'smoke.html',
+    } );
+}
+
 =head1 NAME
 
 t/harness - Parrot Test Harness
@@ -81,219 +139,6 @@ Invoke parrot with '--gc-debug'.
 Emit a C<smoke.html> file instead of displaying results.
 
 =back
-
-=cut
-
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Getopt::Std;
-use Test::Harness();
-use Parrot::Config qw/%PConfig/;
-use FindBin qw/$Bin/;
-
-# handle the long options
-
-$ENV{RUNNING_MAKE_TEST} = grep { $_ eq '--running-make-test' } @ARGV;
-@ARGV = grep { $_ ne '--running-make-test' } @ARGV;
-
-my $gc_debug = grep { $_ eq '--gc-debug' } @ARGV;
-@ARGV = grep { $_ ne '--gc-debug' } @ARGV;
-
-my $core_tests_only = grep { $_ eq '--core-tests' } @ARGV;
-@ARGV = grep { $_ ne '--core-tests' } @ARGV;
-
-my $runcore_tests_only = grep { $_ eq '--runcore-tests' } @ARGV;
-@ARGV = grep { $_ ne '--runcore-tests' } @ARGV;
-
-my $html = grep { $_ eq '--html' } @ARGV;
-@ARGV = grep { $_ ne '--html' } @ARGV;
-
-my $run_exec = grep { $_ eq '--run-exec' } @ARGV;
-@ARGV = grep { $_ ne '--run-exec' } @ARGV;
-
-# Suck the short options into the TEST_PROG_ARGS evar:
-my %opts;
-getopts('wgjPCSefbvdr?hO:D:', \%opts);
-if ($opts{'?'} || $opts{h}) {
-    print <<"EOF";
-perl t/harness [options] [testfiles]
-    -w         ... warnings on
-    -g         ... run CGoto
-    -j         ... run JIT
-    -C         ... run CGP
-    -S         ... run Switched
-    -b         ... run bounds checked
-    --run-exec ... run exec core
-    -f         ... run fast core
-    -v         ... run verbose
-    -d         ... run debug
-    -r         ... assemble to PBC run PBC
-    -O[012]    ... optimize
-    -D[number] ... pass debug flags to parrot interpreter
-    --running-make-test
-    --gc-debug
-    --core-tests
-    --runcore-tests
-    --html
-EOF
-    exit;
-}
-
-# add -D40;  merge it with any existing -D argument
-$opts{D} = sprintf( '%x', hex(40) | (exists $opts{D} ? hex($opts{D}) : 0));
-
-my $args = join(' ', map { "-$_" } keys %opts );
-$args =~ s/-O/-O$opts{O}/ if exists $opts{O};
-$args =~ s/-D/-D$opts{D}/;
-$args .= ' --gc-debug'    if $gc_debug;
-# XXX find better way for passing run_exec to Parrot::Test
-$args .= ' --run-exec'    if $run_exec;
-$ENV{TEST_PROG_ARGS} = $args;
-
-# Build the lists of tests to be run
-
-# runcore tests are always run.
-my @runcore_tests = qw(
-    t/compilers/imcc/*/*.t
-    t/op/*.t
-    t/pmc/*.t
-    t/oo/*.t
-    t/native_pbc/*.t
-    t/dynpmc/*.t
-    t/dynoplibs/*.t
-    t/compilers/pge/*.t
-    t/compilers/pge/p5regex/*.t
-    t/compilers/pge/perl6regex/*.t
-    t/compilers/tge/*.t
-    t/library/*.t
-);
-
-# core tests are run unless --runcore-tests is present.  Typically
-# this list and the list above are run in response to --core-tests
-my @core_tests = qw(
-    t/run/*.t
-    t/src/*.t
-    t/tools/*.t
-    t/perl/*.t
-    t/stm/*.t
-);
-
-# configure tests are tests to be run at the beginning of 'make test';
-# standard tests are other tests run by default with no core options
-# present
-my @configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
-my @standard_tests = qw(
-    t/compilers/json/*.t
-    t/examples/*.t
-    t/doc/*.t
-    t/distro/manifest.t
-);
-
-# add metadata.t and coding standards tests only if we're DEVELOPING
-if ( -e "$Bin/../DEVELOPING" ) {
-    push @standard_tests, map { "t/codingstd/$_" } qw(
-        c_code_coda.t
-        c_header_guards.t
-        c_indent.t
-        c_struct.t
-        check_toxxx.t
-        copyright.t
-        c_cppcomments.t
-        c_cuddled_else.t
-        filenames.t
-        gmt_utc.t
-        linelength.t
-        pccmethod_deps.t
-        svn_id.t
-        tabs.t
-        trailing_space.t
-    );
-    # XXX: This takes WAY too long to run: perlcritic.t
-}
-
-# build the list of default tests
-my @default_tests = @runcore_tests;
-unless ($runcore_tests_only) {
-   push @default_tests, @core_tests;
-   unless ($core_tests_only) {
-       unshift @default_tests, @configure_tests;
-       push @default_tests, @standard_tests;
-   }
-}
-
-# now build the list of tests to run, either from the command
-# line or from @default tests
-my @tests = map { glob( $_ ) } (@ARGV ? @ARGV : @default_tests);
-
-if (!$html) {
-    Test::Harness::runtests(@tests);
-} else {
-    my @smoke_config_vars = qw(
-        osname archname cc build_dir cpuarch revision VERSION optimize DEVEL
-    );
-
-    eval {
-        require Test::TAP::HTMLMatrix;
-        require Test::TAP::Model::Visual;
-    };
-    die "You must have Test::TAP::HTMLMatrix installed.\n\n$@"
-        if $@;
-
-    {
-      no warnings qw/redefine once/;
-      *Test::TAP::Model::run_tests = sub {
-        my $self = shift;
-
-        $self->_init;
-        $self->{meat}{start_time} = time;
-
-        my %stats;
-
-        foreach my $file (@_) {
-            my $data;
-            print STDERR "- $file\n";
-            $data = $self->run_test($file);
-            $stats{tests} += $data->{results}{max} || 0;
-            $stats{ok}    += $data->{results}{ok}  || 0;
-        }
-
-        printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
-            $stats{ok},
-            $stats{tests},
-            $stats{ok} / $stats{tests} * 100;
-
-        $self->{meat}{end_time} = time;
-      };
-
-      my $start = time();
-      my $model = Test::TAP::Model::Visual->new();
-      $model->run_tests(@tests);
-
-      my $end = time();
-
-      my $duration = $end - $start;
-
-      my $v = Test::TAP::HTMLMatrix->new(
-        $model,
-        join("\n",
-             "duration: $duration",
-             "branch: unknown",
-             "harness_args: " . (($args) ? $args : "N/A"),
-             map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
-                   );
-
-      $v->has_inline_css(1); # no separate css file
-
-      open HTML, ">", "smoke.html";
-      print HTML $v->html;
-      close HTML;
-
-      print "smoke.html has been generated.\n";
-    }
-}
 
 =head1 HISTORY
 
