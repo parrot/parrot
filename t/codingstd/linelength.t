@@ -149,15 +149,5 @@ compilers/pirc/heredoc/hdocprep.c
 languages/plumhead/src/yacc/plumhead_lexer.c
 languages/plumhead/src/yacc/plumhead_parser.c
 languages/plumhead/src/yacc/plumhead_parser.h
-# Generators with big strings
-tools/build/jit2c.pl
-tools/build/nativecall.pl
-tools/dev/lib_deps.pl
-tools/dev/mk_inno.pl
-tools/dev/parrot_coverage.pl
-# these ones include a big URL
-docs/dev/pmc_obj_design_meeting_notes.pod
+# these ones include long POD
 docs/embed.pod
-docs/gettingstarted.pod
-docs/glossary.pod
-languages/LANGUAGES_STATUS.pod
