@@ -231,14 +231,3 @@ in favor of the new versions in the Parrot Compiler Toolkit
 PCT follows the specification given by pdd26 .
 
 =back
-
-=head1 Misc
-
-=over 4
-
-=item * 'v' NCI arg signature [post 0.5.1]
-
-See RT #48733. (Been removed for some time; nice warning is going away)
-
-=back
-
