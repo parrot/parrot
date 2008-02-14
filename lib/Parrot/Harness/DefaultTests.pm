@@ -72,12 +72,12 @@ our @developing_tests = (
         gmt_utc.t
         linelength.t
         pccmethod_deps.t
-        pir_code_coda.t
         svn_id.t
         tabs.t
         trailing_space.t
     )
 );
+#        pir_code_coda.t
 
 sub get_default_tests {
     my ($core_tests_only, $runcore_tests_only) = @_;
