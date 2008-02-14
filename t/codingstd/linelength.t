@@ -160,6 +160,7 @@ tools/dev/parrot_coverage.pl
 # these ones include a big URL
 cage/todo.pod
 docs/dev/pmc_obj_design_meeting_notes.pod
+docs/embed.pod
 docs/gettingstarted.pod
 docs/glossary.pod
 languages/LANGUAGES_STATUS.pod
