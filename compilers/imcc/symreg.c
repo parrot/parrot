@@ -851,7 +851,7 @@ PARROT_CANNOT_RETURN_NULL
 SymReg *
 _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int uniq)
 {
-    SymReg * r;
+    SymReg *r;
 
     if (uniq == U_add_all) {
         r       = mem_allocate_zeroed_typed(SymReg);
@@ -982,7 +982,7 @@ mk_local_label(PARROT_INTERP, ARGIN(const char *name))
 
 =item C<SymReg * mk_label_address>
 
-RT#48260: Not yet documented!!!
+Wrapper for _mk_address.
 
 =cut
 
@@ -1153,7 +1153,9 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
 
 =item C<void free_sym>
 
-RT#48260: Not yet documented!!!
+Free all memory of the specified SymReg.
+If it has a pcc_sub_t entry, free all memory of that
+structure as well.
 
 =cut
 
@@ -1188,7 +1190,7 @@ free_sym(ARGMOD(SymReg *r))
 
 =item C<void create_symhash>
 
-RT#48260: Not yet documented!!!
+Create a symbol hash table with space for 16 entries.
 
 =cut
 
@@ -1197,7 +1199,7 @@ RT#48260: Not yet documented!!!
 void
 create_symhash(ARGOUT(SymHash *hash))
 {
-    hash->data    = (SymReg**)mem_sys_allocate_zeroed(16 * sizeof (SymReg*));
+    hash->data    = (SymReg **)mem_sys_allocate_zeroed(16 * sizeof (SymReg *));
     hash->size    = 16;
     hash->entries = 0;
 }
@@ -1206,7 +1208,7 @@ create_symhash(ARGOUT(SymHash *hash))
 
 =item C<static void resize_symhash>
 
-RT#48260: Not yet documented!!!
+Resize a symbol hash table.
 
 =cut
 
@@ -1215,21 +1217,20 @@ RT#48260: Not yet documented!!!
 static void
 resize_symhash(ARGMOD(SymHash *hsh))
 {
-    SymHash nh;
-    const int new_size = hsh->size << 1;
-    int i;
+    SymHash nh;                          /* new symbol table */
+    const int new_size = hsh->size << 1; /* new size is twice as large */
+    int i;                               /* for loop index */
     SymReg ** next_r;
     int n_next;
 
-    nh.data = mem_allocate_n_zeroed_typed(new_size, SymReg*);
+    nh.data = mem_allocate_n_zeroed_typed(new_size, SymReg *);
     n_next  = 16;
-    next_r  = mem_allocate_n_zeroed_typed(n_next, SymReg*);
+    next_r  = mem_allocate_n_zeroed_typed(n_next, SymReg *);
 
     for (i = 0; i < hsh->size; i++) {
-        SymReg *r;
-        SymReg *next;
-        int j = 0;
-        int k;
+        SymReg *r, *next;
+        int j = 0, k;
+
         for (r = hsh->data[i]; r; r = next) {
             next = r->next;
             /*
@@ -1248,15 +1249,18 @@ resize_symhash(ARGMOD(SymHash *hsh))
         for (k = 0; k < j; ++k) {
             int new_i;
             r              = next_r[k];
+            /* recompute hash for this symbol: */
             new_i          = hash_str(r->name) % new_size;
             r->next        = nh.data[new_i];
             nh.data[new_i] = r;
         }
     }
 
+    /* free memory of old hash table */
     mem_sys_free(hsh->data);
     mem_sys_free(next_r);
 
+    /* let the hashtable's data pointers point to the new data */
     hsh->data = nh.data;
     hsh->size = new_size;
 }
@@ -1291,7 +1295,7 @@ _store_symreg(ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
 
 =item C<void store_symreg>
 
-RT#48260: Not yet documented!!!
+Wrapper for _store_symreg.
 
 =cut
 
@@ -1397,7 +1401,9 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
 
 =item C<SymReg * find_sym>
 
-RT#48260: Not yet documented!!!
+Wrapper for _find_sym; only if there's a current
+IMC_Unit, will _find_sym be invoked; otherwise NULL
+is returned.
 
 =cut
 
@@ -1420,7 +1426,8 @@ find_sym(PARROT_INTERP, ARGIN(const char *name))
 
 =item C<void clear_sym_hash>
 
-RT#48260: Not yet documented!!!
+Free all memory of the symbols in the specified
+hash table.
 
 =cut
 
@@ -1455,7 +1462,7 @@ clear_sym_hash(ARGMOD(SymHash *hsh))
 
 =item C<void debug_dump_sym_hash>
 
-RT#48260: Not yet documented!!!
+Print all identifiers in the specified hash table.
 
 =cut
 
@@ -1535,7 +1542,7 @@ clear_globals(PARROT_INTERP)
 
 =item C<unsigned int hash_str>
 
-RT#48260: Not yet documented!!!
+Compute the hash value for the string argument.
 
 =cut
 
