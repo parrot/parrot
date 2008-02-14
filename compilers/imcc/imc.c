@@ -52,7 +52,8 @@ extern FILE* yyin;
 
 =item C<void imc_compile_all_units>
 
-RT#48260: Not yet documented!!!
+Compile all imc_units, and free all memory of instructions
+and structures afterwards.
 
 =cut
 
@@ -62,6 +63,7 @@ PARROT_API
 void
 imc_compile_all_units(PARROT_INTERP)
 {
+    /* compile all units created during the parse */
     IMC_Unit *unit;
 #if ! COMPILE_IMMEDIATE
     for (unit = IMCC_INFO(interp)->imc_units; unit;) {
@@ -71,8 +73,10 @@ imc_compile_all_units(PARROT_INTERP)
     }
 #endif
     emit_close(interp, NULL);
-    /* All done with compilation, now free instructions and other structures */
 
+    /* All done with compilation, now free all memory allocated
+     * for instructions and other structures.
+     */
     for (unit = IMCC_INFO(interp)->imc_units; unit;) {
         IMC_Unit * const unit_next = unit->next;
         Instruction *ins;
@@ -215,7 +219,7 @@ imc_close_unit(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 
 =item C<static void imc_free_unit>
 
-RT#48260: Not yet documented!!!
+Free all memory allocated of an IMC_Unit structure.
 
 =cut
 
