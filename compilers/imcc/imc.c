@@ -11,7 +11,7 @@ compilers/imcc/imc.c
 
 =head1 DESCRIPTION
 
-Main entry point and top level of IMCC compiler.
+Routines for handling imc_units, which represent subs.
 
 Moved all register allocation and spill code to reg_alloc.c
 
