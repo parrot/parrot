@@ -1184,7 +1184,7 @@ id_list :
 id_list_id :
      IDENTIFIER opt_unique_reg
      {
-         IdList* const l = mem_allocate_n_zeroed_typed(1,IdList);
+         IdList* const l = mem_allocate_n_zeroed_typed(1, IdList);
          l->id           = $1;
          l->unique_reg   = $2;
          $$ = l;
