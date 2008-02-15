@@ -1245,6 +1245,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     opcode_t  size;
     int       key_length;     /* P0["hi;there"; S0; 2] has length 3 */
     int       k;
+    SymReg   *reg;
 
     /* 0 is length */
     opcode_t *pc = key + 1;
@@ -1253,7 +1254,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     char     *s  = s_key;
     *s           = 0;
 
-    SymReg *reg  = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
+    reg          = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         SymReg *r = reg;
