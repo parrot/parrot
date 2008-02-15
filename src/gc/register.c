@@ -465,8 +465,8 @@ Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
         const int extend_size = slot + 1;
         int i;
 
-        interp->ctx_mem.free_list = (void **)mem_sys_realloc(
-                interp->ctx_mem.free_list, extend_size * sizeof (void*));
+        interp->ctx_mem.free_list = mem_realloc_n_typed(
+                interp->ctx_mem.free_list, extend_size, void*);
 
         for (i = interp->ctx_mem.n_free_slots; i < extend_size; ++i)
             interp->ctx_mem.free_list[i] = NULL;
