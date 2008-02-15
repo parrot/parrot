@@ -43,14 +43,7 @@ Call Interface.  The function is defined as:-
 
     # Invoke MessageBoxA.
     .local int retVal
-    .begin_call
-        .arg phWnd
-        .arg message
-        .arg caption
-        .arg style
-        .nci_call MessageBoxA
-        .result retVal
-    .end_call
+    retVal = MessageBoxA(phWnd, message, caption, style)
 
     # That's all, folks.
     end
