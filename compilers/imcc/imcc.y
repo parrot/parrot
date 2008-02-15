@@ -295,7 +295,8 @@ INS_LABEL(PARROT_INTERP, IMC_Unit *unit, ARGMOD(SymReg *r0), int emit)
     return ins;
 }
 
-static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0) {
+static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0)
+{
     Instruction * const i = INS_LABEL(interp, unit, r0, 1);
     i->line               = IMCC_INFO(interp)->line;
 
@@ -304,7 +305,8 @@ static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0) {
 }
 
 static Instruction *
-iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r)) {
+iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r))
+{
     Instruction * const i =iLABEL(interp, unit, r);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
@@ -356,7 +358,8 @@ iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
 }
 
 static const char *
-inv_op(const char *op) {
+inv_op(const char *op)
+{
     int n;
     return get_neg_op(op, &n);
 }
@@ -501,7 +504,8 @@ add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, const char *name,
 }
 
 static void
-adv_named_set(PARROT_INTERP, char *name) {
+adv_named_set(PARROT_INTERP, char *name)
+{
     if (IMCC_INFO(interp)->adv_named_id) {
         IMCC_fataly(interp, E_SyntaxError,
                     "Named parameter with more than one name.\n");
