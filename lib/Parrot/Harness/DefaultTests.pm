@@ -67,6 +67,7 @@ our @developing_tests = (
         check_toxxx.t
         copyright.t
         c_cppcomments.t
+        c_operator.t
         c_cuddled_else.t
         filenames.t
         gmt_utc.t
