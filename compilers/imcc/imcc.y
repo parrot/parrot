@@ -295,8 +295,7 @@ INS_LABEL(PARROT_INTERP, IMC_Unit *unit, ARGMOD(SymReg *r0), int emit)
     return ins;
 }
 
-static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0)
-{
+static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0) {
     Instruction * const i = INS_LABEL(interp, unit, r0, 1);
     i->line               = IMCC_INFO(interp)->line;
 
@@ -305,8 +304,7 @@ static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0)
 }
 
 static Instruction *
-iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r))
-{
+iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r)) {
     Instruction * const i =iLABEL(interp, unit, r);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
@@ -358,8 +356,7 @@ iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
 }
 
 static const char *
-inv_op(const char *op)
-{
+inv_op(const char *op) {
     int n;
     return get_neg_op(op, &n);
 }
@@ -504,8 +501,7 @@ add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, const char *name,
 }
 
 static void
-adv_named_set(PARROT_INTERP, char *name)
-{
+adv_named_set(PARROT_INTERP, char *name) {
     if (IMCC_INFO(interp)->adv_named_id) {
         IMCC_fataly(interp, E_SyntaxError,
                     "Named parameter with more than one name.\n");
@@ -688,9 +684,7 @@ hll_def: HLL STRINGC COMMA STRINGC
 constdef:
      CONST { is_def = 1; } type IDENTIFIER '=' const
                 {
-                    SymReg *ignored;
-                    ignored = mk_const_ident(interp, $4, $3, $6, 1);
-                    UNUSED(ignored);
+                    mk_const_ident(interp, $4, $3, $6, 1);
                     mem_sys_free($4);
                     is_def = 0;
                 }
@@ -1190,9 +1184,9 @@ id_list :
 id_list_id :
      IDENTIFIER opt_unique_reg
      {
-         IdList* l = (IdList*)malloc(sizeof (IdList));
-         l->id         = $1;
-         l->unique_reg = $2;
+         IdList* const l = mem_allocate_n_zeroed_typed(1,IdList);
+         l->id           = $1;
+         l->unique_reg   = $2;
          $$ = l;
      }
    ;
@@ -1213,12 +1207,10 @@ labeled_inst:
          IdList *l = $4;
          while (l) {
              IdList *l1;
-             SymReg *ignored;
              if (l->unique_reg)
-                 ignored = mk_ident_ur(interp, l->id, $3);
+                 mk_ident_ur(interp, l->id, $3);
              else
-                 ignored = mk_ident(interp, l->id, $3);
-             UNUSED(ignored);
+                 mk_ident(interp, l->id, $3);
              l1 = l;
              l  = l->next;
              mem_sys_free(l1->id);
@@ -1232,9 +1224,7 @@ labeled_inst:
                     }
    | CONST { is_def=1; } type IDENTIFIER '=' const
                     {
-                        SymReg *ignored;
-                        ignored = mk_const_ident(interp, $4, $3, $6, 0);
-                        UNUSED(ignored);
+                        mk_const_ident(interp, $4, $3, $6, 0);
                         is_def=0;
                         mem_sys_free($4);
                     }
@@ -1242,9 +1232,7 @@ labeled_inst:
    | pmc_const
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
                     {
-                        SymReg *ignored;
-                        ignored = mk_const_ident(interp, $4, $3, $6, 1);
-                        UNUSED(ignored);
+                        mk_const_ident(interp, $4, $3, $6, 1);
                         is_def=0;
                         mem_sys_free($4);
                     }
@@ -1681,7 +1669,7 @@ int yyerror(void *yyscanner, PARROT_INTERP, const char *s)
      * token was already read), yyget_text will return a pointer
      * outside the bison buffer, and thus, not "accessible" by
      * us. This means it may segfault. */
-    char *chr = yyget_text((yyscan_t)yyscanner);
+    const char * const chr = yyget_text((yyscan_t)yyscanner);
 
     /* IMCC_fataly(interp, E_SyntaxError, s); */
     /* --- This was called before, not sure if I should call some
