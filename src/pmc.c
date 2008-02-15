@@ -392,15 +392,9 @@ pmc_register(PARROT_INTERP, ARGIN(STRING *name))
     if (type > enum_type_undef)
         return type;
 
-    if (type < enum_type_undef) {
-        if (type < 0)
-            real_exception(interp, NULL, 1,
-                "undefined type already exists - can't register PMC");
-
+    if (type < enum_type_undef)
         real_exception(interp, NULL, 1,
-            "native type with name '%s' already exists - can't register PMC",
-            data_types[type].name);
-    }
+            "undefined type already exists - can't register PMC");
 
     classname_hash = interp->class_hash;
     type           = interp->n_vtable_max++;
