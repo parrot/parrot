@@ -584,7 +584,7 @@ Makes a new identifier.
 */
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 SymReg *
 mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
@@ -622,7 +622,7 @@ RT#48260: Not yet documented!!!
 */
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 SymReg*
 mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
 {
@@ -699,8 +699,8 @@ Makes a new identifier constant with value val
 
 */
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_IGNORABLE_RESULT
 SymReg *
 mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
         ARGMOD(SymReg *val), int global)

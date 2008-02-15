@@ -261,8 +261,8 @@ SymReg * mk_const(PARROT_INTERP, ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_IGNORABLE_RESULT
 SymReg * mk_const_ident(PARROT_INTERP,
     ARGIN(const char *name),
     int t,
@@ -274,13 +274,13 @@ SymReg * mk_const_ident(PARROT_INTERP,
         FUNC_MODIFIES(*val);
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 SymReg * mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 SymReg* mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
