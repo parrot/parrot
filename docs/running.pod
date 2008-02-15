@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -11,7 +11,7 @@ $Revision$
 
 =head1 OVERVIEW
 
-This document describes parrot's command line options.
+This document describes Parrot's command line options.
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ This document describes parrot's command line options.
 
 =item PARROT_RUNTIME
 
-If this environment variable is set, parrot will use this path as runtime
+If this environment variable is set, parrot will use this path as its runtime
 prefix instead of the compiled in path.
 
 =item PARROT_GC_DEBUG
@@ -69,25 +69,25 @@ Print debugging and tracing flag bits summary.
 =item -o outputfile, --output=outputfile
 
 Act like an assembler. Don't run code, unless B<-r> is given too. If the
-outputfile ends with B<.pbc>, a PBC file is written. If it ends with B<.pasm>,
+outputfile ends with F<.pbc>, a PBC file is written. If it ends with F<.pasm>,
 a PASM output is generated, even from PASM input. This can be handy to check
-various optimizations, including B<-Op>.
+various optimizations, including C<-Op>.
 
 =item --output-pbc
 
 Act like an assembler, but always output bytecode, even if the output file does
-not end in B<.pbc>
+not end in F<.pbc>
 
 =item -r, --run-pbc
 
-Only useful after B<-o> or B<--output-pbc>. Run the program from the compiled
-in-memory image. If two B<-r> options are given, the B<.pbc> file is read from
+Only useful after C<-o> or C<--output-pbc>. Run the program from the compiled
+in-memory image. If two C<-r> options are given, the F<.pbc> file is read from
 disc and run. This is mainly needed for tests.
 
 =item -v, --verbose
 
-One B<-v> shows which files are worked on and prints a summary over register
-usage and optimization stats per I<compilation unit>.  With two B<-v> switches,
+One C<-v> shows which files are worked on and prints a summary over register
+usage and optimization stats per I<compilation unit>.  With two C<-v> switches,
 C<parrot> prints a line per individual processing step too.
 
 =item -y, --yydebug
@@ -110,12 +110,12 @@ Optimize
  -Ot select fastest runcore (default with -O1 and -O2)
  -Oc turns on the optional/experimental tail call optimizations
 
-See F<docs/imcc/operation.pod> for more information on the optimizer.  NB.
-Optimization is currently experimental and these options are likely to change.
+See F<docs/dev/optimizer.pod> for more information on the optimizer.  Note that
+optimization is currently experimental and these options are likely to change.
 
 =item -E, --pre-process-only
 
-Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
+Preprocess source file (expand macros) and print result to stdout:
 
   $ parrot -E t/op/macro_10.pasm
   $ parrot -E t/op/macro_10.pasm | parrot -- -
@@ -124,8 +124,8 @@ Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
 
 =head2 Runcore Options
 
-These options select the runcore, which is useful for performance
-tuning and debugging.  See L<About runcores> below for details.
+These options select the runcore, which is useful for performance tuning and
+debugging.  See L<About runcores> for details.
 
 =over 4
 
@@ -176,8 +176,8 @@ TODO:  This needs to be documented briefly here and also in glossary.pod.
 
 =item -t, --trace
 
-Run with the slow core and print trace information to B<stderr>. See 'parrot
---help-debug' for available flag bits.
+Run with the slow core and print trace information to B<stderr>. See C<parrot
+--help-debug> for available flag bits.
 
 =back
 
@@ -187,11 +187,11 @@ Run with the slow core and print trace information to B<stderr>. See 'parrot
 
 =item -w, --warnings
 
-Turn on warnings. See 'parrot --help-debug' for available flag bits.
+Turn on warnings. See C<parrot --help-debug> for available flag bits.
 
 =item -D, --parrot-debug
 
-Turn on interpreter debug flag. See 'parrot --help-debug' for available flag
+Turn on interpreter debug flag. See C<parrot --help-debug> for available flag
 bits.
 
 =item --gc-debug
@@ -207,11 +207,13 @@ is no longer recycled, it may quickly become exhausted.
 
 =item --leak-test, --destroy-at-end
 
-Free all memory of the last interpreter, so that leak checkers can be run.
+Free all memory of the last interpreter.  This is useful when running leak
+checkers.
 
 =item -., --wait
 
-Read a keystroke before starting.
+Read a keystroke before starting.  This is useful when you want to attach a
+debugger on platforms such as Windows.
 
 =item --runtime-prefix
 
@@ -221,13 +223,13 @@ Print the runtime prefix path and exit.
 
 =head2 <file>
 
-If the file ends in B<.pbc> it will be interpreted immediately.
+If the file ends in F<.pbc> it will be interpreted immediately.
 
-If the file ends in B<.pasm>, then it is parsed as PASM code. Otherwise, it is
-parsed as PIR code. In both cases, it will then be run, unless the B<-o> flag
+If the file ends in F<.pasm>, then it is parsed as PASM code. Otherwise, it is
+parsed as PIR code. In both cases, it will then be run, unless the C<-o> flag
 was given.
 
-If the B<file> is a single dash, input from B<stdin> is read.
+If the C<file> is a single dash, input from C<stdin> is read.
 
 =head2 [arguments ...]
 
@@ -239,63 +241,60 @@ assumed to know what to do with these.
 If JIT debugging is enabled (e.g. via C<--parrot-debug 04>), the
 following additional output files are generated:
 
-  file.stabs.s ... stabsfile for the program
-  file.o ... object file with debug information
-  EVAL_n ... source of B<compile> op number I<n>
-  EVAL_n.stabs.s ... stabsfile for this block
-  EVAL_n.o ... object file with debug information
+  F<file.stabs.s>     stabsfile for the program
+  F<file.o>           object file with debug information
+  F<EVAL_n>           source of C<compile> op number I<n>
+  F<EVAL_n.stabs.s>   stabsfile for this block
+  F<EVAL_n.o>         object file with debug information
 
 See F<docs/jit.pod> for further information.
 
 =head1 About runcores
 
-The runcore (or runloop) tells Parrot how to find the C code that
-implements each instruction.  Parrot provides more than one way to do
-this, partly because it is expected that no one runcore will perform
-optimally on all architectures (or even for all problems on a given
-architecture), and partly because some of the runcores are specialized
-for debugging.
+The runcore (or runloop) tells Parrot how to find the C code that implements
+each instruction.  Parrot provides more than one way to do this, partly because
+no single runcore will perform optimally on all architectures (or even for all
+problems on a given architecture), and partly because some of the runcores have
+specific debugging and tracing capabilities.
 
 In the default "slow" runcore, each opcode is a separate C function.
 That's pretty easy in pseudocode:
 
-	slow_runcore( op ):
-		while ( op ):
-			op = op_function( op )
-			check_for_events()
+    slow_runcore( op ):
+        while ( op ):
+            op = op_function( op )
+            check_for_events()
 
 The GC debugging runcore is similar:
 
-	gcdebug_runcore( op ):
-		while ( op ):
-			perform_full_gc_run()
-			op = op_function( op )
-			check_for_events()
+    gcdebug_runcore( op ):
+        while ( op ):
+            perform_full_gc_run()
+            op = op_function( op )
+            check_for_events()
 
-Of course, this is much slower, but is extremely helpful for pinning
-memory corruption problems that affect GC down to single-instruction
-resolution.  See
+Of course, this is much slower, but is extremely helpful for pinning memory
+corruption problems that affect GC down to single-instruction resolution.  See
 L<http://www.oreillynet.com/onlamp/blog/2007/10/debugging_gc_problems_in_parro.html>
 for more information.
 
 The trace and profile cores are also based on the "slow" core, doing
 full bounds checking, and also printing runtime information to stderr.
 
-The switched core eschews a bunch of tiny op functions in favor of
-cases in a large switch statement:
+The switched core eschews these tiny op functions in favor of cases in a large
+switch statement:
 
-	switch_runcore( op ):
-		while ( op ):
-			switch *op:
-				case NOP:
-					...
-				case STORE:
-					...
-				...
+    switch_runcore( op ):
+        while ( op ):
+            switch *op:
+                case NOP:
+                    ...
+                case STORE:
+                    ...
+                ...
 
-Depending on the C compiler implementation, this may be faster than
-function calling.  On older systems, it may fail to compile
-altogether.
+Depending on the C compiler implementation, this may be faster than function
+calling.  On older systems, it may fail to compile altogether.
 
 The computed-goto ("cgoto") runcore avoids the overhead of function
 calls by jumping directly to the address where each opcode's function
@@ -311,20 +310,20 @@ but run JIT code when possible.
 
 =head1 Operation table
 
- Command line		Action		Output
+ Command Line          Action         Output
  ---------------------------------------------
- parrot x.pir		run
- parrot x.pasm		run
- parrot x.pbc		run
- -o x.pasm x.pir	ass		x.pasm
- -o x.pasm y.pasm	ass		x.pasm
- -o x.pbc  x.pir	ass		x.pbc
- -o x.pbc  x.pasm	ass		x.pbc
- -o x.pbc -r x.pasm	ass/run pasm	x.pbc
- -o x.pbc -r -r x.pasm	ass/run pbc	x.pbc
- -o x.o    x.pbc        obj
+ parrot x.pir          run
+ parrot x.pasm         run
+ parrot x.pbc          run
+ -o x.pasm x.pir       ass            x.pasm
+ -o x.pasm y.pasm      ass            x.pasm
+ -o x.pbc  x.pir       ass            x.pbc
+ -o x.pbc  x.pasm      ass            x.pbc
+ -o x.pbc -r x.pasm    ass/run pasm   x.pbc
+ -o x.pbc -r -r x.pasm ass/run pbc    x.pbc
+ -o x.o    x.pbc       obj
 
-Actions above are:
+... where the possible actions are:
 
   run ... yes, run the program
   ass ... assemble sourcefile
