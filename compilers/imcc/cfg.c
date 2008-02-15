@@ -630,7 +630,7 @@ bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
 
 =item C<static void free_edge>
 
-RT#48260: Not yet documented!!!
+Free the memory of an IMC_Unit's edge list.
 
 =cut
 
@@ -653,7 +653,7 @@ free_edge(ARGMOD(IMC_Unit *unit))
 
 =item C<int edge_count>
 
-RT#48260: Not yet documented!!!
+Count the number of edges in the specified IMC_Unit.
 
 =cut
 
@@ -677,7 +677,8 @@ edge_count(ARGIN(const struct _IMC_Unit *unit))
 
 =item C<void life_analysis>
 
-RT#48260: Not yet documented!!!
+Driver routine to call analyse_life_symbol for each
+reglist in the specified IMC_Unit.
 
 =cut
 
@@ -762,7 +763,7 @@ analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
 
 =item C<void free_life_info>
 
-RT#48260: Not yet documented!!!
+Free memory of the life analysis info structures.
 
 =cut
 
