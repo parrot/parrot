@@ -329,7 +329,7 @@ is_all_hex_digits(ARGIN(const char *s))
 /* most stolen from test_main.c */
 /*
 
-=item C<char * parseflags>
+=item C<const char * parseflags>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -339,8 +339,8 @@ Parse Parrot's command line for options and set appropriate flags.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-char *
-parseflags(PARROT_INTERP, int *argc, char **argv[])
+const char *
+parseflags(PARROT_INTERP, int *argc, const char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int   status;
