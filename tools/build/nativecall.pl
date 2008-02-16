@@ -90,7 +90,7 @@ my %proto_type = (
 my %fix_name = ( '@' => 'xAT_' );
 
 my %other_decl = (
-    p => "PMC *final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
+    p => "PMC * const final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
     t => "STRING *final_destination;"
 
         #     b => "Buffer *final_destination =
@@ -309,7 +309,7 @@ sub print_head {
  * helper funcs - get argument n
  */
 static INTVAL
-get_nci_I(PARROT_INTERP, NOTNULL(call_state *st), int n)
+get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     if (n >= st->src.n) {
         real_exception(interp, NULL, E_ValueError,
@@ -321,7 +321,7 @@ get_nci_I(PARROT_INTERP, NOTNULL(call_state *st), int n)
 }
 
 static FLOATVAL
-get_nci_N(PARROT_INTERP, NOTNULL(call_state *st), int n)
+get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     if (n >= st->src.n) {
         real_exception(interp, NULL, E_ValueError,
@@ -335,7 +335,7 @@ get_nci_N(PARROT_INTERP, NOTNULL(call_state *st), int n)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-get_nci_S(PARROT_INTERP, NOTNULL(call_state *st), int n)
+get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     /* TODO or act like below? */
     if (n >= st->src.n) {
@@ -350,7 +350,7 @@ get_nci_S(PARROT_INTERP, NOTNULL(call_state *st), int n)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-get_nci_P(PARROT_INTERP, NOTNULL(call_state *st), int n)
+get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     /*
      * exessive args are passed as NULL
