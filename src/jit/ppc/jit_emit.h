@@ -877,13 +877,13 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 static void
 jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
-    PMC *sig_pmc;
-    INTVAL *sig_bits, i, n;
+    PMC    *sig_pmc  = CONTEXT(interp->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    INTVAL *sig_bits = PMC_data_typed(sig_pmc, INTVAL *);
+    INTVAL  n        = PMC_int_val(sig_pmc);
+    INTVAL  i;
 
-    sig_pmc = CONTEXT(interp->ctx)->constants[CUR_OPCODE[1]]->u.key;
-    sig_bits = PMC_data(sig_pmc);
-    n = PMC_int_val(sig_pmc);
     jit_info->n_args = n;
+
     for (i = 0; i < n; ++i) {
         switch (sig_bits[i] & PARROT_ARG_TYPE_MASK) {
             case PARROT_ARG_INTVAL:
