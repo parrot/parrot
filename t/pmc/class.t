@@ -18,7 +18,6 @@ Tests the Class PMC.
 
 
 .const int TESTS = 49
-.include 'pmcinfo.pasm'
 
 
 .sub 'main' :main
