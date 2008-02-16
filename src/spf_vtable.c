@@ -275,12 +275,10 @@ getfloat_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
         return (HUGEFLOATVAL)(double)va_arg(*arg, double);
 
     case SIZE_HUGE:
-        return (HUGEFLOATVAL)(HUGEFLOATVAL)
-                va_arg(*arg, HUGEFLOATVAL);
+        return (HUGEFLOATVAL)(HUGEFLOATVAL) va_arg(*arg, HUGEFLOATVAL);
 
     case SIZE_XVAL:
-        return (HUGEFLOATVAL)(FLOATVAL)
-                va_arg(*arg, FLOATVAL);
+        return (HUGEFLOATVAL)(FLOATVAL) va_arg(*arg, FLOATVAL);
 
     case SIZE_PMC:{
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
@@ -291,7 +289,6 @@ getfloat_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
         real_exception(interp, NULL, INVALID_CHARACTER,
                 "Internal sprintf doesn't recognize size %d for a float",
                 size);
-        return (HUGEFLOATVAL)0.0;
     }
 }
 
