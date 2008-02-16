@@ -74,10 +74,6 @@ See RT #48569.
 
 See RT #47011.
 
-=item * C<class_type> [post 0.5.1]
-
-See RT #48142.
-
 =item * C<pmc_namespace>  [post 0.5.1]
 
 See RT# 48144. Replaced by C<get_namespace>.
