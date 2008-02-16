@@ -405,7 +405,7 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
 
     pt_DOD_mark_root_finished(interp);
 
-    while (1) {
+    do {
         const UINTVAL bits = PObj_get_FLAGS(current) & mask;
         PMC *next;
 
@@ -446,9 +446,7 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
             break;
 
         current = next;
-        if (--how_many == 0)
-            break;
-    } /* endless while */
+    } while (--how_many > 0);
 
     arena_base->dod_mark_start = current;
     arena_base->dod_trace_ptr  = NULL;
