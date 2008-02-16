@@ -285,7 +285,6 @@ pt_shared_fixup(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (type_num == enum_type_undef) {
         UNLOCK_INTERPRETER(master);
         real_exception(interp, NULL, 1, "pt_shared_fixup: unsharable type");
-        return PMCNULL;
     }
 
     pmc->vtable = master->vtables[type_num];
