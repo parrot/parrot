@@ -32,7 +32,7 @@ my %default_tests_seen;
 my $cwd = cwd();
 {
     # Simulate non-existence of DEVELOPING
-    my $tdir1 = tempdir();
+    my $tdir1 = tempdir( CLEANUP => 1 );
     ok( chdir $tdir1, "Able to change to tempdir for testing");
 
     ($core_tests_only, $runcore_tests_only) = (0,1);
@@ -71,7 +71,7 @@ my $cwd = cwd();
 
 {
     # Simulate existence of DEVELOPING
-    my $tdir2 = tempdir();
+    my $tdir2 = tempdir( CLEANUP => 1 );
     ok( chdir $tdir2, "Able to change to tempdir for testing");
     open my $FH, ">", q{DEVELOPING}
         or croak "Unable to open file for writing";
