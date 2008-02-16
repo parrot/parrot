@@ -385,27 +385,6 @@ op instantiate(out PMC) {
   goto NEXT();
 }
 
-=item B<pmcinfo>(out INT, invar PMC, inconst INT)
-
-Extract some information about PMC $2 and store it in $1.
-Possible values for $3 are:
-
-=over 4
-
-=item .PMCINFO_FLAGS Get the PMC's flags.
-
-=back
-
-RT#42375 move/officalize this opcode at next op cleanup.
-
-=cut
-
-op pmcinfo(out INT, invar PMC, inconst INT) {
-  if ($3 == PMCINFO_FLAGS)
-      $1 = PObj_get_FLAGS($2);
-  goto NEXT();
-}
-
 ########################################
 
 =item B<add_io_event>(invar PMC, invar PMC, invar PMC, inconst INT)

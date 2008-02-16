@@ -96,14 +96,6 @@ void dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 
 /* HEADERIZER END: src/pmc.c */
 
-/* pmcinfo parameters */
-
-/* &gen_from_def(pmcinfo.pasm) */
-
-#define PMCINFO_FLAGS    4      /* see also STRINGINFO_FLAGS */
-
-/* &end_gen */
-
 #endif /* PARROT_PMC_H_GUARD */
 
 /*

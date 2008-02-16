@@ -128,10 +128,6 @@ See RT #47976.
 
 See RT #48310.
 
-=item * C<pmcinfo> [post 0.5.2]
-
-See RT #42375.
-
 =back
 
 =head1 Class Features
