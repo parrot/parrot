@@ -1876,7 +1876,7 @@ list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 {
     void *ret;
     UINTVAL idx;
-    List_chunk * const chunk = list->first;
+    List_chunk *chunk = list->first;
 
     if (list->length == 0)
         return NULL;
@@ -1889,6 +1889,7 @@ list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
     ret = list_item(interp, list, type, idx);
     if (list->start >= chunk->items) {
         list->cap -= chunk->items;
+        chunk = list->first = chunk->next ? chunk->next : list->last;
         list->start = 0;
         rebuild_chunk_list(interp, list);
         if (list->n_chunks == 1)
