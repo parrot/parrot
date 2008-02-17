@@ -180,7 +180,8 @@ Execute the SQL command and return a Pg;Result object.
     .param pmc res
     .local pmc o_res
     $P0 = get_class ['Pg';'Result']
-    o_res = new $P0, res
+    o_res = new $P0
+    setattribute o_res, 'res', res
     .return (o_res)
 .end
 
@@ -307,18 +308,6 @@ Install a notice receiver callback. The callback will be called as
 =head2 Result Methods
 
 =over
-
-=item __init(res)
-
-Object initializer. Takes a C<PGresult> structure.
-
-=cut
-
-.sub init_pmc :vtable :method
-    .param pmc res
-    setattribute self, 'res', res
-    need_finalize self
-.end
 
 =item __finalize()
 
