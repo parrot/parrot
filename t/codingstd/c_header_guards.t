@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -46,7 +46,7 @@ if (@ARGV) {
 }
 else {
     my %files = map { $_->path() => 1 } $DIST->c_header_files();
-    my $href = $DIST->generated_files();
+    my $href  = $DIST->generated_files();
 
     foreach my $file ( keys %$href ) {
         if ( $file =~ /\.h$/ ) {
@@ -56,9 +56,7 @@ else {
 
     # not all files should be subject to the coding standards
     foreach my $file ( keys %files ) {
-        if ( $DIST->is_c_exemption($file) ) {
-            delete $files{$file};
-        }
+        delete $files{$file} if $DIST->is_c_exemption($file);
     }
 
     @files = sort keys %files;
@@ -110,7 +108,7 @@ F: foreach my $file (@_) {
                     }
                 }
 
-                $ifndef = $1;
+                $ifndef         = $1;
                 $guardnames{$1} = $file;
             }
 
@@ -130,38 +128,35 @@ F: foreach my $file (@_) {
         $missing_comment{$file} = 1 unless defined $endif;
     }
 
-    ok( !( scalar %collisions ), "identical PARROT_*_GUARD macro names used in headers" );
-    diag( "collisions: \n" . join( ", \n", %collisions ) )
-        if scalar keys %collisions;
+    ok( !%collisions, "identical PARROT_*_GUARD macro names used in headers" )
+        or diag( "collisions: \n" . join( ", \n", %collisions ) );
 
-    ok( !( scalar %redundants ), "multiple PARROT_*_GUARD macros found in headers" );
-    diag( "redundants: \n" . join( ", \n", keys %redundants ) )
-        if scalar keys %redundants;
+    ok( !%redundants, "multiple PARROT_*_GUARD macros found in headers" )
+        or diag( "redundants: \n" . join( ", \n", keys %redundants ) );
 
-    ok( !( scalar %missing_guard ), "missing or misspelled PARROT_*_GUARD ifndef in headers" );
-    diag(     "missing guard: \n"
+    ok( !%missing_guard,
+        "missing or misspelled PARROT_*_GUARD ifndef in headers" )
+        or diag(     "missing guard: \n"
             . join( ", \n", sort keys %missing_guard )
             . "\nyou need to add a line like:\n"
             . "  #ifndef PARROT_*_GUARD\n"
-            . "at the top of the header." )
-        if scalar keys %missing_guard;
+            . "at the top of the header." );
 
-    ok( !( scalar %missing_define ), "missing or misspelled PARROT_*_GUARD define in headers" );
-    diag(     "missing define: \n"
+    ok( !%missing_define,
+        "missing or misspelled PARROT_*_GUARD define in headers" )
+        or diag(     "missing define: \n"
             . join( ", \n", sort keys %missing_define )
             . "\nyou need to add a line like:\n"
             . "  #define PARROT_*_GUARD\n"
-            . "at the top of the header." )
-        if scalar keys %missing_define;
+            . "at the top of the header." );
 
-    ok( !( scalar %missing_comment ),
-        "missing or misspelled PARROT_*_GUARD comment after the endif in headers" );
-    diag(     "missing endif comment: \n"
+    ok( !%missing_comment, "missing or misspelled PARROT_*_GUARD "
+        . "comment after the endif in headers" )
+        or diag(     "missing endif comment: \n"
             . join( ", \n", sort keys %missing_comment )
             . "\nyou need to add a line like:\n"
             . "  #endif /* PARROT_*_GUARD */\n"
-            . "at the end of the header." )
-        if scalar keys %missing_comment;
+            . "at the end of the header." );
 
     return 0;
 }
@@ -184,4 +179,3 @@ sub duplicate_files {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
