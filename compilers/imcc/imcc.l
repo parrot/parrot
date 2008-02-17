@@ -520,7 +520,7 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        char *macro_name = yytext + 1;
+        char *macro_name = str_dup(yytext + 1);
         const int type   = pmc_type(interp,
             string_from_cstring(interp, macro_name, 0));
 
@@ -531,13 +531,17 @@ SP              [ ]
 
             /* XXX: free valp->s if already used? Sounds like a good idea, but big segfaults if you do. */
             valp->s = buf;
+            mem_sys_free(macro_name);
             return INTC;
         }
 
         if (!expand_macro(valp, interp, macro_name, yyscanner)) {
+            mem_sys_free(macro_name);
             yyless(1);
             return DOT;
         }
+
+        mem_sys_free(macro_name);
     }
 
 <emit,INITIAL>{ID} {
