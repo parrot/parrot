@@ -1212,7 +1212,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
 /* move reg to mem (i.e. intreg) */
 static void
-jit_mov_mr_offs(Parrot_jit_info_t *jit_info, int base, INTVAL offs, int reg)
+jit_mov_mr_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info, int base,
+                INTVAL offs, int reg)
 {
     jit_emit_mov_mr_i(jit_info->native_ptr, offs, reg);
     /*
@@ -1225,14 +1226,16 @@ jit_mov_mr_offs(Parrot_jit_info_t *jit_info, int base, INTVAL offs, int reg)
 
 /* move mem (i.e. intreg) to reg */
 static void
-jit_mov_rm_offs(Parrot_jit_info_t *jit_info, int reg, int base, INTVAL offs)
+jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info, int reg, int base,
+                INTVAL offs)
 {
     jit_emit_mov_rm_i(jit_info->native_ptr, reg, offs);
 }
 
 /* move reg to mem (i.e. numreg) */
 static void
-jit_mov_mr_n_offs(Parrot_jit_info_t * jit_info, int base, INTVAL offs, int reg)
+jit_mov_mr_n_offs(PARROT_INTERP, Parrot_jit_info_t * jit_info, int base,
+                  INTVAL offs, int reg)
 {
     jit_emit_mov_mr_n(jit_info->native_ptr, offs, reg);
     jit_info->prev_op = 0;
@@ -1240,7 +1243,8 @@ jit_mov_mr_n_offs(Parrot_jit_info_t * jit_info, int base, INTVAL offs, int reg)
 
 /* move mem (i.e. numreg) to reg */
 static void
-jit_mov_rm_n_offs(Parrot_jit_info_t * jit_info, int reg, int base, INTVAL offs)
+jit_mov_rm_n_offs(PARROT_INTERP, Parrot_jit_info_t * jit_info, int reg,
+                  int base, INTVAL offs)
 {
     jit_emit_mov_rm_n(jit_info->native_ptr, reg, offs);
 }
