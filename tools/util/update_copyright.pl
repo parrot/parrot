@@ -23,7 +23,7 @@ use Parrot::Test;
 # Accept a little fuzz in the original copyright notice..
 my $copyright_re = qr/
   Copyright \s+ \(C\) \s+
-  (\d\d\d\d)\s*(?:-\s*\d\d\d\d) \s* ,? \s*
+  (\d\d\d\d)\s*(?:-\s*\d\d\d\d)? \s* ,? \s*
   The \s+ Perl \s+ Foundation\.
 /xi;
 
