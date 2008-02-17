@@ -428,15 +428,22 @@ sub main {
 
         $ofile =~ s/\\/\//g;
 
+        my $sfile = $ofile;
+        $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
+        next if -f $sfile;
+
         my $cfile = $ofile;
-        $cfile =~ s/\Q$PConfig{o}\E$/.c/ or die "$cfile doesn't look like an object file";
+        $cfile =~ s/\Q$PConfig{o}\E$/.c/
+            or die "$cfile doesn't look like an object file";
 
         my $pmcfile = $ofile;
         $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
 
         my $csource = read_file($cfile);
         die "can't find HEADERIZER HFILE directive in '$cfile'"
-            unless $csource =~ m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
+            unless $csource =~
+                m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
+
         my $hfile = $1;
         if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
             die "'$hfile' not found (referenced from '$cfile')";
