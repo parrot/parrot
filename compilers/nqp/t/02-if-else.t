@@ -1,4 +1,4 @@
-#!./parrot
+#!./parrot nqp.pbc
 
 # check control structure 'if ... else'
 

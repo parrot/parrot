@@ -1,4 +1,4 @@
-#!./parrot
+#!./parrot nqp.pbc
 
 # test optional arguments and parameters
 

@@ -1,4 +1,4 @@
-#!./parrot
+#!./parrot nqp.pbc
 
 # checking basic operands and circumfix:( )
 

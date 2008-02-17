@@ -1,4 +1,4 @@
-#!./parrot
+#!./parrot nqp.pbc
 
 # Testing boolean context operators, ! and ?
 
