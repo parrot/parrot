@@ -71,7 +71,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
     eval { my $l = SmartLink->new( link => $link ); };
     like(
         $@,
-        '/^Attribute \(link\) does not pass the type constraint \(PodLink\)/',
+        '/^Attribute \(link\) does not pass the type constraint(?: because: Validation failed for)? [(\']PodLink[\')]/',
         '->new fails with malformed smartlink'
     );
 
