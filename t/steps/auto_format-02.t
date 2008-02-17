@@ -57,7 +57,7 @@ ok($step->description(), "$step_name has description");
     auto::format::_set_floatvalfmt_nvsize($conf);
     is($conf->data->get( 'floatvalfmt' ), '%Lf',
         "floatvalfmt set as expected");
-    is($conf->data->get( 'nvsize' ), $conf->data->get( 'ldsize' ),
+    is($conf->data->get( 'nvsize' ), $conf->data->get( 'hugefloatvalsize' ),
         "nvsize set as expected");
     $conf->data->set(
         nv          => undef,
