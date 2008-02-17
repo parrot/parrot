@@ -1,4 +1,4 @@
-#!./parrot
+#!./parrot pynie.pbc
 
 # check literals
 
