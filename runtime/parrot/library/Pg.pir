@@ -75,13 +75,21 @@ A class method that returns a new connection object.
     connectdb = get_global 'PQconnectdb' 
     con = connectdb(args)
     $P0 = get_class ['Pg';'Conn']
-    o_con = new $P0, con
+
+    .local pmc init_data
+    init_data        = new 'Hash'
+    init_data['con'] = con
+    o_con            = new $P0, init_data
+
     # verify success
     .local int ok
     ok = o_con.'status'()
     if ok == CONNECTION_OK goto is_ok
-    con = new 'Undef'
-    o_con = new $I0, con
+
+    con              = new 'Undef'
+    init_data['con'] = con
+
+    o_con = new $P0, init_data
 is_ok:
     .return (o_con)
 .end
@@ -99,15 +107,20 @@ Object initializer. Takes a C<PGconn> structure.
 =cut
 
 .sub init_pmc :vtable :method
-    .param pmc con
+    .param pmc init
+
+    .local pmc con
+    con = init['con']
     setattribute self, 'con', con
 .end
 
 .sub get_bool :vtable :method
     .local pmc con
     con = getattribute self, 'con'
-    $I0 = typeof con
-    $I1 = isne $I0, .Undef
+
+    $I0 = isa con, 'Undef'
+    $I1 = not $I0
+
     .return ($I1)
 .end
 
