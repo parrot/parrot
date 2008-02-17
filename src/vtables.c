@@ -94,7 +94,7 @@ Parrot_destroy_vtable(SHIM_INTERP, ARGMOD(VTABLE *vtable))
 
 =item C<void parrot_alloc_vtables>
 
-RT#48260: Not yet documented!!!
+Allocate memory for the vtables for all known classes (PMC types).
 
 =cut
 
@@ -112,7 +112,7 @@ parrot_alloc_vtables(PARROT_INTERP)
 
 =item C<void parrot_realloc_vtables>
 
-RT#48260: Not yet documented!!!
+Reallocate memory for vtables, increasing the number of vtables by 16.
 
 =cut
 
@@ -138,7 +138,9 @@ parrot_realloc_vtables(PARROT_INTERP)
 
 =item C<void parrot_free_vtables>
 
-RT#48260: Not yet documented!!!
+Free memory allocated for the vtables. Each vtable is destroyed
+through its destructor Parrot_destroy_vtable, after which the list
+of pointers to these vtables is freed.
 
 =cut
 
@@ -159,7 +161,7 @@ parrot_free_vtables(PARROT_INTERP)
 
 =item C<void mark_vtables>
 
-RT#48260: Not yet documented!!!
+Mark all vtables as being alive for the garbage collector.
 
 =cut
 
