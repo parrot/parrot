@@ -24,7 +24,7 @@ use Parrot::Test;
 my $copyright_re = qr/
   Copyright \s+ \(C\) \s+
   (\d\d\d\d)\s*(?:-\s*\d\d\d\d)? \s* ,? \s*
-  The \s+ Perl \s+ Foundation\.
+  The \s+ Perl \s+ Foundation\.?
 /xi;
 
 my $year = (localtime())[5]+1900;
