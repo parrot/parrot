@@ -109,7 +109,7 @@ These are used with the Parrot_call_sub family of functions.
 
 =over 4
 
-=item C<Parrot_Interp Parrot_Interp Parrot_new(Parrot_Interp parent)>
+=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
 
 Creates a new interpreter, inheriting some data structures from a parent
 interpreter, if supplied.  The first interpreter in any process should be
