@@ -213,7 +213,7 @@ Lookup a class object from a namespace, string, or key PMC.
 =cut
 
 */
-
+PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
