@@ -232,6 +232,7 @@ PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
