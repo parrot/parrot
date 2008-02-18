@@ -55,10 +55,6 @@ static void do_initcall(PARROT_INTERP,
     ARGIN_NULLOK(PMC *init))
         __attribute__nonnull__(1);
 
-static void fail_if_exist(PARROT_INTERP, ARGIN(PMC *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -541,47 +537,6 @@ readable_name(PARROT_INTERP, ARGIN(PMC *name))
 
 /*
 
-=item C<static void fail_if_exist>
-
-Throws an exception if a PMC or class with the same name already exists.
-
-RT#45969 uses global class registry
-
-RT#50644: this function seems to be the same as fail_if_type_exists in this file.
-
-=cut
-
-*/
-
-static void
-fail_if_exist(PARROT_INTERP, ARGIN(PMC *name))
-{
-    INTVAL      type;
-
-    PMC * const classname_hash = interp->class_hash;
-    PMC * const type_pmc       = (PMC *)VTABLE_get_pointer_keyed(interp,
-                                        classname_hash, name);
-    if (PMC_IS_NULL(type_pmc) ||
-            type_pmc->vtable->base_type == enum_class_NameSpace)
-        type = 0;
-    else
-        type = VTABLE_get_integer(interp, type_pmc);
-
-    if (type > enum_type_undef) {
-        /* RT#45971 get printable name */
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "Class %Ss already registered!\n",
-                VTABLE_get_string(interp, name));
-    }
-
-    if (type < enum_type_undef)
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "native type with name '%s' already exists - "
-                "can't register Class", data_types[type].name);
-}
-
-/*
-
 =item C<static void rebuild_attrib_stuff>
 
 Take the class and completely rebuild the attribute stuff for
@@ -806,7 +761,7 @@ Parrot_single_subclass(PARROT_INTERP, ARGIN(PMC *base_class), ARGIN_NULLOK(PMC *
 
     /* Set the classname, if we have one */
     if (!PMC_IS_NULL(name)) {
-        fail_if_exist(interp, name);
+        fail_if_type_exists(interp, name);
     }
     else {
         /* RT#45975 not really threadsafe but good enough for now */
