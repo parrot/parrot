@@ -162,6 +162,13 @@ const char* Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx);
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -231,13 +238,6 @@ PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-PARROT_API
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
