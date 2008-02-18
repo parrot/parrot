@@ -223,7 +223,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
 {
     UINTVAL  i;
     PObj    *object;
-    UINTVAL  num_objects = pool->objects_per_alloc;
+    const UINTVAL num_objects = pool->objects_per_alloc;
 
     pool->total_objects += num_objects;
     arena->used          = num_objects;
@@ -295,16 +295,12 @@ and put them on.
 static void
 gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
-    size_t  size;
-
     /* Setup memory for the new objects */
     Small_Object_Arena * const new_arena =
         mem_internal_allocate_typed(Small_Object_Arena);
 
-    if (!new_arena)
-        PANIC(interp, "Out of arena memory");
-
-    size = pool->object_size * pool->objects_per_alloc;
+    const size_t size = pool->object_size * pool->objects_per_alloc;
+    size_t alloc_size;
 
     /* could be mem_internal_allocate too, but calloc is fast */
     new_arena->start_objects = mem_internal_allocate_zeroed(size);
@@ -328,9 +324,9 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     }
 
     /* check alloc size against maximum */
-    size = pool->object_size * pool->objects_per_alloc;
+    alloc_size = pool->object_size * pool->objects_per_alloc;
 
-    if (size > POOL_MAX_BYTES)
+    if (alloc_size > POOL_MAX_BYTES)
         pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
 }
 
