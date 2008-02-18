@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -21,7 +21,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
 use Parrot::Test::Lua;
 
@@ -261,6 +261,15 @@ language_output_is( 'lua', $code, $out, 'sum-file', params => "< $in" );
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'hello.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'hello-output.txt' ));
 language_output_is( 'lua', $code, $out, 'startup' );
+
+#
+#   meteor-contest
+#
+#
+
+$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'meteor_lua-4.lua' ));
+$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'meteor-output.txt' ));
+language_output_is( 'lua', $code, $out, 'meteor' );
 
 # Local Variables:
 #   mode: cperl
