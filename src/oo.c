@@ -1367,18 +1367,38 @@ Parrot_remove_parent(PARROT_INTERP, ARGIN(PMC *removed_class),
 
 =item C<void mark_object_cache>
 
-RT#48260: Not yet documented!!!
-
-RT#50648: Not implemented.
+Marks all PMCs in the object method cache as live.  This shouldn't strictly be
+necessary, as they're likely all reachable from namespaces and classes, but
+it's unlikely to hurt anything except mark phase performance.
 
 =cut
 
 */
 
+#define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
+#define TBL_SIZE (1 + TBL_SIZE_MASK)
+
 void
 mark_object_cache(PARROT_INTERP)
 {
-    UNUSED(interp);
+    Caches * const mc = interp->caches;
+    UINTVAL type, entry;
+
+    if (!mc)
+        return;
+
+    for (type = 0; type < mc->mc_size; type++) {
+        if (!mc->idx[type])
+            continue;
+
+        for (entry = 0; entry < TBL_SIZE; ++entry) {
+            Meth_cache_entry *e = mc->idx[type][entry];
+            while (e) {
+                pobject_lives(interp, (PObj *)e->pmc);
+                e = e->next;
+            }
+        }
+    }
 }
 
 /*
@@ -1423,9 +1443,6 @@ destroy_object_cache(PARROT_INTERP)
     mem_sys_free(mc->idx);
     mem_sys_free(mc);
 }
-
-#define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
-#define TBL_SIZE (1 + TBL_SIZE_MASK)
 
 /*
 
