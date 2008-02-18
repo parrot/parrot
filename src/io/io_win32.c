@@ -800,9 +800,6 @@ AGAIN:
          * only works with 'ascii'
          */
         *s = string_make(interp, buf, bytesread, "ascii", 0);
-        if (!*s) {
-            PANIC(interp, "PIO_recv: Failed to allocate string");
-        }
 #    if PIO_TRACE
         PIO_eprintf(interp, "PIO_win32_recv: %d bytes\n", bytesread);
 #    endif
