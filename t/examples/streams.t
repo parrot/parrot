@@ -218,7 +218,7 @@ read:[   95 Please send patches and suggestions to the Perl 6 Internals mailing 
 read:[   96 ]
 read:[   97 =head1 COPYRIGHT]
 read:[   98 ]
-read:[   99 Copyright (C) 2004, The Perl Foundation.]
+read:[   99 Copyright (C) 2004-2008, The Perl Foundation.]
 read:[  100 ]
 read:[  101 =cut]
 read:[  102 ]
@@ -226,7 +226,7 @@ read:[  103 # Local Variables:]
 read:[  104 #   mode: pir]
 read:[  105 #   fill-column: 100]
 read:[  106 # End:]
-read:[  107 # vim: expandtab shiftwidth=4:]
+read:[  107 # vim: expandtab shiftwidth=4 ft=pir:]
 EXP_FILELINES
 
         'ParrotIO.pir' => <<'EXP_PARROTIO',
@@ -252,10 +252,10 @@ read:[  stream."dump"()\n    \n    end\n.end\n\n=head1 AUTHOR]
 read:[\n\nJens Rieks E<lt>parrot at jensbeimsurfen dot deE]
 read:[<gt> is the author\nand maintainer.\nPlease send pat]
 read:[ches and suggestions to the Perl 6 Internals maili]
-read:[ng list.\n\n=head1 COPYRIGHT\n\nCopyright (C) 2004, Th]
-read:[e Perl Foundation.\n\n=cut\n\n# Local Variables:\n#   m]
-read:[ode: pir\n#   fill-column: 100\n# End:\n# vim: expand]
-read:[tab shiftwidth=4:\n]
+read:[ng list.\n\n=head1 COPYRIGHT\n\nCopyright (C) 2004-200]
+read:[8, The Perl Foundation.\n\n=cut\n\n# Local Variables:\n]
+read:[#   mode: pir\n#   fill-column: 100\n# End:\n# vim: e]
+read:[xpandtab shiftwidth=4 ft=pir:\n]
 EXP_PARROTIO
     },
 );
