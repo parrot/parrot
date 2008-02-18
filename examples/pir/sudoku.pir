@@ -2434,4 +2434,4 @@ Another example of a 2-dim test is of course Y-Wing.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

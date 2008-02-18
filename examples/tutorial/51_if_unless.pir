@@ -63,5 +63,5 @@ The "truthiness" of a PMC depends on how it implements its vtable method C<get_b
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

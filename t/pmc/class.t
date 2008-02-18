@@ -1,5 +1,5 @@
-#!parrot
-# Copyright (C) 2007, The Perl Foundation.
+#! parrot
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -583,8 +583,7 @@ Tests the Class PMC.
 
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:

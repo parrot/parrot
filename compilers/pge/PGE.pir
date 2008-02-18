@@ -26,4 +26,4 @@ unit, calling the subroutines marked with the C<:load> subpragma for each.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

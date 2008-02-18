@@ -15,5 +15,5 @@ As you may have noticed, PIR files can contain Pod documentation.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

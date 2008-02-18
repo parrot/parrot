@@ -1,5 +1,5 @@
 #!./parrot 
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -131,3 +131,8 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
     .return ()
 .end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

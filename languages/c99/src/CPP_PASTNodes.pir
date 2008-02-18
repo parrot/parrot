@@ -301,4 +301,4 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

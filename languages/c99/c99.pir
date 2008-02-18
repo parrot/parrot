@@ -234,7 +234,7 @@ c99 -- A parser for c99
 
 =head1 LICENSE
 
-Copyright (c) 2005 The Perl Foundation
+Copyright (C) 2005-2008, The Perl Foundation.
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.
@@ -249,4 +249,4 @@ Kevin Tew <kevintew@tewk.com>
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

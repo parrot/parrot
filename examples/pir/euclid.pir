@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # This program is free software. It is subject to the same
 # license as Perl itself.
 # $Id$
@@ -49,4 +49,4 @@ done:   print "The greatest common denominator of 96 and 64 is "
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

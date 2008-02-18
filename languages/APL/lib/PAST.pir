@@ -177,7 +177,7 @@ with C<Data::Dumper>.
 
 =head1 LICENSE
 
-Copyright (C) 2005-2006, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.
@@ -188,4 +188,4 @@ it under the same terms as Parrot.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

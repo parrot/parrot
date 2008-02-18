@@ -20,5 +20,5 @@ Demonstrate the simplest form of control flow, 'goto' a label.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

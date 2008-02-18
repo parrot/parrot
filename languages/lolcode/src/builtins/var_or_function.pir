@@ -24,5 +24,5 @@ var_or_function.pir - Distinguish variable access and function call
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

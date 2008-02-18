@@ -838,7 +838,7 @@ F<t/library/getopt_obj.t>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 This program is free software. It is subject to the same
 license as The Parrot Interpreter.
 
@@ -848,4 +848,4 @@ license as The Parrot Interpreter.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

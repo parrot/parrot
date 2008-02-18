@@ -1379,3 +1379,8 @@ still_ok:
     like(message, 'illegal\ type\ for\ splice', "splice with a different type")
 .end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

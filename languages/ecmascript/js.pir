@@ -94,4 +94,4 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

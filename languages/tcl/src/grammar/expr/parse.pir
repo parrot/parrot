@@ -73,4 +73,4 @@ parse.pir - Parsing support subroutines for [expr]
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

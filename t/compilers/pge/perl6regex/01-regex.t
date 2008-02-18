@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -487,3 +487,8 @@ Need to add in test ids, to avoid the precarious line numbering.
 
 =cut
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

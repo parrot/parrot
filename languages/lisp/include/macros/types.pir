@@ -147,4 +147,4 @@ Create a new macro object with label L, placing the result in F.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

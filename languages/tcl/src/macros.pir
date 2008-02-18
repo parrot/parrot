@@ -115,4 +115,4 @@ Utility macro to simplify generating output during debug cycles.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

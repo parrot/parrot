@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2007, The Perl Foundtation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 .const int TESTS = 47
@@ -358,4 +358,5 @@
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
+

@@ -172,4 +172,4 @@ maintainer.  Patches and suggestions can be sent to
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

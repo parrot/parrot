@@ -17,5 +17,5 @@ PIR has a string repeat operator, that concatenates a string with itself N times
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

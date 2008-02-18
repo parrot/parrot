@@ -22,5 +22,5 @@ This example demonstrates basic file operations. Note the readmode.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

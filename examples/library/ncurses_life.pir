@@ -1,4 +1,4 @@
-s# Copyright (C) 2001-2007, The Perl Foundation.
+s# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -802,4 +802,4 @@ F<library/ncurses.pasm>, F<library/ncurses.declarations>.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

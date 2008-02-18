@@ -28,5 +28,5 @@ Particularly note the options for printing PMCs which C doesn't have.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

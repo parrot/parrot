@@ -31,7 +31,7 @@ Perl 6 compilers mailing lists.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 
 =cut
 
@@ -39,4 +39,4 @@ Copyright (C) 2006, The Perl Foundation.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

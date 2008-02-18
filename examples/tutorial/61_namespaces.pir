@@ -20,5 +20,5 @@ This example demonstrates storing and retrieving a global variable in a namespac
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 

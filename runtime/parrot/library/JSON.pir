@@ -380,4 +380,4 @@ Thunk a better way to deal with the maximum recursion depth exception (Or make i
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

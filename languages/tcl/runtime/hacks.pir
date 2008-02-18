@@ -89,4 +89,4 @@ bad_file: # not even the original exists..
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

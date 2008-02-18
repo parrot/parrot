@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2005, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 =head1 TITLE
@@ -214,4 +214,4 @@ E<lt>jerry dot gay at gmail dot com<gt>
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

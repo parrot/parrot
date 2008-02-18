@@ -303,7 +303,7 @@ Dami^WLeopold Toetsch (as if you couldn't guess)
 
 =head1 COPYRIGHT
 
-Copyright (C) 2003, The Perl Foundation.
+Copyright (C) 2003-2008, The Perl Foundation.
 
 This module is free software. It may be used, redistributed
 and/or modified under the same terms as Parrot.
@@ -315,4 +315,4 @@ and/or modified under the same terms as Parrot.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

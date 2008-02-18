@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 .namespace ['CGI'; 'QueryHash']
@@ -235,4 +235,4 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
