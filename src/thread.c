@@ -115,11 +115,10 @@ void Parrot_really_destroy(PARROT_INTERP, int exit_code, void *arg);
 
 =item C<static PMC * make_local_copy>
 
-Create a local copy of the PMC if necessary. (No copy is made if it
-is marked shared.) This includes workarounds for Parrot_clone() not
-doing the Right Thing with subroutines (specifically, code segments
-aren't preserved and it is difficult to do so as long as
-Parrot_clone() depends on freezing).
+Creates a local copy of the PMC if necessary. (No copy is made if it is marked
+shared.) This includes workarounds for Parrot_clone() not doing the Right Thing
+with subroutines (specifically, code segments aren't preserved and it is
+difficult to do so as long as Parrot_clone() depends on freezing).
 
 =cut
 
@@ -173,7 +172,9 @@ make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PMC *arg))
 
 =item C<static Shared_gc_info * get_pool>
 
-Get the shared gc information.  TODO: improve the docs here.
+Gets the shared gc information.  For now this is global data; ideally it will
+become something other than a static variable.  If everything uses this
+function, it will be easier to change.
 
 =cut
 
@@ -190,7 +191,7 @@ get_pool(PARROT_INTERP)
 
 =item C<void pt_free_pool>
 
-Frees the shared gc information.  This clears any global data hen joining all
+Frees the shared GC information.  This clears any global data when joining all
 threads at parent interpreter destruction.
 
 =cut
@@ -249,7 +250,7 @@ make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp old_interp), ARGIN_NULLO
 
 =item C<PMC * pt_shared_fixup>
 
-Fixup a PMC to be sharable. Right now, reassigns the vtable to one
+Modifies a PMC to be sharable. Right now, reassigns the vtable to one
 owned by some master interpreter, so the PMC can be safely reused
 after thread death.
 
@@ -309,7 +310,7 @@ pt_shared_fixup(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<static void pt_thread_signal>
 
-Wakeup a C<interp> which should have called pt_thread_wait().
+Wakes up an C<interp> which should have called pt_thread_wait().
 
 =cut
 
@@ -325,7 +326,7 @@ pt_thread_signal(NOTNULL(Parrot_Interp self), PARROT_INTERP)
 
 =item C<void pt_thread_wait_with>
 
-Wait for this interpreter to be signalled through its condition variable,
+Waits for this interpreter to be signalled through its condition variable,
 dealing properly with GC issues. C<*mutex> is assumed locked on entry and
 will be locked on exit from this function. If a GC run occurs in the middle of
 this function, then a spurious wakeup may occur.
@@ -340,8 +341,6 @@ pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
     LOCK(interpreter_array_mutex);
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
-        /* fprintf(stderr, "%p: pt_thread_wait, before sleep, doing GC run\n",
-         *  interp); */
         UNLOCK(interpreter_array_mutex);
         UNLOCK(*mutex);
 
@@ -382,8 +381,8 @@ pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
 
 =item C<static void pt_thread_wait>
 
-Wait for us to be signalled. GC matters are handled correctly.
-C<interpreter_array_mutex> is assumed held. Spurious wakeups may occur.
+Waits for a signal, handling GC matters correctly.  C<interpreter_array_mutex>
+is assumed held. Spurious wakeups may occur.
 
 =cut
 
@@ -472,9 +471,8 @@ thread_func(ARGIN_NULLOK(void *arg))
         Parrot_unblock_GC(interp);
         ret_val = Parrot_runops_fromc_args(interp, sub, "PF", sub_arg);
     }
-    /*
-     * thread is finito
-     */
+
+    /* thread is finito */
     LOCK(interpreter_array_mutex);
     DEBUG_ONLY(fprintf(stderr, "marking an thread as finished\n"));
 
@@ -487,7 +485,8 @@ thread_func(ARGIN_NULLOK(void *arg))
     }
     if (interp->thread_data->state & THREAD_STATE_DETACHED) {
         interpreter_array[tid] = NULL;
-        DEBUG_ONLY(fprintf(stderr, "really destroying an interpreter [exit while detached]\n"));
+        DEBUG_ONLY(fprintf(stderr,
+            "really destroying an interpreter [exit while detached]\n"));
         Parrot_really_destroy(interp, 0, NULL);
     }
     else if (interp->thread_data->state & THREAD_STATE_JOINED) {
@@ -513,7 +512,7 @@ thread_func(ARGIN_NULLOK(void *arg))
 
 =item C<void pt_clone_code>
 
-Copy/clone the packfile/code from interpreter C<s> to C<d>. All
+Copies/clones the packfile/code from interpreter C<s> to C<d>. All
 resources are created in C<d>.
 
 =cut
@@ -534,7 +533,7 @@ pt_clone_code(Parrot_Interp d, Parrot_Interp s)
 
 =item C<static void pt_ns_clone>
 
-Clone all globals from C<s> to C<d>.
+Clones all globals from C<s> to C<d>.
 
 =cut
 
@@ -583,7 +582,7 @@ pt_ns_clone(ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
 
 =item C<void pt_clone_globals>
 
-Copy global namespace when cloning new interpreter
+Copies the global namespace when cloning a new interpreter.
 
 =cut
 
@@ -601,7 +600,7 @@ pt_clone_globals(Parrot_Interp d, Parrot_Interp s)
 
 =item C<void pt_thread_prepare_for_run>
 
-Setup code, and TODO ...
+Sets up a new thread to run.
 
 =cut
 
@@ -629,7 +628,7 @@ pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
 
 =item C<PMC * pt_transfer_sub>
 
-create a clone of the sub suitable for the other interpreter
+Clones the sub so that it's suitable for the other interpreter.
 
 =cut
 
@@ -650,11 +649,10 @@ pt_transfer_sub(ARGOUT(Parrot_Interp d), ARGIN(Parrot_Interp s), ARGIN(PMC *sub)
 
 =item C<int pt_thread_run>
 
-Run the C<*sub> PMC in a separate thread using interpreter in
+Runs the C<*sub> PMC in a separate thread using the interpreter in
 C<*dest_interp>.
 
 C<arg> should be an array of arguments for the subroutine.
-int
 
 =cut
 
@@ -737,8 +735,8 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC* dest_interp), ARGIN(PMC* sub), ARGIN(PM
 
 =item C<int pt_thread_run_1>
 
-Runs a type 1 thread. Nothing is shared, both interpreters are free
-running without any communication.
+Runs a thread that shares nothing and does not communicate with the other
+interpreter.
 
 =cut
 
@@ -755,8 +753,8 @@ pt_thread_run_1(PARROT_INTERP, ARGOUT(PMC* dest_interp), ARGIN(PMC* sub), ARGIN(
 
 =item C<int pt_thread_run_2>
 
-Runs a type 2 thread. No shared variables, threads are communicating by
-sending messages.
+Runs an interpreter in a thread with no shared variables, but which
+communicates by sending messages.
 
 =cut
 
@@ -773,8 +771,8 @@ pt_thread_run_2(PARROT_INTERP, ARGOUT(PMC* dest_interp), ARGIN(PMC* sub), ARGIN(
 
 =item C<int pt_thread_run_3>
 
-Run a type 3 thread. Threads may have shared variables and are managed
-in a thread pool.
+Runs an interpreter in a thread, allowing shared variables and using a thread
+pool.
 
 =cut
 
@@ -807,8 +805,8 @@ pt_thread_yield(void)
 
 =item C<static Parrot_Interp pt_check_tid>
 
-Helper function. Check if C<tid> is valid. The caller holds the mutex.
-Returns the interpreter for C<tid>.
+Helper function. Checks if the given thread ID is valid. The caller holds the
+mutex.  Returns the interpreter for C<tid>.
 
 =cut
 
@@ -852,8 +850,8 @@ mutex_unlock(ARGMOD(void *arg))
 
 =item C<static int is_suspended_for_gc>
 
-Returns true iff C<interp> is suspended so a global GC can
-be performed. interpreter_array_mutex must be held.
+Returns true iff C<interp> is suspended for a global GC run.  Be sure to hold
+C<interpreter_array_mutex>.
 
 =cut
 
@@ -880,7 +878,7 @@ is_suspended_for_gc(PARROT_INTERP)
 
 =item C<static QUEUE_ENTRY * remove_queued_suspend_gc>
 
-Remove an event requesting that the interpreter suspend itself for a
+Removes an event requesting that the interpreter suspend itself for a
 garbage-collection run from the event queue.
 
 =cut
@@ -935,7 +933,8 @@ remove_queued_suspend_gc(PARROT_INTERP)
 
 =item C<static int pt_gc_count_threads>
 
-interpreter_array_mutex must be held
+Returns the number of active threads in the system (running or suspended).  Be
+sure to hold C<interpreter_array_mutex>.
 
 =cut
 
@@ -965,9 +964,9 @@ pt_gc_count_threads(PARROT_INTERP)
 
 =item C<static void pt_gc_wait_for_stage>
 
-Waits until all threads have reached the desired stage.  Takes an
-interpreter, starting stage and ending stage as arguments.  Updates the
-thread information.  Used in pt_DOD_start_mark and pt_DOD_stop_mark.
+Waits until all threads have reached the desired stage.  Takes an interpreter,
+starting stage and ending stage as arguments.  Updates the thread information.
+Used in C<pt_DOD_start_mark> and C<pt_DOD_stop_mark>.
 
 =cut
 
@@ -1019,9 +1018,8 @@ pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum from_stage,
 
 =item C<static void pt_gc_wakeup_check>
 
-Check if we need to wake threads to perform garbage collection.
-This is called after thread death.
-interpreter_array_mutex is assumed held.
+Checks if it's necessary to wake threads to perform garbage collection.  This
+is called after thread death.  Be sure to hold C<interpreter_array_mutex>.
 
 =cut
 
@@ -1051,8 +1049,8 @@ pt_gc_wakeup_check(PARROT_INTERP)
 
 =item C<static void pt_suspend_one_for_gc>
 
-Suspend a single interpreter for GC. C<interpreter_array_mutex>
-assumed held.
+Suspends a single interpreter for GC.  Be sure to hold
+C<interpreter_array_mutex>.
 
 =cut
 
@@ -1083,7 +1081,7 @@ pt_suspend_one_for_gc(PARROT_INTERP)
 
 =item C<static void pt_suspend_all_for_gc>
 
-Get all threads to perform a GC run.
+Notifies all threads to perform a GC run.
 
 =cut
 
@@ -1152,7 +1150,7 @@ pt_suspend_all_for_gc(PARROT_INTERP)
 
 =item C<void pt_suspend_self_for_gc>
 
-Suspend this thread for a full GC run.
+Suspends this thread for a full GC run.
 
 XXX FIXME -- if GC is blocked, we need to do a GC run as soon
 as it becomes unblocked.
@@ -1202,7 +1200,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
 
 =item C<PMC* pt_thread_join>
 
-Join (wait for) a joinable thread.
+Joins (by waiting for) a joinable thread.
 
 =cut
 
@@ -1313,7 +1311,7 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
 
 =item C<void pt_join_threads>
 
-Possibly wait for other running threads. This is called when destroying
+Possibly waits for other running threads. This is called when destroying
 C<interp>.
 
 =cut
@@ -1326,18 +1324,15 @@ pt_join_threads(PARROT_INTERP)
     size_t          i;
     pt_free_pool(interp);
 
-    /*
-     * if no threads were started - fine
-     */
+    /* if no threads were started - fine */
     LOCK(interpreter_array_mutex);
     if (n_interpreters <= 1) {
         n_interpreters = 0;
         UNLOCK(interpreter_array_mutex);
         return;
     }
-    /*
-     * only the first interpreter waits for other threads
-     */
+
+    /* only the first interpreter waits for other threads */
     if (interp != interpreter_array[0]) {
         UNLOCK(interpreter_array_mutex);
         return;
@@ -1403,7 +1398,7 @@ detach(UINTVAL tid)
 
 =item C<void pt_thread_detach>
 
-Detaches (make non-joinable) the thread.
+Detaches the thread, making it non-joinable.
 
 =cut
 
@@ -1445,8 +1440,8 @@ pt_thread_kill(UINTVAL tid)
 
 =item C<void pt_add_to_interpreters>
 
-All threaded interpreters are stored in an array. Assumes that caller
-holds LOCK.
+Stores the given interpreter in the array of all interpreters.  Be sure to hold
+C<interpreter_array_mutex>.
 
 =cut
 
@@ -1490,9 +1485,8 @@ pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
     running_threads++;
     if (Interp_debug_TEST(interp, PARROT_THREAD_DEBUG_FLAG))
         fprintf(stderr, "running threads %d\n", running_threads);
-    /*
-     * look for an empty slot
-     */
+
+    /* look for an empty slot */
     for (i = 0; i < n_interpreters; ++i) {
         if (interpreter_array[i] == NULL) {
             interpreter_array[i] = new_interp;
@@ -1523,8 +1517,9 @@ pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
 
 =item C<void pt_DOD_start_mark>
 
-DOD is going to start the mark phase. In the presence of shared PMCs, we can only
-run one DOD run at a time because C<< PMC->next_for_GC >> may be changed.
+Record that the mark phase of DOD is about to begin. In the presence of shared
+PMCs, we can only run one DOD run at a time because C<< PMC->next_for_GC >> may
+be changed.
 
 C<flags> are the DOD flags. We check if we need to collect shared objects or
 not.
@@ -1609,7 +1604,7 @@ pt_DOD_start_mark(PARROT_INTERP)
 
 =item C<void pt_DOD_mark_root_finished>
 
-DOD is finished for the root set.
+Records that DOD has finished for the root set.  UNIMPLEMENTED
 
 =cut
 
@@ -1633,7 +1628,7 @@ pt_DOD_mark_root_finished(PARROT_INTERP)
 
 =item C<void pt_DOD_stop_mark>
 
-DOD's mark phase is done.
+Records that the mark phase of DOD has completed.
 
 =cut
 
@@ -1674,7 +1669,7 @@ pt_DOD_stop_mark(PARROT_INTERP)
 
 =item C<void Parrot_shared_DOD_block>
 
-Block stop-the-world DOD runs.
+Blocks stop-the-world DOD runs.
 
 =cut
 
@@ -1697,7 +1692,7 @@ Parrot_shared_DOD_block(PARROT_INTERP)
 
 =item C<void Parrot_shared_DOD_unblock>
 
-Unblock stop-the-world DOD runs.
+Unblocks stop-the-world DOD runs.
 
 =cut
 
