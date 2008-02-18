@@ -147,8 +147,7 @@ typedef struct PackFile_Segment {
     opcode_t            *data;          /* oparray e.g. bytecode */
 } PackFile_Segment;
 
-typedef INTVAL (*PackFile_map_segments_func_t)
-    (PARROT_INTERP, PackFile_Segment *seg, void *user_data);
+typedef INTVAL (*PackFile_map_segments_func_t)(PARROT_INTERP, PackFile_Segment *seg, void *user_data);
 
 /*
 ** PackFile_FixupTable:
