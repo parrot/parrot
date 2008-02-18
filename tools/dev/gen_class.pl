@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -42,7 +42,7 @@ my $classname = shift
 ## emit file header
 print <<"EOF";
 /* ${classname}.pmc
- *  Copyright (C) 2007, The Perl Foundation.
+ *  Copyright (C) 2008, The Perl Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:
@@ -60,14 +60,15 @@ pmclass $classname {
 
 EOF
 
+my %skip_bodies = map { $_ => 1 } qw( type name pmc_namespace );
+
 ## emit method bodies
 for (@$vtbl) {
     my ( $retval, $methname, $args ) = @$_;
-    if ( $methname eq 'type' || $methname eq 'name' || $methname =~ /prop/ ) {
 
-        # default.pmc handles these
-        next;
-    }
+    # default.pmc handles these
+    next if exists $skip_bodies{$methname};
+    next if $methname =~ /prop/;
 
     print "    $retval $methname ($args) {\n";
 
@@ -80,7 +81,14 @@ for (@$vtbl) {
 }
 
 ## emit file footer
-print "}\n";
+print qq|}
+
+/*
+ * Local Variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */|;
 
 # Local Variables:
 #   mode: cperl
