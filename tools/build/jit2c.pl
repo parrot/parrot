@@ -103,6 +103,8 @@ sub readjit {
     my %ops;
     my $template;
 
+    local $.;
+
     open my $IN, '<', $file or die "Can't open file $file: $!";
     while ( my $line = <$IN> ) {
         if ( $line =~ m/^#define/ ) {
@@ -113,36 +115,35 @@ s/PREV_OP\s(..?)\s(\w+)/(jit_info->prev_op) && (*jit_info->prev_op $1 $opcodes{$
         }
 
         # ignore comment and empty lines
-        next if ( ( $line =~ m/^;/ ) || ( $line =~ m/^\s*$/ ) );
+        next if $line =~ m/^;/ || $line !~ m/\S/;
+
         if ( !defined($function) && !defined($template) ) {
             if ( $line =~ m/TEMPLATE\s+(\w+)\s*{/ ) {    #}
                 $template = $1;
-                $asm      = q{};
+                $asm      = qq{#line $. "$file"\n};
                 next;
             }
             else {
                 $line =~ m/(extern\s*)?(\w+)\s*{/;       #}
                 $extern   = ( defined($1) ) ? 1 : 0;
                 $function = $2;
-                $asm      = q{};
+                $asm      = qq{#line $. "$file"\n};
                 next;
             }
         }
         if ( $line =~ m/^}/ ) {                          #{
                                                          # 1. check templates
-            while ( my ( $t, $body ) = each(%templates) ) {
+            while ( my ( $t, $body ) = each %templates ) {
                 if ( $asm =~ /$t\s+/ ) {
                     my $tbody = $body;
                     while ( $asm =~ s/\b(s(.).+?\2.*?\2)(?:\s+)?// ) {
                         eval "\$tbody =~ ${1}g";
-                        if ($@) {
-                            die "error in template subst: $@\n";
-                        }
+                        die "error in template subst: $@\n" if $@;
                     }
                     $asm = $tbody;
 
                     # reset iterator for next run
-                    keys(%templates);
+                    keys %templates;
                     last;
                 }
             }
@@ -195,7 +196,7 @@ s/jit_emit_mov_ri_i\(jit_info->native_ptr, ISR([12]), &CONST\((\d)\)\);/load_nc(
             $function = undef;
         }
         unless ($jit_cpu) {
-            $line =~ s/emitm_pushl_i/emitm_pushl_m/ if ( $line =~ /string/ );
+            $line =~ s/emitm_pushl_i/emitm_pushl_m/ if $line =~ /string/;
         }
         $asm .= $line;
     }
@@ -259,7 +260,7 @@ print $JITCPU <<"END_C";
 #define Parrot_jit_vtable1_op Parrot_jit_normal_op
 #define Parrot_jit_vtable1r_op Parrot_jit_normal_op
 /*
- * the numbers corresspond to the registers
+ * the numbers correspond to the registers
  */
 #define Parrot_jit_vtable_111_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_112_op Parrot_jit_normal_op
@@ -319,14 +320,14 @@ if ( $cpuarch eq 'ppc' && $genfile ne 'src/jit_cpu.c' ) {
 
 my %core_ops = readjit("src/jit/$cpuarch/core.jit");
 
-print $JITCPU $header if ($header);
+print $JITCPU $header if $header;
 
-my $njit = scalar keys(%core_ops);
+my $njit = keys %core_ops;
 
 my $jit_fn_retn   = 'void';
 my $jit_fn_params = '(Parrot_jit_info_t *jit_info, Interp *interp)';
 
-for ( my $i = 0 ; $i < $core_numops ; $i++ ) {
+for my $i ( 0 .. $core_numops - 1) {
     $body   = $core_ops{ $core_opfunc[$i] }[0];
     $extern = $core_ops{ $core_opfunc[$i] }[1];
 
