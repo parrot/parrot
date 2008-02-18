@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -61,22 +61,23 @@ our @developing_tests = (
     't/distro/file_metadata.t',
     map { "t/codingstd/$_" } qw(
         c_code_coda.t
+        c_cppcomments.t
+        c_cuddled_else.t
         c_header_guards.t
         c_indent.t
+        c_operator.t
+        c_returns.t
         c_struct.t
         check_toxxx.t
         copyright.t
-        c_cppcomments.t
-        c_operator.t
-        c_cuddled_else.t
         filenames.t
         gmt_utc.t
         linelength.t
         pccmethod_deps.t
+        pir_code_coda.t
         svn_id.t
         tabs.t
         trailing_space.t
-        pir_code_coda.t
     )
 );
 
