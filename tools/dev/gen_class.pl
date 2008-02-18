@@ -39,10 +39,12 @@ my $vtbl = parse_vtable("$FindBin::Bin/../../src/vtable.tbl");
 my $classname = shift
     or die "No classname given!\n";
 
+my $year = (localtime())[5] + 1900; # get current year.
+
 ## emit file header
 print <<"EOF";
 /* ${classname}.pmc
- *  Copyright (C) 2008, The Perl Foundation.
+ *  Copyright (C) $year, The Perl Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:
