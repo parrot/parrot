@@ -76,9 +76,9 @@ our @developing_tests = (
         svn_id.t
         tabs.t
         trailing_space.t
+        pir_code_coda.t
     )
 );
-#        pir_code_coda.t
 
 sub get_default_tests {
     my ($core_tests_only, $runcore_tests_only) = @_;
