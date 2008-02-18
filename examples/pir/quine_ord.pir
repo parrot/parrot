@@ -3499,6 +3499,13 @@ push code_as_data, 116
 push code_as_data, 104
 push code_as_data, 61
 push code_as_data, 52
+push code_as_data, 32
+push code_as_data, 102
+push code_as_data, 116
+push code_as_data, 61
+push code_as_data, 112
+push code_as_data, 105
+push code_as_data, 114
 push code_as_data, 58
 push code_as_data, 10
 # ------ End of data section ------
@@ -3644,4 +3651,4 @@ L<http://www.madore.org/~david/computers/quine.html>
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
