@@ -652,13 +652,18 @@ pragma_1:  N_OPERATORS INTC
 hll_def: HLL STRINGC COMMA STRINGC
          {
             STRING * const hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
-            STRING * const hll_lib  = string_unescape_cstring(interp, $4 + 1, '"', NULL);
-            PMC    *ignored;
-            CONTEXT(((Interp*)interp)->ctx)->current_HLL =
+            CONTEXT(interp->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name);
-            ignored = Parrot_load_lib(interp, hll_lib, NULL);
-            UNUSED(ignored);
-            Parrot_register_HLL_lib(interp, hll_lib);
+
+            /* don't bother loading the library for an empty string */
+            if (strlen($4) > 2) {
+                STRING * const hll_lib =
+                    string_unescape_cstring(interp, $4 + 1, '"', NULL);
+                PMC    *ignored        = Parrot_load_lib(interp, hll_lib, NULL);
+                UNUSED(ignored);
+                Parrot_register_HLL_lib(interp, hll_lib);
+            }
+
             IMCC_INFO(interp)->cur_namespace = NULL;
             $$ = 0;
          }
