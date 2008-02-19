@@ -4,6 +4,7 @@
 New up to r25293.
 - Documentation
   + added function documentation to various functions
+  + PCT beginners guide, optable guide and PAST nodes guide
 - Compilers
   + IMCC: plugged various memory leaks and other cleanups
   + PCT:
