@@ -304,7 +304,7 @@ void rethrow_c_exception(PARROT_INTERP)
 #ifdef NDEBUG
 #  define PARROT_ASSERT(x) ((void)0)
 #else
-#  define PARROT_ASSERT(x) Parrot_assert((long)(x), #x, __FILE__, __LINE__)
+#  define PARROT_ASSERT(x) Parrot_assert((INTVAL)(x), #x, __FILE__, __LINE__)
 #endif
 
 

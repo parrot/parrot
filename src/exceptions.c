@@ -973,7 +973,7 @@ A better version of assert() that gives a backtrace.
 PARROT_API
 PARROT_DOES_NOT_RETURN_WHEN_FALSE
 void
-Parrot_assert(long condition, ARGIN(const char *condition_string),
+Parrot_assert(INTVAL condition, ARGIN(const char *condition_string),
         ARGIN(const char *file), unsigned int line)
 {
     if (!condition)
