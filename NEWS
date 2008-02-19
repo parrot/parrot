@@ -1,13 +1,13 @@
 # $Id$
 
 
-New up to r25293.
+New up to r25873
 - Documentation
   + added function documentation to various functions
   + PCT beginners guide, optable guide and PAST nodes guide
 - Compilers
   + IMCC: plugged various memory leaks and other cleanups
-  + PCT:
+  + PCT: Add "attribute" as a scope variant to PAST::Var nodes
   + NQP:
 - Languages
   + cardinal: started on reimplemention using PCT.
@@ -18,6 +18,8 @@ New up to r25293.
   + rakudo (Perl 6 on Parrot): cleanups, match variables
 - Implementation
 - Deprecations
+  + PCCINVOKE syntax for named arguments using []; use () instead.
+  + See DEPRECATED.pod for details
 - Miscellaneous
   + Various bug fixes
   + consting, refactoring, warnings cleanup
