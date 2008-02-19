@@ -73,7 +73,7 @@ in here so we don't have to duplicate pop code.
 
 */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 QUEUE_ENTRY *
 nosync_pop_entry(ARGMOD(QUEUE *queue))
 {

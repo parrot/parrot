@@ -52,7 +52,7 @@ void nosync_insert_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*queue);
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 QUEUE_ENTRY * nosync_pop_entry(ARGMOD(QUEUE *queue))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*queue);
