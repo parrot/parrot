@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 16;
 
 =head1 NAME
 
@@ -467,59 +467,6 @@ CODE
 1j
 1d
 1b
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "instantiate" );
-
-.sub _main
-    .local pmc cl, o
-    cl = getclass "Integer"
-    set_args '(0)', cl
-    o = instantiate
-    print o
-    print "\n"
-    $S0 = typeof o
-    print $S0
-    print "\n"
-.end
-CODE
-0
-Integer
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'instantiate derived' );
-.sub _main :main
-    .local pmc cl, o
-    cl = getclass "Integer"
-    set_args '(0)', cl
-    o = instantiate
-    print o
-    print "\n"
-    $S0 = typeof o
-    print $S0
-    print "\n"
-.end
-CODE
-0
-Integer
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "instantiate w arg" );
-
-.sub _main
-    .local pmc cl, o
-    cl = getclass "Integer"
-    set_args '(0,0)', cl, 42
-    o = instantiate
-    print o
-    print "\n"
-    $S0 = typeof o
-    print $S0
-    print "\n"
-.end
-CODE
-42
-Integer
 OUTPUT
 
 # Local Variables:

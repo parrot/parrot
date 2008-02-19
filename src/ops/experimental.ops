@@ -319,7 +319,7 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
 =item B<new>(out PMC, in INT, in STR)
 
 Create a new PMC of the type $2 according to the PMCs string representation
-in $3. See also B<instantiate> for a more general form.
+in $3.
 
 BUT SINCE INSTANTIATE WILL PROBABLY DIE, DON'T USE THIS;
 OR IF YOU NEED THIS (OR INSTANTIATE), TELL CHIP
@@ -334,54 +334,6 @@ op new(out PMC, in INT, in STR) {
   }
   _class = interp->vtables[$2]->pmc_class;
   $1 = VTABLE_new_from_string(interp, _class, $3, 0);
-  goto NEXT();
-}
-
-=item B<instantiate>(out PMC)
-
-Create a new PMC of the type of class ARGS[0]. This is a classmethod.
-Arguments are passed according to the calling conventions in
-F<docs/pdds/pdd03_calling_conventions.pod> with the C<set_args> opcode.
-See also the I<get_class> opcode to get a class PMC.
-BUT SINCE INSTANTIATE WILL PROBABLY DIE, DON'T USE IT;
-OR IF YOU NEED IT, TELL CHIP
-
-=cut
-
-op instantiate(out PMC) {
-  opcode_t* arg_op;
-  PMC *sig, *_class;
-  int typ;
-
-  arg_op = interp->current_args;
-  if (!arg_op) {
-        real_exception(interp, NULL, NULL_REG_ACCESS,
-            "No set_args with instantiate");
-  }
-  sig = CONTEXT(interp->ctx)->constants[arg_op[1]]->u.key;
-  ASSERT_SIG_PMC(sig);
-  if (!SIG_ELEMS(sig)) {
-        real_exception(interp, NULL, E_ValueError,
-            "Empty signature with instantiate");
-  }
-  switch (SIG_ITEM(sig, 0)) {
-      case PARROT_ARG_IC:
-          typ = arg_op[2];
-          if (typ <= 1 || typ >= interp->n_vtable_max) {
-              real_exception(interp, NULL, E_ValueError,
-                      "Illegal PMC enum (%d) in instantiate", typ);
-          }
-          _class = interp->vtables[typ]->pmc_class;
-          break;
-      case PARROT_ARG_P:
-          _class = REG_PMC(interp, arg_op[2]);
-          break;
-      default:
-          real_exception(interp, NULL, UNIMPLEMENTED,
-                  "unimplemented class argument in instantiate");
-  }
-  $1 = VTABLE_instantiate(interp, _class, sig);
-  interp->current_args = NULL;
   goto NEXT();
 }
 
