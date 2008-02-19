@@ -3,15 +3,23 @@
 
 New up to r25293.
 - Documentation
-  + added function documentation
-- Compiler Toolkit
+  + added function documentation to various functions
+- Compilers
+  + IMCC: plugged various memory leaks and other cleanups
+  + PCT:
+  + NQP:
 - Languages
   + cardinal: started on reimplemention using PCT.
-  + ECMAScript: started on reimplemention using PCT.
+  + ecmascript: started on reimplemention using PCT.
+  + lua: aligned with Lua official release 5.1.3. Added initial
+    PCT-based implementation.
   + pynie (Python for Parrot): add functions.
+  + rakudo (Perl 6 on Parrot): cleanups, match variables
 - Implementation
 - Deprecations
 - Miscellaneous
+  + Various bug fixes
+  + consting, refactoring, warnings cleanup
 
 New in 0.5.2
 - Documentation
