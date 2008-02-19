@@ -40,12 +40,11 @@ static STRING * get_path(PARROT_INTERP,
     ARGMOD(STRING *lib),
     ARGOUT(void **handle),
     ARGIN(STRING *wo_ext),
-    ARGIN(STRING *ext))
+    ARGIN_NULLOK(STRING *ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*lib)
         FUNC_MODIFIES(*handle);
 
@@ -186,7 +185,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING *
 get_path(PARROT_INTERP, ARGMOD(STRING *lib), ARGOUT(void **handle),
-        ARGIN(STRING *wo_ext), ARGIN(STRING *ext))
+        ARGIN(STRING *wo_ext), ARGIN_NULLOK(STRING *ext))
 {
     STRING *path, *full_name;
     const char *err = NULL;    /* buffer returned from Parrot_dlerror */
