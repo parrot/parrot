@@ -1277,7 +1277,8 @@ Parrot_instantiate_object_init(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *ini
 
 =item C<void Parrot_instantiate_object>
 
-RT#48260: Not yet documented!!!
+Wrapper for instantiate_object, passing NULL as initialization.
+Returns a new Parrot object.
 
 =cut
 
@@ -1405,7 +1406,7 @@ mark_object_cache(PARROT_INTERP)
 
 =item C<void init_object_cache>
 
-RT#48260: Not yet documented!!!
+Allocate memory for object cache.
 
 =cut
 
