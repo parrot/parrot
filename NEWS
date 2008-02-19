@@ -3,9 +3,11 @@
 
 New up to r25293.
 - Documentation
+  + added function documentation
 - Compiler Toolkit
 - Languages
-  + ECMAScript: reimplemented using PCT.
+  + cardinal: started on reimplemention using PCT.
+  + ECMAScript: started on reimplemention using PCT.
   + pynie (Python for Parrot): add functions.
 - Implementation
 - Deprecations
