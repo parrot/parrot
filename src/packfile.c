@@ -2402,23 +2402,18 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
         mem_realloc_n_typed(debug->base.data, size, opcode_t);
     }
     else {              /* create one */
-        const size_t len = strlen(cs->base.name) + 4;
+        const size_t len  = strlen(cs->base.name) + 4;
         char * const name = (char *)mem_sys_allocate(len);
+        const int add     = (interp->code && interp->code->base.dir);
+        PackFile_Directory * const dir =
+            add
+                ? interp->code->base.dir
+                : cs->base.dir
+                    ? cs->base.dir
+                    : &interp->initial_pf->directory;
 
         snprintf(name, len, "%s_DB", cs->base.name);
-        if (interp->code && interp->code->base.dir) {
-            debug = (PackFile_Debug *)
-                PackFile_Segment_new_seg(interp,
-                interp->code->base.dir, PF_DEBUG_SEG, name, 1);
-        }
-        else {
-            /* used by eval - don't register the segment */
-            debug = (PackFile_Debug *)
-                PackFile_Segment_new_seg(interp,
-                cs->base.dir ?  cs->base.dir :
-                    &interp->initial_pf->directory,
-                PF_DEBUG_SEG, name, 0);
-        }
+        debug = (PackFile_Debug *)PackFile_Segment_new_seg(interp, dir, PF_DEBUG_SEG, name, add);
         mem_sys_free(name);
 
         debug->base.data = mem_allocate_n_zeroed_typed(size, opcode_t);
