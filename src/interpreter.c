@@ -1128,16 +1128,15 @@ dynop_register_xx(PARROT_INTERP,
 
         new_init_func((long) ops_addr);
     }
-    else {
+    else
 #endif
+    {
         size_t i;
         /* if not install wrappers */
         /* fill new entries with the wrapper op */
         for (i = n_old; i < n_tot; ++i)
             ops_addr[i] = (cg_lib->op_func_table)[CORE_OPS_wrapper__];
-#if 0
     }
-#endif
 
     /* if we are running this core, update event check ops */
     if ((int)interp->run_core == cg_lib->core_type) {
