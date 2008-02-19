@@ -111,12 +111,12 @@ Formerly in dotgnu.ops. Used only in ./languages/Zcode/z3main.pir.
 =cut
 
 inline op conv_u2(inout INT) :base_core {
-  $1 = (INTVAL)((Parrot_UInt2)($1));
+  $1 = (INTVAL)((Parrot_UInt2)($1 & 0xffff));
   goto NEXT();
 }
 
 inline op conv_i2(inout INT) :base_core {
-  $1 = (INTVAL)((Parrot_Int2)($1));
+  $1 = (INTVAL)((Parrot_Int2)($1 & 0xffff));
   goto NEXT();
 }
 
