@@ -1304,7 +1304,6 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
     UNLOCK(interpreter_array_mutex);
     real_exception(interp, NULL, 1, "join: illegal thread state %d tid %d",
             state, tid);
-    return NULL;
 }
 
 /*

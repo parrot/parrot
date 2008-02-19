@@ -914,10 +914,8 @@ Parrot_STM_commit(PARROT_INTERP)
 
     STM_TRACE("commit");
 
-    if (log->depth == 0) {
+    if (log->depth == 0)
         real_exception(interp, NULL, 1, "stm_commit without transaction\n");
-        return 0;
-    }
 
     PARROT_ASSERT(log->depth > 0);
 
@@ -1677,10 +1675,8 @@ Parrot_STM_begin_update(PARROT_INTERP, Parrot_STM_PMC_handle handle)
     STM_write_record   *write;
     const STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
 
-    if (log->depth == 0) {
+    if (log->depth == 0)
         real_exception(interp, NULL, 1, "STM_begin_update outside transaction");
-        return PMCNULL;
-    }
 
     write = find_write_record(interp, handle, 0);
 

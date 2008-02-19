@@ -287,8 +287,7 @@ getfloat_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
         }
     default:
         real_exception(interp, NULL, INVALID_CHARACTER,
-                "Internal sprintf doesn't recognize size %d for a float",
-                size);
+                "Internal sprintf doesn't recognize size %d for a float", size);
     }
 }
 
