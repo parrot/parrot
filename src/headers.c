@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -726,7 +726,7 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
 
 =item C<static void free_pool>
 
-RT#48260: Not yet documented!!!
+Loops backwards through the provided pool, freeing all of its arenas.
 
 =cut
 
@@ -750,7 +750,7 @@ free_pool(ARGMOD(Small_Object_Pool *pool))
 
 =item C<static int sweep_cb_buf>
 
-RT#48260: Not yet documented!!!
+Sweeps and frees the provided pool.  Returns 0.
 
 =cut
 
@@ -781,7 +781,7 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
 
 =item C<static int sweep_cb_pmc>
 
-RT#48260: Not yet documented!!!
+Sweeps and frees a memory pool.  Returns 0.
 
 =cut
 
@@ -840,7 +840,8 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 
 =item C<static void fix_pmc_syncs>
 
-RT#48260: Not yet documented!!!
+Walks through the given arena, looking for all live and shared PMCs,
+transferring their sync values to the destionation interpreter.
 
 =cut
 

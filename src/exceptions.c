@@ -180,7 +180,8 @@ push_exception(PARROT_INTERP, ARGIN(PMC *handler))
 
 =item C<static void run_cleanup_action>
 
-RT#48260: Not yet documented!!!
+Runs the sub PMC from the Stack_Entry_t pointer with an INTVAL arg of 0.  Used
+in C<Parrot_push_action>.
 
 =cut
 
@@ -201,7 +202,7 @@ run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
 
 =item C<void Parrot_push_action>
 
-Push an action handler onto the dynamic environment.
+Pushes an action handler onto the dynamic environment.
 
 =cut
 
@@ -762,7 +763,8 @@ free_internal_exception(PARROT_INTERP)
 
 =item C<void destroy_exception_list>
 
-RT#48260: Not yet documented!!!
+Destroys (and frees the memory of) the exception buffers list and the
+associated exceptions free list for the specified interpreter.
 
 =cut
 
@@ -779,7 +781,9 @@ destroy_exception_list(PARROT_INTERP)
 
 =item C<void really_destroy_exception_list>
 
-RT#48260: Not yet documented!!!
+Takes a pointer to an exception (which had better be the last one in the list).
+Walks back through the list, freeing the memory of each one, until it encounters NULL.
+Used by C<destroy_exception_list>.
 
 =cut
 
@@ -1000,7 +1004,8 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 
 =item C<void Parrot_print_backtrace>
 
-RT#48260: Not yet documented!!!
+Displays the primrose path to disaster, (the stack frames leading up to the
+abort).  Used by C<Parrot_confess>.
 
 =cut
 
