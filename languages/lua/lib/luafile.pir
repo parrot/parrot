@@ -89,8 +89,8 @@ are garbage collected, but that takes an unpredictable amount of time to happen.
     $P0 = get_hll_global ['Lua::io'], 'tofile'
     $P0(self)
     $P0 = get_hll_global ['Lua::io'], 'aux_close'
-    res = $P0(self)
-    .return (res)
+    (res :slurpy) = $P0(self)
+    .return (res :flat)
 .end
 
 
@@ -397,18 +397,8 @@ or C<string.format> before write.
     .local pmc f
     $P0 = get_hll_global ['Lua::io'], 'tofilep'
     f = $P0(self)
-    # ignore closed files and standard files
+    # ignore closed files
     if null f goto L1
-    $P0 = getstdin
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    $P0 = getstdout
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    $P0 = getstderr
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    printerr "closing file for you.\n"
     $P0 = get_hll_global ['Lua::io'], 'aux_close'
     $P0(self)
   L1:

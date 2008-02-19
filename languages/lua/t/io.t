@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 41;
 use Test::More;
 use Parrot::Test::Lua;
 
@@ -410,22 +410,6 @@ CODE
 true
 OUTPUT
 
-SKIP:
-{
-skip('only with Parrot', 1) if ($test_prog eq 'lua');
-
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:__gc' );
-function inner ()
-    local f = io.open("file.out")
-end
-
-inner()
-print("end")
-CODE
-end
-closing file for you.
-OUTPUT
-}
 # clean up file.out
 unlink('../file.out') if ( -f '../file.out' );
 

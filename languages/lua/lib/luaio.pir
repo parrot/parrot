@@ -240,6 +240,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     mt = _lua__REGISTRY[key]
     new file, 'LuaUserdata'
     file.'set_metatable'(mt)
+    # TODO : setfenv with the caller one
     .return (file)
 .end
 
@@ -365,14 +366,20 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 .sub 'aux_close'
     .param pmc file
-    .local pmc env
-    $P0 = getinterp
-    $P1 = $P0['sub'; 1]
-    env = lua_getfenv($P1)
-    new $P1, 'LuaString'
-    set $P1, '__close'
-    $P0 = env[$P1]
-    .return $P0(file)
+    .local pmc f
+    f = tofilep(file)
+    $P0 = getstdin
+    $I0 = issame $P0, f
+    if $I0 goto L1
+    $P0 = getstdout
+    $I0 = issame $P0, f
+    if $I0 goto L1
+    $P0 = getstderr
+    $I0 = issame $P0, f
+    if $I0 goto L1
+    .return fclose(file)
+  L1:
+    .return noclose(file)
 .end
 
 .sub 'aux_lines' :lex
@@ -418,8 +425,8 @@ file.
     file = getiofile(IO_OUTPUT)
   L1:
     tofile(file)
-    res = aux_close(file)
-    .return (res)
+    (res :slurpy) = aux_close(file)
+    .return (res :flat)
 .end
 
 

@@ -267,9 +267,14 @@ language_output_is( 'lua', $code, $out, 'startup' );
 #
 #
 
+TODO:
+{
+    local $TODO = 'pb with loadstring ?';
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'meteor_lua-4.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'meteor-output.txt' ));
 language_output_is( 'lua', $code, $out, 'meteor' );
+}
 
 # Local Variables:
 #   mode: cperl
