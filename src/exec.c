@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -98,7 +98,7 @@ Parrot_exec(PARROT_INTERP, ARGIN(opcode_t *pc),
     /* TODO Go zero the calls to jited opcodes. */
     /* Place the program code in the data section. */
     /* program_code */
-    add_data_member(obj, interp->code->base.pf->src,
+    add_data_member(obj, (void *)interp->code->base.pf->src,
             interp->code->base.pf->size);
     /* opcode_map */
     add_data_member(obj, jit_info->arena.op_map, (jit_info->arena.map_size+1) *

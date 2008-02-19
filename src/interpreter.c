@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1062,9 +1062,10 @@ static void
 dynop_register_xx(PARROT_INTERP,
         size_t n_old, size_t n_new, oplib_init_f init_func)
 {
-    op_lib_t  *cg_lib, *new_lib;
-    op_func_t *ops_addr = NULL;
-    size_t n_tot;
+    const size_t n_tot    = n_old + n_new;
+    op_func_t   *ops_addr = NULL;
+    op_lib_t    *cg_lib   = init_func(1);
+    op_lib_t    *new_lib;
 #if 0
     /* related to CG and CGP ops issue below */
     STRING *op_variant;
@@ -1072,8 +1073,6 @@ dynop_register_xx(PARROT_INTERP,
     oplib_init_f new_init_func;
     PMC *lib_variant;
 
-    n_tot = n_old + n_new;
-    cg_lib = init_func(1);
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
         ops_addr = (op_func_t *)mem_sys_realloc(cg_lib->op_func_table,
@@ -1109,35 +1108,38 @@ dynop_register_xx(PARROT_INTERP,
 #if 0
     /* check if the lib_pmc exists with a _xx flavor */
     new_init_func = get_op_lib_init(0, 0, lib_pmc);
-    new_lib = new_init_func(1);
-    op_variant = Parrot_sprintf_c(interp, "%s_ops%s",
-            new_lib->name, cg_lib->suffix);
-    lib_variant = Parrot_load_lib(interp, op_variant, NULL);
-#endif
-    /*
-     * XXX running CG and CGP ops currently works only via the wrapper
-     */
+    new_lib       = new_init_func(1);
+    op_variant    = Parrot_sprintf_c(interp, "%s_ops%s",
+                        new_lib->name, cg_lib->suffix);
+    lib_variant   = Parrot_load_lib(interp, op_variant, NULL);
+
+    /* XXX running CG and CGP ops currently works only via the wrapper */
     if (0 /*lib_variant */) {
         size_t i;
 
         new_init_func = get_dynamic_op_lib_init(interp, lib_variant);
-        new_lib = new_init_func(1);
+        new_lib       = new_init_func(1);
+
         for (i = n_old; i < n_tot; ++i)
             ops_addr[i] = (new_lib->op_func_table)[i - n_old];
+
         new_lib->op_func_table = ops_addr;
-        new_lib->op_count = n_tot;
+        new_lib->op_count      = n_tot;
+
         new_init_func((long) ops_addr);
     }
     else {
+#endif
         size_t i;
         /* if not install wrappers */
         /* fill new entries with the wrapper op */
         for (i = n_old; i < n_tot; ++i)
             ops_addr[i] = (cg_lib->op_func_table)[CORE_OPS_wrapper__];
+#if 0
     }
-    /*
-     * if we are running this core, update event check ops
-     */
+#endif
+
+    /* if we are running this core, update event check ops */
     if ((int)interp->run_core == cg_lib->core_type) {
         size_t i;
 
@@ -1146,9 +1148,8 @@ dynop_register_xx(PARROT_INTERP,
                 (op_func_t)ops_addr[CORE_OPS_check_events__];
         interp->save_func_table = ops_addr;
     }
-    /*
-     * tell the cg_core about the new jump table
-     */
+
+    /* tell the cg_core about the new jump table */
     cg_lib->op_func_table = ops_addr;
     cg_lib->op_count      = n_tot;
     init_func((long) ops_addr);
