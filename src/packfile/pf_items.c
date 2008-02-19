@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -236,7 +236,7 @@ fetch_op_mixed_le(ARGIN(const unsigned char *b))
         opcode_t o[2];
     } u;
     /* wordsize = 8 then */
-    fetch_buf_le_8(u.buf, (const unsigned char *) b);
+    fetch_buf_le_8(u.buf, b);
     return u.o[0]; /* or u.o[1] */
 #else
     union {
@@ -270,7 +270,7 @@ fetch_op_mixed_be(ARGIN(const unsigned char *b))
         opcode_t o[2];
     } u;
     /* wordsize = 8 then */
-    fetch_buf_be_8(u.buf, (const unsigned char *) b);
+    fetch_buf_be_8(u.buf, b);
     return u.o[1]; /* or u.o[0] */
 #else
     union {
@@ -849,14 +849,13 @@ void
 PackFile_assign_transforms(ARGMOD(PackFile *pf))
 {
     const int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
-    const int need_wordsize  = pf->header->wordsize != sizeof (opcode_t);
+    const int need_wordsize  = pf->header->wordsize  != sizeof (opcode_t);
 
     pf->need_endianize = need_endianize;
     pf->need_wordsize  = need_wordsize;
+
 #if PARROT_BIGENDIAN
-    /*
-     * this Parrot is on a BIG ENDIAN machine
-     */
+    /* this Parrot is on a BIG ENDIAN machine */
     if (need_endianize) {
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_le_4;
@@ -873,10 +872,10 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         else
             pf->fetch_op = fetch_op_be_8;
     }
+
 #else
-    /*
-     * this Parrot is on a LITTLE ENDIAN machine
-     */
+
+    /* this Parrot is on a LITTLE ENDIAN machine */
     if (need_endianize) {
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_be_4;
