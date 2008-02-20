@@ -734,6 +734,35 @@ you can write recursive functions and not have stack overflows.
 
 =back
 
+=head2 Assignment and Morphing
+
+The C<=> syntactic sugar in PIR, when used in the simple case of:
+
+  <var1> = <var2>
+
+directly corresponds to the C<set> opcode. So, two low-level arguments (int,
+num, or string registers, variables, or constants) are a direct C assignment,
+or a C-level conversion (int cast, float cast, a string copy, or a call to one
+of the conversion functions like C<string_to_num>).
+
+A PMC source with a low-level destination, calls the C<get_integer>,
+C<get_number>, or C<get_string> vtable function on the PMC. A low-level source
+with a PMC destination calls the C<set_integer_native>, C<set_number_native>,
+or C<set_string_native> vtable function on the PMC (assign to value semantics).
+Two PMC arguments are a direct C assignment (assign to container semantics).
+
+For assign to value semantics for two PMC arguments use C<assign>, which calls
+the C<assign_pmc> vtable function.
+
+
+{{ NOTE: response to the question:
+
+    <pmichaud>  I don't think that 'morph' as a method call is a good idea
+    <pmichaud>  we need something that says "assign to value" versus "assign to container"
+    <pmichaud>  we can't eliminate the existing 'morph' opcode until we have a replacement
+
+}}
+
 
 =head2 Macros
 
@@ -756,7 +785,7 @@ identifier. The optional parameter list is a comma-separated list of identifiers
 enclosed in parentheses.
 See C<.endm> for ending the macro definition.
 
-=item * <.endm>
+=item * C<.endm>
 
 Closes a macro definition.
 
@@ -847,7 +876,41 @@ the following is not allowed:
 
 {{ NOTE: This is likely because the parsing of heredocs happens later than the
 preprocessing of macros. Might be nice if we could parse heredocs at the macro
-level, but not a high priority. }}
+level, but not a high priority. compilers/pirc/new can do this, but there's a
+bug in the heredoc handling on Win32 XP using MSVS. }}
+
+Using braces, { }, allows you to span multiple lines for an argument.
+See runtime/parrot/include/hllmacros.pir for examples and possible usage.
+A simple example is this:
+
+ .macro foo(a,b)
+   .a
+   .b
+ .endm
+
+ .sub main
+   .foo({ print "1"
+          print "2"
+        }, {
+          print "3"
+          print "4"
+        })
+ .end
+
+This will expand the macro C<foo>, after which the input to the PIR parser is:
+
+ .sub main
+   print "1"
+   print "2"
+   print "3"
+   print "4"
+ .end
+
+which will result in the output:
+
+ 1234
+
+{{ NOTE: braced arguments does not work correctly yet in compilers/pirc/new }}
 
 =back
 
@@ -968,35 +1031,6 @@ Obviously, this will result in an error, as the variable C<b> is defined twice.
 If you intend the macro to create unique variables names, use C<.macro_local>
 instead of C<.local> to take advantage of the name munging.
 
-=head2 Assignment and Morphing
-
-The C<=> syntactic sugar in PIR, when used in the simple case of:
-
-  <var1> = <var2>
-
-directly corresponds to the C<set> opcode. So, two low-level arguments (int,
-num, or string registers, variables, or constants) are a direct C assignment,
-or a C-level conversion (int cast, float cast, a string copy, or a call to one
-of the conversion functions like C<string_to_num>).
-
-A PMC source with a low-level destination, calls the C<get_integer>,
-C<get_number>, or C<get_string> vtable function on the PMC. A low-level source
-with a PMC destination calls the C<set_integer_native>, C<set_number_native>,
-or C<set_string_native> vtable function on the PMC (assign to value semantics).
-Two PMC arguments are a direct C assignment (assign to container semantics).
-
-For assign to value semantics for two PMC arguments use C<assign>, which calls
-the C<assign_pmc> vtable function.
-
-
-{{ NOTE: response to the question:
-
-    <pmichaud>  I don't think that 'morph' as a method call is a good idea
-    <pmichaud>  we need something that says "assign to value" versus "assign to container"
-    <pmichaud>  we can't eliminate the existing 'morph' opcode until we have a replacement
-
-}}
-
 =head1 EXAMPLES
 
 =head2 Subroutine Definition
@@ -1052,6 +1086,8 @@ the C<assign_pmc> vtable function.
   (r1[, r2 ...]) = _sub_label(x, y, z)
   _sub_label(x, y, z)
 
+This also works for NCI calls, as the subroutine PMC will be
+a NCI sub, and on invocation will do the Right Thing.
 Instead of the label a subroutine object can be used too:
 
    find_global $P0, "_sub_label"
