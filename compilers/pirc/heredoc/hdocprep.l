@@ -139,7 +139,9 @@ main(int argc, char *argv[]) {
 
 
 /*
+
 using this we can check how often each rule is executed.
+XXX this should be removed at some point (globals!)
 
 */
 
@@ -244,7 +246,7 @@ LINECOMMENT    [#].*{EOL}
 
 <SCANSTRING>"<<"{Q_STRING} { /* 2nd and later heredoc argument */
                              global_state *state = yyget_extra(yyscanner);
-                             state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                             state->delimiter    = (char *)calloc(yyleng - 4 + 1, sizeof (char));
                              assert(state->delimiter);
                              strncpy(state->delimiter, yytext + 3, yyleng - 4);
 
@@ -254,7 +256,7 @@ LINECOMMENT    [#].*{EOL}
 
 "<<"{Q_STRING}         { /* only copy the string after "<<'" and skip the last quote too */
                          global_state *state = yyget_extra(yyscanner);
-                         state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                         state->delimiter    = (char *)calloc(yyleng - 4 + 1, sizeof (char));
                          assert(state->delimiter);
                          strncpy(state->delimiter, yytext + 3, yyleng - 4);
                          state->heredoc = strdup("");
@@ -266,7 +268,7 @@ LINECOMMENT    [#].*{EOL}
                             argument. Save the rest of the line and go scan the heredoc.
                           */
                          global_state *state = yyget_extra(yyscanner);
-                         state->linebuff = strdup(yytext);
+                         state->linebuff     = strdup(yytext);
                          BEGIN(HEREDOC);
                        }
 
@@ -276,7 +278,7 @@ LINECOMMENT    [#].*{EOL}
                             because <SAVELINE2> state is activated when reading a string.
                           */
                          global_state *state = yyget_extra(yyscanner);
-                         state->linebuff = strdup(yytext);
+                         state->linebuff     = strdup(yytext);
                          yy_switch_to_buffer(state->file_buffer, yyscanner);
                          BEGIN(HEREDOC);
                        }
@@ -285,8 +287,8 @@ LINECOMMENT    [#].*{EOL}
                             escape it.
                           */
                          global_state *state = yyget_extra(yyscanner);
-                         int len = strlen(state->heredoc);
-                         char *temp = (char *)calloc(len + 1 + 2, sizeof (char));
+                         int len             = strlen(state->heredoc);
+                         char *temp          = (char *)calloc(len + 1 + 2, sizeof (char));
                          assert(temp != NULL);
                          strcpy(temp, state->heredoc);
 
@@ -299,7 +301,7 @@ LINECOMMENT    [#].*{EOL}
                          assert(state->heredoc != NULL);
 
                          /* translate "\n" to a "\" and "n" character */
-                         state->heredoc[len] = '\\';
+                         state->heredoc[len]     = '\\';
                          state->heredoc[len + 1] = 'n';
                          state->heredoc[len + 2] = '\0';
                        }
@@ -314,7 +316,7 @@ LINECOMMENT    [#].*{EOL}
 
                          if (strcmp(yytext, state->delimiter) == 0) {
                             int heredoc_length = strlen(state->heredoc);
-                            char *hdstring = (char *)calloc(heredoc_length + 3, sizeof (char));
+                            char *hdstring     = (char *)calloc(heredoc_length + 3, sizeof (char));
                             assert(hdstring != NULL);
 
                             sprintf(hdstring, "\"%s\"", state->heredoc);
@@ -345,7 +347,7 @@ LINECOMMENT    [#].*{EOL}
                          }
                          else {
                             /* save this heredoc string line */
-                            char *line = strdup(yytext);
+                            char *line     = strdup(yytext);
                             state->heredoc = strcat(state->heredoc, line);
                          }
                        }
