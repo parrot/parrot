@@ -71,6 +71,7 @@ our @developing_tests = (
         c_operator.t
         c_returns.t
         c_struct.t
+        check_isxxx.t
         check_toxxx.t
         copyright.t
         filenames.t
