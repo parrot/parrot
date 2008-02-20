@@ -120,7 +120,7 @@ sub start_new_file {
 ###  placed in the file (performing substitutions on @lang@, @lclang@,
 ###  @UCLANG@, and @Id@ as appropriate).
 
-__END__
+__DATA__
 __config/makefiles/root.in__
 ## @Id@
 

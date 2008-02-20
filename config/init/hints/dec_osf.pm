@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 package init::hints::dec_osf;
@@ -46,7 +46,7 @@ sub runstep {
     }
 
     unless ( $conf->data->get("gccversion") ) {
-	$conf->data->set( link => "cxx" );
+        $conf->data->set( link => "cxx" );
     }
 
     # Perl 5 hasn't been compiled with this visible.
