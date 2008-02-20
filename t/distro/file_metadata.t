@@ -241,7 +241,7 @@ BEGIN {
             plan skip_all => q{git svn file metadata not retained};
         }
     }
-    elsif ( !( `svn ls .` or `svk ls .` ) ) {
+    elsif ( !( (-d '.svn' && `svn ls .`) or `svk ls .` ) ) {
         plan skip_all => 'not a working copy';
     }
     else { plan tests => 4 }
