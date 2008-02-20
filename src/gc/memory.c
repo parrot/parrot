@@ -156,7 +156,7 @@ mem_sys_realloc(ARGIN_NULLOK(void *from), size_t size)
     if (from)
         ptr = realloc(from, size);
     else
-        ptr = malloc(size);
+        ptr = calloc(1, size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
