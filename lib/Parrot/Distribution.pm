@@ -460,6 +460,7 @@ sub get_perl_exemption_regexp {
         lib/SmartLink.pm
         lib/Test/
         lib/Text/
+        examples/sdl/
     };
 
     my $regex = join '|', map { quotemeta $_ } @paths;

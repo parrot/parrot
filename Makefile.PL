@@ -14,6 +14,9 @@ Parrot.  If you're reading this yourself, use F<Configure.pl>
 
 =cut
 
+use strict;
+use warnings;
+
 my %translations =
 (
     INSTALL_BASE => 'prefix',
