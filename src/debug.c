@@ -332,7 +332,7 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
     unsigned long c = 0;
 
     /* Skip leading whitespace. */
-    while (isspace(*command))
+    while (isspace((unsigned char) *command))
         command++;
 
     if (*command == '\0') {
@@ -467,7 +467,7 @@ PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         fgets(buf, 1024, fd);
 
         /* skip spaces */
-        for (ptr=(char *)&buf;*ptr&&isspace((unsigned char)*ptr);ptr=ptr+1);
+        for (ptr = (char *)&buf; *ptr && isspace((unsigned char)*ptr); ptr++);
 
         /* avoid null blank and commented lines */
         if (*buf == '\0' || *buf == '#')
@@ -2503,7 +2503,7 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     unsigned long c;
 
     /* Extract the command after leading whitespace (for error messages). */
-    while (*command && isspace(*command))
+    while (*command && isspace((unsigned char)*command))
         command++;
     parse_command(command, &c);
 
@@ -2779,7 +2779,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     char reg_type;
 
     /* Skip leading whitespace. */
-    while (isspace(*s))
+    while (isspace((unsigned char)*s))
         s++;
 
     reg_type = (unsigned char) toupper((unsigned char)*s);
