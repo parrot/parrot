@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -113,12 +113,12 @@ Nothing is printed. An array of file pathes is returned to the caller.
                     ( 't/*.t', 't/*/*.t' );
             if ( List::Util::first { $_ eq '--master' } @{ $options{arguments} } ) {
                 # if --master is passed, add the language dir as a prefix
-                @files = map { glob( File::Spec->catfile( $options{language}, $_  ) ) 
+                @files = map { glob( File::Spec->catfile( $options{language}, $_  ) )
                              }
                              @file_patterns;
             }
             else {
-                @files = map { glob( $_ ) 
+                @files = map { glob( $_ )
                              }
                              @file_patterns;
             }

@@ -83,7 +83,7 @@ our @developing_tests = (
 
 sub get_default_tests {
     my ($core_tests_only, $runcore_tests_only) = @_;
-    
+
     # add metadata.t and coding standards tests only if we're DEVELOPING
     if ( -e "DEVELOPING" ) {
         push @standard_tests, @developing_tests;

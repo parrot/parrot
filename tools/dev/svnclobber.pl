@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -44,7 +44,7 @@ File::Find::find(
              and not -e ".svn/text-base/$_.svn-base"
            )
         {
-          unlink $_; 
+          unlink $_;
         }
     },
     q{.}

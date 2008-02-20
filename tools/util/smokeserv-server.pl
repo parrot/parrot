@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 use strict;
 use warnings;
@@ -286,7 +286,7 @@ sub unpack_smoke {
                 my $str = gmtime($9)->strftime("%d %b %Y %H:%M %a");
                 $str =~ s/ /&nbsp;/g;
 
-                # hack, to make the timestamps not break so the 
+                # hack, to make the timestamps not break so the
                 # smoke reports look good even on 640x480
                 $str;
             },

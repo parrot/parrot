@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 package Parrot::Revision::Utils;
 use strict;
@@ -6,7 +6,7 @@ use warnings;
 use lib qw( lib );
 use Parrot::Revision;
 use base qw( Exporter );
-our @EXPORT_OK = qw( 
+our @EXPORT_OK = qw(
     get_revision_numbers
     print_src_revision_c
 );
@@ -74,7 +74,7 @@ F<tools/build/revision_c.pl>.
 
 =head1 SYNOPSIS
 
-    use Parrot::Revision::Utils qw( 
+    use Parrot::Revision::Utils qw(
         get_revision_numbers
         print_src_revision_c
     );
