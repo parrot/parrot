@@ -583,7 +583,7 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
 =item C<METHOD void PMC *add_var(STRING *name, PMC *var)>
 
-Stores the given sub under this namespace, with the given name.
+Stores the given variable under this namespace, with the given name.
 
 =cut
 
