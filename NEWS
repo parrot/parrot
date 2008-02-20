@@ -1,28 +1,43 @@
 # $Id$
 
 
-New up to r25873
+New up to r25878
 - Documentation
-  + added function documentation to various functions
-  + PCT beginners guide, optable guide and PAST nodes guide
+  + PDD09 (garbage collection) - approved
+  + PDD28 (character sets) - draft started
+  + added function documentation to some core functions
+  + PCT beginners guide, optable guide and PAST nodes guide, bug fixes
 - Compilers
   + IMCC: plugged various memory leaks and other cleanups
-  + PCT: Add "attribute" as a scope variant to PAST::Var nodes
-  + NQP:
+  + PCT:
+    . add "attribute" as a scope variant to PAST::Var nodes
+    . add 'shift' and 'pop' methods to PAST:: nodes
+  + NQP: add '=:=' op, tests for scalar and list contextualizers, \x escapes
 - Languages
-  + cardinal: started on reimplemention using PCT.
-  + ecmascript: started on reimplemention using PCT.
-  + lua: aligned with Lua official release 5.1.3. Added initial
-    PCT-based implementation.
-  + pynie (Python for Parrot): add functions.
-  + rakudo (Perl 6 on Parrot): cleanups, match variables
+  + APL: reimplementation with PCT
+  + Cardinal (Ruby): reimplemention with PCT
+  + Ecmascript: reimplementation with PCT
+  + lolcode: improved expression parsing, ifthen, IT, YARN
+  + lua:
+    . aligned with Lua official release 5.1.3.
+    . added initial PCT-based implementation.
+  + Pynie (Python): add functions
+  + Rakudo (Perl 6):
+    . rebranded, formerly known as 'perl6'
+    . passes many more official Perl 6 Specification tests
+    . added 'perl6doc' utility
+    . oo including meta?classes, objects, methods, attributes, role composition
+    . match variables, while/until statements, traits
+    . many new methods for Str, List, Hash, Junction, 
 - Implementation
 - Deprecations
   + PCCINVOKE syntax for named arguments using []; use () instead.
-  + See DEPRECATED.pod for details
+  + see DEPRECATED.pod for details
 - Miscellaneous
-  + Various bug fixes
-  + consting, refactoring, warnings cleanup
+  + pbc_to_exe refactored for code reduction, portability, and maintainability
+  + various bug fixes
+  + #line directives added to generated JIT files, improving debugging
+  + consting, attribute marking, refactoring, warnings cleanup
 
 New in 0.5.2
 - Documentation
