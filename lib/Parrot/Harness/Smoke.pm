@@ -88,9 +88,9 @@ sub generate_html_smoke_report {
 
       $v->has_inline_css(1); # no separate css file
 
-      open HTML, '>', $html_fn;
-      print HTML $v->html();
-      close HTML;
+      open my $HTML, '>', $html_fn;
+      print {$HTML} $v->html();
+      close $HTML;
 
       print "$html_fn has been generated.\n";
     }
