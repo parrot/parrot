@@ -30,6 +30,8 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 
 =cut
 
+$ENV{TEST_PROG_ARGS} ||= '';
+
 SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         skip( "Please make libnci_test$PConfig{load_ext}", Test::Builder->expected_tests() );

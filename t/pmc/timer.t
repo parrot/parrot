@@ -22,6 +22,8 @@ Tests the Timer PMC.
 
 =cut
 
+$ENV{TEST_PROG_ARGS} ||= '';
+
 my %platforms = map { $_ => 1 } qw/
     aix
     cygwin
@@ -151,7 +153,9 @@ ok 1
 ok 2
 OUT
 
-    pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/repeat" , todo => 'RT #49718, add scheduler features to JIT' );
+    my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
+       ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
+    pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/repeat" , @todo );
 .include "timer.pasm"
     new P1, 'SArray'
     set P1, 8

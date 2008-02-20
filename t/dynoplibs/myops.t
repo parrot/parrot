@@ -23,8 +23,10 @@ Tests the sample dynamic op library "myops".
 
 =cut
 
+$ENV{TEST_PROG_ARGS} ||= '';
+
 my $is_ms_win32 = $^O =~ m!MSWin32!;
-my $is_mingw = $is_ms_win32 && grep { $PConfig{cc} eq $_ } qw(gcc gcc.exe);
+my $is_mingw    = $is_ms_win32 && grep { $PConfig{cc} eq $_ } qw(gcc gcc.exe);
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'fortytwo' );
 .loadlib "myops_ops"
@@ -74,7 +76,10 @@ END_PASM
     pasm_output_is( $quine, $quine, 'a short cheating quine', @todo );
 }
 
-pir_output_is( << 'CODE', << 'OUTPUT', "one alarm", todo => 'RT #49718, add scheduler features to JIT' );
+    my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
+       ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
+
+pir_output_is( << 'CODE', << 'OUTPUT', "one alarm", @todo );
 .loadlib "myops_ops"
 
 .sub main :main
@@ -107,7 +112,10 @@ OUTPUT
 SKIP: {
     skip "three alarms, infinite loop under mingw32", 2 if $is_mingw;
 
-    pir_output_like( << 'CODE', << 'OUTPUT', "three alarm", todo => 'RT #49718, add scheduler features to JIT' );
+    my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
+       ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
+
+    pir_output_like( << 'CODE', << 'OUTPUT', "three alarm", @todo );
 
 .loadlib "myops_ops"
 .sub main :main
