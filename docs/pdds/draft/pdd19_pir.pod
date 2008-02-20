@@ -778,6 +778,12 @@ name of the PIR file that is included. The contents of the included
 file are inserted as if they were written at the point where the
 C<.include> directive occurs.
 
+The include file is searched for in the current directory and in
+runtime/parrot/include, in that order. The first file of that name to
+be found is included.
+
+{{ Check the search order of the include directive and whether it's complete }}
+
 =item * C<.macro> <identifier> [<parameters>]
 
 The C<.macro> directive starts the definition of a macro named by the specified
