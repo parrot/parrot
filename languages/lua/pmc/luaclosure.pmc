@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006-2007, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -96,6 +96,7 @@ Return the string "function".
     PMC* clone() {
         PMC* ret = SUPER();
         PMC_metadata(ret) = PMC_metadata(SELF);
+        PObj_custom_mark_destroy_SETALL(ret);
         return ret;
     }
 

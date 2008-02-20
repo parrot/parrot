@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -66,6 +66,7 @@ Allow :
         else
             res = pmc_new(INTERP, type);
         PMC_str_val(res) = string_copy(INTERP, rep);
+        PObj_custom_mark_SET(res);
         return res;
     }
 
@@ -94,8 +95,8 @@ Creates a copy of the string.
 */
     PMC* clone() {
         PMC* dest = pmc_new_noinit(INTERP, PMC_type(SELF));
-        PObj_custom_mark_SET(dest);
         PMC_str_val(dest) = string_copy(INTERP, PMC_str_val(SELF));
+        PObj_custom_mark_SET(dest);
         return dest;
     }
 
