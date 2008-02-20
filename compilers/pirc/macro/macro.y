@@ -373,6 +373,7 @@ update_unique_id(lexer_state *lexer) {
     lexer->id_gen++;
     /* Count number of digits:
      * log10 returns a double, get the part before the dot (so, "3.14" -> "3")
+     * using the floor() function.
      * log10(1000) -> 3, so add 1 more digit.
      */
     lexer->num_digits = floor(log10(lexer->id_gen)) + 1;
