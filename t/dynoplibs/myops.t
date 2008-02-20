@@ -153,7 +153,7 @@ alarm2
 alarm3/
 OUTPUT
 
-    pir_output_like( << 'CODE', << 'OUTPUT', "repeating alarm", todo => 'RT #49718, add scheduler features to JIT' );
+    pir_output_like( << 'CODE', << 'OUTPUT', "repeating alarm", @todo );
 
 .loadlib "myops_ops"
 .sub main :main
