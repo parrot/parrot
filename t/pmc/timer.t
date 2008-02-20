@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -151,7 +151,7 @@ ok 1
 ok 2
 OUT
 
-    pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/repeat" );
+    pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/repeat" , todo => 'RT #49718, add scheduler features to JIT' );
 .include "timer.pasm"
     new P1, 'SArray'
     set P1, 8

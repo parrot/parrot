@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -74,7 +74,7 @@ END_PASM
     pasm_output_is( $quine, $quine, 'a short cheating quine', @todo );
 }
 
-pir_output_is( << 'CODE', << 'OUTPUT', "one alarm" );
+pir_output_is( << 'CODE', << 'OUTPUT', "one alarm", todo => 'RT #49718, add scheduler features to JIT' );
 .loadlib "myops_ops"
 
 .sub main :main
@@ -107,7 +107,7 @@ OUTPUT
 SKIP: {
     skip "three alarms, infinite loop under mingw32", 2 if $is_mingw;
 
-    pir_output_like( << 'CODE', << 'OUTPUT', "three alarm" );
+    pir_output_like( << 'CODE', << 'OUTPUT', "three alarm", todo => 'RT #49718, add scheduler features to JIT' );
 
 .loadlib "myops_ops"
 .sub main :main
@@ -145,7 +145,7 @@ alarm2
 alarm3/
 OUTPUT
 
-    pir_output_like( << 'CODE', << 'OUTPUT', "repeating alarm" );
+    pir_output_like( << 'CODE', << 'OUTPUT', "repeating alarm", todo => 'RT #49718, add scheduler features to JIT' );
 
 .loadlib "myops_ops"
 .sub main :main
