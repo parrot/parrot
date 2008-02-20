@@ -190,9 +190,7 @@ the specified C<PMC>.
         }
         else {
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, SELF.name()));
-            return NULL;
+                    "attempt to perform arithmetic on a %S value", SELF.name());
         }
     }
 
@@ -210,8 +208,7 @@ the specified C<PMC>.
         }
         else {
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, SELF.name()));
+                    "attempt to perform arithmetic on a %S value", SELF.name());
         }
     }
 
@@ -280,9 +277,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -292,9 +288,7 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value", SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -308,9 +302,8 @@ MMD_DEFAULT: {
                 return dest;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return NULL;
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -329,8 +322,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -340,8 +333,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -355,8 +348,8 @@ MMD_DEFAULT: {
                 return;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -376,9 +369,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -389,9 +381,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -405,9 +396,8 @@ MMD_DEFAULT: {
                 return dest;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return NULL;
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -426,8 +416,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -437,8 +427,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -452,8 +442,8 @@ MMD_DEFAULT: {
                 return;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -473,9 +463,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -486,9 +475,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -502,9 +490,8 @@ MMD_DEFAULT: {
                 return dest;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return NULL;
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -523,8 +510,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -534,8 +521,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -549,8 +536,8 @@ MMD_DEFAULT: {
                 return;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -570,9 +557,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -583,9 +569,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -599,9 +584,8 @@ MMD_DEFAULT: {
                 return dest;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return NULL;
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -620,8 +604,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -631,8 +615,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -646,8 +630,8 @@ MMD_DEFAULT: {
                 return;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -667,9 +651,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -680,9 +663,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -696,9 +678,8 @@ MMD_DEFAULT: {
                 return dest;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return NULL;
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -717,8 +698,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -728,8 +709,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -743,8 +724,8 @@ MMD_DEFAULT: {
                 return;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -763,9 +744,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -775,9 +755,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
-                return NULL;
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -791,9 +770,8 @@ MMD_DEFAULT: {
                 return dest;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return NULL;
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -812,8 +790,8 @@ MMD_LuaNumber: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_LuaString: {
@@ -823,8 +801,8 @@ MMD_LuaString: {
             }
             else {
                 real_exception(INTERP, NULL, ILL_INHERIT,
-                        "attempt to perform arithmetic on a %s value",
-                        string_to_cstring(INTERP, SELF.name()));
+                        "attempt to perform arithmetic on a %S value",
+                        SELF.name());
             }
         }
 MMD_DEFAULT: {
@@ -838,8 +816,8 @@ MMD_DEFAULT: {
                 return;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to perform arithmetic on a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                    "attempt to perform arithmetic on a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -885,9 +863,8 @@ MMD_LuaString: {
         }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare string with %s",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return (INTVAL)0;
+                    "attempt to compare string with %S",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -926,9 +903,8 @@ MMD_DEFAULT: {
                 return dest;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to concatenate a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return NULL;
+                    "attempt to concatenate a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -961,8 +937,8 @@ MMD_DEFAULT: {
                 return;
             }
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to concatenate a %s value",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+                    "attempt to concatenate a %S value",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -1059,10 +1035,10 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* tobase(INTVAL base) {
-        STRING *rep = SELF.get_string();
-        char *s1 = string_to_cstring(INTERP, rep);
-        char *s2;
-        unsigned long n = strtoul(s1, &s2, base);
+        STRING       *rep = SELF.get_string();
+        char         *s1  = string_to_cstring(INTERP, rep);
+        char         *s2;
+        unsigned long n   = strtoul(s1, &s2, base);
 
         /* at least one valid digit? */
         if (s1 != s2) {
