@@ -16,7 +16,10 @@ scalar context it returns a reference to that list.
 =cut
 
 package Parrot::Harness::DefaultTests;
+
 use strict;
+use warnings;
+
 use base qw( Exporter );
 our @EXPORT = qw( get_default_tests );
 
@@ -111,4 +114,3 @@ sub get_default_tests {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-

@@ -11,7 +11,10 @@ Parrot::Harness::Options - Handle options and argument processing in F<t/harness
 =cut
 
 package Parrot::Harness::Options;
+
 use strict;
+use warnings;
+
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     handle_long_options
@@ -90,4 +93,3 @@ EOF
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
