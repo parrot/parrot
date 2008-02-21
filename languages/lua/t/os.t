@@ -206,7 +206,7 @@ print(os.time({
 CODE
 /^
 946\d+\n
-nil\n
+-306\d+\n
 $/x
 OUTPUT
 

@@ -864,7 +864,7 @@ MMD_LuaString: {
         }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare string with %S",
+                    "attempt to compare string with %Ss",
                     VTABLE_name(INTERP, value));
         }
     }
