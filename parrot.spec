@@ -1,11 +1,11 @@
 Name:           parrot
-Version:        0.5.2
+Version:        0.5.3
 Release:        1%{?dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrotcode.org/
-Source0:        http://www.cpan.org/authors/id/P/PA/PARTICLE/parrot-%{version}.tar.gz
+Source0:        http://www.cpan.org/authors/id/P/PM/PMIC/parrot-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
@@ -116,6 +116,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Feb 20 2008 Patrick Michaud <pmichaud@pobox.com> 0.5.3
+- Update to 0.5.3.
+
 * Tue Jan 15 2008 Bob Rogers <rogers@rgrjr.dyndns.org> 0.5.2
 - Update to 0.5.2.
 

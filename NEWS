@@ -1,7 +1,7 @@
 # $Id$
 
 
-New up to r25878
+New in 0.5.3
 - Documentation
   + PDD09 (garbage collection) - approved
   + PDD28 (character sets) - draft started
@@ -21,6 +21,7 @@ New up to r25878
   + lua:
     . aligned with Lua official release 5.1.3.
     . added initial PCT-based implementation.
+  + Punie (Perl 1): refactor to use standard PCT-based filenames
   + Pynie (Python): add functions
   + Rakudo (Perl 6):
     . rebranded, formerly known as 'perl6'
@@ -28,7 +29,7 @@ New up to r25878
     . added 'perl6doc' utility
     . oo including meta?classes, objects, methods, attributes, role composition
     . match variables, while/until statements, traits
-    . many new methods for Str, List, Hash, Junction, 
+    . many new methods for Str, List, Hash, Junction
 - Implementation
 - Deprecations
   + PCCINVOKE syntax for named arguments using []; use () instead.

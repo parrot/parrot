@@ -110,4 +110,6 @@ the strings?).
 
  Bob       0.5.2          2008-Jan-15     "P.e. nipalensis"
 
+ Patrick   0.5.3          2008-Feb-20     "Way of the Parrot"
+
 =cut
