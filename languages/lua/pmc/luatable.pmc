@@ -95,7 +95,7 @@ static Node *mainposition(PARROT_INTERP, const Hash *t, const PMC *key)
         h = PMC_int_val(key);
     }
     else if (PMC_type(key) == dynpmc_LuaString) {
-        h = string_hash(interp, VTABLE_get_string(INTERP, key), 3793);
+        h = string_hash(interp, VTABLE_get_string(interp, key), 3793);
         /* h = PMC_str_val(key)->hashval; */
     }
     else {
