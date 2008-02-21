@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2007, The Perl Foundation.
+ *  Copyright (C) 2007-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -12,8 +12,6 @@
 /*
  * This set of macros define capabilities that may or may not be available
  * for a given compiler.  They are based on GCC's __attribute__ functionality.
- * Over in Perl 5 world, we determine whether these capabilities exist at
- * ./Configure time.  For now, you'll have to do it by hand.
  */
 
 /*
@@ -35,13 +33,13 @@
 #endif
 #ifdef HASATTRIBUTE_DEPRECATED
 #  ifdef _MSC_VER
-#    define __attribute__deprecated__         __declspec(deprecated)
+#    define __attribute__deprecated__       __declspec(deprecated)
 #  else
-#    define __attribute__deprecated__           __attribute__((__deprecated__))
+#    define __attribute__deprecated__       __attribute__((__deprecated__))
 #  endif
 #endif
 #ifdef HASATTRIBUTE_FORMAT
-#  define __attribute__format__(x, y, z)      __attribute__((__format__(x, y, z)))
+#  define __attribute__format__(x, y, z)    __attribute__((__format__(x, y, z)))
 #endif
 #ifdef HASATTRIBUTE_MALLOC
 #  define __attribute__malloc__             __attribute__((__malloc__))
@@ -53,7 +51,7 @@
 #  ifdef _MSC_VER
 #    define __attribute__noreturn__         __declspec(noreturn)
 #  else
-#    define __attribute__noreturn__           __attribute__((__noreturn__))
+#    define __attribute__noreturn__         __attribute__((__noreturn__))
 #  endif
 #endif
 #ifdef HASATTRIBUTE_PURE
