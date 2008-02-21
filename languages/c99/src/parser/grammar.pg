@@ -34,13 +34,10 @@ rule external_declaration {
 rule function_definition {
     <declaration_specifiers>
     <declarator>
-    <declaration_list>?
+    <declaration>*
     <compound_statement>
 }
 
-rule declaration_list {
-    <declaration>+
-}
 
 ## A.2.2
 ##
@@ -99,15 +96,14 @@ rule type_specifier {
 
 rule struct_or_union_specifier {
     ['struct'|'union']
-    [ <struct_or_union_definition>
+    [
+    | <struct_or_union_definition>
     | <pre_declaration>
     ]
 }
 
-
 rule struct_or_union_definition {
-    <identifier>? '{' <struct_declaration>+
-    [ '}' || <.panic: '}' expected to close struct or union> ]
+    <identifier>? '{' <struct_declaration>+ '}'
 }
 
 rule pre_declaration {
@@ -115,12 +111,12 @@ rule pre_declaration {
 }
 
 rule struct_declaration {
-    <specifier_qualifier_list> <struct_declarator>*
-    [ ';' || <.panic: ';' expected after struct declaration> ]
+    <specifier_qualifier_list> <struct_declarator>* ';'
 }
 
 rule specifier_qualifier_list {
-    [ <type_specifier>
+    [
+    | <type_specifier>
     | <type_qualifier>
     ]+
 }
@@ -154,13 +150,12 @@ rule type_qualifier {
 }
 
 rule declarator {
-    <.debug: declarator>
     <pointer>? <direct_declarator>
 }
 
 rule direct_declarator {
-    <.debug: direct_declarator>
-    [ '(' <declarator> ')'
+    [
+    | '(' <declarator> ')'
     | <identifier>
     ]
     <declarator_suffix>*
@@ -178,7 +173,6 @@ rule pointer {
 }
 
 rule parameter_type_list {
-    <.debug: param. type list>
     <parameter_list> [',' '...']?
 }
 
@@ -188,7 +182,8 @@ rule parameter_list {
 
 rule parameter_declaration {
     <declaration_specifiers>
-    [ <declarator>
+    [
+    | <declarator>
     | <abstract_declarator>?
     ]
 }
@@ -263,8 +258,12 @@ rule statement {
     | <labeled_statement>
     | <compound_statement>
     | <expression_statement>
-    | <selection_statement>
-    | <iteration_statement>
+    | <if_statement>
+    | <switch_statement>
+    | <while_statement>
+    | <do_while_statement>
+    | <for1_statement>
+    | <for2_statement>
     | <jump_statement>
 }
 
@@ -287,16 +286,28 @@ rule expression_statement {
     <expression>? ';'
 }
 
-rule selection_statement {
-    | 'if' '(' <expression> ')' <statement> ['else' <statement>]?
-    | 'switch' '(' <expression> ')' <statement>
+rule if_statement {
+    'if' '(' <expression> ')' <statement> ['else' $<else>=<statement>]?
 }
 
-rule iteration_statement {
-    | 'while' '(' <expression> ')' <statement>
-    | 'do' <statement> 'while' '(' <expression> ')' ';'
-    | 'for' '(' <expression>? ';' <expression>? ';' <expression>? ')' <statement>
-    | 'for' '(' <declaration> <expression>? ';' <expression>? ')' <statement>
+rule switch_statement {
+    'switch' '(' <expression> ')' <statement>
+}
+
+rule while_statement {
+    'while' '(' <expression> ')' <statement>
+}
+
+rule do_while_statement {
+    'do' <statement> 'while' '(' <expression> ')' ';'
+}
+
+rule for1_statement {
+    'for' '(' <expression>? ';' <expression>? ';' <expression>? ')' <statement>
+}
+
+rule for2_statement {
+    'for' '(' <declaration> <expression>? ';' <expression>? ')' <statement>
 }
 
 rule jump_statement {
@@ -386,9 +397,7 @@ token integer_constant {
 }
 
 token decimal_constant {
-    \d+
-    #| 0
-    #| <[1..9]> <digit>*
+    <[1..9]> <digit>*
 }
 
 token octal_constant {
@@ -400,19 +409,21 @@ token hexadecimal_constant {
 }
 
 token integer_suffix {
-  | <[uU]> [ll?|LL?]?
-  | [ll?|LL?] <[uU]>?
+    | <[uU]> [ll?|LL?]?
+    | [ll?|LL?] <[uU]>?
 }
 
 token floating_constant {
-  | <decimal_floating_constant>
-  | <hexadecimal_floating_constant>
+    | <decimal_floating_constant>
+    | <hexadecimal_floating_constant>
 }
 
 token decimal_floating_constant {
-  [ <fractional_constant> <exponent_part>?
-  | <digit_sequence> <exponent_part>
-  ] <floating_suffix>?
+    [
+    | <fractional_constant> <exponent_part>?
+    | <digit_sequence> <exponent_part>
+    ]
+    <floating_suffix>?
 }
 
 token hexadecimal_prefix {
@@ -421,9 +432,11 @@ token hexadecimal_prefix {
 
 token hexadecimal_floating_constant {
   <hexadecimal_prefix>
-  [ <hexadecimal_fractional_constant>
+  [
+  | <hexadecimal_fractional_constant>
   | <hexadecimal_digit_constant>
-  ] <binary_exponent_part> <floating_suffix>?
+  ]
+  <binary_exponent_part> <floating_suffix>?
 }
 
 token fractional_constant {
