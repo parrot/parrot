@@ -3030,16 +3030,14 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
         interp->code->fixups = self;
         self->code = interp->code;
     }
-    i = self->fixup_count;
-    self->fixup_count++;
+    i = self->fixup_count++;
     mem_realloc_n_typed(self->fixups, self->fixup_count, PackFile_FixupEntry *);
 
-    self->fixups[i]       = mem_allocate_typed(PackFile_FixupEntry);
-    self->fixups[i]->type = type;
-    self->fixups[i]->name = (char *)mem_sys_allocate(strlen(label) + 1);
-    strcpy(self->fixups[i]->name, label);
+    self->fixups[i]         = mem_allocate_typed(PackFile_FixupEntry);
+    self->fixups[i]->type   = type;
+    self->fixups[i]->name   = str_dup(label);
     self->fixups[i]->offset = offs;
-    self->fixups[i]->seg = self->code;
+    self->fixups[i]->seg    = self->code;
 }
 
 /*
