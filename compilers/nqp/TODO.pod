@@ -36,7 +36,7 @@ longer as much of a priority as it was.
 
 =over 4
 
-=item * Method ops
+=item * More tests for method ops
 
 We should be able to load an external module (Pm suggests Test.pbc)
 and exercise methods using that.

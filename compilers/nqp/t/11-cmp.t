@@ -2,7 +2,7 @@
 
 # check comparisons
 
-say('1..14');
+say('1..19');
 
 ##Integers, positive and negative
 
@@ -61,3 +61,38 @@ if -14 ne +"-14" {
     print("not ");
 }
 say("ok 14 # coerce string -14 into an integer");
+
+##Containers
+
+if (1,2) =:= (1,2) {
+    print("not ");
+}
+say("ok 15 # container equality, unnamed arrays");
+
+my @a := (1, 2);
+
+unless @a =:= @a {
+    print("not ");
+}
+say("ok 16 # container equality, self");
+
+my @b := @a;
+
+unless @a =:= @b {
+    print("not ");
+}
+say("ok 17 # container equality, named arrays");
+  
+my $x := 'foo';
+my $y := $x;
+my $z := 'foo';
+
+unless $x =:= $y {
+    print("not ");
+}
+say("ok 18 # container equality, string binding");
+
+if $x =:= $z {
+    print("not ");
+}
+say("ok 19 # container equality, string value");
