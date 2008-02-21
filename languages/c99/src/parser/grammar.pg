@@ -1,0 +1,552 @@
+# $Id$
+
+=begin overview
+
+This is the grammar for C99 written as a sequence of Perl 6 rules.
+
+
+taken from n869.pdf
+google for n869.pdf
+
+=end overview
+
+grammar C99::Grammar is PCT::Grammar;
+
+## A.2.4 External definitions
+##
+
+token TOP {
+    ^
+    <translation_unit>
+    [ $ || <.panic: Syntax error> ]
+}
+
+rule translation_unit {
+    <external_declaration>+
+}
+
+rule external_declaration {
+    | <declaration>
+    | <function_definition>
+}
+
+rule function_definition {
+    <declaration_specifiers>
+    <declarator>
+    <declaration_list>?
+    <compound_statement>
+}
+
+rule declaration_list {
+    <declaration>+
+}
+
+## A.2.2
+##
+
+rule declaration {
+    <declaration_specifiers>
+    <init_declarator_list>?
+    ';'
+}
+
+rule declaration_specifiers {
+    [ <type_specifier>
+    | <storage_class_specifier>
+    | <type_qualifier>
+    | <function_specifier>
+    ]+
+}
+
+rule function_specifier {
+    'inline'
+}
+
+rule init_declarator_list {
+    <init_declarator> [',' <init_declarator>]*
+}
+
+rule init_declarator {
+    <declarator> ['=' <initializer>]?
+}
+
+rule storage_class_specifier {
+    | 'typedef'
+    | 'extern'
+    | 'static'
+    | 'auto'
+    | 'register'
+}
+
+rule type_specifier {
+    | 'void'
+    | 'char'
+    | 'short'
+    | 'int'
+    | 'long'
+    | 'float'
+    | 'double'
+    | 'signed'
+    | 'unsigned'
+    | '_Bool'
+    | '_Complex'
+    | '_Imaginary'
+    | <struct_or_union_specifier>
+    | <enum_specifier>
+    | <typedef_name>
+}
+
+rule struct_or_union_specifier {
+    ['struct'|'union']
+    [ <struct_or_union_definition>
+    | <pre_declaration>
+    ]
+}
+
+
+rule struct_or_union_definition {
+    <identifier>? '{' <struct_declaration>+
+    [ '}' || <.panic: '}' expected to close struct or union> ]
+}
+
+rule pre_declaration {
+    <identifier>
+}
+
+rule struct_declaration {
+    <specifier_qualifier_list> <struct_declarator>*
+    [ ';' || <.panic: ';' expected after struct declaration> ]
+}
+
+rule specifier_qualifier_list {
+    [ <type_specifier>
+    | <type_qualifier>
+    ]+
+}
+
+rule struct_declarator_list {
+    <struct_declarator> [',' <struct_declarator>]*
+}
+
+rule struct_declarator {
+    | <declarator>? ':' <constant_expression>
+    | <declarator>
+}
+
+rule enum_specifier {
+    | 'enum' <identifier>? '{' <enumerator_list> [',']? '}'
+    | 'enum' <identifier>
+}
+
+rule enumerator_list {
+    <enumerator> [',' <enumerator>]*
+}
+
+rule enumerator {
+    <enumeration_constant> ['=' <constant_expression>]?
+}
+
+rule type_qualifier {
+    | 'const'
+    | 'restrict'
+    | 'volatile'
+}
+
+rule declarator {
+    <.debug: declarator>
+    <pointer>? <direct_declarator>
+}
+
+rule direct_declarator {
+    <.debug: direct_declarator>
+    [ '(' <declarator> ')'
+    | <identifier>
+    ]
+    <declarator_suffix>*
+}
+
+rule declarator_suffix {
+    | '(' <identifier_list>? ')'
+    | '(' <parameter_type_list> ')'
+    | '[' <assignment_expression>? ']'
+    | '[' '*' ']'
+}
+
+rule pointer {
+    '*' <type_qualifier>* ['*']?
+}
+
+rule parameter_type_list {
+    <.debug: param. type list>
+    <parameter_list> [',' '...']?
+}
+
+rule parameter_list {
+    <parameter_declaration> [',' <parameter_declaration>]*
+}
+
+rule parameter_declaration {
+    <declaration_specifiers>
+    [ <declarator>
+    | <abstract_declarator>?
+    ]
+}
+
+rule identifier_list {
+    <identifier> [',' <identifier>]*
+}
+
+rule type_name {
+    <specifier_qualifier_list> <abstract_declarator>?
+}
+
+rule abstract_declarator {
+    | '*'
+    | ['*']? <direct_abstract_declarator>
+}
+
+rule direct_abstract_declarator {
+    [
+    | '(' <abstract_declatator> ')'
+    | '[' <assignment_expression>? ']'
+    | '(' <parameter_type_list> ')'
+    ]
+    <direct_abstract_declarator_1>*
+}
+
+rule direct_abstract_declarator_1 {
+    | '[' <assignment_expression>? ']'
+    | '[' '*' ']'
+    | '(' <parameter_type_list> ')'
+}
+
+rule typedef_name {
+
+## a typedef name can be a return type specifier. This is ambiguous, because
+## the parser doesn't know if it's a return type thingie or the name of the
+## function. Therefore, typedef'd names must be stored in a %hash, so that
+## this rule is not calling <identifier>, but inspecting the registered
+## typedef'd names. For now, specify 'foo' as the only typedef'd name.
+##
+    #<identifier>
+    'foo'
+}
+
+rule initializer {
+    | <assignment_expression>
+    | '{' <initializer_list> [',']? '}'
+}
+
+rule initializer_list {
+    <initializer_item> [',' <initializer_item>]*
+}
+
+rule initializer_item {
+    <designation>? <initializer>
+}
+
+rule designation {
+    <designator>+ '='
+}
+
+rule designator {
+    | '[' <constant_expression> ']'
+    | '.' <identifier>
+}
+
+
+## A.2.3 Statements
+##
+
+rule statement {
+    | <labeled_statement>
+    | <compound_statement>
+    | <expression_statement>
+    | <selection_statement>
+    | <iteration_statement>
+    | <jump_statement>
+}
+
+rule labeled_statement {
+    | <identifier> ':' <statement>
+    | 'case' <constant_expression> ':' <statement>
+    | 'default' ':' <statement>
+}
+
+rule compound_statement {
+    '{' <block_item>* '}'
+}
+
+rule block_item {
+    | <declaration>
+    | <statement>
+}
+
+rule expression_statement {
+    <expression>? ';'
+}
+
+rule selection_statement {
+    | 'if' '(' <expression> ')' <statement> ['else' <statement>]?
+    | 'switch' '(' <expression> ')' <statement>
+}
+
+rule iteration_statement {
+    | 'while' '(' <expression> ')' <statement>
+    | 'do' <statement> 'while' '(' <expression> ')' ';'
+    | 'for' '(' <expression>? ';' <expression>? ';' <expression>? ')' <statement>
+    | 'for' '(' <declaration> <expression>? ';' <expression>? ')' <statement>
+}
+
+rule jump_statement {
+    | 'goto' <identifier> ';'
+    | 'continue' ';'
+    | 'break' ';'
+    | 'return' <expression>? ';'
+}
+
+
+## A.1.1 Lexical elements
+##
+##rule token {
+##  | <keyword>
+##  | <identifier>
+##  | <constant>
+##  | <c_string_literal>
+##  | <punctuator>
+##}
+
+regex preprocessing_token {
+  | <header_name>
+  | <identifier>
+  | <pp_number>
+  | <character_constant>
+  | <string_literal>
+  | <!pound> <punctuator>
+  | <universal_character_name>
+  | <-[# \r\n\t]>\S* ## <-[#]-\S>\S* ##non-whitespace
+}
+
+## A.1.2 Keywords
+##
+token keyword {
+  [ auto      | enum      | restrict  | unsigned
+  | break     | extern    | return    | void
+  | case      | float     | short     | volatile
+  | char      | for       | signed    | while
+  | const     | goto      | sizeof    | _Bool
+  | continue  | if        | static    | _Complex
+  | default   | inline    | struct    | _Imaginary
+  | do        | int       | switch
+  | double    | long      | typedef
+  | else      | register  | union     ]>>
+
+}
+
+token reserved_word {
+    <keyword>
+}
+
+
+token identifier {
+    <!reserved_word> <alpha>+
+}
+
+#
+#    <identifier_nondigit> [ <identifier_nondigit> | <digit> ]*
+#}
+
+token identifier_nondigit {
+    <alpha> | <[_]> | <universal_character_name>
+}
+
+## A.1.4 Universal character names
+##
+token universal_character_name {
+  | '\u' <xdigit>**{4}
+  | '\U' <xdigit>**{8}
+}
+
+
+## A.1.5 Constants
+##
+token constant {
+  | <integer_constant>
+  | <floating_constant>
+  | <enumeration_constant>
+  | <character_constant>
+}
+
+token integer_constant {
+  [ <decimal_constant>
+  | <octal_constant>
+  | <hexadecimal_constant>
+  ] <integer_suffix>?
+}
+
+token decimal_constant {
+    <[1..9]> <digit>*
+}
+
+token octal_constant {
+    0 <[0..7]>*
+}
+
+token hexadecimal_constant {
+    0 <[xX]> <xdigit>+
+}
+
+token integer_suffix {
+  | <[uU]> [ll?|LL?]?
+  | [ll?|LL?] <[uU]>?
+}
+
+token floating_constant {
+  | <decimal_floating_constant>
+  | <hexadecimal_floating_constant>
+}
+
+token decimal_floating_constant {
+  [ <fractional_constant> <exponent_part>?
+  | <digit_sequence> <exponent_part>
+  ] <floating_suffix>?
+}
+
+token hexadecimal_prefix {
+  0 <[xX]>
+}
+
+token hexadecimal_floating_constant {
+  <hexadecimal_prefix>
+  [ <hexadecimal_fractional_constant>
+  | <hexadecimal_digit_constant>
+  ] <binary_exponent_part> <floating_suffix>?
+}
+
+token fractional_constant {
+  | <digit_sequence>? \. <digit_sequence>
+  | <digit_sequence> \.
+}
+
+token exponent_part {
+  <[eE]> ['+'|'-']? <digit_sequence>
+}
+
+token digit_sequence { <digit>+ }
+
+token hexadecimal_fractional_constant {
+  | <hexadecimal_digit_sequence>? \. <hexadecimal_digit_sequence>
+  | <hexadecimal_digit_sequence> \.
+}
+
+token binary_exponent_part {
+  <[pP]> ['+'|'-']? <digit_sequence>
+}
+
+token hexadecimal_digit_sequence { <xdigit>+ }
+
+token floating_suffix { <[fFlL]> }
+
+token enumeration_constant { <identifier> }
+
+token character_constant { [L]? \' <c_char>+ \' }
+
+token <c_char> { <-['\\\n]> | <escape_sequence> }
+
+token escape_sequence {
+  \\
+  [ <['"?\\abfnrtv]>
+  | <octal_digit>**{1..3}
+  | x <xdigit>+
+  | <universal_character_name>
+  ]
+}
+
+## A.1.6 String literals
+token c_string_literal { [L]? \" <s_char>* \" }
+
+token s_char { <-["\\\n]> | <escape_sequence> }
+
+
+## A.2 Phrase structure grammar
+##
+
+## A.2.1 Expressions
+##
+
+rule constant_expression {
+    <conditional_expression>
+}
+
+rule expression {
+    <assignment_expression> [',' <assignment_expression>]*
+}
+
+rule assignment_expression {
+    [<unary_expression> <assign_op>]* <conditional_expression>
+}
+
+rule assign_op { '='|'*='|'/='|'%='|'+='|'-='|'<<='|'>>='|'&='|'^='|'|=' }
+
+rule conditional_expression {
+    <logical_expression> ['?' <expression> ':' <conditional_expression>]?
+}
+
+rule logical_expression is optable { ... }
+
+proto 'infix:||' is precedence('1') { ... }
+
+proto 'term:' is parsed(&cast_expression) { ... }
+
+
+rule postfix_expression {
+    <primary_expression>
+}
+
+rule unary_expression {
+    <postfix_expression>
+}
+
+rule cast_expression {
+    ['(' <type_name> ')']* <unary_expression>
+}
+
+rule primary_expression {
+    | <identifier>
+    | <constant>
+    | <c_string_literal>
+    | '(' <expression> ')'
+}
+
+token ws {
+  [
+  | '//' \N* \n
+  | '/*' .*? '*/'
+  | \s+
+  ]*
+}
+
+## copied from old c99 grammar.
+##
+## A.1.7 Punctuators
+##token punctuator {
+##  | \[        | \]        | <[(){}.]>   | <'->'>
+##  | <'++'>    | <'--'>    | <[&*+\-~!/%]>
+##  | <'<<'>    | <'>>'>    | <[<>]>
+##  | <'<='>    | <'>='>    | <'=='>   | <'!='>
+##  | <[^|]>    | <'&&'>    | <'||'>
+##  | <[?:;]>   | <'...'>
+##  | [ <[*/%+\-&^|]> | <'<<'> | <'>>'> ] <'='>
+##  | <[,#]>    | <'##'>
+##  | <'<:'>    | <':>'>    | <'<%'>   | <'%>'>   | <'%:'>   | <'%:%:'>
+##}
+##
+#### A.1.8 Header names
+##token header_name {
+##  | \< $<name:>=<?h_char>+ \>
+##  | " $<name>:=<?q_char>+ "
+##}
+##
+##token h_char { <-[\n>]> }
+##token q_char { <-[\n"]> }
+##
