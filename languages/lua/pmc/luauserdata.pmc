@@ -21,7 +21,7 @@ the Lua C<Userdata> type.
 
 #include "lua_private.h"
 
-typedef struct {
+typedef struct userdata_t {
     PMC * val;
     PMC * env;
 } userdata_t;
