@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -82,7 +82,7 @@ Creates and returns a clone of the scalar.
 
 */
     PMC* clone() {
-        PMC* dest = pmc_new(INTERP, PMC_type(SELF));
+        PMC *dest = pmc_new(INTERP, PMC_type(SELF));
         STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
     }
@@ -139,7 +139,7 @@ Return always C<false>.
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
 MMD_LuaNil: {
             return (INTVAL)1;
         }
@@ -161,12 +161,13 @@ MMD_DEFAULT: {
 =cut
 
 */
-    METHOD PMC* rawequal(PMC* value) {
+    METHOD PMC *rawequal(PMC *value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (PMC_type(SELF) == PMC_type(value))
-            PMC_int_val(retval) = 1;
+            VTABLE_set_integer_native(INTERP, retval, 1);
         else
-            PMC_int_val(retval) = 0;
+            VTABLE_set_integer_native(INTERP, retval, 0);
+
         return retval;
     }
 
