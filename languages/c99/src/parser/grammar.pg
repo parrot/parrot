@@ -497,15 +497,66 @@ rule logical_expression is optable { ... }
 
 proto 'infix:||' is precedence('1') { ... }
 
+proto 'infix:&&' is tighter('infix:||') { ... }
+
+proto 'infix:|' is tighter('infix:&&') { ... }
+
+proto 'infix:^' is tighter('infix:|') { ... }
+
+proto 'infix:&' is tighter('infix:^') { ... }
+
+proto 'infix:==' is tighter('infix:&') { ... }
+proto 'infix:!=' is equal('infix:==') { ... }
+
+proto 'infix:<' is tighter('infix:==') { ... }
+proto 'infix:>' is equal('infix:<') { ... }
+proto 'infix:>=' is equal('infix:<') { ... }
+proto 'infix:<=' is equal('infix:<') { ... }
+
+proto 'infix:<<' is tighter('infix:==') { ... }
+proto 'infix:>>' is equal('infix:<<') { ... }
+
+proto 'infix:+' is tighter('infix:<<') { ... }
+proto 'infix:-' is equal('infix:+') { ... }
+
+proto 'infix:*' is tighter('infix:+') { ... }
+proto 'infix:/' is equal('infix:*') { ... }
+proto 'infix:%' is equal('infix:*') { ... }
+
 proto 'term:' is parsed(&cast_expression) { ... }
 
 
 rule postfix_expression {
-    <primary_expression>
+    [
+    | <primary_expression>
+    | '(' <type_name> ')' '{' <initializer_list> [',']? '}'
+    ]
+    <postfix_expression_suffix>
+}
+
+rule postfix_expression_suffix {
+    | '[' <expression> ']'
+    | '(' <argument_expression_list>? ')'
+    | '.' <identifier>
+    | '->' <identifier>
+    | '++'
+    | '--'
+}
+
+rule argument_expression_list {
+    <assignment_expression> [',' <assignment_expression>]*
 }
 
 rule unary_expression {
-    <postfix_expression>
+    | <postfix_expression>
+    | ['++'|'--'] <unary_expression>
+    | <unary_operator> <cast_expression>
+    | 'sizeof' <unary_expression>
+    | 'sizeof' '(' <type_name> ')'
+}
+
+rule unary_operator {
+    '&' | '*' | '+' | '-' | '~' | '!'
 }
 
 rule cast_expression {

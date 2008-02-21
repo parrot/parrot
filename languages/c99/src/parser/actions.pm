@@ -15,7 +15,7 @@ value of the comment is passed as the second argument to the method.
 
 =end comments
 
-class C::Grammar::Actions;
+class C99::Grammar::Actions;
 
 method TOP($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
