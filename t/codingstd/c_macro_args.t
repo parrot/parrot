@@ -51,8 +51,8 @@ sub check_macro_args {
                 }{}gsx;
 
         # combine lines extended with \\n
-        $buf =~ s/\\\n//g;  
- 
+        $buf =~ s/\\\n//g;
+
         if ( $buf =~ m{ ^ \s* \#define \s+ ([a-zA-Z_]+)  \( ([^)]+) \)  ([^\n]*) }smx ) {
             my ($macro,$args,$definition) = ($1, $2, $3);
             # for each of these args, verify it's wrapped in parens each time
