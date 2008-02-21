@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -21,6 +21,13 @@ the Lua C<Userdata> type.
 
 #include "lua_private.h"
 
+typedef struct {
+    PMC * val;
+    PMC * env;
+} userdata_t;
+
+#define u_val(pmc) (PMC_data_typed((pmc), userdata_t *))->val
+#define u_env(pmc) (PMC_data_typed((pmc), userdata_t *))->env
 
 pmclass LuaUserdata
     extends LuaAny
@@ -40,7 +47,8 @@ Initializes the userdata.
 
 */
     void init() {
-        PMC_pmc_val(SELF) = NULL;
+        userdata_t *u = mem_allocate_zeroed_typed(userdata_t);
+        PMC_data(SELF) = u;
         PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -55,8 +63,10 @@ Marks the userdata as live.
 
 */
     void mark() {
-        if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+        if (u_val(SELF))
+            pobject_lives(INTERP, (PObj *)u_val(SELF));
+        if (u_env(SELF))
+            pobject_lives(INTERP, (PObj *)u_env(SELF));
         if (PMC_metadata(SELF))
             pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
     }
@@ -71,12 +81,14 @@ Call finalizer and free the userdata.
 
 */
     void destroy() {
+        userdata_t *u = PMC_data_typed(SELF, userdata_t *);
         PMC* meth = find_meth(INTERP, SELF, "__gc");
         if (meth != NULL) {
             (void)Parrot_runops_fromc_args(INTERP, meth, "vP", SELF);
         }
-        if (PMC_pmc_val(SELF)) {
-            PMC_pmc_val(SELF) = NULL;
+        if (u) {
+            mem_sys_free(u);
+            PMC_data(SELF) = NULL;
         }
     }
 
@@ -123,7 +135,8 @@ Return the string "userdata".
 
 */
     void set_pmc(PMC *value) {
-        PMC_struct_val(SELF) = PMC_struct_val(value);
+        u_val(SELF) = u_val(value);
+        u_env(SELF) = u_env(value);
         PMC_metadata(SELF) = PMC_metadata(value);
     }
 
@@ -135,7 +148,7 @@ Return the string "userdata".
 
 */
     PMC* get_attr_str(STRING* key) {
-        return PMC_pmc_val(SELF);
+        return u_val(SELF);
     }
 
 /*
@@ -146,7 +159,7 @@ Return the string "userdata".
 
 */
     void set_attr_str(STRING* key, PMC* value) {
-        PMC_pmc_val(SELF) = value;
+        u_val(SELF) = value;
     }
 
 /*
@@ -214,6 +227,21 @@ MMD_DEFAULT: {
 
 =over 4
 
+=item C<PMC *getfenv()>
+
+=cut
+
+*/
+    METHOD PMC* getfenv() {
+        PMC *retval = u_env(SELF);
+        if (retval != NULL)
+            return retval;
+        else
+            return pmc_new(INTERP, dynpmc_LuaNil);
+    }
+
+/*
+
 =item C<PMC *get_metatable()>
 
 =cut
@@ -236,11 +264,23 @@ MMD_DEFAULT: {
     METHOD PMC* rawequal(PMC* value) {
         PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (PMC_type(SELF) == PMC_type(value)
-         && SELF == value)
+         && u_val(SELF) == u_val(value)
+         && u_env(SELF) == u_env(value))
             PMC_int_val(retval) = 1;
         else
             PMC_int_val(retval) = 0;
         return retval;
+    }
+
+/*
+
+=item C<void setfenv(PMC *env)>
+
+=cut
+
+*/
+    METHOD void setfenv(PMC *env) {
+        u_env(SELF) = env;
     }
 
 /*

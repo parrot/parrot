@@ -39,16 +39,18 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 .sub 'luaopen_io'
 #    print "init Lua I/O\n"
 
+    .local pmc _file
+    $P0 = get_hll_global ['Lua::io::file'], 'createmeta'
+    _file = $P0()
+
+    # create (private) environment (with fields IO_INPUT, IO_OUTPUT, __close)
+    .local pmc _io_env
+    .const .Sub _io_fclose = 'fclose'
+    _io_env = newfenv(_io_fclose)
+
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
     new $P1, 'LuaString'
-
-    .local pmc _io_env
-    new _io_env, 'LuaTable'
-
-    .local pmc _file
-    $P0 = get_hll_global ['Lua::io::file'], 'createmeta'
-    _file = $P0(_io_env)
 
     .local pmc _io
     new _io, 'LuaTable'
@@ -115,16 +117,19 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .const .Sub _readline = 'readline'
     _readline.'setfenv'(_io_env)
 
-
-    # set default close function
-    .const .Sub _io_fclose = 'fclose'
-    _io_fclose.'setfenv'(_io_env)
-    set $P1, '__close'
-    _io_env[$P1] = _io_fclose
-
     # create (and set) default files
     createstdfiles(_file, _io, _io_env)
 
+.end
+
+
+.sub 'newfenv' :anon
+    .param pmc fct
+    .local pmc env
+    new env, 'LuaTable'
+    .const .LuaString key = '__close'
+    env[key] = fct
+    .return (env)
 .end
 
 
@@ -135,7 +140,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 .sub 'createstdfiles' :anon
     .param pmc mt
     .param pmc io
-    .param pmc env
+    .param pmc io_env
+    .local pmc env
+    .const .Sub _io_noclose = 'noclose'
+    env = newfenv(_io_noclose) # close function for default files
     new $P1, 'LuaString'
     new $P3, 'LuaNumber'
 
@@ -144,24 +152,27 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     new $P0, 'LuaUserdata'
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(mt)
+    $P0.'setfenv'(env)
     io[$P1] = $P0
     set $P3, IO_INPUT
-    env[$P3] = $P0
+    io_env[$P3] = $P0
 
     set $P1, 'stdout'
     $P2 = getstdout
     new $P0, 'LuaUserdata'
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(mt)
+    $P0.'setfenv'(env)
     io[$P1] = $P0
     set $P3, IO_OUTPUT
-    env[$P3] = $P0
+    io_env[$P3] = $P0
 
     set $P1, 'stderr'
     $P2 = getstderr
     new $P0, 'LuaUserdata'
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(mt)
+    $P0.'setfenv'(env)
     io[$P1] = $P0
 .end
 
@@ -233,14 +244,18 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 .sub 'newfile' :anon
     .local pmc file
+    new file, 'LuaUserdata'
+    $P0 = getinterp
+    $P1 = $P0['sub'; 1]
+    .local pmc env
+    env = $P1.'getfenv'()
+    file.'setfenv'(env)
     .local pmc _lua__REGISTRY
-    .local pmc mt
     _lua__REGISTRY = get_hll_global '_REGISTRY'
     .const .LuaString key = 'ParrotIO'
+    .local pmc mt
     mt = _lua__REGISTRY[key]
-    new file, 'LuaUserdata'
     file.'set_metatable'(mt)
-    # TODO : setfenv with the caller one
     .return (file)
 .end
 
@@ -366,20 +381,11 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 .sub 'aux_close'
     .param pmc file
-    .local pmc f
-    f = tofilep(file)
-    $P0 = getstdin
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    $P0 = getstdout
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    $P0 = getstderr
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    .return fclose(file)
-  L1:
-    .return noclose(file)
+    .local pmc env
+    env = file.'getfenv'()
+    .const .LuaString key = '__close'
+    $P0 = env[key]
+    .return $P0(file)
 .end
 
 .sub 'aux_lines' :lex
