@@ -50,21 +50,20 @@ Raises an exception. Use C<init_pmc()>.
 =cut
 
 */
-    void init_pmc(PMC* sub) {
+    void init_pmc(PMC *sub) {
         PMC *classobj = Parrot_oo_get_class_str(INTERP,
                           const_string(INTERP, "Parrot::Coroutine"));
+        PMC *init_args;
 
-        if (!PMC_IS_NULL(classobj)) {
-            PMC *init_args = pmc_new(INTERP, enum_class_Hash);
-            VTABLE_set_pmc_keyed_str(INTERP, init_args,
-                                     const_string(INTERP, "initial_sub"), sub);
-            PMC_pmc_val(SELF) = VTABLE_instantiate(INTERP,
-                                                   classobj, init_args);
-            PObj_custom_mark_SET(SELF);
-        }
-        else
+        if (PMC_IS_NULL(classobj))
             real_exception(INTERP, NULL, E_Exception,
                            "Parrot::Coroutine not found");
+
+        init_args = pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pmc_keyed_str(INTERP, init_args,
+                                 const_string(INTERP, "initial_sub"), sub);
+        PMC_pmc_val(SELF) = VTABLE_instantiate(INTERP, classobj, init_args);
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -107,12 +106,12 @@ Return the string "thread".
 
 /*
 
-=item C<PMC* get_attr_str(STRING* key)>
+=item C<PMC* get_attr_str(STRING *key)>
 
 =cut
 
 */
-    PMC* get_attr_str(STRING* key) {
+    PMC* get_attr_str(STRING *key) {
         return PMC_pmc_val(SELF);
     }
 
@@ -146,12 +145,12 @@ Return the string "thread".
 
 =over 4
 
-=item C<INTVAL is_equal(PMC* value)>
+=item C<INTVAL is_equal(PMC *value)>
 
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
 MMD_LuaThread: {
             if (SELF == value)
                 return (INTVAL)1;
@@ -171,18 +170,19 @@ MMD_DEFAULT: {
 
 =over 4
 
-=item C<PMC* rawequal(PMC* value)>
+=item C<PMC* rawequal(PMC *value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal(PMC* value) {
-        PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (PMC_type(SELF) == PMC_type(value)
-         && SELF == value)
-            PMC_int_val(retval) = 1;
+    METHOD PMC* rawequal(PMC *value) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+
+        if (PMC_type(SELF) == PMC_type(value) && SELF == value)
+            VTABLE_set_integer_native(INTERP, retval, 1);
         else
-            PMC_int_val(retval) = 0;
+            VTABLE_set_integer_native(INTERP, retval, 0);
+
         return retval;
     }
 
