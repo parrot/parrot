@@ -99,20 +99,20 @@ Return the string "function".
 */
     void set_pmc(PMC *value) {
         PMC_struct_val(SELF) = PMC_struct_val(value);
-        PMC_metadata(SELF) = PMC_metadata(value);
+        PMC_metadata(SELF)   = PMC_metadata(value);
     }
 
 /*
 
-=item C<INTVAL is_equal(PMC* value)>
+=item C<INTVAL is_equal(PMC *value)>
 
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
 MMD_LuaFunction: {
             return (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
-                && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg;
+                && (PMC_sub(SELF))->seg        == (PMC_sub(value))->seg;
         }
 MMD_DEFAULT: {
             return (INTVAL)0;
@@ -134,27 +134,30 @@ MMD_DEFAULT: {
 */
     METHOD PMC* getfenv() {
         PMC *retval = PMC_metadata(SELF);
-        if (retval != NULL)
+
+        if (retval)
             return retval;
-        else
-            return pmc_new(INTERP, dynpmc_LuaNil);
+
+        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
 
-=item C<PMC* rawequal(PMC* value)>
+=item C<PMC* rawequal(PMC *value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal(PMC* value) {
+    METHOD PMC* rawequal(PMC *value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (PMC_type(SELF) == PMC_type(value)
-         && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
-         && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg)
-            PMC_int_val(retval) = 1;
+
+        if (PMC_type(SELF)             == PMC_type(value)
+        && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
+        && (PMC_sub(SELF))->seg        == (PMC_sub(value))->seg)
+            VTABLE_set_integer_native(INTERP, retval, 1);
         else
-            PMC_int_val(retval) = 0;
+            VTABLE_set_integer_native(INTERP, retval, 0);
+
         return retval;
     }
 
