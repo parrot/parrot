@@ -90,11 +90,15 @@ for details.
 In order to define what an operand is, a special rule is define, named
 C<term:>.
 
- proto 'term:' is precedence('=') is parsed(&simple_expression) { ... }
+ proto 'term:' is tighter('infix:*')
+               is parsed(&simple_expression) { ... }
 
 This rule states that whenever an operand is expected, it is parsed by
 the rule named C<simple_expression>. In other words, this is the point
 where the parser switches back from bottom-up to top-down.
+
+Be sure to add the C<tighter> clause, to make sure that your I<terms>
+are parsed correctly.
 
 =head2 Defining operators
 
