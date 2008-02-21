@@ -8,9 +8,9 @@ pmc/luaclosure.pmc - Lua Closure
 
 =head1 DESCRIPTION
 
-C<LuaClosure> extends C<Parrot Closure> and C<LuaAny> to provide a class
-with the behaviour of the Lua C<Function> type.
-C<LuaClosure> is used by function written in Lua.
+C<LuaClosure> extends C<Parrot Closure> and C<LuaAny> to provide a class with
+the behaviour of the Lua C<Function> type.  C<LuaClosure> is used by functions
+written in Lua.
 
 See also: F<languages/lua/pmc/luafunction.pmc>
 
@@ -43,19 +43,18 @@ pmclass LuaClosure
 =cut
 
 */
-    void init_pmc(PMC* sub) {
+    void init_pmc(PMC *sub) {
         if (VTABLE_isa(INTERP, sub, const_string(INTERP, "Closure"))) {
-            PMC_struct_val(SELF) = mem_allocate_typed(struct Parrot_sub);
-            PMC_pmc_val(SELF)    = PMCNULL;
-            PMC_metadata(SELF)   = PMCNULL;
+            PMC_struct_val(SELF) = mem_allocate_zeroed_typed(Parrot_sub);
+            PMC_pmc_val(SELF)    = NULL;
+            PMC_metadata(SELF)   = NULL;
             PObj_custom_mark_destroy_SETALL(SELF);
             /* copy the sub struct */
-            memcpy(PMC_sub(SELF), PMC_sub(sub), sizeof (struct Parrot_sub));
+            memcpy(PMC_sub(SELF), PMC_sub(sub), sizeof (Parrot_sub));
         }
-        else {
-            real_exception(INTERP, NULL, E_Exception, "not a Closure (%s)",
+        else
+            real_exception(INTERP, NULL, E_Exception, "not a Closure (%Ss)",
                            string_to_cstring(INTERP, SELF->vtable->whoami));
-        }
     }
 
 /*
@@ -94,7 +93,7 @@ Return the string "function".
 
 */
     PMC* clone() {
-        PMC* ret = SUPER();
+        PMC *ret = SUPER();
         PMC_metadata(ret) = PMC_metadata(SELF);
         PObj_custom_mark_destroy_SETALL(ret);
         return ret;
@@ -120,7 +119,7 @@ Return the string "function".
 */
     void set_pmc(PMC *value) {
         PMC_struct_val(SELF) = PMC_struct_val(value);
-        PMC_metadata(SELF) = PMC_metadata(value);
+        PMC_metadata(SELF)   = PMC_metadata(value);
     }
 
 /*
@@ -133,7 +132,7 @@ Return the string "function".
     INTVAL is_equal(PMC* value) {
 MMD_LuaClosure: {
             return (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
-                && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg;
+                && (PMC_sub(SELF))->seg        == (PMC_sub(value))->seg;
         }
 MMD_DEFAULT: {
             return (INTVAL)0;
@@ -155,10 +154,11 @@ MMD_DEFAULT: {
 */
     METHOD PMC* getfenv() {
         PMC *retval = PMC_metadata(SELF);
-        if (retval != NULL)
+
+        if (retval)
             return retval;
-        else
-            return pmc_new(INTERP, dynpmc_LuaNil);
+
+        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
@@ -170,12 +170,14 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal(PMC* value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (PMC_type(SELF) == PMC_type(value)
-         && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
-         && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg)
-            PMC_int_val(retval) = 1;
+
+        if (PMC_type(SELF)             == PMC_type(value)
+        && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
+        && (PMC_sub(SELF))->seg        == (PMC_sub(value))->seg)
+            VTABLE_set_integer_native(INTERP, retval, 1);
         else
-            PMC_int_val(retval) = 0;
+            VTABLE_set_integer_native(INTERP, retval, 0);
+
         return retval;
     }
 
