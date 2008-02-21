@@ -1,3 +1,6 @@
+# $Id$
+# Copyright (C) 2008, The Perl Foundation.
+
 =head1 TITLE
 
 c99.pir - A C99 compiler.
