@@ -59,7 +59,10 @@ sub check_macro_args {
             # it's referenced in the definition.
             if ($definition ne "") {
                 foreach my $arg (split /\s*,\s*/, $args) {
-                    if ($definition =~ m/(?<!\(\b)$arg(?!\b\()/) {
+                    # eliminate any properly formed usage of the macro arg
+                    $definition =~ s/\($arg\)//g;
+                    # Any remaining usage must be improper
+                    if ($definition =~ m/\b$arg\b/) {
                         push (@defines, "$path: $macro has unwrapped arg: $arg\n");
                     }
                 }
