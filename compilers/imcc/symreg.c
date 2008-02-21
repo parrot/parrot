@@ -362,10 +362,10 @@ add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
     pcc_sub_t * const sub = r->pcc_sub;
     const int         n   = sub->nargs;
 
-    sub->args         = mem_realloc_n_typed(sub->args, n+1, SymReg *);
-    sub->args[n]      = arg;
+    mem_realloc_n_typed(sub->args,      n+1, SymReg *);
+    mem_realloc_n_typed(sub->arg_flags, n+1, int);
 
-    sub->arg_flags    = mem_realloc_n_typed(sub->arg_flags, n+1, int);
+    sub->args[n]      = arg;
     sub->arg_flags[n] = arg->type;
 
     arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
@@ -406,13 +406,13 @@ add_pcc_result(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
     pcc_sub_t * const sub = r->pcc_sub;
     const int         n   = sub->nret;
 
-    sub->ret       = mem_realloc_n_typed(sub->ret, n+1, SymReg *);
-    sub->ret[n]    = arg;
+    mem_realloc_n_typed(sub->ret,       n+1, SymReg *);
+    mem_realloc_n_typed(sub->ret_flags, n+1, int);
 
     /* we can't keep the flags in the SymReg as the SymReg
      * maybe used with different flags for different calls */
-    sub->ret_flags    = mem_realloc_n_typed(sub->ret_flags, n+1, int);
 
+    sub->ret[n]       = arg;
     sub->ret_flags[n] = arg->type;
 
     arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
@@ -436,7 +436,7 @@ add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
     pcc_sub_t * const sub = r->pcc_sub;
     const int n           = sub->nmulti;
 
-    sub->multi    = mem_realloc_n_typed(sub->multi, n+1, SymReg *);
+    mem_realloc_n_typed(sub->multi, n+1, SymReg *);
     sub->multi[n] = arg;
     sub->nmulti++;
 }
