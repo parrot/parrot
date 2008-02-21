@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -77,8 +77,8 @@ Marks the Parrot::Coroutine as live.
 
 */
     void mark() {
-        if (PMC_struct_val(SELF))
-            pobject_lives(INTERP, PMC_struct_val(SELF));
+        if (PMC_pmc_val(SELF))
+            pobject_lives(INTERP, PMC_pmc_val(SELF));
     }
 
 /*
