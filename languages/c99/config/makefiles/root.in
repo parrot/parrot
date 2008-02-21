@@ -27,7 +27,7 @@ PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
 PMC_DIR       = src/pmc
 
-all: c.pbc
+all: c99.pbc
 
 C_GROUP = $(PMC_DIR)/c_group$(LOAD_EXT)
 
@@ -45,7 +45,7 @@ BUILTINS_PIR = \
 
 # the default target
 c99.pbc: $(PARROT) $(SOURCES)
-	$(PARROT) $(PARROT_ARGS) -o c.pbc c99.pir
+	$(PARROT) $(PARROT_ARGS) -o c99.pbc c99.pir
 
 src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
