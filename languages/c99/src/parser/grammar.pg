@@ -372,21 +372,23 @@ token universal_character_name {
 ## A.1.5 Constants
 ##
 token constant {
-  | <integer_constant>
-  | <floating_constant>
-  | <enumeration_constant>
-  | <character_constant>
+    | <floating_constant>
+    | <integer_constant>
+    | <enumeration_constant>
+    | <character_constant>
 }
 
 token integer_constant {
-  [ <decimal_constant>
-  | <octal_constant>
-  | <hexadecimal_constant>
-  ] <integer_suffix>?
+    [ <decimal_constant>
+    | <octal_constant>
+    | <hexadecimal_constant>
+    ] <integer_suffix>?
 }
 
 token decimal_constant {
-    <[1..9]> <digit>*
+    \d+
+    #| 0
+    #| <[1..9]> <digit>*
 }
 
 token octal_constant {
@@ -523,7 +525,8 @@ proto 'infix:*' is tighter('infix:+') { ... }
 proto 'infix:/' is equal('infix:*') { ... }
 proto 'infix:%' is equal('infix:*') { ... }
 
-proto 'term:' is parsed(&cast_expression) { ... }
+proto 'term:' is tighter('infix:*')
+              is parsed(&cast_expression) { ... }
 
 
 rule postfix_expression {
@@ -531,7 +534,7 @@ rule postfix_expression {
     | <primary_expression>
     | '(' <type_name> ')' '{' <initializer_list> [',']? '}'
     ]
-    <postfix_expression_suffix>
+    <postfix_expression_suffix>*
 }
 
 rule postfix_expression_suffix {
