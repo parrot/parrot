@@ -59,7 +59,7 @@ sub check_macro_args {
             # it's referenced in the definition.
             if ($definition ne "") {
                 foreach my $arg (split /\s*,\s*/, $args) {
-                    if ($definition =~ m/\b[^(]$arg[^)]\b/) {
+                    if ($definition =~ m/(?<!\(\b)$arg(?!\b\()/) {
                         push (@defines, "$path: $macro has unwrapped arg: $arg\n");
                     }
                 }
