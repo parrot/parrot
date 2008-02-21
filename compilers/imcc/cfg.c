@@ -778,8 +778,7 @@ free_life_info(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg *r))
     if (r->life_info) {
         int i;
         for (i=0; i < unit->n_basic_blocks; i++) {
-            if (r->life_info[i])
-                mem_sys_free(r->life_info[i]);
+            mem_sys_free(r->life_info[i]);
         }
         mem_sys_free(r->life_info);
         r->life_info = NULL;
@@ -1391,14 +1390,8 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 
     /* now 'loop' contains the set of nodes inside the loop.  */
     n_loops  = unit->n_loops;
-    loop_info = unit->loop_info;
 
-    if (!loop_info)
-        loop_info = unit->loop_info = (Loop_info **)mem_sys_allocate(
-                (n_loops + 1) * sizeof (Loop_info *));
-    else
-        loop_info = unit->loop_info = (Loop_info **)mem_sys_realloc(loop_info,
-                (n_loops + 1) * sizeof (Loop_info *));
+    loop_info = mem_realloc_n_typed(unit->loop_info, n_loops+1, Loop_info *);
 
     loop_info[n_loops]            = mem_allocate_typed(Loop_info);
     loop_info[n_loops]->loop      = loop;
@@ -1531,10 +1524,7 @@ make_basic_block(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins)
 {
     int n;
     Basic_block * const bb = mem_allocate_typed(Basic_block);
-
-    if (ins == NULL) {
-        PANIC(interp, "make_basic_block: called with NULL argument\n");
-    }
+    PARROT_ASSERT(ins);
 
     bb->start      = ins;
     bb->end        = ins;
@@ -1549,8 +1539,7 @@ make_basic_block(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins)
 
     if (n == unit->bb_list_size) {
         unit->bb_list_size *= 2;
-        unit->bb_list = (Basic_block **)mem_sys_realloc(unit->bb_list,
-                unit->bb_list_size * sizeof (Basic_block *));
+        mem_realloc_n_typed(unit->bb_list, unit->bb_list_size, Basic_block *);
     }
 
     unit->bb_list[n] = bb;
