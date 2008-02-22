@@ -5752,13 +5752,10 @@ define_macro(Interp *interp, ARGIN(const char *name), ARGIN(const params_t *para
 static macro_t *
 find_macro(Interp *interp, const char *name)
 {
-    DECL_CONST_CAST_OF(char);
-
     if (!IMCC_INFO(interp)->macros)
         return NULL;
 
-    return (macro_t *)parrot_hash_get(interp,
-        IMCC_INFO(interp)->macros, const_cast(name));
+    return (macro_t *)parrot_hash_get(interp, IMCC_INFO(interp)->macros, name);
 }
 
 static int

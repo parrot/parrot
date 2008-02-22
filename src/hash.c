@@ -89,7 +89,9 @@ static size_t key_hash_cstring(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t key_hash_pointer(SHIM_INTERP, ARGIN(void *value), size_t seed)
+static size_t key_hash_pointer(SHIM_INTERP,
+    ARGIN(const void *value),
+    size_t seed)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -186,7 +188,7 @@ Returns a hashvalue for a pointer.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t
-key_hash_pointer(SHIM_INTERP, ARGIN(void *value), size_t seed)
+key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
     return ((size_t) value) ^ seed;
 }
@@ -247,7 +249,7 @@ Custom C<key_hash> function.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-key_hash_int(SHIM_INTERP, ARGIN(void *value), size_t seed)
+key_hash_int(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
     return (size_t)value ^ seed;
 }
@@ -846,8 +848,7 @@ PARROT_API
 void
 parrot_new_pointer_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
 {
-    parrot_new_hash_x(hptr, enum_type_ptr, Hash_key_type_ptr,
-                        pointer_compare, key_hash_pointer);
+    parrot_new_hash_x(hptr, enum_type_ptr, Hash_key_type_ptr, pointer_compare, key_hash_pointer);
 }
 
 /*
@@ -966,13 +967,9 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 HashBucket *
-parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(void *key))
+parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 {
-    if (hash->entries == 0)
-        return NULL;
-
-    /* this block here should be C89-safe; const is very nice on hashval */
-    {
+    if (hash->entries > 0) {
         const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
         HashBucket   *bucket  = hash->bi[hashval & hash->mask];
 
@@ -1001,7 +998,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
-parrot_hash_get(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(void *key))
+parrot_hash_get(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(const void *key))
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? bucket->value : NULL;

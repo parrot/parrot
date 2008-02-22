@@ -40,7 +40,7 @@ typedef UINTVAL BucketIndex;
 
 typedef int (*hash_comp_fn)(PARROT_INTERP, const void*const, const void*const);
 typedef void (*hash_mark_key_fn)(PARROT_INTERP, PObj *);
-typedef size_t (*hash_hash_key_fn)(PARROT_INTERP, NOTNULL(void*), size_t seed);
+typedef size_t (*hash_hash_key_fn)(PARROT_INTERP, ARGIN(const void *), size_t seed);
 
 typedef enum {
     Hash_key_type_int,
@@ -110,7 +110,9 @@ INTVAL parrot_hash_exists(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void * parrot_hash_get(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(void *key))
+void * parrot_hash_get(PARROT_INTERP,
+    ARGIN(Hash *hash),
+    ARGIN(const void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -120,7 +122,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 HashBucket * parrot_hash_get_bucket(PARROT_INTERP,
     ARGIN(const Hash *hash),
-    ARGIN(void *key))
+    ARGIN(const void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -203,7 +205,7 @@ int int_compare(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-size_t key_hash_int(SHIM_INTERP, ARGIN(void *value), size_t seed)
+size_t key_hash_int(SHIM_INTERP, ARGIN(const void *value), size_t seed)
         __attribute__nonnull__(2);
 
 void parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))

@@ -193,7 +193,7 @@ void new_internal_exception(PARROT_INTERP)
 PARROT_API
 PARROT_DOES_NOT_RETURN_WHEN_FALSE
 void Parrot_assert(
-    long condition,
+    INTVAL condition,
     ARGIN(const char *condition_string),
     ARGIN(const char *file),
     unsigned int line)
