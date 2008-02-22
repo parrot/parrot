@@ -29,6 +29,25 @@ typedef struct userdata_t {
 #define u_val(pmc) (PMC_data_typed((pmc), userdata_t *))->val
 #define u_env(pmc) (PMC_data_typed((pmc), userdata_t *))->env
 
+static PMC* curr_func(PARROT_INTERP) {
+    parrot_context_t *ctx = CONTEXT(interp->ctx);
+    PMC *sub = ctx->current_sub;
+    PMC *cont = ctx->current_cont;
+    ctx = PMC_cont(cont)->to_ctx;
+    sub = ctx->current_sub;
+    return sub;
+}
+
+static PMC* getcurrenv(PARROT_INTERP) {
+    PMC *env = NULL;
+    PMC *sub = curr_func(interp);
+    if (sub) {
+        env = PMC_metadata(sub);
+    }
+    return env;
+}
+
+
 pmclass LuaUserdata
     extends LuaAny
     does scalar
@@ -49,6 +68,7 @@ Initializes the userdata.
     void init() {
         userdata_t *u      = mem_allocate_zeroed_typed(userdata_t);
         PMC_data(SELF)     = u;
+        u_env(SELF) = getcurrenv(INTERP);
         PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }

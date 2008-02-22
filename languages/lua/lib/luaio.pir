@@ -245,11 +245,6 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 .sub 'newfile' :anon
     .local pmc file
     new file, 'LuaUserdata'
-    $P0 = getinterp
-    $P1 = $P0['sub'; 1]
-    .local pmc env
-    env = $P1.'getfenv'()
-    file.'setfenv'(env)
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
     .const .LuaString key = 'ParrotIO'
