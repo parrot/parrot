@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 package Parrot::Ops2c::Utils;
 use strict;
@@ -898,14 +898,14 @@ static void store_op(op_info_t *info, int full) {
     hop[hidx] = p;
 }
 static int get_op(const char * name, int full) {
-    HOP * p;
+    const HOP * p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
-        hop = (HOP **)mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
+        hop = mem_allocate_n_zeroed_typed(OP_HASH_SIZE,HOP *);
         hop_init();
     }
     for (p = hop[hidx]; p; p = p->next) {
-        if(!strcmp(name, full ? p->info->full_name : p->info->name))
+        if(STREQ(name, full ? p->info->full_name : p->info->name))
             return p->info - $self->{bs}op_lib.op_info_table;
     }
     return -1;
@@ -923,18 +923,19 @@ static void hop_init(void) {
 }
 static void hop_deinit(void)
 {
-    HOP *p, *next;
     if (hop) {
         size_t i;
-        for (i = 0; i < OP_HASH_SIZE; i++)
-            for (p = hop[i]; p; ) {
-                next = p->next;
-                free(p);
+        for (i = 0; i < OP_HASH_SIZE; i++) {
+            HOP *p = hop[i];
+            while (p) {
+                HOP * const next = p->next;
+                mem_sys_free(p);
                 p = next;
+            }
         }
-        free(hop);
+        mem_sys_free(hop);
+        hop = NULL;
     }
-    hop = 0;
 }
 
 END_C
