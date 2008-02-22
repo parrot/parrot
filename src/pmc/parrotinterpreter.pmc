@@ -643,8 +643,8 @@ Finish thawing.
 
                 if (!STRING_IS_EMPTY(lib_name)) {
                     INTVAL id;
-                    PObj_constant_SET(lib_name);
                     ignored      = Parrot_load_lib(INTERP, lib_name, NULL);
+                    PObj_constant_SET(lib_name);
                     id           = Parrot_register_HLL_lib(INTERP, lib_name);
                     UNUSED(id);
                 }
