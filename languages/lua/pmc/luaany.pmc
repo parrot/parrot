@@ -116,7 +116,7 @@ Returns the address of the PMC.
 
 /*
 
-=item C<PMC* get_pmc_keyed(PMC* key)>
+=item C<PMC* get_pmc_keyed(PMC *key)>
 
 Throws an exception.
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -26,8 +26,9 @@ This implementation is based on the Lua 4.0 one.
 #define LUA_ASSERT(c, s)         assert(((void)s, (c)))
 
 #define Hash LuaHash
+#define PMC_hash(s) (LuaHash *)PMC_struct_val((s))
 
-#define MAX_INT (INT_MAX-2)  /* maximum value of an int (-2 for safety) */
+#define MAX_INT (INT_MAX-2)     /* maximum value of an int (-2 for safety) */
 
 #define MINPOWER2       4       /* minimum size for "growing" vectors */
 
@@ -54,9 +55,9 @@ typedef struct Node {
 
 typedef struct Hash {
     Node *node;
-    int size;
     Node *firstfree;  /* this position is free; all positions after it are full */
     PMC *container;
+    int   size;
 } Hash;
 
 #define node(t, i)       (&(t)->node[i])
@@ -65,16 +66,21 @@ typedef struct Hash {
 
 static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
 {
-    if (NULL == t2)
+    if (!t2)
         return 0;
+
     if (PMC_type(t1) != PMC_type(t2))
         return 0;
+
     if (PMC_type(t1) == dynpmc_LuaNumber)
         return PMC_num_val(t1) == PMC_num_val(t2);
+
     if (PMC_type(t1) == dynpmc_LuaBoolean)
         return PMC_int_val(t1) == PMC_int_val(t2);
+
     if (PMC_type(t1) == dynpmc_LuaString)
         return 0 == string_compare(interp, PMC_str_val(t1), PMC_str_val(t2));
+
     return PMC_struct_val(t1) == PMC_struct_val(t2);
 }
 
@@ -85,9 +91,10 @@ static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
 static Node *mainposition(PARROT_INTERP, const Hash *t, const PMC *key)
 {
     unsigned long h;
-    if (PMC_type(key) == dynpmc_LuaNil) {
+
+    if (PMC_type(key) == dynpmc_LuaNil)
         return NULL;
-    }
+
     if (PMC_type(key) == dynpmc_LuaNumber) {
         h = (unsigned long)(long)PMC_num_val(key);
     }
@@ -96,14 +103,15 @@ static Node *mainposition(PARROT_INTERP, const Hash *t, const PMC *key)
     }
     else if (PMC_type(key) == dynpmc_LuaString) {
         h = string_hash(interp, VTABLE_get_string(interp, key), 3793);
-        /* h = PMC_str_val(key)->hashval; */
     }
     else {
         h = (unsigned long)PMC_struct_val(key);
         h >>= 3;
     }
+
     LUA_ASSERT(h%(unsigned int)t->size == (h&((unsigned int)t->size-1)),
                "a&(x-1) == a%x, for x power of 2");
+
     return &t->node[h&(t->size-1)];
 }
 
@@ -111,47 +119,62 @@ static Node *mainposition(PARROT_INTERP, const Hash *t, const PMC *key)
 static PMC** lua_getstr(PARROT_INTERP, const Hash *t, STRING *key)
 {
     unsigned long h = string_hash(interp, key, 3793);
-    Node *n = &t->node[h&(t->size-1)];
+    Node         *n = &t->node[h&(t->size-1)];
+
     do {
         if (PMC_type(n->key) == dynpmc_LuaString
-            && 0 == string_compare(interp, PMC_str_val(n->key), key))
+         && 0 == string_compare(interp, PMC_str_val(n->key), key))
             return &n->val;
+
         n = n->next;
     } while (n);
-    return NULL;  /* key not found */
+
+    /* key not found */
+    return NULL;
 }
 
-static PMC** lua_get(PARROT_INTERP, const Hash *t, const PMC* key)
+static PMC** lua_get(PARROT_INTERP, const Hash *t, const PMC *key)
 {
     Node *n = mainposition(interp, t, key);
-    if (n == NULL)
+
+    if (!n)
         return NULL;
+
     do {
         if (lua_equalObj(interp, key, n->key))
             return &n->val;
         n = n->next;
     } while (n);
-    return NULL;  /* key not found */
+
+    /* key not found */
+    return NULL;
 }
 
 static Node* lua_next(PARROT_INTERP, const Hash *t, const PMC *key)
 {
     int i;
+
+    /* first iteration */
     if (key == NULL || PMC_type(key) == dynpmc_LuaNil)
-        i = 0;  /* first iteration */
+        i = 0;
     else {
         PMC **v = lua_get(interp, t, key);
-        if (NULL == v || NULL == *v)
+        if (!v || ! *v)
             real_exception(interp, NULL, 1, "invalid key to 'next'");
+
         i = (int)(((const char *)v -
                    (const char *)(&t->node[0].val)) / sizeof (Node)) + 1;
     }
+
     for (; i<t->size; i++) {
         Node *n = node(t, i);
-        if (n->val != NULL)
+
+        if (n->val)
             return n;
     }
-    return NULL;  /* no more elements */
+
+    /* no more elements */
+    return NULL;
 }
 
 static void rehash(PARROT_INTERP, Hash *t);
@@ -164,101 +187,144 @@ static void rehash(PARROT_INTERP, Hash *t);
 ** in its main position; otherwise (colliding node is in its main position),
 ** new key goes to an empty position.
 */
-static PMC** lua_set(PARROT_INTERP, Hash *t, PMC* key)
+static PMC** lua_set(PARROT_INTERP, Hash *t, PMC *key)
 {
     Node *mp = mainposition(interp, t, key);
-    Node *n = mp;
-    if (NULL == mp) {
+    Node *n  = mp;
+    if (!mp)
         real_exception(interp, NULL, 1, "table index is nil");
-        return NULL;
-    }
-    do {  /* check whether `key' is somewhere in the chain */
+
+    /* check whether `key' is somewhere in the chain */
+    do {
+        /* that's all */
         if (lua_equalObj(interp, key, n->key))
-            return &n->val;  /* that's all */
-        else n = n->next;
+            return &n->val;
+        else
+            n = n->next;
     } while (n);
+
     /* `key' not found; must insert it */
-    if (mp->key != NULL) {  /* main position is not free? */
-        Node *othern;  /* main position of colliding node */
-        n = t->firstfree;  /* get a free place */
-        /* is colliding node out of its main position? (can only happens if
+    /* main position is not free? */
+    if (mp->key) {
+        Node *othern;        /* main position of colliding node */
+
+        /* get a free place */
+        n = t->firstfree;
+
+        /* is colliding node out of its main position? (can only happen if
            its position is after "firstfree") */
         if (mp > n && (othern=mainposition(interp, t, mp->key)) != mp) {
             /* yes; move colliding node into free position */
-            while (othern->next != mp) othern = othern->next;  /* find previous */
-            othern->next = n;  /* redo the chain with `n' in place of `mp' */
-            *n = *mp;  /* copy colliding node into free pos. (mp->next also goes) */
-            mp->next = NULL;  /* now `mp' is free */
+            while (othern->next != mp)
+                othern = othern->next;  /* find previous */
+
+            /* redo the chain with `n' in place of `mp' */
+            othern->next = n;
+
+            /* copy colliding node into free pos. (mp->next also goes) */
+            *n = *mp;
+
+            /* now `mp' is free */
+            mp->next = NULL;
         }
-        else {  /* colliding node is in its own main position */
+        /* colliding node is in its own main position */
+        else {
             /* new node will go into free position */
-            n->next = mp->next;  /* chain new position */
+            /* chain new position */
+            n->next  = mp->next;
             mp->next = n;
-            mp = n;
+            mp       = n;
         }
     }
+
     mp->key = key;
-    for (;;) {  /* correct `firstfree' */
-        if (NULL == t->firstfree->key)
-            return &mp->val;  /* OK; table still has a free place */
-        else if (t->firstfree == t->node) break;  /* cannot decrement from here */
-        else (t->firstfree)--;
+
+    /* correct `firstfree' */
+    for (;;) {
+        /* OK; table still has a free place */
+        if (! t->firstfree->key)
+            return &mp->val;
+        else if (t->firstfree == t->node)
+            break;  /* cannot decrement from here */
+        else
+            (t->firstfree)--;
     }
-    rehash(interp, t);  /* no more free places */
-    return lua_set(interp, t, key);  /* `rehash' invalidates this insertion */
+
+    /* no more free places */
+    rehash(interp, t);
+
+    /* `rehash' invalidates this insertion */
+    return lua_set(interp, t, key);
 }
 
 static void setnodevector(PARROT_INTERP, Hash *t, int size)
 {
     int i;
+
     if (size > MAX_INT)
         real_exception(interp, NULL, 1, "table overflow");
-    t->node = mem_sys_allocate_zeroed(size * sizeof (Node));
-    t->size = size;
-    t->firstfree = &t->node[size-1];  /* first free position to be used */
+
+    t->node      = mem_allocate_n_zeroed_typed(size, Node);
+    t->size      = size;
+
+    /* first free position to be used */
+    t->firstfree = &t->node[size-1];
 }
 
 static int numuse(const Hash *t) {
-    Node *v = t->node;
-    int size = t->size;
-    int realuse = 0;
-    int i;
-    for (i=0; i<size; i++) {
-        if (v[i].val != NULL)
+    Node *v       = t->node;
+    int   size    = t->size;
+    int   realuse = 0;
+    int   i;
+
+    for (i = 0; i < size; i++) {
+        if (v[i].val)
             realuse++;
     }
+
     return realuse;
 }
 
 static void rehash(PARROT_INTERP, Hash *t)
 {
-    int oldsize = t->size;
-    Node *nold = t->node;
-    int nelems = numuse(t);
-    int i;
+    int   oldsize = t->size;
+    Node *nold    = t->node;
+    int   nelems   = numuse(t);
+    int   i;
+
     LUA_ASSERT(nelems<=oldsize, "wrong count");
+
     Parrot_block_DOD(interp);
-    if (nelems >= oldsize-oldsize/4)  /* using more than 3/4? */
+
+    /* using more than 3/4? */
+    if (nelems >= oldsize-oldsize/4)
         setnodevector(interp, t, oldsize*2);
-    else if (nelems <= oldsize/4 &&  /* less than 1/4? */
-             oldsize > MINPOWER2)
+
+    /* less than 1/4? */
+    else if (nelems <= oldsize/4 && oldsize > MINPOWER2)
         setnodevector(interp, t, oldsize/2);
     else
         setnodevector(interp, t, oldsize);
-    for (i=0; i<oldsize; i++) {
-        Node *old = nold+i;
-        if (old->val != NULL)
+
+    for (i = 0; i < oldsize; i++) {
+        Node *old = nold + i;
+
+        if (old->val)
             *lua_set(interp, t, old->key) = old->val;
     }
+
     Parrot_unblock_DOD(interp);
-    mem_sys_free(nold);  /* free old array */
+
+    /* free old array */
+    mem_sys_free(nold);
 }
 
 static void lua_new_table(PARROT_INTERP, PMC *container)
 {
-    Hash * const t = mem_allocate_zeroed_typed(Hash);
+    Hash * const t            = mem_allocate_zeroed_typed(Hash);
     PMC_struct_val(container) = t;
-    t->container = container;
+    t->container              = container;
+
     setnodevector(interp, t, MINPOWER2);
 }
 
@@ -270,16 +336,21 @@ static void lua_destroy_table(PARROT_INTERP, Hash *t)
 
 static void lua_mark_table(PARROT_INTERP, Hash *t, STRING *mode)
 {
-    Node *v = t->node;
-    int i;
-    int mark_key = 1;
-    int mark_val = 1;
+    Node *v        = t->node;
+    int   mark_key = 1;
+    int   mark_val = 1;
+    int   i;
+
     if (mode) {
-        mark_key = string_str_index(interp, mode, const_string(interp, "k"), 0) < 0;
-        mark_val = string_str_index(interp, mode, const_string(interp, "v"), 0) < 0;
+        mark_key = string_str_index(interp, mode,
+                    const_string(interp, "k"), 0) < 0;
+
+        mark_val = string_str_index(interp, mode,
+                    const_string(interp, "v"), 0) < 0;
     }
+
     for (i = 0; i < t->size; i++) {
-        if (v[i].val != NULL) {
+        if (v[i].val) {
             if (mark_key)
                 pobject_lives(interp, (PObj *)v[i].key);
             if (mark_val)
@@ -308,7 +379,7 @@ Initializes the instance.
 */
     void init() {
         PMC_struct_val(SELF) = NULL;
-        PMC_metadata(SELF) = NULL;
+        PMC_metadata(SELF)   = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         lua_new_table(INTERP, SELF);
     }
@@ -323,22 +394,27 @@ Marks the hash as live.
 
 */
     void mark() {
-        STRING* mode = NULL;
-        PMC* meta = PMC_metadata(SELF);
+        STRING *mode = NULL;
+        PMC    *meta = PMC_metadata(SELF);
+
         if (meta) {
             PMC **m;
 #if 0
             PMC *key = pmc_new(INTERP, dynpmc_LuaString);
-            VTABLE_set_string_native(INTERP, key, const_string(INTERP, "__mode"));
-            m = lua_get(INTERP, PMC_struct_val(meta), key);
+            VTABLE_set_string_native(INTERP, key,
+                    const_string(INTERP, "__mode"));
+            m = lua_get(INTERP, PMC_hash(meta), key);
 #else
-            m = lua_getstr(INTERP, PMC_struct_val(meta), const_string(INTERP, "__mode"));
+            m = lua_getstr(INTERP, PMC_hash(meta),
+                    const_string(INTERP, "__mode"));
 #endif
             if (m && *m)
                 mode = PMC_str_val(*m);
         }
+
         if (PMC_struct_val(SELF))
-            lua_mark_table(INTERP, PMC_struct_val(SELF), mode);
+            lua_mark_table(INTERP, PMC_hash(SELF), mode);
+
         if (meta)
             pobject_lives(INTERP, (PObj *)meta);
     }
@@ -354,7 +430,7 @@ Free hash structure.
 */
     void destroy() {
         if (PMC_struct_val(SELF)) {
-            lua_destroy_table(INTERP, PMC_struct_val(SELF));
+            lua_destroy_table(INTERP, PMC_hash(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -412,74 +488,77 @@ therefore only clone the reference to themselves, not make a deep copy.
 */
     void set_pmc(PMC *other) {
         PMC_struct_val(SELF) = PMC_struct_val(other);
-        PMC_metadata(SELF) = PMC_metadata(other);
+        PMC_metadata(SELF)   = PMC_metadata(other);
     }
 
 /*
 
-=item C<PMC* get_pmc_keyed (PMC* key)>
+=item C<PMC* get_pmc_keyed (PMC *key)>
 
 C<table> accessor.
 
 =cut
 
 */
-    PMC* get_pmc_keyed(PMC* key) {
-        PMC* value = NULL;
-        PMC** pvalue = lua_get(INTERP, PMC_struct_val(SELF), key);
-        if (pvalue == NULL) {
-            PMC* meth = find_meth(INTERP, SELF, "__index");
-            if (meth != NULL) {
-                if (dynpmc_LuaClosure == PMC_type(meth)
-                 || dynpmc_LuaFunction == PMC_type(meth)) {
+    PMC* get_pmc_keyed(PMC *key) {
+        PMC  *value  = NULL;
+        PMC **pvalue = lua_get(INTERP, PMC_hash(SELF), key);
+
+        if (pvalue)
+            value = *pvalue;
+        else {
+            PMC *meth = find_meth(INTERP, SELF, "__index");
+            if (meth) {
+                if (dynpmc_LuaClosure  == PMC_type(meth)
+                ||  dynpmc_LuaFunction == PMC_type(meth)) {
                     value = Parrot_runops_fromc_args(INTERP, meth, "PPP",
-                                                     SELF, key);
+                                                 SELF, key);
                 }
-                else {
+                else
                     return VTABLE_get_pmc_keyed(INTERP, meth, key);
-                }
             }
         }
-        else
-            value = *pvalue;
-        if (value == NULL) {
-            return pmc_new(INTERP, dynpmc_LuaNil);
-        }
-        return value;
+
+        if (value)
+            return value;
+
+        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
 
-=item C<void set_pmc_keyed(PMC* key, PMC* value)>
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
 
 C<table> mutator.
 
 =cut
 
 */
-    void set_pmc_keyed(PMC* key, PMC* value) {
-        if (NULL == lua_get(INTERP, PMC_struct_val(SELF), key)) {
-            PMC* meth = find_meth(INTERP, SELF, "__newindex");
-            if (meth != NULL) {
-                if (dynpmc_LuaClosure == PMC_type(meth)
-                 || dynpmc_LuaFunction == PMC_type(meth)) {
-                    Parrot_runops_fromc_args(INTERP, meth, "vPPP",
-                                             SELF, key, value);
+    void set_pmc_keyed(PMC *key, PMC *value) {
+        if (! lua_get(INTERP, PMC_hash(SELF), key)) {
+            PMC *meth = find_meth(INTERP, SELF, "__newindex");
+            if (meth) {
+                if (dynpmc_LuaClosure  == PMC_type(meth)
+                ||  dynpmc_LuaFunction == PMC_type(meth)) {
+                    Parrot_runops_fromc_args(INTERP, meth, "vPPP", SELF,
+                            key, value);
                 }
-                else {
+                else
                     VTABLE_set_pmc_keyed(INTERP, meth, key, value);
-                }
+
                 return;
             }
         }
+
         if (dynpmc_LuaNil == PMC_type(value)) {
             value = NULL;
         }
         else {
             value = VTABLE_clone(interp, value);
-            key = VTABLE_clone(interp, key);
+            key   = VTABLE_clone(interp, key);
         }
-        *lua_set(INTERP, PMC_struct_val(SELF), key) = value;
+
+        *lua_set(INTERP, PMC_hash(SELF), key) = value;
     }
 
 /*
@@ -492,7 +571,7 @@ Returns the number of elements in the table.
 
 */
     INTVAL elements() {
-        return numuse(PMC_struct_val(SELF));
+        return numuse(PMC_hash(SELF));
     }
 
 /*
@@ -503,24 +582,26 @@ Returns the number of elements in the table.
 
 =over 4
 
-=item C<INTVAL is_equal(PMC* value)>
+=item C<INTVAL is_equal(PMC *value)>
 
 The C<==> operation. Compares reference (not in depth).
 
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
 MMD_LuaTable: {
-            PMC* meth = find_meth(INTERP, SELF, "__eq");
-            if (meth != NULL) {
-                PMC* retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+            PMC *meth = find_meth(INTERP, SELF, "__eq");
+            if (meth) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                        SELF, value);
-                if (PMC_IS_NULL(retval)) {
+
+                if (PMC_IS_NULL(retval))
                     return (INTVAL)0;
-                }
+
                 return VTABLE_get_bool(INTERP, retval);
             }
+
             if (SELF == value)
                 return (INTVAL)1;
             else
@@ -538,65 +619,61 @@ MMD_DEFAULT: {
 =cut
 
 */
-    INTVAL cmp(PMC* value) {
+    INTVAL cmp(PMC *value) {
 MMD_LuaTable: {
 #if 0
-            PMC* meth = find_meth(INTERP, SELF, "__cmp");
-            if (meth != NULL) {
-                PMC* retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+            PMC *meth = find_meth(INTERP, SELF, "__cmp");
+            if (meth) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                        SELF, value);
-                if (retval != NULL) {
+
+                if (retval)
                     return (INTVAL)VTABLE_get_number(INTERP, retval);
-                }
             }
 #else
-            PMC* _lt = find_meth(INTERP, SELF, "__lt");
-            if (_lt != NULL) {
-                PMC* retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+            PMC *_lt = find_meth(INTERP, SELF, "__lt");
+
+            if (_lt) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
                                                        SELF, value);
-                INTVAL r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
-                                            : (INTVAL)0;
-                if (r) {
+                INTVAL r = retval ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+
+                if (r)
                     return (INTVAL)-1;
-                }
                 else {
-                    PMC* _le = find_meth(INTERP, SELF, "__le");
-                    if (_le != NULL) {
+                    PMC *_le = find_meth(INTERP, SELF, "__le");
+                    if (_le) {
                         retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
                                                           SELF, value);
-                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
-                                             : (INTVAL)0;
-                        if (r) {
+                        r = retval ?
+                            VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+
+                        if (r)
                             return (INTVAL)0;
-                        }
-                        else {
+                        else
                             return (INTVAL)1;
-                        }
                     }
                     else {
                         retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
                                                           value, SELF);
-                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
-                                             : (INTVAL)0;
-                        if (r) {
+                        r      = retval
+                            ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+
+                        if (r)
                             return (INTVAL)1;
-                        }
-                        else {
+                        else
                             return (INTVAL)0;
-                        }
                     }
                 }
             }
 #endif
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to compare two table values");
-            return (INTVAL)0;
         }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare table with %s",
-                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
-            return (INTVAL)0;
+                "attempt to compare table with %Ss",
+                    VTABLE_name(INTERP, value));
         }
     }
 
@@ -614,10 +691,12 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* get_metatable() {
-        PMC* retval = PMC_metadata(SELF);
-        if (NULL == retval)
-            retval = pmc_new(INTERP, dynpmc_LuaNil);
-        return retval;
+        PMC *retval = PMC_metadata(SELF);
+
+        if (retval)
+            return retval;
+
+        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
@@ -628,39 +707,43 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* len() {
-        PMC** pvalue;
-        PMC* key = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC   **pvalue;
+        PMC   *key = pmc_new(INTERP, dynpmc_LuaNumber);
         INTVAL idx = 1;
+
         VTABLE_set_integer_native(INTERP, key, idx);
-        pvalue = lua_get(INTERP, PMC_struct_val(SELF), key);
+
+        pvalue = lua_get(INTERP, PMC_hash(SELF), key);
+
         while (pvalue && *pvalue) {
-            idx ++;
+            idx++;
             VTABLE_set_integer_native(INTERP, key, idx);
-            pvalue = lua_get(INTERP, PMC_struct_val(SELF), key);
+            pvalue = lua_get(INTERP, PMC_hash(SELF), key);
         }
+
         VTABLE_set_integer_native(INTERP, key, idx - 1);
         return key;
     }
 
 /*
 
-=item C<PMC* next(PMC* index)>
+=item C<PMC* next(PMC *index)>
 
 =cut
 
 */
     METHOD PMC* next(PMC* index) {
-        Node* n = lua_next(INTERP, PMC_struct_val(SELF), index);
-        if (NULL == n) {
-            return pmc_new(INTERP, dynpmc_LuaNil);
-        }
-        else {
+        Node *n = lua_next(INTERP, PMC_hash(SELF), index);
+
+        if (n) {
             PMC *retval = pmc_new(INTERP, enum_class_Array);
             VTABLE_set_integer_native(INTERP, retval, 2);
             VTABLE_set_pmc_keyed_int(INTERP, retval, 0, n->key);
             VTABLE_set_pmc_keyed_int(INTERP, retval, 1, n->val);
             return retval;
         }
+
+        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
@@ -670,42 +753,47 @@ MMD_DEFAULT: {
 =cut
 
 */
-    METHOD PMC* rawequal(PMC* value) {
-        PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        PMC_int_val(retval) = (SELF == value) ? 1 : 0;
+    METHOD PMC* rawequal(PMC *value) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_integer_native(INTERP, retval, (SELF == value) ? 1 : 0);
         return retval;
     }
 
 /*
 
-=item C<PMC* rawget(PMC* key)>
+=item C<PMC* rawget(PMC *key)>
 
 =cut
 
 */
-    METHOD PMC* rawget(PMC* key) {
-        PMC** pvalue = lua_get(INTERP, PMC_struct_val(SELF), key);
-        if (NULL == pvalue || NULL == *pvalue)
+    METHOD PMC* rawget(PMC *key) {
+        PMC **pvalue = lua_get(INTERP, PMC_hash(SELF), key);
+
+        if (! pvalue || ! *pvalue)
+
             return pmc_new(INTERP, dynpmc_LuaNil);
+
         return *pvalue;
     }
 
 /*
 
-=item C<void rawset(PMC* key, PMC* value)>
+=item C<void rawset(PMC *key, PMC *value)>
 
 =cut
 
 */
-    METHOD void rawset(PMC* key, PMC* value) {
+    METHOD void rawset(PMC *key, PMC *value) {
+
         if (dynpmc_LuaNil == PMC_type(value)) {
             value = NULL;
         }
         else {
             value = VTABLE_clone(interp, value);
-            key = VTABLE_clone(interp, key);
+            key   = VTABLE_clone(interp, key);
         }
-        *lua_set(INTERP, PMC_struct_val(SELF), key) = value;
+
+        *lua_set(INTERP, PMC_hash(SELF), key) = value;
     }
 
 /*
@@ -716,12 +804,10 @@ MMD_DEFAULT: {
 
 */
     METHOD void set_metatable(PMC *meta) {
-        if (dynpmc_LuaNil == PMC_type(meta)) {
+        if (dynpmc_LuaNil == PMC_type(meta))
             PMC_metadata(SELF) = NULL;
-        }
-        else {
+        else
             PMC_metadata(SELF) = meta;
-        }
     }
 
 }
@@ -745,4 +831,3 @@ Klaas-Jan Stol
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
