@@ -739,8 +739,8 @@ SP              [ ]
 int yywrap(void* yyscanner) {
     /* Add code here to open next source file and start scanning
      * yywrap returns 0 if scanning is to continue */
-    yyguts_t *yyg    = (yyguts_t *)yyscanner;
-    Interp   *interp = yyget_extra(yyscanner);
+    Interp   * const interp = yyget_extra(yyscanner);
+    yyguts_t * const yyg    = (yyguts_t *)yyscanner;
 
     if (!interp) {
         fprintf(stderr, "Argh, interp not found\n");
@@ -763,7 +763,7 @@ int yywrap(void* yyscanner) {
 static macro_frame_t *
 new_frame(Interp *interp) {
     static int label   = 0;
-    macro_frame_t *tmp = mem_allocate_zeroed_typed(macro_frame_t);
+    macro_frame_t * const tmp = mem_allocate_zeroed_typed(macro_frame_t);
 
     tmp->label         = ++label;
     tmp->s.line        = IMCC_INFO(interp)->line;
@@ -783,8 +783,8 @@ new_frame(Interp *interp) {
 static void
 scan_string(macro_frame_t *frame, const char *expansion, void *yyscanner)
 {
-    yyguts_t *yyg             = (yyguts_t *)yyscanner;
-    Interp   *interp          = yyget_extra(yyscanner);
+    yyguts_t * const yyg      = (yyguts_t *)yyscanner;
+    Interp   * const interp   = yyget_extra(yyscanner);
 
     frame->buffer             = YY_CURRENT_BUFFER;
     frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
@@ -825,7 +825,7 @@ yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip, void *yyscanner)
 {
     int         c;
     const char *p;
-    yyguts_t   *yyg = (yyguts_t *)yyscanner;
+    yyguts_t   * const yyg = (yyguts_t *)yyscanner;
 
     do {
         c = yylex(valp, yyscanner, interp);
@@ -980,13 +980,14 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
     }
 
     while (c != ENDM) {
-        int elem_len = 0;
+        int elem_len;
 
         if (c <= 0)
             IMCC_fataly(interp, E_SyntaxError,
                         "File ended before macro '%s' was complete",
                         IMCC_INFO(interp)->cur_macro_name);
 
+        PARROT_ASSERT(valp->s);
         elem_len = strlen(valp->s);
 
         if (buffer_used) {
@@ -998,19 +999,15 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
                     (char *)mem_sys_realloc(IMCC_INFO(interp)->macro_buffer,
                         buffer_size);
             }
-
-            buffer_used += elem_len;
-            strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
         }
         else {
             buffer_size = (elem_len << 1) > 1024 ? elem_len << 1 : 1024;
 
             IMCC_INFO(interp)->macro_buffer =
                 (char *)mem_sys_allocate_zeroed(buffer_size);
-            strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
-            buffer_used = elem_len;
         }
-
+        strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
+        buffer_used += elem_len;
         mem_sys_free(valp->s);
         valp->s = NULL;
 
