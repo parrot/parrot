@@ -385,10 +385,10 @@ token universal_character_name {
 ## A.1.5 Constants
 ##
 token constant {
-    | <floating_constant>
-    | <integer_constant>
-    | <enumeration_constant>
-    | <character_constant>
+    | <floating_constant> {*}       #= floating_constant
+    | <integer_constant> {*}        #= integer_constant
+    | <enumeration_constant> {*}    #= enumeration_constant
+    | <character_constant> {*}      #= character_constant
 }
 
 token integer_constant {
@@ -418,8 +418,11 @@ token integer_suffix {
 }
 
 token floating_constant {
+    [
     | <decimal_floating_constant>
     | <hexadecimal_floating_constant>
+    ]
+    {*}
 }
 
 token decimal_floating_constant {
@@ -484,9 +487,11 @@ token escape_sequence {
 
 ## A.1.6 String literals
 token c_string_literal {
-    [L]? \" <s_char>* \"
+    [L]? '"' <string_literal: "> '"'
     {*}
 }
+
+##\" <s_char>* \"
 
 token s_char { <-["\\\n]> | <escape_sequence> }
 

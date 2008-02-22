@@ -18,10 +18,17 @@ value of the comment is passed as the second argument to the method.
 class C99::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
+    my $past;
     for $<external_declaration> {
-        $past.push( $( $_ ) );
+        my $fun := $( $_ );
+
+        ## Look for the "main" function, and set that as the result
+        ## object.
+        if $fun.name() eq 'main' {
+             $past := $fun;
+        }
     }
+
     make $past;
 }
 
@@ -33,6 +40,9 @@ method function_definition($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
     my $decl := $( $<declarator> );
     $past.name( $decl.name() );
+
+    my $body := $( $<compound_statement> );
+    $past.push($body);
     make $past;
 }
 
@@ -70,7 +80,8 @@ method expression_statement($/) {
 }
 
 method compound_statement($/) {
-    my $past := PAST::Block.new( :blocktype('immediate'), :node($/) );
+    #my $past := PAST::Block.new( :blocktype('immediate'), :node($/) );
+    my $past := PAST::Stmts.new( :node($/) );
     for $<block_item> {
         $past.push( $($_) );
     }
@@ -78,6 +89,10 @@ method compound_statement($/) {
 }
 
 method block_item($/, $key) {
+    make $( $/{$key} );
+}
+
+method constant($/, $key) {
     make $( $/{$key} );
 }
 
@@ -112,7 +127,9 @@ method arguments($/) {
 
 method argument_expression_list($/) {
     my $past := PAST::Op.new( :pasttype('call'), :node($/) );
-
+    for $<assignment_expression> {
+        $past.push( $( $_ ) );
+    }
     make $past;
 }
 
@@ -121,7 +138,8 @@ method postfix_expression($/) {
     for $<postfix_expression_suffix> {
         ## XXX
         my $args := $( $_ );
-        $past := PAST::Op.new( $past, $args, :pasttype('call'), :node($/)  );
+        $args.unshift($past);
+        $past := $args;
     }
     make $past;
 }
@@ -134,12 +152,18 @@ method unary_expression($/, $key) {
     make $( $/{$key} );
 }
 
-method integer($/) {
+method integer_constant($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
 }
 
+method floating_constant($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('Float'), :node($/) );
+}
+
+
 method c_string_literal($/) {
-    make PAST::Val.new( :value( ~$/ ), :node($/) );
+    make PAST::Val.new( :value( ~$<string_literal> ), :node($/) );
+    #make PAST::Val.new( :value( ~$/ ), :node($/) );
 }
 
 method identifier($/) {
