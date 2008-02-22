@@ -26,7 +26,7 @@ method TOP($/) {
 
 
 method statement ($/, $key) {
-    if ($key eq 'bare_expression') {
+    if (($key eq 'expression')&&($<expression><tokens>[0]<identifier> ne 'VISIBLE')) {
         my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
         $past.push( $it );
@@ -37,17 +37,6 @@ method statement ($/, $key) {
     }
 }
 
-
-method visible($/) {
-    my $past := PAST::Op.new( :name('VISIBLE'), :pasttype('call'), :node( $/ ) );
-    if ( $<no_newline> ) {
-        $past.push( PAST::Val.new( :value( 1 ), :named( PAST::Val.new( :value('no_newline') ) ) ) );
-    }
-    for $<expression> {
-        $past.push( $( $_ ) );
-    }
-    make $past;
-}
 
 method declare($/) {
     if ($<expression>) {
@@ -73,28 +62,35 @@ method function($/) {
     my $block := $( $<block> );
     $block.blocktype('declaration');
 
+    my $arglist := PAST::Stmts.new( :node($<arglist>) );
     # if there are any parameters, get the PAST for each of them and
     # adjust the scope to parameter.
-    if $<parameters> {
-        my @params := $<parameters>[0]<identifier>;
-        for @params {
-            my $param := $($_);
-            $param.scope('parameter');
-            $block.push($param);
-        }
+    $block.arity(0);
+    for $<parameters> {
+        #my $param := $($_);
+        #$param.scope('parameter');
+        my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
+        $param.isdecl(1);
+        $arglist.push($param);
+        $block.arity($block.arity() + 1);
     }
 
+
     my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
-    $block.unshift($it);
+    $block[0].unshift($it);
 
     $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
-    $block.push($it);
+    $block[0].push($it);
 
-    my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
-    $($<variable>).isdecl(1);
-    $past.push( $( $<variable> ) );
-    $past.push( $block );
-    make $past;
+    $block.unshift($arglist);
+
+    $block.name(~$<variable><identifier>);
+    make $block;
+    #my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+    #$($<variable>).isdecl(1);
+    #$past.push( $( $<variable> ) );
+    #$past.push( $block );
+    #make $past;
 }
 
 method ifthen($/) {
@@ -133,9 +129,11 @@ method ifthen($/) {
 
 method block($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
+    my $stmts := PAST::Stmts.new( :node( $/ ) );
     for $<statement> {
-        $past.push( $( $_ ) );
+        $stmts.push( $( $_ ) );
     }
+    $past.push($stmts);
     make $past;
 }
 
@@ -143,14 +141,26 @@ method value($/, $key) {
     make $( $/{$key} );
 }
 
-method expression($/, $key) {
-    if ($key eq 'var_or_function') {
-        my $past := PAST::Op.new( :name('var_or_function'), :pasttype('call'), :node( $/ ) );
-        $past.push( $( $<variable> ) );
-        make $past;
-    } else {
-        make $( $/{$key} );
+method bang($/) {
+    make PAST::Val.new( :value( ~$/ ), :returns('String'), :node($/) );
+}
+
+method expression($/) {
+    my $past := PAST::Op.new( :name('expr_parse'), :pasttype('call'), :node( $/ ) );
+    for $<tokens> {
+        if($_<identifier>) {
+            my $inline := '%r = find_name "' ~ $_<identifier> ~ '"';
+            $past.push(PAST::Op.new( :inline($inline) ));
+        }
+        elsif($_ eq "MKAY"){
+            my $inline := '%r = find_name "MKAY"';
+            $past.push(PAST::Op.new( :inline($inline) ));
+        }
+        else {
+            $past.push( $( $_ ) );
+        }
     }
+    make $past;
 }
 
 method integer($/) {
@@ -174,15 +184,11 @@ method quote($/) {
 }
 
 
-method identifier($/) {
-    make PAST::Val.new( :value( ~$/ ), :node($/) );
-}
-
 method variable ($/) {
-    if ($<identifier><name> eq 'IT') {
+    if ($<identifier> eq 'IT') {
         make PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
     } else {
-        make PAST::Var.new( :name( ~$<identifier><name> ),
+        make PAST::Var.new( :name( $<identifier> ),
                             :scope('lexical'),
                             :viviself('Undef'),
                             :node( $/ )

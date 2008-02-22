@@ -41,6 +41,8 @@ SOURCES = lolcode.pir \
 
 BUILTINS_PIR = \
   src/builtins/say.pir \
+  src/builtins/expr_parse.pir \
+  src/builtins/math.pir \
   src/builtins/var_or_function.pir
 
 # PMCS = lolcode

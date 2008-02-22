@@ -19,20 +19,14 @@ rule TOP {
 token version { \d+ [ '.' \d+ ]? }
 
 rule statement {
-    | <visible>    {*}   #= visible
     | <declare>    {*}   #= declare
     | <assign>     {*}   #= assign
     | <function>   {*}   #= function
     | <ifthen>     {*}   #= ifthen
-    | <expression> {*}   #= bare_expression
+    | <expression> {*}   #= expression
 }
 
 token statement_terminator { [ ',' | \n+ | $ ] }
-
-rule visible {
-    'VISIBLE' <expression> [ <expression> ]* [$<no_newline>='!']?
-    {*}
-}
 
 rule declare {
     'I' 'HAS' 'A' <variable> [ 'ITZ' <expression> ]?
@@ -44,7 +38,7 @@ rule assign {
 }
 
 rule function {
-    'HOW' 'DUZ' 'I' <variable> <statement_terminator>
+    'HOW' 'DUZ' 'I' <variable> $<arglist>=['YR' $<parameters>=<variable>['AN' 'YR' $<parameters>=<variable>]* ]?<statement_terminator>
     <block>
     'IF' 'U' 'SAY' 'SO'
     {*}
@@ -90,29 +84,40 @@ rule parameters {
 }
 
 rule expression {
-    | <variable> {*}                             #= var_or_function
-    | <value> {*}                                #= value
+    [
+    | $<tokens>=<operator>
+    | $<tokens>=<variable>
+    | $<tokens>=<value>
+    | 'AN'
+    | $<tokens>='MKAY'
+    ]+ {*}
 }
 
-rule value {
+token value {
     | <float>    {*}                             #= float
     | <integer>  {*}                             #= integer
     | <boolean>  {*}                             #= boolean
     | <quote>    {*}                             #= quote
+    | <bang>     {*}                             #= bang
 }
 
-rule variable { <identifier> {*} }
+token bang {
+    '!' {*}
+}
 
-token identifier { <!keyword> $<name>=( <[a..zA..Z]> \w* ) {*} }
+token operator { $<identifier>=(<.identifier> <.ws> 'OF') {*} }
+token variable { <identifier> {*} }
+
+token identifier { <!keyword> <[a..zA..Z]> \w* }
 
 # RT #46213 : Because PGE doesn't yet know how to do longest token matching,
 # order all tokens in reverse alpha order to avoid a parsing bug.
 token keyword {
-    [ 'YR' | 'YA' | 'WTF?' | 'WIN' | 'WAI' | 'VISIBLE' | 'U' | 'SUM' | 'SO'
-    | 'SMALLR' | 'SAY' | 'RLY?' | 'RLY' | 'R' | 'QUOSHUNT' | 'PRODUKT'
-    | 'OMGWTF' | 'OMG' | 'OIC' | 'O' | 'NO' | 'MOD' | 'MEBBE' | 'KTHXBYE'
-    | 'ITZ' | 'IF' | 'I' | 'HOW' | 'HAS' | 'GTFO' | 'FOUND' | 'FAIL' | 'DIFF'
-    | 'BIGGR' | 'AN' | 'A' ] >>
+    [ 'YR' | 'YA' | 'WTF?' | 'WIN' | 'WAI' | 'U' | 'SO'
+    | 'SAY' | 'RLY?' | 'RLY' | 'R' 
+    | 'OMGWTF' | 'OMG' | 'OIC' | 'OF' | 'O' | 'NO' | 'MKAY' | 'MEBBE' | 'KTHXBYE'
+    | 'ITZ' | 'IF' | 'I' | 'HOW' | 'HAS' | 'GTFO' | 'FOUND' | 'FAIL' 
+    | 'AN' | 'A' ] >>
 }
 
 token integer { '-'? \d+ {*} }
