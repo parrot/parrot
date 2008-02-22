@@ -1019,7 +1019,6 @@ MMD_DEFAULT: {
 
         /* at least one valid digit? */
         if (s1 != s2) {
-            string_cstring_free(s1);
 
             /* skip trailing spaces */
             while (isspace((unsigned char)(*s2)))
@@ -1029,6 +1028,7 @@ MMD_DEFAULT: {
             if (*s2 == '\0') {
                 PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 VTABLE_set_number_native(INTERP, retval, n);
+                string_cstring_free(s1);
                 return retval;
             }
         }
