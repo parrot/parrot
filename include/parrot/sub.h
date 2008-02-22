@@ -1,5 +1,5 @@
 /* sub.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -45,13 +45,13 @@ typedef enum {
 #define SUB_FLAG_flag_CLEAR(flag, o) (SUB_FLAG_get_FLAGS(o) &= ~(UINTVAL)(SUB_FLAG_ ## flag))
 
 #define SUB_FLAG_flags_SETTO(o, f) SUB_FLAG_get_FLAGS(o) = (f)
-#define SUB_FLAG_flags_CLEARALL(o) SUB_FLAG_flags_SETTO(o, 0)
+#define SUB_FLAG_flags_CLEARALL(o) SUB_FLAG_flags_SETTO((o), 0)
 
-#define SUB_FLAG_TAILCALL_TEST(o) SUB_FLAG_flag_TEST(TAILCALL, o)
-#define SUB_FLAG_TAILCALL_ISSET(o) SUB_FLAG_flag_TEST(TAILCALL, o)
-#define SUB_FLAG_TAILCALL_NOTSET(o) (!SUB_FLAG_flag_TEST(TAILCALL, o))
-#define SUB_FLAG_TAILCALL_SET(o) SUB_FLAG_flag_SET(TAILCALL, o)
-#define SUB_FLAG_TAILCALL_CLEAR(o) SUB_FLAG_flag_CLEAR(TAILCALL, o)
+#define SUB_FLAG_TAILCALL_TEST(o)   SUB_FLAG_flag_TEST(TAILCALL, (o))
+#define SUB_FLAG_TAILCALL_ISSET(o)  SUB_FLAG_flag_TEST(TAILCALL, (o))
+#define SUB_FLAG_TAILCALL_NOTSET(o) (!SUB_FLAG_flag_TEST(TAILCALL, (o)))
+#define SUB_FLAG_TAILCALL_SET(o)    SUB_FLAG_flag_SET(TAILCALL, (o))
+#define SUB_FLAG_TAILCALL_CLEAR(o)  SUB_FLAG_flag_CLEAR(TAILCALL, (o))
 
 #define SUB_FLAG(n) ((UINTVAL)1 << (n))
 typedef enum {

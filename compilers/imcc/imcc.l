@@ -109,7 +109,7 @@ static void include_file(Interp *interp, char *file_name, void *yyscanner);
 #define DUP_AND_RET(valp, token)             \
   do {                                       \
       if (valp) (valp)->s = str_dup(yytext); \
-      return token;                          \
+      return (token);                        \
   } while (0)
 
 #define DUP_AND_RET_FREE(valp, token)        \
@@ -117,7 +117,7 @@ static void include_file(Interp *interp, char *file_name, void *yyscanner);
       if (valp) {                            \
           mem_sys_free((valp)->s);           \
           (valp)->s = str_dup(yytext);       \
-          return token;                      \
+          return (token);                    \
       }                                      \
   } while (0)
 

@@ -33,18 +33,18 @@ L<https://rt.perl.org/rt3/Ticket/Display.html?id=36330>
 #define PINT_ interpreter,
 #define PINTD_ INTERP* interpreter,
 #define BN_alloc(i, x) malloc(x)
-#define BN_realloc(i, x, y) realloc(x, y)
+#define BN_realloc(i, x, y) realloc((x), (y))
 #define BN_free(i, x) free(x)
 #define BN_FATAL(i, x) bn_fatal_error(x)
-#define BN_EXCEPT(i, excp, mesg) BN_exception(i, excp, mesg)
+#define BN_EXCEPT(i, excp, mesg) BN_exception((i), (excp), (mesg))
 #else /* Not in parrot core */
 #define PINTD_
 #define PINT_
 #define BN_alloc(x) malloc(x)
-#define BN_realloc(x, y) realloc(x, y)
+#define BN_realloc(x, y) realloc((x), (y))
 #define BN_free(x) free(x)
 #define BN_FATAL(x) bn_fatal_error(x)
-#define BN_EXCEPT(excp, mesg) BN_exception(excp, mesg)
+#define BN_EXCEPT(excp, mesg) BN_exception((excp), (mesg))
 typedef unsigned int UINTVAL;
 typedef int INTVAL;
 #endif /* ifdef PARROT_IN_CORE else */

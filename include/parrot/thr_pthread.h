@@ -19,40 +19,41 @@
 #  include <pthread.h>
 
 #  define PARROT_SYNC_PRIMITIVES_DEFINED
-#  define LOCK(m) pthread_mutex_lock((pthread_mutex_t*)&m)
-#  define UNLOCK(m) pthread_mutex_unlock((pthread_mutex_t*)&m)
-#  define COND_WAIT(c, m) pthread_cond_wait(&c, &m)
-#  define COND_TIMED_WAIT(c, m, t) pthread_cond_timedwait(&c, &m, t)
-#  define COND_SIGNAL(c) pthread_cond_signal(&c)
-#  define COND_BROADCAST(c) pthread_cond_broadcast(&c)
+#  define LOCK(m) pthread_mutex_lock((pthread_mutex_t*)&(m))
+#  define UNLOCK(m) pthread_mutex_unlock((pthread_mutex_t*)&(m))
+#  define COND_WAIT(c, m) pthread_cond_wait(&(c), &(m))
+#  define COND_TIMED_WAIT(c, m, t) pthread_cond_timedwait(&(c), &(m), (t))
+#  define COND_SIGNAL(c) pthread_cond_signal(&(c))
+#  define COND_BROADCAST(c) pthread_cond_broadcast(&(c))
 
 /*
  * for now use a fast mutex w/o error checking and non recursive
  */
-#  define MUTEX_INIT(m) pthread_mutex_init(&m, NULL)
-#  define MUTEX_DESTROY(m) pthread_mutex_destroy(&m)
+#  define MUTEX_INIT(m) pthread_mutex_init(&(m), NULL)
+#  define MUTEX_DESTROY(m) pthread_mutex_destroy(&(m))
 
-#  define COND_INIT(c)    pthread_cond_init(&c, NULL);
-#  define COND_DESTROY(c) pthread_cond_destroy(&c)
+#  define COND_INIT(c)    pthread_cond_init(&(c), NULL);
+#  define COND_DESTROY(c) pthread_cond_destroy(&(c))
 
-#  define THREAD_CREATE_DETACHED(t, func, arg) do { \
+#  define THREAD_CREATE_DETACHED(t, func, arg) \
+    do { \
         pthread_attr_t      attr;   \
         int rc = pthread_attr_init(&attr);      \
         PARROT_ASSERT(rc == 0);    \
         rc = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);   \
         PARROT_ASSERT(rc == 0);    \
-        rc = pthread_create(&t, &attr, func, arg); \
+        rc = pthread_create(&(t), &attr, (func), (arg)); \
         PARROT_ASSERT(rc == 0);    \
         pthread_attr_destroy(&attr);        \
    } while (0)
 
 #  define THREAD_CREATE_JOINABLE(t, func, arg) \
-        pthread_create(&t, NULL, func, arg)
+        pthread_create(&(t), NULL, (func), (arg))
 
-#  define JOIN(t, ret) pthread_join(t, &ret)
+#  define JOIN(t, ret) pthread_join((t), &(ret))
 #  define DETACH(t)    pthread_detach(t)
 
-#  define CLEANUP_PUSH(f, a) pthread_cleanup_push(f, a)
+#  define CLEANUP_PUSH(f, a) pthread_cleanup_push((f), (a))
 #  define CLEANUP_POP(a)     pthread_cleanup_pop(a)
 
 typedef pthread_mutex_t Parrot_mutex;

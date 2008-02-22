@@ -29,9 +29,9 @@ typedef struct Capture_data {
 #define CAPTURE_array(obj)  (((Capture_data*)PMC_data(obj))->array)
 #define CAPTURE_hash(obj)   (((Capture_data*)PMC_data(obj))->hash)
 #define CAPTURE_array_CREATE(i, obj) \
-    if (!CAPTURE_array(obj)) CAPTURE_array(obj) = pmc_new(i, enum_class_ResizablePMCArray);
+    if (!CAPTURE_array(obj)) CAPTURE_array(obj) = pmc_new((i), enum_class_ResizablePMCArray);
 #define CAPTURE_hash_CREATE(i, obj) \
-    if (!CAPTURE_hash(obj)) CAPTURE_hash(obj) = pmc_new(i, enum_class_Hash);
+    if (!CAPTURE_hash(obj)) CAPTURE_hash(obj) = pmc_new((i), enum_class_Hash);
 
 
 pmclass Capture need_ext does array does hash {
