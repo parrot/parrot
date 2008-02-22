@@ -3,7 +3,8 @@
 
 =head1 NAME
 
-Parrot Compiler Tools for Dummies - A Complete Beginner's Guide to the Parrot Compiler Tools.
+Getting Started with the Parrot Compiler Tools - 
+A Complete Beginner's Guide to the Parrot Compiler Tools.
 
 =head1 DESCRIPTION
 
