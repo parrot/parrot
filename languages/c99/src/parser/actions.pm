@@ -80,12 +80,34 @@ method expression_statement($/) {
 }
 
 method compound_statement($/) {
-    #my $past := PAST::Block.new( :blocktype('immediate'), :node($/) );
-    my $past := PAST::Stmts.new( :node($/) );
+    my $past := PAST::Block.new( :blocktype('immediate'), :node($/) );
+    #my $past := PAST::Stmts.new( :node($/) );
     for $<block_item> {
         $past.push( $($_) );
     }
     make $past;
+}
+
+method if_statement($/) {
+    my $cond := $( $<expression> );
+    my $then := $( $<statement> );
+    my $past := PAST::Op.new( $cond, $then, :pasttype('if'), :node($/) );
+    if $<else> {
+        $past.push( $( $<else>[0] ) );
+    }
+    make $past;
+}
+
+method do_while_statement($/) {
+    my $cond := $( $<expression> );
+    my $body := $( $<statement> );
+    make PAST::Op.new( $cond, $body, :pasttype('repeat_while'), :node($/) );
+}
+
+method while_statement($/) {
+    my $cond := $( $<expression> );
+    my $body := $( $<statement> );
+    make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
 }
 
 method block_item($/, $key) {

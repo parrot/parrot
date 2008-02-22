@@ -260,10 +260,10 @@ rule statement {
     | <labeled_statement>
     | <compound_statement> {*}        #= compound_statement
     | <expression_statement> {*}      #= expression_statement
-    | <if_statement>
+    | <if_statement> {*}              #= if_statement
     | <switch_statement>
-    | <while_statement>
-    | <do_while_statement>
+    | <while_statement> {*}           #= while_statement
+    | <do_while_statement> {*}        #= do_while_statement
     | <for1_statement>
     | <for2_statement>
     | <jump_statement>
@@ -292,6 +292,7 @@ rule expression_statement {
 
 rule if_statement {
     'if' '(' <expression> ')' <statement> ['else' $<else>=<statement>]?
+    {*}
 }
 
 rule switch_statement {
@@ -300,10 +301,12 @@ rule switch_statement {
 
 rule while_statement {
     'while' '(' <expression> ')' <statement>
+    {*}
 }
 
 rule do_while_statement {
     'do' <statement> 'while' '(' <expression> ')' ';'
+    {*}
 }
 
 rule for1_statement {
