@@ -1936,6 +1936,20 @@ splint-andy :
     +partial \
     -bufferoverflow \
     +enumindex \
+    compilers/imcc/cfg.c \
+    compilers/imcc/debug.c \
+    compilers/imcc/imc.c \
+    compilers/imcc/imclexer.c \
+    compilers/imcc/imcparser.c \
+    compilers/imcc/instructions.c \
+    compilers/imcc/main.c \
+    compilers/imcc/optimizer.c \
+    compilers/imcc/parser_util.c \
+    compilers/imcc/pbc.c \
+    compilers/imcc/pcc.c \
+    compilers/imcc/reg_alloc.c \
+    compilers/imcc/sets.c \
+    compilers/imcc/symreg.c \
     src/builtin.c \
     src/byteorder.c \
     src/charset.c \
