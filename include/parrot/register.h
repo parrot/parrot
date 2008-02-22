@@ -26,10 +26,10 @@
 #define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-1L-(x)]
 #define CTX_REG_STR(ctx, x) (ctx)->bp_ps.regs_s[x]
 
-#define REG_NUM(interp, x) CTX_REG_NUM(&(interp)->ctx, x)
-#define REG_INT(interp, x) CTX_REG_INT(&(interp)->ctx, x)
-#define REG_PMC(interp, x) CTX_REG_PMC(&(interp)->ctx, x)
-#define REG_STR(interp, x) CTX_REG_STR(&(interp)->ctx, x)
+#define REG_NUM(interp, x) CTX_REG_NUM(&(interp)->ctx, (x))
+#define REG_INT(interp, x) CTX_REG_INT(&(interp)->ctx, (x))
+#define REG_PMC(interp, x) CTX_REG_PMC(&(interp)->ctx, (x))
+#define REG_STR(interp, x) CTX_REG_STR(&(interp)->ctx, (x))
 
 /*
  * and a set of macros to access a register by offset, used
