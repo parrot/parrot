@@ -40,6 +40,9 @@ structures.
 #include "parrot/parrot.h"
 
 #define VALID_RANGE(r) ((r) && ((INTVAL)(r) != -1))
+#define RVal_int(u) (u).i
+#define RVal_str(u) (u).s
+
 
 /*
  * create range_t structure

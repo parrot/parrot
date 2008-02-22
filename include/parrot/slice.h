@@ -1,5 +1,5 @@
 /* slice.h
- *  Copyright (C) 2001-2004, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -19,9 +19,6 @@ typedef struct RUnion {
     INTVAL i;
     STRING *s;
 } RUnion;
-
-#define RVal_int(u) u.i
-#define RVal_str(u) u.s
 
 typedef struct _parrot_range_t {
     int type;                      /* enum_type_INTVAL or STRING */
