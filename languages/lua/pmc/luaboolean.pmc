@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -90,7 +90,7 @@ Creates and returns a clone of the scalar.
 
 */
     PMC* clone() {
-        PMC* dest = pmc_new(INTERP, PMC_type(SELF));
+        PMC *dest = pmc_new(INTERP, PMC_type(SELF));
         STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
     }
@@ -207,12 +207,12 @@ Used to unarchive the boolean.
 
 =over 4
 
-=item C<INTVAL is_equal(PMC* value)>
+=item C<INTVAL is_equal(PMC *value)>
 
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
 MMD_LuaBoolean: {
             return (INTVAL)(PMC_int_val(SELF) == PMC_int_val(value));
         }
@@ -229,18 +229,20 @@ MMD_DEFAULT: {
 
 =over 4
 
-=item C<PMC* rawequal(PMC* value)>
+=item C<PMC* rawequal(PMC *value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal(PMC* value) {
+    METHOD PMC* rawequal(PMC *value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (PMC_type(SELF) == PMC_type(value)
-         && PMC_int_val(SELF) == PMC_int_val(value))
-            PMC_int_val(retval) = 1;
+
+        if (PMC_type(SELF)    == PMC_type(value)
+        &&  PMC_int_val(SELF) == VTABLE_get_integer(INTERP, value))
+            VTABLE_set_integer_native(INTERP, retval, 1);
         else
-            PMC_int_val(retval) = 0;
+            VTABLE_set_integer_native(INTERP, retval, 0);
+
         return retval;
     }
 
