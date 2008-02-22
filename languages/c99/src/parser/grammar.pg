@@ -18,17 +18,14 @@ grammar C99::Grammar is PCT::Grammar;
 
 token TOP {
     ^
-    <translation_unit>
-    [ $ || <.panic: Syntax error> ]
-}
-
-rule translation_unit {
     <external_declaration>+
+    [ $ || <.panic: Syntax error> ]
+    {*}
 }
 
 rule external_declaration {
-    | <declaration>
-    | <function_definition>
+    | <declaration> {*}          #= declaration
+    | <function_definition> {*}  #= function_definition
 }
 
 rule function_definition {
@@ -36,6 +33,7 @@ rule function_definition {
     <declarator>
     <declaration>*
     <compound_statement>
+    {*}
 }
 
 
@@ -151,14 +149,18 @@ rule type_qualifier {
 
 rule declarator {
     <pointer>? <direct_declarator>
+    {*}
 }
 
 rule direct_declarator {
-    [
-    | '(' <declarator> ')'
-    | <identifier>
-    ]
+    <declarator_prefix>
     <declarator_suffix>*
+    {*}
+}
+
+rule declarator_prefix {
+    | '(' <declarator> ')' {*}       #= declarator
+    | <identifier> {*}               #= identifier
 }
 
 rule declarator_suffix {
@@ -256,8 +258,8 @@ rule designator {
 
 rule statement {
     | <labeled_statement>
-    | <compound_statement>
-    | <expression_statement>
+    | <compound_statement> {*}        #= compound_statement
+    | <expression_statement> {*}      #= expression_statement
     | <if_statement>
     | <switch_statement>
     | <while_statement>
@@ -275,15 +277,17 @@ rule labeled_statement {
 
 rule compound_statement {
     '{' <block_item>* '}'
+    {*}
 }
 
 rule block_item {
-    | <declaration>
-    | <statement>
+    | <declaration> {*}    #= declaration
+    | <statement> {*}      #= statement
 }
 
 rule expression_statement {
     <expression>? ';'
+    {*}
 }
 
 rule if_statement {
@@ -363,6 +367,7 @@ token reserved_word {
 token identifier {
     <!reserved_word>
     <identifier_nondigit> [ <identifier_nondigit> | <digit> ]*
+    {*}
 }
 
 token identifier_nondigit {
@@ -390,7 +395,9 @@ token integer_constant {
     [ <decimal_constant>
     | <octal_constant>
     | <hexadecimal_constant>
-    ] <integer_suffix>?
+    ]
+    <integer_suffix>?
+    {*}
 }
 
 token decimal_constant {
@@ -476,7 +483,10 @@ token escape_sequence {
 }
 
 ## A.1.6 String literals
-token c_string_literal { [L]? \" <s_char>* \" }
+token c_string_literal {
+    [L]? \" <s_char>* \"
+    {*}
+}
 
 token s_char { <-["\\\n]> | <escape_sequence> }
 
@@ -489,20 +499,24 @@ token s_char { <-["\\\n]> | <escape_sequence> }
 
 rule constant_expression {
     <conditional_expression>
+    {*}
 }
 
 rule expression {
     <assignment_expression> [',' <assignment_expression>]*
+    {*}
 }
 
 rule assignment_expression {
     [<unary_expression> <assign_op>]* <conditional_expression>
+    {*}
 }
 
 rule assign_op { '='|'*='|'/='|'%='|'+='|'-='|'<<='|'>>='|'&='|'^='|'|=' }
 
 rule conditional_expression {
     <logical_expression> ['?' <expression> ':' <conditional_expression>]?
+    {*}
 }
 
 rule logical_expression is optable { ... }
@@ -539,29 +553,38 @@ proto 'term:' is tighter('infix:*')
               is parsed(&cast_expression) { ... }
 
 
+rule postfix_expression_prefix {
+    | <primary_expression> {*}                                 #= primary_expression
+    | '(' <type_name> ')' '{' <initializer_list> [',']? '}' {*} #= type_name
+}
+
 rule postfix_expression {
-    [
-    | <primary_expression>
-    | '(' <type_name> ')' '{' <initializer_list> [',']? '}'
-    ]
+    <postfix_expression_prefix>
     <postfix_expression_suffix>*
+    {*}
 }
 
 rule postfix_expression_suffix {
     | '[' <expression> ']'
-    | '(' <argument_expression_list>? ')'
+    | <arguments>  {*}                      #= arguments
     | '.' <identifier>
     | '->' <identifier>
     | '++'
     | '--'
 }
 
+rule arguments {
+    '(' <argument_expression_list>? ')'
+    {*}
+}
+
 rule argument_expression_list {
     <assignment_expression> [',' <assignment_expression>]*
+    {*}
 }
 
 rule unary_expression {
-    | <postfix_expression>
+    | <postfix_expression> {*}              #= postfix_expression
     | ['++'|'--'] <unary_expression>
     | <unary_operator> <cast_expression>
     | 'sizeof' <unary_expression>
@@ -574,13 +597,14 @@ rule unary_operator {
 
 rule cast_expression {
     ['(' <type_name> ')']* <unary_expression>
+    {*}
 }
 
 rule primary_expression {
-    | <identifier>
-    | <constant>
-    | <c_string_literal>
-    | '(' <expression> ')'
+    | <identifier> {*}             #= identifier
+    | <constant> {*}               #= constant
+    | <c_string_literal> {*}       #= c_string_literal
+    | '(' <expression> ')' {*}     #= expression
 }
 
 token ws {

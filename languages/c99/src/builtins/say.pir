@@ -22,6 +22,24 @@ say.pir -- simple implementation of a say function
     .return ()
 .end
 
+.sub 'printf'
+    .param pmc format
+    .param pmc args   :slurpy
+    .local pmc iter
+    iter = new 'Iterator', args
+  iter_loop:
+    unless iter goto iter_end
+    goto iter_loop
+  iter_end:
+.end
+
+.sub 'puts'
+    .param pmc str
+    print str
+    print "\n"
+.end
+
+
 
 # Local Variables:
 #   mode: pir
