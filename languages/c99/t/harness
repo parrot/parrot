@@ -4,5 +4,4 @@
 
 use FindBin;
 use lib qw( . lib ../lib ../../lib ../../lib );
-use Parrot::Test::Harness language => 'C99';
-
+use Parrot::Test::Harness language => 'c99', compiler => 'c99.pbc';
