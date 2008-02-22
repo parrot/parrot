@@ -60,7 +60,8 @@ sub check_macro_args {
             if ($definition ne "") {
                 foreach my $arg (split /\s*,\s*/, $args) {
                     # eliminate any properly formed usage of the macro arg
-                    $definition =~ s/\($arg\)//g;
+                    $definition =~ s/\Q($arg)//g;
+                    $definition =~ s/\Q[$arg]//g;
                     # Any remaining usage must be improper
                     if ($definition =~ m/\b$arg\b/) {
                         push (@defines, "$path: $macro has unwrapped arg: $arg\n");
@@ -70,8 +71,9 @@ sub check_macro_args {
         }
     }
 
-    ok( !scalar(@defines), 'unwrapped macro args' )
-        or diag( scalar @defines . " unsafe macro args found:\n@defines" );
+    my $ndefines = scalar @defines;
+    is( $ndefines, 0, 'Check for unwrapped macro arguments' )
+        or diag( "$ndefines unsafe macro args found:\n@defines\nThat's $ndefines of 'em!" );
 }
 
 # Local Variables:
