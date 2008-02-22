@@ -53,7 +53,7 @@ sub check_macro_args {
         # combine lines extended with \\n
         $buf =~ s/\\\n//g;
 
-        while ( $buf =~ m{ ^ \s* \#define \s+ ([a-zA-Z_]+)  \( ([^)]+) \)  ([^\n]*) }smgx ) {
+        while ( $buf =~ m{ ^ \s* \# \s* define \s+ ([a-zA-Z_]+)  \( ([^)]+) \)  ([^\n]*) }smgx ) {
             my ($macro,$args,$definition) = ($1, $2, $3);
             # for each of these args, verify it's wrapped in parens each time
             # it's referenced in the definition.
