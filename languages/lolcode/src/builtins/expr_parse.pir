@@ -114,9 +114,10 @@ it_done:
     return_val = pop val_stack
     .return (return_val)
 .end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
 
