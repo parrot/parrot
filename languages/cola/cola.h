@@ -387,11 +387,11 @@ char                *make_label();
 char                *op_name(int);
 int                 op_inverse(int);
 
-#  define NAME(x) (x->literal == NULL ? x->name : x->literal->name)
-#  define IS_LVAL(x)  (x->is_lval)
-#  define IS_RVAL(x)  (!x->is_lval)
+#  define NAME(x) ((x)->literal == NULL ? (x)->name : (x)->literal->name)
+#  define IS_LVAL(x)  ((x)->is_lval)
+#  define IS_RVAL(x)  (!(x)->is_lval)
 #  define SWITCH_OR_LOOP() (primary_block > 0 ? 1 : 0)
-#  define eval_expr(x) ((x->asttype == ASTT_LITERAL || x->asttype == ASTT_IDENTIFIER) ? (x->targ = x->sym, 1) : 0)
+#  define eval_expr(x) (((x)->asttype == ASTT_LITERAL || (x)->asttype == ASTT_IDENTIFIER) ? ((x)->targ = (x)->sym, 1) : 0)
 
 extern long         line;
 

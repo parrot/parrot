@@ -52,7 +52,7 @@ VERSION = PARROT_VERSION;
 #define CHECK_MUL_OVERFLOW(a, b) \
         ((Parrot_Int4)(a) == 0) || ((Parrot_Int4)(b) == 0) ? 0 : \
         (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) == -1)) ? FALSE : \
-        (((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) == -1)) ? (a == - MAX_INT4) : \
+        (((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) == -1)) ? ((a) == - MAX_INT4) : \
         (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) > 0)) ? \
             (Parrot_Int4)(a) > ((MAX_INT4) / (Parrot_Int4)(b)) : \
         (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) < 0)) ? \
