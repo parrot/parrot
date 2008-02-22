@@ -2,7 +2,7 @@
 
 
 void main() {
-    puts("1..4");
+    puts("1..5");
     puts("ok 1");
 
     if (0)
@@ -22,6 +22,11 @@ void main() {
         puts("ok 4");
     }
     while(0);
+
+    while(0) {
+        puts("nok 5");
+    }
+    puts("ok 5");
 
 }
 

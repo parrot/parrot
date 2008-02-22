@@ -1,5 +1,8 @@
 # $Id$
 
+New in r25986
+- Languages
+  + C99: reimplementation with PCT
 
 New in 0.5.3
 - Documentation

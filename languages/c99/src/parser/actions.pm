@@ -3,7 +3,7 @@
 
 =begin comments
 
-C::Grammar::Actions - ast transformations for C
+C99::Grammar::Actions - ast transformations for C99
 
 This file contains the methods that are used by the parse grammar
 to build the PAST representation of an C program.
@@ -18,18 +18,15 @@ value of the comment is passed as the second argument to the method.
 class C99::Grammar::Actions;
 
 method TOP($/) {
-    my $past;
     for $<external_declaration> {
         my $fun := $( $_ );
 
         ## Look for the "main" function, and set that as the result
         ## object.
         if $fun.name() eq 'main' {
-             $past := $fun;
+             make $fun;
         }
     }
-
-    make $past;
 }
 
 method external_declaration($/, $key) {
@@ -189,6 +186,7 @@ method c_string_literal($/) {
 }
 
 method identifier($/) {
+    ## XXX fix scopes
     make PAST::Var.new( :name( ~$/ ), :scope('package'), :node($/) );
 }
 
