@@ -2,7 +2,7 @@
 
 
 void main() {
-    puts("1..5");
+    puts("1..6");
     puts("ok 1");
 
     if (0)
@@ -28,5 +28,6 @@ void main() {
     }
     puts("ok 5");
 
+    1 ? puts("ok 6") : puts("nok 6");
 }
 

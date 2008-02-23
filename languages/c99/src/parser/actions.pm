@@ -198,7 +198,15 @@ method assignment_expression($/) {
 }
 
 method conditional_expression($/) {
-    make $( $<logical_expression> );
+    my $cond := $( $<logical_expression> );
+    if $<expression> {
+        my $then := $( $<expression>[0] );
+        my $else := $( $<conditional_expression>[0] );
+        make PAST::Op.new( $cond, $then, $else, :pasttype('if'), :node($/) );
+    }
+    else {
+        make $cond;
+    }
 }
 
 method postfix_expression_prefix($/, $key) {
