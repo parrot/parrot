@@ -57,8 +57,6 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
     } while (0)
 #define END_WRITE_HLL_INFO(interp, hll_info)
 
-#define ASSERT_CONST_STRING(src) PARROT_ASSERT(PObj_constant_TEST(src))
-
 
 /*
 
@@ -160,7 +158,6 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
     /* register HLL name */
     name     = constant_pmc_new_noinit(interp, enum_class_String);
-    ASSERT_CONST_STRING(hll_name);
 
     VTABLE_set_string_native(interp, name, hll_name);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, name);
@@ -235,7 +232,6 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 
     /* register dynlib */
     name    = constant_pmc_new_noinit(interp, enum_class_String);
-    ASSERT_CONST_STRING(hll_lib);
 
     VTABLE_set_string_native(interp, name, hll_lib);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_lib, name);
