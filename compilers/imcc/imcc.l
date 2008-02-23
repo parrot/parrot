@@ -75,29 +75,31 @@ typedef struct macro_frame_t {
 } macro_frame_t;
 
 /* static function declariations */
-static void pop_parser_state(PARROT_INTERP, void *yyscanner);
+static void pop_parser_state(PARROT_INTERP, ARGMOD(void *yyscanner));
 
 static struct macro_frame_t *new_frame(PARROT_INTERP);
 
 static void define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *params),
-             ARGIN(const char *expansion), int start_line);
+        ARGIN(const char *expansion), int start_line);
 
 static macro_t *find_macro(PARROT_INTERP, ARGIN(const char *name));
 
-static void scan_string(macro_frame_t *frame, ARGIN(const char *expansion), void *yyscanner);
+static void scan_string(macro_frame_t *frame, ARGIN(const char *expansion),
+        ARGMOD(void *yyscanner));
 
-static void scan_file(PARROT_INTERP, struct macro_frame_t *frame, ARGMOD(FILE *file),
-                      void *yyscanner);
+static void scan_file(PARROT_INTERP, ARGIN(struct macro_frame_t *frame), ARGMOD(FILE *file),
+        ARGMOD(void *yyscanner));
 
-static int destroy_frame(macro_frame_t *frame, void *yyscanner);
+static int destroy_frame(macro_frame_t *frame, ARGMOD(void *yyscanner));
 
-static int yylex_skip(YYSTYPE *valp, PARROT_INTERP, ARGIN(const char *skip), void *yyscanner);
+static int yylex_skip(YYSTYPE *valp, PARROT_INTERP, ARGIN(const char *skip),
+        ARGMOD(void *yyscanner));
 
-static int read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner);
+static int read_macro(YYSTYPE *valp, PARROT_INTERP, ARGMOD(void *yyscanner));
 
-static int expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner);
+static int expand_macro(PARROT_INTERP, ARGIN(const char *name), ARGMOD(void *yyscanner));
 
-static void include_file(PARROT_INTERP, char *file_name, void *yyscanner);
+static void include_file(PARROT_INTERP, char *file_name, ARGMOD(void *yyscanner));
 
 #define YY_DECL int yylex(YYSTYPE *valp, yyscan_t yyscanner, PARROT_INTERP)
 
@@ -517,23 +519,25 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
-        /* For some reason, we have to dupe the macro name, instead of passing it around. */
-        const char * const macro_name = str_dup(yytext + 1);
-        STRING * name_string          = string_from_cstring(interp, macro_name, 0);
-        const int type                = pmc_type(interp, name_string);
+        STRING * name_string = string_from_cstring(interp, yytext + 1, 0);
+        const int type       = pmc_type(interp, name_string);
+        char *macro_name;
 
         if (type > 0) {
             const size_t len = 16;
             char * const buf = (char *)mem_sys_allocate(len);
             snprintf(buf, len, "%d", type);
 
-            /* XXX: free valp->s if already used? Sounds like a good idea, but big segfaults if you do. */
+            /* XXX: free valp->s if already used? Sounds like a good idea, */
+            /* but big segfaults if you do. */
             valp->s = buf;
-            mem_sys_free(macro_name);
             return INTC;
         }
 
+        /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
+        /* For some reason, we have to use a dupe of the macro name to pass in to */
+        /* expand_macro, or we get a segfault. XXX Make it stop. */
+        macro_name = str_dup(yytext + 1);
         if (!expand_macro(interp, macro_name, yyscanner)) {
             mem_sys_free(macro_name);
             yyless(1);
@@ -1085,7 +1089,7 @@ find_macro(PARROT_INTERP, const char *name)
 }
 
 static int
-expand_macro(PARROT_INTERP, const char *name, void *yyscanner)
+expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 {
     yyguts_t   * const yyg       = (yyguts_t *)yyscanner;
     const char * const expansion = find_macro_param(interp, name);
