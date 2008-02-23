@@ -336,7 +336,7 @@ Planned.
 
 =item Last verified with parrot version
 
-0.5.2
+0.5.3
 
 =item Location
 
