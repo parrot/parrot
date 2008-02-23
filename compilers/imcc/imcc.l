@@ -520,9 +520,8 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        char *macro_name = str_dup(yytext + 1);
-        const int type   = pmc_type(interp,
-            string_from_cstring(interp, macro_name, 0));
+        const char * const macro_name = yytext + 1;
+        const int type                = pmc_type(interp, string_from_cstring(interp, macro_name, 0));
 
         if (type > 0) {
             const size_t len = 16;
@@ -531,17 +530,13 @@ SP              [ ]
 
             /* XXX: free valp->s if already used? Sounds like a good idea, but big segfaults if you do. */
             valp->s = buf;
-            mem_sys_free(macro_name);
             return INTC;
         }
 
         if (!expand_macro(valp, interp, macro_name, yyscanner)) {
-            mem_sys_free(macro_name);
             yyless(1);
             return DOT;
         }
-
-        mem_sys_free(macro_name);
     }
 
 <emit,INITIAL>{ID} {
@@ -781,7 +776,7 @@ new_frame(Interp *interp) {
 }
 
 static void
-scan_string(macro_frame_t *frame, const char *expansion, void *yyscanner)
+scan_string(macro_frame_t *frame, ARGIN(const char *expansion), void *yyscanner)
 {
     yyguts_t * const yyg      = (yyguts_t *)yyscanner;
     Interp   * const interp   = yyget_extra(yyscanner);
@@ -802,7 +797,8 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
 
 
     for (i = 0; i < frame->expansion.num_param; i++) {
-        free(frame->expansion.name[i]);
+        mem_sys_free(frame->expansion.name[i]);
+        frame->expansion.name[i] = NULL;
     }
 
     if (frame->heredoc_rest) {
@@ -867,14 +863,15 @@ read_braced(YYSTYPE *valp, Interp *interp, const char *macro_name,
         current  = (char *)realloc(current, len + 1);
         strcat(current,val.s);
 
-        free(val.s);
+        mem_sys_free(val.s);
+        val.s = NULL;
         c = yylex(&val, yyscanner, interp);
     }
 
     if (valp)
         *valp = val;
     else
-        free(val.s);
+        mem_sys_free(val.s);
 
     return current;
 }

@@ -3891,9 +3891,8 @@ case 117:
 YY_RULE_SETUP
 #line 522 "compilers/imcc/imcc.l"
 {
-        char *macro_name = str_dup(yytext + 1);
-        const int type   = pmc_type(interp,
-            string_from_cstring(interp, macro_name, 0));
+        const char * const macro_name = yytext + 1;
+        const int type                = pmc_type(interp, string_from_cstring(interp, macro_name, 0));
 
         if (type > 0) {
             const size_t len = 16;
@@ -3902,22 +3901,18 @@ YY_RULE_SETUP
 
             /* XXX: free valp->s if already used? Sounds like a good idea, but big segfaults if you do. */
             valp->s = buf;
-            mem_sys_free(macro_name);
             return INTC;
         }
 
         if (!expand_macro(valp, interp, macro_name, yyscanner)) {
-            mem_sys_free(macro_name);
             yyless(1);
             return DOT;
         }
-
-        mem_sys_free(macro_name);
     }
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 547 "compilers/imcc/imcc.l"
+#line 542 "compilers/imcc/imcc.l"
 {
         if (!is_def) {
             SymReg *r = find_sym(interp, yytext);
@@ -3947,32 +3942,32 @@ YY_RULE_SETUP
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 574 "compilers/imcc/imcc.l"
+#line 569 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 575 "compilers/imcc/imcc.l"
+#line 570 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 576 "compilers/imcc/imcc.l"
+#line 571 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 577 "compilers/imcc/imcc.l"
+#line 572 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 578 "compilers/imcc/imcc.l"
+#line 573 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 580 "compilers/imcc/imcc.l"
+#line 575 "compilers/imcc/imcc.l"
 {
         valp->s = str_dup(yytext);
 
@@ -3985,7 +3980,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 590 "compilers/imcc/imcc.l"
+#line 585 "compilers/imcc/imcc.l"
 {
         valp->s = str_dup(yytext);
 
@@ -3995,7 +3990,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 597 "compilers/imcc/imcc.l"
+#line 592 "compilers/imcc/imcc.l"
 {
         macro_frame_t *frame;
 
@@ -4027,7 +4022,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 626 "compilers/imcc/imcc.l"
+#line 621 "compilers/imcc/imcc.l"
 {
         /* charset:"..." */
         valp->s = str_dup(yytext);
@@ -4038,7 +4033,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 634 "compilers/imcc/imcc.l"
+#line 629 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         return IREG;
@@ -4046,7 +4041,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 639 "compilers/imcc/imcc.l"
+#line 634 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         return NREG;
@@ -4054,7 +4049,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 644 "compilers/imcc/imcc.l"
+#line 639 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         return SREG;
@@ -4062,7 +4057,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 649 "compilers/imcc/imcc.l"
+#line 644 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         return PREG;
@@ -4070,7 +4065,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 654 "compilers/imcc/imcc.l"
+#line 649 "compilers/imcc/imcc.l"
 {
         IMCC_fataly(interp, E_SyntaxError,
             "'%s' is not a valid register name", yytext);
@@ -4078,19 +4073,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 660 "compilers/imcc/imcc.l"
+#line 655 "compilers/imcc/imcc.l"
 /* skip */;
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 662 "compilers/imcc/imcc.l"
+#line 657 "compilers/imcc/imcc.l"
 {
         /* catch all except for state macro */
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 667 "compilers/imcc/imcc.l"
+#line 662 "compilers/imcc/imcc.l"
 {
         BEGIN(INITIAL);
 
@@ -4103,18 +4098,18 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 678 "compilers/imcc/imcc.l"
+#line 673 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 680 "compilers/imcc/imcc.l"
+#line 675 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ENDM);
 	YY_BREAK
 case 136:
 /* rule 136 can match eol */
 YY_RULE_SETUP
-#line 682 "compilers/imcc/imcc.l"
+#line 677 "compilers/imcc/imcc.l"
 {
         IMCC_INFO(interp)->line++;
         DUP_AND_RET(valp, '\n');
@@ -4122,12 +4117,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 687 "compilers/imcc/imcc.l"
+#line 682 "compilers/imcc/imcc.l"
 return LABEL;
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 689 "compilers/imcc/imcc.l"
+#line 684 "compilers/imcc/imcc.l"
 {
 
         if (yylex(valp,yyscanner,interp) != LABEL)
@@ -4153,7 +4148,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 712 "compilers/imcc/imcc.l"
+#line 707 "compilers/imcc/imcc.l"
 {
         if (valp) {
             const size_t len = strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 12;
@@ -4170,39 +4165,39 @@ YY_RULE_SETUP
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 726 "compilers/imcc/imcc.l"
+#line 721 "compilers/imcc/imcc.l"
 /* skip leading ws */;
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 727 "compilers/imcc/imcc.l"
+#line 722 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 728 "compilers/imcc/imcc.l"
+#line 723 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 729 "compilers/imcc/imcc.l"
+#line 724 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 730 "compilers/imcc/imcc.l"
+#line 725 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 731 "compilers/imcc/imcc.l"
+#line 726 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 733 "compilers/imcc/imcc.l"
+#line 728 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 4206 "compilers/imcc/imclexer.c"
+#line 4201 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -5404,7 +5399,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 733 "compilers/imcc/imcc.l"
+#line 728 "compilers/imcc/imcc.l"
 
 
 
@@ -5457,7 +5452,7 @@ new_frame(Interp *interp) {
 }
 
 static void
-scan_string(macro_frame_t *frame, const char *expansion, void *yyscanner)
+scan_string(macro_frame_t *frame, ARGIN(const char *expansion), void *yyscanner)
 {
     yyguts_t * const yyg      = (yyguts_t *)yyscanner;
     Interp   * const interp   = yyget_extra(yyscanner);
@@ -5478,7 +5473,8 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
 
 
     for (i = 0; i < frame->expansion.num_param; i++) {
-        free(frame->expansion.name[i]);
+        mem_sys_free(frame->expansion.name[i]);
+        frame->expansion.name[i] = NULL;
     }
 
     if (frame->heredoc_rest) {
@@ -5543,14 +5539,15 @@ read_braced(YYSTYPE *valp, Interp *interp, const char *macro_name,
         current  = (char *)realloc(current, len + 1);
         strcat(current,val.s);
 
-        free(val.s);
+        mem_sys_free(val.s);
+        val.s = NULL;
         c = yylex(&val,yyscanner,interp);
     }
 
     if (valp)
         *valp = val;
     else
-        free(val.s);
+        mem_sys_free(val.s);
 
     return current;
 }
