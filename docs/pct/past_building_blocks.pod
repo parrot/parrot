@@ -55,9 +55,6 @@ A variable in C<block1> is (depending on the language) usually not visible
 in C<block2>. If the statements in the body of the C<if> statement are not
 in a different scope, use a PAST::Stmts node instead.
 
-As a block defines a new scope, a PAST::Block object has a symbol table,
-which can be used to store and look up symbols. See PDD26 for more details.
-
 =head2 Attributes
 
 =head3 C<:namespace>
@@ -119,6 +116,44 @@ translates to:
      .return ()
  .end
 
+=head2 Symbol tables
+
+As a block defines a new scope, a PAST::Block object has a symbol table,
+which can be used to store and look up symbols. See PDD26 for more details.
+A PAST::Block node has a method C<symbol> used to both enter and find symbols.
+
+The C<symbol> method takes the symbol name as an argument, and optional
+attributes. If the symbol does not exist in the table, a new hash is created
+for that symbol. Any additional attribute arguments are set into this new hash.
+The C<symbol> method returns the current entry for the specified name. Checking
+for a symbol in a symbol table is as easy as:
+
+ our $?BLOCK; # the current scope
+
+ if $?BLOCK.symbol('foo') {
+   # symbol 'foo' was found
+ }
+ else {
+   # symbol 'foo' was not found
+ }
+
+If a symbol is not found in a block's symbol table, any outer blocks
+(outer scopes) will be inspected. The symbol table entry of the innermost
+scope is returned. For instance, consider the following Perl 6 code:
+
+ sub foo {
+   my $i = 42;
+   sub bar {
+     sub baz {
+       say("baz: $i");
+     }
+   }
+ }
+
+In the subroutine C<baz>, the variable C<$i> is referenced. It is not
+found in the symbol table of C<baz>, so it is looked for in baz' outer
+scope, C<bar>. It's not found there either, so bar's outer scope, C<foo>
+is inspected, where it is found.
 
 =head1 PAST::Stmts
 
@@ -164,9 +199,13 @@ source language, this can be represented by a PAST::Var node.
 
 Sets the name of the variable. This attribute is required.
 
-=head3 C<:scope> (required)
+=head3 C<:scope>
 
-Set the scope of this PAST::Var node. Available values:
+Set the scope of this PAST::Var node. If the C<:scope>  is not set, it is
+inherited from the symbol table entry in a PAST::Block's symbol table.
+If the scope is not set, the scope defaults to C<lexical>.
+
+Available values:
 
 =over 4
 
