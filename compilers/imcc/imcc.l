@@ -75,34 +75,31 @@ typedef struct macro_frame_t {
 } macro_frame_t;
 
 /* static function declariations */
-static void pop_parser_state(Interp* interp, void *yyscanner);
+static void pop_parser_state(PARROT_INTERP, void *yyscanner);
 
-static struct macro_frame_t *new_frame(Interp*);
+static struct macro_frame_t *new_frame(PARROT_INTERP);
 
-static void define_macro(Interp *interp, ARGIN(const char *name), ARGIN(const params_t *params),
+static void define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *params),
              ARGIN(const char *expansion), int start_line);
 
-static macro_t *find_macro(Interp *interp, ARGIN(const char *name));
+static macro_t *find_macro(PARROT_INTERP, ARGIN(const char *name));
 
-static void scan_string(macro_frame_t *frame, const char *expansion,
-                        void *yyscanner);
+static void scan_string(macro_frame_t *frame, ARGIN(const char *expansion), void *yyscanner);
 
-static void scan_file(Interp* interp, struct macro_frame_t *frame, FILE *,
+static void scan_file(PARROT_INTERP, struct macro_frame_t *frame, ARGMOD(FILE *file),
                       void *yyscanner);
 
 static int destroy_frame(macro_frame_t *frame, void *yyscanner);
 
-static int yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip,
-                      void *yyscanner);
+static int yylex_skip(YYSTYPE *valp, PARROT_INTERP, ARGIN(const char *skip), void *yyscanner);
 
-static int read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner);
+static int read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner);
 
-static int expand_macro(YYSTYPE *valp, Interp *interp, const char *name,
-                        void *yyscanner);
+static int expand_macro(YYSTYPE *valp, PARROT_INTERP, ARGIN(const char *name), void *yyscanner);
 
-static void include_file(Interp *interp, char *file_name, void *yyscanner);
+static void include_file(PARROT_INTERP, char *file_name, void *yyscanner);
 
-#define YY_DECL int yylex(YYSTYPE *valp, yyscan_t yyscanner, Interp *interp)
+#define YY_DECL int yylex(YYSTYPE *valp, yyscan_t yyscanner, PARROT_INTERP)
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
 
@@ -756,7 +753,7 @@ int yywrap(void* yyscanner) {
 }
 
 static macro_frame_t *
-new_frame(Interp *interp) {
+new_frame(PARROT_INTERP) {
     static int label   = 0;
     macro_frame_t * const tmp = mem_allocate_zeroed_typed(macro_frame_t);
 
@@ -817,7 +814,7 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
 }
 
 static int
-yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip, void *yyscanner)
+yylex_skip(YYSTYPE *valp, PARROT_INTERP, const char *skip, void *yyscanner)
 {
     int         c;
     const char *p;
@@ -839,7 +836,7 @@ yylex_skip(YYSTYPE *valp, Interp *interp, const char *skip, void *yyscanner)
 }
 
 static char*
-read_braced(YYSTYPE *valp, Interp *interp, const char *macro_name,
+read_braced(YYSTYPE *valp, PARROT_INTERP, const char *macro_name,
              char *current, void *yyscanner)
 {
     YYSTYPE val;
@@ -877,7 +874,7 @@ read_braced(YYSTYPE *valp, Interp *interp, const char *macro_name,
 }
 
 static int
-read_params(YYSTYPE *valp, Interp *interp, params_t *params,
+read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
              const char *macro_name, int need_id, void *yyscanner)
 {
     YYSTYPE  val;
@@ -942,7 +939,7 @@ read_params(YYSTYPE *valp, Interp *interp, params_t *params,
 }
 
 static int
-read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
+read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
 {
     int       c, start_line;
     params_t  params;
@@ -1026,7 +1023,7 @@ read_macro(YYSTYPE *valp, Interp *interp, void *yyscanner)
 }
 
 static char *
-find_macro_param(Interp *interp, const char *name)
+find_macro_param(PARROT_INTERP, const char *name)
 {
     macro_frame_t *f;
 
@@ -1044,7 +1041,7 @@ find_macro_param(Interp *interp, const char *name)
 }
 
 static void
-define_macro(Interp *interp, ARGIN(const char *name), ARGIN(const params_t *params),
+define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *params),
              ARGIN(const char *expansion), int start_line)
 {
     macro_t *m = find_macro(interp, name);
@@ -1071,7 +1068,7 @@ define_macro(Interp *interp, ARGIN(const char *name), ARGIN(const params_t *para
 }
 
 static macro_t *
-find_macro(Interp *interp, const char *name)
+find_macro(PARROT_INTERP, const char *name)
 {
     if (!IMCC_INFO(interp)->macros)
         return NULL;
@@ -1080,7 +1077,7 @@ find_macro(Interp *interp, const char *name)
 }
 
 static int
-expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
+expand_macro(YYSTYPE *valp, PARROT_INTERP, const char *name, void *yyscanner)
 {
     yyguts_t   *yyg       = (yyguts_t *)yyscanner;
     const char *expansion = find_macro_param(interp, name);
@@ -1185,7 +1182,7 @@ expand_macro(YYSTYPE *valp, Interp *interp, const char *name, void *yyscanner)
 }
 
 static void
-include_file(Interp* interp, char *file_name, void *yyscanner)
+include_file(PARROT_INTERP, char *file_name, void *yyscanner)
 {
     char          *ext;
     FILE          *file  = 0;
@@ -1222,7 +1219,7 @@ include_file(Interp* interp, char *file_name, void *yyscanner)
 }
 
 static void
-scan_file(Interp *interp, macro_frame_t *frame, FILE *file, void *yyscanner)
+scan_file(PARROT_INTERP, macro_frame_t *frame, FILE *file, void *yyscanner)
 {
     yyguts_t * const yyg      = (yyguts_t *)yyscanner;
     frame->buffer             = YY_CURRENT_BUFFER;
@@ -1237,7 +1234,7 @@ scan_file(Interp *interp, macro_frame_t *frame, FILE *file, void *yyscanner)
 }
 
 void
-IMCC_push_parser_state(Interp *interp)
+IMCC_push_parser_state(PARROT_INTERP)
 {
     macro_frame_t * const frame = new_frame(interp);
     frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
@@ -1248,7 +1245,7 @@ IMCC_push_parser_state(Interp *interp)
 }
 
 static void
-pop_parser_state(Interp *interp, void *yyscanner)
+pop_parser_state(PARROT_INTERP, void *yyscanner)
 {
     macro_frame_t * const tmp = IMCC_INFO(interp)->frames;
     if (tmp) {
@@ -1269,13 +1266,13 @@ pop_parser_state(Interp *interp, void *yyscanner)
 }
 
 void
-IMCC_pop_parser_state(Interp *interp, void *yyscanner)
+IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner)
 {
     pop_parser_state(interp, yyscanner);
 }
 
 void
-compile_file(Interp *interp, FILE *file, void *yyscanner)
+compile_file(PARROT_INTERP, FILE *file, void *yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  buffer;
@@ -1308,7 +1305,7 @@ compile_file(Interp *interp, FILE *file, void *yyscanner)
 }
 
 void
-compile_string(Interp *interp, char *s, void *yyscanner)
+compile_string(PARROT_INTERP, char *s, void *yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  buffer;
@@ -1339,7 +1336,7 @@ compile_string(Interp *interp, char *s, void *yyscanner)
 }
 
 void
-IMCC_print_inc(Interp *interp)
+IMCC_print_inc(PARROT_INTERP)
 {
     macro_frame_t *f;
     const char    *old = IMCC_INFO(interp)->frames->s.file;
