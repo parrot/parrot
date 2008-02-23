@@ -134,11 +134,40 @@ method for1_statement($/) {
 }
 
 method for2_statement($/) {
+    my $past := PAST::Block.new( :blocktype('immediate'), :node($/) );
+    my $loop := PAST::Op.new( :pasttype('while'), :node($/) );
 
+    $past.push( $( $<declaration> ) );
+    my $body := $( $<statement> );
+
+    if $<step> {
+        my $step := $( $<step>[0] );
+    }
+    my $cond;
+    if $<cond> {
+        $cond := $( $<cond>[0] );
+    }
+    else {
+        $cond := PAST::Val.new( :returns('Integer'), :value('1'), :node($/) );
+    }
+    $loop.push($cond);
+    $loop.push($body);
+
+    $past.push($loop);
+    make $past;
 }
 
 method expression($/) {
-    make $( $<assignment_expression>[0] );
+    if +$<assignment_expression> != 1 {
+        my $past := PAST::Stmts.new( :node($/) );
+        for $<assignment_expression> {
+            $past.push( $( $_ ) );
+        }
+        make $past;
+    }
+    else {
+        make $( $<assignment_expression>[0] );
+    }
 }
 
 method expression_statement($/) {
@@ -267,6 +296,12 @@ method postfix_expression($/) {
         $past := $args;
     }
     make $past;
+}
+
+method prefix_expression($/) {
+    my $opname := 'prefix:' ~ ~$<op>;
+    my $expr   := $( $<unary_expression> );
+    make PAST::Op.new( $expr, :name($opname), :pasttype('call'), :node($/) );
 }
 
 method primary_expression($/, $key) {

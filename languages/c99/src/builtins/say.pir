@@ -60,6 +60,19 @@ say.pir -- simple implementation of a say function
     .return (arg)
 .end
 
+.sub 'prefix:++'
+    .param pmc arg
+    inc arg
+    .return (arg)
+.end
+
+.sub 'prefix:--'
+    .param pmc arg
+    dec arg
+    .return (arg)
+.end
+
+
 
 # Local Variables:
 #   mode: pir

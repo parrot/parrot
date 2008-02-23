@@ -269,7 +269,7 @@ rule statement {
     | <while_statement> {*}           #= while_statement
     | <do_while_statement> {*}        #= do_while_statement
     | <for1_statement> {*}            #= for1_statement
-    | <for2_statement>
+    | <for2_statement> {*}            #= for2_statement
     | <jump_statement> {*}            #= jump_statement
 }
 
@@ -320,7 +320,7 @@ rule for1_statement {
 }
 
 rule for2_statement {
-    'for' '(' <declaration> <expression>? ';' <expression>? ')' <statement>
+    'for' '(' <declaration> [$<cond>=<expression>]? ';' [$<step>=<expression>]? ')' <statement>
     {*}
 }
 
@@ -619,10 +619,15 @@ rule argument_expression_list {
 
 rule unary_expression {
     | <postfix_expression> {*}              #= postfix_expression
-    | ['++'|'--'] <unary_expression>
+    | <prefix_expression> {*}               #= prefix_expression
     | <unary_operator> <cast_expression>
     | 'sizeof' <unary_expression>
     | 'sizeof' '(' <type_name> ')'
+}
+
+rule prefix_expression {
+    $<op>=['++'|'--'] <unary_expression>
+    {*}
 }
 
 rule unary_operator {
