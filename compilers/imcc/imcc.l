@@ -517,8 +517,11 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        const char * const macro_name = yytext + 1;
-        const int type                = pmc_type(interp, string_from_cstring(interp, macro_name, 0));
+        /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
+        /* For some reason, we have to dupe the macro name, instead of passing it around. */
+        const char * const macro_name = str_dup(yytext + 1);
+        STRING * name_string          = string_from_cstring(interp, macro_name, 0);
+        const int type                = pmc_type(interp, name_string);
 
         if (type > 0) {
             const size_t len = 16;
@@ -527,13 +530,17 @@ SP              [ ]
 
             /* XXX: free valp->s if already used? Sounds like a good idea, but big segfaults if you do. */
             valp->s = buf;
+            mem_sys_free(macro_name);
             return INTC;
         }
 
         if (!expand_macro(valp, interp, macro_name, yyscanner)) {
+            mem_sys_free(macro_name);
             yyless(1);
             return DOT;
         }
+
+        mem_sys_free(macro_name);
     }
 
 <emit,INITIAL>{ID} {
@@ -943,7 +950,7 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
 {
     int       c, start_line;
     params_t  params;
-    yyguts_t *yyg         = (yyguts_t *)yyscanner;
+    yyguts_t * const yyg  = (yyguts_t *)yyscanner;
     int       start_cond  = YY_START;
     int       buffer_size = 0;
     int       buffer_used = 0;
@@ -1017,6 +1024,7 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
                  &params, IMCC_INFO(interp)->macro_buffer, start_line);
 
     mem_sys_free(IMCC_INFO(interp)->macro_buffer);
+    IMCC_INFO(interp)->macro_buffer = NULL;
     IMCC_INFO(interp)->cur_macro_name = NULL;
 
     return MACRO;
@@ -1031,7 +1039,7 @@ find_macro_param(PARROT_INTERP, const char *name)
         if (f->params) {
             int i;
             for (i = 0; i < f->params->num_param; i++) {
-                if (strcmp(f->params->name[i], name) == 0)
+                if (STREQ(f->params->name[i], name))
                     return f->expansion.name[i];
             }
         }
