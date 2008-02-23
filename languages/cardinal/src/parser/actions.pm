@@ -86,8 +86,8 @@ method not_expr($/) {
 
 ## not entirely sure what alias does, but this is a guess...
 method alias($/) {
-    my $fname := $( $<fname>[0] );
-    my $alias := $( $<fname>[1] );
+    my $fname := $<fname>[0];
+    my $alias := $<fname>[1];
     make PAST::Op.new( $alias, $fname, :pasttype('bind'), :node($/) );
 }
 
@@ -154,7 +154,7 @@ method instance_variable($/) {
 }
 
 method local_variable($/) {
-    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
+    make PAST::Var.new( :name(~$/), :scope('lexical'), :node($/), :viviself('Undef') );
 }
 
 
@@ -220,16 +220,18 @@ method begin_end($/) {
 }
 
 method functiondef($/) {
-    my $name := $( $<fname> );
-    my $past := $( $<argdecl> );
-    $past.name($name.name());
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $name := $<fname>;
+    my $args := $( $<argdecl> );
+    $past.name($name);
     my $body := $( $<comp_stmt> );
+    $past.push($args);
     $past.push($body);
     make $past;
 }
 
 method argdecl($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := PAST::Stmts.new( :node($/) );
     for $<identifier> {
         my $param := $( $_ );
         $param.scope('parameter');
@@ -258,12 +260,8 @@ method block_param($/) {
     make $past;
 }
 
-method fname($/, $key) {
-    make $( $/{$key} );
-}
-
 method identifier($/) {
-    make PAST::Var.new( :name(~$<ident>), :scope('package'), :node($/) );
+    make PAST::Var.new( :name(~$<ident>), :node($/) );
 }
 
 method module_identifier($/) {
@@ -279,7 +277,7 @@ method command($/, $key) {
 }
 
 method call($/) {
-    my $op := $( $<operation> );
+    my $op := $<operation>;
     my $past := $( $<call_args> );
 
     if $<primary> {
@@ -288,7 +286,7 @@ method call($/) {
         $past.unshift($invocant);
     }
 
-    $past.unshift($op);
+    $past.name($op);
     make $past;
 }
 

@@ -21,15 +21,13 @@ token TOP {
     {*}
 }
 
-## XXX figure out if this \n* thing is good here.
 token comp_stmt {
-    \n* <stmts> <.term>*
+    <stmts>
     {*}
 }
 
 rule stmts {
-    [ <stmt> [ <.term>+ <stmt> ]* ]?
-    {*}
+    <.term>?[ <stmt> <.term>+]* {*}
 }
 
 rule term { \n | ';' }
@@ -112,12 +110,12 @@ rule indexed_variable {
     {*}
 }
 
-rule member_variable {
+token member_variable {
     <primary> '.' <identifier>
     {*}
 }
 
-rule command {
+token command {
     | <call> {*}         #= call
     | <super_call> {*}   #= super_call
 }
@@ -138,13 +136,13 @@ rule not_command {
     {*}
 }
 
-rule operation {
-    <identifier> ['!'|'?']?
-    {*}
+token operation {
+    <.identifier> ('!'|'?')?
 }
 
-rule call_args {
+token call_args {
     | <args> {*}
+    | '(' <.ws> <args> <.ws> ')' {*}
 }
 
 rule variable {
@@ -172,6 +170,7 @@ rule args {
 
 rule 'arg' is optable { ... }
 
+proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 
 
 
@@ -306,8 +305,8 @@ rule begin_end {
     {*}
 }
 
-rule fname {
-    | <identifier> {*}          #= identifier
+token fname {
+    <.identifier>
 }
 
 rule array {
@@ -335,7 +334,7 @@ token identifier {
 }
 
 token module_identifier {
-    <[A..Z]> <ident>
+    <before <[A..Z]>> <ident>
     {*}
 }
 
@@ -355,12 +354,12 @@ token class_variable {
 }
 
 token local_variable {
-    <[a..z_]> <ident>
+    <before <[a..z_]>> <ident>
     {*}
 }
 
 token constant_variable {
-    <[A..Z]> <ident>
+    <before <[A..Z]>> <ident>
     {*}
 }
 
@@ -402,7 +401,7 @@ token ws {
 }
 
 
-proto 'infix:=' is precedence('1')      { ... }
+proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 
 proto 'prefix:defined?' is looser('infix:=') { ... }
 
