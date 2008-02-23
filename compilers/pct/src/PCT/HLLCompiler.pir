@@ -681,6 +681,9 @@ Generic method for compilers invoked from a shell command line.
     goto save_output
   interactive:
     self.'interactive'(args :flat, adverbs :flat :named)
+    goto save_output
+  eval_line:
+    result = self.'eval'($S0, adverbs :flat :named)
 
   save_output:
     if null result goto end
@@ -711,8 +714,6 @@ Generic method for compilers invoked from a shell command line.
   version:
     self.'version'()
     goto end
-  eval_line:
-    self.'eval'($S0, adverbs :flat :named)
 .end
 
 
