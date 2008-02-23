@@ -147,9 +147,9 @@ void array_key_convert(PARROT_INTERP, PMC **key) {
                 INTVAL key_int = VTABLE_get_integer(interp, *key);
                 *key = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, *key, key_int);
-                dprintf("converting string key %d to int key\n",(int)key_int);
+                dprintf("converting string key %d to int key\n", (int)key_int);
             }
-        } 
+        }
         else {
             INTVAL key_int = VTABLE_get_integer(interp, *key);
             c0 = VTABLE_get_string_keyed(interp, *key, index_pmc);
@@ -158,12 +158,12 @@ void array_key_convert(PARROT_INTERP, PMC **key) {
             if (key_int != 0 && *c0->strstart != '0' && *c0->strstart != '-') {
                 *key = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, *key, key_int);
-                dprintf("converting string key %d to int key\n",(int)key_int);
+                dprintf("converting string key %d to int key\n", (int)key_int);
             }
             else if (*c0->strstart == '-' && *c1->strstart != '0') {
                 *key = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, *key, key_int);
-                dprintf("converting string key %d to int key\n",(int)key_int);
+                dprintf("converting string key %d to int key\n", (int)key_int);
             }
         }
     }
@@ -183,7 +183,7 @@ void add_to_hashtable(PARROT_INTERP, HashTable *ht, PMC *key, PMC *value, add_ty
     b = ht->buckets[index];
 
     if (PMC_type(key) == enum_class_Integer && VTABLE_get_integer(interp, key) >= ht->nextIndex) {
-        
+
         curr_index = VTABLE_get_integer(interp, key);
         if (curr_index < 0)
             ht->nextIndex = 0;
@@ -1187,7 +1187,7 @@ Initialize this PHPArray's internal structures
 
     }
 
-    void init_pmc (PMC *initializer) {
+    void init_pmc(PMC *initializer) {
         if (initializer == PMCNULL)
             DYNSELF.init();
     }
