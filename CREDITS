@@ -139,6 +139,7 @@ E: cdolan@cpan.org
 N: Christoph Otto
 D: Patch for key flags in pdd08
 D: Range check in Env PMC
+D: PHPArray implementation
 E: christoph@mksig.org
 
 N: chromatic

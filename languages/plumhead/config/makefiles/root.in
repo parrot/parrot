@@ -1,15 +1,30 @@
 # $Id$
 
+# Configuration settings
+LOAD_EXT = @load_ext@
+O        = @o@
+
 # Set up commands
 PARROT        = ../../parrot@exe@
 PERL          = @perl@
 RM_F          = @rm_f@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+PMCBUILD      = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 # Set up directories
 BUILD_DIR     = @build_dir@
 TGE_DIR       = ../../compilers/tge
 LIBRARY_DIR   = @build_dir@/runtime/parrot/library
+PMC_DIR       = pmc
+PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
+
+
+# Set up PMCs
+PMCS = \
+  phparray
+
+PMC_FILES = \
+  $(PMC_DIR)/phparray.pmc
 
 
 # default
@@ -91,6 +106,18 @@ build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java 
 
+pmc : pmc/php_group$(LOAD_EXT)
+
+pmc/php_group$(LOAD_EXT) : $(PMC_FILES)
+	@cd $(PMC_DIR) && $(PMCBUILD) generate $(PMCS)
+	@cd $(PMC_DIR) && $(PMCBUILD) compile $(PMCS)
+	@cd $(PMC_DIR) && $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
+
+
+pmc-test : pmc
+	$(PERL) -I../../lib t/pmc/array.t
+
 src/common/plumheadlib.pbc: src/common/builtins.pir
 	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
 
@@ -128,7 +155,7 @@ test-pct:
 test-yacc:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-yacc
 
-clean: clean-common clean-pct clean-antlr3 clean-test
+clean: clean-common clean-pct clean-antlr3 clean-test clean-pmc
 
 clean-common:
 	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
@@ -141,6 +168,9 @@ clean-antlr3:
 
 clean-test:
 	$(RM_F) t/*.php t/*.pir t/*.out 
+
+clean-pmc:
+	$(RM_F) pmc/*.c pmc/*.h pmc/*.o pmc/*.so pmc/*.dump
 
 realclean: clean
 	$(RM_F) Makefile
