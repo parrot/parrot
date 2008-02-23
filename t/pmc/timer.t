@@ -100,7 +100,7 @@ ok 3
 OUT
 
 SKIP: {
-    skip( "No thread config yet", 5 ) unless ( $platforms{$^O} );
+    skip( "No thread config yet", 3 ) unless ( $platforms{$^O} );
 
     pasm_output_like( <<'CODE', <<'OUT', "Timer setup - initializer/start" );
 .include "timer.pasm"
