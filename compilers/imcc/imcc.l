@@ -95,7 +95,7 @@ static int yylex_skip(YYSTYPE *valp, PARROT_INTERP, ARGIN(const char *skip), voi
 
 static int read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner);
 
-static int expand_macro(YYSTYPE *valp, PARROT_INTERP, ARGIN(const char *name), void *yyscanner);
+static int expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner);
 
 static void include_file(PARROT_INTERP, char *file_name, void *yyscanner);
 
@@ -534,7 +534,7 @@ SP              [ ]
             return INTC;
         }
 
-        if (!expand_macro(valp, interp, macro_name, yyscanner)) {
+        if (!expand_macro(interp, macro_name, yyscanner)) {
             mem_sys_free(macro_name);
             yyless(1);
             return DOT;
@@ -1085,16 +1085,14 @@ find_macro(PARROT_INTERP, const char *name)
 }
 
 static int
-expand_macro(YYSTYPE *valp, PARROT_INTERP, const char *name, void *yyscanner)
+expand_macro(PARROT_INTERP, const char *name, void *yyscanner)
 {
-    yyguts_t   *yyg       = (yyguts_t *)yyscanner;
-    const char *expansion = find_macro_param(interp, name);
+    yyguts_t   * const yyg       = (yyguts_t *)yyscanner;
+    const char * const expansion = find_macro_param(interp, name);
     macro_t    *m;
 
-    UNUSED(valp);
-
     if (expansion) {
-        macro_frame_t *frame = new_frame(interp);
+        macro_frame_t * const frame = new_frame(interp);
 
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
@@ -1192,22 +1190,17 @@ expand_macro(YYSTYPE *valp, PARROT_INTERP, const char *name, void *yyscanner)
 static void
 include_file(PARROT_INTERP, char *file_name, void *yyscanner)
 {
-    char          *ext;
-    FILE          *file  = 0;
-    yyguts_t      *yyg   = (yyguts_t *)yyscanner;
-    macro_frame_t *frame = new_frame(interp);
+    yyguts_t      * const yyg   = (yyguts_t *)yyscanner;
+    macro_frame_t * const frame = new_frame(interp);
     char *s              = Parrot_locate_runtime_file(interp, file_name,
                                    PARROT_RUNTIME_FT_INCLUDE);
+    char *ext;
+    FILE *file;
 
-    if (!s)
+    if (!s || !(file = fopen(s, "r")))
         IMCC_fataly(interp, E_IOError, strerror(errno));
 
-    file = fopen(s, "r");
     mem_sys_free(s);
-
-    if (!file)
-        IMCC_fataly(interp, E_IOError, strerror(errno));
-
     frame->s.file   = file_name;
     frame->s.handle = file;
     ext             = strrchr(file_name, '.');
