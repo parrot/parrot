@@ -181,12 +181,12 @@ PGE grammar for C99.
 
 =item Status
 
-Parser is pretty complete.
-Needs optok help.
+Parser is complete.
+More work on backend(s) is needed.
 
 =item Last verified with parrot version
 
-0.4.6
+0.5.3
 
 =item Location
 
@@ -210,7 +210,7 @@ Generates PIR for basic Ruby programs
 
 =item Last verified with parrot version
 
-0.4.9
+0.5.3
 
 =item Location
 
@@ -636,7 +636,7 @@ In progress.
 
 =item Last verified with parrot version
 
-0.5.2
+0.5.3
 
 =item Location
 
@@ -708,7 +708,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.5.2
+0.5.3
 
 =item Location
 
@@ -856,18 +856,18 @@ L<http://pugscode.org/>
 
 =item Description
 
-Perl1 implemented in PIR with the help of
-TGE, Tree Grammar Engine, and PGE, Parrot Grammar Engine.
+Perl1 implemented in PIR with the PCT
 
 =item Status
 
 So far, Punie handles constants (strings, integers, floats), variables, print
 statements, conditionals, do blocks, comma lists, and some basic math
 and logic ops.
+Parser is 90% complete; waiting for more PAST support.
 
 =item Last verified with parrot version
 
-0.5.2
+0.5.3
 
 =item Location
 
@@ -882,7 +882,7 @@ C<languages/punie>
 
 =item Description
 
-A Python compiler for Parrot, based on PGE and TGE.
+A Python compiler for Parrot implemented with PCT
 
 =item Status
 
@@ -890,7 +890,7 @@ Functions and simple expressions are working.
 
 =item Last verified with parrot version
 
-0.4.9
+0.5.3
 
 =item Location
 
@@ -1149,7 +1149,7 @@ by the one in the repository. (See above)
 
 =head2 Perl 5
 
-From r16836 up to r25231 F<languages/perl5> served as a repository 
+From r16836 up to r25231 F<languages/perl5> served as a repository
 for some Perl 5 - specific functionality that was heavily used in early parrot development.
 
 =head2 Pint
