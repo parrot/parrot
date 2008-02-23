@@ -52,15 +52,89 @@ method declarator($/) {
 }
 
 method direct_declarator($/) {
-    make $( $<declarator_prefix> );
+    my $past := $( $<declarator_prefix> );
+    #my $past := $( $<declarator_suffix>[0] );
+    #$past.name($pref.name());
+    make $past;
 }
 
 method declarator_prefix($/, $key) {
     make $( $/{$key} );
 }
 
+method declarator_suffix($/, $key) {
+    make $( $/{$key} );
+}
+
+method parameter_type_list($/) {
+    my $past := $( $<parameter_list> );
+    if $<vararg> {
+        $past.push( PAST::Var.new( :name('@vararg'), :slurpy(1), :scope('parameter'), :node($/) ) );
+    }
+    make $past;
+}
+
+method parameter_list($/) {
+    ## create the function block here already; it's needed to store the parameters
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    for $<parameter_declaration> {
+        $past.push( $( $_ ) );
+    }
+    make $past;
+}
+
+method parameter_declaration($/, $key) {
+    make $( $/{$key} );
+}
+
 method statement($/, $key) {
     make $( $/{$key} );
+}
+
+method jump_statement($/, $key) {
+    if $key eq 'return' {
+        my $past := PAST::Op.new( :pirop('return'), :node($/) );
+        if $<expression> {
+            $past.push( $( $<expression>[0] ) );
+        }
+        make $past;
+    }
+    else {
+        $/.panic("$key is not implemented!");
+    }
+}
+
+method for1_statement($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+    my $body := $( $<statement> );
+    my $cond;
+    if $<cond> {
+        $cond := $( $<cond>[0] );
+    }
+    else { # a missing condition is true
+        $cond := PAST::Val.new( :returns('Integer'), :value('1'), :node($/) );
+    }
+
+
+
+    if $<init> {
+        my $init := $( $<init>[0] );
+        $past.unshift($init);
+    }
+
+
+    if $<step> {
+        my $step := $( $<step>[0] );
+        $body := PAST::Stmts.new( $body, $step, :node($/) );
+    }
+    my $loop := PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
+    $past.push($loop);
+
+    make $past;
+}
+
+method for2_statement($/) {
+
 }
 
 method expression($/) {
@@ -135,6 +209,30 @@ method postfix_expression_suffix($/, $key) {
     make $( $/{$key} );
 }
 
+method index($/) {
+    my $expr := $( $<expression> );
+    ## XXX
+    make PAST::Op.new( $expr, :name('xxx_index'), :pasttype('call'), :node($/) );
+}
+
+method direct_field($/) {
+    my $field := $( $<identifier> );
+    ## XXX
+    make PAST::Op.new( $field, :name('xxx_get_field'), :pasttype('call'), :node($/) );
+}
+
+method indirect_field($/) {
+    my $field := $( $<identifier> );
+    ## XXX
+    make PAST::Op.new( $field, :name('xxx_get_indirect'), :pasttype('call'), :node($/) );
+}
+
+method inc_or_dec($/) {
+    my $opname := 'postfix:' ~ ~$<op>;
+    my $past := PAST::Op.new( :name($opname), :pasttype('call'), :node($/) );
+    make $past;
+}
+
 method arguments($/) {
     if $<argument_expression_list> {
         make $( $<argument_expression_list>[0] );
@@ -187,7 +285,8 @@ method c_string_literal($/) {
 
 method identifier($/) {
     ## XXX fix scopes
-    make PAST::Var.new( :name( ~$/ ), :scope('package'), :node($/) );
+    ## XXX fix declarations so that :viviself can be removed
+    make PAST::Var.new( :name( ~$/ ), :scope('package'), :viviself('Integer'), :node($/) );
 }
 
 method cast_expression($/) {

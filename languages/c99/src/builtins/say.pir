@@ -39,6 +39,26 @@ say.pir -- simple implementation of a say function
     print "\n"
 .end
 
+.sub 'infix:<'
+    .param pmc a
+    .param pmc b
+    islt $I0, a, b
+    .return ($I0)
+.end
+
+.sub 'postfix:++'
+    .param pmc arg
+    $P0 = clone arg
+    inc $P0
+    .return (arg)
+.end
+
+.sub 'postfix:--'
+    .param pmc arg
+    $P0 = clone arg
+    dec $P0
+    .return (arg)
+.end
 
 
 # Local Variables:

@@ -75,6 +75,13 @@ rule storage_class_specifier {
 }
 
 rule type_specifier {
+    | <builtin_type>
+    | <struct_or_union_specifier>
+    | <enum_specifier>
+    | <typedef_name>
+}
+
+rule builtin_type {
     | 'void'
     | 'char'
     | 'short'
@@ -87,13 +94,10 @@ rule type_specifier {
     | '_Bool'
     | '_Complex'
     | '_Imaginary'
-    | <struct_or_union_specifier>
-    | <enum_specifier>
-    | <typedef_name>
 }
 
 rule struct_or_union_specifier {
-    ['struct'|'union']
+    $<type>=['struct'|'union']
     [
     | <struct_or_union_definition>
     | <pre_declaration>
@@ -142,9 +146,7 @@ rule enumerator {
 }
 
 rule type_qualifier {
-    | 'const'
-    | 'restrict'
-    | 'volatile'
+    $<qualifier>=['const'|'restrict'|'volatile']
 }
 
 rule declarator {
@@ -164,8 +166,8 @@ rule declarator_prefix {
 }
 
 rule declarator_suffix {
-    | '(' <identifier_list>? ')'
-    | '(' <parameter_type_list> ')'
+    | '(' <identifier_list>? ')' ###{*}       #= identifier_list ## old-style C parameter declarations
+    | '(' <parameter_type_list> ')' {*}    #= parameter_type_list
     | '[' <assignment_expression>? ']'
     | '[' '*' ']'
 }
@@ -175,18 +177,20 @@ rule pointer {
 }
 
 rule parameter_type_list {
-    <parameter_list> [',' '...']?
+    <parameter_list>  [$<vararg>=[',' '...']]?
+    {*}
 }
 
 rule parameter_list {
     <parameter_declaration> [',' <parameter_declaration>]*
+    {*}
 }
 
 rule parameter_declaration {
     <declaration_specifiers>
     [
-    | <declarator>
-    | <abstract_declarator>?
+    | <declarator> {*}               #= declarator
+    | <abstract_declarator>? {*}     #= abstract_declarator
     ]
 }
 
@@ -264,9 +268,9 @@ rule statement {
     | <switch_statement>
     | <while_statement> {*}           #= while_statement
     | <do_while_statement> {*}        #= do_while_statement
-    | <for1_statement>
+    | <for1_statement> {*}            #= for1_statement
     | <for2_statement>
-    | <jump_statement>
+    | <jump_statement> {*}            #= jump_statement
 }
 
 rule labeled_statement {
@@ -310,18 +314,21 @@ rule do_while_statement {
 }
 
 rule for1_statement {
-    'for' '(' <expression>? ';' <expression>? ';' <expression>? ')' <statement>
+    'for' '(' [$<init>=<expression>]? ';' [$<cond>=<expression>]? ';' [$<step>=<expression>]? ')'
+    <statement>
+    {*}
 }
 
 rule for2_statement {
     'for' '(' <declaration> <expression>? ';' <expression>? ')' <statement>
+    {*}
 }
 
 rule jump_statement {
-    | 'goto' <identifier> ';'
-    | 'continue' ';'
-    | 'break' ';'
-    | 'return' <expression>? ';'
+    | 'goto' <identifier> ';' {*}         #= goto
+    | 'continue' ';' {*}                  #= continue
+    | 'break' ';' {*}                     #= break
+    | 'return' <expression>? ';' {*}      #= return
 }
 
 
@@ -550,19 +557,19 @@ proto 'infix:<=' is equal('infix:<') { ... }
 proto 'infix:<<' is tighter('infix:==') { ... }
 proto 'infix:>>' is equal('infix:<<') { ... }
 
-proto 'infix:+' is tighter('infix:<<') { ... }
-proto 'infix:-' is equal('infix:+') { ... }
+proto 'infix:+' is tighter('infix:<<') is pirop('n_add') { ... }
+proto 'infix:-' is equal('infix:+') is pirop('n_sub') { ... }
 
-proto 'infix:*' is tighter('infix:+') { ... }
-proto 'infix:/' is equal('infix:*') { ... }
-proto 'infix:%' is equal('infix:*') { ... }
+proto 'infix:*' is tighter('infix:+') is pirop('n_mul') { ... }
+proto 'infix:/' is equal('infix:*') is pirop('n_div') { ... }
+proto 'infix:%' is equal('infix:*') is pirop('n_mod') { ... }
 
 proto 'term:' is tighter('infix:*')
               is parsed(&cast_expression) { ... }
 
 
 rule postfix_expression_prefix {
-    | <primary_expression> {*}                                 #= primary_expression
+    | <primary_expression> {*}                                  #= primary_expression
     | '(' <type_name> ')' '{' <initializer_list> [',']? '}' {*} #= type_name
 }
 
@@ -573,12 +580,31 @@ rule postfix_expression {
 }
 
 rule postfix_expression_suffix {
-    | '[' <expression> ']'
+    | <index> {*}                           #= index
     | <arguments>  {*}                      #= arguments
-    | '.' <identifier>
-    | '->' <identifier>
-    | '++'
-    | '--'
+    | <direct_field> {*}                    #= direct_field
+    | <indirect_field> {*}                  #= indirect_field
+    | <inc_or_dec> {*}                      #= inc_or_dec
+}
+
+rule inc_or_dec {
+    $<op>=['++'|'--']
+    {*}
+}
+
+rule index {
+    '[' <expression> ']'
+    {*}
+}
+
+rule direct_field {
+    '.' <identifier>
+    {*}
+}
+
+rule indirect_field {
+    '->' <identifier>
+    {*}
 }
 
 rule arguments {
