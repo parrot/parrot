@@ -227,8 +227,8 @@ typedef struct PackFile_Directory {
 
 
 typedef opcode_t (*packfile_fetch_op_t)(ARGIN(const unsigned char *));
-typedef INTVAL   (*packfile_fetch_iv_t)(ARGIN(const unsigned char *));
-typedef void     (*packfile_fetch_nv_t)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
+typedef INTVAL (*packfile_fetch_iv_t)(ARGIN(const unsigned char *));
+typedef void (*packfile_fetch_nv_t)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
 
 typedef struct PackFile {
     /* the packfile is its own directory */
