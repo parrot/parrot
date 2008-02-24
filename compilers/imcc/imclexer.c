@@ -5515,6 +5515,11 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
 
     params->num_param = 0;
 
+    /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
+    /* For some reason, we have to use a dupe of the macro name to pass in to */
+    /* read_params, or we get a segfault. XXX Make it stop. */
+    macro_name = str_dup(macro_name);
+
     while (c != ')') {
         if (YYSTATE == heredoc2)
             IMCC_fataly(interp, E_SyntaxError,
@@ -5756,10 +5761,7 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
         start_cond = YY_START;
         BEGIN(macro);
 
-        /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
-        /* For some reason, we have to use a dupe of the macro name to pass in to */
-        /* read_params, or we get a segfault. XXX Make it stop. */
-        read_params(NULL, interp, &frame->expansion, str_dup(name), 0, yyscanner);
+        read_params(NULL, interp, &frame->expansion, name, 0, yyscanner);
 
         BEGIN(start_cond);
 
