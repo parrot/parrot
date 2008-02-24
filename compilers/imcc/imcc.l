@@ -1104,11 +1104,10 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 
     m = find_macro(interp, name);
     if (m) {
+        int i,c,start_cond;
+
         macro_frame_t * const frame = new_frame(interp);
         frame->params               = &m->params;
-        int c;
-        int start_cond;
-        int i;
 
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
