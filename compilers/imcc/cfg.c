@@ -115,12 +115,11 @@ static void init_basic_blocks(ARGMOD(IMC_Unit *unit))
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static Basic_block* make_basic_block(PARROT_INTERP,
+static Basic_block* make_basic_block(
     ARGMOD(IMC_Unit *unit),
     ARGMOD(Instruction* ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(* ins);
 
@@ -228,7 +227,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
     }
     ins->index = i = 0;
 
-    bb = make_basic_block(interp, unit, ins);
+    bb = make_basic_block(unit, ins);
     if (ins->type & ITBRANCH) {
         SymReg * const addr = get_branch_reg(bb->end);
         if (addr)
@@ -266,7 +265,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
             nu = 0;
         else if ((ins->type & ITLABEL)) {
             bb->end = ins->prev;
-            bb = make_basic_block(interp, unit, ins);
+            bb = make_basic_block(unit, ins);
         }
         /* a branch is the end of a basic block
          * so start a new one with the next instruction */
@@ -281,7 +280,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
             if (STREQ(ins->opname, "set_addr"))
                 continue;
             if (ins->next)
-                bb = make_basic_block(interp, unit, ins->next);
+                bb = make_basic_block(unit, ins->next);
             nu = 1;
         }
     }
@@ -1520,7 +1519,7 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Basic_block*
-make_basic_block(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins))
+make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins))
 {
     int n;
     Basic_block * const bb = mem_allocate_typed(Basic_block);
