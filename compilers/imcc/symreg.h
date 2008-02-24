@@ -251,12 +251,6 @@ SymReg * link_keys(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_address(PARROT_INTERP, ARGIN(const char *name), int uniq)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 SymReg * mk_const(PARROT_INTERP, ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

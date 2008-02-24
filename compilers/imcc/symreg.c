@@ -866,32 +866,6 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
 
 /*
 
-=item C<SymReg * mk_address>
-
-Eventually make mk_address static
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg *
-mk_address(PARROT_INTERP, ARGIN(const char *name), int uniq)
-{
-    const int begins_with_underscore = (*name == '_');
-    SymHash * const h = begins_with_underscore
-        ? &IMCC_INFO(interp)->ghash : &IMCC_INFO(interp)->cur_unit->hash;
-    SymReg  * const s = _mk_address(interp, h, name, uniq);
-
-    if (begins_with_underscore)
-       s->usage |= U_FIXUP;
-
-    return s;
-}
-
-/*
-
 =item C<SymReg * mk_sub_label>
 
 Make and store a new address label for a sub.
