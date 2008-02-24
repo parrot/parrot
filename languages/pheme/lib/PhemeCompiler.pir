@@ -77,17 +77,16 @@
 .end
 
 .sub get_parse_tree :method
-	.param pmc source
+    .param pmc source
 
-	.local pmc start_rule
-	.local pmc match
+    .local pmc start_rule
+    .local pmc match
 
-	start_rule = find_global 'Pheme::Grammar', 'prog'
-        $P0        = get_root_global ['parrot';'PGE'], 'Match'
-        source     = $P0.'new'(source, 'grammar'=>'Pheme::Grammar')
-	match      = start_rule( source )
+    start_rule = find_global 'Pheme::Grammar', 'prog'
+    match      = get_root_global ['parrot';'PGE'], 'Match'
+    source     = match.'new'(source, 'grammar'=>'Pheme::Grammar')
 
-	.return( match )
+    .return start_rule( source )
 .end
 
 .sub get_past_tree :method
@@ -111,9 +110,7 @@
 	.local pmc ast_builder
 	ast_builder = tge_past.apply( parse_tree )
 
-	.local pmc past_tree
-	past_tree = ast_builder.get( 'result' )
-	.return( past_tree )
+	.return ast_builder.get( 'result' )
 .end
 
 .sub get_post_tree :method
@@ -127,9 +124,7 @@
 	.local pmc post_builder
 	post_builder = tge_ost.apply( past_tree )
 
-	.local pmc post_tree
-	post_tree = post_builder.get( 'result' )
-	.return( post_tree )
+	.return post_builder.get( 'result' )
 .end
 
 .sub get_pir :method
@@ -141,19 +136,15 @@
 	.local pmc pir_builder
 	pir_builder = tge_pir.apply( post_tree )
 
-	.local pmc pir
-	pir = pir_builder.get( 'result' )
-	.return( pir )
+	.return pir_builder.get( 'result' )
 .end
 
 .sub compile_pir :method
 	.param pmc pir
 
 	.local pmc pir_compiler
-	.local pmc pir_compiled
-	pir_compiler = compreg "PIR" 
-	pir_compiled = pir_compiler( pir )
-	.return( pir_compiled )
+	pir_compiler = compreg "PIR"
+	.return pir_compiler( pir )
 .end
 
 .sub dump_parse_tree :method

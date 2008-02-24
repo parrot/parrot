@@ -37,17 +37,17 @@
 .end
 
 .sub 'head' :method
-	.param pmc new_head  :optional
-	.param int have_head :opt_flag
+    .param pmc new_head  :optional
+    .param int have_head :opt_flag
 
-	unless have_head goto return_head
-	setattribute self, 'head', new_head
-	.return( new_head )
+    unless have_head goto return_head
+    setattribute self, 'head', new_head
+    .return( new_head )
 
   return_head:
-	.local pmc head
-	head = getattribute self, 'head'
-	.return( head )
+    .local pmc head
+    head = getattribute self, 'head'
+    .return( head )
 .end
 
 .sub get_integer :vtable :method
@@ -76,17 +76,17 @@
 .end
 
 .sub 'tail' :method
-	.param pmc new_tail  :optional
-	.param int have_tail :opt_flag
+    .param pmc new_tail  :optional
+    .param int have_tail :opt_flag
 
-	unless have_tail goto return_tail
-	setattribute self, 'tail', new_tail
-	.return( new_tail )
+    unless have_tail goto return_tail
+    setattribute self, 'tail', new_tail
+    .return( new_tail )
 
   return_tail:
-	.local pmc tail
-	tail = getattribute self, 'tail'
-	.return( tail )
+    .local pmc tail
+    tail = getattribute self, 'tail'
+    .return( tail )
 .end
 
 .namespace [ 'Pheme'; 'Atom' ]
