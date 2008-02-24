@@ -5,7 +5,7 @@
 # See http://www.catseye.mb.ca/esoteric/bf/
 # for more information on this silly language
 
-  get_params '(0)', P5  # P5 = @ARGV
+  get_params '0', P5  # P5 = @ARGV
   # Get the brainfuck source file into S0
   set S0, P5[1]
   if S0, SOURCE
@@ -20,7 +20,7 @@ usage:
 SOURCE:
   null I3
   ne S0, "-O", no_o
-  set I3, 1		# optimize switch
+  set I3, 1     # optimize switch
   set S0, P5[2]
 no_o:
   open P1, S0, "<"
@@ -36,9 +36,9 @@ SOURCE_LOOP:
 
   # Initialise
 
-  set I0, 0                      # Our program counter
-  new P0, .ResizableIntegerArray # Our memory
-  set I1, 0                      # Our pointer
+  set I0, 0                       # Our program counter
+  new P0, 'ResizableIntegerArray' # Our memory
+  set I1, 0                       # Our pointer
   getstdin P30
 
   # The main interpreter loop
@@ -119,7 +119,7 @@ NOTDOT:
   ne S0, ",", NEXT
   read S31, P30, 1
   if S31, no_eof
-  null I2	# some return -1, some don't change data
+  null I2   # some return -1, some don't change data
   branch eof
 no_eof:
   ord I2, S31
