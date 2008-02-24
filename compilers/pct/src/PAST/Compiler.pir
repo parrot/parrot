@@ -1332,8 +1332,7 @@ blocks to determine the scope.
     .return self.'vivify'(node, ops, fetchop, storeop)
 
   attribute_decl:
-    ops = $P0.'new'('node'=>node)
-    .return (ops)
+    .return $P0.'new'('node'=>node)
 
   attribute_bind:
     $P0 = get_hll_global ['POST'], 'Op'
