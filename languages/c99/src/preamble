@@ -15,7 +15,7 @@
     .local pmc ns
     ns = get_root_namespace [ 'parrot'; 'Cardinal::Grammar' ]
     .local pmc iter
-    iter = new Iterator, ns
+    iter = new 'Iterator', ns
     set iter, 0
     .label $iter_loop:
     unless iter, .$iter_end
@@ -31,7 +31,7 @@
     .local pmc ns
     ns = get_hll_namespace
     .local pmc iter
-    iter = new Iterator, ns
+    iter = new 'Iterator', ns
     set iter, 0
     .label $iter_loop:
     unless iter, .$iter_end
@@ -47,7 +47,7 @@
     .local pmc ns
     ns = get_hll_namespace
     .local pmc iter
-    iter = new Iterator, ns
+    iter = new 'Iterator', ns
     set iter, 0
     .label $iter_loop:
     unless iter, .$iter_end
@@ -63,7 +63,7 @@
     .local pmc ns
     ns = get_namespace
     .local pmc iter
-    iter = new Iterator, ns
+    iter = new 'Iterator', ns
     set iter, 0
     .label $iter_loop:
     unless iter, .$iter_end
