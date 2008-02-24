@@ -143,7 +143,7 @@ void array_key_convert(PARROT_INTERP, PMC **key) {
             c0 = VTABLE_get_string_keyed(interp, *key, index_pmc);
 
             /*I should be able to get away with this when I'm just checking the first char*/
-            if (isdigit(*c0->strstart)) {
+            if (isdigit((unsigned char)*(c0->strstart))) {
                 INTVAL key_int = VTABLE_get_integer(interp, *key);
                 *key = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, *key, key_int);
