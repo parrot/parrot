@@ -25,14 +25,10 @@ directly to Parrot bytecode.
 So far, all the compiler does is register allocation and spilling. I like
 Steve Muchnick's MIR language, and I'm taking a few things from it.
 
-Presently you can write code with unlimited symbolics or named
-locals and imcc will map them to ``physical'' registers.
-
 I expect the IR compiler to be FAST, simple, and maintainable,
 and never develop featuritis; however I want it to be adequate
 for all languages targetting parrot. Did I mention that it
 needs to be FAST?
-
 
 Register Allocation
 
@@ -56,125 +52,9 @@ the easiest to maintain. An additional, important benefit, is
 C-based parsers are pretty darn fast. Currently assembling
 Parrot on the fly is still relatively slow.
 
-
-More documentation
-
-  s. the docs subdir
-
-
-Language Reference
-
-Variables, Registers and Constants
-
-  Variables are simple identifiers, anything that is NOT a register
-  or constant is a legal identifier. The syntax will have to change
-  a bit to support Perl's non-alpha identifiers, which will probably
-  spell renaming the registers.
-
-  You may use an infinite number of typed temporaries.
-  S=String, I=Int, N=Number, P=Object(or PMC)
-
-   $S0 = 1
-   $S1 = $S0 + 2
-   ...
-
-  You may also define lexicals with the .local directive below
-  and use them by name.
-
-   .local int i
-   .local int j
-   i = 4
-   j = i * i
-
-  Assigning to a constant is illegal syntax.
-
-Directives
-
-  For this reference, I use the following legend:
-    reg = A symbolic temporary ($S0, $I25)
-    var = A named variable or symbol (i, foo, myArray)
-    IDENTIFIER = An optionally quoted name
-    lval = reg | var
-    rval = reg | var | const
-
-    lval is allowed as targets of instructions, but not constants,
-    so we refer to operands on the right side as rvals. lvals
-    are also used on the right hand side to indicate that the
-    item can be a const or non-const token.
-
-  These are tokens that might not directly translate to a specific
-  opcode, and are intentionally left generic. Some of them aren't
-  ops at all, but instructions to the compiler.
-
-   .sym <type> <IDENTIFIER>
-
-   .sub <IDENTIFIER>
-   .end
-
-   .local <type> <IDENTIFIER>
-
-   .return '(' <rval> ')'
-
-   .param <type> <lval>
-
-   .emit
-
-   .eom
-
-
-Instructions
-
-  Assignments, calls, branches, etc. Simplified forms of lower
-  level operations. Typically is 1-to-1 or 1-to-2 instruction to
-  Parrot ratio.
-
-
-   lval = rval
-
-   lval = rval + rval
-
-   lval = rval - rval
-
-   lval = rval * rval
-
-   lval = rval / rval
-
-   lval = rval % rval
-
-   lval = rval << rval
-
-   lval = rval >> rval
-
-   <S.lval> = <S.rval> . <S.rval>
-
-  For array and string access you can use:
-
-   <S.lval|P.lval> [ rval ] = rval
-
-   lval = <S.lval|P.lval> [ rval ]
-
-   <P.lval> = new <TYPE>
-
-   dec <lval>
-
-   inc <lval>
-
-   end
-
-   goto <LABEL>
-
-   if <expression> goto <LABEL>
-
-   print rval
-
-
 Instructions not known to imcc are looked up in parrot's
 op_info_table and must have the proper amount and types of
 arguments.
-
-
-The best way to learn PIR quickly is to study the examples
-in examples/tutorial.
 
 
 Please mail parrot-porters@perl.org with bug-reports or patches.
