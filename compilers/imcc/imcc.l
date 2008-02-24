@@ -519,9 +519,9 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        STRING * name_string = string_from_cstring(interp, yytext + 1, 0);
-        const int type       = pmc_type(interp, name_string);
-        char *macro_name;
+        char   * const macro_name = yytext + 1;
+        STRING * name_string      = string_from_cstring(interp, macro_name, 0);
+        const int type            = pmc_type(interp, name_string);
 
         if (type > 0) {
             const size_t len = 16;
@@ -534,17 +534,10 @@ SP              [ ]
             return INTC;
         }
 
-        /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
-        /* For some reason, we have to use a dupe of the macro name to pass in to */
-        /* expand_macro, or we get a segfault. XXX Make it stop. */
-        macro_name = str_dup(yytext + 1);
         if (!expand_macro(interp, macro_name, yyscanner)) {
-            mem_sys_free(macro_name);
             yyless(1);
             return DOT;
         }
-
-        mem_sys_free(macro_name);
     }
 
 <emit,INITIAL>{ID} {
@@ -886,7 +879,7 @@ read_braced(YYSTYPE *valp, PARROT_INTERP, const char *macro_name,
 
 static int
 read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
-             const char *macro_name, int need_id, void *yyscanner)
+             ARGIN(const char *macro_name), int need_id, void *yyscanner)
 {
     YYSTYPE  val;
     int      len      = 0;
@@ -1106,11 +1099,11 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 
     m = find_macro(interp, name);
     if (m) {
-        int            c;
-        int            start_cond;
-        int            i;
-        macro_frame_t *frame = new_frame(interp);
-        frame->params        = &m->params;
+        macro_frame_t * const frame = new_frame(interp);
+        frame->params               = &m->params;
+        int c;
+        int start_cond;
+        int i;
 
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
@@ -1137,7 +1130,10 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
         start_cond = YY_START;
         BEGIN(macro);
 
-        read_params(NULL, interp, &frame->expansion, name, 0, yyscanner);
+        /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
+        /* For some reason, we have to use a dupe of the macro name to pass in to */
+        /* read_params, or we get a segfault. XXX Make it stop. */
+        read_params(NULL, interp, &frame->expansion, str_dup(name), 0, yyscanner);
 
         BEGIN(start_cond);
 
