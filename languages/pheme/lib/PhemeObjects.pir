@@ -1,11 +1,17 @@
 .namespace [ 'Pheme'; 'Cons' ]
 
 .sub _initialize :anon :load :init
-	.local pmc cons_class
-	newclass cons_class, [ 'Pheme'; 'Cons' ]
+    .local pmc cons_class
+    cons_class = get_class [ 'Pheme'; 'Cons' ]
+    $I0 = defined cons_class
+    unless $I0 goto register
+    .return()
 
-	addattribute cons_class, 'head'
-	addattribute cons_class, 'tail'
+  register:
+    newclass cons_class, [ 'Pheme'; 'Cons' ]
+
+    addattribute cons_class, 'head'
+    addattribute cons_class, 'tail'
 .end
 
 .sub 'get_bool' :vtable
