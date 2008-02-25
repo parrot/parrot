@@ -10,13 +10,11 @@ plumhead.pir - four variants of PHP on Parrot
 
    ./parrot languages/plumhead/plumhead.pbc t.php
 
-   ./parrot languages/plumhead/plumhead.pbc --variant=antlr t.php
+   ./parrot languages/plumhead/plumhead.pbc --variant=pct t.php
 
    ./parrot languages/plumhead/plumhead.pbc --variant=phc t.php
 
-   ./parrot languages/plumhead/plumhead.pbc --variant=pct t.php
-
-   ./parrot languages/plumhead/plumhead.pbc --variant=yacc t.php
+   ./parrot languages/plumhead/plumhead.pbc --variant=antlr t.php
 
 =head1 DESCRIPTION
 
@@ -36,10 +34,6 @@ Run the PAST with the help of PCT.
 =head2 Plumhead antlr3
 
 Parse PHP with Java based parser and tree parser, generated from ANTLR3 grammars.
-
-=head2 Plumhead yacc
-
-Parse PHP with lex and yacc.
 
 =head1 SEE ALSO
 
@@ -105,7 +99,6 @@ GOT_PHP_SOURCE_FN:
     if variant == 'antlr3'    goto VARIANT_ANTLR3
     if variant == 'pct'       goto VARIANT_PCT
     if variant == 'phc'       goto VARIANT_PHC
-    if variant == 'yacc'      goto VARIANT_YACC
 
 VARIANT_PCT:
     # look for subs in other namespaces                           
@@ -150,16 +143,6 @@ VARIANT_PHC:
 
     err_msg = 'Creating PIR with xsltproc failed'
     cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
-    ret = spawnw cmd
-    if ret goto ERROR
-    goto EXECUTE_PAST_PIR
-
-VARIANT_YACC:
-    err_msg = 'Creating PAST with lex and yacc'
-    # Do it with YACC
-    cmd = 'languages/plumhead/src/yacc/plumhead_yacc <'
-    concat cmd, php_source_fn
-    concat cmd, '> plumhead_past.pir'
     ret = spawnw cmd
     if ret goto ERROR
     goto EXECUTE_PAST_PIR

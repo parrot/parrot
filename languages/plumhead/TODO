@@ -8,6 +8,4 @@
 - Support for floating point numbers
 - Support for the superglobals  _POST and _GET
 - Implement var_dump()
-- Subclass OrderedHash for PlumheadArray
-- Add another variant 'yacc'
 - distinguish between subs and keywords

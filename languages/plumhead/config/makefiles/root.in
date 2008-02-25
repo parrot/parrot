@@ -46,7 +46,6 @@ help:
 	@echo "                     Current this has nothing to do."
 	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
 	@echo "                     Needs javac and a proper CLASSPATH."
-	@echo "  build-yacc         Build support for variant 'Plumhead yacc'."
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite for 'Plumhead pct'."
@@ -55,7 +54,6 @@ help:
 	@echo "  test-phc:          Run the test suite for 'Plumhead phc'."
 	@echo "  test-antlr3:       Run the test suite for 'Plumhead antlr3'."
 	@echo "  test-pct:          Run the test suite for 'Plumhead pct'."
-	@echo "  test-yacc:         Run the test suite for 'Plumhead yacc'."
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
 	@echo "  clean-test:        Clean up temporary files from testing."
@@ -65,42 +63,31 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 	@echo "Only for maintainer:"
-	@echo "  maintain:          Maintainance for 'Plumhead antlr3' and 'Plumhead yacc'."
+	@echo "  maintain:          Maintainance for 'Plumhead antlr3'."
 	@echo "                     The other variants need no maintainance."
 	@echo "  maintain-antlr3:   Generate Java source files with ANTLR 3."
-	@echo "  maintain-yacc:     Generate C source files with lex and yacc."
-	@echo "                     Depends on 'perl Configure.pl --maintainer'."
 	@echo ""
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=plumhead
 
-maintain: maintain-antlr3 maintain-yacc
+maintain: maintain-antlr3
 
 maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 	@echo 'Be sure to set CLASSPATH first, see docs/antlr3.pod'
 	java org.antlr.Tool src/antlr3/Plumhead.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
-maintain-yacc: src/yacc/plumhead.y src/yacc/plumhead.l
-	$(LEX)  -o src/yacc/plumhead_lexer.c     src/yacc/plumhead.l
-	$(YACC) -o src/yacc/plumhead_parser.c -d src/yacc/plumhead.y
-
 build:           build-pct
 
-build-all:       build-pct build-phc build-antlr3 build-yacc
+build-all:       build-pct build-phc build-antlr3
 
 build-common:    src/common/plumheadlib.pbc plumhead.pbc
 
 build-pct:       build-common
 
 build-phc:       build-common
-
-build-yacc:      build-common src/yacc/plumhead_yacc
-
-src/yacc/plumhead_yacc: src/yacc/plumhead_lexer.c src/yacc/plumhead_parser.c
-	$(CC) src/yacc/plumhead_lexer.c src/yacc/plumhead_parser.c -o src/yacc/plumhead_yacc
 
 build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
@@ -151,9 +138,6 @@ test-antlr3:
 
 test-pct:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-pct
-
-test-yacc:
-	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-yacc
 
 clean: clean-common clean-pct clean-antlr3 clean-test clean-pmc
 

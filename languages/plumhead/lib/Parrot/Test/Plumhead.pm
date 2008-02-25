@@ -16,7 +16,6 @@ use Parrot::Test::Plumhead::PHP;
 use Parrot::Test::Plumhead::Phc;
 use Parrot::Test::Plumhead::Antlr3;
 use Parrot::Test::Plumhead::PCT;
-use Parrot::Test::Plumhead::Yacc;
 
 =head1 NAME
 
