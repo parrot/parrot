@@ -20,6 +20,7 @@ To see what a minimal PMC looks like, create a PMC template and compile
 it to C.
 
     % perl tools/dev/gen_class.pl Foo > src/pmc/foo.pmc
+    % perl tools/build/pmc2c.pl --dump src/pmc/foo.pmc
     % perl tools/build/pmc2c.pl -c src/pmc/foo.pmc
 
 =head1 SEE ALSO
@@ -72,7 +73,7 @@ for (@$vtbl) {
     next if exists $skip_bodies{$methname};
     next if $methname =~ /prop/;
 
-    print "    $retval $methname ($args) {\n";
+    print "    $retval $methname($args) {\n";
 
     if ( $retval ne 'void' ) {
         print $retval eq 'PMC*'
