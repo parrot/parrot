@@ -10,6 +10,39 @@ pmc/luaany.pmc - Lua abstract base class
 
 C<LuaAny> provides an abstract base class for some Lua types.
 
+=head2 PMC Inheritance Summary
+
+ Class                  Parents
+ -----------------------------------------------
+ LuaBoolean             LuaAny, Default
+ LuaClosure             Closure, LuaAny, Default
+ LuaFunction            Sub, LuaAny, Default
+ LuaNil                 LuaAny, Default
+ LuaNumber              LuaAny, Default
+ LuaString              LuaAny, Default
+ LuaTable               LuaAny, Default
+ LuaThread              LuaAny, Default
+ LuaUserdata            LuaAny, Default
+
+=head2 PMC "Attribute" Summary
+
+ Class                  Metatable       Environment     Userdata
+     accessor           get_metatable   getfenv         get_attr_str (getattribute)
+     mutator            set_metatable   setfenv         set_attr_str (setattribute)
+     default value      nil             nil             NULL
+ ------------------------------------------------------------------
+ LuaBoolean             nil             -               -
+ LuaClosure             nil             yes             -
+ LuaFunction            nil             yes             -
+ LuaNil                 nil             -               -
+ LuaNumber              nil             -               -
+ LuaString              yes (common)    -               -
+ LuaTable               yes             -               -
+ LuaThread              nil             todo            -
+ LuaUserdata            yes             yes             yes
+
+The metatable supports the OO mecanism.
+
 =head2 Methods
 
 =over 4
