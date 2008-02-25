@@ -113,7 +113,7 @@ rule pre_declaration {
 }
 
 rule struct_declaration {
-    <specifier_qualifier_list> <struct_declarator>* ';'
+    <specifier_qualifier_list> <struct_declarator_list>* ';'
 }
 
 rule specifier_qualifier_list {
@@ -651,6 +651,7 @@ token ws {
   | '//' \N* \n
   | '/*' .*? '*/'
   | \s+
+  | '#' \N* \n
   ]*
 }
 
