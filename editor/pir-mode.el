@@ -144,59 +144,71 @@ newline or semicolon after an end keyword."
   "Syntax table for PIR major mode.")
 
 (defvar pir-PMC-keyword-symbols
-  '("Array" "Boolean" "Compiler" "Continuation" "Coroutine" "CSub"
-    "Eval" "IntList" "Iterator" "Key" "ManagedStruct" "MultiArray"
-    "NCI" "PerlArray" "PerlHash" "PerlInt" "PerlNum" "PerlString"
-    "PerlUndef" "Pointer" "Scratchpad" "Sub" "UnManagedStruct"))
+  '("AddrRegistry" "Array" "BigInt" "Boolean" "Bound_NCI" "Capture"
+    "Class" "Closure" "Compiler" "Complex" "Continuation" "Coroutine"
+    "Enumerate" "Env" "Eval" "Exception" "Exception_Handler"
+    "Exporter" "File" "FixedBooleanArray" "FixedFloatArray"
+    "FixedIntegerArray" "FixedPMCArray" "FixedStringArray" "Float"
+    "Hash" "IntList" "Integer" "Iterator" "Key" "LexInfo" "LexPad"
+    "ManagedStruct" "MultiArray" "MultiSub" "NCI" "NameSpace" "Null"
+    "OS" "Object" "OrderedHash" "PMCProxy" "Pair" "ParrotClass"
+    "ParrotIO" "ParrotInterpreter" "ParrotLibrary" "ParrotObject"
+    "ParrotRunningThread" "ParrotThread" "Pointer" "Random" "Ref"
+    "ResizableBooleanArray" "ResizableFloatArray" "ResizableIntegerArray"
+    "ResizablePMCArray" "ResizableStringArray" "RetContinuation"
+    "Role" "SArray" "Scalar" "SharedRef" "Slice" "String" "Sub"
+    "Super" "TQueue" "Timer" "UnManagedStruct" "Undef" "Version"
+    "VtableCache"))
 
 (defvar pir-ops
-  '("call" "goto" "if" "unless" "global" "clone" "addr"
-    "band" "bands" "bnot" "bnots" "bor" "bors" "shl" "shr" "lsr" "bxor" "bxors"
-    "eq" "eq_str" "eq_num" "eq_addr" "isnull" "ne" "ne_str" "ne_num"
-    "ne_addr" "lt" "lt_str" "lt_num" "le" "le_str" "le_num" "gt" "gt_str"
-    "gt_num" "ge" "ge_str" "ge_num" "cmp" "cmp_str" "cmp_num" "and" "not" "or"
-    "xor" "end" "noop" "cpu_ret" "check_events" "check_events__"
-    "wrapper__" "prederef__" "reserved" "load_bytecode" "branch"
-    "branch_cs" "bsr" "ret" "jsr" "jump" "enternative" "if" "unless" "invoke"
-    "invokecc" "updatecc" "set_addr" "get_addr" "newsub" "set_eh"
-    "pop_eh" "throw" "rethrow" "die_hard" "exit" "debug" "bounds"
-    "profile" "trace" "gc_debug" "interpinfo" "warningson"
-    "warningsoff" "errorson" "errorsoff" "runinterp" "getinterp"
-    "setline" "getline" "setfile" "getfile" "setpackage" "getpackage"
-    "sweep" "collect" "sweepoff" "sweepon" "collectoff" "collecton"
-    "needs_destroy" "foldup" "loadlib" "dlfunc" "dlvar" "compile"
-    "compreg" "bogus" "new_callback" "debug_init" "debug_load"
-    "debug_break" "debug_print" "die" "gcd" "issame"
-    "isntsame" "istrue" "isgt" "isge" "isle" "islt" "iseq" "isne" "rand"
-    "srand" "close" "fdopen" "getfd" "getstdin" "getstdout" "getstderr"
-    "pioctl" "open" "print" "write" "printerr" "read" "readline" "peek"
-    "stat" "seek" "tell" "socket" "sockaddr" "connect" "recv" "send" "poll"
-    "abs" "add" "cmod" "dec" "div" "fdiv" "ceil" "floor" "inc" "mod" "mul" "neg"
-    "pow" "sub" "sqrt" "acos" "asec" "asin" "atan" "cos" "cosh" "exp" "ln" "log10"
-    "log2" "sec" "sech" "sin" "sinh" "tan" "tanh" "lcm" "fact" "callmethod"
-    "callmethodcc" "can" "does" "isa" "newclass" "subclass"
-    "findclass" "get_class" "singleton" "class" "classname" "addparent"
-    "removeparent" "addattribute" "getattribute" "setattribute"
-    "classoffset" "covers" "exsec" "hav" "vers" "new" "morph" "typeof"
-    "find_type" "valid_type" "find_method" "defined" "exists" "delete"
-    "elements" "push" "pop" "unshift" "shift" "splice" "setprop" "getprop"
-    "delprop" "prophash" "freeze" "thaw" "mmdvtregister" "mmdvtfind"
-    "register" "unregister" "print_item"
-    "clone" "exchange" "set" "assign" "setref" "deref" "setp_ind"
-    "setn_ind" "sets_ind" "seti_ind" "slice" "iter" "null" "cleari"
-    "clearn" "clears" "clearp" "popi" "popn" "pops" "popp" "popbottomi"
-    "popbottomn" "popbottoms" "popbottomp" "poptopi" "poptopn"
-    "poptops" "poptopp" "pushi" "pushn" "pushs" "pushp" "pushtopi"
-    "pushtopn" "pushtops" "pushtopp" "pushbottomi" "pushbottomn"
-    "pushbottoms" "pushbottomp" "saveall" "restoreall" "savetop"
-    "restoretop" "entrytype" "depth" "lookback" "save" "savec" "restore"
-    "rotate_up" "intsave" "intrestore" "intdepth" "ord" "chr" "chopn"
-    "concat" "repeat" "length" "pin" "unpin" "substr" "substr_r" "index"
-    "pack" "sprintf" "find_encoding" "stringinfo" "upcase" "downcase"
-    "titlecase" "join" "split" "spawnw" "exec" "err" "time" "gmtime"
-    "localtime" "decodetime" "decodelocaltime" "sysinfo" "sleep"
-    "sizeof" "new_pad" "push_pad" "pop_pad" "peek_pad" "store_lex"
-    "find_lex" "store_global" "find_global"))
+  '("abs" "accept" "acos" "add" "addattribute" "addmethod" "addparent"
+    "addrole" "and" "asec" "asin" "assign" "atan"
+    "band" "bands" "bind" "bnot" "bnots" "bor" "bounds" "branch" "bsr"
+    "bxor" "bxors" "bytelength"
+    "callmethod" "callmethodcc" "can" "ceil" "charset" "charsetname" "chopn"
+    "chr" "class" "classname" "classoffset" "clear_eh" "cleari" "clearn"
+    "clearp" "clears" "clone" "close" "cmod" "cmp" "collect" "collectoff"
+    "collecton" "compile" "compose" "compreg" "concat" "connect" "cos" "cosh"
+    "debug" "dec" "decodelocaltime" "decodetime" "defined" "delete"
+    "delprop" "depth" "deref" "die" "div" "dlfunc" "dlvar" "does" "downcase"
+    "elements" "encoding" "encodingname" "enternative" "entrytype" "eq"
+    "err" "errorsoff" "errorson" "escape" "exchange" "exists" "exit" "exp"
+    "fact" "fdiv" "fdopen" "find_cclass" "find_charset" "find_encoding"
+    "find_lex" "find_method" "find_not_cclass" "find_type" "floor" "freeze"
+    "gc_debug" "gcd" "ge" "get_addr" "get_class" "get_global" "get_hll_global"
+    "get_hll_namespace" "get_mro" "get_namespace" "get_params" "get_repr"
+    "get_results" "get_root_global" "get_root_namespace" "getattribute"
+    "get_class" "getfd" "getinterp" "getprop" "getstderr" "getstdin"
+    "getstdout" "gmtime" "goto" "gt"
+    "hash"
+    "if" "if_null" "inc" "index" "infix" "inspect" "interpinfo" "invoke"
+    "invokecc" "is_cclass" "isa" "iseq" "isfalse" "isge" "isgt" "isle"
+    "islt" "isne" "isntsame" "isnull" "issame" "istrue"
+    "join" "jsr" "jump"
+    "lcm" "le" "length" "listen" "ln" "load_bytecode" "loadlib" "localtime"
+    "log10" "log2" "lookback" "lsr" "lt"
+    "mmdvtfind" "mmdvtregister" "mod" "mul"
+    "n_infix" "ne" "needs_destroy" "neg" "new" "new_callback" "newclass"
+    "newclosure" "nors" "not" "null"
+    "open" "or" "ord"
+    "peek" "pin" "pioctl" "poll" "pop" "popmark" "pow" "print" "printerr"
+    "profile" "prophash" "push" "push_eh" "pushaction" "pushmark"
+    "read" "readline" "recv" "register" "removeattribute" "removeparent"
+    "repeat" "restore" "restoreall" "result_info" "ret" "rethrow" "returncc"
+    "rot" "rotate_up" "runtinterp"
+    "save" "saveall" "savec" "sec" "sech" "seek" "send" "set" "set_addr"
+    "set_args" "set_global" "set_hll_global" "set_returns" "set_root_global"
+    "setattribute" "seti_ind" "setn_ind" "setp_ind" "setprop" "setref"
+    "sets_ind" "setstderr" "shift" "shl" "shr" "sin" "sinh" "sizeof" "sleep"
+    "sockaddr" "socket" "spawnw" "split" "sprintf" "sqrt" "stat" "store_lex"
+    "stringinfo" "sub" "subclass" "substr" "sweep" "sweepoff" "sweepon" "sysinfo"
+    "tailcall" "tailcallmethod" "tan" "tanh" "tell" "thaw" "throw" "time"
+    "titlecase" "trace" "trans_charset" "trans_encoding" "typeof"
+    "unless" "unless_null" "unpin" "unregister" "unshift" "upcase"
+    "valid_type"
+    "warningsoff" "warningson"
+    "xor"
+    "yield"))
 
 (defvar pir-mode-abbrev-table nil
   "Abbrev table used when in PIR mode.")
@@ -205,19 +217,24 @@ newline or semicolon after an end keyword."
   "Completion table used for PIR mode.")
 
 (defvar pir-type-keywords
-  '("int" "float" "string" "pmc" "object"))
+  '("int" "num" "pmc" "string"))
 
 (defvar pir-register-regexp "[INPS]\\([12][0-9]\\|3[01]\\|[0-9]\\)")
 (defvar pir-dollar-register-regexp "\\$[INPS][0-9]+")
 
 (defvar pir-directives
-  '("method" "non_prototyped" "prototyped" ":load" "@MAIN"))
+  '(":anon" ":flat" ":init" ":lex" ":load" ":main" ":method" ":multi"
+    ":named" ":opt_count" ":opt_flag" ":optional" ":outer" ":postcomp"
+    ":slurpy" ":unique_reg" ":vtable" ":wrap"))
 
 (defvar pir-dotted-directives
-  '(".sub" ".sub" ".end" ".emit" ".eom" ".const" ".namespace"
-    ".endnamespace" ".result" ".arg" ".return" ".include" ".loadlib"
-    ".begin_call" ".end_call" ".begin_return" ".end_return"
-    ".begin_yield" ".end_yield"))
+  '(".HLL" ".HLL_map" ".arg" ".const" ".constant" ".emit" ".end" ".endm"
+    ".endnamespace" ".eom" ".get_results" ".global" ".globalconst"
+    ".include" ".invocant" ".lex" ".line" ".loadlib" ".macro" ".meth_call"
+    ".namespace" ".nci_call" ".pcc_begin" ".pcc_begin_return"
+    ".pcc_begin_yield" ".pcc_call" ".pcc_end" ".pcc_end_return"
+    ".pcc_end_yield" ".pcc_sub" ".pragma" ".result" ".return" ".sub"
+    ".yield"))
 
 (defvar pir-variable-declarations
   '(".local" ".sym" ".param"))
