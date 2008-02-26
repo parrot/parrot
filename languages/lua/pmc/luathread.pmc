@@ -41,6 +41,7 @@ static PMC* getcurrenv(PARROT_INTERP) {
 pmclass LuaThread
     extends LuaAny
     dynpmc
+    need_ext
     group lua_group
     hll Lua {
 
@@ -93,7 +94,7 @@ Marks the Parrot::Coroutine as live.
 */
     void mark() {
         if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, PMC_pmc_val(SELF));
+            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
         if (PMC_metadata(SELF))
             pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
     }
