@@ -42,8 +42,9 @@ rule function_definition {
 
 rule declaration {
     <declaration_specifiers>
-    <init_declarator_list>?
+    [ <init_declarator> [',' <init_declarator>]* ]?
     ';'
+    {*}
 }
 
 rule declaration_specifiers {
@@ -58,12 +59,9 @@ rule function_specifier {
     'inline'
 }
 
-rule init_declarator_list {
-    <init_declarator> [',' <init_declarator>]*
-}
-
 rule init_declarator {
     <declarator> ['=' <initializer>]?
+    {*}
 }
 
 rule storage_class_specifier {
@@ -81,7 +79,7 @@ rule type_specifier {
     | <typedef_name>
 }
 
-rule builtin_type {
+token builtin_type {
     | 'void'
     | 'char'
     | 'short'
@@ -150,7 +148,8 @@ rule type_qualifier {
 }
 
 rule declarator {
-    <pointer>? <direct_declarator>
+    <pointer>?
+    <direct_declarator>
     {*}
 }
 
@@ -166,8 +165,8 @@ rule declarator_prefix {
 }
 
 rule declarator_suffix {
-    | '(' <identifier_list>? ')' ###{*}       #= identifier_list ## old-style C parameter declarations
     | '(' <parameter_type_list> ')' {*}    #= parameter_type_list
+    | '(' <identifier_list>? ')' {*}       #= identifier_list ## old-style C parameter declarations
     | '[' <assignment_expression>? ']'
     | '[' '*' ']'
 }
@@ -228,10 +227,10 @@ rule typedef_name {
 ## the parser doesn't know if it's a return type thingie or the name of the
 ## function. Therefore, typedef'd names must be stored in a %hash, so that
 ## this rule is not calling <identifier>, but inspecting the registered
-## typedef'd names. For now, specify 'foo' as the only typedef'd name.
+## typedef'd names. For now, specify 'SOME_TYPEDEF_NAME' as the only typedef'd name.
 ##
     #<identifier>
-    'foo'
+    'SOME_TYPEDEF_NAME'
 }
 
 rule initializer {

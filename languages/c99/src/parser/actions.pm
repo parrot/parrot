@@ -33,6 +33,19 @@ method external_declaration($/, $key) {
     make $( $/{$key} );
 }
 
+method declaration($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+
+    for $<init_declarator> {
+           $past.push( $( $_ ) );
+    }
+    make $past;
+}
+
+method init_declarator($/) {
+    make $( $<declarator> );
+}
+
 method function_definition($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
     my $decl := $( $<declarator> );
