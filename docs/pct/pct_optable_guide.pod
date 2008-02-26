@@ -371,7 +371,12 @@ Some operators, such as the shift operators contain the "<" or ">" character.
 As operators can be specified as, for instance, infix:<+>, defining an operator
 such as "<<" will make the rule parser (the parser generator) confused.
 
-Therefore, use so-called French quotes to do this. This looks as follows:
+You have two options. Either use quoted names for the operator subroutine names,
+like so:
+
+ proto 'infix:>>' is equiv('infix:<<') { ... }
+
+Or, use so-called French quotes to do this. This looks as follows:
 
  proto infix:«>>»  is equiv(infix:«<<») { ... }
 
