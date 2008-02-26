@@ -22,3 +22,7 @@
 				    (statement-case-intro . *)
 				    (inextern-lang . 0)
 				    ))))
+
+(setq auto-mode-alist (cons '("\\.pmc$" . c-mode) auto-mode-alist))
+
+(setq auto-mode-alist (cons '("\\.ops$" . perl-mode) auto-mode-alist))
