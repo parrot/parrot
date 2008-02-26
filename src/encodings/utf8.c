@@ -446,20 +446,21 @@ function.
 static void
 utf8_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL pos)
 {
-    UINTVAL charpos     = 0;
     const utf8_t *u8ptr = (const utf8_t *)i->str->strstart;
 
     /* start from last known charpos, if we can */
     if (i->charpos <= pos) {
-        charpos = i->charpos;
-        u8ptr += i->bytepos;
+        const UINTVAL old_pos = pos;
+        pos       -= i->charpos;
+        u8ptr     += i->bytepos;
+        i->charpos = old_pos;
     }
+    else
+        i->charpos = pos;
 
-    while (charpos < pos) {
+    while (pos-- > 0)
         u8ptr += UTF8SKIP(u8ptr);
-        charpos++;
-    }
-    i->charpos = pos;
+
     i->bytepos = (const char *)u8ptr - (const char *)i->str->strstart;
 }
 
@@ -648,17 +649,26 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
-    String_iter iter;
-    UINTVAL start;
+
     STRING * const return_string = Parrot_make_COW_reference(interp, src);
+    String_iter    iter;
+    UINTVAL        start;
+
     iter_init(interp, src, &iter);
-    iter.set_position(interp, &iter, offset);
-    start = iter.bytepos;
-    return_string->strstart = (char *)return_string->strstart + start ;
-    iter.set_position(interp, &iter, offset + count);
-    return_string->bufused = iter.bytepos - start;
-    return_string->strlen = count;
-    return_string->hashval = 0;
+
+    if (offset)
+        iter.set_position(interp, &iter, offset);
+
+    start                   = iter.bytepos;
+    return_string->strstart = (char *)return_string->strstart + start;
+
+    if (count)
+        iter.set_position(interp, &iter, offset + count);
+
+    return_string->bufused  = iter.bytepos - start;
+    return_string->strlen   = count;
+    return_string->hashval  = 0;
+
     return return_string;
 }
 

@@ -811,7 +811,10 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 
     PARROT_ASSERT(source_string);
     ENCODING_ITER_INIT(interp, source_string, &iter);
-    iter.set_position(interp, &iter, pos);
+
+    if (pos)
+        iter.set_position(interp, &iter, pos);
+
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         codepoint = iter.get_and_advance(interp, &iter);
