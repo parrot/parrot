@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2007, The Perl Foundation.
+Copyright (C) 2003-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -46,13 +46,11 @@ Class method to construct an Integer from the string representation C<rep>.
 
 */
     PMC *new_from_string(STRING *rep, INTVAL flags) {
-        PMC *res;
         const INTVAL type = SELF->vtable->base_type;
-
-        if (flags & PObj_constant_FLAG)
-            res = constant_pmc_new(INTERP, type);
-        else
-            res = pmc_new(INTERP, type);
+        PMC * const res =
+            (flags & PObj_constant_FLAG)
+                ? constant_pmc_new(INTERP, type)
+                : pmc_new(INTERP, type);
 
         PMC_num_val(res) = string_to_num(INTERP, rep);
         return res;
