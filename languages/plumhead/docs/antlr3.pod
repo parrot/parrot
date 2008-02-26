@@ -4,28 +4,26 @@
 
 These are some ramblings on using ANTLR 3 for Plumhead, or with Parrot in general.
 
-=head1 Parsing in general
-
-=head1 ANTLR 3
-
-See http://www.antlr.org/v3/index.html.
-
-=head2 Running
+=head1 Making it work
 
 Plumhead.java needs to find the needed classes. This works for me:
 
-  export ANTLR_HOME=/home/bernhard/devel/ANTLR/antlr-3
-  export PARROT_HOME=/home/bernhard/devel/Parrot/repos/parrot
+  export ANTLR_HOME=/home/bernhard/devel/antlr/antlr-3
+  export PARROT_HOME=/home/bernhard/devel/Parrot/trunk/parrot
   export CLASSPATH=$ANTLR_HOME/lib/antlr-2.7.7.jar:\
-$ANTLR_HOME/lib/antlr-3.0.jar:\
-$ANTLR_HOME:/lib/antlr-runtime-3.0.jar:\
-$ANTLR_HOME/lib/stringtemplate-3.0.jar:\
+$ANTLR_HOME/lib/antlr-3.0.1.jar:\
+$ANTLR_HOME:/lib/antlr-runtime-3.0.1.jar:\
+$ANTLR_HOME/lib/stringtemplate-3.1b1.jar:\
 $PARROT_HOME/languages/plumhead/src/antlr3:\
 $PARROT_HOME/languages/plumhead 
 
-And see the targets maintain-antlr3, build-antlr3, test-antlr3 in plumhead/Makefile.
+Now try:
+   cd languages/plumhead
+   make maintain-antlr3
+   make build-antlr3
+   make test-antlr3 
 
-=head2 Syntax
+=head1 ANTLR 3 Syntax
 
 Lexer, Parser and TreeParser are in the same file, speak grammar.
 C and C++ style comments are accepted.

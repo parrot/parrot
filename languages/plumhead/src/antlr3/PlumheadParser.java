@@ -1,4 +1,4 @@
-// $ANTLR 3.0 src/antlr3/Plumhead.g 2007-11-29 22:01:18
+// $ANTLR 3.0.1 src/antlr3/Plumhead.g 2008-02-26 20:49:04
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -12,37 +12,37 @@ public class PlumheadParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "NOQUOTE_STRING", "STMTS", "SCALAR", "ARRAY", "FUNCTION", "PREFIX", "SEA", "CODE_START", "CODE_END", "WS", "DOUBLEQUOTE_STRING", "SINGLEQUOTE_STRING", "ECHO", "VAR_DUMP", "PAREN_OPEN", "PAREN_CLOSE", "IDENT", "VAR_NAME", "DIGITS", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "BITWISE_OP", "ASSIGN_OP", "REL_OP", "IF", "ELSE", "';'", "'{'", "'}'", "'['", "']'"
     };
+    public static final int INTEGER=24;
+    public static final int FUNCTION=9;
+    public static final int PREFIX=10;
     public static final int CODE_START=12;
+    public static final int PAREN_CLOSE=20;
+    public static final int BITWISE_OP=29;
+    public static final int DIGITS=23;
+    public static final int ELSE=33;
+    public static final int NUMBER=25;
+    public static final int STMTS=6;
     public static final int MINUS=26;
     public static final int VAR_NAME=22;
-    public static final int DIGITS=23;
-    public static final int IDENT=21;
-    public static final int ARRAY=8;
-    public static final int BITWISE_OP=29;
-    public static final int NUMBER=25;
-    public static final int WS=14;
-    public static final int SINGLEQUOTE_STRING=16;
-    public static final int MUL_OP=28;
-    public static final int SEA=11;
-    public static final int CODE_END=13;
-    public static final int STMTS=6;
-    public static final int PROGRAM=4;
-    public static final int PREFIX=10;
-    public static final int PAREN_OPEN=19;
-    public static final int ASSIGN_OP=30;
-    public static final int INTEGER=24;
-    public static final int DOUBLEQUOTE_STRING=15;
-    public static final int PAREN_CLOSE=20;
-    public static final int ECHO=17;
-    public static final int ELSE=33;
-    public static final int FUNCTION=9;
-    public static final int IF=32;
     public static final int EOF=-1;
-    public static final int VAR_DUMP=18;
+    public static final int IF=32;
+    public static final int ASSIGN_OP=30;
+    public static final int CODE_END=13;
+    public static final int ECHO=17;
+    public static final int WS=14;
     public static final int REL_OP=31;
-    public static final int PLUS=27;
     public static final int NOQUOTE_STRING=5;
+    public static final int DOUBLEQUOTE_STRING=15;
     public static final int SCALAR=7;
+    public static final int VAR_DUMP=18;
+    public static final int IDENT=21;
+    public static final int SINGLEQUOTE_STRING=16;
+    public static final int PLUS=27;
+    public static final int PROGRAM=4;
+    public static final int PAREN_OPEN=19;
+    public static final int SEA=11;
+    public static final int MUL_OP=28;
+    public static final int ARRAY=8;
 
         public PlumheadParser(TokenStream input) {
             super(input);
@@ -79,7 +79,7 @@ public class PlumheadParser extends Parser {
 
         RewriteRuleSubtreeStream stream_sea_or_code=new RewriteRuleSubtreeStream(adaptor,"rule sea_or_code");
         try {
-            // src/antlr3/Plumhead.g:66:5: ( sea_or_code -> ^( PROGRAM sea_or_code ) )
+            // src/antlr3/Plumhead.g:66:3: ( sea_or_code -> ^( PROGRAM sea_or_code ) )
             // src/antlr3/Plumhead.g:66:5: sea_or_code
             {
             pushFollow(FOLLOW_sea_or_code_in_program838);
@@ -152,7 +152,7 @@ public class PlumheadParser extends Parser {
 
 
         try {
-            // src/antlr3/Plumhead.g:70:5: ( ( sea | code )+ )
+            // src/antlr3/Plumhead.g:70:3: ( ( sea | code )+ )
             // src/antlr3/Plumhead.g:70:5: ( sea | code )+
             {
             root_0 = (CommonTree)adaptor.nil();
@@ -243,7 +243,7 @@ public class PlumheadParser extends Parser {
         RewriteRuleTokenStream stream_SEA=new RewriteRuleTokenStream(adaptor,"token SEA");
 
         try {
-            // src/antlr3/Plumhead.g:74:5: ( SEA -> ^( ECHO NOQUOTE_STRING[$SEA] ) )
+            // src/antlr3/Plumhead.g:74:3: ( SEA -> ^( ECHO NOQUOTE_STRING[$SEA] ) )
             // src/antlr3/Plumhead.g:74:5: SEA
             {
             SEA4=(Token)input.LT(1);
@@ -315,11 +315,11 @@ public class PlumheadParser extends Parser {
 
         CommonTree CODE_START5_tree=null;
         CommonTree CODE_END7_tree=null;
-        RewriteRuleTokenStream stream_CODE_START=new RewriteRuleTokenStream(adaptor,"token CODE_START");
         RewriteRuleTokenStream stream_CODE_END=new RewriteRuleTokenStream(adaptor,"token CODE_END");
+        RewriteRuleTokenStream stream_CODE_START=new RewriteRuleTokenStream(adaptor,"token CODE_START");
         RewriteRuleSubtreeStream stream_statements=new RewriteRuleSubtreeStream(adaptor,"rule statements");
         try {
-            // src/antlr3/Plumhead.g:78:5: ( CODE_START statements ( CODE_END )? -> statements )
+            // src/antlr3/Plumhead.g:78:3: ( CODE_START statements ( CODE_END )? -> statements )
             // src/antlr3/Plumhead.g:78:5: CODE_START statements ( CODE_END )?
             {
             CODE_START5=(Token)input.LT(1);
@@ -411,7 +411,7 @@ public class PlumheadParser extends Parser {
         CommonTree REL_OP9_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:82:5: ( expression ( REL_OP expression )? )
+            // src/antlr3/Plumhead.g:82:3: ( expression ( REL_OP expression )? )
             // src/antlr3/Plumhead.g:82:5: expression ( REL_OP expression )?
             {
             root_0 = (CommonTree)adaptor.nil();
@@ -485,7 +485,7 @@ public class PlumheadParser extends Parser {
 
 
         try {
-            // src/antlr3/Plumhead.g:86:5: ( ( statement )* )
+            // src/antlr3/Plumhead.g:86:3: ( ( statement )* )
             // src/antlr3/Plumhead.g:86:5: ( statement )*
             {
             root_0 = (CommonTree)adaptor.nil();
@@ -631,27 +631,27 @@ public class PlumheadParser extends Parser {
         CommonTree char_literal37_tree=null;
         CommonTree ASSIGN_OP38_tree=null;
         CommonTree char_literal39_tree=null;
-        RewriteRuleTokenStream stream_PAREN_OPEN=new RewriteRuleTokenStream(adaptor,"token PAREN_OPEN");
-        RewriteRuleTokenStream stream_CODE_START=new RewriteRuleTokenStream(adaptor,"token CODE_START");
         RewriteRuleTokenStream stream_ASSIGN_OP=new RewriteRuleTokenStream(adaptor,"token ASSIGN_OP");
-        RewriteRuleTokenStream stream_VAR_NAME=new RewriteRuleTokenStream(adaptor,"token VAR_NAME");
-        RewriteRuleTokenStream stream_PAREN_CLOSE=new RewriteRuleTokenStream(adaptor,"token PAREN_CLOSE");
         RewriteRuleTokenStream stream_ECHO=new RewriteRuleTokenStream(adaptor,"token ECHO");
+        RewriteRuleTokenStream stream_CODE_END=new RewriteRuleTokenStream(adaptor,"token CODE_END");
+        RewriteRuleTokenStream stream_35=new RewriteRuleTokenStream(adaptor,"token 35");
+        RewriteRuleTokenStream stream_CODE_START=new RewriteRuleTokenStream(adaptor,"token CODE_START");
+        RewriteRuleTokenStream stream_36=new RewriteRuleTokenStream(adaptor,"token 36");
+        RewriteRuleTokenStream stream_34=new RewriteRuleTokenStream(adaptor,"token 34");
+        RewriteRuleTokenStream stream_PAREN_CLOSE=new RewriteRuleTokenStream(adaptor,"token PAREN_CLOSE");
+        RewriteRuleTokenStream stream_37=new RewriteRuleTokenStream(adaptor,"token 37");
         RewriteRuleTokenStream stream_ELSE=new RewriteRuleTokenStream(adaptor,"token ELSE");
         RewriteRuleTokenStream stream_38=new RewriteRuleTokenStream(adaptor,"token 38");
-        RewriteRuleTokenStream stream_IF=new RewriteRuleTokenStream(adaptor,"token IF");
-        RewriteRuleTokenStream stream_36=new RewriteRuleTokenStream(adaptor,"token 36");
         RewriteRuleTokenStream stream_VAR_DUMP=new RewriteRuleTokenStream(adaptor,"token VAR_DUMP");
-        RewriteRuleTokenStream stream_35=new RewriteRuleTokenStream(adaptor,"token 35");
-        RewriteRuleTokenStream stream_37=new RewriteRuleTokenStream(adaptor,"token 37");
+        RewriteRuleTokenStream stream_PAREN_OPEN=new RewriteRuleTokenStream(adaptor,"token PAREN_OPEN");
         RewriteRuleTokenStream stream_SEA=new RewriteRuleTokenStream(adaptor,"token SEA");
-        RewriteRuleTokenStream stream_CODE_END=new RewriteRuleTokenStream(adaptor,"token CODE_END");
-        RewriteRuleTokenStream stream_34=new RewriteRuleTokenStream(adaptor,"token 34");
+        RewriteRuleTokenStream stream_VAR_NAME=new RewriteRuleTokenStream(adaptor,"token VAR_NAME");
+        RewriteRuleTokenStream stream_IF=new RewriteRuleTokenStream(adaptor,"token IF");
+        RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_statements=new RewriteRuleSubtreeStream(adaptor,"rule statements");
         RewriteRuleSubtreeStream stream_relational_expression=new RewriteRuleSubtreeStream(adaptor,"rule relational_expression");
-        RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // src/antlr3/Plumhead.g:90:5: ( ECHO expression ';' -> ^( ECHO expression ) | VAR_DUMP PAREN_OPEN expression PAREN_CLOSE ';' -> ^( VAR_DUMP expression ) | IF PAREN_OPEN relational_expression PAREN_CLOSE '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | VAR_NAME ASSIGN_OP val= expression ';' -> ^( ASSIGN_OP SCALAR[$VAR_NAME] $val) | VAR_NAME '[' key= expression ']' ASSIGN_OP val= expression ';' -> ^( ASSIGN_OP ^( ARRAY[$VAR_NAME] $key) $val) )
+            // src/antlr3/Plumhead.g:90:3: ( ECHO expression ';' -> ^( ECHO expression ) | VAR_DUMP PAREN_OPEN expression PAREN_CLOSE ';' -> ^( VAR_DUMP expression ) | IF PAREN_OPEN relational_expression PAREN_CLOSE '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | VAR_NAME ASSIGN_OP val= expression ';' -> ^( ASSIGN_OP SCALAR[$VAR_NAME] $val) | VAR_NAME '[' key= expression ']' ASSIGN_OP val= expression ';' -> ^( ASSIGN_OP ^( ARRAY[$VAR_NAME] $key) $val) )
             int alt6=6;
             switch ( input.LA(1) ) {
             case ECHO:
@@ -678,11 +678,11 @@ public class PlumheadParser extends Parser {
                 {
                 int LA6_5 = input.LA(2);
 
-                if ( (LA6_5==ASSIGN_OP) ) {
-                    alt6=5;
-                }
-                else if ( (LA6_5==37) ) {
+                if ( (LA6_5==37) ) {
                     alt6=6;
+                }
+                else if ( (LA6_5==ASSIGN_OP) ) {
+                    alt6=5;
                 }
                 else {
                     NoViableAltException nvae =
@@ -771,7 +771,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: VAR_DUMP, expression
+                    // elements: expression, VAR_DUMP
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -870,14 +870,14 @@ public class PlumheadParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: relational_expression, IF, s2, s1
+                            // elements: s2, IF, s1, relational_expression
                             // token labels: 
-                            // rule labels: s2, retval, s1
+                            // rule labels: retval, s2, s1
                             // token list labels: 
                             // rule list labels: 
                             retval.tree = root_0;
-                            RewriteRuleSubtreeStream stream_s2=new RewriteRuleSubtreeStream(adaptor,"token s2",s2!=null?s2.tree:null);
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"token retval",retval!=null?retval.tree:null);
+                            RewriteRuleSubtreeStream stream_s2=new RewriteRuleSubtreeStream(adaptor,"token s2",s2!=null?s2.tree:null);
                             RewriteRuleSubtreeStream stream_s1=new RewriteRuleSubtreeStream(adaptor,"token s1",s1!=null?s1.tree:null);
 
                             root_0 = (CommonTree)adaptor.nil();
@@ -922,7 +922,7 @@ public class PlumheadParser extends Parser {
                             {
 
                             // AST REWRITE
-                            // elements: s1, relational_expression, IF
+                            // elements: IF, s1, relational_expression
                             // token labels: 
                             // rule labels: retval, s1
                             // token list labels: 
@@ -1095,15 +1095,15 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: key, ASSIGN_OP, val
+                    // elements: val, ASSIGN_OP, key
                     // token labels: 
-                    // rule labels: key, val, retval
+                    // rule labels: val, retval, key
                     // token list labels: 
                     // rule list labels: 
                     retval.tree = root_0;
-                    RewriteRuleSubtreeStream stream_key=new RewriteRuleSubtreeStream(adaptor,"token key",key!=null?key.tree:null);
                     RewriteRuleSubtreeStream stream_val=new RewriteRuleSubtreeStream(adaptor,"token val",val!=null?val.tree:null);
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"token retval",retval!=null?retval.tree:null);
+                    RewriteRuleSubtreeStream stream_key=new RewriteRuleSubtreeStream(adaptor,"token key",key!=null?key.tree:null);
 
                     root_0 = (CommonTree)adaptor.nil();
                     // 98:69: -> ^( ASSIGN_OP ^( ARRAY[$VAR_NAME] $key) $val)
@@ -1186,7 +1186,7 @@ public class PlumheadParser extends Parser {
         RewriteRuleTokenStream stream_38=new RewriteRuleTokenStream(adaptor,"token 38");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // src/antlr3/Plumhead.g:102:5: ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | bitwise_expression | VAR_NAME '[' key= expression ']' -> ^( ARRAY[$VAR_NAME] $key) | VAR_NAME -> SCALAR[$VAR_NAME] )
+            // src/antlr3/Plumhead.g:102:3: ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | bitwise_expression | VAR_NAME '[' key= expression ']' -> ^( ARRAY[$VAR_NAME] $key) | VAR_NAME -> SCALAR[$VAR_NAME] )
             int alt7=5;
             switch ( input.LA(1) ) {
             case DOUBLEQUOTE_STRING:
@@ -1296,12 +1296,12 @@ public class PlumheadParser extends Parser {
                     // AST REWRITE
                     // elements: key
                     // token labels: 
-                    // rule labels: key, retval
+                    // rule labels: retval, key
                     // token list labels: 
                     // rule list labels: 
                     retval.tree = root_0;
-                    RewriteRuleSubtreeStream stream_key=new RewriteRuleSubtreeStream(adaptor,"token key",key!=null?key.tree:null);
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"token retval",retval!=null?retval.tree:null);
+                    RewriteRuleSubtreeStream stream_key=new RewriteRuleSubtreeStream(adaptor,"token key",key!=null?key.tree:null);
 
                     root_0 = (CommonTree)adaptor.nil();
                     // 105:40: -> ^( ARRAY[$VAR_NAME] $key)
@@ -1390,7 +1390,7 @@ public class PlumheadParser extends Parser {
         CommonTree BITWISE_OP48_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:110:5: ( adding_expression ( BITWISE_OP adding_expression )* )
+            // src/antlr3/Plumhead.g:110:3: ( adding_expression ( BITWISE_OP adding_expression )* )
             // src/antlr3/Plumhead.g:110:5: adding_expression ( BITWISE_OP adding_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
@@ -1477,7 +1477,7 @@ public class PlumheadParser extends Parser {
         CommonTree MINUS52_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:114:5: ( multiplying_expression ( ( PLUS | MINUS ) multiplying_expression )* )
+            // src/antlr3/Plumhead.g:114:3: ( multiplying_expression ( ( PLUS | MINUS ) multiplying_expression )* )
             // src/antlr3/Plumhead.g:114:5: multiplying_expression ( ( PLUS | MINUS ) multiplying_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
@@ -1599,7 +1599,7 @@ public class PlumheadParser extends Parser {
         CommonTree MUL_OP55_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:118:5: ( unary_expression ( MUL_OP unary_expression )* )
+            // src/antlr3/Plumhead.g:118:3: ( unary_expression ( MUL_OP unary_expression )* )
             // src/antlr3/Plumhead.g:118:5: unary_expression ( MUL_OP unary_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
@@ -1685,7 +1685,7 @@ public class PlumheadParser extends Parser {
         RewriteRuleTokenStream stream_MINUS=new RewriteRuleTokenStream(adaptor,"token MINUS");
         RewriteRuleSubtreeStream stream_postfix_expression=new RewriteRuleSubtreeStream(adaptor,"rule postfix_expression");
         try {
-            // src/antlr3/Plumhead.g:122:5: ( postfix_expression | MINUS postfix_expression -> ^( PREFIX[\"-\"] postfix_expression ) )
+            // src/antlr3/Plumhead.g:122:3: ( postfix_expression | MINUS postfix_expression -> ^( PREFIX[\"-\"] postfix_expression ) )
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -1802,7 +1802,7 @@ public class PlumheadParser extends Parser {
         RewriteRuleTokenStream stream_PAREN_CLOSE=new RewriteRuleTokenStream(adaptor,"token PAREN_CLOSE");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // src/antlr3/Plumhead.g:127:5: ( NUMBER | INTEGER | PAREN_OPEN expression PAREN_CLOSE -> expression )
+            // src/antlr3/Plumhead.g:127:3: ( NUMBER | INTEGER | PAREN_OPEN expression PAREN_CLOSE -> expression )
             int alt13=3;
             switch ( input.LA(1) ) {
             case NUMBER:
