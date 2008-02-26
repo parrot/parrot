@@ -439,9 +439,9 @@ static Instruction * MK_I(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 static Instruction* mk_pmc_const(PARROT_INTERP,
     IMC_Unit *unit,
-    NOTNULL(const char *type),
-    NOTNULL(SymReg *left),
-    NOTNULL(char *constant))
+    ARGIN(const char *type),
+    ARGMOD(SymReg *left),
+    ARGIN(const char *constant))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -521,8 +521,8 @@ MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
 
 PARROT_WARN_UNUSED_RESULT
 static Instruction*
-mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
-             NOTNULL(SymReg *left), NOTNULL(char *constant))
+mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
+        ARGMOD(SymReg *left), ARGIN(const char *constant))
 {
     const   int type_enum = atoi(type);
     SymReg *rhs;
@@ -870,7 +870,7 @@ typedef union YYSTYPE
     SymReg * sr;
     Instruction *i;
 }
-/* Line 187 of yacc.c.  */
+/* Line 193 of yacc.c.  */
 #line 864 "compilers/imcc/imcparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
