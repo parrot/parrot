@@ -38,7 +38,7 @@ C<LuaAny> provides an abstract base class for some Lua types.
  LuaNumber              nil             -               -
  LuaString              yes (common)    -               -
  LuaTable               yes             -               -
- LuaThread              nil             todo            -
+ LuaThread              nil             yes             -
  LuaUserdata            yes             yes             yes
 
 The metatable supports the OO mecanism.

@@ -22,6 +22,21 @@ This implementation is based on C<Parrot::Coroutine>.
 
 #include "lua_private.h"
 
+static PMC* curr_func(PARROT_INTERP) {
+    parrot_context_t *ctx = CONTEXT(interp->ctx);
+    PMC *sub = ctx->current_sub;
+    return sub;
+}
+
+static PMC* getcurrenv(PARROT_INTERP) {
+    PMC *env = NULL;
+    PMC *sub = curr_func(interp);
+    if (sub) {
+        env = PMC_metadata(sub);
+    }
+    return env;
+}
+
 
 pmclass LuaThread
     extends LuaAny
@@ -63,6 +78,7 @@ Raises an exception. Use C<init_pmc()>.
         VTABLE_set_pmc_keyed_str(INTERP, init_args,
                                  const_string(INTERP, "initial_sub"), sub);
         PMC_pmc_val(SELF) = VTABLE_instantiate(INTERP, classobj, init_args);
+        PMC_metadata(SELF) = getcurrenv(INTERP);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -78,6 +94,8 @@ Marks the Parrot::Coroutine as live.
     void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, PMC_pmc_val(SELF));
+        if (PMC_metadata(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
     }
 
 /*
@@ -170,6 +188,22 @@ MMD_DEFAULT: {
 
 =over 4
 
+=item C<PMC *getfenv()>
+
+=cut
+
+*/
+    METHOD PMC* getfenv() {
+        PMC *retval = PMC_metadata(SELF);
+
+        if (retval)
+            return retval;
+
+        return pmc_new(INTERP, dynpmc_LuaNil);
+    }
+
+/*
+
 =item C<PMC* rawequal(PMC *value)>
 
 =cut
@@ -184,6 +218,17 @@ MMD_DEFAULT: {
             VTABLE_set_integer_native(INTERP, retval, 0);
 
         return retval;
+    }
+
+/*
+
+=item C<void setfenv(PMC *env)>
+
+=cut
+
+*/
+    METHOD void setfenv(PMC *env) {
+        PMC_metadata(SELF) = env;
     }
 
 }
