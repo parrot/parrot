@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -68,3 +68,7 @@ The following grammar comes from "Lua 5.1 Reference Manual".
 
 =cut
 
+# Local Variables:
+#   fill-column:78
+# End:
+# vim: expandtab shiftwidth=4:
