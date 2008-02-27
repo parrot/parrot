@@ -55,6 +55,7 @@ my @steps = qw(
     auto::gmp
     auto::readline
     auto::gdbm
+    auto::gettext
     auto::snprintf
     auto::perldoc
     auto::python
