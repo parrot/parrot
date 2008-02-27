@@ -422,7 +422,8 @@ Transform PAST C<source> into POST.
     .param pmc adverbs         :slurpy :named
 
     $P0 = compreg 'PIR'
-    .return $P0(source)
+    $P1 = $P0(source)
+    .return ($P1)
 .end
 
 
