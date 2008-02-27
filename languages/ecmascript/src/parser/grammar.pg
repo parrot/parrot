@@ -143,7 +143,8 @@ rule labelled_statement {
 
 rule try_statement {
     'try' <block>
-    [ <catch> <finally>
+    [
+    | <catch> <finally>
     | <finally>
     | <catch>
     ]
@@ -244,7 +245,8 @@ token this { 'this' {*} }
 
 rule array_literal {
     '['
-    [ <elision>
+    [
+    | <elision>
     | <element_list> [',' <elision>]?
     ]
     ']'
@@ -316,7 +318,8 @@ token decimal_literal {
 }
 
 token floating_point_number {
-    [ <decimal_integer_literal> '.' <digit>+? <exponent_part>?
+    [
+    | <decimal_integer_literal> '.' <digit>+? <exponent_part>?
     | '.' <digit>+ <exponent_part>?
     ]
     {*}
@@ -334,7 +337,8 @@ token decimal_integer_literal {
 token exponent_part { <[eE]> <[+\-]> <digit>+ }
 
 token str_literal {
-    [ '"' <string_literal: "> '"'
+    [
+    | '"' <string_literal: "> '"'
     | \' <string_literal: '> \'
     ]
     {*}
@@ -342,20 +346,21 @@ token str_literal {
 
 
 token keyword {
-    [ break | case | catch | continue | default
-    | delete | do | else | finally | for | function | if
-    | in | instance | new | return | switch | this | throw
-    | try | typeof | var | void | while | with
+    [ break  | case     | catch    | continue | default  | delete
+    | do     | else     | finally  | for      | function | if
+    | in     | instance | new      | return   | switch   | this
+    | throw  | try      | typeof   | var      | void     | while
+    | with
     ] >>
 }
 
 token future_reserved_word {
-    [ abstract | enum | int | short
-    | boolean | export | interface | static
-    | byte | extends | long | super
-    | char | final | native | synchronized
-    | class | float | package | throws
-    | const | goto | private | transient
+    [ abstract | enum       | int       | short
+    | boolean  | export     | interface | static
+    | byte     | extends    | long      | super
+    | char     | final      | native    | synchronized
+    | class    | float      | package   | throws
+    | const    | goto       | private   | transient
     | debugger | implements | protected | volatile
     ] >>
 }
@@ -363,7 +368,6 @@ token future_reserved_word {
 token reserved_word {
     <keyword> | <future_reserved_word>
 }
-
 
 #### whitespace
 #token ws {
@@ -388,17 +392,16 @@ token reserved_word {
 #    <.singlelinecomment>
 #}
 
-##
-#### comments
-##rule multilinecomment {
-##    <PGE::Text::Bracketed: /* */>
-##}
-##
-token singlelinecomment {
-    '//' \N* <newline>
+
+## comments
+
+token multilinecomment {
+    '/*' .*? '*/'
 }
 
-
+token singlelinecomment {
+    '//' \N* \n
+}
 
 rule expression {
     <assignment_expression> [',' <assignment_expression>]*
@@ -429,32 +432,32 @@ proto 'infix:&&'  is tighter('infix:||') is pasttype('if') { ... }
 
 proto 'infix:|'   is tighter('infix:&&') { ... }
 
-proto 'infix:^'   is tighter('infix:|') { ... }
+proto 'infix:^'   is tighter('infix:|')  { ... }
 
-proto 'infix:&'   is tighter('infix:^') { ... }
+proto 'infix:&'   is tighter('infix:^')  { ... }
 
-proto 'infix:=='  is tighter('infix:&') { ... }
-proto 'infix:!='  is equiv('infix:==') { ... }
-proto 'infix:===' is equiv('infix:==') { ... }
-proto 'infix:!==' is equiv('infix:==') { ... }
+proto 'infix:=='  is tighter('infix:&')  { ... }
+proto 'infix:!='  is equiv('infix:==')   { ... }
+proto 'infix:===' is equiv('infix:==')   { ... }
+proto 'infix:!==' is equiv('infix:==')   { ... }
 
 proto 'infix:<'   is tighter('infix:==') { ... }
-proto 'infix:>'   is equiv('infix:<') { ... }
-proto 'infix:<='  is equiv('infix:<') { ... }
-proto 'infix:>='  is equiv('infix:<') { ... }
+proto 'infix:>'   is equiv('infix:<')    { ... }
+proto 'infix:<='  is equiv('infix:<')    { ... }
+proto 'infix:>='  is equiv('infix:<')    { ... }
 proto 'infix:instanceof' is equiv('infix:<') { ... }
-proto 'infix:in' is equiv('infix:<') { ... }
+proto 'infix:in'  is equiv('infix:<')    { ... }
 
-proto 'infix:<<' is tighter('infix:<') { ... }
-proto 'infix:>>' is equiv('infix:<<') { ... }
-proto 'infix:>>>' is equiv('infix:<<') { ... }
+proto 'infix:<<'  is tighter('infix:<')  { ... }
+proto 'infix:>>'  is equiv('infix:<<')   { ... }
+proto 'infix:>>>' is equiv('infix:<<')   { ... }
 
 proto 'infix:+' is tighter('infix:<<') is pirop('n_add') { ... }
-proto 'infix:-' is equiv('infix:+') is pirop('n_sub') { ... }
+proto 'infix:-' is equiv('infix:+')    is pirop('n_sub') { ... }
 
-proto 'infix:*' is tighter('infix:+') is pirop('n_mul') { ... }
-proto 'infix:/' is equiv('infix:*') is pirop('n_div') { ... }
-proto 'infix:%' is equiv('infix:*') is pirop('n_mod') { ... }
+proto 'infix:*' is tighter('infix:+')  is pirop('n_mul') { ... }
+proto 'infix:/' is equiv('infix:*')    is pirop('n_div') { ... }
+proto 'infix:%' is equiv('infix:*')    is pirop('n_mod') { ... }
 
 
 rule unary_expression {

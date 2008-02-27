@@ -7,19 +7,17 @@ method TOP($/, $key) {
     our @?BLOCK;
 
     if $key eq 'open' {
-        ## create a 'global' block and stuff it into a 'stack' of blocks.
-        $?BLOCK := PAST::Block.new( :node($/) );
+        ## create a 'global' current block and stuff it into the scope stack.
+        $?BLOCK := PAST::Block.new( :blocktype('declaration'), :node($/) );
         @?BLOCK.unshift($?BLOCK);
     }
     elsif $key eq 'close' {
-        my $past := PAST::Block.new( :node($/), :blocktype('declaration') );
+        # retrieve the current block from the scope stack
+        my $past := @?BLOCK.shift();
         for $<source_element> {
             $past.push( $( $_ ) );
         }
         make $past;
-
-        ## this is the end of the input; no need to shift the current block
-        ## from the scope stack; there's no use for it anymore.
     }
 }
 
@@ -41,7 +39,7 @@ method function_common($/) {
     ## the current block to the "previous" block, at the top of
     ## the stack (position 0).
     @?BLOCK.shift();
-    $?BLOCK  := @?BLOCK[0];
+    $?BLOCK := @?BLOCK[0];
 
     make $past;
 }
@@ -198,6 +196,7 @@ method for4_statement($/) {
 }
 
 method labelled_statement($/) {
+    # XXX labels dont work properly.
     my $label   := $( $<identifier> ).name() ~ ':' ;
     my $labelop := PAST::Op.new( :inline($label), :node($/) );
     my $stat    := $( $<statement> );
@@ -253,6 +252,7 @@ method throw_statement($/) {
 }
 
 method return_statement($/) {
+    # XXX returns don't work propertly yet
     if $<expression> {
         my $expr := $( $<expression>[0] );
         make PAST::Op.new( $expr, :inline('    .return (%0)'), :node($/) );
@@ -301,7 +301,7 @@ method variable_declaration($/) {
 
 method empty_statement($/) {
     ## to prevent special cases for the empty statement, just create a comment.
-    make PAST::Op.new( :node($/), :inline('    # no-op') );
+    make PAST::Op.new( :node($/), :inline('    # empty statement') );
 }
 
 method expression_statement($/) {
@@ -396,6 +396,7 @@ method primary_expression($/, $key) {
 }
 
 method this($/) {
+    ## XXX wait for PAST support for 'self'
     ## load 'self' into a register; when this PAST node is used as a child somewhere
     ## this register will be used. This step is superfluous, but PAST does not support
     ## PIR's 'self' special variable.
