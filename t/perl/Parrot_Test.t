@@ -18,7 +18,7 @@ These tests cover the basic functionality of C<Parrot::Test>.
 
 use strict;
 use warnings;
-use lib qw( . lib ../lib ../../lib );
+use Test::More;
 
 BEGIN {
     eval "use Test::Builder::Tester;";
@@ -27,8 +27,7 @@ BEGIN {
         exit 0;
     }
 }
-
-use Test::More;
+use lib qw( . lib ../lib ../../lib );
 
 BEGIN {
     my $pre_env = exists $ENV{PARROT_TEST} ? $ENV{PARROT_TEST} : undef;
@@ -89,7 +88,7 @@ is( Parrot::Test::per_test( undef, undef ), undef, 'per_test() two invalid args'
 # RT#46893: test the untested test functions
 my ( $desc, $err, $line );
 
-## PASM
+# PASM
 $desc = 'pasm_output_is: success';
 test_out("ok 1 - $desc");
 pasm_output_is( <<'CODE', <<'OUTPUT', $desc );
@@ -101,10 +100,11 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pasm_output_is: failure';
-$line = line_num(+11);
+$line = line_num(+12);
 test_out("not ok 1 - $desc");
 $err = <<"ERR";
-#     Failed test ($0 at line $line)
+#   Failed test '$desc'
+#   at $0 line $line.
 #          got: 'ok
 # '
 #     expected: 'not ok
@@ -131,10 +131,11 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pasm_output_isnt: failure';
-$line = line_num(+12);
+$line = line_num(+13);
 test_out("not ok 1 - $desc");
 $err = <<"ERR";
-#     Failed test ($0 at line $line)
+#   Failed test '$desc'
+#   at $0 line $line.
 #     'ok
 # '
 #         ne
@@ -162,10 +163,11 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pasm_output_like: failure';
-$line = line_num(+11);
+$line = line_num(+12);
 test_out("not ok 1 - $desc");
 $err = <<"ERR";
-#     Failed test ($0 at line $line)
+#   Failed test '$desc'
+#   at $0 line $line.
 #                   'ok
 # '
 #     doesn't match '/not ok/
@@ -181,7 +183,7 @@ CODE
 OUTPUT
 test_test($desc);
 
-## PIR
+# PIR
 $desc = 'pir_output_is: success';
 test_out("ok 1 - $desc");
 pir_output_is( <<'CODE', <<'OUTPUT', $desc );
@@ -194,10 +196,11 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pir_output_is: failure';
-$line = line_num(+11);
+$line = line_num(+12);
 test_out("not ok 1 - $desc");
 $err = <<"ERR";
-#     Failed test ($0 at line $line)
+#   Failed test '$desc'
+#   at $0 line $line.
 #          got: 'ok
 # '
 #     expected: 'not ok
@@ -226,10 +229,11 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pir_output_isnt: failure';
-$line = line_num(+12);
+$line = line_num(+13);
 test_out("not ok 1 - $desc");
 $err = <<"ERR";
-#     Failed test ($0 at line $line)
+#   Failed test '$desc'
+#   at $0 line $line.
 #     'ok
 # '
 #         ne
@@ -259,10 +263,11 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pir_output_like: failure';
-$line = line_num(+11);
+$line = line_num(+12);
 test_out("not ok 1 - $desc");
 $err = <<"ERR";
-#     Failed test ($0 at line $line)
+#   Failed test '$desc'
+#   at $0 line $line.
 #                   'ok
 # '
 #     doesn't match '/not ok/
