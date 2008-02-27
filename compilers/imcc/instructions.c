@@ -639,10 +639,11 @@ Print details of instruction ins in file fd.
 
 */
 
+#define REGB_SIZE 256
 int
 ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
 {
-    char regb[IMCC_MAX_FIX_REGS][256];      /* XXX */
+    char regb[IMCC_MAX_FIX_REGS][REGB_SIZE];
     /* only long key constants can overflow */
     char *regstr[IMCC_MAX_FIX_REGS];
     int i;
@@ -663,40 +664,42 @@ ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
         if (p->type & VT_CONSTP)
             p = p->reg;
         if (p->color >= 0 && REG_NEEDS_ALLOC(p)) {
-            sprintf(regb[i], "%c%d", p->set, (int)p->color);
+            snprintf(regb[i], REGB_SIZE, "%c%d", p->set, (int)p->color);
             regstr[i] = regb[i];
         }
         else if (IMCC_INFO(interp)->allocated &&
                 (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
                 p->set != 'K' &&
                 p->color < 0 && REG_NEEDS_ALLOC(p)) {
-                    sprintf(regb[i], "r%c%d", tolower((unsigned char)p->set), -1 - (int)p->color);
+                    snprintf(regb[i], REGB_SIZE,
+                        "r%c%d", tolower((unsigned char)p->set), -1 - (int)p->color);
                     regstr[i] = regb[i];
         }
         else if (p->type & VTREGKEY) {
-            const SymReg *k = p->nextkey;
+            const SymReg *k = p;
 
-            for (*regb[i] = '\0'; k; k = k->nextkey) {
+            *regb[i] = '\0';
+            while ((k = k->nextkey) != NULL) {
+                const size_t used = strlen(regb[i]);
                 if (k->reg && k->reg->color >= 0)
-                    sprintf(regb[i]+strlen(regb[i]), "%c%d",
-                            k->reg->set, (int)k->reg->color);    /* XXX */
+                    snprintf(regb[i]+used, REGB_SIZE - used, "%c%d",
+                            k->reg->set, (int)k->reg->color);
                 else if (IMCC_INFO(interp)->allocated &&
                         (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
                         k->reg &&
                         k->reg->color < 0)
-                    sprintf(regb[i]+strlen(regb[i]), "r%c%d",
+                    snprintf(regb[i]+used, REGB_SIZE - used, "r%c%d",
                             tolower((unsigned char)k->reg->set), -1 - (int)k->reg->color);
                 else
-                    strcat(regb[i], k->name);   /* XXX */
-                if (k->nextkey)
+                    strncat(regb[i], k->name, REGB_SIZE - used - 1);
+                if (k->nextkey && regb[i]+1 < REGB_SIZE)
                     strcat(regb[i], ";");
             }
             regstr[i] = regb[i];
         }
-        else if (p->type == VTCONST && p->set == 'S' &&
-                *p->name != '"' && *p->name != '\'') {
+        else if (p->type == VTCONST && p->set == 'S' && *p->name != '"' && *p->name != '\'') {
             /* unquoted string const */
-            sprintf(regb[i], "\"%s\"", p->name);      /* XXX */
+            snprintf(regb[i], REGB_SIZE, "\"%s\"", p->name);
             regstr[i] = regb[i];
         }
         else
