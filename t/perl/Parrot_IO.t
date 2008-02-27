@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More 'tests' => 57;
+use Test::More 'tests' => 58;
 use File::Spec::Functions qw(:ALL);
 
 =head1 NAME
@@ -161,8 +161,7 @@ ok( $f3->modified_since($time), 'modified_since' );
 $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
 ok( $f->has_svn_id(), 'has_svn_id' );
 
-# RT#46913 doesn not work aftern switch to svn
-#ok($f->svn_id() =~ /File.pm,v/, 'svn_id');
+ok($f->svn_id() =~ /^(?:\$)Id: File.pm \d+ \d{4}-\d\d-\d\d \d\d:\d\d:\d\dZ [^\$]+ \$$/, 'svn_id');
 
 $f3->delete();
 @a = $d2->files();
