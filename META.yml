@@ -14,7 +14,6 @@ no_index:
         - lib/Parse
         - lib/Perl/Critic
         - lib/Pod
-        - lib/Test
         - lib/Text
         - t
         - tools
