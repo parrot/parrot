@@ -58,9 +58,6 @@ my $DIST = Parrot::Distribution->new();
 my @files;
 if ( !@ARGV ) {
 
-    # RT#44439 We should skip any files that are copied wholesale
-    #     into our repository. Add a method to $DIST for this. -Coke
-
     @files = map { $_->path } $DIST->get_perl_language_files();
 
     # Skip any language files...
