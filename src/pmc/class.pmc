@@ -1017,7 +1017,7 @@ Creates a new PMC object of the type of the class and calls init().
             for (i = 0; i < mro_length; i++) {
                 PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
                     _class->all_parents, i);
-                if (!VTABLE_isa(interp, class_check, class_str)) {
+                if (class_check->vtable->base_type != enum_class_Class) {
                     /* Found one; that's enough. */
                     CLASS_has_alien_parents_SET(SELF);
                     break;
@@ -1064,6 +1064,7 @@ Creates a new PMC object of the type of the class and calls init().
          * in the MRO and create instances of them. */
         if (CLASS_has_alien_parents_TEST(SELF)) {
             const INTVAL mro_length = VTABLE_elements(interp, _class->all_parents);
+            /*int pos = VTABLE_elements(interp, _class->attrib_metadata);*/
             int i;
 
             for (i = 0; i < mro_length; i++) {
@@ -1079,7 +1080,9 @@ Creates a new PMC object of the type of the class and calls init().
 
                     /* ...and tack on end of the attribute store (after all the
                      * slots for attributes). */
+                    /*VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store, pos, parent_ins);*/
                     VTABLE_push_pmc(interp, obj_guts->attrib_store, parent_ins);
+                    /*pos++;*/
                 }
             }
         }
@@ -1164,6 +1167,72 @@ Returns whether the class is or inherits from C<*classname>.
         VTABLE_set_string_native(interp, string_pmc, classname);
 
         return VTABLE_isa_pmc(interp, SELF, string_pmc);
+    }
+
+/*
+
+=item C<INTVAL does(STRING *rolename)>
+
+Returns whether the class does the role with the given C<*rolename>.
+
+=cut
+
+*/
+    INTVAL does(STRING *role_name) {
+        INTVAL i, role_count, isa;
+        PMC * const role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
+
+        if (!role_list)
+            return 0;
+
+        role_count = VTABLE_elements(interp, role_list);
+
+        for (i = 0; i < role_count; i++) {
+            INTVAL  role_does;
+            PMC    * const role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
+
+            role_does = VTABLE_does(interp, role, role_name);
+
+            if (role_does)
+                return 1;
+        }
+
+        isa = VTABLE_isa(interp, SELF, role_name);
+
+        return isa;
+    }
+
+/*
+
+=item C<INTVAL does_pmc(PMC *role)>
+
+Returns whether the class does the given C<*role>.
+
+=cut
+
+*/
+    INTVAL does_pmc(PMC *role) {
+        INTVAL i, role_count, isa;
+        PMC * const role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
+
+        if (!role_list)
+            return 0;
+
+        role_count = VTABLE_elements(interp, role_list);
+
+        for (i = 0; i < role_count; i++) {
+            INTVAL  role_does;
+            PMC    * const test_role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
+
+            role_does = VTABLE_does_pmc(interp, test_role, role);
+
+            if (role_does)
+                return 1;
+        }
+
+        isa = VTABLE_isa_pmc(interp, SELF, role);
+
+        return isa;
     }
 
 /*
@@ -1674,27 +1743,8 @@ false otherwise.
 
 */
     PCCMETHOD does(STRING *role_name) {
-        INTVAL i, role_count, isa;
-        PMC * const role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
-
-        if (!role_list)
-            PCCRETURN(INTVAL 0);
-
-        role_count = VTABLE_elements(interp, role_list);
-
-        for (i = 0; i < role_count; i++) {
-            INTVAL  role_does;
-            PMC    * const role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
-
-            (INTVAL role_does) = PCCINVOKE(interp, role, "does", STRING *role_name);
-
-            if (role_does)
-                PCCRETURN(INTVAL 1);
-        }
-
-        (INTVAL isa) = PCCINVOKE(interp, SELF, "isa", STRING *role_name);
-
-        PCCRETURN(INTVAL isa);
+        INTVAL does = VTABLE_does(interp, SELF, role_name);
+        PCCRETURN(INTVAL does);
     }
 
 } /* END pmclass */

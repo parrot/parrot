@@ -904,6 +904,21 @@ true (1) is returned; otherwise, false (0) is returned.
 
 /*
 
+=item C<INTVAL does_pmc(PMC *role)>
+
+Reports whether the PMC "does" the C<role>.
+
+=cut
+
+*/
+
+    INTVAL does_pmc(PMC *role) {
+        /* No C-level roles yet. */
+        return 0;
+    }
+
+/*
+
 =item C<INTVAL isa_pmc(PMC *_class)>
 
 Reports whether the PMC "isa" C<_class>.

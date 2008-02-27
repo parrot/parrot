@@ -493,6 +493,60 @@ Return the name of the role (without the HLL namespace).
         return string_copy(interp, role->name);
     }
 
+/*
+
+=item C<INTVAL does(STRING *rolename)>
+
+Returns whether the class does the role with the given C<*rolename>.
+
+=cut
+
+*/
+    INTVAL does(STRING *role_name)
+    {
+        Parrot_Role * const role  = PARROT_ROLE(SELF);
+        INTVAL      i, count;
+
+        if (string_equal(interp, role->name, role_name) == 0)
+            return 1;
+
+        count = VTABLE_elements(interp, role->roles);
+        for (i = 0; i < count; i++) {
+            PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, role->roles, i);
+            if (VTABLE_does(interp, cur_role, role_name))
+                return 1;
+        }
+
+        return 0;
+    }
+
+/*
+
+=item C<INTVAL does_pmc(PMC *role)>
+
+Returns whether the class does the givne C<*role>.
+
+=cut
+
+*/
+    INTVAL does_pmc(PMC *role)
+    {
+        Parrot_Role * const this_role  = PARROT_ROLE(SELF);
+        INTVAL      i, count;
+
+        if (role == SELF)
+            return 1;
+
+        count = VTABLE_elements(interp, this_role->roles);
+        for (i = 0; i < count; i++) {
+            PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, this_role->roles, i);
+            if (VTABLE_does_pmc(interp, cur_role, role))
+                return 1;
+        }
+
+        return 0;
+    }
+
     /*
      * Below here are non-vtable methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from
@@ -701,28 +755,8 @@ named role.  This will recurse through all roles as far back as it can.
 */
 
     PCCMETHOD does(STRING *name) {
-        INTVAL  i, count;
-        STRING *r_name;
-        PMC    *roles, *role;
-
-        (STRING *r_name) = PCCINVOKE(interp, SELF, "name");
-
-        if (string_equal(interp, r_name, name) == 0)
-            PCCRETURN(INTVAL 1);
-
-        (PMC *roles)     = PCCINVOKE(interp, SELF, "roles");
-        count            = VTABLE_elements(interp, roles);
-
-        for (i = 0; i < count; i++) {
-            INTVAL does;
-            role          = VTABLE_get_pmc_keyed_int(interp, roles, i);
-            (INTVAL does) = PCCINVOKE(interp, role, "does", STRING *name);
-
-            if (does)
-                PCCRETURN(INTVAL 1);
-        }
-
-        PCCRETURN(INTVAL 0);
+        INTVAL does = VTABLE_does(INTERP, SELF, name);
+        PCCRETURN(INTVAL does);
     }
 
 } /* end pmclass Role */
