@@ -11,7 +11,7 @@ config\gen\platform\win32\exec.c
 
 =head1 DESCRIPTION
 
-Functions for dealing with child processes and Execs. 
+Functions for dealing with child processes and Execs.
 
 =head2 Functions
 

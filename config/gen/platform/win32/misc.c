@@ -34,7 +34,7 @@ RT#48260: Not yet documented!!!
 void
 Parrot_platform_init_code(void)
 {
-	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+    SetErrorMode(SEM_NOGPFAULTERRORBOX);
 }
 
 /*

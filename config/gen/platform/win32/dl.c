@@ -42,7 +42,7 @@ Parrot_dlopen(const char *filename)
 
 =item C<const char * Parrot_dlerror(void)>
 
-System-dependant error code that indicates failure in opening a DL. 
+System-dependant error code that indicates failure in opening a DL.
 
 =cut
 
@@ -61,13 +61,13 @@ Parrot_dlerror(void)
 Returns a pointer to the specified function in the given library. The library must have been opened already with
 Parrot_dlopen(). To call the function "int Foo(int)" from the library "Bar" , you would write something similar to:
 
-	void *lib;
-	int (*Foo_ptr)(int);
-	lib = Parrot_dlopen("Bar");
-	if(lib != Parrot_dlerror())
-	{
-		Foo_ptr = Parrot_dlsym(lib, "Foo");
-	}
+    void *lib;
+    int (*Foo_ptr)(int);
+    lib = Parrot_dlopen("Bar");
+    if(lib != Parrot_dlerror())
+    {
+        Foo_ptr = Parrot_dlsym(lib, "Foo");
+    }
 
 =cut
 
@@ -83,16 +83,16 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 =item C<int Parrot_dlclose(void *handle)>
 
-Closes a dynamic library handle. 
-	
-	void *lib;
-	lib = Parrot_dlopen("Foo");
-	if(lib != Parrot_dlerror())
-	{
-		...
-		Parrot_dlclose(lib);
-	}
-	
+Closes a dynamic library handle.
+
+    void *lib;
+    lib = Parrot_dlopen("Foo");
+    if(lib != Parrot_dlerror())
+    {
+        ...
+        Parrot_dlclose(lib);
+    }
+
 =cut
 
 */
