@@ -58,8 +58,10 @@ Parrot_dlerror(void)
 
 =item C<void * Parrot_dlsym(void *handle, const char *symbol)>
 
-Returns a pointer to the specified function in the given library. The library must have been opened already with
-Parrot_dlopen(). To call the function "int Foo(int)" from the library "Bar" , you would write something similar to:
+Returns a pointer to the specified function in the given library.
+The library must have been opened already with Parrot_dlopen().
+To call the function "int Foo(int)" from the library "Bar",
+you would write something similar to:
 
     void *lib;
     int (*Foo_ptr)(int);

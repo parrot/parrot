@@ -28,8 +28,9 @@ Functions for dealing with child processes and Execs.
 =item C<INTVAL
 Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
 
-Spawn the subprocess specified in C<command>. Waits for the process to complete, and then returns the exit code
-in POSIX-compatibility mode.
+Spawn the subprocess specified in C<command>.
+Waits for the process to complete, and then
+returns the exit code in POSIX-compatibility mode.
 
 =cut
 
@@ -80,9 +81,11 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
 =item C<INTVAL
 Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
 
-Spawns a subprocess with the arguments provided in the C<cmdargs> PMC array. The first array element should
-be the name of the process to spawn, and the remainder of the array elements should be arguments. Waits until
-the child process completes, and returns the exit code in POSIX-compatibility mode.
+Spawns a subprocess with the arguments provided in the C<cmdargs> PMC array.
+The first array element should be the name of the process to spawn,
+and the remainder of the array elements should be arguments.
+Waits until the child process completes,
+and returns the exit code in POSIX-compatibility mode.
 
 =cut
 
