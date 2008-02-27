@@ -45,7 +45,6 @@ reordered independently of keys and values.
         (list) = (b);                       \
     }
 
-
 #define PREPEND_TO_TABLE_LIST(b, list)  \
     if ((list)->tableHead == NULL) {      \
         (list)->internalPointer = (b);      \
@@ -72,6 +71,24 @@ reordered independently of keys and values.
         (list)->tableTail = (b);            \
     }
 
+#define DELETE_FROM_TABLE_LIST(b, list)  \
+    (list)->internalPointer = (b)->tableNext;      \
+    if ((list)->tableHead == (b))        \
+        (list)->tableHead = (b)->tableNext; \
+    else \
+        (b)->tablePrev->tableNext = (b)->tableNext;     \
+    if ((list)->tableTail == (b))        \
+        (list)->tableTail = (b)->tablePrev; \
+    else  \
+        (b)->tableNext->tablePrev = (b)->tablePrev;     \
+
+#define DELETE_FROM_BUCKET_LIST(b, list)  \
+    if ((list) == (b))        \
+        (list) = (b)->bucketNext; \
+    else \
+        (b)->bucketPrev->bucketNext = (b)->bucketNext;     \
+    if ((b)->bucketNext != NULL)        \
+        (b)->bucketNext->bucketPrev = (b)->bucketPrev; \
 
 /* XXX: temporary workaround until VTABLE_is_equal starts working in the
  * context this code needs: see RT #50878 */
@@ -123,7 +140,7 @@ INTVAL phparray_hash(PARROT_INTERP, PMC *key) {
     }
     else
         real_exception(interp, NULL, INVALID_OPERATION,
-                "must use integer or string keys in phparray_hash");
+            "must use integer or string keys in phparray_hash");
 }
 
 /*If the key is a String PMC and can be converted an integer according to PHP's rules, do so*/
@@ -208,9 +225,6 @@ void add_to_hashtable(PARROT_INTERP, HashTable *ht, PMC *key, PMC *value, add_ty
 
     while (b != NULL) {
         if (b->hash == hash && VTABLE_is_equal(interp, key, b->key)) {
-            /*XXX: you may have to update some other pointers too
-              XXX: there may be some DOD marking of some kind
-              */
             b->value = value;
             return;
         }
@@ -251,10 +265,8 @@ PMC* delete_from_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
 
     while (b != NULL) {
         if (b->hash == hash && VTABLE_is_equal(interp, key, b->key)) {
-            /*XXX: you may have to update some other pointers too
-              XXX: there may be some DOD marking of some kind
-              */
-        /*do some stupid pointer juggling to delete the element*/
+            DELETE_FROM_BUCKET_LIST(b, ht->buckets[index]);
+            DELETE_FROM_TABLE_LIST(b, ht);
 
             pmc = b->value;
             return pmc;
@@ -305,7 +317,7 @@ INTVAL find_in_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
     dprintf("looking for thing with hash %X in hashtable\n", (uint)hash);
     while (b != NULL) {
         dprintf("searching bucket #%d with key at %X and b->key at %X\n",
-                (int)i, (uint)key, (uint)b->key);
+            (int)i, (uint)key, (uint)b->key);
         i++;
         if (b->hash == hash && VTABLE_is_equal(interp, key, b->key)) {
             return 1;
@@ -404,9 +416,12 @@ void resize_and_rehash(PARROT_INTERP, HashTable *ht) {
     hash_check(interp, ht);
 }
 
+/*extends OrderedHash may make PHPArray Iterators smarter.  Who knows.  It's
+ * still too magical for my tastes.*/
 pmclass PHPArray
     provides hash
     provides array
+    extends OrderedHash
     need_ext
     dynpmc
     group php_group
@@ -473,18 +488,46 @@ that easy.
         return (INTVAL)0;
     }
 
-    /* not sure if this needs to be implemented
-    INTVAL cmp (PMC *value) {
+/*
+
+=item C<INTVAL cmp(PCM*)>
+
+=item C<INTVAL cmp_num(PCM*)>
+
+=item C<INTVAL cmp_string(PCM*)>
+
+Compare a PHPArray to another PMC.  A PHPArray is always greater than a STRING,
+INTVAL or FLOATVAL.  Given two PHPArrays C<a> and C<b>, C<a> is greater than b
+if all of the following are true:
+
+=over 4
+
+=item * C<a> and C<b> have the same number of elements and the same keys.
+
+=item  * The values of C<a> are greater than the values of C<b>, according to C<a>'s internal order.
+
+=back
+
+Note that this means it is possible for both C<a> > C<b> and C<b> > C<a> to be
+true.  Zend PHP's behavoir is to return null when two arrays aren't comparable.
+B<This behavoir is not reproduced by the PHPArray PMC.>
+
+=cut
+
+*/
+    INTVAL cmp(PMC *value) {
+        /*compare size*/
+        /*iterate through values*/
         return (INTVAL)0;
     }
 
-    INTVAL cmp_num (PMC *value) {
-        return (INTVAL)0;
+    INTVAL cmp_num(PMC *value) {
+        return (INTVAL)1;
     }
 
-    INTVAL cmp_string (PMC *value) {
-        return (INTVAL)0;
-    }*/
+    INTVAL cmp_string(PMC *value) {
+        return (INTVAL)1;
+    }
 
 /*
 
@@ -574,20 +617,98 @@ Remove the element at key.
 */
 
     void delete_keyed(PMC *key) {
-        /*XXX: implement keyed code properly*/
-        delete_from_hashtable(INTERP, (HashTable*)PMC_struct_val(SELF), key);
+
+        PMC *box, *next_key;
+        INTVAL index_i, key_t, next_key_t;
+        STRING *index_s, *key_str;
+        char *key_cstr, *val_cstr;
+        char key_is_int;
+
+        key_str = key_set_to_string(INTERP, key);
+        key_cstr = string_to_cstring(INTERP, key_str);
+        dprintf("delete_keyed called with key = %s\n", key_cstr);
+        string_cstring_free(key_cstr);
+
+        /*if key is null*/
+        if (key == NULL) {
+            return ;
+        }
+
+        key_t = key_type(INTERP, key);
+
+        /*figure out type of the key*/
+        if (key_t & KEY_integer_FLAG) {
+            index_i = key_integer(INTERP, key);
+            dprintf("delete_keyed: integer index is %d\n", (int)index_i);
+            key_is_int = 1;
+        }
+        else if (key_t & KEY_string_FLAG) {
+            index_s = key_string(INTERP, key);
+            key_cstr = string_to_cstring(INTERP, index_s);
+            dprintf("delete_keyed: string index is '%s'\n", key_cstr);
+            string_cstring_free(key_cstr);
+            key_is_int = 0;
+        }
+        else {
+            dprintf("exception from delete_keyed, current key\n");
+            real_exception(INTERP, NULL, E_KeyError, "must use integer or string keys");
+        }
+
+        next_key = key_next(INTERP, key);
+
+        /*if this is the PMC being requested...*/
+        if (next_key == NULL && key_is_int) {
+            dprintf("retrieving value from index %d\n", (int)index_i);
+            SELF.delete_keyed_int(index_i);
+            return;
+        }
+        else if (next_key == NULL && !key_is_int) {
+            SELF.delete_keyed_str(index_s);
+            return;
+        }
+
+        next_key_t = key_type(INTERP, next_key);
+
+        if (key_t & KEY_integer_FLAG) {
+            dprintf("box has int key %d\n", (int)index_i);
+            box = SELF.get_pmc_keyed_int(index_i);
+            if (box == PMCNULL) {
+                return;
+            }
+        }
+        else if (key_t & KEY_string_FLAG) {
+            char *cstr = string_to_cstring(INTERP, index_s);
+            dprintf("box has string key %s\n", cstr);
+            box = SELF.get_pmc_keyed_str(index_s);
+            string_cstring_free(cstr);
+            if (box == PMCNULL) {
+                return;
+            }
+        }
+        else {
+            dprintf("exception from delete_keyed, next key\n");
+            real_exception(INTERP, NULL, E_KeyError, "must use integer or string keys");
+        }
+
+        VTABLE_delete_keyed(INTERP, box, next_key);
     }
 
     void delete_keyed_int(INTVAL key) {
-        PMC *key_pmc = pmc_new(INTERP, enum_class_Integer);
+        PMC *key_pmc;
+        dprintf("called delete_keyed_int\n");
+
+        key_pmc = pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, key_pmc, key);
-        SELF.delete_keyed(key_pmc);
+        delete_from_hashtable(INTERP, (HashTable*) PMC_struct_val(SELF), key_pmc);
     }
 
     void delete_keyed_str(STRING *key) {
-        PMC *key_pmc = pmc_new(INTERP, enum_class_String);
+        PMC *key_pmc;
+        dprintf("called delete_keyed_str\n");
+
+        key_pmc = pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, key_pmc, key);
-        SELF.delete_keyed(key_pmc);
+        delete_from_hashtable(INTERP, (HashTable*) PMC_struct_val(SELF), key_pmc);
     }
 
 /*
@@ -642,26 +763,96 @@ Returns TRUE if the element at C<key> exists; otherwise returns false.
 
 */
     INTVAL exists_keyed(PMC *key) {
-        /*XXX: implement keyed code properly*/
-        return find_in_hashtable(INTERP, (HashTable*)PMC_struct_val(SELF), key);
+        PMC *box, *next_key;
+        INTVAL index_i, key_t, next_key_t;
+        STRING *index_s, *key_str;
+        char *key_cstr, *val_cstr;
+        char key_is_int;
+
+        key_str = key_set_to_string(INTERP, key);
+        key_cstr = string_to_cstring(INTERP, key_str);
+        dprintf("exists_keyed called with key = %s\n", key_cstr);
+        string_cstring_free(key_cstr);
+
+        /*if key is null*/
+        if (key == NULL) {
+            return (INTVAL)0;
+        }
+
+        key_t = key_type(INTERP, key);
+
+        /*figure out type of the key*/
+        if (key_t & KEY_integer_FLAG) {
+            index_i = key_integer(INTERP, key);
+            dprintf("exists_keyed: integer index is %d\n", (int)index_i);
+            key_is_int = 1;
+        }
+        else if (key_t & KEY_string_FLAG) {
+            index_s = key_string(INTERP, key);
+            key_cstr = string_to_cstring(INTERP, index_s);
+            dprintf("exists_keyed: string index is '%s'\n", key_cstr);
+            string_cstring_free(key_cstr);
+            key_is_int = 0;
+        }
+        else {
+            dprintf("exception from exists_keyed, current key\n");
+            real_exception(INTERP, NULL, E_KeyError, "must use integer or string keys");
+        }
+
+        next_key = key_next(INTERP, key);
+
+        /*if this is the PMC being requested...*/
+        if (next_key == NULL && key_is_int) {
+            dprintf("retrieving value from index %d\n", (int)index_i);
+            return SELF.exists_keyed_int(index_i);
+        }
+        else if (next_key == NULL && !key_is_int) {
+            return SELF.exists_keyed_str(index_s);
+        }
+
+        next_key_t = key_type(INTERP, next_key);
+
+        if (key_t & KEY_integer_FLAG) {
+            dprintf("box has int key %d\n", (int)index_i);
+            box = SELF.get_pmc_keyed_int(index_i);
+            if (box == PMCNULL) {
+                return (INTVAL)0;
+            }
+        }
+        else if (key_t & KEY_string_FLAG) {
+            char *cstr = string_to_cstring(INTERP, index_s);
+            dprintf("box has string key %s\n", cstr);
+            box = SELF.get_pmc_keyed_str(index_s);
+            string_cstring_free(cstr);
+            if (box == PMCNULL) {
+                return (INTVAL)0;
+            }
+        }
+        else {
+            dprintf("exception from exists_keyed, next key\n");
+            real_exception(INTERP, NULL, E_KeyError, "must use integer or string keys");
+        }
+
+        return VTABLE_exists_keyed(INTERP, box, next_key);
     }
 
     INTVAL exists_keyed_int(INTVAL key) {
-        PMC *key_pmc = pmc_new(INTERP, enum_class_Integer);
+        PMC *key_pmc;
+        dprintf("called exists_keyed_int\n");
+
+        key_pmc = pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, key_pmc, key);
-        return SELF.exists_keyed(key_pmc);
+        return find_in_hashtable(INTERP, (HashTable*) PMC_struct_val(SELF), key_pmc);
     }
 
     INTVAL exists_keyed_str(STRING *key) {
-        PMC *key_pmc = pmc_new(INTERP, enum_class_String);
+        PMC *key_pmc;
+        dprintf("called exists_keyed_int\n");
+
+        key_pmc = pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, key_pmc, key);
-        return SELF.exists_keyed(key_pmc);
+        return find_in_hashtable(INTERP, (HashTable*) PMC_struct_val(SELF), key_pmc);
     }
-
-    /* XXX: probably need to implement
-    void freeze (visit_info *info) {
-    }*/
-
 /*
 
 =item C<INTVAL get_bool()>
@@ -672,7 +863,7 @@ Return TRUE if this PHPArray has one or more elements, return FALSE otherwise.
 
 */
     INTVAL get_bool() {
-        return SELF.elements() == 1;
+        return SELF.elements() >= 1;
     }
 /*
 
@@ -1707,13 +1898,6 @@ Associate C<key> with C<value>.
 
     }
 
-    /* I'm pretty sure I don't care about these
-    void set_pointer_keyed_int(INTVAL key, void *value) {
-    }
-
-    void set_pointer_keyed_str(STRING *key, void *value) {
-    }*/
-
     void set_string_keyed_int(INTVAL key, STRING *value) {
         PMC *key_pmc, *value_pmc;
         HashTable *ht;
@@ -1907,12 +2091,7 @@ shifting, the internal pointer is reset to the first element of the PHPArray.
     }
 
     void splice (PMC *value, INTVAL offset, INTVAL count) {
-    }
 
-    void thaw (visit_info *info) {
-    }
-
-    void thawfinish (visit_info *info) {
     } */
 
 /*
@@ -1973,12 +2152,26 @@ the newly inserted element.
 
 Used by freeze and thaw to visit the contents of the PMC.
 
+=item C<void freeze(visit_info *)>
+
+Used to serialize this PHPArray.
+
+
+=item C<void thaw(visit_info *)>
+
+Used to unserialize this PHPArray.
+
 =cut
 
 */
 
     void visit(visit_info *info) {
+    }
 
+    void freeze(visit_info *info) {
+    }
+
+    void thaw(visit_info *info) {
     }
 
 }
