@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 src/antlr3/GenPastPir.g 2008-02-26 22:21:13
+// $ANTLR 3.0.1 src/antlr3/GenPastPir.g 2008-02-27 19:28:28
 
   import java.util.regex.*;
 
@@ -91,18 +91,18 @@ public class GenPastPir extends TreeParser {
                     + "                                                                       \n"
                     + "    # look for subs in other namespaces                                \n"
                     + "    .local pmc decode_base64_sub, parse_get_sub, parse_post_sub        \n"
-                    + "    decode_base64_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'  \n"
-                    + "    parse_get_sub  = get_global [ 'CGI'; 'QueryHash' ], 'parse_get'    \n"
-                    + "    parse_post_sub = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'   \n"
+                    + "    decode_base64_sub = get_global [ 'MIME'; 'Base64' ], 'decode_base64'  \n"
+                    + "    parse_get_sub     = get_global [ 'CGI'; 'QueryHash' ], 'parse_get'    \n"
+                    + "    parse_post_sub    = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'   \n"
                     + "                                                                       \n"
                     + "    # the superglobals                                                 \n"
                     + "    .local pmc superglobal_GET                                         \n"
                     + "    ( superglobal_GET ) = parse_get_sub()                              \n"
-                    + "    set_global "_GET", superglobal_GET                                 \n"
+                    + "    set_global '_GET', superglobal_GET                                 \n"
                     + "                                                                       \n"
                     + "    .local pmc superglobal_POST                                        \n"
                     + "    ( superglobal_POST ) = parse_post_sub()                            \n"
-                    + "    set_global "_POST", superglobal_POST                               \n"
+                    + "    set_global '_POST', superglobal_POST                               \n"
                     + "                                                                       \n"
                     + "    # The root node of PAST.                                           \n"
                     + "    .local pmc past_root                                               \n"
