@@ -7,8 +7,8 @@
 	ne S10, "--install", no_arg
 	set I11, 1      # install flag
 no_arg:
-	new P0, .Hash
-	new P1, .Undef
+	new P0, 'Hash'
+	new P1, 'Undef'
 
 	<<PCONFIG>>
 
