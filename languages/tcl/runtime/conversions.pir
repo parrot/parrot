@@ -679,6 +679,35 @@ done:
   .return (contents)
 .end
 
+# Given a list, reverse the elements in the list.
+# Might make sense to make this a method on one of the parrot types we
+# inherit from.
+.sub 'reverse'
+  .param pmc value
+  
+  .local int high
+  .local int low
+  .local pmc swap_one
+  .local pmc swap_two
+  
+  high = value
+  dec high # need index, not count
+  low = 0
+
+ loop:
+  if high <= low goto loop_end
+  swap_one    = value[low] 
+  swap_two    = value[high] 
+  value[low]  = swap_two
+  value[high] = swap_one
+  inc low
+  dec high
+  goto loop
+ loop_end:
+
+ .return()
+.end 
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

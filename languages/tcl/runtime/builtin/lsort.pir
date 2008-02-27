@@ -62,7 +62,7 @@ got_list:
   __list = get_root_global ['_tcl'], '__list'
   $P0 = __list($P0)
 
-  sort(compare, $P0, decr)
+  $P0.'sort'(compare)
 
   unless unique goto skip_unique
   .local int c, size
@@ -85,6 +85,13 @@ strip_loop:
 strip_end:
 
 skip_unique:
+  unless decr goto ordered
+
+  .local pmc reverse
+  reverse = get_root_global ['_tcl'], 'reverse'
+  reverse($P0)
+
+ordered:
   .return ($P0)
 
 bad_opt:
@@ -100,114 +107,34 @@ wrong_args:
 .HLL '_Tcl', ''
 .namespace [ 'helpers'; 'lsort' ]
 
-.sub 'sort'
-  .param pmc compare
-  .param pmc list
-  .param int decreasing
-
-  .local int size
-  size = list
-  size -= 1
-  quicksort(compare, list, 0, size, decreasing)
-.end
-
-.sub 'quicksort'
-  .param pmc compare
-  .param pmc list
-  .param int lo
-  .param int hi
-  .param int decreasing
-
-  if lo >= hi goto done
-
-  .local pmc pivot
-  pivot = list[hi]
-
-  .local int l,h
-  l = lo
-  h = hi
-
-move_loop:
-  inc_loop:
-    unless l < h goto inc_end
-    $P0 = list[l]
-    $I0 = compare($P0, pivot, decreasing)
-    unless $I0 <= 0 goto inc_end
-    l += 1
-    branch inc_loop
-  inc_end:
-  dec_loop:
-    unless h > l goto dec_end
-    $P0 = list[h]
-    $I0 = compare($P0, pivot, decreasing)
-    unless $I0 >= 0 goto dec_end
-    h -= 1
-    branch dec_loop
-  dec_end:
-
-  unless l < h goto move_end
-  $P0 = list[l]
-  $P1 = list[h]
-  list[l] = $P1
-  list[h] = $P0
-
-  branch move_loop
-move_end:
-
-  $P0 = list[l]
-  $P1 = list[hi]
-  list[l] = $P1
-  list[hi] = $P0
-
-  $I0 = l - 1
-  $I1 = l + 1
-
-  quicksort(compare, list, lo, $I0, decreasing)
-  quicksort(compare, list, $I1, hi, decreasing)
-
-done:
-  .return ()
-.end
-
 .sub 'ascii'
   .param string s1
   .param string s2
-  .param int is_decr
-  if is_decr goto decreasing
   $I0 = cmp_str s1, s2
-  .return ($I0)
-decreasing:
-  $I0 = cmp_str s2, s1
   .return ($I0)
 .end
 
 .sub 'integer'
   .param pmc s1
   .param pmc s2
-  .param int is_decr
 
   # check that they're actually integers.
+  # This points out that we should really be caching
+  # the integer value rather than recalculating on each compare.
   .local pmc __integer
   __integer = get_root_global ['_tcl'], '__integer'
   .local pmc i1,i2
-  i1 = clone s1
-  i2 = clone s2
-  i1 = __integer(i1)
-  i2 = __integer(i2)
-
-  if is_decr goto decreasing
+  i1 = __integer(s1)
+  i2 = __integer(s2)
   $I0 = cmp_num i1, i2
   .return ($I0)
 
-decreasing:
-  $I0 = cmp_num i2, i1
-  .return ($I0)
 .end
+
 
 .sub 'dictionary'
     .param string s1
     .param string s2
-    .param int is_decr
 
     .include 'cclass.pasm'
 
@@ -259,27 +186,18 @@ end1:
     goto less
 
 less:
-    if is_decr goto pos
-    goto neg
+    .return(-1)
 
 equal:
     .return(0)
 
 greater:
-    if is_decr goto neg
-    goto pos
-
-neg:
-    .return(-1)
-
-pos:
     .return(1)
 .end
 
 .sub 'real'
   .param pmc s1
   .param pmc s2
-  .param int is_decr
 
   # check that they're actually numbers
   .local pmc __number
@@ -287,12 +205,7 @@ pos:
   s1 = __number(s1)
   s2 = __number(s2)
 
-  if is_decr goto decreasing
   $I0 = cmp_num s1, s2
-  .return ($I0)
-
-decreasing:
-  $I0 = cmp_num s2, s1
   .return ($I0)
 .end
 
