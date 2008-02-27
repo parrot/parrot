@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -459,11 +459,11 @@ Returns whether the object's class does the role with name C<*role_name>.
 
         if (role_name == NULL)
             return 0;
-        
+
         /* Dispatch role to the object's class to check HLL roles first */
         if (VTABLE_does(interp, VTABLE_get_class(interp, SELF), role_name))
             return 1;
-        
+
         /* Check if we have any PMC parents, and if so also dispatch to
          * their does check. */
         if (CLASS_has_alien_parents_TEST(obj->_class)) {
