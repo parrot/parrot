@@ -78,6 +78,7 @@ our @valid_options = qw{
     verbose-step
     version
     without-gdbm
+    without-gettext
     without-gmp
     without-icu
     yacc
