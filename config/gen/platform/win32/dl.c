@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, The Perl Foundation.
+ * Copyright (C) 2004-2008, The Perl Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ config\gen\platform\win32\dl.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Functions for working with dynamic libraries under windows.
 
 =head2 Functions
 
@@ -25,7 +25,8 @@ RT#48264
 
 =item C<void * Parrot_dlopen(const char *filename)>
 
-RT#48260: Not yet documented!!!
+Opens a dynamic library, and returns a system handle to that library.
+Returns Parrot_dlerror() on failure.
 
 =cut
 
@@ -41,7 +42,7 @@ Parrot_dlopen(const char *filename)
 
 =item C<const char * Parrot_dlerror(void)>
 
-RT#48260: Not yet documented!!!
+System-dependant error code that indicates failure in opening a DL. 
 
 =cut
 
@@ -57,7 +58,16 @@ Parrot_dlerror(void)
 
 =item C<void * Parrot_dlsym(void *handle, const char *symbol)>
 
-RT#48260: Not yet documented!!!
+Returns a pointer to the specified function in the given library. The library must have been opened already with
+Parrot_dlopen(). To call the function "int Foo(int)" from the library "Bar" , you would write something similar to:
+
+	void *lib;
+	int (*Foo_ptr)(int);
+	lib = Parrot_dlopen("Bar");
+	if(lib != Parrot_dlerror())
+	{
+		Foo_ptr = Parrot_dlsym(lib, "Foo");
+	}
 
 =cut
 
@@ -73,8 +83,16 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 =item C<int Parrot_dlclose(void *handle)>
 
-RT#48260: Not yet documented!!!
-
+Closes a dynamic library handle. 
+	
+	void *lib;
+	lib = Parrot_dlopen("Foo");
+	if(lib != Parrot_dlerror())
+	{
+		...
+		Parrot_dlclose(lib);
+	}
+	
 =cut
 
 */

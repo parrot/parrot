@@ -59,7 +59,15 @@ Parrot_stat_info_pmc(Parrot_Interp interp, STRING *filename, INTVAL thing)
 =item C<INTVAL
 Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)>
 
-RT#48260: Not yet documented!!!
+Stats the file, and returns the information specified by C<thing>. C<thing> can be one of:
+C<STAT_EXISTS>, C<STAT_FILESIZE>, C<STAT_ISDIR>, C<STAT_ISDEV>, C<STAT_ACCESSTIME>,
+C<STAT_MODIFYTIME>, C<STAT_CHANGETIME>, C<STAT_UID>, C<STAT_GID>, C<STAT_PLATFORM_DEV>,
+C<STAT_PLATFORM_INODE>, C<STAT_PLATFORM_NLINKS>, C<STAT_PLATFORM_DEVTYPE>. 
+
+C<STAT_BACKUPTIME> and C<STAT_CREATETIME> are not supported on Win32, so will return -1.
+
+C<STAT_PLATFORM_BLOCKS> and C<STAT_PLATFORM_BLOCKSIZE> are not supported by Win32 and will throw an 
+exception.
 
 =cut
 
@@ -147,7 +155,15 @@ Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)
 =item C<INTVAL
 Parrot_fstat_info_intval(Parrot_Interp interp, INTVAL file, INTVAL thing)>
 
-RT#48260: Not yet documented!!!
+Fstats the file, and returns the information specified by C<thing>. C<thing> can be one of:
+C<STAT_EXISTS>, C<STAT_FILESIZE>, C<STAT_ISDIR>, C<STAT_ISDEV>, C<STAT_ACCESSTIME>,
+C<STAT_MODIFYTIME>, C<STAT_CHANGETIME>, C<STAT_UID>, C<STAT_GID>, C<STAT_PLATFORM_DEV>,
+C<STAT_PLATFORM_INODE>, C<STAT_PLATFORM_NLINKS>, C<STAT_PLATFORM_DEVTYPE>. 
+
+C<STAT_BACKUPTIME> and C<STAT_CREATETIME> are not supported on Win32, so will return -1.
+
+C<STAT_PLATFORM_BLOCKS> and C<STAT_PLATFORM_BLOCKSIZE> are not supported by Win32 and will throw an 
+exception.
 
 =cut
 

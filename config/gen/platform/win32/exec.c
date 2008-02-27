@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, The Perl Foundation.
+ * Copyright (C) 2004-2008, The Perl Foundation.
  */
 
 /*
@@ -11,7 +11,7 @@ config\gen\platform\win32\exec.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Functions for dealing with child processes and Execs. 
 
 =head2 Functions
 
@@ -28,7 +28,8 @@ RT#48264
 =item C<INTVAL
 Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
 
-Spawn a subprocess
+Spawn the subprocess specified in C<command>. Waits for the process to complete, and then returns the exit code
+in POSIX-compatibility mode.
 
 =cut
 
@@ -79,7 +80,9 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
 =item C<INTVAL
 Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
 
-RT#48260: Not yet documented!!!
+Spawns a subprocess with the arguments provided in the C<cmdargs> PMC array. The first array element should
+be the name of the process to spawn, and the remainder of the array elements should be arguments. Waits until
+the child process completes, and returns the exit code in POSIX-compatibility mode.
 
 =cut
 
@@ -148,7 +151,8 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 =item C<void
 Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)>
 
-RT#48260: Not yet documented!!!
+Exits parrot and passes control to the specified process. Does not return. Raises an exception
+if the exec fails.
 
 =cut
 
