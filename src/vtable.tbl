@@ -336,9 +336,10 @@ opcode_t* invoke(void* next)
 
 INTVAL can(STRING* method)
 
-INTVAL does(STRING* method)
+INTVAL does_pmc(PMC* role)
+INTVAL does(STRING* role)
 
-INTVAL isa_pmc(PMC* lookup)
+INTVAL isa_pmc(PMC* _class)
 INTVAL isa(STRING* _class)
 
 PMC* get_attr(INTVAL idx)

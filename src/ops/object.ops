@@ -183,15 +183,26 @@ inline op can(out INT, invar PMC, in STR) :object_base {
 =item B<does>(out INT, invar PMC, in STR)
 
 Sets result $1 to the result of the "does" vtable function for PMC $2,
-given interface $3.
+given the role of name $3.
 
-See L<tools/build/pmc2c.pl> for a list of available interfaces.
+=cut
 
 inline op does(out INT, invar PMC, in STR) :object_base {
   $1 = $3 ? $2->vtable->does(interp, $2, $3) : 0;
   goto NEXT();
 }
 
+=item B<does>(out INT, invar PMC, invar PMC)
+
+Sets result $1 to the result of the "does" vtable function for PMC $2,
+given the role $3.
+
+=cut
+
+inline op does(out INT, invar PMC, invar PMC) :object_base {
+  $1 = $3 ? $2->vtable->does_pmc(interp, $2, $3) : 0;
+  goto NEXT();
+}
 
 =item B<isa>(out INT, invar PMC, in STR)
 

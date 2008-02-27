@@ -1252,3 +1252,4 @@ stm_commit_ic                  1221
 stm_wait_ic                    1222
 stm_abort                      1223
 stm_depth_i                    1224
+does_i_p_p                     1225
