@@ -126,21 +126,21 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
                     NOTNULL(Parrot_compiler_func_t func))
 {
     PMC* const iglobals = interp->iglobals;
-    PMC *hash, *nci;
-    STRING *sc;
+    PMC        *nci     = pmc_new(interp, enum_class_NCI);
+    STRING     *sc      = CONST_STRING(interp, "PJt");
+    PMC        *hash    = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                              IGLOBALS_COMPREG_HASH);
 
-    hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-            IGLOBALS_COMPREG_HASH);
     if (!hash) {
         hash = pmc_new_noinit(interp, enum_class_Hash);
         VTABLE_init(interp, hash);
         VTABLE_set_pmc_keyed_int(interp, iglobals,
                 (INTVAL)IGLOBALS_COMPREG_HASH, hash);
     }
-    nci = pmc_new(interp, enum_class_Compiler);
+
     VTABLE_set_pmc_keyed_str(interp, hash, type, nci);
+
     /* build native call interface for the C sub in "func" */
-    sc = CONST_STRING(interp, "PJt");
     VTABLE_set_pointer_keyed_str(interp, nci, sc, (void*)func);
 }
 
