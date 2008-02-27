@@ -106,10 +106,11 @@ In between these two rules defining the entry point and the I<exit> point
 of the operator parser, operators are declared, along with their
 precedence. This typically look as follows:
 
- proto 'infix:+' is looser('term:') { ... }
+ proto 'infix:+' is looser('infix:*') { ... }
 
-This defines the symbol C<+> as an C<infix> operator.
-
+This defines the symbol C<+> as an C<infix> operator. The C<is looser>
+specification defines the precedence of the C<+> operator in relation
+to the C<*> operator.
 
 =head3 Operator precedence
 
@@ -122,7 +123,7 @@ Operator precedence can be expressed using the following traits:
 States that the precedence of the current operator being defined is looser
 than C<op>.
 
-=item * equal( OP )
+=item * equiv( OP )
 
 States that the precedence of the current operator being defined is equal
 to the precedence of operator C<OP>.
@@ -133,6 +134,9 @@ States that the precedence of the current operator being defined is
 tighter than the precedence of the operator C<OP>.
 
 =back
+
+Be sure that OP is defined I<before> referencing it in a operator precedence
+statement as discussed in this section.
 
 =head3 Where's the operator?
 
@@ -405,6 +409,16 @@ that operators containing the character "<" or ">" are quoted using French quote
 The best solution to solve this is to comment out the whole table except for a
 single operator, and try to find the error using a binary search. Or, better yet,
 set up your operator table incrementally, while keeping tests passing.
+
+=item * Help! I defined my operator table, but some operators are not recognized.
+
+Be sure that there are no spelling errors. For instance, on first sight the following
+looks correct:
+
+ proto 'infix:-' is equal('infix:+') { ... }
+
+However, C<equal> is not a valid precedence specifier, it should be spelled as C<equiv>.
+The PGE will not warn you for such errors.
 
 =item * How many operator tables can I use in my language?
 
