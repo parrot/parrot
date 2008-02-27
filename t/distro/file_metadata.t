@@ -93,7 +93,7 @@ KEYWORD_EXP: {
 
     if (@failed) {
         my $failure = join q{}, "Set $test with:\n",
-            map { " $cmd ps $test '$expected' $_\n" } @failed;
+            map { " $cmd ps $test \"$expected\" $_\n" } @failed;
         $failure = "git svn metadata $test incorrect for @failed" if -d '.git';
         is( $failure, '', $test );
     }
