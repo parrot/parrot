@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: auto_gettext-03.t 26105 2008-03-27 18:10:33Z particle $
+# $Id$
 # auto_gettext-03.t
 
 use strict;
