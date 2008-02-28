@@ -135,9 +135,6 @@ static void start_flatten(PARROT_INTERP,
 static void store_arg(ARGIN(const call_state *st), INTVAL idx)
         __attribute__nonnull__(1);
 
-static int store_current_arg(ARGIN(const call_state *st))
-        __attribute__nonnull__(1);
-
 static void too_few(PARROT_INTERP,
     ARGIN(const call_state *st),
     ARGIN(const char *action))
@@ -972,7 +969,7 @@ store_arg(ARGIN(const call_state *st), INTVAL idx)
 
 /*
 
-=item C<static int store_current_arg>
+=item C<int Parrot_store_arg>
 
 RT#48260: Not yet documented!!!
 
@@ -980,8 +977,8 @@ RT#48260: Not yet documented!!!
 
 */
 
-static int
-store_current_arg(ARGIN(const call_state *st))
+int
+Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
 {
     INTVAL idx;
     if (st->dest.i >= st->dest.n)
@@ -993,22 +990,6 @@ store_current_arg(ARGIN(const call_state *st))
     store_arg(st, idx);
 
     return 1;
-}
-
-/*
-
-=item C<int Parrot_store_arg>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
-
-int
-Parrot_store_arg(SHIM_INTERP, ARGMOD(call_state *st))
-{
-    return store_current_arg(st);
 }
 
 /*
@@ -1364,7 +1345,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
         }
         else {
             Parrot_convert_arg(interp, st);
-            store_current_arg(st);
+            Parrot_store_arg(interp, st);
 
             /* if we're at an :optional argument, we need to check for an :opt_flag */
             if (dest->sig & PARROT_ARG_OPTIONAL)
