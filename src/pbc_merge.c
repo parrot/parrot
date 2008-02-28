@@ -119,7 +119,7 @@ static void pbc_merge_debugs(PARROT_INTERP,
         FUNC_MODIFIES(*bc);
 
 static void pbc_merge_fixups(PARROT_INTERP,
-    ARGMOD(pbc_merge_input **inputs),
+    ARGIN(pbc_merge_input **inputs),
     int num_inputs,
     ARGMOD(PackFile *pf),
     ARGMOD(PackFile_ByteCode *bc))
@@ -127,7 +127,6 @@ static void pbc_merge_fixups(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        FUNC_MODIFIES(*inputs)
         FUNC_MODIFIES(*pf)
         FUNC_MODIFIES(*bc);
 
@@ -445,7 +444,7 @@ This function merges the fixups tables from the input PBC files.
 */
 
 static void
-pbc_merge_fixups(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
+pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
     PackFile_FixupTable *fixup_seg;
