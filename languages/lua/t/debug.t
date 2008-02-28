@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.getfenv' );
@@ -41,6 +41,14 @@ assert(debug.getfenv(print) == _G)
 CODE
 nil
 table
+table
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.getfenv (thread)' );
+a = coroutine.create(function () return 1 end)
+print(type(debug.getfenv(a)))
+assert(debug.getfenv(a) == _G)
+CODE
 table
 OUT
 
@@ -75,6 +83,16 @@ print(type(debug.getfenv(print)))
 assert(debug.getfenv(print) == t)
 CODE
 table
+table
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.setfenv (thread)' );
+t = {}
+a = coroutine.create(function () return 1 end)
+assert(debug.setfenv(a, t) == a)
+print(type(debug.getfenv(a)))
+assert(debug.getfenv(a) == t)
+CODE
 table
 OUT
 
