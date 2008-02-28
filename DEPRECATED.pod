@@ -158,6 +158,12 @@ by integer or string key, use C<getattribute> and C<setattribute> instead.
 
 =over 4
 
+=item * unneeded type names
+
+Since Parrot 0.4.16 all type names for .local other than string, num, int, and
+pmc are deprecated. The option to use C<float> for C<num>
+or a basic PMC name like C<Array> for C<pmc> will be removed soon.  [RT#42769].
+
 =item * C<<.namespace <identifier> >> syntax [post 0.5.1]
 
 See RT #48737.

@@ -1,10 +1,11 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Config;
 use Parrot::Test;
@@ -12,7 +13,7 @@ use Parrot::Test;
 plan skip_all => 'No reason to compile invalid PBC here'
     if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/-r/;
 
-plan tests => 3;
+plan tests => 5;
 
 ## tests for imcc error messages
 
@@ -54,6 +55,28 @@ $test_3_pir_code .= ".end\n";
 pir_error_output_like( $test_3_pir_code, <<'OUT', "check parser recovery patience." );
 /Too many errors. Correct some first.\n$/
 OUT
+
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'SomethingFunny isnt pmc' );
+.sub main :main
+  .local SomethingFunny my_string
+  my_string = new String
+  my_string = 'hello'
+  say my_string
+.end
+END_PIR
+/^error:imcc:Unknown PMC type 'SomethingFunny'/
+END_EXPECTED
+
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array isnt pmc', todo => 'still is' );
+.sub main :main
+  .local Array my_string
+  my_string = new String
+  my_string = 'hello'
+  say my_string
+.end
+END_PIR
+/^error:imcc:Unknown PMC type 'Array'/
+END_EXPECTED
 
 # Local Variables:
 #   mode: cperl
