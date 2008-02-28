@@ -1814,7 +1814,7 @@ SPLINT_TMP = $(TMP)/splint
 
 # Splint flags: http://splint.org/manual/html/appB.html
 SPLINTFLAGS  = \
-    +checks \
+    +weak \
     -hints \
     \
     +indentspaces 4 \
@@ -1831,6 +1831,16 @@ SPLINTFLAGS  = \
     -show-summary \
     +show-scan \
     +time-dist \
+
+
+# Andy is working on making a decent splint target.  He's currently
+# (2/29/08) dropping all the flags that he's been working with
+# and going with the +weak settings, just to get the most egregious
+# problems uncovered.  Then, he'll be gradually adding stricter and
+# stricter settings.  The SPLINTFLAGS_OVERLY_NOISY list below represents
+# his noisy-based work at the time he reverted to weak mode.
+SPLINTFLAGS_OVERLY_NOISY = \
+    +checks \
     \
     -abstract \
     +aliasunique \
@@ -1923,7 +1933,11 @@ SPLINTFLAGS  = \
 
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
-SPLINTFLAGS_TEST =
+SPLINTFLAGS_TEST = \
+    +fcnpost \
+    +partial \
+    -bufferoverflow \
+    +enumindex \
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
@@ -1933,10 +1947,6 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-    +fcnpost \
-    +partial \
-    -bufferoverflow \
-    +enumindex \
     compilers/imcc/cfg.c \
     compilers/imcc/debug.c \
     compilers/imcc/imc.c \
