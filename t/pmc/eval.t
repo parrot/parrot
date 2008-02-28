@@ -82,7 +82,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub" );
 
 .sub test :main
-    .local NCI compiler
+    .local pmc compiler
     get_global compiler, "xcompile"
     compreg "XPASM", compiler
     .local pmc my_compiler
@@ -105,7 +105,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub" );
     $S0 .= sub_name
     $S0 .= ":\n"
     $S0 .= code
-    .local NCI pasm_compiler
+    .local pmc pasm_compiler
     pasm_compiler = compreg "PASM"
     # print $S0
     $P0 = pasm_compiler($S0)

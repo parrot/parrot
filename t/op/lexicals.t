@@ -592,7 +592,7 @@ the_end:
 .end
 
 .sub _choose :outer(main)
-     .param ResizablePMCArray choices
+     .param pmc choices
 
      .local pmc our_try, old_fail, cc, try
      .lex 'old_fail', old_fail
@@ -611,7 +611,7 @@ the_end:
 .end
 
 .sub _try :outer(_choose)
-     .param ResizablePMCArray choices
+     .param pmc choices
 
      .lex 'choices', $P0
      #print "In try\n"

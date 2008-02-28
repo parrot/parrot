@@ -1340,7 +1340,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cloned iterator independent of original"
     new i1, 'Iterator', ar
     clone i2, i1
 
-    .local Integer temp
+    .local pmc temp
 
     shift temp, i1
     unless temp == 17 goto fail
@@ -1366,7 +1366,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "clone of partly-advanced iterator" );
 .sub main :main
     .local pmc ar, i1, i2
-    .local Integer temp
+    .local pmc temp
     ar = new 'ResizableIntegerArray'
     push ar, 1
     push ar, 2
@@ -1397,7 +1397,7 @@ TODO: {
         <<'CODE', <<'OUTPUT', "cloned iterator doesn't copy the array to which it 'points'" );
 .sub main :main
     .local pmc ar, i1, i2
-    .local Integer temp
+    .local pmc temp
     temp = new 'Integer'
     ar   = new 'ResizableIntegerArray'
     push ar, 1
