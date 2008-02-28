@@ -151,6 +151,29 @@ Set the value of the Pair.
 
 /*
 
+=item C<void set_pmc(PMC *pair)>
+
+Sets this pair to hold the value of another.
+
+=cut
+
+*/
+
+    void set_pmc(PMC *pair) {
+        if (pair->vtable->base_type == enum_class_Pair) {
+            PMC_struct_val(SELF) = PMC_struct_val(pair);
+            PMC_pmc_val(SELF)    = PMC_pmc_val(pair);
+            if (PObj_key_is_string_TEST(pair))
+                PObj_key_is_string_SET(SELF);
+        }
+        else {
+            real_exception(INTERP, NULL, INVALID_OPERATION,
+                           "Can only set a pair to another pair.");
+        }
+    }
+
+/*
+
 =item C<INTVAL is_equal(PMC *value)>
 
 The C<==> operation.
