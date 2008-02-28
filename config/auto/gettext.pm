@@ -73,15 +73,13 @@ sub runstep {
     else {
         eval { $conf->cc_build( '', '-lintl' ); };
     }
-    my $has_gettext = 0;
+    my $has_gettext;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_gettext = $self->_evaluate_cc_run($test, $has_gettext, $verbose);
+        $has_gettext = $self->_evaluate_cc_run($test, $verbose);
     }
     if ($has_gettext) {
-        $conf->data->set( ccflags => "$ccflags -DHAS_GETTEXT" );
-        $ccflags = $conf->data->get("ccflags");
-        $verbose and print "\n  ccflags: $ccflags\n";
+        _handle_gettext($conf, $verbose);
     }
     else {
         # The Parrot::Configure settings might have changed while class ran
@@ -94,13 +92,21 @@ sub runstep {
 
 sub _evaluate_cc_run {
     my $self = shift;
-    my ($test, $has_gettext, $verbose) = @_;
+    my ($test, $verbose) = @_;
+    my $has_gettext = 0;
     if ( $test eq "Hello, world!\n" ) {
         $has_gettext = 1;
         print " (yes) " if $verbose;
         $self->set_result('yes');
     }
     return $has_gettext;
+}
+
+sub _handle_gettext {
+    my ($conf, $verbose) = @_;
+    $conf->data->add( ' ', ccflags => "-DHAS_GETTEXT" );
+    $verbose and print "\n  ccflags: ", $conf->data->get("ccflags"), "\n";
+    return 1;
 }
 
 1;
