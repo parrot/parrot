@@ -137,6 +137,9 @@ for a symbol in a symbol table is as easy as:
    # symbol 'foo' was not found
  }
 
+ {{
+ XXX Review this; this should refer to PAST compiler's symbol() method.
+
 If a symbol is not found in a block's symbol table, any outer blocks
 (outer scopes) will be inspected. The symbol table entry of the innermost
 scope is returned. For instance, consider the following Perl 6 code:
@@ -154,6 +157,9 @@ In the subroutine C<baz>, the variable C<$i> is referenced. It is not
 found in the symbol table of C<baz>, so it is looked for in baz' outer
 scope, C<bar>. It's not found there either, so bar's outer scope, C<foo>
 is inspected, where it is found.
+
+ XXX
+ }}
 
 =head1 PAST::Stmts
 
