@@ -187,9 +187,8 @@ opcode_t * parrot_pass_args_fromc(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*dest);
 
-int Parrot_store_arg(SHIM_INTERP, ARGMOD(call_state *st))
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*st);
+int Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
