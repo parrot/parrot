@@ -85,8 +85,8 @@ If the free list is empty then a DOD run is started, which may be able to
 refill the free list with dead objects it detects are free for re-use.  If it
 finds none then a new pool is allocated to hold more objects.
 
-These fixed sized objects are never freed during the lifetime of an
-interpreter, they just get reused or recycled.
+These fixed-sized objects are never returned to the operating system
+during the lifetime of an interpreter, they just get reused or recycled.
 
 =head2 General structure of a buffer-like item
 
