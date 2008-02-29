@@ -79,12 +79,12 @@ int
 main(int argc, char *argv[])
 {
     char const * const program_name = argv[0];
-    lexer_state *lexer = NULL;
-    int   flexdebug    = 0;
-    char *filename     = NULL;
-    char *outputfile   = NULL;
-    FILE *infile       = NULL;
-    yyscan_t yyscanner;
+    lexer_state       *lexer        = NULL;
+    int                flexdebug    = 0;
+    char              *filename     = NULL;
+    char              *outputfile   = NULL;
+    FILE              *infile       = NULL;
+    yyscan_t           yyscanner;
 
     /* skip program name */
     argc--;
@@ -180,7 +180,8 @@ main(int argc, char *argv[])
 =item C<int
 yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message)>
 
-Parse error handling routine.
+Default parse error handling routine, that is invoked when the bison-generated
+parser finds a syntax error.
 
 */
 int
@@ -196,7 +197,7 @@ yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const messa
     /* the following should be fixed; the point is not to print the token if
      * it's a newline, that looks silly.
      */
-    if (strcmp(text, "\r\n") != 0 || strcmp(text, "\n") == 0) {
+    if (strcmp(text, "\r\n") != 0 || strcmp(text, "\n") != 0) {
         fprintf(stderr, "('%s')\n\n", text);
     }
     else {
