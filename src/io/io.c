@@ -1081,6 +1081,7 @@ Writes a C string format with varargs to C<stderr>.
 */
 
 PARROT_API
+PARROT_IGNORABLE_RESULT
 INTVAL
 PIO_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 {

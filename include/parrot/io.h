@@ -201,6 +201,7 @@ INTVAL PIO_eof(SHIM_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 PARROT_API
+PARROT_IGNORABLE_RESULT
 INTVAL PIO_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
         __attribute__nonnull__(2);
 

@@ -108,6 +108,7 @@ static Instruction * iSUBROUTINE(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_IGNORABLE_RESULT
 static Instruction * MK_I(PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(const char *fmt),
@@ -169,6 +170,7 @@ static void set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), ARGIN(const char *nam
  *        exceptions. Thus, we can't easily factorize that piece of
  *        code.
  */
+PARROT_IGNORABLE_RESULT
 static Instruction *
 MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
 {

@@ -785,7 +785,7 @@ PARROT_MALLOC
 static char *
 add_ns(PARROT_INTERP, ARGIN(const char *name))
 {
-    int len, l;
+    size_t len, l;
     char *ns_name, *p;
 
     if (!IMCC_INFO(interp)->cur_namespace ||
@@ -836,30 +836,30 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         r->type = VTADDRESS;
         r->name = str_dup(name);
         _store_symreg(hsh, r);
-        return r;
     }
+    else {
+        if (uniq == U_add_uniq_sub)
+            name = add_ns(interp, name);
 
-    if (uniq == U_add_uniq_sub)
-        name = add_ns(interp, name);
+        r = _get_sym(hsh, name);
 
-    r = _get_sym(hsh, name);
-
-    if (uniq && r && r->type == VTADDRESS &&
-            r->lhs_use_count) {      /* we use this for labels/subs */
-        if (uniq == U_add_uniq_label) {
-            IMCC_fataly(interp, E_SyntaxError,
-                   "Label '%s' already defined\n", name);
+        if (uniq && r && r->type == VTADDRESS &&
+                r->lhs_use_count) {      /* we use this for labels/subs */
+            if (uniq == U_add_uniq_label) {
+                IMCC_fataly(interp, E_SyntaxError,
+                    "Label '%s' already defined\n", name);
+            }
+            else if (uniq == U_add_uniq_sub)
+                IMCC_fataly(interp, E_SyntaxError,
+                        "Subroutine '%s' already defined\n", name);
         }
-        else if (uniq == U_add_uniq_sub)
-            IMCC_fataly(interp, E_SyntaxError,
-                    "Subroutine '%s' already defined\n", name);
+
+        r       = _mk_symreg(hsh, name, 0);
+        r->type = VTADDRESS;
+
+        if (uniq)
+            r->lhs_use_count++;
     }
-
-    r       = _mk_symreg(hsh, name, 0);
-    r->type = VTADDRESS;
-
-    if (uniq)
-        r->lhs_use_count++;
 
     return r;
 }
