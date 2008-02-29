@@ -14,7 +14,7 @@ compilers/imcc/main.c
 
 =head1 DESCRIPTION
 
-main program
+IMCC main function and helpers.
 
 =head2 Functions
 
@@ -847,15 +847,18 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 {
     yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
-    /* Read in the source and determine whether it's Parrot bytecode
-       or PASM. If it either of these, then we assume that it is PIR. */
+    /* Read in the source and check the file extension for the input type;
+       a file extension .pbc means it's parrot bytecode;
+       a file extension .pasm means it's parrot assembly (PASM);
+       otherwise, it's assumed to be PIR.
+     */
     if (STREQ(sourcefile, "-")) {
         imc_yyin_set(stdin, yyscanner);
     }
     else {
         const char * const ext = strrchr(sourcefile, '.');
 
-        if (ext && (STREQ(ext, ".pbc"))) {
+        if (ext && (STREQ(ext, ".pbc"))) { /* a PBC file */
             load_pbc  = 1;
             write_pbc = 0;
         }
@@ -988,8 +991,9 @@ compile_to_bytecode(PARROT_INTERP,
 
 =item C<int imcc_run>
 
+Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
-and run.
+and run. This function always returns 0.
 
 =cut
 
@@ -999,8 +1003,8 @@ int
 imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv))
 {
-    int              obj_file;
-    yyscan_t        yyscanner   = IMCC_INFO(interp)->yyscanner;
+    int                obj_file;
+    yyscan_t           yyscanner   = IMCC_INFO(interp)->yyscanner;
     const char * const output_file = interp->output_file;
 
     if (!interp->lo_var_ptr)
