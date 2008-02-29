@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 
 # macro tests
 
@@ -433,6 +433,19 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'test that macros labels names can have the
 .endm
 .end
 CODE
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'invalid label syntax (RT#47978, RT#51104)' );
+.sub test :main
+    .macro m()
+        .local $iter_loop:
+        print "ok\n"
+    .endm
+
+    .m()
+.end
+CODE
+/syntax error, unexpected LABEL/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'call a sub in a macro' );
