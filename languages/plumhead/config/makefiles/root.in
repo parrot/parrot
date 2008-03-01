@@ -152,7 +152,7 @@ clean-antlr3:
 	$(RM_F) src/antlr3/*.class
 
 clean-test:
-	$(RM_F) t/*.php t/*.pir t/*.out t/pmc/*.pir
+	$(RM_F) t/php/*.php t/php/*.pir t/php/*.out t/pmc/*.pir
 
 clean-pmc:
 	$(RM_F) pmc/*.c pmc/*.h pmc/*.o pmc/*.so pmc/*.dump

@@ -39,7 +39,6 @@ use warnings;
 use lib '..';
 
 use Cwd                   ();
-use Data::Dumper;
 use File::Spec;
 use Test::Harness         ();
 
@@ -48,7 +47,7 @@ my $language = 'plumhead';
 if ( grep { m/^--files$/ } @ARGV ) {
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
+    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 } else { 
@@ -72,10 +71,10 @@ if ( grep { m/^--files$/ } @ARGV ) {
     } else {
         ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
         if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
+            @files = glob( File::Spec->catfile( $language, 't', '*/*.t' ) );
         }
         elsif ( $current_dir eq $language ) {
-            @files = glob( File::Spec->catfile( 't', '*.t' ) );
+            @files = glob( File::Spec->catfile( 't', '*/*.t' ) );
         }
         else {
             die "Where am I?";

@@ -8,7 +8,9 @@ Plumhead - Testing
 
 For testing the test-suite from a current PHP release is used.
 For sanity checking there are also very few tests in
-languages/plumhead/t. These are used by 'make test'. 
+F<languages/plumhead/t/php>. These are used by 'make test'.
+
+The PMC implementations are checked in F<t/pmc>
 
 =head1 How to run the PHP test suite
 
