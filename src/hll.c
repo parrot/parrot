@@ -201,8 +201,8 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
 Register an HLL library.
 Takes an interpreter name and a pointer to a library name.
-If the name matches one already registered, return the list position. 
-Otherwise, add the entry to the list and return 0. 
+If the name matches one already registered, return the list position.
+Otherwise, add the entry to the list and return 0.
 
 =cut
 
