@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 # A wrapper around a Scheme test file
@@ -17,14 +17,14 @@ use Data::Dumper;
 ( my $t_fn = $FindBin::Script ) =~ s/\.pl$/\.t/;
 
 # 'petite' is Petite Chez Scheme
-# 7.3 is the current version
+# 7.4 is the current version
 my $petite_version = `petite --version 2>&1` || q{};
-my $has_petite = $petite_version =~ m/ \A 7\.3 # exact version
+my $has_petite = $petite_version =~ m/ \A 7\.4 # exact version
                                      /xms;
 #diag( Dumper( $petite_version, $has_petite ) );
 
 if ( ! $has_petite ) {
-    plan skip_all => 'petite 7.3 is needed for running this test';
+    plan skip_all => 'petite 7.4 is needed for running this test';
 }
 else {
     chdir 'eclectus';
