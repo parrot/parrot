@@ -64,9 +64,15 @@ pmclass TclObject dynpmc group tcl_group {
         PMC_num_val(SELF) = value;
     }
 
-    void set_string_native(STRING* value) {
+    void set_string_native(STRING *value) {
         DYNSELF.morph(dynpmc_TclString);
-        PMC_str_val(SELF) = string_copy(INTERP, value);
+        /* Only allow constant PMCs to embed constant strings */
+        if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
+            const char *copy  = string_to_cstring(INTERP, value);
+            PMC_str_val(SELF) = const_string(INTERP, copy);
+        }
+        else
+            PMC_str_val(SELF) = string_copy(INTERP, value);
     }
 }
 
