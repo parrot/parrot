@@ -296,7 +296,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "pmc constant 1" );
 .sub main :main
-    .const Integer i = "42"
+    .const .Integer i = "42"
     print i
     print "\n"
 .end

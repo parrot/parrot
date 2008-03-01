@@ -1138,7 +1138,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "new_from_string" );
 .sub main :main
-    .const Float pi = "3.1"
+    .const .Float pi = "3.1"
     print pi
     print "\n"
 .end
