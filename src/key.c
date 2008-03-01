@@ -289,7 +289,9 @@ key_type(SHIM_INTERP, ARGIN(const PMC *key))
 
 =item C<INTVAL key_integer>
 
-RT#48260: Not yet documented!!!
+Translates a key value into an integer.
+Takes an interpreter name and pointer to a key.
+Returns an integer value corresponding to the key.
 
 =cut
 
@@ -328,7 +330,10 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
 
 =item C<FLOATVAL key_number>
 
-RT#48260: Not yet documented!!!
+Translates a key value into a number.
+Takes an interpreter name and pointer to a key.
+Returns a number value corresponding to the key.
+Throws an exception if the key is not a valid number.
 
 =cut
 
@@ -361,7 +366,9 @@ key_number(PARROT_INTERP, ARGIN(PMC *key))
 
 =item C<STRING * key_string>
 
-RT#48260: Not yet documented!!!
+Translates a key value into a string.
+Takes an interpreter name and pointer to a key.
+Returns a string value corresponding to the key.
 
 =cut
 
@@ -505,7 +512,9 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 
 =item C<STRING * key_set_to_string>
 
-RT#48260: Not yet documented!!!
+Translates a series of key values into strings, quoted or bracketed if
+appropriate.  Takes an interpreter name and pointer to a key.  Returns a
+string value corresponding to the key.
 
 =cut
 

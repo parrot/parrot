@@ -62,7 +62,10 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
 =item C<static PMC* new_hll_entry>
 
-RT#48260: Not yet documented!!!
+Create a new HLL information table entry.
+Takes an interpreter name and (optional) entry name.
+Returns a pointer to the new entry.
+Used by Parrot_register_HLL and Parrot_register_HLL_lib.
 
 =cut
 
@@ -103,7 +106,9 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
 =item C<void Parrot_init_HLL>
 
-RT#48260: Not yet documented!!!
+Initialises the HLL_info and HLL_namespace fields.
+Takes an interpreter name.
+Calls Parrot_register_HLL to register name within Parrot core.
 
 =cut
 
@@ -194,7 +199,10 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
 =item C<INTVAL Parrot_register_HLL_lib>
 
-RT#48260: Not yet documented!!!
+Register an HLL library.
+Takes an interpreter name and a pointer to a library name.
+If the name matches one already registered, return the list position. 
+Otherwise, add the entry to the list and return 0. 
 
 =cut
 
@@ -278,7 +286,10 @@ Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 
 =item C<STRING * Parrot_get_HLL_name>
 
-RT#48260: Not yet documented!!!
+Returns the corresponding PMC's name.
+Takes an interpreter name and an id.
+If the id is out of range, or the PMC name is NULL,
+returns NULL.
 
 =cut
 
