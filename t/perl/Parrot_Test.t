@@ -284,8 +284,33 @@ CODE
 OUTPUT
 test_test($desc);
 
+$desc = 'pir_error_output_like: todo';
+$line = line_num(+15);
+test_out("not ok 1 - $desc # TODO foo");
+$err = <<"ERR";
+#   Failed (TODO) test '$desc'
+#   at $0 line $line.
+# Expected error but exited cleanly
+# Received:
+# ok
+# 
+# Expected:
+# /not ok/
+# 
+ERR
+chomp $err;
+test_err($err);
+pir_error_output_like( <<'CODE', <<"OUTPUT", $desc, todo => 'foo' );
+.sub 'test' :main
+    print "ok\n"
+.end
+CODE
+/not ok/
+OUTPUT
+test_test($desc);
+
 # remember to change the number of tests
-BEGIN { plan tests => 63; }
+BEGIN { plan tests => 64; }
 
 # Local Variables:
 #   mode: cperl

@@ -526,9 +526,12 @@ sub generate_languages_functions {
 sub _handle_error_output {
     my ( $builder, $real_output, $expected, $desc ) = @_;
 
+    my $level = $builder->level();
+    $builder->level( $level + 1 );
     $builder->ok( 0, $desc );
     $builder->diag(
         "Expected error but exited cleanly\n" . "Received:\n$real_output\nExpected:\n$expected\n" );
+    $builder->level($level);
 
     return 0;
 }
