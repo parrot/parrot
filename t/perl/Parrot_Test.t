@@ -100,11 +100,9 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pasm_output_is: failure';
-$line = line_num(+12);
 test_out("not ok 1 - $desc");
+test_fail(+9);
 $err = <<"ERR";
-#   Failed test '$desc'
-#   at $0 line $line.
 #          got: 'ok
 # '
 #     expected: 'not ok
@@ -131,11 +129,9 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pasm_output_isnt: failure';
-$line = line_num(+13);
 test_out("not ok 1 - $desc");
+test_fail(+10);
 $err = <<"ERR";
-#   Failed test '$desc'
-#   at $0 line $line.
 #     'ok
 # '
 #         ne
@@ -163,11 +159,9 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pasm_output_like: failure';
-$line = line_num(+12);
 test_out("not ok 1 - $desc");
+test_fail(+9);
 $err = <<"ERR";
-#   Failed test '$desc'
-#   at $0 line $line.
 #                   'ok
 # '
 #     doesn't match '/not ok/
@@ -196,11 +190,9 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pir_output_is: failure';
-$line = line_num(+12);
 test_out("not ok 1 - $desc");
+test_fail(+9);
 $err = <<"ERR";
-#   Failed test '$desc'
-#   at $0 line $line.
 #          got: 'ok
 # '
 #     expected: 'not ok
@@ -229,11 +221,9 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pir_output_isnt: failure';
-$line = line_num(+13);
 test_out("not ok 1 - $desc");
+test_fail(+10);
 $err = <<"ERR";
-#   Failed test '$desc'
-#   at $0 line $line.
 #     'ok
 # '
 #         ne
@@ -263,11 +253,9 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pir_output_like: failure';
-$line = line_num(+12);
 test_out("not ok 1 - $desc");
+test_fail(+9);
 $err = <<"ERR";
-#   Failed test '$desc'
-#   at $0 line $line.
 #                   'ok
 # '
 #     doesn't match '/not ok/
