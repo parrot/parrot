@@ -90,9 +90,10 @@ reordered independently of keys and values.
     if ((b)->bucketNext != NULL)        \
         (b)->bucketNext->bucketPrev = (b)->bucketPrev; \
 
-/* XXX: temporary workaround until VTABLE_is_equal starts working in the
- * context this code needs: see RT #50878 */
+/* These aren't VTABLE methods, but it's easier to pretend that they are.  See
+ * RT #50878 */
 #define VTABLE_is_equal(a, b, c) mmd_dispatch_i_pp((a), (b), (c), MMD_EQ)
+#define VTABLE_cmp(a, b, c) mmd_dispatch_i_pp((a), (b), (c), MMD_CMP)
 
 typedef enum {
     APPEND,
@@ -416,12 +417,9 @@ void resize_and_rehash(PARROT_INTERP, HashTable *ht) {
     hash_check(interp, ht);
 }
 
-/*extends OrderedHash may make PHPArray Iterators smarter.  Who knows.  It's
- * still too magical for my tastes.*/
 pmclass PHPArray
     provides hash
     provides array
-    extends OrderedHash
     need_ext
     dynpmc
     group php_group
@@ -431,7 +429,7 @@ pmclass PHPArray
 
 =item C<PMC* add(PMC*, PMC*)>
 
-=item C<PMC* i_add(PMC*, PMC*)>
+=item C<PMC* i_add(PMC*)>
 
 Insert all key/value pairs from the second array into the first
 
@@ -440,11 +438,14 @@ Insert all key/value pairs from the second array into the first
 */
 
 
-    /*array + array -> combine elements */
+    /*dest = self + value */
     PMC* add(PMC *value, PMC *dest) {
-        return PMCNULL;
+        /* check for aggregates */
+
+        /* check for scalars */
     }
 
+    /*self = self + value*/
     void i_add(PMC *value) {
     }
 
@@ -455,6 +456,9 @@ Insert all key/value pairs from the second array into the first
 Determine equality between this and another PMC.  Two PHPArrays PMCs are equal
 if they contain the same key/value pairs, regardless of order.  This is the
 same behavoir that is found in PHP.
+
+Currently, only two PHPArray PMCs can be considered equal.  It is possible for
+equality comparisons to be extended to other PMCs via the VTABLE API.
 
 =cut
 
@@ -509,15 +513,62 @@ if all of the following are true:
 =back
 
 Note that this means it is possible for both C<a> > C<b> and C<b> > C<a> to be
-true.  Zend PHP's behavoir is to return null when two arrays aren't comparable.
-B<This behavoir is not reproduced by the PHPArray PMC.>
+true.  Zend PHP's behavior is to return null when two arrays aren't comparable.
+B<This behavior is not reproduced by the PHPArray PMC.>  An C<cmp> between two
+uncomparable PHPArrays will return 1.
 
 =cut
 
 */
-    INTVAL cmp(PMC *value) {
+    INTVAL cmp(PMC *other) {
+        INTVAL self_size, other_size, diff;
+        Bucket *b;
+        HashTable *self_ht, *other_ht;
+        PMC *self_value, *other_value;
+        STRING *self_str, *other_str;
+        char *self_cstr, *other_cstr;
+        dprintf("comparing PMCs\n");
+
+        if (PMC_type(other) != PMC_type(SELF))
+            return 1;
+
+        self_ht  = (HashTable*)PMC_struct_val(SELF);
+        other_ht = (HashTable*)PMC_struct_val(other);
+
         /*compare size*/
-        /*iterate through values*/
+        self_size = self_ht->elementCount;
+        other_size = other_ht->elementCount;
+        dprintf("self size is %d, other is %d\n", (int)self_size, (int)other_size);
+
+        if (self_size > other_size) {
+            dprintf("self is bigger: returning 1\n");
+            return (INTVAL)1;
+        }
+        else if (other_size > self_size) {
+            dprintf("other is bigger: returning -1\n");
+            return (INTVAL)-1;
+        }
+
+        /*iterate through keys according to SELF order */
+        dprintf("comparing values\n");
+        for (b = self_ht->tableHead; b != NULL; b = b->tableNext) {
+            other_value = get_from_hashtable(INTERP, other_ht, b->key);
+            if (other_value == PMCNULL)
+                return 1;
+            self_value = b->value;
+            diff = VTABLE_cmp(INTERP, self_value, other_value);
+
+            self_str = VTABLE_get_string(INTERP, self_value);
+            other_str = VTABLE_get_string(INTERP, other_value);
+            self_cstr = string_to_cstring(INTERP, self_str);
+            other_cstr = string_to_cstring(INTERP, other_str);
+            dprintf("result of comparing '%s' to '%s': %d\n", self_cstr, other_cstr, (int)diff);
+
+
+            if (diff)
+                return diff;
+        }
+
         return (INTVAL)0;
     }
 
@@ -624,15 +675,20 @@ Remove the element at key.
         char *key_cstr, *val_cstr;
         char key_is_int;
 
+        if (key == NULL) {
+            return;
+        }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
         key_str = key_set_to_string(INTERP, key);
         key_cstr = string_to_cstring(INTERP, key_str);
         dprintf("delete_keyed called with key = %s\n", key_cstr);
         string_cstring_free(key_cstr);
-
-        /*if key is null*/
-        if (key == NULL) {
-            return ;
-        }
 
         key_t = key_type(INTERP, key);
 
@@ -769,15 +825,20 @@ Returns TRUE if the element at C<key> exists; otherwise returns false.
         char *key_cstr, *val_cstr;
         char key_is_int;
 
+        if (key == NULL) {
+            return 0;
+        }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
         key_str = key_set_to_string(INTERP, key);
         key_cstr = string_to_cstring(INTERP, key_str);
         dprintf("exists_keyed called with key = %s\n", key_cstr);
         string_cstring_free(key_cstr);
-
-        /*if key is null*/
-        if (key == NULL) {
-            return (INTVAL)0;
-        }
 
         key_t = key_type(INTERP, key);
 
@@ -883,18 +944,24 @@ Return the integer value of the elements a C<key>.
 
         PMC *box, *next_key;
         INTVAL index_i, key_t, next_key_t;
-        STRING *index_s;
+        STRING *index_s, *key_str;
         char key_is_int;
+        char *key_cstr;
 
-        STRING *key_str = key_set_to_string(INTERP, key);
-        char *key_cstr = string_to_cstring(INTERP, key_str);
-        dprintf("get_integer_keyed called with key = %s\n", key_cstr);
-        string_cstring_free(key_cstr);
-
-        /*if key is null*/
         if (key == NULL) {
             return 0;
         }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
+        key_str = key_set_to_string(INTERP, key);
+        key_cstr = string_to_cstring(INTERP, key_str);
+        dprintf("get_integer_keyed called with key = %s\n", key_cstr);
+        string_cstring_free(key_cstr);
 
         key_t = key_type(INTERP, key);
 
@@ -987,20 +1054,6 @@ Return the integer value of the elements a C<key>.
 
 /*
 
-=item C<PMC* get_iter()>
-
-Return a new iterator for this PHPArray.
-
-=cut
-
-*/
-    PMC* get_iter() {
-        /*XXX: implement */
-        return PMCNULL;
-    }
-
-/*
-
 =item C<FLOATVAL get_number_keyed(PMC*)>
 
 =item C<FLOATVAL get_number_keyed_int(INTVAL)>
@@ -1017,18 +1070,24 @@ Return the float value of the element at C<key>.
 
         PMC *box, *next_key;
         INTVAL index_i, key_t, next_key_t;
-        STRING *index_s;
+        STRING *index_s, *key_str;
         char key_is_int;
+        char *key_cstr;
 
-        STRING *key_str = key_set_to_string(INTERP, key);
-        char *key_cstr = string_to_cstring(INTERP, key_str);
-        dprintf("get_number_keyed called with key = %s\n", key_cstr);
-        string_cstring_free(key_cstr);
-
-        /*if key is null*/
         if (key == NULL) {
             return 0;
         }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
+        key_str = key_set_to_string(INTERP, key);
+        key_cstr = string_to_cstring(INTERP, key_str);
+        dprintf("get_number_keyed called with key = %s\n", key_cstr);
+        string_cstring_free(key_cstr);
 
         key_t = key_type(INTERP, key);
 
@@ -1118,6 +1177,28 @@ Return the float value of the element at C<key>.
 
         return VTABLE_get_number(INTERP, value);
     }
+/*
+
+=item C<PMC* get_iter()>
+
+Return a new iterator for this PHPArray.
+
+=cut
+
+*/
+    PMC* get_iter() {
+        PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *key = pmc_new(INTERP, enum_class_Key);
+
+        PMC_struct_val(iter) = key;
+        PMC_int_val(iter) = 1;
+
+        /*tell Parrot_Key_nextkey_keyed to let me do my own iterating*/
+        PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
+
+        return iter;
+    }
+
 
 /*
 
@@ -1137,18 +1218,36 @@ Return the string value of the element at C<key>.
 
         PMC *box, *next_key;
         INTVAL index_i, key_t, next_key_t;
-        STRING *index_s;
+        STRING *index_s, *key_str;
         char key_is_int;
+        char *key_cstr;
+        HashTable *ht;
 
-        STRING *key_str = key_set_to_string(INTERP, key);
-        char *key_cstr = string_to_cstring(INTERP, key_str);
-        dprintf("get_pmc_keyed called with key = %s\n", key_cstr);
-        string_cstring_free(key_cstr);
+        ht = (HashTable*)PMC_struct_val(SELF);
 
-        /*if key is null*/
         if (key == NULL) {
             return 0;
         }
+        else if (PObj_get_FLAGS(key) & KEY_hash_iterator_FLAGS) {
+            dprintf("pmc keyed magic time\n");
+            if (ht->internalPointer == NULL) {
+                 return PMCNULL;
+            }
+            next_key = ht->internalPointer->key;
+            ht->internalPointer = ht->internalPointer->tableNext;
+            return next_key;
+        }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
+        key_str = key_set_to_string(INTERP, key);
+        key_cstr = string_to_cstring(INTERP, key_str);
+        dprintf("get_pmc_keyed called with key = %s\n", key_cstr);
+        string_cstring_free(key_cstr);
 
         key_t = key_type(INTERP, key);
 
@@ -1251,18 +1350,24 @@ Return the string value of the element at C<key>.
     STRING* get_string_keyed(PMC *key) {
         PMC *box, *next_key;
         INTVAL index_i, key_t, next_key_t;
-        STRING *index_s;
+        STRING *index_s, *key_str;
         char key_is_int;
+        char *key_cstr;
 
-        STRING *key_str = key_set_to_string(INTERP, key);
-        char *key_cstr = string_to_cstring(INTERP, key_str);
-        dprintf("get_string_keyed called with key = %s\n", key_cstr);
-        string_cstring_free(key_cstr);
-
-        /*if key is null*/
         if (key == NULL) {
             return 0;
         }
+        if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
+        key_str = key_set_to_string(INTERP, key);
+        key_cstr = string_to_cstring(INTERP, key_str);
+        dprintf("get_string_keyed called with key = %s\n", key_cstr);
+        string_cstring_free(key_cstr);
 
         key_t = key_type(INTERP, key);
 
@@ -1627,15 +1732,21 @@ Associate C<key> with C<value>.
         char *key_cstr;
         char key_is_int;
 
+        if (key == NULL) {
+            return;
+        }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
+
         key_str = key_set_to_string(INTERP, key);
         key_cstr = string_to_cstring(INTERP, key_str);
         dprintf("set_integer_keyed called with value = %d and key = %s\n", (int)value, key_cstr);
         string_cstring_free(key_cstr);
-
-        /*if key is null*/
-        if (key == NULL) {
-            return;
-        }
 
         key_t = key_type(INTERP, key);
 
@@ -1729,15 +1840,20 @@ Associate C<key> with C<value>.
         char *key_cstr;
         char key_is_int;
 
+        if (key == NULL) {
+            return;
+        }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
         key_str = key_set_to_string(INTERP, key);
         key_cstr = string_to_cstring(INTERP, key_str);
         dprintf("set_number_keyed called with value = %d and key = %s\n", (int)value, key_cstr);
         string_cstring_free(key_cstr);
-
-        /*if key is null*/
-        if (key == NULL) {
-            return;
-        }
 
         key_t = key_type(INTERP, key);
 
@@ -1827,15 +1943,20 @@ Associate C<key> with C<value>.
         char *key_cstr;
         char key_is_int;
 
+        if (key == NULL) {
+            return;
+        }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
         key_str = key_set_to_string(INTERP, key);
         key_cstr = string_to_cstring(INTERP, key_str);
         dprintf("set_pmc_keyed called with value = %d and key = %s\n", (int)value, key_cstr);
         string_cstring_free(key_cstr);
-
-        /*if key is null*/
-        if (key == NULL) {
-            return;
-        }
 
         key_t = key_type(INTERP, key);
 
@@ -1930,17 +2051,22 @@ Associate C<key> with C<value>.
         char *key_cstr, *val_cstr;
         char key_is_int;
 
+        if (key == NULL) {
+            return;
+        }
+        else if (PMC_type(key) == enum_class_String) {
+            key = key_new_string(INTERP, VTABLE_get_string(INTERP, key));
+        }
+        else if (PMC_type(key) == enum_class_Integer) {
+            key = key_new_integer(INTERP, VTABLE_get_integer(INTERP, key));
+        }
+
         key_str = key_set_to_string(INTERP, key);
         key_cstr = string_to_cstring(INTERP, key_str);
         val_cstr = string_to_cstring(INTERP, value);
         dprintf("set_string_keyed called with value = '%s' and key = %s\n", val_cstr, key_cstr);
         string_cstring_free(key_cstr);
         string_cstring_free(val_cstr);
-
-        /*if key is null*/
-        if (key == NULL) {
-            return;
-        }
 
         key_t = key_type(INTERP, key);
 

@@ -300,7 +300,6 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'iterator' );
     .local pmc iter, p, val
 
     p = new 'PHPArray'
-    iter = new 'Iterator', p
 
     p['FOO'] = 'The '
     p[25]    = 'iterator '
@@ -308,11 +307,14 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'iterator' );
     p[-87]   = 'doing '
     p['BUZ'] = 'the '
     p['x']   = 'right '
-    p[1]     = 'thing.\n'
+    p[1]     = "thing.\n"
+
+    iter = new 'Iterator', p
 
 iter_loop:
     unless iter, iter_end
     val = shift iter
+    val = p[val]
     print val
     goto iter_loop
 iter_end:
@@ -322,63 +324,178 @@ CODE
 The iterator is doing the right thing.
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'add' );
-.HLL 'PHP', 'php_group'
-.sub _main
-    .local pmc p1, p2, p3
-
-    p1 = new 'PHPArray'
-    p2 = new 'PHPArray'
-    p3 = new 'PHPArray'
-
-    p1[0] = 'It '
-    p1[1] = 'looks '
-    p2[2] = 'like'
-    p2[3] = ' add '
-    p1[4] = 'is working.\n'
-    p2[4] = 'is broken.\n'
-
-    p3 = p1 + p2
-    
-    print p3[0]
-    print p3[1]
-    print p3[2]
-    print p3[3]
-    print p3[4]
-
-.end
-CODE
-OUTPUT
-
-
-pir_output_is( << 'CODE', << 'OUTPUT', 'add_i' );
+pir_output_is( << 'CODE', << 'OUTPUT', 'cmp - shallow tests' );
 .HLL 'PHP', 'php_group'
 .sub _main
     .local pmc p1, p2
+    .local int i
 
     p1 = new 'PHPArray'
     p2 = new 'PHPArray'
-    p3 = new 'PHPArray'
 
-    p1[0] = 'It '
-    p1[1] = 'looks '
-    p2[2] = 'like'
-    p2[3] = ' add '
-    p1[4] = 'is working.\n'
-    p2[4] = 'is broken.\n'
+    i = cmp p1, p2
+    print "test 0:"
+    print i
+    print "\n"
 
-    p1 += p2
-    
-    print p1[0]
-    print p1[1]
-    print p1[2]
-    print p1[3]
-    print p1[4]
+    p1['Foo'] = 'bar'
+    p1[224]   = 'quux'
+    p1['box'] = 3882
+    p1[828]   = 894
+
+    p2[828]   = 894
+    p2['box'] = 3882
+    p2[224]   = 'quux'
+    p2['Foo'] = 'bar'
+
+    i = cmp p1, p2
+    print "test 1:"
+    print i
+    print "\n"
+
+    p1[828] = 'bub'
+
+    i = cmp p1, p2
+    print "test 2:"
+    print i
+    print "\n"
+
+    p2['xxx'] = 0
+
+    i = cmp p1, p2
+    print "test 3:"
+    print i
+    print "\n"
 
 .end
 CODE
-foo
+test 0:0
+test 1:0
+test 2:1
+test 3:-1
 OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'cmp - deep tests' );
+.HLL 'PHP', 'php_group'
+.sub _main
+    .local pmc p1, p1a, p1b 
+    .local pmc p2, p2a, p2b, p2c
+    .local int i
+
+    p1 = new 'PHPArray'
+    p1a = new 'PHPArray'
+    p1b = new 'PHPArray'
+
+    p2 = new 'PHPArray'
+    p2a = new 'PHPArray'
+    p2b = new 'PHPArray'
+    p2c = new 'PHPArray'
+
+    p1['a'] = p1a
+    p1['b'] = p1b
+
+    p2['a'] = p2a
+    p2['b'] = p2b
+
+    i = cmp p1, p2
+    print "test 0:"
+    print i
+    print "\n"
+
+    p1['fooo'] = 0
+    p2['fooo'] = 0
+
+    p1['a';'box'] = 9
+    p1['b';8] = 123
+    p1['b';9] = 'mismatch'
+    p2['a';'box'] = 9
+    p2['b';8] = 123
+
+    i = cmp p1, p2
+    print "test 1:"
+    print i
+    print "\n"
+
+    p2['b';9] = 'mismatch'
+
+    i = cmp p1, p2
+    print "test 2:"
+    print i
+    print "\n"
+
+    p2['c'] = p2c
+    p1['c'] = 'o'
+
+    i = cmp p1, p2
+    print "test 3:"
+    print i
+    print "\n"
+
+.end
+CODE
+test 0:0
+test 1:1
+test 2:0
+test 3:1
+OUTPUT
+
+#pir_output_is( << 'CODE', << 'OUTPUT', 'add' );
+#.HLL 'PHP', 'php_group'
+#.sub _main
+#    .local pmc p1, p2, p3
+#
+#    p1 = new 'PHPArray'
+#    p2 = new 'PHPArray'
+#    p3 = new 'PHPArray'
+#
+#    p1[0] = 'It '
+#    p1[1] = 'looks '
+#    p2[2] = 'like'
+#    p2[3] = ' add '
+#    p1[4] = 'is working.\n'
+#    p2[4] = 'is broken.\n'
+#
+#    p3 = p1 + p2
+#    
+#    print p3[0]
+#    print p3[1]
+#    print p3[2]
+#    print p3[3]
+#    print p3[4]
+#
+#.end
+#CODE
+#It looks like add is working.
+#OUTPUT
+#
+#
+#pir_output_is( << 'CODE', << 'OUTPUT', 'i_add' );
+#.HLL 'PHP', 'php_group'
+#.sub _main
+#    .local pmc p1, p2
+#
+#    p1 = new 'PHPArray'
+#    p2 = new 'PHPArray'
+#
+#    p1[0] = 'It '
+#    p1[1] = 'looks '
+#    p2[2] = 'like'
+#    p2[3] = ' i_add '
+#    p1[4] = "is working.\n"
+#    p2[4] = "is broken.\n"
+#
+#    p1 += p2
+#    
+#    print p1[0]
+#    print p1[1]
+#    print p1[2]
+#    print p1[3]
+#    print p1[4]
+#
+#.end
+#CODE
+#It looks like i_add is working.
+#OUTPUT
 
 
 # Local Variables:
