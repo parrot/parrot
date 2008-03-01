@@ -466,11 +466,9 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
 
         for (t = 0; t < 4; ++t) {
             if (types[t] == dest->set) {
-                if (temps[t])
-                    src = temps[t];
-                else {
-                    src = temps[t] = mk_temp_reg(interp, dest->set);
-                }
+                if (!temps[t])
+                    temps[t] = mk_temp_reg(interp, dest->set);
+                src = temps[t];
                 break;
             }
         }
@@ -650,7 +648,7 @@ This is the nuts and bolts of pdd03 routine call style
 */
 
 void
-expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
+expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
     SymReg *arg, *reg, *regs[3];
     int          n;

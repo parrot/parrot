@@ -359,11 +359,12 @@ void expand_pcc_sub(PARROT_INTERP,
 
 void expand_pcc_sub_call(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
-    ARGIN(Instruction *ins))
+    ARGMOD(Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*unit);
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins);
 
 void expand_pcc_sub_ret(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
