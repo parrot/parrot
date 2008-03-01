@@ -344,6 +344,28 @@ C<languages/eclectus>
 
 =back
 
+=head2 ECMAScript
+
+=over 4
+
+=item Description
+
+Implementation of ECMAScript 3 (a JavaScript standard)
+
+=item Status
+
+Parser is complete. Simple arithmetic and function calls work.
+Much work needed on parse actions and data types (PMCs or classes.
+
+=item Last verified with parrot version
+
+0.5.3
+
+=item Location
+
+C<languages/ecmascript>
+
+=back
 
 =head2 forth
 
