@@ -34,7 +34,7 @@ BEGIN {
     eval { require Moose };
     plan $@
         ? (skip_all => 'Moose not installed')
-        : (tests => 65);
+        : (tests => 66);
 }
 
 BEGIN {
