@@ -161,11 +161,11 @@ PARROT_CAN_RETURN_NULL
 static SymReg *
 _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
 {
-    const int i = hash_str(name) % hsh->size;
+    const unsigned int i = hash_str(name) % hsh->size;
     SymReg   *p;
 
     for (p = hsh->data[i]; p; p = p->next) {
-        if (STREQ(name, p->name) && (t == p->set))
+        if ((t == p->set) && STREQ(name, p->name))
             return p;
     }
 
