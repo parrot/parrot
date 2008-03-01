@@ -232,7 +232,7 @@ pir_2_pasm_like( <<'CODE', <<'OUT', "in P param" );
     end
 .end
 .sub foo
-    .param Undef a
+    .param pmc a
     print a
 .end
 CODE

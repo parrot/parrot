@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -656,10 +656,10 @@ TEMPLATE
 
 my $code = repeat(
     $template2, 18,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
+    LOCALS => ".local pmc a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
-    PARAMS => '.param Integer a<index>',
+    PARAMS => '.param pmc a<index>',
     TESTS  => "set I0, a<index>\nne I0, <index>, fail",
     TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
 );
@@ -670,10 +670,10 @@ OUT
 
 $code = repeat(
     $template2, 22,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
+    LOCALS => ".local pmc a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
-    PARAMS => '.param Integer a<index>',
+    PARAMS => '.param pmc a<index>',
     TESTS  => "set I0, a<index>\nne I0, <index>, fail",
     TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
 );
@@ -684,10 +684,10 @@ OUT
 
 $code = repeat(
     $template2, 40,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
+    LOCALS => ".local pmc a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
-    PARAMS => '.param Integer a<index>',
+    PARAMS => '.param pmc a<index>',
     TESTS  => "set I0, a<index>\nne I0, <index>, fail",
     TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
 );
@@ -698,10 +698,10 @@ OUT
 
 $code = repeat(
     $template2, 60,
-    LOCALS => ".local Integer a<index>\n\ta<index> = new 'Integer'",
+    LOCALS => ".local pmc a<index>\n\ta<index> = new 'Integer'",
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
-    PARAMS => '.param Integer a<index>',
+    PARAMS => '.param pmc a<index>',
     TESTS  => "set I0, a<index>\nne I0, <index>, fail",
     TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
 );
