@@ -161,7 +161,8 @@ ok( $f3->modified_since($time), 'modified_since' );
 $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
 ok( $f->has_svn_id(), 'has_svn_id' );
 
-ok($f->svn_id() =~ /^(?:\$)Id: File.pm \d+ \d{4}-\d\d-\d\d \d\d:\d\d:\d\dZ [^\$]+ \$$/, 'svn_id');
+ok($f->svn_id() =~ /^(?:\$)Id:.*?File.pm \d+ \d{4}-\d\d-\d\d.*?[^\$]+ \$$/,
+    'svn_id');
 
 $f3->delete();
 @a = $d2->files();
