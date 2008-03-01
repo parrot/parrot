@@ -3,7 +3,7 @@
 # Setup some commands
 LN_S     = @lns@
 PERL     = @perl@
-RM_RF    = @rm_rf@
+RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
 CP       = @cp@
@@ -29,7 +29,7 @@ $(PARROT_LIBRARY)/PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
 PGE.pbc: $(PARROT) $(SOURCES)
-	$(RM_RF) PGE.pbc $(PARROT_LIBRARY)/PGE.pbc
+	$(RM_F) PGE.pbc $(PARROT_LIBRARY)/PGE.pbc
 	$(PERL) -e "" >PGE/builtins_gen.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
 	$(PARROT) $(PARROT_LIBRARY)/PGE/Perl6Grammar.pir  --output=PGE/builtins_gen.pir PGE/builtins.pg
@@ -59,20 +59,20 @@ test: all
 	cd $(TOOL_DIR); prove -r t/compilers/pge
 
 testclean:
-	$(RM_RF) "../../t/compilers/pge/*.pir" \
+	$(RM_F) "../../t/compilers/pge/*.pir" \
 	    "../../t/compilers/pge/p5regex/*.pir" \
 	    "../../t/compilers/pge/p6regex/*.pir"
-	$(RM_RF) "../../t/compilers/pge/*.pbc" \
+	$(RM_F) "../../t/compilers/pge/*.pbc" \
 	    "../../t/compilers/pge/p5regex/*.pbc" \
 	    "../../t/compilers/pge/p6regex/*.pbc"
 
 clean: testclean
-	$(RM_RF) \
+	$(RM_F) \
     PGE.pbc \
     $(PARROT_LIBRARY)/PGE.pbc \
     PGE/builtins_gen.pir
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean

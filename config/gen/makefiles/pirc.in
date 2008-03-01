@@ -3,7 +3,6 @@
 # Setup some commands
 LN_S          = @lns@
 PERL          = @perl@
-RM_RF         = @rm_rf@
 RM_F          = @rm_f@
 PARROT        = ../../parrot@exe@
 TOOL_DIR      = ../..
@@ -119,7 +118,7 @@ clean:
 	$(RM_F) *$(O)
 
 realclean: clean
-	$(RM_RF) \
+	$(RM_F) \
   Makefile \
   pirc$(EXE) \
   doc/*.html

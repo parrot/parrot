@@ -3,7 +3,7 @@
 # Setup some commands
 LN_S     = @lns@
 PERL     = @perl@
-RM_RF    = @rm_rf@
+RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
 CP       = @cp@
@@ -56,9 +56,9 @@ CLEANUPS = \
 
 
 clean:
-	$(RM_RF) $(CLEANUPS)
+	$(RM_F) $(CLEANUPS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean

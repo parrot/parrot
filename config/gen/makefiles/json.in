@@ -1,7 +1,7 @@
 # $Id$
 
 PERL     = @perl@
-RM_RF    = @rm_rf@
+RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 
 TOOL_DIR = ../..
@@ -33,7 +33,7 @@ test: all
 	cd $(TOOL_DIR) && prove -r t/compilers/json
 
 testclean:
-	$(RM_RF) "../../t/compilers/json/*.pir" \
+	$(RM_F) "../../t/compilers/json/*.pir" \
 
 JSON.pbc : JSON/grammar.pbc JSON/pge2pir.pbc JSON.pir
 	$(PARROT) --output=JSON.pbc JSON.pir

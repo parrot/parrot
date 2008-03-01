@@ -3,7 +3,7 @@
 # Setup some commands
 LN_S     = @lns@
 PERL     = @perl@
-RM_RF    = @rm_rf@
+RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 PGE_DIR   = ../../compilers/pge
 CP       = @cp@
@@ -62,10 +62,10 @@ test: all
 	prove -r ../../t/compilers/tge
 
 testclean:
-	$(RM_RF) "../../t/compilers/tge/*.pir"
+	$(RM_F) "../../t/compilers/tge/*.pir"
 
 clean: testclean
-	$(RM_RF) TGE.pbc \
+	$(RM_F) TGE.pbc \
 	TGE/Rule.pbc \
 	TGE/Parser.pir \
 	TGE/Parser.pbc \
@@ -75,6 +75,6 @@ clean: testclean
 	$(PARROT_LIBRARY)/TGE.pbc
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean
