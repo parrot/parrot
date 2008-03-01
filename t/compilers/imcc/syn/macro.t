@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -204,7 +204,7 @@ unlink('macro.tempfile');
 pir_output_is( <<'CODE', <<'OUTPUT', '.newid' );
 .sub test :main
 .macro newid(ID, CLASS)
-    .local .CLASS .ID
+    .local pmc .ID
     .ID = new .CLASS
 .endm
     .newid(var, Undef)
@@ -220,7 +220,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', '.newlex' );
 .sub test :main
 .macro newlex(ID, CLASS)
-    .local .CLASS .ID
+    .local pmc .ID
     .ID = new .CLASS
     # store_lex -1, .ID , .ID    # how to stringify .ID
 .endm

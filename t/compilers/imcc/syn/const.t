@@ -1,14 +1,15 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+use vars qw($TODO);
+
 use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 34;
-use vars qw($TODO);
 
 pir_output_is( <<'CODE', <<'OUT', "globalconst 1" );
 
@@ -71,7 +72,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "array/hash consts" );
 .sub 'main' :main
-   .local Array ar
+   .local pmc ar
    .local pmc ha
    .local string key1
    .const string key2 = "key2"
