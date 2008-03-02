@@ -44,8 +44,8 @@ strings.
 
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \
-    PARROT_ASSERT(s->encoding); \
-    PARROT_ASSERT(s->charset); \
+    PARROT_ASSERT((s)->encoding); \
+    PARROT_ASSERT((s)->charset); \
     PARROT_ASSERT(!PObj_on_free_list_TEST(s))
 
 /* HEADERIZER HFILE: include/parrot/string_funcs.h */
@@ -1367,11 +1367,8 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 string_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
-    if (!s1 && !s2)
-        return 0;
-
     if (!s2)
-        return s1->strlen != 0;
+        return s1 && (s1->strlen != 0);
 
     if (!s1)
         return -(s2->strlen != 0);
