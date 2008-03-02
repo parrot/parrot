@@ -73,9 +73,10 @@ static void do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction* func_ins(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
-    SymReg *lhs,
+    ARGIN(SymReg *lhs),
     ARGIN(const char *op),
     ARGMOD(SymReg **r),
     int n,
@@ -83,11 +84,13 @@ static Instruction* func_ins(PARROT_INTERP,
     int emit)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
+PARROT_CAN_RETURN_NULL
 static Instruction * iINDEXFETCH(PARROT_INTERP,
     IMC_Unit *unit,
     SymReg *r0,
@@ -95,6 +98,7 @@ static Instruction * iINDEXFETCH(PARROT_INTERP,
     SymReg *r2)
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
 static Instruction * iINDEXSET(PARROT_INTERP,
     IMC_Unit * unit,
     SymReg * r0,
@@ -102,7 +106,10 @@ static Instruction * iINDEXSET(PARROT_INTERP,
     SymReg * r2)
         __attribute__nonnull__(1);
 
-static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0)
+PARROT_CANNOT_RETURN_NULL
+static Instruction * iLABEL(PARROT_INTERP,
+    ARGMOD_NULLOK(IMC_Unit *unit),
+    SymReg *r0)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -110,6 +117,7 @@ PARROT_CAN_RETURN_NULL
 static const char * inv_op(ARGIN(const char *op))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static Instruction * iSUBROUTINE(PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(SymReg *r))
@@ -117,6 +125,7 @@ static Instruction * iSUBROUTINE(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction * MK_I(PARROT_INTERP,
     IMC_Unit *unit,
     ARGIN(const char *fmt),
@@ -188,6 +197,7 @@ static void set_lexical(PARROT_INTERP,
  *        code.
  */
 PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction *
 MK_I(PARROT_INTERP, IMC_Unit *unit, ARGIN(const char *fmt), int n, ...)
 {
@@ -274,8 +284,9 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction*
-func_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), SymReg *lhs, ARGIN(const char *op),
+func_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *lhs), ARGIN(const char *op),
          ARGMOD(SymReg **r), int n, int keyv, int emit)
 {
     int i;
@@ -300,8 +311,9 @@ clear_state(PARROT_INTERP)
     IMCC_INFO(interp) -> keyvec = 0;
 }
 
+PARROT_CANNOT_RETURN_NULL
 Instruction *
-INS_LABEL(PARROT_INTERP, IMC_Unit *unit, ARGMOD(SymReg *r0), int emit)
+INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0), int emit)
 {
 
     Instruction * const ins = _mk_instruction("", "%s:", 1, &r0, 0);
@@ -314,8 +326,9 @@ INS_LABEL(PARROT_INTERP, IMC_Unit *unit, ARGMOD(SymReg *r0), int emit)
     return ins;
 }
 
+PARROT_CANNOT_RETURN_NULL
 static Instruction *
-iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0)
+iLABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), SymReg *r0)
 {
     Instruction * const i = INS_LABEL(interp, unit, r0, 1);
     i->line               = IMCC_INFO(interp)->line;
@@ -324,6 +337,7 @@ iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0)
     return i;
 }
 
+PARROT_CANNOT_RETURN_NULL
 static Instruction *
 iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r))
 {
@@ -342,6 +356,7 @@ iSUBROUTINE(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *r))
 /*
  * substr or X = P[key]
  */
+PARROT_CAN_RETURN_NULL
 static Instruction *
 iINDEXFETCH(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, SymReg *r1, SymReg *r2)
 {
@@ -358,6 +373,7 @@ iINDEXFETCH(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, SymReg *r1, SymReg *r2)
  * substr or P[key] = X
  */
 
+PARROT_CAN_RETURN_NULL
 static Instruction *
 iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
           SymReg * r0, SymReg * r1, SymReg * r2)
@@ -374,7 +390,7 @@ iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
         IMCC_fataly(interp, E_SyntaxError,
             "unsupported indexed set op\n");
     }
-    return 0;
+    return NULL;
 }
 
 PARROT_WARN_UNUSED_RESULT
