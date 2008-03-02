@@ -96,6 +96,9 @@ Rips apart a C file to get the function declarations.
 sub extract_function_declarations {
     my $text = shift;
 
+    # Only check the YACC C code if we find what looks like YACC file
+    $text =~ s[%\{(.*)%\}.*][$1]sm;
+
     # Drop all text after HEADERIZER STOP
     $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
 
@@ -161,7 +164,6 @@ sub extract_function_declarations_and_update_source {
     close $fhin;
 
     my @func_declarations = extract_function_declarations( $text );
-
     for my $decl ( @func_declarations ) {
         my $specs = function_components_from_declaration( $cfile_name, $decl );
         my $name = $specs->{name};
@@ -428,12 +430,15 @@ sub main {
 
         $ofile =~ s/\\/\//g;
 
-        my $sfile = $ofile;
-        $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
-        next if -f $sfile;
+        my $is_yacc = ($ofile =~ /\.y$/);
+        if ( !$is_yacc ) {
+            my $sfile = $ofile;
+            $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
+            next if -f $sfile;
+        }
 
         my $cfile = $ofile;
-        $cfile =~ s/\Q$PConfig{o}\E$/.c/
+        $cfile =~ s/\Q$PConfig{o}\E$/.c/ or $is_yacc
             or die "$cfile doesn't look like an object file";
 
         my $pmcfile = $ofile;
@@ -450,7 +455,7 @@ sub main {
         }
 
         my @decls;
-        if ( $macro_match || -f $pmcfile ) {
+        if ( $macro_match || (-f $pmcfile && !$is_yacc) ) {
             @decls = extract_function_declarations( $csource );
         }
         else {
@@ -492,7 +497,8 @@ sub main {
             for my $cfile ( sort keys %{$cfiles} ) {
                 my @funcs = @{ $cfiles->{$cfile} };
                 @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
-                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
+                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs )
+                    unless $cfile =~ /\.y$/;
             }
 
             write_file( $hfile, $header );
