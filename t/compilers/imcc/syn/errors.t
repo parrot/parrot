@@ -56,7 +56,7 @@ pir_error_output_like( $test_3_pir_code, <<'OUT', "check parser recovery patienc
 /Too many errors. Correct some first.\n$/
 OUT
 
-pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'SomethingFunny isnt pmc' );
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'identifier SomethingFunny is unexpected' );
 .sub main :main
   .local SomethingFunny my_string
   my_string = new String
@@ -64,10 +64,10 @@ pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'SomethingFunny isnt pmc' 
   say my_string
 .end
 END_PIR
-/^error:imcc:Unknown PMC type 'SomethingFunny'/
+/^error:imcc:syntax error, unexpected IDENTIFIER, expecting/
 END_EXPECTED
 
-pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array isnt pmc', todo => 'still is' );
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array is on type, RT#42769' );
 .sub main :main
   .local Array my_string
   my_string = new String
@@ -75,7 +75,7 @@ pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array isnt pmc', todo => 
   say my_string
 .end
 END_PIR
-/^error:imcc:Unknown PMC type 'Array'/
+/^error:imcc:syntax error, unexpected IDENTIFIER, expecting/
 END_EXPECTED
 
 # Local Variables:
