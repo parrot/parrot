@@ -18,7 +18,7 @@ These tests cover the basic functionality of C<Parrot::Test>.
 
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 66;
 
 BEGIN {
     eval "use Test::Builder::Tester;";
@@ -296,9 +296,6 @@ CODE
 /not ok/
 OUTPUT
 test_test($desc);
-
-# remember to change the number of tests
-BEGIN { plan tests => 64; }
 
 # Local Variables:
 #   mode: cperl
