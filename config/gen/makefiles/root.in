@@ -597,6 +597,7 @@ $(GEN_LIBRARY) : $(PARROT)
 
 STR_FILES = \
     $(SRC_DIR)/builtin.str \
+    $(SRC_DIR)/hll.str \
     $(SRC_DIR)/inter_call.str \
     $(SRC_DIR)/inter_cb.str \
     $(SRC_DIR)/inter_create.str \
@@ -1051,7 +1052,7 @@ $(SRC_DIR)/gc/res_lea$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/headers$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/hll.str
 
 $(SRC_DIR)/platform$(O) : $(GENERAL_H_FILES)
 
