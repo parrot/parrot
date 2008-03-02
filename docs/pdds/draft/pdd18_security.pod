@@ -1,6 +1,6 @@
 =head1 NAME
 
-docs/pdds/pdd18_security.pod - Parrot's security model
+docs/pdds/pdd18_security.pod - Security Model
 
 =head1 ABSTRACT
 
@@ -12,140 +12,209 @@ $Revision$
 
 =head1 DESCRIPTION
 
-{{ NOTE: This PDD is inadequate. We want to provide a much more
-extensive level of sandboxing. }}
-
-There are three basic subsystems in Parrot's security system. They are:
+Parrot will be used in a variety of different application contexts, each with
+its own unique security needs.
 
 =over 4
 
-=item Quotas
+=item * Small devices such as cell phones need tight control over resource
+usage (CPU, memory, etc).
 
-To ensure that an interpreter doesn't use more CPU time, memory, or system
-resources than is allowed.
+=item * Web applications need filtering and validation of incoming data and
+blocks to prevent the use of unfiltered data in execution contexts (SQL, system
+calls, runtime eval, etc).
 
-=item Privilege checks
+=item * Web browser embedding, i.e. client-side execution of high-level
+languages, needs control over resource access on the client machine (local disk
+access, local network connections), sandboxing for downloaded code, limits on
+what code can be loaded and executed, and limits on certain dynamic features
+(runtime eval of code, modification of global namespaces).
 
-To restrict access to what an interpreter can do.
+=item * Database engine embedding, i.e. server-side execution of high-level
+languages as stored procedures, also needs control over resource access (disk
+access, network connections), and limits on loaded code, but additionally needs
+adminstrator configured lists of allowed libraries and library paths.
 
-=item Parameter checks
-
-To double-check bytecode parameters for basic sanity.
+=item * Security auditing tools need hooks in the compilation process for
+static analysis.
 
 =back
 
-Each of these can be enabled or disabled separately, and each has a particular
-purpose. Often two or more systems will be engaged at once, but this isn't
-required.
-
-=head2 Quotas
-
-The purpose of a quota system is to ensure that an interpreter doesn't use up
-too many resources -- usually memory and CPU, but there may be other scarce
-resources, such as files, that need managing. In a shared environment it
-prevents an interpreter from hogging too many resources, either explicitly (as
-in a DOS attack) or implicitly (through poor programming or poorly scheduled
-runs), and preventing other interpreters from running.
-
-=head2 Privilege checks
-
-A privilege system is used to restrict code from performing certain actions.
-When privilege checking is in force you may need a particular privilege to load
-a library, or open a file.
-
-Each interpreter has three sets of privileges. The first set is the I<current>
-privilege set, which is the set of privileges  currently in force. The second
-set is the set of I<authorized>  privileges. These are the privileges that the
-interpreter is  allowed to put into its current set. The third set are the
-I<sub> privileges. These are the privileges that a sub has intrinsic to itself,
-regardless of what the interpreter privileges currently are. (Subs with
-privileges attached to them are called I<privileged subs>, oddly enough).
-
-An interpreter may drop any privilege it likes from the current set. It may
-also at any time enable a privilege which is in the authorized set but not in
-the current set. It is possible for a sub to have a privilege in its current
-set which isn't in its authorized set. Those privileges are, once dropped,
-gone.
-
-Subroutines may also have a set of I<required privileges> attached to them. The
-current interpreter B<must> have those privileges in its current or sub set to
-call a subroutine so tagged. If the interpreter doesn't have the privileges
-then a privilege violation exception is thrown.
-
-=head2 Parameter checking
-
-In normal operation the interpreter assumes that the bytecode that it executes
-is valid -- that is, any parameters to opcodes are sane, data structures are
-intact, and the world, generally, is a good place. When parameter checking is
-enabled, however, we assume that bytecode is not necessarily valid. The
-interpreter then, at runtime, makes sure that all specified register numbers
-are within valid range, and string and PMC structures used are valid.
-
-=head2 Feature usage
-
-Each of the three features has a separate use. Parameter checking is most
-useful when executing code which may come from an unsafe source, for example
-from the network. Quotas are most useful when running code in a managed
-environment such as a web, database, or game server where no one interpreter is
-allowed to consume too many resources and impact the system too badly.
-Privileges are used when running untrusted code in a trusted environment, again
-such as a database or game server, where Parrot can't disable certain features,
-but must limit their use to trusted code.
-
-It's unlikely that any one of these features will be enabled individually,
-though there are certainly reasons to do so. Each feature is separately
-implemented, however, and as such can be taken singly and discussed.
-
 =head1 IMPLEMENTATION
 
-=head2 Quotas
+Parrot's security infrastructure is not an independent, encapsulated subsystem.
+It is a series of related features and functionality spread throughout the
+virtual machine. 
 
-Quota management is split into two separate parts, CPU time and everything
-else.
+=head2 Resource Quotas
 
-=head3 CPU time
-
-CPU time is managed by the runloop. There's a certain unavoidable overhead, but
-there's no way around this, at least not reliably. (We may be able to play
-interesting games with timer events and system event handlers. We'll see).
-
-=head3 Everything else
-
-The rest of the quotas are enforced by code scattered across the interpreter.
-The memory system handles memory quotas, the IO system handles file open and
-pending IO count quotas, and so on. There's not a whole lot for this, though we
-should abstract out all the high-level operations that do things which may have
-quotas applied so we can wrap these functions, so as not to pay the price when
-quotas aren't in force.
-
-For example, rather than having checks in the memory subsystem to see if quotas
-are enabled (a check that would have to be done on each memory allocation) we
-should instead access the memory allocation via a function pointer stored off
-the interpreter somewhere. This way when quotas are enabled we can swap in an
-alternate function pointer, one that points to a function which checks quotas
-before calling into the memory subsystem.
-
-This should be relatively painless as most, if not all, of the functions which
-should have quotas applied to them are also functions which embedders may wish
-to override, and thus already need to be accessed indirectly.
+Resource quotas ensure that an interpreter doesn't use more CPU time, memory,
+or system resources than are allowed. Quotas are most useful when running code
+in a managed environment such as a web, database, or game server where no one
+interpreter is allowed to consume too many resources and impact the system too
+badly. CPU time is managed by the runloop. The memory system handles memory
+quotas, the I/O system handles file open and pending I/O count quotas, and so
+on. 
 
 =head2 Privileges
 
+A privilege system is used to restrict code from performing certain
+actions. When privilege checking is in force the code may need a particular
+privilege to load a library, or open a file.
 
+Privileges can be quite broad, on the order of "allow file I/O", or as
+fine-grained as allowing/denying the right to run one particular opcode.
+Privileges are discrete entities, They are also hierarchical, one privilege can
+be specified to follow from another privilege (the privilege FOO may be
+automatically granted to anything with the privilege BAR). Anything with the
+ALL privilege is automatically granted all other privileges in the system.
+Privileges are user-definable, but user-defined privileges can only give grants
+of rights, they cannot take them (BAZ may grant its privileges to any user with
+FOO privileges, but it can't automatically grant itself all the FOO
+privileges).
 
-=head2 Parameter Checking
+A few example privileges:
 
-Parameter checking is done with an alternate runloop, one where the opcodes
-first check their parameters before executing. This is fairly expensive, which
-is why it isn't the default mode for operations. (The JIT may, at its choice,
-check parameters at JIT time). Checking at load time is also somewhat
-problematic, as it is also somewhat expensive, means the checker needs to know
-the signatures for ops which may not have been loaded yet, and precludes code
-doing overly clever things. (Which itself probably ought be forbidden, but
-that's a separate problem).
+=over 4
 
-The checking op variants are automatically generated by the op file
-preprocessor, the same way that it generates all the other oploop variants.
+=item ALL
+
+Granted all privileges.
+
+=item IO
+
+May run I/O operations.
+
+=item INVOKE
+
+May invoke subroutines, methods, or return continuations.
+
+=item RETURN
+
+May invoke return continuations (not subroutines or methods). (RETURN
+privileges are granted to anyone with INVOKE privileges.)
+
+=item SYSCALL
+
+May run a system call.
+
+=item COMPILE
+
+May compile code from string source at runtime (eval).
+
+=item LOAD
+
+May load libraries at runtime.
+
+=back
+
+=head3 Users
+
+For the most part, a "user" in the Parrot privilege system doesn't correspond
+to a literal user (though it may, if Parrot is running embedded in a database
+engine or multi-user gaming system). A user is a bundle of privileges,
+identified by a user ID, and authenticated with a pass key. The privilege ID
+can be cheaply passed around, and validated whenever a restricted action is
+performed.
+
+=head3 Opcode Disabling
+
+All opcodes in Parrot can be selectively disabled, by short name (C<print>),
+long name (including signature, C<print_sc>), or by group (C<io>, C<net>,
+C<load>, C<compile>). They can also be selectively enabled, by defining a
+privilege with "disable all", and then allowing only specific opcodes.
+
+When running in a secured mode, all dynamically loaded opcode libraries are
+disabled by default, and have to be explicitly enabled (individually, as a
+group, or by a system-wide configuration).
+
+Opcodes are tagged with their group in their definition, and may be tagged in
+multiple groups, as in:
+
+  inline op print(in INT) :base_io,io {
+      ...
+  }
+
+=head3 Library Loading
+
+In certain environments, it's desirable to be able to restrict what libraries
+may be loaded by code running on the virtual machine. The allowed library list
+is defined in a system-wide configuration file, or set at runtime by a user
+with administrative privileges. Libraries may be signed, with the key specified
+in the library list and verified on loading. Libraries that can't be signed (C
+libraries), can be check-summed to ensure that the library you load is the
+exact file you expect.
+
+Generally, library loading restrictions are useful in an embedded environment
+like a database engine or web browser, or a multi-user environment like a web
+hosting server, where arbitrarily extended behavior is a security risk. It can
+also be a useful development tool, as running your daily development
+environment with library loading restrictions turned on means you always know
+exactly what dependencies the code base has.
+
+=head3 Resource Access
+
+Access to resources such as the local disk, network, are controlled through the
+privilege system. Resource access limitations are a combination of disabled
+opcodes, blocked library loading, and privilege checks within standard
+libraries for I/O, network, etc.
+
+=head2 Sandboxing
+
+A sandbox is a virtual machine within the virtual machine. It's a safe zone to
+contain code from an untrusted source. In the extreme case, a sandbox is
+completely isolated from all outside code, with no access to read or write to
+the surrounding environment. In the general case, a sandbox will have the
+ability to read from, but not write to the surrounding environment (global
+namespaces, for example), with a very narrow and carefully filtered route to
+send some data back to the code that called it. The sandbox system works
+together with the privileges system, in that by default code in the sandbox has
+no privileges outside the sandbox, but may be granted privileges.
+
+=head2 Data Firewall
+
+Any data that originates from user input (command-line, user prompt, web form,
+file access, network operation) is a potential security risk. The best place to
+trap bad data is at the point of entry, before it touches a single line of
+code. When the data firewall is enabled, all data entering from an external
+source or crossing a sandbox barrier is subjected to filter rules. The filter
+rules in force are configurable, and filters can be selectively enabled and
+disabled for particular types and sources of data.
+
+Data filters can be sanitizing or validating. Sanitizing data filters modify
+the data as it passes (escaping quotes, encoding entities, etc). Validating
+filters check that the data meets certain conditions (the presence or absence
+of specific features), and when it fails to meet those conditions, the data is
+blocked from passing the firewall (returning an empty string or PMCNULL instead
+of the expected data). Data filters can also be user-defined, as a regular
+expression (PGE rule) or subroutine.
+
+The same filter rules applied within the data firewall can be called explicitly
+on any data.
+
+=head2 Bytecode Validation
+
+In normal operation the interpreter assumes that the bytecode that it executes
+is valid -- that is, any parameters to opcodes are sane, data structures are
+intact. When bytecode validation is enabled, however, Parrot assumes that
+bytecode is not necessarily valid. The interpreter then, at runtime, makes sure
+that all specified register numbers are within valid range, and string and PMC
+structures used are valid.
+
+=head2 Auditing Hooks
+
+Even in dynamic languages, it's possible to perform a degree of static analysis
+for security risks. The opcode syntax tree (OST) produced by the language
+compiler is a good data source for static analysis checks, because it's
+low-level enough that you can check for individual opcodes that will be called
+(checking for I/O, networking, and other similar operations, or unknown
+dynamically-loaded opcodes), and high-level enough that you still have access
+to substantial metadata from the parse. The standard compiler tools already
+have the ability to add and remove stages from the compilation process. Static
+analysis tools can be implemented by stopping the standard compilation at the
+OST phase, and inserting an additional phase to scan the OST. Because the OST
+form is standard across high-level languages running on Parrot, the tools can
+be written once and applied to many languages.
 
 =head1 ATTACHMENTS
 
@@ -158,6 +227,10 @@ preprocessor, the same way that it generates all the other oploop variants.
 "Exploring the Broken Web": http://talks.php.net/show/osdc07
 
 "Safe ERB": http://agilewebdevelopment.com/plugins/safe_erb
+
+pecl/filter: http://us2.php.net/filter
+
+Rasmus Lerdorf for the term "data firewall".
 
 =cut
 
