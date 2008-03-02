@@ -186,9 +186,6 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
     } while (0);
 #else /* not PARROT_GC_GMS */
 
-    if (PObj_constant_TEST(obj) && PObj_custom_mark_TEST(obj))
-        VTABLE_mark(interp, (PMC *)obj);
-
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj))
         return;
@@ -216,7 +213,7 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
     /* if object is a PMC and contains buffers or PMCs, then attach
      * the PMC to the chained mark list.
      */
-    if (PObj_is_special_PMC_TEST(obj) && !PObj_constant_TEST(obj)) {
+    if (PObj_is_special_PMC_TEST(obj)) {
         mark_special(interp, (PMC*) obj);
     }
 #  ifndef NDEBUG
