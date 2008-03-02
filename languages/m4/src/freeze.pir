@@ -34,7 +34,7 @@ Dump a state file.
   .local pmc symtab
   symtab = state['symtab']
 
-  .local Hash  symbol
+  .local pmc       symbol
   .local int       len
   .local string    name
   .local string    text
