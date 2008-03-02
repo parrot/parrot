@@ -91,7 +91,7 @@ hello\n
 (in\salarm!\t\d\d:\d\d:\d\d\t\d+\t\d+%\n)+
 100000\n
 bye
-/gmx
+/mx
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (bad delay)' );
