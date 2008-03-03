@@ -240,16 +240,17 @@ newline or semicolon after an end keyword."
   '(".local" ".sym" ".param"))
 
 (defvar pir-begin-keywords
-  '(".sub" ".emit" ".begin_yield" ".begin_return"
+  '(".sub" ".emit" ".macro" ".begin_yield" ".begin_return"
     ".begin_call" ".namespace"))
 
 (defvar pir-end-keywords
-  '(".end" ".eom" ".end_yield" ".end_return"
+  '(".end" ".eom" ".endm" ".end_yield" ".end_return"
     ".end_call" ".endnamespace"))
 
 (defvar pir-block-match-alist
   '((".sub" ".end" 1)
     (".emit" ".eom" 1)
+    (".macro" ".endm" 1)
     (".begin_yield" ".end_yield" 0)
     (".begin_return" ".end_return" 0)
     (".begin_call" ".end_call" 0)
