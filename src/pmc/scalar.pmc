@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1501,7 +1501,7 @@ Sets this PMC as shared and read-only.
         VTABLE_set_integer_native(INTERP, _true, 1);
 
         /* first set readonly */
-        VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), _true);
+        VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
 
         /* now share; we add a PMC_EXT so we can identify the owning interp */
         add_pmc_sync(INTERP, ret);

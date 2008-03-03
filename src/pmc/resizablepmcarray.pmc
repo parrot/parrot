@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -663,10 +663,10 @@ Returns the Parrot string representation C<ResizablePMCArray>.
             res      = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
 
             if (j < n - 1)
-                res = string_append(INTERP, res, const_string(INTERP, ", "));
+                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        return string_append(INTERP, res, const_string(INTERP, " ]"));
+        return string_append(INTERP, res, CONST_STRING(INTERP, " ]"));
     }
 
 /*

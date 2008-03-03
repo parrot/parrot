@@ -343,10 +343,10 @@ Returns the Parrot string representation C<key>.
             res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
 
             if (j < n - 1)
-                res = string_append(INTERP, res, const_string(INTERP, ", "));
+                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = string_append(INTERP, res, const_string(INTERP, " ]"));
+        res = string_append(INTERP, res, CONST_STRING(INTERP, " ]"));
         return res;
     }
 

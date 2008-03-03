@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -18,6 +18,7 @@ src/dynext.c - Dynamic extensions to Parrot
 
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
+#include "dynext.str"
 
 /* HEADERIZER HFILE: include/parrot/dynext.h */
 
@@ -372,7 +373,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     VTABLE_set_pointer(interp, lib_pmc, handle);
 
     if (!load_func)
-        type = const_string(interp, "NCI");
+        type = CONST_STRING(interp, "NCI");
     else {
         /* we could set a private flag in the PMC header too
          * but currently only ops files have struct_val set
@@ -451,14 +452,14 @@ PMC *
 Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
 {
     STRING * const wo_ext = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
-        const_string(s, "_filename")));
+        CONST_STRING(s, "_filename")));
     STRING * const lib_name = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
-        const_string(s, "_lib_name")));
+        CONST_STRING(s, "_lib_name")));
     void * const handle = PMC_data(lib_pmc);
     STRING * const type = VTABLE_get_string(s,
-        VTABLE_getprop(s, lib_pmc, const_string(s, "_type")));
+        VTABLE_getprop(s, lib_pmc, CONST_STRING(s, "_type")));
 
-    if (!string_equal(s, type, const_string(s, "Ops"))) {
+    if (!string_equal(s, type, CONST_STRING(s, "Ops"))) {
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.

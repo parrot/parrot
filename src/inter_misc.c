@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -106,8 +106,7 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
     PMC    *const method   = VTABLE_get_pmc_keyed_str(
         interp, interp->vtables[type]->_namespace, str_name);
     VTABLE_set_integer_native(interp, pmc_true, 1);
-    VTABLE_setprop(interp, method, const_string(interp, "write"),
-                   pmc_true);
+    VTABLE_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
 }
 
 /*
@@ -161,13 +160,13 @@ PMC *
 Parrot_compile_string(PARROT_INTERP, ARGIN(STRING *type),
         ARGIN(const char *code), ARGOUT(STRING **error))
 {
-    if (string_compare(interp, const_string(interp, "PIR"), type) == 0)
+    if (string_compare(interp, CONST_STRING(interp, "PIR"), type) == 0)
         return IMCC_compile_pir_s(interp, code, error);
 
-    if (string_compare(interp, const_string(interp, "PASM"), type) == 0)
+    if (string_compare(interp, CONST_STRING(interp, "PASM"), type) == 0)
         return IMCC_compile_pasm_s(interp, code, error);
 
-    *error=const_string(interp, "Invalid interpreter type");
+    *error = CONST_STRING(interp, "Invalid interpreter type");
     return NULL;
 }
 

@@ -597,21 +597,26 @@ $(GEN_LIBRARY) : $(PARROT)
 
 STR_FILES = \
     $(SRC_DIR)/builtin.str \
+    $(SRC_DIR)/debug.str \
+    $(SRC_DIR)/dynext.str \
+    $(SRC_DIR)/exceptions.str \
+    $(SRC_DIR)/global.str \
+    $(SRC_DIR)/global_setup.str \
     $(SRC_DIR)/hll.str \
     $(SRC_DIR)/inter_call.str \
     $(SRC_DIR)/inter_cb.str \
     $(SRC_DIR)/inter_create.str \
     $(SRC_DIR)/inter_misc.str \
-    $(SRC_DIR)/global.str \
-    $(SRC_DIR)/global_setup.str \
     $(SRC_DIR)/key.str \
     $(SRC_DIR)/library.str \
     $(SRC_DIR)/mmd.str \
+    $(SRC_DIR)/packfile.str \
     $(SRC_DIR)/pmc.str \
     $(SRC_DIR)/oo.str \
     $(SRC_DIR)/scheduler.str \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \
+    $(SRC_DIR)/sub.str \
     $(CLASS_STR_FILES)
 
 $(SRC_DIR)/string_private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
@@ -1019,7 +1024,7 @@ $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h
 
-$(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/debug.str
 
 $(SRC_DIR)/jit_debug_xcoff$(O) : $(GENERAL_H_FILES)
 
@@ -1062,9 +1067,10 @@ $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debug.h
+$(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debug.h \
+    $(SRC_DIR)/debug.str
 
-$(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/sub.str
 
 $(SRC_DIR)/string$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/string_private_cstring.h
 
@@ -1072,9 +1078,9 @@ $(SRC_DIR)/string_primitives$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/longopt$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/dynext$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/dynext$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dynext.str
 
-$(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exceptions.str
 
 $(SRC_DIR)/events$(O) : $(GENERAL_H_FILES)
 
@@ -1129,7 +1135,7 @@ $(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/mmd.str
 
 $(SRC_DIR)/builtin$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/builtin.str
 
-$(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str
 
 $(PF_DIR)/pf_items$(O) : $(GENERAL_H_FILES)
 
@@ -2196,6 +2202,3 @@ smoke-clean :
 # mode: makefile
 # ex: ft=make
 # End:
-#
-
-

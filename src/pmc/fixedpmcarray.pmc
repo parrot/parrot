@@ -275,12 +275,12 @@ RT#46673 implement freeze/thaw and use that instead.
 
             res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
             if (n == 1)
-                res = string_append(INTERP, res, const_string(INTERP, ","));
+                res = string_append(INTERP, res, CONST_STRING(INTERP, ","));
             else if (i < n - 1)
-                res = string_append(INTERP, res, const_string(INTERP, ", "));
+                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = string_append(INTERP, res, const_string(INTERP, ")"));
+        res = string_append(INTERP, res, CONST_STRING(INTERP, ")"));
 
         return res;
     }

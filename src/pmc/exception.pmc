@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -271,11 +271,10 @@ Compare the passed in Exception with SELF. Returns True if C<SELF> isa C<value>
 
 */
     INTVAL is_equal(PMC *value) {
-        if (value->vtable->base_type == enum_class_Exception ||
-                VTABLE_isa(INTERP, value, const_string(INTERP, "Exception"))) {
-            /* RT#46689 check parents */
+        /* RT#46689 check parents */
+        if (value->vtable->base_type == enum_class_Exception
+        ||  VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Exception")))
             return 1;
-        }
 
         return 0;
     }

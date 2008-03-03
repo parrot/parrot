@@ -438,7 +438,7 @@ non-existent layers, returns an empty string.
         ParrotIOLayer *layer;
 
         if (!io)
-            return const_string(INTERP, "");
+            return CONST_STRING(INTERP, "");
 
         layer = io->stack;
 
@@ -453,7 +453,7 @@ non-existent layers, returns an empty string.
             if (last)
                 return string_from_cstring(INTERP, last->name, 0);
 
-            return const_string(INTERP, "");
+            return CONST_STRING(INTERP, "");
         }
 
         for (++n; n && layer; layer = layer->down, ++n)
@@ -462,7 +462,7 @@ non-existent layers, returns an empty string.
         if (layer)
             return string_from_cstring(INTERP, layer->name, 0);
 
-        return const_string(INTERP, "");
+        return CONST_STRING(INTERP, "");
     }
 /*
 

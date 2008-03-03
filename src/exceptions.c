@@ -32,6 +32,7 @@ Define the internal interpreter exceptions.
 
 #include "parrot/parrot.h"
 #include "parrot/exceptions.h"
+#include "exceptions.str"
 
 #ifdef PARROT_HAS_GLIBC_BACKTRACE
 #  include <execinfo.h>
@@ -212,10 +213,9 @@ PARROT_API
 void
 Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
 {
-    if (!VTABLE_isa(interp, sub,
-                const_string(interp, "Sub"))) {
+    if (!VTABLE_isa(interp, sub, CONST_STRING(interp, "Sub")))
         real_exception(interp, NULL, 1, "Tried to push a non Sub PMC action");
-    }
+
     stack_push(interp, &interp->dynamic_env, sub,
                STACK_ENTRY_ACTION, run_cleanup_action);
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -126,7 +126,7 @@ Returns the name of the loaded library.
 */
 
     STRING *get_string() {
-        STRING *key  = const_string(INTERP, "_filename");
+        STRING *key  = CONST_STRING(INTERP, "_filename");
         PMC    *prop = VTABLE_getprop(INTERP, SELF, key);
 
         return VTABLE_get_string(INTERP, prop);

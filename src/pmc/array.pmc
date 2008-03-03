@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1293,7 +1293,7 @@ Recursively make the array read-only and shared.
         ret   = pt_shared_fixup(INTERP, SELF);
 
         /* first set readonly */
-        VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), _true);
+        VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
 
         /* XXX do something that deals better with sparse lists */
         {

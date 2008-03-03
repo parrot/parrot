@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -390,7 +390,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
             /* grab the struct from the metadata */
             if (ptr->pmc_ext && PMC_metadata(ptr)) {
                 ret = VTABLE_getprop(interp, ptr,
-                        const_string(interp, "_struct"));
+                        CONST_STRING(interp, "_struct"));
             }
             else {
                 real_exception(interp, NULL, E_TypeError,

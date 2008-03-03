@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -20,6 +20,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "sub.str"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 
@@ -303,15 +304,14 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             return s->name;
         }
         else {
-            PMC *ns_array;
-            STRING *j;
+            PMC    *ns_array;
+            STRING *j = CONST_STRING(interp, ";");
             STRING *res;
 
             Parrot_block_DOD(interp);
             ns_array = Parrot_NameSpace_nci_get_name(interp, s->namespace_stash);
             if (s->name)
                 VTABLE_push_string(interp, ns_array, s->name);
-            j = const_string(interp, ";");
 
             res = string_join(interp, j, ns_array);
             Parrot_unblock_DOD(interp);
@@ -359,8 +359,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
     }
 
     /* fetch Parrot_sub of the current sub in the given context */
-    if (!VTABLE_isa(interp, ctx->current_sub,
-                    const_string(interp, "Sub")))
+    if (!VTABLE_isa(interp, ctx->current_sub, CONST_STRING(interp, "Sub")))
         return 1;
 
     sub = PMC_sub(ctx->current_sub);

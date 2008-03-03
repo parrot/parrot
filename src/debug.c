@@ -27,6 +27,7 @@ debugger, and the C<debug> ops.
 #include "trace.h"
 #include "parrot/debug.h"
 #include "parrot/oplib/ops.h"
+#include "debug.str"
 
 
 /* Not sure how we want to handle this sort of cross-project header */
@@ -2299,7 +2300,7 @@ PDB_compile(PARROT_INTERP, ARGIN(const char *command))
 {
     STRING     *buf;
     const char *end      = "\nend\n";
-    STRING     *key      = const_string(interp, "PASM");
+    STRING     *key      = CONST_STRING(interp, "PASM");
     PMC *compreg_hash    = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_COMPREG_HASH);
     PMC        *compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, key);

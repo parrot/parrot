@@ -29,6 +29,7 @@ structure of the frozen bytecode.
 #include "parrot/packfile.h"
 #include "jit.h"
 #include "../compilers/imcc/imc.h"
+#include "packfile.str"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -3574,7 +3575,7 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     self->type  = PFC_PMC;
     self->u.key = pmc;
 
-    _sub = const_string(interp, "Sub");    /* CONST_STRING */
+    _sub = CONST_STRING(interp, "Sub");    /* CONST_STRING */
     if (VTABLE_isa(interp, pmc, _sub)) {
         /*
          * finally place the sub into some namespace stash
@@ -3738,7 +3739,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN(STRING *file_str))
         interp->iglobals, IGLOBALS_PBC_LIBS);
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
-    pbc = const_string(interp, "pbc");
+    pbc = CONST_STRING(interp, "pbc");
     if (string_equal(interp, ext, pbc) == 0)
         file_type = PARROT_RUNTIME_FT_PBC;
     else

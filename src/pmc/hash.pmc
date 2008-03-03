@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -395,20 +395,20 @@ Return a representation of the hash contents.
                 res = string_append(INTERP, res, key);
             }
             else {
-                res = string_append(INTERP, res, const_string(INTERP, "'"));
+                res = string_append(INTERP, res, CONST_STRING(INTERP, "'"));
                 res = string_append(INTERP, res, key);
-                res = string_append(INTERP, res, const_string(INTERP, "'"));
+                res = string_append(INTERP, res, CONST_STRING(INTERP, "'"));
             }
 
-            res = string_append(INTERP, res, const_string(INTERP, ": "));
+            res = string_append(INTERP, res, CONST_STRING(INTERP, ": "));
             val = SELF.get_pmc_keyed_str(key);
             res = string_append(INTERP, res, VTABLE_get_string(INTERP, val));
 
             if (j < n - 1)
-                res = string_append(INTERP, res, const_string(INTERP, ", "));
+                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = string_append(INTERP, res, const_string(INTERP, "}"));
+        res = string_append(INTERP, res, CONST_STRING(INTERP, "}"));
 
         return res;
     }
