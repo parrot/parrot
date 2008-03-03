@@ -197,7 +197,12 @@ key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 =item C<static size_t key_hash_cstring>
 
-RT#48260: Not yet documented!!!
+Create a hash value from a string.
+
+Takes an interpreter, a pointer to a string, and a seed value.
+Returns the hash value.
+
+Used by Parrot_new_cstring_hash.
 
 =cut
 
@@ -401,7 +406,12 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info* info))
 
 =item C<static void hash_freeze>
 
-RT#48260: Not yet documented!!!
+Freeze hash into a string.
+
+Takes an interpreter, a pointer to the hash, and a pointer to the structure
+containing the string start location.
+
+Use by parrot_hash_visit.
 
 =cut
 
@@ -448,7 +458,9 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info* in
 
 =item C<void parrot_hash_visit>
 
-RT#48260: Not yet documented!!!
+Freeze or thaw hash as specified.
+Takes an interpreter, a pointer to the hash, and a pointer to the
+structure identifying what to do and the location of the string.
 
 =cut
 
@@ -739,7 +751,8 @@ create_hash(PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
 
 =item C<void parrot_hash_destroy>
 
-RT#48260: Not yet documented!!!
+Free the memory allocated to the specified hash and its bucket store.
+Used by Parrot_chash_destroy.
 
 =cut
 
@@ -757,7 +770,8 @@ parrot_hash_destroy(SHIM_INTERP, ARGMOD(Hash *hash))
 
 =item C<void parrot_chash_destroy>
 
-RT#48260: Not yet documented!!!
+Delete the specified hash by freeing the memory allocated to all
+the key-value pairs, and finally the hash itself.
 
 =cut
 
