@@ -644,7 +644,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type type_without_classname pragma_1 hll_def return_or_yield comma_or_goto opt_unique_reg
+%type <t> type pragma_1 hll_def return_or_yield comma_or_goto opt_unique_reg
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
@@ -905,7 +905,7 @@ sub_param:
    ;
 
 sub_param_type_def:
-     type_without_classname IDENTIFIER paramtype_list    { if ($3 & VT_UNIQUE_REG)
+     type IDENTIFIER paramtype_list    { if ($3 & VT_UNIQUE_REG)
                                              $$ = mk_ident_ur(interp, $2, $1);
                                          else
                                              $$ = mk_ident(interp, $2, $1);
@@ -913,7 +913,7 @@ sub_param_type_def:
                                          mem_sys_free($2); }
 
    /* don't free $2 here; adv_named_set uses the pointer directly */
-   | type_without_classname STRINGC ADV_ARROW IDENTIFIER paramtype_list {
+   | type STRINGC ADV_ARROW IDENTIFIER paramtype_list {
                                          if ($5 & VT_UNIQUE_REG)
                                              $$ = mk_ident_ur(interp, $4, $1);
                                          else
@@ -1101,7 +1101,7 @@ pcc_results:
 
 pcc_result:
      RESULT target paramtype_list      {  $$ = $2; $$->type |= $3; }
-   | LOCAL { is_def=1; } type_without_classname id_list_id
+   | LOCAL { is_def=1; } type id_list_id
      {
          IdList *l = $4;
          SymReg *ignored;
@@ -1291,7 +1291,7 @@ labeled_inst:
    | conditional_statement
    | NAMESPACE IDENTIFIER            { push_namespace($2); mem_sys_free($2); }
    | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); mem_sys_free($2); }
-   | LOCAL           { is_def=1; } type_without_classname id_list
+   | LOCAL           { is_def=1; } type id_list
      {
          IdList *l = $4;
          while (l) {
@@ -1311,7 +1311,7 @@ labeled_inst:
                     {
                        set_lexical(interp, $4, $2); $$ = 0;
                     }
-   | CONST { is_def=1; } type_without_classname IDENTIFIER '=' const
+   | CONST { is_def=1; } type IDENTIFIER '=' const
                     {
                         mk_const_ident(interp, $4, $3, $6, 0);
                         is_def=0;
@@ -1346,14 +1346,6 @@ labeled_inst:
    ;
 
 type:
-     INTV { $$ = 'I'; }
-   | FLOATV { $$ = 'N'; }
-   | STRINGV { $$ = 'S'; }
-   | PMCV { $$ = 'P'; }
-   | classname { $$ = 'P';  }
-   ;
-
-type_without_classname:
      INTV { $$ = 'I'; }
    | FLOATV { $$ = 'N'; }
    | STRINGV { $$ = 'S'; }
