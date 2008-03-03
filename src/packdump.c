@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -193,7 +193,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         {
             PMC * const pmc = self->u.key;
             Parrot_sub *sub;
-            STRING * const null = CONST_STRING(interp, "(null)");
+            STRING * const null = const_string(interp, "(null)");
             STRING *namespace_description;
 
             switch (pmc->vtable->base_type) {
