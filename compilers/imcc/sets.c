@@ -72,8 +72,8 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_make_full(int length)
 {
-    Set * const s   = set_make(length);
-    const int bytes = NUM_BYTES(length);
+    Set * const s      = set_make(length);
+    const size_t bytes = NUM_BYTES(length);
 
     if (bytes)
         memset(s->bmp, 0xff, bytes);

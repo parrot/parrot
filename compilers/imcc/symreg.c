@@ -1275,7 +1275,7 @@ SymReg *
 _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 {
     SymReg   *p;
-    const int i = hash_str(name) % hsh->size;
+    const unsigned int i = hash_str(name) % hsh->size;
 
     for (p = hsh->data[i]; p; p = p->next) {
 #if IMC_TRACE_HIGH
