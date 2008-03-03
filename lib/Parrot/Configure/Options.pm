@@ -39,8 +39,11 @@ sub process_options {
     my %valid_opts          = map { $_, 1 } @{ $options_components{valid_options} };
     my $data                = {};
     my @short_circuits_seen = ();
-    for ( @{ $argsref->{argv} } ) {
-        my ( $key, $value ) = m/--([-\w]+)(?:=(.*))?/;
+    for my $el ( @{ $argsref->{argv} } ) {
+        my ( $key, $value );
+        if ($el =~ m/--([-\w]+)(?:=(.*))?/) {
+            ( $key, $value ) = ($1, $2);
+        }
         $key   = 'help' unless defined $key;
         $value = 1      unless defined $value;
 
