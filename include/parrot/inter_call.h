@@ -100,7 +100,7 @@ int Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP,
         FUNC_MODIFIES(*sti);
 
 PARROT_API
-int Parrot_init_arg_nci(PARROT_INTERP,
+void Parrot_init_arg_nci(PARROT_INTERP,
     ARGOUT(call_state *st),
     ARGIN(const char *sig))
         __attribute__nonnull__(1)
@@ -129,7 +129,7 @@ int Parrot_init_arg_sig(SHIM_INTERP,
         FUNC_MODIFIES(*sti);
 
 PARROT_API
-int Parrot_init_ret_nci(PARROT_INTERP,
+void Parrot_init_ret_nci(PARROT_INTERP,
     ARGOUT(call_state *st),
     ARGIN(const char *sig))
         __attribute__nonnull__(1)
