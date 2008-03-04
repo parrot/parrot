@@ -8,10 +8,8 @@ src/runops_cores.c - Run Loops
 
 =head1 DESCRIPTION
 
-This file implements the various run loops for the interpreter. A slow
-one with bounds checking, tracing and (optional) profiling, and a fast
-one without. There's also one which uses computed C<goto>, which enables
-the faster dispatch of operations.
+This file implements the various run loops for the interpreter.  See
+F<docs/running.pod> for a fuller description of the runcores and what they do.
 
 =head2 Functions
 
@@ -47,9 +45,7 @@ static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 =item C<opcode_t * runops_fast_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
-operations.
-
-No bounds checking, profiling or tracing is performed.
+operations.  This performs no bounds checking, profiling, or tracing.
 
 =cut
 
@@ -63,17 +59,18 @@ runops_fast_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     while (pc) {
         DO_OP(pc, interp);
     }
+
     return pc;
 }
+
 
 /*
 
 =item C<opcode_t * runops_cgoto_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
-operations, using the computed C<goto> core.
-
-No bounds checking, profiling or tracing is performed.
+operations, using the computed C<goto> core, performing no bounds checking,
+profiling, or tracing.
 
 If computed C<goto> is not available then Parrot exits with exit code 1.
 
@@ -106,6 +103,7 @@ runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 #define  code_start interp->code->base.data
 #define  code_end (interp->code->base.data + interp->code->base.size)
+
 
 /*
 
@@ -144,7 +142,9 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
             interp;
 #endif
         debugger->lo_var_ptr = interp->lo_var_ptr;
+
         pio = PIO_STDERR(debugger);
+
         if (PIO_isatty(debugger, pio))
             PIO_setlinebuf(debugger, pio);
         else {
@@ -155,30 +155,34 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     }
     else
         debugger = interp->debugger;
+
     trace_op(interp, code_start, code_end, pc);
     while (pc) {
-        if (pc < code_start || pc >= code_end) {
+        if (pc < code_start || pc >= code_end)
             real_exception(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
-        }
+
         CONTEXT(interp->ctx)->current_pc = pc;
 
         DO_OP(pc, interp);
         trace_op(interp, code_start, code_end, pc);
+
         if (dod != arena_base->dod_runs) {
             dod = arena_base->dod_runs;
             PIO_eprintf(debugger, "       DOD\n");
         }
+
         if (gc != arena_base->collect_runs) {
             gc = arena_base->collect_runs;
             PIO_eprintf(debugger, "       GC\n");
         }
     }
-    pio = PIO_STDERR(debugger);
-    PIO_flush(debugger, pio);
+
+    PIO_flush(debugger, PIO_STDERR(debugger));
 
     return pc;
 }
+
 
 /*
 
@@ -197,23 +201,25 @@ opcode_t *
 runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
 
-    if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
+    if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
         return runops_trace_core(interp, pc);
-    }
-    else if (interp->debugger && interp->debugger->pdb) {
+
+    if (interp->debugger && interp->debugger->pdb)
         return Parrot_debug(interp->debugger, pc);
-    }
+
     while (pc) {
-        if (pc < code_start || pc >= code_end) {
+        if (pc < code_start || pc >= code_end)
             real_exception(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
-        }
+
         CONTEXT(interp->ctx)->current_pc = pc;
 
         DO_OP(pc, interp);
     }
+
     return pc;
 }
+
 
 /*
 
@@ -233,10 +239,10 @@ opcode_t *
 runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     while (pc) {
-        if (pc < code_start || pc >= code_end) {
+        if (pc < code_start || pc >= code_end)
             real_exception(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
-        }
+
         Parrot_do_dod_run(interp, 0);
         CONTEXT(interp->ctx)->current_pc = pc;
 
@@ -249,12 +255,13 @@ runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 #undef code_start
 #undef code_end
 
+
 /*
 
 =item C<opcode_t * runops_profile_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
-operations, with tracing, bounds checking and profiling enabled.
+operations, with tracing, bounds checking, and profiling enabled.
 
 =cut
 
@@ -266,23 +273,20 @@ opcode_t *
 runops_profile_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     RunProfile * const profile = interp->profile;
+    const opcode_t     old_op  = profile->cur_op;
 
-    const opcode_t old_op = profile->cur_op;
-    /*
-     * if we are reentering the runloop:
-     * - remember old op and calc time till now
-     */
-    if (old_op) {
+    /* if reentering the runloop, remember old op and calc time 'til now */
+    if (old_op)
         profile->data[old_op].time +=
             Parrot_floatval_time() - profile->starttime;
-    }
 
     while (pc) {/* && pc >= code_start && pc < code_end) */
         opcode_t cur_op;
+
         CONTEXT(interp->ctx)->current_pc = pc;
-        profile->cur_op = cur_op = *pc + PARROT_PROF_EXTRA;
+        profile->cur_op                  = cur_op = *pc + PARROT_PROF_EXTRA;
+        profile->starttime               = Parrot_floatval_time();
         profile->data[cur_op].numcalls++;
-        profile->starttime = Parrot_floatval_time();
 
         DO_OP(pc, interp);
 
@@ -290,11 +294,13 @@ runops_profile_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         profile->data[profile->cur_op].time +=
             Parrot_floatval_time() - profile->starttime;
     }
+
     if (old_op) {
         /* old opcode continues */
         profile->starttime = Parrot_floatval_time();
-        profile->cur_op = old_op;
+        profile->cur_op    = old_op;
     }
+
     return pc;
 }
 
