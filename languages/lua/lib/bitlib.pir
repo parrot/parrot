@@ -96,9 +96,18 @@ that can be used in bitwise operations, and the following functions:
 
 .sub '_get_bits' :anon
     .local int bits
-    bits = 31
+    .include 'sysinfo.pasm'
+    sysinfo $I0, .SYSINFO_PARROT_INTSIZE
+    $I0 *= 8
+    bits = $I0 - 1
     .local int max
-    max = 0x7FFFFFFF
+    $I0 = 0
+    $I0 = bnot $I0
+    max = shr $I0, 1
+    unless bits == 63 goto L1
+    bits = 53
+    max = shr max, 10
+  L1:
     new $P0, 'Integer'
     set $P0, max
     set_hll_global ['Lua::bit'], 'BIT_MAX', $P0
@@ -126,14 +135,14 @@ that can be used in bitwise operations, and the following functions:
     $I1 = lua_checknumber(1, .a)
     .local int i
     i = 2
-  L1:	
+  L1:
     unless .vararg goto L2
     $P0 = shift .vararg
     $I0 = lua_checknumber(i, $P0)
     .op $I1, $I0
     inc i
     goto L1
-  L2:	
+  L2:
     band $I1, BIT_MAX
     new res, 'LuaNumber'
     set res, $I1

@@ -25,6 +25,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test;
 use Test::More;
 use Parrot::Test::Lua;
+use Config;
 
 my $test_prog = Parrot::Test::Lua::get_test_prog();
 if ( $test_prog eq 'lua' ) {
@@ -34,11 +35,15 @@ else {
     plan tests => 8;
 }
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'bit.bits' );
+my $bit_bits = $Config{longsize} * 8 - 1;
+$bit_bits = 53 if ($bit_bits == 63);
+language_output_is( 'lua', << 'CODE', << "OUTPUT", 'bit.bits' );
 require "bitlib"
 print(type(bit.bits))
+print(bit.bits)
 CODE
 number
+$bit_bits
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'bit.bnot' );
@@ -47,7 +52,7 @@ assert(bit.bnot(0) == bit.cast(-1))
 assert(bit.bnot(-1) == bit.cast(0))
 for nb = 1, bit.bits do
     local a = 2 ^ nb - 1
-    -- print("nb = " .. nb .. ", a = " .. a) 
+    -- print("nb = " .. nb .. ", a = " .. a)
     assert(bit.bnot(a) == bit.cast(-1 - a))
 end
 CODE
@@ -60,7 +65,7 @@ assert(bit.band(0, -1) == bit.cast(0))
 assert(bit.band(-1, -1) == bit.cast(-1))
 for nb = 1, bit.bits do
     local a = 2 ^ nb - 1
-    -- print("nb = " .. nb .. ", a = " .. a) 
+    -- print("nb = " .. nb .. ", a = " .. a)
     assert(bit.band(a, 0) == bit.cast(0))
     assert(bit.band(a, 1) == bit.cast(1))
     assert(bit.band(a, -1) == bit.cast(a))
@@ -76,7 +81,7 @@ assert(bit.bor(0, -1) == bit.cast(-1))
 assert(bit.bor(-1, -1) == bit.cast(-1))
 for nb = 1, bit.bits do
     local a = 2 ^ nb - 1
-    -- print("nb = " .. nb .. ", a = " .. a) 
+    -- print("nb = " .. nb .. ", a = " .. a)
     assert(bit.bor(a, 0) == bit.cast(a))
     assert(bit.bor(a, 1) == bit.cast(a))
     assert(bit.bor(a, -1) == bit.cast(-1))
@@ -92,7 +97,7 @@ assert(bit.bxor(0, -1) == bit.cast(-1))
 assert(bit.bxor(-1, -1) == bit.cast(0))
 for nb = 1, bit.bits do
     local a = 2 ^ nb - 1
-    -- print("nb = " .. nb .. ", a = " .. a) 
+    -- print("nb = " .. nb .. ", a = " .. a)
     assert(bit.bxor(a, 0) == bit.cast(a))
     assert(bit.bxor(a, 1) == bit.cast(a - 1))
     assert(bit.bxor(a, -1) == bit.cast(-a - 1))
