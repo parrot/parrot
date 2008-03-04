@@ -692,7 +692,8 @@ ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
                             tolower((unsigned char)k->reg->set), -1 - (int)k->reg->color);
                 else
                     strncat(regb[i], k->name, REGB_SIZE - used - 1);
-                if (k->nextkey && regb[i]+1 < REGB_SIZE) /* XXX This comparison is wrong. Comparing poitner to an int */
+                if (k->nextkey && regb[i]+1 < REGB_SIZE) /* XXX This comparison is wrong.
+                                                            Comparing pointer to an int */
                     strcat(regb[i], ";");
             }
             regstr[i] = regb[i];
