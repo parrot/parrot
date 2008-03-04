@@ -18,15 +18,17 @@ These tests cover the basic functionality of C<Parrot::Test>.
 
 use strict;
 use warnings;
-use Test::More tests => 66;
+use Test::More;
 
 BEGIN {
     eval "use Test::Builder::Tester;";
     if ($@) {
-        print "1..0 # Skip Test::Builder::Tester not installed\n";
+        plan( skip_all => "Test::Builder::Tester not installed\n" );
         exit 0;
     }
+    plan( tests => 66 );
 }
+
 use lib qw( . lib ../lib ../../lib );
 
 BEGIN {
