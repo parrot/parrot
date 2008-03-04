@@ -946,8 +946,8 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
 
 =item C<INTVAL Parrot_oo_register_type>
 
-This function registers a type in the global registry, first checking if it      
-already exists. The global type registry will go away eventually, but this   
+This function registers a type in the global registry, first checking if it
+already exists. The global type registry will go away eventually, but this
 allows the new object metamodel to interact with the old one until it does.
 
 =cut
