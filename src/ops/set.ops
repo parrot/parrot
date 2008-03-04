@@ -547,8 +547,11 @@ inline op copy(inout PMC, invar PMC) :base_mem {
   const INTVAL type   = VTABLE_type(interp, $2);
 
   /* avoid leaks and unreachable memory by destroying the destination PMC */
+  /* See RT#51136 - Commenting this out causes memory leaks, but avoids a segfault
+     Leaving original code here until ticket is resolved.
   if (PObj_active_destroy_TEST($1))
       VTABLE_destroy(interp, $1);
+  */
 
   VTABLE_morph(interp, $1, type);
 
