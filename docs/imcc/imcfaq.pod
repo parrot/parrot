@@ -1,9 +1,9 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 TITLE
 
-IMCC and Parrot Programming for Compiler Developers - Frequently Asked Questions
+PIR and Parrot Programming for Compiler Developers - Frequently Asked Questions
 
 =head1 GENERAL QUESTIONS
 
@@ -17,13 +17,13 @@ The Parrot FAQ : http://www.parrotcode.org/faq/
 
 =head2 What is IMC, PIR and IMCC?
 
-IMC stands for Intermediate Code; IMCC stands for Intermediate Code Compiler.
-You will also see the term PIR which is for Parrot Intermediate Representation
+IMC stands for Intermediate Code. IMCC stands for Intermediate Code Compiler.
+Most of the time you will encounter the term PIR which is for Parrot Intermediate Representation
 and means the same thing as IMC. PIR files use the extension C<.pir>.
 
-It is an intermediate language that compiles either directly to Parrot Byte
-code, or translates to Parrot Assembly language. It is the preferred target
-language for compilers for the Parrot Virtual Machine. PIR is halfway between
+PIR is an intermediate language that compiles either directly to Parrot Byte
+code. It is a possible target language for compilers targeting
+the Parrot Virtual Machine. PIR is halfway between
 a High Level Language (HLL) and Parrot Assembly (PASM).
 
 IMCC is the current implementation of the PIR language. A PGE-based implementation
@@ -70,7 +70,7 @@ of Parrot's ops are polymorphic, IMCC punts most of the type checking and
 method dispatch to runtime. This allows extremely fast compile times, which
 is what scripters need.
 
-=head2 How Is IMCC different than Parrot Assembly language?
+=head2 How Is PIR different than Parrot Assembly language?
 
 PASM is an assembly language, raw and low-level. PASM does exactly what you
 say, and each PASM instruction represents a single VM opcode.  Assembly
@@ -80,10 +80,10 @@ typically has no concept of basic blocks, namespaces, variable tracking, etc.
 You must track your register usage and take care of saving/restoring values
 in cases where you run out of registers. This is called spilling.
 
-IMC is medium level and a bit more friendly to write or debug. IMCC also has
+PIR is medium level and a bit more friendly to write or debug. IMCC also has
 a builtin register allocator and spiller. PIR has the concept of a
 "subroutine" unit, complete with local variables and high-level sub call
-syntax. IMCC also allows unlimited symbolic registers. It will take care of
+syntax. PIR also allows unlimited symbolic registers. It will take care of
 assigning the appropriate register to your variables and will usually find the
 most efficient mapping so as to use as few registers as possible for a given
 piece of code. If you use more registers than are currently available, IMCC
@@ -119,17 +119,20 @@ certain things and pack them into the bytecode in a way that does not have an
 equivalent set of Parrot instructions. The PASM assembler may or may not ever
 catch up with these features.
 
+=head2 Shouldn't I rather target PAST?
+
+Yes, preferably using the PCT, the Parrot Compiler Toolkit.
+
 =head2 Can I use IMCC without Parrot?
 
 Not yet. IMCC is currently tightly integrated to the Parrot bytecode format.
-One goal is to rework IMCC's modularity to make it easy to run separately, but
+An old idea is to rework IMCC's modularity to make it easy to run separately, but
 this is not a top priority since IMCC currently only targets Parrot.
 Eventually IMCC will contain a config option to build without linking the
 Parrot VM, but IMCC must be able to do lookups of opcodes so it will require
 some sort of static opcode metadata.
 
-
-=head1 IMCC PROGRAMMING 101
+=head1 PIR PROGRAMMING 101
 
 =head2 Hello world?
 
@@ -137,11 +140,15 @@ The basic block of execution of an IMC program is the subroutine. Subs can be
 simple, with no arguments or returns. Line comments are allowed in IMC using #.
 
 	# Hello world
-	.sub _main
-	print "Hello world.\n"
+	.sub main :main
+	  print "Hello world.\n"
 	.end
 
-=head2 How do I compile and run an IMC module?
+=head2 Tutorial
+
+For more examples see the PIR tutorial in F<examples/tutorial>.
+
+=head2 How do I compile and run an PIR module?
 
 Parrot uses the filename extension to detect whether the file is an PIR file
 (.pir), a Parrot Assembly file (.pasm) or a pre-compiled
@@ -156,6 +163,8 @@ Use the -o option for Parrot. You can provide an output filename, or the -
 character which indicates standard output. If the filename has a .pbc
 extension, IMCC will compile the module and assemble it to bytecode.
 
+Beware that compiling to PASM is not well supported and might produce broken PASM.
+
 Examples:
 
 =over 4
@@ -164,11 +173,11 @@ Examples:
 
 	parrot -o hello.pasm hello.pir
 
-=item Compile to bytecode from IMC.
+=item Compile to bytecode from PIR.
 
 	parrot -o hello.pbc hello.pir
 
-=item Dump PASM to screen (my favorite shortcut).
+=item Dump PASM to screen
 
 	parrot -o - hello.pir
 
@@ -183,7 +192,7 @@ without special support from IMCC.
 
 =head2 What are PIR variables?
 
-IMC has 2 classes of variables, symbolic registers and named variables. Both
+PIR has 2 classes of variables, symbolic registers and named variables. Both
 are mapped to real registers, but there are a few minor differences. Named
 variables must be declared. They may be global or local, and may be qualified
 by a namespace. Symbolic registers, on the other hand, do not need declaration,
@@ -218,7 +227,7 @@ B<num>, B<string> or B<pmc>).
 
 Example:
 
-	.sub _main
+	.sub _main :main
 	   .local int i
 	   .local num n
 	   i = 7
@@ -231,7 +240,9 @@ Example:
 You can't. You can explicitly create global variables at runtime, however,
 but it only works for PMC types, like so:
 
-	.sub _main
+=cut
+
+	.sub _main :main
 	   .local pmc i
 	   .local pmc j
 	   i = new 'Integer'
@@ -247,4 +258,3 @@ but it only works for PMC types, like so:
 Happy Hacking.
 
 =cut
-
