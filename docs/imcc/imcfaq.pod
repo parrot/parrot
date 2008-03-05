@@ -240,8 +240,6 @@ Example:
 You can't. You can explicitly create global variables at runtime, however,
 but it only works for PMC types, like so:
 
-=cut
-
 	.sub _main :main
 	   .local pmc i
 	   .local pmc j
