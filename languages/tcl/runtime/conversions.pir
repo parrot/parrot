@@ -23,7 +23,7 @@ this is as simple as returning the list.
     $P0 = $P0.'get_list'($S0)
   pop_eh 
 
-  morph value, .Undef
+  morph value, 'Undef'
   assign value, $P0
 
   .return(value)
@@ -50,7 +50,7 @@ Given a PMC, get a TclDict from it, converting as needed.
   .param pmc list
 
   $P0 = __listToDict(list)
-  morph list, .Undef
+  morph list, 'Undef'
   assign list, $P0
 
   .return(list)
@@ -60,7 +60,7 @@ Given a PMC, get a TclDict from it, converting as needed.
   .param pmc value
 
   $P0 = __stringToDict(value)
-  morph value, .Undef
+  morph value, 'Undef'
   assign value, $P0
 
   .return(value)
@@ -159,7 +159,7 @@ normal:
   $I0 = typeof integer
   if $I0 != .TclInt goto not_integer
 
-  morph value, .Undef
+  morph value, 'Undef'
   assign value, integer
 
   .return(value)

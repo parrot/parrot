@@ -107,7 +107,7 @@ loop:
   $S1 = shift argv
   $S2 = value
   $S2 .= $S1
-  morph value, .Undef
+  morph value, 'Undef'
   assign value, $S2
   goto loop
 loop_done:
