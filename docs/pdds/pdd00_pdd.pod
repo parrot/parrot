@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -64,7 +64,7 @@ future PDDs.
 =head2 FORMAT
 
 All PDDs will be written in POD parseable by the current stable release of
-Perl.  Although XML is a viable solution and has its vocal supporters, and
+Perl 5. Although XML is a viable solution and has its vocal supporters, and
 although Parrot is intended to be used by many groups outside of the Perl
 community, we have chosen POD for its simplicity and ease of reading in
 plaintext form.  Conversion to other formats (e.g. HTML) is encouraged, but
