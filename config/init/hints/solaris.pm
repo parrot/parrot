@@ -66,7 +66,8 @@ sub runstep {
         }
         $conf->data->deltrigger( "gccversion", "solaris_cc_shared" );
     };
-    $conf->data->settrigger( "gccversion", "solaris_cc_shared", $solaris_cc_shared_cb );
+    $conf->data->settrigger(
+        "gccversion", "solaris_cc_shared", $solaris_cc_shared_cb );
 
     ################################################################
     # Parrot usually aims for IEEE-754 compliance.
@@ -75,9 +76,9 @@ sub runstep {
     # return 0, when they should return +PI and -PI respectively.
     # For Sun's compilers, fix this with the -xlibmieee flag.
     # I don't know of an equivalent flag for gcc.
-    # (Alternatively, and more generally, perhahs we should run an
+    # (Alternatively, and more generally, perhaps we should run an
     # ieee-conformance test and then call back into a hints-file trigger
-    # to set platform-specific flags.
+    # to set platform-specific flags.)
     #   A. Dougherty  7 March 2005
     # We don't know which compiler we're using till after the gccversion test.
     my $solaris_ieee_cb = sub {
