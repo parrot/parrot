@@ -5791,11 +5791,11 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
             }
             else {
                 const size_t len = strlen(current);
-                if (len && (current[len-1] == '$')) { /* local label */
+                if (len && (current[len - 1] == '$')) { /* local label */
                     const size_t slen = len + 10;
                     char * const s    = (char *)mem_sys_allocate(slen);
 
-                    current[len-1] = '\0';
+                    current[len - 1] = '\0';
 
                     snprintf(s, slen, "%s%d", current, IMCC_INFO(interp)->frames->label);
 
