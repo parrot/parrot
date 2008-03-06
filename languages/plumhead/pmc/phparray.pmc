@@ -8,8 +8,8 @@ pmc/phparray.pmc - PHP array
 
 =head1 DESCRIPTION
 
-C<PHPAray> provides an implementation of PHP arrays.  These so-called arrays
-are actually hashes which use integer or string keys.  Stored vaues may
+C<PHPArray> provides an implementation of PHP arrays.  These so-called arrays
+are actually hashes which use integer or string keys.  Stored values may
 arbitrarily types.  The order of insertion is preserved and can be arbitrarily
 reordered independently of keys and values.
 
@@ -122,17 +122,17 @@ typedef struct hashtable {
     INTVAL nextIndex;
 } HashTable;
 
-void array_key_convert(PARROT_INTERP, PMC **key);
-void add_to_hashtable(PARROT_INTERP, HashTable*, PMC*, PMC*, add_type);
-PMC* get_from_hashtable(PARROT_INTERP, HashTable*, PMC*);
-PMC* delete_from_hashtable(PARROT_INTERP, HashTable *, PMC*);
-INTVAL find_in_hashtable(PARROT_INTERP, HashTable*, PMC*);
-INTVAL phparray_hash(PARROT_INTERP, PMC*);
-void hash_check(PARROT_INTERP, HashTable*);
-void renumber_hash(PARROT_INTERP, HashTable*);
-void resize_and_rehash(PARROT_INTERP, HashTable*);
+static void array_key_convert(PARROT_INTERP, PMC **key);
+static void add_to_hashtable(PARROT_INTERP, HashTable*, PMC*, PMC*, add_type);
+static PMC* get_from_hashtable(PARROT_INTERP, HashTable*, PMC*);
+static PMC* delete_from_hashtable(PARROT_INTERP, HashTable *, PMC*);
+static INTVAL find_in_hashtable(PARROT_INTERP, HashTable*, PMC*);
+static INTVAL phparray_hash(PARROT_INTERP, PMC*);
+static void hash_check(PARROT_INTERP, HashTable*);
+static void renumber_hash(PARROT_INTERP, HashTable*);
+static void resize_and_rehash(PARROT_INTERP, HashTable*);
 
-INTVAL phparray_hash(PARROT_INTERP, PMC *key) {
+static INTVAL phparray_hash(PARROT_INTERP, PMC *key) {
     if (PMC_type(key) == enum_class_Integer)
         return VTABLE_get_integer(interp, key);
     else if (PMC_type(key) == enum_class_String) {
@@ -145,7 +145,7 @@ INTVAL phparray_hash(PARROT_INTERP, PMC *key) {
 }
 
 /*If the key is a String PMC and can be converted an integer according to PHP's rules, do so*/
-void array_key_convert(PARROT_INTERP, PMC **key) {
+static void array_key_convert(PARROT_INTERP, PMC **key) {
 
     STRING *key_str, *c0, *c1;
     PMC *index_pmc;
@@ -187,9 +187,9 @@ void array_key_convert(PARROT_INTERP, PMC **key) {
     }
 }
 
-void add_to_hashtable(PARROT_INTERP, HashTable *ht, PMC *key, PMC *value, add_type type) {
+static void add_to_hashtable(PARROT_INTERP, HashTable *ht, PMC *key, PMC *value, add_type type) {
 
-    uint index;
+    unsigned int index;
     Bucket *newB, *b;
     INTVAL curr_index, hash;
     char *key_cstr, *value_cstr;
@@ -252,7 +252,7 @@ void add_to_hashtable(PARROT_INTERP, HashTable *ht, PMC *key, PMC *value, add_ty
     resize_and_rehash(interp, ht);
 }
 
-PMC* delete_from_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
+static PMC* delete_from_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
 
     INTVAL hash = phparray_hash(interp, key);
     INTVAL index;
@@ -281,7 +281,7 @@ PMC* delete_from_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
     return PMCNULL;
 }
 
-PMC* get_from_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
+static PMC* get_from_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
     INTVAL index, hash, i;
     Bucket *b;
 
@@ -306,7 +306,7 @@ PMC* get_from_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
     return PMCNULL;
 }
 
-INTVAL find_in_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
+static INTVAL find_in_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
     INTVAL hash = phparray_hash(interp, key);
     INTVAL index, i;
     Bucket *b;
@@ -328,7 +328,7 @@ INTVAL find_in_hashtable(PARROT_INTERP, HashTable *ht, PMC *key) {
     return 0;
 }
 
-void hash_check(PARROT_INTERP, HashTable *ht) {
+static void hash_check(PARROT_INTERP, HashTable *ht) {
 
     INTVAL i, bucket_order_count, insert_order_count;
     int key_type, value_type;
@@ -375,7 +375,7 @@ void hash_check(PARROT_INTERP, HashTable *ht) {
             (int)ht->elementCount, (int)bucket_order_count, (int)insert_order_count);
 }
 
-void renumber_hash(PARROT_INTERP, HashTable *ht) {
+static void renumber_hash(PARROT_INTERP, HashTable *ht) {
     Bucket *b;
     INTVAL index;
 
@@ -392,7 +392,7 @@ void renumber_hash(PARROT_INTERP, HashTable *ht) {
     ht->nextIndex = ++index;
 }
 
-void resize_and_rehash(PARROT_INTERP, HashTable *ht) {
+static void resize_and_rehash(PARROT_INTERP, HashTable *ht) {
     Bucket **buckets;
     Bucket *b;
     INTVAL index;
