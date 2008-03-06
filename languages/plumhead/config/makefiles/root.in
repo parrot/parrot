@@ -18,14 +18,6 @@ PMC_DIR       = pmc
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 
-# Set up PMCs
-PMCS = \
-  phparray
-
-PMC_FILES = \
-  $(PMC_DIR)/phparray.pmc
-
-
 # default
 all: build
 
@@ -45,7 +37,6 @@ help:
 	@echo "                     Current this has nothing to do."
 	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
 	@echo "                     Needs javac and a proper CLASSPATH."
-	@echo "  pmc                Build only the PMCs."
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite for 'Plumhead pct'."
@@ -54,7 +45,6 @@ help:
 	@echo "  test-phc:          Run the test suite for 'Plumhead phc'."
 	@echo "  test-antlr3:       Run the test suite for 'Plumhead antlr3'."
 	@echo "  test-pct:          Run the test suite for 'Plumhead pct'."
-	@echo "  pmc-test:          Test the PMCs."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
@@ -81,7 +71,7 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 	java org.antlr.Tool src/antlr3/Plumhead.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
-build:           pmc build-pct
+build:           build-pct
 
 build-all:       build-pct build-phc build-antlr3
 
@@ -94,17 +84,6 @@ build-phc:       build-common
 build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java 
-
-pmc : pmc/php_group$(LOAD_EXT)
-
-pmc/php_group$(LOAD_EXT) : $(PMC_FILES)
-	@cd $(PMC_DIR) && $(PMCBUILD) generate $(PMCS)
-	@cd $(PMC_DIR) && $(PMCBUILD) compile $(PMCS)
-	@cd $(PMC_DIR) && $(PMCBUILD) linklibs $(PMCS)
-	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
-
-pmc-test : pmc
-	$(PERL) -I../../lib t/pmc/array.t
 
 src/common/plumheadlib.pbc: src/common/builtins.pir
 	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
@@ -140,7 +119,7 @@ test-antlr3:
 test-pct:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-pct
 
-clean: clean-common clean-pct clean-antlr3 clean-test clean-pmc
+clean: clean-common clean-pct clean-antlr3 clean-test
 
 clean-common:
 	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
@@ -153,9 +132,6 @@ clean-antlr3:
 
 clean-test:
 	$(RM_F) t/php/*.php t/php/*.pir t/php/*.out t/pmc/*.pir
-
-clean-pmc:
-	$(RM_F) pmc/*.c pmc/*.h pmc/*.o pmc/*.so pmc/*.dump
 
 realclean: clean
 	$(RM_F) Makefile
