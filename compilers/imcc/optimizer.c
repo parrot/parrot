@@ -916,7 +916,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
             /*
              * create instruction e.g. add_i_ic_ic => add_i_i_i
              */
-            snprintf(op, sizeof(op), "%s_%c_%c_%c", name, tolower((unsigned char)r[0]->set),
+            snprintf(op, sizeof (op), "%s_%c_%c_%c", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set), tolower((unsigned char)r[2]->set));
             debug_fmt = "opt %s_x_xc_xc => ";
             break;
@@ -930,7 +930,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 r[1]->type & (VTCONST|VT_CONSTP) &&
                 STREQ(name, ops2[i])) {
             found = 3;
-            snprintf(op, sizeof(op), "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
+            snprintf(op, sizeof (op), "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set));
             debug_fmt = "opt %s_x_xc => ";
             break;
@@ -945,7 +945,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 r[1]->type & (VTCONST|VT_CONSTP)  &&
                 STREQ(name, ops3[i])) {
             found = 2;
-            snprintf(op, sizeof(op), "%s_%c_%c_ic", name, tolower((unsigned char)r[0]->set),
+            snprintf(op, sizeof (op), "%s_%c_%c_ic", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set));
             debug_fmt = "opt %s_xc_xc_ic => ";
             break;
@@ -959,7 +959,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 r[0]->type & (VTCONST|VT_CONSTP) &&
                 STREQ(name, ops4[i])) {
             found = 1;
-            snprintf(op, sizeof(op), "%s_%c_ic", name, tolower((unsigned char)r[0]->set));
+            snprintf(op, sizeof (op), "%s_%c_ic", name, tolower((unsigned char)r[0]->set));
             debug_fmt = "opt %s_xc_ic => ";
             break;
         }
@@ -1001,10 +1001,10 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         char b[128];
         switch (r[0]->set) {
             case 'I':
-                snprintf(b, sizeof(b), INTVAL_FMT, REG_INT(interp, 0));
+                snprintf(b, sizeof (b), INTVAL_FMT, REG_INT(interp, 0));
                 break;
             case 'N':
-                snprintf(b, sizeof(b), fmt, REG_NUM(interp, 0));
+                snprintf(b, sizeof (b), fmt, REG_NUM(interp, 0));
                 break;
             default:
                 break;
@@ -1769,7 +1769,7 @@ move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
         Instruction * tmp;
 
         regs[0] = 0;
-        snprintf(buf, sizeof(buf), "# Invar moved: %s", out->next->op);
+        snprintf(buf, sizeof (buf), "# Invar moved: %s", out->next->op);
         tmp = INS(interp, unit, "", buf, regs, 0, 0, 0);
         insert_ins(unit, (*ins)->prev, tmp);
     }

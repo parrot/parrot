@@ -241,7 +241,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
             case 'P': flags |= PARROT_ARG_PMC;      break;
             default :                               break;
         }
-        snprintf(s, sizeof(s), "0x%x", flags);
+        snprintf(s, sizeof (s), "0x%x", flags);
         if (i < n - 1)
             strcat(s, ",");
         strcat(buf, s);         /* XXX check avail len */

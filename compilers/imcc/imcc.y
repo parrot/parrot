@@ -448,7 +448,7 @@ IMCC_create_itcall_label(PARROT_INTERP)
     SymReg      *r;
     Instruction *i;
 
-    snprintf(name, sizeof(name), "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR,
+    snprintf(name, sizeof (name), "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR,
         IMCC_INFO(interp)->cnr++);
 
     r       = mk_pcc_sub(interp, name, 0);
@@ -513,7 +513,7 @@ begin_return_or_yield(PARROT_INTERP, int yield)
                     "yield or return directive outside pcc subroutine\n");
     if (yield)
        ins->symregs[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
-    snprintf(name, sizeof(name), yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
+    snprintf(name, sizeof (name), yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
     interp->imc_info->sr_return = mk_pcc_sub(interp, name, 0);
     i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, interp->imc_info->sr_return);
@@ -995,7 +995,7 @@ pcc_sub_call:
             SymReg *r, *r1;
             Instruction *i;
 
-            snprintf(name, sizeof(name), "%cpcc_sub_call_%d",
+            snprintf(name, sizeof (name), "%cpcc_sub_call_%d",
                     IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
             $<sr>$ = r = mk_pcc_sub(interp, name, 0);
             /* this mid rule action has the semantic value of the

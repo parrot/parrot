@@ -163,14 +163,14 @@ iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
     const int pmc_num = pmc_type(interp,
             string_from_cstring(interp, *type == '.' ? type + 1 : type, 0));
 
-    snprintf(fmt, sizeof(fmt), "%d", pmc_num);
+    snprintf(fmt, sizeof (fmt), "%d", pmc_num);
     pmc = mk_const(interp, fmt, 'I');
 
     if (pmc_num <= 0)
         IMCC_fataly(interp, E_SyntaxError,
                 "Unknown PMC type '%s'\n", type);
 
-    snprintf(fmt, sizeof(fmt), "%%s, %d\t # .%s", pmc_num, type);
+    snprintf(fmt, sizeof (fmt), "%%s, %d\t # .%s", pmc_num, type);
 
     r0->usage |= U_NEW;
     if (STREQ(type, "Hash"))
@@ -418,7 +418,7 @@ to_infix(PARROT_INTERP, ARGIN(const char *name), ARGMOD(SymReg **r),
 
     if (*n == 3 && r[0] == r[1] && !is_n) {       /* cvt to inplace */
         char buf[10];
-        snprintf(buf, sizeof(buf), "%d", mmd_op + 1);  /* XXX */
+        snprintf(buf, sizeof (buf), "%d", mmd_op + 1);  /* XXX */
         mmd = mk_const(interp, buf, 'I');
     }
     else {
@@ -427,7 +427,7 @@ to_infix(PARROT_INTERP, ARGIN(const char *name), ARGMOD(SymReg **r),
         for (i = *n; i > 0; --i)
             r[i] = r[i - 1];
 
-        snprintf(buf, sizeof(buf), "%d", *n == 2 ? (mmd_op + 1) : mmd_op);  /* XXX */
+        snprintf(buf, sizeof (buf), "%d", *n == 2 ? (mmd_op + 1) : mmd_op);  /* XXX */
         mmd = mk_const(interp, buf, 'I');
         (*n)++;
     }
@@ -865,7 +865,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         IMCC_INFO(interp) = imc_info;
     }
 
-    snprintf(name, sizeof(name), "EVAL_" INTVAL_FMT, ++eval_nr);
+    snprintf(name, sizeof (name), "EVAL_" INTVAL_FMT, ++eval_nr);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
 
@@ -1497,7 +1497,7 @@ multi_keyed(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
         /* make a new P symbol */
         do {
-            snprintf(buf, sizeof(buf), "$P%d", ++p);
+            snprintf(buf, sizeof (buf), "$P%d", ++p);
         } while (get_sym(interp, buf));
 
         preg[n] = mk_symreg(interp, buf, 'P');

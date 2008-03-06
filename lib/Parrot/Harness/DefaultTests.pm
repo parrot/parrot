@@ -69,6 +69,7 @@ our @developing_tests = (
         c_header_guards.t
         c_indent.t
         c_operator.t
+        c_parens.t
         c_returns.t
         c_struct.t
         check_isxxx.t
