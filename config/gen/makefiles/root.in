@@ -1821,7 +1821,7 @@ SPLINT_TMP = $(TMP)/splint
 
 # Splint flags: http://splint.org/manual/html/appB.html
 SPLINTFLAGS  = \
-    +weak \
+    +standard \
     -hints \
     \
     +indentspaces 4 \
@@ -1839,8 +1839,31 @@ SPLINTFLAGS  = \
     +show-scan \
     +time-dist \
     \
+    +bool-compare \
     +bufferoverflow \
+    +duplicate-case \
+    +enum-members \
+    +eval-order \
+    +eval-order-uncon \
+    +format-code \
+    +format-type \
+    +ignore-signs \
+    +incon-defs \
+    +incon-defs-lib \
+    -iso-reserved \
+    +macro-assign \
+    +macro-empty \
+    +macro-parens \
+    +macro-redef \
+    +macro-stmt \
+    +macro-unrecog \
+    +match-fields \
+    +nullptrarith \
+    +ptr-compare \
+    +ptr-negate \
 
+# I'd like the +ignore-signs to go away, but we have too many
+# cross-signedness comparisons.
 
 # Andy is working on making a decent splint target.  He's currently
 # (2/29/08) dropping all the flags that he's been working with
@@ -1856,9 +1879,7 @@ SPLINTFLAGS_OVERLY_NOISY = \
     -ansireserved \
     +ansireservedinternal \
     +assignexpose \
-    +boolcompare \
     -boolops \
-    +booltype BOOLVAL \
     -casebreak \
     -castfcnptr \
     -charint \
@@ -1871,18 +1892,12 @@ SPLINTFLAGS_OVERLY_NOISY = \
     -exportlocal \
     -fcnuse \
     +fielduse \
-    +forcehints \
     -globs \
     +imptype \
-    +incondefs \
-    +incondefslib \
     -initallelements \
     -isoreserved \
     -isoreservedinternal \
     +longintegral \
-    +macroassign \
-    +macroempty \
-    +macroredef \
     +matchanyintegral \
     +nestedextern \
     -noeffect \
@@ -1943,9 +1958,6 @@ SPLINTFLAGS_OVERLY_NOISY = \
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 SPLINTFLAGS_TEST = \
-    +fcnpost \
-    +partial \
-    +enumindex \
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
