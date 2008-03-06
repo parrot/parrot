@@ -219,7 +219,7 @@ typedef struct parrot_interp_t Interp;
  * no good.  So we should use "funcptr_t" in place of void* when dealing with
  * function pointers and NULLfunc in place of NULL */
 typedef void (*funcptr_t)(void);
-#define NULLfunc (funcptr_t)0
+#define NULLfunc (funcptr_t)NULL
 
 /* define macros for converting between data and function pointers.  As it
  * turns out, ANSI C does appear to permit you to do this conversion if you
