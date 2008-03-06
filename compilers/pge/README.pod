@@ -36,18 +36,18 @@ C<parrot demo.pir>.  The demo understands the following commands:
     trace             - toggle pattern execution tracing
     next              - repeat last match on target string
 
-=head1 PGE's rule engine  (PGE::P6Regex)
+=head1 PGE's rule engine  (PGE::Perl6Regex)
 
 Once PGE is compiled and installed, you generally load it using
 the load_bytecode operation, as in
 
     load_bytecode 'PGE.pbc'
 
-This imports the PGE::P6Regex compiler, which can be used to compile
-strings of Perl 6 rules.  A sample compile sequence would be:
+This imports the PGE::Perl6Regex compiler, which can be used to compile
+strings of Perl 6 regexes.  A sample compile sequence would be:
 
     .local pmc p6regex_compile
-    p6regex_compile = compreg 'PGE::P6Regex'         # get the compiler
+    p6regex_compile = compreg 'PGE::Perl6Regex'         # get the compiler
 
     .local string pattern
     .local pmc rulesub

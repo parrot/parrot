@@ -22,7 +22,7 @@
     load_bytecode "PGE/Glob.pir"
     load_bytecode "PGE/Text.pir"
     load_bytecode "PGE/Util.pir"
-    p6rule_compile = compreg "PGE::P6Regex"
+    p6rule_compile = compreg "PGE::Perl6Regex"
     glob_compile = compreg "PGE::Glob"
     p5regexp_compile = compreg "PGE::P5Regex"
     istrace = 0
