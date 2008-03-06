@@ -192,7 +192,7 @@ int Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void* set_retval(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
+void * set_retval(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 

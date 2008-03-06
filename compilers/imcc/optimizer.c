@@ -886,7 +886,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
     };
 
     size_t i;
-    char b[128], fmt[64], op[20];
+    char fmt[64], op[20];
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
 
@@ -916,7 +916,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
             /*
              * create instruction e.g. add_i_ic_ic => add_i_i_i
              */
-            sprintf(op, "%s_%c_%c_%c", name, tolower((unsigned char)r[0]->set),
+            snprintf(op, sizeof(op), "%s_%c_%c_%c", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set), tolower((unsigned char)r[2]->set));
             debug_fmt = "opt %s_x_xc_xc => ";
             break;
@@ -930,7 +930,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 r[1]->type & (VTCONST|VT_CONSTP) &&
                 STREQ(name, ops2[i])) {
             found = 3;
-            sprintf(op, "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
+            snprintf(op, sizeof(op), "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set));
             debug_fmt = "opt %s_x_xc => ";
             break;
@@ -945,7 +945,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 r[1]->type & (VTCONST|VT_CONSTP)  &&
                 STREQ(name, ops3[i])) {
             found = 2;
-            sprintf(op, "%s_%c_%c_ic", name, tolower((unsigned char)r[0]->set),
+            snprintf(op, sizeof(op), "%s_%c_%c_ic", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set));
             debug_fmt = "opt %s_xc_xc_ic => ";
             break;
@@ -959,7 +959,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 r[0]->type & (VTCONST|VT_CONSTP) &&
                 STREQ(name, ops4[i])) {
             found = 1;
-            sprintf(op, "%s_%c_ic", name, tolower((unsigned char)r[0]->set));
+            snprintf(op, sizeof(op), "%s_%c_ic", name, tolower((unsigned char)r[0]->set));
             debug_fmt = "opt %s_xc_ic => ";
             break;
         }
@@ -998,12 +998,13 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         /*
          * create set x, constant
          */
+        char b[128];
         switch (r[0]->set) {
             case 'I':
-                sprintf(b, INTVAL_FMT, REG_INT(interp, 0));
+                snprintf(b, sizeof(b), INTVAL_FMT, REG_INT(interp, 0));
                 break;
             case 'N':
-                sprintf(b, fmt, REG_NUM(interp, 0));
+                snprintf(b, sizeof(b), fmt, REG_NUM(interp, 0));
                 break;
             default:
                 break;
@@ -1184,7 +1185,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
         int found = 0;
 
         for (count = 1; count != 999; ++count) {
-            sprintf(label, "%s_post%d", branch->symregs[0]->name, count);
+            snprintf(label, size, "%s_post%d", branch->symregs[0]->name, count);
             if (get_sym(interp, label) == 0) {
                 found = 1;
                 break;
@@ -1768,7 +1769,7 @@ move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
         Instruction * tmp;
 
         regs[0] = 0;
-        sprintf(buf, "# Invar moved: %s", out->next->op);
+        snprintf(buf, sizeof(buf), "# Invar moved: %s", out->next->op);
         tmp = INS(interp, unit, "", buf, regs, 0, 0, 0);
         insert_ins(unit, (*ins)->prev, tmp);
     }

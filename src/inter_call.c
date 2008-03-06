@@ -1588,7 +1588,7 @@ set_retval_util(PARROT_INTERP, ARGIN(const char *sig),
 
 /*
 
-=item C<void* set_retval>
+=item C<void * set_retval>
 
 Handles void and pointer (PMC *, STRING *) return values.  Returns a PMC,
 STRING, or NULL pointer as appropriate.
