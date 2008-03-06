@@ -5470,7 +5470,7 @@ read_braced(YYSTYPE *valp, PARROT_INTERP, const char *macro_name,
              char *current, void *yyscanner)
 {
     YYSTYPE val;
-    int     len   = strlen(current);
+    size_t  len   = strlen(current);
     int     c     = yylex(&val,yyscanner,interp);
     int     count = 0;
 
@@ -5790,13 +5790,12 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 
             }
             else {
-                const int len = strlen(current) - 1;
-
-                if (len >= 0 && current[len] == '$') { /* local label */
-                    const size_t slen = len + 1 + 10;
+                const size_t len = strlen(current);
+                if (len && (current[len-1] == '$')) { /* local label */
+                    const size_t slen = len + 10;
                     char * const s    = (char *)mem_sys_allocate(slen);
 
-                    current[len] = '\0';
+                    current[len-1] = '\0';
 
                     snprintf(s, slen, "%s%d", current, IMCC_INFO(interp)->frames->label);
 
