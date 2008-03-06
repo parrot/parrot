@@ -227,6 +227,8 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =item * alarm library F<languages/lua/lib/alarm.pir>
 
+=item * base64 library F<languages/lua/lib/base64.pir>
+
 =item * bitwise operation library F<languages/lua/lib/bitlib.pir>
 
 =item * Lua File System library F<languages/lua/lib/lfs.pir>
