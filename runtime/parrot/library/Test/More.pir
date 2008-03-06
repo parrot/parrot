@@ -699,7 +699,7 @@ optional test description in C<description>.
     load_bytecode "PGE/Dumper.pbc"
     load_bytecode "PGE/Text.pbc"
     load_bytecode "PGE/Util.pbc"
-    p6rule_compile = compreg "PGE::P6Regex"
+    p6rule_compile = compreg "PGE::Perl6Regex"
 
     .local string diagnostic
     .local int pass
