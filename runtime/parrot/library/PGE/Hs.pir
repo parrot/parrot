@@ -66,7 +66,7 @@ whole thing may be taken out or refactored away at any moment.
     .param pmc adverbs :slurpy :named
     .local pmc p6rule_compile, rulesub
 
-    p6rule_compile = compreg 'PGE::P6Regex'
+    p6rule_compile = compreg 'PGE::Perl6Regex'
     null rulesub
 
     # adverbs['grammar'] = 'PGE::Grammar'
@@ -93,7 +93,7 @@ whole thing may be taken out or refactored away at any moment.
     .local pmc p6rule_compile
     .local pmc capt
 
-    p6rule_compile = compreg 'PGE::P6Regex'
+    p6rule_compile = compreg 'PGE::Perl6Regex'
     null rulesub
 
     push_eh match_error
