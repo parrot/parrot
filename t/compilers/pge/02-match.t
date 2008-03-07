@@ -27,7 +27,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)' );
 .sub main :main
     load_bytecode 'PGE.pbc'
 
-    $P0 = compreg 'PGE::P6Regex'
+    $P0 = compreg 'PGE::Perl6Regex'
     $P1 = $P0('.+')
     $P2 = $P1('world')
 

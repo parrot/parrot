@@ -27,7 +27,7 @@ pir_output_is( <<'CODE', <<'OUT', "This made Parrot m4 fail" );
   load_bytecode "PGE.pbc"
 
   .local pmc p6rule
-  p6rule = compreg "PGE::P6Regex"
+  p6rule = compreg "PGE::Perl6Regex"
 
   .local pmc rulesub_a, rulesub_b
   rulesub_a  = p6rule( "a" )

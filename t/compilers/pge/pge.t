@@ -34,11 +34,10 @@ my $ns_subs = {
         ],
     },
     'PGE/OPTable.pir' => { 'PGE::OPTable' => [qw/ newtok parse /], },
-    'PGE/P6Regex.pir' => {
+    'PGE/Perl6Regex.pir' => {
         'PGE'          => [qw/ /],
         'PGE::Exp'     => [qw/ /],
-        'PGE::P6Regex' => [qw/ /],
-        'PGE::Grammar' => [qw/ regex /],    ## RT#44447 deprecated
+        'PGE::Perl6Regex' => [qw/ /],
     },
     'PGE/Regex.pir' => {
         'PGE::Match' => [
@@ -54,7 +53,7 @@ my $ns_subs = {
 ## populate_namespaces -- populate many namespaces with a subname
 ## data format like: subname => [qw/ list of namespaces /],
 ## my $p6r_subs = { p6analyze => [qw/ Literal /], };
-## populate_namespaces( $ns_subs, $p6r_subs, 'PGE/P6Regex.pir', 'PGE::Exp' );
+## populate_namespaces( $ns_subs, $p6r_subs, 'PGE/Perl6Regex.pir', 'PGE::Exp' );
 sub populate_namespaces {
     my ( $outdata_ref, $indata_ref, $filekey, $nsprefix ) = @_;
     for my $key ( sort keys %$indata_ref ) {
@@ -93,7 +92,7 @@ ok
 OUT
 
 ## compiler registration
-for my $compiler (qw/ PGE::Perl6Regex PGE::P6Regex PGE::P5Regex PGE::Glob /) {
+for my $compiler (qw/ PGE::Perl6Regex PGE::Perl6Regex PGE::P5Regex PGE::Glob /) {
     pir_output_is( <<"CODE". $POST, <<OUT, 'compreg "$compiler"' );
 .sub 'main' :main
         load_bytecode 'PGE.pbc'

@@ -34,7 +34,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::Bar::baz'" );
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE::Util'], 'split'
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
   $P0 = split(regex, "Foo::Bar::baz")
@@ -57,7 +57,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::'" );
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE::Util'], 'split'
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
   $P0 = split(regex, "Foo::")
@@ -78,7 +78,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, '::Foo'" );
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE::Util'], 'split'
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
   $P0 = split(regex, "::Foo")
@@ -100,7 +100,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo'" );
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE::Util'], 'split'
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
   $P0 = split(regex, "Foo")
@@ -121,7 +121,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar'" );
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE::Util'], 'split'
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:')
 
   $P0 = split(regex, "Foo::Bar")
@@ -144,7 +144,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar::Baz', 2" );
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE::Util'], 'split'
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
   $P0 = split(regex, "Foo::Bar::Baz", 2)
@@ -166,7 +166,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /(a)(b)/, 'abracadabra'" );
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE::Util'], 'split'
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('(a)(b)')
 
   $P0 = split(regex, "abracadabra")
