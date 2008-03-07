@@ -65,16 +65,16 @@ TOOO: recognize nested quoted strings
   # setup of some rules
   # these rules should be kept in sync with t/regex/002_tokens.t
   # TODO: Use named or positional captures
-  # TODO: rulesub for frozen state 
+  # TODO: rulesub for frozen state
   .local pmc p6rule
-  p6rule = compreg "PGE::P6Regex"
+  p6rule = compreg "PGE::Perl6Regex"
   .local pmc rulesub_in_state
   rulesub_in_state = new .Hash
   state['rulesub'] = rulesub_in_state
   .local pmc rulesub
   rulesub = p6rule( "^(<[_a..zA..Z]><[_a..zA..Z0..9>]>*)" )
   rulesub_in_state['word'] = rulesub
-  rulesub = p6rule( "^(`<-[`]>*')" )
+  rulesub = p6rule( "^(\\`<-[`]>*\\')" )
   rulesub_in_state['string'] = rulesub
   rulesub = p6rule( "^(<-[`#_a..zA..Z]>)" )
   rulesub_in_state['simple'] = rulesub
