@@ -177,7 +177,7 @@ bad_args:
   if argc != 1 goto bad_args
 
   .local pmc p6r,match
-  p6r = compreg 'PGE::P6Regex'
+  p6r = compreg 'PGE::Perl6Regex'
   match = p6r("(.*)\\:\\:+<-[:]>*$$")
 
   $S0 = argv[0]
@@ -204,7 +204,7 @@ WHOLE:
   if argc != 1 goto bad_args
 
   .local pmc p6r,match
-  p6r= compreg 'PGE::P6Regex'
+  p6r= compreg 'PGE::Perl6Regex'
   match = p6r("\\:\\:+(<-[:]>)$$")
 
   $S0 = argv[0]

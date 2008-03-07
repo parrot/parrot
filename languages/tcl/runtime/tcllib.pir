@@ -238,7 +238,7 @@ env_loop_done:
 
   # the regex used for namespaces
   .local pmc p6rule, colons
-  p6rule = compreg 'PGE::P6Regex'
+  p6rule = compreg 'PGE::Perl6Regex'
   colons = p6rule('\:\:+')
   set_hll_global 'colons', colons
 
