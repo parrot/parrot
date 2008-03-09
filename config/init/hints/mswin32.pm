@@ -14,8 +14,8 @@ sub runstep {
     my $ccflags   = $conf->option_or_data('ccflags');
     my $cc        = $conf->option_or_data('cc');
 
-    # Later in the Parrot::Configure::RunSteps->runsteps process,
-    # inter/progs.pl will merge the command-line overrides with the defaults.
+    # Later in the Parrot::Configure::runsteps() process,
+    # inter::progs will merge the command-line overrides with the defaults.
     # We do one bit of its work early here, because we need the result now.
     $cc = $conf->options->get('cc') if defined $conf->options->get('cc');
 
