@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-plan $^O =~ /MSWin32/ ? ( skip_all => 'Broken on Win32' ) : tests => 5;
+plan tests => 5;
 
 =pod
 
