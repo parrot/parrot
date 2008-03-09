@@ -59,7 +59,7 @@ pir_output_is( <<'CODE', <<'OUT', "parse FASTA" );
 
 .sub "example" :main
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/P6Grammar.pbc'
+    load_bytecode 'PGE/Perl6Grammar.pbc'
 
     .local string fasta_grammar
     fasta_grammar = <<'END_FASTA_GRAMMAR'
@@ -88,7 +88,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 END_FASTA
 
     .local pmc p6grammar
-    p6grammar = compreg "PGE::P6Grammar"
+    p6grammar = compreg "PGE::Perl6Grammar"
     .local pmc code
     ( code ) = p6grammar.'compile'(fasta_grammar, 'target'=>'PIR')
     $P0 = compreg 'PIR'
