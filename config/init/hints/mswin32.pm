@@ -193,7 +193,7 @@ sub runstep {
         my $make = $conf->data->get(qw(make));
         if ( $make =~ /nmake/i ) {
 
-            # ActiveState Perl or PXPerl
+            # ActiveState Perl
             $conf->data->set(
                 a       => '.a',
                 ar      => 'ar',
@@ -208,16 +208,23 @@ sub runstep {
                 o         => '.o',
                 blib_dir  => 'blib\\lib',
             );
-            if ( $conf->data->get(qw(optimize)) eq "1" ) {
-                $conf->data->set( optimize => '-O2' );
-            }
         }
         elsif ( $make =~ /dmake/i ) {
 
-            # mingw Perl
+            # strawberry Perl
+            $conf->data->set(
+                ccflags   => '-DWIN32 ',
+                ldflags   => '',
+                linkflags => '',
+                optimize  => '',
+            );
         }
         else {
             warn "unknown configuration";
+        }
+
+        if ( $conf->data->get(qw(optimize)) eq "1" ) {
+            $conf->data->set( optimize => '-O2' );
         }
 
         $conf->data->set(
