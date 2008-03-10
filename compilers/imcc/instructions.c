@@ -555,7 +555,7 @@ subst_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins),
         ins->next->prev = tmp;
     else
         unit->last_ins = tmp;
-    if (!tmp->line)
+    if (tmp->line == 0)
         tmp->line = ins->line;
     if (needs_freeing)
         free_ins(ins);
@@ -757,7 +757,7 @@ e_file_open(SHIM_INTERP, ARGIN(void *param))
 {
     char * const file = (char *) param;
 
-    if (strcmp(file, "-"))
+    if (!STREQ(file, "-"))
         freopen(file, "w", stdout);
     output = file;
     printf("# IMCC does produce b0rken PASM files\n");
