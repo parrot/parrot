@@ -240,6 +240,7 @@ PARROT_PURE_FUNCTION
 unsigned int hash_str(ARGIN(const char *str))
         __attribute__nonnull__(1);
 
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 SymReg * link_keys(PARROT_INTERP,
     int nargs,

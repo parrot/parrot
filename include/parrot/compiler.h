@@ -127,8 +127,7 @@
 #define PARROT_CONST_FUNCTION               __attribute__const__ __attribute__warn_unused_result__
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/
-#define PARROT_MALLOC                       __attribute__malloc__ __attribute__warn_unused_result__
-
+#define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ __attribute__warn_unused_result__
 
 /* Function argument instrumentation */
 /* For explanations of the annotations, see http://www.splint.org/manual/manual.html */
@@ -183,6 +182,14 @@
     /* Never applied by a human, only by the headerizer. */
 
 #endif
+
+#define ARGFREE(x)                          /*@only@*/ /*@out@*/ /*@null@*/ x
+    /* From the Splint manual: The parameter to free() must reference */
+    /* an unshared object.  Since the parameter is declared using "only", */
+    /* the caller may not use the referenced object after the call, and */
+    /* may not pass in a reference to a shared object.  There is nothing */
+    /* special about malloc and free — their behavior can be described */
+    /* entirely in terms of the provided annotations. */
 
 #endif /* PARROT_COMPILER_H_GUARD */
 

@@ -147,7 +147,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem_sys_realloc(ARGIN_NULLOK(void *from), size_t size)
+mem_sys_realloc(ARGFREE(void *from), size_t size)
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
@@ -180,7 +180,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem_sys_realloc_zeroed(ARGIN_NULLOK(void *from), size_t size, size_t old_size)
+mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
@@ -212,7 +212,7 @@ RT#48260: Not yet documented!!!
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem__internal_realloc(ARGIN(void *from), size_t size,
+mem__internal_realloc(ARGFREE(void *from), size_t size,
         ARGIN(const char *file), int line)
 {
     void * const ptr = realloc(from, size);
@@ -242,7 +242,7 @@ Free a chunk of memory back to the system.
 
 PARROT_API
 void
-mem_sys_free(ARGIN_NULLOK(void *from))
+mem_sys_free(ARGFREE(void *from))
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p\n", from);
@@ -262,7 +262,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-mem__internal_free(ARGIN_NULLOK(void *from), ARGIN(const char *file), int line)
+mem__internal_free(ARGFREE(void *from), ARGIN(const char *file), int line)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);
