@@ -160,7 +160,9 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $P0 = _lua__REGISTRY[key]
     $P1 = arg.'get_metatable'()
     unless $P0 == $P1 goto L1
-    .return ()
+    .local pmc val
+    val = getattribute arg, 'data'
+    .return (val)
   L1:
     lua_typerror(narg, $S0, type)
 .end

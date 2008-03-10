@@ -114,8 +114,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     .param pmc fh
     .param string funcname
     .local pmc res
-    lua_checkudata(narg, fh, 'ParrotIO')
-    res =  getattribute fh, 'data'
+    res = lua_checkudata(narg, fh, 'ParrotIO')
     unless null res goto L1
     lua_error(funcname, ": closed file")
   L1:
