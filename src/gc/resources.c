@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -676,7 +676,7 @@ memory is not cleared.
 */
 
 void
-Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t tosize)
+Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
 {
     size_t copysize;
     char  *mem;
@@ -686,7 +686,7 @@ Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t tosize)
     /*
      * we don't shrink buffers
      */
-    if (tosize <= PObj_buflen(buffer))
+    if (newsize <= PObj_buflen(buffer))
         return;
 
     /*
@@ -697,14 +697,14 @@ Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t tosize)
      * normally, which play ping pong with buffers.
      * The normal case is therefore always to allocate a new block
      */
-    new_size = aligned_size(buffer, tosize);
+    new_size = aligned_size(buffer, newsize);
     old_size = aligned_size(buffer, PObj_buflen(buffer));
     needed = new_size - old_size;
     if ((pool->top_block->free >= needed) &&
             (pool->top_block->top == (char*)PObj_bufstart(buffer) + old_size)) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
-        PObj_buflen(buffer) = tosize;
+        PObj_buflen(buffer) = newsize;
         return;
     }
     copysize = PObj_buflen(buffer);
@@ -739,7 +739,7 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 */
 
 void
-Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t tosize)
+Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
 {
     size_t copysize;
     char *mem, *oldmem;
@@ -752,7 +752,7 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t tosize)
     /*
      * if the requested size is smaller then buflen, we are done
      */
-    if (tosize <= PObj_buflen(str))
+    if (newsize <= PObj_buflen(str))
         return;
 
     /*
@@ -760,7 +760,7 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t tosize)
      * - if the passed strings buffer is the last string in the pool and
      * - if there is enough size, we can just move the pool's top pointer
      */
-    new_size = aligned_string_size(tosize);
+    new_size = aligned_string_size(newsize);
     old_size = aligned_string_size(PObj_buflen(str));
     needed = new_size - old_size;
     if (pool->top_block->free >= needed &&
@@ -771,7 +771,7 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t tosize)
         PObj_buflen(str) = new_size - sizeof (void*);
         return;
     }
-    PARROT_ASSERT(str->bufused <= tosize);
+    PARROT_ASSERT(str->bufused <= newsize);
     /* only copy used memory, not total string buffer */
     copysize = str->bufused;
 

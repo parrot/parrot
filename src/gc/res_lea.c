@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -113,7 +113,7 @@ xrealloc(void *p, size_t size)
 
 /*
 
-=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t tosize)>
+=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)>
 
 COWable objects (strings or Buffers) use an INTVAL before C<bufstart> for
 refcounting in DOD.
@@ -123,27 +123,27 @@ refcounting in DOD.
 */
 
 void
-Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t tosize)
+Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)
 {
     const size_t oldlen = PObj_buflen(buffer);
     Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(buffer)) {
-        Parrot_allocate_aligned(interp, buffer, tosize);
+        Parrot_allocate_aligned(interp, buffer, newsize);
         /* The previous version zeroed the memory here, but I'm not
            sure why. */
-        memset(PObj_bufstart(buffer), 0, tosize);
+        memset(PObj_bufstart(buffer), 0, newsize);
     }
     else {
-        if (!tosize) {    /* realloc(3) does free, if tosize == 0 here */
+        if (!newsize) {    /* realloc(3) does free, if newsize == 0 here */
             return;    /* do nothing */
         }
         p = (Buffer_alloc_unit *) xrealloc(PObj_bufallocstart(buffer),
-                                           Buffer_alloc_offset + tosize);
-        if (tosize > oldlen)
-            memset((char *)p->buffer + oldlen, 0, tosize - oldlen);
+                                           Buffer_alloc_offset + newsize);
+        if (newsize > oldlen)
+            memset((char *)p->buffer + oldlen, 0, newsize - oldlen);
         PObj_bufstart(buffer) = p->buffer;
-        PObj_buflen(buffer) = tosize;
+        PObj_buflen(buffer) = newsize;
     }
 }
 
@@ -181,9 +181,9 @@ Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 
 /*
 
-=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t tosize)>
+=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)>
 
-Reallocates the string buffer in C<*str> and returns it. C<tosize> is the
+Reallocates the string buffer in C<*str> and returns it. C<newsize> is the
 number of bytes memory required.
 
 =cut
@@ -191,18 +191,18 @@ number of bytes memory required.
 */
 
 void
-Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t tosize)
+Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)
 {
     Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(str)) {
-        Parrot_allocate_string(interp, str, tosize);
+        Parrot_allocate_string(interp, str, newsize);
     }
-    else if (tosize) {
+    else if (newsize) {
         p = (Buffer_alloc_unit *) xrealloc(PObj_bufallocstart(str),
-                                           Buffer_alloc_offset + tosize);
+                                           Buffer_alloc_offset + newsize);
         PObj_bufstart(str) = str->strstart = (char *) p->buffer;
-        PObj_buflen(str) = tosize;
+        PObj_buflen(str) = newsize;
     }
 }
 
