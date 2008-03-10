@@ -217,8 +217,8 @@ void parrot_new_hash_x(
     ARGOUT(Hash **hptr),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
-    ARGIN(hash_comp_fn compare),
-    ARGIN(hash_hash_key_fn keyhash))
+    NOTNULL(hash_comp_fn compare),
+    NOTNULL(hash_hash_key_fn keyhash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
@@ -228,8 +228,8 @@ void parrot_new_pmc_hash_x(
     ARGMOD(PMC *container),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
-    ARGIN(hash_comp_fn compare),
-    ARGIN(hash_hash_key_fn keyhash))
+    NOTNULL(hash_comp_fn compare),
+    NOTNULL(hash_hash_key_fn keyhash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
