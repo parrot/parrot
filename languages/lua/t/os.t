@@ -194,6 +194,9 @@ print(os.time({
     year = 2000,
     isdst = 0,
 }))
+
+-- os.time returns nil when C mktime returns -1
+-- this test needs a out of range value on any platform
 print(os.time({
     sec = 0,
     min = 0,
@@ -206,7 +209,7 @@ print(os.time({
 CODE
 /^
 946\d+\n
--306\d+\n
+nil\n
 $/x
 OUTPUT
 
