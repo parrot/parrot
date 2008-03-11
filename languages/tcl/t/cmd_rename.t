@@ -75,7 +75,7 @@ TCL
 OUT
 
 language_output_is( "tcl", <<'TCL', <<'OUT', "rename in a namespace" );
-proc puts2 {args} {puts {expand}$args}
+proc puts2 {args} {puts {*}$args}
 
 namespace eval joe {
     proc puts2 {args} {puts "HELLO WORLD"}

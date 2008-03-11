@@ -44,7 +44,7 @@ proc is {value expected {description ""} {special {}}}  {
                 set special ""
             }
         }
-        set special_reason [concat {expand}[lindex $special 1]]
+        set special_reason [concat {*}[lindex $special 1]]
         set description " - $description # $type $special_reason"
     } else {
         if  {$description ne ""} {
@@ -182,7 +182,7 @@ proc makeDirectory      {args} {return 0}
 proc removeDirectory    {args} {return 0}
 proc testobj            {args} {return 0}
 proc testsetplatform    {args} {return 0}
-proc testevalex         {cmd}  { uplevel {expand}$cmd }
+proc testevalex         {cmd}  { uplevel {*}$cmd }
 
 namespace eval tcltest  {
     set verbose 0
