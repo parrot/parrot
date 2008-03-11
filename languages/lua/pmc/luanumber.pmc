@@ -564,7 +564,6 @@ MMD_LuaString: {
                     "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
->>>>>>> .merge-right.r26307
                 Parrot_LuaNumber_i_divide_LuaNumber(INTERP, SELF, n);
             else
                 real_exception(INTERP, NULL, ILL_INHERIT,
