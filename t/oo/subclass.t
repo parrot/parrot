@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 19;
 
 =head1 NAME
 
@@ -589,22 +589,6 @@ pir_error_output_like( <<'CODE', <<'OUT', "the same parent can't be added twice"
 .end
 CODE
 /The class 'Bar' already has a parent class 'Foo'./
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'subclass should do what the parent does' );
-.sub 'main' :main
-    $P0 = subclass 'ResizablePMCArray', 'List'
-    $I0 = does $P0, 'array'
-
-    if $I0 goto okay
-    say 'not ok 1 - subclass of PMC that does array should do array'
-    end
-
-  okay:
-    say 'ok 1 - subclass of PMC that does array should do array'
-.end
-CODE
-ok 1 - subclass of PMC that does array should do array
 OUT
 
 # Local Variables:

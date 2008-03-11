@@ -239,13 +239,13 @@ SDL::Font library anyway, which calls this for you.
     dlfunc nci_sub, ttf_lib, 'TTF_OpenFont', 'pti'
     store_global 'SDL::NCI::TTF', 'OpenFont', nci_sub
 
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'ppti'
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'pptp'
     store_global 'SDL::NCI::TTF', 'RenderText_Solid', nci_sub
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'ppti'
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'pptp'
     store_global 'SDL::NCI::TTF', 'RenderUTF8_Solid', nci_sub
 
     # this one could be wrong
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'ppti'
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'pptp'
     store_global 'SDL::NCI::TTF', 'RenderUNICODE_Solid', nci_sub
 
     dlfunc nci_sub, ttf_lib, 'TTF_SizeText', 'ipt33'

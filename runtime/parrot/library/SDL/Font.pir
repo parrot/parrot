@@ -139,13 +139,9 @@ C<SDL::Surface> containing the rendered font.
     .local pmc RenderText_Solid
     find_global RenderText_Solid, 'SDL::NCI::TTF', 'RenderText_Solid'
 
-    .local int color
-    color = color_pmc
+    .local pmc color
+    color = color_pmc.'color'()
 
-    print "Color int: "
-    say color
-
-    color <<= 2
     .local pmc font_surface_struct
     font_surface_struct = RenderText_Solid( font, text, color )
     font_surface.'wrap_surface'( font_surface_struct )

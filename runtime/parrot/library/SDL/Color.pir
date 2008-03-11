@@ -131,7 +131,6 @@ is none and 255 is the maximum possible.
 
     component = color['b']
     color_int += component
-
     .return( color_int )
 .end
 
