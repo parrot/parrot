@@ -6,9 +6,6 @@
 
 # RT#40713: put this in a namespace to avoid global pollution
 
-# get listing of all the tests we can't run.
-source lib/skipped_tests.tcl
-
 proc skip_all {} {
     puts 1..0
 }
@@ -130,6 +127,10 @@ proc diag {diagnostic} {
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description args} {
     global skipped_tests
+    if {![info exists skipped_tests]} {
+        # get listing of all the tests we can't run.
+        source lib/skipped_tests.tcl
+    }
     global abort_after
     set full_desc "$num $description"
 
