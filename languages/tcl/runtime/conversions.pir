@@ -110,11 +110,22 @@ Given a PMC, get a number from it.
 
   .local string className
   .local pmc    value
+  
   className = ast['class']
   value     = ast['value']
 
-  number = new className
-  assign number, value
+  # XXX We probably shouldn't have to invoke the PIR compiler here.
+
+  $P0 = new 'CodeString'
+  $P0.emit(".sub 'anon' :anon")
+  $P0.emit('$P0 = new "%0"', className)
+  $P0.emit("$P0 = %0", value)
+  $P0.emit(".return($P0)")
+  $P0.emit(".end")
+
+  $P1 = compreg 'PIR'
+  $P2 = $P1($P0)
+  number = $P2()
 
   .return(number)
 
@@ -153,8 +164,8 @@ normal:
   push_eh not_integer_eh
     integer = __number(value)
   pop_eh
-  $I0 = typeof integer
-  if $I0 != .TclInt goto not_integer
+  $S0 = typeof integer
+  if $S0 != 'TclInt' goto not_integer
 
   copy value, integer
 

@@ -86,8 +86,8 @@ empty_string:
       a = __number(a)
     pop_eh
 
-    $I0 = typeof a
-    if $I0 == .TclFloat goto cant_use_float
+    $S0 = typeof a
+    if $S0 == 'TclFloat' goto cant_use_float
 
     $I0 = a
     $I0 = bnot $I0
