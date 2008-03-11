@@ -298,6 +298,10 @@ new_pmc_header(PARROT_INTERP, UINTVAL flags)
             : interp->arena_base->pmc_pool;
     PMC * const pmc = (PMC *)pool->get_free_object(interp, pool);
 
+    if (!pmc)
+        real_exception(interp, NULL, ALLOCATION_ERROR,
+            "Parrot VM: PMC allocation failed!\n");
+
     /* clear flags, set is_PMC_FLAG */
     if (flags & PObj_is_PMC_EXT_FLAG) {
         flags |= PObj_is_special_PMC_FLAG;

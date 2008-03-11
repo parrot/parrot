@@ -174,8 +174,9 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 {
-    PMC *pmc;
+    PMC    *pmc;
     VTABLE *vtable = interp->vtables[base_type];
+    UINTVAL vtable_flags;
 
     /* This is usually because you either didn't call init_world early enough,
      * you added a new PMC class without adding Parrot_(classname)_class_init
@@ -184,8 +185,10 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     if (!vtable)
         PANIC(interp, "Null vtable used; did you add a new PMC?");
 
+    vtable_flags = vtable->flags;
+
     /* we only have one global Env object, living in the interp */
-    if (vtable->flags & VTABLE_PMC_IS_SINGLETON) {
+    if (vtable_flags & VTABLE_PMC_IS_SINGLETON) {
         /*
          * singletons (monadic objects) exist only once, the interface
          * with the class is:
@@ -209,10 +212,10 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
         return pmc;
     }
 
-    if (vtable->flags & VTABLE_IS_CONST_PMC_FLAG) {
+    if (vtable_flags & VTABLE_IS_CONST_PMC_FLAG) {
         flags |= PObj_constant_FLAG;
     }
-    else if (vtable->flags & VTABLE_IS_CONST_FLAG) {
+    else if (vtable_flags & VTABLE_IS_CONST_FLAG) {
         /* put the normal vtable in, so that the pmc can be initialized first
          * parrot or user code has to set the _ro property then,
          * to morph the PMC to the const variant
@@ -232,18 +235,13 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
         vtable = interp->vtables[base_type];
     }
 
-    if (vtable->flags & VTABLE_PMC_NEEDS_EXT) {
+    if (vtable_flags & VTABLE_PMC_NEEDS_EXT) {
         flags |= PObj_is_PMC_EXT_FLAG;
-        if (vtable->flags & VTABLE_IS_SHARED_FLAG)
+        if (vtable_flags & VTABLE_IS_SHARED_FLAG)
             flags |= PObj_is_PMC_shared_FLAG;
     }
 
-    pmc = new_pmc_header(interp, flags);
-
-    if (!pmc)
-        real_exception(interp, NULL, ALLOCATION_ERROR,
-                "Parrot VM: PMC allocation failed!\n");
-
+    pmc            = new_pmc_header(interp, flags);
     pmc->vtable    = vtable;
     pmc->real_self = pmc;
 
