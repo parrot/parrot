@@ -74,8 +74,7 @@ token backslash_substitution {
 }
 
 token expand {
-      \{expand\}<!before:\s>
-    | \{\*\}<!before:\s>
+    \{\*\}<!before:\s>
 }
 
 # this is so we can use these rules in [subst]

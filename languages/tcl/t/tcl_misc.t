@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 32;
 use Test::More;
 
 language_output_is( 'tcl', <<'TCL', <<'OUT', 'multiple foreaches. seems to need puts to trigger.' );
@@ -243,15 +243,6 @@ proc new {} {
 puts [new]
 TCL
 
-OUT
-
-language_output_is('tcl', <<'TCL', <<'OUT', '{expand}');
-  set var {a   b c}
-  puts [join [list {expand}$var] ,]
-  puts [join [list {expand}{a {b c} d}] ,]
-TCL
-a,b,c
-a,b c,d
 OUT
 
 language_output_is('tcl', <<'TCL', <<'OUT', '{*}');
