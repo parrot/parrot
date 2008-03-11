@@ -1047,6 +1047,7 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* tonumber() {
+        PMC     *retval;
         STRING  *rep = SELF.get_string();
         char    *s1  = string_to_cstring(INTERP, rep);
         char    *s2;
@@ -1060,17 +1061,15 @@ MMD_DEFAULT: {
 
             /* no invalid trailing characters? */
             if (*s2 == '\0') {
-                PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+                retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 VTABLE_set_number_native(INTERP, retval, d);
                 string_cstring_free(s1);
                 RETURN(PMC *retval);
             }
         }
-        else {
-            PMC *retval = pmc_new(INTERP, dynpmc_LuaNil);
-            string_cstring_free(s1);
-            RETURN(PMC *retval);
-        }
+        retval = pmc_new(INTERP, dynpmc_LuaNil);
+        string_cstring_free(s1);
+        RETURN(PMC *retval);
     }
 
 /*
@@ -1081,6 +1080,7 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* tobase(INTVAL base) {
+        PMC          *retval;
         STRING       *rep = SELF.get_string();
         char         *s1  = string_to_cstring(INTERP, rep);
         char         *s2;
@@ -1095,17 +1095,15 @@ MMD_DEFAULT: {
 
             /* no invalid trailing characters? */
             if (*s2 == '\0') {
-                PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+                retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 VTABLE_set_number_native(INTERP, retval, n);
                 string_cstring_free(s1);
                 RETURN(PMC *retval);
             }
         }
-        else {
-            PMC *retval = pmc_new(INTERP, dynpmc_LuaNil);
-            string_cstring_free(s1);
-            RETURN(PMC *retval);
-        }
+        retval = pmc_new(INTERP, dynpmc_LuaNil);
+        string_cstring_free(s1);
+        RETURN(PMC *retval);
     }
 
 }
