@@ -324,7 +324,6 @@ static void
 compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 {
     INTVAL        j;
-    UINTVAL       object_size;
     UINTVAL       total_size;
 
     Memory_Block *new_block;     /* A pointer to our working block */
@@ -351,10 +350,9 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     /* total - reclaimable == currently used. Add a minimum block to the
      * current amount, so we can avoid having to allocate it in the future. */
     {
-        Memory_Block *cur_block;
+        Memory_Block *cur_block = pool->top_block;
 
         total_size = 0;
-        cur_block  = pool->top_block;
 
         while (cur_block) {
             /*
@@ -399,23 +397,22 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     cur_spot  = new_block->start;
 
     /* Run through all the Buffer header pools and copy */
-    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+    for (j = (INTVAL)arena_base->num_sized - 1; j >= 0; --j) {
         Small_Object_Pool * const header_pool = arena_base->sized_header_pools[j];
+        UINTVAL       object_size;
 
-        if (header_pool == NULL)
+        if (!header_pool)
             continue;
 
         object_size = header_pool->object_size;
 
         for (cur_buffer_arena = header_pool->last_Arena;
-                NULL != cur_buffer_arena;
+                cur_buffer_arena;
                 cur_buffer_arena = cur_buffer_arena->prev) {
-            Buffer *b;
+            Buffer *b = (Buffer *)ARENA_to_PObj(cur_buffer_arena->start_objects);
             UINTVAL i;
 
-            b = (Buffer *)ARENA_to_PObj(cur_buffer_arena->start_objects);
-
-            for (i = 0; i < cur_buffer_arena->used; i++) {
+            for (i = cur_buffer_arena->used; i; --i) {
                 /* ! (on_free_list | constant | external | sysmem) */
                 if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     ptrdiff_t offset = 0;
@@ -513,14 +510,16 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     /* Now we're done. We're already on the pool's free list, so let us be the
      * only one on the free list and free the rest */
     {
-        Memory_Block *cur_block;
+        Memory_Block *cur_block = new_block->prev;
 
         PARROT_ASSERT(new_block == pool->top_block);
-        cur_block = new_block->prev;
+
         while (cur_block) {
             Memory_Block * const next_block = cur_block->prev;
+
             /* Note that we don't have it any more */
             arena_base->memory_allocated -= cur_block->size;
+
             /* We know the pool body and pool header are a single chunk, so
              * this is enough to get rid of 'em both */
             mem_internal_free(cur_block);
@@ -528,14 +527,16 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
         }
 
         /* Set our new pool as the only pool */
-        new_block->prev = NULL;
+        new_block->prev       = NULL;
         pool->total_allocated = total_size;
     }
 
     pool->guaranteed_reclaimable = 0;
-    pool->possibly_reclaimable = 0;
+    pool->possibly_reclaimable   = 0;
+
     if (interp->profile)
         Parrot_dod_profile_end(interp, PARROT_PROF_GC);
+
     --arena_base->GC_block_level;
 }
 
