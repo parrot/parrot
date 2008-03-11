@@ -311,30 +311,37 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
     UINTVAL found  = 0;
     int mark_key   = 0;
     int mark_value = 0;
-    size_t i;
 
-    if (hash->entry_type == enum_hash_string || hash->entry_type == enum_hash_pmc)
+    INTVAL i, entries;
+
+    if (hash->entry_type == enum_hash_string
+    ||  hash->entry_type == enum_hash_pmc)
         mark_value = 1;
-    if (hash->key_type == Hash_key_type_STRING || hash->key_type == Hash_key_type_PMC)
+
+    if (hash->key_type == Hash_key_type_STRING
+    ||  hash->key_type == Hash_key_type_PMC)
         mark_key = 1;
+
     if (!mark_key && !mark_value)
         return;
 
-    for (i = 0; i <= hash->mask; i++) {
+    entries = hash->entries;
+
+    for (i = hash->mask; i >= 0; --i) {
         HashBucket *bucket = hash->bi[i];
 
         while (bucket) {
-            if (++found > hash->entries)
+            if (++found > entries)
                 real_exception(interp, NULL, 1,
                         "Detected hash corruption at hash %p entries %d",
-                        hash, (int)hash->entries);
+                        hash, (int)entries);
 
-            /* don't mark the key if it's not true */
-            if (mark_key && bucket->key)
+            if (mark_key)
                 pobject_lives(interp, (PObj *)bucket->key);
 
             if (mark_value)
                 pobject_lives(interp, (PObj *)bucket->value);
+
             bucket = bucket->next;
         }
     }
