@@ -275,11 +275,17 @@ OUTPUT
 test_test($desc);
 
 $desc = 'pir_error_output_like: todo';
-$line = line_num(+15);
+$line = line_num(+21);
+my $location;
+if ($Test::Builder::VERSION <= eval '0.33') {
+    $location = "in $0 at line $line";
+} else {
+    $location = "at $0 line $line";
+}
 test_out("not ok 1 - $desc # TODO foo");
 $err = <<"ERR";
 #   Failed (TODO) test '$desc'
-#   at $0 line $line.
+#   $location.
 # Expected error but exited cleanly
 # Received:
 # ok
