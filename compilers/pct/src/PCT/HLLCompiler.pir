@@ -32,7 +32,7 @@ running compilers from a command line.
     $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine each version|v'
     setattribute self, '@cmdoptions', $P0
 
-    $P1 = new String
+    $P1 = new 'String'
     $P1 = <<'    USAGE'
   This compiler is based on PCT::HLLCompiler.
 
@@ -40,7 +40,7 @@ running compilers from a command line.
     USAGE
 
     .local pmc iter
-    iter = new Iterator, $P0
+    iter = new 'Iterator', $P0
   options_loop:
     unless iter goto options_end
     $P3  = shift iter

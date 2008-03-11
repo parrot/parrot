@@ -365,7 +365,7 @@ ok:
 .sub get_builtins
     .local pmc b
     .local string raw_given
-    b = new Hash
+    b = new 'Hash'
 
     # sudokusan malicious 26.6
     raw_given  = "..9...8.."
@@ -608,7 +608,7 @@ ly1:
     .local pmc cols, rows, sqrs, e, col, row, sqr, all
     .local pmc i_cols, i_rows, i_sqrs, i_col, i_row, i_sqr, inv
     setattribute self, "orig", ar
-    all = new Hash
+    all = new 'Hash'
     setattribute self, "all", all
     self.create_1("rows")
     self.create_1("cols")

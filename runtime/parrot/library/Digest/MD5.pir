@@ -1,3 +1,5 @@
+# $Id$
+#
 # Parrot MD5 library; Nick Glencross <nickg@glencros.demon.co.uk>
 #                     Improvements from Leo and Jens Rieks
 #
@@ -69,7 +71,7 @@ consumption which should be resolved soon.
     .param string str
 
     .local pmc context
-    context = new FixedIntegerArray
+    context = new 'FixedIntegerArray'
     context = 4
 
     .local pmc buffer
@@ -183,7 +185,7 @@ consumption which should be resolved soon.
     .param string str
 
     .local pmc buffer
-    buffer = new FixedIntegerArray
+    buffer = new 'FixedIntegerArray'
 
     .local int counter
     .local int subcounter
@@ -393,7 +395,7 @@ loop:
     .param int C
     .param int D
 
-    $P0 = new FixedIntegerArray
+    $P0 = new 'FixedIntegerArray'
     $P0 = 4
 
     $P0[0] = A

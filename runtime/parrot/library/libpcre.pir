@@ -76,7 +76,7 @@ RETURN:
     ovector_length= osize * num_result_pairs
 
     .local pmc ovector
-    ovector= new ManagedStruct
+    ovector= new 'ManagedStruct'
     ovector= ovector_length
 
     ## on 32 bit systems
@@ -105,7 +105,7 @@ RETURN:
     .local int ovece
 
     .local pmc struct
-    struct= new SArray
+    struct= new 'SArray'
     struct= 3
 
     .include "datatypes.pasm"

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -136,9 +136,9 @@ SKIP: {
     print "ok\n"
     l = new "Rational"
     l = 43
-    r = new BigInt
+    r = new 'BigInt'
     r = 0x7ffffff
-    d = new Undef
+    d = new 'Undef'
     add d, l, r
     print d
     print "\n"

@@ -452,7 +452,7 @@ for my $op ( "/", "%" ) {
     set P0, "1000000000000000000000"
     P1 = new 'BigInt'
     ## divide by a zero $type
-    P2 = new $type
+    P2 = new '$type'
     set P2, 0
     push_eh OK
     P1 = P0 $op P2

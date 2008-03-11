@@ -1221,7 +1221,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading attribute accessor vtable" );
     .local pmc cl, o
     cl = newclass 'MyClass'
     o = new 'MyClass'
-    $P2 = new String
+    $P2 = new 'String'
     $P2 = "blue"
     setattribute o, "blue", $P2
     $P1 = getattribute o, "blue"
