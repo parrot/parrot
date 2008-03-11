@@ -867,10 +867,8 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
                int need_lex)
 {
     int                 i;
-    decl_func_t         decl_func;
 
     PMC                *lex_info  = NULL;
-    STRING             *decl_lex  = const_string(interp, "declare_lex_preg");
     SymHash            *hsh       = &unit->hash;
     PackFile_Constant **constants = interp->code->const_table->constants;
     const INTVAL lex_info_id      = Parrot_get_ctx_HLL_type(interp,
