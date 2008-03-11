@@ -1,5 +1,5 @@
 /* tclobject.pmc
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -55,17 +55,17 @@ pmclass TclObject dynpmc group tcl_group {
     }
 
     void set_integer_native(INTVAL value) {
-        DYNSELF.morph(dynpmc_TclInt);
+        SELF.morph(dynpmc_TclInt);
         PMC_int_val(SELF) = value;
     }
 
     void set_number_native(FLOATVAL value) {
-        DYNSELF.morph(dynpmc_TclFloat);
+        SELF.morph(dynpmc_TclFloat);
         PMC_num_val(SELF) = value;
     }
 
     void set_string_native(STRING *value) {
-        DYNSELF.morph(dynpmc_TclString);
+        SELF.morph(dynpmc_TclString);
         /* Only allow constant PMCs to embed constant strings */
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
             const char *copy  = string_to_cstring(INTERP, value);

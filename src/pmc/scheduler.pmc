@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -22,6 +22,19 @@ Implements the core concurrency scheduler.
 #include "parrot/scheduler_private.h"
 
 pmclass Scheduler need_ext {
+    ATTR INTVAL        id;         /* The scheduler's ID. */
+    ATTR INTVAL        max_tid;    /* The highest assigned task ID. */
+    ATTR INTVAL        pending;    /* A count of pending tasks (cached for fast
+                                     lookup). */
+    ATTR PMC          *task_list;  /* The current list of tasks. */
+    ATTR PMC          *task_index; /* An index into the current list of tasks,
+                                     ordered by priority. */
+    ATTR PMC          *wait_index; /* An unordered index of inactive tasks. */
+    ATTR PMC          *handlers;   /* The list of currently active handlers. */
+    ATTR PMC          *messages;   /* A message queue used for communication
+                                     between schedulers. */
+    ATTR Parrot_mutex  msg_lock;   /* Lock to synchronize the message queue. */
+    ATTR Parrot_Interp interp;     /* A link to the scheduler's interpreter. */
 
 /*
 
@@ -33,8 +46,9 @@ Initialize a concurrency scheduler object.
 
 */
 
-    void init() {
-        Parrot_Scheduler * const core_struct = mem_allocate_zeroed_typed(Parrot_Scheduler);
+    VTABLE void init() {
+        Parrot_Scheduler * const core_struct =
+            mem_allocate_zeroed_typed(Parrot_Scheduler);
 
         /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -69,7 +83,7 @@ An C<Integer> representing the unique identifier for this scheduler.
 
 */
 
-    void init_pmc(PMC *data) {
+    VTABLE void init_pmc(PMC *data) {
         PMC              *elem;
         Parrot_Scheduler *core_struct;
 
@@ -135,7 +149,7 @@ recalculate it before retrieving the next task.
 
 */
 
-    PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() {
         Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
         PMC *task = PMCNULL;
 
@@ -160,7 +174,7 @@ Retrieve the number of pending tasks in the scheduler's task list.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
         return VTABLE_elements(INTERP, core_struct->task_index);
     }
@@ -176,7 +190,7 @@ Removes the task with the given task ID from the task list.
 
 */
 
-    void delete_keyed_int(INTVAL key) {
+    VTABLE void delete_keyed_int(INTVAL key) {
         Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
         STRING *task_id_str = string_from_int(INTERP, key);
         VTABLE_delete_keyed_str(INTERP, core_struct->task_list, task_id_str);
@@ -193,7 +207,7 @@ Set this PMC as shared.
 
 */
 
-    PMC *share_ro() {
+    VTABLE PMC *share_ro() {
         PMC *shared_self;
         Parrot_Scheduler *shared_struct;
 
@@ -221,7 +235,7 @@ Free the scheduler's underlying struct.
 =cut
 
 */
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
         MUTEX_DESTROY(core_struct->msg_lock);
         mem_sys_free(core_struct);
@@ -236,7 +250,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         if (PARROT_SCHEDULER(SELF)) {
             Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
 
@@ -265,7 +279,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
         PMC **pos;
 
@@ -290,7 +304,7 @@ Used to archive the scheduler.
 
 */
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
 
@@ -311,7 +325,7 @@ Used to unarchive the scheduler.
 
 */
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         /* 1. thaw scheduler id */
@@ -358,7 +372,7 @@ Called after the scheduler has been thawed.
 
 /*
 
-=item C<PCCMETHOD add_handler(PMC *handler)>
+=item C<METHOD add_handler(PMC *handler)>
 
 Add a handler to the scheduler.
 
@@ -366,14 +380,14 @@ Add a handler to the scheduler.
 
 */
 
-    PCCMETHOD add_handler(PMC *handler) {
+    METHOD add_handler(PMC *handler) {
         Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
         VTABLE_push_pmc(INTERP, core_struct->handlers, handler);
     }
 
 /*
 
-=item C<PCCMETHOD find_handler(PMC *task)>
+=item C<METHOD find_handler(PMC *task)>
 
 Search for a handler for the given task. If no handler is found, return
 PMCNULL.
@@ -382,7 +396,7 @@ PMCNULL.
 
 */
 
-    PCCMETHOD find_handler(PMC *task) {
+    METHOD find_handler(PMC *task) {
         Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
         INTVAL elements = VTABLE_elements(INTERP, core_struct->handlers);
         INTVAL counter;
@@ -394,12 +408,12 @@ PMCNULL.
             if (!PMC_IS_NULL(handler)) {
                 (INTVAL valid_handler) = PCCINVOKE(interp, handler, "can_handle", PMC *task);
                 if (valid_handler) {
-                    PCCRETURN(PMC *handler);
+                    RETURN(PMC *handler);
                 }
             }
         }
 
-        PCCRETURN(PMC *PMCNULL);
+        RETURN(PMC *PMCNULL);
     }
 
 

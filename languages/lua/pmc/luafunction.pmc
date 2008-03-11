@@ -27,15 +27,15 @@ See also: F<languages/lua/pmc/luaclosure.pmc>
 
 
 pmclass LuaFunction
-    extends Sub
-    extends LuaAny
-    does scalar
-    does sub
+    extends  Sub
+    extends  LuaAny
+    provides scalar
+    provides sub
     dynpmc
     need_ext
-    group lua_group
-    hll Lua
-    maps Sub {
+    group    lua_group
+    hll      Lua
+    maps     Sub {
 
 /*
 
@@ -135,10 +135,10 @@ MMD_DEFAULT: {
     METHOD PMC* getfenv() {
         PMC *retval = PMC_metadata(SELF);
 
-        if (retval)
-            return retval;
+        if (!retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
 
-        return pmc_new(INTERP, dynpmc_LuaNil);
+        RETURN(PMC *retval);
     }
 
 /*
@@ -158,7 +158,7 @@ MMD_DEFAULT: {
         else
             VTABLE_set_integer_native(INTERP, retval, 0);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*

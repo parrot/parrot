@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006-2007, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -27,7 +27,7 @@ static INTVAL dynpmc_WmlsInvalid;
 
 pmclass WmlsInvalid
     extends Undef
-    does scalar
+    provides scalar
     dynpmc
     group wmls_group
     hll Lua maps Undef {

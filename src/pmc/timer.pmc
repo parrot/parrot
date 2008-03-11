@@ -58,7 +58,21 @@ initializer.
 #include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
-pmclass Timer extends Task does event need_ext {
+pmclass Timer extends Task provides event need_ext {
+    ATTR INTVAL        id;        /* The task ID. */
+    ATTR INTVAL        priority;  /* The priority of the task. */
+    ATTR FLOATVAL      birthtime; /* The creation time stamp of the task. */
+    ATTR STRING       *type;      /* The type of the task. */
+    ATTR STRING       *subtype;   /* The subtype of the task. */
+    ATTR STRING       *status;    /* The status of the task. */
+    ATTR Parrot_Interp interp;    /* The interpreter that created the task. */
+    ATTR PMC          *codeblock; /* An (optional) codeblock for the task. */
+    ATTR PMC          *data;      /* Additional data for the task. */
+    ATTR char         *cb_data;   /* Additional data for a callback event. */
+    ATTR FLOATVAL      duration;  /* The duration of the timer pause */
+    ATTR FLOATVAL      interval;  /* How often to repeat */
+    ATTR INTVAL        repeat;    /* Whether to repeat:
+                                   * 0 = run once (no repeat), -1 = forever */
 
 /*
 
@@ -70,7 +84,7 @@ Initializes the timer.
 
 */
 
-    void init() {
+    VTABLE void init() {
         Parrot_Timer * const core_struct = mem_allocate_zeroed_typed(Parrot_Timer);
 
         /* Set flags for custom DOD mark and destroy. */
@@ -105,7 +119,7 @@ See F<docs/pdds/pdd02_vtables.pod> for initializers.
 
 */
 
-    void init_pmc(PMC *init) {
+    VTABLE void init_pmc(PMC *init) {
         const INTVAL n = VTABLE_get_integer(INTERP, init);
         INTVAL       i;
 
@@ -151,7 +165,7 @@ Create a copy of the timer, resetting status, id, and birthtime.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         PMC          * const copy       = SUPER();
         Parrot_Timer * const new_struct = PARROT_TIMER(copy);
         Parrot_Timer * const old_struct = PARROT_TIMER(SELF);
@@ -173,7 +187,7 @@ Destroys the timer.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_cx_delete_task(INTERP, SELF);
         mem_sys_free(PMC_data(SELF));
     }
@@ -188,7 +202,7 @@ Returns the timer info for C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
         const FLOATVAL absolute_time = core_struct->birthtime + core_struct->duration;
 
@@ -218,7 +232,7 @@ Returns the PMC associated with C<key>.
 
 */
 
-    PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         if (key == PARROT_TIMER_HANDLER) {
             const Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
             return core_struct->codeblock;
@@ -237,7 +251,7 @@ Returns the number associated with C<key>.
 
 */
 
-    FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         const Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {
@@ -262,7 +276,7 @@ Sets the value associated with C<key> to C<value>.
 
 */
 
-    void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {
@@ -301,7 +315,7 @@ Sets the PMC associated with C<key> to C<*value>.
 
 */
 
-    void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         if (key == PARROT_TIMER_HANDLER) {
             Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
             core_struct->codeblock = value;
@@ -318,7 +332,7 @@ Adds the timer to the event queue.
 
 */
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         Parrot_cx_schedule_task(INTERP, SELF);
         return (opcode_t *)next;
     }
@@ -333,7 +347,7 @@ Sets the floating-point value associated with C<key> to C<value>.
 
 */
 
-    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         Parrot_Timer * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {

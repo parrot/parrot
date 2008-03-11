@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -12,7 +12,7 @@ $Revision$
 =head1 ABSTRACT
 
 This PDD describes the internal structure and behavior of the Parrot Magic
-Cookie (PMC) data type. 
+Cookie (PMC) data type.
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ pointer, but is useful for PMCs which hold only a single piece of data (e.g.
 C<PerlInts>).
 
 C<flags> holds a set of flags associated with the PMC; these are documented  in
-F<include/parrot/pobj.h>, and are generally only used within the Parrot 
+F<include/parrot/pobj.h>, and are generally only used within the Parrot
 internals.
 
 C<vtable> holds a pointer to the B<vtable> associated with the PMC. This points
@@ -90,7 +90,7 @@ L<Vtable Functions> that implement the basic behaviour of the PMC
 (i.e. how it behaves under addition, subtraction, cloning etc.)
 
 C<data> holds a pointer to the core data associated with the PMC. This
-may be NULL.
+may be null.
 
 C<pmc_ext> points to an extended PMC structure. This has the form:
 
@@ -105,7 +105,7 @@ yet been finalized.
 
 C<_synchronize> is for access synchronization between shared PMCs.
 
-C<_next_for_GC> determines the next PMC in the 'used' list during dead object 
+C<_next_for_GC> determines the next PMC in the 'used' list during dead object
 detection in the GC.
 
 PMCs are not required to have a C<PMC_EXT> structure (i.e. C<pmc_ext> can be
@@ -230,18 +230,33 @@ of a C<pmclass> or C<prole> declaration.
 
   ATTR <type> <name> [ :<modifier> ... ];
 
-This declaration is used to generate the data struct for the PMC
-(named "Parrot_<pmcname>_Data"). The data struct incorporates any
-attributes declared in a composed role. The declaration is also used to
-generate accessor macros for the class, in the form of
-GET_ATTR_<attrname> and SET_ATTR_<attrname>, and to set up helper
-information for the C<inspect> vtable function, and to provide attribue
-access throught the default C<get_attr> and C<set_attr> vtable functions.
+This declaration is used to generate the data struct for the PMC (named
+"Parrot_<pmcname>_Data"). The data struct incorporates any attributes declared
+in a composed role or inherited class. Composed attributes are inserted at the
+end of the generated struct. Inherited attributes are inserted at the top of
+the generated struct, so the struct members shared by the parent and child are
+in the same position, and code compiled for direct struct access to the parent
+can also perform the same direct struct access on the child.
+
+The declaration is also used to generate accessor macros, C<GET_ATTR_attrname>
+and C<SET_ATTR_attrname>, to set up helper information for the C<inspect>
+vtable function, and to provide attribute access through the default
+C<get_attr> and C<set_attr> vtable functions.
 
 It's also possible to define and store the PMC's data struct manually,
 but the standard declaration syntax must be used in roles, in PMCs that
 compose roles, and in PMCs that will be subclassed by high-level classes
 (this means all core PMCs, and most non-core PMCs).
+
+Low-level PMCs that use multiple inheritance (C<pmclass> declarations with more
+than one C<extends> entry) have to be careful with the contents of their
+structs. There's no problem if the two parents have identical data struct
+members. But, if the two parents have different data struct members, any vtable
+functions inherited from the parents will not be able to directly access the
+parents' struct members or use the accessor macros. The solution is to either
+override those vtable functions that directly access data struct members in the
+child PMC, define the parents as roles instead of classes, or declare the
+multiply inheriting child in PIR or an HLL.
 
 =head3 Defining vtable functions
 
@@ -261,22 +276,20 @@ The current interpreter object.
 
 =item SELF
 
-The current static invocant.
+The current invocant by dynamic type.
 
-=item DYNSELF
+=item STATICSELF
 
-The current dynamic invocant. [NOTE: it seems that this is actually what
-most people mean when they say C<SELF>.]
+The current invocant by static type.
 
 =item SUPER
 
-Calls the current method in the nearest superclass, using the static
-type of C<SELF>. [NOTE: again, seems that this should be the dynamic
-type, not static type.]
-
-=item DYNSUPER
-
 Calls the current method in the nearest superclass, using the dynamic
+type of C<SELF>.
+
+=item STATICSUPER
+
+Calls the current method in the nearest superclass, using the static
 type of C<SELF>.
 
 =back
@@ -287,9 +300,6 @@ Methods are declared in the body of the C<pmclass> or C<prole>
 declaration with C<METHOD>.
 
   METHOD inspect(STRING *what :optional, int got_what :opt_flag) {...}
-
-[NOTE: There is an older C<METHOD> keyword, which is deprecated. The
-current C<PCCMETHOD> will be renamed to C<METHOD>. See: RT#48565]
 
 =head2 PMCs and Namespaces
 
@@ -324,7 +334,7 @@ roles aren't complete stand-alone PMCs, they are just bundles of behavior and
 state that can be used within the composing PMC. As such, roles are never
 instantiated directly, and are never translated to C directly. They have no
 core structs, though they define attributes to be added to the PMC they are
-composed into. 
+composed into.
 
 When a PMC that uses a role is translated to C, the role provides vtable
 functions, methods, and attributes that will be added to the generated C
@@ -336,7 +346,7 @@ the same name as inherited vtable functions, methods, or attributes, the
 composed feature overrides the inherited feature, just as it would if
 defined in the composing PMC.
 
-Roles are defined using the C<prole> keyword. 
+Roles are defined using the C<prole> keyword.
 
   prole <name> <modifiers> {
   }
@@ -417,11 +427,6 @@ within the low-level PMC are dispatched on the PDD 15 object invocant.
 This allows the PDD 15 object to intelligently handle method and vtable
 overrides within multiple parents and itself.
 
-(This will likely require changing the C<SELF> shortcut to be equivalent
-to C<DYNSELF>, which is what it probably should have been in the first
-place. We can create an alternative C<STATICSELF> for the rare cases
-when we really need it.)
-
 If a low-level PMC expects to be overridden by high-level classes (which
 means all the core low-level PMC types), it must respect the standard
 interface.
@@ -431,7 +436,7 @@ interface.
 
 =head2 Vtable Functions
 
-Vtables decouple the interface and implementation of various object functions. 
+Vtables decouple the interface and implementation of various object functions.
 The actual vtable structure contains pointers to functions that implement the
 methods for that particular PMC.  All pointers must point to valid functions
 with appropriate prototypes.
@@ -460,7 +465,7 @@ turns it into a PMC of the appropriate class.
 Alternative entry point called when a PMC is first instantiated.  Accepts a PMC
 parameter used to initialize the given object.  Interpretation of the PMC
 initializer is left open, each PMC is free to choose its own implemention. A
-NULL value passed as the initializer parameter is allowed.
+null value passed as the initializer parameter is allowed.
 
 NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to
 init(), though there will of necessity be exceptions.
@@ -624,21 +629,21 @@ merged.]
   PMC* getprop(INTERP, PMC* self, STRING* key)
 
 Return the value from the property hash of I<self> keyed by I<key>. The key
-should not be NULL.
+should not be null.
 
 =item setprop
 
   void setprop(INTERP, PMC* self, STRING* key, PMC* value)
 
 Set the value in the property hash of I<self> that is keyed by I<key> to the
-value of I<value>. The key should not be NULL.
+value of I<value>. The key should not be null.
 
 =item delprop
 
   void delprop(INTERP, PMC* self, STRING* key)
 
 Delete the value from the property hash of I<self> keyed by I<key>. The key
-should not be NULL.
+should not be null.
 
 =item getprops
 
@@ -652,7 +657,7 @@ Return the entire property hash for I<self>.
 
 Return the type of the PMC. Type is a unique number associated with the PMC when
 the PMC's class is loaded. Negative numbers are considered
-interpreter-specific, non-public types. 
+interpreter-specific, non-public types.
 
 =item subtype [deprecated: See RT #48569]
 
@@ -824,13 +829,13 @@ PMC.
 
 Many of the following functions have a *_keyed form, a *_keyed_int form, and a
 *_keyed_str form. The keyed forms take a PMC*, INTVAL, or STRING* key as a
-parameter. The PMC* parameter is NULL if there is no key for that
+parameter. The PMC* parameter is null (PMCNULL) if there is no key for that
 PMC; this means that that argument is unkeyed.
 
-In some cases, the caller must provide a non-NULL key.  Those cases are
+In some cases, the caller must provide a non-null key.  Those cases are
 explicitly stated below.  In the other cases, you may have to implement the
-keyed vtable functions and check for a NULL I<self> key even if you are
-implementing a non-aggregate type.  If the I<self> key is non-NULL and the PMC
+keyed vtable functions and check for a null I<self> key even if you are
+implementing a non-aggregate type.  If the I<self> key is non-null and the PMC
 class is a non-aggregate type, the _keyed_* methods should throw an exception.
 
 If you do not implement the *_keyed_int and *_keyed_str functions, the default
@@ -852,7 +857,7 @@ Return the number of elements in the PMC.
   INTVAL get_integer_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return the integer value for the element indexed by a PMC, integer, or string
-key. The key is guaranteed not to be NULL for this function.
+key. The key is guaranteed not to be null for this function.
 
 =item get_number_keyed
 
@@ -861,7 +866,7 @@ key. The key is guaranteed not to be NULL for this function.
   FLOATVAL get_number_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return the native floating-point value for the element indexed by a PMC,
-integer, or string key. The key is guaranteed not to be NULL for this
+integer, or string key. The key is guaranteed not to be null for this
 function.
 
 =item get_string_keyed
@@ -871,7 +876,7 @@ function.
   STRING* get_string_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return the string value for the element indexed by a PMC, integer, or string
-key. The key is guaranteed not to be NULL for this function.
+key. The key is guaranteed not to be null for this function.
 
 =item get_bool_keyed [deprecated: See RT #48571]
 
@@ -892,7 +897,7 @@ Return the boolean value for the element indexed by a string key.
   PMC* get_pmc_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return the PMC value for the element indexed by a PMC, integer, or
-string key. The key is guaranteed not to be NULL for this function.
+string key. The key is guaranteed not to be null for this function.
 
 =item get_pointer_keyed
 
@@ -911,7 +916,7 @@ PMC.
   void set_integer_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
 
 Set the integer value of the element indexed by a PMC, integer, or
-string key. The key is guaranteed not to be NULL for this function.
+string key. The key is guaranteed not to be null for this function.
 
 =item set_number_keyed
 
@@ -920,7 +925,7 @@ string key. The key is guaranteed not to be NULL for this function.
   void set_number_keyed_str(INTERP, PMC* self, STRING* key, FLOATVAL value)
 
 Set the floating-point value of the element indexed by a PMC, integer,
-or string key. The key is guaranteed not to be NULL for this function.
+or string key. The key is guaranteed not to be null for this function.
 
 =item set_string_keyed
 
@@ -929,7 +934,7 @@ or string key. The key is guaranteed not to be NULL for this function.
   void set_string_keyed_str(INTERP, PMC* self, STRING* key, STRING* value)
 
 Set the string value of the element indexed by a PMC, integer, or string
-key. The key is guaranteed not to be NULL for this function.
+key. The key is guaranteed not to be null for this function.
 
 =item set_pmc_keyed
 
@@ -955,7 +960,7 @@ Set the pointer value of the element indexed by a PMC, integer, or string key.
   INTVAL type_keyed_str(INTERP, PMC* self, STRING* key) [RT #48581]
 
 Return the type number of the PMC indexed by a PMC, integer, or string key.
-The I<key> parameter is guaranteed not to be NULL for this method.
+The I<key> parameter is guaranteed not to be null for this method.
 
 =item pop_integer
 
@@ -1129,7 +1134,7 @@ I<self>.
   void i_subtract_float(INTERP, PMC* self, FLOATVAL value)
 
 Subtract the value of a PMC, native integer, or native floating-point number
-from a PMC and store the result in I<dest>. If I<dest> is NULL create a result
+from a PMC and store the result in I<dest>. If I<dest> is null create a result
 PMC of an appropriate type.  Note that I<dest> may be the same PMC as I<self>;
 in that case optimizations may be made. The C<i_> variants perform an
 inplace operation, modifying the value of I<self>.
@@ -1686,10 +1691,6 @@ A true/false value. Returns 0 for false, 1 for true when fetched as an
 integer or float, empty string for false and '1' for true when fetched
 as a string.
 
-{{ IMPLEMENTATION NOTE: move the definitions of the Python constants
-"True" and "False" out of src/pmc/boolean.pmc. They belong in
-HLL-specific code, not in the core boolean type. }}
-
 =item BigInt
 
 An arbitrary precision integer.
@@ -1707,7 +1708,7 @@ numbers? }}
 
 =item Class
 
-The PMC for Parrot's class. 
+The PMC for Parrot's class.
 
 =item Object
 
@@ -1721,8 +1722,8 @@ the referred-to PMC.
 =item AggregateElementRef
 
 This PMC represents a reference to an element contained in an aggregate PMC
-type, such as an array or hash. It is initialized with the key being 
-referenced and the aggregate PMC containing that key. 
+type, such as an array or hash. It is initialized with the key being
+referenced and the aggregate PMC containing that key.
 
 Note that assigning to the reference PMC will be equivalent to a keyed set on
 the referenced aggregate PMC - that is, it modifies the element rather than
@@ -1775,7 +1776,7 @@ singleton PMCNULL.
 The base class for all array types (a statically sized array for any
 arbitrary type). New array types can be derived from the base Array.
 In user code it is recommended to use one of the specific array types
-below, rather than the base type. 
+below, rather than the base type.
 
 =item FixedBooleanArray
 
@@ -1907,7 +1908,7 @@ A native call interface wrapper around a C function.
 
 =item Bound_NCI
 
-An internal NCI method call bound to a particular call instance. 
+An internal NCI method call bound to a particular call instance.
 
 =item Compiler
 

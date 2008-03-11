@@ -20,6 +20,7 @@ Implements an instance of a class.
 
 #include "parrot/parrot.h"
 #include "parrot/oo_private.h"
+#include "pmc_class.h"
 
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
@@ -90,6 +91,8 @@ get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
 }
 
 pmclass Object need_ext {
+    ATTR PMC *_class;       /* The class this is an instance of. */
+    ATTR PMC *attrib_store; /* The attributes store - a resizable PMC array. */
 
 /*
 
@@ -101,7 +104,7 @@ Raises an exception; you can only instantiate objects from a class.
 
 */
 
-    void init() {
+    VTABLE void init() {
         real_exception(interp, NULL, INVALID_OPERATION,
                 "Object must be created by a class.");
     }
@@ -117,7 +120,7 @@ Raises an exception; you can only instantiate objects from a class.
 
 */
 
-    void init_pmc(PMC *worreva) {
+    VTABLE void init_pmc(PMC *worreva) {
         real_exception(interp, NULL, INVALID_OPERATION,
                 "Object must be created by a class.");
     }
@@ -131,7 +134,7 @@ Free the object's underlying struct.
 =cut
 
 */
-    void destroy() {
+    VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
     }
 
@@ -145,7 +148,7 @@ Returns the fully qualified name of the object's class.
 
 */
 
-    STRING *name() {
+    VTABLE STRING *name() {
         PMC    * const _class     = VTABLE_get_class(interp, SELF);
         STRING * const class_name = VTABLE_get_string(interp, _class);
 
@@ -161,7 +164,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         if (PARROT_OBJECT(SELF)) {
             Parrot_Object * const obj = PARROT_OBJECT(SELF);
 
@@ -182,7 +185,7 @@ of the given name walking up the inheritance tree.
 =cut
 
 */
-    PMC *get_attr_str(STRING *name) {
+    VTABLE PMC *get_attr_str(STRING *name) {
         Parrot_Object * const obj      = PARROT_OBJECT(SELF);
         STRING        * const get_attr = CONST_STRING(interp, "get_attr_str");
         INTVAL index;
@@ -216,7 +219,7 @@ defined in the parent identified by the given key.
 =cut
 
 */
-    PMC *get_attr_keyed(PMC *key, STRING *name) {
+    VTABLE PMC *get_attr_keyed(PMC *key, STRING *name) {
         Parrot_Object * const obj = PARROT_OBJECT(SELF);
 
         /* Look up the index. */
@@ -241,7 +244,7 @@ of the given name walking up the inheritance tree.
 =cut
 
 */
-    void set_attr_str(STRING *name, PMC *value) {
+    VTABLE void set_attr_str(STRING *name, PMC *value) {
         Parrot_Object * const obj       = PARROT_OBJECT(SELF);
         STRING        *vtable_meth_name = CONST_STRING(interp, "set_attr_str");
         INTVAL         index;
@@ -276,7 +279,7 @@ defined in the parent identified by the given key.
 =cut
 
 */
-    void set_attr_keyed(PMC *key, STRING *name, PMC *value) {
+    VTABLE void set_attr_keyed(PMC *key, STRING *name, PMC *value) {
         Parrot_Object * const obj = PARROT_OBJECT(SELF);
         const INTVAL index        = get_attrib_index_keyed(interp, obj->_class, key, name);
 
@@ -298,7 +301,7 @@ Queries this object's class to find the method with the given name.
 =cut
 
 */
-    PMC *find_method(STRING *name) {
+    VTABLE PMC *find_method(STRING *name) {
         Parrot_Object * const obj    = PARROT_OBJECT(SELF);
         Parrot_Class  * const _class = PARROT_CLASS(obj->_class);
         PMC           *method        = PMCNULL;
@@ -373,7 +376,7 @@ Get the class PMC representing the class that this object is an instance of.
 =cut
 
 */
-    PMC *get_class() {
+    VTABLE PMC *get_class() {
         PMC    * const classobj = PARROT_OBJECT(SELF)->_class;
         STRING *get_class       = CONST_STRING(interp, "get_class");
         /* If there's a vtable override for 'get_class' run that instead. */
@@ -397,7 +400,7 @@ non-zero value if it does.
 =cut
 
 */
-    INTVAL can(STRING *method_name) {
+    VTABLE INTVAL can(STRING *method_name) {
         /* Just use find_method and see it if finds anything. */
         const PMC * const method = VTABLE_find_method(interp, SELF, method_name);
         return !PMC_IS_NULL(method);
@@ -413,7 +416,7 @@ Returns whether the object's class is or inherits from C<*classname>.
 
 */
 
-    INTVAL isa_pmc(PMC *lookup) {
+    VTABLE INTVAL isa_pmc(PMC *lookup) {
         if (PMC_IS_NULL(lookup))
             return 0;
 
@@ -434,7 +437,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    INTVAL isa(STRING *classname) {
+    VTABLE INTVAL isa(STRING *classname) {
         PMC   *_class;
 
         if (SUPER(classname))
@@ -454,34 +457,14 @@ Returns whether the object's class does the role with name C<*role_name>.
 
 */
 
-    INTVAL does(STRING *role_name) {
+    VTABLE INTVAL does(STRING *role_name) {
         Parrot_Object * const obj    = PARROT_OBJECT(SELF);
 
-        if (role_name == NULL)
+        if (!role_name)
             return 0;
 
         /* Dispatch role to the object's class to check HLL roles first */
-        if (VTABLE_does(interp, VTABLE_get_class(interp, SELF), role_name))
-            return 1;
-
-        /* Check if we have any PMC parents, and if so also dispatch to
-         * their does check. */
-        if (CLASS_has_alien_parents_TEST(obj->_class)) {
-            Parrot_Class * const _class = PARROT_CLASS(obj->_class);
-            const int num_attribs       = VTABLE_elements(interp,
-                                                          obj->attrib_store);
-            int pos                     = VTABLE_elements(interp,
-                                                          _class->attrib_metadata);
-
-            for (; pos < num_attribs; pos++) {
-                PMC * const del_class = VTABLE_get_pmc_keyed_int(interp,
-                    obj->attrib_store, pos);
-                if (VTABLE_does(interp, del_class, role_name))
-                    return 1;
-            }
-        }
-
-        return 0;
+        return VTABLE_does(interp, VTABLE_get_class(interp, SELF), role_name);
     }
 
 /*
@@ -494,7 +477,7 @@ Returns whether the object's class does C<*role>.
 
 */
 
-    INTVAL does_pmc(PMC *role) {
+    VTABLE INTVAL does_pmc(PMC *role) {
         if (PMC_IS_NULL(role))
             return 0;
 
@@ -559,7 +542,7 @@ Returns the integer type of the object's class.
 
 */
 
-    INTVAL type() {
+    VTABLE INTVAL type() {
         PMC *class = VTABLE_get_class(interp, SELF);
         return VTABLE_type(interp, class);
     }
@@ -576,7 +559,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         Parrot_Object * const obj_data = PARROT_OBJECT(SELF);
         PMC **pos;
 
@@ -601,7 +584,8 @@ Used to archive the object.
 
 */
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
+        /*
         /*
         IMAGE_IO *io = info->image_io;
         INTVAL num_attributes = VTABLE_elements(interp, SELF);
@@ -620,7 +604,7 @@ Used to unarchive the object.
 
 */
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             SUPER(info);
         }
@@ -658,7 +642,7 @@ Used to mark a PMC as read-only shared.
 =cut
 
 */
-    PMC *share_ro() {
+    VTABLE PMC *share_ro() {
         PMC   *ret, *_true, *data;
         INTVAL i, n;
         PMC *classobj;
@@ -720,6 +704,20 @@ Used to mark a PMC as read-only shared.
         PARROT_ASSERT(ret->vtable->share_ro == Parrot_Object_share_ro);
 
         return ret;
+    }
+
+/*
+
+=item C<void morph(INTVAL type)>
+
+Changes the PMC to a PMC of a new type
+
+=cut
+
+*/
+
+    VTABLE void morph(INTVAL type) {
+        SUPER(type);
     }
 }
 

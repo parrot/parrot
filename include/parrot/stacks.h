@@ -25,9 +25,10 @@ typedef struct Stack_Entry {
 } Stack_Entry_t;
 
 typedef struct Stack_Chunk {
-    pobj_t obj;
-    int size;
-    const char * name;
+    UnionVal            cache;
+    Parrot_UInt         flags;
+    int                 size;
+    const char         *name;
     struct Stack_Chunk *prev;
     union { /* force appropriate alignment of 'data'.  If alignment
                is necessary, assume double is good enough.  27-04-2007. */

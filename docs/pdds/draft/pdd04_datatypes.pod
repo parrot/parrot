@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -46,7 +46,8 @@ C<FLOATVAL> will get you one of these.
 Parrot has a single internal string form:
 
     struct parrot_string_t {
-        pobj_t obj;
+        UnionVal cache;
+        Parrot_UInt flags;
         UINTVAL bufused;
         void *strstart;
         UINTVAL strlen;
@@ -115,23 +116,13 @@ are also potentially the most important. Their basic structure is as follows.
 All PMCs have the form:
 
     struct PMC {
-        pobj_t obj;
-        VTABLE *vtable;
- #if ! PMC_DATA_IN_EXT
-        DPOINTER *data;
- #endif
-        struct PMC_EXT *pmc_ext;
-    };
-
-where C<obj> is a pointer to an C<pobj_t> structure:
-
-    typedef struct pobj_t {
-        UnionVal u;
+        UnionVal cache;
         Parrot_UInt flags;
- #if ! DISABLE_GC_DEBUG
-        UINTVAL _pobj_version;
- #endif
-    } pobj_t;
+        VTABLE *vtable;
+        DPOINTER *data;
+        struct PMC_EXT *pmc_ext;
+        PMC *real_self;
+    };
 
 and where:
 

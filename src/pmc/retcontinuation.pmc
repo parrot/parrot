@@ -37,7 +37,7 @@ Initializes the continuation.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = new_ret_continuation(INTERP);
         PMC_pmc_val(SELF)    = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -48,7 +48,7 @@ Initializes the continuation.
      *     have to set ref_count initially to 1
      */
 
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_cont * const cc = PMC_cont(SELF);
 
         if (cc)
@@ -69,7 +69,7 @@ the GC gets at them.
 =cut
 
 */
-    PMC *clone() {
+    VTABLE PMC *clone() {
         invalidate_retc_context(INTERP, SELF);
         return SUPER();
     }
@@ -83,7 +83,7 @@ Transfers control to the calling context, and frees the current context.
 
 */
 
-    opcode_t *invoke(void *in_next) {
+    VTABLE opcode_t *invoke(void *in_next) {
         Parrot_cont       *cc         = PMC_cont(SELF);
         Parrot_Context    *from_ctx   = cc->from_ctx;
         PackFile_ByteCode * const seg = cc->seg;

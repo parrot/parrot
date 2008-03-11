@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -120,7 +120,7 @@ Creates an identical copy of the matchrange number.
 
     void init_pmc(PMC* initializer) {
         /* RT#48168 not implemented */
-        DYNSELF.init();
+        SELF.init();
     }
 
     void destroy() {
@@ -180,18 +180,18 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         }
         else {
             STRING* s = VTABLE_get_string(interp, key);
-            return DYNSELF.get_integer_keyed_str(s);
+            return SELF.get_integer_keyed_str(s);
         }
     }
 
     INTVAL get_integer_keyed_str(STRING* key) {
-        FLOATVAL f = DYNSELF.get_number_keyed_str(key);
+        FLOATVAL f = SELF.get_number_keyed_str(key);
         return (INTVAL)f;
     }
 
     FLOATVAL get_number_keyed(PMC* key) {
         STRING* s = VTABLE_get_string(interp, key);
-        return DYNSELF.get_number_keyed_str(s);
+        return SELF.get_number_keyed_str(s);
     }
 
     FLOATVAL get_number_keyed_str(STRING* key) {
@@ -203,7 +203,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
     PMC* get_pmc_keyed(PMC* key) {
         STRING* s = VTABLE_get_string(interp, key);
-        return DYNSELF.get_pmc_keyed_str(s);
+        return SELF.get_pmc_keyed_str(s);
     }
 
     PMC* get_pmc_keyed_str(STRING* key) {
@@ -211,7 +211,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         FLOATVAL val;
 
         ret = pmc_new(interp, enum_class_Float);
-        val = DYNSELF.get_number_keyed_str(key);
+        val = SELF.get_number_keyed_str(key);
         VTABLE_set_number_native(interp, ret, val);
         return ret;
     }
@@ -308,7 +308,7 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
         }
         else {
             STRING* s = VTABLE_get_string(interp, key);
-            DYNSELF.set_integer_keyed_str(s, value);
+            SELF.set_integer_keyed_str(s, value);
         }
     }
 
@@ -319,25 +319,25 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
     }
 
     void set_number_keyed(PMC* key, FLOATVAL value) {
-        DYNSELF.set_integer_keyed(key, (INTVAL) value);
+        SELF.set_integer_keyed(key, (INTVAL) value);
     }
 
     void set_number_keyed_str(STRING* key, FLOATVAL value) {
-        DYNSELF.set_integer_keyed_str(key, (INTVAL) value);
+        SELF.set_integer_keyed_str(key, (INTVAL) value);
     }
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        DYNSELF.set_integer_keyed_int(key, (INTVAL) value);
+        SELF.set_integer_keyed_int(key, (INTVAL) value);
     }
 
     void set_pmc_keyed(PMC* key, PMC* value) {
         INTVAL f = VTABLE_get_integer(interp, value);
-        DYNSELF.set_integer_keyed(key, f);
+        SELF.set_integer_keyed(key, f);
     }
 
     void set_pmc_keyed_str(STRING* key, PMC* value) {
         INTVAL f = VTABLE_get_integer(interp, value);
-        DYNSELF.set_integer_keyed_str(key, f);
+        SELF.set_integer_keyed_str(key, f);
     }
 
 /*

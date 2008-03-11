@@ -171,7 +171,7 @@ OUTPUT
 
         # these make sure NCI methods check does-write flags
         # 'writer' is marked as writing; 'reader' is not.
-        q{$I0 = value.'reader'(42)} => [ 1, 0 ],
+        q{$I0 = value.'reader'()} => [ 1, 0 ],
         q{$I0 = value.'writer'(42)} => [ 0, 0 ],
     );
     for my $test ( keys %tests ) {

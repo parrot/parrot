@@ -33,7 +33,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '# co' );
 co = coroutine.create(function () return 1 end)
 print(# co)
 CODE
-/^[^:]+: [^:]+:\d+: attempt to get length of/
+/^[^:]+: [^:]+:-?\d+: attempt to get length of/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not co' );

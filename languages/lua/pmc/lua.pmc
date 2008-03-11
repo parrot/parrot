@@ -41,7 +41,7 @@ context_infostr(PARROT_INTERP, parrot_context_t *ctx)
     Parrot_block_DOD(interp);
 
     if (Parrot_Context_get_info(interp, ctx, &info)) {
-        char *file = info.file;
+        const char *file = info.file;
         res        = Parrot_sprintf_c(interp, "\t%s:%d in function '%Ss'\n",
                                        file, info.line, info.subname);
 
@@ -115,39 +115,44 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* caller() {
-        parrot_context_t *ctx = CONTEXT(INTERP->ctx);
+        parrot_context_t *sub_ctx = CONTEXT(INTERP->ctx)->caller_ctx;
+        STRING           *retval;
 
         /* backtrace: follow the continuation chain */
         while (1) {
             PMC *cont;
-            if (PMC_metadata(ctx->current_sub) != NULL) {
+            if (sub_ctx->current_sub && PMC_metadata(sub_ctx->current_sub)) {
                 Parrot_Context_info info;
                 Parrot_block_DOD(INTERP);
 
-                if (Parrot_Context_get_info(INTERP, ctx, &info)) {
+                if (Parrot_Context_get_info(INTERP, sub_ctx, &info)) {
+                    STRING *retval = info.subname;
+
                     /* free the non-constant string, but not the constant one */
                     if (strncmp("(unknown file)", info.file, 14) < 0)
                         string_cstring_free(info.file);
 
                     Parrot_unblock_DOD(INTERP);
-                    return info.subname;
+                    RETURN(STRING *retval);
                 }
                 Parrot_unblock_DOD(INTERP);
                 break;
             }
 
-            cont = ctx->current_cont;
+            cont = sub_ctx->current_cont;
+
 
             if (!cont)
                 break;
 
-            ctx = PMC_cont(cont)->to_ctx;
+            sub_ctx = PMC_cont(cont)->to_ctx;
 
-            if (!ctx)
+            if (!sub_ctx)
                 break;
         }
 
-        return const_string(INTERP, "?");
+        retval = const_string(INTERP, "?");
+        RETURN(STRING *retval);
     }
 
 /*
@@ -161,7 +166,7 @@ information see F<src/pmc.c>.
         PMC     *retval = pmc_new(INTERP, dynpmc_LuaNumber);
         FLOATVAL f      = ((FLOATVAL)clock())/(FLOATVAL)CLOCKS_PER_SEC;
         VTABLE_set_number_native(INTERP, retval, f);
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -184,7 +189,7 @@ information see F<src/pmc.c>.
         VTABLE_set_pmc_keyed_int(INTERP, retval, 0, y);
         VTABLE_set_pmc_keyed_int(INTERP, retval, 1, expn);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -200,7 +205,7 @@ information see F<src/pmc.c>.
         VTABLE_set_number_native(INTERP, retval,
                                  ldexp(VTABLE_get_number(INTERP, x),
                                        VTABLE_get_integer(INTERP, expn)));
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -213,6 +218,8 @@ information see F<src/pmc.c>.
     METHOD PMC* mktime(PMC *tm) {
         time_t t;
         struct tm ts;
+        PMC *retval;
+
         ts.tm_sec   = VTABLE_get_integer_keyed_int(INTERP, tm, 0);
         ts.tm_min   = VTABLE_get_integer_keyed_int(INTERP, tm, 1);
         ts.tm_hour  = VTABLE_get_integer_keyed_int(INTERP, tm, 2);
@@ -224,12 +231,13 @@ information see F<src/pmc.c>.
         t = mktime(&ts);
 
         if (t == -1)
-            return pmc_new(INTERP, dynpmc_LuaNil);
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
         else {
-            PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+            retval = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_integer_native(INTERP, retval, t);
-            return retval;
         }
+
+        RETURN(PMC *retval);
     }
 
 /*
@@ -252,7 +260,7 @@ information see F<src/pmc.c>.
         VTABLE_set_pmc_keyed_int(INTERP, retval, 0, d);
         VTABLE_set_pmc_keyed_int(INTERP, retval, 1, y);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -269,15 +277,17 @@ information see F<src/pmc.c>.
 
         char *loc = (locale != NULL) ? string_to_cstring(INTERP, locale) : NULL;
         char *p   = setlocale(cat[category], loc);
+        PMC  *retval;
 
         if (p) {
-            PMC *retval = pmc_new(INTERP, dynpmc_LuaString);
+            retval = pmc_new(INTERP, dynpmc_LuaString);
             VTABLE_set_string_native(INTERP, retval,
                                      string_from_cstring(INTERP, p, 0));
-            return retval;
         }
         else
-            return pmc_new(INTERP, dynpmc_LuaNil);
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+
+        RETURN(PMC *retval);
     }
 
 /*
@@ -288,10 +298,11 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* strftime(STRING* fmt, PMC* tm) {
-        struct tm stm;
-        char b[200];
-        size_t reslen;
+        char        b[200];
         const char *s = string_to_cstring(INTERP, fmt);
+        STRING     *retval;
+        size_t      reslen;
+        struct tm   stm;
 
         stm.tm_sec   = VTABLE_get_integer_keyed_int(INTERP, tm, 0);
         stm.tm_min   = VTABLE_get_integer_keyed_int(INTERP, tm, 1);
@@ -307,7 +318,8 @@ information see F<src/pmc.c>.
 
         string_cstring_free(s);
 
-        return string_from_cstring(INTERP, b, reslen);
+        retval = string_from_cstring(INTERP, b, reslen);
+        RETURN(STRING *retval);
     }
 
 /*
@@ -318,8 +330,9 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* tmpname() {
-        char buff[32];
-        int e;
+        char    buff[32];
+        STRING *retval;
+        int     e;
 #ifdef WIN32
         e = (tmpnam(buff) == NULL);
 #else
@@ -335,7 +348,8 @@ information see F<src/pmc.c>.
             real_exception(INTERP, NULL, 1,
                            "unable to generate a unique filename");
 
-        return string_from_cstring(INTERP, buff, 0);
+        retval = string_from_cstring(INTERP, buff, 0);
+        RETURN(STRING *retval);
     }
 
 /*
@@ -350,26 +364,28 @@ information see F<src/pmc.c>.
         STRING *str;
 
         /* information about the current sub */
-        parrot_context_t *ctx = CONTEXT(INTERP->ctx);
+        parrot_context_t *sub_ctx = CONTEXT(INTERP->ctx)->caller_ctx;
 
         if (level == 0) {
-            str = context_infostr(INTERP, ctx);
+            str = context_infostr(INTERP, sub_ctx);
             bt  = string_append(INTERP, bt, str);
         }
 
         /* backtrace: follow the continuation chain */
         while (1) {
-            PMC *cont = ctx->current_cont;
+            PMC *cont = sub_ctx->current_cont;
+
 
             if (!cont)
                 break;
 
-            ctx = PMC_cont(cont)->to_ctx;
+            sub_ctx = PMC_cont(cont)->to_ctx;
 
-            if (!ctx)
+            if (!sub_ctx)
                 break;
 
-            str = context_infostr(INTERP, ctx);
+            str = context_infostr(INTERP, sub_ctx);
+
 
             if (!str)
                 break;
@@ -377,7 +393,7 @@ information see F<src/pmc.c>.
             bt = string_append(INTERP, bt, str);
         }
 
-        return bt;
+        RETURN(STRING *bt);
     }
 
 /*
@@ -388,19 +404,21 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* where() {
-        parrot_context_t *ctx = CONTEXT(INTERP->ctx);
+        parrot_context_t *sub_ctx = CONTEXT(INTERP->ctx)->caller_ctx;
+        STRING           *retval;
 
         /* backtrace: follow the continuation chain */
         while (1) {
             PMC *cont;
-            PMC *sub = ctx->current_sub;
-            if (PMC_metadata(sub)
-            && VTABLE_isa(INTERP, sub, const_string(INTERP, "LuaClosure"))) {
+            PMC *sub = sub_ctx->current_sub;
+            if (sub
+            &&  PMC_metadata(sub)
+            &&  VTABLE_isa(INTERP, sub, const_string(INTERP, "LuaClosure"))) {
                 Parrot_Context_info info;
                 Parrot_block_DOD(INTERP);
 
-                if (Parrot_Context_get_info(INTERP, ctx, &info)) {
-                    STRING* res = Parrot_sprintf_c(INTERP, "%s:%d:",
+                if (Parrot_Context_get_info(INTERP, sub_ctx, &info)) {
+                    STRING *res = Parrot_sprintf_c(INTERP, "%s:%d:",
                                                    info.file, info.line);
 
                     /* free the non-constant string, but not the constant one */
@@ -408,24 +426,26 @@ information see F<src/pmc.c>.
                         string_cstring_free(info.file);
 
                     Parrot_unblock_DOD(INTERP);
-                    return res;
+                    RETURN(STRING *res);
                 }
                 Parrot_unblock_DOD(INTERP);
                 break;
             }
 
-            cont = ctx->current_cont;
+            cont = sub_ctx->current_cont;
+
 
             if (!cont)
                 break;
 
-            ctx = PMC_cont(cont)->to_ctx;
+            sub_ctx = PMC_cont(cont)->to_ctx;
 
-            if (!ctx)
+            if (!sub_ctx)
                 break;
         }
 
-        return const_string(INTERP, "_._:0:");
+        retval = const_string(INTERP, "_._:0:");
+        RETURN(STRING *retval);
     }
 }
 

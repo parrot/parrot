@@ -31,7 +31,7 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', '# 1' );
 print(# 1)
 CODE
-/^[^:]+: [^:]+:\d+: attempt to get length of a number value\nstack traceback:\n/
+/^[^:]+: [^:]+:-?\d+: attempt to get length of a number value\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not 1' );

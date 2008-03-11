@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -20,21 +20,14 @@ The vtable functions for the native C call functions.
 
 #include "parrot/parrot.h"
 
-/* NCI PMC's underlying struct. */
-typedef struct Parrot_NCI {
-    STRING *signature;    /* The signature. */
-    int arity;            /* Cached arity of the NCI. */
-    funcptr_t *func;      /* Function pointer to what we'll call. */
-} Parrot_NCI;
-
-/* Macro to access underlying structure of an NCI PMC. */
-#define PARROT_NCI(o) ((Parrot_NCI *) PMC_data(o))
-
 pmclass NCI need_ext {
+    ATTR STRING    *signature;    /* The signature. */
+    ATTR void      *func;         /* Function pointer to what we'll call. */
+    ATTR INTVAL     arity;        /* Cached arity of the NCI. */
 
 /*
 
-=item C<METHOD PMC *get_multisig()>
+=item C<METHOD get_multisig()>
 
 Return the MMD signature PMC, if any or a Null PMC.
 
@@ -42,13 +35,14 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 */
 
-    METHOD PMC *get_multisig() {
-        return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+    METHOD get_multisig() {
+        PMC *sig = PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+        RETURN(PMC *sig);
     }
 
 /*
 
-=item C<METHOD PMC *set_raw_nci_ptr(void *func)>
+=item C<METHOD set_raw_nci_ptr(void *func)>
 
 Sets the specified function pointer and raw flag.
 
@@ -56,9 +50,8 @@ Sets the specified function pointer and raw flag.
 
 */
 
-    METHOD void make_raw_nci(void *func) {
-        PMC_struct_val(SELF) = func;
-        PObj_flag_SET(private2, SELF);
+    METHOD make_raw_nci(PMC *func) {
+        VTABLE_set_pointer(interp, SELF, (void *)func);
     }
 
 /*
@@ -71,7 +64,7 @@ Initializes the NCI with a C<NULL> function pointer.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF)    = PMCNULL;
         PMC_data(SELF)       = mem_allocate_zeroed_typed(Parrot_NCI);
@@ -91,7 +84,12 @@ Sets the specified function pointer and signature (C<*key>).
 
 */
 
-    void set_pointer_keyed_str(STRING *key, void *func) {
+    VTABLE void set_pointer(void *ptr) {
+        PMC_struct_val(SELF) = ptr;
+        PObj_flag_SET(private2, SELF);
+    }
+
+    VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
         Parrot_NCI * const nci_info = PARROT_NCI(SELF);
 
         /* Store the original function and signature. */
@@ -102,8 +100,7 @@ Sets the specified function pointer and signature (C<*key>).
         nci_info->arity      = string_length(INTERP, key) - 1;
 
         /* Build call function. */
-        nci_info->func       =
-            (void (**)(void))(build_call_func(INTERP, SELF, key));
+        nci_info->func       = (PMC *)(build_call_func(INTERP, SELF, key));
     }
 
 /*
@@ -116,7 +113,7 @@ Destroys the NCI, freeing any allocated memory.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         if (PMC_data(SELF)) {
             Parrot_NCI * const nci_info = PARROT_NCI(SELF);
 
@@ -139,7 +136,7 @@ Creates and returns a clone of the NCI.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         Parrot_NCI * const nci_info_self = PARROT_NCI(SELF);
         Parrot_NCI *nci_info_ret;
 
@@ -147,16 +144,16 @@ Creates and returns a clone of the NCI.
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret)    = PMCNULL;
         PMC_data(ret)       = mem_allocate_zeroed_typed(Parrot_NCI);
-        nci_info_ret = PARROT_NCI(ret);
+        nci_info_ret        = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need
          * the length of data here, to memcpy it
          * ManagedStruct or Buffer?
          */
-        nci_info_ret->func = nci_info_self->func;
+        nci_info_ret->func      = nci_info_self->func;
         nci_info_ret->signature = nci_info_self->signature;
-        nci_info_ret->arity = nci_info_self->arity;
-        PObj_get_FLAGS(ret) |= (PObj_get_FLAGS(SELF) & 0x7);
+        nci_info_ret->arity     = nci_info_self->arity;
+        PObj_get_FLAGS(ret)    |= (PObj_get_FLAGS(SELF) & 0x7);
 
         return ret;
     }
@@ -171,7 +168,7 @@ Returns whether the NCI is defined.
 
 */
 
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         Parrot_NCI * const nci_info = PARROT_NCI(SELF);
         return nci_info->func != NULL;
     }
@@ -188,7 +185,7 @@ shifted down.
 
 */
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         Parrot_NCI * const nci_info = PARROT_NCI(SELF);
 
         typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
@@ -232,7 +229,7 @@ Returns the function pointer as an integer.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         Parrot_NCI * const nci_info = PARROT_NCI(SELF);
         return (INTVAL)nci_info->func;
     }
@@ -247,30 +244,33 @@ Returns the boolean value of the pointer.
 
 */
 
-    INTVAL get_bool() {
+    VTABLE INTVAL get_bool() {
         Parrot_NCI * const nci_info = PARROT_NCI(SELF);
         return (0 != (INTVAL)nci_info->func);
     }
 
 /*
 
-=item C<METHOD INTVAL arity()>
+=item C<METHOD arity()>
 
 Return the arity of the NCI (the number of arugments).
 
 =cut
 
 */
-    METHOD INTVAL arity() {
+    METHOD arity() {
         Parrot_NCI * const nci_info = PARROT_NCI(SELF);
-        if (nci_info && nci_info->func)
-            return nci_info->arity;
+
+        if (nci_info && nci_info->func) {
+            INTVAL arity = nci_info->arity;
+            RETURN(INTVAL arity);
+        }
         else
             real_exception(INTERP, NULL, INVALID_OPERATION,
                     "You cannot get the arity of an undefined NCI.");
-        return 0; /* Unreachable; avoids warning. */
-    }
 
+        RETURN(INTVAL 0);
+    }
 }
 
 /*

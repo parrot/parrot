@@ -55,7 +55,7 @@ Tests builtin opcode-like methods.
     io = getstdout
     $I0 = say io, "ok 5 - say in scalar context with io pmc"
     say "ok 6 - say in void context"
-    say io, "ok 7 - say in voide context with io pmc"
+    say io, "ok 7 - say in void context with io pmc"
     "say"(io, "ok 8 - say in function call syntax with io pmc")
     .local pmc s
     s = new 'String'

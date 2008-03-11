@@ -361,12 +361,12 @@ static void lua_mark_table(PARROT_INTERP, Hash *t, STRING *mode)
 
 
 pmclass LuaTable
-    extends LuaAny
-    does hash
+    extends  LuaAny
+    provides hash
     dynpmc
     need_ext
-    group lua_group
-    hll Lua {
+    group    lua_group
+    hll      Lua {
 
 /*
 
@@ -693,10 +693,10 @@ MMD_DEFAULT: {
     METHOD PMC* get_metatable() {
         PMC *retval = PMC_metadata(SELF);
 
-        if (retval)
-            return retval;
+        if (!retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
 
-        return pmc_new(INTERP, dynpmc_LuaNil);
+        RETURN(PMC *retval);
     }
 
 /*
@@ -722,7 +722,7 @@ MMD_DEFAULT: {
         }
 
         VTABLE_set_integer_native(INTERP, key, idx - 1);
-        return key;
+        RETURN(PMC *key);
     }
 
 /*
@@ -740,10 +740,13 @@ MMD_DEFAULT: {
             VTABLE_set_integer_native(INTERP, retval, 2);
             VTABLE_set_pmc_keyed_int(INTERP, retval, 0, n->key);
             VTABLE_set_pmc_keyed_int(INTERP, retval, 1, n->val);
-            return retval;
+            RETURN(PMC *retval);
+        }
+        else {
+            PMC *retval = pmc_new(INTERP, dynpmc_LuaNil);
+            RETURN(PMC *retval);
         }
 
-        return pmc_new(INTERP, dynpmc_LuaNil);
     }
 
 /*
@@ -756,7 +759,7 @@ MMD_DEFAULT: {
     METHOD PMC* rawequal(PMC *value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         VTABLE_set_integer_native(INTERP, retval, (SELF == value) ? 1 : 0);
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -768,12 +771,14 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawget(PMC *key) {
         PMC **pvalue = lua_get(INTERP, PMC_hash(SELF), key);
+        PMC *retval;
 
         if (! pvalue || ! *pvalue)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+        else
+            retval = *pvalue;
 
-            return pmc_new(INTERP, dynpmc_LuaNil);
-
-        return *pvalue;
+        RETURN(PMC *retval);
     }
 
 /*

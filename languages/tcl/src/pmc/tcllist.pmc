@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ pmclass TclList
     dynpmc
     need_ext
     extends ResizablePMCArray
-    does    array
+    provides    array
     group   tcl_group
     hll     Tcl
     maps    Array
@@ -43,25 +43,25 @@ Returns the list as a string
 
 */
 
-    STRING* get_string() {
-        STRING* retval = string_from_literal(INTERP, "");
-        INTVAL elems = VTABLE_get_integer(INTERP, SELF);
-        INTVAL i;
-        STRING* str;
-        PMC* P0;
-        INTVAL count;
-        INTVAL str_len;
-        INTVAL pos;
+    VTABLE STRING* get_string() {
+        STRING *retval  = string_from_literal(INTERP, "");
+        STRING *replace = string_from_literal(INTERP, "replace");
+        INTVAL  elems   = VTABLE_get_integer(INTERP, SELF);
+        INTVAL  i;
+        STRING *orig, *repl;
+        PMC    *P0;
+        INTVAL  count, pos;
 
-        for (i=0; i < elems; i++) {
-            str = VTABLE_get_string_keyed_int(INTERP, SELF, i);
+        for (i = 0; i < elems; i++) {
+            STRING *str    = VTABLE_get_string_keyed_int(INTERP, SELF, i);
+            INTVAL str_len = string_length(INTERP, str);
 
-            str_len = string_length(INTERP, str);
             if (str_len == 0) {
                 /* empty element */
                 str = string_from_literal(INTERP, "{}");
                 goto append_elem;
             }
+
             count = pos = 0;
             while (pos < str_len) {
                 switch (string_ord(INTERP, str, pos)) {
@@ -71,6 +71,7 @@ Returns the list as a string
                     case '}':
                         if (--count < 0) goto escape;
                         break;
+
                 }
                 pos++;
             }
@@ -81,7 +82,7 @@ Returns the list as a string
                  goto quote;
 
             /* only check hashes on first elem.*/
-            if (i==0 && -1 != string_str_index(INTERP, str, string_from_literal(INTERP, "#"), 0))
+            if (i == 0 && -1 != string_str_index(INTERP, str, string_from_literal(INTERP, "#"), 0))
                 goto quote;
 
             if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP, "$"), 0))
@@ -107,34 +108,61 @@ Returns the list as a string
             P0 = pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, P0, str);
 
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "\\"), string_from_literal(INTERP, "\\\\"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "\t"), string_from_literal(INTERP, "\\t"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "\f"), string_from_literal(INTERP, "\\f"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "\n"), string_from_literal(INTERP, "\\n"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "\r"), string_from_literal(INTERP, "\\r"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "\v"), string_from_literal(INTERP, "\\v"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, ";"), string_from_literal(INTERP, "\\;"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "$"), string_from_literal(INTERP, "\\$"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "}"), string_from_literal(INTERP, "\\}"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "{"), string_from_literal(INTERP, "\\{"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, " "), string_from_literal(INTERP, "\\ "));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "["), string_from_literal(INTERP, "\\["));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "]"), string_from_literal(INTERP, "\\]"));
-            Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP, "\""), string_from_literal(INTERP, "\\\""));
+            orig = string_from_literal(INTERP, "\\");
+            repl = string_from_literal(INTERP, "\\\\");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "\t");
+            repl = string_from_literal(INTERP, "\\t");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "\f");
+            repl = string_from_literal(INTERP, "\\f");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "\n");
+            repl = string_from_literal(INTERP, "\\n");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "\r");
+            repl = string_from_literal(INTERP, "\\r");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "\v");
+            repl = string_from_literal(INTERP, "\\v");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, ";");
+            repl = string_from_literal(INTERP, "\\;");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "$");
+            repl = string_from_literal(INTERP, "\\$");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "}");
+            repl = string_from_literal(INTERP, "\\}");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "{");
+            repl = string_from_literal(INTERP, "\\{");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, " ");
+            repl = string_from_literal(INTERP, "\\ ");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "[");
+            repl = string_from_literal(INTERP, "\\[");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "]");
+            repl = string_from_literal(INTERP, "\\]");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
+
+            orig = string_from_literal(INTERP, "\"");
+            repl = string_from_literal(INTERP, "\\\"");
+            Parrot_PCCINVOKE(INTERP, P0, replace, "SS->", orig, repl);
 
             str = VTABLE_get_string(INTERP, P0);
             goto append_elem;
@@ -192,17 +220,17 @@ Copy the contents of other to self.
             INTVAL i;
 
             size = VTABLE_elements(INTERP, other);
-            DYNSELF.set_integer_native(size);
+            SELF.set_integer_native(size);
             for (i = 0; i < size; i++) {
                 PMC* elem = VTABLE_get_pmc_keyed_int(INTERP, other, i);
-                DYNSELF.set_pmc_keyed_int(i, elem);
+                SELF.set_pmc_keyed_int(i, elem);
             }
         }
         else if (VTABLE_isa(INTERP, other, string))
         {
             STRING *v = VTABLE_get_string(INTERP, other);
             pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
-            DYNSELF.set_string_native(v);
+            SELF.set_string_native(v);
         }
         else if (VTABLE_isa(INTERP, other, undef))
         {
@@ -211,7 +239,7 @@ Copy the contents of other to self.
         else
         {
             real_exception(INTERP, NULL, E_TypeError,
-                           "unable to assign self to this type");
+                           "unable to assign self to TclList");
         }
     }
 

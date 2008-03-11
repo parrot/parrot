@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  */
 
 /*
@@ -2317,25 +2317,18 @@ jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
     L2 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_js, 0);
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct pobj_t, u._i._int_val));
+            offsetof(struct PMC, cache._i._int_val));
     jit_emit_cmp_rr_i(NATIVECODE, emit_ECX, emit_EAX);
     L3 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_jnl, 0);
 
     /*
-     * mov (pmc_ext)%edi, %eax
-     * mov (data)%eax, %eax
+     * mov (data)%edi, %eax
      * mov (%eax, %ecx, 4), %eax
      * jmp L4
      */
-#  if ! PMC_DATA_IN_EXT
-#    error "todo"
-#  else
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct PMC, pmc_ext));
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EAX, 0, 1,
-            offsetof(struct PMC_EXT, data));
-#  endif
+            offsetof(struct PMC, data));
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EAX, emit_ECX, 4, 0);
 
     L4 = NATIVECODE;
@@ -2386,26 +2379,19 @@ jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
     L2 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_js, 0);
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct pobj_t, u._i._int_val));
+            offsetof(struct PMC, cache._i._int_val));
     jit_emit_cmp_rr_i(NATIVECODE, emit_ECX, emit_EAX);
     L3 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_jnl, 0);
 
     /*
-     * mov (pmc_ext)%edi, %eax
      * mov (data)%eax, %eax
      * mov $3, %edx
      * mov $edx, (%eax, %ecx, 4)
      * jmp L4
      */
-#  if ! PMC_DATA_IN_EXT
-#    error "todo"
-#  else
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct PMC, pmc_ext));
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EAX, 0, 1,
-            offsetof(struct PMC_EXT, data));
-#  endif
+            offsetof(struct PMC, data));
     if (MAP(3)) {
         jit_emit_mov_rr_i(NATIVECODE, emit_EDX, MAP(3));
     }
@@ -3816,13 +3802,13 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci,
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'p':   /* push pmc->data */
+                jit_emit_mov_RM_i(interp, pc, emit_EDX,
+                        REG_OFFS_PMC(count_regs(interp, sig, signature->strstart)));
 #  if ! PMC_DATA_IN_EXT
                 /* mov pmc, %edx
                  * mov 8(%edx), %eax
                  * push %eax
                  */
-                jit_emit_mov_RM_i(interp, pc, emit_EDX,
-                        REG_OFFS_PMC(count_regs(interp, sig, signature->strstart)));
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EDX, 0, 1,
                         offsetof(struct PMC, data));
 #  else
@@ -3832,8 +3818,6 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci,
                  * mov data(%eax), %eax
                  * push %eax
                  */
-                jit_emit_mov_RM_i(interp, pc, emit_EDX,
-                        REG_OFFS_PMC(count_regs(interp, sig, signature->strstart)));
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EDX, 0, 1,
                         offsetof(struct PMC, pmc_ext));
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
@@ -3989,7 +3973,7 @@ preg:
             /* *eax = buffer_header */
             /* set external flag */
             emitm_orl_i_m(pc, PObj_external_FLAG, emit_EAX, 0, 1,
-                    offsetof(pobj_t, flags));
+                    offsetof(PMC, flags));
             emitm_popl_r(pc, emit_EDX);
             /* mov %edx, (bufstart) %eax */
             emitm_movl_r_m(interp, pc, emit_EDX, emit_EAX, 0, 1,

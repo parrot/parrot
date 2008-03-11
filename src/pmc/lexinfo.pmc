@@ -27,7 +27,7 @@ These are the vtable functions for the lexinfo PMC.
  * needed (except for freeze/thaw
  */
 
-pmclass LexInfo need_ext does hash no_ro {
+pmclass LexInfo need_ext provides hash no_ro {
 
 /*
 
@@ -54,12 +54,12 @@ subroutine.
 
     }
 
-    void init() {
+    VTABLE void init() {
         real_exception(INTERP, NULL, INVALID_OPERATION,
                 "Cannot create a LexInfo PMC without an initializer");
     }
 
-    void init_pmc(PMC *sub) {
+    VTABLE void init_pmc(PMC *sub) {
         PARROT_ASSERT(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
 
@@ -89,7 +89,7 @@ Frees any malloced memory held by this PMC.
 
 /*
 
-=item C<METHOD void declare_lex_preg(STRING *name, INTVAL preg)>
+=item C<void declare_lex_preg(STRING *name, INTVAL preg)>
 
 Declare a lexical variable that is an alias for a PMC register.  The PIR
 compiler calls this method in response to a ".lex STRING, PREG" directive.
@@ -102,11 +102,11 @@ Returns the number of elements in the LexInfo hash.
 
 */
 
-    METHOD void declare_lex_preg(STRING *name, INTVAL preg) {
+    METHOD declare_lex_preg(STRING *name, INTVAL preg) {
         parrot_hash_put(INTERP, (Hash*)PMC_struct_val(SELF), name, (void*)preg);
     }
 
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
     }
 
@@ -125,15 +125,15 @@ The implementation of the Hash PMC is called.
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         Parrot_Hash_visit(INTERP, SELF, info);
     }
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         Parrot_Hash_freeze(INTERP, SELF, info);
     }
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         if (info->extra_flags == EXTRA_IS_NULL) {

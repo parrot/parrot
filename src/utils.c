@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -48,6 +48,9 @@ static long _lrand48(void);
 static long _mrand48(void);
 static long _nrand48(_rand_buf buf);
 static void _srand48(long seed);
+static INTVAL COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)
+        __attribute__nonnull__(1);
+
 static void next_rand(_rand_buf X);
 static void process_cycle_without_exit(
     int node_index,
@@ -59,6 +62,7 @@ static void rec_climb_back_and_mark(
     ARGIN(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
+static void swap(void **x, void **y);
 /* HEADERIZER END: static */
 
 #define move_reg(from, dest, c) (c)->mov((c)->interp, (dest), (from), (c)->info)
@@ -829,6 +833,70 @@ Parrot_register_move(PARROT_INTERP,
     mem_sys_free(backup);
 }
 
+static void
+swap(void **x, void **y)
+{
+    void *t = *x;
+    *x      = *y;
+    *y      =  t;
+}
+
+typedef INTVAL (*sort_func_t)(PARROT_INTERP, void*, void*);
+
+static INTVAL
+COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)
+{
+    if (PMC_IS_NULL(cmp))
+        return mmd_dispatch_i_pp(interp, (PMC *)a, (PMC *)b, MMD_CMP);
+
+    if (cmp->vtable->base_type == enum_class_NCI) {
+        sort_func_t f = (sort_func_t)D2FPTR(PMC_struct_val(cmp));
+        return f(interp, a, b);
+    }
+
+    return Parrot_runops_fromc_args_reti(interp, cmp, "IPP", a, b);
+}
+
+
+void
+Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)
+{
+    UINTVAL i, j, ln, rn;
+
+    while (n > 1) {
+        swap(&data[0], &data[n/2]);
+
+        for (i = 0, j = n; ;) {
+            do
+                --j;
+            while (COMPARE(interp, data[j], data[0], cmp) > 0);
+
+            do
+                ++i;
+            while (i < j && COMPARE(interp, data[i], data[0], cmp) < 0);
+
+            if (i >= j)
+                break;
+
+            swap(&data[i], &data[j]);
+        }
+
+        swap(&data[j], &data[0]);
+
+        ln = j;
+        rn = n - ++j;
+
+        if (ln < rn) {
+            Parrot_quicksort(interp, data, ln, cmp);
+            data += j;
+            n = rn;
+        }
+        else {
+            Parrot_quicksort(interp, data + j, rn, cmp);
+            n = ln;
+        }
+    }
+}
 
 /*
 

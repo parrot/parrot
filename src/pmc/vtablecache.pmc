@@ -19,12 +19,12 @@ vtable is freed.
 
 pmclass VtableCache {
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
         PObj_active_destroy_SET(SELF);
     }
 
-    void destroy() {
+    VTABLE void destroy() {
         if (PMC_struct_val(SELF))
             Parrot_destroy_vtable(INTERP, (VTABLE *)PMC_struct_val(SELF));
     }

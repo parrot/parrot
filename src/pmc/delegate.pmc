@@ -75,7 +75,7 @@ useful defaults and don't throw exceptions.
 */
 
 
-    void init() {
+    VTABLE void init() {
         STRING * const meth     = CONST_STRING(interp, "init");
         PMC    * const classobj = Parrot_oo_get_class_str(interp, VTABLE_name(interp, SELF));
         PMC    * const sub      = Parrot_oo_find_vtable_override(interp, classobj, meth);
@@ -84,7 +84,7 @@ useful defaults and don't throw exceptions.
             Parrot_run_meth_fromc(interp, sub, SELF, meth);
     }
 
-    void init_pmc(PMC *initializer) {
+    VTABLE void init_pmc(PMC *initializer) {
         STRING * const meth     = CONST_STRING(interp, "init_pmc");
         PMC    * const classobj = Parrot_oo_get_class_str(interp, VTABLE_name(interp, SELF));
         PMC    * const sub      = Parrot_oo_find_vtable_override(interp, classobj, meth);
@@ -94,7 +94,7 @@ useful defaults and don't throw exceptions.
                                        "vP", initializer);
     }
 
-    PMC *instantiate(PMC *sig) {
+    VTABLE PMC *instantiate(PMC *sig) {
         STRING * const meth     = CONST_STRING(interp, "instantiate");
         PMC    * const classobj = Parrot_oo_get_class_str(interp, VTABLE_name(interp, SELF));
         PMC    * const sub      = Parrot_oo_find_vtable_override(interp, classobj, meth);
@@ -105,31 +105,31 @@ useful defaults and don't throw exceptions.
         return (PMC *)Parrot_run_meth_fromc(INTERP, sub, SELF, meth);
     }
 
-    void destroy() {
+    VTABLE void destroy() {
         /* don't delegate destroy */
     }
 
-    void mark() {
+    VTABLE void mark() {
         /* don't delegate mark */
     }
 
-    void add_method(STRING *method_name, PMC *sub_pmc) {
+    VTABLE void add_method(STRING *method_name, PMC *sub_pmc) {
         SUPER(method_name, sub_pmc);
     }
 
-    STRING *name() {
+    VTABLE STRING *name() {
         return SELF->vtable->whoami;
     }
 
-    PMC *pmc_namespace() {
+    VTABLE PMC *pmc_namespace() {
         return SELF->vtable->_namespace;
     }
 
-    INTVAL type() {
+    VTABLE INTVAL type() {
         return SUPER();
     }
 
-    INTVAL isa(STRING *classname) {
+    VTABLE INTVAL isa(STRING *classname) {
         if (SUPER(classname))
             return 1;
 
@@ -146,7 +146,7 @@ Invokes a subroutine.
 
 */
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         STRING * const meth     = CONST_STRING(interp, "invoke");
         PMC    * const classobj = Parrot_oo_get_class_str(interp, VTABLE_name(interp, SELF));
         PMC    * const sub      = Parrot_oo_find_vtable_override(interp, classobj, meth);

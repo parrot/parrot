@@ -44,7 +44,7 @@ Initializes the queue.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_int_val(SELF) = 0;
         PMC_data(SELF)    = queue_init(0);
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -60,7 +60,7 @@ Returns the queue itself. No copy is made.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         /* XXX fake a shared PMC */
         return SELF;
     }
@@ -75,7 +75,7 @@ Marks all the threads in the queue as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         QUEUE       *queue = PMC_data_typed(SELF, QUEUE *);
         QUEUE_ENTRY *entry;
 
@@ -104,7 +104,7 @@ Destroys the queue.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         if (PMC_data(SELF)) {
             QUEUE * const queue = PMC_data_typed(SELF, QUEUE *);
 #if 0
@@ -134,7 +134,7 @@ Returns whether there are any threads in the queue.
 
 */
 
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         return SELF.get_integer() != 0;
     }
 
@@ -146,7 +146,7 @@ Returns whether there are any threads in the queue.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return PMC_int_val(SELF);
     }
 
@@ -160,7 +160,7 @@ Returns the number of threads in the queue.
 
 */
 
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return SELF.get_integer();
     }
 
@@ -220,7 +220,7 @@ Removes the first thread from the start of the queue.
 
 */
 
-    PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() {
         QUEUE       * const queue = PMC_data_typed(SELF, QUEUE *);
         QUEUE_ENTRY *entry;
         PMC         *ret;

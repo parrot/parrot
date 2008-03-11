@@ -33,7 +33,7 @@ Initializes the closure.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = new_closure(INTERP);
         PMC_pmc_val(SELF)    = PMCNULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -54,7 +54,7 @@ Marks the closure as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         Parrot_sub *sub = PMC_sub(SELF);
         SUPER();
 
@@ -80,13 +80,13 @@ Invokes the closure.
 
 */
 
-    void set_pointer(void *value) {
+    VTABLE void set_pointer(void *value) {
         Parrot_sub *sub  = PMC_sub(SELF);
         opcode_t   *addr = (opcode_t *)value;
         sub->start_offs  = addr -  sub->seg->base.data;
     }
 
-    opcode_t *invoke(void *in_next) {
+    VTABLE opcode_t *invoke(void *in_next) {
         Parrot_sub *sub       = PMC_sub(SELF);
         opcode_t   *next      = SUPER(in_next);
         PMC        *outer_sub = sub->outer_sub;
@@ -208,7 +208,7 @@ Destroys the closure.  This is necessary in order to reclaim the context.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_sub *sub = PMC_sub(SELF);
 
 #if CTX_LEAK_DEBUG

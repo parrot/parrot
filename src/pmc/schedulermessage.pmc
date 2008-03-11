@@ -22,6 +22,9 @@ Implements a message passed between concurrency schedulers.
 #include "parrot/scheduler_private.h"
 
 pmclass SchedulerMessage need_ext {
+    ATTR INTVAL  id;        /* The message's ID. */
+    ATTR STRING *type;      /* The message's type. */
+    ATTR PMC    *data;      /* Additional data for the message. */
 
 /*
 
@@ -33,7 +36,7 @@ Initialize a concurrency scheduler message object.
 
 */
 
-    void init() {
+    VTABLE void init() {
         Parrot_SchedulerMessage * const core_struct
             = mem_allocate_zeroed_typed(Parrot_SchedulerMessage);
 
@@ -52,7 +55,8 @@ Initialize a concurrency scheduler message object.
 
 =item C<void init_pmc(PMC *data)>
 
-Initializes a new SchedulerMessage with a C<Hash> PMC with any or all of the keys:
+Initializes a new SchedulerMessage with a C<Hash> PMC with any or all of the
+keys:
 
 =over 4
 
@@ -72,8 +76,8 @@ An C<PMC> representing the data passed in this scheduler message.
 
 */
 
-    void init_pmc(PMC *data) {
-        PMC              *elem;
+    VTABLE void init_pmc(PMC *data) {
+        PMC                     *elem;
         Parrot_SchedulerMessage *core_struct;
 
         if (! VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
@@ -106,7 +110,7 @@ Retrieve the message ID.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         Parrot_SchedulerMessage * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
         return core_struct->id;
     }
@@ -121,7 +125,7 @@ Set the message ID.
 
 */
 
-    void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) {
         Parrot_SchedulerMessage * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
         core_struct->id = value;
     }
@@ -152,7 +156,7 @@ Set the message type.
 
 */
 
-    void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) {
         Parrot_SchedulerMessage * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
         core_struct->type = value;
     }
@@ -168,17 +172,16 @@ Set this PMC as shared.
 
 */
 
-    PMC *share_ro() {
+    VTABLE PMC *share_ro() {
         PMC *shared_self;
         Parrot_SchedulerMessage *shared_struct;
 
         if (PObj_is_PMC_shared_TEST(SELF))
             return SELF;
 
-        shared_self = pt_shared_fixup(INTERP, SELF);
-        shared_struct = PARROT_SCHEDULERMESSAGE(shared_self);
-
-        shared_struct->data  = pt_shared_fixup(INTERP, shared_struct->data);
+        shared_self         = pt_shared_fixup(INTERP, SELF);
+        shared_struct       = PARROT_SCHEDULERMESSAGE(shared_self);
+        shared_struct->data = pt_shared_fixup(INTERP, shared_struct->data);
 
         return shared_self;
     }
@@ -192,7 +195,7 @@ Free the scheduler's underlying struct.
 =cut
 
 */
-    void destroy() {
+    VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
     }
 
@@ -205,9 +208,10 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         if (PARROT_SCHEDULERMESSAGE(SELF)) {
-            Parrot_SchedulerMessage * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+            Parrot_SchedulerMessage * const core_struct =
+                PARROT_SCHEDULERMESSAGE(SELF);
 
             if (core_struct->data)
                 pobject_lives(interp, (PObj*)core_struct->data);
@@ -226,15 +230,15 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    void visit(visit_info *info) {
-        Parrot_SchedulerMessage * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+    VTABLE void visit(visit_info *info) {
+        Parrot_SchedulerMessage * const core_struct =
+            PARROT_SCHEDULERMESSAGE(SELF);
         PMC **pos;
 
         /* 1) visit message data */
         pos            = &core_struct->data;
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
-
     }
 
 /*
@@ -247,9 +251,10 @@ Used to archive the scheduler message.
 
 */
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        Parrot_SchedulerMessage * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        Parrot_SchedulerMessage * const core_struct =
+            PARROT_SCHEDULERMESSAGE(SELF);
 
         /* 1) freeze message id */
         VTABLE_push_integer(INTERP, io, core_struct->id);
@@ -268,7 +273,7 @@ Used to unarchive the scheduler message.
 
 */
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         /* 1. thaw message id */

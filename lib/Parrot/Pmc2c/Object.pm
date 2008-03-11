@@ -1,6 +1,6 @@
 package Parrot::Pmc2c::Object;
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 use base 'Parrot::Pmc2c';
@@ -55,14 +55,14 @@ sub body {
     my $decl = $self->decl( $self->{class}, $method, 0 );
 
     # Need to build signature and work out what return type we expect.
-    my $ret_sig = ctype_to_sigchar( $method->{type} );
+    my $ret_sig  = ctype_to_sigchar( $method->{type} );
 
-    my $ret_type = '';
-    $ret_type = "_reti" if $ret_sig eq 'I';
-    $ret_type = "_retf" if $ret_sig eq 'N';
+    my $ret_type = $ret_sig eq 'I' ? '_reti' : '_retf';
 
-    my $sig = $ret_sig;
-    my @types = grep { $_ } map { my @x = split /\s+/; $x[0] } split /\s*,\s*/, $parameters;
+    my $sig      = $ret_sig;
+    my @types    = grep { $_ } map { my @x = split /\s+/; $x[0] }
+                        split /\s*,\s*/, $parameters;
+
     foreach (@types) {
         $sig .= ctype_to_sigchar($_);
     }
@@ -97,25 +97,27 @@ sub body {
         $null_return = '';
     }
 
-    my $l = $self->line_directive( $line + 1, "\L$self->{class}.c" );
+    my $l         = $self->line_directive( $line + 1, "\L$self->{class}.c" );
     my $generated = <<EOC;
 $l
 $decl {
-    Parrot_Object * const obj = PARROT_OBJECT(pmc);
-    Parrot_Class * const _class = PARROT_CLASS(obj->_class);
+    Parrot_Object * const obj    = PARROT_OBJECT(pmc);
+    Parrot_Class  * const _class = PARROT_CLASS(obj->_class);
 
     /* Walk and search for the vtable method. */
-    const int num_classes = VTABLE_elements(interp, _class->all_parents);
-    const int all_in_universe = !PObj_HasAlienParents_TEST(obj->_class);
+    const int num_classes       = VTABLE_elements(interp, _class->all_parents);
+    const int all_in_universe   = !PObj_HasAlienParents_TEST(obj->_class);
     const int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
     int i;
     for (i = 0; i < num_classes; i++) {
         /* Get the class. */
-        PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+        PMC * const cur_class =
+            VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
         /* If it's from this universe or the class doesn't inherit from
          * anything outside of it... */
-        if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
+        if (all_in_universe
+        ||  VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
 EOC
 
     # We shouldn't allow overrides of get_pointer and friends,
@@ -137,8 +139,9 @@ EOC
         }
         else {
             /* Get the PMC instance and call the vtable method on that. */
-            PMC * const del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
-                alien_parents_pos);
+            PMC * const del_class = VTABLE_get_pmc_keyed_int(interp,
+                                        obj->attrib_store, alien_parents_pos);
+
             ${return}VTABLE_$meth(interp, del_class$arg);
         }
     }
@@ -149,9 +152,10 @@ EOC
     return $generated;
 }
 
-sub ctype_to_sigchar($) {
+sub ctype_to_sigchar {
     my $ctype = shift;
-    $ctype =~ s/\s//g;
+    $ctype    =~ s/\s//g;
+
     if ( !$ctype || $ctype =~ /void/ ) {
         return "v";
     }

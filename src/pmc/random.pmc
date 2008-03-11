@@ -48,7 +48,7 @@ Class initialization.  Clears the singleton PMC.
 
 */
 
-    void *get_pointer() {
+    VTABLE void *get_pointer() {
         return Rand_PMC;
     }
 
@@ -63,7 +63,7 @@ information see F<src/pmc.c>.
 
 */
 
-    void set_pointer(void *ptr) {
+    VTABLE void set_pointer(void *ptr) {
         PARROT_ASSERT(!Rand_PMC);
         Rand_PMC = (PMC *)ptr;
     }
@@ -78,7 +78,7 @@ Sets the random number seed to C<seed>.
 
 */
 
-    void set_integer_native(INTVAL seed) {
+    VTABLE void set_integer_native(INTVAL seed) {
         Parrot_srand(seed);
     }
 
@@ -92,7 +92,7 @@ Returns a random integer in the range C<-2^31..2^31>.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return Parrot_int_rand(0);
     }
 
@@ -106,7 +106,7 @@ Returns a random integer in the range C<0..max>.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL max) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL max) {
         return Parrot_range_rand(0, max, 0);
     }
 
@@ -120,7 +120,7 @@ Returns a random floating-point number in the range C<0.0..1.0>.
 
 */
 
-    FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() {
         return Parrot_float_rand(0);
     }
 

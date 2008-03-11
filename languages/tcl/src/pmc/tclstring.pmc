@@ -19,7 +19,7 @@ pmclass TclString
     maps    String
 {
 
-    METHOD PMC* get_list(STRING* str) {
+    METHOD get_list(STRING* str) {
         PMC*   retval = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclList")));
         INTVAL pos = -1; /* we're going to increment before we use it... */
         INTVAL len;
@@ -27,7 +27,9 @@ pmclass TclString
         PMC* P0;
         STRING* S0;
 
-        if (! str) return SELF;
+        if (! str) {
+             RETURN(PMC *SELF);
+        }
         /*
          * RT#48166 This prevents a segfault; retval gets claimed before it
          * it is used below without this register. This shouldn't happen
@@ -166,7 +168,7 @@ pmclass TclString
 
       done:
         Parrot_unregister_pmc(INTERP, retval);
-        return retval;
+        RETURN(PMC *retval);
     }
 }
 

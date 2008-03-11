@@ -29,35 +29,38 @@ sub dump_pmc {
     my $pmcs;
 
     # help those dumb 'shells' that are not shells
-    @files = glob $files[0] if ( $files[0] eq 'src/pmc/*.pmc' );
+    @files = glob $files[0] if $files[0] eq 'src/pmc/*.pmc';
 
     # make sure that a default.dump will always be created if it doesn't
     # already exist; do so by adding default.pmc to list of files for dumping
-    unshift @files, './src/pmc/default.pmc' unless ( -e './src/pmc/default.dump' );
+    unshift @files, './src/pmc/default.pmc' unless -e './src/pmc/default.dump';
 
-    #load and parse all pmc files in @files
+    # load and parse all pmc files in @files
     for my $filename (@files) {
         my $parsed_pmc = parse_pmc( $pmc2cMain, $filename );
         $pmcs->{ $parsed_pmc->name } = $parsed_pmc;
     }
 
-    $pmcs->{default} = $pmc2cMain->read_dump("default.pmc") if not $pmcs->{default};
+    $pmcs->{default} = $pmc2cMain->read_dump("default.pmc")
+        unless $pmcs->{default};
 
-    #ensure that the default pmc's super entries point back to itself.
+    # ensure that the default pmc's super entries point back to itself.
     my $vtable_dump = $pmc2cMain->read_dump("vtable.pmc");
     my $default_pmc = $pmcs->{default};
-    foreach my $vt_method_name ( @{ $vtable_dump->names } ) {
+
+    for my $vt_method_name ( @{ $vtable_dump->names } ) {
         $default_pmc->super_method( $vt_method_name, 'default' );
     }
 
-    foreach my $pmc ( values %{$pmcs} ) {
-        next if ( $pmc->name =~ /default$/ && $pmc->dump_is_current );
+    for my $pmc ( values %$pmcs ) {
+        next if $pmc->name =~ /default$/ && $pmc->dump_is_current;
 
         gen_parent_lookup_info( $pmc, $pmc2cMain, $pmcs );
         gen_parent_reverse_lookup_info( $pmc, $pmcs, $vtable_dump );
 
         $pmc->dump;
     }
+
     return 1;
 }
 
@@ -106,18 +109,18 @@ sub gen_parent_lookup_info {
         for my $parent_name ( @{ [ @{ $pmcs->{$current_pmc_name}->parents } ] } ) {
             next if $parent_name eq 'default';
 
-            #load $parent_name pmc into $pmcs if needed
+            # load $parent_name pmc into $pmcs if needed
             $pmcs->{$parent_name} = $pmc2cMain->read_dump( lc("$parent_name.pmc") )
-                if not $pmcs->{$parent_name};
+                unless $pmcs->{$parent_name};
 
             $pmc->add_parent( $pmcs->{$parent_name} );
 
-            #add parent_name on to work queue list.
+            # add parent_name on to work queue list.
             push @c3_work_queue, $parent_name;
         }
     }
 
-    #default should appear very last in the @c3 order
+    # default should appear very last in the @c3 order
     $pmc->add_parent( $pmcs->{"default"} );
     return 1;
 }
@@ -162,7 +165,8 @@ sub gen_parent_reverse_lookup_info {
 
     # for each vt_meth in pmc, locate the implementing
     foreach my $vt_method_name ( @{ $vt->names } ) {
-        next if $pmc->super_method($vt_method_name);    #skip if super mapping is already set
+        # skip if super mapping is already set
+        next if $pmc->super_method($vt_method_name); 
 
         foreach my $parent_name ( @{ $pmc->parents } ) {
             my $parent = $pmcs->{$parent_name};

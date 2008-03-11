@@ -276,11 +276,6 @@ invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
 
 }
 
-/* XXX use method lookup - create interface
- *                         see also pbc.c
- */
-extern PMC* Parrot_NameSpace_nci_get_name(PARROT_INTERP, PMC* pmc);
-
 /*
 
 =item C<STRING* Parrot_full_sub_name>
@@ -309,7 +304,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             STRING *res;
 
             Parrot_block_DOD(interp);
-            ns_array = Parrot_NameSpace_nci_get_name(interp, s->namespace_stash);
+            ns_array = Parrot_ns_get_name(interp, s->namespace_stash);
             if (s->name)
                 VTABLE_push_string(interp, ns_array, s->name);
 

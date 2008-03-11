@@ -119,19 +119,19 @@ Documentation
 =cut
 END_C
 
-pmc2c_output_like( <<'END_PMC', <<'END_C', 'does' );
-pmclass a does nothing { }
+pmc2c_output_like( <<'END_PMC', <<'END_C', 'provides' );
+pmclass a provides nothing { }
 END_PMC
-vt_clone->does_str = CONST_STRING(interp, "nothing");
+vt_clone->provides_str = CONST_STRING(interp, "nothing");
 END_C
 
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'need_ext' );
 pmclass a need_ext { }
 END_PMC
    const VTABLE temp_ro_vtable = {
-        NULL,   /* namespace */
+        NULL,       /* namespace */
         enum_class_a, /* base_type */
-        NULL,   /* whoami */
+        NULL,       /* whoami */
         0|VTABLE_PMC_NEEDS_EXT|VTABLE_IS_READONLY_FLAG, /* flags */
 END_C
 

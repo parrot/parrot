@@ -276,6 +276,27 @@ Parrot_get_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     return Parrot_get_namespace_keyed(interp, base_ns, key);
 }
 
+/*
+
+=item C<PMC * Parrot_ns_get_name>
+
+Retrieve an array of names from a namespace object.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *namespace))
+{
+    PMC *names;
+    Parrot_PCCINVOKE(interp, namespace,
+            CONST_STRING(interp, "get_name"), "->P", &names);
+    return names;
+}
 
 /*
 

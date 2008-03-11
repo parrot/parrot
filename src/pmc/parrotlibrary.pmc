@@ -34,7 +34,7 @@ a ParrotLibrary PMC.
 
 #include "parrot/parrot.h"
 
-pmclass ParrotLibrary need_ext does library {
+pmclass ParrotLibrary need_ext provides library {
 
 /*
 
@@ -46,7 +46,7 @@ Initializes the library with a C<NULL> oplib init function.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PObj_active_destroy_SET(SELF);
         PMC_struct_val(SELF) = NULL;
     }
@@ -61,24 +61,11 @@ Destroys the library, closing the shared library.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         if (PMC_data(SELF))
             Parrot_dlclose(PMC_data(SELF));
     }
 
-/*
-
-=item C<void morph(INTVAL type)>
-
-Morphs to C<type>.
-
-=cut
-
-*/
-
-    void morph(INTVAL type) {
-        SUPER(type);
-    }
 
 /*
 
@@ -90,7 +77,7 @@ Creates and returns a clone of the library.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         PMC *dest            = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
         PMC_data(dest)       = PMC_data(SELF);
@@ -111,7 +98,7 @@ Returns whether a library has been successfully loaded.
 
 */
 
-    INTVAL get_bool() {
+    VTABLE INTVAL get_bool() {
         return (PMC_data(SELF) != NULL);
     }
 
@@ -125,7 +112,7 @@ Returns the name of the loaded library.
 
 */
 
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         STRING *key  = CONST_STRING(INTERP, "_filename");
         PMC    *prop = VTABLE_getprop(INTERP, SELF, key);
 
@@ -142,7 +129,7 @@ Set the pointer to the shared library handle.
 
 */
 
-    void set_pointer(void *handle) {
+    VTABLE void set_pointer(void *handle) {
         PMC_data(SELF) = handle;
     }
 }

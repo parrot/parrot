@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -64,7 +64,7 @@ static INTVAL calc_offset(PARROT_INTERP, List*list, PMC *key)
     return l;
 }
 
-pmclass MultiArray extends Array need_ext does array {
+pmclass MultiArray extends Array need_ext provides array {
 
 /*
 
@@ -76,7 +76,7 @@ Overrides the default in C<Array>. There is no initialization.
 
 */
 
-    void init() {
+    VTABLE void init() {
         /* override default in Array - no init */
     }
 
@@ -90,9 +90,9 @@ Returns the integer value for C<*key>.
 
 */
 
-    INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
         INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
-        return DYNSELF.get_integer_keyed_int(ix);
+        return SELF.get_integer_keyed_int(ix);
     }
 
 /*
@@ -105,9 +105,9 @@ Returns the floating-point number value for C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) {
         INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
-        return DYNSELF.get_number_keyed_int(ix);
+        return SELF.get_number_keyed_int(ix);
     }
 
 /*
@@ -120,9 +120,9 @@ Returns the Parrot string value for C<*key>.
 
 */
 
-    STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) {
         INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
-        return DYNSELF.get_string_keyed_int(ix);
+        return SELF.get_string_keyed_int(ix);
     }
 
 /*
@@ -135,9 +135,9 @@ Returns the PMC value for C<*key>.
 
 */
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
-        return DYNSELF.get_pmc_keyed_int(ix);
+        return SELF.get_pmc_keyed_int(ix);
     }
 
 /*
@@ -150,9 +150,9 @@ Sets the integer value C<value> at C<*key>.
 
 */
 
-    void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
-        DYNSELF.set_integer_keyed_int(ix, value);
+        SELF.set_integer_keyed_int(ix, value);
     }
 
 /*
@@ -165,9 +165,9 @@ Sets the floating-point number value C<value> at C<*key>.
 
 */
 
-    void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
-        DYNSELF.set_number_keyed_int(ix, value);
+        SELF.set_number_keyed_int(ix, value);
     }
 
 /*
@@ -180,9 +180,9 @@ Sets the Parrot string value C<value> at C<*key>.
 
 */
 
-    void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) {
         INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
-        DYNSELF.set_string_keyed_int(ix, value);
+        SELF.set_string_keyed_int(ix, value);
     }
 
 /*
@@ -195,7 +195,7 @@ Unimplemented.
 
 */
 
-    void set_pmc_keyed(PMC *dest_key, PMC *src) {
+    VTABLE void set_pmc_keyed(PMC *dest_key, PMC *src) {
         /* XXX array ??? */
     }
 }

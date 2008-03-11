@@ -16,12 +16,12 @@
 
 pmclass SubProxy dynpmc need_ext extends Sub {
 
-    void init() {
+    VTABLE void init() {
         SUPER();
         PObj_get_FLAGS(SELF) |= PObj_private0_FLAG;
     }
 
-    void set_pmc(PMC *key) {
+    VTABLE void set_pmc(PMC *key) {
         PMC_data(SELF) = key;
     }
 

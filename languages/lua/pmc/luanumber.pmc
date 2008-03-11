@@ -26,13 +26,13 @@ the Lua C<Number> type.
 
 
 pmclass LuaNumber
-    extends LuaAny
-    does scalar
-    does float
+    extends  LuaAny
+    provides scalar
+    provides float
     dynpmc
-    group lua_group
-    hll Lua
-    maps Float {
+    group    lua_group
+    hll      Lua
+    maps     Float {
 
 /*
 
@@ -170,8 +170,8 @@ Returns a Parrot string representation of the number.
 
 */
     void set_string_native(STRING *value) {
-        DYNSELF.morph(dynpmc_LuaString);
-        DYNSELF.set_string_native(value);
+        SELF.morph(dynpmc_LuaString);
+        SELF.set_string_native(value);
     }
 
 /*
@@ -260,7 +260,9 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_add_LuaNumber(INTERP, SELF, n, dest);
@@ -300,7 +302,9 @@ MMD_LuaNumber: {
             SELF.set_number_native(n);
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_add_LuaNumber(INTERP, SELF, n);
@@ -344,7 +348,9 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_subtract_LuaNumber(INTERP, SELF, n, dest);
@@ -384,7 +390,9 @@ MMD_LuaNumber: {
             SELF.set_number_native(n);
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_subtract_LuaNumber(INTERP, SELF, n);
@@ -425,7 +433,9 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_multiply_LuaNumber(INTERP, SELF,
@@ -464,7 +474,10 @@ MMD_LuaNumber: {
             SELF.set_number_native(n);
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_multiply_LuaNumber(INTERP, SELF, n);
             else
@@ -504,7 +517,10 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_divide_LuaNumber(INTERP, SELF,
                                                          n, dest);
@@ -543,8 +559,12 @@ MMD_LuaNumber: {
             SELF.set_number_native(n);
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
+>>>>>>> .merge-right.r26307
                 Parrot_LuaNumber_i_divide_LuaNumber(INTERP, SELF, n);
             else
                 real_exception(INTERP, NULL, ILL_INHERIT,
@@ -586,7 +606,10 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_modulus_LuaNumber(INTERP, SELF,
                                                           n, dest);
@@ -626,7 +649,9 @@ MMD_LuaNumber: {
             SELF.set_number_native(a - floor(a/b)*b);
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_modulus_LuaNumber(INTERP, SELF, n);
@@ -667,7 +692,10 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_pow_LuaNumber(INTERP, SELF, n, dest);
 
@@ -706,7 +734,10 @@ MMD_LuaNumber: {
             SELF.set_number_native(n);
         }
 MMD_LuaString: {
-            PMC *n = LuaString.value.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, value, const_string(interp, "tonumber"),
+                    "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_pow_LuaNumber(INTERP, SELF, n);
             else
@@ -871,7 +902,7 @@ MMD_DEFAULT: {
         else
             VTABLE_set_integer_native(INTERP, retval, 0);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -882,7 +913,8 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC *tonumber() {
-        return SELF.clone();
+        PMC *clone = SELF.clone();
+        RETURN(PMC *clone);
     }
 
 }

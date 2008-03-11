@@ -24,13 +24,13 @@ the Lua C<String> type.
 
 
 pmclass LuaString
-    extends LuaAny
-    does scalar
-    does string
+    extends  LuaAny
+    provides scalar
+    provides string
     dynpmc
-    group lua_group
-    hll Lua
-    maps String {
+    group    lua_group
+    hll      Lua
+    maps     String {
 
 /*
 
@@ -131,8 +131,8 @@ Return the string "string".
 
 */
     void set_integer_native(INTVAL value) {
-        DYNSELF.morph(dynpmc_LuaNumber);
-        DYNSELF.set_integer_native(value);
+        SELF.morph(dynpmc_LuaNumber);
+        SELF.set_integer_native(value);
     }
 
 /*
@@ -143,8 +143,8 @@ Return the string "string".
 
 */
     void set_number_native(FLOATVAL value) {
-        DYNSELF.morph(dynpmc_LuaNumber);
-        DYNSELF.set_number_native(value);
+        SELF.morph(dynpmc_LuaNumber);
+        SELF.set_number_native(value);
     }
 
 /*
@@ -188,7 +188,9 @@ the specified C<PMC>.
 
 */
     PMC* neg(PMC *dest) {
-        PMC *n = SELF.tonumber();
+        PMC *n;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+            "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
             return LuaNumber.n.neg(dest);
@@ -205,7 +207,9 @@ the specified C<PMC>.
 
 */
     void i_neg() {
-        PMC *n = SELF.tonumber();
+        PMC *n;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+            "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
             LuaNumber.n.i_neg();
@@ -273,7 +277,9 @@ Used to unarchive the string.
 */
     PMC* add(PMC *value, PMC *dest) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_add_LuaNumber(INTERP, n, value, dest);
@@ -282,7 +288,10 @@ MMD_LuaNumber: {
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_add_LuaString(INTERP, n, value, dest);
 
@@ -315,7 +324,9 @@ MMD_DEFAULT: {
 */
     void i_add(PMC *value) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_add_LuaNumber(INTERP, n, value);
@@ -325,7 +336,9 @@ MMD_LuaNumber: {
                         SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_add_LuaString(INTERP, n, value);
@@ -360,7 +373,9 @@ MMD_DEFAULT: {
 */
     PMC* subtract(PMC *value, PMC *dest) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_subtract_LuaNumber(INTERP, n,
@@ -370,7 +385,10 @@ MMD_LuaNumber: {
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_subtract_LuaString(INTERP, n,
                                                            value, dest);
@@ -404,7 +422,9 @@ MMD_DEFAULT: {
 */
     void i_subtract(PMC *value) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_subtract_LuaNumber(INTERP, n, value);
@@ -414,7 +434,9 @@ MMD_LuaNumber: {
                         SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_subtract_LuaString(INTERP, n, value);
@@ -450,7 +472,9 @@ MMD_DEFAULT: {
 */
     PMC* multiply(PMC *value, PMC *dest) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_multiply_LuaNumber(INTERP, n,
@@ -460,7 +484,10 @@ MMD_LuaNumber: {
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_multiply_LuaString(INTERP, n,
                                                            value, dest);
@@ -494,7 +521,9 @@ MMD_DEFAULT: {
 */
     void i_multiply(PMC *value) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_multiply_LuaNumber(INTERP, n, value);
@@ -504,7 +533,9 @@ MMD_LuaNumber: {
                         SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_multiply_LuaString(INTERP, n, value);
@@ -539,7 +570,10 @@ MMD_DEFAULT: {
 */
     PMC* divide(PMC *value, PMC *dest) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_divide_LuaNumber(INTERP, n,
                                                          value, dest);
@@ -548,7 +582,10 @@ MMD_LuaNumber: {
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_divide_LuaString(INTERP, n,
                                                          value, dest);
@@ -583,7 +620,9 @@ MMD_DEFAULT: {
 */
     void i_divide(PMC *value) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_divide_LuaNumber(INTERP, n, value);
@@ -593,7 +632,10 @@ MMD_LuaNumber: {
                         SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_divide_LuaString(INTERP, n, value);
             else
@@ -627,7 +669,10 @@ MMD_DEFAULT: {
 */
     PMC* modulus(PMC *value, PMC *dest) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_modulus_LuaNumber(INTERP, n,
                                                           value, dest);
@@ -636,7 +681,10 @@ MMD_LuaNumber: {
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_modulus_LuaString(INTERP, n,
                                                           value, dest);
@@ -671,7 +719,9 @@ MMD_DEFAULT: {
 */
     void i_modulus(PMC *value) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_modulus_LuaNumber(INTERP, n, value);
@@ -681,7 +731,9 @@ MMD_LuaNumber: {
                         SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_modulus_LuaString(INTERP, n, value);
@@ -716,7 +768,9 @@ MMD_DEFAULT: {
 */
     PMC* pow(PMC *value, PMC *dest) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_pow_LuaNumber(INTERP, n, value, dest);
@@ -725,7 +779,10 @@ MMD_LuaNumber: {
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
+
             if (PMC_type(n) == dynpmc_LuaNumber)
                 return Parrot_LuaNumber_pow_LuaString(INTERP, n, value, dest);
 
@@ -759,7 +816,9 @@ MMD_DEFAULT: {
 */
     void i_pow(PMC *value) {
 MMD_LuaNumber: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_pow_LuaNumber(INTERP, n, value);
@@ -769,7 +828,9 @@ MMD_LuaNumber: {
                         SELF.name());
         }
 MMD_LuaString: {
-            PMC *n = SELF.tonumber();
+            PMC *n;
+            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+                "->P", &n);
 
             if (PMC_type(n) == dynpmc_LuaNumber)
                 Parrot_LuaNumber_i_pow_LuaString(INTERP, n, value);
@@ -938,10 +999,10 @@ MMD_DEFAULT: {
         PMC *retval = Parrot_find_global_s(INTERP,
                              const_string(INTERP, "Lua::string"),
                              const_string(INTERP, "mt_string"));
-        if (retval)
-            return retval;
+        if (!retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
 
-        return pmc_new(INTERP, dynpmc_LuaNil);
+        RETURN(PMC *retval);
     }
 
 /*
@@ -955,7 +1016,7 @@ MMD_DEFAULT: {
     METHOD PMC* len() {
         PMC *retval         = pmc_new(INTERP, dynpmc_LuaNumber);
         VTABLE_set_number_native(INTERP, retval, SELF.elements());
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -975,7 +1036,7 @@ MMD_DEFAULT: {
         else
             VTABLE_set_bool(INTERP, retval, 0);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*
@@ -1002,12 +1063,14 @@ MMD_DEFAULT: {
                 PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 VTABLE_set_number_native(INTERP, retval, d);
                 string_cstring_free(s1);
-                return retval;
+                RETURN(PMC *retval);
             }
         }
-
-        string_cstring_free(s1);
-        return pmc_new(INTERP, dynpmc_LuaNil);
+        else {
+            PMC *retval = pmc_new(INTERP, dynpmc_LuaNil);
+            string_cstring_free(s1);
+            RETURN(PMC *retval);
+        }
     }
 
 /*
@@ -1035,12 +1098,14 @@ MMD_DEFAULT: {
                 PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 VTABLE_set_number_native(INTERP, retval, n);
                 string_cstring_free(s1);
-                return retval;
+                RETURN(PMC *retval);
             }
         }
-
-        string_cstring_free(s1);
-        return pmc_new(INTERP, dynpmc_LuaNil);
+        else {
+            PMC *retval = pmc_new(INTERP, dynpmc_LuaNil);
+            string_cstring_free(s1);
+            RETURN(PMC *retval);
+        }
     }
 
 }

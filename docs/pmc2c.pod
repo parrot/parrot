@@ -166,16 +166,16 @@ Calls the static vtable method 'method' in C<OtherClass>.
 
 =item C<SELF.method(a,b,c)>
 
-Calls the vtable method 'method' using the static type of C<SELF> (in
-other words, calls another method defined in the same file).
-
-=item C<DYNSELF.method(a,b,c)>
-
 Calls the vtable method 'method' using the dynamic type of C<SELF>.
 
-=item C<DYNSELF(a,b,c)>
+=item C<SELF(a,b,c)>
 
 Same as above, but calls the current method.
+
+=item C<STATICSELF.method(a,b,c)>
+
+Calls the vtable method 'method' using the static type of C<SELF> (in
+other words, calls another method defined in the same file).
 
 =item C<OtherClass.SUPER(a,b,c)>
 

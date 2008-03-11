@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -23,7 +23,7 @@ C<Parrot::Pmc2c>.
 
 #include "parrot/parrot.h"
 
-pmclass Ref does ref {
+pmclass Ref provides ref {
 
 /*
 
@@ -35,11 +35,11 @@ Sets the referenced PMC to C<PMCNULL>.
 
 */
 
-    void init() {
+    VTABLE void init() {
         SELF.init_pmc(PMCNULL);
     }
 
-    void destroy() {
+    VTABLE void destroy() {
         SELF.init_pmc(NULL);
         /* don't pass it on */
     }
@@ -54,7 +54,7 @@ Sets the referenced PMC to C<initializer>.
 
 */
 
-    void init_pmc(PMC *initializer) {
+    VTABLE void init_pmc(PMC *initializer) {
         /* the referred PMC itself */
         PMC_pmc_val(SELF) = initializer;
         PObj_custom_mark_SET(SELF);
@@ -78,17 +78,17 @@ Get the referenced PMC.
 
 */
 
-    void set_pmc(PMC *other) {
+    VTABLE void set_pmc(PMC *other) {
         PObj_active_destroy_CLEAR(SELF);
         DOD_WRITE_BARRIER(INTERP, SELF, PMC_pmc_val(SELF), other);
         SELF.init_pmc(other);
     }
 
-    void assign_pmc(PMC *other) {
+    VTABLE void assign_pmc(PMC *other) {
         SELF.set_pmc(other);
     }
 
-    PMC *get_pmc() {
+    VTABLE PMC *get_pmc() {
         return PMC_pmc_val(SELF);
     }
 
@@ -102,7 +102,7 @@ Returns the PMC's type.
 
 */
 
-    INTVAL type() {
+    VTABLE INTVAL type() {
         return VTABLE_type(interp, PMC_pmc_val(SELF));
     }
 
@@ -116,7 +116,7 @@ Marks the referenced PMC as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
     }
 
@@ -136,9 +136,23 @@ Returns the name of the PMC, not the name of the referenced PMC.
 
 */
 
-    STRING *name() {
+    VTABLE STRING *name() {
         return SUPER();
     }
+
+/*
+
+=item C<void morph(INTVAL type)>
+
+Changes the PMC to a PMC of a new type.
+
+=cut
+
+*/
+    VTABLE void morph(INTVAL type) {
+        SUPER(type);
+    }
+
 }
 
 /*

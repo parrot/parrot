@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -76,7 +76,7 @@ Initializes a PMCProxy PMC.
 
 */
 
-    void init() {
+    VTABLE void init() {
         Parrot_Class * const _pmc          = mem_allocate_zeroed_typed(Parrot_Class);
         PMC          * const new_attribute = pmc_new(interp, enum_class_Hash);
         STRING       * const name          = CONST_STRING(interp, "proxy");
@@ -111,7 +111,7 @@ Initializes a PMCProxy PMC.
         PObj_is_class_SET(SELF);
     }
 
-    void init_pmc(PMC *init_data) {
+    VTABLE void init_pmc(PMC *init_data) {
         const INTVAL type_num = VTABLE_get_integer(interp, init_data);
         Parrot_Class *proxy_info;
 
@@ -125,9 +125,9 @@ Initializes a PMCProxy PMC.
         SELF.init();
 
         /* Set up number, name and namespace. */
-        proxy_info = PARROT_CLASS(SELF);
-        proxy_info->id = type_num;
-        proxy_info->name = interp->vtables[type_num]->whoami;
+        proxy_info             = PARROT_CLASS(SELF);
+        proxy_info->id         = type_num;
+        proxy_info->name       = interp->vtables[type_num]->whoami;
         proxy_info->_namespace = interp->vtables[type_num]->_namespace;
 
         /* XXX Parents and MRO still todo. */
@@ -154,7 +154,7 @@ Creates an instance of the PMC.
 =cut
 
 */
-    PMC *instantiate(PMC *init) {
+    VTABLE PMC *instantiate(PMC *init) {
         Parrot_Class * const _pmc = PARROT_CLASS(SELF);
 
         if (!PMC_IS_NULL(init))
@@ -173,7 +173,7 @@ Free the memory associated with the object's underlying struct.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
     }
 
@@ -187,7 +187,7 @@ Mark any referenced strings and PMCs in the structure as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         Parrot_Class * const _pmc = PARROT_CLASS(SELF);
 
         if (_pmc->name)
@@ -224,7 +224,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    INTVAL isa_pmc(PMC *lookup) {
+    VTABLE INTVAL isa_pmc(PMC *lookup) {
         Parrot_Class * const _proxy = PARROT_CLASS(SELF);
         INTVAL        i, num_classes;
         STRING       *classname;
@@ -256,16 +256,40 @@ Returns whether the class is or inherits from C<*classname>.
             return 1;
 
         /* Iterate over all the parents and check if they respond true
-         * for 'isa' on the original comparison.
-         */
+         * for 'isa' on the original comparison. */
         num_classes = VTABLE_elements(interp, _proxy->parents);
+
         for (i = 0; i < num_classes; i++) {
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _proxy->parents, i);
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
+                _proxy->parents, i);
+
             if (VTABLE_isa_pmc(interp, cur_class, lookup))
                 return 1;
         }
 
         return 0;
+    }
+
+/*
+
+=item C<INTVAL does(STRING *role_name)>
+
+Returns whether the class does the role with the given C<*rolename>.
+
+=cut
+
+*/
+
+    VTABLE INTVAL does(STRING *role_name) {
+        Parrot_Class *_class  = PARROT_CLASS(SELF);
+        INTVAL        id      = _class->id;
+        PMC          *proxied = pmc_new_noinit(interp, id);
+
+        if (VTABLE_does(interp, proxied, role_name))
+            return 1;
+
+        return VTABLE_isa(interp, proxied, role_name);
+
     }
 
 /*
@@ -279,7 +303,7 @@ Returns the integer type of the class.
 */
 
 
-    INTVAL type() {
+    VTABLE INTVAL type() {
         const Parrot_Class * const _class = PARROT_CLASS(SELF);
         return _class->id;
     }
@@ -320,10 +344,10 @@ Gets the name of the PMC.
 =cut
 
 */
-    PCCMETHOD name() {
+    METHOD name() {
         Parrot_Class * const _pmc     = PARROT_CLASS(SELF);
         STRING       * const ret_name = _pmc->name;
-        PCCRETURN(STRING *ret_name);
+        RETURN(STRING *ret_name);
     }
 
 /*
@@ -335,10 +359,10 @@ Gets the namespace that this class is attached to.
 =cut
 
 */
-    PCCMETHOD pmc_namespace() {
+    METHOD pmc_namespace() {
         Parrot_Class * const _pmc          = PARROT_CLASS(SELF);
         PMC          * const ret_namespace = _pmc->_namespace;
-        PCCRETURN(PMC *ret_namespace);
+        RETURN(PMC *ret_namespace);
     }
 
 /*
@@ -350,10 +374,10 @@ Creates an instance of the PMC.
 =cut
 
 */
-    PCCMETHOD new(PMC *args :optional, int got_args :opt_flag) {
+    METHOD new(PMC *args :optional, int got_args :opt_flag) {
         PMC * const obj = VTABLE_instantiate(interp, SELF, args);
         UNUSED(got_args);
-        PCCRETURN(PMC *obj);
+        RETURN(PMC *obj);
     }
 
 /*
@@ -365,9 +389,9 @@ Return a hash where the keys are method names and the values are methods.
 =cut
 
 */
-    PCCMETHOD methods() {
+    METHOD methods() {
         PMC * const ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
-        PCCRETURN(PMC *ret_methods);
+        RETURN(PMC *ret_methods);
     }
 
 /*
@@ -379,9 +403,9 @@ Return the parents array PMC.
 =cut
 
 */
-    PCCMETHOD parents() {
+    METHOD parents() {
         PMC * const ret_parents = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents"));
-        PCCRETURN(PMC *ret_parents);
+        RETURN(PMC *ret_parents);
     }
 
 /*
@@ -394,14 +418,14 @@ parameter is supplied, a particular item of introspection data.
 =cut
 
 */
-    PCCMETHOD inspect(STRING *what :optional, int got_what :opt_flag) {
+    METHOD inspect(STRING *what :optional, int got_what :opt_flag) {
         /* Just delegate to the appropriate vtable method. */
         PMC * const found =
             got_what
                 ? VTABLE_inspect_str(interp, SELF, what)
                 : VTABLE_inspect(interp, SELF);
 
-        PCCRETURN(PMC *found);
+        RETURN(PMC *found);
     }
 
 /*
@@ -414,7 +438,7 @@ Return the name of the low-level class (without the HLL namespace).
 
 */
 
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         Parrot_Class * const proxy_info = PARROT_CLASS(SELF);
 
         /* Copy the stored string name of the proxy. */

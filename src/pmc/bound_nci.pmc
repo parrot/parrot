@@ -45,17 +45,17 @@ Set the bound object live.
 
 */
 
-    void set_pmc(PMC *obj) {
+    VTABLE void set_pmc(PMC *obj) {
         PMC_pmc_val(SELF) = obj;
         if (!PMC_IS_NULL(obj))
             PObj_custom_mark_SET(SELF);
     }
 
-    PMC *get_pmc() {
+    VTABLE PMC *get_pmc() {
         return PMC_pmc_val(SELF);
     }
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
             /* bound multi sub
              * XXX maybe create separate PMC class
@@ -93,7 +93,7 @@ Set the bound object live.
         return (opcode_t *)next;
     }
 
-    void mark() {
+    VTABLE void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
         if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {

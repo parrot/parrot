@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007, The Perl Foundation.
+Copyright (C) 2007-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -34,7 +34,7 @@ objects with other strings outside of the C<emit> method.
 
 #include "parrot/parrot.h"
 
-pmclass CodeString extends String does string {
+pmclass CodeString extends String provides string {
 
 /*
 
@@ -61,7 +61,7 @@ A newline is automatically added to the end of the fmt.
 
 */
 
-  PCCMETHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
+  METHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
     INTVAL pos          = 0;
     INTVAL replen       = 0;
     STRING *percent     = CONST_STRING(INTERP, "%");
@@ -113,18 +113,18 @@ A newline is automatically added to the end of the fmt.
         replen = string_length(INTERP, repl);
     }
 
-    S1 = string_concat(INTERP, DYNSELF.get_string(), fmt, 0);
+    S1 = string_concat(INTERP, SELF.get_string(), fmt, 0);
     VTABLE_set_string_native(INTERP, SELF, S1);
 
     /* Add a newline if necessary */
     S0 = string_substr(interp, fmt, -1, 1, &S0, 0);
     if (0 != string_equal(INTERP, S0, newline)) {
-        S1 = DYNSELF.get_string();
+        S1 = SELF.get_string();
         S1 = string_concat(INTERP, S1, newline, 0);
         VTABLE_set_string_native(INTERP, SELF, S1);
     }
 
-    PCCRETURN(PMC *SELF);
+    RETURN(PMC *SELF);
 }
 
 
@@ -143,7 +143,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 */
 
-  PCCMETHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
+  METHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
     static INTVAL counter = 10;
     STRING *counter_as_string = string_from_int(INTERP, counter);
     UNUSED(SELF);
@@ -151,12 +151,12 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     counter++;
 
     if (!has_fmt) {
-        PCCRETURN(STRING *counter_as_string);
+        RETURN(STRING *counter_as_string);
     }
     else {
         STRING *result = string_copy(INTERP, format);
         result         = string_concat(INTERP, result, counter_as_string, 1);
-        PCCRETURN(STRING *result);
+        RETURN(STRING *result);
     }
   }
 
@@ -172,7 +172,7 @@ prefixed with 'unicode:'.
 
 */
 
-  PCCMETHOD escape(STRING *str) {
+  METHOD escape(STRING *str) {
     STRING *escaped_str = string_escape_string(INTERP, str);
     STRING *quote       = CONST_STRING(INTERP, "\x22");
     STRING *x           = CONST_STRING(INTERP, "\\x");
@@ -200,7 +200,7 @@ prefixed with 'unicode:'.
         escaped_str     = string_concat(INTERP, unicode, escaped_str, 1);
     }
 
-    PCCRETURN(STRING *escaped_str);
+    RETURN(STRING *escaped_str);
   }
 
 /*
@@ -214,7 +214,7 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 
 */
 
-  PCCMETHOD key(PMC *args :slurpy) {
+  METHOD key(PMC *args :slurpy) {
     STRING *open_bracket  = CONST_STRING(INTERP, "[");
     STRING *semi          = CONST_STRING(INTERP, ";");
     STRING *close_bracket = CONST_STRING(INTERP, "]");
@@ -249,7 +249,7 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 
     out = string_append(INTERP, out, close_bracket);
 
-    PCCRETURN(STRING *out);
+    RETURN(STRING *out);
 }
 
 /*

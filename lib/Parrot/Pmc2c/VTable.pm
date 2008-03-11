@@ -14,7 +14,7 @@ use Cwd qw(cwd);
 sub new {
     my ( $class, $filename ) = @_;
     my $self = {};
-    bless $self, ( ref($class) || $class );
+    bless $self, $class;
     $self->build($filename) if $filename;
     $self;
 }

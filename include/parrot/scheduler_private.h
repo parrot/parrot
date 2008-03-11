@@ -15,78 +15,7 @@
 
 #include "parrot/parrot.h"
 
-/* Scheduler PMC's underlying struct. */
-typedef struct Parrot_Scheduler {
-    INTVAL        id;             /* The scheduler's ID. */
-    INTVAL        max_tid;        /* The highest assigned task ID. */
-    INTVAL        pending;        /* A count of pending tasks (cached for fast
-                                     lookup). */
-    PMC          *task_list;      /* The current list of tasks. */
-    PMC          *task_index;     /* An index into the current list of tasks,
-                                     ordered by priority. */
-    PMC          *wait_index;     /* An unordered index of inactive tasks. */
-    PMC          *handlers;       /* The list of currently active handlers. */
-    PMC          *messages;       /* A message queue used for communication
-                                     between schedulers. */
-    Parrot_mutex  msg_lock;       /* Lock to synchronize use of the message queue. */
-    Parrot_Interp interp;         /* A link back to the scheduler's interpreter. */
-} Parrot_Scheduler;
-
-/* Macro to access underlying structure of a Scheduler PMC. */
-#define PARROT_SCHEDULER(s) ((Parrot_Scheduler *) PMC_data(s))
-
-/* SchedulerMessage PMC's underlying struct. */
-typedef struct Parrot_SchedulerMessage {
-    INTVAL        id;        /* The message's ID. */
-    STRING       *type;      /* The message's type. */
-    PMC          *data;      /* Additional data for the message. */
-} Parrot_SchedulerMessage;
-
-/* Macro to access underlying structure of a Scheduler PMC. */
-#define PARROT_SCHEDULERMESSAGE(s) ((Parrot_SchedulerMessage *) PMC_data(s))
-
-/* Task PMC's underlying struct. */
-typedef struct Parrot_Task {
-    INTVAL        id;        /* The task ID. */
-    INTVAL        priority;  /* The priority of the task. */
-    FLOATVAL      birthtime; /* A time stamp marking the creation of the task. */
-    STRING       *type;      /* The type of the task. */
-    STRING       *subtype;   /* The subtype of the task. */
-    STRING       *status;    /* The status of the task. */
-    Parrot_Interp interp;    /* The interpreter that created the task. */
-    PMC          *codeblock; /* An (optional) codeblock for the task. */
-    PMC          *data;      /* Additional data for the task. */
-    char         *cb_data;   /* Additional data for a callback event. */
-} Parrot_Task;
-
-/* Macro to access underlying structure of a Task PMC. */
-#define PARROT_TASK(t) ((Parrot_Task *) PMC_data(t))
-
-/* Timer PMC's underlying struct. The first part of the PMC struct is identical
- * to a core Task PMC (and will be constructed automatically by inheritance in
- * the new PMC implementation). */
-typedef struct Parrot_Timer {
-    INTVAL        id;        /* The task ID. */
-    INTVAL        priority;  /* The priority of the task. */
-    FLOATVAL      birthtime; /* A time stamp marking the creation of the task. */
-    STRING       *type;      /* The type of the task. */
-    STRING       *subtype;   /* The subtype of the task. */
-    STRING       *status;    /* The status of the task. */
-    Parrot_Interp interp;    /* The interpreter that created the task. */
-    PMC          *codeblock; /* An (optional) codeblock for the task. */
-    PMC          *data;      /* Additional data for the task. */
-    char         *cb_data;   /* Additional data for a callback event. */
-    FLOATVAL      duration;  /* The duration of the timer pause */
-    FLOATVAL      interval;  /* How often to repeat */
-    INTVAL        repeat;    /* Whether to repeat: 0 = run once (no repeat), -1 = forever */
-} Parrot_Timer;
-
-/* Macro to access underlying structure of a Timer PMC. */
-#define PARROT_TIMER(t) ((Parrot_Timer *) PMC_data(t))
-
-/*
- * Scheduler private flags
- */
+/* Scheduler private flags */
 typedef enum {
     SCHEDULER_cache_valid_FLAG         = PObj_private0_FLAG,
     SCHEDULER_wake_requested_FLAG      = PObj_private1_FLAG,

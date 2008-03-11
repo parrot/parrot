@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -42,13 +42,13 @@ Class method to construct an Integer according to passed arguments.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = NULL;  /* key */
         PMC_pmc_val(SELF)    = NULL;  /* value */
         PObj_custom_mark_SET(SELF);
     }
 
-    PMC *instantiate(PMC *sig) {
+    VTABLE PMC *instantiate(PMC *sig) {
         return PMCNULL;
 
         /* TODO -- really create this thing */
@@ -83,7 +83,7 @@ Marks the hash as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         if (PMC_struct_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
 
@@ -101,12 +101,12 @@ Marks the hash as live.
 
 */
 
-    PMC *get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
         /* check key ? */
         return PMC_pmc_val(SELF);
     }
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         /* check key ? */
         return PMC_pmc_val(SELF);
     }
@@ -127,7 +127,7 @@ Set the value of the Pair.
 
 */
 
-    void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         if (PMC_struct_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                     "attempt to set existing Pair key");
@@ -136,7 +136,7 @@ Set the value of the Pair.
     }
 
 
-    void set_pmc_keyed_str(STRING *key, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
         if (PMC_struct_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                     "attempt to set existing Pair key");
@@ -145,7 +145,7 @@ Set the value of the Pair.
         PMC_pmc_val(SELF)    = value;
     }
 
-    void assign_pmc(PMC *value) {
+    VTABLE void assign_pmc(PMC *value) {
         PMC_pmc_val(SELF) = value;
     }
 
@@ -184,7 +184,7 @@ Check if two Pairs hold the same keys and values.
 
 */
 
-    INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) {
         STRING *s1, *s2;
         PMC *k1, *k2, *p1, *p2;
 
@@ -243,7 +243,7 @@ Used to unarchive the Pair.
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         PMC **pos;
 
@@ -266,7 +266,7 @@ Used to unarchive the Pair.
         SUPER(info);
     }
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
         VTABLE_push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
@@ -275,7 +275,7 @@ Used to unarchive the Pair.
             VTABLE_push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
     }
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
@@ -296,36 +296,56 @@ Used to unarchive the Pair.
 
 =over 4
 
-=item C<METHOD PMC *key()>
+=item C<METHOD key()>
 
-=item C<METHOD PMC *value()>
-
-=item C<METHOD PMC *kv()>
-
-Return the key, the value, or a tuple of (key, value) respectively.
+Return the key of the pair.
 
 =cut
 
 */
 
-    METHOD PMC *key() {
+    METHOD key() {
+        PMC *key;
         if (PObj_key_is_string_TEST(SELF)) {
-            PMC * const k  = pmc_new(INTERP,
+            key = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
 
-            PMC_str_val(k) = (STRING *)PMC_struct_val(SELF);
+            PMC_str_val(key) = (STRING *)PMC_struct_val(SELF);
 
-            return k;
+        }
+        else {
+            key = (PMC *)PMC_struct_val(SELF);
         }
 
-        return (PMC *)PMC_struct_val(SELF);
+        RETURN(PMC *key);
     }
 
-    METHOD PMC *value() {
-        return PMC_pmc_val(SELF);
+/*
+
+=item C<METHOD value()>
+
+Return the value of the pair.
+
+=cut
+
+*/
+
+    METHOD value() {
+        PMC *value = PMC_pmc_val(SELF);
+        RETURN(PMC *value);
     }
 
-    METHOD PMC *kv() {
+/*
+
+=item C<METHOD kv()>
+
+Return a tuple of (key, value) for the pair.
+
+=cut
+
+*/
+
+    METHOD kv() {
         PMC * const t = pmc_new(INTERP,
             Parrot_get_ctx_HLL_type(INTERP, enum_class_FixedPMCArray));
 
@@ -338,7 +358,7 @@ Return the key, the value, or a tuple of (key, value) respectively.
             VTABLE_set_pmc_keyed_int(INTERP, t, 0, (PMC *)PMC_struct_val(SELF));
 
         VTABLE_set_pmc_keyed_int(INTERP, t, 1, PMC_pmc_val(SELF));
-        return t;
+        RETURN(PMC *t);
     }
 }
 

@@ -27,7 +27,7 @@ To declare that a method in a PMC should take arguments using the Parrot
 Calling Conventions, prefix its name with the keyword C<PCCMETHOD>.
 Where you would put the C parameter list, put a PCC parameter list.
 Do not specify a return type for C<PCCMETHOD>s -- the true
-signature of the return is specified inside the method using C<PCCRETURN>,
+signature of the return is specified inside the method using C<RETURN>,
 described below.
 
   PCCMETHOD PlayRandomSong() {
@@ -41,14 +41,14 @@ described below.
 For full details of the parameter list syntax, see L<Parameter List Syntax>.
 
 
-=head2 PCCRETURN
+=head2 RETURN
 
 To return arguments using the Parrot Calling Conventions, which you should do
 if you have implemented a C<PCCMETHOD> (unless it returns no arguments, of
-course), use the C<PCCRETURN> keyword. This takes a signature as specified in
+course), use the C<RETURN> keyword. This takes a signature as specified in
 the L<Parameter List Syntax> section.
 
-  PCCRETURN(PMC *status, INTVAL count);
+  RETURN(PMC *status, INTVAL count);
 
 
 =head2 PCCINVOKE

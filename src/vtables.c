@@ -185,8 +185,8 @@ mark_vtables(PARROT_INTERP)
             pobject_lives(interp, (PObj *)vtable->_namespace);
         if (vtable->whoami)
             pobject_lives(interp, (PObj *)vtable->whoami);
-        if (vtable->does_str)
-            pobject_lives(interp, (PObj *)vtable->does_str);
+        if (vtable->provides_str)
+            pobject_lives(interp, (PObj *)vtable->provides_str);
         if (vtable->isa_str)
             pobject_lives(interp, (PObj *)vtable->isa_str);
         if (vtable->pmc_class)

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -48,22 +48,14 @@ typedef enum {
 #define FPA_is_ns_ext PObj_private0_FLAG
 #define NS_HASH(pmc) ((Hash *)PMC_struct_val(pmc))
 
+pmclass NameSpace extends Hash provides hash need_ext no_ro {
 
-/* We store extra information about the namespace in a struct, which we will
- * hang off the PMC_data slot. */
-typedef struct Parrot_NSInfo {
-    STRING *name;     /* Name of this namespace part. */
-    PMC    *_class;   /* The class or role attached to this namespace. */
-    PMC    *methods;  /* A Hash of methods, keyed on the method name. This
-                       * goes away when the methods are sucked in by a
-                       * class. */
-    PMC    *vtable;   /* A Hash of vtable subs, keyed on the vtable index */
-} Parrot_NSInfo;
-
-/* Macro for easy access to the namespace info. */
-#define PARROT_NSINFO(o) ((Parrot_NSInfo *) PMC_data(o))
-
-pmclass NameSpace extends Hash does hash need_ext no_ro {
+    ATTR STRING *name;     /* Name of this namespace part. */
+    ATTR PMC    *_class;   /* The class or role attached to this namespace. */
+    ATTR PMC    *methods;  /* A Hash of methods, keyed on the method name. This
+                            * goes away when the methods are sucked in by a
+                            * class. */
+    ATTR PMC    *vtable;   /* A Hash of vtable subs, keyed on the vtable index */
 
 /*
 
@@ -76,11 +68,12 @@ other fields.
 
 */
 
-    void init() {
-        SUPER();                             /* _struct_val := Hash */
-        PMC_pmc_val(SELF)           = NULL;  /* parent */
-        PMC_data(SELF)              = mem_allocate_zeroed_typed(Parrot_NSInfo);
-        PARROT_NSINFO(SELF)->vtable = PMCNULL;
+    VTABLE void init() {
+        SUPER();                                /* _struct_val := Hash */
+        PMC_pmc_val(SELF)              = NULL;  /* parent */
+        PMC_data(SELF)                 =
+                mem_allocate_zeroed_typed(Parrot_NameSpace);
+        PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
     }
 
 /*
@@ -92,8 +85,8 @@ Marks the namespace as live.
 =cut
 
 */
-    void mark() {
-        Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
+    VTABLE void mark() {
+        Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
         SUPER();
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
@@ -116,8 +109,8 @@ Frees the namespace info struct.
 =cut
 
 */
-    void destroy() {
-        mem_sys_free(PARROT_NSINFO(SELF));
+    VTABLE void destroy() {
+        mem_sys_free(PARROT_NAMESPACE(SELF));
         SUPER();
     }
 
@@ -131,10 +124,8 @@ Returns the class or role PMC that is associated with this namespace.
 
 */
 
-    PMC *get_class()
-    {
-        const Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
-        return nsinfo->_class;
+    PMC *get_class() {
+        return PARROT_NAMESPACE(SELF)->_class;
     }
 
 /*
@@ -170,7 +161,7 @@ really a public API.
 
 */
 
-    void set_pmc_keyed_str(STRING *key, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
         const int   val_is_NS =
             value->vtable->base_type == enum_class_NameSpace;
         PMC        *new_tuple = NULL;
@@ -179,10 +170,10 @@ really a public API.
 
         /* If it's a sub... */
         if (value->vtable->base_type == enum_class_Sub) {
-            Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
-            PMC           *       vtable = nsinfo->vtable;
-            Parrot_sub    * const sub    = PMC_sub(value);
-            PMC * const classobj = VTABLE_get_class(interp, SELF);
+            Parrot_NameSpace * const nsinfo   = PARROT_NAMESPACE(SELF);
+            PMC              *       vtable   = nsinfo->vtable;
+            Parrot_sub       * const sub      = PMC_sub(value);
+            PMC              * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Handle vtable methods with two underscores at the start. */
             if (sub->vtable_index == -1) {
@@ -237,7 +228,7 @@ really a public API.
 
         /* If it's an NCI method */
         if (value->vtable->base_type == enum_class_NCI) {
-            Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
+            Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
             PMC * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Insert it in class, if there is a class */
@@ -260,7 +251,7 @@ really a public API.
         if (value->vtable->base_type == enum_class_MultiSub) {
 
             if (VTABLE_elements(interp, value) > 0) {
-                Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
+                Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
                 PMC * const classobj = VTABLE_get_class(interp, SELF);
 
                 /* Extract the first alternate and check if it is a method */
@@ -317,9 +308,9 @@ really a public API.
 
         if (val_is_NS) {
             /* TODO - this hack needs to go */
-            Parrot_NSInfo *nsinfo = PARROT_NSINFO(value);
-            PMC_pmc_val(value)    = SELF;  /* set parent */
-            nsinfo->name          = key;   /* and name */
+            Parrot_NameSpace *nsinfo = PARROT_NAMESPACE(value);
+            PMC_pmc_val(value)       = SELF;  /* set parent */
+            nsinfo->name             = key;   /* and name */
 
             if (new_tuple) {
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns, value);
@@ -339,7 +330,7 @@ really a public API.
         }
     }
 
-    void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         PMC    *ns = SELF;
 
         if (key->vtable->base_type == enum_class_String) {
@@ -380,7 +371,7 @@ really a public API.
             "Invalid namespace key in set_pmc_keyed");
     }
 
-    PMC *get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
         if (!ns)
@@ -393,7 +384,7 @@ really a public API.
         return ns;
     }
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         PMC    *ns = SELF;
 
         if (key->vtable->base_type == enum_class_String)
@@ -420,9 +411,9 @@ really a public API.
             "Invalid namespace key in get_pmc_keyed_str");
     }
 
-    PMC *get_pmc_keyed_int(INTVAL key) {
-        Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
-        PMC           * const vtable = nsinfo->vtable;
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+        Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
+        PMC              * const vtable = nsinfo->vtable;
 
         if (PMC_IS_NULL(vtable))
             return PMCNULL;
@@ -445,7 +436,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
 */
 
-    void *get_pointer_keyed_str(STRING *key) {
+    VTABLE void *get_pointer_keyed_str(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
         if (PMC_IS_NULL(ns))
@@ -458,11 +449,11 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
         return ns;
     }
 
-    void *get_pointer_keyed(PMC *key) {
+    VTABLE void *get_pointer_keyed(PMC *key) {
         PMC    *ns = SELF;
 
         if (PMC_IS_NULL(key))
-          return PMCNULL;
+            return PMCNULL;
 
         if (key->vtable->base_type == enum_class_String)
             return SELF.get_pointer_keyed_str(VTABLE_get_string(INTERP, key));
@@ -490,7 +481,8 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
             for (i = 0; i < elements; ++i)  {
                 STRING * const part = VTABLE_get_string_keyed_int(interp, key, i);
 
-                if ((i + 1) >= elements) /* Last entry in the array */
+                /* Last entry in the array */
+                if ((i + 1) >= elements)
                     return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
 
                 ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
@@ -515,8 +507,8 @@ Return the name of this namespace part.
 
 */
 
-    STRING *get_string() {
-        const Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
+    VTABLE STRING *get_string() {
+        const Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
         return nsinfo->name;
     }
 
@@ -534,7 +526,7 @@ Return the name of this namespace part.
 
 /*
 
-=item C<METHOD void PMC *add_namespace(STRING *name, PMC *namespace)>
+=item C<METHOD add_namespace(STRING *name, PMC *namespace)>
 
 Stores the given namespace under this namespace, with the given name.  Throws
 an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
@@ -543,7 +535,7 @@ an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
 
 */
 
-    METHOD void add_namespace(STRING *name, PMC *_namespace) {
+    METHOD add_namespace(STRING *name, PMC *_namespace) {
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
 
         if (!VTABLE_isa(INTERP, _namespace, s_ns))
@@ -558,7 +550,7 @@ an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
 
 /*
 
-=item C<METHOD void PMC *add_sub(STRING *name, PMC *sub)>
+=item C<METHOD add_sub(STRING *name, PMC *sub)>
 
 Stores the given sub under this namespace, with the given name.  Throws an
 invalid type exception if C<sub> is not a Sub PMC or subclass.
@@ -567,7 +559,7 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
 */
 
-    METHOD void add_sub(STRING *name, PMC *sub) {
+    METHOD add_sub(STRING *name, PMC *sub) {
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
 
         if (!VTABLE_isa(INTERP, sub, s_sub))
@@ -581,7 +573,7 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
 /*
 
-=item C<METHOD void PMC *add_var(STRING *name, PMC *var)>
+=item C<METHOD add_var(STRING *name, PMC *var)>
 
 Stores the given variable under this namespace, with the given name.
 
@@ -589,13 +581,13 @@ Stores the given variable under this namespace, with the given name.
 
 */
 
-    METHOD void add_var(STRING *name, PMC *var) {
+    METHOD add_var(STRING *name, PMC *var) {
         VTABLE_set_pmc_keyed_str(INTERP, SELF, name, var);
     }
 
 /*
 
-=item C<METHOD PMC *get_name()>
+=item C<METHOD get_name()>
 
 Returns the name of the namespace as an array of strings.
 
@@ -606,12 +598,12 @@ Returns the name of the namespace as an array of strings.
 
 */
 
-    METHOD PMC *get_name() {
+    METHOD get_name() {
         PMC * const ar = pmc_new(INTERP, enum_class_ResizableStringArray);
         PMC *ns        = SELF;
 
         while (ns) {
-            Parrot_NSInfo *nsinfo = PARROT_NSINFO(ns);
+            Parrot_NameSpace *nsinfo = PARROT_NAMESPACE(ns);
             VTABLE_unshift_string(INTERP, ar, nsinfo->name);
             ns = PMC_pmc_val(ns);
         }
@@ -619,11 +611,11 @@ Returns the name of the namespace as an array of strings.
         /* remove the NULL string of the namespace root */
         VTABLE_shift_string(INTERP, ar);
 
-        return ar;
+        RETURN(PMC *ar);
     }
 /*
 
-=item C<METHOD PMC *find_namespace(STRING *name)>
+=item C<METHOD find_namespace(STRING *name)>
 
 Return the namespace with the given name.
 
@@ -631,23 +623,24 @@ Return the namespace with the given name.
 
 */
 
-    METHOD PMC *find_namespace(STRING *key) {
+    METHOD find_namespace(STRING *key) {
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
-        PMC    * const ns   = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
+        PMC    * const ns   = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF),
+                                                     key);
 
         if (!ns)
-            return PMCNULL;
+            RETURN(PMC *PMCNULL);
 
         /* it's a NameSpace */
         if (VTABLE_isa(INTERP, ns, s_ns))
-            return ns;
+            RETURN(PMC *ns);
 
-        return PMCNULL;
+        RETURN(PMC *PMCNULL);
     }
 
 /*
 
-=item C<METHOD PMC *find_sub(STRING *name)>
+=item C<METHOD find_sub(STRING *name)>
 
 Return the Sub PMC with the given name.
 
@@ -655,23 +648,24 @@ Return the Sub PMC with the given name.
 
 */
 
-    METHOD PMC *find_sub(STRING *key) {
+    METHOD find_sub(STRING *key) {
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
-        PMC    * const sub   = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
+        PMC    * const sub   = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF),
+                                                      key);
 
         if (!sub)
-            return PMCNULL;
+            RETURN(PMC *PMCNULL);
 
         /* it's a Sub */
         if (VTABLE_isa(INTERP, sub, s_sub))
-            return sub;
+            RETURN(PMC *sub);
 
-        return PMCNULL;
+        RETURN(PMC *PMCNULL);
     }
 
 /*
 
-=item C<METHOD PMC *find_var(STRING *name)>
+=item C<METHOD find_var(STRING *name)>
 
 Return the PMC with the given name.
 
@@ -679,18 +673,18 @@ Return the PMC with the given name.
 
 */
 
-    METHOD PMC *find_var(STRING *key) {
+    METHOD find_var(STRING *key) {
         PMC * const val = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
         if (!val)
-            return PMCNULL;
+            RETURN(PMC *PMCNULL);
 
-        return val;
+        RETURN(PMC *val);
     }
 
 /*
 
-=item C<METHOD PMC *del_namespace(STRING *name)>
+=item C<METHOD del_namespace(STRING *name)>
 
 Deletes the contained NameSpace PMC with the given name.  Throws an invalid
 type exception if the item to delete is not a NameSpace PMC or subclass, and
@@ -700,26 +694,25 @@ does not delete the PMC.
 
 */
 
-    METHOD void del_namespace(STRING *name) {
+    METHOD del_namespace(STRING *name) {
         Hash   * const hash = NS_HASH(SELF);
         PMC    * const ns   = (PMC *)parrot_hash_get(INTERP, hash, name);
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
 
         if (PMC_IS_NULL(ns))
-            return;
+            RETURN(void);
 
-        if (!VTABLE_isa(INTERP, ns, s_ns)) {
+        if (!VTABLE_isa(INTERP, ns, s_ns))
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d for '%Ss' in del_namespace()",
                 ns->vtable->base_type, name);
-        }
 
         parrot_hash_delete(INTERP, hash, name);
     }
 
 /*
 
-=item C<METHOD PMC *del_sub(STRING *name)>
+=item C<METHOD del_sub(STRING *name)>
 
 Deletes the contained Sub PMC with the given name.  Throws an invalid type
 exception if the item to delete is not a Sub PMC or subclass, and does not
@@ -729,26 +722,25 @@ delete the PMC.
 
 */
 
-    METHOD void del_sub(STRING *name) {
+    METHOD del_sub(STRING *name) {
         Hash   * const hash  = NS_HASH(SELF);
         PMC    * const sub   = (PMC *)parrot_hash_get(INTERP, hash, name);
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
 
         if (PMC_IS_NULL(sub))
-            return;
+            RETURN(void);
 
-        if (!VTABLE_isa(INTERP, sub, s_sub)) {
+        if (!VTABLE_isa(INTERP, sub, s_sub))
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d for '%Ss' in del_sub()",
                 sub->vtable->base_type, name);
-        }
 
         parrot_hash_delete(INTERP, hash, name);
     }
 
 /*
 
-=item C<METHOD PMC *del_var(STRING *name)>
+=item C<METHOD del_var(STRING *name)>
 
 Deletes the contained variable-like PMC with the given name.
 
@@ -756,13 +748,13 @@ Deletes the contained variable-like PMC with the given name.
 
 */
 
-    METHOD void del_var(STRING *name) {
+    METHOD del_var(STRING *name) {
         parrot_hash_delete(INTERP, NS_HASH(SELF), name);
     }
 
 /*
 
-=item C<METHOD PMC *get_sym(STRING *name)>
+=item C<METHOD get_sym(STRING *name)>
 
 Return the symbol (var or sub) with the given name. This can be used
 to retrieve symbols, if a NameSpace with the same name exists.
@@ -771,26 +763,26 @@ to retrieve symbols, if a NameSpace with the same name exists.
 
 */
 
-    METHOD PMC *get_sym(STRING *key) {
+    METHOD get_sym(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
         if (!ns)
-            return PMCNULL;
+            RETURN(PMC *PMCNULL);
 
         /* it's a NameSpace */
         if (ns->vtable == SELF->vtable)
-            return PMCNULL;
+            RETURN(PMC *PMCNULL);
 
-        if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
-                ns->vtable->base_type == enum_class_FixedPMCArray)
+        if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext)
+        &&  ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
 
-        return ns;
+        RETURN(PMC *ns);
     }
 
 /*
 
-=item C<METHOD void export_to(PMC *dest, PMC *what)>
+=item C<METHOD export_to(PMC *dest, PMC *what)>
 
 Export items from this NameSpace into the C<dest> NameSpace. The items to
 export are named in C<what>, which may be an array of strings, a hash, or null.
@@ -808,20 +800,20 @@ NOTE: exporting 'default' set of items is not yet implemented.
 
 */
 
-    METHOD void export_to(PMC *dest, PMC *what) {
+    METHOD export_to(PMC *dest, PMC *what) {
         STRING * const s_hash  = CONST_STRING(interp, "hash");
         STRING * const s_array = CONST_STRING(interp, "array");
 
         if (PMC_IS_NULL(dest)) {
             real_exception(interp, NULL, 0,
                     "destination namespace not specified");
-            return;
+            RETURN(void);
         }
 
         if (PMC_IS_NULL(what) || !VTABLE_elements(interp, what)) {
             real_exception(interp, NULL, 0,
                     "exporting default object set not yet implemented");
-            return;
+            RETURN(void);
         }
 
         /* if "what" does "hash", we extract string key/value pairs,
@@ -840,7 +832,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name)) {
                     real_exception(interp, NULL, 0,
                         "source object name not specified");
-                    return;
+                    RETURN(void);
                 }
 
                 if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(interp, what, src_name))) {
@@ -858,7 +850,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                     real_exception(interp, NULL, 0,
                             "object '%s' not found in current namespace",
                             string_to_cstring(interp, src_name));
-                    return;
+                    RETURN(void);
                 }
 
                 VTABLE_set_pmc_keyed_str(interp, dest, dest_name, object);
@@ -874,7 +866,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
 
                 if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name)) {
                     real_exception(interp, NULL, 0, "object name not specified");
-                    return;
+                    RETURN(void);
                 }
 
                 object = VTABLE_get_pmc_keyed_str(interp, SELF, name);
@@ -883,21 +875,20 @@ NOTE: exporting 'default' set of items is not yet implemented.
                     real_exception(interp, NULL, 0,
                             "object '%s' not found in current namespace",
                             string_to_cstring(interp, name));
-                    return;
+                    RETURN(void);
                 }
 
                 VTABLE_set_pmc_keyed_str(interp, dest, name, object);
             }
         }
-        else {
+        else
             real_exception(interp, NULL, 0,
                 "can't handle argument of type %s", what->vtable->base_type);
-        }
     }
 
 /*
 
-=item C<METHOD PMC *get_parent()>
+=item C<METHOD get_parent()>
 
 Return the parent NameSpace or PMCNULL, if none.
 
@@ -905,13 +896,14 @@ Return the parent NameSpace or PMCNULL, if none.
 
 */
 
-    METHOD PMC *get_parent() {
-        return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+    METHOD get_parent() {
+        PMC *parent = PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+        RETURN(PMC *parent);
     }
 
 /*
 
-=item C<PCCMETHOD get_class()>
+=item C<METHOD get_class()>
 
 Returns the class or role PMC that is associated with this namespace.
 
@@ -919,19 +911,19 @@ Returns the class or role PMC that is associated with this namespace.
 
 */
 
-    PCCMETHOD get_class() {
-        Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
-        PMC           *ret_class     = nsinfo->_class;
+    METHOD get_class() {
+        Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
+        PMC              *ret_class     = nsinfo->_class;
 
         if (PMC_IS_NULL(ret_class))
             ret_class = PMCNULL;
 
-        PCCRETURN(PMC *ret_class);
+        RETURN(PMC *ret_class);
     }
 
 /*
 
-=item C<PCCMETHOD set_class(PMC *class_or_role)>
+=item C<METHOD set_class(PMC *class_or_role)>
 
 Sets the class or role PMC that is associated with this namespace.
 
@@ -939,15 +931,13 @@ Sets the class or role PMC that is associated with this namespace.
 
 */
 
-    PCCMETHOD set_class(PMC *class_or_role) {
-        Parrot_NSInfo * const nsinfo = PARROT_NSINFO(SELF);
-
-        nsinfo->_class = class_or_role;
+    METHOD set_class(PMC *class_or_role) {
+        PARROT_NAMESPACE(SELF)->_class = class_or_role;
     }
 
 /*
 
-=item C<PCCMETHOD get_associated_methods()>
+=item C<METHOD get_associated_methods()>
 
 Gets the Hash of methods associated with this namespace and removes it from
 the namespace.
@@ -956,18 +946,18 @@ the namespace.
 
 */
 
-    PCCMETHOD get_associated_methods() {
-        Parrot_NSInfo * const nsinfo      = PARROT_NSINFO(SELF);
-        PMC           * const ret_methods = nsinfo->methods;
+    METHOD get_associated_methods() {
+        Parrot_NameSpace * const nsinfo      = PARROT_NAMESPACE(SELF);
+        PMC              * const ret_methods = nsinfo->methods;
 
         nsinfo->methods = PMCNULL;
 
-        PCCRETURN(PMC *ret_methods);
+        RETURN(PMC *ret_methods);
     }
 
 /*
 
-=item C<PCCMETHOD get_associated_vtable_methods()>
+=item C<METHOD get_associated_vtable_methods()>
 
 Gets the Hash of vtable methods associated with this namespace and removes it
 from the namespace.
@@ -976,13 +966,13 @@ from the namespace.
 
 */
 
-    PCCMETHOD get_associated_vtable_methods() {
-        Parrot_NSInfo * const nsinfo      = PARROT_NSINFO(SELF);
-        PMC           * const ret_methods = nsinfo->vtable;
+    METHOD get_associated_vtable_methods() {
+        Parrot_NameSpace * const nsinfo      = PARROT_NAMESPACE(SELF);
+        PMC              * const ret_methods = nsinfo->vtable;
 
         nsinfo->vtable = PMCNULL;
 
-        PCCRETURN(PMC *ret_methods);
+        RETURN(PMC *ret_methods);
     }
 
 }

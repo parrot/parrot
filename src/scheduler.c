@@ -19,6 +19,10 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
+#include "pmc/pmc_scheduler.h"
+#include "pmc/pmc_task.h"
+#include "pmc/pmc_timer.h"
+
 #include "scheduler.str"
 
 #define CX_DEBUG 0

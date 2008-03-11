@@ -3,8 +3,6 @@
 ** experimental.ops
 */
 
-extern PMC* Parrot_NameSpace_nci_get_name(Interp* interp, PMC* pmc);
-
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -228,7 +226,7 @@ a Key PMC that you can use with "new", for example.
 =cut
 
 op classname(out PMC, invar PMC) :object_base {
-    PMC *ns = Parrot_NameSpace_nci_get_name(interp,
+    PMC *ns = Parrot_ns_get_name(interp,
                                     VTABLE_pmc_namespace(interp, $2));
     if (PMC_IS_NULL(ns) || VTABLE_elements(interp, ns) < 2)
     {

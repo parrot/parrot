@@ -22,8 +22,9 @@ sub new {
             %{ $self_hash || {} }
         )
     };
-    bless $self, ( ref($class) || $class );
-    $self;
+
+    # this is usually wrong, but *something* calls new on an object somewhere
+    bless $self, ref $class || $class;
 }
 
 sub clone {
@@ -78,14 +79,16 @@ Used in C<signature()> to normalize argument types.
 sub trans {
     my ( $self, $type ) = @_;
 
-    return "v" if ( !$type );
+    return 'v' unless $type;
+
     my $char = substr $type, 0, 1;
-    return $1 if ( $char =~ /([ISP])/ );
-    return 'N' if ( $char eq 'F' );
-    return 'v' if ( $type eq 'void' );
-    return 'V' if ( $type =~ /void\s*\*\s*/ );
-    return 'P' if ( $type =~ /opcode_t\*/ );
-    return "I" if ( $type =~ /int(val)?/i );
+
+    return $1  if $char =~ /([ISP])/;
+    return 'N' if $char eq 'F';
+    return 'v' if $type eq 'void';
+    return 'V' if $type =~ /void\s*\*\s*/;
+    return 'P' if $type =~ /opcode_t\*/;
+    return 'I' if $type =~ /int(val)?/i;
     return '?';
 }
 
@@ -99,25 +102,30 @@ sub signature {
     my ($self) = @_;
 
     my $args             = passable_args_from_parameter_list( $self->parameters );
-    my ($types,$vars)    = args_from_parameter_list( $self->parameters );
+    my ($types, $vars)   = args_from_parameter_list( $self->parameters );
     my $return_type      = $self->return_type;
     my $return_type_char = $self->trans($return_type);
-    my $sig              = $self->trans($return_type) . join '', map { $self->trans($_) } @{$types};
+    my $sig              = $self->trans($return_type) .
+                           join '', map { $self->trans($_) } @{$types};
     my $return_prefix    = '';
     my $method_suffix    = '';
 
     if ( $return_type ne 'void' ) {
         $return_prefix = "return ($return_type)";
-        if ( $return_type !~ /\*/ ) {    # PMC* and STRING* don't need a special suffix
+
+        # PMC* and STRING* don't need a special suffix
+        if ( $return_type !~ /\*/ ) {
             $method_suffix = "_ret" . lc substr $return_type, 0, 1;
-            $method_suffix =~ s/_retu/_reti/;    #change UINTVAl type to reti
+
+            # change UINTVAl type to reti
+            $method_suffix =~ s/_retu/_reti/;
         }
     }
 
     my $null_return = '';
-    $null_return = "return ($return_type) NULL;" if ( $return_type_char =~ /P|I|S|V/ );
-    $null_return = 'return (FLOATVAL) 0;'        if ( $return_type_char =~ /N/ );
-    $null_return = 'return;'                     if ( $return_type_char =~ /v/ );
+    $null_return = "return ($return_type) NULL;" if $return_type_char =~ /P|I|S|V/;
+    $null_return = 'return (FLOATVAL) 0;'        if $return_type_char =~ /N/;
+    $null_return = 'return;'                     if $return_type_char =~ /v/;
 
     return ( $return_prefix, $method_suffix, $args, $sig, $return_type_char, $null_return );
 }

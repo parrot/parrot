@@ -1,5 +1,6 @@
 /*
  $Id$
+ Copyright (C) 2008, The Perl Foundation.
 
 =head1 NAME
 
@@ -79,7 +80,7 @@ This method starts the code generation phase.
 =cut
 
 */
-    METHOD void startCodeGen()
+    METHOD startCodeGen()
     {
         BCG_info *bcg_info;
 
@@ -101,7 +102,7 @@ This method concludes the code generation phase.
 =cut
 
 */
-    METHOD void endCodeGen()
+    METHOD endCodeGen()
     {
         BCG_info *bcg_info;
 
@@ -125,7 +126,7 @@ This method is called to generate byte code for start subroutine.
 =cut
 
 */
-    METHOD void startSub(STRING *subName, STRING *pragma)
+    METHOD startSub(STRING *subName, STRING *pragma)
     {
         BCG_info *bcg_info;
 
@@ -152,7 +153,7 @@ This method is called to generate bytecode for end subroutine
 =cut
 
 */
-    METHOD void endSub()
+    METHOD endSub()
     {
         BCG_info *bcg_info;
 
@@ -174,7 +175,7 @@ This method generates code for a subroutine call.
 =cut
 
 */
-    METHOD void startCall(STRING *subName)
+    METHOD startCall(STRING *subName)
     {
         BCG_info *bcg_info;
 
@@ -199,7 +200,7 @@ This method generated code for ending a subroutine call.
 =cut
 
 */
-    METHOD void endCall()
+    METHOD endCall()
     {
         BCG_info *bcg_info;
 
@@ -222,7 +223,7 @@ This method generates code for an opertion.
 =cut
 
 */
-    METHOD void startOp(STRING *op)
+    METHOD startOp(STRING *op)
     {
         BCG_info *bcg_info;
 
@@ -247,7 +248,7 @@ This method marks the end of an operation.
 =cut
 
 */
-    METHOD void endOp()
+    METHOD endOp()
     {
         BCG_info *bcg_info;
 
@@ -270,7 +271,7 @@ This method generates bytecode for a variable.
 =cut
 
 */
-    METHOD void val(STRING *value, STRING *type)
+    METHOD val(STRING *value, STRING *type)
     {
         BCG_info *bcg_info;
         char      data_type;
@@ -304,7 +305,7 @@ This method generates bytecode for a constant.
 =cut
 
 */
-    METHOD void var(STRING *varName, STRING *type)
+    METHOD var(STRING *varName, STRING *type)
     {
         BCG_info *bcg_info;
         char      data_type;
@@ -337,7 +338,7 @@ This method generates bytecode for label.
 =cut
 
 */
-    METHOD void label(STRING *label)
+    METHOD label(STRING *label)
     {
         BCG_info *bcg_info;
         char     *label_str = string_to_cstring(INTERP, label);
@@ -357,7 +358,7 @@ This method generates bytecode for label.
     }
 
 
-    METHOD void printPASM()
+    METHOD printPASM()
     {
         BCG_info *bcg_info;
 

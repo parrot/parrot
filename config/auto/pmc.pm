@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,6 @@ package auto::pmc;
 use strict;
 use warnings;
 
-
 use base qw(Parrot::Configure::Step);
 
 use File::Basename qw/basename/;
@@ -26,21 +25,20 @@ use Parrot::Configure::Utils ':auto';
 
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Determining what pmc files should be compiled in};
-    $data{result}      = q{};
-    $data{PMC_PARENTS} = {};
-    $data{srcpmc} = [ sort map { basename($_) } glob "./src/pmc/*.pmc" ];
-    return \%data;
+    return {
+        description => 'Determining what pmc files should be compiled in',
+        result      => '',
+        PMC_PARENTS => {},
+        srcpmc      => [ sort map { basename($_) } glob "./src/pmc/*.pmc" ],
+    };
 }
 
 # Return the (lowercased) name of the immediate parent of the given
 # (lowercased) pmc name.
 sub pmc_parent {
-    my $self = shift;
-    my ($pmc) = @_;
+    my ($self, $pmc) = @_;
 
-    return $self->{PMC_PARENTS}->{$pmc} if defined $self->{PMC_PARENTS}->{$pmc};
+    return $self->{PMC_PARENTS}{$pmc} if defined $self->{PMC_PARENTS}{$pmc};
 
     local $/;
     open( my $PMC, '<', "src/pmc/$pmc.pmc" )
@@ -52,20 +50,19 @@ sub pmc_parent {
     s/^.*?pmclass//s;
     s/\{.*$//s;
 
-    return $self->{PMC_PARENTS}->{$pmc} = lc($1) if m/extends\s+(\w+)/;
-    return $self->{PMC_PARENTS}->{$pmc} = 'default';
+    return $self->{PMC_PARENTS}{$pmc} = lc($1) if m/extends\s+(\w+)/;
+    return $self->{PMC_PARENTS}{$pmc} = 'default';
 }
 
 # Return an array of all
 sub pmc_parents {
-    my $self = shift;
-    my ($pmc) = @_;
+    my ($self, $pmc) = @_;
 
     my @parents = ($pmc);
     push @parents, $self->pmc_parent( $parents[-1] )
         until $parents[-1] eq 'default';
-    shift(@parents);
 
+    shift @parents;
     return @parents;
 }
 
@@ -73,11 +70,13 @@ sub get_pmc_order {
     open my $IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
     my %order;
     while (<$IN>) {
-        next if (/^#/);
+        next if /^#/;
+
         if (/(\w+\.\w+)\s+(\d+)/) {
             $order{$1} = $2;
         }
     }
+
     close $IN;
 
     return \%order;
@@ -86,16 +85,18 @@ sub get_pmc_order {
 sub sort_pmcs {
     my @pmcs      = @_;
     my $pmc_order = get_pmc_order();
-    my $n         = scalar keys( %{$pmc_order} );
+    my $n         = keys %$pmc_order;
     my @sorted_pmcs;
-    for (@pmcs) {
-        if ( exists $pmc_order->{$_} ) {
-            $sorted_pmcs[ $pmc_order->{$_} ] = $_;
+
+    for my $pmc (@pmcs) {
+        if ( exists $pmc_order->{$pmc} ) {
+            $sorted_pmcs[ $pmc_order->{$pmc} ] = $pmc;
         }
         else {
-            $sorted_pmcs[ $n++ ] = $_;
+            $sorted_pmcs[ $n++ ] = $pmc;
         }
     }
+
     return @sorted_pmcs;
 }
 
@@ -153,9 +154,9 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/PMC/RO.pm
 END
 
-    foreach my $pmc ( split( /\s+/, $pmc_list ) ) {
+    for my $pmc ( split( /\s+/, $pmc_list ) ) {
         $pmc =~ s/\.pmc$//;
-        next if ( $pmc =~ /^const/ );
+        next if $pmc =~ /^const/;
 
         # make each pmc depend upon its parent.
         my $parent_dumps = '';
@@ -163,7 +164,7 @@ END
             foreach reverse( ( $self->pmc_parents($pmc) ) );
         my $parent_headers = '';
         $parent_headers .= "src/pmc/pmc_$_.h "
-            foreach ( $self->pmc_parents($pmc) );
+            for $self->pmc_parents($pmc);
 
         # make each pmc depend upon PCCMETHOD.pm if it uses PCCMETHOD
         my $pmc_fname = catfile('src', 'pmc', "$pmc.pmc");
@@ -196,36 +197,39 @@ END
     # Gather the actual names (with MixedCase) of all of the
     # non-abstract built-in PMCs.
     my @names;
-PMC: foreach my $pmc_file ( split( /\s+/, $pmc_list ) ) {
-        next if ( $pmc_file =~ /^const/ );
+PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
+        next if $pmc_file =~ /^const/;
         my $name;
         open my $PMC, "<", "src/pmc/$pmc_file"
             or die "open src/pmc/$pmc_file: $!";
         my $const;
         while (<$PMC>) {
             if (/^pmclass (\w+)(.*)/) {
-                $name = $1;
+                $name    = $1;
                 my $decl = $2;
-                $decl .= <$PMC> until ( $decl =~ s/\{.*// );
+                $decl .= <$PMC> until $decl =~ s/\{.*//;
+
                 $const = 1 if $decl =~ /\bconst_too\b/;
-                next PMC if $decl =~ /\babstract\b/;
-                next PMC if $decl =~ /\bextension\b/;
+                next PMC   if $decl =~ /\babstract\b/;
+                next PMC   if $decl =~ /\bextension\b/;
+
                 last;
             }
         }
-        close $PMC;
-        die "No pmclass declaration found in $pmc_file"
-            if !defined $name;
 
-        # please note that normal and Const PMCs must be in this
-        # order
+        close $PMC;
+
+        die "No pmclass declaration found in $pmc_file"
+            unless defined $name;
+
+        # please note that normal and Const PMCs must be in this order
         push @names, $name;
         push @names, "Const$name" if $const;
     }
 
     $conf->data->set(
         pmc                  => $pmc_list,
-        pmc_names            => join( " ", @names ),
+        pmc_names            => join( ' ', @names ),
         TEMP_pmc_o           => $TEMP_pmc_o,
         TEMP_pmc_build       => $TEMP_pmc_build,
         TEMP_pmc_classes_o   => $TEMP_pmc_classes_o,

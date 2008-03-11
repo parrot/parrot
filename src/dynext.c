@@ -112,11 +112,10 @@ static void
 set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
         ARGIN(STRING *name))
 {
-    STRING *key;
+    STRING * const key  = const_string(interp, what);
+    PMC    * const prop = constant_pmc_new(interp, enum_class_String);
 
-    PMC * const prop = pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, prop, name);
-    key = const_string(interp, what);
     VTABLE_setprop(interp, lib_pmc, key, prop);
 }
 
@@ -138,12 +137,11 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_DYN_LIBS);
 
-    /*
-     * remember path/file in props
-     */
+    /* remember path/file in props */
     set_cstring_prop(interp, lib_pmc, "_filename", path);  /* XXX */
     set_cstring_prop(interp, lib_pmc, "_type", type);
     set_cstring_prop(interp, lib_pmc, "_lib_name", lib_name);
+
     VTABLE_set_pmc_keyed_str(interp, dyn_libs, path, lib_pmc);
 }
 
@@ -294,24 +292,16 @@ Parrot_init_lib(PARROT_INTERP,
                 ARGIN_NULLOK(PMC *(*load_func)(PARROT_INTERP)),
                 ARGIN_NULLOK(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
 {
-    PMC *lib_pmc = NULL;
+    PMC *lib_pmc;
 
     if (load_func)
         lib_pmc = (*load_func)(interp);
 
-    if (!load_func || !lib_pmc) {
-        /* seems to be a native/NCI lib */
-        /*
-         * this PMC should better be constant, but then all the contents
-         * and the metadata have to be constant too
-         * s. also tools/build/ops2c.pl and lib/Parrot/Pmc2c.pm
-         */
-        lib_pmc = pmc_new(interp, enum_class_ParrotLibrary);
-    }
+    /* seems to be a native/NCI lib */
+    if (!load_func || !lib_pmc)
+        lib_pmc = constant_pmc_new(interp, enum_class_ParrotLibrary);
 
-    /*
-     *  Call init, if it exists
-     */
+    /*  Call init, if it exists */
     if (init_func)
         (init_func)(interp, lib_pmc);
 
@@ -344,8 +334,9 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
      * something during library loading doesn't stand a DOD run
      */
     Parrot_block_DOD(interp);
+
     /* get load_func */
-    if (lib_name != NULL) {
+    if (lib_name) {
         STRING * const load_func_name = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_load", lib_name);
         char * const cload_func_name = string_to_cstring(interp, load_func_name);
@@ -383,6 +374,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 
     /* remember lib_pmc in iglobals */
     store_lib_pmc(interp, lib_pmc, wo_ext, type, lib_name);
+
     /* UNLOCK */
     Parrot_unblock_DOD(interp);
 

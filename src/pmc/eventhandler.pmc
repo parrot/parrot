@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007, The Perl Foundation.
+Copyright (C) 2007-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -23,6 +23,11 @@ Event.
 
 pmclass EventHandler extends Sub need_ext {
 
+    ATTR STRING *type;          /* the type of the event to handle */
+    ATTR PMC    *code;          /* the code object to execute */
+    ATTR PMC    *interp;        /* the registered interpreter */
+    ATTR INTVAL  priority;      /* the minimum priority threshhold of events */
+
 /*
 
 =item C<void init()>
@@ -34,7 +39,7 @@ do anything.
 
 */
 
-    void init() {
+    VTABLE void init() {
         Parrot_EventHandler *e = mem_allocate_zeroed_typed(Parrot_EventHandler);
 
         PObj_custom_mark_SET(SELF);
@@ -75,7 +80,7 @@ handler to care
 
 */
 
-    void init_pmc(PMC *data) {
+    VTABLE void init_pmc(PMC *data) {
         PMC                 *code        = NULL;
         PMC                 *interpreter = PMCNULL;
         STRING              *type        = NULL;
@@ -126,7 +131,7 @@ Marks this PMC and any of its contents as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
 
         if (e) {
@@ -149,7 +154,7 @@ Frees any memory held by this PMC.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
 
         if (e) {
@@ -185,7 +190,7 @@ Retrieves the C<type> attribute of this event handler.
 
 */
 
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
 
         if (e)
@@ -203,7 +208,7 @@ Sets the minimum interesting priority for this event handler.
 =cut
 
 */
-    void set_integer_native(INTVAL priority) {
+    VTABLE void set_integer_native(INTVAL priority) {
         Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
 
         if (e)
@@ -220,7 +225,7 @@ handle the registered events.
 =cut
 
 */
-    void set_pmc(PMC *interpreter) {
+    VTABLE void set_pmc(PMC *interpreter) {
         Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
 
         if (e)
@@ -235,7 +240,7 @@ handle the registered events.
 
 */
 
-    PMC *get_attr_str(STRING *name) {
+    VTABLE PMC *get_attr_str(STRING *name) {
         Parrot_EventHandler *core_struct  = PMC_data_typed(SELF, Parrot_EventHandler *);
         PMC *value = PMCNULL;
 
@@ -255,7 +260,7 @@ Runs the contained code, if any; this is what handles the event.
 =cut
 
 */
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
         void                *unused;
 
@@ -284,7 +289,7 @@ Runs the contained code, if any; this is what handles the event.
 
 /*
 
-=item C<PCCMETHOD can_handle(PMC *event)>
+=item C<METHOD can_handle(PMC *event)>
 
 Report whether the event handler can handle a particular type of event.
 
@@ -292,7 +297,7 @@ Report whether the event handler can handle a particular type of event.
 
 */
 
-    PCCMETHOD can_handle(PMC *event) {
+    METHOD can_handle(PMC *event) {
         Parrot_EventHandler *handler_struct = PMC_data_typed(SELF, Parrot_EventHandler *);
         if (event->vtable->base_type == enum_class_Task) {
             PMC *type = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "type"));
@@ -303,12 +308,12 @@ Report whether the event handler can handle a particular type of event.
                 STRING *subtype_str = VTABLE_get_string(interp, subtype);
 
                 if (string_equal(interp, subtype_str, handler_struct->type) == 0) {
-                    PCCRETURN(INTVAL 1);
+                    RETURN(INTVAL 1);
                 }
             }
         }
 
-        PCCRETURN(INTVAL 0);
+        RETURN(INTVAL 0);
     }
 
 }

@@ -28,11 +28,9 @@ use Parrot::Pmc2c::UtilFunctions
     qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
 use Parrot::Pmc2c::PCCMETHOD;
 
-=item C<body($method, $line, $out_name)>
+=item C<generate_body($pmc)>
 
-Returns the C code for the method body. C<$line> is used to accumulate
-the number of lines, C<$out_name> is the name of the output file we are
-generating.
+Generate and emit the C code for the method body.
 
 =cut
 
@@ -198,12 +196,12 @@ sub rewrite_nci_method {
     my $pmcname = $pmc->name;
     my $body    = $self->body;
 
-    # Rewrite DYNSELF.other_method(args...)
+    # Rewrite SELF.other_method(args...)
     $body->subst(
         qr{
-    \bDYNSELF\b       # Macro: DYNSELF
-      \.(\w+)           # other_method
-      \(\s*(.*?)\)      # capture argument list
+    \bSELF\b         # Macro: SELF
+      \.(\w+)        # other_method
+      \(\s*(.*?)\)   # capture argument list
       }x,
         sub { "pmc->real_self->vtable->$1(" . full_arguments( $2, 'pmc->real_self' ) . ')' }
     );
@@ -211,7 +209,17 @@ sub rewrite_nci_method {
     # Rewrite SELF.other_method(args...)
     $body->subst(
         qr{
-      \bSELF\b          # Macro SELF
+    \bSELF\b         # Macro: SELF
+      \.(\w+)        # other_method
+      \(\s*(.*?)\)   # capture argument list
+      }x,
+        sub { "pmc->vtable->$1(" . full_arguments($2) . ')' }
+    );
+
+    # Rewrite STATICSELF.other_method(args...)
+    $body->subst(
+        qr{
+      \bSTATICSELF\b          # Macro STATICSELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
       }x,
@@ -225,6 +233,10 @@ sub rewrite_nci_method {
     # Rewrite SELF -> pmc, INTERP -> interp
     $body->subst( qr{\bSELF\b},   sub { 'pmc' } );
     $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
+
+    # Rewrite GET_ATTR, SET_ATTR with typename
+    $body->subst( qr{\bGET_ATTR}, sub { 'GETATTR_' . $pmcname } );
+    $body->subst( qr{\bSET_ATTR}, sub { 'SETATTR_' . $pmcname } );
 }
 
 =item C<rewrite_vtable_method($self, $pmc, $super, $super_table)>
@@ -279,21 +291,21 @@ sub rewrite_vtable_method {
         );
     }
 
-    # Rewrite DYNSELF.other_method(args...)
+    # Rewrite SELF.other_method(args...)
     $body->subst(
         qr{
-        \bDYNSELF\b       # Macro: DYNSELF
-        \.(\w+)           # other_method
-        \(\s*(.*?)\)      # capture argument list
+        \bSELF\b       # Macro: SELF
+        \.(\w+)        # other_method
+        \(\s*(.*?)\)   # capture argument list
       }x,
         sub { "pmc->vtable->$1(" . full_arguments($2) . ')' }
     );
 
-    # Rewrite DYNSELF(args...). See comments above.
+    # Rewrite SELF(args...). See comments above.
     $body->subst(
         qr{
-        \bDYNSELF\b       # Macro: DYNSELF
-        \(\s*(.*?)\)      # capture argument list
+        \bSELF\b       # Macro: SELF
+        \(\s*(.*?)\)   # capture argument list
       }x,
         sub { "pmc->vtable->$name(" . full_arguments($1) . ')' }
     );
@@ -303,6 +315,21 @@ sub rewrite_vtable_method {
         qr{
         (\w+)             # OtherClass
         \.\bSELF\b        # Macro SELF
+        \.(\w+)           # other_method
+        \(\s*(.*?)\)      # capture argument list
+      }x,
+        sub {
+            "Parrot_${1}"
+                . ( $pmc->is_vtable_method($2) ? "" : "_nci" ) . "_$2("
+                . full_arguments($3) . ')';
+        }
+    );
+
+    # Rewrite OtherClass.STATICSELF.other_method(args...)
+    $body->subst(
+        qr{
+        (\w+)             # OtherClass
+        \.\bSTATICSELF\b  # Macro STATICSELF
         \.(\w+)           # other_method
         \(\s*(.*?)\)      # capture argument list
       }x,
@@ -342,9 +369,27 @@ sub rewrite_vtable_method {
         }
     );
 
+    # Rewrite STATICSELF.other_method(args...)
+    $body->subst(
+        qr{
+        \bSTATICSELF\b    # Macro STATICSELF
+        \.(\w+)           # other_method
+        \(\s*(.*?)\)      # capture argument list
+      }x,
+        sub {
+            "Parrot_${pmcname}"
+                . ( $pmc->is_vtable_method($1) ? "" : "_nci" ) . "_$1("
+                . full_arguments($2) . ")";
+        }
+    );
+
     # Rewrite SELF -> pmc, INTERP -> interp
     $body->subst( qr{\bSELF\b},   sub { 'pmc' } );
     $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
+
+    # Rewrite GET_ATTR, SET_ATTR with typename
+    $body->subst( qr{\bGET_ATTR}, sub { 'GETATTR_' . $pmcname } );
+    $body->subst( qr{\bSET_ATTR}, sub { 'SETATTR_' . $pmcname } );
 
     # now use macros for all rewritten stuff
     $body->subst( qr{\b(?:\w+)->vtable->(\w+)\(}, sub { "VTABLE_$1(" } );

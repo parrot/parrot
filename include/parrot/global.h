@@ -124,6 +124,13 @@ PMC * Parrot_make_namespace_keyed_str(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *namespace))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void Parrot_set_global(PARROT_INTERP,
     ARGIN_NULLOK(PMC *ns),
     ARGIN_NULLOK(STRING *globalname),

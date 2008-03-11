@@ -124,7 +124,7 @@ Initializes the thread.
 
 */
 
-    void init() {
+    VTABLE void init() {
         /* protect interpreter creation and list handling */
         LOCK(interpreter_array_mutex);
 
@@ -147,7 +147,7 @@ Create a new thread by cloning the passed interpreter.
 
 */
 
-    void init_pmc(PMC *parent) {
+    VTABLE void init_pmc(PMC *parent) {
         LOCK(interpreter_array_mutex);
         SUPER(parent);
 

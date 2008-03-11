@@ -33,7 +33,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '# f' );
 f = print
 print(# f)
 CODE
-/^[^:]+: [^:]+:\d+: attempt to get length of/
+/^[^:]+: [^:]+:-?\d+: attempt to get length of/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not f' );
@@ -209,7 +209,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '# f' );
 f = function () return 1 end
 print(# f)
 CODE
-/^[^:]+: [^:]+:\d+: attempt to get length of/
+/^[^:]+: [^:]+:-?\d+: attempt to get length of/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not f' );

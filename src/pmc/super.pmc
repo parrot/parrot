@@ -61,17 +61,17 @@ Find the method for C<*name> in the parent class of the bound object.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_pmc_val(SELF)    = PMCNULL;
         PMC_struct_val(SELF) = PMCNULL;
     }
 
-    void init_pmc(PMC *obj) {
+    VTABLE void init_pmc(PMC *obj) {
         PMC_struct_val(SELF) = PMCNULL;
         SELF.set_pmc(obj);
     }
 
-    void set_pmc(PMC *obj) {
+    VTABLE void set_pmc(PMC *obj) {
         PMC *mro, *classobj;
         PMC_pmc_val(SELF) = obj;
 
@@ -97,19 +97,19 @@ Find the method for C<*name> in the parent class of the bound object.
         PObj_custom_mark_SET(SELF);
     }
 
-    PMC *get_pmc() {
+    VTABLE PMC *get_pmc() {
         return PMC_pmc_val(SELF);
     }
 
 
-    void mark() {
+    VTABLE void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
         if (PMC_struct_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
     }
 
-    PMC *find_method(STRING *name) {
+    VTABLE PMC *find_method(STRING *name) {
         PMC *mro, *classobj, *parent_class, *parent_methods;
         PMC *method = PMCNULL;
 

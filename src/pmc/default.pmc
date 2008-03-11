@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -278,7 +278,7 @@ Does nothing.
 
 */
 
-    void init() {
+    VTABLE void init() {
     }
 
 /*
@@ -291,9 +291,9 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
 
 */
 
-    void init_pmc(PMC *initializer) {
+    VTABLE void init_pmc(PMC *initializer) {
         if (PMC_IS_NULL(initializer))
-            DYNSELF.init();
+            SELF.init();
         else
             real_exception(interp, NULL, ILL_INHERIT,
                        "init_pmc() not implemented in class '%s'",
@@ -311,7 +311,7 @@ calls init().
 
 */
 
-    PMC *instantiate(PMC *init) {
+    VTABLE PMC *instantiate(PMC *init) {
         const INTVAL type = VTABLE_type(INTERP, SELF);
 
         /* Ensure no looping, as pmc_new calls the instantiate vtable entry for
@@ -336,7 +336,7 @@ Panics with a "no custom mark routine defined" error message.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         PANIC(INTERP, "custom_mark flag set but no custom mark routine defined");
     }
 
@@ -351,7 +351,7 @@ NULL PMC is returned.
 
 */
 
-    PMC *getprop(STRING *key) {
+    VTABLE PMC *getprop(STRING *key) {
         if (SELF->pmc_ext && PMC_metadata(SELF))
             return VTABLE_get_pmc_keyed_str(INTERP, PMC_metadata(SELF), key);
         else
@@ -368,7 +368,7 @@ Sets the property for C<*key> to C<*value>.
 
 */
 
-    void setprop(STRING *key, PMC *value) {
+    VTABLE void setprop(STRING *key, PMC *value) {
         if (check_set_std_props(INTERP, SELF, key, value))
             return;
 
@@ -394,7 +394,7 @@ Deletes the property for C<*key>.
 
 */
 
-    void delprop(STRING *key) {
+    VTABLE void delprop(STRING *key) {
         if (SELF->pmc_ext && PMC_metadata(SELF))
             VTABLE_delete_keyed_str(INTERP, PMC_metadata(SELF), key);
     }
@@ -409,7 +409,7 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
 
 */
 
-    PMC *getprops() {
+    VTABLE PMC *getprops() {
         if (!SELF->pmc_ext)
             add_pmc_ext(INTERP, SELF);
 
@@ -433,7 +433,7 @@ Returns the PMC's type.
 
 */
 
-    INTVAL type() {
+    VTABLE INTVAL type() {
         return SELF->vtable->base_type;
     }
 
@@ -448,9 +448,9 @@ C<type_keyed()> with it.
 
 */
 
-    INTVAL type_keyed_int(INTVAL key) {
+    VTABLE INTVAL type_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.type_keyed(r_key);
+        return SELF.type_keyed(r_key);
     }
 
 /*
@@ -463,7 +463,7 @@ Returns the name of the PMC.
 
 */
 
-    STRING *name() {
+    VTABLE STRING *name() {
         return SELF->vtable->whoami;
     }
 
@@ -487,16 +487,16 @@ Store the method as a global in the namespace of this class.
 
 */
 
-    PMC *pmc_namespace() {
+    VTABLE PMC *pmc_namespace() {
         return SELF->vtable->_namespace;
     }
 
 
-    PMC *find_method(STRING *method_name) {
+    VTABLE PMC *find_method(STRING *method_name) {
         return Parrot_find_method_with_cache(INTERP, SELF, method_name);
     }
 
-    void add_method(STRING *method_name, PMC *sub_pmc) {
+    VTABLE void add_method(STRING *method_name, PMC *sub_pmc) {
         VTABLE_set_pmc_keyed_str(INTERP, SELF->vtable->_namespace,
                                  method_name, sub_pmc);
     }
@@ -511,9 +511,9 @@ C<get_integer_keyed()> with it.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.get_integer_keyed(r_key);
+        return SELF.get_integer_keyed(r_key);
     }
 
 /*
@@ -527,9 +527,9 @@ C<get_number_keyed()> with it.
 
 */
 
-    FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.get_number_keyed(r_key);
+        return SELF.get_number_keyed(r_key);
     }
 
 
@@ -544,9 +544,9 @@ C<get_string_keyed()> with it.
 
 */
 
-    STRING *get_string_keyed_int(INTVAL key) {
+    VTABLE STRING *get_string_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.get_string_keyed(r_key);
+        return SELF.get_string_keyed(r_key);
     }
 
 /*
@@ -562,7 +562,7 @@ C<get_bool_keyed()> with it.
 
     INTVAL get_bool_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.get_bool_keyed(r_key);
+        return SELF.get_bool_keyed(r_key);
     }
 
 /*
@@ -578,7 +578,7 @@ C<elements_keyed()> with it.
 
     INTVAL elements_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.elements_keyed(r_key);
+        return SELF.elements_keyed(r_key);
     }
 
 
@@ -593,9 +593,9 @@ C<get_pmc_keyed()> with it.
 
 */
 
-    PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.get_pmc_keyed(r_key);
+        return SELF.get_pmc_keyed(r_key);
     }
 
 /*
@@ -608,7 +608,7 @@ Returns the address of the PMC.
 
 */
 
-    void *get_pointer() {
+    VTABLE void *get_pointer() {
         return SELF;
     }
 
@@ -622,7 +622,7 @@ Returns whether the PMC is numerically equal to C<value>.
 
 */
 
-    INTVAL is_same(PMC *value) {
+    VTABLE INTVAL is_same(PMC *value) {
         return SELF == value;
     }
 
@@ -638,17 +638,17 @@ Defaults fall back to C<set_pmc> and C<set_string_native>.
 
 */
 
-    void assign_pmc(PMC *value) {
+    VTABLE void assign_pmc(PMC *value) {
         STRING * const undef = CONST_STRING(INTERP, "Undef");
 
         if (VTABLE_isa(INTERP, value, undef))
             pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
         else
-            DYNSELF.set_pmc(value);
+            SELF.set_pmc(value);
     }
 
-    void assign_string_native(STRING *value) {
-        DYNSELF.set_string_native(value);
+    VTABLE void assign_string_native(STRING *value) {
+        SELF.set_string_native(value);
     }
 
 /*
@@ -661,7 +661,7 @@ Changes the PMC to a PMC of a new type
 
 */
 
-    void morph(INTVAL type) {
+    VTABLE void morph(INTVAL type) {
         pmc_reuse(INTERP, SELF, type, 0);
     }
 
@@ -676,9 +676,9 @@ and C<value>.
 
 */
 
-    void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        DYNSELF.set_integer_keyed(r_key, value);
+        SELF.set_integer_keyed(r_key, value);
     }
 
 /*
@@ -692,9 +692,9 @@ and C<value>.
 
 */
 
-    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        DYNSELF.set_number_keyed(r_key, value);
+        SELF.set_number_keyed(r_key, value);
     }
 
 /*
@@ -708,9 +708,9 @@ and C<value>.
 
 */
 
-    void set_string_keyed_int(INTVAL key, STRING *string) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *string) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        DYNSELF.set_string_keyed(r_key, string);
+        SELF.set_string_keyed(r_key, string);
     }
 
 /*
@@ -726,7 +726,7 @@ and C<value>.
 
     void set_bool_keyed_int(INTVAL key, INTVAL value) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        DYNSELF.set_bool_keyed(r_key, value);
+        SELF.set_bool_keyed(r_key, value);
     }
 
 /*
@@ -740,9 +740,9 @@ and C<value>.
 
 */
 
-    void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        DYNSELF.set_pmc_keyed(r_key, value);
+        SELF.set_pmc_keyed(r_key, value);
     }
 
 /*
@@ -755,7 +755,7 @@ Returns whether the PMC is equal to C<*value>.
 
 */
 
-    INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) {
         return (SELF->vtable         == value->vtable
             &&  PMC_struct_val(SELF) == PMC_struct_val(value)
             &&  PMC_data(SELF)       == PMC_data(value));
@@ -771,7 +771,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 
 */
 
-    INTVAL is_equal_num(PMC *value) {
+    VTABLE INTVAL is_equal_num(PMC *value) {
         return (VTABLE_get_number(INTERP, SELF) ==
                 VTABLE_get_number(INTERP, value));
     }
@@ -786,7 +786,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 
 */
 
-    INTVAL is_equal_str(PMC *value) {
+    VTABLE INTVAL is_equal_str(PMC *value) {
         return (0 == string_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                           VTABLE_get_string(INTERP, value)));
     }
@@ -804,9 +804,9 @@ C<exists_keyed()> with it.
 
 */
 
-    INTVAL exists_keyed_int(INTVAL key) {
+    VTABLE INTVAL exists_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.exists_keyed(r_key);
+        return SELF.exists_keyed(r_key);
     }
 
 /*
@@ -819,7 +819,7 @@ Returns true.
 
 */
 
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         return 1;
     }
 
@@ -834,9 +834,9 @@ C<defined_keyed()> with it.
 
 */
 
-    INTVAL defined_keyed_int(INTVAL key) {
+    VTABLE INTVAL defined_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.defined_keyed(r_key);
+        return SELF.defined_keyed(r_key);
     }
 
 /*
@@ -849,9 +849,9 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 
 */
 
-    void delete_keyed_int(INTVAL key) {
+    VTABLE void delete_keyed_int(INTVAL key) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        DYNSELF.delete_keyed(r_key);
+        SELF.delete_keyed(r_key);
     }
 
 /*
@@ -865,9 +865,9 @@ C<nextkey_keyed()> with it.
 
 */
 
-    PMC *nextkey_keyed_int(INTVAL key, INTVAL w) {
+    VTABLE PMC *nextkey_keyed_int(INTVAL key, INTVAL w) {
         PMC *const r_key = INT2KEY(INTERP, key);
-        return DYNSELF.nextkey_keyed(r_key, w);
+        return SELF.nextkey_keyed(r_key, w);
     }
 
 /*
@@ -882,7 +882,7 @@ true (1) is returned; otherwise, false (0) is returned.
 
 */
 
-    INTVAL can(STRING *method) {
+    VTABLE INTVAL can(STRING *method) {
         return !PMC_IS_NULL(VTABLE_find_method(INTERP, SELF, method));
     }
 
@@ -898,8 +898,8 @@ true (1) is returned; otherwise, false (0) is returned.
 
 */
 
-    INTVAL does(STRING *_interface) {
-        return does_isa(INTERP, _interface, SELF->vtable->does_str);
+    VTABLE INTVAL does(STRING *_interface) {
+        return does_isa(INTERP, _interface, SELF->vtable->provides_str);
     }
 
 /*
@@ -929,7 +929,7 @@ true (1) is returned; otherwise, false (0) is returned.
 
 */
 
-    INTVAL isa_pmc(PMC *lookup) {
+    VTABLE INTVAL isa_pmc(PMC *lookup) {
         /* RT#46665 - walk mro */
         return does_isa(INTERP, VTABLE_get_string(INTERP, lookup),
                 SELF->vtable->isa_str);
@@ -947,7 +947,7 @@ true (1) is returned; otherwise, false (0) is returned.
 
 */
 
-    INTVAL isa(STRING *_class) {
+    VTABLE INTVAL isa(STRING *_class) {
         /* RT#46665 - walk mro */
         return does_isa(INTERP, _class, SELF->vtable->isa_str);
     }
@@ -1023,7 +1023,7 @@ Look for NCI methods and properties.
 =cut
 
 */
-    PMC *get_class() {
+    VTABLE PMC *get_class() {
         /* Create a proxy */
         INTVAL type = VTABLE_type(interp, SELF);
         PMC *type_num = pmc_new(interp, enum_class_Integer);
@@ -1031,7 +1031,7 @@ Look for NCI methods and properties.
         return pmc_new_init(interp, enum_class_PMCProxy, type_num);
     }
 
-    PMC *get_attr_str(STRING *name) {
+    VTABLE PMC *get_attr_str(STRING *name) {
         PMC *p = NULL;
 
         /* let's look for props first
@@ -1087,11 +1087,11 @@ the string name passed in.
 =cut
 
 */
-    PMC *get_attr_keyed(PMC *key, STRING *name) {
+    VTABLE PMC *get_attr_keyed(PMC *key, STRING *name) {
         return VTABLE_get_attr_str(INTERP, SELF, name);
     }
 
-    void set_attr_keyed(PMC *key, STRING *name, PMC *value) {
+    VTABLE void set_attr_keyed(PMC *key, STRING *name, PMC *value) {
         VTABLE_set_attr_str(INTERP, SELF, name, value);
     }
 
@@ -1105,7 +1105,7 @@ Add class C<parent> to the list of our parents.
 
 */
 
-    void add_parent(PMC *parent) {
+    VTABLE void add_parent(PMC *parent) {
         if (!PObj_is_class_TEST(SELF))
             real_exception(interp, NULL, 1, "Only classes can be subclassed");
 
@@ -1122,7 +1122,7 @@ Used by DOD to mark the PMC.
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         /* default - mark prop hash */
         if (SELF->pmc_ext && PMC_metadata(SELF) &&
             info->extra_flags != EXTRA_IS_PROP_HASH) {
@@ -1147,7 +1147,7 @@ Does nothing.
 
 */
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         /* default - no action */
     }
 
@@ -1161,7 +1161,7 @@ Initializes the PMC during unarchiving.
 
 */
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         /* default - initialize the PMC */
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             if (!SELF->pmc_ext)
@@ -1173,7 +1173,7 @@ Initializes the PMC during unarchiving.
             (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
         }
         else
-            DYNSELF.init();
+            SELF.init();
     }
 
 /*

@@ -32,11 +32,11 @@ troublesome (if not possible?).
 
 
 pmclass LuaNil
-    extends LuaAny
-    does scalar
+    extends  LuaAny
+    provides scalar
     dynpmc
-    group lua_group
-    hll Lua {
+    group    lua_group
+    hll      Lua {
 
 /*
 
@@ -168,7 +168,7 @@ MMD_DEFAULT: {
         else
             VTABLE_set_integer_native(INTERP, retval, 0);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 }

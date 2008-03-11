@@ -1,6 +1,6 @@
 /* amber_integer.pmc
  * $Id$
- *  Copyright (C) 2005-2007, The Perl Foundation.
+ *  Copyright (C) 2005-2008, The Perl Foundation.
  *  Overview:
  *     The Amber_INTEGER PMC, which implementes the Amber kernel class INTEGER
  */
@@ -22,7 +22,7 @@ pmclass Amber_INTEGER
     }
 
     PMC* neg(PMC* dest) {
-        INTVAL a = -DYNSELF.get_integer();
+        INTVAL a = -SELF.get_integer();
         /* if (!dest)  --RT#48190: can we reinstate this if we generate n_neg instead of neg? */
             dest = pmc_new(
                 INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));

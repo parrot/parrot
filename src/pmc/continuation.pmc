@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -57,7 +57,7 @@ Initializes the continuation.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
         PMC_pmc_val(SELF)    = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -81,7 +81,7 @@ Marks the continuation as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         Parrot_cont *cc = PMC_cont(SELF);
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
@@ -99,7 +99,7 @@ Destroys the continuation.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_cont * const cc = PMC_cont(SELF);
         if (cc) {
 #if CTX_LEAK_DEBUG
@@ -125,7 +125,7 @@ Creates and returns a clone of the continuation.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         Parrot_cont * const cc_self = PMC_cont(SELF);
         Parrot_cont * const cc      = new_continuation(INTERP, cc_self);
         PMC         * const ret     = pmc_new_noinit(INTERP, enum_class_Continuation);
@@ -148,7 +148,7 @@ Assign context.
 =cut
 
 */
-    void set_pmc(PMC *src) {
+    VTABLE void set_pmc(PMC *src) {
         Parrot_cont * const cc_self = PMC_cont(SELF);
         Parrot_cont * const cc_src  = PMC_cont(src);
 
@@ -166,7 +166,7 @@ dynamic state, and the descriptor address for any returned values.
 
 */
 
-    void set_pointer(void *value) {
+    VTABLE void set_pointer(void *value) {
         opcode_t    * const pos = (opcode_t *)value;
         Parrot_cont * const cc  = PMC_cont(SELF);
 
@@ -190,7 +190,7 @@ Returns the pointer to the return instruction.
 
 */
 
-    void *get_pointer() {
+    VTABLE void *get_pointer() {
         return PMC_cont(SELF)->address;
     }
 /*
@@ -205,11 +205,11 @@ Returns whether the subroutine is defined.
 
 */
 
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         return PMC_cont(SELF)->address != NULL;
     }
 
-    INTVAL get_bool() {
+    VTABLE INTVAL get_bool() {
         return PMC_cont(SELF)->address != NULL;
     }
 
@@ -224,7 +224,7 @@ destination to continue execution.
 
 */
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         Parrot_cont      *cc           = PMC_cont(SELF);
         Stack_Chunk_t    *stack_target = cc->dynamic_state;
         int               stack_delta  = 0;
@@ -397,48 +397,48 @@ Experimental: return caller info as a STRING.
 
 */
 
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         return Parrot_Context_infostr(INTERP, PMC_cont(SELF)->to_ctx);
     }
 
 /*
 
-=item C<METHOD PMC *"caller"()>
+=item C<PMC *caller()>
 
-Experimental: return caller PMC or Undef if none.
+Experimental: return caller PMC or PMCNULL if none.
 
 =cut
 
 */
 
-    METHOD PMC *caller() {
+    METHOD caller() {
         Parrot_cont *cc     = PMC_cont(SELF);
         PMC         *caller = cc->to_ctx->current_sub;
 
         if (!caller || !PMC_sub(caller)->seg)
-            caller = pmc_new(INTERP, enum_class_Undef);
+            caller = PMCNULL;
 
-        return caller;
+        RETURN(PMC *caller);
 
     }
 /*
 
-=item C<METHOD PMC *"continuation"()>
+=item C<PMC *continuation()>
 
-Experimental: return continuation PMC of this Continuation or Undef if none.
+Experimental: return continuation PMC of this Continuation or PMCNULL if none.
 
 =cut
 
 */
 
-    METHOD PMC *continuation() {
+    METHOD continuation() {
         Parrot_cont *cc   = PMC_cont(SELF);
         PMC         *cont = cc->to_ctx->current_cont;
 
         if (cont)
-            return cont;
+            RETURN(PMC *cont);
 
-        return pmc_new(INTERP, enum_class_Undef);
+        RETURN(PMC *PMCNULL);
     }
 }
 

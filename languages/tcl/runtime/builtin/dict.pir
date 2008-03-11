@@ -107,8 +107,10 @@ loop:
   $S1 = shift argv
   $S2 = value
   $S2 .= $S1
-  morph value, 'Undef'
-  assign value, $S2
+  .local pmc stringy
+  stringy = new 'String'
+  stringy = $S2
+  copy value, stringy
   goto loop
 loop_done:
 

@@ -119,7 +119,7 @@ mark_subs(PARROT_INTERP, PMC *self)
 
 pmclass Eval extends Sub need_ext {
 
-    void init() {
+    VTABLE void init() {
         Parrot_sub *sub_data;
         SUPER();
 
@@ -137,12 +137,12 @@ Invokes the first subroutine in the eval code.
 
 */
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         PMC *sub = SELF.get_pmc_keyed_int(0);
         return VTABLE_invoke(INTERP, sub, next);
     }
 
-    void destroy() {
+    VTABLE void destroy() {
         /*
          * If the compiled code contained any .sub (or .pcc.sub)
          * subroutines, these subs got installed in the globals
@@ -202,7 +202,7 @@ Invokes the first subroutine in the eval code.
         SUPER();
     }
 
-    void mark() {
+    VTABLE void mark() {
         SUPER();
         mark_subs(INTERP, SELF);
     }
@@ -218,7 +218,7 @@ for writing to disc and later loading via C<load_bytecode>.
 
 */
 
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         PackFile          *pf  = PackFile_new(INTERP, 0);
         PackFile_ByteCode *seg = PMC_sub(SELF)->seg;
         STRING            *res;
@@ -291,7 +291,7 @@ Returns the Sub PMC of the element at index C<key> or PMCNULL.
 
 */
 
-    PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         return get_sub(INTERP, SELF, key);
     }
 
@@ -309,7 +309,7 @@ Unarchives the code.
 
 */
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO *io     = info->image_io;
         STRING   *packed = SELF.get_string();
         VTABLE_push_string(INTERP, io, packed);
@@ -317,7 +317,7 @@ Unarchives the code.
         SUPER(info);
     }
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO         *io     = info->image_io;
         STRING           *packed = VTABLE_shift_string(INTERP, io);
         PackFile         *pf;

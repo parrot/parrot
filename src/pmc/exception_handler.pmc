@@ -49,7 +49,7 @@ Initializes the exception handler.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
         PMC_pmc_val(SELF)    = PMCNULL;
 
@@ -69,7 +69,7 @@ Initializes the exception handler.
      * have to convert all RetContinuations to real Continuations
      */
 
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_cont * const cc = PMC_cont(SELF);
 
         if (cc) {
@@ -78,13 +78,13 @@ Initializes the exception handler.
         }
     }
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         PMC * const result = SUPER();
         PObj_custom_mark_CLEAR(result);
         return result;
     }
 
-    opcode_t *invoke(void *ex) {
+    VTABLE opcode_t *invoke(void *ex) {
         Parrot_cont        *cc        = PMC_cont(SELF);
         PMC                *exception = (PMC *)ex;
         opcode_t           *next      = NULL;

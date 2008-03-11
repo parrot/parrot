@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -40,13 +40,13 @@ pmclass STMVar is_shared need_ext no_ro {
 =cut
 
 */
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_struct_val(SELF) = Parrot_STM_alloc(INTERP, PMCNULL);
         PObj_custom_mark_SET(SELF);
     }
 
-    void init_pmc(PMC *value) {
+    VTABLE void init_pmc(PMC *value) {
         PMC_struct_val(SELF) = NULL;
 
         if (value->vtable->base_type == enum_class_STMRef ||
@@ -67,7 +67,7 @@ Return the STMVar PMC.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         return SELF;
     }
 
@@ -81,26 +81,28 @@ Mark data associated with this transactional variable.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         PARROT_ASSERT(PObj_is_PMC_shared_TEST(SELF));
         PARROT_ASSERT(PMC_sync(SELF)->owner == INTERP);
 
         Parrot_STM_mark_pmc_handle(INTERP, PMC_STM_handle(SELF));
     }
 
-    METHOD PMC *get_read() {
-        return Parrot_STM_read(INTERP, PMC_STM_handle(SELF));
+    METHOD get_read() {
+        PMC *read = Parrot_STM_read(INTERP, PMC_STM_handle(SELF));
+        RETURN(PMC *read);
     }
 
-    METHOD PMC *get_update() {
-        return Parrot_STM_begin_update(INTERP, PMC_STM_handle(SELF));
+    METHOD get_update() {
+        PMC *update = Parrot_STM_begin_update(INTERP, PMC_STM_handle(SELF));
+        RETURN(PMC *update);
     }
 
-    METHOD void set(PMC *new_value) {
+    METHOD set(PMC *new_value) {
         Parrot_STM_write(INTERP, PMC_STM_handle(SELF), new_value);
     }
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
@@ -108,7 +110,7 @@ Mark data associated with this transactional variable.
         Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_STM_handle(SELF));
     }
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
@@ -123,7 +125,7 @@ Mark data associated with this transactional variable.
        ways -- we are always a reference to the same transactional
        variable.
      */
-    PMC *share_ro() {
+    VTABLE PMC *share_ro() {
         return pt_shared_fixup(INTERP, SELF);
     }
 }

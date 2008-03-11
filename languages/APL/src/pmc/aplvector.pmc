@@ -63,7 +63,7 @@ size_of_shape(Interp *interp, PMC* self, PMC* shape)
 
 pmclass APLVector
     extends ResizablePMCArray
-    does    array
+    provides array
     group   apl_group
 
     need_ext
@@ -129,15 +129,13 @@ Returns a vector-like PMC containing the shape of this PMC.
                 string_from_literal(INTERP, "APLVector"));
             */
             shape = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-            /*
-#array_t);
-            */
+
             VTABLE_set_integer_native(INTERP, shape, 1);
             VTABLE_set_integer_keyed_int(INTERP, shape, 0,
                 VTABLE_get_integer(INTERP, SELF));
             VTABLE_setprop(INTERP, SELF, property_name, shape);
         }
-        return (shape);
+        RETURN(PMC* shape);
     }
 
 /*
@@ -157,7 +155,7 @@ the end of the APLv.
 */
 
 
-    METHOD void set_shape(PMC *new_shape) {
+    METHOD set_shape(PMC *new_shape) {
         STRING* property_name;
         PMC*    old_shape;
         INTVAL  old_size, new_size, pos;
@@ -183,8 +181,6 @@ the end of the APLv.
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, pos));
             }
         }
-
-        return;
     }
 
 /*

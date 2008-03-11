@@ -875,23 +875,6 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
     PackFile_Constant **constants = interp->code->const_table->constants;
     const INTVAL lex_info_id      = Parrot_get_ctx_HLL_type(interp,
                                         enum_class_LexInfo);
-    PMC * const lex_info_class    = interp->vtables[lex_info_id]->pmc_class;
-    PMC * const decl_lex_meth     = VTABLE_find_method(interp,
-                                        lex_info_class, decl_lex);
-
-    if (PMC_IS_NULL(decl_lex_meth))
-        real_exception(interp, NULL, METH_NOT_FOUND,
-                "Method '%Ss' not found", decl_lex);
-
-    if (decl_lex_meth->vtable->base_type != enum_class_NCI)
-        real_exception(interp, NULL, METH_NOT_FOUND,
-                "Method '%Ss' is not a NCI", decl_lex);
-
-    /*
-     * I think letting this override in PASM/PIR would be a
-     * can of worms - how do we call this if it declares .lex?
-     */
-    decl_func = (decl_func_t) D2FPTR(PMC_struct_val(decl_lex_meth));
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -919,7 +902,9 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
                             "add lexical '%s' to sub name '%s'\n",
                             n->name, (char*)PMC_sub(sub)->name->strstart);
 
-                    (decl_func)(interp, lex_info, lex_name, r->color);
+                    Parrot_PCCINVOKE(interp, lex_info,
+                            string_from_literal(interp, "declare_lex_preg"),
+                            "SI->", lex_name, r->color);
 
                     /* next possible name */
                     n = n->reg;

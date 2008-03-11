@@ -32,7 +32,7 @@ Initializes the key.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PObj_custom_mark_SET(SELF);
     }
 
@@ -46,7 +46,7 @@ Creates and returns a clone of the key.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC *dkey        = dest;
         PMC *key         = SELF;
@@ -100,7 +100,7 @@ Marks the key as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         key_mark(INTERP, SELF);
     }
 
@@ -114,7 +114,7 @@ Returns the integer value of the key.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return key_integer(INTERP, SELF);
     }
 
@@ -128,7 +128,7 @@ Returns the floating-point number value of the key.
 
 */
 
-    FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() {
         return key_number(INTERP, SELF);
     }
 
@@ -142,7 +142,7 @@ Returns the Parrot string value of the key.
 
 */
 
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         /* key_string() is only useful if this PMC has a key type */
         if (PObj_get_FLAGS(SELF) & KEY_type_FLAGS)
             return key_string(INTERP, SELF);
@@ -160,7 +160,7 @@ Returns the PMC value of the key.
 
 */
 
-    PMC *get_pmc() {
+    VTABLE PMC *get_pmc() {
         return key_pmc(INTERP, SELF);
     }
 
@@ -172,7 +172,7 @@ Returns the PMC value of the key.
 
 */
 
-    void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) {
         key_set_integer(INTERP, SELF, value);
     }
 
@@ -186,7 +186,7 @@ Sets the value of the key to C<value>.
 
 */
 
-    void set_number_native(FLOATVAL value) {
+    VTABLE void set_number_native(FLOATVAL value) {
         key_set_number(INTERP, SELF, value);
     }
 
@@ -199,7 +199,7 @@ Sets the value of the key to C<value>.
 
 */
 
-    void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) {
         key_set_string(INTERP, SELF, value);
     }
 
@@ -213,7 +213,7 @@ Sets the value of the key to C<*value>.
 
 */
 
-    void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) {
         key_set_pmc(INTERP, SELF, value);
     }
 
@@ -248,7 +248,7 @@ chain.
 
 */
 
-    PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() {
         return key_next(INTERP, SELF);
     }
 
@@ -268,7 +268,7 @@ Returns the key itself.
 
 */
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         return key;
     }
 
@@ -283,7 +283,7 @@ PMC_int_val(-1) means end of iteration.
 
 */
 
-    PMC *nextkey_keyed(PMC *agg, INTVAL what) {
+    VTABLE PMC *nextkey_keyed(PMC *agg, INTVAL what) {
         const INTVAL n   = VTABLE_elements(INTERP, agg);
         PMC         *ret = SELF;
 
@@ -374,7 +374,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         /*
          * at end a PMCNULL is written during thaw,
          * which should stop visiting the key

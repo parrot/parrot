@@ -24,9 +24,6 @@ sub runstep {
     my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
     $ldflags .= " -L$lib_dir";
     $ccflags .= " -pipe -fno-common -Wno-long-double ";
-    $ccflags =~ s/-flat_namespace\s*//;
-    $ldflags =~ s/-flat_namespace\s*//;
-    $ldflags .= " -flat_namespace ";
 
     $conf->data->set(
         darwin              => 1,
@@ -37,9 +34,10 @@ sub runstep {
         share_ext           => '.dylib',
         load_ext            => '.bundle',
         link                => 'c++',
+        linkflags           => '-undefined dynamic_lookup',
         ld                  => 'c++',
-        ld_share_flags      => '-dynamiclib -undefined suppress',
-        ld_load_flags       => '-bundle -undefined suppress',
+        ld_share_flags      => '-dynamiclib -undefined dynamic_lookup',
+        ld_load_flags       => '-bundle -undefined dynamic_lookup',
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
 

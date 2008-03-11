@@ -197,10 +197,10 @@ MMD_DEFAULT: {
     METHOD PMC* getfenv() {
         PMC *retval = PMC_metadata(SELF);
 
-        if (retval)
-            return retval;
+        if (!retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
 
-        return pmc_new(INTERP, dynpmc_LuaNil);
+        RETURN(PMC *retval);
     }
 
 /*
@@ -218,7 +218,7 @@ MMD_DEFAULT: {
         else
             VTABLE_set_integer_native(INTERP, retval, 0);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 /*

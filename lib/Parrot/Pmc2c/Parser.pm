@@ -1,11 +1,16 @@
 # Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
+
 package Parrot::Pmc2c::Parser;
+
 use strict;
 use warnings;
+
 use base qw( Exporter );
+
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
 use Parrot::Pmc2c::PMC ();
+use Parrot::Pmc2c::Attribute;
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
@@ -21,7 +26,7 @@ Parrot::Pmc2c::Parser - PMC Parser
 
 =head1 DESCRIPTION
 
-Parrot::Pmc2c::Paser parses a sudo C syntax into a perl hash that is then dumped.
+Parrot::Pmc2c::Parser parses a sudo C syntax into a perl hash that is then dumped.
 
 
 =head2 C<parse_pmc()>
@@ -55,7 +60,7 @@ sub parse_pmc {
 
     #slurp file contents
     $filename = $pmc2cMain->find_file( filename( $filename, '.pmc' ), 1 );
-    my $code = slurp($filename);
+    my $code  = slurp($filename);
 
     my ( $preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines ) =
         parse_top_level($code);
@@ -67,55 +72,137 @@ sub parse_pmc {
     $pmc->set_flags($flags);
     $pmc->set_parents($parents);
 
-    my $lineno = count_newlines($preamble) + $chewed_lines + 1;  #the +1 puts us on the current line
+    # the +1 puts us on the current line
+    my $lineno = count_newlines($preamble) + $chewed_lines + 1;
     my $class_init;
+
+    ($lineno, $pmcbody)    = find_attrs(  $pmc, $pmcbody, $lineno, $filename);
+    ($lineno, $class_init) = find_methods($pmc, $pmcbody, $lineno, $filename);
+
+    $pmc->postamble( Parrot::Pmc2c::Emitter->text( $post, $filename, $lineno ) );
+
+    # ensure class_init is the last method in the method list
+    $pmc->add_method($class_init) if $class_init;
+    $pmc->vtable( $pmc2cMain->read_dump("vtable.pmc") );
+    $pmc->pre_method_gen();
+
+    return $pmc;
+}
+
+sub find_attrs {
+    my ($pmc, $pmcbody, $lineno, $filename) = @_;
+
+    # backreferences here are all +1 because below the qr is wrapped in quotes
+    my $attr_re = qr{
+        ^
+        (?:
+          [;\n\s]*            # blank spaces and spurious semicolons
+          (?:/\*.*?\*/)?      # C comments
+        )*
+
+        # attribute marker
+        ATTR
+
+        # type
+        \s+
+        (INTVAL|FLOATVAL|STRING\s+\*|PMC\s+\*|\w+\s+\*|Parrot_\w*)
+
+        # name
+        \s*
+        (\w+)
+
+        # modifiers
+        \s*
+        ((?::\w+\s*)*)
+
+        # declaration terminator
+        ;
+
+    # optional comment
+    \s*
+    (/\*.*?\*/)?
+    }sx;
+
+    while ($pmcbody =~ s/($attr_re)//) {
+        my ($type, $name, @modifiers, $comment);
+        $type = $2;
+        $name = $3;
+        @modifiers = split /\s/, $4;
+        $comment = $5;
+
+        $lineno++;
+
+        $pmc->add_attribute(Parrot::Pmc2c::Attribute->new(
+            {
+                name      => $name,
+                type      => $type,
+                modifiers => \@modifiers,
+            }
+        ));
+    }
+
+    return ($lineno, $pmcbody);
+}
+
+sub find_methods {
+    my ($pmc, $pmcbody, $lineno, $filename) = @_;
+    my $class_init                          = 0;
 
     # backreferences here are all +1 because below the qr is wrapped in quotes
     my $signature_re = qr{
         ^
         (?:
-          [;\n\s]*            #blank spaces and spurious semicolons
-          (?:/\*.*?\*/)?      #C comments
+          [;\n\s]*            # blank spaces and spurious semicolons
+          (?:/\*.*?\*/)?      # C comments
         )*
 
-        ((?:PARROT_\w+\s+)+)? #decorators
+        ((?:PARROT_\w+\s+)+)? # decorators
 
-        # attribute|vtable|method marker
-        (ATTR|VTABLE|(PCC)?METHOD\s+)?
-        # return type (no return type for PCCMETHOD)
-        (?(4) | (\w+\s*?\**))
+        # vtable|method marker
+        (?:(VTABLE|METHOD)\s+)?
+
+        ((?:\w+\s*?\**\s*)?\w+) # method name (includes return type)
         \s*
-        (\w+)                 #method name
+        \( ([^\(]*) \)          # parameters
         \s*
-        \( ([^\(]*) \)        #parameters
-        \s*
-        ((?::(\w+)\s*)*)      #method attrs
+        ((?::(\w+)\s*)*)        # method attrs
         \s*
     }sx;
 
     while ( $pmcbody =~ s/($signature_re)// ) {
+        my ( $decorators, $marker, $methodname, $parameters, $rawattrs ) =
+            ( $2, $3, $4, $5, $6 );
+        my $attrs = parse_method_attrs($rawattrs) if defined $rawattrs;
         $lineno += count_newlines($1);
-        my ( $decorators, $marker, $pcc, $return_type, $methodname, $parameters, $attrs ) =
-            ( $2, $3, $4, $5, $6, $7, parse_method_attrs($8) );
+
+        my $returntype = '';
+
+        if ($methodname =~ /(.*\s+\*?)(\w+)/) {
+            ($returntype, $methodname) = ($1, $2);
+        }
 
         ( my $methodblock, $pmcbody ) = extract_balanced($pmcbody);
+
         $methodblock = strip_outer_brackets($methodblock);
-        $methodblock =~ s/^[ ]{4}//mg;    #remove pmclass 4 space indent
-        $methodblock =~ s/\n\s+$/\n/g;    #trim trailing whitespace from lastline
+
+        # remove pmclass 4 space indent
+        $methodblock =~ s/^[ ]{4}//mg;
+
+        # trim trailing ws from last line
+        $methodblock =~ s/\n\s+$/\n/g;
 
         $decorators ||= '';
-        $decorators =~ s/^\s*(.*?)\s*$/$1/s;
-        $decorators = [ split /\s+/ => $decorators ];
+        $decorators   =~ s/^\s*(.*?)\s*$/$1/s;
+        $decorators   = [ split /\s+/ => $decorators ];
 
-        $return_type = 'void'
-            if defined $pcc;
+        $returntype = 'void' if (defined $marker && $marker eq 'METHOD');
 
         my $method = Parrot::Pmc2c::Method->new(
             {
                 name        => $methodname,
                 parent_name => $pmc->name,
                 body        => Parrot::Pmc2c::Emitter->text( $methodblock, $filename, $lineno ),
-                return_type => $return_type,
+                return_type => $returntype,
                 parameters  => $parameters,
                 type        => Parrot::Pmc2c::Method::VTABLE,
                 attrs       => $attrs,
@@ -123,14 +210,14 @@ sub parse_pmc {
             }
         );
 
-        #PCCMETHOD needs FixedIntegerArray header
-        if ( $marker and $marker =~ /PCCMETHOD/ ) {
+        # METHOD needs FixedIntegerArray header
+        if ( $marker and $marker =~ /METHOD/ ) {
             Parrot::Pmc2c::PCCMETHOD::rewrite_pccmethod( $method, $pmc );
             $pmc->set_flag('need_fia_header');
         }
 
-        #PCCINVOKE needs FixedIntegerArray header
-        $pmc->set_flag('need_fia_header') if ( $methodblock =~ /PCCINVOKE/ );
+        # PCCINVOKE needs FixedIntegerArray header
+        $pmc->set_flag('need_fia_header') if $methodblock =~ /PCCINVOKE/;
 
         # the class_init method is added last after all other methods
         if ( $methodname eq 'class_init' ) {
@@ -139,26 +226,22 @@ sub parse_pmc {
         else {
 
             # Name-mangle NCI methods to avoid conflict with vtable methods.
-            if ( $marker and $marker !~ /ATTR|VTABLE/ ) {
+            if ( $marker and $marker !~ /VTABLE/ ) {
                 $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
                 $method->name("nci_$methodname");
                 $method->symbol($methodname);
             }
 
-            parse_mmds( $method, $filename, $lineno ) if $methodblock =~ /\bMMD_(\w+):/;
+            parse_mmds( $method, $filename, $lineno )
+                if $methodblock =~ /\bMMD_(\w+):/;
+
             $pmc->add_method($method);
         }
+
         $lineno += count_newlines($methodblock);
     }
 
-    $pmc->postamble( Parrot::Pmc2c::Emitter->text( $post, $filename, $lineno ) );
-
-    #ensure class_init is the last method in the method list
-    $pmc->add_method($class_init) if $class_init;
-    $pmc->vtable( $pmc2cMain->read_dump("vtable.pmc") );
-    $pmc->pre_method_gen();
-
-    return $pmc;
+    return ($lineno, $class_init);
 }
 
 sub parse_mmds {
@@ -170,13 +253,20 @@ sub parse_mmds {
 
     # now split into MMD if necessary:
     while ( $body_text =~ s/(\bMMD_(\w+):\s*)// ) {
-        $lineno += count_newlines($1);
+
+        $lineno       += count_newlines($1);
         my $right_type = $2;
+
         $method->add_mmd_rights($right_type);
+
         ( my $mmd_part, $body_text ) = extract_bracketed_body_text( $body_text, '{' );
-        die "Empty MMD body near '$body_text'" if ( !$mmd_part );
+
+        die "Empty MMD body near '$body_text'" unless $mmd_part;
         my $mmd_part_lines = count_newlines($mmd_part);
-        $mmd_part =~ s/\n\s*$/\n/s;    #remove whitespace at end of last line
+
+        # remove whitespace at end of last line
+        $mmd_part =~ s/\n\s*$/\n/s;
+
         if ( $right_type eq 'DEFAULT' ) {
             $default_body        = $mmd_part;
             $default_body_lineno = $lineno;
@@ -194,6 +284,7 @@ sub parse_mmds {
                     right       => $right_type,
                 }
             );
+
             push @{$mmd_methods}, $mmd_method;
         }
 
@@ -205,8 +296,12 @@ sub parse_mmds {
 
 sub strip_outer_brackets {
     my ($method_body) = @_;
-    die "First character in $method_body is not a {" unless substr( $method_body, 0,  1 ) eq '{';
-    die "Last character in $method_body is not a }"  unless substr( $method_body, -1, 1 ) eq '}';
+    die "First character in $method_body is not a {"
+        unless substr( $method_body, 0,  1 ) eq '{';
+
+    die "Last character in $method_body is not a }"
+        unless substr( $method_body, -1, 1 ) eq '}';
+
     return substr $method_body, 1, -1;
 }
 
@@ -214,7 +309,6 @@ sub extract_bracketed_body_text {
     my ( $body_text, $bracketed ) = @_;
     my ( $extracted, $remaining ) = extract_bracketed( $body_text, $bracketed );
     return ( strip_outer_brackets($extracted), $remaining );
-
 }
 
 =head2 C<parse_top_level()>
@@ -241,7 +335,7 @@ the name of the pmc
 =item *
 
 a hash ref containing the flags associated with the pmc (such as
-C<extends> and C<does>).
+C<extends> and C<provides>).
 
 =item *
 
@@ -270,31 +364,34 @@ sub parse_top_level {
     my $code = shift;
 
     my $top_level_re = qr{
-        ^                 #beginning of line
-        (.*?)             #preamble
+        ^                 # beginning of line
+        (.*?)             # preamble
         ^
         (
             \s*
-            pmclass       #pmclass keyword
-            \s+           #whitespace
-            ([\w]*)       #pmc name
-            ([\s+\w+]*)   #pmc attributes
-            \s*           #whitespace
+            pmclass       # pmclass keyword
+            \s+           # whitespace
+            ([\w]*)       # pmc name
+            ((?:\s+\w+)*)   # pmc attributes
+            \s*           # whitespace
         )
-        \{                #pmc body beginning marker
+        \{                # pmc body beginning marker
     }smx;
     $code =~ s[$top_level_re][{]smx or die "No pmclass found\n";
     my ( $preamble, $pmc_signature, $pmcname, $attributes ) = ( $1, $2, $3, $4 );
 
-    my $chewed_lines = count_newlines($pmc_signature);
-    my ( $flags, $parents ) = parse_flags( $attributes, $pmcname );
+    my $chewed_lines         = count_newlines($pmc_signature);
+    my ( $flags, $parents )  = parse_flags( $attributes, $pmcname );
     my ( $body, $postamble ) = extract_balanced($code);
-    $body = strip_outer_brackets($body);    # trim out the { }
+
+    # trim out the { }
+    $body = strip_outer_brackets($body);
+
     return ( $preamble, $pmcname, $flags, $parents, $body, $postamble, $chewed_lines );
 }
 
-our %has_value  = map { $_ => 1 } qw(group hll);
-our %has_values = map { $_ => 1 } qw(does extends maps lib);
+our %has_value  = map { $_ => 1 } qw(does group hll);
+our %has_values = map { $_ => 1 } qw(provides extends maps lib);
 
 =head2 C<parse_flags()>
 
@@ -311,7 +408,7 @@ B<Return Values:>  List of two elements:
 =item *
 
 a hash ref containing the flags associated with the pmc (such as
-C<extends> and C<does>).
+C<extends> and C<provides>).
 
 =item *
 
@@ -325,12 +422,17 @@ B<Comments:>  Called internally by C<parse_top_level()>.
 
 sub parse_flags {
     my ( $data, $pmcname ) = @_;
+
     my ( $flags, @parents );
-    my @words = ( $data =~ /(\w+)/g );
-    while ( scalar @words ) {
+
+    my @words = $data =~ /(\w+)/g;
+
+    while ( @words ) {
         my $name = shift @words;
         if ( $has_value{$name} || $has_values{$name} ) {
-            my $value = shift @words or die "Parser error: no value for '$name'";
+            my $value = shift @words;
+            die "Parser error: no value for '$name'" unless $value;
+
             if ( $name eq 'extends' ) {
                 push @parents, $value;
             }
@@ -348,9 +450,10 @@ sub parse_flags {
 
     # setup some defaults
     if ( $pmcname ne 'default' ) {
-        push @parents, 'default' unless scalar @parents;
-        $flags->{does}{scalar} = 1 unless $flags->{does};
+        push @parents, 'default' unless @parents;
+        $flags->{provides}{scalar} = 1 unless $flags->{provides};
     }
+
     return ( $flags, \@parents );
 }
 
@@ -412,6 +515,7 @@ sub extract_balanced {
             return ( substr( $code, 0, pos, "" ), $code ) if not $unbalanced;
         }
     }
+
     die "Badly balanced PMC source\n" if $unbalanced;
     return;
 }

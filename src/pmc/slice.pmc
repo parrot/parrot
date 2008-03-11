@@ -212,12 +212,12 @@ next_range:
 
 pmclass Slice need_ext extends Key {
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF)    = NULL;
     }
 
-    void mark() {
+    VTABLE void mark() {
         parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
 
         if (PMC_pmc_val(SELF))
@@ -237,7 +237,7 @@ pmclass Slice need_ext extends Key {
         }
     }
 
-    void init_pmc(PMC *key) {
+    VTABLE void init_pmc(PMC *key) {
         SELF.init();
 
         /*
@@ -250,7 +250,7 @@ pmclass Slice need_ext extends Key {
         set_slice_start(INTERP, SELF, key, SELF);
     }
 
-    void destroy() {
+    VTABLE void destroy() {
         parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
 
         /* iteration ended - all is freed */
@@ -264,7 +264,7 @@ pmclass Slice need_ext extends Key {
         }
     }
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         real_exception(INTERP, NULL, E_NotImplementedError, "Unimplemented");
     }
 
@@ -282,7 +282,7 @@ Get the next string key from the current slice range.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
 
         if (!VALID_RANGE(r))
@@ -291,7 +291,7 @@ Get the next string key from the current slice range.
         return RVal_int(r->cur);
     }
 
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
 
         return RVal_str(r->cur);
@@ -310,7 +310,7 @@ This is used for implementing Pythons xrange()
 
 */
 
-    PMC *slice(PMC *key, INTVAL f) {
+    VTABLE PMC *slice(PMC *key, INTVAL f) {
         PMC *iter;
 
         if (f)
@@ -322,13 +322,13 @@ This is used for implementing Pythons xrange()
         return iter;
     }
 
-    PMC *get_iter() {
+    VTABLE PMC *get_iter() {
         PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = SELF;
         return iter;
     }
 
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
         /* only start .. end supported so:
          * TODO check flags somewhere
@@ -336,17 +336,17 @@ This is used for implementing Pythons xrange()
         return RVal_int(r->start) - RVal_int(r->end);
     }
 
-    INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
         const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
         return RVal_int(r->cur);
     }
 
-    STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) {
         const INTVAL v = VTABLE_get_integer(INTERP, key);
         return string_from_int(INTERP, v);
     }
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(key);
         PMC * const res   = PMC_pmc_val(SELF);
         PMC_int_val(res)  = RVal_int(r->cur);
@@ -363,7 +363,7 @@ advance to next position in the range, depending on what.
 =cut
 
 */
-    PMC *nextkey_keyed(PMC *agg, INTVAL what) {
+    VTABLE PMC *nextkey_keyed(PMC *agg, INTVAL what) {
         PMC *ret = SELF;
 
         switch (what) {

@@ -20,7 +20,7 @@ C<IntList> provides an integer-only array.
 
 #include "parrot/parrot.h"
 
-pmclass IntList does array {
+pmclass IntList provides array {
 
 /*
 
@@ -32,7 +32,7 @@ Creates and returns a clone of the list.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         PMC * const dest     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_struct_val(dest) = intlist_clone(INTERP,
@@ -50,7 +50,7 @@ Initializes the list.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = intlist_new(INTERP);
         PObj_custom_mark_SET(SELF);
     }
@@ -65,7 +65,7 @@ Marks the list as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         intlist_mark(INTERP, (IntList *)PMC_struct_val(SELF));
     }
 
@@ -79,11 +79,11 @@ Sets C<value> at index C<key>.
 
 */
 
-    void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         intlist_assign(INTERP, (IntList *)PMC_struct_val(SELF), key, value);
     }
 
-    void set_integer_native(INTVAL len) {
+    VTABLE void set_integer_native(INTVAL len) {
         list_set_length(INTERP, (List *)PMC_struct_val(SELF), len);
     }
 /*
@@ -96,7 +96,7 @@ Sets C<value> at index C<*key>.
 
 */
 
-    void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         INTVAL ix;
 
         if (!key)
@@ -116,11 +116,11 @@ Returns the number of elements in the list.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return intlist_length(INTERP, (IntList *)PMC_struct_val(SELF));
     }
 
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return intlist_length(INTERP, (IntList *)PMC_struct_val(SELF));
     }
 
@@ -134,7 +134,7 @@ Returns the value of the element at index C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         return intlist_get(INTERP, (IntList *)PMC_struct_val(SELF), key);
     }
 
@@ -148,7 +148,7 @@ Returns the value of the element at index C<*key>.
 
 */
 
-    INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
         INTVAL ix;
         if (!key) return 0;
         ix = key_integer(INTERP, key);
@@ -165,7 +165,7 @@ Adds C<value> to the end of the list.
 
 */
 
-    void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) {
         intlist_push(INTERP, (IntList *)PMC_struct_val(SELF), value);
     }
 
@@ -179,7 +179,7 @@ Removes and returns the last element in the list.
 
 */
 
-    INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() {
         return intlist_pop(INTERP, (IntList *)PMC_struct_val(SELF));
     }
 
@@ -193,7 +193,7 @@ Adds C<value> to the start of the list.
 
 */
 
-    void unshift_integer(INTVAL value) {
+    VTABLE void unshift_integer(INTVAL value) {
         IntList **list = (IntList **)PMC_struct_val(SELF);
         intlist_unshift(INTERP, list, value);
     }
@@ -208,7 +208,7 @@ Removes and returns the first element in the list.
 
 */
 
-    INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() {
         IntList **list = (IntList **)PMC_struct_val(SELF);
         return intlist_shift(INTERP, list);
     }
@@ -222,7 +222,7 @@ Removes and returns the first element in the list.
             (List *)PMC_struct_val(value), offset, count);
     }
 
-    PMC *slice(PMC *key, INTVAL f) {
+    VTABLE PMC *slice(PMC *key, INTVAL f) {
         if (f) {
             real_exception(INTERP, NULL, E_IndexError,
                 "IntList: Unknown slice type");
@@ -234,7 +234,7 @@ Removes and returns the first element in the list.
         }
     }
 
-    PMC *get_iter() {
+    VTABLE PMC *get_iter() {
         PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC * const key      = pmc_new(INTERP, enum_class_Key);
 

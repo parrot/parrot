@@ -8,9 +8,9 @@
  * proper inheritance - used for testing only
  */
 
-pmclass Foo dynpmc does scalar extends Integer {
+pmclass Foo dynpmc provides scalar extends Integer {
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return 42;
     }
 

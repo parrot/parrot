@@ -23,7 +23,7 @@ it doesn't morph to other types. Only its value is changed.
 
 #include "parrot/parrot.h"
 
-pmclass Boolean extends Integer does boolean does scalar {
+pmclass Boolean extends Integer provides boolean provides scalar {
 
 /*
 
@@ -35,7 +35,7 @@ C<bool> object according to the passed PMC value.
 =cut
 
 */
-    PMC *instantiate(PMC *sig) {
+    VTABLE PMC *instantiate(PMC *sig) {
         /* XXX other types */
         const int argcP = REG_INT(interp, 3);
         PMC * const res = pmc_new(interp, enum_class_Boolean);
@@ -54,7 +54,7 @@ Return "1" or "0".
 =cut
 
 */
-    STRING *get_string() {
+    VTABLE STRING *get_string() {
         return SUPER();
     }
 
@@ -70,12 +70,12 @@ Return "1" or "0".
 =cut
 
 */
-    void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
 
-    void set_bool(INTVAL value) {
+    VTABLE void set_bool(INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
@@ -89,7 +89,7 @@ Sets the value to C<value> evaluated in a boolean context.
 
 */
 
-    void set_number_native(FLOATVAL value) {
+    VTABLE void set_number_native(FLOATVAL value) {
         PMC_int_val(SELF) = !FLOAT_IS_ZERO(value);
     }
 
@@ -103,7 +103,7 @@ Sets the value to C<*value> evaluated in a boolean context.
 
 */
 
-    void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) {
         PMC_int_val(SELF) = string_bool(INTERP, value);
     }
 }

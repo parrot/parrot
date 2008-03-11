@@ -1254,7 +1254,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
 .end
 .sub foo
     .param pmc s
-    .return s."lower"()
+    $S0 = s."lower"()
+    .return ($S0)
 .end
 CODE
 ok 1

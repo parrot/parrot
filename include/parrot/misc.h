@@ -85,6 +85,9 @@ FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
 PARROT_CONST_FUNCTION
 INTVAL intval_mod(INTVAL i2, INTVAL i3);
 
+void Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))

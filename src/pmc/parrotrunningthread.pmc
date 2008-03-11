@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006-2007, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -43,7 +43,7 @@ Create a new, invalid handle to a running thread.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_int_val(SELF) = -1;
     }
 
@@ -58,7 +58,7 @@ the Thread ID specified in C<tid>.
 
 */
 
-    void init_pmc(PMC *tid) {
+    VTABLE void init_pmc(PMC *tid) {
         PMC_int_val(SELF) = VTABLE_get_integer(INTERP, tid);
     }
 
@@ -72,7 +72,7 @@ Return the thread ID of this thread.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return PMC_int_val(SELF);
     }
 
@@ -84,30 +84,30 @@ Change the thread ID we refer to to C<new_tid>.
 
 */
 
-    void set_integer_native(INTVAL new_tid) {
+    VTABLE void set_integer_native(INTVAL new_tid) {
         PMC_int_val(SELF) = new_tid;
     }
 /*
 
-=item C<METHOD PMC *join()>
+=item C<METHOD join()>
 
 Join the thread, returning whatever its main method returns.
 
 =cut
 
 */
-    METHOD PMC *join() {
+    METHOD join() {
         PMC *ret          = pt_thread_join(INTERP, PMC_int_val(SELF));
 
         /* invalidate self */
         PMC_int_val(SELF) = -1;
 
-        return ret;
+        RETURN(PMC *ret);
     }
 
 /*
 
-=item C<METHOD void detach()>
+=item C<METHOD detach()>
 
 Detach the thread so it cannot be joined and will free its
 resources immediatelly when it exits.
@@ -116,13 +116,13 @@ resources immediatelly when it exits.
 
 */
 
-    METHOD void detach() {
+    METHOD detach() {
         pt_thread_detach(PMC_int_val(SELF));
     }
 
 /*
 
-=item C<METHOD void kill()>
+=item C<METHOD kill()>
 
 Terminate a running thread.
 
@@ -130,7 +130,7 @@ Terminate a running thread.
 
 */
 
-    METHOD void kill() {
+    METHOD kill() {
         pt_thread_kill(PMC_int_val(SELF));
     }
 

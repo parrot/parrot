@@ -24,8 +24,8 @@ done_access:
   .local pmc channel
   channel = open fileName, pir_access
 
-  $S0 = typeof channel
-  if $S0 == 'Undef' goto file_error
+  $I0 = defined channel
+  unless $I0 goto file_error
 
   .local pmc channels, next_channel_id
   channels        = get_root_global ['_tcl'], 'channels'

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -291,8 +291,8 @@ pmclass PugsCapture extends PugsAny
     }
 
     void push_integer(INTVAL value) {
-        INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_integer_keyed_int(nextix, value);
+        INTVAL nextix = SELF.elements();
+        SELF.set_integer_keyed_int(nextix, value);
     }
 
 
@@ -372,7 +372,7 @@ pmclass PugsCapture extends PugsAny
         box = SELF.get_pmc_keyed_str(keystr);
         if (box == NULL) {
             /* autovivify an PerlHash */
-            box = pmc_new(INTERP, DYNSELF.type());
+            box = pmc_new(INTERP, SELF.type());
         }
         VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
     }
@@ -420,7 +420,7 @@ pmclass PugsCapture extends PugsAny
         box = SELF.get_pmc_keyed_str(keystr);
         if (box == NULL) {
             /* autovivify an PerlHash */
-            box = pmc_new(INTERP, DYNSELF.type());
+            box = pmc_new(INTERP, SELF.type());
         }
         VTABLE_set_string_keyed(INTERP, box, nextkey, value);
     }
@@ -466,13 +466,13 @@ pmclass PugsCapture extends PugsAny
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            DYNSELF.set_integer_keyed_int(ix, value);
+            SELF.set_integer_keyed_int(ix, value);
             return;
         }
         box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) {
             /* autovivify an Array */
-            box = pmc_new(INTERP, DYNSELF.type());
+            box = pmc_new(INTERP, SELF.type());
         }
         VTABLE_set_integer_keyed(INTERP, box, nextkey, value);
     }
@@ -509,8 +509,8 @@ pmclass PugsCapture extends PugsAny
     }
 
     void push_pmc(PMC* value) {
-        INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_pmc_keyed_int(nextix, value);
+        INTVAL nextix = SELF.elements();
+        SELF.set_pmc_keyed_int(nextix, value);
     }
 
     PMC* pop_pmc() {

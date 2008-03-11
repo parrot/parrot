@@ -35,13 +35,13 @@ pmclass deleg_pmc no_ro {
 
 */
 
-    void init() {
+    VTABLE void init() {
     }
 
-    void init_pmc(PMC *_class) {
+    VTABLE void init_pmc(PMC *_class) {
     }
 
-    void mark() {
+    VTABLE void mark() {
         /* don't pass that on
          *
          * NB objects have the flag PObj_data_is_PMC_array_FLAG set,
@@ -49,11 +49,11 @@ pmclass deleg_pmc no_ro {
          */
     }
 
-    void destroy() {
+    VTABLE void destroy() {
         /* don't pass that on */
     }
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         PMC      *res          = pmc_new(INTERP, SELF->vtable->base_type);
         SLOTTYPE *attrib_array = PMC_data_typed(res, SLOTTYPE *);
         INTVAL    i;
@@ -64,23 +64,23 @@ pmclass deleg_pmc no_ro {
         return res;
     }
 
-    STRING *name() {
+    VTABLE STRING *name() {
         return SELF->vtable->whoami;
     }
 
-    INTVAL type() {
+    VTABLE INTVAL type() {
         return SELF->vtable->base_type;
     }
 
-    void add_method(STRING *method_name, PMC *sub_pmc) {
+    VTABLE void add_method(STRING *method_name, PMC *sub_pmc) {
         SUPER(method_name, sub_pmc);
     }
 
-    PMC *find_method(STRING *method_name) {
+    VTABLE PMC *find_method(STRING *method_name) {
         return SUPER(method_name);
     }
 
-    PMC *pmc_namespace() {
+    VTABLE PMC *pmc_namespace() {
         return SELF->vtable->_namespace;
     }
 

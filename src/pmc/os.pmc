@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -54,11 +54,11 @@ information see F<src/pmc.c>.
         OS_PMC = NULL;
     }
 
-    void *get_pointer() {
+    VTABLE void *get_pointer() {
         return OS_PMC;
     }
 
-    void set_pointer(void *ptr) {
+    VTABLE void set_pointer(void *ptr) {
         OS_PMC = (PMC *)ptr;
     }
 
@@ -73,7 +73,7 @@ Returns the current working directory.
 
 */
 
-    METHOD STRING *cwd() {
+    METHOD cwd() {
         char *cwd;
 #ifdef _MSC_VER
         cwd = _getcwd(NULL, 0);
@@ -89,7 +89,7 @@ Returns the current working directory.
         if (cwd) {
             STRING * const scwd = string_from_cstring(interp, cwd, strlen(cwd));
             mem_sys_free(cwd);
-            return scwd;
+            RETURN(STRING *scwd);
         }
         else {
             const char * const errmsg = strerror(errno);
@@ -107,7 +107,7 @@ Changes the current working directory to the one specified by C<path>.
 
 */
 
-    METHOD void chdir(STRING *path) {
+    METHOD chdir(STRING *path) {
         int error;
         char * const cpath = string_to_cstring(interp, path);
 #ifdef _MSC_VER
@@ -133,7 +133,7 @@ C<path>.
 
 */
 
-    METHOD void rm(STRING *path) {
+    METHOD rm(STRING *path) {
         struct stat info;
         char *cpath = string_to_cstring(interp, path);
         int   error = stat(cpath, &info);
@@ -175,7 +175,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 
 */
 
-    METHOD void mkdir(STRING *path, INTVAL mode) {
+    METHOD mkdir(STRING *path, INTVAL mode) {
         int   error;
         char * const cpath = string_to_cstring(interp, path);
         /* should we validate mode? */
@@ -217,7 +217,7 @@ Stats a file, and returns a 13 position array as in Perl:
 
 */
 
-    METHOD PMC *stat(STRING *path) {
+    METHOD stat(STRING *path) {
         struct stat info;
         char  * const cpath = string_to_cstring(interp, path);
         const int     error = stat(cpath, &info);
@@ -246,7 +246,7 @@ Stats a file, and returns a 13 position array as in Perl:
             VTABLE_set_integer_keyed_int(interp, array, 11, info.st_blksize);
             VTABLE_set_integer_keyed_int(interp, array, 12, info.st_blocks);
 #endif
-            return array;
+            RETURN(PMC *array);
         }
     }
 
@@ -276,7 +276,7 @@ Stats a file, and returns a 13 position array as in Perl:
 
 */
 
-    METHOD PMC *lstat(STRING *path) {
+    METHOD lstat(STRING *path) {
         struct stat info;
 
         char * const cpath = string_to_cstring(interp, path);
@@ -310,7 +310,7 @@ Stats a file, and returns a 13 position array as in Perl:
             VTABLE_set_integer_keyed_int(interp, array, 11, info.st_blksize);
             VTABLE_set_integer_keyed_int(interp, array, 12, info.st_blocks);
 #endif
-            return array;
+            RETURN(PMC *array);
         }
     }
 
@@ -324,7 +324,7 @@ Creates a symlink, where available
 
 */
 
-    METHOD void symlink(STRING *from, STRING *to) {
+    METHOD symlink(STRING *from, STRING *to) {
 #ifndef WIN32
         char * const cfrom = string_to_cstring(interp, from);
         char * const cto   = string_to_cstring(interp, to);
@@ -353,7 +353,7 @@ Creates a hard link, where available(?)
 
 */
 
-    METHOD void link(STRING *from, STRING *to) {
+    METHOD link(STRING *from, STRING *to) {
 #ifndef WIN32
         char * const cfrom = string_to_cstring(interp, from);
         char * const cto   = string_to_cstring(interp, to);
@@ -383,10 +383,10 @@ previous one).
 
 */
 
-    METHOD INTVAL umask(INTVAL mask) {
+    METHOD umask(INTVAL mask) {
 #ifndef _MSC_VER
         const INTVAL old = umask(mask);
-        return old;
+        RETURN(INTVAL old);
 #else
         real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
@@ -407,7 +407,7 @@ idea to do the same with parrot.
 
 */
 
-    METHOD void chroot(STRING *path) {
+    METHOD chroot(STRING *path) {
 #ifndef WIN32
         char * const cpath = string_to_cstring(interp, path);
         const int    error = chroot(cpath);
@@ -434,7 +434,7 @@ reads entries from a directory.
 =cut
 
 */
-    METHOD PMC *readdir(STRING *path) {
+    METHOD readdir(STRING *path) {
 #ifndef _MSC_VER
         struct dirent *dirent;
         PMC           *array;
@@ -458,7 +458,7 @@ reads entries from a directory.
 
         closedir(dir);
 
-        return array ;
+        RETURN(PMC *array);
 #else
         real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need Win32 developer!");
@@ -472,7 +472,7 @@ thrown.
 
 =cut
 */
-    METHOD void rename(STRING *oldpath, STRING *newpath) {
+    METHOD rename(STRING *oldpath, STRING *newpath) {
         char * const coldpath = string_to_cstring(interp, oldpath);
         char * const cnewpath = string_to_cstring(interp, newpath);
         const int    ret      = rename(coldpath, cnewpath);

@@ -31,7 +31,7 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', '# nil' );
 print(# nil)
 CODE
-/^[^:]+: [^:]+:\d+: attempt to get length of a nil value\nstack traceback:\n/
+/^[^:]+: [^:]+:-?\d+: attempt to get length of a nil value\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not nil' );

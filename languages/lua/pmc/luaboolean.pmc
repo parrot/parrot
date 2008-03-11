@@ -25,14 +25,14 @@ The value is stored as an Integer.
 
 
 pmclass LuaBoolean
-    extends LuaAny
-    does scalar
-    does boolean
-    does integer
+    extends  LuaAny
+    provides scalar
+    provides boolean
+    provides integer
     dynpmc
-    group lua_group
-    hll Lua
-    maps Boolean {
+    group    lua_group
+    hll      Lua
+    maps     Boolean {
 
 /*
 
@@ -243,7 +243,7 @@ MMD_DEFAULT: {
         else
             VTABLE_set_integer_native(INTERP, retval, 0);
 
-        return retval;
+        RETURN(PMC *retval);
     }
 
 }

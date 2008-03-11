@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -33,7 +33,7 @@ C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 /* Convert a size in bits to a size in bytes */
 #define BITS_TO_BYTES(size) ((size) / BITS_PER_CHAR)
 
-pmclass ResizableBooleanArray extends FixedBooleanArray need_ext does array {
+pmclass ResizableBooleanArray extends FixedBooleanArray need_ext provides array {
 
 
 /*
@@ -52,7 +52,7 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         INTVAL offsetkey;
 
         /* Try to make negative index into a real index */
@@ -69,7 +69,7 @@ Returns the integer value of the element at index C<key>.
         offsetkey = key + PMC_int_val2(SELF);
 
         if (offsetkey >= PMC_int_val(SELF))
-            DYNSELF.set_integer_native(key+1);
+            SELF.set_integer_native(key+1);
 
         return SUPER(offsetkey);
     }
@@ -84,7 +84,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         INTVAL offsetkey;
 
         /* Try to make negative index into a real index */
@@ -101,7 +101,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         offsetkey = key + PMC_int_val2(SELF);
 
         if (offsetkey >= PMC_int_val(SELF))
-            DYNSELF.set_integer_native(key+1);
+            SELF.set_integer_native(key+1);
 
         SUPER(offsetkey, value);
     }
@@ -116,7 +116,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    void set_integer_native(INTVAL size) {
+    VTABLE void set_integer_native(INTVAL size) {
         /* Size respects any existing head position offset from unshift */
         INTVAL newsize = size + PMC_int_val2(SELF);
         INTVAL oldsize = PMC_int_val(SELF);
@@ -167,10 +167,10 @@ Extends the array by adding an element of value C<value> to the end.
 
 */
 
-    void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) {
         const INTVAL size = PMC_int_val(SELF) - PMC_int_val2(SELF);
-        DYNSELF.set_integer_native(size + 1);
-        DYNSELF.set_integer_keyed_int(size, value);
+        SELF.set_integer_native(size + 1);
+        SELF.set_integer_keyed_int(size, value);
     }
 
 /*
@@ -183,16 +183,16 @@ Removes and returns the last element.
 
 */
 
-    INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() {
         INTVAL size, value;
 
-        if (DYNSELF.elements() < 1)
+        if (SELF.elements() < 1)
             real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't pop from an empty array!");
 
         size  = PMC_int_val(SELF) - PMC_int_val2(SELF);
-        value = DYNSELF.get_integer_keyed_int(size - 1);
-        DYNSELF.set_integer_native(size - 1);
+        value = SELF.get_integer_keyed_int(size - 1);
+        SELF.set_integer_native(size - 1);
 
         return value;
     }
@@ -208,7 +208,7 @@ beginning.
 
 */
 
-    void unshift_integer(INTVAL value) {
+    VTABLE void unshift_integer(INTVAL value) {
         /* If the current head position offset is 0, size this thing up by one
          * allocation unit */
         if (PMC_int_val2(SELF) <= 0) {
@@ -240,7 +240,7 @@ beginning.
         PMC_int_val2(SELF)--;
 
         /* Assign the new value as the first item */
-        DYNSELF.set_integer_keyed_int(0, value);
+        SELF.set_integer_keyed_int(0, value);
     }
 
 /*
@@ -253,15 +253,15 @@ Removes and returns the first element.
 
 */
 
-    INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() {
         INTVAL value;
 
-        if (DYNSELF.elements() < 1)
+        if (SELF.elements() < 1)
             real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't shift from an empty array!");
 
         /* Get head value */
-        value = DYNSELF.get_integer_keyed_int(0);
+        value = SELF.get_integer_keyed_int(0);
 
         /* Move the head position */
         PMC_int_val2(SELF)++;
@@ -303,7 +303,7 @@ Removes and returns the first element.
 
 */
 
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return PMC_int_val(SELF) - PMC_int_val2(SELF);
     }
 
@@ -317,7 +317,7 @@ Returns the number of elements in the array.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return SELF.elements();
     }
 
@@ -336,7 +336,7 @@ Used to archive the string.
 =cut
 
 */
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         /* XXX Dino - I'm concerned about freezing the entire
             allocated block of memory, it's dependent on the
             BITS_PER_CHAR value.
@@ -365,7 +365,7 @@ Used to unarchive the string.
 =cut
 
 */
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io      = info->image_io;
         const INTVAL     headPos = VTABLE_shift_integer(INTERP, io);
         const INTVAL     tailPos = VTABLE_shift_integer(INTERP, io);

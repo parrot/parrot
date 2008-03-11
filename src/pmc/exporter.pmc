@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007, The Perl Foundation.
+Copyright (C) 2007-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -79,14 +79,6 @@ A Null PMC is allocated during initialization.
 */
 
 #include "parrot/parrot.h"
-#define PARROT_EXPORTER(e) ((Parrot_Exporter *) PMC_data(e))
-
-typedef struct Parrot_Exporter {
-    PMC *ns_src;
-    PMC *ns_dest;
-    PMC *globals;
-} Parrot_Exporter;
-
 
 /*
 
@@ -100,9 +92,11 @@ typedef struct Parrot_Exporter {
 
 */
 
-pmclass Exporter
-    need_ext {
+pmclass Exporter need_ext {
 
+    ATTR PMC *ns_src;
+    ATTR PMC *ns_dest;
+    ATTR PMC *globals;
 
 /*
 
@@ -114,7 +108,7 @@ Initializes an Exporter PMC.
 
 */
 
-    void init() {
+    VTABLE void init() {
         Parrot_Exporter *exp = NULL;
 
         /* Set up the object. */
@@ -140,7 +134,7 @@ Free the memory associated with the object's underlying struct.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
     }
 
@@ -155,7 +149,7 @@ Mark referenced strings and PMCs in the structure as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
 
         if (exp->ns_src)
@@ -175,7 +169,7 @@ Mark referenced strings and PMCs in the structure as live.
 
 =over 4
 
-=item C<PCCMETHOD
+=item C<METHOD
 source(PMC *src :optional, int got_src :opt_flag)>
 
 Accessor for the source NameSpace object (C<ns_src>.)
@@ -186,26 +180,25 @@ Throws an exception if a non-NameSpace PMC is passed.
 
 */
 
-    PCCMETHOD source(PMC *src :optional, int got_src :opt_flag) {
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-
+    METHOD source(PMC *src :optional, int got_src :opt_flag) {
         if (got_src) {
             if (src->vtable->base_type != enum_class_NameSpace) {
                 real_exception(interp, NULL, 0,
                         "source must be a NameSpace PMC");
             }
-            exp->ns_src = src;
+            SET_ATTR_ns_src(interp, SELF, src);
         }
         else {
-            PMC *tmp_ns_src = exp->ns_src;
-            PCCRETURN(PMC *tmp_ns_src);
+            PMC *tmp_ns_src;
+            GET_ATTR_ns_src(interp, SELF, tmp_ns_src);
+            RETURN(PMC *tmp_ns_src);
         }
     }
 
 
 /*
 
-=item C<PCCMETHOD
+=item C<METHOD
     destination(PMC *dest :optional, int got_dest :opt_flag)>
 
 Accessor for the destination NameSpace object (C<ns_dest>.)
@@ -216,26 +209,25 @@ Throws an exception if a non-NameSpace PMC is passed.
 
 */
 
-    PCCMETHOD destination(PMC *dest :optional, int got_dest :opt_flag) {
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-
+    METHOD destination(PMC *dest :optional, int got_dest :opt_flag) {
         if (got_dest) {
             if (dest->vtable->base_type != enum_class_NameSpace) {
                 real_exception(interp, NULL, 0,
                         "destination must be a NameSpace PMC");
             }
-            exp->ns_dest = dest;
+            SET_ATTR_ns_dest(interp, SELF, dest);
         }
         else {
-            PMC *tmp_ns_dest = exp->ns_dest;
-            PCCRETURN(PMC *tmp_ns_dest);
+            PMC *tmp_ns_dest;
+            GET_ATTR_ns_dest(interp, SELF, tmp_ns_dest);
+            RETURN(PMC *tmp_ns_dest);
         }
     }
 
 
 /*
 
-=item C<PCCMETHOD
+=item C<METHOD
     globals(PMC *glb :optional, int got_glb :opt_flag)>
 
 Accessor for the globals to export (C<globals>.)
@@ -251,8 +243,7 @@ Throws an exception if an unknown PMC type is passed.
 
 */
 
-    PCCMETHOD globals(PMC *glb :optional, int got_glb :opt_flag) {
-        Parrot_Exporter *exp    = PARROT_EXPORTER(SELF);
+    METHOD globals(PMC *glb :optional, int got_glb :opt_flag) {
         STRING          *s_str  = CONST_STRING(interp, "String");
         STRING          *s_arr  = CONST_STRING(interp, "array");
         STRING          *s_hash = CONST_STRING(interp, "hash");
@@ -296,23 +287,23 @@ Throws an exception if an unknown PMC type is passed.
                     "Invalid type %d in globals()", glb->vtable->base_type);
             }
 
-            exp->globals = temp_globals;
+            SET_ATTR_globals(interp, SELF, temp_globals);
          }
          else {
-            if (PMC_IS_NULL(exp->globals)) {
-                PCCRETURN(PMC *PMCNULL);
+            PMC *tmp_globals;
+            GET_ATTR_globals(interp, SELF, tmp_globals);
+            if (PMC_IS_NULL(tmp_globals)) {
+                RETURN(PMC *PMCNULL);
             }
-            else {
-                PMC *tmp_globals = exp->globals;
-                PCCRETURN(PMC *tmp_globals);
-            }
+            else
+                RETURN(PMC *tmp_globals);
         }
     }
 
 
 /*
 
-=item C<PCCMETHOD
+=item C<METHOD
     import(PMC *dest    :optional :named["destination"], int got_dest :opt_flag,
         PMC    *src     :optional :named["source"],      int got_src  :opt_flag,
         PMC    *globals :optional :named["globals"], int got_globals  :opt_flag)>
@@ -328,11 +319,10 @@ Throws an exception upon error.
 
 */
 
-    PCCMETHOD import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
+    METHOD import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
             PMC *src     :optional :named["source"],  int got_src     :opt_flag,
             PMC *globals :optional :named["globals"], int got_globals :opt_flag) {
 
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
         PMC *ns_src, *ns_dest, *ns_globals;
 
         if (got_src)
@@ -344,15 +334,15 @@ Throws an exception upon error.
         if (got_globals)
             PCCINVOKE(interp, SELF, "globals", PMC *globals);
 
-        if (PMC_IS_NULL(exp->ns_src))
+        GET_ATTR_ns_src(interp, SELF, ns_src);
+        if (PMC_IS_NULL(ns_src))
             real_exception(interp, NULL, 0, "source namespace not set");
 
-        if (PMC_IS_NULL(exp->ns_dest))
+        GET_ATTR_ns_dest(interp, SELF, ns_dest);
+        if (PMC_IS_NULL(ns_dest))
             real_exception(interp, NULL, 0, "destination namespace not set");
 
-        ns_src     = exp->ns_src;
-        ns_dest    = exp->ns_dest;
-        ns_globals = exp->globals;
+        GET_ATTR_globals(interp, SELF, ns_globals);
 
         PCCINVOKE(interp, ns_src, "export_to", PMC *ns_dest, PMC *ns_globals);
     }

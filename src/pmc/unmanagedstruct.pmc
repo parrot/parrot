@@ -648,7 +648,7 @@ Initializes the C<struct> with a default value of C<NULL>.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_pmc_val(SELF) = NULL;
     }
 
@@ -680,7 +680,7 @@ The offset.
 
 */
 
-    void init_pmc(PMC *value) {
+    VTABLE void init_pmc(PMC *value) {
         SELF.set_pmc(value);
     }
 
@@ -694,7 +694,7 @@ Sets C<*value> (see C<init_pmc()> and calculates the offsets.
 
 */
 
-    void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) {
         PMC_pmc_val(SELF) = value;
         PObj_custom_mark_SET(SELF);
         calc_offsets(INTERP, SELF, value, 0);
@@ -710,7 +710,7 @@ Marks the C<struct> as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
     }
@@ -725,7 +725,7 @@ Returns whether the two C<struct>s are equivalent.
 
 */
 
-    INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) {
         return (SELF->vtable == value->vtable &&
             PMC_data(SELF) == PMC_data(value));
     }
@@ -740,7 +740,7 @@ Returns whether the C<struct> is defined.
 
 */
 
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         return PMC_data(SELF) != NULL;
     }
 
@@ -754,7 +754,7 @@ Returns the size of the C<struct>.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return PMC_int_val(SELF);
     }
 
@@ -768,7 +768,7 @@ Sets the size of the C<struct>.
 
 */
 
-    void set_integer_native(INTVAL size) {
+    VTABLE void set_integer_native(INTVAL size) {
         PMC_int_val(SELF) = size;
     }
 
@@ -782,7 +782,7 @@ Returns the integer value at index C<ix>.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL ix) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL ix) {
         int   type;
         char *p = char_offset_int(INTERP, pmc, ix, &type);
         return ret_int(INTERP, p, type);
@@ -798,7 +798,7 @@ Returns the integer value associated with C<*key>.
 
 */
 
-    INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
         int   type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_int(INTERP, p, type);
@@ -814,7 +814,7 @@ Returns the floating-point value at index C<ix>.
 
 */
 
-    FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         int   type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         return ret_float(INTERP, p, type);
@@ -830,7 +830,7 @@ Returns the floating-point value associated with C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) {
         int   type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_float(INTERP, p, type);
@@ -846,7 +846,7 @@ Returns the Parrot string value at index C<ix>.
 
 */
 
-    STRING *get_string_keyed_int(INTVAL key) {
+    VTABLE STRING *get_string_keyed_int(INTVAL key) {
         int   type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         return ret_string(INTERP, p, type);
@@ -862,7 +862,7 @@ Returns the Parrot string value associated with C<*key>.
 
 */
 
-    STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) {
         int   type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_string(INTERP, p, type);
@@ -878,7 +878,7 @@ Returns the PMC value at index C<ix>.
 
 */
 
-    PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         int   type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         return ret_pmc(INTERP, pmc, p, type, key);
@@ -894,7 +894,7 @@ Returns the PMC value associated with C<*key>.
 
 */
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         int   type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_pmc(INTERP, pmc, p, type, key_2_idx(INTERP, pmc, key));
@@ -910,7 +910,7 @@ Returns the pointer to the actual C C<struct>.
 
 */
 
-    void *get_pointer() {
+    VTABLE void *get_pointer() {
         return PMC_data(SELF);
     }
 
@@ -924,7 +924,7 @@ Set the pointer to the actual C C<struct>.
 
 */
 
-    void set_pointer(void *value) {
+    VTABLE void set_pointer(void *value) {
         PMC_data(SELF) = value;
     }
 
@@ -938,7 +938,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
 */
 
-    void set_integer_keyed_int(INTVAL ix, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL ix, INTVAL value) {
         int   type;
         char *p = char_offset_int(INTERP, pmc, ix, &type);
         set_int(INTERP, p, type, value);
@@ -956,7 +956,7 @@ May cause segfaults if value is out of bounds.
 
 */
 
-    void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         int   type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         set_int(INTERP, p, type, value);
@@ -972,7 +972,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
 */
 
-    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         int   type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         set_float(INTERP, p, type, value);
@@ -988,7 +988,7 @@ Sets the value of the element associated with key C<*key> to C<value>.
 
 */
 
-    void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         set_float(INTERP, p, type, value);
@@ -1004,7 +1004,7 @@ Sets the value of the element at index C<key> to C<*value>.
 
 */
 
-    void set_string_keyed_int(INTVAL key, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         int   type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         set_string(INTERP, p, type, value);
@@ -1020,7 +1020,7 @@ Sets the value of the element associated with key C<*key> to C<*value>.
 
 */
 
-    void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) {
         int   type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         set_string(INTERP, p, type, value);

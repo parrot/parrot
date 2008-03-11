@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007, The Perl Foundation.
+Copyright (C) 2007-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -28,9 +28,9 @@ These are the vtable functions for the lexpad PMC.
  * pmc_val    ... LexInfo
  */
 
-pmclass LexPad does hash no_ro {
+pmclass LexPad provides hash no_ro {
 
-    void init() {
+    VTABLE void init() {
         real_exception(INTERP, NULL, INVALID_OPERATION,
                 "Cannot create a LexPad PMC without an initializer");
     }
@@ -70,38 +70,38 @@ lexical doesn't exist.
 Set the lexical with the given name to value. If the lexical name
 doesn't exist, it is created.
 
-=item C<METHOD PMC *get_lexinfo()>
+=item C<PMC *get_lexinfo()>
 
 Return the LexInfo PMC, if any or a Null PMC.
 
 =cut
 
 */
-    void init_pmc(PMC *lexinfo) {
+    VTABLE void init_pmc(PMC *lexinfo) {
         PMC_pmc_val(SELF) = lexinfo;
     }
 
-    void set_pointer(void *ctx) {
+    VTABLE void set_pointer(void *ctx) {
         PMC_struct_val(SELF) = ctx;
     }
 
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         PMC *info = PMC_pmc_val(SELF);
         return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(info));
     }
 
-    INTVAL exists_keyed_str(STRING *name) {
+    VTABLE INTVAL exists_keyed_str(STRING *name) {
         PMC * const info = PMC_pmc_val(SELF);
         return parrot_hash_get_bucket(INTERP,
             (Hash *)PMC_struct_val(info), name) != 0;
     }
 
-    INTVAL exists_keyed(PMC *name) {
+    VTABLE INTVAL exists_keyed(PMC *name) {
         STRING * const s = key_string(INTERP, name);
         return SELF.exists_keyed_str(s);
     }
 
-    PMC *get_pmc_keyed_str(STRING *name) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *name) {
         PMC              * const info = PMC_pmc_val(SELF);
         Hash             * const hash = (Hash *)PMC_struct_val(info);
         parrot_context_t * const ctx  = (parrot_context_t *)PMC_struct_val(SELF);
@@ -116,12 +116,12 @@ Return the LexInfo PMC, if any or a Null PMC.
         return CTX_REG_PMC(ctx, regno);
     }
 
-    PMC *get_pmc_keyed(PMC *name) {
+    VTABLE PMC *get_pmc_keyed(PMC *name) {
         STRING * const s = key_string(INTERP, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
-    void set_pmc_keyed_str(STRING *name, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *name, PMC *value) {
         PMC              * const info  = PMC_pmc_val(SELF);
         Hash             * const hash  = (Hash *)PMC_struct_val(info);
         parrot_context_t * const ctx   = (parrot_context_t *)PMC_struct_val(SELF);
@@ -136,13 +136,14 @@ Return the LexInfo PMC, if any or a Null PMC.
         CTX_REG_PMC(ctx, regno) = value;
     }
 
-    void set_pmc_keyed(PMC *name, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *name, PMC *value) {
         STRING * const s = key_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 
-    METHOD PMC *get_lexinfo() {
-        return PMC_pmc_val(SELF);
+    METHOD get_lexinfo() {
+        PMC *lexinfo = PMC_pmc_val(SELF);
+        RETURN(PMC *lexinfo);
     }
 }
 

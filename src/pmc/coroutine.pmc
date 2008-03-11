@@ -70,7 +70,7 @@ Clone the couroutine.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = new_coroutine(INTERP);
         PMC_pmc_val(SELF)    = PMCNULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -86,7 +86,7 @@ Destroys the coroutine.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_coro * const sub = PMC_coro(SELF);
 
         if (sub->ctx)
@@ -95,7 +95,7 @@ Destroys the coroutine.
         SUPER();
     }
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         Parrot_coro * const sub = mem_allocate_typed(Parrot_coro);
         PMC         * const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 
@@ -121,7 +121,7 @@ Swaps the "context".
 
 */
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         PackFile_ByteCode  *wanted_seg;
         Parrot_coro * const co = PMC_coro(SELF);
         opcode_t    * dest     = co->address;
@@ -178,7 +178,7 @@ Swaps the "context".
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             PMC *ccont;
-            struct Stack_Chunk *state;
+            Stack_Chunk_t    *state;
             parrot_context_t *ctx;
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
@@ -203,7 +203,7 @@ Swaps the "context".
         }
         else {
             PMC *ccont;
-            struct Stack_Chunk *state;
+            Stack_Chunk_t    *state;
             parrot_context_t *ctx;
 
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
@@ -251,7 +251,7 @@ Marks the coroutine as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         Parrot_coro * const c = PMC_coro(SELF);
 
         if (c) {

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,8 +13,7 @@ Parrot::Vtable - Functions for manipulating vtables
 
 C<Parrot::Vtable> provides a collection of functions for manipulating
 PMC vtables. It is used by F<tools/build/jit2c.pl>, F<tools/build/pmc2c.pl>,
-F<tools/build/vtable_h.pl>, F<tools/dev/gen_class.pl>, and
-F<src/pmc/null.pl>.
+F<tools/build/vtable_h.pl>, F<tools/dev/gen_class.pl>.
 
 =head2 Functions
 
@@ -173,7 +172,7 @@ typedef struct _vtable {
     INTVAL  base_type;      /* 'type' value for MMD */
     STRING *whoami;         /* Name of class this vtable is for */
     UINTVAL flags;          /* Flags. Duh */
-    STRING *does_str;       /* space-separated list of interfaces */
+    STRING *provides_str;   /* space-separated list of interfaces */
     STRING *isa_str;        /* space-separated list of classes */
     PMC    *pmc_class;      /* for PMCs: a PMC of that type
                                for objects: the class PMC */
@@ -364,19 +363,23 @@ sub vtbl_embed {
         $protos .= sprintf "extern PARROT_API %s Parrot_PMC_%s( %s );\n", $ret_type, $name,
             $signature;
 
-        $funcs .= sprintf "/*
+        # make sure the bare POD here doesn't appear in this module's perldoc
+        (my $func_header =<< "  END_HEADER") =~ s/^    //mg;
+    /*
 
-=item C<%s
-%s(%s)>
+    =item C<%s
+    %s(%s)>
 
-=cut
+    =cut
 
-*/
+    */
 
-PARROT_API %s
-Parrot_PMC_%s( %s )
-{
-", ( $ret_type, $name, $signature ) x 2;
+    PARROT_API %s
+    Parrot_PMC_%s( %s )
+    {
+  END_HEADER
+
+        $funcs .= sprintf $func_header, ( $ret_type, $name, $signature ) x 2;
 
         $funcs .= "    $ret_type retval;\n" unless $ret_type eq 'void';
         $funcs .= "    PARROT_CALLIN_START( interp );\n    ";
@@ -437,8 +440,6 @@ sub parse_params {
 =item F<tools/build/vtable_h.pl>
 
 =item F<tools/dev/gen_class.pl>
-
-=item F<src/pmc/null.pl>
 
 =cut
 

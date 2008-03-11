@@ -1,5 +1,5 @@
 /* gdbmhash.pmc
- *  Copyright (C) 2005, The Perl Foundation.
+ *  Copyright (C) 2005-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -67,7 +67,7 @@ static STRING* make_hash_key(PARROT_INTERP, NOTNULL(PMC * key))
 }
 
 
-pmclass GDBMHash does hash dynpmc lib gdbm {
+pmclass GDBMHash provides hash dynpmc lib gdbm {
 
 /*
 
@@ -94,7 +94,7 @@ So we do a bit of cheating here, and load it during class initialization.
         }
     }
 
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
     }
 
@@ -138,7 +138,7 @@ RT#46395: This can be optimized by keeping track of number of elements
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
         if (! dbf) {
             return 0;
@@ -166,7 +166,7 @@ Returns true if the hash size is not zero.
 
 */
 
-    INTVAL get_bool() {
+    VTABLE INTVAL get_bool() {
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
         if (! dbf) {
             return 0;
@@ -253,7 +253,7 @@ Convert C<value> to a string and set the string for the C<key>.
         STRING *temp;
 
         temp = VTABLE_get_string(interp, value);
-        DYNSELF.set_string_keyed(key, temp);
+        SELF.set_string_keyed(key, temp);
     }
 
 /*
@@ -267,7 +267,7 @@ Returns the PMC value for the element at C<*key>.
 */
 
     PMC* get_pmc_keyed(PMC* key) {
-        STRING * ret_string = DYNSELF.get_string_keyed(key);
+        STRING * ret_string = SELF.get_string_keyed(key);
         PMC *ret_pmc = pmc_new(interp, enum_class_String);
 
         VTABLE_set_string_native(interp, ret_pmc, ret_string);
@@ -290,7 +290,7 @@ Convert C<value> to a string and set the string for the C<key>.
 
         temp = pmc_new(interp, enum_class_String);
         VTABLE_set_integer_native(interp, temp, value);
-        DYNSELF.set_pmc_keyed(key, temp);
+        SELF.set_pmc_keyed(key, temp);
     }
 
 
@@ -309,7 +309,7 @@ Convert C<value> to a string and set the string for the C<key>.
 
         temp = pmc_new(interp, enum_class_String);
         VTABLE_set_number_native(interp, temp, value);
-        DYNSELF.set_pmc_keyed(key, temp);
+        SELF.set_pmc_keyed(key, temp);
     }
 
 /*

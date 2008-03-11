@@ -33,19 +33,19 @@ Overrides the default to do nothing.
 
 */
 
-    void init() {
+    VTABLE void init() {
     }
 
     PARROT_CAN_RETURN_NULL
-    void *get_pointer() {
+    VTABLE void *get_pointer() {
         return PMCNULL;
     }
 
-    void set_pointer(void *p) {
+    VTABLE void set_pointer(void *p) {
         PMCNULL = (PMC *)p;
     }
 
-    INTVAL does(STRING *what) {
+    VTABLE INTVAL does(STRING *what) {
         /* XXX maybe a hack to get TGE running again */
         return 0;
     }

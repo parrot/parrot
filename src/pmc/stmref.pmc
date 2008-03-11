@@ -26,7 +26,7 @@ C<Parrot::Pmc2c>.
 
 #define PMC_STM_handle(o) ((Parrot_STM_PMC_handle)PMC_struct_val(o))
 
-pmclass STMRef does ref is_shared need_ext {
+pmclass STMRef provides ref is_shared need_ext {
 
 /*
 
@@ -38,7 +38,7 @@ Sets the referenced PMC to C<PMCNULL>.
 
 */
 
-    void init() {
+    VTABLE void init() {
         SELF.init_pmc(PMCNULL);
     }
 
@@ -52,7 +52,7 @@ Sets the referenced PMC to C<initializer>.
 
 */
 
-    void init_pmc(PMC *initializer) {
+    VTABLE void init_pmc(PMC *initializer) {
         PMC_struct_val(SELF) = Parrot_STM_alloc(INTERP, initializer);
         PObj_custom_mark_SET(SELF);
     }
@@ -66,7 +66,7 @@ Marks the referenced PMC as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         Parrot_STM_mark_pmc_handle(INTERP, PMC_STM_handle(SELF));
     }
 
@@ -79,7 +79,7 @@ Return ourself.
 =cut
 
 */
-    PMC *clone() {
+    VTABLE PMC *clone() {
         return SELF;
     }
 
@@ -99,22 +99,22 @@ Returns the name of the PMC, not the name of the referenced PMC.
 
 */
 
-    STRING *name() {
+    VTABLE STRING *name() {
         return SUPER();
     }
 
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         Parrot_STM_PMC_handle  handle = PMC_STM_handle(pmc);
         PMC                   *value  = Parrot_STM_read(INTERP, handle);
 
         return !PMC_IS_NULL(value);
     }
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         /* so it's not delegated */
     }
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
@@ -122,7 +122,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
         Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_STM_handle(SELF));
     }
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
@@ -134,7 +134,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
         /* so it's not delegated */
     }
 
-    PMC *get_pmc() {
+    VTABLE PMC *get_pmc() {
         Parrot_STM_PMC_handle handle = PMC_STM_handle(SELF);
         return Parrot_STM_begin_update(INTERP, handle);
     }

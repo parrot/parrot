@@ -22,7 +22,7 @@ Sub PMCs with the same short name, but different long names.
 #include "parrot/parrot.h"
 
 
-pmclass MultiSub extends ResizablePMCArray need_ext does array {
+pmclass MultiSub extends ResizablePMCArray need_ext provides array {
 
     void push_pmc(PMC *value) {
         STRING * const _sub = CONST_STRING(interp, "Sub");
@@ -34,7 +34,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
         SUPER(value);
     }
 
-    void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         STRING *_sub = CONST_STRING(interp, "Sub");
         if (!VTABLE_isa(interp, value, _sub))
             real_exception(interp, NULL, E_TypeError,
@@ -42,22 +42,22 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
         SUPER(key, value);
     }
 
-    void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         real_exception(interp, NULL, E_TypeError,
                 "attempt to set non Sub PMC");
     }
 
-    void set_string_keyed_int(INTVAL key, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         real_exception(interp, NULL, E_TypeError,
                 "attempt to set non Sub PMC");
     }
 
-    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         real_exception(interp, NULL, E_TypeError,
                 "attempt to set non Sub PMC");
     }
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         PMC * const list = Parrot_mmd_sort_candidate_list(interp, SELF);
         PMC *func;
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 package Parrot::Pmc2c::UtilFunctions;
@@ -148,18 +148,12 @@ EOC
     $cout .= <<"EOC";
     int pass;
 
-    /*
-     * create a library PMC
-     */
-    pmc = pmc_new(interp, enum_class_ParrotLibrary);
-    /*
-     * TODO stuff some info into this PMCs props
-     *
-     */
+    /* create a library PMC */
+    pmc = constant_pmc_new(interp, enum_class_ParrotLibrary);
 
-    /*
-     * for all PMCs we want to register:
-     */
+    /* TODO: stuff some info into this PMC's props */
+
+    /* for all PMCs we want to register: */
 EOC
     while ( my ( $class, $info ) = each %classes ) {
         my $lhs = $info->{flags}{no_init} ? "" : "type$class = ";

@@ -21,7 +21,7 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 #include "parrot/parrot.h"
 
-pmclass FixedFloatArray need_ext does array {
+pmclass FixedFloatArray need_ext provides array {
 
 /*
 
@@ -39,25 +39,10 @@ Initializes the array.
 
 */
 
-    void init() {
+    VTABLE void init() {
         PMC_int_val(SELF) = 0;
         PMC_data(SELF)    = NULL;
     }
-
-/*
-
-=item C<void morph(INTVAL type)>
-
-Const PMCs must have a C<morph()>.
-
-=cut
-
-*/
-
-    void morph(INTVAL type) {
-        SUPER(type);
-    }
-
 
 /*
 
@@ -69,7 +54,7 @@ Destroys the array.
 
 */
 
-    void destroy() {
+    VTABLE void destroy() {
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
 
@@ -87,7 +72,7 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         INTVAL size;
         size_t mem_size;
         PMC   * const dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -116,7 +101,7 @@ fixed sized array).
 =cut
 
 */
-    INTVAL get_bool() {
+    VTABLE INTVAL get_bool() {
         const INTVAL size = SELF.elements();
         return (INTVAL)(size != 0);
     }
@@ -129,7 +114,7 @@ fixed sized array).
 
 */
 
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return PMC_int_val(SELF);
     }
 
@@ -143,7 +128,7 @@ Returns the number of elements in the array.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return SELF.elements();
     }
 
@@ -158,8 +143,8 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL key) {
-        const FLOATVAL f = DYNSELF.get_number_keyed_int(key);
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+        const FLOATVAL f = SELF.get_number_keyed_int(key);
         return (INTVAL)f;
     }
 
@@ -173,10 +158,10 @@ Returns the integer value of the element at index C<*key>.
 
 */
 
-    INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
         /* simple int keys only */
         const INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_integer_keyed_int(k);
+        return SELF.get_integer_keyed_int(k);
     }
 
 
@@ -190,7 +175,7 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         FLOATVAL *data;
 
         if (key < 0 || key >= PMC_int_val(SELF))
@@ -211,9 +196,9 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) {
         const INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_number_keyed_int(k);
+        return SELF.get_number_keyed_int(k);
     }
 
 /*
@@ -226,8 +211,8 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    STRING *get_string_keyed_int(INTVAL key) {
-        PMC * const e = DYNSELF.get_pmc_keyed_int(key);
+    VTABLE STRING *get_string_keyed_int(INTVAL key) {
+        PMC * const e = SELF.get_pmc_keyed_int(key);
         return VTABLE_get_string(INTERP, e);
     }
 
@@ -241,9 +226,9 @@ Returns the Parrot string value of the element at index C<*key>.
 
 */
 
-    STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) {
         const INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_string_keyed_int(k);
+        return SELF.get_string_keyed_int(k);
     }
 
 
@@ -257,9 +242,9 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC * const ret    = pmc_new(INTERP, enum_class_Float);
-        const FLOATVAL val = DYNSELF.get_number_keyed_int(key);
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+        PMC    * const ret = pmc_new(INTERP, enum_class_Float);
+        const FLOATVAL val = SELF.get_number_keyed_int(key);
 
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
@@ -275,9 +260,9 @@ Returns the PMC value of the element at index C<*key>.
 
 */
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         const INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_pmc_keyed_int(k);
+        return SELF.get_pmc_keyed_int(k);
     }
 
 /*
@@ -290,7 +275,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    void set_integer_native(INTVAL size) {
+    VTABLE void set_integer_native(INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
             real_exception(INTERP, NULL, E_IndexError,
                     "FixedFloatArray: Can't resize!");
@@ -310,8 +295,8 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        DYNSELF.set_number_keyed_int(key, (FLOATVAL)value);
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        SELF.set_number_keyed_int(key, (FLOATVAL)value);
     }
 
 /*
@@ -324,9 +309,9 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         const INTVAL k = key_integer(INTERP, key);
-        DYNSELF.set_integer_keyed_int(k, value);
+        SELF.set_integer_keyed_int(k, value);
     }
 
 /*
@@ -340,7 +325,7 @@ C<value>.
 
 */
 
-    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         FLOATVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
@@ -361,9 +346,9 @@ C<value>.
 
 */
 
-    void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         const INTVAL k = key_integer(INTERP, key);
-        DYNSELF.set_number_keyed_int(k, value);
+        SELF.set_number_keyed_int(k, value);
     }
 
 /*
@@ -376,13 +361,13 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    void set_string_keyed_int(INTVAL key, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         FLOATVAL tempNum;
         PMC * const tempPMC = pmc_new(INTERP, enum_class_Float);
 
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempNum = VTABLE_get_number(INTERP, tempPMC);
-        DYNSELF.set_number_keyed_int(key, tempNum);
+        SELF.set_number_keyed_int(key, tempNum);
     }
 
 /*
@@ -396,9 +381,9 @@ C<value>.
 
 */
 
-    void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) {
         const INTVAL k = key_integer(INTERP, key);
-        DYNSELF.set_string_keyed_int(k, value);
+        SELF.set_string_keyed_int(k, value);
     }
 
 /*
@@ -411,9 +396,9 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    void set_pmc_keyed_int(INTVAL key, PMC *src) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) {
         const FLOATVAL tempNum = VTABLE_get_number(INTERP, src);
-        DYNSELF.set_number_keyed_int(key, tempNum);
+        SELF.set_number_keyed_int(key, tempNum);
     }
 
 /*
@@ -427,9 +412,9 @@ C<value>.
 
 */
 
-    void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const INTVAL k = key_integer(INTERP, key);
-        DYNSELF.set_pmc_keyed_int(k, value);
+        SELF.set_pmc_keyed_int(k, value);
     }
 
 }

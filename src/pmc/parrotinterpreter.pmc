@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -214,7 +214,7 @@ Initializes the interpreter.
 
 */
 
-    void init() {
+    VTABLE void init() {
         /*
          * init/init_pmc may be called internally (from thread creation in
          * ParrotThread::init_pmc() or stand-alone
@@ -241,7 +241,7 @@ C<parent> and uses that thread.
 
 */
 
-    void init_pmc(PMC *parent) {
+    VTABLE void init_pmc(PMC *parent) {
         Parrot_Interp p = PMC_data_typed(parent, Parrot_Interp);
 
         if (!PMC_data(SELF))
@@ -260,7 +260,7 @@ Sets C<struct_val> to C<*value>.
 
 */
 
-    void set_pointer(void *value) {
+    VTABLE void set_pointer(void *value) {
         PMC_struct_val(SELF) = value;
     }
 
@@ -274,7 +274,7 @@ Returns C<struct_val>.
 
 */
 
-    void *get_pointer() {
+    VTABLE void *get_pointer() {
         return PMC_struct_val(SELF);
     }
 
@@ -288,7 +288,7 @@ Returns the thread id of the interpreter.
 
 */
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         const Parrot_Interp i = PMC_data_typed(SELF, Parrot_Interp);
         return (INTVAL)i->thread_data->tid;
     }
@@ -303,7 +303,7 @@ Runs the interpreter's byte code.
 
 */
 
-    opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) {
         Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         /* setup code */
@@ -329,7 +329,7 @@ Returns the PMC global value for C<key>.
 
 */
 
-    PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         if (key >= 0 && key < IGLOBALS_SIZE)
@@ -363,7 +363,7 @@ Introspection interface. C<key> can be:
 
 */
 
-    PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
         PMC    *nextkey, *cont;
         STRING *outer = NULL;
         STRING *item  = key_string(interp, key);
@@ -460,7 +460,7 @@ Returns the interpreter info for C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         if (key == -1)
@@ -479,7 +479,7 @@ Sets the interpreter info for C<key> to C<val>.
 
 */
 
-    void set_integer_keyed_int(INTVAL key, INTVAL val) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL val) {
         Interp * const new_interp = PMC_data_typed(SELF, Interp *);
 
         /* set interpreter flags */
@@ -504,7 +504,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         clone_interpreter((Parrot_Interp)PMC_data(dest),
@@ -526,7 +526,7 @@ have the same thread id.
 
 */
 
-    INTVAL is_equal(PMC *val) {
+    VTABLE INTVAL is_equal(PMC *val) {
         Parrot_Interp self  = PMC_data_typed(SELF, Parrot_Interp);
         Parrot_Interp other = PMC_data_typed(val, Parrot_Interp);
 
@@ -567,7 +567,7 @@ Finish thawing.
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         PMC **pos;
         /*
          * the information frozen here is part of all PBCs
@@ -603,7 +603,7 @@ Finish thawing.
         (info->visit_pmc_now)(INTERP, *pos, info);
     }
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             SUPER(info);
         }
@@ -668,7 +668,7 @@ Finish thawing.
         }
     }
 
-    METHOD void run_gc() {
+    METHOD run_gc() {
         Parrot_do_dod_run(PMC_data_typed(SELF, Parrot_Interp), 0);
     }
 }

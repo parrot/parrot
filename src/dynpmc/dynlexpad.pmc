@@ -19,9 +19,9 @@ lexicals at runtime.
 
 */
 
-pmclass DynLexPad dynpmc does lexpad need_ext {
+pmclass DynLexPad dynpmc provides lexpad need_ext {
 
-    void init() {
+    VTABLE void init() {
         real_exception(interp, NULL, INVALID_OPERATION,
                 "don't create me like this");
     }
@@ -85,7 +85,7 @@ Return the LexInfo PMC, if any or a Null PMC.
             VTABLE_set_pointer(interp, std_pad, ctx);
     }
 
-    void destroy() {
+    VTABLE void destroy() {
         if (PMC_struct_val(SELF)) {
             parrot_hash_destroy(interp, (Hash*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
@@ -101,7 +101,7 @@ Marks the lexpad hash as live.
 
 */
 
-    void mark() {
+    VTABLE void mark() {
         PMC *std_pad = PMC_pmc_val(SELF);
         if (std_pad)
             pobject_lives(interp, (PObj *)std_pad);

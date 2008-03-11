@@ -31,7 +31,7 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', '# true' );
 print(# true)
 CODE
-/^[^:]+: [^:]+:\d+: attempt to get length of a boolean value\nstack traceback:\n/
+/^[^:]+: [^:]+:-?\d+: attempt to get length of a boolean value\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not false' );

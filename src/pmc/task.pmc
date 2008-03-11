@@ -22,6 +22,16 @@ Implements the basic task behavior for the concurrency scheduler.
 #include "parrot/scheduler_private.h"
 
 pmclass Task need_ext {
+    ATTR INTVAL        id;        /* The task ID. */
+    ATTR INTVAL        priority;  /* The priority of the task. */
+    ATTR FLOATVAL      birthtime; /* The creation time stamp of the task. */
+    ATTR STRING       *type;      /* The type of the task. */
+    ATTR STRING       *subtype;   /* The subtype of the task. */
+    ATTR STRING       *status;    /* The status of the task. */
+    ATTR Parrot_Interp interp;    /* The interpreter that created the task. */
+    ATTR PMC          *codeblock; /* An (optional) codeblock for the task. */
+    ATTR PMC          *data;      /* Additional data for the task. */
+    ATTR char         *cb_data;   /* Additional data for a callback event. */
 
 /*
 
@@ -33,7 +43,7 @@ Initialize a concurrency task object.
 
 */
 
-    void init() {
+    VTABLE void init() {
         Parrot_Task * const core_struct = mem_allocate_zeroed_typed(Parrot_Task);
 
         /* Set flags for custom DOD mark and destroy. */
@@ -105,7 +115,7 @@ An interpreter in which to execute this task.
 
 */
 
-    void init_pmc(PMC *data) {
+    VTABLE void init_pmc(PMC *data) {
         PMC         *elem;
         Parrot_Task *core_struct;
 
@@ -174,7 +184,7 @@ Create a copy of the task, resetting status, ID, and birthtime.
 
 */
 
-    PMC *clone() {
+    VTABLE PMC *clone() {
         /* Create the new task PMC, of the same type of this one (we may
          * have been subclassed). */
         PMC * const copy  = pmc_new(interp, SELF->vtable->base_type);
@@ -198,7 +208,7 @@ Gets the value of an attribute for this task.
 =cut
 
 */
-    PMC *get_attr_str(STRING *name) {
+    VTABLE PMC *get_attr_str(STRING *name) {
         Parrot_Task * const core_struct = PARROT_TASK(SELF);
         PMC *value;
 
@@ -242,7 +252,7 @@ Sets the value of an attribute for this task.
 =cut
 
 */
-    void set_attr_str(STRING *name, PMC *value) {
+    VTABLE void set_attr_str(STRING *name, PMC *value) {
         Parrot_Task * const core_struct = PARROT_TASK(SELF);
 
         if (string_equal(interp, name, CONST_STRING(interp, "id")) == 0) {
@@ -280,7 +290,7 @@ Retrieves the task ID for this task.
 =cut
 
 */
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         const Parrot_Task * const core_struct = PARROT_TASK(SELF);
         return core_struct->id;
     }
@@ -295,7 +305,7 @@ Sets the task ID of the task.
 
 */
 
-    void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) {
         Parrot_Task * const core_struct = PARROT_TASK(SELF);
         core_struct->id = value;
     }
@@ -310,7 +320,7 @@ Sets the birthtime of the task.
 
 */
 
-    void set_number_native(FLOATVAL value) {
+    VTABLE void set_number_native(FLOATVAL value) {
         Parrot_Task * const core_struct = PARROT_TASK(SELF);
         core_struct->birthtime = value;
     }
@@ -325,7 +335,7 @@ Sets the type of the task.
 
 */
 
-    void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) {
         Parrot_Task * const core_struct = PARROT_TASK(SELF);
         core_struct->type = value;
     }
@@ -340,7 +350,7 @@ Set this PMC as shared.
 
 */
 
-    PMC *share_ro() {
+    VTABLE PMC *share_ro() {
         PMC *shared_self;
         Parrot_Task *shared_struct;
 
@@ -368,7 +378,7 @@ Free the task's underlying struct.
 =cut
 
 */
-    void destroy() {
+    VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
     }
 
@@ -381,7 +391,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         if (PARROT_TASK(SELF)) {
             Parrot_Task * const core_struct = PARROT_TASK(SELF);
 
@@ -404,7 +414,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    void visit(visit_info *info) {
+    VTABLE void visit(visit_info *info) {
         Parrot_Task * const core_struct = PARROT_TASK(SELF);
         PMC **pos;
 
@@ -424,7 +434,7 @@ Used to archive the task.
 
 */
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         const Parrot_Task * const core_struct = PARROT_TASK(SELF);
 
@@ -457,7 +467,7 @@ Used to unarchive the task.
 
 */
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         /* 1. thaw task id */

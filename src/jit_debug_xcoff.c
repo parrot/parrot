@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -126,9 +126,9 @@ write_types(FILE *stabs, PARROT_INTERP)
                 "strstart:15,%d,%d;"        /* fake a char* */
                 ";\""
                 ",0," C_DECL ",0\n", i++, BYTE_SIZE(STRING),
-                BIT_OFFSET(STRING, obj.u._b._bufstart), BIT_SIZE(void*),
-                BIT_OFFSET(STRING, obj.u._b._buflen), BIT_SIZE(size_t),
-                BIT_OFFSET(STRING, obj.flags), BIT_SIZE(UINTVAL),
+                BIT_OFFSET(STRING, cache._b._bufstart), BIT_SIZE(void*),
+                BIT_OFFSET(STRING, cache._b._buflen), BIT_SIZE(size_t),
+                BIT_OFFSET(STRING, flags), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, bufused), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, strstart), BIT_SIZE(void*));
 
@@ -144,26 +144,24 @@ write_types(FILE *stabs, PARROT_INTERP)
 
     /* PMC type */
     fprintf(stabs, ".stabx \"PMC:T%d=s%d", i, BYTE_SIZE(PMC));
-    fprintf(stabs, "obj:%d,%d,%d;",
-            i + 1, BIT_OFFSET(PMC, obj), BIT_SIZE(pobj_t));
+    fprintf(stabs, "cache:%d,%d,%d;",
+            i + 1, BIT_OFFSET(PMC, cache), BIT_SIZE(UnionVal));
+    fprintf(stabs, "flags:%d,%d,%d;",
+            i + 1, BIT_OFFSET(PMC, flags), BIT_SIZE(Parrot_UInt));
     fprintf(stabs, "vtable:*%d,%d,%d;",
             i + 3, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*));
-#  if ! PMC_DATA_IN_EXT
     fprintf(stabs, "data:14,%d,%d;",
             BIT_OFFSET(PMC, data), BIT_SIZE(void*));
-#  endif
     fprintf(stabs, "pmc_ext:*%d,%d,%d;",
             i, BIT_OFFSET(PMC, pmc_ext), BIT_SIZE(void*));
     fprintf(stabs, ";\"");
     fprintf(stabs, ",0," C_DECL ",0\n");
 
-    fprintf(stabs, ".stabx \"pobj_t:T%d=s%d"
-                "u:%d,%d,%d;"
+    fprintf(stabs, ".stabx \"cache:%d,%d,%d;"
                 "flags:12,%d,%d;"
                 ";\""
-                ",0," C_DECL ",0\n", i + 1, (int)(sizeof (pobj_t)),
-                i + 2, BIT_OFFSET(pobj_t, u), BIT_SIZE(UnionVal),
-                BIT_OFFSET(pobj_t, flags), BIT_SIZE(Parrot_UInt));
+                ",0," C_DECL ",0\n",
+                i + 2, BIT_SIZE(UnionVal), BIT_SIZE(Parrot_UInt));
     fprintf(stabs, ".stabx \"UnionVal:T%d=u%d"
                 "int_val:12,%d,%d;"
                 "pmc_val:*%d,%d,%d;"

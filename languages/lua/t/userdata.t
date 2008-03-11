@@ -33,7 +33,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '# u' );
 local u = io.stdin
 print(# u)
 CODE
-/^[^:]+: [^:]+:\d+: attempt to get length of/
+/^[^:]+: [^:]+:-?\d+: attempt to get length of/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not u' );

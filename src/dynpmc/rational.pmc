@@ -18,9 +18,9 @@ Not implemented yet. 'LispRational' will subclass this.
 
 */
 
-pmclass Rational dynpmc does scalar extends Integer {
+pmclass Rational dynpmc provides scalar extends Integer {
 
-    INTVAL get_integer() {
+    VTABLE INTVAL get_integer() {
         return 43;
     }
 }
