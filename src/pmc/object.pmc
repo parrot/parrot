@@ -576,26 +576,6 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 /*
 
-=item C<void freeze(visit_info *info)>
-
-Used to archive the object.
-
-=cut
-
-*/
-
-    VTABLE void freeze(visit_info *info) {
-        /*
-        /*
-        IMAGE_IO *io = info->image_io;
-        INTVAL num_attributes = VTABLE_elements(interp, SELF);
-        PMC_int_val(SELF) = num_attributes;
-        VTABLE_push_integer(INTERP, io, num_attributes);
-        */
-    }
-
-/*
-
 =item C<void thaw(visit_info *info)>
 
 Used to unarchive the object.
