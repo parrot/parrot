@@ -586,7 +586,6 @@ are immune from collection (i.e. constant).
 void
 Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
-    UINTVAL i;
     UINTVAL total_used        = 0;
     const UINTVAL object_size = pool->object_size;
 
@@ -608,11 +607,13 @@ Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 #endif
 
     /* Run through all the buffer header pools and mark */
-    for (cur_arena = pool->last_Arena;
-            NULL != cur_arena; cur_arena = cur_arena->prev) {
+    for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
         Buffer *b = (Buffer *)cur_arena->start_objects;
+        UINTVAL i;
 
-        for (i = 0; i < cur_arena->total_objects; i++) {
+        /* loop only while there are objects in the arena */
+        for (i = cur_arena->total_objects; i; i--) {
+
             if (PObj_on_free_list_TEST(b))
                 ; /* if it's on free list, do nothing */
             else if (PObj_live_TEST(b)) {
@@ -647,7 +648,6 @@ Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
                     }
                 }
 
-                PARROT_ASSERT(dod_object);
                 dod_object(interp, pool, b);
 
                 pool->add_free_object(interp, pool, b);
