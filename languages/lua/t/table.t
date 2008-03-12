@@ -259,10 +259,6 @@ luaH_present	48
 luaH_set	10
 OUTPUT
 
-SKIP:
-{
-    skip('low memory', 1) unless ($test_prog eq 'lua');
-
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function sort (all permutations)' );
 function permgen (a, n)
     n = n or #a
@@ -318,7 +314,6 @@ a b c d e f
 a b c d e f g
 5040
 OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl

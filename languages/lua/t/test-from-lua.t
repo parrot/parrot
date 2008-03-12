@@ -107,10 +107,6 @@ language_output_is( 'lua', $code, $out, 'factorial' );
 #       fibonacci function with cache
 #
 
-SKIP:
-{
-    skip('PANIC: Out of mem!', 1) unless ($test_prog eq 'lua');
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fib.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'fib' );
 /^
@@ -119,7 +115,6 @@ plain\t24\t46368\t\d+(\.\d+)?\t150049\n
 cached\t24\t46368\t\d+(\.\d+)?\t25\n
 /x
 OUTPUT
-}
 
 #
 #   fibfor.lua

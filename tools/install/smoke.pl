@@ -109,7 +109,7 @@ ok($out =~ /^usage/, "check bfc");
 $out = `$parrot languages/bf/bfco.pbc`;
 ok($out =~ /^usage/, "check bfco");
 
-$out = `$parrot --no-gc languages/cardinal/cardinal.pbc -e "print 'hello world';"`;
+$out = `$parrot languages/cardinal/cardinal.pbc -e "print 'hello world';"`;
 ok($out eq "hello world\n", "check cardinal");
 
 $out = `$parrot languages/dotnet/net2pbc.pbc`;
@@ -155,7 +155,7 @@ $out = `$parrot languages/lolcode/lolcode.pbc $filename`;
 ok($out eq "HAI WORLD!\n", "check lolcode");
 unlink($filename);
 
-$out = `$parrot --no-gc languages/lua/lua.pbc -e "print(nil)"`;
+$out = `$parrot languages/lua/lua.pbc -e "print(nil)"`;
 ok($out eq "nil\n", "check lua");
 
 $out = `$parrot languages/m4/m4.pbc`;
@@ -164,7 +164,7 @@ ok($out =~ /^Usage/, "check m4");
 $out = `$parrot languages/ook/ook.pbc`;
 ok($out eq q{}, "check ook");
 
-$out = `$parrot --no-gc languages/perl6/perl6.pbc -e "say 'hello world'"`;
+$out = `$parrot languages/perl6/perl6.pbc -e "say 'hello world'"`;
 ok($out eq "hello world\n", "check rakudo");
 
 $filename = 'test.l';
