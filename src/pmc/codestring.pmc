@@ -113,16 +113,12 @@ A newline is automatically added to the end of the fmt.
         replen = string_length(INTERP, repl);
     }
 
+    /* Add a newline if necessary */
+    if ('\n' != string_index(INTERP, fmt, string_length(interp, fmt) - 1))
+        fmt = string_concat(INTERP, fmt, newline, 0);
+
     S1 = string_concat(INTERP, SELF.get_string(), fmt, 0);
     VTABLE_set_string_native(INTERP, SELF, S1);
-
-    /* Add a newline if necessary */
-    S0 = string_substr(interp, fmt, -1, 1, &S0, 0);
-    if (0 != string_equal(INTERP, S0, newline)) {
-        S1 = SELF.get_string();
-        S1 = string_concat(INTERP, S1, newline, 0);
-        VTABLE_set_string_native(INTERP, SELF, S1);
-    }
 
     RETURN(PMC *SELF);
 }
