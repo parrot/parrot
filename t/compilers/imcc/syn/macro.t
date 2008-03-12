@@ -207,7 +207,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', '.newid' );
     .local pmc .ID
     .ID = new .CLASS
 .endm
-    .newid(var, Undef)
+    .newid(var, 'Undef')
     var = 10
     print var
     print "\n"
@@ -224,7 +224,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', '.newlex' );
     .ID = new .CLASS
     # store_lex -1, .ID , .ID    # how to stringify .ID
 .endm
-    .newlex(var, Undef)
+    .newlex(var, 'Undef')
     var = 10
     print var
     print "\n"
