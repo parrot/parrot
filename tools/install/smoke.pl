@@ -203,7 +203,7 @@ TODO: {
 $filename = 'test.tcl';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "puts 'hello world!'\n";
+print $FH "puts {hello world!}\n";
 close $FH;
 $out = `$parrot languages/tcl/tcl.pbc $filename`;
 ok($out eq "hello world!\n", "check tcl");
