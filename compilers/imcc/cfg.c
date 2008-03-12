@@ -974,7 +974,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
     dominators[0] = set_make(n);
     set_add(dominators[0], 0);
 
-    for (i = 1; i < n; i++) {
+    for (i = n - 1; i; --i) {
         if (unit->bb_list[i]->pred_list) {
             dominators[i] = set_make_full(n);
         }
@@ -1039,14 +1039,14 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
     /* calc idoms */
     unit->idoms[0] = unit->bb_list[0]->index;
 
-    for (b = 1; b < n; b++) {
+    for (b = n - 1; b; --b) {
         unit->idoms[b] = 0;
         for (i = n - 1; i > 0; i--) {
             if (i != b && set_contains(dominators[b], i)) {
                 wrong = 0;
-                for (runner = 0; runner < n; runner++) {
-                    if (runner != b && runner != i &&
-                        set_contains(dominators[b], runner))
+                for (runner = n - 1; runner >= 0; --runner) {
+                    if (runner != b && runner != i
+                    &&  set_contains(dominators[b], runner))
                     {
                         if (set_contains(dominators[runner], i)) {
                             wrong = 1;
