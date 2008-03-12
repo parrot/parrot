@@ -1,10 +1,11 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 53;
@@ -184,7 +185,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "add" );
     new P0, 'Complex'
     new P1, 'Complex'
     new P2, 'Float'
-        new P3, 'Integer'
+    new P3, 'Integer'
 
     set P0, "1 + i"
     add P0, P0, P0
@@ -250,7 +251,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "subtract" );
     new P0, 'Complex'
     new P1, 'Complex'
     new P2, 'Float'
-        new P3, 'Integer'
+    new P3, 'Integer'
 
     set P0, "1 + i"
     sub P0, P0, P0
@@ -316,7 +317,7 @@ pasm_output_is( << 'CODE', << 'OUTPUT', "multiply" );
     new P0, 'Complex'
     new P1, 'Complex'
     new P2, 'Float'
-        new P3, 'Integer'
+    new P3, 'Integer'
 
     set P0, "2 + 3i"
     mul P0, P0, P0
@@ -427,14 +428,14 @@ CODE
 4-6i
 OUTPUT
 
-for my $type ( "Complex", "Float", "Integer" ) {
+for my $type ( qw( Complex Float Integer ) ) {
     pir_output_is( <<"CODE", <<OUTPUT, "complex divide by zero $type" );
 .sub _main :main
     P0 = new 'Complex'
     set P0, "4+3.5i"
     P1 = new 'Complex'
     ## divide by a zero $type
-    P2 = new $type
+    P2 = new '$type'
     set P2, 0
     push_eh OK
     P1 = P0 / P2
@@ -845,7 +846,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "pow with complex numbers" );
 .endm
 .sub main :main
     .local pmc c, c2, c3
-    c = new 'Complex'
+    c  = new 'Complex'
     c2 = new 'Complex'
     c3 = new 'Complex'
     .DoIt("i", "i")
@@ -904,7 +905,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0" );
 .endm
 .sub main :main
     .local pmc c, c2, c3
-    c = new 'Complex'
+    c  = new 'Complex'
     c2 = new 'Complex'
     c3 = new 'Complex'
     # e^(pi * i) + 1 = 0
@@ -955,7 +956,7 @@ OUTPUT
 #.sub main :main
 #    .local pmc c, c2
 #    .local string str
-#    c = new 'Complex'
+#    c  = new 'Complex'
 #    c2 = new 'Complex'
 #END
 #    foreach my $num (
