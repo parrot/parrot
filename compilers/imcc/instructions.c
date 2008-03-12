@@ -101,11 +101,13 @@ _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         (Instruction*)mem_sys_allocate_zeroed(sizeof (Instruction) + reg_space);
     int i;
 
-    ins->opname     = str_dup(op);
+    ins->opname       = str_dup(op);
     ins->format       = str_dup(fmt);
     ins->symreg_count = n;
+
     for (i = 0; i < n; i++)
         ins->symregs[i] = r[i];
+
     ins->flags = flags;
     ins->opnum = -1;
 
@@ -176,7 +178,9 @@ ins_reads2(ARGIN(const Instruction *ins), int t)
 
     if (ins->opnum == r_special[0])
         return 1;
+
     p = strchr(types, t);
+
     if (p) {
         const size_t idx = p - types;
         size_t i;
@@ -185,6 +189,7 @@ ins_reads2(ARGIN(const Instruction *ins), int t)
             if (ins->opnum == r_special[i + idx])
                 return 1;
     }
+
     return 0;
 }
 
@@ -205,7 +210,9 @@ ins_writes2(ARGIN(const Instruction *ins), int t)
 
     if (ins->opnum == w_special[0])
         return 1;
+
     p = strchr(types, t);
+
     if (p) {
         const size_t idx = p - types;
         size_t i;
@@ -214,6 +221,7 @@ ins_writes2(ARGIN(const Instruction *ins), int t)
             if (ins->opnum == w_special[i + idx])
                 return 1;
     }
+
     return 0;
 }
 
@@ -221,7 +229,7 @@ ins_writes2(ARGIN(const Instruction *ins), int t)
 
 =item C<int instruction_reads>
 
-next 2 functions are called very often, says gprof
+next two functions are called very often, says gprof
 they should be fast
 
 =cut
@@ -233,24 +241,29 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 {
     int f, i;
 
-    if (ins->opnum == PARROT_OP_set_args_pc ||
-            ins->opnum == PARROT_OP_set_returns_pc) {
-        int i;
-        for (i = 0; i < ins->symreg_count; i++)
+    if (ins->opnum == PARROT_OP_set_args_pc
+    ||  ins->opnum == PARROT_OP_set_returns_pc) {
+
+        for (i = ins->symreg_count - 1; i >= 0; --i)
             if (r == ins->symregs[i])
                 return 1;
+
         return 0;
     }
     else if (ins->opnum == PARROT_OP_get_params_pc ||
-            ins->opnum == PARROT_OP_get_results_pc) {
+             ins->opnum == PARROT_OP_get_results_pc) {
         return 0;
     }
+
     f = ins->flags;
-    for (i = 0; i < ins->symreg_count; i++) {
-        if (f & (1<<i)) {
+
+    for (i = ins->symreg_count - 1; i >= 0; --i) {
+        if (f & ( 1 << i )) {
             const SymReg * const ri = ins->symregs[i];
+
             if (ri == r)
                 return 1;
+
             /* this additional test for _kc ops seems to slow
              * down instruction_reads by a huge amount compared to the
              * _writes below
@@ -258,23 +271,26 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
             if (ri->set == 'K') {
                 const SymReg *key;
                 for (key = ri->nextkey; key; key = key->nextkey)
-                    if (key->reg && key->reg == r)
+                    if (key->reg == r)
                         return 1;
             }
         }
     }
+
     /* a sub call reads the previous args */
     if (ins->type & ITPCCSUB) {
-        int i;
         while (ins && ins->opnum != PARROT_OP_set_args_pc)
             ins = ins->prev;
+
         if (!ins)
             return 0;
-        for (i = 0; i < ins->symreg_count; i++) {
+
+        for (i = ins->symreg_count - 1; i >= 0; --i) {
             if (ins->symregs[i] == r)
                 return 1;
         }
     }
+
     return 0;
 }
 
@@ -301,16 +317,19 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
      */
     if (ins->opnum == PARROT_OP_get_results_pc) {
         int i;
-        /* but only, if it isn't the get_results opcode of
+
+        /* but only if it isn't the get_results opcode of
          * an exception_handler, which doesn't have
          * a call next
          */
         if (ins->next && (ins->next->type & ITPCCSUB))
             return 0;
-        for (i = 0; i < ins->symreg_count; i++) {
+
+        for (i = ins->symreg_count - 1; i >= 0; --i) {
             if (ins->symregs[i] == r)
                 return 1;
         }
+
         return 0;
     }
     else if (ins->type & ITPCCSUB) {
@@ -323,29 +342,35 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
          */
         while (ins && ins->opnum != PARROT_OP_get_results_pc)
             ins = ins->prev;
+
         if (!ins)
             return 0;
-        for (i = 0; i < ins->symreg_count; i++) {
+
+        for (i = ins->symreg_count - 1; i >= 0; --i) {
             if (ins->symregs[i] == r)
                 return 1;
         }
+
         return 0;
     }
 
     if (ins->opnum == PARROT_OP_get_params_pc) {
         int i;
-        for (i = 0; i < ins->symreg_count; i++) {
+
+        for (i = ins->symreg_count - 1; i >= 0; --i) {
             if (ins->symregs[i] == r)
                 return 1;
         }
+
         return 0;
     }
-    else if (ins->opnum == PARROT_OP_set_args_pc ||
-            ins->opnum == PARROT_OP_set_returns_pc) {
+    else if (ins->opnum == PARROT_OP_set_args_pc
+         ||  ins->opnum == PARROT_OP_set_returns_pc) {
         return 0;
     }
+
     for (i = 0; i < ins->symreg_count; i++)
-        if (f & (1<<(16+i)))
+        if (f & (1 << (16 + i)))
             if (ins->symregs[i] == r)
                 return 1;
 
@@ -366,9 +391,11 @@ int
 get_branch_regno(ARGIN(const Instruction *ins))
 {
     int j;
-    for (j = ins->opsize - 2;  j >= 0 && ins->symregs[j] ; --j)
-        if (ins->type & (1<<j))
+
+    for (j = ins->opsize - 2; j >= 0 && ins->symregs[j] ; --j)
+        if (ins->type & (1 << j))
             return j;
+
     return -1;
 }
 
@@ -388,8 +415,10 @@ SymReg *
 get_branch_reg(ARGIN(const Instruction *ins))
 {
     const int r = get_branch_regno(ins);
+
     if (r >= 0)
         return ins->symregs[r];
+
     return NULL;
 }
 
@@ -420,6 +449,7 @@ _delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGIN(Instruction *ins))
         prev->next = next;
     else
         unit->instructions = next;
+
     if (next)
         next->prev = prev;
     else
@@ -470,10 +500,11 @@ insert_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
         Instruction * const next = unit->instructions;
 
         unit->instructions = tmp;
-        tmp->next = next;
+        tmp->next          = next;
+
         if (next) {
             next->prev = tmp;
-            tmp->line = next->line;
+            tmp->line  = next->line;
         }
         else {
             unit->last_ins = tmp;
@@ -485,10 +516,12 @@ insert_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
         ins->next = tmp;
         tmp->prev = ins;
         tmp->next = next;
+
         if (next)
             next->prev = tmp;
         else
             unit->last_ins = tmp;
+
         if (!tmp->line)
             tmp->line = ins->line;
     }
@@ -512,9 +545,9 @@ prepend_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
         Instruction * const next = unit->instructions;
 
         unit->instructions = tmp;
-        tmp->next = next;
-        next->prev = tmp;
-        tmp->line = next->line;
+        tmp->next          = next;
+        next->prev         = tmp;
+        tmp->line          = next->line;
     }
     else {
         Instruction * const prev = ins->prev;
@@ -522,8 +555,10 @@ prepend_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
         ins->prev = tmp;
         tmp->next = ins;
         tmp->prev = prev;
+
         if (prev)
             prev->next = tmp;
+
         if (!tmp->line)
             tmp->line = ins->line;
     }
@@ -549,14 +584,18 @@ subst_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins),
         prev->next = tmp;
     else
         unit->instructions = tmp;
+
     tmp->prev = prev;
     tmp->next = ins->next;
+
     if (ins->next)
         ins->next->prev = tmp;
     else
         unit->last_ins = tmp;
+
     if (tmp->line == 0)
         tmp->line = ins->line;
+
     if (needs_freeing)
         free_ins(ins);
 }
@@ -600,14 +639,18 @@ emitb(PARROT_INTERP, ARGMOD_NULLOK(struct _IMC_Unit *unit), ARGIN_NULLOK(Instruc
 
     if (!unit || !i)
         return NULL;
+
     if (!unit->instructions)
         unit->last_ins = unit->instructions = i;
     else {
         unit->last_ins->next = i;
-        i->prev = unit->last_ins;
-        unit->last_ins = i;
+        i->prev              = unit->last_ins;
+        unit->last_ins       = i;
     }
-    i->line = IMCC_INFO(interp)->line - 1;         /* lexer is in next line already */
+
+    /* lexer is in next line already */
+    i->line = IMCC_INFO(interp)->line - 1;
+
     return i;
 }
 
@@ -661,44 +704,57 @@ ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
         const SymReg *p = ins->symregs[i];
         if (!p)
             continue;
+
         if (p->type & VT_CONSTP)
             p = p->reg;
+
         if (p->color >= 0 && REG_NEEDS_ALLOC(p)) {
             snprintf(regb[i], REGB_SIZE, "%c%d", p->set, (int)p->color);
             regstr[i] = regb[i];
         }
-        else if (IMCC_INFO(interp)->allocated &&
-                (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
-                p->set != 'K' &&
-                p->color < 0 && REG_NEEDS_ALLOC(p)) {
+        else if (IMCC_INFO(interp)->allocated
+             && (IMCC_INFO(interp)->optimizer_level & OPT_J)
+             &&  p->set != 'K'
+             &&  p->color < 0
+             && REG_NEEDS_ALLOC(p)) {
                     snprintf(regb[i], REGB_SIZE,
-                        "r%c%d", tolower((unsigned char)p->set), -1 - (int)p->color);
+                        "r%c%d", tolower((unsigned char)p->set),
+                        -1 -(int)p->color);
                     regstr[i] = regb[i];
         }
         else if (p->type & VTREGKEY) {
             const SymReg *k = p;
 
             *regb[i] = '\0';
+
             while ((k = k->nextkey) != NULL) {
                 const size_t used = strlen(regb[i]);
+
                 if (k->reg && k->reg->color >= 0)
                     snprintf(regb[i]+used, REGB_SIZE - used, "%c%d",
                             k->reg->set, (int)k->reg->color);
-                else if (IMCC_INFO(interp)->allocated &&
-                        (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
-                        k->reg &&
-                        k->reg->color < 0)
-                    snprintf(regb[i]+used, REGB_SIZE - used, "r%c%d",
-                            tolower((unsigned char)k->reg->set), -1 - (int)k->reg->color);
+                else if (IMCC_INFO(interp)->allocated
+                     && (IMCC_INFO(interp)->optimizer_level & OPT_J)
+                     && k->reg
+                     && k->reg->color < 0)
+                        snprintf(regb[i]+used, REGB_SIZE - used, "r%c%d",
+                            tolower((unsigned char)k->reg->set),
+                            -1 -(int)k->reg->color);
                 else
                     strncat(regb[i], k->name, REGB_SIZE - used - 1);
-                if (k->nextkey && regb[i]+1 < REGB_SIZE) /* XXX This comparison is wrong.
-                                                            Comparing pointer to an int */
+
+                /* XXX This comparison of a pointer to an int is wrong */
+
+                if (k->nextkey && regb[i] + 1 < REGB_SIZE)
                     strcat(regb[i], ";");
             }
+
             regstr[i] = regb[i];
         }
-        else if (p->type == VTCONST && p->set == 'S' && *p->name != '"' && *p->name != '\'') {
+        else if (p->type == VTCONST
+             &&  p->set  == 'S'
+             && *p->name != '"'
+             && *p->name != '\'') {
             /* unquoted string const */
             snprintf(regb[i], REGB_SIZE, "\"%s\"", p->name);
             regstr[i] = regb[i];
@@ -736,6 +792,7 @@ ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
             exit(EXIT_FAILURE);
             break;
     }
+
     return len;
 }
 
@@ -826,9 +883,10 @@ PARROT_API
 int
 emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 {
-    emitter = type;
-    IMCC_INFO(interp)->has_compile = 0;
+    emitter                          = type;
+    IMCC_INFO(interp)->has_compile   = 0;
     IMCC_INFO(interp)->dont_optimize = 0;
+
     return (emitters[emitter]).open(interp, param);
 }
 
@@ -850,12 +908,15 @@ emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(struct _IMC_Unit *uni
 
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(interp, param, unit);
+
     for (ins = unit->instructions; ins; ins = ins->next) {
         IMCC_debug(interp, DEBUG_IMC, "emit %I\n", ins);
         (emitters[emitter]).emit(interp, param, unit, ins);
     }
+
     if (emitters[emitter].end_sub)
         (emitters[emitter]).end_sub(interp, param, unit);
+
     return 0;
 }
 
