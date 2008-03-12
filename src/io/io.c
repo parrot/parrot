@@ -1284,6 +1284,7 @@ Returns C<offset>.
 
 */
 
+PARROT_API
 PIOOFF_T
 PIO_make_offset(INTVAL offset)
 {
