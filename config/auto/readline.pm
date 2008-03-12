@@ -51,6 +51,7 @@ sub runstep {
     # On OS X check the presence of the readline header in the standard
     # Fink/macports locations.
     $self->_handle_darwin_for_fink($conf, $osname, 'readline/readline.h');
+
     # Since this config step class is the only one that checks for a
     # macports-installed program, we have not yet had need to create an
     # 'auto::macports' config step and do not yet have enough basis to extract
