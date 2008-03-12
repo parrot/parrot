@@ -258,7 +258,7 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
     f = ins->flags;
 
     for (i = ins->symreg_count - 1; i >= 0; --i) {
-        if (f & ( 1 << i )) {
+        if (f & (1 << i)) {
             const SymReg * const ri = ins->symregs[i];
 
             if (ri == r)
