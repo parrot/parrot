@@ -164,13 +164,8 @@ F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
 
 =head2 BUGS
 
-Lua PMC have problems with the Parrot garbage collector : used objects are
-released by the GC (infant mortality ?).
-
-And Parrot has some problem,
+Parrot has some problem,
 see L<http://rt.perl.org/rt3/Ticket/Display.html?id=49328>.
-
-So, use the option C<--no-gc>.
 
 =head2 TODO
 

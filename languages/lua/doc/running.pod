@@ -29,16 +29,15 @@ With an original C<Lua> in your path, it's possible to check the test suite.
 
 =head1 Running your own code
 
-  ../../parrot --no-gc lua.pbc example.lua
+  ../../parrot lua.pbc example.lua
 
 or in interactive mode :
 
-  ../../parrot --no-gc lua.pbc
+  ../../parrot lua.pbc
 
 =head1 BUGS & LIMITATIONS
 
-Lua PMC have problems with the Parrot garbage collector. So, use the option
-C<--no-gc>.
+See F<languages/lua/doc/status.pod>
 
 =head1 SEE ALSO
 

@@ -5,7 +5,6 @@ package Parrot::Test::Lua;
 
 use strict;
 
-use Data::Dumper;
 use File::Basename;
 
 require Parrot::Test;
@@ -16,7 +15,7 @@ Test/Lua.pm - Testing routines specific to 'lua'.
 
 =head1 DESCRIPTION
 
-Call 'Parrot lua' and 'original lua'.
+Call 'Lua on Parrot' and 'original lua'.
 
 =head1 METHODS
 
@@ -82,7 +81,7 @@ foreach my $func ( keys %language_test_map ) {
         }
         elsif ( $lua_test eq 'lua.pbc' ) {
             @test_prog = (
-                "$self->{parrot} --no-gc languages/lua/lua.pbc $test_prog_args $src $params",
+                "$self->{parrot} languages/lua/lua.pbc $test_prog_args $src $params",
             );
         }
         else {
