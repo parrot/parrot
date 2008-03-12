@@ -297,7 +297,7 @@ DYING_TCL_TESTS = \
 
 tcl-test: t_tcl tcl.pbc
     # For now, just test the ones that ``work'' with test_more
-	TEST_PROG_ARGS=-G prove $(RUNNABLE_TCL_TESTS)
+	prove $(RUNNABLE_TCL_TESTS)
 t_tcl:
 	$(PERL) tools/tcl_test.pl
 
