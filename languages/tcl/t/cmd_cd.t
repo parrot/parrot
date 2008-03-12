@@ -19,11 +19,11 @@ TCL
 wrong # args: should be "cd ?dirName?"
 OUT
 
-language_output_is( "tcl", <<'TCL', <<"OUT", "cd home" );
+language_output_like( "tcl", <<'TCL', <<"OUT", "cd home" );
  cd
  puts [pwd]
 TCL
-$ENV{HOME}
+/(?i)\Q$ENV{HOME}\E/
 OUT
 
 {
