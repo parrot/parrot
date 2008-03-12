@@ -19,12 +19,20 @@ TCL
 wrong # args: should be "cd ?dirName?"
 OUT
 
-language_output_like( "tcl", <<'TCL', <<"OUT", "cd home" );
+## tclsh on windows shows unix slashies, so use unix canonpath to get them
+my $homedir = File::Spec::Unix->canonpath( $ENV{HOME} );
+
+TODO: {
+    local $TODO;
+    $TODO = 'pwd is broken on windows' if $^O eq 'MSWin32';
+
+    language_output_is( "tcl", <<'TCL', <<"OUT", "cd home" );
  cd
  puts [pwd]
 TCL
-/(?i)\Q$ENV{HOME}\E/
+$homedir
 OUT
+}
 
 {
     my $testdir = tempdir( CLEANUP => 1 );
