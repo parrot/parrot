@@ -408,10 +408,40 @@ IO layers, we might copy C<data> and C<struct_val>.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest     = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_data(dest)       = PMC_data(SELF);
-        PMC_struct_val(dest) = PMC_struct_val(SELF);
+        PMC * const dest     = PIO_dup(INTERP, SELF);
         return dest;
+    }
+    /*
+
+=item C<void assign_pmc(PMC *other)>
+
+Set SELF to the data in other.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc(PMC *other) {
+        SELF.assign_pmc(other);
+    }
+
+    VTABLE void assign_pmc(PMC *other) {
+        PMC * clone;
+        /* only handle the case where the other PMC is the same type */
+        if (other->vtable->base_type == SELF->vtable->base_type) {
+            clone = VTABLE_clone(INTERP, other);
+            PMC_data(SELF)       = PMC_data(clone);
+            PMC_struct_val(SELF) = PMC_struct_val(clone);
+            /* prevent the clone from freeing its data when it's gc'd */
+            PObj_active_destroy_CLEAR(clone);
+            if (PObj_is_PMC_EXT_TEST(clone))
+              clone->pmc_ext = NULL;
+
+        }
+        else {
+            real_exception(INTERP, NULL, E_TypeError,
+                           "Can't assign a non-IO type to an IO");
+        }
     }
 
 /*
