@@ -35,7 +35,10 @@ L<docs/pdds/pdd07_codingstd.pod>
 my $DIST = Parrot::Distribution->new;
 
 my $skip_files = $DIST->generated_files();
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my @files = @ARGV ? @ARGV : (
+    $DIST->get_c_language_files(),
+    $DIST->get_perl_language_files(),
+);
 my @failed_files;
 
 foreach my $file (@files) {

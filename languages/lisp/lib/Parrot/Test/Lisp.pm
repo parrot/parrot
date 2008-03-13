@@ -18,7 +18,7 @@ This is largely a copy of Parrot::Test::Punie.
 =cut
 
 # Generate output_is(), output_isnt() and output_like() in current package.
-Parrot::Test::generate_languages_functions(); 
+Parrot::Test::generate_languages_functions();
 
 sub new {
     return bless {};
@@ -66,7 +66,7 @@ sub get_test_prog {
 
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
 
-    return 
+    return
         join( ' ',
               "../../$self->{parrot}",
               'lisp.pbc',

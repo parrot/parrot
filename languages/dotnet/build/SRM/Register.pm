@@ -217,7 +217,7 @@ sub pre_load($) {
     # into here.
     if ($need_dest) {
         $pir .= <<'PIR'
-inc stack_depth 
+inc stack_depth
 ${DEST0} = "$"
 ${STEMP0} = ${LOADTYPE}["reg_type_short"]
 ${DEST0} = concat ${STEMP0}
@@ -239,7 +239,7 @@ sub post_load($) {
     # generate a move instruction.
     if ( !$need_dest ) {
         $pir .= <<'PIR'
-inc stack_depth 
+inc stack_depth
 ${STEMP0} = "$"
 ${STEMP1} = ${LOADTYPE}["reg_type_short"]
 ${STEMP0} = concat ${STEMP1}

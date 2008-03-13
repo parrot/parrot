@@ -44,14 +44,14 @@ sub header {
     <<"HEADER";
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
     "http://www.w3.org/TR/REC-html40/loose.dtd">
-<HTML>  
+<HTML>
     <HEAD>
         <TITLE>$title</TITLE>
-        <LINK REL="stylesheet" TYPE="text/css" 
-            HREF="$resources/perl.css" 
+        <LINK REL="stylesheet" TYPE="text/css"
+            HREF="$resources/perl.css"
             TITLE="Default CSS2" media="screen">
     </HEAD>
-    <BODY> 
+    <BODY>
         <A NAME="_top"></A>
         <TABLE CELLSPACING="0" WIDTH="730">
             <TR>
@@ -97,7 +97,7 @@ sub footer {
                 </TD>
                 <TD VALIGN="middle" ALIGN="center">
                     <IMG BORDER=0
-                        SRC="$resources/parrot_small.png" 
+                        SRC="$resources/parrot_small.png"
                         ALT="parrot">
                 </TD>
             </TR>

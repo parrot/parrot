@@ -116,7 +116,7 @@ sub _check_num_args {
 sub _get_num_args {
     my ( $node ) = @_;
 
-    return 
+    return
         defined $node->{children} ? @{ $node->{children} } - 1 : 0;
 }
 
@@ -206,7 +206,7 @@ sub _constant {
         if ( $pmc_type eq 'Complex' ) {
             $value = qq{"$value"};
         }
-    } 
+    }
     elsif ( $value eq '#t' || $value eq '#f' ) {
         $pmc_type = 'Boolean';
         $value    = $value eq '#t' ? '1' : '0';
@@ -215,7 +215,7 @@ sub _constant {
         $pmc_type = 'Integer';
         $value    = 0;
     }
-    
+
     my $return = $self->_save_1();
     $self->_add_inst( '', 'new', [ $return, qq{'$pmc_type'} ] );
     $self->_add_inst( '', 'set', [ $return, $value ] ) if defined $value;
@@ -420,13 +420,13 @@ sub _op_lambda {
     for ( @{ _get_arg( $node, 1 )->{children} } ) {
         my $param_name = "param_$cnt";
         $self->_add_inst( '', '.param pmc', [ $param_name ] );
-        push @store_lex, [ '', '.lex', [ "\"$_->{value}\"", $param_name ]]; 
+        push @store_lex, [ '', '.lex', [ "\"$_->{value}\"", $param_name ]];
         $cnt++;
     }
     foreach ( @store_lex ) {
         $self->_add_inst( @{$_} );
     }
-  
+
     # generate code for the body
     my $temp = 'none';
     for ( _get_args( $node, 2 ) ) {
@@ -692,8 +692,8 @@ sub _op_not {
 
 sub _op_boolean_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'boolean?', $node ); 
+
+    return $self->_type_predicate( 'boolean?', $node );
 }
 
 sub _op_eqv_p {
@@ -707,8 +707,8 @@ sub _op_equal_p {
 
 sub _op_pair_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'pair?', $node ); 
+
+    return $self->_type_predicate( 'pair?', $node );
 }
 
 sub _op_cons {
@@ -787,8 +787,8 @@ sub _op_set_cdr_bang {
 
 sub _op_null_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'null?', $node ); 
+
+    return $self->_type_predicate( 'null?', $node );
 }
 
 sub _op_list_p {
@@ -884,32 +884,32 @@ sub _op_string_symbol {
 
 sub _op_number_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'number?', $node ); 
+
+    return $self->_type_predicate( 'number?', $node );
 }
 
 sub _op_complex_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'number?', $node ); 
+
+    return $self->_type_predicate( 'number?', $node );
 }
 
 sub _op_real_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'real?', $node ); 
+
+    return $self->_type_predicate( 'real?', $node );
 }
 
 sub _op_rational_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'rational?', $node ); 
+
+    return $self->_type_predicate( 'rational?', $node );
 }
 
 sub _op_integer_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'integer?', $node ); 
+
+    return $self->_type_predicate( 'integer?', $node );
 }
 
 sub _op_exact_p {
@@ -1343,7 +1343,7 @@ sub _op_make_point {
 
 sub _op_real_part {
     my ( $self, $node ) = @_;
-    
+
     my $is_real = $self->_op_real_p( $node );
     my $item   = $self->_generate( _get_arg( $node, 1 ) );
 }
@@ -1431,8 +1431,8 @@ sub _op_char_downcase {
 
 sub _op_string_p {
     my ( $self, $node ) = @_;
-    
-    return $self->_type_predicate( 'string?', $node ); 
+
+    return $self->_type_predicate( 'string?', $node );
 }
 
 sub _op_make_string {
@@ -2057,15 +2057,15 @@ sub _call_function_obj {
                 $empty = $moved;
             }
             $self->_add_inst( '', 'set', [ "P$count", $arg ] );
-            
+
         }
         push @args, "P$count";
         $count++;
     }
 
     {
-        my $spec = q{"} . join( q{,}, ( q{0} ) x scalar(@args) ) . q{"};    
-        $self->_add_inst( '', 'set_args', [ $spec, @args ] );    
+        my $spec = q{"} . join( q{,}, ( q{0} ) x scalar(@args) ) . q{"};
+        $self->_add_inst( '', 'set_args', [ $spec, @args ] );
     }
     $self->_add_inst( '', 'get_results', [ q{"0"}, $return ] );
     $self->_add_inst( '', 'invokecc', [ $func_obj ] );

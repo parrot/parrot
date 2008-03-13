@@ -136,7 +136,7 @@ sub runstep {
 
     die <<"HELP" unless $ok;    # this text is also in Configure.PL!
 Something is wrong with your ICU installation!
-   
+
    If you do not have a full ICU installation:
 
    --without-icu        Build parrot without ICU support

@@ -18,7 +18,7 @@ sub import {
     main::pir_output_is( << 'CODE', << 'OUTPUT', "check sanity for pugs_group" );
 .sub _main
     loadlib $P1, "pugs_group"
-    $I0 = defined $P1 
+    $I0 = defined $P1
     if $I0 goto ok
     print "not "
 ok:

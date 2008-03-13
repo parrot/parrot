@@ -415,7 +415,7 @@ sub generate_initial_pir {
         .const int ELEMENT_TYPE_OBJECT = 0x1C
         .const int ELEMENT_TYPE_SZARRAY = 0x1D
         .const int ELEMENT_TYPE_INTERNAL = 0x21
-    
+
     # Trace info - param and local types.
     if trace != 2 goto NO_IN_TRACE
 printerr "    PTYPES: "
@@ -445,7 +445,7 @@ goto LTYPES_LOOP
 LTYPES_LOOP_END:
 printerr "\\n"
 NO_IN_TRACE:
-    
+
     # Get bytecode and initialize pc.
     bc = meth.get_bytecode()
     bc_length = bc.get_length()
@@ -503,7 +503,7 @@ TRANS_LOOP:
     pc = bc.get_pos()
         next_pc = pc
     if pc >= bc_length goto COMPLETE
-    
+
     # If we have a stack type state propogated here, put it in place.
     ss = ss_propogate[pc]
     if null ss goto NO_SS_PROP
@@ -528,7 +528,7 @@ EH_LOOP:
     dec i
     if i < 0 goto END_EH_LOOP
     eh = ehs[i]
-    
+
     # If this is the start of a try block, emit a push_eh instruction.
     try_offset = eh.get_try_offset()
     try_length = eh.get_try_length()
@@ -693,7 +693,7 @@ INS_NOT_FOUND_ERROR:
         str_ic = cur_ic
         err = concat str_ic
         err = concat ")"
-    ex["_message"] = err 
+    ex["_message"] = err
     throw ex
 
 PIRCODE

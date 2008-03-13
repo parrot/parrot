@@ -165,7 +165,7 @@ return
 END_TCL
         <<'END_TCL',
 ::tcltest::cleanupTests
-return 
+return
 END_TCL
         <<'END_TCL',
 ::tcltest::cleanupTests

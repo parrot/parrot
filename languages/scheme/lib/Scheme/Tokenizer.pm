@@ -16,7 +16,7 @@ sub new {
     my $class     = shift;
     my $target    = shift;
 
-    return 
+    return
         bless sub {
          TOKEN:
          {

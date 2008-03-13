@@ -2,7 +2,7 @@
 
 # #############################################################################
 # .NET CLI To PIR Translator
-# Copyright (C) 2005-2007, Jonathan Worthington 
+# Copyright (C) 2005-2007, Jonathan Worthington
 # $Id$
 # #############################################################################
 # Configure Script
@@ -83,7 +83,7 @@ sub generate_makefile {
     }
     $makefile =~ s/\$\{build_dir\}/$parrot_path/g;
 
-    my $local_mono_lib_path = $mono_lib_path || q{}; 
+    my $local_mono_lib_path = $mono_lib_path || q{};
     $makefile =~ s/\$\{trans_mono_lib_path\}/$local_mono_lib_path/g;
 
     $makefile =~ s/\$\{trans_class_library\}/$class_lib_make/g;

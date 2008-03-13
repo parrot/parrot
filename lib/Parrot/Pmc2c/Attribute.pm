@@ -203,7 +203,7 @@ EOA
     }
 
 EOA
-    
+
     $h->emit($decl);
 
     return 1;

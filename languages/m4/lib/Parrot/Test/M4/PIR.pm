@@ -12,7 +12,7 @@ use base 'Parrot::Test::M4';
 use Data::Dumper;
 
 # Generate output_is(), output_isnt() and output_like() in current package.
-Parrot::Test::generate_languages_functions(); 
+Parrot::Test::generate_languages_functions();
 
 sub get_out_fn {
     my $self = shift;
@@ -33,7 +33,7 @@ sub get_test_prog {
 
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
 
-    return 
+    return
         join( ' ',
               $self->{parrot},
               File::Spec->join( qw( languages m4 m4.pbc ) ),

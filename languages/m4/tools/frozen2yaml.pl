@@ -33,8 +33,8 @@ $::RD_TRACE = undef;
 my $frozen_parser = Parse::RecDescent->new( << 'END_GRAMMAR' );
 
 {
-  $::name_len         = 0; 
-  $::substitution_len = 0; 
+  $::name_len         = 0;
+  $::substitution_len = 0;
 }
 
 # We are only interested in the macro definitions
@@ -43,7 +43,7 @@ frozen:             comment V1 macros comment
 
 # Return a hash reference where the macro_name is the key
 macros:             macro(s)
-                  { my $dummy = { map { $_->[0] => 
+                  { my $dummy = { map { $_->[0] =>
                                         { flag         => $_->[1],
                                           substitution => $_->[2],
                                         }
@@ -59,7 +59,7 @@ V1:                 "V1\n"
 
 # for each macro we need: name, substitution and flag
 # The length is uninteresting later on.
-# 
+#
 # Example:
 # F8,8
 # translittranslit
@@ -67,13 +67,13 @@ V1:                 "V1\n"
 # Flag is 'F'
 # Name is 'translit'
 # substitution: 'translit'
-macro:              flag name_len ',' substitution_len name substitution 
-                  { [ @item[5,1,6] ] }       
+macro:              flag name_len ',' substitution_len name substitution
+                  { [ @item[5,1,6] ] }
 
 # TODO: What does this means???
 flag:               'F' | 'T'
 
-# We need the len of the macro name, 
+# We need the len of the macro name,
 # because we extract is as a substring in the next line
 name_len:           m/[0-9]+/
                   { $::name_len = $item[1] }
@@ -84,10 +84,10 @@ substitution_len:   m/[0-9]+/
                   { $::substitution_len = $item[1] }
 
 # length is known from the line above
-name:               m/[a-zA-Z0-9_-]{$::name_len}/ 
+name:               m/[a-zA-Z0-9_-]{$::name_len}/
 
 # length is known from the line above
-substitution:       m/[a-zA-Z0-9_-]{$::substitution_len}/ 
+substitution:       m/[a-zA-Z0-9_-]{$::substitution_len}/
 
 END_GRAMMAR
 

@@ -166,7 +166,7 @@ sub gen_parent_reverse_lookup_info {
     # for each vt_meth in pmc, locate the implementing
     foreach my $vt_method_name ( @{ $vt->names } ) {
         # skip if super mapping is already set
-        next if $pmc->super_method($vt_method_name); 
+        next if $pmc->super_method($vt_method_name);
 
         foreach my $parent_name ( @{ $pmc->parents } ) {
             my $parent = $pmcs->{$parent_name};

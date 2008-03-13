@@ -327,9 +327,9 @@ sub parse_locate {    # locate x,y   | locate x   | locate ,y
     if ( @codey and @codex ) {                          # X and Y
 
         push @{ $code{$seg}->{code} }, <<XANDY;
-@codey  
+@codey
         \$N100= $resulty
-@codex  
+@codex
         \$N101= $resultx
         _screen_locate(\$N101,\$N100)
 XANDY
@@ -678,7 +678,7 @@ sub parse_select {
         P1= P0["SELECTS"]
         P1["$selectcounter"]= P6   # Store for later.
         goto CASE_${selectcounter}_0
-        
+
 SELECTSTART
 
     # Honestly the next thing needs to be a case statement.
@@ -699,7 +699,7 @@ sub parse_case {
     }
 
     my $lambda = <<GL;
-        
+
         P0= P10[I25]
         P1= P0["SELECTS"]
         P5= P1["$jump"]      # Stored value.
@@ -806,7 +806,7 @@ CASE_${jump}_${incase}_NO_TO:
         pop P0, P13
         bsr RUNTIME_PUSH
         dec I5
-        gt I5, 0, CASE_${jump}_${incase}_STARTTO        
+        gt I5, 0, CASE_${jump}_${incase}_STARTTO
 TOS
     }
     if ( $ops and ( $tos or $ors ) ) {
@@ -1103,7 +1103,7 @@ USER
         popp
         restore P1
         ret
-OUTOF_$typename: 
+OUTOF_$typename:
 
 OUTOF
 
@@ -1431,7 +1431,7 @@ sub parse_endsub {
 sub parse_function_dispatch {
     return;
     print FUNC<<FUNCDISP;
-                                
+
         #
         # User function dispatch routine
         #
@@ -1468,7 +1468,7 @@ SUBEND
 sub parse_struct_copy_dispatch {
     goto RTJUMP;
     print CODE <<SCOPYDIS;
-        
+
         #
         # Structure copy dispatch routine
         # Call with S0 set to the type

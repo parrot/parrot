@@ -23,7 +23,7 @@ use Parrot::Configure::Step  ();
 # Parrot::Configure::Step::genfile( 'config/makefiles/root.in' => 'Makefile' );
 
 print <<'END_TEXT';
-Hi, 
+Hi,
 I'm Configure.pl. Eventually I'll generate Makefile.
 END_TEXT
 

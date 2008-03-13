@@ -26,7 +26,7 @@ sub parse {
     }
 
     my $token = $tokenizer->();   # grap next token
-   
+
     return unless $token;
 
     return if $token->[1] eq ')';
@@ -41,7 +41,7 @@ sub parse {
         else {
             return { children => \@children };
         }
-    } 
+    }
 
     my %special_function = (
             q{'}      => 'quote',
@@ -52,7 +52,7 @@ sub parse {
     if ( exists $special_function{$token->[1]}  ) {
         my $child = parse( $tokenizer );
 
-        return { children => [ { value => $special_function{$token->[1]} 
+        return { children => [ { value => $special_function{$token->[1]}
                                },
                                $child
                              ]
@@ -85,7 +85,7 @@ Scheme::Parser - The Scheme token parser
 
 The parser reads a list of tokens and turns it into a tree structure.
 The Nodes of the tree are hash references with either the attribute C<value>
-or the attribute C<children>. C<children> is an array reference with subbnodes. 
+or the attribute C<children>. C<children> is an array reference with subbnodes.
 
 =head1 AUTHOR
 

@@ -11,7 +11,7 @@ use 5.006;
 use base 'Parrot::Test::M4';
 
 # Generate output_is(), output_isnt() and output_like() in current package.
-Parrot::Test::generate_languages_functions(); 
+Parrot::Test::generate_languages_functions();
 
 sub get_out_fn {
     my $self = shift;
@@ -32,7 +32,7 @@ sub get_test_prog {
 
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
 
-    return 
+    return
         join( ' ',
               $ENV{PARROT_M4_TEST_PROG},
               $test_prog_args,

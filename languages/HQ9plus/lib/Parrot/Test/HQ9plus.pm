@@ -23,7 +23,7 @@ Call HQ9plus.pbc
 =cut
 
 # Generate output_is(), output_isnt() and output_like() in current package.
-Parrot::Test::generate_languages_functions(); 
+Parrot::Test::generate_languages_functions();
 
 =head1 METHODS
 
@@ -55,7 +55,7 @@ sub get_test_prog {
 #
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
 
-    return 
+    return
         join( ' ',
               "../../$self->{parrot}",
               'HQ9plus.pbc',

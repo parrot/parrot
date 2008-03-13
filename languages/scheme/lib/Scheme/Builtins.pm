@@ -176,7 +176,7 @@ sub new {
     my $class = shift;
 
     my $self = { instruction => [] };
-    
+
     return bless $self, $class;
 }
 

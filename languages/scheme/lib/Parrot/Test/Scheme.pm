@@ -12,11 +12,11 @@ use Parrot::Config;
 use Parrot::Test;
 
 # Generate output_is(), output_isnt() and output_like() in current package.
-Parrot::Test::generate_languages_functions(); 
+Parrot::Test::generate_languages_functions();
 
 sub new {
     my $class = shift;
- 
+
     return bless {}, $class;
 }
 
@@ -50,7 +50,7 @@ sub get_test_prog {
     my $lang_fn = Parrot::Test::per_test( '.scheme', $count );
     my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
 
-    #return "mzscheme -r languages/$lang_fn";    
+    #return "mzscheme -r languages/$lang_fn";
     return "$PConfig{perl} languages/scheme/schemec languages/$lang_fn > languages/$pir_fn && ./parrot languages/$pir_fn";
 }
 

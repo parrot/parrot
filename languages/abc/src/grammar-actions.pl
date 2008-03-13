@@ -22,7 +22,7 @@ Some hopefully helpful hints for reading this file:
 
 =item
 
-It often helps to refer to the rules in F<grammar.pg> when 
+It often helps to refer to the rules in F<grammar.pg> when
 looking at the corresponding methods here.
 
 =item

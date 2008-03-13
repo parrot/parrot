@@ -284,7 +284,7 @@ sub pre_load($) {
     if ($need_dest) {
         $pir = _do_lazy_moves('_${CURIC}');
         $pir .= <<'PIR'
-inc stack_depth 
+inc stack_depth
 ${DEST0} = "$"
 ${STEMP0} = ${LOADTYPE}["reg_type_short"]
 ${DEST0} = concat ${STEMP0}
