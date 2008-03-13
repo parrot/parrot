@@ -162,7 +162,7 @@ sub compile {
         my $pmc_type = $dest_ident->type->imcc_pmc;
         my $pmc_reg  = $compiler->temp_pmc();
 
-        $compiler->emit("  $pmc_reg = new $pmc_type");
+        $compiler->emit("  $pmc_reg = new '$pmc_type'");
         $compiler->emit("  $pmc_reg = $dest");
         $compiler->emit("  global \"$dest_name\" = $pmc_reg");
     }

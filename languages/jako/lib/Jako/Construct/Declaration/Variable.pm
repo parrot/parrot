@@ -143,7 +143,7 @@ sub compile {
 
         my $reg = $compiler->temp_pmc();
 
-        $compiler->emit("  $reg = new $pmc_type");
+        $compiler->emit("  $reg = new '$pmc_type'");
         $compiler->emit("  global \"$name\" = $reg");
     }
     else {

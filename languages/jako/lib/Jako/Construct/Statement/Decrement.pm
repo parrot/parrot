@@ -55,7 +55,7 @@ sub compile {
     if ( ( $self->ident->kind eq 'var' ) and ( $self->ident->scope eq 'global' ) ) {
         my $pmc_type = $self->ident->type->imcc_pmc;
         my $pmc_reg  = $compiler->temp_pmc();
-        $compiler->emit("  $pmc_reg = new $pmc_type");
+        $compiler->emit("  $pmc_reg = new '$pmc_type'");
         $compiler->emit("  $pmc_reg = $ident");
         $compiler->emit("  global \"$ident_name\" = $pmc_reg");
     }

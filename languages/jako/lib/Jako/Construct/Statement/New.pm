@@ -53,7 +53,7 @@ sub compile {
     my $left  = $self->left->value;
     my $right = $self->right->compile($compiler);
 
-    $compiler->emit("  new $left, .$right");
+    $compiler->emit("  new $left, .$right # asdf");
 
     return 1;
 }

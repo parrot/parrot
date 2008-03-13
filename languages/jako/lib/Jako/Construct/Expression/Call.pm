@@ -154,7 +154,7 @@ sub compile {
         my $pmc_type = $dest_ident->type->imcc_pmc();
         my $temp_pmc = $compiler->temp_pmc();
 
-        $compiler->emit("  $temp_pmc = new $pmc_type");
+        $compiler->emit("  $temp_pmc = new '$pmc_type'");
         $compiler->emit("  $temp_pmc = $dest");
 
         my $dest_name = $dest_ident->value;

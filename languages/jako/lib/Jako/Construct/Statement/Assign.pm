@@ -58,7 +58,7 @@ sub compile {
         my $pmc_type = $type->imcc_pmc;
         my $temp_pmc = $compiler->temp_pmc();
 
-        $compiler->emit("  $temp_pmc = new $pmc_type");
+        $compiler->emit("  $temp_pmc = new '$pmc_type'");
         $compiler->emit("  $temp_pmc = $right");
         $compiler->emit("  global \"$left\" = $temp_pmc");
     }
