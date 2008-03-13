@@ -833,6 +833,7 @@ Parrot_register_move(PARROT_INTERP,
     mem_sys_free(backup);
 }
 
+/* TODO: Macroize swap and COMPARE */
 static void
 swap(void **x, void **y)
 {
@@ -850,7 +851,7 @@ COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)
         return mmd_dispatch_i_pp(interp, (PMC *)a, (PMC *)b, MMD_CMP);
 
     if (cmp->vtable->base_type == enum_class_NCI) {
-        sort_func_t f = (sort_func_t)D2FPTR(PMC_struct_val(cmp));
+        const sort_func_t f = (sort_func_t)D2FPTR(PMC_struct_val(cmp));
         return f(interp, a, b);
     }
 
@@ -861,9 +862,9 @@ COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)
 void
 Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)
 {
-    UINTVAL i, j, ln, rn;
-
     while (n > 1) {
+        UINTVAL i, j, ln, rn;
+
         swap(&data[0], &data[n/2]);
 
         for (i = 0, j = n; ;) {
