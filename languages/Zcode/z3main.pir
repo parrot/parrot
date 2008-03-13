@@ -29,7 +29,7 @@
   .param int c
 
   .local pmc ar, val
-  ar = new FixedPMCArray
+  ar = new 'FixedPMCArray'
   ar = 1
   ar[0] = c
   $S0 = sprintf "%x", ar
@@ -46,7 +46,7 @@
 
   .local pmc ar
   if val < 16 goto no_global
-    ar = new FixedPMCArray
+    ar = new 'FixedPMCArray'
     ar = 1
     val -= 16
     ar[0] = val
@@ -57,7 +57,7 @@
     $S0 = "sp"
     goto done
 is_local:
-  ar = new FixedPMCArray
+  ar = new 'FixedPMCArray'
   ar = 1
   val += 15		# L1 => I16
   ar[0] = val
@@ -92,7 +92,7 @@ done:
   .param string file
 
   .local pmc pfile, im, io
-  pfile = new String
+  pfile = new 'String'
   pfile = file
   setattribute self, "Zmachine\0file", pfile
   .include "stat.pasm"
@@ -100,7 +100,7 @@ done:
   io = open file, "<"
   $S0 = read io, $I0
   close io
-  im = new String
+  im = new 'String'
   assign im, $S0
   setattribute self, "Zmachine\0image", im
 .end
@@ -230,16 +230,16 @@ vers_ok:
 .namespace ["ZComp"]
 
 .sub "init" :vtable :method
-  $P0 = new Hash
+  $P0 = new 'Hash'
   setattribute self, "ZComp\0labels", $P0
-  $P0 = new Hash
+  $P0 = new 'Hash'
   setattribute self, "ZComp\0subs", $P0
-  $P0 = new ResizablePMCArray
+  $P0 = new 'ResizablePMCArray'
   setattribute self, "ZComp\0todo_subs", $P0
   .local pmc ops
   ops = self."set_oplist"()
   setattribute self, "ZComp\0ops", ops
-  $P0 = new String
+  $P0 = new 'String'
   setattribute self, "ZComp\0code", $P0
   $P0 = new 'Integer'
   setattribute self, "ZComp\0temp", $P0
@@ -286,7 +286,7 @@ no_add:
   first = 1
   # Very first time through, reset seen hash, print code header
   unless pass goto no_emit0
-    $P0 = new Hash
+    $P0 = new 'Hash'
     setattribute self, "ZComp\0subs", $P0
     # Output macros at the very beginning of the translated code
     self."emit_macros"()
@@ -393,7 +393,7 @@ inner:
       print " "
   no_deb_4:
     # collect args encoded in opcode
-    args = new ResizablePMCArray
+    args = new 'ResizablePMCArray'
     (args, pc) = self."decode_args"(im, pc, args, type)
     # call opcode function to parse more
     # and emit code in pass 1
@@ -749,21 +749,21 @@ done:
 
 .sub "set_oplist" :method
   .local pmc ops, ops_2op, ops_1op, ops_0op, ops_var, ops_ext
-  ops = new FixedPMCArray
+  ops = new 'FixedPMCArray'
   ops = 5
-  ops_2op = new FixedPMCArray
+  ops_2op = new 'FixedPMCArray'
   ops_2op = 32
   ops[0] = ops_2op
-  ops_1op = new FixedPMCArray
+  ops_1op = new 'FixedPMCArray'
   ops_1op = 16
   ops[1] = ops_1op
-  ops_0op = new FixedPMCArray
+  ops_0op = new 'FixedPMCArray'
   ops_0op = 16
   ops[2] = ops_0op
-  ops_var = new FixedPMCArray
+  ops_var = new 'FixedPMCArray'
   ops_var = 32
   ops[3] = ops_var
-  ops_ext = new FixedPMCArray
+  ops_ext = new 'FixedPMCArray'
   ops_ext = 32
   ops[4] = ops_ext
 
