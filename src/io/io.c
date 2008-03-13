@@ -174,12 +174,13 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIO *
-PIO_dup(PARROT_INTERP, PMC * pmc)
+PIO_dup(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    ParrotIO * const io = PMC_data_typed(pmc, ParrotIO *);
-    ParrotIO * newio;
-    PIOHANDLE newfd = dup(io->fd);
+    ParrotIO * const io   = PMC_data_typed(pmc, ParrotIO *);
+    const PIOHANDLE newfd = dup(io->fd);
     ParrotIOLayer * layer = (ParrotIOLayer *)PMC_struct_val(pmc);
+
+    ParrotIO * newio;
 
     if (!layer) {
         layer = interp->piodata->default_stack;

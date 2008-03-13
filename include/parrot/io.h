@@ -190,9 +190,15 @@ INTVAL PIO_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *address))
         FUNC_MODIFIES(*address);
 
 PARROT_API
-void PIO_destroy(SHIM_INTERP, ARGMOD(PMC *pmc))
+void PIO_destroy(SHIM_INTERP, ARGMOD(PMC * pmc))
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+        FUNC_MODIFIES(* pmc);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+ParrotIO * PIO_dup(PARROT_INTERP, PMC * pmc)
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -266,18 +272,15 @@ INTVAL PIO_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
         FUNC_MODIFIES(*pmc);
 
 PARROT_API
+PIOOFF_T PIO_make_offset(INTVAL offset);
+
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIO * PIO_new(PARROT_INTERP,
     NULLOK(INTVAL iotype),
     INTVAL flags,
     INTVAL mode)
-        __attribute__nonnull__(1);
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-ParrotIO * PIO_dup(PARROT_INTERP, PMC * pmc)
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -444,7 +447,6 @@ STRING * PIO_make_io_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buf);
 
-PIOOFF_T PIO_make_offset(INTVAL offset);
 PIOOFF_T PIO_make_offset32(INTVAL hi, INTVAL lo);
 PIOOFF_T PIO_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
