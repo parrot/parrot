@@ -33,7 +33,7 @@ pmclass WmlsString
     provides string
     dynpmc
     group wmls_group
-    hll Lua maps String {
+    hll WMLScript maps String {
 
 /* Class initialization. Caches constant strings that will be used later.
 */
