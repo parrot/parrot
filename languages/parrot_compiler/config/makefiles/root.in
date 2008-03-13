@@ -34,7 +34,7 @@ help :
 Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=parrot_compiler
 
-test :
+test : all
 	cd .. && $(PERL) -I../lib parrot_compiler/t/harness
 
 clean :
