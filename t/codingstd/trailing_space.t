@@ -46,11 +46,20 @@ foreach my $file (@files) {
 
     next if exists $skip_files->{$path};
 
-    my $buf = $DIST->slurp($path);
+    open my $fh, '<', $path
+        or die "Cannot open '$path' for reading: $!\n";
 
-    if ( $buf =~ m{.?[ \t]+$}m ) {
-        push @failed_files, $path;
+    my $spacecount = 0;
+
+    my $message = qq<  $path:>;
+    while (<$fh>) {
+        next unless m{.?[ \t]+$}m;
+        $message .= " $.";
+        $spacecount++;
     }
+    push @failed_files => "$message\n"
+        if $spacecount;
+    
 }
 
 # check the file
