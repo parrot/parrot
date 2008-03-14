@@ -1,8 +1,17 @@
 # $Id$
 
 New in r25986
+- Documentation
+  + cleanup of IMCC documentation
 - Languages
   + C99: reimplementation with PCT
+  + lolcode: various updates
+- Implementation
+  + PDD17 (PMCs)
+- Miscellaneous
+  + various bugfixes, code cleanups and coding standard fixes
+  + consting
+
 
 New in 0.5.3
 - Documentation
