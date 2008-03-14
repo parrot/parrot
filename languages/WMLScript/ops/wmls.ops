@@ -61,51 +61,6 @@ inline op istrue(out PMC, invar PMC) :base_core {
 }
 
 
-=item B<typeof>(out PMC, invar PMC)
-
-implements C<TYPEOF> WMLScript opcode.
-
-=cut
-
-inline op typeof(out PMC, invar PMC) :base_core {
-    INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
-        const_string(interp, "WmlsBoolean"));
-    INTVAL dynpmc_WmlsFloat = pmc_type(interp,
-        const_string(interp, "WmlsFloat"));
-    INTVAL dynpmc_WmlsInteger = pmc_type(interp,
-        const_string(interp, "WmlsInteger"));
-    INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
-        const_string(interp, "WmlsInvalid"));
-    INTVAL dynpmc_WmlsString = pmc_type(interp,
-        const_string(interp, "WmlsString"));
-    INTVAL type = VTABLE_type(interp, $2);
-    INTVAL result;
-
-    if (type == dynpmc_WmlsInteger) {
-        result = 0;
-    }
-    else if (type == dynpmc_WmlsFloat) {
-        result = 1;
-    }
-    else if (type == dynpmc_WmlsString) {
-        result = 2;
-    }
-    else if (type == dynpmc_WmlsBoolean) {
-        result = 3;
-    }
-    else if (type == dynpmc_WmlsInvalid) {
-        result = 4;
-    }
-    else {
-        real_exception(interp, NULL, NO_CLASS,
-            "Attempt to typeof of a non-wmls type.");
-    }
-    $1 = pmc_new(interp, dynpmc_WmlsInteger);
-    PMC_int_val($1) = result;
-    goto NEXT();
-}
-
-
 =item B<isgt>(out PMC, invar PMC, invar PMC)
 
 implements C<GT> WMLScript opcode.

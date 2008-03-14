@@ -83,6 +83,21 @@ pmclass WmlsBoolean
 
 /*
 
+=item C<PMC* get_class()>
+
+Return the integer 3.
+
+=cut
+
+*/
+    PMC* get_class() {
+        PMC* retval = pmc_new(interp, dynpmc_WmlsInteger);
+        PMC_int_val(retval) = 3;
+        return retval;
+    }
+
+/*
+
 =item C<STRING* get_string()>
 
 Return the string "true" or "false".
