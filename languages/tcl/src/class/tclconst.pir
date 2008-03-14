@@ -1,5 +1,5 @@
-.include 'languages/tcl/src/returncodes.pir'
-.include 'languages/tcl/src/macros.pir'
+#.include 'languages/tcl/src/returncodes.pir'
+#.include 'languages/tcl/src/macros.pir'
 
 .HLL 'parrot', ''
 .namespace [ 'TclConst' ]
