@@ -22,7 +22,7 @@ See L<www.openssl.org>
 
 pmclass MDx
     dynpmc
-    need_ext 
+    need_ext
     group digest_group {
 
 /*
@@ -75,7 +75,7 @@ pmclass MDx
     PMC* clone() {
         PMC *retval = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         MDx_CTX *c = mem_allocate_zeroed_typed(MDx_CTX);
-        memcpy(c, PMC_data(SELF), sizeof(MDx_CTX));
+        memcpy(c, PMC_data(SELF), sizeof (MDx_CTX));
         PMC_data(retval) = c;
         PObj_custom_mark_destroy_SETALL(retval);
         return retval;
