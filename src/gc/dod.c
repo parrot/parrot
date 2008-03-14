@@ -135,7 +135,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
          *     use a second pointer chain, which is, when not empty,
          *     processed first.
          */
-        if (tptr && hi_prio) {
+        if (hi_prio && tptr) {
             if (PMC_next_for_GC(tptr) == tptr) {
                 PMC_next_for_GC(obj) = obj;
             }
