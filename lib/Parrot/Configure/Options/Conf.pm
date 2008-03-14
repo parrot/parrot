@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 package Parrot::Configure::Options::Conf;
@@ -78,6 +78,7 @@ our @valid_options = qw{
     verbose-step
     version
     without-gdbm
+    without-crypto
     without-gettext
     without-gmp
     without-icu
@@ -189,6 +190,7 @@ External Library Options:
 
    --without-gmp        Build parrot without GMP support
    --without-gdbm       Build parrot without GDBM support
+   --without-crypto     Build parrot without crypto support (libssl)
 
 ICU Options:
 

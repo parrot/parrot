@@ -86,6 +86,9 @@ F<lib/icudt.lib>, which contains the standard data in binary form.
 
 The availability of these libraries is checked by Configure.pl.
 
+B<libcrypto> - a part of libssl
+L<http://www.openssl.org/>
+
 B<gdbm> - GNU database manager
 L<http://gnuwin32.sourceforge.net/>
 
