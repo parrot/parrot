@@ -409,6 +409,19 @@ is evaluated as the subroutine to be invoked.
 
 =item C<callmethod>
 
+ my $invocant := PAST::Var.new( :name('foo'), :scope('package') );
+ PAST::Op.new( $invocant,
+               :name('bar'),
+               :pasttype('callmethod')
+              );
+
+generates:
+
+ get_global $P10, "foo"
+ $P10."bar"()
+
+
+
 =item C<bind>
 
 Binds the variable represented by the first child to the value
