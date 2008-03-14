@@ -64,6 +64,6 @@ See C<docs/> and C<TODO>
 
 =head2 Tcl Version
 
-We are targeting Tcl 8.5.
+We are targeting Tcl 8.5.1.
 
 =cut

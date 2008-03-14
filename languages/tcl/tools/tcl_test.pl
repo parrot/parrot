@@ -92,7 +92,7 @@ sub convert_tests {
 sub checkout_tests {
     print "Checking out tests from CVS\n";
 
-    my $tag = "core-8-5-0"; # For the version we're targeting.
+    my $tag = "core-8-5-1"; # For the version we're targeting.
 
     my $command =
           "cvs -z3 -d :pserver:anonymous:\@tcl.cvs.sourceforge.net:"
