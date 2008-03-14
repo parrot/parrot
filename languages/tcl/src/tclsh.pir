@@ -100,8 +100,7 @@ execute_line:
   # print out the result of the evaluation.
   if_null retval, input_loop_continue
   if retval == '' goto input_loop_continue
-  print retval
-  print "\n"
+  say retval
   goto input_loop_continue
 
 loop_error:

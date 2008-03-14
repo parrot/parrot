@@ -60,8 +60,7 @@ one_arg:
   $P0 = argv[0]
   $S1 = $P0
   $S1 = trans_encoding $S1, utf8
-  print $S1
-  print "\n"
+  say $S1
   goto done  
 
 bad_option:
