@@ -401,7 +401,7 @@ again:
     if (io) {
         size_t chunk_size;
         char *cursor;
-        INTVAL read_result;
+        size_t read_result;
         INTVAL wanted;
 
         chunk_size = program_size > 0 ? program_size : 1024;
