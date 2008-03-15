@@ -1,16 +1,52 @@
 # $Id$
 
-New in r25986
+New in r26831
+- Specification
+  + launched pdd18_security.pod
+  + updated pdd17_pmc.pod
+  + launching draft of pdd28_character_sets.pod
 - Documentation
   + cleanup of IMCC documentation
+- Configuration
+  + add step auto::gettext
+- Compilers
+  + PCT:
+    . Fix '-e' option
+    . Phase out P6Reges in favor of Perl6Regex
+  + IMCC:
+    '.local Array my_arr' is illegal now 
 - Languages
   + C99: reimplementation with PCT
-  + lolcode: various updates
+  + lolcode:
+    . various updates
+    . add support for functions with params 
+    . add math functions
+  + Rakudo: 
+    . support for 'say'
+    . first cut at smart matching
+    . indirect method calls
+    . support for Pairs
+    . added methods 'grep' and 'first'
+    . implement auto{increment,decrement} 
+    . initial implementation of 'perl6doc'
+  + Lua:
+    . various updates
+    . add base64 library
+  + Cardinal: basic support for functions with parameters
+  + Pheme: various updates
+  + Ecmascript: various updates
+  + Tcl: various updates
+  + Eclectus: various updates
+  + WMLScript: various updates
 - Implementation
   + PDD17 (PMCs)
+  + Add library YAML::Dumper
+  + Add the MDx PMC, as a wrapper around libcrypto
 - Miscellaneous
   + various bugfixes, code cleanups and coding standard fixes
   + consting
+  + remove externale Perl 5 modules from the Parrot distribution
+
 
 
 New in 0.5.3
