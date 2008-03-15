@@ -182,7 +182,7 @@ sub find_methods {
     while ( $pmcbody =~ s/($signature_re)// ) {
         my ( $decorators, $marker, $methodname, $parameters, $rawattrs ) =
             ( $2, $3, $4, $5, $6 );
-        my $attrs = parse_method_attrs($rawattrs) if defined $rawattrs;
+        my $attrs = defined $rawattrs ? parse_method_attrs($rawattrs) : {};
         $lineno  += count_newlines($1);
 
         my $returntype = '';
@@ -546,8 +546,10 @@ B<Comments:>  Called within C<parse_pmc()>.
 
 sub parse_method_attrs {
     my $flags = shift;
+
     my %result;
     ++$result{$1} while $flags =~ /:(\w+)/g;
+
     return \%result;
 }
 
