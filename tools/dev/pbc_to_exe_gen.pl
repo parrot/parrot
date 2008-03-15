@@ -272,9 +272,10 @@ END_BODY
     .param string objfile
 
     $P0 = '_config'()
-    .local string cc, ccflags, osname, build_dir, slash
+    .local string cc, ccflags, cc_o_out, osname, build_dir, slash
     cc        = $P0['cc']
     ccflags   = $P0['ccflags']
+    cc_o_out  = $P0['cc_o_out']
     osname    = $P0['osname']
     build_dir = $P0['build_dir']
     slash     = $P0['slash']
@@ -289,7 +290,8 @@ END_BODY
 
     .local string compile
     compile  = cc
-    compile .= ' -Fo'
+    compile .= ' '
+    compile .= cc_o_out
     compile .= objfile
     compile .= ' -I'
     compile .= pathquote
