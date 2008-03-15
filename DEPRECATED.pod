@@ -12,19 +12,7 @@ repository should be updated or removed; including documentation.
 
 =head1 PMC syntax
 
-=over 4
-
-=item * C<METHOD> [post 0.5.2]
-
-The current C<METHOD> syntax will be deleted and the current C<PCCMETHOD>
-syntax will replace it under the name C<METHOD>. See RT #48565.
-
-=item * C<PCCINVOKE> [post 0.5.2]
-
-The syntax for passing named arguments to C<PCCINVOKE> will change from
-:named['key'] to :named('key') to better match PDD 3. See RT #42292.
-
-=back
+None planned.
 
 =head1 vtable entries
 
@@ -77,10 +65,6 @@ See RT #47011.
 =item * C<pmc_namespace>  [post 0.5.1]
 
 See RT# 48144. Replaced by C<get_namespace>.
-
-=item * C<DYNSELF> [post 0.5.2]
-
-Replaced by C<SELF>. (Old behavior of C<SELF> changes to C<STATICSELF>.)
 
 =back
 
