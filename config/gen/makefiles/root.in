@@ -1520,10 +1520,6 @@ buildtools_tests :
 manifest_tests :
 	$(PERL) t/harness $(MANIFEST_TEST_FILES)
 
-# obsolete
-testbench :
-	@echo "Please use the target benchmark_tests."
-
 # benchmark tests
 benchmark_tests : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(BENCHMARK_TEST_FILES)
