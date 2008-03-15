@@ -227,7 +227,7 @@ Appends C<*value> to the key.
 
 */
 
-    void push_pmc(PMC *value /*NN*/) {
+    void push_pmc(PMC *value) {
         if (value->vtable->base_type != enum_class_Key)
             real_exception(interp, NULL, INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
@@ -384,7 +384,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         (info->visit_pmc_now)(INTERP, *pos, info);
     }
 
-    void freeze(visit_info *info /*NN*/) {
+    void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         /* write flags */
@@ -416,7 +416,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    void thaw(visit_info *info /*NN*/) {
+    void thaw(visit_info *info) {
         IMAGE_IO * const io    = info->image_io;
         INTVAL     const flags = VTABLE_shift_integer(INTERP, io)
                                     & KEY_type_FLAGS;
