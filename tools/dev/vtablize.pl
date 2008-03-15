@@ -25,6 +25,8 @@ docs/pdds/pdd17_pmc.pod
 
 =cut
 
+use strict;
+use warnings;
 
 s/^(\s*)(void\s+init\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+init_pmc\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
