@@ -1584,10 +1584,10 @@ C<add_method> vtable method.
 
 */
     METHOD add_method(STRING *name, PMC *sub,
-                              int vtable :optional :named["vtable"],
+                              int vtable     :optional :named("vtable"),
                               int has_vtable :opt_flag,
-                              int anon :optional :named["anon"],
-                              int has_anon :opt_flag)
+                              int anon       :optional :named("anon"),
+                              int has_anon   :opt_flag)
     {
         /* If it's a vtable method... */
         if (has_vtable && vtable) {
@@ -1677,8 +1677,8 @@ Return the roles array PMC.
 
 /*
 
-=item C<void add_role(PMC *role, PMC *exclude :optional :named["exclude"],
-PMC *alias :optional :named["alias"])>
+=item C<void add_role(PMC *role, PMC *exclude :optional :named("exclude"),
+PMC *alias :optional :named("alias"))>
 
 Compose a role into a class with the given exclusions and aliases.
 
@@ -1686,9 +1686,9 @@ Compose a role into a class with the given exclusions and aliases.
 
 */
     METHOD add_role(PMC *role,
-            PMC *exclude_method     :optional :named["exclude_method"],
+            PMC *exclude_method     :optional :named("exclude_method"),
             int has_exclude_method  :opt_flag,
-            PMC *alias_method       :optional :named["alias_method"],
+            PMC *alias_method       :optional :named("alias_method"),
             int has_alias_method    :opt_flag) {
 
         Parrot_Class * const _class = PARROT_CLASS(SELF);

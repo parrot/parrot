@@ -682,10 +682,10 @@ Return the roles array PMC.
 
 =item C<METHOD
     add_role(PMC *role,
-            PMC *exclude_method :optional :named["exclude_method"],
-            int got_exclude_method :opt_flag,
-            PMC *alias_method :optional :named["alias_method"],
-            int got_alias_method :opt_flag)>
+            PMC *exclude_method     :optional :named("exclude_method"),
+            int  got_exclude_method :opt_flag,
+            PMC *alias_method       :optional :named("alias_method"),
+            int  got_alias_method   :opt_flag)>
 
 Compose the given role into this one, using the given exclusions and aliases.
 
@@ -693,10 +693,10 @@ Compose the given role into this one, using the given exclusions and aliases.
 
 */
     METHOD add_role(PMC *role,
-            PMC *exclude_method :optional :named["exclude_method"],
-            int got_exclude_method :opt_flag,
-            PMC *alias_method :optional :named["alias_method"],
-            int got_alias_method :opt_flag) {
+            PMC *exclude_method     :optional :named("exclude_method"),
+            int  got_exclude_method :opt_flag,
+            PMC *alias_method       :optional :named("alias_method"),
+            int  got_alias_method   :opt_flag) {
         Parrot_Role *role_info = PARROT_ROLE(SELF);
         STRING *s_name, *r_name;
 

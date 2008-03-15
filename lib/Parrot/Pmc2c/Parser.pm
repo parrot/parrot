@@ -163,7 +163,17 @@ sub find_methods {
 
         ((?:\w+\s*?\**\s*)?\w+) # method name (includes return type)
         \s*
-        \( ([^\(]*) \)          # parameters
+        \((                     # parameters
+            (?:\w+\s*\*?        # type (pointer optional)
+            \s*
+            \w+                 # argument name
+            (?:
+              \s+:\w+           # attribute
+              (?:\("[^\)]+"\))? # with optional parameter
+            )*
+            ,?\s*               # probably a comma and whitespace
+            )*                  # zero or more of these bad boys
+        )\)
         \s*
         ((?::(\w+)\s*)*)        # method attrs
         \s*
@@ -173,7 +183,7 @@ sub find_methods {
         my ( $decorators, $marker, $methodname, $parameters, $rawattrs ) =
             ( $2, $3, $4, $5, $6 );
         my $attrs = parse_method_attrs($rawattrs) if defined $rawattrs;
-        $lineno += count_newlines($1);
+        $lineno  += count_newlines($1);
 
         my $returntype = '';
 

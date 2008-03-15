@@ -48,7 +48,7 @@ pmclass PCCMETHOD_Test need_ext provides hash {
         RETURN(int 1000, STRING *kevin);
     }
 
-    METHOD test_method3(PMC *a1 :named["a1name"], PMC *a2  :named["a2name"])
+    METHOD test_method3(PMC *a1 :named("a1name"), PMC *a2  :named("a2name"))
     {
         UNUSED(SELF);
         PIO_printf(interp, "test_method3\n");

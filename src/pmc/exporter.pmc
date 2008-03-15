@@ -304,9 +304,9 @@ Throws an exception if an unknown PMC type is passed.
 /*
 
 =item C<METHOD
-    import(PMC *dest    :optional :named["destination"], int got_dest :opt_flag,
-        PMC    *src     :optional :named["source"],      int got_src  :opt_flag,
-        PMC    *globals :optional :named["globals"], int got_globals  :opt_flag)>
+    import(PMC *dest    :optional :named("destination"), int got_dest :opt_flag,
+        PMC    *src     :optional :named("source"),      int got_src  :opt_flag,
+        PMC    *globals :optional :named("globals"), int got_globals  :opt_flag)>
 
 Import C<globals> from the C<src> namespace to the C<dest> namespace.
 If C<src>, C<dest>, or C<globals> are passed, they override the current value.
@@ -319,9 +319,12 @@ Throws an exception upon error.
 
 */
 
-    METHOD import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
-            PMC *src     :optional :named["source"],  int got_src     :opt_flag,
-            PMC *globals :optional :named["globals"], int got_globals :opt_flag) {
+    METHOD import(PMC *dest        :optional :named("destination"),
+                  int  got_dest    :opt_flag,
+                  PMC *src         :optional :named("source"),
+                  int  got_src     :opt_flag,
+                  PMC *globals     :optional :named("globals"),
+                  int  got_globals :opt_flag) {
 
         PMC *ns_src, *ns_dest, *ns_globals;
 

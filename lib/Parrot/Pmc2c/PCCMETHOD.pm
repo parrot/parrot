@@ -277,16 +277,18 @@ sub parse_p_args_string {
     my $linear_args  = [];
 
     for my $x ( split /,/, $parameters ) {
-        my ( $type, $name, $rest ) = split / /, trim($x), 3;
+        my ( $type, $name, $rest ) = split /\s+/, trim($x), 3;
 
         die "invalid PCC arg '$x': did you forget to specify a type?\n"
              unless defined $name;
 
-        $name   =~ /[\**]?(\"?[\w_]+\"?)/;
+        if ($name =~ /[\**]?(\"?\w+\"?)/) {
+            $name = $1;
+        }
 
         my $arg = {
             type  => convert_type_string_to_reg_type($type),
-            name  => $1,
+            name  => $name,
             attrs => parse_adverb_attributes($rest)
         };
 
@@ -300,7 +302,7 @@ sub is_named {
     my ($arg) = @_;
 
     while ( my ( $k, $v ) = each( %{ $arg->{attrs} } ) ) {
-        return ( 1, $1 ) if $k =~ /named\[(.*)\]/;
+        return ( 1, $1 ) if $k =~ /named\((.*)\)/;
     }
 
     return ( 0, '' );
