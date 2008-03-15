@@ -1191,6 +1191,9 @@ check_named(PARROT_INTERP, ARGMOD(call_state *st))
                 idx = st->dest.u.op.pc[i];
                 store_arg(st, idx);
 
+                /* Don't walk off the end of the array */
+                if (i+1 >= st->dest.n)
+                    continue;
                 arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i+1);
                 if (arg_sig & PARROT_ARG_OPT_FLAG) {
                     i++;
