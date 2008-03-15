@@ -69,6 +69,67 @@ Dumps the constant C<self>.
 
 */
 
+/* [this desperately needs better abstraction, so we're not duplicating the enum
+ * PObj_enum definition in the include/parrot/pobj.h file.  -- rgr, 1-Mar-08.]
+ */
+static const char *flag_bit_names[] =
+{
+    "private0",
+    "private1",
+    "private2",
+    "private3",
+    "private4",
+    "private5",
+    "private6",
+    "private7",
+    "is_string",
+    "is_PMC",
+    "is_PMC_EXT",
+    "is_shared",
+    "constant",
+    "external",
+    "aligned",
+    "sysmem",
+    "COW",
+    "is_COWable",
+    "live",
+    "on_free_list",
+    "custom_mark",
+    "custom_GC",
+    "active_destroy",
+    "report",
+    "data_is_PMC_array",
+    "need_finalize",
+    "is_special_PMC",
+    "high_priority_DOD",
+    "needs_early_DOD",
+    "is_class",
+    "is_object"
+};
+
+static void
+pobj_flag_dump(PARROT_INTERP, ARGIN(long flags))
+/* Given a word of flags, generate a dump line of the whole word in hex,
+ * followed by individual bits.
+ */
+{
+    INTVAL idx = 0;
+    int printed_flag_p = 0;
+
+    PIO_printf(interp, "\tFLAGS => 0x%04lx (", flags);
+    while (flags) {
+        if (flags & 1) {
+            if (printed_flag_p)
+                PIO_printf(interp, ",");
+            PIO_printf(interp, "%s", flag_bit_names[idx]);
+            printed_flag_p++;
+        }
+        idx++;
+        flags >>= 1;
+    }
+    PIO_printf(interp, ")\n");
+}
+
 static void
 PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                        ARGIN(const PackFile_Constant *self))
@@ -84,8 +145,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
     case PFC_STRING:
         PIO_printf(interp, "    [ 'PFC_STRING', {\n");
-        PIO_printf(interp, "        FLAGS    => 0x%04lx,\n",
-                   (long)PObj_get_FLAGS(self->u.string));
+        pobj_flag_dump(interp, (long)PObj_get_FLAGS(self->u.string));
         PIO_printf(interp, "        CHARSET  => %ld,\n",
                    self->u.string->charset);
         PIO_printf(interp, "        SIZE     => %ld,\n",
@@ -98,34 +158,28 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         break;
 
     case PFC_KEY:
-        PIO_printf(interp, "    [ 'PFC_KEY");
         for (i = 0, key = self->u.key; key; key = PMC_data(key), i++)
             ;
         /* number of key components */
-        PIO_printf(interp, " %ld items\n", i);
+        PIO_printf(interp, "    [ 'PFC_KEY' (%ld items)\n", i);
         /* and now type / value per component */
         for (key = self->u.key; key; key = PMC_data(key)) {
             opcode_t type = PObj_get_FLAGS(key);
-            opcode_t slice_bits = 0; /* XXX slice_bits gets set, but never used */
 
             PIO_printf(interp, "       {\n");
-            slice_bits = 0;
             if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==
                 (KEY_start_slice_FLAG|KEY_inf_slice_FLAG))
                 PIO_printf(interp, "        SLICE_BITS  => PF_VT_END_INF\n");
             if ((type & (KEY_end_slice_FLAG|KEY_inf_slice_FLAG)) ==
                 (KEY_end_slice_FLAG|KEY_inf_slice_FLAG))
-                slice_bits |= PF_VT_START_ZERO;
                 PIO_printf(interp, "        SLICE_BITS  => PF_VT_START_ZERO\n");
             if (type & KEY_start_slice_FLAG)
-                slice_bits |= PF_VT_START_SLICE;
                 PIO_printf(interp, "        SLICE_BITS  => PF_VT_START_SLICE\n");
             if (type & KEY_end_slice_FLAG)
-                slice_bits |= PF_VT_END_SLICE;
                 PIO_printf(interp, "        SLICE_BITS  => PF_VT_END_SLICE\n");
 
             type &= KEY_type_FLAGS;
-            PIO_printf(interp, "        FLAGS       => 0x%04lx,\n", (long)PObj_get_FLAGS(key));
+            pobj_flag_dump(interp, (long)PObj_get_FLAGS(key));
             switch (type) {
                 case KEY_integer_FLAG:
                     PIO_printf(interp, "        TYPE        => INTEGER\n");
@@ -196,6 +250,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
             STRING * const null = const_string(interp, "(null)");
             STRING *namespace_description;
 
+            pobj_flag_dump(interp, (long)PObj_get_FLAGS(pmc));
             switch (pmc->vtable->base_type) {
                 case enum_class_FixedBooleanArray:
                 case enum_class_FixedFloatArray:
@@ -219,6 +274,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     }
                     break;
                 case enum_class_Sub:
+                case enum_class_Closure:
                 case enum_class_Coroutine:
                     sub = PMC_sub(pmc);
                     if (sub->namespace_name) {

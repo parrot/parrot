@@ -202,6 +202,9 @@ typedef struct PMC_EXT {
 typedef enum PObj_enum {
     /* This first 8 flags may be used privately by a Parrot Object.
      * You should alias these within an individual class's header file.
+     *
+     * Note:  If the meanings of these flags are changed, then the symbolic
+     * names kept in flag_bit_names (see src/packdump.c) must also be updated.
      */
     PObj_private0_FLAG          = POBJ_FLAG(0),
     PObj_private1_FLAG          = POBJ_FLAG(1),
