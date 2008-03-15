@@ -158,11 +158,18 @@ is( $a[1], "world", 'array read' );
 
 ok( $f3->modified_since($time), 'modified_since' );
 
-$f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
-ok( $f->has_svn_id(), 'has_svn_id' );
+SKIP: {
+    my $nul = File::Spec->devnull;
 
-ok($f->svn_id() =~ /^(?:\$)Id:.*?File.pm \d+ \d{4}-\d\d-\d\d.*?[^\$]+ \$$/,
-    'svn_id');
+    skip( 'git-svn does not expand keywords', 2 )
+      if my @git_svn_info = qx/git svn log --limit=1 2>$nul/ and $? == 0;
+
+    $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
+    ok( $f->has_svn_id(), 'has_svn_id' );
+
+    ok($f->svn_id() =~ /^(?:\$)Id:.*?File.pm \d+ \d{4}-\d\d-\d\d.*?[^\$]+ \$$/,
+       'svn_id');
+}
 
 $f3->delete();
 @a = $d2->files();
