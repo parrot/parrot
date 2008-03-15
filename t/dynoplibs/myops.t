@@ -111,6 +111,7 @@ OUTPUT
 
 SKIP: {
     skip "three alarms, infinite loop under mingw32", 2 if $is_mingw;
+    skip "dynops weird in CGP with events", 2 if $ENV{TEST_PROG_ARGS} =~ /-g/;
 
     my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
        ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
