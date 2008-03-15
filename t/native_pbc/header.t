@@ -50,14 +50,14 @@ my @fields = qw(
 my %h;
 @h{@fields} = unpack "a8CCCCCCa10a8", $pbc;
 
-is( $h{magic}, "\xfe\x50\x42\x43\x0d\x0a\x1a\x0a", "magic string" );
+is( $h{magic}, "\xfe\x50\x42\x43\x0a\x1a\x0a\cD", "magic string" );
 ok( $h{wordsize} < 2,  "wordsize" );
 ok( $h{byteorder} < 2, "byteorder" );
 is( $h{major}, $PConfig{MAJOR}, "major version" );
 is( $h{minor}, $PConfig{MINOR}, "minor version" );
-ok( $h{intval} == 4 || $h{intval} == 8, "intval" );
-ok( $h{floattype} < 2, "floattype" );
-is( $h{padding}, pack "x8", "NULL padding" );
+ok( $h{intval} == 3 || $h{intval} == 4 || $h{intval} == 8, "intval" );
+ok( $h{floattype} < 4, "floattype" );
+is( $h{padding}, pack("x7")."\cA", "NULL padding" );
 
 # Local Variables:
 #   mode: cperl

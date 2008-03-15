@@ -100,6 +100,11 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     $I0 = typeof libsdl
     if $I0 != .Undef goto OK_HINT2
 
+    # cygwin
+    loadlib libsdl, 'cygSDL-1-2-0'
+    $I0 = typeof libsdl
+    if $I0 != .Undef goto OK
+
     # failed to load libSDL
     $P0 = new 'Exception'
     $P0["_message"] = "libSDL not found!"
@@ -186,6 +191,10 @@ SDL::Image library anyway, which calls this for you.
     $I0 = typeof image_lib
     if $I0 != .Undef goto OK_HINT2
 
+    loadlib image_lib, 'cygSDL_image-1-2-0'
+    $I0 = typeof image_lib
+    if $I0 != .Undef goto OK
+
     # failed to load libSDL
     $P0 = new 'Exception'
     $P0["_message"] = "libSDL_image not found!"
@@ -214,6 +223,8 @@ SDL::Font library anyway, which calls this for you.
 .sub _init_ttf
     .local pmc ttf_lib
     loadlib ttf_lib, 'libSDL_ttf'
+    if ttf_lib goto initialize
+    loadlib ttf_lib, 'cygSDL_ttf-2-0-0'
     unless ttf_lib goto error
 
   initialize:

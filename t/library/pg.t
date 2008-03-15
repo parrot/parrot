@@ -35,7 +35,10 @@ table, which should be created by your sysadmin.
 
     # TODO: fix when exception handling works again
     loadlib $P0, 'libpq'
+    if $P0 goto have_lib
+    loadlib $P0, 'pq'
     unless $P0 goto no_pg
+ have_lib:
     load_bytecode 'postgres.pir'
     pop_eh
     test.'ok'(1, 'load_bytecode')

@@ -123,6 +123,7 @@ sub runstep {
                 || ( $osname eq 'netbsd' )
                 || ( $osname eq 'linux' )
                 || ( $osname eq 'darwin' )
+                || ( $osname eq 'cygwin' )
                 || ( $osname eq 'MSWin32' ) )
             {
                 $execcapable = 0;

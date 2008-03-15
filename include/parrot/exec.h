@@ -33,7 +33,7 @@
 #  if defined(PARROT_EXEC_OS_FREEBSD) || defined(PARROT_EXEC_OS_NETBSD) || defined(PARROT_EXEC_OS_LINUX)
 #    define EXEC_ELF
 #  endif
-#  ifdef PARROT_EXEC_OS_MSWIN32
+#  if defined(PARROT_EXEC_OS_MSWIN32) || defined(PARROT_EXEC_OS_CYGWIN)
 #    define EXEC_COFF
 #  endif
 

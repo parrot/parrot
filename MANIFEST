@@ -24,6 +24,7 @@ NEWS                                                        [devel]doc
 PBC_COMPAT                                                  [devel]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
+README_cygwin.pod                                           []
 README_win32.pod                                            []
 RESPONSIBLE_PARTIES                                         [main]doc
 TODO                                                        [main]doc
@@ -260,6 +261,7 @@ config/auto/isreg.pm                                        []
 config/auto/isreg/test_c.in                                 []
 config/auto/jit.pm                                          []
 config/auto/jit/test_c.in                                   []
+config/auto/jit/test_exec_cygwin.in                         []
 config/auto/jit/test_exec_linux.in                          []
 config/auto/jit/test_exec_openbsd.in                        []
 config/auto/m4.pm                                           []

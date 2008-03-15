@@ -268,6 +268,22 @@ get_path(PARROT_INTERP, ARGMOD(STRING *lib), ARGOUT(void **handle),
         }
     }
 #endif
+
+    /* And on cygwin replace a leading "lib" by "cyg". */
+#ifdef __CYGWIN__
+    if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
+        strcpy(path->strstart, lib->strstart);
+
+        path->strstart[0] = 'c';
+        path->strstart[1] = 'y';
+        path->strstart[2] = 'g';
+
+        *handle           = Parrot_dlopen(path->strstart);
+
+        if (*handle)
+            return path;
+    }
+#endif
     err = Parrot_dlerror();
     Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                 "Couldn't load '%Ss': %s\n",
