@@ -62,7 +62,7 @@ sub get_version {
     my $v = <$IN>;
     close $IN;
     $v =~ /^(\d+)\.(\d+)/;
-    
+
     return ( $1, $2 );
 }
 
