@@ -1,27 +1,30 @@
 #!perl
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
+use 5.008;
 
-my $opt_v = 0;  # XXX perhaps add Getopt::Long
+use Getopt::Long;
+
+my $opt_verbose = 0;
+GetOptions( 'verbose'  => \$opt_verbose );
 
 die "usage: $0 path/to/embed.h path/to/Embed.xs\n"
     unless @ARGV == 2;
 
 my ($embed_h, $embed_xs) = @ARGV;
 
-
 my $embed_funcs_h_ref  = extract_parrot_funcs($embed_h);
-print "$embed_h: @{[ sort keys %$embed_funcs_h_ref ]}\n" if $opt_v;
+print "$embed_h: @{[ sort keys %$embed_funcs_h_ref ]}\n" if $opt_verbose;
 
 my $embed_funcs_xs_ref = extract_parrot_funcs($embed_xs);
-print "$embed_xs: @{[ sort keys %$embed_funcs_xs_ref ]}\n" if $opt_v;
+print "$embed_xs: @{[ sort keys %$embed_funcs_xs_ref ]}\n" if $opt_verbose;
 
-my %funcs_not_used = %$embed_funcs_h_ref;
-delete @funcs_not_used{ keys %$embed_funcs_xs_ref };
+my %funcs_not_used = %{ $embed_funcs_h_ref };
+delete @funcs_not_used{ keys %{ $embed_funcs_xs_ref } };
 
 if (%funcs_not_used) {
 

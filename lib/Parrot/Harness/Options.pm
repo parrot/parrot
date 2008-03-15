@@ -24,6 +24,7 @@ our @EXPORT_OK = qw(
 
 sub handle_long_options {
     my @argv = @_;
+
     my %longopts;
     $longopts{running_make_test} = grep { $_ eq '--running-make-test' } @argv;
     @argv = grep { $_ ne '--running-make-test' } @argv;
@@ -51,13 +52,17 @@ sub handle_long_options {
 
 sub get_test_prog_args {
     my ($optsref, $gc_debug, $run_exec) = @_;
+
     my %opts = %{ $optsref };
     my $args = join(' ', map { "-$_" } keys %opts );
     $args =~ s/-O/-O$opts{O}/ if exists $opts{O};
     $args =~ s/-D/-D$opts{D}/;
     $args .= ' --gc-debug'    if $gc_debug;
-    # XXX find better way for passing run_exec to Parrot::Test
+    ## no critic qw(Bangs::ProhibitFlagComments)
+    # XXX find better way
+    # for passing run_exec to Parrot::Test
     $args .= ' --run-exec'    if $run_exec;
+
     return $args;
 }
 
@@ -83,6 +88,8 @@ perl t/harness [options] [testfiles]
     --runcore-tests
     --html
 EOF
+
+    return;
 }
 
 1;
