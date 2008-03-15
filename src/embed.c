@@ -442,9 +442,9 @@ again:
             cursor = (char *)program_code + program_size;
         }
 
-        if (read_result < 0) {
-            PIO_eprintf(interp,
-                    "Parrot VM: Problem reading packfile from PIO.\n");
+        if (ferror(io)) {
+            PIO_eprintf(interp, "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
+                        ferror(io));
             return NULL;
         }
         fclose(io);
