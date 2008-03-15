@@ -64,7 +64,7 @@ foreach my $file (@files) {
     my $i            = 1;
 
     # get the lines just matching isxxx
-    my @isxxx_lines  = grep { $_->[0] =~ /[^_]($isxxx_functions)\(/ }
+    my @isxxx_lines  = grep { $_->[0] =~ /[^_]($isxxx_functions)\([^)]+/ }
         map { [ $_, $i++ ] } @buffer_lines;
 
     next unless @isxxx_lines;
