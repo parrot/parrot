@@ -476,7 +476,8 @@ Parrot_dod_trace_pmc_data(PARROT_INTERP, ARGIN(PMC *p))
 
     if (data) {
         INTVAL i;
-        for (i = 0; i < PMC_int_val(p); i++)
+
+        for (i = PMC_int_val(p) - 1; i >= 0; --i)
             if (data[i])
                 pobject_lives(interp, (PObj *)data[i]);
     }

@@ -694,28 +694,34 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
 {
     Arenas * const arena_base = interp->arena_base;
 
-    if ((flag & (POOL_PMC | POOL_CONST)) == (POOL_PMC | POOL_CONST)) {
-        const int ret_val = (func)(interp, arena_base->constant_pmc_pool,
-                POOL_PMC | POOL_CONST, arg);
-        if (ret_val)
-            return ret_val;
-    }
     if (flag & POOL_PMC) {
-        const int ret_val = (func)(interp, arena_base->pmc_pool, POOL_PMC, arg);
-        if (ret_val)
-            return ret_val;
-    }
-    if ((flag & (POOL_BUFFER | POOL_CONST)) == (POOL_BUFFER | POOL_CONST)) {
-        const int ret_val = (func)(interp, arena_base->constant_string_header_pool,
-                POOL_BUFFER | POOL_CONST, arg);
+        Small_Object_Pool *pool = flag & POOL_CONST
+            ? arena_base->constant_pmc_pool
+            : arena_base->pmc_pool;
+
+        const int ret_val = (func)(interp, pool,
+            flag & (POOL_PMC | POOL_CONST) , arg);
+
         if (ret_val)
             return ret_val;
     }
 
+
     if (flag & POOL_BUFFER) {
-        int i;
-        for (i = 0; i < (INTVAL)interp->arena_base->num_sized; i++) {
+        INTVAL i;
+
+        if (flag & POOL_CONST) {
+            const int ret_val = (func)(interp,
+                arena_base->constant_string_header_pool,
+                POOL_BUFFER | POOL_CONST, arg);
+
+            if (ret_val)
+                return ret_val;
+        }
+
+        for (i = interp->arena_base->num_sized - 1; i >= 0; --i) {
             Small_Object_Pool * const pool = arena_base->sized_header_pools[i];
+
             if (pool) {
                 const int ret_val = (func)(interp, pool, POOL_BUFFER, arg);
                 if (ret_val)
@@ -723,6 +729,7 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
             }
         }
     }
+
     return 0;
 }
 
