@@ -1,3 +1,7 @@
+# $Id$
+#
+# This file describes the CPAN distribution for Parrot.
+# See http://module-build.sourceforge.net/META-spec-current.html for details.
 ---
 name: parrot
 version: 0.5.3
@@ -28,6 +32,7 @@ no_index:
         - Parrot::OpTrans::Compiled
         - Parrot::OpsFile
 resources:
-    homepage: http://parrotcode.org/
-    bugtracker: https://rt.perl.org/rt3/
+    homepage:   'http://parrotcode.org/'
+    license:    'http://opensource.org/licenses/artistic-license-2.0.php'
+    bugtracker: 'https://rt.perl.org/rt3/'
 generated_by: Humans
