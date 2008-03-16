@@ -33,6 +33,7 @@ PGE.pbc: $(PARROT) $(SOURCES)
 	$(PERL) -e "" >PGE/builtins_gen.pir
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
 	$(PARROT) $(PARROT_LIBRARY)/PGE/Perl6Grammar.pir  --output=PGE/builtins_gen.pir PGE/builtins.pg
+	$(RM_F) PGE.pbc
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
 
 # This is a listing of all targets, that are meant to be called by users

@@ -479,6 +479,7 @@ EOF
 close $S;
 
 # compile to pbc
+unlink "$temp.pbc";
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
 c_output_is( <<'CODE', <<'OUTPUT', "call a parrot sub, catch exception" );
@@ -576,6 +577,7 @@ EOF
 close $S;
 
 # compile to pbc
+unlink "$temp.pbc";
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pir");
 
 c_output_is( <<'CODE', <<'OUTPUT', "eval code through a parrot sub - #39669" );

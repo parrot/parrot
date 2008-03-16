@@ -311,13 +311,15 @@ pir_output_is( <<'CODE', <<'OUTPUT', "eval.get_string - same file" );
 .sub main :main
 
   .local pmc f1, f2
-  .local pmc io
+  .local pmc io, os
   f1 = compi("foo_1", "hello from foo_1")
   $S0 = f1
   io = open "temp.pbc", ">"
   print io, $S0
   close io
   load_bytecode "temp.pbc"
+  os = new 'OS'
+  os.rm("temp.pbc")
   f2 = compi("foo_2", "hello from foo_2")
   io = open "temp.pbc", ">"
   print io, f2

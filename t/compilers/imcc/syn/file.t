@@ -191,6 +191,7 @@ close $FOO;
 
 # compile it
 
+unlink 'temp.pbc';
 system_or_die( $PARROT, qw( -o temp.pbc temp.pir ) );
 
 pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc, return' );
@@ -230,6 +231,7 @@ close $FOO;
 
 # compile it
 
+unlink 'temp.pbc';
 system("$PARROT -o temp.pbc temp.pir");
 
 pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc with 2 subs' );
@@ -333,6 +335,7 @@ close $FOO;
 
 # compile it
 
+unlink 'temp.pbc';
 system_or_die( $PARROT, qw( -o temp.pbc temp.pir ) );
 
 use Test::More;
