@@ -135,7 +135,7 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) t/harness t/00-parrot t/01-sanity
+	$(PERL) t/harness
 
 # this target has nothing to do
 testclean:
