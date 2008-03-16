@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <openssl/opensslv.h>
+#include <openssl/sha.h> /* For SHA256_CTX */
 #include <openssl/err.h>
 
 int main(int argc, char *argv[])
 {
+    SHA256_CTX c; /* Only available in 0.9.8 and later */
     unsigned long dummy = ERR_get_error();
 
     printf ("%s\n", OPENSSL_VERSION_TEXT);
