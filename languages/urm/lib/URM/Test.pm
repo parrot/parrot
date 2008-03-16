@@ -21,7 +21,9 @@ sub import {
 
     Test::More->import( $plan, @args );
 
-    __PACKAGE__->_export_to_level( 2, __PACKAGE__ );
+    # __PACKAGE__->_export_to_level( 2, __PACKAGE__ );
+    my $callpkg = caller(2);
+    __PACKAGE__->export($callpkg);
 }
 
 my $count;
