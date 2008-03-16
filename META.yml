@@ -8,13 +8,11 @@ no_index:
     directory:
         - config
         - languages
-        - lib/Class
         - lib/Digest
         - lib/File
         - lib/Parse
         - lib/Perl/Critic
         - lib/Pod
-        - lib/Text
         - t
         - tools
     file:
