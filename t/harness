@@ -1,13 +1,13 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
-
 
 use strict;
 use warnings;
-use Getopt::Std;
-use Test::Harness();
 use lib qw( lib );
+
+use Getopt::Std;
+use Test::Harness ();
 use Parrot::Harness::DefaultTests;
 use Parrot::Harness::Options qw(
     handle_long_options
@@ -19,8 +19,7 @@ use Parrot::Harness::Smoke qw(
 );
 
 local @ARGV = @ARGV;
-my $longopts;
-($longopts, @ARGV) = handle_long_options(@ARGV);
+(my $longopts, @ARGV) = handle_long_options(@ARGV);
 
 $ENV{RUNNING_MAKE_TEST} = $longopts->{running_make_test};
 
@@ -38,7 +37,8 @@ if ($opts{'?'} || $opts{h} || $longopts->{help}) {
 $opts{D} = sprintf( '%x', hex(40) | (exists $opts{D} ? hex($opts{D}) : 0));
 
 my $args = get_test_prog_args(
-    \%opts, $longopts->{gc_debug}, $longopts->{run_exec});
+    \%opts, $longopts->{gc_debug}, $longopts->{run_exec}
+);
 $ENV{TEST_PROG_ARGS} = $args;
 
 # now build the list of tests to run, either from the command
@@ -50,9 +50,10 @@ my @default_tests = get_default_tests(
 
 my @tests = map { glob( $_ ) } (@ARGV ? @ARGV : @default_tests);
 
-if (!$longopts->{html}) {
+if ( ! $longopts->{html} ) {
     Test::Harness::runtests(@tests);
-} else {
+}
+else {
     generate_html_smoke_report ( {
         tests       => \@tests,
         args        => $args,
