@@ -7,7 +7,6 @@
 # format of this file.
 # See docs/submissions.pod on how to recreate this file after SVN
 # has been told about new or deleted files.
-ABI_CHANGES                                                 []
 CREDITS                                                     []
 ChangeLog                                                   []
 Configure.pl                                                []
