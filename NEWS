@@ -1,6 +1,6 @@
 # $Id$
 
-New in r26831
+New in r26416
 - Specification
   + launched pdd18_security.pod
   + updated pdd17_pmc.pod
@@ -9,6 +9,7 @@ New in r26831
   + cleanup of IMCC documentation
 - Configuration
   + add step auto::gettext
+  + add step auto::crypto
 - Compilers
   + PCT:
     . Fix '-e' option
@@ -45,9 +46,7 @@ New in r26831
 - Miscellaneous
   + various bugfixes, code cleanups and coding standard fixes
   + consting
-  + remove externale Perl 5 modules from the Parrot distribution
-
-
+  + remove external Perl 5 modules from the Parrot distribution
 
 New in 0.5.3
 - Documentation

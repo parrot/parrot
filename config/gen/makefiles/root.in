@@ -1445,20 +1445,20 @@ check : test
 # Test various run cores and other stuff
 # 'testC', 'testg' and 'testj' are tested only
 # when the needed runcores are available
-fulltest : \
-    testb \
-#CONDITIONED_LINE(cg_flag):    testC \
-    testf \
-#CONDITIONED_LINE(cg_flag):    testg \
-#CONDITIONED_LINE(jitcapable):    testj \
-    testr \
-    testS \
-    src_tests \
-    perl_tests \
-    codingstd_tests \
-    benchmark_tests \
-    doc_tests \
-    distro_tests
+fulltest :
+	-@make@ testb
+#CONDITIONED_LINE(cg_flag):	-@make@ testC
+	-@make@ testf
+#CONDITIONED_LINE(cg_flag):	-@make@ testg
+#CONDITIONED_LINE(cg_flag):	-@make@ testj
+	-@make@ testr
+	-@make@ testS
+	-@make@ src_tests
+	-@make@ perl_tests
+	-@make@ codingstd_tests
+	-@make@ benchmark_tests
+	-@make@ doc_tests
+	-@make@ distro_tests
 
 # bounds checking, slow core
 testb : test_prep
