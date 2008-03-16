@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007 - 2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ my $filehandle;
 open $filehandle, '>', "$external_lib" or die "Can't write $external_lib";
 print $filehandle <<'EOF';
     .namespace ['Foo']
-    
+
     .sub 'bar_method' :method
         say 'in bar_method'
     .end
@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<'OUT', 'loading a set of methods from a file' );
     $P1 = new 'Foo'
     $P1.'bar_method'()
 .end
-    
+
 .namespace ['Foo']
 .sub 'foo_method' :method
     say 'in foo_method'
@@ -82,6 +82,33 @@ END
 CODE
 in foo_method
 in bar_method
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "overridden find_method() should not eat passed-in args (RT #48134)" );
+.sub 'main' :main
+    $P0 = newclass 'Obj'
+    $P2 = new 'Obj'
+    $P2.'some_method'(42)
+.end
+
+.namespace ['Obj']
+
+.sub 'meth' :method
+    .param pmc a
+    say a
+.end
+
+.sub 'find_method' :vtable :method
+    .param string meth_name
+
+    say meth_name
+
+    .const .Sub meth = 'meth'
+    .return (meth)
+.end
+CODE
+some_method
+42
 OUT
 
 # Local Variables:
