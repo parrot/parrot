@@ -320,19 +320,20 @@ END_BODY
     .param string exefile
 
     $P0 = '_config'()
-    .local string cc, ld, linkflags, ld_out, libparrot, libs, o, rpath
-    .local string osname, build_dir, slash
-    cc        = $P0['cc']
-    ld        = $P0['ld']
-    linkflags = $P0['linkflags']
-    ld_out    = $P0['ld_out']
-    libparrot = $P0['libparrot_ldflags']
-    libs      = $P0['libs']
-    o         = $P0['o']
-    rpath     = $P0['rpath_blib']
-    osname    = $P0['osname']
-    build_dir = $P0['build_dir']
-    slash     = $P0['slash']
+    .local string cc, ld, link_dynamic, linkflags, ld_out, libparrot, libs, o
+    .local string rpath, osname, build_dir, slash
+    cc           = $P0['cc']
+    ld           = $P0['ld']
+    link_dynamic = $P0['link_dynamic']
+    linkflags    = $P0['linkflags']
+    ld_out       = $P0['ld_out']
+    libparrot    = $P0['libparrot_ldflags']
+    libs         = $P0['libs']
+    o            = $P0['o']
+    rpath        = $P0['rpath_blib']
+    osname       = $P0['osname']
+    build_dir    = $P0['build_dir']
+    slash        = $P0['slash']
 
     .local string config, pathquote
     config     = concat build_dir, slash
@@ -358,6 +359,8 @@ END_BODY
     link .= pathquote
     link .= objfile
     link .= pathquote
+    link .= ' '
+    link .= link_dynamic
     link .= ' '
     link .= linkflags
     link .= ' '
