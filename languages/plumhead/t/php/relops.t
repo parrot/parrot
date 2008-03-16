@@ -20,7 +20,7 @@ use warnings;
 use 5.006_001;
 
 use FindBin;
-use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
+use lib "$FindBin::Bin/../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;

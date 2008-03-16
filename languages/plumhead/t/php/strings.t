@@ -16,7 +16,7 @@ use warnings;
 use 5.006_001;
 
 use FindBin;
-use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
+use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
 use Test::More     tests => 5;
