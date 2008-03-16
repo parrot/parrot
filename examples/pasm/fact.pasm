@@ -33,30 +33,31 @@ loop:
 	print	"fact of "
 	print	I1
 	print	" is: "
-	set	I0,I1
+    new P0, 'Integer'
+	set	P0,I1
 	bsr	fact
-	print	I0
+	print	P0
 	print	"\n"
 	inc	I1
-	eq	I1,7,done
+	eq	I1,31,done
 	branch	loop
 done:
 	end
 
-# I0 is the number to compute
+# P0 is the number to compute
 fact:
         saveall
-	lt	I0,2,is_one
-	set	I1,I0
-	dec	I0
+	lt	P0,2,is_one
+	set	I1,P0
+	dec	P0
 	bsr	fact
-	mul	I0,I0,I1
-	save	I0
+	mul	P0,P0,I1
+	save	P0
 	branch	fact_done
 is_one:
-	set	I0,1
-	save	I0
+	set	P0,1
+	save	P0
 fact_done:
 	restoreall
-	restore	I0
+	restore	P0
 	ret
