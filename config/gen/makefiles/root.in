@@ -755,6 +755,8 @@ help :
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
 	@echo "  cover:             Run test suite coverage analysis."
+	@echo "  tags:              Create tags for the vi editor."
+	@echo "  TAGS:              Create tags for the EMACS editor."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
@@ -2152,6 +2154,21 @@ exec : $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
 $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
     @ld_out@$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
+
+# emacs etags
+# this needs exuberant-ctags
+
+TAGS: TAGS.dummy
+	$(RM_F) TAGS
+	@ctags@ -e \
+        --links=no --totals \
+        -R --exclude=blib --exclude=.svn  \
+        --exclude=res_lea.c \
+        --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
+        -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
+        $(CUR_DIR)
+
+TAGS.dummy:
 
 # vim ctags
 # this needs exuberant-ctags
