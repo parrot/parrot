@@ -11,7 +11,7 @@ use ExtUtils::Manifest;
 
 =head1 NAME
 
-t/distro/manifest.t - sanity check the MANIFEST file
+t/distro/manifest.t - check sanity of the MANIFEST file
 
 =head1 SYNOPSIS
 
