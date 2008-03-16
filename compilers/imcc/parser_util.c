@@ -1058,7 +1058,7 @@ imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
     if (sub)
         return sub;
 
-    real_exception(interp, "%Ss", E_Exception, error_message);
+    real_exception(interp, NULL, E_Exception, "%Ss", error_message);
 }
 
 /*
@@ -1082,7 +1082,7 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
     if (sub)
         return sub;
 
-    real_exception(interp, "%Ss", E_Exception, error_message);
+    real_exception(interp, NULL, E_Exception, "%Ss", error_message);
 }
 
 /*
