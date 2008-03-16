@@ -240,52 +240,53 @@ a float.
 static void
 gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 {
-    int i = 0;
-
+    int i    = 0;
     out[i++] = '%';
+
     if (info->flags) {
-        if (info->flags & FLAG_MINUS) {
+        if (info->flags & FLAG_MINUS)
             out[i++] = '-';
-        }
-        if (info->flags & FLAG_PLUS) {
+
+        if (info->flags & FLAG_PLUS)
             out[i++] = '+';
-        }
-        if (info->flags & FLAG_ZERO) {
+
+        if (info->flags & FLAG_ZERO)
             out[i++] = '0';
-        }
-        if (info->flags & FLAG_SPACE) {
+
+        if (info->flags & FLAG_SPACE)
             out[i++] = ' ';
-        }
-        if (info->flags & FLAG_SHARP) {
+
+        if (info->flags & FLAG_SHARP)
             out[i++] = '#';
-        }
     }
 
     if (info->flags & FLAG_WIDTH) {
-        if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1) {
+        if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1)
             info->width = PARROT_SPRINTF_BUFFER_SIZE;
-        }
+
         i += sprintf(out + i, "%u", (unsigned)info->width);
     }
 
     if (info->flags & FLAG_PREC) {
-        if (info->prec > PARROT_SPRINTF_MAX_PREC) {
+        if (info->prec > PARROT_SPRINTF_MAX_PREC)
             info->prec = PARROT_SPRINTF_MAX_PREC;
-        }
 
         out[i++] = '.';
-        i += sprintf(out + i, "%u", (unsigned)info->prec);
+        i       += sprintf(out + i, "%u", (unsigned)info->prec);
     }
+
     if (thingy == 'd' || thingy == 'i' ||thingy == 'u') {
-        /* theu?int isa HUGEU?INTVAL aka long long
+        /* the u?int isa HUGEU?INTVAL aka long long
          * the 'll' modifier is specced in susv3 - hopefully all our
          * compilers support it too */
         out[i++] = 'l';
         out[i++] = 'l';
     }
-    out[i++] = thingy;
-    out[i] = 0;
+
+    out[i++] = (char)thingy;
+    out[i]   = 0;
 }
+
 
 /*
 
