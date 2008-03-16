@@ -1682,6 +1682,7 @@ test-clean :
     "t/library/*.pbc" \
     "t/dynoplibs/*.pbc" \
     "t/op/*.pbc" \
+    "t/oo/*.pbc" \
     "t/pmc/*.pbc" \
     "t/stress/*.pbc" \
     "t/tools/*.pbc"
