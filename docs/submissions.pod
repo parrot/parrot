@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -25,9 +25,8 @@ about submitting a patch, or (see below) getting commit privileges.
 =head1 How To Submit A Patch
 
 Try to keep your patches specific to a single change, and ensure that your
-change does not break any tests.
-This sanity checking can be done by running 'make test'.
-If there is no test for the fixed bug, please provide one.
+change does not break any tests.  Do this by running C<make test>.  If there is
+no test for the fixed bug, please provide one.
 
 =over
 
@@ -64,15 +63,15 @@ your patch with C<svn diff>.
 
 =item Single C<diff>
 
-If you are working from a released distribution of Parrot
-and the change you wish to make affects only one or
-two files, then you can supply a C<diff> for each file.
-The C<diff> should be created in F<parrot>.
+If you are working from a released distribution of Parrot and the change you
+wish to make affects only one or two files, then you can supply a C<diff> for
+each file.  The C<diff> should be created in F<parrot>.  Please be sure to
+create a unified diff, with C<diff -u>.
 
     cd parrot
     diff -u docs/submissions.pod docs/submissions.new > submissions.patch
 
-Win32 users will probably need to specify C<-ub>. 
+Win32 users will probably need to specify C<-ub>.
 
 =item Recursive C<diff>
 
@@ -84,7 +83,7 @@ should be created in F<workingdir>.
     cd workingdir
     diff -ur --exclude='.svn' parrot parrot.new > docs.patch
 
-OS X users should also specify C<--exclude=.DS_Store>.
+Mac OS X users should also specify C<--exclude=.DS_Store>.
 
 =item C<CREDITS>
 
@@ -152,7 +151,7 @@ For recursive C<diff> patches, copy the patch file to F<workingdir>, and run:
 In order to be on the safe side run 'make test' before actually committing
 the changes. 
 
-=head2 Configuration of to be ignored files
+=head2 Configuration of files to ignore
 
 Sometimes new files will be created in the configuration and build process of
 Parrot. These files should not show up when checking the distribution with
@@ -182,8 +181,8 @@ If you have a new feature to add to Parrot, such as a new test.
 =item 1
 
 Add your new file path(s), relative to F<parrot>, to the file MANIFEST. Create
-a patch for the MANIFEST file according to the instructions above in B<How To
-Submit A Patch>
+a patch for the MANIFEST file according to the instructions in B<How To Submit
+A Patch>.
 
 =item 2
 
@@ -211,8 +210,8 @@ Prefix it with a C<[NEW]> identifier.
 =item 6
 
 The message body should contain an explanation of the purpose of the feature
-you are adding.  Optionally, the output of the C<diffstat(1)> utility when run
-on your patch(s) may be included at the bottom of the message body.
+you are adding.  Optionally, include the output of the C<diffstat(1)> utility
+when run on your patch(es).
 
 =item 7
 
@@ -239,15 +238,14 @@ Everyone on the list sees the submission, and can comment on it. A developer
 with SVN commit authority will commit it to SVN once it is clear that it is the
 right thing to do.
 
-Even those developers with SVN commit authority stick to this scheme for all
-but the most trivial of their own patches, to allow time for peer review of
-their changes.
+Even developers with SVN commit authority stick to this scheme for larger or
+more complex changes, to allow time for peer review.
 
 You can check the progress of your submission at the Parrot bugs page
 L<http://bugs6.perl.org/>. If you have trouble logging in try username C<guest>
 with password C<guest>.
 
-A Parrot Bug Summary page is also generated and can be viewed here
+A Parrot Bug Summary page is also available from
 L<https://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
 
 A list of all the unresolved patches is at
@@ -263,31 +261,44 @@ retrieved with 'guest/guest'.
 You will notice that some of the content is generated directly from the Parrot
 repository. So the usual rules for Parrot patches apply for this content.
 
-For changes specific for parrotcode.org please send patches to    
-B<webmaster> I<at> B<perl> I<dot> B<org>, and cc
-B<parrot-porters> I<at> B<perl> I<dot> B<org>.
+For changes specific for parrotcode.org please send patches to B<webmaster>
+I<at> B<perl> I<dot> B<org>, and cc B<parrot-porters> I<at> B<perl> I<dot>
+B<org>.
 
 =head1 Getting Commit Privileges
 
-If you are interested in getting commit privileges to parrot, here is
+If you are interested in getting commit privileges to Parrot, here is
 the procedure:
 
 =over 4
 
 =item 1
 
-Submit one or more patches via the process described in this document that are
-accepted.
+Submit several high quality patches (and have them committed) via the process
+described in this document.  This process may take weeks or months.
 
 =item 2
 
-Obtain a perl.org account at https://auth.perl.org/auth/account
+Obtain a perl.org account at L<https://auth.perl.org/auth/account>
 
 =item 3
 
-Request commit access via the C<parrot-porters> mailing list, or via
-IRC (#parrot on irc.perl.org).  The people who can do this are called
-"metacommitters"; see C<RESPONSIBLE_PARTIES> for the current list.
+Submit a Perl Contributor License Agreement; this document signifies that you
+have the authority to license your work to The Perl Foundation for inclusion in
+their projects.  You may need to discuss this with your employer if you
+contribute to Parrot on work time or with work resources, or depending on your
+employment agreement.
+
+L<http://www.perlfoundation.org/contributor_license_agreement>
+
+=item 4
+
+Request commit access via the C<parrot-porters> mailing list, or via IRC
+(#parrot on irc.perl.org).  The existing commiters will discuss your request in
+the next couple of weeks.
+
+If approved, a metacommiter will update the permissions to allow you to commit
+to Parrot; see C<RESPONSIBLE_PARTIES> for the current list.  Welcome aboard!
 
 =back
 
