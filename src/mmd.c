@@ -1596,7 +1596,7 @@ mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
     PMC_struct_val(nci) = F2DPTR(distance_cmp);
 
     /* sort it */
-    Parrot_quicksort(interp, helper, n, nci);
+    Parrot_quicksort(interp, (void **)helper, n, nci);
 
     /*
      * now helper has a sorted list of indices in the upper 16 bits

@@ -984,7 +984,7 @@ Register a dynamic oplib.
 */
 
 void
-dynop_register(PARROT_INTERP, PMC* lib_pmc)
+dynop_register(PARROT_INTERP, PMC *lib_pmc)
 {
     op_lib_t *lib, *core;
     oplib_init_f init_func;
@@ -1010,7 +1010,8 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
         interp->all_op_libs = (op_lib_t **)mem_sys_allocate(
                 sizeof (op_lib_t *) * (interp->n_libs + 1));
     else
-        mem_realloc_n_typed(interp->all_op_libs, interp->n_libs + 1, op_lib_t);
+        mem_realloc_n_typed(interp->all_op_libs, interp->n_libs + 1,
+                op_lib_t *);
 
     init_func = get_dynamic_op_lib_init(interp, lib_pmc);
     lib       = init_func(1);

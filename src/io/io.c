@@ -162,7 +162,7 @@ PIO_new(PARROT_INTERP, SHIM(INTVAL iotype), INTVAL flags, INTVAL mode)
 
 /*
 
-=item C<ParrotIO * PIO_dup>
+=item C<PMC * PIO_dup>
 
 Duplicates an IO stream.
 
@@ -173,7 +173,7 @@ Duplicates an IO stream.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-ParrotIO *
+PMC *
 PIO_dup(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ParrotIO * const io   = PMC_data_typed(pmc, ParrotIO *);

@@ -345,7 +345,7 @@ perl6.test:
 	- $(MAKE) perl6 test
 perl6.clean:
 	- $(MAKE) perl6 clean
-dotnet.realclean:
+perl6.realclean:
 	- $(MAKE) perl6 realclean
 
 pheme : pheme.dummy

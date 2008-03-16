@@ -743,10 +743,8 @@ ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
                 else
                     strncat(regb[i], k->name, REGB_SIZE - used - 1);
 
-                /* XXX This comparison of a pointer to an int is wrong */
-
-                if (k->nextkey && regb[i] + 1 < REGB_SIZE)
-                    strcat(regb[i], ";");
+                if (k->nextkey)
+                    strncat(regb[i], ";", REGB_SIZE - strlen(regb[i]) - 1);
             }
 
             regstr[i] = regb[i];

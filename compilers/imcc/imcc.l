@@ -13,8 +13,8 @@
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
 
-#ifndef __STDC_VERSION_
-#  define __STDC_VERSION_
+#ifndef __STDC_VERSION__
+#  define __STDC_VERSION__ 0
 #endif
 
 }

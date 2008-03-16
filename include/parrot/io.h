@@ -197,7 +197,7 @@ void PIO_destroy(SHIM_INTERP, ARGMOD(PMC * pmc))
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-ParrotIO * PIO_dup(PARROT_INTERP, ARGIN(PMC *pmc))
+PMC * PIO_dup(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

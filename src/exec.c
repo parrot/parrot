@@ -34,7 +34,7 @@ src/exec.c - Generate an object file
 
 static void add_data_member(
     ARGMOD(Parrot_exec_objfile_t *obj),
-    ARGIN_NULLOK(void *src),
+    ARGIN_NULLOK(const void *src),
     size_t len)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*obj);
@@ -98,7 +98,7 @@ Parrot_exec(PARROT_INTERP, ARGIN(opcode_t *pc),
     /* TODO Go zero the calls to jited opcodes. */
     /* Place the program code in the data section. */
     /* program_code */
-    add_data_member(obj, (void *)interp->code->base.pf->src,
+    add_data_member(obj, interp->code->base.pf->src,
             interp->code->base.pf->size);
     /* opcode_map */
     add_data_member(obj, jit_info->arena.op_map, (jit_info->arena.map_size+1) *
@@ -146,7 +146,8 @@ C<< obj->data_size[N] >>.
 */
 
 static void
-add_data_member(ARGMOD(Parrot_exec_objfile_t *obj), ARGIN_NULLOK(void *src), size_t len)
+add_data_member(ARGMOD(Parrot_exec_objfile_t *obj),
+        ARGIN_NULLOK(const void *src), size_t len)
 {
     char *cp;
 

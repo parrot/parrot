@@ -108,7 +108,7 @@ void graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-int ig_test(int i, int j, int N, ARGIN(const unsigned int *graph))
+unsigned int ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
         __attribute__nonnull__(4);
 
 void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))

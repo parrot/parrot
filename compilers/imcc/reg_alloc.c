@@ -123,7 +123,7 @@ static void make_stat(
 static void map_colors(
     ARGIN(const IMC_Unit* unit),
     int x,
-    ARGIN(const unsigned int *graph),
+    ARGIN(unsigned int *graph),
     ARGMOD(char *avail),
     int typ,
     int already_allocated)
@@ -171,7 +171,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static unsigned int*
-ig_get_word(int i, int j, int N, ARGIN(unsigned int *graph), ARGMOD(int *bit_ofs))
+ig_get_word(int i, int j, int N, ARGIN(unsigned int *graph),
+            ARGMOD(int *bit_ofs))
 {
     unsigned int bit = i * N + j;
     *bit_ofs = bit % sizeof (*graph);
@@ -192,7 +193,7 @@ static void
 ig_set(int i, int j, int N, ARGIN(unsigned int *graph))
 {
     int bit_ofs;
-    unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
+    unsigned int *word = ig_get_word(i, j, N, graph, &bit_ofs);
     *word |= (1 << bit_ofs);
 }
 
@@ -206,8 +207,8 @@ RT#48260: Not yet documented!!!
 
 */
 
-int
-ig_test(int i, int j, int N, ARGIN(const unsigned int *graph))
+unsigned int
+ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 {
     int bit_ofs;
     unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
@@ -977,7 +978,7 @@ map_colors: calculates what colors can be assigned to the x-th symbol.
 */
 
 static void
-map_colors(ARGIN(const IMC_Unit* unit), int x, ARGIN(const unsigned int *graph),
+map_colors(ARGIN(const IMC_Unit* unit), int x, ARGIN(unsigned int *graph),
         ARGMOD(char *avail), int typ, int already_allocated)
 {
     const int n_symbols = unit->n_symbols;
