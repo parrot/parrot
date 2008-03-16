@@ -33,20 +33,16 @@ math stuff
 #if DOUBLE_SIZE == 2 * INT_SIZE
 /*
 
-=item C<PARROT_API extern int
-Parrot_signbit(double x)>
+=item C<extern int Parrot_signbit(double x)>
 
 return true if the Numval has a negative sign.
 This is mostly for handling the -0.0 case.
-
-Parrot_signbit is exported because PerlNum.set_number_native() uses it.
-RT#48272: This is probably not a good reason.
 
 =cut
 
 */
 
-PARROT_API extern int
+extern int
 Parrot_signbit(double x)
 {
     union {
