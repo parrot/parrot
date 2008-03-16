@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -48,12 +48,12 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interp,
+    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
     pir = const_string(interp, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
@@ -62,7 +62,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
      */
     prog = imcc_compile_pir(interp, c_src);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+    if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
@@ -73,7 +73,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = VTABLE_invoke(interp, entry, NULL);
+    dest = Parrot_PMC_invoke(interp, entry, NULL);
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
@@ -131,12 +131,12 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interp,
+    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
     pir = const_string(interp, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
@@ -146,7 +146,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
      */
     prog = Parrot_compile_string(interp, pir, c_src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+    if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
@@ -157,7 +157,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = VTABLE_invoke(interp, entry, NULL);
+    dest = Parrot_PMC_invoke(interp, entry, NULL);
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
@@ -211,7 +211,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     opcode_t *dest;
     prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+    if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
@@ -222,7 +222,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = VTABLE_invoke(interp, entry, NULL);
+    dest = Parrot_PMC_invoke(interp, entry, NULL);
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
@@ -242,12 +242,12 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interp,
+    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
     pir = const_string(interp, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
@@ -302,7 +302,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     opcode_t *dest;
     prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+    if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
@@ -313,7 +313,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = VTABLE_invoke(interp, entry, NULL);
+    dest = Parrot_PMC_invoke(interp, entry, NULL);
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
@@ -333,12 +333,12 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interp,
+    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
     pir = const_string(interp, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
@@ -393,7 +393,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     opcode_t *dest;
     prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+    if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
@@ -404,7 +404,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = VTABLE_invoke(interp, entry, NULL);
+    dest = Parrot_PMC_invoke(interp, entry, NULL);
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
@@ -424,12 +424,12 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interp,
+    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
     pir = const_string(interp, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
@@ -484,7 +484,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     opcode_t *dest;
     prog = Parrot_compile_string(interp, type, src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
+    if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
@@ -495,7 +495,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     entry = Parrot_find_global_cur(interp, smain);
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = VTABLE_invoke(interp, entry, NULL);
+    dest = Parrot_PMC_invoke(interp, entry, NULL);
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
@@ -514,12 +514,12 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /*
      * get PIR compiler  - TODO API
      */
-    compreg = VTABLE_get_pmc_keyed_int(interp,
+    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
     pir = const_string(interp, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
+    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
