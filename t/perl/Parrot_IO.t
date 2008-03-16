@@ -5,8 +5,11 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More 'tests' => 58;
-use File::Spec::Functions qw(:ALL);
+
+use Parrot::Distribution;
+use File::Spec::Functions ':ALL';
 
 =head1 NAME
 
@@ -162,7 +165,7 @@ SKIP: {
     my $nul = File::Spec->devnull;
 
     skip( 'git-svn does not expand keywords', 2 )
-      if my @git_svn_info = qx/git svn log --limit=1 2>$nul/ and $? == 0;
+        if Parrot::Distribution->new->is_svn_co();
 
     $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
     ok( $f->has_svn_id(), 'has_svn_id' );

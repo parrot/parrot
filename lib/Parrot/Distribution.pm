@@ -130,6 +130,10 @@ BEGIN {
 
 =over 4
 
+=item C<is_svn_co()>
+
+=item C<is_git_co()>
+
 =item C<c_source_file_directories()>
 
 =item C<c_header_file_directories()>
@@ -274,6 +278,26 @@ BEGIN {
             };
         }
     }
+}
+
+=item C<is_svn_co()>
+
+Returns true if this is a subversion checkout of Parrot.
+
+=cut
+
+sub is_svn_co {
+    return shift->directory_exists_with_name('.svn');
+}
+
+=item C<is_git_co()>
+
+Returns true if this is a git checkout of Parrot.
+
+=cut
+
+sub is_git_co {
+    return shift->directory_exists_with_name('.git');
 }
 
 =item C<get_c_language_files()>

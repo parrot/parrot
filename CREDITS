@@ -649,3 +649,6 @@ D: Various bug fixes and tests
 N: Mark Grimes
 E: mgrimes@cpan.org
 D: Clean up some tests
+
+N: Josh McAdams
+D: Allow git checkouts to pass some tests that require an svn checkout
