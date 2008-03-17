@@ -1859,9 +1859,7 @@ MMD_DEFAULT: {
         char   *s2;
         INTVAL  d;
 
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "get_string"),
-            "->P", &rep);
-
+        rep = SELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         d  = strtol(s1, &s2, 10);
 
@@ -1891,10 +1889,7 @@ MMD_DEFAULT: {
         char    *s2;
         FLOATVAL d;
 
-
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "get_string"),
-            "->P", &rep);
-
+        rep = SELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         d  = strtod(s1, &s2);
 
