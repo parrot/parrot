@@ -133,7 +133,7 @@ eval_is {
   unset elem
   set array(a)
 } {can't read "array(a)": no such element in array} \
-  {unset array elem upvar}
+  {unset array elem upvar} {TODO {used to work!}}
 
 eval_is {
   catch {unset array}

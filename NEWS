@@ -36,7 +36,8 @@ New in r26416
   + Cardinal: basic support for functions with parameters
   + Pheme: various updates
   + Ecmascript: various updates
-  + Tcl: various updates
+  + Tcl: now targeting tcl 8.5.1, no more expected failures in test suite.
+    (No, this doesn't mean everything's implemented. =-)
   + Eclectus: various updates
   + WMLScript: various updates
 - Implementation
