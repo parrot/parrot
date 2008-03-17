@@ -703,6 +703,7 @@ help :
 	@echo "  doc_tests:         Check POD syntax of all files containing POD."
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
+	@echo "  examples_tests:    Test the example scripts."
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smoke:             Run the test suite and send smoke.html to "
@@ -1407,21 +1408,23 @@ OPS2CUTILS_DIR = t/tools/ops2cutils
 REVISIONUTILS_DIR = t/tools/revision
 HARNESS_DIR = t/pharness
 BUILDTOOLS_TEST_FILES = \
-        $(PMC2CUTILS_DIR)/*.t \
-        $(OPS2PMUTILS_DIR)/*.t \
-        $(OPS2CUTILS_DIR)/*.t \
-        $(REVISIONUTILS_DIR)/*.t \
-		$(HARNESS_DIR)/*.t
+    $(PMC2CUTILS_DIR)/*.t \
+    $(OPS2PMUTILS_DIR)/*.t \
+    $(OPS2CUTILS_DIR)/*.t \
+    $(REVISIONUTILS_DIR)/*.t \
+    $(HARNESS_DIR)/*.t
 MANIFEST_DIR = t/manifest
 MANIFEST_TEST_FILES = \
-        $(MANIFEST_DIR)/01-basic.t \
-        $(MANIFEST_DIR)/02-regenerate_file.t \
-        $(MANIFEST_DIR)/03-regenerate_skip.t \
-        $(MANIFEST_DIR)/04-alt_file.t \
-        $(MANIFEST_DIR)/05-alt_skip.t
+    $(MANIFEST_DIR)/01-basic.t \
+    $(MANIFEST_DIR)/02-regenerate_file.t \
+    $(MANIFEST_DIR)/03-regenerate_skip.t \
+    $(MANIFEST_DIR)/04-alt_file.t \
+    $(MANIFEST_DIR)/05-alt_skip.t
+EXAMPLES_TEST_FILES = \
+    t/examples/*.t
 CONFIGURE_TEST_FILES = \
     t/configure/*.t \
-	t/steps/*.t
+    t/steps/*.t
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
@@ -1459,6 +1462,8 @@ fulltest :
 	-@make@ benchmark_tests
 	-@make@ doc_tests
 	-@make@ distro_tests
+	-@make@ manifest_tests
+	-@make@ examples_tests
 
 # bounds checking, slow core
 testb : test_prep
@@ -1508,7 +1513,6 @@ src_tests :
 run_tests :
 	$(PERL) t/harness $(RUN_TEST_FILES)
 
-
 # Test the Perl5 Modules in the Parrot distribution
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
@@ -1522,6 +1526,9 @@ buildtools_tests :
 
 manifest_tests :
 	$(PERL) t/harness $(MANIFEST_TEST_FILES)
+
+examples_tests :
+	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
 
 # benchmark tests
 benchmark_tests : test_prep
