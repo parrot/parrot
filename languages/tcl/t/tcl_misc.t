@@ -258,10 +258,21 @@ TODO: {
     local $TODO;
     $TODO = 'new (to partcl) syntax, need to update expand rule.';
 
-language_output_is('tcl', <<'TCL', <<'OUT', '{*}');
+language_output_is('tcl', <<'TCL', <<'OUT', '{*} on command');
   {*}{puts hi}
+  {*}{puts "hello world"}
+  {*}"puts {hello world}"
+  {*}[concat puts {{hello world}}]
+  {*}[concat puts] {hello world}
+  set a puts
+  {*}"$a {hello world}"
 TCL
 hi
+hello world
+hello world
+hello world
+hello world
+hello world
 OUT
 }
 
