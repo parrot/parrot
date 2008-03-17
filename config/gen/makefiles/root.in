@@ -695,6 +695,7 @@ help :
 	@echo "  test<runcore>:     Run the test suite with a specified runcore."
 	@echo "                     Valid runcores are b, C, f, g, j, r, S."
 	@echo "  src_tests:         Run test in C-file."
+	@echo "  run_tests:         Command line and various environments."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  codingstd_tests:   Test pdd07_codingstd."
 	@echo "  testexec:          Testing the exec runcore."
@@ -1457,6 +1458,7 @@ fulltest :
 	-@make@ testr
 	-@make@ testS
 	-@make@ src_tests
+	-@make@ run_tests
 	-@make@ perl_tests
 	-@make@ codingstd_tests
 	-@make@ benchmark_tests
@@ -1509,7 +1511,7 @@ testexec: test_prep
 src_tests :
 	$(PERL) t/harness $(SRC_TEST_FILES)
 
-# Command line and varous environments
+# Command line and various environments
 run_tests :
 	$(PERL) t/harness $(RUN_TEST_FILES)
 
