@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,10 +20,10 @@ use base qw(Parrot::Configure::Step);
 
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Figuring out how to pack() Parrot's types};
-    $data{result}      = q{};
-    return \%data;
+
+    return { description => q{Figuring out how to pack() Parrot's types},
+             result      => q{},
+           };
 }
 
 sub runstep {
@@ -42,18 +42,17 @@ sub runstep {
         my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
         my $size = $conf->data->get($_);
         my $format;
-        if (
-            ( $] >= 5.006 ) &&
-            ( $size == $longsize ) &&
-            ( $size == $conf->data->get_p5('longsize') )
-        ) {
+        if (    $size == $longsize
+             && $size == $conf->data->get_p5('longsize')
+           ) {
             $format = 'l!';
         }
         elsif ( $size == 4 ) {
             $format = 'l';
         }
-       elsif ( $size == 8 ||
-            $conf->data->get_p5('use64bitint') eq 'define' ) {
+        elsif (    $size == 8
+                || $conf->data->get_p5('use64bitint') eq 'define'
+              ) {
             # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
             $format = 'q';
         }
@@ -93,6 +92,7 @@ AARGH
 
 sub _set_packtypes {
     my $conf = shift;
+
     $conf->data->set(
         packtype_b => 'C',
         packtype_n => ( $conf->data->get('numvalsize') == 12 ? 'D' : 'd' )
@@ -101,6 +101,7 @@ sub _set_packtypes {
 
 sub _set_ptrconst {
     my ($conf, $ptrsize, $intsize, $longsize) = @_;
+
     if ( $intsize == $ptrsize ) {
         $conf->data->set( ptrconst => "u" );
     }
