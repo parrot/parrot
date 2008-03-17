@@ -6,7 +6,6 @@ package Parrot::Test::M4::PIR;
 
 use strict;
 use warnings;
-use 5.006;
 
 use base 'Parrot::Test::M4';
 use Data::Dumper;

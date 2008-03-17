@@ -6,7 +6,6 @@ package Parrot::Test::M4::Gnu;
 
 use strict;
 use warnings;
-use 5.006;
 
 use base 'Parrot::Test::M4';
 

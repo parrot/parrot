@@ -15,7 +15,6 @@ use Regex::Driver;
 
 # Running this with perl5.005 produces:
 # Can't locate object method "new" via package "Regex::CodeGen::IMCC"
-use 5.006;
 
 use File::Spec::Functions;    # In perl core only for >= 5.6.
 

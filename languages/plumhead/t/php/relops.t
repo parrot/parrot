@@ -17,7 +17,6 @@ Set up tests in an array, like in arithmetics.t
 # pragmata
 use strict;
 use warnings;
-use 5.006_001;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib";

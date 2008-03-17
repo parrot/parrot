@@ -13,7 +13,6 @@ String testing.
 # pragmata
 use strict;
 use warnings;
-use 5.006_001;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
