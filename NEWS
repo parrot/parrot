@@ -43,7 +43,8 @@ New in r26416
 - Implementation
   + PDD17 (PMCs)
   + Add library YAML::Dumper
-  + Add the MDx PMC, as a wrapper around libcrypto
+  + Add the MD2, MD4, MD5, RIPEMD160, SHA & SHA1 PMC, as a wrapper
+     around libcrypto
 - Miscellaneous
   + various bugfixes, code cleanups and coding standard fixes
   + consting

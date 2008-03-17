@@ -22,8 +22,6 @@ PMCS = \
 #CONDITIONED_LINE(has_crypto):  ripemd160 \
 #CONDITIONED_LINE(has_crypto):  sha \
 #CONDITIONED_LINE(has_crypto):  sha1 \
-#CONDITIONED_LINE(has_crypto):  sha256 \
-#CONDITIONED_LINE(has_crypto):  sha512 \
   subproxy 
 
 DIGEST = md2.pmc md4.pmc md5.pmc ripemd160.pmc sha.pmc sha1.pmc sha256.pmc sha512.pmc
