@@ -142,15 +142,7 @@ pmclass TclString
       found_quote:
         I0 = I1 + 1;
         if (I0 >= len) {
-            I0 = I1 - pos;
-            S0 = string_substr(INTERP, str, pos, I0, &S0, 0);
-
-            P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
-            VTABLE_set_string_native(INTERP, P0, S0);
-            VTABLE_push_pmc(INTERP, retval, P0);
-
-            pos = I1 + 1;
-            goto eat_space;
+            goto found_close_quote;
         }
 
         if (!Parrot_string_is_cclass(INTERP, enum_cclass_whitespace, str, I0)) {
@@ -165,6 +157,16 @@ pmclass TclString
                     string_to_cstring(INTERP, S0));
         }
 
+     found_close_quote:
+        I0 = I1 - pos;
+        S0 = string_substr(INTERP, str, pos, I0, &S0, 0);
+
+        P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
+        VTABLE_set_string_native(INTERP, P0, S0);
+        VTABLE_push_pmc(INTERP, retval, P0);
+
+        pos = I1 + 1;
+        goto eat_space;
 
       done:
         Parrot_unregister_pmc(INTERP, retval);
