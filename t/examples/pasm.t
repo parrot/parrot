@@ -81,7 +81,7 @@ END_EXPECTED
 );
 
 SKIP: {
-    skip( 'GPM is not available', 1 ) unless $PConfig{gmp};
+    skip( 'GMP is not available', 1 ) unless $PConfig{gmp};
 
     $expected{'fact.pasm'} = << 'END_EXPECTED'
 fact of 0 is: 1
