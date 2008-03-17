@@ -208,10 +208,8 @@ transform pir (PAST::StaticCommand) {
     $P0  = shift iter
     name = $P0['value']
 
-    .local int has_expand, pastexpand, pastvar
+    .local int has_expand
     has_expand = 0
-    pastexpand = find_type 'PAST::Expand'
-    pastvar    = find_type 'PAST::Var'
 
   iter_loop: 
     unless iter goto iter_done
@@ -220,9 +218,9 @@ transform pir (PAST::StaticCommand) {
     reg = $P1['ret']
     push args, reg
     pir .= $P0
-    $I0 = typeof $P1
-    if $I0 == pastexpand  goto iter_expand
-    unless $I0 == pastvar goto iter_loop
+    $S0 = typeof $P1
+    if $S0 == 'PAST::Expand' goto iter_expand
+    unless $S0 == 'PAST::Var' goto iter_loop
     pir.emit("    %0 = clone %0", reg)
     goto iter_loop
   iter_expand:

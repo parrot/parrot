@@ -262,10 +262,9 @@ Given a string, return the appropriate channel.
   io_obj = channels[channelID]
   if null io_obj goto bad_channel
 
-  $I0 = typeof io_obj
-  if $I0 == .ParrotIO goto done
-  $I1 = find_type 'TCPStream'
-  if $I0 == $I1 goto done
+  $S0 = typeof io_obj
+  if $S0 == 'ParrotIO' goto done
+  if $S0 == 'TCPStream' goto done
 
   # should never happen
   goto bad_channel
