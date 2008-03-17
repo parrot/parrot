@@ -631,7 +631,7 @@ fixup_globals(PARROT_INTERP)
                 if (s1) {
                     PARROT_ASSERT(s1->unit);
                     if (s1->unit->type & IMC_PCCSUB) {
-                        const Instruction const *ins = s1->unit->instructions;
+                        const Instruction * const ins = s1->unit->instructions;
                         SymReg                  *r1;
                         pcc_sub_t               *pcc_sub;
 
