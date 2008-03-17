@@ -149,9 +149,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     set $P1, 'stdin'
     $P2 = getstdin
-    new $P0, 'LuaUserdata'
-    setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(mt)
+    $P0 = lua_newuserdata($P2, mt)
     $P0.'setfenv'(env)
     io[$P1] = $P0
     set $P3, IO_INPUT
@@ -159,9 +157,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     set $P1, 'stdout'
     $P2 = getstdout
-    new $P0, 'LuaUserdata'
-    setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(mt)
+    $P0 = lua_newuserdata($P2, mt)
     $P0.'setfenv'(env)
     io[$P1] = $P0
     set $P3, IO_OUTPUT
@@ -169,9 +165,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     set $P1, 'stderr'
     $P2 = getstderr
-    new $P0, 'LuaUserdata'
-    setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(mt)
+    $P0 = lua_newuserdata($P2, mt)
     $P0.'setfenv'(env)
     io[$P1] = $P0
 .end
@@ -243,14 +237,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 
 .sub 'newfile' :anon
+    .param pmc f
     .local pmc file
-    new file, 'LuaUserdata'
-    .local pmc _lua__REGISTRY
-    _lua__REGISTRY = get_hll_global '_REGISTRY'
-    .const .LuaString key = 'ParrotIO'
-    .local pmc mt
-    mt = _lua__REGISTRY[key]
-    file.'set_metatable'(mt)
+    $P0 = lua_getmetatable('ParrotIO')
+    file = lua_newuserdata(f, $P0)
     .return (file)
 .end
 
@@ -473,8 +463,7 @@ error code.
     unless null f goto L3
     lua_argerror(1, file)
   L3:
-    $P0 = newfile()
-    setattribute $P0, 'data', f
+    $P0 = newfile(f)
     setiofile(IO_INPUT, $P0)
     goto L1
   L2:
@@ -521,8 +510,7 @@ input file. In this case it does not close the file when the loop ends.
     unless null f goto L2
     lua_argerror(1, $S1)
   L2:
-    file = newfile()
-    setattribute file, 'data', f
+    file = newfile(f)
     .return aux_lines(file, 1)
 .end
 
@@ -581,8 +569,7 @@ in the standard C function C<fopen>.
     if $S0 == '' goto L1
     f = open $S1, $S0
     unless f goto L1
-    res = newfile()
-    setattribute res, 'data', f
+    res = newfile(f)
     .return (res)
   L1:
     new res, 'LuaNil'
@@ -616,8 +603,7 @@ Similar to C<io.input>, but operates over the default output file.
     unless null f goto L3
     lua_argerror(1, file)
   L3:
-    $P0 = newfile()
-    setattribute $P0, 'data', f
+    $P0 = newfile(f)
     setiofile(IO_OUTPUT, $P0)
     goto L1
   L2:
@@ -651,8 +637,7 @@ This function is system dependent and is not available on all platforms.
     if $S0 == '' goto L1
     f = open $S1, $S0
     unless f goto L1
-    res = newfile()
-    setattribute res, 'data', f
+    res = newfile(f)
     .return (res)
   L1:
     new res, 'LuaNil'
@@ -697,8 +682,7 @@ it is automatically removed when the program ends.
     $S0 = $P0.'tmpname'()
     f = open $S0, '+>'
     unless f goto L1
-    res = newfile()
-    setattribute res, 'data', f
+    res = newfile(f)
     new $P0, 'OS'
     $P0.'rm'($S0)
     .return (res)

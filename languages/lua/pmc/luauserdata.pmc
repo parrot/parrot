@@ -30,12 +30,19 @@ typedef struct userdata_t {
 #define u_env(pmc) (PMC_data_typed((pmc), userdata_t *))->env
 
 static PMC* curr_func(PARROT_INTERP) {
-    parrot_context_t *ctx = CONTEXT(interp->ctx);
-    PMC *sub = ctx->current_sub;
-    PMC *cont = ctx->current_cont;
-    ctx = PMC_cont(cont)->to_ctx;
-    sub = ctx->current_sub;
-    return sub;
+    parrot_context_t *sub_ctx = CONTEXT(interp->ctx)->caller_ctx;
+    while (1) {
+        PMC *cont;
+        if (sub_ctx->current_sub && PMC_metadata(sub_ctx->current_sub))
+            return sub_ctx->current_sub;
+        cont = sub_ctx->current_cont;
+        if (!cont)
+            break;
+        sub_ctx = PMC_cont(cont)->to_ctx;
+        if (!sub_ctx)
+            break;
+    }
+    return NULL;
 }
 
 static PMC* getcurrenv(PARROT_INTERP) {
