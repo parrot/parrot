@@ -108,7 +108,7 @@ CODE
 SHA1
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'SHA256 typeof' );
+pir_output_is( << 'CODE', << 'OUTPUT', 'SHA256 typeof', todo => 'SHA256 removed by r26447' );
 .sub test :main
     $P0 = loadlib 'digest_group'
     .local pmc md
@@ -121,7 +121,7 @@ CODE
 SHA256
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'SHA512 typeof' );
+pir_output_is( << 'CODE', << 'OUTPUT', 'SHA512 typeof', todo => 'SHA256 removed by r26447' );
 .sub test :main
     $P0 = loadlib 'digest_group'
     .local pmc md
