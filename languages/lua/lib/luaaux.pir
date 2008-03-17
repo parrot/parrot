@@ -18,6 +18,13 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =item C<lua_argerror (narg, extramsg, ...)>
 
+Raises an error with the following message, where C<func> is retrieved from
+the call stack:
+
+    bad argument #<narg> to <func> (<extramsg>)
+
+This function never returns.
+
 =cut
 
 .sub 'lua_argerror'
@@ -32,6 +39,9 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =item C<lua_checkany (narg, arg)>
 
+Checks whether the function has an argument of any type (including B<nil>)
+at position C<narg>.
+
 =cut
 
 .sub 'lua_checkany'
@@ -44,6 +54,9 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 
 =item C<lua_checknumber (narg, arg)>
+
+Checks whether the function argument C<narg> is a number
+and returns this number.
 
 =cut
 
@@ -96,6 +109,12 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =item C<lua_checkstring (narg, arg)>
 
+Checks whether the function argument C<narg> is a string
+and returns this string.
+
+This function uses C<tostring> to get its result,
+so all conversions and caveats of that function apply here.
+
 =cut
 
 .sub 'lua_checkstring'
@@ -121,7 +140,9 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
-=item C<lua_checktype (narg, arg, type)>
+=item C<lua_checktype (narg, arg, t)>
+
+Checks whether the function argument C<narg> has type C<t>.
 
 =cut
 
@@ -139,7 +160,9 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
-=item C<lua_checkudata (narg, arg, type)>
+=item C<lua_checkudata (narg, arg, tname)>
+
+Checks whether the function argument C<narg> is a userdata of the type C<tname>.
 
 =cut
 
@@ -169,6 +192,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 
 =item C<lua_error (message, ...)>
+
+Raises an error.
+
+This function never returns.
 
 =cut
 
@@ -217,6 +244,50 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 
 =item C<lua_gc (what, data)>
+
+Controls the garbage collector.
+
+This function performs several tasks, according to the value of the parameter
+C<what>:
+
+=over 4
+
+=item B<"stop">
+
+stops the garbage collector.
+
+=item B<"restart">
+
+restarts the garbage collector.
+
+=item B<"collect">
+
+performs a full garbage-collection cycle.
+
+=item B<"count">
+
+returns the total memory in use by Lua (in Kbytes).
+
+=item B<"step">
+
+performs an incremental step of garbage collection The step C<"size">
+is controlled by C<data> (larger values mean more steps) in a non-specified way.
+If you want to control the step size you must tune experimentally the value
+of C<data>. Returns B<true> if the step finished a garbage-collection cycle.
+
+=item B<"steppause">
+
+sets C<data>/100 as the new value for the I<pause> of the collector.
+The function returns the previous value of the pause.
+
+=item B<"setstepmul">
+
+sets C<data>/100 as the new value for the I<step multiplier> of the collector.
+The function returns the previous value of the step multiplier.
+
+=back
+
+STILL INCOMPLETE.
 
 =cut
 
@@ -267,6 +338,8 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =item C<lua_getfenv (o)>
 
+Returns the environment table of the argument C<o>.
+
 =cut
 
 .sub 'lua_getfenv'
@@ -283,7 +356,29 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
+=item C<lua_getmetatable (tname)>
+
+Returns the metatable registered with the name C<tname>.
+
+=cut
+
+.sub 'lua_getmetatable'
+    .param string tname
+    .local pmc _lua__REGISTRY
+    _lua__REGISTRY = get_hll_global '_REGISTRY'
+    .local pmc key
+    new key, 'LuaString'
+    set key, tname
+    .local pmc res
+     res= _lua__REGISTRY[key]
+    .return (res)
+.end
+
+
 =item C<lua_gsub (src, pat, repl)>
+
+Returns a copy of string C<src> by replacing any occurrence of the string C<pat>
+with the string C<rep>.
 
 =cut
 
@@ -311,6 +406,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =item C<lua_loadbuffer (buff, name)>
 
+Loads a buffer as a Lua chunk.
+
+C<name> is the chunk name, used for debug information and error messages. 
+
 =cut
 
 .sub 'lua_loadbuffer'
@@ -333,6 +432,12 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 
 =item C<lua_loadfile (filename)>
+
+Loads a file as a Lua chunk.
+If C<filename> is a empty string, then it loads from the standard input.
+The first line in the file is ignored if it starts with a #.
+
+This function only loads the chunk; it does not run it.
 
 =cut
 
@@ -376,6 +481,11 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =item C<lua_newmetatable (tname)>
 
+Unless the registry already has the key C<tname>, creates a new table to be
+used as a metatable for userdata, adds it to the registry with key C<tname>.
+
+In both cases returns the final value associated with C<tname> in the registry.
+
 =cut
 
 .sub 'lua_newmetatable'
@@ -395,7 +505,24 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
+=item C<lua_newuserdata (data, mt)>
+
+=cut
+
+.sub 'lua_newuserdata'
+    .param pmc data
+    .param pmc mt
+    .local pmc res
+    new res, 'LuaUserdata'
+    setattribute res, 'data', data
+    res.'set_metatable'(mt)
+    .return (res)
+.end
+
+
 =item C<lua_openlibs ()>
+
+Opens all standard Lua libraries.
 
 =cut
 
@@ -423,7 +550,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
-=item C<lua_optint (narg, arg)>
+=item C<lua_optint (narg, arg, def)>
+
+If the function argument C<narg> is a number, returns this number cast to an C<int>.
+If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an error.
 
 =cut
 
@@ -440,7 +570,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
-=item C<lua_optstring (narg, arg)>
+=item C<lua_optstring (narg, arg, def)>
+
+If the function argument C<narg> is a string, returns this string.
+If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an error.
 
 =cut
 
@@ -474,6 +607,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =item C<lua_setfenv (o, table)>
 
+Sets the table C<table> as the new environment for the value C<o>.
+If the value C<o> is neither a function nor a thread nor a userdata,
+returns 0. Otherwise it returns 1.
+
 =cut
 
 .sub 'lua_setfenv'
@@ -490,6 +627,12 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 
 =item C<lua_typerror (narg, got, expec)>
+
+Generates an error with a message like the following:
+
+    bad argument narg to 'func' (tname expected, got rt)
+
+This function never returns.
 
 =cut
 
