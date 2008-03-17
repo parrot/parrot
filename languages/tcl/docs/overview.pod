@@ -1,7 +1,7 @@
 =head1 OVERVIEW 
 
 This is a from-scratch implementation, based primarily on the tcl man page(s),
-and the cvs-current test suite for tcl (8.5)
+and the cvs-current test suite for tcl (8.5.1)
 
 Another interesting project would have been to modify the tcl source and 
 have it generate parrot directly. Many people smarter than I am have
@@ -16,6 +16,14 @@ So, converting the tcl-specific bytecodes there to parrot would be a big deal.)
 When you make tcl, you're generating several files:
 
 =over 4
+
+=item tclsh
+
+While not included in the C<make all> target, you can C<make tclsh> (or
+whatever the executable would be called on your platform), and this will
+give you a faux-executable; a C binary that loads in all the parrot bytecode
+for partcl. You can then use this in most places where you see 
+C<parrot tcl.pbc>
 
 =item runtime/tcllib.pbc
 
@@ -105,23 +113,13 @@ TODO tests, C<make devtest> instead. This is NOT the tcl test suite.
 Occasional failures are suspected against svn-head; there should be no
 failures in a released version, however.
 
-To run the tcl test suite, type C<make tcl-test>. This will checkout the latest
-cvs copy of the tests from the tcl repository and run them.  Warning, this can
-be a little slow.
+To run the tcl test suite, type C<make tcl-test>. This will checkout the 
+appropriate cvs copy of the tests from the tcl repository and run them.
+arning, this will be slow.
 
 =head1 EXAMPLES
 
 There are examples in the C<examples> directory that are vaguely more
 interesting. Change to that directory and type C<make> for directions.
-
-=head1 HISTORY
-
-This was originally written as a perl5 script. Rather than doing bootstrapping,
-I foolishly decided it would be fun to write the parser IN parrot assembly,
-esp. as this would help implementing "eval" and "proc" 
-
-partcl has gone through many iterations since its original beginnings,
-requiring many updates as various parts of parrot have changed, and as we
-implement features which require extensions to our framework.
 
 =cut

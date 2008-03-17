@@ -62,7 +62,7 @@ and their code. For example:
  2
  %
 
-Right now, partcl is using globals to store the argument list and the the
+Right now, partcl is using globals to store the argument list and the
 body information. It would seem that we'd want to have a builtin mechanism
 for querying the subs directly rather than storing this information separately.
 
@@ -113,7 +113,4 @@ This is waiting, pending the event system re-thunk.
 
 =back
 
-
 =cut
-
-
