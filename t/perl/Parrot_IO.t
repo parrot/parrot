@@ -164,8 +164,8 @@ ok( $f3->modified_since($time), 'modified_since' );
 SKIP: {
     my $nul = File::Spec->devnull;
 
-    skip( 'git-svn does not expand keywords', 2 )
-        if Parrot::Distribution->new->is_svn_co();
+    skip( 'keywords not expanded in non-svn checkouts', 2 )
+        unless Parrot::Distribution->new->is_svn_co();
 
     $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
     ok( $f->has_svn_id(), 'has_svn_id' );
