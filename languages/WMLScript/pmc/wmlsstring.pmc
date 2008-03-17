@@ -1919,7 +1919,7 @@ MMD_DEFAULT: {
     METHOD PMC* parseNumber() {
         PMC    *retval;
 
-        if (retval->vtable->base_type == dynpmc_WmlsInvalid)
+        if (SELF->vtable->base_type == dynpmc_WmlsInvalid)
             Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
                 "->P", &retval);
         else
