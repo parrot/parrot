@@ -200,9 +200,11 @@ see F<src/dynpmc/mdx.pmc>.
     .local pmc res
     $P1 = lua_checkudata(1, c, MYTYPE)
     $I1 = get_addr $P1
-    $S1 = $I1
-    $S0 = MYTYPE . ' '
-    $S0 .= $S1
+    new $P0, 'FixedPMCArray'
+    set $P0, 2
+    $P0[0] = MYTYPE
+    $P0[1] = $I1
+    $S0 = sprintf '%s %08p', $P0
     new res, 'LuaString'
     set res, $S0
     .return (res)
