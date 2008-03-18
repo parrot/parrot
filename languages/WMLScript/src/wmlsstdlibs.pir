@@ -110,9 +110,9 @@ helper for CALL_URL* opcodes.
     .return (entry)
   _handler_1:
     .local pmc e
-    .local string s
-    .get_results (e, s)
-    print s
+    .local string msg
+    .get_results (e, msg)
+    print msg
     print "\n"
     $S0 = "verification failed (can't translate '"
     $S0 .= url

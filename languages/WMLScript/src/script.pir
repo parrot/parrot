@@ -1,6 +1,8 @@
 # Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
+.namespace ['Wmls']
+
 .sub '__onload' :anon :load
 #    print "__onload (script.pir)\n"
     $P0 = subclass 'Hash', 'Wmls::Script'

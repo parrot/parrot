@@ -49,9 +49,9 @@ Francois Perrad.
     end
   _handler:
     .local pmc e
-    .local string s
-    .get_results (e, s)
-    print s
+    .local string msg
+    .get_results (e, msg)
+    print msg
     print "\n"
   L1:
     end
