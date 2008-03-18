@@ -8,6 +8,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
 use Parrot::Distribution;
+use Parrot::Test::Util::Runloop;
 
 =head1 NAME
 
@@ -54,35 +55,23 @@ my @isxxx_functions_list = qw(
 
 my $isxxx_functions = join '|', @isxxx_functions_list;
 
-foreach my $file (@files) {
+sub check_isxxx {
+    my $line = shift;
 
-    # if we have command line arguments, the file is the full path
-    # otherwise, use the relevant Parrot:: path method
-    my $path         = @ARGV ? $file : $file->path;
-    my $buf          = $DIST->slurp($path);
-    my @buffer_lines = split( /\n/, $buf );
-    my $i            = 1;
-
-    # get the lines just matching isxxx
-    my @isxxx_lines  = grep { $_->[0] =~ /[^_]($isxxx_functions)\([^)]+/ }
-        map { [ $_, $i++ ] } @buffer_lines;
-
-    next unless @isxxx_lines;
-
-    # find the instances without the explicit cast
-    my @no_cast =
-        grep { $_->[0] !~ /[^_]($isxxx_functions)\(\(unsigned char\)/ }
-        @isxxx_lines;
-
-    push @no_explicit_cast, $path . ' (' . join( ", ",
-        map { $_->[1] } @no_cast ) . ")\n"
-        if @no_cast;
+    # does the line contain an isxxx call?
+    return 1 unless $line =~ /[^_]($isxxx_functions)\([^)]+/;
+    # is the line missing a cast?
+    return 1 unless $line !~ /[^_]($isxxx_functions)\(\(unsigned char\)/;
+    # yes!  fail.
+    return 0;
 }
 
-ok( !@no_explicit_cast, 'isxxx() functions cast correctly' )
-    or diag( "isxxx() function not cast to unsigned char "
-        . @no_explicit_cast
-        . " files:\n@no_explicit_cast" );
+Parrot::Test::Util::Runloop->testloop(
+    name     => 'isxxx() functions cast correctly',
+    files    => [@files],
+    per_line => \&check_isxxx,
+    diag_prefix => 'isxxx() function not cast to unsigned char'
+);
 
 # Local Variables:
 #   mode: cperl

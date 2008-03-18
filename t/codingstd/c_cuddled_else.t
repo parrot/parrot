@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
 use Parrot::Distribution;
+use Parrot::Test::Util::Runloop;
 
 =head1 NAME
 
@@ -32,31 +33,14 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
-my @else;
 
-foreach my $file (@files) {
 
-    # if we have command line arguments, the file is the full path
-    # otherwise, use the relevant Parrot:: path method
-    my $path = @ARGV ? $file : $file->path;
-
-    open my $fh, '<', $path
-        or die "Cannot open '$path' for reading: $!\n";
-
-    my $tabcount;
-    my $message = qq<  $path:>;
-    while (<$fh>) {
-        next unless /}\s*else\s*{/;
-        $message .= " $.";
-        $tabcount++;
-    }
-    push @else => "$message\n"
-        if $tabcount;
-    close $fh;
-}
-
-ok( !scalar(@else), "cuddled else" )
-    or diag( "cuddled else found in " . scalar @else . " files:\n@else" );
+Parrot::Test::Util::Runloop->testloop(
+    name        => 'no cuddled elses',
+    files       => [@files],
+    per_line    => sub { shift !~ /}\s*else\s*{/ },
+    diag_prefix => 'Cuddled else found'
+);
 
 # Local Variables:
 #   mode: cperl

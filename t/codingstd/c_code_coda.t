@@ -8,6 +8,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 2;
 use Parrot::Distribution;
+use Parrot::Test::Util::Runloop;
 
 =head1 NAME
 
@@ -45,35 +46,31 @@ CODA
 
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
-my @no_coda;
-my @extra_coda;
 
-foreach my $file (@files) {
+Parrot::Test::Util::Runloop->testloop(
+    name        => 'every file has a coda',
+    files       => [@files],
+    per_file    => sub { shift =~ m{\Q$coda\E\n*\z} },
+    diag_prefix => 'No coda found'
+);
 
-    # if we have command line arguments, the file is the full path
-    # otherwise, use the relevant Parrot:: path method
-    my $path = @ARGV ? $file : $file->path;
+Parrot::Test::Util::Runloop->testloop(
+    name        => 'only one coda per file',
+    files       => [@files],
+    per_file    => \&check_duplicates,
+    diag_prefix => 'Duplicate coda found'
+);
 
-    my $buf = $DIST->slurp($path);
-
-    # append to the no_coda array if the code doesn't match
-    push @no_coda => "$path\n"
-        unless $buf =~ m{\Q$coda\E\n*\z};
+sub check_duplicates {
+    my $buf = shift;
 
     # append to the extra_coda array if coda-like text appears more than once
     my $vim_many = 0;
     $vim_many++ while $buf =~ m{^ [* \t]* vim: }gmx;
     my $emacs_many = 0;
     $emacs_many++ while $buf =~ m{^ [* \t]* Local \s variables: }gmx;
-    push @extra_coda => "$path\n"
-        if $vim_many > 1 || $emacs_many > 1;
+    return ($vim_many <= 1 && $emacs_many <= 1);
 }
-
-ok( !scalar(@no_coda), 'C code coda present' )
-    or diag( "C code coda missing in " . scalar @no_coda . " files:\n@no_coda" );
-
-ok( !scalar(@extra_coda), 'C code coda appears only once' )
-    or diag( "C code coda repeating in " . scalar @extra_coda . " files:\n@extra_coda" );
 
 # Local Variables:
 #   mode: cperl

@@ -8,6 +8,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 1;
 use Parrot::Distribution;
+use Parrot::Test::Util::Runloop;
 
 =head1 NAME
 
@@ -34,29 +35,24 @@ L<docs/pdds/pdd07_codingstd.pod>
 my $DIST = Parrot::Distribution->new();
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 
-check_cppcomments(@files);
+
+Parrot::Test::Util::Runloop->testloop(
+    name        => 'no cuddled elses',
+    files       => [@files],
+    per_file    => \&check_cppcomments,
+    diag_prefix => 'Cuddled else found'
+);
 
 sub check_cppcomments {
-    my @files = @_;
+    my $buf = shift;
+    $buf =~ s{ (?:
+                   (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
+                 | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
+                 | /\* .*? \*/                         # remove C comment
+               )
+            }{}gsx;
 
-    my @comments;
-    foreach my $file (@files) {
-        my $path = @ARGV ? $file : $file->path();
-        my $buf = $DIST->slurp($path);
-        $buf =~ s{ (?:
-                       (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
-                     | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
-                     | /\* .*? \*/                         # remove C comment
-                   )
-                }{}gsx;
-
-        if ( $buf =~ m{ ( .*? // .* ) }x ) {
-            push( @comments, "$path: $1\n" );
-        }
-    }
-
-    ok( !scalar(@comments), 'C++ comments' )
-        or diag( "C++ comments found in " . scalar @comments . " files:\n@comments" );
+    return $buf !~ m{ ( .*? // .* ) }x;
 }
 
 # Local Variables:
