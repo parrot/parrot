@@ -141,6 +141,8 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 #else
             interp;
 #endif
+        /* set the top of the stack so GC can trace it for GC-able pointers
+         * see trace_system_areas() in src/cpu_dep.c */
         debugger->lo_var_ptr = interp->lo_var_ptr;
 
         pio = PIO_STDERR(debugger);

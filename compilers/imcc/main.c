@@ -4,6 +4,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
+ * Copyright (C) 2003-2008, The Perl Foundation.
  */
 
 /*
@@ -1007,6 +1008,8 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     yyscan_t           yyscanner   = IMCC_INFO(interp)->yyscanner;
     const char * const output_file = interp->output_file;
 
+    /* set the top of the stack so GC can trace it for GC-able pointers
+     * see trace_system_areas() in src/cpu_dep.c */
     if (!interp->lo_var_ptr)
         interp->lo_var_ptr = (void *)&obj_file;
 

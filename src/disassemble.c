@@ -56,6 +56,8 @@ main(int argc, char *argv[])
         return 1;
     }
 
+    /* set the top of the stack so GC can trace it for GC-able pointers
+     * see trace_system_areas() in src/cpu_dep.c */
     interp->lo_var_ptr = &interp;
 
     if (argc != 2) {

@@ -118,14 +118,12 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 #endif
         interp = mem_allocate_zeroed_typed(Interp);
 
-    /*
-     * the last interpreter (w/o) parent has to cleanup globals
-     * so remember parent if any
-     */
     interp->lo_var_ptr = NULL;
-    if (parent) {
+
+    /* the last interpreter (w/o) parent has to cleanup globals
+     * so remember parent if any */
+    if (parent)
         interp->parent_interpreter = parent;
-    }
     else {
         interp->parent_interpreter = NULL;
         PMCNULL                    = NULL;
