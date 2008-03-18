@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -13,12 +13,12 @@ source lib/test_more.tcl
 plan 52
 
 eval_is {info} \
-  {wrong # args: should be "info option ?arg arg ...?"} \
-  {info no subcommand}
+  {wrong # args: should be "info subcommand ?argument ...?"} \
+  {info no subcommand} {TODO {new behavior in tcl 8.5.1}}
 
 eval_is {info bork} \
-  {bad option "bork": must be args, body, cmdcount, commands, complete, default, exists, frame, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars} \
-  {info bad subcommand}
+  {unknown or ambiguous subcommand "bork": must be args, body, cmdcount, commands, complete, default, exists, frame, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars} \
+  {info bad subcommand} {TODO {new behavior in tcl 8.5.1}}
 
 eval_is {info args} \
   {wrong # args: should be "info args procname"} \
@@ -217,7 +217,9 @@ eval_is {
   list [info default defaults1 a x] $x
 } {0 {}} {something without a default}
 
+# Note: this test will fail when run with tclsh8.5
 like [info nameofexecutable] parrot {basic exec name}
+
 eval_is {info nameofexecutable 1} \
   {wrong # args: should be "info nameofexecutable"} {too many args}
 

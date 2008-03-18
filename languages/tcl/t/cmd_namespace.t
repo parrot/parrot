@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -26,8 +26,9 @@ eval_is {namespace children a b c} \
   {namespace children: too many args}
 
 eval_is {namespace children what?} \
-  {unknown namespace "what?" in namespace children command} \
-  {namespace children: unknown namespace}
+  {namespace "what?" not found in "::"} \
+  {namespace children: unknown namespace} \
+  {TODO {new behavior in 8.5.1}}
 
 is [namespace children]        {::tcltest ::tcl} {namespace children: no args}
 is [namespace children ::]     {::tcltest ::tcl} {namespace children: ::}

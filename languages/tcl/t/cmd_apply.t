@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -24,7 +24,7 @@ eval_is {apply {foo bar baz bit}} \
   {bad lamdba expression}
 
 eval_is {apply {foo bar baz}} \
-  {cannot find namespace "::baz"} \
+  {namespace "::baz" not found} \
   {namespace doesn't exist} \
   $TODO
 

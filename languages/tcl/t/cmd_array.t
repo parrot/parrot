@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -225,9 +225,8 @@ eval_is {
 } {{b c}} {array names, insure list results}
 
 eval_is {array names a b c} \
-  {} \
-  {array names, bad option} \
-  {SKIP {verified behavior in 8.5}}
+  {bad option "b": must be -exact, -glob, or -regexp} \
+  {array names, bad option} 
 
 eval_is {array names a b c d}\
   {wrong # args: should be "array names arrayName ?mode? ?pattern?"}\

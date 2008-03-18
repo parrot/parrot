@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -10,7 +10,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 20
+plan 18
 
 eval_is {
  set a ""
@@ -150,21 +150,11 @@ eval_is {
   }
 } ok {namespace resolution in body}
 
-eval_is {
-  if {[error moo]&&1} {error oink} else
-} {wrong # args: no expression after "else" argument} \
-  {no expression after else, occurs before command invocation} \
-  {SKIP {doesn't pass in tclsh8.5...}}
-
-eval_is {
-  if {[error moo]&&1} {error oink} elseif
-} {wrong # args: no expression after "elseif" argument} \
-  {no expression after elseif, occurs before command invocation} \
-  {SKIP {doesn't pass in tclsh8.5...}}
-
 eval_is {if {}} \
-  {syntax error in expression "": premature end of expression} \
-  {expression errors before [if] errors}
+  {empty expression
+in expression ""} \
+  {expression errors before [if] errors} \
+  {TODO {new behavior in 8.5.1}}
 
 eval_is {if 0 then} \
   {wrong # args: no script following "then" argument} \

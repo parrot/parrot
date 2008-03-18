@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -27,8 +27,9 @@ eval_is {foreach {} {a b c} {puts foo}} \
 eval_is {
     array set a {}
     foreach a {1 2 3 4} {puts $a}
-} {couldn't set loop variable: "a"} \
-  {couldn't set loop variable}
+} {can't set "a": variable is array} \
+  {couldn't set loop variable} \
+  {TODO {new behavior in tcl 8.5.1}}
 
 unset -nocomplain a
 is [foreach a {1 2 3 4} {set a}] {} {return value}

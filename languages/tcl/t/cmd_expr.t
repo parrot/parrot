@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -26,8 +26,10 @@ is [expr 2.3e2] 230.0 {scientific with float base}
 is [expr 2.3E2] 230.0 {scientific with float base (upper E)}
 is [expr 2e17]  2e+17 {scientific in, scientific out}
 eval_is {expr 3e2.0} \
- {syntax error in expression "3e2.0": extra tokens at end of expression} \
- {can only e with an integer exponent}
+ {missing operator at _@_
+in expression "3e2_@_.0"} \
+ {can only e with an integer exponent} \
+{TODO {new behavior in tcl 8.5.1}}
 
 # booleans
 is [expr TrUe]    TrUe  {true}
@@ -49,17 +51,26 @@ is [expr !!Y]     1  {y}
 is [expr !!No]    0  {no}
 is [expr !!N]     0  {n}
 
-eval_is {expr trues}  \
- {syntax error in expression "trues": the word "trues" requires a preceding $ if it's a variable or function arguments if it's a function} \
- {trues}
+eval_is {expr trues} \
+ {invalid bareword "trues"
+in expression "trues";
+should be "$trues" or "{trues}" or "trues(...)" or ...} {trues} \
+{TODO {new behavior in tcl 8.5.1}}
 eval_is {expr falses} \
- {syntax error in expression "falses": the word "falses" requires a preceding $ if it's a variable or function arguments if it's a function} \
- {falses}
+ {invalid bareword "falses"
+in expression "falses";
+should be "$falses" or "{falses}" or "falses(...)" or ...} {falses} \
+{TODO {new behavior in tcl 8.5.1}}
+
+# expected : 'syntax error in expression "falses": the word "falses" requires a preceding $ if it's a variable or function arguments if it's a function'
+
+
 is [expr 0b1001]    9 {binary}
 is [expr 0b10]      2 {binary}
 is [expr 0b101010] 42 {binary}
 
-eval_is {expr {}} {syntax error in expression "": premature end of expression}
+eval_is {expr {}} {empty expression
+in expression ""} {empty expr} {TODO {new behavior in tcl 8.5.1}}
 
 # simple unary ops.
 is [expr -2]   -2   {unary -}

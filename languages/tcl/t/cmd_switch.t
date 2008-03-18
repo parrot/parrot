@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 # the following lines re-execute this as a tcl script
@@ -21,8 +21,8 @@ eval_is {switch a} \
   {too few args, 1}
 
 eval_is {switch -monkey a} \
-  {bad option "-monkey": must be -exact, -glob, -indexvar, -matchvar, -nocase, -regexp, or --} \
-  {bad flag, -monkey}
+  {extra switch pattern with no body} \
+  {bad flag, -monkey} {TODO {new behavior in 8.5.1}}
 
 eval_is {switch a {    }} \
   {wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"} \
