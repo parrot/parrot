@@ -34,26 +34,11 @@ pmclass MDx
 */
     void init() {
 #ifndef OPENSSL_NO_MDx
-        MDx_CTX *c = mem_allocate_zeroed_typed(MDx_CTX);
+        MDx_CTX *c     = mem_allocate_zeroed_typed(MDx_CTX);
         PMC_data(SELF) = c;
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_active_destroy_SET(SELF);
 #else
-        real_exception(interp, NULL, ILL_INHERIT,
-            "MDx is disabled");
-#endif
-    }
-
-/*
-
-=item C<void mark()>
-
-=cut
-
-*/
-    void mark() {
-#ifndef OPENSSL_NO_MDx
-        if (PMC_data(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_data(SELF));
+        real_exception(interp, NULL, ILL_INHERIT, "MDx is disabled");
 #endif
     }
 
@@ -83,11 +68,13 @@ pmclass MDx
 */
     PMC* clone() {
 #ifndef OPENSSL_NO_MDx
-        PMC *retval = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        MDx_CTX *c = mem_allocate_zeroed_typed(MDx_CTX);
+        PMC     *retval  = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        MDx_CTX *c       = mem_allocate_zeroed_typed(MDx_CTX);
+
         memcpy(c, PMC_data(SELF), sizeof (MDx_CTX));
         PMC_data(retval) = c;
-        PObj_custom_mark_destroy_SETALL(retval);
+
+        PObj_active_destroy_SET(retval);
         return retval;
 #else
         return NULL;
@@ -139,10 +126,12 @@ pmclass MDx
     METHOD STRING* MDx_Final() {
 #ifndef OPENSSL_NO_MDx
         unsigned char digest[MDx_DIGEST_LENGTH];
-        MDx_CTX *c = PMC_data_typed(SELF, MDx_CTX *);
-        STRING *retval;
+        MDx_CTX      *c = PMC_data_typed(SELF, MDx_CTX *);
+        STRING       *retval;
+
         (void)MDx_Final(digest, c);
         retval = string_from_cstring(INTERP, (char *)digest, MDx_DIGEST_LENGTH);
+
         RETURN(STRING *retval);
 #else
         return NULL;
