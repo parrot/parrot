@@ -5,7 +5,7 @@
 
 
 .sub x
-.end              
+.end
 
 # Local Variables:
 #   mode: pir

@@ -1,6 +1,6 @@
 
 
-.macro M ( ) 
+.macro M ( )
 
 .endm
 

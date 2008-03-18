@@ -1,4 +1,4 @@
-# RT#40702: Stub 
+# RT#40702: Stub
 # help tcltest compile
 
 .HLL '_Tcl', 'tcl_group'

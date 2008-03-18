@@ -10,7 +10,7 @@ This file contains miscellaneous macros.
 
 =head1 Macros
 
-=head2 .NIL(R) 
+=head2 .NIL(R)
 
 Sets R to the empty list (the NIL symbol).
 
@@ -20,7 +20,7 @@ Sets R to the empty list (the NIL symbol).
   find_global .R, "SYMBOLS", "NIL"
 .endm
 
-=head2 .TRUE(R) 
+=head2 .TRUE(R)
 
 Sets R to true (the TRUE symbol).
 

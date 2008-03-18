@@ -6,8 +6,8 @@
 
 .sub '&puts'
   .param pmc argv :slurpy
- 
-  .local int argc 
+
+  .local int argc
   argc = argv
   if argc == 0 goto error
   if argc > 3 goto error
@@ -21,7 +21,7 @@
   if argc == 1 goto one_arg
   if argc == 2 goto two_arg
 
-three_arg: 
+three_arg:
   $S1 = argv[0]
   if $S1 != '-nonewline' goto bad_option
 
@@ -40,7 +40,7 @@ three_arg_stream:
 
 two_arg:
   # The last arg is the string to print.
-  $S3 = argv[1] 
+  $S3 = argv[1]
   $S3 = trans_encoding $S3, utf8
   # The first arg could be the option, or it could be a channel
   # figure out which.
@@ -50,7 +50,7 @@ two_arg_nonewline:
   print $S3
   goto done
 
-two_arg_channel:  
+two_arg_channel:
   io = __channel($S2)
 
   io.'say'($S3)
@@ -61,7 +61,7 @@ one_arg:
   $S1 = $P0
   $S1 = trans_encoding $S1, utf8
   say $S1
-  goto done  
+  goto done
 
 bad_option:
   $S0 = 'bad argument "'
@@ -69,7 +69,7 @@ bad_option:
   $S0 .= $S3
   $S0 .= '": should be "nonewline"'
   tcl_error $S0
- 
+
 error:
   tcl_error 'wrong # args: should be "puts ?-nonewline? ?channelId? string"'
 

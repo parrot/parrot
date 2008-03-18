@@ -63,7 +63,7 @@ loop:
     inc i
     if i < 3 goto loop
 .end
-    
+
 
 # Local Variables:
 #   mode: pir

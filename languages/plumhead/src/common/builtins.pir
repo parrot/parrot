@@ -101,7 +101,7 @@
     .return ($I0)
 .end
 
-.sub 'infix:==' 
+.sub 'infix:=='
     .param pmc a
     .param pmc b
 
@@ -121,7 +121,7 @@
     .return ($I0)
 .end
 
-.sub 'infix:eq' 
+.sub 'infix:eq'
     .param pmc a
     .param pmc b
 
@@ -282,7 +282,7 @@ not_a_string:
         say ') {'
 
         .local pmc    iter, val
-	.local string indent, key 
+	.local string indent, key
 	.local int    key_starts_with_digit
 	indent = '  '
         new iter, .Iterator, a
@@ -294,13 +294,13 @@ iter_loop:
         key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key, 0
 	print indent
 	print '['
-	if key_starts_with_digit goto key_is_an_integer_1 
+	if key_starts_with_digit goto key_is_an_integer_1
 	    print '"'
-key_is_an_integer_1: 
+key_is_an_integer_1:
 	print key
-	if key_starts_with_digit goto key_is_an_integer_2 
+	if key_starts_with_digit goto key_is_an_integer_2
 	    print '"'
-key_is_an_integer_2: 
+key_is_an_integer_2:
 	say ']=>'
 	print indent
 	val = a[key]

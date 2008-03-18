@@ -3,13 +3,13 @@
 
 .sub '&regsub'
   .param pmc argv :slurpy
- 
+
   .local int argc
-  argc = elements argv 
+  argc = elements argv
   if argc < 3 goto badargs
 
   .local string expression, target, subSpec, original_target
- 
+
   .local pmc options
   options = new 'ResizablePMCArray'
   push options, 'all'
@@ -28,7 +28,7 @@
   target     = shift argv
   original_target = target
   subSpec    = shift argv
- 
+
   .local pmc tclARE # RT#40774: for now, just use P5 regexen
   tclARE = compreg 'PGE::P5Regex'
   $I0 = exists switches['nocase']
@@ -37,20 +37,20 @@
   target = downcase target
 
 ready:
-  .local pmc rule,match 
+  .local pmc rule,match
   rule = tclARE(expression)
   match = rule(target)
   unless match goto match_failed
- 
+
   .local int from, to, match_len
   from = match.'from'()
   to   = match.'to'()
   match_len = to - from
 
   .local pmc matches
-  matches = match.'get_array'() 
+  matches = match.'get_array'()
 
-  # replace any special characters with the results of the match 
+  # replace any special characters with the results of the match
   .local int pos
   pos = 0
   .local string replStr
@@ -78,7 +78,7 @@ emit_0:
   $I1 -= $I0
   $S0 = substr original_target, $I0, $I1
   replStr .= $S0
-  inc pos 
+  inc pos
   goto loop
 
 handle_bs:
@@ -111,7 +111,7 @@ loop_done:
   .local string varName
   varName = shift argv
   __set (varName, original_target)
-  
+
   .return(1)  # XXX fix this when we support multiple replacements
 
 return_it:

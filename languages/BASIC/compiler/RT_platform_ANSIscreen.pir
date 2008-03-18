@@ -74,7 +74,7 @@
 .end
 
 ## These don't work exactly right.  ANSI would require that I send
-## \e[6n and read the input stream for a \e[row;colR reply from the 
+## \e[6n and read the input stream for a \e[row;colR reply from the
 ## terminal.  I *really* can't do that until IO is fixed, because STDIN
 ## is line-buffered and asking the user to press return after each cursor
 ## positioning is lame.
@@ -110,12 +110,12 @@
 	lt fore, 8, ANSI_FG
 	sub fore, fore, 8
 	print "1;"	# Turn on high intensity
-ANSI_FG: 
+ANSI_FG:
 	$I3 = $P0[fore]
 	print "3"
 	print $I3
 	print ";"
-	
+
 	# Background
 ANSI_BG:
 	$P0 = find_global "ANSI_bgcolors"
@@ -202,7 +202,7 @@ ANSI_BG:
 	I0= $P0["value"]
 	eq I0, 1, END
 	_set_noecho_cbreak()
-END:    
+END:
 	$P0["value"]= 1
 	store_global "scankey", $P0
 .end
@@ -212,7 +212,7 @@ END:
 	I0= $P0["value"]
 	eq I0, 0, END
 	_set_echo_nocbreak()
-END:    
+END:
 	$P0["value"]= 0
 	store_global "scankey", $P0
 .end

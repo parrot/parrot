@@ -18,7 +18,7 @@ Creates a stream and pipes it through a Stream::Lines stream.
 
     load_bytecode "library/Stream/Sub.pir"
     load_bytecode "library/Stream/Lines.pir"
-    
+
     # create a text stream
     stream = new "Stream::Sub"
     # set the source
@@ -29,10 +29,10 @@ Creates a stream and pipes it through a Stream::Lines stream.
     lines = new "Stream::Lines"
     # set the source
     assign lines, stream
-    
+
     # dump the stream
     lines."dump"()
-    
+
     end
 .end
 

@@ -3,7 +3,7 @@
 
 .sub '&clock'
   .param pmc argv :slurpy
-  
+
   .local int argc
   argc = argv
 

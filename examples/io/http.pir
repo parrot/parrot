@@ -11,7 +11,7 @@ examples/io/http.pir - HTTP client
 
 =head1 DESCRIPTION
 
-HTTP client, connects to WWW port and grabs a page (L<http://www.ibm.com>). 
+HTTP client, connects to WWW port and grabs a page (L<http://www.ibm.com>).
 
 You should be running the echo service on your box (port 7). Be sure to
 set C<PARROT_NET_DEVEL> to 1 in F<io/io_private.h> and rebuld Parrot or
@@ -26,7 +26,7 @@ the network layer won't exist.
     .local int ret
     .local int len
 
-    # create the socket handle 
+    # create the socket handle
     print "Creating socket.\n"
     socket sock, 2, 1, 0
     unless sock goto ERR
@@ -34,23 +34,23 @@ the network layer won't exist.
     # Pack a sockaddr_in structure with IP and port
     sockaddr address, 80, "www.ibm.com"
     print "Connecting to http://www.ibm.com:80\n"
-    connect ret, sock, address 
+    connect ret, sock, address
     print "connect returned "
-    print ret 
+    print ret
     print "\n"
 
     send ret, sock, "GET /us/en/ HTTP/1.0\nUser-agent: Parrot\n\n"
     poll ret, sock, 1, 5, 0
 MORE:
-    recv ret, sock, buf 
+    recv ret, sock, buf
     if ret <= 0 goto END
-    print buf 
-    goto MORE 
+    print buf
+    goto MORE
 ERR:
     print "Socket error\n"
     end
 END:
-    close sock 
+    close sock
     end
 .end
 

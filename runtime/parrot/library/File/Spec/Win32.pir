@@ -417,18 +417,18 @@ no_match_13:
 #   $dest = \@path_dirs if $dir eq $self->updir;
 #   push @$dest, $dir;
 #    }
-#    # for each .. in @path_dirs pop one item from 
+#    # for each .. in @path_dirs pop one item from
 #    # @base_dirs
-#    while (my $dir = shift @path_dirs){ 
+#    while (my $dir = shift @path_dirs){
 #   unless ($dir eq $self->updir){
 #       unshift @path_dirs, $dir;
 #       last;
 #   }
 #   pop @base_dirs;
 #    }
-#    $path = $self->catpath( 
-#              $vol, 
-#              $self->catdir(@base_dirs, @path_dirs), 
+#    $path = $self->catpath(
+#              $vol,
+#              $self->catdir(@base_dirs, @path_dirs),
 #              $file
 #             );
 
@@ -455,7 +455,7 @@ return:
     p6rule= find_global 'PGE', 'p6rule'
 
     unless no_file, with_file
-    ## m{^( (?:[a-zA-Z]:|(?:\\\\|//)[^\\/]+[\\/][^\\/]+)? ) 
+    ## m{^( (?:[a-zA-Z]:|(?:\\\\|//)[^\\/]+[\\/][^\\/]+)? )
     ##       (.*)
     ##  }xs;
 

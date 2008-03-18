@@ -15,7 +15,7 @@ copy.
 
     firstname = new 'String'
     firstname = "Ford"
-    say firstname 
+    say firstname
 
     $P1 = firstname
     $P1 = "Zaphod"

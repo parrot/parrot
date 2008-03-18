@@ -57,9 +57,9 @@ at the pio.
     addattribute cl, 'active'   # list of active ClientConns
     addattribute cl, 'to_log'   # list of strings to be logged
     addattribute cl, 'doc_root' # where to serve files from
-    
+
     # client connection
-    # XXX this should subclass ParrotIO but opcode or PIO code 
+    # XXX this should subclass ParrotIO but opcode or PIO code
     # just doesn't work with classes
     cl = newclass ['HTTP'; 'Daemon'; 'ClientConn']
     addattribute cl, 'socket'	# the connected pio
@@ -282,7 +282,7 @@ do_debug:
     n = elements args
     fmt = repeat "%Ss", n
     res = sprintf fmt, args
-    printerr res	
+    printerr res
 .end
 
 =item log(...)
@@ -332,7 +332,7 @@ runnloop.
 add_lp:
     conn = active[i]
     sock = conn.'socket'()
-    add_io_event sock, req_handler, conn, .IO_THR_MSG_ADD_SELECT_RD 
+    add_io_event sock, req_handler, conn, .IO_THR_MSG_ADD_SELECT_RD
     ## self.'debug'('**select ', i, "\n")
     inc i
     if i < n goto add_lp
@@ -349,7 +349,7 @@ Called from server runnloop.
     .local int n, now, last
     .local pmc active, conn, sock
 
-    now = time 
+    now = time
     active = getattribute self, 'active'
     n = elements active
     dec n
@@ -472,7 +472,7 @@ yes:
     if $I0 goto do_read
     .return srv.'accept_conn'()
 
-do_read:    
+do_read:
     req = conn.'get_request'()
     unless req goto close_it
     $S0 = req.'method'()
@@ -784,11 +784,11 @@ The hash keys and values are urldecoded already.
     .param pmc args :slurpy
 
     .local string ret
-    ret = sprintf "%d", args 
+    ret = sprintf "%d", args
     .return( ret )
 .end
 
-# convert %xx to char 
+# convert %xx to char
 .sub urldecode
     .param string in
 
@@ -1062,7 +1062,7 @@ create header response items.
 =cut
 
 .sub 'code' :method
-    .param string ccc 
+    .param string ccc
     .const string proto = 'HTTP/1.1 '
 
     .local string line
@@ -1090,7 +1090,7 @@ fin:
 
 =item header(h => v, ...)
 
-Append the given keyed items to the response headers. 
+Append the given keyed items to the response headers.
 
 XXX shall this be actually push_header?
 

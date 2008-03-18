@@ -10,12 +10,12 @@
     .param int i
     .local pmc new_type
     .local int s
-    
+
     # Get type describing hash to store.
     s = elements stypes
     dec s
     new_type = stypes[s]
-    
+
     # Set updated type info in place.
     ptypes[i] = new_type
 .end
@@ -27,7 +27,7 @@
     .param int i
     .local pmc new_type, old_type, ex
     .local int s, ot, nt
-    
+
     # Get type describing hash to store.
     s = elements stypes
     dec s

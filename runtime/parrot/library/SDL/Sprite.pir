@@ -198,7 +198,7 @@ done:
 
 Draws the image this object represents to the given SDL::Surface.  This will
 return two SDL::Rect objects, one representing the previous position of this
-sprite and one representing the current position.  
+sprite and one representing the current position.
 
 Use this when dealing with a single-buffered main window.  You'll need to call
 C<update_rect()> on the C<surface> to make things actually show up, if it's the

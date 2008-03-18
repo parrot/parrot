@@ -26,7 +26,7 @@ check_splitchars:
 got_splitchars:
   if splitchars == '' goto split_empty
 
-  .local pmc charHash 
+  .local pmc charHash
   charHash = new 'Hash'
 
   .local int sc_len, pos
@@ -58,7 +58,7 @@ done_hash_loop:
 
 split_loop:
   if str_len == pos goto split_done
-  split_char = substr splitstring, pos, 1 
+  split_char = substr splitstring, pos, 1
   $I1 = exists charHash[split_char]
   unless $I1 goto next_split_loop
   begin = last_match + 1

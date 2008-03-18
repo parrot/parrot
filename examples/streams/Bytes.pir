@@ -32,7 +32,7 @@ This example shows the usage of C<Stream::read_bytes>.
 
     stream = clone stream
     $P0 = clone stream
-    
+
     $S0 = stream."read_bytes"( 4 )
     print "'lowo': ["
     print $S0
@@ -42,7 +42,7 @@ This example shows the usage of C<Stream::read_bytes>.
     print "["
     print $S0
     print "]\n"
-    
+
     $S0 = stream."read"()
     print "'rld!': ["
     print $S0

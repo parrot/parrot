@@ -9,11 +9,11 @@
 
 .sub '&uplevel'
   .param pmc argv :slurpy
- 
+
   .local int argc
   argc = elements argv
   if argc == 0 goto bad_args
- 
+
   .local pmc __script, __call_level
   __script        = get_root_global ['_tcl'], '__script'
   __call_level    = get_root_global ['_tcl'], '__call_level'
@@ -26,8 +26,8 @@
 
   .local pmc new_call_level
   new_call_level = argv[0]
- 
-  .local int defaulted 
+
+  .local int defaulted
   (new_call_level,defaulted) = __call_level(new_call_level)
   if defaulted == 1 goto skip
 

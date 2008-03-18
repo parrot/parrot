@@ -103,7 +103,7 @@ STEP_7:
 
 STEP_8:
     peek char, stream                         # A bit of a workaround until a
-    ord ordv, char                            # unget opcode is implemented 
+    ord ordv, char                            # unget opcode is implemented
     type = readtable[ordv]                    # to push chars back on the stream.
 
     if char == "" goto STEP_10
@@ -347,7 +347,7 @@ CLtL section 2.4.1.
     .return(retv)
 .end
 
-=head2 _right_paren_macro   
+=head2 _right_paren_macro
 
 As described in CLtL section 2.4.2
 
@@ -365,7 +365,7 @@ As described in CLtL section 2.4.3
 
 =cut
 
-.sub _single_quote_macro                
+.sub _single_quote_macro
     .param pmc args
 
     .local pmc stream

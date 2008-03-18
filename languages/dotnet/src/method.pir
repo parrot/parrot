@@ -23,7 +23,7 @@
     # Get details of parameter info and multi-method dispatch markup.
     ns = class.get_fullname()
     (rettype, ptypes, pir_params, pir_multi) = trans_method_params(assembly, meth, ns)
-    
+
     # Emit top of method.
     pir_output = ".sub \""
     name = meth
@@ -83,7 +83,7 @@ NOSELF:
     # Emit end of method.
 METHOD_END:
     pir_output = concat ".end\n\n"
-    
+
     # Return generated string.
     .return (pir_output)
 .end
@@ -111,7 +111,7 @@ METHOD_END:
 
     # Get flags.
     flags = signature.read_uint8()
-    
+
     # Check if it's a static method, has this specified explicitly or is
     # var arg.
     static_check = band flags, 0x20
@@ -151,10 +151,10 @@ NOSELF:
     pir_mmdunbox = ""
 PARAM:
     if i >= param_count goto ENDPARAM
-    
+
     # Emit first bit of PIR.
     pir_output = concat "    .param "
-    
+
     # Parameter type.
     ptype = get_signature_RetType_or_Param(signature)
     annotate_reg_type(ptype)
@@ -227,7 +227,7 @@ MMD_R4:
     pir_multi = concat "\"@@DOTNET_MMDBOX_R4\""
     goto MMD_DONE
 MMD_DONE:
-    
+
     # Loop.
     inc i
     goto PARAM
@@ -285,7 +285,7 @@ LOCAL:
 
     # Emit first bit of PIR.
     pir_output = concat "    .local "
-    
+
     # Parameter type.
     ltype = get_signature_Local(signature)
     annotate_reg_type(ltype)
@@ -311,7 +311,7 @@ LOCAL:
     pir_output = concat $S0
     pir_output = concat "\n"
 NOT_VT:
-    
+
     # Loop.
     inc i
     goto LOCAL
@@ -500,7 +500,7 @@ REF:
 NO_NS:
     tmp = pclass
     pclass_ns = concat tmp
-    
+
     # Return class and its namespace.
 DONE:
     .return (pclass, pclass_ns)

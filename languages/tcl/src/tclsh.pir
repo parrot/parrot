@@ -76,7 +76,7 @@
   if $I0 >=0  goto got_readline_status
   readlineInd = 0
 got_readline_status:
-  
+
   input_line = ''
 
   .local int level
@@ -111,7 +111,7 @@ loop_error:
   if exception_msg == 'missing close-brace'   goto input_loop_continue2
   if exception_msg == 'missing close-bracket' goto input_loop_continue2
   if exception_msg == 'missing "'             goto input_loop_continue2
-  
+
 loop_error_real:
   .get_stacktrace($S0)
   print $S0
@@ -128,7 +128,7 @@ input_loop_continue2:
 
 open_file:
   tcl_interactive = 0
- 
+
 file:
   filename = shift argv
   .local string contents
@@ -136,7 +136,7 @@ file:
   contents = $P99.'slurp'('')
 
   .set_tcl_argv()
-  unless dump_only goto run_file  
+  unless dump_only goto run_file
   push_eh file_error
     ($S0,$I0) = __script(contents, 'pir_only'=>1, 'bsnl'=>1, 'wrapper'=>1)
   pop_eh
@@ -196,13 +196,13 @@ break_outside_loop:
   end
 
 exit_exception:
-  .rethrow() 
+  .rethrow()
 .end
 
 .sub __prompt
   .param int level
-  .param int readlineInd 
- 
+  .param int readlineInd
+
   .local pmc STDOUT
   STDOUT = getstdout
   .local pmc STDIN

@@ -23,7 +23,7 @@ Creates a counter stream that generates numbers from 0 to 9.
 
     load_bytecode "library/Stream/Sub.pir"
     load_bytecode "library/Stream/Filter.pir"
-    
+
     # create the counter stream
     stream = new "Stream::Sub"
     # assign its source
@@ -37,10 +37,10 @@ Creates a counter stream that generates numbers from 0 to 9.
     # set the filter sub
     .const .Sub temp = "_filter"
     filter."filter"( temp )
-    
+
     # dump the stream
     filter."dump"()
-    
+
     end
 .end
 
@@ -55,7 +55,7 @@ It generates numbers from 0 to 9 in string form.
     .param pmc stream
     .local string str
     .local int i
-    
+
     i = 0
 
 LOOP:

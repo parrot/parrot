@@ -947,10 +947,10 @@
 ##    method typename($/, $key) {
 ##        my $ns := $<name><ident>.clone();
 ##        my $name := $ns.pop();
-##        make PAST::Var.new( :node($/), 
+##        make PAST::Var.new( :node($/),
 ##                            :scope('package'),
-##                            :name($name), 
-##                            :namespace($ns) 
+##                            :name($name),
+##                            :namespace($ns)
 ##                          );
 ##    }
 .sub 'typename' :method

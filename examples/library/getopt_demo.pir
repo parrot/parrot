@@ -135,7 +135,7 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
 
-.sub usage 
+.sub usage
   .param string program_name
 
   print "Usage: ./parrot "

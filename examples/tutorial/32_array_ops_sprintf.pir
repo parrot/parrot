@@ -9,7 +9,7 @@ Particularly note the options for printing PMCs which C doesn't have.
 
     .local pmc myarray
     myarray = new 'ResizablePMCArray'
-   
+
     $P0 = new 'Integer'
     $P0 = 42
     push myarray, $P0
@@ -21,7 +21,7 @@ Particularly note the options for printing PMCs which C doesn't have.
     $S0 = sprintf "int %#Px num %+2.2Pf\n", myarray
     print $S0     # prints "int 0x2a num +10.50"
     print "\n"
-    
+
 .end
 
 # Local Variables:

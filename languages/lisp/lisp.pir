@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-lisp.pir - main function of Parrot Common Lisp 
+lisp.pir - main function of Parrot Common Lisp
 
 =head1 Description
 
@@ -74,17 +74,17 @@ Needed PIR code is included.
     # check the commandline whether we should read STDIN or load from file
     .local int argc
     argc = argv
-    if argc <= 1 goto READ_STDIN   
+    if argc <= 1 goto READ_STDIN
 
         # interpret a file
         .local pmc infile_name          # name of the inputfile from the commandline
-        .STRING(infile_name, argv[1])       
+        .STRING(infile_name, argv[1])
         .LIST_1(args, infile_name)
         retv = _load(args)              # Load the specified file.
 
         end
-    
-READ_STDIN:        
+
+READ_STDIN:
     # Read-Eval-Print-Loop
 
     .local pmc symbol

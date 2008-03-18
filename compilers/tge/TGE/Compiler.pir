@@ -155,7 +155,7 @@ err_no_tree:
   parent_defined:
     rule["build"] = "rule"
     .return (rule)
-   
+
 err_no_rule:
     print "Unable to find all the components of a rule definition\n"
     exit 1
@@ -363,7 +363,7 @@ loop_end:
     output .= name
     output .= "', '"
     output .= parent
-    output .= "',  '_" 
+    output .= "',  '_"
     output .= type
     output .= "_"
     output .= name

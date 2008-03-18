@@ -19,11 +19,11 @@
   count = __integer($P0)
 
   if count < 1 goto must_have_count
-   
+
   # convert the Array ireturned by foldup into a TclList.
   .local pmc retval
   retval = new 'TclList'
- 
+
   .local int i_cnt
   .local int o_cnt
 
@@ -37,7 +37,7 @@ INNER_LOOP:
   push retval, $P0
   inc i_cnt
   goto INNER_LOOP
-INNER_DONE: 
+INNER_DONE:
   inc o_cnt
   goto OUTER_LOOP
 OUTER_DONE:

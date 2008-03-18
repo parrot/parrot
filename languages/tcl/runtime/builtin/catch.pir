@@ -6,8 +6,8 @@
 
 .sub '&catch'
   .param pmc argv :slurpy
- 
-  .local int argc 
+
+  .local int argc
   argc = elements argv
 
   .local int retval
@@ -41,7 +41,7 @@ got_retval:
 
   varname = argv[1]
 
-  # Store the caught value in a 
+  # Store the caught value in a
 
   .local pmc __set
   __set = get_root_global ['_tcl'], '__set'

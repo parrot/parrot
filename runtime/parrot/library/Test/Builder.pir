@@ -351,7 +351,7 @@ declared a plan or if you pass an invalid argument.
     throw plan_exception
 
   FINISH_PLAN:
-    unless vivify_global_testplan goto WRITE_HEADER 
+    unless vivify_global_testplan goto WRITE_HEADER
     store_global 'Test::Builder::_singleton', 'testplan', testplan
 
   WRITE_HEADER:
@@ -586,7 +586,7 @@ also calls C<exit>.
 
     .local pmc number
     number = new 'Integer'
-    
+
     .local int count
     count  = results
     number = count

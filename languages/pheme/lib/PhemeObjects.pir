@@ -30,7 +30,7 @@
 
 	.local pmc tail
 	tail = self.'tail'()
-	
+
 	.local string tail_output
 	tail_output = tail
 	unless tail_output goto return_it

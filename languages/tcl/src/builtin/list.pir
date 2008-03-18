@@ -17,10 +17,10 @@
     # handle all the list elements
     .local int arg_num
     arg_num = 0
-  arg_loop:  
-    if arg_num >= argc goto end_loop 
+  arg_loop:
+    if arg_num >= argc goto end_loop
     $P1 = argv[arg_num]
-    pir_code .= retval  
+    pir_code .= retval
     pir_code .= '['
     $S0 = arg_num
     pir_code .= $S0

@@ -29,34 +29,34 @@ a test suite.
     .local int ret
     .local int len
     print "Creating socket.\n"
-    # create the socket handle 
+    # create the socket handle
     socket sock, 2, 1, 0
     unless sock goto ERR
     # Pack a sockaddr_in structure with IP and port
     sockaddr address, 7, "127.0.0.1"
     print "Connecting to port 7 (ECHO)\n"
-    connect ret, sock, address 
+    connect ret, sock, address
     print "connect returned "
-    print ret 
+    print ret
     print "\n"
 COMMAND:
     print "echo>"
     read buf, 100
     chopn buf, 1
-    length len, buf 
+    length len, buf
     if len <= 0 goto END
     concat buf, "\n"
-    send ret, sock, buf 
+    send ret, sock, buf
     poll ret, sock, 1, 5, 0
-    recv ret, sock, buf 
+    recv ret, sock, buf
     if ret < 0 goto END
-    print buf 
+    print buf
     branch COMMAND
 ERR:
     print "Socket error, you may not have compiled with PARROT_SOCKET_DEV (see io/io_private.h)\n"
     end
 END:
-    close sock 
+    close sock
     end
 .end
 

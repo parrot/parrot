@@ -53,7 +53,7 @@ arg_loop:
   list = new 'Iterator', list
   push varLists, varList
   push lists, list
-  
+
   if $I0 <= iterations goto arg_loop
   iterations = $I0
   goto arg_loop
@@ -64,7 +64,7 @@ arg_done:
 next_iteration:
   inc iteration
   if iteration >= iterations goto done
-  
+
   .local int counter, elems
   counter = -1
   elems   = elements varLists
@@ -115,7 +115,7 @@ handle_continue:
   if return_type == TCL_BREAK goto done
   if return_type == TCL_CONTINUE goto next_iteration
   .rethrow()
- 
+
 done:
   .return('')
 

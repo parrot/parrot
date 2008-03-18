@@ -5,14 +5,14 @@
     #load_bytecode 'Test/More.pir'
 
     .local pmc import_sub
-    
+
     .IMPORT ( 'Test::More', 'pln' )
-    
+
    #.local string res, exp, desc
-    
-    
+
+
     'plan'(TESTS)
-    
+
     'issame'()
     'isntsame'()
     'istrue'()

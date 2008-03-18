@@ -6,8 +6,8 @@
 
 .sub '&concat'
   .param pmc argv :slurpy
- 
-  .local int argc 
+
+  .local int argc
   argc = argv
 
   .local string retval
@@ -31,7 +31,7 @@ arg_loop:
 
 loop_init:
 
-  # Trim off leading and trailing space on the arg. 
+  # Trim off leading and trailing space on the arg.
   start_pos = 0
   end_pos = length current_arg
 
@@ -70,10 +70,10 @@ append_string:
 
 arg_loop_next:
   inc arg_num
-  goto arg_loop 
+  goto arg_loop
 
 arg_loop_done:
- 
+
 done:
   .return(retval)
 .end

@@ -8,10 +8,10 @@
 	bsr $I0
 	noop
 	noop
-	end 
+	end
 .end
 
-	
+
 
 # Local Variables:
 #   mode: pir

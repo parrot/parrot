@@ -197,7 +197,7 @@ conversion.
     throw $P0
     .return ('', 0)
 .end
-    
+
 =back
 
 =head1 AUTHORS

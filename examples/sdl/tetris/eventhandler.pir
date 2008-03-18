@@ -29,7 +29,7 @@ END:
 
 .sub app :method
     .local pmc app
-    
+
     classoffset $I0, self, "Tetris::EventHandler"
     getattribute app, self, $I0
     .return (app)
@@ -38,7 +38,7 @@ END:
 .sub dispatch_event :method
     .local pmc app
     .local int ret
-    
+
     app = self."app"()
     app."setTimer"( 0 )
     save app
@@ -62,7 +62,7 @@ END:
     print " is "
     print blockID
     print "\n"
-    
+
     app = self."app"()
     board = app."board"( boardID )
 

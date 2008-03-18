@@ -37,7 +37,7 @@ available.
     i = 0
 spin:
     # the IO event is inactive, after it fired, just reattach always
-    add_io_event pio, handler, data, .IO_THR_MSG_ADD_SELECT_RD 
+    add_io_event pio, handler, data, .IO_THR_MSG_ADD_SELECT_RD
     sleep 0.2
     $S0 = idles[i]
     inc i
@@ -54,7 +54,7 @@ spin:
     .param pmc pio
     .param pmc data
     $S0 = read pio, 4	# arbitray - could of course read more
-    $I0 = length $S0 
+    $I0 = length $S0
     unless $I0 goto ex
     print $S0
     print " - "

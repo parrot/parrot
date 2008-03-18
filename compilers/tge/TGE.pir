@@ -7,7 +7,7 @@ TGE - A tree grammar engine.
 =head1 SYNOPSIS
 
     # define a grammar leaf.tg
-    transform min (Leaf) :language('PIR') { 
+    transform min (Leaf) :language('PIR') {
         $P1 = getattribute node, "value"
         .return ($P1)
     }
@@ -66,7 +66,7 @@ only valid language is PIR. Within the block, two parameters are supplied for
 you: C<node> is the current node considered, and C<tree> is the top-level node
 for the entire tree.
 
-The C<:applyto> modifier says which node the transform applies to. 
+The C<:applyto> modifier says which node the transform applies to.
 
     transform name (pattern) :applyto('childname') {
         # action

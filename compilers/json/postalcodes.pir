@@ -33,33 +33,33 @@ places with that code from around the world.
     .local int ret
     .local int len
 
-    # create the socket handle 
+    # create the socket handle
     socket sock, 2, 1, 0
     unless sock goto ERR
 
     # Pack a sockaddr_in structure with IP and port
     sockaddr address, 80, 'ws.geonames.org'
-    connect ret, sock, address 
+    connect ret, sock, address
 
-    .local string url 
+    .local string url
     url = 'http://ws.geonames.org/postalCodeSearchJSON?maxRows=10&postalcode='
     url .= postal
- 
+
     $S0 = 'GET '
     $S0 .= url
-    $S0 .= " HTTP/1.0\nUser-agent: Parrot\n\n" 
+    $S0 .= " HTTP/1.0\nUser-agent: Parrot\n\n"
     send ret, sock, $S0
     poll ret, sock, 1, 5, 0
 MORE:
-    recv ret, sock, buf 
+    recv ret, sock, buf
     if ret < 0 goto END
     json_result .= buf
-    goto MORE 
+    goto MORE
 ERR:
     print "Socket error\n"
     end
 END:
-    close sock 
+    close sock
 
     $I1 = find_charset 'unicode'
     trans_charset json_result, $I1
@@ -78,12 +78,12 @@ END:
     $P2 = $P2['postalCodes']
     .local pmc iter, code
     iter = new 'Iterator', $P2
-  
+
  code_loop:
     push_eh code_end
       code = shift iter
     pop_eh
-    unless code goto code_end 
+    unless code goto code_end
 
     $S0 = code['placeName']
     print "Place: "
@@ -94,8 +94,8 @@ END:
     print '; Code: '
     $S0 = code['postalCode']
     print $S0
-    print "\n"  
-    
+    print "\n"
+
     goto code_loop
  code_end:
 

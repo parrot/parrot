@@ -69,10 +69,10 @@ has_host:
     .param pmc arg0
     print "Usage: ./parrot "
     print arg0
-    print <<"EOP" 
+    print <<"EOP"
  options ...
 
-Valid options are: 
+Valid options are:
 
     [ --port|p=<port> ]     default 1234
     [ --host|h=<host> ]     default 'localhost'

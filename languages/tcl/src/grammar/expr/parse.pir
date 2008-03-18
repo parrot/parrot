@@ -1,7 +1,7 @@
 
 =head1 TITLE
 
-parse.pir - Parsing support subroutines for [expr] 
+parse.pir - Parsing support subroutines for [expr]
 
 =cut
 
@@ -13,7 +13,7 @@ parse.pir - Parsing support subroutines for [expr]
     $S0 = '0' . $S0
     $S0 = 'expected integer but got "' . $S0
     $S0 = $S0 . '" (looks like invalid octal number)'
-    
+
     tcl_error $S0
 .end
 
@@ -40,12 +40,12 @@ parse.pir - Parsing support subroutines for [expr]
     .param pmc    mob
     .param string msg
     .param pmc    adverbs :named :slurpy
-    
+
     .local pmc target
     target = getattribute mob, '$.target'
-   
+
     $S0 = target
-    $S0 = 'syntax error in expression "' . $S0 
+    $S0 = 'syntax error in expression "' . $S0
     $S0 .= '": '
     $S0 .= msg
 
@@ -55,11 +55,11 @@ parse.pir - Parsing support subroutines for [expr]
 .sub 'syntax_error_variable_or_function'
     .param pmc    mob
     .param pmc    adverbs :named :slurpy
-    
+
     .local string target
     $P0 = getattribute mob, '$.target'
     target = $P0
-    
+
     .local string msg
     msg = 'the word "'
     msg .= target

@@ -73,15 +73,15 @@
     .local pmc op_add
     op_add = new 'PAST::Op'
     op_add.init( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'n_add' )
-                
+
     .local pmc var_last
     var_last = new 'PAST::Var'
     var_last.init( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
-               
+
     .local pmc op_bind
     op_bind = new 'PAST::Op'
     op_bind.init( var_last, op_add, 'pasttype' => 'bind' )
-           
+
     .local pmc op_say
     op_say = new 'PAST::Op'
     op_say.init( op_bind, 'name' => 'say', 'pasttype' => 'call' )

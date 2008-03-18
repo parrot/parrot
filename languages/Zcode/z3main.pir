@@ -353,7 +353,7 @@ fin:
 no_deb_2:
   unless pass goto no_emit
     # TODO read in nlocals here (I think I need to change subs
-    # to be R + position of nlocals - change seen/todo) and pass it to 
+    # to be R + position of nlocals - change seen/todo) and pass it to
     # emit_sub_header (OR have emit_sub_header read it).
     # Print out the sub header, params, variable declarations/assignments
     self."emit_sub_header"($S0, first)
@@ -521,7 +521,7 @@ done:
       $S0 = i
       declares .= $S0
       declares .= "\n"
-      # I17 = a1 
+      # I17 = a1
       # uses of Z local var '1' will be translated to I17
       # But only assign as many args as we read in
       assigns .= "\tif argcI == "
@@ -898,7 +898,7 @@ no_local:
 no_stack:
     result = var
 # now convert to signed int if nec
-got_it: 
+got_it:
     unless is_signed goto no_conv
     conv_temp = self."temp"()
     $S0 = "\t"
@@ -929,7 +929,7 @@ no_conv:
   .local string t
   .local int global_adr
   .local string conv_temp
-  # Change the value to a signed value: 
+  # Change the value to a signed value:
   # $I27=I46; conv_temp $I27; use $I27 instead of I46 for the rest of the sub
   conv_temp = self."temp"()
   $S0 = "\t"

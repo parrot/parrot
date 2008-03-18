@@ -1,6 +1,6 @@
 # $Id$
 
-=head1 NAME 
+=head1 NAME
 
 input.pir - Setting up input and reading input
 
@@ -15,7 +15,7 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head2 void input_init( Hash state )
 
-Initialise some stacks and put them into the Hash state['stack']: 
+Initialise some stacks and put them into the Hash state['stack']:
 
 =over 4
 
@@ -27,7 +27,7 @@ Initialise some stacks and put them into the Hash state['stack']:
 
 =back
 
-Initialize some PGE rulesubs and put them into the Hash state['rulesub']: 
+Initialize some PGE rulesubs and put them into the Hash state['rulesub']:
 
 =over 4
 
@@ -47,8 +47,8 @@ TOOO: recognize nested quoted strings
 
 .include "datatypes.pasm"
 
-.sub input_init 
-  .param pmc state         
+.sub input_init
+  .param pmc state
 
   # setup of stacks
   .local pmc stack_in_state
@@ -91,9 +91,9 @@ TODO: open these files and complain when they don't or pass filehandles
 
 =cut
 
-.sub push_file 
-  .param string   filename    
-  .param pmc      state 
+.sub push_file
+  .param string   filename
+  .param pmc      state
 
   # This is needed for m4___file__
   # TODO: this is badly broken, when there are multiple input files
@@ -106,7 +106,7 @@ TODO: open these files and complain when they don't or pass filehandles
   pio = new 'ParrotIO'
   input_string = pio.slurp( filename )
 
-  # state['stack';'input'] has been created in input_init 
+  # state['stack';'input'] has been created in input_init
   # TODO: seperate input blocks for every file
   .local pmc input_stack
   input_stack = state['stack';'input']
@@ -136,7 +136,7 @@ Parse and return a single token from the input stream.  A token can
 either be TOKEN_EOF, if the state['stack';'input'] is empty; it can be TOKEN_STRING
 for a quoted string; TOKEN_WORD for something that is a potential macro
 name; and TOKEN_SIMPLE for any single character that is not a part of
-any of the previous types.					
+any of the previous types.
 									   |
 Next_token () return the token type and the token data.
 
@@ -144,54 +144,54 @@ Uses regular expressions for finding tokens.
 
 =cut
 
-.sub next_token 
-  .param pmc state 
+.sub next_token
+  .param pmc state
 
-  .local pmc input_stack    
+  .local pmc input_stack
   input_stack = state['stack';'input']
-  .local pmc input_block    
+  .local pmc input_block
   input_block = shift input_stack
-  .local string input_string    
+  .local string input_string
   input_string = input_block['string']
   .local int current_file_len
-  current_file_len = length input_string    
-  .local pmc rulesub   
+  current_file_len = length input_string
+  .local pmc rulesub
   .local string token_type
   token_type = 'TOKEN_EOF'
   .local string token_data
   token_data = ''
   .local pmc match
-    
+
   # look for 'TOKEN_SIMPLE'
   # read a whole bunch of non-macro and non-word charcters
   rulesub = state['rulesub';'simple']
   token_type = 'TOKEN_SIMPLE'
-  match = rulesub( input_string ) 
+  match = rulesub( input_string )
   if match goto MATCH
 
   # look for comments and return it as 'TOKEN_SIMPLE'
   rulesub = state['rulesub';'comment']
   token_type = 'TOKEN_SIMPLE'
-  match = rulesub( input_string ) 
+  match = rulesub( input_string )
   if match goto MATCH
 
   # look for 'TOKEN_STRING'
   rulesub = state['rulesub';'string']
   token_type = 'TOKEN_STRING'
-  match = rulesub( input_string ) 
+  match = rulesub( input_string )
   if match goto MATCH
 
   # look for 'TOKEN_WORD'
   # this will be checked for macro substitution
   rulesub = state['rulesub';'word']
   token_type = 'TOKEN_WORD'
-  match = rulesub( input_string ) 
+  match = rulesub( input_string )
   if match goto MATCH
 
-  if current_file_len != 0 goto MATCH_FAILED 
+  if current_file_len != 0 goto MATCH_FAILED
   token_type = 'TOKEN_EOF'
   token_data = ''
-  goto FINISH_NEXT_TOKEN 
+  goto FINISH_NEXT_TOKEN
 
   MATCH:
   # TODO: is there a method for extraction the matched string?
@@ -200,7 +200,7 @@ Uses regular expressions for finding tokens.
   ( captures ) = match."get_array"()
   token_from = match.'from'()
   token_to = match.'to'()
-  token_data = captures[0]   
+  token_data = captures[0]
   #token_data = substr input_string, token_from, token_to, ''      # TODO nibble at input without replacing input_string
   substr input_string, token_from, token_to, ''      # TODO nibble at input without replacing input_string
 
@@ -219,16 +219,16 @@ Uses regular expressions for finding tokens.
   ne token_type, 'TOKEN_STRING', NO_STRING_MATCH
     substr token_data, 0, 1, ''
     substr token_data, -1, 1, ''
-  NO_STRING_MATCH: 
+  NO_STRING_MATCH:
   goto FINISH_NEXT_TOKEN
 
   MATCH_FAILED:
     printerr "failed to match !"
     printerr input_string
-    printerr "!\n"     
+    printerr "!\n"
   goto FINISH_NEXT_TOKEN
 
-  FINISH_NEXT_TOKEN: 
+  FINISH_NEXT_TOKEN:
   input_block['string'] = input_string
   push input_stack, input_block
 

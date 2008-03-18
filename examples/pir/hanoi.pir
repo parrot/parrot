@@ -97,16 +97,16 @@ Converted to PIR Bernhard Schmalhofer 2005-10-20
         # check number of command line arguments
         $I0 = argv
         if $I0 < 2 goto USE_DEFAULT_SIZE
-        S5 = argv[1]    
+        S5 = argv[1]
         size = S5
         print "Building a tower of size "
         print size
         print ".\n"
-        goto SIZE_IS_NOW_KNOWN        
+        goto SIZE_IS_NOW_KNOWN
 USE_DEFAULT_SIZE:
         print "Using default size 3 for tower.\n"
         size = 3
-SIZE_IS_NOW_KNOWN:        
+SIZE_IS_NOW_KNOWN:
         print "\n"
 
         new P0, 'FixedPMCArray'
@@ -151,7 +151,7 @@ loop_cols:
         print S0
         mul I6, I4, 2                         #I6 = cursize * 2
         repeat S0, "=", I6
-        print S0        
+        print S0
         repeat S0, " ", size
         print S0
 

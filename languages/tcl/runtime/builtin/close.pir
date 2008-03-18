@@ -11,7 +11,7 @@
     argc = elements argv
 
     if argc != 1 goto bad_args
-    
+
     .local string channel_id
     channel_id = argv[0]
 

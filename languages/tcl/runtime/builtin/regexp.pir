@@ -3,9 +3,9 @@
 
 .sub '&regexp'
   .param pmc argv :slurpy
- 
+
   .local int argc
-  argc = argv 
+  argc = argv
   if argc < 2 goto badargs
 
   .local pmc options
@@ -56,13 +56,13 @@ ready:
 
    $I0 = exists switches['indices']
    if $I0 goto matches_ind
-  
+
    # Do this in case there was a -nocase
    $I0 = match.'from'()
    $I1 = match.'to'()
    $I1 -= $I0
    matchStr = substr original_string, $I0, $I1
- 
+
    __set(matchVar, matchStr)
 
    matches = match.'get_array'()
@@ -83,12 +83,12 @@ subMatches:
    $I1 = $P0.'to'()
    $I1 -= $I0
    subMatchStr = substr original_string, $I0, $I1
- 
+
 set_it:
-   __set(subMatchVar,subMatchStr) 
+   __set(subMatchVar,subMatchStr)
 
 next_submatch:
-  goto subMatches  
+  goto subMatches
 
 matches_ind:
   .local pmc matchList
@@ -98,14 +98,14 @@ matches_ind:
   $I0 = match.'from'()
   $I1 = match.'to'()
   dec $I1
-  matchList[0] = $I0 
-  matchList[1] = $I1 
-  __set(matchVar, matchList) 
+  matchList[0] = $I0
+  matchList[1] = $I1
+  __set(matchVar, matchList)
 
   matches = match.'get_array'()
 
 subMatches_ind:
-  .local pmc subMatchList 
+  .local pmc subMatchList
 subMatches_ind_loop:
    argc = elements argv
    unless argc goto done
@@ -124,9 +124,9 @@ subMatches_ind_loop:
    dec $I1
    subMatchList[0] = $I0
    subMatchList[1] = $I1
- 
+
 set_it_ind:
-   __set(subMatchVar,subMatchList) 
+   __set(subMatchVar,subMatchList)
 
 next_submatch_ind:
   goto subMatches_ind_loop

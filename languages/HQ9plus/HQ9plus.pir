@@ -63,11 +63,11 @@ L<http://www.cliff.biffle.org/esoterica/hq9plus.html>
         I0 = defined op_sub
         unless I0 goto OP_NOT_FOUND
             accumulator = op_sub( code_string_orig, accumulator )
-            goto SHIFT_NEXT_OP 
+            goto SHIFT_NEXT_OP
         OP_NOT_FOUND:
             print op_char
             print " not found\n"
-            goto SHIFT_NEXT_OP 
+            goto SHIFT_NEXT_OP
     FINISH_SHIFT_OPS:
 
 .end
@@ -80,21 +80,21 @@ L<http://www.cliff.biffle.org/esoterica/hq9plus.html>
 
     set I1, 99 # bottles of beer
     set I2, 1  # single bottle
-    
+
     set S1, " of beer on the wall,\n"
     set S2, " of beer,\n"
     set S3, "Take one down, pass it around,\n"
     set S4, " of beer on the wall.\n\n"
-    
+
     set S5, " bottle"
     set S6, " bottles"
-    
+
     set S7, "No more bottles of beer on the wall.\n\n"
-    
+
     set S8, "*Buuurrp*\n"
-    
+
     branch N_BOTTLES # start drinking
-    
+
     N_BOTTLES:
             print I1
             print S6
@@ -109,13 +109,13 @@ L<http://www.cliff.biffle.org/esoterica/hq9plus.html>
             print S6
             print S4
             ne I1, I2, N_BOTTLES # keep on drinking
-    
+
     BOTTLE_OF:
             print I1
             print S5
             print S4
             branch ONE_BOTTLE # 'bout time for a liver transplant
-    
+
     ONE_BOTTLE: # it's been fun
             print I1
             print S5

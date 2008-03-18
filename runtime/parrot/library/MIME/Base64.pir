@@ -22,7 +22,7 @@ This module defines the following subroutines:
 =item C<encode_base64( str )>
 
 Encode data by calling the encode_base64() function. The first argument
-is the string to encode. 
+is the string to encode.
 The returned encoded string is broken into lines
 of no more than 76 characters each.
 
@@ -97,7 +97,7 @@ then a warning is generated if perl is running under -w.
     .local int len, len_mod_3
     len = length plain
     len_mod_3 = len % 3
-      
+
     # Fill up with with null bytes
     if len_mod_3 == 0 goto END_1
         concat plain, ascii:"\0"
@@ -118,11 +118,11 @@ then a warning is generated if perl is running under -w.
     if i >= len goto END_3
 
 	# read 3*8 bits
-        eight_0 = ord plain, i  
+        eight_0 = ord plain, i
 	inc i
-        eight_1 = ord plain, i  
+        eight_1 = ord plain, i
 	inc i
-        eight_2 = ord plain, i  
+        eight_2 = ord plain, i
 	inc i
 
         # d[i]>>2;
@@ -215,16 +215,16 @@ then a warning is generated if perl is running under -w.
     if i >= len goto END_2
 
 	# read 4*6 bits
-        tmp_int_1 = ord base64_cleaned, i  
+        tmp_int_1 = ord base64_cleaned, i
 	six_0 = eight_to_six[tmp_int_1]
 	inc i
-        tmp_int_1 = ord base64_cleaned, i  
+        tmp_int_1 = ord base64_cleaned, i
 	six_1 = eight_to_six[tmp_int_1]
 	inc i
-        tmp_int_1 = ord base64_cleaned, i  
+        tmp_int_1 = ord base64_cleaned, i
 	six_2 = eight_to_six[tmp_int_1]
 	inc i
-        tmp_int_1 = ord base64_cleaned, i  
+        tmp_int_1 = ord base64_cleaned, i
 	six_3 = eight_to_six[tmp_int_1]
 	inc i
 
@@ -232,18 +232,18 @@ then a warning is generated if perl is running under -w.
         # (f64[t.charAt(i)]<<2) | (f64[t.charAt(i+1)]>>4)
         shl tmp_int_1, six_0, 2
 	shr tmp_int_2, six_1, 4
-	bor eight_0, tmp_int_1, tmp_int_2   
+	bor eight_0, tmp_int_1, tmp_int_2
 
         # (f64[t.charAt(i+1)]&15)<<4) | (f64[t.charAt(i+2)]>>2)
-        band tmp_int_1, six_1, 15 
+        band tmp_int_1, six_1, 15
 	shl tmp_int_1, 4
 	shr tmp_int_2, six_2, 2
-	bor eight_1, tmp_int_1, tmp_int_2   
+	bor eight_1, tmp_int_1, tmp_int_2
 
         # (f64[t.charAt(i+2)]&3)<<6) | (f64[t.charAt(i+3)])
-        band tmp_int_1, six_2, 3 
+        band tmp_int_1, six_2, 3
 	shl tmp_int_1, 6
-	bor eight_2, tmp_int_1, six_3   
+	bor eight_2, tmp_int_1, six_3
 
 	# write 3*8 bits
 	# output is larger than input

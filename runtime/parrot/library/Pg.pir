@@ -72,7 +72,7 @@ A class method that returns a new connection object.
 .sub connectdb :method
     .param string args
     .local pmc con, connectdb, o_con
-    connectdb = get_global 'PQconnectdb' 
+    connectdb = get_global 'PQconnectdb'
     con = connectdb(args)
     $P0 = get_class ['Pg';'Conn']
 
@@ -284,7 +284,7 @@ Install a notice receiver callback. The callback will be called as
   .sub 'notice'
     .param pmc arg
     .param pmc res
-    
+
 
 =cut
 

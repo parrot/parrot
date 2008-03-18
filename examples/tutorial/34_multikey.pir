@@ -17,7 +17,7 @@ created.
     myhash["answer"] = innerarray
 
     $I0 = myhash["answer";$I0]        # $i = $hash{"answer"}[2]
-    print $I0 
+    print $I0
     print "\n"
 
 .end

@@ -48,7 +48,7 @@
   .local int is_array
   .local string array_name
   .local pmc the_array
-  
+
   array_name = shift argv
 
   null the_array
@@ -165,7 +165,7 @@ set_loop:
   inc loop
   val = elems[loop]
   inc loop
-  
+
   # Do this just as if were were calling each set manually, as tcl's
   # error messages indicate it seems to.
 
@@ -176,7 +176,7 @@ set_loop:
   subvar .= '('
   subvar .= key
   subvar .= ')'
-  set(subvar, val) 
+  set(subvar, val)
 
   goto set_loop
 

@@ -279,7 +279,7 @@ Call a function.
 
         # VALID_IN_PARROT_0_2_0 returncc
     NOT_A_LISP_CONS:
-       
+
     .return ()
 
 DONE:
@@ -362,7 +362,7 @@ ARG_LOOP_END:
     .local pmc body
     .THIRD(body, form)
 
-    .const .Sub sub_that_calls_eval = 'sub_that_calls_eval' 
+    .const .Sub sub_that_calls_eval = 'sub_that_calls_eval'
     .local pmc closure
     closure = newclosure sub_that_calls_eval       # Capture the scope the closure
 
@@ -455,15 +455,15 @@ CLOSURE_DONE:
     .local int alen
      alen = 0
     .local pmc _nilp
-  
+
     .NIL(_nilp)
-  
+
 LOOP:
     eq_addr lptr, _nilp, DONE
     inc alen
     .CDR(lptr, lptr)
     goto LOOP
-  
+
 DONE:
     .return(alen)
 .end

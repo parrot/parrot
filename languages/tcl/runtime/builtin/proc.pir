@@ -26,7 +26,7 @@ Create a PIR sub on the fly for this user defined proc.
   __script     = get_root_global ['_tcl'], '__script'
   __list       = get_root_global ['_tcl'], '__list'
   __namespace  = get_root_global ['_tcl'], '__namespace'
- 
+
   .local pmc code, args_code, defaults
   .local string namespace
   code      = new 'CodeString'
@@ -40,7 +40,7 @@ Create a PIR sub on the fly for this user defined proc.
   name = ''
 
   if full_name == '' goto create
-  
+
   ns   = __namespace(full_name, 1)
   $I0  = elements ns
   if $I0 == 0 goto create
@@ -49,7 +49,7 @@ Create a PIR sub on the fly for this user defined proc.
   if $I0 == 1 goto root
   $P0 = get_hll_namespace ns
   if null $P0 goto unknown_namespace
-  
+
   namespace = join "'; '", ns
   namespace = "['" . namespace
   namespace .= "']"
@@ -61,7 +61,7 @@ root:
   $S0 = name
   $P1 = get_root_global ['_tcl'; 'builtins'], $S0
   if null $P1 goto create
-  
+
   .local pmc epoch
   epoch = get_root_global ['_tcl'], 'epoch'
   inc epoch
@@ -119,19 +119,19 @@ args_loop:
   if i == elems goto args_loop_done
   arg = args[i]
   arg = __list(arg)
-  
+
   $S0 = arg[0]
   args_info .= $S0
   args_info .= ' '
-  
+
   $I0 = elements arg
   if $I0 > 2 goto too_many_fields
   if $I0 == 2 goto default_arg
-  
+
   min = i + 1
   args_code.emit('  $P1 = shift args')
   args_code.emit("  lexpad['$%0'] = $P1", $S0)
-  
+
   args_usage .= ' '
   args_usage .= $S0
   goto args_next
@@ -184,7 +184,7 @@ END_PIR
 
 emit_args:
   code .= args_code
-  
+
   # Convert the remaining elements returned by foldup into a TclList
   code.emit(<<'END_PIR')
   .local pmc arg_list
@@ -212,7 +212,7 @@ END_PIR
   (parsed_body, body_reg) = __script(body, 'pir_only'=>1)
 
   code .= parsed_body
-  
+
   code.emit(<<'END_PIR', body_reg)
   pop_eh
 was_ok:
@@ -252,7 +252,7 @@ END_PIR
   # was compiled in it. we want the first (and only) one, and we want to
   # put it into a TclProc...
   $P0 = $P0[0]
- 
+
   $P1 = new 'TclProc'
   assign $P1, $P0
 
@@ -271,10 +271,10 @@ END_PIR
   setattribute $P1, 'args',       $P9
 
   setattribute $P1, 'defaults',   defaults_info
- 
+
   # And now store it into the appropriate slot in the namespace
   .local pmc ns_target
-  ns_target = get_hll_namespace 
+  ns_target = get_hll_namespace
 
   .local pmc iter, sub_ns
   iter = new 'Iterator', ns
@@ -302,7 +302,7 @@ too_many_fields:
   $S1 .= $S0
   $S1 .= '"'
   tcl_error $S1
-  
+
 error:
   tcl_error 'wrong # args: should be "proc name args body"'
 .end

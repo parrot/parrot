@@ -25,10 +25,10 @@ The main function.
     .local pmc screen
     .local int debug
 
-    # the debug mode is activated if you pass in any argument    
+    # the debug mode is activated if you pass in any argument
     debug = args
     dec debug
-    
+
     load_bytecode "library/SDL/App.pir"
     load_bytecode "library/SDL/Event.pir"
     load_bytecode "library/SDL/EventHandler.pir"
@@ -37,7 +37,7 @@ The main function.
     load_bytecode "library/SDL/Color.pir"
     load_bytecode "library/SDL/Image.pir"
     load_bytecode "examples/sdl/minesweeper/field.pir"
-    
+
     # setup the screen properties
     $P0 = new 'Hash'
     $P0["height"] = 480
@@ -48,10 +48,10 @@ The main function.
     # create the SDL object
     $P0 = new "SDL::App", $P0
     screen = $P0."surface"()
-    
+
     # choose a "random" field
     $I0 = time
-    
+
     # setup field properties
     $P0 = new 'Hash'
     $P0['width']  = 40
@@ -61,13 +61,13 @@ The main function.
     $P0['level']  = $I0
     $P0['screen'] = screen
     $P0['debug']  = debug
-    
+
     # create the field
     field = new "Mines::Field", $P0
 
     # draw the field
     field.'draw'()
-            
+
     # runloop
     $P0 = new "SDL::Event"
     $P1 = new "Mines::EventHandler"

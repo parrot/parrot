@@ -2,7 +2,7 @@
 
  L1:
   end
-  
+
 .end
 
 # Local Variables:

@@ -43,7 +43,7 @@ beginwhile:
 	line = readline stdin
 	unless line goto endwhile
 	$I0 = ord line
-	unless $I0 == 62 goto else   # '>' 
+	unless $I0 == 62 goto else   # '>'
 		if seq == '' goto no_rev
 		print_revcomp(seq)
 		seq = ''
@@ -73,7 +73,7 @@ done:
 
 	i = 0
 	$S0 = 'x'
-print_loop:	
+print_loop:
 	$S0 = substr_r line, i, 60
 	print $S0
 	print "\n"

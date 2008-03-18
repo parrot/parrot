@@ -1,10 +1,10 @@
 
 # this is the test program for the forth implementation targetting parrot.
-# this script can be passed the names of any number of test files. each test is 
+# this script can be passed the names of any number of test files. each test is
 # a series of input/output pairs, with optional comments that start with #s.
 #
 # the first non-blank, non-comment line is considered the first input. the line
-# immediately following that is the first output line. the output can be either 
+# immediately following that is the first output line. the output can be either
 # the stack (where the elements are joined by a space) or the message of a
 # thrown exception.
 

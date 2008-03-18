@@ -408,7 +408,7 @@ with the string C<rep>.
 
 Loads a buffer as a Lua chunk.
 
-C<name> is the chunk name, used for debug information and error messages. 
+C<name> is the chunk name, used for debug information and error messages.
 
 =cut
 

@@ -36,7 +36,7 @@ F<examples/benchmarks/arriter_o1.pir>.
     $P24 = new 'Undef'
     .lex "$s", $P24
 
-# same as @k = qw( A B C D E F G H I J ); 
+# same as @k = qw( A B C D E F G H I J );
     find_lex $P29 , "$i"
     $P29 = 0
 for_1_start:

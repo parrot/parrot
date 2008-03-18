@@ -69,7 +69,7 @@ loop_x:
 
 loop_y:
 	main_screen.'draw_pixel'( x, y, converted_blue )
-	
+
 	inc y
 	if y < 480 goto loop_y
 	inc x

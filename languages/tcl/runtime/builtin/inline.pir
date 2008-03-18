@@ -13,7 +13,7 @@
 
   .local int argc
   argc = argv
-  
+
   if argc != 2 goto bad_args
 
   .local string language,code

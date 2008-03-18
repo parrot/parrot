@@ -27,9 +27,9 @@ Dump a state file.
 
 =cut
 
-.sub produce_frozen_state 
+.sub produce_frozen_state
   .param pmc        state
-  .param string     frozen_file    
+  .param string     frozen_file
 
   .local pmc symtab
   symtab = state['symtab']
@@ -78,9 +78,9 @@ For now we just worry about the flags 'F', 'T' and 'V'.
 
 =cut
 
-.sub reload_frozen_state 
-  .param pmc        state    
-  .param string     frozen_file    
+.sub reload_frozen_state
+  .param pmc        state
+  .param string     frozen_file
 
   # Read the file into the string file
   .local string content
@@ -104,7 +104,7 @@ READ_CONTENT:
 
   # vars which will contain the extracted info
   .local int    name_len
-  .local int    substitution_len   
+  .local int    substitution_len
   .local string name
   .local string text
 
@@ -149,27 +149,27 @@ NOT_AN_EMPTY_LINE:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_COMMA_1
     #goto PERHAPS_ANOTHER_DIGIT_1
   EXPECT_A_COMMA_1:
-    substr token, content, 0, pos, '' 
+    substr token, content, 0, pos, ''
     name_len = token
     pos = 0
     # rx_ is deprecated rx_literal content, pos, ',', UNEXPECTED
-    substr content, 0, pos, '' 
+    substr content, 0, pos, ''
     pos = 0
-    # We expect at least another digit 
+    # We expect at least another digit
     # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_2:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_NEWLINE_1
     #goto PERHAPS_ANOTHER_DIGIT_2
   EXPECT_A_NEWLINE_1:
-    substr token, content, 0, pos, '' 
+    substr token, content, 0, pos, ''
     substitution_len = token
     pos = 0
     # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
-    substr content, 0, pos, '' 
+    substr content, 0, pos, ''
     pos = 0
     # We know the length, so we can extract the strings
-    substr name, content, 0, name_len, '' 
-    substr text, content, 0, substitution_len, '' 
+    substr name, content, 0, name_len, ''
+    substr text, content, 0, substitution_len, ''
     builtin = builtin_tab[name]
     unless builtin goto BUILTIN_NOT_FOUND
     define_builtin( state, name, builtin )
@@ -177,11 +177,11 @@ NOT_AN_EMPTY_LINE:
     BUILTIN_NOT_FOUND:
       printerr "`"
       printerr name
-      printerr "' from frozen file not found in builtin table!\n" 
+      printerr "' from frozen file not found in builtin table!\n"
     BUILTIN_HAS_BEEN_HANDLED:
     pos = 0
     # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
-    substr content, 0, pos, '' 
+    substr content, 0, pos, ''
     pos = 0
     goto CHECK_PARSING_FINISHED
   NOT_A_BUILTIN_MACRO:
@@ -195,31 +195,31 @@ NOT_AN_EMPTY_LINE:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_COMMA_2
     # goto PERHAPS_ANOTHER_DIGIT_3
   EXPECT_A_COMMA_2:
-    substr token, content, 0, pos, '' 
+    substr token, content, 0, pos, ''
     name_len = token
     pos = 0
     # rx_ is deprecated rx_literal content, pos, ',', UNEXPECTED
-    substr content, 0, pos, '' 
+    substr content, 0, pos, ''
     pos = 0
-    # We expect at least another digit 
+    # We expect at least another digit
     # rc_ is deprecated rx_is_d content, pos, UNEXPECTED
   PERHAPS_ANOTHER_DIGIT_4:
     # rc_ is deprecated rx_is_d content, pos, EXPECT_A_NEWLINE_2
     # goto PERHAPS_ANOTHER_DIGIT_4
   EXPECT_A_NEWLINE_2:
-    substr token, content, 0, pos, '' 
+    substr token, content, 0, pos, ''
     substitution_len = token
     pos = 0
     # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
-    substr content, 0, pos, '' 
+    substr content, 0, pos, ''
     pos = 0
-    substr name, content, 0, name_len, '' 
-    substr text, content, 0, substitution_len, '' 
+    substr name, content, 0, name_len, ''
+    substr text, content, 0, substitution_len, ''
     # We know the length, so we can extract the strings
     define_user_macro( state, name, text )
     pos = 0
     # rx_ is deprecated rx_literal content, pos, "\n", UNEXPECTED
-    substr content, 0, pos, '' 
+    substr content, 0, pos, ''
     pos = 0
     goto CHECK_PARSING_FINISHED
   NOT_A_USER_DEFINED_MACRO:

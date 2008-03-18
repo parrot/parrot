@@ -283,7 +283,7 @@ done:
 .end
 
 ##########
-# Jump if a > b (using a signed 16-bit comparison). 
+# Jump if a > b (using a signed 16-bit comparison).
 .sub zop_jg :method
   .param pmc im
   .param int pc
@@ -309,7 +309,7 @@ done:
 
 
 ##########
-# Jump if a < b (using a signed 16-bit comparison). 
+# Jump if a < b (using a signed 16-bit comparison).
 .sub zop_jl :method
   .param pmc im
   .param int pc

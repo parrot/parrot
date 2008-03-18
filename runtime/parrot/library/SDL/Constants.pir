@@ -53,7 +53,7 @@ For example, C<8> corresponds to C<backspace>.
 	# $ cat /usr/include/SDL/SDL_keysym.h |
 	#   perl -wne 'next unless /SDLK_/; m/_F\d/ || tr/A-Z/a-z/;
 	#		/_(.*?)\s+=\s(\d*)/ && print qq{\tkey_names[ $2 ] = \'$1\'\n}'
-	
+
 	key_names[   0 ] = 'unknown'
 	key_names[   0 ] = 'first'
 	key_names[   8 ] = 'backspace'

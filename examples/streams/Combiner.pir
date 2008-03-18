@@ -37,7 +37,7 @@ Creates the 3 Stream objects and dumps the combined stream.
     counter = new "Stream::Sub"
     .const .Sub temp = "_counter"
     assign counter, temp
-    
+
     # create the text stream
     text = new "Stream::Sub"
     # set its source
@@ -49,11 +49,11 @@ Creates the 3 Stream objects and dumps the combined stream.
     # add the streams
     assign combined, counter
     assign combined, text
-    
+
     # specify our own combiner sub
     .const .Sub temp = "_combiner"
     combined."combiner"( temp )
-    
+
     # dump the combined stream
     combined."dump"()
 
@@ -72,7 +72,7 @@ time someone reads the stream.
     .param pmc stream
     .local int i
     .local string str
-    
+
     i = 0
 LOOP:
     inc i

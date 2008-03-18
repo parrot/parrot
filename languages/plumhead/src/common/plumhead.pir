@@ -59,10 +59,10 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     load_bytecode 'PGE/Dumper.pbc'
     load_bytecode 'PCT.pbc'
     load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
-    load_bytecode 'CGI/QueryHash.pbc'    
-    load_bytecode 'dumper.pbc'                                      
+    load_bytecode 'CGI/QueryHash.pbc'
+    load_bytecode 'dumper.pbc'
     load_bytecode 'Getopt/Obj.pbc'
-    
+
 
     # import PGE::Util::die into Plumhead::Grammar
     $P0 = get_hll_global ['PGE::Util'], 'die'
@@ -84,7 +84,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     .local pmc    opt
     ( opt, rest ) = parse_options(argv)
 
-    .local string php_source_fn 
+    .local string php_source_fn
     php_source_fn = opt['f']
     if php_source_fn goto GOT_PHP_SOURCE_FN
         php_source_fn = rest
@@ -92,7 +92,7 @@ GOT_PHP_SOURCE_FN:
 
     .local string cmd, err_msg
     .local int ret
-    
+
     .local string variant
     variant = opt['variant']
 
@@ -101,22 +101,22 @@ GOT_PHP_SOURCE_FN:
     if variant == 'phc'       goto VARIANT_PHC
 
 VARIANT_PCT:
-    # look for subs in other namespaces                           
-    .local pmc parse_get_sub, parse_post_sub   
-    parse_get_sub  = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'         
-    parse_post_sub = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'        
-                                                                  
-    # the superglobals                                            
-    .local pmc superglobal_GET                                    
-    ( superglobal_GET ) = parse_get_sub()                         
-    set_hll_global '$_GET', superglobal_GET                            
-    #'_dumper'( superglobal_GET, 'GET' ) 
-                                                                  
-    .local pmc superglobal_POST                                   
-    ( superglobal_POST ) = parse_post_sub()                       
-    set_hll_global '$_POST', superglobal_POST                          
-    #'_dumper'( superglobal_POST, 'POST' ) 
-                                                                  
+    # look for subs in other namespaces
+    .local pmc parse_get_sub, parse_post_sub
+    parse_get_sub  = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'
+    parse_post_sub = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'
+
+    # the superglobals
+    .local pmc superglobal_GET
+    ( superglobal_GET ) = parse_get_sub()
+    set_hll_global '$_GET', superglobal_GET
+    #'_dumper'( superglobal_GET, 'GET' )
+
+    .local pmc superglobal_POST
+    ( superglobal_POST ) = parse_post_sub()
+    set_hll_global '$_POST', superglobal_POST
+    #'_dumper'( superglobal_POST, 'POST' )
+
     err_msg = 'Compiling and executing with pct failed'
     .local pmc plumhead_compiler
     plumhead_compiler = compreg 'Plumhead'

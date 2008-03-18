@@ -49,7 +49,7 @@ F<docs/pdds/pdd26_ast.pod>
     .local pmc var_block
     var_block = new 'PAST::Block'
     var_block.init( val_x, 'blocktype' => 'immediate' )
- 
+
     # set up compiler
     .local pmc astcompiler
     astcompiler = new [ 'PCT::HLLCompiler' ]

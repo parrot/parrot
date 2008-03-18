@@ -3,7 +3,7 @@
 .const int TYPE = 0
 .const int VALUE = 1
 .sub _main :main
-	$P0 = new .Hash 
+	$P0 = new .Hash
 	store_global "BASICARR", $P0
 	$P0 = new .ResizablePMCArray
 	store_global "READDATA", $P0
@@ -39,7 +39,7 @@
 	_basicmain()
 	_platform_shutdown()
 	end
-.end	        
+.end
 
 # Local Variables:
 #   mode: pir

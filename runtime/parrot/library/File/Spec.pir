@@ -147,7 +147,7 @@ found_module:
 .sub '__isa' :method
     .local pmc sub
     .local string name
-    
+
     typeof name, self
 
     .local string osname

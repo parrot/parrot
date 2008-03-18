@@ -6,7 +6,7 @@ include/macros/types.pir
 
 =head1 Macros
 
-=head2 .CONS(R,A,B) 
+=head2 .CONS(R,A,B)
 
 Creates a new cons with car A and cdr B, placing the result in R.
 
@@ -24,7 +24,7 @@ Creates a new cons with car A and cdr B, placing the result in R.
   .R = _consp
 .endm
 
-=head2 .STRING(R,S) 
+=head2 .STRING(R,S)
 
 Creates a new string with value S, placing the result in R.
 
@@ -56,7 +56,7 @@ Create a new readtable object and places it in R.
   .R = new "LispReadtable"
 .endm
 
-=head2 .FLOAT(R,F) 
+=head2 .FLOAT(R,F)
 
 Creates a new float with value F, placing the result in R.
 
@@ -67,7 +67,7 @@ Creates a new float with value F, placing the result in R.
   .R = .F
 .endm
 
-=head2 .INTEGER(R,I) 
+=head2 .INTEGER(R,I)
 
 Creates a new integer with value I, placing the result in R.
 
@@ -78,7 +78,7 @@ Creates a new integer with value I, placing the result in R.
   .R = .I
 .endm
 
-=head2 .HASH(R) 
+=head2 .HASH(R)
 
 Creates a new hash table, placing the result in R.
 

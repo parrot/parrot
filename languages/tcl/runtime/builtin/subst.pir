@@ -16,7 +16,7 @@
     switches = select_switches(options, argv)
 
     .local int argc
-    argc = elements argv 
+    argc = elements argv
     if argc == 0 goto badargs
     if argc > 1  goto badswitch
 

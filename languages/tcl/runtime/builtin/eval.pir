@@ -9,7 +9,7 @@
 
 .sub '&eval'
   .param pmc argv :slurpy
- 
+
   .local int argc
   argc = elements argv
   unless argc goto bad_args
@@ -17,7 +17,7 @@
   .local pmc ns
   $P0 = getinterp
   ns  = $P0['namespace'; 1]
- 
+
   .local pmc __script
   __script = get_root_global ['_tcl'], '__script'
 

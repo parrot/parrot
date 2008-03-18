@@ -33,7 +33,7 @@
     print "target string, \"pir\", \"exp\", \"trace\", \"next\"\n"
     getstdin stdin
     readline x, stdin
-    length $I0, x 
+    length $I0, x
     if $I0 < 1 goto end_demo
     $I0 = index x, " "
     if $I0 > 0 goto get_cmd
@@ -92,8 +92,8 @@
     print x
     print "\n"
     goto read_loop
-    
-  
+
+
   print_pir:
     if_null rulesub, match_nopattern
     print pir

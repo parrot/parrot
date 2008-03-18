@@ -50,7 +50,7 @@
   null subcommand_proc
 
   subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'string'], canonical_subcommand
-  if_null subcommand_proc, bad_args 
+  if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
 
 bad_args:
@@ -106,10 +106,10 @@ bad_args:
   if argc < 2 goto bad_args
   $S1 = argv[0]
   $S2 = argv[1]
-  
+
   $I0 = length $S2
   if argc == 2 goto last_do
-  
+
   $S3 = argv[2]
   .local pmc __index
   __index = get_root_global ['_tcl'], '__index'
@@ -124,7 +124,7 @@ last_do:
   if index_1 > $I0 goto not_found
   if index_1 < 0   goto not_found
 
-iterate:	
+iterate:
   $I1 = index_1
   $I2 = $I1 + 1
   index_1 = index $S2, $S1, $I2
@@ -132,12 +132,12 @@ iterate:
   if index_1 > $I0 goto return
   goto iterate
 
-return:	
+return:
   .return($I1)
 
 not_found:
   .return(-1)
-  
+
 bad_args:
   tcl_error 'wrong # args: should be "string last subString string ?startIndex?"'
 .end
@@ -182,7 +182,7 @@ done:
   argc = argv
   if argc > 3 goto bad_args
   if argc < 1 goto bad_args
-  
+
   $S1 = argv[0]
   $I1 = length $S1 # it will be useful
 
@@ -199,7 +199,7 @@ done:
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto tolower_do
-  
+
   $S3 = argv[2]
   $I3 = __index($S3, $S1)
 
@@ -215,7 +215,7 @@ tolower_start:
   downcase $S2
   substr $S1, $I2, $I4, $S2
 
-tolower_return:	
+tolower_return:
   .return($S1)
 
 bad_args:
@@ -235,7 +235,7 @@ bad_args:
   argc = argv
   if argc > 3 goto bad_args
   if argc < 1 goto bad_args
-  
+
   $S1 = argv[0]
   $I1 = length $S1 # it will be useful
 
@@ -252,7 +252,7 @@ bad_args:
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto toupper_do
-  
+
   $S3 = argv[2]
   $I3 = __index($S3, $S1)
 
@@ -268,7 +268,7 @@ toupper_start:
   upcase $S2
   substr $S1, $I2, $I4, $S2
 
-toupper_return:	
+toupper_return:
   .return($S1)
 
 bad_args:
@@ -287,7 +287,7 @@ bad_args:
   argc = argv
   if argc > 3 goto bad_args
   if argc < 1 goto bad_args
-  
+
   $S1 = argv[0]
   $I1 = length $S1 # it will be useful
 
@@ -304,7 +304,7 @@ bad_args:
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto totitle_do
-  
+
   $S3 = argv[2]
   $I3 = __index($S3, $S1)
 
@@ -320,7 +320,7 @@ totitle_start:
   titlecase $S2
   substr $S1, $I2, $I4, $S2
 
-totitle_return:	
+totitle_return:
   .return($S1)
 
 bad_args:
@@ -442,7 +442,7 @@ match_continue:
   .local pmc globber
   globber = compreg 'Tcl::Glob'
 
-  .local pmc rule, match 
+  .local pmc rule, match
   rule = globber.'compile'(pattern)
   match = rule(the_string)
 
@@ -470,7 +470,7 @@ bad_match:
   .local pmc    the_repeat
   the_string = argv[0]
   the_repeat = argv[1]
- 
+
   .local pmc __integer
   __integer = get_root_global ['_tcl'], '__integer'
   the_repeat = __integer(the_repeat)
@@ -573,7 +573,7 @@ bad_args:
   .param pmc argv
   .local int argc
   argc = argv
-  
+
   .local string a, b
   .local int length, nocase
   nocase = 0
@@ -706,20 +706,20 @@ control_check:
   the_cclass = .CCLASS_CONTROL
   goto cclass_check
 boolean_check:
-  if the_string == 'yes' goto yep 
-  if the_string == 'no' goto yep 
-  if the_string == '1' goto yep 
-  if the_string == '0' goto yep 
-  if the_string == 'true' goto yep 
-  if the_string == 'tru'  goto yep 
-  if the_string == 'tr'   goto yep 
-  if the_string == 't'    goto yep 
-  if the_string == 'false' goto yep 
-  if the_string == 'fals'  goto yep 
-  if the_string == 'fal'   goto yep 
-  if the_string == 'fa'    goto yep 
-  if the_string == 'f'     goto yep 
-  goto nope 
+  if the_string == 'yes' goto yep
+  if the_string == 'no' goto yep
+  if the_string == '1' goto yep
+  if the_string == '0' goto yep
+  if the_string == 'true' goto yep
+  if the_string == 'tru'  goto yep
+  if the_string == 'tr'   goto yep
+  if the_string == 't'    goto yep
+  if the_string == 'false' goto yep
+  if the_string == 'fals'  goto yep
+  if the_string == 'fal'   goto yep
+  if the_string == 'fa'    goto yep
+  if the_string == 'f'     goto yep
+  goto nope
 digit_check:
   the_cclass = .CCLASS_NUMERIC
   goto cclass_check
@@ -734,14 +734,14 @@ double_check:
   if $S0 == 'TclInt'   goto yep
   goto nope
 false_check:
-  if the_string == 'no' goto yep 
-  if the_string == '0' goto yep 
-  if the_string == 'false' goto yep 
-  if the_string == 'fals'  goto yep 
-  if the_string == 'fal'   goto yep 
-  if the_string == 'fa'    goto yep 
-  if the_string == 'f'     goto yep 
-  goto nope 
+  if the_string == 'no' goto yep
+  if the_string == '0' goto yep
+  if the_string == 'false' goto yep
+  if the_string == 'fals'  goto yep
+  if the_string == 'fal'   goto yep
+  if the_string == 'fa'    goto yep
+  if the_string == 'f'     goto yep
+  goto nope
 graph_check:
   the_cclass = .CCLASS_GRAPHICAL
   goto cclass_check
@@ -773,13 +773,13 @@ space_check:
   the_cclass = .CCLASS_WHITESPACE
   goto cclass_check
 true_check:
-  if the_string == 'yes' goto yep 
-  if the_string == '1' goto yep 
-  if the_string == 'true' goto yep 
-  if the_string == 'tru'  goto yep 
-  if the_string == 'tr'   goto yep 
-  if the_string == 't'    goto yep 
-  goto nope 
+  if the_string == 'yes' goto yep
+  if the_string == '1' goto yep
+  if the_string == 'true' goto yep
+  if the_string == 'tru'  goto yep
+  if the_string == 'tr'   goto yep
+  if the_string == 't'    goto yep
+  goto nope
 upper_check:
   the_cclass = .CCLASS_UPPERCASE
   goto cclass_check
@@ -813,7 +813,7 @@ bad_args:
   tcl_error 'wrong # args: should be "string is class ?-strict? ?-failindex var? str"'
 .end
 
-                           
+
 .sub 'replace'
   .param pmc argv
 
@@ -832,11 +832,11 @@ bad_args:
 
   .local string low_s, high_s, the_string
   .local int string_len
- 
+
   the_string = argv[0]
   string_len = length the_string
   $S4 = ''
-         
+
   low_s = argv[1]
   low = __index(low_s, the_string)
 
@@ -855,23 +855,23 @@ low_ok:
   if high <= len goto high_ok
   high = len
 
-high_ok:        
+high_ok:
   if argc == 1 goto replace_do
   $S4 = argv[3]
 
 replace_do:
   len = high - low
   len += 1
-  substr the_string, low, len, $S4         
+  substr the_string, low, len, $S4
 
-replace_done:   
+replace_done:
   .return(the_string)
 
 bad_args:
   tcl_error 'wrong # args: should be "string replace string first last ?string?"'
 .end
 
-         
+
 .sub 'trimleft'
   .param pmc argv
 
@@ -881,7 +881,7 @@ bad_args:
   argc = argv
   if argc > 2 goto bad_args
   if argc < 1 goto bad_args
-  
+
   $S1 = argv[0]
   $S2 = " \t\r\n"
 
@@ -900,8 +900,8 @@ trimleft_do:
   if $I1 < 0 goto trimleft_done
   substr $S1, 0, 1, ''
   goto trimleft_do
-         
-trimleft_done:  
+
+trimleft_done:
   .return($S1)
 
 bad_args:
@@ -910,7 +910,7 @@ bad_args:
 .end
 
 
-                  
+
 .sub 'trimright'
   .param pmc argv
 
@@ -920,7 +920,7 @@ bad_args:
   argc = argv
   if argc > 2 goto bad_args
   if argc < 1 goto bad_args
-  
+
   $S1 = argv[0]
   $S2 = " \t\r\n"
 
@@ -939,8 +939,8 @@ trimright_do:
   if $I1 < 0 goto trimright_done
   chopn $S1, 1
   goto trimright_do
-         
-trimright_done:  
+
+trimright_done:
   .return($S1)
 
 bad_args:
@@ -950,7 +950,7 @@ bad_args:
 
 # here, I might use trimleft and trim right, but I think it is
 # better to implement it here as it should be faster
-                  
+
 .sub 'trim'
   .param pmc argv
 
@@ -960,7 +960,7 @@ bad_args:
   argc = argv
   if argc > 2 goto bad_args
   if argc < 1 goto bad_args
-  
+
   $S1 = argv[0]
   $S2 = " \t\r\n"
 
@@ -981,7 +981,7 @@ trim_do1:
   chopn $S1, 1
   goto trim_do1
 
-trim_do2:       
+trim_do2:
   $I1 = length $S1
   unless $I1 goto trim_done
 
@@ -991,15 +991,15 @@ trim_do2:
   if $I1 < 0 goto trim_done
   substr $S1, 0, 1, ''
   goto trim_do2
-         
-trim_done:  
+
+trim_done:
   .return($S1)
 
 bad_args:
   tcl_error 'wrong # args: should be "string trim string ?chars?"'
 
 .end
-                  
+
 .sub 'compare'
   .param pmc argv
 
@@ -1011,11 +1011,11 @@ bad_args:
   argc = argv
 
   if argc < 1 goto bad_args
-  
+
   $S2 = pop argv
   $S1 = pop argv
 
-args_processment:       
+args_processment:
   argc = argv
   if argc == 0 goto args_processed
   $S4 = shift argv
@@ -1024,23 +1024,23 @@ args_processment:
   goto bad_args
 
 args_processed:
-  if $S1 == $S2 goto equal         
+  if $S1 == $S2 goto equal
   if $S1 < $S2 goto smaller
   .return(1)
 
-smaller:        
+smaller:
   .return(-1)
 
 equal:
-  .return(0)         
-         
+  .return(0)
+
 arg_nocase:
   downcase $S1
   downcase $S2
   goto args_processment
 
 arg_length:
-  if size != -1 goto bad_args         
+  if size != -1 goto bad_args
   argc = elements argv
   if argc == 0 goto bad_args
 
@@ -1049,11 +1049,11 @@ arg_length:
   $S4  = shift argv
   size = __integer($S4)
   # "if -length is negative, it is ignored"
-  if size < 0 goto args_processment         
+  if size < 0 goto args_processment
   $S1 = substr $S1, 0, size
   $S2 = substr $S2, 0, size
   goto args_processment
-         
+
 bad_args:
   tcl_error 'wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"'
 
@@ -1061,14 +1061,14 @@ bad_args:
 
 .sub 'reverse'
   .param pmc argv
- 
+
   .local int argc
   argc = elements argv
   if argc != 1 goto bad_args
- 
+
   $S0 = shift argv
   $P0 = new 'TclString'
-  $S0 = $P0.'reverse'($S0) 
+  $S0 = $P0.'reverse'($S0)
   .return ($S0)
 
 bad_args:
@@ -1120,7 +1120,7 @@ bad_args:
   .local pmc __index
   __index = get_root_global ['_tcl'], '__index'
   idx = __index(idx, str)
-  
+
   .local int pos
   pos = idx
   # XXX should these checks be in __index itself?
@@ -1146,7 +1146,7 @@ loop:
 loop_done:
   if pos == old_idx goto ret_val
   inc pos
-ret_val:  
+ret_val:
   .return(pos)
 
 bad_args:

@@ -76,7 +76,7 @@ error:
     .param pmc value
     .local pmc scope
     scope = self.'top_scope_stack'()
-    $I0 = isa scope, 'Cardinal::PAST::Block' 
+    $I0 = isa scope, 'Cardinal::PAST::Block'
     unless $I0 goto end
     scope.'vardecl'(key, value)
     .return ()

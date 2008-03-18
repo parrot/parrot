@@ -76,7 +76,7 @@ endif:
 	print "stretch tree of depth "
 	print stretchdepth
 	print "\t check: "
-	print $I0 
+	print $I0
 	print "\n"
 
 	null stretchtree
@@ -93,7 +93,7 @@ beginfor_1:
 	$N1 = 2
 	$N2 = pow $N1, $N0
 	iterations = $N2
-	
+
 	check = 0
 
 	i = 1
@@ -107,14 +107,14 @@ beginfor_1:
 			tmptree = bottomuptree($I0, dep)
 			$I0 = itemcheck(tmptree)
 			check += $I0
-		
+
 	inc i
 	if i <= iterations goto beginfor_2
 	$I0 = iterations * 2
-	print $I0 
+	print $I0
 	print "\t trees of depth "
 	print dep
-	print "\t check: " 
+	print "\t check: "
 	print check
 	print "\n"
 
@@ -126,7 +126,7 @@ beginfor_1:
 	print "long lived tree of depth "
 	print maxdepth
 	print "\t check: "
-	print $I0 
+	print $I0
 	print "\n"
 
 .end

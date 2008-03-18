@@ -21,18 +21,18 @@ PMC to the stream with the C<assign> op.
 
     load_bytecode "library/Stream/ParrotIO.pir"
 
-    # create the ParrotIO stream    
+    # create the ParrotIO stream
     stream = new "Stream::ParrotIO"
 
     # open this file
     stream."open"( "examples/streams/ParrotIO.pir", "<" )
-    
+
     # you can specifiy a custom block size with
     # stream."blockSize"( 10 )
-    
+
     # dump the stream
     stream."dump"()
-    
+
     end
 .end
 

@@ -7,7 +7,7 @@
   .local int argc
   argc = elements argv
   if argc == 0 goto bad_args
-  
+
   $I0 = argv[0]
   $N0 = $I0 / 1000
   sleep $N0

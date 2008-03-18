@@ -15,7 +15,7 @@
 	.local int n1
 	n1 = n
 	dec n1
-	
+
 	if n > 1 goto countok
 	.return(0)
 countok:
@@ -41,7 +41,7 @@ beginwhile_1:
 		if i < n goto for_2
 		print "\n"
 		inc didpr
-	endif_1: 
+	endif_1:
 	for_3:
 		unless r != 1 goto endfor_3
 			$I0 = r - 1

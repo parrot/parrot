@@ -5,7 +5,7 @@
 .HLL 'Tcl', ''
 .namespace
 
-# RT#40707: Stub 
+# RT#40707: Stub
 # help tcltest compile
 
 .sub '&package'

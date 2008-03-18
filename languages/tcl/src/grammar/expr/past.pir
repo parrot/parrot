@@ -60,7 +60,7 @@ Creates the C<PAST::*> classes.
 
 .namespace [ 'PAST::Node' ]
 
-=back 
+=back
 
 =head2  PAST::Node methods
 

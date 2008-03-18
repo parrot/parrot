@@ -1,4 +1,4 @@
-# RT#40701: Stub 
+# RT#40701: Stub
 # help shootout compile
 
 .HLL '_Tcl', 'tcl_group'

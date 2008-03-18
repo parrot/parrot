@@ -7,7 +7,7 @@
     .param pmc signature
     .param int opt_req
     .local int type_def_or_ref
-    
+
     # Read optional or required flag. Turn it to 1 if it's required, 0 if
     # optional.
     if opt_req == 0x20 goto OPTIONAL
@@ -19,7 +19,7 @@ GETDEFREF:
 
     # Read type def or ref.
     type_def_or_ref = signature.read_compressed()
-    
+
     # Return stuff.
     .return (opt_req, type_def_or_ref)
 .end
@@ -112,7 +112,7 @@ NOFP:
     ex["_message"] = "Expected a field signature, got something else."
     throw ex
 NORMAL:
-    
+
     # Read type token.
     t1 = signature.read_compressed()
     ret["type"] = t1
@@ -161,10 +161,10 @@ NOFP:
 
     # We return a hash with details of the return type or parameter in it.
     ret = new .Hash
-    
+
     # Read type token.
     t1 = signature.read_compressed()
-    
+
     # There's a chance this won't be a type token, but rather a constraint.
     # It can only be the pinned constraint.
     if t1 != 0x45 goto NOTPINNED
@@ -217,7 +217,7 @@ NOFP:
 .end
 
 
-# This routine takes a type and annotates it with the single letter (I, N, S, 
+# This routine takes a type and annotates it with the single letter (I, N, S,
 # P)and long # name of the register type that holds it (int, num, string, pmc).
 .sub annotate_reg_type
     .param pmc type
@@ -273,7 +273,7 @@ PMC_TYPE:
     type["reg_type_short"] = "P"
     type["reg_type_long"] = "pmc"
     type["reg_type_pmc"] = "Undef"
-    
+
 EXIT:
 .end
 

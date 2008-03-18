@@ -9,7 +9,7 @@ Given a dictionary, return a string representing it.
 
 .sub __dictToString
   .param pmc dict
-  
+
   .local pmc list
   list = new 'ResizablePMCArray'
 
@@ -20,7 +20,7 @@ loop:
   unless iterator goto done
   $S1 = shift iterator
   push list, $S1
-  $S2 = dict[$S1] 
+  $S2 = dict[$S1]
   push list, $S2
   goto loop
 done:

@@ -387,41 +387,41 @@ DONE:
 
     .local pmc form
     .CAR(form, args)
-  
+
     .local pmc retv
 
     .local string type
     type = typeof form
     if type == "LispSymbol" goto SYMBOL          # Retrieve function from symbol
-  
+
     .local int is_lambda_list
     is_lambda_list = _IS_ORDINARY_LAMBDA_LIST(form)        # Check if it's a lambda form
     if is_lambda_list goto LAMBDA_FORM                     # and build a closure if so
-  
+
     goto INVALID_FUNCTION_NAME
-  
+
 SYMBOL:
     .local string symname
     symname = form._get_name_as_string()         # Retrieve the symbols name
- 
+
     .local pmc package
     package = form._get_package()                # Retrieve the symbols package name
     .local string pkgname
     pkgname = package._get_name_as_string()
- 
+
     .local pmc symbol
     symbol = _LOOKUP_GLOBAL(pkgname, symname)    # Lookup the symbol
- 
+
     .local int found
     found = defined symbol                       # Ensure the symbol was found in
     unless found goto FUNCTION_NOT_FOUND         # the global namespace
- 
+
     retv = symbol._get_function()                # Ensure the symbol had a function
     defined found, symbol                        # defined
     unless found goto FUNCTION_NOT_FOUND
- 
+
     goto DONE
- 
+
 LAMBDA_FORM:
     retv = _MAKE_LAMBDA(form)                    # Create a closure PMC
     goto DONE
@@ -588,7 +588,7 @@ DONE:
   .NULL(a, IS_NULL)
 
   .NIL(retv)
-   goto DONE  
+   goto DONE
 
 IS_NULL:
   .TRUE(retv)
@@ -781,7 +781,7 @@ DONE:
 .sub _print                     # This is just a temporary stand-in - it
     .param pmc args               # doesn't have near enough the amount of
                                 # functionality required.
-    .local string strval          
+    .local string strval
     .local pmc retv
     .local pmc obj
 
@@ -1108,7 +1108,7 @@ OVERFLOW_LOOP:
    if indx == size goto DONE_OVERFLOW
 
    elem = P16[0]
- 
+
    P3[indx] = elem                              # Set next overflow element
    inc indx
 
@@ -1275,7 +1275,7 @@ DONE:
 
   .ASSERT_TYPE(numb, "number")                  # Ensure both of the args are
   .ASSERT_TYPE(div,  "number")                  # numeric.
-  
+
   .INTEGER(retv,0)
 
    mod retv, numb, div                          # Compute the modulus

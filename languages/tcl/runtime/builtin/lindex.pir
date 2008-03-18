@@ -6,11 +6,11 @@
 
 .sub '&lindex'
   .param pmc argv :slurpy
-  
-  .local int argc 
+
+  .local int argc
   argc = argv
   if argc < 1 goto bad_args
-  
+
   .local pmc __list, __index
   __list  = get_root_global ['_tcl'], '__list'
   __index = get_root_global ['_tcl'], '__index'
@@ -47,7 +47,7 @@ select:
 select_loop:
   if $I1 >= elems goto select_elem
   list = __list(list)
-  
+
   $P0 = indices[$I1]
   index = __index($P0, list)
 
@@ -56,7 +56,7 @@ select_loop:
   if index < 0    goto empty
 
   list  = list[index]
-  
+
   inc $I1
   goto select_loop
 

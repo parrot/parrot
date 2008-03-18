@@ -9,7 +9,7 @@ All macro arguments are assumed to be PMC types unless otherwise noted.
 
 =head1 Macros
 
-=head2 .NULL(L,B) 
+=head2 .NULL(L,B)
 
 Branch to B if L is an empty list.
 
@@ -22,7 +22,7 @@ Branch to B if L is an empty list.
   eq_addr .L, _nilp, .B
 .endm
 
-=head2 .CAR(R,A) 
+=head2 .CAR(R,A)
 
 Puts the car of A into R.  A is assumed to be a valid list.
 
@@ -67,16 +67,16 @@ Appends B to list A, placing the result into R.  A is assumed to be a valid list
 
 .label $DONE_LOOP:              # At the EOL, replace the list end (NIL)
   .LIST_1(_listtmpp, .B)        # with a new cons containing the new element.
-  _listptr2p[1] = _listtmpp  
+  _listptr2p[1] = _listtmpp
   goto .$DONE
 
 .label $EMPTY_LIST:
   .LIST_1(.R,.B)
- 
+
 .label $DONE:
 .endm
 
-=head2 .CDR(R,A) 
+=head2 .CDR(R,A)
 
 Puts the cdr of A into R.  A is assumed to be a valid list.
 
@@ -95,7 +95,7 @@ Puts the cdr of A into R.  A is assumed to be a valid list.
 .label $DONE:
 .endm
 
-=head2 .SECOND(R,A) 
+=head2 .SECOND(R,A)
 
 Puts the second element of A into R.  A is assumed to be a valid list.
 
@@ -108,7 +108,7 @@ Puts the second element of A into R.  A is assumed to be a valid list.
   .CAR(.R, _cdrp)
 .endm
 
-=head2 .THIRD(R,A) 
+=head2 .THIRD(R,A)
 
 Puts the third element of A into R.  A is assumed to be a valid list.
 
@@ -122,7 +122,7 @@ Puts the third element of A into R.  A is assumed to be a valid list.
   .CAR(.R, _cdrp)
 .endm
 
-=head2 .FOURTH(R,A) 
+=head2 .FOURTH(R,A)
 
 Puts the fourth element of A into R.  A is assumed to be a valid list.
 
@@ -137,7 +137,7 @@ Puts the fourth element of A into R.  A is assumed to be a valid list.
   .CAR(.R, _cdrp)
 .endm
 
-=head2 .LIST_1(R,A) 
+=head2 .LIST_1(R,A)
 
 Creates a one element list containing A, placing the result in R.
 
@@ -151,7 +151,7 @@ Creates a one element list containing A, placing the result in R.
 .endm
 
 
-=head2 .LIST_2(R,A,B) 
+=head2 .LIST_2(R,A,B)
 
 Creates a two element list containing A and B, placing the result in R.
 

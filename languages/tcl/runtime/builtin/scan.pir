@@ -20,7 +20,7 @@
 
   .local pmc rule, match
 
-  .local string input, format 
+  .local string input, format
   input = shift argv
   format = shift argv
 
@@ -31,8 +31,8 @@
 
   .local int input_pos, format_pos, format_len, input_len
   input_pos = 0
-  format_pos = 0 
-  format_len = length format 
+  format_pos = 0
+  format_len = length format
   input_len = length input
 
 loop:
@@ -127,7 +127,7 @@ check_xpg3:
   $I0 = $I1 - $I0
   format_pos += $I0
 
-  $S0 = substr format, format_pos, 1  
+  $S0 = substr format, format_pos, 1
 
   if $S0 == '$' goto got_xpg3
   # We got a number, but it was the width.
@@ -142,7 +142,7 @@ got_xpg3:
 get_width:
   inc format_pos
   match = decimal(format, 'pos'=>format_pos, 'grammar'=>'TclExpr::Grammar')
-  unless match goto got_width  
+  unless match goto got_width
   $S0 = match
   width = __integer($S0)
 
@@ -150,15 +150,15 @@ get_width:
   $I1 = match.'to'()
   $I0 = $I1 - $I0
   format_pos += $I0
-  
+
 got_width:
 
   .local int size_modifier # XXX we parse it, but ignore it for now
-  bsr get_size_modifier  
+  bsr get_size_modifier
 
   # conversion character
   $S0 = substr format, format_pos, 1
-  inc format_pos 
+  inc format_pos
 
   if $S0 == 'c' goto handle_character
   if $S0 == '[' goto handle_charclass
@@ -175,7 +175,7 @@ got_width:
   if $S0 == 'g' goto handle_float
   if $S0 == 's' goto handle_string
   if $S0 == '%' goto handle_percent_literal
-  goto bad_conversion  
+  goto bad_conversion
 
 handle_charclass:
   .local int negated
@@ -190,7 +190,7 @@ handle_charclass:
   $S0 = substr format, format_pos, 1
 
 skip_negated:
-  if $S0 != ']' goto normal 
+  if $S0 != ']' goto normal
   class[']'] = 1
   inc format_pos
   #$S0 = substr format, format_pos, 1
@@ -205,13 +205,13 @@ normal: # Now at beginning of class. Find the end marker..
 
   $S0 = substr class_fmt, 0, 1
   if $S0 != '-' goto handle_end
-  class['-'] = 1 
+  class['-'] = 1
   $S0 = substr class_fmt, 0, 1, ''
 
 handle_end:
   $S0 = substr class_fmt, -1, 1
   if $S0 != '-' goto loop_dash
-  class['-'] = 1 
+  class['-'] = 1
   $S0 = substr class_fmt, -1, 1, ''
 
 loop_dash:
@@ -228,12 +228,12 @@ just_chars:
 loop_chars:
   if $I0 >= $I1 goto have_class
   $S0 = substr class_fmt, $I0, 1
-  class[$S0] = 1 
+  class[$S0] = 1
   inc $I0
   goto loop_chars
 
 have_class:
-  $I1 = input_pos 
+  $I1 = input_pos
   if negated goto neg_do_loop
 
 do_loop:
@@ -277,13 +277,13 @@ add_range:
   $I11 = $I12
 
 range_loop:
-  if $I10 > $I11 goto range_loop_done 
+  if $I10 > $I11 goto range_loop_done
   $S0 = chr $I10
   class[$S0] = 1
   inc $I10
   goto range_loop
 
-range_loop_done:  
+range_loop_done:
   ret
 
 bad_class:
@@ -340,9 +340,9 @@ handle_hex:
   $I2 = width
 
 hex_width:
-  input_pos += $I2 
+  input_pos += $I2
   $P0 = __integer($S0, 'rawhex'=>1)
-  bsr set_val 
+  bsr set_val
   goto next
 
 handle_integer:
@@ -360,9 +360,9 @@ do_integer:
   $I2 = width
 
 integer_width:
-  input_pos += $I2 
+  input_pos += $I2
   $P0 = __integer($S0)
-  bsr set_val 
+  bsr set_val
   goto next
 
 handle_float:
@@ -372,7 +372,7 @@ handle_float:
   $I0 = match.'to'()
   $I1 = match.'from'()
   $I2 = $I0 - $I1
-  input_pos += $I2     
+  input_pos += $I2
   $S0 = match
   $P0 = __number($S0)
   $S1 = typeof $P0
@@ -390,16 +390,16 @@ handle_string:
   if width == 0 goto string_width
   if width >= $I2 goto string_width
   $I2 = width
-  $I1 = input_pos + width 
- 
-string_width: 
+  $I1 = input_pos + width
+
+string_width:
   $S1 = substr input, input_pos, $I2
   input_pos = $I1
   $P0 = new 'TclString'
   $P0 = $S1
-  bsr set_val 
+  bsr set_val
   goto next
- 
+
 bad_match:
   $P0 = new 'TclString'
   $P0 = ''
@@ -407,7 +407,7 @@ bad_match:
   goto next
 
 # consume as much whitespace as possible from the input string
-eat_whitespace: 
+eat_whitespace:
   input_pos = find_not_cclass .CCLASS_WHITESPACE, input, input_pos, input_len
   ret
 
@@ -422,7 +422,7 @@ get_size_modifier:
   if $S0 == 'L' goto set_size_l
   dec format_pos
   ret
- 
+
 set_size_h:
   size_modifier = 1
   ret
@@ -437,13 +437,13 @@ set_size_ll:
 set_val:
   if xpg3 != 0 goto set_xpg3
   if using_xpg3 == 1 goto cant_mix
-  using_xpg3 = 0  
+  using_xpg3 = 0
   push results, $P0
   ret
 
 set_xpg3:
   if using_xpg3 == 0 goto cant_mix
-  using_xpg3 = 1 
+  using_xpg3 = 1
   if xpg3 == -1 goto done_xpg3
   dec xpg3 # zero based assignment.
   $P1 = results[xpg3]

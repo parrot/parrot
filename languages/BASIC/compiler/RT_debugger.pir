@@ -60,7 +60,7 @@ DEBUGGER_PRINT:
 	eq $I0, 0, DEBUGGER_PARG
 
 	shift $S0, $P1
-	set $S1, locals[$S0]	
+	set $S1, locals[$S0]
 	print $S1
 	print "\n"
 	branch DEBUGGER_COMMAND
@@ -142,7 +142,7 @@ DEBUGGER_ERR:
 
 
 
-DEBUG_CLEAR:  
+DEBUG_CLEAR:
 	set P0, P25["watch"]
 	set I0, P0
         eq I0, 0, DEBUG_CLEAREND
@@ -176,7 +176,7 @@ DEBUG_ADDSLOT:set $P0[$I1], $S0
 DEBUG_ADDNEW: push $P0, $S0
 DEBUG_ADDEND: ret
 
-DEBUGGER_PRINTWATCH:  
+DEBUGGER_PRINTWATCH:
 	set $P0, $P25["watch"]
 	set $I0, $P0
         eq $I0, 0, DEBUG_PRINTEND
@@ -189,7 +189,7 @@ DEBUG_PRINTLOOP:
         eq $S0, "", DEBUG_PRINTLOOP
 	print $S0
 	print "="
-	set $S1, locals[$S0]	
+	set $S1, locals[$S0]
 	print $S1
 	print "\t"
         branch DEBUG_PRINTLOOP

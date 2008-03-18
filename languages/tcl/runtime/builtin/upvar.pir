@@ -10,7 +10,7 @@
   .local int argc
   argc = elements argv
   if argc < 2 goto bad_args
-  
+
   .local pmc __call_level, call_chain
   .local int call_level
   __call_level = get_root_global ['_tcl'], '__call_level'
@@ -27,9 +27,9 @@
 skip:
   $I0 = argc % 2
   if $I0 == 1 goto bad_args
-  
+
   # for each othervar/myvar pair, created a mapping from
- 
+
   .local pmc __make, __set, __find_var
   __make     = get_root_global ['_tcl'], '__make'
   __set      = get_root_global ['_tcl'], '__set'
@@ -42,12 +42,12 @@ skip:
   difference = call_level - new_call_level
 loop:
   if counter >= argc goto done
-  
+
   .local string old_var, new_var
   old_var = argv[counter]
   inc counter
   new_var = argv[counter]
-  
+
   if new_call_level == 0 goto store_var
   $P0 = __find_var(new_var, 'depth'=>1)
   if null $P0 goto store_var
@@ -103,7 +103,7 @@ lexical:
   $P0[$S0] = $P1
   inc counter
   goto loop
- 
+
 done:
   .return('')
 

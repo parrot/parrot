@@ -118,7 +118,7 @@ Adds (or replaces) a syntactic category's defaults.
     token[$P1] = $P2
     goto args_loop
   args_end:
-    
+
     $S0 = token['match']
     if $S0 > '' goto with_match
     token['match'] = 'PGE::Match'
@@ -153,7 +153,7 @@ Adds (or replaces) a syntactic category's defaults.
     $P0 = token['precedence']
     token['precclose'] = $P0
   with_precclose:
-    
+
     .local string keyclose
     $I0 = index key, ' '
     if $I0 < 0 goto with_close
@@ -206,7 +206,7 @@ Adds (or replaces) a syntactic category's defaults.
   end:
     .return (token)
 .end
-    
+
 
 .sub 'parse' :method
     .param pmc mob
@@ -218,7 +218,7 @@ Adds (or replaces) a syntactic category's defaults.
     .local int pos, lastpos, wspos
     .local int expect, nows
     .local pmc ws
-    .local string key 
+    .local string key
     .local pmc token, top, oper
     .local pmc iter
     .local int tokencat, topcat
@@ -244,7 +244,7 @@ Adds (or replaces) a syntactic category's defaults.
     rulename = ''
   have_rulename:
     ##   see if we have a 'stop' adverb.  If so, then it is either
-    ##   a string to be matched directly or a sub(rule) to be called 
+    ##   a string to be matched directly or a sub(rule) to be called
     ##   to check for a match.
     .local int has_stop, has_stop_nows
     .local string stop_str
@@ -378,7 +378,7 @@ Adds (or replaces) a syntactic category's defaults.
     goto token_next
 
   oper_found:
-    ##   tighter: if we have an insufficiently tight token, 
+    ##   tighter: if we have an insufficiently tight token,
     ##   treat it as not found.
     if circumnest > 0 goto oper_found_1
     $S0 = token['precedence']
@@ -391,7 +391,7 @@ Adds (or replaces) a syntactic category's defaults.
     if tokencat == PGE_OPTABLE_PREFIX goto oper_shift          # (S1)
     if tokencat == PGE_OPTABLE_CIRCUMFIX goto oper_shift       # (S2)
 
-    $I0 = elements termstack                                 
+    $I0 = elements termstack
     if $I0 > 0 goto shift_reduce
     if tokencat != PGE_OPTABLE_PRELIST goto end
 
@@ -459,7 +459,7 @@ Adds (or replaces) a syntactic category's defaults.
     if topcat == PGE_OPTABLE_CLOSE goto reduce_close
     if topcat < PGE_OPTABLE_POSTCIRCUMFIX goto reduce_normal
     ##   we have an unbalanced open, so error.  remove the
-    ##   incomplete circumfixed term, and for circumfix: opers 
+    ##   incomplete circumfixed term, and for circumfix: opers
     ##   put a failed nullterm onto the termstack
     wspos = -1
     $P0 = pop termstack

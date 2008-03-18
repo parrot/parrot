@@ -12,7 +12,7 @@
   if argc == 0 goto error
   if argc  > 3 goto error
 
-  fileName = argv[0] 
+  fileName = argv[0]
   access   = argv[1]
   pir_access = '<'
   if access == '' goto done_access
@@ -40,10 +40,10 @@ done_access:
   channels[channel_id] = channel
 
   .return(channel_id)
- 
+
 file_error:
   tcl_error 'unable to open specified file'
- 
+
 error:
   tcl_error 'wrong # args: should be "open fileName ?access? ?permissions?"'
 .end

@@ -10,18 +10,18 @@
   .local int argc
   argc = elements argv
   if argc == 0 goto loop_end
-  
+
   .local int i
   i = 0
-  
+
   .local int nocomplain
   nocomplain = 0
-  
+
   $S0 = argv[0]
   if $S0 != '-nocomplain' goto flags_done
   nocomplain = 1
   i = 1
-  
+
   if argc < 2 goto flags_done
   $S0 = argv[1]
   if $S0 != '--' goto flags_done
@@ -47,7 +47,7 @@ loop:
 array:
   .local string array_name
   array_name = substr name, 0, char
-  
+
   .local string key
   .local int len
   len = length name
@@ -55,12 +55,12 @@ array:
   len -= 2
   inc char
   key = substr name, char, len
- 
+
   var = find_var(array_name)
   if null var goto no_such_var
   $I0 = isa var, 'TclArray'
   unless $I0 goto variable_isnt_array
-  
+
   $I0 = exists var[key]
   if $I0 == 0 goto no_such_element
   delete var[key]

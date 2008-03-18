@@ -10,7 +10,7 @@
   .param pmc    argv
 
   .local string pir_code
-  .local int argc 
+  .local int argc
   argc = argv
 
   if argc == 0 goto noargs

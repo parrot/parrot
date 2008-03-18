@@ -17,16 +17,16 @@ Creates a C<Stream::Sub> and dumps it.
 
     load_bytecode "library/Stream/Base.pbc"
     load_bytecode "library/Stream/Sub.pbc"
-    
+
     stream = new "Stream::Sub"
 
     # set the stream's source sub
     .const .Sub temp = "_counter"
     assign stream, temp
-    
+
     # dump the stream
     stream."dump"()
-    
+
     end
 .end
 
@@ -41,14 +41,14 @@ It writes the numbers 0 .. 9 as strings to the stream.
 .sub _counter :method
     .local string str
     .local int i
-    
+
     i = 0
 
 LOOP:
     # streams are using strings,
     # so we have to convert the number into a string
     str = i
-    
+
     # write the string
     self."write"( str )
 

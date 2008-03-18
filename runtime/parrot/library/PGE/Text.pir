@@ -28,7 +28,7 @@ also.)
 Extracts a balanced-bracket-delimited substring from the
 current position of C<target> using the delimiters specified
 by C<delim>, and returns a C<Match> object containing the result
-of the extraction.  
+of the extraction.
 
 =cut
 
@@ -94,7 +94,7 @@ of the extraction.
     if $I0 >= 0 goto open
     $I0 = index delim_ket, $S0                     # unbalanced nest?>
     if $I0 >= 0 goto fail
-  skip:                                       
+  skip:
     inc pos                                        # move to next char
     goto next                                      # try next
   escape:

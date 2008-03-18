@@ -122,7 +122,7 @@ MACRO_FORM:
 SYMBOL:
   symbol = form
   symname = symbol._get_name_as_string()
-  
+
   .local int is_special
   is_special = _IS_SPECIAL(symbol)                 # Check if we're a dynamic
   unless is_special goto LEXICAL_SYMBOL            # variable
@@ -152,7 +152,7 @@ CHECK_VALUE:
 DONE_SYMBOL:
   # VALID_IN_PARROT_0_2_0 argcP = 1                                # One value returned
   # VALID_IN_PARROT_0_2_0 P5 = retv                                # Return value
-  # VALID_IN_PARROT_0_2_0 
+  # VALID_IN_PARROT_0_2_0
   # VALID_IN_PARROT_0_2_0 goto DONE
   .return(retv)
 
@@ -172,13 +172,13 @@ SELF_EVALUATING_OBJECT:
 MACRO_NOT_INITIALIZED:
   .ERROR_0("internal","the macro system has not been initialized")
 # VALID_IN_PARROT_0_2_0   goto DONE
-# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0
 # VALID_IN_PARROT_0_2_0 DONE:
 # VALID_IN_PARROT_0_2_0   is_prototyped = 0                        # Nonprototyped return
 # VALID_IN_PARROT_0_2_0   argcI = 0                                # No integer values returned
 # VALID_IN_PARROT_0_2_0   argcN = 0                                # No float values returned
 # VALID_IN_PARROT_0_2_0   argcS = 0                                # No string values returned
-# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0
 # VALID_IN_PARROT_0_2_0   returncc                                 # Call the return continuation
 
   .return()

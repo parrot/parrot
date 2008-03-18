@@ -51,7 +51,7 @@ Used in bootstrapping.
 
     # XXX - THESE SHOULD BE REMOVED AND CONVERTED TO PROPER LISP FUNCTIONS
     .DEFUN(symbol, package, "ERROR", "_raise_error")
-    
+
     .DEFUN(symbol, package, "LOAD", "_load")
 
     .return(1)

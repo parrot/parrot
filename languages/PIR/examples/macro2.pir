@@ -8,8 +8,8 @@
 
 .macro X(a,b)
 	.local $x: doit()
-	
-	
+
+
 	loop: doit()
 	.a = .b
 	.sym int i
@@ -25,8 +25,8 @@
 
 .macro X(a,b)
 	.local $x: doit()
-	
-	
+
+
 	loop: doit()
 	.a = .b
 	.sym int i
@@ -34,8 +34,8 @@
 
 .macro X(a,b)
 	.local $x: doit()
-	
-	
+
+
 	loop: doit()
 	.a = .b
 	.sym int i

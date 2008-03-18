@@ -1,13 +1,13 @@
 .sub _main :main
     .local pmc stream
-    
+
     load_bytecode "library/Stream/Writer.pir"
     load_bytecode "library/Stream/Replay.pir"
-    
+
     stream = new "Stream::Writer"
     $P0 = global "_reader"
     assign stream, $P0
-    
+
     stream."write"( "1" )
     stream."write"( "2" )
     stream."write"( "A" )
@@ -27,7 +27,7 @@
 
     stream1 = new "Stream::Replay"
     assign stream1, self
-    
+
     print "reader start\n"
 
     print "1:'"
@@ -36,10 +36,10 @@
     str = stream1."read"()
     print str
     print "'\n"
-    
+
     stream2 = clone stream1
     stream3 = clone stream1
-    
+
     print "2:'"
     str = stream2."read"()
     print str
@@ -47,17 +47,17 @@
     print str
     stream2."close"()
     print "'\n1:'"
-    
+
     str = stream1."read"()
     print str
     str = stream1."read"()
     print str
-    
+
     str = stream1."read"()
     print str
     str = stream1."read"()
     print str
-    
+
     print "\n3:'"
 
     str = stream3."read"()
@@ -71,9 +71,9 @@
 
     str = stream3."read"()
     print str
-    
+
     print "'\n"
-    
+
     print "reader done\n"
 .end
 

@@ -9,7 +9,7 @@
 
 .sub '&expr'
   .param pmc argv :slurpy
- 
+
   .local string expr
   .local int argc
   .local int looper
@@ -19,7 +19,7 @@
 
   expr = ''
   looper = 0
-  argc = argv 
+  argc = argv
   unless argc goto no_args
 
   expr = join ' ', argv

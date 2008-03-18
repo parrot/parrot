@@ -226,7 +226,7 @@ L<http://hoohoo.ncsa.uiuc.edu/cgi/overview.html>
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de> 
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
 

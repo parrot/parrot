@@ -8,7 +8,7 @@
 	.param pmc argv
 	.local int argc, n
 	argc = argv
-	n = 3 
+	n = 3
 	unless argc == 2 goto argsok
 	$S0 = argv[1]
 	n = $S0

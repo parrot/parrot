@@ -64,13 +64,13 @@ Returns the created data object.
     .local pmc temp
     .local int i
     .local int id
-    
+
     classoffset id, self, "Tetris::BoardData"
-    
+
     # create the data array
     new data, 'ResizablePMCArray'
     setattribute self, id, data
-    
+
     # calculate the array size
     set i, w
     mul i, h
@@ -119,8 +119,8 @@ This method returns nothing.
 
     classoffset $I0, self, "Tetris::BoardData"
     getattribute data, self, $I0
-    
-    # get data size    
+
+    # get data size
     set i, data
     # fill the data
 WHILE:
@@ -140,7 +140,7 @@ END:
 
 .sub __get_integer_keyed :method
     .param pmc key
-    
+
     classoffset $I0, self, "Tetris::BoardData"
     getattribute $P0, self, $I0
     $I0 = key
@@ -154,7 +154,7 @@ END:
     sleep 0.1
 OK:
     $I0 = $P0[$I0]
-    
+
     .return ($I0)
 .end
 
@@ -231,7 +231,7 @@ Returns the width and height of the board.
     add $I0, bHeight
     getattribute $P0, self, $I0
     h = $P0
-    
+
     .return (w, h)
 .end
 

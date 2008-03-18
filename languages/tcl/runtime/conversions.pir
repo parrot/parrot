@@ -21,7 +21,7 @@ this is as simple as returning the list.
 
   push_eh convert_to_tcl_error
     $P0 = $P0.'get_list'($S0)
-  pop_eh 
+  pop_eh
 
   copy value, $P0
 
@@ -110,7 +110,7 @@ Given a PMC, get a number from it.
 
   .local string className
   .local pmc    value
-  
+
   className = ast['class']
   value     = ast['value']
 
@@ -150,7 +150,7 @@ Given a PMC, get an integer from it.
 
 .sub __integer :multi(_)
   .param pmc value
-  .param pmc rawhex :named ('rawhex') :optional 
+  .param pmc rawhex :named ('rawhex') :optional
   .param int has_rawhex               :opt_flag
 
   unless has_rawhex goto normal
@@ -158,7 +158,7 @@ Given a PMC, get an integer from it.
   $S0 =  '0x' . $S0
   value = $S0
 
-normal: 
+normal:
   .local pmc integer
 
   push_eh not_integer_eh
@@ -485,14 +485,14 @@ depth_set:
   .local pmc colons, split
   colons = get_root_global ['_tcl'], 'colons'
   split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
-  
+
   .local pmc ns_name
   ns_name = split(colons, name)
   $I0 = elements ns_name
   if $I0 == 0 goto relative
   $S0 = ns_name[0]
   if $S0 != '' goto relative
-  
+
 absolute:
   $P1 = shift ns_name
   goto return
@@ -507,7 +507,7 @@ relative_loop:
   $P0 = $P0.'get_name'()
   $S0 = $P0[0]
   if $S0 == '_tcl' goto relative_loop
-  
+
   $I0 = elements $P0
 combine_loop:
   dec $I0
@@ -530,10 +530,10 @@ throw an exception.
 .sub __boolean
     .param pmc value
 
-    .local string lc 
+    .local string lc
     $S0 = value
     lc = downcase $S0
- 
+
     if lc == '1' goto true
     if lc == '0' goto false
     if lc == 'true'  goto true
@@ -599,7 +599,7 @@ was this a valid tcl-style level, or did we get this value as a default?
   __number   = get_root_global ['_tcl'], '__number'
   orig_level = new 'Integer'
   orig_level = call_level
- 
+
   .local int num_length
 
 get_absolute:
@@ -611,7 +611,7 @@ get_absolute:
     parrot_level = __number($S0)
   pop_eh
   goto bounds_check
- 
+
 get_integer:
   push_eh default
     parrot_level = __number(tcl_level)
@@ -620,7 +620,7 @@ get_integer:
   if parrot_level < 0 goto default
   parrot_level = orig_level - parrot_level
   goto bounds_check
- 
+
 default:
   defaulted = 1
   parrot_level = new 'Integer'
@@ -632,7 +632,7 @@ bounds_check:
   if parrot_level < 0          goto bad_level
   if parrot_level > orig_level goto bad_level
 
-  $I1 = defaulted 
+  $I1 = defaulted
   .return(parrot_level,$I1)
 
 bad_level:
@@ -653,7 +653,7 @@ Given a string of tcl code, perform the backslash/newline subsitution.
 
   .local int len
   len = length contents
- 
+
   # perform the backslash-newline substitution
   $I0 = -1
 backslash_loop:
@@ -690,20 +690,20 @@ done:
 # inherit from.
 .sub 'reverse'
   .param pmc value
-  
+
   .local int high
   .local int low
   .local pmc swap_one
   .local pmc swap_two
-  
+
   high = value
   dec high # need index, not count
   low = 0
 
  loop:
   if high <= low goto loop_end
-  swap_one    = value[low] 
-  swap_two    = value[high] 
+  swap_one    = value[low]
+  swap_two    = value[high]
   value[low]  = swap_two
   value[high] = swap_one
   inc low
@@ -712,7 +712,7 @@ done:
  loop_end:
 
  .return()
-.end 
+.end
 
 # Local Variables:
 #   mode: pir

@@ -87,7 +87,7 @@ numeric:
     $I0 = str
     token = new 'Integer'
     token = $I0
-    
+
 return:
     .return(token)
 .end

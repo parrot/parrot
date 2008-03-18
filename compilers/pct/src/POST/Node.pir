@@ -94,7 +94,7 @@ Returns the result of the current node as a string.
 
 =item push_pirop(pirop [,arglist :slurpy] [,adverbs :slurpy :named])
 
-Shortcut for creating and adding a new POST::Op node with opcode 
+Shortcut for creating and adding a new POST::Op node with opcode
 C<pirop> and any supplied arguments or options.  Returns the
 newly created node.
 

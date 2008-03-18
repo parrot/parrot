@@ -36,7 +36,7 @@
 
 delete_sub:
   delete ns[$S0]
-  
+
   if delete_only goto delete_builtin
 
 add_sub:
@@ -57,7 +57,7 @@ set_new_sub:
 delete_builtin:
   builtin = get_root_global ['_tcl'; 'builtins'], oldName
   if null builtin goto return
-  
+
   $P0 = get_root_namespace ['_tcl'; 'builtins']
   delete $P0[oldName]
 

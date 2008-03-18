@@ -25,7 +25,7 @@ This is the user interface to PCRE. Use this to initialize the library,
 compile regexes, match against strings, and return the results.
 All functions are found in the 'PCRE' namespace.
 
-The NCI interface is contained in libpcre.pir. 
+The NCI interface is contained in libpcre.pir.
 
 =cut
 
@@ -37,7 +37,7 @@ The NCI interface is contained in libpcre.pir.
 
 =item sub init()
 
-Intialize the pcre library. The library handle is returned as a PMC 
+Intialize the pcre library. The library handle is returned as a PMC
 and is additionally stored as global 'PCRE', 'lib'.
 
 =cut
@@ -108,7 +108,7 @@ LIB_RETURN:
 
 =item sub ( regex, error, errptr )= compile( pattern, options )
 
-Compile the string B<pattern> with int B<options>. 
+Compile the string B<pattern> with int B<options>.
 Returns pmc B<regex>, string B<error> and int B<errptr>.
 
 =cut
@@ -187,9 +187,9 @@ Returns the match.
 
 =head1 BUGS
 
-None known, but this hasn't been well tested. This interface 
-is designed to work on all platforms where PCRE and parrot 
-are supported, but has not been tested on all of them. 
+None known, but this hasn't been well tested. This interface
+is designed to work on all platforms where PCRE and parrot
+are supported, but has not been tested on all of them.
 Send bug reports to E<lt>parrotbug@parrotcode.org<gt>
 
 =cut
@@ -204,7 +204,7 @@ pcre(3)
 
 =head1 AUTHORS
 
-Original code by Leo Toetsch, updated by Jerry Gay 
+Original code by Leo Toetsch, updated by Jerry Gay
 E<lt>jerry dot gay at gmail dot com<gt>
 
 =cut

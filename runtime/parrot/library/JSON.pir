@@ -202,7 +202,7 @@ plain:
 
   unless pretty goto pre_loop
   unless indent goto pre_loop
- 
+
   $S0 = repeat _json_prefix, indent
   result = $S0 . result
   if len goto pre_loop
@@ -274,8 +274,8 @@ iter_loop:
   goto iter_loop
 
 done_iter:
-  $P0 = find_global 'Data::Sort', 'simple' 
-  $P0( keys ) 
+  $P0 = find_global 'Data::Sort', 'simple'
+  $P0( keys )
 
   .local string result,separator
 
@@ -285,7 +285,7 @@ done_iter:
   unless pretty goto pre_loop
   separator = ' : '
   unless indent goto pre_loop
- 
+
   $S0 = repeat _json_prefix, indent
   result = $S0 . result
   if not_empty goto pre_loop
@@ -310,15 +310,15 @@ loop:
 
   # remove any leading whitespace on the value's string.
   unless pretty goto space_loop_skip
- 
+
   .local int space_pos,space_len
   space_pos = 0
   space_len = length $S0
- 
+
 space_loop:
   if space_pos >= space_len goto space_loop_done
   $I0 = ord $S0, space_pos
-  if $I0 != 32 goto space_loop_done 
+  if $I0 != 32 goto space_loop_done
 
   inc space_pos
   goto space_loop

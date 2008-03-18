@@ -62,7 +62,7 @@ endfor:
 	array = new 'FixedPMCArray'
 	$I0 = elements table
 	array = $I0
-	
+
 	.local pmc iter
    	iter = new 'Iterator', table
 	set iter, .ITERATE_FROM_START
@@ -82,7 +82,7 @@ iter_end_1:
 
 	$P0 = global "sort"
 	array."sort"($P0)
-	
+
 	$I0 = array
 	i = 0
 beginfor:

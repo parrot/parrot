@@ -110,7 +110,7 @@ it_done:
     $P0 = sub_to_call(args_array :flat)
     push val_stack, $P0
     no_leftover_function:
-    .local pmc return_val 
+    .local pmc return_val
     return_val = pop val_stack
     .return (return_val)
 .end

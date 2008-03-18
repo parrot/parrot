@@ -20,7 +20,7 @@ loop0:
        _f = _str[0]
        delete _str[0]
 
-       # you can't push onto the type of array that split returns. Do a 
+       # you can't push onto the type of array that split returns. Do a
        # two step.
        $I1 = _str
        $I2 = $I1 + 1

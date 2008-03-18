@@ -175,7 +175,7 @@ empty_string:
       a = __number(a)
       b = __number(b)
     pop_eh
-   
+
     if a == 0 goto zero
 
     $P0 = new 'TclFloat'
@@ -271,7 +271,7 @@ empty_string:
       a = __number(a)
       b = __number(b)
     pop_eh
-    
+
     $I0 = isa a, 'TclFloat'
     if $I0 goto is_float
     $I0 = isa b, 'TclFloat'
@@ -570,7 +570,7 @@ is_string:
 .sub 'infix:eq'    # string equality
     .param string a
     .param string b
-    $I0 = iseq a, b 
+    $I0 = iseq a, b
     .return ($I0)
 .end
 
@@ -714,7 +714,7 @@ empty_string:
 .end
 
 
-# bitwise exclusive OR 
+# bitwise exclusive OR
 .sub 'infix:^'     :multi(String, String)
   .param pmc a
   .param pmc b

@@ -44,11 +44,11 @@
   pattern = shift argv
 
   .local pmc iter
-  iter = new 'Iterator', list 
+  iter = new 'Iterator', list
 
   .local int pos, result
-  result = -1 
-  pos = 0  
+  result = -1
+  pos = 0
 
   .local int lc
   lc = exists switches['nocase']
@@ -69,15 +69,15 @@ glob_begin:
 
 glob_loop:
   unless iter goto done
-  $S0 = shift iter 
+  $S0 = shift iter
   unless lc goto glob_match
   $S0 = downcase $S0
 glob_match:
   match = rule($S0)
   unless match goto glob_next
-  result = pos  
+  result = pos
   goto done
-glob_next: 
+glob_next:
   inc pos
   goto glob_loop
 
@@ -89,28 +89,28 @@ regexp_begin: # very similar to glob_...
 
 regexp_loop:
   unless iter goto done
-  $S0 = shift iter 
+  $S0 = shift iter
   unless lc goto regexp_match
   $S0 = downcase $S0
 regexp_match:
   match = rule($S0)
   unless match goto regexp_next
-  result = pos  
+  result = pos
   goto done
-regexp_next: 
+regexp_next:
   inc pos
   goto regexp_loop
 
 exact_loop:
   unless iter goto done
-  $S0 = shift iter 
+  $S0 = shift iter
   unless lc goto exact_match
   $S0 = downcase $S0
 exact_match:
   if $S0 != pattern goto exact_next
-  result = pos  
+  result = pos
   goto done
-exact_next: 
+exact_next:
   inc pos
   goto exact_loop
 

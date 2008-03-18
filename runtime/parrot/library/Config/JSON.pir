@@ -8,7 +8,7 @@ Provides a simple wrapper to read and write JSON config files.
 
 =head2 ReadConfig(filename)
 
-Given a filename, parse the file containing valid JSON and return a 
+Given a filename, parse the file containing valid JSON and return a
 PMC containing the data.
 
 If the data is not valid, an exception will be thrown.

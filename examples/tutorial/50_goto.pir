@@ -1,4 +1,4 @@
-=head1 
+=head1
 
 Demonstrate the simplest form of control flow, 'goto' a label.
 

@@ -49,7 +49,7 @@ real top level namespace.
   select_option  = get_root_global ['_tcl'], 'select_option'
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
-  
+
   .local pmc subcommand_proc
   null subcommand_proc
 
@@ -94,11 +94,11 @@ bad_args:
   argc = elements argv
   # no arg delete does nothing
   if argc == 0 goto return
-  
+
   .local pmc __namespace, ns_root
   __namespace = get_root_global ['_tcl'], '__namespace'
   ns_root = get_root_namespace ['tcl']
-  
+
   $I0 = 0
 delete_loop:
   if $I0 == argc goto return
@@ -161,7 +161,7 @@ get_loop:
   goto get_loop
 get_end:
   .return(1)
-  
+
 doesnt_exist:
   .return(0)
 
@@ -171,7 +171,7 @@ bad_args:
 
 .sub 'qualifiers'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
   if argc != 1 goto bad_args
@@ -198,7 +198,7 @@ WHOLE:
 
 .sub 'tail'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
   if argc != 1 goto bad_args
@@ -212,7 +212,7 @@ WHOLE:
   unless $P0 goto WHOLE
 
   $P2 = $P0[0]
-  
+
   $S1 = $P2
   .return ($S1)
 
@@ -227,7 +227,7 @@ bad_args:
 
 .sub 'eval'
   .param pmc argv
-  
+
   .local int argc
   argc = elements argv
   if argc < 2 goto bad_args
@@ -247,7 +247,7 @@ bad_args:
 
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
-  
+
   ns = shift argv
   ns = __namespace(ns, 1)
 
@@ -255,7 +255,7 @@ bad_args:
   namespace = ''
   $I0 = elements ns
   if $I0 == 0 goto global_ns
-  
+
   namespace = join "'; '", ns
   namespace = "['" . namespace
   namespace .= "']"
@@ -272,7 +272,7 @@ global_ns:
 .namespace %0
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
-.sub compiled_tcl_sub_%2 
+.sub compiled_tcl_sub_%2
   .include 'languages/tcl/src/returncodes.pir'
   .local pmc epoch, colons, split, unk, interactive :unique_reg
   epoch  = get_root_global ['_tcl'], 'epoch'
@@ -283,7 +283,7 @@ global_ns:
   .return(%3)
 .end
 END_PIR
-  
+
   .local pmc pir_compiler
   pir_compiler = compreg 'PIR'
   push_eh restore_call_chain
@@ -326,7 +326,7 @@ bad_args:
 iterate:
   .local pmc list
   list = new 'TclList'
-  
+
   .local pmc __namespace, ns, ns_name
   .local string name
   __namespace = get_root_global ['_tcl'], '__namespace'
@@ -448,12 +448,12 @@ b_first:
 
   .local string name
   name = ''
-  
+
   if argc > 1  goto bad_args
   if argc == 0 goto get_parent
 
   name = argv[0]
-  
+
 get_parent:
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'

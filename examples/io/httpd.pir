@@ -13,7 +13,7 @@ examples/io/httpd.pir - HTTP server
 
 A very tiny HTTP-Server. It currently only understands the GET method.
 It's a nice way of testing pretty much all IO functions.
-By default (and not yet configurable) it binds to localhost:1234. 
+By default (and not yet configurable) it binds to localhost:1234.
 
 =head2 Serving Parrot Docs
 
@@ -43,7 +43,7 @@ was started.
 
 If the file extension is C<.pir> or C<.pbc>, this file will be loaded
 below the directory F<cgi-pir> and the function C<cgi_main> will be
-invoked with the query as an argument. 
+invoked with the query as an argument.
 This functions should return a plain string, which will be sent to the
 browser.
 
@@ -60,7 +60,7 @@ C<'+'>. C<key> and C<value> are already C<urldecoded>.
                                 # unless serving XMLHttpRequest's
   .end
 
-The browser request:  
+The browser request:
 
   http://localhost:1234/foo.pir?foo=1+bar=%61
 
@@ -79,7 +79,7 @@ RFC2616
 
 =head1 AUTHOR
 
-Original author is Markus Amsler - <markus.amsler@oribi.org> 
+Original author is Markus Amsler - <markus.amsler@oribi.org>
 The code was heavily hacked by bernhard and leo.
 
 =cut
@@ -242,7 +242,7 @@ SERVE_docroot:
     rep .= 'Location: /docs/html/index.html'
     rep .= CRLF
     rep .= 'Content-Length: '
-    file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
+    file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>."
     length len, file_content
     temp = to_string (len)
     concat rep, temp
@@ -294,11 +294,11 @@ END:
     .param pmc args :slurpy
 
     .local string ret
-    ret = sprintf "%d", args 
+    ret = sprintf "%d", args
     .return( ret )
 .end
 
-# convert %xx to char 
+# convert %xx to char
 .sub urldecode
     .param string in
 

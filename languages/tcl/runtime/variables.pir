@@ -6,7 +6,7 @@
 Read a variable from its name. It may be a scalar or an
 array.
 
-Use the call level to determine if we are referring to a 
+Use the call level to determine if we are referring to a
 global variable or a lexical variable - will no doubt
 require further refinement later as we support namespaces
 other than the default, and multiple interpreters.
@@ -30,7 +30,7 @@ other than the default, and multiple interpreters.
 array:
   .local string var
   var = substr name, 0, char
-  
+
   .local string key
   .local int len
   len = length name
@@ -38,10 +38,10 @@ array:
   len -= 2
   inc char
   key = substr name, char, len
- 
+
   variable = __find_var(var)
   if null variable goto no_such_variable
-  
+
   $I0 = does variable, 'hash'
   unless $I0 goto cant_read_not_array
 
@@ -66,8 +66,8 @@ cant_read_not_array:
 scalar:
   variable = __find_var(name)
   if null variable goto no_such_variable
- 
-  $S0 = typeof variable 
+
+  $S0 = typeof variable
   if $S0 == 'TclArray' goto cant_read_array
   .return(variable)
 
@@ -89,7 +89,7 @@ no_such_variable:
 Read a variable from its name. If it doesn't exist, create it. It may be a
 scalar or an array.
 
-Use the call level to determine if we are referring to a 
+Use the call level to determine if we are referring to a
 global variable or a lexical variable - will no doubt
 require further refinement later as we support namespaces
 other than the default, and multiple interpreters.
@@ -114,7 +114,7 @@ other than the default, and multiple interpreters.
 array:
   .local string var
   var = substr name, 0, char
-  
+
   .local string key
   .local int len
   len = length name
@@ -122,19 +122,19 @@ array:
   len -= 2
   inc char
   key = substr name, char, len
- 
+
   variable = __find_var(var, 'depth' => depth)
   unless null variable goto check_is_hash
 
   variable = new 'TclArray'
   variable = __store_var(var, variable, 'depth' => depth)
-  
+
 check_is_hash:
   $I0 = does variable, 'hash'
   unless $I0 goto cant_read_not_array
 
   $P0 = variable[key]
-  if null $P0 goto create_elem 
+  if null $P0 goto create_elem
   .return($P0)
 
 create_elem:
@@ -150,7 +150,7 @@ cant_read_not_array:
 
 scalar:
   variable = __find_var(name, 'depth' => depth)
-  if null variable goto make_variable  
+  if null variable goto make_variable
   .return(variable)
 
 make_variable:
@@ -163,7 +163,7 @@ make_variable:
 
 Set a variable by its name. It may be a scalar or an array.
 
-Use the call level to determine if we are referring to a 
+Use the call level to determine if we are referring to a
 global variable or a lexical variable - will no doubt
 require further refinement later as we support namespaces
 other than the default, and multiple interpreters.
@@ -195,7 +195,7 @@ other than the default, and multiple interpreters.
 find_array:
   .local string var
   var = substr name, 0, char
-  
+
   .local string key
   .local int len
   len = length name
@@ -203,7 +203,7 @@ find_array:
   len -= 2
   inc char
   key = substr name, char, len
-  
+
   .local pmc array
   null array
   array = __find_var(var)

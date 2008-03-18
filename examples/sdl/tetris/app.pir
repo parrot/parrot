@@ -314,7 +314,7 @@ Returns the color palette.
     branch RET
 CREATE:
     (palette) = self."genPalette"()
-    
+
     branch RET
 
 NULL:

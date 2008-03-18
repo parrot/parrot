@@ -67,7 +67,7 @@
 
 no_precompiled:
   # now read it in...
-  $P99 = open filename, '<' 
+  $P99 = open filename, '<'
   file_contents = $P99.'slurp'( '' )
 
   # and compile it..

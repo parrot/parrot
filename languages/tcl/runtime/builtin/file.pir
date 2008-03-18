@@ -3,7 +3,7 @@
 
 .sub '&file'
   .param pmc argv :slurpy
-  
+
   .local int argc
   argc = argv
 
@@ -79,7 +79,7 @@ few_args:
 
 .sub 'join'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
   if argc == 0 goto bad_args
@@ -94,7 +94,7 @@ few_args:
   ii = 0
 
 name_loop:
-  if ii == argc goto name_loop_done 
+  if ii == argc goto name_loop_done
 
   .local string name,char
   name = argv[ii]
@@ -106,7 +106,7 @@ name_loop:
 
 absolute:
   result = name
- 
+
 name_loop_next:
   inc ii
   if ii == argc goto name_loop_done
@@ -120,9 +120,9 @@ bad_args:
   tcl_error 'wrong # args: should be "file join name ?name ...?"'
 .end
 
-.sub 'stat' 
+.sub 'stat'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
 
@@ -130,7 +130,7 @@ bad_args:
 
   .local string file,varname
   file = shift argv
-  varname = shift argv 
+  varname = shift argv
 
   $P1 = new 'OS'
   push_eh no_file
@@ -138,7 +138,7 @@ bad_args:
   pop_eh
 
   .local pmc __set
-  __set = find_global '__set' 
+  __set = find_global '__set'
 
   $P3 = new 'TclArray'
   $P1 = $P2[8]
@@ -164,7 +164,7 @@ bad_args:
   $I2 = 0o170000   #S_IFMT
   $I3 = $I1 & $I2
 
-  $P4 = find_global 'filetypes'  
+  $P4 = find_global 'filetypes'
   $S1 = $P4[$I3]
   $P3['type'] = $S1
 
@@ -188,7 +188,7 @@ bad_args:
 
 .sub 'isdirectory'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
 
@@ -225,7 +225,7 @@ bad_args:
 
 .sub 'isfile'
   .param pmc argv
- 
+
   .local int argc
   argc = argv
 
@@ -241,9 +241,9 @@ bad_args:
 
   $I1 = $P2[2]
   $I3 = $I1 & 0o170000   #S_IFMT
-  
+
   if $I3 == 0o100000 goto true # file mask
-  
+
   .return(0)
 
 true:
@@ -262,7 +262,7 @@ bad_args:
 
 .sub 'type'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
 
@@ -280,7 +280,7 @@ bad_args:
   $I2 = 0o170000   #S_IFMT
   $I3 = $I1 & $I2
 
-  $P4 = find_global 'filetypes'  
+  $P4 = find_global 'filetypes'
   $S1 = $P4[$I3]
   .return ($S1)
 
@@ -296,7 +296,7 @@ bad_args:
 
 .sub 'size'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
 
@@ -324,7 +324,7 @@ bad_args:
 
 .sub 'atime'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
 
@@ -352,7 +352,7 @@ bad_args:
 
 .sub 'mtime'
   .param pmc argv
-  
+
   .local int argc
   argc = argv
 

@@ -198,7 +198,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	find_global P5, "Win32Inputhandle"
 	set I5, 0
 	invoke
-INKEY:  
+INKEY:
 	dlfunc P9, P1,  "PeekConsoleInputA",  "ippip"
         dlfunc P10, P1, "ReadConsoleInputA", "ippip"
 	find_global P5, "Win32Inputhandle"
@@ -239,7 +239,7 @@ NEXT_EVENT:
 	chr S0, I9
 
 	# I6 is the event we're interested in!
-	# 
+	#
 	# There *was* a key event.  Pull everything up to that event
 	#
 	inc I5

@@ -9,7 +9,7 @@
     load_bytecode 'languages/forth/tokenstream.pbc'
     load_bytecode 'languages/forth/variablestack.pbc'
     load_bytecode 'languages/forth/virtualstack.pbc'
-    
+
     # initialize the rstack
     .local pmc stack
     stack = new 'ResizablePMCArray'
@@ -101,7 +101,7 @@ next_token:
     ' dispatch'(code, stream, stack, token)
 
     goto next_token
-    
+
 done:
     $S0 = stack.consolidate_to_cstack()
     code .= $S0

@@ -1,6 +1,6 @@
 # $Id$
 
-=head1 NAME 
+=head1 NAME
 
 output.pir - handle output for Parrot m4
 
@@ -22,9 +22,9 @@ TODO: Support for sync lines.
 
 =cut
 
-.sub shipout_text 
-  .param pmc      state 
-  .param string   text 
+.sub shipout_text
+  .param pmc      state
+  .param string   text
 
   print text
 .end

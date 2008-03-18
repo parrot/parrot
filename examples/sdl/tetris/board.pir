@@ -67,7 +67,7 @@ Returns the created board.
 
     # blocksize to use
     set blocksize, 20
-    
+
     # field size to use
     set w, 10
     set h, 20
@@ -85,22 +85,22 @@ Returns the created board.
     #
     # setup some properties
     #
-    
+
     # set the application object
     setprop self, "app", app
     # XXX: register the board and save its ID
     i = app."registerBoard"( self )
-    
+
     # set the 'next fall time'
     new temp, 'Float'
     set temp, 0
     setprop self, "NextFallTime", temp
-    
+
     # set the 'fall interval'
     new temp, 'Float'
     set temp, 0.5
     setprop self, "FallInterval", temp
-    
+
     # xpos
     new temp, 'Integer'
     set temp, 10
@@ -110,12 +110,12 @@ Returns the created board.
     new temp, 'Integer'
     set temp, 10
     setprop self, "ypos", temp
-    
+
     # set the blocksize
     new temp, 'Integer'
     set temp, blocksize
     setprop self, "blocksize", temp
-    
+
     # create the preview block
     self."nextBlock"()
 
@@ -136,7 +136,7 @@ Returns the application object to which this board belongs to.
     .local pmc app
 
     getprop app, "app", self
-    
+
     .return (app)
 .end
 
@@ -151,7 +151,7 @@ in the preview window.
     .local pmc block
 
     getprop block, "nextblock", self
-    
+
     # return the block
     .return (block)
 .end
@@ -169,7 +169,7 @@ This method returns nothing.
     .param pmc block
 
     setprop self, "nextblock", block
-    
+
     # return the block
     .return ()
 .end
@@ -190,17 +190,17 @@ This method returns nothing.
     .param pmc block
     .local int width
     .local int size
-    
+
     $I0 = typeof block
     if $I0 == .Undef goto END
-    
+
     # assign the board to the block
     block."setBoard"( self )
 
     #
     # set the block's x position to the center of the board
     # xpos = (self.width - block.size) / 2
-    # 
+    #
     # get the board's width
     width = self."width"()
     # get the block's size
@@ -241,7 +241,7 @@ This method returns the block that is now falling down.
 
     .local pmc block
     .local pmc temp
-    
+
     if got_id goto SKIP_SET_ID
     # no INT arg => use a random next block
     id = -1
@@ -249,7 +249,7 @@ SKIP_SET_ID:
 
     # get the 'next block' and store it as the current one
     getprop block, "nextblock", self
-    
+
     # create a new 'next block'
     $P0 = self."blockID"( id )
     temp = new $P0, self
@@ -257,7 +257,7 @@ SKIP_SET_ID:
 
     # new currently falling block created, activate it
     self."newCurrentBlock"( block )
-    
+
 END:
     # return the block
     .return (block)
@@ -273,10 +273,10 @@ This method returns nothing.
 
 .sub fall :method
     .local pmc block
-    
+
     getprop block, "block", self
     block."fall"()
-    
+
     .return ()
 .end
 
@@ -290,10 +290,10 @@ Returns 1 if the current block is falling down fast, 0 otherwise.
     .param pmc self
     .local pmc block
     .local int ret
-    
+
     getprop block, "block", self
     ret = block."falling"()
-    
+
     .return (ret)
 .end
 
@@ -305,7 +305,7 @@ Returns the currently falling block.
 
 .sub currentBlock :method
     .local pmc block
-    
+
     getprop block, "block", self
 
     .return (block)
@@ -323,10 +323,10 @@ measured in pixels.
 .sub blockSize :method
     .local pmc temp
     .local int i
-        
+
     getprop temp, "blocksize", self
     set i, temp
-    
+
     .return (i)
 .end
 
@@ -357,11 +357,11 @@ Returns the calculated offset.
     .local int offset
     .local pmc temp
     .local pmc i
-    
+
     offset = self."width"()
     mul offset, y
     add offset, x
-    
+
     .return (offset)
 .end
 
@@ -404,9 +404,9 @@ This method returns nothing.
     .local int s
     .local int offset
     .local int i
-        
+
     s = block."size"()
-    
+
     (xp, yp) = block."position"()
 
     set i, 0
@@ -423,7 +423,7 @@ TRANS_LOOPx:
     offset = self."offset"( xp, yp )
     sub xp, x
     sub yp, y
-    
+
     # set the value at the calculated offset to the specified color value
     set data[offset], value
 
@@ -432,7 +432,7 @@ TRANS_SKIP:
     inc i
     if x >= s goto TRANS_LOOPy
     branch TRANS_LOOPx
-    
+
 TRANS_LOOPend:
     .return ()
 .end
@@ -461,7 +461,7 @@ This method returns nothing.
     value = block."id"()
     inc value # make first id (0) blue
     self."translateBlockData"( block, self, value )
-    
+
     .return ()
 .end
 
@@ -479,9 +479,9 @@ This method returns nothing.
     .local int src
     .local int dst
     .local int temp
-    
+
     w = self."width"()
-    
+
     temp = line
     dst = self."offset"( w, temp )
     dec temp
@@ -529,9 +529,9 @@ This method returns the number of lines removed.
     .local int hits
     .local int offset
     .local int offset2
-    
+
     (w, h) = self."dimensions"()
-    
+
     set hits, 0
     set line, -1
 RFL_NEXTLINE:
@@ -606,13 +606,13 @@ This method returns nothing.
     .local int xp
     .local int yp
     .local pmc rect
-    
+
     rect = new 'Hash'
-    
+
     # get the app's palette
     $P0 = self."application"()
     palette = $P0."palette"()
-    
+
     (xpos, ypos) = self."position"()
     (w, h) = self."dimensions"()
     blocksize = self."blockSize"()
@@ -641,7 +641,7 @@ NO_CLEAR_CACHE:
     add yp, 1
 
     unless full goto NO_FIELDBACKGROUND
-    
+
     rect["x"] = xpos
     rect["y"] = ypos
     rect["width"] = xp
@@ -690,7 +690,7 @@ LOOPx:
     $I1 = palette
     if $I0 >= $I1 goto LOOPend
     color = palette[$I0]
-    
+
     surface."fill_rect"( temp, color )
 
 NO_DRAW:
@@ -707,7 +707,7 @@ LOOPend:
     temp."draw"( surface, xpos, ypos, blocksize )
     # clear the cache at the position of the current block
     self."translateBlockData"( temp, cache, -1 )
-    
+
     #
     # draw the next block
     #
@@ -875,9 +875,9 @@ TDB
     .param int id
     .local pmc blocks
     .local pmc ret
-    
+
     blocks = find_global "Tetris::Block", "blocks"
-    
+
     if id != -1 goto OK
 
     # max id = number of blocks - 1
@@ -888,7 +888,7 @@ TDB
     $N0 = $P0
     $N0 = $N0 * $I0
     id = $N0
-    
+
 OK:
     ret = blocks[id]
 

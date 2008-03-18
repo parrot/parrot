@@ -4,7 +4,7 @@
 
 .sub 'yarn_literal' :method
     .param pmc adverbs         :slurpy :named
-    
+
     .local string delim
     delim = '"'
 

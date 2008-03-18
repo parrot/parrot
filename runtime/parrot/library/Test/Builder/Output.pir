@@ -153,7 +153,7 @@ unescaped newlines.
 
   	inc i
 	if i < num_lines goto LOOP
-	
+
 	message = join '', lines
 	concat message, "\n"
 

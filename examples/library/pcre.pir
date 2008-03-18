@@ -16,7 +16,7 @@ Note that PCRE must be installed for this to work.
 
 =head1 AUTHORS
 
-Original code by Leo Toetsch, updated by Jerry Gay 
+Original code by Leo Toetsch, updated by Jerry Gay
 E<lt>jerry dot gay at gmail dot com<gt>
 
 =cut
@@ -61,7 +61,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
 
     .local int ok
     .local pmc result
-    
+
     func= find_global 'PCRE', 'match'
     ( ok, result )= func( regex, s, 0, 0 )
 
@@ -72,7 +72,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
     i= 0
     .local string match
 
-LP: 
+LP:
     func= find_global 'PCRE', 'dollar'
     match= func( s, ok, result, i )
     print match

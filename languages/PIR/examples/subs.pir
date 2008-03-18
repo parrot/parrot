@@ -7,9 +7,9 @@
 	.param pmc z
 	.param string s
 	#.param $P1
-	#.param $P2	
+	#.param $P2
 	#.param $P3
-	#.param $P4	
+	#.param $P4
 	#.param I1
 	#.param P2
 	#.param S3
@@ -46,7 +46,7 @@
 	.yield($I222, I11)
 	.yield($S999, S9)
 	.yield($N999, N9)
-	
+
 	'f'()
 	f()
 	# this does not work, and should not: check and fix.

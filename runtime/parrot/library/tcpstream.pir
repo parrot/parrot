@@ -7,18 +7,18 @@ TCPStream
 
   .sub main :main
       load_bytecode 'library/tcpstream.pir'
-      
+
       .local pmc stream
       stream = new 'TCPStream'
       stream.'connect'("www.google.com", 80)
-      
+
       stream.'say'("GET / HTTP/1.0")
       stream.'say'("User-agent: Parrot")
       stream.'say'("")
-      
+
       $S0 = stream.'slurp'()
       print $S0
-      
+
       stream.'close'()
   .end
 
@@ -134,7 +134,7 @@ Connects to a host/port.
 Throws an exception if unable to connect.
 
 =cut
-    
+
 .sub connect :method
     .param string host
     .param int    port

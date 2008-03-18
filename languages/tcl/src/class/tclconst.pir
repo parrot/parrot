@@ -14,7 +14,7 @@ Define the attributes required for the class.
 .sub __class_init :anon :load
   $P0 = get_class 'String'
   $P1 = subclass $P0, 'TclConst'
-  
+
   $P0 = new 'Hash'
   $P0[ 97] = "\a"
   $P0[ 98] = "\x8" # \b
@@ -50,8 +50,8 @@ Define the attributes required for the class.
   $P0[100] = 13
   $P0[101] = 14
   $P0[102] = 15
- 
-  set_root_global ['_tcl'], 'hexadecimal', $P0 
+
+  set_root_global ['_tcl'], 'hexadecimal', $P0
 
 .end
 
@@ -63,25 +63,25 @@ Define the attributes required for the class.
   .local pmc backslashes, hexadecimal
   backslashes = get_root_global ['_tcl'], 'backslashes'
   hexadecimal = get_root_global ['_tcl'], 'hexadecimal'
-  
+
   .local int pos
   pos = 0
 loop:
   value_length = length value
   pos = index value, '\', pos
   if pos == -1 goto done
- 
+
   $I0 = pos + 1
   $I0 = ord value, $I0
   if $I0 == 120 goto hex      # x
   if $I0 == 117 goto unicode  # u
   if $I0 <   48 goto simple   # < 0
-  if $I0 <=  55 goto octal    # 0..7  
+  if $I0 <=  55 goto octal    # 0..7
                               # > 7
 simple:
   $I1 = exists backslashes[$I0]
   if $I1 goto special
-  
+
   substr value, pos, 1, ''
   inc pos
   goto loop
@@ -108,14 +108,14 @@ octal:
   $I0 = ord value, $I0
 
   if $I0 <   48 goto octal_only1 # < 0
-  if $I0 <=  55 goto octal2      # 0..7  
+  if $I0 <=  55 goto octal2      # 0..7
                                  # > 7
 octal_only1:
   $S0 = chr octal_value
-  substr value, pos, 2, $S0 
+  substr value, pos, 2, $S0
 
   inc pos
-  goto loop 
+  goto loop
 
 octal2:
   # at this point, $I0 contains the value of the second digit,
@@ -131,14 +131,14 @@ octal2:
   $I0 = ord value, $I0
 
   if $I0 <   48 goto octal_only2 # < 0
-  if $I0 <=  55 goto octal3      # 0..7  
+  if $I0 <=  55 goto octal3      # 0..7
 
 octal_only2:
   $S0 = chr octal_value
-  substr value, pos, 3, $S0 
+  substr value, pos, 3, $S0
 
   inc pos
-  goto loop 
+  goto loop
 
 octal3:
   # at this point, $I0 contains the value of the third digit
@@ -146,9 +146,9 @@ octal3:
 
   octal_value *= 8
   octal_value += digit
-  
+
   $S0 = chr octal_value
-  substr value, pos, 4, $S0 
+  substr value, pos, 4, $S0
 
   inc pos
   goto loop # can't have four digits, stop now.
@@ -165,12 +165,12 @@ hex:
   # at this point, pos is set to the backslash
   hex_value = 0
   hex_pos = pos + 2 # skip the backslash and the x
-  
+
 hex_loop:
   if hex_pos >= value_length goto hex_done
   $I0 = ord value, hex_pos
   $I1 = exists hexadecimal[$I0]
-  unless $I1 goto hex_done 
+  unless $I1 goto hex_done
   hex_digit = hexadecimal[$I0]
   band hex_value, 15     # high byte discarded
   hex_value *= 16        # low byte promoted
@@ -184,9 +184,9 @@ hex_done:
   $I0 = hex_pos - pos
   if $I0 == 2 goto hex_not_really
   $S0 = chr hex_value
-  substr value, pos, $I0, $S0 
+  substr value, pos, $I0, $S0
 
-  inc pos 
+  inc pos
 
   goto loop
 
@@ -208,13 +208,13 @@ unicode:
   uni_value = 0
   uni_digit_count = 0
   uni_pos = pos + 2 # skip the backslash and the u
-  
+
 uni_loop:
   if uni_digit_count == 4 goto uni_done     #only four digits allowed
   if uni_pos >= value_length goto uni_done
   $I0 = ord value, uni_pos
   $I1 = exists hexadecimal[$I0]
-  unless $I1 goto uni_done 
+  unless $I1 goto uni_done
   uni_digit = hexadecimal[$I0]
   uni_value *= 16        # low byte promoted
   uni_value += uni_digit # new low byte added.
@@ -228,7 +228,7 @@ uni_done:
   $I0 = uni_pos - pos
   if $I0 == 2 goto uni_not_really
   $S0 = chr uni_value
-  substr value, pos, $I0, $S0 
+  substr value, pos, $I0, $S0
 
   inc pos
   goto loop
@@ -244,7 +244,7 @@ special:
   substr value, pos, 2, $S0
   inc pos
   goto loop
-  
+
 done:
   # Finally, delegate to our parent's set_string
   $P0 = getattribute self, ['String'], 'proxy'

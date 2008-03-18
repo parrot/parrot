@@ -66,7 +66,7 @@ init_matrix_2:
 init_matrix_done:
         i = 1
 
-cycle:  
+cycle:
         j = 1
 inner_cycle:
         $I0 = i - 1
@@ -88,7 +88,7 @@ inner_cycle:
 
         cost = minimum(a,b,c)
         matrix[i;j] = cost
-        
+
         j += 1
         if j <= n goto inner_cycle
         i += 1
@@ -96,7 +96,7 @@ inner_cycle:
 
         cost = matrix[m;n]
         .return(cost)
-        
+
 return_m:
         .return(m)
 
@@ -132,7 +132,7 @@ b_label:
 other:
         if a < c goto a_label
         goto c_label
-        
+
 .end
 
 # Local Variables:

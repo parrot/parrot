@@ -27,7 +27,7 @@ Creates a coroutine stream and dumps it.
     load_bytecode "library/Stream/Base.pbc"
     load_bytecode "library/Stream/Coroutine.pbc"
 
-    # create the coroutine stream    
+    # create the coroutine stream
     stream = new "Stream::Coroutine"
 
     # set the stream's source coroutine
@@ -35,10 +35,10 @@ Creates a coroutine stream and dumps it.
     .const .Sub temp = "_coro"
     assign stream, temp
     #stream."source"( temp )
-    
+
     # dump the stream
     stream."dump"()
-    
+
     end
 .end
 
@@ -57,7 +57,7 @@ It just writes the numbers 0 to 9 to the stream.
     i = 0
 LOOP:
     str = i
-    
+
     .yield(str)
 
     inc i
@@ -67,7 +67,7 @@ LOOP:
     # you can also close it explicitly with
     # stream."close"()
     # in which case it doesn't matter what you are returning.
-    
+
     null str
     .return(str)
 .end

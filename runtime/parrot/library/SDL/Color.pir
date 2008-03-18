@@ -152,7 +152,7 @@ those functions directly.
 =item color_for_surface( surface )
 
 Returns an integer representing the current color appropriate for the given
-SDL::Surface C<surface>, 
+SDL::Surface C<surface>,
 
 As far as I understand things right now, you don't need to call this directly
 unless you're manipulating raw pixels and need the boost of speed from

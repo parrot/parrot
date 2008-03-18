@@ -22,7 +22,7 @@ Defaults to 'option'.
 
   if has_type_name goto got_type_name
   type_name = 'option'
-  
+
 got_type_name:
 
   .local pmc partials
@@ -42,13 +42,13 @@ got_type_name:
     if option == choice goto got_match
     $S1 = substr option, 0, choice_len
     if $S1 != choice goto loop_next
-    push partials, option 
- 
-  loop_next:      
+    push partials, option
+
+  loop_next:
     inc ii
   goto loop
- 
-check_partial: 
+
+check_partial:
   $I1 = elements partials
   if $I1 == 0 goto no_match
   if $I1 >1 goto ambiguous
@@ -64,7 +64,7 @@ no_match:
   error .= choice
   error .= '": must be '
   $S1 = __options_to_string(options)
-  error .= $S1 
+  error .= $S1
   tcl_error error
 
 ambiguous:
@@ -75,7 +75,7 @@ ambiguous:
   error .= '": must be '
   # $S1 = __options_to_string(partials)  # Now, I like this better...
   $S1 = __options_to_string(options)
-  error .= $S1 
+  error .= $S1
   tcl_error error
 .end
 
@@ -86,7 +86,7 @@ possible switches and be followed by the remaining args), return a hash
 containing the names of the switches as keys, with the assigned values
 as values.
 
-If ?endswitch? is specified as a true value, then "--" is treated as an 
+If ?endswitch? is specified as a true value, then "--" is treated as an
 end of switch marker. The default is to not treat "--" specially.
 
 Any options that are matched are removed from the argv array, simplifying
@@ -121,7 +121,7 @@ check_catch:
   catchbad = 0
 
 check_name:
-  if has_name goto init 
+  if has_name goto init
   name = 'switch'
 
 init:
@@ -140,13 +140,13 @@ init_loop:
   $I2 = $I1 + 1
   type = substr switch, $I2, 1
   substr switch, $I1, 2, '' # assume a single char following the :
- 
+
 init_got_type:
   with_type[switch] = type
   goto init_loop
 
 init_loop_done:
-  
+
   .local int argv_len, pos
   argv_len = elements argv
   pos =0
@@ -155,14 +155,14 @@ init_loop_done:
 loop:
   if pos >= argv_len goto loop_done
   arg = argv[pos]
-  $S1 = substr arg, 0, 1, '' 
+  $S1 = substr arg, 0, 1, ''
   if $S1 != '-' goto loop_done
   unless endswitch goto loop_2
   if arg == '-' goto handle_endswitch # already ate one -
 loop_2:
-  $P1 = with_type[arg] 
+  $P1 = with_type[arg]
   if_null $P1, bad_argument
-  type = $P1 
+  type = $P1
   if type == '' goto simple_switch
 typed_switch:
   inc pos
@@ -189,7 +189,7 @@ throw_error:
   $S1 .= '": must be '
   $S2 = __switches_to_string(switches)
   $S1 .= $S2
-  tcl_error $S1 
+  tcl_error $S1
 loop_next:
   inc pos
   goto loop
@@ -198,17 +198,17 @@ loop_done:
   # delete any processed switches from the argv
   if pos <= 0 goto done
   $P1 = new 'ResizablePMCArray'
-  splice argv, $P1, 0, pos   
- 
+  splice argv, $P1, 0, pos
+
 done:
   .return (results)
 .end
-  
+
 .sub __options_to_string
   .param pmc options
 
   # uncomment this if folks start passing in un-ordered lists...
-  # options.'sort'()  
+  # options.'sort'()
 
   .local string error
   error = ''
@@ -245,7 +245,7 @@ done:
   .param pmc switches
 
   # uncomment this if folks start passing in un-ordered lists...
-  # switches.'sort'()  
+  # switches.'sort'()
 
   .local string error
   error = ''

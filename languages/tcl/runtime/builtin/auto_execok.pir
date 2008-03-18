@@ -1,8 +1,8 @@
-# RT#40700: Stub 
+# RT#40700: Stub
 # help tcltest compile
 
 .HLL '_Tcl', 'tcl_group'
-.namespace 
+.namespace
 
 .sub 'auto_execok'
   .param string retval

@@ -4,7 +4,7 @@
 	.local string pattern, chunk, seq, key, replacement
 	.local int readlen, chunklen, seqlen, finallen, i, varnum, count
 	p6rule_compile = compreg "PGE::Perl6Regex"
-	
+
 	# Store the regexes we need...
 	variants = new 'FixedStringArray'
 	variants = 9
@@ -54,7 +54,7 @@
 #	iub['[ <-[v]>*: (v) ]*'] = '(a|c|g)'
 #	iub['[ <-[w]>*: (w) ]*'] = '(a|t)'
 #	iub['[ <-[y]>*: (y) ]*'] = '(c|t)'
-	
+
 	############################################
 	# Read in the file
 beginwhile:
@@ -85,7 +85,7 @@ stripfind:
 	goto stripfind
 endstripfind:
 	seqlen = length seq
-	
+
 	###########################################
 	# Count the matches
 	varnum = elements variants

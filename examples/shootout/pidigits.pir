@@ -6,7 +6,7 @@
 #
 # by Leopold Toetsch
 # not really optimized yet
-# modified by Karl Forner to set a default value of N=27 (shootout test default) 
+# modified by Karl Forner to set a default value of N=27 (shootout test default)
 
 #def gen_x():
 #    return imap(lambda k: (k, 4*k + 2, 0, 2*k + 1), count(1))
@@ -20,7 +20,7 @@ loop:
     inc start
     goto loop
 .end
-		
+
 .sub gen_x
     .param pmc start
     .local pmc k
@@ -105,16 +105,16 @@ loop:
 #        y = extract(z, 3)
 loop1:
 	y = extract(z0, z1, z2, z3, three)
-	
+
 #        while y != extract(z, 4):
 loop2:
 	    $P0 = extract(z0, z1, z2, z3, four)
 	    if y == $P0 goto end_loop2
-	
+
 #            z = compose(z, x.next())
 	    ($P1, $P2, $P3, $P4) = gen_x(one)
 	    (z0, z1, z2, z3) = "compose"(z0, z1, z2, z3, $P1, $P2, $P3, $P4)
-	
+
 #            y = extract(z, 3)
 	    y = extract(z0, z1, z2, z3, three)
 	goto loop2
@@ -165,7 +165,7 @@ loop:
     if $I0 goto n
     print "\t:"
     print i
-    print "\n" 
+    print "\n"
 n:
     if i < N goto loop
     $I0 = i % width
@@ -177,10 +177,10 @@ rest:
         if $I0 goto rest
     print "\t:"
     print N
-    print "\n" 
+    print "\n"
 done:
 .end
-    
+
 
 # Local Variables:
 #   mode: pir

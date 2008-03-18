@@ -13,7 +13,7 @@ appropriate values. For example:
  JSON = compreg 'JSON'
  $P0 = JSON('[1,2,3]')
 
-Will create a pmc that C<does> array, contains the values 1, 2, and 3, and 
+Will create a pmc that C<does> array, contains the values 1, 2, and 3, and
 store it in register C<$P0>.
 
 For more information about the structure of the JSON representation, see the
@@ -63,10 +63,10 @@ documentation at L<http://www.json.org/>.
    pirgrammar = new 'JSON::PIR'
    pirbuilder = pirgrammar.apply(match)
    pir = pirbuilder.get('result')
-   
+
    .local pmc pirc, result
    pirc = compreg "PIR"
-   result = pirc(pir) 
+   result = pirc(pir)
    .return result()
 
   failed:

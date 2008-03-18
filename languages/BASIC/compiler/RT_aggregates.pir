@@ -1,7 +1,7 @@
 	# Array things.
-	# Yes, the _N and _S are cheesy hacks. 
+	# Yes, the _N and _S are cheesy hacks.
 .const int FLOAT = 2
-.const int STRING = 3 
+.const int STRING = 3
 .const int PMC = 4
 .sub _ARRAY_LOOKUP_N	# float ARRAY_LOOKUP_N(string array, int keycount[, string|float])
 	.param string array
@@ -102,7 +102,7 @@ NOTSTRING:
 	$P0[key] = $N0
 	goto END_UNK
 
-NOTINT:	
+NOTINT:
 	if $S0 != "FLOAT" goto ASSIGN_ERR
 	$N0 = rhs[VALUE]
 	$P0[key] = $N0
@@ -124,13 +124,13 @@ END_ASSIGN:
 	$P0 = $P1["index"]
 	.local int i
 	i = 0
-E_A:	
+E_A:
 	$S0 = $P0[i]
 	if $S0=="" goto E_A2
 	if $S0==key goto E_A2
 	inc i
 	goto E_A
-E_A2:	
+E_A2:
 	$P0[i]=key
 	$P1["index"]=$P0
 	BASICARR[array]=$P1
@@ -168,7 +168,7 @@ KEYLOOP:set $S0, SRCINDEX[i]
 	TARGINDEX[i]=$S2
 	inc i
 	branch KEYLOOP
- 
+
 ENDLOOP:noop
 .end
 #.sub _ARRAY_ASSIGN_S	# void ARRAY_ASSIGN_N(string array, string rhs, int keycount[, string|float keys])
@@ -202,7 +202,7 @@ KEYLOOP:
 	if keycount ==0 goto KEYDONE
 	thing = shift things
 	key_type = typeof thing
-	
+
 	key .= "|"
 	if key_type == .Float goto ADDFLOAT
 	if key_type == .String goto ADDSTRING

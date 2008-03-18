@@ -32,10 +32,10 @@ Array with commandline parameters.
     .local pmc app
 
     load_bytecode "examples/sdl/tetris/app.pir"
-    
+
     # create the tetris app
     app = new "Tetris::App"
-    
+
     app."flag"( "show blocksize", 1 )
     # run the tetris app
     app."run"()

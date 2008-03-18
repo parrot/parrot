@@ -13,7 +13,7 @@ operations (which are similar to Perl).
     myarray[0] = "Foo"
     push myarray, "Bar"
     unshift myarray, "Baz"
-    
+
     $S0 = join " ", myarray
     say $S0
 
@@ -26,7 +26,7 @@ operations (which are similar to Perl).
 
     $S3 = shift myarray
     say $S3
-    
+
 .end
 
 # Local Variables:

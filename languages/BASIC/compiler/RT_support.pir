@@ -19,7 +19,7 @@
 #	# no error!  It simply does a "restore"
 #RESTORE:set I15, P16[S0]
 #	ret
-#	
+#
 #ERR_READ:
 #	print "Out of data"
 #	branch GEN_ERROR
@@ -55,7 +55,7 @@ ERR_READ:
 	set READPOINTER, $P0["value"]
 
 	set READPOINTER, RESTOREINFO[where]
-	
+
 	set $P0["value"], READPOINTER
 	store_global "READPOINTER", $P0
 .end
@@ -65,7 +65,7 @@ ERR_READ:
 	.param int		offset
 	.param int		bytes
 	.local int 		target
-	set target, 0	
+	set target, 0
 	eq bytes, 0, END
 	add $I6, offset, bytes
 LOOP:   lt $I6, offset, END

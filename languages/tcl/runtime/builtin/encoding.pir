@@ -32,7 +32,7 @@
   null subcommand_proc
 
   subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'encoding'], canonical_subcommand
-  if_null subcommand_proc, bad_args 
+  if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
 
 bad_args:

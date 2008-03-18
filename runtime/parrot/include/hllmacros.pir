@@ -129,7 +129,7 @@ true, runs C<code>, and then the C<continue> code, such as C<inc i>.
     .start
 .local $beginfor:
     unless .conditional goto .$endfor
-    .code 
+    .code
     .cont
     goto .$beginfor
 .local $endfor:
@@ -151,7 +151,7 @@ work with in C<code>.
 .local $beginforeach:
     unless local__Foreach__i < local__Foreach__k goto .$endforeach
     .name = .array[local__Foreach__i]
-    .code 
+    .code
     inc local__Foreach__i
     goto .$beginforeach
 .local $endforeach:

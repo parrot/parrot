@@ -68,7 +68,7 @@ Add a rule to the current attribute grammar.
 =head2 apply
 
 Use a precompiled grammar on a data structure. This returns an
-object on which you can call methods to fetch attributes on the 
+object on which you can call methods to fetch attributes on the
 I<top node> of the data structure.
 
 =cut
@@ -80,7 +80,7 @@ I<top node> of the data structure.
     newtree = new 'TGE::Tree'
     setattribute newtree, 'data', tree
     setattribute newtree, 'grammar', self
-    visit = getattribute newtree, 'visit' 
+    visit = getattribute newtree, 'visit'
     # Build up the visit hash
     .local pmc rules
     .local int index

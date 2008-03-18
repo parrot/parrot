@@ -156,7 +156,7 @@ see F<src/dynpmc/mdx.pmc>.
     goto L4
   L5:
     set res, $S0
-    .return (res)  
+    .return (res)
 .end
 
 

@@ -22,14 +22,14 @@ Functions are very similar to ops, so handle them similarly here.
 
 .sub '&abs'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc b
     $S0 = typeof a
     b = new $S0
@@ -42,17 +42,17 @@ is_string:
 
 .sub '&acos'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-   
+
     if a < -1 goto domain_error
     if a >  1 goto domain_error
- 
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -77,7 +77,7 @@ domain_error:
 
 .sub '&asin'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
@@ -87,7 +87,7 @@ domain_error:
 
     if a < -1 goto domain_error
     if a >  1 goto domain_error
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -112,14 +112,14 @@ domain_error:
 
 .sub '&atan'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -145,14 +145,14 @@ is_string:
 
 .sub '&ceil'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -166,14 +166,14 @@ is_string:
 
 .sub '&cos'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -190,14 +190,14 @@ is_string:
 
 .sub '&cosh'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -214,14 +214,14 @@ is_string:
 
 .sub '&double'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -256,14 +256,14 @@ is_string:
 
 .sub '&exp'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -278,7 +278,7 @@ is_string:
     tcl_error $S0
 .end
 
-.sub '&floor' 
+.sub '&floor'
     .param pmc a
 
     .local pmc result
@@ -291,16 +291,16 @@ is_string:
     pop_eh
 
     if result >= 0 goto positive
-      
-negative: 
+
+negative:
     $I0 = result
     dec $I0
     $N0 = $I0
     $P0 = new 'TclFloat'
     $P0 = $N0
-    .return ($P0) 
+    .return ($P0)
 
-positive: 
+positive:
     $I0 = result
     $N0 = $I0
     $P0 = new 'TclFloat'
@@ -317,18 +317,18 @@ is_string:
 
 .sub '&int'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     $I0 = a
     $P0 = new 'TclInt'
     $P0 = $I0
-    
+
     .return ($P0)
 
 is_string:
@@ -340,7 +340,7 @@ is_string:
 
 .sub '&log'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
@@ -374,7 +374,7 @@ is_string:
 
 .sub '&log10'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
@@ -440,21 +440,21 @@ done:
 
 .sub '&round'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     if a < 0 goto neg
 
     $N0 = a
     $N0 += 0.5
     $I0 = $N0
     .return ($I0)
-neg: 
+neg:
     $N0 = a
     $N0 -= 0.5
     $I0 = $N0
@@ -466,14 +466,14 @@ is_string:
 
 .sub '&sin'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -490,14 +490,14 @@ is_string:
 
 .sub '&sinh'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -514,14 +514,14 @@ is_string:
 
 .sub '&sqrt'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     if a < 0 goto domain_error
     ret = new 'TclFloat'
@@ -550,14 +550,14 @@ is_string:
 
 .sub '&tan'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -574,14 +574,14 @@ is_string:
 
 .sub '&tanh'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     $N0 = a
@@ -599,18 +599,18 @@ is_string:
 # RT#40689: implement wide() - this is just int()
 .sub '&wide'
     .param pmc a
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
     push_eh is_string
       a = __number(a)
     pop_eh
-    
+
     $I0 = a
     $P0 = new 'TclInt'
     $P0 = $I0
-    
+
     .return ($P0)
 
 is_string:
@@ -624,7 +624,7 @@ is_string:
 .sub '&atan2'
     .param pmc a
     .param pmc b
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
@@ -632,7 +632,7 @@ is_string:
       a = __number(a)
       b = __number(b)
     pop_eh
-    
+
     $N0 = a
     $N1 = b
     $N0 = atan $N0, $N1
@@ -648,7 +648,7 @@ is_string:
 .sub '&fmod'
     .param pmc a
     .param pmc b
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
@@ -656,8 +656,8 @@ is_string:
       a = __number(a)
       b = __number(b)
     pop_eh
-    
-    if b == 0 goto domain_error 
+
+    if b == 0 goto domain_error
     $N0 = a
     $N1 = b
     $N0 = $N0 % $N1
@@ -681,7 +681,7 @@ is_string:
 .sub '&hypot'
     .param pmc a
     .param pmc b
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 
@@ -689,15 +689,15 @@ is_string:
       a = __number(a)
       b = __number(b)
     pop_eh
-    
+
     $N0 = a
     $N1 = b
     $N0 = pow $N0, 2
     $N1 = pow $N1, 2
-    
+
     $N0 = $N0 + $N1
     $N0 = sqrt $N0
-    
+
     .local pmc ret
     ret = new 'TclFloat'
     ret = $N0
@@ -710,7 +710,7 @@ is_string:
 .sub '&pow'
     .param pmc a
     .param pmc b
-    
+
     .local pmc __number
     __number = get_root_global ['_tcl'], '__number'
 

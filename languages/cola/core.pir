@@ -8,12 +8,12 @@
 
 .sub __puti
   .param int i
-  print i 
+  print i
 .end
 
 .sub __putf
   .param num n
-  print n 
+  print n
 .end
 
 .sub __substr
@@ -23,17 +23,17 @@
   .local string sret
   substr sret, s, i1, i2
   .return(sret)
-.end 
+.end
 
 .sub __strlen
   .param string s
-  .local int len 
+  .local int len
   length len, s
   .return(len)
 .end
- 
+
 .sub __strchop
-  .param string s 
+  .param string s
   chopn s, 1
   .return(s)
 .end
@@ -50,8 +50,8 @@
 .sub __ord
   .param string s
   .local int i
-  ord i, s 
-  .return (i) 
+  ord i, s
+  .return (i)
 .end
 
 .sub __gets
@@ -62,7 +62,7 @@
 
 .sub __sleep
   .param int sec
-  sleep sec 
+  sleep sec
 .end
 
 

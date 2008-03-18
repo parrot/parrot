@@ -16,7 +16,7 @@ Hand crafted PIR code version of F<examples/benchmarks/arriter.pl>.
 The PIR code is the same as in arriter.pir, with following optimizations:
 
 =over 4
- 
+
 =item pull somecode out of the inner loop, s. opt below
 
 =back
@@ -47,7 +47,7 @@ F<examples/benchmarks/arriter.pir>.
     $P24 = new 'Undef'
     .lex "$s", $P24
 
-# same as @k = qw( A B C D E F G H I J ); 
+# same as @k = qw( A B C D E F G H I J );
     find_lex $P29 , "$i"
     $P29 = 0
 for_1_start:

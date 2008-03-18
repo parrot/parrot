@@ -14,7 +14,7 @@
 
   if argc >= 2 goto bad_args
   if argc == 0 goto noargs
-  
+
   dir = argv[0]
   goto cd_it
 

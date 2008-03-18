@@ -154,7 +154,7 @@ bad_args:
     $P1 = __script(body)
   pop_eh
   .return(1)
- 
+
 nope:
   get_results '0,0', $P0, $S0
   if $S0 == 'missing close-brace'   goto fail
@@ -164,7 +164,7 @@ nope:
 
 fail:
   .return(0)
- 
+
 bad_args:
   tcl_error 'wrong # args: should be "info complete command"'
 .end
@@ -206,7 +206,7 @@ bad_args:
   $P3 = $P2[argname]
   if_null $P3, check_arg
   push_eh error_on_set
-    __set(varname, $P3) 
+    __set(varname, $P3)
   pop_eh
 
   # store in variable
@@ -217,9 +217,9 @@ check_arg:
   $P3 = __list($P9)
   $P4 = new 'Iterator', $P3
 loop:
-  unless $P4 goto not_argument 
+  unless $P4 goto not_argument
   $S1 = shift $P4
-  if $S1==argname goto no_default 
+  if $S1==argname goto no_default
   goto loop
 
 not_argument:
@@ -227,12 +227,12 @@ not_argument:
   $S0 .= procname
   $S0 .= "\" doesn't have an argument \""
   $S0 .= argname
-  $S0 .= '"' 
+  $S0 .= '"'
   tcl_error $S0
 
 no_default:
   push_eh error_on_set
-    __set(varname, '') 
+    __set(varname, '')
   pop_eh
   .return (0)
 
@@ -300,7 +300,7 @@ bad_args:
     .local int argc
     argc = elements argv
     if argc > 1 goto bad_args
-    .local pmc matching 
+    .local pmc matching
     null matching
     if argc ==0 goto done_setup
 
@@ -322,7 +322,7 @@ bad_args:
 
     .local pmc ns
     ns = get_root_global 'tcl'
-  
+
     .local pmc iter
     iter = new 'Iterator', ns
   iter_loop:
@@ -334,9 +334,9 @@ bad_args:
      if_null matching, add_result
      $P2 = matching($S1)
      unless $P2 goto iter_loop
-  add_result: 
+  add_result:
      push result, $S1
-     goto iter_loop 
+     goto iter_loop
   iter_loop_end:
 
     .return(result)
@@ -431,7 +431,7 @@ iterate:
   .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
   $I1 = elements call_chain
-  if $I1 == 0 goto get_globals 
+  if $I1 == 0 goto get_globals
 
   lexpad     = call_chain[-1]
 
@@ -477,7 +477,7 @@ find_level:
   .local pmc __integer, __call_level
   __integer    = get_root_global ['_tcl'], '__integer'
   __call_level = get_root_global ['_tcl'], '__call_level'
-  
+
   .local pmc level
   level = shift argv
   level = __integer(level)

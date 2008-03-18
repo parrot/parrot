@@ -3,7 +3,7 @@
 
 .macro X(a,b,c)
 x = .b
-.endm 
+.endm
 
 
 # Local Variables:

@@ -39,7 +39,7 @@ References: http://www.gnu.org/software/m4/m4.html
 
 
 =head1 SUBROUTINES
- 
+
 =head2 __onload
 
 Load needed libraries
@@ -48,8 +48,8 @@ Load needed libraries
 
 .sub "__onload" :load
 
-  #load_bytecode "Getopt/Obj.pbc" 
-  # load_bytecode "PGE.pbc"       
+  #load_bytecode "Getopt/Obj.pbc"
+  # load_bytecode "PGE.pbc"
 
 .end
 
@@ -60,11 +60,11 @@ Looks at the command line arguments and acts accordingly.
 
 =cut
 
-.sub 'm4' :main 
+.sub 'm4' :main
   .param pmc argv
 
   # TODO: put this into '__onload'
-  load_bytecode "Getopt/Obj.pbc"  
+  load_bytecode "Getopt/Obj.pbc"
   load_bytecode "PGE.pbc"          # Parrot Grammar engine
 
   # shift name of the program, so that argv contains only options and extra params
@@ -131,14 +131,14 @@ Looks at the command line arguments and acts accordingly.
   unless is_defined goto NO_VERSION_FLAG
     print "Parrot m4 0.0.14\n"
     end
-NO_VERSION_FLAG: 
+NO_VERSION_FLAG:
 
   # Was '--help' passed ?
   is_defined = defined opt["help"]
   unless is_defined goto NO_HELP_FLAG
     usage( program_name )
     end
-NO_HELP_FLAG: 
+NO_HELP_FLAG:
 
   # TODO: In near future we probably should use objects here
   # For now let's just just use a hash with all state information
@@ -160,13 +160,13 @@ NO_HELP_FLAG:
     .local int nesting_limit
     nesting_limit = opt['nesting-limit']
     state['nesting_limit'] = nesting_limit
-NO_NESTING_LIMIT_FLAG: 
+NO_NESTING_LIMIT_FLAG:
 
   # Was '--prefix-builtins' passed ?
   is_defined = defined opt['prefix-builtins']
   unless is_defined goto NO_PREFIX_BUILTINS_FLAG
     state['prefix_all_builtins'] = 1
-NO_PREFIX_BUILTINS_FLAG: 
+NO_PREFIX_BUILTINS_FLAG:
 
   # Was a yet unimplemented option passed?
   # TODO: put names of unimplemented options in an ResizableStringArray
@@ -249,13 +249,13 @@ NO_UNIMPLEMENTED_OPTION:
 
   # TODO: init of output structures
 
-  # First we set up a table of all symbols, that is macros 
+  # First we set up a table of all symbols, that is macros
   .local pmc symtab
   symtab = new .Hash
   # symtab = new .OrderedHash
-  state['symtab'] = symtab    
+  state['symtab'] = symtab
 
-  # TODO: read M4PATH with env.pmc 
+  # TODO: read M4PATH with env.pmc
   # TODO: setup searchpath for m4-files
   # TODO: handling of debuglevel
   # TODO: enable suppression of warnings
@@ -263,7 +263,7 @@ NO_UNIMPLEMENTED_OPTION:
   # TODO: handling of sync lines
   # TODO: enable changing definition of what words are
   # TODO: enable changing of quote characters
-  # TODO: enable changing of comment delimiters 
+  # TODO: enable changing of comment delimiters
   # TODO: error handling
   # TODO: handle reading from STDIN, multiple input files
 
@@ -278,8 +278,8 @@ ARGC_IS_OK:
   # We need the builtin_tab, whether '--reload_state' was passed or not
   .local pmc builtin_tab
   builtin_tab = new .OrderedHash
-  state['builtin_tab'] = builtin_tab    
-  
+  state['builtin_tab'] = builtin_tab
+
   builtin_tab_init( state )
 
   # Was '--reload-state' passed ?
@@ -333,7 +333,7 @@ HANDLE_WRAPUP_TEXT:
     goto FINISH_PROGRAM
 
 NO_FREEZE_STATE_FLAG:
-  # TODO: make_diversion, undiver_all, whatever that does 
+  # TODO: make_diversion, undiver_all, whatever that does
 
 FINISH_PROGRAM:
 
@@ -350,7 +350,7 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
 
-.sub usage 
+.sub usage
   .param string program_name
 
   print "Usage: ../../parrot "

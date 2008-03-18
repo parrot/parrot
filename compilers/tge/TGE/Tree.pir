@@ -172,7 +172,7 @@ run_thunk_action:
     $P1 = cell['node']
     $S0 = cell['action']
     # the action is a method on the grammar object
-    value = grammar.$S0(self, $P1) 
+    value = grammar.$S0(self, $P1)
     cell['value'] = value
     cell['thunk'] = 0
 

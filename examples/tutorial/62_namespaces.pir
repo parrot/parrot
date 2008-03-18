@@ -8,7 +8,7 @@ retrieving it from the namespace. Also demonstrates the .namespace directive.
 .sub main :main
 
    $P0 = get_global ["Different"; "Namespace"], "foo"
-   
+
    $S0 = $P0("Zaphod")
    say $S0
 

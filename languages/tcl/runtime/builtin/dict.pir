@@ -46,7 +46,7 @@
   null subcommand_proc
 
   subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'dict'], canonical_subcommand
-  if_null subcommand_proc, bad_args 
+  if_null subcommand_proc, bad_args
   .return subcommand_proc(argv)
 
 bad_args:
@@ -88,7 +88,7 @@ dict_error:
 
 got_dict:
   .local pmc key, value
-  key = shift argv   
+  key = shift argv
 
   # argv now contains all the new elements to append.
 
@@ -99,7 +99,7 @@ got_dict:
   goto loop
 
 vivified:
-  value = dictionary[key] 
+  value = dictionary[key]
 
 loop:
   argc = elements argv
@@ -140,7 +140,7 @@ bad_args:
   retval = new 'TclDict'
 
   .local pmc key,value
-  
+
 loop:
   $I1 = elements argv
   unless $I1 goto loop_done
@@ -172,7 +172,7 @@ bad_args:
 loop:
   argc = elements argv
   unless argc goto loop_done
-  key = shift argv 
+  key = shift argv
   dictionary = dictionary[key]
   if_null dictionary, not_exist
   goto loop
@@ -210,7 +210,7 @@ bad_args:
   __script  = get_root_global ['_tcl'], '__script'
   __boolean  = get_root_global ['_tcl'], '__boolean'
   .local pmc option
-  option = shift argv  
+  option = shift argv
   option = select_option(options, option, 'filterType')
 
   .local pmc results, key, value
@@ -221,7 +221,7 @@ bad_args:
   .local pmc globber, pattern
   globber = compreg 'Tcl::Glob'
   if argc != 3 goto missing_glob
-  pattern = shift argv 
+  pattern = shift argv
 
   .local pmc rule, match, iterator
   rule = globber.'compile'(pattern)
@@ -233,7 +233,7 @@ do_value_loop:
   unless iterator goto do_value_done
   key = shift iterator
   value = dictionary[key]
-  match = rule(value) 
+  match = rule(value)
   unless match goto do_value_loop
   results[key] = value
   goto do_value_loop
@@ -243,7 +243,7 @@ do_value_done:
 do_key_loop:
   unless iterator goto do_key_done
   key = shift iterator
-  match = rule(key) 
+  match = rule(key)
   unless match goto do_key_loop
   value = dictionary[key]
   results[key] = value
@@ -261,7 +261,7 @@ do_script_prelude:
   $I0 = elements vars
   if $I0 != 2 goto bad_list_size
 
-  body = shift argv 
+  body = shift argv
   .local string keyVar,valueVar
   keyVar   = vars[0]
   valueVar = vars[1]
@@ -285,7 +285,7 @@ script_loop:
   pop_eh
   $P1 = __boolean($P1)
   unless $P1 goto script_loop
-  retval[check_key] = check_value 
+  retval[check_key] = check_value
   goto script_loop
 end_script_loop:
   .return (retval)
@@ -324,7 +324,7 @@ bad_args:
   set     = get_root_global ['_tcl'], '__set'
   script  = get_root_global ['_tcl'], '__script'
 
-  .local pmc varNames 
+  .local pmc varNames
   .local string keyVar, valueVar
 
   varNames = shift argv
@@ -347,13 +347,13 @@ bad_args:
 for_loop:
   unless iterator goto for_loop_done
   $P1 = shift iterator
-  __set(keyVar,   $P1)  
+  __set(keyVar,   $P1)
   $S1 = $P1
   $P2 = dictionary[$S1]
-  __set(valueVar, $P2)  
+  __set(valueVar, $P2)
 
   push_eh loop_handler
-    code() 
+    code()
   pop_eh
 
   goto for_loop
@@ -393,7 +393,7 @@ bad_args:
 loop:
   argc = elements argv
   if argc <= 1 goto loop_done
-  key = shift argv 
+  key = shift argv
   dictionary = dictionary[key]
   if_null dictionary, not_exist
   dictionary = __dict(dictionary) # might be a string, error out if so
@@ -401,7 +401,7 @@ loop:
 
 loop_done:
   if argc == 0 goto done
-  key = shift argv 
+  key = shift argv
   dictionary = dictionary[key]
   if_null dictionary, not_exist
 done:
@@ -445,12 +445,12 @@ dict_error:
 
 got_dict:
   .local pmc key
-  key = shift argv   
+  key = shift argv
 
   .local pmc increment
   increment = new 'TclInt'
   increment = 1
-  
+
   if argc == 2 goto got_increment
   increment = shift argv
   increment = __integer (increment)
@@ -464,7 +464,7 @@ got_increment:
   goto done
 
 vivified:
-  value = dictionary[key] 
+  value = dictionary[key]
   value = __integer(value)
   value += increment
 
@@ -490,7 +490,7 @@ bad_args:
 # This is a stub, doesn't actually generate the info.
 # it's exposing the guts of the interface, not sure how if it's appropriate
 # to do this in partcl.
-.sub 'info'  
+.sub 'info'
   .param pmc argv
 
   .local int argc
@@ -535,7 +535,7 @@ dict_error:
 
 got_dict:
   .local pmc key, value
-  key = shift argv   
+  key = shift argv
 
   # argv now contains all the new list elements to lappend.
 
@@ -545,7 +545,7 @@ got_dict:
   goto loop
 
 vivified:
-  value = dictionary[key] 
+  value = dictionary[key]
   value = __list(value)
 
 loop:
@@ -593,7 +593,7 @@ got_pattern:
 
   .local pmc rule, match
   rule = globber.'compile'(pattern)
- 
+
   .local pmc iterator
   iterator = new 'Iterator', dictionary
 
@@ -630,15 +630,15 @@ bad_args:
   $P2 =  shift argv # discard
 
   .local pmc dictionary,key,value,iterator
- 
+
 dict_loop:
   $I1 = elements argv
   unless $I1 goto done
-  dictionary = shift argv 
+  dictionary = shift argv
   dictionary = __dict(dictionary)
   iterator = new 'Iterator', dictionary
 key_loop:
-  unless iterator goto dict_loop 
+  unless iterator goto dict_loop
   key = shift iterator
   value = dictionary[key]
   retval[key] = value
@@ -662,12 +662,12 @@ nothing:
   dictionary = shift argv
   dictionary = __dict(dictionary)
   dictionary = clone dictionary
- 
+
   .local pmc key, value
 loop:
   argc = elements argv
   unless argc goto loop_done
-  key   = shift argv 
+  key   = shift argv
   delete dictionary[key]
   goto loop
 
@@ -691,7 +691,7 @@ bad_args:
   dictionary = shift argv
   dictionary = __dict(dictionary)
   dictionary = clone dictionary
- 
+
   if argc < 0 goto loop_done
   $I0 = mod argc, 2
   if $I0 == 0 goto odd_args # we shifted the dict off, above...
@@ -700,7 +700,7 @@ bad_args:
 loop:
   argc = elements argv
   unless argc goto loop_done
-  key   = shift argv 
+  key   = shift argv
   value = shift argv
   dictionary[key] = value
   goto loop
@@ -749,12 +749,12 @@ got_dict:
 loop:
   argc = elements argv
   if argc <= 1 goto loop_done
-  key = shift argv 
+  key = shift argv
   $P1= sub_dict[key]
   # Does this key exist? set it.
   if null $P1 goto new_key
   sub_dict = $P1
-  goto loop 
+  goto loop
 new_key:
   $P1 = new 'TclDict'
   sub_dict[key] = $P1
@@ -787,7 +787,7 @@ bad_args:
   .local pmc dictionary
   dictionary = shift argv
   dictionary = __dict(dictionary)
- 
+
   .local int size
   size = elements dictionary
   .return (size)
@@ -830,10 +830,10 @@ got_dict:
 loop:
   argc = elements argv
   if argc <=1 goto loop_done
-  key = shift argv 
+  key = shift argv
   sub_dict = sub_dict[key]
   if null sub_dict goto not_exist
-  goto loop 
+  goto loop
 loop_done:
   key = shift argv # should be the last one..
   delete sub_dict[key]
@@ -901,7 +901,7 @@ key_loop:
   $P3 = dictionary[$P1]
   __set($P2, $P3)
   goto key_loop
-done_key_loop: 
+done_key_loop:
 # run the body of the script. save the return vaalue.
   .local pmc retval
   $P1 = __script(body)
@@ -958,7 +958,7 @@ got_pattern:
 
   .local pmc rule, match
   rule = globber.'compile'(pattern)
- 
+
   .local pmc iterator
   iterator = new 'Iterator', dictionary
 
@@ -970,7 +970,7 @@ loop:
   value = dictionary[key]
   match = rule(value)
   unless match goto loop
-  push results, value 
+  push results, value
   goto loop
 
 loop_done:
@@ -1020,10 +1020,10 @@ while_keys:
 done_keys:
   .local pmc iterator
   iterator = new 'Iterator', dictionary
-  
+
 alias_keys:
   unless iterator goto done_alias
-  $P1 = shift iterator 
+  $P1 = shift iterator
   $P2 = dictionary[$P1]
   __set($P1,$P2)
   goto alias_keys
