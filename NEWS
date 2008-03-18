@@ -1,6 +1,6 @@
 # $Id$
 
-New in r26416
+New in 0.6.0
 - Specification
   + launched pdd18_security.pod
   + updated pdd17_pmc.pod
@@ -13,7 +13,7 @@ New in r26416
 - Compilers
   + PCT:
     . Fix '-e' option
-    . Phase out P6Reges in favor of Perl6Regex
+    . Phase out P6Regex in favor of Perl6Regex
   + IMCC:
     '.local Array my_arr' is illegal now 
 - Languages

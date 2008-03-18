@@ -15,8 +15,7 @@ Project Team
 
 Architect                       Allison Randal
 
-Release Manager                 -
-                                Bob Rogers
+Release Manager                 Bob Rogers
                                 Patrick Michaud
                                 Bernhard Schmalhofer
                                 Jerry Gay
@@ -32,8 +31,7 @@ Metacommitter                   Allison Randal
 Committers
 ----------
 
-Core Developer                  -
-                                Jonathan Worthington
+Core Developer                  Jonathan Worthington
                                 Matt Diephouse
                                 Bernhard Schmalhofer
                                 Kevin Tew
@@ -43,8 +41,7 @@ Core Developer                  -
                                 Chip Salzenberg
                                 Allison Randal
 
-Compiler Developer              -
-                                Vishal Soni (BCG, IMCC)
+Compiler Developer              Vishal Soni (BCG, IMCC)
                                 Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
 

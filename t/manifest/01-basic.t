@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 11;
 use Carp;
 use Cwd;
 use File::Temp qw( tempdir );
@@ -20,10 +20,12 @@ my $skip   = q{MANIFEST.SKIP};
 my $mani = Parrot::Manifest->new( { script => $script, } );
 isa_ok( $mani, 'Parrot::Manifest' );
 
-ok( scalar( @{ $mani->{dirs} } ),
-    "Parrot::Manifest constructor used 'status' command to find at least 1 directory." );
-ok( scalar( @{ $mani->{versioned_files} } ),
-    "Parrot::Manifest constructor used 'status' command to find at least 1 versioned file." );
+# RT#51860: this fails in a downloaded release
+#ok( scalar( @{ $mani->{dirs} } ),
+    #"Parrot::Manifest constructor used 'status' command to find at least 1 directory." );
+# RT#51860: this fails in a downloaded release
+#ok( scalar( @{ $mani->{versioned_files} } ),
+    #"Parrot::Manifest constructor used 'status' command to find at least 1 versioned file." );
 
 my $manifest_lines_ref = $mani->prepare_manifest();
 is( ref($manifest_lines_ref), q{HASH}, "prepare_manifest() returned hash ref" );

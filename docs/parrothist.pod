@@ -112,4 +112,6 @@ the strings?).
 
  Patrick   0.5.3          2008-Feb-20     "Way of the Parrot"
 
+ Barney    0.6.0          2008-Mar-18     "P&P"
+
 =cut

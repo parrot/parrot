@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 Release Instructions
@@ -73,6 +73,10 @@ URL, then change the ticket number in the C<DependedOnBy> parameter to the
 ticket for the next release.  Take the entire resulting URL to
 L<http://xrl.us/> and get a short URL.  Add that to this field.
 
+=item C<wiki.bugday>
+
+Update the date part of the link to the wiki page for the next bugday.
+
 =back
 
 =item d
@@ -81,13 +85,14 @@ Make sure F<RESPONSIBLE_PARTIES> is still accurate.
 
 =item e
 
-Configure parrot and run C<perl t/harness t/distro/*.t>, and either fix
+Configure parrot and run C<make distro_tests>, and either fix
 what those tests complain about, or fix them so they don't complain.
 
 =item f
 
 Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
 to update version and fingerprint in the native tests.
+You may check with C<perl t/native_pbc/*.t>
 
 =item g
 
@@ -95,7 +100,7 @@ Make sure everything works:
 
  $ make realclean
  $ perl Configure.pl --test ...
- $ make -s all world fulltest html
+ $ make -s all world fulltest html 2>&1 | tee make_log.txt
  # Note that fulltest runs separate harnesses..
 
 It is not necessary to quiet all the codingstd tests for a release.
@@ -240,7 +245,7 @@ F<README>, F<RESPONSIBLE_PARTIES>.
 
 =head1 Appendix 1
 
-parrot repository layout as of end of Apr 2005
+The Parrot repository layout as of end of Apr 2005:
 
  $ svn ls $SVNPARROT
  branches/
@@ -289,6 +294,11 @@ of the trunk):
    $ svn copy -m"Release a.b.c" \
            $SVNPARROT/branches/RELEASE_a_b_c $SVNPARROT/tags/RELEASE_a_b_c
 
+Alternatively you can also move the branch:
+
+   $ svn move -m "Tagging release a.b.c" \
+           $SVNPARROT/branches/RELEASE_a_b_c $SVNPARROT/tags/RELEASE_a_b_c
+
 Upload your shiny new tarball, announce the release, and close tickets
 (steps 9 through 11) as described above.
 
@@ -320,8 +330,8 @@ determined each month, and will depend on the features that will be in
 that release.
 
  - Jan 15th (0.5.2) Bob Rogers
- - Feb 19th (?)     Patrick Michaud
- - Mar 18th (?)     Bernhard Schmalhofer
+ - Feb 19th (0.5.3) Patrick Michaud
+ - Mar 18th (0.6.0) Bernhard Schmalhofer
  - Apr 15th (?)     Jerry Gay
  - May 20th (?)     chromatic
  - Jun 17th (?)     Nuno Carvalho

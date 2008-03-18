@@ -1,5 +1,5 @@
 Name:           parrot
-Version:        0.5.3
+Version:        0.6.0
 Release:        1%{?dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
@@ -26,7 +26,7 @@ Requires:       %{_libdir}/pkgconfig
 
 %description
 Parrot is a virtual machine designed to efficiently compile and
-execute bytecode for interpreted languages. Parrot will be a target
+execute bytecode for dynamic languages. Parrot is a be a target
 for the Perl 6 compiler, and is already usable as a backend for
 Pugs, as well as variety of other languages.
 
@@ -99,7 +99,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc ABI_CHANGES ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
+%doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
 %doc RESPONSIBLE_PARTIES TODO
 %doc docs examples
 %exclude %{_bindir}/parrot-config
@@ -116,6 +116,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Tue Mar 18 2008 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de> 0.6.0
+- Update to 0.5.3.
+
 * Wed Feb 20 2008 Patrick Michaud <pmichaud@pobox.com> 0.5.3
 - Update to 0.5.3.
 
