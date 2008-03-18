@@ -104,15 +104,15 @@ sub testloop {
         }
     }
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    ok(!scalar @failures, $args{name});
-    if(scalar @failures) {
+    ok(!@failures, $args{name});
+    if(@failures) {
         diag($args{diag_prefix} . " in the following files:")
             if exists $args{diag_prefix};
         foreach my $failure (@failures) {
             diag($failure);
         }
-        my $failures = scalar @failures;
-        my $total_files = scalar @{$args{files}};
+        my $failures = @failures;
+        my $total_files = @{$args{files}};
         diag("That's $failures failed files out of $total_files files total.");
     }
 }
