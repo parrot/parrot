@@ -40,7 +40,7 @@ sol11-x86-cc_5.8                  -    -    -     -   -   -    Y/121 ?  20070821
 opensolaris-x86-gcc_4.0.3     4   Y    Y    ?     ?   ?   Y    Y/3   ?  20070417
 tru64-alpha-compaq_c6.5       8   ?    ?    ?     Y   ?   Y    Y/2   ?  20060203
 cygwin1.5.24-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20071016
-win32-x86-mingw_gcc3.4.2          Y    Y    -     -   -   Y    Y/5   Y  20071218
+win32-x86-mingw_gcc3.4.2          Y    Y    -     -   -   Y    Y/10  Y  20080318
 win32-x86-mingw_gcc4.2.1          Y    Y    -     -   -   Y    Y/8   ?  20071016
 win32-x86-msvc_7.1                -    Y    -     Y   -   Y    Y/8   ?  20071218
 win32-x86-msvc_8.0                -    Y    -     Y   -   Y    Y     ?  20080220
