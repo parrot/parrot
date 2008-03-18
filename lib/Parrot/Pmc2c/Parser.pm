@@ -199,7 +199,7 @@ sub find_methods {
         $methodblock =~ s/^[ ]{4}//mg;
 
         # trim trailing ws from last line
-        $methodblock =~ s/\n\s+$/\n/g;
+        $methodblock =~ s/\n[\t ]+$/\n/g;
 
         $decorators ||= '';
         $decorators   =~ s/^\s*(.*?)\s*$/$1/s;
