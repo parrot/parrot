@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 74;
+use Parrot::Test tests => 75;
 
 =head1 NAME
 
@@ -348,6 +348,41 @@ ok 4
 ok 5
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "addmethod" );
+
+.sub main :main
+
+        newclass $P0, 'Foo'
+        $P2 = get_hll_global 'sayFoo'
+
+        # add a method BEFORE creating a Foo object
+        addmethod $P0, 'foo', $P2
+        $P1 = new 'Foo'
+        $P1.'foo'()
+
+        # get a method from some other namespace
+        $P2 = get_hll_global ['Bar'], 'sayBar'
+
+        # add a method AFTER creating   the object
+        addmethod $P0, 'bar', $P2
+        $P1.'bar'()
+.end
+
+.sub sayFoo
+    print "foo\n"
+.end
+
+.namespace ['Bar']
+
+.sub sayBar
+    print "bar\n"
+.end
+
+CODE
+foo
+bar
+OUTPUT
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "addattribute" );
     newclass P1, "Foo"
 # Check that addattribute doesn't blow up
@@ -629,11 +664,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing 2" );
     new P3, "Bar"
 
     # print I3                  # don't assume anything about this offset
-    # print "\n"		# ' for vim
+    # print "\n"        # ' for vim
 
-    new P10, 'String'		# set attribute values
-    set P10, "i\n"		# attribute slots have reference semantics
-    setattribute P3, ".i", P10	# so always put new PMCs in
+    new P10, 'String'       # set attribute values
+    set P10, "i\n"      # attribute slots have reference semantics
+    setattribute P3, ".i", P10  # so always put new PMCs in
                                 # if you have unique values
     new P10, 'String'
     set P10, "j\n"
@@ -646,7 +681,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing 2" );
     set P10, "l\n"
     setattribute P3, ".l", P10
 
-    getattribute P11, P3, ".i"	# retrieve attribs
+    getattribute P11, P3, ".i"  # retrieve attribs
     print P11
     getattribute P11, P3, ".j"
     print P11
@@ -687,8 +722,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     new P13, "Bar"
 
     # Foo and Bar have attribute accessor methods
-    new P5, 'String'		# set attribute values
-    set P5, "i\n"		# attribute slots have reference semantics
+    new P5, 'String'        # set attribute values
+    set P5, "i\n"       # attribute slots have reference semantics
     set_args "0,0", P5, "i"
     get_results ""
     callmethodcc P13, "Foo::set"
@@ -715,7 +750,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     set_args "0",  "i"
     get_results "0", P5
     callmethodcc  P13,"Foo::get"
-    print P5			# return result
+    print P5            # return result
 
     set_args "0",  "j"
     get_results "0", P5
@@ -725,7 +760,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     set_args "0",  "k"
     get_results "0", P5
     callmethodcc  P13,"Bar::get"
-    print P5			# return result
+    print P5            # return result
 
     set_args "0",  "l"
     get_results "0", P5
@@ -739,7 +774,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     print "in Foo::set\n"
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    setattribute P2, S4, P5	# so always put new PMCs in
+    setattribute P2, S4, P5 # so always put new PMCs in
     set_returns ""
     returncc
 
@@ -756,7 +791,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     get_params "0,0", P5, S4
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print "in Bar::set\n"
-    setattribute P2, S4, P5	# so always put new PMCs in
+    setattribute P2, S4, P5 # so always put new PMCs in
     set_returns ""
     returncc
 
@@ -808,8 +843,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     new P2, "Bar"
 
     # Foo and Bar have attribute accessor methods
-    new P5, 'String'		# set attribute values
-    set P5, "i\n"		# attribute slots have reference semantics
+    new P5, 'String'        # set attribute values
+    set P5, "i\n"       # attribute slots have reference semantics
     set_args "0,0,0", P5, "Foo", "i"
     get_results ""
     callmethodcc P2, "set"
@@ -842,7 +877,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     set_args "0,0", "Foo", "i"
     get_results "0", P5
     callmethodcc P2, "get"
-    print P5			# return result
+    print P5            # return result
 
     set_args "0,0", "Foo", "j"
     get_results "0", P5
@@ -1238,12 +1273,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - methods" );
   .local pmc i
   i = new "MyInt"
   print "ok 3\n"
-  i = 42	# set_integer is inherited from Integer
+  i = 42    # set_integer is inherited from Integer
   print "ok 4\n"
-  $I0 = i	# get_integer is overridden below
+  $I0 = i   # get_integer is overridden below
   print $I0
   print "\n"
-  $S0 = i 	# get_string is overridden below
+  $S0 = i   # get_string is overridden below
   print $S0
   print "\n"
 .end
@@ -1297,7 +1332,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - mmd methods" );
   $I0 = k
   print $I0
   print "\n"
-  $S0 = k 	# get_string is overridden below
+  $S0 = k   # get_string is overridden below
   print $S0
   print "\n"
 .end
@@ -1381,12 +1416,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 1" );
   print $I0
   print "\n"
   print "ok 3\n"
-  i = 42	# set_integer is overridden below
+  i = 42    # set_integer is overridden below
   print "ok 4\n"
-  $I0 = i	# get_integer is overridden below
+  $I0 = i   # get_integer is overridden below
   print $I0
   print "\n"
-  $S0 = i 	# get_string is overridden below
+  $S0 = i   # get_string is overridden below
   print $S0
   print "\n"
 .end
@@ -1446,12 +1481,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2" );
   print $I0
   print "\n"
   print "ok 3\n"
-  i = 42	# set_integer is overridden below
+  i = 42    # set_integer is overridden below
   print "ok 4\n"
-  $I0 = i	# get_integer is overridden below
+  $I0 = i   # get_integer is overridden below
   print $I0
   print "\n"
-  $S0 = i 	# get_string is overridden below
+  $S0 = i   # get_string is overridden below
   print $S0
   print "\n"
 .end
@@ -1520,12 +1555,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 3" );
   print $I0
   print "\n"
   print "ok 3\n"
-  i = 42	# set_integer is overridden below
+  i = 42    # set_integer is overridden below
   print "ok 4\n"
-  $I0 = i	# get_integer is overridden below
+  $I0 = i   # get_integer is overridden below
   print $I0
   print "\n"
-  $S0 = i 	# get_string is overridden below
+  $S0 = i   # get_string is overridden below
   print $S0
   print "\n"
 .end
@@ -1785,7 +1820,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "verfiy namespace types" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "verify namespace types" );
     newclass P0, ['Foo';'Bar']
     getinterp P0
     .include "iglobals.pasm"
@@ -1803,7 +1838,7 @@ NameSpace
 NameSpace
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "verfiy data type" );
+pasm_output_like( <<'CODE', <<'OUTPUT', "verify data type" );
     newclass P0, ['Foo';'Bar']
     getinterp P0
     .include "iglobals.pasm"
@@ -2010,28 +2045,28 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ":vtable fails for subclasses of core classes - (#40626)" );
 .sub main :main
-	$P0 = subclass 'Hash', 'Foo'
-	$P0 = subclass 'Hash', 'Bar'
-	
-	$P1 = new 'Foo'
-	$S1 = $P1
-	say $S1
-	
-	$P1 = new 'Bar'
-	$S1 = $P1
-	say $S1
+    $P0 = subclass 'Hash', 'Foo'
+    $P0 = subclass 'Hash', 'Bar'
+
+    $P1 = new 'Foo'
+    $S1 = $P1
+    say $S1
+
+    $P1 = new 'Bar'
+    $S1 = $P1
+    say $S1
 .end
 
 .namespace [ 'Foo' ]
 
 .sub '__get_string' :method
-	.return('Hello world')
+    .return('Hello world')
 .end
 
 .namespace [ 'Bar' ]
 
 .sub 'get_string' :method :vtable
-	.return('Hello world')
+    .return('Hello world')
 .end
 CODE
 Hello world
