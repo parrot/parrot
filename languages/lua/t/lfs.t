@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 use Cwd;
 use File::Basename;
@@ -37,7 +37,7 @@ print(type(lfs))
 print(lfs._VERSION)
 CODE
 table
-LuaFileSystem 1.2
+LuaFileSystem 1.4.0
 OUT
 
 my $cwd = dirname(File::Spec->canonpath(getcwd));
@@ -207,6 +207,15 @@ f:close()
 lfs.lock(f)
 CODE
 /^[^:]+: [^:]+:\d+: lock: closed file\nstack traceback:\n/
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.symlinkattributes' );
+require "lfs"
+print(lfs.symlinkattributes("file.txt", "mode"))
+print(lfs.symlinkattributes("file.txt", "size"))
+CODE
+file
+15
 OUT
 
 # clean up file.txt

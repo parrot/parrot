@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-lib/lfs.pir - Lua File System Library v1.2
+lib/lfs.pir - Lua File System Library v1.4.0
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,11 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     set $P1, 'rmdir'
     _lfs[$P1] = _lfs_rmdir
 
+    .const .Sub _lfs_symlinkattributes = 'symlinkattributes'
+    _lfs_symlinkattributes.'setfenv'(_lua__GLOBAL)
+    set $P1, 'symlinkattributes'
+    _lfs[$P1] = _lfs_symlinkattributes
+
     .const .Sub _lfs_touch = 'touch'
     _lfs_touch.'setfenv'(_lua__GLOBAL)
     set $P1, 'touch'
@@ -94,7 +99,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 
     new $P2, 'LuaString'
 
-    set $P2, "Copyright (C) 2007, The Perl Foundation"
+    set $P2, "Copyright (C) 2007-2008, The Perl Foundation"
     set $P1, "_COPYRIGHT"
     _lfs[$P1] = $P2
 
@@ -102,7 +107,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     set $P1, "_DESCRIPTION"
     _lfs[$P1] = $P2
 
-    set $P2, "LuaFileSystem 1.2"
+    set $P2, "LuaFileSystem 1.4.0"
     set $P1, "_VERSION"
     _lfs[$P1] = $P2
 
@@ -195,13 +200,10 @@ optimal file system I/O blocksize; (Unix only)
 
 =cut
 
-.sub 'attributes' :anon
-    .param pmc filepath :optional
-    .param pmc aname :optional
-    .param pmc extra :slurpy
+.macro FILE_INFO(func, filepath, aname)
     .local pmc res
     .local pmc members
-    $S1 = lua_checkstring(1, filepath)
+    $S1 = lua_checkstring(1, .filepath)
     $S0 = $S1
     new members, 'Hash'
     .const .Sub st_mode = 'st_mode'
@@ -232,12 +234,12 @@ optimal file system I/O blocksize; (Unix only)
     members['blksize'] = st_blksize
     new $P0, 'OS'
     push_eh _handler
-    $P1 = $P0.'stat'($S1)
+    $P1 = $P0. .func($S1)
     pop_eh
-    if null aname goto L1
-    $I0 = isa aname, 'LuaString'
+    if null .aname goto L1
+    $I0 = isa .aname, 'LuaString'
     unless $I0 goto L2
-    $S2 = aname
+    $S2 = .aname
     $P2 = members[$S2]
     unless null $P2 goto L3
     lua_checkoption(2, $S2, '')
@@ -245,9 +247,9 @@ optimal file system I/O blocksize; (Unix only)
     res = $P2($P1)
     .return (res)
   L2:
-    $I0 = isa aname, 'LuaTable'
+    $I0 = isa .aname, 'LuaTable'
     unless $I0 goto L1
-    res = aname
+    res = .aname
     goto L4
   L1:
     new res, 'LuaTable'
@@ -274,6 +276,13 @@ optimal file system I/O blocksize; (Unix only)
     $S0 = concat "'"
     set msg, $S0
     .return (nil, msg)
+.endm
+
+.sub 'attributes' :anon
+    .param pmc filepath :optional
+    .param pmc aname :optional
+    .param pmc extra :slurpy
+    .FILE_INFO('stat', filepath, aname)
 .end
 
 .sub 'st_dev' :anon
@@ -631,6 +640,21 @@ C<nil> plus an error string.
     new msg, 'LuaString'
     set msg, s
     .return (nil, msg)
+.end
+
+
+=item C<lfs.symlinkattributes (filepath [, aname])>
+
+Identical to C<lfs.attributes> except that it obtains information about
+the link itself (not the file it refers to).
+
+=cut
+
+.sub 'symlinkattributes' :anon
+    .param pmc filepath :optional
+    .param pmc aname :optional
+    .param pmc extra :slurpy
+    .FILE_INFO('lstat', filepath, aname)
 .end
 
 
