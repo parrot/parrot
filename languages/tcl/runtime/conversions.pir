@@ -366,7 +366,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     tcl_error $S0
 
   empty:
-    tcl_error "empty expression\nin expression \"\"" 
+    tcl_error "empty expression\nin expression \"\""
 .end
 
 =head2 _Tcl::__script
