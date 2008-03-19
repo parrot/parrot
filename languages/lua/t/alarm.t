@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -66,7 +66,8 @@ in alarm!
 in alarm!
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (repeat)' );
+my @todo = ( todo => 'event loop not checked frequently enough -- RT #51870' );
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (repeat)', @todo );
 require "alarm"
 
 function myalarm()
@@ -121,4 +122,3 @@ OUTPUT
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
