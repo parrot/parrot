@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -128,24 +128,20 @@ extern void imcc_init(Parrot_Interp interp);
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp interp, debugger;
-    char *filename;
-    Parrot_PackFile pf;
-    char *ext;
-    int pasm_file;
-    PDB_t *pdb;
-    void *yyscanner;
+    Parrot_Interp   debugger = Parrot_new(NULL);
+    Parrot_Interp   interp   = Parrot_new(debugger);
+    PDB_t          *pdb      = mem_allocate_zeroed_typed(PDB_t);
 
+    char           *filename;
+    char           *ext;
+    void           *yyscanner;
 
     /*Parrot_set_config_hash();  TODO link with cfg */
-    debugger = Parrot_new(NULL);
-    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof (PDB_t));
-    /* attach pdb structure */
-    debugger->pdb = pdb;
 
-    interp = Parrot_new(debugger);
+    /* attach pdb structure */
+    debugger->pdb    = pdb;
     interp->debugger = debugger;
-    pdb->debugee = interp;
+    pdb->debugee     = interp;
 
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
@@ -159,18 +155,20 @@ main(int argc, char *argv[])
     }
 
     filename = argv[1];
-    ext = strrchr(filename, '.');
-    if (ext && STREQ(ext, ".pbc")) {
-        pf = Parrot_readbc(interp, filename);
+    ext      = strrchr(filename, '.');
 
-        if (!pf) {
+    if (ext && STREQ(ext, ".pbc")) {
+        Parrot_PackFile pf = Parrot_readbc(interp, filename);
+
+        if (!pf)
             return 1;
-        }
 
         Parrot_loadbc(interp, pf);
     }
     else {
-        pf = PackFile_new(interp, 0);
+        Parrot_PackFile pf        = PackFile_new(interp, 0);
+        int             pasm_file = 0;
+
         Parrot_loadbc(interp, pf);
 
         IMCC_push_parser_state(interp);
@@ -181,12 +179,13 @@ main(int argc, char *argv[])
                     "Error reading source file %s.\n",
                     filename);
         }
-        pasm_file = 0;
+
         if (ext && STREQ(ext, ".pasm"))
             pasm_file = 1;
+
         emit_open(interp, 1, NULL);
         IMCC_INFO(interp)->state->pasm_file = pasm_file;
-        yyparse(yyscanner, (void *) interp);
+        yyparse(yyscanner, interp);
         imc_compile_all_units(interp);
 
         imc_cleanup(interp, yyscanner);
@@ -194,6 +193,7 @@ main(int argc, char *argv[])
         fclose(imc_yyin_get(yyscanner));
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     }
+
     Parrot_unblock_DOD(interp);
     Parrot_unblock_GC(interp);
 
