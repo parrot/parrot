@@ -62,15 +62,12 @@ in expression "falses";
 should be "$falses" or "{falses}" or "falses(...)" or ...} {falses} \
 {TODO {new behavior in tcl 8.5.1}}
 
-# expected : 'syntax error in expression "falses": the word "falses" requires a preceding $ if it's a variable or function arguments if it's a function'
-
-
 is [expr 0b1001]    9 {binary}
 is [expr 0b10]      2 {binary}
 is [expr 0b101010] 42 {binary}
 
 eval_is {expr {}} {empty expression
-in expression ""} {empty expr} {TODO {new behavior in tcl 8.5.1}}
+in expression ""} {empty expr}
 
 # simple unary ops.
 is [expr -2]   -2   {unary -}

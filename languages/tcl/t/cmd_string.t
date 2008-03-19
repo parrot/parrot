@@ -14,8 +14,7 @@ plan 136
 
 # arg checking
 eval_is {string} \
-  {wrong # args: should be "string subcommand ?argument ...?"} {no args} \
-  {TODO {new behavior in 8.5.1}} 
+  {wrong # args: should be "string subcommand ?argument ...?"} {no args}
 
 # [string first]
 is [string first a abcdefa]     0 {first, initial}
@@ -32,11 +31,11 @@ eval_is {string first c abcd joe} \
 
 eval_is {string first} \
   {wrong # args: should be "string first needleString haystackString ?startIndex?"} \
-  {first, not enough args} {TODO {new behavior in 8.5.1}} 
+  {first, not enough args}
 
 eval_is {string first a b c d} \
   {wrong # args: should be "string first needleString haystackString ?startIndex?"} \
-  {first, too many args} {TODO {new behavior in 8.5.1}} 
+  {first, too many args}
 
 # [string last]
 is [string last a abcdefa]     6 {last, initial}
@@ -54,11 +53,9 @@ eval_is {string last c abcdc joe} \
   {bad index "joe": must be integer?[+-]integer? or end?[+-]integer?} \
   {last, index, invalid index}
 eval_is {string last} \
-  {wrong # args: should be "string last needleString haystackString ?startIndex?"} \
-  {last, not enough args} {TODO {new behavior in 8.5.1}} 
+  {wrong # args: should be "string last needleString haystackString ?startIndex?"}
 eval_is {string last a b c d} \
-  {wrong # args: should be "string last needleString haystackString ?startIndex?"} \
-  {last, too many args} {TODO {new behavior in 8.5.1}} 
+  {wrong # args: should be "string last needleString haystackString ?startIndex?"}
 
 # [string index]
 is [string index abcde 0]       a {index, initial}

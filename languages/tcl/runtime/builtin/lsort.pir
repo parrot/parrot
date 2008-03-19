@@ -152,10 +152,19 @@ loop:
     $I0 = is_cclass .CCLASS_NUMERIC, s2, pos2
     if $I0 goto numeric
 
-    $I1 = ord s1, pos1
-    $I1 %= 91
-    $I2 = ord s2, pos2
-    $I2 %= 91
+    .local string char1, char2, sortchar1, sortchar2
+    char1 = substr s1, pos1, 1
+    char2 = substr s2, pos2, 1
+    sortchar1 = downcase char1
+    sortchar2 = downcase char2
+    if sortchar1 != sortchar2 goto got_chars
+    sortchar1 = char1
+    sortchar2 = char2
+
+got_chars:
+    $I1 = ord sortchar1
+    $I2 = ord sortchar2
+
     inc pos1
     inc pos2
     goto compare
@@ -183,7 +192,6 @@ compare:
 
 end1:
     if len1 == len2 goto equal
-    goto less
 
 less:
     .return(-1)

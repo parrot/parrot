@@ -57,7 +57,7 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 no_args:
-  tcl_error 'wrong # args: should be "string option arg ?arg ...?"'
+  tcl_error 'wrong # args: should be "string subcommand ?argument ...?"'
 
 .end
 
@@ -91,7 +91,7 @@ first_do:
   .return(index_1)
 
 bad_args:
-  tcl_error 'wrong # args: should be "string first subString string ?startIndex?"'
+  tcl_error 'wrong # args: should be "string first needleString haystackString ?startIndex?"'
 
 .end
 
@@ -139,7 +139,7 @@ not_found:
   .return(-1)
 
 bad_args:
-  tcl_error 'wrong # args: should be "string last subString string ?startIndex?"'
+  tcl_error 'wrong # args: should be "string last needleString haystackString ?startIndex?"'
 .end
 
 .sub 'index'

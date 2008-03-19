@@ -13,8 +13,7 @@ source lib/test_more.tcl
 plan 52
 
 eval_is {info} \
-  {wrong # args: should be "info subcommand ?argument ...?"} \
-  {info no subcommand} {TODO {new behavior in tcl 8.5.1}}
+  {wrong # args: should be "info subcommand ?argument ...?"}
 
 eval_is {info bork} \
   {unknown or ambiguous subcommand "bork": must be args, body, cmdcount, commands, complete, default, exists, frame, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars} \

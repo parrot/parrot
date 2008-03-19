@@ -59,7 +59,7 @@ bad_subcommand:
   .return ('') # once all commands are implemented, remove this...
 
  bad_args:
-  tcl_error 'wrong # args: should be "info option ?arg arg ...?"'
+  tcl_error 'wrong # args: should be "info subcommand ?argument ...?"'
 .end
 
 .HLL '_Tcl', ''

@@ -153,8 +153,7 @@ eval_is {
 eval_is {if {}} \
   {empty expression
 in expression ""} \
-  {expression errors before [if] errors} \
-  {TODO {new behavior in 8.5.1}}
+  {expression errors before [if] errors}
 
 eval_is {if 0 then} \
   {wrong # args: no script following "then" argument} \

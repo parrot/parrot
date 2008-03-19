@@ -295,6 +295,8 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     .local pmc parse
     .local pmc match
 
+    if expression == '' goto empty
+
     parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'expression'
     match = parse(expression, 'pos'=>0, 'grammar'=>'TclExpr::Grammar')
 
@@ -362,6 +364,9 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     $S0 = 'syntax error in expression "' . $S0
     $S0 = $S0 . '": extra tokens at end of expression'
     tcl_error $S0
+
+  empty:
+    tcl_error "empty expression\nin expression \"\"" 
 .end
 
 =head2 _Tcl::__script
