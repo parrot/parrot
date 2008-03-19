@@ -273,22 +273,6 @@ env_loop_done:
   slash = $P1['slash']
   $P2 = $P1['slash']
   set_root_global ['_tcl'], 'slash', $P2
-
-  .local pmc tcl_library
-  tcl_library = get_global '$tcl_library'
-
-  $S0 = tcl_library
-  $S0 .= slash
-  $S0 .= 'parray.tcl'
-
-  .local pmc script
-  $P99 = open $S0, '<'
-  $S0 = $P99.'slurp'('')
-
-  script = get_root_global ['_tcl'], '__script'
-
-  $P1 = script($S0)
-  $P1()
 .end
 
 # Local Variables:
