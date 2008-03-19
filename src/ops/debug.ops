@@ -161,7 +161,7 @@ Get the current line number.
 
 inline op getline(out INT) {
   Parrot_Context_info info;
-  Parrot_Context_get_info(interp, CONTEXT(interp->ctx), &info);
+  Parrot_Context_get_info(interp, CONTEXT(interp), &info);
   $1 = info.line;
   goto NEXT();
 }
@@ -174,7 +174,7 @@ Get the name of the current file.
 
 inline op getfile(out STR) {
   Parrot_Context_info info;
-  Parrot_Context_get_info(interp, CONTEXT(interp->ctx), &info);
+  Parrot_Context_get_info(interp, CONTEXT(interp), &info);
   $1 = string_from_cstring(interp, info.file, 0);
   goto NEXT();
 }

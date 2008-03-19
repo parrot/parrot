@@ -115,7 +115,7 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* caller() {
-        parrot_context_t *sub_ctx = CONTEXT(INTERP->ctx)->caller_ctx;
+        parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
         STRING           *retval;
 
         /* backtrace: follow the continuation chain */
@@ -364,7 +364,7 @@ information see F<src/pmc.c>.
         STRING *str;
 
         /* information about the current sub */
-        parrot_context_t *sub_ctx = CONTEXT(INTERP->ctx)->caller_ctx;
+        parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
 
         if (level == 0) {
             str = context_infostr(INTERP, sub_ctx);
@@ -404,7 +404,7 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* where() {
-        parrot_context_t *sub_ctx = CONTEXT(INTERP->ctx)->caller_ctx;
+        parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
         STRING           *retval;
 
         /* backtrace: follow the continuation chain */

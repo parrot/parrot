@@ -397,7 +397,7 @@ Introspection interface. C<key> can be:
         if (level < 0)
             real_exception(interp, NULL, E_ValueError, "No such caller depth");
 
-        ctx = CONTEXT(interp->ctx);
+        ctx = CONTEXT(interp);
 
         if (outer) {
             for (; level; --level) {

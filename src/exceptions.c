@@ -491,7 +491,7 @@ pop_exception(PARROT_INTERP)
                 "No exception to pop.");
     }
     cc = PMC_cont(handler);
-    if (cc->to_ctx != CONTEXT(interp->ctx)) {
+    if (cc->to_ctx != CONTEXT(interp)) {
         real_exception(interp, NULL, E_RuntimeError,
                 "No exception to pop.");
     }

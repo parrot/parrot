@@ -2864,7 +2864,7 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
     PMC *sig_pmc;
     INTVAL *sig_bits, i, n;
 
-    sig_pmc = CONTEXT(interp->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
     sig_bits = SIG_ARRAY(sig_pmc);
     n = SIG_ELEMS(sig_pmc);
     jit_info->n_args = n;
@@ -2900,7 +2900,7 @@ jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
     int i, used_i, save_i;
     const jit_arch_regs *reg_info;
 
-    used_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
+    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
     save_i = reg_info->n_preserved_I;
     for (i = save_i; i < used_i; ++i) {
@@ -2916,7 +2916,7 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
     int i, used_i, save_i;
     const jit_arch_regs *reg_info;
 
-    used_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
+    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
     save_i = reg_info->n_preserved_I;
     /* note - reversed order of jit_save_regs  */
@@ -2940,8 +2940,8 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
     int i, used_i, used_n;
     const jit_arch_regs *reg_info;
 
-    used_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
-    used_n = CONTEXT(interp->ctx)->n_regs_used[REGNO_NUM];
+    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
+    used_n = CONTEXT(interp)->n_regs_used[REGNO_NUM];
     jit_emit_sub_ri_i(interp, jit_info->native_ptr, emit_ESP,
             (used_i * sizeof (INTVAL) + used_n * sizeof (FLOATVAL)));
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
@@ -2971,8 +2971,8 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     int i, used_i, used_n;
     const jit_arch_regs *reg_info;
 
-    used_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
-    used_n = CONTEXT(interp->ctx)->n_regs_used[REGNO_NUM];
+    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
+    used_n = CONTEXT(interp)->n_regs_used[REGNO_NUM];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
 
     for (i = 0; i < used_i; ++i) {
@@ -3001,7 +3001,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     PMC *sig_pmc;
     INTVAL *sig_bits, sig;
 
-    sig_pmc = CONTEXT(interp->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
     if (!SIG_ELEMS(sig_pmc))
         return;
     sig_bits = SIG_ARRAY(sig_pmc);
@@ -3074,7 +3074,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         real_exception(interp, NULL, 1, "set_args_jit - can't do that yet ");
     }
 
-    constants = CONTEXT(interp->ctx)->constants;
+    constants = CONTEXT(interp)->constants;
     sig_args = constants[CUR_OPCODE[1]]->u.key;
     if (!SIG_ELEMS(sig_args))
         return;
@@ -3409,8 +3409,8 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         L1 = NATIVECODE;
         emitm_calll(NATIVECODE, 0);
         /* check type of return value */
-        constants = CONTEXT(interp->ctx)->constants;
-        result = CONTEXT(interp->ctx)->current_results;
+        constants = CONTEXT(interp)->constants;
+        result = CONTEXT(interp)->current_results;
         sig_result = constants[result[1]]->u.key;
         if (!SIG_ELEMS(sig_result))
             goto no_result;

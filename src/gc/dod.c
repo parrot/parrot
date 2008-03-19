@@ -286,7 +286,7 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     pobject_lives(interp, (PObj *)interp->iglobals);
 
     /* mark the current context. */
-    ctx = CONTEXT(interp->ctx);
+    ctx = CONTEXT(interp);
     mark_context(interp, ctx);
 
     /* mark the dynamic environment. */

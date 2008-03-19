@@ -963,7 +963,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     }
 
     /* could be eval too; check if :outer is the current sub */
-    current = CONTEXT(interp->ctx)->current_sub;
+    current = CONTEXT(interp)->current_sub;
 
     if (! current)
         IMCC_fatal(interp, 1, "Undefined :outer sub '%s'.\n",
@@ -1058,7 +1058,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
     sub->namespace_name = ns_pmc;
     sub->start_offs     = offs;
     sub->end_offs       = end;
-    sub->HLL_id         = CONTEXT(interp->ctx)->current_HLL;
+    sub->HLL_id         = CONTEXT(interp)->current_HLL;
 
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = unit->n_regs_used[i];

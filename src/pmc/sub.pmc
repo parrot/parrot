@@ -231,7 +231,7 @@ Invokes the subroutine.
          *
          */
         pc                   = sub->seg->base.data + sub->start_offs;
-        caller_ctx           = CONTEXT(INTERP->ctx);
+        caller_ctx           = CONTEXT(interp);
         ccont                = INTERP->current_cont;
         INTERP->current_cont = NULL;
 

@@ -151,13 +151,13 @@ Parrot_cont *
 new_continuation(PARROT_INTERP, ARGIN_NULLOK(const Parrot_cont *to))
 {
     Parrot_cont    * const cc     = mem_allocate_typed(Parrot_cont);
-    Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
+    Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp);
 
     cc->to_ctx        = to_ctx;
-    cc->from_ctx      = CONTEXT(interp->ctx);
+    cc->from_ctx      = CONTEXT(interp);
     cc->dynamic_state = NULL;
     cc->runloop_id    = 0;
-    CONTEXT(interp->ctx)->ref_count++;
+    CONTEXT(interp)->ref_count++;
     if (to) {
         cc->seg = to->seg;
         cc->address = to->address;
@@ -187,7 +187,7 @@ new_ret_continuation(PARROT_INTERP)
 {
     Parrot_cont * const cc = mem_allocate_typed(Parrot_cont);
 
-    cc->to_ctx          = CONTEXT(interp->ctx);
+    cc->to_ctx          = CONTEXT(interp);
     cc->from_ctx        = NULL;    /* filled in during a call */
     cc->dynamic_state   = NULL;
     cc->runloop_id      = 0;
@@ -426,7 +426,7 @@ STRING*
 Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
 {
     Parrot_Context_info info;
-    const char* const msg = (CONTEXT(interp->ctx) == ctx)
+    const char* const msg = (CONTEXT(interp) == ctx)
         ? "current instr.:"
         : "called from Sub";
     STRING *res;
@@ -525,7 +525,7 @@ parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
      * the given sub_pmc has to have an :outer(sub) that is
      * this subroutine
      */
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    parrot_context_t * const ctx = CONTEXT(interp);
     if (PMC_IS_NULL(sub->outer_sub)) {
         real_exception(interp, NULL, INVALID_OPERATION,
                 "'%Ss' isn't a closure (no :outer)", sub->name);

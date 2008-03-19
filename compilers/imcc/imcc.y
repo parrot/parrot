@@ -736,7 +736,7 @@ pragma_1:  N_OPERATORS INTC
 hll_def: HLL STRINGC COMMA STRINGC
          {
             STRING * const hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
-            CONTEXT(interp->ctx)->current_HLL =
+            CONTEXT(interp)->current_HLL =
                 Parrot_register_HLL(interp, hll_name);
 
             /* don't bother loading the library for an empty string */
@@ -753,19 +753,17 @@ hll_def: HLL STRINGC COMMA STRINGC
          }
    | HLL_MAP STRINGC COMMA STRINGC
          {
-            int built_in_type = 0;
-            int language_type = 0;
+            Parrot_Context *ctx           = CONTEXT(interp);
+            STRING * const  built_in_name =
+                string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            STRING * const language_name  =
+                string_unescape_cstring(interp, $4 + 1, '"', NULL);
 
-            STRING * const built_in_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
-            STRING * const language_name = string_unescape_cstring(interp, $4 + 1, '"', NULL);
-            built_in_type = pmc_type(interp, built_in_name);
-            language_type = pmc_type(interp, language_name);
+            int             built_in_type = pmc_type(interp, built_in_name);
+            int             language_type = pmc_type(interp, language_name);
 
-            /*
-            fprintf(stderr, "built in type is: %d, language type is: %d\n", built_in_type, language_type);
-            */
-            Parrot_register_HLL_type(interp,
-                 CONTEXT(((Interp *)interp)->ctx)->current_HLL, built_in_type, language_type);
+            Parrot_register_HLL_type(interp, ctx->current_HLL,
+                built_in_type, language_type);
             $$ = 0;
          }
    ;

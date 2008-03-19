@@ -204,7 +204,7 @@ PARROT_API
 void
 Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
 {
-    CONTEXT(interp->ctx)->trace_flags |= flag;
+    CONTEXT(interp)->trace_flags |= flag;
     Interp_core_SET(interp, PARROT_SLOW_CORE);
 }
 
@@ -259,7 +259,7 @@ PARROT_API
 void
 Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)
 {
-    CONTEXT(interp->ctx)->trace_flags &= ~flag;
+    CONTEXT(interp)->trace_flags &= ~flag;
 }
 
 
@@ -313,7 +313,7 @@ PARROT_API
 UINTVAL
 Parrot_test_trace(PARROT_INTERP, UINTVAL flag)
 {
-    return CONTEXT(interp->ctx)->trace_flags & flag;
+    return CONTEXT(interp)->trace_flags & flag;
 }
 
 
@@ -826,8 +826,8 @@ set_current_sub(PARROT_INTERP)
                 const size_t offs = sub->start_offs;
 
                 if (offs == interp->resume_offset) {
-                    CONTEXT(interp->ctx)->current_sub = sub_pmc;
-                    CONTEXT(interp->ctx)->current_HLL = sub->HLL_id;
+                    CONTEXT(interp)->current_sub = sub_pmc;
+                    CONTEXT(interp)->current_HLL = sub->HLL_id;
                     return sub_pmc;
                 }
 
@@ -838,9 +838,9 @@ set_current_sub(PARROT_INTERP)
 
     /* if we didn't find anything put a dummy PMC into current_sub */
 
-    sub_pmc                           = pmc_new(interp, enum_class_Sub);
-    PMC_sub(sub_pmc)->start_offs      = 0;
-    CONTEXT(interp->ctx)->current_sub = sub_pmc;
+    sub_pmc                      = pmc_new(interp, enum_class_Sub);
+    PMC_sub(sub_pmc)->start_offs = 0;
+    CONTEXT(interp)->current_sub = sub_pmc;
 
     return sub_pmc;
 }
@@ -928,15 +928,15 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
     Parrot_on_exit(interp, print_profile, NULL);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
-    main_sub = CONTEXT(interp->ctx)->current_sub;
+    main_sub = CONTEXT(interp)->current_sub;
 
     /* if no sub was marked being :main, we create a dummy sub with offset 0 */
 
     if (!main_sub)
         main_sub = set_current_sub(interp);
 
-    CONTEXT(interp->ctx)->current_sub = NULL;
-    CONTEXT(interp->ctx)->constants   = interp->code->const_table->constants;
+    CONTEXT(interp)->current_sub = NULL;
+    CONTEXT(interp)->constants   = interp->code->const_table->constants;
 
     Parrot_runops_fromc_args(interp, main_sub, "vP", userargv);
 }
@@ -1100,8 +1100,7 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     run_native = func;
 
     if (interp->code && interp->code->const_table)
-        CONTEXT(interp->ctx)->constants =
-            interp->code->const_table->constants;
+        CONTEXT(interp)->constants = interp->code->const_table->constants;
 
     runops(interp, interp->resume_offset);
 }

@@ -625,7 +625,7 @@ is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t 
     parrot_context_t *caller_ctx;
     opcode_t *args;
     PMC * const sig1 = (PMC*)(pc[1]);
-    const parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    const parrot_context_t * const ctx = CONTEXT(interp);
 
     /* check params */
 
@@ -718,7 +718,7 @@ is_pic_func(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), int core_t
     opcode_t *op, n;
     int flags;
 
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    parrot_context_t * const ctx = CONTEXT(interp);
     PMC * const sig_args = (PMC*)(pc[1]);
 
     ASSERT_SIG_PMC(sig_args);

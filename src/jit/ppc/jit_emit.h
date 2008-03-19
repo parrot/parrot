@@ -877,7 +877,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 static void
 jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
-    PMC    *sig_pmc  = CONTEXT(interp->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    PMC    *sig_pmc  = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
     INTVAL *sig_bits = PMC_data_typed(sig_pmc, INTVAL *);
     INTVAL  n        = PMC_int_val(sig_pmc);
     INTVAL  i;
@@ -905,7 +905,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     PMC *sig_pmc;
     INTVAL *sig_bits, sig;
 
-    sig_pmc = CONTEXT(interp->ctx)->constants[CUR_OPCODE[1]]->u.key;
+    sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
     if (!SIG_ELEMS(sig_pmc))
         return;
     sig_bits = SIG_ARRAY(sig_pmc);
@@ -976,7 +976,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         internal_exception(1, "set_args_jit - can't do that yet ");
     }
 
-    constants = CONTEXT(interp->ctx)->constants;
+    constants = CONTEXT(interp)->constants;
     sig_args = constants[CUR_OPCODE[1]]->u.key;
     if (!SIG_ELEMS(sig_args))
         return;
@@ -1034,7 +1034,7 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
     jit_emit_mflr(jit_info->native_ptr, r0);    /* store link reg */
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
     jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
-    used_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
+    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
     for (i = 0; i < used_i; ++i) {
         if (reg_info->map_I[i] == skip)
@@ -1054,7 +1054,7 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     int i, used_i, save_i;
     const jit_arch_regs *reg_info;
 
-    used_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
+    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
     /* note - reversed order of jit_save_regs  */
     for (i = used_i - 1; i >= 0; --i) {

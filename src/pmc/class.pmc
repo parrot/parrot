@@ -189,7 +189,7 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
         }
         else {
             PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
-                    interp->HLL_namespace, CONTEXT(interp->ctx)->current_HLL);
+                    interp->HLL_namespace, CONTEXT(interp)->current_HLL);
             new_namespace = Parrot_make_namespace_keyed(interp, hll_ns, name_arg);
         }
 

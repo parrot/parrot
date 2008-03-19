@@ -70,7 +70,7 @@ sub defines {
 #define NREG(i) REG_NUM(interp, cur_opcode[i])
 #define PREG(i) REG_PMC(interp, cur_opcode[i])
 #define SREG(i) REG_STR(interp, cur_opcode[i])
-#define CONST(i) CONTEXT(interp->ctx)->constants[cur_opcode[i]]
+#define CONST(i) CONTEXT(interp)->constants[cur_opcode[i]]
 END
 }
 

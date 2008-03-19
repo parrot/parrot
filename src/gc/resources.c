@@ -272,7 +272,7 @@ buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
     int i;
     static char reg[10];
 
-    parrot_context_t* const ctx = CONTEXT(interp->ctx);
+    parrot_context_t* const ctx = CONTEXT(interp);
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         PObj * const obj = (PObj *) CTX_REG_STR(interp, ctx, i);

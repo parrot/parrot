@@ -286,7 +286,7 @@ set_register_usage(PARROT_INTERP,
         int arg_type;
         PMC *sig;
         if (argn >= args) {
-            sig = CONTEXT(interp->ctx)->constants[cur_op[1]]->u.key;
+            sig = CONTEXT(interp)->constants[cur_op[1]]->u.key;
             arg_type = VTABLE_get_integer_keyed_int(interp,
                     sig, argn - args);
             arg_type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);
@@ -397,9 +397,9 @@ init_regusage(PARROT_INTERP, Parrot_jit_optimizer_section_ptr cur_section)
     int typ, j;
 
     cur_section->ru[0].registers_used =
-        CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
+        CONTEXT(interp)->n_regs_used[REGNO_INT];
     cur_section->ru[3].registers_used =
-        CONTEXT(interp->ctx)->n_regs_used[REGNO_NUM];
+        CONTEXT(interp)->n_regs_used[REGNO_NUM];
     cur_section->ru[1].registers_used =
         cur_section->ru[2].registers_used = 0;
     for (typ = 0; typ < 4; typ++)
@@ -1307,7 +1307,7 @@ set_reg_usage(PARROT_INTERP, opcode_t *pc)
             size_t      offs    = pc - sub->seg->base.data;
 
             if (offs >= sub->start_offs && offs < sub->end_offs) {
-                CONTEXT(interp->ctx)->n_regs_used = sub->n_regs_used;
+                CONTEXT(interp)->n_regs_used = sub->n_regs_used;
                 return;
             }
         }
@@ -1427,7 +1427,7 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
     /*
      * remember register usage
      */
-    n_regs_used = CONTEXT(interp->ctx)->n_regs_used;
+    n_regs_used = CONTEXT(interp)->n_regs_used;
     set_reg_usage(interp, code_start);
 
     if (jit_seg)
@@ -1680,7 +1680,7 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
     /*
      * restore register usage
      */
-    CONTEXT(interp->ctx)->n_regs_used = n_regs_used;
+    CONTEXT(interp)->n_regs_used = n_regs_used;
 
     /* Do fixups before converting offsets */
     (arch_info->jit_dofixup)(jit_info, interp);

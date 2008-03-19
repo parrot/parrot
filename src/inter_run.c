@@ -159,7 +159,7 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
     dest = VTABLE_invoke(interp, sub, (void*) 1);
     if (!dest)
         real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
-    ctx = CONTEXT(interp->ctx);
+    ctx = CONTEXT(interp);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
     return ctx;
@@ -187,7 +187,7 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
 
     char new_sig[10];
     const char *sig_p;
-    parrot_context_t * const old_ctx = CONTEXT(interp->ctx);
+    parrot_context_t * const old_ctx = CONTEXT(interp);
 
     interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
@@ -225,7 +225,7 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
      }
      */
 
-    ctx = CONTEXT(interp->ctx);
+    ctx = CONTEXT(interp);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
     return ctx;
@@ -260,7 +260,7 @@ Parrot_run_meth_fromc(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj), SH
     dest = VTABLE_invoke(interp, sub, (void*)1);
     if (!dest)
         real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
-    ctx = CONTEXT(interp->ctx);
+    ctx = CONTEXT(interp);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
     return set_retval(interp, 0, ctx);

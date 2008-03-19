@@ -67,7 +67,7 @@ Set the bound object live.
         else {
             /* Locate register holding invocant. */
             int  sig_const = interp->current_args[1];
-            PMC *sig       = CONTEXT(interp->ctx)->constants[sig_const]->u.key;
+            PMC *sig       = CONTEXT(interp)->constants[sig_const]->u.key;
 
             if (PMC_IS_NULL(sig))
                 real_exception(interp, NULL, INVALID_OPERATION,

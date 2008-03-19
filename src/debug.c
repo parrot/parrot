@@ -2389,7 +2389,7 @@ PDB_print_user_stack(PARROT_INTERP, ARGIN(const char *command))
 {
     Stack_Entry_t *entry;
     long           depth = 0;
-    Stack_Chunk_t * const chunk = CONTEXT(interp->ctx)->user_stack;
+    Stack_Chunk_t * const chunk = CONTEXT(interp)->user_stack;
 
     command = nextarg(command);
     if (*command)
@@ -2656,7 +2656,7 @@ PDB_backtrace(PARROT_INTERP)
 
     /* information about the current sub */
     PMC              *sub = interpinfo_p(interp, CURRENT_SUB);
-    parrot_context_t *ctx = CONTEXT(interp->ctx);
+    parrot_context_t *ctx = CONTEXT(interp);
 
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interp, ctx);
@@ -2739,7 +2739,7 @@ static const char*
 GDB_print_reg(PARROT_INTERP, int t, int n)
 {
 
-    if (n >= 0 && n < CONTEXT(interp->ctx)->n_regs_used[t]) {
+    if (n >= 0 && n < CONTEXT(interp)->n_regs_used[t]) {
         switch (t) {
             case REGNO_INT:
                 return string_from_int(interp, REG_INT(interp, n))->strstart;
@@ -2793,7 +2793,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     }
     if (! s[1]) {
         /* Print all registers of this type. */
-        const int max_reg = CONTEXT(interp->ctx)->n_regs_used[t];
+        const int max_reg = CONTEXT(interp)->n_regs_used[t];
         int n;
 
         for (n = 0; n < max_reg; n++) {

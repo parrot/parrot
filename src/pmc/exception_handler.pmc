@@ -99,7 +99,7 @@ Initializes the exception handler.
         /* clear all results, so that continuation.invoke
          * doesn't pass any args #' */
         cc->to_ctx->current_results = cc->current_results = NULL;
-        ex_ctx                      = CONTEXT(INTERP->ctx);
+        ex_ctx                      = CONTEXT(interp);
         next                        = SUPER(next);
 
         if (results) {

@@ -151,7 +151,7 @@ stack_entry(PARROT_INTERP, ARGIN(Stack_Chunk_t *stack), INTVAL depth)
     /* For negative depths, look from the bottom of the stack up. */
     if (depth < 0) {
         depth = stack_height(interp,
-                             CONTEXT(interp->ctx)->user_stack) + depth;
+                             CONTEXT(interp)->user_stack) + depth;
         if (depth < 0)
             return NULL;
         offset = (size_t)depth;

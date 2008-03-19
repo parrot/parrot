@@ -432,7 +432,7 @@ PARROT_API
 INTVAL
 Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 {
-    const INTVAL hll_id = CONTEXT(interp->ctx)->current_HLL;
+    const INTVAL hll_id = CONTEXT(interp)->current_HLL;
 
     return Parrot_get_HLL_type(interp, hll_id, core_type);
 }
@@ -453,7 +453,7 @@ PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
 {
-    return Parrot_get_HLL_namespace(interp, CONTEXT(interp->ctx)->current_HLL);
+    return Parrot_get_HLL_namespace(interp, CONTEXT(interp)->current_HLL);
 }
 
 /*

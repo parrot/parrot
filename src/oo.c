@@ -232,7 +232,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         case enum_class_ResizableStringArray:
             {
             PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-                                    CONTEXT(interp->ctx)->current_HLL);
+                                    CONTEXT(interp)->current_HLL);
             PMC * const ns     = Parrot_get_namespace_keyed(interp, hll_ns, key);
 
             if (!PMC_IS_NULL(ns))
@@ -276,7 +276,7 @@ PMC *
 Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
 {
     PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-                           CONTEXT(interp->ctx)->current_HLL);
+                           CONTEXT(interp)->current_HLL);
     PMC * const ns     = Parrot_get_namespace_keyed_str(interp, hll_ns, name);
     PMC * const _class = PMC_IS_NULL(ns) ? PMCNULL : VTABLE_get_class(interp, ns);
 
@@ -1038,7 +1038,7 @@ parrot_class_register(PARROT_INTERP, ARGIN(PMC *name),
     interp->vtables[new_type] = new_vtable;
 
     /* check if we already have a NameSpace */
-    top = CONTEXT(interp->ctx)->current_namespace;
+    top = CONTEXT(interp)->current_namespace;
     ns  = VTABLE_get_pmc_keyed(interp, top, name);
 
     /* RT#45979 nested, use current as base ? */

@@ -149,10 +149,10 @@ prederef_args(ARGMOD(void **pc_prederef), PARROT_INTERP,
 {
     const PackFile_ConstTable * const const_table = interp->code->const_table;
 
-    const int regs_n = CONTEXT(interp->ctx)->n_regs_used[REGNO_NUM];
-    const int regs_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
-    const int regs_p = CONTEXT(interp->ctx)->n_regs_used[REGNO_PMC];
-    const int regs_s = CONTEXT(interp->ctx)->n_regs_used[REGNO_STR];
+    const int regs_n = CONTEXT(interp)->n_regs_used[REGNO_NUM];
+    const int regs_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
+    const int regs_p = CONTEXT(interp)->n_regs_used[REGNO_PMC];
+    const int regs_s = CONTEXT(interp)->n_regs_used[REGNO_STR];
 
     /* prederef var part too */
     const int m = opinfo->op_count;
@@ -480,7 +480,7 @@ init_prederef(PARROT_INTERP, int which)
                 N * sizeof (void *));
 #endif
         /* calc and remember pred_offset */
-        CONTEXT(interp->ctx)->pred_offset = pc - (opcode_t *)temp;
+        CONTEXT(interp)->pred_offset = pc - (opcode_t *)temp;
 
         /* fill with the prederef__ opcode function */
         if (which == PARROT_SWITCH_CORE || which == PARROT_SWITCH_JIT_CORE)

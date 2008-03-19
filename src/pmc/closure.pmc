@@ -127,7 +127,7 @@ Invokes the closure.
 
                 (void)VTABLE_invoke(INTERP, sub->outer_sub, next);
 
-                caller               = CONTEXT(INTERP->ctx);
+                caller               = CONTEXT(interp);
                 cont                 = caller->current_cont;
                 cont->vtable         = interp->vtables[enum_class_Continuation];
                 sub->outer_ctx       = sub->ctx->outer_ctx = caller;

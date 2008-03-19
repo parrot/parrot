@@ -228,7 +228,7 @@ destination to continue execution.
         Parrot_cont      *cc           = PMC_cont(SELF);
         Stack_Chunk_t    *stack_target = cc->dynamic_state;
         int               stack_delta  = 0;
-        parrot_context_t *from_ctx     = CONTEXT(INTERP->ctx);
+        parrot_context_t *from_ctx     = CONTEXT(interp);
         parrot_context_t *to_ctx       = cc->to_ctx;
         opcode_t         *pc           = cc->address;
         Stack_Chunk_t    *corresponding_target;
@@ -345,7 +345,7 @@ destination to continue execution.
         }
 
         /* set context */
-        CONTEXT(INTERP->ctx) = to_ctx;
+        CONTEXT(interp) = to_ctx;
         INTERP->ctx.bp       = to_ctx->bp;
         INTERP->ctx.bp_ps    = to_ctx->bp_ps;
 

@@ -197,7 +197,7 @@ parrot_global_setup_2(PARROT_INTERP)
     interp->root_namespace = pmc_new(interp, enum_class_NameSpace);
     Parrot_init_HLL(interp);
 
-    CONTEXT(interp->ctx)->current_namespace =
+    CONTEXT(interp)->current_namespace =
         VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0);
 
     /* We need a class hash */

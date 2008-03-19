@@ -99,7 +99,7 @@ Returns the dict as a string
         namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);
         dictToString = VTABLE_get_pmc_keyed_str(INTERP, namespace, sub);
 
-        CONTEXT(INTERP->ctx)->constants =
+        CONTEXT(interp)->constants =
           PMC_sub(dictToString)->seg->const_table->constants;
         return (STRING *)Parrot_runops_fromc_args(INTERP, dictToString, "SP", SELF);
 

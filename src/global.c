@@ -241,10 +241,10 @@ Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
-        base_ns = CONTEXT(interp->ctx)->current_namespace;
+        base_ns = CONTEXT(interp)->current_namespace;
     else
         base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-            CONTEXT(interp->ctx)->current_HLL);
+            CONTEXT(interp)->current_HLL);
     return Parrot_make_namespace_keyed(interp, base_ns, key);
 }
 
@@ -269,10 +269,10 @@ Parrot_get_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
-        base_ns = CONTEXT(interp->ctx)->current_namespace;
+        base_ns = CONTEXT(interp)->current_namespace;
     else
         base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-            CONTEXT(interp->ctx)->current_HLL);
+            CONTEXT(interp)->current_HLL);
     return Parrot_get_namespace_keyed(interp, base_ns, key);
 }
 
@@ -420,7 +420,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 {
-    PMC * const ns = CONTEXT(interp->ctx)->current_namespace;
+    PMC * const ns = CONTEXT(interp)->current_namespace;
     return Parrot_find_global_n(interp, ns, globalname);
 }
 
@@ -523,7 +523,7 @@ Parrot_store_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname),
         ARGIN_NULLOK(PMC *val))
 {
     Parrot_store_global_n(interp,
-                          CONTEXT(interp->ctx)->current_namespace,
+                          CONTEXT(interp)->current_namespace,
                           globalname, val);
 
     /* RT#46165 - method cache invalidation should occur */
@@ -650,7 +650,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 {
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    parrot_context_t * const ctx = CONTEXT(interp);
     PMC * const lex_pad = Parrot_find_pad(interp, name, ctx);
     PMC *g;
 
@@ -759,13 +759,13 @@ PARROT_API
 void
 Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
 {
-    const INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
+    const INTVAL cur_id = CONTEXT(interp)->current_HLL;
 
     PMC *ns;
     /* PF structures aren't fully constructed yet */
     Parrot_block_DOD(interp);
     /* store relative to HLL namespace */
-    CONTEXT(interp->ctx)->current_HLL = PMC_sub(sub)->HLL_id;
+    CONTEXT(interp)->current_HLL = PMC_sub(sub)->HLL_id;
 
     ns = get_namespace_pmc(interp, sub);
 
@@ -790,7 +790,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
     }
 
     /* restore HLL_id */
-    CONTEXT(interp->ctx)->current_HLL = cur_id;
+    CONTEXT(interp)->current_HLL = cur_id;
     Parrot_unblock_DOD(interp);
 }
 

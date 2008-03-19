@@ -481,7 +481,7 @@ run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     &&  interp->run_core != PARROT_FAST_CORE)
             interp->run_core = PARROT_FAST_CORE;
 
-    CONTEXT(interp->ctx)->constants = interp->code->const_table->constants;
+    CONTEXT(interp)->constants = interp->code->const_table->constants;
 
     retval           = (PMC *)Parrot_runops_fromc_args(interp, sub_pmc, "P");
     interp->run_core = old;
@@ -558,7 +558,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), int action)
                                           / sizeof (opcode_t *);
 
                     PObj_get_FLAGS(sub_pmc)          &= ~SUB_FLAG_PF_MAIN;
-                    CONTEXT(interp->ctx)->current_sub = sub_pmc;
+                    CONTEXT(interp)->current_sub = sub_pmc;
                 }
                 else {
                     /* XXX which warn_class */
@@ -2702,11 +2702,11 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
                 new_cs->base.name);
     }
     interp->code = new_cs;
-    CONTEXT(interp->ctx)->constants =
+    CONTEXT(interp)->constants =
         really ? find_constants(interp, new_cs->const_table) :
         new_cs->const_table->constants;
             /* new_cs->const_table->constants; */
-    CONTEXT(interp->ctx)->pred_offset =
+    CONTEXT(interp)->pred_offset =
         new_cs->base.data - (opcode_t*) new_cs->prederef.code;
     if (really)
         prepare_for_run(interp);

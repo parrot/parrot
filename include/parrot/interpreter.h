@@ -129,9 +129,9 @@ typedef Parrot_Run_core_t Run_Cores;
 #define Interp_debug_CLEAR(interp, flag) ((interp)->debug_flags &= ~(flag))
 #define Interp_debug_TEST(interp, flag)  ((interp)->debug_flags & (flag))
 
-#define Interp_trace_SET(interp, flag)   (CONTEXT((interp)->ctx)->trace_flags |= (flag))
-#define Interp_trace_CLEAR(interp, flag) (CONTEXT((interp)->ctx)->trace_flags &= ~(flag))
-#define Interp_trace_TEST(interp, flag)  (CONTEXT((interp)->ctx)->trace_flags & (flag))
+#define Interp_trace_SET(interp, flag)   (CONTEXT(interp)->trace_flags |= (flag))
+#define Interp_trace_CLEAR(interp, flag) (CONTEXT(interp)->trace_flags &= ~(flag))
+#define Interp_trace_TEST(interp, flag)  (CONTEXT(interp)->trace_flags & (flag))
 
 #define Interp_core_SET(interp, core)   ((interp)->run_core = (core))
 #define Interp_core_TEST(interp, core)  ((interp)->run_core == (core))
@@ -276,7 +276,7 @@ typedef struct Interp_Context {
     /* end common header */
 } Interp_Context;
 
-#define CONTEXT(ctx) ((ctx).state)
+#define CONTEXT(interp) ((interp)->ctx.state)
 
 #define CHUNKED_CTX_MEM 0           /* no longer works, but will be reinstated
                                      * some day; see src/register.c for details.

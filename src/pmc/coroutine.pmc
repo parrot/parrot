@@ -146,7 +146,7 @@ Swaps the "context".
                         "tail call to coro not allowed");
 
             /* first time set current sub, cont, object */
-            caller_ctx = CONTEXT(INTERP->ctx);
+            caller_ctx = CONTEXT(interp);
             ctx        = Parrot_alloc_context(INTERP, co->n_regs_used);
 
             co->ctx                   = ctx;
@@ -191,13 +191,13 @@ Swaps the "context".
             /* and the recent call context */
             ccont                 = ctx->current_cont;
             ctx->caller_ctx       = PMC_cont(ccont)->to_ctx
-                                  = CONTEXT(INTERP->ctx);
+                                  = CONTEXT(interp);
 
             /* set context to coro context */
             state                 = interp->dynamic_env;
             interp->dynamic_env   = co->dynamic_state;
             co->dynamic_state     = state;
-            CONTEXT(INTERP->ctx)  = ctx;
+            CONTEXT(interp)  = ctx;
             INTERP->ctx.bp        = ctx->bp;
             INTERP->ctx.bp_ps     = ctx->bp_ps;
         }
@@ -226,7 +226,7 @@ Swaps the "context".
             state                = interp->dynamic_env;
             interp->dynamic_env  = co->dynamic_state;
             co->dynamic_state    = state;
-            CONTEXT(INTERP->ctx) = ctx;
+            CONTEXT(interp) = ctx;
             INTERP->ctx.bp       = ctx->bp;
             INTERP->ctx.bp_ps    = ctx->bp_ps;
         }

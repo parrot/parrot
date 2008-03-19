@@ -164,7 +164,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
             real_exception(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
 
-        CONTEXT(interp->ctx)->current_pc = pc;
+        CONTEXT(interp)->current_pc = pc;
 
         DO_OP(pc, interp);
         trace_op(interp, code_start, code_end, pc);
@@ -214,7 +214,7 @@ runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
             real_exception(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
 
-        CONTEXT(interp->ctx)->current_pc = pc;
+        CONTEXT(interp)->current_pc = pc;
 
         DO_OP(pc, interp);
     }
@@ -246,7 +246,7 @@ runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
                     "attempt to access code outside of current code segment");
 
         Parrot_do_dod_run(interp, 0);
-        CONTEXT(interp->ctx)->current_pc = pc;
+        CONTEXT(interp)->current_pc = pc;
 
         DO_OP(pc, interp);
     }
@@ -285,7 +285,7 @@ runops_profile_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     while (pc) {/* && pc >= code_start && pc < code_end) */
         opcode_t cur_op;
 
-        CONTEXT(interp->ctx)->current_pc = pc;
+        CONTEXT(interp)->current_pc      = pc;
         profile->cur_op                  = cur_op = *pc + PARROT_PROF_EXTRA;
         profile->starttime               = Parrot_floatval_time();
         profile->data[cur_op].numcalls++;

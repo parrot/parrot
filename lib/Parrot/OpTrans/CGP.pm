@@ -68,7 +68,7 @@ sub defines {
     return $pred_def . <<END;
 /* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   \\
-     (opcode_t *) (op   - CONTEXT(i->ctx)->pred_offset)
+     (opcode_t *) (op   - CONTEXT(i)->pred_offset)
 END
 }
 

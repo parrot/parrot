@@ -184,13 +184,13 @@ Parrot_init_arg_nci(PARROT_INTERP, ARGOUT(call_state *st),
     init_call_stats(st);
 
     if (PMC_IS_NULL(interp->args_signature))
-        Parrot_init_arg_op(interp, CONTEXT(interp->ctx), interp->current_args,
+        Parrot_init_arg_op(interp, CONTEXT(interp), interp->current_args,
                            &st->src);
     else
-        Parrot_init_arg_indexes_and_sig_pmc(interp, CONTEXT(interp->ctx),
+        Parrot_init_arg_indexes_and_sig_pmc(interp, CONTEXT(interp),
             interp->current_args, interp->args_signature, &st->src);
 
-    Parrot_init_arg_sig(interp, CONTEXT(interp->ctx), sig, NULL, &st->dest);
+    Parrot_init_arg_sig(interp, CONTEXT(interp), sig, NULL, &st->dest);
 }
 
 
@@ -209,7 +209,7 @@ PARROT_API
 void
 Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig))
 {
-    Parrot_Context *ctx                 = CONTEXT(interp->ctx);
+    Parrot_Context *ctx                 = CONTEXT(interp);
     PMC            * const current_cont = ctx->current_cont;
 
     /* if this NCI call was a taicall, return results to caller's get_results
@@ -218,7 +218,7 @@ Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig
         ctx = PMC_cont(current_cont)->to_ctx;
 
     /* TODO simplify all */
-    Parrot_init_arg_sig(interp, CONTEXT(interp->ctx), sig, NULL, &st->src);
+    Parrot_init_arg_sig(interp, CONTEXT(interp), sig, NULL, &st->src);
     Parrot_init_arg_op(interp, ctx, ctx->current_results, &st->dest);
 }
 
@@ -453,7 +453,7 @@ fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
             break;
         case PARROT_ARG_PMC:
             if (st->src.u.sig.sig[st->src.i] == 'O')
-                UVal_pmc(st->val) = CONTEXT(interp->ctx)->current_object;
+                UVal_pmc(st->val) = CONTEXT(interp)->current_object;
             else {
                 UVal_pmc(st->val) = va_arg(*ap, PMC *);
                 dod_register_pmc(interp, UVal_pmc(st->val));
@@ -1548,7 +1548,7 @@ parrot_pass_args_fromc(PARROT_INTERP, ARGIN(const char *sig),
 {
     call_state st;
 
-    Parrot_init_arg_op(interp, CONTEXT(interp->ctx), dest, &st.dest);
+    Parrot_init_arg_op(interp, CONTEXT(interp), dest, &st.dest);
     Parrot_init_arg_sig(interp, old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
     Parrot_process_args(interp, &st, PARROT_PASS_PARAMS);
     return dest + st.dest.n + 2;
@@ -1575,7 +1575,7 @@ set_retval_util(PARROT_INTERP, ARGIN(const char *sig),
     interp->current_returns = NULL;
 
     if (todo) {
-        todo = Parrot_init_arg_sig(interp, CONTEXT(interp->ctx), sig, NULL,
+        todo = Parrot_init_arg_sig(interp, CONTEXT(interp), sig, NULL,
             &st->dest);
 
         if (todo) {

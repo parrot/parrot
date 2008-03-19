@@ -445,7 +445,7 @@ inline op invoke(invar PMC, invar PMC) {
 
 inline op yield() {
     opcode_t *dest = expr NEXT();
-    PMC * const p = CONTEXT(interp->ctx)->current_sub;
+    PMC * const p = CONTEXT(interp)->current_sub;
     dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
@@ -454,14 +454,14 @@ inline op tailcall(invar PMC) {
     opcode_t *dest;
     PMC * const p = $1;
     dest = expr NEXT();
-    interp->current_cont = CONTEXT(interp->ctx)->current_cont;
+    interp->current_cont = CONTEXT(interp)->current_cont;
     PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
     dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
 
 inline op returncc() {
-    PMC * const p = CONTEXT(interp->ctx)->current_cont;
+    PMC * const p = CONTEXT(interp)->current_cont;
     opcode_t * const dest = (opcode_t *)p->vtable->invoke(interp,
             p, expr NEXT());
     goto ADDRESS(dest);
@@ -522,7 +522,7 @@ op get_results(inconst PMC) {
     PMC * const signature = $1;
     INTVAL argc;
 
-    CONTEXT(interp->ctx)->current_results = _this;
+    CONTEXT(interp)->current_results = _this;
     argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
 }
@@ -536,7 +536,7 @@ op get_params(inconst PMC) {
     opcode_t *src_indexes, *dst_indexes;
 
     interp->current_params = _this;
-    ctx = CONTEXT(interp->ctx);
+    ctx = CONTEXT(interp);
     ccont = ctx->current_cont;
 
     caller_ctx = ctx->caller_ctx;
@@ -570,7 +570,7 @@ op set_returns(inconst PMC) {
     opcode_t *src_indexes, *dest_indexes;
 
     interp->current_returns = _this;
-    ctx = CONTEXT(interp->ctx);
+    ctx = CONTEXT(interp);
     ccont = ctx->current_cont;
 
     if (PMC_cont(ccont)->address) {
@@ -605,7 +605,7 @@ specified in F<docs/pdds/pdd03_calling_conventions.pod>.
 
 inline op result_info(out PMC) {
     /* Get context of callee from return continuation. */
-    PMC * const cc = CONTEXT(interp->ctx)->current_cont;
+    PMC * const cc = CONTEXT(interp)->current_cont;
     PMC *sig = NULL;
     if (cc && PMC_cont(cc)->to_ctx) {
         /* caller context has results */

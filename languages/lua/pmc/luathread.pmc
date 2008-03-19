@@ -23,7 +23,7 @@ This implementation is based on C<Parrot::Coroutine>.
 #include "lua_private.h"
 
 static PMC* curr_func(PARROT_INTERP) {
-    parrot_context_t *ctx = CONTEXT(interp->ctx);
+    parrot_context_t *ctx = CONTEXT(interp);
     PMC *sub = ctx->current_sub;
     return sub;
 }
