@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 package Parrot::Test::Lua;
@@ -101,6 +101,12 @@ foreach my $func ( keys %language_test_map ) {
         );
 
         my $builder_func = $language_test_map{$func};
+
+        # set a todo-item for Test::Builder to find
+        my $call_pkg = $self->{builder}->exported_to() || '';
+
+        local *{ $call_pkg . '::TODO' } = ## no critic Variables::ProhibitConditionalDeclarations
+                        \$options{todo} if defined $options{todo};
 
         # That's the reason for:   no strict 'refs';
         my $pass =
