@@ -337,7 +337,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
     DECL_CONST_CAST;
 
     /* set file/line/pc defaults */
-    info->file     = (char *) const_cast("(unknown file)");
+    info->file     = CONST_STRING(interp, "(unknown file)");
     info->line     = -1;
     info->pc       = -1;
     info->nsname   = NULL;
@@ -396,8 +396,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
             if (n >= offs) {
                 /* set source line and file */
                 info->line = debug->base.data[i];
-                info->file = string_to_cstring(interp,
-                Parrot_debug_pc_to_filename(interp, debug, i));
+                info->file = Parrot_debug_pc_to_filename(interp, debug, i);
                 break;
             }
             ADD_OP_VAR_PART(interp, sub->seg, pc, var_args);
@@ -426,28 +425,19 @@ STRING*
 Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
 {
     Parrot_Context_info info;
-    const char* const msg = (CONTEXT(interp) == ctx)
+    STRING             *res = NULL;
+    const char * const  msg = (CONTEXT(interp) == ctx)
         ? "current instr.:"
         : "called from Sub";
-    STRING *res;
 
     Parrot_block_DOD(interp);
     if (Parrot_Context_get_info(interp, ctx, &info)) {
         static const char unknown_file[] = "(unknown file)";
         DECL_CONST_CAST;
-        const char *file = info.file;
 
         res = Parrot_sprintf_c(interp,
-            "%s '%Ss' pc %d (%s:%d)", msg,
-            info.fullname, info.pc, file, info.line);
-
-        /* free the non-constant string, but not the constant one */
-        if (strncmp(unknown_file, file, sizeof (unknown_file) - 1) < 0)
-            string_cstring_free((char *)const_cast(info.file));
-        /* XXX This is probably a source of mis-freeing. */
-    }
-    else {
-        res = NULL;
+            "%s '%Ss' pc %d (%Ss:%d)", msg,
+            info.fullname, info.pc, info.file, info.line);
     }
 
     Parrot_unblock_DOD(interp);

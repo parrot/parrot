@@ -214,13 +214,13 @@ typedef struct Parrot_cont {
 #define PMC_cont(pmc) ((Parrot_cont *)PMC_struct_val(pmc))
 
 typedef struct Parrot_Context_info {
-    STRING* subname;
-    STRING* nsname;
-    STRING* fullname;
-    int pc;
-    const char *file;
-    int line;
+    STRING   *subname;
+    STRING   *nsname;
+    STRING   *fullname;
+    STRING   *file;
     opcode_t *address;
+    int       pc;
+    int       line;
 } Parrot_Context_info;
 
 /* HEADERIZER BEGIN: src/sub.c */
