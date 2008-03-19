@@ -531,7 +531,8 @@ sub parse {
         #
         #   }
         #   } continue {
-        #   } else {
+        #   }
+        #   else {
         #
 
         if ( $token->is_close_brace ) {

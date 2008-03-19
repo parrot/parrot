@@ -388,7 +388,8 @@ sub genfile {
             if(defined(my $val=$conf->data->get($1))) {
                 #use Data::Dumper;warn Dumper("val for $1 is ",$val);
                 $val;
-            } else {
+            }
+            else {
                 warn "value for '$1' in $source is undef";
                 '';
             }

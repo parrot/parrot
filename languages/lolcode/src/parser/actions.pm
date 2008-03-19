@@ -32,7 +32,8 @@ method statement ($/, $key) {
         $past.push( $it );
         $past.push( $( $<expression> ) );
         make $past;
-    } else {
+    }
+    else {
         make $( $/{$key} ); # For now
     }
 }
@@ -46,7 +47,8 @@ method declare($/) {
         $past.push( $( $<variable> ) );
         $past.push( $( $<expression>[0] ) );
         make $past;
-    } else {
+    }
+    else {
         make $( $<variable> );
     }
 }
@@ -174,7 +176,8 @@ method float($/) {
 method boolean($/) {
     if (~$/ eq 'FAIL' ) {
         make PAST::Val.new( :value( 0 ), :returns('Boolean'), :node($/) );
-    } else {
+    }
+    else {
         make PAST::Val.new( :value( 1 ), :returns('Boolean'), :node($/) );
     }
 }
@@ -187,7 +190,8 @@ method quote($/) {
 method variable ($/) {
     if ($<identifier> eq 'IT') {
         make PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
-    } else {
+    }
+    else {
         make PAST::Var.new( :name( $<identifier> ),
                             :scope('lexical'),
                             :viviself('Undef'),

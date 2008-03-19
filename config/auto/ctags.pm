@@ -76,7 +76,8 @@ sub _evaluate_ctags {
     if ($has_ctags) {
         $conf->data->set( ctags => $ctags );
         $self->set_result( 'yes' );
-    } else {
+    }
+    else {
         $conf->data->set( ctags => 'ctags' );
         $self->set_result( 'no' );
     }

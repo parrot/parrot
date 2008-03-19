@@ -62,7 +62,8 @@ sub runstep {
             if (defined $align) {
                 $minimum_valid_align = $align;
                 last TRY_ALIGN;
-            } else {
+            }
+            else {
                 next TRY_ALIGN;
             }
         }

@@ -51,7 +51,8 @@ sub print_conclusion {
         }
         print "You should diagnose and fix these errors before calling '$make'\n";
         return;
-    } else {
+    }
+    else {
         print <<"END";
 
 Okay, we're done!

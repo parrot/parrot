@@ -437,7 +437,8 @@ sub output_rule_def {
     #         (<rx_input>, <rx_pos>, <rx_stack>) = \@_;
     #         \$rx_match{'!INPUT'} = <rx_input>;
     #         \$rx_match{'!GROUPS'} ||= [];
-    #     } else {
+    #     }
+    #     else {
     #         \%rx_match = %{ shift() };
     #         <rx_input> = <rx_match>{'!INPUT'};
     #         <rx_pos> = <rx_match>{'!POS'};
@@ -470,7 +471,8 @@ END
     push @ops,
         "if (\$rx_mode) { goto "
         . $self->output_label_use($L_trymatch)
-        . "} else { goto "
+        . "}"
+        . "else { goto "
         . $self->output_label_use($L_backup) . "};";
 
     return @ops;
@@ -517,7 +519,8 @@ sub output_call {
 \$rx_pos = \$$uid\->{'!POS'};
 END
 
-    #     } else {
+    #     }
+    #     else {
     #         return split(/\n/, <<"END");
     # \$$uid = _rule_$name($mode, \$$uid || <rx_match>{'$uid'});
     # \$rx_pos = \$$uid\->{'!POS'};
@@ -552,7 +555,8 @@ while (my ($key, $val) = each %rx_match) {
         if (defined($start) && defined($end) && $start != -2 && $end != -2) {
             $MATCH{$key} = substr($rx_match{'!INPUT'}, $start, $end - $start);
         }
-    } else {
+    }
+    else {
         # Don't deal with parse tree yet
         $MATCH{$key} = $val;
     }

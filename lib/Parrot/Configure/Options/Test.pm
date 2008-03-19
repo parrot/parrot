@@ -25,7 +25,8 @@ for my $t (grep { /\.t$/ } readdir $DIRH2) {
     if ($t =~ m/(init|inter|auto|gen)_(\w+)-(\d{2})\.t$/) {
         ($type, $class, $num) = ($1,$2,$3);
         $steps_tests{$type}{$class}{$num}++;
-    } else {
+    }
+    else {
         carp "Unable to match $t";
     }
 }

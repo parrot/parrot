@@ -419,7 +419,8 @@ __DATA__
       if(elem.className == "details") {
         elem.className = "";  /* hack? */
         expander.innerHTML = "&laquo;";
-      } else {
+      }
+      else {
         elem.className = "details";
         expander.innerHTML = "&raquo;";
       }

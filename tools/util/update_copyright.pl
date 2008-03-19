@@ -37,13 +37,15 @@ foreach my $file (@ARGV) {
         if ($old_year eq $year) {
             warn "$file already up to date.\n";
             next;
-        } else {
+        }
+        else {
             $contents =~ s/$copyright_re/Copyright (C) $old_year-$year, The Perl Foundation./;
             open my $ofh, '>', $file;
             print {$ofh} $contents;
             close $ofh;
         }
-    } else {
+    }
+    else {
         warn "$file doesn't have a valid copyright line.\n";
     }
 }

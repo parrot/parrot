@@ -76,7 +76,8 @@ sub reduce {
         if (@$v == 2 && $v->[1] != -2) {
           $r{$k} = substr($input, $v->[0], $v->[1] - $v->[0] + 1);
         }
-      } else {
+      }
+      else {
         $r{$k} = reduce($v, $input);
       }
     }

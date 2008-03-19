@@ -11,7 +11,7 @@ use Parrot::Test::Util::Runloop;
 
 =head1 NAME
 
-t/codingstd/cuddled_else.t - checks for cuddled elses in C source and headers
+t/codingstd/cuddled_else.t - checks for cuddled elses in source and headers
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,10 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my @files = @ARGV ? @ARGV : (
+    $DIST->get_c_language_files(),
+    $DIST->get_perl_language_files(),
+);
 
 
 Parrot::Test::Util::Runloop->testloop(

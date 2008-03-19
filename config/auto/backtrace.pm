@@ -58,7 +58,8 @@ sub _evaluate_backtrace {
     my ($self, $conf, $anyerror) = @_;
     if ( $anyerror ) {
         $self->set_result("no");
-    } else {
+    }
+    else {
         $conf->data->set( glibc_backtrace => 1 );
         $self->set_result("yes");
     }

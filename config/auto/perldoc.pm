@@ -59,7 +59,8 @@ sub _initial_content_check {
         );
         $self->set_result('no');
         return;
-    } else {
+    }
+    else {
         return 1;
     }
 }
@@ -72,7 +73,8 @@ sub _analyze_perldoc {
         $content = capture_output("$cmd perldoc") || '';
         if ($content =~ m/perldoc/) {
             $version = $self->_handle_old_perldoc();
-        } else {
+        }
+        else {
             $version = $self->_handle_no_perldoc();
         }
     }

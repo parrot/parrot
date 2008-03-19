@@ -79,7 +79,8 @@ sub runstep {
             if $verbose;
         $self->set_result('failed');
         return;
-    } else {
+    }
+    else {
         $conf->data->set(
             fink_base_dir       => $fink_base_dir,
             fink_lib_dir        => $fink_lib_dir,
