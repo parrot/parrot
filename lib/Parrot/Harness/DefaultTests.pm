@@ -65,7 +65,6 @@ our @developing_tests = (
     map { "t/codingstd/$_" } qw(
         c_code_coda.t
         c_cppcomments.t
-        c_cuddled_else.t
         c_header_guards.t
         c_indent.t
         c_operator.t
@@ -75,6 +74,7 @@ our @developing_tests = (
         check_isxxx.t
         check_toxxx.t
         copyright.t
+        cuddled_else.t
         filenames.t
         gmt_utc.t
         linelength.t
