@@ -1,0 +1,38 @@
+# Parrot is Copyright (C) 2001-2008, The Perl Foundation.
+# $Id$
+
+=head1 DONORS
+
+We would like to thank the following people and institutions,
+whose financial contributions help support the development of Parrot.
+
+=over 4
+
+=item *
+
+ N: The Perl Foundation
+ W: perlfoundation.org
+
+=item * 
+
+ N: NLnet Foundation
+ W: nlnet.nl
+
+=item * 
+
+ N: The Mozilla Foundation
+ W: www.mozilla.org
+
+=item  * 
+
+ N: Best Practical
+ W: bestpractical.com
+
+=back
+
+=head1 ERRATA
+
+Information will be added to this file as it becomes available.
+For errors and omissions, please contact Will Coleda <will@coleda.com>.
+
+=cut
