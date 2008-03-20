@@ -211,6 +211,8 @@ Add a release announcement to news/[year]/Parrot-[release].html.
 Update C</index.html> (The old mini-announcement may be commented out).
 Update C</.htredirects> to point to the proper CPAN URL.
 
+Update the Wikipedia entry at L<http://en.wikipedia.org/wiki/Parrot_virtual_machine>.
+
 If your name is Allison, Will, or chromatic, you will be able to
 commit these changes yourself; be sure to test locally in combust
 before pushing the update out.  Otherwise, prepare the changes and
