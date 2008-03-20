@@ -62,7 +62,6 @@ sub new {
             $self->new_item( '', 'parrotbug' ),
             $self->new_item( '', 'tools/docs/pod_errors.pl' ),
             $self->new_item( '', 'tools/dev/manicheck.pl' ),
-            $self->new_item( '', 'tools/dev/run_indent.pl' ),
         ),
         $self->new_group(
             'Documentation',
