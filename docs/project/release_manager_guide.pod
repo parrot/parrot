@@ -171,10 +171,9 @@ See F<docs/project/pause_guide.pod> for more details.
 
 =item 9.
 
-Compose and send out the announcements -- parrot-porters,
-perl6-language, perl6-announce, perl5-porters, use Perl,
-PerlMonks, etc. Don't forget to include the next scheduled
-release date.
+Compose and send out the announcements -- parrot-porters, perl6-language,
+perl6-announce, perl5-porters, use Perl, Perl Monks, etc. Don't forget to
+include the next scheduled release date.
 
 Use F<tools/util/crow.pir> to make this part easier. You can specify the
 format of your announcments like so:
@@ -189,7 +188,7 @@ works well for use Perl and PerlMonks, and text for the rest.
 
 =item a
 
-Submit the use Perl announcement story to Slashdot, Newsforge, etc.
+Submit the use Perl announcement story to Slashdot, Newsforge, LWN, etc.
 Don't forget to set a Reply-To: or Followup-To: header, if your mail
 client lets you.
 
@@ -210,7 +209,7 @@ L<https://svn.perl.org/perl.org/docs/live/parrotcode>.
 
 Add a release announcement to news/[year]/Parrot-[release].html.
 Update C</index.html> (The old mini-announcement may be commented out).
-Update C</.htredirects> to point to the proper CPAN URL. 
+Update C</.htredirects> to point to the proper CPAN URL.
 
 If your name is Allison, Will, or chromatic, you will be able to
 commit these changes yourself; be sure to test locally in combust
@@ -227,7 +226,7 @@ Non-critical unresolved tickets can be simply unlinked.
 
 =item 11.
 
-You're done! Help yourself to a beer, cola or other celebratory drink.
+You're done! Help yourself to a beer, cola, or other celebratory drink.
 
 =back
 
