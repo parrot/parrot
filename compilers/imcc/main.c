@@ -236,17 +236,17 @@ when working from repository -- not from release versions).
 static void
 Parrot_version(PARROT_INTERP)
 {
-    int rev = PARROT_REVISION;
+    int rev;
     printf("This is parrot version " PARROT_VERSION);
-    if (rev != 0)
-        printf(" (r%d)", rev);
-    printf(" built for " PARROT_ARCHNAME ".\n");
     rev = Parrot_revision();
-    if (PARROT_REVISION != rev) {
+    if (rev != 0)
+        printf(" (r%d)", PARROT_REVISION);
+    printf(" built for " PARROT_ARCHNAME ".\n");
+    if (rev != 0 && PARROT_REVISION != rev) {
         printf("Warning: runtime has revision %d!\n", rev);
     }
     rev = Parrot_config_revision();
-    if (PARROT_REVISION != rev) {
+    if (rev != 0 && PARROT_REVISION != rev) {
         printf("Warning: used Configure.pl revision %d!\n", rev);
     }
     printf("Copyright (C) 2001-2008, The Perl Foundation.\n\
