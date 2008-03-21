@@ -194,7 +194,7 @@ $ENV{TEST_PROG_ARGS} = '-l no_lib';
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', '-l no_lib' );
 print "hello"
 CODE
-/^lua.pbc: module 'no_lib' not found:\n/
+/^lua[^:]*: [^:]+:\d+: module 'no_lib' not found:\n/
 OUTPUT
 
 }

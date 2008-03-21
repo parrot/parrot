@@ -346,9 +346,9 @@ show version information.
 
 
 .sub 'dostring' :anon
-    .param string s
+    .param string buf
     .param string name
-    ($P0, $S0) = lua_loadbuffer(s, name)
+    ($P0, $S0) = lua_loadbuffer(buf, name)
     if null $P0 goto L1
     ($P0 :slurpy) = docall($P0)
     .return report($P0 :flat)
@@ -365,12 +365,8 @@ show version information.
     $P0 = env.'rawget'(k_require)
     new $P1, 'LuaString'
     set $P1, name
-    push_eh _handler
-    $P0($P1)
-    .return (0)
-  _handler:
-    .get_results ($P0, $S0)
-    .return report(1, $S0)
+    ($P0 :slurpy) = docall($P0, $P1)
+    .return report($P0 :flat)
 .end
 
 
