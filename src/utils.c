@@ -65,7 +65,8 @@ static void rec_climb_back_and_mark(
 static void swap(void **x, void **y);
 /* HEADERIZER END: static */
 
-#define move_reg(from, dest, c) (c)->mov((c)->interp, (dest), (from), (c)->info)
+#define move_reg(from, dest, c) (c)->mov((c)->interp, (unsigned char)(dest), \
+                                         (unsigned char)(from), (c)->info)
 
 /*
 
