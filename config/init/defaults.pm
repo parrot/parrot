@@ -56,7 +56,7 @@ sub runstep {
         longsize
         optimize
         sig_name
-        scriptdir
+        scriptdirexp
         use64bitint
     | ) {
         $conf->data->set_p5( $orig => $Config{$orig} );
