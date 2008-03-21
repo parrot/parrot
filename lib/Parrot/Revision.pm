@@ -59,8 +59,9 @@ sub _analyze_sandbox {
             ($revision) = $line =~ /(\d+)/;
         }
     }
-    elsif ( my @git_svn_info = qx/git svn log --limit=1 2>$nul/ and $? == 0 ) {
-        ($revision) = $git_svn_info[1] =~ m/^r(\d+)\D/xms;
+    elsif ( -d '.git' && (my @git_info = qx/git log -1 2>$nul/ and $? == 0) ) {
+        ($revision) =
+            $git_info[-1] =~ m[git-svn-id: https://svn.perl.org/parrot/trunk@(\d+) ];
     }
     elsif ( my @svk_info = qx/svk info 2>$nul/ and $? == 0 ) {
         if ( my ($line) = grep /(?:file|svn|https?)\b/, @svk_info ) {
