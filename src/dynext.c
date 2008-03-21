@@ -308,7 +308,7 @@ Parrot_init_lib(PARROT_INTERP,
                 ARGIN_NULLOK(PMC *(*load_func)(PARROT_INTERP)),
                 ARGIN_NULLOK(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
 {
-    PMC *lib_pmc;
+    PMC *lib_pmc = NULL;
 
     if (load_func)
         lib_pmc = (*load_func)(interp);
