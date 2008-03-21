@@ -19,7 +19,7 @@
 
 PARROT_API
 PARROT_CONST_FUNCTION
-UINTVAL Parrot_char_digit_value(SHIM_INTERP, UINTVAL character);
+INTVAL Parrot_char_digit_value(SHIM_INTERP, UINTVAL character);
 
 PARROT_API
 PARROT_MALLOC
