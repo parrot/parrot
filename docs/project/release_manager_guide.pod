@@ -64,7 +64,10 @@ The date of the next release is in L<Appendix 2>.
 =item C<rt.tracking>
 
 Create a new ticket for the next release.  Change the URL fragment here to use
-that ticket's number.
+that ticket's number.  Please use the release month in the ticket, and *don't*
+use the release number.  Releases are date-based, while release numbers are
+feature-based.  Project team members agree on the release number near the
+actual release, based on the features available in trunk at the time.
 
 =item C<rt.saved_search>
 
