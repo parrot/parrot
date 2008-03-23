@@ -199,7 +199,7 @@ ig_set(int i, int j, int N, ARGIN(unsigned int *graph))
 
 /*
 
-=item C<int ig_test>
+=item C<unsigned int ig_test>
 
 RT#48260: Not yet documented!!!
 
