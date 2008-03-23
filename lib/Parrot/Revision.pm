@@ -59,7 +59,7 @@ sub _analyze_sandbox {
             ($revision) = $line =~ /(\d+)/;
         }
     }
-    elsif ( -d '.git' && (my @git_info = qx/git log -1 2>$nul/ and $? == 0) ) {
+    elsif ( -d '.git' && (my @git_info = qx/git log -1 --grep=^git-svn-id: 2>$nul/ and $? == 0) ) {
         ($revision) =
             $git_info[-1] =~ m[git-svn-id: https://svn.perl.org/parrot/trunk@(\d+) ];
     }
