@@ -1,7 +1,9 @@
 #! perl
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
 use strict;
 use warnings;
-
 
 =head1 NAME
 
