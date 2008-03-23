@@ -509,7 +509,7 @@ PIO_win32_read(PARROT_INTERP,
 =item C<static size_t PIO_win32_write>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
-C<buffer> to C<*io>'s file descriptor. Returns C<(size_t)-1> on 
+C<buffer> to C<*io>'s file descriptor. Returns C<(size_t)-1> on
 failure.
 
 =cut
