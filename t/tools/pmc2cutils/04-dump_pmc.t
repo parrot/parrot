@@ -62,6 +62,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -100,6 +101,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -141,6 +143,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -156,6 +159,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -191,6 +195,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -236,6 +241,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -287,6 +293,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -329,6 +336,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -368,6 +376,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -411,6 +420,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -468,6 +478,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );

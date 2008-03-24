@@ -3,7 +3,6 @@
 package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
-use FindBin;
 use Storable ();
 use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
@@ -88,7 +87,7 @@ sub new {
         unless ( defined $allargsref->{args} and ref( $allargsref->{args} ) eq q{ARRAY} );
 
     unshift @{ $allargsref->{include} },
-        ( ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/" );
+        ( ".", "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc/" );
 
     foreach my $opt qw(nolines) {
         if ( !defined $allargsref->{opt}{$opt} ) {
@@ -100,7 +99,7 @@ sub new {
 
 =head3 C<dump_vtable()>
 
-    $self->dump_vtable("$FindBin::Bin/../../src/vtable.tbl");
+    $self->dump_vtable("$Bin/../../src/vtable.tbl");
 
 B<Purpose:>  Create a F<.dump> file for the default vtable (from which
 all PMCs inherit).

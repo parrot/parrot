@@ -41,6 +41,7 @@ my $cwd;
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");

@@ -65,6 +65,7 @@ my ( $tie, $msg, @lines );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -106,6 +107,7 @@ my ( $tie, $msg, @lines );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -148,6 +150,7 @@ my ( $tie, $msg, @lines );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
@@ -198,6 +201,7 @@ my ( $tie, $msg, @lines );
             include => \@include,
             opt     => \%opt,
             args    => [@args],
+            bin     => $Bin,
         }
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );

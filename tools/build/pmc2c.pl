@@ -4,10 +4,9 @@
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../..";
-use lib "$FindBin::Bin/../../lib";
 use Getopt::Long ();
+use FindBin qw($Bin);
+use lib "$Bin/../../lib";
 use Parrot::Pmc2c::Pmc2cMain ();
 
 my ( %action, %options, @pmc_include_paths );
@@ -39,11 +38,12 @@ my $self = Parrot::Pmc2c::Pmc2cMain->new(
         include => \@pmc_include_paths,
         opt     => \%options,
         args    => \@args,
+        bin     => $Bin,
     }
 );
 
 if ( $action{default} ) {
-    $self->dump_vtable("$FindBin::Bin/../../src/vtable.tbl");
+    $self->dump_vtable("$Bin/../../src/vtable.tbl");
     exit;
 }
 
