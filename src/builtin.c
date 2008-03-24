@@ -210,7 +210,7 @@ Takes the builtin's index, a signature string, and a flag indicating
 if conversion to PMCs is allowed.
 Compares the builtin's signature to the supplied string.
 Returns 1 if they match where it matters, (voids are ignored),
-returns 0 if they don't. 
+returns 0 if they don't.
 
 =cut
 
