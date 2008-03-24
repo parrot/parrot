@@ -63,7 +63,7 @@ my @steps = qw(
     auto::m4
     auto::ctags
     auto::revision
-    gen::icu
+    auto::icu
     gen::config_h
     gen::core_pmcs
     gen::parrot_include

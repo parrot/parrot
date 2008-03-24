@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/icu.pm - ICU
+config/auto/icu.pm - ICU
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ Configures ICU and add appropriate targets to the Makefile.
 
 =cut
 
-package gen::icu;
+package auto::icu;
 
 use strict;
 use warnings;

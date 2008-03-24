@@ -1,14 +1,14 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# gen_icu-01.t
+# auto_icu-01.t
 
 use strict;
 use warnings;
 use Test::More tests =>  2;
 use Carp;
 use lib qw( lib );
-use_ok('config::gen::icu');
+use_ok('config::auto::icu');
 
 =for hints_for_testing Provide an explanation in the POD for what 'ICU'
 is.  Try to test all branches and conditions; consult a recent code
@@ -23,17 +23,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-gen_icu-01.t - test config::gen::icu
+auto_icu-01.t - test config::auto::icu
 
 =head1 SYNOPSIS
 
-    % prove t/steps/gen_icu-01.t
+    % prove t/steps/auto_icu-01.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::gen::icu.
+The tests in this file test subroutines exported by config::auto::icu.
 
 =head1 AUTHOR
 
@@ -41,7 +41,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::gen::icu, F<Configure.pl>.
+config::auto::icu, F<Configure.pl>.
 
 =cut
 
