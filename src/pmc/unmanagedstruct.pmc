@@ -389,8 +389,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
 
             /* grab the struct from the metadata */
             if (ptr->pmc_ext && PMC_metadata(ptr)) {
-                ret = VTABLE_getprop(interp, ptr,
-                        CONST_STRING(interp, "_struct"));
+                ret = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
             }
             else {
                 real_exception(interp, NULL, E_TypeError,

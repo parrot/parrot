@@ -113,10 +113,11 @@ HEADER
     print $ALL "# $infile\n";
     my %this_file_seen;
 
-    # NOTE: when CONST_STRING gets used in a .pmc it *should not* be split
-    # across more than one line, because some compilers generate line
-    # numbers in such cases differently to the way gcc does this (a case in
-    # point is Intel's C compiler, icc) and hence the #defined CONST_STRING
+    # NOTE: when CONST_STRING gets used it and any macro invocations
+    # that it is used in *should not* be split across more than one
+    # line, because some compilers generate line numbers in such cases
+    # differently from the way gcc does this (a case in point is
+    # Intel's C compiler, icc) and hence the #defined CONST_STRING
     # won't be found by the compiler.
 
     # There is a chance that the same __LINE__ will reoccur if #line directives
