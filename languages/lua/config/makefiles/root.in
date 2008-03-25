@@ -185,10 +185,8 @@ $(LIBPATH)/lfs.pbc: $(LIBPATH)/lfs.pir
 $(LIBPATH)/md5.pbc: $(LIBPATH)/md5.pir
 	$(PARROT) --output=$(LIBPATH)/md5.pbc $(LIBPATH)/md5.pir
 
-$(LIBPATH)/sha1.pir: $(LIBPATH)/md5.pir
+$(LIBPATH)/sha1.pbc: $(LIBPATH)/md5.pir
 	$(PERL) -pe "s|md5|sha1|g; s|MD5|SHA1|g" $(LIBPATH)/md5.pir > $(LIBPATH)/sha1.pir
-
-$(LIBPATH)/sha1.pbc: $(LIBPATH)/sha1.pir
 	$(PARROT) --output=$(LIBPATH)/sha1.pbc $(LIBPATH)/sha1.pir
 
 Lua/parser.pm: Lua/lua51.yp
