@@ -40,7 +40,7 @@ for compiling programs in Parrot.
 =head2 POST::Node
 
 C<POST::Node> is the base class for all POST nodes.  It's derived from class
-C<PAST::Node> (see F<compilers/pct/src/PAST/Node.pir>).
+C<PCT::Node> (see F<compilers/pct/src/PCT/Node.pir>).
 
 =over 4
 
