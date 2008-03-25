@@ -54,10 +54,6 @@ See RT #48575.
 
 See RT #48567.
 
-=item * C<subtype> [post 0.5.2]
-
-See RT #48569.
-
 =item * C<new_from_string> [post 0.5.0]
 
 See RT #47011.

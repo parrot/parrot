@@ -659,17 +659,6 @@ Return the type of the PMC. Type is a unique number associated with the PMC when
 the PMC's class is loaded. Negative numbers are considered
 interpreter-specific, non-public types.
 
-=item subtype [deprecated: See RT #48569]
-
-  UINTVAL subtype(INTERP, PMC* self, INTVAL type)
-
-Return the subtype of a PMC. (Note that this may be unimplemented, and may go
-away). This is intended to return information about the PMC--what type of
-number or string it is, whether it's a scalar, hash, array, or list, and
-suchlike things.
-
-[This can be adequately handled by C<does> and C<inspect>.]
-
 =item name
 
   STRING* name(INTERP, PMC* self)

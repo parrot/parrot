@@ -27,8 +27,6 @@ INTVAL type_keyed(PMC* key)
 INTVAL type_keyed_int(INTVAL key)
 INTVAL type_keyed_str(STRING* key)
 
-UINTVAL subtype(INTVAL type)
-
 STRING* name()
 
 PMC* clone()
