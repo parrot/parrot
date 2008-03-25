@@ -6,7 +6,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More;
+plan( skip_all => "\nRelevant only when working in checkout from repository" )
+    unless (-e 'DEVELOPING');
+plan( tests =>  6 );
 use Carp;
 use lib (qw| lib |);
 use_ok('Parrot::Manifest');

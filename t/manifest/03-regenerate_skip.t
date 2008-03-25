@@ -6,7 +6,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More;
+plan( skip_all => "\nRelevant only when working in checkout from repository" )
+    unless (-e 'DEVELOPING');
+plan( tests => 10 );
 use Carp;
 use Cwd;
 use File::Copy;
@@ -36,8 +39,7 @@ ok( $print_str, "prepare_manifest_skip() returned" );
         or croak "Unable to copy $sk to tempdir";
     ok( -f $sk, "$sk found in tempdir" );
     my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
-    # RT#51860 this fails in a downloaded release
-    #ok( !$need_for_skip, "No need to regenerate $sk" );
+    ok( !$need_for_skip, "No need to regenerate $sk" );
     unlink qq{$tdir/$sk} or croak "Unable to delete file from tempdir";
     chdir $cwd
         or croak "Unable to change back from temporary directory after testing";

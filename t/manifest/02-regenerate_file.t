@@ -6,7 +6,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More;
+plan( skip_all => "\nRelevant only when working in checkout from repository" )
+    unless (-e 'DEVELOPING');
+plan( tests => 12 );
 use Carp;
 use Cwd;
 use File::Copy;
@@ -37,8 +40,7 @@ ok( $manifest_lines_ref, "prepare_manifest_skip() returned" );
         or croak "Unable to copy $f to tempdir";
     ok( -f $f, "$f found in tempdir" );
     my $need_for_file = $mani->determine_need_for_manifest($manifest_lines_ref);
-    # RT#51860: this fails in a downloaded release
-    #ok( !$need_for_file, "No need to regenerate $f" );
+    ok( !$need_for_file, "No need to regenerate $f" );
     chdir $cwd
         or croak "Unable to change back from temporary directory after testing";
     unlink qq{$tdir/$f} or croak "Unable to delete file from tempdir";
