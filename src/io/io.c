@@ -177,7 +177,7 @@ PMC *
 PIO_dup(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ParrotIO * const io   = PMC_data_typed(pmc, ParrotIO *);
-    const PIOHANDLE newfd = dup(io->fd);
+    const PIOHANDLE newfd = Parrot_dup(io->fd);
     ParrotIOLayer * layer = (ParrotIOLayer *)PMC_struct_val(pmc);
 
     ParrotIO * newio;
@@ -186,12 +186,12 @@ PIO_dup(PARROT_INTERP, ARGIN(PMC *pmc))
         layer = interp->piodata->default_stack;
     }
 
-    if (newfd == -1) {
+    if (newfd == (PIOHANDLE)-1) {
         real_exception(interp, NULL, 1, "could not dup an fd");
     }
 
     newio = PIO_fdopen_down(interp, layer, newfd, io->flags);
-    /* io could be null here but we still have to
+    /* io could be null here but we still have
      * to create a PMC for the caller, no PMCNULL here
      * as that would cause an exception upon access.
      */

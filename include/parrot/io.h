@@ -123,6 +123,12 @@ struct _ParrotIOLayer {
 #define PIO_DOWNLAYER(x)   (x)->down
 #define PIO_UPLAYER(x)     (x)->up
 
+#ifdef _MSC_VER
+/* Win32/MSVC has a deprecation warning about dup() in favor of _dup(). */
+#  define Parrot_dup(x) (PIOHANDLE)_dup((int)(x))
+#else /* !_MSC_VER */
+#  define Parrot_dup(x) (PIOHANDLE)dup((int)(x))
+#endif /* _MSC_VER */
 
 /* Others to come */
 #ifdef PIO_OS_UNIX
