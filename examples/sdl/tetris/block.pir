@@ -20,12 +20,6 @@ is not subclassed further.
 
 .namespace ["Tetris::Block"]
 
-.const int xPos      = 0
-.const int xPosDiff  = 1
-.const int yPos      = 2
-.const int Fall      = 3
-.const int Board     = 4
-
 .sub __onload :load
     $P0 = get_class "Tetris::Block"
     unless null $P0 goto END
@@ -67,40 +61,27 @@ The board the new block will belong to.
 .sub BUILD :method
     .param pmc board
     .local pmc prop
-    .local int id
 
-    classoffset id, self, "Tetris::Block"
-
-    #
     # set some properties
-    #
 
-    # xpos
     new prop, 'Integer'
     set prop, 0
-    setattribute self, id, prop
-    inc id
+    setattribute self, 'xpos', prop
 
-    # xposdiff
     new prop, 'Integer'
     set prop, 0
-    setattribute self, id, prop
-    inc id
+    setattribute self, 'xposdiff', prop
 
-    # ypos
     new prop, 'Integer'
     set prop, 0
-    setattribute self, id, prop
-    inc id
+    setattribute self, 'ypos', prop
 
-    # fall
     new prop, 'Integer'
     set prop, 0
-    setattribute self, id, prop
-    inc id
+    setattribute self, 'fall', prop
 
     # set the board the block blongs to
-    setattribute self, id, board
+    setattribute self, 'board', board
 
     # return the block
     .return (self)
@@ -115,9 +96,7 @@ This method returns nothing.
 =cut
 
 .sub fall :method
-    classoffset $I0, self, "Tetris::Block"
-    add $I0, Fall
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'fall'
     $P0 = 1
 .end
 
@@ -128,9 +107,7 @@ Returns whether the block is falling down fast.
 =cut
 
 .sub falling :method
-    classoffset $I0, self, "Tetris::Block"
-    add $I0, Fall
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'fall'
     $I0 = $P0
 
     .return ($I0)
@@ -150,27 +127,18 @@ Returns the x and y position of the block.
     .local pmc xposdiffP
     .local pmc yposP
 
-    classoffset $I0, self, "Tetris::Block"
-    add $I0, xPos
-    getattribute xposP, self, $I0
-    sub $I0, xPos
-
-    add $I0, xPosDiff
-    getattribute xposdiffP, self, $I0
-    sub $I0, xPosDiff
-
-    add $I0, yPos
-    getattribute yposP, self, $I0
-    sub $I0, yPos
+    getattribute xposP,     self, 'xpos'
+    getattribute xposdiffP, self, 'xposdiff'
+    getattribute yposP,     self, 'ypos'
 
     # calculate the ypos
-    $I0 = self."vfree"()
+    $I0  = self."vfree"()
     ypos = yposP
     sub ypos, $I0
 
     # calculate the xpos
     xpos = xposP
-    $I0 = xposdiffP
+    $I0  = xposdiffP
     add xpos, $I0
 
     .return (xpos, ypos)
@@ -221,9 +189,7 @@ Returns 1 if the rotation was possible, 0 otherwise.
 
     # no => can i move the block?
     i = self."hfree"()
-    classoffset $I0, self, "Tetris::Block"
-    add $I0, xPosDiff
-    getattribute temp, self, $I0
+    getattribute temp, self, 'xposdiff'
     set temp, i
 
     # is the position of the rotated block still valid?
@@ -248,9 +214,7 @@ Returns the board associated with this block.
 
 .sub board :method
     # get the board
-    classoffset $I0, self, "Tetris::Block"
-    add $I0, Board
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'board'
 
     .return ($P0)
 .end
@@ -265,9 +229,7 @@ Set the board associated with this block.
     .param pmc board
 
     # get the board
-    classoffset $I0, self, "Tetris::Block"
-    add $I0, Board
-    setattribute self, $I0, board
+    setattribute self, 'board', board
 .end
 
 =item valid = block."validPosition"()
@@ -367,13 +329,8 @@ This method returns 1 on success, 0 otherwise.
     .local int yold
     .local int valid
 
-    classoffset $I0, self, "Tetris::Block"
-    add $I0, xPos
-    getattribute xpos, self, $I0
-    sub $I0, xPos
-
-    add $I0, yPos
-    getattribute ypos, self, $I0
+    getattribute xpos, self, 'xpos'
+    getattribute ypos, self, 'ypos'
 
     set xold, xpos
     set yold, ypos

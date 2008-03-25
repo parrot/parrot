@@ -23,15 +23,13 @@ END:
 .sub BUILD :method
     .param pmc app
 
-    classoffset $I0, self, "Tetris::EventHandler"
-    setattribute self, $I0, app
+    setattribute self, 'app', app
 .end
 
 .sub app :method
     .local pmc app
 
-    classoffset $I0, self, "Tetris::EventHandler"
-    getattribute app, self, $I0
+    getattribute app, self, 'app'
     .return (app)
 .end
 

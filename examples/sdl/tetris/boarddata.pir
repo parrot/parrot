@@ -19,10 +19,6 @@ This is the base class of the Board class.
 
 .namespace ["Tetris::BoardData"]
 
-.const int bData   = 0
-.const int bWidth  = 1
-.const int bHeight = 2
-
 .sub __onload :load
     $P0 = get_class "Tetris::BoardData"
     unless null $P0 goto END
@@ -63,13 +59,10 @@ Returns the created data object.
     .local pmc data
     .local pmc temp
     .local int i
-    .local int id
-
-    classoffset id, self, "Tetris::BoardData"
 
     # create the data array
     new data, 'ResizablePMCArray'
-    setattribute self, id, data
+    setattribute self, 'data', data
 
     # calculate the array size
     set i, w
@@ -80,14 +73,12 @@ Returns the created data object.
     # store the width
     new temp, 'Integer'
     set temp, w
-    inc id
-    setattribute self, id, temp
+    setattribute self, 'width', temp
 
     # store the height
     new temp, 'Integer'
     set temp, h
-    inc id
-    setattribute self, id, temp
+    setattribute self, 'height', temp
 .end
 
 =back
@@ -117,8 +108,7 @@ This method returns nothing.
     .local pmc data
     .local int i
 
-    classoffset $I0, self, "Tetris::BoardData"
-    getattribute data, self, $I0
+    getattribute data, self, 'data'
 
     # get data size
     set i, data
@@ -132,8 +122,7 @@ END:
 .end
 
 .sub __get_integer :method
-    classoffset $I0, self, "Tetris::BoardData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     $I0 = $P0
     .return ($I0)
 .end
@@ -141,8 +130,7 @@ END:
 .sub __get_integer_keyed :method
     .param pmc key
 
-    classoffset $I0, self, "Tetris::BoardData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     $I0 = key
     $I1 = $P0
     if $I0 < $I1 goto OK
@@ -162,24 +150,21 @@ OK:
     .param pmc key
     .param int val
 
-    classoffset $I0, self, "Tetris::BoardData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     $P0[key] = val
 .end
 
 .sub __set_integer_native :method
     .param int val
 
-    classoffset $I0, self, "Tetris::BoardData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     $P0 = val
 .end
 
 .sub __push_integer :method
     .param int val
 
-    classoffset $I0, self, "Tetris::BoardData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     push $P0, val
 .end
 
@@ -190,9 +175,7 @@ Returns the width (number of blocks in one row) of the board.
 =cut
 
 .sub width :method
-    classoffset $I0, self, "Tetris::BoardData"
-    add $I0, bWidth
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'width'
     $I0 = $P0
     .return ($I0)
 .end
@@ -204,9 +187,7 @@ Returns the height (number of blocks in one column) of the board.
 =cut
 
 .sub height :method
-    classoffset $I0, self, "Tetris::BoardData"
-    add $I0, bHeight
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'height'
     $I0 = $P0
     .return ($I0)
 .end
@@ -222,14 +203,10 @@ Returns the width and height of the board.
     .local int h
     .local pmc temp
 
-    classoffset $I0, self, "Tetris::BoardData"
-    add $I0, bWidth
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'width'
     w = $P0
-    sub $I0, bWidth
 
-    add $I0, bHeight
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'height'
     h = $P0
 
     .return (w, h)

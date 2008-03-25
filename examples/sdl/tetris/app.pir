@@ -29,16 +29,6 @@ it parent classes nor is it subclassed.
 .include "timer.pasm"
 .namespace ["Tetris::App"]
 
-.const int tSDL               = 0
-.const int tEventHandler      = 1
-.const int tDebugFlags        = 2
-.const int tTimer             = 3
-.const int tTimerDisableCount = 4
-.const int tInTimer           = 5
-.const int tPlayers           = 6
-.const int tPalette           = 7
-.const int tBoards            = 8
-
 .sub __onload :load
     $P0 = get_class "Tetris::App"
     unless null $P0 goto END
@@ -89,10 +79,8 @@ This method throws an exception if an error occurs.
     # create the app object
     store_global "Tetris::App", "app", self
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tDebugFlags
     $P0 = new 'Hash'
-    setattribute self, $I0, $P0
+    setattribute self, 'DebugFlags', $P0
 
     # prepare SDL's constructor arguments
     $P0           = new 'Hash'
@@ -105,9 +93,7 @@ This method throws an exception if an error occurs.
     $P0 = new "SDL::App", $P0
 
     # store the SDL object
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tSDL
-    setattribute self, $I0, $P0
+    setattribute self, 'SDL', $P0
 
     # generate some data structures
     self."genPalette"()
@@ -117,15 +103,11 @@ This method throws an exception if an error occurs.
 
     # init the SDL event handler
     $P0 = new "Tetris::EventHandler", self
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tEventHandler
-    setattribute self, $I0, $P0
+    setattribute self, 'EventHandler', $P0
 
     # create the debug flags hash
     $P0 = new 'Hash'
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tDebugFlags
-    setattribute self, $I0, $P0
+    setattribute self, 'DebugFlags', $P0
 
     # start a new single player game
     self."newGame"( 1 )
@@ -144,10 +126,7 @@ The Tetris::App class provides the following methods:
 =cut
 
 .sub SDL :method
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tSDL
-
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'SDL'
 
     .return ($P0)
 .end
@@ -194,9 +173,7 @@ An exeption is thrown if an error occurs.
     .local pmc eh
     .local pmc loop
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tEventHandler
-    getattribute eh, self, $I0
+    getattribute eh, self, 'EventHandler'
 
     loop = new "SDL::Event"
 
@@ -224,22 +201,15 @@ An exeption is thrown if an error occurs.
     $P0[7] = 1
 
     $P1 = new 'Timer', $P0
-
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tTimer
-    setattribute self, $I0, $P1
-    sub $I0, tTimer
+    setattribute self, 'Timer', $P1
 
     $P0 = new 'Integer'
     $P0 = 1
-    add $I0, tTimerDisableCount
-    setattribute self, $I0, $P0
-    sub $I0, tTimerDisableCount
+    setattribute self, 'TimerDisableCount', $P0
 
     $P0 = new 'Integer'
     $P0 = 0
-    add $I0, tInTimer
-    setattribute self, $I0, $P0
+    setattribute self, 'InTimer', $P0
 .end
 
 =item app."setTimerStatus"( status )
@@ -249,9 +219,7 @@ An exeption is thrown if an error occurs.
 .sub setTimerStatus :method
     .param int status
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tTimer
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'Timer'
     set $P0[.PARROT_TIMER_RUNNING], status
 .end
 
@@ -260,9 +228,7 @@ An exeption is thrown if an error occurs.
 =cut
 
 .sub enableTimer :method
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tTimerDisableCount
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'TimerDisableCount'
     dec $P0
     if $P0 != 0 goto END
     self."setTimerStatus"( 1 )
@@ -274,9 +240,7 @@ END:
 =cut
 
 .sub disableTimer :method
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tTimerDisableCount
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'TimerDisableCount'
     inc $P0
     self."setTimerStatus"( 0 )
 .end
@@ -307,9 +271,7 @@ Returns the color palette.
 .sub palette :method
     .local pmc palette
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tPalette
-    getattribute palette, self, $I0
+    getattribute palette, self, 'Palette'
     if_null palette, CREATE
     branch RET
 CREATE:
@@ -371,9 +333,7 @@ NOT_BRIGHT:
     inc i
     if i < 16 goto GENLOOP
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tPalette
-    setattribute self, $I0, palette
+    setattribute self, 'Palette', palette
 
     .return (palette)
 .end
@@ -399,9 +359,7 @@ no board with the specified ID exists.
     .param int boardID
     .local pmc board
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tBoards
-    getattribute board, self, $I0
+    getattribute board, self, 'Boards'
 
     $I0 = board
     if boardID < $I0 goto OK
@@ -783,14 +741,10 @@ Returns 1 if the screen has been redrawn, 0 otherwise.
 
     # check the timer disable count
     # do nothing if the timer is disabled
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tTimerDisableCount
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'TimerDisableCount'
     if $P0 > 0 goto END
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tInTimer
-    getattribute inTimer, self, $I0
+    getattribute inTimer, self, 'InTimer'
 
     i = inTimer
     if i goto END
@@ -941,9 +895,7 @@ the boards array.
     .local pmc boards
     .local int count
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tBoards
-    getattribute boards, self, $I0
+    getattribute boards, self, 'Boards'
     count = 0
     if_null boards, END
     count = boards
@@ -1000,9 +952,7 @@ Returns the flag's (new) value.
     .local int ret
 
     # get the flags hash
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tDebugFlags
-    getattribute flag, self, $I0
+    getattribute flag, self, 'DebugFlags'
 
     # check the number of INT args
     unless got_value goto FLAG_GET
@@ -1044,9 +994,7 @@ This method returns nothing.
     # check the number of INT args
     if got_players goto SET
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tPlayers
-    getattribute temp, self, $I0
+    getattribute temp, self, 'Players'
     players = 1
     if_null temp, SET
     players = temp
@@ -1057,9 +1005,7 @@ SET:
     new temp, 'Integer'
     set temp, players
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tPlayers
-    setattribute self, $I0, temp
+    setattribute self, 'Players', temp
 END_SET:
 
     print "starting a "
@@ -1069,9 +1015,7 @@ END_SET:
     # create the boards array
     new temp, 'ResizablePMCArray'
 
-    classoffset $I0, self, "Tetris::App"
-    add $I0, tBoards
-    setattribute self, $I0, temp
+    setattribute self, 'Boards', temp
 
 NEWGAME_NEW_BOARD:
     if players <= 0 goto NEWGAME_END

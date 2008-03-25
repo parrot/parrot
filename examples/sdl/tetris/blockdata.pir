@@ -55,8 +55,7 @@ This method returns the old data representation.
     .local int v
     .local pmc olddata
 
-    classoffset $I0, self, "Tetris::BlockData"
-    getattribute olddata, self, $I0
+    getattribute olddata, self, 'data'
     olddata = clone olddata
 
     size = self."size"()
@@ -209,8 +208,7 @@ items in the blockdata array.
 =cut
 
 .sub size :method
-    classoffset $I0, self, "Tetris::BlockData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     $I0 = 0
     if_null $P0, END
     $I0 = $P0
@@ -224,8 +222,7 @@ END:
 .sub __set_pmc :method
     .param pmc data
 
-    classoffset $I0, self, "Tetris::BlockData"
-    setattribute self, $I0, data
+    setattribute self, 'data', data
 .end
 
 .sub __get_integer_keyed :method
@@ -234,8 +231,7 @@ END:
 
     index = key
 
-    classoffset $I0, self, "Tetris::BlockData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     if_null $P0, ERR
     $I0 = $P0
     if index >= $I0 goto ERR
@@ -260,8 +256,7 @@ ERR:
 
     index = key
 
-    classoffset $I0, self, "Tetris::BlockData"
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'data'
     if_null $P0, ERR
     $I0 = $P0
     if index >= $I0 goto ERR
