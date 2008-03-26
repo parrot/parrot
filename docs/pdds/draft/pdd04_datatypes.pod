@@ -289,8 +289,6 @@ Return the string value of the PMC
 
 Return the true/false value of the PMC
 
-=item get_bool_keyed
-
 =item get_pmc
 
 Return the PMC for this PMC.

@@ -34,10 +34,6 @@ See RT #48579.
 
 See RT #48581.
 
-=item * C<get_bool_keyed> [post 0.5.2]
-
-See RT #48571.
-
 =item * C<type> [post 0.5.2]
 
 See RT #48567.
