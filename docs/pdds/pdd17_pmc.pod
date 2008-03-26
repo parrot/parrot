@@ -864,10 +864,6 @@ key. The key is guaranteed not to be null for this function.
 
 Return the boolean value for the element indexed by a PMC key.
 
-=item get_bool_keyed_str [deprecated: See RT #48575]
-
-Return the boolean value for the element indexed by a string key.
-
 =item get_pmc_keyed
 
   PMC* get_pmc_keyed(INTERP, PMC* self, PMC* key)
