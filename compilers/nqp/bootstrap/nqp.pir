@@ -50,8 +50,8 @@ to the nqp compiler.
 .end
 
 
-.include '../src/Grammar_gen.pir'
-.include 'gen_actions.pir'
+.include 'src/Grammar_gen.pir'
+.include 'bootstrap/gen_actions.pir'
 
 
 .namespace
