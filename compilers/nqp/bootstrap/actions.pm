@@ -237,9 +237,8 @@ method while_statement($/) {
 
 method for_statement($/) {
     my $block := $( $<block> );
-    #$block.blocktype('sub');
-    $block.blocktype('immediate');
-    $block.symbol(:name('$_'), :scope('lexical'));
+    $block.blocktype('declaration');
+    $block.symbol( '$_', :scope('lexical'));
     my $topic_var := PAST::Var.new(:name('$_'), :scope('parameter'));
     $block[0].push($topic_var);
     my $past := PAST::Op.new($($<EXPR>),
