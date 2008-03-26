@@ -170,6 +170,9 @@ tree as a PIR code object that can be compiled.
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
           $P0 = interpinfo %2
           setattribute mob, '&!corou', $P0
+          .local int lastpos
+          lastpos = length target
+          if cpos > lastpos goto fail_rule
         CODE
     goto code_body
 
@@ -185,6 +188,9 @@ tree as a PIR code object that can be compiled.
           .local int cpos, iscont :unique_reg
           $P0 = get_hll_global ['PGE'], 'Match'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(self, adverbs :flat :named)
+          .local int lastpos
+          lastpos = length target
+          if cpos > lastpos goto fail_rule
         CODE
 
   code_body:
@@ -210,8 +216,7 @@ tree as a PIR code object that can be compiled.
   code_body_3:
 
     code.emit(<<"        CODE", PGE_CUT_RULE, returnop)
-          .local int pos, lastpos, rep, cutmark :unique_reg
-          lastpos = length target
+          .local int pos, rep, cutmark :unique_reg
         try_match:
           if cpos > lastpos goto fail_rule
           mfrom = cpos
