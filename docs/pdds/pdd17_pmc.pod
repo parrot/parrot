@@ -568,13 +568,6 @@ Return the class object for this PMC. For high-level objects, this is a
 C<Class> object (or other high-level class object). For low-level PMCs,
 this returns a C<PMCProxy> object.
 
-=item pmc_namespace [deprecated: See RT# 48144]
-
-  PMC* pmc_namespace(INTERP, PMC* self)
-
-Return the namespace object for this PMC. [NOTE: replaced by
-C<get_namespace>.]
-
 =item get_namespace
 
   PMC* get_namespace(INTERP, PMC* self)

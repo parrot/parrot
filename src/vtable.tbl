@@ -14,7 +14,7 @@ PMC* new_from_string(STRING* rep, INTVAL flags)
 void morph(INTVAL type) :write
 void mark()
 void destroy()
-PMC* pmc_namespace()
+PMC* get_namespace()
 
 # XXX FIXME should this be marked as writing?
 PMC* getprop(STRING* key)

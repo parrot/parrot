@@ -76,7 +76,7 @@ ok_1:
     print "\n"
     print "ok 2 - got name\n"
 
-    $P1 = $P0.'pmc_namespace'()
+    $P1 = $P0.'get_namespace'()
     $S1 = $P1
     print $S1
     print "\n"

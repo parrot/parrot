@@ -189,8 +189,8 @@ sub fixup_singleton {
     # Note that this trick won't work if the singleton inherits from something
     # else (because the MRO will still be shared).
 
-    unless ( $self->implements_vtable('pmc_namespace')
-        or $self->super_method('pmc_namespace') ne 'default' )
+    unless ( $self->implements_vtable('get_namespace')
+        or $self->super_method('get_namespace') ne 'default' )
     {
         my $body =
             Parrot::Pmc2c::Emitter->text(
@@ -198,7 +198,7 @@ sub fixup_singleton {
         $self->add_method(
             Parrot::Pmc2c::Method->new(
                 {
-                    name        => 'pmc_namespace',
+                    name        => 'get_namespace',
                     parent_name => $self->name,
                     parameters  => '',
                     body        => $body,

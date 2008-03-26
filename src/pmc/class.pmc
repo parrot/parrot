@@ -1467,14 +1467,14 @@ Sets the name of the class, and updates the namespace accoringly.
 
 /*
 
-=item C<void pmc_namespace()>
+=item C<void get_namespace()>
 
 Gets the namespace that this class is attached to.
 
 =cut
 
 */
-    METHOD pmc_namespace(PMC *_namespace :optional, int has_name :opt_flag) {
+    METHOD get_namespace(PMC *_namespace :optional, int has_name :opt_flag) {
         Parrot_Class * const _class        = PARROT_CLASS(SELF);
         PMC          * const ret_namespace = _class->_namespace;
         UNUSED(_namespace);

@@ -35,7 +35,7 @@ s/^(\s*)(PMC\s+\*new_from_string\(STRING\s+\*\w*,\s+INTVAL\s+\w*\)\s+{)/$1VTABLE
 s/^(\s*)(void\s+morph\(INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+mark\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+destroy\(\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(PMC\s+\*pmc_namespace\(\)\s+{)/$1VTABLE $2/;
+s/^(\s*)(PMC\s+\*get_namespace\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*getprop\(STRING\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+setprop\(STRING\s+\*\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+delprop\(STRING\s+\*\w*\)\s+{)/$1VTABLE $2/;

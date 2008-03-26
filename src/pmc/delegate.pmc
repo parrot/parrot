@@ -121,7 +121,7 @@ useful defaults and don't throw exceptions.
         return SELF->vtable->whoami;
     }
 
-    VTABLE PMC *pmc_namespace() {
+    VTABLE PMC *get_namespace() {
         return SELF->vtable->_namespace;
     }
 

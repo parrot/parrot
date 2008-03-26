@@ -227,7 +227,7 @@ a Key PMC that you can use with "new", for example.
 
 op classname(out PMC, invar PMC) :object_base {
     PMC *ns = Parrot_ns_get_name(interp,
-                                    VTABLE_pmc_namespace(interp, $2));
+                                    VTABLE_get_namespace(interp, $2));
     if (PMC_IS_NULL(ns) || VTABLE_elements(interp, ns) < 2)
     {
         real_exception(interp, NULL, NO_CLASS,

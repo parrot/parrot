@@ -583,7 +583,7 @@ Sets the name of the role, and updates the namespace accoringly.
 /*
 
 =item C<METHOD
-    pmc_namespace()>
+    get_namespace()>
 
 Gets the namespace associated with this role, if any.
 
@@ -591,7 +591,7 @@ Gets the namespace associated with this role, if any.
 
 */
 
-    METHOD pmc_namespace() {
+    METHOD get_namespace() {
         Parrot_Role *role          = PARROT_ROLE(SELF);
         PMC         *ret_namespace = role->_namespace;
         RETURN(PMC *ret_namespace);

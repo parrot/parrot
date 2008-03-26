@@ -352,14 +352,14 @@ Gets the name of the PMC.
 
 /*
 
-=item C<void pmc_namespace()>
+=item C<void get_namespace()>
 
 Gets the namespace that this class is attached to.
 
 =cut
 
 */
-    METHOD pmc_namespace() {
+    METHOD get_namespace() {
         Parrot_Class * const _pmc          = PARROT_CLASS(SELF);
         PMC          * const ret_namespace = _pmc->_namespace;
         RETURN(PMC *ret_namespace);

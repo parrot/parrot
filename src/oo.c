@@ -485,7 +485,7 @@ Parrot_find_vtable_meth(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *meth))
         PMC *ns;
 
         _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        ns     = VTABLE_pmc_namespace(interp, _class);
+        ns     = VTABLE_get_namespace(interp, _class);
 
         if (!PMC_IS_NULL(ns)) {
             PMC * const res = find_vtable_meth_ns(interp, ns, vtable_index);
@@ -1142,7 +1142,7 @@ get_init_meth(PARROT_INTERP, ARGIN(PMC *_class),
 #endif
 
     *meth_str = meth;
-    ns        = VTABLE_pmc_namespace(interp, _class);
+    ns        = VTABLE_get_namespace(interp, _class);
     method    = VTABLE_get_pmc_keyed_str(interp, ns, meth);
 
     return method;
@@ -1233,7 +1233,7 @@ do_initcall(PARROT_INTERP, ARGIN_NULLOK(PMC* _class), ARGIN_NULLOK(PMC *object),
             else
                 meth_str = CONST_STRING(interp, "init");
 
-            ns   = VTABLE_pmc_namespace(interp, parent_class);
+            ns   = VTABLE_get_namespace(interp, parent_class);
 
             /* can't use find_method, it walks mro */
             vtable_index = Parrot_get_vtable_index(interp, meth_str);
@@ -1738,7 +1738,7 @@ find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
         PMC* method, *ns;
 
         _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        ns = VTABLE_pmc_namespace(interp, _class);
+        ns = VTABLE_get_namespace(interp, _class);
         method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
         TRACE_FM(interp, _class, method_name, method);
         if (!PMC_IS_NULL(method)) {

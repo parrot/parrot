@@ -470,7 +470,7 @@ Returns the name of the PMC.
 
 /*
 
-=item C<PMC *pmc_namespace>
+=item C<PMC *get_namespace>
 
 Return the namespace for this PMC.
 
@@ -487,7 +487,7 @@ Store the method as a global in the namespace of this class.
 
 */
 
-    VTABLE PMC *pmc_namespace() {
+    VTABLE PMC *get_namespace() {
         return SELF->vtable->_namespace;
     }
 

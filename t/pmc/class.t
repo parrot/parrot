@@ -95,7 +95,7 @@ Tests the Class PMC.
   t_too_many_args:
     ok($I0, 'name() with too many args fails')
 
-    result = class.'pmc_namespace'()
+    result = class.'get_namespace'()
     is(result, 'Alex', 'name() with args sets namespace too')
 .end
 

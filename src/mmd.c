@@ -1360,7 +1360,7 @@ mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
             if (PObj_is_class_TEST(_class))
                 ns = Parrot_oo_get_namespace(interp, _class);
             else
-                ns = VTABLE_pmc_namespace(interp, _class);
+                ns = VTABLE_get_namespace(interp, _class);
             methodobj = VTABLE_get_pmc_keyed_str(interp, ns, meth);
             if (!PMC_IS_NULL(methodobj)) {
                 /*

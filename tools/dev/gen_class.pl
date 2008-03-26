@@ -63,7 +63,7 @@ pmclass $classname {
 
 EOF
 
-my %skip_bodies = map { $_ => 1 } qw( type name pmc_namespace );
+my %skip_bodies = map { $_ => 1 } qw( type name get_namespace );
 
 ## emit method bodies
 for (@$vtbl) {
