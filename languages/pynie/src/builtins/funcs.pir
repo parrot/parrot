@@ -40,7 +40,7 @@ Return True if all elements of the iterable are true.
 .sub 'all'
     .param pmc iterable
     .local pmc iter, result, obj
-    iter = new .Iterator, iterable
+    iter = new 'Iterator', iterable
     result = new 'Integer' # should be boolean or whatever
 
     .local int bool
@@ -70,7 +70,7 @@ Return True if any element of the iterable is true.
 .sub 'any'
     .param pmc iterable
     .local pmc iter, result, obj
-    iter = new .Iterator, iterable
+    iter = new 'Iterator', iterable
     result = new 'Integer' # should be bool
     .local int bool
 
@@ -162,13 +162,13 @@ be raised if i is outside that range.
     if i < 0 goto valueerror
     if i > 255 goto valueerror
     .local pmc result
-    result = new .String
+    result = new 'String'
     $S0 = chr i
     result = $S0
     .return (result)
 
   valueerror:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0['_message'] = "ValueError"
     throw $P0
 .end

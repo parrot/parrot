@@ -26,7 +26,7 @@ src/builtins/inplace.pir - Inplace assignments
     .local pmc isbol
     isbol = get_global '$isbol'
     .local pmc iter
-    iter = new .Iterator, args
+    iter = new 'Iterator', args
   iter_loop:
     unless iter goto iter_end
     $S0 = shift iter

@@ -26,7 +26,7 @@ src/parser/indent.pir - Helper parsing function for Python indents
     .param pmc adverbs         :slurpy :named
 
     .local pmc indents
-    indents = new .ResizablePMCArray
+    indents = new 'ResizablePMCArray'
     push indents, 0
     set_global '@!indents', indents
     .local int pos

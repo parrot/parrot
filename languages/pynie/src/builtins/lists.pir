@@ -13,7 +13,7 @@ src/builtins/lists.pir - List operations
 .sub 'listmaker'
     .param pmc args            :slurpy
     unless null args goto have_args
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
   have_args:
     .return (args)
 .end
