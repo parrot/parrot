@@ -551,22 +551,6 @@ C<get_string_keyed()> with it.
 
 /*
 
-=item C<INTVAL get_bool_keyed_int(INTVAL key)>
-
-Converts C<key> to a PMC key and returns the result of calling
-C<get_bool_keyed()> with it.
-
-=cut
-
-*/
-
-    INTVAL get_bool_keyed_int(INTVAL key) {
-        PMC *const r_key = INT2KEY(INTERP, key);
-        return SELF.get_bool_keyed(r_key);
-    }
-
-/*
-
 =item C<INTVAL elements_keyed_int(INTVAL key)>
 
 Converts C<key> to a PMC key and returns the result of calling

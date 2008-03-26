@@ -38,10 +38,6 @@ See RT #48581.
 
 See RT #48571.
 
-=item * C<get_bool_keyed_int> [post 0.5.2]
-
-See RT #48573.
-
 =item * C<get_bool_keyed_str> [post 0.5.2]
 
 See RT #48575.

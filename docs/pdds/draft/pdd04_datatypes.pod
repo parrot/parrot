@@ -291,8 +291,6 @@ Return the true/false value of the PMC
 
 =item get_bool_keyed
 
-=item get_bool_keyed_int
-
 =item get_bool_keyed_str
 
 =item get_pmc
