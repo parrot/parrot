@@ -512,8 +512,6 @@ op removeattribute(invar PMC, in INT) {
     real_exception(interp, NULL, UNIMPLEMENTED, "removeattribute is not implemented");
 }
 
-=item B<getattribute>(out PMC, invar PMC, in INT)
-
 =item B<getattribute>(out PMC, invar PMC, in STR)
 
 Get the attribute $3 from object $2 and put the result in $1.
@@ -527,12 +525,6 @@ class name, namespace, or key PMC.
 
 =cut
 
-inline op getattribute(out PMC, invar PMC, in INT) :object_classes {
-    real_exception(interp, NULL, UNIMPLEMENTED,
-            "Integer access to attributes has been deprecated, "
-            "use named attribute access instead. See RT #48729");
-}
-
 inline op getattribute(out PMC, invar PMC, in STR) :object_classes {
     $1 = VTABLE_get_attr_str(interp, $2, $3);
     goto NEXT();
@@ -542,8 +534,6 @@ inline op getattribute(out PMC, invar PMC, in PMC, in STR) :object_classes {
     $1 = VTABLE_get_attr_keyed(interp, $2, $3, $4);
     goto NEXT();
 }
-
-=item B<setattribute>(invar PMC, in INT, invar PMC)
 
 =item B<setattribute>(invar PMC, in STR, invar PMC)
 
@@ -556,12 +546,6 @@ for storing data for a parent class attribute that is overridden in a
 child class.) The parent $2 is a class name, namespace, or key PMC.
 
 =cut
-
-inline op setattribute(invar PMC, in INT, invar PMC) :object_classes {
-    real_exception(interp, NULL, UNIMPLEMENTED,
-            "Integer access to attributes has been deprecated, "
-            "use named attribute access instead. See RT #48729");
-}
 
 inline op setattribute(invar PMC, in STR, invar PMC) :object_classes {
     VTABLE_set_attr_str(interp, $1, $2, $3);
