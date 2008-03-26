@@ -75,7 +75,7 @@ And returns the node.
     .param pmc adverbs         :slurpy :named
 
     .local pmc iter
-    iter = new .Iterator, children
+    iter = new 'Iterator', children
   children_loop:
     unless iter goto children_end
     $P0 = shift iter
@@ -83,7 +83,7 @@ And returns the node.
     goto children_loop
   children_end:
 
-    iter = new .Iterator, adverbs
+    iter = new 'Iterator', adverbs
   adverbs_loop:
     unless iter goto adverbs_end
     $S0 = shift iter
@@ -134,7 +134,7 @@ Create and returns a clone of a PAST node.
     res.'push'($P1)
     goto iter_child_loop
   iter_child_end:
-    iter = new .Iterator, self
+    iter = new 'Iterator', self
   iter_attr_loop:
     unless iter goto iter_attr_end
     $S0 = shift iter
@@ -186,7 +186,7 @@ children.
 .sub 'iterator' :method
     .local pmc iter
     $P0 = self.'get_array'()
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
     iter = 0
     .return (iter)
 .end

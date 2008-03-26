@@ -116,7 +116,7 @@ eof:
 .sub test :main
     .param pmc argv
     null $P0
-    $P1 = new .Hash
+    $P1 = new 'Hash'
     $P1['f'] = '1.html'
     $S0 = argv[1]
     $I0 = $S0

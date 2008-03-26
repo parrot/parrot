@@ -138,13 +138,13 @@ PGE is authored and maintained by Patrick Michaud L<pmichaud@pobox.com>
 	.local int i, filecount
 	.local string filename
 	.local pmc File, OS, files, handle
-	files = new .ResizableStringArray
+	files = new 'ResizableStringArray'
 	files = argv
 	filecount = files
 	# define with-filename if there's more than one file
 	.If(filecount >= 2, { opts["with-filename"] = 1 })
-	File = new .File
-	OS = new .OS
+	File = new 'File'
+	OS = new 'OS'
 	# This must be here, or else it'll get filled with junk data we use stdin...
 	i = 0
 	.Unless(filecount, {
@@ -180,7 +180,7 @@ PGE is authored and maintained by Patrick Michaud L<pmichaud@pobox.com>
 				.If($S0 != '..', {
 					$S1 = filename . '/'
 					$S0 = $S1 . $S0
-					$P1 = new .ResizableStringArray
+					$P1 = new 'ResizableStringArray'
 					$P1[0] = $S0
 					$I0 = i + 1
 					splice files, $P1, $I0, 0

@@ -5,7 +5,7 @@
 	name_str = name
 
 	.local pmc greeting
-	greeting  = new .String
+	greeting  = new 'String'
 	greeting  = 'Hello, '
 	greeting .= name_str
 	greeting .= '!'

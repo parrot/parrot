@@ -533,7 +533,7 @@ pir_output_is( <<'CODE', <<'OUT', 'call inherited init vtable overrides' );
 .namespace [ 'Foo' ]
 .sub 'init' :method :vtable
     say 'Foo init'
-    $P1 = new .ResizablePMCArray
+    $P1 = new 'ResizablePMCArray'
     setattribute self, 'storage', $P1
 .end
 
