@@ -242,7 +242,7 @@ These functions return 0 if no arguments are present, or 1 on success.
 PARROT_API
 int
 Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP, ARGIN(parrot_context_t *ctx),
-        ARGIN(opcode_t *indexes), ARGIN_NULLOK(PMC* sig_pmc),
+        ARGIN_NULLOK(opcode_t *indexes), ARGIN_NULLOK(PMC* sig_pmc),
         ARGMOD(call_state_item *sti))
 {
     if (!sig_pmc && indexes) {
