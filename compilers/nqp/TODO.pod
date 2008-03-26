@@ -64,10 +64,6 @@ must be fixed.
 
 =over 4
 
-=item * The file C<bootstrap/actions.pm> must be aligned with the grammar file.
-At some points, the grammar defines #= keys, and these are missing in this
-action file as parameters.
-
 =item * it seems that the action for the C<for-statement> is broken.
 
 =item * NQP should not have a runtime containing support routines. The

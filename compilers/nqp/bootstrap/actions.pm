@@ -903,7 +903,7 @@ method quote($/) {
 
 
 
-method typename($/) {
+method typename($/, $key) {
     my $ns := $<name><ident>;
     my $shortname;
     PIR q<    $P0 = find_lex '$ns'         >;
@@ -933,7 +933,7 @@ method typename($/) {
 ##.end
 
 
-method number($/, $key?) {
+method number($/    ) {
     make PAST::Val.new(:node($/), :value(~$/), :returns('Integer'));
 }
 ##.sub 'number' :method
@@ -947,7 +947,7 @@ method number($/, $key?) {
 ##.end
 
 
-method subcall($/, $key?) {
+method subcall($/) {
     my $past := $($<arglist>);
     $past.name(~$<ident>);
     $past.pasttype('call');

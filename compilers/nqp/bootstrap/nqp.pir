@@ -49,7 +49,7 @@ to the nqp compiler.
     $P1 = $P0.'command_line'(args)
 .end
 
-
+.include 'src/builtins.pir'
 .include 'src/Grammar_gen.pir'
 .include 'bootstrap/gen_actions.pir'
 
