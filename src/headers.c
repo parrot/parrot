@@ -832,6 +832,8 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 #else
     const INTVAL start = 2;
 #endif
+
+    Parrot_forall_header_pools(interp, POOL_PMC, NULL, sweep_cb_pmc);
     Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
 
