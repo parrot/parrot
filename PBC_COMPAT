@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+3.12    2008.03.26	coke	deleted classoffset
 3.11    2008.03.26	coke	deleted getattribute_p_p_i,setattribute_p_p_i
 3.10    2007.12.18	coke	deleted print_newline opcode
 3.09	2007.12.13	chromatic	added copy_p_p opcode

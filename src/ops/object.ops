@@ -557,20 +557,6 @@ inline op setattribute(invar PMC, in PMC, in STR, invar PMC) :object_classes {
     goto NEXT();
 }
 
-=item B<classoffset>(out INT, invar PMC, in STR)
-
-Returns the offset of the first attribute for class $3 in object $2.
-Throws an exception if $3 isn't in $2's hierarchy.
-
-=cut
-
-op classoffset(out INT, invar PMC, in STR) :object_classes {
-    real_exception(interp, NULL, UNIMPLEMENTED,
-            "The 'classoffset' opcode has been deprecated, "
-            "use named attribute access instead. See RT #48727");
-}
-
-
 ###############################################################################
 
 =item B<inspect>(out PMC, in PMC)

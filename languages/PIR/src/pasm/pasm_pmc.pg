@@ -19,7 +19,6 @@ rule pmc_op {
 | removeattribute     <arg_hack> #
 | getattribute        <arg_hack> #
 | setattribute        <arg_hack> #
-| classoffset         <arg_hack> #
 | new <var> \, [ <arg_int> | <arg_string> | <macro_id> ]
 | typeof              <arg_hack> #
 | find_type           <arg_hack> #

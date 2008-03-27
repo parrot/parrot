@@ -325,19 +325,10 @@ You can access attributes by a short name:
   $P0 = getattribute self, 'legs'
   assign $P0, 4                   # set attribute's value
 
-a fully qualified name:
+or by a fully qualified name:
 
   $P0 = getattribute self, "Animal\0legs"
   assign $P0, 4                   # set attribute's value
-
-or by an index:
-
-  .local int offs
-  offs = classoffset 'Animal'
-  $I0 = offs + 0                  # 1st attribute
-  $P0 = getattribute self, $I0
-  $I0 = offs + 1                  # 2nd attribute
-  $P0 = getattribute self, $I0
 
 =head2 When should I use properties vs. attributes?
 

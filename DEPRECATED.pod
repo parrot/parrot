@@ -48,10 +48,6 @@ See RT #47011.
 
 =over 4
 
-=item * C<classoffset> [post 0.5.1]
-
-See RT # 48727. This was already deprecated, but not fully removed.
-
 =item * C<pioctl> [post 0.5.1]
 
 See RT #48589.

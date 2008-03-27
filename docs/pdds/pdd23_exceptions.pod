@@ -314,11 +314,6 @@ The C<ord> opcode throws C<exception;domain> when it's passed an empty
 argument or a string index that's outside the length of the string.  Payload
 is an array, first element being the string 'ord'.
 
-The C<classoffset> opcode throws C<exception;domain> when it's asked to
-retrieve the attribute offset for a class that isn't in the object's
-inheritance hierarchy.  Payload is an array: [0] string 'classoffset',
-[1] object in question, [2] ID of class not found.
-
 The C<find_charset> opcode throws C<exception;domain> if the charset name it's
 looking up doesn't exist.  Payload is an array: [0] string 'find_charset', [1]
 charset name that was not found.

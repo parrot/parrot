@@ -358,17 +358,6 @@ Return the R<CLASS> of the given R<OBJECT>.
 
 I<Arguments: P, P>
 
-=head2 classoffset
-
-X<classoffset opcode (PASM)>
-
-  classoffset R<OFFSET>, R<OBJECT>, R<CLASS>
-
-Return the offset R<OFFSET> of the first attribute of class R<CLASS> in
-object R<OBJECT>.
-
-I<Arguments: IR, P, S>
-
 =head2 clear_eh
 
 X<clear_eh>
