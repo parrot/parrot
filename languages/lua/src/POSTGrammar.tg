@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -28,17 +28,17 @@ transform post (PAST::Block) :language('PIR') {
     unless $S0 == '' goto L1
     $S0 = 'anon'
   L1:
-    name = node.'unique'($S0, '_')
     .local pmc post
-    new post, 'POST::Sub'
+    new post, 'Lua::POST::Sub'
+    name = post.'unique'($S0, '_')
     post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>':anon :lex', 'blocktype'=>'declaration', 'result'=>'')
     new $P0, 'Hash'
     post.'storage_lex'($P0)
     new $P0, 'Hash'
     post.'storage_const'($P0)
-    $P0 = post.'push_new'('POST::Ops')
+    $P0 = post.'push_new'('Lua::POST::Ops')
     post.'ops_const'($P0)
-    $P1 = post.'push_new'('POST::Ops')
+    $P1 = post.'push_new'('Lua::POST::Ops')
     post.'ops_subr'($P1)
     set_hll_global ['Lua::POST'], '$?SUB', post
     .local pmc iter, cpost
@@ -53,7 +53,7 @@ transform post (PAST::Block) :language('PIR') {
     set_hll_global ['Lua::POST'], '$?SUB', outerpost
     set_hll_global ['Lua::POST'], '@endlabels', endlabels
     .local string esc_name
-    esc_name = node.'escape'(name)
+    esc_name = post.'escape'(name)
     if null outerpost goto L4
     .local pmc ops_subr
     ops_subr = outerpost.'ops_subr'()
@@ -64,9 +64,9 @@ transform post (PAST::Block) :language('PIR') {
     outerpost.'ops_subr'($P0)
   L5:
     .local pmc ops
-    ops = post.'new'('POST::Ops', 'node'=>node)
+    ops = post.'new'('Lua::POST::Ops', 'node'=>node)
     ops.'push'(post)
-    $S0 = node.'unique'('fct_')
+    $S0 = post.'unique'('fct_')
     ops.'push_pirop'('inline', '    .const .Sub %0 = %1', $S0, esc_name)
     $P0 = ops.'push_pirop'('newclosure')
     $P0.'arglist'($P0, $S0)
@@ -76,7 +76,7 @@ transform post (PAST::Block) :language('PIR') {
     .return (ops)
   L4:
     .local pmc start
-    start = post.'new'('POST::Sub', 'name'=>'&start', 'pragma'=>':anon :main', 'result'=>'')
+    start = post.'new'('Lua::POST::Sub', 'name'=>'&start', 'pragma'=>':anon :main', 'result'=>'')
     start.'push_pirop'('inline', '    .param pmc args :optional')
     start.'push_pirop'('inline', '#    print "start\n"')
     start.'push_pirop'('inline', '    load_bytecode "languages/lua/lua.pbc"')
@@ -102,7 +102,7 @@ PIRCODE
 
 transform post (PAST::Stmts) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc iter
     iter = node.'iterator'()
@@ -166,7 +166,7 @@ transform pirop (PAST::Op) :language('PIR') {
     post.'result'($P0)
     .return (post)
   L1:
-    new post, 'POST::Op'
+    new post, 'Lua::POST::Op'
     post.'init'('node'=>node, 'pirop'=>$S0)
     .local pmc arglist, iter
     new arglist, 'ResizableStringArray'
@@ -188,7 +188,7 @@ transform pirop (PAST::Op) :language('PIR') {
 
 transform cmp (PAST::Op) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc expr1
     $P0 = node[0]
@@ -200,7 +200,7 @@ transform cmp (PAST::Op) :language('PIR') {
     ops.'push'(expr2)
     .local string pirop
     pirop = node.'pirop'()
-    $S0 = node.'unique'('$I')
+    $S0 = ops.'unique'('$I')
     ops.'push_pirop'(pirop, $S0, expr1, expr2)
     ops.'result'($S0)
     .return (ops)
@@ -209,7 +209,7 @@ transform cmp (PAST::Op) :language('PIR') {
 
 transform call (PAST::Op) :language('PIR') {
     .local pmc post
-    new post, 'POST::Op'
+    new post, 'Lua::POST::Op'
     post.'init'('node'=>node, 'pirop'=>'call', 'result'=>'')
     .local pmc arglist, iter, cpost
     new arglist, 'ResizableStringArray'
@@ -224,7 +224,7 @@ transform call (PAST::Op) :language('PIR') {
     $S0 = cpost.'result'()
     if first goto L3
     if iter goto L3
-    $I0 = isa cpost, 'POST::Op'
+    $I0 = isa cpost, 'Lua::POST::Op'
     unless $I0 goto L3
     $S1 = cpost.'pirop'()
     unless $S1 == 'call' goto L3
@@ -246,14 +246,14 @@ transform call (PAST::Op) :language('PIR') {
 
 transform len (PAST::Op) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc expr
     $P0 = node[0]
     expr = tree.'get'('post', $P0)
     ops.'push'(expr)
     $P0 = ops.'push_pirop'('callmethod', 'node'=>node)
-    $S0 = node.'escape'('len')
+    $S0 = ops.'escape'('len')
     $P0.'arglist'($S0, expr)
     ops.'result'($P0)
     .return (ops)
@@ -262,7 +262,7 @@ transform len (PAST::Op) :language('PIR') {
 
 transform and (PAST::Op) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local string type
     type = node.'pasttype'()
@@ -271,11 +271,11 @@ transform and (PAST::Op) :language('PIR') {
     expr1 = tree.'get'('post', $P0)
     ops.'push'(expr1)
     .local pmc label, endlabel
-    $S0 = node.'unique'(type, '_')
-    label = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = ops.'unique'(type, '_')
+    label = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     $S0 = $S0 . '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
-    $S0 = node.'unique'('$P')
+    endlabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
+    $S0 = ops.'unique'('$P')
     unless type == 'and' goto L1
     ops.'push_pirop'('if', expr1, label)
     goto L2
@@ -303,7 +303,7 @@ transform or (PAST::Op) :language('PIR') {
 
 transform vararg (PAST::Op) :language('PIR') {
     .local pmc post
-    new post, 'POST::Op'
+    new post, 'Lua::POST::Op'
     post.'init'('node'=>node, 'pirop'=>'call')
     post.'arglist'('mkarg', 'vararg')
     $P0 = post.'push_pirop'('new')
@@ -315,13 +315,13 @@ transform vararg (PAST::Op) :language('PIR') {
 
 transform if (PAST::Op) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc thenlabel, endlabel
-    $S0 = node.'unique'('if_')
-    thenlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = ops.'unique'('if_')
+    thenlabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     $S0 = $S0 . '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    endlabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     .local pmc expr
     $P0 = node[0]
     expr = tree.'get'('cond', $P0)
@@ -352,13 +352,13 @@ transform while (PAST::Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc looplabel, endlabel
-    $S0 = node.'unique'('while_')
-    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = ops.'unique'('while_')
+    looplabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     $S0 = $S0 . '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    endlabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     unshift endlabels, endlabel
     ops.'push'(looplabel)
     .local pmc expr
@@ -381,13 +381,13 @@ transform repeat (PAST::Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc looplabel, endlabel
-    $S0 = node.'unique'('repeat_')
-    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = ops.'unique'('repeat_')
+    looplabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     $S0 = $S0 . '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    endlabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     unshift endlabels, endlabel
     ops.'push'(looplabel)
     .local pmc blk
@@ -410,7 +410,7 @@ transform fornum (PAST::Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc e_var, e_limit, e_step
     $P0 = node[1]
@@ -430,23 +430,23 @@ transform fornum (PAST::Op) :language('PIR') {
     var = $P0.'result'()
     ops.'push'($P0)
     .local string limit, step
-    limit = node.'unique'('$P')
-    step = node.'unique'('$P')
+    limit = ops.'unique'('$P')
+    step = ops.'unique'('$P')
     ops.'push_pirop'('inline', '    (%0, %1, %2) = checkforloop(%3, %4, %5)', var, limit, step, e_var, e_limit, e_step)
     .local string incr
-    $S0 = node.'unique'('$N')
+    $S0 = ops.'unique'('$N')
     ops.'push_pirop'('set', $S0, step)
-    incr = node.'unique'('$I')
+    incr = ops.'unique'('$I')
     ops.'push_pirop'('isgt', incr, $S0, '0.0')
     .local pmc looplabel, endlabel, orlabel, blklabel
-    $S0 = node.'unique'('fornum_')
-    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = ops.'unique'('fornum_')
+    looplabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     $S1 = $S0 . '_or'
-    orlabel = ops.'new'('POST::Label', 'result'=>$S1)
+    orlabel = ops.'new'('Lua::POST::Label', 'result'=>$S1)
     $S1 = $S0 . '_blk'
-    blklabel = ops.'new'('POST::Label', 'result'=>$S1)
+    blklabel = ops.'new'('Lua::POST::Label', 'result'=>$S1)
     $S1 = $S0 . '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S1)
+    endlabel = ops.'new'('Lua::POST::Label', 'result'=>$S1)
     unshift endlabels, endlabel
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', incr, orlabel)
@@ -471,7 +471,7 @@ transform forlist (PAST::Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc explist, rpost
     explist = node[1]
@@ -483,7 +483,7 @@ transform forlist (PAST::Op) :language('PIR') {
     ops.'push'(rpost)
     func = rpost.'result'()
     if iter goto L1
-    $I0 = isa rpost, 'POST::Op'
+    $I0 = isa rpost, 'Lua::POST::Op'
     unless $I0 goto L1
     $S0 = rpost.'pirop'()
     unless $S0 == 'call' goto L1
@@ -507,7 +507,7 @@ transform forlist (PAST::Op) :language('PIR') {
     ops.'push'(rpost)
     state = rpost.'result'()
     if iter goto L2
-    $I0 = isa rpost, 'POST::Op'
+    $I0 = isa rpost, 'Lua::POST::Op'
     unless $I0 goto L2
     $S0 = rpost.'pirop'()
     unless $S0 == 'call' goto L2
@@ -557,10 +557,10 @@ transform forlist (PAST::Op) :language('PIR') {
     goto L7
   L8:
     .local pmc looplabel, endlabel
-    $S0 = node.'unique'('forlist_')
-    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = ops.'unique'('forlist_')
+    looplabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     $S0 = $S0 . '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    endlabel = ops.'new'('Lua::POST::Label', 'result'=>$S0)
     unshift endlabels, endlabel
     ops.'push'(looplabel)
     new iter, 'Iterator', tmp
@@ -582,7 +582,7 @@ transform forlist (PAST::Op) :language('PIR') {
     $P0 = ops.'push_pirop'('assign')
     $S0 = tmp[0]
     $P0.'arglist'(var, $S0)
-    $S0 = node.'unique'('$I')
+    $S0 = ops.'unique'('$I')
     ops.'push_pirop'('isa', $S0, var, '"LuaNil"')
     ops.'push_pirop'('if', $S0, endlabel)
     .local pmc blk
@@ -598,7 +598,7 @@ transform forlist (PAST::Op) :language('PIR') {
 
 transform return (PAST::Op) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local string result
     result = '('
@@ -611,7 +611,7 @@ transform return (PAST::Op) :language('PIR') {
     ops.'push'(cpost)
     $S0 = cpost.'result'()
     if iter goto L3
-    $I0 = isa cpost, 'POST::Op'
+    $I0 = isa cpost, 'Lua::POST::Op'
     unless $I0 goto L3
     $S1 = cpost.'pirop'()
     unless $S1 == 'call' goto L3
@@ -641,7 +641,7 @@ transform break (PAST::Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
     .local pmc post
-    new post, 'POST::Op'
+    new post, 'Lua::POST::Op'
     post.'init'('node'=>node, 'pirop'=>'goto')
     $P0 = endlabels[0]
     post.'arglist'($P0)
@@ -658,14 +658,14 @@ transform assign (PAST::Op) :language('PIR') {
     lpost = tree.'get'('post', $P0)
     lpost.'arglist'(lpost, rpost)
     .local pmc ops
-    ops = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node)
+    ops = lpost.'new'('Lua::POST::Ops', rpost, lpost, 'node'=>node)
     .return (ops)
 }
 
 
 transform assignlist (PAST::Op) :language('PIR') {
     .local pmc lpost, rpost, ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc namelist, explist
     namelist = node[0]
@@ -681,7 +681,7 @@ transform assignlist (PAST::Op) :language('PIR') {
     $S1 = rpost.'result'()
     push tmp, $S1
     if iter goto L1
-    $I0 = isa rpost, 'POST::Op'
+    $I0 = isa rpost, 'Lua::POST::Op'
     unless $I0 goto L1
     $S0 = rpost.'pirop'()
     unless $S0 == 'call' goto L1
@@ -705,7 +705,7 @@ transform assignlist (PAST::Op) :language('PIR') {
     rpost.'result'($S0)
   L2:
     .local pmc ass
-    new ass, 'POST::Ops'
+    new ass, 'Lua::POST::Ops'
     ass.'init'('node'=>node)
     new iter, 'Iterator', namelist
   L5:
@@ -733,7 +733,7 @@ transform assignlist (PAST::Op) :language('PIR') {
 
 transform parenthese (PAST::Op) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc expr
     $P0 = node[0]
@@ -750,29 +750,29 @@ transform cond (PAST::Val) :language('PIR') {
 
 
 transform post (PAST::Val) :language('PIR') {
-    .local string vtype
-    vtype = node.'vtype'()
-    $I0 = index vtype, 'Lua'
+    .local string type
+    type = node.'name'()
+    $I0 = index type, 'Lua'
     if $I0 < 0 goto L1
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc val
     val = ops.'push_pirop'('new')
-    $S0 = node.'escape'(vtype)
+    $S0 = ops.'escape'(type)
     val.'arglist'(val, $S0)
-    .local string name
-    name = node.'name'()
-    if name == '' goto L2
-    unless vtype == 'LuaString' goto L3
-    name = node.'escape'(name)
+    .local string value
+    value = node.'value'()
+    if value == '' goto L2
+    unless type == 'LuaString' goto L3
+    value = ops.'escape'(value)
   L3:
-    ops.'push_pirop'('set', val, name, 'result'=>val)
+    ops.'push_pirop'('set', val, value, 'result'=>val)
   L2:
     ops.'result'(val)
     .return (ops)
   L1:
-    .return tree.'get'(vtype, node)
+    .return tree.'get'(type, node)
 }
 
 
@@ -782,18 +782,18 @@ transform key (PAST::Val) :language('PIR') {
     .local pmc storage_const
     storage_const = subpost.'storage_const'()
     .local string name
-    name = node.'name'()
+    name = node.'value'()
     $I0 = exists storage_const[name]
     if $I0 goto L1
     .local pmc ops_const
     ops_const = subpost.'ops_const'()
     $S0 = 'k_' . name
-    $S1 = node.'escape'(name)
+    $S1 = ops_const.'escape'(name)
     $P0 = ops_const.'push_pirop'('inline', '    .const .LuaString %0 = %1', $S0, $S1)
     storage_const[name] = $S0
   L1:
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     $S0 = storage_const[name]
     ops.'result'($S0)
@@ -803,7 +803,7 @@ transform key (PAST::Val) :language('PIR') {
 
 transform constructor (PAST::Val) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc val
     val = ops.'push_pirop'('new')
@@ -819,7 +819,7 @@ transform constructor (PAST::Val) :language('PIR') {
     $P0 = shift iter
     $I0 = does $P0, 'array'
     if $I0 goto L3
-    kpost = ops.'new'('POST::Ops', 'node'=>node)
+    kpost = ops.'new'('Lua::POST::Ops', 'node'=>node)
     $P1 = kpost.'push_pirop'('new')
     $P1.'arglist'($P1, '"LuaNumber"')
     $S0 = i
@@ -828,7 +828,7 @@ transform constructor (PAST::Val) :language('PIR') {
     kpost.'result'($P1)
     vpost = tree.'get'('post', $P0)
     if iter goto L4
-    $I0 = isa vpost, 'POST::Op'
+    $I0 = isa vpost, 'Lua::POST::Op'
     unless $I0 goto L4
     $S0 = vpost.'pirop'()
     unless $S0 == 'call' goto L4
@@ -877,11 +877,11 @@ transform parameter (PAST::Var) :language('PIR') {
     .local pmc subpost
     subpost = get_hll_global ['Lua::POST'], '$?SUB'
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local string name
     name = node.'name'()
-    $I0 = node.'isslurpy'()
+    $I0 = node.'slurpy'()
     unless $I0 goto L1
     subpost.'push_param'('pmc', name, ':slurpy')
     .return (ops)
@@ -891,10 +891,10 @@ transform parameter (PAST::Var) :language('PIR') {
     .local string pname
     pname = 'param_' . name
     subpost.'push_param'('pmc', pname, ':optional')
-    $S0 = node.'escape'(name)
+    $S0 = ops.'escape'(name)
     ops.'push_pirop'('.lex', $S0, pname)
     .local pmc vivilabel
-    vivilabel = ops.'new'('POST::Label', 'name'=>'vivify_')
+    vivilabel = ops.'new'('Lua::POST::Label', 'name'=>'vivify_')
     ops.'push_pirop'('unless_null', pname, vivilabel)
     ops.'push_pirop'('new', pname, '"LuaNil"')
     ops.'push'(vivilabel)
@@ -910,12 +910,12 @@ transform lexical (PAST::Var) :language('PIR') {
     .local pmc storage_lex
     storage_lex = subpost.'storage_lex'()
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local string name, lname
     name = node.'name'()
-    lname = node.'escape'(name)
-    $I0 = node.'islvalue'()
+    lname = ops.'escape'(name)
+    $I0 = node.'lvalue'()
     if $I0 goto L1
     $I0 = exists storage_lex[name]
     if $I0 goto L2
@@ -928,7 +928,7 @@ transform lexical (PAST::Var) :language('PIR') {
     ops.'result'($S0)
     .return (ops)
   L1:
-    $I0 = node.'ismy'()
+    $I0 = node.'isdecl'()
     unless $I0 goto L3
     $I0 = exists storage_lex[name]
     if $I0 goto L3
@@ -940,7 +940,7 @@ transform lexical (PAST::Var) :language('PIR') {
     storage_lex[name] = pname
   L3:
     .local pmc post
-    new post, 'POST::Op'
+    new post, 'Lua::POST::Op'
     post.'init'('node'=>node, 'pirop'=>'store_lex')
     post.'push'(ops)
     post.'result'(lname)
@@ -950,7 +950,7 @@ transform lexical (PAST::Var) :language('PIR') {
 
 transform package (PAST::Var) :language('PIR') {
     .local pmc ops
-    new ops, 'POST::Ops'
+    new ops, 'Lua::POST::Ops'
     ops.'init'('node'=>node)
     .local pmc basepost, keypost
     $S0 = node.'scope'()
@@ -987,11 +987,11 @@ transform package (PAST::Var) :language('PIR') {
     .local pmc ops_const
     ops_const = subpost.'ops_const'()
     $S0 = 'k_' . name
-    $S1 = node.'escape'(name)
+    $S1 = ops_const.'escape'(name)
     $P0 = ops_const.'push_pirop'('inline', '    .const .LuaString %0 = %1', $S0, $S1)
     storage_const[name] = $S0
   L5:
-    new keypost, 'POST::Ops'
+    new keypost, 'Lua::POST::Ops'
     keypost.'init'('node'=>node)
     $S0 = storage_const[name]
     keypost.'result'($S0)
@@ -1003,7 +1003,7 @@ transform package (PAST::Var) :language('PIR') {
     key .= $S0
     key .= ']'
     ops.'result'(key)
-    $I0 = node.'islvalue'()
+    $I0 = node.'lvalue'()
     if $I0 goto L6
     $P0 = ops.'push_pirop'('set')
     $P0.'arglist'($P0, key)
@@ -1011,7 +1011,7 @@ transform package (PAST::Var) :language('PIR') {
     .return (ops)
   L6:
     .local pmc post
-    new post, 'POST::Op'
+    new post, 'Lua::POST::Op'
     post.'init'('node'=>node, 'pirop'=>'set')
     post.'push'(ops)
     post.'result'(key)

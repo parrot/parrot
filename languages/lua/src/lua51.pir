@@ -29,11 +29,8 @@ Used by F<languages/lua/lua.pir>.
 .namespace [ 'Lua' ]
 
 .sub '__onload' :anon :load :init
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pbc'
+    load_bytecode 'PCT.pbc'
     load_bytecode 'PGE/Text.pbc'
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'PCT/HLLCompiler.pbc'
 
     $P0 = subclass 'PCT::HLLCompiler', 'Lua::Compiler'
     addattribute $P0, '$ostgrammar'
@@ -739,68 +736,6 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ 'Lua::POST::Chunk' ]
-
-.sub '__onload' :anon :load :init
-    $P0 = subclass 'POST::Sub', 'Lua::POST::Chunk'
-.end
-
-.sub 'prologue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('prologue', value, has_value)
-.end
-
-.sub 'pir' :method
-    self.'cpir'()
-    $S0 = self.'prologue'()
-    if $S0 == '' goto L1
-    .local pmc code
-    new code, 'CodeString'
-    code.'emit'($S0)
-    $P0 = get_hll_global ['POST'], '$!subpir'
-    code .= $P0
-    set_hll_global ['POST'], '$!subpir', code
-  L1:
-.end
-
-
-.namespace [ 'POST::Node' ]
-
-.sub 'pop' :method
-    $P0 = self.'get_array'()
-    $P1 = pop $P0
-    .return ($P1)
-.end
-
-
-.namespace [ 'POST::Sub' ]
-
-.sub 'ops_const' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('ops_const', value, has_value)
-.end
-
-.sub 'ops_subr' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('ops_subr', value, has_value)
-.end
-
-.sub 'storage_const' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('storage_const', value, has_value)
-.end
-
-.sub 'storage_lex' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('storage_lex', value, has_value)
-.end
-
-
 .namespace [ 'Lua::Symbtab' ]
 
 .sub '__onload' :anon :load :init
@@ -854,6 +789,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .include 'languages/lua/src/lua51_gen.pir'
 .include 'languages/lua/src/PASTGrammar_gen.pir'
 .include 'languages/lua/src/POSTGrammar_gen.pir'
+.include 'languages/lua/src/POST.pir'
 
 =back
 

@@ -43,10 +43,13 @@ F<languages/lua/lib/luaregex.pir>.
 Two stages of tree transformation are used
 F<languages/lua/src/PASTGrammar.tg> & F<languages/lua/src/POSTGrammar.tg>.
 
-=item PAST-pm
+=item PAST
 
-The AST is represented with F<compilers/past-pm/PAST/Node.pir> and the OST
-with F<compilers/past-pm/POST/Node.pir>.
+The AST is represented with F<compilers/pct/src/PAST/Node.pir>.
+
+=item POST
+
+The OST is represented with F<languages/lua/src/POST.pir>.
 
 =item HLLCompiler
 
