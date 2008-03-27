@@ -257,8 +257,7 @@ Sets the x position of the LCD.
     .param int val
 
     $I0 = classoffset self, "SDL::LCD"
-    add $I0, 2
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'xpos'
     $P0 = val
 .end
 
@@ -271,9 +270,7 @@ Sets the y position of the LCD.
 .sub ypos :method
     .param int val
 
-    $I0 = classoffset self, "SDL::LCD"
-    add $I0, 3
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'ypos'
     $P0 = val
 .end
 

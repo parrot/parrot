@@ -63,16 +63,13 @@ The stopwatch will be drawn onto the specified screen.
 .sub init :vtable :method
     .param pmc screen
 
-    $I0 = classoffset self, 'SDL::StopWatch'
-
     $P0 = new 'Float'
     $P0 = 0
-    setattribute self, $I0, $P0
+    setattribute self, 'time', $P0
 
-    inc $I0
     $P0 = new 'Float'
     $P0 = 0.1
-    setattribute self, $I0, $P0
+    setattribute self, 'precision', $P0
 
     inc $I0
     $P0 = new 'Float'
@@ -98,15 +95,12 @@ Resets the stopwatch.
     .local pmc start
 
     # read the attributes
-    $I0 = classoffset self, 'SDL::StopWatch'
-    total = getattribute self, $I0
-    inc $I0
-    precision = getattribute self, $I0
-    inc $I0
-    start = getattribute self, $I0
+    total     = getattribute self, 'time'
+    precision = getattribute self, 'precision'
+    start     = getattribute self, 'start'
 
-    total = 0
-    start = 0
+    total     = 0
+    start     = 0
 .end
 
 =item start()
@@ -121,12 +115,9 @@ Starts the stopwatch.
     .local pmc start
 
     # read the attributes
-    $I0 = classoffset self, 'SDL::StopWatch'
-    total = getattribute self, $I0
-    inc $I0
-    precision = getattribute self, $I0
-    inc $I0
-    start = getattribute self, $I0
+    total     = getattribute self, 'time'
+    precision = getattribute self, 'precision'
+    start     = getattribute self, 'start'
 
     if start != 0 goto END
 
@@ -151,29 +142,26 @@ Stops the stopwatch.
     .local pmc start
 
     # read the attributes
-    $I0 = classoffset self, 'SDL::StopWatch'
-    total = getattribute self, $I0
-    inc $I0
-    precision = getattribute self, $I0
-    inc $I0
-    start = getattribute self, $I0
+    total     = getattribute self, 'time'
+    precision = getattribute self, 'precision'
+    start     = getattribute self, 'start'
 
     if start == 0 goto END
 
     time $N0
-    $N1 = start
-    $N0 = $N0 - $N1
+    $N1   = start
+    $N0   = $N0 - $N1
 
-    $N1 = total
-    $N0 += $N1
+    $N1   = total
+    $N0 + = $N1
 
-    $N1 = precision
-    $N0 /= $N1
+    $N1   = precision
+    $N0 / = $N1
 
     total = $N0
     start = 0
 
-    $P0 = find_global "SDL::StopWatch::Timer", "removeWatch"
+    $P0   = find_global "SDL::StopWatch::Timer", "removeWatch"
     $P0( self )
 END:
 .end
@@ -192,26 +180,23 @@ reciprocal of the precision value.
     .local int ret
 
     # read the attributes
-    $I0 = classoffset self, 'SDL::StopWatch'
-    total = getattribute self, $I0
-    inc $I0
-    precision = getattribute self, $I0
-    inc $I0
-    start = getattribute self, $I0
+    total     = getattribute self, 'time'
+    precision = getattribute self, 'precision'
+    start     = getattribute self, 'start'
 
     ret = total
     if start == 0 goto END
 
     time $N0
-    $N1 = start
-    $N0 = $N0 - $N1
+    $N1   = start
+    $N0   = $N0 - $N1
 
-    $N1 = total
-    $N0 += $N1
+    $N1   = total
+    $N0 + = $N1
 
-    $N1 = precision
-    $N0 /= $N1
-    ret = $N0
+    $N1   = precision
+    $N0 / = $N1
+    ret   = $N0
 
 END:
     .return( ret )
@@ -258,11 +243,9 @@ It is drawn onto the screen consigned to the constructor.
     self = $S0
 
     .local pmc screen
+    screen = getattribute self, 'screen'
+    $P0    = find_global "SDL::LCD", "draw"
 
-    $I0 = classoffset self, "SDL::StopWatch"
-    add $I0, 3
-    screen = getattribute self, $I0
-    $P0 = find_global "SDL::LCD", "draw"
     $P0( screen )
 .end
 

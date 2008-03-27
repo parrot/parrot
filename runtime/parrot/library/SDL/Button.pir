@@ -66,39 +66,26 @@ An SDL::Button object has the following methods:
 .sub init_pmc :vtable :method
     .param pmc name
 
-    $I0 = classoffset self, 'SDL::Button'
-
-    # image
     $P0 = new 'SDL::Image', name
-    setattribute self, $I0, $P0
+    setattribute self, 'image', $P0
 
-    # status
-    inc $I0
     $P0 = new 'Integer'
     $P0 = 0
-    setattribute self, $I0, $P0
+    setattribute self, 'status', $P0
 
-    # states
-    inc $I0
     $P0 = new 'Integer'
     $P0 = 1
-    setattribute self, $I0, $P0
+    setattribute self, 'states', $P0
 
-    # rect
-    inc $I0
     $P0 = new 'SDL::Rect'
-    setattribute self, $I0, $P0
+    setattribute self, 'rect', $P0
 
-    # clicked
-    inc $I0
     $P0 = new 'Integer'
     $P0 = 0
-    setattribute self, $I0, $P0
+    setattribute self, 'clicked', $P0
 
-    # actions
-    inc $I0
     $P0 = new 'ResizablePMCArray'
-    setattribute self, $I0, $P0
+    setattribute self, 'actions', $P0
 .end
 
 =item set_integer_native
@@ -108,9 +95,7 @@ An SDL::Button object has the following methods:
 .sub set_integer_native :vtable :method
     .param int val
 
-    $I0 = classoffset self, 'SDL::Button'
-    inc $I0
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'status'
     $P0 = val
 .end
 
@@ -119,9 +104,7 @@ An SDL::Button object has the following methods:
 =cut
 
 .sub get_integer :vtable :method
-    $I0 = classoffset self, 'SDL::Button'
-    inc $I0
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'status'
     $I0 = $P0
 
     .return( $I0 )
@@ -134,9 +117,7 @@ An SDL::Button object has the following methods:
 .sub states :method
     .param int count
 
-    $I0 = classoffset self, 'SDL::Button'
-    add $I0, 2
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'states'
     $P0 = count
 .end
 
@@ -148,9 +129,7 @@ An SDL::Button object has the following methods:
     .param int x
     .param int y
 
-    $I0 = classoffset self, 'SDL::Button'
-    add $I0, 3
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'rect'
 
     $P0.'x'( x )
     $P0.'y'( y )
@@ -164,9 +143,7 @@ An SDL::Button object has the following methods:
     .param int w
     .param int h
 
-    $I0 = classoffset self, 'SDL::Button'
-    add $I0, 3
-    $P0 = getattribute self, $I0
+    $P0 = getattribute self, 'rect'
 
     $P0.'width'( w )
     $P0.'height'( h )
@@ -185,25 +162,18 @@ An SDL::Button object has the following methods:
     .local pmc srect
     .local pmc clicked
 
-    $I0 = classoffset self, 'SDL::Button'
+    image   = getattribute self, 'image'
 
-    image = getattribute self, $I0
+    $P0     = getattribute self, 'status'
+    status  = $P0
 
-    inc $I0
-    $P0 = getattribute self, $I0
-    status = $P0
+    $P0     = getattribute self, 'states'
+    states  = $P0
 
-    inc $I0
-    $P0 = getattribute self, $I0
-    states = $P0
+    drect   = getattribute self, 'rect'
+    clicked = getattribute self, 'clicked'
 
-    inc $I0
-    drect = getattribute self, $I0
-
-    inc $I0
-    clicked = getattribute self, $I0
-
-    srect = new 'SDL::Rect'
+    srect   = new 'SDL::Rect'
 
     $I1 = drect.'height'()
     srect.'height'( $I1 )
@@ -235,11 +205,8 @@ An SDL::Button object has the following methods:
     .local pmc rect
     .local pmc clicked
 
-    $I0 = classoffset self, 'SDL::Button'
-    add $I0, 3
-    rect = getattribute self, $I0
-    inc $I0
-    clicked = getattribute self, $I0
+    rect    = getattribute self, 'rect'
+    clicked = getattribute self, 'clicked'
 
     $I0 = rect.'x'()
     if x < $I0 goto OUT
@@ -285,16 +252,12 @@ END:
     .local int status
     .local pmc action
 
-    $I0 = classoffset self, 'SDL::Button'
-
-    inc $I0
-    $P0 = getattribute self, $I0
+    $P0    = getattribute self, 'status'
     status = $P0
 
-    add $I0, 4
-    action = getattribute self, $I0
+    action = getattribute self, 'actions'
 
-    $P0 = action[status]
+    $P0    = action[status]
 
     $P0( arg )
 .end
@@ -308,10 +271,7 @@ END:
     .param pmc cb
     .local pmc action
 
-    $I0 = classoffset self, 'SDL::Button'
-    add $I0, 5
-    action = getattribute self, $I0
-
+    action         = getattribute self, 'actions'
     action[status] = cb
 .end
 
