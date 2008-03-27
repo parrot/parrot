@@ -248,6 +248,8 @@ Accessor method -- sets/returns the C<name> attribute of the invocant.
 .end
 
 
+=back
+
 =head1 POST Node types
 
 =head2 POST::Node
@@ -813,6 +815,8 @@ Get/set
 .end
 
 
+=back
+
 =head1 NAME
 
 POST::Compiler - Compiler for POST trees
@@ -857,8 +861,6 @@ either PIR or executable bytecode.
     .return (code)
 .end
 
-
-=back
 
 =head1 HISTORY
 
