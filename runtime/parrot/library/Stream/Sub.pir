@@ -115,8 +115,8 @@ END:
     .local string str
 
     temp = self."source"()
-    typeof $I0, temp
-    if $I0 == .Undef goto END
+    $I0 = defined temp
+    unless $I0 goto END
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     setattribute self, 'write_cont', $P0

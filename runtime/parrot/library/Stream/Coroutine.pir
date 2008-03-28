@@ -49,8 +49,8 @@ END:
 
     null str
     coro = self."source"()
-    typeof $I0, coro
-    if $I0 == .Undef goto END
+    $I0 = defined coro
+    unless $I0 goto END
 
     str = coro( self )
 END:

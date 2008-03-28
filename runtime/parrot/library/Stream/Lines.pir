@@ -60,8 +60,8 @@ END:
     # XXX: check if the buffer is empty if the source stream is not connected
     getattribute $P0, self, 'source'
     if_null $P0, NOT_CONNECTED
-    typeof $I0, $P0
-    if $I0 == .Undef goto NOT_CONNECTED
+    $I0 = defined $P0
+    unless $I0 goto NOT_CONNECTED
     $I0 = $P0."connected"()
     .return($I0)
 NOT_CONNECTED:

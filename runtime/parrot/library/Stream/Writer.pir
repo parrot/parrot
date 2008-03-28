@@ -142,14 +142,13 @@ WRITE:
     setattribute self, 'writer', $P0
 
     source = self."source"()
-    if_null source, END
-    typeof $I0, source
-    if $I0 == .Undef goto END
+    $I0 = defined source
+    unless $I0 goto END
 
     source( str )
 END:
     .return()
-    goto WRITE	# XXX else self get's overwritten by source
+    goto WRITE	# XXX else self gets overwritten by source
 .end
 
 =item source."rawRead"() (B<internal>)

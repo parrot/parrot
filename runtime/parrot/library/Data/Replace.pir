@@ -98,8 +98,8 @@ CANT_REPLACE:
     find_global temp, "Data::Replace", name
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     # invoke it if found
-    typeof $I0, temp
-    if $I0 == .Undef goto REPLACE_PROPS
+    $I0 = defined temp
+    unless $I0 goto REPLACE_PROPS
     temp( where, oldVal, newVal, cache )
 
 REPLACE_PROPS:

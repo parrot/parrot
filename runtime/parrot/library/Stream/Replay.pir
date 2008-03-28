@@ -180,8 +180,8 @@ END:
     .local pmc clones
 
     null ret
-    typeof $I0, source
-    if $I0==.Undef goto END
+    $I0 = defined source
+    unless $I0 goto END
 
     getattribute strings, self, 'strings'
     getattribute clones, self, 'clones'
