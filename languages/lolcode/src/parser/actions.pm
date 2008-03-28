@@ -64,17 +64,20 @@ method function($/) {
     my $block := $( $<block> );
     $block.blocktype('declaration');
 
-    my $arglist := PAST::Stmts.new( :node($<arglist>) );
-    # if there are any parameters, get the PAST for each of them and
-    # adjust the scope to parameter.
-    $block.arity(0);
-    for $<parameters> {
-        #my $param := $($_);
-        #$param.scope('parameter');
-        my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
-        $param.isdecl(1);
-        $arglist.push($param);
-        $block.arity($block.arity() + 1);
+    my $arglist;
+    if $<arglist> {
+        $arglist := PAST::Stmts.new( :node($<arglist>) );
+        # if there are any parameters, get the PAST for each of them and
+        # adjust the scope to parameter.
+        $block.arity(0);
+        for $<parameters> {
+            #my $param := $($_);
+            #$param.scope('parameter');
+            my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
+            $param.isdecl(1);
+            $arglist.push($param);
+            $block.arity($block.arity() + 1);
+        }
     }
 
 
@@ -84,7 +87,7 @@ method function($/) {
     $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
     $block[0].push($it);
 
-    $block.unshift($arglist);
+    if $<arglist> { $block.unshift($arglist); }
 
     $block.name(~$<variable><identifier>);
     make $block;
