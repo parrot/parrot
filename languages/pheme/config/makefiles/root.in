@@ -4,6 +4,7 @@
 PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
+TOOL_DIR = ../..
 PGE_DIR  = ../../compilers/pge
 TGE_DIR  = ../../compilers/tge
 CP       = @cp@
@@ -12,7 +13,8 @@ CP       = @cp@
 all: pheme.pbc
 
 lib/pheme_grammar_gen.pir: lib/pheme.g
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pheme_grammar_gen.pir lib/pheme.g
+	$(PARROT) $(TOOL_DIR)/runtime/parrot/library/PGE/Perl6Grammar.pbc \
+	 --output=lib/pheme_grammar_gen.pir lib/pheme.g
 
 lib/ASTGrammar.pir: lib/pge2past.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=lib/ASTGrammar.pir lib/pge2past.tg
