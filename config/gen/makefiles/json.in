@@ -42,7 +42,7 @@ JSON/grammar.pbc : JSON/grammar.pir
 	$(PARROT) --output=JSON/grammar.pbc JSON/grammar.pir
 
 JSON/grammar.pir : JSON/grammar.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=JSON/grammar.pir JSON/grammar.pg
+	$(PARROT) $(TOOL_DIR)/runtime/parrot/library/PGE/Perl6Grammar.pbc --output=JSON/grammar.pir JSON/grammar.pg
 
 JSON/pge2pir.pbc : JSON/pge2pir.pir
 	$(PARROT) --output=JSON/pge2pir.pbc JSON/pge2pir.pir
