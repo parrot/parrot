@@ -72,13 +72,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "find_type nested, with key" );
     isgt I1, I0, 0
     print I1
     print "\n"
-
-    new P3, I0
-    print "new\n"
     end
 CODE
 1
-new
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "find_type nested, with array [EXPERIMENTAL]" );
@@ -92,13 +88,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "find_type nested, with array [EXPERIMENTA
     isgt I0, I0, 0
     print I0
     print "\n"
-
-    new P3, I0
-    print "new\n"
     end
 CODE
 1
-new
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get classname from class" );
@@ -938,10 +930,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods" )
   .local pmc i
   .local pmc j
   .local pmc k
-  $I0 = find_type "MyInt"
-  i = new $I0
-  j = new $I0
-  k = new $I0
+  i = new 'MyInt'
+  j = new 'MyInt'
+  k = new 'MyInt'
   i = 6
   j = 7
   k = i + j
