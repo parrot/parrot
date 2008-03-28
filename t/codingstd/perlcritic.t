@@ -151,12 +151,6 @@ else {
         $default_policies{'Bangs::ProhibitFlagComments'} = 1;
     }
 
-    # Give a diag to let users know if this is doing anything, how to repeat.
-    eval { require Perl::Tidy; };
-    if ( !$@ ) {
-        diag "Using $perl_tidy_conf for Perl::Tidy settings";
-    }
-
     # decide which policy group to use
     if ( $policy_group eq 'default' ) {
         %policies = %default_policies;
@@ -169,6 +163,14 @@ else {
     }
     else {
         warn "Unknown policy group, using 'default' policy group";
+    }
+
+    # Give a diag to let users know if this is doing anything, how to repeat.
+    if (exists $policies{'CodeLayout::RequireTidyCode'}) {
+        eval { require Perl::Tidy; };
+        if ( !$@ ) {
+            diag "Using $perl_tidy_conf for Perl::Tidy settings";
+        }
     }
 }
 
