@@ -345,7 +345,7 @@ token quote {
 }
 
 
-token typename { 
+token typename {
     <name> {*}                                             #= name
 }
 
@@ -375,8 +375,16 @@ proto 'term:' is precedence('z=')
     is parsed(&term)
     { ... }
 
+## Postfix operators
+proto postfix:<++> is looser('term:')
+    is pasttype('inline')
+    { ... }
+proto postfix:<--> is equiv(postfix:<++>)
+    is pasttype('inline')
+    { ... }
+
 ## Unary prefix operators
-proto prefix:<+> is looser('term:')
+proto prefix:<+> is looser(postfix:<++>)
     is pasttype('inline')
     { ... }
 proto prefix:<~> is equiv(prefix:<+>)
@@ -424,6 +432,19 @@ proto infix:<==> is looser(infix:<+>)
 proto infix:<!=> is equiv(infix:<==>)
     is pasttype('inline')
     { ... }
+proto infix:«>=» is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
+proto infix:«<=» is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
+proto infix:«>» is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
+proto infix:«<» is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
+
 proto infix:<eq> is equiv(infix:<==>)
     is pasttype('inline')
     { ... }

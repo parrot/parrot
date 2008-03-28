@@ -2,7 +2,7 @@
 
 # checking basic operands and circumfix:( )
 
-plan(17);
+plan(29);
 
 ##Additive operators
 ok(      1+2  == 3, 'Checking addition 1+2');
@@ -28,3 +28,21 @@ ok(  8%(3+2)  == 3, 'Checking compound statement 8%(3+2)');
 ok( 'a' ~ 'b' eq 'ab', 'Checking concatenation "a" ~ "b"');
 ok(  1  ~ 'b' eq '1b', 'Checking concatenation  1  ~ "b"');
 ok( 'a' ~  2  eq 'a2', 'Checking concatenation "a" ~  2 ');
+
+##Postfix operators
+my $x := 0;
+ok( $x++ == 0 );
+ok( $x   == 1 );
+ok( $x-- == 1 );
+ok( $x   == 0 );
+
+##Relational operators
+ok( ?(1 <  2) );
+ok( !(2 <  1) );
+ok( ?(2 <= 2) );
+ok( !(3 <= 2) );
+ok( ?(2 >  1) );
+ok( !(2 >  3) );
+ok( ?(2 >= 1) );
+ok( !(2 >= 3) );
+

@@ -25,6 +25,18 @@
         %r = $N0
         END
 
+    optable['postfix:++'; 'inline'] = <<"        END"
+        ##  inline postfix:++
+        clone %r, %0
+        inc %0
+        END
+
+    optable['postfix:--'; 'inline'] = <<"        END"
+        ##  inline postfix:--
+        clone %r, %0
+        dec %0
+        END
+
     optable['infix:=='; 'inline'] = <<"        END"
         ##  inline infix:==
         $I0 = cmp_num %0, %1
@@ -37,6 +49,38 @@
         ##  inline infix:!=
         $I0 = cmp_num %0, %1
         $I0 = isne $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:<'; 'inline'] = <<"        END"
+        ##  inline infix:!=
+        $I0 = cmp_num %0, %1
+        $I0 = islt $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:<='; 'inline'] = <<"        END"
+        ##  inline infix:!=
+        $I0 = cmp_num %0, %1
+        $I0 = isle $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:>'; 'inline'] = <<"        END"
+        ##  inline infix:!=
+        $I0 = cmp_num %0, %1
+        $I0 = isgt $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:>='; 'inline'] = <<"        END"
+        ##  inline infix:!=
+        $I0 = cmp_num %0, %1
+        $I0 = isge $I0, 0
         %r = new 'Integer'
         %r = $I0
         END
