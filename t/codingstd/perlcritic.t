@@ -106,6 +106,10 @@ if ( keys %policies ) {
     # if the policy is passed in on the command line, and it's one of the
     # ones where we require certain config arguments, then set them to the
     # ones we want here.
+
+    # XXX this information is being duplicated, we should only specify the
+    # perltidyrc once, e.g.
+
     if ( grep /CodeLayout::RequireTidyCode/, @input_policies ) {
         $policies{'CodeLayout::RequireTidyCode'} = { perltidyrc => $perl_tidy_conf };
     }
@@ -114,8 +118,8 @@ if ( keys %policies ) {
     }
 }
 else {
-
     # otherwise, just run perlcritic.t normally
+
     my %default_policies = (
         'BuiltinFunctions::ProhibitStringySplit'          => 1,
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
@@ -133,13 +137,19 @@ else {
         'Variables::ProhibitConditionalDeclarations'      => 1,
     );
 
-    # add other policies which aren't yet passing consistently see RT#42427
+    # Allow some names normally proscribed by PBP.
+    my @ambiguousNames = grep {$_ ne 'abstract'}
+        Perl::Critic::Policy::NamingConventions::ProhibitAmbiguousNames::default_forbidden_words();
+
+    # These policies are not yet passing consistently.
     my %extra_policies = (
-        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
-        'NamingConventions::ProhibitAmbiguousNames'       => 1,
-        'Subroutines::ProhibitBuiltinHomonyms'            => 1,
-        'Subroutines::ProhibitSubroutinePrototypes'       => 1,
-        'Subroutines::RequireFinalReturn'                 => 1,
+        'CodeLayout::RequireTidyCode' =>
+            { perltidyrc => $perl_tidy_conf },
+        'NamingConventions::ProhibitAmbiguousNames' =>
+            { forbid => join(" ", @ambiguousNames)},
+        'Subroutines::ProhibitBuiltinHomonyms'      => 1,
+        'Subroutines::ProhibitSubroutinePrototypes' => 1,
+        'Subroutines::RequireFinalReturn'           => 1,
     );
 
     # Add Perl::Critic::Bangs if it exists
