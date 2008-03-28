@@ -40,15 +40,15 @@ pir_output_is( <<'CODE', <<'OUT', "basic long options" );
 
         $P0 = getopts."add"()
         $P0."long"("foo")
-        $P0."type"(.String)
+        $P0."type"('String')
 
         $P0 = getopts."add"()
         $P0."long"("bar")
-        $P0."type"(.Float)
+        $P0."type"('Float')
 
         $P0 = getopts."add"()
         $P0."long"("bax")
-        $P0."type"(.Integer)
+        $P0."type"('Integer')
 
         $P0 = getopts."add"()
         $P0."long"("baz")
@@ -99,11 +99,11 @@ pir_output_is( <<'CODE', <<'OUT', "basic short options" );
 
         $P0 = getopts."add"()
         $P0."short"("f")
-        $P0."type"(.String)
+        $P0."type"('String')
 
         $P0 = getopts."add"()
         $P0."short"("A")
-        $P0."type"(.String)
+        $P0."type"('String')
 
         $P0 = getopts."add"()
         $P0."short"("c")
@@ -145,7 +145,7 @@ pir_output_is( <<'CODE', <<'OUT', "simple array" );
 
         $P0 = getopts."add"()
         $P0."short"("I")
-        $P0."type"(.Array)
+        $P0."type"('Array')
 
         $P1 = getopts."get_options"(argv)
 
@@ -180,7 +180,7 @@ pir_output_is( <<'CODE', <<'OUT', "mixing long and short with array" );
         $P0 = getopts."add"()
         $P0."long"("include")
         $P0."short"("I")
-        $P0."type"(.Array)
+        $P0."type"('Array')
 
         $P1 = getopts."get_options"(argv)
 
@@ -216,7 +216,7 @@ pir_output_is( <<'CODE', <<'OUT', "hash" );
         $P0 = getopts."add"()
         $P0."long"("define")
         $P0."short"("D")
-        $P0."type"(.Hash)
+        $P0."type"('Hash')
 
         $P1 = getopts."get_options"(argv)
 
@@ -427,17 +427,17 @@ pir_output_is( <<'CODE', <<'OUT', "optarg" );
         $P0 = getopts."add"()
         $P0."long"("foo")
         $P0."optarg"(1)
-        $P0."type"(.String)
+        $P0."type"('String')
 
         $P0 = getopts."add"()
         $P0."short"("f")
         $P0."optarg"(1)
-        $P0."type"(.String)
+        $P0."type"('String')
 
         $P0 = getopts."add"()
         $P0."short"("b")
         $P0."optarg"(1)
-        $P0."type"(.String)
+        $P0."type"('String')
 
         $P1 = getopts."get_options"(argv)
 

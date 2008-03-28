@@ -153,8 +153,8 @@ It is connected until the source sub returns.
     .local pmc stream
 
     getattribute $P0, self, 'source'
-    typeof $I0, $P0
-    if $I0 == .Undef goto NOT
+    typeof $S0, $P0
+    if $S0 == 'Undef' goto NOT
 
     can $I0, $P0, "connected"
     unless $I0 goto SKIP
