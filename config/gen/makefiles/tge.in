@@ -5,11 +5,11 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
-PGE_DIR   = ../../compilers/pge
 CP       = @cp@
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
+PERL6GRAMMAR      = $(PARROT_LIBRARY)/PGE/Perl6Grammar.pbc
 
 # the default target
 all: $(PARROT_LIBRARY)/TGE.pbc
@@ -36,7 +36,7 @@ TGE/Parser.pbc: TGE/Parser.pir
 	$(PARROT) -o TGE/Parser.pbc --output-pbc TGE/Parser.pir
 
 TGE/Parser.pir: TGE/Parser.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=TGE//Parser.pir TGE//Parser.pg
+	$(PARROT) $(PERL6GRAMMAR) --output=TGE//Parser.pir TGE//Parser.pg
 
 # This is a listing of all targets, that are meant to be called by users
 help:

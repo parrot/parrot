@@ -8,7 +8,7 @@ rule statements {
 }
 
 rule grammardec {
-    grammar <type> <inherit>?;
+    grammar <type> <inherit>?';'
 }
 
 rule inherit {
@@ -17,26 +17,26 @@ rule inherit {
 
 rule transrule {
     transform <name> 
-    \( <type> \)
+    '(' <type> ')'
     <parent>?
     <language>?
     <action>
 }
     
 rule parent {
-    \:applyto \( \'(<-[']>*)\' \)
+    ':applyto' '(' \'(<-[']>*)\' ')'
 }
 
 rule language {
-    \:language \( \'(\w+)\' \)
+    ':language' '(' \'(\w+)\' ')'
 }
 
 token action {
-    \{ (<-[}]>*) \}
+    '{' (<-[}]>*) '}'
 }
 
 token type {
-    [ \:\: ]? \w+ [ \:\: \w+ ]*
+    [ '::' ]? \w+ [ '::' \w+ ]*
 }
 
 token name { \w+ }
@@ -50,11 +50,11 @@ token ws {
 
 
 regex pod_comment {
-    ^^ = [ [ cut \h*: | end [\h\N*]? ]
-         | for [ \h\N+: ] \n [ \N+\n ]*:
-         | \w\N*: \n .*? \n = [ cut \h*: | end [\h\N*:]? ]
-         ]
-         [\n|$]
+    ^^ '=' [ [ cut \h*: | end [\h\N*]? ]
+           | for [ \h\N+: ] \n [ \N+\n ]*:
+           | \w\N*: \n .*? \n '=' [ cut \h*: | end [\h\N*:]? ]
+           ]
+           [\n|$]
 }
 
 token syntax_error { <?die: Syntax error> }
