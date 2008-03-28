@@ -40,8 +40,8 @@ method statement ($/, $key) {
 
 
 method declare($/) {
-    $($<variable>).isdecl(1);
     if ($<expression>) {
+        $($<variable>).isdecl(1);
         # XXX Someone clever needs to refactor this into C<assign>
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
         $past.push( $( $<variable> ) );
@@ -65,19 +65,17 @@ method function($/) {
     $block.blocktype('declaration');
 
     my $arglist;
-    if $<arglist> {
-        $arglist := PAST::Stmts.new( :node($<arglist>) );
-        # if there are any parameters, get the PAST for each of them and
-        # adjust the scope to parameter.
-        $block.arity(0);
-        for $<parameters> {
-            #my $param := $($_);
-            #$param.scope('parameter');
-            my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
-            $param.isdecl(1);
-            $arglist.push($param);
-            $block.arity($block.arity() + 1);
-        }
+    $arglist := PAST::Stmts.new();
+    # if there are any parameters, get the PAST for each of them and
+    # adjust the scope to parameter.
+    $block.arity(0);
+    for $<parameters> {
+        #my $param := $($_);
+        #$param.scope('parameter');
+        my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
+        $param.isdecl(1);
+        $arglist.push($param);
+        $block.arity($block.arity() + 1);
     }
 
 
@@ -87,7 +85,7 @@ method function($/) {
     $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
     $block[0].push($it);
 
-    if $<arglist> { $block.unshift($arglist); }
+    if $<parameters> { $block.unshift($arglist); }
 
     $block.name(~$<variable><identifier>);
     make $block;
