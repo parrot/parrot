@@ -46,7 +46,7 @@ Used by F<languages/lua/lua.pir>.
 
 .namespace [ 'Lua::Compiler' ]
 
-=head3 Overloaded methods
+=head2 Overloaded methods
 
 =over 4
 
@@ -100,6 +100,10 @@ resulting ost.
 
 
 .namespace [ 'Lua::PAST::Grammar' ]
+
+=head2 Functions
+
+=over 4
 
 =item C<internal_error>
 
