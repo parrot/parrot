@@ -11,7 +11,6 @@ use File::Basename qw( fileparse );
 use File::Spec::Functions qw( catfile splitpath splitdir );
 use File::Spec::Unix;
 use Parrot::Config;
-use Parrot::Revision;
 use ExtUtils::Manifest qw( maniread );
 
 =head1 NAME
