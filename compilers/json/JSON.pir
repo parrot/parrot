@@ -51,7 +51,7 @@ documentation at L<http://www.json.org/>.
     .param string json_string
 
    .local pmc parse, match
-   parse = get_root_global ['parrot'; 'JSON'], 'thing'
+   parse = get_root_global ['parrot'; 'JSON'], 'value'
 
    $P0 = get_root_global ['parrot'; 'PGE'], 'Match'
    match = $P0.'new'(json_string)

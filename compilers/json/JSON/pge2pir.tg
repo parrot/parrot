@@ -4,7 +4,7 @@ transform result (ROOT) {
     .local pmc pir
     .local string result
  
-    $S0 = tree.'get'('pir', node, 'thing')
+    $S0 = tree.'get'('pir', node, 'value')
 
     pir = new 'CodeString'
     pir.emit('.sub anon :anon')
@@ -16,7 +16,7 @@ transform result (ROOT) {
    .return(pir)
 } 
 
-transform pir (thing) {
+transform pir (value) {
 
     .local pmc sub_node, transform_result
     .local pmc pir, result
@@ -94,7 +94,7 @@ transform pir (object) {
 
     .local pmc keys
     keys  = items['string']
-    items = items['thing']
+    items = items['value']
 
     .local pmc iter, key_iter, child, key
     key_iter = new 'Iterator', keys
@@ -104,7 +104,7 @@ transform pir (object) {
 loop:
     unless iter goto end
     child = shift iter
-    $P0 = tree.'get'('pir', child, 'thing')
+    $P0 = tree.'get'('pir', child, 'value')
     $S0 = $P0
     pir .= $S0 
     child_result = child['ret']
@@ -138,14 +138,14 @@ transform pir (array) {
     items = node['elements']
     if null items goto end
 
-    items = items['thing']
+    items = items['value']
 
     .local pmc iter, child
     iter = new 'Iterator', items
 loop:
     unless iter goto end
     child = shift iter
-    $P0 = tree.'get'('pir', child, 'thing')
+    $P0 = tree.'get'('pir', child, 'value')
     $S0 = $P0
     pir .= $S0 
 
