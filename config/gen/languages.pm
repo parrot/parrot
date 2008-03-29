@@ -52,7 +52,8 @@ sub runstep {
         cardinal c99 cola
         eclectus ecmascript
         forth
-        hq9plus jako
+        hq9plus
+        jako
         lisp lolcode lua
         m4
         ook
