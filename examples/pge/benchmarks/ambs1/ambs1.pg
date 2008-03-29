@@ -1,12 +1,12 @@
 grammar Benchmark;
 
-token program { <?statement>+ }
+token program { <.statement>+ }
 
 rule statement { 
-    | print <expression> ;              {{ $I0 = match['expression']
+    | print <expression> ';'            {{ $I0 = match['expression']
                                            print $I0
 					   print "\n" }}
-    | <var> = <expression> ;            {{ $P0 = match['expression']
+    | <var> '=' <expression> ';'        {{ $P0 = match['expression']
                                            $S0 = match['var']
                                            set_global $S0, $P0 }}
 }
@@ -44,21 +44,20 @@ rule expression { <valor> [ <add> | <sub> ]* {{ $I0 = match['valor']
                                               iter_end1:
 
                                               end_part:
-                                                .return($I0)
+                                                match.'result_object'($I0)
                                               }}
 }
 
-rule add { \+ <valor> }
-rule sub { \- <valor> }
+rule add { '+' <valor> }
+rule sub { '-' <valor> }
 
 rule valor { <number>   {{ $I0 = match['number']
-                           .return ($I0) }}
+                           match.'result_object'($I0) }}
            | <var>      {{ $S0 = match['var']
                            $P0 = get_global $S0
                            $I0 = $P0
-                           .return($I0) }} 
+                           match.'result_object'($I0) }} 
 }
 
 token number { \d+ }
 token var    { <[a..z]>+ }
-

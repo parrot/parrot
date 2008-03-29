@@ -1,5 +1,5 @@
 PARROT=../../../../parrot
-PGC=../../../../compilers/pge/pgc.pir
+PGC=../../../../runtime/parrot/library/PGE/Perl6Grammar.pbc
 RM=rm -f
 
 ambs1_gen.pir: ambs1.pg
