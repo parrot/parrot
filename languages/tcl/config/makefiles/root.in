@@ -25,8 +25,8 @@ CFLAGS     = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_f
 CC         = @cc@
 
 
-PGE_DIR  = ../../compilers/pge
 TGE_DIR  = ../../compilers/tge
+PERL6GRAMMAR = ../../runtime/parrot/library/PGE/Perl6Grammar.pbc
 
 # can't use $(wildcard) and friends for PMCS, as these have to be in 
 # dependency order; with no duplicates. 
@@ -95,7 +95,7 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=$@ $<
 
 .pg.pir :
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=$@ $<
+	$(PARROT) $(PERL6GRAMMAR) --output=$@ $<
 
 .pir.pbc :
 	$(PARROT) --output=$@ $<

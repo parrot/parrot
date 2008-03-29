@@ -8,18 +8,18 @@ grammar TclExpr::Grammar;
 token ws { \h* }
 
 token program {
-   | <[;\n\r\t\ ]>* <command> [ <?ws> <[\r\n;]> <?ws> <command>? ]*
-   | $<empty>:=[^\s*$]
+   | <[;\n\r\t\ ]>* <command> [ <.ws> <[\r\n;]> <.ws> <command>? ]*
+   | $<empty>=[^\s*$]
 }
 
 token command {
-    | \# \N*
-    | [ $<word>:=( <expand>?
+    | '#' \N*
+    | [ $<word>=( <expand>?
           [ <quoted_word> [ <before [<[;\n\r\t\ ]>|$]>
                           | <error: extra characters after close-quote> ]
           | <braced_word> [ <before [<[;\n\r\t\ ]>|$]>
                           | <error: extra characters after close-brace> ]
-          | $<chunk>:=( <substitution> | \$ | <-[[$\\;\n\r\t\ ]>+ )+
+          | $<chunk>=( <substitution> | '$' | <-[[$\\;\n\r\t\ ]>+ )+
           ]
         ) \h*
       ]+
@@ -32,37 +32,37 @@ token substitution {
 }
 
 token quoted_word {
-    " $<chunk>:=( <substitution> | \$ | <-[[$\\"]>+ )* [ " | <error: missing "> ]
+    '"' $<chunk>=( <substitution> | '$' | <-[[$\\"]>+ )* [ '"' | <error: missing "> ]
 }
 
 token braced_word {
     <PGE::Text::bracketed: {}>
-  | \{ <error: missing close-brace>
+  | '{' <error: missing close-brace>
 }
 
 token command_substitution {
-    \[ \]
-  | \[ <[;\n\r\t\ ]>* <subcommand> [ <?ws> <[\r\n;]> <?ws> <subcommand>? ]* \]
-  | \[ <error: missing close-bracket>
+    '[' ']'
+  | '[' <[;\n\r\t\ ]>* <subcommand> [ <.ws> <[\r\n;]> <.ws> <subcommand>? ]* ']'
+  | '[' <error: missing close-bracket>
 }
 
 token subcommand {
-    | \# \N*
-    | [ $<word>:=( <expand>?
+    | '#' \N*
+    | [ $<word>=( <expand>?
           [ <quoted_word> [ <before [<[\];\n\r\t\ ]>|$]>
                           | <error: extra characters after close-quote> ]
           | <braced_word> [ <before [<[\];\n\r\t\ ]>|$]>
                           | <error: extra characters after close-brace> ]
-          | $<chunk>:=( <substitution> | \$ | <-[[$\]\\;\n\r\t\ ]>+ )+
+          | $<chunk>=( <substitution> | \$ | <-[[$\]\\;\n\r\t\ ]>+ )+
           ]
         ) \h*
       ]+
 }
 
 token variable_substitution {
-    \$ [ \{  ( <-[}]>+ )  \}
-       | ([\:\:]?<?name>) [ \( $<index>:=( <substitution> | \$ | <-[[$\\)]>+ )+ \) ]?
-       ]
+    '$' [ '{'  ( <-[}]>+ )  '}'
+        | ('::'?<.name>) [ '(' $<index>=( <substitution> | '$' | <-[[$\\)]>+ )+ ')' ]?
+        ]
 }
 
 token backslash_substitution {
@@ -74,7 +74,7 @@ token backslash_substitution {
 }
 
 token expand {
-    \{\*\}<!before:\s>
+    '{*}'<!before:\s>
 }
 
 # this is so we can use these rules in [subst]
@@ -104,10 +104,10 @@ rule boolean {
       | no    | n
       | on
       | off   | of )
-    <?wb>
+    <.wb>
 }
 
-rule nested { \( <expression> \) }
+rule nested { '(' <expression> ')' }
 
 token number { <scientific> | <float> | <integer> }
 
@@ -138,8 +138,8 @@ token nary_function { max | min }
 # XXX This should actually be a PIR rule so we can add more rules.
 token mathfunc {
   [ <nary_function> | <binary_function> | <unary_function> | <nullary_function> 
-  | ( <[a..zA..Z]>\w* )  \(  <unknown_math_function>  ]
-        \( [<expression> [, <expression>]*]? \)
+  | ( <[a..zA..Z]>\w* )  '('  <unknown_math_function>  ]
+        '(' [<expression> [',' <expression>]*]? ')'
 }
 
 rule 'expression' is optable {...}
