@@ -190,7 +190,7 @@ sub _handle_execcapable {
             TEMP_exec_h =>
 '$(SRC_DIR)/jit.h $(INC_DIR)/exec.h $(SRC_DIR)/exec_dep.h $(SRC_DIR)/exec_save.h',
             TEMP_exec_o =>
-                '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
+                '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_dep$(O) $(SRC_DIR)/exec_save$(O)',
             execcapable => 1
         );
     }
