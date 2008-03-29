@@ -42,10 +42,10 @@ sub runstep {
 
     # check the candidates for a 'make' program in this order:
     # environment ; option ; probe ; ask ; default
-    # first pick wins.
+    # first pick wins. On cygwin prefer make over nmake.
     $prog ||= $ENV{ uc($util) };
     $prog ||= $conf->options->get($util);
-    $prog ||= check_progs( ['gmake', 'mingw32-make', 'nmake', 'make'], $verbose );
+    $prog ||= check_progs( $^O eq 'cygwin' ? ['gmake', 'make'] : ['gmake', 'mingw32-make', 'nmake', 'make'], $verbose );
     if ( !$prog ) {
         $prog = ( $conf->options->get('ask') )
             ? prompt( $prompt, $prog ? $prog : $conf->data->get($util) )
