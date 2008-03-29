@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -501,7 +501,7 @@ Foo;Bar
 data for Foo;Bar
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init', todo => 'init keyed' );
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init' );
 .sub main :main
     $P1 = newclass ['Foo';'Bar']
     addattribute $P1, 'data'
@@ -529,7 +529,7 @@ pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init', todo =>
 .end
 CODE
 Foo;Bar
-1
+0
 1
 data for Foo;Bar
 OUT

@@ -1478,6 +1478,8 @@ assignment:
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $1, $4); }
    | target '=' NEW '[' keylist ']'
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $1, $5); }
+   | target '=' NEW '[' keylist ']' COMMA var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $5, $8); }
    | target '=' NEW var COMMA var
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
    | target '=' NEW var '[' keylist ']'
