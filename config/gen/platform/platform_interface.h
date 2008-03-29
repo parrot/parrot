@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2003-2007, The Perl Foundation.
+ * Copyright (C) 2003-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_PLATFORM_INTERFACE_H_GUARD
@@ -34,7 +34,7 @@ void Parrot_free_memalign(void *);
 #if !defined(PARROT_HAS_SOME_MEMALIGN)
 #  define Parrot_memalign_if_possible(a, s) malloc(s)
 #else
-#  define Parrot_memalign_if_possible(a, s) Parrot_memalign(a, s)
+#  define Parrot_memalign_if_possible(a, s) Parrot_memalign((a), (s))
 #endif
 
 #ifdef PARROT_HAS_EXEC_PROTECT
@@ -54,17 +54,17 @@ void* Parrot_memcpy_aligned(void*, void*, size_t);
 typedef void* (*Parrot_memcpy_func_t)(void *dest, const void *src, size_t);
 extern Parrot_memcpy_func_t Parrot_memcpy_aligned_sse;
 
-#  define Parrot_memcpy_aligned(d, s, l) Parrot_memcpy_aligned_sse(d, s, l)
+#  define Parrot_memcpy_aligned(d, s, l) Parrot_memcpy_aligned_sse((d), (s), (l))
 
 #elif defined(PARROT_HAS_I386_MMX)
 
 typedef void* (*Parrot_memcpy_func_t)(void *dest, const void *src, size_t);
 extern Parrot_memcpy_func_t Parrot_memcpy_aligned_mmx;
 
-#  define Parrot_memcpy_aligned(d, s, l) Parrot_memcpy_aligned_mmx(d, s, l)
+#  define Parrot_memcpy_aligned(d, s, l) Parrot_memcpy_aligned_mmx((d), (s), (l))
 
 #else
-#  define Parrot_memcpy_aligned(d, s, l) mem_sys_memcopy(d, s, l)
+#  define Parrot_memcpy_aligned(d, s, l) mem_sys_memcopy((d), (s), (l))
 #endif
 
 /*

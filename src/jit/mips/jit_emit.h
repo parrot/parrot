@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2007, The Perl Foundation.
+ * Copyright (C) 2003-2008, The Perl Foundation.
  */
 
 /*
@@ -101,7 +101,7 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 #  define emit_j(pc, opcode, target) \
       *(int *)((pc += 4) - 4) = opcode << 26 | target;
 
-#  define emit_nop(pc) emit_j(pc, 0, 0)
+#  define emit_nop(pc) emit_j((pc), 0, 0)
 
 /*  LW
  *

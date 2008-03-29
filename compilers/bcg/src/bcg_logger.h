@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_BCG_LOGGER_H_GUARD
@@ -9,7 +9,7 @@
 #include "bcg.h"
 
 #define MAX_MESSAGE_SIZE 1024
-#define BCG_THROW(bcg, excp)   longjmp((bcg)->jump_location, excp);
+#define BCG_THROW(bcg, excp)   longjmp((bcg)->jump_location, (excp));
 
 void bcg_throw_exception(BCG_info * bcg_info, const int code,
                          const char *format, ...);

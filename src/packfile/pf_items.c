@@ -85,7 +85,7 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 /*
  * round val up to whole size, return result in bytes
  */
-#define ROUND_UP_B(val, size) ((((val) + (size - 1))/(size)) * (size))
+#define ROUND_UP_B(val, size) ((((val) + ((size) - 1))/(size)) * (size))
 
 /*
  * round val up to whole opcode_t, return result in opcodes

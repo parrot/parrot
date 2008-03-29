@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 #include <stdio.h>
@@ -35,8 +35,8 @@ typedef enum arg_flags {
 
 } arg_flag;
 
-#define SET_FLAG(obj, flag)  obj |= flag
-#define TEST_FLAG(obj, flag) obj & flag
+#define SET_FLAG(obj, flag)  (obj) |= (flag)
+#define TEST_FLAG(obj, flag) (obj) & (flag)
 
 /*
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2006, The Perl Foundation.
+ * Copyright (C) 2001-2008, The Perl Foundation.
  * $Id$
 
 =head1 NAME
@@ -53,16 +53,16 @@ struct Reg {
     PMC *pmc_reg;
 };
 
-#define REG_INT(interp, x) interp->bp[x].int_reg
+#define REG_INT(interp, x) (interp)->bp[(x)].int_reg
 
 #if defined(PREDEREF_CORE)
-#  define IREG(x)   (_reg_base + pc[x])
-#  define ICONST(x) *(INTVAL*)pc[x]
-#  define SCONST(x) *(STRING**)pc[x]
+#  define IREG(x)   (_reg_base + pc[(x)])
+#  define ICONST(x) *(INTVAL*)pc[(x)]
+#  define SCONST(x) *(STRING**)pc[(x)]
 #else
-#  define IREG(x)   REG_INT(interp, pc[x])
-#  define ICONST(x) pc[x]
-#  define SCONST(x) interp->code->const_table[pc[x]]
+#  define IREG(x)   REG_INT(interp, pc[(x)])
+#  define ICONST(x) pc[(x)]
+#  define SCONST(x) interp->code->const_table[pc[(x)]]
 #endif
 
 struct pf {
@@ -94,7 +94,7 @@ typedef struct Interp {
  * or for the curious: look at the preprocessor output
  */
 
-#define OP(x) OP_ ## x
+#define OP(x) OP_ ## (x)
 typedef enum { OPCODES } opcodes;
 #undef OP
 
@@ -170,7 +170,7 @@ run(Interp *interp, opcode_t *pc)
         switch (*pc) {
 #    endif
 
-#    define CASE(x)         case OP_ ## x:
+#    define CASE(x)         case OP_ ## (x):
 #    define NEXT            continue;
 #    define DONE            return;
 #    define ENDDISPATCH     default : printf("illegal instruction"); \

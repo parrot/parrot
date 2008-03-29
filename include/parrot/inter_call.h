@@ -1,5 +1,5 @@
 /* inter_call.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *  $Id$
  *  Overview:
@@ -230,7 +230,7 @@ STRING* set_retval_s(PARROT_INTERP,
 
 #define SIG_ELEMS(sig) PMC_int_val(sig)
 #define SIG_ARRAY(sig) (INTVAL*)PMC_data(sig)
-#define SIG_ITEM(sig, idx) (SIG_ARRAY(sig))[idx]
+#define SIG_ITEM(sig, idx) (SIG_ARRAY(sig))[(idx)]
 
 /* XXX Remove interp from this */
 #define ADD_OP_VAR_PART(interp, seg, pc, n) do { \

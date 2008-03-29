@@ -1,5 +1,5 @@
 /* stacks.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -39,7 +39,7 @@ typedef struct Stack_Chunk {
     } u;
 } Stack_Chunk_t;
 
-#define STACK_DATAP(chunk)    &chunk->u.data
+#define STACK_DATAP(chunk)    &((chunk)->u.data)
 /* #define STACK_ITEMSIZE(chunk) PObj_buflen(chunk) */
 
 

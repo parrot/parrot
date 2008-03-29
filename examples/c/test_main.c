@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -25,8 +25,8 @@ still clean, Parrot embedding.
 #include <stdlib.h>
 #include <string.h>
 
-#define setopt(flag) Parrot_setflag(interp, flag, (*argv)[0]+2);
-#define unsetopt(flag) Parrot_setflag(interp, flag, 0)
+#define setopt(flag) Parrot_setflag(interp, (flag), (*argv)[0]+2);
+#define unsetopt(flag) Parrot_setflag(interp, (flag), 0)
 
 char *parseflags(Parrot_Interp interp, int *argc, char **argv[]);
 

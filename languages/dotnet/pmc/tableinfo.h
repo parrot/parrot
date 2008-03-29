@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_DOTNET_PMC_TABLEINFO_H_GUARD
@@ -123,14 +123,14 @@
 #define Table_Field_RL(ass)             (2 + ass->strings_ptr_size + \
                                          ass->blobs_ptr_size)
 
-#define Table_FieldLayout_RL(ass)       (4 + (ass->rows[Table_Field] < (2 << 15) ? 2 : 4))
+#define Table_FieldLayout_RL(ass)       (4 + ((ass)->rows[Table_Field] < (2 << 15) ? 2 : 4))
 
 #define Table_FieldMarshall_RL(ass)     (ass->blobs_ptr_size + \
                                          ((ass->rows[Table_Field] < (2 << 14) && \
                                            ass->rows[Table_Param] < (2 << 14)) \
                                           ? 2 : 4))
 
-#define Table_FieldRVA_RL(ass)          (4 + (ass->rows[Table_Field] < (2 << 15) ? 2 : 4))
+#define Table_FieldRVA_RL(ass)          (4 + ((ass)->rows[Table_Field] < (2 << 15) ? 2 : 4))
 
 #define Table_File_RL(ass)              (4 + ass->strings_ptr_size + \
                                          ass->blobs_ptr_size)
@@ -177,11 +177,11 @@
 #define Table_Module_RL(ass)            (2 + ass->strings_ptr_size + \
                                          (3 * ass->guid_ptr_size))
 
-#define Table_ModuleRef_RL(ass)         (ass->strings_ptr_size)
+#define Table_ModuleRef_RL(ass)         ((ass)->strings_ptr_size)
 
-#define Table_NestedClass_RL(ass)       (2 * (ass->rows[Table_TypeDef] < (2 << 15) ? 2 : 4))
+#define Table_NestedClass_RL(ass)       (2 * ((ass)->rows[Table_TypeDef] < (2 << 15) ? 2 : 4))
 
-#define Table_Param_RL(ass)             (4 + ass->strings_ptr_size)
+#define Table_Param_RL(ass)             (4 + (ass)->strings_ptr_size)
 
 #define Table_Property_RL(ass)          (2 + ass->strings_ptr_size + \
                                          ass->blobs_ptr_size)
@@ -189,7 +189,7 @@
 #define Table_PropertyMap_RL(ass)       ((ass->rows[Table_TypeDef] < (2 << 15) ? 2 : 4) + \
                                          (ass->rows[Table_Property] < (2 << 15) ? 2 : 4))
 
-#define Table_StandAloneSig_RL(ass)     (ass->blobs_ptr_size)
+#define Table_StandAloneSig_RL(ass)     ((ass)->blobs_ptr_size)
 
 #define Table_TypeDef_RL(ass)           (4 + (2 * ass->strings_ptr_size) + \
                                          ((ass->rows[Table_TypeDef] < (2 << 13) && \
@@ -206,7 +206,7 @@
                                            ass->rows[Table_TypeRef] < (2 << 13)) \
                                           ? 2 : 4))
 
-#define Table_TypeSpec_RL(ass)          (ass->blobs_ptr_size)
+#define Table_TypeSpec_RL(ass)          ((ass)->blobs_ptr_size)
 
 #endif /* PARROT_DOTNET_PMC_TABLEINFO_H_GUARD */
 

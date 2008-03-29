@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2002-2007, The Perl Foundation
+ * Copyright (C) 2002-2008, The Perl Foundation
  */
 
 #ifndef PARROT_SMALLOBJECT_H_GUARD
@@ -40,8 +40,8 @@ typedef struct _gc_gms_hdr {
     void *gc_dummy_align;       /* see above */
 } Gc_gms_hdr;
 
-#  define PObj_to_GMSH(o) (((Gc_gms_hdr*)o)-1)
-#  define GMSH_to_PObj(p) ((PObj*) (p+1))
+#  define PObj_to_GMSH(o) (((Gc_gms_hdr*)(o))-1)
+#  define GMSH_to_PObj(p) ((PObj*) ((p)+1))
 
 /* the structure uses 2 ptrs itself */
 #  define GC_GMS_STORE_SIZE (64-2)

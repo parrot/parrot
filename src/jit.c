@@ -422,8 +422,8 @@ This C<Parrot_jit_vtable_n_op()> does use register mappings.
 */
 
 #ifndef EXTCALL
-#  define EXTCALL(op) (op_jit[op].extcall >= 1 || op >= jit_op_count())
-#  define CALLS_C_CODE(op) (op_func[op].extcall == -1)
+#  define EXTCALL(op) (op_jit[(op)].extcall >= 1 || (op) >= jit_op_count())
+#  define CALLS_C_CODE(op) (op_func[(op)].extcall == -1)
 #endif
 
 static void

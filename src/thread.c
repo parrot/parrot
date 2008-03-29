@@ -102,7 +102,7 @@ static void* thread_func(ARGIN_NULLOK(void *arg));
 /* HEADERIZER END: static */
 
 #if defined THREAD_DEBUG && THREAD_DEBUG
-#  define DEBUG_ONLY(x) x
+#  define DEBUG_ONLY(x) (x)
 #else
 #  define DEBUG_ONLY(x)
 #endif

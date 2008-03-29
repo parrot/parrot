@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -442,7 +442,7 @@ static int sweep_cb(PARROT_INTERP,
 #define MEM_POOL_RECLAIM      0.2
 
 #if 0
-#  define IMS_DEBUG(x) fprintf x
+#  define IMS_DEBUG(x) fprintf (x)
 #else
 #  define IMS_DEBUG(x)
 #endif

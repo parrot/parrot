@@ -235,7 +235,7 @@ void subst_ins(
  * please use INS
  */
 #ifndef _PARSER
-#  define _mk_instruction(a, b, n, c, d) dont_use_this_function(a, b)
+#  define _mk_instruction(a, b, n, c, d) dont_use_this_function((a), (b))
 #endif
 /* This macro must come after the declaration of _mk_instruction() */
 

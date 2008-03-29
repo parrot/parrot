@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_IO_H_GUARD
@@ -12,7 +12,7 @@ typedef void* Parrot_WIN32_HANDLE;
 typedef HUGEINTVAL Parrot_OFF_T;
 
 #ifndef S_ISREG
-#  define S_ISREG(m) ((m & S_IFMT) == S_IFREG)
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 #endif
 
 #endif /* PARROT_PLATFORM_WIN32_IO_H_GUARD */

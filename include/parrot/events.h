@@ -1,5 +1,5 @@
 /* events.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -77,8 +77,8 @@ typedef struct parrot_event {
 
 struct QUEUE_ENTRY;
 
-#define CHECK_EVENTS(i, n)  (opcode_t *)Parrot_do_check_events(i, n)
-#define HANDLE_EVENTS(i, n) (opcode_t *)Parrot_do_handle_events(i, 1, n)
+#define CHECK_EVENTS(i, n)  (opcode_t *)Parrot_do_check_events((i), (n))
+#define HANDLE_EVENTS(i, n) (opcode_t *)Parrot_do_handle_events((i), 1, (n))
 
 /* HEADERIZER BEGIN: src/events.c */
 

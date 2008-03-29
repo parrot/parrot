@@ -1,5 +1,5 @@
 /* atomic/gcc_pcc.h
- *  Copyright (C) 2006, The Perl Foundation.
+ *  Copyright (C) 2006-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -19,7 +19,7 @@ typedef struct Parrot_atomic_pointer {
     void * volatile val;
 } Parrot_atomic_pointer;
 
-#  define PARROT_ATOMIC_PTR_GET(result, a) result = (void *) (a).val
+#  define PARROT_ATOMIC_PTR_GET(result, a) (result) = (void *) (a).val
 
 #  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = (void *) (b)
 
@@ -89,9 +89,9 @@ typedef struct Parrot_atomic_integer {
 
 #  define PARROT_ATOMIC_INT_DESTROY(a)
 
-#  define PARROT_ATOMIC_INT_GET(result, a) (result = (a).val)
+#  define PARROT_ATOMIC_INT_GET(result, a) ((result) = (a).val)
 
-#  define PARROT_ATOMIC_INT_SET(a, b) ((a).val = b)
+#  define PARROT_ATOMIC_INT_SET(a, b) ((a).val = (b))
 
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \

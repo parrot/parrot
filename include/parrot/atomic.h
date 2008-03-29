@@ -1,5 +1,5 @@
 /* atomic.h
- *  Copyright (C) 2006, The Perl Foundation.
+ *  Copyright (C) 2006-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -41,8 +41,8 @@ typedef Parrot_atomic_integer {
 } Parrot_atomic_integer;
 
 #  define PARROT_ATOMIC_PTR_INIT(a)
-#  define PARROT_ATOMIC_PTR_GET(result, a) result = (a).val
-#  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = b
+#  define PARROT_ATOMIC_PTR_GET(result, (a)) result = (a).val
+#  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = (b)
 
 /* a is the Parrot_atomic.
  * expect is the value we expect the atomic to be holding,
@@ -65,8 +65,8 @@ typedef Parrot_atomic_integer {
 #  define PARROT_ATOMIC_PTR_DESTROY(a)
 #  define PARROT_ATOMIC_INT_INIT(a)
 #  define PARROT_ATOMIC_INT_DESTROY(a)
-#  define PARROT_ATOMIC_INT_GET(result, a) result = (a).val
-#  define PARROT_ATOMIC_INT_SET(a, value)  (a).val = value
+#  define PARROT_ATOMIC_INT_GET(result, (a)) result = (a).val
+#  define PARROT_ATOMIC_INT_SET(a, value)  (a).val = (value)
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
       do { \
           INTVAL orig; \
@@ -79,8 +79,8 @@ typedef Parrot_atomic_integer {
               result = 0; \
           } \
       } while (0)
-#  define PARROT_ATOMIC_INT_INC(result, a) (result = ++(a).val)
-#  define PARROT_ATOMIC_INT_DEC(result, a) (result = --(a).val)
+#  define PARROT_ATOMIC_INT_INC(result, a) ((result) = ++(a).val)
+#  define PARROT_ATOMIC_INT_DEC(result, a) ((result) = --(a).val)
 
 
 #endif /* PARROT_HAS_THREADS */

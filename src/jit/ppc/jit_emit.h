@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  */
 
 /*
@@ -110,11 +110,11 @@ typedef enum {
 
 enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
-#  define emit_op(op) (op << 2)
+#  define emit_op(op) ((op) << 2)
 
-#  define emit_r3(reg) (reg >> 3)
+#  define emit_r3(reg) ((reg) >> 3)
 
-#  define emit_l5(reg) (reg << 5)
+#  define emit_l5(reg) ((reg) << 5)
 
 /* Move (mr).
  *
@@ -413,7 +413,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_subfic(pc, D, A, immediate) \
     jit_emit_2reg(pc, 8, D, A, immediate)
 
-#  define jit_emit_subi(pc, D, A, im) jit_emit_add_rri_i(pc, D, A, -(im))
+#  define jit_emit_subi(pc, D, A, im) jit_emit_add_rri_i((pc), (D), (A), -(im))
 
 #  define jit_emit_lwz(pc, D, disp, A) \
     jit_emit_2reg(pc, 32, D, A, disp)
@@ -472,12 +472,12 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
     jit_emit_3a(pc, 23, S, A, B, M, ME, 0)
 
 /* mfcr (CR -> D) */
-#  define jit_emit_mfcr(pc, D) jit_emit_3reg_x(pc, 31, D, 0, 0, 19, 0)
+#  define jit_emit_mfcr(pc, D) jit_emit_3reg_x((pc), 31, (D), 0, 0, 19, 0)
 
-#  define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 21, 0)
-#  define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
-#  define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
-#  define jit_emit_fdiv_rrr_no_check(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
+#  define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a((pc), 63, (D), (A), (B), 0, 21, 0)
+#  define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a((pc), 63, (D), (A), (B), 0, 20, 0)
+#  define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a((pc), 63, (D), (A), 0, (B), 25, 0)
+#  define jit_emit_fdiv_rrr_no_check(pc, D, A, B) jit_emit_3a((pc), 63, (D), (A), (B), 0, 18, 0)
 
 /* canonical names */
 #  define jit_emit_add_rrr_n jit_emit_fadd_rrr
@@ -485,21 +485,21 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_mul_rrr_n jit_emit_fmul_rrr
 #  define jit_emit_sub_rrr_n jit_emit_fsub_rrr
 
-#  define jit_emit_fsel(pc, D, A, B, C) jit_emit_3a(pc, 63, D, A, B, C, 23, 0)
+#  define jit_emit_fsel(pc, D, A, B, C) jit_emit_3a((pc), 63, (D), (A), (B), (C), 23, 0)
 
-#  define jit_emit_abs_rr_n(pc, D, A)  jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
-#  define jit_emit_neg_rr_n(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
+#  define jit_emit_abs_rr_n(pc, D, A)  jit_emit_3reg_x((pc), 63, (D), 0, (A), 264, 0)
+#  define jit_emit_neg_rr_n(pc, D, A)   jit_emit_3reg_x((pc), 63, (D), 0, (A), 40, 0)
 
-#  define jit_emit_fmr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 72, 0)
-#  define jit_emit_mov_rr_n(pc, D, A) jit_emit_fmr(pc, D, A)
+#  define jit_emit_fmr(pc, D, A)   jit_emit_3reg_x((pc), 63, (D), 0, (A), 72, 0)
+#  define jit_emit_mov_rr_n(pc, D, A) jit_emit_fmr((pc), (D), (A))
 
 /* float cvt to int (round towards zero) */
-#  define jit_emit_fctiwz(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 15, 0)
+#  define jit_emit_fctiwz(pc, D, A)   jit_emit_3reg_x((pc), 63, (D), 0, (A), 15, 0)
 /* Store Floating-Point as Integer Word Indexed */
-#  define jit_emit_stfiwx(pc, S, A, B)  jit_emit_3reg_x(pc, 31, S, A, B, 983, 0)
+#  define jit_emit_stfiwx(pc, S, A, B)  jit_emit_3reg_x((pc), 31, (S), (A), (B), 983, 0)
 
 /* not in core.ops, but probably should be: */
-#  define jit_emit_fsqrt(pc, D, A) jit_emit_3reg(pc, 63, D, 0, A, 0, 18, 0)
+#  define jit_emit_fsqrt(pc, D, A) jit_emit_3reg((pc), 63, (D), 0, (A), 0, 18, 0)
 
 /* Load a CPU register from a Parrot register. */
 
@@ -526,8 +526,8 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
     *(pc++) = (char)(rb << 3); \
     *(pc++) = 0
 
-#  define jit_emit_cmp_rr_i(pc, ra, rb) _emit_cmp(pc, 31, 0, ra, rb)
-#  define jit_emit_cmp_rr_n(pc, ra, rb) _emit_cmp(pc, 63, 0, ra, rb)
+#  define jit_emit_cmp_rr_i(pc, ra, rb) _emit_cmp((pc), 31, 0, (ra), (rb))
+#  define jit_emit_cmp_rr_n(pc, ra, rb) _emit_cmp((pc), 63, 0, (ra), (rb))
 
 /* compare immediate operation.
  *
@@ -764,8 +764,8 @@ fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     return pc;
 }
 
-#  define jit_emit_div_rrr(pc, D, A, B) pc = div_rrr(jit_info, D, A, B)
-#  define jit_emit_fdiv_rrr(pc, D, A, B) pc = fdiv_rrr(jit_info, D, A, B)
+#  define jit_emit_div_rrr(pc, D, A, B) (pc) = div_rrr(jit_info, (D), (A), (B))
+#  define jit_emit_fdiv_rrr(pc, D, A, B) (pc) = fdiv_rrr(jit_info, (D), (A), (B))
 
 /* XXX except A = -2^31 and B = -1 */
 
@@ -779,7 +779,7 @@ cmod_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     return pc;
 }
 
-#  define jit_emit_cmod_rrr(pc, D, A, B) pc = cmod_rrr(jit_info, D, A, B)
+#  define jit_emit_cmod_rrr(pc, D, A, B) (pc) = cmod_rrr(jit_info, (D), (A), (B))
 
 
 void Parrot_ppc_jit_restore_nonvolatile_registers(void);
@@ -897,7 +897,7 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
     }
 }
 
-#  define CONST(i) interp->code->const_table->constants[jit_info->cur_op[i]]
+#  define CONST(i) interp->code->const_table->constants[jit_info->cur_op[(i)]]
 static void
 jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive)

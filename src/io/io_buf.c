@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -157,9 +157,9 @@ ParrotIOLayer pio_buf_layer = {
 
 /* XXX: This is not portable */
 #define DEFAULT_RECSEP '\n'
-#define IS_EOL(io, c) (io->recsep == (*c))
+#define IS_EOL(io, c) ((io)->recsep == (*(c)))
 /*
-#define IS_EOL(io, c) ((*c) == '\n')
+#define IS_EOL(io, c) ((*(c)) == '\n')
 */
 
 

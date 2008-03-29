@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 /*
@@ -88,7 +88,7 @@ typedef struct parser_state {
 #define MAX_HEREDOC_ARGS    10
 
 /* call next() to get the next token from the lexer */
-#define next(P) P->curtoken = next_token(P->lexer)
+#define next(P) (P)->curtoken = next_token((P)->lexer)
 
 
 /* forward declaration; program is called by include. */

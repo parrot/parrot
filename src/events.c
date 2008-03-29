@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -119,7 +119,7 @@ static opcode_t * wait_for_wakeup(PARROT_INTERP,
 #endif
 
 #if EVENT_DEBUG
-#  define edebug(x) fprintf x
+#  define edebug(x) fprintf (x)
 static const char *ev_names[] = {
     "EVENT_TYPE_NONE",
     "EVENT_TYPE_EVENT",

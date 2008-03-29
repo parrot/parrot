@@ -32,9 +32,9 @@ RT#48264
     exit(e); \
 } while (0)
 
-#define NUM_BYTES(length)    ((length / 8) + 1)
-#define BYTE_IN_SET(element) (element >> 3)
-#define BIT_IN_BYTE(element) (1 << (element & 7))
+#define NUM_BYTES(length)    (((length) / 8) + 1)
+#define BYTE_IN_SET(element) ((element) >> 3)
+#define BIT_IN_BYTE(element) (1 << ((element) & 7))
 
 /*
 

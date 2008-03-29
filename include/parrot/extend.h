@@ -1,5 +1,5 @@
 /* extend.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -38,7 +38,7 @@
                                if (!oldtop) x->lo_var_ptr = &oldtop;
 /* Put the stack top back, if what we cached was NULL. Otherwise we
    leave it alone and assume it's OK */
-#define PARROT_CALLIN_END(x)   if (!oldtop) x->lo_var_ptr = NULL;
+#define PARROT_CALLIN_END(x)   if (!oldtop) (x)->lo_var_ptr = NULL;
 
 #else
 

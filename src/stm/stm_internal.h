@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_STM_INTERNAL_H_GUARD
@@ -14,7 +14,7 @@
 
 #  define CYCLE_BUCKETS 20
 #  define TIME_BUCKETS 20
-#  define PROFILE(log) log->profile
+#  define PROFILE(log) (log)->profile
 #  define PROFILE_WAIT(log, time, cycles) \
       do { \
           FLOATVAL the_time = (time); \

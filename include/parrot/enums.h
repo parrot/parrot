@@ -1,6 +1,6 @@
 /* enums.h
  * $Id$
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  Overview:
  *     enums shared by much of the stack-handling code
  *  Data Structure and Algorithms:
@@ -69,18 +69,18 @@ typedef enum {
 
 /* &end_gen */
 
-#define PARROT_ARG_INTVAL_ISSET(o)        (o & PARROT_ARG_INTVAL)
-#define PARROT_ARG_STRING_ISSET(o)        (o & PARROT_ARG_STRING)
-#define PARROT_ARG_PMC_ISSET(o)           (o & PARROT_ARG_PMC)
-#define PARROT_ARG_FLOATVAL_ISSET(o)      (o & PARROT_ARG_FLOATVAL)
-#define PARROT_ARG_TYPE_MASK_MASK(o)      (o & PARROT_ARG_TYPE_MASK)
+#define PARROT_ARG_INTVAL_ISSET(o)        ((o) & PARROT_ARG_INTVAL)
+#define PARROT_ARG_STRING_ISSET(o)        ((o) & PARROT_ARG_STRING)
+#define PARROT_ARG_PMC_ISSET(o)           ((o) & PARROT_ARG_PMC)
+#define PARROT_ARG_FLOATVAL_ISSET(o)      ((o) & PARROT_ARG_FLOATVAL)
+#define PARROT_ARG_TYPE_MASK_MASK(o)      ((o) & PARROT_ARG_TYPE_MASK)
 #define PARROT_ARG_TYPE(o)                PARROT_ARG_TYPE_MASK_MASK(o)
-#define PARROT_ARG_CONSTANT_ISSET(o)      (o & PARROT_ARG_CONSTANT)
-#define PARROT_ARG_FLATTEN_ISSET(o)       (o & PARROT_ARG_FLATTEN)
-#define PARROT_ARG_SLURPY_ARRAY_ISSET(o)  (o & PARROT_ARG_SLURPY_ARRAY)
-#define PARROT_ARG_OPTIONAL_ISSET(o)      (o & PARROT_ARG_OPTIONAL)
-#define PARROT_ARG_OPT_FLAG_ISSET(o)      (o & PARROT_ARG_OPT_FLAG)
-#define PARROT_ARG_NAME_ISSET(o)          (o & PARROT_ARG_NAME)
+#define PARROT_ARG_CONSTANT_ISSET(o)      ((o) & PARROT_ARG_CONSTANT)
+#define PARROT_ARG_FLATTEN_ISSET(o)       ((o) & PARROT_ARG_FLATTEN)
+#define PARROT_ARG_SLURPY_ARRAY_ISSET(o)  ((o) & PARROT_ARG_SLURPY_ARRAY)
+#define PARROT_ARG_OPTIONAL_ISSET(o)      ((o) & PARROT_ARG_OPTIONAL)
+#define PARROT_ARG_OPT_FLAG_ISSET(o)      ((o) & PARROT_ARG_OPT_FLAG)
+#define PARROT_ARG_NAME_ISSET(o)          ((o) & PARROT_ARG_NAME)
 
 
 #endif /* PARROT_ENUMS_H_GUARD */

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_STAT_H_GUARD
@@ -19,15 +19,15 @@
 #endif
 
 #ifndef S_ISBLK
-#  define S_ISBLK(m) ((m & S_IFMT) == S_IFBLK)
+#  define S_ISBLK(m) (((m) & S_IFMT) == S_IFBLK)
 #endif
 
 #ifndef S_ISCHR
-#  define S_ISCHR(m) ((m & S_IFMT) == S_IFCHR)
+#  define S_ISCHR(m) (((m) & S_IFMT) == S_IFCHR)
 #endif
 
 #ifndef S_ISDIR
-#  define S_ISDIR(m) ((m & S_IFMT) == S_IFDIR)
+#  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 #endif
 
 #endif /* PARROT_PLATFORM_WIN32_STAT_H_GUARD */

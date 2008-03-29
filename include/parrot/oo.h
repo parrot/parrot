@@ -32,7 +32,7 @@ typedef enum {
  * The active destroy flag is necessary to free the malloced array.
  */
 #define SLOTTYPE PMC*
-#define get_attrib_num(x, y)    ((PMC **)x)[y]
+#define get_attrib_num(x, y)    ((PMC **)(x))[(y)]
 #define set_attrib_num(o, x, y, z) \
     do { \
         DOD_WRITE_BARRIER(interp, o, ((PMC **)x)[y], z); \

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_BCG_PRIVATE_H_GUARD
@@ -9,7 +9,7 @@
 #include "bcg.h"
 #include "bcg_utils.h"
 
-#define BCG_INFO_PRIV(bcg) ((bcg_info_private*)(bcg->private_info))
+#define BCG_INFO_PRIV(bcg) ((bcg_info_private*)((bcg)->private_info))
 
 typedef enum bcg_state_t {
     BCG_STATE_INIT = 0,

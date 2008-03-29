@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2008, The Perl Foundation.
  */
 
 /*
@@ -35,7 +35,7 @@ example compiler used by japh16.pasm
 
 #if C_DEBUG
 #  include <stdio.h>
-#  define cdebug(x) fprintf x
+#  define cdebug(x) fprintf (x)
 #else
 #  define cdebug(x)
 #endif

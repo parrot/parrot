@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 /*
@@ -409,46 +409,46 @@ The REX prefix, only emitted if using an extended register.
     *sav_ptr = (char)(pc - sav_ptr - 1); \
 }
 
-#  define emit_cmp_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x7, dst, imm)
-#  define emit_cmp_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x7, dst, disp, imm)
-#  define emit_cmp_r_r(pc, dst, src) emit_op_r_r(0x3b, pc, dst, src)
-#  define emit_cmp_r_mr(pc, dst, src, disp) emit_op_r_mr(0x3b, pc, dst, src, disp)
-#  define emit_cmp_mr_r(pc, dst, disp, src) emit_op_r_mr(0x39, pc, src, dst, disp)
+#  define emit_cmp_r_i(pc, dst, imm) emit_op_r_i((pc), 0x83, 0x81, 0x7, (dst), (imm))
+#  define emit_cmp_mr_i(pc, dst, disp, imm) emit_op_mr_i((pc), 0x83, 0x81, 0x7, (dst), (disp), (imm))
+#  define emit_cmp_r_r(pc, dst, src) emit_op_r_r(0x3b, (pc), (dst), (src))
+#  define emit_cmp_r_mr(pc, dst, src, disp) emit_op_r_mr(0x3b, (pc), (dst), (src), (disp))
+#  define emit_cmp_mr_r(pc, dst, disp, src) emit_op_r_mr(0x39, (pc), (src), (dst), (disp))
 
 
-#  define emit_add_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x0, dst, imm)
-#  define emit_add_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x0, dst, disp, imm)
-#  define emit_add_r_r(pc, dst, src) emit_op_r_r(0x03, pc, dst, src)
-#  define emit_add_r_mr(pc, dst, src, disp) emit_op_r_mr(0x03, pc, dst, src, disp)
-#  define emit_add_mr_r(pc, dst, disp, src) emit_op_r_mr(0x01, pc, src, dst, disp)
+#  define emit_add_r_i(pc, dst, imm) emit_op_r_i((pc), 0x83, 0x81, 0x0, (dst), (imm))
+#  define emit_add_mr_i(pc, dst, disp, imm) emit_op_mr_i((pc), 0x83, 0x81, 0x0, (dst), (disp), (imm))
+#  define emit_add_r_r(pc, dst, src) emit_op_r_r(0x03, (pc), (dst), (src))
+#  define emit_add_r_mr(pc, dst, src, disp) emit_op_r_mr(0x03, (pc), (dst), (src), (disp))
+#  define emit_add_mr_r(pc, dst, disp, src) emit_op_r_mr(0x01, (pc), (src), (dst), (disp))
 
-#  define emit_sub_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x5, dst, imm)
-#  define emit_sub_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x5, dst, disp, imm)
-#  define emit_sub_r_r(pc, dst, src) emit_op_r_r(0x2b, pc, dst, src)
-#  define emit_sub_r_mr(pc, dst, src, disp) emit_op_r_mr(0x29, pc, dst, src, disp)
-#  define emit_sub_mr_r(pc, dst, disp, src) emit_op_r_mr(0x2b, pc, src, dst, disp)
+#  define emit_sub_r_i(pc, dst, imm) emit_op_r_i((pc), 0x83, 0x81, 0x5, (dst), (imm))
+#  define emit_sub_mr_i(pc, dst, disp, imm) emit_op_mr_i((pc), 0x83, 0x81, 0x5, (dst), (disp), (imm))
+#  define emit_sub_r_r(pc, dst, src) emit_op_r_r(0x2b, (pc), (dst), (src))
+#  define emit_sub_r_mr(pc, dst, src, disp) emit_op_r_mr(0x29, (pc), (dst), (src), (disp))
+#  define emit_sub_mr_r(pc, dst, disp, src) emit_op_r_mr(0x2b, (pc), (src), (dst), (disp))
 
-#  define emit_xchg_r_r(pc, dst, src) emit_op_r_r(0x87, pc, dst, src)
-#  define emit_xchg_r_mr(pc, dst, src, disp) emit_op_r_mr(0x87, pc, dst, src, disp)
-#  define emit_xchg_mr_r(pc, dst, disp, src) emit_op_r_mr(0x87, pc, src, dst, disp)
+#  define emit_xchg_r_r(pc, dst, src) emit_op_r_r(0x87, (pc), (dst), (src))
+#  define emit_xchg_r_mr(pc, dst, src, disp) emit_op_r_mr(0x87, (pc), (dst), (src), (disp))
+#  define emit_xchg_mr_r(pc, dst, disp, src) emit_op_r_mr(0x87, (pc), (src), (dst), (disp))
 
-#  define emit_xor_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x6, dst, imm)
-#  define emit_xor_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x6, dst, disp, imm)
-#  define emit_xor_r_r(pc, dst, src) emit_op_r_r(0x33, pc, dst, src)
-#  define emit_xor_r_mr(pc, dst, src, disp) emit_op_r_mr(0x33, pc, dst, src, disp)
-#  define emit_xor_mr_r(pc, dst, disp, src) emit_op_r_mr(0x31, pc, src, dst, disp)
+#  define emit_xor_r_i(pc, dst, imm) emit_op_r_i((pc), 0x83, 0x81, 0x6, (dst), (imm))
+#  define emit_xor_mr_i(pc, dst, disp, imm) emit_op_mr_i((pc), 0x83, 0x81, 0x6, (dst), (disp), (imm))
+#  define emit_xor_r_r(pc, dst, src) emit_op_r_r(0x33, (pc), (dst), (src))
+#  define emit_xor_r_mr(pc, dst, src, disp) emit_op_r_mr(0x33, (pc), (dst), (src), (disp))
+#  define emit_xor_mr_r(pc, dst, disp, src) emit_op_r_mr(0x31, (pc), (src), (dst), (disp))
 
-#  define emit_and_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x4, dst, imm)
-#  define emit_and_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x4, dst, disp, imm)
-#  define emit_and_r_r(pc, dst, src) emit_op_r_r(0x23, pc, dst, src)
-#  define emit_and_r_mr(pc, dst, src, disp) emit_op_r_mr(0x23, pc, dst, src, disp)
-#  define emit_and_mr_r(pc, dst, disp, src) emit_op_r_mr(0x21, pc, src, dst, disp)
+#  define emit_and_r_i(pc, dst, imm) emit_op_r_i((pc), 0x83, 0x81, 0x4, (dst), (imm))
+#  define emit_and_mr_i(pc, dst, disp, imm) emit_op_mr_i((pc), 0x83, 0x81, 0x4, (dst), (disp), (imm))
+#  define emit_and_r_r(pc, dst, src) emit_op_r_r(0x23, (pc), (dst), (src))
+#  define emit_and_r_mr(pc, dst, src, disp) emit_op_r_mr(0x23, (pc), (dst), (src), (disp))
+#  define emit_and_mr_r(pc, dst, disp, src) emit_op_r_mr(0x21, (pc), (src), (dst), (disp))
 
-#  define emit_or_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x1, dst, imm)
-#  define emit_or_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x1, dst, disp, imm)
-#  define emit_or_r_r(pc, dst, src) emit_op_r_r(0x0b, pc, dst, src)
-#  define emit_or_r_mr(pc, dst, src, disp) emit_op_r_mr(0x0b, pc, dst, src, disp)
-#  define emit_or_mr_r(pc, dst, disp, src) emit_op_r_mr(0x09, pc, src, dst, disp)
+#  define emit_or_r_i(pc, dst, imm) emit_op_r_i((pc), 0x83, 0x81, 0x1, (dst), (imm))
+#  define emit_or_mr_i(pc, dst, disp, imm) emit_op_mr_i((pc), 0x83, 0x81, 0x1, (dst), (disp), (imm))
+#  define emit_or_r_r(pc, dst, src) emit_op_r_r(0x0b, (pc), (dst), (src))
+#  define emit_or_r_mr(pc, dst, src, disp) emit_op_r_mr(0x0b, (pc), (dst), (src), (disp))
+#  define emit_or_mr_r(pc, dst, disp, src) emit_op_r_mr(0x09, (pc), (src), (dst), (disp))
 
 #  define emit_imul_r_r(pc, dst, src) { \
     emit_rex64(pc, dst, src); \
@@ -488,15 +488,15 @@ The REX prefix, only emitted if using an extended register.
     emit_op_r_mr(0xf7, pc, 0x7, src, disp); \
 }
 
-#  define emit_abs_r(pc, reg) emit_and_r_i(pc, reg, ~(1L << 63))
+#  define emit_abs_r(pc, reg) emit_and_r_i((pc), (reg), ~(1L << 63))
 
-#  define emit_neg_r(pc, reg) emit_op_r_r(0xf7, pc, 0x2, reg)
-#  define emit_not_r(pc, reg) emit_op_r_r(0xf7, pc, 0x3, reg)
-#  define emit_inc_r(pc, reg) emit_op_r_r(0xff, pc, 0x0, reg)
-#  define emit_dec_r(pc, reg) emit_op_r_r(0xff, pc, 0x1, reg)
+#  define emit_neg_r(pc, reg) emit_op_r_r(0xf7, (pc), 0x2, (reg))
+#  define emit_not_r(pc, reg) emit_op_r_r(0xf7, (pc), 0x3, (reg))
+#  define emit_inc_r(pc, reg) emit_op_r_r(0xff, (pc), 0x0, (reg))
+#  define emit_dec_r(pc, reg) emit_op_r_r(0xff, (pc), 0x1, (reg))
 
 /* This needs a fixup it seems...  call_r doesn't */
-#  define emit_call_i(pc, imm) emit_op_i(0xe8, pc, imm)
+#  define emit_call_i(pc, imm) emit_op_i(0xe8, (pc), (imm))
 #  define emit_call_r(pc, reg) { \
         emit_rex64(pc, 0x0, reg); \
         *(pc)++ = (char)0xff; \
@@ -509,7 +509,7 @@ The REX prefix, only emitted if using an extended register.
     emit_sib(pc, b00, reg1, reg2); \
 }
 
-#  define emit_jmp_i(pc, imm) emit_op_i(0xe9, pc, imm)
+#  define emit_jmp_i(pc, imm) emit_op_i(0xe9, (pc), (imm))
 #  define emit_jmp_i_fixup(ji, imm) { \
     opcode_t opcode; \
     opcode = jit_info->op_i + imm; \
@@ -523,8 +523,8 @@ The REX prefix, only emitted if using an extended register.
     emit_jmp_i(jit_info->native_ptr, 0xdead); \
 }
 
-#  define emit_leave(pc) *(pc++) = (char)0xc9;
-#  define emit_ret(pc) *(pc++) = (char)0xc3;
+#  define emit_leave(pc) *((pc)++) = (char)0xc9;
+#  define emit_ret(pc) *((pc)++) = (char)0xc3;
 
 #  define emit_mov_r_r(pc, dst, src) \
             emit_op_r_r(0x8B, pc, dst, src)
@@ -563,16 +563,16 @@ The REX prefix, only emitted if using an extended register.
  }
 
 /* push reg */
-#  define emit_push_r(pc, reg) emit_64op_r(0x50, pc, reg)
+#  define emit_push_r(pc, reg) emit_64op_r(0x50, (pc), (reg))
 /* pop reg */
-#  define emit_pop_r(pc, reg)  emit_64op_r(0x58, pc, reg)
+#  define emit_pop_r(pc, reg)  emit_64op_r(0x58, (pc), (reg))
 
 /* push imm */
-#  define emit_push_i(pc, imm) emit_op_i(0x68, pc, imm)
+#  define emit_push_i(pc, imm) emit_op_i(0x68, (pc), (imm))
 
 /* did you know, that (unsigned)0 is not an 8 bit value? */
-#  define is8bit(c) (((long)c) >= -128 && ((long)c) <= 127)
-#  define is32bit(c) (((long)c) >= -2147483648 && ((long)c) <= 2147483647)
+#  define is8bit(c) (((long)(c)) >= -128 && ((long)(c)) <= 127)
+#  define is32bit(c) (((long)(c)) >= -2147483648 && ((long)(c)) <= 2147483647)
 
 #  define emit_get_int_from_stack(pc, dst, disp) \
     emit_mov_r_mr(pc, dst, RBP, disp)
@@ -746,10 +746,10 @@ typedef enum {
     } \
 }
 
-#  define emit_mov_x_x(pc, dst, src) emit_op_x_x(0x66, 0x28, pc, dst, src)
+#  define emit_mov_x_x(pc, dst, src) emit_op_x_x(0x66, 0x28, (pc), (dst), (src))
 
-#  define emit_mov_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x10, pc, dst, src, offs)
-#  define emit_mov_mx_x(pc, dst, offs, src) emit_op_x_mx(0xf2, 0x11, pc, src, dst, offs)
+#  define emit_mov_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x10, (pc), (dst), (src), (offs))
+#  define emit_mov_mx_x(pc, dst, offs, src) emit_op_x_mx(0xf2, 0x11, (pc), (src), (dst), (offs))
 
 /* Intended to zero a register */
 #  define emit_movhlps_x_x(pc, dst, src) { \
@@ -787,23 +787,23 @@ typedef enum {
     emit_comisd_x_x(pc, reg, FSR2); \
 }
 
-#  define emit_comisd_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x2f, pc, dst, src)
-#  define emit_comisd_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x2f, pc, dst, src, offs)
+#  define emit_comisd_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x2f, (pc), (dst), (src))
+#  define emit_comisd_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x2f, (pc), (dst), (src), (offs))
 
-#  define emit_add_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x58, pc, dst, src)
-#  define emit_add_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x58, pc, dst, src, offs)
+#  define emit_add_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x58, (pc), (dst), (src))
+#  define emit_add_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x58, (pc), (dst), (src), (offs))
 
-#  define emit_sub_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x5c, pc, dst, src)
-#  define emit_sub_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x5c, pc, dst, src, offs)
+#  define emit_sub_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x5c, (pc), (dst), (src))
+#  define emit_sub_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x5c, (pc), (dst), (src), (offs))
 
-#  define emit_and_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x54, pc, dst, src)
-#  define emit_and_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x54, pc, dst, src, offs)
+#  define emit_and_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x54, (pc), (dst), (src))
+#  define emit_and_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x54, (pc), (dst), (src), (offs))
 
-#  define emit_xor_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x57, pc, dst, src)
-#  define emit_xor_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x57, pc, dst, src, offs)
+#  define emit_xor_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x57, (pc), (dst), (src))
+#  define emit_xor_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x57, (pc), (dst), (src), (offs))
 
-#  define emit_mul_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x59, pc, dst, src)
-#  define emit_mul_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x59, pc, dst, src, offs)
+#  define emit_mul_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x59, (pc), (dst), (src))
+#  define emit_mul_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x59, (pc), (dst), (src), (offs))
 
 /* I tried to do a check for FSR1 == dst, such as from core.jit, but the bugs
  * to track down, the hackish things to do(movhlpd and movlhpd were used, but I
@@ -823,19 +823,19 @@ typedef enum {
     emit_op_x_mx(0xf2, 0x5e, pc, dst, src, offs); \
 }
 
-#  define emit_sqrt_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x51, pc, dst, src)
-#  define emit_sqrt_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x51, pc, dst, src, offs)
+#  define emit_sqrt_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x51, (pc), (dst), (src))
+#  define emit_sqrt_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x51, (pc), (dst), (src), (offs))
 
-#  define emit_cvtsi2sd_x_mr(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2a, pc, dst, src, offs)
-#  define emit_cvtsi2sd_x_r(pc, dst, src)         emit_op64_x_x(0xf2, 0x2a, pc, dst, src)
+#  define emit_cvtsi2sd_x_mr(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2a, (pc), (dst), (src), (offs))
+#  define emit_cvtsi2sd_x_r(pc, dst, src)         emit_op64_x_x(0xf2, 0x2a, (pc), (dst), (src))
 
 /* Truncate */
-#  define emit_cvttsd2si_r_mx(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2c, pc, dst, src, offs)
-#  define emit_cvttsd2si_r_x(pc, dst, src)         emit_op64_x_x(0xf2, 0x2c, pc, dst, src)
+#  define emit_cvttsd2si_r_mx(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2c, (pc), (dst), (src), (offs))
+#  define emit_cvttsd2si_r_x(pc, dst, src)         emit_op64_x_x(0xf2, 0x2c, (pc), (dst), (src))
 
 /* Round */
-#  define emit_cvtsd2si_r_mx(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2d, pc, dst, src, offs)
-#  define emit_cvtsd2si_r_x(pc, dst, src)         emit_op64_x_x(0xf2, 0x2d, pc, dst, src)
+#  define emit_cvtsd2si_r_mx(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2d, (pc), (dst), (src), (offs))
+#  define emit_cvtsd2si_r_x(pc, dst, src)         emit_op64_x_x(0xf2, 0x2d, (pc), (dst), (src))
 
 #  define emit_ldmxcsr(pc) { \
     emit_xor_r_r(pc, ISR2, ISR2); \

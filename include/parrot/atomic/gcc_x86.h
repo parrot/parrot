@@ -1,5 +1,5 @@
 /* atomic/gcc_x86.h
- *  Copyright (C) 2006, The Perl Foundation.
+ *  Copyright (C) 2006-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -42,9 +42,9 @@ PARROT_INLINE
 void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
                                         void *update);
 
-#define PARROT_ATOMIC_PTR_GET(result, a) (result = (a).val)
+#define PARROT_ATOMIC_PTR_GET(result, a) ((result) = (a).val)
 
-#define PARROT_ATOMIC_PTR_SET(a, b) ((a).val = b)
+#define PARROT_ATOMIC_PTR_SET(a, b) ((a).val = (b))
 
 #define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
     do { \
@@ -64,9 +64,9 @@ void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
 
 #define PARROT_ATOMIC_INT_DESTROY(a)
 
-#define PARROT_ATOMIC_INT_GET(result, a) (result = (a).val)
+#define PARROT_ATOMIC_INT_GET(result, a) ((result) = (a).val)
 
-#define PARROT_ATOMIC_INT_SET(a, b) ((a).val = b)
+#define PARROT_ATOMIC_INT_SET(a, b) ((a).val = (b))
 
 #define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \

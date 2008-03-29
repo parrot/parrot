@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2007, The Perl Foundation.
+ * Copyright (C) 2003-2008, The Perl Foundation.
  */
 
 /*
@@ -577,10 +577,10 @@ constant_not(int value,  struct constant *result)
       emit_arith(pc, cond, op, status, rd, rn, 2, ((rotate) << 8) | (val))
 
 /* I'll use mov r0, r0 as my NOP for now.  */
-#  define emit_nop(pc) emit_mov(pc, r0, r0)
+#  define emit_nop(pc) emit_mov((pc), r0, r0)
 
 /* MOV ignores rn  */
-#  define emit_mov(pc, dest, src) emit_arith_reg(pc, cond_AL, MOV, 0, dest, 0, src)
+#  define emit_mov(pc, dest, src) emit_arith_reg((pc), cond_AL, MOV, 0, (dest), 0, (src))
 
 static char *
 emit_word(char *pc, unsigned int word)

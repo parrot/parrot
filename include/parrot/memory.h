@@ -1,5 +1,5 @@
 /* memory.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -17,7 +17,7 @@
 /* Use these macros instead of calling the functions listed below. */
 /* They protect against things like passing null to mem__sys_realloc, */
 /* which is not portable. */
-#define mem_internal_allocate(x) mem__internal_allocate(x, __FILE__, __LINE__)
+#define mem_internal_allocate(x) mem__internal_allocate((x), __FILE__, __LINE__)
 #define mem_internal_allocate_typed(t) \
     (t *)mem__internal_allocate(sizeof (t), __FILE__, __LINE__)
 #define mem_internal_allocate_zeroed(x) mem__internal_allocate_zeroed(x, \

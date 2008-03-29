@@ -1,5 +1,5 @@
 /* parrot.h
- *  Copyright (C) 2001-2007, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -151,8 +151,8 @@ typedef struct parrot_interp_t Interp;
 #    define UINTVAL2PTR(any, d)    (any)(unsigned int)(d)
 #  endif /* PTR_SIZE == LONG_SIZE */
 #endif /* PTR_SIZE == INTVAL_SIZE */
-#define PTR2INTVAL(p)    INTVAL2PTR(INTVAL, p)
-#define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL, p)
+#define PTR2INTVAL(p)    INTVAL2PTR(INTVAL, (p))
+#define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL, (p))
 
 /* Use similar macros for casting between pointers and opcode_t.
    (We can't assume that sizeof (opcode_t) == sizeof (intval).
@@ -166,7 +166,7 @@ typedef struct parrot_interp_t Interp;
 #    define OPCODE_T2PTR(any, d)    (any)(unsigned int)(d)
 #  endif /* PTR_SIZE == LONG_SIZE */
 #endif /* OPCODE_T_SIZE == PTR_SIZE */
-#define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t, p)
+#define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t, (p))
 
 /*
  * some compilers don't like lvalue casts, so macroize them
@@ -197,7 +197,7 @@ typedef struct parrot_interp_t Interp;
  * definition that doesn't work for us. */
 #if defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400)
 #  undef offsetof
-#  define offsetof(s, m) (size_t)(&(((s *)0)->m))
+#  define offsetof(s, m) (size_t)(&((((s) *)0)->(m)))
 #endif
 
 /* work around warning:
@@ -231,7 +231,7 @@ typedef void (*funcptr_t)(void);
  * hold a pointer.
  */
 #define D2FPTR(x) UINTVAL2PTR(funcptr_t, PTR2UINTVAL(x))
-#define F2DPTR(x) UINTVAL2PTR(void *, PTR2UINTVAL((funcptr_t) x))
+#define F2DPTR(x) UINTVAL2PTR(void *, PTR2UINTVAL((funcptr_t) (x)))
 
 /* On Win32 we need the constant O_BINARY for open() (at least for Borland C),
    but on UNIX it doesn't exist, so set it to 0 if it's not defined
@@ -242,7 +242,7 @@ typedef void (*funcptr_t)(void);
 
 /* Hide our struct copying behind macros */
 #define STRUCT_COPY(d, s)    (PARROT_ASSERT(d), PARROT_ASSERT(s), *(d)=*(s))
-#define STRUCT_COPY_N(d, s, n) (PARROT_ASSERT(d), PARROT_ASSERT(s), PARROT_ASSERT(sizeof (*d)==sizeof (*s)), memcpy((d), (s), sizeof (*d)*(n)))
+#define STRUCT_COPY_N(d, s, n) (PARROT_ASSERT(d), PARROT_ASSERT(s), PARROT_ASSERT(sizeof (*(d))==sizeof (*(s))), memcpy((d), (s), sizeof (*(d))*(n)))
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"
