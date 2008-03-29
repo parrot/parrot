@@ -63,7 +63,7 @@ Column 6, if present, contains a description of what is being tested.
 
     # Variable declarations, initializations
     .local pmc test       # the test harness object.
-               test = new 'Test::Builder'
+               test = new [ 'Test'; 'Builder' ]
 
     .local pmc todo_tests # keys indicate test file; values test number.
                todo_tests = new 'Hash'

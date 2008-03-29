@@ -1,4 +1,6 @@
 #!./parrot
+# Copyright (C) 2005-2008, The Perl Foundation.
+# $Id$
 
 .sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
@@ -7,7 +9,7 @@
 	tb_args = new 'Hash'
 
 	.local pmc test
-	test = new 'Test::Builder', tb_args
+	test = new [ 'Test'; 'Builder' ], tb_args
 
 	.local pmc plan
 	.local pmc test_pass

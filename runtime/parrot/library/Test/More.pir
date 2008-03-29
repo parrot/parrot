@@ -67,7 +67,7 @@ This class defines the following functions:
     load_bytecode 'library/Test/Builder.pbc'
 
     .local pmc test
-    test = new 'Test::Builder'
+    test = new [ 'Test'; 'Builder' ]
 
     store_global [ 'Test'; 'More' ], '_test', test
 .end

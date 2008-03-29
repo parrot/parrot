@@ -10,7 +10,7 @@ Test::Builder - Parrot extension for building test modules
     # create a new Test::Builder object
     .local pmc test
 
-    test = new 'Test::Builder'
+    test = new [ 'Test'; 'Builder' ]
 
     # plan to run ten tests
     test.'plan'( 10 )
@@ -43,7 +43,7 @@ This class defines the following methods:
 
 =cut
 
-.namespace [ 'Test::Builder' ]
+.namespace [ 'Test'; 'Builder' ]
 
 .sub _initialize :load
     load_bytecode 'library/Test/Builder/Test.pbc'
@@ -52,7 +52,7 @@ This class defines the following methods:
 
     .local pmc tb_class
 
-    newclass     tb_class, 'Test::Builder'
+    newclass     tb_class, [ 'Test'; 'Builder' ]
     addattribute tb_class, 'output'
     addattribute tb_class, 'testplan'
     addattribute tb_class, 'results'
@@ -60,7 +60,7 @@ This class defines the following methods:
     .local pmc single
     single = new 'Undef'
 
-    store_global 'Test::Builder::_singleton', 'singleton', single
+    store_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', single
 .end
 
 =item C<new( args_hash )>
@@ -158,7 +158,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     results    = new 'ResizablePMCArray'
 
     .local pmc test
-    test       = new 'Test::Builder'
+    test       = new [ 'Test'; 'Builder' ]
 
     test.'_assign_args'( output, testplan, results )
     .return( test )
@@ -168,7 +168,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     .param pmc args
 
     .local pmc single
-    single     = find_global 'Test::Builder::_singleton', 'singleton'
+    single     = find_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton'
 
     .local pmc output
     .local pmc testplan
@@ -176,7 +176,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     .local int is_defined
 
     # try for the global first
-    is_defined = isa single, 'Test::Builder'
+    is_defined = isa single, [ 'Test'; 'Builder' ]
     unless is_defined goto CREATE_ATTRIBUTES
 
     output     = single.'output'()
@@ -215,7 +215,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     results    = new 'ResizablePMCArray'
 
     # store this as the singleton
-    store_global 'Test::Builder::_singleton', 'singleton', self
+    store_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', self
 
   RESULTS_DEFINED:
     .return( output, testplan, results )
@@ -352,7 +352,7 @@ declared a plan or if you pass an invalid argument.
 
   FINISH_PLAN:
     unless vivify_global_testplan goto WRITE_HEADER
-    store_global 'Test::Builder::_singleton', 'testplan', testplan
+    store_global [ 'Test'; 'Builder'; '_singleton' ], 'testplan', testplan
 
   WRITE_HEADER:
     .local pmc output

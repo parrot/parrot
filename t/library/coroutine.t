@@ -183,8 +183,8 @@ equal:
 
 .sub main :main
 	load_bytecode 'Test/Builder.pir'
-	.local pmc test	
-	test = new 'Test::Builder'
+	.local pmc test
+	test = new [ 'Test'; 'Builder' ]
 	test.'plan'(N_TESTS)
 
 	push_eh cant_load

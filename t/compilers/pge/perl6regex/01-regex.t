@@ -63,7 +63,7 @@ Description of the test.
 
     # Variable declarations, initializations
     .local pmc test       # the test harness object.
-               test = new 'Test::Builder'
+               test = new [ 'Test'; 'Builder' ]
 
     .local string test_dir # the directory containing tests
                   test_dir = 't/compilers/pge/perl6regex/'

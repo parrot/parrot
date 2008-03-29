@@ -25,7 +25,7 @@ Test::Builder::Tester - Parrot extension for testing test modules
     .local pmc test
 
     tb_args = new 'Hash'
-    test    = new 'Test::Builder', tb_args
+    test    = new [ 'Test'; 'Builder' ], tb_args
 
     # set your test plan
     plan( 4 )
@@ -169,13 +169,13 @@ This module defines the following public functions:
     args         = new 'Hash'
     set args['output'], test_output
 
-    default_test = new 'Test::Builder', args
+    default_test = new [ 'Test'; 'Builder' ], args
     default_test.'plan'( 'no_plan' )
     test_output.'output'()
 
     # create the Test::Builder object that this uses
     .local pmc tb_create
-    tb_create   = find_global 'Test::Builder', 'create'
+    tb_create   = find_global [ 'Test'; 'Builder' ], 'create'
 
     args        = new 'Hash'
     output      = new 'Test::Builder::Output', args

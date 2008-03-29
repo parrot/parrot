@@ -1,4 +1,6 @@
 #!./parrot
+# Copyright (C) 2005-2008, The Perl Foundation.
+# $Id$
 
 .sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
@@ -8,7 +10,7 @@
 	tb_args = new 'Hash'
 
 	.local pmc test
-	test = new 'Test::Builder', tb_args
+	test = new [ 'Test'; 'Builder' ], tb_args
 
 	.local pmc exports, curr_namespace, test_namespace
 	curr_namespace = get_namespace
@@ -326,7 +328,7 @@
 .sub test_skip
 
     .local pmc test
-    test = new 'Test::Builder'
+    test = new [ 'Test'; 'Builder' ]
 
 	test_out( 'ok 1 #skip skipping' )
 	test_out( 'ok 2 #skip skipping' )
@@ -354,7 +356,7 @@
 .sub test_todo
 
     .local pmc test
-    test = new 'Test::Builder'
+    test = new [ 'Test'; 'Builder' ]
 
     test_out( 'ok 8 # TODO passing test' )
     test.'todo'( 1, 'passing test', 'todo reason' )

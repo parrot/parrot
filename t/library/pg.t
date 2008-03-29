@@ -29,7 +29,7 @@ table, which should be created by your sysadmin.
 .sub main :main
     load_bytecode 'Test/Builder.pir'
     .local pmc test
-    test = new 'Test::Builder'
+    test = new [ 'Test'; 'Builder' ]
     test.'plan'(N_TESTS)
     push_eh no_pg
 

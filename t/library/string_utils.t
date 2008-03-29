@@ -18,7 +18,7 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
     load_bytecode 'Test/Builder.pir'
 
     .local pmc test       # the test harness object.
-               test = new 'Test::Builder'
+               test = new [ 'Test'; 'Builder' ]
 
     set_global '$test', test
 

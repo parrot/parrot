@@ -20,7 +20,7 @@ Test the basic testing library.
 
     .local pmc test
 
-    test = new 'Test::Builder'
+    test = new [ 'Test'; 'Builder' ]
     test.'plan'(1)
     test.'ok'(1,'Basic passing')
 .end
