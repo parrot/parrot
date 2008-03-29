@@ -14,7 +14,7 @@ This class provides the following methods:
 
 =cut
 
-.namespace [ 'Test::Builder::Test' ]
+.namespace [ 'Test'; 'Builder'; 'Test' ]
 
 .sub _initialize :load
     .local pmc tbtb_class

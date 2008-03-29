@@ -19,11 +19,11 @@ This class defines the following methods:
 
 =cut
 
-.namespace [ 'Test::Builder::Output' ]
+.namespace [ 'Test'; 'Builder'; 'Output' ]
 
 .sub _initialize :load
 	.local pmc   tbo_class
-	newclass     tbo_class, 'Test::Builder::Output'
+	newclass     tbo_class, [ 'Test'; 'Builder'; 'Output' ]
 	addattribute tbo_class, 'output'
 	addattribute tbo_class, 'diag_output'
 .end

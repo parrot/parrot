@@ -23,11 +23,11 @@ Both classes support the following methods.
 
 =cut
 
-.namespace [ 'Test::Builder::TestPlan' ]
+.namespace [ 'Test'; 'Builder'; 'TestPlan' ]
 
 .sub _initialize :load
     .local pmc tbtp_class
-    newclass     tbtp_class, 'Test::Builder::TestPlan'
+    newclass     tbtp_class, [ 'Test'; 'Builder'; 'TestPlan' ]
     addattribute tbtp_class, 'expect'
 
     # XXX - can't seem to do this within its own class

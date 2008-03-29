@@ -29,4 +29,3 @@ simple test file written in parrot.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-

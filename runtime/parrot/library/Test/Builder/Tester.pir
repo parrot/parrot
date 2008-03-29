@@ -15,10 +15,10 @@ Test::Builder::Tester - Parrot extension for testing test modules
     .local pmc test_diag
     .local pmc test_test
 
-    plan      = find_global 'Test::Builder::Tester', 'plan'
-    test_out  = find_global 'Test::Builder::Tester', 'test_out'
-    test_diag = find_global 'Test::Builder::Tester', 'test_diag'
-    test_test = find_global 'Test::Builder::Tester', 'test_test'
+    plan      = find_global [ 'Test'; 'Builder'; 'Tester' ], 'plan'
+    test_out  = find_global [ 'Test'; 'Builder'; 'Tester' ], 'test_out'
+    test_diag = find_global [ 'Test'; 'Builder'; 'Tester' ], 'test_diag'
+    test_test = find_global [ 'Test'; 'Builder'; 'Tester' ], 'test_test'
 
     # create a new Test::Builder object
     .local pmc tb_args
@@ -151,7 +151,7 @@ This module defines the following public functions:
     .return( diag_string )
 .end
 
-.namespace [ 'Test::Builder::Tester' ]
+.namespace [ 'Test'; 'Builder'; 'Tester' ]
 
 .sub _initialize :load
     load_bytecode 'library/Test/Builder.pbc'
@@ -178,7 +178,7 @@ This module defines the following public functions:
     tb_create   = find_global [ 'Test'; 'Builder' ], 'create'
 
     args        = new 'Hash'
-    output      = new 'Test::Builder::Output', args
+    output      = new [ 'Test'; 'Builder'; 'Output' ], args
     .local pmc results, testplan
     results    = new 'ResizablePMCArray'
     testplan   = new 'String'
@@ -190,11 +190,11 @@ This module defines the following public functions:
     expect_out  = new 'ResizablePMCArray'
     expect_diag = new 'ResizablePMCArray'
 
-    store_global 'Test::Builder::Tester', '_test',         test
-    store_global 'Test::Builder::Tester', '_default_test', default_test
-    store_global 'Test::Builder::Tester', '_test_output',  test_output
-    store_global 'Test::Builder::Tester', '_expect_out',   expect_out
-    store_global 'Test::Builder::Tester', '_expect_diag',  expect_diag
+    store_global [ 'Test'; 'Builder'; 'Tester' ], '_test',         test
+    store_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test', default_test
+    store_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output',  test_output
+    store_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out',   expect_out
+    store_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag',  expect_diag
 .end
 
 =item C<plan( num_tests )>
@@ -207,7 +207,7 @@ Sets the number of tests you plan to run, where C<num_tests> is an int.
     .param int tests
 
     .local pmc test
-    test = find_global 'Test::Builder::Tester', '_test'
+    test = find_global [ 'Test'; 'Builder'; 'Tester' ], '_test'
 
     test.'plan'( tests )
 .end
@@ -250,7 +250,7 @@ description of the test.
     .local int result_count
     .local pmc next_result
 
-    test         = find_global 'Test::Builder::Tester', '_default_test'
+    test         = find_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test'
     results      = test.'results'()
     result_count = results
     inc result_count
@@ -272,7 +272,7 @@ description of the test.
 
   SET_EXPECT_OUTPUT:
     .local pmc expect_out
-    expect_out = find_global 'Test::Builder::Tester', '_expect_out'
+    expect_out = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
 
     push expect_out, line_string
 .end
@@ -293,7 +293,7 @@ directive.
     set line_string, line
 
     .local pmc expect_out
-    expect_out = find_global 'Test::Builder::Tester', '_expect_out'
+    expect_out = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
 
     push expect_out, line_string
 .end
@@ -313,7 +313,7 @@ a line of TAP output containing a test directive.
     set line_string, line
 
     .local pmc expect_diag
-    expect_diag = find_global 'Test::Builder::Tester', '_expect_diag'
+    expect_diag = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
 
     push expect_diag, line_string
 .end
@@ -335,7 +335,7 @@ This and C<test_err()> are effectively the same.
     set line_string, line
 
     .local pmc expect_diag
-    expect_diag = find_global 'Test::Builder::Tester', '_expect_diag'
+    expect_diag = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
 
     push expect_diag, line_string
 .end
@@ -363,10 +363,10 @@ output or diagnostic output.
     .local pmc expect_diag
     .local pmc test_output
 
-    test          = find_global 'Test::Builder::Tester', '_test'
-    expect_out    = find_global 'Test::Builder::Tester', '_expect_out'
-    expect_diag   = find_global 'Test::Builder::Tester', '_expect_diag'
-    test_output   = find_global 'Test::Builder::Tester', '_test_output'
+    test          = find_global [ 'Test'; 'Builder'; 'Tester' ], '_test'
+    expect_out    = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out'
+    expect_diag   = find_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag'
+    test_output   = find_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output'
 
     .local string received_out_string
     .local string received_diag_string
