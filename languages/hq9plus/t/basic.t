@@ -15,7 +15,8 @@ Very basic checks, but all tests of HQ9plus are necessarily basic.
 
 use strict;
 use warnings;
-use lib qw( lib ../lib ../../lib hq9plus/lib );
+use FindBin  ();
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Test tests => 13;
 
