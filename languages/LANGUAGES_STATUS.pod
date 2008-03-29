@@ -390,7 +390,7 @@ C<languages/forth>
 =back
 
 
-=head2 HQ9plus
+=head2 HQ9+
 
 =over 4
 
@@ -401,6 +401,7 @@ A joke language. See L<http://www.cliff.biffle.org/esoterica/hq9plus.html>
 =item Status
 
 Works and is mostly complete.
+Based on PCT.
 
 =item Last verified with parrot version
 
@@ -408,7 +409,7 @@ Works and is mostly complete.
 
 =item Location
 
-C<languages/HQ9plus>
+C<languages/hq9plus>
 
 =back
 
