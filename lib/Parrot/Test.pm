@@ -263,6 +263,7 @@ use warnings;
 
 use Cwd;
 use File::Spec;
+use File::Basename;
 use Memoize ();
 
 use Parrot::Config;
@@ -575,6 +576,7 @@ sub _run_test_file {
         die "Unknown test function: $func";
     }
     $code_f = File::Spec->rel2abs($code_f);
+    my $code_basef = basename($code_f);
 
     # native tests are just run, others need to write code first
     if ( $code_f !~ /\.pbc$/ ) {
@@ -583,7 +585,7 @@ sub _run_test_file {
 
     # honor opt* filename to actually run code with -Ox
     my $args = $ENV{TEST_PROG_ARGS} || '';
-    my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "";
+    my $opt = $code_basef =~ m!opt(.)! ? "-O$1" : "";
     $args .= " $opt";
 
     my $run_exec = 0;
@@ -766,11 +768,12 @@ sub _generate_test_functions {
 
             # Name of the file with test code.
             my $code_f = File::Spec->rel2abs( per_test( '.pir', $test_no ) );
+            my $code_basef = basename($code_f);
 
             # output file
             my $out_f = per_test( '.pasm', $test_no );
 
-            my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "-O1";
+            my $opt = $code_basef =~ m!opt(.)! ? "-O$1" : "-O1";
             my $args = $ENV{TEST_PROG_ARGS} || '';
             $args .= " $opt --output=$out_f";
             $args =~ s/--run-exec//;
