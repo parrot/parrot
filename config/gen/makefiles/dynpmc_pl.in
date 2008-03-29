@@ -92,6 +92,8 @@ sub partial_link_cmd {
     }
     else {
         $liblist = join( ' ', map { "-l$_" } keys %$libs );
+        my $extraLibs = '@libs@ @icu_shared@';
+        $liblist .= ' ' . $extraLibs;
     }
 
     return
