@@ -804,7 +804,7 @@ $(PBC_TO_EXE) : pbc_to_exe.pir
 
 
 # HLL Executable targets
-perl6 : $(PERL6)
+#CONDITIONED_LINE(win32):perl6 : $(PERL6)
 
 $(PERL6) : compilers $(PBC_TO_EXE)
 	$(MAKE) languages/perl6 perl6$(EXE)
