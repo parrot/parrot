@@ -68,8 +68,8 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 new_io_pmc(PARROT_INTERP, ARGIN_NULLOK(ParrotIO *io))
 {
-    PMC * const new_pmc = pmc_new(interp, enum_class_ParrotIO);
-    PMC_data(new_pmc) = io;
+    PMC * const new_pmc     = pmc_new(interp, enum_class_ParrotIO);
+    PMC_data(new_pmc)       = io;
     PMC_struct_val(new_pmc) = io ? io->stack : NULL;
     return new_pmc;
 }
@@ -111,7 +111,6 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 PIO_make_io_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
 {
-    STRING *s;
     /*
      * when we get a NULL string, we read a default len
      */
@@ -119,10 +118,12 @@ PIO_make_io_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
         *buf = string_make_empty(interp, enum_stringrep_one, len);
         return *buf;
     }
-    s = *buf;
-    if (s->bufused < len)
-        Parrot_allocate_string(interp, s, len);
-    return s;
+    else {
+        STRING *s = *buf;
+        if (s->bufused < len)
+            Parrot_allocate_string(interp, s, len);
+        return s;
+    }
 }
 
 
@@ -148,15 +149,15 @@ PIO_new(PARROT_INTERP, SHIM(INTVAL iotype), INTVAL flags, INTVAL mode)
 {
     ParrotIO * const new_io = (ParrotIO *)mem_sys_allocate(sizeof (ParrotIO));
 
-    new_io->fpos = new_io->lpos = piooffsetzero;
-    new_io->flags = flags;
-    new_io->mode = mode;
-    new_io->stack = interp->piodata->default_stack;
-    new_io->b.flags = 0;
-    new_io->b.size = 0;
+    new_io->fpos     = new_io->lpos = piooffsetzero;
+    new_io->flags    = flags;
+    new_io->mode     = mode;
+    new_io->stack    = interp->piodata->default_stack;
+    new_io->b.flags  = 0;
+    new_io->b.size   = 0;
     new_io->b.startb = NULL;
-    new_io->b.endb = NULL;
-    new_io->b.next = NULL;
+    new_io->b.endb   = NULL;
+    new_io->b.next   = NULL;
     return new_io;
 }
 
@@ -583,8 +584,8 @@ PARROT_API
 INTVAL
 PIO_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 {
-    ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
-    ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
+    ParrotIOLayer * const l  = (ParrotIOLayer *)PMC_struct_val(pmc);
+    ParrotIO      * const io = (ParrotIO *)PMC_data0(pmc);
     if (!io)
         return -1;
     return PIO_peek_down(interp, l, io, buffer);
@@ -615,7 +616,7 @@ PIO_pioctl(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL cmd, INTVAL arg)
 {
 
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
-    ParrotIOBuf * b;
+    ParrotIOBuf *b;
     if (!io)
         return -1;
     b = &io->b;
@@ -665,7 +666,7 @@ INTVAL
 PIO_setbuf(PARROT_INTERP, ARGMOD(PMC *pmc), size_t bufsize)
 {
     ParrotIOLayer * const layer = (ParrotIOLayer *)PMC_struct_val(pmc);
-    ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
+    ParrotIO      * const io    = (ParrotIO *)PMC_data0(pmc);
     if (!io)
         return -1;
     PIO_flush(interp, pmc);
@@ -687,8 +688,8 @@ PARROT_API
 INTVAL
 PIO_setlinebuf(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
-    ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
+    ParrotIOLayer * const l  = (ParrotIOLayer *)PMC_struct_val(pmc);
+    ParrotIO      * const io = (ParrotIO *)PMC_data0(pmc);
     if (!io)
         return -1;
 
@@ -789,16 +790,18 @@ PARROT_API
 INTVAL
 PIO_close(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    INTVAL res;
-    ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
     if (!io)
         return -1;
-    PIO_flush(interp, pmc); /* XXX boe: is this neccessary here? */
-    res =  PIO_close_down(interp, l, io);
-    PIO_destroy(interp, pmc);
+    else {
+        INTVAL res;
+        ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
+        PIO_flush(interp, pmc); /* XXX boe: is this neccessary here? */
+        res =  PIO_close_down(interp, l, io);
+        PIO_destroy(interp, pmc);
 
-    return res;
+        return res;
+    }
 }
 
 /*
