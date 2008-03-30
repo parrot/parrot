@@ -17,18 +17,18 @@ use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
 use Math::BigInt ();
 use Getopt::Long ();
+use IO::File;
 
 my $outfile          = 'all_cstring.str';
 my $string_private_h = 'src/string_private_cstring.h';
-my $lockfile         = "$outfile.lck";
 
 # add read/write permissions even if we don't read/write the file
 # for example, Solaris requires write permissions for exclusive locks
-sysopen( my $lock, $lockfile, O_CREAT | O_RDWR ) or die "Can't write '$lockfile': $!\n";
+my $ALL = IO::File->new($outfile, O_CREAT | O_RDWR) or die "Can't open '$outfile': $!\n";
 
-flock( $lock, LOCK_EX ) or die "Can't lock '$lockfile': $!\n";
+flock( $ALL, LOCK_EX ) or die "Can't lock '$outfile': $!\n";
 
-END { close $lock; unlink $lockfile; }
+$ALL->seek(2, 0); # in case its been appended to while we waited for the lock
 
 my ( $result, $do_all, $do_init, $file );
 $result = Getopt::Long::GetOptions(
@@ -55,9 +55,7 @@ my %known_strings = ();
 my @all_strings;
 
 read_all();
-open my $ALL, '>>', $outfile or die "Can't write '$outfile': $!";
 process_cfile();
-close $ALL;
 
 sub hash_val {
     my $h = Math::BigInt->new('+0');
@@ -72,17 +70,14 @@ sub hash_val {
 }
 
 sub read_all {
-    if ( -e $outfile ) {
-        open my $IN, '<', $outfile;
-        while (<$IN>) {
+    $ALL->seek(0, 0);
+    while (<$ALL>) {
 
-            # len hashval "string"
-            if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
-                push @all_strings, [ $1, $2, $3 ];
-                $known_strings{$3} = scalar @all_strings;
-            }
+        # len hashval "string"
+        if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
+            push @all_strings, [ $1, $2, $3 ];
+            $known_strings{$3} = scalar @all_strings;
         }
-        close($IN);
     }
     return;
 }
