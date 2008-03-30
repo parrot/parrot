@@ -850,7 +850,15 @@ $(SRC_DIR)/parrot_config$(O) : $(SRC_DIR)/parrot_config.c
 
 $(SRC_DIR)/install_config$(O) : $(SRC_DIR)/install_config.c
 
-$(SRC_DIR)/null_config.$(O) : $(SRC_DIR)/null_config.c
+$(SRC_DIR)/null_config$(O) : $(SRC_DIR)/null_config.c
+
+$(SRC_DIR)/oo$(O) : $(SRC_DIR)/pmc/class.c $(INC_DIR)/pbcversion.h
+
+$(SRC_DIR)/scheduler$(O) : $(SRC_DIR)/scheduler.str   \
+                           $(SRC_DIR)/pmc/scheduler.c \
+                           $(SRC_DIR)/pmc/task.c      \
+                           $(SRC_DIR)/pmc/timer.c     \
+                           $(INC_DIR)/pbcversion.h
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -1328,9 +1336,9 @@ dynoplibs-clean :
 #
 ###############################################################################
 
-compilers : $(GEN_LIBRARY) compilers.dummy
+compilers : compilers.dummy
 
-compilers.dummy : $(PARROT)
+compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/past-pm
