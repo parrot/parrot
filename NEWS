@@ -1,5 +1,9 @@
 # $Id$
 
+New in 0.6.1
+- Languages
+  + Reimplemented HQ9+ with PCT
+
 New in 0.6.0
 - Specification
   + launched pdd18_security.pod
