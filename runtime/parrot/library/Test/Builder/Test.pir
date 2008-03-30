@@ -19,7 +19,7 @@ This class provides the following methods:
 .sub _initialize :load
     .local pmc tbtb_class
 
-    newclass     tbtb_class, 'Test::Builder::Test::Base'
+    newclass     tbtb_class, [ 'Test'; 'Builder'; 'Test'; 'Base' ]
     addattribute tbtb_class, 'passed'
     addattribute tbtb_class, 'number'
     addattribute tbtb_class, 'diagnostic'
@@ -129,7 +129,7 @@ Returns the TAP-compatible string representation of this test.
 
 =cut
 
-.namespace [ 'Test::Builder::Test::Base' ]
+.namespace [ 'Test'; 'Builder'; 'Test'; 'Base' ]
 
 .sub init_pmc :vtable :method
     .param pmc args

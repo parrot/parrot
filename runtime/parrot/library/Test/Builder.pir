@@ -341,7 +341,7 @@ declared a plan or if you pass an invalid argument.
     goto PLAN_FAILURE
 
   PLAN_NULL:
-    testplan = new 'Test::Builder::NullPlan'
+    testplan = new [ 'Test'; 'Builder'; 'NullPlan' ]
     goto FINISH_PLAN
 
   PLAN_FAILURE:

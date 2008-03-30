@@ -63,11 +63,11 @@ This module defines the following public functions:
 
 =cut
 
-.namespace [ 'Test::Builder::Tester::Output' ]
+.namespace [ 'Test'; 'Builder'; 'Tester'; 'Output' ]
 
 .sub _initialize :load
     .local pmc tbto_class
-    newclass tbto_class, 'Test::Builder::Tester::Output'
+    newclass tbto_class, [ 'Test'; 'Builder'; 'Tester'; 'Output' ]
     addattribute tbto_class, 'output'
     addattribute tbto_class, 'diagnostics'
 .end
@@ -165,7 +165,7 @@ This module defines the following public functions:
     .local pmc args
 
     # set the default output for the Test::Builder singleton
-    test_output  = new 'Test::Builder::Tester::Output'
+    test_output  = new [ 'Test'; 'Builder'; 'Tester'; 'Output' ]
     args         = new 'Hash'
     set args['output'], test_output
 

@@ -6,7 +6,7 @@
 
     .local pmc import_sub
 
-    .IMPORT ( 'Test::More', 'pln' )
+    .IMPORT ( [ 'Test'; 'More' ], 'plan' )
 
    #.local string res, exp, desc
 

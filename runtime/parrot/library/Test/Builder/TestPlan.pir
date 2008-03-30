@@ -32,7 +32,7 @@ Both classes support the following methods.
 
     # XXX - can't seem to do this within its own class
     .local pmc tbnp_class
-    subclass tbnp_class, tbtp_class, 'Test::Builder::NullPlan'
+    subclass tbnp_class, tbtp_class, [ 'Test'; 'Builder'; 'NullPlan' ]
 .end
 
 =item C<new( args_hash )>
@@ -127,7 +127,7 @@ plan.
     .return( footer )
 .end
 
-.namespace [ 'Test::Builder::NullPlan' ]
+.namespace [ 'Test'; 'Builder'; 'NullPlan' ]
 
 .sub header :method
     .local string header
