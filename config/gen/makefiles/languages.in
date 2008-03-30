@@ -13,7 +13,7 @@ RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 LANGUAGES = \
     APL \
     BASIC \
-    HQ9plus \
+    hq9plus \
     PIR \
     WMLScript \
     Zcode \
@@ -95,7 +95,7 @@ smoke-clean :
 clean: \
     APL.clean \
     BASIC.clean \
-    HQ9plus.clean \
+    hq9plus.clean \
     PIR.clean \
     WMLScript.clean \
     Zcode.clean \
@@ -130,6 +130,7 @@ clean: \
 realclean: \
     dotnet.realclean \
     eclectus.realclean \
+    hq9plus.realclean \
     unlambda.realclean \
     jako.realclean
 
@@ -264,13 +265,15 @@ forth.test:
 forth.clean:
 	- $(MAKE) forth clean
 
-HQ9plus: HQ9plus.dummy
-HQ9plus.dummy:
-	- $(MAKE) HQ9plus
-HQ9plus.test:
-	- $(MAKE) HQ9plus test
-HQ9plus.clean:
-	- $(MAKE) HQ9plus clean
+hq9plus: hq9plus.dummy
+hq9plus.dummy:
+	- $(MAKE) hq9plus
+hq9plus.test:
+	- $(MAKE) hq9plus test
+hq9plus.clean:
+	- $(MAKE) hq9plus clean
+hq9plus.realclean:
+	- $(MAKE) hq9plus realclean
 
 jako: jako.dummy
 jako.dummy:

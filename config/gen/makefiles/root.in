@@ -162,7 +162,6 @@ GEN_MAKEFILES = \
     languages/cola/Makefile \
     languages/ecmascript/Makefile \
     languages/forth/Makefile \
-    languages/HQ9plus/Makefile \
     languages/jako/Makefile \
     languages/lazy-k/Makefile \
     languages/lisp/Makefile \
