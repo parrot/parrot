@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ pugsundef.pmc - Pugs Undef
 
 =head1 DESCRIPTION
 
-C<PugsUndef> extends C<Exception> and C<PerlUndef> to provide a Perl 6 C<Undef>.
+C<PugsUndef> extends C<Exception> and C<Undef> to provide a Perl 6 C<Undef>.
 
 =head2 Methods
 
@@ -18,11 +18,11 @@ C<PugsUndef> extends C<Exception> and C<PerlUndef> to provide a Perl 6 C<Undef>.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 pmclass PugsUndef extends PugsAny need_ext
     extends Exception
-    extends PerlUndef
+    extends Undef
     does string
     does boolean
     does integer
@@ -32,12 +32,6 @@ pmclass PugsUndef extends PugsAny need_ext
     hll Perl6
     maps Exception
 {
-    /* the PMC compiler doesn't know, that Exception inherits
-     * this from SArray
-     */
-    void set_integer_native(INTVAL v) {
-        Parrot_SArray_set_integer_native(INTERP, SELF, v);
-    }
 }
 
 /*

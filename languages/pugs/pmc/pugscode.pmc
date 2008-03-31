@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -18,7 +18,7 @@ C<PugsCode> extends C<Closure> to provide a Perl 6 C<Code>.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 pmclass PugsCode extends PugsAny
     extends Closure

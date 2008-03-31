@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ C<PugsAny> provides an abstract base class for both Pugs Values and References.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "../include/pugs_common.h"
 
 pmclass PugsAny

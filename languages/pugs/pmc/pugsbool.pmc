@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ C<PugsBool> extends C<Boolean> to provide a Perl 6 boolean.
 
 #define PUGS_BOOL
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "pmc_pugsbool.h"
 #include "../include/pugs_common.h"
 
