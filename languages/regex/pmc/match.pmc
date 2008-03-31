@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -23,7 +23,7 @@ anyone who reads this to hurl. Violently.
 */
 
 #include <assert.h>
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 extern int MatchRange_type_id;
 

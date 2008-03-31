@@ -31,7 +31,7 @@ the Match PMC.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 #define RANGE_START(pmc) PMC_int_val(pmc)
 #define RANGE_END(pmc) PMC_int_val2(pmc)
