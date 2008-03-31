@@ -6,7 +6,7 @@
  *     These are the vtable functions for the TclString base class
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "parrot/cclass.h"
 #include <stdio.h>
 

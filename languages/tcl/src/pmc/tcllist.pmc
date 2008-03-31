@@ -18,7 +18,7 @@ These are the vtable functions for the TclList base class
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 /* cache of classes referenced */
 

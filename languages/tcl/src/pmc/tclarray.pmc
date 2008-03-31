@@ -25,7 +25,7 @@ This is the Array PMC for the Tcl implementation.
 
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 pmclass TclArray
     need_ext

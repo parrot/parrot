@@ -9,7 +9,7 @@
  *  References:
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 pmclass TclInt
     dynpmc

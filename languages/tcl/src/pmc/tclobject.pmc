@@ -18,7 +18,7 @@
  *  References:
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 static INTVAL dynpmc_TclString;
 static INTVAL dynpmc_TclFloat;
