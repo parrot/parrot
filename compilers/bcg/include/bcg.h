@@ -15,7 +15,8 @@
                                case 0:
 #define BCG_CATCH(excp)          break; \
                                case excp:
-#define BCG_END_TRY          } \
+#define BCG_END_TRY          default: break; \
+                               } \
                           } while (0)
 #define BCG_EXCEPTION 1
 

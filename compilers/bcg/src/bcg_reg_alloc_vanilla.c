@@ -96,8 +96,9 @@ assig_reg_num(int *reg_count, char data_type, int reg_num)
     case 'S':
         reg_count[3]++;
         return reg_count[3] - 1;
+    default:
+        return -1;
     }
-    return -1;
 }
 
 /*

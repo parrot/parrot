@@ -302,12 +302,12 @@ BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
 
     curr_unit = bcg_info_current_unit(bcg_info);
     curr_op = bcg_info_current_op(bcg_info);
-    op_arg = bcg_hash_get(bcg_info, curr_unit->symbol_table, var_name);
-    if (op_arg == NULL) {
-        op_arg =
-            bcg_op_arg_create(bcg_info, var_name, BCG_OP_ARG_VARIABLE,
+    op_arg  = (bcg_op_arg *)bcg_hash_get(bcg_info, curr_unit->symbol_table, var_name);
+
+    if (!op_arg)
+        op_arg = bcg_op_arg_create(bcg_info, var_name, BCG_OP_ARG_VARIABLE,
                               var_type);
-    }
+
     bcg_op_add_arg(bcg_info, curr_op, op_arg);
     bcg_hash_put(bcg_info, curr_unit->symbol_table, var_name, op_arg);
 }
