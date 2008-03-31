@@ -18,7 +18,24 @@ value of the comment is passed as the second argument to the method.
 class HQ9plus::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
+    my $past :=
+        PAST::Block.new(
+            :blocktype('declaration'),
+            :node( $/ ),
+            PAST::Op.new(
+                :name('infix:='),
+                :pasttype('copy'),
+                PAST::Var.new(
+                    :name('hq9plus_code'),
+                    :viviself('String'),
+                    :isdecl(1),
+                    :scope('lexical')
+                ),
+                PAST::Val.new(
+                     :value(~$/)
+                )
+            )
+        );
     for $<statement> {
         $past.push( $( $_ ) );
     }
@@ -26,7 +43,19 @@ method TOP($/) {
 }
 
 method statement($/,$key) {
-    my $past := PAST::Op.new( :name($key), :pasttype('call'), :node( $/ ) );
+    my $past;
+    if ( $key eq 'quine' ) {
+        $past := PAST::Op.new( :name($key),
+                               :pasttype('call'),
+                               :node( $/ ),
+                               PAST::Var.new(
+                                   :name('hq9plus_code'),
+                                   :scope('lexical')
+                               ) );
+    }
+    else {
+        $past := PAST::Op.new( :name($key), :pasttype('call'), :node( $/ ) );
+    }
     make $past;
 }
 

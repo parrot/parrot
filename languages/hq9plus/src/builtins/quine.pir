@@ -1,18 +1,17 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
 =head1
 
-quine.pir -- simple implementation of a quine function
+quine.pir -- a simple print, the code is passed in
 
 =cut
 
 .namespace
 
-.sub 'quine'  :outer(main)
+.sub 'quine'
 
-    .local pmc code_string
-    code_string = find_lex "$code_string"
+    .param pmc code_string
 
     print code_string
 
@@ -25,4 +24,3 @@ quine.pir -- simple implementation of a quine function
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-

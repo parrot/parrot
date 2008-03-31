@@ -45,16 +45,6 @@ to the HQ9plus compiler.
 .sub 'main' :main
     .param pmc args
 
-    # we need the code the 'quine'
-    .local string code_fn
-    code_fn = args[1]
-    .local pmc pio
-    pio = new 'ParrotIO'
-    .local pmc code_string
-    code_string = new 'String'
-    code_string = pio.slurp( code_fn )
-    .lex "$code_string", code_string
-
     # needed for 'plus'
     .local pmc accumulator
     accumulator = new 'Integer'
