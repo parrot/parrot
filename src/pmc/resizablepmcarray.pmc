@@ -739,12 +739,12 @@ end of the array.
 */
 
     METHOD PMC* shift() {
-        PMC* value = VTABLE_shift_pmc(INTERP, SELF);
+        PMC *value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
     METHOD PMC* pop() {
-        PMC* value = VTABLE_pop_pmc(INTERP, SELF);
+        PMC *value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
