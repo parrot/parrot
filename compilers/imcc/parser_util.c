@@ -746,6 +746,10 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
     }
     else if (STREQ(name, "yield")) {
+        if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
+            IMCC_fataly(interp, E_SyntaxError,
+                "Cannot yield from non-continuation\n");
+
         IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub
             |= 1 | ITPCCYIELD;
     }

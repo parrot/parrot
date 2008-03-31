@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -88,6 +88,8 @@ for my $op (@$Parrot::OpLib::core::ops) {
     $cmds{$basename}{ $basename . ' ' . $args }++;
     $cmds{$basename}{ $op->full_name . ' ' . $args }++;
 }
+
+$ENV{TEST_PROG_ARGS} ||= '';
 
 plan skip_all => 'IMCC cannot do parse-only with JIT enabled'
     if $ENV{TEST_PROG_ARGS} =~ /-j/;
