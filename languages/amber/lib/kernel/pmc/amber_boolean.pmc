@@ -5,7 +5,7 @@
  *     The Amber_BOOLEAN PMC, which implementes the Amber kernel class BOOLEAN
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 static INTVAL class_CHARACTER;
 
@@ -33,7 +33,7 @@ pmclass Amber_BOOLEAN
         PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(
             INTERP, result, PMC_int_val(SELF) ? 't' : 'f');
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* classname() {
@@ -41,14 +41,14 @@ pmclass Amber_BOOLEAN
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
             INTERP, result, string_from_cstring(INTERP, "BOOLEAN", 7));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* integer() {
         PMC* result = pmc_new(
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(INTERP, result, PMC_int_val(SELF) ? 1 : 0);
-        return result;
+        RETURN(PMC *result);
     }
 
 }

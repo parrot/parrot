@@ -5,7 +5,7 @@
  *     The Amber_PATHNAME PMC, which implementes the Amber kernel class PATHNAME
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include <dirent.h>
 
 static INTVAL class_PATHNAME;
@@ -67,7 +67,7 @@ pmclass Amber_PATHNAME
                 start = end + 1;
             }
         }
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* classname() {
@@ -75,7 +75,7 @@ pmclass Amber_PATHNAME
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
             INTERP, result, string_from_cstring(INTERP, "PATHNAME", 8));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* entry_names() {
@@ -103,7 +103,7 @@ pmclass Amber_PATHNAME
                 INTERP, NULL, E_IOError,
                 "PATHNAME.entry_names: couldn't read directory");
         }
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* file_names() {
@@ -133,7 +133,7 @@ pmclass Amber_PATHNAME
                 INTERP, NULL, E_IOError,
                 "PATHNAME.file_names: couldn't read directory");
         }
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* file_pathnames() {
@@ -171,7 +171,7 @@ pmclass Amber_PATHNAME
                 INTERP, NULL, E_IOError,
                 "PATHNAME.file_names: couldn't read directory");
         }
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* is_readable_directory() {
@@ -186,7 +186,7 @@ pmclass Amber_PATHNAME
         else {
             VTABLE_set_integer_native(INTERP, result, 0);
         }
-        return result;
+        RETURN(PMC *result);
     }
 /*
     METHOD PMC* string() {
@@ -194,7 +194,7 @@ pmclass Amber_PATHNAME
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
             INTERP, result, VTABLE_get_string(INTERP, SELF));
-        return result;
+        RETURN(PMC *result);
     }
 */
     METHOD PMC* subdirectory_names() {
@@ -227,7 +227,7 @@ pmclass Amber_PATHNAME
                 INTERP, NULL, E_IOError,
                 "PATHNAME.subdirectory_names: couldn't read directory");
         }
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* subdirectory_pathnames() {
@@ -265,7 +265,7 @@ pmclass Amber_PATHNAME
                 INTERP, NULL, E_IOError,
                 "PATHNAME.subdirectory_pathnames: couldn't read directory");
         }
-        return result;
+        RETURN(PMC *result);
     }
 
 }

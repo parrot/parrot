@@ -5,7 +5,7 @@
  *     The Amber_STRING PMC, which implementes the Amber kernel class STRING
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 static INTVAL class_CHARACTER;
 
@@ -27,7 +27,7 @@ pmclass Amber_STRING
         PMC* result = pmc_new(
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(INTERP, result, PMC_int_val(SELF));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* count() {
@@ -35,7 +35,7 @@ pmclass Amber_STRING
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(
             INTERP, result, string_compute_strlen(INTERP, PMC_str_val(SELF)));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* classname() {
@@ -43,7 +43,7 @@ pmclass Amber_STRING
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
             INTERP, result, string_from_cstring(INTERP, "STRING", 6));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* first() {
@@ -51,7 +51,7 @@ pmclass Amber_STRING
         PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), (INTVAL) 0));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* integer() {  /* RT#48192 OVERFLOW */
@@ -59,7 +59,7 @@ pmclass Amber_STRING
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(
             INTERP, result, string_to_int(INTERP, PMC_str_val(SELF)));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* item(PMC* index) {
@@ -70,7 +70,7 @@ pmclass Amber_STRING
         result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), adjusted_index));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* last() {
@@ -79,7 +79,7 @@ pmclass Amber_STRING
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), string_compute_strlen(
                 INTERP, PMC_str_val(SELF)) - 1));
-        return result;
+        RETURN(PMC *result);
     }
 
 }

@@ -5,7 +5,7 @@
  *     The Amber_TABLE PMC, which implementes the Amber kernel class TABLE
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 pmclass Amber_TABLE need_ext
     extends Hash
@@ -18,7 +18,7 @@ pmclass Amber_TABLE need_ext
         PMC* result = pmc_new(
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(INTERP, result, VTABLE_get_bool(INTERP, SELF));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* classname() {
@@ -26,7 +26,7 @@ pmclass Amber_TABLE need_ext
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
             INTERP, result, string_from_cstring(INTERP, "TABLE", 5));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* count() {
@@ -34,7 +34,7 @@ pmclass Amber_TABLE need_ext
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(
             INTERP, result, VTABLE_get_integer(INTERP, SELF));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD void delete(PMC* key) {
@@ -46,11 +46,12 @@ pmclass Amber_TABLE need_ext
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(
             INTERP, result, VTABLE_exists_keyed(INTERP, SELF, key));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* item(PMC* key) {
-        return VTABLE_get_pmc_keyed(INTERP, SELF, key);
+        PMC *result = VTABLE_get_pmc_keyed(INTERP, SELF, key);
+        RETURN(PMC *result);
     }
 
     METHOD void set_item(PMC* key, PMC* value) {

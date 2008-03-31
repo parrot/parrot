@@ -5,14 +5,14 @@
  *     The am_default PMC, an abstract ancestor for the Amber PMCs
  */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 pmclass Amber_DEFAULT abstract dynpmc group amber_kernel {
 
 /* non-vtable methods follow */
 
     METHOD PMC* current() {
-        return SELF;
+        RETURN(PMC *SELF);
     }
 
     METHOD PMC* is_defined() {
@@ -20,7 +20,7 @@ pmclass Amber_DEFAULT abstract dynpmc group amber_kernel {
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_integer_native(
             INTERP, result, VTABLE_defined(INTERP, SELF));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* string() {
@@ -28,14 +28,14 @@ pmclass Amber_DEFAULT abstract dynpmc group amber_kernel {
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
             INTERP, result, VTABLE_get_string(INTERP, SELF));
-        return result;
+        RETURN(PMC *result);
     }
 
     METHOD PMC* type_id() {
         PMC* result = pmc_new(
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(INTERP, result, SELF->vtable->base_type);
-        return result;
+        RETURN(PMC *result);
     }
 
 }
