@@ -1,20 +1,31 @@
 #!perl
 # Copyright (C) 2008, The Perl Foundation.
-# $Id $
+# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Config;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
-pir_error_output_like( <<'CODE', <<'OUT', "RT# 41097", todo => 'segfaults');
+pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax', todo => "RT# 41097");
 .sub main :main
     get_results '(0)'
 .end
 CODE
 /syntax error/
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0', todo=> 'RT# 43048');
+.sub fold_by_zero
+  push_eh ok
+    $I1 = 1/0
+  clear_eh
+ ok:
+  say "ok"
+.end  
+CODE
+ok
 OUT
 
 # Local Variables:
