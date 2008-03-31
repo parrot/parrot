@@ -1,11 +1,11 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 /* .NET CLI Assembly PMC */
 
-#include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "tableinfo.h"
 #include "structures.h"
 
@@ -23,7 +23,7 @@ static INTVAL dynclass_DotNetAssemblyRefMetadata;
 
 
 /* This frees memory associated with a dotnet_assembly structure. */
-static void destroy_dotnet_assembly(struct dotnet_assembly *ass)
+static void destroy_dotnet_assembly(dotnet_assembly *ass)
 {
     if (ass != NULL)
     {
@@ -41,9 +41,9 @@ static void destroy_dotnet_assembly(struct dotnet_assembly *ass)
 
 
 /* This creates a new dotnet_assembly structure and sets the filename. */
-static struct dotnet_assembly* new_dotnet_assembly(STRING *s)
+static dotnet_assembly* new_dotnet_assembly(STRING *s)
 {
-    struct dotnet_assembly *ass = mem_sys_allocate_zeroed(sizeof (struct dotnet_assembly));
+    dotnet_assembly *ass = mem_allocate_zeroed_typed(dotnet_assembly);
     ass->filename = s;
     return ass;
 }
@@ -168,10 +168,11 @@ static Parrot_Int2 stream_short(char *stream, int offset)
    boundary. */
 static char* read_string_padded(FILE *in)
 {
-    int string_len = 16;
-    int string_pos = 0;
-    char *string = mem_sys_allocate(string_len);
-    int done = 0;
+    int   string_len = 16;
+    int   string_pos = 0;
+    char *string     = (char *)mem_sys_allocate(string_len);
+    int   done       = 0;
+
     while (done == 0)
     {
         fread(string + string_pos, 1, 4, in);
@@ -179,7 +180,7 @@ static char* read_string_padded(FILE *in)
         if (string_pos == string_len)
         {
             string_len *= 2;
-            string = mem_sys_realloc(string, string_len);
+            string      = (char *)mem_sys_realloc(string, string_len);
         }
         if (string[string_pos - 1] == 0)
             done = 1;
@@ -190,7 +191,7 @@ static char* read_string_padded(FILE *in)
 
 /* This converts a relative virtual address in a PE file into a position in
    the file. Returns 0 if the RVA cannot be converted. */
-static int rva_to_filepos(FILE *in, struct dotnet_assembly *ass, Parrot_UInt4 rva)
+static int rva_to_filepos(FILE *in, dotnet_assembly *ass, Parrot_UInt4 rva)
 {
     Parrot_UInt2 i;
     int saved_pos = ftell(in);
@@ -225,7 +226,7 @@ static int rva_to_filepos(FILE *in, struct dotnet_assembly *ass, Parrot_UInt4 rv
 /* This loads a section of data from a file into a chunk of memory. */
 static char* load_to_memory(FILE *in, int file_pos, int size)
 {
-    char *loaded = mem_sys_allocate(size);
+    char *loaded  = (char *)mem_sys_allocate(size);
     int saved_pos = ftell(in);
 
     /* Seek to position. */
@@ -240,7 +241,7 @@ static char* load_to_memory(FILE *in, int file_pos, int size)
 
 /* This loads the PE parts of the file. If there are any problems then
    throws a real_exception and returns zero. */
-static int load_pe_file(Interp *INTERP, FILE *in, struct dotnet_assembly *ass)
+static int load_pe_file(Interp *INTERP, FILE *in, dotnet_assembly *ass)
 {
     char temp[64];
     Parrot_UInt4 sig_location;
@@ -339,7 +340,7 @@ static int load_pe_file(Interp *INTERP, FILE *in, struct dotnet_assembly *ass)
 /* This loads the CLI header, assuming that the file position is at the start
    of it. If any problem occurs, the function throws a real_exception and
    returns zero. */
-static int load_cli_header(Interp *INTERP, FILE *in, struct dotnet_assembly *ass)
+static int load_cli_header(Interp *INTERP, FILE *in, dotnet_assembly *ass)
 {
     Parrot_UInt4 metadata_rva;
     int metadata_filepos;
@@ -381,7 +382,7 @@ static int load_cli_header(Interp *INTERP, FILE *in, struct dotnet_assembly *ass
 
 
 /* This loads the .NET metadata streams from the file. */
-static int load_cli_streams(Interp *INTERP, FILE *in, struct dotnet_assembly *ass)
+static int load_cli_streams(Interp *INTERP, FILE *in, dotnet_assembly *ass)
 {
     Parrot_UInt4 magic_word;
     Parrot_UInt4 vstring_length;
@@ -459,7 +460,7 @@ static int load_cli_streams(Interp *INTERP, FILE *in, struct dotnet_assembly *as
 
 /* Function for checking if table is present in valid bit vector.
    (Not a macro; stupid C compilers moan about invalid shift sizes. */
-static int TablePresent(struct dotnet_assembly *ass, int t)
+static int TablePresent(dotnet_assembly *ass, int t)
 {
         return t >= 32 ?
         (ass->valid_hi & (1 << (t - 32))) :
@@ -468,17 +469,17 @@ static int TablePresent(struct dotnet_assembly *ass, int t)
 
 
 /* This calculates the positions and finds the lengths of all the tables. */
-static int locate_tables(Interp *INTERP, struct dotnet_assembly *ass)
+static int locate_tables(Interp *INTERP, dotnet_assembly *ass)
 {
-    unsigned char *stream = ass->tables;
+    char *stream = ass->tables;
     int cur_pos;
     int i;
 
     /* The heap size flags detail how big references into the heaps
        are for each type of heap. */
     ass->strings_ptr_size = (stream[6] & 0x01) ? 4 : 2;
-    ass->guid_ptr_size = (stream[6] & 0x02) ? 4 : 2;
-    ass->blobs_ptr_size = (stream[6] & 0x04) ? 4 : 2;
+    ass->guid_ptr_size    = (stream[6] & 0x02) ? 4 : 2;
+    ass->blobs_ptr_size   = (stream[6] & 0x04) ? 4 : 2;
 
     /* Get valid tables vector. */
     ass->valid_lo = stream_word_u(stream, 8);
@@ -682,7 +683,7 @@ static int locate_tables(Interp *INTERP, struct dotnet_assembly *ass)
 
 /* This takes an RVA and turns it into a bytecode walking PMC and array of
    exception handler PMCs. */
-static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                            FILE *in, Parrot_UInt4 rva)
 {
     int bc_filepos;
@@ -693,7 +694,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *bc = pmc_new(INTERP, dynclass_DotNetBytecode);
-    struct dotnet_bytecode *bytecode = mem_sys_allocate_zeroed(sizeof (struct dotnet_bytecode));
+    dotnet_bytecode *bytecode = mem_allocate_zeroed_typed(dotnet_bytecode);
     PMC_struct_val(bc) = bytecode;
 
     /* Resolve RVA to file position. */
@@ -720,7 +721,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
     {
         /* Thin header. Code size encoded in bits of this byte. */
         bytecode->body_size = b1 >> 2;
-        bytecode->body = mem_sys_allocate(bytecode->body_size);
+        bytecode->body      = (char *)mem_sys_allocate(bytecode->body_size);
         fread(bytecode->body, bytecode->body_size, 1, in);
     }
     else
@@ -740,7 +741,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
             sig_token &= 0xFFFF; /* RT#48130 Why do we have to do this? */
 
         /* Load code. */
-        bytecode->body = mem_sys_allocate(bytecode->body_size);
+        bytecode->body = (char *)mem_sys_allocate(bytecode->body_size);
         fseek(in, bc_filepos + (header_size * 4), SEEK_SET);
         fread(bytecode->body, bytecode->body_size, 1, in);
 
@@ -799,8 +800,8 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
                     {
                         /* Create PMC, underlying struct and tie 'em together. */
                         PMC *eh = pmc_new(INTERP, dynclass_DotNetEH);
-                        struct dotnet_eh *handler =
-                            mem_sys_allocate_zeroed(sizeof (struct dotnet_eh));
+                        dotnet_eh *handler =
+                            mem_allocate_zeroed_typed(dotnet_eh);
                         PMC_struct_val(eh) = handler;
 
                         /* Read data and stash it in the struct. */
@@ -837,8 +838,8 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
                     {
                         /* Create PMC, underlying struct and tie 'em together. */
                         PMC *eh = pmc_new(INTERP, dynclass_DotNetEH);
-                        struct dotnet_eh *handler =
-                            mem_sys_allocate_zeroed(sizeof (struct dotnet_eh));
+                        dotnet_eh *handler =
+                            mem_allocate_zeroed_typed(dotnet_eh);
                         PMC_struct_val(eh) = handler;
 
                         /* Read data and stash it in the struct. */
@@ -886,7 +887,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
 
 /* This looks up a row in the params metadata table and makes a parameter PMC
    from it. */
-static PMC* make_param_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_param_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                            FILE *in, Parrot_UInt4 row)
 {
     Parrot_UInt4 row_addr;
@@ -894,7 +895,7 @@ static PMC* make_param_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *p = pmc_new(INTERP, dynclass_DotNetParamMetadata);
-    struct dotnet_param *param = mem_sys_allocate_zeroed(sizeof (struct dotnet_param));
+    dotnet_param *param = mem_allocate_zeroed_typed(dotnet_param);
     PMC_struct_val(p) = param;
 
     /* Sanity check. */
@@ -933,7 +934,7 @@ static PMC* make_param_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
 /* This looks up a row in the fields metadata table and makes a field PMC
    from it. */
-static PMC* make_field_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_field_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                            FILE *in, Parrot_UInt4 row)
 {
     Parrot_UInt4 row_addr;
@@ -942,7 +943,7 @@ static PMC* make_field_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *f = pmc_new(INTERP, dynclass_DotNetFieldMetadata);
-    struct dotnet_field *field = mem_sys_allocate_zeroed(sizeof (struct dotnet_field));
+    dotnet_field *field = mem_allocate_zeroed_typed(dotnet_field);
     PMC_struct_val(f) = field;
 
     /* Sanity check. */
@@ -992,7 +993,7 @@ static PMC* make_field_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
 /* This looks up a row in the methods metadata table and makes a method PMC
    from it. */
-static PMC* make_method_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_method_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                             FILE *in, Parrot_UInt4 row)
 {
     Parrot_UInt4 row_addr;
@@ -1005,7 +1006,7 @@ static PMC* make_method_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *a
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *m = pmc_new(INTERP, dynclass_DotNetMethodMetadata);
-    struct dotnet_method *method = mem_sys_allocate_zeroed(sizeof (struct dotnet_method));
+    dotnet_method *method = mem_allocate_zeroed_typed(dotnet_method);
     PMC_struct_val(m) = method;
 
     /* Sanity check. */
@@ -1111,12 +1112,12 @@ static PMC* make_method_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *a
 
 /* This takes a class and looks for all of its PMCs. */
 static void add_class_interfaces(Interp *INTERP, PMC *self,
-                                 struct dotnet_assembly *ass,
+                                 dotnet_assembly *ass,
                                  Parrot_UInt4 row)
 {
     Parrot_UInt4 cur_addr;
     Parrot_UInt4 i;
-    struct dotnet_class *type = PMC_struct_val(self);
+    dotnet_class *type = (dotnet_class *)PMC_struct_val(self);
 
     /* Set up two resizable PMC arrays for the interfaces info. */
     type->interface_types = pmc_new(INTERP, enum_class_ResizableIntegerArray);
@@ -1171,7 +1172,7 @@ static void add_class_interfaces(Interp *INTERP, PMC *self,
 
 /* This looks up a row in the classes metadata table and makes a class PMC from
    it. */
-static PMC* make_class_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_class_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                            FILE *in, Parrot_UInt4 row)
 {
     Parrot_UInt4 row_addr;
@@ -1186,7 +1187,7 @@ static PMC* make_class_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *c = pmc_new(INTERP, dynclass_DotNetClassMetadata);
-    struct dotnet_class *type = mem_sys_allocate_zeroed(sizeof (struct dotnet_class));
+    dotnet_class *type = mem_allocate_zeroed_typed(dotnet_class);
     PMC_struct_val(c) = type;
 
     /* Sanity check. */
@@ -1341,7 +1342,7 @@ static PMC* make_class_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
 /* This looks up a row in the typeref metadata table and makes a typeref PMC from
    it. */
-static PMC* make_typeref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_typeref_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                            FILE *in, Parrot_UInt4 row)
 {
     Parrot_UInt4 row_addr;
@@ -1351,7 +1352,7 @@ static PMC* make_typeref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *
 
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *tr = pmc_new(INTERP, dynclass_DotNetTypeRefMetadata);
-    struct dotnet_typeref *typeref = mem_sys_allocate_zeroed(sizeof (struct dotnet_typeref));
+    dotnet_typeref *typeref = mem_allocate_zeroed_typed(dotnet_typeref);
     PMC_struct_val(tr) = typeref;
 
     /* Sanity check. */
@@ -1410,7 +1411,7 @@ static PMC* make_typeref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *
 
 /* This looks up a row in the MemberRef metadata table and makes a memberref
    PMC from it. */
-static PMC* make_memberref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_memberref_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                                FILE *in, Parrot_UInt4 row)
 {
     Parrot_UInt4 row_addr;
@@ -1419,7 +1420,7 @@ static PMC* make_memberref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly
 
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *mr = pmc_new(INTERP, dynclass_DotNetMemberRefMetadata);
-    struct dotnet_memberref *memberref = mem_sys_allocate_zeroed(sizeof (struct dotnet_memberref));
+    dotnet_memberref *memberref = mem_allocate_zeroed_typed(dotnet_memberref);
     PMC_struct_val(mr) = memberref;
 
     /* Sanity check. */
@@ -1480,7 +1481,7 @@ static PMC* make_memberref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly
 
 /* This looks up a row in the AssemblyRef metadata table and makes a assemblyref
    PMC from it. */
-static PMC* make_assemblyref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *ass,
+static PMC* make_assemblyref_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
                                  FILE *in, Parrot_UInt4 row)
 {
     Parrot_UInt4 row_addr;
@@ -1490,8 +1491,8 @@ static PMC* make_assemblyref_pmc(Interp *INTERP, PMC *self, struct dotnet_assemb
 
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *ar = pmc_new(INTERP, dynclass_DotNetAssemblyRefMetadata);
-    struct dotnet_assemblyref *assemblyref =
-        mem_sys_allocate_zeroed(sizeof (struct dotnet_assemblyref));
+    dotnet_assemblyref *assemblyref =
+        mem_allocate_zeroed_typed(dotnet_assemblyref);
     PMC_struct_val(ar) = assemblyref;
 
     /* Sanity check. */
@@ -1565,7 +1566,7 @@ static PMC* make_assemblyref_pmc(Interp *INTERP, PMC *self, struct dotnet_assemb
 /* This produces an ordering for classes so those highest in the inheritance
    hierachy come first, since this is the order we need to generate them in
    the output file. */
-static void sort_classes(Interp *INTERP, struct dotnet_assembly *ass)
+static void sort_classes(Interp *INTERP, dotnet_assembly *ass)
 {
     /* Bit of background. Classes in the .NET metadata can appear in any order
        but in the PIR we emit they must appear so those that are higher in an
@@ -1577,12 +1578,12 @@ static void sort_classes(Interp *INTERP, struct dotnet_assembly *ass)
        the classes we have put in the ordered list so far. A class can only be
        put in the target list if its parents are flagged in the main list as
        done. */
-    PMC* target_list = pmc_new(INTERP, enum_class_FixedIntegerArray);
-    int num_classes = VTABLE_elements(INTERP, ass->classes);
-    char* class_flags = mem_sys_allocate_zeroed(num_classes + 1);
-    int iters = 0;
-    int done = 0;
-    int i;
+    PMC  *target_list = pmc_new(INTERP, enum_class_FixedIntegerArray);
+    int   num_classes = VTABLE_elements(INTERP, ass->classes);
+    char *class_flags = (char *)mem_sys_allocate_zeroed(num_classes + 1);
+    int   iters       = 0;
+    int   done        = 0;
+    int   i;
 
     /* Order list has as many elements as there are classes. */
     VTABLE_set_integer_native(INTERP, target_list, num_classes);
@@ -1594,7 +1595,7 @@ static void sort_classes(Interp *INTERP, struct dotnet_assembly *ass)
         {
             /* Get the class. */
             PMC *c = VTABLE_get_pmc_keyed_int(INTERP, ass->classes, i);
-            struct dotnet_class *type = PMC_struct_val(c);
+            dotnet_class *type = (dotnet_class *)PMC_struct_val(c);
             int have_all_parents = 1;
 
             /* If we've already got this class in the list, skip. */
@@ -1657,7 +1658,7 @@ static void sort_classes(Interp *INTERP, struct dotnet_assembly *ass)
 
 /* This turns data in metadata tables into a bunch of PMCs. */
 static int metadata_to_pmcs(Interp *INTERP, PMC *self, FILE *in,
-                            struct dotnet_assembly *ass)
+                            dotnet_assembly *ass)
 {
     Parrot_UInt4 row;
 
@@ -1813,8 +1814,8 @@ pmclass DotNetAssembly dynpmc group dotnet {
     /* Get string vtable function; returns the filename, if one is set. */
     STRING* get_string()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
-        if (ass != NULL)
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
+        if (ass)
             return ass->filename;
         else
             return NULL;
@@ -1826,7 +1827,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
     void set_string_native(STRING* s)
     {
         /* Out with the old... */
-        destroy_dotnet_assembly(PMC_struct_val(SELF));
+        destroy_dotnet_assembly((dotnet_assembly *)PMC_struct_val(SELF));
 
         /* ...in with the (name of) the new. :-) */
         PMC_struct_val(SELF) = new_dotnet_assembly(s);
@@ -1837,7 +1838,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
     void mark()
     {
         /* Tell the GC about stuff we're holding on to. */
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
         if (ass)
         {
             if (ass->filename)
@@ -1868,14 +1869,14 @@ pmclass DotNetAssembly dynpmc group dotnet {
     void destroy()
     {
         /* Cleanup any memory we're using. */
-        destroy_dotnet_assembly(PMC_struct_val(SELF));
+        destroy_dotnet_assembly((dotnet_assembly *)PMC_struct_val(SELF));
     }
 
 
     /* The load method. */
     METHOD void load()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
         FILE *in;
         char *filename;
 
@@ -1953,182 +1954,155 @@ pmclass DotNetAssembly dynpmc group dotnet {
     }
 
 
-    METHOD int is_dll()
+    METHOD INTVAL is_dll()
     {
         /* Provided we have an assembly, return the flag. */
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
-        if (ass != NULL)
-            return ass->is_dll;
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
+        if (ass) {
+            INTVAL result = ass->is_dll;
+            RETURN(INTVAL result);
+        }
         else
-        {
             real_exception(INTERP, NULL, E_StandardError,
                 "No .NET CLI file loaded");
-            return 0;
-        }
     }
 
 
     METHOD STRING* get_internal_string(int i)
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
-        Parrot_UInt4 cur_pos = i;
+        dotnet_assembly *ass     = (dotnet_assembly *)PMC_struct_val(SELF);
+        Parrot_UInt4     cur_pos = i;
+        STRING          *result;
 
-        /* If we don't have an assembly, throw an esception and leave. */
-        if (ass == NULL)
-        {
+        /* If we don't have an assembly, throw an exception and leave. */
+        if (!ass)
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
-        }
 
         /* Otherwise, check string is within range. */
         if ((Parrot_UInt4)i >= ass->strings_size)
-        {
             real_exception(INTERP, NULL, E_StandardError,
                "String position out of range");
-            return NULL;
-        }
 
         /* Create and return a new string (pass 0 as length; end found
            automatically). */
-        return string_from_cstring(INTERP, ass->strings + i, 0);
+
+        result = string_from_cstring(INTERP, ass->strings + i, 0);
+        RETURN(STRING *result);
     }
 
 
     METHOD STRING* get_user_string(int i)
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
-        Parrot_UInt4 length;
-        Parrot_UInt4 start;
-        ENCODING *encoding = Parrot_find_encoding(INTERP, "utf16");
-        CHARSET *charset = Parrot_find_charset(INTERP, "unicode");
+        dotnet_assembly *ass      = (dotnet_assembly *)PMC_struct_val(SELF);
+        const ENCODING  *encoding = Parrot_find_encoding(INTERP, "utf16");
+        const CHARSET   *charset  = Parrot_find_charset(INTERP, "unicode");
+        STRING          *result;
+        Parrot_UInt4     length;
+        Parrot_UInt4     start;
 
         /* If we don't have an assembly, throw an esception and leave. */
-        if (ass == NULL)
-        {
+        if (!ass)
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
-        }
 
         /* Otherwise, check string is within range. */
         if ((Parrot_UInt4)i >= ass->user_strings_size)
-        {
             real_exception(INTERP, NULL, E_StandardError,
                "User string position out of range");
-            return NULL;
-        }
 
         /* Get size of string (Partition II Clause 23.2.4). */
         if ((ass->user_strings[i] & 0x80) == 0)
         {
             length = ass->user_strings[i];
-            start = i + 1;
+            start  = i + 1;
         }
         else if ((ass->user_strings[i] & 0x40) == 0)
         {
             length = ((ass->user_strings[i] & 0x3F) << 8) +
                      ass->user_strings[i+1];
-            start = i + 2;
+            start  = i + 2;
         }
         else if ((ass->user_strings[i] & 0x20) == 0)
         {
             length = ((ass->user_strings[i] & 0x1F) << 24) +
-                     (ass->user_strings[i+1] << 16) +
-                     (ass->user_strings[i+2] << 8) +
-                     ass->user_strings[i+3];
-            start = i + 4;
+                      (ass->user_strings[i + 1]     << 16) +
+                      (ass->user_strings[i + 2]     << 8) +
+                       ass->user_strings[i + 3];
+            start  = i + 4;
         }
-        else {
+        else
             real_exception(INTERP, NULL, E_StandardError,
                "Unable to decode user string length");
-            return NULL;
-        }
 
         /* Sanity check. */
         if (start + length > ass->user_strings_size)
-        {
             real_exception(INTERP, NULL, E_StandardError,
                "Blob position and length out of range");
-            return NULL;
-        }
 
         /* Return string. */
-        return string_make_direct(INTERP, ass->user_strings + start, length - 1,
-                                  encoding, charset, 0);
+        result = string_make_direct(INTERP, ass->user_strings + start,
+                    length - 1, encoding, charset, 0);
+        RETURN(STRING *result);
     }
 
 
     METHOD STRING* get_blob(int i)
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
         unsigned int length;
         unsigned int start;
-                STRING *out;
+        STRING *out;
 
         /* If we don't have an assembly, throw an esception and leave. */
-        if (ass == NULL)
-        {
+        if (!ass)
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
-        }
 
         /* Otherwise, check blob is within range. */
         if ((Parrot_UInt4)i >= ass->blobs_size)
-        {
             real_exception(INTERP, NULL, E_StandardError,
                "Blob position out of range");
-            return NULL;
-        }
 
         /* Get size of blob (Partition II Clause 23.2.4). */
         if ((ass->blobs[i] & 0x80) == 0)
         {
             length = ass->blobs[i];
-            start = i + 1;
+            start  = i + 1;
         }
         else if ((ass->blobs[i] & 0x40) == 0)
         {
             length = ((ass->blobs[i] & 0x3F) << 8) + ass->blobs[i+1];
-            start = i + 2;
+            start  = i + 2;
         }
         else if ((ass->blobs[i] & 0x20) == 0)
         {
             length = ((ass->blobs[i] & 0x1F) << 24) + (ass->blobs[i+1] << 16) +
                      (ass->blobs[i+2] << 8) + ass->blobs[i+3];
-            start = i + 4;
+            start  = i + 4;
         }
-        else {
+        else
             real_exception(INTERP, NULL, E_StandardError,
                "Unable to decode blob length");
-            return NULL;
-        }
 
         /* Sanity check. */
         if (start + length > ass->blobs_size)
-        {
             real_exception(INTERP, NULL, E_StandardError,
                "Blob position and length out of range");
-            return NULL;
-        }
 
         /* Return string containing blob. */
-                out = string_from_cstring(INTERP, ass->blobs + start, length);
-                if (out == NULL)
-        {
+        out = string_from_cstring(INTERP, ass->blobs + start, length);
+        if (!out)
             real_exception(INTERP, NULL, E_StandardError,
                "Unable to create blob string");
-            return NULL;
-        }
-                else
-                        return out;
+
+        RETURN(STRING *out);
     }
 
 
     METHOD PMC* get_global()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. Otherwise, return classes PMC array. */
@@ -2136,16 +2110,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
         }
-        else
-            return ass->globals;
+        else {
+            PMC *result = ass->globals;
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_classes()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. Otherwise, return classes PMC array. */
@@ -2153,16 +2128,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
         }
-        else
-            return ass->classes;
+        else {
+            PMC *result = ass->classes;
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_class_order()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. Otherwise, return class order PMC array. */
@@ -2170,16 +2146,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
         }
-        else
-            return ass->class_order;
+        else {
+            PMC *result = ass->class_order;
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_typerefs()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. */
@@ -2187,16 +2164,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
         }
-        else
-            return ass->typerefs;
+        else {
+            PMC *result = ass->typerefs;
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_memberrefs()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. */
@@ -2204,16 +2182,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
         }
-        else
-            return ass->memberrefs;
+        else {
+            PMC *result = ass->memberrefs;
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_assemblyrefs()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. */
@@ -2221,16 +2200,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
         }
-        else
-            return ass->assemblyrefs;
+        else {
+            PMC *result = ass->assemblyrefs;
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_field(int i)
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. Otherwise, return appropriate element of
@@ -2239,16 +2219,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
         }
-        else
-            return VTABLE_get_pmc_keyed_int(INTERP, ass->fields, i - 1);
+        else {
+            PMC *result = VTABLE_get_pmc_keyed_int(INTERP, ass->fields, i - 1);
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_method(int i)
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. Otherwise, return appropriate element of
@@ -2257,16 +2238,18 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
+            RETURN(PMC *PMCNULL);
         }
-        else
-            return VTABLE_get_pmc_keyed_int(INTERP, ass->methods, i - 1);
+        else {
+            PMC *result = VTABLE_get_pmc_keyed_int(INTERP, ass->methods, i - 1);
+            RETURN(PMC *result);
+        }
     }
 
 
     METHOD PMC* get_entry_method()
     {
-        struct dotnet_assembly *ass = PMC_struct_val(SELF);
+        dotnet_assembly *ass = (dotnet_assembly *)PMC_struct_val(SELF);
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. */
@@ -2274,11 +2257,13 @@ pmclass DotNetAssembly dynpmc group dotnet {
         {
             real_exception(INTERP, NULL, E_StandardError,
                "No .NET CLI file loaded");
-            return NULL;
+            RETURN(PMC *PMCNULL);
         }
-        else
-            return VTABLE_get_pmc_keyed_int(INTERP, ass->methods,
+        else {
+            PMC *result = VTABLE_get_pmc_keyed_int(INTERP, ass->methods,
                 ass->entry_point);
+            RETURN(PMC *result);
+        }
     }
 }
 

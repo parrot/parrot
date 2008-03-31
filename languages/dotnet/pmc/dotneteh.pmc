@@ -1,12 +1,12 @@
 /*
  * $Id$
- * Copyright (C) 2006, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 /* .NET CLI Exception Handler PMC */
 
 
-#include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "tableinfo.h"
 #include "structures.h"
 
@@ -25,7 +25,7 @@ pmclass DotNetEH dynpmc group dotnet {
     void mark()
     {
         /* Tell the GC about stuff we're holding on to. */
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
         if (eh->parent)
             pobject_lives(INTERP, (PObj*)eh->parent);
     }
@@ -35,148 +35,138 @@ pmclass DotNetEH dynpmc group dotnet {
     void destroy()
     {
         /* Cleanup any memory we're using. */
-        if (PMC_struct_val(SELF) != NULL)
-        {
-            struct dotnet_eh *eh = PMC_struct_val(SELF);
-            free(eh);
+        if (PMC_struct_val(SELF)) {
+            mem_sys_free(PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
 
 
     /* Get try offset. */
-    METHOD int get_try_offset()
+    METHOD INTVAL get_try_offset()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->try_offset;
+
+        result = (INTVAL)eh->try_offset;
+        RETURN(INTVAL result);
     }
 
 
     /* Get try length. */
-    METHOD int get_try_length()
+    METHOD INTVAL get_try_length()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->try_length;
+
+        result = (INTVAL)eh->try_length;
+        RETURN(INTVAL result);
     }
 
 
     /* Get handler offset. */
-    METHOD int get_handler_offset()
+    METHOD INTVAL get_handler_offset()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->handler_offset;
+
+        result = (INTVAL)eh->handler_offset;
+        RETURN(INTVAL result);
     }
 
 
     /* Get handler length. */
-    METHOD int get_handler_length()
+    METHOD INTVAL get_handler_length()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->handler_length;
+
+        result = (INTVAL)eh->handler_length;
+        RETURN(INTVAL result);
     }
 
 
     /* Get flags. */
-    METHOD int get_flags()
+    METHOD INTVAL get_flags()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->flags;
+
+        result = (INTVAL)eh->flags;
+        RETURN(INTVAL result);
     }
 
 
     /* Get typed handler's class type. */
-    METHOD int get_class_type()
+    METHOD INTVAL get_class_type()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->class_type;
+
+        result = (INTVAL)eh->class_type;
+        RETURN(INTVAL result);
     }
 
 
     /* Get typed handler's class ID. */
-    METHOD int get_class_id()
+    METHOD INTVAL get_class_id()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->class_id;
+
+        result = (INTVAL)eh->class_id;
+        RETURN(INTVAL result);
     }
 
 
     /* Get filter handler's offset. */
-    METHOD int get_filter_offset()
+    METHOD INTVAL get_filter_offset()
     {
-        struct dotnet_eh *eh = PMC_struct_val(SELF);
+        dotnet_eh *eh = (dotnet_eh *)PMC_struct_val(SELF);
+        INTVAL     result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (eh == NULL)
-        {
+        if (!eh)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetEH PMC");
-            return 0;
-        }
-        else
-            return (int) eh->filter_offset;
+
+        result = (INTVAL)eh->filter_offset;
+        RETURN(INTVAL result);
     }
 }
 

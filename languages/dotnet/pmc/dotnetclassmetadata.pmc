@@ -1,12 +1,12 @@
 /*
  * $Id$
- * Copyright (C) 2006, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 /* .NET CLI Class Metadata PMC */
 
 
-#include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "tableinfo.h"
 #include "structures.h"
 
@@ -24,17 +24,14 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
     /* Get string vtable function; returns the name of the class. */
     STRING* get_string()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
 
         /* Handle cases where we've an invalid PMC. */
         if (c == NULL || c->str_name == NULL)
-        {
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return NULL;
-        }
-        else
-            return c->str_name;
+
+        return c->str_name;
     }
 
 
@@ -42,26 +39,25 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
     void mark()
     {
         /* Tell the GC about stuff we're holding on to. */
-        struct dotnet_class *c = PMC_struct_val(SELF);
-                if (c)
-                {
-                        if (c->parent)
-                                pobject_lives(INTERP, (PObj*)c->parent);
-                        if (c->str_name)
-                                pobject_lives(INTERP, (PObj*)c->str_name);
-                        if (c->str_namespace)
-                                pobject_lives(INTERP, (PObj*)c->str_namespace);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        if (c) {
+            if (c->parent)
+                pobject_lives(INTERP, (PObj *)c->parent);
+            if (c->str_name)
+                pobject_lives(INTERP, (PObj *)c->str_name);
+            if (c->str_namespace)
+                pobject_lives(INTERP, (PObj *)c->str_namespace);
             if (c->str_fullname)
-                                pobject_lives(INTERP, (PObj*)c->str_fullname);
-                        if (c->fields)
-                                pobject_lives(INTERP, (PObj*)c->fields);
+                pobject_lives(INTERP, (PObj *)c->str_fullname);
+            if (c->fields)
+                pobject_lives(INTERP, (PObj *)c->fields);
             if (c->methods)
-                                pobject_lives(INTERP, (PObj*)c->methods);
-                        if (c->interface_types)
-                                pobject_lives(INTERP, (PObj*)c->interface_types);
+                pobject_lives(INTERP, (PObj *)c->methods);
+            if (c->interface_types)
+                pobject_lives(INTERP, (PObj *)c->interface_types);
             if (c->interface_ids)
-                                pobject_lives(INTERP, (PObj*)c->interface_ids);
-                }
+                pobject_lives(INTERP, (PObj *)c->interface_ids);
+        }
     }
 
 
@@ -69,9 +65,9 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
     void destroy()
     {
         /* Cleanup any memory we're using. */
-        if (PMC_struct_val(SELF) != NULL)
+        if (PMC_struct_val(SELF))
         {
-            free(PMC_struct_val(SELF));
+            mem_sys_free(PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -80,162 +76,152 @@ pmclass DotNetClassMetadata dynpmc group dotnet {
     /* Get the namespace of the class. */
         METHOD STRING* get_namespace()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        STRING       *result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return NULL;
-        }
-        else
-            return c->str_namespace;
+        result = c->str_namespace;
+        RETURN(STRING *result);
     }
 
 
     /* Get the fully qualified name of the class. */
-        METHOD STRING* get_fullname()
+    METHOD STRING* get_fullname()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        STRING       *result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return NULL;
-        }
-        else
-            return c->str_fullname;
+
+        result = c->str_fullname;
+        RETURN(STRING *result);
     }
 
 
     /* Get the flags of the class. */
-        METHOD int get_flags()
+    METHOD INTVAL get_flags()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        INTVAL        result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return 0;
-        }
-        else
-            return (int) c->flags;
+
+        result = (INTVAL)c->flags;
+        RETURN(INTVAL result);
     }
 
-
-        /* Get a PMC array of fields belonging to the class. */
-        METHOD PMC* get_fields()
+    /* Get a PMC array of fields belonging to the class. */
+    METHOD PMC* get_fields()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        PMC          *result;
 
         /* Handle cases where we've an invalid PMC or no fields. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return NULL;
-        }
-                else if (c->fields == NULL)
-                {
-                        return pmc_new(INTERP, enum_class_FixedPMCArray);
-                }
+
+        if (c->fields)
+            result = c->fields;
         else
-            return c->fields;
+            result = pmc_new(INTERP, enum_class_FixedPMCArray);
+
+        RETURN(PMC *result);
     }
 
 
     /* Get a PMC array of methods belonging to the class. */
-        METHOD PMC* get_methods()
+    METHOD PMC* get_methods()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        PMC          *result;
 
         /* Handle cases where we've an invalid PMC or no methods. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return NULL;
-        }
-                else if (c->methods == NULL)
-                {
-                        return pmc_new(INTERP, enum_class_FixedPMCArray);
-                }
+
+        if (c->methods)
+            result = c->methods;
         else
-            return c->methods;
+            result = pmc_new(INTERP, enum_class_FixedPMCArray);
+
+        RETURN(PMC *result);
     }
 
 
     /* Get the id of the class that this one inherits. */
-        METHOD int get_parent_id()
+    METHOD INTVAL get_parent_id()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        INTVAL        result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return 0;
-        }
-        else
-            return (int) c->parent_id;
+
+        result = (INTVAL)c->parent_id;
+        RETURN(INTVAL result);
     }
 
 
     /* Get the type of the class that this one inherits. This is either a
        type defined in this module or a reference to another module. */
-        METHOD int get_parent_type()
+    METHOD INTVAL get_parent_type()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        INTVAL        result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return 0;
-        }
-        else
-            return (int) c->parent_type;
+
+        result = (INTVAL)c->parent_type;
+
+        RETURN(INTVAL result);
     }
 
 
     /* Get the array of ids of the interfaces this class implements. */
-        METHOD PMC* get_interface_ids()
+    METHOD PMC* get_interface_ids()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        PMC          *result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL || c->interface_ids == NULL)
-        {
+        if (!c || !c->interface_ids)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return 0;
-        }
-        else
-            return c->interface_ids;
+
+        result =  c->interface_ids;
+        RETURN(PMC *result);
     }
 
 
     /* Get the array of types of the interfaces this class implements. */
-        METHOD PMC* get_interface_types()
+    METHOD PMC* get_interface_types()
     {
-        struct dotnet_class *c = PMC_struct_val(SELF);
+        dotnet_class *c = (dotnet_class *)PMC_struct_val(SELF);
+        PMC          *result;
 
         /* Handle cases where we've an invalid PMC. */
         if (c == NULL || c->interface_types == NULL)
-        {
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetClassMetadata PMC");
-            return 0;
-        }
-        else
-            return c->interface_types;
+
+        result = c->interface_types;
+        RETURN(PMC *result);
     }
 }
 

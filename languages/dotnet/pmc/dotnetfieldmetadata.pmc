@@ -1,12 +1,12 @@
 /*
  * $Id$
- * Copyright (C) 2006, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 /* .NET CLI Field Metadata PMC */
 
 
-#include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "tableinfo.h"
 #include "structures.h"
 
@@ -24,7 +24,7 @@ pmclass DotNetFieldMetadata dynpmc group dotnet {
     /* Get string vtable function; returns the name of the field. */
     STRING* get_string()
     {
-        struct dotnet_field *f = PMC_struct_val(SELF);
+        dotnet_field *f = (dotnet_field *)PMC_struct_val(SELF);
 
         /* Handle cases where we've an invalid PMC. */
         if (f == NULL || f->str_name == NULL)
@@ -42,13 +42,13 @@ pmclass DotNetFieldMetadata dynpmc group dotnet {
     void mark()
     {
         /* Tell the GC about stuff we're holding on to. */
-        struct dotnet_field *f = PMC_struct_val(SELF);
+        dotnet_field *f = (dotnet_field *)PMC_struct_val(SELF);
         if (f)
         {
             if (f->parent)
-                pobject_lives(INTERP, (PObj*)f->parent);
+                pobject_lives(INTERP, (PObj *)f->parent);
             if (f->str_name)
-                pobject_lives(INTERP, (PObj*)f->str_name);
+                pobject_lives(INTERP, (PObj *)f->str_name);
         }
     }
 
@@ -57,62 +57,58 @@ pmclass DotNetFieldMetadata dynpmc group dotnet {
     void destroy()
     {
         /* Cleanup any memory we're using. */
-        if (PMC_struct_val(SELF) != NULL)
-        {
-            free(PMC_struct_val(SELF));
+        if (PMC_struct_val(SELF)) {
+            mem_sys_free(PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
 
 
     /* Get flags of the field. */
-    METHOD int get_flags()
+    METHOD INTVAL get_flags()
     {
-        struct dotnet_field *f = PMC_struct_val(SELF);
+        dotnet_field *f = (dotnet_field *)PMC_struct_val(SELF);
+        INTVAL        result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (f == NULL)
-        {
+        if (!f)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetFieldMetadata PMC");
-            return 0;
-        }
-        else
-            return (int) f->flags;
+
+        result = (INTVAL)f->flags;
+        RETURN(INTVAL result);
     }
 
 
     /* Get the position of the blob holding the signature for the method. */
-    METHOD int get_signature()
+    METHOD INTVAL get_signature()
     {
-        struct dotnet_field *f = PMC_struct_val(SELF);
+        dotnet_field *f = (dotnet_field *)PMC_struct_val(SELF);
+        INTVAL        result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (f == NULL)
-        {
+        if (!f)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetFieldMetadata PMC");
-            return 0;
-        }
-        else
-            return (int) f->signature;
+
+        result = (INTVAL)f->signature;
+        RETURN(INTVAL result);
     }
 
 
     /* Get the class meta-data PMC for the field. */
     METHOD PMC* get_class()
     {
-        struct dotnet_field *f = PMC_struct_val(SELF);
+        dotnet_field *f = (dotnet_field *)PMC_struct_val(SELF);
+        PMC          *result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (f == NULL || f->parent == NULL)
-        {
+        if (!f || !f->parent)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetFieldMetadata PMC");
-            return NULL;
-        }
-        else
-            return f->parent;
+
+        result = f->parent;
+        RETURN(PMC *result);
     }
 }
 

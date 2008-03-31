@@ -1,12 +1,12 @@
 /*
  * $Id$
- * Copyright (C) 2006, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 /* .NET CLI TypeRef Metadata PMC */
 
 
-#include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "tableinfo.h"
 #include "structures.h"
 
@@ -24,17 +24,14 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
     /* Get string vtable function; returns the name of the referenced type. */
     STRING* get_string()
     {
-        struct dotnet_typeref *c = PMC_struct_val(SELF);
+        dotnet_typeref *c = (dotnet_typeref *)PMC_struct_val(SELF);
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL || c->str_name == NULL)
-        {
+        if (!c || !c->str_name)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetTypeRefMetadata PMC");
-            return NULL;
-        }
-        else
-            return c->str_name;
+
+        return c->str_name;
     }
 
 
@@ -42,14 +39,13 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
     void mark()
     {
         /* Tell the GC about stuff we're holding on to. */
-        struct dotnet_typeref *c = PMC_struct_val(SELF);
-                if (c)
-                {
-                        if (c->str_name)
-                                pobject_lives(INTERP, (PObj*)c->str_name);
-                        if (c->str_namespace)
-                                pobject_lives(INTERP, (PObj*)c->str_namespace);
-                }
+        dotnet_typeref *c = (dotnet_typeref *)PMC_struct_val(SELF);
+        if (c) {
+            if (c->str_name)
+                pobject_lives(INTERP, (PObj*)c->str_name);
+            if (c->str_namespace)
+                pobject_lives(INTERP, (PObj*)c->str_namespace);
+        }
     }
 
 
@@ -57,45 +53,42 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
     void destroy()
     {
         /* Cleanup any memory we're using. */
-        if (PMC_struct_val(SELF) != NULL)
-        {
-            free(PMC_struct_val(SELF));
+        if (PMC_struct_val(SELF)) {
+            mem_sys_free(PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
 
 
     /* Get the namespace of the referenced type. */
-        METHOD STRING* get_namespace()
+    METHOD STRING* get_namespace()
     {
-        struct dotnet_typeref *c = PMC_struct_val(SELF);
+        dotnet_typeref *c = (dotnet_typeref *)PMC_struct_val(SELF);
+        STRING         *result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetTypeRefMetadata PMC");
-            return NULL;
-        }
-        else
-            return c->str_namespace;
+
+        result = c->str_namespace;
+        RETURN(STRING *result);
     }
 
 
     /* Get the resolution scope. */
-        METHOD int get_resolution_scope()
+    METHOD INTVAL get_resolution_scope()
     {
-        struct dotnet_typeref *c = PMC_struct_val(SELF);
+        dotnet_typeref *c = (dotnet_typeref *)PMC_struct_val(SELF);
+        INTVAL          result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (c == NULL)
-        {
+        if (!c)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetTypeRefMetadata PMC");
-            return 0;
-        }
-        else
-            return c->resolution_scope;
+
+        result = c->resolution_scope;
+        RETURN(INTVAL result);
     }
 }
 

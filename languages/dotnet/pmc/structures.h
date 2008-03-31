@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_DOTNET_PMC_STRUCTURES_H_GUARD
@@ -9,22 +9,22 @@
 /* Some structures relating to the .NET CLI files and metadata PMCs. */
 
 /* This structure describes a loaded .NET assembly. */
-struct dotnet_assembly {
+typedef struct dotnet_assembly {
     /* Details that the user of the PMC may be interested in. */
-    STRING* filename;
+    STRING *filename;
     int is_dll;
     Parrot_UInt4 entry_point;
 
     /* Heaps and tables pointers, sizes and pointer sizes if needed. */
-    unsigned char *strings;
+    char *strings;
     Parrot_UInt4 strings_size;
     Parrot_UInt4 strings_ptr_size;
-    unsigned char *user_strings;
+    char *user_strings;
     Parrot_UInt4 user_strings_size;
-    unsigned char *blobs;
+    char *blobs;
     Parrot_UInt4 blobs_size;
     Parrot_UInt4 blobs_ptr_size;
-    unsigned char *tables;
+    char *tables;
     Parrot_UInt4 tables_size;
     Parrot_UInt4 guid_ptr_size;
 
@@ -56,11 +56,11 @@ struct dotnet_assembly {
 
     /* Flag indicating if the file has been loaded. */
     int loaded;
-};
+} dotnet_assembly;
 
 
 /* This structure describes a reference to another assembly. */
-struct dotnet_assemblyref {
+typedef struct dotnet_assemblyref {
     /* Version. */
     Parrot_UInt2 version_major;
     Parrot_UInt2 version_minor;
@@ -73,11 +73,11 @@ struct dotnet_assemblyref {
     STRING *str_name;
     STRING *str_culture;
     Parrot_UInt4 hash_value;
-};
+} dotnet_assemblyref;
 
 
 /* This structure describes a .NET class. */
-struct dotnet_class {
+typedef struct dotnet_class {
     /* Pointer to the assembly PMC the class belongs to. */
     PMC *parent;
 
@@ -98,13 +98,13 @@ struct dotnet_class {
     Parrot_UInt4 parent_id;
 
     /* Interfaces. */
-    PMC* interface_types;
-    PMC* interface_ids;
-};
+    PMC *interface_types;
+    PMC *interface_ids;
+} dotnet_class;
 
 
 /* This structure describes a .NET method. */
-struct dotnet_method {
+typedef struct dotnet_method {
     /* Pointer to the class PMC the method belongs to. */
     PMC *parent;
 
@@ -119,11 +119,11 @@ struct dotnet_method {
     /* Some flags. */
     Parrot_UInt2 implFlags;
     Parrot_UInt2 flags;
-};
+} dotnet_method;
 
 
 /* This structure describes a .NET field. */
-struct dotnet_field {
+typedef struct dotnet_field {
     /* Pointer to the class PMC the field belongs to. */
     PMC *parent;
 
@@ -133,11 +133,11 @@ struct dotnet_field {
 
     /* Flags. */
     Parrot_UInt2 flags;
-};
+} dotnet_field;
 
 
 /* This structure describes a .NET member reference. */
-struct dotnet_memberref {
+typedef struct dotnet_memberref {
     /* Name and signature blob position. */
     STRING *str_name;
     Parrot_UInt4 signature;
@@ -145,11 +145,11 @@ struct dotnet_memberref {
     /* Class (which could be a method def or many other things) */
     Parrot_UInt4 class_type;
     Parrot_UInt4 class_id;
-};
+} dotnet_memberref;
 
 
 /* This structure describes a .NET parameter. */
-struct dotnet_param {
+typedef struct dotnet_param {
     /* Pointer to the method PMC the parameter belongs to. */
     PMC *parent;
 
@@ -159,11 +159,11 @@ struct dotnet_param {
     /* Flags and sequence number. */
     Parrot_UInt2 flags;
     Parrot_UInt2 sequence;
-};
+} dotnet_param;
 
 
 /* This structure describes a chunk of .NET bytecode. */
-struct dotnet_bytecode {
+typedef struct dotnet_bytecode {
     /* Pointer to the method PMC the field belongs to. */
     PMC *parent;
 
@@ -182,11 +182,11 @@ struct dotnet_bytecode {
 
     /* Array of DotNetEH (Exception Handlers). */
     PMC *eh;
-};
+} dotnet_bytecode;
 
 
 /* This structure describes a .NET exception handler. */
-struct dotnet_eh {
+typedef struct dotnet_eh {
     /* Pointer to the method PMC the handler belongs to. */
     PMC *parent;
 
@@ -203,29 +203,29 @@ struct dotnet_eh {
     Parrot_UInt4 class_type;
     Parrot_UInt4 class_id;
     Parrot_UInt4 filter_offset;
-};
+} dotnet_eh;
 
 
 /* This structure describes a .NET signature. */
-struct dotnet_signature {
+typedef struct dotnet_signature {
     /* Stream of bytes that makes up the signature and its length. */
     char *data;
     int data_size;
 
     /* Current position we're at while walking the sig. */
     int cur_pos;
-};
+} dotnet_signature;
 
 
 /* This structure describes a reference to a type in another file. */
-struct dotnet_typeref {
+typedef struct dotnet_typeref {
     /* Position in heaps for name and namespace. */
     STRING *str_name;
     STRING *str_namespace;
 
     /* Resolution scope (basically, what module do we find the type in). */
     Parrot_UInt4 resolution_scope;
-};
+} dotnet_typeref;
 
 
 /* Enums and structure relating to the managed pointer PMC. */
@@ -244,14 +244,13 @@ typedef enum dotnet_managed_ptr_reg_type {
 } Dotnet_Reg_Type;
 
 /* Register info. */
-struct reg_info {
+typedef struct reg_info {
     Dotnet_Reg_Type reg_type;
     int number;
-};
+} reg_info;
 
 /* Underlying struct for the PMC. */
-struct dotnet_managed_ptr
-{
+typedef struct dotnet_managed_ptr {
     Dotnet_Ptr_Type type;
     union {
         PMC* pmc;              /* For arrays, fields and PMCs. */
@@ -260,21 +259,19 @@ struct dotnet_managed_ptr
     union {
         int index;             /* For arrays. */
         STRING *name;          /* For field name. */
-        struct reg_info r;     /* For registers. */
+        reg_info r;            /* For registers. */
     };
-};
+} dotnet_managed_ptr;
 
 
 /* Int64 and UInt64 PMC underlying structs. */
-struct dotnet_int64
-{
+typedef struct dotnet_int64 {
     HUGEINTVAL x;
-};
+} dotnet_int64;
 
-struct dotnet_uint64
-{
+typedef struct dotnet_uint64 {
     UHUGEINTVAL x;
-};
+} dotnet_uint64;
 
 #endif /* PARROT_DOTNET_PMC_STRUCTURES_H_GUARD */
 

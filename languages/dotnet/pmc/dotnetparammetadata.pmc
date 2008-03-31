@@ -1,12 +1,12 @@
 /*
  * $Id$
- * Copyright (C) 2006, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 /* .NET CLI Param Metadata PMC */
 
 
-#include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "tableinfo.h"
 #include "structures.h"
 
@@ -24,17 +24,14 @@ pmclass DotNetParamMetadata dynpmc group dotnet {
     /* Get string vtable function; returns the name of the parameter. */
     STRING* get_string()
     {
-        struct dotnet_param *p = PMC_struct_val(SELF);
+        dotnet_param *p = (dotnet_param *)PMC_struct_val(SELF);
 
         /* Handle cases where we've an invalid PMC. */
-        if (p == NULL || p->str_name == NULL)
-        {
+        if (!p || !p->str_name)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetParamMetadata PMC");
-            return NULL;
-        }
-        else
-            return p->str_name;
+
+        return p->str_name;
     }
 
 
@@ -42,7 +39,7 @@ pmclass DotNetParamMetadata dynpmc group dotnet {
     void mark()
     {
         /* Tell the GC about stuff we're holding on to. */
-        struct dotnet_param *p = PMC_struct_val(SELF);
+        dotnet_param *p = (dotnet_param *)PMC_struct_val(SELF);
         if (p)
         {
             if (p->parent)
@@ -57,45 +54,43 @@ pmclass DotNetParamMetadata dynpmc group dotnet {
     void destroy()
     {
         /* Cleanup any memory we're using. */
-        if (PMC_struct_val(SELF) != NULL)
-        {
-            free(PMC_struct_val(SELF));
+        if (PMC_struct_val(SELF)) {
+            mem_sys_free(PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
 
 
     /* Returns the flags associated with the parameter. */
-    METHOD int get_flags()
+    METHOD INTVAL get_flags()
     {
-        struct dotnet_param *p = PMC_struct_val(SELF);
+        dotnet_param *p = (dotnet_param *)PMC_struct_val(SELF);
+        INTVAL        result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (p == NULL)
-        {
+        if (!p)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetParamMetadata PMC");
-            return 0;
-        }
-        else
-            return (int) p->flags;
+
+        result = (INTVAL)p->flags;
+        RETURN(INTVAL result);
+
     }
 
 
     /* Returns the sequence number associated with the parameter. */
-    METHOD int get_sequence()
+    METHOD INTVAL get_sequence()
     {
-        struct dotnet_param *p = PMC_struct_val(SELF);
+        dotnet_param *p = (dotnet_param *)PMC_struct_val(SELF);
+        INTVAL        result;
 
         /* Handle cases where we've an invalid PMC. */
-        if (p == NULL)
-        {
+        if (!p)
             real_exception(INTERP, NULL, E_StandardError,
                "Invalid DotNetParamMetadata PMC");
-            return 0;
-        }
-        else
-            return (int) p->sequence;
+
+        result = (INTVAL)p->sequence;
+        RETURN(INTVAL result);
     }
 }
 
