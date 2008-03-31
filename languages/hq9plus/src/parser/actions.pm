@@ -34,6 +34,19 @@ method TOP($/) {
                 PAST::Val.new(
                      :value(~$/)
                 )
+            ),
+            PAST::Op.new(
+                :name('infix:='),
+                :pasttype('copy'),
+                PAST::Var.new(
+                    :name('hq9plus_accumulator'),
+                    :viviself('Integer'),
+                    :isdecl(1),
+                    :scope('lexical')
+                ),
+                PAST::Val.new(
+                     :value(0)
+                )
             )
         );
     for $<statement> {
@@ -53,8 +66,18 @@ method statement($/,$key) {
                                    :scope('lexical')
                                ) );
     }
+    elsif ( $key eq 'plus' ) {
+        $past := PAST::Op.new( :name('postfix:++'),
+                               :lvalue(1),
+                               PAST::Var.new(
+                                   :name('hq9plus_accumulator'),
+                                   :scope('lexical')
+                               ) );
+    }
     else {
-        $past := PAST::Op.new( :name($key), :pasttype('call'), :node( $/ ) );
+        $past := PAST::Op.new( :name($key),
+                               :pasttype('call'),
+                               :node( $/ ) );
     }
     make $past;
 }

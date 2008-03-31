@@ -45,12 +45,6 @@ to the HQ9plus compiler.
 .sub 'main' :main
     .param pmc args
 
-    # needed for 'plus'
-    .local pmc accumulator
-    accumulator = new 'Integer'
-    accumulator = 0
-    .lex "$accumulator", accumulator
-
     $P0 = compreg 'HQ9plus'
     $P1 = $P0.'command_line'(args)
 .end
