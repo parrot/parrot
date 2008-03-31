@@ -106,7 +106,7 @@ sub contains_pccmethod {
 
     local $_;
     while (<$fh>) {
-        next unless /PCCMETHOD/;
+        next unless /METHOD/;
         return 1;
     }
 
@@ -166,7 +166,7 @@ END
         $parent_headers .= "src/pmc/pmc_$_.h "
             for $self->pmc_parents($pmc);
 
-        # make each pmc depend upon PCCMETHOD.pm if it uses PCCMETHOD
+        # make each pmc depend upon PCCMETHOD.pm if it uses METHOD
         my $pmc_fname = catfile('src', 'pmc', "$pmc.pmc");
         my $pccmethod_depend =
             contains_pccmethod($pmc_fname) ? 'lib/Parrot/Pmc2c/PCCMETHOD.pm' : '';
