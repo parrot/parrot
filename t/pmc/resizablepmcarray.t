@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -1219,6 +1219,25 @@ CODE
 13
 15
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'method forms of unshift/push/shift/pop/elems' );
+.sub main :main
+    $P0 = new 'ResizablePMCArray'
+    $P0.'unshift'(1)
+    $P0.'push'('two')
+    $I0 = $P0.'elems'()
+    say $I0
+    $P1 = $P0.'shift'()
+    say $P1
+    $P1 = $P0.'pop'()
+    say $P1
+.end
+CODE
+2
+1
+two
+OUTPUT
+
 
 # don't forget to change the number of tests
 
