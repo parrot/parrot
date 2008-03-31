@@ -768,8 +768,8 @@ IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const cha
 =item C<static int eval_ins>
 
 Run one parrot instruction, registers are filled with the
-according constants. Thus the result is always ok as the function
-core evaluates the constants.
+according constants. If an exception occurs, return -1, aborting
+this optimization: this lets the runtime handle any exceptions.
 
 =cut
 
@@ -829,10 +829,9 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 
     /* eval the opcode */
     new_internal_exception(interp);
-    if (setjmp(interp->exceptions->destination)) {
-        fprintf(stderr, "eval_ins: op '%s' failed\n", op);
-        handle_exception(interp);
-    }
+    if (setjmp(interp->exceptions->destination))
+        return -1;
+
     pc = (interp->op_func_table[opnum]) (eval, interp);
     free_internal_exception(interp);
     /* the returned pc is either incremented by op_count or is eval,
@@ -977,6 +976,8 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
      * from the result
      */
     branched = eval_ins(interp, op, found, r);
+    if (branched == -1)
+         return NULL;
     /*
      * for math ops result is in I0/N0
      * if it was a branch with constant args, the result is

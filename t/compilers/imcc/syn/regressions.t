@@ -16,11 +16,11 @@ CODE
 /syntax error/
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0', todo=> 'RT# 43048');
+pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0');
 .sub fold_by_zero
   push_eh ok
     $I1 = 1/0
-  clear_eh
+  pop_eh
  ok:
   say "ok"
 .end  

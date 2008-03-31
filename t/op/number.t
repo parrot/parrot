@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 56;
 
 =head1 NAME
 
@@ -1104,13 +1104,6 @@ OUTPUT
 pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_nc by zero" );
         set N1, 10
         div N1, 0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_nc_nc by zero" );
-        div N1, 0, 0
         end
 CODE
 /.*Divide by zero.*/
