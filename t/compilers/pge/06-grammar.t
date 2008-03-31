@@ -177,7 +177,7 @@ EOF_SIMPLE_GRAMMAR
 
   do_match:
     load_bytecode 'PGE.pbc'
-    load_bytecode 'compilers/pge/pgc.pir'
+    load_bytecode 'PGE/Perl6Grammar.pbc'
 
     match     = parser(expr)
     result    = match

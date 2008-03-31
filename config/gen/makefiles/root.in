@@ -285,7 +285,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Parrot/HLLCompiler.pbc \
     $(LIBRARY_DIR)/PGE/Dumper.pbc \
     $(LIBRARY_DIR)/PGE/Glob.pbc \
-    $(LIBRARY_DIR)/PGE/P6Grammar.pbc \
     $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc \
     $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \

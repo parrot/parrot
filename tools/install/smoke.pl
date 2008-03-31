@@ -58,7 +58,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "token TOP { \\s* }\n";
 close $FH;
-$out = `$parrot lib/parrot/library/PGE/P6Grammar.pir $filename`;
+$out = `$parrot lib/parrot/library/PGE/Perl6Grammar.pir $filename`;
 ok($out =~ /^\n## <::TOP>/, "check PGE");
 unlink($filename);
 

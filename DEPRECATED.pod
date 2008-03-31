@@ -149,19 +149,6 @@ Will have to be:
 
 =over 4
 
-=item * pgc.pir [post 0.5.0]
-
-See RT #48026. The pgc.pir compiler for P6 grammars (pre-2007 regex syntax)
-is deprecated.  Switch to using the new PGE::Perl6Grammar.pir compiler instead,
-and the Perl6Regex syntax.
-
-=item * PGE::P6Regex [post 0.5.0]
-
-See RT #48028. In early 2007 there were a number of changes made to the Perl
-6 regular expression syntax (as given by Synopsis 5).  The new syntax is
-implemented via the PGE::Perl6Regex compiler, and the PGE::P6Regex compiler
-is now deprecated in favor of the new syntax.
-
 =item * compilers/PAST-pm [post 0.5.1]
 
 See RT #48030. The compiler tools in compilers/PAST-pm/ and

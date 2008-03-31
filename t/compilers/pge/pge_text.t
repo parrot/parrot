@@ -19,7 +19,7 @@ These tests examine the ability of PGE to match text with brackets in it.
 
 =head1 SYNOPSIS
 
-        % prove t/p6regex/text_brk.t
+        % prove t/compilers/pge/text_brk.t
 
 =cut
 

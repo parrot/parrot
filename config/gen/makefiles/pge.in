@@ -18,12 +18,10 @@ SOURCES = PGE.pir \
   PGE/Exp.pir \
   PGE/Match.pir \
   PGE/Regex.pir \
-  PGE/P6Regex.pir \
   PGE/Perl6Regex.pir \
   PGE/OPTable.pir \
   PGE/P5Regex.pir \
   PGE/builtins.pg \
-  pgc.pir \
 
 $(PARROT_LIBRARY)/PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
@@ -62,10 +60,10 @@ test: all
 testclean:
 	$(RM_F) "../../t/compilers/pge/*.pir" \
 	    "../../t/compilers/pge/p5regex/*.pir" \
-	    "../../t/compilers/pge/p6regex/*.pir"
+	    "../../t/compilers/pge/perl6regex/*.pir"
 	$(RM_F) "../../t/compilers/pge/*.pbc" \
 	    "../../t/compilers/pge/p5regex/*.pbc" \
-	    "../../t/compilers/pge/p6regex/*.pbc"
+	    "../../t/compilers/pge/perl6regex/*.pbc"
 
 clean: testclean
 	$(RM_F) \

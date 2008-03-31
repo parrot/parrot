@@ -3,6 +3,8 @@
 New in 0.6.1
 - Languages
   + Reimplemented HQ9+ with PCT
+- Compilers
+  + Removed P6Regex, pgc, P6Grammar from PGE
 
 New in 0.6.0
 - Specification

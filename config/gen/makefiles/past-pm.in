@@ -56,20 +56,20 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-test: all NoneParser.pir NoneGrammar.pir
-	cd $(TOOL_DIR); prove -r t/compilers/past-pm
-
+#test: all NoneParser.pir NoneGrammar.pir
+#	cd $(TOOL_DIR); prove -r t/compilers/past-pm
+#
 # NoneParser and NoneGrammar are external modules for some of
 # the tests. They will be moved into the test file later.
-NoneParser.pir: $(TEST_DIR)/NoneParser.pg
-	$(PARROT) $(PGE_DIR)/pgc.pir \
-	    --output=$(TEST_DIR)/NoneParser.pir \
-	    $(TEST_DIR)/NoneParser.pg
-
-NoneGrammar.pir: $(TEST_DIR)/NoneGrammar.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir \
-	    --output=$(TEST_DIR)/NoneGrammar.pir \
-	    $(TEST_DIR)/NoneGrammar.tg
+#NoneParser.pir: $(TEST_DIR)/NoneParser.pg
+#	$(PARROT) $(PGE_DIR)/pgc.pir \
+#	    --output=$(TEST_DIR)/NoneParser.pir \
+#	    $(TEST_DIR)/NoneParser.pg
+#
+#NoneGrammar.pir: $(TEST_DIR)/NoneGrammar.tg
+#	$(PARROT) $(TGE_DIR)/tgc.pir \
+#	    --output=$(TEST_DIR)/NoneGrammar.pir \
+#	    $(TEST_DIR)/NoneGrammar.tg
 
 testclean:
 	$(RM_F) $(TEST_DIR)/*.pir \
