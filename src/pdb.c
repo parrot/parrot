@@ -111,6 +111,7 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include "parrot/embed.h"
 
 static void PDB_printwelcome(void);
+static void PDB_run_code(Parrot_Interp interp, int argc, char *argv[]);
 
 /*
 
@@ -128,13 +129,12 @@ extern void imcc_init(Parrot_Interp interp);
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp   debugger = Parrot_new(NULL);
-    Parrot_Interp   interp   = Parrot_new(debugger);
-    PDB_t          *pdb      = mem_allocate_zeroed_typed(PDB_t);
-
-    char           *filename;
-    char           *ext;
-    void           *yyscanner;
+    Parrot_Interp     debugger = Parrot_new(NULL);
+    Parrot_Interp     interp   = Parrot_new(debugger);
+    PDB_t            *pdb      = mem_allocate_zeroed_typed(PDB_t);
+    char             *filename;
+    char             *ext;
+    void             *yyscanner;
 
     /*Parrot_set_config_hash();  TODO link with cfg */
 
@@ -199,8 +199,34 @@ main(int argc, char *argv[])
 
     PDB_printwelcome();
 
-    Parrot_runcode(interp, argc - 1, argv + 1);
+    PDB_run_code(interp, argc - 1, argv + 1);
+
+
     Parrot_exit(interp, 0);
+}
+
+/*
+
+=item C<static void PDB_add_exception_handler(Parrot_Interp)>
+
+Adds a default exception handler to PDB.
+
+*/
+
+static void
+PDB_run_code(Parrot_Interp interp, int argc, char *argv[])
+{
+    Parrot_exception exp;
+
+    if (setjmp(exp.destination)) {
+        fprintf( stderr, "Caught exception: %s\n",
+            string_to_cstring(interp, interp->exceptions->msg) );
+        return;
+    }
+
+    push_new_c_exception_handler(interp, &exp);
+
+    Parrot_runcode(interp, argc - 1, argv + 1);
 }
 
 /*
