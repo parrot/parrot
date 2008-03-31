@@ -9,7 +9,24 @@ README.cygwin - Parrot under cygwin
 parrot builds out of the box under cygwin. 
 Some tweaks are needed for different names of dynamic loading of some dll's.
 
-=head1 ICU 
+=head1 Packages
+
+You'll need the following cygwin packages to build parrot.
+
+=over 4
+
+=item gcc
+
+=item make
+
+=item perl
+
+=item subversion
+
+If you use svn to get a copy of parrot, you should use the cygwin svn
+and not the tortoiseSVN client to avoid build errors.
+
+=item ICU 
 
 This is no official cygwin package yet.
 However, icu4c-3_8 builds out of the box on cygwin.
@@ -18,11 +35,14 @@ However, icu4c-3_8 builds out of the box on cygwin.
 Note that ICU is now optional, you can build Parrot without it, 
 by not installing it or asking Parrot to ignore it (C<--without-icu>). 
 
-=head1 INSTALL
+=back
 
-  perl Configure.pl 
+=head1 BUILD
+
+  export PATH=`pwd`:$PATH
+  perl Configure.pl
   make
-  make test
+  make test # see PLATFORMS for known issues.
   make reallyinstall
 
 =head1 TODO
