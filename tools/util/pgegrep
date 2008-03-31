@@ -128,7 +128,7 @@ PGE is authored and maintained by Patrick Michaud L<pmichaud@pobox.com>
 	.local string rule
 	.local pmc p6rule_compile, matchsub
 	rule = shift argv
-	p6rule_compile = compreg "PGE::P6Regex"
+	p6rule_compile = compreg "PGE::Perl6Regex"
 	matchsub = p6rule_compile(rule)
 	.If(null matchsub, {
 		printerr "Null matchsub, probably a syntax error\n"
@@ -221,7 +221,7 @@ handler:
 
 	.local pmc cntrlchar
 	$S0 = '<cntrl-[\t\r\n]>'
-	$P0 = compreg "PGE::P6Regex"
+	$P0 = compreg "PGE::Perl6Regex"
 	cntrlchar = $P0($S0)
 
 	.For(, linelen, { line = readline handle .NL() linelen = length line .NL() inc lineno }, {
