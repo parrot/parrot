@@ -18,22 +18,22 @@ This singleton PMC holds a factory.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 static PMC * WmlsBytecode_PMC;
 static PMC * script;
 static const char * bytecode;
 static UINTVAL maxi;
-static const unsigned char *fp;
+static const char *fp;
 
 static void _init(Interp *interp, STRING *str)
 {
     bytecode = Parrot_string_cstring(interp, str);
-    maxi = string_length(interp, str);
-    fp = (const unsigned char *)bytecode;
+    maxi     = string_length(interp, str);
+    fp       = (const char *)bytecode;
 }
 
-#define _info_get()     (UINTVAL)(&bytecode[maxi] - (const char *)fp)
+#define _info_get()     (UINTVAL)(&bytecode[maxi] - fp)
 #define _get_pos()      (fp)
 #define _get_c()        (*(fp++))
 

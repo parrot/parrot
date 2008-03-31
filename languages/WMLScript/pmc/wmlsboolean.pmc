@@ -19,7 +19,7 @@ the WMLScript C<Boolean> type.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "pmc_wmlsstring.h"
 
 static INTVAL dynpmc_WmlsBoolean;

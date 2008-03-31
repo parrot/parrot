@@ -19,7 +19,7 @@ the WMLScript C<Invalid> type.
 
 */
 
-#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 static INTVAL dynpmc_WmlsBoolean;
 static INTVAL dynpmc_WmlsInteger;
