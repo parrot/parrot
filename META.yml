@@ -5,8 +5,8 @@
 ---
 name: parrot
 version: 0.6.0
-author: ~
-abstract: ~
+author: parrot-porters@perl.org
+abstract: a virtual machine designed for dynamic languages
 license: artistic2
 no_index:
     directory:
