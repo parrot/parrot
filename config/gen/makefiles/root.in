@@ -179,7 +179,6 @@ GEN_MAKEFILES = \
     languages/pynie/Makefile \
     languages/regex/Makefile \
     languages/scheme/Makefile \
-    languages/tap/Makefile \
     languages/tcl/Makefile \
     languages/tcl/examples/Makefile \
     languages/urm/Makefile \

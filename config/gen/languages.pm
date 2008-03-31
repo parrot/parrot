@@ -60,7 +60,7 @@ sub runstep {
         parrot_compiler perl6 pheme PIR plumhead pugs punie pynie
         regex
         scheme
-        tap tcl
+        tcl
         unlambda urm
         WMLScript
         Zcode
