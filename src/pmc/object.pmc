@@ -458,8 +458,6 @@ Returns whether the object's class does the role with name C<*role_name>.
 */
 
     VTABLE INTVAL does(STRING *role_name) {
-        Parrot_Object * const obj    = PARROT_OBJECT(SELF);
-
         if (!role_name)
             return 0;
 
