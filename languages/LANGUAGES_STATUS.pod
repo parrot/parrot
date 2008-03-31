@@ -1020,29 +1020,6 @@ C<languages/tcl>
 =back
 
 
-=head2 TAP (Test Anything Protocol)
-
-=over 4
-
-=item Description
-
-A parser for the Test Anything Protocol
-
-=item Status
-
-See Parrot RT for details. Search for [TAP]
-
-=item Last verified with parrot version
-
-0.4.6
-
-=item Location
-
-C<languages/tap>
-
-=back
-
-
 =head2 unlambda
 
 =over 4
@@ -1198,4 +1175,10 @@ programmers. It features an object system modeled on the Smalltalk object
 system and a language syntax designed to be easy to learn for developers of
 C-like languages. Last verified against parrot 0.1.11.
 L<http://homepage.mac.com/matt.kennedy/Span>
+
+=head2 TAP (Test Anything Protocol)
+
+A parser for the Test Anything Protocol
+Was located in C<languages/tap>, removed in r26661.
+
 
