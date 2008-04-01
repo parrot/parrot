@@ -26,11 +26,10 @@ a few further definitions are needed.
 
 =head2 Character Set
 
-The Unicode Standard has deprecated the term character set, preferring the
-concepts of I<character repertoire> (a collection of characters) and
-I<character code> (a mapping which tells you what number represents which
-character in the repertoire). We still use it, though, to mean the standard
-which defines both a repertoire and a code. 
+The Unicode Standard prefers the concepts of I<character repertoire> (a
+collection of characters) and I<character code> (a mapping which tells you what
+number represents which character in the repertoire). Character set is commonly
+used to mean the standard which defines both a repertoire and a code. 
 
 =head2 Codepoint
 
@@ -65,12 +64,11 @@ In linguistics, a grapheme is a single symbol in a writing system (letter,
 number, punctuation mark, kanji, hiragana, Arabic glyph, Devanagari symbol,
 etc), including any modifiers (diacritics, etc).
 
-We've adopted the term grapheme to refer to one or more characters forming a
-visible whole when displayed, in other words, a bundle of a character and all
-of its combining characters. Parrot must support languages which manipulate
-strings grapheme-by-grapheme, and since graphemes are the highest-level
-interpretation of a "character", they're useful for converting between
-character sets.
+The Unicode Standard defines a I<grapheme cluster> (commonly simplified to just
+I<graheme>) as one or more characters forming a visible whole when displayed,
+in other words, a bundle of a character and all of its combining characters.
+Since graphemes are the highest-level abstract idea of a "character", they're
+useful for converting between character sets.
 
 =head2 Normalization Form
 
@@ -106,7 +104,7 @@ between character sets and encodings.
 =item *
 
 Operations that require understanding the semantics of a string must respect
-the character set (character repertoire and character code) of the string.
+the character set of the string.
 
 =item *
 
@@ -124,8 +122,9 @@ format that is a sequence of 32-bit Unicode codepoints in NFG.
 
 Parrot was designed from the outset to support multiple string formats:
 multiple character sets and multiple encodings. We don't standardize on Unicode
-internally, because for the majority of use cases, it's still far more
-efficient to deal with whatever input data the user sends us.
+internally, converting all strings to Unicode strings, because for the majority
+of use cases it's still far more efficient to deal with whatever input data the
+user sends us.
 
 Consumers of Parrot strings need to be aware that there is a plurality of
 string encodings inside Parrot. (Producers of Parrot strings can do whatever is
@@ -293,6 +292,9 @@ world.
 
 http://www.unicode.org/reports/tr15/ - The Unicode Consortium's
 explanation of different normalization forms.
+
+http://unicode.org/reports/tr29/ - "grapheme clusters" in the Unicode Standard
+Annex
 
 "Unicode: A Primer", Tony Graham - Arguably the most readable book on
 how Unicode works.
