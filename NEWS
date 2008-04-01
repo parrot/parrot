@@ -5,6 +5,10 @@ New in 0.6.1
   + Reimplemented HQ9+ with PCT
 - Compilers
   + Removed P6Regex, pgc, P6Grammar from PGE
+  + NQP
+    . added <, <=, >, >= relational operators
+    . added postfix:++,-- operators
+
 
 New in 0.6.0
 - Specification
@@ -21,20 +25,20 @@ New in 0.6.0
     . Fix '-e' option
     . Phase out P6Regex in favor of Perl6Regex
   + IMCC:
-    '.local Array my_arr' is illegal now 
+    '.local Array my_arr' is illegal now
 - Languages
   + C99: reimplementation with PCT
   + lolcode:
     . various updates
-    . add support for functions with params 
+    . add support for functions with params
     . add math functions
-  + Rakudo: 
+  + Rakudo:
     . support for 'say'
     . first cut at smart matching
     . indirect method calls
     . support for Pairs
     . added methods 'grep' and 'first'
-    . implement auto{increment,decrement} 
+    . implement auto{increment,decrement}
     . initial implementation of 'perl6doc'
   + Lua:
     . various updates
