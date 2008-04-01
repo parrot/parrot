@@ -23,8 +23,6 @@ object.
 
 .namespace [ 'HQ9plus::Compiler' ]
 
-.loadlib 'hq9plus_group'
-
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
 
