@@ -123,10 +123,11 @@ struct parrot_string_t {
     char       *strstart;
     UINTVAL     bufused;
     UINTVAL     strlen;
+    UINTVAL     hashval; /* cached hash value computation */
+
     /*    parrot_string_representation_t representation;*/
     const struct _encoding *encoding;
-    const struct _charset *charset;
-    UINTVAL hashval; /* cached hash value computation; not yet used */
+    const struct _charset  *charset;
 };
 
 
