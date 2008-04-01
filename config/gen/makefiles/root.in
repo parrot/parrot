@@ -194,6 +194,7 @@ GEN_CONFIGS = \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/core_pmcs.h \
+    $(SRC_DIR)/exec_dep.c \
     $(SRC_DIR)/exec_dep.h \
     lib/Parrot/Config/Generated.pm \
     lib/Parrot/PMC.pm \
