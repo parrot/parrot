@@ -26,11 +26,11 @@ a few further definitions are needed.
 
 =head2 Character Set
 
-A character set is officially a deprecated term, with Unicode preferring
-the concepts of I<character repertoire> (a collection of characters) and
-I<character code> (a mapping which tells you what number represents
-which character in the repertoire). We still use it, though, to mean
-the standard which defines both a repertoire and a code. 
+The Unicode Standard has deprecated the term character set, preferring the
+concepts of I<character repertoire> (a collection of characters) and
+I<character code> (a mapping which tells you what number represents which
+character in the repertoire). We still use it, though, to mean the standard
+which defines both a repertoire and a code. 
 
 =head2 Codepoint
 
