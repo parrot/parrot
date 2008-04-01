@@ -18,12 +18,12 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0');
 .sub fold_by_zero
-  #push_eh ok
+  push_eh ok
     $I1 = 1/0
-  #pop_eh
+  pop_eh
  ok:
   say "ok"
-.end  
+.end
 CODE
 ok
 OUT
