@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,6 +16,7 @@ Klaas-Jan Stol
 
 =head1 ABSTRACT
 
+This PDD specifies the Parrot Compiler Tools (PCT).
 
 =head1 SYNOPSIS
 
@@ -30,6 +31,9 @@ Klaas-Jan Stol
 
 
 =head1 REFERENCES
+
+docs/pdd26_ast.pod
+
 
 =cut
 
