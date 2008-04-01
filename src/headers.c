@@ -43,6 +43,15 @@ PARROT_CANNOT_RETURN_NULL
 static PMC_EXT * new_pmc_ext(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#ifdef GC_IS_MALLOC
+static int sweep_cb_buf(PARROT_INTERP,
+    ARGMOD(Small_Object_Pool *pool),
+    SHIM(int flag),
+    ARGIN(void *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+#else
 static int sweep_cb_buf(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     SHIM(int flag),
@@ -50,6 +59,7 @@ static int sweep_cb_buf(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
+#endif
 
 static int sweep_cb_pmc(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
@@ -769,7 +779,11 @@ Sweeps and frees the provided pool.  Returns 0.
 
 static int
 sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
+#ifdef GC_IS_MALLOC
+        ARGIN(void *arg))
+#else
         SHIM(void *arg))
+#endif
 {
 #ifdef GC_IS_MALLOC
     const int pass = (int)(INTVAL)arg;
