@@ -13,20 +13,14 @@
  * References:
  */
 
+#include "jit.h"
+#include "jit_emit.h"
+
 #ifndef PARROT_ARM_EXEC_DEP_H_GUARD
 #define PARROT_ARM_EXEC_DEP_H_GUARD
 
-#ifdef JIT_CGP
-
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-#else /* JIT_CGP */
-
-void
-Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-#endif /* JIT_CGP */
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);

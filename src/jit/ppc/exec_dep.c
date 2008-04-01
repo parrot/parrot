@@ -13,6 +13,10 @@
  * References:
  */
 
+#include "parrot/parrot.h"
+#include "jit.h"
+#define JIT_EMIT 1
+#include "jit_emit.h"
 #include "exec_dep.h"
 
 #ifdef JIT_CGP

@@ -13,8 +13,11 @@
  * References:
  */
 
-#ifndef PARROT_ARM_EXEC_DEP_H_GUARD
-#define PARROT_ARM_EXEC_DEP_H_GUARD
+#include "parrot/parrot.h"
+#include "jit.h"
+#define JIT_EMIT 1
+#include "jit_emit.h"
+#include "exec_dep.h"
 
 #ifdef JIT_CGP
 
@@ -85,8 +88,6 @@ offset_fixup(Parrot_exec_objfile_t *obj)
             obj->symbol_table[i].value += obj->data_size[j];
     }
 }
-
-#endif /* PARROT_ARM_EXEC_DEP_H_GUARD */
 
 /*
  * Local variables:
