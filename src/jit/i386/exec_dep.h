@@ -1,6 +1,4 @@
-/*
- * Copyright (C) 2003-2008, The Perl Foundation.
- */
+/* Copyright (C) 2003-2008, The Perl Foundation.  */
 
 /*
  * exec_dep.h
@@ -29,7 +27,6 @@ Parrot_exec_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 void
 offset_fixup(Parrot_exec_objfile_t *obj);
-
 
 #endif /* PARROT_I386_EXEC_DEP_H_GUARD */
 
