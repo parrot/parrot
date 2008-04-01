@@ -731,7 +731,7 @@ everything via the VTABLE api.
 
 =item METHOD PMC* pop()
 
-Method forms to remove and return a PMC from the beginning or 
+Method forms to remove and return a PMC from the beginning or
 end of the array.
 
 =cut

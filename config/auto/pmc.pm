@@ -128,7 +128,7 @@ sub get_includes {
         } elsif ($include =~ m/^pmc_|\.str$/) { # local pmc header
           $include = "src/pmc/" . $include;
         } # else it's probably a system header, don't depend on it.
-        push @retval, $include;  
+        push @retval, $include;
     }
 
     return join(' ', @retval);
