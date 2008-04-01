@@ -113,6 +113,28 @@ sub contains_pccmethod {
     return;
 }
 
+# Given a PMC file name, get a list of all the includes it specifies
+sub get_includes {
+    my $file = shift;
+    open( my $fh, '<', $file ) or die "Can't read '$file': $!\n";
+
+    my @retval;
+    local $_;
+    while (<$fh>) {
+        next unless /^\s*#include\s+["<](.*)[">]\s+$/;
+        my $include = $1;
+        if ($include =~ m{^(\.|parrot/)}) { # main parrot include dir
+          $include = "include/" . $include;
+        } elsif ($include =~ m/^pmc_|\.str$/) { # local pmc header
+          $include = "src/pmc/" . $include;
+        } # else it's probably a system header, don't depend on it.
+        push @retval, $include;  
+    }
+
+    return join(' ', @retval);
+}
+
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
@@ -170,6 +192,7 @@ END
         my $pmc_fname = catfile('src', 'pmc', "$pmc.pmc");
         my $pccmethod_depend =
             contains_pccmethod($pmc_fname) ? 'lib/Parrot/Pmc2c/PCCMETHOD.pm' : '';
+        my $include_headers = get_includes($pmc_fname);
 
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
@@ -181,7 +204,7 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 src/pmc/$pmc\$(O): src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
-    $parent_headers
+    $parent_headers $include_headers
 
 END
     }
