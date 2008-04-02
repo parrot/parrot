@@ -215,7 +215,7 @@ The optional C<:unique_reg> modifier will force the register allocator to
 associate the identifier with a unique register for the duration of the
 compilation unit.
 
-=item .lex <identifier>, <reg>
+=item .lex <string constant>, <reg>
 
 Declare a lexical variable that is an alias for a PMC register. For example,
 given this preamble:
@@ -234,6 +234,11 @@ given this preamble:
     $P1 = find_lex "$a"
 
 =item .const <type> <identifier> = <const>
+
+{{ PROPOSAL: add
+   .const <string constant> <identifier> = <const>
+   as an alternative to allow ".const 'Sub' ... "
+}}
 
 Define a constant named I<identifier> of type I<type> and assign value
 I<const> to it. The constant is stored in the constant table of the current
@@ -276,6 +281,16 @@ in any namespace.  If you specify more than one, separated by semicolons, it
 creates nested namespaces, by storing the inner namespace object in the outer
 namespace's global pad.
 
+{{ PROPOSAL: make the brackets non-optional for specifying the "root" namespace,
+   so the key becomes optional.
+
+   .namespace [ <key>? ]
+
+   key: <identifier> [';' <identifier>]*
+
+   Also, the "identifier" should be a quoted string?
+}}
+
 =item .pragma n_operators
 
 Convert arithmethic infix operators to n_infix operations. The unary opcodes
@@ -302,7 +317,16 @@ Define the HLL for the current file. Takes two string constants. If the string
 I<hll_lib> isn't empty this compile time pragma also loads the shared lib for
 the HLL, so that integer type constants are working for creating new PMCs.
 
+{{ PROPOSAL: make the ",<hll_lib>" part optional, so you don't have to
+   specify an empty string for the library.
+   (Alternatively, make this two different directives: .HLL_name, .HLL_lib)
+}}
+
 =item .HLL_map <core_type>, <user_type>
+
+{{ PROPOSAL: make the ',' an "->", "=>", "=", for instance, so it's easier
+   to remember what argument comes first, the core type or the user type.
+}}
 
 Whenever Parrot has to create PMCs inside C code on behalf of the running
 user program it consults the current type mapping for the executing HLL
@@ -443,6 +467,14 @@ The marked C<.sub> is lexically nested within the sub known by B<subname>.
 
 =head3 Directives used for Parrot calling conventions.
 
+{{ A bit of a radical idea, but now would be the time to decide on this:
+   Remove the whole "long-style" invocation syntax altogether.
+   Only allow the short version.
+   As PIR is typically being generated, and hopefully by PCT-based
+   compilers, there seems to be no real use for too much syntactic
+   sugar. Just a thought.
+}}
+
 =over 4
 
 =item .begin_call and .end_call
@@ -547,6 +579,8 @@ always takes 2 arguments: an exception object and a message string.
 
 This is syntactic sugar for the C<get_results> op, but any flags set on the
 targets will be handled automatically by the PIR compiler.
+The C<.get_results> directive must be the first instruction of the exception
+handler; only declarations (.lex, .local) may come first.
 
 =head2 Syntactic Sugar
 
