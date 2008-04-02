@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 2;
 
-pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax', todo => "RT# 41097");
+pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
     get_results '(0)'
 .end

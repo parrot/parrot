@@ -1615,8 +1615,8 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
     n = VTABLE_elements(interp, sig_arr);
 
     if (n != ins->symreg_count - 1)
-        IMCC_fatal(interp, 1, "IMCC error: parameter count mismatch in '%s' -- "
-                              "have %d, want %d",
+        IMCC_fatal(interp, 1, "syntax error: parameter count mismatch in '%s'"
+                              " -- have %d, want %d",
                               ins->opname, ins->symreg_count - 1, n );
 
     for (i = 0; i < n; ++i) {
