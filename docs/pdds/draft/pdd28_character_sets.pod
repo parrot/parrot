@@ -29,7 +29,7 @@ a few further definitions are needed.
 The Unicode Standard prefers the concepts of I<character repertoire> (a
 collection of characters) and I<character code> (a mapping which tells you what
 number represents which character in the repertoire). Character set is commonly
-used to mean the standard which defines both a repertoire and a code. 
+used to mean the standard which defines both a repertoire and a code.
 
 =head2 Codepoint
 
@@ -38,7 +38,7 @@ given character set. So in ASCII, the character C<A> has codepoint 0x41.
 
 =head2 Encoding
 
-An encoding determines how a codepoint is represented inside a computer. 
+An encoding determines how a codepoint is represented inside a computer.
 Simple encodings like ASCII define that the codepoints 0-127 simply
 live as their numeric equivalents inside an eight-bit bytes. Other
 fixed-width encodings like UTF-16 use more bytes to encode more
@@ -65,9 +65,9 @@ number, punctuation mark, kanji, hiragana, Arabic glyph, Devanagari symbol,
 etc), including any modifiers (diacritics, etc).
 
 The Unicode Standard defines a I<grapheme cluster> (commonly simplified to just
-I<graheme>) as one or more characters forming a visible whole when displayed,
+I<grapheme>) as one or more characters forming a visible whole when displayed,
 in other words, a bundle of a character and all of its combining characters.
-Since graphemes are the highest-level abstract idea of a "character", they're
+Because graphemes are the highest-level abstract idea of a "character", they're
 useful for converting between character sets.
 
 =head2 Normalization Form
@@ -98,7 +98,7 @@ interface.
 
 =item *
 
-Parrot provides an interface for interacting with strings and converting 
+Parrot provides an interface for interacting with strings and converting
 between character sets and encodings.
 
 =item *
@@ -130,7 +130,7 @@ Consumers of Parrot strings need to be aware that there is a plurality of
 string encodings inside Parrot. (Producers of Parrot strings can do whatever is
 most efficient for them.) To put it in simple terms: if you find yourself
 writing C<*s++> or any other C string idioms, you need to stop and think if
-that's what you really mean. Not everything is byte-based any more.
+that's what you really mean. Not everything is byte-based anymore.
 
 =head2 Grapheme Normalization Form
 
@@ -147,7 +147,7 @@ DOUBLE GRAVE ACCENT> (C<0x30F>). We use the term I<grapheme> to refer to a
 
 String operations on this kind of variable-byte encoding can be complex and
 expensive. Operations like comparison and traversal require a series of
-computations and lookaheads, since any given grapheme may be a sequence of
+computations and lookaheads, because any given grapheme may be a sequence of
 combining characters. The Unicode Standard defines several "normalization
 forms" that help with this problem. Normalization Form C (NFC), for example,
 decomposes everything, then re-composes as much as possible. So if you see the
@@ -161,8 +161,8 @@ LETTER I> (C<0x438>) with C<COMBINING DOUBLE GRAVE ACCENT> (C<0x30F>). This
 means that even in the most normalized Unicode form, string manipulation code
 must always assume a variable-byte encoding, and use expensive lookaheads. The
 cost is incurred on every operation, though the particular string operated on
-might not contain combining characters. It's particularly noticable in parsing
-and regular expression matches, where backtracking operations may retraverse
+might not contain combining characters. It's particularly noticeable in parsing
+and regular expression matches, where backtracking operations may re-traverse
 the characters of a simple string hundreds of times.
 
 In order to reduce the cost of variable-byte operations and simplify some
@@ -243,22 +243,22 @@ the grapheme C<0x438 0x30F>:
                    push @grapheme_table, "\x{438}\x{30F}";
                    ~ $#grapheme_table;
                 });
-   push @string, $codepoint; 
+   push @string, $codepoint;
 
 =head2 String API
 
 Strings have the following structure:
 
   struct parrot_string_t {
-      UnionVal                cache;
-      Parrot_UInt             flags;
-      char                   *strstart;
-      UINTVAL                 bufused;
-      UINTVAL                 strlen;
-      const struct _encoding *encoding;
-      const struct _charset  *charset;
+      UnionVal                      cache;
+      Parrot_UInt                   flags;
+      UINTVAL                       bufused;
+      UINTVAL                       hashval;
+      UINTVAL                       strlen;
+      char                         *strstart;
+      const struct _encoding       *encoding;
+      const struct _charset        *charset;
       const struct _normalization  *normalization;
-      UINTVAL                 hashval;
   };
 
 Deprecation note: the enum C<parrot_string_representation_t> will be removed.
@@ -270,7 +270,7 @@ modifications for the addition of the NFG string format.
 
 Conversion will be done with a function called C<string_grapheme_copy>:
 
-    INTVAL string_grapheme_copy(STRING* src, STRING* dst)
+    INTVAL string_grapheme_copy(STRING *src, STRING *dst)
 
 Converting a string from one format to another involves creating a new empty
 string with the required attributes, and passing the source string and the new
