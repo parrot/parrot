@@ -1,6 +1,8 @@
 # $Id$
 
 New in 0.6.1
+- Specification
+  + initial draft of pdd29_compiler_tools.pod
 - Languages
   + Reimplemented HQ9+ with PCT
 - Compilers
