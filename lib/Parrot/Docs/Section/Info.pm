@@ -47,6 +47,9 @@ sub new {
                 'README'
             ),
             $self->new_item(
+                'Instructions for Parrot in a cygwin environment.', 'README_cygwin.pod'
+            ),
+            $self->new_item(
                 'Instructions for Parrot in a Win32 environment.', 'README_win32.pod'
             ),
             $self->new_item( 'This file lists what\'s new in each version.', 'NEWS' ),
