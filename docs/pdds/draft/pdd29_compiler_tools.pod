@@ -20,20 +20,190 @@ This PDD specifies the Parrot Compiler Tools (PCT).
 
 =head1 SYNOPSIS
 
+Creating a PCT-based compiler can be done as follows:
+
+ .sub 'onload' :anon :load :init
+     load_bytecode 'PCT.pbc'
+     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+     $P1 = $P0.'new'()
+     $P1.'language'('Foo')
+     $P1.'parsegrammar'('Foo::Grammar')
+     $P1.'parseactions'('Foo::Grammar::Actions')
+ .end
+
+ .sub 'main' :main
+     .param pmc args
+     $P0 = compreg 'Foo'
+     $P1 = $P0.'command_line'(args)
+ .end
+
+{{ this is the most important part; is this enough? }}
+
+The Parrot distribution contains a Perl script to generate a compiler
+stub, containing all necessary files. This generated compiler will
+compile out of the box. It is highly suggested to use this script to
+get started with the PCT.
+The script is located in C<tools/dev/mk_language_shell.pl>.
+
+{{ Not sure whether the mk_language_shell.pl script should be mentioned long term }}
+
+
+Running the compiler is then done as follows:
+
+ $ parrot foo.pbc [--target=[parse|past|post|pir]] <file>
+
+{{ other options? }}
 
 =head1 DESCRIPTION
+
+The Parrot Compiler Tools are specially designed to easily create a
+compiler targeting the Parrot Virtual Machine. The tools themselves
+run on Parrot, which implies that no other external programs are
+needed.
+
+The PCT is a set of libraries and programs, to:
+
+=over 4
+
+=item * create a parser
+
+=item * create an intermediate data structure (Abstract Syntax Tree)
+
+=item * generate executable code (Parrot Intermediate Representation)
+
+=back
+
 
 
 =head1 IMPLEMENTATION
 
+The PCT is made up of the following libraries and programs:
+
+=over 4
+
+=item * Parrot Grammar Engine (PGE)
+
+=item * Parrot Abstract Syntax Tree (PAST) classes
+
+=item * Parrot Opcode Syntax Tree (POST) classes
+
+=item * PCT::HLLCompiler class
+
+=item * PCT::Grammar class
+
+=back
+
+Although strictly speaking it is not part of the PCT, the
+Not Quite Perl (6) (NQP) language is typically used in all PCT-based
+compilers. NQP is a subset of the Perl 6 language, and is a
+high-level language as an alternative for PIR.
+
+=head2 Compilation phases
+
+A PCT-based compiler has by default four compilation phases, or
+I<transformations>. Phases can be removed and added through the API of
+the C<HLLCompiler> class. These are:
+
+=over 4
+
+=item * source to parse tree
+
+The source is read, parsed and stored in a parse tree.
+
+=item * parse tree to PAST
+
+The parse tree is converted into a Parrot Abstract Syntax Tree.
+
+=item * PAST to POST
+
+The PAST is converted into a Parrot Opcode Syntax Tree.
+
+=item * POST to PIR
+
+The POST is converted into executable Parrot Intermediate Representation.
+
+=back
+
+=head3 Source to Parse Tree
+
+{{ XXX }}
+
+=head3 Parse tree to PAST
+
+{{ XXX }}
+
+=head3 PAST to POST
+
+{{ XXX }}
+
+=head3 POST to PIR
+
+{{ XXX }}
+
+=head2 Parrot Grammar Engine
+
+The Parrot Grammar Engine (PGE) is a component that I<executes> regular
+expressions. Besides I<classic> regular expressions, it also understands
+Perl 6 Rules. Such rules are special regular expressions to define a grammar.
+
+=head2 PCT::Grammar
+
+The class C<PCT::Grammar> is a built-in grammar class that can be used as
+a parent class for a custom grammar. This class defines a number of rules and
+tokens that are inherited by child classes. Note that the concept of C<class>
+and C<grammar> are equivalent.
+
+The following rules are predefined:
+
+{{ is this necessary, or just a reference to the file? }}
+
+=over 4
+
+=item ident
+
+=item ws
+
+=back
+
+=head2 PCT::HLLCompiler
+
+All PCT-based compilers use a HLLCompiler object as a compiler driver.
+This object invokes the different compiler phases.
+
+=head3 HLLCompiler API Methods
+
+{{ TODO: complete this }}
+
+=over 4
+
+=item commandline_prompt
+
+$P0.'commandline_prompt'($S0)
+
+sets the string in C<$S0> as a commandline prompt on the compiler in C<$P0>.
+The prompt is the text that is shown on the commandline before a command is
+entered when the compiler is started in interactive mode.
+
+=item commandline_banner
+
+$P0.'commandline_banner'($S0)
+
+sets the string in C<$S0> as a commandline banner on the compiler in C<$P0>.
+The banner is the first text that is shown when the compiler is started in
+interactive mode. This can be used for a copyright notice or other information.
+
+=back
+
 
 =head1 ATTACHMENTS
 
+None.
 
 =head1 REFERENCES
 
 docs/pdd26_ast.pod
 
+http://dev.perl.org/perl6/doc/design/syn/S05.html
 
 =cut
 
