@@ -1603,19 +1603,21 @@ static void
 verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *pc))
 {
     INTVAL  i, n;
-    int     no_consts;
-
     int     needed         = 0;
+    int     no_consts      = (ins->opnum == PARROT_OP_get_results_pc
+                           || ins->opnum == PARROT_OP_get_params_pc);
     PMC    *changed_sig    = NULL;
     PMC    * const sig_arr = interp->code->const_table->constants[pc[-1]]->u.key;
 
     PARROT_ASSERT(PObj_is_PMC_TEST(sig_arr));
     PARROT_ASSERT(sig_arr->vtable->base_type == enum_class_FixedIntegerArray);
 
-    no_consts = (ins->opnum == PARROT_OP_get_results_pc ||
-        ins->opnum == PARROT_OP_get_params_pc);
-
     n = VTABLE_elements(interp, sig_arr);
+
+    if (n != ins->symreg_count - 1)
+        IMCC_fatal(interp, 1, "IMCC error: parameter count mismatch in '%s' -- "
+                              "have %d, want %d",
+                              ins->opname, ins->symreg_count - 1, n );
 
     for (i = 0; i < n; ++i) {
         SymReg * const r   = ins->symregs[i + 1];
