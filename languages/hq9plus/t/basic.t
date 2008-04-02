@@ -528,7 +528,7 @@ $code = 'H H';
 language_output_is( 'hq9plus', $code, $hello x 2, "code: $code" );
 
 $code = 'HHH';
-language_output_is( 'hq9plus', $code, $hello x length($code), "code: $code", todo => 'ws handling' );
+language_output_is( 'hq9plus', $code, $hello x length($code), "code: $code" );
 
 $code = 'Q';
 language_output_is( 'hq9plus', $code, $code, "code: $code" );
@@ -537,7 +537,7 @@ $code = 'Q Q';
 language_output_is( 'hq9plus', $code, $code x 2, "code: $code" );
 
 $code = 'QQQ';
-language_output_is( 'hq9plus', $code, $code x length($code), "code: $code", todo => 'ws handling' );
+language_output_is( 'hq9plus', $code, $code x length($code), "code: $code" );
 
 $code = '9';
 language_output_is( 'hq9plus', $code, $song_text, "code: $code" );
@@ -546,7 +546,7 @@ $code = '9 9';
 language_output_is( 'hq9plus', $code, $song_text x 2, "code: $code" );
 
 $code = '999';
-language_output_is( 'hq9plus', $code, $song_text x length($code), "code: $code", todo => 'ws handling' );
+language_output_is( 'hq9plus', $code, $song_text x length($code), "code: $code" );
 
 $code = '+';
 language_output_is( 'hq9plus', $code, '', "code: $code" );
@@ -555,10 +555,10 @@ $code = '+ +';
 language_output_is( 'hq9plus', $code, '' x 2, "code: $code" );
 
 $code = '+++++++++++++++++++';
-language_output_is( 'hq9plus', $code, '', "code: $code", todo => 'ws handling' );
+language_output_is( 'hq9plus', $code, '', "code: $code" );
 
 $code = 'HQ9+';
-language_output_is( 'hq9plus', $code, $hello . $code . $song_text, "code: $code", todo => 'ws handling' );
+language_output_is( 'hq9plus', $code, $hello . $code . $song_text, "code: $code" );
 
 # Local Variables:
 #   mode: cperl

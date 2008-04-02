@@ -9,31 +9,31 @@ This is the grammar for HQ9plus written as a sequence of Perl 6 rules.
 
 grammar HQ9plus::Grammar is PCT::Grammar;
 
-rule TOP {
+token TOP {
     <statement>*
     [ $ || <panic: Syntax error> ]
     {*}
 }
 
-rule statement {
+token statement {
     | <hello>                      {*}   #= hello
     | <quine>                      {*}   #= quine
     | <nintynine_bottles_of_beer>  {*}   #= nintynine_bottles_of_beer
     | <plus>                       {*}   #= plus
 }
 
-rule hello {
-      'H' {*}
+token hello {
+      'H' \s* {*}
 }
 
-rule quine {
-      'Q' {*}
+token quine {
+      'Q' \s* {*}
 }
 
-rule nintynine_bottles_of_beer {
-      '9' {*}
+token nintynine_bottles_of_beer {
+      '9' \s* {*}
 }
 
-rule plus {
-      '+' {*}
+token plus {
+      '+' \s* {*}
 }
