@@ -11,7 +11,7 @@ examples/pasm/fact.pasm - Mmmm, beer good
 
 =head1 DESCRIPTION
 
-Compute the factorial recursively for 0! to 6! and print the results.
+Compute the factorial recursively for 0! to 30! and print the results.
 
 =head1 HISTORY
 
@@ -28,7 +28,8 @@ of the now missing C<clonei>.
 
 main:
 	set 	I1,0
-
+	## P9 is used as a stack for temporaries.
+	new     P9, 'ResizableIntegerArray'
 loop:
 	print	"fact of "
 	print	I1
@@ -44,20 +45,17 @@ loop:
 done:
 	end
 
-# P0 is the number to compute
+### P0 is the number to compute, and also the return value.
 fact:
-        saveall
 	lt	P0,2,is_one
-	set	I1,P0
+	## save I2, because we're gonna trash it.
+	push	P9,I2
+	set	I2,P0
 	dec	P0
 	bsr	fact
-	mul	P0,P0,I1
-	save	P0
-	branch	fact_done
+	mul	P0,P0,I2
+	pop     I2,P9
+	ret
 is_one:
 	set	P0,1
-	save	P0
-fact_done:
-	restoreall
-	restore	P0
 	ret
