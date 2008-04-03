@@ -30,7 +30,6 @@ transform post (PAST::Block) :language('PIR') {
   L1:
     .local pmc post
     $P0 = get_hll_global ['Lua'; 'POST'], 'Sub'
-#    post = $P0.'new'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>':anon :lex', 'blocktype'=>'declaration', 'result'=>'')
     post = $P0.'new'('node'=>node, 'outer'=>outerpost, 'pirflags'=>':anon :lex', 'blocktype'=>'declaration')
     $S1 = $S0 . '_'
     name = post.'unique'($S1)
@@ -1022,16 +1021,12 @@ transform package (PAST::Var) :language('PIR') {
   L1:
     .local pmc subpost
     subpost = get_hll_global ['Lua::POST'], '$?SUB'
-#    subpost = get_global '$?SUB'
     basepost = get_hll_global ['Lua::POST'], '$?environ'
     unless null basepost goto L3
     .local pmc ops_subr
-#    print "retrieve ops_subr in package\n"
     ops_subr = subpost.'ops_subr'()
-#    unless ops_subr goto L4 ### FIXME
     $I0 = defined ops_subr
     unless $I0 goto L4
-#    print "populate ops_subr in package\n"
     ops_subr.'push_pirop'('inline', 'inline'=><<'PIRCODE')
     .local pmc subr
     subr = interpinfo .INTERPINFO_CURRENT_SUB
@@ -1040,7 +1035,6 @@ PIRCODE
     subpost.'ops_subr'($P0)
   L4:
     result = ops.'unique'('$P')
-#    print "package basepost\n"
     basepost = ops.'push_pirop'('callmethod', 'getfenv', 'subr', 'result'=>result)
     set_hll_global ['Lua::POST'], '$?environ', basepost
   L3:
@@ -1071,20 +1065,11 @@ PIRCODE
     ops.'result'(key)
     $I0 = node.'lvalue'()
     if $I0 goto L6
-#    $P0 = ops.'push_pirop'('set')
-#    $P0.'arglist'($P0, key)
-#    ops.'result'($P0)
     result = ops.'unique'('$P')
     ops.'push_pirop'('set', result, key, 'result'=>result)
     ops.'result'(result)
     .return (ops)
   L6:
-#    .local pmc post
-#    $P0 = get_hll_global ['POST'], 'Op'
-#    post = $P0.'new'('node'=>node, 'pirop'=>'set')
-#    post.'push'(ops)
-#    post.'result'(key)
-#    .return (post)
     ops.'push_pirop'('set', key, 'node'=>node)
     ops.'result'(key)
     .return (ops)
