@@ -32,8 +32,8 @@ transform post (PAST::Block) :language('PIR') {
     $P0 = get_hll_global ['Lua'; 'POST'], 'Sub'
 #    post = $P0.'new'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>':anon :lex', 'blocktype'=>'declaration', 'result'=>'')
     post = $P0.'new'('node'=>node, 'outer'=>outerpost, 'pirflags'=>':anon :lex', 'blocktype'=>'declaration')
-    name = post.'unique'($S0)
-    name .= '_'
+    $S1 = $S0 . '_'
+    name = post.'unique'($S1)
     post.'name'(name)
     new $P0, 'Hash'
     post.'storage_lex'($P0)
@@ -298,8 +298,8 @@ transform and (PAST::Op) :language('PIR') {
     expr1 = tree.'get'('post', $P0)
     ops.'push'(expr1)
     .local pmc label, endlabel
-    $S0 = ops.'unique'(type)
-    $S0 .= '_'
+    $S1 = type . '_'
+    $S0 = ops.'unique'($S1)
     $P0 = get_hll_global ['POST'], 'Label'
     label = $P0.'new'('result'=>$S0)
     $S0 = $S0 . '_end'
@@ -752,6 +752,7 @@ transform assignlist (PAST::Op) :language('PIR') {
     $I1 -= $I2
     unless $I1 goto L1
     $S0 = '(' . $S1
+    $P0 = rpost.'pop'()
   L3:
     unless $I1 > 0 goto L4
     $S1 = ops.'unique'('$P')
@@ -763,7 +764,8 @@ transform assignlist (PAST::Op) :language('PIR') {
     goto L3
   L4:
     $S0 .= ')'
-    rpost.'result'($S0)
+    $P0.'result'($S0)
+    rpost.'push'($P0)
   L2:
     .local pmc ass
     $P0 = get_hll_global ['POST'], 'Ops'
