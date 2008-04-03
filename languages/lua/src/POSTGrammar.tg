@@ -459,9 +459,11 @@ transform fornum (PAST::Op) :language('PIR') {
     .local string var
     $P0 = node[0]
     $P0 = tree.'get'('post', $P0)
-    $P0 = $P0.'pop'()
-    var = $P0.'result'()
+    $P1 = $P0.'pop'()
     ops.'push'($P0)
+    $P1 = $P0.'pop'()
+    $P0.'push'($P1)
+    var = $P1.'result'()
     .local string limit, step
     limit = ops.'unique'('$P')
     step = ops.'unique'('$P')
