@@ -34,8 +34,7 @@ and imports many definitions from the full Lua compiler
 =cut
 
 .sub '__onload' :anon :load :init
-    load_bytecode 'PCT.pbc'
-    load_bytecode 'PGE/Text.pbc'
+    load_bytecode 'languages/lua/lua.pbc'
 
     new $P0, 'PCT::HLLCompiler'
     $P0.'language'('LuaTestLex')
@@ -80,8 +79,6 @@ and imports many definitions from the full Lua compiler
 
 .include 'languages/lua/src/dumplex_gen.pir'
 .include 'languages/lua/src/lua51_testlex_gen.pir'
-.include 'languages/lua/src/lua51_gen.pir'
-.include 'languages/lua/src/grammar51.pir'
 
 .namespace
 

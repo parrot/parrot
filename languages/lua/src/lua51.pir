@@ -90,15 +90,6 @@ resulting ost.
 .end
 
 
-.sub 'pir' :method
-    .param pmc source
-    .param pmc adverbs         :slurpy :named
-    $P0 = compreg 'POST'
-    $P1 = $P0.'compile'(source, adverbs :flat :named)
-    .return ($P1)
-.end
-
-
 .namespace [ 'Lua::PAST::Grammar' ]
 
 =head2 Functions
@@ -134,6 +125,74 @@ used in F<languages/lua/src/POSTGrammar.tg>
     $S0 .= "\n"
     printerr $S0
     exit 1
+.end
+
+
+.namespace [ 'Lua::POST::Sub' ]
+
+.sub '__onload' :anon :load :init
+    .local pmc protomaker, base
+    protomaker = new 'Protomaker'
+    base = get_class 'POST::Sub'
+    $P0 = protomaker.'new_subclass'(base , 'Lua::POST::Sub')
+.end
+
+.sub 'ops_const' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('ops_const', value, has_value)
+.end
+
+.sub 'ops_subr' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('ops_subr', value, has_value)
+.end
+
+.sub 'storage_const' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('storage_const', value, has_value)
+.end
+
+.sub 'storage_lex' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('storage_lex', value, has_value)
+.end
+
+
+.namespace [ 'Lua::POST::Chunk' ]
+
+.sub '__onload' :anon :load :init
+    .local pmc protomaker, base
+    protomaker = new 'Protomaker'
+    base = get_class 'Lua::POST::Sub'
+    $P0 = protomaker.'new_subclass'(base , 'Lua::POST::Chunk')
+.end
+
+.sub 'prologue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('prologue', value, has_value)
+.end
+
+
+.namespace [ 'POST::Compiler' ]
+
+.sub 'pir' :method :multi(_, ['Lua::POST::Chunk'])
+    .param pmc node
+    .local pmc code
+    code = self.'pir_children'(node)
+    $S0 = node.'prologue'()
+    if $S0 == '' goto L1
+    new code, 'CodeString'
+    code.'emit'($S0)
+    $P0 = self.'code'()
+    code .= $P0
+    self.'code'(code)
+  L1:
+    .return (code)
 .end
 
 
@@ -191,7 +250,6 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .include 'languages/lua/src/lua51_gen.pir'
 .include 'languages/lua/src/PASTGrammar_gen.pir'
 .include 'languages/lua/src/POSTGrammar_gen.pir'
-.include 'languages/lua/src/POST.pir'
 
 =back
 
