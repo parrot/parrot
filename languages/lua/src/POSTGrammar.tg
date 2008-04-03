@@ -60,7 +60,8 @@ transform post (PAST::Block) :language('PIR') {
     if null outerpost goto L4
     .local pmc ops_subr
     ops_subr = outerpost.'ops_subr'()
-    unless ops_subr goto L5
+    $I0 = defined ops_subr
+    unless $I0 goto L5
     ops_subr.'push_pirop'('inline', 'inline'=><<'PIRCODE')
     .local pmc subr
     subr = interpinfo .INTERPINFO_CURRENT_SUB
