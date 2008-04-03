@@ -631,8 +631,8 @@ transform return (PAST::Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
-    .local string result
-    result = '('
+    .local pmc arglist
+    new arglist, 'ResizableStringArray'
     .local pmc iter, cpost
     iter = node.'iterator'()
   L1:
@@ -653,7 +653,7 @@ transform return (PAST::Op) :language('PIR') {
     unless $I0 goto L3
     $S1 = $P0.'pirop'()
     unless $S1 == 'call' goto L3
-    unless result == '(' goto L4
+    if arglist goto L4
     $P0.'pirop'('tailcall')
     .return (ops)
   L4:
@@ -662,14 +662,10 @@ transform return (PAST::Op) :language('PIR') {
     $P0.'result'($S1)
     $S0 .= ' :flat'
   L3:
-    if result == '(' goto L5
-    result .= ', '
-  L5:
-    result .= $S0
+    push arglist, $S0
     goto L1
   L2:
-    result .= ')'
-    ops.'push_pirop'('.return', result)
+    ops.'push_pirop'('return', arglist :flat)
     .return (ops)
 }
 
