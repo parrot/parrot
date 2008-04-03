@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 20;
 
 =head1 NAME
 
@@ -121,26 +121,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Nested collectoff/collecton" );
 CODE
 0
 1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "sweepoff with newpmcs" );
-    print "starting\n"
-
-    sweepoff
-    set I0, 0
-
-LOOP: new P0, 'String'
-    set P0, "ABC"
-    save P0
-    inc I0
-    lt I0, 127, LOOP
-
-    print "ending\n"
-
-    end
-CODE
-starting
-ending
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "vanishing slingleton PMC" );
@@ -701,72 +681,6 @@ done:
 CODE
 k1k2k3
 OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUT', "reg_stack marking" );
-new P1, 'Integer'
-set P1, 0
-new P3, 'Integer'
-set P3, 0
-new P4, 'Integer'
-set P4, 50
-new P6, 'Integer'
-new P7, 'Integer'
-
-LOOP:
-  save P1
-  bsr PRIMECHECK
-  restore P9
-  unless P9, NOTPRIME
-#ISPRIME:
-  inc P6
-  assign P7, P1
-NOTPRIME:
-  inc P1
-  ne P1,P4, LOOP
-
-DONE:
-  print"N primes calculated to "
-  print P1
-  print " is "
-  print P6
-  print "\n"
-  print "last is: "
-  print P7
-  print "\n"
-  end
-
-PRIMECHECK:
- saveall
-  sweep 1
- restore P5
- lt P5,1,ret0
-new P6, 'Integer'
- assign P6,P5
- dec P6
-NLOOP:
-  le P6, 1, ret1
-new P7, 'Integer'
-  cmod P7, P5, P6
-  eq P7, 0, ret0
-  dec P6
-  branch NLOOP
-  # is prime
-ret1:
-  new P0, 'Integer'
-  set P0, 1
-  save P0
-  restoreall
-  ret
-ret0:
-  new P0, 'Integer'
-  set P0, 0
-  save P0
-  restoreall
-  ret
-CODE
-N primes calculated to 50 is 16
-last is: 47
-OUT
 
 =head1 SEE ALSO
 

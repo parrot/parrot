@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -477,28 +477,6 @@ CODE
 0
 1
 1024
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "saveall/restoreall" );
-        set S0,"test ok"
-        set N0,4.3
-        set I0,6
-        saveall
-        set S0,"test not ok"
-        set N0,4.1
-        set I0,8
-        restoreall
-        print I0
-        print "\n"
-        print N0
-        print "\n"
-        print S0
-        print "\n"
-        end
-CODE
-6
-4.300000
-test ok
 OUTPUT
 
 pasm_output_is( <<CODE, <<'OUTPUT', "lookback" );
