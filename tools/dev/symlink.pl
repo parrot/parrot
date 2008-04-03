@@ -1,20 +1,36 @@
 #! perl -s
 
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
-#
-# Create a symlink tree shadowing the Parrot source tree.  Nifty for
-# having just one (read-only) copy of the sources but several different
-# build trees.  The -v option displays the created symlinks.
-#
-# Changes:
-# 1.1: Handle also:
-#       - being called with a relative path
-#       - being called through a symlink
-#
-# jhi@iki.fi
-#
+=head1 NAME
+
+symlink.pl - create a symlink shadow of the Parrot source.
+
+=head1 SYNOPSIS
+
+   # when in directory containing the checked out source in 'trunk'
+   mkdir shadow
+   cd shadow
+   perl ../trunk/tools/dev/symlink.pl
+
+=head1 DESCRIPTION
+   
+Create a symlink tree shadowing the Parrot source tree.  Nifty for
+having just one (read-only) copy of the sources but several different
+build trees.  The -v option displays the created symlinks.
+
+=head1 CHANGES
+
+1.1: Handle also:
+      - being called with a relative path
+      - being called through a symlink
+
+=head1 AUTHOR
+
+jhi@iki.fi
+
+=cut
 
 use strict;
 use warnings;
@@ -37,8 +53,8 @@ my $toolsrcbase = basename($self);
 use vars qw($v);
 
 if ( $toolsrcdir ne '' && -d $toolsrcdir && lc $toolsrcbase eq 'symlink.pl' ) {
-    my $trydir  = File::Spec->catdir( "include", "parrot" );
-    my $tryfile = File::Spec->catfile( "src",    "main.c" );
+    my $trydir  = File::Spec->catdir( 'include', 'parrot' );
+    my $tryfile = File::Spec->catfile( 'src',    'main.c' );
     die "$0: Do not run this under the original Parrot tree.\n"
         if ( -d $trydir ) && ( -f $tryfile && !-l $tryfile );
 }
@@ -53,8 +69,8 @@ die "$self: not in tools/dev\n"
         && lc( $toolsrcdir[-2] ) eq 'tools';
 my @topsrcdir = @toolsrcdir[ 0 .. $#toolsrcdir - 2 ];
 my $topsrcdir = File::Spec->catdir(@topsrcdir);
-my $manifest  = File::Spec->catfile( $topsrcdir, "MANIFEST" );
-my @srcfiles  = ();
+my $manifest  = File::Spec->catfile( $topsrcdir, 'MANIFEST' );
+my @srcfiles;
 if ( open( my $MANIFEST, '<', $manifest ) ) {
     my %dstdir;
     while (<$MANIFEST>) {
