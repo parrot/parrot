@@ -252,6 +252,8 @@ transform call (PAST::Op) :language('PIR') {
     unless $I0 goto L3
     $P0 = cpost.'pop'()
     cpost.'push'($P0)
+    $I0 = isa $P0, 'POST::Op'
+    unless $I0 goto L3
     $S1 = $P0.'pirop'()
     unless $S1 == 'call' goto L3
     $S1 = '(' . $S0
@@ -526,6 +528,8 @@ transform forlist (PAST::Op) :language('PIR') {
     unless $I0 goto L1
     $P0 = rpost.'pop'()
     rpost.'push'($P0)
+    $I0 = isa $P0, 'POST::Op'
+    unless $I0 goto L1
     $S0 = $P0.'pirop'()
     unless $S0 == 'call' goto L1
     $P0 = rpost.'pop'()
@@ -555,6 +559,8 @@ transform forlist (PAST::Op) :language('PIR') {
     unless $I0 goto L2
     $P0 = rpost.'pop'()
     rpost.'push'($P0)
+    $I0 = isa $P0, 'POST::Op'
+    unless $I0 goto L2
     $S0 = $P0.'pirop'()
     unless $S0 == 'call' goto L2
     $P0 = rpost.'pop'()
@@ -663,6 +669,8 @@ transform return (PAST::Op) :language('PIR') {
     unless $I0 goto L3
     $P0 = cpost.'pop'()
     cpost.'push'($P0)
+    $I0 = isa $P0, 'POST::Op'
+    unless $I0 goto L3
     $S1 = $P0.'pirop'()
     unless $S1 == 'call' goto L3
     unless result == '(' goto L4
@@ -745,6 +753,8 @@ transform assignlist (PAST::Op) :language('PIR') {
     unless $I0 goto L1
     $P0 = rpost.'pop'()
     rpost.'push'($P0)
+    $I0 = isa $P0, 'POST::Op'
+    unless $I0 goto L1
     $S0 = $P0.'pirop'()
     unless $S0 == 'call' goto L1
     $I1 = namelist
@@ -898,19 +908,21 @@ transform constructor (PAST::Val) :language('PIR') {
     unless $I0 goto L4
     $P0 = vpost.'pop'()
     vpost.'push'($P0)
+    $I0 = isa $P0, 'POST::Op'
+    unless $I0 goto L4
     $S0 = $P0.'pirop'()
     unless $S0 == 'call' goto L4
     ops.'push'(kpost)
-    $S0 = vpost.'result'()
+    $P0 = vpost.'pop'()
+    vpost.'push'($P0)
+    $S0 = $P0.'result'()
     $S1 = '(' . $S0
     $S1 .= ' :slurpy)'
-    vpost.'result'($S1)
+    $P0.'result'($S1)
     ops.'push'(vpost)
     $S0 .= ' :flat'
-#    $P1 = ops.'push_pirop'('call', 'tconstruct', val, kpost, $S0)
-#    $P1.'result'(val)
-    $P1 = ops.'push_pirop'('call', 'tconstruct', result, kpost, $S0)
-    $P1.'result'(result)
+    $P1 = ops.'push_pirop'('call', 'tconstruct', table, kpost, $S0)
+    $P1.'result'($S1)
     goto L2
   L3:
     $P1 = $P0[0]
