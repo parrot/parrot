@@ -360,13 +360,13 @@ END_BODY
     link .= objfile
     link .= pathquote
     link .= ' '
-    link .= link_dynamic
-    link .= ' '
-    link .= linkflags
+    link .= rpath
     link .= ' '
     link .= libparrot
     link .= ' '
-    link .= rpath
+    link .= link_dynamic
+    link .= ' '
+    link .= linkflags
     link .= ' '
     link .= libs
     link .= ' '
