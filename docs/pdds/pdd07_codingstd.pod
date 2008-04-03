@@ -16,6 +16,10 @@ This document describes the various rules, guidelines and advice for those
 wishing to contribute to the source code of Parrot, in such areas as code
 structure, naming conventions, comments etc.
 
+=head1 SYNOPSIS
+
+Not applicable.
+
 =head1 DESCRIPTION
 
 One of the criticisms of Perl 5 is that its source code is impenetrable to
@@ -114,9 +118,9 @@ code they label.
 
 =item *
 
-Closing braces for control structures must line up vertically with the start
-of the control structures; e.g. C<}> that closes an C<if> must line up with the
-C<if>.
+Closing braces for control structures must line up vertically with the
+start of the control structures; e.g. C<}> that closes an C<if> must
+line up with the C<if>.
 
 =item *
 
@@ -581,46 +585,48 @@ need some sort of pre-processing applied to them or which do the preprocessing
 The characters making up filenames must be chosen from the ASCII set
 A-Z,a-z,0-9 plus .-_
 
-An underscore should be used to separate words rather than a hyphen (-).  A
-file should not normally have more than a single '.' in it, and this should be
-used to denote a suffix of some description. The filename must still be unique
-if the main part is truncated to 8 characters and any suffix truncated to 3
-characters. Ideally, filenames should restricted to 8.3 in the first place, but
-this is not essential.
+An underscore should be used to separate words rather than a hyphen (-).
+A file should not normally have more than a single '.' in it, and this
+should be used to denote a suffix of some description. The filename must
+still be unique if the main part is truncated to 8 characters and any
+suffix truncated to 3 characters. Ideally, filenames should restricted
+to 8.3 in the first place, but this is not essential.
 
-Each subsystem I<foo> should supply the following files. This arrangement is
-based on the assumption that each subsystem will -- as far as is practical --
-present an opaque interface to all other subsystems within the core, as well as
-to extensions and embeddings.
+Each subsystem I<foo> should supply the following files. This
+arrangement is based on the assumption that each subsystem will -- as
+far as is practical -- present an opaque interface to all other
+subsystems within the core, as well as to extensions and embeddings.
 
 =over 4
 
 =item C<foo.h>
 
-This contains all the declarations needed for external users of that API (and
-nothing more), i.e. it defines the API. It is permissible for the API to include
-different or extra functionality when used by other parts of the core, compared
-with its use in extensions and embeddings. In this case, the extra stuff within
-the file is enabled by testing for the macro C<PARROT_IN_CORE>.
+This contains all the declarations needed for external users of that API
+(and nothing more), i.e. it defines the API. It is permissible for the
+API to include different or extra functionality when used by other parts
+of the core, compared with its use in extensions and embeddings. In this
+case, the extra stuff within the file is enabled by testing for the
+macro C<PARROT_IN_CORE>.
 
 =item C<foo_private.h>
 
-This contains declarations used internally by that subsystem, and which must
-only be included within source files associated the subsystem. This file
-defines the macro C<PARROT_IN_FOO> so that code knows when it is being used
-within that subsystem. The file will also contain all the 'convenience' macros
-used to define shorter working names for functions without the perl prefix (see
-below).
+This contains declarations used internally by that subsystem, and which
+must only be included within source files associated the subsystem. This
+file defines the macro C<PARROT_IN_FOO> so that code knows when it is
+being used within that subsystem. The file will also contain all the
+'convenience' macros used to define shorter working names for functions
+without the perl prefix (see below).
 
 =item C<foo_globals.h>
 
-This file contains the declaration of a single structure containing the private
-global variables used by the subsystem (see the section on globals below for
-more details).
+This file contains the declaration of a single structure containing the
+private global variables used by the subsystem (see the section on
+globals below for more details).
 
 =item C<foo_bar.[ch]> etc.
 
-All other source files associated with the subsystem will have the prefix C<foo_>.
+All other source files associated with the subsystem will have the
+prefix C<foo_>.
 
 =back
 
@@ -633,9 +639,9 @@ local ones) should all follow these general guidelines.
 
 =item *
 
-Multiple words or components should be separated with underscores rather than
-using tricks such as capitalization, e.g. C<new_foo_bar> rather than C<NewFooBar>
-or (gasp) C<newfoobar>.
+Multiple words or components should be separated with underscores rather
+than using tricks such as capitalization, e.g. C<new_foo_bar> rather
+than C<NewFooBar> or (gasp) C<newfoobar>.
 
 =item *
 
@@ -666,18 +672,18 @@ name should incorporate the structure's name or an abbreviation of it.
 
 =item *
 
-Typedef names should be lower-case except for the first letter, e.g. C<Foo_bar>.
-The exception to this is when the first component is a short abbreviation, in
-which case the whole first component may be made uppercase for readability
-purposes, e.g. C<IO_foo> rather than C<Io_foo>.  Structures should generally be
-typedefed.
+Typedef names should be lower-case except for the first letter, e.g.
+C<Foo_bar>.  The exception to this is when the first component is a
+short abbreviation, in which case the whole first component may be made
+uppercase for readability purposes, e.g. C<IO_foo> rather than
+C<Io_foo>.  Structures should generally be typedefed.
 
 =item *
 
-Macros should have their first component uppercase, and the majority of the
-remaining components should be likewise. Where there is a family of macros, the
-variable part can be indicated in lowercase, e.g. C<PMC_foo_FLAG>,
-C<PMC_bar_FLAG>, ....
+Macros should have their first component uppercase, and the majority of
+the remaining components should be likewise. Where there is a family of
+macros, the variable part can be indicated in lowercase, e.g.
+C<PMC_foo_FLAG>, C<PMC_bar_FLAG>, ....
 
 =item *
 
@@ -729,11 +735,12 @@ e.g. C<PARROT_USE_STDIO>, C<USE_MULTIPLICITY>.
 
 =item *
 
-A macro that may declare stuff and thus needs to be at the start of a block
-should be prefixed with C<DECL_>, e.g. C<DECL_SAVE_STACK>. Note that macros
-which implicitly declare and then use variables are strongly discouraged,
-unless it is essential for portability or extensibility. The following are in
-decreasing preference style-wise, but increasing preference extensibility-wise.
+A macro that may declare stuff and thus needs to be at the start of a
+block should be prefixed with C<DECL_>, e.g. C<DECL_SAVE_STACK>. Note
+that macros which implicitly declare and then use variables are strongly
+discouraged, unless it is essential for portability or extensibility.
+The following are in decreasing preference style-wise, but increasing
+preference extensibility-wise.
 
     { Stack sp = GETSTACK;  x = POPSTACK(sp) ... /* sp is an auto variable */
     { DECL_STACK(sp);  x = POPSTACK(sp); ... /* sp may or may not be auto */
@@ -744,11 +751,11 @@ decreasing preference style-wise, but increasing preference extensibility-wise.
 
 =item Global Variables
 
-Global variables must never be accessed directly outside the subsystem in which
-they are used. Some other method, such as accessor functions, must be provided
-by that subsystem's API. (For efficiency the 'accessor functions' may
-occasionally actually be macros, but then the rule still applies in spirit at
-least).
+Global variables must never be accessed directly outside the subsystem
+in which they are used. Some other method, such as accessor functions,
+must be provided by that subsystem's API. (For efficiency the 'accessor
+functions' may occasionally actually be macros, but then the rule still
+applies in spirit at least).
 
 All global variables needed for the internal use of a particular subsystem
 should all be declared within a single struct called C<foo_globals> for
@@ -793,14 +800,14 @@ files.
 
 =item Developer files
 
-Each source file (e.g. a F<foo.c>, F<foo.h> pair), should contain inline POD
-documentation containing information on the implementation decisions associated
-with the source file. (Note that this is in contrast to PDDs, which describe
-design decisions). In addition, more discussive documentation can be placed in
-F<*.pod> files in the F<docs/dev> directory. This is the place for mini-essays
-on how to avoid overflows in unsigned arithmetic, or on the pros and cons of
-differing hash algorithms, and why the current one was chosen, and how it
-works.
+Each source file (e.g. a F<foo.c>, F<foo.h> pair), should contain inline
+POD documentation containing information on the implementation decisions
+associated with the source file. (Note that this is in contrast to PDDs,
+which describe design decisions). In addition, more discussive
+documentation can be placed in F<*.pod> files in the F<docs/dev>
+directory. This is the place for mini-essays on how to avoid overflows
+in unsigned arithmetic, or on the pros and cons of differing hash
+algorithms, and why the current one was chosen, and how it works.
 
 In principle, someone coming to a particular source file for the first time
 should be able to read the inline documentation file and gain an immediate
@@ -847,11 +854,12 @@ stuff going on in the code -- e.g. the book you stole the hash function from.
 
 =item Per-section comments
 
-If there is a collection of functions, structures or whatever which are grouped
-together and have a common theme or purpose, there should be a general comment
-at the start of the section briefly explaining their overall purpose. (Detailed
-essays should be left to the developer file). If there is really only one
-section, then the top-of-file comment already satisfies this requirement.
+If there is a collection of functions, structures or whatever which are
+grouped together and have a common theme or purpose, there should be a
+general comment at the start of the section briefly explaining their
+overall purpose. (Detailed essays should be left to the developer file).
+If there is really only one section, then the top-of-file comment
+already satisfies this requirement.
 
 =item Per-entity comments
 
@@ -893,10 +901,11 @@ schmuck trying subsequently to replace it with something 'cleaner'.
 
 =item General comments
 
-While there is no need to go mad commenting every line of code, it is immensely
-helpful to provide a "running commentary" every 10 lines or so if nothing
-else, this makes it easy to quickly locate a specific chunk of code. Such
-comments are particularly useful at the top of each major branch, e.g.
+While there is no need to go mad commenting every line of code, it is
+immensely helpful to provide a "running commentary" every 10 lines or so
+if nothing else, this makes it easy to quickly locate a specific chunk
+of code. Such comments are particularly useful at the top of each major
+branch, e.g.
 
     if (FOO_bar_BAZ(**p+*q) <= (r-s[FOZ & FAZ_MASK]) || FLOP_2(z99)) {
         /* we're in foo mode: clean up lexicals */
@@ -954,12 +963,13 @@ subsequent tweaking of code is secondary to this. Also, any tweaking that is
 done should as far as possible be platform independent, or at least likely to
 cause speed-ups in a wide variety of environments, and do no harm elsewhere.
 
-If you do put an optimization in, time it on as many architectures as you can,
-and be suspicious of it if it slows down on any of them! Perhaps it will be
-slow on other architectures too (current and future). Perhaps it wasn't so
-clever after all? If the optimization is platform specific, you should probably
-put it in a platform-specific function in a platform-specific file, rather than
-cluttering the main source with zillions of #ifdefs.
+If you do put an optimization in, time it on as many architectures as
+you can, and be suspicious of it if it slows down on any of them!
+Perhaps it will be slow on other architectures too (current and future).
+Perhaps it wasn't so clever after all? If the optimization is platform
+specific, you should probably put it in a platform-specific function in
+a platform-specific file, rather than cluttering the main source with
+zillions of #ifdefs.
 
 And remember to document it.
 
