@@ -15,7 +15,7 @@ compilers/imcc/main.c
 
 =head1 DESCRIPTION
 
-IMCC main function and helpers.
+IMCC helpers.
 
 =head2 Functions
 
@@ -327,7 +327,6 @@ is_all_hex_digits(ARGIN(const char *s))
     return 1;
 }
 
-/* most stolen from test_main.c */
 /*
 
 =item C<const char * parseflags>
