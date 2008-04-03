@@ -14,6 +14,10 @@ $Revision$
 This document defines the content and format of Parrot Design Documents
 (PDDs).
 
+=head1 SYNOPSIS
+
+Not applicable.
+
 =head1 DESCRIPTION
 
 PDDs are living documents, which should be maintained to reflect the current
