@@ -38,7 +38,7 @@ use vars qw($v);
 
 if ( $toolsrcdir ne '' && -d $toolsrcdir && lc $toolsrcbase eq 'symlink.pl' ) {
     my $trydir  = File::Spec->catdir( "include", "parrot" );
-    my $tryfile = File::Spec->catfile( "src",    "parrot.c" );
+    my $tryfile = File::Spec->catfile( "src",    "main.c" );
     die "$0: Do not run this under the original Parrot tree.\n"
         if ( -d $trydir ) && ( -f $tryfile && !-l $tryfile );
 }
