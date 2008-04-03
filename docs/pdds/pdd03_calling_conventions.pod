@@ -13,6 +13,10 @@ Parrot's inter-routine calling conventions.
 
 $Revision$
 
+=head1 SYNOPSIS
+
+Not applicable.
+
 =head1 DESCRIPTION
 
 This document describes how to pass arguments from registers to subroutines,
@@ -92,9 +96,9 @@ C<call_methodcc>, use the C<set_args> opcode to tell Parrot where the
 subroutine's or method's arguments will come from and how they should be
 expanded by the target.
 
-Similarly, just before returning from such a subroutine or method, use the
-C<set_returns> opcode to tell Parrot where the return values will come from and
-how to expand them for the caller's use.
+Similarly, just before returning from such a subroutine or method, use
+the C<set_returns> opcode to tell Parrot where the return values will
+come from and how to expand them for the caller's use.
 
 =head3 Flag Word Bits For 'Setting'
 
@@ -140,14 +144,14 @@ specifying the name of the next argument (or returned value).
 
 =head2 Accepting Parameters, Accepting Return Values
 
-As the I<first opcode> in a subroutine that will be called with C<invokecc> or
-a method that will be called with C<call_methodcc>, use the C<get_params> opcode
-to tell Parrot where the subroutine's or method's arguments should be stored
-and how they should be expanded.
+As the I<first opcode> in a subroutine that will be called with
+C<invokecc> or a method that will be called with C<call_methodcc>, use
+the C<get_params> opcode to tell Parrot where the subroutine's or
+method's arguments should be stored and how they should be expanded.
 
-Similarly, just I<before> (yes, I<before>) calling such a subroutine or method,
-use the C<get_results> opcode to tell Parrot where the return values should be
-stored and how to expand them for your use.
+Similarly, just I<before> (yes, I<before>) calling such a subroutine or
+method, use the C<get_results> opcode to tell Parrot where the return
+values should be stored and how to expand them for your use.
 
 NOTE: It should be obvious, but in case it's not: You must name only registers
 as targets of these opcodes, not constants.  (You can't store anything into a
@@ -319,6 +323,10 @@ to a new String[1] which has been C<assign>ed the given string.
 [1] or some other type specified by the current HLL type map, which may
 substitute an alternative type for each default low-level Parrot type (array,
 hash, string, number, etc.).
+
+=head1 IMPLEMENTATION
+
+Not applicable.
 
 =head1 BUGS
 
