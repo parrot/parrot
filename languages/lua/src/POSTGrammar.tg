@@ -678,12 +678,9 @@ transform return (PAST::Op) :language('PIR') {
 transform break (PAST::Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
-    .local pmc post
+    $S0 = endlabels[0]
     $P0 = get_hll_global ['POST'], 'Op'
-    post = $P0.'new'('node'=>node, 'pirop'=>'goto')
-    $P0 = endlabels[0]
-    post.'push'($P0)
-    .return (post)
+    .return $P0.'new'($S0, 'node'=>node, 'pirop'=>'goto')
 }
 
 
