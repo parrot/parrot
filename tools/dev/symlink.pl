@@ -15,7 +15,7 @@ symlink.pl - create a symlink shadow of the Parrot source.
    perl ../trunk/tools/dev/symlink.pl
 
 =head1 DESCRIPTION
-   
+
 Create a symlink tree shadowing the Parrot source tree.  Nifty for
 having just one (read-only) copy of the sources but several different
 build trees.  The -v option displays the created symlinks.
