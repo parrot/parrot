@@ -13,7 +13,7 @@ t/base64.t - base64 library
 =head1 DESCRIPTION
 
 Tests base64
-(implemented in F<languages/lua/lib/base64.pir>).
+(implemented in F<languages/lua/src/lib/base64.pir>).
 
 =cut
 

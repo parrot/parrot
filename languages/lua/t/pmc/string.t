@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/pmc/string.t - LuaString
 =head1 DESCRIPTION
 
 Tests C<LuaString> PMC
-(implemented in F<languages/lua/pmc/luastring.pmc>).
+(implemented in F<languages/lua/src/pmc/luastring.pmc>).
 
 =cut
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 package Parrot::Test::Lua_lex;
@@ -91,7 +91,7 @@ foreach my $func ( keys %language_test_map ) {
 
 =head1 SEE ALSO
 
-F<languages/lua/lib/Parrot/Test/Lua.pm>
+F<languages/lua/t/Parrot/Test/Lua.pm>
 
 =head1 AUTHOR
 

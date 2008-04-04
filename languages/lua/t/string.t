@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/string.t - Lua String Library
 =head1 DESCRIPTION
 
 Tests Lua String Library
-(implemented in F<languages/lua/lib/luastring.pir>).
+(implemented in F<languages/lua/src/lib/luastring.pir>).
 
 See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation",
 L<http://www.lua.org/manual/5.1/manual.html#5.4>.

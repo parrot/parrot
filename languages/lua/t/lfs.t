@@ -13,7 +13,7 @@ t/lfs.t - Lua File System Library
 =head1 DESCRIPTION
 
 Tests Lua File System Library
-(implemented in F<languages/lua/lib/lfs.pir>).
+(implemented in F<languages/lua/src/lib/lfs.pir>).
 
 =cut
 

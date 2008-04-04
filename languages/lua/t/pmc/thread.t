@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/pmc/thread.t - Lua thread
 =head1 DESCRIPTION
 
 Tests Lua C<thread> type
-(implemented in F<languages/lua/pmc/luathread.pmc>).
+(implemented in F<languages/lua/src/pmc/luathread.pmc>).
 
 =cut
 

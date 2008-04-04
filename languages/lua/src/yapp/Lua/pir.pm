@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -23,19 +23,19 @@ package pirVisitor;
     .param pmc args
 #    print "start Lua\n"
     sweepoff
-    load_bytecode 'languages/lua/lib/luaaux.pbc'
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
-    load_bytecode 'languages/lua/lib/luacoroutine.pbc'
-    load_bytecode 'languages/lua/lib/luapackage.pbc'
-    load_bytecode 'languages/lua/lib/luastring.pbc'
-    load_bytecode 'languages/lua/lib/luaregex.pbc'
-    load_bytecode 'languages/lua/lib/luatable.pbc'
-    load_bytecode 'languages/lua/lib/luamath.pbc'
-    load_bytecode 'languages/lua/lib/luaio.pbc'
-    load_bytecode 'languages/lua/lib/luafile.pbc'
-    load_bytecode 'languages/lua/lib/luaos.pbc'
-    load_bytecode 'languages/lua/lib/luadebug.pbc'
-    load_bytecode 'languages/lua/lib/luaperl.pbc'
+    load_bytecode 'languages/lua/src/lib/luaaux.pbc'
+    load_bytecode 'languages/lua/src/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/src/lib/luacoroutine.pbc'
+    load_bytecode 'languages/lua/src/lib/luapackage.pbc'
+    load_bytecode 'languages/lua/src/lib/luastring.pbc'
+    load_bytecode 'languages/lua/src/lib/luaregex.pbc'
+    load_bytecode 'languages/lua/src/lib/luatable.pbc'
+    load_bytecode 'languages/lua/src/lib/luamath.pbc'
+    load_bytecode 'languages/lua/src/lib/luaio.pbc'
+    load_bytecode 'languages/lua/src/lib/luafile.pbc'
+    load_bytecode 'languages/lua/src/lib/luaos.pbc'
+    load_bytecode 'languages/lua/src/lib/luadebug.pbc'
+    load_bytecode 'languages/lua/src/lib/luaperl.pbc'
     lua_openlibs()
     .local pmc env
     env = get_hll_global '_G'

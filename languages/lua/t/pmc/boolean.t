@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/pmc/boolean.t - LuaBoolean
 =head1 DESCRIPTION
 
 Tests C<LuaBoolean> PMC
-(implemented in F<languages/lua/pmc/luaboolean.pmc>).
+(implemented in F<languages/lua/src/pmc/luaboolean.pmc>).
 
 =cut
 

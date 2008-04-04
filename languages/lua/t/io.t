@@ -13,7 +13,7 @@ t/io.t - Lua Input/Output Library
 =head1 DESCRIPTION
 
 Tests Lua Input/Output Library
-(implemented in F<languages/lua/lib/luaio.pir>).
+(implemented in F<languages/lua/src/lib/luaio.pir>).
 
 See "Lua 5.1 Reference Manual", section 5.7 "Input and Output Facilities",
 L<http://www.lua.org/manual/5.1/manual.html#5.7>.

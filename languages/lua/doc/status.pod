@@ -36,7 +36,7 @@ The Lua grammar is described in F<languages/lua/src/lua51.pg>.
 The PIR code is emitted by C<CodeString>.
 
 C<PGE> is also used by the Lua pattern compiler in
-F<languages/lua/lib/luaregex.pir>.
+F<languages/lua/src/lib/luaregex.pir>.
 
 =item TGE
 
@@ -49,7 +49,7 @@ The AST is represented with F<compilers/pct/src/PAST/Node.pir>.
 
 =item POST
 
-The OST is represented with F<languages/lua/src/POST.pir>.
+The OST is represented with F<compilers/pct/src/POST/Node.pir>.
 
 =item HLLCompiler
 
@@ -95,7 +95,7 @@ This compiler is written in Perl5 :
 
 Implemented with Perl5 regex
 
-F<languages/lua/Lua/lexer.pm>
+F<languages/lua/src/yapp/Lua/lexer.pm>
 
 =item * parser
 
@@ -105,23 +105,23 @@ It supports the full grammar described in F<languages/lua/doc/lua51.bnf>.
 
 Only one C<error> rule, so the syntax error diagnostic is minimalist.
 
-F<languages/lua/Lua/lua51.yp>
+F<languages/lua/src/yapp/Lua/lua51.yp>
 
 =item * code generation
 
-F<languages/lua/Lua/build.pm>
+F<languages/lua/src/yapp/Lua/build.pm>
 
 =item * symbole table
 
-F<languages/lua/Lua/symbtab.pm>
+F<languages/lua/src/yapp/Lua/symbtab.pm>
 
 =item * opcode representation
 
-F<languages/lua/Lua/opcode.pm>
+F<languages/lua/src/yapp/Lua/opcode.pm>
 
 =item * opcode emission
 
-F<languages/lua/Lua/pir.pm>
+F<languages/lua/src/yapp/Lua/pir.pm>
 
 =back
 
@@ -131,44 +131,39 @@ There are eight basic types in Lua, each of them is implemented by a PMC.
 
 =over 4
 
-=item * nil F<languages/lua/pmc/luanil.pmc>
+=item * nil F<languages/lua/src/pmc/luanil.pmc>
 
-=item * boolean F<languages/lua/pmc/luaboolean.pmc>
+=item * boolean F<languages/lua/src/pmc/luaboolean.pmc>
 
-=item * number F<languages/lua/pmc/luanumber.pmc>
+=item * number F<languages/lua/src/pmc/luanumber.pmc>
 
-=item * string F<languages/lua/pmc/luastring.pmc>
+=item * string F<languages/lua/src/pmc/luastring.pmc>
 
-=item * function F<languages/lua/pmc/luafunction.pmc>
-& F<languages/lua/pmc/luaclosure.pmc>
+=item * function F<languages/lua/src/pmc/luafunction.pmc>
+& F<languages/lua/src/pmc/luaclosure.pmc>
 
-=item * userdata F<languages/lua/pmc/luauserdata.pmc>
+=item * userdata F<languages/lua/src/pmc/luauserdata.pmc>
 
 This type allows OO extension.
 
 Currently, C<file> in I/O library is an C<userdata>.
 
-=item * thread F<languages/lua/pmc/luathread.pmc>
+=item * thread F<languages/lua/src/pmc/luathread.pmc>
 
 This type is used to implement coroutines.
 The current implementation use the library
 F<runtime/parrot/library/Parrot/Coroutine.pir>.
 
-=item * table F<languages/lua/pmc/luatable.pmc>
+=item * table F<languages/lua/src/pmc/luatable.pmc>
 
 This type is I<the> data structure of the language.
 
 =back
 
-F<languages/lua/pmc/luaany.pmc> provides an abstract base class for all
+F<languages/lua/src/pmc/luaany.pmc> provides an abstract base class for all
 Lua types.
 
-F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
-
-=head2 BUGS
-
-Parrot has some problem,
-see L<http://rt.perl.org/rt3/Ticket/Display.html?id=49328>.
+F<languages/lua/src/pmc/lua.pmc> is a singleton PMC what holds some static methods.
 
 =head2 TODO
 
@@ -184,29 +179,29 @@ Lua 5.1 defines the following standard libraries:
 
 =over 4
 
-=item * basic library F<languages/lua/lib/luabasic.pir>
+=item * basic library F<languages/lua/src/lib/luabasic.pir>
 
-=item * coroutine manipulation F<languages/lua/lib/luacoroutine.pir>
+=item * coroutine manipulation F<languages/lua/src/lib/luacoroutine.pir>
 
-=item * package library F<languages/lua/lib/luapackage.pir>
+=item * package library F<languages/lua/src/lib/luapackage.pir>
 
-=item * string manipulation F<languages/lua/lib/luastring.pir>
+=item * string manipulation F<languages/lua/src/lib/luastring.pir>
 
-=item * table manipulation F<languages/lua/lib/luatable.pir>
+=item * table manipulation F<languages/lua/src/lib/luatable.pir>
 
-=item * mathematical functions F<languages/lua/lib/luamath.pir>
+=item * mathematical functions F<languages/lua/src/lib/luamath.pir>
 
-=item * input and output F<languages/lua/lib/luaio.pir>, F<languages/lua/lib/luafile.pir>
+=item * input and output F<languages/lua/src/lib/luaio.pir>, F<languages/lua/src/lib/luafile.pir>
 
-=item * operating system facilities F<languages/lua/lib/luaos.pir>
+=item * operating system facilities F<languages/lua/src/lib/luaos.pir>
 
-=item * debug facilities F<languages/lua/lib/luadebug.pir>
+=item * debug facilities F<languages/lua/src/lib/luadebug.pir>
 
 =back
 
-F<languages/lua/lib/luaaux.pir> is the equivalent of Auxiliary Library.
+F<languages/lua/src/lib/luaaux.pir> is the equivalent of Auxiliary Library.
 
-F<languages/lua/lib/luaregex.pir> implements a regex compiler using PGE.
+F<languages/lua/src/lib/luaregex.pir> implements a regex compiler using PGE.
 
 =head2 TODO
 
@@ -223,15 +218,15 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =over 4
 
-=item * alarm library F<languages/lua/lib/alarm.pir>
+=item * alarm library F<languages/lua/src/lib/alarm.pir>
 
-=item * base64 library F<languages/lua/lib/base64.pir>
+=item * base64 library F<languages/lua/src/lib/base64.pir>
 
-=item * bitwise operation library F<languages/lua/lib/bitlib.pir>
+=item * bitwise operation library F<languages/lua/src/lib/bitlib.pir>
 
-=item * Lua File System library F<languages/lua/lib/lfs.pir>
+=item * Lua File System library F<languages/lua/src/lib/lfs.pir>
 
-=item * md5 & sha1 library F<languages/lua/lib/md5.pir>
+=item * md5 & sha1 library F<languages/lua/src/lib/md5.pir>
 
 =back
 

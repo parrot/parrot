@@ -18,8 +18,8 @@ RECONFIGURE = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 ## places to look for things
-LIBPATH  = lib
-PMCDIR   = pmc
+LIBPATH  = src/lib
+PMCDIR   = src/pmc
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 PMCS = \
@@ -87,7 +87,7 @@ GEN_PBC = \
  lua.pbc
 
 all: \
- pmc/lua_group$(LOAD_EXT) \
+ src/pmc/lua_group$(LOAD_EXT) \
  $(LIB_PBCS) \
  $(LIBPATH)/luaperl.pbc \
  $(LIBPATH)/alarm.pbc \
@@ -98,7 +98,7 @@ all: \
  $(LIBPATH)/sha1.pbc \
  $(GEN_PIR) \
  $(GEN_PBC) \
- Lua/parser.pm
+ src/yapp/Lua/parser.pm
 
 
 src/lua51_testlex_gen.pir: src/lua51_testlex.pg
@@ -125,7 +125,7 @@ lua@exe@: lua.pbc
 $(LIBPATH)/lualibs.pbc: $(LIB_PBCS)
 	$(PBC_MERGE) -o $(LIBPATH)/lualibs.pbc $(LIB_PBCS)
 
-pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
+src/pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
@@ -189,8 +189,8 @@ $(LIBPATH)/sha1.pbc: $(LIBPATH)/md5.pir
 	$(PERL) -pe "s|md5|sha1|g; s|MD5|SHA1|g" $(LIBPATH)/md5.pir > $(LIBPATH)/sha1.pir
 	$(PARROT) --output=$(LIBPATH)/sha1.pbc $(LIBPATH)/sha1.pir
 
-Lua/parser.pm: Lua/lua51.yp
-	yapp -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp
+src/yapp/Lua/parser.pm: src/yapp/Lua/lua51.yp
+	yapp -v -m Lua::parser -o src/yapp/Lua/parser.pm src/yapp/Lua/lua51.yp
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in

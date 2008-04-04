@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/package.t - Lua Package Library
 =head1 DESCRIPTION
 
 Tests Lua Package Library
-(implemented in F<languages/lua/lib/luapackage.pir>).
+(implemented in F<languages/lua/src/lib/luapackage.pir>).
 
 See "Lua 5.1 Reference Manual", section 5.3 "Modules",
 L<http://www.lua.org/manual/5.1/manual.html#5.3>.
@@ -289,7 +289,7 @@ print(type(package.pbcpath))
 print(package.pbcpath)
 CODE
 string
-./?.pbc;./?.pir;languages/lua/lib/?.pbc
+./?.pbc;./?.pir;languages/lua/src/lib/?.pbc
 OUTPUT
 
 $ENV{LUA_PBCPATH} = "?.pbc";
@@ -303,7 +303,7 @@ $ENV{LUA_PBCPATH} = ";;languages/lua/?.pbc";
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.pbcpath' );
 print(package.pbcpath)
 CODE
-;./?.pbc;./?.pir;languages/lua/lib/?.pbc;languages/lua/?.pbc
+;./?.pbc;./?.pir;languages/lua/src/lib/?.pbc;languages/lua/?.pbc
 OUTPUT
 
 delete $ENV{LUA_PBCPATH};

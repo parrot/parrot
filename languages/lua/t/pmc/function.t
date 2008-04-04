@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/pmc/function.t - LuaFunction
 =head1 DESCRIPTION
 
 Tests C<LuaFunction> PMC
-(implemented in F<languages/lua/pmc/luafunction.pmc>).
+(implemented in F<languages/lua/src/pmc/luafunction.pmc>).
 
 =cut
 
@@ -232,8 +232,8 @@ OUTPUT
 pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 .HLL 'Lua', 'lua_group'
 .sub __start :main
-    load_bytecode 'languages/lua/lib/luaaux.pbc'
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/src/lib/luaaux.pbc'
+    load_bytecode 'languages/lua/src/lib/luabasic.pbc'
     $P0 = get_hll_global ['Lua::basic'], 'luaopen_basic'
     $P0()
     _main()

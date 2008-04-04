@@ -13,7 +13,7 @@ t/bitlib.t - bitwise operations library
 =head1 DESCRIPTION
 
 Tests bitlib
-(implemented in F<languages/lua/lib/bitlib.pir>).
+(implemented in F<languages/lua/src/lib/bitlib.pir>).
 
 =cut
 

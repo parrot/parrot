@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/pmc/closure.t - LuaClosure
 =head1 DESCRIPTION
 
 Tests C<LuaClosure> PMC
-(implemented in F<languages/lua/pmc/luaclosure.pmc>).
+(implemented in F<languages/lua/src/pmc/luaclosure.pmc>).
 
 =cut
 
@@ -280,8 +280,8 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'from pir' );
     tmp_1 = tmp_0[cst_1]
     tmp_1(tmp_1)
 .end
-.include 'languages/lua/lib/luaaux.pir'
-.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/src/lib/luaaux.pir'
+.include 'languages/lua/src/lib/luabasic.pir'
 CODE
 /^function: [0-9A-Fa-f]{8}/
 OUTPUT

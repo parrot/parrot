@@ -13,7 +13,7 @@ t/alarm.t - Lua Alarm Library
 =head1 DESCRIPTION
 
 Tests Lua Alarm Library
-(implemented in F<languages/lua/lib/alarm.pir>).
+(implemented in F<languages/lua/src/lib/alarm.pir>).
 
 =cut
 

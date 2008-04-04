@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -14,7 +14,7 @@ t/math.t - Lua Mathematic Library
 =head1 DESCRIPTION
 
 Tests Lua Mathematic Library
-(implemented in F<languages/lua/lib/luamath.pir>).
+(implemented in F<languages/lua/src/lib/luamath.pir>).
 
 See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions",
 L<http://www.lua.org/manual/5.1/manual.html#5.6>.

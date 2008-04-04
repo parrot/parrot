@@ -13,7 +13,7 @@ t/sha1.t - sha1 library
 =head1 DESCRIPTION
 
 Tests sha1
-(implemented as md5 in F<languages/lua/lib/md5.pir>).
+(implemented as md5 in F<languages/lua/src/lib/md5.pir>).
 
 =cut
 

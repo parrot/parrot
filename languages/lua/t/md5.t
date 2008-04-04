@@ -13,7 +13,7 @@ t/md5.t - md5 library
 =head1 DESCRIPTION
 
 Tests md5
-(implemented in F<languages/lua/lib/md5.pir>).
+(implemented in F<languages/lua/src/lib/md5.pir>).
 
 =cut
 

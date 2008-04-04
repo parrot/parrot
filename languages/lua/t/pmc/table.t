@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/pmc/table.t - Lua Table
 =head1 DESCRIPTION
 
 Tests C<table> type
-(implemented in F<languages/lua/pmc/luatable.pmc>).
+(implemented in F<languages/lua/src/pmc/luatable.pmc>).
 
 =cut
 

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/debug.t - Lua Debug Library
 =head1 DESCRIPTION
 
 Tests Lua Debug Library
-(implemented in F<languages/lua/lib/luadebug.pir>).
+(implemented in F<languages/lua/src/lib/luadebug.pir>).
 
 See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library",
 L<http://www.lua.org/manual/5.1/manual.html#5.9>.

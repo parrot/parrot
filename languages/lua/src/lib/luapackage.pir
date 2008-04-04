@@ -80,7 +80,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     _loaders[$P2] = loader_PBCroot
 
     setpath(_package, 'path', 'LUA_PATH', './?.lua')
-    setpath(_package, 'pbcpath', 'LUA_PBCPATH', './?.pbc;./?.pir;languages/lua/lib/?.pbc')
+    setpath(_package, 'pbcpath', 'LUA_PBCPATH', './?.pbc;./?.pir;languages/lua/src/lib/?.pbc')
 
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'

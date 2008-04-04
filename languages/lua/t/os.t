@@ -13,7 +13,7 @@ t/os.t - Lua Operating System Library
 =head1 DESCRIPTION
 
 Tests Lua Operating System Library
-(implemented in F<languages/lua/lib/luaos.pir>).
+(implemented in F<languages/lua/src/lib/luaos.pir>).
 
 See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities",
 L<http://www.lua.org/manual/5.1/manual.html#5.8>.

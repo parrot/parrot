@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ t/regex.t - Lua Regex Compiler
 =head1 DESCRIPTION
 
 Tests Lua Regex Compiler
-(implemented in F<languages/lua/lib/luaregex.pir>).
+(implemented in F<languages/lua/src/lib/luaregex.pir>).
 
 Individual tests are stored in the C<rx_*> files in the same directory;
 There is one test per line: each test consists of the following
