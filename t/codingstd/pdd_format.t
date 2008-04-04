@@ -65,7 +65,13 @@ sub check_pdd_formatting {
     tie @lines, 'Tie::File', $pdd
         or croak "Unable to tie to $pdd: $!";
     for (my $i=0; $i<=$#lines; $i++) {
-        push @toolong, ($i + 1) if length( $lines[$i] ) > 78;
+        if (
+            ( length( $lines[$i] ) > 78 )
+            and
+            ( $lines[$i] !~ m/^(?:L<)?http/ ) 
+        ) {
+            push @toolong, ($i + 1);
+        }
         foreach my $need ( @sections_needed ) {
             $sections_seen{$need}++ if $lines[$i] =~ m{^=head1\s+$need};
         }
