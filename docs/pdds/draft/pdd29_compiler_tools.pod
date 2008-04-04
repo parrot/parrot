@@ -45,7 +45,8 @@ compile out of the box. It is highly suggested to use this script to
 get started with the PCT.
 The script is located in C<tools/dev/mk_language_shell.pl>.
 
-{{ Not sure whether the mk_language_shell.pl script should be mentioned long term }}
+{{ Not sure whether the mk_language_shell.pl script should be mentioned long
+term }}
 
 
 Running the compiler is then done as follows:
@@ -190,10 +191,10 @@ $P0.'commandline_banner'($S0)
 
 sets the string in C<$S0> as a commandline banner on the compiler in C<$P0>.
 The banner is the first text that is shown when the compiler is started in
-interactive mode. This can be used for a copyright notice or other information.
+interactive mode. This can be used for a copyright notice or other
+information.
 
 =back
-
 
 =head1 ATTACHMENTS
 

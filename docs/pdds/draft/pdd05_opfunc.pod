@@ -65,8 +65,8 @@ want to write it (for example if you have no inner function) that's fine.
 
 =head2 The inner function
 
-The inner function is the code that actually does the work. This is generally a
-chunk of C code, though the interpreter will be able to call perl code soon.
+The inner function is the code that actually does the work. This is generally
+a chunk of C code, though the interpreter will be able to call perl code soon.
 
 =head1 IMPLEMENTATION
 
@@ -149,8 +149,8 @@ Indicates the item is a PMC register number.
 
 =back
 
-The function starts with the first open brace, which should generally be on the
-first non-empty line.
+The function starts with the first open brace, which should generally be on
+the first non-empty line.
 
 For example:
 

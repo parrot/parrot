@@ -27,9 +27,9 @@ a few further definitions are needed.
 =head2 Character Set
 
 The Unicode Standard prefers the concepts of I<character repertoire> (a
-collection of characters) and I<character code> (a mapping which tells you what
-number represents which character in the repertoire). Character set is commonly
-used to mean the standard which defines both a repertoire and a code.
+collection of characters) and I<character code> (a mapping which tells you
+what number represents which character in the repertoire). Character set is
+commonly used to mean the standard which defines both a repertoire and a code.
 
 =head2 Codepoint
 
@@ -64,11 +64,11 @@ In linguistics, a grapheme is a single symbol in a writing system (letter,
 number, punctuation mark, kanji, hiragana, Arabic glyph, Devanagari symbol,
 etc), including any modifiers (diacritics, etc).
 
-The Unicode Standard defines a I<grapheme cluster> (commonly simplified to just
-I<grapheme>) as one or more characters forming a visible whole when displayed,
-in other words, a bundle of a character and all of its combining characters.
-Because graphemes are the highest-level abstract idea of a "character", they're
-useful for converting between character sets.
+The Unicode Standard defines a I<grapheme cluster> (commonly simplified to
+just I<grapheme>) as one or more characters forming a visible whole when
+displayed, in other words, a bundle of a character and all of its combining
+characters.  Because graphemes are the highest-level abstract idea of a
+"character", they're useful for converting between character sets.
 
 =head2 Normalization Form
 
@@ -92,9 +92,9 @@ one codepoint to each grapheme.
 
 =item *
 
-Parrot supports multiple string formats, and so users of Parrot strings must be
-aware at all times of string encoding issues and how these relate to the string
-interface.
+Parrot supports multiple string formats, and so users of Parrot strings must
+be aware at all times of string encoding issues and how these relate to the
+string interface.
 
 =item *
 
@@ -108,8 +108,8 @@ the character set of the string.
 
 =item *
 
-Operations that require understanding the layout of the string must respect the
-encoding of the string.
+Operations that require understanding the layout of the string must respect
+the encoding of the string.
 
 =item *
 
@@ -121,14 +121,14 @@ format that is a sequence of 32-bit Unicode codepoints in NFG.
 =head1 IMPLEMENTATION
 
 Parrot was designed from the outset to support multiple string formats:
-multiple character sets and multiple encodings. We don't standardize on Unicode
-internally, converting all strings to Unicode strings, because for the majority
-of use cases it's still far more efficient to deal with whatever input data the
-user sends us.
+multiple character sets and multiple encodings. We don't standardize on
+Unicode internally, converting all strings to Unicode strings, because for the
+majority of use cases it's still far more efficient to deal with whatever
+input data the user sends us.
 
 Consumers of Parrot strings need to be aware that there is a plurality of
-string encodings inside Parrot. (Producers of Parrot strings can do whatever is
-most efficient for them.) To put it in simple terms: if you find yourself
+string encodings inside Parrot. (Producers of Parrot strings can do whatever
+is most efficient for them.) To put it in simple terms: if you find yourself
 writing C<*s++> or any other C string idioms, you need to stop and think if
 that's what you really mean. Not everything is byte-based anymore.
 
@@ -143,7 +143,8 @@ character C<0x209>, also known as C<LATIN SMALL LETTER I WITH DOUBLE GRAVE>,
 which does the job all in one go. It can also represent this letter as a
 decomposed sequence: C<LATIN SMALL LETTER I> (C<0x69>) followed by C<COMBINING
 DOUBLE GRAVE ACCENT> (C<0x30F>). We use the term I<grapheme> to refer to a
-"letter" whether it's represented by a single codepoint or multiple codepoints.
+"letter" whether it's represented by a single codepoint or multiple
+codepoints.
 
 String operations on this kind of variable-byte encoding can be complex and
 expensive. Operations like comparison and traversal require a series of
@@ -152,25 +153,26 @@ combining characters. The Unicode Standard defines several "normalization
 forms" that help with this problem. Normalization Form C (NFC), for example,
 decomposes everything, then re-composes as much as possible. So if you see the
 integer stream C<0x69 0x30F>, it needs to be replaced by C<0x209>. However,
-Unicode's normalization forms don't go quite far enough to completely solve the
-problem. For example, Serbo-Croat is sometimes also written with Cyrillic
+Unicode's normalization forms don't go quite far enough to completely solve
+the problem. For example, Serbo-Croat is sometimes also written with Cyrillic
 letters rather than Latin letters. Unicode doesn't have a single composed
-character for the Cyrillic equivalent of the Serbo-Croat C<LATIN SMALL LETTER I
-WITH DOUBLE GRAVE>, so it is represented as a decomposed pair C<CYRILLIC SMALL
-LETTER I> (C<0x438>) with C<COMBINING DOUBLE GRAVE ACCENT> (C<0x30F>). This
-means that even in the most normalized Unicode form, string manipulation code
-must always assume a variable-byte encoding, and use expensive lookaheads. The
-cost is incurred on every operation, though the particular string operated on
-might not contain combining characters. It's particularly noticeable in parsing
-and regular expression matches, where backtracking operations may re-traverse
-the characters of a simple string hundreds of times.
+character for the Cyrillic equivalent of the Serbo-Croat C<LATIN SMALL LETTER
+I WITH DOUBLE GRAVE>, so it is represented as a decomposed pair C<CYRILLIC
+SMALL LETTER I> (C<0x438>) with C<COMBINING DOUBLE GRAVE ACCENT> (C<0x30F>).
+This means that even in the most normalized Unicode form, string manipulation
+code must always assume a variable-byte encoding, and use expensive
+lookaheads. The cost is incurred on every operation, though the particular
+string operated on might not contain combining characters. It's particularly
+noticeable in parsing and regular expression matches, where backtracking
+operations may re-traverse the characters of a simple string hundreds of
+times.
 
 In order to reduce the cost of variable-byte operations and simplify some
 string manipulation tasks, Parrot defines an additional normalization:
 Normalization Form G (NFG). In NFG, every grapheme is guaranteed to be
-represented by a single codepoint. Graphemes that don't have a single codepoint
-representation in Unicode are given a dynamically generated codepoint unique to
-the NFG string.
+represented by a single codepoint. Graphemes that don't have a single
+codepoint representation in Unicode are given a dynamically generated
+codepoint unique to the NFG string.
 
 An NFG string is a sequence of signed 32-bit Unicode codepoints. It's
 equivalent to UCS-4 except for the normalization form semantics. UCS-4
@@ -182,9 +184,10 @@ maps between a dynamic codepoint and its associated decomposition.
 
 In practice, this goes as follows: When our Russified Serbo-Croat string is
 converted to NFG, it is normalized to a single character having the codepoint
-C<0xFFFFFFFFF> (in other words, -1 in 2's complement). At the same time, Parrot
-inserts an entry into the string's grapheme table at array index -1, containing
-the Unicode decomposition of the grapheme C<0x00000438 0x000000030F>.
+C<0xFFFFFFFFF> (in other words, -1 in 2's complement). At the same time,
+Parrot inserts an entry into the string's grapheme table at array index -1,
+containing the Unicode decomposition of the grapheme C<0x00000438
+0x000000030F>.
 
 Parrot will provide both grapheme-aware and codepoint-aware string operations,
 such as iterators for string traversal and calculations of string length.
@@ -215,15 +218,15 @@ converting between string types.
 A 32-bit encoding is quite large, considering the fact that the Unicode
 codespace only requires up to C<0x10FFFF>. The Unicode Consortium's FAQ notes
 that most Unicode interfaces use UTF-16 instead of UTF-32, out of memory
-considerations. This means that although Parrot will use 32-bit NFG strings for
-optimizations within operations, for the most part individual users should use
-the native character set and encoding of their data, rather than using NFG
+considerations. This means that although Parrot will use 32-bit NFG strings
+for optimizations within operations, for the most part individual users should
+use the native character set and encoding of their data, rather than using NFG
 strings directly.
 
 The conceptual cost of adding a normalization form beyond those defined in the
 Unicode Standard has to be considered. However, to fully support Unicode,
-Parrot already needs to keep track of what normalization form a given string is
-in, and provide functions to convert between normalization forms. The
+Parrot already needs to keep track of what normalization form a given string
+is in, and provide functions to convert between normalization forms. The
 conceptual cost of one additional normalization form is relatively small.
 
 =head3 The grapheme table
@@ -231,13 +234,13 @@ conceptual cost of one additional normalization form is relatively small.
 When constructing strings in NFG, graphemes not expressible as a single
 character in Unicode are represented by a dynamic codepoint index into the
 string's grapheme table. When Parrot comes across a multi-codepoint grapheme,
-it must first determine whether or not the grapheme already has an entry in the
-grapheme table. Therefore the table cannot strictly be an array, as that would
-make lookup inefficient. The grapheme table is represented, then, as both an
-array and a hash structure. The array interface provides forward-lookup and the
-hash interface reverse lookup. Converting a multi-codepoint grapheme into a
-dynamic codepoint can be demonstrated with the following Perl 5 pseudocode, for
-the grapheme C<0x438 0x30F>:
+it must first determine whether or not the grapheme already has an entry in
+the grapheme table. Therefore the table cannot strictly be an array, as that
+would make lookup inefficient. The grapheme table is represented, then, as
+both an array and a hash structure. The array interface provides
+forward-lookup and the hash interface reverse lookup. Converting a
+multi-codepoint grapheme into a dynamic codepoint can be demonstrated with the
+following Perl 5 pseudocode, for the grapheme C<0x438 0x30F>:
 
    $codepoint = ($grapheme_lookup->{0x438}{0x30F} ||= do {
                    push @grapheme_table, "\x{438}\x{30F}";
@@ -278,16 +281,16 @@ string to C<string_grapheme_copy>. This function iterates through the source
 string one grapheme at a time, using the character set function pointer
 C<get_grapheme> (which may read ahead multiple characters with strings that
 aren't in NFG). For each source grapheme, the function will call
-C<set_grapheme> on the destination string (which may append multiple characters
-in non-NFG strings). This conversion effectively uses an intermediate NFG
-representation.
+C<set_grapheme> on the destination string (which may append multiple
+characters in non-NFG strings). This conversion effectively uses an
+intermediate NFG representation.
 
 =head2 String PMC API
 
 =head1 REFERENCES
 
-http://sirviente.9grid.es/sources/plan9/sys/doc/utf.ps - Plan 9's Runes are not
-dissimilar to NFG strings, and this is a good introduction to the Unicode
+http://sirviente.9grid.es/sources/plan9/sys/doc/utf.ps - Plan 9's Runes are
+not dissimilar to NFG strings, and this is a good introduction to the Unicode
 world.
 
 http://www.unicode.org/reports/tr15/ - The Unicode Consortium's

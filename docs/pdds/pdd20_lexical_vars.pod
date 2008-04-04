@@ -62,10 +62,10 @@ a.k.a. a call frame.
 
 =head3 LexInfo PMC
 
-LexInfo PMCs contain what is known at compile time about lexical variables of a
-given subroutine: their names (for most languages), perhaps their types, etc.
-They are the interface through which the PIR compiler stores and validates
-compile-time information about lexical variables.
+LexInfo PMCs contain what is known at compile time about lexical variables of
+a given subroutine: their names (for most languages), perhaps their types,
+etc.  They are the interface through which the PIR compiler stores and
+validates compile-time information about lexical variables.
 
 At compile time, each newly created Subroutine (or Subroutine derivative,
 e.g. Closure) that uses lexical variables will be populated with a PMC of
@@ -320,8 +320,8 @@ Array) of LexPads captured at C<newclosure> time.
 =head2 Default Parrot LexPad and LexInfo
 
 The default LexInfo supports lexicals only as aliases for PMC registers.  It
-therefore implements C<declare_lex_preg()>.  (Internally, it could be a Hash of
-some kind, where keys are String variable names and values are integer
+therefore implements C<declare_lex_preg()>.  (Internally, it could be a Hash
+of some kind, where keys are String variable names and values are integer
 register numbers.)
 
 The default LexPad (like all LexPads) implements the Hash interface.  When

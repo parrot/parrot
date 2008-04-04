@@ -80,14 +80,14 @@ C<u> may be empty, since the PMC structure also provides a more general data
 pointer, but is useful for PMCs which hold only a single piece of data (e.g.
 C<PerlInts>).
 
-C<flags> holds a set of flags associated with the PMC; these are documented  in
-F<include/parrot/pobj.h>, and are generally only used within the Parrot
+C<flags> holds a set of flags associated with the PMC; these are documented
+in F<include/parrot/pobj.h>, and are generally only used within the Parrot
 internals.
 
-C<vtable> holds a pointer to the B<vtable> associated with the PMC. This points
-to a set of functions, with interfaces described in
-L<Vtable Functions> that implement the basic behaviour of the PMC
-(i.e. how it behaves under addition, subtraction, cloning etc.)
+C<vtable> holds a pointer to the B<vtable> associated with the PMC. This
+points to a set of functions, with interfaces described in L<Vtable Functions>
+that implement the basic behaviour of the PMC (i.e. how it behaves under
+addition, subtraction, cloning etc.)
 
 C<data> holds a pointer to the core data associated with the PMC. This
 may be null.
@@ -167,8 +167,8 @@ from.
 =item does
 
 Compose a role. Takes one argument, the name of the role to compose. [NOTE:
-this modifier has been taken from the older feature C<does> which is now called
-C<provides>.]
+this modifier has been taken from the older feature C<does> which is now
+called C<provides>.]
 
 =item resolves
 
@@ -178,8 +178,8 @@ current C<pmclass> or C<prole>.
 
 =item provides
 
-The PMC satisfies a particular low-level interface, which gives some assurances
-on how and where a PMC can be used.
+The PMC satisfies a particular low-level interface, which gives some
+assurances on how and where a PMC can be used.
 
 Roles composed with C<does> may also define C<provides> for one or more
 interfaces. (They generally define at least a C<provides> corresponding
@@ -248,15 +248,15 @@ but the standard declaration syntax must be used in roles, in PMCs that
 compose roles, and in PMCs that will be subclassed by high-level classes
 (this means all core PMCs, and most non-core PMCs).
 
-Low-level PMCs that use multiple inheritance (C<pmclass> declarations with more
-than one C<extends> entry) have to be careful with the contents of their
+Low-level PMCs that use multiple inheritance (C<pmclass> declarations with
+more than one C<extends> entry) have to be careful with the contents of their
 structs. There's no problem if the two parents have identical data struct
-members. But, if the two parents have different data struct members, any vtable
-functions inherited from the parents will not be able to directly access the
-parents' struct members or use the accessor macros. The solution is to either
-override those vtable functions that directly access data struct members in the
-child PMC, define the parents as roles instead of classes, or declare the
-multiply inheriting child in PIR or an HLL.
+members. But, if the two parents have different data struct members, any
+vtable functions inherited from the parents will not be able to directly
+access the parents' struct members or use the accessor macros. The solution is
+to either override those vtable functions that directly access data struct
+members in the child PMC, define the parents as roles instead of classes, or
+declare the multiply inheriting child in PIR or an HLL.
 
 =head3 Defining vtable functions
 
@@ -329,12 +329,12 @@ in the C<pmclass> declaration using the C<extends> keyword.
 
 =head2 Composition
 
-Composition is another form of code reuse in PMCs. Unlike inheritance, composed
-roles aren't complete stand-alone PMCs, they are just bundles of behavior and
-state that can be used within the composing PMC. As such, roles are never
-instantiated directly, and are never translated to C directly. They have no
-core structs, though they define attributes to be added to the PMC they are
-composed into.
+Composition is another form of code reuse in PMCs. Unlike inheritance,
+composed roles aren't complete stand-alone PMCs, they are just bundles of
+behavior and state that can be used within the composing PMC. As such, roles
+are never instantiated directly, and are never translated to C directly. They
+have no core structs, though they define attributes to be added to the PMC
+they are composed into.
 
 When a PMC that uses a role is translated to C, the role provides vtable
 functions, methods, and attributes that will be added to the generated C
@@ -462,8 +462,8 @@ turns it into a PMC of the appropriate class.
 
   void init_pmc(INTERP, PMC* self, PMC* initializer)
 
-Alternative entry point called when a PMC is first instantiated.  Accepts a PMC
-parameter used to initialize the given object.  Interpretation of the PMC
+Alternative entry point called when a PMC is first instantiated.  Accepts a
+PMC parameter used to initialize the given object.  Interpretation of the PMC
 initializer is left open, each PMC is free to choose its own implemention. A
 null value passed as the initializer parameter is allowed.
 
@@ -526,9 +526,9 @@ normal PMCs don't need a custom mark routine.)
 
 If a PMC has this flag set, then it is responsible for marking all buffers and
 PMCs under its control as alive. If it does not, those PMCs or buffers may be
-collected later. This method does I<not> have to call the C<mark> method on any
-PMCs it marks--the DOD system takes care of that. (So no need to recurse into
-aggregate PMCs or anything of the sort).
+collected later. This method does I<not> have to call the C<mark> method on
+any PMCs it marks--the DOD system takes care of that. (So no need to recurse
+into aggregate PMCs or anything of the sort).
 
 This method may allocate no memory from Parrot, nor may it alter Parrot's
 internal structures. It should have no side-effects from the C level either.
@@ -648,8 +648,8 @@ Return the entire property hash for I<self>.
 
   INTVAL type(INTERP, PMC* self)
 
-Return the type of the PMC. Type is a unique number associated with the PMC when
-the PMC's class is loaded. Negative numbers are considered
+Return the type of the PMC. Type is a unique number associated with the PMC
+when the PMC's class is loaded. Negative numbers are considered
 interpreter-specific, non-public types.
 
 =item name
@@ -1131,9 +1131,9 @@ Decrement the value of a PMC by 1.
   void i_multiply_int(INTERP, PMC* self, INTVAL value)
   void i_multiply_float(INTERP, PMC* self, FLOATVAL value)
 
-Multiply a PMC, native integer, or floating-point value by the value of the PMC
-I<self> and store the result in the I<dest> PMC. Note that I<dest> may be the
-same PMC as I<self>; in that case optimizations may be made. The C<i_>
+Multiply a PMC, native integer, or floating-point value by the value of the
+PMC I<self> and store the result in the I<dest> PMC. Note that I<dest> may be
+the same PMC as I<self>; in that case optimizations may be made. The C<i_>
 variants perform an inplace operation, modifying the value of I<self>.
 
 =item divide
@@ -1180,8 +1180,8 @@ operation, modifying the value of I<self>.
 
 Divide the value of the I<self> PMC by the value of a PMC, native integer, or
 native floating-point number and store the remainder in I<dest>.  Note that
-I<dest> may be the same PMC as I<self>; in that case optimizations may be made.
-The C<i_> variants perform an inplace operation, modifying the value of
+I<dest> may be the same PMC as I<self>; in that case optimizations may be
+made.  The C<i_> variants perform an inplace operation, modifying the value of
 I<self>.
 
 =item cmodulus
@@ -1196,8 +1196,8 @@ I<self>.
 
 Divide the value of the I<self> PMC by the value of a PMC, native integer, or
 native floating-point number and store the remainder in I<dest>.  Note that
-I<dest> may be the same PMC as I<self>; in that case optimizations may be made.
-The C<i_> variants perform an inplace operation, modifying the value of
+I<dest> may be the same PMC as I<self>; in that case optimizations may be
+made.  The C<i_> variants perform an inplace operation, modifying the value of
 I<self>.
 
 Note that C<modulus> uses Knuth's "corrected mod" algorithm, as implemented in
@@ -1247,9 +1247,9 @@ operation, modifying the value of I<self>.
   void i_bitwise_or(INTERP, PMC* self, PMC* value)
   void i_bitwise_or_int(INTERP, PMC* self, INTVAL value)
 
-Calculate the bitwise-OR of the value of the I<self> PMC and the value of a PMC
-or native integer and store the result in I<dest>. Note that I<dest> may be the
-same PMC as I<self>; in that case optimizations may be made.
+Calculate the bitwise-OR of the value of the I<self> PMC and the value of a
+PMC or native integer and store the result in I<dest>. Note that I<dest> may
+be the same PMC as I<self>; in that case optimizations may be made.
 [Question: what happens when the I<self> and I<value> PMCs aren't integers?]
 
 The C<i_> variants perform an inplace operation and store the result in
@@ -1335,8 +1335,8 @@ performs an inplace operation, storing the result in I<self>.
 
 Return the value of the I<self> PMC bitwise shifted left by the amount
 specified in I<value>, shifting in zeroes on the right (arithmetic/logical
-bitwise shift). A negative I<value> shifts right. The C<i_> variants perform an
-inplace operation, storing the result in I<self>.
+bitwise shift). A negative I<value> shifts right. The C<i_> variants perform
+an inplace operation, storing the result in I<self>.
 
 The result may be promoted to a C<BigInt>.
 
@@ -1349,8 +1349,8 @@ The result may be promoted to a C<BigInt>.
 
 Return the value of the I<self> PMC bitwise shifted right by the amount
 specified in I<value>, shifting in copies of the sign bit on the left
-(arithmetic bitwise shift). A negative I<value> shifts left. The C<i_> variants
-perform an inplace operation, storing the result in I<self>.
+(arithmetic bitwise shift). A negative I<value> shifts left. The C<i_>
+variants perform an inplace operation, storing the result in I<self>.
 
 The result may be promoted to a C<BigInt> (when I<value> is negative).
 
@@ -1600,8 +1600,8 @@ generate methods on the fly?]
 =head2 Core PMCs
 
 Parrot has a number of core PMC types that all programs can guarantee will be
-available to them. (With the possible exception of Parrot programs executing on
-an embedded device or other restricted environment)
+available to them. (With the possible exception of Parrot programs executing
+on an embedded device or other restricted environment)
 
 =head3 Scalar types
 
@@ -1628,8 +1628,8 @@ Floating point, string, and bignum values assigned to an Integer PMC round to
 the nearest integer. Floats, or strings which resolve to numbers, cap at the
 platform maximum or minimum integer value.
 
-Integer PMCs take on a value of 1 if a boolean true is assigned, and a value of
-0 if a boolean false is assigned.
+Integer PMCs take on a value of 1 if a boolean true is assigned, and a value
+of 0 if a boolean false is assigned.
 
 If an out-of-range value is assigned to an Integer PMC, the PMC will throw an
 exception if exact math is enabled.
@@ -1808,9 +1808,9 @@ A container with key-value semantics. The values are PMCs.
 Env is a singleton PMC class, that is there is only one Env PMC in any
 interpreter. This PMC gives access to the process' environment
 variables--reading from it returns the value of the named process environment
-variable, while writing to it sets the value of a process environment variable.
-For example, to retrieve the current value of TERM (the terminal type on most
-Unix systems):
+variable, while writing to it sets the value of a process environment
+variable.  For example, to retrieve the current value of TERM (the terminal
+type on most Unix systems):
 
    new P1, 'Env'
    set S1, P1['TERM']

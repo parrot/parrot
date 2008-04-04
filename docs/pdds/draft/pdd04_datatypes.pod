@@ -32,8 +32,8 @@ more explicit guarantees of stability.
 
 Integer data types are generically referred to as C<INT>s.  These are whatever
 size native integer was chosen at Parrot configuration time. The C-level
-typedefs C<INTVAL> and C<UINTVAL> get you a platform-native signed and unsigned
-integer respectively.
+typedefs C<INTVAL> and C<UINTVAL> get you a platform-native signed and
+unsigned integer respectively.
 
 =head2 Floating point data types
 
@@ -62,9 +62,9 @@ The fields are:
 
 =item obj
 
-A pointer to a Parrot object, Parrot's most general internal data type. In this
-case, it holds the buffer for the string data, the size of the buffer in bytes,
-and any applicable flags.
+A pointer to a Parrot object, Parrot's most general internal data type. In
+this case, it holds the buffer for the string data, the size of the buffer in
+bytes, and any applicable flags.
 
 =item bufused
 
@@ -85,8 +85,8 @@ How the data is encoded (e.g. fixed 8-bit characters, UTF-8, or UTF-32).  Note
 that this specifies encoding only -- it's valid to encode  EBCDIC characters
 with the UTF-8 algorithm. Silly, but valid.
 
-The ENCODING structure specifies the encoding (by index number and by name, for
-ease of lookup), the maximum number of bytes that a single character will
+The ENCODING structure specifies the encoding (by index number and by name,
+for ease of lookup), the maximum number of bytes that a single character will
 occupy in that encoding, as well as functions for manipulating strings with
 that encoding.
 
@@ -102,8 +102,8 @@ name) and provides functions for transcoding to and from that character type.
 
 This specifies the language corresponding to the string. This is to allow for
 locale-based data to be attached to strings. To give an example of the use of
-this: strings in German may not sort in the same way as strings in French, even
-when both types use the Latin-1 charset and are encoded in UTF-8.
+this: strings in German may not sort in the same way as strings in French,
+even when both types use the Latin-1 charset and are encoded in UTF-8.
 
 Note that language-agnostic utilities are at liberty to ignore this entry.
 
@@ -140,25 +140,25 @@ and where:
         struct parrot_string_t * _string_val;
     } UnionVal;
 
-C<u> holds data associated with the PMC. This can be in the form of an  integer
-value, a floating point value, a string value, or a pointer  to other data.
-C<u> may be empty, since the PMC structure also provides a more general data
-pointer, but is useful for PMCs which hold only a single piece of data (e.g.
-C<PerlInts>).
+C<u> holds data associated with the PMC. This can be in the form of an
+integer value, a floating point value, a string value, or a pointer  to other
+data.  C<u> may be empty, since the PMC structure also provides a more general
+data pointer, but is useful for PMCs which hold only a single piece of data
+(e.g.  C<PerlInts>).
 
-C<flags> holds a set of flags associated with the PMC; these are documented  in
-F<include/parrot/pobj.h>, and are generally only used within the Parrot 
+C<flags> holds a set of flags associated with the PMC; these are documented
+in F<include/parrot/pobj.h>, and are generally only used within the Parrot
 internals.
 
 C<_pobj_version> is only used for debugging Parrot's garbage collector. It is
 documented elsewhere (well, it will be once we get around to doing that...).
 
-C<vtable> holds a pointer to the B<vtable> associated with the PMC. This points
-to a set of functions, with interfaces described in
+C<vtable> holds a pointer to the B<vtable> associated with the PMC. This
+points to a set of functions, with interfaces described in
 F<docs/pdds/pdd02_vtables.pod> that implement the basic behaviour of the PMC
 (i.e. how it behaves under addition, subtraction, cloning etc.)
 
-C<data> (if present) holds a pointer to any additional data associated  with
+C<data> (if present) holds a pointer to any additional data associated with
 the PMC. This may be NULL.
 
 C<pmc_ext> points to an extended PMC structure. This has the form:
@@ -192,7 +192,8 @@ types of PMC.
 
 =head2 Vtable Overloading
 
-PMCs may declare vtable methods. The following list details the raw method names:
+PMCs may declare vtable methods. The following list details the raw method
+names:
 
 =over 4
 

@@ -49,8 +49,8 @@ the class being derived from. If A derives from B, B is the parent class of A.
 
 =head2 Child class
 
-Also called the sub-class. The child class is, in an inheritance situation, the
-class doing the deriving. If A derives from B, A is the child class.
+Also called the sub-class. The child class is, in an inheritance situation,
+the class doing the deriving. If A derives from B, A is the child class.
 
 =head2 Role
 
@@ -70,8 +70,8 @@ because the class is from a different object universe.
 A property is a role that only adds attributes and accessors.
 
 Properties are generally assigned at runtime, and a particular property may or
-may not exist on a PMC at any particular time. Properties are not restricted to
-objects as such--any PMC may have a property attached to it.
+may not exist on a PMC at any particular time. Properties are not restricted
+to objects as such--any PMC may have a property attached to it.
 
 =head2 Interface
 
@@ -134,15 +134,15 @@ and moving the object to it is allowable)
 =head1 IMPLEMENTATION
 
 There are four pieces to the object implementation. There are the PMCs for the
-classes, roles, and objects, the opcodes the engine uses to do objecty things, the
-specific vtable functions used to perform those objecty things, and the
+classes, roles, and objects, the opcodes the engine uses to do objecty things,
+the specific vtable functions used to perform those objecty things, and the
 supporting code provided by the interpreter engine to do the heavy lifting.
 
 Parrot, in general, doesn't restrict operations on objects and classes. If a
 language has restrictions on what can be done with them, the language is
-responsible for making sure that disallowed things do not happen.  For example,
-Parrot permits multiple inheritance, and will not stop code that adds a new
-parent to an existing class. If a language doesn't allow for multiple
+responsible for making sure that disallowed things do not happen.  For
+example, Parrot permits multiple inheritance, and will not stop code that adds
+a new parent to an existing class. If a language doesn't allow for multiple
 inheritance it must not emit code which would add multiple parents to a class.
 (Parrot may, at some point, allow imposition of runtime restrictions on a
 class, but currently it doesn't.)
@@ -333,8 +333,8 @@ Add a role to the class.
 
 =item find_method(string *)
 
-Returns the PMC for the named method. If no method of this name exists, nor can
-be constructed, returns a Null PMC.
+Returns the PMC for the named method. If no method of this name exists, nor
+can be constructed, returns a Null PMC.
 
 Note that for languages which support default fallback methods, such as Perl
 5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
@@ -371,8 +371,8 @@ Returns true or false to note whether the class in question implements the
 interface passed in.
 
 A class object only reports on interfaces of the class (i.e. roles composed
-into the metaclass), while an instance object only reports on interfaces of the
-instance (i.e. roles composed into the class).
+into the metaclass), while an instance object only reports on interfaces of
+the instance (i.e. roles composed into the class).
 
 =item inspect()
 
@@ -545,8 +545,8 @@ Returns true if the object in question implements the role, class, type,
 or behavior passed in, false otherwise.
 
 A class object only reports on interfaces of the class (i.e. roles composed
-into the metaclass), while an instance object only reports on interfaces of the
-instance (i.e. roles composed into the class).
+into the metaclass), while an instance object only reports on interfaces of
+the instance (i.e. roles composed into the class).
 
 =item inspect
 
@@ -758,8 +758,8 @@ Returns true or false to note whether the role in question implements the
 interface passed in.
 
 A role object only reports on interfaces of the role (i.e. roles composed into
-the metarole), it doesn't report on which interfaces will be added to an object
-that composes the role.
+the metarole), it doesn't report on which interfaces will be added to an
+object that composes the role.
 
 =item clone
 
@@ -940,10 +940,10 @@ go.
   $P1 = getattribute $P2, $S3
   $P1 = getattribute $P2, $P3, $S4
 
-Get the attribute with the fully qualified name $S3 from object $P2 and
-put it in $P1. To get an attribute for a parent class that has the same name
-as an attribute in the child class, pass an optional class object or namespace
-key $P3 for the parent class.
+Get the attribute with the fully qualified name $S3 from object $P2 and put it
+in $P1. To get an attribute for a parent class that has the same name as an
+attribute in the child class, pass an optional class object or namespace key
+$P3 for the parent class.
 
 If the attribute doesn't exist, it will throw an exception. If the attribute
 exists, but the value hasn't been set, it will return a null PMC.
@@ -980,8 +980,9 @@ use C<callmethodcc>.
   callmethodcc $P1, $S1
   callmethodcc $P1, $P2
 
-Call the method specified in the attribute $S1, or in the Sub object $P2, using
-$P1 as the invocant for method lookup and generate a new return continuation.
+Call the method specified in the attribute $S1, or in the Sub object $P2,
+using $P1 as the invocant for method lookup and generate a new return
+continuation.
 
 Throws a Method_Not_Found_Exception for a non-existent method.
 
@@ -990,18 +991,18 @@ Throws a Method_Not_Found_Exception for a non-existent method.
   callmethodsupercc $P1, $S1
   callmethodsupercc $P1, $P2
 
-Call the method specified in the attribute $S1, or in the Sub object $P2, using
-$P1 as the invocant for method lookup and generate a new return continuation.
-This is a variant of C<callmethodcc> that skips over the current class when
-searching for the method, and only looks in the parent classes.  PIR may
-provide some syntactical sugar for this.
+Call the method specified in the attribute $S1, or in the Sub object $P2,
+using $P1 as the invocant for method lookup and generate a new return
+continuation.  This is a variant of C<callmethodcc> that skips over the
+current class when searching for the method, and only looks in the parent
+classes.  PIR may provide some syntactical sugar for this.
 
 =item callmethodnextcc
 
   callmethodnextcc $P1, $S1
   callmethodnextcc $P1, $P2
 
-Call the method specified in the attribute $S1, or in the Sub object $P2, 
+Call the method specified in the attribute $S1, or in the Sub object $P2,
 using $P1 as the invocant for method lookup and generate a new return
 continuation. A variant of C<callmethodcc> that picks up an existing
 C<find_method> search where it left off for the current call. {{ Note: this
@@ -1039,9 +1040,9 @@ Retrieve a class object for the class identified by the string name in
 $S2, or by the PMC key or namespace object in $P2.
 
 A string name looks for the class in a namespace with that name nested in the
-currently selected namespace. Passing in a namespace object looks for the class
-in that namespace object. A key looks for the class in the namespace identified
-by the multilevel key relative to the currently selected HLL.
+currently selected namespace. Passing in a namespace object looks for the
+class in that namespace object. A key looks for the class in the namespace
+identified by the multilevel key relative to the currently selected HLL.
 
 If the class doesn't exist, it returns a null PMC.
 
@@ -1062,9 +1063,9 @@ class, or the class proxy object for an instance of a low-level PMC.
   $P1 = new $P2
   $P1 = new $P2, $P3
 
-Create a new object from the class named by $S2 or $P2 (a string PMC, namespace
-key, or class object), and put the PMC for it in $P1. You may optionally pass a
-hash of initialization parameters for the class in $P3.
+Create a new object from the class named by $S2 or $P2 (a string PMC,
+namespace key, or class object), and put the PMC for it in $P1. You may
+optionally pass a hash of initialization parameters for the class in $P3.
 
 =item addparent
 
@@ -1116,10 +1117,10 @@ any methods and attributes of $P2 that aren't already in $P1.
   $P1 = inspect $P2, $S3
 
 Return introspection information for the PMC.  Without the optional string
-argument, return a data structure of all information relevant to introspection.
-With the optional string argument, return a PMC Hash, Array, String, Integer,
-or Number value with introspection information corresponding to the requested
-string name.
+argument, return a data structure of all information relevant to
+introspection.  With the optional string argument, return a PMC Hash, Array,
+String, Integer, or Number value with introspection information corresponding
+to the requested string name.
 
 =back
 
@@ -1150,8 +1151,8 @@ Flags the code entity as a vtable override.
 :method and :vtable can be combined to indicate that a particular code entity
 is callable both as a method and as a vtable override.
 
-If the class object has not yet been created at the point when the PIR subs are
-compiled, the methods and vtable overrides are temporarily stored in the
+If the class object has not yet been created at the point when the PIR subs
+are compiled, the methods and vtable overrides are temporarily stored in the
 associated namespace.
 
 =head2 Vtable Overriding
@@ -1258,8 +1259,8 @@ Both ways work. It is, however, more efficient to use the first method, and
 just subclass the immediate parent class of your new class.
 
 When adding in extra parents in a multiple-inheritance scenario, subclass the
-first class in the immediate parent list then use the C<addparent> op to add in
-the rest of the immediate parents.
+first class in the immediate parent list then use the C<addparent> op to add
+in the rest of the immediate parents.
 
 =head1 LANGUAGE NOTES
 
@@ -1268,7 +1269,8 @@ Notes on some of the OO-related needs of various languages.
 =head2 PMCs
 
 Ruby: Just like Smalltalk, everything is an object.  I'm hoping to be able to
-implement core Ruby classes (String, Array, Hash, Module, etc)  something like this.
+implement core Ruby classes (String, Array, Hash, Module, etc)  something like
+this.
 
  ParrotClass
     |
@@ -1279,9 +1281,9 @@ implement core Ruby classes (String, Array, Hash, Module, etc)  something like t
 
 =head2 Objectspace
 
-Ruby: Objectspace in Ruby allows the programmer to iterate through every live object
-in the system.  There is some debate about how to make this play nice with different
-garbage collection schemes.
+Ruby: Objectspace in Ruby allows the programmer to iterate through every live
+object in the system.  There is some debate about how to make this play nice
+with different garbage collection schemes.
 
 =head2 Classes
 
@@ -1324,8 +1326,8 @@ methods that do not get inherited.
 
 .Net: Like attributes, methods may be public, private, protected or internal.
 
-Ruby: has a method_missing that gets called when method resolution fails to find a method.
-Methods can be dynamically added and removed at runtime.
+Ruby: has a method_missing that gets called when method resolution fails to
+find a method.  Methods can be dynamically added and removed at runtime.
 
 =head2 Constructors
 
@@ -1359,10 +1361,10 @@ on its own, but must be composed into a class. When this happens its methods
 and attributes become of that classes methods and attributes. This may happen
 at compile time or runtime, however when a role is composed into a class at
 runtime then what really happens is that a new anonymous class is created with
-the role composed into it and then the namespace entry for the existing class is
-updated to refer to the new one. Note that this means classes must be garbage
-collectable, with all those referred to by a namespace or with objects of that
-class existing being marked live.
+the role composed into it and then the namespace entry for the existing class
+is updated to refer to the new one. Note that this means classes must be
+garbage collectable, with all those referred to by a namespace or with objects
+of that class existing being marked live.
 
 Perl 6: Roles pretty much are a Perl 6 thing, so the definition above contains
 all that is needed. An open question is whether Parrot worry about collision
@@ -1376,9 +1378,9 @@ parent classes and the roles it does, as well as the name of the class and its
 memory address. For methods, their name, signature, return type and whether
 the method is declared multi are available.
 
-.Net: Reflection provides access to a list of attributes and methods as well as
-the name of the class and its parent. The types of attributes and signatures of
-methods are also available.
+.Net: Reflection provides access to a list of attributes and methods as well
+as the name of the class and its parent. The types of attributes and
+signatures of methods are also available.
 
 =head2 Inner Classes
 

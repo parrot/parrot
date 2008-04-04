@@ -73,21 +73,22 @@ generating PASM or PIR.
 
 =head3 Optimizer
 
-The optimizer module takes the bytecode stream from the compiler and optionally
-the syntax tree the bytecode was generated from, and optimizes the bytecode.
+The optimizer module takes the bytecode stream from the compiler and
+optionally the syntax tree the bytecode was generated from, and optimizes the
+bytecode.
 
 =head3 Interpreter
 
 The interpreter module takes the bytecode stream from either the optimizer or
 the bytecode compiler and executes it. There must always be at least one
-interpreter module available for any program that can handle all of Perl, since
-it's required for use statements and BEGIN blocks.
+interpreter module available for any program that can handle all of Perl,
+since it's required for use statements and BEGIN blocks.
 
-While there must be at least one interpreter, there may be multiple interpreter
-modules linked into an executable. This would be the case, for example, for
-programs that produced Java bytecode, where one of the interpreter modules
-would take the bytecode stream and spit out Java bytecode instead of
-interpreting it.
+While there must be at least one interpreter, there may be multiple
+interpreter modules linked into an executable. This would be the case, for
+example, for programs that produced Java bytecode, where one of the
+interpreter modules would take the bytecode stream and spit out Java bytecode
+instead of interpreting it.
 
 =head3 Standalone pieces
 
@@ -148,9 +149,10 @@ simple interface, though more complete integration will take longer.
 =head3 Extensions
 
 The extension API is the set of calls exported to Parrot extensions. They
-provide access to most of the things an extension needs to do, while hiding the
-implementation details. (So that, for example, we can change the way scalars
-are stored without having to rewrite, or even recompile, an extension).
+provide access to most of the things an extension needs to do, while hiding
+the implementation details. (So that, for example, we can change the way
+scalars are stored without having to rewrite, or even recompile, an
+extension).
 
 =head3 Guts
 
@@ -203,6 +205,10 @@ However, there are other possibilities: we could translate the bytecode
 to Java bytecode or .NET code, or even to a native executable. In
 principle, Parrot could also act as a front end to other modular
 compilers such as gcc or HP's GEM compiler system.
+
+=head1 REFERENCES
+
+To come.
 
 =cut
 

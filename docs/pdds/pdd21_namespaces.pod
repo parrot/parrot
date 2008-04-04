@@ -481,8 +481,8 @@ should map roughly to this PIR:
     set_global "$x", $P0
   .end
 
-In this case, the C<main> sub would be tied to Perl 5 by the C<.HLL> directive,
-so a Perl 5 namespace would be created.
+In this case, the C<main> sub would be tied to Perl 5 by the C<.HLL>
+directive, so a Perl 5 namespace would be created.
 
 =head3 Run-time Creation
 
@@ -525,10 +525,10 @@ a Perl 5 namespace.
 
 =head3 Sigils
 
-Perl 6 may wish to be able to access the namespace as a hash with sigils.  That
-is certainly possible, even with subroutines and methods.  It's not important
-that a HLL use the typed namespace API, it is only important that it provides
-it for others to use.
+Perl 6 may wish to be able to access the namespace as a hash with sigils.
+That is certainly possible, even with subroutines and methods.  It's not
+important that a HLL use the typed namespace API, it is only important that it
+provides it for others to use.
 
 So Perl 6 may implement C<get_keyed> and C<set_keyed> VTABLE slots that
 allow the namespace PMC to be used as a hash.  The C<find_sub> method would,

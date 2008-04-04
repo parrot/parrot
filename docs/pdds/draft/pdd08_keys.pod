@@ -50,8 +50,8 @@ type encoded in the private flags of the PMC and the value stored in the PMCs
 cache.
 
 So, for instance, indexing the multidimensional array C<@foo[$a;12;"hi"]>
-produces three PMCs, one with a PMC type, one with an integer type and one with
-a string type.
+produces three PMCs, one with a PMC type, one with an integer type and one
+with a string type.
 
 As stated, the key type is encoded in the PMC flags using 8 bits based on the
 following scheme:
@@ -110,12 +110,13 @@ code which indexes a non-aggregate shouldn't be generated.
 
 So what of these magical C<_keyed> vtable methods? They are generated when you
 add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They are
-constructed by following B<every> C<PMC> argument with a second C<PMC> argument
-which acts as the key for that argument; the name of the second C<PMC> argument
-is formed by adding C<_key> onto the end of the first C<PMC> argument.
+constructed by following B<every> C<PMC> argument with a second C<PMC>
+argument which acts as the key for that argument; the name of the second
+C<PMC> argument is formed by adding C<_key> onto the end of the first C<PMC>
+argument.
 
-The reason why every PMC argument has an associated key is twofold. Firstly, it
-means that
+The reason why every PMC argument has an associated key is twofold. Firstly,
+it means that
 
     @a[$b] = $c
 
@@ -140,7 +141,8 @@ These are all replaced with the single entry
 
     void foo_keyed(PMC* x, PMC* a_key, PMC* a, PMC* a_key)
 
-(Think how much worse it gets when there are three or more PMCs in an entry...)
+(Think how much worse it gets when there are three or more PMCs in an
+entry...)
 
 Yes. This means that you may need to turn some things into C<PMC>s that you
 didn't want to. Since the alternative is mega pollution and duplication in the
@@ -148,8 +150,8 @@ vtable table, and since the majority of things that you'll deal with in a real
 world situation are expected to be C<PMC>s anyway, this shouldn't be too much
 of a problem.
 
-So, if you have a PMC in a C<_keyed> method which you don't want to index, pass
-in C<NULL> instead of a real key. Code implementing these methods should
+So, if you have a PMC in a C<_keyed> method which you don't want to index,
+pass in C<NULL> instead of a real key. Code implementing these methods should
 understand C<PMC* foo, PMC* NULL> as meaning the entirety of C<foo> in some
 sense; this is trivial to understand if C<foo> is non-aggregate, and
 implementation-defined if C<foo> is aggregate. If you remember that a key PMC
@@ -184,9 +186,9 @@ assembler. These are:
 than C<op P1, P2, P3>. Also, is C<op P1, P2, P3> the same as C<op P1[P2], P3>
 or C<op P1, P2[P3]>, or are these three separate PMCs?)
 
-In all there are four types of key. The first two are integer keys and constant
-integer keys which are optimisations for the common case of single level
-integer keys.
+In all there are four types of key. The first two are integer keys and
+constant integer keys which are optimisations for the common case of single
+level integer keys.
 
 The other two are constant keys, which can handle any combination of constants
 and registers with any number of levels; and register keys which are
@@ -280,5 +282,9 @@ list. - steve@fink.com
 
 updated to reflect Dan's comments that non-aggregates also support C<_keyed>
 variant vtable methods.
+
+=head2 REFERENCES
+
+To come.
 
 =back

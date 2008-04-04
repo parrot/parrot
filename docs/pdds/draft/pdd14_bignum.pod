@@ -78,12 +78,12 @@ similar manner to strings.
 
 =head2 Special Values
 
-Additionally the library provides special values, which represent the result of
-otherwise undefined operations (division by zero, for instance).  +Infinity,
--Infinity and both quiet and signalling Not a Number (NaN) are available.  In
-general, the result of an operation with at least one argument which is NaN
-will be NaN, if the argument is a signalling NaN, an exception will also be
-raised.  See the EDA for full details.
+Additionally the library provides special values, which represent the result
+of otherwise undefined operations (division by zero, for instance).
++Infinity, -Infinity and both quiet and signalling Not a Number (NaN) are
+available.  In general, the result of an operation with at least one argument
+which is NaN will be NaN, if the argument is a signalling NaN, an exception
+will also be raised.  See the EDA for full details.
 
 =head2 Context
 
@@ -103,8 +103,8 @@ have more than I<precision> digits in their coefficient before or after any
 operation.  Arguments to operations with more than I<precision> digits will be
 truncated and rounded appropriately and results of operations will not have
 more than I<precision> digits in their coefficients, with any extra digits
-accumulated during the calculation of the operation being truncated and rounded
-as required.
+accumulated during the calculation of the operation being truncated and
+rounded as required.
 
 A I<precision> of zero indicates that integer operations are to be performed. 
 Arguments to operations are rounded so that they have no fractional part, and
@@ -180,8 +180,8 @@ The exponent of a number has underflowed.
 
 =head2 Rounding
 
-The rounding part of the context defines the rounding algorithm to be used, the
-following are provided (examples assume a precision of 5):
+The rounding part of the context defines the rounding algorithm to be used,
+the following are provided (examples assume a precision of 5):
 
 =over 4
 
@@ -232,9 +232,9 @@ This is rounding towards +Infinity.
 =head2 Operations
 
 The following operations are provided by the library, they function exactly as
-those described in the Standard Decimal Arithmetic (SDA) (see references below)
-with some extension to cope with integer and fixed fractional part numbers. 
-Only the deviations are outlined here.
+those described in the Standard Decimal Arithmetic (SDA) (see references
+below) with some extension to cope with integer and fixed fractional part
+numbers.  Only the deviations are outlined here.
 
 In all cases, the sequence of rounding and promotion to zero outlined by the
 SDA are followed, even where the context implies integer operations.
@@ -247,15 +247,15 @@ SDA are followed, even where the context implies integer operations.
 
 =item Division
 
-Under integer conditions, division is halted once the first fractional digit is
-calculated, with the result then being rounded to an integer and returned. 
-Under fixed-fraction conditions, one more digit than needed is calculated, with
-the coefficient then being rounded and returned.
+Under integer conditions, division is halted once the first fractional digit
+is calculated, with the result then being rounded to an integer and returned.
+Under fixed-fraction conditions, one more digit than needed is calculated,
+with the coefficient then being rounded and returned.
 
 If a floating point value is required, or if inexact division by a very small
-number is attempted, it may be wise to follow big float arithmetic to limit the
-number of digits returned.  It is safe to chose a precision at least as big the
-largest number of digits of either argument to the division function.
+number is attempted, it may be wise to follow big float arithmetic to limit
+the number of digits returned.  It is safe to chose a precision at least as
+big the largest number of digits of either argument to the division function.
 
 =item Integer division, Remainder
 
@@ -295,13 +295,15 @@ share a common private header file).
 
 =head1 IMPLEMENTATION
 
-Functions are provided which implement the arithmetic, conversion, creation and
-destruction of big numbers by dealing with otherwise opaque big number objects.
+Functions are provided which implement the arithmetic, conversion, creation
+and destruction of big numbers by dealing with otherwise opaque big number
+objects.
 
 =head2 Big number representation
 
 A big number is represented by the following structure, this is capable of
-being allocated, tracked and destroyed by the Parrot garbage collection system.
+being allocated, tracked and destroyed by the Parrot garbage collection
+system.
 
  typedef struct {
     BN_NIB* buffer; /* string of nibbles */
@@ -397,10 +399,10 @@ Perl's Math::Big* modules.
 
 =item version 1.1
 
-The first version is more a description of the state of the art than a plan for
-the future.  The author believes this is akin to learning how to crawl before
-trying to run.  Leaving the ground is considered Right Out with attempts being
-left as an exercise for the interested reader.
+The first version is more a description of the state of the art than a plan
+for the future.  The author believes this is akin to learning how to crawl
+before trying to run.  Leaving the ground is considered Right Out with
+attempts being left as an exercise for the interested reader.
 
 =back
 

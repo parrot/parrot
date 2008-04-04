@@ -64,7 +64,8 @@ replacing the stack with that execution context of the invocable pmc.
 
 =item B<pop_eh>
 
-Pop the most recently pushed exception handler off the exception handler stack.
+Pop the most recently pushed exception handler off the exception handler
+stack.
 
 =item B<throw I<EXCEPTION>>
 
@@ -135,7 +136,8 @@ exception handler's way of telling Parrot that it has handled the exception.
 
 =head2 Exception Introspection Opcodes
 
-These are the opcodes relevant to introspection of the exception handler stack:
+These are the opcodes relevant to introspection of the exception handler
+stack:
 
 =over
 

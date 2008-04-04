@@ -223,8 +223,8 @@ ID, scheduler ID, and possibly a URL/hostname) a scheduler can address other
 schedulers, both local to the current interpreter and remote.
 
 The task list is a simple unordered integer indexed data structure, currently
-implemented as a hash. Each task in the list has an integer ID assigned when it
-is first inserted into the list. A task retains the same ID throughout its
+implemented as a hash. Each task in the list has an integer ID assigned when
+it is first inserted into the list. A task retains the same ID throughout its
 lifetime, and the ID is not reused once a task is finalized. (The data
 structure is currently implemented as a hash so that it only takes up the
 memory required for currently living tasks. A task list for a particular
@@ -232,9 +232,9 @@ program may use thousands of task IDs, but only need memory allocated for a
 handful of elements at any given moment.)
 
 The task rank index is calculated based on the type, priority rating, age of
-the tasks in the task list. The index is a simple array, and in general the top
-(zeroth) element in the array is the next one to receive attention. The index
-is recalculated regularly as new tasks are inserted into the task list,
+the tasks in the task list. The index is a simple array, and in general the
+top (zeroth) element in the array is the next one to receive attention. The
+index is recalculated regularly as new tasks are inserted into the task list,
 existing tasks are modified or completed, and as time progresses so the age of
 some tasks pushes them to a higher priority. Because of the regular
 recalculation, the rank index may cache some frequently-accessed and rarely
@@ -242,12 +242,12 @@ changing data from the tasks (though it is not required to do so). (As a later
 optimization, some data structure other than an array may be used to speed up
 rank recalculation. For example, with a hash of hashes of arrays keyed on task
 attributes, the process of inserting new tasks at a relative priority to other
-existing tasks could be performed without shifting the rank of all lower ranked
-tasks.)
+existing tasks could be performed without shifting the rank of all lower
+ranked tasks.)
 
-The list of handlers is a simple stack of handler PMCs currently waiting for an
-appropriate task (event, exception). See PDD 24 on Events for more details on
-event handlers.
+The list of handlers is a simple stack of handler PMCs currently waiting for
+an appropriate task (event, exception). See PDD 24 on Events for more details
+on event handlers.
 
 =head3 Flags
 
@@ -332,20 +332,20 @@ An interpreter structure for the task (optional)
 
 =back
 
-Types of tasks include 'event', 'exception', 'io', and 'code'. The subtype of a
-task is used by events and exceptions to identify appropriate handlers.
-Possible status values for tasks include 'created', 'invoked', 'inprocess', and
-'completed'.  The final state of a task is 'destroyed', but is never marked
-(the task PMC is removed from the task list and at some later point destroyed
-by GC). The priority of a task is an integer value between 0 and 100, with 0 as
-the lowest priority.
+Types of tasks include 'event', 'exception', 'io', and 'code'. The subtype of
+a task is used by events and exceptions to identify appropriate handlers.
+Possible status values for tasks include 'created', 'invoked', 'inprocess',
+and 'completed'.  The final state of a task is 'destroyed', but is never
+marked (the task PMC is removed from the task list and at some later point
+destroyed by GC). The priority of a task is an integer value between 0 and
+100, with 0 as the lowest priority.
 
 The birthtime stamp is the point at which the task was inserted into the task
 list, and is used for calculating the age of tasks.
 
-The code block is optional and only for tasks that are associated with a simple
-code block. The interpreter structure is also optional and only used for
-thread-like tasks that maintain their own interpreter state.
+The code block is optional and only for tasks that are associated with a
+simple code block. The interpreter structure is also optional and only used
+for thread-like tasks that maintain their own interpreter state.
 
 =head3 Vtable Functions
 

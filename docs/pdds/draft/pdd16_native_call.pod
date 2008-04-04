@@ -61,8 +61,9 @@ parameters). Can't be mixed with other parameter types.
 
 =item c
 
-Char. This is an integer type, taken from (or put into) an I register. NOTE: it
-might be signed or unsigned because that is how an unadorned C 'char' works.
+Char. This is an integer type, taken from (or put into) an I register. NOTE:
+it might be signed or unsigned because that is how an unadorned C 'char'
+works.
 
 =item s
 
@@ -169,15 +170,15 @@ like this:
 =head2 Callbacks
 
 Some libraries, particularly ones implementing more complex functionality such
-as databases or GUIs, want callbacks, that is ways to call a function under the
-control of the library rather than under control of the interpreter. These
+as databases or GUIs, want callbacks, that is ways to call a function under
+the control of the library rather than under control of the interpreter. These
 functions must be C functions, and generally are passed parameters to indicate
 what should be done.
 
-Unfortunately there's no good way to generically describe all possible callback
-parameter sets, so in some cases hand-written C will be necessary. However,
-many callback functions share a common signature, and parrot provides some
-ready-made functions for this purpose that should serve for most of the
+Unfortunately there's no good way to generically describe all possible
+callback parameter sets, so in some cases hand-written C will be necessary.
+However, many callback functions share a common signature, and parrot provides
+some ready-made functions for this purpose that should serve for most of the
 callback uses.
 
 There are two callback functions, Parrot_callback_C and Parrot_callback_D,

@@ -21,19 +21,19 @@ its own unique security needs.
 usage (CPU, memory, etc).
 
 =item * Web applications need filtering and validation of incoming data and
-blocks to prevent the use of unfiltered data in execution contexts (SQL, system
-calls, runtime eval, etc).
+blocks to prevent the use of unfiltered data in execution contexts (SQL,
+system calls, runtime eval, etc).
 
 =item * Web browser embedding, i.e. client-side execution of high-level
-languages, needs control over resource access on the client machine (local disk
-access, local network connections), sandboxing for downloaded code, limits on
-what code can be loaded and executed, and limits on certain dynamic features
-(runtime eval of code, modification of global namespaces).
+languages, needs control over resource access on the client machine (local
+disk access, local network connections), sandboxing for downloaded code,
+limits on what code can be loaded and executed, and limits on certain dynamic
+features (runtime eval of code, modification of global namespaces).
 
 =item * Database engine embedding, i.e. server-side execution of high-level
 languages as stored procedures, also needs control over resource access (disk
-access, network connections), and limits on loaded code, but additionally needs
-adminstrator configured lists of allowed libraries and library paths.
+access, network connections), and limits on loaded code, but additionally
+needs adminstrator configured lists of allowed libraries and library paths.
 
 =item * Security auditing tools need hooks in the compilation process for
 static analysis.
@@ -42,9 +42,9 @@ static analysis.
 
 =head1 IMPLEMENTATION
 
-Parrot's security infrastructure is not an independent, encapsulated subsystem.
-It is a series of related features and functionality spread throughout the
-virtual machine. 
+Parrot's security infrastructure is not an independent, encapsulated
+subsystem.  It is a series of related features and functionality spread
+throughout the virtual machine. 
 
 =head2 Resource Quotas
 
@@ -64,13 +64,13 @@ privilege to load a library, or open a file.
 
 Privileges can be quite broad, on the order of "allow file I/O", or as
 fine-grained as allowing/denying the right to run one particular opcode.
-Privileges are discrete entities, They are also hierarchical, one privilege can
-be specified to follow from another privilege (the privilege FOO may be
+Privileges are discrete entities, They are also hierarchical, one privilege
+can be specified to follow from another privilege (the privilege FOO may be
 automatically granted to anything with the privilege BAR). Anything with the
 ALL privilege is automatically granted all other privileges in the system.
-Privileges are user-definable, but user-defined privileges can only give grants
-of rights, they cannot take them (BAZ may grant its privileges to any user with
-FOO privileges, but it can't automatically grant itself all the FOO
+Privileges are user-definable, but user-defined privileges can only give
+grants of rights, they cannot take them (BAZ may grant its privileges to any
+user with FOO privileges, but it can't automatically grant itself all the FOO
 privileges).
 
 A few example privileges:
@@ -140,10 +140,10 @@ multiple groups, as in:
 In certain environments, it's desirable to be able to restrict what libraries
 may be loaded by code running on the virtual machine. The allowed library list
 is defined in a system-wide configuration file, or set at runtime by a user
-with administrative privileges. Libraries may be signed, with the key specified
-in the library list and verified on loading. Libraries that can't be signed (C
-libraries), can be check-summed to ensure that the library you load is the
-exact file you expect.
+with administrative privileges. Libraries may be signed, with the key
+specified in the library list and verified on loading. Libraries that can't be
+signed (C libraries), can be check-summed to ensure that the library you load
+is the exact file you expect.
 
 Generally, library loading restrictions are useful in an embedded environment
 like a database engine or web browser, or a multi-user environment like a web
@@ -154,10 +154,10 @@ exactly what dependencies the code base has.
 
 =head3 Resource Access
 
-Access to resources such as the local disk, network, are controlled through the
-privilege system. Resource access limitations are a combination of disabled
-opcodes, blocked library loading, and privilege checks within standard
-libraries for I/O, network, etc.
+Access to resources such as the local disk, network, are controlled through
+the privilege system. Resource access limitations are a combination of
+disabled opcodes, blocked library loading, and privilege checks within
+standard libraries for I/O, network, etc.
 
 =head2 Sandboxing
 
@@ -168,14 +168,14 @@ the surrounding environment. In the general case, a sandbox will have the
 ability to read from, but not write to the surrounding environment (global
 namespaces, for example), with a very narrow and carefully filtered route to
 send some data back to the code that called it. The sandbox system works
-together with the privileges system, in that by default code in the sandbox has
-no privileges outside the sandbox, but may be granted privileges.
+together with the privileges system, in that by default code in the sandbox
+has no privileges outside the sandbox, but may be granted privileges.
 
 =head2 Data Firewall
 
 Any data that originates from user input (command-line, user prompt, web form,
-file access, network operation) is a potential security risk. The best place to
-trap bad data is at the point of entry, before it touches a single line of
+file access, network operation) is a potential security risk. The best place
+to trap bad data is at the point of entry, before it touches a single line of
 code. When the data firewall is enabled, all data entering from an external
 source or crossing a sandbox barrier is subjected to filter rules. The filter
 rules in force are configurable, and filters can be selectively enabled and
@@ -185,9 +185,9 @@ Data filters can be sanitizing or validating. Sanitizing data filters modify
 the data as it passes (escaping quotes, encoding entities, etc). Validating
 filters check that the data meets certain conditions (the presence or absence
 of specific features), and when it fails to meet those conditions, the data is
-blocked from passing the firewall (returning an empty string or PMCNULL instead
-of the expected data). Data filters can also be user-defined, as a regular
-expression (PGE rule) or subroutine.
+blocked from passing the firewall (returning an empty string or PMCNULL
+instead of the expected data). Data filters can also be user-defined, as a
+regular expression (PGE rule) or subroutine.
 
 The same filter rules applied within the data firewall can be called explicitly
 on any data.
@@ -197,17 +197,17 @@ on any data.
 In normal operation the interpreter assumes that the bytecode that it executes
 is valid -- that is, any parameters to opcodes are sane, data structures are
 intact. When bytecode validation is enabled, however, Parrot assumes that
-bytecode is not necessarily valid. The interpreter then, at runtime, makes sure
-that all specified register numbers are within valid range, and string and PMC
-structures used are valid.
+bytecode is not necessarily valid. The interpreter then, at runtime, makes
+sure that all specified register numbers are within valid range, and string
+and PMC structures used are valid.
 
 =head2 Auditing Hooks
 
-Even in dynamic languages, it's possible to perform a degree of static analysis
-for security risks. The opcode syntax tree (OST) produced by the language
-compiler is a good data source for static analysis checks, because it's
-low-level enough that you can check for individual opcodes that will be called
-(checking for I/O, networking, and other similar operations, or unknown
+Even in dynamic languages, it's possible to perform a degree of static
+analysis for security risks. The opcode syntax tree (OST) produced by the
+language compiler is a good data source for static analysis checks, because
+it's low-level enough that you can check for individual opcodes that will be
+called (checking for I/O, networking, and other similar operations, or unknown
 dynamically-loaded opcodes), and high-level enough that you still have access
 to substantial metadata from the parse. The standard compiler tools already
 have the ability to add and remove stages from the compilation process. Static

@@ -514,6 +514,10 @@ C<PAST::CompUnit> nodes are used for the abstract representation
 of compilation units.  Specific attributes and semantics are
 yet to be determined.
 
+=head1 REFERENCES
+
+NA.
+
 =head1 COPYRIGHT
 
 Copyright (C) 2007, The Perl Foundation.
