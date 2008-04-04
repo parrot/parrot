@@ -95,6 +95,7 @@ all: \
  $(LIBPATH)/bitlib.pbc \
  $(LIBPATH)/lfs.pbc \
  $(LIBPATH)/md5.pbc \
+ $(LIBPATH)/random.pbc \
  $(LIBPATH)/sha1.pbc \
  $(GEN_PIR) \
  $(GEN_PBC) \
@@ -185,6 +186,9 @@ $(LIBPATH)/lfs.pbc: $(LIBPATH)/lfs.pir
 $(LIBPATH)/md5.pbc: $(LIBPATH)/md5.pir
 	$(PARROT) --output=$(LIBPATH)/md5.pbc $(LIBPATH)/md5.pir
 
+$(LIBPATH)/random.pbc: $(LIBPATH)/random.pir
+	$(PARROT) --output=$(LIBPATH)/random.pbc $(LIBPATH)/random.pir
+
 $(LIBPATH)/sha1.pbc: $(LIBPATH)/md5.pir
 	$(PERL) -pe "s|md5|sha1|g; s|MD5|SHA1|g" $(LIBPATH)/md5.pir > $(LIBPATH)/sha1.pir
 	$(PARROT) --output=$(LIBPATH)/sha1.pbc $(LIBPATH)/sha1.pir
@@ -250,4 +254,3 @@ realclean: clean
 	$(RM_F) Makefile
 
 distclean: realclean
-
