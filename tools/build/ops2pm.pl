@@ -63,8 +63,8 @@ F<Parrot::OpLib::core> module containing information about the ops.
 Also outputs F<include/parrot/oplib/ops.h>.  This program is called by Parrot's
 F<make>.
 
-If called with the C<--renum> flag, checks the numbering of ops against
-F<src/opts/opts.num>.
+If called with the C<--renum> flag, renumbers the file F<src/ops/ops.num>.
+This is mandatory when adding or removing opcodes. 
 
 =head1 OPTIONS
 
