@@ -90,10 +90,10 @@ The script is located in C<tools/dev/mk_language_shell.pl>.
 
 {{ Is this a good idea? }}
 
-class Foo::Grammar::Actions;
+ class Foo::Grammar::Actions;
 
  method TOP($/) {
-     my $past := PAST::Block.new( :blocktype('declaration') );
+     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
      for $<statement> {
          $past.push( $( $_ ) );
      }
@@ -101,7 +101,10 @@ class Foo::Grammar::Actions;
  }
 
  method statement($/) {
-     ...
+     make PAST::Op.new( $( $<ident> ),
+                        $( $<expression> ),
+                        :pasttype('bind'),
+                        :node($/) );
  }
 
  method expression($/, $key) {
@@ -291,6 +294,18 @@ compiler phases.
 {{ TODO: complete this }}
 
 =over 4
+
+=item language
+
+$P0.'language'('Foo')
+
+=item parsegrammar
+
+$P0.'parsegrammar'('Foo::Grammar')
+
+=item parseactions
+
+$P0.'parseactions('Foo::Grammar::Actions')
 
 =item commandline_prompt
 
