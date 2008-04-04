@@ -118,7 +118,6 @@ sub new {
         $self->new_group(
             'General',
             '',
-            $self->c_source_item( 'This file is unused.', 'parrot' ),
             $self->c_header_item( '', 'parrot' ),
             $self->c_pair_item( '', 'warnings' ),
             $self->c_pair_item( '', 'longopt' ),
