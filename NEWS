@@ -5,6 +5,7 @@ New in 0.6.1
   + initial draft of pdd29_compiler_tools.pod
 - Languages
   + Reimplemented HQ9+ with PCT
+  + Lua : reimplementation with PCT/PAST & POST
 - Compilers
   + Removed P6Regex, pgc, P6Grammar from PGE
   + NQP

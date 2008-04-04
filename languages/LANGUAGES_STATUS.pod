@@ -537,7 +537,7 @@ C<languages/lolcode>
 
 =item Description
 
-Lua 5.1 interpreter implemented with PGE/TGE/Partridge and friends.
+Lua 5.1 interpreter implemented with PCT and TGE.
 
 Lua 5.1 Standard Libraries (a large subset) implemented in PIR.
 
