@@ -39,7 +39,7 @@ by not installing it or asking Parrot to ignore it (C<--without-icu>).
 
 =head1 BUILD
 
-  export PATH=`pwd`:$PATH
+  export PATH=`pwd`/blib/lib:$PATH
   perl Configure.pl
   make
   make test # see PLATFORMS for known issues.
