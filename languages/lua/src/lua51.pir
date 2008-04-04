@@ -128,6 +128,25 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
+.namespace [ 'POST::Node' ]
+
+.sub 'has_call_in_last_op' :method
+    $I0 = isa self, 'POST::Ops'
+    unless $I0 goto L1
+    $P0 = self.'get_array'()
+    $I0 = elements $P0
+    unless $I0 goto L1
+    $P1 = $P0[-1]
+    $I0 = isa $P1, 'POST::Op'
+    unless $I0 goto L1
+    $S0 = $P1.'pirop'()
+    unless $S0 == 'call' goto L1
+    .return (1, $P1)
+  L1:
+    .return (0)
+.end
+
+
 .namespace [ 'Lua::POST::Sub' ]
 
 .sub '__onload' :anon :load :init

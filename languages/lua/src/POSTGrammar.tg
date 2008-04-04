@@ -245,17 +245,8 @@ transform call (PAST::Op) :language('PIR') {
     $S0 = cpost.'result'()
     if first goto L3
     if iter goto L3
-    $I0 = isa cpost, 'POST::Ops'
+    ($I0, $P0) = cpost.'has_call_in_last_op'()
     unless $I0 goto L3
-    $P0 = cpost.'get_array'()
-    $I0 = elements $P0
-    unless $I0 goto L3
-    $P0 = cpost.'pop'()
-    cpost.'push'($P0)
-    $I0 = isa $P0, 'POST::Op'
-    unless $I0 goto L3
-    $S1 = $P0.'pirop'()
-    unless $S1 == 'call' goto L3
     $S1 = '(' . $S0
     $S1 .= ' :slurpy)'
     $P0.'result'($S1)
@@ -504,17 +495,8 @@ transform forlist (PAST::Op) :language('PIR') {
     ops.'push'(rpost)
     func = rpost.'result'()
     if iter goto L1
-    $I0 = isa rpost, 'POST::Ops'
+    $I0 = rpost.'has_call_in_last_op'()
     unless $I0 goto L1
-    $P0 = rpost.'get_array'()
-    $I0 = elements $P0
-    unless $I0 goto L1
-    $P0 = rpost.'pop'()
-    rpost.'push'($P0)
-    $I0 = isa $P0, 'POST::Op'
-    unless $I0 goto L1
-    $S0 = $P0.'pirop'()
-    unless $S0 == 'call' goto L1
     $P0 = rpost.'pop'()
     $S0 = '(' . func
     state = rpost.'unique'('$P')
@@ -535,17 +517,8 @@ transform forlist (PAST::Op) :language('PIR') {
     ops.'push'(rpost)
     state = rpost.'result'()
     if iter goto L2
-    $I0 = isa rpost, 'POST::Ops'
+    $I0 = rpost.'has_call_in_last_op'()
     unless $I0 goto L2
-    $P0 = rpost.'get_array'()
-    $I0 = elements $P0
-    unless $I0 goto L2
-    $P0 = rpost.'pop'()
-    rpost.'push'($P0)
-    $I0 = isa $P0, 'POST::Op'
-    unless $I0 goto L2
-    $S0 = $P0.'pirop'()
-    unless $S0 == 'call' goto L2
     $P0 = rpost.'pop'()
     $S0 = '(' . state
     var = rpost.'unique'('$P')
@@ -642,17 +615,8 @@ transform return (PAST::Op) :language('PIR') {
     ops.'push'(cpost)
     $S0 = cpost.'result'()
     if iter goto L3
-    $I0 = isa cpost, 'POST::Ops'
+    ($I0, $P0) = cpost.'has_call_in_last_op'()
     unless $I0 goto L3
-    $P0 = cpost.'get_array'()
-    $I0 = elements $P0
-    unless $I0 goto L3
-    $P0 = cpost.'pop'()
-    cpost.'push'($P0)
-    $I0 = isa $P0, 'POST::Op'
-    unless $I0 goto L3
-    $S1 = $P0.'pirop'()
-    unless $S1 == 'call' goto L3
     if arglist goto L4
     $P0.'pirop'('tailcall')
     .return (ops)
@@ -718,17 +682,8 @@ transform assignlist (PAST::Op) :language('PIR') {
     $S1 = rpost.'result'()
     push tmp, $S1
     if iter goto L1
-    $I0 = isa rpost, 'POST::Ops'
+    $I0 = rpost.'has_call_in_last_op'()
     unless $I0 goto L1
-    $P0 = rpost.'get_array'()
-    $I0 = elements $P0
-    unless $I0 goto L1
-    $P0 = rpost.'pop'()
-    rpost.'push'($P0)
-    $I0 = isa $P0, 'POST::Op'
-    unless $I0 goto L1
-    $S0 = $P0.'pirop'()
-    unless $S0 == 'call' goto L1
     $I1 = namelist
     $I2 = explist
     $I1 -= $I2
@@ -873,17 +828,8 @@ transform constructor (PAST::Val) :language('PIR') {
     kpost.'result'(result)
     vpost = tree.'get'('post', $P0)
     if iter goto L4
-    $I0 = isa vpost, 'POST::Ops'
+    $I0 = vpost.'has_call_in_last_op'()
     unless $I0 goto L4
-    $P0 = vpost.'get_array'()
-    $I0 = elements $P0
-    unless $I0 goto L4
-    $P0 = vpost.'pop'()
-    vpost.'push'($P0)
-    $I0 = isa $P0, 'POST::Op'
-    unless $I0 goto L4
-    $S0 = $P0.'pirop'()
-    unless $S0 == 'call' goto L4
     ops.'push'(kpost)
     $P0 = vpost.'pop'()
     vpost.'push'($P0)
