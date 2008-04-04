@@ -32,8 +32,9 @@ Used by F<languages/lua/lua.pir>.
     load_bytecode 'PCT.pbc'
     load_bytecode 'PGE/Text.pbc'
 
-    $P0 = subclass 'PCT::HLLCompiler', 'Lua::Compiler'
-    addattribute $P0, '$ostgrammar'
+    new $P0, 'Protomaker'
+    $P0.'new_subclass'('PCT::HLLCompiler', 'Lua::Compiler', '$ostgrammar')
+
     new $P0, 'Lua::Compiler'
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
@@ -150,10 +151,8 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .namespace [ 'Lua::POST::Sub' ]
 
 .sub '__onload' :anon :load :init
-    .local pmc protomaker, base
-    protomaker = new 'Protomaker'
-    base = get_class 'POST::Sub'
-    $P0 = protomaker.'new_subclass'(base , 'Lua::POST::Sub')
+    new $P0, 'Protomaker'
+    $P0.'new_subclass'('POST::Sub' , 'Lua::POST::Sub')
 .end
 
 .sub 'ops_const' :method
@@ -184,10 +183,8 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .namespace [ 'Lua::POST::Chunk' ]
 
 .sub '__onload' :anon :load :init
-    .local pmc protomaker, base
-    protomaker = new 'Protomaker'
-    base = get_class 'Lua::POST::Sub'
-    $P0 = protomaker.'new_subclass'(base , 'Lua::POST::Chunk')
+    new $P0, 'Protomaker'
+    $P0.'new_subclass'('Lua::POST::Sub' , 'Lua::POST::Chunk')
 .end
 
 .sub 'prologue' :method
