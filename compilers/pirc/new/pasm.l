@@ -89,6 +89,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ","            { return ','; }
 ";"            { return ';'; }
 
+".lex"         { return TK_LEX; }
 ".pcc_sub"     { return TK_PCC_SUB; }
 ".namespace"   { return TK_NAMESPACE; }
 

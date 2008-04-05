@@ -41,6 +41,7 @@ extern int yyerror(yyscan_t yyscanner, char *message);
 
 %token TK_NAMESPACE      ".namespace"
        TK_PCC_SUB        ".pcc_sub"
+       TK_LEX            ".lex"
        TK_NL             "\n"
 
 %token TK_FLAG_INIT      ":init"
@@ -113,6 +114,7 @@ sub_flag: ":init"
         ;
 
 instruction: TK_PARROT_OP opt_arguments
+           | ".lex" TK_STRINGC ',' TK_PREG
            ;
 
 opt_arguments: /* empty */
