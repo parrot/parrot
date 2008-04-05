@@ -644,7 +644,7 @@ transform break (PAST::Op) :language('PIR') {
 
 
 transform assign (PAST::Op) :language('PIR') {
-    .local pmc lpost, rpost, ops
+    .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     .local pmc rpost
@@ -656,22 +656,23 @@ transform assign (PAST::Op) :language('PIR') {
     .local pmc lpost
     $P0 = node[0]
     lpost = tree.'get'('post', $P0)
-    $P0 = lpost.'pop'()
+    .local pmc ass
+    ass = lpost.'pop'()
     ops.'push'(lpost)
-    $P0.'push'(val)
-    ops.'push'($P0)
+    ass.'push'(val)
+    ops.'push'(ass)
     .return (ops)
 }
 
 
 transform assignlist (PAST::Op) :language('PIR') {
-    .local pmc lpost, rpost, ops
+    .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     .local pmc namelist, explist
     namelist = node[0]
     explist = node[1]
-    .local pmc iter, tmp
+    .local pmc iter, tmp, rpost
     new tmp, 'ResizableStringArray'
     new iter, 'Iterator', explist
   L1:
@@ -704,7 +705,7 @@ transform assignlist (PAST::Op) :language('PIR') {
     $P0.'result'($S0)
     rpost.'push'($P0)
   L2:
-    .local pmc ass
+    .local pmc ass, lpost
     $P0 = get_hll_global ['POST'], 'Ops'
     ass = $P0.'new'('node'=>node)
     new iter, 'Iterator', namelist
