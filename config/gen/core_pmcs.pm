@@ -43,6 +43,7 @@ sub generate_h {
     my ( $self, $conf ) = @_;
 
     my $file = "include/parrot/core_pmcs.h";
+    $conf->append_configure_log($file);
     open( my $OUT, ">", "$file.tmp" );
 
     print {$OUT} <<"END_H";
@@ -95,6 +96,7 @@ sub generate_c {
     my $file = "src/core_pmcs.c";
     my @pmcs = split( / /, $conf->data->get('pmc_names') );
 
+    $conf->append_configure_log($file);
     open( my $OUT, ">", "$file.tmp" );
 
     print {$OUT} <<"END_C";
@@ -180,6 +182,7 @@ sub generate_pm {
     my $file = "lib/Parrot/PMC.pm";
     my @pmcs = split( / /, $conf->data->get('pmc_names') );
 
+    $conf->append_configure_log($file);
     open( my $OUT, ">", "$file.tmp" );
 
     print $OUT <<'END_PM';

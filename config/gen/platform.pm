@@ -19,7 +19,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Utils qw(copy_if_diff);
+use Parrot::Configure::Utils ':gen';
 
 sub _init {
     my $self = shift;
@@ -74,8 +74,10 @@ CODA
         string.h
         /;
 
-    open my $PLATFORM_H, ">", "include/parrot/platform.h"
-        or die "Can't open include/parrot/platform.h: $!";
+    my $plat_h = q{include/parrot/platform.h};
+    $conf->append_configure_log($plat_h);
+    open my $PLATFORM_H, ">", $plat_h
+        or die "Can't open $plat_h: $!";
 
     print {$PLATFORM_H} <<"END_HERE";
 /* ex: set ro:
@@ -176,8 +178,10 @@ END_HERE
         misc.c
         /;
 
-    open my $PLATFORM_C, ">", "src/platform.c"
-        or die "Can't open src/platform.c: $!";
+    my $plat_c = q{src/platform.c};
+    $conf->append_configure_log($plat_c);
+    open my $PLATFORM_C, ">", $plat_c
+        or die "Can't open $plat_c: $!";
 
     print {$PLATFORM_C} <<"END_HERE";
 /*

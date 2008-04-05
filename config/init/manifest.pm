@@ -19,6 +19,7 @@ use warnings;
 use base qw(Parrot::Configure::Step);
 
 use Parrot::Configure::Step;
+use Parrot::Configure::Utils ':gen';
 use ExtUtils::Manifest qw(manicheck);
 
 
@@ -33,6 +34,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    $conf->append_configure_log('MANIFEST.configure.generated');
     if ( $conf->options->get('nomanicheck') ) {
         $self->set_result('skipped');
         return 1;

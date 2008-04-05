@@ -224,7 +224,8 @@ STICKY_FILES = \
     $(GEN_MAKEFILES) \
     ext/Parrot-Embed/Makefile.PL \
     myconfig  \
-    $(GEN_PASM_INCLUDES)
+    $(GEN_PASM_INCLUDES) \
+    MANIFEST.configure.generated
 
 
 ###############################################################################

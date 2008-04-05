@@ -44,7 +44,7 @@ our %EXPORT_TAGS = (
     auto  => [
         qw(capture_output check_progs)
     ],
-    gen => [qw(copy_if_diff move_if_diff)]
+    gen => [qw( copy_if_diff move_if_diff )]
 );
 
 =item C<_run_command($command, $out, $err)>
@@ -310,6 +310,8 @@ sub _slurp {
 }
 
 =back
+
+=cut
 
 =head1 SEE ALSO
 

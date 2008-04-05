@@ -158,6 +158,7 @@ sub runstep {
                 $conf->options->get('verbose') and print "$target ";
                 my $gen = join "\n",
                     ( $target =~ /\.pl$/ ? \&const_to_perl : \&const_to_parrot )->(@defs);
+                $conf->append_configure_log(qq{$destdir/$target});
                 my $target_tmp = "$target.tmp";
                 open my $out, '>', $target_tmp or die "Can't open $target_tmp: $!\n";
 

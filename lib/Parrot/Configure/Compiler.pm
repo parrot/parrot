@@ -258,6 +258,11 @@ sub genfile {
     my $conf = shift;
     my ( $source, $target, %options ) = @_;
 
+    my $calling_sub = (caller(1))[3] || q{};
+    if ( $calling_sub !~ /cc_gen$/ ) {
+        $conf->append_configure_log($target);
+    }
+
     open my $in,  '<', $source       or die "Can't open $source: $!";
     open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
 
@@ -303,7 +308,9 @@ sub genfile {
 
             # OUT was/is used at the output filehandle in eval'ed scripts
             # e.g. feature.pl or feature_h.in
+            no warnings 'once';
             local *OUT = $out;
+            use warnings;
             my $text = do { local $/; <$in> };
 
             # interpolate @foo@ values
@@ -416,6 +423,18 @@ sub genfile {
     close($out) or die "Can't close $target: $!";
 
     move_if_diff( "$target.tmp", $target, $options{ignore_pattern} );
+}
+
+sub append_configure_log {
+    my $conf = shift;
+    my $target = shift;
+    if ( $conf->{active_configuration} ) {
+        my $generated_log = 'MANIFEST.configure.generated';
+        open my $GEN, '>>', $generated_log
+            or die "Can't open $generated_log for appending: $!";
+        print $GEN "$target\n";
+        close $GEN or die "Can't close $generated_log after appending: $!";
+    }
 }
 
 =head1 SEE ALSO

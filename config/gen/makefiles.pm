@@ -76,6 +76,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $self->makefiles($conf);
+    $conf->append_configure_log('docs/Makefile');
     $self->cflags($conf);
 
     return 1;

@@ -48,6 +48,7 @@ sub runstep {
     );
 
     my $hh = "include/parrot/has_header.h";
+    $conf->append_configure_log($hh);
     open( my $HH, ">", "$hh.tmp" )
         or die "Can't open has_header.h: $!";
 

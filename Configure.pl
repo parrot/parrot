@@ -58,6 +58,7 @@ $conf->options->set( %{$args} );
 
 # Run the actual steps
 # from Parrot::Configure
+$conf->{active_configuration} = 1;
 $conf->runsteps or exit(1);
 
 # build tests will only be run if you requested them
