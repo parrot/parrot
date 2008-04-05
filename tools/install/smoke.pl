@@ -112,12 +112,8 @@ ok($out =~ /^usage/, "check bfco");
 $out = `$parrot languages/cardinal/cardinal.pbc -e "print 'hello world';"`;
 ok($out eq "hello world\n", "check cardinal");
 
-TODO: {
-    local $TODO = 'broken since ppd17pmc merge';
-
 $out = `$parrot languages/dotnet/net2pbc.pbc`;
 ok($out =~ /^Usage/, "check dotnet");
-}
 
 $filename = 'test.js';
 open $FH, '>', $filename
