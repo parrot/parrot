@@ -642,7 +642,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         op = try_find_op(interp, unit, name, r, n, keyvec, emit);
 
     if (op < 0) {
-        int ok;
+        int ok = 0;
 
         /* check mixed constants */
         ins = IMCC_subst_constants_umix(interp, unit, name, r, n + 1);

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -303,8 +303,8 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
-   set I0, 2
-   set N0, 2
+   div I0, 10, 5
+   div N0, 10.0, 5.0
    end
 OUT
 

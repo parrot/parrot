@@ -34,8 +34,6 @@ cmp_i_nc_nc
 cmp_i_sc_sc
 cosh_n_nc
 cos_n_nc
-div_i_ic_ic
-div_n_nc_nc
 eq_ic_ic_ic
 eq_nc_nc_ic
 eq_sc_sc_ic

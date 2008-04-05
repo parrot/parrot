@@ -23,11 +23,12 @@
 
 # or TODO much better: all .pbc files should make-depend on PBC_COMPAT
 
-# Also, if you're removing an opcode, be sure to run 
+# Also, if you're removing an opcode, be sure to run
 # make -f tools/dev/ops_renum.mak
 
 # please insert tab separated entries at the top of the list
 
+3.14    2008.04.04	chromatic	enabled div_i_ic_ic and div_n_nc_nc opcodes
 3.13    2008.03.29	chromatic	added does_i_p_pc opcode
 3.12    2008.03.26	coke	deleted classoffset
 3.11    2008.03.26	coke	deleted getattribute_p_p_i,setattribute_p_p_i
