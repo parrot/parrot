@@ -663,7 +663,6 @@ examples/pasm/fact.pasm                                     [main]doc
 examples/pasm/hello.pasm                                    [main]doc
 examples/pasm/nanoforth.pasm                                [main]doc
 examples/pasm/nanoforth2.pasm                               [main]doc
-examples/pasm/queens.pasm                                   [main]doc
 examples/pasm/small.xml                                     [main]doc
 examples/pasm/stack.pasm                                    [main]doc
 examples/pasm/trace.pasm                                    [main]doc

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 5;
 use Parrot::Config;
 
 =head1 NAME
@@ -36,29 +36,6 @@ my %expected = (
 
     'hello.pasm' => << 'END_EXPECTED',
 Hello World
-END_EXPECTED
-
-    'queens.pasm' => << 'END_EXPECTED',
-Making new board with 8 ranks and 8 files...
-Board length is 64.
-  +---+---+---+---+---+---+---+---+
-8 |   | * | Q | * |   | * |   | * |
-  +---+---+---+---+---+---+---+---+
-7 | * |   | * |   | * | Q | * |   |
-  +---+---+---+---+---+---+---+---+
-6 |   | * |   | Q |   | * |   | * |
-  +---+---+---+---+---+---+---+---+
-5 | * | Q | * |   | * |   | * |   |
-  +---+---+---+---+---+---+---+---+
-4 |   | * |   | * |   | * |   | Q |
-  +---+---+---+---+---+---+---+---+
-3 | * |   | * |   | Q |   | * |   |
-  +---+---+---+---+---+---+---+---+
-2 |   | * |   | * |   | * | Q | * |
-  +---+---+---+---+---+---+---+---+
-1 | Q |   | * |   | * |   | * |   |
-  +---+---+---+---+---+---+---+---+
-    A   B   C   D   E   F   G   H  
 END_EXPECTED
 
     'stack.pasm' => << 'END_EXPECTED',
