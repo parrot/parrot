@@ -1263,8 +1263,7 @@ None. First version
 
 =over 4
 
-=item * Fixed stack ops; push, pop, and clear properly documented according to the
-engine's behaviour now.
+=item * Fixed stack ops; push, pop, and clear properly documented according to the engine's behaviour now.
 
 =back
 
