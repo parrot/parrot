@@ -473,7 +473,6 @@ sub get_perl_exemption_regexp {
 
     my $parrot_dir = $self->path();
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
-        languages/lua/Lua/parser.pm
         languages/regex/lib/Regex/Grammar.pm
         compilers/nqp/
         lib/Digest/Perl/
