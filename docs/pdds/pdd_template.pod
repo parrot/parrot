@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -13,7 +13,7 @@ $Revision$
 
 Summary of the contents of the PDD.
 
-=item SYNOPSIS I<(optional)>:
+=head1 SYNOPSIS I<(optional)>:
 
 Code snippets showing the semantics of the PDD (if applicable).
 
