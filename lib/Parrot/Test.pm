@@ -859,8 +859,6 @@ sub _generate_test_functions {
             }
             else {
 
-                # RT#43753: $language should be the name of the test Module
-                #       that would open the door for Scheme::Test
                 $language = ucfirst($language);
 
                 # make sure todo-items will work, by telling Test::Builder which
