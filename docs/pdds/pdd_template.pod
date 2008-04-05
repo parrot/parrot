@@ -5,13 +5,17 @@
 
 docs/pdds/pdd_template.pod - PDD Template
 
+=head1 VERSION
+
+$Revision$
+
 =head1 ABSTRACT
 
 Summary of the contents of the PDD.
 
-=head1 VERSION
+=item SYNOPSIS I<(optional)>:
 
-$Revision$
+Code snippets showing the semantics of the PDD (if applicable).
 
 =head1 DESCRIPTION
 

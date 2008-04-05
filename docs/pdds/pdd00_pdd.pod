@@ -112,7 +112,7 @@ are maintained by the Parrot Architect.
 
 A quick blurb explaining the purpose of the PDD.
 
-=item SYNOPSIS:
+=item SYNOPSIS I<(optional)>:
 
 Code snippets showing the semantics of the PDD (if applicable).
 

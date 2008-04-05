@@ -55,7 +55,6 @@ sub check_pdd_formatting {
         NAME
         VERSION
         ABSTRACT
-        SYNOPSIS
         DESCRIPTION
         IMPLEMENTATION
         REFERENCES
