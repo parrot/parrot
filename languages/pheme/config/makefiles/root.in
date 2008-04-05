@@ -1,19 +1,22 @@
 # $Id$
 
+# configuration settings
+BUILD_DIR     = @build_dir@
+
 # Setup some commands
-PERL     = @perl@
-RM_F     = @rm_f@
-PARROT   = ../../parrot@exe@
-TOOL_DIR = ../..
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
-CP       = @cp@
+PERL          = @perl@
+RM_F          = @rm_f@
+PARROT        = ../../parrot@exe@
+TGE_DIR       = ../../compilers/tge
+PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
+PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
+RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 
 # the default target
 all: pheme.pbc
 
 lib/pheme_grammar_gen.pir: lib/pheme.g
-	$(PARROT) $(TOOL_DIR)/runtime/parrot/library/PGE/Perl6Grammar.pbc \
+	$(PARROT) $(PERL6GRAMMAR) \
 	 --output=lib/pheme_grammar_gen.pir lib/pheme.g
 
 lib/ASTGrammar.pir: lib/pge2past.tg
@@ -21,6 +24,10 @@ lib/ASTGrammar.pir: lib/pge2past.tg
 
 pheme.pbc: pheme.pir lib/PhemeSymbols.pir lib/PhemeObjects.pir lib/ASTGrammar.pir lib/pheme_grammar_gen.pir
 	$(PARROT) -o pheme.pbc pheme.pir
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=pheme
 
 # This is a listing of all targets that users can call
 help:
