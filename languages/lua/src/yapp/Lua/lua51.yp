@@ -3,6 +3,13 @@ Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 */
 
+%{
+
+# Copyright (C) 2005-2008, The Perl Foundation.
+# $Id$
+
+%}
+
 %token NAME
 /* Literal */
 %token STRING
@@ -794,4 +801,3 @@ sub Info {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
