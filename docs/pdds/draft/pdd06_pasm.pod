@@ -610,9 +610,13 @@ operating on the scratchpad on the top of the stack.
 Find the PMC for the global variable sy from the table sz and store it in
 register X
 
+{{ DEPRECATED: op find_global was deprecated }}
+
 =item find_global Px, sy
 
 Find the PMC for the global in the default table and put it in X.
+
+{{ DEPRECATED: op find_global was deprecated }}
 
 =item find_global_table Px, sy
 
@@ -630,6 +634,8 @@ Fetch the global in slot Z of the symbol table pointed to by Y
 =item store_global Px, sy
 
 Store X in the default global symbol table with a name of Y.
+
+{{ DEPRECATED: op store_global was deprecated }}
 
 =back
 

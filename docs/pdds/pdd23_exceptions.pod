@@ -352,7 +352,8 @@ runtime is OK in Tcl.)
 general categories of opcodes that should throw exceptions. }}
 
 Other opcodes respond to an C<errorson> setting to decide whether to
-throw an exception or return an error value. C<find_global> throws an
+throw an exception or return an error value. C<get_hll_global> and
+C<get_root_global> throw an
 exception (or returns a Null PMC) if the global name requested doesn't
 exist. C<find_name> throws an exception (or returns a Null PMC) if the
 name requested doesn't exist in a lexical, current, global, or built-in
@@ -401,7 +402,7 @@ error in with normal return values. }}
 =head2 Resuming after Exceptions
 
 Exceptions thrown by standard Parrot opcodes (like the one thrown by
-C<find_global> above or by the C<throw> opcode) are always resumable,
+C<get_hll_global> above or by the C<throw> opcode) are always resumable,
 so when the exception handler function returns normally it continues
 execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
