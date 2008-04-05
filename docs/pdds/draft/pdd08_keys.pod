@@ -283,8 +283,10 @@ list. - steve@fink.com
 updated to reflect Dan's comments that non-aggregates also support C<_keyed>
 variant vtable methods.
 
+=back
+
 =head2 REFERENCES
 
 To come.
 
-=back
+=cut
