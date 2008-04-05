@@ -784,9 +784,9 @@ filehandles where this can't be determined. (Such as stream connections)
 
 =item status px, py, tz
 
-Get informational item Z for filehandle Y and put the result in X. This fetches
-things like the number of entries in the IO pipe, number of outstanding I/O
-ops, number of ops on the filehandle, and so forth.
+Get informational item Z for filehandle Y and put the result in X. This
+fetches things like the number of entries in the IO pipe, number of
+outstanding I/O ops, number of ops on the filehandle, and so forth.
 
 =back
 
@@ -1284,8 +1284,7 @@ engine's behaviour now.
 
 =item * return is now ret
 
-=item * Added save and restore ops for saving and restoring individual
-registers
+=item * Added save and restore ops for saving and restoring individual registers
 
 =back
 
