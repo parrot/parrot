@@ -835,9 +835,9 @@ Get information item Y and put it in register X. Currently defined are:
 
 =item 1 TOTAL_MEM_ALLOC
 
-The total amount of system memory allocated for later parceling out to Buffers.
-Doesn't include any housekeeping memory, memory for Buffer or PMC structs, or
-things of that nature.
+The total amount of system memory allocated for later parceling out to
+Buffers.  Doesn't include any housekeeping memory, memory for Buffer or PMC
+structs, or things of that nature.
 
 =item 2 DOD_RUNS
 
@@ -849,8 +849,8 @@ The total number of memory collection runs that have been made.
 
 =item 4 ACTIVE_PMCS
 
-The number of PMCs considered active. This means the DOD scan hasn't noted them
-as dead.
+The number of PMCs considered active. This means the DOD scan hasn't noted
+them as dead.
 
 =item 5 ACTIVE_BUFFERS
 
@@ -868,8 +868,8 @@ The total number of Buffer structs the interpreter has available.
 
 =item 8 HEADERS_ALLOC_SINCE_COLLECT
 
-The number of new Buffer header block allocations that have been made since the
-last DOD run. (Buffers, when allocated, are allocated in chunks)
+The number of new Buffer header block allocations that have been made since
+the last DOD run. (Buffers, when allocated, are allocated in chunks)
 
 =item 9 MEM_ALLOCS_SINCE_COLLECT
 
@@ -907,7 +907,8 @@ interpreter to fire one off when it deems it necessary.
 =head2 Key operations
 
 Keys are used to get access to individual elements of an aggregate variable.
-This is done to allow for opaque, packed, and multidimensional aggregate types.
+This is done to allow for opaque, packed, and multidimensional aggregate
+types.
 
 A key entry may be an integer, string, or PMC. Integers are used for array
 lookups, strings for hash lookups, and PMCs for either.
@@ -920,8 +921,8 @@ Create a new key structure and put a pointer to it in register X.
 
 =item clone_key Sx, ky
 
-Make a copy of the key Y and put a pointer to it in register X. Y may be either
-an S register or a constant.
+Make a copy of the key Y and put a pointer to it in register X. Y may be
+either an S register or a constant.
 
 =item size_key Sx, iy
 
@@ -954,9 +955,10 @@ Increment entry Y of key X by one.
 
 =item set_key Sw, [isp]x, iy[, iz]
 
-Set key W, offset Y, to value X. If X is a PMC, then the fourth operand must be
-specified. It can have a value of 0, 1, or 2, corresponding to integer, string,
-or object. Aggregates use this to figure out how to treat the key entry.
+Set key W, offset Y, to value X. If X is a PMC, then the fourth operand must
+be specified. It can have a value of 0, 1, or 2, corresponding to integer,
+string, or object. Aggregates use this to figure out how to treat the key
+entry.
 
 =back
 
@@ -977,8 +979,8 @@ Set the property named Y of PMC X to the PMC in Z
 
 =item getprop Px, sy, Pz
 
-Get the property named Y from PMC Z and put the result in register X. Returns a
-NULL if the property doesn't exist.
+Get the property named Y from PMC Z and put the result in register X. Returns
+a NULL if the property doesn't exist.
 
 =item delprop Px, sy
 
@@ -1028,8 +1030,8 @@ These are the ops we use to load in and interface to non-parrot libraries.
 
 =item loadlib Px, Sy
 
-Load in the library whose name is specified by y, and put a handle to it into P
-register x.
+Load in the library whose name is specified by y, and put a handle to it into
+P register x.
 
 =item dlfunc Pw, Px, Sy, Sz
 
@@ -1115,10 +1117,10 @@ identical same set of registers used (and in the same order).
 
 =item invoke
 
-Invoke a subroutine in P0. Presumes that all the registers are set up right for
-the call. The invoked subroutine I<must> preserve any registers that are not
-explicitly return parameters or calling convention metadata parameters. (Such
-as the number of I reg parameters, for example)
+Invoke a subroutine in P0. Presumes that all the registers are set up right
+for the call. The invoked subroutine I<must> preserve any registers that are
+not explicitly return parameters or calling convention metadata parameters.
+(Such as the number of I reg parameters, for example)
 
 =back
 
