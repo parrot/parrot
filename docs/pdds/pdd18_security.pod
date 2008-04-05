@@ -189,8 +189,8 @@ blocked from passing the firewall (returning an empty string or PMCNULL
 instead of the expected data). Data filters can also be user-defined, as a
 regular expression (PGE rule) or subroutine.
 
-The same filter rules applied within the data firewall can be called explicitly
-on any data.
+The same filter rules applied within the data firewall can be called
+explicitly on any data.
 
 =head2 Bytecode Validation
 

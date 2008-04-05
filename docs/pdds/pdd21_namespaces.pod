@@ -9,6 +9,10 @@ docs/pdds/pdd21_namespaces.pod - Parrot Namespaces
 
 $Revision$
 
+=head1 ABSTRACT
+
+Description and implementation of Parrot namespaces.
+
 =head1 DESCRIPTION
 
 =over 4

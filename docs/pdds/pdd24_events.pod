@@ -362,13 +362,13 @@ None.
 
 =head1 REFERENCES
 
-  src/events.c
+src/events.c
 
-  http://www.seas.upenn.edu/~lipeng/homepage/unify.html
+L<http://www.seas.upenn.edu/~lipeng/homepage/unify.html>
 
-  http://developer.apple.com/documentation/Carbon/Conceptual/Carbon_Event_Manager/Concept/chapter_2_section_2.html
+L<http://developer.apple.com/documentation/Carbon/Conceptual/Carbon_Event_Manager/Concept/chapter_2_section_2.html>
 
-  http://www.quirksmode.org/js/events_compinfo.html
+L<http://www.quirksmode.org/js/events_compinfo.html>
 
 =cut
 

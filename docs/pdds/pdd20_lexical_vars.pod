@@ -344,6 +344,8 @@ For example, to get the immediate caller's LexPad, use:
 It's likely that this interface will continue to be available even once call
 frames become visible as PMCs.
 
+=head1 IMPLEMENTATION
+
 TODO: Full interpreter introspection interface.
 
 =head1 ATTACHMENTS
