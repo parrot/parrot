@@ -435,6 +435,27 @@ Delete the element corresponding to C<key> in the hash component.
 
 /*
 
+=item C<void set_pmc(PMC *capture)>
+
+Set this capture to hold the value of another.
+
+=cut
+
+*/
+
+    void set_pmc(PMC *capture) {
+        if (VTABLE_isa(INTERP, capture, CONST_STRING(INTERP, "Capture"))) {
+            PARROT_CAPTURE(SELF)->array = PARROT_CAPTURE(capture)->array;
+            PARROT_CAPTURE(SELF)->hash = PARROT_CAPTURE(capture)->hash;
+        }
+        else {
+            real_exception(INTERP, NULL, INVALID_OPERATION,
+                           "Can only set a capture to another capture.");
+        }
+    }
+
+/*
+
 =back
 
 =head2 Methods
