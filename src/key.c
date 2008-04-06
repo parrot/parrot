@@ -302,28 +302,30 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_integer(PARROT_INTERP, ARGIN(PMC *key))
 {
-    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-    case KEY_hash_iterator_FLAGS:
-    case KEY_integer_FLAG:
-        return PMC_int_val(key);
-    case KEY_integer_FLAG | KEY_register_FLAG:
-        return REG_INT(interp, PMC_int_val(key));
-    case KEY_pmc_FLAG | KEY_register_FLAG:
-        {
-        PMC * const reg = REG_PMC(interp, PMC_int_val(key));
-        return VTABLE_get_integer(interp, reg);
+    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+        case KEY_hash_iterator_FLAGS:
+        case KEY_integer_FLAG:
+            return PMC_int_val(key);
+        case KEY_integer_FLAG | KEY_register_FLAG:
+            return REG_INT(interp, PMC_int_val(key));
+        case KEY_pmc_FLAG | KEY_register_FLAG:
+            {
+            PMC * const reg = REG_PMC(interp, PMC_int_val(key));
+            return VTABLE_get_integer(interp, reg);
+            }
+        case KEY_string_FLAG:
+            return string_to_int(interp, PMC_str_val(key));
+        case KEY_string_FLAG | KEY_register_FLAG:
+            {
+            STRING * const s_reg = REG_STR(interp, PMC_int_val(key));
+            return string_to_int(interp, s_reg);
+            }
+            /* TODO check for slice_FLAGs */
         }
-    case KEY_string_FLAG:
-        return string_to_int(interp, PMC_str_val(key));
-    case KEY_string_FLAG | KEY_register_FLAG:
-        {
-        STRING * const s_reg = REG_STR(interp, PMC_int_val(key));
-        return string_to_int(interp, s_reg);
-        }
-    default:
-        /* TODO check for slice_FLAGs */
-        return VTABLE_get_integer(interp, key);
     }
+
+    return VTABLE_get_integer(interp, key);
 }
 
 /*
@@ -440,9 +442,12 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_next(SHIM_INTERP, ARGIN(const PMC *key))
+key_next(PARROT_INTERP, ARGIN(const PMC *key))
 {
-    return key->pmc_ext ? (PMC *)PMC_data(key) : NULL;
+    return
+        VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext ?
+            (PMC *)PMC_data(key) :
+            NULL;
 }
 
 /*
