@@ -55,6 +55,9 @@ N: Anders Nor Berle
 D: Some cleanups and FreeBSD related fixes.
 E: debolaz@gmail.com
 
+N: Andrew Parker
+D: Port PAST-pm test to PCT.
+
 N: Andrew Rodland
 D: vim syntax files and editor doc
 
