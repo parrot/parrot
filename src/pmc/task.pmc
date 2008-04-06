@@ -170,7 +170,7 @@ An interpreter in which to execute this task.
 
         core_struct->codeblock =
             VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
-        core_struct->interp =
+        core_struct->interp = (Parrot_Interp)
             VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "data"));
     }
 
