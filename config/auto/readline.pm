@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -80,8 +80,7 @@ sub _handle_mswin32 {
     my ($conf, $osname, $cc) = @_;
     if ( $osname =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ',
-                libs => '-lreadline -lgw32c -lole32 -luuid -lwsock32 -lmsvcp60' );
+            $conf->data->add( ' ', libs => '-lreadline' );
         }
         else {
             $conf->data->add( ' ', libs => 'readline.lib' );

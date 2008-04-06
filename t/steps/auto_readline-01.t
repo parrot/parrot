@@ -48,7 +48,7 @@ $osname = 'mswin32';
 $cc = 'gcc';
 ok(auto::readline::_handle_mswin32($conf, $osname, $cc),
     "_handle_mswin32() returned true value");
-like($conf->data->get( 'libs' ), qr/-lreadline -lgw32c/,
+like($conf->data->get( 'libs' ), qr/-lreadline/,
     "'libs' modified as expected");
 
 $osname = 'mswin32';
