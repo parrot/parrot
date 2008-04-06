@@ -37,10 +37,10 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 
 
 Parrot::Test::Util::Runloop->testloop(
-    name        => 'no cuddled elses',
+    name        => 'no c++ comments',
     files       => [@files],
     per_file    => \&check_cppcomments,
-    diag_prefix => 'Cuddled else found'
+    diag_prefix => 'C++ comments found'
 );
 
 sub check_cppcomments {
