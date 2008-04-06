@@ -290,10 +290,10 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *namespace))
+Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *_namespace))
 {
     PMC *names;
-    Parrot_PCCINVOKE(interp, namespace,
+    Parrot_PCCINVOKE(interp, _namespace,
             CONST_STRING(interp, "get_name"), "->P", &names);
     return names;
 }
