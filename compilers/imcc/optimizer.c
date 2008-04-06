@@ -82,16 +82,6 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 
 /* HEADERIZER BEGIN: static */
 
-PARROT_WARN_UNUSED_RESULT
-static int _is_ins_save(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *check_ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -148,6 +138,18 @@ static int if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+#if DO_LOOP_OPTIMIZATION
+
+PARROT_WARN_UNUSED_RESULT
+static int _is_ins_save(
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *check_ins),
+    ARGIN(const SymReg *r),
+    int what)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_WARN_UNUSED_RESULT
 static int is_ins_save(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
@@ -158,6 +160,8 @@ static int is_ins_save(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
+
+#endif /* DO_LOOP_OPTIMIZATION */
 
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -1506,6 +1510,7 @@ used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     return opt;
 }
 
+#if DO_LOOP_OPTIMIZATION
 
 static int reason;
 enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
@@ -1638,7 +1643,6 @@ is_ins_save(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction 
     return save;
 }
 
-#if DO_LOOP_OPTIMIZATION
 /*
 
 =item C<int max_loop_depth>
