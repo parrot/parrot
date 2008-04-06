@@ -266,8 +266,8 @@ transform force_to_val (PAST::Op) :language('PIR') {
     node.'name'( '__list_to_cons' )
     name  = "'" . name
     name .= "'"
-    result.'name'( name )
-    result.'vtype'( '.Undef' )
+    result.'value'( name )
+    result.'returns'( 'Undef' )
 
     .local pmc children
     children = node.'get_array'()
@@ -493,8 +493,9 @@ transform past (atom) :language('PIR') {
     quoted_value .= value
     quoted_value .= "'"
 
+    result.'value'( quoted_value )
     result.'name'( quoted_value )
-    result.'vtype'( '.Undef' )
+    result.'returns'( 'Undef' )
 
     .return( result )
 }
@@ -507,7 +508,8 @@ transform past (quoted_string) :language('PIR') {
     value  = node
 
     result.'name'( value )
-    result.'vtype'( '.Undef' )
+    result.'value'( value )
+    result.'returns'( 'Undef' )
 
     .return( result )
 }

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 pheme.pir - A Pheme compiler.
@@ -7,7 +9,7 @@ pheme.pir - A Pheme compiler.
 This is the base file for the Pheme compiler.
 
 This file includes the parsing and grammar rules from
-the src/ directory, loads the relevant PGE libraries,
+the lib/ directory, loads the relevant PGE libraries,
 and registers the compiler under the name 'Pheme'.
 
 =head2 Functions
@@ -25,21 +27,19 @@ object.
 .namespace [ 'Pheme::Compiler' ]
 
 .sub '__onload' :load :init
-    load_bytecode 'PGE.pbc'
+    load_bytecode 'PCT.pbc'
     load_bytecode 'PGE/Text.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-    load_bytecode 'PAST-pm.pbc'
 
     $P0 = subclass 'PGE::Match', 'Match'
     $P0 = subclass 'Match',      'Grammar'
     $P0 = subclass 'Grammar',    'Pheme::PGE::Grammar'
 
-    $P0 = new [ 'HLLCompiler' ]
+    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+    $P1 = $P0.'new'()
 
-    $P0.'language'('Pheme')
-    $P0.'parsegrammar'( 'Pheme::Grammar' )
-    $P0.'astgrammar'(   'Pheme::AST::Grammar' )
+    $P1.'language'('Pheme')
+    $P1.'parsegrammar'( 'Pheme::Grammar' )
+    $P1.'astgrammar'(   'Pheme::AST::Grammar' )
 .end
 
 =item main(args :slurpy)  :main
