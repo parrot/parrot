@@ -168,7 +168,7 @@ void parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 void parrot_gc_gms_wb(PARROT_INTERP,
     ARGIN(PMC *agg),
     ARGIN(void *old),
-    ARGIN(void *new))
+    ARGIN(void *_new))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -178,7 +178,7 @@ void parrot_gc_gms_wb_key(PARROT_INTERP,
     ARGIN(PMC *agg),
     ARGIN(void *old),
     ARGIN(void *old_key),
-    ARGIN(void *new),
+    ARGIN(void *_new),
     ARGIN(void *new_key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -207,45 +207,45 @@ void Parrot_gc_ims_init(PARROT_INTERP)
  * write barrier
  */
 #if PARROT_GC_IMS
-#  define DOD_WRITE_BARRIER(interp, agg, old, new) \
+#  define DOD_WRITE_BARRIER(interp, agg, old, _new) \
     do { \
-        if (!PMC_IS_NULL(new)   && \
+        if (!PMC_IS_NULL(_new)   && \
                 PObj_live_TEST(agg) && \
                 (PObj_get_FLAGS(agg) & PObj_custom_GC_FLAG) && \
-                !PObj_live_TEST(new)) { \
-            Parrot_dod_ims_wb(interp, agg, new); \
+                !PObj_live_TEST(_new)) { \
+            Parrot_dod_ims_wb(interp, agg, _new); \
         } \
     } while (0)
 
-#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key) \
-          DOD_WRITE_BARRIER(interp, agg, old, new)
+#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) \
+          DOD_WRITE_BARRIER(interp, agg, old, _new)
 #endif
 
 #if PARROT_GC_MS
-#  define DOD_WRITE_BARRIER(interp, agg, old, new)
-#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key)
+#  define DOD_WRITE_BARRIER(interp, agg, old, _new)
+#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key)
 #endif
 
 #if PARROT_GC_GMS
-#  define DOD_WRITE_BARRIER(interp, agg, old, new) do { \
+#  define DOD_WRITE_BARRIER(interp, agg, old, _new) do { \
     UINTVAL gen_agg, gen_new; \
-    if (!(new) || PMC_IS_NULL(new)) \
+    if (!(_new) || PMC_IS_NULL(_new)) \
         break; \
     gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
-    gen_new = PObj_to_GMSH(new)->gen->gen_no; \
+    gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
     if (gen_agg < gen_new) \
-        parrot_gc_gms_wb(interp, agg, old, new); \
+        parrot_gc_gms_wb(interp, agg, old, _new); \
 } while (0)
 
-#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key) do { \
+#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { \
     UINTVAL gen_agg, gen_new, gen_key; \
-    if (!(new) || PMC_IS_NULL(new)) \
+    if (!(_new) || PMC_IS_NULL(_new)) \
         break; \
     gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
-    gen_new = PObj_to_GMSH(new)->gen->gen_no; \
+    gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
     gen_key = PObj_to_GMSH(new_key)->gen->gen_no; \
     if (gen_agg < gen_new || gen_agg < gen_key) \
-        parrot_gc_gms_wb_key(interp, agg, old, old_key, new, new_key); \
+        parrot_gc_gms_wb_key(interp, agg, old, old_key, _new, new_key); \
 } while (0)
 
 #endif
