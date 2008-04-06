@@ -1924,7 +1924,7 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
     for (i = 0; i < list_count; i++) {
         int j;
 
-        PMC * const list       = VTABLE_get_pmc_keyed_int(interp, merge_list,i);
+        PMC * const list       = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
         const int   list_count = VTABLE_elements(interp, list);
 
         for (j = 0; j < list_count; j++) {
