@@ -218,7 +218,7 @@ Set C<dest> to the negated value of C<SELF>.
         const FLOATVAL a = -SELF.get_number();
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, a);
         return dest;
@@ -344,7 +344,7 @@ Sets C<dest> to the absolute value of SELF.
         const FLOATVAL a = fabs(SELF.get_number());
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, a);
         return dest;
@@ -432,7 +432,7 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
 */
 
     METHOD acos() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = acos(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
@@ -445,97 +445,97 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     }
 
     METHOD asec() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = acos(1.0 / PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD asin() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = asin(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD atan() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = atan(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD atan2(PMC *val) {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = atan2(PMC_num_val(SELF), PMC_num_val(val));
         RETURN(PMC *d);
     }
 
     METHOD cosh() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = cosh(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD exp() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = exp(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD ln() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = log(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD log10() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = log10(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD log2() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = log(PMC_num_val(SELF)) / log(2.0);
         RETURN(PMC *d);
     }
 
     METHOD sec() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = 1.0 / cos(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD sech() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = 1.0 / cosh(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD sin() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = sin(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD sinh() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = sinh(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD tan() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = tan(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD tanh() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = tanh(PMC_num_val(SELF));
         RETURN(PMC *d);
     }
 
     METHOD sqrt() {
-        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC_num_val(d) = sqrt(PMC_num_val(SELF));
         RETURN(PMC *d);
     }

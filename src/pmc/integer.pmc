@@ -374,7 +374,7 @@ MMD_DEFAULT: {
 
         if ((c^a) >= 0 || (c^b) >= 0) {
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -452,7 +452,7 @@ MMD_Integer: {
 
             if ((c^a) >= 0 || (c^~b) >= 0) {
                 if (!dest)
-                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                    dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
                 VTABLE_set_integer_native(INTERP, dest, c);
                 return dest;
@@ -465,7 +465,7 @@ MMD_Complex: {
             if (dest)
                 VTABLE_morph(INTERP, dest, value->vtable->base_type);
             else
-                dest = pmc_new(INTERP, value->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
             VTABLE_set_number_native(INTERP, dest,
                     a - VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -479,7 +479,7 @@ MMD_BigInt: {
         }
 MMD_DEFAULT: {
             if (!dest)
-                dest = pmc_new(INTERP, value->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
             VTABLE_set_number_native(INTERP, dest,
                 SELF.get_integer() - VTABLE_get_number(INTERP, value));
@@ -502,7 +502,7 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
 
         if ((c^a) >= 0 || (c^~b) >= 0) {
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -587,7 +587,7 @@ MMD_Integer: {
 
             if ((double) c == cf) {
                 if (!dest)
-                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                    dest = pmc_new(INTERP, VTABLE_type(interp, SELF));
 
                 VTABLE_set_integer_native(INTERP, dest, c);
                 return dest;
@@ -609,7 +609,7 @@ MMD_String: {
 MMD_DEFAULT: {
             const FLOATVAL valf = VTABLE_get_number(INTERP, value);
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             VTABLE_set_number_native(INTERP, dest, valf * PMC_int_val(SELF));
             return dest;
@@ -623,7 +623,7 @@ MMD_DEFAULT: {
 
         if ((double) c == cf) {
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -713,7 +713,7 @@ MMD_DEFAULT: {
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "float division by zero");
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
             VTABLE_set_number_native(INTERP, dest, SELF.get_number() / d);
             return dest;
         }
@@ -767,7 +767,7 @@ MMD_DEFAULT: {
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "float division by zero");
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             f = floor(SELF.get_number() / d);
             VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
@@ -783,7 +783,7 @@ MMD_DEFAULT: {
                     "float division by zero");
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         f = floor(SELF.get_number() / value);
         VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
@@ -799,7 +799,7 @@ MMD_DEFAULT: {
                     "float division by zero");
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         f = floor(SELF.get_number() / value);
         VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
@@ -881,7 +881,7 @@ MMD_DEFAULT: {
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "int cmodulus by zero");
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             VTABLE_set_integer_native(INTERP, dest,
                     SELF.get_integer() % d);
@@ -897,7 +897,7 @@ MMD_DEFAULT: {
                     "int cmodulus by zero");
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         f = fmod(SELF.get_integer(), value);
         VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
@@ -910,7 +910,7 @@ MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int cmodulus by zero");
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         VTABLE_set_integer_native(INTERP, dest,
                 SELF.get_integer() % value);
         return dest;
@@ -985,7 +985,7 @@ MMD_DEFAULT: {
                         "int modulus by zero");
 
             if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             VTABLE_set_integer_native(INTERP, dest,
                     intval_mod(SELF.get_integer(), d));
@@ -999,7 +999,7 @@ MMD_DEFAULT: {
                     "int modulus by zero");
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest,
                 intval_mod(SELF.get_integer(), value));
@@ -1012,7 +1012,7 @@ MMD_DEFAULT: {
                     "int modulus by zero");
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest,
                 intval_mod(SELF.get_integer(), (INTVAL)value));
@@ -1109,7 +1109,7 @@ RT#46631 Complex and BigInt rhs.
         }
 
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, r);
         return dest;
@@ -1260,7 +1260,7 @@ Sets C<dest> to the absolute value of SELF.
 
         /* RT#46635 overlflow for -maxint */
         if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
