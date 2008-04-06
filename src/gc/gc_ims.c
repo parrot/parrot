@@ -851,7 +851,7 @@ parrot_gc_ims_collect(PARROT_INTERP, int check_only)
         Parrot_dod_profile_start(interp);
     g_ims = (Gc_ims_private *)arena_base->gc_private;
     ret   = Parrot_forall_header_pools(interp, POOL_BUFFER,
-            (void*)check_only, collect_cb);
+            (void*)(long)check_only, collect_cb);
     if (ret)
         return ret;
     if (check_only)
