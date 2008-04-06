@@ -183,8 +183,10 @@ static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#ifdef HAS_JIT
 PARROT_WARN_UNUSED_RESULT
 static int old_blocks(void);
+#endif /* HAS_JIT */
 
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
@@ -377,7 +379,7 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     return globals.cs->jit_info->data + old * 4;
 }
 
-#endif
+#endif /* HAS_JIT */
 
 /*
 
