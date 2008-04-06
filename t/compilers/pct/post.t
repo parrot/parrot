@@ -1,26 +1,19 @@
 #! perl
 
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
-
-pir_output_is( <<'CODE', <<'OUT', 'load the libraries' );
-.sub _main
-    load_bytecode 'PAST-pm.pbc'
-.end
-CODE
-OUT
+use Parrot::Test tests => 6;
 
 foreach my $name (qw(Op Ops Sub Label)) {
     my $module = "POST::$name";
     my $code   = <<'CODE'
 .sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     .local pmc node2
 CODE
@@ -55,49 +48,37 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Op node in visual format' );
 .sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     node = new 'POST::Op'
     node.'pirop'('add')
     node.'result'('$P1')
-    node.'arglist'("$P1", "$P2")
-    $P1 = node.'pir'()
-    say $P1
+    node.'inline'('%r=1')
     "_dumper"(node, "ost")
     .return ()
 .end
 CODE
-    add $P1, $P2
-
 "ost" => PMC 'POST::Op'  {
     <pirop> => "add"
     <result> => "$P1"
-    <arglist> => ResizablePMCArray (size:2) [
-        "$P1",
-        "$P2"
-    ]
+    <inline> => "%r=1"
 }
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Label node in visual format' );
 .sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     node = new 'POST::Label'
     node.'name'('labeler')
-    $P1 = node.'pir'()
-    say $P1
     "_dumper"(node, "ost")
     .return ()
 .end
 CODE
-  labeler10:
-
 "ost" => PMC 'POST::Label'  {
     <name> => "labeler"
-    <value> => "labeler10"
 }
 OUT
 

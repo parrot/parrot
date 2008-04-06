@@ -1,26 +1,20 @@
 #! perl
 
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 11;
 
-pir_output_is( <<'CODE', <<'OUT', 'load the libraries' );
-.sub _main
-    load_bytecode 'PAST-pm.pbc'
-.end
-CODE
-OUT
+use Parrot::Test tests => 10;
 
 foreach my $name (qw(Node Val Var Op Block Stmts)) {
     my $module = "PAST::$name";
     my $code   = <<'CODE'
-.sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+.sub _main :main
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     .local pmc node2
 CODE
@@ -29,8 +23,8 @@ CODE
     $code .= "    node = new '$module'\n";
     $code .= "    node2 = new '$module'\n";
     $code .= <<'CODE'
-    node.'init'('name' => 'foo', 'atype'=> '42')
-    node2.'init'('name' => 'bar', 'atype'=> '43')
+    node.'init'('name' => 'foo')
+    node2.'init'('name' => 'bar')
     node.'push'(node2)
 
     $P1 = node.'name'()
@@ -45,10 +39,8 @@ CODE
 foo
 "ast" => PMC '$module'  {
     <name> => "foo"
-    <atype> => "42"
     [0] => PMC '$module'  {
         <name> => "bar"
-        <atype> => "43"
     }
 }
 OUT
@@ -56,63 +48,61 @@ OUT
 }
 
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Val node in visual format' );
-.sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+.sub _main :main
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     node = new 'PAST::Val'
-    node.'ctype'('s~')
-    node.'vtype'('.String')
-    $P1 = node.'ctype'()
+    node.'value'(1)
+    node.'returns'('Integer')
+    $P1 = node.'value'()
     say $P1
-    $P1 = node.'vtype'()
+    $P1 = node.'returns'()
     say $P1
     "_dumper"(node, "ast")
     .return ()
 .end
 CODE
-s~
-.String
+1
+Integer
 "ast" => PMC 'PAST::Val'  {
-    <ctype> => "s~"
-    <vtype> => ".String"
+    <value> => 1
+    <returns> => "Integer"
 }
 OUT
 
+## TODO: test that return() is taken from the type of value when not specified
+
+## TODO: check the rest of the PAST::Var attributes
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Var node in visual format' );
-.sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+.sub _main :main
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     node = new 'PAST::Var'
     node.'scope'('foo')
-    node.'ismy'('bar')
     node.'viviself'('baz')
-    node.'islvalue'('buz')
-    node.'bindvalue'('boz')
+    node.'lvalue'('buz')
     "_dumper"(node, "ast")
     .return ()
 .end
 CODE
 "ast" => PMC 'PAST::Var'  {
     <scope> => "foo"
-    <ismy> => "bar"
     <viviself> => "baz"
-    <islvalue> => "buz"
-    <bindvalue> => "boz"
+    <lvalue> => "buz"
 }
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Op node in visual format' );
-.sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+.sub _main :main
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     node = new 'PAST::Op'
     node.'pasttype'('pirop')
     node.'pirop'('add')
-    node.'returns'('.String')
-    node.'islvalue'('foo')
+    node.'lvalue'('foo')
     node.'inline'('%r = add %0, %1')
     "_dumper"(node, "ast")
     .return ()
@@ -121,31 +111,24 @@ CODE
 "ast" => PMC 'PAST::Op'  {
     <pasttype> => "pirop"
     <pirop> => "add"
-    <returns> => ".String"
-    <islvalue> => "foo"
+    <lvalue> => "foo"
     <inline> => "%r = add %0, %1"
 }
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Block node in visual format' );
-.sub _main
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'Dumper.pbc'
+.sub _main :main
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'library/dumper.pbc'
     .local pmc node
     node = new 'PAST::Block'
     node.'blocktype'('declaration')
-    node.'symtable'('foo')
-    node.'compiler'('PIR')
-    node.'pragma'('anon')
     "_dumper"(node, "ast")
     .return ()
 .end
 CODE
 "ast" => PMC 'PAST::Block'  {
     <blocktype> => "declaration"
-    <symtable> => "foo"
-    <compiler> => "PIR"
-    <pragma> => "anon"
 }
 OUT
 
