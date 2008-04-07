@@ -461,7 +461,7 @@ Returns whether the object's class does the role with name C<*role_name>.
         if (!role_name)
             return 0;
 
-        /* Dispatch role to the object's class to check HLL roles first */
+        /* Dispatch to the object's class */
         return VTABLE_does(interp, VTABLE_get_class(interp, SELF), role_name);
     }
 
@@ -482,7 +482,7 @@ Returns whether the object's class does C<*role>.
         if (SUPER(role))
             return 1;
 
-        /* Dispatch role to the object's class */
+        /* Dispatch to the object's class */
         return VTABLE_does_pmc(interp, VTABLE_get_class(interp, SELF), role);
     }
 

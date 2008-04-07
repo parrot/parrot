@@ -1237,8 +1237,9 @@ Returns whether the class does the given C<*role>.
 
 */
     INTVAL does_pmc(PMC *role) {
-        INTVAL i, role_count, isa;
-        PMC * const role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
+        INTVAL i, role_count, count, isa;
+        Parrot_Class * const _class    = PARROT_CLASS(SELF);
+        PMC * const role_list          = _class->roles;
 
         if (!role_list)
             return 0;
@@ -1252,6 +1253,18 @@ Returns whether the class does the given C<*role>.
             role_does = VTABLE_does_pmc(interp, test_role, role);
 
             if (role_does)
+                return 1;
+        }
+
+        /* Iterate over all the parents and check if they respond true
+         * for 'does' on the original comparison. */
+        count = VTABLE_elements(interp, _class->parents);
+
+        for (i = 0; i < count; i++) {
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
+                    _class->parents, i);
+
+            if (VTABLE_does_pmc(interp, cur_class, role))
                 return 1;
         }
 
