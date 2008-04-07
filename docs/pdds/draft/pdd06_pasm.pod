@@ -573,37 +573,12 @@ the inline POD documentation in F<ops/var.ops>.
 
 =over 4
 
-=item new_pad ix
-
-=item new_pad Px, iy
-
-=item push_pad Px
-
-=item pop_pad
-
-=item pop_pad Px
-
-=item peek_pad Px
-
-Instructions for creating scratchpads and manipulating the lexical stack.
-
 =item store_lex sx, Py
-
-=item store_lex ix, sy, Pz
-
-=item store_lex ix, iy, Pz
 
 =item find_lex Px, sy
 
-=item find_lex Px, iy, sz
-
-=item find_lex Px, iy, iz
-
-Instructions for storing in, and retrieving from the scratchpad currently at
-the top of the lexical stack.  For each of these operations there is an
-equivalent form that uses keyed versions of the set instruction. The keyed
-variants require that a scratchpad be specified rather than implicitly
-operating on the scratchpad on the top of the stack.
+Instructions for storing in, and retrieving from, the scratchpad associated
+with the current context.
 
 =item find_global Px, sy, sz
 

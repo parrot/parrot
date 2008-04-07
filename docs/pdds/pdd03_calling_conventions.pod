@@ -54,7 +54,7 @@ C<get_results>, for accepting return values.
 FAQ: Given Parrot's internal use of continuation-passing style ["CPS"], it
 would be possible to use one pair of opcodes for both call and return, since
 under CPS returns I<are> calls.  And perhaps someday we will have only two
-opcodes.  But for now, certain efficiency hacks are easier with four opcodes.)
+opcodes.  But for now, certain efficiency hacks are easier with four opcodes.
 
 The common syntax of these opcodes is:
 
