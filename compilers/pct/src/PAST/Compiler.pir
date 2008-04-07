@@ -137,6 +137,8 @@ third and subsequent children can be any value they wish.
     cpast = shift iter
     cpost = self.'as_post'(cpast, 'rtype'=>rtype)
     ops.'push'(cpost)
+    .local pmc is_flat
+    is_flat = cpast.'flat'()
     if null posargs goto iter_rtype
     if rtype != ':' goto iter_pos
     .local pmc npast, npost
@@ -144,16 +146,27 @@ third and subsequent children can be any value they wish.
     unless npast goto iter_pos
   iter_named:
     npost = self.'as_post'(npast, 'rtype'=>'~')
-    ops.'push'(npost)
     $S0 = cpost
+    if is_flat goto flat_named
     $S1 = npost
+    ops.'push'(npost)
     concat $S0, ' :named('
     concat $S0, $S1
     concat $S0, ')'
+    goto named_done
+  flat_named:
+    concat $S0, ' :named :flat'
+  named_done:
     push namedargs, $S0
     goto iter_rtype
   iter_pos:
+    if is_flat goto flat_pos
     push posargs, cpost
+    goto iter_rtype
+  flat_pos:
+    $S0 = cpost
+    concat $S0, ' :flat'
+    push posargs, $S0
   iter_rtype:
     unless sigidx < sigmax goto iter_loop
     inc sigidx
