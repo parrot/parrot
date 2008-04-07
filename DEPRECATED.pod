@@ -147,14 +147,6 @@ Will have to be:
 
 =head1 Parrot Compiler tools
 
-=over 4
+Currently there are no deprecations.
 
-=item * compilers/PAST-pm [post 0.5.1]
-
-See RT #48030. The compiler tools in compilers/PAST-pm/ and
-runtime/parrot/library/Parrot/HLLCompiler.pir are deprecated
-in favor of the new versions in the Parrot Compiler Toolkit
-( compilers/pct/ ).  In particular, the PAST representation in
-PCT follows the specification given by pdd26 .
-
-=back
+=cut
