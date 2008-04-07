@@ -142,20 +142,6 @@ ok( $step->description(), "$step_name has description" );
         "Got expected warning");
 }
 
-#sub _set_float4 {
-#    my ($conf, $resultsref) = @_;
-#    if ( $resultsref->{floatsize} == 4 ) {
-#        $conf->data->set( float4_t => 'float' );
-#    }
-#    else {
-#        $conf->data->set( float4_t => 'double' );
-#        print <<'END';
-#
-#Can't find a float type with size 4, conversion ops might fail!
-#
-#END
-#    }
-#}
 {
     my $stdout;
     my %results = ( floatsize => 4 );
@@ -181,20 +167,6 @@ ok( $step->description(), "$step_name has description" );
         "Got expected warning");
 }
 
-#sub _set_float8 {
-#    my ($conf, $resultsref) = @_;
-#    if ( $resultsref->{doublesize} == 8 ) {
-#        $conf->data->set( float8_t => 'double' );
-#    }
-#    else {
-#        $conf->data->set( float8_t => 'double' );
-#        print <<'END';
-#
-#Can't find a float type with size 8, conversion ops might fail!
-#
-#END
-#    }
-#}
 {
     my $stdout;
     my %results = ( doublesize => 8 );
