@@ -223,7 +223,7 @@ found_dest_row:
 	.param int target_col
 	.param int storage_col
 
-	## We don't need to fetch the lexical size and 
+	## We don't need to fetch the lexical size and
 
         if n_to_move > 1 goto move_multiple
         MOVE(start_col, target_col)
