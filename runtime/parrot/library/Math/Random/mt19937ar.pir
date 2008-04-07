@@ -63,7 +63,7 @@ initializes the state vector by using one "seed", which may be zero.
     .local pmc mt
     .local int i
     mt = getattribute self, '@mt'
-    seed &= 0xffffffff 
+    seed &= 0xffffffff
     mt[0] = seed
     $I1 = seed
     i = 1
