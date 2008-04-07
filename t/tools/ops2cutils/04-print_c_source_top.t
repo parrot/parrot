@@ -74,8 +74,9 @@ sub test_print_c_source_top {
         ok( -e $c_header_file, "$c_header_file created" );
         ok( -s $c_header_file, "$c_header_file has non-zero size" );
 
-        my $SOURCE = $self->print_c_source_top();
-        is( ref($SOURCE), q{GLOB}, "Argument type is filehandle (typeglob)" );
+        my $source = IO::File->new('>' . $$self{source});
+        $self->print_c_source_top($source);
+        ok( -s $source, "print_c_source_top printed something to the file" );
     }
 }
 

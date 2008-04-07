@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 14;
+use Test::More tests => 11;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -63,16 +63,11 @@ my $cwd = cwd();
         ok( -e $c_header_file, "$c_header_file created" );
         ok( -s $c_header_file, "$c_header_file has non-zero size" );
 
-        my $SOURCE = $self->print_c_source_top();
-        is( ref($SOURCE), q{GLOB}, "Argument type is filehandle (typeglob)" );
-
-        my $c_source_final;
-        ok(
-            $c_source_final = $self->print_c_source_bottom($SOURCE),
-            "print_c_source_bottom() returned successfully"
-        );
-        ok( -e $c_source_final, "$c_source_final created" );
-        ok( -s $c_source_final, "$c_source_final has non-zero size" );
+        my $source = IO::File->new('>' . $$self{source});
+        $self->print_c_source_top($source);
+        $self->print_c_source_bottom($source);
+        $source->close();
+        ok( -s $$self{source}, "file was written" );
     }
 
     ok( chdir($cwd), "returned to starting directory" );

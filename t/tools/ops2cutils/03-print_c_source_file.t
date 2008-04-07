@@ -1,7 +1,7 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
-# 05-print_c_source_bottom.t
+# 03-print_c_source_file.t
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 27;
+use Test::More tests => 22;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -38,7 +38,6 @@ my $skip = "src/ops/ops.skip";
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
-my ( $msg, $tie );
 
 {
     my $tdir = tempdir( CLEANUP => 1 );
@@ -50,50 +49,58 @@ my ( $msg, $tie );
     unshift @INC, $tlib;
     require Parrot::Ops2c::Utils;
 
-    test_print_c_source_bottom( [qw( C )] );
-    test_print_c_source_bottom( [qw( CGoto )] );
-    test_print_c_source_bottom( [qw( CGP )] );
-    test_print_c_source_bottom( [qw( CSwitch )] );
-    test_print_c_source_bottom( [qw( C CGoto CGP CSwitch CPrederef )] );
+    test_single_trans_and_source(q{C});
+    test_single_trans_and_source(q{CGoto});
+    test_single_trans_and_source(q{CGP});
+    test_single_trans_and_source(q{CSwitch});
+
+    {
+        local @ARGV = qw( C CGoto CGP CSwitch );
+        my $self = Parrot::Ops2c::Utils->new(
+            {
+                argv => [@ARGV],
+                flag => { core => 1 },
+            }
+        );
+        ok( defined $self, "Constructor correctly returned when provided >= 1 arguments" );
+        my $c_header_file = $self->print_c_header_file();
+        ok( -e $c_header_file, "$c_header_file created" );
+        ok( -s $c_header_file, "$c_header_file has non-zero size" );
+    }
 
     ok( chdir($cwd), "returned to starting directory" );
 }
 
 pass("Completed all tests in $0");
 
-sub test_print_c_source_bottom {
-    my $local_argv_ref = shift;
-    {
-        my $self = Parrot::Ops2c::Utils->new(
-            {
-                argv => $local_argv_ref,
-                flag => { core => 1 },
-            }
-        );
-        ok( defined $self,
-            "Constructor correctly returned when provided with argument(s): @{$local_argv_ref}" );
+sub test_single_trans_and_source {
+    my $trans = shift;
+    my %available = map { $_, 1 } qw( C CGoto CGP CSwitch CPrederef );
+    croak "Bad argument $trans to test_single_trans()"
+        unless $available{$trans};
 
-        my $c_header_file = $self->print_c_header_file();
-        ok( -e $c_header_file, "$c_header_file created" );
-        ok( -s $c_header_file, "$c_header_file has non-zero size" );
+    my $self = Parrot::Ops2c::Utils->new(
+        {
+            argv => [$trans],
+            flag => { core => 1 },
+        }
+    );
+    ok( defined $self, "Constructor correct when provided with single argument $trans" );
 
-        my $source = IO::File->new('>' . $$self{source});
-        $self->print_c_source_bottom($source);
-        $source->close();
-        ok( -s $$self{source}, "print_c_source_bottom printed something to the file $$self{source}" );
-    }
+    my $c_source_file = $self->print_c_source_file();
+    ok( -e $c_source_file, "$c_source_file created" );
+    ok( -s $c_source_file, "$c_source_file has non-zero size" );
 }
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-05-print_c_source_bottom.t - test
-C<Parrot::Ops2c::Utils::print_c_source_bottom()>
+03-print_c_header_file.t - test C<Parrot::Ops2c::Utils::new()>
 
 =head1 SYNOPSIS
 
-    % prove t/tools/ops2cutils/05-print_c_source_bottom.t
+    % prove t/tools/ops2cutils/03-print_c_header_file.t
 
 =head1 DESCRIPTION
 
@@ -109,8 +116,8 @@ are B<not> part of the test suite run by F<make test>.   Once you have run
 F<Configure.pl>, however, you may run these tests as part of F<make
 buildtools_tests>.
 
-F<05-print_c_source_bottom.t> tests whether
-C<Parrot::Ops2c::Utils::print_c_source_bottom()> work properly.
+F<03-print_c_header_file.t> tests whether
+C<Parrot::Ops2c::Utils::print_c_header_file()> works properly.
 
 =head1 AUTHOR
 

@@ -30,9 +30,7 @@ if ( not defined $self ) {
 
 $self->print_c_header_file();
 
-my $SOURCE = $self->print_c_source_top();
-
-my $c_source_final = $self->print_c_source_bottom($SOURCE);
+$self->print_c_source_file();
 
 exit 0;
 
