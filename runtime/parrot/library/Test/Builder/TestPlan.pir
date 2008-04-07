@@ -25,15 +25,64 @@ Both classes support the following methods.
 
 .namespace [ 'Test'; 'Builder'; 'TestPlan' ]
 
-.sub _initialize :load
+.sub '_initialize' :load
     .local pmc tbtp_class
     newclass     tbtp_class, [ 'Test'; 'Builder'; 'TestPlan' ]
-    addattribute tbtp_class, 'expect'
+    addattribute tbtp_class, 'plan'
 
-    # XXX - can't seem to do this within its own class
+    .local pmc tbap_class
+    newclass     tbap_class, [ 'Test'; 'Builder'; 'ActivePlan' ]
+    addattribute tbap_class, 'expect'
+
     .local pmc tbnp_class
-    subclass tbnp_class, tbtp_class, [ 'Test'; 'Builder'; 'NullPlan' ]
+    subclass tbnp_class, tbap_class, [ 'Test'; 'Builder'; 'NullPlan' ]
 .end
+
+.sub 'init' :vtable :method
+    .local pmc plan
+    plan = new [ 'Test'; 'Builder'; 'NullPlan' ]
+    setattribute self, 'plan', plan
+.end
+
+.sub 'init_pmc' :vtable :method
+    .param pmc args
+
+    .local pmc plan
+    plan = new [ 'Test'; 'Builder'; 'ActivePlan' ], args
+    setattribute self, 'plan', plan
+.end
+
+.sub 'set_tests' :method
+    .param int tests
+
+    .local pmc plan
+    plan = getattribute self, 'plan'
+
+    $I0 = isa plan, [ 'Test'; 'Builder'; 'NullPlan' ]
+    unless $I0 goto delegate_plan
+
+    plan = new [ 'Test'; 'Builder'; 'ActivePlan' ]
+    setattribute self, 'plan', plan
+
+  delegate_plan:
+    plan.'set_tests'( tests )
+.end
+
+.sub 'header' :method
+    .local pmc plan
+    plan = getattribute self, 'plan'
+    .return plan.'header'()
+.end
+
+.sub 'footer' :method
+    .param int ran
+
+    .local pmc plan
+    plan = getattribute self, 'plan'
+    .return plan.'footer'( ran )
+.end
+
+.namespace [ 'Test'; 'Builder'; 'ActivePlan' ]
 
 =item C<new( args_hash )>
 
@@ -44,7 +93,13 @@ Test::Builder::NullPlan object, do not pass the hash.
 
 =cut
 
-.sub init_pmc :vtable :method
+.sub 'init' :vtable :method
+    .local pmc expect
+    expect = new 'Integer'
+    setattribute self, 'expect', expect
+.end
+
+.sub 'init_pmc' :vtable :method
     .param pmc args
 
     .local int valid_args
@@ -70,7 +125,33 @@ Test::Builder::NullPlan object, do not pass the hash.
     .local pmc intvalue
     intvalue = new 'Integer'
     intvalue = expect
-    setattribute self, "expect", intvalue
+    setattribute self, 'expect', intvalue
+.end
+
+=item C<set_tests()>
+
+Sets the number of expected tests; throws an exception if you've already done
+this.
+
+=cut
+
+.sub 'set_tests' :method
+    .param int tests
+
+    .local pmc expect
+    expect = getattribute self, 'expect'
+
+    $I0 = expect
+    if $I0 goto double_set_exception
+
+    expect = tests
+    .return()
+
+  double_set_exception:
+    .local pmc exception
+    exception            = new 'Exception'
+    exception['message'] = 'Tried to set the test plan when it already exists'
+    throw exception
 .end
 
 =item C<header()>
@@ -80,7 +161,7 @@ plan.
 
 =cut
 
-.sub header :method
+.sub 'header' :method
     .local string expect
     .local string header
 
@@ -101,7 +182,7 @@ plan.
 
 =cut
 
-.sub footer :method
+.sub 'footer' :method
     .param int    ran
 
     .local int    expect
@@ -129,13 +210,13 @@ plan.
 
 .namespace [ 'Test'; 'Builder'; 'NullPlan' ]
 
-.sub header :method
+.sub 'header' :method
     .local string header
     header = ''
     .return( header )
 .end
 
-.sub footer :method
+.sub 'footer' :method
     .param int tests_run
 
     .local string tests_run_string

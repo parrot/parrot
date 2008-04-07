@@ -45,7 +45,7 @@ This class defines the following methods:
 
 .namespace [ 'Test'; 'Builder' ]
 
-.sub _initialize :load
+.sub '_initialize' :load
     load_bytecode 'library/Test/Builder/Test.pbc'
     load_bytecode 'library/Test/Builder/Output.pbc'
     load_bytecode 'library/Test/Builder/TestPlan.pbc'
@@ -88,7 +88,7 @@ the same state.
 
 =cut
 
-.sub init :vtable :method
+.sub 'init' :vtable :method
     .local pmc args
     .local pmc output
     .local pmc testplan
@@ -98,7 +98,7 @@ the same state.
     self.'_assign_args'( output, testplan, results )
 .end
 
-.sub init_pmc :vtable :method
+.sub 'init_pmc' :vtable :method
     .param pmc args
     .local pmc output
     .local pmc testplan
@@ -108,14 +108,14 @@ the same state.
     self.'_assign_args'( output, testplan, results )
 .end
 
-.sub _assign_args :method
+.sub '_assign_args' :method
     .param pmc output
     .param pmc testplan
     .param pmc results
 
-    setattribute self, "output", output
-    setattribute self, "testplan", testplan
-    setattribute self, "results", results
+    setattribute self, 'output', output
+    setattribute self, 'testplan', testplan
+    setattribute self, 'results', results
 
     results = self.'results'()
 .end
@@ -127,7 +127,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
 
 =cut
 
-.sub create
+.sub 'create'
     .param pmc args
 
     .local pmc output
@@ -150,11 +150,9 @@ This probably doesn't work correctly yet, but you will probably never use it.
     goto TESTPLAN_DEFINED
 
   DEFAULT_TESTPLAN:
-    testplan   = new 'String'
-    testplan   = ''
+    testplan   = new [ 'Test'; 'Builder'; 'TestPlan' ]
 
   TESTPLAN_DEFINED:
-
     results    = new 'ResizablePMCArray'
 
     .local pmc test
@@ -164,7 +162,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     .return( test )
 .end
 
-.sub _assign_default_args :method
+.sub '_assign_default_args' :method
     .param pmc args
 
     .local pmc single
@@ -206,8 +204,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     goto TESTPLAN_DEFINED
 
   CREATE_TESTPLAN:
-    testplan   = new 'String'
-    testplan   = 'global_testplan'
+    testplan   = new [ 'Test'; 'Builder'; 'TestPlan' ]
 
   TESTPLAN_DEFINED:
     is_defined = defined results
@@ -221,7 +218,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     .return( output, testplan, results )
 .end
 
-.sub output :method
+.sub 'output' :method
     .local pmc output
 
     getattribute output, self, "output"
@@ -229,15 +226,13 @@ This probably doesn't work correctly yet, but you will probably never use it.
     .return( output )
 .end
 
-.sub testplan :method
+.sub 'testplan' :method
     .local pmc testplan
-
-    getattribute testplan, self, "testplan"
-
+    testplan = getattribute self, 'testplan'
     .return( testplan )
 .end
 
-.sub results :method
+.sub 'results' :method
     .local pmc results
 
     getattribute results, self, "results"
@@ -256,7 +251,7 @@ where "too many" means "more than one".
 
 =cut
 
-.sub finish :method
+.sub 'finish' :method
     .local pmc output
     .local pmc testplan
     .local pmc results
@@ -289,81 +284,30 @@ declared a plan or if you pass an invalid argument.
 
 =cut
 
-.sub plan :method
+.sub 'plan' :method
     .param string tests
 
     .local pmc testplan
     testplan = self.'testplan'()
 
-    .local int vivify_global_testplan
-    .local int is_defined
-
-    .local int is_equal
-    .local int is_plan
-
-    is_plan = isa testplan, [ 'Test'; 'Builder'; 'TestPlan' ]
-    if is_plan == 1 goto CHECK_REPLAN
-    eq_str testplan, 'global_testplan', SET_GLOBAL_TESTPLAN
-    goto CHECK_REPLAN
-
-  SET_GLOBAL_TESTPLAN:
-    vivify_global_testplan = 1
-    goto CHECK_TESTNUM
-
-  CHECK_REPLAN:
-    .local int valid_tp
-    valid_tp = does testplan, [ 'Test'; 'Builder'; 'TestPlan' ]
-
-    unless valid_tp goto CHECK_TESTNUM
-
-    .local pmc plan_exception
-    plan_exception = new 'Exception'
-    plan_exception['_message'] = 'Plan already set!'
-    throw plan_exception
-
-  CHECK_TESTNUM:
-    if tests == 'no_plan' goto PLAN_NULL
+    eq tests, 'no_plan', write_header
 
     .local int num_tests
     num_tests = tests
 
-    unless num_tests goto PLAN_FAILURE
+    unless num_tests goto write_header
 
-    .local pmc args
+    testplan.'set_tests'( num_tests )
 
-    args = new 'Hash'
-    args['expect'] = num_tests
-
-    testplan = new [ 'Test'; 'Builder'; 'TestPlan' ], args
-    goto FINISH_PLAN
-
-  CHECK_EXPLANATION:
-    goto PLAN_FAILURE
-
-  PLAN_NULL:
-    testplan = new [ 'Test'; 'Builder'; 'NullPlan' ]
-    goto FINISH_PLAN
-
-  PLAN_FAILURE:
-    .local pmc plan_exception
-    plan_exception = new 'Exception'
-    plan_exception['_message'] = 'Unknown test plan!'
-    throw plan_exception
-
-  FINISH_PLAN:
-    unless vivify_global_testplan goto WRITE_HEADER
-    store_global [ 'Test'; 'Builder'; '_singleton' ], 'testplan', testplan
-
-  WRITE_HEADER:
+  write_header:
     .local pmc output
     output = self.'output'()
 
     .local string header
     header = testplan.'header'()
+    output.'write'( header )
 
-    setattribute self, "testplan", testplan
-
-    output.write( header )
+    .return()
 .end
 
 =item C<diag( diagnostic_message )>
@@ -372,7 +316,7 @@ Records a diagnostic message for output.
 
 =cut
 
-.sub diag :method
+.sub 'diag' :method
     .param string diagnostic
 
     if diagnostic goto DIAGNOSTIC_SET
@@ -391,7 +335,7 @@ recording it with the optional test description in C<description>.
 
 =cut
 
-.sub ok :method
+.sub 'ok' :method
     .param int    passed
     .param string description     :optional
     .param int    has_description :opt_flag
@@ -427,7 +371,7 @@ TODO.
 
 =cut
 
-.sub todo :method
+.sub 'todo' :method
     .param int    passed
     .param string description     :optional
     .param int    has_description :opt_flag
@@ -469,7 +413,7 @@ why you've skipped them.
 
 =cut
 
-.sub skip :method
+.sub 'skip' :method
     .param int    number          :optional
     .param int    has_number      :opt_flag
     .param string reason          :optional
@@ -518,7 +462,7 @@ plan.  This calls C<exit>; there's little point in continuing.
 
 =cut
 
-.sub skip_all :method
+.sub 'skip_all' :method
     .local pmc testplan
     testplan = self.'testplan'()
 
@@ -543,7 +487,7 @@ also calls C<exit>.
 
 =cut
 
-.sub BAILOUT :method
+.sub 'BAILOUT' :method
     .param string reason  :optional
     .param int has_reason :opt_flag
 
@@ -563,22 +507,12 @@ also calls C<exit>.
     exit 0
 .end
 
-.sub report_test :method
+.sub 'report_test' :method
     .param pmc test_args
 
     .local pmc testplan
     testplan = self.'testplan'()
 
-    .local int plan_ok
-    plan_ok = isa testplan, [ 'Test'; 'Builder'; 'TestPlan' ]
-    if plan_ok goto CREATE_TEST
-
-    .local pmc plan_exception
-    plan_exception = new 'Exception'
-    plan_exception['_message'] = 'No plan set!'
-    throw plan_exception
-
-  CREATE_TEST:
     .local pmc results
     results = self.'results'()
 
