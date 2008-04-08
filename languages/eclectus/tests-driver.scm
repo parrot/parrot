@@ -40,7 +40,7 @@
                 ((null? tests) (f i ls))
                 (else
                  (test-one i (car tests) test-name)
-                 (g (add1 i) (cdr tests))))))))))
+                 (g (+ i 1) (cdr tests))))))))))
 
 (define compile-port
   (make-parameter
@@ -60,15 +60,15 @@
 
 ; TODO: can I use (directory-separator) in petite?
 (define *path-to-parrot*
-  (if (fxzero? (system "perl -e \"exit($^O eq q{MSWin32} ? 1 : 0)\""))
+  (if (zero? (system "perl -e \"exit($^O eq q{MSWin32} ? 1 : 0)\""))
     "../../parrot"
     "..\\..\\parrot"))
 
 (define (execute)
   (if run-with-petite
-    (unless (fxzero? (system "petite --script stst.scm > stst.out"))
+    (unless (zero? (system "petite --script stst.scm > stst.out"))
       (error 'execute "produced program exited abnormally"))
-    (unless (fxzero? (system (string-append *path-to-parrot* " stst.pir > stst.out")))
+    (unless (zero? (system (string-append *path-to-parrot* " stst.pir > stst.out")))
       (error 'execute "produced program exited abnormally"))))
 
 (define (get-string)
@@ -86,8 +86,8 @@
    (run-compile expr)
    (execute)
    (if (string=? expected-output (get-string))
-     (pass ( + test-id 1 ) (format "~a: ~a" test-name expr))
-     (fail ( + test-id 1 ) (format "~a: expected ~s, got ~a" test-name expr (get-string) ))))
+     (pass ( + test-id 1 ) (format #f "~a: ~a" test-name expr))
+     (fail ( + test-id 1 ) (format #f "~a: expected ~s, got ~a" test-name expr (get-string) ))))
 
 (define (emit . args)
   (apply fprintf (compile-port) args)

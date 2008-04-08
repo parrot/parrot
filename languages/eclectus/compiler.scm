@@ -159,32 +159,27 @@
 
 ; Support for primitive functions
 
-; is x a primitive?
-(define primitive?
-  (lambda (x)
-    (and (symbol? x)
-         (getprop x '*is-prim*))))
+(define-record primitive (arg-count emitter))
+
+(define *primitives* (make-eq-hashtable))
+
+(define (lookup-primitive sym)
+  (hashtable-ref *primitives* sym #f))
 
 ; is x a call to a primitive? 
 (define primcall?
   (lambda (x)
-    (and (pair? x)
-         (primitive? (car x)))))
+    (and (pair? x) (lookup-primitive (car x)))))
 
-; a primitive function is a symbol with the properties
-; *is-prim*, *arg-count* and *emitter*
 ; implementatus of primitive functions are added
 ; with 'define-primitive'
 (define-syntax define-primitive
   (syntax-rules ()
     ((_ (prim-name arg* ...) b b* ...)
-     (begin
-        (putprop 'prim-name '*is-prim*
-          #t)
-        (putprop 'prim-name '*arg-count*
-          (length '(arg* ...)))
-        (putprop 'prim-name '*emitter*
-          (lambda (arg* ...) b b* ...))))))
+     (hashtable-set! *primitives*
+                     'prim-name
+                     (make-primitive (length '(arg* ...))
+                                     (lambda (arg* ...) b b* ...))))))
 
 ; implementation of fxadd1
 (define-primitive (fxadd1 arg)
@@ -319,7 +314,7 @@
      '(@ (pasttype "if"))
      (past::op
       (quasiquote (@ (pasttype "inline")
-                     (inline (unquote (format "new %r, 'EclectusBoolean'\\nisa $I1, %0, '~a'\\n %r = $I1" typename)))))
+                     (inline (unquote (format #f "new %r, 'EclectusBoolean'\\nisa $I1, %0, '~a'\\n %r = $I1" typename)))))
       (emit-expr arg))
      (emit-expr #t)
      (emit-expr #f))))
@@ -341,11 +336,6 @@
 
 
 
-; a getter of '*emitter*'
-(define primitive-emitter
-  (lambda (x)
-    (getprop x '*emitter*)))
-
 (define emit-function-header
   (lambda (function-name)
     (emit (string-append ".sub " function-name))))
@@ -359,7 +349,7 @@
 
 (define emit-primcall
   (lambda (x)
-    (let ((prim (car x)) (args (cdr x)))
+    (let ((prim (lookup-primitive (car x))) (args (cdr x)))
       (apply (primitive-emitter prim) args))))
 
 (define emit-functional-application
@@ -395,7 +385,7 @@
                       (scope "lexical")
                       (viviself "Undef"))))
       ((string? x)
-       (quasiquote (@ (value (unquote (format "'~a'" x)))
+       (quasiquote (@ (value (unquote (format #f "'~a'" x)))
                       (returns "EclectusString"))))
       ((vector? x)
        (quasiquote (@ (value "'#0()'")

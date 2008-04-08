@@ -29,9 +29,10 @@ use 5.008;
 use lib qw( ../lib ../../lib ../../lib );
 
 use Parrot::Test::Harness
-    language => 'eclectus',
-    exec     => [ 'petite', '--script' ],
-    files    => [ 't/*.pl' ];
+  language => 'eclectus',
+  exec     => [ 'petite', '--script' ],
+  #exec     => [ 'guile', '--debug', '-l', 'guile/prelude.scm', '-s' ],
+  files    => [ 't/*.pl' ];
 
 =head1 SEE ALSO
 

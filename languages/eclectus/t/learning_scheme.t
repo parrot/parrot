@@ -6,24 +6,15 @@
 ; It is just a playgroud for trying out Scheme syntax
 
 ; set up TAP test plan
-(plan 17)
+(plan 15)
 
 (define test-num 1)
 (pass test-num "form definition")
 
-; object properties are something like Perl hashes
-(putprop 'parrot 'wing "feather")
-
-(define desc "getprop equals")
-(set! test-num (add1 test-num))
-(if (string=? (getprop 'parrot 'wing) "feather")       (pass test-num desc) (fail test-num desc)) 
-
-(define desc "getprop not equal")
-(set! test-num (add1 test-num))
-(if (string=? (getprop 'parrot 'wing) "not a feather") (fail test-num desc) (pass test-num desc)) 
-
 ; and
 (define desc "and")
+
+(define (add1 x) (+ x 1))
 
 (set! test-num (add1 test-num))
 ( if (and #t #t) (pass test-num desc) (fail test-num desc)) 
