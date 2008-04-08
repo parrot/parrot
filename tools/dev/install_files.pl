@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 ################################################################################
 
@@ -167,7 +167,7 @@ while (<>) {
     $meta =~ s/^\[(.*?)\]//;
     next unless $package;    # Skip if this file belongs to no package
 
-    next unless $package =~ /main|library/;    # RT#46911 -lt
+    next unless $package =~ /main|library/;
 
     my %meta;
     @meta{ split( /,/, $meta ) } = ();
