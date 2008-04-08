@@ -48,6 +48,19 @@ L<http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/emt19937ar.html>.
 .end
 
 
+.sub 'clone' :vtable :method
+    .local pmc res
+    res = new [ 'Math'; 'Random'; 'MT' ]
+    $P0 = getattribute self, '$mti'
+    $P1 = clone $P0
+    setattribute res, '$mti', $P1
+    $P0 = getattribute self, '@mt'
+    $P1 = clone $P0
+    setattribute res, '@mt', $P1
+    .return (res)
+.end
+
+
 =head2 Initialization
 
 =over 4
@@ -290,7 +303,6 @@ generates a random number on [0,1]-real-interval
     unless $I0 < 0 goto L1
     $N0 += 4294967296.0
   L1:
-    $N0 = $I0
     $N0 /= 4294967295.0   # divided by 2^32-1
     .return ($N0)
 .end
@@ -325,7 +337,6 @@ generates a random number on (0,1)-real-interval
     unless $I0 < 0 goto L1
     $N0 += 4294967296.0
   L1:
-    $N0 = $I0
     $N0 += 0.5
     $N0 /= 4294967296.0   # divided by 2^32
     .return ($N0)
