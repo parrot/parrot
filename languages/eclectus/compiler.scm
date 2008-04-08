@@ -10,6 +10,20 @@
   (set! counter (+ 1 counter))
   counter)
 
+(define (make-past-conser type)
+  (let ((type-symbol (string->symbol type)))
+    (lambda args
+      (cons type-symbol args))))
+
+(define past::op (make-past-conser "PAST::Op"))
+(define past::val (make-past-conser "PAST::Val"))
+(define past::var (make-past-conser "PAST::Var"))
+(define past::block (make-past-conser "PAST::Block"))
+(define past::stmts
+  (let ((type-symbol (string->symbol "PAST::Stmts")))
+    (lambda (stmts)
+      (cons type-symbol stmts))))
+
 ; Emit PIR that loads libs
 (define emit-init
   (lambda ()
@@ -174,110 +188,83 @@
 
 ; implementation of fxadd1
 (define-primitive (fxadd1 arg)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pirop "n_add"))
-    (emit-expr arg)
-    (emit-expr 1)))
+  (past::op '(@ (pirop "n_add"))
+            (emit-expr arg)
+            (emit-expr 1)))
 
 ; implementation of fx+
 (define-primitive (fx+ arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pirop "n_add"))
-    (emit-expr arg1)
-    (emit-expr arg2)))
+  (past::op '(@ (pirop "n_add"))
+            (emit-expr arg1)
+            (emit-expr arg2)))
 
 ; implementation of fxsub1
 (define-primitive (fxsub1 arg)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pirop "n_sub"))
-    (emit-expr arg)
-    (emit-expr 1)))
+  (past::op
+        '(@ (pirop "n_sub"))
+        (emit-expr arg)
+        (emit-expr 1)))
 
 ; implementation of fx-
 (define-primitive (fx- arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pirop "n_sub"))
-    (emit-expr arg1)
-    (emit-expr arg2)))
+  (past::op '(@ (pirop "n_sub"))
+            (emit-expr arg1)
+            (emit-expr arg2)))
 
 ; implementation of fxlogand
 (define-primitive (fxlogand arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pirop "n_band"))
-    (emit-expr arg1)
-    (emit-expr arg2)))
+  (past::op '(@ (pirop "n_band"))
+            (emit-expr arg1)
+            (emit-expr arg2)))
 
 ; implementation of fxlogor
 (define-primitive (fxlogor arg1 arg2)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pirop "n_bor"))
-    (emit-expr arg1)
-    (emit-expr arg2)))
+  (past::op '(@ (pirop "n_bor"))
+            (emit-expr arg1)
+            (emit-expr arg2)))
 
 ; implementation of char->fixnum
 (define-primitive (char->fixnum arg)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pasttype "inline")
-                   (inline "new %r, 'EclectusFixnum'\\nassign %r, %0\\n"))
-    (emit-expr arg)))
+  (past::op '(@ (pasttype "inline")
+                (inline "new %r, 'EclectusFixnum'\\nassign %r, %0\\n"))
+            (emit-expr arg)))
 
 ; implementation of fixnum->char
 (define-primitive (fixnum->char arg)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pasttype "inline")
-                   (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n"))
-    (emit-expr arg)))
+  (past::op '(@ (pasttype "inline")
+                (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n"))
+            (emit-expr arg)))
 
 ; implementation of cons
 (define-primitive (cons arg1 arg2)
-  (list
-    (string->symbol "PAST::Var")
-    '(@ (viviself "EclectusPair")
-        (name "%dummy")
-        (isdecl 1)
-        (scope "lexical"))
-    (list
-      (string->symbol "PAST::Op")
-      '(@ (name "infix:,"))
-      (emit-expr arg1)
-      (emit-expr arg2))))
+  (past::var '(@ (viviself "EclectusPair")
+                 (name "%dummy")
+                 (isdecl 1)
+                 (scope "lexical"))
+             (past::op '(@ (name "infix:,"))
+                       (emit-expr arg1)
+                       (emit-expr arg2))))
 
 ; implementation of car
 (define-primitive (car arg)
-  (list
-    (string->symbol "PAST::Op")
-    '(@ (pasttype "inline")
-        (inline "%r = %0.'key'()\\n"))
-    (emit-expr arg)))
+  (past::op '(@ (pasttype "inline")
+                (inline "%r = %0.'key'()\\n"))
+            (emit-expr arg)))
 
 ; implementation of cdr
 (define-primitive (cdr arg)
-  (list
-    (string->symbol "PAST::Val")
-    '(@ (value 31)
-        (returns "EclectusFixnum"))))
+  (past::val '(@ (value 31)
+                 (returns "EclectusFixnum"))))
 
 (define emit-comparison
   (lambda (builtin arg1 arg2)
-    (list
-      (string->symbol "PAST::Op")
-      '(@ (pasttype "if"))
-      (list
-        (string->symbol "PAST::Op")
-        (quasiquote (@ (pasttype "chain")
-                       (name (unquote builtin))))
-        (emit-expr arg1)
-        (emit-expr arg2))
-      (emit-expr #t)
-      (emit-expr #f))))
+    (past::op '(@ (pasttype "if"))
+              (past::op (quasiquote (@ (pasttype "chain")
+                                       (name (unquote builtin))))
+                        (emit-expr arg1)
+                        (emit-expr arg2))
+              (emit-expr #t)
+              (emit-expr #f))))
 
 ; implementation of char<
 (define-primitive (char< arg1 arg2)
@@ -328,16 +315,14 @@
 ; asking for the type of an object
 (define emit-typequery
   (lambda (typename arg)
-    (list
-      (string->symbol "PAST::Op")
-      '(@ (pasttype "if"))
-      (list
-        (string->symbol "PAST::Op")
-        (quasiquote (@ (pasttype "inline")
-                       (inline (unquote (format "new %r, 'EclectusBoolean'\\nisa $I1, %0, '~a'\\n %r = $I1" typename)))))
-        (emit-expr arg))
-      (emit-expr #t)
-      (emit-expr #f))))
+    (past::op
+     '(@ (pasttype "if"))
+     (past::op
+      (quasiquote (@ (pasttype "inline")
+                     (inline (unquote (format "new %r, 'EclectusBoolean'\\nisa $I1, %0, '~a'\\n %r = $I1" typename)))))
+      (emit-expr arg))
+     (emit-expr #t)
+     (emit-expr #f))))
    
 (define-primitive (boolean? arg)
   (emit-typequery "EclectusBoolean" arg))
@@ -380,44 +365,41 @@
 (define emit-functional-application
   (lambda (x)
     (append
-      (list  
-        (string->symbol "PAST::Op")
-        '(@ (pasttype "call"))
-        (emit-expr (car x)))
+      (past::op '(@ (pasttype "call"))
+                (emit-expr (car x)))
       (map
-        (lambda (arg)
-          (emit-expr arg))
-        (cdr x)))))
+       (lambda (arg)
+         (emit-expr arg))
+       (cdr x)))))
 
 
 ; emit PIR for a scalar
 (define emit-atom
   (lambda (x)
-    (list
-      (string->symbol (if (symbol? x) "PAST::Var" "PAST::Val"))
-      (cond
-        [(fixnum? x)
-         (quasiquote (@ (value (unquote x))
-                        (returns "EclectusFixnum")))]
-        [(char? x)
-         (quasiquote (@ (value (unquote (char->integer x)))
-                        (returns "EclectusCharacter")))]
-        [(null? x)
-         '(@ (value 0)
-             (returns "EclectusEmptyList"))]
-        [(boolean? x)
-         (quasiquote (@ (value (unquote (if x 1 0)))
-                        (returns "EclectusBoolean")))]
-        [(symbol? x)
-         (quasiquote (@ (name (unquote x))
-                        (scope "lexical")
-                        (viviself "Undef")))]
-        [(string? x)
-         (quasiquote (@ (value (unquote (format "'~a'" x)))
-                        (returns "EclectusString")))]
-        [(vector? x)
-         (quasiquote (@ (value "'#0()'")
-                        (returns "EclectusString")))]))))
+    ((if (symbol? x) past::var past::val)
+     (cond
+      [(fixnum? x)
+       (quasiquote (@ (value (unquote x))
+                      (returns "EclectusFixnum")))]
+      [(char? x)
+       (quasiquote (@ (value (unquote (char->integer x)))
+                      (returns "EclectusCharacter")))]
+      [(null? x)
+       '(@ (value 0)
+           (returns "EclectusEmptyList"))]
+      [(boolean? x)
+       (quasiquote (@ (value (unquote (if x 1 0)))
+                      (returns "EclectusBoolean")))]
+      [(symbol? x)
+       (quasiquote (@ (name (unquote x))
+                      (scope "lexical")
+                      (viviself "Undef")))]
+      [(string? x)
+       (quasiquote (@ (value (unquote (format "'~a'" x)))
+                      (returns "EclectusString")))]
+      [(vector? x)
+       (quasiquote (@ (value "'#0()'")
+                      (returns "EclectusString")))]))))
 
 (define bindings
   (lambda (x)
@@ -429,11 +411,9 @@
 
 (define emit-variable
   (lambda (x)
-    (list
-      (string->symbol "PAST::Var")
-      (quasiquote (@ (name (unquote x))
-                     (scope "lexical")
-                     (viviself "Undef"))))))
+    (past::var (quasiquote (@ (name (unquote x))
+                              (scope "lexical")
+                              (viviself "Undef"))))))
 
 (define emit-let
   (lambda (binds body)
@@ -441,56 +421,46 @@
       (emit-expr body)
       (begin
         (append
-          (cons
-            (string->symbol "PAST::Stmts")
-            (map 
-              (lambda (decl)
-                (list
-                  (string->symbol "PAST::Op")
-                  '(@ (pasttype "copy")
-                      (lvalue "1"))
-                  (list
-                    (string->symbol "PAST::Var")
-                    (quasiquote (@ (name (unquote (car decl)))
-                                   (scope "lexical")
-                                   (viviself "Undef")
-                                   (isdecl 1))))
-                  (emit-expr (cadr decl))))
-              binds))
+          (past::stmts
+           (map 
+            (lambda (decl)
+              (past::op
+               '(@ (pasttype "copy")
+                   (lvalue "1"))
+               (past::var
+                (quasiquote (@ (name (unquote (car decl)))
+                               (scope "lexical")
+                               (viviself "Undef")
+                               (isdecl 1))))
+               (emit-expr (cadr decl))))
+            binds))
           (list
-            (emit-expr body)))))))
+           (emit-expr body)))))))
 
 (define emit-if
   (lambda (x)
-    (list
-      (string->symbol "PAST::Op")
-      '(@ (pasttype "if"))
-      (emit-expr (if-test x))
-      (emit-expr (if-conseq x))
-      (emit-expr (if-altern x)))))
+    (past::op
+     '(@ (pasttype "if"))
+     (emit-expr (if-test x))
+     (emit-expr (if-conseq x))
+     (emit-expr (if-altern x)))))
 
 (define emit-lambda
   (lambda (x)  
     ; (write (list "all" x "decl" (cadr x) "stmts" (cddr x) ))(newline)
-    (list
-      (string->symbol "PAST::Block")
-      (quasiquote (@ (blocktype "declaration")
-                     (arity (unquote (length (cadr x))))))
-      (cons
-        (string->symbol "PAST::Stmts")
-        (map
-          (lambda (decl)
-            (list
-              (string->symbol "PAST::Var")
-              (quasiquote (@ (name (unquote decl))
-                             (scope "parameter")))))
-          (cadr x)))
-      (cons
-        (string->symbol "PAST::Stmts")
-        (map
-          (lambda (stmt)
-            (emit-expr stmt))
-          (cddr x))))))
+    (past::block
+     (quasiquote (@ (blocktype "declaration")
+                    (arity (unquote (length (cadr x))))))
+     (past::stmts (map
+                   (lambda (decl)
+                     (past::var
+                      (quasiquote (@ (name (unquote decl))
+                                     (scope "parameter")))))
+                   (cadr x)))
+     (past::stmts (map
+                   (lambda (stmt)
+                     (emit-expr stmt))
+                   (cddr x))))))
 
 ; emir PIR for an expression
 (define emit-expr
@@ -577,11 +547,10 @@
 ; print the result of the evaluation
 (define wrap-say
   (lambda (past)
-    (list
-      (string->symbol "PAST::Op")
-      '(@ (pasttype "call")
-          (name "say"))
-      past)))
+    (past::op
+     '(@ (pasttype "call")
+         (name "say"))
+     past)))
 
 ; the actual compiler
 (define compile-program
