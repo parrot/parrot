@@ -96,7 +96,7 @@ sub new {
         $self->new_group(
             'Utilities',
             '',
-            $self->new_item( '', 'tools/build/list_unjitted.pl' ),
+            $self->new_item( '', 'tools/dev/list_unjitted.pl' ),
             $self->new_item( '', 'tools/dev/gen_class.pl' ),
             $self->new_item( '', 'tools/dev/nm.pl' ),
             $self->new_item( '', 'tools/util/ncidef2pasm.pl' ),
