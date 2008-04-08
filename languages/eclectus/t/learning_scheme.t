@@ -46,15 +46,15 @@
 ; play with tree transformation
 (define-syntax my-and
   (syntax-rules ()
-    [(_)              #t]
-    [(_ e)            e]
-    [(_ e1 e2 e3 ...) ( if e1 (my-and e2 e3 ...) #f )]))
+    ((_)              #t)
+    ((_ e)            e)
+    ((_ e1 e2 e3 ...) ( if e1 (my-and e2 e3 ...) #f ))))
 
 (define-syntax my-or
   (syntax-rules ()
-    [(_)              #f]
-    [(_ e)            e]
-    [(_ e1 e2 e3 ...) ( if e1 e1 (my-or e2 e3 ...) )]))
+    ((_)              #f)
+    ((_ e)            e)
+    ((_ e1 e2 e3 ...) ( if e1 e1 (my-or e2 e3 ...) ))))
 
 ; and
 (define desc "my-and")

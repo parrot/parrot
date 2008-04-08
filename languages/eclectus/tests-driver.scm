@@ -9,38 +9,38 @@
 
 (define-syntax add-tests-with-string-output
   (syntax-rules (=>)
-    [(_ test-name [expr => output-string] ...)
+    ((_ test-name (expr => output-string) ...)
      (set! all-tests
         (cons 
-           '(test-name [expr string  output-string] ...)
-            all-tests))]))
+           '(test-name (expr string  output-string) ...)
+            all-tests)))))
 
 (define (test-one test-id test test-name)
-  (let ([expr (car test)]
-        [type (cadr test)]
-        [out  (caddr test)])
+  (let ((expr (car test))
+        (type (cadr test))
+        (out  (caddr test)))
     (flush-output-port)
     (case type
-     [(string) (test-with-string-output test-id expr out test-name)]
-     [else (error 'test "invalid test type ~s" type)])))
+     ((string) (test-with-string-output test-id expr out test-name))
+     (else (error 'test "invalid test type ~s" type)))))
  
 (define (test-all)
   (plan (length (cdar all-tests)))
 
   ;; run the tests
-  (let f ([i 0] [ls (reverse all-tests)])
+  (let f ((i 0) (ls (reverse all-tests)))
     (if (null? ls)
         (printf "")   ; XXX remove this
-        (let ([x (car ls)] [ls (cdr ls)])
-          (let* ([test-name (car x)] 
-                 [tests (cdr x)]
-                 [n (length tests)])
-            (let g ([i i] [tests tests])
+        (let ((x (car ls)) (ls (cdr ls)))
+          (let* ((test-name (car x)) 
+                 (tests (cdr x))
+                 (n (length tests)))
+            (let g ((i i) (tests tests))
               (cond
-                [(null? tests) (f i ls)]
-                [else
+                ((null? tests) (f i ls))
+                (else
                  (test-one i (car tests) test-name)
-                 (g (add1 i) (cdr tests))])))))))
+                 (g (add1 i) (cdr tests))))))))))
 
 (define compile-port
   (make-parameter
@@ -53,8 +53,8 @@
 (define (run-compile expr)
   (if run-with-petite
     (with-output-to-file "stst.scm" (lambda () (write expr)))
-    (let ([p (open-output-file "stst.pir" 'replace)])
-      (parameterize ([compile-port p])
+    (let ((p (open-output-file "stst.pir" 'replace)))
+      (parameterize ((compile-port p))
          (compile-program expr))
       (close-output-port p))))
 
@@ -77,10 +77,10 @@
       (with-input-from-file "stst.out"
         (lambda ()
           (let f ()
-            (let ([c (read-char)])
+            (let ((c (read-char)))
               (cond
-               [(eof-object? c) (void)]
-               [else (display c) (f)]))))))))
+               ((eof-object? c) (void))
+               (else (display c) (f))))))))))
 
 (define (test-with-string-output test-id expr expected-output test-name)
    (run-compile expr)

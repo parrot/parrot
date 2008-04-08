@@ -177,14 +177,14 @@
 ; with 'define-primitive'
 (define-syntax define-primitive
   (syntax-rules ()
-    [(_ (prim-name arg* ...) b b* ...)
+    ((_ (prim-name arg* ...) b b* ...)
      (begin
         (putprop 'prim-name '*is-prim*
           #t)
         (putprop 'prim-name '*arg-count*
           (length '(arg* ...)))
         (putprop 'prim-name '*emitter*
-          (lambda (arg* ...) b b* ...)))]))
+          (lambda (arg* ...) b b* ...))))))
 
 ; implementation of fxadd1
 (define-primitive (fxadd1 arg)
@@ -359,7 +359,7 @@
 
 (define emit-primcall
   (lambda (x)
-    (let ([prim (car x)] [args (cdr x)])
+    (let ((prim (car x)) (args (cdr x)))
       (apply (primitive-emitter prim) args))))
 
 (define emit-functional-application
@@ -378,28 +378,28 @@
   (lambda (x)
     ((if (symbol? x) past::var past::val)
      (cond
-      [(fixnum? x)
+      ((fixnum? x)
        (quasiquote (@ (value (unquote x))
-                      (returns "EclectusFixnum")))]
-      [(char? x)
+                      (returns "EclectusFixnum"))))
+      ((char? x)
        (quasiquote (@ (value (unquote (char->integer x)))
-                      (returns "EclectusCharacter")))]
-      [(null? x)
+                      (returns "EclectusCharacter"))))
+      ((null? x)
        '(@ (value 0)
-           (returns "EclectusEmptyList"))]
-      [(boolean? x)
+           (returns "EclectusEmptyList")))
+      ((boolean? x)
        (quasiquote (@ (value (unquote (if x 1 0)))
-                      (returns "EclectusBoolean")))]
-      [(symbol? x)
+                      (returns "EclectusBoolean"))))
+      ((symbol? x)
        (quasiquote (@ (name (unquote x))
                       (scope "lexical")
-                      (viviself "Undef")))]
-      [(string? x)
+                      (viviself "Undef"))))
+      ((string? x)
        (quasiquote (@ (value (unquote (format "'~a'" x)))
-                      (returns "EclectusString")))]
-      [(vector? x)
+                      (returns "EclectusString"))))
+      ((vector? x)
        (quasiquote (@ (value "'#0()'")
-                      (returns "EclectusString")))]))))
+                      (returns "EclectusString"))))))))
 
 (define bindings
   (lambda (x)
@@ -467,12 +467,12 @@
   (lambda (x)
     ;(diag (format "emit-expr: ~s" x))
     (cond
-      [(atom? x)      (emit-atom x)]
-      [(let? x)       (emit-let (bindings x) (body x))]
-      [(if? x)        (emit-if x)]
-      [(lambda? x)    (emit-lambda x)]
-      [(primcall? x)  (emit-primcall x)]
-      [else           (emit-functional-application x)]))) 
+      ((atom? x)      (emit-atom x))
+      ((let? x)       (emit-let (bindings x) (body x)))
+      ((if? x)        (emit-if x))
+      ((lambda? x)    (emit-lambda x))
+      ((primcall? x)  (emit-primcall x))
+      (else           (emit-functional-application x))))) 
 
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling
@@ -482,30 +482,30 @@
 ; as I don't know how to manipulate S-expressions while traversing it
 (define preprocess
   (lambda (tree)
-    (cond [(atom? tree)
-           tree]
-          [(eqv? (car tree) 'and) 
+    (cond ((atom? tree)
+           tree)
+          ((eqv? (car tree) 'and) 
            (preprocess
-             (cond [(null? (cdr tree)) #t]
-                   [(= (length (cdr tree)) 1) (cadr tree)]
-                   [else (list
+             (cond ((null? (cdr tree)) #t)
+                   ((= (length (cdr tree)) 1) (cadr tree))
+                   (else (list
                            'if
                            (cadr tree)
                            (cons 'and (cddr tree))
-                            #f)]))]
-          [(eqv? (car tree) 'or) 
+                            #f)))))
+          ((eqv? (car tree) 'or) 
            (preprocess
-             (cond [(null? (cdr tree)) #f]
-                   [(= (length (cdr tree)) 1) (cadr tree)]
-                   [else (list
+             (cond ((null? (cdr tree)) #f)
+                   ((= (length (cdr tree)) 1) (cadr tree))
+                   (else (list
                            'if
                            (cadr tree)
                            (cadr tree)
-                           (cons 'or (cddr tree)))]))]
-          [(eqv? (car tree) 'not) 
+                           (cons 'or (cddr tree)))))))
+          ((eqv? (car tree) 'not) 
            (preprocess
-             (list 'if (cadr tree) #f #t))]
-          [(eqv? (car tree) 'let*) 
+             (list 'if (cadr tree) #f #t)))
+          ((eqv? (car tree) 'let*) 
            (preprocess
              (if (null? (cadr tree))
                  (cons 'let (cdr tree))
@@ -514,16 +514,16 @@
                    (list (caadr tree))
                    (append
                      (list 'let* (cdadr tree))
-                     (cddr tree)))))]
-          [else
-           (map preprocess tree)]))) 
+                     (cddr tree))))))
+          (else
+           (map preprocess tree))))) 
 
 ; eventually this will become a PIR generator
 ; for PAST as SXML
 ; currently it only handles the pushes
 (define past-sxml->past-pir
   (lambda (past)
-    (let ([uid (gen-unique-id)])
+    (let ((uid (gen-unique-id)))
       ;(diag (format "to_pir: ~a" past))
       (emit "
             .local pmc reg_~a
