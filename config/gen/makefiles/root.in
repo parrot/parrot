@@ -826,6 +826,10 @@ $(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     $(SRC_DIR)/main$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
 
+$(INC_DIR)/parrot.h : $(INC_DIR)/pbcversion.h $(INC_DIR)/vtable.h
+
+$(INC_DIR)/extend.h : $(INC_DIR)/extend_vtable.h
+
 $(INC_DIR)/pbcversion.h :
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
 
