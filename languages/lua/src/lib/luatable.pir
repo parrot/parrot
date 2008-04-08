@@ -469,7 +469,7 @@ the given order may have their relative positions changed by the sort.
     $P2 = table.'rawget'(idx2)
     $I0 = sort_comp(comp, $P2, $P1)
     unless $I0 goto L7
-    unless i > u goto L6
+    unless i >= u goto L6
     lua_error("invalid order function for sorting")
     goto L6
   L7:
@@ -479,7 +479,7 @@ the given order may have their relative positions changed by the sort.
     $P3 = table.'rawget'(idx1)
     $I0 = sort_comp(comp, $P1, $P3)
     unless $I0 goto L8
-    unless j < l goto L7
+    unless j <= l goto L7
     lua_error("invalid order function for sorting")
     goto L7
   L8:

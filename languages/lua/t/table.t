@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 use Parrot::Test::Lua;
 
@@ -313,6 +313,14 @@ a b c d e f
 720
 a b c d e f g
 5040
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function sort (bad func)' );
+-- see bug : http://www.lua.org/bugs.html#5.1.3
+local t = { 1 }
+table.sort( { t, t, t, t, }, function (a, b) return a[1] == b[1] end )
+CODE
+/^[^:]+: [^:]+:\d+: invalid order function for sorting\nstack traceback:\n/
 OUTPUT
 
 # Local Variables:
