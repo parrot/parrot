@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
-# 03-print_c_source_file.t
+# 10-print_c_source_file.t
 
 use strict;
 use warnings;
@@ -93,11 +93,11 @@ sub test_single_trans_and_source {
 
 =head1 NAME
 
-03-print_c_header_file.t - test C<Parrot::Ops2c::Utils::new()>
+10-print_c_source_file.t - test C<Parrot::Ops2c::Utils::new()>
 
 =head1 SYNOPSIS
 
-    % prove t/tools/ops2cutils/03-print_c_header_file.t
+    % prove t/tools/ops2cutils/10-print_c_source_file.t
 
 =head1 DESCRIPTION
 
@@ -113,8 +113,8 @@ are B<not> part of the test suite run by F<make test>.   Once you have run
 F<Configure.pl>, however, you may run these tests as part of F<make
 buildtools_tests>.
 
-F<03-print_c_header_file.t> tests whether
-C<Parrot::Ops2c::Utils::print_c_header_file()> works properly.
+F<10-print_c_source_file.t> tests whether
+C<Parrot::Ops2c::Utils::print_c_source_file()> works properly.
 
 =head1 AUTHOR
 
