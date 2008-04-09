@@ -42,7 +42,9 @@
       (gauche:open-output-file filename))))
 
 (define (system command)
-  (process-exit-status (run-process (list "sh" "-c" command) :wait #t)))
+  ; use the deprecated syntax or run-process for now
+  ; (process-exit-status (run-process (list "sh" "-c" command) :wait #t)))
+  (process-exit-status (run-process "/bin/sh" "-c" command :wait #t)))
 
 (define (atom? x)
   (not (pair? x)))
