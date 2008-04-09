@@ -5,21 +5,26 @@ use strict;
 use warnings;
 our ( @ISA, @EXPORT_OK );
 @ISA       = qw(Exporter);
+
+our @srcopsfiles = qw( src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops
+    src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
+    src/ops/object.ops src/ops/pic.ops src/ops/pmc.ops src/ops/set.ops
+    src/ops/stack.ops src/ops/stm.ops src/ops/string.ops src/ops/sys.ops
+    src/ops/var.ops );
+our $num  = "src/ops/ops.num";
+our $skip = "src/ops/ops.skip";
+
 @EXPORT_OK = qw(
     generate_core
+    @srcopsfiles
+    $num
+    $skip
 );
 use Carp;
 use File::Copy;
 use lib ("./lib");
 use Parrot::Ops2pm::Utils;
 
-my @srcopsfiles = qw( src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops
-    src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
-    src/ops/object.ops src/ops/pic.ops src/ops/pmc.ops src/ops/set.ops
-    src/ops/stack.ops src/ops/stm.ops src/ops/string.ops src/ops/sys.ops
-    src/ops/var.ops );
-my $num  = "src/ops/ops.num";
-my $skip = "src/ops/ops.skip";
 
 sub generate_core {
     my ( $cwd, $tdir, $srcopsref, $num_file, $skip_file ) = @_;

@@ -19,23 +19,21 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 44;
+use Test::More tests => 43;
 use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use_ok('Parrot::Ops2pm::Utils');
 use lib ("$main::topdir/t/tools/ops2cutils/testlib");
-use_ok( "GenerateCore", qw| generate_core | );
+use GenerateCore qw|
+    generate_core
+    @srcopsfiles
+    $num
+    $skip
+|;
 use IO::CaptureOutput qw | capture |;
 
-my @srcopsfiles = qw( src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops
-    src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
-    src/ops/object.ops src/ops/pic.ops src/ops/pmc.ops src/ops/set.ops
-    src/ops/stack.ops src/ops/stm.ops src/ops/string.ops src/ops/sys.ops
-    src/ops/var.ops );
-my $num         = "src/ops/ops.num";
-my $skip        = "src/ops/ops.skip";
 my @dynopsfiles = qw( src/dynoplibs/dan.ops src/dynoplibs/myops.ops );
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
