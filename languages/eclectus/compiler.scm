@@ -518,7 +518,7 @@
       (emit "
             .local pmc reg_~a
             reg_~a = new '~a'
-            " uid uid (car past))
+            " uid uid (symbol->string (car past)))
       (for-each
         (lambda (daughter)
           (if (eq? '@ (car daughter))

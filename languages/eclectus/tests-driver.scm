@@ -60,7 +60,7 @@
 
 ; TODO: can I use (directory-separator) in petite?
 (define *path-to-parrot*
-  (if (zero? (system "perl -e \"exit($^O eq q{MSWin32} ? 1 : 0)\""))
+  (if (zero? (system "perl -e 'exit($^O eq q{MSWin32} ? 1 : 0)'"))
     "../../parrot"
     "..\\..\\parrot"))
 
@@ -79,15 +79,18 @@
           (let f ()
             (let ((c (read-char)))
               (cond
-               ((eof-object? c) (void))
-               (else (display c) (f))))))))))
+               ((not (eof-object? c))
+                (display c)
+                (f))))))))))
 
 (define (test-with-string-output test-id expr expected-output test-name)
    (run-compile expr)
    (execute)
-   (if (string=? expected-output (get-string))
-     (pass ( + test-id 1 ) (format #f "~a: ~a" test-name expr))
-     (fail ( + test-id 1 ) (format #f "~a: expected ~s, got ~a" test-name expr (get-string) ))))
+   (let ((actual-output (get-string)))
+     (if (string=? expected-output actual-output)
+         (pass ( + test-id 1 ) (format #f "~a: ~a" test-name expr))
+         (fail ( + test-id 1 ) (format #f "~a: expected ~s, got ~s"
+                                       test-name expected-output actual-output)))))
 
 (define (emit . args)
   (apply fprintf (compile-port) args)
