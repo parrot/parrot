@@ -5,7 +5,7 @@ PortSystem              1.0
 name			parrot
 version			0.5.2
 categories		lang devel
-maintainers             bfulgham@mac.com,will@coleda.com	
+maintainers             bfulgham coleda.com:will
 description		Open source virtual machine (for Perl6 et al.)
 long_description	\
  	Parrot is the new interpreter being designed from scratch to support \
