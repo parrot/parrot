@@ -19,14 +19,13 @@ unified languages testing.
 The F<t/*.pl> scripts are used in unified languages testing. They
 are executing the respective F<t/*.t> Scheme scripts. In
 unified languages testing the Eclectus tests are skipped, when
-the is no 'petite 7.3' around.
+the is no 'gauche 0.8' around.
 
 =head1 TODO
 
 - support for strings
 - support for pairs
 - support for 'letrec
-- allow running the tests with 'petite' itself
 - allow test-description per test case
 - In the longterm, Eclectus should become self-hosting
 

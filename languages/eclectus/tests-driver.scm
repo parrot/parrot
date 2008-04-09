@@ -4,8 +4,8 @@
 
 (define all-tests '())
 
-(define run-with-petite #f)
-;(define run-with-petite #t)
+(define run-with-gauche #f)
+;(define run-with-gauche #t)
 
 (define-syntax add-tests-with-string-output
   (syntax-rules (=>)
@@ -51,22 +51,22 @@
        p)))
 
 (define (run-compile expr)
-  (if run-with-petite
+  (if run-with-gauche
     (with-output-to-file "stst.scm" (lambda () (write expr)))
     (let ((p (open-output-file "stst.pir" 'replace)))
       (parameterize ((compile-port p))
          (compile-program expr))
       (close-output-port p))))
 
-; TODO: can I use (directory-separator) in petite?
+; TODO: can I use (directory-separator) in gauche?
 (define *path-to-parrot*
   (if (zero? (system "perl -e 'exit($^O eq q{MSWin32} ? 1 : 0)'"))
     "../../parrot"
     "..\\..\\parrot"))
 
 (define (execute)
-  (if run-with-petite
-    (unless (zero? (system "petite --script stst.scm > stst.out"))
+  (if run-with-gauche
+    (unless (zero? (system "gosh -fcase-fold -I .  -l gauche/prelude.scm stst.scm > stst.out"))
       (error 'execute "produced program exited abnormally"))
     (unless (zero? (system (string-append *path-to-parrot* " stst.pir > stst.out")))
       (error 'execute "produced program exited abnormally"))))

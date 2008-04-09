@@ -16,19 +16,19 @@ use Data::Dumper;
 
 ( my $t_fn = $FindBin::Script ) =~ s/\.pl$/\.t/;
 
-# 'petite' is Petite Chez Scheme
-# 7.4 is the current version
-my $petite_version = `petite --version 2>&1` || q{};
-my $has_petite = $petite_version =~ m/ \A 7\.4 # exact version
+# 'gosh' is Gauche
+# 0.8 is the current version
+my $gauche_version = `gosh -V 2>&1` || q{};
+my $has_gauche = $gauche_version =~ m/  0\.8 # inexact version
                                      /xms;
-#diag( Dumper( $petite_version, $has_petite ) );
+#diag( Dumper( $gauche_version, $has_gauche ) );
 
-if ( ! $has_petite ) {
-    plan skip_all => 'petite 7.4 is needed for running this test';
+if ( ! $has_gauche ) {
+    plan skip_all => 'gauche 0.8 is needed for running this test';
 }
 else {
     chdir 'eclectus';
-    exec 'petite', '--script', "t/$t_fn";
+    exec 'gosh', '-fcase-fold', '-I', '.',  '-l', 'gauche/prelude.scm', "t/$t_fn";
 }
 
 # Local Variables:
