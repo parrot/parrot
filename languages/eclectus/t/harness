@@ -32,6 +32,7 @@ use Parrot::Test::Harness
   language => 'eclectus',
   exec     => [ 'petite', '--script' ],
   #exec     => [ 'guile', '--debug', '-l', 'guile/prelude.scm', '-s' ],
+  #exec	    => [ 'gosh', '-fcase-fold', '-I', '.',  '-l', 'gauche/prelude.scm' ],
   files    => [ 't/*.pl' ];
 
 =head1 SEE ALSO
