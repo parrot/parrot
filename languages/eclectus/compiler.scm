@@ -145,6 +145,9 @@
 (define lambda?
   (make-combination-predicate 'lambda))
 
+(define begin?
+  (make-combination-predicate 'begin))
+
 (define if-test
   (lambda (form)
     (car (cdr form))))
@@ -452,6 +455,10 @@
                      (emit-expr stmt))
                    (cddr x))))))
 
+(define emit-begin
+  (lambda (x)
+    (past::stmts (map emit-expr (cdr x)))))
+
 ; emir PIR for an expression
 (define emit-expr
   (lambda (x)
@@ -460,6 +467,7 @@
       ((atom? x)      (emit-atom x))
       ((let? x)       (emit-let (bindings x) (body x)))
       ((if? x)        (emit-if x))
+      ((begin? x)     (emit-begin x))
       ((lambda? x)    (emit-lambda x))
       ((primcall? x)  (emit-primcall x))
       (else           (emit-functional-application x))))) 
