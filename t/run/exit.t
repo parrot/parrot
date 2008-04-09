@@ -13,7 +13,9 @@ t/run/exit.t - test parrot exit codes
 =head1 DESCRIPTION
 
 Tests C<Parrot> exit codes. Tests variations of normal and abnormal exit
-with combinations of STDERR and STDOUT open and closed.
+with combinations of STDERR and STDOUT open and closed.  Also tests behavior
+under error conditions, whether output files are created and whether the error
+is returned properly.
 
 =cut
 
@@ -22,9 +24,11 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 use File::Spec;
+use File::Temp qw(tempdir);
+use IO::File;
 
 my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
 my $redir  = File::Spec->devnull;
@@ -62,6 +66,17 @@ open *STDOUT, ">&OLDOUT" or die qq|Cannot restore stdout: $!|;    ## no critic
 # close copies
 close *OLDOUT or die qq|Cannot close OLDOUT: $!|;
 close *OLDERR or die qq|Cannot close OLDERR: $!|;
+
+# exits nonzero on a parse error
+my $tempdir = tempdir(CLEANUP => 1);
+my $pirfn = File::Spec->catfile($tempdir, "test.pir");
+my $pbcfn = File::Spec->catfile($tempdir, "test.pbc");
+my $pirfile = IO::File->new(">$pirfn");
+$pirfile->print("Parse error.\n");
+$pirfile->close();
+my $rv = system("$PARROT -o $pbcfn $pirfn") >> 8;
+isnt($rv, 0, "parrot returns error on parse failure\n");
+ok(! -e $pbcfn, "parrot doesn't create outfile on parse failure\n");
 
 # Local Variables:
 #   mode: cperl
