@@ -485,6 +485,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     stdin = getstdin
     has_readline = stdin.'set_readline_interactive'(1)
     encoding = adverbs['encoding']
+    if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
     push stdin, encoding
   interactive_loop:
@@ -574,6 +575,7 @@ options are passed to the evaluator.
     iname = shift iter
     ifh = open iname, '<'
     unless ifh goto err_infile
+    if encoding == 'fixed_8' goto iter_loop_1
     unless encoding goto iter_loop_1
     push ifh, encoding
   iter_loop_1:
