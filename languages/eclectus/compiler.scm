@@ -136,17 +136,11 @@
       (and (pair? form)
            (eq? name (car form))))))
 
-(define if?
-  (make-combination-predicate 'if))
-
-(define let?
-  (make-combination-predicate 'let))
-
-(define lambda?
-  (make-combination-predicate 'lambda))
-
-(define begin?
-  (make-combination-predicate 'begin))
+(define if?     (make-combination-predicate 'if))
+(define let?    (make-combination-predicate 'let))
+(define lambda? (make-combination-predicate 'lambda))
+(define begin?  (make-combination-predicate 'begin))
+(define quote?  (make-combination-predicate 'quote))
 
 (define if-test
   (lambda (form)
@@ -159,6 +153,12 @@
 (define if-altern
   (lambda (form)
     (car (cdr (cdr (cdr form))))))
+
+(define (self-evaluating? x)
+  (or (string? x)
+      (number? x)
+      (char? x)
+      (boolean? x)))
 
 ; Support for primitive functions
 
@@ -365,34 +365,32 @@
          (emit-expr arg))
        (cdr x)))))
 
+(define (emit-variable x)
+  (past::var `(@ (name ,x)
+                 (scope "lexical")
+                 (viviself "Undef"))))
 
-; emit PIR for a scalar
-(define emit-atom
-  (lambda (x)
-    ((if (symbol? x) past::var past::val)
-     (cond
-      ((fixnum? x)
-       (quasiquote (@ (value (unquote x))
-                      (returns "EclectusFixnum"))))
-      ((char? x)
-       (quasiquote (@ (value (unquote (char->integer x)))
-                      (returns "EclectusCharacter"))))
-      ((null? x)
-       '(@ (value 0)
-           (returns "EclectusEmptyList")))
-      ((boolean? x)
-       (quasiquote (@ (value (unquote (if x 1 0)))
-                      (returns "EclectusBoolean"))))
-      ((symbol? x)
-       (quasiquote (@ (name (unquote x))
-                      (scope "lexical")
-                      (viviself "Undef"))))
-      ((string? x)
-       (quasiquote (@ (value (unquote (format #f "'~a'" x)))
-                      (returns "EclectusString"))))
-      ((vector? x)
-       (quasiquote (@ (value "'#0()'")
-                      (returns "EclectusString"))))))))
+(define (emit-constant x)
+  (past::val
+   (cond
+    ((fixnum? x)
+     (quasiquote (@ (value (unquote x))
+                    (returns "EclectusFixnum"))))
+    ((char? x)
+     (quasiquote (@ (value (unquote (char->integer x)))
+                    (returns "EclectusCharacter"))))
+    ((null? x)
+     '(@ (value 0)
+         (returns "EclectusEmptyList")))
+    ((boolean? x)
+     (quasiquote (@ (value (unquote (if x 1 0)))
+                    (returns "EclectusBoolean"))))    
+    ((string? x)
+     (quasiquote (@ (value (unquote (format #f "'~a'" x)))
+                    (returns "EclectusString"))))
+    ((vector? x)
+     (quasiquote (@ (value "'#0()'")
+                    (returns "EclectusString")))))))
 
 (define bindings
   (lambda (x)
@@ -464,13 +462,15 @@
   (lambda (x)
     ;(diag (format "emit-expr: ~s" x))
     (cond
-      ((atom? x)      (emit-atom x))
-      ((let? x)       (emit-let (bindings x) (body x)))
-      ((if? x)        (emit-if x))
-      ((begin? x)     (emit-begin x))
-      ((lambda? x)    (emit-lambda x))
-      ((primcall? x)  (emit-primcall x))
-      (else           (emit-functional-application x))))) 
+      ((symbol? x)          (emit-variable x))
+      ((quote? x)           (emit-constant (cadr x)))
+      ((self-evaluating? x) (emit-constant x))
+      ((let? x)             (emit-let (bindings x) (body x)))
+      ((if? x)              (emit-if x))
+      ((begin? x)           (emit-begin x))
+      ((lambda? x)          (emit-lambda x))
+      ((primcall? x)        (emit-primcall x))
+      (else                 (emit-functional-application x)))))
 
 ; transverse the program and rewrite
 ; "and" can be supported by transformation before compiling

@@ -31,21 +31,21 @@
   ((fxzero? 1)                            => "#f\n" )
   ((fxzero? (char->fixnum #\A))           => "#f\n" )
 
-  ((null? ())                             => "#t\n" )
+  ((null? '())                            => "#t\n" )
   ((null? (fxsub1 1))                     => "#f\n" )
   ((null? (fxsub1 10))                    => "#f\n" )
   ((null? #\A)                            => "#f\n" )
   ((null? 65)                             => "#f\n" )
   ((null? (char->fixnum #\A))             => "#f\n" )
 
-  ((fixnum? ())                           => "#f\n" )
+  ((fixnum? '())                          => "#f\n" )
   ((fixnum? (fxsub1 1))                   => "#t\n" )
   ((fixnum? (fxsub1 10))                  => "#t\n" )
   ((fixnum? #\A)                          => "#f\n" )
   ((fixnum? 65)                           => "#t\n" )
   ((fixnum? (char->fixnum #\A))           => "#t\n" )
 
-  ((boolean? ())                          => "#f\n" )
+  ((boolean? '())                         => "#f\n" )
   ((boolean? (fxsub1 1))                  => "#f\n" )
   ((boolean? (fxsub1 10))                 => "#f\n" )
   ((boolean? #\A)                         => "#f\n" )
@@ -56,7 +56,7 @@
   ((boolean? (fixnum? #\A))               => "#t\n" )
   ((boolean? (fixnum? 65))                => "#t\n" )
 
-  ((char? ())                             => "#f\n" )
+  ((char? '())                            => "#f\n" )
   ((char? (fxsub1 1))                     => "#f\n" )
   ((char? (fxsub1 10))                    => "#f\n" )
   ((char? #\A)                            => "#t\n" )
@@ -70,7 +70,7 @@
 
   ((not 1)                               => "#f\n" )
   ((not 0)                               => "#f\n" )
-  ((not ())                              => "#f\n" )
+  ((not '())                             => "#f\n" )
   ((not (fxsub1 1))                      => "#f\n" )
   ((not (fxsub1 10))                     => "#f\n" )
   ((not #\A)                             => "#f\n" )
