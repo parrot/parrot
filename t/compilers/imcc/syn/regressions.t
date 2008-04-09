@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -35,6 +35,26 @@ pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0');
 CODE
 ok 1 - caught div_i_ic_ic exception
 ok 2 - caught div_n_nc_nc exception
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'should be able to have comments in params', todo=>'RT #46499');
+.sub comments
+  $S1 = parrot('hello','world')
+  say $S1
+.end
+
+.sub parrot
+ # Describe param 1
+ .param string verb
+ # Describe param 2
+ .param string noun
+ 
+ .local string retval
+ retval = concat verb, noun
+ .return (retval)
+.end
+CODE
+helloworld
 OUT
 
 # Local Variables:
