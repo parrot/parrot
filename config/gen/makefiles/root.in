@@ -1333,9 +1333,9 @@ dynoplibs-clean :
 compilers : compilers.dummy
 
 compilers.dummy : $(PARROT) $(GEN_LIBRARY)
+	$(MAKE) compilers/pct
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
-	$(MAKE) compilers/pct
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
 
