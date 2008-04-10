@@ -126,6 +126,7 @@ clean: \
     smoke-clean
 
 realclean: \
+    c99.realclean \
     dotnet.realclean \
     eclectus.realclean \
     hq9plus.realclean \
@@ -209,6 +210,8 @@ c99.test:
 	- $(MAKE) c99 test
 c99.clean:
 	- $(MAKE) c99 clean
+c99.realclean:
+	- $(MAKE) c99 realclean
 
 cardinal : cardinal.dummy
 cardinal.dummy:

@@ -116,7 +116,7 @@ clean:
 	$(RM_RF) $(CLEANUPS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_RF) Makefile src/cpp/Makefile
 
 distclean: realclean
 

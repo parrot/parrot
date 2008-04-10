@@ -152,7 +152,6 @@ GEN_MAKEFILES = \
     languages/APL/Makefile \
     languages/befunge/Makefile \
     languages/bf/Makefile \
-    languages/c99/Makefile \
     languages/cardinal/Makefile \
     languages/cola/Makefile \
     languages/ecmascript/Makefile \
