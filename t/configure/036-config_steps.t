@@ -25,7 +25,13 @@ Regressions tests for configure steps that live under the config directory.
 =cut
 
 my @steps;
-sub wanted { /^.*\.pm\z/s && push @steps, $File::Find::name; }
+sub wanted { $File::Find::name =~ m{^config\/(.*)\.pm\z}s &&
+    do {
+        my $mod = $1;
+        my $class = join '::', ( split /\//, $mod );
+        push @steps, $class;
+    };
+}
 find( { wanted => \&wanted }, 'config' );
 
 if ( $^O !~ /win32/i ) {
@@ -33,10 +39,9 @@ if ( $^O !~ /win32/i ) {
 }
 
 my $testcount = @steps + 2;
-
-# my $testcount = @steps;
-
 plan tests => $testcount;
+unshift @INC, 'config';
+
 foreach my $step (@steps) {
     require_ok($step);
 }
