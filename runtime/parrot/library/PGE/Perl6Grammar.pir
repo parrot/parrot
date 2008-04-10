@@ -72,7 +72,7 @@ the output to the correct output file.
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
+    load_bytecode 'PCT/HLLCompiler.pbc'
 
     .local pmc p6regex
     p6regex = compreg 'PGE::Perl6Regex'
@@ -125,7 +125,7 @@ the output to the correct output file.
 
     ##   create the PGE::Perl6Grammar compiler object
     .local pmc pgc
-    $P99 = subclass 'HLLCompiler', 'PGE::Perl6Grammar::Compiler'
+    $P99 = subclass 'PCT::HLLCompiler', 'PGE::Perl6Grammar::Compiler'
     pgc = new [ 'PGE::Perl6Grammar::Compiler' ]
     pgc.'language'('PGE::Perl6Grammar')
 .end
