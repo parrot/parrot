@@ -1,4 +1,4 @@
-# $Id: c99.pir 25966 2008-02-22 01:25:37Z coke $
+# $Id$
 # Copyright (C) 2008, The Perl Foundation.
 
 =head1 TITLE

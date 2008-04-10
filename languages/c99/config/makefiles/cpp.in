@@ -1,4 +1,4 @@
-## $Id: root.in 25944 2008-02-21 19:31:54Z kjs $
+## $Id$
 
 ## arguments we want to run parrot with
 PARROT_ARGS =
