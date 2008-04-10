@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+# $Id: harness 25985 2008-02-22 12:22:13Z kjs $
+
+use FindBin;
+use lib qw( . lib ../lib ../../lib ../../lib ../../../../lib );
+use Parrot::Test::Harness language => 'c99', exec => [ '../../../../parrot', './', 'cpp.pbc' ] ;

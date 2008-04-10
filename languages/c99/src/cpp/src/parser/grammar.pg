@@ -1,0 +1,182 @@
+# $Id: grammar.pg 26072 2008-02-26 16:32:43Z kjs $
+# Copyright (C) 2008, The Perl Foundation.
+
+=begin overview
+
+This is the grammar for C99 written as a sequence of Perl 6 rules.
+
+
+taken from n869.pdf
+google for n869.pdf
+
+=end overview
+
+grammar C99::CPP::Grammar is PCT::Grammar;
+
+## A.2.4 External definitions
+##
+
+token TOP {
+    ^
+    <pre_processing_file>
+    [ $ || <.panic: Syntax error> ]
+    {*}
+}
+
+regex preprocessing_token {
+  | <header_name>
+  | <identifier>
+  | <pp_number>
+  | <character_constant>
+  | <string_literal>
+  | <!pound> <punctuator>
+  | <universal_character_name>
+  | <-[# \r\n\t]>\S* ## <-[#]-\S>\S* ##non-whitespace
+}
+
+## A.1.2 Keywords
+##
+token keyword {
+  [ auto      | enum      | restrict  | unsigned
+  | break     | extern    | return    | void
+  | case      | float     | short     | volatile
+  | char      | for       | signed    | while
+  | const     | goto      | sizeof    | _Bool
+  | continue  | if        | static    | _Complex
+  | default   | inline    | struct    | _Imaginary
+  | do        | int       | switch
+  | double    | long      | typedef
+  | else      | register  | union     ]>>
+
+}
+
+token reserved_word {
+    <keyword>
+}
+
+
+token identifier {
+    <!reserved_word>
+    <identifier_nondigit> [ <identifier_nondigit> | <digit> ]*
+    {*}
+}
+
+token identifier_nondigit {
+    <alpha> | <[_]> | <universal_character_name>
+}
+
+token character_constant { [L]? \' <c_char>+ \' }
+
+token <c_char> { <-['\\\n]> | <escape_sequence> }
+
+## A.1.4 Universal character names
+##
+token universal_character_name {
+  | '\u' <xdigit>**{4}
+  | '\U' <xdigit>**{8}
+}
+
+
+
+## A.1.7 Punctuators
+##
+
+token punctuator {
+  | \[        | \]      | <[(){}.]>     | '->'
+  | '++'      | '--'    | <[&*+\-~!/%]>
+  | '<<'      | '>>'    | '<'    | '>'
+  | '<='      | '>='    | '=='          | '!='
+  | <[^|]>    | '&&'    | '||'
+  | <[?:;]>   | '...'
+  | <[*/%+\-&^|]>       | '<<'   | '>>' | '='
+  | <[,#]>    | '##'
+  | '<:'      | ':>'    | '<%'   | '%>' | '%:' | '%:%:'
+}
+
+## A.3 Preprocessing directives
+##
+
+rule pre_processing_file {
+    <group>?
+}
+
+rule group {
+    <group_part>+
+}
+
+rule group_part {
+    | <pp_tokens>? <newline>
+    | <if_section>
+    | <control_line>
+}
+
+rule if_section {
+    <if_group> <elif_group>* <else_group>? <endif_line>
+}
+
+rule if_group {
+    | '#' 'if' <constant_expression> <newline> <group>?
+    | '#' 'ifdef' <identifier> <newline> <group>?
+    | '#' 'ifndef' <identifier> <newline> <group>?
+}
+
+rule elif_group {
+    '#' 'elif' <constant_expression> <newline> <group>?
+}
+
+rule else_group {
+    '#' 'else' <newline> <group>?
+}
+
+rule endif_line {
+    '#' 'endif' <newline>
+}
+
+rule control_line {
+    | '#' 'include' <pp_tokens> <newline>
+    | '#' 'define' <identifier> <replacement_list> <newline>
+    | '#' 'define' <identifier> <lparen> <identifier_list>? ')' <replacement_list> <newline>
+    | '#' 'define' <identifier> <lparen> '...' ')' <replacement_list> <newline>
+    | '#' 'define' <identifier> <lparen> <identifier_list> ',' '...' ')' <replacement_list> <newline>
+    | '#' 'undef' <identifier> <newline>
+    | '#' 'line' <pp_tokens> <newline>
+    | '#' 'error' <pp_tokens>? <newline>
+    | '#' 'pragma' <pp_tokens>? <newline>
+    | '#' <newline>
+}
+
+rule pp_tokens {
+    <preprocessing_token>+
+}
+
+rule pp_number {
+    ['.']? <digit> <pp_number_suffix>*
+}
+
+rule pp_number_suffix {
+    | '.'
+    | <identifier_nondigit>
+    | <digit>
+    | <[eEpP]> ['+'|'-']
+}
+
+rule replacement_list {
+    <pp_tokens>?
+}
+
+token lparen {
+    '('
+}
+
+token newline {
+     \n
+}
+
+## A.1.8 Header names
+token header_name {
+    | \< <h_char>+ \>
+    | \" <q_char>+ \"
+}
+
+token h_char { <-[\n>]> }
+token q_char { <-[\n"]> }

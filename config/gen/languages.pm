@@ -73,6 +73,10 @@ sub runstep {
             # languages/dotnet/Configure.pl works only after the root 'perl Configure.pl'.
             # system( 'cd languages/dotnet; perl Configure.pl' );
         }
+        elsif ( $language eq 'c99' ) {
+            $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");
+            $conf->genfile("$langdir/config/makefiles/cpp.in"      => "$langdir/src/cpp//Makefile");
+        }
         elsif ( $language eq 'tcl' ) {
             # tcl has more than one Makefile
             # currently this is handled as a special case
