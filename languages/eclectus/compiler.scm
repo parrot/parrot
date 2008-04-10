@@ -63,7 +63,6 @@
               $P0 = split ' ', 'post pir evalpmc'
               past_compiler.'stages'( $P0 )
               past_compiler.'eval'(stmts)
-          
           .end
           ")))
 
@@ -71,6 +70,16 @@
 (define emit-builtins
   (lambda ()
     (emit "
+          .sub '__initconst' :init
+              $P0 = new 'EclectusBoolean'
+              $P0 = 1
+              set_root_global ['_eclectus'], '#t', $P0
+              $P0 = new 'EclectusBoolean'
+              set_root_global ['_eclectus'], '#f', $P0
+              $P0 = new 'EclectusEmptyList'
+              set_root_global ['_eclectus'], '()', $P0
+          .end
+
           .sub 'say'
               .param pmc args :slurpy
               if null args goto end
@@ -127,6 +136,29 @@
               .return ($I0)
           .end
 
+          .sub 'eq?'
+              .param pmc a
+              .param pmc b
+              $I0 = issame a, b
+
+              .return ($I0)
+          .end
+
+          .sub 'eqv?'
+              .param pmc a
+              .param pmc b
+              $I0 = iseq a, b
+
+              .return ($I0)
+          .end
+
+          .sub 'equal?'
+              .param pmc a
+              .param pmc b
+              $I0 = iseq a, b
+
+              .return ($I0)
+          .end
           ")))
 
 ; recognition of forms
@@ -308,7 +340,14 @@
 (define-primitive (fx> arg1 arg2)
   (emit-comparison "infix:>" arg1 arg2))
 
+(define-primitive (eq? arg1 arg2)
+  (emit-comparison "eq?" arg1 arg2))
 
+(define-primitive (eqv? arg1 arg2)
+  (emit-comparison "eqv?" arg1 arg2))
+
+(define-primitive (equal? arg1 arg2)
+  (emit-comparison "equal?" arg1 arg2))
 
 ; asking for the type of an object
 (define emit-typequery
@@ -371,26 +410,28 @@
                  (viviself "Undef"))))
 
 (define (emit-constant x)
-  (past::val
-   (cond
-    ((fixnum? x)
-     (quasiquote (@ (value (unquote x))
-                    (returns "EclectusFixnum"))))
-    ((char? x)
-     (quasiquote (@ (value (unquote (char->integer x)))
-                    (returns "EclectusCharacter"))))
-    ((null? x)
-     '(@ (value 0)
-         (returns "EclectusEmptyList")))
-    ((boolean? x)
-     (quasiquote (@ (value (unquote (if x 1 0)))
-                    (returns "EclectusBoolean"))))    
-    ((string? x)
-     (quasiquote (@ (value (unquote (format #f "'~a'" x)))
-                    (returns "EclectusString"))))
-    ((vector? x)
-     (quasiquote (@ (value "'#0()'")
-                    (returns "EclectusString")))))))
+  (cond
+   ((fixnum? x)
+    (past::val `(@ (value ,x)
+                   (returns "EclectusFixnum"))))
+   ((char? x)
+    (past::val `(@ (value ,(char->integer x))
+                   (returns "EclectusCharacter"))))
+   ((null? x)
+    (emit-global-ref "()"))
+   ((boolean? x)
+    (emit-global-ref (if x "#t" "#f")))
+   ((string? x)
+    (past::val `(@ (value (unquote (format #f "'~a'" x)))
+                   (returns "EclectusString"))))
+   ((vector? x)
+    (past::val '(@ (value "'#0()'")
+                   (returns "EclectusString"))))))
+
+
+(define (emit-global-ref name)
+  (past::op `(@ (pasttype "inline")
+                (inline ,(format #f "%r = get_root_global ['_eclectus'], '~a'" name)))))
 
 (define bindings
   (lambda (x)
