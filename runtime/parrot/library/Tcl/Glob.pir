@@ -83,7 +83,7 @@ or the resulting PIR code (target='PIR').
 .sub '__onload' :load :init
     .local pmc optable
     load_bytecode 'PGE.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
+    load_bytecode 'PCT/HLLCompiler.pbc'
 
     optable = new 'PGE::OPTable'
     store_global '$optable', optable
@@ -102,9 +102,13 @@ or the resulting PIR code (target='PIR').
 
     optable.newtok('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
+    $P2 = newclass [ 'Tcl::Glob::Compiler' ]
+    addattribute $P2, '$!compsub'
+
     $P0 = get_global 'compile_glob'
-    $P1 = new [ 'HLLCompiler' ]
+    $P1 = new [ 'Tcl::Glob::Compiler' ]
     $P1.'register'('Tcl::Glob', $P0)
+
     .return ()
 .end
 
@@ -325,6 +329,42 @@ Parse an enumerated character list, such as [abcd],
     .return (mob)
 .end
 
+.namespace [ 'Tcl::Glob::Compiler' ]
+
+=item register(string name, pmc compsub)
+
+Registers this compiler object as C<name> and
+using C<compsub> as the subroutine to call for performing compilation.
+
+=cut
+
+.sub 'register' :method
+    .param string name
+    .param pmc compsub
+
+    setattribute self, '$!compsub', compsub
+    compreg name, self
+
+    .return ()
+.end
+
+=item compile(pmc code [, "option" => value, ... ])
+
+Compile C<source> (possibly modified by any provided options).
+
+=cut
+
+.sub 'compile' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    .local pmc compsub
+
+    #   $!compsub is deprecated
+    compsub = getattribute self, '$!compsub'
+
+    .return compsub(source, adverbs :flat :named)
+.end
 
 =back
 
