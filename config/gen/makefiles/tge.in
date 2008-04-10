@@ -1,11 +1,8 @@
 # $Id$
 
 # Setup some commands
-LN_S     = @lns@
-PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
-CP       = @cp@
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
@@ -14,26 +11,11 @@ PERL6GRAMMAR      = $(PARROT_LIBRARY)/PGE/Perl6Grammar.pbc
 # the default target
 all: $(PARROT_LIBRARY)/TGE.pbc
 
-$(PARROT_LIBRARY)/TGE.pbc: TGE.pbc
-	$(CP) TGE.pbc $(PARROT_LIBRARY)
+$(PARROT_LIBRARY)/TGE.pbc: TGE.pir TGE/Rule.pbc TGE/Parser.pbc TGE/Grammar.pbc TGE/Compiler.pbc TGE/Tree.pbc
+	$(PARROT) -o $(PARROT_LIBRARY)/TGE.pbc --output-pbc TGE.pir
 
-TGE.pbc: TGE.pir TGE/Rule.pbc TGE/Parser.pbc TGE/Grammar.pbc TGE/Compiler.pbc TGE/Tree.pbc
-	$(PARROT) -o TGE.pbc --output-pbc TGE.pir
-
-TGE/Rule.pbc: TGE/Rule.pir
-	$(PARROT) -o TGE/Rule.pbc --output-pbc TGE/Rule.pir
-
-TGE/Tree.pbc: TGE/Tree.pir
-	$(PARROT) -o TGE/Tree.pbc --output-pbc TGE/Tree.pir
-
-TGE/Grammar.pbc: TGE/Grammar.pir
-	$(PARROT) -o TGE/Grammar.pbc --output-pbc TGE/Grammar.pir
-
-TGE/Compiler.pbc: TGE/Compiler.pir
-	$(PARROT) -o TGE/Compiler.pbc --output-pbc TGE/Compiler.pir
-
-TGE/Parser.pbc: TGE/Parser.pir
-	$(PARROT) -o TGE/Parser.pbc --output-pbc TGE/Parser.pir
+.pir.pbc :
+	$(PARROT) -o $@ --output-pbc $<
 
 TGE/Parser.pir: TGE/Parser.pg
 	$(PARROT) $(PERL6GRAMMAR) --output=TGE//Parser.pir TGE//Parser.pg
@@ -65,8 +47,7 @@ testclean:
 	$(RM_F) "../../t/compilers/tge/*.pir"
 
 clean: testclean
-	$(RM_F) TGE.pbc \
-	TGE/Rule.pbc \
+	$(RM_F) TGE/Rule.pbc \
 	TGE/Parser.pir \
 	TGE/Parser.pbc \
 	TGE/Tree.pbc \
