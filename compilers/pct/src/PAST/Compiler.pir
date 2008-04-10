@@ -14,7 +14,7 @@ By default PAST::Compiler transforms a PAST tree into POST.
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT/HLLCompiler.pbc'
     $P0 = get_hll_global 'Protomaker'
-    $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'PAST::Compiler')
+    $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'PAST::Compiler', '%!symtable')
 
     $P0 = get_hll_global ['PAST'], 'Compiler'
     $P0.'language'('PAST')
@@ -65,6 +65,10 @@ Compile the abstract syntax tree given by C<past> into POST.
 .sub 'to_post' :method
     .param pmc past
     .param pmc options         :slurpy :named
+
+    .local pmc symtable
+    symtable = new 'Hash'
+    setattribute self, '%!symtable', symtable
 
     .local pmc blockpast
     blockpast = get_global '@?BLOCK'
@@ -290,6 +294,33 @@ Return the POST representation of a C<PAST::Block>.
     set_global '$?SUB', bpost
   outer_done:
 
+    ##  merge the node's symtable with the master
+    .local pmc outersym, symtable
+    outersym = getattribute self, '%!symtable'
+    symtable = outersym
+    ##  if the Block doesn't have a symtable, re-use the existing one
+    $P0 = node.'symtable'()
+    unless $P0 goto have_symtable
+    ##  if the Block has a default ('') entry, use the Block's symtable as-is
+    symtable = $P0
+    $I0 = defined symtable['']
+    if $I0 goto have_symtable
+    ##  merge the Block's symtable with outersym
+    symtable = clone symtable
+  symtable_merge:
+    .local pmc iter
+    iter = new 'Iterator', outersym
+  symtable_merge_loop:
+    unless iter goto have_symtable
+    $S0 = shift iter
+    $I0 = exists symtable[$S0]
+    if $I0 goto symtable_merge_loop
+    $P0 = iter[$S0]
+    symtable[$S0] = $P0
+    goto symtable_merge_loop
+  have_symtable:
+    setattribute self, '%!symtable', symtable
+
     .local pmc compiler
     compiler = node.'compiler'()
     if compiler goto children_compiler
@@ -317,8 +348,9 @@ Return the POST representation of a C<PAST::Block>.
     bpost.'push'($P0)
 
   children_done:
-    ##  restore previous outer scope
+    ##  restore previous outer scope and symtable
     set_global '$?SUB', outerpost
+    setattribute self, '%!symtable', outersym
 
     ##  get a result register if we need it
     .local string rtype, result
@@ -1077,17 +1109,11 @@ blocks to determine the scope.
 
     .local string name
     name = node.'name'()
-    .local pmc iter, bpast
-    $P0 = get_global '@?BLOCK'
-    iter = new 'Iterator', $P0
-  iter_loop:
-    unless iter goto end
-    .local pmc bpast, symbol
-    bpast = shift iter
-    symbol = bpast.'symbol'(name)
-    unless symbol goto iter_loop
-    scope = symbol['scope']
-    unless scope goto iter_loop
+    .local pmc symtable
+    symtable = getattribute self, '%!symtable'
+    $P0 = symtable[name]
+    if null $P0 goto end
+    scope = $P0['scope']
   end:
     .return (scope)
 .end
