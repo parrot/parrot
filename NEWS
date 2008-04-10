@@ -8,6 +8,7 @@ New in 0.6.1
   + Lua : reimplementation with PCT/PAST & POST
 - Compilers
   + Removed P6Regex, pgc, P6Grammar from PGE
+  + Removed PAST-pm and Parrot::HLLCompiler
   + NQP
     . added <, <=, >, >= relational operators
     . added postfix:++,-- operators
