@@ -1115,12 +1115,18 @@ attribute.
     .local string scope
     scope = node.'scope'()
     if scope goto have_scope
-    ## otherwise, check the current symbol table
+    ## otherwise, check the current symbol table under the variable's name
     .local string name
     name = node.'name'()
     .local pmc symtable
     symtable = getattribute self, '%!symtable'
     $P0 = symtable[name]
+    if null $P0 goto default_scope
+    scope = $P0['scope']
+    if scope goto have_scope
+  default_scope:
+    ##  see if an outer block has set a default scope
+    $P0 = symtable['']
     if null $P0 goto scope_error
     scope = $P0['scope']
     unless scope goto scope_error
@@ -1132,6 +1138,7 @@ attribute.
   scope_error:
     .return self.'panic'("Scope ", scope, " not found for PAST::Var '", name, "'")
 .end
+
 
 .sub 'vivify' :method
     .param pmc node
