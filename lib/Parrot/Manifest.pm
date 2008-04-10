@@ -37,7 +37,7 @@ sub new {
         # ignore .svn, blib directories;
         # ignore ports/ directories, as that information does not need to be
         # in tarball releases
-        next if $filename =~ m[/\.svn|blib|ports];
+        next if $filename =~ m[/\.svn|^blib|^ports];
         if ( -d $filename ) {
             push @dirs, $filename;
         }
