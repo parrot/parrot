@@ -1011,11 +1011,8 @@ node with a 'pasttype' of bind.
     rpost = self.'as_post'(rpast, 'rtype'=>'P')
     ops.'push'(rpost)
 
-    .local string scope
     lpast.lvalue(1)
-    scope = self.'scope'(lpast)
-    $P0 = find_method self, scope
-    lpost = self.$P0(lpast, rpost)
+    lpost = self.'as_post'(lpast, 'bindpost'=>rpost)
     ops.'push'(lpost)
     ops.'result'(lpost)
     .return (ops)
@@ -1107,44 +1104,34 @@ attribute.
     .param pmc node
     .param pmc options         :slurpy :named
 
+    ##  set 'bindpost'
+    .local pmc bindpost
+    bindpost = options['bindpost']
+    unless null bindpost goto have_bindpost
+    bindpost = new 'Undef'
+  have_bindpost:
+
+    ## determine the node's scope.  First, check the node itself
     .local string scope
-    scope = self.'scope'(node)
-    push_eh scope_error
-    $P0 = find_method self, scope
-    pop_eh
-    .return self.$P0(node)
-  scope_error:
-    $S0 = node.'name'()
-    .return self.'panic'("No scope found for PAST::Var '", $S0, "'")
-.end
-
-
-=item scope(PAST::Var node)
-
-Helper function to return the scope of a variable given by C<node>.
-The scope is determined by the node's C<scope> attribute if set,
-otherwise search outward through the symbol tables of any lexical
-blocks to determine the scope.
-
-=cut
-
-.sub 'scope' :method :multi(_, ['PAST::Var'])
-    .param pmc node
-    .local pmc scope
     scope = node.'scope'()
-    if scope goto end
-
+    if scope goto have_scope
+    ## otherwise, check the current symbol table
     .local string name
     name = node.'name'()
     .local pmc symtable
     symtable = getattribute self, '%!symtable'
     $P0 = symtable[name]
-    if null $P0 goto end
+    if null $P0 goto scope_error
     scope = $P0['scope']
-  end:
-    .return (scope)
+    unless scope goto scope_error
+  have_scope:
+    push_eh scope_error
+    $P0 = find_method self, scope
+    pop_eh
+    .return self.$P0(node, bindpost)
+  scope_error:
+    .return self.'panic'("Scope ", scope, " not found for PAST::Var '", name, "'")
 .end
-
 
 .sub 'vivify' :method
     .param pmc node
@@ -1174,6 +1161,7 @@ blocks to determine the scope.
 
 .sub 'parameter' :method :multi(_, ['PAST::Var'])
     .param pmc node
+    .param pmc bindpost                            
 
     ##  get the current sub
     .local pmc subpost
@@ -1219,8 +1207,7 @@ blocks to determine the scope.
 
 .sub 'package' :method :multi(_, ['PAST::Var'])
     .param pmc node
-    .param pmc bindpost        :optional
-    .param int has_bindpost    :opt_flag
+    .param pmc bindpost
 
     .local pmc ops, fetchop, storeop
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -1235,7 +1222,7 @@ blocks to determine the scope.
     ns = node.'namespace'()
     $I0 = defined ns
     if $I0 goto package_hll
-    if has_bindpost goto package_bind
+    if bindpost goto package_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'get_global')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
@@ -1244,7 +1231,7 @@ blocks to determine the scope.
 
   package_hll:
     if ns goto package_ns
-    if has_bindpost goto package_hll_bind
+    if bindpost goto package_hll_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set_hll_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
@@ -1254,7 +1241,7 @@ blocks to determine the scope.
   package_ns:
     $P1 = new 'CodeString'
     ns = $P1.'key'(ns)
-    if has_bindpost goto package_ns_bind
+    if bindpost goto package_ns_bind
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
@@ -1265,8 +1252,7 @@ blocks to determine the scope.
 
 .sub 'lexical' :method :multi(_, ['PAST::Var'])
     .param pmc node
-    .param pmc bindpost        :optional
-    .param int has_bindpost    :opt_flag
+    .param pmc bindpost
 
     .local string name
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -1276,7 +1262,7 @@ blocks to determine the scope.
     .local int isdecl
     isdecl = node.'isdecl'()
 
-    if has_bindpost goto lexical_bind
+    if bindpost goto lexical_bind
 
   lexical_post:
     if isdecl goto lexical_decl
@@ -1308,8 +1294,7 @@ blocks to determine the scope.
 
 .sub 'keyed' :method :multi(_, ['PAST::Var'])
     .param pmc node
-    .param pmc bindpost        :optional
-    .param int has_bindpost    :opt_flag
+    .param pmc bindpost
 
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -1348,7 +1333,7 @@ blocks to determine the scope.
     concat name, ']'
     .local pmc fetchop, storeop
     $P0 = get_hll_global ['POST'], 'Op'
-    if has_bindpost goto keyed_bind
+    if bindpost goto keyed_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'set')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set')
     .return self.'vivify'(node, ops, fetchop, storeop)
@@ -1361,8 +1346,7 @@ blocks to determine the scope.
 
 .sub 'attribute' :method :multi(_, ['PAST::Var'])
     .param pmc node
-    .param pmc bindpost        :optional
-    .param int has_bindpost    :opt_flag
+    .param pmc bindpost
 
     .local string name
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -1372,7 +1356,7 @@ blocks to determine the scope.
     .local int isdecl
     isdecl = node.'isdecl'()
 
-    if has_bindpost goto attribute_bind
+    if bindpost goto attribute_bind
 
   attribute_post:
     if isdecl goto attribute_decl
