@@ -980,8 +980,10 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
      * from the result
      */
     branched = eval_ins(interp, op, found, r);
-    if (branched == -1)
+    if (branched == -1) {
+         /* Don't set ok (See RT #43048 for info) */
          return NULL;
+    }
     /*
      * for math ops result is in I0/N0
      * if it was a branch with constant args, the result is
