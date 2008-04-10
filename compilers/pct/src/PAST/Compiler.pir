@@ -1161,7 +1161,7 @@ attribute.
 
 .sub 'parameter' :method :multi(_, ['PAST::Var'])
     .param pmc node
-    .param pmc bindpost                            
+    .param pmc bindpost
 
     ##  get the current sub
     .local pmc subpost
