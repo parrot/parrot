@@ -1,5 +1,7 @@
 # $Id$
 
+.SUFFIXES : .pir .pbc
+
 # Setup some commands
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
@@ -15,20 +17,6 @@ $(PARROT_LIBRARY)/TGE.pbc: TGE.pir TGE/Rule.pbc TGE/Parser.pbc TGE/Grammar.pbc T
 	$(PARROT) -o $(PARROT_LIBRARY)/TGE.pbc --output-pbc TGE.pir
 
 .pir.pbc :
-	$(PARROT) -o $@ --output-pbc $<
-
-# FIXME: GNU Make 3.81 on my linux box doesn't follow the above summary rule
-# for stuff in subdirectories.  The following rules work around r26896 until
-# Coke can fix it.
-TGE/Rule.pbc: TGE/Rule.pir
-	$(PARROT) -o $@ --output-pbc $<
-TGE/Parser.pbc:   TGE/Parser.pir
-	$(PARROT) -o $@ --output-pbc $<
-TGE/Grammar.pbc:  TGE/Grammar.pir
-	$(PARROT) -o $@ --output-pbc $<
-TGE/Compiler.pbc: TGE/Compiler.pir
-	$(PARROT) -o $@ --output-pbc $<
-TGE/Tree.pbc:     TGE/Tree.pir
 	$(PARROT) -o $@ --output-pbc $<
 
 TGE/Parser.pir: TGE/Parser.pg
