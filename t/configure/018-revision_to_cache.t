@@ -31,7 +31,7 @@ my $cwd = cwd();
     require Parrot::Revision;
     no warnings 'once';
     like($Parrot::Revision::current, qr/^\d+$/,
-        "Got numeric value for reversion number");
+        "Got numeric value for revision number");
     use warnings;
     my $cache = q{.parrot_current_rev};
     ok( ( -e $cache ), "Cache for revision number was created");

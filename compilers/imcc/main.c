@@ -225,9 +225,7 @@ help(void)
 
 =item C<static void Parrot_version>
 
-Print out parrot version number and copyright message.  Include warning if
-configuration and build were done at different revision numbers (applies only
-when working from repository -- not from release versions).
+Print out parrot version number.
 
 =cut
 
@@ -236,19 +234,8 @@ when working from repository -- not from release versions).
 static void
 Parrot_version(PARROT_INTERP)
 {
-    int rev;
     printf("This is parrot version " PARROT_VERSION);
-    rev = Parrot_revision();
-    if (rev != 0)
-        printf(" (r%d)", PARROT_REVISION);
     printf(" built for " PARROT_ARCHNAME ".\n");
-    if (rev != 0 && PARROT_REVISION != rev) {
-        printf("Warning: runtime has revision %d!\n", rev);
-    }
-    rev = Parrot_config_revision();
-    if (rev != 0 && PARROT_REVISION != rev) {
-        printf("Warning: used Configure.pl revision %d!\n", rev);
-    }
     printf("Copyright (C) 2001-2008, The Perl Foundation.\n\
 \n\
 This code is distributed under the terms of the Artistic License 2.0.\

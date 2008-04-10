@@ -70,10 +70,6 @@ PF_DIR          = src/packfile
 # source directory
 SRC_DIR         = src
 
-# revision control
-#CONDITIONED_LINE(SVN_ENTRIES):SVN_ENTRIES=@SVN_ENTRIES@
-#INVERSE_CONDITIONED_LINE(SVN_ENTRIES):SVN_ENTRIES=
-
 ###############################################################################
 #
 # BUILD TOOL CONFIGURATIONS:
@@ -199,7 +195,6 @@ GEN_CONFIGS = \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
     $(SRC_DIR)/platform.c \
-    $(SRC_DIR)/revision.c \
 #CONDITIONED_LINE(platform_asm):    $(SRC_DIR)/platform_asm.s \
     $(SRC_DIR)/core_pmcs.c \
     CFLAGS \
@@ -446,7 +441,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/platform$(O) \
     $(SRC_DIR)/pmc_freeze$(O) \
     $(SRC_DIR)/pmc$(O) \
-    $(SRC_DIR)/revision$(O) \
     $(SRC_DIR)/runops_cores$(O) \
     $(SRC_DIR)/scheduler$(O) \
     $(SRC_DIR)/spf_render$(O) \
@@ -984,9 +978,6 @@ $(IMCC_DIR)/main$(O) : $(IMCC_DIR)/main.c $(GENERAL_H_FILES) $(IMCC_H_FILES)
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS_DIR)/ops.num $(OPS_DIR)/ops.skip
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl $(OPS_FILES)
-
-$(SRC_DIR)/revision.c : $(SVN_ENTRIES) $(BUILD_TOOLS_DIR)/revision_c.pl
-	$(PERL) -Ilib $(BUILD_TOOLS_DIR)/revision_c.pl > $(SRC_DIR)/revision.c
 
 ###############################################################################
 #
