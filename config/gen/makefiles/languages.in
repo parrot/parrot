@@ -130,8 +130,9 @@ realclean: \
     dotnet.realclean \
     eclectus.realclean \
     hq9plus.realclean \
+    jako.realclean \
+    perl6.realclean \
     unlambda.realclean \
-    jako.realclean
 
 #
 # Language specific targets
