@@ -193,7 +193,7 @@ POST equivalents.
 
 =over 4
 
-=item post(node)
+=item as_post(node)
 
 Return a POST representation of C<node>.  Note that C<post> is
 a multimethod based on the type of its first argument, this is
@@ -244,13 +244,14 @@ instead of an entire PAST structure.
     .return (ops)
 .end
 
+
 =back
 
 =head3 C<PAST::Block>
 
 =over 4
 
-=item post(PAST::Block node)
+=item as_post(PAST::Block node)
 
 Return the POST representation of a C<PAST::Block>.
 
@@ -398,13 +399,14 @@ Return the POST representation of a C<PAST::Block>.
     .return (bpost)
 .end
 
+
 =back
 
 =head3 C<PAST::Op>
 
 =over 4
 
-=item post(PAST::Op node)
+=item as_post(PAST::Op node)
 
 Return the POST representation of a C<PAST::Op> node.  Normally
 this is handled by redispatching to a method corresponding to
@@ -1020,7 +1022,7 @@ node with a 'pasttype' of bind.
 .end
 
 
-=item assign(PAST::Op node)
+=item copy(PAST::Op node)
 
 Implement a 'copy' assignment (at least until we get the 'copy'
 opcode -- see RT#47828).
@@ -1086,11 +1088,36 @@ node with a 'pasttype' of inline.
     .return (ops)
 .end
 
+
 =back
 
 =head3 C<PAST::Var>
 
 =over 4
+
+=item as_post(PAST::Block node)
+
+Return the POST representation of a C<PAST::Var>.  Generally we
+redispatch to an appropriate handler based on the node's 'scope'
+attribute.
+
+=cut
+
+.sub 'as_post' :method :multi(_, ['PAST::Var'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local string scope
+    scope = self.'scope'(node)
+    push_eh scope_error
+    $P0 = find_method self, scope
+    pop_eh
+    .return self.$P0(node)
+  scope_error:
+    $S0 = node.'name'()
+    .return self.'panic'("No scope found for PAST::Var '", $S0, "'")
+.end
+
 
 =item scope(PAST::Var node)
 
@@ -1142,22 +1169,6 @@ blocks to determine the scope.
     ops.'push'(vivilabel)
   vivipost_done:
     .return (ops)
-.end
-
-
-.sub 'as_post' :method :multi(_, ['PAST::Var'])
-    .param pmc node
-    .param pmc options         :slurpy :named
-
-    .local string scope
-    scope = self.'scope'(node)
-    push_eh scope_error
-    $P0 = find_method self, scope
-    pop_eh
-    .return self.$P0(node)
-  scope_error:
-    $S0 = node.'name'()
-    .return self.'panic'("No scope found for PAST::Var '", $S0, "'")
 .end
 
 
@@ -1390,7 +1401,7 @@ blocks to determine the scope.
 
 =over 4
 
-=item post(PAST::Val node [, 'rtype'=>rtype])
+=item as_post(PAST::Val node [, 'rtype'=>rtype])
 
 Return the POST representation of the constant value given
 by C<node>.  The C<rtype> parameter advises the method whether
