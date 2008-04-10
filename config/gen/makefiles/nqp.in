@@ -1,12 +1,9 @@
 # $Id$
 
 # Setup some commands
-LN_S     = @lns@
 PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
-TOOL_DIR = ../..
-CP       = @cp@
 
 PARROT_LIBRARY = @build_dir@/runtime/parrot/library
 PGE_LIBRARY  = @build_dir@/runtime/parrot/library/PGE
