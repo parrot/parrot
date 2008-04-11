@@ -768,21 +768,6 @@ Method forms to add a PMC to the beginning or end of the array.
         VTABLE_push_pmc(INTERP, SELF, value);
     }
 
-/*
-
-=item METHOD elems()
-
-Method form to return the number of elements in an array.
-
-=cut
-
-*/
-
-    METHOD elems() {
-        INTVAL n = VTABLE_elements(INTERP, SELF);
-        RETURN(INTVAL n);
-    }
-
 }
 
 /*
