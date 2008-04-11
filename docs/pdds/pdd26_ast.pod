@@ -486,6 +486,14 @@ may be useful.  However, the C<scope> entry for a symbol is
 typically used to provide the C<scope> attribute for any nested
 C<PAST::Var> nodes that do not provide an explicit C<scope> attribute.
 
+=item symbol_defaults([attr1 => val1, attr2 => val2, ...])
+
+Sets default attributes for symbols that aren't explicitly
+given by the C<symbol> method above.  For example, an abstract
+syntax tree can use this method on a top-level C<PAST::Block>
+to specify the C<scope> attribute to be used for all
+variable nodes that don't otherwise provide one.
+
 =item pir_pragma([value])
 
 Get/set any PIR pragmas to be used when generating the block.
