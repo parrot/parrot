@@ -32,9 +32,9 @@ operations for moving disks.
 
 So this situation (after the first move)
 
-           |        |       
-     ====  |        |       
-    ====== |        |   ==  
+           |        |
+     ====  |        |
+    ====== |        |   ==
 
 is represented as
 
@@ -167,7 +167,7 @@ loop_cols:
         disk_size = 0
         if stack_size <= i goto print_it
         disk_size = stack[i]                 # disk_size = towers[j][i]
-print_it: 
+print_it:
         n_spaces = tower_size - disk_size
         repeat S0, " ", n_spaces
         print S0
