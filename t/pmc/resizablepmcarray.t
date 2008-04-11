@@ -1220,12 +1220,12 @@ CODE
 15
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'method forms of unshift/push/shift/pop/elems' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'method forms of unshift/push/shift/pop' );
 .sub main :main
     $P0 = new 'ResizablePMCArray'
     $P0.'unshift'(1)
     $P0.'push'('two')
-    $I0 = $P0.'elems'()
+    $I0 = $P0
     say $I0
     $P1 = $P0.'shift'()
     say $P1
