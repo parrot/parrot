@@ -18,16 +18,9 @@ F<README> files in the root directory for more information about building
 Parrot.
 
 =head2 How can I implement a compiler to use as a compiler object from within
-Parrot? (For example, with the C<compile> op.)
+Parrot?
 
-Define a sub that takes as input a string, and returns something
-invokable. The easiest way to create something invokable at the moment
-is to use another compiler object (for example, the C<PIR> compiler), which
-you can get with:
-
- .local pmc pir_compiler
- pir_compiler = compreg 'PIR'
-
+See L<http://www.parrotblog.org/2008/03/targeting-parrot-vm.html>.
 
 =head2 How do I embed source locations in my code for debugging?
 
