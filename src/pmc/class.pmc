@@ -381,8 +381,9 @@ initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC *all_parents, PMC *init)
 pmclass Class
     need_ext {
 
-    ATTR INTVAL id;                /* The type number of the PMC. [deprecated: See RT #48024] */
+    ATTR INTVAL id;             /* The type number of the PMC. [deprecated: See RT #48024] */
     ATTR STRING *name;          /* The name of the class. */
+    ATTR STRING *fullname;      /* The name of the class. */
     ATTR PMC *_namespace;       /* The namespace it's linked to, if any. */
     ATTR INTVAL instantiated;      /* Any instantiations since last modification? */
     ATTR PMC *parents;          /* Immediate parent classes. */
@@ -424,6 +425,7 @@ arguments.  The class is attatched to the current HLL namespace.
         PMC_data(SELF)          = _class;
         _class->id              = 0;
         _class->name            = CONST_STRING(interp, "");
+        _class->fullname        = NULL;
         _class->_namespace      = PMCNULL;
         _class->instantiated    = 0;
         _class->parents         = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -553,16 +555,21 @@ Return the name of the class (without the HLL namespace).
         PMC          * const _namespace = _class->_namespace;
 
         if (!PMC_IS_NULL(_namespace)) {
-            /* Call the 'get_name' method on the class's associated namespace
-             * to retrieve a fully qualified list of names, then join the list
-             * with a semicolon.
-             */
-            PMC * const names = Parrot_ns_get_name(interp, _namespace);
+            if (_class->fullname)
+                return string_copy(interp, _class->fullname);
+            else {
 
-            if (!PMC_IS_NULL(names))
-                /* remove the HLL namespace name */
-                VTABLE_shift_string(INTERP, names);
-                return string_join(interp, CONST_STRING(interp, ";"), names);
+                /* Call the 'get_name' method on the class's associated
+                 * namespace to retrieve a fully qualified list of names, then
+                 * join the list with a semicolon.  */
+                PMC * const names = Parrot_ns_get_name(interp, _namespace);
+
+                if (!PMC_IS_NULL(names))
+                    /* remove the HLL namespace name */
+                    VTABLE_shift_string(INTERP, names);
+                    _class->fullname = string_join(interp, CONST_STRING(interp, ";"), names);
+                    return _class->fullname;
+            }
         }
 
         /* Otherwise, copy the stored string name of the class. */
