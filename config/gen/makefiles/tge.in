@@ -3,6 +3,7 @@
 .SUFFIXES : .pir .pbc
 
 # Setup some commands
+PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 
