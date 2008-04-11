@@ -1270,12 +1270,15 @@ UnManagedStruct PMC and stick the address into its data pointer.
 
 =item B<compreg>(out PMC, in STR)
 
-Get a compiler for source type $2.
+Get the compiler object for source type $2.  The returned compiler
+object should provide a C<compile> method for translating code
+in the source type.  However, some Parrot compilers such as
+C<PIR> and C<PASM> currently return a sub that is to be
+invoked directly on the source.
 
 =item B<compreg>(in STR, invar PMC)
 
-Register the sub $2 as a compiler for source type $1.
-$2 is either a NCI PMC with signature C<pIt> or a PASM Sub.
+Register $2 as the compiler object for source type $1.
 
 =item B<new_callback>(out PMC, invar PMC, invar PMC, in STR)
 
