@@ -494,7 +494,7 @@ symbol hash (see C<symbol> above).  If no named arguments
 are given, returns the default attribute hash itself.
 
 Currently we just use the '' entry of the symbol hash to
-store the default attributes, but it's probably not safe 
+store the default attributes, but it's probably not safe
 to rely on this behavior in the future.
 
 =cut
