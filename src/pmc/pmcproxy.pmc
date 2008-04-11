@@ -269,6 +269,24 @@ Returns whether the class is or inherits from C<*classname>.
 
         return 0;
     }
+/*
+
+=item C<INTVAL isa(STRING *classname)>
+
+Returns whether the class is or inherits from C<*classname>.
+
+=cut
+
+*/
+
+    VTABLE INTVAL isa(STRING *classname) {
+        const STRING * const pmc_proxy = CONST_STRING(interp, "PMCProxy");
+
+        if (string_equal(INTERP, classname, pmc_proxy) == 0)
+            return 1;
+
+        return SUPER(classname);
+    }
 
 /*
 

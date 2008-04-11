@@ -1180,10 +1180,31 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa(STRING *classname) {
-        PMC * const string_pmc = pmc_new(interp, enum_class_String);
-        VTABLE_set_string_native(interp, string_pmc, classname);
+        Parrot_Class * const _class = PARROT_CLASS(SELF);
 
-        return VTABLE_isa_pmc(interp, SELF, string_pmc);
+        INTVAL i, num_parents;
+
+        /* hard-code this one exception right away */
+        if (string_equal(interp, classname, CONST_STRING(interp, "Class")) == 0)
+            return 1;
+
+        /* check the fully-qualified name */
+        if (string_equal(interp, classname,
+                VTABLE_get_string(interp, SELF)) == 0)
+            return 1;
+
+        /* loop through parents */
+        num_parents = VTABLE_elements(interp, _class->parents);
+
+        for (i = 0; i < num_parents; i++) {
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
+                    _class->parents, i);
+
+            if (VTABLE_isa(interp, cur_class, classname))
+                return 1;
+        }
+
+        return 0;
     }
 
 /*
