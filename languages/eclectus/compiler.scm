@@ -267,13 +267,10 @@
 
 ; implementation of cons
 (define-primitive (cons arg1 arg2)
-  (past::var '(@ (viviself "EclectusPair")
-                 (name "%dummy")
-                 (isdecl 1)
-                 (scope "lexical"))
-             (past::op '(@ (name "infix:,"))
-                       (emit-expr arg1)
-                       (emit-expr arg2))))
+  (past::op '(@ (pasttype "inline")
+                (inline "new %r, 'EclectusPair'\\nset %r[%0], %1\\n"))
+            (emit-expr arg1)
+            (emit-expr arg2)))
 
 ; implementation of car
 (define-primitive (car arg)
@@ -283,8 +280,9 @@
 
 ; implementation of cdr
 (define-primitive (cdr arg)
-  (past::val '(@ (value 31)
-                 (returns "EclectusFixnum"))))
+  (past::op '(@ (pasttype "inline")
+                (inline "%r = %0.'value'()\\n"))
+            (emit-expr arg)))
 
 (define emit-comparison
   (lambda (builtin arg1 arg2)
