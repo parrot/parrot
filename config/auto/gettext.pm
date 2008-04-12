@@ -71,7 +71,9 @@ sub runstep {
         }
     }
     else {
-        eval { $conf->cc_build( '', '-lintl' ); };
+        # don't need to link with libintl if we have GNU libc
+        my $linklibs = defined $conf->data->get('glibc') ? '' : '-lintl';
+        eval { $conf->cc_build( '', $linklibs ); };
     }
     my $has_gettext;
     if ( !$@ ) {
