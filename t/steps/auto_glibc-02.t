@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
-# auto_glibc-01.t
+# auto_glibc-02.t
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -36,7 +36,17 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
-ok($step->runstep($conf), "runstep() returned true value");
+my $test = {};
+$test->{glibc} = 1;
+$step->_evaluate_glibc($conf, $test);
+is( $step->result(), q{yes}, "Got expected result" );
+is( $conf->data->get( 'glibc' ), 1, "Got expected value for 'glibc'" );
+
+$test->{glibc} = undef;
+$step->_evaluate_glibc($conf, $test);
+is( $step->result(), q{no}, "Got expected result" );
+ok( ! defined $conf->data->get( 'glibc' ),
+    "'glibc' undefined as expected" );
 
 pass("Completed all tests in $0");
 
@@ -44,21 +54,21 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_glibc-01.t - test config::auto::glibc
+auto_glibc-02.t - test config::auto::glibc
 
 =head1 SYNOPSIS
 
-    % prove t/steps/auto_glibc-01.t
+    % prove t/steps/auto_glibc-02.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test the 'normal functioning' of config::auto::glibc.
+The tests in this file test internal method auto::glibc::_evaluate_glibc().
 
 =head1 AUTHOR
 
-Jerry Gay
+James E Keenan
 
 =head1 SEE ALSO
 

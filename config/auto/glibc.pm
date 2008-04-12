@@ -53,7 +53,6 @@ sub _probe_for_glibc {
 
 sub _evaluate_glibc {
     my ( $self, $conf, $test ) = @_;
-    my $verbose = $conf->options->get('verbose');
 
     if ( defined $test->{glibc} ) {
         $self->set_result("yes");
