@@ -660,8 +660,9 @@ Integer? 0
 Foo? 1
 Bar? 1
 OUTPUT
+}
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass built-in" );
+pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass built-in" );
 .namespace [ 'Foo' ]
 
 .sub foometh :method
@@ -745,8 +746,6 @@ Integer? 1
 Foo? 1
 Bar? 1
 OUTPUT
-
-}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL" );
 .HLL 'Test', ''

@@ -28,6 +28,7 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/dynext.h"
+#include "pmc_class.h"
 
 /*
 
@@ -119,8 +120,12 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
                     PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
                 /* Cloning the class into the new interpreter ought
                  * to be sufficient to instantiate the class.  */
-                 PMC *ignored = Parrot_clone(d, s->vtables[i]->pmc_class);
-                UNUSED(ignored);
+                 PMC          *source       = s->vtables[i]->pmc_class;
+                 PMC          *dest         = Parrot_clone(d, source);
+                 Parrot_Class *source_class = PARROT_CLASS(source);
+                 Parrot_Class *dest_class   = PARROT_CLASS(dest);
+                 dest_class->name           = string_copy(d, source_class->name);
+                 dest_class->_namespace     = VTABLE_clone(d, source_class->_namespace);
             }
         }
     }

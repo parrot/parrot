@@ -1123,6 +1123,20 @@ Used by DOD to mark the PMC.
 
 /*
 
+=item C<PMC* clone()>
+
+Clones this PMC.  By default, this just does a freeze and thaw.
+
+=cut
+
+*/
+
+    VTABLE PMC* clone() {
+        return Parrot_thaw(interp, Parrot_freeze(interp, SELF));
+    }
+
+/*
+
 =item C<void freeze(visit_info *info)>
 
 Does nothing.

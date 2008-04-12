@@ -1846,7 +1846,7 @@ PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_clone(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    return Parrot_thaw(interp, Parrot_freeze(interp, pmc));
+    return VTABLE_clone(interp, pmc);
 }
 
 /*

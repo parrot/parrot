@@ -946,7 +946,7 @@ namespace). Unsets the instantiated flag, allowing modifications.
 
         /* Create the new class PMC, of the same type of this one (we may
          * have been subclassed). */
-        PMC          * const copy  = pmc_new(interp, SELF->vtable->base_type);
+        PMC          * const copy  = SUPER();
 
         /* Clone parents, roles, methods, attributes and resolve data. We do
          * not copy name/namespace related stuff (need anonymous clone) or
@@ -954,15 +954,17 @@ namespace). Unsets the instantiated flag, allowing modifications.
 
         Parrot_Class * const new_class = PARROT_CLASS(copy);
 
-        new_class->parents         = VTABLE_clone(interp, _class->parents);
-        new_class->roles           = VTABLE_clone(interp, _class->roles);
-        new_class->methods         = VTABLE_clone(interp, _class->methods);
-        new_class->vtable_overrides  = VTABLE_clone(interp,
-                                                  _class->vtable_overrides);
-        new_class->attrib_metadata = VTABLE_clone(interp,
-                                                  _class->attrib_metadata);
-        new_class->resolve_method  = VTABLE_clone(interp,
-                                                  _class->resolve_method);
+        new_class->name                = CONST_STRING(interp, "");
+        new_class->_namespace          = PMCNULL;
+        new_class->parents             = VTABLE_clone(interp, _class->parents);
+        new_class->roles               = VTABLE_clone(interp, _class->roles);
+        new_class->methods             = VTABLE_clone(interp, _class->methods);
+        new_class->vtable_overrides    = VTABLE_clone(interp,
+                                            _class->vtable_overrides);
+        new_class->attrib_metadata     = VTABLE_clone(interp,
+                                            _class->attrib_metadata);
+        new_class->resolve_method      = VTABLE_clone(interp,
+                                            _class->resolve_method);
 
         /* Return cloned class. */
         return copy;
