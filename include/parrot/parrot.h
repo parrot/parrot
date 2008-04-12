@@ -244,6 +244,20 @@ typedef void (*funcptr_t)(void);
 #define STRUCT_COPY(d, s)    (PARROT_ASSERT(d), PARROT_ASSERT(s), *(d)=*(s))
 #define STRUCT_COPY_N(d, s, n) (PARROT_ASSERT(d), PARROT_ASSERT(s), PARROT_ASSERT(sizeof (*(d))==sizeof (*(s))), memcpy((d), (s), sizeof (*(d))*(n)))
 
+
+#ifdef    PARROT_HAS_GEXTTEXT
+#  include <libintl.h>
+#  define _(s)                 gettext(s)
+#  define gettext_noop(s)      (s)
+#  define N_(s)                gettext_noop(s)
+#else
+#  define _(s)                 (s)
+#  define N_(s)                (s)
+#  define textdomain(d)
+#  define bindtextdomain(p, d)
+#endif /* PARROT_HAS_GETTEXT */
+
+
 #include "parrot/settings.h"
 #include "parrot/enums.h"
 #include "parrot/platform.h"
