@@ -60,9 +60,14 @@
               # compile and evaluate
               .local pmc past_compiler
               past_compiler = new [ 'PCT::HLLCompiler' ]
-              $P0 = split ' ', 'post pir evalpmc'
+              $P0 = split ' ', 'post pir'
               past_compiler.'stages'( $P0 )
               past_compiler.'eval'(stmts)
+              $P1 = past_compiler.'eval'(stmts)
+              #_dumper ($P1)
+              $P0 = split ' ', 'evalpmc'
+              past_compiler.'stages'( $P0 )
+              past_compiler.'eval'( $P1 )
           .end
           ")))
 
