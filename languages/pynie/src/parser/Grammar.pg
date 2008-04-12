@@ -280,7 +280,7 @@ rule attributeref {
 }
 
 rule subscription {
-    '[' <expression_list> ']'
+    '[' <tuple_or_scalar> ']' {*}
 }
 
 rule slicing {
@@ -445,17 +445,33 @@ token stringprefix {
 }
 
 rule expression_list {
-    <expression> [ ',' <expression> ]* ','?
-    {*}
+     <expression> [',' <expression> ]* ','? {*}
 }
 
-rule list_display { '[' <listmaker>? ']' }
+rule tuple_or_scalar {
+    | <tuple_constructor> {*} #= tuple_constructor
+    | <expression> {*}        #= expression
+}
 
-rule listmaker {
-    <expression>
-    [ <list_for>
-    | [ ',' <expression> ]* ','?
-    ]
+rule tuple_constructor {
+      <expression> ',' [ <expression> [ ',' <expression> ]* ','? ]? {*}
+} 
+
+rule list_display {
+    '['
+        [ <list_literal> {*}       #= list_literal
+        # | <list_comprehension> {*} #= list_comprehension
+        ]
+     ']'
+}
+
+rule list_literal {
+     [ <expression> [',' <expression> ]* ','? ]?
+     {*}
+}
+
+rule list_comprehension {
+     <expression> <list_iter>+
 }
 
 rule list_iter {
@@ -493,7 +509,7 @@ rule primary {
 
 rule postop {
     #| <attributeref>
-    #| <subscription>
+    | <subscription> {*}       #= subscription
     #| <slicing>
     | <call> {*}               #= call
 }
@@ -503,14 +519,14 @@ rule atom {
     | <identifier> {*}                           #= identifier
     | <literal> {*}                              #= literal
     | <parenth_form> {*}                         #= parenth_form
-   #| <list_display>                   #   ""
+    | <list_display> {*}                         #= list_display
    #| <generator_expression>           #   ""
    #| <dict_display>                   #   ""
    #| <string_conversion>              #   ""
 }
 
 rule parenth_form {
-    '(' <expression_list>? ')'
+    '(' <tuple_or_scalar>? ')'
     {*}
 }
 

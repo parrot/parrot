@@ -439,7 +439,10 @@ method call($/, $key) {
     else {
         make PAST::Op.new( :pasttype('call'), :node($/) );
     }
+}
 
+method subscription($/) {
+    make PAST::Var.new( $( $<tuple_or_scalar> ), :scope('keyed'));
 }
 
 method atom($/, $key) {
@@ -467,7 +470,13 @@ method shortstring($/) {
 }
 
 method parenth_form($/) {
-    make $( $<expression_list>[0] );
+    if +$<tuple_or_scalar> {
+	make $( $<tuple_or_scalar>[0] );
+    }
+    else {
+	make PAST::Op.new( :name('tuplemaker'),
+			   :pasttype('call'));
+    }
 }
 
 method assignment_stmt($/) {
@@ -487,3 +496,28 @@ method target($/, $key) {
     make $past;
 }
 
+method list_literal($/) {
+    my $past := PAST::Op.new( :name('listmaker'),
+                              :pasttype('call'));
+    for $<expression> {
+	$past.push( $($_) );
+    }
+    make $past;
+}
+
+method list_display($/, $key) {
+    make $( $/{$key} );
+}
+
+method tuple_or_scalar($/, $key) {
+    make $( $/{$key} );
+}
+
+method tuple_constructor($/) {
+    my $past := PAST::Op.new( :name('tuplemaker'),
+                              :pasttype('call'));
+    for $<expression> {
+	$past.push( $($_) );
+    }
+    make $past;
+}

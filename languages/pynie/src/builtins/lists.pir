@@ -18,6 +18,15 @@ src/builtins/lists.pir - List operations
     .return (args)
 .end
 
+.sub 'tuplemaker'
+    .param pmc args            :slurpy
+    .local pmc ret
+    ret = new .FixedPMCArray
+    if null args goto no_args
+    set ret, args
+  no_args:
+    .return (ret)
+.end
 =back
 
 =head1 AUTHOR
