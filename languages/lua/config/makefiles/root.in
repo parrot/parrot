@@ -97,6 +97,7 @@ all: \
  $(LIBPATH)/md5.pbc \
  $(LIBPATH)/random.pbc \
  $(LIBPATH)/sha1.pbc \
+ $(LIBPATH)/uuid.pbc \
  $(GEN_PIR) \
  $(GEN_PBC) \
  src/yapp/Lua/parser.pm
@@ -192,6 +193,9 @@ $(LIBPATH)/random.pbc: $(LIBPATH)/random.pir
 $(LIBPATH)/sha1.pbc: $(LIBPATH)/md5.pir
 	$(PERL) -pe "s|md5|sha1|g; s|MD5|SHA1|g" $(LIBPATH)/md5.pir > $(LIBPATH)/sha1.pir
 	$(PARROT) --output=$(LIBPATH)/sha1.pbc $(LIBPATH)/sha1.pir
+
+$(LIBPATH)/uuid.pbc: $(LIBPATH)/uuid.pir
+	$(PARROT) --output=$(LIBPATH)/uuid.pbc $(LIBPATH)/uuid.pir
 
 src/yapp/Lua/parser.pm: src/yapp/Lua/lua51.yp
 	yapp -v -m Lua::parser -o src/yapp/Lua/parser.pm src/yapp/Lua/lua51.yp

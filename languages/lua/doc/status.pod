@@ -230,6 +230,8 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =item * random library F<languages/lua/src/lib/random.pir>
 
+=item * uuid library F<languages/lua/src/lib/uuid.pir>
+
 =back
 
 =head1 Next Milestones
