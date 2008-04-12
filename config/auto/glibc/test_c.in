@@ -1,0 +1,30 @@
+/*
+ * test_c.c - seeing if GNU libc is installed
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int
+main()
+{
+    puts("(");
+#ifdef __GLIBC__
+    printf("glibc => %d,\n", __GLIBC__);
+#else
+    printf("glibc => undef,\n");
+#endif
+    puts(");");
+
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
