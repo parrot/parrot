@@ -124,18 +124,19 @@ see F<src/dynpmc/mdx.pmc>.
     .param pmc c :optional
     .param pmc raw :optional
     .param pmc extra :slurpy
+    .local pmc md
     .local pmc res
     $I0 = isa c, 'LuaUserdata'
     unless $I0 goto L1
-    $P1 = lua_checkudata(1, c, MYTYPE)
-    $S0 = $P1.'MD5_Final'()
+    md = lua_checkudata(1, c, MYTYPE)
+    $S0 = md.'Final'()
     goto L2
   L1:
     $S1 = lua_checkstring(1, c)
-    new $P1, 'MD5'
-    $P1.'MD5_Init'()
-    $P1.'MD5_Update'($S1)
-    $S0 = $P1.'MD5_Final'()
+    new md, 'MD5'
+    md.'Init'()
+    md.'Update'($S1)
+    $S0 = md.'Final'()
   L2:
     new res, 'LuaString'
     if null raw goto L3
@@ -168,7 +169,7 @@ see F<src/dynpmc/mdx.pmc>.
     .param pmc extra :slurpy
     .local pmc res
     new $P0, 'MD5'
-    $P0.'MD5_Init'()
+    $P0.'Init'()
     .local pmc mt
     mt = lua_getmetatable(MYTYPE)
     res = lua_newuserdata($P0, mt)
@@ -185,7 +186,7 @@ see F<src/dynpmc/mdx.pmc>.
     .param pmc extra :slurpy
     .local pmc res
     $P1 = lua_checkudata(1, c, MYTYPE)
-    $P1.'MD5_Init'()
+    $P1.'Init'()
     .return ()
 .end
 
@@ -221,7 +222,7 @@ see F<src/dynpmc/mdx.pmc>.
     .param pmc extra :slurpy
     $P1 = lua_checkudata(1, c, MYTYPE)
     $S2 = lua_checkstring(2, s)
-    $P1.'MD5_Update'($S2)
+    $P1.'Update'($S2)
     .return ()
 .end
 

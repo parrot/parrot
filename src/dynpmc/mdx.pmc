@@ -90,12 +90,12 @@ pmclass MDx
 
 =over 4
 
-=item C<void MDx_Init()>
+=item C<void Init()>
 
 =cut
 
 */
-    METHOD void MDx_Init() {
+    METHOD void Init() {
 #ifndef OPENSSL_NO_MDx
         MDx_CTX *c = PMC_data_typed(SELF, MDx_CTX *);
         (void)MDx_Init(c);
@@ -104,12 +104,12 @@ pmclass MDx
 
 /*
 
-=item C<void MDx_Update(STRING *buf)>
+=item C<void Update(STRING *buf)>
 
 =cut
 
 */
-    METHOD void MDx_Update(STRING *buf) {
+    METHOD void Update(STRING *buf) {
 #ifndef OPENSSL_NO_MDx
         MDx_CTX *c = PMC_data_typed(SELF, MDx_CTX *);
         (void)MDx_Update(c, (unsigned char *)buf->strstart, buf->bufused);
@@ -118,12 +118,12 @@ pmclass MDx
 
 /*
 
-=item C<STRING* MDx_Final()>
+=item C<STRING* Final()>
 
 =cut
 
 */
-    METHOD STRING* MDx_Final() {
+    METHOD STRING* Final() {
 #ifndef OPENSSL_NO_MDx
         unsigned char digest[MDx_DIGEST_LENGTH];
         MDx_CTX      *c = PMC_data_typed(SELF, MDx_CTX *);

@@ -139,10 +139,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'MD5 digest' );
     $P0 = loadlib 'digest_group'
     .local pmc md
     md = new 'MD5'
-    md.'MD5_Init'()
+    md.'Init'()
     $S0 = 'message digest'
-    md.'MD5_Update'($S0)
-    $S0 = md.'MD5_Final'()
+    md.'Update'($S0)
+    $S0 = md.'Final'()
     $P0 = split '', $S0
     new $P1, 'FixedPMCArray'
     set $P1, 1
