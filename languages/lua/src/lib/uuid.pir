@@ -100,9 +100,8 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
   L3:
     $P0 = get_hll_global ['uuid'], $S0
     $P1 = $P0()
-#    $P0 = get_hll_global ['uuid'], 'get_string'
-#    $S0 = $P0($P1)
-    $S0 = sprintf '%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x', $P1
+    $P0 = get_hll_global ['uuid'], 'get_string'
+    $S0 = $P0($P1)
 #    $S0 = $P1
     new res, 'LuaString'
     set res, $S0
