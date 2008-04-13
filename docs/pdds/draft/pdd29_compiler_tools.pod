@@ -143,6 +143,8 @@ The PCT is a set of libraries and programs, to:
 
 =back
 
+{{ Maybe just say it's used to create parrot-targeting compilers, not
+   list these as =items }}
 
 
 =head1 IMPLEMENTATION
@@ -241,6 +243,13 @@ into Parrot Byte Code (PBC) by the PIR compiler.
 The Parrot Grammar Engine (PGE) is a component that I<executes> regular
 expressions. Besides I<classic> regular expressions, it also understands
 Perl 6 Rules. Such rules are special regular expressions to define a grammar.
+
+The I<start> symbol in a grammar is named C<TOP>; this is the top-level
+rule that is executed when the parser is invoked.
+
+=head3 Operator precedence parsing
+
+{{ insert stuff about using an operator prec. table here }}
 
 =head2 Parrot Abstract Syntax Tree
 
