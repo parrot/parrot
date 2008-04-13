@@ -30,7 +30,9 @@ use lib qw( ../lib ../../lib ../../lib );
 
 use Parrot::Test::Harness
     language => 'eclectus',
-    exec	    => [ 'gosh', '-fcase-fold', '-I', '.',  '-l', 'gauche/prelude.scm' ],
+    exec     => ($^O eq 'MSWin32')
+              ? [ 'petite', '--script' ]
+              : [ 'gosh', '-fcase-fold', '-I', '.',  '-l', 'gauche/prelude.scm' ],
     #exec     => [ 'guile', '--debug', '-l', 'guile/prelude.scm', '-s' ],
     files    => [ 't/*.pl' ];
 
