@@ -44,7 +44,7 @@ See RT #47011.
 
 =back
 
-=head1 opcodes
+=head1 Opcodes
 
 =over 4
 
@@ -75,6 +75,26 @@ See RT #47976.
 =item * C<getfd> [post 0.5.1]
 
 See RT #48310.
+
+=item * C<saveall> and C<restoreall> ("register stack" ops) [post 0.6.1]
+
+It is much faster to use Parrot Calling Conventions or a separate set
+of registers rather than C<bsr>/C<ret> calling.  See RT #52838.
+
+=item * C<save>, C<restore>, other "user stack" ops [post 0.7.0]
+
+It is much faster and more flexible to use C<push> and C<pop> on an
+explicit array object.  The full list of deprecated ops is show below:
+
+	depth
+	entrytype
+	lookback
+	restore
+	rotate_up
+	save
+	savec
+
+See RT #52842 for details.
 
 =back
 
