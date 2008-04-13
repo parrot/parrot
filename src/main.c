@@ -42,6 +42,11 @@ main(int argc, const char * argv[])
     Interp  *interp;
     int      status;
 
+    /* internationalization setup */
+    /* setlocale(LC_ALL, ""); */
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    textdomain(PACKAGE);
+
     Parrot_set_config_hash();
 
     interp = Parrot_new(NULL);
