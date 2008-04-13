@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -149,6 +149,34 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'time' );
 .end
 CODE
 -1
+OUTPUT
+
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'type' );
+.sub test :main
+    load_bytecode 'library/uuid.pbc'
+    $P0 = get_global ['uuid'], 'generate'
+    $P1 = $P0()
+    $I0 = $P1.'type'()
+    print $I0
+    print "\n"
+.end
+CODE
+4
+OUTPUT
+
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'variant' );
+.sub test :main
+    load_bytecode 'library/uuid.pbc'
+    $P0 = get_global ['uuid'], 'generate'
+    $P1 = $P0()
+    $I0 = $P1.'variant'()
+    print $I0
+    print "\n"
+.end
+CODE
+1
 OUTPUT
 
 

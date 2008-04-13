@@ -42,6 +42,42 @@ L<http://e2fsprogs.sourceforge.net/>
     .return (-1)
 .end
 
+=item C<type>
+
+=cut
+
+.sub 'type' :method
+    $I0 = self[6]
+    $I0 >>= 4
+    .return ($I0)
+.end
+
+=item C<variant>
+
+=cut
+
+.const int UUID_VARIANT_NCS = 0
+.const int UUID_VARIANT_DCE = 1
+.const int UUID_VARIANT_MICROSOFT = 2
+.const int UUID_VARIANT_OTHER = 3
+
+.sub 'variant' :method
+    $I0 = self[8]
+    $I1 = $I0 & 0x80
+    unless $I1 == 0 goto L1
+    .return (UUID_VARIANT_NCS)
+  L1:
+    $I1 = $I0 & 0x40
+    unless $I1 == 0 goto L2
+    .return (UUID_VARIANT_DCE)
+  L2:
+    $I1 = $I0 & 0x20
+    unless $I1 == 0 goto L3
+    .return (UUID_VARIANT_MICROSOFT)
+  L3:
+    .return (UUID_VARIANT_OTHER)
+.end
+
 =back
 
 =head2 Functions
