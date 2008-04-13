@@ -87,7 +87,7 @@ sub runstep {
         # The Parrot::Configure settings might have changed while class ran
         $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
-    $conf->data->set( has_gettext => $has_gettext );
+    $conf->data->set( HAS_GETTEXT => $has_gettext );
 
     return 1;
 }
