@@ -245,6 +245,7 @@ typedef void (*funcptr_t)(void);
 #define STRUCT_COPY_N(d, s, n) (PARROT_ASSERT(d), PARROT_ASSERT(s), PARROT_ASSERT(sizeof (*(d))==sizeof (*(s))), memcpy((d), (s), sizeof (*(d))*(n)))
 
 
+/* internationalization settings */
 #ifdef    PARROT_HAS_GEXTTEXT
 #  include <libintl.h>
 #  define _(s)                 gettext(s)
@@ -256,6 +257,9 @@ typedef void (*funcptr_t)(void);
 #  define textdomain(d)
 #  define bindtextdomain(p, d)
 #endif /* PARROT_HAS_GETTEXT */
+
+#define PACKAGE     "parrot"
+#define LOCALEDIR  "."
 
 
 #include "parrot/settings.h"
