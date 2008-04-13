@@ -316,7 +316,7 @@ Returns the PMC value of the element at index C<key>.
 
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
-                "FixedPMCArray: index out of bounds!");
+                _("FixedPMCArray: index out of bounds!"));
 
         data = (PMC **)PMC_data(SELF);
         return data[key];
@@ -365,7 +365,7 @@ array.
 
         if (PMC_int_val(SELF) && size)
             real_exception(INTERP, NULL, E_IndexError,
-                    "FixedPMCArray: Can't resize!");
+                    _("FixedPMCArray: Can't resize!"));
         if (!size)
             return;
 
@@ -387,7 +387,7 @@ array.
 
         if (!VTABLE_does(interp, value, CONST_STRING(interp, "array")))
             real_exception(INTERP, NULL, E_TypeError,
-                    "Can't set self from this type");
+                    _("Can't set self from this type"));
 
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
@@ -554,7 +554,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
-                "FixedPMCArray: index out of bounds!");
+                _("FixedPMCArray: index out of bounds!"));
 
         data      = (PMC**)PMC_data(SELF);
         DOD_WRITE_BARRIER(INTERP, SELF, data[key], src);
@@ -647,7 +647,7 @@ Return a new iterator for SELF.
             return iter;
         }
 
-        real_exception(INTERP, NULL, E_IndexError, "Array: Unknown slice type");
+        real_exception(INTERP, NULL, E_IndexError, _("Array: Unknown slice type"));
     }
 
     VTABLE PMC *get_iter() {
@@ -678,7 +678,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
-                "FixedPMCArray: index out of bounds!");
+                _("FixedPMCArray: index out of bounds!"));
 
         data = (PMC**)PMC_data(SELF);
         return !PMC_IS_NULL(data[key]);
