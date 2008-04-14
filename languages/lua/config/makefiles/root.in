@@ -87,7 +87,7 @@ GEN_PBC = \
  lua.pbc
 
 all: \
- src/pmc/lua_group$(LOAD_EXT) \
+ $(PMCDIR)/lua_group$(LOAD_EXT) \
  $(LIB_PBCS) \
  $(LIBPATH)/luaperl.pbc \
  $(LIBPATH)/alarm.pbc \
@@ -127,7 +127,7 @@ lua@exe@: lua.pbc
 $(LIBPATH)/lualibs.pbc: $(LIB_PBCS)
 	$(PBC_MERGE) -o $(LIBPATH)/lualibs.pbc $(LIB_PBCS)
 
-src/pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
+$(PMCDIR)/lua_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
