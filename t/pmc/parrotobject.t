@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -167,7 +167,7 @@ OUT
 
 # assign opcode in inherited classes
 pir_output_is(
-    <<'CODE', <<'OUT', 'assign opcode in inherited classes', 'todo' => 'assign opcode inheritance' );
+    <<'CODE', <<'OUT', 'assign opcode in inherited classes' );
 .sub main :main
     $P1 = new 'ResizablePMCArray'
     push $P1, 3
