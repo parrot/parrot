@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 # Makefile for languages/regex
@@ -22,7 +22,9 @@ O             = @o@
 
 PMCS = match matchrange
 
-build : lib/Regex/Grammar.pm  $(PARROT_DYNEXT)/match_group$(LOAD_EXT) regex-compiler.pbc
+PMC_SOURCES = $(PMC_DIR)/match.pmc $(PMC_DIR)/matchrange.pmc
+
+build : lib/Regex/Grammar.pm $(PMC_DIR)/match_group$(LOAD_EXT) regex-compiler.pbc
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
@@ -34,7 +36,7 @@ lib/Regex/Grammar.pm : lib/Regex/Grammar.yp
 regex-compiler.pbc : regex-compiler.pir
 	$(PARROT) -o regex-compiler.pbc regex-compiler.pir
 
-$(PARROT_DYNEXT)/match_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
+$(PMC_DIR)/match_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
 	cd $(PMC_DIR) && $(BUILD_DYNPMC) generate $(PMCS)
 	cd $(PMC_DIR) && $(BUILD_DYNPMC) compile $(PMCS)
 	cd $(PMC_DIR) && $(BUILD_DYNPMC) linklibs $(PMCS)
