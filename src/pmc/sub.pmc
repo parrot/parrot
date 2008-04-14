@@ -743,8 +743,8 @@ slurpy arguments).
 
     METHOD get_namespace() {
         Parrot_sub * const sub = PMC_sub(SELF);
-        PMC *namespace = sub->namespace_stash;
-        RETURN(PMC *namespace);
+        PMC *_namespace = sub->namespace_stash;
+        RETURN(PMC *_namespace);
     }
 
     METHOD __get_regs_used(STRING *reg) {

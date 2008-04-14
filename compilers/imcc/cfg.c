@@ -394,13 +394,15 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
             for (pred = bb->pred_list; pred; pred = pred->next) {
                 int found = 0;
                 if (STREQ(pred->from->end->opname, "bsr")) {
-                    SymReg * const r = pred->from->end->symregs[0];
                     int j;
+                    {
+                        SymReg * const r = pred->from->end->symregs[0];
 
-                    sub = pred->to->start;
-                    if ((sub->type & ITLABEL) &&
-                            STREQ(sub->symregs[0]->name, r->name))
-                        found = 1;
+                        sub = pred->to->start;
+                        if ((sub->type & ITLABEL)
+                        &&  STREQ(sub->symregs[0]->name, r->name))
+                            found = 1;
+                    }
 invok:
                     j = pred->from->index;
                     if (found) {

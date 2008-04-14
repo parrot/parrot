@@ -1722,7 +1722,7 @@ div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, real_exception);
+    call_func(jit_info, (void *)real_exception);
     pc = jit_info->native_ptr;
     /* L1: */
     L1[1] = (char)(pc - L1 - 2);
@@ -1761,7 +1761,7 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, real_exception);
+    call_func(jit_info, (void *)real_exception);
     pc = jit_info->native_ptr;
     /* L1: */
     L1[1] = (char)(pc - L1 - 2);
@@ -1955,7 +1955,7 @@ opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, real_exception);
+    call_func(jit_info, (void *)real_exception);
     pc = jit_info->native_ptr;
     /* L3: */
     L3[1] = (char)(pc - L3 - 2);
@@ -3603,7 +3603,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         emitm_pushl_i(jit_info->native_ptr, CORE_OPS_check_events);
 
         call_func(jit_info,
-            (void (*)(void))interp->op_func_table[CORE_OPS_check_events]);
+            (void *)(interp->op_func_table[CORE_OPS_check_events]));
 #    ifdef PARROT_JIT_STACK_REUSE_INTERP
         emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 #    else
@@ -3625,7 +3625,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
     call_func(jit_info,
-            (void (*)(void))interp->op_func_table[cur_op]);
+            (void *)(interp->op_func_table[cur_op]));
 #    ifdef PARROT_JIT_STACK_REUSE_INTERP
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 #    else
@@ -4013,7 +4013,7 @@ preg:
     PARROT_ASSERT(pc - jit_info.arena.start <= size);
     /* could shrink arena.start here to used size */
     PObj_active_destroy_SET(pmc_nci);
-    return (jit_f)D2FPTR(jit_info.arena.start);
+    return (void *)D2FPTR(jit_info.arena.start);
 }
 
 #endif

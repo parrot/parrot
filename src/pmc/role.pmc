@@ -432,7 +432,7 @@ inspect_str.
         PMC * const metadata = pmc_new(interp, enum_class_Hash);
 
         STRING * const name       = CONST_STRING(interp, "name");
-        STRING * const namespace  = CONST_STRING(interp, "namespace");
+        STRING * const _namespace = CONST_STRING(interp, "namespace");
         STRING * const attributes = CONST_STRING(interp, "attributes");
         STRING * const methods    = CONST_STRING(interp, "methods");
         STRING * const roles      = CONST_STRING(interp, "roles");
@@ -440,8 +440,8 @@ inspect_str.
         VTABLE_set_pmc_keyed_str(interp, metadata, name,
             VTABLE_inspect_str(interp, SELF, name));
 
-        VTABLE_set_pmc_keyed_str(interp, metadata, namespace,
-            VTABLE_inspect_str(interp, SELF, namespace));
+        VTABLE_set_pmc_keyed_str(interp, metadata, _namespace,
+            VTABLE_inspect_str(interp, SELF, _namespace));
 
         VTABLE_set_pmc_keyed_str(interp, metadata, attributes,
             VTABLE_inspect_str(interp, SELF, attributes));
