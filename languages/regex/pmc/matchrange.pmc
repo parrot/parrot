@@ -357,7 +357,7 @@ result in C<dest>.
 
     PMC* add(PMC* value, PMC* dest) {
         INTVAL v = VTABLE_get_integer(interp, dest);
-        return SELF.add_int(v, dest);
+        return STATICSELF.add_int(v, dest);
     }
 
     PMC* add_int(INTVAL value, PMC* dest) {
@@ -378,7 +378,7 @@ result in C<dest>.
     }
 
     PMC* add_float(FLOATVAL value, PMC* dest) {
-        return SELF.add_int((INTVAL) value, dest);
+        return STATICSELF.add_int((INTVAL) value, dest);
     }
 
 /*
@@ -398,7 +398,7 @@ the result in C<dest>.
 
     PMC* subtract(PMC* value, PMC* dest) {
         INTVAL v = VTABLE_get_integer(interp, dest);
-        return SELF.subtract_int(v, dest);
+        return STATICSELF.subtract_int(v, dest);
     }
 
     PMC* subtract_int(INTVAL value, PMC* dest) {
@@ -413,7 +413,7 @@ the result in C<dest>.
     }
 
     PMC* subtract_float(FLOATVAL value, PMC* dest) {
-        return SELF.subtract_int((INTVAL) value, dest);
+        return STATICSELF.subtract_int((INTVAL) value, dest);
     }
 
 /*
