@@ -2,16 +2,42 @@
 
 New in 0.6.1
 - Specification
-  + initial draft of pdd29_compiler_tools.pod
+  + drafted pdd29_compiler_tools.pod
+  + updated pdd28_character_sets.pod draft
+  + updated pdd19_pir.pod draft
 - Languages
-  + Reimplemented HQ9+ with PCT
-  + Lua : reimplementation with PCT/PAST & POST
+  + c99: added independent C pre-processor
+  + HQ9+: reimplemented with PCT
+  + Lua:
+    . reimplementation with PCT, using PAST and POST
+    . behavior aligned wih 5.1.3
+  + Rakudo:
+    . implemented basic I/O, including '$*IN', '$*OUT', '$*ERR', 'prefix:='
+    . implemented simple typing and runtime type checking
+    . added basic multi-method dispatch
+    . expanded named argument handling, including Pair and colonpairs
+    . added 'Whatever' and 'Capture' classes
+    . implemented 'handles' trait verb
+    . added 'loop' statement
+    . implemented 'given', 'when', 'for', 'while', 'until' statement modifiers
+    . implemented Hash methods '.keys' and '.values'
+    . fixed bug to get '.WHAT' working correctly
+    . initial implementation of 'eval'
 - Compilers
-  + Removed P6Regex, pgc, P6Grammar from PGE
-  + Removed PAST-pm and Parrot::HLLCompiler
-  + NQP
-    . added <, <=, >, >= relational operators
-    . added postfix:++,-- operators
+  + NQP:
+    . created a bootstrapped build, see 'make boot'
+    . added 'infix:<', 'infix:<=', 'infix:>', 'infix:>=' relational operators
+    . added 'postfix:++', 'postfix:--' operators
+  + PCT:
+    . added methods specifying default behaviors in PAST, reducing repeated code
+    . improved symbol table lookup
+  + PGE:
+    . removed deprecated code including: P6Regex, P6Grammar, PAST-pm
+- Miscellaneous
+  + notable speedups during compilation and execution of parrot and HLLs
+  + pdb (the parrot debugger) can now catch parrot exceptions
+  + better detection of glibc and gettext during configuration
+  + various bugfixes, code cleanups, deprecations, and coding standard fixes
 
 
 New in 0.6.0
