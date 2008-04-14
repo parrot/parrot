@@ -61,10 +61,18 @@ sub runstep {
     # Fink location.
     $self->_handle_darwin_for_fink($conf, $osname, 'gdbm.h');
 
-    _handle_mswin32($conf, $osname, $cc);
-
     $conf->cc_gen('config/auto/gdbm/gdbm.in');
-    eval { $conf->cc_build(); };
+    if ( $osname =~ /mswin32/i ) {
+        if ( $cc =~ /^gcc/i ) {
+            eval { $conf->cc_build( '', '-llibgdbm' ); };
+        }
+        else {
+            eval { $conf->cc_build( '', 'gdbm.lib' ); };
+        }
+    }
+    else {
+        eval { $conf->cc_build( '', '-lgdbm' ); };
+    }
     my $has_gdbm = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
@@ -77,22 +85,6 @@ sub runstep {
     }
     $conf->data->set( has_gdbm => $has_gdbm );    # for gdbmhash.t and dynpmc.in
 
-    return 1;
-}
-
-sub _handle_mswin32 {
-    my ($conf, $osname, $cc) = @_;
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lgdbm.dll' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'libgdbm.lib' );
-        }
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lgdbm' );
-    }
     return 1;
 }
 
