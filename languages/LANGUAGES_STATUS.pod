@@ -210,7 +210,7 @@ Generates PIR for basic Ruby programs
 
 =item Last verified with parrot version
 
-0.5.3
+0.6.1
 
 =item Location
 
@@ -359,7 +359,7 @@ Much work needed on parse actions and data types (PMCs or classes.
 
 =item Last verified with parrot version
 
-0.5.3
+0.6.1
 
 =item Location
 
@@ -443,7 +443,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.2
+0.6.1
 
 =item Location
 
@@ -522,7 +522,7 @@ VISIBLE and BTW "work"
 
 =item Last verified with parrot version
 
-0.5.2
+0.6.1
 
 =item Location
 
@@ -706,7 +706,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.5.2
+0.6.1
 
 =item Location
 
@@ -731,7 +731,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.5.3
+0.6.1
 
 =item Location
 
@@ -759,7 +759,7 @@ builtins.
 
 =item Last verified with Parrot version
 
-0.5.2
+0.6.1
 
 =item Location
 
@@ -913,7 +913,7 @@ Functions and simple expressions are working.
 
 =item Last verified with parrot version
 
-0.5.3
+0.6.1
 
 =item Location
 
