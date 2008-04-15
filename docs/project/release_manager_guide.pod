@@ -336,7 +336,7 @@ that release.
  - Jan 15th (0.5.2) Bob Rogers
  - Feb 19th (0.5.3) Patrick Michaud
  - Mar 18th (0.6.0) Bernhard Schmalhofer
- - Apr 15th (?)     Jerry Gay
+ - Apr 15th (0.6.1) Jerry Gay
  - May 20th (?)     chromatic
  - Jun 17th (?)     Nuno Carvalho
 

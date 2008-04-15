@@ -114,4 +114,6 @@ the strings?).
 
  Barney    0.6.0          2008-Mar-18     "P&P"
 
+ Jerry     0.6.1          2008-Apr-15     "Bird of Paradise"
+
 =cut
