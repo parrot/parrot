@@ -1,13 +1,6 @@
-/* TclDict.pmc
- *  Copyright (C) 2001-2003, The Perl Foundation.
- *  SVN Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the TclDict base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
+/*
+ * Copyright (C) 2001-2008, The Perl Foundation.
+ * $Id$
 
 =head1 NAME
 
@@ -36,49 +29,6 @@ pmclass TclDict
     hll     Tcl
     maps    Hash
 {
-
-/*
-
-=item C<void assign_pmc(PMC *other)>
-
-Copy the contents of other to self.
-
-=cut
-
-*/
-
-    void set_pmc(PMC *other) {
-        SELF.assign_pmc(other);
-    }
-
-    void assign_pmc(PMC *other) {
-        STRING *hash   = string_from_cstring(INTERP, "hash", 4);
-        STRING *undef  = string_from_cstring(INTERP, "Undef", 5);
-
-        if (VTABLE_does(INTERP, other, hash))
-        {
-            PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, other);
-
-            pmc_reuse(INTERP, SELF, SELF->vtable->base_type, 0);
-            while (VTABLE_get_bool(INTERP, iter))
-            {
-                STRING *key   = VTABLE_shift_string(INTERP, iter);
-                PMC    *value = VTABLE_get_pmc_keyed_str(INTERP, other, key);
-                VTABLE_set_pmc_keyed_str(INTERP, SELF, key, value);
-            }
-        }
-        else if (VTABLE_isa(INTERP, other, undef))
-        {
-            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
-        }
-        else
-        {
-            real_exception(INTERP, NULL, E_TypeError,
-                           "unable to assign self to this TclDict");
-        }
-    }
-
-/*
 
 =item C<STRING *get_string()>
 
