@@ -236,6 +236,7 @@ D: Debian packaging
 S: Chemnitz, Germany
 
 N: François Perrad
+E: francois.perrad@gadz.org
 W: http://fperrad.googlepages.com/home
 D: build fixes for MinGW
 D: a patch to remove slash_exec from config
