@@ -199,7 +199,11 @@
 
 ; Support for primitive functions
 
-(define-record primitive (arg-count emitter))
+(define-record-type primitive
+  (make-primitive arg-count emitter)
+  primitive?
+  (arg-count primitive-arg-count)
+  (emitter primitive-emitter))
 
 (define *primitives* (make-eq-hashtable))
 

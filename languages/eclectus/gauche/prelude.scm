@@ -8,16 +8,6 @@
      (if (not condition)
          (begin body1 body ...)))))
 
-(define-macro (define-record name fields)
-  (define (symbol-append . symbols)
-    (string->symbol (apply string-append (map symbol->string symbols))))
-  `(define-record-type name
-     (,(symbol-append 'make- name) ,@fields)
-     ,(symbol-append name '?)
-     ,@(map (lambda (field)
-              `(,field ,(symbol-append name '- field)))
-            fields)))
-
 (define (make-eq-hashtable)
   (make-hash-table))
 
