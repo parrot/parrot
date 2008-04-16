@@ -148,7 +148,6 @@ GEN_MAKEFILES = \
     ext/Makefile \
     languages/Makefile \
     languages/abc/Makefile \
-    languages/amber/Makefile \
     languages/APL/Makefile \
     languages/befunge/Makefile \
     languages/bf/Makefile \

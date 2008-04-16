@@ -42,7 +42,6 @@ use ExtUtils::Manifest qw( maniread );
 my %lang_is_checked = map { $_ => 1 } qw{
     APL
     WMLScript
-    amber
     cardinal
     dotnet
     lua
