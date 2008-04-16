@@ -50,7 +50,7 @@ my $cwd = cwd();
     ok( (mkdir 'include'), "Able to make include directory");
 
     ok($step->runstep($conf), "runstep() returned true value");
-    is($step->result(), q{ports located}, "Got expected result");
+    is($step->result(), q{yes}, "Got expected result");
 
     is($conf->data->get('ports_base_dir'), $tdir,
         "ports base directory set as expected");

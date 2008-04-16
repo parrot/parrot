@@ -45,11 +45,11 @@ $step->{ports_root} = File::Spec->catdir( qw( / my ridiculous foobar ) );
 {
     my ($stdout, $stderr);
     my $ret = capture sub { $step->runstep($conf) }, \$stdout, \$stderr;
-    ok(! defined $ret, "runstep() returned undefined value");
-    is($step->result(), 'failed', "Got expected result");
+    ok($ret, "runstep() returned true value");
+    is($step->result(), 'no', "Got expected result");
     like(
         $stdout,
-        qr/^Could not locate ports directories/,
+        qr/^Could not locate Macports directories/,
         "Got expected verbose output"
     );
 }

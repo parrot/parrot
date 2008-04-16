@@ -41,8 +41,8 @@ ok($step->description(), "$step_name has description");
 
 # mock no Macports-default directories
 $step->{ports_root} = File::Spec->catdir( qw( / my ridiculous foobar ) );
-ok(! defined $step->runstep($conf), "runstep() returned undefined value");
-is($step->result(), 'failed', "Got expected result");
+ok($step->runstep($conf), "runstep() returned true value");
+is($step->result(), 'no', "Got expected result");
 
 pass("Completed all tests in $0");
 
