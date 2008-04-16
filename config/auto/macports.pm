@@ -32,13 +32,17 @@ use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':auto';
 use Parrot::BuildUtil;
 
-
 sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining Macports location on Darwin};
     $data{result}      = q{};
-    $data{ports_root} = File::Spec->catdir( '/', 'opt', 'local' );
+    my $optlocal = File::Spec->catdir( '/', 'opt', 'local' );
+    $data{ports_root} = (defined $ENV{TEST_MACPORTS})
+        ? $ENV{TEST_MACPORTS}
+        : (-d $optlocal)
+            ? $optlocal
+            : undef;
     return \%data;
 }
 
@@ -52,6 +56,13 @@ sub runstep {
         $self->set_result('skipped');
         return 1;
     }
+    if (! defined $self->{ports_root}) {
+        print "Could not locate Macports root directory\n"
+            if $verbose;
+        $self->set_result('no');
+        return 1;
+    }
+
     my $ports_base_dir = $self->{ports_root};
     my $ports_lib_dir = qq{$ports_base_dir/lib};
     my $ports_include_dir = qq{$ports_base_dir/include};
@@ -60,10 +71,10 @@ sub runstep {
         push @unlocateables, $dir unless (-d $dir);
     }
     if (@unlocateables) {
-        print "Could not locate ports directories:  @unlocateables\n"
+        print "Could not locate Macports directories:  @unlocateables\n"
             if $verbose;
-        $self->set_result('failed');
-        return;
+        $self->set_result('no');
+        return 1;
     }
     else {
         $conf->data->set(
@@ -71,7 +82,7 @@ sub runstep {
             ports_lib_dir        => $ports_lib_dir,
             ports_include_dir    => $ports_include_dir,
         );
-        $self->set_result('ports located');
+        $self->set_result('yes');
         return 1;
     }
 }
