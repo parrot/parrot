@@ -19,34 +19,6 @@ will have their test results listed under the smokes marked
 
 =head1 List of languages
 
-=head2 Amber for parrot
-
-=over 4
-
-=item Description
-
-Scripting language inspired by Eiffel and Ruby.
-
-=item Status
-
-Incomplete - but all examples and test cases are working.
-Estimated progress towards release 1.0: language constructs 47%,
-libraries 6%, documentation 4%, robustness 6%.
-See also L<http://xamber.org/history.html>
-
-=item Last verified with parrot version
-
-0.4.2
-
-=item Location
-
-L<http://xamber.org/>
-
-The Amber PMCs are in C<languages/amber>.
-
-=back
-
-
 =head2 APL
 
 =over 4
@@ -1125,6 +1097,12 @@ C<languges/Zcode>
 
 This section will eventually be removed, for now serves as a pointer to
 some older implementations.
+
+=head2 Amber
+
+Scripting language inspired by Eiffel and Ruby. Original version
+targeted parrot, current version is self-contained. The PMCs for amber
+were in the repository until 0.6.1. L<http://xamber.org/>
 
 =head2 Parakeet
 
