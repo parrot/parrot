@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# auto_macports-02.t
+# auto_macports-06.t
 
 use strict;
 use warnings;
@@ -50,18 +50,18 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_macports-02.t - test config::auto::macports
+auto_macports-06.t - test config::auto::macports
 
 =head1 SYNOPSIS
 
-    % prove t/steps/auto_macports-02.t
+    % prove t/steps/auto_macports-06.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
 The tests in this file test config::auto::macports by mocking the case where
-default directories for Macports are not located.
+the root directory for Macports is not located.
 
 =head1 AUTHOR
 
