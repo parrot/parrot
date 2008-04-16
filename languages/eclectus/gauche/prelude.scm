@@ -2,6 +2,9 @@
 (use gauche.parameter)
 (use gauche.process)
 
+(load "riaxpander/gauche.scm")
+(import riaxpander)
+
 (define-syntax unless
   (syntax-rules ()
     ((unless condition body1 body ...)

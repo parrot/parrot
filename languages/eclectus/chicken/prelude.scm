@@ -1,6 +1,8 @@
 (use srfi-9)
 (use srfi-1)
 
+(load "riaxpander/chicken-sexp.scm")
+
 (define-syntax unless
   (syntax-rules ()
     ((unless condition body1 body ...)
