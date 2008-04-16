@@ -85,10 +85,6 @@ pdump                                             [main]bin
 pdump.exe                                         [main]bin
 perl6                                             [main]bin
 perl6.exe                                         [main]bin
-runtime/parrot/dynext/amber_kernel.bundle         [library]
-runtime/parrot/dynext/amber_kernel.dll            [library]
-runtime/parrot/dynext/amber_kernel.dylib          [library]
-runtime/parrot/dynext/amber_kernel.so             [library]
 runtime/parrot/dynext/apl_group.bundle            [library]
 runtime/parrot/dynext/apl_group.dll               [library]
 runtime/parrot/dynext/apl_group.dylib             [library]
