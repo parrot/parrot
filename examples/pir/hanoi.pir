@@ -108,10 +108,14 @@ Replace I6 etc. with mnemonic register names.
         if $I0 < 2 goto USE_DEFAULT_SIZE
         S5 = argv[1]
         size = S5
+        if size < 1 goto INVALID_SIZE
         print "Building a tower of size "
         print size
         print ".\n"
         goto SIZE_IS_NOW_KNOWN
+INVALID_SIZE:
+        print "Given tower size is invalid.\n"
+        goto USE_DEFAULT_SIZE
 USE_DEFAULT_SIZE:
         print "Using default size 3 for tower.\n"
         size = 3
@@ -140,8 +144,12 @@ loop_populate:
         if i > 0 goto loop_populate
         ## towers = [[...,3,2,1],[],[]]
 
+        # uncomment to print initial layout
+        # print_towers(towers)
+
         ## Now solve it.
         move_stack(size, 0, 2, 1)
+        .return ()
 .end
 
 ## Print the current state of the towers array.
