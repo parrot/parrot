@@ -109,7 +109,6 @@ Build the packages. From ~/deb/parrot/parrot_<version>/, run:
 Check the package for errors. From ~/deb/parrot, run:
 
   $ lintian -i parrot_<version>.changes
-  $ linda -i parrot_<version>.changes
 
 =item 11.
 
