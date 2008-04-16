@@ -89,6 +89,9 @@ The availability of these libraries is checked by Configure.pl.
 B<libcrypto> - a part of libssl
 L<http://www.openssl.org/>
 
+B<gettext> - library and tools for native language support
+L<http://gnuwin32.sourceforge.net/>
+
 B<gdbm> - GNU database manager
 L<http://gnuwin32.sourceforge.net/>
 

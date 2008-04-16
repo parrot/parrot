@@ -64,7 +64,7 @@ sub runstep {
     $conf->cc_gen('config/auto/gettext/gettext.in');
     if ( $osname =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
-            eval { $conf->cc_build( '', '-llibintl' ); };
+            eval { $conf->cc_build( '', '-lintl' ); };
         }
         else {
             eval { $conf->cc_build( '', 'intl.lib' ); };
