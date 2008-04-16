@@ -16,7 +16,7 @@ use Parrot::Distribution;
 use Getopt::Long;
 
 BEGIN {
-    eval { require Perl::Critic };
+    eval { require Perl::Critic; };
     if ($@) {
         plan skip_all => 'Perl::Critic not installed';
     }
