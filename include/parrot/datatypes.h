@@ -74,6 +74,7 @@ struct _data_types {
     int size;
 };
 
+extern const struct _data_types data_types[];
 #if defined(INSIDE_GLOBAL_SETUP)
 const struct _data_types data_types[] = {
     { "INTVAL",   INTVAL_SIZE },          /* parrot types */
@@ -122,8 +123,6 @@ const struct _data_types data_types[] = {
 
     { "illegal", 0 }
 };
-#else
-extern const struct _data_types data_types[];
 #endif /* INSIDE_GLOBAL_SETUP */
 
 /* HEADERIZER BEGIN: src/datatypes.c */
