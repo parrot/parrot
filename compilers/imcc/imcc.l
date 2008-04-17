@@ -1118,7 +1118,11 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 
         /* whitespace can be safely ignored */
         do {
+#ifdef __cplusplus
+            c = yyinput(yyscanner);
+#else
             c = input(yyscanner);
+#endif
         } while (c == ' ' || c == '\t');
 
         if (c != '(') {
