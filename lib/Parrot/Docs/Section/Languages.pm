@@ -70,7 +70,6 @@ sub new {
         $self->new_section( 'Pynie',       'pynie.html',      '', 'languages/pynie' ),
         $self->new_section( 'Regex',       'regex.html',      '', 'languages/regex' ),
         $self->new_section( 'Scheme',      'scheme.html',     '', 'languages/scheme' ),
-        $self->new_section( 'TAP',         'tap.html',        '', 'languages/tap' ),
         $self->new_section( 'TCL',         'tcl.html',        '', 'languages/tcl' ),
         $self->new_section( 'unlambda',    'unlambda.html',   '', 'languages/unlambda' ),
         $self->new_section( 'URM',         'urm.html',        '', 'languages/urm' ),
