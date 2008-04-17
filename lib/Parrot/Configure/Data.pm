@@ -256,7 +256,7 @@ Reference to hash holding main Parrot::Configure data structure.
 
 =cut
 
-sub slurp() {
+sub slurp {
     my $self = shift;
     my $res  = eval <<EVAL_CONFIG;
 no strict;
@@ -292,7 +292,7 @@ structure holding temporary data.
 
 =cut
 
-sub slurp_temp() {
+sub slurp_temp {
     my $self = shift;
     my $res  = eval <<EVAL_CONFIG_TEMP;
 no strict;

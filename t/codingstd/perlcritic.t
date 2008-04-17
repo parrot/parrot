@@ -129,6 +129,7 @@ else {
         'InputOutput::ProhibitBarewordFileHandles'        => 1,
         'InputOutput::ProhibitTwoArgOpen'                 => 1,
         'Subroutines::ProhibitExplicitReturnUndef'        => 1,
+        'Subroutines::ProhibitSubroutinePrototypes'       => 1,
         'TestingAndDebugging::MisplacedShebang'           => 1,
         'TestingAndDebugging::ProhibitShebangWarningsArg' => 1,
         'TestingAndDebugging::RequirePortableShebang'     => 1,
@@ -148,7 +149,6 @@ else {
         'NamingConventions::ProhibitAmbiguousNames' =>
             { forbid => join(" ", @ambiguousNames)},
         'Subroutines::ProhibitBuiltinHomonyms'      => 1,
-        'Subroutines::ProhibitSubroutinePrototypes' => 1,
         'Subroutines::RequireFinalReturn'           => 1,
     );
 

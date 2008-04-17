@@ -189,7 +189,7 @@ Returns the Parrot C code coda
 
 =cut
 
-sub c_code_coda() {
+sub c_code_coda {
     <<"EOC";
 /*
  * Local variables:

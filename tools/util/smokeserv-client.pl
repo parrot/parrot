@@ -10,7 +10,7 @@ use Getopt::Long;
 use LWP::UserAgent;
 
 use constant VERSION => 0.4;
-sub debug($);
+sub debug;
 
 our $compress = sub { return };
 
@@ -87,7 +87,7 @@ USAGE
 {
     my $fresh;
 
-    sub debug($) {
+    sub debug {
         my $msg = shift;
 
         print STDERR "* " and $fresh++ unless $fresh;

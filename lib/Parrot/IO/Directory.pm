@@ -184,7 +184,7 @@ directory.
 
 =cut
 
-sub file_and_directory_names() {
+sub file_and_directory_names {
     my $self = shift;
     my $dh   = DirHandle->new( $self->path )
         or die "can't opendir $self->{PATH}: $!";
@@ -198,7 +198,7 @@ These are the full paths of all the files and subdirectories in the directory.
 
 =cut
 
-sub file_and_directory_paths() {
+sub file_and_directory_paths {
     my $self = shift;
 
     return map { File::Spec->catfile( $self->{PATH}, $_ ) } $self->file_and_directory_names;
@@ -210,7 +210,7 @@ These are the full paths of all the files in the directory.
 
 =cut
 
-sub file_paths() {
+sub file_paths {
     my $self = shift;
 
     return sort grep { -f } $self->file_and_directory_paths;

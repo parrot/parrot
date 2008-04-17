@@ -22,10 +22,8 @@ sub new {
     return bless {};
 }
 
-sub output_is() {
+sub output_is {
     my ( $self, $code, $output, $desc ) = @_;
-
-    #print "@_\n";
 
     my $count = $self->{builder}->current_test + 1;
     $desc = 'Cardinal Test' unless $desc;

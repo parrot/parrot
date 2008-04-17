@@ -22,7 +22,7 @@ sub new {
     return bless {};
 }
 
-sub output_is() {
+sub output_is {
     my ( $self, $code, $output, $desc ) = @_;
 
     my $count = $self->{builder}->current_test + 1;
