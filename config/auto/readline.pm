@@ -60,7 +60,8 @@ sub runstep {
             $has_readline = $self->_evaluate_cc_run($verbose);
         }
         _handle_readline($conf, $has_readline);
-    } else {
+    }
+    else {
         _handle_ncurses_need($conf, $osname, $cc);
         eval { $conf->cc_build() };
         if ( !$@ ) {
