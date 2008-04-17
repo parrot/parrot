@@ -60,6 +60,15 @@ sub runstep {
             $has_readline = $self->_evaluate_cc_run($verbose);
         }
         _handle_readline($conf, $has_readline);
+    } else {
+        _handle_ncurses_need($conf, $osname, $cc);
+        eval { $conf->cc_build() };
+        if ( !$@ ) {
+            if ( $conf->cc_run() ) {
+                $has_readline = $self->_evaluate_cc_run($verbose);
+            }
+            _handle_readline($conf, $has_readline);
+        }
     }
     unless ($has_readline) {
         # The Parrot::Configure settings might have changed while class ran
@@ -81,6 +90,22 @@ sub _handle_mswin32 {
     }
     else {
         $conf->data->add( ' ', libs => '-lreadline' );
+    }
+    return 1;
+}
+
+sub _handle_ncurses_need {
+    my ($conf, $osname, $cc) = @_;
+    if ( $osname =~ /mswin32/i ) {
+        if ( $cc =~ /^gcc/i ) {
+            $conf->data->add( ' ', libs => '-lncuses' );
+        }
+        else {
+            $conf->data->add( ' ', libs => 'ncurses.lib' );
+        }
+    }
+    else {
+        $conf->data->add( ' ', libs => '-lncurses' );
     }
     return 1;
 }
