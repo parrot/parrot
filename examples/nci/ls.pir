@@ -25,7 +25,7 @@ List the content of the directory 'docs'.
      store_global 'libc::closedir', closedir
      .local pmc curdir
      curdir = libc::opendir("docs")
-     .local OrderedHash entry
+     .local pmc entry
 
      .include "datatypes.pasm"
      new $P2, 'OrderedHash'
