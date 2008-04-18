@@ -222,6 +222,8 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =item * base64 library F<languages/lua/src/lib/base64.pir>
 
+=item * big number library F<languages/lua/src/lib/bc.pir>
+
 =item * bitwise operation library F<languages/lua/src/lib/bitlib.pir>
 
 =item * Lua File System library F<languages/lua/src/lib/lfs.pir>

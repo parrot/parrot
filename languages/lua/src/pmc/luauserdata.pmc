@@ -237,6 +237,52 @@ MMD_DEFAULT: {
 */
     INTVAL cmp(PMC *value) {
 MMD_LuaUserdata: {
+#if 0
+            PMC *meth = find_meth(INTERP, SELF, "__cmp");
+            if (meth) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                       SELF, value);
+
+                if (retval)
+                    return (INTVAL)VTABLE_get_number(INTERP, retval);
+            }
+#else
+            PMC *_lt = find_meth(INTERP, SELF, "__lt");
+
+            if (_lt) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                       SELF, value);
+                INTVAL r = retval ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+
+                if (r)
+                    return (INTVAL)-1;
+                else {
+                    PMC *_le = find_meth(INTERP, SELF, "__le");
+                    if (_le) {
+                        retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
+                                                          SELF, value);
+                        r = retval ?
+                            VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+
+                        if (r)
+                            return (INTVAL)0;
+                        else
+                            return (INTVAL)1;
+                    }
+                    else {
+                        retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                          value, SELF);
+                        r      = retval
+                            ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+
+                        if (r)
+                            return (INTVAL)1;
+                        else
+                            return (INTVAL)0;
+                    }
+                }
+            }
+#endif
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to compare two userdata values");
         }

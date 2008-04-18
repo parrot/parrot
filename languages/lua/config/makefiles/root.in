@@ -92,6 +92,7 @@ all: \
  $(LIBPATH)/luaperl.pbc \
  $(LIBPATH)/alarm.pbc \
  $(LIBPATH)/base64.pbc \
+ $(LIBPATH)/bc.pbc \
  $(LIBPATH)/bitlib.pbc \
  $(LIBPATH)/lfs.pbc \
  $(LIBPATH)/md5.pbc \
@@ -177,6 +178,9 @@ $(LIBPATH)/alarm.pbc: $(LIBPATH)/alarm.pir
 
 $(LIBPATH)/base64.pbc: $(LIBPATH)/base64.pir
 	$(PARROT) --output=$(LIBPATH)/base64.pbc $(LIBPATH)/base64.pir
+
+$(LIBPATH)/bc.pbc: $(LIBPATH)/bc.pir
+	$(PARROT) --output=$(LIBPATH)/bc.pbc $(LIBPATH)/bc.pir
 
 $(LIBPATH)/bitlib.pbc: $(LIBPATH)/bitlib.pir
 	$(PARROT) --output=$(LIBPATH)/bitlib.pbc $(LIBPATH)/bitlib.pir
