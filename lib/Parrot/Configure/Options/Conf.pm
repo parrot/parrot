@@ -78,6 +78,7 @@ our @valid_options = qw{
     verbose-step
     version
     without-gdbm
+    without-opengl
     without-crypto
     without-gettext
     without-gmp
@@ -190,6 +191,7 @@ External Library Options:
 
    --without-gmp        Build parrot without GMP support
    --without-gdbm       Build parrot without GDBM support
+   --without-opengl     Build parrot without OpenGL support (GL/GLU/GLUT)
    --without-crypto     Build parrot without crypto support (libssl)
 
 ICU Options:

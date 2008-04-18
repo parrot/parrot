@@ -194,6 +194,7 @@ GEN_CONFIGS = \
     runtime/parrot/include/config.fpmc \
     $(SRC_DIR)/platform.c \
 #CONDITIONED_LINE(platform_asm):    $(SRC_DIR)/platform_asm.s \
+#CONDITIONED_LINE(has_glut):    $(SRC_DIR)/glut_callbacks.c \
     $(SRC_DIR)/core_pmcs.c \
     CFLAGS \
     $(IMCC_DIR)/CFLAGS \
@@ -209,6 +210,7 @@ GEN_CONFIGS = \
 
 GEN_PASM_INCLUDES = \
     runtime/parrot/include/signal.pasm \
+#CONDITIONED_LINE(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
     @TEMP_gen_pasm_includes@
 
 STICKY_FILES = \
@@ -271,7 +273,9 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/JSON.pbc \
     $(LIBRARY_DIR)/Math/Random/mt19937ar.pbc \
     $(LIBRARY_DIR)/MIME/Base64.pbc \
+    $(LIBRARY_DIR)/NCI/call_toolkit_init.pbc \
     $(LIBRARY_DIR)/ncurses.pbc \
+#CONDITIONED_LINE(has_opengl):    $(LIBRARY_DIR)/OpenGL.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
     $(LIBRARY_DIR)/Parrot/Capture_PIR.pbc \
@@ -518,6 +522,7 @@ ALL_PARROT_LIBS     = @libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
 # dynamic extensions
 DYNEXT_DIR          = runtime/parrot/dynext
 LIBNCI_TEST_SO      = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
+LIBGLUTCB_SO        = $(DYNEXT_DIR)/libglutcb$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -574,6 +579,7 @@ all : \
     runtime/parrot/include/config.fpmc \
     docs \
     $(LIBNCI_TEST_SO) \
+#CONDITIONED_LINE(has_glut):    $(LIBGLUTCB_SO) \
     $(GEN_LIBRARY) \
     dynpmc \
     dynoplibs \
@@ -1608,6 +1614,8 @@ prog-clean :
     $(SRC_DIR)/exec_start$(O) \
     $(SRC_DIR)/nci_test$(O) \
     $(LIBNCI_TEST_SO) \
+    $(SRC_DIR)/glut_callbacks$(O) \
+    $(LIBGLUTCB_SO) \
     install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
@@ -1646,6 +1654,8 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     install_config.fpmc \
     $(SRC_DIR)/nci_test$(O) \
     $(LIBNCI_TEST_SO) \
+    $(SRC_DIR)/glut_callbacks$(O) \
+    $(LIBGLUTCB_SO) \
     $(LIBPARROT_STATIC) \
     $(LIBPARROT_SHARED)
 
@@ -2166,6 +2176,11 @@ exec : $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
 $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
     @ld_out@$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
+
+# for use by runtime/parrot/library/OpenGL.pir
+$(LIBGLUTCB_SO): $(SRC_DIR)/glut_callbacks$(O)
+	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
+    @ld_out@$@ $(SRC_DIR)/glut_callbacks$(O) $(C_LIBS)
 
 # emacs etags
 # this needs exuberant-ctags

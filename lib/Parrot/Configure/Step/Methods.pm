@@ -32,8 +32,8 @@ begin with an underscore 'C<_>'.
 
     $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
 
-Currently used in configuration step classes auto::gmp, auto::readline and
-auto::gdbm.
+Currently used in configuration step classes auto::gmp, auto::readline,
+auto::gdbm, and auto::opengl.
 
 =cut
 

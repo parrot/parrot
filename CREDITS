@@ -247,6 +247,7 @@ N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
 
 N: Geoff Broadwell
+D: OpenGL binding
 D: examples fixes
 
 N: Gerard Goossen
