@@ -26,6 +26,8 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
     set_hll_global 'luaopen_base64', entry
 .end
 
+.const string MYNAME = 'base64'
+
 .sub 'luaopen_base64'
 
 #    print "luaopen_base64\n"
@@ -38,7 +40,7 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 
     .local pmc _base64
     new _base64, 'LuaTable'
-    set $P1, 'base64'
+    set $P1, MYNAME
     _lua__GLOBAL[$P1] = _base64
 
     lua_register($P1, _base64)

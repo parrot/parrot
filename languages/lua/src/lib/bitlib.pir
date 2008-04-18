@@ -29,6 +29,8 @@ that can be used in bitwise operations, and the following functions:
     set_hll_global 'luaopen_bitlib', entry
 .end
 
+.const string MYNAME = 'bit'
+
 .sub 'luaopen_bitlib'
 
 #    print "luaopen_bitlib\n"
@@ -40,7 +42,7 @@ that can be used in bitwise operations, and the following functions:
 
     .local pmc _bitlib
     new _bitlib, 'LuaTable'
-    set $P1, 'bit'
+    set $P1, MYNAME
     _lua__GLOBAL[$P1] = _bitlib
 
     lua_register($P1, _bitlib)

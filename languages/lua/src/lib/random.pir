@@ -27,6 +27,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
     set_hll_global 'luaopen_random', entry
 .end
 
+.const string MYNAME = 'random'
 .const string MYTYPE = 'random handle'
 
 .sub 'luaopen_random'
@@ -44,7 +45,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
     set $P1, '__index'
     _random[$P1] = _random
 
-    set $P1, 'random'
+    set $P1, MYNAME
     _lua__GLOBAL[$P1] = _random
     lua_register($P1, _random)
 

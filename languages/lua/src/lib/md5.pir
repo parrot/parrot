@@ -27,7 +27,9 @@ see F<src/dynpmc/mdx.pmc>.
     set_hll_global 'luaopen_md5', entry
 .end
 
+.const string MYNAME = 'md5'
 .const string MYTYPE = 'md5 context'
+.const string MYPMC = 'MD5'
 
 .sub 'luaopen_md5'
 
@@ -44,7 +46,7 @@ see F<src/dynpmc/mdx.pmc>.
     set $P1, '__index'
     _md5[$P1] = _md5
 
-    set $P1, 'md5'
+    set $P1, MYNAME
     _lua__GLOBAL[$P1] = _md5
     lua_register($P1, _md5)
 
@@ -133,7 +135,7 @@ see F<src/dynpmc/mdx.pmc>.
     goto L2
   L1:
     $S1 = lua_checkstring(1, c)
-    new md, 'MD5'
+    new md, MYPMC
     md.'Init'()
     md.'Update'($S1)
     $S0 = md.'Final'()
@@ -168,7 +170,7 @@ see F<src/dynpmc/mdx.pmc>.
 .sub 'new' :anon
     .param pmc extra :slurpy
     .local pmc res
-    new $P0, 'MD5'
+    new $P0, MYPMC
     $P0.'Init'()
     .local pmc mt
     mt = lua_getmetatable(MYTYPE)
