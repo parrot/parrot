@@ -10,6 +10,7 @@ use Cwd;
 use Data::Dumper;
 use File::Temp qw( tempdir );
 use Test::More tests =>  9;
+#use Test::More qw( no_plan );
 use lib qw( lib );
 use IO::CaptureOutput qw| capture |;
 use_ok(
@@ -17,7 +18,7 @@ use_ok(
         process_options
         |
 );
-use_ok("Parrot::Configure::Options::Test");
+use_ok('Parrot::Configure::Options::Test');
 
 my ( $args, $opttest );
 
@@ -27,7 +28,8 @@ $args = process_options(
         mode => q{configure},
     }
 );
-ok( defined $args, "process_options() returned successfully when options were specified" );
+ok( defined $args,
+    "process_options() returned successfully when options were specified" );
 
 $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
@@ -58,34 +60,30 @@ TEST
 
     my $reason = q{Devel::Cover gags on this test};
 
-    @Parrot::Configure::Options::Test::preconfiguration_tests = ($test);
     {
         my ($rv, $stdout);
     SKIP: {
             skip $reason, 1 if $ENV{PERL5OPT};
             capture (
-                sub { $rv = $opttest->run_configure_tests(); },
+                sub { $rv = $opttest->run_configure_tests($test); },
                 \$stdout
             );
             ok( $rv, "Configuration tests are runnable" );
         }
     }
 
-    @Parrot::Configure::Options::Test::postconfiguration_tests = ($test);
     {
         my ($rv, $stdout);
     SKIP: {
             skip $reason, 1 if $ENV{PERL5OPT};
             capture (
-                sub { $rv = $opttest->run_build_tests(); },
+                sub { $rv = $opttest->run_build_tests($test); },
                 \$stdout
             );
             ok( $rv, "Build tests are runnable" );
         }
     }
     unlink $test or croak "Unable to delete $test";
-    @Parrot::Configure::Options::Test::preconfiguration_tests = ();
-    @Parrot::Configure::Options::Test::postconfiguration_tests = ();
 
     ok( ( chdir $cwd ), "Changed back to starting directory after testing" );
 }

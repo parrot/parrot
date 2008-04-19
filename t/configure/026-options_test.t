@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Cwd;
 use Data::Dumper;
-use Test::More tests => 13;
+use Test::More tests => 14;
 use lib qw( lib );
 use IO::CaptureOutput qw| capture |;
 use_ok(
@@ -17,6 +17,11 @@ use_ok(
         |
 );
 use_ok("Parrot::Configure::Options::Test");
+use_ok('Parrot::Configure::Options::Test::Prepare', qw|
+    get_preconfiguration_tests
+    get_postconfiguration_tests
+    |
+);
 
 my ( $args, $opttest );
 
@@ -26,7 +31,8 @@ $args = process_options(
         mode => q{configure},
     }
 );
-ok( defined $args, "process_options() returned successfully when no options were specified" );
+ok( defined $args,
+    "process_options() returned successfully when no options were specified" );
 
 $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
@@ -34,7 +40,7 @@ ok( defined $opttest, "Constructor returned successfully" );
 {
     my $stdout;
     capture(
-        sub { $opttest->run_configure_tests(); },
+        sub { $opttest->run_configure_tests( get_preconfiguration_tests() ); },
         \$stdout,
     );
     ok( ! $stdout,
@@ -44,7 +50,7 @@ ok( defined $opttest, "Constructor returned successfully" );
 {
     my $stdout;
     capture(
-        sub { $opttest->run_build_tests(); },
+        sub { $opttest->run_build_tests( get_postconfiguration_tests() ); },
         \$stdout,
     );
     ok( ! $stdout,
@@ -69,7 +75,8 @@ $args = process_options(
         mode => q{configure},
     }
 );
-ok( defined $args, "process_options() returned successfully when '--test=build' was specified" );
+ok( defined $args,
+    "process_options() returned successfully when '--test=build' was specified" );
 
 $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
@@ -85,7 +92,11 @@ ok( defined $args,
     "process_options() returned successfully when '--test=$badoption' was specified" );
 
 eval { $opttest = Parrot::Configure::Options::Test->new($args); };
-like( $@, qr/'$badoption' is a bad value/, "Bad option to '--test' correctly detected" );
+like(
+    $@,
+    qr/'$badoption' is a bad value/,
+    "Bad option to '--test' correctly detected"
+);
 
 pass("Completed all tests in $0");
 

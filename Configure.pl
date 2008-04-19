@@ -11,6 +11,10 @@ use lib 'lib';
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Options::Test;
+use Parrot::Configure::Options::Test::Prepare qw(
+    get_preconfiguration_tests
+    get_postconfiguration_tests
+);
 use Parrot::Configure::Messages qw(
     print_introduction
     print_conclusion
@@ -41,7 +45,7 @@ my $opttest = Parrot::Configure::Options::Test->new($args);
 
 # configuration tests will only be run if you requested them
 # as command-line option
-$opttest->run_configure_tests();
+$opttest->run_configure_tests( get_preconfiguration_tests() );
 
 my $parrot_version = $Parrot::Configure::Options::Conf::parrot_version;
 
@@ -63,7 +67,7 @@ $conf->runsteps or exit(1);
 
 # build tests will only be run if you requested them
 # as command-line option
-$opttest->run_build_tests();
+$opttest->run_build_tests( get_postconfiguration_tests() );
 
 my $make = $conf->data->get('make');
 # from Parrot::Configure::Messages

@@ -8,54 +8,6 @@ use Test::Harness;
 use lib qw(lib);
 use Parrot::Configure::Step::List qw( get_steps_list );
 
-my @framework_tests;
-my $config_dir = q{t/configure};
-opendir my $DIRH, $config_dir or croak "Unable to open $config_dir";
-for my $t (sort grep { /\d{3}-\w+\.t$/ } readdir $DIRH) {
-    push @framework_tests, qq{$config_dir/$t};
-}
-closedir $DIRH or croak "Unable to close $config_dir";
-
-my $steps_dir = q{t/steps};
-my %steps_tests;
-my @steps_tests;
-opendir my $DIRH2, $steps_dir or croak "Unable to open $steps_dir";
-for my $t (grep { /\.t$/ } readdir $DIRH2) {
-    my ($type, $class, $num);
-    if ($t =~ m/(init|inter|auto|gen)_(\w+)-(\d{2})\.t$/) {
-        ($type, $class, $num) = ($1,$2,$3);
-        $steps_tests{$type}{$class}{$num}++;
-    }
-    else {
-        carp "Unable to match $t";
-    }
-}
-closedir $DIRH2 or croak "Unable to close $steps_dir";
-
-my @steps = get_steps_list();
-
-foreach my $step (@steps) {
-    my @temp = split /::/, $step;
-    my %these_tests = %{ $steps_tests{$temp[0]}{$temp[1]} };
-    foreach my $k (sort keys %these_tests) {
-        push @steps_tests, qq{$steps_dir/$temp[0]_$temp[1]-$k.t};
-    }
-}
-
-our @preconfiguration_tests = (
-    @framework_tests,
-    @steps_tests,
-);
-
-our @postconfiguration_tests = (
-    glob("t/postconfigure/*.t"),
-    glob("t/tools/pmc2cutils/*.t"),
-    glob("t/tools/ops2cutils/*.t"),
-    glob("t/tools/ops2pmutils/*.t"),
-    glob("t/tools/revision/*.t"),
-    glob("t/pharness/*.t"),
-);
-
 sub new {
     my ( $class, $argsref ) = @_;
     my $self = {};
@@ -129,9 +81,9 @@ sub get_run {
     return $self->{run}{$option} || undef;
 }
 
-
 sub run_configure_tests {
     my $self = shift;
+    my @preconfiguration_tests = @_;
     if ( $self->get_run('run_configure_tests') ) {
         print "As you requested, we'll start with some tests of the configuration tools.\n\n";
 
@@ -149,6 +101,7 @@ TEST
 
 sub run_build_tests {
     my $self = shift;
+    my @postconfiguration_tests = @_;
     if ( $self->get_run('run_build_tests') ) {
         print "\n\n";
         print "As you requested, I will now run some tests of the build tools.\n\n";
@@ -172,6 +125,10 @@ In F<Configure.pl>:
 
     use Parrot::Configure::Options;
     use Parrot::Configure::Options::Test;
+    use Parrot::Configure::Options::Test::Prepare qw(
+        get_preconfiguration_tests
+        get_postconfiguration_tests
+    );
 
     $args = process_options( {
         argv            => [ @ARGV ],
@@ -180,9 +137,9 @@ In F<Configure.pl>:
 
     $opttest = Parrot::Configure::Options::Test->new($args);
 
-    $opttest->run_configure_tests();
+    $opttest->run_configure_tests( get_preconfiguration_tests() );
 
-    $opttest->run_build_tests();
+    $opttest->run_build_tests( get_postconfiguration_tests() );
 
 On command line:
 
@@ -245,18 +202,12 @@ Run tests of Parrot's configuration tools.
 
 =item * Arguments
 
-None.
+List of test files, typically supplied by
+C<Parrot::Configure::Options::Test::Prepare::get_preconfiguration_tests()>.
 
 =item * Return Value
 
 None.
-
-=item * Comments
-
-The tests to be executed are listed in
-C<@Parrot::Configure::Options::Test::preconfiguration_tests>.  Edit that list
-to run different tests.  Currently, that array runs all tests in
-F<t/configure/*.t>.
 
 =back
 
@@ -272,22 +223,12 @@ F<Configure.pl> has completed execution.
 
 =item * Arguments
 
-None.
+List of test files, typically supplied by
+C<Parrot::Configure::Options::Test::Prepare::get_postconfiguration_tests()>.
 
 =item * Return Value
 
 None.
-
-=item * Comments
-
-The tests to be executed are listed in
-C<@Parrot::Configure::Options::Test::postconfiguration_tests>.  Edit that list
-to run different tests.  Currently, that array runs all tests in:
-
-    t/postconfigure/*.t
-    t/tools/pmc2cutils/*.t
-    t/tools/ops2cutils/*.t
-    t/tools/ops2pmutils/*.t
 
 =back
 
