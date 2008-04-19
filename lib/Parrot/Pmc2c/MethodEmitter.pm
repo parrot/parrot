@@ -92,7 +92,8 @@ sub decl {
     my $ret     = $self->return_type;
     my $meth    = $self->name;
     my $args    = $self->parameters;
-    my $ro      = $pmc->flag('is_ro') ? '' : '';
+    my $attrs   = $self->attrs();
+    my $const   = $$attrs{const} ? ' const' : '';
     my $decs    = $self->decorators;
 
     # convert 'type*' to 'type *' per PDD07
@@ -121,7 +122,7 @@ sub decl {
     }
 
     return <<"EOC";
-$decorators$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(PARROT_INTERP, PMC *$pmcvar$args)$semi
+$decorators$export$extern$ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP,$const PMC *$pmcvar$args)$semi
 EOC
 }
 

@@ -129,7 +129,7 @@ useful defaults and don't throw exceptions.
         return SUPER();
     }
 
-    VTABLE INTVAL isa(STRING *classname) {
+    VTABLE INTVAL isa(STRING *classname) :const {
         if (SUPER(classname))
             return 1;
 

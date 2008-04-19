@@ -279,7 +279,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    VTABLE INTVAL isa(STRING *classname) {
+    VTABLE INTVAL isa(STRING *classname) :const {
         const STRING * const pmc_proxy = CONST_STRING(interp, "PMCProxy");
 
         if (string_equal(INTERP, classname, pmc_proxy) == 0)

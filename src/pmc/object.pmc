@@ -437,7 +437,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    VTABLE INTVAL isa(STRING *classname) {
+    VTABLE INTVAL isa(STRING *classname) :const {
         PMC   *_class;
 
         if (SUPER(classname))

@@ -931,7 +931,7 @@ true (1) is returned; otherwise, false (0) is returned.
 
 */
 
-    VTABLE INTVAL isa(STRING *_class) {
+    VTABLE INTVAL isa(STRING *_class) :const {
         /* RT#46665 - walk mro */
         return does_isa(INTERP, _class, SELF->vtable->isa_str);
     }

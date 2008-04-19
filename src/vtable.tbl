@@ -338,7 +338,7 @@ INTVAL does_pmc(PMC* role)
 INTVAL does(STRING* role)
 
 INTVAL isa_pmc(PMC* _class)
-INTVAL isa(STRING* _class)
+INTVAL isa(STRING* _class) :const
 
 PMC* get_attr(INTVAL idx)
 PMC* get_attr_str(STRING* idx)
