@@ -123,10 +123,6 @@ information see F<src/pmc.c>.
                 if (Parrot_Context_get_info(INTERP, sub_ctx, &info)) {
                     STRING *retval = info.subname;
 
-                    /* free the non-constant string, but not the constant one */
-                    if (strncmp("(unknown file)", info.file, 14) < 0)
-                        string_cstring_free(info.file);
-
                     Parrot_unblock_DOD(INTERP);
                     RETURN(STRING *retval);
                 }
