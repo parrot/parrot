@@ -82,7 +82,7 @@ sub _handle_mswin32 {
     # XXXX: Mindlessly morphed from readline ... may need to be fixed
     if ( $osname =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lglut -lGLU -lGL' );
+            $conf->data->add( ' ', libs => '-lglut32 -lglu32 -lopengl32' );
         }
         else {
             $conf->data->add( ' ', libs => 'glut.lib glu.lib gl.lib' );
