@@ -629,21 +629,33 @@ SP              [ ]
 
 <emit,INITIAL>\$I[0-9]+ {
         if (valp) (valp)->s = yytext;
+        if (IMCC_INFO(interp)->state->pasm_file)
+                IMCC_fataly(interp, E_SyntaxError,
+                    "'%s' is not a valid register name in pasm mode", yytext);
         return IREG;
     }
 
 <emit,INITIAL>\$N[0-9]+ {
         if (valp) (valp)->s = yytext;
+        if (IMCC_INFO(interp)->state->pasm_file)
+                IMCC_fataly(interp, E_SyntaxError,
+                    "'%s' is not a valid register name in pasm mode", yytext);
         return NREG;
     }
 
 <emit,INITIAL>\$S[0-9]+ {
         if (valp) (valp)->s = yytext;
+        if (IMCC_INFO(interp)->state->pasm_file)
+                IMCC_fataly(interp, E_SyntaxError,
+                    "'%s' is not a valid register name in pasm mode", yytext);
         return SREG;
     }
 
 <emit,INITIAL>\$P[0-9]+ {
         if (valp) (valp)->s = yytext;
+        if (IMCC_INFO(interp)->state->pasm_file)
+                IMCC_fataly(interp, E_SyntaxError,
+                    "'%s' is not a valid register name in pasm mode", yytext);
         return PREG;
     }
 

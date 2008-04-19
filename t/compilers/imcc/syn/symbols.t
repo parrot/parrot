@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 # 1 ##########################
 pir_error_output_like( <<'CODE', <<'OUT', "register names with one letter only are invalid" );
@@ -55,6 +55,14 @@ pir_output_is( <<'CODE', <<'OUT', "RT#42769 register name 'object' is valid" );
 CODE
 1
 OUT
+
+# 6 ##########################
+pasm_error_output_like(<<'CODE', <<'OUT', q|#52858: "$" vars in PASM don't work, but aren't disallowed either| );
+    say $S0
+CODE
+/error:imcc:'\$S0' is not a valid register name in pasm mode/
+OUT
+
 
 # Local Variables:
 #   mode: cperl
