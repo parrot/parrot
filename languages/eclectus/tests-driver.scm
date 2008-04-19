@@ -4,8 +4,8 @@
 
 (define all-tests '())
 
-(define run-with-gauche #f)
-;(define run-with-gauche #t)
+;(define implementation "gauche" )
+(define implementation "gen_past_in_pir" )
 
 (define-syntax add-tests-with-string-output
   (syntax-rules (=>)
@@ -51,12 +51,14 @@
        p)))
 
 (define (run-compile expr)
-  (if run-with-gauche
-    (with-output-to-file "stst.scm" (lambda () (write expr)))
-    (let ((p (open-output-file "stst.pir" 'replace)))
-      (parameterize ((compile-port p))
-         (compile-program expr))
-      (close-output-port p))))
+  (case implementation
+    ( ("gauche")
+      (with-output-to-file "stst.scm" (lambda () (write expr))))
+    (else
+      (let ((p (open-output-file "stst.pir" 'replace)))
+        (parameterize ((compile-port p))
+           (compile-program expr))
+        (close-output-port p)))))
 
 ; TODO: can I use (directory-separator) in gauche?
 (define *path-to-parrot*
@@ -65,11 +67,13 @@
     "..\\..\\parrot"))
 
 (define (execute)
-  (if run-with-gauche
-    (unless (zero? (system "gosh -fcase-fold -I .  -l gauche/prelude.scm stst.scm > stst.out"))
-      (error 'execute "produced program exited abnormally"))
-    (unless (zero? (system (string-append *path-to-parrot* " stst.pir > stst.out")))
-      (error 'execute "produced program exited abnormally"))))
+  (case implementation
+    ( ("gauche")
+      (unless (zero? (system "gosh -fcase-fold -I .  -l gauche/prelude.scm stst.scm > stst.out"))
+        (error 'execute "produced program exited abnormally")))
+    (else
+      (unless (zero? (system (string-append *path-to-parrot* " stst.pir > stst.out")))
+        (error 'execute "produced program exited abnormally")))))
 
 (define (get-string)
   (with-output-to-string
