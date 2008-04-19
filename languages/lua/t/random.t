@@ -54,7 +54,7 @@ require 'random'
 r = random.new()
 print(r)
 CODE
-/^random handle [0-9A-Fa-f]{8}$/
+/^random handle [0-9A-Fa-f]{8,16}$/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'random:tostring()' );
@@ -64,7 +64,7 @@ s = r:tostring()
 assert(type(s) == 'string', "got string")
 print(r)
 CODE
-/^random handle [0-9A-Fa-f]{8}$/
+/^random handle [0-9A-Fa-f]{8,16}$/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'random:value()' );

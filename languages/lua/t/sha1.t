@@ -58,7 +58,7 @@ require 'sha1'
 d = sha1.new()
 print(d)
 CODE
-/^sha1 context [0-9A-Fa-f]{8}$/
+/^sha1 context [0-9A-Fa-f]{8,16}$/
 OUTPUT
 
 # Local Variables:
