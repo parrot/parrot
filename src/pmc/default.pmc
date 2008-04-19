@@ -1007,7 +1007,7 @@ Look for NCI methods and properties.
 =cut
 
 */
-    VTABLE PMC *get_class() {
+    VTABLE PMC *get_class() :const {
         /* Create a proxy */
         INTVAL type = VTABLE_type(interp, SELF);
         PMC *type_num = pmc_new(interp, enum_class_Integer);

@@ -347,7 +347,7 @@ void set_attr(INTVAL idx, PMC* value) :write
 void set_attr_str(STRING* idx, PMC* value) :write
 void set_attr_keyed(PMC* key, STRING* idx, PMC* value) :write
 
-PMC* get_class()
+PMC* get_class() :const
 
 void add_parent(PMC* parent) :write
 void remove_parent(PMC* parent) :write

@@ -124,7 +124,7 @@ Returns the class or role PMC that is associated with this namespace.
 
 */
 
-    PMC *get_class() {
+    PMC *get_class() :const {
         return PARROT_NAMESPACE(SELF)->_class;
     }
 
