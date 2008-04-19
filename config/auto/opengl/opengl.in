@@ -11,7 +11,10 @@
 
 int main(int argc, char *argv[])
 {
-    glutInit(&argc, argv);
+    if(!glutInit) {
+        printf("glutInit is NULL\n");
+        return EXIT_FAILURE;
+    }
     printf("%d\n", GLUT_API_VERSION);
     return EXIT_SUCCESS;
 }
