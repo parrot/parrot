@@ -34,7 +34,7 @@ use Parrot::Test::Harness
               ? [ 'csi', '-R', 'alexpander', '-i', '-k', 'none', '-I', 'riaxpander',
 		  '-e', '(load "chicken/prelude.scm")', '-s' ]
               : [ 'gosh', '-fcase-fold', '-I', '.',  '-I', 'riaxpander', '-l', 'gauche/prelude.scm' ],
-    files    => [ 't/*.pl' ];
+    files    => [ 't/*.t' ];
 
 =head1 SEE ALSO
 
