@@ -99,7 +99,7 @@ Nothing is printed. An array of file pathes is returned to the caller.
 
 =cut
 
-    if ( grep { /^--files$/ } @{ $options{arguments} } ) {
+    if ( grep { m/^--files$/ } @{ $options{arguments} } ) {
 
         # --files indicates that 'languages/t/harness' wants a list of test files
         my @files;
@@ -139,13 +139,16 @@ Nothing is printed. An array of file pathes is returned to the caller.
         return @files;
     }
     else {
-
-        # I must be running out of languages/$language.
-        # You may want a deeper search than this.
-        return (
-            glob( File::Spec->catfile( 't', '*.t' ) ),
-            glob( File::Spec->catfile( 't', '*/*.t' ) )
-        );
+        # file patterns are either passed from a <language>/t/harness,
+        # or the default is used
+        my @file_patterns =
+            ( $options{files} && ref $options{files} eq 'ARRAY' ) ?
+                @{ $options{files} }
+                :
+                ( 't/*.t', 't/*/*.t' );
+        return map { glob( $_ )
+                   }
+                   @file_patterns;
     }
 }
 

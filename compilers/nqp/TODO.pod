@@ -60,7 +60,9 @@ and exercise methods using that.
 The directory C<bootstrap> contains the necessary files to implement NPQ
 in NQP. While this is not a major goal, it is interesting to compare the
 speed of NQP implemented in PIR and in NQP. For this to work, some things
-must be fixed.
+must be fixed. The bootstrap version can be tested with
+
+  cd bootstrap && perl t/harness
 
 =over 4
 
