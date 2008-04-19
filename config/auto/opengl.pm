@@ -57,7 +57,7 @@ sub runstep {
 
     # On OS X check the presence of the OpenGL headers in the standard
     # Fink/macports locations.
-    # XXXX: Mindlessly morphed from readline ... may need to be fixed
+    # Mindlessly morphed from readline ... may need to be fixed
     $self->_handle_darwin_for_fink    ($conf, $osname, 'GL/glut.h');
     $self->_handle_darwin_for_macports($conf, $osname, 'GL/glut.h');
 
@@ -79,7 +79,7 @@ sub runstep {
 
 sub _handle_mswin32 {
     my ($conf, $osname, $cc) = @_;
-    # XXXX: Mindlessly morphed from readline ... may need to be fixed
+    # Mindlessly morphed from readline ... may need to be fixed
     if ( $osname =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
             $conf->data->add( ' ', libs => '-lglut32 -lglu32 -lopengl32' );
@@ -106,7 +106,7 @@ sub _evaluate_cc_run {
 sub _handle_glut {
     my ($conf, $has_glut) = @_;
     $conf->data->set(
-        # XXXX: Completely cargo culted
+        # Completely cargo culted
         opengl     => 'define',
         has_opengl => $has_glut,
         HAS_OPENGL => $has_glut,
