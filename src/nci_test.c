@@ -37,6 +37,11 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 #include <stdlib.h>
 #include <parrot/config.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* Declarations of structs */
 
 typedef struct Nested {
@@ -1068,6 +1073,10 @@ main(void)
     return 0;
 }
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /*

@@ -79,6 +79,7 @@ sub check_indent {
                 )
             {
                 next if (m/PARROT_IN_CORE|_GUARD/);
+                next if (m/__cplusplus/);
 
                 my $indent = q{  } x @stack;
                 if ( $1 ne $indent ) {
