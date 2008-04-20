@@ -55,7 +55,6 @@ sub runstep {
         return 1;
     }
 
-#    for my $md (keys %digest) {
     while (my ($md, $val) = each(%digest)) {
         my $file = lc $md;
         $conf->data->set( md_name => $md );
