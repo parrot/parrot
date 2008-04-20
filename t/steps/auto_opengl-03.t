@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 10;
 use Carp;
 use lib qw( lib );
 use_ok('config::init::defaults');
@@ -39,27 +39,27 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my $test = qq{4\n};
-my $has_glut;
-{
-    my ($stdout, $stderr);
-    capture(
-        sub { $has_glut = $step->_evaluate_cc_run(
-            $test,
-            $conf->options->get( 'verbose' )
-        ); },
-        \$stdout,
-        \$stderr,
-    );
-    is( $has_glut, 4, "Got expected return value for _evaluate_cc_run()." );
-    is( $step->result(),
-        "yes, GLUT 4", "Got expected result for _evaluate_cc_run()." );
-    like(
-        $stdout,
-        qr/\(yes, GLUT API $has_glut\)/,
-        "Got expected verbose output"
-    );
-}
+#my $test = qq{4\n};
+#my $has_glut;
+#{
+#    my ($stdout, $stderr);
+#    capture(
+#        sub { $has_glut = $step->_evaluate_cc_run(
+#            $test,
+#            $conf->options->get( 'verbose' )
+#        ); },
+#        \$stdout,
+#        \$stderr,
+#    );
+#    is( $has_glut, 4, "Got expected return value for _evaluate_cc_run()." );
+#    is( $step->result(),
+#        "yes, GLUT 4", "Got expected result for _evaluate_cc_run()." );
+#    like(
+#        $stdout,
+#        qr/\(yes, GLUT API $has_glut\)/,
+#        "Got expected verbose output"
+#    );
+#}
 
 pass("Completed all tests in $0");
 
