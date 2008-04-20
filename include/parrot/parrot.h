@@ -246,7 +246,7 @@ typedef void (*funcptr_t)(void);
 
 
 /* internationalization settings */
-#ifdef    PARROT_HAS_GEXTTEXT
+#ifdef    PARROT_HAS_GETTEXT
 #  include <libintl.h>
 #  define _(s)                 gettext(s)
 #  define gettext_noop(s)      (s)
