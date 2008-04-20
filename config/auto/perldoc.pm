@@ -36,7 +36,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $cmd = $conf->data->get_p5('scriptdirexp') . q{/perldoc};
+    my $cmd = q{perldoc};
     my $tmpfile = q{c99da7c4.tmp};
     my $content = capture_output("$cmd -ud $tmpfile perldoc") || undef;
 
