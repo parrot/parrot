@@ -260,7 +260,11 @@ cannot be used.
 
 */
 
+#ifdef WIN32
+#include <GL/glut.h>
+#else
 #include <GL/freeglut.h>
+#endif
 #include "parrot/parrot.h"
 
 
