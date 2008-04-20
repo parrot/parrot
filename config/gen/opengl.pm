@@ -60,16 +60,23 @@ my @GLUT_3_CALLBACKS = (
 );
 
 my @GLUT_4_CALLBACKS = (
-    [ 'Close',            'void' ],
-    [ 'Menu Destroy',     'void' ],
-    [ 'WM Close',         'void' ],
     [ 'Window Status',    'int state' ],
     [ 'Keyboard Up',      'unsigned char key, int x, int y' ],
     [ 'Special Up',       'int key, int x, int y' ],
-    [ 'Mouse Wheel',      'int wheel, int direction, int x, int y' ],
 
     # NOTE: Hardcoded because of special arguments
     # [ 'Joystick',         'int buttons, int xaxis, int yaxis, int zaxis' ],
+);
+
+my @MACOSXGLUT_CALLBACKS = (
+    # Also works in freeglut
+    [ 'WM Close',         'void' ],
+);
+
+my @FREEGLUT_CALLBACKS = (
+    [ 'Close',            'void' ],
+    [ 'Menu Destroy',     'void' ],
+    [ 'Mouse Wheel',      'int wheel, int direction, int x, int y' ],
 );
 
 my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pasm';
@@ -93,23 +100,29 @@ sub runstep {
         return 1;
     }
 
-    $self->gen_opengl_defines($conf);
+    my @header_globs = (
+        '/usr/include/GL/*.h',
+        '/System/Library/Frameworks/OpenGL.framework/Headers/*.h',
+        '/System/Library/Frameworks/GLUT.framework/Headers/*.h',
+    );
+
+    my @header_files = sort map {glob} @header_globs;
+
+    $self->gen_opengl_defines($conf, \@header_files);
     $self->gen_glut_callbacks($conf);
 
     return 1;
 }
 
 sub gen_opengl_defines {
-    my ( $self, $conf ) = @_;
+    my ( $self, $conf, $header_files ) = @_;
 
     my $verbose = $conf->options->get('verbose');
-
-    my @header_files = glob '/usr/include/GL/*.h';
 
     my (%defs, @macros);
     my $max_len = 0;
 
-    foreach my $file (@header_files) {
+    foreach my $file (@$header_files) {
         open my $header, '<', $file
         or die "Could not open header '$file': $!";
 
@@ -157,7 +170,7 @@ sub gen_opengl_defines {
 #
 HEADER
 
-    print $macros "# $_\n" foreach sort @header_files;
+    print $macros "# $_\n" foreach @$header_files;
     print $macros "\n\n";
 
     foreach my $api (sort keys %defs) {
@@ -177,11 +190,21 @@ HEADER
 sub gen_glut_callbacks {
     my ( $self, $conf ) = @_;
 
-    my   $glut_api       = $conf->data->get('has_glut');
+    my $glut_api   = $conf->data->get('has_glut');
+    my $glut_brand = $conf->data->get('glut_brand');
+
     my   @glut_callbacks = @GLUT_1_CALLBACKS;
-    push @glut_callbacks,  @GLUT_2_CALLBACKS if $glut_api >= 2;
-    push @glut_callbacks,  @GLUT_3_CALLBACKS if $glut_api >= 3;
-    push @glut_callbacks,  @GLUT_4_CALLBACKS if $glut_api >= 4;
+    push @glut_callbacks,  @GLUT_2_CALLBACKS     if $glut_api   >= 2;
+    push @glut_callbacks,  @GLUT_3_CALLBACKS     if $glut_api   >= 3;
+    push @glut_callbacks,  @GLUT_4_CALLBACKS     if $glut_api   >= 4;
+    push @glut_callbacks,  @FREEGLUT_CALLBACKS   if $glut_brand eq 'freeglut';
+    push @glut_callbacks,  @MACOSXGLUT_CALLBACKS if $glut_brand eq 'freeglut'
+                                                 or $glut_brand eq 'MacOSX_GLUT';
+
+    my $glut_header = $glut_brand eq 'MacOSX_GLUT' ? 'GLUT/glut.h'   :
+                      $glut_brand eq 'OpenGLUT'    ? 'GL/openglut.h' :
+                      $glut_brand eq 'freeglut'    ? 'GL/freeglut.h' :
+                                                     'GL/glut.h'     ;
 
     my @callbacks;
     foreach my $raw (@glut_callbacks) {
@@ -260,11 +283,7 @@ cannot be used.
 
 */
 
-#ifdef WIN32
-#include <GL/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+#include <$glut_header>
 #include "parrot/parrot.h"
 
 

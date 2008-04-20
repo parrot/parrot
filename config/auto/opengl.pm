@@ -66,8 +66,7 @@ sub runstep {
     eval { $conf->cc_build() };
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_glut = $self->_evaluate_cc_run($test, $verbose);
-        _handle_glut($conf, $has_glut);
+        $has_glut = _handle_glut($conf, $self->_evaluate_cc_run($test, $verbose));
     }
     unless ($has_glut) {
         # The Parrot::Configure settings might have changed while class ran
@@ -88,6 +87,9 @@ sub _handle_mswin32 {
             $conf->data->add( ' ', libs => 'glut.lib glu.lib gl.lib' );
         }
     }
+    elsif ( $osname =~ /darwin/i ) {
+        $conf->data->add( ' ', libs => '-framework OpenGL -framework GLUT' );
+    }
     else {
         $conf->data->add( ' ', libs => '-lglut -lGLU -lGL' );
     }
@@ -96,25 +98,29 @@ sub _handle_mswin32 {
 
 sub _evaluate_cc_run {
     my ($self, $test, $verbose) = @_;
-    chomp $test;
-    my $has_glut = $test;
-    print " (yes, GLUT API $has_glut) " if $verbose;
-    $self->set_result("yes, GLUT $has_glut");
-    return $has_glut;
+    my ($glut_api_version, $glut_brand) = split ' ', $test;
+
+    print " (yes, $glut_brand API version $glut_api_version) " if $verbose;
+    $self->set_result("yes, $glut_brand $glut_api_version");
+
+    return ($glut_api_version, $glut_brand);
 }
 
 sub _handle_glut {
-    my ($conf, $has_glut) = @_;
+    my ($conf, $glut_api_version, $glut_brand) = @_;
+
     $conf->data->set(
         # Completely cargo culted
         opengl     => 'define',
-        has_opengl => $has_glut,
-        HAS_OPENGL => $has_glut,
+        has_opengl => 1,
+        HAS_OPENGL => 1,
 
         glut       => 'define',
-        has_glut   => $has_glut,
-        HAS_GLUT   => $has_glut,
+        glut_brand => $glut_brand,
+        has_glut   => $glut_api_version,
+        HAS_GLUT   => $glut_api_version,
     );
+
     return 1;
 }
 

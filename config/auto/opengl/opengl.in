@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* XXXX: This location is platform dependent.  What's the preferred
-         way to find headers that move? */
+#ifdef __APPLE_CC__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 
 
 int main(int argc, char *argv[])
@@ -15,6 +17,16 @@ int main(int argc, char *argv[])
         printf("glutInit is NULL\n");
         return EXIT_FAILURE;
     }
-    printf("%d\n", GLUT_API_VERSION);
+
+#ifdef OPENGLUT
+    printf("%d OpenGLUT\n",    GLUT_API_VERSION);
+#elif  FREEGLUT
+    printf("%d freeglut\n",    GLUT_API_VERSION);
+#elif  GLUT_MACOSX_IMPLEMENTATION
+    printf("%d MacOSX_GLUT\n", GLUT_API_VERSION);
+#else
+    printf("%d GLUT\n",        GLUT_API_VERSION);
+#endif
+
     return EXIT_SUCCESS;
 }
