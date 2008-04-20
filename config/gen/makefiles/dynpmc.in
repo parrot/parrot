@@ -24,39 +24,13 @@ PMCS = \
 #CONDITIONED_LINE(has_crypto):  sha1 \
   subproxy 
 
-DIGEST = md2.pmc md4.pmc md5.pmc ripemd160.pmc sha.pmc sha1.pmc sha256.pmc sha512.pmc
-
 BUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
-all : $(DIGEST)
+all :
 	@$(BUILD) generate $(PMCS)
 	@$(BUILD) compile $(PMCS)
 	@$(BUILD) linklibs $(PMCS)
 	@$(BUILD) copy --destination=$(RUNTIME_DIR) $(PMCS)
-
-md2.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|md2|g; s|MDx|MD2|g" mdx.pmc > md2.pmc
-
-md4.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|md4|g; s|MDx|MD4|g" mdx.pmc > md4.pmc
-
-md5.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|md5|g; s|MDx|MD5|g" mdx.pmc > md5.pmc
-
-ripemd160.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|ripemd|g; s|MDx|RIPEMD160|g" mdx.pmc > ripemd160.pmc
-
-sha.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|sha|g; s|MDx|SHA|g" mdx.pmc > sha.pmc
-
-sha1.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|sha|g; s|MDx_CTX|SHA_CTX|g; s|MDx_DIGEST|SHA_DIGEST|g; s|MDx|SHA1|g" mdx.pmc > sha1.pmc
-
-sha256.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|sha|g; s|MDx|SHA256|g" mdx.pmc > sha256.pmc
-
-sha512.pmc : mdx.pmc
-	$(PERL) -pe "s|mdx|sha|g; s|MDx|SHA512|g" mdx.pmc > sha512.pmc
 
 test : all
 	cd ../.. ; perl -Ilib t/harness t/dynpmc/*.t
