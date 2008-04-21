@@ -353,9 +353,8 @@ INTVAL string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), INTVAL nchars)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+INTVAL string_ord(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), INTVAL idx)
+        __attribute__nonnull__(1);
 
 PARROT_API
 void string_pin(PARROT_INTERP, ARGMOD(STRING *s))

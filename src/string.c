@@ -880,7 +880,7 @@ are treated as counting from the end of the string.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
+string_ord(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), INTVAL idx)
 {
     const UINTVAL len = s ? string_length(interp, s) : 0;
 
