@@ -32,6 +32,7 @@ cmod_n_nc_nc
 cmp_i_ic_ic
 cmp_i_nc_nc
 cmp_i_sc_sc
+concat_s_sc_sc
 cosh_n_nc
 cos_n_nc
 eq_ic_ic_ic
