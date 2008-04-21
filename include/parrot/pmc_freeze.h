@@ -66,19 +66,19 @@ typedef struct _visit_info {
     visit_f             visit_pmc_later;
     visit_f             visit_action;   /* freeze, thaw ... */
     INTVAL              what;
-    STRING*             image;
-    PMC*                mark_ptr;
-    PMC**               thaw_ptr;       /* where to thaw a new PMC */
-    PMC*                container;      /* when thawing aggregate items */
+    STRING             *image;
+    PMC                *mark_ptr;
+    PMC               **thaw_ptr;       /* where to thaw a new PMC */
+    PMC                *container;      /* when thawing aggregate items */
     INTVAL              last_type;
-    PMC*                seen;           /* seen hash */
-    PMC*                todo;           /* todo list */
-    PMC*                id_list;        /* seen list used by thaw */
+    PMC                *seen;           /* seen hash */
+    PMC                *todo;           /* todo list */
+    PMC                *id_list;        /* seen list used by thaw */
     UINTVAL             id;             /* freze ID of PMC */
-    void*               extra;          /* PMC specific */
+    void               *extra;          /* PMC specific */
     INTVAL              extra_flags;    /* concerning to extra */
-    PMC*                thaw_result;    /* 1st thawed */
-    IMAGE_IO            *image_io;
+    PMC                *thaw_result;    /* 1st thawed */
+    IMAGE_IO           *image_io;
 } visit_info;
 
 /*

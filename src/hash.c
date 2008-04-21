@@ -361,7 +361,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 */
 
 static void
-hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info* info))
+hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
 {
     size_t           entry_index;
     IMAGE_IO * const io = info->image_io;
@@ -394,14 +394,18 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info* info))
 
         switch (hash->entry_type) {
             case enum_hash_pmc:
-                info->thaw_ptr = (PMC**)&b->value;
-                (info->visit_pmc_now)(interp, NULL, info);
-                break;
+                {
+                    /* this looks awful, but it avoids type-punning warnings */
+                    void **ptr     = &b->value;
+                    info->thaw_ptr = (PMC **)ptr;
+                    (info->visit_pmc_now)(interp, NULL, info);
+                    break;
+                }
             case enum_hash_int:
                 {
-                const INTVAL i = VTABLE_shift_integer(interp, io);
-                b->value = (void *)i;
-                break;
+                    const INTVAL i = VTABLE_shift_integer(interp, io);
+                    b->value       = (void *)i;
+                    break;
                 }
             default:
                 real_exception(interp, NULL, 1, "unimplemented value type");
