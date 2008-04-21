@@ -726,21 +726,25 @@ void
 mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t* chunk))
 {
     for (; ; chunk = chunk->prev) {
-        int i;
         save_regs_t   *save_r;
         Interp_Context ctx;
+        int            i;
 
-        pobject_lives(interp, (PObj*)chunk);
+        pobject_lives(interp, (PObj *)chunk);
+
         if (chunk == chunk->prev)
             break;
-        save_r = (save_regs_t *)STACK_DATAP(chunk);
+
+        save_r           = (save_regs_t *)chunk->u.data;
         ctx.bp.regs_i    = NULL;
         ctx.bp_ps.regs_p = save_r->old_bp_ps.regs_p;
+
         for (i = 0; i < save_r->n_regs_pmc; ++i) {
             PObj * const obj = (PObj *)CTX_REG_PMC(&ctx, i);
             if (obj)
                 pobject_lives(interp, obj);
         }
+
         for (i = 0; i < save_r->n_regs_str; ++i) {
             PObj * const obj = (PObj *)CTX_REG_STR(&ctx, i);
             if (obj)
