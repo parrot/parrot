@@ -23,28 +23,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-my $fp_equality_macro = <<'ENDOFMACRO';
-.macro fp_eq (  J, K, L )
-    set N10, .J
-    set N11, .K
-    sub N12, N11, N10
-    abs N12, N12
-    gt  N12, 0.000001, .$FPEQNOK
-
-    branch  .L
-.label $FPEQNOK:
-.endm
-.macro fp_ne(   J,K,L)
-    set N10, .J
-    set N11, .K
-    sub N12, N11, N10
-    abs N12, N12
-    lt  N12, 0.000001, .$FPNENOK
-
-    branch  .L
-.label $FPNENOK:
-.endm
-ENDOFMACRO
+my $fp_equality_macro = pasm_fp_equality_macro();
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
     new P0, 'ResizableBooleanArray'

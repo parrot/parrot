@@ -24,26 +24,7 @@ Tests the Complex PMC.
 
 =cut
 
-my $fp_equality_macro = <<'ENDOFMACRO';
-.macro fp_eq (  J, K, L )
-    set N8, .J
-    set N9, .K
-    sub N7, N9,N8
-    abs N7, N7
-    gt  N7, 0.000001, .$FPEQNOK
-    branch  .L
-.label $FPEQNOK:
-.endm
-.macro fp_ne(   J,K,L)
-    set N8, .J
-    set N9, .K
-    sub N7, N9,N8
-    abs N7, N7
-    lt  N7, 0.000001, .$FPNENOK
-    branch  .L
-.label $FPNENOK:
-.endm
-ENDOFMACRO
+my $fp_equality_macro = pasm_fp_equality_macro();
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "String parsing" );
     new P0, 'Complex'
