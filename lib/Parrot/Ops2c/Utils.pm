@@ -894,7 +894,7 @@ typedef struct hop {
 static HOP **hop;
 
 static void hop_init(void);
-static size_t hash_str(const char * str);
+static size_t hash_str(const char *str);
 static void store_op(op_info_t *info, int full);
 
 /* XXX on changing interpreters, this should be called,
@@ -912,11 +912,15 @@ static void hop_deinit(void);
  * returns >= 0 (found idx into info_table), -1 if not
  */
 
-static size_t hash_str(const char * str) {
-    size_t key = 0;
-    const char * s;
-    for(s=str; *s; s++)
-        key = key * 65599 + *s;
+static size_t hash_str(const char *str) {
+    size_t      key = 0;
+    const char *s   = str;
+
+    while (*s) {
+        key *= 65599;
+        key += *s++;
+    }
+
     return key;
 }
 
