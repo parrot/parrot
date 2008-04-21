@@ -507,24 +507,6 @@ Push register or constant X onto the generic stack
 Restore register X from the generic stack by popping off the topmost entry.
 The type of this entry must match the register type.
 
-=item saveall
-
-Save all of the current set of registers onto the appropriate frame  stacks.
-Equivalent to performing a separate push for each register type.
-
-=item restoreall
-
-Restore all of the registers from the appropriate frame stacks. Equivalent to
-performing a separate pop for each register type.
-
-=item savetop
-
-As L<saveall> but only acts on registers 16-31.
-
-=item restoretop
-
-As L<restoreall> but only affects registers 16-31.
-
 =item set_warp string
 
 Sets a named marker for the stacks for later use.

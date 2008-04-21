@@ -84,8 +84,6 @@ END_PIR
     #INIT
     my ( $edit, @saves );
 
-    #print CODE "\t.sub ${seg}_main\n\t\tsaveall\n";
-
     # If any "common" declared variables are in scope, set them up.
     @saves = ();
     foreach my $var ( keys %{ $code{$seg}->{declarations} } ) {
@@ -160,9 +158,10 @@ END_PIR
         print CODE ".end\t# outer segment\n";
         next;
     }
+    # saveall deleted from heredoc below April 2008
+    # see http://rt.perl.org/rt3/Ticket/Display.html?id=52838
     print CODE<<EOD;
         .sub ${seg}_debug
-                saveall
                 .param int debline
                 find_global \$P0, "DEBUGGER"
                 \$I0= \$P0["step"]
