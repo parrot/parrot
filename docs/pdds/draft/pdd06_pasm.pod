@@ -403,80 +403,6 @@ These opcodes deal with registers and stacks
 
 =over 4
 
-=item pushp
-
-Push the current set of PMC registers onto the register frame stack, and start
-a new set (which will all initially be NULL). Register frames hold only 16
-registers, so we need to push two frames onto the stack. The  first frame
-holds the contents of registers 0-15; the second holds the  contents of
-registers 16-31.
-
-=item popp
-
-Restore all of the PMC registers from the most recently C<push>ed PMC
-register frames. Since the register frames hold only 16 registers, we pop two
-frames. We use the first frame to restore registers 16-31, and  the second
-frame to restore registers 0-15. Hence, C<pushp> followed by C<popp> restores
-all of the PMC registers to their original state.
-
-=item poptopp
-
-Pop a single PMC register frame off the PMC register frame stack and use it to
-restore the values of registers 16-31. Registers 0-15 retain their old values.
-
-=item popbottomp
-
-Pop a single PMC register frame off the PMC register frame stack and use it to
-restore the values of registers 0-15. Registers 16-31 retain their old values.
-
-=item pushi
-
-The same as L<pushp>, for the integer register set.
-
-=item popi
-
-The same as L<popp>, for the integer register set.
-
-=item poptopi
-
-The same as L<poptopp>, for the integer register set.
-
-=item popbottomi
-
-The same as L<popbottomp>, for the integer register set.
-
-=item pushs
-
-The same as L<pushp>, for the string register set.
-
-=item pops
-
-The same as L<popp>, for the string register set.
-
-=item poptops
-
-The same as L<poptopp>, for the string register set.
-
-=item popbottoms
-
-The same as L<popbottomp>, for the string register set.
-
-=item pushn
-
-The same as L<pushp>, for the floating-point register set.
-
-=item popn
-
-The same as L<popp>, for the floating-point register set.
-
-=item poptopn
-
-The same as L<poptopp>, for the floating-point register set.
-
-=item popbottomn
-
-The same as L<popbottomp>, for the floating-point register set.
-
 =item clearp
 
 Clean out the current set of PMC registers, setting them to NULL
@@ -507,10 +433,6 @@ Push register or constant X onto the generic stack
 Restore register X from the generic stack by popping off the topmost entry.
 The type of this entry must match the register type.
 
-=item set_warp string
-
-Sets a named marker for the stacks for later use.
-
 =item entrytype Ix, iy
 
 Put the type of generic stack entry Y into integer register X
@@ -528,20 +450,6 @@ does not remove an entry from the stack, merely fetches the entry off it.
 that, and so on. Entry -1 is the very bottom-most entry in the stack. (While
 the stack may be a tree when looked at from the bottom up,  you don't have
 access to any other branches when looking this way).
-
-=item warp [string]
-
-Reset the current register stacks to the state they were in when the warp was
-set. Resets only the frame pointers, doesn't guarantee the contents of the
-registers. Be I<very> careful modifying the frame pointers by, for example,
-pushing register frames.
-
-If a name is passed, warp back to the named point.
-
-=item unwarp
-
-Reset the current register stacks to the state they were in before the last
-warp.
 
 =back
 
@@ -631,18 +539,11 @@ These opcodes deal with PMCs as objects, rather than as opaque data items.
 
 =over 4
 
-=item make_object Px, ty
-
-Make the variable in PMC x an object of type ty. The type can be a string, in
-which case we treat it as a package name.
-
 =item find_method Px, Py, tz
 
 Find the method Z for object Y, and return a PMC for it in X.
 
-=item call_method Px, ty
-
-=item find_attribute Px, sy
+=item callmethod Px, ty
 
 =item set_attribute Px, ty, tz
 
