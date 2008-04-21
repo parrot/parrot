@@ -1392,19 +1392,22 @@ tree as a PIR code object that can be compiled.
     lang = self['lang']
     value = code.'escape'(value)
     lang = code.'escape'(lang)
+    ##  to prevent recompiling every execution, this code makes use of
+    ##  a global %!cache, keyed on the inline closure source.  There
+    ##  could be a (unlikely) problem if the same source is sent to
+    ##  two different compilers.  Also, if the sources can be lengthy
+    ##  we might be well served to use a hashed representation of
+    ##  the source.
     code.emit(<<"        CODE", label, next, lang, value)
         %0: # closure
-          $S0 = concat %2, ':"'
           $S1 = %3
-          $S0 .= $S1
           $P0 = get_hll_global ['PGE::Match'], '%!cache'
-          $I0 = exists $P0[$S0]
-          if $I0 goto %0_1
+          $P1 = $P0[$S1]
+          unless null $P1 goto %0_1
           $P1 = compreg %2
           $P1 = $P1($S1)
-          $P0[$S0] = $P1
+          $P0[$S1] = $P1
         %0_1:
-          $P1 = $P0[$S0]
           mpos = pos
           ($P0 :optional, $I0 :opt_flag) = $P1(mob)
           if $I0 == 0 goto %1
