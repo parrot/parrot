@@ -723,9 +723,10 @@ Marks the register stack and its registers as live.
 */
 
 void
-mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t* chunk))
+mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
 {
     for (; ; chunk = chunk->prev) {
+        void          **chunk_data;
         save_regs_t   *save_r;
         Interp_Context ctx;
         int            i;
@@ -735,7 +736,8 @@ mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t* chunk))
         if (chunk == chunk->prev)
             break;
 
-        save_r           = (save_regs_t *)chunk->u.data;
+        chunk_data       = STACK_DATAP(chunk);
+        save_r           = (save_regs_t *)chunk_data;
         ctx.bp.regs_i    = NULL;
         ctx.bp_ps.regs_p = save_r->old_bp_ps.regs_p;
 
