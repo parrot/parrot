@@ -209,43 +209,39 @@ PMC* pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
 void pt_thread_kill(UINTVAL tid);
 void pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s);
 int pt_thread_run(PARROT_INTERP,
-    ARGOUT(PMC* dest_interp),
-    ARGIN(PMC* sub),
-    ARGIN(PMC *arg))
+    ARGOUT(PMC *dest_interp),
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(* dest_interp);
 
 int pt_thread_run_1(PARROT_INTERP,
-    ARGOUT(PMC* dest_interp),
-    ARGIN(PMC* sub),
-    ARGIN(PMC *arg))
+    ARGOUT(PMC *dest_interp),
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(* dest_interp);
 
 int pt_thread_run_2(PARROT_INTERP,
-    ARGOUT(PMC* dest_interp),
-    ARGIN(PMC* sub),
-    ARGIN(PMC *arg))
+    ARGOUT(PMC *dest_interp),
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(* dest_interp);
 
 int pt_thread_run_3(PARROT_INTERP,
-    ARGOUT(PMC* dest_interp),
-    ARGIN(PMC* sub),
-    ARGIN(PMC *arg))
+    ARGOUT(PMC *dest_interp),
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(* dest_interp);
 
 void pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))

@@ -659,7 +659,7 @@ C<arg> should be an array of arguments for the subroutine.
 */
 
 int
-pt_thread_run(PARROT_INTERP, ARGOUT(PMC* dest_interp), ARGIN(PMC* sub), ARGIN(PMC *arg))
+pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NULLOK(PMC *arg))
 {
     PMC *old_dest_interp;
     PMC *parent;
