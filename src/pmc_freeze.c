@@ -730,12 +730,14 @@ packfile header for wordsize and endianess.
 static INTVAL
 shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
-    const char * const start = (char*)io->image->strstart;
-    const INTVAL i =
-        PF_fetch_integer(io->pf, (opcode_t**) &io->image->strstart);
+    const char * const   start  = (char *)io->image->strstart;
+    char               **opcode = &io->image->strstart;
+    const INTVAL i              = PF_fetch_integer(io->pf,
+                                    (const opcode_t **)opcode);
 
-    io->image->bufused -= ((char*)io->image->strstart - start);
+    io->image->bufused -= ((char *)io->image->strstart - start);
     PARROT_ASSERT((int)io->image->bufused >= 0);
+
     return i;
 }
 
@@ -773,12 +775,14 @@ Removes and returns an number from the start of the C<*io> "stream".
 static FLOATVAL
 shift_opcode_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
-    const char * const start = (const char*)io->image->strstart;
-    const FLOATVAL f =
-        PF_fetch_number(io->pf, (const opcode_t**) &io->image->strstart);
+    const char * const   start  = (const char *)io->image->strstart;
+    char               **opcode = &io->image->strstart;
+    const FLOATVAL       f      = PF_fetch_number(io->pf,
+                                    (const opcode_t **)opcode);
 
-    io->image->bufused -= ((char*)io->image->strstart - start);
+    io->image->bufused -= ((char *)io->image->strstart - start);
     PARROT_ASSERT((int)io->image->bufused >= 0);
+
     return f;
 }
 
@@ -797,12 +801,14 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 {
-    char * const start = (char*)io->image->strstart;
-    STRING * const s =
-        PF_fetch_string(interp, io->pf, (const opcode_t**) &io->image->strstart);
+    char * const   start  = (char*)io->image->strstart;
+    char         **opcode = &io->image->strstart;
+    STRING * const s      = PF_fetch_string(interp, io->pf,
+                                (const opcode_t **)opcode);
 
-    io->image->bufused -= ((char*)io->image->strstart - start);
+    io->image->bufused -= ((char *)io->image->strstart - start);
     PARROT_ASSERT((int)io->image->bufused >= 0);
+
     return s;
 }
 

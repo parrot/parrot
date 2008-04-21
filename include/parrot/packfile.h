@@ -684,7 +684,7 @@ char * PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
 PARROT_WARN_UNUSED_RESULT
 INTVAL PF_fetch_integer(
     ARGIN_NULLOK(PackFile *pf),
-    ARGIN(opcode_t **stream))
+    ARGIN(const opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT

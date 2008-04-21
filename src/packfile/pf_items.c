@@ -485,16 +485,17 @@ C<INTVAL> size in the PackFile header.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(opcode_t **stream))
+PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     INTVAL i;
     if (!pf || pf->fetch_iv == NULL)
         return *(*stream)++;
-    i = (pf->fetch_iv)(*((unsigned char **)stream));
+    i = (pf->fetch_iv)(*((const unsigned char **)stream));
+
     /* XXX assume sizeof (opcode_t) == sizeof (INTVAL) on the
      * machine producing this PBC
      */
-    *((unsigned char **) (stream)) += pf->header->wordsize;
+    *((const unsigned char **) (stream)) += pf->header->wordsize;
     return i;
 }
 
