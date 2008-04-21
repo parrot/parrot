@@ -240,6 +240,10 @@ Construct a relative path from the current dir to the parrot root dir.
 Construct a path for a temporary files.
 Takes C<$0> into account.
 
+=item C<pasm_fp_equality_macros()>
+
+Returns a PASM macro that can be used to test fp equality/inequality.
+
 =item C<write_code_to_file($code, $code_f)>
 
 Writes C<$code> into the file C<$code_f>.
@@ -272,7 +276,7 @@ require Exporter;
 require Test::Builder;
 require Test::More;
 
-our @EXPORT = qw( plan run_command skip slurp_file );
+our @EXPORT = qw( plan run_command skip slurp_file pasm_fp_equality_macro );
 
 use base qw( Exporter );
 
@@ -391,6 +395,33 @@ sub per_test {
 
     return $t;
 }
+
+sub pasm_fp_equality_macro {
+    my $fp_equality_macro = <<'ENDOFMACRO';
+.macro fp_eq (  J, K, L )
+    set N10, .J
+    set N11, .K
+    sub N12, N11, N10
+    abs N12, N12
+    gt  N12, 0.000001, .$FPEQNOK
+
+    branch  .L
+.label $FPEQNOK:
+.endm
+.macro fp_ne(   J,K,L)
+    set N10, .J
+    set N11, .K
+    sub N12, N11, N10
+    abs N12, N12
+    lt  N12, 0.000001, .$FPNENOK
+
+    branch  .L
+.label $FPNENOK:
+.endm
+ENDOFMACRO
+    return $fp_equality_macro;
+}
+
 
 sub write_code_to_file {
     my ( $code, $code_f ) = @_;
