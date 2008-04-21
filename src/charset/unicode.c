@@ -126,10 +126,9 @@ static void titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 PARROT_CANNOT_RETURN_NULL
 static STRING* to_charset(PARROT_INTERP,
     ARGIN(STRING *src),
-    ARGMOD(STRING *dest))
+    ARGIN_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static int u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
@@ -231,7 +230,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
+to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 {
     const charset_converter_t conversion_func =
             Parrot_find_charset_converter(interp, src->charset,
