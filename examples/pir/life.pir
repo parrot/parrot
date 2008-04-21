@@ -143,10 +143,11 @@ getout:	time N6
 # I2 is the count for that cell
 # I3 is the offset to the neighbor
 generate:
-	save I0
-	save I1
-	save I2
-	save I3
+        .local int save_I0, save_I1, save_I2, save_I3
+	save_I0 = I0
+	save_I1 = I1
+	save_I2 = I2
+	save_I3 = I3
 	length I0, S15
 	set S1, ""
 	set I1, 0
@@ -241,10 +242,10 @@ iter_done:
 	lt I1, I0, genloop
 done:
 	set S15, S1
-	restore I3
-	restore I2
-	restore I1
-	restore I0
+	I3 = save_I3
+	I2 = save_I2
+	I1 = save_I1
+	I0 = save_I0
 	ret
 
 # S15 has the incoming string, S0 is scratch

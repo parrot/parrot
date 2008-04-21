@@ -39,10 +39,8 @@ END:
 
     app = self."app"()
     app."setTimer"( 0 )
-    save app
     $P0 = find_global "SDL::Event", "disptach_event"
     invokecc $P0
-    restore app
     ret = I5
     app."setTimer"( 1 )
     .return (ret)
