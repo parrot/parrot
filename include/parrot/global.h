@@ -44,11 +44,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_find_global_op(PARROT_INTERP,
     ARGIN(PMC *ns),
-    ARGIN(STRING *globalname),
+    ARGIN_NULLOK(STRING *globalname),
     ARGIN_NULLOK(void *next))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

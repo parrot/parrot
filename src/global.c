@@ -614,7 +614,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
-        ARGIN(STRING *globalname), ARGIN_NULLOK(void *next))
+        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(void *next))
 {
     PMC *res;
 
