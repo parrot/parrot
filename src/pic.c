@@ -620,12 +620,12 @@ RT#48260: Not yet documented!!!
 static int
 is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t op)
 {
-    PMC *sig2;
-    int type;
-    parrot_context_t *caller_ctx;
-    opcode_t *args;
-    PMC * const sig1 = (PMC*)(pc[1]);
-    const parrot_context_t * const ctx = CONTEXT(interp);
+    PMC                           *sig2;
+    parrot_context_t              *caller_ctx;
+    opcode_t                      *args;
+    PMC                    * const sig1 = (PMC *)(pc[1]);
+    const parrot_context_t * const ctx  = CONTEXT(interp);
+    int                            type = 0;
 
     /* check params */
 
@@ -634,29 +634,31 @@ is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t 
         if (!PMC_cont(ccont)->address)
             return 0;
         caller_ctx = PMC_cont(ccont)->to_ctx;
-        args = caller_ctx->current_results;
+        args       = caller_ctx->current_results;
     }
     else {
         caller_ctx = ctx->caller_ctx;
-        args = interp->current_args;
+        args       = interp->current_args;
     }
+
     if (args) {
         const INTVAL const_nr = args[1];
         int n;
+
         /* check current_args signature */
         sig2 = caller_ctx->constants[const_nr]->u.key;
-        n = parrot_pic_check_sig(sig1, sig2, &type);
+        n    = parrot_pic_check_sig(sig1, sig2, &type);
+
         if (n == -1)
             return 0;
     }
     else {
-        if (SIG_ELEMS(sig1) == 0) {
-            sig2 = NULL;
-            type = 0;
-        }
-        else
+        if (SIG_ELEMS(sig1))
             return 0;
+
+        sig2 = NULL;
     }
+
     switch (type) {
         case PARROT_ARG_INTVAL:
             mic->lru.f.real_function = (funcptr_t)pass_int;
@@ -676,9 +678,12 @@ is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t 
         default:
             return 0;
     }
+
     mic->m.sig = sig1;
+
     /* remember this sig2 - it has to match the other end at call time */
     mic->lru.u.signature = sig2;
+
     return 1;
 }
 
