@@ -13,6 +13,10 @@
  */
 
 /* TODO:
+ * - fix the bug. There's an ugly bug somewhere with memory.
+     Shouldn't be too hard to find it, as this program is very small;
+     first it might be interesting to see whether it's worth the trouble,
+     i.e. will this ever be used?
  * - improve memory management
  * - use a buffer of a certain (large) size, instead of resizing on each
  *   line, which is not efficient. Only resize if realsize > fixedsize.
