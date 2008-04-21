@@ -61,15 +61,21 @@ PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
 register_new_stack(PARROT_INTERP, ARGIN(const char *name), size_t item_size)
 {
-    Stack_Chunk_t *chunk;
+    Stack_Chunk_t     *chunk;
     Small_Object_Pool *ignored;
+
     item_size += offsetof(Stack_Chunk_t, u.data);
-    ignored = make_bufferlike_pool(interp, item_size);
+    ignored    = make_bufferlike_pool(interp, item_size);
+
     UNUSED(ignored);
-    chunk = (Stack_Chunk_t *)new_bufferlike_header(interp, item_size);
+
+    chunk       = (Stack_Chunk_t *)new_bufferlike_header(interp, item_size);
     chunk->prev = chunk;        /* mark the top of the stack */
     chunk->name = name;
     chunk->size = item_size;    /* TODO store the pool instead the size */
+
+    /* that's one more reference to this chunk */
+    PMC_int_val((PObj *)chunk)++;
     return chunk;
 }
 
@@ -94,10 +100,11 @@ cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
     Stack_Chunk_t * const new_chunk = (Stack_Chunk_t *)pool->get_free_object(interp, pool);
 
     PObj_bufstart(new_chunk) = NULL;
-    PObj_buflen(new_chunk) = 0;
+    PObj_buflen(new_chunk)   = 0;
 
-    new_chunk->size = chunk->size;
-    new_chunk->name = chunk->name;
+    new_chunk->size          = chunk->size;
+    new_chunk->name          = chunk->name;
+
     return new_chunk;
 }
 
@@ -117,11 +124,14 @@ PARROT_CANNOT_RETURN_NULL
 void*
 stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 {
-    Stack_Chunk_t * const chunk = *stack_p;
+    Stack_Chunk_t * const chunk     = *stack_p;
     Stack_Chunk_t * const new_chunk = cst_new_stack_chunk(interp, chunk);
 
     new_chunk->prev = chunk;
-    *stack_p = new_chunk;
+    *stack_p        = new_chunk;
+
+    PMC_int_val((PObj *)chunk)++;
+
     return STACK_DATAP(new_chunk);
 }
 
@@ -144,14 +154,15 @@ stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 {
     Stack_Chunk_t * const chunk = *stack_p;
 
-    /*
-     * the first entry (initial top) refers to itself
-     */
-    if (chunk == chunk->prev) {
-        real_exception(interp, NULL, ERROR_STACK_EMPTY, "No entries on %sStack!",
-                chunk->name);
-    }
+    /* the first entry (initial top) refers to itself */
+    if (chunk == chunk->prev)
+        real_exception(interp, NULL, ERROR_STACK_EMPTY,
+            "No entries on %sStack!", chunk->name);
+
     *stack_p = chunk->prev;
+
+    /* that's one fewer reference to this chunk */
+    PMC_int_val((PObj *)chunk)--;
     return STACK_DATAP(chunk);
 }
 

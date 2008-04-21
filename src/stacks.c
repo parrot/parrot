@@ -265,8 +265,10 @@ stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
 
     /* Remember the type */
     entry->entry_type = type;
+
     /* Remember the cleanup function */
     entry->cleanup = cleanup;
+
     /* Store our thing */
     switch (type) {
         case STACK_ENTRY_INT:
@@ -307,7 +309,9 @@ void *
 stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
           ARGOUT_NULLOK(void *where), Stack_entry_type type)
 {
-    Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
+    Stack_Chunk_t     *cur_chunk   = *stack_p;
+    Stack_Entry_t * const entry    =
+        (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {
@@ -319,33 +323,41 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
     if (entry->cleanup != STACK_CLEANUP_NULL)
         (*entry->cleanup) (interp, entry);
 
-    /* Sometimes the caller doesn't care what the value was */
-    if (where == NULL)
-        return NULL;
+    /* Sometimes the caller cares what the value was */
+    if (where) {
+        /* Snag the value */
+        switch (type) {
+        case STACK_ENTRY_MARK:
+        case STACK_ENTRY_INT:
+            *(INTVAL *)where   = UVal_int(entry->entry);
+            break;
+        case STACK_ENTRY_FLOAT:
+            *(FLOATVAL *)where = UVal_num(entry->entry);
+            break;
+        case STACK_ENTRY_ACTION:
+        case STACK_ENTRY_PMC:
+            *(PMC **)where     = UVal_pmc(entry->entry);
+            break;
+        case STACK_ENTRY_STRING:
+            *(STRING **)where  = UVal_str(entry->entry);
+            break;
+        case STACK_ENTRY_POINTER:
+        case STACK_ENTRY_DESTINATION:
+            *(void **)where    = UVal_ptr(entry->entry);
+            break;
+        default:
+            real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
+                               "Wrong type on top of stack!\n");
+        }
+    }
 
-    /* Snag the value */
-    switch (type) {
-    case STACK_ENTRY_MARK:
-    case STACK_ENTRY_INT:
-        *(INTVAL *)where   = UVal_int(entry->entry);
-        break;
-    case STACK_ENTRY_FLOAT:
-        *(FLOATVAL *)where = UVal_num(entry->entry);
-        break;
-    case STACK_ENTRY_ACTION:
-    case STACK_ENTRY_PMC:
-        *(PMC **)where     = UVal_pmc(entry->entry);
-        break;
-    case STACK_ENTRY_STRING:
-        *(STRING **)where  = UVal_str(entry->entry);
-        break;
-    case STACK_ENTRY_POINTER:
-    case STACK_ENTRY_DESTINATION:
-        *(void **)where    = UVal_ptr(entry->entry);
-        break;
-    default:
-        real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
-                           "Wrong type on top of stack!\n");
+    /* recycle this chunk to the free list if it's otherwise unreferenced */
+    if (PMC_int_val((PObj *)cur_chunk) == 0) {
+        Small_Object_Pool * const pool =
+            get_bufferlike_pool(interp, cur_chunk->size);
+
+        pool->dod_object(interp, pool, (PObj *)cur_chunk);
+        pool->add_free_object(interp, pool, (PObj *)cur_chunk);
     }
 
     return where;
