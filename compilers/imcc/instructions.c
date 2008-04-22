@@ -117,9 +117,8 @@ _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
 
 /*
  * Some instructions don't have a hint in op_info that they work
- * on all registers (e.g. saveall, restoreall) or on all registers
- * of a given type  (e.g. pushi, popi, cleari). These instructions
- * need special handling at various points in the code.
+ * on all registers or all registers of a given type (e.g., cleari)
+ * These instructions need special handling at various points in the code.
  */
 
 static int r_special[5];
@@ -139,10 +138,8 @@ void
 imcc_init_tables(PARROT_INTERP)
 {
     const char *reads[] = {
-        "saveall"
     };
     const char *writes[] = {
-        "restoreall",
         "cleari", "clearn", "clearp", "clears",
     };
     /* init opnums */

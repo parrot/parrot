@@ -17,48 +17,6 @@ Operations that manipulate Parrot's register and user stacks.
 
 ###############################################################################
 
-=head2 Register stack operations
-
-These operations affect entire sets of registers.
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<saveall>()
-
-Save all of the registers onto the register stack.
-
-=item B<restoreall>()
-
-Restore all the registers from the register stack.
-
-=cut
-
-inline op saveall() :base_core {
-  Parrot_push_regs(interp);
-  /* these 2 opcodes change the register base pointer
-   * restart NEXT() reloads cached base pointers, and works with
-   * arbitrary branch opcodes too. While it's a bit of overkill,
-   * we don't have an opcode annotation to reload just the base pointers
-   * RT#42369 OPTIMIZE later
-   */
-  restart NEXT();
-}
-
-inline op restoreall() :base_core {
-  Parrot_pop_regs(interp);
-  restart NEXT();
-}
-
-=back
-
-=cut
-
-###############################################################################
-
 =head2 User stack operations
 
 These operations affect individual registers.

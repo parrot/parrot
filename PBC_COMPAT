@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+3.15    2008.04.22	pmichaud	remove saveall/restoreall opcodes
 3.14    2008.04.04	chromatic	enabled div_i_ic_ic and div_n_nc_nc opcodes
 3.13    2008.03.29	chromatic	added does_i_p_pc opcode
 3.12    2008.03.26	coke	deleted classoffset
