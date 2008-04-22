@@ -69,7 +69,7 @@ my @steps = qw(
     auto::icu
     gen::config_h
     gen::core_pmcs
-    gen::digest
+    gen::crypto
     gen::parrot_include
     gen::opengl
     gen::languages

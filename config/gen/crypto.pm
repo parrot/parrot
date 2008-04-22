@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/digest.pm - Digest PMC Files
+config/gen/crypto.pm - Digest PMC Files
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ Generates Digest PMC files.
 
 =cut
 
-package gen::digest;
+package gen::crypto;
 
 use strict;
 use warnings;
@@ -63,7 +63,7 @@ sub runstep {
         $conf->data->set( md_ctx => $val->{md_ctx} || $md . '_CTX' );
         $conf->data->set( md_digest => $val->{md_digest} || $md . '_DIGEST' );
         $conf->genfile(
-            'config/gen/digest/digest_pmc.in' => "src/dynpmc/${file}.pmc",
+            'config/gen/crypto/digest_pmc.in' => "src/dynpmc/${file}.pmc",
             comment_type => '/*',
         );
     }
