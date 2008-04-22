@@ -488,7 +488,7 @@ sub make_op {
         my $op_size = $op->size;
         my $jumps   = "0";
 
-        unless ($flags =~ /\b:flow\b/) {
+        unless ($flags =~ m/:flow\b/) {
             $body .= "\ngoto NEXT();";
         }
 
