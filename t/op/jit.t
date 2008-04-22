@@ -1014,24 +1014,14 @@ set N0, 4000
 set P0, 123
 div P0, P0, N0
 
-save    N0
-save    N1
-save    N2
-
 set     N0, P0
 set     N1, 0.03074969250307496925
 sub     N2, N1,N0
 abs     N2, N2
 gt      N2, 0.000001, local__fp_eq__FPEQNOK__1
 
-restore N2
-restore N1
-restore N0
 branch  EQ1
 local__fp_eq__FPEQNOK__1:
-restore N2
-restore N1
-restore N0
 print P0
 print "not "
 EQ1:    print "ok 1"
