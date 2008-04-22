@@ -57,24 +57,14 @@ sub runstep {
 
     my $osname = $conf->data->get_p5('OSNAME');
 
+    _handle_mswin32($conf, $osname, $cc);
+
     # On OS X check the presence of the gettext header in the standard
     # Fink location.
     $self->_handle_darwin_for_fink($conf, $osname, 'libintl.h');
 
     $conf->cc_gen('config/auto/gettext/gettext.in');
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            eval { $conf->cc_build( '', '-lintl' ); };
-        }
-        else {
-            eval { $conf->cc_build( '', 'intl.lib' ); };
-        }
-    }
-    else {
-        # don't need to link with libintl if we have GNU libc
-        my $linklibs = defined $conf->data->get('glibc') ? '' : '-lintl';
-        eval { $conf->cc_build( '', $linklibs ); };
-    }
+    eval { $conf->cc_build(); };
     my $has_gettext;
     if ( !$@ ) {
         my $test = $conf->cc_run();
@@ -89,6 +79,24 @@ sub runstep {
     }
     $conf->data->set( HAS_GETTEXT => $has_gettext );
 
+    return 1;
+}
+
+sub _handle_mswin32 {
+    my ($conf, $osname, $cc) = @_;
+    if ( $osname =~ /mswin32/i ) {
+        if ( $cc =~ /^gcc/i ) {
+            $conf->data->add( ' ', libs => '-lintl' );
+        }
+        else {
+            $conf->data->add( ' ', libs => 'intl.lib' );
+        }
+    }
+    else {
+        # don't need to link with libintl if we have GNU libc
+        my $linklibs = defined $conf->data->get('glibc') ? '' : '-lintl';
+        $conf->data->add( ' ', libs => $linklibs );
+    }
     return 1;
 }
 
