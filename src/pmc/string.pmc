@@ -43,7 +43,7 @@ Initializes the string.
 
 =item C<PMC new_from_string(STRING *rep)>
 
-Class method to construct an Integer from the string representation C<rep>.
+Class method to construct a String from the string representation C<rep>.
 
 =cut
 
@@ -579,7 +579,7 @@ C<length>, and places it in C<dest>.
 
 /*
 
-=item C<STRING *substr(INTVAL offset, INTVAL length)>
+=item C<STRING *substr_str(INTVAL offset, INTVAL length)>
 
 Extracts the substring starting at C<offset>, with size
 C<length>, and returns it.
