@@ -667,9 +667,8 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             IMCC_debug(interp, DEBUG_OPT2,
                     "propagating constant %I => \n", ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
-                if (ins2->type & ITSAVES ||
+                if (ins2->bbindex != ins->bbindex)
                     /* restrict to within a basic block */
-                    ins2->bbindex != ins->bbindex)
                     goto next_constant;
                 /* was opsize - 2, changed to n_r - 1
                  */
