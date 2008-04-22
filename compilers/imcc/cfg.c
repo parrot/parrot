@@ -406,26 +406,16 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 invok:
                     j = pred->from->index;
                     if (found) {
-                        int saves = 0;
                         IMCC_debug(interp, DEBUG_CFG,
                                 "\tcalled from bb %d '%I'\n",
                                 j, pred->from->end);
                         for (; sub && sub != bb->end; sub = sub->next) {
-                            if (STREQ(sub->opname, "saveall"))
-                                if (!(sub->type & ITSAVES))
-                                    break;
                             unit->bb_list[sub->bbindex]->flag |= BB_IS_SUB;
-                            if (STREQ(sub->opname, "restoreall")) {
-                                sub->type |= ITSAVES;
-                                saves = 1;
-                            }
                         }
-                        if (!saves)
-                            bb_add_edge(unit, bb,
+                        bb_add_edge(unit, bb,
                                     unit->bb_list[j+1]);
                         IMCC_debug(interp, DEBUG_CFG,
-                                   "\tand does saveall %s\n",
-                                   saves ? "yes" : "no");
+                                   "\tand does saveall no\n");
                     }
                 }
                 else if (STREQ(pred->from->end->opname, "invoke")) {
