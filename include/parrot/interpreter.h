@@ -213,7 +213,6 @@ typedef struct Parrot_Context {
     INTVAL *n_regs_used;                /* INSP in PBC points to Sub */
     size_t regs_mem_size;               /* memory occupied by registers */
     int ref_count;                      /* how often refered to */
-    struct Stack_Chunk *reg_stack;      /* register stack */
 
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     PMC      *lex_pad;                  /* LexPad PMC */

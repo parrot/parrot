@@ -202,9 +202,6 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* allocate stack chunk cache */
     stack_system_init(interp);
 
-    /* Set up the initial register chunks */
-    setup_register_stacks(interp);
-
     /* Need a user stack */
     CONTEXT(interp)->user_stack = new_stack(interp, "User");
 

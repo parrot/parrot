@@ -95,10 +95,6 @@ void Parrot_pop_context(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_pop_regs(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 struct Parrot_Context * Parrot_push_context(PARROT_INTERP,
@@ -106,10 +102,6 @@ struct Parrot_Context * Parrot_push_context(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*n_regs_used);
-
-PARROT_API
-void Parrot_push_regs(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_set_context_threshold(SHIM_INTERP,
@@ -120,11 +112,6 @@ void create_initial_context(PARROT_INTERP)
 
 void destroy_context(PARROT_INTERP)
         __attribute__nonnull__(1);
-
-void mark_register_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t* chunk))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* chunk);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -140,9 +127,6 @@ struct Parrot_Context * Parrot_dup_context(PARROT_INTERP,
     ARGIN(const struct Parrot_Context *old))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-void setup_register_stacks(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/gc/register.c */
 
