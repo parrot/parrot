@@ -68,7 +68,6 @@ VALID_MIME: {
 
     my @failed      = verify_attributes( $test, $expected_re, 0, $mime_types, \@manifest_files, 1 );
 
-    ## XXX Fix this.
     if (@failed) {
         my $failure = join q{}, "Invalid svn:mime-types found in the following files:\n",
             map { "$_\n" } @failed;
