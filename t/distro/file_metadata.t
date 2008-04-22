@@ -43,10 +43,44 @@ my $chunk_size = 100;
 my @manifest_files =
     sort keys %{ maniread( catfile $PConfig{build_dir}, 'MANIFEST' ) };
 
+my $mime_types = get_attribute( 'svn:mime-type', @manifest_files );
+
+## only certain mime types are expected.
+
+
+VALID_MIME: {
+
+    my $test        = 'svn:mime-type';
+    my @expected    = qw[
+        text/css
+        text/plain
+        text/script
+        text/xml
+        application/octet-stream
+        application/postscript
+        image/gif
+        image/png
+    ];
+    push @expected, 'text/plain; charset=UTF-8'; # used by pugs, primarily
+
+    my $expected    = join '|', @expected, "";
+    my $expected_re = qr{^(${expected})$};
+
+    my @failed      = verify_attributes( $test, $expected_re, 0, $mime_types, \@manifest_files, 1 );
+
+    ## XXX Fix this.
+    if (@failed) {
+        my $failure = join q{}, "Invalid svn:mime-types found in the following files:\n",
+            map { "$_\n" } @failed;
+        is( $failure, '', $test );
+    }
+    else {
+        pass($test);
+    }
+}    # VALID_MIME
+
 ## all test files must have "text/plain" mime-type. Assume anything in the
 ## repository with a .t is test file.
-
-my $mime_types = get_attribute( 'svn:mime-type', @manifest_files );
 
 TEST_MIME: {
 
@@ -225,7 +259,7 @@ BEGIN {
         my $git_svn_metadata = catfile(qw/.git svn git-svn unhandled.log/);
         if ( -e $git_svn_metadata ) {
             diag 'Checking git svn metadata';
-            plan tests => 4;
+            plan tests => 5;
 
             # Read the file once and store lines
             if ( !open my $git_svn_metadata_fh, '<', $git_svn_metadata ) {
@@ -243,7 +277,7 @@ BEGIN {
     elsif ( !( (-d '.svn' && `svn info .`) or `svk info .` ) ) {
         plan skip_all => 'not a working copy';
     }
-    else { plan tests => 4 }
+    else { plan tests => 5 }
 }
 
 #
@@ -324,6 +358,9 @@ sub verify_attributes {
     my $exact     = shift;    # should this be an exact match?
     my $results   = shift;    # the results hash ref: file -> value
     my $files     = shift;    # an arrayref of files we care about. (undef->all)
+    my $allow_empty = shift;  # should we allow blank values? (default: no)
+   
+    $allow_empty = 0 unless defined $allow_empty;
 
     my @files;
     if ( defined($files) ) {
@@ -336,6 +373,9 @@ sub verify_attributes {
     my @failures;
     foreach my $file ( sort @files ) {
         my $actual = $results->{$file};
+        if ($allow_empty && ! defined $actual) {
+            $actual = "";
+        }
         if ( !defined $actual ) {
             push @failures, $file;
             next;
