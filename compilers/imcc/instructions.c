@@ -137,19 +137,12 @@ RT#48260: Not yet documented!!!
 void
 imcc_init_tables(PARROT_INTERP)
 {
-    const char *reads[] = {
-    };
     const char *writes[] = {
         "cleari", "clearn", "clearp", "clears",
     };
     /* init opnums */
-    if (!r_special[0]) {
+    if (!w_special[0]) {
         size_t i;
-        for (i = 0; i < N_ELEMENTS(reads); i++) {
-            const int n = interp->op_lib->op_code(reads[i], 1);
-            PARROT_ASSERT(n);
-            r_special[i] = n;
-        }
         for (i = 0; i < N_ELEMENTS(writes); i++) {
             const int n = interp->op_lib->op_code(writes[i], 1);
             PARROT_ASSERT(n);
