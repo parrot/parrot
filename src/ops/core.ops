@@ -47,7 +47,7 @@ Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
 
 =cut
 
-inline op end() :base_core,check_event {
+inline op end() :base_core :check_event :flow {
     HALT();
 }
 
@@ -102,7 +102,6 @@ RT#42381 search the library path to locate the file.
 =cut
 
 inline op noop() :base_core {
-    goto NEXT();
 }
 
 inline op cpu_ret() {
@@ -111,16 +110,15 @@ inline op cpu_ret() {
     __asm__("ret");
 #  endif
 #endif
-    goto NEXT();
 }
 
-inline op check_events() :base_core {
+inline op check_events() :base_core :flow {
     opcode_t *next = expr NEXT();
     Parrot_cx_check_tasks(interp, interp->scheduler);
     goto ADDRESS(next);   /* force this being a branch op */
 }
 
-inline op check_events__() :internal {
+inline op check_events__() :internal :flow {
     opcode_t *_this = CUR_OPCODE;
     /* Restore op_func_table. */
     disable_event_checking(interp);
@@ -128,13 +126,13 @@ inline op check_events__() :internal {
     goto ADDRESS(_this);   /* force this being a branch op */
 }
 
-inline op wrapper__() :internal {
+inline op wrapper__() :internal :flow {
     opcode_t *pc = CUR_OPCODE;
     DO_OP(pc, interp);
     goto ADDRESS(pc);
 }
 
-inline op prederef__() :internal {
+inline op prederef__() :internal :flow {
     opcode_t *_this = CUR_OPCODE;
     if (interp->run_core & PARROT_CGOTO_CORE) {
         /* must be CGP then - check for events in not yet prederefed code */
@@ -146,12 +144,11 @@ inline op prederef__() :internal {
 }
 
 inline op reserved(inconst INT) {
-    goto NEXT();  /* reserve 1 entries */
+    /* reserve 1 entries */
 }
 
 inline op load_bytecode(in STR) :load_file {
     Parrot_load_bytecode(interp, $1);
-    goto NEXT();
 }
 
 =back
@@ -176,7 +173,7 @@ Branch forward or backward by the amount in $1.
 
 =cut
 
-inline op branch(label INT) :base_loop {
+inline op branch(label INT) :base_loop :flow {
     goto OFFSET($1);
 }
 
@@ -187,7 +184,7 @@ Intersegment branch to location in fixup table named $1.
 
 =cut
 
-inline op branch_cs(in STR) :base_loop,check_event {
+inline op branch_cs(in STR) :base_loop :check_event :flow {
     char * const         label = string_to_cstring(interp, $1);
     PackFile_FixupEntry * const fe =
         PackFile_find_fixup_entry(interp, enum_fixup_label, label);
@@ -216,7 +213,7 @@ stack for later returning.
 
 =cut
 
-inline op bsr(label INT) :base_core,check_event {
+inline op bsr(label INT) :base_core :check_event :flow {
     stack_push(interp, &interp->dynamic_env,
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
     goto OFFSET($1);
@@ -228,7 +225,7 @@ Pop the location off the top of the call stack and go there.
 
 =cut
 
-inline op ret() {
+inline op ret() :flow {
     goto POP();
 }
 
@@ -242,7 +239,7 @@ location onto the call stack for later returning.
 
 =cut
 
-inline op jsr(label INT) :base_core,check_event {
+inline op jsr(label INT) :base_core :check_event :flow {
     opcode_t * loc;
     stack_push(interp, &interp->dynamic_env,
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
@@ -259,7 +256,7 @@ Jump to the address held in register $1.
 
 =cut
 
-inline op jump(label INT) :base_loop {
+inline op jump(label INT) :base_loop :flow {
     opcode_t * const loc = INTVAL2PTR(opcode_t *, $1);
     goto ADDRESS(loc);
 }
@@ -272,7 +269,7 @@ Internal opcode used to jump from normal bytecode into a JITted version.
 
 =cut
 
-op enternative() {
+op enternative() :flow {
     opcode_t * const addr = run_native(interp, CUR_OPCODE,
             interp->code->base.data);
     goto ADDRESS(addr);
@@ -308,31 +305,23 @@ Check register $1. If true, branch by $2.
 =cut
 
 inline op if(invar INT, labelconst INT) {
-    if ($1 != 0) {
+    if ($1 != 0)
         goto OFFSET($2);
-    }
-    goto NEXT();
 }
 
 inline op if(invar NUM, labelconst INT) {
     if (!FLOAT_IS_ZERO($1))
         goto OFFSET($2);
-
-    goto NEXT();
 }
 
 op if (invar STR, labelconst INT) {
-    if ($1 && string_bool(interp, $1)) {
+    if ($1 && string_bool(interp, $1))
         goto OFFSET($2);
-    }
-    goto NEXT();
 }
 
 op if(invar PMC, labelconst INT) {
-    if ($1->vtable->get_bool(interp, $1)) {
+    if ($1->vtable->get_bool(interp, $1))
         goto OFFSET($2);
-    }
-    goto NEXT();
 }
 
 ########################################
@@ -350,31 +339,23 @@ Check register $1. If false, branch by $2.
 =cut
 
 inline op unless(invar INT, labelconst INT) {
-    if ($1 == 0) {
+    if ($1 == 0)
         goto OFFSET($2);
-    }
-    goto NEXT();
 }
 
 inline op unless(invar NUM, labelconst INT) {
     if (FLOAT_IS_ZERO($1))
         goto OFFSET($2);
-
-    goto NEXT();
 }
 
 op unless(invar STR, labelconst INT) {
-    if (!$1 || !string_bool(interp, $1)) {
+    if (!$1 || !string_bool(interp, $1))
         goto OFFSET($2);
-    }
-    goto NEXT();
 }
 
 op unless(invar PMC, labelconst INT) {
-    if (!$1->vtable->get_bool(interp, $1)) {
+    if (!$1->vtable->get_bool(interp, $1))
         goto OFFSET($2);
-    }
-    goto NEXT();
 }
 
 =back
@@ -423,7 +404,7 @@ Create a closure of the given subroutine PMC by cloning the sub's state.
 
 =cut
 
-inline op invokecc(invar PMC) {
+inline op invokecc(invar PMC) :flow {
     opcode_t *dest;
     PMC * const p = $1;
     dest = expr NEXT();
@@ -433,7 +414,7 @@ inline op invokecc(invar PMC) {
     goto ADDRESS(dest);
 }
 
-inline op invoke(invar PMC, invar PMC) {
+inline op invoke(invar PMC, invar PMC) :flow {
     opcode_t *dest;
     PMC * const p = $1;
 
@@ -443,14 +424,14 @@ inline op invoke(invar PMC, invar PMC) {
     goto ADDRESS(dest);
 }
 
-inline op yield() {
+inline op yield() :flow {
     opcode_t *dest = expr NEXT();
     PMC * const p = CONTEXT(interp)->current_sub;
     dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
 
-inline op tailcall(invar PMC) {
+inline op tailcall(invar PMC) :flow {
     opcode_t *dest;
     PMC * const p = $1;
     dest = expr NEXT();
@@ -460,7 +441,7 @@ inline op tailcall(invar PMC) {
     goto ADDRESS(dest);
 }
 
-inline op returncc() {
+inline op returncc() :flow {
     PMC * const p = CONTEXT(interp)->current_cont;
     opcode_t * const dest = (opcode_t *)p->vtable->invoke(interp,
             p, expr NEXT());
@@ -469,7 +450,6 @@ inline op returncc() {
 
 inline op newclosure(out PMC, invar PMC) {
     $1 = parrot_new_closure(interp, $2);
-    goto NEXT();
 }
 
 =back
@@ -506,7 +486,7 @@ to the elements of the signature array.
 =cut
 
 
-op set_args(inconst PMC) {
+op set_args(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
     PMC * const signature = $1;
     INTVAL argc;
@@ -517,7 +497,7 @@ op set_args(inconst PMC) {
     goto OFFSET(argc + 2);
 }
 
-op get_results(inconst PMC) {
+op get_results(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
     PMC * const signature = $1;
     INTVAL argc;
@@ -527,7 +507,7 @@ op get_results(inconst PMC) {
     goto OFFSET(argc + 2);
 }
 
-op get_params(inconst PMC) {
+op get_params(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
     parrot_context_t *caller_ctx, *ctx;
     PMC * ccont;
@@ -561,7 +541,7 @@ op get_params(inconst PMC) {
     goto OFFSET(argc + 2);
 }
 
-op set_returns(inconst PMC) {
+op set_returns(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
     parrot_context_t *ctx;
     PMC *ccont;
@@ -621,7 +601,6 @@ inline op result_info(out PMC) {
         $1 = pmc_new(interp, enum_class_FixedIntegerArray);
     else
         $1 = sig;
-    goto NEXT();
 }
 
 =back
@@ -654,23 +633,19 @@ Sets $1 to the absolute address of the Sub PMC $2.
 
 inline op set_addr(out INT, labelconst INT) {
     $1 = PTR2OPCODE_T(CUR_OPCODE + $2);
-    goto NEXT();
 }
 
 inline op set_addr(invar PMC, labelconst INT) {
     $1->vtable->set_pointer(interp, $1, (CUR_OPCODE + $2));
-    goto NEXT();
 }
 
 inline op set_addr(invar PMC, labelvar INT) {
     $1->vtable->set_pointer(interp, $1, (void*)$2);
-    goto NEXT();
 }
 
 inline op get_addr(out INT, invar PMC) {
     void *ptr = $2->vtable->get_pointer(interp, $2);
     $1        = (INTVAL)ptr;
-    goto NEXT();
 }
 
 =back
@@ -690,7 +665,6 @@ stored within the task PMC.
 
 inline op schedule(invar PMC) {
     Parrot_cx_schedule_task(interp, $1);
-    goto NEXT();
 }
 
 =item B<addhandler>(invar PMC)
@@ -700,7 +674,6 @@ the handler are stored within the handler PMC.
 
 inline op addhandler(invar PMC) {
     Parrot_cx_add_handler(interp, $1);
-    goto NEXT();
 }
 
 =back
@@ -793,88 +766,79 @@ inline op push_eh(labelconst INT) {
     PMC * const eh = pmc_new(interp, enum_class_Exception_Handler);
     VTABLE_set_pointer(interp, eh, CUR_OPCODE + $1);
     push_exception(interp, eh);
-    goto NEXT();
 }
 
 inline op push_eh(invar PMC) {
     push_exception(interp, $1);
-    goto NEXT();
 }
 
 inline op pop_eh() {
     pop_exception(interp);
-    goto NEXT();
 }
 
-inline op throw(invar PMC) {
+inline op throw(invar PMC) :flow {
     opcode_t * const ret = expr NEXT();
     opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, ret);
     goto ADDRESS(dest);
 }
 
-inline op throwcc(invar PMC) {
+inline op throwcc(invar PMC) :flow {
     opcode_t * const ret = expr NEXT();
     opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, ret);
     goto ADDRESS(dest);
 }
 
-inline op throwcc(invar PMC, invar PMC) {
+inline op throwcc(invar PMC, invar PMC) :flow {
     opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, $2);
     goto ADDRESS(dest);
 }
 
-inline op rethrow(invar PMC) {
+inline op rethrow(invar PMC) :flow {
     opcode_t * const dest = (opcode_t *)rethrow_exception(interp, $1);
     goto ADDRESS(dest);
 }
 
 inline op count_eh(out INT) {
     $1 = count_exception_handlers(interp);
-    goto NEXT();
 }
 
 inline op get_eh(out PMC, in INT) {
     $1 = get_exception_handler(interp, $2);
-    goto NEXT();
 }
 
 inline op get_all_eh(out PMC) {
     $1 = get_all_exception_handlers(interp);
-    goto NEXT();
 }
 
 
-inline op die(in STR) {
+inline op die(in STR) :flow {
     do_str_exception(interp, $1);
 }
 
-inline op die(in PMC) {
+inline op die(in PMC) :flow {
     do_pmc_exception(interp, $1);
 }
 
-inline op die(in INT, in INT) {
+inline op die(in INT, in INT) :flow {
     if ($1 == EXCEPT_doomed)
         _exit($2);
     do_exception(interp, $1, $2);
 }
 
-inline op exit(in INT) {
+inline op exit(in INT) :flow {
     do_exception(interp, EXCEPT_exit, $1);
 }
 
 inline op pushmark(in INT) {
     Parrot_push_mark(interp, $1);
-    goto NEXT();
 }
 
 inline op popmark(in INT) {
     Parrot_pop_mark(interp, $1);
-    goto NEXT();
 }
 
 inline op pushaction(invar PMC) {
     Parrot_push_action(interp, $1);
-    goto NEXT();
 }
 
 =back
@@ -900,7 +864,7 @@ If $1 is zero, turn off debugging. Otherwise turn debug flag $1 on.
 
 =cut
 
-inline op debug(in INT) {
+inline op debug(in INT) :flow {
     if ($1 != 0) { Interp_debug_SET(interp,   $1); }
     else         { Interp_debug_CLEAR(interp, PARROT_ALL_DEBUG_FLAGS); }
     restart NEXT();
@@ -915,7 +879,7 @@ If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 
 =cut
 
-inline op bounds(in INT) {
+inline op bounds(in INT) :flow {
     if ($1 != 0) { Parrot_set_flag(interp,   PARROT_BOUNDS_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG); }
     restart NEXT();
@@ -930,7 +894,7 @@ If $1 is zero, turn off profiling. Otherwise turn it on.
 
 =cut
 
-inline op profile(in INT) {
+inline op profile(in INT) :flow {
     if ($1 != 0) { Parrot_set_flag(interp,   PARROT_PROFILE_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG); }
     restart NEXT();
@@ -945,7 +909,7 @@ If $1 is zero, turn off tracing. Otherwise turn trace flag $1 on.
 
 =cut
 
-inline op trace(in INT) {
+inline op trace(in INT) :flow {
     if ($1 != 0) { Parrot_set_trace(interp,   $1); }
     else         { Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS); }
     restart NEXT();
@@ -962,7 +926,6 @@ If $1 is zero, turn off GC_DEBUG. Otherwise turn it on.
 inline op gc_debug(in INT) {
     if ($1 != 0) { Interp_flags_SET(interp,   PARROT_GC_DEBUG_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_GC_DEBUG_FLAG); }
-    goto NEXT();
 }
 
 ########################################
@@ -996,17 +959,14 @@ The valid constants for each return value are:
 
 op interpinfo(out INT, in INT) {
     $1 = interpinfo(interp, $2);
-    goto NEXT();
 }
 
 op interpinfo(out PMC, in INT) {
     $1 = interpinfo_p(interp, $2);
-    goto NEXT();
 }
 
 op interpinfo(out STR, in INT) {
     $1 = interpinfo_s(interp, $2);
-    goto NEXT();
 }
 
 =item B<warningson>(in INT)
@@ -1033,7 +993,6 @@ To turn on multiple categories, OR the category numbers together.
 
 inline op warningson(in INT) {
     PARROT_WARNINGS_on(interp, $1);
-    goto NEXT();
 }
 
 =item B<warningsoff>(in INT)
@@ -1046,7 +1005,6 @@ numbers.
 
 inline op warningsoff(in INT) {
     PARROT_WARNINGS_off(interp, $1);
-    goto NEXT();
 }
 
 =item B<errorson>(in INT)
@@ -1082,7 +1040,6 @@ To turn on multiple categories, OR the category numbers together.
 
 inline op errorson(in INT) {
     PARROT_ERRORS_on(interp, $1);
-    goto NEXT();
 }
 
 =item B<errorsoff>(in INT)
@@ -1095,7 +1052,6 @@ numbers.
 
 inline op errorsoff(in INT) {
     PARROT_ERRORS_off(interp, $1);
-    goto NEXT();
 }
 
 ########################################
@@ -1115,13 +1071,11 @@ op runinterp(invar PMC, label INT) {
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
     new_interp->code = interp->code;
     runops(new_interp, REL_PC + $2);
-    goto NEXT();
 }
 
 op getinterp(out PMC) {
     $1 = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
            IGLOBALS_INTERPRETER);
-    goto NEXT();
 }
 
 #######################################
@@ -1169,7 +1123,6 @@ op sweep(inconst INT) {
     else
         if (interp->arena_base->num_early_DOD_PMCs)
             Parrot_do_dod_run(interp, DOD_lazy_FLAG);
-    goto NEXT();
 }
 
 =item B<collect>()
@@ -1180,7 +1133,6 @@ Trigger a garbage collection.
 
 op collect() {
     Parrot_go_collect(interp);
-    goto NEXT();
 }
 
 =item B<sweepoff>()
@@ -1191,7 +1143,6 @@ Disable DOD sweeps. (Nestable)
 
 op sweepoff() {
     Parrot_block_DOD(interp);
-    goto NEXT();
 }
 
 =item B<sweepon>()
@@ -1202,7 +1153,6 @@ Re-enable DOD sweeps.
 
 op sweepon() {
     Parrot_unblock_DOD(interp);
-    goto NEXT();
 }
 
 =item B<collectoff>()
@@ -1213,7 +1163,6 @@ Disable GC runs (nestable).
 
 op collectoff() {
     Parrot_block_GC(interp);
-    goto NEXT();
 }
 
 =item B<collecton>()
@@ -1224,7 +1173,6 @@ Re-enable GC.
 
 op collecton() {
     Parrot_unblock_GC(interp);
-    goto NEXT();
 }
 
 =item B<needs_destroy>(invar PMC)
@@ -1237,7 +1185,6 @@ when unused during the lazy sweep, triggered by C<sweep 0>.
 op needs_destroy(invar PMC) {
      PObj_needs_early_DOD_SET($1);
      ++interp->arena_base->num_early_DOD_PMCs;
-    goto NEXT();
 }
 
 =back
@@ -1292,9 +1239,7 @@ the callback function.
 =cut
 
 inline op loadlib(out PMC, in STR) {
-
     $1 = Parrot_load_lib(interp, $2, NULL);
-    goto NEXT();
 }
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
@@ -1319,7 +1264,6 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
         PObj_get_FLAGS($1) |= PObj_private1_FLAG;
     }
     string_cstring_free(name);
-    goto NEXT();
 }
 
 op dlvar(out PMC, invar PMC, in STR) {
@@ -1338,26 +1282,22 @@ op dlvar(out PMC, invar PMC, in STR) {
         $1 = pmc_new(interp, enum_class_UnManagedStruct);
         PMC_data($1) = p;
     }
-    goto NEXT();
 }
 
 inline op compreg(in STR, invar PMC) {
     PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_COMPREG_HASH);
     VTABLE_set_pmc_keyed_str(interp, compreg_hash, $1, $2);
-    goto NEXT();
 }
 
 inline op compreg(out PMC, in STR) {
     PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_COMPREG_HASH);
     $1 = VTABLE_get_pmc_keyed_str(interp, compreg_hash, $2);
-    goto NEXT();
 }
 
 op new_callback(out PMC, invar PMC, invar PMC, in STR) {
     $1 = Parrot_make_cb(interp, $2, $3, $4);
-    goto NEXT();
 }
 
 =back
@@ -1368,7 +1308,7 @@ op new_callback(out PMC, invar PMC, invar PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 

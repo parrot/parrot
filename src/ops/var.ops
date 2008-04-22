@@ -48,7 +48,6 @@ op store_lex(in STR, invar PMC) {
                 "Lexical '%Ss' not found", lex_name);
     }
     VTABLE_set_pmc_keyed_str(interp, lex_pad, lex_name, $2);
-    goto NEXT();
 }
 
 ########################################
@@ -76,7 +75,6 @@ op find_lex(out PMC, in STR) {
                 "Lexical '%Ss' not found", lex_name);
     }
     $1 = result;
-    goto NEXT();
 }
 
 =back
@@ -103,7 +101,6 @@ current namespace.  If the namespace doesn't exist, $1 is set to null.
 op get_namespace(out PMC) {
     PMC * const cur_ns = CONTEXT(interp)->current_namespace;
     $1 = cur_ns;
-    goto NEXT();
 }
 
 op get_namespace(out PMC, in PMC) {
@@ -111,7 +108,6 @@ op get_namespace(out PMC, in PMC) {
     PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, $2);
 
     $1 = PMC_IS_NULL(ns) ? PMCNULL : ns;
-    goto NEXT();
 }
 
 =item B<get_hll_namespace>(out PMC)
@@ -129,19 +125,16 @@ null.
 op get_hll_namespace(out PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
     $1 = hll_ns;
-    goto NEXT();
 }
 
 op get_hll_namespace(out PMC, in PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
-    if (PMC_IS_NULL(hll_ns)) {
+    if (PMC_IS_NULL(hll_ns))
         $1 = PMCNULL;
-    }
     else {
         PMC * const ns = Parrot_get_namespace_keyed(interp, hll_ns, $2);
         $1 = ns;
     }
-    goto NEXT();
 }
 
 =item B<get_root_namespace>(out PMC)
@@ -158,19 +151,16 @@ root namespace.  If the namespace doesn't exist, $1 is set to null.
 op get_root_namespace(out PMC) {
     PMC * const root_ns = interp->root_namespace;
     $1 = root_ns;
-    goto NEXT();
 }
 
 op get_root_namespace(out PMC, in PMC) {
     PMC * const root_ns = interp->root_namespace;
-    if (PMC_IS_NULL(root_ns)) {
+    if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
-    }
     else {
         PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
         $1 = ns;
     }
-    goto NEXT();
 }
 
 =back
@@ -199,7 +189,6 @@ doesn't exist, $1 is set to null.
 op get_global(out PMC, in STR) {
     PMC * const cur_ns = CONTEXT(interp)->current_namespace;
     $1 = Parrot_find_global_op(interp, cur_ns, $2, expr NEXT());
-    goto NEXT();
 }
 
 op get_global(out PMC, in PMC, in STR) {
@@ -214,7 +203,6 @@ op get_global(out PMC, in PMC, in STR) {
         else
             $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
     }
-    goto NEXT();
 }
 
 =item B<get_hll_global>(out PMC, in STR)
@@ -233,7 +221,6 @@ global doesn't exist, $1 is set to null.
 op get_hll_global(out PMC, in STR) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
     $1 = Parrot_find_global_op(interp, hll_ns, $2, expr NEXT());
-    goto NEXT();
 }
 
 op get_hll_global(out PMC, in PMC, in STR) {
@@ -248,7 +235,6 @@ op get_hll_global(out PMC, in PMC, in STR) {
         else
             $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
     }
-    goto NEXT();
 }
 
 =item B<get_root_global>(out PMC, in STR)
@@ -267,14 +253,12 @@ doesn't exist, $1 is set to null.
 op get_root_global(out PMC, in STR) {
     PMC * const root_ns = interp->root_namespace;
     $1 = Parrot_find_global_op(interp, root_ns, $2, expr NEXT());
-    goto NEXT();
 }
 
 op get_root_global(out PMC, in PMC, in STR) {
     PMC * const root_ns = interp->root_namespace;
-    if (PMC_IS_NULL(root_ns)) {
+    if (PMC_IS_NULL(root_ns))
         $1 = PMCNULL;
-    }
     else {
         PMC * const ns = Parrot_get_namespace_keyed(interp, root_ns, $2);
         if (PMC_IS_NULL(ns))
@@ -282,7 +266,6 @@ op get_root_global(out PMC, in PMC, in STR) {
         else
             $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
     }
-    goto NEXT();
 }
 
 =back
@@ -310,7 +293,6 @@ it is created.
 op set_global(in STR, invar PMC) {
     PMC * const cur_ns = CONTEXT(interp)->current_namespace;
     Parrot_set_global(interp, cur_ns, $1, $2);
-    goto NEXT();
 }
 
 op set_global(in PMC, in STR, invar PMC) {
@@ -318,7 +300,6 @@ op set_global(in PMC, in STR, invar PMC) {
     PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, $1);
 
     Parrot_set_global(interp, ns, $2, $3);
-    goto NEXT();
 }
 
 =item B<set_hll_global>(in STR, invar PMC)
@@ -336,7 +317,6 @@ does not exist, it is created.
 op set_hll_global(in STR, invar PMC) {
     PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
     Parrot_set_global(interp, hll_ns, $1, $2);
-    goto NEXT();
 }
 
 op set_hll_global(in PMC, in STR, invar PMC) {
@@ -344,7 +324,6 @@ op set_hll_global(in PMC, in STR, invar PMC) {
     PMC * const ns     = Parrot_make_namespace_keyed(interp, hll_ns, $1);
 
     Parrot_set_global(interp, ns, $2, $3);
-    goto NEXT();
 }
 
 =item B<set_root_global>(in STR, invar PMC)
@@ -362,7 +341,6 @@ not exist, it is created.
 op set_root_global(in STR, invar PMC) {
     PMC * const root_ns = interp->root_namespace;
     Parrot_set_global(interp, root_ns, $1, $2);
-    goto NEXT();
 }
 
 op set_root_global(in PMC, in STR, invar PMC) {
@@ -370,7 +348,6 @@ op set_root_global(in PMC, in STR, invar PMC) {
     PMC * const ns      = Parrot_make_namespace_keyed(interp, root_ns, $1);
 
     Parrot_set_global(interp, ns, $2, $3);
-    goto NEXT();
 }
 
 =back
@@ -405,17 +382,14 @@ of strings.
 
 op store_global(in STR, invar PMC) {
     Parrot_store_global_cur(interp, $1, $2);
-    goto NEXT();
 }
 
 op store_global(in STR, in STR, invar PMC) {
     Parrot_store_global_s(interp, $1, $2, $3);
-    goto NEXT();
 }
 
 op store_global(in PMC, in STR, invar PMC) {
     Parrot_store_global_k(interp, $1, $2, $3);
-    goto NEXT();
 }
 
 ########################################
@@ -447,7 +421,6 @@ Null PMC, depending on current errors settings.  See B<errorson>.
 op find_global(out PMC, in STR) {
     PMC * const cur_ns = CONTEXT(interp)->current_namespace;
     $1 = Parrot_find_global_op(interp, cur_ns, $2, expr NEXT());
-    goto NEXT();
 }
 
 op find_global(out PMC, in STR, in STR) {
@@ -455,7 +428,6 @@ op find_global(out PMC, in STR, in STR) {
                                                     Parrot_get_ctx_HLL_namespace(interp),
                                                     $2);
     $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
-    goto NEXT();
 }
 
 op find_global(out PMC, in PMC, in STR) {
@@ -463,7 +435,6 @@ op find_global(out PMC, in PMC, in STR) {
                                                 Parrot_get_ctx_HLL_namespace(interp),
                                                 $2);
     $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
-    goto NEXT();
 }
 
 =item B<find_name>(out PMC, in STR)
@@ -480,7 +451,6 @@ op find_name(out PMC, in STR) {
         real_exception(interp, NULL, 1, "Tried to find null name");
 
     $1 = Parrot_find_name_op(interp, $2, expr NEXT());
-    goto NEXT();
 }
 
 =back

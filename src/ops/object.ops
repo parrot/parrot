@@ -171,7 +171,6 @@ Adds $3 as a method named $2 to $1.
 
 inline op addmethod(invar PMC, in STR, invar PMC) :object_classes {
   VTABLE_add_method(interp, $1, $2, $3);
-  goto NEXT();
 }
 
 
@@ -184,7 +183,6 @@ given method $3.
 
 inline op can(out INT, invar PMC, in STR) :object_base {
   $1 = $2->vtable->can(interp, $2, $3);
-  goto NEXT();
 }
 
 
@@ -197,7 +195,6 @@ given the role of name $3.
 
 inline op does(out INT, invar PMC, in STR) :object_base {
   $1 = $3 ? $2->vtable->does(interp, $2, $3) : 0;
-  goto NEXT();
 }
 
 =item B<does>(out INT, invar PMC, in PMC)
@@ -209,7 +206,6 @@ given the role $3.
 
 inline op does(out INT, invar PMC, in PMC) :object_base {
   $1 = $3 ? $2->vtable->does_pmc(interp, $2, $3) : 0;
-  goto NEXT();
 }
 
 =item B<isa>(out INT, invar PMC, in STR)
@@ -223,12 +219,10 @@ given class $3.
 
 inline op isa(out INT, invar PMC, in STR) :object_base {
   $1 = $3 ? $2->vtable->isa(interp, $2, $3) : 0;
-  goto NEXT();
 }
 
 inline op isa(out INT, invar PMC, in PMC) :object_base {
     $1 = $3 ? $2->vtable->isa_pmc(interp, $2, $3) : 0;
-    goto NEXT();
 }
 
 ###############################################################################
@@ -249,12 +243,10 @@ inline op newclass(out PMC, in STR) :object_classes {
   PMC * const name = pmc_new(interp, enum_class_String);
   VTABLE_set_string_native(interp, name, $2);
   $1 = pmc_new_init(interp, enum_class_Class, name);
-  goto NEXT();
 }
 
 inline op newclass(out PMC, in PMC) :object_classes {
     $1 = pmc_new_init(interp, enum_class_Class, $2);
-    goto NEXT();
 }
 
 =item B<subclass>(out PMC, in PMC)
@@ -269,7 +261,7 @@ anonymous subclass.
 
 =cut
 
-inline op subclass(out PMC, in PMC) :object_classes {
+inline op subclass(out PMC, in PMC) :object_classes :flow {
     PMC      * const parent_class = Parrot_oo_get_class(interp, $2);
     opcode_t * const next         = expr NEXT();
 
@@ -282,7 +274,7 @@ inline op subclass(out PMC, in PMC) :object_classes {
     goto ADDRESS(next);
 }
 
-inline op subclass(out PMC, in PMC, in STR) :object_classes {
+inline op subclass(out PMC, in PMC, in STR) :object_classes :flow {
     PMC      * const parent_class = Parrot_oo_get_class(interp, $2);
     opcode_t * const next         = expr NEXT();
 
@@ -295,7 +287,7 @@ inline op subclass(out PMC, in PMC, in STR) :object_classes {
     goto ADDRESS(next);
 }
 
-inline op subclass(out PMC, in PMC, in PMC) :object_classes {
+inline op subclass(out PMC, in PMC, in PMC) :object_classes :flow {
     PMC      * const parent_class = Parrot_oo_get_class(interp, $2);
     opcode_t * const next         = expr NEXT();
 
@@ -321,7 +313,7 @@ subclass is an anonymous subclass.
 =cut
 
 
-op subclass(out PMC, in STR) :object_classes {
+op subclass(out PMC, in STR) :object_classes :flow {
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, $2);
     opcode_t * const next         = expr NEXT();
 
@@ -335,7 +327,7 @@ op subclass(out PMC, in STR) :object_classes {
     goto ADDRESS(next);
 }
 
-op subclass(out PMC, in STR, in STR) :object_classes {
+op subclass(out PMC, in STR, in STR) :object_classes :flow {
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, $2);
     opcode_t * const next         = expr NEXT();
 
@@ -349,7 +341,7 @@ op subclass(out PMC, in STR, in STR) :object_classes {
     goto ADDRESS(next);
 }
 
-op subclass(out PMC, in STR, in PMC) :object_classes {
+op subclass(out PMC, in STR, in PMC) :object_classes :flow {
     PMC      * const parent_class = Parrot_oo_get_class_str(interp, $2);
     opcode_t * const next         = expr NEXT();
 
@@ -374,7 +366,7 @@ system.
 
 =cut
 
-inline op getclass(out PMC, in STR) :object_classes {
+inline op getclass(out PMC, in STR) :object_classes :flow {
     PMC      * const _class = Parrot_class_lookup(interp, $2);
     opcode_t * const next   = expr NEXT();
 
@@ -391,7 +383,7 @@ inline op getclass(out PMC, in STR) :object_classes {
         "The 'getclass' opcode has been deprecated, use 'get_class'. See RT #47972.");*/
 }
 
-inline op getclass(out PMC, in PMC) :object_classes {
+inline op getclass(out PMC, in PMC) :object_classes :flow {
   PMC      * const _class = Parrot_class_lookup_p(interp, $2);
   opcode_t * const next   = expr NEXT();
 
@@ -418,12 +410,10 @@ Find the PMC for a class, by string name or by key.
 
 inline op get_class(out PMC, in STR) :object_classes {
   $1 = Parrot_oo_get_class_str(interp, $2);
-  goto NEXT();
 }
 
 inline op get_class(out PMC, in PMC) :object_classes {
   $1 = Parrot_oo_get_class(interp, $2);
-  goto NEXT();
 }
 
 ###############################################################################
@@ -436,7 +426,6 @@ Get the class PMC for the object in $2 and put it in $1.
 
 inline op class(out PMC, invar PMC) :object_classes {
     $1 = VTABLE_get_class(interp, $2);
-    goto NEXT();
 }
 
 ##################################################
@@ -450,7 +439,6 @@ Add class $2 to the list of parent classes for $1.
 
 inline op addparent(invar PMC, invar PMC) :object_classes {
     VTABLE_add_parent(interp, $1, $2);
-    goto NEXT();
 }
 
 =item B<removeparent>(invar PMC, invar PMC)
@@ -461,7 +449,6 @@ Remove class $2 from class $1's list of parents.
 
 inline op removeparent(invar PMC, invar PMC) :object_classes {
     Parrot_remove_parent(interp, $2, $1);
-    goto NEXT();
 }
 
 =item B<addrole>(invar PMC, invar PMC)
@@ -472,7 +459,6 @@ Compose the role $2 into $1.
 
 inline op addrole(invar PMC, invar PMC) :object_classes {
     VTABLE_add_role(interp, $1, $2);
-    goto NEXT();
 }
 
 =item B<addattribute>(invar PMC, in STR)
@@ -492,8 +478,6 @@ inline op addattribute(invar PMC, in STR) :object_classes {
     else
         real_exception(interp, NULL, INVALID_OPERATION,
             "Cannot add attribute to non-class");
-
-    goto NEXT();
 }
 
 =item B<removeattribute>(invar PMC, in STR) B<(unimplemented)>
@@ -504,11 +488,11 @@ Remove attribute $2 from class $1, specified either by name or offset.
 
 =cut
 
-op removeattribute(invar PMC, in STR) {
+op removeattribute(invar PMC, in STR) :flow {
     real_exception(interp, NULL, UNIMPLEMENTED, "removeattribute is not implemented");
 }
 
-op removeattribute(invar PMC, in INT) {
+op removeattribute(invar PMC, in INT) :flow {
     real_exception(interp, NULL, UNIMPLEMENTED, "removeattribute is not implemented");
 }
 
@@ -527,12 +511,10 @@ class name, namespace, or key PMC.
 
 inline op getattribute(out PMC, invar PMC, in STR) :object_classes {
     $1 = VTABLE_get_attr_str(interp, $2, $3);
-    goto NEXT();
 }
 
 inline op getattribute(out PMC, invar PMC, in PMC, in STR) :object_classes {
     $1 = VTABLE_get_attr_keyed(interp, $2, $3, $4);
-    goto NEXT();
 }
 
 =item B<setattribute>(invar PMC, in STR, invar PMC)
@@ -549,12 +531,10 @@ child class.) The parent $2 is a class name, namespace, or key PMC.
 
 inline op setattribute(invar PMC, in STR, invar PMC) :object_classes {
     VTABLE_set_attr_str(interp, $1, $2, $3);
-    goto NEXT();
 }
 
 inline op setattribute(invar PMC, in PMC, in STR, invar PMC) :object_classes {
     VTABLE_set_attr_keyed(interp, $1, $2, $3, $4);
-    goto NEXT();
 }
 
 ###############################################################################
@@ -573,19 +553,17 @@ introspection information corresponding to the requested string name.
 
 inline op inspect(out PMC, in PMC) :object_classes {
   $1 = VTABLE_inspect(interp, $2);
-  goto NEXT();
 }
 
 inline op inspect(out PMC, in PMC, in STR) :object_classes {
   $1 = VTABLE_inspect_str(interp, $2, $3);
-  goto NEXT();
 }
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 

@@ -38,12 +38,10 @@ object-like. see RT ticket [perl #36619] for more info.
 
 inline op spawnw(out INT, in STR) {
   $1 = Parrot_Run_OS_Command(interp, $2);
-  goto NEXT();
 }
 
 inline op spawnw(out INT, invar PMC) {
   $1 = Parrot_Run_OS_Command_Argv(interp, $2);
-  goto NEXT();
 }
 
 ###############################################################################
@@ -65,19 +63,16 @@ and store it in $1.
 
 inline op err(out INT) {
   $1 = errno;
-  goto NEXT();
 }
 
 op err(out STR) {
   const char * const tmp = strerror(errno);
   $1 = string_make(interp, tmp, strlen(tmp), "ascii", 0);
-  goto NEXT();
 }
 
 op err(out STR, in INT) {
   const char * const tmp = strerror($2);
   $1 = string_make(interp, tmp, strlen(tmp), "ascii", 0);
-  goto NEXT();
 }
 
 
@@ -92,7 +87,6 @@ in $1.
 
 inline op time(out INT) {
   $1 = Parrot_intval_time();
-  goto NEXT();
 }
 
 
@@ -107,7 +101,6 @@ microseconds) in $1.
 
 inline op time(out NUM) {
   $1 = Parrot_floatval_time();
-  goto NEXT();
 }
 
 ########################################
@@ -186,7 +179,6 @@ op gmtime(out STR, in INT) {
   Parrot_gmtime_r(&t, &tm);
   Parrot_asctime_r(&tm, resultbuffer);
   $1 = string_from_cstring(interp, resultbuffer, 26);
-  goto NEXT();
 }
 
 op localtime(out STR, in INT) {
@@ -196,7 +188,6 @@ op localtime(out STR, in INT) {
   Parrot_localtime_r(&t, &tm);
   Parrot_asctime_r(&tm, resultbuffer);
   $1 = string_from_cstring(interp, resultbuffer, 26);
-  goto NEXT();
 }
 
 op decodetime(out PMC, in INT) {
@@ -204,7 +195,6 @@ op decodetime(out PMC, in INT) {
   const time_t t = (time_t) $2;
   Parrot_gmtime_r(&t, &tm);
   $1 = tm_to_array(interp, &tm);
-  goto NEXT();
 }
 
 op decodelocaltime(out PMC, in INT) {
@@ -212,7 +202,6 @@ op decodelocaltime(out PMC, in INT) {
   const time_t t = (time_t) $2;
   Parrot_localtime_r(&t, &tm);
   $1 = tm_to_array(interp, &tm);
-  goto NEXT();
 }
 
 ########################################
@@ -274,12 +263,10 @@ even if it's really running on an OS X system.
 
 inline op sysinfo(out STR, in INT) {
    $1 = sysinfo_s(interp, $2);
-   goto NEXT();
 }
 
 inline op sysinfo(out INT, in INT) {
    $1 = sysinfo_i(interp, $2);
-   goto NEXT();
 }
 
 ########################################
@@ -292,7 +279,7 @@ Sleep for $1 seconds.
 
 =cut
 
-inline op sleep(in INT) {
+inline op sleep(in INT) :flow {
   opcode_t *next = expr NEXT();
   if ($1 < 0) {
       real_exception(interp, next, NEG_SLEEP,
@@ -302,7 +289,7 @@ inline op sleep(in INT) {
   goto ADDRESS(next);
 }
 
-inline op sleep(in NUM) {
+inline op sleep(in NUM) :flow {
   opcode_t *next = expr NEXT();
   if ($1 < 0.0) {
       real_exception(interp, next, NEG_SLEEP,
@@ -325,7 +312,6 @@ inline op sizeof (out INT, in INT) {
         $1 = -1;
     else
         $1 = data_types[$2 - enum_first_type].size;
-  goto NEXT();
 }
 
 ###############################################################################
@@ -334,7 +320,7 @@ inline op sizeof (out INT, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 

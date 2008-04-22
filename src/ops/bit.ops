@@ -54,12 +54,10 @@ from $2 and $3.
 
 inline op band(inout INT, in INT) :base_core {
   $1 &= $2;
-  goto NEXT();
 }
 
 inline op band(out INT, in INT, in INT) :base_core {
   $1 = $2 & $3;
-  goto NEXT();
 }
 
 =item B<bands>(inout STR, in STR)
@@ -76,12 +74,10 @@ from $2 and $3.
 
 inline op bands(inout STR, in STR) :base_core {
   string_bitwise_and(interp, $1, $2, &$1);
-  goto NEXT();
 }
 
 inline op bands(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_and(interp, $2, $3, NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -104,27 +100,22 @@ Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 inline op bnot(inout INT) :base_core {
   $1 = ~ $1;
-  goto NEXT();
 }
 
 inline op bnot(out INT, in INT) :base_core {
   $1 = ~ $2;
-  goto NEXT();
 }
 
 inline op bnot(invar PMC) :base_core {
   $1->vtable->i_bitwise_not(interp, $1);
-  goto NEXT();
 }
 
 inline op bnot(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_not(interp, $2, $1);
-  goto NEXT();
 }
 
 inline op n_bnot(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_not(interp, $2, NULL);
-  goto NEXT();
 }
 
 =item B<bnots>(inout STR)
@@ -143,27 +134,22 @@ Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 inline op bnots(inout STR) :base_core {
   string_bitwise_not(interp, $1, &$1);
-  goto NEXT();
 }
 
 inline op bnots(out STR, in STR) :base_core {
   string_bitwise_not(interp, $2, &$1);
-  goto NEXT();
 }
 
 inline op bnots(invar PMC) :base_core {
   $1->vtable->i_bitwise_nots(interp, $1);
-  goto NEXT();
 }
 
 inline op bnots(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_nots(interp, $2, $1);
-  goto NEXT();
 }
 
 inline op n_bnots(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->bitwise_nots(interp, $2, NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -182,12 +168,10 @@ from $2 and $3.
 
 inline op bor(inout INT, in INT) :base_core {
   $1 |= $2;
-  goto NEXT();
 }
 
 inline op bor(out INT, in INT, in INT) :base_core {
   $1 = $2 | $3;
-  goto NEXT();
 }
 
 =item B<bors>(inout STR, in STR)
@@ -204,12 +188,10 @@ from $2 and $3.
 
 inline op bors(inout STR, in STR) :base_core {
   string_bitwise_or(interp, $1, $2, &$1);
-  goto NEXT();
 }
 
 inline op bors(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_or(interp, $2, $3, NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -226,12 +208,10 @@ Set $1 to the value of $2 shifted left by $3 bits.
 
 inline op shl(inout INT, in INT) :base_core {
   $1 = bit_shift_left($1, $2);
-  goto NEXT();
 }
 
 inline op shl(out INT, in INT, in INT) :base_core {
   $1 = bit_shift_left($2, $3);
-  goto NEXT();
 }
 
 ########################################
@@ -249,13 +229,11 @@ Set $1 to the value of $2 shifted right by $3 bits.
 inline op shr(inout INT, in INT) :base_core {
   INTVAL signed_shift = -$2;
   $1 = bit_shift_left($1, signed_shift);
-  goto NEXT();
 }
 
 inline op shr(out INT, in INT, in INT) :base_core {
   INTVAL signed_shift = -$3;
   $1 = bit_shift_left($2, signed_shift);
-  goto NEXT();
 }
 
 ########################################
@@ -276,12 +254,10 @@ inline op lsr(out INT, in INT) :base_core {
    * it's just casting a signed integral to the equivalent unsigned.
    */
   LVALUE_CAST(UINTVAL, $1) >>= $2;
-  goto NEXT();
 }
 
 inline op lsr(out INT, in INT, in INT) :base_core {
   $1 = (INTVAL)((UINTVAL)$2 >> $3);
-  goto NEXT();
 }
 
 =item B<rot>(out INT, in INT, in INT, inconst INT)
@@ -305,7 +281,6 @@ inline op rot(out INT, in INT, in INT, inconst INT) {
   t = (INTVAL)((UINTVAL)r >> t);
   d |= t;
   $1 = d;
-  goto NEXT();
 }
 
 
@@ -327,12 +302,10 @@ from $2 and $3.
 
 inline op bxor(inout INT, in INT) :base_core {
   $1 ^= $2;
-  goto NEXT();
 }
 
 inline op bxor(out INT, in INT, in INT) :base_core {
   $1 = $2 ^ $3;
-  goto NEXT();
 }
 
 =item B<bxors>(inout STR, in STR)
@@ -349,12 +322,10 @@ from $2 and $3.
 
 inline op bxors(inout STR, in STR) :base_core {
   string_bitwise_xor(interp, $1, $2, &$1);
-  goto NEXT();
 }
 
 inline op bxors(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_xor(interp, $2, $3, NULL);
-  goto NEXT();
 }
 
 =back
@@ -365,7 +336,7 @@ inline op bxors(out STR, in STR, in STR) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 

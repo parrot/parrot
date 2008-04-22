@@ -71,28 +71,24 @@ inline op eq(in INT, in INT, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 inline op eq(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq(in STR, in STR, labelconst INT) :base_core {
   if (string_equal(interp, $1, $2) == 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq(invar PMC, in INT, labelconst INT) :base_core {
@@ -105,7 +101,6 @@ op eq(invar PMC, in INT, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_EQ)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq(invar PMC, in NUM, labelconst INT) :base_core {
@@ -118,7 +113,6 @@ op eq(invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interp, $1) == $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq(invar PMC, in STR, labelconst INT) :base_core {
@@ -126,35 +120,30 @@ op eq(invar PMC, in STR, labelconst INT) :base_core {
       $1->vtable->get_string(interp, $1), $2)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq_str(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STREQ)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq_num(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMEQ)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq_addr(in STR, in STR, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op eq_addr(invar PMC, invar PMC, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 ########################################
@@ -189,28 +178,24 @@ inline op ne(in INT, in INT, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 inline op ne(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne(in STR, in STR, labelconst INT) :base_core {
   if (string_equal(interp, $1, $2) != 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne(invar PMC, invar PMC, labelconst INT) :base_core {
   if (! mmd_dispatch_i_pp(interp, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne(invar PMC, in INT, labelconst INT) :base_core {
@@ -219,14 +204,12 @@ op ne(invar PMC, in INT, labelconst INT) :base_core {
   if (! mmd_dispatch_i_pp(interp, $1, temp, MMD_EQ)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne(invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interp, $1) != $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne(invar PMC, in STR, labelconst INT) :base_core {
@@ -234,35 +217,30 @@ op ne(invar PMC, in STR, labelconst INT) :base_core {
       $1->vtable->get_string(interp, $1), $2)) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne_str(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) != 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne_num(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) != 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne_addr(in STR, in STR, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ne_addr(invar PMC, invar PMC, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 ########################################
@@ -293,28 +271,24 @@ inline op lt(in INT, in INT, labelconst INT) :base_core {
   if ($1 < $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 inline op lt(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 < $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op lt(in STR, in STR, labelconst INT) :base_core {
   if (string_compare(interp, $1, $2) < 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op lt(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) < 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op lt(invar PMC, in INT, labelconst INT) :base_core {
@@ -323,14 +297,12 @@ op lt(invar PMC, in INT, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) < 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op lt(invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interp, $1) < $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op lt(invar PMC, in STR, labelconst INT) :base_core {
@@ -338,21 +310,18 @@ op lt(invar PMC, in STR, labelconst INT) :base_core {
       $1->vtable->get_string(interp, $1), $2) < 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op lt_str(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) < 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op lt_num(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) < 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 ########################################
@@ -383,28 +352,24 @@ inline op le(in INT, in INT, labelconst INT) :base_core {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 inline op le(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op le(in STR, in STR, labelconst INT) :base_core {
   if (string_compare(interp, $1, $2) <= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op le(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) <= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op le(invar PMC, in INT, labelconst INT) :base_core {
@@ -413,14 +378,12 @@ op le(invar PMC, in INT, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) <= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op le(invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interp, $1) <= $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op le(invar PMC, in STR, labelconst INT) :base_core {
@@ -428,21 +391,18 @@ op le(invar PMC, in STR, labelconst INT) :base_core {
       $1->vtable->get_string(interp, $1), $2) <= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op le_str(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) <= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op le_num(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) <= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 ########################################
@@ -467,7 +427,6 @@ op gt(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) > 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op gt(invar PMC, in INT, labelconst INT) :base_core {
@@ -476,14 +435,12 @@ op gt(invar PMC, in INT, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) > 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op gt(invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interp, $1) > $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op gt(invar PMC, in STR, labelconst INT) :base_core {
@@ -491,21 +448,18 @@ op gt(invar PMC, in STR, labelconst INT) :base_core {
       $1->vtable->get_string(interp, $1), $2) > 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op gt_str(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) > 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op gt_num(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) > 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 ########################################
@@ -530,7 +484,6 @@ op ge(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) >= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ge(invar PMC, in INT, labelconst INT) :base_core {
@@ -539,14 +492,12 @@ op ge(invar PMC, in INT, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) >= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ge(invar PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interp, $1) >= $2) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ge(invar PMC, in STR, labelconst INT) :base_core {
@@ -554,21 +505,18 @@ op ge(invar PMC, in STR, labelconst INT) :base_core {
       $1->vtable->get_string(interp, $1), $2) >= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ge_str(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) >= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 op ge_num(invar PMC, invar PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) >= 0) {
     goto OFFSET($3);
   }
-  goto NEXT();
 }
 
 ########################################
@@ -587,14 +535,12 @@ op if_null(invar PMC, labelconst INT) {
   if (PMC_IS_NULL($1)) {
     goto OFFSET($2);
   }
-  goto NEXT();
 }
 
 op if_null(invar STR, labelconst INT) {
   if (!$1) {
     goto OFFSET($2);
   }
-  goto NEXT();
 }
 
 ########################################
@@ -613,14 +559,12 @@ op unless_null(invar PMC, labelconst INT) {
   if (!PMC_IS_NULL($1)) {
     goto OFFSET($2);
   }
-  goto NEXT();
 }
 
 op unless_null(invar STR, labelconst INT) {
   if ($1) {
     goto OFFSET($2);
   }
-  goto NEXT();
 }
 
 =back
@@ -663,24 +607,20 @@ inline op cmp(out INT, in INT, in INT) :base_core {
   $1 = $2 < $3 ? -1 :
        $2 > $3 ? +1 :
        0;
-  goto NEXT();
 }
 
 inline op cmp(out INT, in NUM, in NUM) :base_core {
   $1 = $2 < $3 ? -1 :
        $2 > $3 ? +1 :
        0;
-  goto NEXT();
 }
 
 inline op cmp(out INT, in STR, in STR) :base_core {
   $1 = string_compare(interp, $2, $3);
-  goto NEXT();
 }
 
 inline op cmp(out INT, invar PMC, invar PMC) :base_core {
   $1 = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
-  goto NEXT();
 }
 
 inline op cmp(out INT, invar PMC, in INT) :base_core {
@@ -688,7 +628,6 @@ inline op cmp(out INT, invar PMC, in INT) :base_core {
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
        0;
-  goto NEXT();
 }
 
 inline op cmp(out INT, invar PMC, in NUM) :base_core {
@@ -696,23 +635,19 @@ inline op cmp(out INT, invar PMC, in NUM) :base_core {
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
        0;
-  goto NEXT();
 }
 
 inline op cmp(out INT, invar PMC, in STR) :base_core {
   STRING* l = VTABLE_get_string(interp, $2);
   $1 = string_compare(interp, l, $3);
-  goto NEXT();
 }
 
 inline op cmp_str(out INT, invar PMC, invar PMC) :base_core {
   $1 = mmd_dispatch_i_pp(interp, $2, $3, MMD_STRCMP);
-  goto NEXT();
 }
 
 inline op cmp_num(out INT, invar PMC, invar PMC) :base_core {
   $1 = mmd_dispatch_i_pp(interp, $2, $3, MMD_NUMCMP);
-  goto NEXT();
 }
 
 ########################################
@@ -749,12 +684,10 @@ inline op issame(out INT, invar PMC, invar PMC) {
         $1 = 1;
     else
         $1 = VTABLE_is_same(interp, $2, $3);
-    goto NEXT();
 }
 
 inline op issame(out INT, in STR, in STR) {
     $1 = $2 == $3;
-    goto NEXT();
 }
 
 inline op isntsame(out INT, invar PMC, invar PMC) {
@@ -762,27 +695,22 @@ inline op isntsame(out INT, invar PMC, invar PMC) {
         $1 = 0;
     else
         $1 = !VTABLE_is_same(interp, $2, $3);
-    goto NEXT();
 }
 
 inline op isntsame(out INT, in STR, in STR) {
     $1 = $2 != $3;
-    goto NEXT();
 }
 
 inline op istrue(out INT, invar PMC) {
     $1 = VTABLE_get_bool(interp, $2);
-    goto NEXT();
 }
 
 inline op isfalse(out INT, invar PMC) {
     $1 = !VTABLE_get_bool(interp, $2);
-    goto NEXT();
 }
 
 inline op isnull(out INT, in PMC) {
     $1 = PMC_IS_NULL($2);
-    goto NEXT();
 }
 
 =item B<isgt>(out INT, in INT, in INT)
@@ -801,7 +729,6 @@ Sets $1 to 1 if $2 is greater than $3.
 
 inline op isgt(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP) > 0);
-  goto NEXT();
 }
 
 =item B<isge>(out INT, in INT, in INT)
@@ -820,7 +747,6 @@ Sets $1 to 1 if $2 is greater than or equal to $3.
 
 inline op isge(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP) >= 0);
-  goto NEXT();
 }
 
 =item B<isle>(out INT, in INT, in INT)
@@ -837,22 +763,18 @@ Sets $1 to 1 if $2 is less than or equal to $3.
 
 inline op isle(out INT, in INT, in INT) {
   $1 = $2 <= $3;
-  goto NEXT();
 }
 
 inline op isle(out INT, in NUM, in NUM) {
   $1 = $2 <= $3;
-  goto NEXT();
 }
 
 inline op isle(out INT, in STR, in STR) {
   $1 = string_compare(interp, $2, $3) <= 0;
-  goto NEXT();
 }
 
 inline op isle(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP) <= 0);
-  goto NEXT();
 }
 
 =item B<islt>(out INT, in INT, in INT)
@@ -869,22 +791,18 @@ Sets $1 to 1 if $2 is less than $3.
 
 inline op islt(out INT, in INT, in INT) {
   $1 = ($2 < $3) ? 1 : 0;
-  goto NEXT();
 }
 
 inline op islt(out INT, in NUM, in NUM) {
   $1 = $2 < $3;
-  goto NEXT();
 }
 
 inline op islt(out INT, in STR, in STR) {
   $1 = string_compare(interp, $2, $3) < 0;
-  goto NEXT();
 }
 
 inline op islt(out INT, invar PMC, invar PMC) {
   $1 = (mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP) < 0);
-  goto NEXT();
 }
 
 =item B<iseq>(out INT, in INT, in INT)
@@ -901,17 +819,14 @@ Sets $1 to 1 if $2 is equal to $3.
 
 inline op iseq(out INT, in INT, in INT) {
   $1 = ($2 == $3) ? 1 : 0;
-  goto NEXT();
 }
 
 inline op iseq(out INT, in NUM, in NUM) {
   $1 = $2 == $3;
-  goto NEXT();
 }
 
 inline op iseq(out INT, in STR, in STR) {
   $1 = string_equal(interp, $2, $3) == 0;
-  goto NEXT();
 }
 
 inline op iseq(out INT, invar PMC, invar PMC) {
@@ -919,7 +834,6 @@ inline op iseq(out INT, invar PMC, invar PMC) {
     $1 = 1;
   else
     $1 = mmd_dispatch_i_pp(interp, $2, $3, MMD_EQ);
-  goto NEXT();
 }
 
 =item B<isne>(out INT, in INT, in INT)
@@ -936,17 +850,14 @@ Sets $1 to 1 if $2 is not equal to $3.
 
 inline op isne(out INT, in INT, in INT) {
   $1 = ($2 == $3) ? 0 : 1;
-  goto NEXT();
 }
 
 inline op isne(out INT, in NUM, in NUM) {
   $1 = $2 != $3;
-  goto NEXT();
 }
 
 inline op isne(out INT, in STR, in STR) {
   $1 = string_equal(interp, $2, $3) != 0;
-  goto NEXT();
 }
 
 inline op isne(out INT, invar PMC, invar PMC) {
@@ -954,7 +865,6 @@ inline op isne(out INT, invar PMC, invar PMC) {
     $1 = 0;
   else
     $1 = !mmd_dispatch_i_pp(interp, $2, $3, MMD_EQ);
-  goto NEXT();
 }
 
 =back
@@ -982,7 +892,6 @@ Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
 
 inline op and(out INT, in INT, in INT) :base_core {
   $1 = $2 ? $3 : $2;
-  goto NEXT();
 }
 
 ########################################
@@ -1005,27 +914,22 @@ Set the boolean state of $1 to the opposite of the boolean state from $2.
 
 inline op not(inout INT) :base_core {
   $1 = ! $1;
-  goto NEXT();
 }
 
 inline op not(out INT, in INT) :base_core {
   $1 = ! $2;
-  goto NEXT();
 }
 
 inline op not(invar PMC) :base_core {
   $2->vtable->i_logical_not(interp, $1);
-  goto NEXT();
 }
 
 inline op not(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->logical_not(interp, $2, $1);
-  goto NEXT();
 }
 
 inline op n_not(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->logical_not(interp, $2, NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -1038,7 +942,6 @@ Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
 
 inline op or(out INT, in INT, in INT) :base_core {
   $1 = $2 ? $2 : $3;
-  goto NEXT();
 }
 
 ########################################
@@ -1052,7 +955,6 @@ returns $3 if it's true and $2 isn't, else returns false.
 
 inline op xor(out INT, in INT, in INT) :base_core {
   $1 = ($2 && ! $3) ? $2 : ($3 && ! $2) ? $3 : 0;
-  goto NEXT();
 }
 
 =back
@@ -1064,7 +966,7 @@ inline op xor(out INT, in INT, in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 

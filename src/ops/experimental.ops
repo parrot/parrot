@@ -59,7 +59,6 @@ inline op gcd(out INT, in NUM, in NUM) :advanced_math {
   }
 
   $1 = (INTVAL)temp2;
-  goto NEXT();
 }
 
 inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
@@ -120,8 +119,6 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
   else if (-x + y == r1) {
     $2 = -$2;
   }
-
-  goto NEXT();
 }
 
 =back
@@ -146,7 +143,6 @@ be reused, they have to be B<clone>d.
 
 inline op splice(invar PMC, invar PMC, in INT, in INT) {
     $1->vtable->splice(interp, $1, $2, $3, $4);
-    goto NEXT();
 }
 
 
@@ -169,17 +165,14 @@ Return a new Iterator PMC $1 for aggregate $2.
 
 inline op slice(out PMC, invar PMC, in KEY) :base_core {
     $1 = $2->vtable->slice(interp, $2, $3, 0);
-    goto NEXT();
 }
 
 inline op slice(out PMC, invar PMC, in KEY, inconst INT) :python {
     $1 = $2->vtable->slice(interp, $2, $3, $4);
-    goto NEXT();
 }
 
 inline op iter(out PMC, invar PMC) :base_core {
     $1 = $2->vtable->get_iter(interp, $2);
-    goto NEXT();
 }
 
 ########################################
@@ -194,13 +187,11 @@ Have $1 turn itself into a PMC of type $2.
 
 inline op morph(invar PMC, in INT) {
   VTABLE_morph(interp, $1, $2);
-  goto NEXT();
 }
 
 inline op morph(invar PMC, in STR) {
   INTVAL type = pmc_type(interp, $2);
   VTABLE_morph(interp, $1, type);
-  goto NEXT();
 }
 
 =item B<exec>(in STR)
@@ -214,7 +205,6 @@ wrong.
 
 inline op exec(in STR) {
   Parrot_Exec_OS_Command(interp, $1);
-  goto NEXT();
 }
 
 
@@ -252,7 +242,6 @@ op classname(out PMC, invar PMC) :object_base {
             key_tail = key;
         }
     }
-    goto NEXT();
 }
 
 =back
@@ -280,7 +269,6 @@ op trap() {
 #if defined(__GNUC__) && defined(PPC)
     __asm__("trap");       /* opcode tr 31, 0, 0 */
 #endif
-    goto NEXT();
 }
 
 =item B<pow>(out NUM, in NUM, in INT)
@@ -311,7 +299,6 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
         res = 1.0/res;
     }
     $1 = res;
-    goto NEXT();
 }
 
 =item B<new>(out PMC, in INT, in STR)
@@ -332,7 +319,6 @@ op new(out PMC, in INT, in STR) {
   }
   _class = interp->vtables[$2]->pmc_class;
   $1 = VTABLE_new_from_string(interp, _class, $3, 0);
-  goto NEXT();
 }
 
 ########################################
@@ -346,7 +332,6 @@ RT#42376 The only handled $4 = IO_THR_MSG_ADD_SELECT_RD aka 2 for now.
 
 op add_io_event(invar PMC, invar PMC, invar PMC, inconst INT) {
     Parrot_event_add_io_event(interp, $1, $2, $3, $4);
-    goto NEXT();
 }
 
 =item B<need_finalize>(invar PMC)
@@ -360,7 +345,6 @@ op need_finalize(invar PMC) {
     if (PObj_is_object_TEST(pmc)) {
         PObj_get_FLAGS(pmc) |= PObj_need_finalize_FLAG;
     }
-    goto NEXT();
 }
 
 #########################################
@@ -380,12 +364,10 @@ PMC.
 
 inline op setstdout(invar PMC) :base_io {
         _PIO_STDOUT(interp) = $1;
-        goto NEXT();
 }
 
 inline op setstderr(invar PMC) :base_io {
         _PIO_STDERR(interp) = $1;
-        goto NEXT();
 }
 
 
@@ -404,7 +386,6 @@ op runinterp(invar PMC, in PMC) {
     pc = (opcode_t *)VTABLE_invoke(new_interp, $2, NULL);
     UNUSED(pc);
     Parrot_runops_fromc_args(new_interp, $2, "P");
-    goto NEXT();
 }
 
 ########################################
@@ -429,7 +410,6 @@ inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
   if (!dest)
     dest = new_string_header(interp, 0);
   $1 = string_substr(interp, $2, $3, $4, &dest, 1);
-  goto NEXT();
 }
 
 
@@ -437,7 +417,7 @@ inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 

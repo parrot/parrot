@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -87,7 +87,7 @@ descriptors. Element I<x> is the direction of argument C<< $args->[I<x>]
 C<$labels> is a reference to an array of boolean values indicating
 whether each argument direction was prefixed by 'C<label>'.
 
-C<$flags> is one or more (comma-separated) I<hints>.
+C<$flags> is one or more (colon-prefixed) I<hints> or I<directives>.
 
 =cut
 
@@ -447,7 +447,7 @@ license as Parrot itself.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =end TODO
 

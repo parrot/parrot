@@ -60,62 +60,50 @@ These opcodes return a new result PMC $2.
 
 inline op infix(inconst INT, invar PMC, in INT) :base_core {
   mmd_dispatch_v_pi(interp, $2, $3, $1);
-  goto NEXT();
 }
 
 inline op infix(inconst INT, invar PMC, in NUM) :base_core {
   mmd_dispatch_v_pn(interp, $2, $3, $1);
-  goto NEXT();
 }
 
 inline op infix(inconst INT, invar PMC, in STR) :base_core {
   mmd_dispatch_v_ps(interp, $2, $3, $1);
-  goto NEXT();
 }
 
 inline op infix(inconst INT, invar PMC, invar PMC) :base_core {
   mmd_dispatch_v_pp(interp, $2, $3, $1);
-  goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, in INT) :base_core {
   $2 = mmd_dispatch_p_pip(interp, $3, $4, $2, $1);
-  goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, in NUM) :base_core {
   $2 = mmd_dispatch_p_pnp(interp, $3, $4, $2, $1);
-  goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, in STR) :base_core {
   $2 = mmd_dispatch_p_psp(interp, $3, $4, $2, $1);
-  goto NEXT();
 }
 
 inline op infix(inconst INT, out PMC, invar PMC, invar PMC) :base_core {
   $2 = mmd_dispatch_p_ppp(interp, $3, $4, $2, $1);
-  goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, in INT) :base_core {
   $2 = mmd_dispatch_p_pip(interp, $3, $4, NULL, $1);
-  goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, in NUM) :base_core {
   $2 = mmd_dispatch_p_pnp(interp, $3, $4, NULL, $1);
-  goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, in STR) :base_core {
   $2 = mmd_dispatch_p_psp(interp, $3, $4, NULL, $1);
-  goto NEXT();
 }
 
 inline op n_infix(inconst INT, out PMC, invar PMC, invar PMC) :base_core {
   $2 = mmd_dispatch_p_ppp(interp, $3, $4, NULL, $1);
-  goto NEXT();
 }
 ###############################################################################
 
@@ -156,47 +144,36 @@ Create new $1 as the absolute of $2.
 
 inline op abs(inout INT) :base_core {
   $1 = abs($1);
-  goto NEXT();
 }
 
 inline op abs(inout NUM) :base_core {
   $1 = fabs($1);
-  goto NEXT();
 }
 
 inline op abs(out INT, in INT) :base_core {
-  if ($2 < 0) {
+  if ($2 < 0)
     $1 = - (INTVAL)$2;
-  }
-  else {
+  else
     $1 = (INTVAL)$2;
-  }
-  goto NEXT();
 }
 
 inline op abs(out NUM, in NUM) :base_core {
-  if ($2 < 0) {
+  if ($2 < 0)
     $1 = - (FLOATVAL)$2;
-  }
-  else {
+  else
     $1 = (FLOATVAL)$2;
-  }
-  goto NEXT();
 }
 
 inline op abs(invar PMC) :base_core {
   $1->vtable->i_absolute(interp, $1);
-  goto NEXT();
 }
 
 inline op abs(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->absolute(interp, $2, $1);
-  goto NEXT();
 }
 
 inline op n_abs(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->absolute(interp, $2, NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -221,22 +198,18 @@ of e.g. C<add_p_p_p>.
 
 inline op add(inout INT, in INT) :base_core {
   $1 += $2;
-  goto NEXT();
 }
 
 inline op add(inout NUM, in NUM) :base_core {
   $1 += $2;
-  goto NEXT();
 }
 
 inline op add(out INT, in INT, in INT) :base_core {
   $1 = $2 + $3;
-  goto NEXT();
 }
 
 inline op add(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 + $3;
-  goto NEXT();
 }
 
 ########################################
@@ -282,7 +255,6 @@ inline op cmod(out INT, in INT, in INT) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = $2 % den;
-  goto NEXT();
 }
 
 ########################################
@@ -322,7 +294,6 @@ inline op cmod(out NUM, in NUM, in NUM) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = fmod($2, den);
-  goto NEXT();
 }
 
 ########################################
@@ -339,17 +310,14 @@ Decrease $1 by one.
 
 inline op dec(inout INT) :base_core {
   $1--;
-  goto NEXT();
 }
 
 inline op dec(inout NUM) :base_core {
   $1--;
-  goto NEXT();
 }
 
 inline op dec(invar PMC) :base_core {
   $1->vtable->decrement(interp, $1);
-  goto NEXT();
 }
 
 ########################################
@@ -376,7 +344,6 @@ inline op div(inout INT, in INT) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 /= den;
-  goto NEXT();
 }
 
 inline op div(inout NUM, in NUM) :base_core {
@@ -385,7 +352,6 @@ inline op div(inout NUM, in NUM) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 /= den;
-  goto NEXT();
 }
 
 inline op div(out INT, in INT, in INT) :base_core {
@@ -394,7 +360,6 @@ inline op div(out INT, in INT, in INT) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = $2 / den;
-  goto NEXT();
 }
 
 inline op div(out NUM, in NUM, in NUM) :base_core {
@@ -403,7 +368,6 @@ inline op div(out NUM, in NUM, in NUM) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = $2 / den;
-  goto NEXT();
 }
 
 =item B<fdiv>(inout INT, in INT)
@@ -432,7 +396,6 @@ inline op fdiv(inout INT, in INT) :base_core {
 
   f  = floor($1 / den);
   $1 = (INTVAL)f;
-  goto NEXT();
 }
 
 inline op fdiv(inout NUM, in NUM) :base_core {
@@ -441,7 +404,6 @@ inline op fdiv(inout NUM, in NUM) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = floor($1 / den);
-  goto NEXT();
 }
 
 inline op fdiv(out INT, in INT, in INT) :base_core {
@@ -454,7 +416,6 @@ inline op fdiv(out INT, in INT, in INT) :base_core {
 
   f  = floor($2 / den);
   $1 = (INTVAL)f;
-  goto NEXT();
 }
 
 inline op fdiv(out NUM, in NUM, in NUM) :base_core {
@@ -463,7 +424,6 @@ inline op fdiv(out NUM, in NUM, in NUM) :base_core {
     real_exception(interp, NULL, E_ZeroDivisionError,
                     "Divide by zero");
   $1 = floor($2 / den);
-  goto NEXT();
 }
 
 ########################################
@@ -482,18 +442,15 @@ Set $1 to the smallest integral value greater than or equal to $2.
 
 inline op ceil(inout NUM) :base_core {
   $1 = ceil($1);
-  goto NEXT();
 }
 
 inline op ceil(out INT, in NUM) :base_core {
   FLOATVAL f = ceil($2);
   $1         = (INTVAL)f;
-  goto NEXT();
 }
 
 inline op ceil(out NUM, in NUM) :base_core {
   $1 = ceil($2);
-  goto NEXT();
 }
 
 ########################################
@@ -512,18 +469,15 @@ Set $1 to the largest integral value less than or equal to $2.
 
 inline op floor(inout NUM) :base_core {
   $1 = floor($1);
-  goto NEXT();
 }
 
 inline op floor(out INT, in NUM) :base_core {
   FLOATVAL f = floor($2);
   $1         = (INTVAL)f;
-  goto NEXT();
 }
 
 inline op floor(out NUM, in NUM) :base_core {
   $1 = floor($2);
-  goto NEXT();
 }
 
 ########################################
@@ -540,17 +494,14 @@ Increase $1 by one.
 
 inline op inc(inout INT) :base_core {
   $1++;
-  goto NEXT();
 }
 
 inline op inc(inout NUM) :base_core {
   $1++;
-  goto NEXT();
 }
 
 inline op inc(invar PMC) :base_core {
   $1->vtable->increment(interp, $1);
-  goto NEXT();
 }
 
 
@@ -591,22 +542,18 @@ References:
 
 op mod(inout INT, in INT) :base_core {
   $1 = intval_mod($1, $2);
-  goto NEXT();
 }
 
 op mod(out INT, in INT, in INT) :base_core {
   $1 = intval_mod($2, $3);
-  goto NEXT();
 }
 
 op mod(out NUM, in NUM, in NUM) :base_core {
   $1 = floatval_mod($2, $3);
-  goto NEXT();
 }
 
 op mod(inout NUM, in NUM) :base_core {
   $1 = floatval_mod($1, $2);
-  goto NEXT();
 }
 
 ########################################
@@ -627,22 +574,18 @@ Set $1 to the product of $2 and $3.
 
 inline op mul(inout INT, in INT) :base_core {
   $1 *= $2;
-  goto NEXT();
 }
 
 inline op mul(inout NUM, in NUM) :base_core {
   $1 *= $2;
-  goto NEXT();
 }
 
 inline op mul(out INT, in INT, in INT) :base_core {
   $1 = $2 * $3;
-  goto NEXT();
 }
 
 inline op mul(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 * $3;
-  goto NEXT();
 }
 
 ########################################
@@ -671,37 +614,30 @@ Create $1 as the negative of $2.
 
 inline op neg(inout INT) :base_core {
   $1 = - $1;
-  goto NEXT();
 }
 
 inline op neg(inout NUM) :base_core {
   $1 = - $1;
-  goto NEXT();
 }
 
 inline op neg(invar PMC) :base_core {
   $1->vtable->i_neg(interp, $1);
-  goto NEXT();
 }
 
 inline op neg(out INT, in INT) :base_core {
   $1 = - $2;
-  goto NEXT();
 }
 
 inline op neg(out NUM, in NUM) :base_core {
   $1 = - $2;
-  goto NEXT();
 }
 
 inline op neg(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->neg(interp, $2, $1);
-  goto NEXT();
 }
 
 inline op n_neg(out PMC, invar PMC) :base_core {
   $1 = $2->vtable->neg(interp, $2, NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -714,7 +650,6 @@ Set $1 to $2 raised to the power $3.
 
 inline op pow(out NUM, in NUM, in NUM) :base_core {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-  goto NEXT();
 }
 
 ########################################
@@ -735,22 +670,18 @@ Set $1 to $2 minus $3.
 
 inline op sub(inout INT, in INT) :base_core {
   $1 -= $2;
-  goto NEXT();
 }
 
 inline op sub(inout NUM, in NUM) :base_core {
   $1 -= $2;
-  goto NEXT();
 }
 
 inline op sub(out INT, in INT, in INT) :base_core {
   $1 = $2 - $3;
-  goto NEXT();
 }
 
 inline op sub(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 - $3;
-  goto NEXT();
 }
 
 ########################################
@@ -763,7 +694,6 @@ Set $1 to the square root of $2.
 
 inline op sqrt(out NUM, in NUM) :base_core {
   $1 = sqrt((FLOATVAL)$2);
-  goto NEXT();
 }
 
 =back
@@ -793,7 +723,6 @@ Set $1 to the arc cosine (in radians) of $2.
 
 inline op acos(out NUM, in NUM) :base_math {
   $1 = acos((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -806,7 +735,6 @@ Set $1 to the arc secant (in radians) of $2.
 
 inline op asec(out NUM, in NUM) :base_math {
   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
-  goto NEXT();
 }
 
 ########################################
@@ -820,7 +748,6 @@ Set $1 to the arc sine (in radians) of $2.
 
 inline op asin(out NUM, in NUM) :base_math {
   $1 = asin((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -839,12 +766,10 @@ quadrant of the result.
 
 inline op atan(out NUM, in NUM) :base_math {
   $1 = atan((FLOATVAL)$2);
-  goto NEXT();
 }
 
 inline op atan(out NUM, in NUM, in NUM) :base_math {
   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
-  goto NEXT();
 }
 
 ########################################
@@ -857,7 +782,6 @@ Set $1 to the cosine of $2 (given in radians).
 
 inline op cos(out NUM, in NUM) :base_math {
   $1 = cos((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -870,7 +794,6 @@ Set $1 to the hyperbolic cosine of $2 (given in radians).
 
 inline op cosh(out NUM, in NUM) :base_math {
   $1 = cosh((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -884,7 +807,6 @@ logarithm.
 
 inline op exp(out NUM, in NUM) :base_math {
   $1 = exp((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -897,7 +819,6 @@ Set $1 to the natural (base I<e>) logarithm of $2.
 
 inline op ln(out NUM, in NUM) :base_math {
   $1 = log((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -910,7 +831,6 @@ Set $1 to the base 10 logarithm of $2.
 
 inline op log10(out NUM, in NUM) :base_math {
   $1 = log10((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -924,7 +844,6 @@ Set $1 to the base 2 logarithm of $2.
 op log2(out NUM, in NUM) :base_math {
    FLOATVAL temp = log((FLOATVAL)2.0);
   $1 = log((FLOATVAL)$2) / temp;
-  goto NEXT();
 }
 
 ########################################
@@ -937,7 +856,6 @@ Set $1 to the secant of $2 (given in radians).
 
 inline op sec(out NUM, in NUM) :base_math {
   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -950,7 +868,6 @@ Set $1 to the hyperbolic secant of $2 (given in radians).
 
 inline op sech(out NUM, in NUM) :base_math {
   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -963,7 +880,6 @@ Set $1 to the sine of $2 (given in radians).
 
 inline op sin(out NUM, in NUM) :base_math {
   $1 = sin((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -976,7 +892,6 @@ Set $1 to the hyperbolic sine of $2 (given in radians).
 
 inline op sinh(out NUM, in NUM) :base_math {
   $1 = sinh((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -989,7 +904,6 @@ Set $1 to the tangent of $2 (given in radians).
 
 inline op tan(out NUM, in NUM) :base_math {
   $1 = tan((FLOATVAL)$2);
-  goto NEXT();
 }
 
 ########################################
@@ -1002,7 +916,6 @@ Set $1 to the hyperbolic tangent of $2 (given in radians).
 
 inline op tanh(out NUM, in NUM) :base_math {
   $1 = tanh((FLOATVAL)$2);
-  goto NEXT();
 }
 
 =back
@@ -1049,7 +962,6 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
  }
 
  $1 = b<<p;
- goto NEXT();
 }
 
 
@@ -1086,7 +998,6 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
  gcd = b<<p;
  saved_var1 /= gcd;
  $1 = saved_var1*saved_var2;
- goto NEXT();
 }
 
 ########################################
@@ -1109,7 +1020,6 @@ inline op fact(out INT, in INT) :advanced_math {
     i--;
   }
   $1 = q;
-  goto NEXT();
 }
 
 inline op fact(out NUM, in INT) :advanced_math {
@@ -1122,7 +1032,6 @@ inline op fact(out NUM, in INT) :advanced_math {
     i--;
   }
   $1 = q;
-  goto NEXT();
 }
 
 =back
@@ -1133,7 +1042,7 @@ inline op fact(out NUM, in INT) :advanced_math {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 =head1 LICENSE
 

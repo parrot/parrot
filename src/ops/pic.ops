@@ -35,7 +35,7 @@ One for fun and MOPS.
 
 =cut
 
-inline op pic_infix__(inconst INT, invar PMC, invar PMC) :pic {
+inline op pic_infix__(inconst INT, invar PMC, invar PMC) :pic :flow {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     PMC *left, *right;
@@ -116,7 +116,6 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
             parrot_pic_opcode(interp, PARROT_OP_pic_infix___ic_p_p);
         goto OFFSET(0);
     }
-    goto NEXT();
 }
 
 =item B<pic_get_params__>(inconst PMC /* , ... */)
@@ -129,7 +128,7 @@ Return values to caller.
 
 =cut
 
-inline op pic_get_params__(inconst PMC) :pic {
+inline op pic_get_params__(inconst PMC) :pic :flow {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     PMC *sig, *ccont;
@@ -180,7 +179,7 @@ inline op pic_get_params__(inconst PMC) :pic {
     goto OFFSET(0);
 }
 
-inline op pic_set_returns__(inconst PMC) :pic {
+inline op pic_set_returns__(inconst PMC) :pic :flow {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     PMC *sig, *ccont;
@@ -238,7 +237,7 @@ C<pc> of the next opcode and is usually just returned.
 
 =cut
 
-inline op pic_callr__(inconst PMC) :pic {
+inline op pic_callr__(inconst PMC) :pic :flow {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     void *args[6];      /* RT#42355 ARG_MAX */
@@ -303,7 +302,7 @@ inline op pic_callr__(inconst PMC) :pic {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 
 =head1 LICENSE
 

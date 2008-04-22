@@ -40,12 +40,10 @@ If $3 is less than the negative of the length of $2, an exception is thrown.
 
 inline op ord(out INT, in STR) :base_core {
     $1 = string_ord(interp, $2, 0);
-    goto NEXT();
 }
 
 inline op ord(out INT, in STR, in INT) :base_core {
     $1 = string_ord(interp, $2, $3);
-    goto NEXT();
 }
 
 
@@ -59,7 +57,6 @@ is returned in string $1.
 inline op chr(out STR, in INT) :base_core {
     STRING * const s = string_chr(interp, (UINTVAL)$2);
     $1 = s;
-    goto NEXT();
 }
 
 
@@ -78,12 +75,10 @@ If $3 is negative, cut the string after -$3 characters.
 
 inline op chopn(inout STR, in INT) :base_core {
     string_chopn_inplace(interp, $1, $2);
-    goto NEXT();
 }
 
 inline op chopn(out STR, in STR, in INT) :base_core {
     $1 = string_chopn(interp, $2, $3);
-    goto NEXT();
 }
 
 
@@ -144,7 +139,6 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
         real_exception(interp, NULL, NEG_REPEAT,
                 "Cannot repeat with negative arg");
     $1 = string_repeat(interp, $2, (UINTVAL)$3, NULL);
-    goto NEXT();
 }
 
 
@@ -162,7 +156,6 @@ If $2 is NULL or zero length, zero is returned.
 
 inline op length(out INT, in STR) :base_mem {
     $1 = $2 ? string_length(interp, $2) : 0;
-    goto NEXT();
 }
 
 inline op bytelength(out INT, in STR) :base_mem {
@@ -175,7 +168,6 @@ inline op bytelength(out INT, in STR) :base_mem {
         PARROT_ASSERT(n == ENCODING_BYTES(interp, $2));
     }
     $1 = n;
-    goto NEXT();
 }
 
 
@@ -191,7 +183,6 @@ $1 should be unpinned if it is used after pinning is no longer necessary.
 
 op pin(inout STR) :base_mem {
     string_pin(interp, $1);
-    goto NEXT();
 }
 
 
@@ -204,7 +195,6 @@ This will make the memory in $1 move.
 
 op unpin(inout STR) :base_mem {
     string_unpin(interp, $1);
-    goto NEXT();
 }
 
 
@@ -242,27 +232,22 @@ substring and does not waste a register to do the string replace.
 inline op substr(out STR, in STR, in INT) :base_core {
     const INTVAL len = string_length(interp, $2);
     $1 = string_substr(interp, $2, $3, len, &$1, 0);
-    goto NEXT();
 }
 
 inline op substr(out STR, in STR, in INT, in INT) :base_core {
     $1 = string_substr(interp, $2, $3, $4, &$1, 0);
-    goto NEXT();
 }
 
 inline op substr(out STR, inout STR, in INT, in INT, in STR) :base_core {
     $1 = string_replace(interp, $2, $3, $4, $5, &$1);
-    goto NEXT();
 }
 
 inline op substr(inout STR, in INT, in INT, in STR) :base_core {
     (void)string_replace(interp, $1, $2, $3, $4, NULL);
-    goto NEXT();
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
     $1 = $2->vtable->substr_str(interp, $2, $3, $4);
-    goto NEXT();
 }
 
 
@@ -283,12 +268,10 @@ B<index> returns "-1".
 
 inline op index(out INT, in STR, in STR) :base_core {
     $1 = ($2 && $3) ? string_str_index(interp, $2, $3, 0) : -1;
-    goto NEXT();
 }
 
 inline op index(out INT, in STR, in STR, in INT) :base_core {
     $1 = ($2 && $3) ? string_str_index(interp, $2, $3, $4) : -1;
-    goto NEXT();
 }
 
 
@@ -310,14 +293,12 @@ see F<misc.c> for details.
 
 inline op sprintf(out STR, in STR, invar PMC) :base_core {
     $1=Parrot_psprintf(interp, $2, $3);
-    goto NEXT();
 }
 
 inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
     $1->vtable->set_string_native(interp, $1,
         Parrot_psprintf(interp,
                        $2->vtable->get_string(interp, $2), $3));
-    goto NEXT();
 }
 
 
@@ -332,27 +313,11 @@ Allocate a new empty string, of length $2 (optional), encoding $3
 
 inline op new(out STR) :base_mem {
   $1 = string_make_empty(interp, enum_stringrep_one, 0);
-  goto NEXT();
 }
 
 inline op new(out STR, in INT) :base_mem {
     $1 = string_make_empty(interp, enum_stringrep_one, $2);
-    goto NEXT();
 }
-
-
-#=item B<find_encoding>(out INT, in STR)
-#
-#Find the encoding named in $2 and return its number in $1
-#
-#=cut
-#
-#op find_encoding(out INT, in STR) :base_core {
-#  char *encoding = string_to_cstring(interp, $2);
-#  $1 = encoding_find_encoding(encoding);
-#  string_cstring_free(encoding);
-#  goto NEXT();
-#}
 
 
 =item B<stringinfo>(out INT, in STR, in INT)
@@ -381,9 +346,8 @@ Possible values for $3 are:
 =cut
 
 inline op stringinfo(out INT, in STR, in INT) :base_core {
-    if ($2 == NULL) {
+    if ($2 == NULL)
         $1 = 0;
-    }
     else {
         switch ($3) {
             case STRINGINFO_HEADER:
@@ -409,7 +373,6 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
                     "stringinfo: unknown info type: %d", $3);
         }
     }
-    goto NEXT();
 }
 
 
@@ -425,12 +388,10 @@ Uppercase $1 in place
 
 inline op upcase(out STR, in STR) :base_core {
     $1 = string_upcase(interp, $2);
-    goto NEXT();
 }
 
 inline op upcase(inout STR) :base_core {
     string_upcase_inplace(interp, $1);
-    goto NEXT();
 }
 
 
@@ -446,12 +407,10 @@ Downcase $1 in place
 
 inline op downcase(out STR, in STR) :base_core {
     $1 = string_downcase(interp, $2);
-    goto NEXT();
 }
 
 inline op downcase(inout STR) :base_core {
     string_downcase_inplace(interp, $1);
-    goto NEXT();
 }
 
 
@@ -467,12 +426,10 @@ Titlecase $1 in place
 
 inline op titlecase(out STR, in STR) :base_core {
     $1 = string_titlecase(interp, $2);
-    goto NEXT();
 }
 
 inline op titlecase(inout STR) :base_core {
     string_titlecase_inplace(interp, $1);
-    goto NEXT();
 }
 
 
@@ -495,12 +452,10 @@ on regular expression, use C<PGE::Util>'s split from the standard library.
 
 op join(out STR, in STR, invar PMC) :base_core {
     $1 = string_join(interp, $2, $3);
-    goto NEXT();
 }
 
 op split(out PMC, in STR, in STR) :base_core {
     $1 = string_split(interp, $2, $3);
-    goto NEXT();
 }
 
 
@@ -532,13 +487,11 @@ Both functions may throw an exception on information loss.
 
 op charset(out INT, in STR) :base_core {
     $1 = Parrot_charset_number_of_str(interp, $2);
-    goto NEXT();
 }
 
 op charsetname(out STR, in INT) :base_core {
     STRING * const name = Parrot_charset_name(interp, $2);
     $1 = name ? string_copy(interp, name) : NULL;
-    goto NEXT();
 }
 
 op find_charset(out INT, in STR) :base_core {
@@ -547,18 +500,15 @@ op find_charset(out INT, in STR) :base_core {
         real_exception(interp, NULL, 1,
                 "charset '%Ss' not found", $2);
     $1 = n;
-    goto NEXT();
 }
 
 op trans_charset(inout STR, in INT) {
     $1 = Parrot_string_trans_charset(interp, $1, $2, NULL);
-    goto NEXT();
 }
 
 op trans_charset(out STR, in STR, in INT) {
     STRING *dest = new_string_header(interp, 0);
     $1 = Parrot_string_trans_charset(interp, $2, $3, dest);
-    goto NEXT();
 }
 
 
@@ -590,13 +540,11 @@ Both functions may throw an exception on information loss.
 
 op encoding(out INT, in STR) :base_core {
   $1 = Parrot_encoding_number_of_str(interp, $2);
-  goto NEXT();
 }
 
 op encodingname(out STR, in INT) :base_core {
     STRING * const name = Parrot_encoding_name(interp, $2);
     $1 = name ? string_copy(interp, name) : NULL;
-    goto NEXT();
 }
 
 op find_encoding(out INT, in STR) :base_core {
@@ -605,18 +553,15 @@ op find_encoding(out INT, in STR) :base_core {
         real_exception(interp, NULL, 1,
                 "encoding '%Ss' not found", $2);
     $1 = n;
-    goto NEXT();
 }
 
 op trans_encoding(inout STR, in INT) {
     $1 = Parrot_string_trans_encoding(interp, $1, $2, NULL);
-    goto NEXT();
 }
 
 op trans_encoding(out STR, in STR, in INT) {
     STRING * const dest = new_string_header(interp, 0);
     $1 = Parrot_string_trans_encoding(interp, $2, $3, dest);
-    goto NEXT();
 }
 
 
@@ -629,7 +574,6 @@ the character class(es) given by $2.
 
 inline op is_cclass(out INT, in INT, in STR, in INT) {
     $1 = Parrot_string_is_cclass(interp, $2, $3, $4);
-    goto NEXT();
 }
 
 
@@ -644,7 +588,6 @@ character is found, set $1 to (offset + count).
 
 inline op find_cclass(out INT, in INT, in STR, in INT, in INT) {
     $1 = Parrot_string_find_cclass(interp, $2, $3, $4, $5);
-    goto NEXT();
 }
 
 
@@ -659,7 +602,6 @@ consists entirely of matching characters, set $1 to (offset + count).
 
 inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
     $1 = Parrot_string_find_not_cclass(interp, $2, $3, $4, $5);
-    goto NEXT();
 }
 
 
@@ -676,12 +618,10 @@ Compose (normalize) a string.
 
 op escape(out STR, invar STR) {
     $1 = string_escape_string(interp, $2);
-    goto NEXT();
 }
 
 op compose(out STR, in STR) {
     $1 = string_compose(interp, $2);
-    goto NEXT();
 }
 
 

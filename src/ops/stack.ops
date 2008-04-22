@@ -42,7 +42,6 @@ op entrytype(out INT, in INT) :base_core {
     real_exception(interp, NULL, 99, "Stack Depth wrong");
   }
   $1 = get_entry_type(entry);
-  goto NEXT();
 }
 
 ########################################
@@ -55,7 +54,6 @@ Puts the depth of the user stack in $1.
 
 inline op depth(out INT) :base_core {
   $1 = stack_height(interp, CONTEXT(interp)->user_stack);
-  goto NEXT();
 }
 
 #######################################
@@ -86,7 +84,6 @@ op lookback(out INT, in INT) :base_core {
   }
 
   $1 = UVal_int(entry->entry);
-  goto NEXT();
 }
 
 op lookback(out STR, in INT) :base_core {
@@ -100,7 +97,6 @@ op lookback(out STR, in INT) :base_core {
   }
 
   $1 = UVal_str(entry->entry);
-  goto NEXT();
 }
 
 op lookback(out NUM, in INT) :base_core {
@@ -114,7 +110,6 @@ op lookback(out NUM, in INT) :base_core {
   }
 
   $1 = UVal_num(entry->entry);
-  goto NEXT();
 }
 
 op lookback(out PMC, in INT) :base_core {
@@ -127,7 +122,6 @@ op lookback(out PMC, in INT) :base_core {
   }
 
   $1 = UVal_pmc(entry->entry);
-  goto NEXT();
 }
 
 ########################################
@@ -149,25 +143,21 @@ inline op save(in INT) :base_core {
   stack_push(interp,
              &CONTEXT(interp)->user_stack, &i,
              STACK_ENTRY_INT, STACK_CLEANUP_NULL);
-  goto NEXT();
 }
 
 inline op save(in NUM) :base_core {
   stack_push(interp, &CONTEXT(interp)->user_stack,
              &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
-  goto NEXT();
 }
 
 inline op save(invar PMC) :base_core {
   stack_push(interp, &CONTEXT(interp)->user_stack,
               $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
-  goto NEXT();
 }
 
 inline op save(in STR) :base_core {
   stack_push(interp, &CONTEXT(interp)->user_stack,
              $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -182,7 +172,6 @@ inline op savec(in STR) :base_core {
   stack_push(interp, &CONTEXT(interp)->user_stack,
              string_copy(interp, $1),
              STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
-  goto NEXT();
 }
 
 ########################################
@@ -202,25 +191,21 @@ Restore register $1 from the user stack.
 inline op restore(out INT) :base_core {
   (void)stack_pop(interp, &CONTEXT(interp)->user_stack, &($1),
                   STACK_ENTRY_INT);
-  goto NEXT();
 }
 
 inline op restore(out NUM) :base_core {
   (void)stack_pop(interp, &CONTEXT(interp)->user_stack, &($1),
                   STACK_ENTRY_FLOAT);
-  goto NEXT();
 }
 
 inline op restore(out PMC) :base_core {
   (void)stack_pop(interp, &CONTEXT(interp)->user_stack, &($1),
                   STACK_ENTRY_PMC);
-  goto NEXT();
 }
 
 inline op restore(out STR) :base_core {
   (void)stack_pop(interp, &CONTEXT(interp)->user_stack, &($1),
                   STACK_ENTRY_STRING);
-  goto NEXT();
 }
 
 ########################################
@@ -239,7 +224,6 @@ the second entry, the second becomes the third etc., while the former
 
 inline op rotate_up(in INT) :base_core {
   rotate_entries(interp, &CONTEXT(interp)->user_stack, $1);
-  goto NEXT();
 }
 
 =back

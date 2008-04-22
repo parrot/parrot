@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,7 +23,7 @@ F<tools/build/ops2pm.pl> and F<tools/build/pbc2c.pl>.
 For ops that have trivial bodies (such as just a call to some other
 function and a C<return> statement), opcode functions are in the format:
 
-    inline op opname (args) :class,flags {
+    inline op opname (args) :flags {
         ... body of function ...
     }
 
@@ -32,13 +32,15 @@ Note that currently the C<inline> op type is ignored.
 Alternately, for opcode functions that have more internal complexity the
 format is:
 
-    op opname (args) :class,flags {
+    op opname (args) :flags {
         ... body of function ...
     }
 
 There may be more than one C<return>.
 
 In both cases the closing brace B<must> be on its own line.
+
+When specifying multiple flags, each flag gets its own prefixing colon.
 
 =head2 Op Arguments
 
@@ -72,13 +74,24 @@ Argument type is one of:
 The size of the return offset is determined from the op function's
 signature.
 
-=head2 Op Classification and Flags
+=head2 Op Flags
 
-The op classification and flags are optional hints which provide
-information about the op.
+The flags are of two types:
+
+=over 4
+
+=item 1 class
 
 The classification of ops is intended to facilitate the selection of
 suitable ops for a Parrot safe mode, or for inclusion in miniparrot.
+
+=item 2 behavior
+
+The presence (or absence) of certain flags will change how the op
+behaviors. For example, the lack of the C<flow> flag will cause the
+op to be implicitly terminated with C<goto NEXT()>. (See next section).
+
+=back
 
 =head2 Op Body (Macro Substitutions)
 
@@ -309,7 +322,22 @@ sub read_ops {
         #   kic  Integer Key constant index (in-line)
         #
 
-        if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*(\S*)?\s*{/) {
+        my $op_sig_RE = qr/
+            ^
+            (inline\s+)?  # optional keywords
+            op
+            \s+
+            ([a-zA-Z]\w*) # op name
+            \s*
+            \((.*)\)      # argument signature
+            \s*
+            ((?: \:\w+\s*)*)         # :flags
+            \s*
+            {
+            $
+        /x;
+
+        if ($_ =~ $op_sig_RE) {
             if ($seen_op) {
                 die "$ops_file [$.]: Cannot define an op within an op definition!\n";
             }
@@ -459,6 +487,10 @@ sub make_op {
             $flags );
         my $op_size = $op->size;
         my $jumps   = "0";
+
+        unless ($flags =~ /\b:flow\b/) {
+            $body .= "\ngoto NEXT();";
+        }
 
         #
         # Macro substitutions:
