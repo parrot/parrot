@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More qw(no_plan); # tests => 17;
 use Carp;
 use Cwd;
 use lib qw( lib t/configure/testlib );
@@ -40,40 +40,40 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my ($test, $has_crypto, $verbose);
-
-$test = qq{OpenSSL 0.9.9z\n};
-$has_crypto = 0;
-$verbose = undef;
-$has_crypto = $step->_evaluate_cc_run($test, $has_crypto, $verbose);
-is($has_crypto, 1, "'has_crypto' set as expected");
-is($step->result(), 'yes, 0.9.9z', "Expected result was set");
-# Prepare for next test
-$step->set_result(undef);
-
-$test = qq{foobar};
-$has_crypto = 0;
-$verbose = undef;
-$has_crypto = $step->_evaluate_cc_run($test, $has_crypto, $verbose);
-is($has_crypto, 0, "'has_crypto' set as expected");
-ok(! defined $step->result(), "Result is undefined, as expected");
-
-{
-    my $stdout;
-    $test = qq{OpenSSL 0.9.9z\n};
-    $has_crypto = 0;
-    $verbose = 1;
-    capture(
-        sub { $has_crypto =
-            $step->_evaluate_cc_run($test, $has_crypto, $verbose); },
-        \$stdout,
-    );
-    is($has_crypto, 1, "'has_crypto' set as expected");
-    is($step->result(), 'yes, 0.9.9z', "Expected result was set");
-    like($stdout, qr/\(yes\)/, "Got expected verbose output");
-    # Prepare for next test
-    $step->set_result(undef);
-}
+#my ($test, $has_crypto, $verbose);
+#
+#$test = qq{OpenSSL 0.9.9z\n};
+#$has_crypto = 0;
+#$verbose = undef;
+#$has_crypto = $step->_evaluate_cc_run($test, $has_crypto, $verbose);
+#is($has_crypto, 1, "'has_crypto' set as expected");
+#is($step->result(), 'yes, 0.9.9z', "Expected result was set");
+## Prepare for next test
+#$step->set_result(undef);
+#
+#$test = qq{foobar};
+#$has_crypto = 0;
+#$verbose = undef;
+#$has_crypto = $step->_evaluate_cc_run($test, $has_crypto, $verbose);
+#is($has_crypto, 0, "'has_crypto' set as expected");
+#ok(! defined $step->result(), "Result is undefined, as expected");
+#
+#{
+#    my $stdout;
+#    $test = qq{OpenSSL 0.9.9z\n};
+#    $has_crypto = 0;
+#    $verbose = 1;
+#    capture(
+#        sub { $has_crypto =
+#            $step->_evaluate_cc_run($test, $has_crypto, $verbose); },
+#        \$stdout,
+#    );
+#    is($has_crypto, 1, "'has_crypto' set as expected");
+#    is($step->result(), 'yes, 0.9.9z', "Expected result was set");
+#    like($stdout, qr/\(yes\)/, "Got expected verbose output");
+#    # Prepare for next test
+#    $step->set_result(undef);
+#}
 
 pass("Completed all tests in $0");
 
