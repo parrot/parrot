@@ -42,8 +42,14 @@ my %digest = (
         md_ctx => 'SHA_CTX',
         md_digest => 'SHA_DIGEST',
     },
-    SHA256      => {},
-    SHA512      => {},
+    SHA256      => {
+        md_inc => 'sha',
+        version_needed => '0.9.8a',
+    },
+    SHA512      => {
+        md_inc => 'sha',
+        version_needed => '0.9.8a',
+    },
 );
 
 sub runstep {
@@ -54,6 +60,7 @@ sub runstep {
         $self->set_result('skipped');
         return 1;
     }
+    my $openssl_version  = $conf->data->get('openssl_version');
 
     while (my ($md, $val) = each(%digest)) {
         my $file = lc $md;
@@ -62,6 +69,11 @@ sub runstep {
         $conf->data->set( md_inc => $val->{md_inc} || $file );
         $conf->data->set( md_ctx => $val->{md_ctx} || $md . '_CTX' );
         $conf->data->set( md_digest => $val->{md_digest} || $md . '_DIGEST' );
+        $conf->data->set( md_guard => 
+            ( exists $val->{version_needed} and ( $openssl_version lt $val->{version_needed} ))
+            ? '#if 0'
+            : '#ifndef OPENSSL_NO_' . $md
+        );
         $conf->genfile(
             'config/gen/crypto/digest_pmc.in' => "src/dynpmc/${file}.pmc",
             comment_type => '/*',

@@ -59,7 +59,7 @@ sub runstep {
     my $has_crypto = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_crypto = $self->_evaluate_cc_run($test, $has_crypto, $verbose);
+        $has_crypto = $self->_evaluate_cc_run($conf, $test, $has_crypto, $verbose);
     }
     unless ($has_crypto) {
         # The Parrot::Configure settings might have changed while class ran
@@ -88,9 +88,10 @@ sub _handle_mswin32 {
 
 sub _evaluate_cc_run {
     my $self = shift;
-    my ($test, $has_crypto, $verbose) = @_;
+    my ($conf, $test, $has_crypto, $verbose) = @_;
     if ( $test =~ m/^OpenSSL (\d\.\d\.\d\w)/ ) {
         $has_crypto = 1;
+        $conf->data->set( openssl_version => $1 );
         print " (yes) " if $verbose;
         $self->set_result("yes, $1");
     }

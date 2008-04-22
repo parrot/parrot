@@ -108,7 +108,10 @@ CODE
 SHA1
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'SHA256 typeof', todo => 'SHA256 removed by r26447' );
+SKIP: {
+    skip( "Only with OpenSSL 0.9.8", 2 ) if ($PConfig{openssl_version} lt '0.9.8a');
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'SHA256 typeof' );
 .sub test :main
     $P0 = loadlib 'digest_group'
     .local pmc md
@@ -121,7 +124,7 @@ CODE
 SHA256
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'SHA512 typeof', todo => 'SHA256 removed by r26447' );
+pir_output_is( << 'CODE', << 'OUTPUT', 'SHA512 typeof' );
 .sub test :main
     $P0 = loadlib 'digest_group'
     .local pmc md
@@ -133,6 +136,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'SHA512 typeof', todo => 'SHA256 removed 
 CODE
 SHA512
 OUTPUT
+}
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MD5 digest' );
 .sub test :main
