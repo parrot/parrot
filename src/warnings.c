@@ -44,9 +44,7 @@ PARROT_API
 void
 print_pbc_location(PARROT_INTERP)
 {
-    Interp * const tracer =
-        interp->debugger ?
-            interp->debugger : interp;
+    Interp * const tracer = interp->debugger ? interp->debugger : interp;
     PIO_eprintf(tracer, "%Ss\n",
             Parrot_Context_infostr(interp,
                 CONTEXT(interp)));
@@ -101,18 +99,18 @@ INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             ARGIN(const char *message), ...)
 {
-    STRING *targ;
-
-    va_list args;
-
     PARROT_ASSERT(interp);
     if (!PARROT_WARNINGS_test(interp, warnclass))
         return 2;
+    else {
+        STRING *targ;
+        va_list args;
 
-    va_start(args, message);
-    targ = Parrot_vsprintf_c(interp, message, args);
-    va_end(args);
-    return print_warning(interp, targ);
+        va_start(args, message);
+        targ = Parrot_vsprintf_c(interp, message, args);
+        va_end(args);
+        return print_warning(interp, targ);
+    }
 }
 
 /*
@@ -134,18 +132,18 @@ INTVAL
 Parrot_warn_s(NULLOK_INTERP, INTVAL warnclass,
               ARGIN(STRING *message), ...)
 {
-    STRING *targ;
-
-    va_list args;
-
     if (!interp || !PARROT_WARNINGS_test(interp, warnclass))
         return 2;
+    else {
+        STRING *targ;
+        va_list args;
 
-    va_start(args, message);
-    targ = Parrot_vsprintf_s(interp, message, args);
-    va_end(args);
+        va_start(args, message);
+        targ = Parrot_vsprintf_s(interp, message, args);
+        va_end(args);
 
-    return print_warning(interp, targ);
+        return print_warning(interp, targ);
+    }
 }
 
 /*
