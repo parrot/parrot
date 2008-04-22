@@ -250,28 +250,98 @@ following Perl 5 pseudocode, for the grapheme C<0x438 0x30F>:
 
 =head2 String API
 
-Strings have the following structure:
+Strings in the Parrot core should use the Parrot C<STRING> structure. Parrot
+developers generally shouldn't deal with C<char *> or other string-like types
+outside of this abstraction. It's also best not to access members of the
+C<STRING> structure directly. The interpretation of the data inside the
+structure is determined by the data's encoding. Parrot's strings are
+encoding-aware so your functions don't need to be.
+
+Parrot's internal strings (C<STRING>s) have the following structure:
 
   struct parrot_string_t {
       UnionVal                      cache;
       Parrot_UInt                   flags;
       UINTVAL                       bufused;
-      UINTVAL                       hashval;
       UINTVAL                       strlen;
-      char                         *strstart;
+      UINTVAL                       hashval;
       const struct _encoding       *encoding;
       const struct _charset        *charset;
       const struct _normalization  *normalization;
   };
 
-Deprecation note: the enum C<parrot_string_representation_t> will be removed.
+The fields are:
 
-The current string functions will on the whole be maintained, with some
-modifications for the addition of the NFG string format.
+=over 4
+
+=item cache
+
+A structure that holds the buffer for the string data and the size of the
+buffer in bytes.
+
+{{NOTE: this is currently called "cache" for compatibility with PMC structures.
+As we move toward eliminating the cache from PMCs, we will flatten out this
+union value in the string structure to two members: a string buffer and the
+size of the buffer used.}}
+
+=item flags
+
+Binary flags used for garbage collection, copy-on-write tracking, and other
+metadata.
+
+=item bufused
+
+The amount of the buffer currently in use, in bytes.
+
+=item strlen
+
+The length of the string, in bytes. {{NOTE, not in characters, as characters
+may be variably sized.}}
+
+=item hashval
+
+A cache of the hash value of the string, for rapid lookups when the string is
+used as a hash key.
+
+=item encoding
+
+How the data is encoded (e.g. fixed 8-bit characters, UTF-8, or UTF-32).  Note
+that this specifies encoding only -- it's valid to encode  EBCDIC characters
+with the UTF-8 algorithm. Silly, but valid.
+
+The encoding structure specifies the encoding (by index number and by name,
+for ease of lookup), the maximum number of bytes that a single character will
+occupy in that encoding, as well as functions for manipulating strings with
+that encoding.
+
+=item charset
+
+What sort of string data is in the buffer, for example ASCII, EBCDIC, or
+Unicode.
+
+The charset structure specifies the character set (by index number and by 
+name) and provides functions for transcoding to and from that character set.
+
+=item normalization
+
+What normalization form the string data is in, one of the 4 Unicode
+normalization forms or NFG. This structure stores information about the current
+normalization form, function pointers for composition and decomposition for the
+current normalization form, and a pointer to the grapheme table for NFG.
+
+=back
+
+
+{{DEPRECATION NOTE: the enum C<parrot_string_representation_t> will be removed
+from the parrot string structure. It's been commented out for years.}}
+
+{{DEPRECATION NOTE: the C<char *> pointer C<strstart> will be removed. It
+complicates the entire string subsystem for a tiny optimization on substring
+operations, and offset math is messy with encodings that aren't byte-based.}}
 
 =head3 Conversions between normalization form, encoding, and charset
 
-Conversion will be done with a function called C<string_grapheme_copy>:
+Conversion will be done with a function called C<Parrot_string_grapheme_copy>:
 
     INTVAL string_grapheme_copy(STRING *src, STRING *dst)
 
@@ -285,7 +355,445 @@ C<set_grapheme> on the destination string (which may append multiple
 characters in non-NFG strings). This conversion effectively uses an
 intermediate NFG representation.
 
+=head2 String Subsystem
+
+The following functions are used internally to initialise and terminate the
+string allocation and garbage collection subsystem.
+
+=head3 Parrot_string_system_init (was string_init)
+
+Initialize Parrot's string subsystem.
+
+=head3 Parrot_string_system_end (was string_deinit)
+
+Terminate Parrot's string subsystem (clean up).
+
+=head2 String Interface Functions
+
+The current string functions will be maintained, with some modifications for
+the addition of the NFG string format. Many string functions that are part of
+Parrot's external API will be renamed for the standard "Parrot_*" naming
+conventions.
+
+=head3 Parrot_string_set (was string_set)
+
+Set one string to a copy of the value of another string.
+
+=head3 Parrot_string_new_COW (was Parrot_make_COW_reference)
+
+Create a new copy-on-write string. Creating a new string header, clone the
+struct members of the original string, and point to the same string buffer as
+the original string.
+
+=head3 Parrot_string_reuse_COW (was Parrot_reuse_COW_reference)
+
+Create a new copy-on-write string. Clone the struct members of the original
+string into a passed in string header, and point the reused string header to
+the same string buffer as the original string.
+
+=head3 Parrot_string_write_COW (was Parrot_unmake_COW)
+
+If the specified Parrot string is copy‐on‐write, copy the string value to a new
+string buffer and clear the copy-on-write flag.
+
+=head3 Parrot_string_concat (was string_concat)
+
+Concatenate two strings. Takes three arguments: two strings, and one integer
+value of flags. If both string arguments are null, returns a new string created
+according to the integer flags.
+
+=head3 Parrot_string_append (was string_append)
+
+Append one string to another and return the result. In the default case, the
+return value is the same as the first string argument (the argument is modified
+by the operation). If the first argument is COW or read-only, then the return
+value is a new string.
+
+=head3 Parrot_string_from_cstring (was string_from_cstring)
+
+Create a Parrot string from a C string (a C<char *>). Takes two arguments, a C
+string, and an integer length of the string (number of characters). If the
+integer length isn't passed, the function will calculate the length.
+
+{{NOTE: the integer length isn't really necessary, and is under consideration
+for deprecation.}}
+
+=head3 Parrot_constant_string_new (was const_string)
+
+Creates and returns a new Parrot constant string. Takes one C string (a C<char
+*>) as an argument, the value of the constant string. The length of the C
+string is calculated internally.
+
+=head3 Parrot_string_new
+
+Return a new string with the default encoding and character set. Accepts one
+argument, a C string (C<char *>) to initialize the value of the string.
+
+=head3 Parrot_string_new_noinit (was string_make_empty)
+
+Returns a new empty string with the default encoding and chararacter set.
+
+=head3 Parrot_string_new_init (was string_make_direct)
+
+Returns a new string of the requested encoding, character set, and
+normalization form, initializing the string value to the value passed in. Takes
+5 arguments, a C string (C<char *>), an integer length of the string argument
+in bytes, and struct pointers for encoding, character set, and normalization
+form structs. If the C string (C<char *>) value is not passed, returns an empty
+string. If the encoding, character set, or normalization form are passed as
+null values, default values are used.
+
+{{NOTE: the crippled version of this function, C<string_make>, used to accept a
+string name for the character set. This behavior is no longer supported, but
+C<Parrot_find_encoding> and C<Parrot_find_charset> can be called to look up the
+encoding or character set structs.}}
+
+=head3 Parrot_string_resize (was string_grow)
+
+Resize the string buffer of the given string adding the number of bytes passed
+in the integer argument. If the argument is negative, remove the given number
+of bytes. Throws an exception if shrinking the string buffer size will truncate
+the string (if C<strlen> will be longer than C<buflen>).
+
+=head3 Parrot_string_length (was string_compute_strlen)
+
+Returns the number of characters in the string. Combining characters are each
+counted separately. Variable-width encodings may lookahead.
+
+=head3 Parrot_string_grapheme_length
+
+Returns the number of graphemes in the string. Groups of combining characters
+count as a single grapheme.
+
+=head3 Parrot_string_byte_length (was string_length)
+
+Returns the number of bytes in the string. The character width of
+variable-width encodings is ignored. Combining characters are not treated any
+differently than other characters. This is equivalent to directly accessing the
+C<strlen> member of the C<STRING> struct.
+
+=head3 Parrot_string_index (was string_index)
+
+Returns the character at the specified index (the Nth character from the start
+of the string). Combining characters are counted separately. Variable-width
+encodings will lookahead to capture full character values.
+
+=head3 Parrot_string_grapheme_index
+
+Returns the grapheme at the specified index (the Nth grapheme from the start of
+the string). Groups of combining characters count as a single grapheme, so this
+function may return multiple characters.
+
+=head3 Parrot_string_find_substr (was string_str_index)
+
+Search for a given substring within a string. If it's found, return an integer
+index to where the substring was found (the Nth character from the start of the
+string). Combining characters are counted separately. Variable-width encodings
+will lookahead to capture full character values. Returns -1 if the substring is
+not found.
+
+=head3 Parrot_string_copy (was string_copy)
+
+Make a COW copy a string (a new string header pointing to the same string
+buffer).
+
+=head3 Parrot_string_grapheme_copy (new)
+
+Accepts two string arguments: a destination and a source. Iterates through the
+source string one grapheme at a time and appends it to the destination string.
+
+This function can be used to convert a string of one format to another format.
+
+=head3 Parrot_string_repeat (was string_repeat)
+
+Return a string containing the passed string argument, repeated the number of
+times in the integer argument.
+
+=head3 Parrot_string_substr (was string_substr)
+
+Return a substring starting at an integer offset with an integer length. The
+offset and length specify characters. Combining characters are counted
+separately. Variable-width encodings will lookahead to capture full character
+values.
+
+=head3 Parrot_string_grapheme_substr
+
+Return a substring starting at an integer offset with an integer length. The
+offset and length specify graphemes. Groups of combining characters count as a
+single grapheme.
+
+=head3 Parrot_string_replace (was string_replace)
+
+Replaces a substring within the first string argument with the second string
+argument. An integer offset and length, in characters, specify where the
+removed substring starts and how long it is.
+
+=head3 Parrot_string_grapheme_replace
+
+Replaces a substring within the first string argument with the second string
+argument. An integer offset and length, in graphemes, specify where the removed
+substring starts and how long it is.
+
+=head3 Parrot_string_chopn (was string_chopn)
+
+Chop the requested number of characters off the end of a string without
+modifying the original string.
+
+=head3 Parrot_string_chopn_inplace (was string_chopn_inplace).
+
+Chop the requested number of characters off the end of a string, modifying the
+original string.
+
+=head3 Parrot_string_grapheme_chopn
+
+Chop the requested number of graphemes off the end of a string without
+modifying the original string.
+
+
+
+=head2 Internal String Functions
+
+=head3 string_max_bytes
+
+Calculate the number of bytes needed to contain a given number of characters in
+a particular encoding. It multiplies the maximum possible width of a character
+in the encoding by the number of characters requested.
+
+{{NOTE: pretty primitive and not very useful. May be deprecated.}}
+
+=head2 Deprecated String Functions
+
+The following string functions are slated to be deprecated.
+
+=head3 string_primary_encoding_for_representation
+
+Not useful, it only ever returned ASCII.
+
+=head3 string_rep_compatible
+
+Only useful on a very narrow set of string encodings/character sets.
+
+=head3 string_make
+
+This was a crippled version of a string initializer, now replaced with the full
+version C<Parrot_string_new_init>.
+
+=head3 string_capacity
+
+This was used to calculate the size of the buffer after the C<strstart>
+pointer. Deprecated with C<strstart>.
+
+=head3 string_ord
+
+Replaced by C<Parrot_string_index>.
+
+=head3 string_chr
+
+This is handled just fine by C<Parrot_string_new>, we don't need a special
+version for a single character.
+
+=head3 make_writable
+
+An archaic function that uses a method of describing strings that hasn't been
+allowed for years.
+
 =head2 String PMC API
+
+The String PMC provides a high-level object interface to the string
+functionality. It contains a standard Parrot string, holding the string data.
+
+=head3 Vtable Functions
+
+The String PMC implements the following vtable functions.
+
+=over 4
+
+=item init
+
+Initialize a new String PMC.
+
+=item new_from_string
+
+Create a new String PMC from a Parrot string argument.
+
+=item clone
+
+Clone a String PMC.
+
+=item mark
+
+Mark the string value of the String PMC as live.
+
+
+=item get_integer
+
+Return the integer representation of the string.
+
+=item get_number
+
+Return the floating-point representation of the string.
+
+=item get_bignum
+
+Return the big number representation of the string.
+
+=item get_string
+
+Return the string value of the String PMC.
+
+=item get_bool
+
+Return the boolean value of the string.
+
+=item set_integer_native
+
+Set the string to an integer value, transforming the integer to its string
+equivalent.
+
+=item set_bool
+
+Set the string to a boolean (integer) value, transforming the boolean to its
+string equivalent.
+
+=item set_number_native
+
+Set the string to a floating-point value, transforming the number to its string
+equivalent.
+
+=item set_string_native
+
+Set the String PMC's stored string value to be the string argument. If the
+passed in string is a constant, store a copy.
+
+=item assign_string_native
+
+Set the String PMC's stored string value to a copy of the string argument.
+
+=item set_string_same
+
+Set the String PMC's stored string value to be the same as another String PMC's
+stored string value. {{NOTE: uses direct access into the storage of the two
+PMCs, very ugly.}}
+
+=item set_pmc
+
+Set the String PMC's stored string value to be the same as another PMC's string
+value, as returned by that PMC's C<get_string> vtable function.
+
+=item *bitwise*
+
+All the bitwise string vtable functions, for AND, OR, XOR, and NOT, both
+inplace and standard return.
+
+=item is_equal
+
+Compares the string values of two PMCs and returns true if they match exactly.
+
+=item is_equal_num
+
+Compares the numeric values of two PMCs (first transforming any strings to
+numbers) and returns true if they match exactly.
+
+=item is_equal_string
+
+Compares the string values of two PMCs and returns true if they match exactly.
+{{NOTE: the documentation for the PMC says that it returns FALSE if they match.
+This is not the desired behavior.}}
+
+=item is_same
+
+Compares two PMCs and returns true if they are the same PMC class and contain
+the same string (not an equivalent string value, but aliases to the same
+low-level string).
+
+=item cmp
+
+Compares two PMCs and returns 1 if SELF is shorter, 0 if they are equal length
+strings, and -1 if the passed in string argument is shorter.
+
+=item cmp_num
+
+Compares the numeric values of two PMCs (first changing those values to
+numbers) and returns 1 if SELF is smaller, 0 if they are equal, and -1 if the
+passed in string argument is smaller.
+
+=item cmp_string
+
+Compares two PMCs and returns 1 if SELF is shorter, 0 if they are equal length
+strings, and -1 if the passed in string argument is shorter.
+
+=item substr
+
+Extract a substring of a given length starting from a given offset (in
+graphemes) and store the result in the string argument.
+
+=item substr_str
+
+Extract a substring of a given length starting from a given offset (in
+graphemes) and return the string.
+
+=item exists_keyed
+
+Return true if the Nth grapheme in the string exists. Negative numbers count
+from the end.
+
+=item get_string_keyed
+
+Return the Nth grapheme in the string. Negative numbers count from the end.
+
+=item set_string_keyed
+
+Insert a string at the Nth grapheme position in the string. {{NOTE: this is
+different than the current implementation.}}
+
+=item get_integer_keyed
+
+Returns the integer value of the Nth C<char> in the string. {{DEPRECATE}}
+
+=item set_integer_keyed
+
+Replace the C<char> at the Nth character position in the string with the
+C<char> that corresponds to the passed integer value key. {{DEPRECATE}}
+
+=back
+
+=head3 Methods
+
+The String PMC provides the following methods.
+
+=over 4
+
+=item replace
+
+Replace every occurance of one string with another.
+
+=item to_int
+
+Return the integer equivalent of a string.
+
+=item lower
+
+Change the string to all lowercase.
+
+=item trans
+
+Translate an ASCII string with entries from a translation table.
+
+{{NOTE: likely to be deprecated.}}
+
+=item reverse
+
+Reverse a string, one grapheme at a time. {{NOTE: Currenly only works for ASCII
+strings, because it reverses one C<char> at a time.}}
+
+
+=item is_integer
+
+Checks if the string is just an integer. {{NOTE: Currently only works for ASCII
+strings, fix or deprecate.}}
+
+=back
+
 
 =head1 REFERENCES
 
