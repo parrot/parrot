@@ -121,7 +121,6 @@ _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
  * These instructions need special handling at various points in the code.
  */
 
-static int r_special[5];
 static int w_special[1+4*3];
 
 /*
@@ -149,38 +148,6 @@ imcc_init_tables(PARROT_INTERP)
             w_special[i] = n;
         }
     }
-}
-
-/*
-
-=item C<int ins_reads2>
-
-Returns TRUE if instruction ins reads from a register of type t
-
-=cut
-
-*/
-
-int
-ins_reads2(ARGIN(const Instruction *ins), int t)
-{
-    const char *p;
-
-    if (ins->opnum == r_special[0])
-        return 1;
-
-    p = strchr(types, t);
-
-    if (p) {
-        const size_t idx = p - types;
-        size_t i;
-
-        for (i = 1; i < N_ELEMENTS(r_special); i += 4)
-            if (ins->opnum == r_special[i + idx])
-                return 1;
-    }
-
-    return 0;
 }
 
 /*

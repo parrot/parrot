@@ -170,9 +170,6 @@ int ins_print(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*fd);
 
-int ins_reads2(ARGIN(const Instruction *ins), int t)
-        __attribute__nonnull__(1);
-
 int ins_writes2(ARGIN(const Instruction *ins), int t)
         __attribute__nonnull__(1);
 
