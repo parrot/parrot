@@ -480,6 +480,10 @@ sub make_op {
     my $next     = 0;
     my $restart  = 0;
 
+    unless ($flags =~ m/:flow\b/) {
+        $body .= "\ngoto NEXT();";
+    }
+
     foreach my $variant ( expand_args(@$args) ) {
         my (@fixedargs) = split( /,/, $variant );
         my $op =
@@ -487,10 +491,6 @@ sub make_op {
             $flags );
         my $op_size = $op->size;
         my $jumps   = "0";
-
-        unless ($flags =~ m/:flow\b/) {
-            $body .= "\ngoto NEXT();";
-        }
 
         #
         # Macro substitutions:
