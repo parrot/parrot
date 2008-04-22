@@ -38,22 +38,18 @@ my %expected = (
 Hello World
 END_EXPECTED
 
-    'stack.pasm' => << 'END_EXPECTED',
-9876543210 9876543210 0123456789 0123456789 9876543210 9876543210
-END_EXPECTED
-
-    'xml_parser.pasm' => << 'END_EXPECTED',
-Start xml version=1.0
-Start top
-Start inner foo=bar narf=poit
-Start junk
-Data Hello
-Close junk
-Start empty
-Close empty
-Close inner
-Close top
-END_EXPECTED
+#    'xml_parser.pasm' => << 'END_EXPECTED',
+#Start xml version=1.0
+#Start top
+#Start inner foo=bar narf=poit
+#Start junk
+#Data Hello
+#Close junk
+#Start empty
+#Close empty
+#Close inner
+#Close top
+#END_EXPECTED
 
 );
 
