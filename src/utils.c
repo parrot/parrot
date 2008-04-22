@@ -98,32 +98,34 @@ PARROT_CONST_FUNCTION
 INTVAL
 intval_mod(INTVAL i2, INTVAL i3)
 {
-    INTVAL y;
     INTVAL z = i3;
-    int s = 0;
-    INTVAL r;
 
     if (z == 0)
         return i2;
+    else {
+        INTVAL r;
+        INTVAL y;
+        int s = 0;
 
-    y = i2;
+        y = i2;
 
-    if (y < 0) { s += 2; y = -y; }
-    if (z < 0) { s += 1; z = -z; }
+        if (y < 0) { s += 2; y = -y; }
+        if (z < 0) { s += 1; z = -z; }
 
-    r = y % z;
+        r = y % z;
 
-    if (r) {    /* # 36003 */
-        switch (s) {
-            case 0:            break;
-            case 1: r = r - z; break;
-            case 2: r = z - r; break;
-            case 3: r = -r;    break;
-            default:           break;
+        if (r) {    /* # 36003 */
+            switch (s) {
+                case 0:            break;
+                case 1: r = r - z; break;
+                case 2: r = z - r; break;
+                case 3: r = -r;    break;
+                default:           break;
+            }
         }
-    }
 
-    return r;
+        return r;
+    }
 }
 
 /*
@@ -756,9 +758,9 @@ Parrot_register_move(PARROT_INTERP,
         ARGIN(void *info))
 {
     int i;
-    int max_reg = 0;
-    int* nb_succ = NULL;
-    int* backup = NULL;
+    int max_reg       = 0;
+    int* nb_succ      = NULL;
+    int* backup       = NULL;
     int* reg_to_index = NULL;
     parrot_prm_context c;
 
