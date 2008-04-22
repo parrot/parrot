@@ -442,7 +442,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-key_next(PARROT_INTERP, ARGIN(const PMC *key))
+key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
     return
         VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext ?
