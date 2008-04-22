@@ -50,7 +50,7 @@ Make a tailcall to method $2 with invocant $1.
 
 =cut
 
-op callmethodcc(invar PMC, in STR) :object_base {
+op callmethodcc(invar PMC, in STR) :object_base :flow {
   PMC      * const object     = $1;
   STRING   * const meth       = $2;
   opcode_t * const next       = expr NEXT();
@@ -79,7 +79,7 @@ op callmethodcc(invar PMC, in STR) :object_base {
   goto ADDRESS(dest);
 }
 
-op callmethodcc(invar PMC, invar PMC) :object_base {
+op callmethodcc(invar PMC, invar PMC) :object_base :flow {
   PMC      * const object     = $1;
   PMC      * const method_pmc = $2;
   opcode_t * const next       = expr NEXT();
@@ -93,7 +93,7 @@ op callmethodcc(invar PMC, invar PMC) :object_base {
   goto ADDRESS(dest);
 }
 
-op callmethod(invar PMC, in STR, invar PMC) :object_base {
+op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
   PMC      * const object     = $1;
   STRING   * const meth       = $2;
   opcode_t * const next       = expr NEXT();
@@ -116,7 +116,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base {
   goto ADDRESS(dest);
 }
 
-op callmethod(invar PMC, invar PMC, invar PMC) :object_base {
+op callmethod(invar PMC, invar PMC, invar PMC) :object_base :flow {
   PMC      * const object     = $1;
   PMC      * const method_pmc = $2;
   opcode_t * const next       = expr NEXT();
@@ -129,7 +129,7 @@ op callmethod(invar PMC, invar PMC, invar PMC) :object_base {
   goto ADDRESS(dest);
 }
 
-op tailcallmethod(invar PMC, in STR) :object_base {
+op tailcallmethod(invar PMC, in STR) :object_base :flow {
   opcode_t * const next       = expr NEXT();
   PMC      * const object     = $1;
   STRING   * const meth       = $2;
@@ -149,7 +149,7 @@ op tailcallmethod(invar PMC, in STR) :object_base {
   goto ADDRESS(dest);
 }
 
-op tailcallmethod(invar PMC, invar PMC) :object_base {
+op tailcallmethod(invar PMC, invar PMC) :object_base :flow {
   opcode_t * const next       = expr NEXT();
   PMC      * const object     = $1;
   PMC      * const method_pmc = $2;

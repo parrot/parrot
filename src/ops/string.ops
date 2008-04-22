@@ -110,12 +110,10 @@ See F<src/ops/math.ops> for the general C<infix> and C<n_infix> syntax.
 
 inline op concat(inout STR, in STR) :base_mem {
     $1 = string_append(interp, $1, $2);
-    goto NEXT();
 }
 
 inline op concat(out STR, in STR, in STR) :base_mem {
     $1 = string_concat(interp, $2, $3, 1);
-    goto NEXT();
 }
 
 
