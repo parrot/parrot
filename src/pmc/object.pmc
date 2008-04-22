@@ -376,7 +376,7 @@ Get the class PMC representing the class that this object is an instance of.
 =cut
 
 */
-    VTABLE PMC *get_class() :const {
+    VTABLE PMC *get_class() {
         PMC    * const classobj = PARROT_OBJECT(SELF)->_class;
         STRING *get_class       = CONST_STRING(interp, "get_class");
         /* If there's a vtable override for 'get_class' run that instead. */
@@ -437,7 +437,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    VTABLE INTVAL isa(STRING *classname) :const {
+    VTABLE INTVAL isa(STRING *classname) {
         PMC   *_class;
 
         if (SUPER(classname))

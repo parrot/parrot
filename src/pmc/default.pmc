@@ -931,7 +931,7 @@ true (1) is returned; otherwise, false (0) is returned.
 
 */
 
-    VTABLE INTVAL isa(STRING *_class) :const {
+    VTABLE INTVAL isa(STRING *_class) {
         /* RT#46665 - walk mro */
         return does_isa(INTERP, _class, SELF->vtable->isa_str);
     }
@@ -1007,7 +1007,7 @@ Look for NCI methods and properties.
 =cut
 
 */
-    VTABLE PMC *get_class() :const {
+    VTABLE PMC *get_class() {
         /* Create a proxy */
         INTVAL type = VTABLE_type(interp, SELF);
         PMC *type_num = pmc_new(interp, enum_class_Integer);

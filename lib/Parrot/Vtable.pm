@@ -134,8 +134,7 @@ sub vtbl_defs {
 
     for $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
-        my $type = $$entry[5]{const} ? 'const PMC* pmc' : 'PMC* pmc';
-        my $args = join( ", ", 'PARROT_INTERP', $type, split( /\s*,\s*/, $entry->[2] ) );
+        my $args = join( ", ", 'PARROT_INTERP', 'PMC* pmc', split( /\s*,\s*/, $entry->[2] ) );
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
 

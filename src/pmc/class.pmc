@@ -1190,7 +1190,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    VTABLE INTVAL isa(STRING *classname) :const {
+    VTABLE INTVAL isa(STRING *classname) {
         Parrot_Class * const _class = PARROT_CLASS(SELF);
 
         INTVAL i, num_parents;
