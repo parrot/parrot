@@ -80,7 +80,10 @@ Returns a Parrot string for C<*key>.
 
 */
 
-static STRING *make_hash_key(PARROT_INTERP, NOTNULL(PMC *key))
+
+PARROT_CANNOT_RETURN_NULL
+static STRING
+*make_hash_key(PARROT_INTERP, NOTNULL(PMC *key))
 {
     if (!key)
         real_exception(interp, NULL, E_KeyError, "Hash: Cannot use NULL key");
@@ -559,7 +562,7 @@ Returns the PMC value for the element at C<*key>.
 
     VTABLE PMC *get_iter() {
         PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-        PMC * const key      =  pmc_new(INTERP, enum_class_Key);
+        PMC * const key      = pmc_new(INTERP, enum_class_Key);
 
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
