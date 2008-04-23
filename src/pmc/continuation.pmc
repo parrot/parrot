@@ -83,8 +83,10 @@ Marks the continuation as live.
 
     VTABLE void mark() {
         Parrot_cont *cc = PMC_cont(SELF);
+
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
+
         if (cc->dynamic_state)
             mark_stack(INTERP, cc->dynamic_state);
     }
@@ -111,6 +113,7 @@ Destroys the continuation.
 #endif
             if (cc->from_ctx)
                 Parrot_free_context(interp, cc->from_ctx, 0);
+
             mem_sys_free(cc);
             PMC_struct_val(SELF) = NULL;
         }

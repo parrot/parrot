@@ -151,6 +151,7 @@ Swaps the "context".
 
             co->ctx                   = ctx;
             co->dynamic_state         = interp->dynamic_env;
+
             ctx->caller_ctx           = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
             ctx->current_sub          = SELF;
@@ -252,13 +253,14 @@ Marks the coroutine as live.
 */
 
     VTABLE void mark() {
-        Parrot_coro * const c = PMC_coro(SELF);
+        Parrot_coro * const co = PMC_coro(SELF);
 
-        if (c) {
-            if (c->ctx)
-                mark_context(INTERP, c->ctx);
-            if (c->dynamic_state)
-                mark_stack(INTERP, c->dynamic_state);
+        if (co) {
+            if (co->ctx)
+                mark_context(INTERP, co->ctx);
+            if (co->dynamic_state)
+                mark_stack(INTERP, co->dynamic_state);
+
         }
 
         SUPER();

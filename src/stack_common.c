@@ -75,7 +75,7 @@ register_new_stack(PARROT_INTERP, ARGIN(const char *name), size_t item_size)
     chunk->size = item_size;    /* TODO store the pool instead the size */
 
     /* that's one more reference to this chunk */
-    PMC_int_val((PObj *)chunk)++;
+    chunk->refcount++;
     return chunk;
 }
 
@@ -130,7 +130,7 @@ stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
     new_chunk->prev = chunk;
     *stack_p        = new_chunk;
 
-    PMC_int_val((PObj *)chunk)++;
+    chunk->refcount++;
 
     return STACK_DATAP(new_chunk);
 }
@@ -162,7 +162,10 @@ stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
     *stack_p = chunk->prev;
 
     /* that's one fewer reference to this chunk */
-    PMC_int_val((PObj *)chunk)--;
+    chunk->refcount--;
+    if ((*stack_p)->refcount < chunk->refcount)
+        (*stack_p)->refcount = chunk->refcount;
+
     return STACK_DATAP(chunk);
 }
 

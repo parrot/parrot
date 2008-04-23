@@ -30,6 +30,7 @@ typedef struct Stack_Chunk {
     int                 size;
     const char         *name;
     struct Stack_Chunk *prev;
+    Parrot_UInt         refcount;
     union { /* force appropriate alignment of 'data'.  If alignment
                is necessary, assume double is good enough.  27-04-2007. */
         void *data;
