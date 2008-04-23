@@ -5,7 +5,8 @@
 (define all-tests '())
 
 ;(define implementation "gauche" )
-(define implementation "gen_past_in_pir" )
+;(define implementation "gen_past_in_pir" )
+(define implementation "gen_past_in_nqp" )
 
 (define-syntax add-tests-with-string-output
   (syntax-rules (=>)
@@ -54,10 +55,17 @@
   (case implementation
     ( ("gauche")
       (with-output-to-file "stst.scm" (lambda () (write expr))))
+    ( ("gen_past_in_nqp")
+      (let ((p (open-output-file "gen_past.nqp" 'replace)))
+        (parameterize ((compile-port p))
+           (compile-program expr))
+        (close-output-port p))
+      (unless (zero? (system (string-append *path-to-parrot* "../../compilers/nqp/nqp.pbc --output=gen_past.pir --target=pir gen_past.nqp")))
+        (error 'execute "produced program exited abnormally")))
     (else
       (let ((p (open-output-file "stst.pir" 'replace)))
         (parameterize ((compile-port p))
-           (compile-program expr))
+           (compile-program-old expr))
         (close-output-port p)))))
 
 ; TODO: can I use (directory-separator) in gauche?
@@ -70,6 +78,9 @@
   (case implementation
     ( ("gauche")
       (unless (zero? (system "gosh -fcase-fold -I .  -l gauche/prelude.scm stst.scm > stst.out"))
+        (error 'execute "produced program exited abnormally")))
+    ( ("gen_past_in_nqp")
+      (unless (zero? (system (string-append *path-to-parrot* " driver_nqp.pir > stst.out")))
         (error 'execute "produced program exited abnormally")))
     (else
       (unless (zero? (system (string-append *path-to-parrot* " stst.pir > stst.out")))

@@ -42,6 +42,7 @@ LANGUAGES = \
     pynie \
     regex \
     scheme \
+    squaak \
     tcl \
     unlambda \
     urm
@@ -121,6 +122,7 @@ clean: \
     pynie.clean \
     regex.clean \
     scheme.clean \
+    squaak.clean \
     tcl.clean \
     urm.clean \
     smoke-clean
@@ -132,7 +134,8 @@ realclean: \
     hq9plus.realclean \
     jako.realclean \
     perl6.realclean \
-    unlambda.realclean \
+    squaak.realclean \
+    unlambda.realclean
 
 #
 # Language specific targets
@@ -400,6 +403,15 @@ scheme.test :
 	- $(MAKE) scheme test
 scheme.clean :
 	- $(MAKE) scheme clean
+
+squaak.dummy:
+	- $(MAKE) squaak
+squaak.test:
+	- $(MAKE) squaak test
+squaak.clean:
+	- $(MAKE) squaak clean
+squaak.realclean:
+	- $(MAKE) squaak realclean
 
 tcl: tcl.dummy
 tcl.dummy:

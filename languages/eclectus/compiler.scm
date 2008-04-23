@@ -525,6 +525,30 @@
         (cdr past))
       uid)))
 
+; eventually this will become a NQP generator
+; for PAST as SXML
+; currently it only handles the pushes
+(define past-sxml->past-nqp
+  (lambda (past)
+      (emit "
+            ~a.new( 
+            " (symbol->string (car past))
+      (for-each
+        (lambda (daughter)
+          (if (eq? '@ (car daughter))
+            (for-each
+              (lambda (key_val)
+                (emit "
+                      :~a(~a)
+                      " (car key_val) (cadr key_val))))
+                (cdr daughter))
+              (emit "
+                    reg_~a.push( reg_~a )
+                    " uid (past-sxml->past-pir daughter))))
+        (cdr past))
+      uid))
+      (emit ");") ))
+
 ; print the result of the evaluation
 (define wrap-say
   (lambda (past)
@@ -537,8 +561,8 @@
 (define (normalize-syntax program)
   (sexp/expand program (make-sexp-environment)))
 
-; the actual compiler
-(define compile-program
+; the current compiler, emitting PAST set up in PIR
+(define compile-program-old
   (lambda (program)
     (emit-init)
     (emit-driver)
@@ -548,3 +572,10 @@
       (past-sxml->past-pir
         (wrap-say
           (emit-expr (normalize-syntax program)))))))
+
+; the future compiler, emitting PAST set up in PIR
+(define compile-program
+  (lambda (program)
+    (past-sxml->past-nqp
+      (wrap-say
+        (emit-expr (normalize-syntax program))))))
