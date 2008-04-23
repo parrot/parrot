@@ -967,6 +967,25 @@ C<languages/scheme>
 =back
 
 
+=head2 Squaak
+
+Squaak is not Squeak
+
+=item Status
+
+An example languages from the PCT tutorial.
+
+=item Last verified with parrot version
+
+0.6.1
+
+=item Location
+
+C<languages/squaak>
+
+=back
+
+
 =head2 Tcl ("partcl")
 
 =over 4
