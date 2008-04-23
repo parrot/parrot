@@ -5,8 +5,8 @@
 (define all-tests '())
 
 ;(define implementation "gauche" )
-;(define implementation "gen_past_in_pir" )
-(define implementation "gen_past_in_nqp" )
+(define implementation "gen_past_in_pir" )
+;(define implementation "gen_past_in_nqp" )
 
 (define-syntax add-tests-with-string-output
   (syntax-rules (=>)

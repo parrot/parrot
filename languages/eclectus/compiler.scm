@@ -531,8 +531,8 @@
 (define past-sxml->past-nqp
   (lambda (past)
       (emit "
-            ~a.new( 
-            " (symbol->string (car past))
+            ~a.new 
+            " (symbol->string (car past)))
       (for-each
         (lambda (daughter)
           (if (eq? '@ (car daughter))
@@ -545,9 +545,7 @@
               (emit "
                     reg_~a.push( reg_~a )
                     " uid (past-sxml->past-pir daughter))))
-        (cdr past))
-      uid))
-      (emit ");") ))
+      (emit ";") ) )
 
 ; print the result of the evaluation
 (define wrap-say
