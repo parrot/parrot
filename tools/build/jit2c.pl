@@ -183,7 +183,7 @@ s/PREV_OP\s(..?)\s(\w+)/(jit_info->prev_op) && (*jit_info->prev_op $1 $opcodes{$
 s/CONST\((\d)\)\s*([><=!]=?)\s*CONST\((\d)\)/RCONST($1)->u.number $2 RCONST($3)->u.number/
                     if ( $asm =~ /CONST.*CONST/ );
                 $asm =~
-s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n        Parrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
+s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n        Parrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_DATA, "const_table", 0);/g;
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
             if ( ( $cpuarch eq 'ppc' ) && ( $genfile ne "src/jit_cpu.c" ) ) {

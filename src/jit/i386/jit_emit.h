@@ -2810,7 +2810,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 #      define exec_emit_end(interp, pc) { \
            jit_emit_mov_rm_i(pc, c, 2); \
            Parrot_exec_add_text_rellocation(jit_info->objfile, \
-             0, RTYPE_COM, "cgp_core", 0); \
+             jit_info->native_ptr, RTYPE_COM, "cgp_core", 0); \
            emitm_movl_m_r(interp, jit_info->native_ptr, emit_ESI, emit_ESI, \
              emit_None, 1, 0); \
            emitm_addb_i_r(jit_info->native_ptr, \
