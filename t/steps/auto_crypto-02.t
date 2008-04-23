@@ -82,11 +82,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_crypto-04.t - test config::auto::crypto
+auto_crypto-02.t - test config::auto::crypto
 
 =head1 SYNOPSIS
 
-    % prove t/steps/auto_crypto-04.t
+    % prove t/steps/auto_crypto-02.t
 
 =head1 DESCRIPTION
 
