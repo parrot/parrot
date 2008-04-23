@@ -262,7 +262,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         else {
              PMC * const type_num = pmc_new(interp, enum_class_Integer);
              VTABLE_set_integer_native(interp, type_num, type);
-             return pmc_new_init(interp, enum_class_PMCProxy, type_num);
+             classobj = pmc_new_init(interp, enum_class_PMCProxy, type_num);
         }
     }
 
@@ -382,23 +382,30 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
 {
     Parrot_Class * const _class = PARROT_CLASS(classobj);
 
-    /* Walk and search for the vtable method. */
-    const INTVAL num_classes = VTABLE_elements(interp, _class->all_parents);
-    INTVAL i;
+    if (VTABLE_exists_keyed_str(interp, _class->parent_overrides, name))
+        return VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
+    else {
+        /* Walk and search for the vtable method. */
+        const INTVAL num_classes = VTABLE_elements(interp, _class->all_parents);
+        PMC         *result      = PMCNULL;
+        INTVAL       i;
 
-    for (i = 0; i < num_classes; i++) {
-        /* Get the class. */
-        PMC * const cur_class =
-            VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+        for (i = 0; i < num_classes; i++) {
+            /* Get the class. */
+            PMC * const cur_class =
+                VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
-        PMC * const meth =
-            Parrot_oo_find_vtable_override_for_class(interp, cur_class, name);
+            result = Parrot_oo_find_vtable_override_for_class(interp,
+                        cur_class, name);
 
-        if (!PMC_IS_NULL(meth))
-            return meth;
+            if (!PMC_IS_NULL(result))
+                break;
+        }
+
+        VTABLE_set_pmc_keyed_str(interp, _class->parent_overrides, name, result);
+
+        return result;
     }
-
-    return PMCNULL;
 }
 
 

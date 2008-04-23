@@ -94,7 +94,8 @@ Initializes a PMCProxy PMC.
         _pmc->all_parents     = pmc_new(interp, enum_class_ResizablePMCArray);
         _pmc->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
         _pmc->methods         = pmc_new(interp, enum_class_Hash);
-        _pmc->vtable_overrides = pmc_new(interp, enum_class_Hash);
+        _pmc->vtable_overrides = constant_pmc_new(interp, enum_class_Hash);
+        _pmc->parent_overrides = pmc_new(interp, enum_class_Hash);
         _pmc->attrib_metadata = pmc_new(interp, enum_class_Hash);
         _pmc->attrib_index    = PMCNULL;
         _pmc->attrib_cache    = PMCNULL;
@@ -204,6 +205,8 @@ Mark any referenced strings and PMCs in the structure as live.
             pobject_lives(interp, (PObj*)_pmc->methods);
         if (_pmc->vtable_overrides)
             pobject_lives(interp, (PObj*)_pmc->vtable_overrides);
+        if (_pmc->parent_overrides)
+            pobject_lives(interp, (PObj*)_pmc->parent_overrides);
         if (_pmc->attrib_metadata)
             pobject_lives(interp, (PObj*)_pmc->attrib_metadata);
         if (_pmc->attrib_index)

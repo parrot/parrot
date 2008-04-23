@@ -163,8 +163,6 @@ stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 
     /* that's one fewer reference to this chunk */
     chunk->refcount--;
-    if ((*stack_p)->refcount < chunk->refcount)
-        (*stack_p)->refcount = chunk->refcount;
 
     return STACK_DATAP(chunk);
 }

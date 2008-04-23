@@ -397,6 +397,7 @@ pmclass Class
     ATTR PMC *vtable_cache;     /* Cache of the vtable used for objects (only STM). */
     ATTR PMC *resolve_method;   /* List of method names the class provides to resolve
                                  * conflicts with methods from roles. */
+    ATTR PMC *parent_overrides;
 
 /*
 
@@ -432,7 +433,8 @@ arguments.  The class is attatched to the current HLL namespace.
         _class->all_parents     = pmc_new(interp, enum_class_ResizablePMCArray);
         _class->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
         _class->methods         = pmc_new(interp, enum_class_Hash);
-        _class->vtable_overrides  = pmc_new(interp, enum_class_Hash);
+        _class->vtable_overrides = pmc_new(interp, enum_class_Hash);
+        _class->parent_overrides = constant_pmc_new(interp, enum_class_Hash);
         _class->attrib_metadata = pmc_new(interp, enum_class_Hash);
         _class->attrib_index    = PMCNULL;
         _class->attrib_cache    = PMCNULL;
@@ -604,6 +606,8 @@ Mark any referenced strings and PMCs in the structure as live.
             pobject_lives(interp, (PObj *)_class->methods);
         if (_class->vtable_overrides)
             pobject_lives(interp, (PObj *)_class->vtable_overrides);
+        if (_class->parent_overrides)
+            pobject_lives(interp, (PObj *)_class->parent_overrides);
         if (_class->attrib_metadata)
             pobject_lives(interp, (PObj *)_class->attrib_metadata);
         if (_class->attrib_index)
@@ -961,6 +965,8 @@ namespace). Unsets the instantiated flag, allowing modifications.
         new_class->methods             = VTABLE_clone(interp, _class->methods);
         new_class->vtable_overrides    = VTABLE_clone(interp,
                                             _class->vtable_overrides);
+        new_class->parent_overrides    = VTABLE_clone(interp,
+                                            _class->parent_overrides);
         new_class->attrib_metadata     = VTABLE_clone(interp,
                                             _class->attrib_metadata);
         new_class->resolve_method      = VTABLE_clone(interp,
@@ -1472,6 +1478,8 @@ Called after the class has been thawed.
 
         /* Recalculate full MRO from thawed parents */
         _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+
+        _class->parent_overrides = pmc_new(interp, enum_class_Hash);
 
         /* Rebuild attribute index from thawed attribute metadata */
         build_attrib_index(interp, SELF);
