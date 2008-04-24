@@ -3,6 +3,7 @@
 - Implementation
   + removed user stack opcodes
     (save, restore, lookback, entrytype, depth, rotate_up)
+    (NOTE: This was scheduled to occur after 0.7.0, moved up to this release)
   + removed register stack, saveall & restoreall opcodes
 
 New in 0.6.1
