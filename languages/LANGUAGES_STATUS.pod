@@ -969,6 +969,10 @@ C<languages/scheme>
 
 =head2 Squaak
 
+=over 4
+
+=item Description
+
 Squaak is not Squeak
 
 =item Status
