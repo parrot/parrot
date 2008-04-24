@@ -294,10 +294,6 @@ void PDB_print(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_print_user_stack(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 char PDB_program_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 

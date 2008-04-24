@@ -2376,60 +2376,6 @@ dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<void PDB_print_user_stack>
-
-Print an entry from the user stack.
-
-=cut
-
-*/
-
-void
-PDB_print_user_stack(PARROT_INTERP, ARGIN(const char *command))
-{
-    Stack_Entry_t *entry;
-    long           depth = 0;
-    Stack_Chunk_t * const chunk = CONTEXT(interp)->user_stack;
-
-    command = nextarg(command);
-    if (*command)
-        depth = atol(command);
-
-    entry = stack_entry(interp, chunk, (INTVAL)depth);
-
-    if (!entry) {
-        PIO_eprintf(interp, "No such entry on stack\n");
-        return;
-    }
-
-    switch (entry->entry_type) {
-        case STACK_ENTRY_INT:
-            PIO_eprintf(interp, "Integer\t=\t%8vi\n", UVal_int(entry->entry));
-            break;
-        case STACK_ENTRY_FLOAT:
-            PIO_eprintf(interp, "Float\t=\t%8.4vf\n", UVal_num(entry->entry));
-            break;
-        case STACK_ENTRY_STRING:
-            PIO_eprintf(interp, "String =\n");
-            dump_string(interp, UVal_str(entry->entry));
-            break;
-        case STACK_ENTRY_PMC:
-            PIO_eprintf(interp, "PMC =\n%PS\n", UVal_ptr(entry->entry));
-            break;
-        case STACK_ENTRY_POINTER:
-            PIO_eprintf(interp, "POINTER\n");
-            break;
-        case STACK_ENTRY_DESTINATION:
-            PIO_eprintf(interp, "DESTINATION\n");
-            break;
-        default:
-            PIO_eprintf(interp, "Invalid stack_entry_type!\n");
-            break;
-    }
-}
-
-/*
-
 =item C<void PDB_print>
 
 Print interp registers.
