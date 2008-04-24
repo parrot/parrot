@@ -202,9 +202,6 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* allocate stack chunk cache */
     stack_system_init(interp);
 
-    /* Need a user stack */
-    CONTEXT(interp)->user_stack = new_stack(interp, "User");
-
     /* And a dynamic environment stack */
     interp->dynamic_env = new_stack(interp, "DynamicEnv");
 
@@ -441,7 +438,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* deinit op_lib */
     (void) PARROT_CORE_OPLIB_INIT(0);
 
-    stack_destroy(CONTEXT(interp)->user_stack);
     stack_destroy(interp->dynamic_env);
 
     destroy_context(interp);

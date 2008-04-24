@@ -40,8 +40,6 @@ mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
     PObj *obj;
     int   i;
 
-    mark_stack(interp, ctx->user_stack);
-
     obj = (PObj *)ctx->current_sub;
     if (obj)
         pobject_lives(interp, obj);

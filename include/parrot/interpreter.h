@@ -214,7 +214,6 @@ typedef struct Parrot_Context {
     size_t regs_mem_size;               /* memory occupied by registers */
     int ref_count;                      /* how often refered to */
 
-    struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     PMC      *lex_pad;                  /* LexPad PMC */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
     UINTVAL warns;             /* Keeps track of what warnings

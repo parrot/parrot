@@ -295,7 +295,6 @@ init_context(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
     if (old) {
         /* some items should better be COW copied */
         ctx->constants = old->constants;
-        ctx->user_stack = old->user_stack;   /* RT#46183 move into interpreter? */
         ctx->warns = old->warns;
         ctx->errors = old->errors;
         ctx->trace_flags = old->trace_flags;
