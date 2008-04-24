@@ -14,14 +14,10 @@
 
 typedef enum {
     NO_STACK_ENTRY_TYPE     = 0,
-    STACK_ENTRY_INT         = 1,
-    STACK_ENTRY_FLOAT       = 2,
-    STACK_ENTRY_STRING      = 3,
-    STACK_ENTRY_PMC         = 4,
-    STACK_ENTRY_POINTER     = 5,
-    STACK_ENTRY_DESTINATION = 6,
-    STACK_ENTRY_MARK        = 7,
-    STACK_ENTRY_ACTION      = 8
+    STACK_ENTRY_MARK        = 1,
+    STACK_ENTRY_DESTINATION = 2,
+    STACK_ENTRY_ACTION      = 3,
+    STACK_ENTRY_PMC         = 4
 } Stack_entry_type;
 
 typedef enum {

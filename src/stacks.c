@@ -71,18 +71,8 @@ mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
         entry_data = STACK_DATAP(chunk);
         entry      = (Stack_Entry_t *)entry_data;
 
-        switch (entry->entry_type) {
-            case STACK_ENTRY_PMC:
-                if (UVal_pmc(entry->entry))
-                    pobject_lives(interp, (PObj *)UVal_pmc(entry->entry));
-                break;
-            case STACK_ENTRY_STRING:
-                if (UVal_str(entry->entry))
-                    pobject_lives(interp, (PObj *)UVal_str(entry->entry));
-                break;
-            default:
-                break;
-        }
+        if (entry->entry_type == STACK_ENTRY_PMC && UVal_pmc(entry->entry))
+            pobject_lives(interp, (PObj *)UVal_pmc(entry->entry));
     }
 }
 
@@ -265,23 +255,15 @@ stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
 
     /* Store our thing */
     switch (type) {
-        case STACK_ENTRY_INT:
         case STACK_ENTRY_MARK:
             UVal_int(entry->entry) = *(INTVAL *)thing;
             break;
-        case STACK_ENTRY_FLOAT:
-            UVal_num(entry->entry) = *(FLOATVAL *)thing;
+        case STACK_ENTRY_DESTINATION:
+            UVal_ptr(entry->entry) = thing;
             break;
         case STACK_ENTRY_ACTION:
         case STACK_ENTRY_PMC:
             UVal_pmc(entry->entry) = (PMC *)thing;
-            break;
-        case STACK_ENTRY_STRING:
-            UVal_str(entry->entry) = (STRING *)thing;
-            break;
-        case STACK_ENTRY_POINTER:
-        case STACK_ENTRY_DESTINATION:
-            UVal_ptr(entry->entry) = thing;
             break;
         default:
             real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
@@ -322,22 +304,14 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
         /* Snag the value */
         switch (type) {
         case STACK_ENTRY_MARK:
-        case STACK_ENTRY_INT:
             *(INTVAL *)where   = UVal_int(entry->entry);
             break;
-        case STACK_ENTRY_FLOAT:
-            *(FLOATVAL *)where = UVal_num(entry->entry);
+        case STACK_ENTRY_DESTINATION:
+            *(void **)where    = UVal_ptr(entry->entry);
             break;
         case STACK_ENTRY_ACTION:
         case STACK_ENTRY_PMC:
             *(PMC **)where     = UVal_pmc(entry->entry);
-            break;
-        case STACK_ENTRY_STRING:
-            *(STRING **)where  = UVal_str(entry->entry);
-            break;
-        case STACK_ENTRY_POINTER:
-        case STACK_ENTRY_DESTINATION:
-            *(void **)where    = UVal_ptr(entry->entry);
             break;
         default:
             real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
@@ -405,13 +379,10 @@ stack_peek(PARROT_INTERP, ARGIN(Stack_Chunk_t *stack_base),
     if (type != NULL)
         *type = entry->entry_type;
 
-    switch (entry->entry_type) {
-        case STACK_ENTRY_POINTER:
-        case STACK_ENTRY_DESTINATION:
-            return UVal_ptr(entry->entry);
-        default:
-            return (void *) UVal_pmc(entry->entry);
-    }
+    if (entry->entry_type == STACK_ENTRY_DESTINATION)
+        return UVal_ptr(entry->entry);
+
+    return (void *) UVal_pmc(entry->entry);
 }
 
 /*
