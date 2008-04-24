@@ -1,5 +1,10 @@
 # $Id$
 
+- Implementation
+  + removed user stack opcodes
+    (save, restore, lookback, entrytype, depth, rotate_up)
+  + removed register stack, saveall & restoreall opcodes
+
 New in 0.6.1
 - Specification
   + drafted pdd29_compiler_tools.pod

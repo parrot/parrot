@@ -19,7 +19,6 @@ OPS_FILES = \
     $(OPS_DIR)/pic.ops \
     $(OPS_DIR)/pmc.ops \
     $(OPS_DIR)/set.ops \
-    $(OPS_DIR)/stack.ops \
     $(OPS_DIR)/string.ops \
     $(OPS_DIR)/sys.ops \
     $(OPS_DIR)/var.ops \
