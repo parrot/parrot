@@ -90,10 +90,11 @@ sub _evaluate_cc_run {
     my $self = shift;
     my ($conf, $test, $has_crypto, $verbose) = @_;
     if ( $test =~ m/^OpenSSL (\d\.\d\.\d\w)/ ) {
+        my $version = $1;
         $has_crypto = 1;
-        $conf->data->set( openssl_version => $1 );
+        $conf->data->set( openssl_version => $version );
         print " (yes) " if $verbose;
-        $self->set_result("yes, $1");
+        $self->set_result("yes, $version");
     }
     return $has_crypto;
 }

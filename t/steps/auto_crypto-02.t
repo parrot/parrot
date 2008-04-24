@@ -17,7 +17,7 @@ use IO::CaptureOutput qw| capture |;
 
 my $args = process_options(
     {
-        argv => [ q{--without-crypto} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
