@@ -192,10 +192,10 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 
 #  if ! DISABLE_GC_DEBUG
 #    if GC_VERBOSE
-    if (CONSERVATIVE_POINTER_CHASING) {
+    if (CONSERVATIVE_POINTER_CHASING)
         fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
                 PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
-    }
+
 #    endif
 #  endif
     /* mark it live */
@@ -206,37 +206,25 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
     if (PObj_is_PMC_TEST(obj)) {
         PMC * const p = (PMC *)obj;
 
-        if (p->real_self && p->real_self != p)
+        if (p->real_self != p)
             pobject_lives(interp, (PObj *)p->real_self);
-    }
 
-    /* if object is a PMC and contains buffers or PMCs, then attach
-     * the PMC to the chained mark list.
-     */
-    if (PObj_is_special_PMC_TEST(obj)) {
-        mark_special(interp, (PMC*) obj);
-    }
+        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
+         * to the chained mark list. */
+        if (PObj_is_special_PMC_TEST(obj))
+            mark_special(interp, p);
+
 #  ifndef NDEBUG
-    else {
-        if (PObj_is_PMC_TEST(obj)) {
-            PMC * const p = (PMC*)obj;
-
-            if (p->pmc_ext && PMC_metadata(p)) {
-                fprintf(stderr, "GC: error obj %p (%s) has properties\n",
-                        (void *)p, (char*)p->vtable->whoami->strstart);
-            }
-        }
+        else if (p->pmc_ext && PMC_metadata(p))
+            fprintf(stderr, "GC: error obj %p (%s) has properties\n",
+                    (void *)p, (char*)p->vtable->whoami->strstart);
     }
 #  endif
 #  if GC_VERBOSE
     /* buffer GC_DEBUG stuff */
-    if (! GC_DEBUG(interp))
-        return;
-
-    if (PObj_report_TEST(obj)) {
+    if (GC_DEBUG(interp) && PObj_report_TEST(obj))
         fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
-                obj, PObj_bufstart((Buffer*) obj));
-    }
+                obj, PObj_bufstart((Buffer *)obj));
 #  endif
 #endif  /* PARROT_GC_GMS */
 }
