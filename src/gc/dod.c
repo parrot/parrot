@@ -218,8 +218,8 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
         else if (p->pmc_ext && PMC_metadata(p))
             fprintf(stderr, "GC: error obj %p (%s) has properties\n",
                     (void *)p, (char*)p->vtable->whoami->strstart);
-    }
 #  endif
+    }
 #  if GC_VERBOSE
     /* buffer GC_DEBUG stuff */
     if (GC_DEBUG(interp) && PObj_report_TEST(obj))
