@@ -27,7 +27,6 @@ A dynamic oplib loadable at demand.
 inline op mul(out INT, in INT, in NUM) :base_core {
   FLOATVAL lhs = $2 * $3;
   $1 = (INTVAL)lhs;
-  goto NEXT();
 }
 
 =back
