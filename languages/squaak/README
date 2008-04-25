@@ -3,6 +3,9 @@ Squaak: A Simple Language
 Squaak is a case-study language described in the Parrot Compiler Tools
 tutorial at http://www.parrotblog.org/2008/03/targeting-parrot-vm.html.
 
+Note that Squaak is NOT an implementation Squeak; it has nothing to do
+with any SmallTalk implementation.
+
 Squaak demonstrates some common language constructs, but at the same
 time is lacking some other, seemingly simple features. For instance,
 Squaak does not have return, break or continue statements (or equivalents
