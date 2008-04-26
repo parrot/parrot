@@ -87,7 +87,8 @@ descriptors. Element I<x> is the direction of argument C<< $args->[I<x>]
 C<$labels> is a reference to an array of boolean values indicating
 whether each argument direction was prefixed by 'C<label>'.
 
-C<$flags> is one or more (colon-prefixed) I<hints> or I<directives>.
+C<$flags> is a hash reference containing zero or more I<hints> or
+I<directives>.
 
 =cut
 
@@ -236,7 +237,8 @@ sub labels {
 
 =item C<flags()>
 
-Sets/gets the op's flags.
+Sets/gets the op's flags.  This returns a hash reference, whose keys are any
+flags (passed as ":flag") specified for the op.
 
 =cut
 
@@ -388,7 +390,9 @@ C<$trans> (a subclass of C<Parrot::OpTrans>).
 sub source {
     my ( $self, $trans ) = @_;
 
-    if ( $self->flags =~ /:pic/
+    my $flags = $self->flags;
+
+    if (exists($$flags{pic})
         && !( ref($trans) eq 'Parrot::OpTrans::CGP' || ref($trans) eq 'Parrot::OpTrans::CSwitch' ) )
     {
         return qq{PANIC(interp, "How did you do that");\n};

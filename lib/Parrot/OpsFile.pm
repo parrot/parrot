@@ -353,6 +353,8 @@ sub read_ops {
             $seen_op    = 1;
             $line       = $. + 1;
 
+            $flags = { map { $_ => undef } (split(/[ :]+/, $flags)) };
+
             my @temp = ();
 
             foreach my $arg (@args) {
@@ -480,7 +482,7 @@ sub make_op {
     my $next     = 0;
     my $restart  = 0;
 
-    unless ($flags =~ m/:flow\b/) {
+    unless (exists($$flags{flow})) {
         $body .= "\ngoto NEXT();";
     }
 
