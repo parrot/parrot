@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests =>   5;
 use Carp;
 use Cwd;
 use Data::Dumper;
@@ -35,7 +35,7 @@ my $step_name   = $task->step;
 my $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+
 
 # Lets see if we can trick ExtUtils::Manifest into thinking there are missing
 # files.

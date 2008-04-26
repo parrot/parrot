@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests =>  14;
 use Carp;
 use lib qw( lib );
 use_ok('config::init::defaults');
@@ -30,7 +30,7 @@ my $step_name   = $task->step;
 my $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+
 
 $conf->data->set( archname => 'x86_64' );
 $conf->data->set( cc => 'cc' );

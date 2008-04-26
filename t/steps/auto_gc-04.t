@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  8;
+use Test::More tests =>   7;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::gc');
 use Parrot::Configure;
@@ -33,7 +33,7 @@ $step_name   = $task->step;
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+
 
 $conf->data->set('i_malloc' => undef);
 my $ret = $step->runstep($conf);

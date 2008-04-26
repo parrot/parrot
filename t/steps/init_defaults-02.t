@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests =>  11;
 use Carp;
 use_ok('Cwd');
 use_ok('File::Copy');
@@ -43,7 +43,6 @@ my $cwd = cwd();
     my $step = $step_name->new();
     ok( defined $step, "$step_name constructor returned defined value" );
     isa_ok( $step, $step_name );
-    ok( $step->description(), "$step_name has description" );
 
     my $ret = $step->runstep($conf);
     ok( defined $ret, "$step_name runstep() returned defined value" );

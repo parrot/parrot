@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests =>  21;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -40,7 +40,7 @@ $step_name   = $task->step;
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+
 
 # Mock values for OS
 my ($osname);

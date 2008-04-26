@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests =>  15;
 use Carp;
 use Cwd;
 use File::Path ();
@@ -40,7 +40,7 @@ $step_name   = $task->step;
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+
 
 {
     $conf->data->set_p5( OSNAME => q{imaginaryOS} );

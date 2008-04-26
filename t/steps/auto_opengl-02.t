@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests =>   9;
 use Carp;
 use lib qw( lib );
 use_ok('config::init::defaults');
@@ -36,7 +36,7 @@ $step_name   = $task->step;
 $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+
 
 #my $test = qq{4\n};
 #my $has_glut = $step->_evaluate_cc_run($test, undef);
