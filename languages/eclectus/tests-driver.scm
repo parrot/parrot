@@ -43,10 +43,11 @@
                  (n (length tests)))
             (let g ((i i) (tests tests))
               (cond
-                ((null? tests) (f i ls))
+                ((null? tests)
+                   (f i ls))
                 (else
-                 (test-one i (car tests) test-name)
-                 (g (+ i 1) (cdr tests))))))))))
+                  (test-one i (car tests) test-name)
+                  (g (+ i 1) (cdr tests))))))))))
 
 (define compile-port
   (make-parameter
@@ -65,7 +66,7 @@
         (parameterize ((compile-port p))
            (compile-program expr))
         (close-output-port p))
-      (unless (zero? (system (string-append *path-to-parrot* "../../compilers/nqp/nqp.pbc --output=gen_past.pir --target=pir gen_past.nqp")))
+      (unless (zero? (system (string-append *path-to-parrot* " ../../compilers/nqp/nqp.pbc --output=gen_past.pir --target=pir gen_past.nqp")))
         (error 'execute "produced program exited abnormally")))
     (else
       (let ((p (open-output-file "stst.pir" 'replace)))

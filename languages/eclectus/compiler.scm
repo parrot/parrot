@@ -530,22 +530,22 @@
 ; currently it only handles the pushes
 (define past-sxml->past-nqp
   (lambda (past)
-      (emit "
-            ~a.new 
-            " (symbol->string (car past)))
-      (for-each
-        (lambda (daughter)
-          (if (eq? '@ (car daughter))
-            (for-each
-              (lambda (key_val)
-                (emit "
-                      :~a(~a)
-                      " (car key_val) (cadr key_val))))
-                (cdr daughter))
-              (emit "
-                    reg_~a.push( reg_~a )
-                    " uid (past-sxml->past-pir daughter))))
-      (emit ";") ) )
+    (if (symbol? (car past))
+        (emit "
+                ~a.new( 
+              " (symbol->string (car past))))
+    (for-each
+       (lambda (daughter)
+         (if (eq? '@ (car daughter))
+           (for-each
+             (lambda (key_val)
+               (emit "
+                     :~a('~a'),
+                     " (car key_val) (cadr key_val)))
+             (cdr daughter))
+           (past-sxml->past-nqp daughter)))
+       (cdr past))
+    (emit ")")))
 
 ; print the result of the evaluation
 (define wrap-say
@@ -574,6 +574,8 @@
 ; the future compiler, emitting PAST set up in PIR
 (define compile-program
   (lambda (program)
+    (emit "sub scheme_entry () { " ) 
     (past-sxml->past-nqp
       (wrap-say
-        (emit-expr (normalize-syntax program))))))
+        (emit-expr (normalize-syntax program))))
+    (emit "; }" ))) 
