@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Test::More;
 plan( skip_all => 'Fink is Darwin only' ) unless $^O =~ /darwin/;
-plan( tests => 13 );
+plan( tests => 12 );
 # plan( 'no_plan' );
 use Carp;
 use File::Temp;
@@ -39,7 +39,6 @@ $step_name   = $task->step;
 $step = $step_name->new();
 ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
 
 {
     # mock Fink config file with no Basepath
