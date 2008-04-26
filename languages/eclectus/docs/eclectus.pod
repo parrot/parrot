@@ -23,6 +23,8 @@ the is no 'gauche 0.8' around.
 
 =head1 TODO
 
+- Bring Eclectus back to unified languages testing
+- Switch to NQP as the PAST generating code
 - support for strings
 - support for pairs
 - support for 'letrec
