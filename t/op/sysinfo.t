@@ -50,7 +50,7 @@ Tests basic string and branching operations.
 
 
 
-pasm_output_is( <<'CODE', $PConfig{intsize}, "sysinfo integer size" );
+pasm_output_is( <<'CODE', $PConfig{intvalsize}, "sysinfo integer size" );
 		sysinfo_i_ic I1, 1
 		print I1
 		end
