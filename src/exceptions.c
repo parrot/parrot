@@ -34,7 +34,7 @@ Define the internal interpreter exceptions.
 #include "parrot/exceptions.h"
 #include "exceptions.str"
 
-#ifdef PARROT_HAS_GLIBC_BACKTRACE
+#ifdef PARROT_HAS_BACKTRACE
 #  include <execinfo.h>
 #endif
 
@@ -1013,7 +1013,7 @@ abort).  Used by C<Parrot_confess>.
 void
 Parrot_print_backtrace(void)
 {
-#ifdef PARROT_HAS_GLIBC_BACKTRACE
+#ifdef PARROT_HAS_BACKTRACE
 #  define BACKTRACE_DEPTH 32
 /*#  define BACKTRACE_VERBOSE */
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
@@ -1061,7 +1061,7 @@ Parrot_print_backtrace(void)
     mem_sys_free(strings);
 
 #  undef BACKTRACE_DEPTH
-#endif /* ifdef PARROT_HAS_GLIBC_BACKTRACE */
+#endif /* ifdef PARROT_HAS_BACKTRACE */
 }
 
 

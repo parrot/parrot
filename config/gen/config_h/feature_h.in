@@ -154,9 +154,9 @@ print OUT <<'END_PRINT';
 
 /* from config/auto/backtrace */
 END_PRINT
-if (defined @glibc_backtrace@) {
+if (defined @backtrace@) {
     print OUT <<"END_PRINT";
-#define PARROT_HAS_GLIBC_BACKTRACE
+#define PARROT_HAS_BACKTRACE
 END_PRINT
 }
 

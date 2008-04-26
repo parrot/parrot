@@ -45,8 +45,8 @@ $error = q{};
 ok($step->_evaluate_backtrace($conf, $error),
     "_evaluate_backtrace returned true value");
 is($step->result, 'yes', "Got expected result");
-ok($conf->data->get('glibc_backtrace'),
-    "glibc_backtrace set as expected");
+ok($conf->data->get('backtrace'),
+    "backtrace set as expected");
 
 pass("Completed all tests in $0");
 

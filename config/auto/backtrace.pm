@@ -7,7 +7,9 @@ config/auto/backtrace.pm - GNU C Compiler
 
 =head1 DESCRIPTION
 
-Determines whether libc has the backtrace* functions (glibc only).
+Determines whether libc has the backtrace* functions.  The backtrace() and
+backtrace_symbols() functions exist in GNU libc, and also in OS X versions
+10.5+.
 
 =cut
 
@@ -24,7 +26,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether libc has the backtrace* functions (glibc only)};
+    $data{description} = q{Determining whether libc has the backtrace* functions};
     $data{result}      = q{};
     return \%data;
 }
@@ -44,9 +46,9 @@ sub _probe_for_backtrace {
     $conf->cc_gen("config/auto/backtrace/test_c.in");
 
     # If the program builds (e.g. the linker found backtrace* in libc)
-    # then we have the glibc backtrace symbols.  If the program fails to
-    # build for whatever reason we're just going to assume that the
-    # build failure is because these symbols are missing.
+    # then we have the "backtrace" and "backtrace_symbols" functions.  If the
+    # program fails to build for whatever reason we're just going to assume
+    # that the build failure is because these symbols are missing.
 
     eval { $conf->cc_build(); };
     my $anyerror = $@;
@@ -60,7 +62,7 @@ sub _evaluate_backtrace {
         $self->set_result("no");
     }
     else {
-        $conf->data->set( glibc_backtrace => 1 );
+        $conf->data->set( backtrace => 1 );
         $self->set_result("yes");
     }
 }
