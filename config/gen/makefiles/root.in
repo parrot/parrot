@@ -2143,7 +2143,7 @@ rpms : release
 	cd /usr/src/*/SPECS @make_and@ sudo rpm -ba parrot.spec
 
 win32-inno-installer : world installable
-	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX) --icudir=@icu_dir@
+	$(PERL) tools/dev/mk_inno.pl
 	$(INNO_SETUP) parrot.iss
 
 ###############################################################################

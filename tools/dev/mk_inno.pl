@@ -1,8 +1,6 @@
 #! perl
-################################################################################
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
-################################################################################
 
 =head1 TITLE
 
@@ -10,27 +8,7 @@ tools/dev/mk_inno.pl - Create a script for Inno Setup
 
 =head1 SYNOPSIS
 
-    % perl tools/dev/mk_inno.pl [options]
-
-=head1 DESCRIPTION
-
-=head2 Options
-
-=over 4
-
-=item C<prefix>
-
-The install prefix.
-
-=item C<version>
-
-The parrot version.
-
-=item C<icudir>
-
-The directory to locate ICU.
-
-=back
+    % perl tools/dev/mk_inno.pl
 
 =head1 SEE ALSO
 
@@ -38,31 +16,21 @@ http://www.jrsoftware.org/
 
 =cut
 
-################################################################################
-
 use strict;
 use warnings;
+use lib qw( lib ../lib ../../lib );
+use Parrot::Config;
 
-my %options = (
-    version => 'x.y.z',
-    prefix  => '\usr\local\parrot',
-    icudir  => '',
-);
+my $version = $PConfig{VERSION} . $PConfig{DEVEL};
 
-foreach (@ARGV) {
-    if (/^--([^=]+)=(.*)/) {
-        $options{$1} = $2;
-    }
-}
+my $prefix = $PConfig{prefix};
+$prefix =~ s/\//\\/g;
 
-$options{prefix} =~ s/\//\\/g;
-$options{icudir} =~ s/\//\\/g;
-
-my $icu_section = qq{
-Source: "$options{icudir}\\license.html"; DestDir: "{app}\\icu"; Flags:
-Source: "$options{icudir}\\bin\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
-};
-$icu_section = q{} unless ( $options{icudir} );
+my $icu_section = q{};
+$icu_section = qq{
+Source: "$PConfig{icu_dir}\\license.html"; DestDir: "{app}\\icu"; Flags:
+Source: "$PConfig{icu_dir}\\bin\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
+} if ($PConfig{has_icu});
 
 my $filename = 'parrot.iss';
 open my $OUT, '>', $filename
@@ -73,23 +41,23 @@ print $OUT qq{
 
 [Setup]
 AppName=Parrot
-AppVerName=Parrot-$options{version}
+AppVerName=Parrot-$version
 AppPublisher=The Perl Foundation
 AppPublisherURL=http://www.parrotcode.org/
 AppSupportURL=http://www.parrotcode.org/
 AppUpdatesURL=http://www.parrotcode.org/
-DefaultDirName={sd}$options{prefix}
+DefaultDirName={sd}$prefix
 DefaultGroupName=Parrot
 AllowNoIcons=yes
-LicenseFile=$options{prefix}\\share\\doc\\parrot\\LICENSE
+LicenseFile=$prefix\\share\\doc\\parrot\\LICENSE
 OutputDir=.\\
-OutputBaseFilename=setup-parrot-$options{version}
+OutputBaseFilename=setup-parrot-$version
 Compression=lzma
 SolidCompression=yes
 ChangesAssociations=yes
 
 [Files]
-Source: "$options{prefix}\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "$prefix\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ${icu_section}
 
 [Icons]
