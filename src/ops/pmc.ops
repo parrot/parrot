@@ -210,8 +210,6 @@ op find_type(out INT, in STR) {
 
 op find_type(out INT, in PMC) {
 
-    /* RT#42350 KLUDGE ALERT: THIS LOGIC SHOULD BE IN pmc_type_p() */
-
     INTVAL n;
 
     if ($2->vtable->base_type == enum_class_String)
