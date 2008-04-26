@@ -472,5 +472,6 @@ proto infix:<:=> is looser(infix:<||>)
 ## Comma
 proto infix:<,> is looser(infix:<:=>)
     is assoc('list')
+    is nullterm
     { ... }
 

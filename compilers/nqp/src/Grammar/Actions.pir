@@ -1088,6 +1088,9 @@
   iter_loop:
     unless iter goto iter_end
     $P2 = shift iter
+    $I0 = $P2.'from'()
+    $I1 = $P2.'to'()
+    if $I0 == $I1 goto iter_loop
     $P2 = $P2.'get_scalar'()
     past.'push'($P2)
     goto iter_loop
