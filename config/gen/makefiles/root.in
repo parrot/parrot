@@ -177,7 +177,6 @@ GEN_MAKEFILES = \
     languages/urm/Makefile \
     languages/WMLScript/Makefile \
     languages/Zcode/Makefile \
-    src/dynpmc/Makefile \
     src/dynoplibs/Makefile
 
 GEN_CONFIGS = \
@@ -1728,8 +1727,11 @@ imcc-clean:
     "$(IMCC_DIR)/*$(O)" \
     $(IMCC_DIR)/imcparser.output
 
-realclean : clean languages-realclean
-	$(MAKE) compilers/pirc realclean
+# a failing step of cleaning, usually doesn't concern the following steps
+realclean : clean
+	-$(MAKE) languages       realclean
+	-$(MAKE) compilers/pirc  realclean
+	-$(MAKE) src/dynpmc      realclean
 	$(RM_RF) \
     $(STICKY_FILES) \
     blib \
