@@ -3,7 +3,7 @@
 
 .sub 'main' :main
 
-    .include 'include/test_more.pir'    
+    .include 'include/test_more.pir'
 
     'plan'(TESTS)
 
