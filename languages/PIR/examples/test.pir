@@ -2,14 +2,8 @@
 
 
 .sub 'main' :main
-    #load_bytecode 'Test/More.pir'
 
-    .local pmc import_sub
-
-    .IMPORT ( [ 'Test'; 'More' ], 'plan' )
-
-   #.local string res, exp, desc
-
+    .include 'include/test_more.pir'    
 
     'plan'(TESTS)
 
