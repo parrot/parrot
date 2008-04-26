@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 27;
+use Test::More tests => 28;
 
 =head1 NAME
 
@@ -195,6 +195,15 @@ print $FH "print 'Hello, World!'\n";
 close $FH;
 $out = `$parrot languages/pynie/pynie.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pynie");
+unlink($filename);
+
+$filename = 'test.squaak';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "print(\"Hello, World!\")\n";
+close $FH;
+$out = `$parrot languages/squaak/squaak.pbc $filename`;
+ok($out eq "Hello, World!\n", "check squaak");
 unlink($filename);
 
 TODO: {

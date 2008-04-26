@@ -404,6 +404,7 @@ scheme.test :
 scheme.clean :
 	- $(MAKE) scheme clean
 
+squaak: squaak.dummy
 squaak.dummy:
 	- $(MAKE) squaak
 squaak.test:
