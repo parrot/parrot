@@ -2,7 +2,6 @@
 
 (load "tests-driver.scm") ; this should come first
 
-; there have to be nine tests, as the number of tests is hardcoded in test-driver.scm
 (add-tests-with-string-output "booleans"      
   (#\a  => "#\\a\n")                    
   (#\A  => "#\\A\n")                    
@@ -13,6 +12,7 @@
   (#\9  => "#\\9\n")                    
   (#\$  => "#\\$\n")                    
   (#\   => "#\\ \n")                    
+  (#\-  => "#\\-\n")                    
 )
 
 (load "compiler.scm")
