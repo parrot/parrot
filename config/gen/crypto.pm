@@ -23,10 +23,11 @@ use Parrot::Configure::Utils ':gen';
 
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Generating Digest PMC files};
-    $data{result}      = q{};
-    return \%data;
+
+    return {
+        description => q{Generating Digest PMC files},
+        result      => q{},
+     };
 }
 
 my %digest = (
@@ -55,14 +56,15 @@ my %digest = (
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose  = $conf->options->get('verbose');
-    unless ( $conf->data->get('has_crypto') ) {
+    if ( ! $conf->data->get('has_crypto') ) {
         $self->set_result('skipped');
+
         return 1;
     }
+
     my $openssl_version  = $conf->data->get('openssl_version');
 
-    while (my ($md, $val) = each(%digest)) {
+    while (my ($md, $val) = each %digest ) {
         my $file = lc $md;
         $conf->data->set( md_name => $md );
         $conf->data->set( md_file => $file );
@@ -76,7 +78,7 @@ sub runstep {
         );
         $conf->genfile(
             'config/gen/crypto/digest_pmc.in' => "src/dynpmc/${file}.pmc",
-            comment_type => '/*',
+            comment_type                      => '/*',
         );
     }
 
