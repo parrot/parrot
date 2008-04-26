@@ -28,6 +28,17 @@ PMCS = \
 
 BUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
+# some *.pmc file are generated
+GEN_PMC_DEFINITIONS = \
+#CONDITIONED_LINE(has_crypto):  md2.pmc \
+#CONDITIONED_LINE(has_crypto):  md4.pmc \
+#CONDITIONED_LINE(has_crypto):  md5.pmc \
+#CONDITIONED_LINE(has_crypto):  ripemd160.pmc \
+#CONDITIONED_LINE(has_crypto):  sha.pmc \
+#CONDITIONED_LINE(has_crypto):  sha1.pmc \
+#CONDITIONED_LINE(has_crypto):  sha256.pmc \
+#CONDITIONED_LINE(has_crypto):  sha512.pmc
+
 all :
 	@$(BUILD) generate $(PMCS)
 	@$(BUILD) compile $(PMCS)
@@ -56,7 +67,7 @@ archclean :
 	$(RM_F) "*$(LOAD_EXT)" "*$(O)" Makefile
 
 realclean: clean
-	$(RM_F) Makefile build.pl
+	$(RM_F) Makefile $(GEN_PMC_DEFINITIONS)
 
 distclean: realclean
 
