@@ -2,7 +2,7 @@
 
 # check subs
 
-say('1..10');
+say('1..11');
 
 sub one ( ) {
     say("ok 1 # sub def and call");
@@ -69,3 +69,8 @@ if $five != 5 {
     print("not ");
 }
 say("ok 10 # subroutines that operate on args do not affect the original arg outside the sub");
+
+sub eleven ($arg) {
+    say("ok 11 # parameter with a trailing comma");
+}
+eleven( 'dummy', ); 
