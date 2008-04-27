@@ -935,6 +935,8 @@ $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
     $(SRC_DIR)/pdump$(O) \
     $(SRC_DIR)/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
+$(SRC_DIR)/pdump$(O) : $(GEN_HEADERS)
+
 $(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdump$(O) \
