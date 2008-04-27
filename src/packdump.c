@@ -161,12 +161,12 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         break;
 
     case PFC_KEY:
-        for (i = 0, key = self->u.key; key; key = PMC_data(key), i++)
+        for (i = 0, key = self->u.key; key; key = (PMC*)PMC_data(key), i++)
             ;
         /* number of key components */
         PIO_printf(interp, "    [ 'PFC_KEY' (%ld items)\n", i);
         /* and now type / value per component */
-        for (key = self->u.key; key; key = PMC_data(key)) {
+        for (key = self->u.key; key; key = (PMC*)PMC_data(key)) {
             opcode_t type = PObj_get_FLAGS(key);
 
             PIO_printf(interp, "       {\n");
