@@ -949,6 +949,8 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
     $(SRC_DIR)/pbc_info$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
+$(SRC_DIR)/pbc_info$(O) : $(GEN_HEADERS)
+
 $(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_info$(O) \
