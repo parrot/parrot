@@ -32,6 +32,24 @@ Source: "$PConfig{icu_dir}\\license.html"; DestDir: "{app}\\icu"; Flags:
 Source: "$PConfig{icu_dir}\\bin\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
 } if ($PConfig{has_icu});
 
+my %dll = (
+    has_gdbm     => [ 'gdbm3.dll' ],
+    HAS_GETTEXT  => [ 'libintl3.dll', 'libiconv2.dll' ],
+    HAS_READLINE => [ 'readline5.dll' ],
+);
+
+my $dll_section = q{};
+while (my ($flag, $dlls) = each %dll) {
+    next unless ($PConfig{$flag});
+    foreach my $dll (@{$dlls}) {
+        my $path = `which $dll`;
+        chomp $path;
+        $path =~ s/\//\\/g;
+        $dll_section .= "Source: \"$path\"; DestDir: \"{app}\\bin\"; Flags:\n"
+            if ($path);
+    }
+}
+
 my $filename = 'parrot.iss';
 open my $OUT, '>', $filename
     or die "Can't open $filename ($!)";
@@ -59,6 +77,7 @@ ChangesAssociations=yes
 [Files]
 Source: "$prefix\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ${icu_section}
+${dll_section}
 
 [Icons]
 Name: "{group}\\{cm:UninstallProgram,parrot}"; Filename: "{uninstallexe}"
