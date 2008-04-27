@@ -73,6 +73,7 @@ $(ECLECTUS_GROUP): $(PARROT) $(PMC_SOURCES)
 clean: dynext-clean
 	$(RM_F) \
   "*.out" \
+  stst.pir \
   gen_past.nqp \
   gen_past.pir
 
