@@ -41,8 +41,9 @@ the name of each segment in the directory.
 static INTVAL
 iter(PARROT_INTERP, PackFile_Segment *seg, void *user_data)
 {
-    int ident = (int)user_data;
-    printf("%*.0s%s\n", ident, "", seg->name);
+    long ident = (long)user_data;
+    int length = ident;
+    printf("%*.0s%s\n", length, "", seg->name);
     if (seg->type == PF_DIR_SEG)
         PackFile_map_segments(interp, (PackFile_Directory*)seg,
                 iter, (void*)(ident+2));
