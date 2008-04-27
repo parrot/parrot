@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -310,7 +310,7 @@ init_context(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
 
 /*
 
-=item C<struct Parrot_Context * Parrot_dup_context>
+=item C<Parrot_Context * Parrot_dup_context>
 
 Duplicate the passed context
 
@@ -320,8 +320,8 @@ Duplicate the passed context
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context *
-Parrot_dup_context(PARROT_INTERP, ARGIN(const struct Parrot_Context *old))
+Parrot_Context *
+Parrot_dup_context(PARROT_INTERP, ARGIN(const Parrot_Context *old))
 {
     size_t          diff;
     Parrot_Context *ctx;
@@ -355,7 +355,7 @@ Parrot_dup_context(PARROT_INTERP, ARGIN(const struct Parrot_Context *old))
 
 /*
 
-=item C<struct Parrot_Context * Parrot_push_context>
+=item C<Parrot_Context * Parrot_push_context>
 
 Remember old context in C<caller_ctx>, suitable to use with
 C<Parrot_pop_context>.
@@ -367,7 +367,7 @@ C<Parrot_pop_context>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context *
+Parrot_Context *
 Parrot_push_context(PARROT_INTERP, ARGMOD(INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp);
@@ -411,7 +411,7 @@ Parrot_pop_context(PARROT_INTERP)
 
 /*
 
-=item C<struct Parrot_Context * Parrot_alloc_context>
+=item C<Parrot_Context * Parrot_alloc_context>
 
 Allocate a new context and set the context pointer. Please note that the
 register usage C<n_regs_used> is copied.  The function returns the new context.
@@ -422,7 +422,7 @@ register usage C<n_regs_used> is copied.  The function returns the new context.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-struct Parrot_Context *
+Parrot_Context *
 Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
 {
     Parrot_Context *old, *ctx;
@@ -526,7 +526,7 @@ return continuation invoke, else from the destructor of a continuation.
 
 PARROT_API
 void
-Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_use)
+Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctxp), int re_use)
 {
     /*
      * The context structure has a reference count, initially 0.  This field is
@@ -592,7 +592,7 @@ Mark the context as possible threshold.
 
 PARROT_API
 void
-Parrot_set_context_threshold(SHIM_INTERP, SHIM(struct Parrot_Context *ctxp))
+Parrot_set_context_threshold(SHIM_INTERP, SHIM(Parrot_Context *ctxp))
 {
     /* nothing to do */
 }

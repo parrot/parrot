@@ -1,5 +1,5 @@
 /* register.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -80,7 +80,7 @@ void Parrot_clear_s(PARROT_INTERP)
 
 PARROT_API
 void Parrot_free_context(PARROT_INTERP,
-    ARGMOD(struct Parrot_Context *ctxp),
+    ARGMOD(Parrot_Context *ctxp),
     int re_use)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -97,7 +97,7 @@ void Parrot_pop_context(PARROT_INTERP)
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context * Parrot_push_context(PARROT_INTERP,
+Parrot_Context * Parrot_push_context(PARROT_INTERP,
     ARGMOD(INTVAL *n_regs_used))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -105,7 +105,7 @@ struct Parrot_Context * Parrot_push_context(PARROT_INTERP,
 
 PARROT_API
 void Parrot_set_context_threshold(SHIM_INTERP,
-    SHIM(struct Parrot_Context *ctxp));
+    SHIM(Parrot_Context *ctxp));
 
 void create_initial_context(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -115,7 +115,7 @@ void destroy_context(PARROT_INTERP)
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-struct Parrot_Context * Parrot_alloc_context(PARROT_INTERP,
+Parrot_Context * Parrot_alloc_context(PARROT_INTERP,
     ARGMOD(INTVAL *number_regs_used))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -123,8 +123,8 @@ struct Parrot_Context * Parrot_alloc_context(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context * Parrot_dup_context(PARROT_INTERP,
-    ARGIN(const struct Parrot_Context *old))
+Parrot_Context * Parrot_dup_context(PARROT_INTERP,
+    ARGIN(const Parrot_Context *old))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
