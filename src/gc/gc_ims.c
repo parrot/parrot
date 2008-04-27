@@ -351,7 +351,7 @@ static int collect_cb(PARROT_INTERP,
 
 static void gc_ims_add_free_object(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
-    ARGOUT(PObj *to_add))
+    ARGOUT(void *to_add))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -486,7 +486,7 @@ C<pool->num_free_objects> has to be updated by the caller.
 */
 
 static void
-gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(PObj *to_add))
+gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(void *to_add))
 {
     *(void **)to_add = pool->free_list;
     pool->free_list  = to_add;

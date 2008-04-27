@@ -163,8 +163,8 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 {
-    const int num_headers = BUFFER_HEADERS_PER_ALLOC;
-    const size_t buffer_size =
+    const int num_headers          = BUFFER_HEADERS_PER_ALLOC;
+    const size_t buffer_size       =
             (actual_buffer_size + sizeof (void *) - 1) & ~(sizeof (void *) - 1);
     Small_Object_Pool * const pool =
             new_small_object_pool(buffer_size, num_headers);
@@ -223,7 +223,9 @@ new_string_pool(PARROT_INTERP, INTVAL constant)
     }
     else
         pool = make_bufferlike_pool(interp, sizeof (STRING));
+
     pool->objects_per_alloc = STRING_HEADERS_PER_ALLOC;
+
     return pool;
 }
 
@@ -346,17 +348,7 @@ static PMC_EXT *
 new_pmc_ext(PARROT_INTERP)
 {
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
-    PMC_EXT *ptr;
-    /*
-     * can't use normal get_free_object--PMC_EXT doesn't have flags
-     * it isn't a Buffer
-     */
-    if (!pool->free_list)
-        (*pool->more_objects) (interp, pool);
-    ptr = (PMC_EXT *)pool->free_list;
-    pool->free_list = *(void **)ptr;
-    memset(ptr, 0, sizeof (*ptr));
-    return ptr;
+    return pool->get_free_object(interp, pool);
 }
 
 /*
@@ -625,7 +617,7 @@ Parrot_initialize_header_pools(PARROT_INTERP)
     Arenas * const arena_base = interp->arena_base;
 
     /* Init the constant string header pool */
-    arena_base->constant_string_header_pool = new_string_pool(interp, 1);
+    arena_base->constant_string_header_pool       = new_string_pool(interp, 1);
     arena_base->constant_string_header_pool->name = "constant_string_header";
 
     /* Init the buffer header pool
@@ -634,15 +626,15 @@ Parrot_initialize_header_pools(PARROT_INTERP)
      * living in the sized_header_pools, this pool pointers are only
      * here for faster access in new_*_header
      */
-    arena_base->buffer_header_pool = new_buffer_pool(interp);
+    arena_base->buffer_header_pool       = new_buffer_pool(interp);
     arena_base->buffer_header_pool->name = "buffer_header";
 
     /* Init the string header pool */
-    arena_base->string_header_pool = new_string_pool(interp, 0);
+    arena_base->string_header_pool       = new_string_pool(interp, 0);
     arena_base->string_header_pool->name = "string_header";
 
     /* Init the PMC header pool */
-    arena_base->pmc_pool = new_pmc_pool(interp);
+    arena_base->pmc_pool       = new_pmc_pool(interp);
     arena_base->pmc_pool->name = "pmc";
 
     /* pmc extension buffer */
@@ -658,8 +650,8 @@ Parrot_initialize_header_pools(PARROT_INTERP)
     arena_base->pmc_ext_pool->name = "pmc_ext";
 
     /* constant PMCs */
-    arena_base->constant_pmc_pool = new_pmc_pool(interp);
-    arena_base->constant_pmc_pool->name = "constant_pmc";
+    arena_base->constant_pmc_pool                    = new_pmc_pool(interp);
+    arena_base->constant_pmc_pool->name              = "constant_pmc";
     arena_base->constant_pmc_pool->objects_per_alloc =
        CONSTANT_PMC_HEADERS_PER_ALLOC;
 }

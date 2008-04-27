@@ -122,7 +122,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
         hi_prio = 0;
 
     if (obj->pmc_ext) {
-        PMC* const tptr = arena_base->dod_trace_ptr;
+        PMC * const tptr = arena_base->dod_trace_ptr;
 
         ++arena_base->num_extended_PMCs;
         /*
@@ -710,7 +710,9 @@ Parrot_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
     }
 
     if (p->pmc_ext)
-        ext_pool->add_free_object(interp, ext_pool, (PObj *)p->pmc_ext);
+        ext_pool->add_free_object(interp, ext_pool, p->pmc_ext);
+
+    ext_pool->num_free_objects++;
 
     p->pmc_ext = NULL;
 }

@@ -27,7 +27,14 @@ Handles the accessing of small object pools (header pools).
 
 static void gc_ms_add_free_object(SHIM_INTERP,
     ARGMOD(Small_Object_Pool *pool),
-    ARGIN(PObj *to_add))
+    ARGIN(void *to_add))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
+
+static void gc_ms_add_free_pmc_ext(SHIM_INTERP,
+    ARGMOD(Small_Object_Pool *pool),
+    ARGIN(void *to_add))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
@@ -40,7 +47,15 @@ static void gc_ms_alloc_objects(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PObj * gc_ms_get_free_object(PARROT_INTERP,
+static void * gc_ms_get_free_object(PARROT_INTERP,
+    ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static void * gc_ms_get_free_pmc_ext(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -156,6 +171,26 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
+=item C<static void gc_ms_add_free_pmc_ext>
+
+Add an unused PMC_EXT structure back to the free pool for later reuse.
+
+=cut
+
+*/
+
+static void
+gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
+{
+    PMC_EXT *object        = (PMC_EXT *)to_add;
+
+    /* yes, this cast is a hack for now, but a pointer is a pointer */
+    object->_next_for_GC   = (PMC *)pool->free_list;
+    pool->free_list        = object;
+}
+
+/*
+
 =item C<static void gc_ms_add_free_object>
 
 Add an unused object back to the free pool for later reuse.
@@ -165,11 +200,16 @@ Add an unused object back to the free pool for later reuse.
 */
 
 static void
-gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(PObj *to_add))
+gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
 {
-    PObj_flags_SETTO(to_add, PObj_on_free_list_FLAG);
-    PMC_struct_val(to_add) = pool->free_list;
-    pool->free_list        = to_add;
+    PObj *object           = (PObj *)to_add;
+
+    PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
+
+    /* during GC buflen is used to check for objects on the free_list */
+    PObj_buflen(object)    = 0;
+    PMC_struct_val(object) = pool->free_list;
+    pool->free_list        = object;
 }
 
 /*
@@ -184,7 +224,7 @@ Get a new object from the free pool and return it.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PObj *
+static void *
 gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     PObj *ptr;
@@ -208,6 +248,39 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
+=item C<static PObj * gc_ms_get_free_pmc_ext>
+
+Get a new PMC_EXT structure from the free pool and return it.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static void *
+gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+{
+    PMC_EXT *ptr;
+    PMC_EXT *free_list = (PMC_EXT *)pool->free_list;
+
+    /* if we don't have any objects */
+    if (!free_list) {
+        (*pool->more_objects)(interp, pool);
+        free_list = (PMC_EXT *)pool->free_list;
+    }
+
+    ptr               = free_list;
+    pool->free_list   = ptr->_next_for_GC;
+    ptr->_next_for_GC = NULL;
+
+    --pool->num_free_objects;
+
+    return ptr;
+}
+
+/*
+
 =item C<void Parrot_add_to_free_list>
 
 Adds the objects in the newly allocated C<arena> to the free list.
@@ -222,24 +295,18 @@ Parrot_add_to_free_list(PARROT_INTERP,
         ARGMOD(Small_Object_Arena *arena))
 {
     UINTVAL  i;
-    PObj    *object;
+    void    *object;
     const UINTVAL num_objects = pool->objects_per_alloc;
 
     pool->total_objects += num_objects;
     arena->used          = num_objects;
 
     /* Move all the new objects into the free list */
-    object = (PObj *)((char *)arena->start_objects);
+    object = (void *)arena->start_objects;
 
     for (i = 0; i < num_objects; i++) {
-        PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
-        /*
-         * during GC buflen is used to check for objects on the
-         * free_list
-         */
-        PObj_buflen(object) = 0;
         pool->add_free_object(interp, pool, object);
-        object = (PObj *)((char *)object + pool->object_size);
+        object = (void *)((char *)object + pool->object_size);
     }
 
     pool->num_free_objects += num_objects;
@@ -370,8 +437,8 @@ RT#48260: Not yet documented!!!
 void
 gc_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
 {
-    pool->add_free_object = gc_ms_add_free_object;
-    pool->get_free_object = gc_ms_get_free_object;
+    pool->add_free_object = gc_ms_add_free_pmc_ext;
+    pool->get_free_object = gc_ms_get_free_pmc_ext;
     pool->alloc_objects   = gc_ms_alloc_objects;
     pool->more_objects    = gc_ms_alloc_objects;
 }
