@@ -366,7 +366,7 @@ static void gc_ims_alloc_objects(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PObj * gc_ims_get_free_object(PARROT_INTERP,
+static void * gc_ims_get_free_object(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -514,7 +514,7 @@ Get a new object off the free_list in the given pool.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PObj *
+static void *
 gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     PObj *ptr;
@@ -537,7 +537,7 @@ gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
      */
     PObj_flags_SETTO(ptr, pool == arena_base->pmc_pool ? 0 : PObj_live_FLAG);
     --pool->num_free_objects;
-    return ptr;
+    return (void *)ptr;
 }
 
 /*

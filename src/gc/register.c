@@ -569,7 +569,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_u
         slot = CALCULATE_SLOT_NUM(ctxp->regs_mem_size);
 
         PARROT_ASSERT(slot < interp->ctx_mem.n_free_slots);
-        *(void **)ptr = interp->ctx_mem.free_list[slot];
+        *(void **)ptr                   = interp->ctx_mem.free_list[slot];
         interp->ctx_mem.free_list[slot] = ptr;
     }
 }

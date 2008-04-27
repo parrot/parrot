@@ -348,7 +348,7 @@ static PMC_EXT *
 new_pmc_ext(PARROT_INTERP)
 {
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
-    return pool->get_free_object(interp, pool);
+    return (PMC_EXT *)pool->get_free_object(interp, pool);
 }
 
 /*
