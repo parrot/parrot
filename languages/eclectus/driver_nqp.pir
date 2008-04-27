@@ -5,6 +5,7 @@
 
 # for devel
 .include 'library/dumper.pir'
+.include 'gen_past.pir'
 
 .namespace
 
@@ -125,22 +126,6 @@ end:
 
     .return ($I0)
 .end
-
-.sub scheme_entry
-
-    .local pmc reg_1001
-    reg_1001 = new 'PAST::Op'
-    reg_1001.init( 'pasttype' => "call" )
-    reg_1001.init( 'name' => "say" )
-    .local pmc reg_1002
-    reg_1002 = new 'PAST::Val'
-    reg_1002.init( 'value' => "'#0()'" )
-    reg_1002.init( 'returns' => "EclectusString" )
-    reg_1001.push( reg_1002 )
-
-    .return( reg_1001 )
-.end
-
 
 # Local Variables:
 #   mode: pir
