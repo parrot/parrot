@@ -54,7 +54,7 @@ efficiency on reading non-native PBCs.
 /*
 
 =item C<static void
-const_dump(PARROT_INTERP, PackFile_Segment *segp)>
+const_dump(PARROT_INTERP, const PackFile_Segment *segp)>
 
 Dump the constant table.
 
@@ -63,17 +63,17 @@ Dump the constant table.
 */
 
 static void
-const_dump(PARROT_INTERP, PackFile_Segment *segp)
+const_dump(PARROT_INTERP, const PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
-    PackFile_ConstTable_dump(interp, (PackFile_ConstTable *)segp);
+    PackFile_ConstTable_dump(interp, (const PackFile_ConstTable *)segp);
     PIO_printf(interp, "],\n");
 }
 
 /*
 
 =item C<static void
-fixup_dump(PARROT_INTERP, PackFile_Segment *segp)>
+fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)>
 
 Dump the fixup table.
 
@@ -82,17 +82,17 @@ Dump the fixup table.
 */
 
 static void
-fixup_dump(PARROT_INTERP, PackFile_Segment *segp)
+fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
-    PackFile_Fixup_dump(interp, (PackFile_FixupTable *)segp);
+    PackFile_Fixup_dump(interp, (const PackFile_FixupTable *)segp);
     PIO_printf(interp, "],\n");
 }
 
 /*
 
 =item C<static void
-disas_dump(PARROT_INTERP, PackFile_Segment *self)>
+disas_dump(PARROT_INTERP, const PackFile_Segment *self)>
 
 Disassemble and dump.
 
@@ -101,7 +101,7 @@ Disassemble and dump.
 */
 
 static void
-disas_dump(PARROT_INTERP, PackFile_Segment *self)
+disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
     opcode_t *pc;
     size_t i, n;
@@ -204,7 +204,7 @@ The run loop. Process the command-line arguments and dump accordingly.
 */
 
 int
-main(int argc, char **argv)
+main(int argc, const char **argv)
 {
     PackFile *pf;
     Interp *interp;
@@ -239,6 +239,7 @@ main(int argc, char **argv)
                 convert = 1;
                 break;
             case '?':
+            default:
                 help();
                 break;
         }
