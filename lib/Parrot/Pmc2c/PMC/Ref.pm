@@ -38,13 +38,13 @@ sub postderef {
 =item C<raw_deref($method)>
 
 Returns C code that can be used to access the underlying PMC in the
-delegated methods. Defualt is PMC_pmc_val(pmc)
+delegated methods. Default is PMC_pmc_val(pmc)
 
 =cut
 
 sub raw_deref {
     my ( $self, $method ) = @_;
-    return '(PMC *)PMC_pmc_val(pmc)';
+    return 'PMC_pmc_val(pmc)';
 }
 
 =item C<body($method, $line, $out_name)>
