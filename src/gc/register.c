@@ -565,8 +565,14 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_u
             ctxp->n_regs_used = NULL;
         }
 
-        ptr  = ctxp;
-        slot = CALCULATE_SLOT_NUM(ctxp->regs_mem_size);
+        /* don't put the same context on the free list multiple times; we don't
+         * have the re-use versus multiple ref count semantics right yet */
+        if (ctxp->ref_count < 0)
+            return;
+
+        ctxp->ref_count = 0;
+        ptr             = ctxp;
+        slot            = CALCULATE_SLOT_NUM(ctxp->regs_mem_size);
 
         PARROT_ASSERT(slot < interp->ctx_mem.n_free_slots);
         *(void **)ptr                   = interp->ctx_mem.free_list[slot];
