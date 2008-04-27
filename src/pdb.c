@@ -111,7 +111,7 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include "parrot/embed.h"
 
 static void PDB_printwelcome(void);
-static void PDB_run_code(Parrot_Interp interp, int argc, char *argv[]);
+static void PDB_run_code(Parrot_Interp interp, int argc, const char *argv[]);
 
 /*
 
@@ -127,12 +127,12 @@ Parrot_debug().
 extern void imcc_init(Parrot_Interp interp);
 
 int
-main(int argc, char *argv[])
+main(int argc, const char *argv[])
 {
     Parrot_Interp     debugger = Parrot_new(NULL);
     Parrot_Interp     interp   = Parrot_new(debugger);
     PDB_t            *pdb      = mem_allocate_zeroed_typed(PDB_t);
-    char             *filename;
+    const char       *filename;
     char             *ext;
     void             *yyscanner;
 
@@ -214,7 +214,7 @@ Adds a default exception handler to PDB.
 */
 
 static void
-PDB_run_code(Parrot_Interp interp, int argc, char *argv[])
+PDB_run_code(Parrot_Interp interp, int argc, const char *argv[])
 {
     Parrot_exception exp;
 
