@@ -708,7 +708,7 @@ Parrot_encoding_utf16_init(PARROT_INTERP)
         bytes,
         iter_init
     };
-    STRUCT_COPY(return_encoding, &base_encoding);
+    STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "utf16", return_encoding);
     return return_encoding;
 }

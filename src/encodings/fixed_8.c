@@ -555,7 +555,7 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
         iter_init
 
     };
-    STRUCT_COPY(return_encoding, &base_encoding);
+    STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "fixed_8", return_encoding);
     return return_encoding;
 }
