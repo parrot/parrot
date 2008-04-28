@@ -1010,7 +1010,11 @@ use tcltest.tcl)
 
 =item Location
 
-C<languages/tcl>
+C<languages/tcl>.
+
+=item Issues
+
+L<http://code.google.com/p/partcl/issues/list>
 
 =back
 
