@@ -925,7 +925,7 @@ Parrot_charset_unicode_init(PARROT_INTERP)
         NULL
     };
 
-    STRUCT_COPY(return_set, &base_set);
+    STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     /*
      * for now use utf8
      * TODO replace it with a fixed uint_16 or uint_32 encoding

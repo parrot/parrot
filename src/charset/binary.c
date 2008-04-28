@@ -467,7 +467,7 @@ Parrot_charset_binary_init(PARROT_INTERP)
         NULL
     };
 
-    STRUCT_COPY(return_set, &base_set);
+    STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
     Parrot_register_charset(interp, "binary", return_set);
     return return_set;

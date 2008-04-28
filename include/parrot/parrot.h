@@ -241,9 +241,11 @@ typedef void (*funcptr_t)(void);
 #endif /* O_BINARY */
 
 /* Hide our struct copying behind macros */
+/* Copying to struct pointer from struct pointer */
 #define STRUCT_COPY(d, s)    (PARROT_ASSERT(d), PARROT_ASSERT(s), *(d)=*(s))
 #define STRUCT_COPY_N(d, s, n) (PARROT_ASSERT(d), PARROT_ASSERT(s), PARROT_ASSERT(sizeof (*(d))==sizeof (*(s))), memcpy((d), (s), sizeof (*(d))*(n)))
-
+/* Copying to struct pointer from struct */
+#define STRUCT_COPY_FROM_STRUCT(d, s)    (PARROT_ASSERT(d), *(d)=(s))
 
 /* internationalization settings */
 #ifdef    PARROT_HAS_GETTEXT
