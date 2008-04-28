@@ -15,7 +15,6 @@ BuildRequires:  /usr/bin/perldoc
 BuildRequires:  bc
 BuildRequires:  m4
 BuildRequires:  libicu-devel
-BuildRequires:  perl-SVK
 
 %package devel
 Summary:        Parrot Virtual Machine development headers and libraries
@@ -25,10 +24,9 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{_libdir}/pkgconfig
 
 %description
-Parrot is a virtual machine designed to efficiently compile and
-execute bytecode for dynamic languages. Parrot is a be a target
-for the Perl 6 compiler, and is already usable as a backend for
-Pugs, as well as variety of other languages.
+Parrot is a virtual machine designed to efficiently compile and execute
+bytecode for dynamic languages. Parrot is a target for the Perl 6 compiler, and
+is already usable as a backend for Pugs, as well as variety of other languages.
 
 %description devel
 Parrot Virtual Machine development headers and libraries.
@@ -81,7 +79,8 @@ find $RPM_BUILD_ROOT%{_libdir} -type f \( -name '*.so' -o -name '*.so.*' \) \
 rm -rf $RPM_BUILD_ROOT%{_usr}/compilers \
     $RPM_BUILD_ROOT%{_usr}/config \
     $RPM_BUILD_ROOT%{_includedir}/src \
-    $RPM_BUILD_ROOT%{_usr}/src
+    $RPM_BUILD_ROOT%{_usr}/src \
+    $RPM_BUILD_ROOT%{_usr}/tools
 
 %check
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
@@ -116,6 +115,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Mon Apr 28 2008 chromatic <chromatic@wgz.org> 0.6.1
+- minor fixes; tested with Fedora 7, 8, and 9-beta
+
 * Tue Mar 18 2008 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de> 0.6.0
 - Update to 0.5.3.
 
