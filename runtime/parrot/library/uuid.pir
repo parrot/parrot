@@ -7,6 +7,8 @@ uuid.pir - minimalist uuid library
 
 =head1 DESCRIPTION
 
+CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
+
 See e2fsprogs/libuuid (ISO-C), UUID (Perl/XS)
 L<http://e2fsprogs.sourceforge.net/>
 
@@ -86,6 +88,8 @@ L<http://e2fsprogs.sourceforge.net/>
 
 =item C<generate_random>
 
+CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
+
 =cut
 
 .sub 'generate_random'
@@ -93,7 +97,7 @@ L<http://e2fsprogs.sourceforge.net/>
     new res, 'uuid'
     set res, N
     new $P0, 'Random'
-    time $I0
+    time $I0    # less than enough entropy
     set $P0, $I0
     .local int i
     i = 0
@@ -121,6 +125,8 @@ L<http://e2fsprogs.sourceforge.net/>
 
 =item C<generate_time>
 
+CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
+
 =cut
 
 .sub 'generate_time'
@@ -128,7 +134,7 @@ L<http://e2fsprogs.sourceforge.net/>
     new res, 'uuid'
     set res, N
     new $P0, 'Random'
-    time $I0
+    time $I0    # less than enough entropy
     set $P0, $I0
     .local int i
     i = 10
@@ -148,6 +154,8 @@ L<http://e2fsprogs.sourceforge.net/>
 .end
 
 =item C<generate>
+
+CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
 
 =cut
 
@@ -291,4 +299,3 @@ Francois Perrad
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-
