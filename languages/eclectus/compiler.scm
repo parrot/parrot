@@ -540,7 +540,7 @@
            (for-each
              (lambda (key_val)
                (emit "
-                     :~a('~a'),
+                     :~a(\"~a\"),
                      " (car key_val) (cadr key_val)))
              (cdr daughter))
            (past-sxml->past-nqp daughter)))
