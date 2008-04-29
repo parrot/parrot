@@ -253,11 +253,13 @@ typedef void (*funcptr_t)(void);
 #  define _(s)                 gettext(s)
 #  define gettext_noop(s)      (s)
 #  define N_(s)                gettext_noop(s)
+#  define PARROT_TEXTDOMAIN(d) textdomain(d)
+#  define PARROT_BINDTEXTDOMAIN(p, d) bindtextdomain((p), (d))
 #else
 #  define _(s)                 (s)
 #  define N_(s)                (s)
-#  define textdomain(d)
-#  define bindtextdomain(p, d)
+#  define PARROT_TEXTDOMAIN(d)
+#  define PARROT_BINDTEXTDOMAIN(p, d)
 #endif /* PARROT_HAS_GETTEXT */
 
 #define PACKAGE     "parrot"

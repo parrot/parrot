@@ -44,8 +44,8 @@ main(int argc, const char * argv[])
 
     /* internationalization setup */
     /* setlocale(LC_ALL, ""); */
-    bindtextdomain(PACKAGE, LOCALEDIR);
-    textdomain(PACKAGE);
+    PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR);
+    PARROT_TEXTDOMAIN(PACKAGE);
 
     Parrot_set_config_hash();
 
