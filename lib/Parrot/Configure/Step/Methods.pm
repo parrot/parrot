@@ -4,6 +4,7 @@
 package Parrot::Configure::Step::Methods;
 use strict;
 use warnings;
+use Carp;
 
 =head1 NAME
 
@@ -24,11 +25,9 @@ and which need access to the data in the Parrot::Configure::Step object.
 Since the methods are not part of the public interface, their names should
 begin with an underscore 'C<_>'.
 
-=head2 Methods
+=head1 METHODS
 
-=over 4
-
-=item C<_recheck_settings()>
+=head2 C<_recheck_settings()>
 
     $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
 
@@ -46,7 +45,7 @@ sub _recheck_settings {
     $self->set_result('no');
 }
 
-=item C<_handle_darwin_for_fink()>
+=head2 C<_handle_darwin_for_fink()>
 
     $self->_handle_darwin_for_fink($conf, $libs, $osname, $file);
 
@@ -83,6 +82,21 @@ sub _handle_darwin_for_fink {
     return 1;
 }
 
+=head2 C<_handle_darwin_for_macports()>
+
+    $self->_handle_darwin_for_macports($conf, $libs, $osname, $file);
+
+Currently used in configuration step classes auto::gmp, auto::readline and
+auto::opengl.
+
+Modifies settings for C<linkflags>, C<ldflags> and C<ccflags> in the
+Parrot::Configure object's data structure.
+
+Potentially expandable to cover all BSD-ports systems -- but as yet there has
+been no demand.
+
+=cut
+
 sub _handle_darwin_for_macports {
     my ($self, $conf, $osname, $file) = @_;
     if ( $osname =~ /darwin/ ) {
@@ -98,7 +112,104 @@ sub _handle_darwin_for_macports {
     return 1;
 }
 
+=head2 C<_add_to_libs()>
+
+    $self->_add_to_libs( {
+        conf            => $conf,
+        osname          => $osname,
+        cc              => $cc,
+        win32_gcc       => '-lalpha32 -lalpha32 -lopenalpha32',
+        win32_nongcc    => 'alpha.lib',
+        darwin          => 'alphadarwin.lib',
+        default         => '-lalpha',
+    } );
+
+B<Purpose>:  In a number of configuration step classes, the class's
+C<runstep()> method adds libraries to the single whitespace-delimited string found in
+the Parrot::Configure object's C<libs> attribute.  The libraries to be added
+are either OS-specific or OS/C-compiler-specific.  This method enables the
+developer of a configuration step class to define a default value for such a
+flag -- usually the value that is appropriate to Unix-like systems -- and,
+optionally, to define non-default values for certain OSes or OS/C-compiler
+combinations.  We currently support settings for:
+
+=over 4
+
+=item * MSWin32 with F<gcc> as the C-compiler.
+
+=item * MSWin32 with any C-compiler other than F<gcc>.
+
+=item * Darwin.
+
 =back
+
+B<Arguments>: Reference to a hash.  Four of the hash's key-value pairs are
+required:
+
+=over 4
+
+=item * C<conf>
+
+The Parrot::Configure object.  Supplied within C<runstep()>.
+
+=item * C<osname>
+
+The name of the operating system.  Supplied within C<runstep()>.
+
+=item * C<cc>
+
+The name of the C-compiler.  Supplied within C<runstep()>.
+
+=item * C<default>
+
+Libraries to be added where no OS-specific or OS/C-compiler-specific libraries
+are to be added.  Single whitespace-delimited string.
+
+=back
+
+These optional settings are currently supported and, if provided, will
+supersede the value in C<default>.
+
+=over 4
+
+=item * C<win32_gcc>
+
+Libraries to be added where OS is mswin32 and C-compiler is F<gcc>.
+Single whitespace-delimited string.
+
+=item * C<win32_nongcc>
+
+Libraries to be added where OS is mswin32 and C-compiler is not F<gcc>.
+Single whitespace-delimited string.
+
+=item * C<darwin>
+
+Libraries to be added where OS is Darwin.  Do not supply a value if the value
+you need is the same as C<default>.  Single whitespace-delimited string.
+
+=back
+
+B<Return Value>:  Returns true value upon success.
+
+=cut
+
+sub _add_to_libs {
+    my $self = shift;
+    my $args = shift;
+    croak "_add_to_libs() takes hashref: $!" unless ref($args) eq 'HASH';
+    my $platform =
+          ($args->{osname} =~ /mswin32/i &&
+           $args->{cc} =~ /^gcc/i)          ? 'win32_gcc'
+        :  $args->{osname} =~ /mswin32/i    ? 'win32_nongcc'
+        :  $args->{osname} =~ /darwin/i     ? 'darwin'
+        :  'default';
+    my $libs = defined($args->{$platform})
+        ? $args->{$platform}
+        : $args->{default};
+    $args->{conf}->data->add(' ', libs => $libs);
+    return 1;
+}
+
 
 =head1 SEE ALSO
 

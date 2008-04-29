@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  18;
+use Test::More tests => 24;
 use Carp;
 use Cwd;
 use lib qw( lib t/configure/testlib );
@@ -39,6 +39,56 @@ $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 
+# Mock different OS/compiler combinations.
+my ($osname, $cc, $initial_libs);
+$initial_libs = $conf->data->get('libs');
+$osname = 'mswin32';
+$cc = 'gcc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'libcrypto.lib',
+    default         => '-lcrypto',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lcrypto/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'mswin32';
+$cc = 'cc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'libcrypto.lib',
+    default         => '-lcrypto',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/libcrypto.lib/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'foobar';
+$cc = 'cc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'libcrypto.lib',
+    default         => '-lcrypto',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lcrypto/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
 
 my ($libs, $ccflags, $linkflags, $verbose);
 

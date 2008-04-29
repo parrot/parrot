@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>   9;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib );
 use_ok('config::init::defaults');
@@ -37,27 +37,83 @@ $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 
+# Mock OS/C-compiler combinations
+my ($osname, $cc, $initial_libs);
+$initial_libs = $conf->data->get('libs');
+$osname = 'mswin32';
+$cc = 'gcc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lglut32 -lglu32 -lopengl32/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
 
-#my $test = qq{4\n};
-#my $has_glut = $step->_evaluate_cc_run($test, undef);
-#is( $has_glut, 4, "Got expected return value for _evaluate_cc_run()." );
-#is( $step->result(),
-#    "yes, GLUT 4", "Got expected result for _evaluate_cc_run()." );
-#
-#ok( auto::opengl::_handle_glut( $conf, $has_glut ),
-#    "_handle_glut returned true value");
-#is( $conf->data->get( 'opengl' ), 'define',
-#    "Expected value set for 'opengl'." );
-#is( $conf->data->get( 'has_opengl' ), $has_glut,
-#    "Expected value set for 'has_opengl'." );
-#is( $conf->data->get( 'HAS_OPENGL' ), $has_glut,
-#    "Expected value set for 'HAS_OPENGL'." );
-#is( $conf->data->get( 'glut' ), 'define',
-#    "Expected value set for 'glut'." );
-#is( $conf->data->get( 'has_glut' ), $has_glut,
-#    "Expected value set for 'has_glut'." );
-#is( $conf->data->get( 'HAS_GLUT' ), $has_glut,
-#    "Expected value set for 'HAS_GLUT'." );
+$osname = 'mswin32';
+$cc = 'cc';
+$initial_libs = $conf->data->get('libs');
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/glut.lib glu.lib gl.lib/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'darwin';
+$cc = 'cc';
+$initial_libs = $conf->data->get('libs');
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-framework OpenGL -framework GLUT/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'foobar';
+$cc = 'cc';
+$initial_libs = $conf->data->get('libs');
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lglut -lGLU -lGL/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
 
 pass("Completed all tests in $0");
 

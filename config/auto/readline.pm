@@ -45,7 +45,13 @@ sub runstep {
 
     my $osname = $conf->data->get_p5('OSNAME');
 
-    _handle_mswin32($conf, $osname, $cc);
+    $self->_add_to_libs( {
+        conf            => $conf,
+        osname          => $osname,
+        cc              => $cc,
+        win32_nongcc    => 'readline.lib',
+        default         => '-lreadline',
+    } );
 
     # On OS X check the presence of the readline header in the standard
     # Fink/macports locations.
@@ -76,22 +82,6 @@ sub runstep {
         $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
 
-    return 1;
-}
-
-sub _handle_mswin32 {
-    my ($conf, $osname, $cc) = @_;
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lreadline' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'readline.lib' );
-        }
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lreadline' );
-    }
     return 1;
 }
 

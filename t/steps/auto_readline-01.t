@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 46;
+use Test::More tests => 47;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -16,6 +16,7 @@ use_ok('config::auto::readline');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
+use IO::CaptureOutput qw | capture |;
 
 my $args = process_options(
     {
@@ -46,24 +47,56 @@ ok( $step->description(), "$step_name has description" );
 my ($osname, $cc);
 $osname = 'mswin32';
 $cc = 'gcc';
-ok(auto::readline::_handle_mswin32($conf, $osname, $cc),
-    "_handle_mswin32() returned true value");
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'readline.lib',
+    default         => '-lreadline',
+} ),
+    "_add_to_libs() returned true value");
 like($conf->data->get( 'libs' ), qr/-lreadline/,
     "'libs' modified as expected");
 
 $osname = 'mswin32';
 $cc = 'cc';
-ok(auto::readline::_handle_mswin32($conf, $osname, $cc),
-    "_handle_mswin32() returned true value");
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'readline.lib',
+    default         => '-lreadline',
+} ),
+    "_add_to_libs() returned true value");
 like($conf->data->get( 'libs' ), qr/readline\.lib/,
     "'libs' modified as expected");
 
 $osname = 'foobar';
 $cc = undef;
-ok(auto::readline::_handle_mswin32($conf, $osname, $cc),
-    "_handle_mswin32() returned true value");
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'readline.lib',
+    default         => '-lreadline',
+} ),
+    "_add_to_libs() returned true value");
 like($conf->data->get( 'libs' ), qr/-lreadline/,
     "'libs' modified as expected");
+
+$osname = 'foobar';
+$cc = undef;
+eval {
+    $step->_add_to_libs( [
+        conf            => $conf,
+        osname          => $osname,
+        cc              => $cc,
+        win32_nongcc    => 'readline.lib',
+        default         => '-lreadline',
+    ] );
+};
+like($@, qr/_add_to_libs\(\) takes hashref/,
+    "Bad argument to _add_to_libs correctly detected");
 
 my ($flagsbefore, $flagsafter);
 

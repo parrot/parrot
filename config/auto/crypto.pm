@@ -52,7 +52,13 @@ sub runstep {
 
     my $osname = $conf->data->get_p5('OSNAME');
 
-    _handle_mswin32($conf, $osname, $cc);
+    $self->_add_to_libs( {
+        conf            => $conf,
+        osname          => $osname,
+        cc              => $cc,
+        win32_nongcc    => 'libcrypto.lib',
+        default         => '-lcrypto',
+    } );
 
     $conf->cc_gen('config/auto/crypto/crypto.in');
     eval { $conf->cc_build(); };
@@ -67,22 +73,6 @@ sub runstep {
     }
     $conf->data->set( has_crypto => $has_crypto );    # for dynpmc.in & digest.t
 
-    return 1;
-}
-
-sub _handle_mswin32 {
-    my ($conf, $osname, $cc) = @_;
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lcrypto' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'libcrypto.lib' );
-        }
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lcrypto' );
-    }
     return 1;
 }
 

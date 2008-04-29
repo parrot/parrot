@@ -63,7 +63,13 @@ sub runstep {
 
     my $osname    = $conf->data->get_p5('OSNAME');
 
-    _handle_mswin32($conf, $osname, $cc);
+    $self->_add_to_libs( {
+        conf            => $conf,
+        osname          => $osname,
+        cc              => $cc,
+        win32_nongcc    => 'gmp.lib',
+        default         => '-lgmp',
+    } );
 
     # On OS X check the presence of the gmp header in the standard
     # Fink location.
@@ -82,22 +88,6 @@ sub runstep {
         $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
 
-    return 1;
-}
-
-sub _handle_mswin32 {
-    my ($conf, $osname, $cc) = @_;
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lgmp' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'gmp.lib' );
-        }
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lgmp' );
-    }
     return 1;
 }
 

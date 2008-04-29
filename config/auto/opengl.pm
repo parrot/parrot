@@ -53,7 +53,15 @@ sub runstep {
 
     my $osname = $conf->data->get_p5('OSNAME');
 
-    _handle_mswin32($conf, $osname, $cc);
+    $self->_add_to_libs( {
+        conf            => $conf,
+        osname          => $osname,
+        cc              => $cc,
+        win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+        win32_nongcc    => 'glut.lib glu.lib gl.lib',
+        darwin          => '-framework OpenGL -framework GLUT',
+        default         => '-lglut -lGLU -lGL',
+    } );
 
     # On OS X check the presence of the OpenGL headers in the standard
     # Fink/macports locations.
@@ -73,26 +81,6 @@ sub runstep {
         $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
 
-    return 1;
-}
-
-sub _handle_mswin32 {
-    my ($conf, $osname, $cc) = @_;
-    # Mindlessly morphed from readline ... may need to be fixed
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lglut32 -lglu32 -lopengl32' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'glut.lib glu.lib gl.lib' );
-        }
-    }
-    elsif ( $osname =~ /darwin/i ) {
-        $conf->data->add( ' ', libs => '-framework OpenGL -framework GLUT' );
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lglut -lGLU -lGL' );
-    }
     return 1;
 }
 
