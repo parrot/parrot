@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  22;
+use Test::More tests =>  21;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -50,7 +50,7 @@ my $rv = auto::warnings::_set_ccflags($conf, $output, $tryflags, undef);
 is($rv, 1, "_set_ccflags() returned 1 as expected");
 is($conf->data->get("ccflags"), $tryflags, "ccflags changed as expected");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

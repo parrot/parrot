@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests =>  13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -53,7 +53,7 @@ is($conf->data->get('has_gdbm'), 0,
     "Got expected value for 'has_gdbm'");
 is($step->result(), q{no}, "Expected result was set");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

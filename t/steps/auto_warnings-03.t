@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  21;
+use Test::More tests =>  20;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -48,7 +48,7 @@ auto::warnings::_set_warning($conf, $warning, 1, undef);
 ok(! $conf->data->get($warning),
     "Got expected setting for warning");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

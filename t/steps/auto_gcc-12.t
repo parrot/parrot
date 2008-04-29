@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  14;
+use Test::More tests =>  13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -47,7 +47,7 @@ is($conf->data->get( 'ccwarn' ), q{-ansi -pedantic},
     "ccwarn set as expected for miniparrot");
 is($step->result(), q{yes}, "Got expected result");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

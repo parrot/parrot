@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  11;
+use Test::More tests =>  10;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -44,7 +44,7 @@ $test = $step->_second_probe_for_inline($conf, $test);
 ok($step->_evaluate_inline($conf, $test),
     "_evaluate_inline() returned true value");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

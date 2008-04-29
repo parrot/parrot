@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests =>  24;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -141,7 +141,7 @@ $has_gettext = $step->_evaluate_cc_run($test, $verbose);
 is($has_gettext, 0, "Got expected value for has_gettext");
 ok(! defined $step->result(), "As expected, result is not yet defined");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

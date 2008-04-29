@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests =>  13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -48,7 +48,7 @@ ok(defined($step->result()), "Result was defined");
 ok($possible_ctags{$conf->data->get('ctags')},
     "Acceptable value for 'ctags' attribute was set");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

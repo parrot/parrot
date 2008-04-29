@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  16;
+use Test::More tests =>  15;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -66,7 +66,7 @@ isa_ok( $step, $step_name );
         "'inline' attribute has expected value");
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

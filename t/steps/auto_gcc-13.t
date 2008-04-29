@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  15;
+use Test::More tests =>  14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -52,7 +52,7 @@ $gnucref->{__GNUC_MINOR__} = q{1};
     is($step->result(), q{yes}, "Got expected result");
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

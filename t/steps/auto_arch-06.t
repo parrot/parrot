@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  14;
+use Test::More tests =>  13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -51,7 +51,7 @@ is($conf->data->get('cpuarch'), q{ppc},
 is($conf->data->get('osname'), q{darwin},
     "'osname' was set as expected");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

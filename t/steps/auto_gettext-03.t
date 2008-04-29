@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  15;
+use Test::More tests =>  14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -66,7 +66,7 @@ like($conf->data->get( 'ccflags' ), qr/-DHAS_GETTEXT/,
     );
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

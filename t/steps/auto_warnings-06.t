@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  23;
+use Test::More tests =>  22;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -57,7 +57,7 @@ isa_ok( $step, $step_name );
     like($stdout, qr/ccflags:\s+$tryflags/, "Got expected verbose output");
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

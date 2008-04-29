@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  25;
+use Test::More tests =>  24;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -65,7 +65,7 @@ is($conf->data->get('TEMP_cg_r'), q{}, "An attribute was set to empty string");
 is($conf->data->get('cg_flag'), q{}, "An attribute was set to empty string");
 is($step->result(), q{no}, "Expected result was set");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

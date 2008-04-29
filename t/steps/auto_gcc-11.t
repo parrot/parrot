@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  13;
+use Test::More tests =>  12;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -46,7 +46,7 @@ ok(defined $conf->data->get( 'gccversion' ),
     "gccversion defined as expected");
 is($step->result(), q{yes}, "Got expected result");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

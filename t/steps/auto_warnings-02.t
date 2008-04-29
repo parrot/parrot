@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  21;
+use Test::More tests =>  20;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -49,7 +49,7 @@ $step->_add_maintainer_warnings($conf);
 %potential_warnings_seen = map { $_, 1 } @{ $step->{potential_warnings} };
 ok($potential_warnings_seen{'-Wlarger-than-4096'}, "Maintainer warning added");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  17;
+use Test::More tests =>  16;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -48,7 +48,7 @@ ok(defined($conf->data->get('TEMP_cg_o')), "An attribute has been defined");
 ok(defined($conf->data->get('TEMP_cg_r')), "An attribute has been defined");
 ok(defined($conf->data->get('cg_flag')), "An attribute has been defined");
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

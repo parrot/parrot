@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  12;
+use Test::More tests =>  11;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -52,7 +52,7 @@ $conf->data->set('gccversion' => '4.1');
       ok( $stdout, "verbose output captured" );
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  13;
+use Test::More tests =>  12;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -63,7 +63,7 @@ my $errstr;
     }
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 sub _capture { $errstr = $_[0]; }

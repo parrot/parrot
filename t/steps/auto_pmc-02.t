@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 23;
+use Test::More tests =>  22;
 use Carp;
 use Cwd;
 use File::Path qw| mkpath |;
@@ -121,7 +121,7 @@ my $cwd = cwd();
     ok( chdir $cwd, 'changed back to original directory after testing' );
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

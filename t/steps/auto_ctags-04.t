@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  14;
+use Test::More tests =>  13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -64,7 +64,7 @@ ok(! auto::ctags::_probe_for_ctags_output('alpha', 0),
     ok(! $rv, "Probe returned false when output matched");
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

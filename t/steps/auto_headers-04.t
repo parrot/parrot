@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  13;
+use Test::More tests =>  12;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -50,7 +50,7 @@ ok(! $conf->data->get('i_niin'), "Mapping made correctly");
     ok($extra_headers{'netdb.h'}, "Special header set for msys");
 }
 
-pass("Keep Devel::Cover happy");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
