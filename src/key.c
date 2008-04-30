@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -40,10 +40,9 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new(PARROT_INTERP)
 {
-    PMC * const key = pmc_new(interp, enum_class_Key);
-
-    return key;
+    return pmc_new(interp, enum_class_Key);
 }
+
 
 /*
 
@@ -64,10 +63,11 @@ key_new_integer(PARROT_INTERP, INTVAL value)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-    PMC_int_val(key) = value;
+    PMC_int_val(key)     = value;
 
     return key;
 }
+
 
 /*
 
@@ -88,10 +88,11 @@ key_new_number(PARROT_INTERP, FLOATVAL value)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
-    PMC_num_val(key) = value;
+    PMC_num_val(key)     = value;
 
     return key;
 }
+
 
 /*
 
@@ -112,10 +113,11 @@ key_new_string(PARROT_INTERP, ARGIN(STRING *value))
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
-    PMC_str_val(key) = value;
+    PMC_str_val(key)     = value;
 
     return key;
 }
+
 
 /*
 
@@ -134,9 +136,9 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
 {
-    return key_new_string(interp,
-            string_from_cstring(interp, value, 0));
+    return key_new_string(interp, string_from_cstring(interp, value, 0));
 }
+
 
 /*
 
@@ -160,6 +162,7 @@ key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
     real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
 }
 
+
 /*
 
 =item C<void key_set_integer>
@@ -175,11 +178,12 @@ void
 key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-    PMC_int_val(key) = value;
+    PObj_get_FLAGS(key) |=  KEY_integer_FLAG;
+    PMC_int_val(key)     = value;
 
     return;
 }
+
 
 /*
 
@@ -196,11 +200,12 @@ void
 key_set_register(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |= KEY_register_FLAG | flag;
-    PMC_int_val(key) = value;
+    PObj_get_FLAGS(key) |=  KEY_register_FLAG | flag;
+    PMC_int_val(key)     = value;
 
     return;
 }
+
 
 /*
 
@@ -217,11 +222,12 @@ void
 key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |= KEY_number_FLAG;
-    PMC_num_val(key) = value;
+    PObj_get_FLAGS(key) |=  KEY_number_FLAG;
+    PMC_num_val(key)     = value;
 
     return;
 }
+
 
 /*
 
@@ -238,11 +244,12 @@ void
 key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |= KEY_string_FLAG;
-    PMC_str_val(key) = value;
+    PObj_get_FLAGS(key) |=  KEY_string_FLAG;
+    PMC_str_val(key)     = value;
 
     return;
 }
+
 
 /*
 
@@ -259,13 +266,15 @@ void
 key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
+    PObj_get_FLAGS(key) |=  KEY_pmc_FLAG;
+
     /*
      * XXX leo
      * what for is this indirection?
      */
     real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
 }
+
 
 /*
 
@@ -284,6 +293,7 @@ key_type(SHIM_INTERP, ARGIN(const PMC *key))
 {
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
+
 
 /*
 
@@ -337,6 +347,7 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
     return VTABLE_get_integer(interp, key);
 }
 
+
 /*
 
 =item C<FLOATVAL key_number>
@@ -372,6 +383,7 @@ key_number(PARROT_INTERP, ARGIN(PMC *key))
         real_exception(interp, NULL, INVALID_OPERATION, "Key not a number!\n");
     }
 }
+
 
 /*
 
@@ -412,12 +424,13 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
     }
 }
 
+
 /*
 
 =item C<PMC * key_pmc>
 
 These functions return the integer/number/string/PMC values of C<key> if
-possible. Otherwise they throws an exceptions.
+possible. Otherwise they throw exceptions.
 
 =cut
 
@@ -437,6 +450,7 @@ key_pmc(PARROT_INTERP, ARGIN(PMC *key))
     }
 }
 
+
 /*
 
 =item C<PMC * key_next>
@@ -453,11 +467,11 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
-    return
-        VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext ?
-            (PMC *)PMC_data(key) :
-            NULL;
+    return VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext
+        ? PMC_data(key)
+        : NULL;
 }
+
 
 /*
 
@@ -465,8 +479,8 @@ key_next(PARROT_INTERP, ARGIN(PMC *key))
 
 Appends C<key2> to C<key1>.
 
-Note that if C<key1> is not the last key in a sequence linked keys then
-the last key will be found and C<key2> appended to that.
+Note that if C<key1> is not the last key in a sequence of linked keys then the
+last key will be found and C<key2> appended to that.
 
 Returns C<key1>.
 
@@ -483,13 +497,14 @@ key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
     PMC *tail = key1;
 
     while (PMC_data(tail)) {
-        tail = (PMC *)PMC_data(tail);
+        tail = PMC_data(tail);
     }
 
     PMC_data(tail) = key2;
 
     return key1;
 }
+
 
 /*
 
@@ -509,6 +524,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 
     if (flags == KEY_string_FLAG)
         pobject_lives(interp, (PObj *)PMC_str_val(key));
+
     /*
      * KEY_hash_iterator_FLAGS denote a hash key iteration, PMC_data() is
      * the bucket_index and not the next key component
@@ -521,6 +537,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
         pobject_lives(interp, (PObj *)PMC_data(key));
 
 }
+
 
 /*
 
@@ -541,13 +558,14 @@ STRING *
 key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
     STRING * const semicolon = string_from_cstring(interp, " ; ", 3);
-    STRING * const quote = string_from_cstring(interp, "'", 1);
-    STRING *value = string_from_cstring(interp, "[ ", 2);
+    STRING * const quote     = string_from_cstring(interp, "'", 1);
+    STRING        *value     = string_from_cstring(interp, "[ ", 2);
 
-    for (; key; key = (PMC *)PMC_data(key)) {
+    for (; key; key = PMC_data(key)) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
-                value = string_append(interp, value, string_from_int(interp, PMC_int_val(key)));
+                value = string_append(interp, value,
+                    string_from_int(interp, PMC_int_val(key)));
                 break;
             case KEY_string_FLAG:
                 value = string_append(interp, value, quote);
@@ -555,32 +573,36 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
                 value = string_append(interp, value, quote);
                 break;
             case KEY_pmc_FLAG:
-                value = string_append(interp, value, VTABLE_get_string(interp, key));
+                value = string_append(interp, value,
+                    VTABLE_get_string(interp, key));
                 break;
             case KEY_integer_FLAG | KEY_register_FLAG:
                 value = string_append(interp, value,
-                        string_from_int(interp, REG_INT(interp, PMC_int_val(key))));
+                        string_from_int(interp,
+                            REG_INT(interp, PMC_int_val(key))));
                 break;
             case KEY_string_FLAG | KEY_register_FLAG:
                 value = string_append(interp, value, quote);
-                value = string_append(interp, value, REG_STR(interp, PMC_int_val(key)));
+                value = string_append(interp, value,
+                    REG_STR(interp, PMC_int_val(key)));
                 value = string_append(interp, value, quote);
                 break;
             case KEY_pmc_FLAG | KEY_register_FLAG:
                 {
                 PMC * const reg = REG_PMC(interp, PMC_int_val(key));
-                value = string_append(interp, value, VTABLE_get_string(interp, reg));
+                value           = string_append(interp, value,
+                                    VTABLE_get_string(interp, reg));
                 }
                 break;
             default:
-                value = string_append(interp, value,
-                        CONST_STRING(interp, "Key type unknown"));
+                value = string_append(interp, value, CONST_STRING(interp, "Key type unknown"));
                 break;
         }
 
         if (PMC_data(key))
             value = string_append(interp, value, semicolon);
     }
+
     value = string_append(interp, value, string_from_cstring(interp, " ]", 2));
     return value;
 }
