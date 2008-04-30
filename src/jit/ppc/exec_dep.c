@@ -60,7 +60,7 @@ Parrot_exec_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 }
 
 /* Assign the offset of the program_code */
-static void
+void
 offset_fixup(Parrot_exec_objfile_t *obj)
 {
     int i, j;

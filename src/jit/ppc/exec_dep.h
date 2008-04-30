@@ -28,7 +28,7 @@ Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
-static void
+void
 offset_fixup(Parrot_exec_objfile_t *obj);
 
 #endif /* PARROT_PPC_EXEC_DEP_H_GUARD */
