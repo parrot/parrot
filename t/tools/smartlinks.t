@@ -12,13 +12,13 @@ t/tools/smartlinks.t - test the smartlink generator
 
 =head1 DESCRIPTION
 
-Tests the C<smartlinks.pl> utility by exersizing different options,
-processing example test files and spec documents, and examining
-the output.
+Tests L<SmartLink> and the F<tools/util/smartlinks.pl> utility
+by exercising different options, processing example test files
+and spec documents, and examining the output.
 
-We never actually check the *full* output of the utility.
+We never actually check the I<full> output of the utility.
 We simply check several smaller components to avoid a test file
-that is far too unweildy.
+that is far too unwieldy.
 
 =cut
 
@@ -34,7 +34,7 @@ BEGIN {
     eval { require Moose };
     plan $@
         ? (skip_all => 'Moose not installed')
-        : (tests => 66);
+        : (tests => 73);
 }
 
 BEGIN {
@@ -127,11 +127,24 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 {
     vdiag 'File';
     my ( $fh, $fn ) = tempfile();
-    print $fh "i am a file" and close $fh;
+    print $fh 'i am a file' and close $fh;
     my $f = File->new( filename => $fn );
     isa_ok( $f, 'File' );
 
-    # RT#46785: many more tests
+    $fh = $f->open( '<' );
+    is( $fh, $f->filehandle, 'open returns a filehandle' );
+    is( $f->mode, '<', 'open mode' );
+    is( scalar <$fh>, 'i am a file', 'read' );
+    $f->close;
+    {
+        local $TODO = 'filehandle after close';
+        is( $f->filehandle, undef, 'filehandle after close' );
+    }
+
+    my $no_such = File->new( filename => 'no_such.txt' );
+    ok( $no_such, 'ok to instantiate a non-existent file' );
+    eval { $no_such->open( '<' ); };
+    like( $@, '/can\'t open/i', 'fail to open non-existent file' );
 }
 
 {
@@ -150,6 +163,9 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
     is( $p->name,      'pdd03_calling_conventions', '->name returns file basename' );
     is( $p->path,      'docs/pdds/',                '->path returns file path' );
     is( $p->extension, '.pod',                      '->extension returns C<.pod>' );
+
+    my $tree = $p->parse;
+    ok( $tree, 'parsed' );
 
     # RT#46787: ->tree
 }
