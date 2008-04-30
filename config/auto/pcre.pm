@@ -90,10 +90,10 @@ sub _evaluate_cc_run {
     my $self = shift;
     my ($test, $verbose) = @_;
     my $has_pcre = 0;
-    if ( $test eq "Hello, world!\n" ) {
+    if ( $test =~ /pcre (\d+\.\d+)/ ) {
         $has_pcre = 1;
-        print " (yes) " if $verbose;
-        $self->set_result('yes');
+        print " (yes, $1) " if $verbose;
+        $self->set_result("yes, v$1");
     }
     return $has_pcre;
 }

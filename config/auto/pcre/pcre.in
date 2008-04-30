@@ -14,7 +14,8 @@ int main(int argc, char *argv[])
         printf("pcre_exec is NULL\n");
         return EXIT_FAILURE;
     }
-	printf("Hello, world!\n");
+	printf("pcre %s\n",pcre_version());
+	
 
     return EXIT_SUCCESS;
 }
