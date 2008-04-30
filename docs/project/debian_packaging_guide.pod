@@ -115,6 +115,22 @@ Check the package for errors. From ~/deb/parrot, run:
 Commit all changes made to the files in the debian/ directory to the Parrot
 repository. (Skip the generated debian/control file.)
 
+=item 12.
+
+Upload the packages to http://alioth.debian.org. (If you don't have admin
+privileges, ask someone who does.) From any of the project pages, click on the
+"Admin" tab, then the "FRS Admin" link on the bottom of the page, then the link
+to "quick-release a file".
+
+Select the appropriate "Package ID" for the file (the same as the filename
+without the version). For the "Release Name" use the current version number
+(e.g.  0.6.1). For the "Release Date" use the date and time you listed in the
+debian changelog file (the date and time the debian package was created, not
+Parrot's release date for that version). For the "Release Notes" use the
+standard release text (the email/website/press announcement) without the change
+list.  For the "Change Log" use the change list from the standard release text.
+Also check "Preserve my pre-formatted text".
+
 =back
 
 =head1 SEE ALSO
