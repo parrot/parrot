@@ -134,7 +134,7 @@ pmclass @md_name@
 
         RETURN(STRING *retval);
 #else
-        return NULL;
+        return;
 #endif
     }
 
