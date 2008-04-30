@@ -270,12 +270,10 @@ sub compile {
 
     $dest_stem ||= $src_stem;
     if (needs_build("$dest_stem$O", "$src_stem.c")) {
-        return run(compile_cmd("$dest_stem$O", "$src_stem.c"))
+        run(compile_cmd("$dest_stem$O", "$src_stem.c"))
           or die "compile $src_stem.c failed ($?)\n";
     }
-    else {
-        return 1;
-    }
+    return 1;
 }
 
 sub partial_link {
