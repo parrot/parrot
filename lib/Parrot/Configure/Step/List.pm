@@ -57,6 +57,7 @@ my @steps = qw(
     auto::gmp
     auto::readline
     auto::gdbm
+    auto::pcre
     auto::opengl
     auto::crypto
     auto::gettext

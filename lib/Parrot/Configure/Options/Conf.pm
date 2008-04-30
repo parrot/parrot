@@ -79,6 +79,7 @@ our @valid_options = qw{
     version
     without-gdbm
     without-opengl
+    without-pcre
     without-crypto
     without-gettext
     without-gmp
