@@ -59,7 +59,7 @@ LIB_DEFAULT:
     loadlib libpcre, 'libpcre'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
-    branch LIB_RETURN
+    branch LIB_FAILED
 
 LIB_WIN32:
     # Usually it's pcre.dll
@@ -70,13 +70,13 @@ LIB_WIN32:
     loadlib libpcre, 'pcre3'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
-    branch LIB_RETURN
+    branch LIB_FAILED
 
 LIB_CYGWIN:
     loadlib libpcre, 'cygpcre-0'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
-    branch LIB_RETURN
+    branch LIB_FAILED
 
 LIB_LOADED:
     store_global 'PCRE', 'lib', libpcre
@@ -100,6 +100,10 @@ LIB_LOADED:
     #        int buffersize);
     dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
     store_global 'PCRE::NCI', 'PCRE_copy_substring', pcre_function
+	branch LIB_RETURN
+
+LIB_FAILED:
+    die "Failed to load libpcre"
 
 LIB_RETURN:
     .return( libpcre )
