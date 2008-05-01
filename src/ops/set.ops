@@ -491,11 +491,16 @@ Morphs the PMC in $1 to the type of the PMC in $2, then assigns $2 to $1.
 
 inline op copy(inout PMC, invar PMC) :base_mem {
   PMC   * const clone = VTABLE_clone(interp, $2);
-  const INTVAL type   = VTABLE_type(interp, $2);
+  INTVAL type         = VTABLE_type(interp, $2);
 
   /* avoid leaks and unreachable memory by destroying the destination PMC */
   if (PObj_active_destroy_TEST($1))
       VTABLE_destroy(interp, $1);
+
+  /* If type comes back as zero, must be an object with an anoymous class.
+   * We can't morph to that, though, so we'll just do it via Undef. */
+  if (type == 0)
+    type = enum_class_Undef;
 
   VTABLE_morph(interp, $1, type);
 
