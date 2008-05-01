@@ -93,7 +93,7 @@ sub _evaluate_cc_run {
     if ( $test =~ /pcre (\d+\.\d+)/ ) {
         $has_pcre = 1;
         print " (yes, $1) " if $verbose;
-        $self->set_result("yes, v$1");
+        $self->set_result("yes, $1");
     }
     return $has_pcre;
 }
