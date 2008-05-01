@@ -59,12 +59,12 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test configuration step class auto::opengl in the case
-where C<--without-opengl> has been requested on the command line.
+The tests in this file test configuration step class auto::pcre in the case
+where C<--without-pcre> has been requested on the command line.
 
 =head1 AUTHOR
 
-Geoffrey Broadwell; modified from a similar file by James E Keenan
+Alberto Sim√es.
 
 =head1 SEE ALSO
 
