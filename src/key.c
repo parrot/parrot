@@ -468,7 +468,7 @@ PMC *
 key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
     return VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext
-        ? PMC_data(key)
+        ? (PMC *)PMC_data(key)
         : NULL;
 }
 
@@ -497,7 +497,7 @@ key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
     PMC *tail = key1;
 
     while (PMC_data(tail)) {
-        tail = PMC_data(tail);
+        tail = (PMC *)PMC_data(tail);
     }
 
     PMC_data(tail) = key2;
@@ -561,7 +561,7 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     STRING * const quote     = string_from_cstring(interp, "'", 1);
     STRING        *value     = string_from_cstring(interp, "[ ", 2);
 
-    for (; key; key = PMC_data(key)) {
+    for (; key; key = (PMC *)PMC_data(key)) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 value = string_append(interp, value,
