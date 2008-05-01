@@ -340,9 +340,9 @@ N: Jonathan Stowe
 
 N: Jonathan Worthington
 D: Bits of Win32 support, PBC utilities, debug segment work, .Net
-D: to PIR translator and various patches
-E: jonathan@jwcs.net
-W: http://www.jwcs.net/~jonathan/
+D: to PIR translator, some Rakudo stuff and various other patches
+E: jnthn@jnthn.net
+W: http://www.jnthn.net/
 
 N: Jos Visser
 D: fortytwo opcode
