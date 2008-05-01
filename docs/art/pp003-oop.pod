@@ -249,7 +249,7 @@ takes advantage of this to retrieve the attribute called
 Immediately after I create the class called "Dog", I use the
 PMC handle returned from C<newclass> to add an attribute called
 "name" to the class.  This just allocates a slot in the class for
-the value, it does nothing more.  
+the value, it does nothing more.
 
 Next, I create a new Dog and give it a name. Because
 attributes may only be PMCs, in order to give the Dog a
@@ -295,7 +295,7 @@ the Animal base class like so:
 
 Each subclass will contain an attribute called "name" that can be
 used to store the name of the animal.  The C<setname> method
-abstracts out the process of creating a C<.String> PMC and
+abstracts out the process of creating a C<String> PMC and
 calling C<setattribute> on it.  And finally the C<getname> method
 becomes a wrapper around C<getattribute>.
 
@@ -315,7 +315,7 @@ many improvements that can be made to this code so take this
 opportunity to read and experiment and learn more about OOP
 in Parrot.
 
-=head2 Acknowledgements 
+=head2 Acknowledgements
 
 =over 4
 
@@ -391,7 +391,7 @@ Jonathan Scott Duff
         dog.'setname'("Snoopy")
         pig   = new "Pig"
         pig.'setname'("Porky")
-        
+
         cow.'speak'()
         dog.'speak'()
         pig.'speak'()

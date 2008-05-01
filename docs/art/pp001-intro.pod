@@ -79,10 +79,10 @@ parrot virtual machine:
 Note that I am using a relative path to parrot given that I didn't
 install it into the system.
 
-The keywords starting with a dot (C<.sub> and C<.end>) are PIR macros.
+The keywords starting with a dot (C<.sub> and C<.end>) are PIR directives.
 They are used together to define subroutines. After the C<.sub> keyword
 I use the name of the subroutine. The keyword that starts with a colon
-(C<:main>) is a attribute (more on those later) that tells parrot that
+(C<:main>) is an attribute (more on those later) that tells parrot that
 this is the main body of the program and that it should start by
 executing this subroutine. By the way, I could use C<.sub foo :main> and
 Parrot will use the C<foo> subroutine as the main body of the program.
@@ -124,7 +124,7 @@ compiler will automatically assign these "virtual registers" to actual
 registers as needed and handle whatever manipulations are needed for
 optimization.
 
-Another PIR perk is that local variable names may be declared and used 
+Another PIR perk is that local variable names may be declared and used
 instead of register names. For that I just need to declare the
 variable using the C<.local> keyword:
 
@@ -231,7 +231,7 @@ integer will be known as "a".
 When calling the function, I need to pass the names of the
 arguments. For that there are two syntaxes as well:
 
-  func( 10 :named("foo") )	  # or
+  func( 10 :named("foo") )    # or
   func( "foo" => 10 )
 
 Note that with named arguments, you may rearrange the order of your
@@ -239,7 +239,7 @@ parameters at will.
 
   .sub foo
     .param string "name"    => a
-    .param int    "age"	    => b
+    .param int    "age"     => b
     .param string "gender"  => c
     # ...
   .end

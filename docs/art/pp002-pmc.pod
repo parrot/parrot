@@ -13,8 +13,7 @@ code examples in this article were tested with Parrot 0.4.5
 
 As mentioned by Alberto Manuel Simões in TPR 2.3, Parrot is
 a register-based virtual machine with 4 register types:
-Integer, String, Number, PMC. There are 32 registers for
-each register type (0 through 31) and registers are
+Integer, String, Number, PMC. Registers are
 referenced by a capital letter signifying the register type
 followed by the register number (C<S15> is String register
 number 15). Parrot programs consist of lines of text where
@@ -24,12 +23,19 @@ Utilizing a slightly higher-level syntax called PIR (Parrot
 Intermediate Representation) you may obtain an arbitrary
 number of each register type by prefixing the register with
 a C<$> (For example, the virtual register C<$I51> is
-perfectly valid). PIR also provides for a more "natural"
-syntax for opcodes. Rather than saying C<set I1, 0> to
-assign a zero to the I1 register, you may say instead C<I1 =
-0>. PIR also provides syntax for easily creating named
-variables and constants, subroutines, passing parameters to
-subroutines, accessing parameters by name, etc.
+perfectly valid). Each subroutine will have as many registers
+available as necessary; a simple subroutine will only need
+a few whereas complex subroutines with many calculations will
+need a larger number of registers. This is a fundamental
+difference from the original design of Parrot, in which there
+were 32 registers for each of the built-in types (int, num,
+pmc, string).
+PIR also provides for a more "natural" syntax for opcodes.
+Rather than saying C<set I1, 0> to assign a zero to the I1
+register, you may say instead C<I1 = 0>.
+PIR also provides syntax for easily creating named variables
+and constants, subroutines, passing parameters to subroutines,
+accessing parameters by name, etc.
 
 Now, on to business ...
 
@@ -53,7 +59,7 @@ types that are builtin to Parrot:
     .sub _ :main
         $I0 = 1                         # The first PMC
       loop:
-        $I1 = valid_type $I0            
+        $I1 = valid_type $I0
         unless $I1 goto end_loop        # stop on invalid PMC number
         $S0 = typeof $I0                # get PMC type name
         print $I0                       # output PMC number
@@ -91,7 +97,7 @@ several interesting and useful PMC types:
 
 Before I take a closer look at some of these PMC types,
 let's look at a common thing that people want to know how to
-do-- read command line arguments. The subroutine designated
+do -- read command line arguments. The subroutine designated
 as the main program (by the C<:main> modifier) has an
 implicit parameter passed to it that is the command line
 arguments. Since previous examples never had such a
@@ -205,10 +211,7 @@ Nope. If you want to access environment variables I<you>
 need to create a PMC of type C<Env>. This is accomplished by
 the C<new> opcode like so: C<$P0 = new 'Env'> After that
 statement, C<$P0> will contain a hash consisting of all of
-the environment variables at that time. All built-in types
-are prefixed with a dot, so if the PMC type is
-C<OrderedHash>, to create a new one you'd do C<$P0 = new
-.OrderedHash>.
+the environment variables at that time.
 
 But, both the keys and values the C<Env> hash are strings,
 so how do I iterate over them as I did for the command
