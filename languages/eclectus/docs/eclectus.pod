@@ -21,6 +21,12 @@ are executing the respective F<t/*.t> Scheme scripts. In
 unified languages testing the Eclectus tests are skipped, when
 the is no 'gauche 0.8' around.
 
+Run individual test scripts with e.g.:
+
+   gosh -fcase-fold -I .  -I riaxpander -l gauche/prelude.scm t/unary_primitives.t
+
+
+
 =head1 TODO
 
 - Bring Eclectus back to unified languages testing

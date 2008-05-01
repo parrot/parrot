@@ -10,14 +10,14 @@
 ; Choose which scheme implementation should be tested.
 ; Choosing 'gauche' is meant for checking the test suite.
 ;(define implementation "gauche" )
-(define implementation "gen_past_in_pir" )          ; current default implementation
-;(define implementation "gen_past_in_nqp" )         ; future default implementation
+;(define implementation "gen_past_in_pir" )          ; current default implementation
+(define implementation "gen_past_in_nqp" )         ; future default implementation
 
 (define-syntax add-tests-with-string-output
   (syntax-rules (=>)
     ((_ test-name (expr => output-string) ...)
      (set! all-tests
-        (cons 
+        (cons
            '(test-name (expr string  output-string) ...)
             all-tests)))))
 

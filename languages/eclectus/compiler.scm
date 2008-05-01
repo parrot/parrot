@@ -543,7 +543,9 @@
                      :~a(\"~a\"),
                      " (car key_val) (cadr key_val)))
              (cdr daughter))
-           (past-sxml->past-nqp daughter)))
+           (begin
+             (past-sxml->past-nqp daughter)
+             (emit ","))))
        (cdr past))
     (emit ")")))
 
