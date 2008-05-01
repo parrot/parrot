@@ -549,6 +549,20 @@ PAST compiler.
     .return self.'attr'('compiler', value, has_value)
 .end
 
+=item compiler_args()
+
+Specify named arguments to be passed to the compiler set
+through the compiler attribute. Not used if compiler is
+not set.
+
+=cut
+
+.sub 'compiler_args' :method
+    .param pmc value           :named :slurpy
+    .local int have_value
+    have_value = elements value
+    .return self.'attr'('compiler_args', value, have_value)
+.end
 
 =item pirflags([pirflags])
 

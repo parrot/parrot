@@ -266,7 +266,11 @@ the sub.
     $P0 = node.'compiler'()
     unless $P0 goto subpir_post
   subpir_compiler:
-    $P0 = self.'hll_pir'(node, 'name'=>name, 'namespace'=>ns, 'pirflags'=>pirflags)
+    $P0 = node.'compiler_args'()
+    if $P0 goto have_compiler_args
+    $P0 = new 'Hash'
+  have_compiler_args:
+    $P0 = self.'hll_pir'(node, 'name'=>name, 'namespace'=>ns, 'pirflags'=>pirflags, $P0 :named :flat)
     code .= $P0
     goto subpir_done
 

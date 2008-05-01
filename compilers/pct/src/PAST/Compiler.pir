@@ -342,9 +342,11 @@ Return the POST representation of a C<PAST::Block>.
     goto children_done
 
   children_compiler:
-    ##  set the compiler to use for the POST::Sub node, and
-    ##  add this block's child to it.
+    ##  set the compiler to use for the POST::Sub node, pass on
+    ##  and compiler arguments and add this block's child to it.
     bpost.'compiler'(compiler)
+    $P0 = node.'compiler_args'()
+    bpost.'compiler_args'($P0)
     $P0 = node[0]
     bpost.'push'($P0)
 
