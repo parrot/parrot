@@ -1,14 +1,14 @@
 # $Id$
 
 # Configuration settings
-LOAD_EXT = @load_ext@
+LOAD_EXT        = @load_ext@
 
 # Set up commands
-PARROT        = ../../parrot@exe@
-PERL          = @perl@
-RM_F          = @rm_f@
-RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
-PMCBUILD      = $(PERL) @build_dir@/tools/build/dynpmc.pl
+PARROT          = ../../parrot@exe@
+PERL            = @perl@
+RM_F            = @rm_f@
+RECONFIGURE     = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+PMCBUILD        = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 # Set up directories
 BUILD_DIR     = @build_dir@
