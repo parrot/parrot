@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 # Makefile for languages/eclectus
@@ -106,3 +106,4 @@ test: build
 
 test-clean:
 	$(RM_F) t/*.nqp
+	$(RM_F) t/*.pir

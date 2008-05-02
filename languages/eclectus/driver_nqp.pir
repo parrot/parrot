@@ -16,11 +16,19 @@
     load_bytecode 'PCT.pbc'
 
     load_bytecode 'languages/eclectus/src/builtins/all.pbc'
-    load_bytecode 'languages/eclectus/gen_past.pir'
 .end
 
 
 .sub drive :main
+
+    .param pmc argv
+
+    .local string program_name, pir_fn
+    program_name = shift argv
+    pir_fn       = shift argv
+ 
+    $S1 = concat "languages/eclectus/", pir_fn
+    load_bytecode $S1
 
     .local pmc stmts
     ( stmts ) = scheme_entry()

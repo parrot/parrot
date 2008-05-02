@@ -56,16 +56,16 @@
          (error 'compile-port "not an output port ~s" p))
        p)))
 
-(define (run-compile expr nqp-fn)
+(define (run-compile expr nqp-fn pir-fn)
   (cond 
     ( (string=? implementation "gauche")
       (with-output-to-file "stst.scm" (lambda () (write expr))))
     (else
       (let ((nqp-port (open-output-file nqp-fn 'replace)))
         (parameterize ((compile-port nqp-port))
-           (compile-program expr))
+          (compile-program expr))
         (close-output-port nqp-port))
-      (unless (zero? (system (string-append *path-to-parrot* " ../../compilers/nqp/nqp.pbc --output=gen_past.pir --target=pir " nqp-fn)))
+      (unless (zero? (system (string-append *path-to-parrot* " ../../compilers/nqp/nqp.pbc --output=" pir-fn " --target=pir " nqp-fn)))
         (error 'execute "produced program exited abnormally")))))
 
 ; TODO: can I use (directory-separator) in gauche?
@@ -74,13 +74,13 @@
     "../../parrot"
     "..\\..\\parrot"))
 
-(define (execute)
+(define (execute pir-fn)
   (cond
     ( (string=? implementation "gauche")
       (unless (zero? (system "gosh -fcase-fold -I .  -l gauche/prelude.scm stst.scm > stst.out"))
         (error 'execute "produced program exited abnormally")))
     (else
-      (unless (zero? (system (string-append *path-to-parrot* " driver_nqp.pbc > stst.out")))
+      (unless (zero? (system (string-append *path-to-parrot* " driver_nqp.pbc " pir-fn " > stst.out")))
         (error 'execute "produced program exited abnormally")))))
 
 (define (get-string)
@@ -96,13 +96,14 @@
                 (f))))))))))
 
 (define (test-with-string-output test-id expr expected-output test-name)
-   (run-compile expr (string-append "t/" test-name "_" (number->string test-id) ".nqp"))
-   (execute)
-   (let ((actual-output (get-string)))
-     (if (string=? expected-output actual-output)
-         (pass ( + test-id 1 ) (format #f "~a: ~a" test-name expr))
-         (fail ( + test-id 1 ) (format #f "~a: expected ~s, got ~s"
-                                       test-name expected-output actual-output)))))
+  (let ((base-fn (string-append "t/" test-name "_" (number->string test-id) )))
+    (run-compile expr (string-append base-fn ".nqp") (string-append base-fn ".pir"))
+    (execute (string-append base-fn ".pir")))
+  (let ((actual-output (get-string)))
+    (if (string=? expected-output actual-output)
+      (pass ( + test-id 1 ) (format #f "~a: ~a" test-name expr))
+      (fail ( + test-id 1 ) (format #f "~a: expected ~s, got ~s"
+                                     test-name expected-output actual-output)))))
 
 (define (emit . args)
   (apply fprintf (compile-port) args)
