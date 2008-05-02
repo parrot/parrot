@@ -3,7 +3,7 @@
 (load "tests-driver.scm")
 (load "compiler.scm")
 
-(add-tests-with-string-output "unary primitives"      
+(add-tests-with-string-output "unary_primitives"      
   ((fxadd1 -2)                            => "-1\n" )
   ((fxadd1 -1)                            => "0\n" )
   ((fxadd1 0)                             => "1\n" )

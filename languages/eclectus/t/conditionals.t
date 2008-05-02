@@ -3,7 +3,7 @@
 (load "tests-driver.scm")
 (load "compiler.scm")
 
-(add-tests-with-string-output "conditional expressions"      
+(add-tests-with-string-output "conditionals"      
   ((if #t 1 0)                                   => "1\n" )
   ((if #f 1 0)                                   => "0\n" )
   ((if 0 1 0)                                    => "1\n" )

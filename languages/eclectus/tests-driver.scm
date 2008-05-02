@@ -56,16 +56,16 @@
          (error 'compile-port "not an output port ~s" p))
        p)))
 
-(define (run-compile expr)
+(define (run-compile expr nqp-fn)
   (cond 
     ( (string=? implementation "gauche")
       (with-output-to-file "stst.scm" (lambda () (write expr))))
     (else
-      (let ((p (open-output-file "gen_past.nqp" 'replace)))
-        (parameterize ((compile-port p))
+      (let ((nqp-port (open-output-file nqp-fn 'replace)))
+        (parameterize ((compile-port nqp-port))
            (compile-program expr))
-        (close-output-port p))
-      (unless (zero? (system (string-append *path-to-parrot* " ../../compilers/nqp/nqp.pbc --output=gen_past.pir --target=pir gen_past.nqp")))
+        (close-output-port nqp-port))
+      (unless (zero? (system (string-append *path-to-parrot* " ../../compilers/nqp/nqp.pbc --output=gen_past.pir --target=pir " nqp-fn)))
         (error 'execute "produced program exited abnormally")))))
 
 ; TODO: can I use (directory-separator) in gauche?
@@ -96,7 +96,7 @@
                 (f))))))))))
 
 (define (test-with-string-output test-id expr expected-output test-name)
-   (run-compile expr)
+   (run-compile expr (string-append "t/" test-name "_" (number->string test-id) ".nqp"))
    (execute)
    (let ((actual-output (get-string)))
      (if (string=? expected-output actual-output)

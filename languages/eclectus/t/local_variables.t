@@ -2,7 +2,7 @@
 
 (load "tests-driver.scm") ; this should come first
 
-(add-tests-with-string-output "local variables"
+(add-tests-with-string-output "local_variables"
   ((let () 13)                                             => "13\n")     
   ((let (($var_a 17)) 13)                                  => "13\n")     
   ((let ((var-a 17)) 13)                                   => "13\n")     

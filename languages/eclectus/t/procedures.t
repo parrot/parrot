@@ -2,7 +2,7 @@
 
 (load "tests-driver.scm") ; this should come first
 
-(add-tests-with-string-output "local variables"
+(add-tests-with-string-output "procedures"
   (((lambda () 18))                                       => "18\n")     
   (((lambda () (fx- 20 2)))                               => "18\n")     
   (((lambda () (fx- 36 (fx- 20 2))))                      => "18\n")     

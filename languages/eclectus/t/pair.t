@@ -2,7 +2,7 @@
 
 (load "tests-driver.scm") ; this should come first
 
-(add-tests-with-string-output "booleans"      
+(add-tests-with-string-output "pair"      
   ((pair? '())                   => "#f\n")
   ((pair? #\A)                   => "#f\n")
   ((pair? (fx+ 1 2))             => "#f\n")

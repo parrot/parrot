@@ -2,7 +2,7 @@
 
 (load "tests-driver.scm") ; this should come first
 
-(add-tests-with-string-output "booleans"      
+(add-tests-with-string-output "characters"      
   (#\a  => "#\\a\n")                    
   (#\A  => "#\\A\n")                    
   (#\z  => "#\\z\n")                    

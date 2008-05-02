@@ -3,7 +3,7 @@
 (load "tests-driver.scm")
 (load "compiler.scm")
 
-(add-tests-with-string-output "binary primitives"      
+(add-tests-with-string-output "binary_primitives"      
   ((fx+ 1 13)                                   => "14\n" )
   ((fx+ 1 (fx+ 7 6))                            => "14\n" )
   ((fx+ 1 (fx+ 7 (fxadd1 5)))                   => "14\n" )
