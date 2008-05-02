@@ -89,7 +89,7 @@ sub _evaluate_cc_run {
         my $pcre_version = $1;
         $has_pcre = 1;
         print " (yes, $pcre_version) " if $verbose;
-        $self->set_result("yes, v$pcre_version");
+        $self->set_result("yes, $pcre_version");
     }
     return $has_pcre;
 }
