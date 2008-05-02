@@ -80,7 +80,7 @@
       (unless (zero? (system "gosh -fcase-fold -I .  -l gauche/prelude.scm stst.scm > stst.out"))
         (error 'execute "produced program exited abnormally")))
     (else
-      (unless (zero? (system (string-append *path-to-parrot* " driver_nqp.pir > stst.out")))
+      (unless (zero? (system (string-append *path-to-parrot* " driver_nqp.pbc > stst.out")))
         (error 'execute "produced program exited abnormally")))))
 
 (define (get-string)

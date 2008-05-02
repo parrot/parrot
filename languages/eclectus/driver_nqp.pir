@@ -5,7 +5,6 @@
 
 # for devel
 .include 'library/dumper.pir'
-.include 'gen_past.pir'
 
 .namespace
 
@@ -17,6 +16,7 @@
     load_bytecode 'PCT.pbc'
 
     load_bytecode 'languages/eclectus/src/builtins/all.pbc'
+    load_bytecode 'languages/eclectus/gen_past.pir'
 .end
 
 
