@@ -1,11 +1,11 @@
-print "1..5\n"
+puts "1..5"
 
 def first
-    print "ok 1"
+    puts "ok 1"
 end
 
 def second(n)
-    print "ok ", n
+    puts "ok ", n
 end
 
 def third(a,b)

@@ -18,8 +18,12 @@ builtin functions for Ruby.
     print $P0
     goto iter_loop
   iter_end:
-    print "\n"
     .return ()
+.end
+
+.sub 'puts'
+    .param pmc args            :slurpy
+    'print'(args :flat, "\n")
 .end
 
 .namespace ["Array"]

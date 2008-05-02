@@ -1,13 +1,13 @@
-print "1..2\n"
+puts "1..2"
 
 if 1 then
-  print "ok 1\n"
+  puts "ok 1"
 else
-  print "nok 1\n"
+  puts "nok 1"
 end
 
 unless 0
-  print "ok 2\n"
+  puts "ok 2"
 end
 
 
