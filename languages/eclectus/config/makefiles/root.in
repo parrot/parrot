@@ -79,9 +79,9 @@ src/builtins/all.pbc: src/builtins/all.pir
 
 clean: dynext-clean test-clean
 	$(RM_F) \
-  "*.out" \
-  gen_past.nqp \
-  gen_past.pir
+  stst.out \
+  driver_nqp.pbc \
+  src/builtins/all.pbc
 
 dynext-clean:
 	$(RM_F) \
