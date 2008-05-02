@@ -30,9 +30,9 @@ rule stmts {
     <.term>?[ <stmt> <.term>+]* {*}
 }
 
-rule term { \n | ';' }
+token term { \n | ';' }
 
-rule basic_stmt {
+token basic_stmt {
     | <alias> {*}           #= alias
     | <expr> {*}            #= expr
     | <begin> {*}           #= begin
@@ -61,7 +61,7 @@ rule expr {
 }
 
 
-rule basic_expr {
+token basic_expr {
     | <assignment> {*}      #= assignment
     | <command> {*}         #= command
     | <arg> {*}             #= arg
@@ -90,16 +90,11 @@ rule assignment {
 }
 
 rule mlhs {
-    <mlhs_item>
-    {*}
-}
-
-rule mlhs_item {
     | <lhs> {*}               #= lhs
     | '(' <mlhs> ')' {*}      #= mlhs
 }
 
-rule lhs {
+token lhs {
     | <variable> {*}            #= variable
     | <indexed_variable> {*}    #= indexed_variable
     | <member_variable> {*}     #= member_variable
@@ -145,13 +140,13 @@ token call_args {
     | '(' <.ws> <args> <.ws> ')' {*}
 }
 
-rule variable {
+token variable {
     | <varname> {*}      #= varname
     | 'nil'              #= nil
     | 'self'             #= self
 }
 
-rule varname {
+token varname {
     <!reserved_word>
     [ <global> {*}             #= global
     | <instance_variable> {*}  #= instance_variable
@@ -159,7 +154,7 @@ rule varname {
     ]
 }
 
-rule mrhs {
+token mrhs {
     <args> {*}
 }
 
@@ -174,7 +169,7 @@ proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 
 
 
-rule basic_primary {
+token basic_primary {
     | <literal> {*}                         #= literal
     | <variable> {*}                        #= variable
     | <array> {*}                           #= array
@@ -220,7 +215,7 @@ rule if_stmt {
     {*}
 }
 
-rule then { ':' | 'then' | <term> ['then']? }
+token then { ':' | 'then' | <term> ['then']? }
 
 rule while_stmt {
     $<sym>=['while'|'until'] <expr> <.do>

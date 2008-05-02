@@ -115,11 +115,7 @@ method assignment($/) {
     make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
 }
 
-method mlhs($/) {
-    make $( $<mlhs_item> );
-}
-
-method mlhs_item($/, $key) {
+method mlhs($/, $key) {
     make $( $/{$key} );
 }
 
