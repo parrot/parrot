@@ -56,14 +56,12 @@ sub runstep {
         conf            => $conf,
         osname          => $osname,
         cc              => $cc,
-        win32_gcc       => '-lpcre',
         win32_nongcc    => 'pcre.lib',
         default         => '-lpcre',
     } );
 
     # On OS X check the presence of the pcre headers in the standard
     # Fink/macports locations.
-    # Mindlessly morphed from readline ... may need to be fixed
     $self->_handle_darwin_for_fink    ($conf, $osname, 'pcre.h');
     $self->_handle_darwin_for_macports($conf, $osname, 'pcre.h');
 
@@ -74,10 +72,7 @@ sub runstep {
         my $test = $conf->cc_run();
         $has_pcre = $self->_evaluate_cc_run($test, $verbose);
     }
-    if ($has_pcre) {
-        _handle_pcre($conf, $verbose);
-    }
-    else {
+    if (! $has_pcre) {
         # The Parrot::Configure settings might have changed while class ran
         $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
     }
@@ -91,21 +86,13 @@ sub _evaluate_cc_run {
     my ($test, $verbose) = @_;
     my $has_pcre = 0;
     if ( $test =~ /pcre (\d+\.\d+)/ ) {
+        my $pcre_version = $1;
         $has_pcre = 1;
-        print " (yes, $1) " if $verbose;
-        $self->set_result("yes, $1");
+        print " (yes, $pcre_version) " if $verbose;
+        $self->set_result("yes, v$pcre_version");
     }
     return $has_pcre;
 }
-
-sub _handle_pcre {
-    my ($conf, $verbose) = @_;
-#    $conf->data->add( ' ', ccflags => "-DHAS_PCRE" );
-#    $verbose and print "\n  ccflags: ", $conf->data->get("ccflags"), "\n";
-    return 1;
-}
-
-
 
 1;
 
