@@ -69,7 +69,7 @@ $(ECLECTUS_GROUP): $(PARROT) $(PMC_SOURCES)
 	cd $(PMC_DIR) && $(BUILD_DYNPMC) linklibs $(PMCS)
 	cd $(PMC_DIR) && $(BUILD_DYNPMC) copy --destination=$(PARROT_DYNEXT) $(PMCS)
 
-driver_nqp.pbc: src/builtins/all.pbc
+driver_nqp.pbc: driver_nqp.pir
 	$(PARROT) -o driver_nqp.pbc driver_nqp.pir
 
 src/builtins/all.pbc: src/builtins/all.pir
