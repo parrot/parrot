@@ -157,47 +157,47 @@
 
 ; implementation of char<
 (define-primitive (char< arg1 arg2)
-  (emit-comparison "infix:<" arg1 arg2))
+  (emit-comparison "eclectus:<" arg1 arg2))
 
 ; implementation of char<=
 (define-primitive (char<= arg1 arg2)
-  (emit-comparison "infix:<=" arg1 arg2))
+  (emit-comparison "eclectus:<=" arg1 arg2))
 
 ; implementation of char=
 (define-primitive (char= arg1 arg2)
-  (emit-comparison "infix:==" arg1 arg2))
+  (emit-comparison "eclectus:==" arg1 arg2))
 
 ; implementation of char>
 (define-primitive (char> arg1 arg2)
-  (emit-comparison "infix:>" arg1 arg2))
+  (emit-comparison "eclectus:>" arg1 arg2))
 
 ; implementation of char>=
 (define-primitive (char>= arg1 arg2)
-  (emit-comparison "infix:>=" arg1 arg2))
+  (emit-comparison "eclectus:>=" arg1 arg2))
 
 ; implementation of fxzero?
 (define-primitive (fxzero? arg)
-  (emit-comparison "infix:==" arg 0))
+  (emit-comparison "eclectus:==" arg 0))
 
 ; implementation of fx<
 (define-primitive (fx< arg1 arg2)
-  (emit-comparison "infix:<" arg1 arg2))
+  (emit-comparison "eclectus:<" arg1 arg2))
 
 ; implementation of fx<=
 (define-primitive (fx<= arg1 arg2)
-  (emit-comparison "infix:<=" arg1 arg2))
+  (emit-comparison "eclectus:<=" arg1 arg2))
 
 ; implementation of fx=
 (define-primitive (fx= arg1 arg2)
-  (emit-comparison "infix:==" arg1 arg2))
+  (emit-comparison "eclectus:==" arg1 arg2))
 
 ; implementation of fx>=
 (define-primitive (fx>= arg1 arg2)
-  (emit-comparison "infix:>=" arg1 arg2))
+  (emit-comparison "eclectus:>=" arg1 arg2))
 
 ; implementation of fx>
 (define-primitive (fx> arg1 arg2)
-  (emit-comparison "infix:>" arg1 arg2))
+  (emit-comparison "eclectus:>" arg1 arg2))
 
 (define-primitive (eq? arg1 arg2)
   (emit-comparison "eq?" arg1 arg2))
