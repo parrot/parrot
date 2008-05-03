@@ -26,7 +26,7 @@
     .local string program_name, pir_fn
     program_name = shift argv
     pir_fn       = shift argv
- 
+
     $S1 = concat "languages/eclectus/", pir_fn
     load_bytecode $S1
 
