@@ -85,8 +85,8 @@
 
 (define-primitive (fx+ arg1 arg2)
   (past::op '(@ (pirop "n_add"))
-            (emit-expr arg1)
-            (emit-expr arg2)))
+                (emit-expr arg1)
+                (emit-expr arg2)))
 
 (define-primitive (fxsub1 arg)
   (past::op
@@ -220,6 +220,12 @@
 (define-primitive (pair? arg)
   (emit-typequery "EclectusPair" arg))
 
+;; inout and output
+(define-primitive (newline)
+  (past::op
+    '(@ (pasttype "call")
+        (name "say"))))
+
 (define emit-primcall
   (lambda (x)
     (let ((prim (lookup-primitive (car x))) (args (cdr x)))
@@ -349,15 +355,15 @@
 (define wrap-say
   (lambda (past)
     (past::op
-     '(@ (pasttype "call")
-         (name "say"))
-     past)))
+      '(@ (pasttype "call")
+          (name "say"))
+      past)))
 
 ;; Macro-expansion and alpha-conversion
 (define (normalize-syntax program)
   (sexp/expand program (make-sexp-environment)))
 
-; the future compiler, emitting PAST set up in PIR
+; emit the PAST as a NQP subroutine
 (define compile-program
   (lambda (program)
     (emit "sub scheme_entry () { " ) 

@@ -17,7 +17,7 @@ loop:
 end:
     say ''
 
-    .return ()
+    .return ('')
 .end
 
 .sub 'eclectus:<'
