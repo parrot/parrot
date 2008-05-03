@@ -56,17 +56,16 @@
          (error 'compile-port "not an output port ~s" p))
        p)))
 
-(define (run-compile expr nqp-fn pir-fn)
+(define (run-compile expr nqp-fn)
   (cond 
     ( (string=? implementation "gauche")
       (with-output-to-file "stst.scm" (lambda () (write expr))))
     (else
+      ; compile to NQP
       (let ((nqp-port (open-output-file nqp-fn 'replace)))
         (parameterize ((compile-port nqp-port))
           (compile-program expr))
-        (close-output-port nqp-port))
-      (unless (zero? (system (string-append *path-to-parrot* " ../../compilers/nqp/nqp.pbc --output=" pir-fn " --target=pir " nqp-fn)))
-        (error 'execute "produced program exited abnormally")))))
+        (close-output-port nqp-port)))))
 
 ; TODO: can I use (directory-separator) in gauche?
 (define *path-to-parrot*
@@ -74,13 +73,14 @@
     "../../parrot"
     "..\\..\\parrot"))
 
-(define (execute pir-fn)
+(define (execute nqp-fn)
   (cond
     ( (string=? implementation "gauche")
       (unless (zero? (system "gosh -fcase-fold -I .  -l gauche/prelude.scm stst.scm > stst.out"))
         (error 'execute "produced program exited abnormally")))
     (else
-      (unless (zero? (system (string-append *path-to-parrot* " driver_nqp.pbc " pir-fn " > stst.out")))
+      ; run NQP with driver_nqp.pbc
+      (unless (zero? (system (string-append *path-to-parrot* " driver_nqp.pbc " nqp-fn " > stst.out")))
         (error 'execute "produced program exited abnormally")))))
 
 (define (get-string)
@@ -96,9 +96,9 @@
                 (f))))))))))
 
 (define (test-with-string-output test-id expr expected-output test-name)
-  (let ((base-fn (string-append "t/" test-name "_" (number->string test-id) )))
-    (run-compile expr (string-append base-fn ".nqp") (string-append base-fn ".pir"))
-    (execute (string-append base-fn ".pir")))
+  (let ((nqp-fn (string-append "t/" test-name "_" (number->string test-id) ".nqp" )))
+    (run-compile expr nqp-fn)
+    (execute nqp-fn))
   (let ((actual-output (get-string)))
     (if (string=? expected-output actual-output)
       (pass ( + test-id 1 ) (format #f "~a: ~a" test-name expr))

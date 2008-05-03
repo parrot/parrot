@@ -23,18 +23,30 @@
 
     .param pmc argv
 
-    .local string program_name, pir_fn
+    .local string program_name, nqp_fn
     program_name = shift argv
-    pir_fn       = shift argv
+    nqp_fn       = shift argv
 
+    # compile NQP to PIR
+    .local string pir_fn, cmd
+    .local int ret
+    clone pir_fn, nqp_fn
+    substr pir_fn, -3, 3, 'pir'
+    cmd = "../../parrot ../../compilers/nqp/nqp.pbc --target=pir --output="
+    concat cmd, pir_fn
+    concat cmd, " "
+    concat cmd, nqp_fn
+    # say cmd
+    ret = spawnw cmd
+
+    # load the generated PIR
     $S1 = concat "languages/eclectus/", pir_fn
     load_bytecode $S1
 
     .local pmc stmts
     ( stmts ) = scheme_entry()
-    # _dumper( stmts, 'stmts' )
 
-    # compile and evaluate
+    # compile and evaluate the PAST returned from scheme_entry()
     .local pmc past_compiler
     past_compiler = new [ 'PCT::HLLCompiler' ]
     $P0 = split ' ', 'post pir'
