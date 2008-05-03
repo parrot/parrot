@@ -85,14 +85,13 @@
 
 (define-primitive (fx+ arg1 arg2)
   (past::op '(@ (pirop "n_add"))
-                (emit-expr arg1)
-                (emit-expr arg2)))
+            (emit-expr arg1)
+            (emit-expr arg2)))
 
 (define-primitive (fxsub1 arg)
-  (past::op
-        '(@ (pirop "n_sub"))
-        (emit-expr arg)
-        (emit-expr 1)))
+  (past::op '(@ (pirop "n_sub"))
+            (emit-expr arg)
+            (emit-expr 1)))
 
 (define-primitive (fx- arg1 arg2)
   (past::op '(@ (pirop "n_sub"))
@@ -196,13 +195,13 @@
 (define emit-typequery
   (lambda (typename arg)
     (past::op
-     '(@ (pasttype "if"))
-     (past::op
-      `(@ (pasttype "inline")
-          (inline ,(format #f "new %r, 'EclectusBoolean'\\nisa $I1, %0, '~a'\\n %r = $I1" typename)))
-      (emit-expr arg))
-     (emit-expr #t)
-     (emit-expr #f))))
+      '(@ (pasttype "if"))
+      (past::op
+        `(@ (pasttype "inline")
+            (inline ,(format #f "new %r, 'EclectusBoolean'\\nisa $I1, %0, '~a'\\n %r = $I1" typename)))
+        (emit-expr arg))
+      (emit-expr #t)
+      (emit-expr #f))))
    
 ;; type queries
 (define-primitive (boolean? arg)
@@ -222,9 +221,8 @@
 
 ;; inout and output
 (define-primitive (newline)
-  (past::op
-    '(@ (pasttype "call")
-        (name "say"))))
+  (past::op '(@ (pasttype "call")
+                (name "say"))))
 
 (define emit-primcall
   (lambda (x)
