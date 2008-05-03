@@ -1,17 +1,17 @@
 ; $Id$
 
-; Generate driver and PAST for Eclectus
+; Generate PAST for Eclectus
 
-;; Helpers that emit PIR
+;; Helpers for generating PAST
 
 (define (make-past-conser type)
   (let ((type-symbol (string->symbol type)))
     (lambda args
       (cons type-symbol args))))
 
-(define past::op (make-past-conser "PAST::Op"))
-(define past::val (make-past-conser "PAST::Val"))
-(define past::var (make-past-conser "PAST::Var"))
+(define past::op    (make-past-conser "PAST::Op"))
+(define past::val   (make-past-conser "PAST::Val"))
+(define past::var   (make-past-conser "PAST::Var"))
 (define past::block (make-past-conser "PAST::Block"))
 (define past::stmts
   (let ((type-symbol (string->symbol "PAST::Stmts")))
@@ -67,7 +67,7 @@
   (lambda (x)
     (and (pair? x) (lookup-primitive (car x)))))
 
-; implementatus of primitive functions are added
+; implementations of primitive functions are added
 ; with 'define-primitive'
 (define-syntax define-primitive
   (syntax-rules ()
@@ -77,69 +77,60 @@
                      (make-primitive (length '(arg* ...))
                                      (lambda (arg* ...) b b* ...))))))
 
-; implementation of fxadd1
+;; arithmetic forms
 (define-primitive (fxadd1 arg)
   (past::op '(@ (pirop "n_add"))
             (emit-expr arg)
             (emit-expr 1)))
 
-; implementation of fx+
 (define-primitive (fx+ arg1 arg2)
   (past::op '(@ (pirop "n_add"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
-; implementation of fxsub1
 (define-primitive (fxsub1 arg)
   (past::op
         '(@ (pirop "n_sub"))
         (emit-expr arg)
         (emit-expr 1)))
 
-; implementation of fx-
 (define-primitive (fx- arg1 arg2)
   (past::op '(@ (pirop "n_sub"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
-; implementation of fxlogand
 (define-primitive (fxlogand arg1 arg2)
   (past::op '(@ (pirop "n_band"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
-; implementation of fxlogor
 (define-primitive (fxlogor arg1 arg2)
   (past::op '(@ (pirop "n_bor"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
-; implementation of char->fixnum
 (define-primitive (char->fixnum arg)
   (past::op '(@ (pasttype "inline")
                 (inline "new %r, 'EclectusFixnum'\\nassign %r, %0\\n"))
             (emit-expr arg)))
 
-; implementation of fixnum->char
 (define-primitive (fixnum->char arg)
   (past::op '(@ (pasttype "inline")
                 (inline "new %r, 'EclectusCharacter'\\nassign %r, %0\\n"))
             (emit-expr arg)))
 
-; implementation of cons
+;; list forms
 (define-primitive (cons arg1 arg2)
   (past::op '(@ (pasttype "inline")
                 (inline "new %r, 'EclectusPair'\\nset %r[%0], %1\\n"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
-; implementation of car
 (define-primitive (car arg)
   (past::op '(@ (pasttype "inline")
                 (inline "%r = %0.'key'()\\n"))
             (emit-expr arg)))
 
-; implementation of cdr
 (define-primitive (cdr arg)
   (past::op '(@ (pasttype "inline")
                 (inline "%r = %0.'value'()\\n"))
@@ -155,47 +146,37 @@
               (emit-expr #t)
               (emit-expr #f))))
 
-; implementation of char<
+;; comparison forms
 (define-primitive (char< arg1 arg2)
   (emit-comparison "eclectus:<" arg1 arg2))
 
-; implementation of char<=
 (define-primitive (char<= arg1 arg2)
   (emit-comparison "eclectus:<=" arg1 arg2))
 
-; implementation of char=
 (define-primitive (char= arg1 arg2)
   (emit-comparison "eclectus:==" arg1 arg2))
 
-; implementation of char>
 (define-primitive (char> arg1 arg2)
   (emit-comparison "eclectus:>" arg1 arg2))
 
-; implementation of char>=
 (define-primitive (char>= arg1 arg2)
   (emit-comparison "eclectus:>=" arg1 arg2))
 
-; implementation of fxzero?
 (define-primitive (fxzero? arg)
   (emit-comparison "eclectus:==" arg 0))
 
-; implementation of fx<
 (define-primitive (fx< arg1 arg2)
   (emit-comparison "eclectus:<" arg1 arg2))
 
-; implementation of fx<=
 (define-primitive (fx<= arg1 arg2)
   (emit-comparison "eclectus:<=" arg1 arg2))
 
-; implementation of fx=
 (define-primitive (fx= arg1 arg2)
   (emit-comparison "eclectus:==" arg1 arg2))
 
-; implementation of fx>=
 (define-primitive (fx>= arg1 arg2)
   (emit-comparison "eclectus:>=" arg1 arg2))
 
-; implementation of fx>
 (define-primitive (fx> arg1 arg2)
   (emit-comparison "eclectus:>" arg1 arg2))
 
@@ -223,6 +204,7 @@
      (emit-expr #t)
      (emit-expr #f))))
    
+;; type queries
 (define-primitive (boolean? arg)
   (emit-typequery "EclectusBoolean" arg))
 
