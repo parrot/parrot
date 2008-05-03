@@ -99,7 +99,7 @@ ok(! $step->_evaluate_cc_run($test, $verbose),
 $test = q{pcre 4.1};
 ok($step->_evaluate_cc_run($test, $verbose),
     "_evaluate_cc_run returned true value as expected");
-is($step->result(), q{yes, v4.1}, "Got expected PCRE version");
+is($step->result(), q{yes, 4.1}, "Got expected PCRE version");
 
 # Mock different outcomes of _recheck_settings()
 my ($libs, $ccflags, $linkflags);

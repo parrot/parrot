@@ -52,7 +52,7 @@ $test = q{pcre 4.0};
         \$stdout,
     );
     ok($has_pcre, "_evaluate_cc_run returned true value as expected");
-    is($step->result(), q{yes, v4.0}, "Got expected PCRE version");
+    is($step->result(), q{yes, 4.0}, "Got expected PCRE version");
     like($stdout, qr/\(yes, 4\.0\)/, "Got expected verbose output");
 }
 
