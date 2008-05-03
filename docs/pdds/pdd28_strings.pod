@@ -9,7 +9,7 @@ docs/pdds/pdd28_strings.pod - Parrot Strings
 
 This PDD describes the conventions for strings in Parrot,
 including but not limited to support for multiple character sets,
-encodings and languages.
+encodings, and languages.
 
 =head1 VERSION
 
@@ -355,18 +355,6 @@ C<set_grapheme> on the destination string (which may append multiple
 characters in non-NFG strings). This conversion effectively uses an
 intermediate NFG representation.
 
-=head2 String Subsystem
-
-The following functions are used internally to initialise and terminate the
-string allocation and garbage collection subsystem.
-
-=head3 Parrot_string_system_init (was string_init)
-
-Initialize Parrot's string subsystem.
-
-=head3 Parrot_string_system_end (was string_deinit)
-
-Terminate Parrot's string subsystem (clean up).
 
 =head2 String Interface Functions
 
@@ -418,12 +406,6 @@ integer length isn't passed, the function will calculate the length.
 {{NOTE: the integer length isn't really necessary, and is under consideration
 for deprecation.}}
 
-=head3 Parrot_constant_string_new (was const_string)
-
-Creates and returns a new Parrot constant string. Takes one C string (a C<char
-*>) as an argument, the value of the constant string. The length of the C
-string is calculated internally.
-
 =head3 Parrot_string_new
 
 Return a new string with the default encoding and character set. Accepts one
@@ -447,6 +429,12 @@ null values, default values are used.
 string name for the character set. This behavior is no longer supported, but
 C<Parrot_find_encoding> and C<Parrot_find_charset> can be called to look up the
 encoding or character set structs.}}
+
+=head3 Parrot_constant_string_new (was const_string)
+
+Creates and returns a new Parrot constant string. Takes one C string (a C<char
+*>) as an argument, the value of the constant string. The length of the C
+string is calculated internally.
 
 =head3 Parrot_string_resize (was string_grow)
 
@@ -550,8 +538,20 @@ Chop the requested number of graphemes off the end of a string without
 modifying the original string.
 
 
-
 =head2 Internal String Functions
+
+The following functions are used internally and are not part of the public
+interface.
+
+=head3 string_system_init (was string_init)
+
+Initialize Parrot's string subsystem, including string allocation and garbage
+collection.
+
+=head3 string_system_end (was string_deinit)
+
+Terminate Parrot's string subsystem (clean up), including string allocation and
+garbage collection.
 
 =head3 string_max_bytes
 
