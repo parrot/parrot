@@ -112,9 +112,6 @@ or by some test.
 B<antlr> - ANother Tool for Language Recognition
 L<http://www.antlr.org/>
 
-B<bc> - arbitrary-precision arithmetic language and calculator
-L<http://gnuwin32.sourceforge.net/>
-
 B<m4> - macro language processor
 L<http://gnuwin32.sourceforge.net/>
 
