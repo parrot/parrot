@@ -1,7 +1,10 @@
 # $Id$
 
+.sub 'print_newline'
+    say ''
+.end
+
 # steal builtins from Perl6
-# TODO: put that into php_builtins.pir
 .sub 'print'
     .param pmc list            :slurpy
     .local pmc iter

@@ -8,6 +8,8 @@
 
 $Id$
 
+This file will soon be removed, as it is being replaced by past_xml_to_past_nqp.xsl.
+
 This transformation takes an abstract syntax tree as generated 
 by phc_xml_to_past_xml.xsl. It generates a PIR-script that creates
 a PAST data structure and runs it with the help of a PCT::HLLCompiler.

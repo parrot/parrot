@@ -141,12 +141,14 @@ VARIANT_PHC:
     ret = spawnw cmd
     if ret goto ERROR
 
-    err_msg = 'Creating PIR with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
+    #err_msg = 'Creating PIR with xsltproc failed'
+    #cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
+    err_msg = 'Creating NQP with xsltproc failed'
+    cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_nqp.xsl  plumhead_past.xml  > plumhead_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
     err_msg = 'Executing plumhead_past.pir with parrot failed'
-    cmd = './parrot plumhead_past.pir'
+    cmd = './parrot languages/plumhead/driver_nqp.pbc plumhead_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
 
