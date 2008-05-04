@@ -1387,7 +1387,7 @@ string_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const
 Compares two Parrot strings, performing type and encoding conversions if
 necessary.
 
-Note that this function returns 0 if the strings are equal and 1
+Note that this function returns 0 if the strings are equal, and non-zero
 otherwise.
 
 =cut
