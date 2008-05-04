@@ -122,7 +122,7 @@ test-antlr3:
 test-pct:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-pct
 
-clean: clean-common clean-pct clean-antlr3 clean-test
+clean: clean-common clean-pct clean-antlr3 clean-phc clean-test
 
 clean-common:
 	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
@@ -137,7 +137,13 @@ clean-phc:
 	$(RM_F) driver_nqp.pbc
 
 clean-test:
-	$(RM_F) t/php/*.php t/php/*.pir t/php/*.out t/pmc/*.pir
+	$(RM_F) \
+  t/php/*.php \
+  t/php/*.pir \
+  t/php/*.out \
+  t/pmc/*.pir \
+  ../../plumhead_*
+
 
 realclean: clean
 	$(RM_F) Makefile
