@@ -1,42 +1,42 @@
-#!/usr/bin/env parrot                                                  
-                                                                       
-.sub 'php_init' :load :init                                            
-                                                                       
-    load_bytecode 'PGE.pbc'                                            
-    load_bytecode 'PGE/Text.pbc'                                       
-    load_bytecode 'PGE/Util.pbc'                                       
-    load_bytecode 'PGE/Dumper.pbc'                                     
-    load_bytecode 'PCT.pbc'                                            
+#!/usr/bin/env parrot
 
-    load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'      
-    load_bytecode 'MIME/Base64.pbc'                                    
-    load_bytecode 'CGI/QueryHash.pbc'                                  
-                                                                       
-.end                                                                   
-                                                                       
-                                                                       
-.sub plumhead :main                                                    
-                                                                       
+.sub 'php_init' :load :init
+
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Text.pbc'
+    load_bytecode 'PGE/Util.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+    load_bytecode 'PCT.pbc'
+
+    load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
+    load_bytecode 'MIME/Base64.pbc'
+    load_bytecode 'CGI/QueryHash.pbc'
+
+.end
+
+
+.sub plumhead :main
+
     .param pmc argv
 
     .local string program_name, nqp_fn
     program_name = shift argv
     nqp_fn       = shift argv
 
-    # look for subs in other namespaces                                
-    .local pmc decode_base64_sub, parse_get_sub, parse_post_sub        
-    decode_base64_sub = get_global [ 'MIME'; 'Base64' ], 'decode_base64'  
-    parse_get_sub     = get_global [ 'CGI'; 'QueryHash' ], 'parse_get'    
-    parse_post_sub    = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'   
-                                                                       
-    # the superglobals                                                 
-    .local pmc superglobal_GET                                         
-    ( superglobal_GET ) = parse_get_sub()                              
-    set_global '_GET', superglobal_GET                                 
-                                                                       
-    .local pmc superglobal_POST                                        
-    ( superglobal_POST ) = parse_post_sub()                            
-    set_global '_POST', superglobal_POST                               
+    # look for subs in other namespaces
+    .local pmc decode_base64_sub, parse_get_sub, parse_post_sub
+    decode_base64_sub = get_global [ 'MIME'; 'Base64' ], 'decode_base64'
+    parse_get_sub     = get_global [ 'CGI'; 'QueryHash' ], 'parse_get'
+    parse_post_sub    = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'
+
+    # the superglobals
+    .local pmc superglobal_GET
+    ( superglobal_GET ) = parse_get_sub()
+    set_global '_GET', superglobal_GET
+
+    .local pmc superglobal_POST
+    ( superglobal_POST ) = parse_post_sub()
+    set_global '_POST', superglobal_POST
 
     # compile NQP to PIR
     .local string pir_fn, cmd
@@ -69,6 +69,10 @@
     past_compiler.'stages'( $P0 )
     past_compiler.'eval'( $P1 )
 
-.end                                                              
-                                                                  
+.end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
