@@ -434,6 +434,13 @@ information see F<src/pmc.c>.
         retval = const_string(INTERP, "_._:0:");
         RETURN(STRING *retval);
     }
+
+    METHOD FLOATVAL float_from_bytecode(STRING *str) {
+        FLOATVAL retval;
+        memcpy(&retval, str->strstart, sizeof retval);
+        RETURN(FLOATVAL retval);
+    }
+
 }
 
 /*

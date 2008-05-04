@@ -81,7 +81,8 @@ GEN_PIR = \
  src/dumplex_gen.pir \
  src/lua51_gen.pir \
  src/PASTGrammar_gen.pir \
- src/POSTGrammar_gen.pir
+ src/POSTGrammar_gen.pir \
+ $(LIBPATH)/luabytecode_gen.pir
 
 GEN_PBC = \
  lua.pbc
@@ -201,6 +202,9 @@ $(LIBPATH)/sha1.pbc: $(LIBPATH)/md5.pir
 $(LIBPATH)/uuid.pbc: $(LIBPATH)/uuid.pir
 	$(PARROT) --output=$(LIBPATH)/uuid.pbc $(LIBPATH)/uuid.pir
 
+$(LIBPATH)/luabytecode_gen.pir: $(LIBPATH)/luabytecode.rules src/build/translator.pl
+	$(PERL) src/build/translator.pl $(LIBPATH)/luabytecode.rules --output $(LIBPATH)/luabytecode_gen.pir
+
 src/yapp/Lua/parser.pm: src/yapp/Lua/lua51.yp
 	yapp -v -m Lua::parser -o src/yapp/Lua/parser.pm src/yapp/Lua/lua51.yp
 
@@ -235,6 +239,7 @@ TEST_CLEANERS = \
  "t/pmc/*.pir" \
  "t/*.pir" \
  "t/*.lua" \
+ "t/*.luac" \
  "t/*.orig_out" \
  "t/*.parrot_out"
 

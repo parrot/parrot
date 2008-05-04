@@ -1,0 +1,180 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+#
+#       Lua 5.1 VM Instructions
+#
+# See : A No-Frills Introduction to Lua 5.1 VM Instructions
+# by Kein-Hong Man
+
+
+## Loading Constants
+
+[MOVE]
+code = 0
+format = AB
+
+[LOADNIL]
+code = 3
+format = AB
+
+[LOADK]
+code = 1
+format = ABx
+
+[LOADBOOL]
+code = 2
+format = ABC
+
+## Upvalues and Globals
+
+[GETUPVAL]
+code = 4
+format = AB
+
+[GETGLOBAL]
+code = 5
+format = ABx
+
+[SETGLOBAL]
+code = 7
+format = ABx
+
+[SETUPVAL]
+code = 8
+format = AB
+
+## Table Instructions
+
+[GETTABLE]
+code = 6
+format = ABC
+
+[SETTABLE]
+code = 9
+format = ABC
+
+## Arithmetic and String Instructions
+
+[ADD]
+code = 12
+format = ABC
+
+[SUB]
+code = 13
+format = ABC
+
+[MUL]
+code = 14
+format = ABC
+
+[DIV]
+code = 15
+format = ABC
+
+[MOD]
+code = 16
+format = ABC
+
+[POW]
+code = 17
+format = ABC
+
+[UNM]
+code = 18
+format = AB
+
+[NOT]
+code = 19
+format = AB
+
+[LEN]
+code = 20
+format = AB
+
+[CONCAT]
+code = 21
+format = ABC
+
+## Jumps and Calls
+
+[JMP]
+code = 22
+format = sBx
+
+[CALL]
+code = 28
+format = ABC
+
+[TAILCALL]
+code = 29
+format = ABC
+
+[RETURN]
+code = 30
+format = AB
+
+[VARARG]
+code = 37
+format = AB
+
+[SELF]
+code = 11
+format = ABC
+
+## Relational and Logic Instructions
+
+[EQ]
+code = 23
+format = ABC
+
+[LT]
+code = 24
+format = ABC
+
+[LE]
+code = 25
+format = ABC
+
+[TEST]
+code = 26
+format = AC
+
+[TESTSET]
+code = 27
+format = ABC
+
+## Loop Instructions
+
+[FORLOOP]
+code = 31
+format = AsBx
+
+[FORPREP]
+code = 32
+format = AsBx
+
+[TFORLOOP]
+code = 33
+format = AC
+
+## Table Creation
+
+[NEWTABLE]
+code = 10
+format = ABC
+
+[SETLIST]
+code = 34
+format = ABC
+
+## Closures and Closing
+
+[CLOSE]
+code = 35
+format = A
+
+[CLOSURE]
+code = 36
+format = ABx
+
