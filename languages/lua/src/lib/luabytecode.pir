@@ -13,41 +13,30 @@ lib/luabytecode.pir - Lua bytecode Library
 .namespace ['Lua::Bytecode']
 
 .sub '__onload' :anon :load :init
-    #~ load_bytecode 'Protoobject.pbc'
-    #~ new $P0, 'Protomaker'
-    #~ $P0.'new_subclass'('Integer', 'Lua::Bytecode', 'version', 'format', 'endian', 'size_of_int', 'size_of_size_t', 'size_of_opcode', 'size_of_number', 'integral', 'top')
-    #~ $P0.'new_subclass'('FixedPMCArray', 'Lua::Function', 'source_name', 'line_defined', 'last_line_defined', 'number_of_upvalues', 'number_of_parameters', 'is_vararg_flag', 'maximum_stack_size')
-    #~ $P0.'new_subclass'('FixedIntegerArray', 'Lua::InstructionList')
-    #~ $P0.'new_subclass'('FixedPMCArray', 'Lua::ConstantList')
-    #~ $P0.'new_subclass'('Undef', 'Lua::Nil')
-    #~ $P0.'new_subclass'('Boolean', 'Lua::Boolean')
-    #~ $P0.'new_subclass'('Float', 'Lua::Number')
-    #~ $P0.'new_subclass'('String', 'Lua::String')
-    #~ $P0.'new_subclass'('FixedPMCArray', 'Lua::PrototypeList')
-    #~ $P0.'new_subclass'('FixedIntegerArray', 'Lua::LineList')
-    #~ $P0.'new_subclass'('FixedPMCArray', 'Lua::LocalList')
-    #~ $P0.'new_subclass'('String', 'Lua::Local', 'startpc', 'endpc')
-    #~ $P0.'new_subclass'('FixedPMCArray', 'Lua::UpvalueList')
-    #~ $P0.'new_subclass'('String', 'Lua::Upvalue')
-
-    $P0 = subclass 'Integer', 'Lua::Bytecode'
+    $P0 = newclass 'Lua::Bytecode'
     addattribute $P0, 'version'
     addattribute $P0, 'format'
     addattribute $P0, 'endian'
-    addattribute $P0, 'size_of_int'
-    addattribute $P0, 'size_of_size_t'
-    addattribute $P0, 'size_of_opcode'
-    addattribute $P0, 'size_of_number'
+    addattribute $P0, 'sizeof_int'
+    addattribute $P0, 'sizeof_size_t'
+    addattribute $P0, 'sizeof_opcode'
+    addattribute $P0, 'sizeof_number'
     addattribute $P0, 'integral'
     addattribute $P0, 'top'
-    $P0 = subclass 'FixedPMCArray', 'Lua::Function'
-    addattribute $P0, 'source_name'
-    addattribute $P0, 'line_defined'
-    addattribute $P0, 'last_line_defined'
-    addattribute $P0, 'number_of_upvalues'
-    addattribute $P0, 'number_of_parameters'
-    addattribute $P0, 'is_vararg_flag'
-    addattribute $P0, 'maximum_stack_size'
+    $P0 = newclass 'Lua::Function'
+    addattribute $P0, 'source'
+    addattribute $P0, 'linedefined'
+    addattribute $P0, 'lastlinedefined'
+    addattribute $P0, 'nups'
+    addattribute $P0, 'numparams'
+    addattribute $P0, 'is_vararg'
+    addattribute $P0, 'maxstacksize'
+    addattribute $P0, 'code'
+    addattribute $P0, 'k'
+    addattribute $P0, 'p'
+    addattribute $P0, 'lineinfo'
+    addattribute $P0, 'locvars'
+    addattribute $P0, 'upvalues'
     $P0 = subclass 'FixedIntegerArray', 'Lua::InstructionList'
     $P0 = subclass 'FixedPMCArray', 'Lua::ConstantList'
     $P0 = subclass 'Undef', 'Lua::Nil'
@@ -64,7 +53,7 @@ lib/luabytecode.pir - Lua bytecode Library
     $P0 = subclass 'String', 'Lua::Upvalue'
 .end
 
-.sub 'load'
+.sub 'undump'
     .param string bytecode
     .local int idx
     .local pmc script
@@ -100,25 +89,25 @@ lib/luabytecode.pir - Lua bytecode Library
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute script, 'size_of_int', $P0
+    setattribute script, 'sizeof_int', $P0
     idx += 1
     $S0 = bytecode[idx]
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute script, 'size_of_size_t', $P0
+    setattribute script, 'sizeof_size_t', $P0
     idx += 1
     $S0 = bytecode[idx]
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute script, 'size_of_opcode', $P0
+    setattribute script, 'sizeof_opcode', $P0
     idx += 1
     $S0 = bytecode[idx]
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute script, 'size_of_number', $P0
+    setattribute script, 'sizeof_number', $P0
     idx += 1
     $S0 = bytecode[idx]
     $I0 = ord $S0
@@ -195,9 +184,8 @@ lib/luabytecode.pir - Lua bytecode Library
     .param pmc script
     .param string bytecode
     .param int idx
-    set self, 6
     .local int size_t
-    $P0 = getattribute script, 'size_of_size_t'
+    $P0 = getattribute script, 'sizeof_size_t'
     size_t = $P0
     $S0 = substr bytecode, idx, size_t
     $I0 = script.'get_int'($S0)
@@ -206,112 +194,111 @@ lib/luabytecode.pir - Lua bytecode Library
     $S0 = substr bytecode, idx, $I0
     new $P0, 'String'
     set $P0, $S0
-    setattribute self, 'source_name', $P0
+    setattribute self, 'source', $P0
     idx += $I0
   L1:
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     $S0 = substr bytecode, idx, size
     $P0 = script.'get_Integer'($S0)
-    setattribute self, 'line_defined', $P0
+    setattribute self, 'linedefined', $P0
     idx += size
     $S0 = substr bytecode, idx, size
     $P0 = script.'get_Integer'($S0)
-    setattribute self, 'last_line_defined', $P0
+    setattribute self, 'lastlinedefined', $P0
     idx += size
     $S0 = bytecode[idx]
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute self, 'number_of_upvalues', $P0
+    setattribute self, 'nups', $P0
     idx += 1
     $S0 = bytecode[idx]
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute self, 'number_of_parameters', $P0
+    setattribute self, 'numparams', $P0
     idx += 1
     $S0 = bytecode[idx]
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute self, 'is_vararg_flag', $P0
+    setattribute self, 'is_vararg', $P0
     idx += 1
     $S0 = bytecode[idx]
     $I0 = ord $S0
     new $P0, 'Integer'
     set $P0, $I0
-    setattribute self, 'maximum_stack_size', $P0
+    setattribute self, 'maxstacksize', $P0
     idx += 1
     $P0 = new 'Lua::InstructionList'
     idx = $P0.'init'(script, bytecode, idx)
-    self[0] = $P0
+    setattribute self, 'code', $P0
     $P0 = new 'Lua::ConstantList'
     idx = $P0.'init'(script, bytecode, idx)
-    self[1] = $P0
+    setattribute self, 'k', $P0
     $P0 = new 'Lua::PrototypeList'
     idx = $P0.'init'(script, bytecode, idx)
-    self[2] = $P0
+    setattribute self, 'p', $P0
     $P0 = new 'Lua::LineList'
     idx = $P0.'init'(script, bytecode, idx)
-    self[3] = $P0
+    setattribute self, 'lineinfo', $P0
     $P0 = new 'Lua::LocalList'
     idx = $P0.'init'(script, bytecode, idx)
-    self[4] = $P0
+    setattribute self, 'locvars', $P0
     $P0 = new 'Lua::UpvalueList'
     idx = $P0.'init'(script, bytecode, idx)
-    self[5] = $P0
-
+    setattribute self, 'upvalues', $P0
     .return (idx)
 .end
 
 .sub 'brief' :method
     .param int i
     .param int level
-    .local int number_of_upvalues
-    $P0 = getattribute self, 'number_of_upvalues'
-    number_of_upvalues = $P0
-    .local int number_of_parameters
-    $P0 = getattribute self, 'number_of_parameters'
-    number_of_parameters = $P0
-    .local int is_vararg_flag
-    $P0 = getattribute self, 'is_vararg_flag'
-    is_vararg_flag = $P0
-    .local int maximum_stack_size
-    $P0 = getattribute self, 'maximum_stack_size'
-    maximum_stack_size = $P0
+    .local int nups
+    $P0 = getattribute self, 'nups'
+    nups = $P0
+    .local int numparams
+    $P0 = getattribute self, 'numparams'
+    numparams = $P0
+    .local int is_vararg
+    $P0 = getattribute self, 'is_vararg'
+    is_vararg = $P0
+    .local int maxstacksize
+    $P0 = getattribute self, 'maxstacksize'
+    maxstacksize = $P0
     print "\n; function ["
     print i
     print "] definition (level "
     print level
     print ")\n"
     print "; "
-    print number_of_upvalues
+    print nups
     print " upvalues, "
-    print number_of_parameters
+    print numparams
     print " params, "
-    print maximum_stack_size
+    print maxstacksize
     print " stacks\n"
     print ".function  "
-    print number_of_upvalues
+    print nups
     print " "
-    print number_of_parameters
+    print numparams
     print " "
-    print is_vararg_flag
+    print is_vararg
     print " "
-    print maximum_stack_size
+    print maxstacksize
     print "\n"
-    $P0 = self[4]   # local list
+    $P0 = getattribute self, 'locvars'
     $P0.'brief'()
-    $P0 = self[5]   # upvalue list
+    $P0 = getattribute self, 'upvalues'
     $P0.'brief'()
-    $P0 = self[1]   # constant list
+    $P0 = getattribute self, 'k'
     $P0.'brief'()
-    $P0 = self[2]   # prototype function list
+    $P0 = getattribute self, 'p'
     inc level
     $P0.'brief'(level)
-    $P0 = self[0]   # instruction list
+    $P0 = getattribute self, 'code'
     $P0.'brief'()
     print "; end of function\n\n"
 .end
@@ -323,14 +310,14 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     .local int n
     $S0 = substr bytecode, idx, size
     n = script.'get_int'($S0)
     set self, n
     idx += size
-    $P0 = getattribute script, 'size_of_opcode'
+    $P0 = getattribute script, 'sizeof_opcode'
     size = $P0
     .local int i
     i = 0
@@ -354,7 +341,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     .local int n
     $S0 = substr bytecode, idx, size
@@ -450,7 +437,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size
-    $P0 = getattribute script, 'size_of_number'
+    $P0 = getattribute script, 'sizeof_number'
     size = $P0
     $S0 = substr bytecode, idx, size
     $N0 = script.'get_number'($S0)
@@ -476,7 +463,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size_t
-    $P0 = getattribute script, 'size_of_size_t'
+    $P0 = getattribute script, 'sizeof_size_t'
     size_t = $P0
     $S0 = substr bytecode, idx, size_t
     $I0 = script.'get_int'($S0)
@@ -511,7 +498,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     .local int n
     $S0 = substr bytecode, idx, size
@@ -553,7 +540,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     .local int n
     $S0 = substr bytecode, idx, size
@@ -582,7 +569,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     .local int n
     $S0 = substr bytecode, idx, size
@@ -623,7 +610,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size_t
-    $P0 = getattribute script, 'size_of_size_t'
+    $P0 = getattribute script, 'sizeof_size_t'
     size_t = $P0
     $S0 = substr bytecode, idx, size_t
     $I0 = script.'get_int'($S0)
@@ -637,7 +624,7 @@ lib/luabytecode.pir - Lua bytecode Library
   L1:
     set self, $S0
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     $S0 = substr bytecode, idx, size
     $P0 = script.'get_Integer'($S0)
@@ -667,7 +654,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size
-    $P0 = getattribute script, 'size_of_int'
+    $P0 = getattribute script, 'sizeof_int'
     size = $P0
     .local int n
     $S0 = substr bytecode, idx, size
@@ -708,7 +695,7 @@ lib/luabytecode.pir - Lua bytecode Library
     .param string bytecode
     .param int idx
     .local int size_t
-    $P0 = getattribute script, 'size_of_size_t'
+    $P0 = getattribute script, 'sizeof_size_t'
     size_t = $P0
     $S0 = substr bytecode, idx, size_t
     $I0 = script.'get_int'($S0)

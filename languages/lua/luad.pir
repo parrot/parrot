@@ -38,8 +38,8 @@ Francois Perrad.
     content = load_file(filename)
     unless content goto L1
     .local pmc script
-#    push_eh _handler
-    $P0 = get_hll_global ['Lua::Bytecode'], 'load'
+    push_eh _handler
+    $P0 = get_hll_global ['Lua::Bytecode'], 'undump'
     script = $P0(content)
     .local string basename
     $P0 = split '/', filename
