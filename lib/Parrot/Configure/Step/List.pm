@@ -63,7 +63,6 @@ my @steps = qw(
     auto::gettext
     auto::snprintf
     auto::perldoc
-    auto::python
     auto::m4
     auto::ctags
     auto::revision

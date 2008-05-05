@@ -115,9 +115,6 @@ L<http://www.antlr.org/>
 B<m4> - macro language processor
 L<http://gnuwin32.sourceforge.net/>
 
-B<Python> - an interpreted, interactive, object-oriented programming language
-L<http://www.python.org/>
-
 B<SVN::Client> - Perl wrapper of Subversion client functions
 L<http://subversion.tigris.org/> (svn-win32-1.4.x_pl.zip)
 
