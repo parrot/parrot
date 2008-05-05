@@ -52,7 +52,7 @@ sub php_entry () {
 <xsl:template match="@value">
   <xsl:choose>
     <xsl:when test="../@encoding = 'base64'" >
-      :<xsl:value-of select="name()" />( "\n" ),                              
+      :<xsl:value-of select="name()" />( decode_base64( '<xsl:value-of select="." />' ) ),
     </xsl:when>
     <xsl:otherwise>
       :<xsl:value-of select="name()" />( '<xsl:value-of select="." />' ),                              
