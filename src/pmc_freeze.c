@@ -1560,7 +1560,6 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
      */
 again:
     while ((list_item = (PMC**)list_shift(interp, todo, enum_type_PMC))) {
-        /* XXX list_shift can return NULL and we're dereferencing it without checking */
         current = *list_item;
         if (!current) {
             real_exception(interp, NULL, 1,
