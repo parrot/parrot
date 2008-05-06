@@ -1121,7 +1121,7 @@ $(SRC_DIR)/inter_create$(O) : $(SRC_DIR)/inter_create.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/inter_run$(O) : $(SRC_DIR)/inter_run.c $(GENERAL_H_FILES)
 
-$(IO_DIR)/io$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
+$(IO_DIR)/io$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h $(IO_DIR)/io.str
 
 $(IO_DIR)/io_buf$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
