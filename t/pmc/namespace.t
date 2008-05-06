@@ -284,7 +284,7 @@ calling Foo::foo
   Foo::bar
   fie
 calling baz
-Null PMC access in invoke\(\)/
+Could not invoke non-existent sub baz/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get namespace of :anon .sub' );
@@ -842,7 +842,7 @@ pir_error_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (an
 CODE
 /^a_foo
 b_foo
-Null PMC access in invoke\(\)/
+Could not invoke non-existent sub b_foo/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_parent" );
