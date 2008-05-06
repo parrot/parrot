@@ -19,6 +19,8 @@
 #include "jit_emit.h"
 #include "exec_dep.h"
 
+/* HEADERIZER HFILE: src/jit/ppc/exec_dep.h */
+
 #ifdef JIT_CGP
 
 void

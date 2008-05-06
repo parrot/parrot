@@ -19,6 +19,8 @@
 #ifndef PARROT_ARM_EXEC_DEP_H_GUARD
 #define PARROT_ARM_EXEC_DEP_H_GUARD
 
+/* HEADERIZER BEGIN: src/exec_dep.c */
+
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
@@ -31,6 +33,8 @@ Parrot_exec_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 /* Assign the offset of the program_code */
 void
 offset_fixup(Parrot_exec_objfile_t *obj);
+
+/* HEADERIZER END: src/exec_dep.c */
 
 #endif /* PARROT_ARM_EXEC_DEP_H_GUARD */
 
