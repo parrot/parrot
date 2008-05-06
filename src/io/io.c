@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -30,6 +30,7 @@ Parrot ops. The C<ParrotIO struct> is defined in F<src/io/io_private.h>.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include "io.str"
 
 #include <stdarg.h>
 
@@ -1038,9 +1039,13 @@ PARROT_API
 INTVAL
 PIO_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
 {
-    ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
-    ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
-    PARROT_ASSERT((unsigned long)l != 0xdeadbeefUL);
+    ParrotIOLayer * const l  = (ParrotIOLayer *)PMC_struct_val(pmc);
+    ParrotIO      * const io = (ParrotIO *)PMC_data0(pmc);
+
+    if (PMC_IS_NULL(pmc)
+    || !VTABLE_isa(interp, pmc, CONST_STRING(interp, "ParrotIO")))
+        real_exception(interp, NULL, PIO_ERROR, "Cannot put to non-PIO PMC");
+
     PARROT_ASSERT(io);
 
     if (!s)

@@ -604,6 +604,7 @@ STR_FILES = \
     $(SRC_DIR)/inter_cb.str \
     $(SRC_DIR)/inter_create.str \
     $(SRC_DIR)/inter_misc.str \
+    $(SRC_DIR)/io/io.str \
     $(SRC_DIR)/key.str \
     $(SRC_DIR)/library.str \
     $(SRC_DIR)/mmd.str \
