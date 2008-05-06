@@ -1722,7 +1722,7 @@ div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, (void *)real_exception);
+    call_func(jit_info, real_exception);
     pc = jit_info->native_ptr;
     /* L1: */
     L1[1] = (char)(pc - L1 - 2);
@@ -1761,7 +1761,7 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, (void *)real_exception);
+    call_func(jit_info, real_exception);
     pc = jit_info->native_ptr;
     /* L1: */
     L1[1] = (char)(pc - L1 - 2);
@@ -1955,7 +1955,7 @@ opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, (void *)real_exception);
+    call_func(jit_info, real_exception);
     pc = jit_info->native_ptr;
     /* L3: */
     L3[1] = (char)(pc - L3 - 2);
