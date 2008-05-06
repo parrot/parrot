@@ -492,41 +492,76 @@ a 'pasttype' of 'pirop'.
 
 =item call(PAST::Op node)
 
-=item callmethod(PAST::Op node)
-
 Return the POST representation of a C<PAST::Op> node
-with a 'pasttype' attribute of either 'call' or 'callmethod'.
+for calling a sub.
 
 =cut
 
 .sub 'call' :method :multi(_, ['PAST::Op'])
     .param pmc node
     .param pmc options         :slurpy :named
+    .local pmc ops, posargs, namedargs
+    .local string name
+    name = node.'name'()
+    if name goto call_by_name
+    ##  our first child is the thing to be invoked, so make sure it's a PMC
+    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'vP:')
+    goto children_done
+  call_by_name:
+    ##  Parrot gives "Null PMC in invoke()" if we use the name
+    ##  directly, so we check for it here and toss an exception
+    ##  first, resolve the children arguments
+    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'v:')
+    ##  now, check for the named sub
+    .local pmc calllabel, findop
+    $P0 = get_hll_global ['POST'], 'Label'
+    calllabel = $P0.'new'('name'=>'call_')
+    $S0 = ops.'escape'(name)
+    findop = ops.'push_pirop'('find_name', '$P10', $S0, 'result'=>'$P10')
+    ops.'push_pirop'('unless_null', findop, calllabel)
+    $S0 = concat "Cannot invoke non-existent sub '", name
+    $S0 .= "'"
+    $S0 = ops.'escape'($S0)
+    ops.'push_pirop'('die', $S0)
+    ops.'push'(calllabel)
+    ##  add the named sub as the invokable sub
+    unshift posargs, findop
+  children_done:
 
-    .local string pasttype
-    pasttype = node.'pasttype'()
-    if pasttype goto have_pasttype
-    pasttype = 'call'
-  have_pasttype:
+    ##  generate the call itself
+    .local string result, rtype
+    result = ''
+    rtype = options['rtype']
+    if rtype == 'v' goto result_done
+    result = ops.'unique'('$P')
+    ops.'result'(result)
+  result_done:
 
-    .local string signature
-    signature = ':'
-    unless pasttype == 'callmethod' goto have_signature
-    signature = 'P:'
-  have_signature:
+    ops.'push_pirop'('call', posargs :flat, namedargs :flat, 'result'=>result)
+    .return (ops)
+.end
 
+
+=item callmethod(PAST::Op node)
+
+Return the POST representation of a C<PAST::Op> node
+to invoke a method on a PMC.
+
+=cut
+
+.sub 'callmethod' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
     .local pmc ops, posargs, namedargs
     .local string name
     name = node.'name'()
     unless name goto call_first_arg
-    signature = concat 'v', signature
-    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
+    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'vP:')
     name = ops.'escape'(name)
     unshift posargs, name
     goto children_done
   call_first_arg:
-    signature = concat 'vP', signature
-    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
+    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'vPP:')
   children_done:
 
     .local string result, rtype
@@ -537,14 +572,8 @@ with a 'pasttype' attribute of either 'call' or 'callmethod'.
     ops.'result'(result)
   result_done:
 
-    ops.'push_pirop'(pasttype, posargs :flat, namedargs :flat, 'result'=>result)
+    ops.'push_pirop'('callmethod', posargs :flat, namedargs :flat, 'result'=>result)
     .return (ops)
-.end
-
-.sub 'callmethod' :method :multi(_, ['PAST::Op'])
-    .param pmc node
-    .param pmc options         :slurpy :named
-    .return self.'call'(node, options :flat :named)
 .end
 
 
