@@ -500,32 +500,31 @@ for calling a sub.
 .sub 'call' :method :multi(_, ['PAST::Op'])
     .param pmc node
     .param pmc options         :slurpy :named
+    .local string pasttype
+    pasttype = node.'pasttype'()
+    if pasttype goto have_pasttype
+    pasttype = 'call'
+  have_pasttype:
+
+    .local string signature
+    signature = 'v:'
+    ## for callmethod, the invocant (child) must be a PMC
+    if pasttype != 'callmethod' goto have_signature
+    signature = 'vP:'
+  have_signature:
+
     .local pmc ops, posargs, namedargs
     .local string name
     name = node.'name'()
     if name goto call_by_name
     ##  our first child is the thing to be invoked, so make sure it's a PMC
-    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'vP:')
+    substr signature, 1, 0, 'P'
+    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
     goto children_done
   call_by_name:
-    ##  Parrot gives "Null PMC in invoke()" if we use the name
-    ##  directly, so we check for it here and toss an exception
-    ##  first, resolve the children arguments
-    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'v:')
-    ##  now, check for the named sub
-    .local pmc calllabel, findop
-    $P0 = get_hll_global ['POST'], 'Label'
-    calllabel = $P0.'new'('name'=>'call_')
+    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
     $S0 = ops.'escape'(name)
-    findop = ops.'push_pirop'('find_name', '$P10', $S0, 'result'=>'$P10')
-    ops.'push_pirop'('unless_null', findop, calllabel)
-    $S0 = concat "Cannot invoke non-existent sub '", name
-    $S0 .= "'"
-    $S0 = ops.'escape'($S0)
-    ops.'push_pirop'('die', $S0)
-    ops.'push'(calllabel)
-    ##  add the named sub as the invokable sub
-    unshift posargs, findop
+    unshift posargs, $S0
   children_done:
 
     ##  generate the call itself
@@ -537,7 +536,7 @@ for calling a sub.
     ops.'result'(result)
   result_done:
 
-    ops.'push_pirop'('call', posargs :flat, namedargs :flat, 'result'=>result)
+    ops.'push_pirop'(pasttype, posargs :flat, namedargs :flat, 'result'=>result)
     .return (ops)
 .end
 
@@ -552,28 +551,7 @@ to invoke a method on a PMC.
 .sub 'callmethod' :method :multi(_, ['PAST::Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .local pmc ops, posargs, namedargs
-    .local string name
-    name = node.'name'()
-    unless name goto call_first_arg
-    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'vP:')
-    name = ops.'escape'(name)
-    unshift posargs, name
-    goto children_done
-  call_first_arg:
-    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'vPP:')
-  children_done:
-
-    .local string result, rtype
-    result = ''
-    rtype = options['rtype']
-    if rtype == 'v' goto result_done
-    result = ops.'unique'('$P')
-    ops.'result'(result)
-  result_done:
-
-    ops.'push_pirop'('callmethod', posargs :flat, namedargs :flat, 'result'=>result)
-    .return (ops)
+    .return self.'call'(node, options :flat :named)
 .end
 
 
