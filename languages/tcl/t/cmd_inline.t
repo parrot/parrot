@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 language_output_is( "tcl", <<'TCL', <<'OUT', "PIR compiler" );
@@ -35,6 +35,19 @@ language_output_is( "tcl", <<'TCL', <<'OUT', "invalid compiler" );
  }
 TCL
 invalid language "JAVA" specified
+OUT
+
+language_output_is( "tcl", <<'TCL', <<'OUT', "invalid PIR code" );
+catch {
+ inline PIR {
+   .sub test
+     say "not ok
+   .end 
+ }
+} err
+puts "ok"
+TCL
+ok
 OUT
 
 # Local Variables:
