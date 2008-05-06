@@ -102,7 +102,36 @@ See RT #48014. This will be removed once all core PMCs have been updated.
 =item * Keyed access to exception attributes [post 0.5.1]
 
 See RT #48012. Attributes on exception objects will no longer be accessible
-by integer or string key, use C<getattribute> and C<setattribute> instead.
+by integer key, use C<getattribute> and C<setattribute> instead.
+
+=item * 'push_exception' function [post 0.6.2]
+
+Is deprecated, replaced by C<Parrot_cx_add_handler> (a method call to
+C<add_handler> on the concurrency scheduler object).
+
+=item * 'pop_exception' function [post 0.6.2]
+
+Is deprecated, replaced by C<Parrot_cx_delete_handler_typed> (a method call to
+C<delete_handler> on the concurrency scheduler object).
+
+=item * 'count_exception_handlers' function [post 0.6.2]
+
+Is deprecated, replaced by C<Parrot_cx_count_handlers_typed> (a method call to
+C<count_handlers> on the concurrency scheduler object).
+
+=item * 'get_exception_handler' function and 'get_eh' opcode [post 0.6.2]
+
+Are deprecated, exception handler lookup by index is no longer supported.
+
+=item * 'get_all_exception_handlers' function and 'get_all_eh' opcode [post 0.6.2]
+
+Are deprecated, access to the exception handler list should be performed
+through the concurrency scheduler.
+
+=item * 'throwcc' opcode [post 0.6.2]
+
+Is deprecated, replaced by the C<throw> opcode (the single argument form of
+'throwcc' was already identical to 'throw').
 
 =back
 
