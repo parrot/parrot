@@ -214,7 +214,7 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *
 
 /*
 
-=item C<static PObj * gc_ms_get_free_object>
+=item C<static void * gc_ms_get_free_object>
 
 Get a new object from the free pool and return it.
 
@@ -248,7 +248,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static PObj * gc_ms_get_free_pmc_ext>
+=item C<static void * gc_ms_get_free_pmc_ext>
 
 Get a new PMC_EXT structure from the free pool and return it.
 

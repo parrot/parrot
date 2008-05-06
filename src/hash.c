@@ -73,12 +73,12 @@ static void hash_freeze(PARROT_INTERP,
 
 static void hash_thaw(PARROT_INTERP,
     ARGMOD(Hash *hash),
-    ARGMOD(visit_info* info))
+    ARGMOD(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash)
-        FUNC_MODIFIES(* info);
+        FUNC_MODIFIES(*info);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION

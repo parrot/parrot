@@ -35,7 +35,8 @@ static void PackFile_Constant_dump(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void pobj_flag_dump(PARROT_INTERP, ARGIN(long flags))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
