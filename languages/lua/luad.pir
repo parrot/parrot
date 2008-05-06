@@ -43,6 +43,8 @@ Francois Perrad.
     script = $P0(content)
     .local string basename
     $P0 = split '/', filename
+    $S0 = pop $P0
+    $P0 = split '\', $S0
     basename = pop $P0
     script.'brief'(basename)
     end
