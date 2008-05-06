@@ -227,7 +227,6 @@ EOM
  * vtable method name defines for delegate
  */
 
-/* &gen_from_def(vtable_methods.pasm) */
 EOM
     for my $entry ( @{$vtable} ) {
         my $uc_meth = uc $entry->[1];
@@ -237,7 +236,6 @@ EOM
 
     }
     $macros .= <<"EOM";
-/* &end_gen */
 
 EOM
 
