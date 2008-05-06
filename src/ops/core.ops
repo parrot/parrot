@@ -405,12 +405,13 @@ Create a closure of the given subroutine PMC by cloning the sub's state.
 =cut
 
 inline op invokecc(invar PMC) :flow {
-    opcode_t *dest;
-    PMC * const p = $1;
-    dest = expr NEXT();
+    PMC      * const p     = $1;
+    opcode_t *dest         = expr NEXT();
+
     interp->current_object = NULL;
-    interp->current_cont = NEED_CONTINUATION;
-    dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
+    interp->current_cont   = NEED_CONTINUATION;
+    dest                   = (opcode_t *)p->vtable->invoke(interp, p, dest);
+
     goto ADDRESS(dest);
 }
 

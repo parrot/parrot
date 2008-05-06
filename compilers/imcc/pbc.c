@@ -655,7 +655,7 @@ fixup_globals(PARROT_INTERP)
                     SymReg * const nam = mk_const(interp, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
-                    op = interp->op_lib->op_code("find_name_p_sc", 1);
+                    op = interp->op_lib->op_code("find_sub_not_null_p_sc", 1);
                     PARROT_ASSERT(op);
 
                     interp->code->base.data[addr] = op;

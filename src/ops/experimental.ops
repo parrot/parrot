@@ -412,6 +412,17 @@ inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
   $1 = string_substr(interp, $2, $3, $4, &dest, 1);
 }
 
+=item C<find_sub_not_null>(out PMC, in STR)
+
+inline op find_sub_not_null(out PMC, in STR) :base_core {
+    PMC *sub = Parrot_find_name_op(interp, $2, expr NEXT());
+
+    if (PMC_IS_NULL(sub))
+        real_exception(interp, NULL, GLOBAL_NOT_FOUND,
+            "Could not invoke non-existent sub %Ss", $2);
+
+    $1 = sub;
+}
 
 =back
 
