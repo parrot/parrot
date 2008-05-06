@@ -1,6 +1,2 @@
 All bugs and todo items should be documented in partcl's issue tracker at:
  http://code.google.com/p/partcl/issues/list
-
-Some tickets are still in parrot's RT system at:
-
- https://rt.perl.org/rt3/NoAuth/parrot/List.html?Field=Lang&Value=tcl

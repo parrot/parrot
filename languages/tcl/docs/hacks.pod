@@ -1,44 +1,22 @@
 =head1 hacks.pod
 
-Prodding by Matt Diephouse to generate documentation for two things:
-
-=over 4
-
-=item 1
+=head1 WORKAROUNDS
 
 Things that partcl has done that might be considered hacks -
 things that will likely impair our ability in the distant future to
 cleanly do language interoperability.
 
-=item 2
-
-Things that partcl hasn't done yet at all because parrot makes them
-hard.
-
-=back
-
-It is, of course, quite likely that said feature already exists with
-a nice interface, and was just not found by the partcl developers -
-If you find something along these lines, let them know on the internals
-list.
-
-=head1 WORKAROUNDS
-
 =over 4
 
 =item PDD20 - lexical vars
 
-The new scheme (PDD20) for lexical vars means that to use the 'store_lex', and
-'find_lex' opcodes, you have to be inside a sub that's marked :lex: That
-is, inside a sub that corresponds to a HLL block that introduces a new
-lexical scope. Tcl uses helper functions to figure out whether a particular
-'$a' is referring to a global or a lexical var. To keep our current
-flexibility, we keep track of the lexpads in the 'call_chain' variable and
-manually look up lexicals in the lexpads.
-
-This is in contrast to the previous way lexicals were implemented, which 
-let you call the _lex opcodes anywhere, as long as at some point in the past
-of the program, you had a created a lex_pad and put it on the stack.
+The current scheme (PDD20) for lexical vars means that to be able use the
+'store_lex', and 'find_lex' opcodes, you have to be inside a sub that's
+marked C<:lex>: That is, inside a sub that corresponds to a HLL block that
+introduces a new lexical scope. Tcl uses helper functions to figure out
+whether a particular '$a' is referring to a global or a lexical var. We
+keep track of the lexpads in the 'call_chain' variable and manually
+look up lexicals in the lexpads.
 
 =item subroutine meta information.
 
@@ -46,7 +24,7 @@ Tcl provides the ability to query subroutines about their arguments
 and their code. For example:
 
  % proc sum {{a 2} {b 3}} {
- return [expr $a + $b]
+  return [expr $a + $b]
  }
  % sum
  5
@@ -94,22 +72,11 @@ actual commands and variables. I think the latter would be somewhat cleaner,
 and, if any other languages support this feature, this would give us a chance
 to interoperate.
 
-=item list splicing
-
-There are several cases where we convert TclLists or ResizablePMCArrays to
-Arrays so that we can use the splice opcode. Need to have better splice
-support in parrot array classes, as well as our own. See
-C<lib/commands/linsert.pir>.
-
 =item flush diagnostics
 
-At the moment, there doesn't seem to be a parrot method for determining if 
-a filehandled was opened for reading/writing. We can work around this by
+At the moment, there doesn't seem to be a parrot method for determining if
+a filehandle was opened for reading/writing. We can work around this by
 tracking it in a hash in the _Tcl namespace.
-
-=item [after], [vwait]
-
-This is waiting, pending the event system re-thunk.
 
 =back
 
