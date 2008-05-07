@@ -782,7 +782,9 @@ Parses a subrule token.
     textarg = ''
     closedelim = '>'
     $S0 = substr target, pos, 1
+    if $S0 == '"' goto subrule_text_quote
     if $S0 != "'" goto subrule_text_loop
+  subrule_text_quote:
     closedelim = $S0
     inc pos
   subrule_text_loop:
