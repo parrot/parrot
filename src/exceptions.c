@@ -36,6 +36,7 @@ Define the internal interpreter exceptions.
 
 #ifdef PARROT_HAS_BACKTRACE
 #  include <execinfo.h>
+#  include <dlfcn.h>
 #endif
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
@@ -1021,44 +1022,35 @@ Parrot_print_backtrace(void)
     size_t i;
 
     const size_t size = backtrace(array, BACKTRACE_DEPTH);
-    char ** const strings = backtrace_symbols(array, size);
+    char ** const strings;
 
     fprintf(stderr,
             "Backtrace - Obtained %zd stack frames (max trace depth is %d).\n",
             size, BACKTRACE_DEPTH);
 #  ifndef BACKTRACE_VERBOSE
     for (i = 0; i < size; i++) {
+        Dl_info frameInfo;
+        int found;
+
         /* always indent */
         const int indent = 2 + (2*i);
-        const char *caller = strchr(strings[i], '(');
 
         fprintf(stderr, "%*s", indent, "");
-
-        /* if the caller was an anon function then strchr won't
-        find a '(' in the string and will return NULL */
-        if (caller) {
-            size_t callerLength;
-            size_t j;
-            /* skip over the '(' */
-            caller++;
-            /* find the end of the symbol name */
-            callerLength = abs(strchr(caller, '+') - caller);
-            /* print just the symbol name */
-            for (j = 0; j < callerLength; j++) {
-                fputc(caller[j], stderr);
-            }
-            fprintf(stderr, "\n");
+        found = dladdr(array[i], &frameInfo);
+        if (0 == found || NULL == frameInfo.dli_sname) {
+            fprintf(stderr, "(unknown)\n");
         }
         else {
-            fprintf(stderr, "(unknown)\n");
+            fprintf(stderr, "%s\n", frameInfo.dli_sname);
         }
     }
 #  else
+    strings = backtrace_symbols(array, size);
     for (i = 0; i < size; i++)
         fprintf(stderr, "%s\n", strings[i]);
-#  endif
 
     mem_sys_free(strings);
+#  endif
 
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_BACKTRACE */
