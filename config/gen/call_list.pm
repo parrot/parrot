@@ -47,19 +47,21 @@ sub runstep {
     open my $combined, '>', $combined_file
         or die "Could not open '$combined_file' for write: $!";
 
+    # add read-only metadata for the generated file
+    print {$combined} "# ex: set ro:\n";
+
     foreach my $fragment_file (@fragment_files) {
         my $fragment =  _slurp($fragment_file);
            $fragment =~ s/^\s*\n//;
            $fragment =~ s/\s*$/\n\n/;
 
-        print $combined $fragment;
+        print {$combined} $fragment;
     }
 
     $conf->append_configure_log($combined_file);
 
     return 1;
 }
-
 
 1;
 
