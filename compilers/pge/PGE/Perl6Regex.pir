@@ -774,17 +774,26 @@ Parses a subrule token.
     mob.'to'(-1)
     goto subrule_end
   subrule_text_arg:
-    pos += 2
-    .local string textarg
+    $I0 = pos + 1
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, $I0, lastpos
+    if pos == $I0 goto end
+    if pos >= lastpos goto end
+    .local string textarg, closedelim
     textarg = ''
-  subrule_text_loop:
+    closedelim = '>'
     $S0 = substr target, pos, 1
-    if $S0 == '>' goto subrule_text_end
+    if $S0 != "'" goto subrule_text_loop
+    closedelim = $S0
+    inc pos
+  subrule_text_loop:
+    if pos >= lastpos goto end
+    $S0 = substr target, pos, 1
+    if $S0 == closedelim goto subrule_text_end
     if $S0 != "\\" goto subrule_text_add
     inc pos
     $S0 = substr target, pos, 1
-    $I0 = index "\\>", $S0
-    if $I0 >= 0 goto subrule_text_add
+    if $S0 == closedelim goto subrule_text_add
+    if $S0 == "\\" goto subrule_text_add
     textarg .= "\\"
   subrule_text_add:
     textarg .= $S0
@@ -792,6 +801,9 @@ Parses a subrule token.
     goto subrule_text_loop
   subrule_text_end:
     mob['arg'] = textarg
+    if closedelim == '>' goto subrule_end
+    inc pos
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
   subrule_end:
     $S0 = substr target, pos, 1
     if $S0 != '>' goto end

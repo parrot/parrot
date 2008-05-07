@@ -337,9 +337,9 @@ token value {
 }
 
 token quote {
-    [ \'  <string_literal: '> \'
-    | '"' <string_literal: "> '"'
-    | 'q' <.ws> '<' <string_literal: \>> '>'
+    [ \'  <string_literal: '\''> \'
+    | '"' <string_literal: '"'> '"'
+    | 'q' <.ws> '<' <string_literal: '>'> '>'
     ]
     {*}
 }
