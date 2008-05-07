@@ -611,7 +611,7 @@ MMD_DEFAULT: {
             if (!dest)
                 dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-            VTABLE_set_number_native(INTERP, dest, valf * PMC_int_val(SELF));
+            VTABLE_set_number_native(INTERP, dest, SELF.get_number() * valf);
             return dest;
         }
     }
