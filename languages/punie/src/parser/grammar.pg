@@ -4,7 +4,7 @@
 grammar Punie::Grammar is PCT::Grammar;
 
 token TOP    {
-    <lineseq> [ $ || <panic: parse error> ] {*}
+    <lineseq> [ $ || <panic: 'parse error'> ] {*}
 }
 
 token ws {
@@ -207,9 +207,9 @@ token key {
 }
 token integer { \d+ {*} }
 token number { \d+\.\d+ {*} }
-token stringdouble { '"' <string_literal: "> '"' {*} }
-token stringsingle { \' <string_literal: '> \' {*} }
-token stringbacktick { \` <string_literal: `> \` {*} }
+token stringdouble { '"' <string_literal: '"' > '"' {*} }
+token stringsingle { \' <string_literal: '\'' > \' {*} }
+token stringbacktick { \` <string_literal: '`'> \` {*} }
 rule subcall { do $<sym>=<word> \( <expr>? \) {*} }
 rule opcall  { $<sym>=<op> \( <expr>? \) {*} }
 

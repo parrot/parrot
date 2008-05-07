@@ -22,7 +22,7 @@ grammar NQP::Grammar is PCT::Grammar;
 
 token TOP {
   <statement_block>
-  [ $ || <panic: Syntax error> ]
+  [ $ || <panic: 'Syntax error'> ]
   {*}
 }
 
@@ -85,7 +85,7 @@ rule statement_block {
 ##  Parse a list of statements.
 rule statement_list {
     [ <statement>
-        [  <.statement_end> || <panic: Statement not terminated properly> ]
+        [  <.statement_end> || <panic: 'Statement not terminated properly'> ]
     ]*
     {*}
 }
@@ -174,13 +174,13 @@ rule for_statement {
 
 rule return_statement {
     $<sym>=['return']
-    [ <EXPR> || <panic: Unable to parse argument to 'return'> ]
+    [ <EXPR> || <panic: 'Unable to parse argument to "return"'> ]
     {*}
 }
 
 rule make_statement {
     $<sym>=['make']
-    [ <EXPR> || <panic: Unable to parse argument to 'make'> ]
+    [ <EXPR> || <panic: 'Unable to parse argument to "make"'> ]
     {*}
 }
 
@@ -205,7 +205,7 @@ rule inline_pir_statement {
 token block {
     '{'
     <statement_block>
-    [ '}' || <panic: Missing '}'> ]
+    [ '}' || <panic: 'Missing "}"'> ]
     [ \h* [ \# \N* ]? \n  <.MARK_STATEMENT_END> ]?
     {*}
 }
@@ -262,7 +262,7 @@ token postfix {
 token methodop {
     '.' <ident>
     '(' <arglist>
-    [ <.ws> ')' || <panic: Missing ')'> ]
+    [ <.ws> ')' || <panic: "Missing ')'"> ]
     {*}                                                    #= methodop
 }
 
@@ -270,7 +270,7 @@ token postcircumfix {
     | '(' <arglist> ')' {*}                                #= ( )
     | '[' <EXPR> <.ws> ']' {*}                             #= [ ]
     | '{' <EXPR> <.ws> '}' {*}                             #= { }
-    | '<' <string_literal: \>> '>' {*}                     #= < >
+    | '<' <string_literal: '>' > '>' {*}                     #= < >
 }
 
 rule arglist {

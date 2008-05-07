@@ -22,7 +22,7 @@ t/library/pge_util.t - Parrot Grammar Engine tests of utility rules
 my $str = "How will this\nstring choose\nto explode?\n\nTest";
 p6rule_error_like(
     $str,
-    'expl <PGE::Util::die: kaboom>',
+    "expl <PGE::Util::die: 'kaboom'>",
     qr/^kaboom at line 3, near "ode\?\\n\\n/, "die"
 );
 

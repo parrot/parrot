@@ -12,7 +12,7 @@ rule TOP {
     'HAI' <version> <statement_terminator>
     <block>
     'KTHXBYE' <statement_terminator>
-    [ $ || <panic: Syntax error> ]
+    [ $ || <panic: 'Syntax error'> ]
     {*}
 }
 

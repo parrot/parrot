@@ -109,11 +109,11 @@ the output to the correct output file.
       | $<cmd>:=(regex|token|rule)
           $<name>:=<arg>
           $<optable>:=(is optable)?
-          [ \{<regex>\} | <?PGE::Util::die: unable to parse regex> ]
+          [ \{<regex>\} | <?PGE::Util::die: 'unable to parse regex'> ]
       | [multi]? $<cmd>:=(proto)
           $<name>:=<arg>
           ( is $<trait>:=[\w+]['('<arg>')']? )*
-          [ \{ <-[}]>*: \} | ';' | <?PGE::Util::die: missing proto/sub body> ]
+          [ \{ <-[}]>*: \} | ';' | <?PGE::Util::die: 'missing proto/sub body'> ]
       | [$|<PGE::Util::die: unrecognized statement>]
       STMT_PARSE
     $P0 = p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'statement', 'w'=>1)

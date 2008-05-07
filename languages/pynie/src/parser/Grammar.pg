@@ -25,7 +25,7 @@ token ws { \h* [ '#' \N* ]? }
 
 token file_input {
     ^ [ <.newline> | <statement> ]*
-    [ $ | <.panic: syntax_error> ]
+    [ $ | <.panic: 'syntax_error'> ]
     {*}
 }
 
@@ -41,7 +41,7 @@ token suite1 {
 token suite2 {
     <.newline> <.indent> <statement>
     [ <.indent_same> <statement> ]*
-    [ <.dedent> | <.panic: IndentationError: unindent does not match any outer indentation level> ]
+    [ <.dedent> | <.panic: 'IndentationError: unindent does not match any outer indentation level'> ]
     {*}
 }
 
