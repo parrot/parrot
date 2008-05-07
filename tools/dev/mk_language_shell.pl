@@ -325,7 +325,7 @@ grammar @lang@::Grammar is PCT::Grammar;
 
 rule TOP {
     <statement>*
-    [ $ || <panic: Syntax error> ]
+    [ $ || <panic: 'Syntax error'> ]
     {*}
 }
 
@@ -349,7 +349,7 @@ rule value {
 rule integer { \d+ {*} }
 
 rule quote {
-    [ \' <string_literal: '> \' | \" <string_literal: "> \" ]
+    [ \' <string_literal: '\'' > \' | \" <string_literal: '"' > \" ]
     {*}
 }
 
