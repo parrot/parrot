@@ -176,6 +176,34 @@ Will have to be:
 
 =head1 Parrot Compiler tools
 
-Currently there are no deprecations.
+=head2 Parser Grammar Engine (PGE)
+
+=over 4
+
+=item Non-capturing C<< <?foo> >> is now C<< <.foo> >>
+
+(See RT#53834)
+
+Synopsis 5 changes the syntax for non-capturing subrules from
+C<< <?foo> >> to C<< <.foo> >>.  According to S05, the
+C<< <?foo> >> syntax is now used to indicate a zero-width
+assertion.  So, grammars that have been using C<< <?foo> >>
+for non-capturing subrules need to convert to the new syntax.
+
+PGE will continue to support the non-capture interpretation
+of C<< <?foo> >> until the May 2008 release, at which point it
+will be removed.
+
+=item Change argument handling of C<< <foo: text> >>
+
+Synopsis 5 changes the handling of arguments after a colon
+in subrule invocations so that  C<< <foo: text> >> must
+now be written as C<< <foo: 'text'> >>.
+
+For the foreseeable future PGE will support both syntaxes,
+but the obsolete C<< <foo: text> >> syntax may disappear
+at any time after June 2008.
+
+=back
 
 =cut
