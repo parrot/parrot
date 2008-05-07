@@ -191,7 +191,7 @@ assertion.  So, grammars that have been using C<< <?foo> >>
 for non-capturing subrules need to convert to the new syntax.
 
 PGE will continue to support the non-capture interpretation
-of C<< <?foo> >> until the May 2008 release, at which point it
+of C<< <?foo> >> until the May 2008 release, after which it
 will be removed.
 
 =item Change argument handling of C<< <foo: text> >>
