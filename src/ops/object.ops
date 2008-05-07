@@ -469,12 +469,9 @@ Add the attribute named $2 to the class $1.
 
 inline op addattribute(invar PMC, in STR) :object_classes {
     STRING * const class_name  = string_from_literal(interp, "Class");
-    STRING * const pclass_name = string_from_literal(interp, "ParrotClass");
 
     if (VTABLE_isa(interp, $1, class_name))
         VTABLE_add_attribute(interp, $1, $2, PMCNULL);
-    else if (VTABLE_isa(interp, $1, pclass_name))
-        Parrot_add_attribute(interp, $1, $2);
     else
         real_exception(interp, NULL, INVALID_OPERATION,
             "Cannot add attribute to non-class");
