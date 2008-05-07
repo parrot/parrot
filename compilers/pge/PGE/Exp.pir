@@ -817,8 +817,8 @@ tree as a PIR code object that can be compiled.
         CODE
 
   subrule_match:
-    $I0 = self['isnegated']
-    if $I0 goto subrule_negated
+    $I0 = self['iszerowidth']
+    if $I0 goto subrule_zerowidth
     $S0 = concat label, '_3'
     $I0 = self['backtrack']
     if $I0 != PGE_BACKTRACK_NONE goto subrule_match_1
@@ -861,18 +861,24 @@ tree as a PIR code object that can be compiled.
     goto end
     .return()
 
-  subrule_negated:
-    ##   This handles negative subrule matches; if a subrule fails, then
-    ##   record a zero-width match and continue to the next node.
-    code.emit(<<"        CODE", PGE_CUT_MATCH, next, subarg)
-          captob = $P0(captob%2)
+  subrule_zerowidth:
+    ##  this handles zero-width subrule matches, either positive
+    ##  or negative.
+    .local string test
+    test = 'if'
+    $I0 = self['isnegated']
+    unless $I0 goto have_test
+    test = 'unless'
+  have_test:
+    code.emit(<<"        CODE", PGE_CUT_MATCH, test, next, subarg)
+          captob = $P0(captob%3)
           $P1 = getattribute captob, '$.pos'
           if $P1 <= %0 goto fail_match
-          if $P1 >= 0 goto fail
+          %1 $P1 < 0 goto fail
           $P1 = pos
           $P1 = getattribute captob, '$.from'
           $P1 = pos
-          goto %1
+          goto %2
         CODE
   end:
     .return()

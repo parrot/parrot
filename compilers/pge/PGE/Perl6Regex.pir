@@ -747,6 +747,7 @@ Parses a subrule token.
 
   negated:
     mob['isnegated'] = 1
+    mob['iszerowidth'] = 1
   nocapture:
     mob['iscapture'] = 0
   subrule_arg:
