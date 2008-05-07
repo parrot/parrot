@@ -285,6 +285,7 @@ languages/pynie/pynie.pbc                         [main]
 languages/squaak/squaak.pbc                       [main]
 languages/tcl/tcl.pbc                             [main]
 languages/tcl/runtime/tcllib.pbc                  [main]
+src/call_list.txt                                 [devel]doc
 src/glut_callbacks.c                              [main]
 src/jit_emit.h                                    [main]include
 src/nci.c                                         [main]

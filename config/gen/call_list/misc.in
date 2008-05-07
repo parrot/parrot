@@ -1,295 +1,4 @@
-# Copyright (C) 2002-2008, The Perl Foundation.
-# $Id$
-
-# Function signature declarations for Parrot Native Call Interface.
-# The first alphanumeric is the type of the return value,
-# the other alphanumerics denote the input parameter types.
-
-# Types
-
-# INT register stuff
-# I - INTVAL
-# c - char
-# s - short
-# i - int
-# l - long
-
-# NUM register stuff
-# N - FLOATVAL
-# f - float
-# d - double
-
-# STR register stuff
-# S - pointer to a STRING-register
-# t - character string (0-terminated)
-# Buffers are not valid return parameters,
-# use 'p' when the native function returns a pointer value
-# b - void *
-# B - void **
-
-# PMC register stuff
-# P - pointer to a PMC-register
-# O - pointer to PMC-register (object)
-# p - data pointer from PMC (on store into a new UnManagedStruct PMC)
-# 2 - pointer to short
-# 3 - pointer to int
-# 4 - pointer to long
-
-# void stuff
-# v - void
-
-# special stuff
-# 0 - insert a NULL (pointer) - doesn't consume a register
-# J - Parrot_Interp param
-# @ - slurpy array
-
-# Callback Things
-
-# U - Single PMC parameter to pass into callback - user data
-
-c             # t/pmc/nci.t
-c    p
-c    pi
-
-d             # t/pmc/nci.t
-d    d
-d    JOd      # Parrot builtins
-I    JOS
-S    JOS      # ParrotIO.readline
-I    JI       # Parrot_is_char_*
-v    JOSP     # String.trans
-v    JOS      # String.reverse
-P    JOS      # Added for os.stat
-I    JOI      # os.umask
-P    JOPS     # Namespace.get_global
-v    JOPSP    # Namespace.set_global
-
-v    JPPP     # infix MMD
-v    JPIP
-v    JPSP
-v    JPNP
-
-v    JPP      # inplace infix MMD
-v    JPI
-v    JPS
-v    JPN
-
-P    JPPP     # infix MMD new
-P    JPIP
-P    JPSP
-P    JPNP
-
-I    JPP      # MMD compare
-
-f             # t/pmc/nci.t
-f    ff       # t/pmc/nci.t
-f    is
-
-i
-i    b        # t/pmc/nci.t
-i    d
-i    i
-i    ii
-i    ii4
-i    ii4i
-i    iiii
-i    iiilsp
-i    iil
-i    iili
-i    iip
-i    iit
-i    iiti
-i    ilsp
-i    iti
-i    l
-i    li
-i    lp
-i    lsp
-i    p
-i    p33
-i    p333
-i    p333333
-i    p4
-i    p42p
-i    p4i
-i    pb
-i    pi
-i    pii
-i    pii4
-i    pii4i
-i    piii
-i    piiiiii
-i    piiilsp
-i    piil
-i    piili
-i    piit
-i    piiti
-i    pilsp
-i    pit
-i    pl
-i    pli
-i    pll
-i    pllllllll
-i    plp
-i    plsp
-i    pp
-i    ppi
-i    ppiiiiiiii
-i    pppp
-i    psp
-i    pt
-i    pti
-i    pitl
-i    s
-i    s22
-i    s222
-i    sp
-i    sss
-i    ssss
-i    t
-i    ti
-i    4
-i    4i
-i    42p
-
-l             # t/pmc/nci.t
-l    ii
-l    l4
-l    p
-l    pi
-l    pii
-l    p33l
-l    33l
-
-P    JOP      # atan2
-P    Ji       # Needed for parrot threads
-P    JOl      # Parrot builtins
-P    Jt
-
-p
-p    B
-p    b
-p    Jt
-p    i
-p    ii
-p    iiii
-p    iiiiii
-p    iiiiiiii
-p    p
-p    pt
-p    pi
-p    pii
-p    piiii
-p    t
-p    tpp
-p    ttttttt
-
-s             # t/pmc/nci.t
-
-t             # t/pmc/nci.t
-t    i
-t    ii
-t    p
-t    pi
-t    pii
-t    pt
-t    t
-t    tl4
-t    t4
-
-v
-v    Jiiip    # examples/japh/japh11.pasm
-v    JOP      # Needed for parrot threads
-v    i
-v    ii
-v    illllllll
-v    l
-v    p
-v    pbip     # for libsyck
-v    pi
-v    piiii
-v    pl
-v    pp
-
-# These are needed for parrotio.pmc
-i    JP
-v    JP
-i    JPi
-i    JPii
-i    JPiii
-i    JPt
-P    JOSSS
-
-# Needed by string.pmc
-v    JOSS
-
-# Py_func signatures
-P    JP
-P    JPP
-P    JO
-S    JO
-i       P
-
-# Needed by integer.pmc
-S    JOI
-
-# Used by t/pmc/nci.t
-i    sc
-s    sc
-c    sc
-i    iii
-i    i3
-t    b
-t    B
-v    P
-v    pP
-p    ip
-i    33
-v    pii
-v    JO
-i    JO
-i    JOi
-i    JOt
-i    Jt
-i    Ji
-
-# Oddball ones for postgres
-p    ptippppi    PQexecParams
-p    pi33ipi     PQfn
-p    pttip       PQprepage
-p    ptipppi     PQexecPrepared
-p    ppP         PQsetNoticeReceiver
-
-# Used by library/pcre.pir
-p    tiB3P
-p    tip3P
-i    pPtiiipi
-i    tpiibi
-
-# Used by SDL
-p    iiil
-i    ppl
-v    pip
-p    pti
-i    ppp
-
-# Used by SDL::Font
-p    ti
-p    ptp
-i    pt33
-
-# Used by OpenGL (including GLU and GLUT)
-v    3p
-v    PP
-v    PPi
-v    PPii
-v    fff
-v    ffff
-
-# For python
-i    JPP
-
-#required for mod_parrot
+# mod_parrot
 i    ip
 i    JPip
 i    JpP
@@ -306,6 +15,29 @@ v    p
 v    pit
 v    ptt
 v    Jtiiipt
+
+v
+v    Jiiip    # examples/japh/japh11.pasm
+v    i
+v    ii
+v    illllllll
+v    l
+v    p
+v    pbip     # for libsyck
+v    pi
+v    piiii
+v    pl
+v    pp
+
+# For python
+i    JPP
+
+# Py_func signatures
+P    JP
+P    JPP
+P    JO
+S    JO
+i    P
 
 # PyBuiltins
 P    JOPP
@@ -349,16 +81,16 @@ P    JOI
 P    JOIS
 S    JOSP
 
-# ParrotThread creation
-i    JOP@
-I    JOP@
-I    JOIP@
+i          # void function returning int like fork()
+i    i3i   # POSIX's waitpid
+i    ibi   # POSIX's read
 
-# other ParrotThread
-P    JO
+# win32
+l     lttl
 
-# src/pmc/nci.pmc
-v    JOb
+i     pip
+i     piS
+S     i
 
 # --- start mysqlclient library ---
 #
@@ -457,13 +189,165 @@ l    pttl  #  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,cons
 v    t     #  void mysql_debug(const char *debug)
 # --- end mysqlclient library ---
 
-i          # void function returning int like fork()
-i    i3i   # POSIX's waitpid
-i    ibi   # POSIX's read
+# Used by library/pcre.pir
+p    tiB3P
+p    tip3P
+i    pPtiiipi
+i    tpiibi
 
-# win32
-l     lttl
+# Oddball ones for postgres
+p    ptippppi    PQexecParams
+p    pi33ipi     PQfn
+p    pttip       PQprepage
+p    ptipppi     PQexecPrepared
+p    ppP         PQsetNoticeReceiver
 
-i     pip
-i     piS
-S     i
+# Used by SDL
+p    iiil
+i    ppl
+v    pip
+p    pti
+i    ppp
+
+# Used by SDL::Font
+p    ti
+p    ptp
+i    pt33
+
+# t/pmc/nci.t
+c
+c    p
+c    pi
+
+d
+d    d
+
+f
+f    ff
+f    is
+
+i
+i    b
+i    d
+i    i
+i    ii
+i    ii4
+i    ii4i
+i    iiii
+i    iiilsp
+i    iil
+i    iili
+i    iip
+i    iit
+i    iiti
+i    ilsp
+i    iti
+i    l
+i    li
+i    lp
+i    lsp
+i    p
+i    p33
+i    p333
+i    p333333
+i    p4
+i    p42p
+i    p4i
+i    pb
+i    pi
+i    pii
+i    pii4
+i    pii4i
+i    piii
+i    piiiiii
+i    piiilsp
+i    piil
+i    piili
+i    piit
+i    piiti
+i    pilsp
+i    pit
+i    pl
+i    pli
+i    pll
+i    pllllllll
+i    plp
+i    plsp
+i    pp
+i    ppi
+i    ppiiiiiiii
+i    pppp
+i    psp
+i    pt
+i    pti
+i    pitl
+i    s
+i    s22
+i    s222
+i    sp
+i    sss
+i    ssss
+i    t
+i    ti
+i    4
+i    4i
+i    42p
+
+l
+l    ii
+l    l4
+l    p
+l    pi
+l    pii
+l    p33l
+l    33l
+
+p
+p    B
+p    b
+p    Jt
+p    i
+p    ii
+p    iiii
+p    iiiiii
+p    iiiiiiii
+p    p
+p    pt
+p    pi
+p    pii
+p    piiii
+p    t
+p    tpp
+p    ttttttt
+
+s
+
+t
+t    i
+t    ii
+t    p
+t    pi
+t    pii
+t    pt
+t    t
+t    tl4
+t    t4
+
+i    sc
+s    sc
+c    sc
+i    iii
+i    i3
+t    b
+t    B
+v    P
+v    pP
+p    ip
+i    33
+v    pii
+v    JO
+i    JO
+i    JOi
+i    JOt
+i    Jt
+i    Ji

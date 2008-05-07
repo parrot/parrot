@@ -72,6 +72,7 @@ my @steps = qw(
     gen::crypto
     gen::parrot_include
     gen::opengl
+    gen::call_list
     gen::languages
     gen::makefiles
     gen::platform
