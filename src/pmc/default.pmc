@@ -981,21 +981,6 @@ inspect_str.
 
 /*
 
-
-=item C<PMC *subclass(PMC *name)>
-
-Creates a subclass, optionally with a given C<name>.
-
-=cut
-
-*/
-
-    PMC *subclass(PMC *name) {
-        return Parrot_single_subclass(INTERP, SELF, name);
-    }
-
-/*
-
 =item C<PMC *get_class()>
 
 Returns SELF. A PMC is its own class.
