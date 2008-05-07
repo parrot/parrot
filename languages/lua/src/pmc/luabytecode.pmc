@@ -51,10 +51,10 @@ static const char header_ref[LUAC_HEADERSIZE] = {
     LUAC_VERSION,
     LUAC_FORMAT,
     PARROT_LITTLEENDIAN,
-    sizeof(int),
-    sizeof(size_t),
-    sizeof(Instruction),
-    sizeof(lua_Number),
+    sizeof (int),
+    sizeof (size_t),
+    sizeof (Instruction),
+    sizeof (lua_Number),
     0,
 };
 
