@@ -740,10 +740,7 @@ Parses a subrule token.
     if key == '<.' goto nocapture
     if key == '<!' goto negated
 
-    ##   if the next character is +/-, this is really an enumcharclass
-    $I0 = index '+-', $S0
-    if $I0 == -1 goto subrule_arg
-    .return 'parse_enumcharclass'(mobsave)
+    goto subrule_arg
 
   negated:
     mob['isnegated'] = 1

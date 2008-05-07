@@ -70,7 +70,6 @@ a<!wb>			abc\ndef\n-==\nghi	y	\w\w nonword boundary
 ^<-upper>dent	ident_1				y	inverted character class
 ^<-upper>dent	Ident_1				n	inverted character class
 <+alpha-[Jj]>+	abc				y	character class with no j
-<alpha-[Jj]>+	abc				y	character class with no j and no leading +
 <+ alpha - [ Jj ]>	abc			y	character class with no j with ws
 ^<+alpha-[Jj]>+$	aJc			n	character class with no j fail
 
