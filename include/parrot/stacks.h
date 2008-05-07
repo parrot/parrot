@@ -33,7 +33,7 @@ typedef struct Stack_Chunk {
     Parrot_UInt         refcount;
     union { /* force appropriate alignment of 'data'.  If alignment
                is necessary, assume double is good enough.  27-04-2007. */
-        void *data;
+        Stack_Entry_t data;
 #if PARROT_PTR_ALIGNMENT > 1
         double d_dummy;
 #endif
