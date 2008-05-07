@@ -57,4 +57,7 @@ $1=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
 # todo :pugs<feature>
 (.)*x					123x		/mob: <123x @ 0>/	repeated dot capture
 
+$<key>=<alpha>				12ab34		/mob<key>: <a @ 2>/	alias capture
+<key=alpha>				12ab34		/mob<key>: <a @ 2>/	alias capture
+
 ## vim: noexpandtab tabstop=4 shiftwidth=4

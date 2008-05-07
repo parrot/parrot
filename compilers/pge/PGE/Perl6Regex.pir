@@ -737,8 +737,15 @@ Parses a subrule token.
     if key == '<?' goto scan_subname             ## FIXME: RT#53834
     if key == '<!' goto negated
 
-    ##  it's a capturing subrule
+    ##  capturing subrule, get its name/alias
     iscapture = 1
+    .local string subname, cname
+    (subname, pos) = 'parse_subname'(target, pos)
+    cname = subname
+    $S0 = substr target, pos, 1
+    unless $S0 == '=' goto subrule_arg
+    ##  aliased subrule, skip the '=' and get the real name
+    inc pos
     goto scan_subname
 
   negated:
@@ -747,12 +754,11 @@ Parses a subrule token.
     mob['iszerowidth'] = 1
 
   scan_subname:
-    .local string subname
     (subname, pos) = 'parse_subname'(target, pos)
-    mob['subname'] = subname
-    $S0 = substr target, pos, 1
 
   subrule_arg:
+    mob['subname'] = subname
+    $S0 = substr target, pos, 1
     if $S0 == ':' goto subrule_text_arg
     if $S0 != ' ' goto subrule_end
   subrule_pattern_arg:
@@ -793,7 +799,7 @@ Parses a subrule token.
     mob.'to'(pos)
     mob['iscapture'] = iscapture
     unless iscapture goto end
-    $S0 = escape subname
+    $S0 = escape cname
     $S0 = concat '"', $S0
     $S0 = concat $S0, '"'
     mob['cname'] = $S0
