@@ -39,8 +39,8 @@ Francois Perrad.
     unless content goto L1
     .local pmc script
     push_eh _handler
-    $P0 = get_hll_global ['Lua::Bytecode'], 'undump'
-    script = $P0(content)
+    new $P0, 'LuaBytecode'
+    script = $P0.'undump'(content)
     .local string basename
     $P0 = split '/', filename
     $S0 = pop $P0

@@ -26,6 +26,7 @@ PMCS = \
  lua \
  luaany \
  luaboolean \
+ luabytecode \
  luaclosure \
  luafunction \
  luanil \
@@ -39,6 +40,7 @@ PMC_FILES = \
  $(PMCDIR)/lua.pmc \
  $(PMCDIR)/luaany.pmc \
  $(PMCDIR)/luaboolean.pmc \
+ $(PMCDIR)/luabytecode.pmc \
  $(PMCDIR)/luaclosure.pmc \
  $(PMCDIR)/luafunction.pmc \
  $(PMCDIR)/luanil.pmc \
