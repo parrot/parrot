@@ -729,24 +729,29 @@ Parses a subrule token.
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Subrule')
     lastpos = length target
 
-    .local string subname
-    (subname, pos) = 'parse_subname'(target, pos)
-    mob['subname'] = subname
-    $S0 = substr target, pos, 1
+    ##  default to non-capturing rule
+    .local int iscapture
 
-    ##   see what type of subrule this is
-    mob['iscapture'] = 1
+    ##  see what type of subrule this is
     if key == '<?' goto nocapture
     if key == '<.' goto nocapture
     if key == '<!' goto negated
 
-    goto subrule_arg
+    ##  it's a capturing subrule
+    iscapture = 1
+    goto scan_subname
 
   negated:
     mob['isnegated'] = 1
     mob['iszerowidth'] = 1
   nocapture:
-    mob['iscapture'] = 0
+
+  scan_subname:
+    .local string subname
+    (subname, pos) = 'parse_subname'(target, pos)
+    mob['subname'] = subname
+    $S0 = substr target, pos, 1
+
   subrule_arg:
     if $S0 == ':' goto subrule_text_arg
     if $S0 != ' ' goto subrule_end
@@ -786,8 +791,8 @@ Parses a subrule token.
     if $S0 != '>' goto end
     inc pos
     mob.'to'(pos)
-    $I0 = mob['iscapture']
-    if $I0 == 0 goto end
+    mob['iscapture'] = iscapture
+    unless iscapture goto end
     $S0 = escape subname
     $S0 = concat '"', $S0
     $S0 = concat $S0, '"'
