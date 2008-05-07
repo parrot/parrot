@@ -140,7 +140,9 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
     /* remember path/file in props */
     set_cstring_prop(interp, lib_pmc, "_filename", path);  /* XXX */
     set_cstring_prop(interp, lib_pmc, "_type", type);
-    set_cstring_prop(interp, lib_pmc, "_lib_name", lib_name);
+
+    if (lib_name)
+        set_cstring_prop(interp, lib_pmc, "_lib_name", lib_name);
 
     VTABLE_set_pmc_keyed_str(interp, dyn_libs, path, lib_pmc);
 }
