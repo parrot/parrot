@@ -733,8 +733,8 @@ Parses a subrule token.
     .local int iscapture
 
     ##  see what type of subrule this is
-    if key == '<?' goto nocapture
-    if key == '<.' goto nocapture
+    if key == '<.' goto scan_subname
+    if key == '<?' goto scan_subname             ## FIXME: RT#53834
     if key == '<!' goto negated
 
     ##  it's a capturing subrule
@@ -743,8 +743,8 @@ Parses a subrule token.
 
   negated:
     mob['isnegated'] = 1
+  zerowidth:
     mob['iszerowidth'] = 1
-  nocapture:
 
   scan_subname:
     .local string subname

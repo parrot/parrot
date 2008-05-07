@@ -77,10 +77,10 @@ the output to the correct output file.
     .local pmc p6regex
     p6regex = compreg 'PGE::Perl6Regex'
 
-    $S0 = "<?ident> [ '::' <?ident> ]*"
+    $S0 = "<.ident> [ '::' <.ident> ]*"
     p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'name')
 
-    $S0 = "[ '#' \\N* | \\s+ | <?pod_comment> ]* :::"
+    $S0 = "[ '#' \\N* | \\s+ | <.pod_comment> ]* :::"
     p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'ws')
 
     $S0 = <<'      END_POD_COMMENT_RULE'

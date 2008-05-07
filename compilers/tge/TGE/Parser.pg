@@ -44,7 +44,7 @@ token name { \w+ }
 token ws {
     [ \s+
     | \# \N*
-    | <?pod_comment>
+    | <.pod_comment>
     ]*
 }
 
