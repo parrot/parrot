@@ -13,168 +13,245 @@
 [MOVE]
 code = 0
 format = AB
+pir = <<PIR
+PIR
 
 [LOADNIL]
 code = 3
 format = AB
+pir = <<PIR
+PIR
 
 [LOADK]
 code = 1
 format = ABx
+pir = <<PIR
+PIR
 
 [LOADBOOL]
 code = 2
 format = ABC
+pir = <<PIR
+PIR
 
 ## Upvalues and Globals
 
 [GETUPVAL]
 code = 4
 format = AB
+pir = <<PIR
+PIR
 
 [GETGLOBAL]
 code = 5
 format = ABx
+pir = <<PIR
+PIR
 
 [SETGLOBAL]
 code = 7
 format = ABx
+pir = <<PIR
+PIR
 
 [SETUPVAL]
 code = 8
 format = AB
+pir = <<PIR
+PIR
 
 ## Table Instructions
 
 [GETTABLE]
 code = 6
 format = ABC
+pir = <<PIR
+PIR
 
 [SETTABLE]
 code = 9
 format = ABC
+pir = <<PIR
+PIR
 
 ## Arithmetic and String Instructions
 
 [ADD]
 code = 12
 format = ABC
+pir = <<PIR
+PIR
 
 [SUB]
 code = 13
 format = ABC
+pir = <<PIR
+PIR
 
 [MUL]
 code = 14
 format = ABC
+pir = <<PIR
+PIR
 
 [DIV]
 code = 15
 format = ABC
+pir = <<PIR
+PIR
 
 [MOD]
 code = 16
 format = ABC
+pir = <<PIR
+PIR
 
 [POW]
 code = 17
 format = ABC
+pir = <<PIR
+PIR
 
 [UNM]
 code = 18
 format = AB
+pir = <<PIR
+PIR
 
 [NOT]
 code = 19
 format = AB
+pir = <<PIR
+PIR
 
 [LEN]
 code = 20
 format = AB
+pir = <<PIR
+PIR
 
 [CONCAT]
 code = 21
 format = ABC
+pir = <<PIR
+PIR
 
 ## Jumps and Calls
 
 [JMP]
 code = 22
 format = sBx
+pir = <<PIR
+PIR
 
 [CALL]
 code = 28
 format = ABC
+pir = <<PIR
+PIR
 
 [TAILCALL]
 code = 29
 format = ABC
+pir = <<PIR
+PIR
 
 [RETURN]
 code = 30
 format = AB
+pir = <<PIR
+    ${INS} = concat "  not_translated()\n"
+PIR
 
 [VARARG]
 code = 37
 format = AB
+pir = <<PIR
+PIR
 
 [SELF]
 code = 11
 format = ABC
+pir = <<PIR
+PIR
 
 ## Relational and Logic Instructions
 
 [EQ]
 code = 23
 format = ABC
+pir = <<PIR
+PIR
 
 [LT]
 code = 24
 format = ABC
+pir = <<PIR
+PIR
 
 [LE]
 code = 25
 format = ABC
+pir = <<PIR
+PIR
 
 [TEST]
 code = 26
 format = AC
+pir = <<PIR
+PIR
 
 [TESTSET]
 code = 27
 format = ABC
+pir = <<PIR
+PIR
 
 ## Loop Instructions
 
 [FORLOOP]
 code = 31
 format = AsBx
+pir = <<PIR
+PIR
 
 [FORPREP]
 code = 32
 format = AsBx
+pir = <<PIR
+PIR
 
 [TFORLOOP]
 code = 33
 format = AC
+pir = <<PIR
+PIR
 
 ## Table Creation
 
 [NEWTABLE]
 code = 10
 format = ABC
+pir = <<PIR
+PIR
 
 [SETLIST]
 code = 34
 format = ABC
+pir = <<PIR
+PIR
 
 ## Closures and Closing
 
 [CLOSE]
 code = 35
 format = A
+pir = <<PIR
+PIR
 
 [CLOSURE]
 code = 36
 format = ABx
+pir = <<PIR
+PIR
 

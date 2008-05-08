@@ -42,6 +42,19 @@ foreach (@rules) {
 
 $pir .= generate_final_dump( $srm, $metavars );
 
+$pir .= generate_initial_code( $srm, \@rules, $metavars );
+
+# Emit translation dispatch table.
+$pir .= generate_dispatch_table( $srm, \@rules, $metavars );
+
+# Generate instruction translation code from rules.
+foreach (@rules) {
+    $pir .= generate_rule_code( $srm, $_, $metavars );
+}
+
+# Generate final translator code.
+$pir .= generate_final_code( $srm, $metavars );
+
 # Finally, write generated PIR to output file.
 open my $fh, '>', $output_file
     or die "Unable to open $output_file: $!\n";
@@ -199,6 +212,10 @@ sub validate_rule {
     unless ( exists $rule->{format} ) {
         die "Mandatory entry format missing in rule $name\n";
     }
+    unless ( exists $rule->{pir} ) {
+        die "Mandatory entry pir missing in rule $name\n";
+    }
+
     return;
 }
 
@@ -211,6 +228,56 @@ sub generate_initial_pir {
 .namespace ['Lua::InstructionList']
 
 PIRCODE
+}
+
+# Generate the translator initialization code.
+# ############################################
+sub generate_initial_code {
+    my ( $srm, $rules, $mv ) = @_;
+
+    # Set up some more metavariables.
+    $mv->{INS}    = 'gen_pir';
+    $mv->{PC}     = 'pc';
+    $mv->{NEXTPC} = 'next_pc';
+
+    # Emit the dumper.
+    my $pir = <<'PIRCODE';
+.sub 'translate' :method
+    .param pmc func
+    .local string gen_pir
+    .local int pc, next_pc, bc_length, cur_ic, cur_op
+    .local int arg_a
+    .local int arg_b
+    .local int arg_c
+
+    bc_length = self
+    next_pc = 0
+
+PIRCODE
+
+    $pir .= <<'PIRCODE';
+    gen_pir = concat "\n# BEGIN OF TRANSLATED BYTECODE\n\n"
+
+  LOOP:
+    pc = next_pc
+    if pc >= bc_length goto COMPLETE
+    cur_ic = self[pc]
+    next_pc += 1
+    cur_op = cur_ic & 0x003f
+
+PIRCODE
+
+    # Emit label generation code.
+    $pir .= <<'PIRCODE';
+    $S0 = pc
+    gen_pir = concat "PC"
+    gen_pir = concat $S0
+    gen_pir = concat ": \n"
+
+PIRCODE
+
+    # Return generated code.
+    return $pir;
 }
 
 # Generate the dumper initialization code.
@@ -339,6 +406,67 @@ sub binary_dispatch_table {
     return $pir;
 }
 
+# Generate translation code relating to a rule.
+# #############################################
+sub generate_rule_code {
+    my ( $srm, $rule, $mv ) = @_;
+
+    # Emit dispatch label.
+    my $pir = <<"PIRCODE";
+  BDISPATCH_$rule->{name}:
+    # Translation code for $rule->{name} ($rule->{code})
+    gen_pir = concat "  # $rule->{name}\\n"
+PIRCODE
+
+    # Emit code to read arguments for the op.
+    if ($rule->{format} =~ /^A/) {
+        $pir .= "    arg_a = cur_ic >> 6\n";
+        $pir .= "    arg_a &= 0x00ff\n";
+    }
+
+    if ($rule->{format} =~ /sBx$/) {
+        $pir .= "    arg_b = cur_ic >>> 14\n";
+        $pir .= "    arg_b -= 131071\n";
+    }
+    elsif ($rule->{format} =~ /Bx$/) {
+        $pir .= "    arg_b = cur_ic >>> 14\n";
+    }
+    elsif ($rule->{format} =~ /B/) {
+        $pir .= "    arg_b = cur_ic >> 23\n";
+        $pir .= "    arg_b &= 0x01ff\n";
+    }
+
+    if ($rule->{format} =~ /C$/) {
+        $pir .= "    arg_c = cur_ic >> 14\n";
+        $pir .= "    arg_c &= 0x01ff\n";
+    }
+
+    $pir .= translation_code( $rule, $mv );
+
+    # Finally, emit code to go to translate next instruction.
+    $pir .= "    goto LOOP\n\n";
+
+    # Return generated code.
+    return $pir;
+}
+
+sub translation_code {
+    my ( $rule, $mv ) = @_;
+
+    # If we have PIR for the instruction, just take that. If not, we need
+    # to generate it from the "to generate" instruction directive.
+    my $pir = "### translation\n";
+    if ( $rule->{pir} ) {
+        $pir .= sub_meta( $rule->{pir}, $mv, "pir for rule $rule->{name}" );
+    }
+    else {
+        $pir .= "# TODO\n";
+    }
+    $pir .= "### end translation\n";
+
+    return $pir;
+}
+
 # Generate dump code relating to a rule.
 # #############################################
 sub generate_rule_dump {
@@ -417,6 +545,68 @@ sub generate_final_dump {
 PIRCODE
 
     # Return generated code.
+    return $pir;
+}
+
+# Generate the translator trailer code.
+# #####################################
+sub generate_final_code {
+    my ( $srm, $mv ) = @_;
+
+    # Emit complete label.
+    # Emit label generation code.
+    my $pir = <<'PIRCODE';
+  COMPLETE:
+
+    $S0 = pc
+    gen_pir = concat "PC"
+    gen_pir = concat $S0
+    gen_pir = concat ": \n"
+
+    gen_pir = concat "\n# END OF TRANSLATED BYTECODE\n\n"
+
+PIRCODE
+
+    # Emit the end of the translator PIR.
+    $pir .= <<'PIRCODE';
+    .return (gen_pir)
+.end
+
+PIRCODE
+
+    # Return generated code.
+    return $pir;
+}
+
+# Substiture meta variables.
+# ##########################
+sub sub_meta {
+    my ( $pir, $mv, $code_source ) = @_;
+    $code_source ||= "(unknown)";
+
+    # Substiture in known meta-variables.
+    for ( keys %$mv ) {
+        $pir =~ s/\${$_}/$mv->{$_}/g;
+    }
+
+    # We need to automagically instantiate [INSP]_ARG_\d+ and [INSP]TEMP\d+.
+    while ( $pir =~ /\$\{([INS])TEMP(\d+)\}/g ) {
+        my $key   = $1 . 'TEMP' . $2;
+        my $value = '$' . $1 . $2;
+        $pir =~ s/\$\{$key\}/$value/g;
+    }
+    while ( $pir =~ /\$\{PTEMP(\d+)\}/g ) {
+        my $key   = 'PTEMP' . $1;
+        my $value = 'P_temp_' . $1;
+        $mv->{$key} = $value;
+        $pir =~ s/\$\{$key\}/$value/g;
+    }
+
+    # If we have any unsubstituted variables, error.
+    if ( $pir =~ /\$\{([^}]*)}/ ) {
+        warn "Unknown metavariable $1 used in $code_source\n";
+    }
+
     return $pir;
 }
 
