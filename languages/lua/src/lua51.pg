@@ -54,11 +54,11 @@ rule expression_list {
 
 
 rule if_stat {
-    'if' <expression> <?then> <block> <elseif_block>* <else_block>? <?end>
+    'if' <expression> <.then> <block> <elseif_block>* <else_block>? <.end>
 }
 
 rule elseif_block {
-    'elseif' <expression> <?then> <block>
+    'elseif' <expression> <.then> <block>
 }
 
 rule else_block {
@@ -67,12 +67,12 @@ rule else_block {
 
 
 rule while_stat {
-    'while' <expression> <?do> <block> <?end>
+    'while' <expression> <.do> <block> <.end>
 }
 
 
 rule do_block {
-    'do' <block> <?end>
+    'do' <block> <.end>
 }
 
 
@@ -81,20 +81,20 @@ rule for_stat {
 }
 
 rule fornum {
-    <Name> '=' <expression> <?comma> <expression> [ ',' <expression> ]?
+    <Name> '=' <expression> <.comma> <expression> [ ',' <expression> ]?
 }
 
 rule forlist {
-    <name_list> <?in> <expression_list>
+    <name_list> <.in> <expression_list>
 }
 
 rule for_body {
-    <?do> <block> <?end>
+    <.do> <block> <.end>
 }
 
 
 rule repeat_stat {
-    'repeat' <block> <?until> <expression>
+    'repeat' <block> <.until> <expression>
 }
 
 
@@ -107,7 +107,7 @@ rule functionname {
 }
 
 rule function_body {
-    '(' <parameter_list> <?closeparen> <block> <?end>
+    '(' <parameter_list> <.closeparen> <block> <.end>
 }
 
 rule parameter_list {
@@ -144,7 +144,7 @@ token break_statement {
 
 
 rule constructor {
-    '{' <tablefieldlist>? <?closebrace>
+    '{' <tablefieldlist>? <.closebrace>
 }
 
 rule tablefieldlist {
@@ -160,7 +160,7 @@ rule record_field {
 }
 
 rule index {
-    '[' <expression> <?closebracket>
+    '[' <expression> <.closebracket>
 }
 
 
@@ -174,7 +174,7 @@ rule prefix_expression {
 }
 
 rule parenthesed_expression {
-    '(' <expression> <?closeparen>
+    '(' <expression> <.closeparen>
 }
 
 rule slice_expression {
@@ -185,7 +185,7 @@ rule slice_expression {
 }
 
 rule function_args {
-    | '(' <expression_list>? <?closeparen>
+    | '(' <expression_list>? <.closeparen>
     | <constructor>
     | <string>
 }
@@ -212,39 +212,39 @@ not all over the grammar, but only in these rules.
 =cut
 
 rule do {
-    'do' | <syntaxerror: 'do' expected>
+    'do' | <syntaxerror: "'do' expected">
 }
 
 rule then {
-    'then' | <syntaxerror: 'then' expected>
+    'then' | <syntaxerror: "'then' expected">
 }
 
 rule end {
-    'end' | <syntaxerror: 'end' expected>
+    'end' | <syntaxerror: "'end' expected">
 }
 
 rule until {
-    'until' | <syntaxerror: 'until' expected>
+    'until' | <syntaxerror: "'until' expected">
 }
 
 rule comma {
-    ',' | <syntaxerror: ',' expected>
+    ',' | <syntaxerror: "',' expected">
 }
 
 rule in {
-    'in' | <syntaxerror: 'in' expected>
+    'in' | <syntaxerror: "'in' expected">
 }
 
 rule closebracket {
-    ']'  | <syntaxerror: ']' expected>
+    ']'  | <syntaxerror: "']' expected">
 }
 
 rule closebrace {
-    '}' | <syntaxerror: '}' expected>
+    '}' | <syntaxerror: "'}' expected">
 }
 
 rule closeparen {
-    ')' | <syntaxerror: ')' expected>
+    ')' | <syntaxerror: "')' expected">
 }
 
 
@@ -256,8 +256,8 @@ F<languages/lua/src/lua51.pir>.
 =cut
 
 token string {
-    | \" <quoted_literal: "> \"
-    | \' <quoted_literal: '> \'
+    | \" <quoted_literal: "\""> \"
+    | \' <quoted_literal: "'"> \'
     | <long_string>
 }
 
@@ -285,7 +285,7 @@ token ws {
 }
 
 token eof {
-    $ | <syntaxerror: 'eof' expected>
+    $ | <syntaxerror: "'eof' expected">
 }
 
 token shebang {
