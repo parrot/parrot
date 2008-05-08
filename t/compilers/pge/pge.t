@@ -115,8 +115,6 @@ for my $file ( sort keys %$ns_subs ) {
 CODE
 ok
 OUT
-
-            ## RT#44449: test pod exists for subs
         }
     }
 }
