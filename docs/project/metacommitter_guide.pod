@@ -28,7 +28,9 @@ Create a bitcard.org id with the username you'd like to use
 
 Login to L<https://rt.perl.org/rt3/> with the id, so the user name is available
 in RT for assigning tickets, and so it is registered in the list of users
-eligible for parrot commit bit
+eligible for parrot commit bit. Your login id is shown at the top of the 
+page, e.g. C<Logged in as coke>. B<This> is the id you must provide to the
+metacommitter so they can add you.
 
 =item 3
 
