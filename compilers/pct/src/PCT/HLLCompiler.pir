@@ -29,7 +29,7 @@ running compilers from a command line.
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
-    $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine each version|v'
+    $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine version|v'
     setattribute self, '@cmdoptions', $P0
 
     $P1 = new 'String'
