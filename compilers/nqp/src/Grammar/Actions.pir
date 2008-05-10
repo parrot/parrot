@@ -103,6 +103,42 @@
         %r = $I0
         END
 
+    optable['infix:lt'; 'inline'] = <<"        END"
+        ##  inline infix:lt
+        $S0 = %0
+        $S1 = %1
+        $I0 = islt $S0, $S1
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:le'; 'inline'] = <<"        END"
+        ##  inline infix:le
+        $S0 = %0
+        $S1 = %1
+        $I0 = isle $S0, $S1
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:gt'; 'inline'] = <<"        END"
+        ##  inline infix:gt
+        $S0 = %0
+        $S1 = %1
+        $I0 = isgt $S0, $S1
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:ge'; 'inline'] = <<"        END"
+        ##  inline infix:ge
+        $S0 = %0
+        $S1 = %1
+        $I0 = isge $S0, $S1
+        %r = new 'Integer'
+        %r = $I0
+        END
+
     optable['infix:=:='; 'inline'] = <<"        END"
         ##  inline infix:=:=
         $I0 = issame %0, %1
