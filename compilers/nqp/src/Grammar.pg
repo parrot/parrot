@@ -451,6 +451,18 @@ proto infix:<eq> is equiv(infix:<==>)
 proto infix:<ne> is equiv(infix:<==>)
     is pasttype('inline')
     { ... }
+proto infix:<lt> is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
+proto infix:<le> is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
+proto infix:<gt> is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
+proto infix:<ge> is equiv(infix:<==>)
+    is pasttype('inline')
+    { ... }
 proto infix:<=:=> is equiv(infix:<==>)
     is pasttype('inline')
     { ... }
