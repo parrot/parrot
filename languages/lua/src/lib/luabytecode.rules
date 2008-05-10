@@ -14,24 +14,67 @@
 code = 0
 format = AB
 pir = <<PIR
+    ${INS} = concat "  set ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", ${REG}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [LOADNIL]
 code = 3
 format = AB
 pir = <<PIR
+    $I0 = ${A}
+  L1_${CUROP}:
+    unless $I0 <= ${B} goto L2_${CUROP}
+    ${INS} = concat "  new ${REG}"
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat ", 'LuaNil'\n"
+    inc $I0
+    goto L1_${CUROP}
+  L2_${CUROP}:
 PIR
 
 [LOADK]
 code = 1
 format = ABx
 pir = <<PIR
+    ${INS} = concat "  set ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", ${K}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [LOADBOOL]
 code = 2
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  new ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", 'LuaBoolean'\n"
+    ${INS} = concat "  set ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", "
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+    unless ${C} goto L1_${CUROP}
+    $I0 = ${NEXTPC}
+    inc $I0
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+  L1_${CUROP}:
 PIR
 
 ## Upvalues and Globals
@@ -46,12 +89,29 @@ PIR
 code = 5
 format = ABx
 pir = <<PIR
+    ${INS} = concat "  ${GLOB} = ${SUBR}.'getfenv'()\n"
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = ${GLOB}[${K}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "]\n"
 PIR
 
 [SETGLOBAL]
 code = 7
 format = ABx
 pir = <<PIR
+    ${INS} = concat "  ${GLOB} = ${SUBR}.'getfenv'()\n"
+    ${INS} = concat "  ${GLOB}[${K}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "] = "
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [SETUPVAL]
@@ -66,12 +126,56 @@ PIR
 code = 6
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = ${REG}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "["
+    $I0 = ${C} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat "${K}"
+    ${C} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat "${REG}"
+  L2_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "]\n"
 PIR
 
 [SETTABLE]
 code = 9
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat "["
+    $I0 = ${B} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat "${K}"
+    ${B} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat "${REG}"
+  L2_${CUROP}:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "] = "
+    $I0 = ${C} & 0x100
+    unless $I0 goto L3_${CUROP}
+    ${INS} = concat "${K}"
+    ${C} &= 0xff
+    goto L4_${CUROP}
+  L3_${CUROP}:
+    ${INS} = concat "${REG}"
+  L4_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 ## Arithmetic and String Instructions
@@ -80,60 +184,239 @@ PIR
 code = 12
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  add ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    $I0 = ${B} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${B} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L2_${CUROP}:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto L3_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto L4_${CUROP}
+  L3_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L4_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [SUB]
 code = 13
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  sub ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    $I0 = ${B} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${B} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L2_${CUROP}:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto L3_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto L4_${CUROP}
+  L3_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L4_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [MUL]
 code = 14
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  mul ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    $I0 = ${B} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${B} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L2_${CUROP}:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto L3_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto L4_${CUROP}
+  L3_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L4_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [DIV]
 code = 15
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  div ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    $I0 = ${B} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${B} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L2_${CUROP}:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto L3_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto L4_${CUROP}
+  L3_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L4_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [MOD]
 code = 16
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  cmod ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    $I0 = ${B} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${B} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L2_${CUROP}:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto L3_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto L4_${CUROP}
+  L3_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L4_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [POW]
 code = 17
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  pow ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    $I0 = ${B} & 0x100
+    unless $I0 goto L1_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${B} &= 0xff
+    goto L2_${CUROP}
+  L1_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L2_${CUROP}:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto L3_${CUROP}
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto L4_${CUROP}
+  L3_${CUROP}:
+    ${INS} = concat ", ${REG}"
+  L4_${CUROP}:
+    $S0 = ${C}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [UNM]
 code = 18
 format = AB
 pir = <<PIR
+    ${INS} = concat "  neg ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", ${REG}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [NOT]
 code = 19
 format = AB
 pir = <<PIR
+    ${INS} = concat "  not ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", ${REG}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [LEN]
 code = 20
 format = AB
 pir = <<PIR
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = ${REG}"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat ".'len'()\n"
 PIR
 
 [CONCAT]
 code = 21
 format = ABC
 pir = <<PIR
+    $I0 = ${B}
+    inc $I0
+  L1_${CUROP}:
+    unless $I0 <= ${C} goto L2_${CUROP}
+    ${INS} = concat "  concat ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", ${REG}"
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
+    inc $I0
+    goto L1_${CUROP}
+  L2_${CUROP}:
 PIR
 
 ## Jumps and Calls
@@ -142,6 +425,11 @@ PIR
 code = 22
 format = sBx
 pir = <<PIR
+    $I0 = ${NEXTPC} + ${B}
+    $S0 = $I0
+    ${INS} = concat "  goto PC"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 [CALL]
@@ -160,7 +448,7 @@ PIR
 code = 30
 format = AB
 pir = <<PIR
-    ${INS} = concat "  not_translated()\n"
+    ${INS} = concat "  end\n"
 PIR
 
 [VARARG]
@@ -233,6 +521,10 @@ PIR
 code = 10
 format = ABC
 pir = <<PIR
+    ${INS} = concat "  new ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat ", 'LuaTable'\n"
 PIR
 
 [SETLIST]
