@@ -18,13 +18,31 @@ value of the comment is passed as the second argument to the method.
 class cardinal::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    $past.push( $( $<comp_stmt> ) );
+    my $past := $( $<comp_stmt> );
+    $past.blocktype('declaration');
     make $past;
 }
 
-method comp_stmt($/) {
-    make $( $<stmts> );
+method comp_stmt($/,$key) {
+    our $?BLOCK;
+    our @?BLOCK;
+    our $?BLOCK_SIGNATURED;
+    if $key eq 'open' {
+        if $?BLOCK_SIGNATURED {
+            $?BLOCK := $?BLOCK_SIGNATURED;
+            $?BLOCK_SIGNATURED := 0;
+        }
+        else {
+            $?BLOCK := PAST::Block.new( PAST::Stmts.new(), :node($/));
+        }
+        @?BLOCK.unshift($?BLOCK);
+    }
+    if $key eq 'close' {
+        my $past := @?BLOCK.shift();
+        $?BLOCK := @?BLOCK[0];
+        $past.push( $( $<stmts> ) );
+        make $past;
+    }
 }
 
 method stmts($/) {
@@ -150,24 +168,49 @@ method instance_variable($/) {
 }
 
 method local_variable($/) {
-    make PAST::Var.new( :name(~$/), :scope('lexical'), :node($/), :viviself('Undef') );
+    our $?BLOCK;
+    my $past := PAST::Var.new( :name(~$/), :scope('lexical'), :node($/), :viviself('Undef') );
+    unless $?BLOCK.symbol($<ident>) {
+        our @?BLOCK;
+        my $exists := 0;
+        for @?BLOCK {
+            if $_ {
+                my $sym_table := $_.symbol(~$<ident>);
+                if $sym_table {
+                    $exists := 1;
+                }
+            }
+        }
+        if $exists == 0 {
+            $past.isdecl(1);
+        }
+        my $scope := 'lexical';
+        $?BLOCK.symbol(~$<ident>, :scope($scope));
+    }
+    make $past;
 }
 
 
 method if_stmt($/) {
     my $cond := +$<expr> - 1;
+    my $comp := $( $<comp_stmt>[$cond] );
+    $comp.blocktype('immediate');
     my $past := PAST::Op.new( $( $<expr>[$cond] ),
-                              $( $<comp_stmt>[$cond] ),
+                              $comp,
                               :pasttype('if'),
                               :node( $/ )
                             );
     if ( $<else> ) {
-        $past.push( $( $<else>[0] ) );
+        my $else := $( $<else>[0] ) ;
+        $else.blocktype('immediate');
+        $past.push( $else );
     }
     while ($cond != 0) {
         $cond := $cond - 1;
+        $comp := $( $<comp_stmt>[$cond] );
+        $comp.blocktype('immediate');
         $past := PAST::Op.new( $( $<expr>[$cond] ),
-                               $( $<comp_stmt>[$cond] ),
+                               $comp,
                                $past,
                                :pasttype('if'),
                                :node( $/ )
@@ -179,6 +222,7 @@ method if_stmt($/) {
 method unless_stmt($/) {
     my $cond := $( $<expr> );
     my $body := $( $<comp_stmt> );
+    $body.blocktype('immediate');
     my $past := PAST::Op.new( $cond, $body, :pasttype('unless'), :node($/) );
     if $<else> {
         $past.push( $( $<else>[0] ) );
@@ -201,7 +245,7 @@ method while_stmt($/) {
 }
 
 method module($/) {
-    my $past := PAST::Block.new( $( $<comp_stmt> ), :node($/) );
+    my $past := $( $<comp_stmt> );
     my $name := $( $<module_identifier> );
     $past.namespace( $name.name() );
     $past.blocktype('declaration');
@@ -210,36 +254,39 @@ method module($/) {
 
 method begin_end($/) {
     my $past := $( $<comp_stmt> );
-    $past := PAST::Block.new( $past, :node($/) );
     # XXX handle resque and ensure clauses
     make $past;
 }
 
 method functiondef($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := $( $<comp_stmt> );
     my $name := $<fname>;
-    my $args := $( $<argdecl> );
-    $past.name($name);
-    my $body := $( $<comp_stmt> );
-    $past.push($args);
-    $past.push($body);
+    #my $args := $( $<argdecl> );
+    #$past.push($args);
+    $past.name(~$name);
+    our $?BLOCK;
+    $?BLOCK.symbol(~$name, :scope('package'));
     make $past;
 }
 
 method argdecl($/) {
-    my $past := PAST::Stmts.new( :node($/) );
+    my $params := PAST::Stmts.new( :node($/) );
+    my $past := PAST::Block.new($params, :blocktype('declaration'));
     for $<identifier> {
-        my $param := $( $_ );
-        $param.scope('parameter');
-        $past.push($param);
+        my $parameter := $( $_ );
+        $past.symbol($parameter.name(), :scope('lexical'));
+        $parameter.scope('parameter');
+        $params.push($parameter);
     }
     if $<slurpy_param> {
-        $past.push( $( $<slurpy_param>[0] ) );
+        $params.push( $( $<slurpy_param>[0] ) );
     }
 
     if $<block_param> {
 
     }
+    $params.arity( +$<identifier> );
+    our $?BLOCK_SIGNATURED := $past;
     make $past;
 }
 
@@ -282,7 +329,7 @@ method call($/) {
         $past.unshift($invocant);
     }
 
-    $past.name($op);
+    $past.name(~$op);
     make $past;
 }
 

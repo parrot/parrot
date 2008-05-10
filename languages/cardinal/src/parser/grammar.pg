@@ -22,8 +22,9 @@ token TOP {
 }
 
 token comp_stmt {
+    {*}                        #= open
     <stmts>
-    {*}
+    {*}                        #= close
 }
 
 rule stmts {
@@ -44,13 +45,13 @@ rule alias {
     {*}
 }
 
-rule stmt {
-    <basic_stmt> <stmt_mod>*
+token stmt {
+    <basic_stmt> <.ws> <stmt_mod>*
     {*}
 }
 
-rule stmt_mod {
-    $<sym>=[if|while|unless|until] <expr>
+token stmt_mod {
+    $<sym>=[if|while|unless|until] <.ws> <expr>
     {*}
 }
 
@@ -85,7 +86,7 @@ rule end {
 }
 
 rule assignment {
-    <mlhs> '=' <mrhs>
+    <mlhs=lhs> '=' <mrhs=arg>       #XXX need to figure out multiple assignment
     {*}
 }
 
@@ -377,7 +378,7 @@ token integer {
 }
 
 token string {
-    [ \' <string_literal: '> \' | \" <string_literal: "> \" ]
+    [ \' <string_literal: "'"> \' | \" <string_literal: '"'> \" ]
     {*}
 }
 

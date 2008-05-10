@@ -52,6 +52,9 @@ object.
      ##  create a list of END blocks to be run
     $P0 = new 'List'
     set_hll_global ['cardinal'], '@?END_BLOCKS', $P0
+
+    $P0 = new 'List'
+    set_hll_global ['cardinal';'Grammar';'Actions'], '@?BLOCK', $P0
 .end
 
 =item main(args :slurpy)  :main
