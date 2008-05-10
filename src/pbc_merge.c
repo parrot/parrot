@@ -170,6 +170,7 @@ Print out the user help info.
 
 */
 
+PARROT_DOES_NOT_RETURN
 static void
 help(PARROT_INTERP)
 {
@@ -895,10 +896,6 @@ main(int argc, const char **argv)
 
     /* Merge. */
     merged = pbc_merge_begin(interp, input_files, argc);
-    if (merged == NULL) {
-        PIO_eprintf(interp, "PBC Merge: Unknown error during merge\n");
-        Parrot_exit(interp, 1);
-    }
 
     /* Write merged packfile. */
     pbc_merge_write(interp, merged, output_file);
