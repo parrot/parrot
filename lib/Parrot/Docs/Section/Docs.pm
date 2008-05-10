@@ -56,7 +56,6 @@ sub new {
             $self->new_item( '', 'docs/configuration.pod' ),
             $self->new_item( '', 'docs/vtables.pod' ),
             $self->new_item( '', 'docs/mmd.pod' ),
-            $self->new_item( '', 'docs/strings.pod' ),
             $self->new_item( '', 'docs/memory_internals.pod' ),
             $self->new_item( '', 'docs/parrotbyte.pod' ),
             $self->new_item( '', 'docs/jit.pod' ),
