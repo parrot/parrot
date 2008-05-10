@@ -113,6 +113,7 @@ sub _init {
         -Wno-import
         -Wno-multichar
         -Wno-pointer-sign
+        -Wold-style-definition
         -Wpadded
         -Wredundant-decls
         -Wswitch-enum
