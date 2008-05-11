@@ -1191,7 +1191,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "addattribute duplicate" );
     print "never\n"
     end
 CODE
-/Attribute 'i' already exists/
+/Attribute 'i' already exists in 'Foo'/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "PMC as classes" );
