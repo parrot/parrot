@@ -1,188 +1,660 @@
 #! perl
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test;
 use Parrot::Config;
 
 =head1 NAME
 
-t/dynpmc/rational.t - Test for the Rational PMC
+t/dynpmc/rational.t - Rational PMC
 
 =head1 SYNOPSIS
 
-        % prove t/dynpmc/rational.t
+    % prove t/dynpmc/rational.t
 
 =head1 DESCRIPTION
 
-This is just a stub, as the rational PMC is not implemented yet.
+Tests the Rational PMC.
 
 =cut
 
-pir_output_is( << 'CODE', << 'OUTPUT', "get_integer" );
-
-.sub main :main
-    loadlib P1, "rational"
-    $P1 = new "Rational"
-
-    $I1 = $P1
-    print $I1
-    print "\n"
-.end
-CODE
-43
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" );
-.sub main :main
-    ## load a relative pathname without the extension.  loadlib will convert the
-    ## '/' characters to '\\' on windows.
-    $S0 = "runtime/parrot/dynext/rational"
-    loadlib P1, $S0
-
-    ## ensure that we can still make Rational instances.
-    $P1 = new "Rational"
-    $I1 = $P1
-    print $I1
-    print "\n"
-.end
-CODE
-43
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" );
-.sub main :main
-    ## get cwd in $S0.
-    .include "iglobals.pasm"
-    $P11 = getinterp
-    $P12 = $P11[.IGLOBALS_CONFIG_HASH]
-    $S0 = $P12["prefix"]
-
-    ## convert cwd to an absolute pathname without the extension, and load it.
-    ## this should always find the version in the build directory, since that's
-    ## the only place "make test" will work.
-    $S0 = concat "/runtime/parrot/dynext/rational"
-    loadlib P1, $S0
-
-    ## ensure that we can still make Rational instances.
-    $P1 = new "Rational"
-    $I1 = $P1
-    print $I1
-    print "\n"
-.end
-CODE
-43
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext" );
-.sub main :main
-    ## get load_ext in $S0.
-    .include "iglobals.pasm"
-    $P11 = getinterp
-    $P12 = $P11[.IGLOBALS_CONFIG_HASH]
-    $S0 = $P12["load_ext"]
-
-    ## load a relative pathname with an extension.
-    $S0 = concat "runtime/parrot/dynext/rational", $S0
-    loadlib P1, $S0
-
-    ## ensure that we can still make Rational instances.
-    $P1 = new "Rational"
-    $I1 = $P1
-    print $I1
-    print "\n"
-.end
-CODE
-43
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext" );
-.sub main :main
-    ## get cwd in $S0, load_ext in $S1.
-    .include "iglobals.pasm"
-    $P11 = getinterp
-    $P12 = $P11[.IGLOBALS_CONFIG_HASH]
-    $S0 = $P12["prefix"]
-    $S1 = $P12["load_ext"]
-
-    ## convert $S0 to an absolute pathname with extension, and load it.
-    ## this should always find the version in the build directory, since that's
-    ## the only place "make test" will work.
-    $S0 = concat $S0, "/runtime/parrot/dynext/rational"
-    $S0 = concat $S0, $S1
-    loadlib P1, $S0
-
-    ## ensure that we can still make Rational instances.
-    $P1 = new "Rational"
-    $I1 = $P1
-    print $I1
-    print "\n"
-.end
-CODE
-43
-OUTPUT
-
-SKIP: {
-    skip( "No BigInt Lib configured", 1 ) if !$PConfig{gmp};
-
-    pir_output_is( << 'CODE', << 'OUTPUT', "inherited add" );
-.sub _main :main
-    .local pmc d, l, r
-    $P0 = loadlib "rational"
-    print "ok\n"
-    l = new "Rational"
-    l = 43
-    r = new 'BigInt'
-    r = 0x7ffffff
-    d = new 'Undef'
-    add d, l, r
-    print d
-    print "\n"
-    $S0 = typeof d
-    print $S0
-    print "\n"
-.end
-CODE
-ok
-134217770
-BigInt
-OUTPUT
-
+if ( $PConfig{gmp} ) { # If GMP is available, we check all functions.
+    plan tests => 32;
+}
+else {                 # If GMP is not available, we only test the constructor and the
+    plan tests => 2;   # version-method that is used to detect presence of GMP at runtime.
 }
 
-pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 1" );
-# load our Rational test (pseudo) language
-# it defines one PMC type "Rational"
-.HLL "Rational", "rational"
-.sub main :main
-    new $P1, "Rational"      # load by name
-    $I1 = $P1
-    print $I1
-    print "\n"
-.end
+pir_output_is(<<'CODE', <<'OUTPUT', "Initialization");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    say "ok" 
+  .end
 CODE
-43
+ok
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 2" );
-.HLL "Rational", "rational"
-.sub main :main
-    new $P1, 'Rational'       # load by index
-    $I1 = $P1
-    print $I1
-    print "\n"
-.end
+if (! $PConfig{gmp}) { # If GMP is not available, this is the last test:
+pir_output_is(<<'CODE', <<'OUTPUT', "version-method");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    $S1 = $P1.'version'()
+    say $S1
+  .end
 CODE
-43
+0.0.0
+OUTPUT
+exit;
+}
+
+# These tests are only run, if GMP is available.
+pir_output_is(<<'CODE', <<'OUTPUT', "version-method");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    $S1 = $P1.'version'()
+    say "ok"
+  .end
+CODE
+ok
 OUTPUT
 
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
+pir_output_is(<<'CODE', <<'OUTPUT', "Set and get native integer");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    
+    $I1 = 42
+    $P1 = $I1
+    $I2 = $P1
+    
+    say $I2
+  .end
+CODE
+42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Set and get native float");
+  .sub main :main
+    loadlib P0, 'rational'
+    new P0, 'Rational'
+    
+    N0 = 11.1
+    P0 = N0
+    N1 = P0
+    
+    say N1
+  .end
+CODE
+11.1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Set and get native string");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    
+    $S1 = "7/4"
+    $P1 = $S1
+    $S2 = $P1
+    
+    say $S2
+  .end
+CODE
+7/4
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Set and get Integer");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    
+    new $P2, 'Integer'
+    new $P3, 'Integer'
+    
+    $P2 = 7
+    $P1 = $P2
+    $P3 = $P1
+    
+    say $P3
+  .end
+CODE
+7
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Set and get Float");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    
+    new $P2, 'Float'
+    new $P3, 'Float'
+    
+    $P2 = 7.110000
+    $P1 = $P2
+    $P3 = $P1
+    
+    say $P3
+  .end
+CODE
+7.11
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Set and get String");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    
+    new $P2, 'String'
+    new $P3, 'String'
+    
+    $P2 = "7/4"
+    $P1 = $P2
+    $P3 = $P1
+    
+    say $P3
+  .end
+CODE
+7/4
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Increment and decrement");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    
+    $P1 = "7/4"
+    inc $P1
+    print $P1
+    print "\n"
+    
+    dec $P1
+    dec $P1
+    say $P1
+  .end
+CODE
+11/4
+3/4
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Adding integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $I1 = 7
+
+    $P1 = "3/2"
+    $P2 = $P1 + $I1
+    $P1 = $P1 + $I1
+    $P1 = $P1 + $I1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+31/2
+17/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Adding floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $N1 = 7.
+
+    $P1 = "3/2"
+    $P2 = $P1 + $N1
+    $P1 = $P1 + $N1
+    $P1 = $P1 + $N1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+31/2
+17/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Adding Integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Integer'
+
+    $P4 = 7
+
+    $P2 = "3/2"
+    $P3 = $P2 + $P4
+    $P2 = $P2 + $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+17/2
+17/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Adding Floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Float'
+
+    $P4 = 7.
+
+    $P2 = "3/2"
+    $P3 = $P2 + $P4
+    $P2 = $P2 + $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+17/2
+17/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Adding Rationals (+inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    
+    $P2 = "3/2"
+    $P3 = "5/2"
+    
+    $P1 = $P2 + $P3
+    $P2 = $P2 + $P3
+    
+    say $P1
+    say $P2
+  .end
+CODE
+4
+4
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Subtracting integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $I1 = 7
+
+    $P1 = "3/2"
+    $P2 = $P1 - $I1
+    $P1 = $P1 - $I1
+    $P1 = $P1 - $I1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+-25/2
+-11/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Subtracting floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $N1 = 7.
+
+    $P1 = "3/2"
+    $P2 = $P1 - $N1
+    $P1 = $P1 - $N1
+    $P1 = $P1 - $N1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+-25/2
+-11/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Subtracting Integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Integer'
+
+    $P4 = 7
+
+    $P2 = "3/2"
+    $P3 = $P2 - $P4
+    $P2 = $P2 - $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+-11/2
+-11/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Subtracting Floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Float'
+
+    $P4 = 7.
+
+    $P2 = "3/2"
+    $P3 = $P2 - $P4
+    $P2 = $P2 - $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+-11/2
+-11/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Subtracting Rationals (+inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    
+    $P2 = "3/2"
+    $P3 = "5/2"
+    
+    $P1 = $P2 - $P3
+    $P2 = $P2 - $P3
+    
+    say $P1
+    say $P2
+  .end
+CODE
+-1
+-1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Multiplying integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $I1 = 7
+
+    $P1 = "3/2"
+    $P2 = $P1 * $I1
+    $P1 = $P1 * $I1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+21/2
+21/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Multiplying floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $N1 = 7.
+
+    $P1 = "3/2"
+    $P2 = $P1 * $N1
+    $P1 = $P1 * $N1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+21/2
+21/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Multiplying Integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Integer'
+
+    $P4 = 7
+
+    $P2 = "3/2"
+    $P3 = $P2 * $P4
+    $P2 = $P2 * $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+21/2
+21/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Multiplying Floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Float'
+
+    $P4 = 7.
+
+    $P2 = "3/2"
+    $P3 = $P2 * $P4
+    $P2 = $P2 * $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+21/2
+21/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Multiplying Rationals (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    
+    $P2 = "3/2"
+    $P3 = "5/2"
+    
+    $P1 = $P2 * $P3
+    $P2 = $P2 * $P3
+    
+    say $P1
+    say $P2
+  .end
+CODE
+15/4
+15/4
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Dividing integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $I1 = 7
+
+    $P1 = "3/2"
+    $P2 = $P1 / $I1
+    $P1 = $P1 / $I1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+3/14
+3/14
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Dividing floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    $N1 = 7.
+
+    $P1 = "3/2"
+    $P2 = $P1 / $N1
+    $P1 = $P1 / $N1
+    
+    say $P1
+    say $P2
+  .end
+CODE
+3/14
+3/14
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Dividing Integers (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Integer'
+
+    $P4 = 7
+
+    $P2 = "3/2"
+    $P3 = $P2 / $P4
+    $P2 = $P2 / $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+3/14
+3/14
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Dividing Floats (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    new $P4, 'Float'
+
+    $P4 = 7.
+
+    $P2 = "3/2"
+    $P3 = $P2 / $P4
+    $P2 = $P2 / $P4
+
+    say $P2
+    say $P3
+  .end
+CODE
+3/14
+3/14
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Dividing Rationals (+ inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P1, 'Rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    
+    $P2 = "3/2"
+    $P3 = "5/2"
+    
+    $P1 = $P2 / $P3
+    $P2 = $P2 / $P3
+    
+    say $P1
+    say $P2
+  .end
+CODE
+3/5
+3/5
+OUTPUT
+pir_output_is(<<'CODE', <<'OUTPUT', "Negating (+inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    
+    $P2 = "-3/2"
+    $P3 = -$P2
+    $P2 = -$P2
+    
+    say $P2
+    say $P3
+  .end
+CODE
+3/2
+3/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Absolute value (+inplace operation)");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    
+    $P2 = "-3/2"
+    $P3 = abs $P2
+    abs $P2
+    
+    say $P2
+    say $P3
+  .end
+CODE
+3/2
+3/2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Comparing rationals to rationals");
+  .sub main :main
+    loadlib $P1, 'rational'
+    new $P2, 'Rational'
+    new $P3, 'Rational'
+    
+    $P2 = "3/2"
+    $P3 = "6/4"
+    
+    if $P2 == $P3 goto EQ
+    goto NE
+  EQ:
+    say "1"
+    goto END_EQ
+  NE:
+    say "0"
+  END_EQ:
+    
+    $P3 = "7/4"
+    cmp $I1, $P2, $P3
+    cmp $I2, $P3, $P2
+    
+    say $I1
+    say $I2
+  .end
+CODE
+1
+-1
+1
+OUTPUT

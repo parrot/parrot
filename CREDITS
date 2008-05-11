@@ -422,6 +422,9 @@ S: South Lake Tahoe, CA, USA
 N: Markus Amsler
 D: httpd.imc, bugfixes
 
+N: Markus Mays
+D: Implementation of the Rational PMC
+
 N: Matt Diephouse
 D: Turn off buffering layer in forth.pasm
 D: Various patches for pmc2c.pl

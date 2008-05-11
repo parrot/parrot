@@ -5,6 +5,8 @@
     (save, restore, lookback, entrytype, depth, rotate_up)
     (NOTE: This was scheduled to occur after 0.7.0, moved up to this release)
   + removed register stack, saveall & restoreall opcodes
+  + Add implementation of Rational PMC.
+
 
 New in 0.6.1
 - Specification
