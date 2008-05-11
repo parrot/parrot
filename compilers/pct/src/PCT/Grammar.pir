@@ -47,16 +47,16 @@ also included.
 .end
 
 
-=item get_scalar()
+=item item()
 
-Here we overload the get_scalar() method from PGE::Match to
+Here we overload the item() method from PGE::Match to
 throw an exception if a result object hasn't been set.
 
 =cut
 
-.sub 'get_scalar' :method
+.sub 'item' :method
     .local pmc obj
-    obj = getattribute self, '$!result'
+    obj = getattribute self, '$!item'
     unless null obj goto end
     die "No result object"
   end:

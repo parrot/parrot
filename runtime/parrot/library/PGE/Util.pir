@@ -211,7 +211,7 @@ split_loop:
     pos = match.to()
 
     .local pmc captures
-    captures = match.get_array()
+    captures = match.'list'()
     if null captures goto capture_end
     $I0 = elements captures
     $I1 = 0

@@ -202,7 +202,7 @@ children.
 
 .sub 'iterator' :method
     .local pmc iter
-    $P0 = self.'get_array'()
+    $P0 = self.'list'()
     iter = new 'Iterator', $P0
     iter = 0
     .return (iter)

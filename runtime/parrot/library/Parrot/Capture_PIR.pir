@@ -6,10 +6,12 @@ Capture_PIR - PIR-based Capture class
 
 This file implements a C<Capture> class of objects.
 Ideally we'd like to use the Capture class that is written
-in C (L<src/pmc/capture.pmc>), but unfortunately Parrot
-currently has a limitation in handling subclasses of
-the built-in Capture.  So, this is a temporary PIR-based
-version until the Capture PMC is working properly.
+in C, but unfortunately Parrot currently has a limitation in
+handling subclasses of the built-in Capture.  So, this is a
+temporary PIR-based version until the Capture PMC is working
+properly.
+
+=over 4
 
 =cut
 
@@ -17,35 +19,47 @@ version until the Capture PMC is working properly.
 
 .sub '__onload' :load :init
     $P0 = subclass 'Hash', 'Capture_PIR'
-    addattribute $P0, '@!array'
+    addattribute $P0, '$!item'
+    addattribute $P0, '@!list'
 .end
 
 
-.sub 'get_array' :method
-    $P0 = getattribute self, '@!array'
+.sub 'list' :method
+    $P0 = getattribute self, '@!list'
     unless null $P0 goto end
     $P0 = new 'ResizablePMCArray'
-    setattribute self, '@!array', $P0
+    setattribute self, '@!list', $P0
   end:
     .return ($P0)
 .end
 
 
-.sub 'get_hash' :method
+.sub 'hash' :method
     .return (self)
+.end
+
+
+# deprecated RT#54000
+.sub 'get_array' :method
+    .return self.'list'()
+.end
+
+# deprecated RT#54000
+.sub 'get_hash' :method
+    .return self.'hash'()
 .end
 
 
 .sub 'unshift_pmc' :vtable :method
     .param pmc val
-    $P0 = self.'get_array'()
+    $P0 = self.'list'()
     unshift $P0, val
     .return ()
 .end
 
 
 .sub 'shift_pmc' :vtable :method
-    $P0 = self.'get_array'()
+    $P0 = self.'list'()
     $P0 = shift $P0
     .return ($P0)
 .end
@@ -53,23 +67,30 @@ version until the Capture PMC is working properly.
 
 .sub 'push_pmc' :vtable :method
     .param pmc val
-    $P0 = self.'get_array'()
+    $P0 = self.'list'()
     push $P0, val
     .return ()
 .end
 
 
 .sub 'pop_pmc' :vtable :method
-    $P0 = self.'get_array'()
+    $P0 = self.'list'()
     $P0 = pop $P0
     .return ($P0)
 .end
 
+=item C<get_string_keyed_int(int key)>
+
+Returns the portion of the target string matched by C<key>,
+in string context. If the Match object contains an array of
+matches, a space seperated list of matches is returned.
+
+=cut
 
 .sub 'get_string_keyed_int' :vtable :method
     .param int key
     $S0 = ''
-    $P0 = getattribute self, '@!array'
+    $P0 = getattribute self, '@!list'
     if null $P0 goto end
     $S0 = $P0[key]
   end:
@@ -77,9 +98,17 @@ version until the Capture PMC is working properly.
 .end
 
 
+=item C<get_pmc_keyed_int(int key)>
+
+Returns the subpattern capture associated with C<key>.  This
+returns either a single Match object or an array of match
+objects depending on the rule.
+
+=cut
+
 .sub 'get_pmc_keyed_int' :vtable :method
     .param int key
-    $P0 = getattribute self, '@!array'
+    $P0 = getattribute self, '@!list'
     if null $P0 goto end
     $P0 = $P0[key]
   end:
@@ -90,9 +119,29 @@ version until the Capture PMC is working properly.
 .sub 'set_pmc_keyed_int' :vtable :method
     .param int key
     .param pmc val
-    $P0 = self.'get_array'()
+    $P0 = self.'list'()
     $P0[key] = val
     .return ()
+.end
+
+
+.sub 'delete_keyed_int' :vtable :method
+    .param int key
+    .local pmc list
+    list = getattribute self, '@!list'
+    delete list[key]
+.end
+
+
+.sub 'defined_keyed_int' :vtable :method
+    .param int key
+    .local pmc list
+    $I0 = 0
+    list = getattribute self, '@!list'
+    if null list goto end
+    $I0 = defined list[key]
+  end:
+    .return ($I0)
 .end
 
 
@@ -106,7 +155,7 @@ version until the Capture PMC is working properly.
     (subindent, indent) = dumper.'newIndent'()
 
     .local pmc hash, iter
-    hash = self.'get_hash'()
+    hash = self.'hash'()
     iter = new 'Iterator', hash
   dump_hash_loop:
     unless iter goto dump_hash_end
@@ -128,7 +177,7 @@ version until the Capture PMC is working properly.
   dump_hash_end:
 
     .local pmc array
-    array = self.'get_array'()
+    array = self.'list'()
     if null array goto dump_array_end
     $I1 = elements array
     $I0 = 0
@@ -155,6 +204,10 @@ version until the Capture PMC is working properly.
   end:
     dumper.'deleteIndent'()
 .end
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: pir

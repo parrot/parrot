@@ -498,7 +498,7 @@ Adds (or replaces) a syntactic category's defaults.
     $S1 = $P1['type']
     $S2 = $P2['type']
     if $S1 != $S2 goto reduce_saveterm
-    $P0 = $P2.get_array()
+    $P0 = $P2.'list'()
     $P1 = $P1[1]
     push $P0, $P1
     $P1 = $P2

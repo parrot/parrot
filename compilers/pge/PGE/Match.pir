@@ -12,11 +12,12 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .sub '__onload' :load
     load_bytecode 'Protoobject.pbc'
+    load_bytecode 'Parrot/Capture_PIR.pbc'
     load_bytecode 'PGE/Dumper.pir'                 # FIXME, XXX, etc.
     .local pmc protomaker, hashclass, base
     protomaker = new 'Protomaker'
-    hashclass = get_class 'Hash'
-    base = protomaker.'new_subclass'(hashclass, 'PGE::Match', '$.target', '$.from', '$.pos', '&!corou', '@!capt', '$!result')
+    hashclass = get_class 'Capture_PIR'
+    base = protomaker.'new_subclass'(hashclass, 'PGE::Match', '$.target', '$.from', '$.pos', '&!corou')
 
     .return ()
 .end
@@ -208,7 +209,7 @@ Returns the portion of the target string matched by this object.
 .end
 
 
-=item C<get_scalar()>
+=item C<item()>
 
 Returns the scalar value of this match -- the "result object"
 if there is one, otherwise the substring matched by this match
@@ -216,8 +217,14 @@ object.
 
 =cut
 
-.sub 'get_scalar' :method
+.sub 'item' :method
     .return self.'result_object'()
+.end
+
+
+# deprecated RT#54000
+.sub 'get_scalar' :method
+    .return self.'item'()
 .end
 
 
@@ -231,10 +238,10 @@ Returns or sets the "result object" for the match object.
     .param pmc obj             :optional
     .param int has_obj         :opt_flag
     if has_obj == 0 goto get_obj
-    setattribute self, '$!result', obj
+    setattribute self, '$!item', obj
     goto ret_obj
   get_obj:
-    obj = getattribute self, '$!result'
+    obj = getattribute self, '$!item'
   ret_obj:
     if null obj goto ret_null
     .return (obj)
@@ -263,7 +270,7 @@ then simply return the first key found.
     unless $I0 goto loop
     .return ($S0)
   first_key:
-    $P0 = self.'get_hash'()
+    $P0 = self.'hash'()
     $P1 = new 'Iterator', $P0
     unless $P1 goto not_found
     $S0 = shift $P1
@@ -288,8 +295,8 @@ the position of the match object to C<cutvalue>.
     null $P0
     setattribute self, '$.target', $P0
     setattribute self, '&!corou', $P0
-    setattribute self, '@!capt', $P0
-    setattribute self, '$!result', $P0
+    setattribute self, '@!list', $P0
+    setattribute self, '$!item', $P0
     .local pmc iter
     iter = new 'Iterator', self
   iter_loop:
@@ -347,107 +354,6 @@ Returns the portion of the target string matched by this object.
 .sub 'get_string' :vtable :method
     $S0 = self.'result_object'()
     .return ($S0)
-.end
-
-=item C<__get_string_keyed_int(int key)>
-
-Returns the portion of the target string matched by C<key>,
-in string context. If the Match object contains an array of
-matches, a space seperated list of matches is returned.
-
-=cut
-
-.sub 'get_string_keyed_int' :vtable :method
-    .param int key
-    $P0 = getattribute self, '@!capt'
-    $S0 = ''
-    if_null $P0, get_1
-    $P0 = $P0[key]
-    $S0 = $P0
-  get_1:
-    .return ($S0)
-.end
-
-=item C<__get_pmc_keyed_int(int key)>
-
-Returns the subpattern capture associated with C<key>.  This
-returns either a single Match object or an array of match
-objects depending on the rule.
-
-=cut
-
-.sub 'get_pmc_keyed_int' :vtable :method
-    .param int key
-    $P0 = getattribute self, '@!capt'
-    if_null $P0, get_1
-    $P0 = $P0[key]
-  get_1:
-    .return ($P0)
-.end
-
-.sub 'set_pmc_keyed_int' :vtable :method
-    .param int key
-    .param pmc val
-    .local pmc capt
-    capt = getattribute self, '@!capt'
-    unless_null capt, set_1
-    capt = new 'ResizablePMCArray'
-    setattribute self, '@!capt', capt
-  set_1:
-    capt[key] = val
-.end
-
-.sub 'delete_keyed_int' :vtable :method
-    .param int key
-    .local pmc capt
-    capt = getattribute self, '@!capt'
-    delete capt[key]
-.end
-
-.sub 'defined_keyed_int' :vtable :method
-    .param int key
-    .local pmc capt
-    $I0 = 0
-    capt = getattribute self, '@!capt'
-    if_null capt, end
-    $I0 = defined capt[key]
-  end:
-    .return ($I0)
-.end
-
-.sub 'push_pmc' :vtable :method
-    .param pmc val
-    .local pmc capt
-    capt = getattribute self, '@!capt'
-    unless null capt goto push_1
-    capt = new 'ResizablePMCArray'
-    setattribute self, '@!capt', capt
-  push_1:
-    push capt, val
-    .return ()
-.end
-
-
-=item C<get_hash()>
-
-Returns the hash component of the match object.
-
-=cut
-
-.sub 'get_hash' :method
-    .return (self)
-.end
-
-=item C<get_array()>
-
-Returns the array component of the match object.
-
-=cut
-
-.sub 'get_array' :method
-    .local pmc array
-    array = getattribute self, '@!capt'
-    .return (array)
 .end
 
 =back

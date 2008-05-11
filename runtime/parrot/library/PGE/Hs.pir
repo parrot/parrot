@@ -51,8 +51,8 @@ whole thing may be taken out or refactored away at any moment.
 .namespace [ "PGE::Hs" ]
 
 .const string PGE_FAIL = "PGE_Fail"
-.const string PGE_SUB_POS = "@!capt"
-.const string PGE_SUB_NAMED = "%!capt"
+.const string PGE_SUB_POS = "@!list"
+.const string PGE_SUB_NAMED = "%!hash"
 
 .sub "__onload" :load
     .local pmc load
@@ -203,7 +203,7 @@ END:
 
   subrules:
     out .= "] ["
-    capt = self."get_hash"()
+    capt = self.'hash'()
     if_null capt, end
     iter = new 'Iterator', capt
     iter = 0

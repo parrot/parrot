@@ -375,7 +375,7 @@ tree as a PIR code object that can be compiled.
 
     .local pmc children, exp
     .local int n
-    children = self.'get_array'()
+    children = self.'list'()
     n = elements children
   reduce_loop:
     if n <= 0 goto reduce_end
@@ -431,7 +431,7 @@ tree as a PIR code object that can be compiled.
 
     .local pmc iter, exp
     code.emit('        %0: # concat', label)
-    $P0 = self.get_array()
+    $P0 = self.'list'()
     iter = new 'Iterator', $P0
     exp = shift iter
     $S0 = code.unique('R')

@@ -5,7 +5,7 @@
 plan(1);
 
 class XYZ {
-    method get_array() {
+    method list() {
         'ok ', '1';
     }
 }

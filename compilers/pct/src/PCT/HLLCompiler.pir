@@ -382,7 +382,7 @@ resulting ast.
   compile_match:
     push_eh err_past
     .local pmc ast
-    ast = source.'get_scalar'()
+    ast = source.'item'()
     pop_eh
     $I0 = isa ast, 'PAST::Node'
     unless $I0 goto err_past

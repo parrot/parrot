@@ -134,7 +134,7 @@ Return pir for an operation node.
 
     ##  get list of arguments to operation
     .local pmc arglist
-    arglist = node.'get_array'()
+    arglist = node.'list'()
 
     ##  get format and arguments based on pirop
     .local string fmt, name, invocant

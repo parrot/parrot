@@ -36,7 +36,7 @@ This method enables Data::Dumper to work on Match objects.
     $I0 = self.from()
     print $I0
     hascapts = 0
-    hash = self."get_hash"()
+    hash = self.'hash'()
     if_null hash, dump_array
     iter = new 'Iterator', hash
   dump_hash_1:
@@ -55,7 +55,7 @@ This method enables Data::Dumper to work on Match objects.
     dumper."dump"(label, val)
     goto dump_hash_1
   dump_array:
-    array = self."get_array"()
+    array = self.'list'()
     if_null array, dump_end
     $I1 = elements array
     $I0 = 0
@@ -123,7 +123,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     $S0 = $I0
     out .= $S0
     out .= "\n"
-    capt = getattribute self, '@!capt'
+    capt = self.'list'()
     if_null capt, subrules
     spi = 0
     spc = elements capt
@@ -142,7 +142,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     goto subpats_1
 
   subrules:
-    capt = self.get_hash()
+    capt = self.'hash'()
     if_null capt, end
     iter = new 'Iterator', capt
   subrules_1:

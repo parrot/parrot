@@ -29,7 +29,7 @@ my $ns_subs = {
             qw/
                 next from to __get_bool __get_integer __get_number
                 __get_string __get_pmc_keyed_int __set_pmc_keyed_int
-                __delete_keyed_int __defined_keyed_int get_hash get_array
+                __delete_keyed_int __defined_keyed_int list hash
                 /
         ],
     },

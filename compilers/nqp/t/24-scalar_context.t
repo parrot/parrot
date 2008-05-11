@@ -5,7 +5,7 @@
 plan(1);
 
 class XYZ {
-    method get_scalar() {
+    method item() {
         'ok 1';
     }
 }

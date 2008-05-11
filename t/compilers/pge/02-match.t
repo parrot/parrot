@@ -53,7 +53,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'push on a Match object' );
     str = new 'String'
     str = 'foo'
     push match, str
-    arr = match.'get_array'()
+    arr = match.'list'()
     $I0 = elements arr
     print $I0
     print "\n"

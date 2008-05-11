@@ -200,13 +200,26 @@ will be removed.
 
 =item Change argument handling of C<< <foo: text> >>
 
+(See RT#53606.)
+
 Synopsis 5 changes the handling of arguments after a colon
 in subrule invocations so that  C<< <foo: text> >> must
 now be written as C<< <foo: 'text'> >>.
 
 For the foreseeable future PGE will support both syntaxes,
 but the obsolete C<< <foo: text> >> syntax may disappear
-at any time after June 2008.
+at any time after the June 2008 release.
+
+=back
+
+=head2 Capture-based objects
+
+=over 4
+
+=item get_array, get_hash, get_scalar deprecations [post 0.6.2]
+
+See RT#54000.  The 'get_array', 'get_hash', and 'get_scalar'
+methods are now called 'list', 'hash', and 'item' respectively.
 
 =back
 

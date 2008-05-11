@@ -1169,7 +1169,7 @@ Parse a modifier.
 
     .local pmc array, exp
     .local int i, j, n
-    array = self.get_array()
+    array = self.'list'()
     n = elements array
     i = 0
     j = 0

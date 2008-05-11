@@ -149,7 +149,7 @@ sub optable_output_is {
     if type == 'term:' goto print_term
     print '('
     .local pmc iter
-    $P0 = match.get_array()
+    $P0 = match.'list'()
     if null $P0 goto iter_end
     unless $P0 goto iter_end
     iter = new 'Iterator', $P0
