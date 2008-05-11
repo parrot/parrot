@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More;
+use Test::More import => [ '$TODO' ];
 use Parrot::Test tests => 8;
 use Parrot::Config;
 
@@ -16,15 +16,15 @@ use Config;
 
 =head1 NAME
 
-t/op/sys_ops.t - System Ops
+t/op/sysinfo.t - System Info
 
 =head1 SYNOPSIS
 
-        % prove t/op/sys_ops.t
+        % prove t/op/sysinfo.t
 
 =head1 DESCRIPTION
 
-Tests basic string and branching operations.
+Tests for basic system information.
 
 =over 4
 
@@ -75,11 +75,12 @@ pasm_output_is( <<'CODE', $PConfig{osname}, "sysinfo osname" );
         end
 CODE
 
-# 5
+# 5 & 6
 if( $PConfig{osname} eq 'MSWin32' ){
-	eval{ require Win32; };
+	# Windows 5 & 6
 	SKIP: {
-		skip "requires package Win32 for these tests", 2;
+		eval{ require Win32; } or
+		    skip "requires package Win32 for these tests", 2;
 		
 		# specifically don't use $Config{osvers}
 		# because it probably was the system perl was compiled on
@@ -106,6 +107,7 @@ CODE
 	}
 
 }else{
+	# Other 5 & 6
 
 # XXX I know this is wrong on Win32 but is it correct on any others?
 # XXX also should it be %Config or %PConfig
@@ -127,7 +129,7 @@ CODE
 
 }
 
-# Common
+# 7
 
 TODO: {
 	local $TODO = "Not Currently Implemented";
@@ -138,6 +140,8 @@ pasm_output_is( <<'CODE', $PConfig{cpuarch}, "sysinfo CPU Arch Family" );
 		end
 CODE
 }
+
+# 8
 
 SKIP: {
 	skip "Requires a lot of work to find out the correct answer", 1;
