@@ -325,7 +325,7 @@ FLUID_FILES_2 = \
     $(GEN_LIBRARY) \
     runtime/parrot/include/parrotlib.pbc \
     .configure_trace.sto \
-	.parrot_current_rev
+    .parrot_current_rev
 
 
 ###############################################################################
@@ -1672,7 +1672,7 @@ dynext-clean :
 # win32 exported functions and data items (.exp)
 # win32 export definition files (.def)
 	$(RM_F) \
-   "$(DYNEXT_DIR)/*$(LOAD_EXT)" \
+    "$(DYNEXT_DIR)/*$(LOAD_EXT)" \
     "$(DYNEXT_DIR)/*$(SHARE_EXT)" \
     "$(DYNEXT_DIR)/*.lib" \
     "*.pdb" "$(DYNEXT_DIR)/*.pdb" \
@@ -2139,7 +2139,7 @@ release : MANIFEST MANIFEST.generated
 	mv MANIFEST MANIFEST.real
 	grep -v DEVELOPING MANIFEST.real > MANIFEST
 	perl -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST | \
-      tar -zcv -T - -f parrot-$(VERSION).tar.gz
+    tar -zcv -T - -f parrot-$(VERSION).tar.gz
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 
@@ -2211,12 +2211,12 @@ TAGS.dummy:
 tags: tags.dummy
 	$(RM_F) tags
 	@ctags@ \
-        --links=no --totals \
-        -R --exclude=blib --exclude=.svn  \
-        --exclude=res_lea.c \
-        --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
-        -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
-        $(CUR_DIR)
+    --links=no --totals \
+    -R --exclude=blib --exclude=.svn  \
+    --exclude=res_lea.c \
+    --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
+    -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
+    $(CUR_DIR)
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.dummy:
