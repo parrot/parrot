@@ -1046,12 +1046,7 @@ opcode -- see RT#47828).
     .local pmc ops, alabel
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'(rpost, lpost, 'node'=>node, 'result'=>lpost)
-    $P0 = get_hll_global ['POST'], 'Label'
-    alabel = $P0.'new'('name'=>'copy_')
-    ops.'push_pirop'('eq_addr', lpost, rpost, alabel)
-    ops.'push_pirop'('morph', lpost, '"Undef"')
-    ops.'push_pirop'('assign', lpost, rpost)
-    ops.'push'(alabel)
+    ops.'push_pirop'('copy', lpost, rpost)
     .return (ops)
 .end
 
