@@ -41,6 +41,18 @@ sub runstep {
 
     $parrot_is_shared = 0 unless $conf->data->get('has_dynamic_linking');
 
+    # Parrot can't necessarily handle a pre-existing installed shared
+    # libparrot.so. At this point, we don't know the actual name
+    # of the shared parrot library. However, 'libparrot.so' will catch
+    # at least some of the problems.
+    # RT#52288: the check for old_versions should be improved
+    my $old_version
+        = File::Spec->catfile($conf->data->get('libdir'), 'libparrot.so');
+    if (-e $old_version) {
+        warn("\nWarning: Building a shared parrot library may conflict " .
+             "with your previously-installed $old_version\n");
+    }
+
     if (
         $conf->options->get('ask')
         &&
