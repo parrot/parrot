@@ -203,7 +203,7 @@ while (<>) {
         $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $dest );
     }
     else {
-        $dest =~ s/^runtime/lib/;
+        $dest =~ s/^runtime/lib/ if /\[library]/;
         $dest = File::Spec->catdir( $options{prefix}, $dest );
     }
 
