@@ -56,6 +56,7 @@ typedef struct pbc_merge_input {
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_DOES_NOT_RETURN
 static void help(PARROT_INTERP)
         __attribute__nonnull__(1);
 
