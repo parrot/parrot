@@ -242,6 +242,7 @@ GEN_HEADERS = \
     $(INC_DIR)/pbcversion.h
 
 GEN_SOURCES = \
+    $(SRC_DIR)/call_list.txt \
     $(SRC_DIR)/core_ops.c \
     $(SRC_DIR)/nci.c \
     $(SRC_DIR)/core_ops_switch.c \
