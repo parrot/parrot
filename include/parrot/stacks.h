@@ -158,7 +158,8 @@ Stack_Chunk_t * register_new_stack(PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Stack_Entry_t* stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
+Stack_Entry_t* stack_prepare_pop(PARROT_INTERP,
+    ARGMOD(Stack_Chunk_t **stack_p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stack_p);
@@ -166,7 +167,8 @@ Stack_Entry_t* stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Stack_Entry_t* stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
+Stack_Entry_t* stack_prepare_push(PARROT_INTERP,
+    ARGMOD(Stack_Chunk_t **stack_p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stack_p);

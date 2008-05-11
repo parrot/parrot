@@ -101,7 +101,8 @@ PMC * key_new_string(PARROT_INTERP, ARGIN(STRING *value))
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * key_next(SHIM_INTERP, ARGIN(PMC *key))
+PMC * key_next(PARROT_INTERP, ARGIN(PMC *key))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API

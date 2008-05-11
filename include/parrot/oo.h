@@ -57,14 +57,6 @@ typedef enum {
 /* HEADERIZER BEGIN: src/oo.c */
 
 PARROT_API
-INTVAL Parrot_add_attribute(PARROT_INTERP,
-    ARGIN(PMC *_class),
-    ARGIN(STRING *attr))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_class_lookup(PARROT_INTERP, ARGIN(STRING *class_name))
@@ -182,15 +174,6 @@ PMC * Parrot_remove_parent(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_single_subclass(PARROT_INTERP,
-    ARGIN(PMC *base_class),
-    ARGIN_NULLOK(PMC *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

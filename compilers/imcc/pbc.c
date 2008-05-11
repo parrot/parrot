@@ -183,10 +183,8 @@ static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#ifdef HAS_JIT
 PARROT_WARN_UNUSED_RESULT
 static int old_blocks(void);
-#endif /* HAS_JIT */
 
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT

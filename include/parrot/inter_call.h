@@ -91,11 +91,10 @@ int Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
 PARROT_API
 int Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP,
     ARGIN(parrot_context_t *ctx),
-    ARGIN(opcode_t *indexes),
+    ARGIN_NULLOK(opcode_t *indexes),
     ARGIN_NULLOK(PMC* sig_pmc),
     ARGMOD(call_state_item *sti))
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*sti);
 

@@ -128,8 +128,7 @@ static STRING* to_charset(PARROT_INTERP,
     ARGIN(STRING *src),
     ARGIN_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
+        __attribute__nonnull__(2);
 
 static int u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
         __attribute__nonnull__(1);

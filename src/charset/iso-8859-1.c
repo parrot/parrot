@@ -93,8 +93,7 @@ static STRING * to_charset(PARROT_INTERP,
     ARGIN(STRING *src),
     ARGIN_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * to_latin1(PARROT_INTERP,
