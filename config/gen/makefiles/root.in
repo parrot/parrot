@@ -2145,7 +2145,7 @@ release : MANIFEST MANIFEST.generated
 rpms : release
 	sudo cp parrot-$(VERSION).tar.gz /usr/src/*/SOURCES
 	sudo cp parrot.spec /usr/src/*/SPECS
-	cd /usr/src/*/SPECS @make_and@ sudo rpm -ba parrot.spec
+	cd /usr/src/*/SPECS @make_and@ sudo rpmbuild -ba parrot.spec
 
 win32-inno-installer : world installable
 	$(PERL) tools/dev/mk_inno.pl
