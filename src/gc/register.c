@@ -320,7 +320,7 @@ Duplicate the passed context
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Parrot_Context *
+struct Parrot_Context *
 Parrot_dup_context(PARROT_INTERP, ARGIN(const Parrot_Context *old))
 {
     size_t          diff;
@@ -367,7 +367,7 @@ C<Parrot_pop_context>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Parrot_Context *
+struct Parrot_Context *
 Parrot_push_context(PARROT_INTERP, ARGMOD(INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp);
@@ -422,7 +422,7 @@ register usage C<n_regs_used> is copied.  The function returns the new context.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Parrot_Context *
+struct Parrot_Context *
 Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
 {
     Parrot_Context *old, *ctx;
