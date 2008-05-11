@@ -433,7 +433,7 @@ PIRCODE
     pir = "    .local pmc loc_"
     $S0 = i
     pir .= $S0
-    pir .= " ; "
+    pir .= " # "
     $S0 = self
     pir .= $S0
     pir .= "\n"
@@ -495,7 +495,7 @@ PIRCODE
     pir .= "    .lex '"
     $S0 = self
     pir .= $S0
-    pir .= "' upv_"
+    pir .= "', upv_"
     $S0 = i
     pir .= $S0
     pir .= "\n"

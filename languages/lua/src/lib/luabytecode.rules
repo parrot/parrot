@@ -107,8 +107,7 @@ pir = <<PIR
     ${INS} = concat "  ${GLOB}[${K}"
     $S0 = ${B}
     ${INS} = concat $S0
-    ${INS} = concat "] = "
-    ${INS} = concat "  ${REG}"
+    ${INS} = concat "] = ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat "\n"
@@ -304,7 +303,7 @@ PIR
 code = 16
 format = ABC
 pir = <<PIR
-    ${INS} = concat "  cmod ${REG}"
+    ${INS} = concat "  mod ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     $I0 = ${B} & 0x100

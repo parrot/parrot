@@ -79,6 +79,13 @@ foreach my $func ( keys %language_test_map ) {
                 "$self->{parrot} languages/${pir_fn} $params",
             );
         }
+        elsif ( $lua_test eq 'luac2pir.pir' ) {
+            @test_prog = (
+                "luac -o ${src}c $src",
+                "$self->{parrot} languages/lua/luac2pir.pir ${src}c",
+                "$self->{parrot} ${src}c.pir $params",
+            );
+        }
         elsif ( $lua_test eq 'lua.pbc' ) {
             @test_prog = (
                 "$self->{parrot} languages/lua/lua.pbc $test_prog_args $src $params",

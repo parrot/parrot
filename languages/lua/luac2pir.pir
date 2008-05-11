@@ -38,13 +38,12 @@ Francois Perrad.
     content = load_file(filename)
     unless content goto L1
     .local pmc script
-#    push_eh _handler
+    push_eh _handler
     new $P0, 'LuaBytecode'
     script = $P0.'undump'(content)
     .local string gen_pir
     gen_pir = script.translate()
     save_pir(gen_pir, filename)
-    print gen_pir
     end
   _handler:
     .local pmc e
