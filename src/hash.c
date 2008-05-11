@@ -299,6 +299,7 @@ parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
 =item C<void parrot_mark_hash>
 
 Marks the hash and its contents as live.
+Assumes that key and value are non null in all buckets.
 
 =cut
 
@@ -337,11 +338,15 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
                         "Detected hash corruption at hash %p entries %d",
                         hash, (int)entries);
 
-            if (mark_key)
+            if (mark_key) {
+                PARROT_ASSERT(bucket->key);
                 pobject_lives(interp, (PObj *)bucket->key);
+            }
 
-            if (mark_value)
+            if (mark_value) {
+                PARROT_ASSERT(bucket->value);
                 pobject_lives(interp, (PObj *)bucket->value);
+            }
 
             bucket = bucket->next;
         }
