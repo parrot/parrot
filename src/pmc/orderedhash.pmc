@@ -46,6 +46,39 @@ pmclass OrderedHash extends Hash need_ext provides array provides hash {
 
 /*
 
+=item C<void mark()>
+
+Marks the OrderedHash as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Hash   *h = (Hash *)PMC_struct_val(SELF);
+        INTVAL  i;
+
+        if (!h)
+            return;
+
+        for (i = h->mask; i >= 0; --i) {
+            HashBucket *b = h->bi[i];
+
+            while (b) {
+
+                if (b->key) {
+                    pobject_lives(interp, (PObj *)b->key);
+                    if (b->value)
+                        pobject_lives(interp, (PObj *)b->value);
+                }
+
+                b = b->next;
+            }
+        }
+    }
+
+/*
+
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>
@@ -348,7 +381,7 @@ The created key = "\1idx".
     VTABLE INTVAL exists_keyed_int(INTVAL idx) {
         Hash * const h = (Hash *)PMC_struct_val(SELF);
         const INTVAL n = h->entries;
-        HashBucket *b;
+        HashBucket  *b;
 
         if (idx < 0)
             idx += n;
@@ -505,7 +538,7 @@ Deletes the key C<*key> from the hash.
     VTABLE void delete_keyed_int(INTVAL idx) {
         Hash * const h = (Hash *)PMC_struct_val(SELF);
         const INTVAL n = h->entries;
-        HashBucket *b;
+        HashBucket  *b;
 
         if (idx < 0)
             idx += n;
@@ -515,16 +548,22 @@ Deletes the key C<*key> from the hash.
 
         b = h->bs + idx;
 
-        if (b)
-            b->key = NULL;
+        if (!b)
+            return;
+
+        b->key   = NULL;
+        b->value = NULL;
     }
 
     VTABLE void delete_keyed_str(STRING *key) {
         const Hash * const h = (Hash *)PMC_struct_val(SELF);
         HashBucket * const b = parrot_hash_get_bucket(INTERP, h, key);
 
-        if (b)
-            b->key = NULL;
+        if (!b)
+            return;
+
+        b->key   = NULL;
+        b->value = NULL;
     }
 
 /*
