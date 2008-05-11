@@ -420,8 +420,8 @@ sub generate_rule_code {
     my @localmv = ();
 
     # Make current instruction code meta-variable.
-    $mv->{CUROP} = $rule->{code};
-    push @localmv, 'CUROP';
+    $mv->{LABEL} = 'L_' . $rule->{code};
+    push @localmv, 'LABEL';
 
     # Emit dispatch label.
     my $pir = <<"PIRCODE";
@@ -477,7 +477,7 @@ sub translation_code {
         $pir .= sub_meta( $rule->{pir}, $mv, "pir for rule $rule->{name}" );
     }
     else {
-        $pir .= "# TODO\n";
+        $pir .= "    gen_pir = concat \"  not_translated()\\n\"\n";
     }
     $pir .= "### end translation\n";
 

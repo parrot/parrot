@@ -181,6 +181,19 @@ PIRCODE
     $P0 = getattribute self, 'locvars'
     $S0 = $P0.'translate'()
     pir .= $S0
+    i = $P0
+    .local int maxstacksize
+    $P0 = getattribute self, 'maxstacksize'
+    maxstacksize = $P0
+  L5:
+    unless i < maxstacksize goto L6
+    pir .= "    .local pmc loc_"
+    $S0 = i
+    pir .= $S0
+    pir .= "\n"
+    inc i
+    goto L5
+  L6:
     $P0 = getattribute self, 'upvalues'
     $S0 = $P0.'translate'()
     pir .= $S0
@@ -245,7 +258,7 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const 'LuaNil' k_"
+    pir = "    .const .LuaNil k_"
     $S0 = i
     pir .= $S0
     pir .= " = '0'\n"
@@ -267,7 +280,7 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const 'LuaBoolean' k_"
+    pir = "    .const .LuaBoolean k_"
     $S0 = i
     pir .= $S0
     pir .= " = '"
@@ -292,7 +305,7 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const 'LuaNumber' k_"
+    pir = "    .const .LuaNumber k_"
     $S0 = i
     pir .= $S0
     pir .= " = '"
@@ -319,7 +332,7 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const 'LuaString' k_"
+    pir = "    .const .LuaString k_"
     $S0 = i
     pir .= $S0
     pir .= " = \""
