@@ -327,7 +327,7 @@ is_safe(PARROT_INTERP, PMC *sub)
     /* XXXX: Verify that interp still exists */
 
     /* XXXX: Verify that sub exists in interp */
-    
+
     return PMC_IS_NULL(sub) ? 0 : 1;
 }
 
