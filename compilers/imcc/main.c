@@ -41,6 +41,7 @@ extern int yydebug;
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void compile_to_bytecode(PARROT_INTERP,
     ARGIN(const char * const sourcefile),
@@ -99,6 +100,7 @@ static void usage(ARGMOD(FILE* fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* fp);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

@@ -46,6 +46,7 @@ int n_comp_units;
 /* HEADERIZER HFILE: compilers/imcc/instructions.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static int e_file_close(PARROT_INTERP, SHIM(void *param))
         __attribute__nonnull__(1);
@@ -60,6 +61,7 @@ static int e_file_emit(PARROT_INTERP,
 static int e_file_open(SHIM_INTERP, ARGIN(void *param))
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 static const char types[] = "INPS";

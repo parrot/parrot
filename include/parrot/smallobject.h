@@ -135,6 +135,7 @@ typedef struct Small_Object_Pool {
 
 
 /* HEADERIZER BEGIN: src/gc/smallobject.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL contained_in_pool(
@@ -188,6 +189,7 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*source);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/smallobject.c */
 
 #endif /* PARROT_SMALLOBJECT_H_GUARD */

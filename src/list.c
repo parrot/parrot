@@ -187,6 +187,7 @@ Also all array usage depends on list.
 /* HEADERIZER HFILE: include/parrot/list.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -292,6 +293,7 @@ static void split_chunk(PARROT_INTERP,
         FUNC_MODIFIES(*list)
         FUNC_MODIFIES(*chunk);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define chunk_list_size(list) \

@@ -55,6 +55,7 @@ typedef struct pbc_merge_input {
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_DOES_NOT_RETURN
 static void help(PARROT_INTERP)
@@ -159,6 +160,7 @@ static void pbc_merge_write(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pf);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

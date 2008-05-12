@@ -25,6 +25,7 @@
 #define DEBUG_PBC_FIXUP    0x4000
 
 /* HEADERIZER BEGIN: compilers/imcc/debug.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
@@ -111,6 +112,7 @@ void dump_loops(ARGIN(const IMC_Unit *unit))
 void dump_symreg(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/debug.c */
 
 

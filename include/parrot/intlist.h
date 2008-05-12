@@ -39,6 +39,7 @@ struct IntList_chunk_t {
 typedef IntList_Chunk IntList;
 
 /* HEADERIZER BEGIN: src/intlist.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void intlist_assign(PARROT_INTERP,
     ARGMOD(IntList *l),
@@ -101,6 +102,7 @@ void intlist_unshift(PARROT_INTERP, ARGMOD(IntList **l), INTVAL val)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*l);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/intlist.c */
 
 #endif /* PARROT_INTLIST_H_GUARD */

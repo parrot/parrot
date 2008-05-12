@@ -20,6 +20,7 @@ Handles getting of various headers, and pool creation.
 /* HEADERIZER HFILE: include/parrot/headers.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void fix_pmc_syncs(
     ARGMOD(Interp *dest_interp),
@@ -60,6 +61,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

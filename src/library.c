@@ -25,6 +25,7 @@ This file contains a C function to access Parrot's bytecode library functions.
 /* HEADERIZER HFILE: include/parrot/library.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void cnv_to_win32_filesep(ARGMOD(STRING *path))
         __attribute__nonnull__(1)
@@ -90,6 +91,7 @@ static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* path);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

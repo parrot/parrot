@@ -7,6 +7,7 @@
 #define PARROT_IMCC_PBC_H_GUARD
 
 /* HEADERIZER BEGIN: compilers/imcc/pbc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 int e_pbc_close(PARROT_INTERP, SHIM(void *param))
         __attribute__nonnull__(1);
@@ -45,6 +46,7 @@ opcode_t * make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/pbc.c */
 
 #endif /* PARROT_IMCC_PBC_H_GUARD */

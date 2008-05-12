@@ -76,6 +76,7 @@ typedef size_t (*charset_compute_hash_t)(PARROT_INTERP, const STRING *, size_t s
 typedef STRING* (*charset_converter_t)(PARROT_INTERP, STRING *src, STRING *dst);
 
 /* HEADERIZER BEGIN: src/charset.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
@@ -167,6 +168,7 @@ void Parrot_register_charset_converter(SHIM_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/charset.c */
 
 struct _charset {

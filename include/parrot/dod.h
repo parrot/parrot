@@ -50,6 +50,7 @@
             /* trace all but volatile root set, i.e. registers */
 
 /* HEADERIZER BEGIN: src/gc/dod.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
@@ -135,14 +136,17 @@ void used_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/dod.c */
 
 
 /* HEADERIZER BEGIN: src/cpu_dep.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void trace_system_areas(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/cpu_dep.c */
 
 
@@ -154,6 +158,7 @@ extern int CONSERVATIVE_POINTER_CHASING;
 
 /* GC subsystem init functions */
 /* HEADERIZER BEGIN: src/gc/gc_gms.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_gc_gms_init(PARROT_INTERP)
@@ -187,9 +192,11 @@ void parrot_gc_gms_wb_key(PARROT_INTERP,
         __attribute__nonnull__(5)
         __attribute__nonnull__(6);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_gms.c */
 
 /* HEADERIZER BEGIN: src/gc/gc_ims.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void Parrot_dod_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
         __attribute__nonnull__(1)
@@ -201,6 +208,7 @@ void Parrot_dod_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 void Parrot_gc_ims_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ims.c */
 
 /*

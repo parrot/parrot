@@ -16,6 +16,7 @@
 #ifdef PARROT_IN_CORE
 
 /* HEADERIZER BEGIN: src/string_primitives.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CONST_FUNCTION
@@ -42,6 +43,7 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
         FUNC_MODIFIES(*offset)
         FUNC_MODIFIES(*string);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string_primitives.c */
 
 #endif /* PARROT_IN_CORE */

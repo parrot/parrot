@@ -31,6 +31,7 @@
 typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, void *);
 
 /* HEADERIZER BEGIN: src/utils.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 INTVAL Parrot_byte_index(SHIM_INTERP,
@@ -94,10 +95,12 @@ PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/utils.c */
 
 
 /* HEADERIZER BEGIN: src/misc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -171,6 +174,7 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/misc.c */
 
 
@@ -229,6 +233,7 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
     extern const SPRINTF_OBJ va_core;
 
 /* HEADERIZER BEGIN: src/spf_render.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -239,6 +244,7 @@ STRING * Parrot_sprintf_format(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/spf_render.c */
 
 #endif /* IN_SPF_SYSTEM */

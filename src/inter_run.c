@@ -25,6 +25,7 @@ Various functions that call the run loop.
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -38,6 +39,7 @@ static parrot_context_t * runops_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define STACKED_EXCEPTIONS 1

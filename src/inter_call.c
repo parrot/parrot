@@ -26,6 +26,7 @@ subroutines.
 /* HEADERIZER HFILE: include/parrot/inter_call.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void check_for_opt_flag(ARGMOD(call_state *st), int has_arg)
         __attribute__nonnull__(1)
@@ -148,6 +149,7 @@ static void too_many(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

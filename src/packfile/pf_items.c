@@ -34,6 +34,7 @@ C<opcode_t> units.
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void cvt_num12_num8(
     ARGOUT(unsigned char *dest),
@@ -77,6 +78,7 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

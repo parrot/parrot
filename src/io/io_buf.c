@@ -23,6 +23,7 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL PIO_buf_close(PARROT_INTERP,
     ARGIN_NULLOK(ParrotIOLayer *layer),
@@ -141,6 +142,7 @@ static size_t PIO_buf_write(PARROT_INTERP,
         FUNC_MODIFIES(*layer)
         FUNC_MODIFIES(*io);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Defined at bottom */

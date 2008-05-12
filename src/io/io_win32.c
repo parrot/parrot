@@ -33,6 +33,7 @@ Win32 System Programming, 2nd Edition.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL flags_to_win32(
     INTVAL flags,
@@ -169,6 +170,7 @@ static size_t PIO_win32_write(SHIM_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*io);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #  include <tchar.h>

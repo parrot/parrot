@@ -27,6 +27,7 @@ Create or destroy a Parrot interpreter
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 static int is_env_var_set(ARGIN(const char* var))
@@ -35,6 +36,7 @@ static int is_env_var_set(ARGIN(const char* var))
 static void setup_default_compreg(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #if EXEC_CAPABLE

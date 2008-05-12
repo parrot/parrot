@@ -81,6 +81,7 @@ struct QUEUE_ENTRY;
 #define HANDLE_EVENTS(i, n) (opcode_t *)Parrot_do_handle_events((i), 1, (n))
 
 /* HEADERIZER BEGIN: src/events.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_del_timer_event(PARROT_INTERP, ARGIN(const PMC *timer))
@@ -168,6 +169,7 @@ opcode_t * Parrot_sleep_on_event(PARROT_INTERP,
 void Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/events.c */
 
 /* &gen_from_enum(io_thr_msg.pasm) */

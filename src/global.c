@@ -21,6 +21,7 @@ src/global.c - Access to global PMCs
 
 /* HEADERIZER HFILE: include/parrot/global.h */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -45,6 +46,7 @@ static void store_sub_in_multi(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define DEBUG_GLOBAL 0

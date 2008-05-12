@@ -22,6 +22,7 @@ These are parrot's generic encoding handling functions
 /* HEADERIZER HFILE: include/parrot/encoding.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL register_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname),
@@ -30,6 +31,7 @@ static INTVAL register_encoding(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 ENCODING *Parrot_default_encoding_ptr;

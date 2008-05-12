@@ -30,6 +30,7 @@ Moved all register allocation and spill code to reg_alloc.c
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -40,6 +41,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define COMPILE_IMMEDIATE 1

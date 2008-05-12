@@ -50,6 +50,7 @@ static void STM_TRACE_SAFE(const char *x, ...) /* HEADERIZER SKIP */
 /* HEADERIZER HFILE: include/parrot/stm/backend.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -185,6 +186,7 @@ static void * wait_for_version(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*log);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

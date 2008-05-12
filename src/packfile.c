@@ -34,6 +34,7 @@ structure of the frozen bytecode.
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void byte_code_destroy(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(2)
@@ -312,6 +313,7 @@ static int sub_pragma(PARROT_INTERP, int action, ARGIN(const PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #if EXEC_CAPABLE

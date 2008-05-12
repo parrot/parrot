@@ -46,6 +46,7 @@ typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void
 
 
 /* HEADERIZER BEGIN: src/headers.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
@@ -158,6 +159,7 @@ void Parrot_merge_header_pools(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest_interp);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/headers.c */
 
 

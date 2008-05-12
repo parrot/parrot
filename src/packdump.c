@@ -26,6 +26,7 @@ This is only used by the PBC dumper C<pdump>.
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void PackFile_Constant_dump(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
@@ -38,6 +39,7 @@ static void pobj_flag_dump(PARROT_INTERP, ARGIN(long flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

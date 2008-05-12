@@ -22,6 +22,7 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 /* HEADERIZER HFILE: src/encodings/fixed_8.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void become_encoding(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
@@ -155,6 +156,7 @@ static STRING * to_encoding(PARROT_INTERP,
     SHIM(STRING *dest))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl fixed_8")

@@ -73,6 +73,7 @@
  */
 
 /* HEADERIZER BEGIN: compilers/imcc/imc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
@@ -94,10 +95,12 @@ PARROT_CANNOT_RETURN_NULL
 IMC_Unit * imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/imc.c */
 
 
 /* HEADERIZER BEGIN: compilers/imcc/reg_alloc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void free_reglist(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -114,6 +117,7 @@ unsigned int ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/reg_alloc.c */
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
@@ -145,6 +149,7 @@ Instruction * INS_LABEL(PARROT_INTERP,
 /* HEADERIZER END: compilers/imcc/imcparser.c */
 
 /* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 int do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
@@ -340,6 +345,7 @@ int try_find_op(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 
 /* imclexer.c */
@@ -348,6 +354,7 @@ void IMCC_print_inc(PARROT_INTERP);
 /* Call convention independant API */
 
 /* HEADERIZER BEGIN: compilers/imcc/pcc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void expand_pcc_sub(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
@@ -386,6 +393,7 @@ SymReg* get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/pcc.c */
 
 /* pragmas avialable: */

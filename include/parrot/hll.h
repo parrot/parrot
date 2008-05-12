@@ -20,6 +20,7 @@
 #define PARROT_HLL_PARROT 0
 
 /* HEADERIZER BEGIN: src/hll.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -76,6 +77,7 @@ void Parrot_register_HLL_type(PARROT_INTERP,
 void Parrot_init_HLL(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hll.c */
 
 typedef enum HLL_enum_t {

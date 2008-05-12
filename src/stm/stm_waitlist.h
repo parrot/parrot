@@ -54,6 +54,7 @@ typedef struct waitlist_thread_data {
 typedef struct waitlist_head STM_waitlist;
 
 /* HEADERIZER BEGIN: src/stm/waitlist.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
 STM_tx_log * Parrot_STM_tx_log_get(PARROT_INTERP)
@@ -85,6 +86,7 @@ void Parrot_STM_waitlist_signal(PARROT_INTERP,
 void Parrot_STM_waitlist_wait(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/stm/waitlist.c */
 
 #endif /* PARROT_STM_WAITLIST_H_GUARD */

@@ -339,6 +339,7 @@ a sleep opcode.
 /* HEADERIZER HFILE: include/parrot/dod.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static int collect_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
@@ -406,6 +407,7 @@ static int sweep_cb(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pool);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

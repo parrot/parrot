@@ -15,6 +15,7 @@ struct Parrot_STM_PMC_handle_data;
 typedef struct Parrot_STM_PMC_handle_data *Parrot_STM_PMC_handle;
 
 /* HEADERIZER BEGIN: src/stm/backend.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void Parrot_freeze_STM_PMC_handle(PARROT_INTERP,
     ARGMOD(IMAGE_IO *io),
@@ -101,6 +102,7 @@ Parrot_STM_PMC_handle Parrot_thaw_STM_PMC_handle(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/stm/backend.c */
 
 #endif /* PARROT_STM_BACKEND_H_GUARD */

@@ -29,6 +29,7 @@ charset functionality for similar charsets like iso-8859-1.
 /* HEADERIZER HFILE: src/charset/ascii.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, ARGIN(STRING *src))
@@ -127,6 +128,7 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

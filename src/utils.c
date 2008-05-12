@@ -40,6 +40,7 @@ typedef struct parrot_prm_context {
 
 /* HEADERIZER HFILE: include/parrot/misc.h */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static FLOATVAL _drand48(void);
 static FLOATVAL _erand48(_rand_buf buf);
@@ -63,6 +64,7 @@ static void rec_climb_back_and_mark(
         __attribute__nonnull__(2);
 
 static void swap(void **x, void **y);
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define move_reg(from, dest, c) (c)->mov((c)->interp, (unsigned char)(dest), \

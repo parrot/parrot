@@ -24,6 +24,7 @@ UTF-16 encoding with the help of the ICU library.
 /* HEADERIZER HFILE: src/encodings/utf16.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void become_encoding(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
@@ -156,6 +157,7 @@ static void utf16_set_position(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #include "utf16.h"

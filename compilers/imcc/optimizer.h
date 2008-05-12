@@ -9,6 +9,7 @@
 #include "unit.h"
 
 /* HEADERIZER BEGIN: compilers/imcc/optimizer.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 int cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
@@ -104,6 +105,7 @@ int pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/optimizer.c */
 
 #endif /* PARROT_IMCC_OPTIMIZER_H_GUARD */

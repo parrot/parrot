@@ -77,6 +77,7 @@ typedef enum {
 
 
 /* HEADERIZER BEGIN: src/list.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CONST_FUNCTION
@@ -224,6 +225,7 @@ void list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pinfo);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/list.c */
 
 #endif /* PARROT_LIST_H_GUARD */

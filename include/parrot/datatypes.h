@@ -126,6 +126,7 @@ const struct _data_types data_types[] = {
 #endif /* INSIDE_GLOBAL_SETUP */
 
 /* HEADERIZER BEGIN: src/datatypes.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -140,6 +141,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/datatypes.c */
 
 #endif /* PARROT_DATATYPES_H_GUARD */

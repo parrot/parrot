@@ -20,6 +20,7 @@
 #define PARROT_MAX_CLASSES 100
 
 /* HEADERIZER BEGIN: src/pmc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
@@ -94,6 +95,7 @@ void dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc.c */
 
 #endif /* PARROT_PMC_H_GUARD */

@@ -150,6 +150,7 @@ extern ParrotIOLayer pio_string_layer;
 extern INTVAL pio_errno;
 
 /* HEADERIZER BEGIN: src/io/io.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -460,10 +461,12 @@ PIOOFF_T PIO_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/io.c */
 
 /* io_layers.c - If you add new layers, register them in init_layers() */
 /* HEADERIZER BEGIN: src/io/io_layers.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void PIO_base_delete_layer(ARGMOD_NULLOK(ParrotIOLayer *layer));
@@ -509,6 +512,7 @@ void PIO_push_layer_str(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/io_layers.c */
 
 /* Put platform specific macros here if you must */

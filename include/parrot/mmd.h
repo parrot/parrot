@@ -44,6 +44,7 @@ typedef struct _MMD_table {
 
 
 /* HEADERIZER BEGIN: src/mmd.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -221,6 +222,7 @@ void mmd_create_builtin_multi_stub(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/mmd.c */
 
 

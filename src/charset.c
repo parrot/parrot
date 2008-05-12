@@ -61,6 +61,7 @@ static All_charsets *all_charsets;
 /* HEADERIZER HFILE: include/parrot/charset.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL register_charset(PARROT_INTERP,
     ARGIN(const char *charsetname),
@@ -72,6 +73,7 @@ static INTVAL register_charset(PARROT_INTERP,
 static void register_static_converters(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

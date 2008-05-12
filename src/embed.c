@@ -25,6 +25,7 @@ This file implements the Parrot embedding interface.
 /* HEADERIZER HFILE: none */ /* The visible types are different than what we use in here */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static FLOATVAL calibrate(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -52,6 +53,7 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 extern int Parrot_exec_run;

@@ -81,6 +81,7 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 #define  DO_LOOP_OPTIMIZATION 0
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 static int _is_ins_save(
@@ -175,6 +176,7 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 #if DO_LOOP_OPTIMIZATION
 int loop_optimization(Interp *, IMC_Unit *);

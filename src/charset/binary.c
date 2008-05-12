@@ -25,6 +25,7 @@ This file implements the charset functions for binary data
 /* HEADERIZER HFILE: src/charset/binary.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL compare(SHIM_INTERP,
     SHIM(const STRING *lhs),
@@ -105,6 +106,7 @@ static void upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
 static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #ifdef EXCEPTION

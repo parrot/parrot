@@ -141,6 +141,7 @@ struct _ParrotIOData {
 /* HEADERIZER END: src/io/io_layers.c */
 
 /* HEADERIZER BEGIN: src/io/io_passdown.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -371,6 +372,7 @@ size_t PIO_write_down(PARROT_INTERP,
         FUNC_MODIFIES(*io)
         FUNC_MODIFIES(*s);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/io_passdown.c */
 
 /*

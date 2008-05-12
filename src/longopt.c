@@ -24,6 +24,7 @@ This is used by C<parrot>.
 /* HEADERIZER HFILE: include/parrot/longopt.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static int longopt_get_longopt(PARROT_INTERP,
     int argc,
@@ -47,6 +48,7 @@ static int longopt_get_shortopt(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 static char longopt_error_buffer[512];

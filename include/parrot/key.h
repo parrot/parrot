@@ -40,6 +40,7 @@ typedef enum {
     ((PObj_get_FLAGS((k)) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS)
 
 /* HEADERIZER BEGIN: src/key.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
@@ -167,6 +168,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/key.c */
 
 #endif /* PARROT_KEY_H_GUARD */

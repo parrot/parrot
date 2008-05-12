@@ -116,6 +116,7 @@ struct _IMC_Unit;
 /* functions */
 
 /* HEADERIZER BEGIN: compilers/imcc/symreg.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -344,6 +345,7 @@ PARROT_CANNOT_RETURN_NULL
 char * symreg_to_str(ARGIN(const SymReg *s))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/symreg.c */
 
 typedef enum {

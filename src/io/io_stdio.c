@@ -27,6 +27,7 @@ Win32), this is I<buffered> IO, out of necessity.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CONST_FUNCTION
 PARROT_CANNOT_RETURN_NULL
@@ -103,6 +104,7 @@ static size_t PIO_stdio_write(SHIM_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*s);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* XXX Use a declaration in a header file */

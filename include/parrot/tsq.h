@@ -41,6 +41,7 @@ struct QUEUE {
 };
 
 /* HEADERIZER BEGIN: src/tsq.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void insert_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
         __attribute__nonnull__(1)
@@ -117,6 +118,7 @@ QUEUE_ENTRY * wait_for_entry(ARGMOD(QUEUE *queue))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*queue);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/tsq.c */
 
 #endif /* PARROT_TSQ_H_GUARD */

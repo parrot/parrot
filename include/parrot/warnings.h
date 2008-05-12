@@ -54,6 +54,7 @@ typedef enum {
 #include "parrot/parrot.h"
 
 /* HEADERIZER BEGIN: src/warnings.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 INTVAL Parrot_warn(PARROT_INTERP,
@@ -75,6 +76,7 @@ PARROT_API
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/warnings.c */
 
 #endif /* PARROT_IN_CORE */

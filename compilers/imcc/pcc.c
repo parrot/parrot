@@ -36,6 +36,7 @@ PCC Implementation by Leopold Toetsch
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void insert_tail_call(PARROT_INTERP,
     ARGIN(IMC_Unit *unit),
@@ -115,6 +116,7 @@ static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

@@ -396,7 +396,11 @@ sub replace_headerized_declarations {
     my $function_decls = join( "\n", @function_decls );
     my $STARTMARKER    = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
     my $ENDMARKER      = qr#/\* HEADERIZER END: $cfile \*/\n?#;
-    $source_code =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1\n$function_decls\n$2#s
+    my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
+
+    $source_code =~
+        s{($STARTMARKER)(?:.*?)($ENDMARKER)}
+         {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
         or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
 
     return $source_code;

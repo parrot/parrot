@@ -122,6 +122,7 @@ typedef struct Gc_gms_private {
 /* HEADERIZER HFILE: include/parrot/dod.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static int end_cycle_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
@@ -328,6 +329,7 @@ static int trace_igp_cb(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

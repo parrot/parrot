@@ -24,6 +24,7 @@ This file implements the charset functions for unicode data
 /* HEADERIZER HFILE: src/charset/unicode.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL compare(PARROT_INTERP,
     ARGIN(const STRING *lhs),
@@ -144,6 +145,7 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #ifdef EXCEPTION

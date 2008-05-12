@@ -36,6 +36,7 @@
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void add_pcc_named_arg(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
@@ -201,6 +202,7 @@ static void set_lexical(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*r);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

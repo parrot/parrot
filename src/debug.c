@@ -41,6 +41,7 @@ extern void imcc_init(PARROT_INTERP);
 /* HEADERIZER HFILE: include/parrot/debug.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
@@ -105,6 +106,7 @@ PARROT_WARN_UNUSED_RESULT
 static const char * skip_ws(ARGIN(const char *str))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

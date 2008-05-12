@@ -33,6 +33,7 @@ flow of execution between blocks.
 /* HEADERIZER HFILE: compilers/imcc/cfg.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void analyse_life_block(
     ARGIN(const Basic_block* bb),
@@ -143,6 +144,7 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Code: */

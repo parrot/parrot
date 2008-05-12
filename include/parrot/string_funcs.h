@@ -25,6 +25,7 @@
     Parrot_unmake_COW((i), (s)), (s) : (s)
 
 /* HEADERIZER BEGIN: src/string.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -525,6 +526,7 @@ STRING* uint_to_str(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*tc);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string.c */
 
 #endif /* PARROT_IN_CORE */

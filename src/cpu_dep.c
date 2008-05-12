@@ -31,10 +31,12 @@ Remember you read something about it in F<docs/infant.dev>?
 /* HEADERIZER HFILE: include/parrot/dod.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void trace_system_stack(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #ifdef __ia64__

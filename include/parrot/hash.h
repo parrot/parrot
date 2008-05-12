@@ -72,6 +72,7 @@ typedef struct _hash {
 } Hash;
 
 /* HEADERIZER BEGIN: src/hash.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
@@ -235,6 +236,7 @@ void parrot_new_pmc_hash_x(
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*container);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hash.c */
 
 #endif /* PARROT_HASH_H_GUARD */

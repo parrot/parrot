@@ -86,6 +86,7 @@ typedef struct _visit_info {
  */
 
 /* HEADERIZER BEGIN: src/pmc_freeze.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -122,6 +123,7 @@ PMC* Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING* image))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc_freeze.c */
 
 #endif /* PARROT_PMC_FREEZE_H_GUARD */

@@ -35,6 +35,7 @@ and SymbolTable (see symbol.h and symbol.c)
 /* HEADERIZER HFILE: compilers/imcc/symreg.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -87,6 +88,7 @@ static void resize_symhash(ARGMOD(SymHash *hsh))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*hsh);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

@@ -19,11 +19,13 @@
 
 
 /* HEADERIZER BEGIN: src/charset/unicode.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
 const CHARSET * Parrot_charset_unicode_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/charset/unicode.c */
 
 

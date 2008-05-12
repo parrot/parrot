@@ -23,6 +23,7 @@ register allocation pass (F<imcc/reg_alloc.c>).
 /* HEADERIZER HFILE: include/parrot/register.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
         __attribute__nonnull__(1)
@@ -36,6 +37,7 @@ static void init_context(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctx);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

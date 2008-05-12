@@ -13,6 +13,7 @@
 #define PARROT_DYNEXT_H_GUARD
 
 /* HEADERIZER BEGIN: src/dynext.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -43,6 +44,7 @@ PMC * Parrot_load_lib(PARROT_INTERP,
     SHIM(PMC *initializer))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/dynext.c */
 
 #endif /* PARROT_DYNEXT_H_GUARD */

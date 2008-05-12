@@ -102,6 +102,7 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 /* HEADERIZER HFILE: include/parrot/pic.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static int is_pic_func(PARROT_INTERP,
     ARGIN(void **pc),
@@ -192,6 +193,7 @@ static int pass_str(SHIM_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

@@ -12,6 +12,7 @@ typedef struct _Set {
 } Set;
 
 /* HEADERIZER BEGIN: compilers/imcc/sets.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void set_add(ARGMOD(Set *s), int element)
         __attribute__nonnull__(1)
@@ -69,6 +70,7 @@ Set * set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/sets.c */
 
 #endif /* PARROT_IMCC_SETS_H_GUARD */

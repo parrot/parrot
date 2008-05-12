@@ -33,6 +33,7 @@ typedef void (*compact_f) (Interp *, Memory_Pool *);
 /* HEADERIZER HFILE: include/parrot/resources.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -96,6 +97,7 @@ static Memory_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact));
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

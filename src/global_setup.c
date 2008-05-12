@@ -36,10 +36,12 @@ static unsigned int parrot_config_size_stored = 0;
 /* HEADERIZER HFILE: include/parrot/global_setup.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void parrot_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

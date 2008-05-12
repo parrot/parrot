@@ -50,6 +50,7 @@ typedef struct _loop_info {
 struct _IMC_Unit;
 
 /* HEADERIZER BEGIN: compilers/imcc/cfg.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 int blocks_are_connected(
@@ -123,6 +124,7 @@ void search_predecessors_not_in(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* s);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/cfg.c */
 
 #endif /* PARROT_CFG_H_GUARD */

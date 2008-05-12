@@ -16,6 +16,7 @@
 #include "parrot/compiler.h"
 
 /* HEADERIZER BEGIN: src/builtin.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
@@ -46,6 +47,7 @@ int Parrot_is_builtin(
     ARGIN_NULLOK(const char *sig))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/builtin.c */
 
 #endif /* PARROT_BUILTIN_H_GUARD */

@@ -80,6 +80,7 @@ static struct globals {
 
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
@@ -209,6 +210,7 @@ static void verify_signature(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

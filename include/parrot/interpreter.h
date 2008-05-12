@@ -484,6 +484,7 @@ typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interp,
                                        const char * program);
 
 /* HEADERIZER BEGIN: src/inter_create.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
@@ -498,9 +499,11 @@ void Parrot_really_destroy(PARROT_INTERP,
     SHIM(void *arg))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/inter_create.c */
 
 /* HEADERIZER BEGIN: src/inter_run.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -676,9 +679,11 @@ INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP,
 void runops(PARROT_INTERP, size_t offs)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/inter_run.c */
 
 /* HEADERIZER BEGIN: src/inter_cb.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_callback_C(ARGIN(char *external_data), ARGMOD(PMC *user_data))
@@ -714,9 +719,11 @@ void Parrot_run_callback(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* user_data);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/inter_cb.c */
 
 /* HEADERIZER BEGIN: src/inter_misc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 INTVAL interpinfo(PARROT_INTERP, INTVAL what)
@@ -800,6 +807,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/inter_misc.c */
 
 

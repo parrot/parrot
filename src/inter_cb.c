@@ -31,6 +31,7 @@ the C-library.
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void callback_CD(PARROT_INTERP,
     ARGIN(char *external_data),
@@ -45,6 +46,7 @@ static void verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*user_data);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

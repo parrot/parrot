@@ -16,6 +16,7 @@
 #include "parrot/parrot.h"
 
 /* HEADERIZER BEGIN: src/scheduler.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
@@ -127,6 +128,7 @@ void Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/scheduler.c */
 
 /* Timer PMC interface constants */

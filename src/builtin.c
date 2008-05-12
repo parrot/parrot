@@ -86,6 +86,7 @@ static Builtins builtins[] = {
 /* HEADERIZER HFILE: include/parrot/builtin.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -105,6 +106,7 @@ static int find_builtin_s(PARROT_INTERP, ARGIN(const STRING *func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

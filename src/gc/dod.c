@@ -31,6 +31,7 @@ There's also a verbose mode for garbage collection.
 /* HEADERIZER HFILE: include/parrot/dod.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void clear_live_bits(ARGIN(const Small_Object_Pool *pool))
         __attribute__nonnull__(1);
@@ -56,6 +57,7 @@ static int sweep_cb(PARROT_INTERP,
 static int trace_active_PMCs(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

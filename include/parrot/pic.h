@@ -71,6 +71,7 @@ typedef int (*arg_pass_f)(PARROT_INTERP, PMC *sig,
 /* more or less private interfaces */
 
 /* HEADERIZER BEGIN: src/pic.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -128,10 +129,12 @@ void parrot_PIC_prederef(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pc_pred);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic.c */
 
 
 /* HEADERIZER BEGIN: src/pic_jit.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 int parrot_pic_is_safe_to_jit(PARROT_INTERP,
@@ -152,6 +155,7 @@ funcptr_t parrot_pic_JIT_sub(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic_jit.c */
 
 #endif /* PARROT_PIC_H_GUARD */

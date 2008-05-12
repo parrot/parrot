@@ -94,6 +94,7 @@ typedef struct _emittert {
 enum Emitter_type { EMIT_FILE, EMIT_PBC };
 
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
@@ -225,6 +226,7 @@ void subst_ins(
         FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*tmp);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/instructions.c */
 
 /*

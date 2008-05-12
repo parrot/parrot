@@ -23,6 +23,7 @@ src/dynext.c - Dynamic extensions to Parrot
 /* HEADERIZER HFILE: include/parrot/dynext.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -92,6 +93,7 @@ static void store_lib_pmc(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* _PARROTLIB is now the default */

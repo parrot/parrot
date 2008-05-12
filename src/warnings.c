@@ -24,10 +24,12 @@ messages.
 /* HEADERIZER HFILE: include/parrot/warnings.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

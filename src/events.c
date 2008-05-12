@@ -32,6 +32,7 @@ typedef struct pending_io_events {
 
 /* HEADERIZER HFILE: include/parrot/events.h */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -101,6 +102,7 @@ static opcode_t * wait_for_wakeup(PARROT_INTERP,
     ARGIN_NULLOK(opcode_t *next))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

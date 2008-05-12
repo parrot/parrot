@@ -24,6 +24,7 @@ Capture output to a string PMC.
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static size_t PIO_string_read(SHIM_INTERP,
     ARGMOD(ParrotIOLayer *l),
@@ -44,6 +45,7 @@ static size_t PIO_string_write(PARROT_INTERP,
         FUNC_MODIFIES(*l)
         FUNC_MODIFIES(*s);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 static const ParrotIOLayerAPI pio_string_layer_api = {

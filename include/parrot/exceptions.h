@@ -148,6 +148,7 @@ typedef struct parrot_exception_t {
 } Parrot_exception;
 
 /* HEADERIZER BEGIN: src/exceptions.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -297,6 +298,7 @@ PARROT_DOES_NOT_RETURN
 void rethrow_c_exception(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
 
 #define PANIC(interp, message) do_panic(interp, message, __FILE__, __LINE__)

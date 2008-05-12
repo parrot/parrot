@@ -74,6 +74,7 @@ PARROT_API extern ENCODING *Parrot_default_encoding_ptr;
 typedef INTVAL (*encoding_converter_t)(PARROT_INTERP, ENCODING *lhs, ENCODING *rhs);
 
 /* HEADERIZER BEGIN: src/encoding.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -151,6 +152,7 @@ INTVAL Parrot_register_encoding(PARROT_INTERP,
 
 void parrot_deinit_encodings(void);
 void parrot_init_encodings_2(void);
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/encoding.c */
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \

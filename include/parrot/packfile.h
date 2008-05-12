@@ -265,6 +265,7 @@ typedef enum {
 } pbc_action_enum_t;
 
 /* HEADERIZER BEGIN: src/packout.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
@@ -321,9 +322,11 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packout.c */
 
 /* HEADERIZER BEGIN: src/packfile.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void do_sub_pragmas(PARROT_INTERP,
@@ -636,10 +639,12 @@ void default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 void mark_const_subs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile.c */
 
 
 /* HEADERIZER BEGIN: src/packdump.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void PackFile_ConstTable_dump(PARROT_INTERP,
@@ -653,6 +658,7 @@ void PackFile_Fixup_dump(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packdump.c */
 
 /* HEADERIZER BEGIN: src/fingerprint.c */
@@ -670,6 +676,7 @@ size_t PackFile_write_fingerprint(NOTNULL(void *cursor))
 
 
 /* HEADERIZER BEGIN: src/packfile/pf_items.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void PackFile_assign_transforms(ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
@@ -760,6 +767,7 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*cursor);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile/pf_items.c */
 
 
@@ -769,6 +777,7 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 */
 
 /* HEADERIZER BEGIN: src/byteorder.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void fetch_buf_be_12(
     ARGOUT(unsigned char *rb),
@@ -842,6 +851,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
 opcode_t fetch_op_le(opcode_t w);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/byteorder.c */
 
 #endif /* PARROT_PACKFILE_H_GUARD */

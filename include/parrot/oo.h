@@ -55,6 +55,7 @@ typedef enum {
 #define GET_CLASS(obj)          (obj)->vtable->pmc_class
 
 /* HEADERIZER BEGIN: src/oo.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
@@ -238,6 +239,7 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/oo.c */
 
 #endif /* PARROT_OO_H_GUARD */

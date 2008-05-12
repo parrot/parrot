@@ -29,6 +29,7 @@ Handles class and object manipulation.
 /* HEADERIZER HFILE: include/parrot/oo.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -116,6 +117,7 @@ static void rebuild_attrib_stuff(PARROT_INTERP, ARGIN(PMC *_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

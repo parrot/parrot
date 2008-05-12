@@ -46,6 +46,7 @@ ParrotIOLayer pio_unix_layer = {
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CONST_FUNCTION
 static INTVAL flags_to_unix(INTVAL flags);
@@ -194,6 +195,7 @@ static size_t PIO_unix_write(SHIM_INTERP,
         FUNC_MODIFIES(*io)
         FUNC_MODIFIES(*s);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

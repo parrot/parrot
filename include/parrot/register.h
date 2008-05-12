@@ -61,6 +61,7 @@ struct Stack_Chunk;
 struct Parrot_Context;        /* parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: src/gc/register.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_clear_i(PARROT_INTERP)
@@ -128,6 +129,7 @@ struct Parrot_Context * Parrot_dup_context(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/register.c */
 
 #endif /* PARROT_REGISTER_H_GUARD */

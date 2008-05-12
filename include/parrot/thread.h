@@ -162,6 +162,7 @@ typedef struct _Sync {
 } Sync;
 
 /* HEADERIZER BEGIN: src/thread.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_shared_DOD_block(PARROT_INTERP)
@@ -263,6 +264,7 @@ PMC * pt_transfer_sub(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(d);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/thread.c */
 
 #endif /* PARROT_THREAD_H_GUARD */

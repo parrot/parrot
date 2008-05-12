@@ -18,6 +18,7 @@
  */
 
 /* HEADERIZER BEGIN: src/charset/ascii.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL ascii_compare(PARROT_INTERP,
@@ -99,6 +100,7 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET * Parrot_charset_ascii_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/charset/ascii.c */
 
 #endif /* PARROT_CHARSET_ASCII_H_GUARD */

@@ -51,6 +51,7 @@ strings.
 /* HEADERIZER HFILE: include/parrot/string_funcs.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void make_writable(PARROT_INTERP,
     ARGMOD(STRING **s),
@@ -60,6 +61,7 @@ static void make_writable(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

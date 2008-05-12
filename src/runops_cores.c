@@ -31,6 +31,7 @@ F<docs/running.pod> for a fuller description of the runcores and what they do.
 /* HEADERIZER HFILE: src/runops_cores.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -38,6 +39,7 @@ static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

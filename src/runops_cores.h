@@ -17,6 +17,7 @@
 #include "parrot/op.h"
 
 /* HEADERIZER BEGIN: src/runops_cores.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -48,6 +49,7 @@ opcode_t * runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runops_cores.c */
 
 opcode_t *runops_fast_core(PARROT_INTERP, opcode_t *);

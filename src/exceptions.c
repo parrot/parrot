@@ -42,6 +42,7 @@ Define the internal interpreter exceptions.
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -58,6 +59,7 @@ static void run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #include <stdarg.h>

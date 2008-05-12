@@ -30,6 +30,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 /* HEADERIZER HFILE: include/parrot/scheduler.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void scheduler_process_messages(PARROT_INTERP,
     ARGMOD(PMC *scheduler))
@@ -43,6 +44,7 @@ static void scheduler_process_wait_list(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

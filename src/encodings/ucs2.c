@@ -24,6 +24,7 @@ UCS-2 encoding with the help of the ICU library.
 /* HEADERIZER HFILE: src/encodings/ucs2.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void become_encoding(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
@@ -148,6 +149,7 @@ static void ucs2_set_position(SHIM_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #include "ucs2.h"

@@ -28,6 +28,7 @@ RT#48260: Not yet documented!!!
 /* HEADERIZER HFILE: src/stm/stm_waitlist.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void add_entry(
     ARGMOD(STM_waitlist *waitlist),
@@ -80,6 +81,7 @@ static void waitlist_signal_one(ARGMOD(struct waitlist_entry *who))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*who);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define WAITLIST_REMOVE_CHECK 0 /* if set, make sure removes really

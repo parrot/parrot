@@ -56,6 +56,7 @@ typedef const void * Parrot_VTABLE;
 #include "parrot/extend_vtable.h" /* the auto-generated prototypes    */
 
 /* HEADERIZER BEGIN: src/extend.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -384,6 +385,7 @@ PARROT_API
 void Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/extend.c */
 
 #endif /* PARROT_EXTEND_H_GUARD */

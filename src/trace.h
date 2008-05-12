@@ -16,6 +16,7 @@
 #include "parrot/parrot.h"
 
 /* HEADERIZER BEGIN: src/trace.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 int trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(1)
@@ -39,6 +40,7 @@ void trace_op_dump(PARROT_INTERP,
 void trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/trace.c */
 
 #endif /* PARROT_TRACE_H_GUARD */

@@ -24,6 +24,7 @@ Open mmaps the file.
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL PIO_mmap_close(PARROT_INTERP,
     ARGIN(ParrotIOLayer *layer),
@@ -54,6 +55,7 @@ static size_t PIO_mmap_read(PARROT_INTERP,
         FUNC_MODIFIES(*io)
         FUNC_MODIFIES(*buf);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

@@ -24,6 +24,7 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 /* HEADERIZER HFILE: include/parrot/thread.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static Parrot_Interp detach(UINTVAL tid);
 PARROT_CAN_RETURN_NULL
@@ -99,6 +100,7 @@ static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)
 PARROT_CAN_RETURN_NULL
 static void* thread_func(ARGIN_NULLOK(void *arg));
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #if defined THREAD_DEBUG && THREAD_DEBUG

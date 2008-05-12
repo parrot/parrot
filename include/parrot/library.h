@@ -34,6 +34,7 @@ typedef enum {
 } enum_lib_paths;
 
 /* HEADERIZER BEGIN: src/library.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_MALLOC
@@ -78,6 +79,7 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
         FUNC_MODIFIES(*wo_ext)
         FUNC_MODIFIES(*ext);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/library.c */
 
 #endif /* PARROT_LIBRARY_H_GUARD */

@@ -18,6 +18,7 @@
 #include "parrot/interpreter.h"
 
 /* HEADERIZER BEGIN: src/global_setup.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_set_config_hash_internal(
@@ -34,6 +35,7 @@ void init_world_once(PARROT_INTERP)
 void parrot_global_setup_2(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/global_setup.c */
 
 #endif /* PARROT_GLOBAL_SETUP_H_GUARD */

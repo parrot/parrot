@@ -45,6 +45,7 @@ struct longopt_opt_info {
 #define LONGOPT_OPT_INFO_INIT { 1, 0, NULL, NULL, NULL }
 
 /* HEADERIZER BEGIN: src/longopt.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 int longopt_get(PARROT_INTERP,
@@ -58,6 +59,7 @@ int longopt_get(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/longopt.c */
 
 #endif /* PARROT_LONGOPT_H_GUARD */

@@ -170,6 +170,7 @@ typedef struct PDB {
 
 
 /* HEADERIZER BEGIN: src/debug.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 long PDB_add_label(
     ARGMOD(PDB_file_t *file),
@@ -323,6 +324,7 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/debug.c */
 
 

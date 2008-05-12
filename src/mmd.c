@@ -49,6 +49,7 @@ not highest type in table.
 /* HEADERIZER HFILE: include/parrot/mmd.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b);
 static void dump_mmd(PARROT_INTERP, INTVAL function)
@@ -195,6 +196,7 @@ static void mmd_sort_candidates(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

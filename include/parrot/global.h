@@ -14,6 +14,7 @@
 #define PARROT_GLOBAL_H_GUARD
 
 /* HEADERIZER BEGIN: src/global.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -169,6 +170,7 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/global.c */
 
 #endif /* PARROT_GLOBAL_H_GUARD */

@@ -55,6 +55,7 @@ enum {
 /* HEADERIZER HFILE: include/parrot/misc.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void gen_sprintf_call(
     ARGOUT(char *out),
@@ -89,6 +90,7 @@ static STRING* str_append_w_flags(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*src);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 

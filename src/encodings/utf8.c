@@ -25,6 +25,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 /* HEADERIZER HFILE: src/encodings/utf8.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void become_encoding(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
@@ -172,6 +173,7 @@ PARROT_CANNOT_RETURN_NULL
 static const void * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl utf8")

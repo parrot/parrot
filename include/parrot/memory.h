@@ -41,6 +41,7 @@
 #define mem_copy_n_typed(dest, src, n, type) memcpy((dest), (src), (n)*sizeof(type))
 
 /* HEADERIZER BEGIN: src/gc/memory.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 PARROT_MALLOC
@@ -102,6 +103,7 @@ void * mem__internal_realloc(
 void mem_setup_allocator(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/memory.c */
 
 #endif /* PARROT_MEMORY_H_GUARD */

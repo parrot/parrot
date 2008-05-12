@@ -26,6 +26,7 @@ representation.
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static size_t PIO_utf8_read(PARROT_INTERP,
     ARGMOD(ParrotIOLayer *layer),
@@ -50,6 +51,7 @@ static size_t PIO_utf8_write(PARROT_INTERP,
         FUNC_MODIFIES(*io)
         FUNC_MODIFIES(*s);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 static const ParrotIOLayerAPI pio_utf8_layer_api = {

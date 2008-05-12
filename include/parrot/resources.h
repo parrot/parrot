@@ -37,6 +37,7 @@ typedef struct Memory_Pool {
 
 
 /* HEADERIZER BEGIN: src/gc/resources.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void Parrot_allocate(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
         __attribute__nonnull__(1)
@@ -89,6 +90,7 @@ void Parrot_reallocate_string(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/resources.c */
 
 typedef struct Arenas {

@@ -53,6 +53,7 @@ have the same number of elements because there is a one-to-one mapping.
 /* XXX Needs to get done at the same time as the other interpreter files */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void dynop_register_switch(size_t n_old, size_t n_new);
 static void dynop_register_xx(PARROT_INTERP,
@@ -125,6 +126,7 @@ static void stop_prederef(PARROT_INTERP)
 static void turn_ev_check(PARROT_INTERP, int on)
         __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #if EXEC_CAPABLE
