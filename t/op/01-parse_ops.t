@@ -40,32 +40,16 @@ my $object_map = {
 };
 
 my %parse_errors = map { $_ => 1 } qw(
-    abs
-    bnot
-    bnots
-    ceil
     defined
     delete
-    downcase
     eq
     exists
-    floor
-    ge
-    get_hll_namespace
-    get_namespace
-    get_root_namespace
-    gt
     le
     lt
     ne
-    neg
-    not
-    print
     set
     slice
-    titlecase
     typeof
-    upcase
     yield
 );
 
@@ -86,7 +70,6 @@ for my $op (@$Parrot::OpLib::core::ops) {
 
     ## store the test commands
     $cmds{$basename}{ $basename . ' ' . $args }++;
-    $cmds{$basename}{ $op->full_name . ' ' . $args }++;
 }
 
 $ENV{TEST_PROG_ARGS} ||= '';
