@@ -64,6 +64,11 @@ D: Port PAST-pm test to PCT.
 N: Andrew Rodland
 D: vim syntax files and editor doc
 
+N: Andrew Whitworth
+D: PDD09 Garbage Collector
+D: Documentation
+E: wknight8111@gmail.com
+
 N: Andrew Sweger
 D: typo squisher
 E: yDNA@cpan.org
