@@ -528,8 +528,6 @@ sub make_op {
         # on the mode of operation (function calls, switch statements, gotos
         # with labels, etc.).
         #
-        # RT#43719: Complain about using, e.g. $3 in an op with only 2 args.
-        #
 
         $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
         $absolute ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
@@ -568,6 +566,14 @@ sub make_op {
         }
 
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
+
+        # We can only reference as many parameters as we declare
+        my $max_arg_num = @$args;
+        my @found_args = ($body =~ m/{{@(\d+)}}/g);
+        foreach my $arg (@found_args) {
+          die "opcode '$short_name' uses '\$$arg' but only has $max_arg_num parameters.\n" if $arg > $max_arg_num;
+        }
+
 
         my $file_escaped = $file;
         $file_escaped =~ s|(\\)|$1$1|g;    # escape backslashes
