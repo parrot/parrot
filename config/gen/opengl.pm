@@ -251,8 +251,8 @@ sub gen_glut_callbacks {
 
    foreach (@callbacks) {
         $enums     .= "    $_->{enum},\n";
-        $thunks    .= "           void          $_->{thunk}($_->{proto});\n";
-        $reg_funcs .= "PARROT_API void          $_->{glutcb}(PMC *, PMC *);\n";
+        $thunks    .= "           void $_->{thunk}($_->{proto});\n";
+        $reg_funcs .= "PARROT_API void $_->{glutcb}(Parrot_Interp, PMC *);\n";
    }
 
     my $header = <<HEADER;
@@ -299,49 +299,36 @@ $enums
 } GLUT_CALLBACKS;
 
 typedef struct GLUT_CB_data {
-    PMC *sub;
-    PMC *interp_pmc;
+    Parrot_Interp  interp;
+    PMC            *sub;
 } GLUT_CB_data;
 
 GLUT_CB_data callback_data[GLUT_NUM_CALLBACKS];
 
 
-           Parrot_Interp verify_safe(PMC *, PMC *);
-           void          check_notnull_cb(PMC *, PMC *);
+           int  is_safe(Parrot_Interp, PMC *);
 
-           void          glut_timer_func(int);
-PARROT_API void          glutcbTimerFunc(PMC *, PMC *, unsigned int, int);
+           void glut_timer_func(int);
+PARROT_API void glutcbTimerFunc(Parrot_Interp, PMC *, unsigned int, int);
 
 #if GLUT_API_VERSION >= 4
-           void          glut_joystick_func(unsigned int, int, int, int);
-PARROT_API void          glutcbJoystickFunc(PMC *, PMC *, int);
+           void glut_joystick_func(unsigned int, int, int, int);
+PARROT_API void glutcbJoystickFunc(Parrot_Interp, PMC *, int);
 #endif
 
 $thunks
 $reg_funcs
 
-/* Never store a null interp in callback_data */
-void
-check_notnull_cb(PMC *interp_pmc, PMC *sub)
+/* Make sure that interp and sub are sane before running callback sub */
+/* XXXX: Should this do the moral equivalent of PANIC? */
+int
+is_safe(PARROT_INTERP, PMC *sub)
 {
-    if (PMC_IS_NULL(interp_pmc) || (Parrot_Interp) PMC_data(interp_pmc) == NULL)
-        PANIC((Parrot_Interp) PMC_data(interp_pmc),
-              "cannot register callback with null interpreter");
-}
-
-
-/* PANIC before running callback sub if interp or sub are insane;
-   return unwrapped Parrot_Interp if everything OK */
-Parrot_Interp
-verify_safe(PMC *interp_pmc, PMC *sub)
-{
-    Parrot_Interp interp = (Parrot_Interp) PMC_data(interp_pmc);
-
     /* XXXX: Verify that interp still exists */
 
     /* XXXX: Verify that sub exists in interp */
-
-    return PMC_IS_NULL(sub) ? NULL : interp;
+    
+    return PMC_IS_NULL(sub) ? 0 : 1;
 }
 
 
@@ -351,7 +338,7 @@ verify_safe(PMC *interp_pmc, PMC *sub)
 # special timer-related arguments that do not follow the template of all
 # of the other GLUT callbacks
 
-=item C<void glutcbTimerFunc(interp_pmc, sub, milliseconds, data)>
+=item C<void glutcbTimerFunc(PARROT_INTERP, sub, milliseconds, data)>
 
 Register a Sub PMC to handle GLUT Timer callbacks.
 
@@ -362,23 +349,19 @@ Register a Sub PMC to handle GLUT Timer callbacks.
 void
 glut_timer_func(int data)
 {
-    PMC *sub        = callback_data[GLUT_CB_TIMER].sub;
-    PMC *interp_pmc = callback_data[GLUT_CB_TIMER].interp_pmc;
+    Parrot_Interp interp = callback_data[GLUT_CB_TIMER].interp;
+    PMC           *sub   = callback_data[GLUT_CB_TIMER].sub;
 
-    Parrot_Interp interp = verify_safe(interp_pmc, sub);
-
-    if (interp)
+    if (is_safe(interp, sub))
         Parrot_runops_fromc_args_event(interp, sub, "vi", data);
 }
 
 PARROT_API
 void
-glutcbTimerFunc(PMC *interp_pmc, PMC *sub, unsigned int milliseconds, int data)
+glutcbTimerFunc(PARROT_INTERP, PMC *sub, unsigned int milliseconds, int data)
 {
-    check_notnull_cb(interp_pmc, sub);
-
-    callback_data[GLUT_CB_TIMER].sub        = sub;
-    callback_data[GLUT_CB_TIMER].interp_pmc = interp_pmc;
+    callback_data[GLUT_CB_TIMER].interp = interp;
+    callback_data[GLUT_CB_TIMER].sub    = sub;
 
     if (sub == PMCNULL)
         glutTimerFunc(0, NULL, 0);
@@ -390,7 +373,7 @@ glutcbTimerFunc(PMC *interp_pmc, PMC *sub, unsigned int milliseconds, int data)
 #if GLUT_API_VERSION >= 4
 /*
 
-=item C<void glutcbJoystickFunc(interp_pmc, sub, pollinterval)>
+=item C<void glutcbJoystickFunc(PARROT_INTERP, sub, pollinterval)>
 
 Register a Sub PMC to handle GLUT Joystick callbacks.
 
@@ -401,23 +384,19 @@ Register a Sub PMC to handle GLUT Joystick callbacks.
 void
 glut_joystick_func(unsigned int buttons, int xaxis, int yaxis, int zaxis)
 {
-    PMC *sub        = callback_data[GLUT_CB_JOYSTICK].sub;
-    PMC *interp_pmc = callback_data[GLUT_CB_JOYSTICK].interp_pmc;
+    Parrot_Interp interp = callback_data[GLUT_CB_JOYSTICK].interp;
+    PMC           *sub   = callback_data[GLUT_CB_JOYSTICK].sub;
 
-    Parrot_Interp interp = verify_safe(interp_pmc, sub);
-
-    if (interp)
+    if (is_safe(interp, sub))
         Parrot_runops_fromc_args_event(interp, sub, "viiii", buttons, xaxis, yaxis, zaxis);
 }
 
 PARROT_API
 void
-glutcbJoystickFunc(PMC *interp_pmc, PMC *sub, int pollinterval)
+glutcbJoystickFunc(PARROT_INTERP, PMC *sub, int pollinterval)
 {
-    check_notnull_cb(interp_pmc, sub);
-
-    callback_data[GLUT_CB_JOYSTICK].sub        = sub;
-    callback_data[GLUT_CB_JOYSTICK].interp_pmc = interp_pmc;
+    callback_data[GLUT_CB_JOYSTICK].interp = interp;
+    callback_data[GLUT_CB_JOYSTICK].sub    = sub;
 
     if (sub == PMCNULL)
         glutJoystickFunc(NULL, 0);
@@ -425,7 +404,6 @@ glutcbJoystickFunc(PMC *interp_pmc, PMC *sub, int pollinterval)
         glutJoystickFunc(glut_joystick_func, pollinterval);
 }
 #endif
-
 HEADER
 
 
@@ -435,7 +413,7 @@ HEADER
 
 /*
 
-=item C<void $_->{glutcb}(interp_pmc, sub)>
+=item C<void $_->{glutcb}(PARROT_INTERP, sub)>
 
 Register a Sub PMC to handle GLUT $_->{friendly} callbacks.
 
@@ -446,23 +424,19 @@ Register a Sub PMC to handle GLUT $_->{friendly} callbacks.
 void
 $_->{thunk}($_->{params})
 {
-    PMC *sub        = callback_data[$_->{enum}].sub;
-    PMC *interp_pmc = callback_data[$_->{enum}].interp_pmc;
+    Parrot_Interp interp = callback_data[$_->{enum}].interp;
+    PMC           *sub   = callback_data[$_->{enum}].sub;
 
-    Parrot_Interp interp = verify_safe(interp_pmc, sub);
-
-    if (interp)
+    if (is_safe(interp, sub))
         Parrot_runops_fromc_args_event(interp, sub, "$_->{sig}"$_->{args});
 }
 
 PARROT_API
 void
-$_->{glutcb}(PMC *interp_pmc, PMC *sub)
+$_->{glutcb}(PARROT_INTERP, PMC *sub)
 {
-    check_notnull_cb(interp_pmc, sub);
-
-    callback_data[$_->{enum}].sub        = sub;
-    callback_data[$_->{enum}].interp_pmc = interp_pmc;
+    callback_data[$_->{enum}].interp = interp;
+    callback_data[$_->{enum}].sub    = sub;
 
     if (sub == PMCNULL)
         $_->{glut}(NULL);

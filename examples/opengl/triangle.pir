@@ -55,15 +55,12 @@ ASCII key.
     window = glutCreateWindow('Test')
     set_global 'glut_window', window
 
-    .local pmc interp
-    interp = getinterp
-
     .const .Sub draw     = 'draw'
     .const .Sub idle     = 'idle'
     .const .Sub keyboard = 'keyboard'
-    glutcbDisplayFunc (interp, draw)
-    glutcbIdleFunc    (interp, idle)
-    glutcbKeyboardFunc(interp, keyboard)
+    glutcbDisplayFunc (draw)
+    glutcbIdleFunc    (idle)
+    glutcbKeyboardFunc(keyboard)
 
     .local pmc rotating
     rotating = new 'Integer'
