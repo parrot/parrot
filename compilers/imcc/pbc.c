@@ -184,9 +184,6 @@ static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-static int old_blocks(void);
-
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -212,6 +209,13 @@ static void verify_signature(PARROT_INTERP,
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+#ifdef HAS_JIT
+
+PARROT_WARN_UNUSED_RESULT
+static int old_blocks(void);
+
+#endif /* HAS_JIT */
 
 /*
 
