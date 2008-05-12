@@ -165,15 +165,15 @@ inline op abs(out NUM, in NUM) :base_core {
 }
 
 inline op abs(invar PMC) :base_core {
-  $1->vtable->i_absolute(interp, $1);
+  VTABLE_i_absolute(interp, $1);
 }
 
 inline op abs(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->absolute(interp, $2, $1);
+  $1 = VTABLE_absolute(interp, $2, $1);
 }
 
 inline op n_abs(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->absolute(interp, $2, NULL);
+  $1 = VTABLE_absolute(interp, $2, NULL);
 }
 
 ########################################
@@ -317,7 +317,7 @@ inline op dec(inout NUM) :base_core {
 }
 
 inline op dec(invar PMC) :base_core {
-  $1->vtable->decrement(interp, $1);
+  VTABLE_decrement(interp, $1);
 }
 
 ########################################
@@ -501,7 +501,7 @@ inline op inc(inout NUM) :base_core {
 }
 
 inline op inc(invar PMC) :base_core {
-  $1->vtable->increment(interp, $1);
+  VTABLE_increment(interp, $1);
 }
 
 
@@ -621,7 +621,7 @@ inline op neg(inout NUM) :base_core {
 }
 
 inline op neg(invar PMC) :base_core {
-  $1->vtable->i_neg(interp, $1);
+  VTABLE_i_neg(interp, $1);
 }
 
 inline op neg(out INT, in INT) :base_core {
@@ -633,11 +633,11 @@ inline op neg(out NUM, in NUM) :base_core {
 }
 
 inline op neg(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->neg(interp, $2, $1);
+  $1 = VTABLE_neg(interp, $2, $1);
 }
 
 inline op n_neg(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->neg(interp, $2, NULL);
+  $1 = VTABLE_neg(interp, $2, NULL);
 }
 
 ########################################

@@ -169,15 +169,15 @@ inline op typeof(out PMC, invar PMC) {
 }
 
 inline op typeof(out INT, invar PMC) {
-  $1 = $2->vtable->type(interp, $2);
+  $1 = VTABLE_type(interp, $2);
 }
 
 inline op typeof(out INT, invar PMC, in KEY) {
-  $1 = $2->vtable->type_keyed(interp, $2, $3);
+  $1 = VTABLE_type_keyed(interp, $2, $3);
 }
 
 inline op typeof(out INT, invar PMC, in INTKEY) {
-  $1 = $2->vtable->type_keyed_int(interp, $2, $3);
+  $1 = VTABLE_type_keyed_int(interp, $2, $3);
 }
 ########################################
 
@@ -256,7 +256,7 @@ Set $1 to a string representation of $2
 =cut
 
 op get_repr(out STR, invar PMC) {
-    $1 = $2->vtable->get_repr(interp, $2);
+    $1 = VTABLE_get_repr(interp, $2);
 }
 
 =back
@@ -284,7 +284,7 @@ PMC in $1.
 
 op find_method(out PMC, invar PMC, in STR) :flow {
     opcode_t * const resume = expr NEXT();
-    $1 = $2->vtable->find_method(interp, $2, $3);
+    $1 = VTABLE_find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
         real_exception(interp, resume, METH_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", $3,
@@ -313,23 +313,23 @@ Places the answer in INT.
 =cut
 
 inline op defined(out INT, invar PMC) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined(interp, $2);
+  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interp, $2);
 }
 
 inline op defined(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed_int(interp, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed_int(interp, $2, $3);
 }
 
 inline op defined(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed(interp, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed(interp, $2, $3);
 }
 
 inline op exists(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->exists_keyed_int(interp, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_exists_keyed_int(interp, $2, $3);
 }
 
 inline op exists(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0: $2->vtable->exists_keyed(interp, $2, $3);
+  $1 = PMC_IS_NULL($2) ? 0: VTABLE_exists_keyed(interp, $2, $3);
 }
 
 ########################################
@@ -343,11 +343,11 @@ Delete the specified entry $2 from aggregate $1.
 =cut
 
 inline op delete(invar PMC, in KEY) {
-  $1->vtable->delete_keyed(interp, $1, $2);
+  VTABLE_delete_keyed(interp, $1, $2);
 }
 
 inline op delete(invar PMC, in INTKEY) {
-  $1->vtable->delete_keyed_int(interp, $1, $2);
+  VTABLE_delete_keyed_int(interp, $1, $2);
 }
 
 ########################################
@@ -391,19 +391,19 @@ Push $2 onto the end of the aggregate PMC $1, if that operation is defined.
 =cut
 
 inline op push(invar PMC, in INT) {
-    $1->vtable->push_integer(interp, $1, $2);
+    VTABLE_push_integer(interp, $1, $2);
 }
 
 inline op push(invar PMC, in NUM) {
-    $1->vtable->push_float(interp, $1, $2);
+    VTABLE_push_float(interp, $1, $2);
 }
 
 inline op push(invar PMC, in STR) {
-    $1->vtable->push_string(interp, $1, $2);
+    VTABLE_push_string(interp, $1, $2);
 }
 
 inline op push(invar PMC, invar PMC) {
-    $1->vtable->push_pmc(interp, $1, $2);
+    VTABLE_push_pmc(interp, $1, $2);
 }
 
 ########################################
@@ -421,19 +421,19 @@ Pop off last entry in the aggregate $2, placing the result in $1.
 =cut
 
 inline op pop(out INT, invar PMC) {
-    $1 = $2->vtable->pop_integer(interp, $2);
+    $1 = VTABLE_pop_integer(interp, $2);
 }
 
 inline op pop(out NUM, invar PMC) {
-    $1 = $2->vtable->pop_float(interp, $2);
+    $1 = VTABLE_pop_float(interp, $2);
 }
 
 inline op pop(out STR, invar PMC) {
-    $1 = $2->vtable->pop_string(interp, $2);
+    $1 = VTABLE_pop_string(interp, $2);
 }
 
 inline op pop(out PMC, invar PMC) {
-    $1 = $2->vtable->pop_pmc(interp, $2);
+    $1 = VTABLE_pop_pmc(interp, $2);
 }
 
 ########################################
@@ -451,19 +451,19 @@ Unshift $2 onto the front of the aggregate PMC $1.
 =cut
 
 inline op unshift(invar PMC, in INT) {
-    $1->vtable->unshift_integer(interp, $1, $2);
+    VTABLE_unshift_integer(interp, $1, $2);
 }
 
 inline op unshift(invar PMC, in NUM) {
-    $1->vtable->unshift_float(interp, $1, $2);
+    VTABLE_unshift_float(interp, $1, $2);
 }
 
 inline op unshift(invar PMC, in STR) {
-    $1->vtable->unshift_string(interp, $1, $2);
+    VTABLE_unshift_string(interp, $1, $2);
 }
 
 inline op unshift(invar PMC, invar PMC) {
-    $1->vtable->unshift_pmc(interp, $1, $2);
+    VTABLE_unshift_pmc(interp, $1, $2);
 }
 
 ########################################
@@ -481,19 +481,19 @@ Shift off the first entry in the aggregate $2 and places it in $1.
 =cut
 
 inline op shift(out INT, invar PMC) {
-    $1 = $2->vtable->shift_integer(interp, $2);
+    $1 = VTABLE_shift_integer(interp, $2);
 }
 
 inline op shift(out NUM, invar PMC) {
-    $1 = $2->vtable->shift_float(interp, $2);
+    $1 = VTABLE_shift_float(interp, $2);
 }
 
 inline op shift(out STR, invar PMC) {
-    $1 = $2->vtable->shift_string(interp, $2);
+    $1 = VTABLE_shift_string(interp, $2);
 }
 
 inline op shift(out PMC, invar PMC) {
-    $1 = $2->vtable->shift_pmc(interp, $2);
+    $1 = VTABLE_shift_pmc(interp, $2);
 }
 
 
@@ -520,7 +520,7 @@ Set property $2 to value $3 for PMC $1.
 =cut
 
 op setprop(invar PMC, in STR, invar PMC) {
-      $1->vtable->setprop(interp, $1, $2, $3);
+      VTABLE_setprop(interp, $1, $2, $3);
 }
 
 ########################################
@@ -532,7 +532,7 @@ Get property $2 of PMC $3 and put it in $1.
 =cut
 
 op getprop(out PMC, in STR, invar PMC) {
-   $1 = $3->vtable->getprop(interp, $3, $2);
+   $1 = VTABLE_getprop(interp, $3, $2);
 }
 
 ########################################
@@ -544,7 +544,7 @@ Delete property $2 from PMC $1.
 =cut
 
 op delprop(invar PMC, in STR) {
-   $1->vtable->delprop(interp, $1, $2);
+   VTABLE_delprop(interp, $1, $2);
 }
 
 ########################################
@@ -557,7 +557,7 @@ hash doesn't exist, the C<Null> PMC is returned.
 =cut
 
 op prophash(out PMC, invar PMC) {
-   $1 = $2->vtable->getprops(interp, $2);
+   $1 = VTABLE_getprops(interp, $2);
 }
 
 =back

@@ -142,7 +142,7 @@ be reused, they have to be B<clone>d.
 =cut
 
 inline op splice(invar PMC, invar PMC, in INT, in INT) {
-    $1->vtable->splice(interp, $1, $2, $3, $4);
+    VTABLE_splice(interp, $1, $2, $3, $4);
 }
 
 
@@ -164,15 +164,15 @@ Return a new Iterator PMC $1 for aggregate $2.
 =cut
 
 inline op slice(out PMC, invar PMC, in KEY) :base_core {
-    $1 = $2->vtable->slice(interp, $2, $3, 0);
+    $1 = VTABLE_slice(interp, $2, $3, 0);
 }
 
 inline op slice(out PMC, invar PMC, in KEY, inconst INT) :python {
-    $1 = $2->vtable->slice(interp, $2, $3, $4);
+    $1 = VTABLE_slice(interp, $2, $3, $4);
 }
 
 inline op iter(out PMC, invar PMC) :base_core {
-    $1 = $2->vtable->get_iter(interp, $2);
+    $1 = VTABLE_get_iter(interp, $2);
 }
 
 ########################################

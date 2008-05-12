@@ -245,7 +245,7 @@ inline op substr(inout STR, in INT, in INT, in STR) :base_core {
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
-    $1 = $2->vtable->substr_str(interp, $2, $3, $4);
+    $1 = VTABLE_substr_str(interp, $2, $3, $4);
 }
 
 
@@ -294,9 +294,8 @@ inline op sprintf(out STR, in STR, invar PMC) :base_core {
 }
 
 inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
-    $1->vtable->set_string_native(interp, $1,
-        Parrot_psprintf(interp,
-                       $2->vtable->get_string(interp, $2), $3));
+    VTABLE_set_string_native(interp, $1,
+        Parrot_psprintf(interp, VTABLE_get_string(interp, $2), $3));
 }
 
 

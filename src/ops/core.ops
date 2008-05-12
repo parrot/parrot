@@ -320,7 +320,7 @@ op if (invar STR, labelconst INT) {
 }
 
 op if(invar PMC, labelconst INT) {
-    if ($1->vtable->get_bool(interp, $1))
+    if (VTABLE_get_bool(interp, $1))
         goto OFFSET($2);
 }
 
@@ -354,7 +354,7 @@ op unless(invar STR, labelconst INT) {
 }
 
 op unless(invar PMC, labelconst INT) {
-    if (!$1->vtable->get_bool(interp, $1))
+    if (!VTABLE_get_bool(interp, $1))
         goto OFFSET($2);
 }
 
@@ -637,15 +637,15 @@ inline op set_addr(out INT, labelconst INT) {
 }
 
 inline op set_addr(invar PMC, labelconst INT) {
-    $1->vtable->set_pointer(interp, $1, (CUR_OPCODE + $2));
+    VTABLE_set_pointer(interp, $1, (CUR_OPCODE + $2));
 }
 
 inline op set_addr(invar PMC, labelvar INT) {
-    $1->vtable->set_pointer(interp, $1, (void*)$2);
+    VTABLE_set_pointer(interp, $1, (void*)$2);
 }
 
 inline op get_addr(out INT, invar PMC) {
-    void *ptr = $2->vtable->get_pointer(interp, $2);
+    void *ptr = VTABLE_get_pointer(interp, $2);
     $1        = (INTVAL)ptr;
 }
 
@@ -1247,7 +1247,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     char * const name = string_to_cstring(interp, ($3));
     void *ptr         = Parrot_dlsym(
                             PMC_IS_NULL($2) ? NULL :
-                            $2->vtable->defined(interp, $2) ? PMC_data($2) :
+                            VTABLE_defined(interp, $2) ? PMC_data($2) :
                             NULL,
                             name);
 
@@ -1261,7 +1261,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     }
     else {
         $1 = pmc_new(interp, enum_class_NCI);
-        $1->vtable->set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
+        VTABLE_set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
         PObj_get_FLAGS($1) |= PObj_private1_FLAG;
     }
     string_cstring_free(name);

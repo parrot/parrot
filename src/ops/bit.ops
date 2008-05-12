@@ -107,15 +107,15 @@ inline op bnot(out INT, in INT) :base_core {
 }
 
 inline op bnot(invar PMC) :base_core {
-  $1->vtable->i_bitwise_not(interp, $1);
+  VTABLE_i_bitwise_not(interp, $1);
 }
 
 inline op bnot(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->bitwise_not(interp, $2, $1);
+  $1 = VTABLE_bitwise_not(interp, $2, $1);
 }
 
 inline op n_bnot(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->bitwise_not(interp, $2, NULL);
+  $1 = VTABLE_bitwise_not(interp, $2, NULL);
 }
 
 =item B<bnots>(inout STR)
@@ -141,15 +141,15 @@ inline op bnots(out STR, in STR) :base_core {
 }
 
 inline op bnots(invar PMC) :base_core {
-  $1->vtable->i_bitwise_nots(interp, $1);
+  VTABLE_i_bitwise_nots(interp, $1);
 }
 
 inline op bnots(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->bitwise_nots(interp, $2, $1);
+  $1 = VTABLE_bitwise_nots(interp, $2, $1);
 }
 
 inline op n_bnots(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->bitwise_nots(interp, $2, NULL);
+  $1 = VTABLE_bitwise_nots(interp, $2, NULL);
 }
 
 ########################################

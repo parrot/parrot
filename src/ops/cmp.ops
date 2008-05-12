@@ -110,14 +110,14 @@ op eq(invar PMC, in NUM, labelconst INT) :base_core {
    * overriding the compare multi subs wouldn't
    * have any effect with the current code
    */
-  if ($1->vtable->get_number(interp, $1) == $2) {
+  if (VTABLE_get_number(interp, $1) == $2) {
     goto OFFSET($3);
   }
 }
 
 op eq(invar PMC, in STR, labelconst INT) :base_core {
   if (0 == string_equal(interp,
-      $1->vtable->get_string(interp, $1), $2)) {
+      VTABLE_get_string(interp, $1), $2)) {
     goto OFFSET($3);
   }
 }
@@ -207,14 +207,14 @@ op ne(invar PMC, in INT, labelconst INT) :base_core {
 }
 
 op ne(invar PMC, in NUM, labelconst INT) :base_core {
-  if ($1->vtable->get_number(interp, $1) != $2) {
+  if (VTABLE_get_number(interp, $1) != $2) {
     goto OFFSET($3);
   }
 }
 
 op ne(invar PMC, in STR, labelconst INT) :base_core {
   if (0 != string_equal(interp,
-      $1->vtable->get_string(interp, $1), $2)) {
+      VTABLE_get_string(interp, $1), $2)) {
     goto OFFSET($3);
   }
 }
@@ -300,14 +300,14 @@ op lt(invar PMC, in INT, labelconst INT) :base_core {
 }
 
 op lt(invar PMC, in NUM, labelconst INT) :base_core {
-  if ($1->vtable->get_number(interp, $1) < $2) {
+  if (VTABLE_get_number(interp, $1) < $2) {
     goto OFFSET($3);
   }
 }
 
 op lt(invar PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interp,
-      $1->vtable->get_string(interp, $1), $2) < 0) {
+      VTABLE_get_string(interp, $1), $2) < 0) {
     goto OFFSET($3);
   }
 }
@@ -381,14 +381,14 @@ op le(invar PMC, in INT, labelconst INT) :base_core {
 }
 
 op le(invar PMC, in NUM, labelconst INT) :base_core {
-  if ($1->vtable->get_number(interp, $1) <= $2) {
+  if (VTABLE_get_number(interp, $1) <= $2) {
     goto OFFSET($3);
   }
 }
 
 op le(invar PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interp,
-      $1->vtable->get_string(interp, $1), $2) <= 0) {
+      VTABLE_get_string(interp, $1), $2) <= 0) {
     goto OFFSET($3);
   }
 }
@@ -438,14 +438,14 @@ op gt(invar PMC, in INT, labelconst INT) :base_core {
 }
 
 op gt(invar PMC, in NUM, labelconst INT) :base_core {
-  if ($1->vtable->get_number(interp, $1) > $2) {
+  if (VTABLE_get_number(interp, $1) > $2) {
     goto OFFSET($3);
   }
 }
 
 op gt(invar PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interp,
-      $1->vtable->get_string(interp, $1), $2) > 0) {
+      VTABLE_get_string(interp, $1), $2) > 0) {
     goto OFFSET($3);
   }
 }
@@ -495,14 +495,13 @@ op ge(invar PMC, in INT, labelconst INT) :base_core {
 }
 
 op ge(invar PMC, in NUM, labelconst INT) :base_core {
-  if ($1->vtable->get_number(interp, $1) >= $2) {
+  if (VTABLE_get_number(interp, $1) >= $2) {
     goto OFFSET($3);
   }
 }
 
 op ge(invar PMC, in STR, labelconst INT) :base_core {
-  if (string_compare(interp,
-      $1->vtable->get_string(interp, $1), $2) >= 0) {
+  if (string_compare(interp, VTABLE_get_string(interp, $1), $2) >= 0) {
     goto OFFSET($3);
   }
 }
@@ -921,15 +920,15 @@ inline op not(out INT, in INT) :base_core {
 }
 
 inline op not(invar PMC) :base_core {
-  $2->vtable->i_logical_not(interp, $1);
+  VTABLE_i_logical_not(interp, $1);
 }
 
 inline op not(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->logical_not(interp, $2, $1);
+  $1 = VTABLE_logical_not(interp, $2, $1);
 }
 
 inline op n_not(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->logical_not(interp, $2, NULL);
+  $1 = VTABLE_logical_not(interp, $2, NULL);
 }
 
 ########################################
