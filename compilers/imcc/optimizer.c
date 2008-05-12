@@ -83,16 +83,6 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_WARN_UNUSED_RESULT
-static int _is_ins_save(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *check_ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -149,17 +139,6 @@ static int if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-PARROT_WARN_UNUSED_RESULT
-static int is_ins_save(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -178,8 +157,51 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
 #if DO_LOOP_OPTIMIZATION
 int loop_optimization(Interp *, IMC_Unit *);
+
+PARROT_WARN_UNUSED_RESULT
+int _is_ins_save(
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *check_ins),
+    ARGIN(const SymReg *r),
+    int what)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+int is_ins_save(PARROT_INTERP,
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *ins),
+    ARGIN(const SymReg *r),
+    int what)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+PARROT_WARN_UNUSED_RESULT
+int max_loop_depth(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
+int is_invariant(PARROT_INTERP,
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *ins))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+Basic_block * find_outer(
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Basic_block *blk))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+
 #endif
 
 /*
