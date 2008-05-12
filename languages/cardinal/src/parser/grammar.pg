@@ -35,9 +35,14 @@ token term { \n | ';' }
 
 token basic_stmt {
     | <alias> {*}           #= alias
+    | <return_stmt> {*}     #= return_stmt
     | <expr> {*}            #= expr
     | <begin> {*}           #= begin
     | <end> {*}             #= end
+}
+
+token return_stmt {
+    'return' <.ws> <call_args> {*}
 }
 
 rule alias {
@@ -64,9 +69,7 @@ rule expr {
 
 token basic_expr {
     | <assignment> {*}      #= assignment
-    #| <command> {*}         #= command
     | <arg> {*}             #= arg
-    #| <not_command> {*}     #= not_command
     | <not_expr> {*}        #= not_expr
 }
 
@@ -176,7 +179,7 @@ token basic_primary {
     | <not_command> {*}                         #= command
     | <variable> {*}                        #= variable
     | <array> {*}                           #= array
-    | <hash> {*}                            #= hash
+    | <ahash> {*}                            #= ahash
     | <functiondef> {*}                     #= functiondef
     | <if_stmt> {*}                         #= if_stmt
     | <while_stmt> {*}                      #= while_stmt
@@ -312,7 +315,7 @@ rule array {
     {*}
 }
 
-rule hash {
+rule ahash {
     '{' [ [ <args> | <assocs> ] [',']? ]? '}'
     {*}
 }

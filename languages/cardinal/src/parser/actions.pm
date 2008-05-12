@@ -102,6 +102,13 @@ method not_expr($/) {
     make PAST::Op.new( $( $<expr> ), :pirop('not'), :node($/) );
 }
 
+method return_stmt($/) {
+    my $past := $($<call_args>);
+    $past.pasttype('inline');
+    $past.inline('    .return(%0)');
+    make $past;
+}
+
 ## not entirely sure what alias does, but this is a guess...
 method alias($/) {
     my $fname := $<fname>[0];
@@ -409,7 +416,7 @@ method array($/) {
     make $past;
 }
 
-method hash($/) {
+method ahash($/) {
     # XXX handle class stuff
     my $past;
     my $getclass := PAST::Op.new( :inline('    %r = new "Hash"'), :node($/) );
