@@ -16,9 +16,9 @@ token command {
     | '#' \N*
     | [ $<word>=( <expand>?
           [ <quoted_word> [ <before [<[;\n\r\t\ ]>|$]>
-                          | <error: extra characters after close-quote> ]
+                          | <error: 'extra characters after close-quote'> ]
           | <braced_word> [ <before [<[;\n\r\t\ ]>|$]>
-                          | <error: extra characters after close-brace> ]
+                          | <error: 'extra characters after close-brace'> ]
           | $<chunk>=( <substitution> | '$' | <-[[$\\;\n\r\t\ ]>+ )+
           ]
         ) \h*
@@ -32,27 +32,27 @@ token substitution {
 }
 
 token quoted_word {
-    '"' $<chunk>=( <substitution> | '$' | <-[[$\\"]>+ )* [ '"' | <error: missing "> ]
+    '"' $<chunk>=( <substitution> | '$' | <-[[$\\"]>+ )* [ '"' | <error: 'missing "'> ]
 }
 
 token braced_word {
     <PGE::Text::bracketed: {}>
-  | '{' <error: missing close-brace>
+  | '{' <error: 'missing close-brace'>
 }
 
 token command_substitution {
     '[' ']'
   | '[' <[;\n\r\t\ ]>* <subcommand> [ <.ws> <[\r\n;]> <.ws> <subcommand>? ]* ']'
-  | '[' <error: missing close-bracket>
+  | '[' <error: 'missing close-bracket'>
 }
 
 token subcommand {
     | '#' \N*
     | [ $<word>=( <expand>?
           [ <quoted_word> [ <before [<[\];\n\r\t\ ]>|$]>
-                          | <error: extra characters after close-quote> ]
+                          | <error: 'extra characters after close-quote'> ]
           | <braced_word> [ <before [<[\];\n\r\t\ ]>|$]>
-                          | <error: extra characters after close-brace> ]
+                          | <error: 'extra characters after close-brace'> ]
           | $<chunk>=( <substitution> | \$ | <-[[$\]\\;\n\r\t\ ]>+ )+
           ]
         ) \h*
@@ -74,7 +74,7 @@ token backslash_substitution {
 }
 
 token expand {
-    '{*}'<!before:\s>
+    '{*}'<!before \s>
 }
 
 # this is so we can use these rules in [subst]
