@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -105,6 +105,16 @@ pasm_output_is( <<'CODE', $year, "decodelocaltime" );
     set I0, P0[.TM_YEAR]
     print I0
     end
+CODE
+
+pir_output_is(<<'CODE', "Tue Jan  1 00:00:00 2008\n25", "gmtime string length");
+.sub _ :main
+$I0 = 1199145600
+$S0 = gmtime $I0
+print $S0
+$I1 = length $S0
+print $I1
+.end
 CODE
 
 # Local Variables:

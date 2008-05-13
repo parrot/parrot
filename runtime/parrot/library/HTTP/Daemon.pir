@@ -300,7 +300,7 @@ Concat passed arguments and schedule the string for logging.
     n += 3
     now = time
     $S0 = gmtime now
-    chopn $S0, 2	# XXX why 2?
+    chopn $S0, 1	# XXX why 1? asctime is \n terminated
     unshift args, ", "
     unshift args, $S0
     push args, "\n"
