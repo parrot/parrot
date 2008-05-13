@@ -659,7 +659,7 @@ transform past (Lua::Grammar::expr) :language('PIR') {
     $S0 = optok['past']
     past = $P0.'new'('node'=>node, 'name'=>type, 'pasttype'=>$S0)
   L3:
-    $P0 = node.'get_array'()
+    $P0 = node.'list'()
     .local pmc iter, expr
     new iter, 'Iterator', $P0
   L5:

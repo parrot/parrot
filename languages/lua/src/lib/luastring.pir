@@ -362,7 +362,7 @@ are also returned, after the two indices.
     .local pmc res
     new res, 'FixedPMCArray'
     .local pmc capts
-    capts = match.'get_array'()
+    capts = match.'list'()
     unless capts goto L1
     $I1 = capts
     set res, $I1
@@ -850,7 +850,7 @@ is replaced.
 .sub 'onecapture' :anon
     .param pmc match
     .param int i
-    $P0 = match.'get_array'()
+    $P0 = match.'list'()
     $I0 = exists $P0[i]
     unless $I0 goto L1
     $P1 = $P0[i]

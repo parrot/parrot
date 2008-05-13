@@ -134,7 +134,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .sub 'has_call_in_last_op' :method
     $I0 = isa self, 'POST::Ops'
     unless $I0 goto L1
-    $P0 = self.'get_array'()
+    $P0 = self.'list'()
     $I0 = elements $P0
     unless $I0 goto L1
     $P1 = $P0[-1]
