@@ -17,7 +17,7 @@ token empty_list { <quote>? '()' }
 
 token atom { [ <symbol_tag> | <quote> ]? <-[\ \n\r\(\)]>+ }
 
-token quoted_string { <PGE::Text::bracketed: "> }
+token quoted_string { <PGE::Text::bracketed: '"'> }
 
 token quote { \' }
 
