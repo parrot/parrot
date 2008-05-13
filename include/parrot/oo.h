@@ -108,15 +108,6 @@ PMC * Parrot_find_method_with_cache(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-PARROT_CAN_RETURN_NULL
-PMC* Parrot_find_vtable_meth(PARROT_INTERP,
-    ARGIN(PMC *pmc),
-    ARGIN(STRING *meth))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_API
 INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

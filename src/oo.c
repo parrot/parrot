@@ -37,12 +37,6 @@ static PMC* C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void create_deleg_pmc_vtable(PARROT_INTERP,
-    ARGIN(PMC *_class),
-    int full)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void debug_trace_find_meth(PARROT_INTERP,
     ARGIN(const PMC *_class),
     ARGIN(const STRING *name),
@@ -475,58 +469,6 @@ find_vtable_meth_ns(PARROT_INTERP, ARGIN(PMC *ns), INTVAL vtable_index)
 
 /*
 
-=item C<PMC* Parrot_find_vtable_meth>
-
-Given pmc, run through its mro looking for the meth vtable method.
-Return the vtable method PMC if found.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_CAN_RETURN_NULL
-PMC*
-Parrot_find_vtable_meth(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *meth))
-{
-    INTVAL i, n;
-    PMC   *mro;
-    PMC   *_class = pmc;
-
-    /* Get index in Parrot_vtable_slot_names[]. */
-    const INTVAL vtable_index = Parrot_get_vtable_index(interp, meth);
-
-    if (vtable_index == -1)
-        return PMCNULL;
-
-    /* Get class. */
-    if (PObj_is_object_TEST(pmc))
-        _class = GET_CLASS(pmc);
-
-    /* Get MRO and iterate over it to find method with a matching
-       vtable index or double-underscored name. */
-    mro = _class->vtable->mro;
-    n   = VTABLE_elements(interp, mro);
-
-    for (i = 0; i < n; ++i) {
-        PMC *ns     = VTABLE_get_namespace(interp, _class);
-        PMC *_class = VTABLE_get_pmc_keyed_int(interp, mro, i);
-
-        if (!PMC_IS_NULL(ns)) {
-            PMC * const res = find_vtable_meth_ns(interp, ns, vtable_index);
-
-            if (!PMC_IS_NULL(res))
-                return res;
-        }
-    }
-
-    /* If we get here, method is not overridden in the class. */
-    return PMCNULL;
-}
-
-
-/*
-
 =item C<STRING* readable_name>
 
 Given a String or Key PMC return the STRING* representation
@@ -642,76 +584,6 @@ rebuild_attrib_stuff(PARROT_INTERP, ARGIN(PMC *_class))
     /* And note the totals */
     CLASS_ATTRIB_COUNT(_class) = cur_offset;
     Parrot_unblock_DOD(interp);
-}
-
-
-/*
-
-=item C<static void create_deleg_pmc_vtable>
-
-Create a vtable that dispatches either to the contained PMC in the first
-attribute (deleg_pmc) or to an overridden method (delegate), depending
-on the existence of the method for this class.
-
-=cut
-
-*/
-
-static void
-create_deleg_pmc_vtable(PARROT_INTERP, ARGIN(PMC *_class), int full)
-{
-    int         i;
-    const char *meth;
-    STRING      meth_str;
-    DECL_CONST_CAST;
-
-    PMC * const vtable_pmc          = get_attrib_num(PMC_data_typed(_class,
-                                       SLOTTYPE *), PCD_OBJECT_VTABLE);
-    VTABLE * const vtable           = (VTABLE *)PMC_struct_val(vtable_pmc);
-    VTABLE * const ro_vtable        = vtable->ro_variant_vtable;
-    VTABLE * const deleg_pmc_vtable = interp->vtables[enum_class_deleg_pmc];
-    VTABLE * const object_vtable    = interp->vtables[enum_class_Object];
-    VTABLE * const ro_object_vtable = object_vtable->ro_variant_vtable;
-    VTABLE * const delegate_vtable  = interp->vtables[enum_class_delegate];
-
-    memset(&meth_str, 0, sizeof (meth_str));
-
-    meth_str.encoding = Parrot_fixed_8_encoding_ptr;
-    meth_str.charset  = Parrot_default_charset_ptr;
-
-    for (i = 0; (meth = Parrot_vtable_slot_names[i]) != NULL; ++i) {
-        if (!*meth)
-            continue;
-
-        /* strip underscores from method name */
-        meth_str.strstart = (char *)const_cast(meth + 2);
-        meth_str.strlen   = meth_str.bufused = strlen(meth) - 2;
-        meth_str.hashval  = 0;
-
-        if (!PMC_IS_NULL(Parrot_find_vtable_meth(interp, _class, &meth_str))) {
-            /* the method exists; keep the ParrotObject delegate vtable slot */
-            ((void **)vtable)[i] = ((void**)object_vtable)[i];
-            if (ro_vtable)
-                ((void **)ro_vtable)[i] = ((void**)ro_object_vtable)[i];
-        }
-        else if (full) {
-            /*
-             * the method doesn't exist; put in the deleg_pmc vtable,
-             * but only if ParrotObject hasn't overridden the method
-             */
-            if (((void **)delegate_vtable)[i] == ((void**)object_vtable)[i]) {
-                if (ro_vtable)
-                    ((void **)ro_vtable)[i] = ((void**)deleg_pmc_vtable)[i];
-                ((void **)vtable)[i] = ((void**)deleg_pmc_vtable)[i];
-            }
-            else {
-                ((void **)vtable)[i] = ((void**)object_vtable)[i];
-                if (ro_vtable)
-                    ((void **)ro_vtable)[i] = ((void**)ro_object_vtable)[i];
-
-            }
-        }
-    }
 }
 
 
