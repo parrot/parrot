@@ -496,7 +496,7 @@ token escape_sequence {
 
 ## A.1.6 String literals
 token c_string_literal {
-    [L]? '"' <string_literal: "> '"'
+    [L]? <string_literal: '"'>
     {*}
 }
 

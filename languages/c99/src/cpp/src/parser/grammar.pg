@@ -23,12 +23,14 @@ token TOP {
     {*}
 }
 
+token pound { '#' }
+
 regex preprocessing_token {
   | <header_name>
   | <identifier>
   | <pp_number>
   | <character_constant>
-  | <string_literal>
+  | <string_literal: '"'>
   | <!pound> <punctuator>
   | <universal_character_name>
   | <-[# \r\n\t]>\S* ## <-[#]-\S>\S* ##non-whitespace
