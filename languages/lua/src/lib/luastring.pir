@@ -363,7 +363,7 @@ are also returned, after the two indices.
     new res, 'FixedPMCArray'
     .local pmc capts
     capts = match.'get_array'()
-    if null capts goto L1
+    unless capts goto L1
     $I1 = capts
     set res, $I1
     $I0 = 0
