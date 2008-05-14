@@ -14,7 +14,7 @@ token expression {
 }
 
 token subexpression {
-    <simple_expression> [ '[' <list> ']' ]? {*}
+    <simple_expression> [ '[' <llist> ']' ]? {*}
 }
 
 token simple_expression {
@@ -22,9 +22,9 @@ token simple_expression {
     | '(' <expression> ')' {*}                   #= expression
 }
 
-token target { <variable_identifier> [ '[' <list> ']' ]? {*} }
+token target { <variable_identifier> [ '[' <llist> ']' ]? {*} }
 
-token list { $0=(<expression>?) $0=( ';' <expression>? )* }
+token llist { $0=(<expression>?) $0=( ';' <expression>? )* }
 
 token dyadic_identifier  { <[|⍟*⌈⌊○!+−×÷~∧∨⍲⍱<≤=≥>≠⍳⊖↑↓⍴⍕]> }
 
