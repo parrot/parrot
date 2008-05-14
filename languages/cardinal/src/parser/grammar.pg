@@ -120,9 +120,13 @@ token command {
 }
 
 rule call {
-    # [ <primary> $<dot>=['.'|'::'] ]?
-    <operation> <call_args>
+    [ <primary=variable> $<dot>=['.'|'::'] ]?
+    <operation> <call_args> <do_block>?
     {*}
+}
+
+rule do_block {
+    'do' <do_args> <.term>? <comp_stmt> 'end' {*}
 }
 
 rule super_call {
@@ -142,6 +146,10 @@ token operation {
 token call_args {
     | <args> {*}
     | '(' <.ws> <args> <.ws> ')' {*}
+}
+
+token do_args {
+    '|' <.ws> <args> <.ws> '|' {*}
 }
 
 token variable {

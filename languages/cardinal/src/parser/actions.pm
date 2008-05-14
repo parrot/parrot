@@ -328,12 +328,23 @@ method command($/, $key) {
 
 method call($/) {
     my $op := $<operation>;
-    my $past := $( $<call_args> );
+    my $past;
+    if $<call_args> {
+        $past := $( $<call_args> );
+    }
+    else {
+        $past := PAST::Op.new();
+    }
 
     if $<primary> {
         my $invocant := $( $<primary>[0] );
         # XXX what's the diff. between "." and "::", in $<op>[0] ?
         $past.unshift($invocant);
+        $past.pasttype('callmethod');
+    }
+
+    if $<do_block> {
+        $/.panic('do blocks are not yet implemented');
     }
 
     $past.name(~$op);
