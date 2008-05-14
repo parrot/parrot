@@ -14,7 +14,7 @@
 code = 0
 format = AB
 pir = <<PIR
-    ${INS} = concat "  set ${REG}"
+    ${INS} = concat "  clone ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat ", ${REG}"
@@ -43,7 +43,7 @@ PIR
 code = 1
 format = ABx
 pir = <<PIR
-    ${INS} = concat "  set ${REG}"
+    ${INS} = concat "  clone ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat ", ${K}"
@@ -619,7 +619,7 @@ code = 23
 format = ABC
 pir = <<PIR
     ${INS} = concat "  \$I0 = is"
-    unless ${A} goto ${LABEL}_1
+    if ${A} goto ${LABEL}_1
     ${INS} = concat "eq"
     goto ${LABEL}_2
   ${LABEL}_1:
@@ -659,7 +659,7 @@ code = 24
 format = ABC
 pir = <<PIR
     ${INS} = concat "  \$I0 = is"
-    unless ${A} goto ${LABEL}_1
+    if ${A} goto ${LABEL}_1
     ${INS} = concat "lt"
     goto ${LABEL}_2
   ${LABEL}_1:
@@ -699,7 +699,7 @@ code = 25
 format = ABC
 pir = <<PIR
     ${INS} = concat "  \$I0 = is"
-    unless ${A} goto ${LABEL}_1
+    if ${A} goto ${LABEL}_1
     ${INS} = concat "le"
     goto ${LABEL}_2
   ${LABEL}_1:
@@ -748,7 +748,7 @@ pir = <<PIR
     ${INS} = concat " ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat "\n  unless \$I0 goto ${PC}"
+    ${INS} = concat "\n  unless \$I0 goto PC"
     $I0 = ${NEXTPC}
     inc $I0
     $S0 = $I0
