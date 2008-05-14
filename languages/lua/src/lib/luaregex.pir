@@ -187,14 +187,9 @@ Francois Perrad
 .sub '__onload' :anon :load :init
     load_bytecode 'PGE.pbc'
 
-    $P0 = get_class 'PGE::Exp::CCShortcut'
-    $P1 = subclass $P0, 'PGE::Exp::LuaCCShortcut'
-
-    $P0 = get_class 'PGE::Exp::CGroup'
-    $P1 = subclass $P0, 'PGE::Exp::LuaCGroup'
-
-    $P0 = get_class 'PGE::Exp'
-    $P1 = subclass $P0, 'PGE::Exp::LuaBalanced'
+    $P0 = subclass 'PGE::Exp::CCShortcut', 'PGE::Exp::LuaCCShortcut'
+    $P0 = subclass 'PGE::Exp::CGroup', 'PGE::Exp::LuaCGroup'
+    $P0 = subclass 'PGE::Exp', 'PGE::Exp::LuaBalanced'
 .end
 
 .namespace [ 'PGE::LuaRegex' ]
