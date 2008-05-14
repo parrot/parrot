@@ -6,7 +6,7 @@ transform past (ROOT) :language('PIR') {
     result.'namespace'( 'Pheme' )
 
     .local pmc lists
-    lists = node['list']
+    lists = node['pheme_list']
 
     .local pmc iter
     iter = new 'Iterator', lists
@@ -16,7 +16,7 @@ transform past (ROOT) :language('PIR') {
   iter_loop:
     unless iter goto iter_end
     elem = shift iter
-    elem = tree.'get'( 'past', elem, 'list' )
+    elem = tree.'get'( 'past', elem, 'pheme_list' )
 
     result.'push'( elem )
     goto iter_loop
@@ -25,7 +25,7 @@ transform past (ROOT) :language('PIR') {
     .return( result )
 }
 
-transform past (list) :language('PIR') {
+transform past (pheme_list) :language('PIR') {
     .local pmc iter
     iter = new 'Iterator', node
 
