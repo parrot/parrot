@@ -165,7 +165,7 @@ method indexed_variable($/) {
     while $args[0] {
         $past.push( $args.shift() );
     }
-    
+
     make $past;
 }
 
