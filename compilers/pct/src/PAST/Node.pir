@@ -400,6 +400,33 @@ given by "%r", "%t", or "%u" in the C<code> string:
     .return self.'attr'('inline', value, has_value)
 .end
 
+
+=item opattr(hash)
+
+Set a variety of C<PAST::Op> attributes based on entries
+in C<hash>.  Typically C<hash> is an entry in the operator
+precedence table, and the attributes being set correspond
+to traits in the grammar.
+
+=cut
+
+.sub 'opattr' :method
+    .param pmc hash
+
+    $P0 = split ' ', "pasttype pirop inline lvalue"
+    $P1 = new 'Iterator', $P0
+  iter_loop:
+    unless $P1 goto iter_end
+    $S0 = shift $P1
+    $P2 = hash[$S0]
+    if null $P2 goto iter_loop
+    $P3 = find_method self, $S0
+    self.$P3($P2)
+    goto iter_loop
+  iter_end:
+.end
+
+
 =back
 
 =head2 PAST::Stmts

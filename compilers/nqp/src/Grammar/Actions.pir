@@ -11,19 +11,6 @@
     ##  initialize optable with inline PIR
     .local pmc optable
     optable = get_hll_global [ 'NQP::Grammar' ], '$optable'
-    optable['prefix:~'; 'inline'] = <<"        END"
-        ##  inline prefix:~
-        $S0 = %0
-        %r = new 'String'
-        %r = $S0
-        END
-
-    optable['prefix:+'; 'inline'] = <<"        END"
-        ##  inline prefix:+
-        $N0 = %0
-        %r = new 'Float'
-        %r = $N0
-        END
 
     optable['postfix:++'; 'inline'] = <<"        END"
         ##  inline postfix:++
@@ -35,129 +22,6 @@
         ##  inline postfix:--
         clone %r, %0
         dec %0
-        END
-
-    optable['infix:=='; 'inline'] = <<"        END"
-        ##  inline infix:==
-        $I0 = cmp_num %0, %1
-        $I0 = iseq $I0, 0
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:!='; 'inline'] = <<"        END"
-        ##  inline infix:!=
-        $I0 = cmp_num %0, %1
-        $I0 = isne $I0, 0
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:<'; 'inline'] = <<"        END"
-        ##  inline infix:!=
-        $I0 = cmp_num %0, %1
-        $I0 = islt $I0, 0
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:<='; 'inline'] = <<"        END"
-        ##  inline infix:!=
-        $I0 = cmp_num %0, %1
-        $I0 = isle $I0, 0
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:>'; 'inline'] = <<"        END"
-        ##  inline infix:!=
-        $I0 = cmp_num %0, %1
-        $I0 = isgt $I0, 0
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:>='; 'inline'] = <<"        END"
-        ##  inline infix:!=
-        $I0 = cmp_num %0, %1
-        $I0 = isge $I0, 0
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:eq'; 'inline'] = <<"        END"
-        ##  inline infix:eq
-        $S0 = %0
-        $S1 = %1
-        $I0 = iseq $S0, $S1
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:ne'; 'inline'] = <<"        END"
-        ##  inline infix:ne
-        $S0 = %0
-        $S1 = %1
-        $I0 = isne $S0, $S1
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:lt'; 'inline'] = <<"        END"
-        ##  inline infix:lt
-        $S0 = %0
-        $S1 = %1
-        $I0 = islt $S0, $S1
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:le'; 'inline'] = <<"        END"
-        ##  inline infix:le
-        $S0 = %0
-        $S1 = %1
-        $I0 = isle $S0, $S1
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:gt'; 'inline'] = <<"        END"
-        ##  inline infix:gt
-        $S0 = %0
-        $S1 = %1
-        $I0 = isgt $S0, $S1
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:ge'; 'inline'] = <<"        END"
-        ##  inline infix:ge
-        $S0 = %0
-        $S1 = %1
-        $I0 = isge $S0, $S1
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['infix:=:='; 'inline'] = <<"        END"
-        ##  inline infix:=:=
-        $I0 = issame %0, %1
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['prefix:!'; 'inline'] = <<"        END"
-        ##  inline prefix:!
-        $I0 = isfalse %0
-        %r = new 'Integer'
-        %r = $I0
-        END
-
-    optable['prefix:?'; 'inline'] = <<"        END"
-        ##  inline prefix:?
-        $I0 = istrue %0
-        %r = new 'Integer'
-        %r = $I0
         END
 
     .return ()
@@ -1088,10 +952,7 @@
 ##        if ($key eq 'end') { make $($<expr>); }
 ##        my $past := PAST::Op.new( :node($/),
 ##                                  :name($<type>),
-##                                  :pasttype($<top><pasttype>),
-##                                  :pirop($<top><pirop>),
-##                                  :inline($<top><inline>),
-##                                  :lvalue($<top><lvalue>)
+##                                  :opattr($<top>),
 ##                                );
 ##        for @($/) {
 ##            $past.push($($_));
@@ -1108,15 +969,12 @@
     match.'result_object'($P1)
     .return ()
   expr_reduce:
-    .local pmc past
-    .local string name, pirop, pasttype, inline, lvalue
+    .local pmc past, opattr
+    .local string name
     name = match['type']
-    pirop = match['top';'pirop']
-    pasttype = match['top'; 'pasttype']
-    inline = match['top'; 'inline']
-    lvalue = match['top'; 'lvalue']
+    opattr = match['top']
     $P0 = get_hll_global ['PAST'], 'Op'
-    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype, 'inline'=>inline, 'lvalue'=>lvalue)
+    past = $P0.'new'('node'=>match, 'name'=>name, 'opattr'=>opattr)
     $P1 = match.'list'()
     if null $P1 goto iter_end
     .local pmc iter

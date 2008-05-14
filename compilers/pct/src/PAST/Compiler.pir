@@ -7,7 +7,36 @@ PAST::Compiler - PAST Compiler
 PAST::Compiler implements a basic compiler for PAST nodes.
 By default PAST::Compiler transforms a PAST tree into POST.
 
+=head2 Signature Flags
+
+Throughout the compiler PAST uses a number of 1-character
+"flags" to indicate allowable register types and conversions.
+This helps the compiler generate more efficient code and know
+what sorts of conversions are allowed (or desired).  The
+basic flags are:
+
+    P,S,I,N   PMC, string, int, or num register
+    s         string register or constant
+    i         int register or constant
+    n         num register or constant
+    r         any register result
+    v         void (no result)
+    *         any result type except void
+    +         PMC, int register, num register, or numeric constant
+    ~         PMC, string register, or string constant
+    :         argument (same as '*'), possibly with :named or :flat
+
+These flags are used to describe signatures and desired return
+types for various operations.  For example, if an opcode is
+specified with a signature of C<I~P*>, then the opcode places
+its result in an int register, its first child is coerced into
+some sort of string value, its second child is coerced into a
+PMC register, and the third and subsequent children can return
+any value type.
+
 =cut
+
+.include "cclass.pasm"
 
 .namespace [ 'PAST::Compiler' ]
 
@@ -21,8 +50,12 @@ By default PAST::Compiler transforms a PAST tree into POST.
     $P1 = split ' ', 'post pir evalpmc'
     $P0.'stages'($P1)
 
+    ##  %piropsig is a table of common opcode signatures
     .local pmc piropsig
     piropsig = new 'Hash'
+    piropsig['isfalse']  = 'IP'
+    piropsig['issame']   = 'IPP'
+    piropsig['istrue']   = 'IP'
     piropsig['n_abs']    = 'PP'
     piropsig['n_add']    = 'PP+'
     piropsig['n_band']   = 'PPP'
@@ -42,12 +75,22 @@ By default PAST::Compiler transforms a PAST tree into POST.
     piropsig['set']      = 'PP'
     set_global '%piropsig', piropsig
 
+    ##  %valflags specifies when PAST::Val nodes are allowed to
+    ##  be used as a constant.  The 'e' flag indicates that the
+    ##  value must be quoted+escaped in PIR code.
     .local pmc valflags
     valflags = new 'Hash'
-    valflags['String']   = '~*:e'
-    valflags['Integer']  = '+*:'
-    valflags['Float']    = '+*:'
+    valflags['String']   = 's~*:e'
+    valflags['Integer']  = 'i+*:'
+    valflags['Float']    = 'n+*:'
     set_global '%valflags', valflags
+
+    $P0 = new 'CodeString'
+    set_global '%!codestring', $P0
+
+    $P0 = new 'Integer'
+    $P0 = 11
+    set_global '$!serno', $P0
 
     .return ()
 .end
@@ -81,22 +124,199 @@ Compile the abstract syntax tree given by C<past> into POST.
     .return self.'as_post'(past, 'rtype'=>'v')
 .end
 
+=item escape(str)
+
+Return C<str> as a PIR constant string.
+
+=cut
+
+.sub 'escape' :method
+    .param string str
+    $P0 = get_global '%!codestring'
+    str = $P0.'escape'(str)
+    .return (str)
+.end
+
+=item unique([STR fmt])
+
+Generate a unique number that can be used as an identifier.
+If C<fmt> is provided, then it will be used as a prefix to the
+unique number.
+
+=cut
+
+.sub 'unique' :method
+    .param string fmt          :optional
+    .param int has_fmt         :opt_flag
+
+    if has_fmt goto unique_1
+    fmt = ''
+  unique_1:
+    $P0 = get_global '$!serno'
+    $S0 = $P0
+    $S0 = concat fmt, $S0
+    inc $P0
+    .return ($S0)
+.end
+
+=item uniquereg(rtype)
+
+Generate a unique register based on C<rtype>, where C<rtype>
+is one of the signature flags described above.
+
+=cut
+
+.sub 'uniquereg' :method
+    .param string rtype
+    unless rtype goto err_nortype
+    if rtype == 'v' goto reg_void
+    .local string reg
+    reg = 'P'
+    $I0 = index 'Ss~Nn+Ii', rtype
+    if $I0 < 0 goto reg_psin
+    reg = substr 'SSSNNNII', $I0, 1
+  reg_psin:
+    reg = concat '$', reg
+    .return self.'unique'(reg)
+  reg_void:
+    .return ('')
+  err_nortype:
+    self.panic('rtype not set')
+.end
+
+=item coerce(post, rtype)
+
+Return a POST tree that coerces the result of C<post> to have a
+return value compatible with C<rtype>.  C<rtype> can also be
+a specific register, in which case the result of C<post> is
+forced into that register (with conversions as needed).
+
+=cut
+
+.sub 'coerce' :method
+    .param pmc post
+    .param string rtype
+
+    unless rtype goto err_nortype
+
+    .local string pmctype, result, rrtype
+    null pmctype
+    null result
+
+    ##  if rtype is a register, then set result and use the register
+    ##  type as rtype
+    $S0 = substr rtype, 0, 1
+    unless $S0 == '$' goto have_rtype
+    result = rtype
+    rtype = substr result, 1, 1
+  have_rtype:
+
+    ##  these rtypes allow any return value, so no coercion needed.
+    $I0 = index 'v*:', rtype
+    if $I0 >= 0 goto end
+
+    ##  figure out what type of result we already have
+    .local string source
+    source = post.'result'()
+    $S0 = substr source, 0, 1
+    if $S0 == '$' goto source_reg
+    if $S0 == '"' goto source_str
+    if $S0 == '.' goto source_int_or_num
+    if $S0 == '-' goto source_int_or_num
+    $I0 = is_cclass .CCLASS_NUMERIC, source, 0
+    if $I0 goto source_int_or_num
+    $S0 = substr source, 0, 8
+    if $S0 == 'unicode:' goto source_str
+    ##  assume that whatever is left acts like a PMC
+    goto source_pmc
+
+  source_reg:
+    ##  source is some sort of register
+    ##  if a register is all we need, we're done
+    if rtype == 'r' goto end
+    $S0 = substr source, 1, 1
+    ##  if we have the correct register type already, we're done
+    if $S0 != rtype goto source_reg_1
+    unless result goto end
+    goto coerce_reg
+  source_reg_1:
+    $S0 = downcase $S0
+    if $S0 == rtype goto end
+    ##  figure it out based on the register type
+    if $S0 == 's' goto source_str
+    if rtype == '+' goto end
+    if $S0 == 'i' goto source_int
+    if $S0 == 'n' goto source_num
+  source_pmc:
+    $I0 = index 'SINsin', rtype
+    if $I0 < 0 goto end
+    goto coerce_reg
+
+  source_str:
+    if rtype == '~' goto end
+    if rtype == 's' goto end
+    rrtype = 'S'
+    pmctype = "'String'"
+    goto coerce_reg
+
+  source_int_or_num:
+    if rtype == '+' goto end
+    ##  existence of an 'e' or '.' implies num
+    $I0 = index source, '.'
+    if $I0 >= 0 goto source_num
+    $I0 = index source, 'E'
+    if $I0 >= 0 goto source_num
+
+  source_int:
+    if rtype == 'i' goto end
+    rrtype = 'I'
+    pmctype = "'Integer'"
+    goto coerce_reg
+
+  source_num:
+    if rtype == 'n' goto end
+    rrtype = 'N'
+    pmctype = "'Float'"
+
+  coerce_reg:
+    ##  okay, we know we have to do a coercion.
+    ##  If we just need the value in a register (rtype == 'r'),
+    ##  then create result based on the preferred register type (rrtype).
+    if rtype != 'r' goto coerce_reg_1
+    result = self.'uniquereg'(rrtype)
+  coerce_reg_1:
+    ##  if we haven't set the result target yet, then generate one
+    ##  based on rtype.  (The case of rtype == 'r' was handled above.)
+    if result goto coerce_reg_2
+    result = self.'uniquereg'(rtype)
+  coerce_reg_2:
+    ##  create a new ops node to hold the coercion, put C<post> in it.
+    $P0 = get_hll_global ['POST'], 'Ops'
+    post = $P0.'new'(post, 'result'=>result)
+    ##  if we need a new pmc (rtype == 'P' && pmctype defined), create it
+    if rtype != 'P' goto have_result
+    unless pmctype goto have_result
+    post.'push_pirop'('new', result, pmctype)
+  have_result:
+    ##  store the value into the target register
+    post.'push_pirop'('set', result, source)
+
+  end:
+    .return (post)
+
+  err_nortype:
+    self.panic('rtype not set')
+.end
+
+
 =item post_children(node [, 'signature'=>signature] )
 
 Return the POST representation of evaluating all of C<node>'s
 children in sequence.  The C<signature> option is a string of
-characters that allow the caller to suggest the type of
-result that should be returned by each child:
-
-    *     Anything
-    P     PMC register
-    +     PMC, numeric register, or numeric constant
-    ~     PMC, string register, or string constant
-    :     Argument (same as '*'), possibly with :named or :flat
-    v     void result (result value not used)
-
-The first character of C<signature> is ignored (return type),
-thus C<v~P*> says that the first child needs to be something
+flags as described in "Signature Flags" above.  Since we're
+just evaluating children nodes, the first character of
+C<signature> (return value type) is ignored.  Thus a C<signature>
+of C<v~P*> says that the first child needs to be something
 in string context, the second child should be a PMC, and the
 third and subsequent children can be any value they wish.
 
@@ -142,6 +362,7 @@ third and subsequent children can be any value they wish.
     .local pmc cpast, cpost
     cpast = shift iter
     cpost = self.'as_post'(cpast, 'rtype'=>rtype)
+    cpost = self.'coerce'(cpost, rtype)
     ops.'push'(cpost)
     .local pmc is_flat
     is_flat = cpast.'flat'()
@@ -193,57 +414,88 @@ POST equivalents.
 
 =over 4
 
-=item as_post(node)
+=item as_post(node) (General)
 
 Return a POST representation of C<node>.  Note that C<post> is
 a multimethod based on the type of its first argument, this is
 the method that is called when no other methods match.
 
-If C<node> is an instance of C<PAST::Node>  (meaning that none
-of the other C<post> multimethods were invoked), then return
-the POST representation of C<node>'s children, with the result
-of the node being the result of the last child.
+=item as_post(Any)
 
-If C<node> revaluates to false, return an empty POST node.
-
-Otherwise, C<node> is treated as a string, and a POST node
-is returned to create a new object of the type given by C<node>.
-This is useful for vivifying values with a simple type name
-instead of an entire PAST structure.
+This is the "fallback" method for any unrecognized node types.
+We use this to throw a more useful exception in case any non-PAST
+nodes make it into the tree.
 
 =cut
 
 .sub 'as_post' :method :multi(_, _)
     .param pmc node
     .param pmc options         :slurpy :named
+    $S0 = typeof node
+    self.panic("PAST::Compiler can't compile node of type ", $S0)
+.end
 
-    .local pmc ops
-    $I0 = isa node, 'PAST::Node'
-    if $I0 goto from_past
-    unless node goto from_nothing
-  from_string:
+=item as_post(Undef)
+
+Return an empty POST node that can be used to hold a (PMC) result.
+
+=cut
+
+.sub 'as_post' :method :multi(_, Undef)
+    .param pmc node
+    .param pmc options         :slurpy :named
+    .local string result
+    $P0 = get_hll_global ['POST'], 'Ops'
+    result = self.'uniquereg'('P')
+    .return $P0.'new'('result'=>result)
+.end
+
+=item as_post(String class)
+
+Generate POST to create a new object of type C<class>.  This
+is typically invoked by the various vivification methods below
+(e.g., in a PAST::Var node to default a variable to a given type).
+
+=cut
+
+.sub 'as_post' :method :multi(_, String)
+    .param pmc node
+    .param pmc options         :slurpy :named
+
     .local string result
     $P0 = get_hll_global ['POST'], 'Op'
-    result = $P0.'unique'('$P')
-    $S0 = $P0.'escape'(node)
+    result = self.'uniquereg'('P')
+    $S0 = self.'escape'(node)
     .return $P0.'new'(result, $S0, 'pirop'=>'new', 'result'=>result)
+.end
 
-  from_nothing:
-    $P0 = get_hll_global ['POST'], 'Ops'
-    result = $P0.'unique'('$P')
-    .return $P0.'new'('result'=>result)
+=item as_post(PAST::Node node)
 
-  from_past:
+Return the POST representation of executing C<node>'s children in
+sequence.  The result of the final child is used as the result
+of this node.
+
+N.B.:  This method is also the one that is invoked for converting
+nodes of type C<PAST::Stmts>.
+
+=cut
+
+.sub 'as_post' :method :multi(_, PAST::Node)
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc ops
+    .local string rtype
+    rtype = options['rtype']
     $P0 = node.'list'()
     $I0 = elements $P0
     $S0 = repeat 'v', $I0
-    concat $S0, 'P'
+    concat $S0, rtype
     ops = self.'post_children'(node, 'signature'=>$S0)
     $P0 = ops[-1]
     ops.'result'($P0)
     .return (ops)
 .end
-
 
 =back
 
@@ -269,7 +521,7 @@ Return the POST representation of a C<PAST::Block>.
     .local string name
     name = node.'name'()
     if name goto have_name
-    name = node.'unique'('_block')
+    name = self.'unique'('_block')
   have_name:
 
     ##  create a POST::Sub node for this block
@@ -327,11 +579,11 @@ Return the POST representation of a C<PAST::Block>.
     if compiler goto children_compiler
 
   children_past:
-    ##  all children but last can return anything, last returns PMC
+    ##  all children but last are void context, last returns anything
     $P0 = node.'list'()
     $I0 = elements $P0
     $S0 = repeat 'v', $I0
-    concat $S0, 'P'
+    concat $S0, '*'
     ##  convert children to post
     .local pmc ops
     ops = self.'post_children'(node, 'signature'=>$S0)
@@ -355,43 +607,41 @@ Return the POST representation of a C<PAST::Block>.
     set_global '$?SUB', outerpost
     setattribute self, '%!symtable', outersym
 
-    ##  get a result register if we need it
-    .local string rtype, result
-    result = ''
-    rtype = options['rtype']
-    if rtype == 'v' goto have_result
-    result = bpost.'unique'('$P')
-  have_result:
-
-    name = bpost.'escape'(name)
+    ##  determine name and namespace
+    name = self.'escape'(name)
     $I0 = defined ns
     unless $I0 goto have_ns_key
-    $P0 = new 'CodeString'
+    $P0 = get_global '%!codestring'
     ns = $P0.'key'(ns)
   have_ns_key:
 
+    .local string rtype, result
+    rtype = options['rtype']
+
     if blocktype == 'immediate' goto block_immediate
     if rtype == 'v' goto block_done
+    result = self.'uniquereg'('P')
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
-    bpost.'push_pirop'('get_global', result, name, 'result'=>result)
+    bpost.'push_pirop'('get_global', result, name)
     goto block_done
   block_decl_ns:
-    bpost.'push_pirop'('get_hll_global', result, ns, name, 'result'=>result)
+    bpost.'push_pirop'('get_hll_global', result, ns, name)
     goto block_done
 
   block_immediate:
+    result = self.'uniquereg'(rtype)
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_immediate_ns
-    $S0 = bpost.'unique'('$P')
+    $S0 = '$P10'
     bpost.'push_pirop'('get_global', $S0, name)
     bpost.'push_pirop'('newclosure', $S0, $S0)
     bpost.'push_pirop'('call', $S0, 'result'=>result)
     goto block_done
   block_immediate_ns:
-    $S0 = bpost.'unique'('$P')
+    $S0 = '$P10'
     bpost.'push_pirop'('get_hll_global', $S0, ns, name, 'result'=>$S0)
     bpost.'push_pirop'('call', $S0, 'result'=>result)
 
@@ -464,6 +714,14 @@ a 'pasttype' of 'pirop'.
 
     .local string pirop, signature
     pirop = node.'pirop'()
+    ##  see if pirop is of form "pirop signature"
+    $I0 = index pirop, ' '
+    if $I0 < 0 goto pirop_1
+    $I1 = $I0 + 1
+    signature = substr pirop, $I1
+    pirop = substr pirop, 0, $I0
+    goto have_signature
+  pirop_1:
     $P0 = get_global '%piropsig'
     signature = $P0[pirop]
     if signature goto have_signature
@@ -480,7 +738,7 @@ a 'pasttype' of 'pirop'.
     if $S0 == 'v' goto pirop_void
   pirop_reg:
     .local string result
-    result = ops.'unique'('$P')
+    result = self.'uniquereg'($S0)
     ops.'result'(result)
     ops.'push_pirop'(pirop, result, arglist :flat)
     .return (ops)
@@ -523,20 +781,16 @@ for calling a sub.
     goto children_done
   call_by_name:
     (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
-    $S0 = ops.'escape'(name)
+    $S0 = self.'escape'(name)
     unshift posargs, $S0
   children_done:
 
     ##  generate the call itself
     .local string result, rtype
-    result = ''
     rtype = options['rtype']
-    if rtype == 'v' goto result_done
-    result = ops.'unique'('$P')
-    ops.'result'(result)
-  result_done:
-
+    result = self.'uniquereg'(rtype)
     ops.'push_pirop'(pasttype, posargs :flat, namedargs :flat, 'result'=>result)
+    ops.'result'(result)
     .return (ops)
 .end
 
@@ -568,18 +822,20 @@ a 'pasttype' of if/unless.
     .param pmc node
     .param pmc options         :slurpy :named
 
-    .local string rtype
+    .local pmc opsclass, ops
+    opsclass = get_hll_global ['POST'], 'Ops'
+    ops = opsclass.'new'('node'=>node)
+
+    .local string rtype, result
     rtype = options['rtype']
+    result = self.'uniquereg'(rtype)
+    ops.'result'(result)
 
     .local string pasttype
     pasttype = node.'pasttype'()
 
-    .local pmc ops
-    $P0 = get_hll_global ['POST'], 'Ops'
-    ops = $P0.'new'('node'=>node)
-
-    .local pmc exprpast, thenpast, elsepast
-    .local pmc exprpost, thenpost, elsepost
+    .local pmc exprpast, thenpast, elsepast, childpast
+    .local pmc exprpost, thenpost, elsepost, childpost
     exprpast = node[0]
     thenpast = node[1]
     elsepast = node[2]
@@ -587,33 +843,73 @@ a 'pasttype' of if/unless.
     .local pmc thenlabel, endlabel
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = concat pasttype, '_'
-    $S0 = ops.'unique'($S0)
+    $S0 = self.'unique'($S0)
     thenlabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
 
-    exprpost = self.'as_post'(exprpast, 'rtype'=>'P')
+    .local string exprrtype, childrtype
+    exprrtype = 'r'
+    if rtype != 'v' goto have_exprrtype
+    exprrtype = '*'
+  have_exprrtype:
+    childrtype = rtype
+    $I0 = index '*:', rtype
+    if $I0 < 0 goto have_childrtype
+    childrtype = 'P'
+  have_childrtype:
+
+    exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
+
+    childpast = thenpast
+    bsr make_childpost
+    thenpost = childpost
+    childpast = elsepast
+    bsr make_childpost
+    elsepost = childpost
+
+    if null elsepost goto no_elsepost
+
     ops.'push'(exprpost)
-    ops.'result'(exprpost)
     ops.'push_pirop'(pasttype, exprpost, thenlabel)
-    $I0 = defined elsepast
-    unless $I0 goto else_done
-    elsepost = self.'as_post'(elsepast, 'rtype'=>'P')
+    if null elsepost goto else_done
     ops.'push'(elsepost)
-    if rtype == 'v' goto else_done
-    ops.'push_pirop'('set', ops, elsepost)
   else_done:
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(thenlabel)
-    $I0 = defined thenpast
-    unless $I0 goto then_done
-    thenpost = self.'as_post'(thenpast, 'rtype'=>'P')
+    if null thenpost goto then_done
     ops.'push'(thenpost)
-    if rtype == 'v' goto then_done
-    ops.'push_pirop'('set', ops, thenpost)
   then_done:
     ops.'push'(endlabel)
     .return (ops)
+
+  no_elsepost:
+    $S0 = 'if'
+    unless pasttype == $S0 goto no_elsepost_1
+    $S0 = 'unless'
+  no_elsepost_1:
+    ops.'push'(exprpost)
+    ops.'push_pirop'($S0, exprpost, endlabel)
+    if null thenpost goto no_elsepost_2
+    ops.'push'(thenpost)
+  no_elsepost_2:
+    ops.'push'(endlabel)
+    .return (ops)
+
+  make_childpost:
+    null childpost
+    $I0 = defined childpast
+    unless $I0 goto no_childpast
+    childpost = self.'as_post'(childpast, 'rtype'=>childrtype)
+    goto childpost_coerce
+  no_childpast:
+    if rtype == 'v' goto ret_childpost
+    childpost = opsclass.'new'('result'=>exprpost)
+  childpost_coerce:
+    unless result goto ret_childpost
+    childpost = self.'coerce'(childpost, result)
+  ret_childpost:
+    ret
 .end
 
 .sub 'unless' :method :multi(_, ['PAST::Op'])
@@ -650,7 +946,7 @@ Return the POST representation of a C<while> or C<until> loop.
     .local pmc looplabel, endlabel
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = concat pasttype, '_'
-    $S0 = ops.'unique'($S0)
+    $S0 = self.'unique'($S0)
     looplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
@@ -663,8 +959,15 @@ Return the POST representation of a C<while> or C<until> loop.
     iftype = 'unless'
   have_iftype:
 
+    .local string rtype, exprrtype
+    rtype = options['rtype']
+    exprrtype = 'r'
+    if rtype != 'v' goto have_exprrtype
+    exprrtype = '*'
+  have_exprrtype:
+
     ops.'push'(looplabel)
-    exprpost = self.'as_post'(exprpast, 'rtype'=>'P')
+    exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
     ops.'push'(exprpost)
     ops.'push_pirop'(iftype, exprpost, endlabel)
     bodypost = self.'as_post'(bodypast, 'rtype'=>'v')
@@ -718,10 +1021,17 @@ Return the POST representation of a C<repeat_while> or C<repeat_until> loop.
     iftype = 'unless'
   have_iftype:
 
+    .local string rtype, exprrtype
+    rtype = options['rtype']
+    exprrtype = 'r'
+    if rtype != 'v' goto have_exprrtype
+    exprrtype = '*'
+  have_exprrtype:
+
     ops.'push'(looplabel)
     bodypost = self.'as_post'(bodypast, 'rtype'=>'v')
     ops.'push'(bodypost)
-    exprpost = self.'as_post'(exprpast, 'rtype'=>'P')
+    exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
     ops.'push'(exprpost)
     ops.'push_pirop'(iftype, exprpost, looplabel)
     ops.'result'(exprpost)
@@ -752,7 +1062,7 @@ by C<node>.
 
     .local pmc looplabel, endlabel
     $P0 = get_hll_global ['POST'], 'Label'
-    $S0 = ops.'unique'('for_')
+    $S0 = self.'unique'('for_')
     looplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
@@ -763,9 +1073,9 @@ by C<node>.
     ops.'push'(collpost)
 
     .local string iter
-    iter = ops.'unique'('$P')
+    iter = self.'unique'('$P')
     ops.'result'(iter)
-    $S0 = ops.'unique'('$I')
+    $S0 = self.'unique'('$I')
     ops.'push_pirop'('defined', $S0, collpost)
     ops.'push_pirop'('unless', $S0, endlabel)
     ops.'push_pirop'('iter', iter, collpost)
@@ -773,7 +1083,7 @@ by C<node>.
     ops.'push_pirop'('unless', iter, endlabel)
 
     .local string nextval
-    nextval = ops.'unique'('$P')
+    nextval = self.'unique'('$P')
     ops.'push_pirop'('shift', nextval, iter)
 
     .local pmc subpast, subpost
@@ -808,7 +1118,7 @@ handler.
 
     .local pmc catchlabel, endlabel
     $P0 = get_hll_global ['POST'], 'Label'
-    $S0 = ops.'unique'('catch_')
+    $S0 = self.'unique'('catch_')
     catchlabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
@@ -866,7 +1176,7 @@ $x < $y and $y < $z, but $y only gets evaluated once.
     .local pmc ops, endlabel
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
-    $S0 = ops.'unique'('$P')
+    $S0 = self.'unique'('$P')
     ops.'result'($S0)
     $P0 = get_hll_global ['POST'], 'Label'
     endlabel = $P0.'new'('name'=>'chain_end_')
@@ -884,7 +1194,7 @@ $x < $y and $y < $z, but $y only gets evaluated once.
     ops.'push'(bpost)
     .local string name
     name = cpast.'name'()
-    name = ops.'escape'(name)
+    name = self.'escape'(name)
     ops.'push_pirop'('call', name, apost, bpost, 'result'=>ops)
     unless clist goto clist_end
     ops.'push_pirop'('unless', ops, endlabel)
@@ -912,7 +1222,7 @@ being refactored out using thunks of some sort.)
 
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
-    $S0 = $P0.'unique'('$P')
+    $S0 = self.'unique'('$P')
     ops = $P0.'new'('node'=>node, 'result'=>$S0)
 
     .local pmc lpast, lpost
@@ -923,10 +1233,10 @@ being refactored out using thunks of some sort.)
 
     .local pmc endlabel
     $P0 = get_hll_global ['POST'], 'Label'
-    $S0 = ops.'unique'('default_')
+    $S0 = self.'unique'('default_')
     endlabel = $P0.'new'('result'=>$S0)
 
-    $S0 = ops.'unique'('$I')
+    $S0 = self.'unique'('$I')
     ops.'push_pirop'('defined', $S0, ops)
     ops.'push_pirop'('if', $S0, endlabel)
     .local pmc rpast, rpost
@@ -955,7 +1265,7 @@ a second child is found that evaluates as true.
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
-    $S0 = ops.'unique'('$P')
+    $S0 = self.'unique'('$P')
     ops.'result'($S0)
 
     .local pmc labelproto, endlabel, falselabel
@@ -964,9 +1274,9 @@ a second child is found that evaluates as true.
     endlabel = labelproto.'new'('name'=>'xor_end')
 
     .local pmc iter, apast, apost, i, t, u
-    i = ops.'unique'('$I')
-    t = ops.'unique'('$I')
-    u = ops.'unique'('$I')
+    i = self.'unique'('$I')
+    t = self.'unique'('$I')
+    u = self.'unique'('$I')
     iter = node.'iterator'()
     apast = shift iter
     apost = self.'as_post'(apast, 'rtype'=>'P')
@@ -1018,6 +1328,7 @@ node with a 'pasttype' of bind.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     rpost = self.'as_post'(rpast, 'rtype'=>'P')
+    rpost = self.'coerce'(rpost, 'P')
     ops.'push'(rpost)
 
     lpast.lvalue(1)
@@ -1074,11 +1385,11 @@ node with a 'pasttype' of inline.
     if $I0 >= 0 goto result_new
     $I0 = index inline, '%r'
     unless $I0 >= 0 goto have_result
-    result = ops.'unique'('$P')
+    result = self.'unique'('$P')
     ops.'result'(result)
     goto have_result
   result_new:
-    result = ops.'unique'('$P')
+    result = self.'unique'('$P')
     ops.'push_pirop'('new', result, "'Undef'")
     ops.'result'(result)
   have_result:
@@ -1086,6 +1397,7 @@ node with a 'pasttype' of inline.
     .local pmc arglist
     arglist = ops.'list'()
     ops.'push_pirop'('inline', arglist :flat, 'inline'=>inline, 'result'=>result)
+    $S0 = options['rtype']
     .return (ops)
 .end
 
@@ -1152,7 +1464,7 @@ attribute.
 
     .local pmc viviself, vivipost, vivilabel
     viviself = node.'viviself'()
-    vivipost = self.'as_post'(viviself)
+    vivipost = self.'as_post'(viviself, 'rtype'=>'P')
     ops.'result'(vivipost)
     ops.'push'(fetchop)
     unless viviself goto vivipost_done
@@ -1182,7 +1494,7 @@ attribute.
     .local string name, named, pname, has_pname
     name = node.'name'()
     named = node.'named'()
-    pname = subpost.'unique'('param_')
+    pname = self.'unique'('param_')
     has_pname = concat 'has_', pname
 
     ##  returned post node
@@ -1194,7 +1506,7 @@ attribute.
     .local pmc viviself, vivipost, vivilabel
     viviself = node.'viviself'()
     unless viviself goto param_required
-    vivipost = self.'as_post'(viviself)
+    vivipost = self.'as_post'(viviself, 'rtype'=>'P')
     $P0 = get_hll_global ['POST'], 'Label'
     vivilabel = $P0.'new'('name'=>'optparam_')
     subpost.'add_param'(pname, 'named'=>named, 'optional'=>1)
@@ -1210,7 +1522,7 @@ attribute.
     subpost.'add_param'(pname, 'named'=>named, 'slurpy'=>slurpy)
 
   param_done:
-    name = ops.'escape'(name)
+    name = self.'escape'(name)
     ops.'push_pirop'('.lex', name, ops)
     .return (ops)
 .end
@@ -1226,7 +1538,7 @@ attribute.
 
     .local string name
     name = node.'name'()
-    name = ops.'escape'(name)
+    name = self.'escape'(name)
 
     $P0 = get_hll_global ['POST'], 'Op'
     .local pmc ns
@@ -1268,7 +1580,7 @@ attribute.
     .local string name
     $P0 = get_hll_global ['POST'], 'Ops'
     name = node.'name'()
-    name = $P0.'escape'(name)
+    name = self.'escape'(name)
 
     .local int isdecl
     isdecl = node.'isdecl'()
@@ -1362,7 +1674,7 @@ attribute.
     .local string name
     $P0 = get_hll_global ['POST'], 'Ops'
     name = node.'name'()
-    name = $P0.'escape'(name)
+    name = self.'escape'(name)
 
     .local int isdecl
     isdecl = node.'isdecl'()
@@ -1427,7 +1739,7 @@ to have a PMC generated containing the constant value.
 
     $I0 = index valflags, 'e'
     if $I0 < 0 goto escape_done
-    value = ops.'escape'(value)
+    value = self.'escape'(value)
   escape_done:
 
     .local string rtype
@@ -1439,8 +1751,8 @@ to have a PMC generated containing the constant value.
 
   result_pmc:
     .local string result
-    result = ops.'unique'('$P')
-    returns = ops.'escape'(returns)
+    result = self.'unique'('$P')
+    returns = self.'escape'(returns)
     ops.'push_pirop'('new', result, returns)
     ops.'push_pirop'('assign', result, value)
     ops.'result'(result)

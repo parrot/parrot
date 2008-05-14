@@ -385,19 +385,19 @@ proto postfix:<--> is equiv(postfix:<++>)
 
 ## Unary prefix operators
 proto prefix:<+> is looser(postfix:<++>)
-    is pasttype('inline')
+    is pirop('set N*')
     { ... }
 proto prefix:<~> is equiv(prefix:<+>)
-    is pasttype('inline')
+    is pirop('set S*')
     { ... }
 proto prefix:<-> is equiv(prefix:<+>)
     is pirop('n_neg')
     { ... }
 proto prefix:<!> is equiv(prefix:<+>)
-    is pasttype('inline')
+    is pirop('isfalse')
     { ... }
 proto prefix:<?> is equiv(prefix:<+>)
-    is pasttype('inline')
+    is pirop('istrue')
     { ... }
 
 ## Multiplicative operators
@@ -427,44 +427,44 @@ proto infix:<~> is looser(infix:<+>)
 
 ## Comparison operators
 proto infix:<==> is looser(infix:<+>)
-    is pasttype('inline')
+    is pirop('iseq INn')
     { ... }
 proto infix:<!=> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isne INn')
     { ... }
 proto infix:«>=» is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isge INn')
     { ... }
 proto infix:«<=» is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isle INn')
     { ... }
 proto infix:«>» is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isgt INn')
     { ... }
 proto infix:«<» is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('islt INn')
     { ... }
 
 proto infix:<eq> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('iseq ISs')
     { ... }
 proto infix:<ne> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isne ISs')
     { ... }
 proto infix:<lt> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('islt ISs')
     { ... }
 proto infix:<le> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isle ISs')
     { ... }
 proto infix:<gt> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isgt ISs')
     { ... }
 proto infix:<ge> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('isge ISs')
     { ... }
 proto infix:<=:=> is equiv(infix:<==>)
-    is pasttype('inline')
+    is pirop('issame')
     { ... }
 
 ## Tight logical operators
