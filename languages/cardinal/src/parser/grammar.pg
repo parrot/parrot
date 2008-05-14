@@ -149,8 +149,8 @@ token call_args {
     | '(' <.ws> <args> <.ws> ')' {*}
 }
 
-token do_args {
-    '|' <.ws> <args> <.ws> '|' {*}
+rule do_args {
+    '|' [ <identifier> [',' <identifier>]*]?'|' {*}
 }
 
 token variable {

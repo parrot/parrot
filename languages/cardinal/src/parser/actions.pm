@@ -344,10 +344,15 @@ method call($/) {
     }
 
     if $<do_block> {
-        $/.panic('do blocks are not yet implemented');
+        $past.push( $( $<do_block>[0] ) );
     }
 
     $past.name(~$op);
+    make $past;
+}
+
+method do_block($/) {
+    my $past := $( $<comp_stmt> );
     make $past;
 }
 
@@ -372,6 +377,20 @@ method call_args($/) {
     else {
         make PAST::Op.new( :pasttype('call'), :node($/) );
     }
+}
+
+method do_args($/) {
+    my $params := PAST::Stmts.new( :node($/) );
+    my $past := PAST::Block.new($params, :blocktype('declaration'));
+    for $<identifier> {
+        my $parameter := $( $_ );
+        $past.symbol($parameter.name(), :scope('lexical'));
+        $parameter.scope('parameter');
+        $params.push($parameter);
+    }
+    $params.arity( +$<identifier> );
+    our $?BLOCK_SIGNATURED := $past;
+    make $past;
 }
 
 method args($/) {

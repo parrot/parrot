@@ -63,6 +63,26 @@ Returns a Perl representation of the CardinalInteger.
 .end
 
 
+=item downto(n, block)
+
+Runs C<block> for each integer from the current value of the Integer down to n.
+
+=cut
+
+.sub 'downto' :method
+    .param int n
+    .param pmc block
+    $I1 = self
+  downto_loop:
+    $I0 = $I1 < n
+    if $I0, downto_done
+    block($I1)
+    dec $I1
+    goto downto_loop
+  downto_done:
+.end
+
+
 =back
 
 =cut
