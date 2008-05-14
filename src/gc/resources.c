@@ -215,7 +215,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
          *      so that collection can be skipped if needed
          */
         if (!interp->arena_base->DOD_block_level
-        &&  !interp->arena_base->mem_allocs_since_last_collect) {
+        &&   interp->arena_base->mem_allocs_since_last_collect) {
             Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
 #if !PARROT_GC_IMS
             /* Compact the pool if allowed and worthwhile */
