@@ -154,8 +154,19 @@ method member_variable($/) {
 }
 
 method indexed_variable($/) {
-    make $( $<primary> );
-    # XXX fix index
+    my $var := $( $<primary> );
+    my $args;
+    if $<args> {
+        $args := $( $<args>[0] );
+    }
+
+    my $past := PAST::Var.new( :scope('keyed'), :node($/) );
+    $past.push($var);
+    while $args[0] {
+        $past.push( $args.shift() );
+    }
+    
+    make $past;
 }
 
 method variable($/, $key) {
