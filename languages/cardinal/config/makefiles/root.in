@@ -40,6 +40,10 @@ SOURCES = cardinal.pir \
 BUILTINS_PIR = \
   src/builtins/say.pir \
   src/builtins/cmp.pir \
+  src/classes/Object.pir \
+  src/classes/String.pir \
+  src/classes/Integer.pir \
+  src/classes/Array.pir \
 
 # PMCS = cardinal
 # PMC_SOURCES = $(PMC_DIR)/cardinal.pmc

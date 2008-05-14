@@ -55,6 +55,9 @@ object.
 
     $P0 = new 'List'
     set_hll_global ['cardinal';'Grammar';'Actions'], '@?BLOCK', $P0
+
+    $P1 = get_hll_global ['PAST::Compiler'], '%valflags'
+    $P1['CardinalString'] = 'e'
 .end
 
 =item main(args :slurpy)  :main

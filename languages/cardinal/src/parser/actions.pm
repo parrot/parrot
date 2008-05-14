@@ -366,7 +366,12 @@ method operation($/) {
 }
 
 method call_args($/) {
-    make $( $<args> );
+    if ~$/ ne '()' {
+        make $( $<args> );
+    }
+    else {
+        make PAST::Op.new( :pasttype('call'), :node($/) );
+    }
 }
 
 method args($/) {
@@ -403,7 +408,8 @@ method scope_identifier($/) {
 }
 
 method literal($/, $key) {
-    make $( $/{$key} );
+    my $past := $( $/{$key} );
+    make $past;
 }
 
 method pcomp_stmt($/) {
@@ -414,7 +420,7 @@ method array($/) {
     my $past;
     ## XXX the "new" method should be invoked on the "Array" class (use get_class)
     ## but that doesn't work yet.
-    my $getclass := PAST::Op.new( :inline('    %r = new "Array"'), :node($/) );
+    my $getclass := PAST::Op.new( :inline('    %r = new "CardinalArray"'), :node($/) );
     if $<args> {
         $past := $( $<args>[0] );
         $past.unshift( $getclass );
@@ -451,11 +457,11 @@ method float($/) {
 }
 
 method integer($/) {
-    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
+    make PAST::Val.new( :value( ~$/ ), :returns('CardinalInteger'), :node($/) );
 }
 
 method string($/) {
-    make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );
+    make PAST::Val.new( :value( ~$<string_literal> ), :returns('CardinalString'), :node($/) );
 }
 
 
