@@ -154,7 +154,7 @@ static const opcode_t * directory_unpack(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), int action)
+static PMC* do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*sub_pmc);
@@ -309,7 +309,7 @@ static void sort_segs(ARGMOD(PackFile_Directory *dir))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*dir);
 
-static int sub_pragma(PARROT_INTERP, int action, ARGIN(const PMC *sub_pmc))
+static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -413,14 +413,15 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
 
 =item C<static int sub_pragma>
 
-Handle :load, :main ... pragmas for B<sub_pmc>
+Check B<sub_pmc>'s pragmas (e.g. flags like C<:load>, C<:main>, etc.) returning
+1 if the sub should be run for C<action>, a C<pbc_action_enum_t>.
 
 =cut
 
 */
 
 static int
-sub_pragma(PARROT_INTERP, int action, ARGIN(const PMC *sub_pmc))
+sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
 {
     int todo    = 0;
     int pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
@@ -505,7 +506,7 @@ Run autoloaded or immediate bytecode, mark MAIN subroutine entry
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
-do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), int action)
+do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
 {
     Parrot_sub const *sub = PMC_sub(sub_pmc);
 
@@ -680,7 +681,7 @@ alive by living subs.
 PARROT_API
 void
 do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
-        int action, ARGIN_NULLOK(PMC *eval_pmc))
+               pbc_action_enum_t action, ARGIN_NULLOK(PMC *eval_pmc))
 {
     opcode_t i;
     PackFile_FixupTable * const ft = self->fixups;

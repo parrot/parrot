@@ -331,7 +331,7 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 PARROT_API
 void do_sub_pragmas(PARROT_INTERP,
     ARGIN(PackFile_ByteCode *self),
-    int action,
+    pbc_action_enum_t action,
     ARGIN_NULLOK(PMC *eval_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
