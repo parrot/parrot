@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for ipairs' );
@@ -82,6 +82,21 @@ CODE
 1	Sunday
 2	Monday
 OUT
+
+TODO: {
+    local $TODO = 'upvalues';
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'for & upval' );
+local a = {[1]=2, [2]=4, [3]=8}
+local b = {}
+for i, v in pairs(a) do
+    b[i] = function () return v end
+end
+print(b[1](), b[2](), b[3]())
+CODE
+2	4	8
+OUT
+}
 
 # Local Variables:
 #   mode: cperl

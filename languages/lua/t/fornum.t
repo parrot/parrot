@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 1, 10, 2' );
@@ -167,6 +167,20 @@ end
 CODE
 /^[^:]+: [^:]+:\d+: 'for' limit must be a number\nstack traceback:\n/
 OUT
+
+TODO: {
+    local $TODO = 'upvalues';
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'for & upval' );
+local a = {}
+for i = 1, 10 do
+    a[i] = function () return i end
+end
+print(a[5]())
+CODE
+5
+OUT
+}
 
 # Local Variables:
 #   mode: cperl
