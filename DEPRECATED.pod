@@ -141,6 +141,14 @@ Is deprecated, replaced by the C<throw> opcode (the single argument form of
 
 Is deprecated, replaced by the C<exit_fatal> function.
 
+=item * 'do_exception', 'do_str_exception', 'do_pmc_exception', 'create_exception' [post 0.6.2]
+
+Are deprecated.
+
+=item * 'handle_exception' [post 0.6.2]
+
+Is deprecated, replaced by C<Parrot_ex_calc_handler_offset>.
+
 =back
 
 =head1 PIR syntax
