@@ -150,9 +150,8 @@ STRING * string_bitwise_xor(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_bool(PARROT_INTERP, ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+INTVAL string_bool(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

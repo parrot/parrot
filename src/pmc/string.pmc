@@ -167,7 +167,7 @@ Returns the boolean value of the string.
 
     VTABLE INTVAL get_bool() {
         STRING * const s = VTABLE_get_string(INTERP, SELF);
-        return s ? string_bool(INTERP, s) : 0;
+        return string_bool(INTERP, s);
     }
 
 /*
