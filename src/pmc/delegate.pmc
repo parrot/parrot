@@ -35,21 +35,16 @@ let flow through.
 static void
 vtable_meth_not_found(PARROT_INTERP, PMC *pmc, const char *meth)
 {
-    char *_class;
+    STRING *_class;
 
     if (PObj_is_class_TEST(pmc))
-        _class = string_to_cstring(interp, PMC_str_val(
-            get_attrib_num(
-                (SLOTTYPE *)PMC_data(GET_CLASS(pmc)), PCD_CLASS_NAME)));
+        _class = VTABLE_get_string(interp, get_attrib_num(
+                (SLOTTYPE *)PMC_data(GET_CLASS(pmc)), PCD_CLASS_NAME));
     else
-        _class = string_to_cstring(interp, pmc->vtable->whoami);
+        _class = interp, pmc->vtable->whoami;
 
     real_exception(interp, NULL, E_LookupError,
-        "Can't find vtable method '%s' in class '%s'", meth, _class);
-
-    /* sorry, can't do this here. will it leak?
-    string_cstring_free(_class);
-    */
+        "Can't find vtable method '%s' in class '%Ss'", meth, _class);
 }
 
 pmclass delegate {
