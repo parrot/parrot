@@ -726,10 +726,9 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         type = VTABLE_get_integer(interp, type_pmc);
 
     if (type > enum_type_undef)
-        /* RT#46091 get printable name */
         real_exception(interp, NULL, INVALID_OPERATION,
-                "Class %Ss already registered!\n",
-                VTABLE_get_string(interp, name));
+                "Class '%Ss' already registered!\n",
+                string_escape_string(interp, VTABLE_get_string(interp, name)));
 
     if (type < enum_type_undef)
         real_exception(interp, NULL, INVALID_OPERATION,
