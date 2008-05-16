@@ -228,7 +228,7 @@ emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, lo
     }
 
     /* modrm disp32 */
-    if (!base && !(i && scale) && (!emit_is8bit(disp) || 1)) {
+    if (!base && !(i && scale)) {
         *(pc++) = (char)(emit_Mod_b00 | reg_opcode | emit_rm_b101);
         *(long *)pc = disp;
 #if EXEC_CAPABLE
