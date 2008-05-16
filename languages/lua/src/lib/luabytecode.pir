@@ -163,7 +163,7 @@ PIRCODE
   L1:
     unless i < numparams goto L2
     $S0 = i
-    pir .= "    .param pmc arg_"
+    pir .= "    .param pmc loc_"
     pir .= $S0
     pir .= " :optional\n"
     inc i
@@ -179,7 +179,7 @@ PIRCODE
     pir .= "    .param pmc extra :slurpy\n"
   L4:
     $P0 = getattribute self, 'locvars'
-    $S0 = $P0.'translate'()
+    $S0 = $P0.'translate'(numparams)
     pir .= $S0
     i = $P0
     .local int maxstacksize
@@ -203,7 +203,7 @@ PIRCODE
     pir .= "    .local pmc subr, glob\n"
     pir .= "    subr = interpinfo .INTERPINFO_CURRENT_SUB\n"
     $P0 = getattribute self, 'code'
-    $S0 = $P0.'translate'(self)
+    $S0 = $P0.'translate'(funcname)
     pir .= $S0
     pir .= ".end\n\n"
     $P0 = getattribute self, 'p'
@@ -399,11 +399,12 @@ PIRCODE
 .end
 
 .sub 'translate' :method
+    .param int numparams
     .local string pir
     .local int i, n
     pir = ''
     n = self
-    i = 0
+    i = numparams
   L1:
     unless i < n goto L2
     $P0 = self[i]

@@ -779,7 +779,7 @@ pir = <<PIR
     ${INS} = concat " ${REG}"
     $S0 = ${B}
     ${INS} = concat $S0
-    ${INS} = concat "\n  unless \$I0 goto ${PC}"
+    ${INS} = concat "\n  unless \$I0 goto PC"
     $I0 = ${NEXTPC}
     inc $I0
     $S0 = $I0
@@ -1019,5 +1019,21 @@ PIR
 code = 36
 format = ABx
 pir = <<PIR
+    ${INS} = concat "  .const .Sub f_"
+    $S0 = ${B}
+    ${INS} = concat $S0
+    ${INS} = concat " = '"
+    ${INS} = concat ${FNAME}
+    ${INS} = concat "_"
+    ${INS} = concat $S0
+    ${INS} = concat "'\n  ${GLOB} = ${SUBR}.'getfenv'()\n"
+    ${INS} = concat "  ${PROTO}"
+    ${INS} = concat $S0
+    ${INS} = concat ".'setfenv'(${GLOB})\n  clone ${REG}"
+    $S1 = ${A}
+    ${INS} = concat $S1
+    ${INS} = concat ", ${PROTO}"
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
