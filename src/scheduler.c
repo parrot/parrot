@@ -139,8 +139,9 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         }
         else {
             real_exception(interp, NULL, INVALID_OPERATION,
-                    "Unknown task type '%s'.\n", string_to_cstring(interp, type));
+                "Unknown task type '%Ss'.\n", type);
         }
+
         Parrot_cx_delete_task(interp, task);
         }
 
@@ -150,7 +151,6 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
             Parrot_cx_refresh_task_list(interp, scheduler);
 
     } /* end of pending tasks */
-
 }
 
 /*
