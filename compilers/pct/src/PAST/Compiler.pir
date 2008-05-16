@@ -1073,25 +1073,34 @@ by C<node>.
     ops.'push'(collpost)
 
     .local string iter
-    iter = self.'unique'('$P')
+    iter = self.'uniquereg'('P')
     ops.'result'(iter)
-    $S0 = self.'unique'('$I')
+    $S0 = self.'uniquereg'('I')
     ops.'push_pirop'('defined', $S0, collpost)
     ops.'push_pirop'('unless', $S0, endlabel)
     ops.'push_pirop'('iter', iter, collpost)
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', iter, endlabel)
 
+    .local int arity
+    .local pmc arglist
+    arity = node.'arity'()
+    arglist = new 'ResizablePMCArray'
+  arity_loop:
     .local string nextval
-    nextval = self.'unique'('$P')
+    nextval = self.'uniquereg'('P')
+    push arglist, nextval
     ops.'push_pirop'('shift', nextval, iter)
+    dec arity
+    if arity > 0 goto arity_loop
+  arity_end:
 
     .local pmc subpast, subpost
     subpast = node[1]
     subpost = self.'as_post'(subpast, 'rtype'=>'P')
     ops.'push'(subpost)
     ops.'push_pirop'('newclosure', subpost, subpost)
-    ops.'push_pirop'('call', subpost, nextval)
+    ops.'push_pirop'('call', subpost, arglist :flat)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
     .return (ops)
