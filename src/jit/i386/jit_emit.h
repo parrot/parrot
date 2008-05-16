@@ -3862,7 +3862,9 @@ preg:
                         REG_OFFS_STR(count_regs(interp, sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 emitm_pushl_r(pc, emit_EBX);
-                emitm_calll(pc, (char*)string_to_cstring - pc - 4);
+
+                /* this leaks horribly */
+                emitm_calll(pc, (char *)string_to_cstring - pc - 4);
                 emitm_addb_i_r(pc, 8, emit_ESP);
                 emitm_pushl_r(pc, emit_EAX);
                 break;

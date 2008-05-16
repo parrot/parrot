@@ -196,12 +196,15 @@ free to change or give me hints on how to change it. -- ambs
 #define CHUNK_SIZE 1024
 
         char *cfrom  = string_to_cstring(interp, from);
-        char *cto    = string_to_cstring(interp, to);
-
         FILE *source = fopen(cfrom, "rb");
 
+        string_cstring_free(cfrom);
+
         if (source) {
+            char *cto    = string_to_cstring(interp, to);
             FILE *target = fopen(cto, "w+b");
+
+            string_cstring_free(cto);
 
             if (target) {
                 char buf[CHUNK_SIZE];
@@ -230,8 +233,6 @@ free to change or give me hints on how to change it. -- ambs
             char *errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
-        string_cstring_free(cfrom);
-        string_cstring_free(cto);
 #undef CHUNK_SIZE
     }
 

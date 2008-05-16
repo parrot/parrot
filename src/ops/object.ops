@@ -370,13 +370,10 @@ inline op getclass(out PMC, in STR) :object_classes :flow {
     PMC      * const _class = Parrot_class_lookup(interp, $2);
     opcode_t * const next   = expr NEXT();
 
-    if (PMC_IS_NULL(_class)) {
-        const char * const class_name = string_to_cstring(interp, $2);
-        real_exception(interp, next, NO_CLASS, "Class '%s' doesn't exist",
-                class_name);
-    }
-    else
-        $1 = _class;
+    if (PMC_IS_NULL(_class))
+        real_exception(interp, next, NO_CLASS, "Class '%Ss' doesn't exist", $2);
+
+    $1 = _class;
 
   goto ADDRESS(next);
 /*  real_exception(interp, NULL, UNIMPLEMENTED,

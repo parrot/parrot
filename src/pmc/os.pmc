@@ -140,6 +140,7 @@ C<path>.
 
         if (error) {
             const char * const errmsg = strerror(errno);
+            string_cstring_free(cpath);
             real_exception(interp, NULL, E_SystemError, errmsg);
         }
 

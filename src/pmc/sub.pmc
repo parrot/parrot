@@ -748,9 +748,9 @@ slurpy arguments).
     }
 
     METHOD __get_regs_used(STRING *reg) {
-        Parrot_sub * const sub = PMC_sub(SELF);
-        char *kind = string_to_cstring(interp, reg);
-        INTVAL regs_used;
+        Parrot_sub * const sub  = PMC_sub(SELF);
+        char              *kind = string_to_cstring(interp, reg);
+        INTVAL             regs_used;
 
         /* TODO switch to canonical NiSP order
          * see also imcc/reg_alloc.c */
@@ -759,15 +759,18 @@ slurpy arguments).
 
         PARROT_ASSERT(sub->n_regs_used);
 
-        if (!*kind || kind[1])
+        if (!*kind || kind[1]) {
+            string_cstring_free(kind);
             real_exception(INTERP, NULL, E_ValueError,
-                "illegal register kind '%s'", kind);
+                "illegal register kind '%Ss'", reg);
+        }
 
         p = strchr(types, *kind);
+        string_cstring_free(kind);
 
         if (!p)
             real_exception(INTERP, NULL, E_ValueError,
-                "illegal register kind '%s'", kind);
+                "illegal register kind '%Ss'", reg);
 
         regs_used = sub->n_regs_used[p - types];
         RETURN(INTVAL regs_used);

@@ -219,8 +219,9 @@ PDB_run_code(Parrot_Interp interp, int argc, const char *argv[])
     Parrot_exception exp;
 
     if (setjmp(exp.destination)) {
-        fprintf(stderr, "Caught exception: %s\n",
-            string_to_cstring(interp, interp->exceptions->msg));
+        char *msg = string_to_cstring(interp, interp->exceptions->msg);
+        fprintf(stderr, "Caught exception: %s\n", msg);
+        string_cstring_free(msg);
         return;
     }
 

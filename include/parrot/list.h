@@ -128,7 +128,6 @@ void list_insert(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*list);
 
-PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))

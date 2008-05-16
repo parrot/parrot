@@ -3756,26 +3756,26 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN(STRING *file_str))
             wo_ext, path);
     filename = string_to_cstring(interp, path);
     if (file_type == PARROT_RUNTIME_FT_PBC) {
-        PackFile *pf;
-        pf = PackFile_append_pbc(interp, filename);
-        if (!pf) {
+        PackFile *pf = PackFile_append_pbc(interp, filename);
+        string_cstring_free(filename);
+
+        if (!pf)
             real_exception(interp, NULL, 1,
                     "Unable to append PBC to the current directory");
-        }
     }
     else {
         STRING *err;
         PackFile_ByteCode * const cs =
             (PackFile_ByteCode *)IMCC_compile_file_s(interp,
                 filename, &err);
-        if (cs) {
+        string_cstring_free(filename);
+
+        if (cs)
             do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
-        }
         else
             real_exception(interp, NULL, E_LibraryNotLoadedError,
                 "compiler returned NULL ByteCode '%Ss' - %Ss", file_str, err);
     }
-    string_cstring_free(filename);
 }
 
 /*

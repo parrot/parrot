@@ -131,7 +131,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 =item C<void
 Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -142,13 +142,12 @@ Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
 {
     /* Be horribly profligate with memory, since we're
        about to be something else */
-    int status;
-    status = execlp("sh", "sh", "-c",
-            string_to_cstring(interp, command), (void *)NULL);
+    char *cmd  = string_to_cstring(interp, command);
+    int status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
+
     /* if we get here, something's horribly wrong... */
-    if (status) {
+    if (status)
         real_exception(interp, NULL, NOSPAWN, "Exec failed, code %i", status);
-    }
 }
 
 /*

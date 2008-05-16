@@ -632,15 +632,14 @@ PIO_sockaddr_in(PARROT_INTERP, unsigned short port, ARGMOD(STRING *addr))
      * it may have been toggled off.
      */
     he = gethostbyname(s);
+    string_cstring_free(s);
+
     /* XXX FIXME - Handle error condition better */
     if (!he) {
-        string_cstring_free(s);
         fprintf(stderr, "gethostbyname failure [%s]\n", s);
         return NULL;
     }
     memcpy((char*)&sa.sin_addr, he->h_addr, sizeof (sa.sin_addr));
-
-    string_cstring_free(s);
 
     sa.sin_port = htons(port);
 

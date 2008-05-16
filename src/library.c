@@ -580,7 +580,7 @@ char*
 Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
         enum_runtime_ft type)
 {
-    STRING * const file = string_from_cstring(interp, file_name, 0);
+    STRING * const file   = string_from_cstring(interp, file_name, 0);
     STRING * const result = Parrot_locate_runtime_file_str(interp, file, type);
     /*
      * XXX valgrind shows e.g.

@@ -155,6 +155,8 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
         }
         else {
             /* "+" or "-" not found: error */
+            string_cstring_free(str);
+
             real_exception(interp, NULL, E_ValueError,
                 "Complex: malformed string");
         }
