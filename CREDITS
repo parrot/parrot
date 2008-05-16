@@ -257,7 +257,8 @@ D: Fix typo in PARROT_BIGENDIAN case
 
 N: Geoff Broadwell
 D: OpenGL binding
-D: examples fixes
+D: Disassembly/source weaver
+D: Miscellaneous fixes
 
 N: Gerard Goossen
 D: Documentation patch for Parrot_PMC_get_pointer_intkey()

@@ -585,6 +585,7 @@ all : \
     dynoplibs \
     compilers \
     $(PBC_TO_EXE) \
+    $(DIS) \
     $(PBCMERGE)
 
 $(GEN_LIBRARY) : $(PARROT)
