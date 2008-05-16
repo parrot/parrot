@@ -52,14 +52,24 @@ go(@ARGV);
 sub go {
     my $pbc = shift;
 
-    open my $dis, '-|', $DISASSEMBLER, $pbc
-        or die "Could not start disassembler, did you remember to make parrot first?\n";
+    # The following mess brought to you by Win32, where pipe open doesn't work,
+    # and thus its greater security and cleaner error handling are unavailable.
+
+    -f $pbc && -r _
+        or die "PBC file '$pbc' does not exist or is not readable.\n";
+
+    -f $DISASSEMBLER && -x _
+        or die  "Can't find disassembler '$DISASSEMBLER';"
+              . "did you remember to make parrot first?\n";
+
+    my @dis = `$DISASSEMBLER $pbc`;
+    die "No disassembly; errors: $?, $!" unless @dis;
 
     my $cur_file = '';
     my $cur_line = -1;
     my %cache;
 
-    while (<$dis>) {
+    foreach (@dis) {
         if    (/^Current Source Filename (.*)/) {
             if ($cur_file ne $1) {
                 $cur_file           = $1;
