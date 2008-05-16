@@ -901,6 +901,54 @@ PIR
 code = 33
 format = AC
 pir = <<PIR
+    ${INS} = concat "  ("
+    $I0 = ${A} + 3
+    $I1 = ${C}
+    $I2 = 1
+  ${LABEL}_1:
+    unless $I1 goto ${LABEL}_2
+    if $I2 goto ${LABEL}_3
+    ${INS} = concat ", "
+  ${LABEL}_3:
+    $I2 = 0
+    ${INS} = concat "${REG}"
+    $S0 = $I0
+    ${INS} = concat $S0
+    inc $I0
+    dec $I1
+    goto ${LABEL}_1
+  ${LABEL}_2:
+    ${INS} = concat ") = ${REG}"
+    $I0 = ${A}
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat "(${REG}"
+    inc $I0
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat ", ${REG}"
+    inc $I0
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat ")\n"
+
+    ${INS} = concat "  \$I0 = isa ${REG}"
+    $I0 = ${A} + 3
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat ", 'LuaNil'\n  if \$I0 goto PC"
+    $I0 = ${NEXTPC} + 1
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat "\n  clone ${REG}"
+    $I0 = ${A} + 2
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat ", ${REG}"
+    $I0 = ${A} + 3
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 ## Table Creation
