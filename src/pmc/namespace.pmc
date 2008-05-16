@@ -804,17 +804,13 @@ NOTE: exporting 'default' set of items is not yet implemented.
         STRING * const s_hash  = CONST_STRING(interp, "hash");
         STRING * const s_array = CONST_STRING(interp, "array");
 
-        if (PMC_IS_NULL(dest)) {
+        if (PMC_IS_NULL(dest))
             real_exception(interp, NULL, 0,
                     "destination namespace not specified");
-            RETURN(void);
-        }
 
-        if (PMC_IS_NULL(what) || !VTABLE_elements(interp, what)) {
+        if (PMC_IS_NULL(what) || !VTABLE_elements(interp, what))
             real_exception(interp, NULL, 0,
                     "exporting default object set not yet implemented");
-            RETURN(void);
-        }
 
         /* if "what" does "hash", we extract string key/value pairs,
          * lookup the object with the name specified in the key,
@@ -829,11 +825,9 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 PMC    *object;
                 STRING * const src_name = VTABLE_shift_string(interp, iter);
 
-                if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name)) {
+                if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name))
                     real_exception(interp, NULL, 0,
                         "source object name not specified");
-                    RETURN(void);
-                }
 
                 if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(interp, what, src_name))) {
                     dest_name = src_name;
@@ -846,12 +840,9 @@ NOTE: exporting 'default' set of items is not yet implemented.
 
                 object = VTABLE_get_pmc_keyed_str(interp, SELF, src_name);
 
-                if (PMC_IS_NULL(object)) {
+                if (PMC_IS_NULL(object))
                     real_exception(interp, NULL, 0,
-                            "object '%s' not found in current namespace",
-                            string_to_cstring(interp, src_name));
-                    RETURN(void);
-                }
+                        "object '%Ss' not found in current namespace", src_name);
 
                 VTABLE_set_pmc_keyed_str(interp, dest, dest_name, object);
             }
@@ -864,19 +855,14 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 PMC    *object;
                 STRING * const name = VTABLE_get_string_keyed_int(interp, what, i);
 
-                if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name)) {
+                if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name))
                     real_exception(interp, NULL, 0, "object name not specified");
-                    RETURN(void);
-                }
 
                 object = VTABLE_get_pmc_keyed_str(interp, SELF, name);
 
-                if (PMC_IS_NULL(object)) {
+                if (PMC_IS_NULL(object))
                     real_exception(interp, NULL, 0,
-                            "object '%s' not found in current namespace",
-                            string_to_cstring(interp, name));
-                    RETURN(void);
-                }
+                        "object '%Ss' not found in current namespace", name);
 
                 VTABLE_set_pmc_keyed_str(interp, dest, name, object);
             }
