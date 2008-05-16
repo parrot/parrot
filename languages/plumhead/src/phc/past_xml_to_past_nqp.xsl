@@ -20,9 +20,11 @@ a PAST data structure and runs it with the help of a PCT::HLLCompiler.
 
 sub php_entry ()
 {
-    PAST::Stmts.new(
-<xsl:apply-templates select="@*"><xsl:with-param name="indent" select="'        '"/></xsl:apply-templates>
-<xsl:apply-templates><xsl:with-param name="indent" select="'        '"/></xsl:apply-templates>
+    PAST::Block.new(
+        PAST::Stmts.new(
+<xsl:apply-templates select="@*"><xsl:with-param name="indent" select="'             '"/></xsl:apply-templates>
+<xsl:apply-templates            ><xsl:with-param name="indent" select="'             '"/></xsl:apply-templates>
+        )
     );
 }
 </xsl:template>
