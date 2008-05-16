@@ -246,6 +246,8 @@ sub generate_initial_code {
     $mv->{A}      = 'arg_a';
     $mv->{B}      = 'arg_b';
     $mv->{C}      = 'arg_c';
+    $mv->{FPF}    = '50';
+    $mv->{STACK}    = 'stack';
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
@@ -256,6 +258,7 @@ sub generate_initial_code {
     .local int arg_a
     .local int arg_b
     .local int arg_c
+    .local int stack
 
     bc_length = self
     next_pc = 0
