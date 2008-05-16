@@ -1082,21 +1082,38 @@ by C<node>.
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', iter, endlabel)
 
+
+    .local pmc subpast
+    subpast = node[1]
+
+    ##  determine the number of elements to take at each iteration
     .local int arity
+    arity = 1
+    $P0 = node.'arity'()
+    $I0 = defined $P0
+    unless $I0 goto arity_child
+    arity = $P0
+    goto have_arity
+  arity_child:
+    $P0 = subpast.'arity'()
+    $I0 = defined $P0
+    unless $I0 goto have_arity
+    arity = $P0
+  have_arity:
+
     .local pmc arglist
-    arity = node.'arity'()
     arglist = new 'ResizablePMCArray'
   arity_loop:
+    if arity < 1 goto arity_end
     .local string nextval
     nextval = self.'uniquereg'('P')
     push arglist, nextval
     ops.'push_pirop'('shift', nextval, iter)
     dec arity
-    if arity > 0 goto arity_loop
+    goto arity_loop
   arity_end:
 
-    .local pmc subpast, subpost
-    subpast = node[1]
+    .local pmc subpost
     subpost = self.'as_post'(subpast, 'rtype'=>'P')
     ops.'push'(subpost)
     ops.'push_pirop'('newclosure', subpost, subpost)
