@@ -41,7 +41,7 @@ vtable_meth_not_found(PARROT_INTERP, PMC *pmc, const char *meth)
         _class = VTABLE_get_string(interp, get_attrib_num(
                 (SLOTTYPE *)PMC_data(GET_CLASS(pmc)), PCD_CLASS_NAME));
     else
-        _class = interp, pmc->vtable->whoami;
+        _class = pmc->vtable->whoami;
 
     real_exception(interp, NULL, E_LookupError,
         "Can't find vtable method '%s' in class '%Ss'", meth, _class);
