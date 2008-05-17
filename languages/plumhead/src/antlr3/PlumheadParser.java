@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 src/antlr3/Plumhead.g 2008-02-27 19:28:25
+// $ANTLR 3.0.1 src/antlr3/Plumhead.g 2008-05-17 10:21:37
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -718,7 +718,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: expression, ECHO
+                    // elements: ECHO, expression
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -771,7 +771,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: VAR_DUMP, expression
+                    // elements: expression, VAR_DUMP
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -870,7 +870,7 @@ public class PlumheadParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: IF, relational_expression, s2, s1
+                            // elements: s2, IF, s1, relational_expression
                             // token labels: 
                             // rule labels: retval, s2, s1
                             // token list labels: 
@@ -922,7 +922,7 @@ public class PlumheadParser extends Parser {
                             {
 
                             // AST REWRITE
-                            // elements: IF, relational_expression, s1
+                            // elements: IF, s1, relational_expression
                             // token labels: 
                             // rule labels: retval, s1
                             // token list labels: 
@@ -1031,7 +1031,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ASSIGN_OP, val
+                    // elements: val, ASSIGN_OP
                     // token labels: 
                     // rule labels: val, retval
                     // token list labels: 
@@ -1095,7 +1095,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ASSIGN_OP, key, val
+                    // elements: val, ASSIGN_OP, key
                     // token labels: 
                     // rule labels: val, retval, key
                     // token list labels: 

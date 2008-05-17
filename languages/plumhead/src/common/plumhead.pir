@@ -31,7 +31,7 @@ Parse PHP with the Parrot compiler toolkit. This is the default variant.
 Take XML from phc and transform it with XSLT to PIR setting up PAST.
 Run the PAST with the help of PCT.
 
-=head2 Plumhead antlr3
+=head2 Plumhead antlr
 
 Parse PHP with Java based parser and tree parser, generated from ANTLR3 grammars.
 
@@ -137,16 +137,16 @@ VARIANT_PHC:
     if ret goto ERROR
 
     err_msg = 'Creating XML-PAST with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/src/phc/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
+    cmd = 'xsltproc languages/plumhead/src/phc/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_phc_past.xml'
     ret = spawnw cmd
     if ret goto ERROR
 
     err_msg = 'Creating NQP with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_nqp.xsl  plumhead_past.xml  > plumhead_past.nqp'
+    cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_nqp.xsl  plumhead_phc_past.xml  > plumhead_phc_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
     err_msg = 'Executing plumhead_past.pir with parrot failed'
-    cmd = './parrot languages/plumhead/driver_nqp.pbc plumhead_past.nqp'
+    cmd = './parrot languages/plumhead/driver_nqp.pbc plumhead_phc_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
 
@@ -157,11 +157,11 @@ VARIANT_ANTLR3:
     err_msg = 'Generating PAST from annotated PHP source failed'
     cmd = 'java PlumheadAntlr3 '
     concat cmd, php_source_fn
-    concat cmd, ' plumhead_past.pir'
+    concat cmd, ' plumhead_antlr_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
-    err_msg = 'Executing plumhead_past.pir with parrot failed'
-    cmd = './parrot plumhead_past.pir'
+    err_msg = 'Executing plumhead_past.nqp with parrot failed'
+    cmd = './parrot languages/plumhead/driver_nqp.pbc plumhead_antlr_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
 
@@ -174,8 +174,9 @@ ERROR:
     #.local pmc os
     #os = new .OS
     #os."rm"('plumhead_phc_ast.xml')
-    #os."rm"('plumhead_past.xml')
-    #os."rm"('plumhead_past.pir')
+    #os."rm"('plumhead_phc_past.xml')
+    #os."rm"('plumhead_phc_past.nqp')
+    #os."rm"('plumhead_antlr_past.nqp')
 
 FINISH:
    exit ret

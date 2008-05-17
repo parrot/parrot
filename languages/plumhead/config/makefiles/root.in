@@ -66,10 +66,10 @@ Makefile: config/makefiles/root.in
 
 maintain: maintain-antlr3
 
-maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
+maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastNqp.g
 	@echo 'Be sure to set CLASSPATH first, see docs/antlr3.pod'
 	java org.antlr.Tool src/antlr3/Plumhead.g
-	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
+	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastNqp.g
 
 build:           build-pct
 

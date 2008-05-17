@@ -9,7 +9,7 @@ These are some ramblings on using ANTLR 3 for Plumhead, or with Parrot in genera
 Plumhead.java needs to find the needed classes. This works for me:
 
   export ANTLR_HOME=/home/bernhard/devel/antlr/antlr-3
-  export PARROT_HOME=/home/bernhard/devel/Parrot/trunk/parrot
+  export PARROT_HOME=/home/bernhard/devel/Parrot/trunk
   export CLASSPATH=$ANTLR_HOME/lib/antlr-2.7.7.jar:\
 $ANTLR_HOME/lib/antlr-3.0.1.jar:\
 $ANTLR_HOME:/lib/antlr-runtime-3.0.1.jar:\
