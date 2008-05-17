@@ -264,6 +264,7 @@ sub generate_initial_code {
 
     bc_length = self
     next_pc = 0
+    stack = 0
 
 PIRCODE
 

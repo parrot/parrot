@@ -194,6 +194,22 @@ PIRCODE
     inc i
     goto L5
   L6:
+    i = 0
+  L7:
+    unless i < numparams goto L8
+    $S0 = i
+    pir .= "    unless_null loc_"
+    pir .= $S0
+    pir .= ", vivify_"
+    pir .= $S0
+    pir .= "\n    new loc_"
+    pir .= $S0
+    pir .= ", 'LuaNil'\n  vivify_"
+    pir .= $S0
+    pir .= ":\n"
+    inc i
+    goto L7
+  L8:
     $P0 = getattribute self, 'upvalues'
     $S0 = $P0.'translate'()
     pir .= $S0
