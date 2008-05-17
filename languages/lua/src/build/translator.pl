@@ -248,12 +248,18 @@ sub generate_initial_code {
     $mv->{C}      = 'arg_c';
     $mv->{FPF}    = '50';
     $mv->{STACK}  = 'stack';
+    $mv->{FCT}    = 'func';
     $mv->{FNAME}  = 'funcname';
     $mv->{PROTO}  = 'f_';
+    $mv->{UPVAL}  = 'upvalues';
+    $mv->{UPVAL}  = 'upval';
+    $mv->{NUPS}   = 'nups';
+    $mv->{CLOSURE}= 'closure';
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
 .sub 'translate' :method
+    .param pmc func
     .param string funcname
     .local string gen_pir
     .local int pc, next_pc, bc_length, cur_ic, cur_op
@@ -261,10 +267,15 @@ sub generate_initial_code {
     .local int arg_b
     .local int arg_c
     .local int stack
+    .local int nups
+    .local int upval
+    .local pmc closure
 
     bc_length = self
     next_pc = 0
     stack = 0
+    nups = 0
+    upval = 0
 
 PIRCODE
 

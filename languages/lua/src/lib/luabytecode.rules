@@ -14,9 +14,20 @@
 code = 0
 format = AB
 pir = <<PIR
+    if ${UPVAL} < ${NUPS} goto ${LABEL}_1
     ${INS} = concat "  clone ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
+    goto ${LABEL}_2
+  ${LABEL}_1:
+    ${INS} = concat "  .lex '"
+    $P0 = getattribute ${CLOSURE}, 'upvalues'
+    $P1 = $P0[${UPVAL}]
+    $S0 = $P1
+    ${INS} = concat $S0
+    ${INS} = concat "'"
+    inc ${UPVAL}
+  ${LABEL}_2:
     ${INS} = concat ", ${REG}"
     $S0 = ${B}
     ${INS} = concat $S0
@@ -83,6 +94,19 @@ PIR
 code = 4
 format = AB
 pir = <<PIR
+    if ${UPVAL} < ${NUPS} goto ${LABEL}_1
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = find_lex '"
+    $P0 = getattribute ${FCT}, 'upvalues'
+    $P1 = $P0[${B}]
+    $S0 = $P1
+    ${INS} = concat $S0
+    ${INS} = concat "'\n"
+  ${LABEL}_1:
+    inc ${UPVAL}
+  ${LABEL}_2:
 PIR
 
 [GETGLOBAL]
@@ -117,6 +141,16 @@ PIR
 code = 8
 format = AB
 pir = <<PIR
+    ${INS} = concat "  store_lex '"
+    $P0 = getattribute ${FCT}, 'upvalues'
+    $P1 = $P0[${B}]
+    $S0 = $P1
+    ${INS} = concat $S0
+    ${INS} = concat "', "
+    ${INS} = concat "${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat "\n"
 PIR
 
 ## Table Instructions
@@ -1079,6 +1113,7 @@ PIR
 code = 35
 format = A
 pir = <<PIR
+    ${INS} = concat "  # nothing\n"
 PIR
 
 [CLOSURE]
@@ -1101,5 +1136,10 @@ pir = <<PIR
     ${INS} = concat ", ${PROTO}"
     ${INS} = concat $S0
     ${INS} = concat "\n"
+    $P0 = getattribute func, 'p'
+    ${CLOSURE} = $P0[${B}]
+    $P0 = getattribute ${CLOSURE}, 'nups'
+    ${NUPS} = $P0
+    ${UPVAL} = 0 
 PIR
 
