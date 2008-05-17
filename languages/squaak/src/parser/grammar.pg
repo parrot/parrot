@@ -13,7 +13,7 @@ grammar Squaak::Grammar is PCT::Grammar;
 rule TOP {
     {*}                                      #= open
     <stat_or_def>*
-    [ $ || <.panic: Syntax error> ]
+    [ $ || <.panic: 'Syntax error'> ]
     {*}                                      #= close
 }
 
@@ -184,7 +184,7 @@ token float_constant {
 }
 
 token string_constant {
-    \" <string_literal: "> \"
+    \" <string_literal: '"'> \"
     {*}
 }
 
