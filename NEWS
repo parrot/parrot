@@ -13,7 +13,7 @@
   + removed various deprecated and unused code
 - Languages
   + Eclectus: various updates
-  + Lua: added bytecode translation, nearly all tests passing again
+  + Lua: started bytecode translation
   + Squaak: added to repository
   + Amber: retired
   + TAP: retired
