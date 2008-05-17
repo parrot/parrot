@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 src/antlr3/GenPastNqp.g 2008-05-17 16:30:01
+// $ANTLR 3.0.1 src/antlr3/GenPastNqp.g 2008-05-17 17:26:22
 
   import java.util.regex.*;
 
@@ -140,6 +140,8 @@ public class GenPastNqp extends TreeParser {
         CommonTree NUMBER4=null;
         CommonTree INTEGER5=null;
         CommonTree REL_OP6=null;
+        CommonTree SCALAR7=null;
+        CommonTree ARRAY8=null;
 
         try {
             // src/antlr3/GenPastNqp.g:44:3: ( ^( ECHO node ) | ^( VAR_DUMP node ) | NOQUOTE_STRING | SINGLEQUOTE_STRING | DOUBLEQUOTE_STRING | NUMBER | INTEGER | ^(infix= ( PLUS | MINUS | MUL_OP | BITWISE_OP ) node node ) | ^(prefix= PREFIX node ) | ^( REL_OP node node ) | ^( IF node node ( node )? ) | ^( STMTS ( node )* ) | ^( ASSIGN_OP node node ) | SCALAR | ^( ARRAY node ) )
@@ -459,37 +461,41 @@ public class GenPastNqp extends TreeParser {
                 case 10 :
                     // src/antlr3/GenPastNqp.g:161:5: ^( REL_OP node node )
                     {
-
-                          System.out.print( 
-                              "                                                                   \n"
-                          );
-                        
                     REL_OP6=(CommonTree)input.LT(1);
-                    match(input,REL_OP,FOLLOW_REL_OP_in_node285); 
+                    match(input,REL_OP,FOLLOW_REL_OP_in_node279); 
+
+
+                                    String name = REL_OP6.getText();
+                                    if      ( name.equals( "==" ) )  { name = "eq"; }
+                                    else if ( name.equals( "!=" ) )  { name = "ne"; }
+                                    name = "infix:" + name;
+                                    System.out.println( 
+                                        "    PAST::Op.new(\n"
+                                      + "        :name( '" + name + "' ),\n"
+                                    );
+                                  
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_node_in_node287);
+                    pushFollow(FOLLOW_node_in_node283);
                     node();
                     _fsp--;
 
-                    pushFollow(FOLLOW_node_in_node289);
+                    pushFollow(FOLLOW_node_in_node285);
                     node();
                     _fsp--;
 
 
                     match(input, Token.UP, null); 
 
-                          // Todo. This is not nice, handle pirops in Plumhead.g
-                          String name = REL_OP6.getText();
-                          if      ( name.equals( "==" ) )  { name = "eq"; }
-                          else if ( name.equals( "!=" ) )  { name = "ne"; }
-                          name = "infix:" + name;
+                          System.out.print( 
+                              "    ),\n"
+                          );
                         
 
                     }
                     break;
                 case 11 :
-                    // src/antlr3/GenPastNqp.g:174:5: ^( IF node node ( node )? )
+                    // src/antlr3/GenPastNqp.g:176:5: ^( IF node node ( node )? )
                     {
 
                           System.out.println( 
@@ -497,18 +503,18 @@ public class GenPastNqp extends TreeParser {
                             + "       :pasttype( 'if' ),\n"
                           );
                         
-                    match(input,IF,FOLLOW_IF_in_node311); 
+                    match(input,IF,FOLLOW_IF_in_node307); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_node_in_node313);
+                    pushFollow(FOLLOW_node_in_node309);
                     node();
                     _fsp--;
 
-                    pushFollow(FOLLOW_node_in_node315);
+                    pushFollow(FOLLOW_node_in_node311);
                     node();
                     _fsp--;
 
-                    // src/antlr3/GenPastNqp.g:180:21: ( node )?
+                    // src/antlr3/GenPastNqp.g:182:21: ( node )?
                     int alt2=2;
                     int LA2_0 = input.LA(1);
 
@@ -517,9 +523,9 @@ public class GenPastNqp extends TreeParser {
                     }
                     switch (alt2) {
                         case 1 :
-                            // src/antlr3/GenPastNqp.g:180:21: node
+                            // src/antlr3/GenPastNqp.g:182:21: node
                             {
-                            pushFollow(FOLLOW_node_in_node317);
+                            pushFollow(FOLLOW_node_in_node313);
                             node();
                             _fsp--;
 
@@ -540,7 +546,7 @@ public class GenPastNqp extends TreeParser {
                     }
                     break;
                 case 12 :
-                    // src/antlr3/GenPastNqp.g:186:5: ^( STMTS ( node )* )
+                    // src/antlr3/GenPastNqp.g:188:5: ^( STMTS ( node )* )
                     {
 
                           System.out.print( 
@@ -548,11 +554,11 @@ public class GenPastNqp extends TreeParser {
                             + "        PAST::Stmts.new(                                               \n"
                           );
                         
-                    match(input,STMTS,FOLLOW_STMTS_in_node340); 
+                    match(input,STMTS,FOLLOW_STMTS_in_node336); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // src/antlr3/GenPastNqp.g:192:14: ( node )*
+                        // src/antlr3/GenPastNqp.g:194:14: ( node )*
                         loop3:
                         do {
                             int alt3=2;
@@ -565,9 +571,9 @@ public class GenPastNqp extends TreeParser {
 
                             switch (alt3) {
                         	case 1 :
-                        	    // src/antlr3/GenPastNqp.g:192:14: node
+                        	    // src/antlr3/GenPastNqp.g:194:14: node
                         	    {
-                        	    pushFollow(FOLLOW_node_in_node342);
+                        	    pushFollow(FOLLOW_node_in_node338);
                         	    node();
                         	    _fsp--;
 
@@ -592,66 +598,85 @@ public class GenPastNqp extends TreeParser {
                     }
                     break;
                 case 13 :
-                    // src/antlr3/GenPastNqp.g:198:5: ^( ASSIGN_OP node node )
+                    // src/antlr3/GenPastNqp.g:200:5: ^( ASSIGN_OP node node )
                     {
 
                           System.out.print( 
-                              "                                                                   \n"
+                              "    PAST::Op.new(\n"
+                            + "        :name( 'infix:=' ),\n"
+                            + "        :pasttype( 'bind' ),\n"
                           );
                         
-                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_node365); 
+                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_node361); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_node_in_node367);
+                    pushFollow(FOLLOW_node_in_node363);
                     node();
                     _fsp--;
 
-                    pushFollow(FOLLOW_node_in_node369);
+                    pushFollow(FOLLOW_node_in_node365);
                     node();
                     _fsp--;
 
 
                     match(input, Token.UP, null); 
 
-                          System.out.println( 
-                              "                                                                  \n"
+                          System.out.print( 
+                              "        ),                                                             \n"
                           );
                         
 
                     }
                     break;
                 case 14 :
-                    // src/antlr3/GenPastNqp.g:209:5: SCALAR
+                    // src/antlr3/GenPastNqp.g:213:5: SCALAR
                     {
-                    match(input,SCALAR,FOLLOW_SCALAR_in_node383); 
+                    SCALAR7=(CommonTree)input.LT(1);
+                    match(input,SCALAR,FOLLOW_SCALAR_in_node379); 
 
                           System.out.println( 
-                              "                                                                  \n"
+                              "     PAST::Var.new(\n"
+                            + "         :name( '" + SCALAR7.getText() + "' ),\n"
+                            + "         :scope('package'),\n"
+                            + "         :viviself('Undef'),\n"
+                            + "         :lvalue('1'),\n"
+                            + "      ),\n"
                           );
                         
 
                     }
                     break;
                 case 15 :
-                    // src/antlr3/GenPastNqp.g:215:5: ^( ARRAY node )
+                    // src/antlr3/GenPastNqp.g:224:5: ^( ARRAY node )
                     {
+                    ARRAY8=(CommonTree)input.LT(1);
+                    match(input,ARRAY,FOLLOW_ARRAY_in_node393); 
 
-                          System.out.print( 
-                              "                                                                  \n"
-                          );
-                        
-                    match(input,ARRAY,FOLLOW_ARRAY_in_node403); 
+
+                                   System.out.println( 
+                                       "PAST::Var.new(\n"
+                                     + "    :scope( 'keyed' ),\n"
+                                     + "    :viviself( 'Undef' ),\n"
+                                     + "    :lvalue( '1' ),\n"
+                                     + "    PAST::Var.new(\n"
+                                     + "        :viviself( 'Hash' ),\n"
+                                     + "        :scope( 'package' ),\n"
+                                     + "        :lvalue( '1' ),\n"
+                                     + "        :name( '" + ARRAY8.getText() + "' ),\n"
+                                     + "    ),\n"
+                                   );
+                                 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_node_in_node405);
+                    pushFollow(FOLLOW_node_in_node397);
                     node();
                     _fsp--;
 
 
                     match(input, Token.UP, null); 
 
-                          System.out.println( 
-                              "                                                                  \n"
+                          System.out.print( 
+                              "        ),                                                             \n"
                           );
                         
 
@@ -689,20 +714,20 @@ public class GenPastNqp extends TreeParser {
     public static final BitSet FOLLOW_node_in_node233 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_PREFIX_in_node251 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_node_in_node263 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_REL_OP_in_node285 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node287 = new BitSet(new long[]{0x00000001FF0785E0L});
-    public static final BitSet FOLLOW_node_in_node289 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_IF_in_node311 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node313 = new BitSet(new long[]{0x00000001FF0785E0L});
-    public static final BitSet FOLLOW_node_in_node315 = new BitSet(new long[]{0x00000001FF0785E8L});
-    public static final BitSet FOLLOW_node_in_node317 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STMTS_in_node340 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node342 = new BitSet(new long[]{0x00000001FF0785E8L});
-    public static final BitSet FOLLOW_ASSIGN_OP_in_node365 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node367 = new BitSet(new long[]{0x00000001FF0785E0L});
-    public static final BitSet FOLLOW_node_in_node369 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SCALAR_in_node383 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ARRAY_in_node403 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node405 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_REL_OP_in_node279 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_node_in_node283 = new BitSet(new long[]{0x00000001FF0785E0L});
+    public static final BitSet FOLLOW_node_in_node285 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_IF_in_node307 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_node_in_node309 = new BitSet(new long[]{0x00000001FF0785E0L});
+    public static final BitSet FOLLOW_node_in_node311 = new BitSet(new long[]{0x00000001FF0785E8L});
+    public static final BitSet FOLLOW_node_in_node313 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STMTS_in_node336 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_node_in_node338 = new BitSet(new long[]{0x00000001FF0785E8L});
+    public static final BitSet FOLLOW_ASSIGN_OP_in_node361 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_node_in_node363 = new BitSet(new long[]{0x00000001FF0785E0L});
+    public static final BitSet FOLLOW_node_in_node365 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SCALAR_in_node379 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ARRAY_in_node393 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_node_in_node397 = new BitSet(new long[]{0x0000000000000008L});
 
 }

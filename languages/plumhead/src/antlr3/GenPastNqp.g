@@ -158,18 +158,20 @@ node
           "      ),                                                            \n"
       );
     }
-  | {
-      System.out.print( 
-          "                                                                   \n"
-      );
-    }
-    ^( REL_OP node node )
+  | ^( REL_OP {
+                String name = $REL_OP.text;
+                if      ( name.equals( "==" ) )  { name = "eq"; }
+                else if ( name.equals( "!=" ) )  { name = "ne"; }
+                name = "infix:" + name;
+                System.out.println( 
+                    "    PAST::Op.new(\n"
+                  + "        :name( '" + name + "' ),\n"
+                );
+              } node node )
     {
-      // Todo. This is not nice, handle pirops in Plumhead.g
-      String name = $REL_OP.text;
-      if      ( name.equals( "==" ) )  { name = "eq"; }
-      else if ( name.equals( "!=" ) )  { name = "ne"; }
-      name = "infix:" + name;
+      System.out.print( 
+          "    ),\n"
+      );
     }
   | {
       System.out.println( 
@@ -197,30 +199,45 @@ node
     }
   | {
       System.out.print( 
-          "                                                                   \n"
+          "    PAST::Op.new(\n"
+        + "        :name( 'infix:=' ),\n"
+        + "        :pasttype( 'bind' ),\n"
       );
     }
     ^( ASSIGN_OP node node )
     {
-      System.out.println( 
-          "                                                                  \n"
+      System.out.print( 
+          "        ),                                                             \n"
       );
     }
   | SCALAR
     {
       System.out.println( 
-          "                                                                  \n"
+          "     PAST::Var.new(\n"
+        + "         :name( '" + $SCALAR.text + "' ),\n"
+        + "         :scope('package'),\n"
+        + "         :viviself('Undef'),\n"
+        + "         :lvalue('1'),\n"
+        + "      ),\n"
       );
     }
-  | {
-      System.out.print( 
-          "                                                                  \n"
-      );
-    }
-    ^( ARRAY node )
+  | ^( ARRAY {
+               System.out.println( 
+                   "PAST::Var.new(\n"
+                 + "    :scope( 'keyed' ),\n"
+                 + "    :viviself( 'Undef' ),\n"
+                 + "    :lvalue( '1' ),\n"
+                 + "    PAST::Var.new(\n"
+                 + "        :viviself( 'Hash' ),\n"
+                 + "        :scope( 'package' ),\n"
+                 + "        :lvalue( '1' ),\n"
+                 + "        :name( '" + $ARRAY.text + "' ),\n"
+                 + "    ),\n"
+               );
+             } node )
     {
-      System.out.println( 
-          "                                                                  \n"
+      System.out.print( 
+          "        ),                                                             \n"
       );
     }
   ;
