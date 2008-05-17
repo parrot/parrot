@@ -75,7 +75,7 @@ sea
   ;
 
 code
-  : CODE_START statements CODE_END? -> statements
+  : CODE_START statements CODE_END? -> ^( STMTS statements )
   ;
 
 relational_expression 
@@ -83,7 +83,7 @@ relational_expression
   ;
 
 statements
-  : ( statement )*                                                  -> ^( STMTS )
+  : ( statement )*
   ;
 
 statement

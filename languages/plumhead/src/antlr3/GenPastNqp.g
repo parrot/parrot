@@ -50,13 +50,14 @@ gen_past_nqp
 node
   : {
       System.out.println( 
-          "# node start                               \n"
+          "    PAST::Op.new(                                                   \n"
+        + "       :name( 'echo' ),                                             \n"
       );
     }
     ^( ECHO node )
     {
-      System.out.println( 
-          "                                                                  \n"
+      System.out.println(  
+          "    ),                                                            \n"
       );
     }
   | {
@@ -75,7 +76,7 @@ node
       String noquote = $NOQUOTE_STRING.text;
       noquote = noquote.replace( "\n", "\\n" );
       System.out.println( 
-          "                                                                  \n"
+          " # NOQUOTE_STRING \n"
       );
     }
   | SINGLEQUOTE_STRING
@@ -83,7 +84,7 @@ node
       String singlequote = $SINGLEQUOTE_STRING.text;
       singlequote = singlequote.replace( "\n", "\\n" );
       System.out.println( 
-          "                                                                  \n"
+          " # SINGLEQUOTE_STRING \n"
       );
     }
   | DOUBLEQUOTE_STRING
@@ -91,7 +92,11 @@ node
       String doublequote = $DOUBLEQUOTE_STRING.text;
       doublequote = doublequote.replace( "\n", "\\n" );
       System.out.println( 
-          "                                                                  \n"
+          " # DOUBLEQUOTE_STRING \n"
+        + "     PAST::Val.new(                                              \n"
+        + "         :returns( 'String' ),                                   \n"
+        + "         :value(" + doublequote + ")                          \n"
+        + "      ),                                                         \n"
       );
     }
   | NUMBER
@@ -103,7 +108,10 @@ node
   | INTEGER
     {
       System.out.println( 
-          "                                                                  \n"
+          "     PAST::Val.new(                                              \n"
+        + "         :returns( 'Integer' ),                                  \n"
+        + "         :value('" + $INTEGER.text + "')                         \n"
+        + "      ),                                                         \n"
       );
     }
   | {
@@ -184,32 +192,15 @@ node
       );
     }
   | {
-      reg_num++;
-      String reg_stmts = "reg_stmts_" + reg_num;
       System.out.print( 
-          "                                                                   \n"
+          "                                                                       \n"
+        + "        PAST::Stmts.new(                                               \n"
       );
     }
     ^( STMTS node* )
     {
       System.out.print( 
-          "                                                                       \n"
-        + "        PAST::Stmts.new(                                               \n"
-        + "            PAST::Op.new(                                              \n"
-        + "                :name( 'echo' ),                                       \n"
-        + "                PAST::Val.new(                                         \n"
-        + "                    :returns( 'Integer' ),                             \n"
-        + "                    :value( '42' ),                                    \n"
-        + "                ),                                                     \n"
-        + "            ),                                                         \n"
-        + "            PAST::Op.new(                                              \n"
-        + "                :name( 'echo' ),                                       \n"
-        + "                PAST::Val.new(                                         \n"
-        + "                    :returns( 'String' ),                              \n"
-        + "                    :value( decode_base64( 'Cg==' ) ),                 \n"
-        + "                ),                                                     \n"
-        + "            ),                                                         \n"
-        + "        ),                                                             \n"
+          "        ),                                                             \n"
       );
     }
   | {
