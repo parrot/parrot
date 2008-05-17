@@ -274,10 +274,12 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const .LuaNil k_"
+    pir = "    .local pmc k_"
     $S0 = i
     pir .= $S0
-    pir .= " = '0'\n"
+    pir .= "\n    new k_"
+    pir .= $S0
+    pir .= ", 'LuaNil'\n"
     .return (pir)
 .end
 
@@ -296,13 +298,17 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const .LuaBoolean k_"
+    pir = "    .local pmc k_"
     $S0 = i
     pir .= $S0
-    pir .= " = '"
+    pir .= "\n    new k_"
+    pir .= $S0
+    pir .= ", 'LuaBoolean'\n    set k_"
+    pir .= $S0
+    pir .= ", "
     $S0 = self
     pir .= $S0
-    pir .= "'\n"
+    pir .= "\n"
     .return (pir)
 .end
 
@@ -321,13 +327,17 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const .LuaNumber k_"
+    pir = "    .local pmc k_"
     $S0 = i
     pir .= $S0
-    pir .= " = '"
+    pir .= "\n    new k_"
+    pir .= $S0
+    pir .= ", 'LuaNumber'\n    set k_"
+    pir .= $S0
+    pir .= ", "
     $S0 = self
     pir .= $S0
-    pir .= "'\n"
+    pir .= "\n"
     .return (pir)
 .end
 
@@ -348,10 +358,14 @@ PIRCODE
 .sub 'translate' :method
     .param int i
     .local string pir
-    pir = "    .const .LuaString k_"
+    pir = "    .local pmc k_"
     $S0 = i
     pir .= $S0
-    pir .= " = \""
+    pir .= "\n    new k_"
+    pir .= $S0
+    pir .= ", 'LuaString'\n    set k_"
+    pir .= $S0
+    pir .= ", \""
     $S0 = self
     $S1 = escape $S0
     pir .= $S1
