@@ -6,6 +6,14 @@
     (NOTE: This was scheduled to occur after 0.7.0, moved up to this release)
   + removed register stack, saveall & restoreall opcodes
   + Add implementation of Rational PMC.
+- Configuration
+  + add step auto::opengl
+  + add step gen::opengl
+  + add step gen::call_list
+- Miscellaneous
+  + new libraries: OpenGL/GLU/GLUT bindings (small subset working)
+  + new pbc_dump.pl utility: PBC disassembly/source code weaver
+
 
 
 New in 0.6.1
