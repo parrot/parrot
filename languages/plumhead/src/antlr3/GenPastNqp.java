@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 src/antlr3/GenPastNqp.g 2008-05-17 15:49:34
+// $ANTLR 3.0.1 src/antlr3/GenPastNqp.g 2008-05-17 16:11:21
 
   import java.util.regex.*;
 
@@ -405,7 +405,7 @@ public class GenPastNqp extends TreeParser {
                              System.out.println( 
                                  "    PAST::Op.new(\n"
                                + "        :pirop( '" + pirop + "' ),\n"
-                               + "        :name( 'infix:" + infix + "' ),\n"
+                               + "        :name( '" + name + "' ),\n"
                              );
                            
 

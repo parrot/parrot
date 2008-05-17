@@ -67,6 +67,15 @@
     .return ($I0)
 .end
 
+.sub 'prefix:-' :multi(PMC)
+    .param pmc a
+
+    $N0 = a
+    $N0 = neg $N0
+
+    .return ($N0)
+.end
+
 
 .sub 'infix:+&'
     .param int a

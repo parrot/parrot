@@ -138,7 +138,7 @@ node
          System.out.println( 
              "    PAST::Op.new(\n"
            + "        :pirop( '" + pirop + "' ),\n"
-           + "        :name( 'infix:" + infix + "' ),\n"
+           + "        :name( '" + name + "' ),\n"
          );
        } node node )
     {
