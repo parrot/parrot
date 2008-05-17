@@ -57,9 +57,13 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'PGE/Dumper.pbc'
+
     load_bytecode 'PCT.pbc'
+
     load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
+
     load_bytecode 'CGI/QueryHash.pbc'
+    load_bytecode 'MIME/Base64.pbc'
     load_bytecode 'dumper.pbc'
     load_bytecode 'Getopt/Obj.pbc'
 
@@ -112,11 +116,15 @@ VARIANT_PCT:
     .local pmc superglobal_GET
     ( superglobal_GET ) = parse_get_sub()
     set_hll_global '$_GET', superglobal_GET
+    # be compatible with PHC variant
+    set_hll_global '_GET', superglobal_GET
     #'_dumper'( superglobal_GET, 'GET' )
 
     .local pmc superglobal_POST
     ( superglobal_POST ) = parse_post_sub()
     set_hll_global '$_POST', superglobal_POST
+    # be compatible with PHC variant
+    set_hll_global '_POST', superglobal_POST
     #'_dumper'( superglobal_POST, 'POST' )
 
     err_msg = 'Compiling and executing with pct failed'
@@ -147,7 +155,7 @@ VARIANT_PHC:
     cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_nqp.xsl  plumhead_phc_past.xml  > plumhead_phc_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
-    source_fn = ' plumhead_phc_past.nqp'
+    source_fn = 'plumhead_phc_past.nqp'
     goto RUN_NQP
 
 
@@ -155,18 +163,45 @@ VARIANT_ANTLR3:
     err_msg = 'Generating PAST from annotated PHP source failed'
     cmd = 'java PlumheadAntlr3 '
     concat cmd, source_fn
-    source_fn = ' plumhead_antlr_past.nqp'
+    source_fn = 'plumhead_antlr_past.nqp'
+    concat cmd, ' '
     concat cmd, source_fn
     ret = spawnw cmd
     if ret goto ERROR
     goto RUN_NQP
 
 RUN_NQP:
+    # compile NQP to PIR
     err_msg = 'Executing NQP failed'
-    cmd = './parrot languages/plumhead/driver_nqp.pbc '
+    .local string pir_fn
+    .local int ret
+    clone pir_fn, source_fn
+    substr pir_fn, -3, 3, 'pir'
+    cmd = "./parrot ./compilers/nqp/nqp.pbc --target=pir --output="
+    concat cmd, pir_fn
+    concat cmd, " "
     concat cmd, source_fn
+    # say cmd
     ret = spawnw cmd
-    if ret goto ERROR
+
+    # load the generated PIR
+    #$S1 = concat "languages/eclectus/", pir_fn
+    $S1 = concat "", pir_fn
+    load_bytecode $S1
+
+    .local pmc stmts
+    ( stmts ) = php_entry()
+
+    # compile and evaluate the PAST returned from scheme_entry()
+    .local pmc past_compiler
+    past_compiler = new [ 'PCT::HLLCompiler' ]
+    $P0 = split ' ', 'post pir'
+    past_compiler.'stages'( $P0 )
+    $P1 = past_compiler.'eval'(stmts)
+    #_dumper ($P1)
+    $P0 = split ' ', 'evalpmc'
+    past_compiler.'stages'( $P0 )
+    past_compiler.'eval'( $P1 )
 
     exit 0
 
