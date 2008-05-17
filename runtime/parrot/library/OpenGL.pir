@@ -361,7 +361,7 @@ this library.
 =item _export_all_functions_to(pmc namespace)
 
 Export all OpenGL/GLU/GLUT functions to the target C<namespace>.
- 
+
 =cut
 
 .sub _export_all_functions_to
