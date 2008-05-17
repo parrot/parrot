@@ -4,14 +4,65 @@ OpenGL - Parrot extension for OpenGL bindings
 
 =head1 SYNOPSIS
 
-TBD
+This covers only the basic OpenGL and GLUT initialization.
+For more, look in F<examples/opengl/>.
+
+ # Include OpenGL constants
+ .include 'opengl_defines.pasm'
+
+ .sub main :main
+    .param pmc argv
+
+    # Load OpenGL libary and a helper library for calling glutInit
+    load_bytecode 'library/OpenGL.pbc'
+    load_bytecode 'library/NCI/call_toolkit_init.pbc'
+
+    # Import all OpenGL/GLU/GLUT functions
+    .local pmc import_gl_to, my_namespace
+    import_gl_to = get_global ['OpenGL'], '_export_all_functions_to'
+    my_namespace = get_namespace
+
+    import_gl_to(my_namespace)
+
+    # Initialize GLUT
+    .local pmc call_toolkit_init
+    call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
+
+    .const .Sub glutInit = 'glutInit'
+    argv = call_toolkit_init(glutInit, argv)
+
+    # Set display mode, create GLUT window, save window handle
+    .local int mode
+    mode = .GLUT_DOUBLE | .GLUT_RGBA
+    glutInitDisplayMode(mode)
+
+    .local pmc window
+    window = new 'Integer'
+    window = glutCreateWindow('My Window Title')
+    set_global 'glut_window', window
+
+    # Set up GLUT callbacks
+    .const .Sub draw     = 'draw'
+    .const .Sub idle     = 'idle'
+    .const .Sub keyboard = 'keyboard'
+    glutcbDisplayFunc (draw)
+    glutcbIdleFunc    (idle)
+    glutcbKeyboardFunc(keyboard)
+
+    # Enter the GLUT main loop
+    glutMainLoop()
+ .end
 
 =head1 DESCRIPTION
 
 This library is a straightforward Parrot NCI wrapper for OpenGL, GLU, and
 GLUT.  It is still a work in progress; work will generally start with the
 oldest, most widely supported functions and progress to the most recently
-standardized calls.
+standardized calls.  Generally you will find programming GLUT in PIR to be
+similar to GLUT in C, with the exception of the renaming of C<glut*Func>
+to C<glutcb*Func> to work around some current Parrot limitations.
+
+The following sections describe other differences from OpenGL in C.
 
 =head2 Initialization
 
@@ -57,29 +108,29 @@ the known different filenames for each library in turn before giving up.
     libnames = new 'ResizableStringArray'
     push libnames, 'libGL'
     push libnames, '/System/Library/Frameworks/OpenGL.framework/OpenGL'
-    libgl = load_lib_with_fallbacks('GL', libnames)
-    set_global 'libgl', libgl
+    libgl = _load_lib_with_fallbacks('GL', libnames)
+    set_global '_libgl', libgl
 
     libnames = new 'ResizableStringArray'
     push libnames, 'libGLU'
     push libnames, '/System/Library/Frameworks/OpenGL.framework/OpenGL'
-    libglu = load_lib_with_fallbacks('GLU', libnames)
-    set_global 'libglu', libglu
+    libglu = _load_lib_with_fallbacks('GLU', libnames)
+    set_global '_libglu', libglu
 
     libnames = new 'ResizableStringArray'
     push libnames, 'libglut'
     push libnames, '/System/Library/Frameworks/GLUT.framework/GLUT'
-    libglut = load_lib_with_fallbacks('GLUT', libnames)
-    set_global 'libglut', libglut
+    libglut = _load_lib_with_fallbacks('GLUT', libnames)
+    set_global '_libglut', libglut
 
     libnames = new 'ResizableStringArray'
     push libnames, 'libglutcb'
-    libglutcb = load_lib_with_fallbacks('GLUTCB', libnames)
-    set_global 'libglutcb', libglutcb
+    libglutcb = _load_lib_with_fallbacks('GLUTCB', libnames)
+    set_global '_libglutcb', libglutcb
 .end
 
 
-=item load_lib_with_fallbacks(string friendly_name, pmc fallback_list)
+=item _load_lib_with_fallbacks(string friendly_name, pmc fallback_list)
 
 This function is more generally useful than just for this module -- it
 implements the search for a particular libary that may appear under any
@@ -91,7 +142,7 @@ match can be found on the system.
 
 =cut
 
-.sub load_lib_with_fallbacks
+.sub _load_lib_with_fallbacks
     .param string friendly_name
     .param pmc    fallback_list
 
@@ -130,24 +181,24 @@ Create NCI wrappers for all GL, GLU, and GLUT functions
     namespace = get_namespace
 
     .local pmc libgl, libglu, libglut, libglutcb
-    libgl     = get_global 'libgl'
-    libglu    = get_global 'libglu'
-    libglut   = get_global 'libglut'
-    libglutcb = get_global 'libglutcb'
+    libgl     = get_global '_libgl'
+    libglu    = get_global '_libglu'
+    libglut   = get_global '_libglut'
+    libglutcb = get_global '_libglutcb'
 
     .local pmc gl_funcs, glu_funcs, glut_funcs, glutcb_funcs
-    gl_funcs     = gl_func_list()
-    glu_funcs    = glu_func_list()
-    glut_funcs   = glut_func_list()
-    glutcb_funcs = glutcb_func_list()
+    gl_funcs     = _gl_func_list()
+    glu_funcs    = _glu_func_list()
+    glut_funcs   = _glut_func_list()
+    glutcb_funcs = _glutcb_func_list()
 
-    wrap_nci_list(namespace, libgl,     gl_funcs)
-    wrap_nci_list(namespace, libglu,    glu_funcs)
-    wrap_nci_list(namespace, libglut,   glut_funcs)
-    wrap_nci_list(namespace, libglutcb, glutcb_funcs)
+    _wrap_nci_list(namespace, libgl,     gl_funcs)
+    _wrap_nci_list(namespace, libglu,    glu_funcs)
+    _wrap_nci_list(namespace, libglut,   glut_funcs)
+    _wrap_nci_list(namespace, libglutcb, glutcb_funcs)
 .end
 
-.sub gl_func_list
+.sub _gl_func_list
     .local pmc gl_funcs
     gl_funcs = new 'ResizableStringArray'
     push gl_funcs, 'glBegin'
@@ -168,14 +219,14 @@ Create NCI wrappers for all GL, GLU, and GLUT functions
     .return (gl_funcs)
 .end
 
-.sub glu_func_list
+.sub _glu_func_list
     .local pmc glu_funcs
     glu_funcs = new 'ResizableStringArray'
 
     .return (glu_funcs)
 .end
 
-.sub glut_func_list
+.sub _glut_func_list
     .local pmc glut_funcs
     glut_funcs = new 'ResizableStringArray'
     push glut_funcs, 'glutInit'
@@ -196,7 +247,7 @@ Create NCI wrappers for all GL, GLU, and GLUT functions
     .return (glut_funcs)
 .end
 
-.sub glutcb_func_list
+.sub _glutcb_func_list
     .local pmc glutcb_funcs
     glutcb_funcs = new 'ResizableStringArray'
     push glutcb_funcs, 'glutcbCloseFunc'
@@ -262,7 +313,7 @@ Create NCI wrappers for all GL, GLU, and GLUT functions
 .end
 
 
-=item wrap_nci_list(pmc namespace, pmc library, pmc nci_list)
+=item _wrap_nci_list(pmc namespace, pmc library, pmc nci_list)
 
 Create NCI wrappers for every C<library> entry point in C<nci_list>,
 and store the results in C<namespace> .  The list should consist of
@@ -270,7 +321,7 @@ alternating function names and Parrot NCI signatures.
 
 =cut
 
-.sub wrap_nci_list
+.sub _wrap_nci_list
     .param pmc namespace
     .param pmc library
     .param pmc nci_list
@@ -294,6 +345,54 @@ alternating function names and Parrot NCI signatures.
 
   done:
 .end
+
+
+=back
+
+=head2 Symbol Export
+
+These routines allow OpenGL symbols to exported to other namespaces to more
+directly replicate the normal OpenGL coding style.  Most calling programs
+will want to use at least one of these, probably immediately after loading
+this library.
+
+=over 4
+
+=item _export_all_functions_to(pmc namespace)
+
+Export all OpenGL/GLU/GLUT functions to the target C<namespace>.
+ 
+=cut
+
+.sub _export_all_functions_to
+    .param pmc namespace
+
+    .local pmc gl_namespace
+    gl_namespace = get_namespace
+
+    .local pmc    iterator, export_list
+    .local string symbol, tag
+    iterator    = new 'Iterator', gl_namespace
+    export_list = new 'ResizableStringArray'
+
+    # Collect all symbols in the OpenGL namespace starting with 'gl'
+  symbol_loop:
+    unless iterator goto symbol_end
+    symbol = shift iterator
+    tag    = substr symbol, 0, 2
+    unless tag == 'gl' goto symbol_loop
+    push export_list, symbol
+    goto symbol_loop
+  symbol_end:
+
+    # Export them all to the requested namespace
+    gl_namespace.export_to(namespace, export_list)
+.end
+
+
+=back
+
+=cut
 
 
 # Local Variables:

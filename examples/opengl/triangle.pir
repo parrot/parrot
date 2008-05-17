@@ -27,34 +27,35 @@ ASCII key.
 .sub main :main
     .param pmc argv
 
+    # Load OpenGL libary and a helper library for calling glutInit
     load_bytecode 'library/OpenGL.pbc'
     load_bytecode 'library/NCI/call_toolkit_init.pbc'
 
-    .local pmc glutInit, glutInitDisplayMode, glutCreateWindow, glutMainLoop
-    .local pmc glutcbDisplayFunc, glutcbIdleFunc
-    .local pmc glutcbKeyboardFunc, glutcbSpecialFunc
-    .local pmc call_toolkit_init
-    glutInit            = get_global ['OpenGL'], 'glutInit'
-    glutInitDisplayMode = get_global ['OpenGL'], 'glutInitDisplayMode'
-    glutCreateWindow    = get_global ['OpenGL'], 'glutCreateWindow'
-    glutMainLoop        = get_global ['OpenGL'], 'glutMainLoop'
-    glutcbDisplayFunc   = get_global ['OpenGL'], 'glutcbDisplayFunc'
-    glutcbIdleFunc      = get_global ['OpenGL'], 'glutcbIdleFunc'
-    glutcbKeyboardFunc  = get_global ['OpenGL'], 'glutcbKeyboardFunc'
-    glutcbSpecialFunc   = get_global ['OpenGL'], 'glutcbSpecialFunc'
-    call_toolkit_init   = get_global ['NCI'],    'call_toolkit_init'
+    # Import all OpenGL/GLU/GLUT functions
+    .local pmc import_gl_to, my_namespace
+    import_gl_to = get_global ['OpenGL'], '_export_all_functions_to'
+    my_namespace = get_namespace
 
+    import_gl_to(my_namespace)
+
+    # Initialize GLUT
+    .local pmc call_toolkit_init
+    call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
+
+    .const .Sub glutInit = 'glutInit'
     argv = call_toolkit_init(glutInit, argv)
 
+    # Set display mode, create GLUT window, save window handle
     .local int mode
     mode = .GLUT_DOUBLE | .GLUT_RGBA
     glutInitDisplayMode(mode)
 
     .local pmc window
-    window = new Integer
+    window = new 'Integer'
     window = glutCreateWindow('Test')
     set_global 'glut_window', window
 
+    # Set up GLUT callbacks
     .const .Sub draw     = 'draw'
     .const .Sub idle     = 'idle'
     .const .Sub keyboard = 'keyboard'
@@ -62,11 +63,13 @@ ASCII key.
     glutcbIdleFunc    (idle)
     glutcbKeyboardFunc(keyboard)
 
+    # Set up global flag for rotating/paused
     .local pmc rotating
     rotating = new 'Integer'
     rotating = 1
     set_global 'rotating', rotating
 
+    # Set up global time to allow constant rotation speed regardless of FPS
     .local pmc prev_time
     .local num now
     now       = time
@@ -74,23 +77,11 @@ ASCII key.
     prev_time = now
     set_global 'prev_time', prev_time
 
+    # Enter the GLUT main loop
     glutMainLoop()
 .end
 
 .sub draw
-    .local pmc glClear, glFlush
-    .local pmc glBegin, glEnd
-    .local pmc glColor3f, glVertex3f
-    glClear    = get_global ['OpenGL'], 'glClear'
-    glFlush    = get_global ['OpenGL'], 'glFlush'
-    glBegin    = get_global ['OpenGL'], 'glBegin'
-    glEnd      = get_global ['OpenGL'], 'glEnd'
-    glColor3f  = get_global ['OpenGL'], 'glColor3f'
-    glVertex3f = get_global ['OpenGL'], 'glVertex3f'
-
-    .local pmc glutSwapBuffers
-    glutSwapBuffers = get_global ['OpenGL'], 'glutSwapBuffers'
-
     .local int buffers
     buffers = .GL_COLOR_BUFFER_BIT | .GL_DEPTH_BUFFER_BIT
     glClear(buffers)
@@ -99,24 +90,19 @@ ASCII key.
 
     glColor3f(1, 0, 0)
     glVertex3f(-.5, -.5, 0)
+
     glColor3f(0, 1, 0)
     glVertex3f( .5, -.5, 0)
+
     glColor3f(0, 0, 1)
     glVertex3f(0  ,  .5, 0)
 
     glEnd()
 
-    glFlush()
-
     glutSwapBuffers()
 .end
 
 .sub idle
-    .local pmc glutPostRedisplay
-    .local pmc glRotatef
-    glutPostRedisplay = get_global ['OpenGL'], 'glutPostRedisplay'
-    glRotatef         = get_global ['OpenGL'], 'glRotatef'
-
     .local pmc prev_time
     .local num prev, now, dt
     prev_time  = get_global 'prev_time'
@@ -147,17 +133,16 @@ ASCII key.
     if key == 113 goto quit
     goto toggle_rotation
   quit:
-    .local pmc glutDestroyWindow, glut_window
-    glutDestroyWindow = get_global ['OpenGL'], 'glutDestroyWindow'
-    glut_window       = get_global             'glut_window'
+    .local pmc glut_window
+    glut_window = get_global 'glut_window'
     glutDestroyWindow(glut_window)
     end
 
     # For all other keys, just toggle rotation
   toggle_rotation:
     .local pmc rotating
-    rotating  = get_global 'rotating'
-    rotating  = not rotating
+    rotating = get_global 'rotating'
+    rotating = not rotating
 .end
 
 
