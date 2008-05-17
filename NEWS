@@ -1,18 +1,33 @@
 # $Id$
 
+- Specification
+  + updated and launched pdd28_strings.pod
 - Implementation
+  + added implementation of Rational PMC.
+  + simplified ops control flow syntax
+  + enabled backtrace on non-glibc platforms too
   + removed user stack opcodes
     (save, restore, lookback, entrytype, depth, rotate_up)
     (NOTE: This was scheduled to occur after 0.7.0, moved up to this release)
-  + removed register stack, saveall & restoreall opcodes
-  + Add implementation of Rational PMC.
+  + removed register stack, saveall, and restoreall opcodes
+  + removed various deprecated and unused code
+- Languages
+  + Eclectus: various updates
+  + Lua: added bytecode translation, nearly all tests passing again
+  + Squaak: added to repository
+  + Amber: retired
+  + TAP: retired
+  + Rakudo: roadmap updated
 - Configuration
-  + add step auto::opengl
-  + add step gen::opengl
-  + add step gen::call_list
+  + added step auto::opengl
+  + added step gen::opengl
+  + added step gen::call_list
 - Miscellaneous
+  + still more optimizations and performance improvements, especially in GC
   + new libraries: OpenGL/GLU/GLUT bindings (small subset working)
   + new pbc_dump.pl utility: PBC disassembly/source code weaver
+  + improved C++ compiler support
+  + optimized builds work again
 
 
 
