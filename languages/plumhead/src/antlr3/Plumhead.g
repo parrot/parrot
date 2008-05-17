@@ -83,7 +83,7 @@ relational_expression
   ;
 
 statements
-  : ( statement )*
+  : ( statement )*                                                  -> ^( STMTS )
   ;
 
 statement

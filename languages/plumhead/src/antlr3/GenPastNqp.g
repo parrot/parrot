@@ -35,60 +35,25 @@ gen_past_nqp
         + "sub php_entry ()                                                       \n"
         + "{                                                                      \n"
         + "    PAST::Block.new(                                                   \n"
-        + "        PAST::Stmts.new(                                               \n"
-        + "                                                                       \n"
-        + "               PAST::Op.new(                                           \n"
-        + "                 :name( 'echo' ),                                      \n"
-        + "                                                                       \n"
-        + "                     PAST::Op.new(                                     \n"
-        + "                     :pirop( 'n_mod' ),                                \n"
-        + "                     :name( 'infix:\%' ),                               \n"
-        + "                                                                       \n"
-        + "                           PAST::Val.new(                              \n"
-        + "                         :returns( 'Integer' ),                        \n"
-        + "                         :value( '2' ),                                \n"
-        + "                     ),                                                \n"
-        + "                                                                       \n"
-        + "                           PAST::Val.new(                              \n"
-        + "                         :returns( 'Integer' ),                        \n"
-        + "                         :value( '2' ),                                \n"
-        + "                     ),                                                \n"
-        + "                                                                       \n"
-        + "                     ),                                                \n"
-        + "                                                                       \n"
-        + "               ),                                                      \n"
-        + "                                                                       \n"
-        + "               PAST::Op.new(                                           \n"
-        + "                 :name( 'echo' ),                                      \n"
-        + "                                                                       \n"
-        + "                     PAST::Val.new(                                    \n"
-        + "                     :returns( 'String' ),                             \n"
-        + "                     :value( decode_base64( 'Cg==' ) ),                \n"
-        + "                 ),                                                    \n"
-        + "                                                                       \n"
-        + "               ),                                                      \n"
-        + "                                                                       \n"
-        + "                                                                       \n"
-        + "        )                                                              \n"
-        + "    );                                                                 \n"
       );
     }
-    ^( PROGRAM node["past_stmts"]* )
+    ^( PROGRAM node* )
     {
       System.out.println( 
           "                                                                       \n"
+        + "    );                                                                 \n"
         + "}                                                                      \n"
       );
     }
   ;
 
-node[String reg_mother]
+node
   : {
       System.out.println( 
-          "                                                                  \n"
+          "# node start                               \n"
       );
     }
-    ^( ECHO node["past_echo"] )
+    ^( ECHO node )
     {
       System.out.println( 
           "                                                                  \n"
@@ -99,7 +64,7 @@ node[String reg_mother]
           "                                                                  \n"
       );
     }
-    ^( VAR_DUMP node["past_var_dump"] )
+    ^( VAR_DUMP node )
     {
       System.out.println( 
           "                                                                  \n"
@@ -148,7 +113,7 @@ node[String reg_mother]
           "                                                                   \n"
       );
     }
-    ^( infix=( PLUS | MINUS | MUL_OP | BITWISE_OP ) node[reg] node[reg] )
+    ^( infix=( PLUS | MINUS | MUL_OP | BITWISE_OP ) node node )
     {
       // Todo. This is not nice, handle pirops in Plumhead.g
       String op = $infix.text;
@@ -174,7 +139,7 @@ node[String reg_mother]
           "                                                                   \n"
       );
     }
-    ^( prefix=PREFIX node[reg] )
+    ^( prefix=PREFIX node )
     {
       // Todo. This is not nice, handle pirops in Plumhead.g
       String op = $prefix.text;
@@ -193,7 +158,7 @@ node[String reg_mother]
           "                                                                   \n"
       );
     }
-    ^( REL_OP node[reg] node[reg] )
+    ^( REL_OP node node )
     {
       // Todo. This is not nice, handle pirops in Plumhead.g
       String name = $REL_OP.text;
@@ -212,7 +177,7 @@ node[String reg_mother]
           "                                                                   \n"
       );
     }
-    ^( IF node["past_if_op"] node["past_if_op"] node["past_if_op"]? )
+    ^( IF node node node? )
     {
       System.out.print( 
           "                                                                   \n"
@@ -225,9 +190,27 @@ node[String reg_mother]
           "                                                                   \n"
       );
     }
-    ^( STMTS node[reg_stmts]* )
+    ^( STMTS node* )
     {
-      System.out.print( " " ); 
+      System.out.print( 
+          "                                                                       \n"
+        + "        PAST::Stmts.new(                                               \n"
+        + "            PAST::Op.new(                                              \n"
+        + "                :name( 'echo' ),                                       \n"
+        + "                PAST::Val.new(                                         \n"
+        + "                    :returns( 'Integer' ),                             \n"
+        + "                    :value( '42' ),                                    \n"
+        + "                ),                                                     \n"
+        + "            ),                                                         \n"
+        + "            PAST::Op.new(                                              \n"
+        + "                :name( 'echo' ),                                       \n"
+        + "                PAST::Val.new(                                         \n"
+        + "                    :returns( 'String' ),                              \n"
+        + "                    :value( decode_base64( 'Cg==' ) ),                 \n"
+        + "                ),                                                     \n"
+        + "            ),                                                         \n"
+        + "        ),                                                             \n"
+      );
     }
   | {
       reg_num++;
@@ -236,7 +219,7 @@ node[String reg_mother]
           "                                                                   \n"
       );
     }
-    ^( ASSIGN_OP node[reg_assign] node[reg_assign] )
+    ^( ASSIGN_OP node node )
     {
       System.out.println( 
           "                                                                  \n"
@@ -255,7 +238,7 @@ node[String reg_mother]
           "                                                                  \n"
       );
     }
-    ^( ARRAY node[reg_array] )
+    ^( ARRAY node )
     {
       System.out.println( 
           "                                                                  \n"
