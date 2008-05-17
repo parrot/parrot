@@ -18,12 +18,6 @@ options
   import java.util.regex.*;
 }
 
-@members
-{
-  // used for generating unique register names, TODO: remove
-  public static int reg_num = 200;
-}
-
 gen_past_nqp 
   : {
       System.out.println( 
@@ -62,13 +56,14 @@ node
     }
   | {
       System.out.println( 
-          "                                                                  \n"
+          "    PAST::Op.new(                                                   \n"
+        + "       :name( 'var_dump' ),                                             \n"
       );
     }
     ^( VAR_DUMP node )
     {
-      System.out.println( 
-          "                                                                  \n"
+      System.out.println(  
+          "    ),                                                            \n"
       );
     }
   | NOQUOTE_STRING
@@ -77,6 +72,10 @@ node
       noquote = noquote.replace( "\n", "\\n" );
       System.out.println( 
           " # NOQUOTE_STRING \n"
+        + "     PAST::Val.new(                                              \n"
+        + "         :returns( 'String' ),                                   \n"
+        + "         :value(" + noquote + ")                                 \n"
+        + "      ),                                                         \n"
       );
     }
   | SINGLEQUOTE_STRING
@@ -85,6 +84,10 @@ node
       singlequote = singlequote.replace( "\n", "\\n" );
       System.out.println( 
           " # SINGLEQUOTE_STRING \n"
+        + "     PAST::Val.new(                                              \n"
+        + "         :returns( 'String' ),                                   \n"
+        + "         :value(" + singlequote + ")                             \n"
+        + "      ),                                                         \n"
       );
     }
   | DOUBLEQUOTE_STRING
@@ -102,7 +105,10 @@ node
   | NUMBER
     {
       System.out.println( 
-          "                                                                  \n"
+          "     PAST::Val.new(                                              \n"
+        + "         :returns( 'Float' ),                                    \n"
+        + "         :value('" + $NUMBER.text + "')                          \n"
+        + "      ),                                                         \n"
       );
     }
   | INTEGER
@@ -114,54 +120,45 @@ node
         + "      ),                                                         \n"
       );
     }
-  | {
-      reg_num++;
-      String reg = "reg_" + reg_num;
-      System.out.print( 
-          "                                                                   \n"
-      );
-    }
-    ^( infix=( PLUS | MINUS | MUL_OP | BITWISE_OP ) node node )
+  | ^( infix=( PLUS | MINUS | MUL_OP | BITWISE_OP )
+       { 
+          // Todo. This is not nice, handle pirops in Plumhead.g
+          String op = $infix.text;
+          String pirop = "";
+          if      ( op.equals( "+" ) )  { pirop = "n_add"; }
+          else if ( op.equals( "-" ) )  { pirop = "n_sub"; }
+          else if ( op.equals( "/" ) )  { pirop = "n_div"; }
+          else if ( op.equals( "*" ) )  { pirop = "n_mul"; }
+          else if ( op.equals( "\%" ) ) { pirop = "n_mod"; }
+          
+          String name = op;
+          if      ( op.equals( "&" ) )  { name = "+&"; }
+          else if ( op.equals( "|" ) )  { name = "+|"; }
+          else if ( op.equals( "^" ) )  { name = "+^"; }
+          name = "infix:" + name;
+          System.out.println( 
+              "    PAST::Op.new(                                                   \n"
+            + "  :name( '" + infix + "' ),"
+          );
+    } node node )
     {
-      // Todo. This is not nice, handle pirops in Plumhead.g
-      String op = $infix.text;
-      String pirop = "";
-      if      ( op.equals( "+" ) )  { pirop = "n_add"; }
-      else if ( op.equals( "-" ) )  { pirop = "n_sub"; }
-      else if ( op.equals( "/" ) )  { pirop = "n_div"; }
-      else if ( op.equals( "*" ) )  { pirop = "n_mul"; }
-      else if ( op.equals( "\%" ) ) { pirop = "n_mod"; }
-      
-      String name = op;
-      if      ( op.equals( "&" ) )  { name = "+&"; }
-      else if ( op.equals( "|" ) )  { name = "+|"; }
-      else if ( op.equals( "^" ) )  { name = "+^"; }
-      name = "infix:" + name;
-
-      System.out.print(  " " ); 
-    }
-  | {
-      reg_num++;
-      String reg = "reg_" + reg_num;
       System.out.print( 
-          "                                                                   \n"
+          "      ),                                                            \n"
       );
     }
-    ^( prefix=PREFIX node )
+  | ^( prefix=PREFIX
+       {
+         System.out.println( 
+             "    PAST::Op.new(                                                   \n"
+           + "        :name( 'prefix:" + $prefix.text + "' ),                     \n"
+         );
+       }  node )
     {
-      // Todo. This is not nice, handle pirops in Plumhead.g
-      String op = $prefix.text;
-      
-      String name = op;
-      name = "prefix:" + name;
-
       System.out.print( 
-          "                                                                   \n"
+          "      ),                                                            \n"
       );
     }
   | {
-      reg_num++;
-      String reg = "reg_" + reg_num;
       System.out.print( 
           "                                                                   \n"
       );
@@ -173,14 +170,8 @@ node
       if      ( name.equals( "==" ) )  { name = "eq"; }
       else if ( name.equals( "!=" ) )  { name = "ne"; }
       name = "infix:" + name;
-      
-      System.out.print( 
-          "  " + reg + ".'attr'( 'name', '" + name + "' , 1 )               \n"
-      );
     }
   | {
-      reg_num++;
-      String reg_exp   = "reg_expression_" + reg_num;
       System.out.print( 
           "                                                                   \n"
       );
@@ -204,8 +195,6 @@ node
       );
     }
   | {
-      reg_num++;
-      String reg_assign = "reg_assign_" + reg_num;
       System.out.print( 
           "                                                                   \n"
       );
@@ -223,8 +212,6 @@ node
       );
     }
   | {
-      reg_num++;
-      String reg_array = "reg_array_" + reg_num;
       System.out.print( 
           "                                                                  \n"
       );

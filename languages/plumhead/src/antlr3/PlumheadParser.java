@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 src/antlr3/Plumhead.g 2008-05-17 12:45:08
+// $ANTLR 3.0.1 src/antlr3/Plumhead.g 2008-05-17 13:39:26
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -726,7 +726,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: expression, ECHO
+                    // elements: ECHO, expression
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -779,7 +779,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: VAR_DUMP, expression
+                    // elements: expression, VAR_DUMP
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -878,7 +878,7 @@ public class PlumheadParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: IF, relational_expression, s2, s1
+                            // elements: relational_expression, IF, s1, s2
                             // token labels: 
                             // rule labels: retval, s2, s1
                             // token list labels: 
@@ -930,7 +930,7 @@ public class PlumheadParser extends Parser {
                             {
 
                             // AST REWRITE
-                            // elements: IF, relational_expression, s1
+                            // elements: relational_expression, s1, IF
                             // token labels: 
                             // rule labels: retval, s1
                             // token list labels: 
@@ -1103,7 +1103,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ASSIGN_OP, key, val
+                    // elements: key, val, ASSIGN_OP
                     // token labels: 
                     // rule labels: val, retval, key
                     // token list labels: 
