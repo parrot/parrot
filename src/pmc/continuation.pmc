@@ -110,7 +110,11 @@ Destroys the continuation.
                         "[destroy cont    %p, to_ctx %p, from_ctx %p]\n",
                         (void *)SELF, (void *)cc->to_ctx, (void *)cc->from_ctx);
             }
+
 #endif
+            if (cc->dynamic_state)
+                cc->dynamic_state->refcount--;
+
             if (cc->from_ctx)
                 Parrot_free_context(interp, cc->from_ctx, 0);
 
@@ -138,6 +142,8 @@ Creates and returns a clone of the continuation.
         cc->dynamic_state    = cc_self->dynamic_state;
         PMC_struct_val(ret)  = cc;
         PMC_pmc_val(ret)     = PMC_pmc_val(SELF);
+
+        cc->dynamic_state->refcount++;
 
         return ret;
     }
@@ -173,9 +179,14 @@ dynamic state, and the descriptor address for any returned values.
         opcode_t    * const pos = (opcode_t *)value;
         Parrot_cont * const cc  = PMC_cont(SELF);
 
+        if (cc->dynamic_state)
+            cc->dynamic_state->refcount--;
+
         cc->address       = (opcode_t *)value;
         cc->dynamic_state = INTERP->dynamic_env;
         cc->runloop_id    = INTERP->current_runloop_id;
+
+        cc->dynamic_state->refcount++;
 
         if (pos && (*pos == PARROT_OP_get_results_pc))
             cc->current_results = pos;
@@ -269,9 +280,7 @@ destination to continue execution.
             real_exception(interp, NULL, INVALID_OPERATION,
                            "Continuation invoked without initialization.");
 
-        /*
-         * Rewind the dynamic environment.
-         */
+        /* Rewind the dynamic environment. */
         if (interp->dynamic_env != stack_target) {
             /* compute the "stack delta", which is a measure of how much
                unwinding we have to do.  if negative, we have to pop that many
@@ -282,8 +291,10 @@ destination to continue execution.
                 = ((int) stack_height(interp, stack_target) -
                    (int) stack_height(interp, interp->dynamic_env));
         }
+
         /* descend down the target stack until we get to the same depth. */
         corresponding_target = stack_target;
+
         while (stack_delta > 0) {
             corresponding_target = corresponding_target->prev;
             stack_delta--;
@@ -329,13 +340,18 @@ destination to continue execution.
              */
             if (stack_delta < 0)
                 stack_delta++;
-            else
-                corresponding_target = corresponding_target->prev;
+            else {
+                Stack_Chunk_t *prev  = corresponding_target->prev;
+                (void)stack_pop(INTERP, &corresponding_target, NULL,
+                        NO_STACK_ENTRY_TYPE);
+                corresponding_target = prev;
+            }
         }
 
         /* run back up the target stack to our destination.  [when we support
            dynamic binding (e.g.), we will have to traverse back up, and will
            therefore need to keep track on the way down.  -- rgr, 30-Sep-06.] */
+        interp->dynamic_env->refcount--;
         interp->dynamic_env = stack_target;
 
         /* debug print before context is switched */
@@ -348,7 +364,7 @@ destination to continue execution.
         }
 
         /* set context */
-        CONTEXT(interp) = to_ctx;
+        CONTEXT(interp)      = to_ctx;
         INTERP->ctx.bp       = to_ctx->bp;
         INTERP->ctx.bp_ps    = to_ctx->bp_ps;
 
@@ -356,14 +372,11 @@ destination to continue execution.
         if (ret_continuation_p)
             return pc;
 
-        /* pass args */
-        if (cc->current_results) {
-            /* where caller wants result */
+        /* pass args to where caller wants result */
+        if (cc->current_results)
             to_ctx->current_results = cc->current_results;
-        }
 
         if (to_ctx->current_results && INTERP->current_args) {
-            opcode_t *src_indexes, *dest_indexes;
             /*
              * the register pointer is already switched back
              * to the caller, therefore the registers of the
@@ -371,9 +384,9 @@ destination to continue execution.
              * inside argument passing a DOD run is triggered
              * therefore we have to block DOD
              */
-            src_indexes          = interp->current_args;
-            interp->current_args = NULL;
-            dest_indexes         = to_ctx->current_results;
+            opcode_t *src_indexes  = interp->current_args;
+            opcode_t *dest_indexes = to_ctx->current_results;
+            interp->current_args   = NULL;
 
             Parrot_block_DOD(INTERP);
             parrot_pass_args(INTERP, from_ctx, to_ctx,

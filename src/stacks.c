@@ -315,7 +315,7 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
     }
 
     /* recycle this chunk to the free list if it's otherwise unreferenced */
-    if (cur_chunk->refcount == 0) {
+    if (cur_chunk->refcount <= 0) {
         Small_Object_Pool * const pool =
             get_bufferlike_pool(interp, cur_chunk->size);
 

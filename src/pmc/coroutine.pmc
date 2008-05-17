@@ -198,7 +198,7 @@ Swaps the "context".
             state                 = interp->dynamic_env;
             interp->dynamic_env   = co->dynamic_state;
             co->dynamic_state     = state;
-            CONTEXT(interp)  = ctx;
+            CONTEXT(interp)       = ctx;
             INTERP->ctx.bp        = ctx->bp;
             INTERP->ctx.bp_ps     = ctx->bp_ps;
         }
@@ -227,7 +227,7 @@ Swaps the "context".
             state                = interp->dynamic_env;
             interp->dynamic_env  = co->dynamic_state;
             co->dynamic_state    = state;
-            CONTEXT(interp) = ctx;
+            CONTEXT(interp)      = ctx;
             INTERP->ctx.bp       = ctx->bp;
             INTERP->ctx.bp_ps    = ctx->bp_ps;
         }

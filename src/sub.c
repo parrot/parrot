@@ -213,9 +213,10 @@ new_coroutine(PARROT_INTERP)
 {
     Parrot_coro * const co = mem_allocate_zeroed_typed(Parrot_coro);
 
-    co->seg = interp->code;
-    co->ctx = NULL;
-    co->dynamic_state = NULL;
+    co->seg                = interp->code;
+    co->ctx                = NULL;
+    co->dynamic_state      = NULL;
+
     return co;
 }
 

@@ -74,8 +74,6 @@ register_new_stack(PARROT_INTERP, ARGIN(const char *name), size_t item_size)
     chunk->name = name;
     chunk->size = item_size;    /* TODO store the pool instead the size */
 
-    /* that's one more reference to this chunk */
-    chunk->refcount++;
     return chunk;
 }
 
@@ -130,8 +128,6 @@ stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
     new_chunk->prev = chunk;
     *stack_p        = new_chunk;
 
-    chunk->refcount++;
-
     return STACK_DATAP(new_chunk);
 }
 
@@ -157,12 +153,9 @@ stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
     /* the first entry (initial top) refers to itself */
     if (chunk == chunk->prev)
         real_exception(interp, NULL, ERROR_STACK_EMPTY,
-            "No entries on %sStack!", chunk->name);
+            "No entries on %s Stack!", chunk->name);
 
     *stack_p = chunk->prev;
-
-    /* that's one fewer reference to this chunk */
-    chunk->refcount--;
 
     return STACK_DATAP(chunk);
 }
