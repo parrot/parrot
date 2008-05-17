@@ -365,6 +365,37 @@ initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC *all_parents, PMC *init)
     }
 }
 
+/* This function makes and caches the name of this class, returning the string
+ * directly.  VTABLE_isa() uses the name without copying it, for efficiency
+ * reasons, as it does not modify the STRING.  VTABLE_get_string() makes a copy
+ * of the STRING, so its callers are free to modify it. */
+static STRING *
+make_class_name(PARROT_INTERP, PMC *SELF)
+{
+    Parrot_Class * const  _class    = PARROT_CLASS(SELF);
+    PMC          * const _namespace = _class->_namespace;
+
+    if (!PMC_IS_NULL(_namespace)) {
+        if (_class->fullname)
+            return _class->fullname;
+        else {
+
+            /* Call the 'get_name' method on the class's associated
+             * namespace to retrieve a fully qualified list of names, then
+             * join the list with a semicolon.  */
+            PMC * const names = Parrot_ns_get_name(interp, _namespace);
+
+            if (!PMC_IS_NULL(names))
+                /* remove the HLL namespace name */
+                VTABLE_shift_string(interp, names);
+                _class->fullname = string_join(interp, CONST_STRING(interp, ";"), names);
+                return _class->fullname;
+        }
+    }
+
+    /* Otherwise, copy the stored string name of the class. */
+    return _class->name;
+}
 
 /*
 
@@ -553,29 +584,7 @@ Return the name of the class (without the HLL namespace).
 */
 
     VTABLE STRING *get_string() {
-        Parrot_Class * const  _class    = PARROT_CLASS(SELF);
-        PMC          * const _namespace = _class->_namespace;
-
-        if (!PMC_IS_NULL(_namespace)) {
-            if (_class->fullname)
-                return string_copy(interp, _class->fullname);
-            else {
-
-                /* Call the 'get_name' method on the class's associated
-                 * namespace to retrieve a fully qualified list of names, then
-                 * join the list with a semicolon.  */
-                PMC * const names = Parrot_ns_get_name(interp, _namespace);
-
-                if (!PMC_IS_NULL(names))
-                    /* remove the HLL namespace name */
-                    VTABLE_shift_string(INTERP, names);
-                    _class->fullname = string_join(interp, CONST_STRING(interp, ";"), names);
-                    return string_copy(interp, _class->fullname);
-            }
-        }
-
-        /* Otherwise, copy the stored string name of the class. */
-        return string_copy(interp, _class->name);
+        return string_copy(interp, make_class_name(interp, SELF));
     }
 
 /*
@@ -1200,6 +1209,7 @@ Returns whether the class is or inherits from C<*classname>.
 
     VTABLE INTVAL isa(STRING *classname) {
         Parrot_Class * const _class = PARROT_CLASS(SELF);
+        STRING              *self_name;
 
         INTVAL i, num_parents;
 
@@ -1207,9 +1217,13 @@ Returns whether the class is or inherits from C<*classname>.
         if (string_equal(interp, classname, CONST_STRING(interp, "Class")) == 0)
             return 1;
 
+        /* avoid the expensive string copy, if possible */
+        self_name = SELF->vtable->base_type != enum_class_PMCProxy
+            ? make_class_name(interp, SELF)
+            : VTABLE_get_string(interp, SELF);
+
         /* check the fully-qualified name */
-        if (string_equal(interp, classname,
-                VTABLE_get_string(interp, SELF)) == 0)
+        if (string_equal(interp, classname, self_name) == 0)
             return 1;
 
         /* loop through parents */
