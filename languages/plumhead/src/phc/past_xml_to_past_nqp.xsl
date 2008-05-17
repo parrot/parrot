@@ -22,8 +22,8 @@ sub php_entry ()
 {
     PAST::Block.new(
         PAST::Stmts.new(
-<xsl:apply-templates select="@*"><xsl:with-param name="indent" select="'             '"/></xsl:apply-templates>
-<xsl:apply-templates            ><xsl:with-param name="indent" select="'             '"/></xsl:apply-templates>
+<xsl:apply-templates select="@*"><xsl:with-param name="indent" select="'            '"/></xsl:apply-templates>
+<xsl:apply-templates select="past:Op | past:Val | past:Var | past:Block | past:Stmts | past:Exp | past:Stmt" ><xsl:with-param name="indent" select="'            '"/></xsl:apply-templates>
         )
     );
 }
@@ -40,7 +40,7 @@ sub php_entry ()
     <xsl:when test="name() = 'past:Val'"   >PAST::Val</xsl:when>
   </xsl:choose>.new(
 <xsl:apply-templates select="@*"><xsl:with-param name="indent" select="concat($indent,'    ')"/></xsl:apply-templates>
-<xsl:apply-templates><xsl:with-param name="indent" select="concat($indent,'    ')"/></xsl:apply-templates>
+<xsl:apply-templates select="past:Op | past:Val | past:Var | past:Block | past:Stmts | past:Exp | past:Stmt"><xsl:with-param name="indent" select="concat($indent,'    ')"/></xsl:apply-templates>
 <xsl:value-of select="$indent" />),
 </xsl:template>
 
