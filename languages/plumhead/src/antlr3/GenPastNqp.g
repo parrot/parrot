@@ -70,11 +70,11 @@ node
       String noquote = $NOQUOTE_STRING.text;
       noquote = noquote.replace( "\n", "\\n" );
       System.out.println( 
-          " # NOQUOTE_STRING \n"
-        + "     PAST::Val.new(                                              \n"
-        + "         :returns( 'String' ),                                   \n"
-        + "         :value(" + noquote + ")                                 \n"
-        + "      ),                                                         \n"
+          "     # NOQUOTE_STRING \n"
+        + "     PAST::Val.new(\n"
+        + "         :returns( 'String' ),\n"
+        + "         :value(\"" + noquote + "\")\n"
+        + "      ),\n"
       );
     }
   | SINGLEQUOTE_STRING
@@ -172,14 +172,15 @@ node
       name = "infix:" + name;
     }
   | {
-      System.out.print( 
-          "                                                                   \n"
+      System.out.println( 
+          "    PAST::Op.new(\n"
+        + "       :pasttype( 'if' ),\n"
       );
     }
     ^( IF node node node? )
     {
       System.out.print( 
-          "                                                                   \n"
+          "      ),                                                            \n"
       );
     }
   | {

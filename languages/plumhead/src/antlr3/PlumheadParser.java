@@ -1,4 +1,4 @@
-// $ANTLR 3.0.1 src/antlr3/Plumhead.g 2008-05-17 16:11:18
+// $ANTLR 3.0.1 src/antlr3/Plumhead.g 2008-05-17 16:29:58
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -878,7 +878,7 @@ public class PlumheadParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: s2, IF, s1, relational_expression
+                            // elements: relational_expression, IF, s1, s2
                             // token labels: 
                             // rule labels: retval, s2, s1
                             // token list labels: 
@@ -930,7 +930,7 @@ public class PlumheadParser extends Parser {
                             {
 
                             // AST REWRITE
-                            // elements: IF, s1, relational_expression
+                            // elements: relational_expression, s1, IF
                             // token labels: 
                             // rule labels: retval, s1
                             // token list labels: 
@@ -1039,7 +1039,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: val, ASSIGN_OP
+                    // elements: ASSIGN_OP, val
                     // token labels: 
                     // rule labels: val, retval
                     // token list labels: 
@@ -1103,7 +1103,7 @@ public class PlumheadParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: val, ASSIGN_OP, key
+                    // elements: key, val, ASSIGN_OP
                     // token labels: 
                     // rule labels: val, retval, key
                     // token list labels: 
