@@ -217,180 +217,264 @@ PIR
 code = 12
 format = ABC
 pir = <<PIR
-    ${INS} = concat "  add ${REG}"
-    $S0 = ${A}
-    ${INS} = concat $S0
-    $I0 = ${B} & 0x100
-    unless $I0 goto ${LABEL}_1
-    ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${INS} = concat "  add "
+    unless ${A} == ${B} goto ${LABEL}_1
+    $I1 = 1
+    ${INS} = concat "\$P0"
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_2:
-    $S0 = ${B}
+    $I1 = 0
+    ${INS} = concat "${REG}"
+    $S0 = ${A}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+  ${LABEL}_2:
+    $I0 = ${B} & 0x100
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${B} &= 0xff
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto ${LABEL}_5
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto ${LABEL}_6
+  ${LABEL}_5:
+    ${INS} = concat ", ${REG}"
+  ${LABEL}_6:
     $S0 = ${C}
     ${INS} = concat $S0
     ${INS} = concat "\n"
+    unless $I1 goto ${LABEL}_7
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = \$P0\n"
+  ${LABEL}_7:
 PIR
 
 [SUB]
 code = 13
 format = ABC
 pir = <<PIR
-    ${INS} = concat "  sub ${REG}"
-    $S0 = ${A}
-    ${INS} = concat $S0
-    $I0 = ${B} & 0x100
-    unless $I0 goto ${LABEL}_1
-    ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${INS} = concat "  sub "
+    unless ${A} == ${B} goto ${LABEL}_1
+    $I1 = 1
+    ${INS} = concat "\$P0"
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_2:
-    $S0 = ${B}
+    $I1 = 0
+    ${INS} = concat "${REG}"
+    $S0 = ${A}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+  ${LABEL}_2:
+    $I0 = ${B} & 0x100
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${B} &= 0xff
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto ${LABEL}_5
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto ${LABEL}_6
+  ${LABEL}_5:
+    ${INS} = concat ", ${REG}"
+  ${LABEL}_6:
     $S0 = ${C}
     ${INS} = concat $S0
     ${INS} = concat "\n"
+    unless $I1 goto ${LABEL}_7
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = \$P0\n"
+  ${LABEL}_7:
 PIR
 
 [MUL]
 code = 14
 format = ABC
 pir = <<PIR
-    ${INS} = concat "  mul ${REG}"
-    $S0 = ${A}
-    ${INS} = concat $S0
-    $I0 = ${B} & 0x100
-    unless $I0 goto ${LABEL}_1
-    ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${INS} = concat "  mul "
+    unless ${A} == ${B} goto ${LABEL}_1
+    $I1 = 1
+    ${INS} = concat "\$P0"
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_2:
-    $S0 = ${B}
+    $I1 = 0
+    ${INS} = concat "${REG}"
+    $S0 = ${A}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+  ${LABEL}_2:
+    $I0 = ${B} & 0x100
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${B} &= 0xff
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto ${LABEL}_5
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto ${LABEL}_6
+  ${LABEL}_5:
+    ${INS} = concat ", ${REG}"
+  ${LABEL}_6:
     $S0 = ${C}
     ${INS} = concat $S0
     ${INS} = concat "\n"
+    unless $I1 goto ${LABEL}_7
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = \$P0\n"
+  ${LABEL}_7:
 PIR
 
 [DIV]
 code = 15
 format = ABC
 pir = <<PIR
-    ${INS} = concat "  div ${REG}"
-    $S0 = ${A}
-    ${INS} = concat $S0
-    $I0 = ${B} & 0x100
-    unless $I0 goto ${LABEL}_1
-    ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${INS} = concat "  div "
+    unless ${A} == ${B} goto ${LABEL}_1
+    $I1 = 1
+    ${INS} = concat "\$P0"
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_2:
-    $S0 = ${B}
+    $I1 = 0
+    ${INS} = concat "${REG}"
+    $S0 = ${A}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+  ${LABEL}_2:
+    $I0 = ${B} & 0x100
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${B} &= 0xff
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto ${LABEL}_5
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto ${LABEL}_6
+  ${LABEL}_5:
+    ${INS} = concat ", ${REG}"
+  ${LABEL}_6:
     $S0 = ${C}
     ${INS} = concat $S0
     ${INS} = concat "\n"
+    unless $I1 goto ${LABEL}_7
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = \$P0\n"
+  ${LABEL}_7:
 PIR
 
 [MOD]
 code = 16
 format = ABC
 pir = <<PIR
-    ${INS} = concat "  mod ${REG}"
-    $S0 = ${A}
-    ${INS} = concat $S0
-    $I0 = ${B} & 0x100
-    unless $I0 goto ${LABEL}_1
-    ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${INS} = concat "  mod "
+    unless ${A} == ${B} goto ${LABEL}_1
+    $I1 = 1
+    ${INS} = concat "\$P0"
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_2:
-    $S0 = ${B}
+    $I1 = 0
+    ${INS} = concat "${REG}"
+    $S0 = ${A}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+  ${LABEL}_2:
+    $I0 = ${B} & 0x100
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${B} &= 0xff
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto ${LABEL}_5
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto ${LABEL}_6
+  ${LABEL}_5:
+    ${INS} = concat ", ${REG}"
+  ${LABEL}_6:
     $S0 = ${C}
     ${INS} = concat $S0
     ${INS} = concat "\n"
+    unless $I1 goto ${LABEL}_7
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = \$P0\n"
+  ${LABEL}_7:
 PIR
 
 [POW]
 code = 17
 format = ABC
 pir = <<PIR
-    ${INS} = concat "  pow ${REG}"
-    $S0 = ${A}
-    ${INS} = concat $S0
-    $I0 = ${B} & 0x100
-    unless $I0 goto ${LABEL}_1
-    ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${INS} = concat "  pow "
+    unless ${A} == ${B} goto ${LABEL}_1
+    $I1 = 1
+    ${INS} = concat "\$P0"
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_2:
-    $S0 = ${B}
+    $I1 = 0
+    ${INS} = concat "${REG}"
+    $S0 = ${A}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+  ${LABEL}_2:
+    $I0 = ${B} & 0x100
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${B} &= 0xff
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
+    $S0 = ${B}
+    ${INS} = concat $S0
+    $I0 = ${C} & 0x100
+    unless $I0 goto ${LABEL}_5
+    ${INS} = concat ", ${K}"
+    ${C} &= 0xff
+    goto ${LABEL}_6
+  ${LABEL}_5:
+    ${INS} = concat ", ${REG}"
+  ${LABEL}_6:
     $S0 = ${C}
     ${INS} = concat $S0
     ${INS} = concat "\n"
+    unless $I1 goto ${LABEL}_7
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = \$P0\n"
+  ${LABEL}_7:
 PIR
 
 [UNM]
