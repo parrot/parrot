@@ -46,7 +46,7 @@ $(PMC_DIR)/match_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
 # working on to the oldest, so that I see the failures quicker.
 .PHONY: test
 test : build
-	cd .. && $(PERL) t\harness --languages=regex
+	cd .. && $(PERL) t/harness --languages=regex
 
 # This is a TODO test -- currently, it loops forever. It will require
 # adding a check to the matcher that it is making progress. Or
