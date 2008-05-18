@@ -562,23 +562,35 @@ pir = <<PIR
     goto ${LABEL}_2
   ${LABEL}_1:
     if ${C} == 1 goto ${LABEL}_2
-    ${INS} = concat "("
     $I0 = ${A}
     $I1 = ${C} - 1
-    $I2 = 1
   ${LABEL}_3:
     unless $I1 goto ${LABEL}_4
-    if $I2 goto ${LABEL}_5
-    ${INS} = concat ", "
-  ${LABEL}_5:
-    $I2 = 0
-    ${INS} = concat "${REG}"
+    ${INS} = concat "new \$P"
     $S0 = $I0
     ${INS} = concat $S0
+    ${INS} = concat ", 'LuaNil'\n  "
     inc $I0
     dec $I1
     goto ${LABEL}_3
   ${LABEL}_4:
+    ${INS} = concat "("
+    $I0 = ${A}
+    $I1 = ${C} - 1
+    $I2 = 1
+  ${LABEL}_5:
+    unless $I1 goto ${LABEL}_6
+    if $I2 goto ${LABEL}_7
+    ${INS} = concat ", "
+  ${LABEL}_7:
+    $I2 = 0
+    ${INS} = concat "\$P"
+    $S0 = $I0
+    ${INS} = concat $S0
+    inc $I0
+    dec $I1
+    goto ${LABEL}_5
+  ${LABEL}_6:
     ${INS} = concat ") = "
   ${LABEL}_2:
     ${INS} = concat "${REG}"
@@ -587,59 +599,50 @@ pir = <<PIR
     ${INS} = concat "("
     $I0 = ${A} + 1
     $I2 = 1
-    unless ${B} goto ${LABEL}_6
+    unless ${B} goto ${LABEL}_8
     $I1 = ${A} + ${B}
-    goto ${LABEL}_7
-  ${LABEL}_6:
+    goto ${LABEL}_9
+  ${LABEL}_8:
     $I1 = ${STACK} + 1
     dec $I1
-  ${LABEL}_7:
-    unless $I0 < $I1 goto ${LABEL}_8
-    if $I2 goto ${LABEL}_9
-    ${INS} = concat ", "
   ${LABEL}_9:
+    unless $I0 < $I1 goto ${LABEL}_10
+    if $I2 goto ${LABEL}_11
+    ${INS} = concat ", "
+  ${LABEL}_11:
     $I2 = 0
     ${INS} = concat "${REG}"
     $S0 = $I0
     ${INS} = concat $S0
     inc $I0
-    goto ${LABEL}_7
-  ${LABEL}_8:
-    if ${B} goto ${LABEL}_10
-    if $I2 goto ${LABEL}_11
+    goto ${LABEL}_9
+  ${LABEL}_10:
+    if ${B} goto ${LABEL}_12
+    if $I2 goto ${LABEL}_13
     ${INS} = concat ", "
-  ${LABEL}_11:
+  ${LABEL}_13:
     ${INS} = concat "${REG}"
     $I0 = ${STACK}
     $S0 = $I0
     ${INS} = concat $S0
     ${INS} = concat " :flat"
-  ${LABEL}_10:
+  ${LABEL}_12:
     ${INS} = concat ")\n"
-    unless ${C} > 1 goto ${LABEL}_12
+    unless ${C} > 1 goto ${LABEL}_14
     $I0 = ${A}
     $I1 = ${C} - 1
-  ${LABEL}_13:
-    unless $I1 goto ${LABEL}_12
-    ${INS} = concat "  unless_null ${REG}"
+  ${LABEL}_15:
+    unless $I1 goto ${LABEL}_14
+    ${INS} = concat "  ${REG}"
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat ", vivify_"
-    $S1 = ${PC}
-    ${INS} = concat $S1
-    ${INS} = concat "_"
+    ${INS} = concat " = \$P"
     ${INS} = concat $S0
-    ${INS} = concat "\n  new ${REG}"
-    ${INS} = concat $S0
-    ${INS} = concat ", 'LuaNil'\nvivify_"
-    ${INS} = concat $S1
-    ${INS} = concat "_"
-    ${INS} = concat $S0
-    ${INS} = concat ":\n"
+    ${INS} = concat "\n"
     inc $I0
     dec $I1
-    goto ${LABEL}_13
-  ${LABEL}_12:
+    goto ${LABEL}_15
+  ${LABEL}_14:
     ${STACK} = ${A}
 PIR
 
