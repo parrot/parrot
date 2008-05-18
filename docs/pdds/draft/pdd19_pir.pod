@@ -387,20 +387,23 @@ generated file.
 
 =item :main
 
-Define "main" entry point to start execution. If multiple subroutines
-are marked as B<:main>, the B<last> marked subroutine is entered.
+Define "main" entry point to start execution.  If multiple subroutines are
+marked as B<:main>, the B<last> marked subroutine is used.  Only the first
+file loaded or compiled counts; subs marked as B<:main> are ignored by the
+B<load_bytecode> op.
 
 =item :load
 
-Run this subroutine during the B<load_bytecode> opcode.
-If multiple subs have the B<:load> pragma, the subs are
-run in source code order.
+Run this subroutine when loaded by the B<load_bytecode> op (i.e. neither in
+the initial program file nor compiled from memory).  This is complementary to
+what B<:init> does (below); to get both behaviours, use B<:init :load>.  If
+multiple subs have the B<:load> pragma, the subs are run in source code order.
 
 =item :init
 
 Run the subroutine when the program is run directly (that is, not loaded as a
-module). This is different from B<:load>, which runs a subroutine when a
-library is being loaded. To get both behaviours, use B<:init :load>.
+module), including when it is compiled from memory.  This is complementary to
+what B<:load> does (above); to get both behaviours, use B<:init :load>.
 
 =item :anon
 
@@ -415,33 +418,60 @@ multiple dispatch system.
 
 =item :immediate
 
-This subroutine is executed immediately after being compiled. (Analagous to
-C<BEGIN> in perl5.)
+Execute this subroutine immediately after being compiled, which is analogous
+to C<BEGIN> in Perl 5.
+
+In addition, if the sub returns a PMC value, that value replaces the sub in
+the constant table of the bytecode file.  This makes it possible to build
+constants at compile time, provided that (a) the generated constant can be
+computed at compile time (i.e. doesn't depend on the runtime environment), and
+(b) the constant value is of a PMC class that supports saving in a bytecode
+file [need a freeze/thaw reference].
+
+For example, C<examples/shootout/revcomp.pir> contains the following (slightly
+abbreviated) definition:
+
+    .sub tr_00_init :immediate
+	.local pmc tr_array
+	tr_array = new 'FixedIntegerArray'
+	tr_array = 256
+	## [code to initialize tr_array omitted.]
+	.return (tr_array)
+    .end
+
+This code is run at compile time, and the returned C<tr_array> is stored 
+in the bytecode file in place of the sub.  Other subs may then do:
+
+	.const .Sub tr_00 = 'tr_00_init'
+
+in order to fetch the constant.
 
 =item :postcomp
 
-Same as C<:immediate>, except that the subroutine is B<not> executed when
-the compilation of the file that contains the subroutine is triggered by
-a C<load_bytecode> instruction in another file.
+Execute immediately after being compiled, but only if the subroutine is in the
+initial file (i.e. not in PIR compiled as result of a C<load_bytecode>
+instruction from another file).
 
-An example. File C<main.pir> contains:
+As an example, suppose file C<main.pir> contains:
 
- .sub main
- load_bytecode "foo.pir"
- .end
+    .sub main
+        load_bytecode "foo.pir"
+    .end
 
-The file C<foo.pir> contains:
+and the file C<foo.pir> contains:
 
- .sub foo :immediate
-   print "42"
- .end
+    .sub foo :immediate
+        print "42"
+    .end
 
- .sub bar :postcomp
-   print "43"
- .end
+    .sub bar :postcomp
+        print "43"
+    .end
 
-When executing file C<foo.pir>, it will execute both C<foo> and C<bar>.
-However, when executing the file C<main.pir>, only C<foo> will be executed.
+Executing C<foo.pir> will run both C<foo> and C<bar>.  On the other hand,
+executing C<main.pir> will run only C<foo>.  If C<foo.pir> is compiled to
+bytecode, only C<foo> will be run, and loading C<foo.pbc> will not run either
+C<foo> or C<bar>.
 
 =item :method
 
