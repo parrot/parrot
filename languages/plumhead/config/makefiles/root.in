@@ -79,7 +79,7 @@ build-common:    src/common/plumheadlib.pbc plumhead.pbc
 
 build-pct:       build-common
 
-build-phc:       build-common driver_nqp.pbc
+build-phc:       build-common
 
 build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
@@ -103,9 +103,6 @@ plumhead.pbc: \
     src/pct/PlumheadPAST_gen.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
-driver_nqp.pbc: src/common/plumheadlib.pbc src/common/driver_nqp.pir
-	$(PARROT) -o driver_nqp.pbc src/common/driver_nqp.pir
-
 test:     all test-pct
 
 test-all: all test-php test-phc test-antlr3 test-pct
@@ -122,7 +119,7 @@ test-antlr3:
 test-pct:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-pct
 
-clean: clean-common clean-pct clean-antlr3 clean-phc clean-test
+clean: clean-common clean-pct clean-antlr3 clean-test
 
 clean-common:
 	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
@@ -132,9 +129,6 @@ clean-pct:
 
 clean-antlr3:
 	$(RM_F) src/antlr3/*.class
-
-clean-phc:
-	$(RM_F) driver_nqp.pbc
 
 clean-test:
 	$(RM_F) \
