@@ -179,7 +179,7 @@ PIRCODE
     pir .= "    .param pmc extra :slurpy\n"
   L4:
     $P0 = getattribute self, 'locvars'
-    $S0 = $P0.'translate'(numparams)
+    $S0 = $P0.'translate'(numparams, is_vararg)
     pir .= $S0
     i = $P0
     .local int maxstacksize
@@ -427,11 +427,15 @@ PIRCODE
 
 .sub 'translate' :method
     .param int numparams
+    .param int is_vararg
     .local string pir
     .local int i, n
     pir = ''
     n = self
     i = numparams
+    $I0 = is_vararg & 1
+    unless $I0 goto L1
+    inc i
   L1:
     unless i < n goto L2
     $P0 = self[i]
