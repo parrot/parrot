@@ -546,20 +546,42 @@ code = 21
 format = ABC
 synopsis = R(A) := R(B) .. ... .. R(C)
 pir = <<PIR
-    $I0 = ${B}
-    inc $I0
+    unless ${A} == ${B} goto ${LABEL}_1
+    $I1 = 1
+    $S1 = "\$P0"
+    goto ${LABEL}_2
   ${LABEL}_1:
-    unless $I0 <= ${C} goto ${LABEL}_2
-    ${INS} = concat "  concat ${REG}"
+    $I1 = 0
     $S0 = ${A}
-    ${INS} = concat $S0
+    $S1 = concat "${REG}", $S0
+  ${LABEL}_2:
+    ${INS} = concat "  concat "
+    ${INS} = concat $S1
     ${INS} = concat ", ${REG}"
+    $I0 = ${B}
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat "\n"
+    ${INS} = concat ", ${REG}"
     inc $I0
-    goto ${LABEL}_1
-  ${LABEL}_2:
+    $S0 = $I0
+    ${INS} = concat $S0
+  ${LABEL}_3:
+    unless $I0 < ${C} goto ${LABEL}_4
+    ${INS} = concat "\n  concat "
+    ${INS} = concat $S1
+    ${INS} = concat ", ${REG}"
+    inc $I0
+    $S0 = $I0
+    ${INS} = concat $S0
+    goto ${LABEL}_3
+  ${LABEL}_4:
+    ${INS} = concat "\n"
+    unless $I1 goto ${LABEL}_5
+    ${INS} = concat "  ${REG}"
+    $S0 = ${A}
+    ${INS} = concat $S0
+    ${INS} = concat " = \$P0\n"
+  ${LABEL}_5:
 PIR
 
 ## Jumps and Calls
