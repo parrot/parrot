@@ -17,7 +17,7 @@ Perl 6 rule features implemented
 * anchors (^, $, ^^, $$, \b, \b)
 * negated character classes 
 * capturing subrules (<expr>)
-* non-capturing subrules  (<?expr>)
+* non-capturing subrules  (<.expr>)
 * negated subrules (<!expr>)
 * lookahead and lookbehind (<before> and <after>)
 * built-in rules: <null>, <fail>, <alpha>, <digit>, <alnum>, 
