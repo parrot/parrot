@@ -41,7 +41,9 @@ OUT
 
 SKIP:
 {
-skip('only with an interpreter', 15) if ($test_prog eq 'luac.pl' || $test_prog eq 'luap.pir');
+skip('only with an interpreter', 15) if ( $test_prog eq 'luac.pl'
+                                       || $test_prog eq 'luap.pir'
+                                       || $test_prog eq 'luac2pir.pir' );
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'shebang misplaced' );
 
