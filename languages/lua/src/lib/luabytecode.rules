@@ -105,6 +105,7 @@ pir = <<PIR
     ${INS} = concat $S0
     ${INS} = concat "'\n"
   ${LABEL}_1:
+    ${INS} = concat "  # nothing\n"
     inc ${UPVAL}
   ${LABEL}_2:
 PIR
@@ -1088,23 +1089,35 @@ PIR
 code = 33
 format = AC
 pir = <<PIR
+    $I0 = ${A} + 3
+    $I1 = ${C}
+  ${LABEL}_1:
+    unless $I1 goto ${LABEL}_2
+    ${INS} = concat "  new ${REG}"
+    $S0 = $I0
+    ${INS} = concat $S0
+    ${INS} = concat ", 'LuaNil'\n"
+    inc $I0
+    dec $I1
+    goto ${LABEL}_1
+  ${LABEL}_2:
     ${INS} = concat "  ("
     $I0 = ${A} + 3
     $I1 = ${C}
     $I2 = 1
-  ${LABEL}_1:
-    unless $I1 goto ${LABEL}_2
-    if $I2 goto ${LABEL}_3
-    ${INS} = concat ", "
   ${LABEL}_3:
+    unless $I1 goto ${LABEL}_4
+    if $I2 goto ${LABEL}_5
+    ${INS} = concat ", "
+  ${LABEL}_5:
     $I2 = 0
     ${INS} = concat "${REG}"
     $S0 = $I0
     ${INS} = concat $S0
     inc $I0
     dec $I1
-    goto ${LABEL}_1
-  ${LABEL}_2:
+    goto ${LABEL}_3
+  ${LABEL}_4:
     ${INS} = concat ") = ${REG}"
     $I0 = ${A}
     $S0 = $I0
@@ -1118,7 +1131,6 @@ pir = <<PIR
     $S0 = $I0
     ${INS} = concat $S0
     ${INS} = concat ")\n"
-
     ${INS} = concat "  \$I0 = isa ${REG}"
     $I0 = ${A} + 3
     $S0 = $I0

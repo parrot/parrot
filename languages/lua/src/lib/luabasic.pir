@@ -459,8 +459,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     unless res goto L2
     .return ($P0, res)
   L2:
-    new res, 'LuaNil'
-    .return (res)
+    .return ()
 .end
 
 
