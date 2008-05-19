@@ -113,6 +113,7 @@ pir = <<PIR
     $S0 = $P1
     ${INS} = concat $S0
     ${INS} = concat "'\n"
+    goto ${LABEL}_2
   ${LABEL}_1:
     ${INS} = concat "  # nothing\n"
     inc ${UPVAL}
@@ -1261,22 +1262,22 @@ code = 36
 format = ABx
 synopsis = R(A) := closure(KPROTO[Bx], R(A), ... , R(A+n))
 pir = <<PIR
-    ${INS} = concat "  .const .Sub f_"
+    ${INS} = concat "  .const .Sub ${PROTO}"
     $S0 = ${B}
     ${INS} = concat $S0
     ${INS} = concat " = '"
     ${INS} = concat ${FNAME}
     ${INS} = concat "_"
     ${INS} = concat $S0
-    ${INS} = concat "'\n  ${GLOB} = ${SUBR}.'getfenv'()\n"
-    ${INS} = concat "  ${PROTO}"
-    ${INS} = concat $S0
-    ${INS} = concat ".'setfenv'(${GLOB})\n  clone ${REG}"
+    ${INS} = concat "'\n  newclosure ${REG}"
     $S1 = ${A}
     ${INS} = concat $S1
     ${INS} = concat ", ${PROTO}"
     ${INS} = concat $S0
-    ${INS} = concat "\n"
+    ${INS} = concat "\n  ${GLOB} = ${SUBR}.'getfenv'()\n"
+    ${INS} = concat "  ${REG}"
+    ${INS} = concat $S1
+    ${INS} = concat ".'setfenv'(${GLOB})\n"
     $P0 = getattribute func, 'p'
     ${CLOSURE} = $P0[${B}]
     $P0 = getattribute ${CLOSURE}, 'nups'
