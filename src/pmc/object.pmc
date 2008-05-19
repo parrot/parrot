@@ -156,7 +156,7 @@ Returns the fully qualified name of the object's class.
         PMC * const method = Parrot_oo_find_vtable_override(interp, _class, name);
 
         if (!PMC_IS_NULL(method))
-            return (PMC *)Parrot_run_meth_fromc_args(interp, method, SELF, name, "S");
+            return (STRING *)Parrot_run_meth_fromc_args(interp, method, SELF, name, "S");
         else
             return VTABLE_get_string(interp, _class);
     }
