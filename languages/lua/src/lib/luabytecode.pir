@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-lib/luabytecode.pir - Lua bytecode Library
+lib/luabytecode.pir - Lua bytecode translation Library
 
 =head1 DESCRIPTION
 
@@ -178,25 +178,9 @@ PIRCODE
   L3:
     pir .= "    .param pmc extra :slurpy\n"
   L4:
-    $P0 = getattribute self, 'locvars'
-    $S0 = $P0.'translate'(numparams, is_vararg)
-    pir .= $S0
-    i = $P0
-    .local int maxstacksize
-    $P0 = getattribute self, 'maxstacksize'
-    maxstacksize = $P0
-  L5:
-    unless i < maxstacksize goto L6
-    pir .= "    .local pmc loc_"
-    $S0 = i
-    pir .= $S0
-    pir .= "\n"
-    inc i
-    goto L5
-  L6:
     i = 0
-  L7:
-    unless i < numparams goto L8
+  L5:
+    unless i < numparams goto L6
     $S0 = i
     pir .= "    unless_null loc_"
     pir .= $S0
@@ -207,6 +191,24 @@ PIRCODE
     pir .= ", 'LuaNil'\n  vivify_"
     pir .= $S0
     pir .= ":\n"
+    inc i
+    goto L5
+  L6:
+    $P0 = getattribute self, 'locvars'
+    $S0 = $P0.'translate'(numparams, is_vararg)
+    pir .= $S0
+    i = $P0
+    .local int maxstacksize
+    $P0 = getattribute self, 'maxstacksize'
+    maxstacksize = $P0
+  L7:
+    unless i < maxstacksize goto L8
+    pir .= "    .local pmc loc_"
+    $S0 = i
+    pir .= $S0
+    pir .= "\n    new loc_"
+    pir .= $S0
+    pir .= ", 'LuaNil'\n"
     inc i
     goto L7
   L8:
@@ -466,9 +468,11 @@ PIRCODE
     $S0 = i
     pir .= $S0
     pir .= " # "
-    $S0 = self
+    $S1 = self
+    pir .= $S1
+    pir .= "\n    new loc_"
     pir .= $S0
-    pir .= "\n"
+    pir .= ", 'LuaNil'\n"
     .return (pir)
 .end
 
