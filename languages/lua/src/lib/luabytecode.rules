@@ -167,10 +167,10 @@ pir = <<PIR
     $S0 = ${B}
     ${INS} = concat $S0
     ${INS} = concat "["
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_1
     ${INS} = concat "${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_2
   ${LABEL}_1:
     ${INS} = concat "${REG}"
@@ -188,10 +188,10 @@ pir = <<PIR
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat "["
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_1
     ${INS} = concat "${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_2
   ${LABEL}_1:
     ${INS} = concat "${REG}"
@@ -199,10 +199,10 @@ pir = <<PIR
     $S0 = ${B}
     ${INS} = concat $S0
     ${INS} = concat "] = "
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat "${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat "${REG}"
@@ -229,20 +229,20 @@ pir = <<PIR
     $S0 = ${A}
     ${INS} = concat $S0
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -273,20 +273,20 @@ pir = <<PIR
     $S0 = ${A}
     ${INS} = concat $S0
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -317,20 +317,20 @@ pir = <<PIR
     $S0 = ${A}
     ${INS} = concat $S0
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -361,20 +361,20 @@ pir = <<PIR
     $S0 = ${A}
     ${INS} = concat $S0
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -405,20 +405,20 @@ pir = <<PIR
     $S0 = ${A}
     ${INS} = concat $S0
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -449,20 +449,20 @@ pir = <<PIR
     $S0 = ${A}
     ${INS} = concat $S0
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat ", ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat ", ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -805,10 +805,10 @@ pir = <<PIR
     $S0 = ${B}
     ${INS} = concat $S0
     ${INS} = concat "["
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_1
     ${INS} = concat "${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_2
   ${LABEL}_1:
     ${INS} = concat "${REG}"
@@ -830,20 +830,20 @@ pir = <<PIR
   ${LABEL}_1:
     ${INS} = concat "  ne"
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat " ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat " ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -867,20 +867,20 @@ pir = <<PIR
   ${LABEL}_1:
     ${INS} = concat "  ge"
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat " ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat " ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"
@@ -904,20 +904,20 @@ pir = <<PIR
   ${LABEL}_1:
     ${INS} = concat "  gt"
   ${LABEL}_2:
-    $I0 = ${B} & 0x100
+    $I0 = ${B} & ${BITRK}
     unless $I0 goto ${LABEL}_3
     ${INS} = concat " ${K}"
-    ${B} &= 0xff
+    ${B} &= ${MASKRK}
     goto ${LABEL}_4
   ${LABEL}_3:
     ${INS} = concat " ${REG}"
   ${LABEL}_4:
     $S0 = ${B}
     ${INS} = concat $S0
-    $I0 = ${C} & 0x100
+    $I0 = ${C} & ${BITRK}
     unless $I0 goto ${LABEL}_5
     ${INS} = concat ", ${K}"
-    ${C} &= 0xff
+    ${C} &= ${MASKRK}
     goto ${LABEL}_6
   ${LABEL}_5:
     ${INS} = concat ", ${REG}"

@@ -246,6 +246,8 @@ sub generate_initial_code {
     $mv->{A}      = 'arg_a';
     $mv->{B}      = 'arg_b';
     $mv->{C}      = 'arg_c';
+    $mv->{BITRK}  = '0x00000100';
+    $mv->{MASKRK} = '0x000000ff';
     $mv->{FPF}    = '50';
     $mv->{STACK}  = 'stack';
     $mv->{FCT}    = 'func';
@@ -450,7 +452,7 @@ PIRCODE
     # Emit code to read arguments for the op.
     if ($rule->{format} =~ /^A/) {
         $pir .= "    arg_a = cur_ic >> 6\n";
-        $pir .= "    arg_a &= 0x00ff\n";
+        $pir .= "    arg_a &= 0x000000ff\n";
     }
 
     if ($rule->{format} =~ /sBx$/) {
@@ -462,12 +464,12 @@ PIRCODE
     }
     elsif ($rule->{format} =~ /B/) {
         $pir .= "    arg_b = cur_ic >> 23\n";
-        $pir .= "    arg_b &= 0x01ff\n";
+        $pir .= "    arg_b &= 0x000001ff\n";
     }
 
     if ($rule->{format} =~ /C$/) {
         $pir .= "    arg_c = cur_ic >> 14\n";
-        $pir .= "    arg_c &= 0x01ff\n";
+        $pir .= "    arg_c &= 0x000001ff\n";
     }
 
     $pir .= translation_code( $rule, $mv );
@@ -519,7 +521,7 @@ PIRCODE
 
     if ($rule->{format} =~ /^A/) {
         $pir .= "    arg_a = cur_ic >> 6\n";
-        $pir .= "    arg_a &= 0x00ff\n";
+        $pir .= "    arg_a &= 0x000000ff\n";
         $pir .= "    push args, arg_a\n";
     }
 
@@ -534,13 +536,13 @@ PIRCODE
     }
     elsif ($rule->{format} =~ /B/) {
         $pir .= "    arg_b = cur_ic >> 23\n";
-        $pir .= "    arg_b &= 0x01ff\n";
+        $pir .= "    arg_b &= 0x000001ff\n";
         $pir .= "    push args, arg_b\n";
     }
 
     if ($rule->{format} =~ /C$/) {
         $pir .= "    arg_c = cur_ic >> 14\n";
-        $pir .= "    arg_c &= 0x01ff\n";
+        $pir .= "    arg_c &= 0x000001ff\n";
         $pir .= "    push args, arg_c\n";
     }
 
