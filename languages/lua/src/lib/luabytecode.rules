@@ -21,18 +21,22 @@ pir = <<PIR
     ${INS} = concat $S0
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat "  .lex '"
     $P0 = getattribute ${CLOSURE}, 'upvalues'
     $P1 = $P0[${UPVAL}]
     $S0 = $P1
+    inc ${UPVAL}
+    $I0 = exists ${LEX}[$S0]
+    if $I0 goto ${LABEL}_3
+    ${LEX}[$S0] = 1
+    ${INS} = concat "  .lex '"
     ${INS} = concat $S0
     ${INS} = concat "'"
-    inc ${UPVAL}
   ${LABEL}_2:
     ${INS} = concat ", ${REG}"
     $S0 = ${B}
     ${INS} = concat $S0
     ${INS} = concat "\n"
+  ${LABEL}_3:
 PIR
 
 [LOADNIL]

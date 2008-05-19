@@ -253,10 +253,10 @@ sub generate_initial_code {
     $mv->{FCT}    = 'func';
     $mv->{FNAME}  = 'funcname';
     $mv->{PROTO}  = 'f_';
-    $mv->{UPVAL}  = 'upvalues';
     $mv->{UPVAL}  = 'upval';
     $mv->{NUPS}   = 'nups';
     $mv->{CLOSURE}= 'closure';
+    $mv->{LEX}    = 'lex';
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
@@ -272,12 +272,14 @@ sub generate_initial_code {
     .local int nups
     .local int upval
     .local pmc closure
+    .local pmc lex
 
     bc_length = self
     next_pc = 0
     stack = 0
     nups = 0
     upval = 0
+    new lex, 'Hash'
 
 PIRCODE
 
