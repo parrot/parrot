@@ -192,7 +192,7 @@ sub validate_rule {
                 die "Invalid value for $key in rule $name\n";
             }
         }
-        elsif ( $key eq 'instruction' ) {
+        elsif ( $key eq 'synopsis' ) {
 
             # always fine
         }
@@ -240,7 +240,7 @@ sub generate_initial_code {
     $mv->{PC}     = 'pc';
     $mv->{NEXTPC} = 'next_pc';
     $mv->{SUBR}   = 'subr';
-    $mv->{GLOB}   = 'glob';
+    $mv->{GLOB}   = 'env';
     $mv->{REG}    = 'loc_';
     $mv->{K}      = 'k_';
     $mv->{A}      = 'arg_a';
@@ -447,6 +447,7 @@ sub generate_rule_code {
   BDISPATCH_$rule->{name}:
     # Translation code for $rule->{name} ($rule->{code})
     gen_pir = concat "  # $rule->{name}\\n"
+### arguments (format $rule->{format})
 PIRCODE
 
     # Emit code to read arguments for the op.
@@ -492,6 +493,9 @@ sub translation_code {
     # If we have PIR for the instruction, just take that. If not, we need
     # to generate it from the "to generate" instruction directive.
     my $pir = "### translation\n";
+    if ($rule->{synopsis}) {
+        $pir .= "    # $rule->{synopsis}\n";
+    }
     if ( $rule->{pir} ) {
         $pir .= sub_meta( $rule->{pir}, $mv, "pir for rule $rule->{name}" );
     }

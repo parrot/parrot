@@ -13,6 +13,7 @@
 [MOVE]
 code = 0
 format = AB
+synopsis = R(A) := R(B)
 pir = <<PIR
     if ${UPVAL} < ${NUPS} goto ${LABEL}_1
     ${INS} = concat "  clone ${REG}"
@@ -37,6 +38,7 @@ PIR
 [LOADNIL]
 code = 3
 format = AB
+synopsis = R(A) := ... := R(B) := nil
 pir = <<PIR
     $I0 = ${A}
   ${LABEL}_1:
@@ -53,6 +55,7 @@ PIR
 [LOADK]
 code = 1
 format = ABx
+synopsis = R(A) := Kst(Bx)
 pir = <<PIR
     ${INS} = concat "  clone ${REG}"
     $S0 = ${A}
@@ -66,6 +69,7 @@ PIR
 [LOADBOOL]
 code = 2
 format = ABC
+synopsis = R(A) := (Bool)B; if (C) PC++
 pir = <<PIR
     ${INS} = concat "  new ${REG}"
     $S0 = ${A}
@@ -93,6 +97,7 @@ PIR
 [GETUPVAL]
 code = 4
 format = AB
+synopsis = R(A) := UpValue[B]
 pir = <<PIR
     if ${UPVAL} < ${NUPS} goto ${LABEL}_1
     ${INS} = concat "  ${REG}"
@@ -113,6 +118,7 @@ PIR
 [GETGLOBAL]
 code = 5
 format = ABx
+synopsis = R(A) := Gbl[Kst(Bx)]
 pir = <<PIR
     ${INS} = concat "  ${GLOB} = ${SUBR}.'getfenv'()\n"
     ${INS} = concat "  ${REG}"
@@ -127,6 +133,7 @@ PIR
 [SETGLOBAL]
 code = 7
 format = ABx
+synopsis = Gbl[Kst(Bx)] := R(A)
 pir = <<PIR
     ${INS} = concat "  ${GLOB} = ${SUBR}.'getfenv'()\n"
     ${INS} = concat "  ${GLOB}[${K}"
@@ -141,6 +148,7 @@ PIR
 [SETUPVAL]
 code = 8
 format = AB
+synopsis = UpValue[B] := R(A)
 pir = <<PIR
     ${INS} = concat "  store_lex '"
     $P0 = getattribute ${FCT}, 'upvalues'
@@ -159,6 +167,7 @@ PIR
 [GETTABLE]
 code = 6
 format = ABC
+synopsis = R(A) := R(B)[RK(C)]
 pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
@@ -183,6 +192,7 @@ PIR
 [SETTABLE]
 code = 9
 format = ABC
+synopsis = R(A)[RK(B)] := RK(C)
 pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
@@ -217,6 +227,7 @@ PIR
 [ADD]
 code = 12
 format = ABC
+synopsis = R(A) := RK(B) + RK(C)
 pir = <<PIR
     ${INS} = concat "  add "
     unless ${A} == ${B} goto ${LABEL}_1
@@ -261,6 +272,7 @@ PIR
 [SUB]
 code = 13
 format = ABC
+synopsis = R(A) := RK(B) - RK(C)
 pir = <<PIR
     ${INS} = concat "  sub "
     unless ${A} == ${B} goto ${LABEL}_1
@@ -305,6 +317,7 @@ PIR
 [MUL]
 code = 14
 format = ABC
+synopsis = R(A) := RK(B) * RK(C)
 pir = <<PIR
     ${INS} = concat "  mul "
     unless ${A} == ${B} goto ${LABEL}_1
@@ -349,6 +362,7 @@ PIR
 [DIV]
 code = 15
 format = ABC
+synopsis = R(A) := RK(B) / RK(C)
 pir = <<PIR
     ${INS} = concat "  div "
     unless ${A} == ${B} goto ${LABEL}_1
@@ -393,6 +407,7 @@ PIR
 [MOD]
 code = 16
 format = ABC
+synopsis = R(A) := RK(B) % RK(C)
 pir = <<PIR
     ${INS} = concat "  mod "
     unless ${A} == ${B} goto ${LABEL}_1
@@ -437,6 +452,7 @@ PIR
 [POW]
 code = 17
 format = ABC
+synopsis = R(A) := RK(B) ^ RK(C)
 pir = <<PIR
     ${INS} = concat "  pow "
     unless ${A} == ${B} goto ${LABEL}_1
@@ -481,6 +497,7 @@ PIR
 [UNM]
 code = 18
 format = AB
+synopsis = R(A) := - RK(B)
 pir = <<PIR
     ${INS} = concat "  neg ${REG}"
     $S0 = ${A}
@@ -494,6 +511,7 @@ PIR
 [NOT]
 code = 19
 format = AB
+synopsis = R(A) := not RK(B)
 pir = <<PIR
     ${INS} = concat "  not ${REG}"
     $S0 = ${A}
@@ -507,6 +525,7 @@ PIR
 [LEN]
 code = 20
 format = AB
+synopsis = R(A) := length of RK(B)
 pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
@@ -520,6 +539,7 @@ PIR
 [CONCAT]
 code = 21
 format = ABC
+synopsis = R(A) := R(B) .. ... .. R(C)
 pir = <<PIR
     $I0 = ${B}
     inc $I0
@@ -542,6 +562,7 @@ PIR
 [JMP]
 code = 22
 format = sBx
+synopsis = PC += sBx
 pir = <<PIR
     $I0 = ${NEXTPC} + ${B}
     $S0 = $I0
@@ -553,6 +574,7 @@ PIR
 [CALL]
 code = 28
 format = ABC
+synopsis = R(A), ... , R(A+C-2) := R(A)(R(A+1), ... , R(A+B-1))
 pir = <<PIR
     ${INS} = concat "  "
     if ${C} goto ${LABEL}_1
@@ -650,6 +672,7 @@ PIR
 [TAILCALL]
 code = 29
 format = ABC
+synopsis = return R(A)(R(A+1), ... , R(A+B-1))
 pir = <<PIR
     ${INS} = concat "  .return "
     ${INS} = concat "${REG}"
@@ -692,6 +715,7 @@ PIR
 [RETURN]
 code = 30
 format = AB
+synopsis = return R(A), ... , R(A+B-2)
 pir = <<PIR
     ${INS} = concat "  .return ("
     $I0 = ${A}
@@ -731,6 +755,7 @@ PIR
 [VARARG]
 code = 37
 format = AB
+synopsis = R(A), ... , R(A+B-1) := vararg
 pir = <<PIR
     ${INS} = concat "  "
     if ${B} goto ${LABEL}_1
@@ -790,6 +815,7 @@ PIR
 [SELF]
 code = 11
 format = ABC
+synopsis = R(A+1) := R(B); R(A) := R(B)[RK(C)]
 pir = <<PIR
     ${INS} = concat "  set ${REG}"
     $I0 = ${A} + 1
@@ -823,6 +849,7 @@ PIR
 [EQ]
 code = 23
 format = ABC
+synopsis = if (RK(B) == RK(C)) ~= A) then PC++
 pir = <<PIR
     if ${A} goto ${LABEL}_1
     ${INS} = concat "  eq"
@@ -860,6 +887,7 @@ PIR
 [LT]
 code = 24
 format = ABC
+synopsis = if (RK(B) < RK(C)) ~= A) then PC++
 pir = <<PIR
     if ${A} goto ${LABEL}_1
     ${INS} = concat "  lt"
@@ -897,6 +925,7 @@ PIR
 [LE]
 code = 25
 format = ABC
+synopsis = if (RK(B) <= RK(C)) ~= A) then PC++
 pir = <<PIR
     if ${A} goto ${LABEL}_1
     ${INS} = concat "  le"
@@ -934,6 +963,7 @@ PIR
 [TEST]
 code = 26
 format = AC
+synopsis = if not (R(A) <=> C) then PC++
 pir = <<PIR
     ${INS} = concat "  \$I0 = is"
     unless ${C} goto ${LABEL}_1
@@ -956,6 +986,7 @@ PIR
 [TESTSET]
 code = 27
 format = ABC
+synopsis = if (R(B) <=> C) then R(A) := R(B) else PC++
 pir = <<PIR
     ${INS} = concat "  \$I0 = is"
     unless ${C} goto ${LABEL}_1
@@ -986,6 +1017,7 @@ PIR
 [FORLOOP]
 code = 31
 format = AsBx
+synopsis = R(A) += R(A+2); if (R(A) <?= R(A+1)) then { PC += sBx; R(A+3) := R(A) }
 pir = <<PIR
     ${INS} = concat "  add ${REG}"
     $S0 = ${A}
@@ -1046,6 +1078,7 @@ PIR
 [FORPREP]
 code = 32
 format = AsBx
+synopsis = R(A) -= R(A+2); PC += sBx
 pir = <<PIR
     $I0 = ${A}
     ${INS} = concat "  (${REG}"
@@ -1088,6 +1121,7 @@ PIR
 [TFORLOOP]
 code = 33
 format = AC
+synopsis = R(A+3), ... , R(A+2+C) := R(A)(R(A+1), R(A+2)); if (R(A+3) ~= nil) then R(A+2) := R(A+3) else PC++
 pir = <<PIR
     $I0 = ${A} + 3
     $I1 = ${C}
@@ -1155,6 +1189,7 @@ PIR
 [NEWTABLE]
 code = 10
 format = ABC
+synopsis = R(A) := {}
 pir = <<PIR
     ${INS} = concat "  new ${REG}"
     $S0 = ${A}
@@ -1165,6 +1200,7 @@ PIR
 [SETLIST]
 code = 34
 format = ABC
+synopsis = R(A)[(C-1)*FPF+i] := R(A+i), 1 <= i <= B
 pir = <<PIR
     ${INS} = concat "  new \$P0, 'LuaNumber'\n"
     $I0 = ${C} - 1
@@ -1211,6 +1247,7 @@ PIR
 [CLOSE]
 code = 35
 format = A
+synopsis = close all variables in the stack up to R(A)
 pir = <<PIR
     ${INS} = concat "  # nothing\n"
 PIR
@@ -1218,6 +1255,7 @@ PIR
 [CLOSURE]
 code = 36
 format = ABx
+synopsis = R(A) := closure(KPROTO[Bx], R(A), ... , R(A+n))
 pir = <<PIR
     ${INS} = concat "  .const .Sub f_"
     $S0 = ${B}
