@@ -487,3 +487,11 @@ proto infix:<,> is looser(infix:<:=>)
     is nullterm
     { ... }
 
+## loose logical operators
+proto infix:<and> is looser(infix:<,>)
+    is pasttype('if')
+    { .... }
+
+proto infix:<or> is looser(infix:<and>)
+    is pasttype('unless')
+    { ... }
