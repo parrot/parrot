@@ -107,10 +107,6 @@ static void parrot_class_register(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
-static void rebuild_attrib_stuff(PARROT_INTERP, ARGIN(PMC *_class))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -501,89 +497,6 @@ readable_name(PARROT_INTERP, ARGIN(PMC *name))
     }
 
     return string_join(interp, CONST_STRING(interp, ";"), array);
-}
-
-
-/*
-
-=item C<static void rebuild_attrib_stuff>
-
-Take the class and completely rebuild the attribute stuff for
-it. Horribly destructive, and definitely not a good thing to do if
-there are instantiated objects for the class
-
-=cut
-
-*/
-
-static void
-rebuild_attrib_stuff(PARROT_INTERP, ARGIN(PMC *_class))
-{
-    INTVAL    attr_count, cur_offset, n_class, n_mro, offset;
-    PMC      *attr_offset_hash, *mro, *attribs;
-    SLOTTYPE *class_slots;
-
-#ifndef NDEBUG
-    PMC * const orig_class = _class;
-#endif
-
-    /* attrib count isn't set yet, a GC caused by concat could
-     * corrupt data under construction */
-    Parrot_block_DOD(interp);
-
-    class_slots      = PMC_data_typed(_class, SLOTTYPE *);
-    attr_offset_hash = pmc_new(interp, enum_class_Hash);
-    set_attrib_num(_class, class_slots, PCD_ATTRIBUTES, attr_offset_hash);
-
-    mro   = _class->vtable->mro;
-    n_mro = VTABLE_elements(interp, mro);
-
-    /* walk from oldest parent down to n_class == 0 which is this class */
-    cur_offset = 0;
-
-    for (n_class = n_mro - 1; n_class >= 0; --n_class) {
-        STRING *classname;
-
-        _class = VTABLE_get_pmc_keyed_int(interp, mro, n_class);
-
-        /* this Class isa PMC - no attributes there */
-        if (!PObj_is_class_TEST(_class))
-            continue;
-
-        class_slots = PMC_data_typed(_class, SLOTTYPE *);
-        classname   = VTABLE_get_string(interp,
-                        get_attrib_num(class_slots, PCD_CLASS_NAME));
-        attribs     = get_attrib_num(class_slots, PCD_CLASS_ATTRIBUTES);
-        attr_count  = VTABLE_elements(interp, attribs);
-
-        if (attr_count) {
-            STRING * const partial_name = string_concat(interp, classname,
-                    CONST_STRING(interp, "\0"), 0);
-
-            for (offset = 0; offset < attr_count; offset++) {
-               STRING * const attr_name =
-                    VTABLE_get_string_keyed_int(interp, attribs, offset);
-               STRING * const full_name =
-                    string_concat(interp, partial_name, attr_name, 0);
-
-                /* store this attribute with short and full name */
-
-                VTABLE_set_integer_keyed_str(interp, attr_offset_hash,
-                        attr_name, cur_offset);
-                VTABLE_set_integer_keyed_str(interp, attr_offset_hash,
-                        full_name, cur_offset);
-                cur_offset++;
-            }
-        }
-    }
-
-#ifndef NDEBUG
-    PARROT_ASSERT(_class == orig_class);
-#endif
-
-    /* And note the totals */
-    CLASS_ATTRIB_COUNT(_class) = cur_offset;
-    Parrot_unblock_DOD(interp);
 }
 
 
