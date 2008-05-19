@@ -144,7 +144,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
     }
     else if (PObj_is_object_TEST(pmc)) {
         PIO_eprintf(debugger, "Object(%Ss)=PMC(%#p)",
-                VTABLE_name(interp, pmc), pmc);
+                VTABLE_get_string(interp, VTABLE_get_class(interp, pmc)), pmc);
     }
     else if (pmc->vtable->base_type == enum_class_delegate) {
         PIO_eprintf(debugger, "delegate=PMC(%#p)", pmc);
