@@ -149,6 +149,11 @@ Are deprecated.
 
 Is deprecated, replaced by C<Parrot_ex_calc_handler_offset>.
 
+=item * 'rethrow_exception', 'rethrow_c_exception' [post 0.6.2]
+
+Are deprecated, replaced by C<Parrot_ex_rethrow_from_op> and
+C<Parrot_ex_rethrow_from_c>.
+
 =back
 
 =head1 PIR syntax
