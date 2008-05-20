@@ -104,10 +104,10 @@ format = AB
 synopsis = R(A) := UpValue[B]
 pir = <<PIR
     if ${UPVAL} < ${NUPS} goto ${LABEL}_1
-    ${INS} = concat "  ${REG}"
+    ${INS} = concat "  find_lex ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = find_lex '"
+    ${INS} = concat ", '"
     $P0 = getattribute ${FCT}, 'upvalues'
     $P1 = $P0[${B}]
     $S0 = $P1
@@ -683,10 +683,10 @@ pir = <<PIR
     $I1 = ${C} - 1
   ${LABEL}_15:
     unless $I1 goto ${LABEL}_14
-    ${INS} = concat "  ${REG}"
+    ${INS} = concat "  set ${REG}"
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat " = \$P"
+    ${INS} = concat ", \$P"
     ${INS} = concat $S0
     ${INS} = concat "\n"
     inc $I0
@@ -844,7 +844,7 @@ code = 11
 format = ABC
 synopsis = R(A+1) := R(B); R(A) := R(B)[RK(C)]
 pir = <<PIR
-    ${INS} = concat "  set ${REG}"
+    ${INS} = concat "  clone ${REG}"
     $I0 = ${A} + 1
     $S0 = $I0
     ${INS} = concat $S0
@@ -992,14 +992,14 @@ code = 26
 format = AC
 synopsis = if not (R(A) <=> C) then PC++
 pir = <<PIR
-    ${INS} = concat "  \$I0 = is"
+    ${INS} = concat "  is"
     unless ${C} goto ${LABEL}_1
     ${INS} = concat "true"
     goto ${LABEL}_2
   ${LABEL}_1:
     ${INS} = concat "false"
   ${LABEL}_2:
-    ${INS} = concat " ${REG}"
+    ${INS} = concat " \$I0, ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat "\n  unless \$I0 goto PC"
@@ -1015,14 +1015,14 @@ code = 27
 format = ABC
 synopsis = if (R(B) <=> C) then R(A) := R(B) else PC++
 pir = <<PIR
-    ${INS} = concat "  \$I0 = is"
+    ${INS} = concat "  is"
     unless ${C} goto ${LABEL}_1
     ${INS} = concat "true"
     goto ${LABEL}_2
   ${LABEL}_1:
     ${INS} = concat "false"
   ${LABEL}_2:
-    ${INS} = concat " ${REG}"
+    ${INS} = concat " \$I0, ${REG}"
     $S0 = ${B}
     ${INS} = concat $S0
     ${INS} = concat "\n  unless \$I0 goto PC"
@@ -1030,7 +1030,7 @@ pir = <<PIR
     inc $I0
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat "\n  set ${REG}"
+    ${INS} = concat "\n  clone ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat ", ${REG}"
@@ -1192,7 +1192,7 @@ pir = <<PIR
     $S0 = $I0
     ${INS} = concat $S0
     ${INS} = concat ")\n"
-    ${INS} = concat "  \$I0 = isa ${REG}"
+    ${INS} = concat "  isa \$I0, ${REG}"
     $I0 = ${A} + 3
     $S0 = $I0
     ${INS} = concat $S0
