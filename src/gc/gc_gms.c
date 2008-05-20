@@ -762,7 +762,7 @@ gc_gms_init_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 =item C<static Gc_gms_gen * gc_gms_find_gen>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -799,7 +799,7 @@ gc_gms_find_gen(PARROT_INTERP, ARGIN(const Gc_gms_hdr *h), UINTVAL gen_no)
 
 =item C<static void gc_gms_promote>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -846,7 +846,7 @@ gc_gms_promote(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), UINTVAL gen_no)
 
 =item C<static void gc_gms_store_hdr_list>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -879,7 +879,7 @@ gc_gms_store_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l), ARGIN(Gc_gms_hd
 
 =item C<static void gc_gms_clear_hdr_list>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -901,7 +901,7 @@ gc_gms_clear_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l))
 
 =item C<static void gc_gms_store_igp>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -920,7 +920,7 @@ gc_gms_store_igp(PARROT_INTERP, ARGIN(Gc_gms_hdr *h))
 
 =item C<static void gc_gms_clear_igp>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -948,15 +948,16 @@ to other items, and promote it to the old generation.
 */
 
 void
-parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old), ARGIN(void *new))
+parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
+    ARGIN(void *_new))
 {
-    Gc_gms_hdr * const nh = PObj_to_GMSH(new);
+    Gc_gms_hdr * const nh = PObj_to_GMSH(_new);
     Gc_gms_hdr * const ah = PObj_to_GMSH(agg);
 
     /* if this may be an aggregate store it in IGP list, thus making
      * it a possible root for this generation
      */
-    if (PObj_is_PMC_TEST((PObj*)new) && ((PMC*)new)->pmc_ext)
+    if (PObj_is_PMC_TEST((PObj *)_new) && ((PMC *)_new)->pmc_ext)
         gc_gms_store_igp(interp, nh);
 
     /* promote RHS to old generation of aggregate */
@@ -973,24 +974,24 @@ parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old), ARGIN(void *n
 
 =item C<void parrot_gc_gms_wb_key>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
 */
 
 void
-parrot_gc_gms_wb_key(PARROT_INTERP, ARGIN(PMC *agg),
-        ARGIN(void *old), ARGIN(void *old_key), ARGIN(void *new), ARGIN(void *new_key))
+parrot_gc_gms_wb_key(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
+    ARGIN(void *old_key), ARGIN(void *_new), ARGIN(void *new_key))
 {
     Gc_gms_hdr *nh, *ah;
 
     /* handle hash values */
-    parrot_gc_gms_wb(interp, agg, old, new);
+    parrot_gc_gms_wb(interp, agg, old, _new);
 
     /* if hash keys are PObj* then promote new key too */
 
-    /* TODO check, if key is a PObj */
+    /* TODO: check if key is a PObj */
 
     nh = PObj_to_GMSH(new_key);
     ah = PObj_to_GMSH(agg);
@@ -1008,7 +1009,7 @@ typedef struct Gc_gms_plan {
 
 =item C<static void gc_gms_merge_gen>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1042,7 +1043,7 @@ gc_gms_merge_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 
 =item C<static void gc_gms_use_gen>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1056,29 +1057,28 @@ gc_gms_use_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
     UINTVAL next_gen;
 
     /* set hdr pointers in last generation */
-    gen = pool->last_gen;
+    gen        = pool->last_gen;
     gen->first = pool->black;
-    gen->fin = pool->black_fin;
-    gen->last = pool->free_list;
+    gen->fin   = pool->black_fin;
+    gen->last  = pool->free_list;
 
     /* create and append a new generation */
-    next_gen = plan->gen_no + 1;
-    gen = gc_gms_create_gen(interp, pool, next_gen);
-    prev = pool->last_gen;
+    next_gen       = plan->gen_no + 1;
+    gen            = gc_gms_create_gen(interp, pool, next_gen);
+    prev           = pool->last_gen;
     pool->last_gen = gen;
-    prev->next = gen;
-    gen->prev = prev;
+    prev->next     = gen;
+    gen->prev      = prev;
 
     /* set generation in interpreter */
     interp->gc_generation = next_gen;
-
 }
 
 /*
 
 =item C<static int set_gen_cb>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1101,7 +1101,7 @@ set_gen_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, ARGIN(void *
 
 =item C<static void gc_gms_set_gen>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1367,7 +1367,7 @@ parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 
 =item C<static int init_mark_cb>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1410,7 +1410,7 @@ gc_gms_init_mark(PARROT_INTERP)
 
 =item C<static int trace_igp_cb>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1458,7 +1458,7 @@ gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 
 =item C<static int trace_children_cb>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1578,7 +1578,7 @@ sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
 
 =item C<static int sweep_cb_buf>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1662,7 +1662,7 @@ gc_gms_sweep(PARROT_INTERP)
 
 =item C<static int end_cycle_cb>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1688,7 +1688,7 @@ end_cycle_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void
 
 =item C<static void gc_gms_end_cycle>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1765,7 +1765,7 @@ parrot_gc_gms_run(PARROT_INTERP, int flags)
 
 =item C<static void gms_debug_verify>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 

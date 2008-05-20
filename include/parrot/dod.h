@@ -173,7 +173,7 @@ void parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 void parrot_gc_gms_wb(PARROT_INTERP,
     ARGIN(PMC *agg),
     ARGIN(void *old),
-    ARGIN(void *new))
+    ARGIN(void *_new))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -183,7 +183,7 @@ void parrot_gc_gms_wb_key(PARROT_INTERP,
     ARGIN(PMC *agg),
     ARGIN(void *old),
     ARGIN(void *old_key),
-    ARGIN(void *new),
+    ARGIN(void *_new),
     ARGIN(void *new_key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
