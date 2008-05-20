@@ -26,12 +26,25 @@
   + Plumhead:
     - use NQP as PAST generating code
     - use riaxpander for macro expansion
-  + Rakudo: roadmap updated
+  + Rakudo:
+    - updated ROADMAP
+    - conditional and loop statement modifiers
+    - lots of class, object, role, and method improvements
+    - Str increment and decrement
+    - improved spectest reporting
+    - type checking on assignment
+    - regexes and grammars
+    - undef and self
+    - placeholder vars
+roadmap updated
   + Squaak: added to repository
   + TAP: retired
 - Compilers
   + PGE: updated to match Synopsis 5, deprecated features removed
-  + PCT: updated
+  + PCT:
+    - improve handling of register types, conversion between registers
+    - improved error diagnostics
+    - add 'arity' to for loops
 - Configuration
   + added step auto::opengl
   + added step gen::opengl
