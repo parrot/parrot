@@ -23,8 +23,8 @@ pir = <<PIR
   ${LABEL}_1:
     $P0 = getattribute ${CLOSURE}, 'upvalues'
     $P1 = $P0[${UPVAL}]
-    $S0 = $P1
     inc ${UPVAL}
+    $S0 = $P1
     $I0 = exists ${LEX}[$S0]
     if $I0 goto ${LABEL}_3
     ${LEX}[$S0] = 1
@@ -78,17 +78,14 @@ pir = <<PIR
     ${INS} = concat "  new ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat ", 'LuaBoolean'\n"
-    ${INS} = concat "  set ${REG}"
-    $S0 = ${A}
+    ${INS} = concat ", 'LuaBoolean'\n  set ${REG}"
     ${INS} = concat $S0
     ${INS} = concat ", "
     $S0 = ${B}
     ${INS} = concat $S0
     ${INS} = concat "\n"
     unless ${C} goto ${LABEL}_1
-    $I0 = ${NEXTPC}
-    inc $I0
+    $I0 = ${NEXTPC} + 1
     $S0 = $I0
     ${INS} = concat "  goto PC"
     ${INS} = concat $S0
@@ -160,8 +157,7 @@ pir = <<PIR
     $P1 = $P0[${B}]
     $S0 = $P1
     ${INS} = concat $S0
-    ${INS} = concat "', "
-    ${INS} = concat "${REG}"
+    ${INS} = concat "', ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat "\n"
@@ -701,8 +697,7 @@ code = 29
 format = ABC
 synopsis = return R(A)(R(A+1), ... , R(A+B-1))
 pir = <<PIR
-    ${INS} = concat "  .return "
-    ${INS} = concat "${REG}"
+    ${INS} = concat "  .return ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat "("
@@ -784,15 +779,14 @@ code = 37
 format = AB
 synopsis = R(A), ... , R(A+B-1) := vararg
 pir = <<PIR
-    ${INS} = concat "  "
+    ${INS} = concat "  ("
     if ${B} goto ${LABEL}_1
-    ${INS} = concat "(${REG}"
+    ${INS} = concat "${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
     ${INS} = concat " :slurpy) = "
     goto ${LABEL}_2
   ${LABEL}_1:
-    ${INS} = concat "("
     $I0 = ${A}
     $I1 = ${B} - 1
     $I2 = 1
@@ -1191,8 +1185,7 @@ pir = <<PIR
     inc $I0
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat ")\n"
-    ${INS} = concat "  isa \$I0, ${REG}"
+    ${INS} = concat ")\n  isa \$I0, ${REG}"
     $I0 = ${A} + 3
     $S0 = $I0
     ${INS} = concat $S0
@@ -1230,9 +1223,10 @@ format = ABC
 synopsis = R(A)[(C-1)*FPF+i] := R(A+i), 1 <= i <= B
 pir = <<PIR
     ${INS} = concat "  new \$P0, 'LuaNumber'\n"
+    ${INS} = concat "  set \$P0, "
     $I0 = ${C} - 1
     $I0 *= ${FPF}
-    ${INS} = concat "  set \$P0, "
+    inc $I0
     $S0 = $I0
     ${INS} = concat $S0
     ${INS} = concat "\n"
@@ -1245,7 +1239,6 @@ pir = <<PIR
     dec $I1
   ${LABEL}_2:
     unless $I0 <= $I1 goto ${LABEL}_3
-    ${INS} = concat "  inc \$P0\n"
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
@@ -1253,12 +1246,11 @@ pir = <<PIR
     $I2 = ${A} + $I0
     $S0 = $I2
     ${INS} = concat $S0
-    ${INS} = concat "\n"
+    ${INS} = concat "\n  inc \$P0\n"
     inc $I0
     goto ${LABEL}_2
   ${LABEL}_3:
     if ${B} goto ${LABEL}_4
-    ${INS} = concat "  inc \$P0\n"
     ${INS} = concat "  tconstruct(${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
