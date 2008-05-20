@@ -233,7 +233,7 @@ pir = <<PIR
     ${INS} = concat "  add "
     unless ${A} == ${B} goto ${LABEL}_1
     $I1 = 1
-    ${INS} = concat "\$P0"
+    ${INS} = concat "${PTEMP}0"
     goto ${LABEL}_2
   ${LABEL}_1:
     $I1 = 0
@@ -266,7 +266,7 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = \$P0\n"
+    ${INS} = concat " = ${PTEMP}0\n"
   ${LABEL}_7:
 PIR
 
@@ -278,7 +278,7 @@ pir = <<PIR
     ${INS} = concat "  sub "
     unless ${A} == ${B} goto ${LABEL}_1
     $I1 = 1
-    ${INS} = concat "\$P0"
+    ${INS} = concat "${PTEMP}0"
     goto ${LABEL}_2
   ${LABEL}_1:
     $I1 = 0
@@ -311,7 +311,7 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = \$P0\n"
+    ${INS} = concat " = ${PTEMP}0\n"
   ${LABEL}_7:
 PIR
 
@@ -323,7 +323,7 @@ pir = <<PIR
     ${INS} = concat "  mul "
     unless ${A} == ${B} goto ${LABEL}_1
     $I1 = 1
-    ${INS} = concat "\$P0"
+    ${INS} = concat "${PTEMP}0"
     goto ${LABEL}_2
   ${LABEL}_1:
     $I1 = 0
@@ -356,7 +356,7 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = \$P0\n"
+    ${INS} = concat " = ${PTEMP}0\n"
   ${LABEL}_7:
 PIR
 
@@ -368,7 +368,7 @@ pir = <<PIR
     ${INS} = concat "  div "
     unless ${A} == ${B} goto ${LABEL}_1
     $I1 = 1
-    ${INS} = concat "\$P0"
+    ${INS} = concat "${PTEMP}0"
     goto ${LABEL}_2
   ${LABEL}_1:
     $I1 = 0
@@ -401,7 +401,7 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = \$P0\n"
+    ${INS} = concat " = ${PTEMP}0\n"
   ${LABEL}_7:
 PIR
 
@@ -413,7 +413,7 @@ pir = <<PIR
     ${INS} = concat "  mod "
     unless ${A} == ${B} goto ${LABEL}_1
     $I1 = 1
-    ${INS} = concat "\$P0"
+    ${INS} = concat "${PTEMP}0"
     goto ${LABEL}_2
   ${LABEL}_1:
     $I1 = 0
@@ -446,7 +446,7 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = \$P0\n"
+    ${INS} = concat " = ${PTEMP}0\n"
   ${LABEL}_7:
 PIR
 
@@ -458,7 +458,7 @@ pir = <<PIR
     ${INS} = concat "  pow "
     unless ${A} == ${B} goto ${LABEL}_1
     $I1 = 1
-    ${INS} = concat "\$P0"
+    ${INS} = concat "${PTEMP}0"
     goto ${LABEL}_2
   ${LABEL}_1:
     $I1 = 0
@@ -491,7 +491,7 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = \$P0\n"
+    ${INS} = concat " = ${PTEMP}0\n"
   ${LABEL}_7:
 PIR
 
@@ -544,7 +544,7 @@ synopsis = R(A) := R(B) .. ... .. R(C)
 pir = <<PIR
     unless ${A} == ${B} goto ${LABEL}_1
     $I1 = 1
-    $S1 = "\$P0"
+    $S1 = "${PTEMP}0"
     goto ${LABEL}_2
   ${LABEL}_1:
     $I1 = 0
@@ -576,7 +576,7 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat " = \$P0\n"
+    ${INS} = concat " = ${PTEMP}0\n"
   ${LABEL}_5:
 PIR
 
@@ -612,7 +612,7 @@ pir = <<PIR
     $I1 = ${C} - 1
   ${LABEL}_3:
     unless $I1 goto ${LABEL}_4
-    ${INS} = concat "new \$P"
+    ${INS} = concat "new ${PTEMP}"
     $S0 = $I0
     ${INS} = concat $S0
     ${INS} = concat ", 'LuaNil'\n  "
@@ -630,7 +630,7 @@ pir = <<PIR
     ${INS} = concat ", "
   ${LABEL}_7:
     $I2 = 0
-    ${INS} = concat "\$P"
+    ${INS} = concat "${PTEMP}"
     $S0 = $I0
     ${INS} = concat $S0
     inc $I0
@@ -682,7 +682,7 @@ pir = <<PIR
     ${INS} = concat "  set ${REG}"
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat ", \$P"
+    ${INS} = concat ", ${PTEMP}"
     ${INS} = concat $S0
     ${INS} = concat "\n"
     inc $I0
@@ -993,10 +993,10 @@ pir = <<PIR
   ${LABEL}_1:
     ${INS} = concat "false"
   ${LABEL}_2:
-    ${INS} = concat " \$I0, ${REG}"
+    ${INS} = concat " ${ITEMP}0, ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat "\n  unless \$I0 goto PC"
+    ${INS} = concat "\n  unless ${ITEMP}0 goto PC"
     $I0 = ${NEXTPC}
     inc $I0
     $S0 = $I0
@@ -1016,10 +1016,10 @@ pir = <<PIR
   ${LABEL}_1:
     ${INS} = concat "false"
   ${LABEL}_2:
-    ${INS} = concat " \$I0, ${REG}"
+    ${INS} = concat " ${ITEMP}0, ${REG}"
     $S0 = ${B}
     ${INS} = concat $S0
-    ${INS} = concat "\n  unless \$I0 goto PC"
+    ${INS} = concat "\n  unless ${ITEMP}0 goto PC"
     $I0 = ${NEXTPC}
     inc $I0
     $S0 = $I0
@@ -1047,11 +1047,11 @@ pir = <<PIR
     $I0 = ${A} + 2
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat "\n  \$N0 = ${REG}"
+    ${INS} = concat "\n  ${NTEMP}0 = ${REG}"
     $I0 = ${A} + 2
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat "\n  le \$N0, 0.0, PC"
+    ${INS} = concat "\n  le ${NTEMP}0, 0.0, PC"
     $S0 = ${PC}
     ${INS} = concat $S0
     ${INS} = concat "_or\n  gt ${REG}"
@@ -1185,11 +1185,11 @@ pir = <<PIR
     inc $I0
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat ")\n  isa \$I0, ${REG}"
+    ${INS} = concat ")\n  isa ${ITEMP}0, ${REG}"
     $I0 = ${A} + 3
     $S0 = $I0
     ${INS} = concat $S0
-    ${INS} = concat ", 'LuaNil'\n  if \$I0 goto PC"
+    ${INS} = concat ", 'LuaNil'\n  if ${ITEMP}0 goto PC"
     $I0 = ${NEXTPC} + 1
     $S0 = $I0
     ${INS} = concat $S0
@@ -1222,8 +1222,8 @@ code = 34
 format = ABC
 synopsis = R(A)[(C-1)*FPF+i] := R(A+i), 1 <= i <= B
 pir = <<PIR
-    ${INS} = concat "  new \$P0, 'LuaNumber'\n"
-    ${INS} = concat "  set \$P0, "
+    ${INS} = concat "  new ${PTEMP}0, 'LuaNumber'\n"
+    ${INS} = concat "  set ${PTEMP}0, "
     $I0 = ${C} - 1
     $I0 *= ${FPF}
     inc $I0
@@ -1242,11 +1242,11 @@ pir = <<PIR
     ${INS} = concat "  ${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat "[\$P0] = ${REG}"
+    ${INS} = concat "[${PTEMP}0] = ${REG}"
     $I2 = ${A} + $I0
     $S0 = $I2
     ${INS} = concat $S0
-    ${INS} = concat "\n  inc \$P0\n"
+    ${INS} = concat "\n  inc ${PTEMP}0\n"
     inc $I0
     goto ${LABEL}_2
   ${LABEL}_3:
@@ -1254,7 +1254,7 @@ pir = <<PIR
     ${INS} = concat "  tconstruct(${REG}"
     $S0 = ${A}
     ${INS} = concat $S0
-    ${INS} = concat ", \$P0, ${REG}"
+    ${INS} = concat ", ${PTEMP}0, ${REG}"
     $S0 = ${STACK}
     ${INS} = concat $S0
     ${INS} = concat " :flat)\n"
