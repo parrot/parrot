@@ -116,4 +116,6 @@ the strings?).
 
  Jerry     0.6.1          2008-Apr-15     "Bird of Paradise"
 
+ chromatic 0.6.2          2008-May-20     "Reverse Sublimation"
+
 =cut
