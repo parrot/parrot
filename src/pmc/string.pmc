@@ -845,12 +845,8 @@ Downcase this string
     METHOD lower() {
         STRING * const s   = string_downcase(INTERP,
             VTABLE_get_string(INTERP, SELF));
-        PMC * const    ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PMC_str_val(ret)   = s;
 
-        PObj_custom_mark_SET(ret);
-
-        RETURN(PMC *ret);
+        RETURN(STRING *s);
     }
 
 /*
