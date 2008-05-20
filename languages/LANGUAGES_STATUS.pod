@@ -35,7 +35,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -85,7 +85,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -134,7 +134,7 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -235,7 +235,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -260,7 +260,7 @@ has been commented out.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -377,7 +377,7 @@ Based on PCT.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -415,7 +415,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -470,7 +470,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -522,7 +522,7 @@ L<http://www.parrotcode.org/talks/LuaOnParrot.pdf>.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -584,7 +584,7 @@ Development is stalled. Takers are welcome.  Some tests fail.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -631,7 +631,7 @@ In progress.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -655,7 +655,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -678,7 +678,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -809,7 +809,7 @@ Started.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -862,7 +862,7 @@ Parser is 90% complete; waiting for more PAST support.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -933,7 +933,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -1006,7 +1006,7 @@ use tcltest.tcl)
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -1036,7 +1036,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -1060,7 +1060,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -1088,7 +1088,7 @@ See details in F<languages/WMLScript/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.2
 
 =item Location
 
@@ -1160,7 +1160,8 @@ for some Perl 5 - specific functionality that was heavily used in early parrot d
 =head2 Pint
 
 An experimental implementation of PHP. Described at
-L<http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html>, but no updates since August 2004, and the link to source is a 404.
+L<http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html>,
+but no updates since August 2004, and the link to source is a 404.
 
 =head2 Ruby
 
