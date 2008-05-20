@@ -734,7 +734,7 @@ Parses a subrule token.
 
     ##  see what type of subrule this is
     if key == '<.' goto scan_subname
-    if key == '<?' goto scan_subname             ## FIXME: RT#53834
+    if key == '<?' goto zerowidth
     if key == '<!' goto negated
 
     ##  capturing subrule, get its name/alias
