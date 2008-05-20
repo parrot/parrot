@@ -17,9 +17,12 @@
   + Amber: retired
   + C99: grammar updated
   + Cardinal: resurrected, method calls and do blocks work now
-  + Eclectus: various updates
+  + Eclectus: use NQP as PAST generating code
   + Lua: started bytecode translation
   + Pheme: updated to match PGE/PCT changes
+  + Plumhead:
+    - use NQP as PAST generating code
+    - use riaxpander for macro expansion
   + Rakudo: roadmap updated
   + Squaak: added to repository
   + TAP: retired
