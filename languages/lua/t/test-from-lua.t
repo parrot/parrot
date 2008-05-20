@@ -87,7 +87,7 @@ language_output_is( 'lua', $code, $out, 'cf' );
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'echo.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'echo', params => 'arg1 arg2' );
 /^
-0\tlanguages.lua.t.test-from-lua_3\.(lua|pir)\n
+0\tlanguages.lua.t.test-from-lua_3\.(lua|pir|luac\.pir)\n
 1\targ1\n
 2\targ2\n
 /x
