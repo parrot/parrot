@@ -18,7 +18,10 @@
   + C99: grammar updated
   + Cardinal: resurrected, method calls and do blocks work now
   + Eclectus: use NQP as PAST generating code
-  + Lua: started bytecode translation
+  + Lua:
+    - added big number library
+    - updated to match PGE changes
+    - added a bytecode disassembler & a Lua 5.1 VM bytecode translator
   + Pheme: updated to match PGE/PCT changes
   + Plumhead:
     - use NQP as PAST generating code
