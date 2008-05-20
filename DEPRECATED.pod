@@ -197,20 +197,6 @@ Will have to be:
 
 =over 4
 
-=item Non-capturing C<< <?foo> >> is now C<< <.foo> >>
-
-(See RT#53834)
-
-Synopsis 5 changes the syntax for non-capturing subrules from
-C<< <?foo> >> to C<< <.foo> >>.  According to S05, the
-C<< <?foo> >> syntax is now used to indicate a zero-width
-assertion.  So, grammars that have been using C<< <?foo> >>
-for non-capturing subrules need to convert to the new syntax.
-
-PGE will continue to support the non-capture interpretation
-of C<< <?foo> >> until the May 2008 release, after which it
-will be removed.
-
 =item Change argument handling of C<< <foo: text> >>
 
 (See RT#53606.)
