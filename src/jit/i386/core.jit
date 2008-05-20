@@ -416,10 +416,6 @@ Parrot_sub_i_ic_ic {
     Parrot_binop_i_ic_ic s/<op>/-/ s/uicast/INTVAL/
 }
 
-Parrot_div_i_ic_ic {
-    Parrot_binop_i_ic_ic s!<op>!/! s/uicast/INTVAL/
-}
-
 Parrot_cmod_i_ic_ic {
     Parrot_binop_i_ic_ic s!<op>!%! s/uicast/INTVAL/
 }
@@ -470,10 +466,6 @@ Parrot_sub_n_nc_nc {
 
 Parrot_mul_n_nc_nc {
     Parrot_binop_n_nc_nc s/<op>/mul/
-}
-
-Parrot_div_n_nc_nc {
-    Parrot_binop_n_nc_nc s/<op>/div/
 }
 
 Parrot_cmod_n_nc_nc {
