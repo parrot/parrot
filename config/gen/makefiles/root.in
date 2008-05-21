@@ -1627,7 +1627,7 @@ prog-clean :
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
     $(SRC_DIR)/string_private_cstring.h \
-    $(STR_FILES) \
+    "$(SRC_DIR)/*.str" "$(SRC_DIR)/io/*.str" "$(SRC_DIR)/pmc/*.str" \
     "src/pmc/*.c" "src/pmc/pmc_*.h" "src/pmc/*.dump" \
     vtable.dump "*.def" "*.lib" "*.exp"
 
