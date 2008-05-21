@@ -654,6 +654,10 @@ D: Nicer command line handling in ops2c.pl
 N: Uri Guttman
 D: Lot of general Parrot design hints
 
+N: Vasily Chekalkin
+E: bacek@bacek.com
+D: Core and Rakudo patches
+
 N: Vladimir Lipsky
 D: Win32, IO fixes
 
