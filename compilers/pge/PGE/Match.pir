@@ -11,14 +11,12 @@ This file implements match objects returned by the Parrot Grammar Engine.
 .namespace [ 'PGE::Match' ]
 
 .sub '__onload' :load
-    load_bytecode 'Protoobject.pbc'
+    load_bytecode 'P6object.pbc'
     load_bytecode 'Parrot/Capture_PIR.pbc'
     load_bytecode 'PGE/Dumper.pir'                 # FIXME, XXX, etc.
-    .local pmc protomaker, hashclass, base
-    protomaker = new 'Protomaker'
-    hashclass = get_class 'Capture_PIR'
-    base = protomaker.'new_subclass'(hashclass, 'PGE::Match', '$.target', '$.from', '$.pos', '&!corou')
-
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PGE::Match', 'parent'=>'Capture_PIR', 'attr'=>'$.target $.from $.pos &!corou')
     .return ()
 .end
 

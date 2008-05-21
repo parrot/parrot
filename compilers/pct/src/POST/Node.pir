@@ -12,16 +12,15 @@ for compiling programs in Parrot.
 .namespace [ 'POST' ]
 
 .sub '__onload' :load :init
-    .local pmc protomaker, base
+    .local pmc p6meta, base
 
     ##  create POST classes
-    protomaker = new 'Protomaker'
-    $P0 = get_class 'PCT::Node'
-    base = protomaker.'new_subclass'($P0 , 'POST::Node')
-    $P0  = protomaker.'new_subclass'(base, 'POST::Op')
-    $P0  = protomaker.'new_subclass'(base, 'POST::Ops')
-    $P0  = protomaker.'new_subclass'(base, 'POST::Label')
-    $P0  = protomaker.'new_subclass'(base, 'POST::Sub')
+    p6meta = new 'P6metaclass'
+    base = p6meta.'new_class'('POST::Node', 'parent'=>'PCT::Node')
+    p6meta.'new_class'('POST::Op', 'parent'=>base)
+    p6meta.'new_class'('POST::Ops', 'parent'=>base)
+    p6meta.'new_class'('POST::Label', 'parent'=>base)
+    p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
     $P0 = new 'ResizableStringArray'
     $P0[0] = "    .param pmc %0"

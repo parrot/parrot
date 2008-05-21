@@ -156,11 +156,12 @@ needed for compiling regexes.
 .namespace [ 'PGE::Perl6Regex' ]
 
 .sub '__onload' :load
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PGE::Exp::WS', 'parent'=>'PGE::Exp::Subrule')
+    p6meta.'new_class'('PGE::Exp::Alias', 'parent'=>'PGE::Exp')
+
     .local pmc optable
-
-    $P0 = subclass 'PGE::Exp::Subrule', 'PGE::Exp::WS'
-    $P0 = subclass 'PGE::Exp', 'PGE::Exp::Alias'
-
     optable = new 'PGE::OPTable'
     set_global '$optable', optable
 

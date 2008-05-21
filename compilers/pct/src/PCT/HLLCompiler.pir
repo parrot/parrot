@@ -12,11 +12,11 @@ running compilers from a command line.
 =cut
 
 .sub 'onload' :anon :load :init
-    load_bytecode 'Protoobject.pbc'
+    load_bytecode 'P6object.pbc'
     load_bytecode 'Parrot/Exception.pbc'
-    $P0 = get_hll_global 'Protomaker'
-    $P1 = split ' ', '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version'
-    $P2 = $P0.'new_subclass'('Protoobject', 'PCT::HLLCompiler', $P1 :flat)
+    $P0 = new 'P6metaclass'
+    $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version'
+    $P0.'new_class'('PCT::HLLCompiler', 'attr'=>$S0)
 .end
 
 .namespace [ 'PCT::HLLCompiler' ]

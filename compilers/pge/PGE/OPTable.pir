@@ -32,12 +32,11 @@ PGE::OPTable - PGE operator precedence table and parser
 .include "cclass.pasm"
 
 .sub '__onload' :load
-    .local pmc base
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PGE::OPTable', 'parent'=>'Hash', 'attr'=>'%!key %!klen &!ws')
+
     .local pmc sctable
-    base = subclass 'Hash', 'PGE::OPTable'
-    addattribute base, '%!key'
-    addattribute base, '%!klen'
-    addattribute base, '&!ws'
     sctable = new 'Hash'
     set_global '%!sctable', sctable
 

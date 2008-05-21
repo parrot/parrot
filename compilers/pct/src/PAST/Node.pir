@@ -13,16 +13,16 @@ for compiling programs in Parrot.
 
 .sub 'onload' :anon :load :init
     ##   create the PAST::Node base class
-    .local pmc protomaker, base
-    protomaker = get_hll_global 'Protomaker'
-    base = protomaker.'new_subclass'('PCT::Node', 'PAST::Node')
+    .local pmc p6meta, base
+    p6meta = new 'P6metaclass'
+    base = p6meta.'new_class'('PAST::Node', 'parent'=>'PCT::Node')
 
-    $P0 = protomaker.'new_subclass'(base, 'PAST::Op')
-    $P0 = protomaker.'new_subclass'(base, 'PAST::Stmts')
-    $P0 = protomaker.'new_subclass'(base, 'PAST::Val')
-    $P0 = protomaker.'new_subclass'(base, 'PAST::Var')
-    $P0 = protomaker.'new_subclass'(base, 'PAST::Block')
-    $P0 = protomaker.'new_subclass'(base, 'PAST::VarList')
+    p6meta.'new_class'('PAST::Op', 'parent'=>base)
+    p6meta.'new_class'('PAST::Stmts', 'parent'=>base)
+    p6meta.'new_class'('PAST::Val', 'parent'=>base)
+    p6meta.'new_class'('PAST::Var', 'parent'=>base)
+    p6meta.'new_class'('PAST::Block', 'parent'=>base)
+    p6meta.'new_class'('PAST::VarList', 'parent'=>base)
 
     .return ()
 .end

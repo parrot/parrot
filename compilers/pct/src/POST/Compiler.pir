@@ -16,13 +16,12 @@ PIR or an Eval PMC (bytecode).
 .namespace [ 'POST::Compiler' ]
 
 .sub '__onload' :load :init
-    $P0 = get_hll_global 'Protomaker'
-    $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'POST::Compiler', '$!code')
-
-    $P0 = get_hll_global ['POST'], 'Compiler'
-    $P0.'language'('POST')
+    .local pmc p6meta, cproto
+    p6meta = new 'P6metaclass'
+    cproto = p6meta.'new_class'('POST::Compiler', 'parent'=>'PCT::HLLCompiler', 'attr'=>'$!code')
+    cproto.'language'('POST')
     $P1 = split ' ', 'pir evalpmc'
-    $P0.'stages'($P1)
+    cproto.'stages'($P1)
 
     $P0 = new 'String'
     set_global '$?NAMESPACE', $P0

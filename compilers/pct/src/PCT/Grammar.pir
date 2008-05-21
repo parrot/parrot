@@ -40,7 +40,10 @@ also included.
 .sub 'onload' :anon :init :load
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
-    $P0 = subclass 'PGE::Grammar', 'PCT::Grammar'
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PCT::Grammar', 'parent'=>'PGE::Grammar')
+    $P0 = get_class 'PCT::Grammar'
     $P1 = get_hll_global ['PGE::Util'], 'die'
     $P0.'add_method'('panic', $P1)
     .return ()

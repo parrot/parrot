@@ -16,11 +16,11 @@ and opcode syntax tree (POST) nodes in the Parrot Compiler Toolkit.
     ##   FIXME: Eventually we want this to be a subclass of
     ##   Capture, but as of now Capture isn't working so we
     ##   use the Capture_PIR class for now.
-    .local pmc base, protomaker
     load_bytecode 'Parrot/Capture_PIR.pbc'
 
-    protomaker = get_hll_global 'Protomaker'
-    base = protomaker.'new_subclass'('Capture_PIR', 'PCT::Node')
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PCT::Node', 'parent'=>'Capture_PIR')
 
     $P0 = new 'Integer'
     $P0 = 10
@@ -95,7 +95,8 @@ children and attributes.  Returns the newly created node.
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
 
-    $P0 = typeof self
+    $P0 = self.'HOW'()
+    $P0 = getattribute $P0, 'parrotclass'
     $P1 = new $P0
     $P1.'init'(children :flat, adverbs :flat :named)
     .return ($P1)

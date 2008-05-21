@@ -42,13 +42,12 @@ any value type.
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT/HLLCompiler.pbc'
-    $P0 = get_hll_global 'Protomaker'
-    $P1 = $P0.'new_subclass'('PCT::HLLCompiler', 'PAST::Compiler', '%!symtable')
-
-    $P0 = get_hll_global ['PAST'], 'Compiler'
-    $P0.'language'('PAST')
+    .local pmc p6meta, cproto
+    p6meta = new 'P6metaclass'
+    cproto = p6meta.'new_class'('PAST::Compiler', 'parent'=>'PCT::HLLCompiler', 'attr'=>'%!symtable')
+    cproto.'language'('PAST')
     $P1 = split ' ', 'post pir evalpmc'
-    $P0.'stages'($P1)
+    cproto.'stages'($P1)
 
     ##  %piropsig is a table of common opcode signatures
     .local pmc piropsig

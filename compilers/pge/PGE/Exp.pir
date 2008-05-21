@@ -21,28 +21,26 @@ PGE::Exp - base class for expressions
     .local pmc optable
     .local pmc term
 
-    .local pmc protomaker, matchclass, expclass
-
-    protomaker = new 'Protomaker'
-    matchclass = get_class 'PGE::Match'
-    expclass = protomaker.new_subclass(matchclass, 'PGE::Exp')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Literal')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Scalar')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::CCShortcut')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Newline')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::EnumCharList')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Anchor')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Concat')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Alt')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Conj')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Group')
-    $P1      = protomaker.new_subclass($P1     , 'PGE::Exp::CGroup')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Subrule')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Cut')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Quant')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Modifier')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Closure')
-    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Action')
+    .local pmc p6meta, expproto
+    p6meta = new 'P6metaclass'
+    expproto = p6meta.'new_class'('PGE::Exp', 'parent'=>'PGE::Match')
+    p6meta.'new_class'('PGE::Exp::Literal',      'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Scalar',       'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::CCShortcut',   'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Newline',      'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::EnumCharList', 'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Anchor',       'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Concat',       'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Alt',          'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Conj',         'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Group',        'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::CGroup',       'parent'=>'PGE::Exp::Group')
+    p6meta.'new_class'('PGE::Exp::Subrule',      'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Cut',          'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Quant',        'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Modifier',     'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Closure',      'parent'=>expproto)
+    p6meta.'new_class'('PGE::Exp::Action',       'parent'=>expproto)
 .end
 
 
@@ -94,7 +92,8 @@ C<target> adverbs.
     $P1 = $P0(code)
   make_grammar:
     push_eh end
-    $P0 = subclass 'PGE::Grammar', grammar
+    $P0 = new 'P6metaclass'
+    $P0.'new_class'(grammar, 'parent'=>'PGE::Grammar')
     pop_eh
   end:
     .return ($P1)
