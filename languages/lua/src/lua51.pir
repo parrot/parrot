@@ -32,8 +32,8 @@ Used by F<languages/lua/lua.pir>.
     load_bytecode 'PCT.pbc'
     load_bytecode 'PGE/Text.pbc'
 
-    new $P0, 'Protomaker'
-    $P0.'new_subclass'('PCT::HLLCompiler', 'Lua::Compiler', '$ostgrammar')
+    new $P0, 'P6metaclass'
+    $P0.'new_class'('Lua::Compiler', 'parent'=>'PCT::HLLCompiler', 'attr'=>'$ostgrammar')
 
     new $P0, 'Lua::Compiler'
     $P0.'language'('Lua')
@@ -151,8 +151,8 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .namespace [ 'Lua::POST::Sub' ]
 
 .sub '__onload' :anon :load :init
-    new $P0, 'Protomaker'
-    $P0.'new_subclass'('POST::Sub' , 'Lua::POST::Sub')
+    new $P0, 'P6metaclass'
+    $P0.'new_class'('Lua::POST::Sub', 'parent'=>'POST::Sub')
 .end
 
 .sub 'ops_const' :method
@@ -183,8 +183,8 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .namespace [ 'Lua::POST::Chunk' ]
 
 .sub '__onload' :anon :load :init
-    new $P0, 'Protomaker'
-    $P0.'new_subclass'('Lua::POST::Sub' , 'Lua::POST::Chunk')
+    new $P0, 'P6metaclass'
+    $P0.'new_class'('Lua::POST::Chunk', 'parent'=>'Lua::POST::Sub')
 .end
 
 .sub 'prologue' :method
