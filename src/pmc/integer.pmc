@@ -187,7 +187,7 @@ Returns the boolean value of the Integer.
 
 */
     VTABLE INTVAL get_bool() {
-        return PMC_int_val(SELF) ? 1 : 0;
+        return SELF.get_integer() ? 1 : 0;
     }
 
 /*
@@ -200,7 +200,7 @@ Returns the floating-point value of the integer.
 
 */
     VTABLE FLOATVAL get_number() {
-        return (FLOATVAL)PMC_int_val(SELF);
+        return SELF.get_integer();
     }
 
 /*
@@ -229,11 +229,11 @@ Returns the string value of the integer.
 
 */
     VTABLE STRING *get_string() {
-        return string_from_int(INTERP, PMC_int_val(SELF));
+        return string_from_int(INTERP, SELF.get_integer());
     }
 
     VTABLE STRING *get_repr() {
-        return string_from_int(INTERP, PMC_int_val(SELF));
+        return string_from_int(INTERP, SELF.get_integer());
     }
 
 /*
@@ -413,7 +413,7 @@ MMD_Complex: {
         }
 MMD_DEFAULT: {
         VTABLE_set_number_native(INTERP, SELF,
-            PMC_int_val(SELF) + VTABLE_get_number(INTERP, value));
+            SELF.get_integer() + VTABLE_get_number(INTERP, value));
         }
     }
 
@@ -660,7 +660,7 @@ MMD_Complex: {
         }
 MMD_DEFAULT: {
         VTABLE_set_number_native(INTERP, SELF,
-            PMC_int_val(SELF) * VTABLE_get_number(INTERP, value));
+            SELF.get_integer() * VTABLE_get_number(INTERP, value));
         }
     }
 
@@ -1136,7 +1136,7 @@ The C<==> operation.
     VTABLE INTVAL is_equal(PMC *value) {
 MMD_BigInt: {
         PMC * const temp = pmc_new(INTERP, enum_class_BigInt);
-        VTABLE_set_integer_native(INTERP, temp, PMC_int_val(SELF));
+        VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
         return Parrot_BigInt_is_equal_BigInt(INTERP, temp, value);
     }
 MMD_DEFAULT: {
@@ -1157,10 +1157,10 @@ Returns the result of comparing the integer with C<*value>.
     VTABLE INTVAL cmp(PMC *value) {
 MMD_String: {
             FLOATVAL fdiff =
-                PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
+                SELF.get_number() - VTABLE_get_number(INTERP, value);
             if (FLOAT_IS_ZERO(fdiff)) {
                 const INTVAL idiff =
-                    PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
+                    SELF.get_integer() - VTABLE_get_integer(INTERP, value);
                 return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
             }
             else {
@@ -1169,12 +1169,12 @@ MMD_String: {
         }
 MMD_Float: {
             const FLOATVAL diff =
-                (FLOATVAL)PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
+                SELF.get_number() - VTABLE_get_number(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
 MMD_DEFAULT: {
             /* int or undef */
-            const INTVAL diff = PMC_int_val(SELF)
+            const INTVAL diff = SELF.get_integer()
                 - VTABLE_get_integer(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
@@ -1192,11 +1192,11 @@ Returns the result of numerically comparing the integer with C<*value>.
     VTABLE INTVAL cmp_num(PMC *value) {
 MMD_String: {
             FLOATVAL fdiff =
-                PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
+                SELF.get_number() - VTABLE_get_number(INTERP, value);
 
             if (FLOAT_IS_ZERO(fdiff)) {
                 const INTVAL idiff =
-                    PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
+                    SELF.get_integer() - VTABLE_get_integer(INTERP, value);
                 return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
             }
             else {
@@ -1205,13 +1205,13 @@ MMD_String: {
         }
 MMD_Float: {
             const FLOATVAL diff =
-                (FLOATVAL)PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
+                SELF.get_number() - VTABLE_get_number(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
 MMD_DEFAULT: {
             /* int or undef */
             const INTVAL diff =
-                PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
+                SELF.get_integer() - VTABLE_get_integer(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
     }
