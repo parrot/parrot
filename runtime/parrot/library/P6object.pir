@@ -302,7 +302,7 @@ of names separated by spaces.
 =cut
 
 .sub 'new_class' :method
-    .param string name
+    .param pmc name
     .param pmc options         :slurpy :named
 
     .local pmc parentclass, parrotclass

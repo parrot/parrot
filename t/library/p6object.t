@@ -26,7 +26,7 @@ t/library/p6object.t -- P6object tests
 
     ##  set our plan
     .local int plan_tests
-    plan(96)
+    plan(104)
 
     ##  make sure we can load the P6object library
     push_eh load_failed
@@ -288,6 +288,26 @@ t/library/p6object.t -- P6object tests
     $I0 = issame $P0, p6objproto
     ok($I0, 'obj.WHAT =:= Object.WHAT')
 
+    ## make sure it works for array-based names
+    .local pmc stuproto
+    $P0 = split '::', 'Foo::STU'
+    $P0 = metaproto.'new_class'($P0)
+    stuproto = get_hll_global ['Foo'], 'STU'
+    $I0 = issame stuproto, $P0
+    ok($I0, 'Foo::STU proto =:= return value from .new_class()')
+    $P0 = get_class ['Foo';'STU']
+    isa_ok(stuproto, $P0, 'Foo::STU proto')
+    isa_ok(stuproto, 'P6object', 'Foo::STU proto')
+    isa_ok(stuproto, 'P6protoobject', 'Foo::STU proto')
+    $P0 = stuproto.'WHAT'()
+    $I0 = issame stuproto, $P0
+    ok($I0, 'Foo::STU proto .WHAT identity')
+    $S0 = stuproto
+    is($S0, 'STU', 'Foo::STU.WHAT eq "STU"')
+    $P0 = stuproto.'HOW'()
+    isa_ok($P0, 'P6metaclass', 'Foo::STU proto .HOW')
+    $I0 = defined stuproto
+    nok($I0, 'Foo::STU proto undefined')
 
     .return ()
   load_failed:
