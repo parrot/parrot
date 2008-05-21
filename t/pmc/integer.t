@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 =head1 NAME
 
@@ -467,6 +467,28 @@ CODE
 1j
 1d
 1b
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'cmp functions for subclasses' );
+.sub main :main
+    $P0 = subclass 'Integer', 'Int'
+ 
+    $P1 = new 'Int'
+    $P1 = 1
+    $P2 = new 'Int'
+    $P2 = 2
+
+    $I0 = cmp $P1, $P2
+    say $I0 
+    $I0 = cmp $P1, $P1
+    say $I0 
+    $I0 = cmp $P2, $P1
+    say $I0 
+.end
+CODE
+-1
+0
+1
 OUTPUT
 
 # Local Variables:
