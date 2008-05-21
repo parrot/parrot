@@ -26,7 +26,7 @@ t/library/p6object.t -- P6object tests
 
     ##  set our plan
     .local int plan_tests
-    plan(95)
+    plan(96)
 
     ##  make sure we can load the P6object library
     push_eh load_failed
@@ -184,6 +184,12 @@ t/library/p6object.t -- P6object tests
     ghiproto = metaproto.'new_class'('GHI')
     $P0 = ghiproto.'new'()
     is($P0, 'GHI::new', 'GHI::new overrides P6protoobject::new')
+
+    ##  check that 'new' method in subclass overrides P6protoobject::new
+    .local pmc ghi2proto
+    ghi2proto = metaproto.'new_class'('GHI2', 'parent'=>ghiproto)
+    $P0 = ghi2proto.'new'()
+    is($P0, 'GHI::new', 'GHI::new overrides P6protoobject::new (in subclass)')
 
     ##  create MyInt subclass from Integer PMC class
     .local pmc myintproto

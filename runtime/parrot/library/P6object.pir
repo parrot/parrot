@@ -247,11 +247,16 @@ or 'Object').
     ##  P6protoobject methods override parrotclass methods...
     protoclass.'add_parent'($P0)
     protoclass.'add_parent'(parrotclass)
-    ##  ...except for 'new'
-    $P0 = parrotclass.'methods'()
-    $P1 = $P0['new']
-    if null $P1 goto have_protoclass
-    protoclass.'add_method'('new', $P1)
+    $P0 = parrotclass.'inspect'('all_parents')
+    iter = new 'Iterator', $P0
+  newmethod_loop:
+    unless iter goto newmethod_end
+    $P0 = shift iter
+    $P0 = $P0.'methods'()
+    $P0 = $P0['new']
+    if null $P0 goto newmethod_loop
+    protoclass.'add_method'('new', $P0)
+  newmethod_end:
   have_protoclass:
     ##  register the protoclass in %!metaobject
     $I0 = get_addr protoclass
