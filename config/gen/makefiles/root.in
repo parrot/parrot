@@ -125,7 +125,7 @@ NONGEN_HEADERS   = @TEMP_nongen_headers@
 
 ###############################################################################
 #
-# "STICKY" GENERATED FILES:
+# CONFIGURE_GENERATED_FILES:
 #
 # These files are created when Configure.pl runs.
 #
@@ -182,7 +182,7 @@ GEN_PASM_INCLUDES = \
 #CONDITIONED_LINE(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
     @TEMP_gen_pasm_includes@
 
-STICKY_FILES = \
+CONFIGURE_GENERATED_FILES = \
     $(GEN_CONFIGS) \
     $(GEN_MAKEFILES) \
     ext/Parrot-Embed/Makefile.PL \
@@ -1205,7 +1205,7 @@ $(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parr
 
 @TEMP_encoding_build@
 
-# $(STICKY_FILES) : Configure.pl
+# $(CONFIGURE_GENERATED_FILES) : Configure.pl
 #	$(PERL) Configure.pl
 
 $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/Vtable.pm
@@ -1719,7 +1719,7 @@ realclean : clean
 	-$(MAKE) compilers/pirc  realclean
 	-$(MAKE) src/dynpmc      realclean
 	$(RM_RF) \
-    $(STICKY_FILES) \
+    $(CONFIGURE_GENERATED_FILES) \
     blib \
     cover_db
 
