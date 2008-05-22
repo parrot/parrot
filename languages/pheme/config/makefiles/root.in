@@ -62,5 +62,6 @@ clean: testclean
 	$(RM_F) lib/ASTGrammar.pir
 
 realclean: clean
+	$(RM_F) Makefile
 
 distclean: realclean

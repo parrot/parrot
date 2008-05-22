@@ -138,13 +138,32 @@ realclean: \
     dotnet.realclean \
     eclectus.realclean \
     ecmascript.realclean \
-    ecmascript.realclean \
     forth.realclean \
     hq9plus.realclean \
     jako.realclean \
+    lazy-k.realclean \
+    lisp.realclean \
+    lolcode.realclean \
+    lua.realclean \
+    m4.realclean \
+    ook.realclean \
+    parrot_compiler.realclean \
     perl6.realclean \
+    pheme.realclean \
+    PIR.realclean \
+    plumhead.realclean \
+    pugs.realclean \
+    punie.realclean \
+    pynie.realclean \
+    regex.realclean \
+    scheme.realclean \
     squaak.realclean \
-    unlambda.realclean
+    tcl.realclean \
+    urm.realclean \
+    unlambda.realclean \
+    WMLScript.realclean \
+    Zcode.realclean
+
 
 #
 # Language specific targets
@@ -177,6 +196,11 @@ PIR.test:
 	- $(MAKE) PIR test
 PIR.clean:
 	- $(MAKE) PIR clean
+PIR.realclean:
+	- $(MAKE) PIR realclean
+
+pugs.realclean:
+	- $(MAKE) pugs realclean
 
 WMLScript: WMLScript.dummy
 WMLScript.dummy:
@@ -185,6 +209,8 @@ WMLScript.test:
 	- $(MAKE) WMLScript test
 WMLScript.clean:
 	- $(MAKE) WMLScript clean
+WMLScript.realclean:
+	- $(MAKE) WMLScript realclean
 
 Zcode : Zcode.dummy
 Zcode.dummy:
@@ -193,6 +219,8 @@ Zcode.test:
 	- $(MAKE) Zcode test
 Zcode.clean:
 	- $(MAKE) Zcode clean
+Zcode.realclean:
+	- $(MAKE) Zcode realclean
 
 abc : abc.dummy
 abc.dummy:
@@ -322,6 +350,8 @@ lazy-k.test:
 	- $(MAKE) lazy-k test
 lazy-k.clean:
 	- $(MAKE) lazy-k clean
+lazy-k.realclean:
+	- $(MAKE) lazy-k realclean
 
 lisp: lisp.dummy
 lisp.dummy:
@@ -330,6 +360,8 @@ lisp.test:
 	- $(MAKE) lisp test
 lisp.clean:
 	- $(MAKE) lisp clean
+lisp.realclean:
+	- $(MAKE) lisp realclean
 
 lolcode: lolcode.dummy
 lolcode.dummy:
@@ -338,6 +370,8 @@ lolcode.test:
 	- $(MAKE) lolcode test
 lolcode.clean:
 	- $(MAKE) lolcode clean
+lolcode.realclean:
+	- $(MAKE) lolcode realclean
 
 lua: lua.dummy
 lua.dummy:
@@ -346,6 +380,8 @@ lua.test:
 	- $(MAKE) lua test
 lua.clean:
 	- $(MAKE) lua clean
+lua.realclean:
+	- $(MAKE) lua realclean
 
 m4: m4.dummy
 m4.dummy:
@@ -354,6 +390,8 @@ m4.test:
 	- $(MAKE) m4 test
 m4.clean:
 	- $(MAKE) m4 clean
+m4.realclean:
+	- $(MAKE) m4 realclean
 
 ook : ook.dummy
 ook.dummy:
@@ -362,6 +400,8 @@ ook.test:
 	- $(MAKE) ook test
 ook.clean:
 	- $(MAKE) ook clean
+ook.realclean:
+	- $(MAKE) ook realclean
 
 parrot_compiler: parrot_compiler.dummy
 parrot_compiler.dummy:
@@ -370,6 +410,8 @@ parrot_compiler.test:
 	- $(MAKE) parrot_compiler test
 parrot_compiler.clean:
 	- $(MAKE) parrot_compiler clean
+parrot_compiler.realclean:
+	- $(MAKE) parrot_compiler realclean
 
 perl6 : perl6.dummy
 perl6.dummy:
@@ -388,6 +430,8 @@ pheme.test:
 	- $(MAKE) pheme test
 pheme.clean:
 	- $(MAKE) pheme clean
+pheme.realclean:
+	- $(MAKE) pheme realclean
 
 plumhead : plumhead.dummy
 plumhead.dummy:
@@ -396,6 +440,8 @@ plumhead.test:
 	- $(MAKE) plumhead test
 plumhead.clean:
 	- $(MAKE) plumhead clean
+plumhead.realclean:
+	- $(MAKE) plumhead realclean
 
 punie : punie.dummy
 punie.dummy:
@@ -404,6 +450,8 @@ punie.test:
 	- $(MAKE) punie test
 punie.clean:
 	- $(MAKE) punie clean
+punie.realclean:
+	- $(MAKE) punie realclean
 
 pynie : pynie.dummy
 pynie.dummy:
@@ -412,6 +460,8 @@ pynie.test:
 	- $(MAKE) pynie test
 pynie.clean:
 	- $(MAKE) pynie clean
+pynie.realclean:
+	- $(MAKE) pynie realclean
 
 regex: regex.dummy
 regex.dummy:
@@ -420,6 +470,8 @@ regex.test :
 	- $(MAKE) regex test
 regex.clean :
 	- $(MAKE) regex clean
+regex.realclean :
+	- $(MAKE) regex realclean
 
 scheme: scheme.dummy
 scheme.dummy:
@@ -428,6 +480,8 @@ scheme.test :
 	- $(MAKE) scheme test
 scheme.clean :
 	- $(MAKE) scheme clean
+scheme.realclean :
+	- $(MAKE) scheme realclean
 
 squaak: squaak.dummy
 squaak.dummy:
@@ -446,6 +500,8 @@ tcl.test:
 	- $(MAKE) tcl test
 tcl.clean:
 	- $(MAKE) tcl clean
+tcl.realclean:
+	- $(MAKE) tcl realclean
 
 unlambda: unlambda.dummy
 unlambda.dummy:
@@ -464,3 +520,6 @@ urm.test:
 	- $(MAKE) urm test
 urm.clean:
 	- $(MAKE) urm clean
+urm.realclean:
+	- $(MAKE) urm realclean
+

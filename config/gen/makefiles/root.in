@@ -147,27 +147,6 @@ GEN_MAKEFILES = \
     editor/Makefile \
     ext/Makefile \
     languages/Makefile \
-    languages/lazy-k/Makefile \
-    languages/lisp/Makefile \
-    languages/lolcode/Makefile \
-    languages/lua/Makefile \
-    languages/m4/Makefile \
-    languages/nqp/Makefile \
-    languages/ook/Makefile \
-    languages/parrot_compiler/Makefile \
-    languages/pheme/Makefile \
-    languages/PIR/Makefile \
-    languages/plumhead/Makefile \
-    languages/pugs/Makefile \
-    languages/punie/Makefile \
-    languages/pynie/Makefile \
-    languages/regex/Makefile \
-    languages/scheme/Makefile \
-    languages/tcl/Makefile \
-    languages/tcl/examples/Makefile \
-    languages/urm/Makefile \
-    languages/WMLScript/Makefile \
-    languages/Zcode/Makefile \
     src/dynoplibs/Makefile
 
 GEN_CONFIGS = \

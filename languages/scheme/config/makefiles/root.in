@@ -48,7 +48,7 @@ clean:
   "t/*/*.out"
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 over:
 	@$(MAKE) clean

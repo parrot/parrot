@@ -41,4 +41,4 @@ test: build
 clean:
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile

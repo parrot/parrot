@@ -55,7 +55,7 @@ clean:
 	$(RM_F) $(CLEANERS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: clean
 	$(RM_F) Makefile

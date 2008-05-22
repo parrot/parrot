@@ -345,7 +345,7 @@ clean:
 	$(RM_F) $(CLEANERS)
 
 realclean: clean
-	$(RM_F) Makefile
+	$(RM_F) examples/Makefile Makefile
 
 distclean: realclean
 
