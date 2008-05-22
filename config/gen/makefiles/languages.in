@@ -11,41 +11,24 @@ RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 # add new languages here
 # remove obsolete languages here
 LANGUAGES = \
-    APL \
-    BASIC \
-    hq9plus \
-    PIR \
-    WMLScript \
-    Zcode \
-    abc \
-    befunge \
-    bf \
-    c99 \
-    cardinal \
-    cola \
+    abc APL \
+    BASIC befunge bf \
+    c99 cardinal cola \
     dotnet \
-    eclectus \
-    ecmascript \
+    eclectus ecmascript \
     forth \
+    hq9plus \
     jako \
-    lazy-k \
-    lisp \
-    lolcode \
-    lua \
+    lazy-k lisp lolcode lua \
     m4 \
     ook \
-    parrot_compiler \
-    perl6 \
-    pheme \
-    plumhead \
-    punie \
-    pynie \
+    parrot_compiler perl6 pheme PIR plumhead punie pynie \
     regex \
-    scheme \
-    squaak \
+    scheme squaak \
     tcl \
-    unlambda \
-    urm
+    unlambda urm \
+    WMLScript \
+    Zcode
 
 # the default target
 all: $(LANGUAGES)
@@ -57,6 +40,7 @@ help:
 	@echo ""
 	@echo "  all:          Make a lot of language implementations."
 	@echo "                This is the default."
+	@echo ""
 	@echo "  test:         Unified test suite for a lot of languages."
 	@echo ""
 	@echo "  clean:        Clean up a lot of languages."
@@ -71,10 +55,13 @@ help:
 	@echo ""
 	@echo "Following languages are available:"
 	@echo "  $(LANGUAGES)"
+	@echo ""
 	@echo "A particular language <lang> can be built, tested and cleand up"
 	@echo "  make <lang>"
 	@echo "  make <lang>.test"
 	@echo "  make <lang>.clean"
+	@echo "  make <lang>.realclean"
+	@echo ""
 	@echo "For the status of individual languages see LANGUAGES.STATUS.pod"
 	@echo ""
 
@@ -93,74 +80,44 @@ smoke-clean :
 	$(RM_F) languages_smoke.html
 
 clean: \
-    APL.clean \
-    BASIC.clean \
-    hq9plus.clean \
-    PIR.clean \
-    WMLScript.clean \
-    Zcode.clean \
-    abc.clean \
-    befunge.clean \
-    bf.clean \
-    c99.clean \
-    cardinal.clean \
-    cola.clean \
+    abc.clean APL.clean \
+    BASIC.clean befunge.clean bf.clean \
+    c99.clean cardinal.clean cola.clean \
     dotnet.clean \
     ecmascript.clean \
     forth.clean \
+    hq9plus.clean \
     jako.clean \
     lisp.clean \
-    lolcode.clean \
-    lua.clean \
+    lolcode.clean lua.clean \
     m4.clean \
     ook.clean \
-    parrot_compiler.clean \
-    perl6.clean \
-    pheme.clean \
-    plumhead.clean \
-    punie.clean \
-    pynie.clean \
+    parrot_compiler.clean perl6.clean pheme.clean PIR.clean plumhead.clean punie.clean pynie.clean \
     regex.clean \
-    scheme.clean \
-    squaak.clean \
+    scheme.clean squaak.clean \
     tcl.clean \
     urm.clean \
+    WMLScript.clean \
+    Zcode.clean \
     smoke-clean
 
 realclean: \
-    APL.realclean \
-    abc.realclean \
-    befunge.realclean \
-    bf.realclean \
-    c99.realclean \
-    cardinal.realclean \
-    cola.realclean \
+    abc.realclean APL.realclean \
+    befunge.realclean bf.realclean \
+    c99.realclean cardinal.realclean cola.realclean \
     dotnet.realclean \
-    eclectus.realclean \
-    ecmascript.realclean \
+    eclectus.realclean ecmascript.realclean \
     forth.realclean \
     hq9plus.realclean \
     jako.realclean \
-    lazy-k.realclean \
-    lisp.realclean \
-    lolcode.realclean \
-    lua.realclean \
+    lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
     m4.realclean \
     ook.realclean \
-    parrot_compiler.realclean \
-    perl6.realclean \
-    pheme.realclean \
-    PIR.realclean \
-    plumhead.realclean \
-    pugs.realclean \
-    punie.realclean \
-    pynie.realclean \
+    parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean plumhead.realclean pugs.realclean punie.realclean pynie.realclean \
     regex.realclean \
-    scheme.realclean \
-    squaak.realclean \
+    scheme.realclean squaak.realclean \
     tcl.realclean \
-    urm.realclean \
-    unlambda.realclean \
+    urm.realclean unlambda.realclean \
     WMLScript.realclean \
     Zcode.realclean
 
@@ -170,6 +127,16 @@ realclean: \
 #
 
 # The *.dummy targets are a replacement for the target .PHONY in 'GNU make'
+
+abc : abc.dummy
+abc.dummy:
+	- $(MAKE) abc
+abc.test:
+	- $(MAKE) abc test
+abc.clean:
+	- $(MAKE) abc clean
+abc.realclean:
+	- $(MAKE) abc realclean
 
 APL : APL.dummy
 APL.dummy:
@@ -188,49 +155,6 @@ BASIC.test:
 # Don't know how to test BASIC
 BASIC.clean:
 # Don't know how to clean BASIC
-
-PIR: PIR.dummy
-PIR.dummy:
-	- $(MAKE) PIR
-PIR.test:
-	- $(MAKE) PIR test
-PIR.clean:
-	- $(MAKE) PIR clean
-PIR.realclean:
-	- $(MAKE) PIR realclean
-
-pugs.realclean:
-	- $(MAKE) pugs realclean
-
-WMLScript: WMLScript.dummy
-WMLScript.dummy:
-	- $(MAKE) WMLScript
-WMLScript.test:
-	- $(MAKE) WMLScript test
-WMLScript.clean:
-	- $(MAKE) WMLScript clean
-WMLScript.realclean:
-	- $(MAKE) WMLScript realclean
-
-Zcode : Zcode.dummy
-Zcode.dummy:
-# Do nothing. make Zcode requires an Inform compiler
-Zcode.test:
-	- $(MAKE) Zcode test
-Zcode.clean:
-	- $(MAKE) Zcode clean
-Zcode.realclean:
-	- $(MAKE) Zcode realclean
-
-abc : abc.dummy
-abc.dummy:
-	- $(MAKE) abc
-abc.test:
-	- $(MAKE) abc test
-abc.clean:
-	- $(MAKE) abc clean
-abc.realclean:
-	- $(MAKE) abc realclean
 
 befunge : befunge.dummy
 befunge.dummy:
@@ -433,6 +357,16 @@ pheme.clean:
 pheme.realclean:
 	- $(MAKE) pheme realclean
 
+PIR: PIR.dummy
+PIR.dummy:
+	- $(MAKE) PIR
+PIR.test:
+	- $(MAKE) PIR test
+PIR.clean:
+	- $(MAKE) PIR clean
+PIR.realclean:
+	- $(MAKE) PIR realclean
+
 plumhead : plumhead.dummy
 plumhead.dummy:
 	- $(MAKE) plumhead
@@ -442,6 +376,9 @@ plumhead.clean:
 	- $(MAKE) plumhead clean
 plumhead.realclean:
 	- $(MAKE) plumhead realclean
+
+pugs.realclean:
+	- $(MAKE) pugs realclean
 
 punie : punie.dummy
 punie.dummy:
@@ -523,3 +460,22 @@ urm.clean:
 urm.realclean:
 	- $(MAKE) urm realclean
 
+WMLScript: WMLScript.dummy
+WMLScript.dummy:
+	- $(MAKE) WMLScript
+WMLScript.test:
+	- $(MAKE) WMLScript test
+WMLScript.clean:
+	- $(MAKE) WMLScript clean
+WMLScript.realclean:
+	- $(MAKE) WMLScript realclean
+
+Zcode : Zcode.dummy
+Zcode.dummy:
+# Do nothing. make Zcode requires an Inform compiler
+Zcode.test:
+	- $(MAKE) Zcode test
+Zcode.clean:
+	- $(MAKE) Zcode clean
+Zcode.realclean:
+	- $(MAKE) Zcode realclean
