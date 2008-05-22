@@ -41,6 +41,8 @@ F<README>.
 Also update the version number, date, and your name in the
 the files: F<DEVELOPING> and F<docs/parrothist.pod>.
 
+Update this file to remove the pending release you're in the middle of.
+
 =item b
 
 Update F<ChangeLog>, F<NEWS> with the new version number and any other
@@ -247,33 +249,7 @@ don't happen again.
 
 F<README>, F<RESPONSIBLE_PARTIES>.
 
-=head1 Appendix 1
-
-The Parrot repository layout as of end of Apr 2005:
-
- $ svn ls $SVNPARROT
- branches/
- tags/
- trunk/
-
- $ svn ls $SVNPARROT/tags
- PRE_REL_0_0_8/
- RELEASE_0_0_10/
- RELEASE_0_0_11/
- RELEASE_0_0_13/
- RELEASE_0_0_6/
- RELEASE_0_0_8/
- RELEASE_0_0_9/
- RELEASE_0_1_0/
- RELEASE_0_1_1/
- RELEASE_0_1_2/
- REL_0_0_5/
- V1/
- file_move_031023/
- help/
- ponie-PRE-P5_592/
-
-=head2 Releasing from a branch
+=head1 Appendix 1 - Releasing from a branch
 
 Instead of step 1, create a new branch, and get a working copy of it:
 
@@ -323,9 +299,7 @@ created the branch.  Check that the merge was clean, "make test" if
 there were any code changes on the branch, and commit.  I<Then> go get
 that beer!
 
-=head1 Appendix 2
-
-Planned releases in 2008.
+=head1 Appendix 2 - Upcoming releases
 
 To make a monthly release schedule possible, we're spreading the burden
 of releases across multiple release managers.  Releases are scheduled for
@@ -333,11 +307,6 @@ the 3rd Tuesday of each month. Version numbers for each release will be
 determined each month, and will depend on the features that will be in
 that release.
 
- - Jan 15th (0.5.2) Bob Rogers
- - Feb 19th (0.5.3) Patrick Michaud
- - Mar 18th (0.6.0) Bernhard Schmalhofer
- - Apr 15th (0.6.1) Jerry Gay
- - May 20th (?)     chromatic
- - Jun 17th (?)     Nuno Carvalho
+ - June 17th, 2008 - Nuno Carvalho
 
 =cut
