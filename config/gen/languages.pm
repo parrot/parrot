@@ -54,7 +54,7 @@ sub runstep {
         forth
         hq9plus
         jako
-        lisp lolcode lua
+        lazy-k lisp lolcode lua
         m4
         ook
         parrot_compiler perl6 pheme PIR plumhead pugs punie pynie
