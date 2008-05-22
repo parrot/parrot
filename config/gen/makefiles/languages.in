@@ -24,8 +24,8 @@ LANGUAGES = \
     cardinal \
     cola \
     dotnet \
-    ecmascript \
     eclectus \
+    ecmascript \
     forth \
     jako \
     lazy-k \
@@ -128,9 +128,18 @@ clean: \
     smoke-clean
 
 realclean: \
+    APL.realclean \
+    abc.realclean \
+    befunge.realclean \
+    bf.realclean \
     c99.realclean \
+    cardinal.realclean \
+    cola.realclean \
     dotnet.realclean \
     eclectus.realclean \
+    ecmascript.realclean \
+    ecmascript.realclean \
+    forth.realclean \
     hq9plus.realclean \
     jako.realclean \
     perl6.realclean \
@@ -150,6 +159,8 @@ APL.test:
 	- $(MAKE) APL test
 APL.clean:
 	- $(MAKE) APL clean
+APL.realclean:
+	- $(MAKE) APL realclean
 
 BASIC : BASIC.dummy
 BASIC.dummy:
@@ -190,6 +201,8 @@ abc.test:
 	- $(MAKE) abc test
 abc.clean:
 	- $(MAKE) abc clean
+abc.realclean:
+	- $(MAKE) abc realclean
 
 befunge : befunge.dummy
 befunge.dummy:
@@ -198,6 +211,8 @@ befunge.test:
 	- $(MAKE) befunge test
 befunge.clean:
 	- $(MAKE) befunge clean
+befunge.realclean:
+	- $(MAKE) befunge realclean
 
 bf : bf.dummy
 bf.dummy:
@@ -206,6 +221,8 @@ bf.test:
 	- $(MAKE) bf test
 bf.clean:
 	- $(MAKE) bf clean
+bf.realclean:
+	- $(MAKE) bf realclean
 
 c99 : c99.dummy
 c99.dummy:
@@ -224,6 +241,8 @@ cardinal.test:
 	- $(MAKE) cardinal test
 cardinal.clean:
 	- $(MAKE) cardinal clean
+cardinal.realclean:
+	- $(MAKE) cardinal realclean
 
 cola : cola.dummy
 cola.dummy:
@@ -232,6 +251,8 @@ cola.test:
 	- $(MAKE) cola test
 cola.clean:
 	- $(MAKE) cola clean
+cola.realclean:
+	- $(MAKE) cola realclean
 
 dotnet : dotnet.dummy
 dotnet.dummy:
@@ -261,6 +282,8 @@ ecmascript.test:
 	- $(MAKE) ecmascript test
 ecmascript.clean:
 	- $(MAKE) ecmascript clean
+ecmascript.realclean:
+	- $(MAKE) ecmascript realclean
 
 forth : forth.dummy
 forth.dummy:
@@ -269,6 +292,8 @@ forth.test:
 	- $(MAKE) forth test
 forth.clean:
 	- $(MAKE) forth clean
+forth.realclean:
+	- $(MAKE) forth realclean
 
 hq9plus: hq9plus.dummy
 hq9plus.dummy:

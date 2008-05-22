@@ -59,6 +59,8 @@ help :
 	@echo ""
 	@echo "  realclean:         clean up generated files"
 	@echo ""
+	@echo "  superclean:       clean up generated files, also the flex/bison files"
+	@echo ""
 	@echo "  help:              print this help message"
 
 # regenerate the Makefile
@@ -79,9 +81,12 @@ clean :
   colacc$(EXE) \
   a.pir a.pbc a.pasm
 
+realclean: clean
+	$(RM_F) Makefile
+
 # Don't run this target unless you have bison and flex installed.
 # These programs are needed for regenerating the removed files.
-realclean:
+superclean: realclean
 	$(RM_F) parser.h
 	$(RM_F) lexer.c parser.c
 

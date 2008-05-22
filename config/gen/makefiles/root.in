@@ -147,15 +147,6 @@ GEN_MAKEFILES = \
     editor/Makefile \
     ext/Makefile \
     languages/Makefile \
-    languages/abc/Makefile \
-    languages/APL/Makefile \
-    languages/befunge/Makefile \
-    languages/bf/Makefile \
-    languages/cardinal/Makefile \
-    languages/cola/Makefile \
-    languages/ecmascript/Makefile \
-    languages/forth/Makefile \
-    languages/jako/Makefile \
     languages/lazy-k/Makefile \
     languages/lisp/Makefile \
     languages/lolcode/Makefile \
