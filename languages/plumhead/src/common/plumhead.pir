@@ -93,7 +93,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 GOT_PHP_SOURCE_FN:
 
     # the superglobals _GET and _POST need to be set up for any variant
-    .local pmc parse_get_sub, superglobal_GET 
+    .local pmc parse_get_sub, superglobal_GET
     parse_get_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'
     ( superglobal_GET ) = parse_get_sub()
     set_hll_global '$_GET', superglobal_GET
@@ -102,7 +102,7 @@ GOT_PHP_SOURCE_FN:
     parse_post_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'
     ( superglobal_POST ) = parse_post_sub()
     set_hll_global '$_POST', superglobal_POST
-    
+
 
     # look at commandline and decide what to do
     .local string cmd, err_msg, variant
@@ -115,7 +115,7 @@ GOT_PHP_SOURCE_FN:
     if $I0                    goto RUN_NQP
 
 VARIANT_PCT:
-    # use the Parrot Compiler Toolkit by default 
+    # use the Parrot Compiler Toolkit by default
     err_msg = 'Compiling and executing with pct failed'
     .local pmc plumhead_compiler
     plumhead_compiler = compreg 'Plumhead'
