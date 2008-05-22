@@ -485,7 +485,7 @@ sub _print_preamble_header {
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
-$self->{sym_export} extern op_lib_t *$self->{init_func}(long init);
+$self->{sym_export} op_lib_t *$self->{init_func}(long init);
 
 END_C
     return 1;

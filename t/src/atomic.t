@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
     void * result;
     Parrot_atomic_pointer a_ptr;
 
-    dummy = "somewhere";
-    result = "somewhere else";
+    dummy = (void *) "somewhere";
+    result = (void *) "somewhere else";
 
     PARROT_ATOMIC_PTR_INIT(a_ptr);
 
@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
     void *tmp_a;
     void *tmp_b;
 
-    tmp_a = "string a";
-    tmp_b = "string b";
+    tmp_a = (void *) "string a";
+    tmp_b = (void *) "string b";
 
     PARROT_ATOMIC_PTR_INIT(a_ptr);
 

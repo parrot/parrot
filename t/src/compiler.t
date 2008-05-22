@@ -116,8 +116,13 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/extend.h"
 
+#ifndef __cplusplus
 extern void imcc_init(Parrot_Interp interp);
+#else
+extern "C" void imcc_init(Parrot_Interp interp);
+#endif
 
 static opcode_t *
 run(Parrot_Interp interp, int argc, char *argv[])
@@ -161,7 +166,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interp, argc, argv);
+    Parrot_runcode(interp, argc, (const char **)argv);
     return NULL;
 }
 
@@ -171,7 +176,7 @@ main(int margc, char *margv[])
     Parrot_Interp interp;
     PackFile *pf;
     int argc = 1;
-    char *argv[] = { "test", NULL };
+    const char *argv[] = { "test", NULL };
 
     PackFile_Segment *seg;
 
@@ -186,7 +191,7 @@ main(int margc, char *margv[])
     pf = PackFile_new_dummy(interp, "test_code");
 
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
-    run(interp, argc, argv);
+    run(interp, argc, (char **)argv);
     Parrot_exit(interp, 0);
     return 0;
 }
@@ -198,8 +203,13 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple Calls" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/extend.h"
 
+#ifndef __cplusplus
 extern void imcc_init(Parrot_Interp interp);
+#else
+extern "C" void imcc_init(Parrot_Interp interp);
+#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -226,7 +236,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interp, argc, argv);
+    Parrot_runcode(interp, argc, (const char **) argv);
 }
 
 static opcode_t *
@@ -261,7 +271,7 @@ main(int margc, char *margv[])
     Parrot_Interp interp;
     PackFile *pf;
     int argc = 1;
-    char *argv[] = { "test", NULL };
+    const char *argv[] = { "test", NULL };
 
     PackFile_Segment *seg;
 
@@ -276,7 +286,7 @@ main(int margc, char *margv[])
     pf = PackFile_new_dummy(interp, "test_code");
 
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
-    run(interp, argc, argv);
+    run(interp, argc, (char **) argv);
     Parrot_exit(interp, 0);
     return 0;
 }
@@ -289,8 +299,13 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 1st bad PIR" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/extend.h"
 
+#ifndef __cplusplus
 extern void imcc_init(Parrot_Interp interp);
+#else
+extern "C" void imcc_init(Parrot_Interp interp);
+#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -317,7 +332,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interp, argc, argv);
+    Parrot_runcode(interp, argc, (const char **) argv);
 }
 
 static opcode_t *
@@ -380,8 +395,13 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 2nd bad PIR" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/extend.h"
 
+#ifndef __cplusplus
 extern void imcc_init(Parrot_Interp interp);
+#else
+extern "C" void imcc_init(Parrot_Interp interp);
+#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -408,7 +428,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interp, argc, argv);
+    Parrot_runcode(interp, argc, (const char **) argv);
 }
 
 static opcode_t *
@@ -471,8 +491,13 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple bad PIR" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/extend.h"
 
+#ifdef __cplusplus
+extern "C" void imcc_init(Parrot_Interp interp);
+#else
 extern void imcc_init(Parrot_Interp interp);
+#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -499,7 +524,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
-    Parrot_runcode(interp, argc, argv);
+    Parrot_runcode(interp, argc, (const char **) argv);
 }
 
 static opcode_t *

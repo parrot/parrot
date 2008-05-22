@@ -22,11 +22,11 @@ typedef struct _charset CHARSET;
 
 
 #if !defined PARROT_NO_EXTERN_CHARSET_PTRS
-PARROT_API extern CHARSET *Parrot_iso_8859_1_charset_ptr;
-PARROT_API extern CHARSET *Parrot_binary_charset_ptr;
-PARROT_API extern CHARSET *Parrot_default_charset_ptr;
-PARROT_API extern CHARSET *Parrot_unicode_charset_ptr;
-PARROT_API extern CHARSET *Parrot_ascii_charset_ptr;
+PARROT_DATA CHARSET *Parrot_iso_8859_1_charset_ptr;
+PARROT_DATA CHARSET *Parrot_binary_charset_ptr;
+PARROT_DATA CHARSET *Parrot_default_charset_ptr;
+PARROT_DATA CHARSET *Parrot_unicode_charset_ptr;
+PARROT_DATA CHARSET *Parrot_ascii_charset_ptr;
 #endif
 
 #define PARROT_DEFAULT_CHARSET Parrot_ascii_charset_ptr

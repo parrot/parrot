@@ -923,7 +923,7 @@ PIO_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t len
     if (io->flags & PIO_F_WRITE) {
         STRING fake;
         /* TODO skip utf8 translation layers if any */
-        fake.strstart = (char *)const_cast(buffer);
+        fake.strstart = (char *) PARROT_const_cast(void *, buffer);
         fake.strlen = fake.bufused = len;
         fake.charset = Parrot_default_charset_ptr;
         fake.encoding = Parrot_default_encoding_ptr;

@@ -285,8 +285,8 @@ print $JITCPU <<"END_C";
 # define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 #endif
 
-extern PARROT_API char **Parrot_exec_rel_addr;
-extern PARROT_API int Parrot_exec_rel_count;
+PARROT_DATA char **Parrot_exec_rel_addr;
+PARROT_DATA int Parrot_exec_rel_count;
 
 #define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[x])
 #define ROFFS_NUM(x) REG_OFFS_NUM(jit_info->cur_op[x])
@@ -497,7 +497,7 @@ print $JITCPU @jit_funcs, "};\n";
 
 if ( $genfile =~ /jit_cpu.c/ ) {
     print $JITCPU <<"EOC";
-    PARROT_API Parrot_jit_fn_info_t *op_jit = &_op_jit[0];
+    Parrot_jit_fn_info_t *op_jit = &_op_jit[0];
 
     extern int jit_op_count(void);
     int jit_op_count(void) { return $core_numops; }

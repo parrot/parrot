@@ -522,71 +522,71 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
         return 0;
 
     switch (c) {
-        case c_script_file:
+        case PARROT_c_script_file:
             PDB_script_file(interp, command);
             break;
-        case c_disassemble:
+        case PARROT_c_disassemble:
             PDB_disassemble(interp, command);
             break;
-        case c_load:
+        case PARROT_c_load:
             PDB_load_source(interp, command);
             break;
-        case c_l:
-        case c_list:
+        case PARROT_c_l:
+        case PARROT_c_list:
             PDB_list(interp, command);
             break;
-        case c_b:
-        case c_break:
+        case PARROT_c_b:
+        case PARROT_c_break:
             PDB_set_break(interp, command);
             break;
-        case c_w:
-        case c_watch:
+        case PARROT_c_w:
+        case PARROT_c_watch:
             PDB_watchpoint(interp, command);
             break;
-        case c_d:
-        case c_delete:
+        case PARROT_c_d:
+        case PARROT_c_delete:
             PDB_delete_breakpoint(interp, command);
             break;
-        case c_disable:
+        case PARROT_c_disable:
             PDB_disable_breakpoint(interp, command);
             break;
-        case c_enable:
+        case PARROT_c_enable:
             PDB_enable_breakpoint(interp, command);
             break;
-        case c_r:
-        case c_run:
+        case PARROT_c_r:
+        case PARROT_c_run:
             PDB_init(interp, command);
             PDB_continue(interp, NULL);
             break;
-        case c_c:
-        case c_continue:
+        case PARROT_c_c:
+        case PARROT_c_continue:
             PDB_continue(interp, command);
             break;
-        case c_p:
-        case c_print:
+        case PARROT_c_p:
+        case PARROT_c_print:
             PDB_print(interp, command);
             break;
-        case c_n:
-        case c_next:
+        case PARROT_c_n:
+        case PARROT_c_next:
             PDB_next(interp, command);
             break;
-        case c_t:
-        case c_trace:
+        case PARROT_c_t:
+        case PARROT_c_trace:
             PDB_trace(interp, command);
             break;
-        case c_e:
-        case c_eval:
+        case PARROT_c_e:
+        case PARROT_c_eval:
             PDB_eval(interp, command);
             break;
-        case c_info:
+        case PARROT_c_info:
             PDB_info(interp);
             break;
-        case c_h:
-        case c_help:
+        case PARROT_c_h:
+        case PARROT_c_help:
             PDB_help(interp, command);
             break;
-        case c_q:
-        case c_quit:
+        case PARROT_c_q:
+        case PARROT_c_quit:
             pdb->state |= PDB_EXIT;
             break;
         case 0:
@@ -2457,25 +2457,25 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     parse_command(command, &c);
 
     switch (c) {
-        case c_disassemble:
+        case PARROT_c_disassemble:
             PIO_eprintf(interp, "No documentation yet");
             break;
-        case c_load:
+        case PARROT_c_load:
             PIO_eprintf(interp, "No documentation yet");
             break;
-        case c_list:
+        case PARROT_c_list:
             PIO_eprintf(interp,
             "List the source code.\n\n\
 Optionally specify the line number to begin the listing from and the number\n\
 of lines to display.\n");
             break;
-        case c_run:
+        case PARROT_c_run:
             PIO_eprintf(interp,
             "Run (or restart) the program being debugged.\n\n\
 Arguments specified after \"run\" are passed as command line arguments to\n\
 the program.\n");
             break;
-        case c_break:
+        case PARROT_c_break:
             PIO_eprintf(interp,
 "Set a breakpoint at a given line number (which must be specified).\n\n\
 Optionally, specify a condition, in which case the breakpoint will only\n\
@@ -2487,32 +2487,32 @@ For example:\n\n\
            break 45 if S1 == \"foo\"\n\n\
 The command returns a number which is the breakpoint identifier.");
             break;
-        case c_script_file:
+        case PARROT_c_script_file:
 PIO_eprintf(interp, "Interprets a file.\n\
 Usage:\n\
 (pdb) script file.script\n");
             break;
-        case c_watch:
+        case PARROT_c_watch:
             PIO_eprintf(interp, "No documentation yet");
             break;
-        case c_delete:
+        case PARROT_c_delete:
             PIO_eprintf(interp,
 "Delete a breakpoint.\n\n\
 The breakpoint to delete must be specified by its breakpoint number.\n\
 Deleted breakpoints are gone completely. If instead you want to\n\
 temporarily disable a breakpoint, use \"disable\".\n");
             break;
-        case c_disable:
+        case PARROT_c_disable:
             PIO_eprintf(interp,
 "Disable a breakpoint.\n\n\
 The breakpoint to disable must be specified by its breakpoint number.\n\
 Disabled breakpoints are not forgotten, but have no effect until re-enabled\n\
 with the \"enable\" command.\n");
             break;
-        case c_enable:
+        case PARROT_c_enable:
             PIO_eprintf(interp, "Re-enable a disabled breakpoint.\n");
             break;
-        case c_continue:
+        case PARROT_c_continue:
             PIO_eprintf(interp,
 "Continue the program execution.\n\n\
 Without arguments, the program runs until a breakpoint is found\n\
@@ -2521,7 +2521,7 @@ If a number is specified, then skip that many breakpoints.\n\n\
 If the program has terminated, then \"continue\" will do nothing;\n\
 use \"run\" to re-run the program.\n");
             break;
-        case c_next:
+        case PARROT_c_next:
             PIO_eprintf(interp,
 "Execute a specified number of instructions.\n\n\
 If a number is specified with the command (e.g. \"next 5\"), then\n\
@@ -2529,28 +2529,28 @@ execute that number of instructions, unless the program reaches a\n\
 breakpoint, or stops for some other reason.\n\n\
 If no number is specified, it defaults to 1.\n");
             break;
-        case c_eval:
+        case PARROT_c_eval:
             PIO_eprintf(interp, "No documentation yet");
             break;
-        case c_trace:
+        case PARROT_c_trace:
             PIO_eprintf(interp,
 "Similar to \"next\", but prints additional trace information.\n\
 This is the same as the information you get when running Parrot with\n\
 the -t option.\n");
             break;
-        case c_print:
+        case PARROT_c_print:
             PIO_eprintf(interp, "Print register: e.g. \"p i2\"\n\
 Note that the register type is case-insensitive.  If no digits appear\n\
 after the register type, all registers of that type are printed.\n");
             break;
-        case c_info:
+        case PARROT_c_info:
             PIO_eprintf(interp,
                     "Print information about the current interpreter\n");
             break;
-        case c_quit:
+        case PARROT_c_quit:
             PIO_eprintf(interp, "Exit the debugger.\n");
             break;
-        case c_help:
+        case PARROT_c_help:
             PIO_eprintf(interp, "Print a list of available commands.\n");
             break;
         case 0:

@@ -728,8 +728,9 @@ string_make_direct(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
            it was safe by setting PObj_external_FLAG.
            (The cast is necessary to pacify TenDRA's tcc.)
            */
-        PObj_bufstart(s) = s->strstart = (char *)const_cast(buffer);
-        PObj_buflen(s)   = s->bufused = len;
+        PObj_bufstart(s) = s->strstart = PARROT_const_cast(char *, buffer);
+        PObj_buflen(s)   = s->bufused  = len;
+
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
@@ -862,8 +863,8 @@ string_str_index(PARROT_INTERP, ARGIN(const STRING *s),
     if (!string_length(interp, s2))
         return -1;
 
-    src    = (STRING *)const_cast(s);
-    search = (STRING *)const_cast(s2);
+    src    = PARROT_const_cast(STRING *, s);
+    search = PARROT_const_cast(STRING *, s2);
 
     return CHARSET_INDEX(interp, src, search, start);
 }
@@ -1949,7 +1950,7 @@ string_to_num(PARROT_INTERP, ARGIN(const STRING *s))
      * XXX C99 atof interprets 0x prefix
      * XXX would strtod() be better for detecting malformed input?
      */
-    cstr = string_to_cstring(interp, (STRING *)const_cast(s));
+    cstr = string_to_cstring(interp, PARROT_const_cast(STRING *, s));
     p    = cstr;
 
     while (isspace((unsigned char)*p))
@@ -2460,7 +2461,7 @@ STRING *
 string_upcase(PARROT_INTERP, ARGIN(const STRING *s))
 {
     DECL_CONST_CAST;
-    STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
+    STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
     string_upcase_inplace(interp, dest);
     return dest;
 }
@@ -2501,7 +2502,7 @@ STRING *
 string_downcase(PARROT_INTERP, ARGIN(const STRING *s))
 {
     DECL_CONST_CAST;
-    STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
+    STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
     string_downcase_inplace(interp, dest);
     return dest;
 }
@@ -2548,7 +2549,7 @@ STRING *
 string_titlecase(PARROT_INTERP, ARGIN(const STRING *s))
 {
     DECL_CONST_CAST;
-    STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
+    STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
     string_titlecase_inplace(interp, dest);
     return dest;
 }

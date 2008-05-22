@@ -26,6 +26,7 @@ Tests C<printf> and C<internal_exception> functions.
 
 c_output_is( <<'CODE', <<'OUTPUT', "hello world" );
     #include <stdio.h>
+    #include <stdlib.h>
 
     int
     main(int argc, char* argv[])

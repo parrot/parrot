@@ -347,7 +347,7 @@ Parrot_dup_context(PARROT_INTERP, ARGIN(const struct Parrot_Context *old))
     ctx->n_regs_used[REGNO_NUM] = old->n_regs_used[REGNO_NUM];
     ctx->n_regs_used[REGNO_STR] = old->n_regs_used[REGNO_STR];
     ctx->n_regs_used[REGNO_PMC] = old->n_regs_used[REGNO_PMC];
-    diff                        = (long *)ctx - (long *)const_cast(old);
+    diff                        = (long *)ctx - (long *) PARROT_const_cast(Parrot_Context *, old);
 
     interp->ctx.bp.regs_i    += diff;
     interp->ctx.bp_ps.regs_s += diff;

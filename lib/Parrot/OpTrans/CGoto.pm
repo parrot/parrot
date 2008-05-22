@@ -302,7 +302,7 @@ sub run_core_after_addr_table {
         ${bs}ops_addr = l_ops_addr;
     if (cur_opcode == 0) {
         DECL_CONST_CAST;
-        return ($t*)const_cast(${bs}ops_addr);
+        return (opcode_t *) PARROT_const_cast(void **, ${bs}ops_addr);
     }
 END_C
 }

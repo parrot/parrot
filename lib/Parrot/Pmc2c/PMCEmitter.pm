@@ -81,6 +81,8 @@ sub generate_c_file {
         $ro->gen_methods;
     }
 
+    $c->emit("#include \"pmc_default.h\"\n");
+
     $c->emit( $self->init_func );
     $c->emit( $self->postamble );
 

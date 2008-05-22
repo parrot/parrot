@@ -28,6 +28,8 @@
 #  define PARROT_HAS_SAL 0
 #endif
 
+#ifndef __cplusplus
+
 #ifdef HASATTRIBUTE_NEVER_WORKS
  #  error This attribute can never succeed.  Something has mis-sniffed your configuration.
 #endif
@@ -65,6 +67,8 @@
 #endif
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
+#endif
+
 #endif
 
 /* If we haven't defined the attributes yet, define them to blank. */
@@ -188,7 +192,7 @@
     /* an unshared object.  Since the parameter is declared using "only", */
     /* the caller may not use the referenced object after the call, and */
     /* may not pass in a reference to a shared object.  There is nothing */
-    /* special about malloc and free — their behavior can be described */
+    /* special about malloc and free --  their behavior can be described */
     /* entirely in terms of the provided annotations. */
 
 #endif /* PARROT_COMPILER_H_GUARD */

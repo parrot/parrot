@@ -34,10 +34,11 @@ C<STRING> with a vtable.
 #include "parrot/parrot.h"
 
 /* default.pmc thawing of properties */
-void Parrot_default_thaw(Interp* , PMC* pmc, visit_info *info);
+PARROT_API void
+Parrot_default_thaw(Interp* , PMC* pmc, visit_info *info);
 
 /* XXX This should be in a header file. */
-extern void
+PARROT_API void
 Parrot_default_thawfinish(PARROT_INTERP, PMC* pmc, visit_info *info);
 
 

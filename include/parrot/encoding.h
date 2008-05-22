@@ -60,11 +60,11 @@ struct _encoding {
 typedef struct _encoding ENCODING;
 
 #if !defined PARROT_NO_EXTERN_ENCODING_PTRS
-PARROT_API extern ENCODING *Parrot_fixed_8_encoding_ptr;
-PARROT_API extern ENCODING *Parrot_utf8_encoding_ptr;
-PARROT_API extern ENCODING *Parrot_utf16_encoding_ptr;
-PARROT_API extern ENCODING *Parrot_ucs2_encoding_ptr;
-PARROT_API extern ENCODING *Parrot_default_encoding_ptr;
+PARROT_DATA ENCODING *Parrot_fixed_8_encoding_ptr;
+PARROT_DATA ENCODING *Parrot_utf8_encoding_ptr;
+PARROT_DATA ENCODING *Parrot_utf16_encoding_ptr;
+PARROT_DATA ENCODING *Parrot_ucs2_encoding_ptr;
+PARROT_DATA ENCODING *Parrot_default_encoding_ptr;
 #endif
 
 #define PARROT_DEFAULT_ENCODING Parrot_fixed_8_encoding_ptr

@@ -56,7 +56,7 @@ sub gen_h {
 #ifndef $guardname
 #define $guardname
 
-Parrot_PMC Parrot_lib_${lc_library_name}_load(PARROT_INTERP);
+PARROT_DYNEXT_EXPORT Parrot_PMC Parrot_lib_${lc_library_name}_load(PARROT_INTERP);
 EOH
     $hout .= c_code_coda;
 

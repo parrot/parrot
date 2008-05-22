@@ -49,7 +49,7 @@ sub generate_body {
         $self->rewrite_nci_method($pmc);
     }
 
-    $emit->( $self->decl( $pmc, 'CFILE' ) );
+    $emit->( ( $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ') . $self->decl( $pmc, 'CFILE' ) );
     $emit->("{\n");
     $emit->($body);
     $emit->("}\n");
@@ -106,7 +106,7 @@ sub decl {
     $decorators = length @$decs ? join $/ => @$decs, '' : '';
     if ( $for_header eq 'HEADER' ) {
         $export = $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
-        $extern = "extern ";
+        $extern = "";
         $newl   = " ";
         $semi   = ";";
         $interp = $pmcvar = "";

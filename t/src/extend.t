@@ -414,6 +414,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "call a parrot sub" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
+#include <parrot/extend.h>
 
 static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
@@ -486,6 +487,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "call a parrot sub, catch exception" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
+#include <parrot/extend.h>
 
 static opcode_t *
 the_test(Parrot_Interp, opcode_t *, opcode_t *);
@@ -589,7 +591,7 @@ int
 main(int argc, char* argv[])
 {
     Parrot_PackFile packfile;
-    char * code[] = { ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n" };
+    const char * code[] = { ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n" };
 
     Parrot_Interp interp = Parrot_new(NULL);
     if (!interp) {
@@ -626,7 +628,7 @@ int
 main(int argc, char* argv[])
 {
     Parrot_Interp   interp    = Parrot_new(NULL);
-    char           *code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
+    const char      *code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
     STRING         *code_type;
@@ -652,7 +654,7 @@ main(int argc, char* argv[])
     foo_name = const_string( interp, "foo" );
     sub      = Parrot_find_global_cur( interp, foo_name );
 
-    retval   = Parrot_call_sub( interp, sub, "V", "" );
+    retval   = (PMC *) Parrot_call_sub( interp, sub, "V", "" );
 
     Parrot_exit(interp, 0);
     return 0;

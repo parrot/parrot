@@ -588,7 +588,7 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
     DECL_CONST_CAST;
 
     start = utf8_skip_forward(src->strstart, offset);
-    p = const_cast(start);
+    p = PARROT_const_cast(void *, start);
     utf8_encode(interp, p, codepoint);
 }
 
