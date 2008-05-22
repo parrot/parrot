@@ -38,19 +38,23 @@ help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:          Make a lot of language implementations."
-	@echo "                This is the default."
+	@echo "  all:           Make a lot of language implementations."
+	@echo "                 This is the default."
 	@echo ""
-	@echo "  test:         Unified test suite for a lot of languages."
+	@echo "  test:          Same as test-unified."
 	@echo ""
-	@echo "  clean:        Clean up a lot of languages."
+	@echo "  test-unified:  Unified test suite for a lot of languages."
 	@echo ""
-	@echo "  help:         Print this help message."
+	@echo "  test-separate: Run 'make test' in the individual lang dirs."
 	@echo ""
-	@echo "  smoke:        Run the test suite and send smoke.html to "
-	@echo "                http://smoke.parrotcode.org/"
+	@echo "  clean:         Clean up a lot of languages."
 	@echo ""
-	@echo "  smoke-clean:  clean up smoke.html"
+	@echo "  help:          Print this help message."
+	@echo ""
+	@echo "  smoke:         Run the unified test suite and send smoke.html to "
+	@echo "                 http://smoke.parrotcode.org/"
+	@echo ""
+	@echo "  smoke-clean:   clean up smoke.html"
 	@echo ""
 	@echo ""
 	@echo "Following languages are available:"
@@ -69,8 +73,31 @@ help:
 Makefile: ../config/gen/makefiles/languages.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=""
 
-test:   all
+test:   test-unified
+
+test-unified: all
 	$(PERL) t/harness
+
+test-separate: all \
+    abc.test APL.test \
+    befunge.test bf.test \
+    c99.test cardinal.test cola.test \
+    dotnet.test \
+    eclectus.test ecmascript.test \
+    forth.test \
+    hq9plus.test \
+    jako.test \
+    lazy-k.test lisp.test lolcode.test lua.test \
+    m4.test \
+    ook.test \
+    parrot_compiler.test perl6.test pheme.test PIR.test plumhead.test pugs.test punie.test pynie.test \
+    regex.test \
+    scheme.test squaak.test \
+    tcl.test \
+    urm.test unlambda.test \
+    WMLScript.test \
+    Zcode.test
+
 
 smoke:  all
 	$(PERL) t/harness --html
@@ -377,6 +404,13 @@ plumhead.clean:
 plumhead.realclean:
 	- $(MAKE) plumhead realclean
 
+pugs : pugs.dummy
+pugs.dummy:
+	- $(MAKE) pugs
+pugs.test:
+	- $(MAKE) pugs test
+pugs.clean:
+	- $(MAKE) pugs clean
 pugs.realclean:
 	- $(MAKE) pugs realclean
 

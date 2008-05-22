@@ -710,6 +710,8 @@ help :
 	@echo "  compilers:         Proxy for default target of pge and tge compilers"
 	@echo "  languages:         Proxy for default target of languages/Makefile"
 	@echo "  languages-test:    Proxy for target 'test' of languages/Makefile"
+	@echo "  languages-test-unified:  Proxy for target 'test-unified' of languages/Makefile"
+	@echo "  languages-test-separate: Proxy for target 'test-separate' of languages/Makefile"
 	@echo "  languages-smoke:   Proxy for target 'smoke' of languages/Makefile"
 	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
 	@echo ""
@@ -1329,6 +1331,12 @@ languages.dummy :
 
 languages-test :
 	$(MAKE) languages test
+
+languages-test-unified :
+	$(MAKE) languages test-unified
+
+languages-test-separate :
+	$(MAKE) languages test-separate
 
 languages-smoke :
 	$(MAKE) languages smoke
