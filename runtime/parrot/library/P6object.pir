@@ -76,6 +76,7 @@ C<P6object> and C<P6metaclass>.
     $P0 = newclass 'P6protoobject'
 
     $P0 = newclass 'P6object'
+    addattribute $P0, '%!properties'
 
     $P1 = subclass $P0, 'P6metaclass'
     addattribute $P1, 'parrotclass'
@@ -488,6 +489,122 @@ will be used in lieu of this one.)
     $P1 = new parrotclass
     .return ($P1)
 .end
+
+
+=item WHENCE()
+
+Returns the protoobject's autovivification closure.
+
+=cut
+
+.sub 'WHENCE' :method
+    .local pmc props, whence
+    props = getattribute self, '%!properties'
+    if null props goto ret_undef
+    whence = props['WHENCE']
+    if null whence goto ret_undef
+    .return (whence)
+  ret_undef:
+    whence = new 'Undef'
+    .return (whence)
+.end
+
+
+=item get_pmc_keyed(key)    (vtable method)
+
+Returns a proto-object with an autovivification closure attached to it.
+
+=cut
+
+.sub get_pmc_keyed :vtable :method
+    .param pmc what
+
+    # We'll build auto-vivification hash of values.
+    .local pmc WHENCE, key, val
+    WHENCE = new 'Hash'
+
+    # What is it?
+    $S0 = what.'WHAT'()
+    if $S0 == 'Pair' goto from_pair
+    if $S0 == 'List' goto from_list
+    'die'("Auto-vivification closure did not contain a Pair")
+
+  from_pair:
+    # Just a pair.
+    key = what.'key'()
+    val = what.'value'()
+    WHENCE[key] = val
+    goto done_whence
+
+  from_list:
+    # List.
+    .local pmc list_iter, cur_pair
+    list_iter = new 'Iterator', what
+  list_iter_loop:
+    unless list_iter goto done_whence
+    cur_pair = shift list_iter
+    key = cur_pair.'key'()
+    val = cur_pair.'value'()
+    WHENCE[key] = val
+    goto list_iter_loop
+  done_whence:
+
+    # Now create a clone of the protoobject.
+    .local pmc protoclass, res, props, tmp
+    protoclass = class self
+    res = new protoclass
+
+    # Attach the WHENCE property.
+    props = getattribute self, '%!properties'
+    unless null props goto have_props
+    props = new 'Hash'
+  have_props:
+    props['WHENCE'] = WHENCE
+    setattribute res, '%!properties', props
+
+    .return (res)
+.end
+
+
+=item ACCEPTS(topic)
+
+=cut
+
+.sub 'ACCEPTS' :method
+    .param pmc topic
+    .local pmc HOW, p6meta
+
+    # Do a does check against the topic.
+    p6meta = get_hll_global 'P6metaclass'
+    HOW = p6meta.'get_parrotclass'(self)
+    $I0 = does topic, HOW
+    if $I0 goto do_return
+
+    # If that didn't work, try invoking the ACCEPTS of the class itself.
+    # XXX Once we get callsame-like stuff implemented, this logic should go away.
+  try_class_accepts:
+    .local pmc parents, found
+    .local int i, count
+    parents = inspect HOW, 'all_parents'
+    count = elements parents
+    i = 1 # skip protoclass
+  find_next_loop:
+    if i >= count goto find_next_loop_end
+    $P0 = parents[i]
+    $P0 = inspect $P0, 'methods'
+    found = $P0['ACCEPTS']
+    unless null found goto find_next_loop_end
+    inc i
+    goto find_next_loop
+  find_next_loop_end:
+
+    $I0 = 0
+    if null found goto do_return
+    $I0 = found(self, topic)
+  do_return:
+    .return 'prefix:?'($I0)
+.end
+
 
 =back
 
