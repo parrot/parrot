@@ -125,7 +125,7 @@ by phc from PHP source. It generates a PAST data structure in XML.
 
 <xsl:template match="phc:AST_variable" >
   <past:Var scope="package" viviself="Undef" lvalue="1" >
-    <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+    <xsl:attribute name="name" ><xsl:value-of select="concat( '$', phc:Token_variable_name/phc:value )" /></xsl:attribute>
   </past:Var>
 </xsl:template>
 
@@ -134,12 +134,12 @@ by phc from PHP source. It generates a PAST data structure in XML.
     <xsl:choose>
       <xsl:when test="phc:Token_variable_name/phc:value = '_GET' or phc:Token_variable_name/phc:value = '_POST'" >
         <past:Var scope="package" >
-          <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+          <xsl:attribute name="name" ><xsl:value-of select="concat( '$', phc:Token_variable_name/phc:value )" /></xsl:attribute>
         </past:Var>
       </xsl:when>
       <xsl:otherwise>
         <past:Var viviself="Hash" scope="package" lvalue="1" >
-          <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+          <xsl:attribute name="name" ><xsl:value-of select="concat( '$', phc:Token_variable_name/phc:value )" /></xsl:attribute>
         </past:Var>
       </xsl:otherwise>
     </xsl:choose>
