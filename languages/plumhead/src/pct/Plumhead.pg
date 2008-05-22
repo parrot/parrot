@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 # PHP grammar for Plumhead partrige
@@ -9,8 +9,8 @@ grammar Plumhead::Grammar is PCT::Grammar;
 
 token TOP                     { <program> }
 
-regex SEA                     { <-[<]>+? ( <?before: \<> | $ ) }
-regex SEA_empty_allowed       { <-[<]>*? <?before: \<> }
+regex SEA                     { <-[<]>+? ( <before \<> | $ ) }
+regex SEA_empty_allowed       { <-[<]>*? <before \<> }
 token CODE_START              { '<?php' }
 token CODE_END                { '?>' \n? }
 token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"' }
@@ -41,25 +41,25 @@ token ELSE                    { 'else' }
 token program                 { ^ <sea_or_code>+ }
 token sea_or_code             { <SEA> | <code> }
 
-rule  code                    { <?CODE_START> <statement>* <?CODE_END>? }
+rule  code                    { <.CODE_START> <statement>* <.CODE_END>? }
 
 rule relational_expression    { <expression> <rel_op_clause>? }
 
-rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <?PAREN_OPEN> <?PAREN_CLOSE> )  ( ';' | <?before: \? > | $ )
-                              | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ( ';' | <?before: \? > | $ )
-                              | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
+rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )  ( ';' | <before \? > | $ )
+                              | <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE> ( ';' | <before \? > | $ )
+                              | <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
                               | <inline_sea> 
                               | <scalar_assign>
                               | <array_assign>
                               }
 
-rule else_clause              { <?ELSE> \{ <statement>* \} }
+rule else_clause              { <.ELSE> \{ <statement>* \} }
 # TODO: rel_op_clause is not a nice name
 rule  rel_op_clause           { <REL_OP> <expression> }
-rule  else_clause             { <?ELSE> \{ <statement>* \} }
-token inline_sea              { <?CODE_END> <SEA_empty_allowed> <?CODE_START> }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <?before: \? > | $ ) }
-rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <?before: \? > | $ ) }
+rule  else_clause             { <.ELSE> \{ <statement>* \} }
+token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
+rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
 
 token expression              { <concat_expression>
                               | <bitwise_expression>
@@ -91,7 +91,7 @@ rule unary_expression         { <UNARY_MINUS>? <postfix_expression> }
 
 rule postfix_expression       { <NUMBER>
                               | <INTEGER>
-                              | <?PAREN_OPEN> <expression> <?PAREN_CLOSE>
+                              | <.PAREN_OPEN> <expression> <.PAREN_CLOSE>
                               | <array_elem>
                               | <var>
                               }
