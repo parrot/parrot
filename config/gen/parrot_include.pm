@@ -64,7 +64,7 @@ sub perform_directive {
 sub parse_file {
     my ( $file, $fh ) = @_;
 
-    my ( @d, %values, $last_val, $cur );
+    my ( @d, %values, $last_val, $cur, $or_continues );
     while ( my $line = <$fh> ) {
         if (
             $line =~ m!
@@ -95,7 +95,45 @@ sub parse_file {
             push @{ $cur->{defs} }, [ $1, $2 ];
         }
         elsif ( $cur->{type} eq 'enum' ) {
-            if ( $line =~ /^\s*(\w+)\s*=\s*(-?\w+)/ ) {
+            # Special case: enum value is or'd combination of other values
+            if ( $or_continues ) {
+                $or_continues = 0;
+                my $last_def = $cur->{defs}->[-1];
+                my ($k, $v) = @{$last_def};
+                my @or_values = grep {defined $_} $line =~ /^\s*(-?\w+)(?:\s*\|\s*(-?\w+))*/;
+                for my $or (@or_values) {
+                    if ( defined $values{$or} ) {
+                        $v |= $values{$or};
+                    }
+                    elsif ( $or =~ /^0/ ) {
+                        $v |= oct $or;
+                    }
+                }
+                if ($line =~ /\|\s*$/) {
+                    $or_continues = 1;
+                }
+                $values{$k} = $last_val = $v;
+                $cur->{defs}->[-1]->[1] = $v;
+            }
+            elsif ( $line =~ /^\s*(\w+)\s*=\s*(-?\w+)\s*\|/ ) {
+                my ( $k, $v ) = ( $1, $2 );
+                my @or_values = ($v, $line =~ /\|\s*(-?\w+)/g);
+                $v = 0;
+                for my $or (@or_values) {
+                    if ( defined $values{$or} ) {
+                        $v |= $values{$or};
+                    }
+                    elsif ( $or =~ /^0/ ) {
+                        $v |= oct $or;
+                    }
+                }
+                if ($line =~ /\|\s*$/) {
+                    $or_continues = 1;
+                }
+                $values{$k} = $last_val = $v;
+                push @{ $cur->{defs} }, [ $k, $v ];
+            }
+            elsif ( $line =~ /^\s*(\w+)\s*=\s*(-?\w+)/ ) {
                 my ( $k, $v ) = ( $1, $2 );
                 if ( defined $values{$v} ) {
                     $v = $values{$v};
