@@ -1,32 +1,38 @@
 =pod
 
-=head0 Parrot Intermediate Representation
+=head1 Parrot Intermediate Representation
 
-Z<CHP-10>
+Z<CHP-3>
 
 X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR (Parrot intermediate representation)>
 The Parrot intermediate representation (PIR) is an overlay on top of
-Parrot assembly language, designed to make the developer's life
-easier. It has many high-level features that ease the pain of working
-with PASM code, but it still isn't a high-level language.
+Parrot assembly language (PASM) that provides some simplifications and
+high-level constructs. It has many high-level features that ease the
+pain of working with PASM code, but it still isn't considered to be
+a high-level language by itself. PASM is discussed in more detail in
+A<CHP-5>Chapter 5.
 
-Internally, Parrot works a little differently with PASM and PIR source
-code, so each has different restrictions. The default is to run in a
+Internally Parrot works a little differently with PASM and PIR source
+code, so each has different restrictions. Parrot's default is to run in a
 mixed mode that allows PASM code to combine with the higher-level syntax
-unique to PIR.
+unique to PIR. This gives the programmer flexibility to use aspects of
+each that are necessary.
 
-X<.pasm files> A file with a F<.pasm> extension is treated as pure
-PASM code, as is any file run with the C<-a> command-line option. This
-mode is mainly used for running pure PASM tests. Parrot treats any
-extension other than F<.pasm> as a PIR file.
-As a convention files containing PIR code generally have a  F<.pir>X<.pir files>
-extension.
+X<.pasm files> A file with a F<.pasm> extension is treated as pure PASM
+code by Parrot, as is any file run with the C<-a> command-line option.
+This mode is mainly used for running pure PASM tests. Parrot treats any
+extension other than F<.pasm> as a PIR file in mixed mode.
+X<.pir files> As a convention, files containing pure PIR code generally
+have a F<.pir> extension.
 
 X<PIR (Parrot intermediate representation);documentation>
-The documentation in F<imcc/docs/> or F<docs/> and the test suite in
-F<imcc/t> are good starting points for digging deeper into the PIR
-syntax and functionality.
+PIR is well documented, both in traditional documentation but also in
+instructional code examples. The documentation for the PIR compiler IMCC
+in F<imcc/docs/> or the project documentation in F<docs/> are good
+sources for information. The test suite in F<imcc/t> shows examples of
+proper working code as it should be. These are all good starting points
+for digging deeper into the PIR syntax and functionality.
 
 =head1 Statements
 
@@ -37,10 +43,12 @@ X<PIR (Parrot intermediate representation);statements>
 The syntax of statements in PIR is much more flexible than PASM. All
 PASM opcodes are valid PIR code, so the basic syntax is the same. The
 statement delimiter is a newline C<\n>, so each statement has to be on
-its own line. Any statement can start with a label. Comments are
-marked by a hash sign (C<#>) and PIR allows POD blocks.
+its own line. Statements may also start with a label, for use with jumps
+and branches. Comments are marked by a hash sign (C<#>), and continue
+until the end of the line. PIR also allows POD blocks for multi-line
+documentation.
 
-But unlike PASM, PIR has some higher-level constructs, including
+Unlike PASM, PIR has some higher-level constructs, including
 symbol operators:
 
   I1 = 5                       # set I1, 5
@@ -54,7 +62,7 @@ operators:
 
   if I1 <= 5 goto LABEL        # le I1, 5, LABEL
 
-We'll get into these in more detail as we go.
+We will get into all of these in more detail as we go.
 
 =head1 Variables and Constants
 
@@ -74,19 +82,22 @@ Z<CHP-10-SECT-2.1>
 PIR code has a variety of ways to store values while you work with
 them. The most basic way is to use Parrot registers directly. PASM
 register names always start with a single character that shows whether
-it is an integer, numeric, string, or PMC register, and end with the
-number of the register (between 0 and 31):
+it is an integer (I), numeric (N), string (S), or PMC (P) register,
+and end with the number of the register:
 
   S0 = "Hello, Polly.\n"
   print S0
 
-When you work directly with Parrot registers, you can only have 32
-registers of any one type at a time.N<Only 31 for PMC registers,
-because C<P31> is reserved for spilling.> If you have more than that,
-you have to start shuffling stored values on and off the user stack.
-You also have to manually track when it's safe to reuse a register.
-This kind of low-level access to the Parrot registers is handy when
-you need it, but it's pretty unwieldy for large sections of code.
+You can have as many registers of each type as you need, Parrot will
+allocate new registers if you need more.N<Parrot registers are allocated
+in a linear array, and register numbers are indices into this array.
+Having more registers means Parrot must allocate more storage space for
+them, which can decrease memory efficency and register allocation/fetch
+performance. In general, it's better to keep the number of registers
+small, and to use registers with contiguous numbers to prevent growing
+the pool of allocated registers too large.> Of course, as with any
+memory management situation, fewer allocations translates directly
+to improved performance.
 
 =head2 Temporary Registers
 
@@ -104,11 +115,11 @@ with a C<$> character:
   print $S42
 
 X<registers;PASM registers vs. PIR temporary register variables>
-The most obvious difference between Parrot registers and temporary
-register variables is that you have an unlimited number of
-temporaries. Parrot handles register allocation for you. It keeps
-track of how long a value in a Parrot register is needed and when that
-register can be reused.
+The most obvious difference between Parrot registers ("P7") and temporary
+register variables ("$P7") is that you have an unlimited number of
+temporaries. Parrot handles register allocation automatically, and
+performs register reuse optimizations for you when it finds such
+situations.
 
 The previous example used the C<$S42> temporary. When the code is
 compiled, that temporary is allocated to a Parrot register. As long as
@@ -116,14 +127,14 @@ the temporary is needed, it is stored in the same register. When it's
 no longer needed, the Parrot register is re-allocated to some other
 value. This example uses two temporary string registers:
 
-  $S42 = "Hello, "
+  $S42 = "Hello, "  # allocated to S16
   print $S42
-  $S43 = "Polly.\n"
+  $S43 = "Polly.\n" # allocated to S16 again
   print $S43
 
-Since they don't overlap, Parrot allocates both to the C<S16>
-register. If you change the order a little so both temporaries are
-needed at the same time, they're allocated to different registers:
+Since they don't overlap, Parrot can allocate both to a single register.
+If you change the order a little so both temporaries are needed at the
+same time, Parrot will allocate them to different registers instead:
 
   $S42 = "Hello, "  # allocated to S17
   $S43 = "Polly.\n" # allocated to S16
@@ -131,18 +142,23 @@ needed at the same time, they're allocated to different registers:
   print $S43
 
 In this case, C<$S42> is allocated to C<S17> and C<$S43> is allocated
-to C<S16>.
+to C<S16>. These numbers are hypothetical, of course. Which registers
+Parrot actually uses in these situations is based on a large number
+of factors.
 
-Parrot allocates temporary variablesN<As well as named variables,
+Parrot allocates temporary registersN<As well as named variables,
 which we'll talk about next.> to Parrot registers in ascending order
-of their score. The score is based on a number of factors related to
-variable usage. Variables used in a loop have a higher score than
+based on their I<score>. The score is used to determine whether a
+register is being actively used, and whether it can be reused for
+another purpose. Variables used in a loop have a higher score than
 variables outside a loop. Variables that span a long range have a
-lower score than ones that are used only briefly.
+lower score than ones that are used only briefly. Variables which have
+a low score (and thus are used less) are shuffled and reused for new
+temporaries.
 
 If you want to peek behind the curtain and see how Parrot is
 allocating registers, you can run it with the C<-d> switch to turn on
-debugging output.
+IMCC debugging output.
 
   $ parrot -d1000 hello.pir
 
