@@ -70,6 +70,7 @@ pir_output_is( <<'CODE', <<'OUT', 'whitespace before .param(RT#46499)');
   comments(1,2)
 .end
 .sub comments
+
   .param pmc a
   .param pmc b
   say 'hello'
