@@ -342,11 +342,10 @@ third and subsequent children can be any value they wish.
     ##  if the signature contains a ':', then we're doing
     ##  flagged arguments (:flat, :named)
     .local pmc posargs, namedargs
-    null posargs
+    posargs = new 'ResizableStringArray'
     null namedargs
     $I0 = index signature, ':'
     if $I0 < 0 goto nocolon
-    posargs = new 'ResizableStringArray'
     namedargs = new 'ResizableStringArray'
   nocolon:
 
@@ -365,7 +364,6 @@ third and subsequent children can be any value they wish.
     ops.'push'(cpost)
     .local pmc is_flat
     is_flat = cpast.'flat'()
-    if null posargs goto iter_rtype
     if rtype != ':' goto iter_pos
     .local pmc npast, npost
     npast = cpast.'named'()
@@ -1119,6 +1117,43 @@ by C<node>.
     ops.'push_pirop'('call', subpost, arglist :flat)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
+    .return (ops)
+.end
+
+
+=item list(PAST::Op node)
+
+Build a list from the children.  The type of list constructed
+is determined by the C<returns> attribute, which defaults
+to C<ResizablePMCArray> if not set.
+
+=cut
+
+.sub 'list' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc ops, posargs
+    (ops, posargs) = self.'post_children'(node, 'signature'=>'v*')
+
+    .local pmc returns
+    returns = node.'returns'()
+    if returns goto have_returns
+    returns = new 'String'
+    returns = 'ResizablePMCArray'
+  have_returns:
+
+    .local pmc listpost, iter
+    listpost = self.'as_post'(returns, 'rtype'=>'P')
+    ops.'result'(listpost)
+    ops.'push'(listpost)
+    iter = new 'Iterator', posargs
+  iter_loop:
+    unless iter goto iter_end
+    $S0 = shift iter
+    ops.'push_pirop'('push', listpost, $S0)
+    goto iter_loop
+  iter_end:
     .return (ops)
 .end
 
