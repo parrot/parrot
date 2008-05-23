@@ -91,7 +91,7 @@ return_cached:
     .local pmc rulesub
     .local pmc match
 
-    p6rule= find_global 'PGE', 'p6rule'
+    p6rule= compreg 'PGE::Perl6Regex'
 
     ## m{^([a-z]:)?[\\/]}is
     rulesub= p6rule( ':ignorecase ^ ( <?alpha> \: )? <[\\/]>' )
@@ -128,7 +128,7 @@ return_cached:
     .local pmc rulesub
     .local pmc match
 
-    p6rule= find_global 'PGE', 'p6rule'
+    p6rule= compreg 'PGE::Perl6Regex'
 
     ## dir =~ m{\\$}is
     rulesub= p6rule( '\\ $' )
@@ -158,7 +158,7 @@ return:
     unless num_args, return
 
     .local pmc p6rule, rulesub, match
-    p6rule= find_global 'PGE', 'p6rule'
+    p6rule= compreg 'PGE::Perl6Regex'
 
     .local pmc dir
     dir= new 'String'
@@ -216,7 +216,7 @@ return:
     .param string path
 
     .local pmc p6rule, rulesub, match
-    p6rule= find_global 'PGE', 'p6rule'
+    p6rule= compreg 'PGE::Perl6Regex'
 
 match_1:
     ## $path =~ s/^([a-z]:)/\u$1/s;
@@ -452,7 +452,7 @@ return:
     .local pmc rulesub
     .local pmc match
 
-    p6rule= find_global 'PGE', 'p6rule'
+    p6rule= compreg 'PGE::Perl6Regex'
 
     unless no_file, with_file
     ## m{^( (?:[a-zA-Z]:|(?:\\\\|//)[^\\/]+[\\/][^\\/]+)? )
@@ -510,7 +510,7 @@ return:
     .local pmc rulesub
     .local pmc match
 
-    p6rule= find_global 'PGE', 'p6rule'
+    p6rule= compreg 'PGE::Perl6Regex'
 
 ## TODO this whole rule section
     rulesub= p6rule( '^ <[\\/]>? ( <-[\\/]>? ) <[\\/]>? ' )
