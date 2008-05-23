@@ -59,7 +59,6 @@ static const char header_ref[LUAC_HEADERSIZE] = {
 };
 
 static PMC * LuaBytecode_PMC;
-static PMC * script;
 static const char * bytecode;
 static UINTVAL maxi;
 static const char *fp;
@@ -155,7 +154,7 @@ static PMC* _load_string(Interp *interp)
     return ret;
 }
 
-static void _load_header(Interp *interp)
+static void _load_header(Interp *interp, PMC *script)
 {
     char header[LUAC_HEADERSIZE];
 
@@ -374,21 +373,21 @@ information see F<src/pmc.c>.
 
 /*
 
-=item C<PMC* undump(STRING* bytecode)>
+=item C<PMC* undump(STRING* luabytecode)>
 
 Loads Lua 5.1 VM bytecode.
 
 =cut
 
 */
-    METHOD PMC* undump(STRING* bytecode) {
-        script = pmc_new(INTERP, pmc_type(INTERP,
+    METHOD PMC* undump(STRING* luabytecode) {
+        PMC * script = pmc_new(INTERP, pmc_type(INTERP,
             const_string(INTERP, "Lua::Bytecode")));
 
-        _init(INTERP, bytecode);
-        _load_header(INTERP);
+        _init(INTERP, luabytecode);
+        _load_header(INTERP, script);
         VTABLE_set_attr_str(INTERP, script,
-          const_string(interp, "top"), _load_function(INTERP));
+          const_string(INTERP, "top"), _load_function(INTERP));
 
         RETURN(PMC *script);
     }
