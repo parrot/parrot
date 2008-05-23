@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 96;
+use Parrot::Test tests => 97;
 
 =head1 NAME
 
@@ -2476,6 +2476,17 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'RT #39844' );
+.sub main :main
+  foo(1)
+.end
+
+.sub foo
+.end
+CODE
+/too many arguments passed\(1\) - 0 params expected/
 OUTPUT
 
 # Local Variables:
