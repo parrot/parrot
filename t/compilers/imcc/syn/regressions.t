@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 6;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -37,24 +37,59 @@ ok 1 - caught div_i_ic_ic exception
 ok 2 - caught div_n_nc_nc exception
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'should be able to have comments in params', todo=>'RT #46499');
-.sub comments
-  $S1 = parrot('hello','world')
-  say $S1
+pir_output_is( <<'CODE', <<'OUT', 'comments before .param(RT#46499)');
+.sub main :main
+  comments(1,2)
 .end
-
-.sub parrot
- # Describe param 1
- .param string verb
- # Describe param 2
- .param string noun
- 
- .local string retval
- retval = concat verb, noun
- .return (retval)
+.sub comments
+  # Testing
+  .param pmc a
+  .param pmc b
+  say 'hello'
 .end
 CODE
-helloworld
+hello
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'comments between .param(RT#46499)', todo => 'broken');
+.sub main :main
+  comments(1,2)
+.end
+.sub comments
+  .param pmc a
+  # Testing
+  .param pmc b
+  say 'hello'
+.end
+CODE
+hello
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'whitespace before .param(RT#46499)');
+.sub main :main
+  comments(1,2)
+.end
+.sub comments
+  .param pmc a
+  .param pmc b
+  say 'hello'
+.end
+CODE
+hello
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(RT#46499)', todo => 'broken');
+.sub main :main
+  comments(1,2)
+.end
+.sub comments
+  .param pmc a
+
+  .param pmc b
+  say 'hello'
+.end
+CODE
+hello
 OUT
 
 # Local Variables:
