@@ -1992,8 +1992,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, ARGIN(PMC *ns),
      * push method onto core multi_sub
      * RT #45961 cache the namespace
      */
-    multi = Parrot_find_global_n(interp, ns,
-                                 const_string(interp, short_name));
+    multi = Parrot_find_global_n(interp, ns, meth_name);
     PARROT_ASSERT(multi);
     VTABLE_push_pmc(interp, multi, method);
 }
