@@ -76,9 +76,9 @@ typedef INTVAL (*encoding_converter_t)(PARROT_INTERP, ENCODING *lhs, ENCODING *r
 /* HEADERIZER BEGIN: src/encoding.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PARROT_API
 const ENCODING * Parrot_default_encoding(SHIM_INTERP);
 
 PARROT_API

@@ -253,7 +253,7 @@ on a single compilation unit at a time.
 void
 imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 {
-    char *function;
+    const char *function;
 
     if (!unit)
         return;

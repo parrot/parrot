@@ -30,7 +30,7 @@ typedef struct _basic_block {
     int flag;
 } Basic_block;
 
-EXTERN enum {
+EXTERN enum block_enum_flags_t {
     BB_IS_SUB = 1 << 0
 } block_enum_flags;
 

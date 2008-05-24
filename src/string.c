@@ -1950,7 +1950,7 @@ string_to_num(PARROT_INTERP, ARGIN(const STRING *s))
      * XXX C99 atof interprets 0x prefix
      * XXX would strtod() be better for detecting malformed input?
      */
-    cstr = string_to_cstring(interp, PARROT_const_cast(STRING *, s));
+    cstr = string_to_cstring(interp, s);
     p    = cstr;
 
     while (isspace((unsigned char)*p))

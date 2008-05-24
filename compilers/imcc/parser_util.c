@@ -632,8 +632,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     if (op < 0) {
         const char * const n_name = try_rev_cmp(name, r);
         if (n_name) {
-            DECL_CONST_CAST;
-            name = PARROT_const_cast(char *, n_name);
+            name = n_name;
             op_fullname(fullname, name, r, n, keyvec);
             op   = interp->op_lib->op_code(fullname, 1);
         }
@@ -856,7 +855,6 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     void                  *yyscanner;
     Parrot_Context        *ignored;
     INTVAL regs_used[4] = {3, 3, 3, 3};
-    DECL_CONST_CAST;
 
     do_yylex_init(interp, &yyscanner);
 
@@ -899,7 +897,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     ignored = Parrot_push_context(interp, regs_used);
     UNUSED(ignored);
 
-    compile_string(interp, PARROT_const_cast(char *, s), yyscanner);
+    compile_string(interp, s, yyscanner);
 
     Parrot_pop_context(interp);
 

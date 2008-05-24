@@ -30,7 +30,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 34
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -212,6 +212,13 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 	while ( 0 )
 
 #define unput(c) yyunput( c, yyg->yytext_ptr , yyscanner )
+
+/* The following is because we cannot portably get our hands on size_t
+ * (without autoconf's help, which isn't available because we want
+ * flex-generated scanners to compile on their own).
+ * Given that the standard has decreed that size_t exists since 1989,
+ * I guess we can afford to depend on it. Manoj.
+ */
 
 #ifndef YY_TYPEDEF_YY_SIZE_T
 #define YY_TYPEDEF_YY_SIZE_T
@@ -2766,7 +2773,7 @@ static void include_file(PARROT_INTERP, char *file_name, ARGMOD(void *yyscanner)
 
 
 
-#line 2770 "compilers/imcc/imclexer.c"
+#line 2777 "compilers/imcc/imclexer.c"
 
 #define INITIAL 0
 #define emit 1
@@ -3025,7 +3032,7 @@ YY_DECL
             return 0;
         }
 
-#line 3029 "compilers/imcc/imclexer.c"
+#line 3036 "compilers/imcc/imclexer.c"
 
 	if ( !yyg->yy_init )
 		{
@@ -4205,7 +4212,7 @@ YY_RULE_SETUP
 #line 741 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 4209 "compilers/imcc/imclexer.c"
+#line 4216 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -5991,7 +5998,7 @@ compile_file(PARROT_INTERP, FILE *file, void *yyscanner)
 }
 
 void
-compile_string(PARROT_INTERP, char *s, void *yyscanner)
+compile_string(PARROT_INTERP, const char *s, void *yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  buffer;

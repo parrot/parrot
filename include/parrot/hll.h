@@ -37,9 +37,9 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
         __attribute__nonnull__(1);
 
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PARROT_API
 STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
         __attribute__nonnull__(1);
 

@@ -481,9 +481,9 @@ PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer * PIO_copy_stack(ARGIN_NULLOK(ParrotIOLayer *stack));
 
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PARROT_API
 ParrotIOLayer * PIO_get_layer(SHIM_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(2);
 

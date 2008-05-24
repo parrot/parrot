@@ -389,9 +389,9 @@ RT#48260: Not yet documented!!!
 
 */
 
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PARROT_API
 const ENCODING *
 Parrot_default_encoding(SHIM_INTERP)
 {

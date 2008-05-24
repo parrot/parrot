@@ -28,8 +28,6 @@
 #  define PARROT_HAS_SAL 0
 #endif
 
-#ifndef __cplusplus
-
 #ifdef HASATTRIBUTE_NEVER_WORKS
  #  error This attribute can never succeed.  Something has mis-sniffed your configuration.
 #endif
@@ -47,7 +45,10 @@
 #  define __attribute__malloc__             __attribute__((__malloc__))
 #endif
 #ifdef HASATTRIBUTE_NONNULL
+#ifndef __cplusplus
+/* g++ has some problem with this attribute */
 #  define __attribute__nonnull__(a)         __attribute__((__nonnull__(a)))
+#endif
 #endif
 #ifdef HASATTRIBUTE_NORETURN
 #  ifdef _MSC_VER
@@ -67,8 +68,6 @@
 #endif
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
-#endif
-
 #endif
 
 /* If we haven't defined the attributes yet, define them to blank. */

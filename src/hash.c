@@ -318,8 +318,8 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
     INTVAL i;
     UINTVAL entries;
 
-    if (hash->entry_type == enum_hash_string
-    ||  hash->entry_type == enum_hash_pmc)
+    if (hash->entry_type == (PARROT_DATA_TYPE) enum_hash_string
+    ||  hash->entry_type == (PARROT_DATA_TYPE) enum_hash_pmc)
         mark_value = 1;
 
     if (hash->key_type == Hash_key_type_STRING

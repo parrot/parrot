@@ -1322,7 +1322,7 @@ compile_file(PARROT_INTERP, FILE *file, void *yyscanner)
 }
 
 void
-compile_string(PARROT_INTERP, char *s, void *yyscanner)
+compile_string(PARROT_INTERP, const char *s, void *yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  buffer;
