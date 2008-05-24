@@ -63,8 +63,7 @@ NOTE: No doubt we will need other things later; this is a start.
 */
 
 
-pmclass PMCProxy extends Class
-    need_ext {
+pmclass PMCProxy extends Class need_ext {
 
 /*
 
@@ -80,26 +79,26 @@ Initializes a PMCProxy PMC.
         Parrot_Class * const _pmc          = mem_allocate_zeroed_typed(Parrot_Class);
         PMC          * const new_attribute = pmc_new(interp, enum_class_Hash);
         STRING       * const name          = CONST_STRING(interp, "proxy");
-        PMC_data(SELF)        = _pmc;
+        PMC_data(SELF)                     = _pmc;
 
         /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
         /* Set up the object. */
-        _pmc->id              = 0;
-        _pmc->name            = CONST_STRING(interp, "");
-        _pmc->_namespace      = PMCNULL;
-        _pmc->parents         = pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->all_parents     = pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->methods         = pmc_new(interp, enum_class_Hash);
+        _pmc->id               = 0;
+        _pmc->name             = CONST_STRING(interp, "");
+        _pmc->_namespace       = PMCNULL;
+        _pmc->parents          = pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->all_parents      = pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->roles            = pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->methods          = pmc_new(interp, enum_class_Hash);
         _pmc->vtable_overrides = constant_pmc_new(interp, enum_class_Hash);
         _pmc->parent_overrides = pmc_new(interp, enum_class_Hash);
-        _pmc->attrib_metadata = pmc_new(interp, enum_class_Hash);
-        _pmc->attrib_index    = PMCNULL;
-        _pmc->attrib_cache    = PMCNULL;
-        _pmc->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->attrib_metadata  = pmc_new(interp, enum_class_Hash);
+        _pmc->attrib_index     = PMCNULL;
+        _pmc->attrib_cache     = PMCNULL;
+        _pmc->resolve_method   = pmc_new(interp, enum_class_ResizablePMCArray);
 
         /* Set up the attribute storage for the proxy instance */
         VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
@@ -117,10 +116,9 @@ Initializes a PMCProxy PMC.
         Parrot_Class *proxy_info;
 
         /* Ensure that it's a valid type number. */
-        if (type_num > interp->n_vtable_max || type_num < 0) {
+        if (type_num > interp->n_vtable_max || type_num < 0)
             real_exception(interp, NULL, 1,
                 "Attempt to create PMC Proxy for invalid type number!");
-        }
 
         /* Set up the object. */
         SELF.init();
@@ -142,7 +140,8 @@ Initializes a PMCProxy PMC.
                 CONST_STRING(interp, "set_class"), "P->", SELF);
 
             /* Extract any methods from the namespace */
-            Parrot_oo_extract_methods_from_namespace(interp, SELF, proxy_info->_namespace);
+            Parrot_oo_extract_methods_from_namespace(interp, SELF,
+                    proxy_info->_namespace);
         }
     }
 
@@ -192,29 +191,29 @@ Mark any referenced strings and PMCs in the structure as live.
         Parrot_Class * const _pmc = PARROT_CLASS(SELF);
 
         if (_pmc->name)
-            pobject_lives(interp, (PObj*)_pmc->name);
+            pobject_lives(interp, (PObj *)_pmc->name);
         if (_pmc->_namespace)
-            pobject_lives(interp, (PObj*)_pmc->_namespace);
+            pobject_lives(interp, (PObj *)_pmc->_namespace);
         if (_pmc->parents)
-            pobject_lives(interp, (PObj*)_pmc->parents);
+            pobject_lives(interp, (PObj *)_pmc->parents);
         if (_pmc->all_parents)
-            pobject_lives(interp, (PObj*)_pmc->all_parents);
+            pobject_lives(interp, (PObj *)_pmc->all_parents);
         if (_pmc->roles)
-            pobject_lives(interp, (PObj*)_pmc->roles);
+            pobject_lives(interp, (PObj *)_pmc->roles);
         if (_pmc->methods)
-            pobject_lives(interp, (PObj*)_pmc->methods);
+            pobject_lives(interp, (PObj *)_pmc->methods);
         if (_pmc->vtable_overrides)
-            pobject_lives(interp, (PObj*)_pmc->vtable_overrides);
+            pobject_lives(interp, (PObj *)_pmc->vtable_overrides);
         if (_pmc->parent_overrides)
-            pobject_lives(interp, (PObj*)_pmc->parent_overrides);
+            pobject_lives(interp, (PObj *)_pmc->parent_overrides);
         if (_pmc->attrib_metadata)
-            pobject_lives(interp, (PObj*)_pmc->attrib_metadata);
+            pobject_lives(interp, (PObj *)_pmc->attrib_metadata);
         if (_pmc->attrib_index)
-            pobject_lives(interp, (PObj*)_pmc->attrib_index);
+            pobject_lives(interp, (PObj *)_pmc->attrib_index);
         if (_pmc->attrib_cache)
-            pobject_lives(interp, (PObj*)_pmc->attrib_cache);
+            pobject_lives(interp, (PObj *)_pmc->attrib_cache);
         if (_pmc->resolve_method)
-            pobject_lives(interp, (PObj*)_pmc->resolve_method);
+            pobject_lives(interp, (PObj *)_pmc->resolve_method);
     }
 
 /*
@@ -246,12 +245,12 @@ Returns whether the class is or inherits from C<*classname>.
 
         classname = VTABLE_get_string(interp, classobj);
 
-        /* Check if the class object is the same as self's class object */
-        if (VTABLE_is_same(interp, SELF, classobj))
-            return 1;
-
         /* Check if the passed name is the same as the stored short name. */
         if (string_equal(interp, classname, _proxy->name) == 0)
+            return 1;
+
+        /* Check if the class object is the same as self's class object */
+        if (VTABLE_is_same(interp, SELF, classobj))
             return 1;
 
         /* Check if the passed name is the same as the fully qualified name. */
