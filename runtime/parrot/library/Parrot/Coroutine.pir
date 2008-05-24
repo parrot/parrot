@@ -8,7 +8,7 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
 
 =head1 SYNOPSIS
 
-    .sub __onload :load
+    .sub onload :load
         load_bytecode 'Parrot/Coroutine.pir'
     .end
 
@@ -82,7 +82,7 @@ in pure PIR using continuations.
 
 =cut
 
-.sub __loadtime_create_class :load
+.sub onload_create_class :load
     $P0 = get_class "Parrot::Coroutine"
     unless null $P0 goto END
     $P0 = newclass "Parrot::Coroutine"
@@ -100,7 +100,7 @@ END:
 
 =head2 METHODS
 
-=head3 B<__init_pmc(sub)>
+=head3 B<init_pmc(sub)>
 
 This method is normally called via the C<new> op:
 
