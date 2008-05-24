@@ -285,8 +285,8 @@ print $JITCPU <<"END_C";
 # define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 #endif
 
-PARROT_DATA char **Parrot_exec_rel_addr;
-PARROT_DATA int Parrot_exec_rel_count;
+extern char **Parrot_exec_rel_addr;
+extern int Parrot_exec_rel_count;
 
 #define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[x])
 #define ROFFS_NUM(x) REG_OFFS_NUM(jit_info->cur_op[x])

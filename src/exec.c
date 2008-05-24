@@ -61,8 +61,9 @@ static int symbol_list_find(
  */
 
 int Parrot_exec_run = 0;
-char **Parrot_exec_rel_addr;
-int Parrot_exec_rel_count;
+
+extern char **Parrot_exec_rel_addr;
+extern int Parrot_exec_rel_count;
 
 /*
 

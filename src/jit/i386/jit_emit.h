@@ -91,6 +91,9 @@ extern UINTVAL ld(UINTVAL);
 #define ISR1 emit_EAX
 #define FSR1 0
 
+extern char **Parrot_exec_rel_addr;
+extern int Parrot_exec_rel_count;
+
 /* Register the address of a rellocation. */
 #if EXEC_CAPABLE
 #  define EXEC_RA(addr) \
@@ -148,9 +151,6 @@ extern UINTVAL ld(UINTVAL);
 #define emit_alu_X_r(X, reg) ((emit_b11 << 6) | ((X) << 3) | ((reg) - 1))
 
 #define emit_alu_r_r(reg1, reg2) emit_alu_X_r(((reg1) - 1), (reg2))
-
-PARROT_DATA char **Parrot_exec_rel_addr;
-PARROT_DATA int Parrot_exec_rel_count;
 
 static int
 emit_is8bit(long disp)
