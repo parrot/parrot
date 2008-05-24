@@ -553,7 +553,7 @@
 ##                                :node( $/ ) );
 ##        }
 ##        else {
-##            my $vivibase := ($key eq '{ }') ? 'Hash' : 'ResizablePMCArray';
+##            my $vivibase := ($key eq '{ }') ?? 'Hash' !! 'ResizablePMCArray';
 ##            make PAST::Var.new( $($<EXPR>),
 ##                                :scope('keyed'),
 ##                                :vivibase($vivibase),
@@ -568,15 +568,17 @@
     if key == '( )' goto subcall
     if key == '< >' goto keyed_const
   keyed_var:
-    .local string vivibase
-    vivibase = 'ResizablePMCArray'
-    if key != '{ }' goto keyed_array
+    .local string vivibase, scope
     vivibase = 'Hash'
-  keyed_array:
+    scope = 'keyed'
+    if key != '[ ]' goto keyed_hash
+    vivibase = 'ResizablePMCArray'
+    scope = 'keyed_int'
+  keyed_hash:
     $P0 = get_hll_global ['PAST'], 'Var'
     $P1 = match['EXPR']
     $P2 = $P1.'item'()
-    $P3 = $P0.'new'( $P2, 'scope'=>'keyed', 'vivibase'=>vivibase, 'viviself'=>'Undef', 'node'=>match )
+    $P3 = $P0.'new'( $P2, 'scope'=>scope, 'vivibase'=>vivibase, 'viviself'=>'Undef', 'node'=>match )
     match.'result_object'($P3)
     .return ()
   subcall:
