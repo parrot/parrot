@@ -136,9 +136,10 @@ static Instruction *
 insINS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         ARGIN(const char *name), ARGIN(SymReg **regs), int n)
 {
-    /* XXX INS can return NULL, but insert_ins() cannot take one */
+    /* INS can return NULL, but insert_ins() cannot take one */
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
-    insert_ins(unit, ins, tmp);
+    if (tmp)
+        insert_ins(unit, ins, tmp);
     return tmp;
 }
 
@@ -209,7 +210,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 {
     int i, flags;
     char buf[1024], s[16];
-    SymReg ** const regs  = mem_allocate_n_zeroed_typed(n+1, SymReg *);
+    SymReg ** const regs  = mem_allocate_n_zeroed_typed(n + 1, SymReg *);
 
     strcpy(buf, "\"(");
     for (i = 0; i < n; i++) {
@@ -217,37 +218,41 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
         if (arg->type & VT_CONSTP)
             arg = arg->reg;
+
         regs[i + 1] = arg;
-        flags = 0;
-        if (arg_flags[i] & VT_FLAT) {
+        flags       = 0;
+
+        if (arg_flags[i] & VT_FLAT)
             flags |= PARROT_ARG_FLATTEN;
-        }
-        if (arg_flags[i] & VT_OPTIONAL) {
+
+        if (arg_flags[i] & VT_OPTIONAL)
             flags |= PARROT_ARG_OPTIONAL;
-        }
-        else if (arg_flags[i] & VT_OPT_FLAG) {
+        else if (arg_flags[i] & VT_OPT_FLAG)
             flags |= PARROT_ARG_OPT_FLAG;
-        }
-        if (arg_flags[i] & VT_NAMED) {
+
+        if (arg_flags[i] & VT_NAMED)
             flags |= PARROT_ARG_NAME;
-        }
+
         /* add argument type bits */
         if (arg->type & VTCONST)
             flags |= PARROT_ARG_CONSTANT;
+
         /* TODO verify if const is allowed */
         switch (arg->set) {
-            case 'I': break;
+            case 'I':                               break;
             case 'S': flags |= PARROT_ARG_STRING;   break;
             case 'N': flags |= PARROT_ARG_FLOATVAL; break;
             case 'K':
             case 'P': flags |= PARROT_ARG_PMC;      break;
             default :                               break;
         }
+
         snprintf(s, sizeof (s), "0x%x", flags);
+
         if (i < n - 1)
             strcat(s, ",");
         strcat(buf, s);         /* XXX check avail len */
-    } /* n params */
+    }
 
     strcat(buf, ")\"");
 
@@ -272,11 +277,11 @@ static void
 unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 {
     struct pcc_sub_t * const pcc_sub = sub->pcc_sub;
-    const int n = pcc_sub->nargs;
-    int i;
+    const int                n       = pcc_sub->nargs;
+    int                      i;
 
-    mem_realloc_n_typed(pcc_sub->args,      n+1, SymReg *);
-    mem_realloc_n_typed(pcc_sub->arg_flags, n+1, int);
+    mem_realloc_n_typed(pcc_sub->args,      n + 1, SymReg *);
+    mem_realloc_n_typed(pcc_sub->arg_flags, n + 1, int);
 
     for (i = n; i; --i) {
         pcc_sub->args[i]      = pcc_sub->args[i - 1];
@@ -307,9 +312,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
     SymReg      *sub = ins->symregs[0];
     SymReg      *regs[2];
 
-    /*
-     * if this sub isa method, unshift 'self' as first param
-     */
+    /* if this sub is a method, unshift 'self' as first param */
     if (sub->pcc_sub->pragma & P_METHOD) {
         SymReg *self = get_sym(interp, "self");
         if (!self) {
@@ -320,53 +323,48 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
     }
 
     /* Don't generate any parameter checking code if there
-     * are no named arguments.
-     */
+     * are no named arguments.  */
     nargs = sub->pcc_sub->nargs;
 
-    if (nargs) {
+    if (nargs)
         ins = pcc_get_args(interp, unit, ins, "get_params", nargs,
                 sub->pcc_sub->args, sub->pcc_sub->arg_flags);
-    }
 
-    /*
-     * check if there is a return
-     */
-    if (unit->last_ins->type & (ITPCCSUB) &&
-            unit->last_ins->symreg_count == 1 &&
-            (sub = unit->last_ins->symregs[0]) &&
-            sub->pcc_sub &&
-            !sub->pcc_sub->object && /* s. src/inter_call.c:119 */
-            (sub->pcc_sub->flags & isTAIL_CALL))
+    /* check if there is a return */
+    if (unit->last_ins->type          & (ITPCCSUB)
+    &&  unit->last_ins->symreg_count == 1
+    && (sub = unit->last_ins->symregs[0])
+    &&  sub->pcc_sub
+    && !sub->pcc_sub->object
+       /* s. src/inter_call.c:119 */
+    && (sub->pcc_sub->flags & isTAIL_CALL))
         return;
 
-    if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
-            STRNEQ(unit->last_ins->opname, "ret") &&
-            STRNEQ(unit->last_ins->opname, "exit") &&
-            STRNEQ(unit->last_ins->opname, "end") &&
-            STRNEQ(unit->last_ins->opname, "branch") &&
-            /* was adding rets multiple times... */
-            STRNEQ(unit->last_ins->opname, "returncc")) {
+    if (unit->last_ins->type != (ITPCCSUB|ITLABEL)
+    && STRNEQ(unit->last_ins->opname, "ret")
+    && STRNEQ(unit->last_ins->opname, "exit")
+    && STRNEQ(unit->last_ins->opname, "end")
+    && STRNEQ(unit->last_ins->opname, "branch")
+       /* was adding rets multiple times... */
+    && STRNEQ(unit->last_ins->opname, "returncc")) {
         Instruction *tmp;
 
         /* check to make sure the sub is ok before we try to use it */
-        if (!sub) {
+        if (!sub)
             real_exception(interp, NULL, 1, "NULL sub detected");
-        }
-        if (!sub->pcc_sub) {
-            real_exception(interp, NULL, 1, "NULL sub->pcc_sub detected");
-        }
 
-        if (sub->pcc_sub->pragma & P_MAIN) {
+        if (!sub->pcc_sub)
+            real_exception(interp, NULL, 1, "NULL sub->pcc_sub detected");
+
+        if (sub->pcc_sub->pragma & P_MAIN)
             tmp = INS(interp, unit, "end", NULL, regs, 0, 0, 0);
-        }
         else {
-            Instruction *unused_ins;
-            unused_ins = pcc_get_args(interp, unit, unit->last_ins,
+            Instruction *unused_ins = pcc_get_args(interp, unit, unit->last_ins,
                     "set_returns", 0, NULL, NULL);
             UNUSED(unused_ins);
             tmp = INS(interp, unit, "returncc", NULL, regs, 0, 0, 0);
         }
+
         IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
@@ -393,9 +391,7 @@ expand_pcc_sub_ret(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins
     ins = pcc_get_args(interp, unit, ins, "set_returns", n,
                        sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
 
-    /*
-     * we have a pcc_begin_yield
-     */
+    /* we have a pcc_begin_yield */
     if (is_yield) {
         SymReg *regs[2];
         ins        = insINS(interp, unit, ins, "yield", regs, 0);
@@ -403,27 +399,25 @@ expand_pcc_sub_ret(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins
     }
     else {
         SymReg *regs[2];
-        /*
-         * insert return invoke
-         */
+        /* insert return invoke */
         ins        = insINS(interp, unit, ins, "returncc", regs, 0);
         ins->type |= ITPCCRET;
     }
 }
 
-struct move_info_t {
+typedef struct move_info_t {
     IMC_Unit    *unit;
     NOTNULL(Instruction *ins);
     int          n;
     SymReg      **dest;
     SymReg      **src;
-};
+} move_info_t;
 
 /*
 
 =item C<static int pcc_reg_mov>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -432,12 +426,13 @@ RT#48260: Not yet documented!!!
 static int
 pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo))
 {
-    struct move_info_t *info = (struct move_info_t *)vinfo;
-    SymReg *regs[2], *src, *dest;
-    static SymReg *temps[4];
     static const char types[] = "INSP";
+    static SymReg    *temps[4];
+    move_info_t      *info    = (move_info_t *)vinfo;
+    SymReg           *src     = NULL;
+    SymReg           *dest    = NULL;
+    SymReg           *regs[2];
 
-    src = dest = NULL;
     if (d == 255) {
         int t;
 
@@ -475,6 +470,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
             }
         }
     }
+
     if (!dest)
         dest = d < info->n ? info->dest[(int)d] : info->src[(int)d - info->n];
 
@@ -492,7 +488,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
 
 =item C<static Instruction * move_regs>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -505,8 +501,8 @@ move_regs(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGIN(Instruction *ins),
         int n, ARGIN(SymReg **dest), ARGIN(SymReg **src))
 {
     unsigned char *move_list;
-    int i;
-    struct move_info_t move_info;
+    move_info_t    move_info;
+    int            i;
 
     if (!n)
         return ins;
@@ -536,6 +532,7 @@ move_regs(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGIN(Instruction *ins),
 done:
         ;
     }
+
     Parrot_register_move(interp, n, move_list, move_list + n, 255,
         pcc_reg_mov, NULL, &move_info);
 
@@ -578,8 +575,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     if (sub->pcc_sub->nargs != this_sub->pcc_sub->nargs)
         return 0;
 
-    /* TODO check if we have only positional args
-    */
+    /* TODO check if we have only positional args */
 
     get_params = unit->instructions->next;
 
@@ -590,7 +586,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     sprintf(buf, "%s@0", this_sub->name);
 
     if (!(label = find_sym(interp, buf))) {
-        label = mk_local_label(interp, buf);
+        label   = mk_local_label(interp, buf);
         tmp_ins = INS_LABEL(interp, unit, label, 0);
         insert_ins(unit, get_params, tmp_ins);
     }
@@ -600,7 +596,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     ins = move_regs(interp, unit, ins, sub->pcc_sub->nargs,
             this_sub->pcc_sub->args, sub->pcc_sub->args);
 
-    regs[0] = label;
+    regs[0]    = label;
     unused_ins = insINS(interp, unit, ins, "branch", regs, 1);
     UNUSED(unused_ins);
 
@@ -611,7 +607,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 
 =item C<static void insert_tail_call>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -663,24 +659,24 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
 
     if (ins->type & ITRESULT) {
         const int n = sub->pcc_sub->nret;
-        ins = pcc_get_args(interp, unit, ins, "get_results", n,
-                sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
+        ins         = pcc_get_args(interp, unit, ins, "get_results", n,
+                        sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
         return;
     }
 
     tail_call = (sub->pcc_sub->flags & isTAIL_CALL);
 
-    if (tail_call && IMCC_INFO(interp)->optimizer_level & OPT_SUB) {
+    if (tail_call && IMCC_INFO(interp)->optimizer_level & OPT_SUB)
         if (recursive_tail_call(interp, unit, ins, sub))
             return;
-    }
 
     if (sub->pcc_sub->object) {
         meth_call = 1;
         if (sub->pcc_sub->object->set == 'S') {
             regs[0] = mk_temp_reg(interp, 'P');
             regs[1] = sub->pcc_sub->object;
-            ins = insINS(interp, unit, ins, "getclass", regs, 2);
+            ins     = insINS(interp, unit, ins, "getclass", regs, 2);
+
             sub->pcc_sub->object = regs[0];
         }
     }
@@ -695,21 +691,18 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         SymReg * const the_sub = sub->pcc_sub->sub;
 
         if (!meth_call && (the_sub->type & VTADDRESS)) {
-            /*
-             * sub->pcc_sub->sub is an actual subroutine name,
-             * not a variable.
-             */
+            /* sub->pcc_sub->sub is an actual subroutine name, not a variable */
             reg = mk_temp_reg(interp, 'P');
             add_pcc_sub(sub, reg);
-            /*
-             * insert set_p_pc with the sub as constant
-             */
+
+            /* insert set_p_pc with the sub as constant */
             the_sub->set    = 'p';
             the_sub->usage  = U_FIXUP;
             the_sub->type  &= ~VTADDRESS;
             the_sub->type  |= VTCONST;   /* preserve VT_ENCODED */
             regs[0]         = reg;
             regs[1]         = the_sub;
+
             /*
              * set_p_pc gets replaced in imcc/pbc.c, if the
              * function can't located in the current namespace
@@ -719,12 +712,10 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         }
     }
 
-    if (sub->pcc_sub->object) {
+    if (sub->pcc_sub->object)
         unshift_self(sub, sub->pcc_sub->object);
-    }
-    /*
-     * insert arguments
-     */
+
+    /* insert arguments */
     n   = sub->pcc_sub->nargs;
     ins = pcc_get_args(interp, unit, ins, "set_args", n,
             sub->pcc_sub->args, sub->pcc_sub->arg_flags);
@@ -744,25 +735,18 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         meth = arg;
 
         if (arg->set != 'P') {
-            if (!(arg->type == VTIDENTIFIER ||
-                        arg->type == VTPASM ||
-                        arg->type == VTREG))
+            if (!(arg->type == VTIDENTIFIER
+            ||    arg->type == VTPASM
+            ||    arg->type == VTREG))
                 meth = mk_const(interp, arg->name, 'S');
         }
     }
 
-    /*
-     * if we have a tail call then
-     * insert a tailcall opcode
-     */
-    if (tail_call) {
-        insert_tail_call(interp, unit, ins, sub, meth);
-        return;
-    }
+    /* if we have a tail call then insert a tailcall opcode */
+    if (tail_call)
+        return insert_tail_call(interp, unit, ins, sub, meth);
 
-    /*
-     * handle return results
-     */
+    /* handle return results */
     n   = sub->pcc_sub->nret;
     ins = pcc_get_args(interp, unit, ins, "get_results", n,
             sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
