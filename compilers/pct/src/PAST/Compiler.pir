@@ -1678,14 +1678,21 @@ attribute.
 .sub 'keyed' :method :multi(_, ['PAST::Var'])
     .param pmc node
     .param pmc bindpost
+    .param string keyrtype     :optional
+    .param int has_keyrtype    :opt_flag
 
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
 
+    if has_keyrtype goto have_keyrtype
+    keyrtype = '*'
+  have_keyrtype:
+
     .local pmc keypast, keypost
     keypast = node[1]
-    keypost = self.'as_post'(keypast, 'rtype'=>'*')
+    keypost = self.'as_post'(keypast, 'rtype'=>keyrtype)
+    keypost = self.'coerce'(keypost, keyrtype)
     ops.'push'(keypost)
 
     .local pmc basepast, basepost
@@ -1724,6 +1731,13 @@ attribute.
     ops.'result'(bindpost)
     ops.'push_pirop'('set', name, ops)
     .return (ops)
+.end
+
+
+.sub 'keyed_int' :method :multi(_, ['PAST::Var'])
+    .param pmc node
+    .param pmc bindpost
+    .return self.'keyed'(node, bindpost, 'i')
 .end
 
 
