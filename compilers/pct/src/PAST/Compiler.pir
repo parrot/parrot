@@ -622,9 +622,18 @@ Return the POST representation of a C<PAST::Block>.
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
     bpost.'push_pirop'('get_global', result, name)
-    goto block_done
+    goto block_decl_closure
   block_decl_ns:
     bpost.'push_pirop'('get_hll_global', result, ns, name)
+  block_decl_closure:
+    .local pmc closurelabel
+    $P0 = get_hll_global ['POST'], 'Label'
+    closurelabel = $P0.'new'('name'=>'closure_')
+    $S0 = self.'uniquereg'('I')
+    bpost.'push_pirop'('isa', $S0, result, "'Closure'")
+    bpost.'push_pirop'('unless', $S0, closurelabel)
+    bpost.'push_pirop'('newclosure', result, result)
+    bpost.'push'(closurelabel)
     goto block_done
 
   block_immediate:
