@@ -159,6 +159,21 @@ Return a true value if the invocant 'isa' C<x>.
     .return ($I0)
 .end
 
+=item can(x)
+
+Return a true value if the invocant 'can' C<x>.
+
+=cut
+
+.sub 'can' :method
+    .param string x
+    .local pmc parrotclass
+    $P0 = self.'WHAT'()
+    $I0 = can $P0, x
+    .return ($I0)
+.end
+
+
 =item add_parent(parentclass [, 'to'=>parrotclass])
 
 =cut
