@@ -5,7 +5,6 @@
 use strict;
 use warnings;
 
-use Getopt::Long;
 use lib 'lib';
 use Parrot::Ops2pm::Utils;
 use Parrot::Ops2pm::Auxiliary qw( Usage getoptions );
