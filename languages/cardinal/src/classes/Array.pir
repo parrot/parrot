@@ -549,6 +549,26 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
     .return(retv)
 .end
 
+
+=item each(block)
+
+Run C<block> once for each item in C<self>, with the item passed as an arg.
+
+=cut
+
+.sub 'each' :method
+    .param pmc block
+    $P0 = new 'Iterator', self
+  each_loop:
+    unless $P0 goto each_loop_end
+    $P1 = shift $P0
+    block($P1)
+    goto each_loop
+  each_loop_end:
+.end
+
+
+
 =back
 
 =head1 Functions
@@ -572,8 +592,8 @@ Build a CardinalArray from its arguments.
     item = shift args
     $I0 = defined item
     unless $I0 goto add_item
-    # $I0 = isa item, 'CardinalArray'
-    # if $I0 goto add_item
+    $I0 = isa item, 'CardinalArray'
+    if $I0 goto add_item
     $I0 = does item, 'array'
     unless $I0 goto add_item
     splice args, item, 0, 0
