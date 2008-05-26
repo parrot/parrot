@@ -111,6 +111,10 @@ CLEANUPS = \
   $(PMC_DIR)/*.manifest \
   $(PMC_DIR)/*.pdb \
   $(PMC_DIR)/*.lib \
+  src/cpp/cpp.pbc \
+  src/cpp/src/gen_actions.pir \
+  src/cpp/src/gen_grammar.pir \
+  src/cpp/src/gen_builtins.pir
 
 
 clean:
