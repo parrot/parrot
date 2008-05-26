@@ -104,8 +104,8 @@ token lhs {
     | <member_variable> {*}     #= member_variable
 }
 
-rule indexed_variable {
-    <primary> '[' <args>? ']'
+token indexed_variable {
+    <primary=variable> '[' <args>? ']'
     {*}
 }
 
@@ -164,6 +164,7 @@ token varname {
     [ <global> {*}             #= global
     | <instance_variable> {*}  #= instance_variable
     | <local_variable> {*}     #= local_variable
+    | <constant_variable> {*}     #= constant_variable
     ]
 }
 
@@ -184,6 +185,7 @@ proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 
 token basic_primary {
     | <literal> {*}                         #= literal
+    | <indexed_variable> {*}                        #= indexed_variable
     | <command> {*}                         #= command
     | <not_command> {*}                         #= command
     | <variable> {*}                        #= variable

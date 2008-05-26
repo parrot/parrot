@@ -75,9 +75,6 @@ to the cardinal compiler.
 .sub 'main' :main
     .param pmc args_str
 
-    $P0 = compreg 'cardinal'
-    $P1 = $P0.'command_line'(args_str)
-
     ##  create ARGS global.
     .local pmc args, iter
     args = new 'CardinalArray'
@@ -89,6 +86,9 @@ to the cardinal compiler.
     goto args_loop
   args_end:
     set_hll_global 'ARGS', args
+
+    $P0 = compreg 'cardinal'
+    $P1 = $P0.'command_line'(args_str)
 
     .include 'iterator.pasm'
     $P0 = get_hll_global ['cardinal'], '@?END_BLOCKS'

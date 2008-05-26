@@ -209,6 +209,13 @@ method local_variable($/) {
 }
 
 
+method constant_variable($/) {
+    my @a;
+    my $past := PAST::Var.new( :name(~$/), :scope('package'), :node($/), :viviself('Undef'), :namespace( @a ) );
+    make $past;
+}
+
+
 method if_stmt($/) {
     my $cond := +$<expr> - 1;
     my $comp := $( $<comp_stmt>[$cond] );
@@ -447,20 +454,16 @@ method pcomp_stmt($/) {
 }
 
 method array($/) {
-    my $past;
-    ## XXX the "new" method should be invoked on the "Array" class (use get_class)
-    ## but that doesn't work yet.
-    my $getclass := PAST::Op.new( :inline('    %r = new "CardinalArray"'), :node($/) );
+    my $list;
     if $<args> {
-        $past := $( $<args>[0] );
-        $past.unshift( $getclass );
-        $past.name('new');
-        $past.pasttype('callmethod');
+        $list := $( $<args>[0] );
+        $list.name('list');
     }
     else {
-        $past := PAST::Op.new( $getclass, :name('new'), :pasttype('callmethod'), :node($/) );
+        $list := PAST::Op.new( :name('list'), :node($/) );
     }
-    make $past;
+
+    make $list;
 }
 
 method ahash($/) {
