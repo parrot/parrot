@@ -79,6 +79,7 @@ to the cardinal compiler.
     .local pmc args, iter
     args = new 'CardinalArray'
     iter = new 'Iterator', args_str
+    $P0 = shift iter
   args_loop:
     unless iter goto args_end
     $P0 = shift iter
