@@ -259,10 +259,13 @@ or 'Object').
     .local pmc parentclass
     parentclass = options['parent']
     if null parentclass goto parent_done
+    $I0 = isa parentclass, 'P6protoobject'
+    if $I0 goto parent_single
     $I0 = does parentclass, 'array'
     if $I0 goto parent_array
     $S0 = typeof parentclass
     if $S0 == 'String' goto parent_string
+  parent_single:
     self.'add_parent'(parentclass, 'to'=>parrotclass)
     goto parent_done
   parent_string:

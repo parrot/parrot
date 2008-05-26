@@ -26,7 +26,7 @@ t/library/p6object.t -- P6object tests
 
     ##  set our plan
     .local int plan_tests
-    plan(106)
+    plan(108)
 
     ##  make sure we can load the P6object library
     push_eh load_failed
@@ -313,6 +313,17 @@ t/library/p6object.t -- P6object tests
     $I0 = defined stuproto
     nok($I0, 'Foo::STU proto undefined')
 
+    ##  remapping ResizablePMCArray to List
+    .local pmc listproto
+    listproto = metaproto.'new_class'('List', 'parent'=>'ResizablePMCArray')
+    metaproto.'register'('ResizablePMCArray', 'parent'=>listproto, 'protoobject'=>listproto)
+    $P0 = new 'List'
+    $I0 = can $P0, 'elems'
+    ok($I0, 'List can elems')
+    $P0 = new 'ResizablePMCArray'
+    $I0 = can $P0, 'elems'
+    ok($I0, 'ResizablePMCArray inherits List methods')
+
     .return ()
   load_failed:
     ok(0, "load_bytecode 'P6object.pir' failed -- skipping tests")
@@ -329,4 +340,9 @@ t/library/p6object.t -- P6object tests
 .namespace ['GHI']
 .sub 'new' :method
     .return ('GHI::new')
+.end
+
+.namespace ['List']
+.sub 'elems' :method
+    .return ('List::elems')
 .end
