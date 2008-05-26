@@ -7,7 +7,24 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
+
+##############################
+# ".namespace" sanity
+
+pir_output_is( <<'CODE', <<'OUT', "different namespace declarations");
+
+.namespace ["Foo"]
+.namespace [ ]
+.namespace []
+.namespace
+
+.sub test :main
+    print "ok\n"
+.end
+CODE
+ok
+OUT
 
 ##############################
 # Parrot Calling Conventions

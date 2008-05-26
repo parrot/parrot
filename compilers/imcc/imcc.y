@@ -893,6 +893,7 @@ class_namespace:
 
 maybe_ns:
      '[' keylist ']'           { $$ = $2; }
+   | '[' ']'                   { $$ = NULL; }
    |                           { $$ = NULL; }
    ;
 
