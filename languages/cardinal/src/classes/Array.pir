@@ -14,12 +14,10 @@ Stolen from Rakudo
 .namespace ['CardinalArray']
 
 .sub 'onload' :anon :load :init
-    $P0 = subclass 'ResizablePMCArray', 'CardinalArray'
-    #$P1 = get_hll_global 'Any'
-    #$P1 = $P1.HOW()
-    #addparent $P0, $P1
-    $P1 = get_hll_global ['CardinalObject'], 'make_proto'
-    $P1($P0, 'CardinalArray')
+    .local pmc cardinalmeta, arrayproto
+    cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
+    arrayproto = cardinalmeta.'new_class'('CardinalArray', 'parent'=>'ResizablePMCArray CardinalObject')
+    cardinalmeta.'register'('ResizablePMCArray', 'parent'=>'CardinalObject', 'protoobject'=>arrayproto)
 .end
 
 

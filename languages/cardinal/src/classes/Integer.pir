@@ -18,13 +18,10 @@ CardinalInteger - Cardinal integers
 =cut
 
 .sub 'onload' :anon :init :load
-    $P0 = subclass 'Integer', 'CardinalInteger'
-    #$P1 = get_hll_global 'Any'
-    #$P1 = $P1.HOW()
-    #addparent $P0, $P1
-    $P1 = get_hll_global ['CardinalObject'], 'make_proto'
-    $P1($P0, 'CardinalInteger')
-    $P1('Integer', 'CardinalInteger')
+    .local pmc cardinalmeta, intproto
+    cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
+    intproto = cardinalmeta.'new_class'('CardinalInteger', 'parent'=>'Integer CardinalObject')
+    cardinalmeta.'register'('Float', 'parent'=>'Object', 'protoobject'=>intproto)
 .end
 
 

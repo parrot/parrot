@@ -24,6 +24,8 @@ object.
 
 .namespace
 
+.include 'src/gen_builtins.pir'
+
 .sub 'onload' :anon :load :init
     $P0 = subclass 'ResizablePMCArray', 'List'
 .end
@@ -39,6 +41,9 @@ object.
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
+    .local pmc cardinalmeta
+    cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
+    cardinalmeta.'new_class'('cardinal::Compiler', 'parent'=>'PCT::HLLCompiler')
 
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
@@ -98,7 +103,6 @@ to the cardinal compiler.
 .end
 
 
-.include 'src/gen_builtins.pir'
 .include 'src/gen_grammar.pir'
 .include 'src/gen_actions.pir'
 
