@@ -131,7 +131,6 @@ sub runstep {
         libs           => $libs,
         ld_share_flags => $ld_share_flags,
         ld_load_flags  => $ld_share_flags,
-        i_lib_pthread  => 1,                 # RT#43149 fake a header entry
         linkflags      => $linkflags,
         link           => $link,
         cc_shared      => $cc_shared,
