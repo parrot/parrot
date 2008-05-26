@@ -26,7 +26,7 @@ t/library/p6object.t -- P6object tests
 
     ##  set our plan
     .local int plan_tests
-    plan(108)
+    plan(107)
 
     ##  make sure we can load the P6object library
     push_eh load_failed
@@ -221,9 +221,6 @@ t/library/p6object.t -- P6object tests
     ##  map Integer objects to MyInt
     .local pmc integerproto
     metaproto.'register'('Integer', 'protoobject'=>myintproto)
-    integerproto = get_hll_global 'Integer'
-    $I0 = issame integerproto, myintproto
-    ok($I0, 'Integer proto =:= MyInt proto')
     .local pmc integer
     integer = new 'Integer'
     $S0 = typeof integer

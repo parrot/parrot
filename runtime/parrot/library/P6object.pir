@@ -344,12 +344,11 @@ or 'Object').
     setattribute how, 'longname', longname
     setattribute how, 'shortname', shortname
 
-  have_how:
     ##  store the protoobject in appropriate namespace
-    protoobject = how.'WHAT'()
     $S0 = pop ns
     set_hll_global ns, $S0, protoobject
 
+  have_how:
     ##  map parrotclass to the metaobject
     $I0 = get_addr parrotclass
     mhash[$I0] = how
