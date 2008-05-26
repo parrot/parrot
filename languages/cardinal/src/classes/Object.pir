@@ -296,6 +296,29 @@ Print the object
     .return $P0(self)
 .end
 
+=item methods()
+
+Get a list of all methods in the object.
+
+=cut
+
+.include 'library/dumper.pir'
+.sub 'methods' :method
+    $P0 = class self
+    $P1 = $P0.methods()
+    .local pmc meth_iter
+    meth_iter = new 'Iterator', $P1
+    .local pmc method_list
+    method_list = new 'CardinalArray'
+  methods_loop:
+    unless meth_iter goto methods_loop_end
+    $P0 = shift meth_iter
+    method_list.push($P0)
+    goto methods_loop
+  methods_loop_end:
+    .return(method_list)
+.end
+
 =back
 
 =cut
