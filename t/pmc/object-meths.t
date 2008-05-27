@@ -202,7 +202,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
     print "baz_init\n"
     returncc
 
-    .namespace  # main again
+    .namespace [] # main again
 .pcc_sub _sub:
     print "in sub\n"
     returncc
@@ -625,7 +625,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "same method name in two namespaces" );
     .end_return
 .end
 
-.namespace
+.namespace []
 .sub _main :main
     print "ok\n"
 .end
@@ -1114,7 +1114,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object (RT #5
 .sub 'blah' :method
 .end
 
-.namespace
+.namespace []
 
 .sub main :main
     $P1 = get_hll_global 'Foo'

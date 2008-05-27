@@ -24,7 +24,7 @@ Tests various arguments to the compiler.
 =cut
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'basic compile, no name/grammar' );
-.namespace
+.namespace []
 
 .sub main :main
     load_bytecode 'PGE.pbc'
@@ -40,7 +40,7 @@ ok 1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'compile into current namespace' );
-.namespace
+.namespace []
 
 .sub main :main
     load_bytecode 'PGE.pbc'

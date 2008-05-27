@@ -17,7 +17,6 @@ pir_output_is( <<'CODE', <<'OUT', "different namespace declarations");
 .namespace ["Foo"]
 .namespace [ ]
 .namespace []
-.namespace
 
 .sub test :main
     print "ok\n"

@@ -556,7 +556,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
     .begin_return
     .end_return
 .end
-.namespace
+.namespace []
 .include "library/dumper.pir"
 CODE
 "VAR1" => ResizablePMCArray (size:2) [
@@ -947,7 +947,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper" );
     dumper.'dump'('attr', ar)
     print "\n}"
 .end
-.namespace
+.namespace []
 .include 'library/dumper.pir'
 
 CODE

@@ -8,7 +8,7 @@ Squaak built-in routines
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'print'
     .param pmc args            :slurpy
