@@ -467,11 +467,16 @@ method array($/) {
 }
 
 method ahash($/) {
-    # XXX handle class stuff
-    my $past;
-    my $getclass := PAST::Op.new( :inline('    %r = new "Hash"'), :node($/) );
-    $past := PAST::Op.new( $getclass, :name('new'), :pasttype('callmethod'), :node($/) );
-    make $past;
+    my $hash;
+    if $<args> {
+        $hash := $( $<args>[0] );
+        $hash.name('hash');
+    }
+    else {
+        $hash := PAST::Op.new( :name('hash'), :node($/) );
+    }
+
+    make $hash;
 }
 
 method assocs($/) {

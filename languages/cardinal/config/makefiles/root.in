@@ -44,6 +44,7 @@ BUILTINS_PIR = \
   src/classes/String.pir \
   src/classes/Integer.pir \
   src/classes/Array.pir \
+  src/classes/Hash.pir \
 
 # PMCS = cardinal
 # PMC_SOURCES = $(PMC_DIR)/cardinal.pmc

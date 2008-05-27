@@ -21,7 +21,7 @@ CardinalInteger - Cardinal integers
     .local pmc cardinalmeta, intproto
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
     intproto = cardinalmeta.'new_class'('CardinalInteger', 'parent'=>'Integer CardinalObject')
-    cardinalmeta.'register'('Float', 'parent'=>'Object', 'protoobject'=>intproto)
+    cardinalmeta.'register'('Float', 'parent'=>'CardinalObject', 'protoobject'=>intproto)
 .end
 
 
