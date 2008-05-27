@@ -168,7 +168,7 @@ See RT #48735.
 
 See RT #46715.
 
-=item * C<.namespace> (without brackets)
+=item * C<.namespace> (without brackets) [post 0.6.2]
 
 All should C<.namespace> directives without brackets should take
 empty brackets to indicate the root namespace.
