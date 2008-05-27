@@ -168,6 +168,12 @@ See RT #48735.
 
 See RT #46715.
 
+=item * C<.namespace> (without brackets)
+
+All should C<.namespace> directives without brackets should take
+empty brackets to indicate the root namespace.
+See RT #48549.
+
 =item * vtable name .constants and __vtable overrides [post 0.5.2]
 
 See RT #48877.
