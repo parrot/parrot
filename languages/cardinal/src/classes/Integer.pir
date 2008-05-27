@@ -35,19 +35,6 @@ CardinalInteger - Cardinal integers
 .end
 
 
-=item clone()
-
-=cut
-
-.sub 'clone' :method :vtable
-    .local pmc clone_type
-    clone_type = self.HOW()
-    $P0 = clone_type.'new'()
-    $P0 = self
-    .return($P0)
-.end
-
-
 =item perl()
 
 Returns a Perl representation of the CardinalInteger.

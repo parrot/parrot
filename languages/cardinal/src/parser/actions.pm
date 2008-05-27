@@ -160,7 +160,7 @@ method indexed_variable($/) {
         $args := $( $<args>[0] );
     }
 
-    my $past := PAST::Var.new( :scope('keyed'), :node($/) );
+    my $past := PAST::Var.new( :scope('keyed'), :viviself('Undef'), :node($/) );
     $past.push($var);
     while $args[0] {
         $past.push( $args.shift() );
