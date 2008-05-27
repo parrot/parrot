@@ -1192,12 +1192,21 @@ handler.
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
 
+    .local string rtype
+    rtype = options['rtype']
+
     .local pmc trypast, trypost
     trypast = node[0]
-    trypost = self.'as_post'(trypast, 'rtype'=>'P')
+    trypost = self.'as_post'(trypast, 'rtype'=>rtype)
     ops.'push_pirop'('push_eh', catchlabel)
     ops.'push'(trypost)
     ops.'push_pirop'('pop_eh')
+    .local pmc elsepast, elsepost
+    elsepast = node[2]
+    if null elsepast goto else_done
+    elsepost = self.'as_post'(elsepast, 'rtype'=>'v')
+    ops.'push'(elsepost)
+  else_done:
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(catchlabel)
     .local pmc catchpast, catchpost
