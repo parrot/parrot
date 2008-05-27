@@ -136,7 +136,22 @@ RT#48260: Not yet documented!!!
 char*
 Parrot_asctime_r(const struct tm *tm, char *buffer)
 {
-    return strcpy(buffer, asctime(tm));
+    static const char wday_name[7][] =
+        { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    static const char mon_name[12][] =
+        { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+    sprintf(buffer, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
+        wday_name[tm->tm_wday],
+        mon_name[tm->tm_mon],
+        tm->tm_mday,
+        tm->tm_hour,
+        tm->tm_min,
+        tm->tm_sec,
+        1900 + tm->tm_year);
+
+    return buffer;
 }
 
 /*
