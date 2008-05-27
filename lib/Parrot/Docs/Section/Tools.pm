@@ -66,7 +66,6 @@ sub new {
         $self->new_group(
             'Documentation',
             '',
-            $self->new_item( '', 'tools/dev/extract_file_descriptions.pl' ),
             $self->new_item( '', 'tools/dev/lib_deps.pl' ),
             $self->new_item( '', 'tools/dev/parrot_coverage.pl' ),
             $self->new_item( '', 'tools/docs/write_docs.pl' ),
