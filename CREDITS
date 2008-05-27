@@ -263,6 +263,9 @@ D: Miscellaneous fixes
 N: Gerard Goossen
 D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
+N: Gerd Pokorra
+E: pokorra@uni-siegen.de
+
 N: Goplat
 D: Win98 and other fixes.
 
