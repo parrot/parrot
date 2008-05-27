@@ -266,7 +266,19 @@ method ensure($/) {
 method while_stmt($/) {
     my $cond := $( $<expr> );
     my $body := $( $<comp_stmt> );
+    $body.blocktype('immediate');
     make PAST::Op.new( $cond, $body, :pasttype(~$<sym>), :node($/) );
+}
+
+method for_stmt($/) {
+    my $list := $( $<expr> );
+    my $body := $( $<comp_stmt> );
+    my $var := $( $<variable> );
+    $body.blocktype('declaration');
+    $var.scope('parameter');
+    $var.isdecl(0);
+    $body[0].push($var);
+    make PAST::Op.new( $list, $body, :pasttype('for'), :node($/) );
 }
 
 method module($/) {

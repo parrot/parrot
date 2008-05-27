@@ -185,15 +185,16 @@ proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 
 token basic_primary {
     | <literal> {*}                         #= literal
-    | <indexed_variable> {*}                        #= indexed_variable
+    | <indexed_variable> {*}                #= indexed_variable
     | <command> {*}                         #= command
-    | <not_command> {*}                         #= command
+    | <not_command> {*}                     #= command
     | <variable> {*}                        #= variable
     | <array> {*}                           #= array
-    | <ahash> {*}                            #= ahash
+    | <ahash> {*}                           #= ahash
     | <functiondef> {*}                     #= functiondef
     | <if_stmt> {*}                         #= if_stmt
     | <while_stmt> {*}                      #= while_stmt
+    | <for_stmt> {*}                        #= for_stmt
     | <unless_stmt> {*}                     #= unless_stmt
     | <module> {*}                          #= module
     | <begin_end> {*}                       #= begin_end
@@ -236,6 +237,13 @@ token then { ':' | 'then' | <term> ['then']? }
 
 rule while_stmt {
     $<sym>=['while'|'until'] <expr> <.do>
+    <comp_stmt>
+    'end'
+    {*}
+}
+
+rule for_stmt {
+    'for' <variable> 'in' <expr> <.do>
     <comp_stmt>
     'end'
     {*}
