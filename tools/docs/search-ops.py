@@ -72,7 +72,7 @@ for file in opFiles:
     results = []
     opsc = open(path+file, "r").read()
     
-    p = re.compile("^=item\sB<(\w+)>\(([^)]+)\)\n\n(?=(.*?)\n\n)", re.MULTILINE|re.DOTALL)
+    p = re.compile("^=item\sB<(\w+)>\(([^)]*)\)\n{2,}(?=(.*?)\n{2,})", re.MULTILINE|re.DOTALL)
     for m in p.findall(opsc):
         if query.search(m[0]) is None:
             continue
@@ -82,7 +82,7 @@ for file in opFiles:
         results.append(m)
     
     if len(results) > 0:
-        title = re.compile("^=head1\sNAME\n\n(.*)", re.MULTILINE).search(opsc).group(1)
+        title = re.compile("^=head1\sNAME\n{2,}(.*)", re.MULTILINE).search(opsc).group(1)
         matches.append({"f": title, "rs": results})
         
 if len(matches) == 0:
