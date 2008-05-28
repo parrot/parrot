@@ -5,7 +5,7 @@ Sockets!
 =cut
 
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub '&socket'
     .param pmc argv :slurpy

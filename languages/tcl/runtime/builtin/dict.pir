@@ -2,7 +2,7 @@
 # [dict]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub '&dict'
   .param pmc argv :slurpy

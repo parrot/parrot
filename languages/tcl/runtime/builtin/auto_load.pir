@@ -2,7 +2,7 @@
 # help tcltest compile
 
 .HLL '_Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub 'auto_load'
   .param string retval

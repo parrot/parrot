@@ -2,7 +2,7 @@
 # [variable]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub '&variable'
     .param pmc argv :slurpy

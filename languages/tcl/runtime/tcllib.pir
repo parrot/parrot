@@ -46,7 +46,7 @@ providing a compreg-compatible method.
 .end
 
 .HLL '_Tcl', ''
-.namespace
+.namespace []
 
 .sub __load_macros :load :anon
   $P0 = compreg 'PIR'
@@ -261,7 +261,7 @@ env_loop_done:
 
 # Load the standard library
 .HLL 'Tcl', ''
-.namespace
+.namespace []
 
 .sub __load_stdlib :load :anon
   .include 'iglobals.pasm'

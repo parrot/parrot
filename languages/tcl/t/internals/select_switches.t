@@ -18,7 +18,7 @@ builtins.
 =cut
 
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub main :main
     load_bytecode 'library/Test/More.pir'
