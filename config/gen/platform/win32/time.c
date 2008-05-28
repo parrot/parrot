@@ -136,9 +136,9 @@ RT#48260: Not yet documented!!!
 char*
 Parrot_asctime_r(const struct tm *tm, char *buffer)
 {
-    static const char wday_name[7][] =
+    static const char wday_name[7][4] =
         { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-    static const char mon_name[12][] =
+    static const char mon_name[12][4] =
         { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
