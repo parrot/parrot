@@ -1,4 +1,4 @@
-/* stacks.h
+/* intlist.h
  *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
