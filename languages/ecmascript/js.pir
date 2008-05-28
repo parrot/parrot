@@ -18,7 +18,7 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 ## Create a 'List' class; stolen from Rakudo.
 ## At some point, this should be refactored/reused.
 ##
-.namespace
+.namespace []
 
 .sub '__onload' :load :init
     $P0 = subclass 'ResizablePMCArray', 'List'
@@ -85,7 +85,7 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 .include 'src/gen_actions.pir'
 
 
-.namespace
+.namespace []
 
 .include 'src/builtin/builtins.pir'
 

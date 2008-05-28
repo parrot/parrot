@@ -1,6 +1,6 @@
 
 .HLL 'Forth', ''
-.namespace
+.namespace []
 
 .include 'languages/forth/words.pir'
 

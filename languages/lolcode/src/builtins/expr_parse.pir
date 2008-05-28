@@ -4,7 +4,7 @@ expr_parse.pir - parse an expression and dispatch function calls with their appr
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'setup_global_parsing_tokens' :init :load :anon
     $P0 = new 'String'

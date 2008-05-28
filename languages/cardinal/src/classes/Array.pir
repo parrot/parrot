@@ -581,7 +581,7 @@ Build a CardinalArray from its arguments.
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'list'
     .param pmc args            :slurpy

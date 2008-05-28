@@ -62,14 +62,14 @@ to the Squaak compiler.
 .include 'src/gen_actions.pir'
 
 
-.namespace
+.namespace []
 
 .sub 'initlist' :anon :load :init
     $P0 = new 'ResizablePMCArray'
     set_hll_global ['Squaak';'Grammar';'Actions'], '@?BLOCK', $P0
 .end
 
-.namespace
+.namespace []
 
 .sub '!array'
     .param pmc fields :slurpy

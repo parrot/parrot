@@ -6,7 +6,7 @@ var_or_function.pir - Distinguish variable access and function call
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'var_or_function'
     .param pmc name

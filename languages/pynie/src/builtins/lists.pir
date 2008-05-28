@@ -8,7 +8,7 @@ src/builtins/lists.pir - List operations
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'listmaker'
     .param pmc args            :slurpy

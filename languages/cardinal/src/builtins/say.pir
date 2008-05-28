@@ -6,7 +6,7 @@ builtin functions for Ruby.
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'print'
     .param pmc args            :slurpy

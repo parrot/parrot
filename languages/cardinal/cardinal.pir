@@ -22,7 +22,7 @@ object.
 =cut
 
 
-.namespace
+.namespace []
 
 .include 'src/gen_builtins.pir'
 

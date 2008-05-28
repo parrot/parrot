@@ -11,7 +11,7 @@ Swiped from Rakudo.
 
 =cut
 
-.namespace
+.namespace []
 
 
 .sub 'prefix:?' :multi(_)
