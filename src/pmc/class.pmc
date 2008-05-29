@@ -129,16 +129,15 @@ build_attrib_index(PARROT_INTERP, PMC *self)
             /* Iterate over the attributes. */
             while (VTABLE_get_bool(interp, iter)) {
                 /* Get attribute. */
-                PMC    * const cur_attrib  = VTABLE_get_pmc_keyed_str(interp, attribs,
-                    VTABLE_shift_string(interp, iter));
-                STRING *full_key           = string_copy(interp, fq_class);
+                PMC    * const cur_attrib  = VTABLE_get_pmc_keyed_str(interp,
+                        attribs, VTABLE_shift_string(interp, iter));
 
                 /* Get attribute name and append it to the key. */
-                STRING * const name_str = CONST_STRING(interp, "name");
+                STRING * const name_str    = CONST_STRING(interp, "name");
                 STRING * const attrib_name = VTABLE_get_string_keyed_str(
                     interp, cur_attrib, name_str);
 
-                full_key = string_append(interp, full_key, attrib_name);
+                STRING *full_key           = string_append(interp, fq_class, attrib_name);
 
                 /* Insert into hash, along with index. */
                 VTABLE_set_integer_keyed_str(interp, table, full_key, cur_index);
