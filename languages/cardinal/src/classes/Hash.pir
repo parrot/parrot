@@ -21,21 +21,48 @@ src/classes/CardinalHash.pir - Cardinal hash class and related functions
 
 
 .sub 'get_string' :vtable :method
-    $S0 = ''
+    $S0 = '{'
     .local pmc iter
     iter = new 'Iterator', self
+    goto loop_start
   loop:
     unless iter goto end
+    $S0 = concat $S0, ','
+  loop_start:
     $S1 = shift iter
     $S2 = iter[$S1]
     $S0 = concat $S0, $S1
-    concat $S0, "\t"
+    $S0 = concat $S0, '=>'
     concat $S0, $S2
-    concat $S0, "\n"
     goto loop
   end:
+    concat $S0, '}'
     .return ($S0)
 .end
+
+=item to_s (method)
+
+Returns a string of keys and values appended together.
+
+=cut
+
+.sub 'to_s' :method
+    .local pmc iter
+    .local pmc rv
+    iter = new 'Iterator', self
+    rv   = new 'CardinalString'
+  loop:
+    unless iter goto end
+    $S1 = shift iter
+    concat rv, $S1
+    $S1 = iter[$S1]
+    concat rv, $S1
+    goto loop
+  end:
+    .return (rv)
+.end
+
+
 
 =item kv (method)
 
@@ -89,6 +116,25 @@ Returns elements of hash as array of C<Pair(key, value)>
     goto loop
   end:
     .return (rv)
+.end
+
+=item each(block)
+
+Run C<block> once for each item in C<self>, with the key and value passed as args.
+
+=cut
+
+.sub 'each' :method
+    .param pmc block
+    .local pmc iter
+    iter = new 'Iterator', self
+  each_loop:
+    unless iter goto each_loop_end
+    $P1 = shift iter
+    $P2 = iter[$P1]
+    block($P1,$P2)
+    goto each_loop
+  each_loop_end:
 .end
 
 

@@ -23,15 +23,29 @@ Stolen from Rakudo
 
 =item get_string()    (vtable method)
 
-Return the elements of the list joined by spaces.
+Return the elements of the list concatenated.
 
 =cut
 
 .sub 'get_string' :vtable :method
-    $S0 = join ' ', self
+    $S0 = join ', ', self
+    $S0 = concat '[', $S0
+    $S0 = concat $S0, ']'
     .return ($S0)
 .end
 
+=item to_s()    (method)
+
+Return a CardinalString representing the Array.
+
+=cut
+
+.sub 'to_s' :method
+    $S0 = self.get_string()
+    $P0 = new 'CardinalString'
+    $P0 = $S0
+    .return($P0)
+.end
 
 =item clone()    (vtable method)
 

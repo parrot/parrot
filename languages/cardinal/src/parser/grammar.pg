@@ -120,8 +120,8 @@ token command {
 }
 
 rule call {
-    [ <primary=variable> $<dot>=['.'|'::'] ]?
-    <operation> <call_args> <do_block>?
+    [ <primary=variable> $<dot>=['.'|'::'] | <.before [<operation><.ws><call_args>]>]
+    <operation> <call_args>? <do_block>?
     {*}
 }
 

@@ -360,14 +360,14 @@ method call($/) {
     my $op := $<operation>;
     my $past;
     if $<call_args> {
-        $past := $( $<call_args> );
+        $past := $( $<call_args>[0] );
     }
     else {
         $past := PAST::Op.new();
     }
 
     if $<primary> {
-        my $invocant := $( $<primary>[0] );
+        my $invocant := $( $<primary> );
         # XXX what's the diff. between "." and "::", in $<op>[0] ?
         $past.unshift($invocant);
         $past.pasttype('callmethod');

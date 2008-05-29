@@ -229,6 +229,18 @@ Returns a Perl representation of the Str.
     .return ($S0)
 .end
 
+=item to_s()
+
+Returns self
+
+=cut
+
+.sub 'to_s' :method
+    $P0 = new 'CardinalString'
+    $P0 = self
+    .return ($P0)
+.end
+
 =back
 
 =head1 Functions

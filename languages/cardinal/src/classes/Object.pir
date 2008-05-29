@@ -296,6 +296,23 @@ Print the object
     .return $P0(self)
 .end
 
+=item to_s()
+
+Return a CardinalString representation of the object.
+
+=cut
+
+.sub 'to_s' :method
+    $P0 = new 'CardinalString'
+    $P0 = self
+    .return ($P0)
+.end
+
+.sub 'puts' :method
+    $P0 = get_hll_global 'puts'
+    .return $P0(self)
+.end
+
 =item methods()
 
 Get a list of all methods in the object.

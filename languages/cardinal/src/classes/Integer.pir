@@ -47,6 +47,19 @@ Returns a Perl representation of the CardinalInteger.
 .end
 
 
+=item to_s()
+
+Returns a CardinalString representation of the CardinalInteger.
+
+=cut
+
+.sub 'to_s' :method
+    $P0 = new 'CardinalString'
+    $P0 = self
+    .return($P0)
+.end
+
+
 =item downto(n, block)
 
 Runs C<block> for each integer from the current value of the Integer down to n.
