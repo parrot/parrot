@@ -1,0 +1,110 @@
+#!perl
+# Copyright (C) 2001-2008, The Perl Foundation.
+# $Id$
+
+use strict;
+use warnings;
+use lib qw( lib );
+
+use Test::Harness ();
+use Parrot::Harness::DefaultTests ();
+
+Test::Harness::runtests(@Parrot::Harness::DefaultTests::developing_tests);
+
+=head1 NAME
+
+t/harness - Parrot Test Harness
+
+=head1 SYNOPSIS
+
+    % perl t/harness [options] [testfiles]
+
+=head1 DESCRIPTION
+
+The short command line options are:
+
+=over 4
+
+=item C<-w>
+
+Turn warnings on.
+
+=item C<-g>
+
+Run the C<CGoto> core.
+
+=item C<-j>
+
+Run with JIT enabled.
+
+=item C<-C>
+
+Run the C<CGP> core.
+
+=item C<-S>
+
+Run Switched.
+
+=item C<-b>
+
+Run bounds checking enabled.
+
+=item C<-d>
+
+Run with debugging enabled.
+
+=item C<-f>
+
+Run fast core.
+
+=item C<-r>
+
+compile to Parrot bytecode and then run the bytecode.
+
+=item C<-O[012]>
+
+Run optimized to the specified level.
+
+=item C<-D[number]>
+
+Pass the specified debug bits to the parrot interpreter.  Note that 
+C<-D40> (fill I, N registers with garbage) is always enabled.  
+See 'parrot --help-debug' for available flags.
+
+=back
+
+There are also long command line options:
+
+=over 4
+
+=item C<--running-make-test>
+
+Some test scripts run more quickly when this is set.
+
+=item C<--gc-debug>
+
+Invoke parrot with '--gc-debug'.
+
+=item C<--html>
+
+Emit a C<smoke.html> file instead of displaying results.
+
+=back
+
+=head1 HISTORY
+
+Mike Lambert stole F<t/harness> for F<languages/perl6/t/harness>.
+
+Leo Toetsch stole F<languages/perl6/t/harness> for F<imcc/t/harness>.
+
+Bernhard Schmalhofer merged F<imcc/t/harness> back into F<t/harness>.
+
+=cut
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
