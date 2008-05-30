@@ -1718,6 +1718,8 @@ attribute.
 
     $P0 = node.'vivibase'()
     unless $P0 goto have_vivibase
+    $I0 = can basepast, 'viviself'
+    unless $I0 goto have_vivibase
     $P1 = basepast.'viviself'()
     unless $P1 goto vivibase_1
     if $P1 != 'Undef' goto have_vivibase
