@@ -188,6 +188,7 @@ CONFIGURE_GENERATED_FILES = \
     ext/Parrot-Embed/Makefile.PL \
     myconfig  \
     $(GEN_PASM_INCLUDES) \
+    $(SRC_DIR)/call_list.txt \
     MANIFEST.configure.generated
 
 
@@ -212,7 +213,6 @@ GEN_HEADERS = \
     $(INC_DIR)/pbcversion.h
 
 GEN_SOURCES = \
-    $(SRC_DIR)/call_list.txt \
     $(SRC_DIR)/core_ops.c \
     $(SRC_DIR)/nci.c \
     $(SRC_DIR)/core_ops_switch.c \
