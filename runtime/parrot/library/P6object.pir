@@ -124,6 +124,20 @@ Return the C<P6protoobject> for the invocant.
 .end
 
 
+=item PROTOOVERRIDES()
+
+Return a list of methods to be overridden in protoobjects
+for the class.  Defaults to 'new' (i.e., any '.new' method
+in a class will override the one given for P6protoobject
+below).
+
+=cut
+
+.sub 'PROTOOVERRIDES' :method
+    .return ('new')
+.end
+
+
 =back
 
 =head2 P6metaclass
@@ -317,22 +331,32 @@ or 'Object').
     ##  P6protoobject methods override parrotclass methods...
     protoclass.'add_parent'($P0)
     protoclass.'add_parent'(parrotclass)
+    protoobject = new protoclass
+    ##  ...except for the ones that don't
+    .local pmc protooverrides
+    (protooverrides :slurpy) = protoobject.'PROTOOVERRIDES'()
+  override_loop:
+    unless protooverrides goto override_end
+    .local string methodname
+    methodname = shift protooverrides
+    unless methodname goto override_loop
     $P0 = parrotclass.'inspect'('all_parents')
     iter = new 'Iterator', $P0
-  newmethod_loop:
-    unless iter goto newmethod_end
+  method_loop:
+    unless iter goto method_end
     $P0 = shift iter
     $P0 = $P0.'methods'()
-    $P0 = $P0['new']
-    if null $P0 goto newmethod_loop
-    protoclass.'add_method'('new', $P0)
-  newmethod_end:
+    $P0 = $P0[methodname]
+    if null $P0 goto method_loop
+    protoclass.'add_method'(methodname, $P0)
+  method_end:
+    goto override_loop
+  override_end:
   have_protoclass:
     ##  register the protoclass in %!metaobject
     $I0 = get_addr protoclass
     mhash[$I0] = how
-    ##  create the protoobject for parrotclass
-    protoobject = new protoclass
+    ##  save the protoobject
     setattribute how, 'protoobject', protoobject
 
     ##  store the long and short names in the protoobject
@@ -589,37 +613,16 @@ Returns a proto-object with an autovivification closure attached to it.
 
 .sub 'ACCEPTS' :method
     .param pmc topic
-    .local pmc HOW, p6meta
+    .local pmc topichow, topicwhat, parrotclass
 
-    # Do a does check against the topic.
-    p6meta = get_hll_global 'P6metaclass'
-    HOW = p6meta.'get_parrotclass'(self)
-    $I0 = does topic, HOW
-    if $I0 goto do_return
-
-    # If that didn't work, try invoking the ACCEPTS of the class itself.
-    # XXX Once we get callsame-like stuff implemented, this logic should go away.
-  try_class_accepts:
-    .local pmc parents, found
-    .local int i, count
-    parents = inspect HOW, 'all_parents'
-    count = elements parents
-    i = 1 # skip protoclass
-  find_next_loop:
-    if i >= count goto find_next_loop_end
-    $P0 = parents[i]
-    $P0 = inspect $P0, 'methods'
-    found = $P0['ACCEPTS']
-    unless null found goto find_next_loop_end
-    inc i
-    goto find_next_loop
-  find_next_loop_end:
-
-    $I0 = 0
-    if null found goto do_return
-    $I0 = found(self, topic)
-  do_return:
-    .return 'prefix:?'($I0)
+    topichow = topic.'HOW'()
+    topicwhat = topic.'WHAT'()
+    parrotclass = topichow.'get_parrotclass'(self)
+    $I0 = isa topicwhat, parrotclass
+    if $I0 goto end
+    $I0 = does topic, parrotclass
+  end:
+    .return ($I0)
 .end
 
 
