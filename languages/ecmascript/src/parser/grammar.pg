@@ -338,8 +338,8 @@ token exponent_part { <[eE]> <[+\-]> <digit>+ }
 
 token str_literal {
     [
-    | '"' <string_literal: "> '"'
-    | \' <string_literal: '> \'
+    | '"' <string_literal: '"'> '"'
+    | \' <string_literal: '\''> \'
     ]
     {*}
 }
