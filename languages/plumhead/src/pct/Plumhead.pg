@@ -21,7 +21,7 @@ token PHP_SAPI_NAME           { 'php_sapi_name' }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
-token IDENT                   { ( <[a..z]> | <[A..Z]> | '_' )( <[a..z]> | <[A..Z]> | '_' )* }
+token IDENT                   { ( <[a..z]> | <[A..Z]> | '_' )( <[a..z]> | <[A..Z]> | '_' | <[0..9]> )* }
 token VAR_NAME                {  '$' <IDENT> }
 
 token INTEGER                 { \d+ }

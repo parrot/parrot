@@ -19,7 +19,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 5;
+use Test::More     tests => 6;
 
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'string assignment' );
@@ -61,6 +61,35 @@ echo "\n";
 ?>
 END_CODE
 1000
+END_OUT
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'expression assignment' );
+<?php
+$h       = 1;
+$e1      = 2;
+$e0f     = 3;
+$e12345  = 4;
+$_e12345 = 5;
+$_12345  = 6;
+$_0      = 7;
+
+echo $h; echo "\n";
+echo $e1; echo "\n";
+echo $e0f; echo "\n";
+echo $e12345; echo "\n";
+echo $_e12345; echo "\n";
+echo $_12345; echo "\n";
+echo $_0; echo "\n";
+
+?>
+END_CODE
+1
+2
+3
+4
+5
+6
+7
 END_OUT
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'case sensitivity' );
