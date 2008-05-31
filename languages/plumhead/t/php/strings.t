@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 5;
+use Test::More     tests => 6;
 
 # Parrot modules
 use Parrot::Test;
@@ -86,5 +86,16 @@ var_dump( 'asdf' );
 ?>
 END_CODE
 string(4) "asdf"
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'string interpolation', todo => 'not implemented yet' );
+<?php
+$var1 = "VAR1";
+$var2 = "VAR2";
+echo "$var1 $var2\n";
+?>
+END_CODE
+VAR1 VAR2
 END_EXPECTED
 
