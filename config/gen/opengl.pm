@@ -276,6 +276,11 @@ my @IGNORE = (
 );
 
 my @SKIP = (
+    # Mesa API-mangling headers (to load vendor GL and Mesa simultaneously)
+    'gl_mangle.h',
+    'glu_mangle.h',
+    'glx_mangle.h',
+
     # Apple CGL OpenGL API conversion macros
     'CGLMacro.h',
 
