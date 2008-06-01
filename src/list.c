@@ -238,9 +238,6 @@ static void list_append(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*list);
 
-static void list_dump(ARGIN(const List *list), INTVAL type)
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void * list_item(PARROT_INTERP,
@@ -338,56 +335,6 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     /*Parrot_unblock_GC(interp); */
     return chunk;
 }
-
-#ifdef LIST_DEBUG
-
-/*
-
-=item C<static void list_dump>
-
-Only char and int are supported currently.
-
-=cut
-
-*/
-
-static void
-list_dump(ARGIN(const List *list), INTVAL type)
-{
-    const List_chunk *chunk = list->first;
-    UINTVAL idx = 0;
-
-    for (; chunk; chunk = chunk->next) {
-        printf(chunk->flags & no_power_2 ? "(" : "[");
-        if (chunk->flags & sparse)
-            printf(INTVAL_FMT " x ''", chunk->items);
-        else {
-            UINTVAL i;
-            for (i = 0; i < chunk->items; i++) {
-                if (idx++ >= list->start && idx <= list->length + list->start) {
-                    switch (list->item_type) {
-                    case enum_type_int:
-                    case enum_type_short:
-                        printf("%d", (int)((int *)
-                                           PObj_bufstart(&chunk->data))[i]);
-                        break;
-                    case enum_type_char:
-                        printf("%c", (char)((char *)
-                                            PObj_bufstart(&chunk->data))[i]);
-                        break;
-                    }
-                }
-                if (i < chunk->items - 1)
-                    printf(",");
-            }
-        }
-        printf(chunk->flags & no_power_2 ? ")" : "]");
-        if (chunk->next)
-            printf(" -> ");
-    }
-    printf("\n");
-}
-#endif
 
 /*
 

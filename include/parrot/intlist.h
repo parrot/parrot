@@ -55,12 +55,6 @@ IntList * intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void intlist_dump(ARGMOD(FILE *fp), ARGMOD(IntList *list), int verbose)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*fp)
-        FUNC_MODIFIES(*list);
-
 PARROT_WARN_UNUSED_RESULT
 INTVAL intlist_get(PARROT_INTERP, ARGMOD(IntList *list), INTVAL idx)
         __attribute__nonnull__(1)
