@@ -138,7 +138,7 @@ END_C
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'maps' );
 pmclass a hll dale maps Integer { }
 END_PMC
-            const INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "dale")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING(interp, "dale")
             );
             if (pmc_id > 0) {
                 Parrot_register_HLL_type( interp, pmc_id, enum_class_Integer, entry);
@@ -148,7 +148,7 @@ END_C
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'maps, more than one.' );
 pmclass a hll dale maps Integer maps Float { }
 END_PMC
-            const INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "dale")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING(interp, "dale")
             );
             if (pmc_id > 0) {
                 Parrot_register_HLL_type( interp, pmc_id, enum_class_Float, entry);
