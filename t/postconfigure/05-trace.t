@@ -7,7 +7,6 @@ use strict;
 use warnings;
 no warnings 'once';
 use Carp;
-use Data::Dumper;
 use Test::More;
 if ( ( -e qq{./lib/Parrot/Config/Generated.pm} )
     and ( -e qq{./.configure_trace.sto} ) )
