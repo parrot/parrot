@@ -33,7 +33,8 @@ sub runstep {
         has_dynamic_linking => 1,
         parrot_is_shared    => 1,
         sym_export          => '__declspec(dllexport)',
-        sym_import          => '__declspec(dllimport)'
+        sym_import          => '__declspec(dllimport)',
+        cygchkdll           => 'tools/build/cygchkdll.sh $(MINIPARROT) $(LIBPARROT)',
     );
 
     # inet_aton needs to be defined on Cygwin.
