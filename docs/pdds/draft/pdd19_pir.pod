@@ -276,20 +276,21 @@ Closes the scope block that was opened with .namespace <identifier>.
 
 =item .namespace [ <identifier> ; <identifier> ]
 
+   .namespace [ <key>? ]
+
+   key: <identifier> [';' <identifier>]*
+
 Defines the namespace from this point onwards.  By default the program is not
 in any namespace.  If you specify more than one, separated by semicolons, it
 creates nested namespaces, by storing the inner namespace object in the outer
 namespace's global pad.
 
-{{ PROPOSAL: make the brackets non-optional for specifying the "root"
-namespace, so the key becomes optional.
+You can specify the root namespace by using empty brackets, such as:
 
-   .namespace [ <key>? ]
+    .namespace [ ]
 
-   key: <identifier> [';' <identifier>]*
+The brackets are not optional, although the string inside them is.
 
-   Also, the "identifier" should be a quoted string?
-}}
 
 =item .pragma n_operators
 
