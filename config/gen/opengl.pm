@@ -186,6 +186,7 @@ my %NCI_TYPE = (
     short        => 's',
     int          => 'i',
     long         => 'l',
+    size_t       => 'l',
     ptrdiff_t    => 'l',
     # Requires RT 53406
     # longlong     => 'L',
@@ -229,7 +230,8 @@ my @IGNORE = (
     # Don't handle this odd create/callback register function yet
     'glutCreateMenu',
 
-    # Don't handle GLU or MUI callbacks yet
+    # Don't handle Mesa, GLU, or MUI callbacks yet
+    'glProgramCallbackMESA',
     'gluNurbsCallback',
     'gluQuadricCallback',
     'gluTessCallback',
@@ -489,7 +491,7 @@ sub gen_opengl_wrappers {
             s/^\s+//;
 
             # Canonicalize types
-            s/\b(\w+)\b/$C_TYPE{$1} ? $C_TYPE{$1} : $1/eg;
+            s/\b(\w+)\b/$C_TYPE{$1} || $1/eg;
             s/\b(?:un)?signed //g;
             s/\blong long\b/longlong/g;
 
