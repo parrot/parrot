@@ -76,8 +76,7 @@ include:
 
 .namespace ['OpenGL']
 
-.include 'datatypes.pasm'
-.include 'iterator.pasm'
+.include 'library/OpenGL_funcs.pir'
 
 
 =item _opengl_init()
@@ -148,7 +147,6 @@ match can be found on the system.
 
     .local pmc    list_iter
     list_iter = new 'Iterator', fallback_list
-    list_iter = .ITERATE_FROM_START
 
     .local string libname
     .local pmc    library
@@ -198,120 +196,6 @@ Create NCI wrappers for all GL, GLU, and GLUT functions
     _wrap_nci_list(namespace, libglutcb, glutcb_funcs)
 .end
 
-.sub _gl_func_list
-    .local pmc gl_funcs
-    gl_funcs = new 'ResizableStringArray'
-    push gl_funcs, 'glBegin'
-    push gl_funcs, 'vi'
-    push gl_funcs, 'glClear'
-    push gl_funcs, 'vi'
-    push gl_funcs, 'glColor3f'
-    push gl_funcs, 'vfff'
-    push gl_funcs, 'glEnd'
-    push gl_funcs, 'v'
-    push gl_funcs, 'glFlush'
-    push gl_funcs, 'v'
-    push gl_funcs, 'glVertex3f'
-    push gl_funcs, 'vfff'
-    push gl_funcs, 'glRotatef'
-    push gl_funcs, 'vffff'
-
-    .return (gl_funcs)
-.end
-
-.sub _glu_func_list
-    .local pmc glu_funcs
-    glu_funcs = new 'ResizableStringArray'
-
-    .return (glu_funcs)
-.end
-
-.sub _glut_func_list
-    .local pmc glut_funcs
-    glut_funcs = new 'ResizableStringArray'
-    push glut_funcs, 'glutInit'
-    push glut_funcs, 'v3p'
-    push glut_funcs, 'glutInitDisplayMode'
-    push glut_funcs, 'vi'
-    push glut_funcs, 'glutCreateWindow'
-    push glut_funcs, 'it'
-    push glut_funcs, 'glutDestroyWindow'
-    push glut_funcs, 'vi'
-    push glut_funcs, 'glutMainLoop'
-    push glut_funcs, 'v'
-    push glut_funcs, 'glutPostRedisplay'
-    push glut_funcs, 'v'
-    push glut_funcs, 'glutSwapBuffers'
-    push glut_funcs, 'v'
-
-    .return (glut_funcs)
-.end
-
-.sub _glutcb_func_list
-    .local pmc glutcb_funcs
-    glutcb_funcs = new 'ResizableStringArray'
-    push glutcb_funcs, 'glutcbCloseFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbDisplayFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbIdleFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbMenuDestroyFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbOverlayDisplayFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbWMCloseFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbEntryFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbMenuStateFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbVisibilityFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbWindowStatusFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbButtonBoxFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbDialsFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbMotionFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbPassiveMotionFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbReshapeFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbSpaceballButtonFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbTabletMotionFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbKeyboardFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbKeyboardUpFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbMenuStatusFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbSpaceballMotionFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbSpaceballRotateFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbSpecialFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbSpecialUpFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbMouseFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbMouseWheelFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbTabletButtonFunc'
-    push glutcb_funcs, 'vJP'
-    push glutcb_funcs, 'glutcbTimerFunc'
-    push glutcb_funcs, 'vJPii'
-    push glutcb_funcs, 'glutcbJoystickFunc'
-    push glutcb_funcs, 'vJPi'
-
-    .return (glutcb_funcs)
-.end
-
 
 =item _wrap_nci_list(pmc namespace, pmc library, pmc nci_list)
 
@@ -331,7 +215,6 @@ alternating function names and Parrot NCI signatures.
 
     .local pmc list_iter
     list_iter = new 'Iterator', nci_list
-    list_iter = .ITERATE_FROM_START
 
     .local string func_name, signature
     .local pmc    function
