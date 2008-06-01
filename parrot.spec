@@ -105,7 +105,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/*
 %{_libdir}/parrot
 %{_libdir}/libparrot.so.*
-%{_usr}/runtime
 
 %files devel
 %defattr(-,root,root,-)
