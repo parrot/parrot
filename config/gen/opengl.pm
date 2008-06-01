@@ -104,6 +104,8 @@ my %C_TYPE = (
     GLXHyperpipeConfigSGIX  => 'void',
     GLXHyperpipeNetworkSGIX => 'void',
 
+    wchar_t                 => 'void',
+
     GLXContext              => 'void*',
     GLXFBConfig             => 'void*',
     GLXFBConfigSGIX         => 'void*',
@@ -322,7 +324,7 @@ sub runstep {
         '/System/Library/Frameworks/GLUT.framework/Headers/*.h',
 
         # Windows/MSVC
-        (map {("$_/*.h", "$_/gl/*.h")} @include_paths_win32),
+        (map "$_/gl/*.h" => @include_paths_win32),
 
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
