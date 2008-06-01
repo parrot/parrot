@@ -278,12 +278,16 @@ string_init(PARROT_INTERP)
             interp->parent_interpreter->const_cstring_table;
         return;
     }
-    interp->const_cstring_table = mem_allocate_n_zeroed_typed(n_parrot_cstrings, STRING*);
-    for (i = 0; i < n_parrot_cstrings; ++i) {
-        interp->const_cstring_table[i] = const_string(interp, parrot_cstrings[i].string);
-        /* TODO construct string here and valid hashval */
-    }
+    interp->const_cstring_table =
+        mem_allocate_n_zeroed_typed(n_parrot_cstrings, STRING *);
 
+    for (i = 0; i < n_parrot_cstrings; ++i) {
+        interp->const_cstring_table[i] = string_make_direct(interp,
+                parrot_cstrings[i].string,
+                parrot_cstrings[i].len,
+                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                PObj_external_FLAG|PObj_constant_FLAG);
+    }
 }
 
 /*
