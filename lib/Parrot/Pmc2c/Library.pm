@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -77,6 +77,7 @@ sub gen_c {
 
     $cout .= <<"EOC";
 #define PARROT_IN_EXTENSION
+#define CONST_STRING(i, s) const_string(i, s)
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/dynext.h"

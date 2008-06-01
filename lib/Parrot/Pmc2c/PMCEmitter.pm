@@ -67,7 +67,10 @@ sub generate_c_file {
     my $c      = $self->{emitter};
 
     $c->emit( dont_edit( $self->filename ) );
-    $c->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
+    if ($self->is_dynamic) {
+        $c->emit("#define PARROT_IN_EXTENSION\n");
+        $c->emit("#define CONST_STRING(i, s) const_string((i), s)\n");
+    }
 
     $self->gen_includes;
 
@@ -643,7 +646,7 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            const INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "$hll")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING(interp, "$hll")
             );
             if (pmc_id > 0) {
 EOC
