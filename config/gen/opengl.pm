@@ -317,7 +317,7 @@ sub runstep {
         '/System/Library/Frameworks/GLUT.framework/Headers/*.h',
 
         # Windows/MSVC
-        (split /;/ => ($ENV{Include} || '')),
+        (map "$_/gl/*.h" => split /;/ => ($ENV{Include} || '')),
 
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
