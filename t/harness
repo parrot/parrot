@@ -8,7 +8,10 @@ use lib qw( lib );
 
 use Getopt::Std;
 use Test::Harness ();
-use Parrot::Harness::DefaultTests;
+use Parrot::Harness::DefaultTests qw(
+    get_default_tests
+    @developing_tests
+);
 use Parrot::Harness::Options qw(
     handle_long_options
     get_test_prog_args
@@ -50,15 +53,18 @@ my @default_tests = get_default_tests(
 
 my @tests = map { glob( $_ ) } (@ARGV ? @ARGV : @default_tests);
 
-if ( ! $longopts->{html} ) {
-    Test::Harness::runtests(@tests);
+if ( $longopts->{code} ) {
+    Test::Harness::runtests(@developing_tests);
 }
-else {
+elsif ( $longopts->{html} ) {
     generate_html_smoke_report ( {
         tests       => \@tests,
         args        => $args,
         file        => 'smoke.html',
     } );
+}
+else {
+    Test::Harness::runtests(@tests);
 }
 
 =head1 NAME
@@ -138,6 +144,10 @@ Invoke parrot with '--gc-debug'.
 =item C<--html>
 
 Emit a C<smoke.html> file instead of displaying results.
+
+=item C<--code-tests>
+
+Run only the file metadata and basic coding standards tests.
 
 =back
 

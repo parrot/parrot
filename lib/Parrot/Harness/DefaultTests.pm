@@ -10,6 +10,14 @@ Parrot::Harness::DefaultTests - Tests run by default by F<t/harness>
 This file exports by default a single subroutine, C<get_default_tests()>,
 which is the list of tests run by F<t/harness> by default.
 
+Upon request, this package exports five arrays holding various sets of tests:
+
+    @runcore_tests
+    @core_tests
+    @configure_tests
+    @standard_tests
+    @developing_tests
+
 In list context, C<get_default_tests()> returns the list of default tests.  In
 scalar context it returns a reference to that list.
 
@@ -20,11 +28,25 @@ package Parrot::Harness::DefaultTests;
 use strict;
 use warnings;
 
+our (
+    @runcore_tests,
+    @core_tests,
+    @configure_tests,
+    @standard_tests,
+    @developing_tests
+);
 use base qw( Exporter );
 our @EXPORT = qw( get_default_tests );
+our @EXPORT_OK = qw(
+    @runcore_tests
+    @core_tests
+    @configure_tests
+    @standard_tests
+    @developing_tests
+);
 
 # runcore tests are always run.
-our @runcore_tests = qw(
+@runcore_tests = qw(
     t/compilers/imcc/*/*.t
     t/op/*.t
     t/pmc/*.t
@@ -42,7 +64,7 @@ our @runcore_tests = qw(
 
 # core tests are run unless --runcore-tests is present.  Typically
 # this list and the list above are run in response to --core-tests
-our @core_tests = qw(
+@core_tests = qw(
     t/run/*.t
     t/src/*.t
     t/tools/*.t
@@ -53,15 +75,15 @@ our @core_tests = qw(
 # configure tests are tests to be run at the beginning of 'make test';
 # standard tests are other tests run by default with no core options
 # present
-our @configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
-our @standard_tests = qw(
+@configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
+@standard_tests = qw(
     t/compilers/json/*.t
     t/examples/*.t
     t/doc/*.t
     t/distro/manifest.t
 );
 
-our @developing_tests = (
+@developing_tests = (
     't/distro/file_metadata.t',
     map { "t/codingstd/$_" } qw(
         c_code_coda.t

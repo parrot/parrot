@@ -670,6 +670,7 @@ help :
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  run_tests:         Command line and various environments."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
+	@echo "  code_tests:        Run file metadata and coding standards tests."
 	@echo "  codingstd_tests:   Test pdd07_codingstd."
 	@echo "  testexec:          Testing the exec runcore."
 	@echo "  benchmark_tests:   Run all benchmarks."
@@ -1432,11 +1433,11 @@ test_prep : all
 # make any edits there.
 # Normal test package
 test : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
 # "core tests" -- test basic functionality but not ancillaries
 coretest : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) --core-tests
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
 
 
 # automake compatibility
@@ -1465,43 +1466,43 @@ fulltest :
 
 # bounds checking, slow core
 testb : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -b $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(RUNCORE_TEST_FILES)
 
 # CGP core
 testC : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -C $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -C $(RUNCORE_TEST_FILES)
 
 # fast core
 testf : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -f $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -f $(RUNCORE_TEST_FILES)
 
 # Computed goto
 testg : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -g $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -g $(RUNCORE_TEST_FILES)
 
 # JIT core
 testj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -j $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(RUNCORE_TEST_FILES)
 
 # normal core, write and run Parrot Byte Code
 testr : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -r $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
 
 # switched core
 testS : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -S $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -S $(RUNCORE_TEST_FILES)
 
 # Computed goto jitted core
 testCj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -Cj $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -Cj $(RUNCORE_TEST_FILES)
 
 # switched jitted core
 testSj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -Sj $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -Sj $(RUNCORE_TEST_FILES)
 
 # test the EXEC stuff
 testexec: test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) --run-exec $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
 
 # Test that need to be compiled by the C-compiler
 src_tests :
@@ -1514,6 +1515,9 @@ run_tests :
 # Test the Perl5 Modules in the Parrot distribution
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
+
+code_tests :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
 
 # Test pdd07_codingstd
 codingstd_tests :
@@ -1538,7 +1542,7 @@ doc_tests :
 
 # Running a benchmark
 mopsbench : test_prep
-	$(PARROT) $(PARROT_ARGS) examples/benchmarks/mops_intval.pasm
+	$(PARROT) examples/benchmarks/mops_intval.pasm
 
 # distro tests
 distro_tests : test_prep
@@ -2235,15 +2239,15 @@ malloclist: $(SRC_DIR)/core_pmcs.c
 ###############################################################################
 
 smoke : all
-	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) $(PARROT_ARGS)
+	$(PERL) t/harness --html $(EXTRA_TEST_ARGS)
 	$(PERL) tools/util/smokeserv-client.pl smoke.html
 
 smokej : all
-	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) -j $(PARROT_ARGS)
+	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) -j
 	$(PERL) tools/util/smokeserv-client.pl smoke.html
 
 smokeexec: all
-	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) $(PARROT_ARGS) --run-exec $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
 	$(PERL) tools/util/smokeserv-client.pl smoke.html
 
 smoke-clean :
