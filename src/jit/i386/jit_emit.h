@@ -25,7 +25,10 @@
 #  define JIT_CGP
 #endif
 
-static void call_func(Parrot_jit_info_t *jit_info, void *addr);
+static void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void));
+
+static void jit_emit_real_exception(Parrot_jit_info_t *jit_info);
+
 /*
  * get the register frame pointer
  */
@@ -1728,7 +1731,7 @@ div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, (void *) real_exception);
+    jit_emit_real_exception(jit_info);
     pc = jit_info->native_ptr;
     /* L1: */
     L1[1] = (char)(pc - L1 - 2);
@@ -1767,7 +1770,7 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, (void *) real_exception);
+    jit_emit_real_exception(jit_info);
     pc = jit_info->native_ptr;
     /* L1: */
     L1[1] = (char)(pc - L1 - 2);
@@ -1961,7 +1964,7 @@ opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
     jit_info->native_ptr = pc;
-    call_func(jit_info, (void *) real_exception);
+    jit_emit_real_exception(jit_info);
     pc = jit_info->native_ptr;
     /* L3: */
     L3[1] = (char)(pc - L3 - 2);
@@ -2237,7 +2240,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
 
 
 
-static void call_func(Parrot_jit_info_t *jit_info, void *addr)
+static void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void))
 {
     Parrot_jit_newfixup(jit_info);
     jit_info->arena.fixups->type = JIT_X86CALL;
@@ -2245,6 +2248,10 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
     emitm_calll(jit_info->native_ptr, 0xdeafc0de);
 }
 
+static void jit_emit_real_exception(Parrot_jit_info_t *jit_info)
+{
+    call_func(jit_info, (void (*) (void)) & real_exception);
+}
 
 #if JIT_VTABLE_OPS
 
@@ -2782,7 +2789,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     else
 #  endif
     {
-        call_func(jit_info, (void*)pmc_new_noinit);
+        call_func(jit_info, (void (*) (void))pmc_new_noinit);
     }
     /* result = eax push pmc */
     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
@@ -3609,7 +3616,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         emitm_pushl_i(jit_info->native_ptr, CORE_OPS_check_events);
 
         call_func(jit_info,
-            (void *)(interp->op_func_table[CORE_OPS_check_events]));
+            (void (*) (void)) (interp->op_func_table[CORE_OPS_check_events]));
 #    ifdef PARROT_JIT_STACK_REUSE_INTERP
         emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 #    else
@@ -3631,7 +3638,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
     call_func(jit_info,
-            (void *)(interp->op_func_table[cur_op]));
+            (void (*) (void))(interp->op_func_table[cur_op]));
 #    ifdef PARROT_JIT_STACK_REUSE_INTERP
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 #    else
