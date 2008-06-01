@@ -13,7 +13,17 @@ Generates several files used by the OpenGL binding.  These include:
 
 =item F<runtime/parrot/include/opengl_defines.pasm>
 
+=item F<runtime/parrot/library/OpenGL_funcs.pir>
+
+=item F<config/gen/call_list/opengl.in>
+
+=item F<src/glut_callbacks.c>
+
 =back
+
+For information about Parrot's OpenGL support on different platforms, and
+system libraries/headers that must be installed to enable OpenGL support,
+see L<config/auto/opengl.pm>, where this support is detected.
 
 =cut
 
