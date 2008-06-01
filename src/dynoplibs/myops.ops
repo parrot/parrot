@@ -1,7 +1,9 @@
-/* Copyright (C) 2003-2007, The Perl Foundation. */
+/* Copyright (C) 2003-2008, The Perl Foundation. */
 /* $Id$ */
 
 #include "parrot/dynext.h"
+#include <stdlib.h>
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -42,15 +44,14 @@ inline op what_do_you_get_if_you_multiply_six_by_nine(out STR) {
 
 =item B<hcf>
 
-Halt and Catch Fire. Tries to crash parrot.
+Halt and Catch Fire. Tries to crash Parrot.  Note that making a segfault here
+is a Bad Thing, so this relies instead on Well Supported end-this-process
+behavior.
 
 =cut
 
 op hcf() :flow {
-    int *a, i;
-    a = NULL;
-    i = *a;
-    goto OFFSET(i) ; /* in case your runtime is very forgiving. */
+    abort();
 }
 
 =item B<q>
