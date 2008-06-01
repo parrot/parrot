@@ -191,7 +191,9 @@ CONFIGURE_GENERATED_FILES = \
     myconfig  \
     $(GEN_PASM_INCLUDES) \
     $(SRC_DIR)/call_list.txt \
-    MANIFEST.configure.generated
+    MANIFEST.configure.generated \
+    .configure_trace.sto \
+    .parrot_current_rev
 
 
 ###############################################################################
@@ -296,9 +298,7 @@ FLUID_FILES_1 = \
 
 FLUID_FILES_2 = \
     $(GEN_LIBRARY) \
-    runtime/parrot/include/parrotlib.pbc \
-    .configure_trace.sto \
-    .parrot_current_rev
+    runtime/parrot/include/parrotlib.pbc
 
 
 ###############################################################################
