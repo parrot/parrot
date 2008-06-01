@@ -664,13 +664,13 @@ help :
 	@echo "Testing:"
 	@echo "  test:              Run the standard test suite."
 	@echo "  coretest:          Run the minimal 'core functionality' suite."
+	@echo "  codetest:          Run file metadata and coding standards tests."
 	@echo "  fulltest:          Run the full test suite under many runcores."
 	@echo "  test<runcore>:     Run the test suite with a specified runcore."
 	@echo "                     Valid runcores are b, C, f, g, j, r, S."
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  run_tests:         Command line and various environments."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
-	@echo "  code_tests:        Run file metadata and coding standards tests."
 	@echo "  codingstd_tests:   Test pdd07_codingstd."
 	@echo "  testexec:          Testing the exec runcore."
 	@echo "  benchmark_tests:   Run all benchmarks."
@@ -1516,7 +1516,7 @@ run_tests :
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
-code_tests :
+codetest :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
 
 # Test pdd07_codingstd
