@@ -31,6 +31,7 @@ package gen::opengl;
 
 use strict;
 use warnings;
+use File::Glob;
 
 use base qw(Parrot::Configure::Step);
 
@@ -308,6 +309,10 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose') || 0;
 
+    my @include_paths_win32 = grep /\S/ => split /;/ => ($ENV{INCLUDE} || '');
+
+    s{\\}{/}g foreach @include_paths_win32;
+
     my @header_globs = (
         # Default location for most UNIX-like platforms
         '/usr/include/GL/*.h',
@@ -317,7 +322,7 @@ sub runstep {
         '/System/Library/Frameworks/GLUT.framework/Headers/*.h',
 
         # Windows/MSVC
-        (map "$_/gl/*.h" => split /;/ => ($ENV{Include} || '')),
+        (map {("$_/*.h", "$_/gl/*.h")} @include_paths_win32),
 
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
@@ -330,7 +335,7 @@ sub runstep {
 #         "$ENV{HOME}/src/glut-3.7.6/include/mui/*.h",
     );
 
-    my @header_files = sort map {glob} @header_globs;
+    my @header_files = sort map {File::Glob::bsd_glob($_)} @header_globs;
 
     my %skip = map {($_ => 1)} @SKIP;
     @header_files = grep {my ($file) = m{([^/]+)$}; !$skip{$file}} @header_files;
