@@ -5,11 +5,10 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  18;
+use Test::More tests =>  13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::auto::arch');
 use_ok('config::auto::jit');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -25,7 +24,6 @@ my $args = process_options(
 my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
-test_step_thru_runstep( $conf, q{auto::arch}, $args );
 
 my $pkg = q{auto::jit};
 
@@ -40,6 +38,9 @@ $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 
+if (! defined $conf->data->get('cpuarch') ) {
+    $conf->data->set('cpuarch' => 1)
+}
 
 ok(auto::jit::_handle_execcapable($conf, 1),
     "_handle_execcapable() returned true value");
@@ -53,7 +54,6 @@ ok(auto::jit::_handle_execcapable($conf, 0),
 is($conf->data->get('execcapable'), 0,
     "Got expected value for execcapable");
 $conf->data->set('execcapable' => undef);
-
 
 pass("Completed all tests in $0");
 
