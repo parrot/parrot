@@ -1,16 +1,122 @@
 # Copyright (C) 2008, The Perl Foundation.
 # $Id $
 
+
 =head1 NAME
 
 config/auto/opengl.pm - Probe for OpenGL, GLU, and GLUT libraries
+
 
 =head1 DESCRIPTION
 
 Determines whether the platform supports OpenGL, GLU and GLUT.  The optimal
 result at this time is to find OpenGL 2.1, GLU 1.3, and GLUT API version 4.
 
+You will typically need to install the headers and libraries required for
+compiling OpenGL/GLU/GLUT applications as a separate step in addition to
+the base development tools for your platform.  The following sections detail
+the steps needed to add OpenGL support for each platform for which we have
+received this information -- details for additional platforms are welcome!
+
+
+=head2 Mac OS X
+
+You will need to install the F<OpenGL Framework> and the F<GLUT Framework>.
+With these in place, everything else should be autodetected.  Mac OS X uses
+a proprietary GLUT variant that supports more functions than standard
+GLUT 3.7, but fewer than F<freeglut>.
+
+
+=head2 Linux
+
+Linux distributions typically use F<freeglut>
+(L<http://freeglut.sourceforge.net/>) for GLUT support, and F<Mesa>
+(L<http://www.mesa3d.org/>) for GLU support.  Either the Mesa headers
+(for open source drivers) or the vendor headers (for closed source drivers)
+can be used for core OpenGL/GLX support.  Here are the package names for
+various distributions; installing each of these will typically pull in a
+number of prerequisites as well:
+
+
+=head3 Debian/Ubuntu/etc.
+
+=over 4
+
+=item GLUT
+
+F<freeglut3-dev>
+
+=item GLU
+
+F<libglu1-mesa-dev>
+
+=item OpenGL/GLX (open source drivers)
+
+F<libgl1-mesa-dev>
+
+=item OpenGL/GLX (NVIDIA drivers)
+
+F<nvidia-glx-dev>
+
+=back
+
+
+=head3 Fedora/RedHat/CentOS/etc.
+
+=over 4
+
+=item GLUT
+
+F<freeglut-devel>
+
+=item GLU
+
+F<mesa-libGLU-devel>
+
+=item OpenGL/GLX (open source drivers)
+
+F<mesa-libGL-devel>
+
+=item OpenGL/GLX (NVIDIA drivers)
+
+F<nvidia-devel> (?)
+
+=back
+
+
+=head2 Windows
+
+On Windows, Parrot supports three different compiler environments, each of
+which has different requirements for OpenGL support:
+
+
+=head3 MSVC
+
+=over 4
+
+=item OpenGL/GLU/WGL
+
+F<Windows SDK for Windows Server 2008 and .NET Framework 3.5>
+
+=item GLUT
+
+F<GLUT for Win32> (L<http://www.xmission.com/~nate/glut.html>)
+
+=back
+
+
+=head3 MinGW
+
+ XXXX: No details yet
+
+
+=head3 cygwin
+
+ XXXX: No details yet
+
+
 =cut
+
 
 package auto::opengl;
 
@@ -58,7 +164,7 @@ sub runstep {
         osname          => $osname,
         cc              => $cc,
         win32_gcc       => '-lglut32 -lglu32 -lopengl32',
-        win32_nongcc    => 'glut.lib glu.lib gl.lib',
+        win32_nongcc    => 'opengl32.lib glu32.lib glut32.lib',
         darwin          => '-framework OpenGL -framework GLUT',
         default         => '-lglut -lGLU -lGL',
     } );

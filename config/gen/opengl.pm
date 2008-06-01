@@ -299,9 +299,15 @@ sub runstep {
     my $verbose = $conf->options->get('verbose') || 0;
 
     my @header_globs = (
+        # Default location for most UNIX-like platforms
         '/usr/include/GL/*.h',
+
+        # Mac OS X
         '/System/Library/Frameworks/OpenGL.framework/Headers/*.h',
         '/System/Library/Frameworks/GLUT.framework/Headers/*.h',
+
+        # Windows/MSVC
+        (split /;/ => ($ENV{Include} || '')),
 
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
@@ -769,8 +775,8 @@ sub gen_glut_callbacks {
 
    foreach (@callbacks) {
         $enums     .= "    $_->{enum},\n";
-        $thunks    .= "           void $_->{thunk}($_->{proto});\n";
-        $reg_funcs .= "PARROT_API void $_->{glutcb}(Parrot_Interp, PMC *);\n";
+        $thunks    .= "                     void $_->{thunk}($_->{proto});\n";
+        $reg_funcs .= "PARROT_DYNEXT_EXPORT void $_->{glutcb}(Parrot_Interp, PMC *);\n";
    }
 
     my $header = <<"HEADER";
@@ -801,6 +807,8 @@ cannot be used.
 
 */
 
+#define PARROT_IN_EXTENSION
+
 #include <$glut_header>
 #include "parrot/parrot.h"
 
@@ -824,14 +832,14 @@ typedef struct GLUT_CB_data {
 GLUT_CB_data callback_data[GLUT_NUM_CALLBACKS];
 
 
-           int  is_safe(Parrot_Interp, PMC *);
+                     int  is_safe(Parrot_Interp, PMC *);
 
-           void glut_timer_func(int);
-PARROT_API void glutcbTimerFunc(Parrot_Interp, PMC *, unsigned int, int);
+                     void glut_timer_func(int);
+PARROT_DYNEXT_EXPORT void glutcbTimerFunc(Parrot_Interp, PMC *, unsigned int, int);
 
 #if GLUT_API_VERSION >= 4
-           void glut_joystick_func(unsigned int, int, int, int);
-PARROT_API void glutcbJoystickFunc(Parrot_Interp, PMC *, int);
+                void glut_joystick_func(unsigned int, int, int, int);
+PARROT_DYNEXT_EXPORT void glutcbJoystickFunc(Parrot_Interp, PMC *, int);
 #endif
 
 $thunks
@@ -874,7 +882,7 @@ glut_timer_func(int data)
         Parrot_runops_fromc_args_event(interp, sub, "vi", data);
 }
 
-PARROT_API
+PARROT_DYNEXT_EXPORT
 void
 glutcbTimerFunc(PARROT_INTERP, PMC *sub, unsigned int milliseconds, int data)
 {
@@ -909,7 +917,7 @@ glut_joystick_func(unsigned int buttons, int xaxis, int yaxis, int zaxis)
         Parrot_runops_fromc_args_event(interp, sub, "viiii", buttons, xaxis, yaxis, zaxis);
 }
 
-PARROT_API
+PARROT_DYNEXT_EXPORT
 void
 glutcbJoystickFunc(PARROT_INTERP, PMC *sub, int pollinterval)
 {
@@ -949,7 +957,7 @@ $_->{thunk}($_->{params})
         Parrot_runops_fromc_args_event(interp, sub, "$_->{sig}"$_->{args});
 }
 
-PARROT_API
+PARROT_DYNEXT_EXPORT
 void
 $_->{glutcb}(PARROT_INTERP, PMC *sub)
 {

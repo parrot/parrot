@@ -106,18 +106,21 @@ the known different filenames for each library in turn before giving up.
 
     libnames = new 'ResizableStringArray'
     push libnames, 'libGL'
+    push libnames, 'opengl32'
     push libnames, '/System/Library/Frameworks/OpenGL.framework/OpenGL'
     libgl = _load_lib_with_fallbacks('GL', libnames)
     set_global '_libgl', libgl
 
     libnames = new 'ResizableStringArray'
     push libnames, 'libGLU'
+    push libnames, 'glu32'
     push libnames, '/System/Library/Frameworks/OpenGL.framework/OpenGL'
     libglu = _load_lib_with_fallbacks('GLU', libnames)
     set_global '_libglu', libglu
 
     libnames = new 'ResizableStringArray'
     push libnames, 'libglut'
+    push libnames, 'glut32'
     push libnames, '/System/Library/Frameworks/GLUT.framework/GLUT'
     libglut = _load_lib_with_fallbacks('GLUT', libnames)
     set_global '_libglut', libglut
