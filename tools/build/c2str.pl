@@ -57,6 +57,15 @@ my @all_strings;
 read_all();
 process_cfile();
 
+# the literal length of the string in source code is NOT its length in C terms
+sub get_length {
+    my $s = shift;
+    $s    =~ s{\\x\d+}{.}g;
+    $s    =~ s{\\.}{.}g;
+
+    return length $s;
+}
+
 sub hash_val {
     my $h = Math::BigInt->new('+0');
     my $s = shift;
@@ -151,10 +160,11 @@ HEADER
             $this_file_seen{$str} = $line;
             next;
         }
-        my $len     = length $str;
-        my $hashval = hash_val($str);
+        my $len               = get_length($str);
+        my $hashval           = hash_val($str);
         push @all_strings, [ $len, $hashval, $str ];
-        $n                    = scalar @all_strings;
+
+        $n                    = @all_strings;
         $known_strings{$str}  = $n;
         $this_file_seen{$str} = $line;
         print "#define _CONST_STRING_$line $n\n";
