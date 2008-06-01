@@ -624,11 +624,11 @@ token charset_specifier {
 }
 
 token stringsingle {
-    \' <string_literal: '> \'
+    \' <string_literal: '\''> \'
 }
 
 token stringdouble {
-    '"' <string_literal: "> '"'
+    '"' <string_literal: '"'> '"'
 }
 
 token type {
