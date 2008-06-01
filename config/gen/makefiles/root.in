@@ -163,6 +163,7 @@ GEN_CONFIGS = \
     runtime/parrot/include/config.fpmc \
     $(SRC_DIR)/platform.c \
 #CONDITIONED_LINE(platform_asm):    $(SRC_DIR)/platform_asm.s \
+#CONDITIONED_LINE(has_opengl):    config/gen/call_list/opengl.in \
 #CONDITIONED_LINE(has_glut):    $(SRC_DIR)/glut_callbacks.c \
     $(SRC_DIR)/core_pmcs.c \
     CFLAGS \
@@ -180,6 +181,7 @@ GEN_CONFIGS = \
 GEN_PASM_INCLUDES = \
     runtime/parrot/include/signal.pasm \
 #CONDITIONED_LINE(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
+#CONDITIONED_LINE(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
     @TEMP_gen_pasm_includes@
 
 CONFIGURE_GENERATED_FILES = \
