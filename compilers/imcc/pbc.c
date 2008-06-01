@@ -1111,7 +1111,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
     unit->sub_pmc = sub_pmc;
 
     IMCC_debug(interp, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' flags %d color %d (%s) "
+            "add_const_pmc_sub '%s' flags %x color %d (%s) "
             "lex_info %s :outer(%s)\n",
             r->name, r->pcc_sub->pragma, k,
             (char *) sub_pmc->vtable->whoami->strstart,
