@@ -90,6 +90,14 @@ my @FREEGLUT_CALLBACKS = (
     [ 'Mouse Wheel',      'int wheel, int direction, int x, int y' ],
 );
 
+# These typemaps try to be both portable and accurate.  However, there is
+# at least one OS release known to get some of these wrong: Mac OS X 10.4
+# headers typedef some of the 'int' types as 'long' instead.  This disagrees
+# with all other headers I can find, and was fixed in Mac OS X 10.5 -- those
+# typedefs now match accepted standards.  I am told that Mac OS X 10.4 has
+# a 32-bit core, making the difference immaterial, so I don't bother to
+# alter the typemaps to fit this bug.
+
 my %C_TYPE = (
     GLvoid                  => 'void',
     GLUnurbs                => 'void',
