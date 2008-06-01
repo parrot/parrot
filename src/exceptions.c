@@ -284,7 +284,6 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
 {
-    char *m;
     int exit_status, print_location;
     int depth = 0;
     Stack_Entry_t *e;
@@ -292,7 +291,6 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
     /* for now, we don't check the exception class and we don't
      * look for matching handlers.  [this is being redesigned anyway.]
      */
-    STRING * const message = VTABLE_get_string_keyed_int(interp, exception, 0);
 
     /* [RT#45909: replace quadratic search with something linear, hopefully
      * without trashing abstraction layers.  -- rgr, 17-Sep-06.] */
@@ -315,29 +313,28 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
         PIO_flush(interp->debugger, PIO_STDERR(interp->debugger));
     }
 
-    m = string_to_cstring(interp, message);
-    exit_status = print_location = 1;
-    if (m && *m) {
-        fputs(m, stderr);
-        if (m[strlen(m)-1] != '\n')
-            fprintf(stderr, "%c", '\n');
-        string_cstring_free(m);
-    }
-    else {
-        if (m)
-            string_cstring_free(m); /* coverity fix, m was allocated but was "\0" */
-        /* new block for const assignment */
-        {
-            const INTVAL severity = VTABLE_get_integer_keyed_int(interp, exception, 2);
+    { /* Scope for message */
+        STRING * const message =
+            VTABLE_get_string_keyed_int(interp, exception, 0);
+        if (message && string_length(interp, message) > 0) {
+            exit_status = print_location = 1;
+            PIO_eprintf(interp, "%Ss", message);
+            if (string_ord(interp, message, -1) != '\n')
+                PIO_eprintf(interp, "%c", '\n');
+        }
+        else {
+            const INTVAL severity =
+                VTABLE_get_integer_keyed_int(interp, exception, 2);
             if (severity == EXCEPT_exit) {
                 print_location = 0;
                 exit_status =
                     (int)VTABLE_get_integer_keyed_int(interp, exception, 1);
             }
             else
-                fprintf(stderr, "No exception handler and no message\n");
+                PIO_eprintf(interp, "No exception handler and no message\n");
         }
     }
+    PIO_flush(interp, PIO_STDERR(interp));
     /* caution against output swap (with PDB_backtrace) */
     fflush(stderr);
     if (print_location)
