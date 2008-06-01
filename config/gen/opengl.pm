@@ -1,5 +1,5 @@
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: /parrot/remote/config/gen/opengl.pm 5153 2008-05-12T11:10:21.497490Z bernhard  $
+# $Id$
 
 =head1 NAME
 
