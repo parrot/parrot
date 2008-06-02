@@ -1,9 +1,10 @@
 =head1 Simple Variables
 
-PIR has two kinds of variables. The simplest kind are the temporary variables
-(also called "symbolic registers").  The names of these variables have a
-dollar sign, a single letter, and a number. The letter in the name corresponds
-to the type of the variable, I for integer, N for number (float), S for string,
+PIR has two kinds of variables. The most simple kind are the temporary variables
+(also called "symbolic registers"). The names of these variables consist of a
+dollar sign followed by a single letter and an integer.
+The letter in the name corresponds to the type of the variable,
+I for integer, N for number (float), S for string,
 and P for PMC (any kind of object).
 
 =cut
@@ -19,17 +20,13 @@ and P for PMC (any kind of object).
     $P0 = new 'String'
     $P0 = "Ford"     # set temp PMC var to "Ford"
 
-    print $I0
-    print "\n"
+    say $I0
 
-    print $N3
-    print "\n"
+    say $N3
 
-    print $S5
-    print "\n"
+    say $S5
 
-    print $P0
-    print "\n"
+    say $P0
 
 .end
 
