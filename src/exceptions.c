@@ -772,8 +772,11 @@ associated exceptions free list for the specified interpreter.
 void
 destroy_exception_list(PARROT_INTERP)
 {
-    really_destroy_exception_list(interp->exceptions);
-    really_destroy_exception_list(interp->exc_free_list);
+    if (interp->exceptions)
+        really_destroy_exception_list(interp->exceptions);
+
+    if (interp->exc_free_list)
+        really_destroy_exception_list(interp->exc_free_list);
 }
 
 /*
@@ -781,8 +784,8 @@ destroy_exception_list(PARROT_INTERP)
 =item C<void really_destroy_exception_list>
 
 Takes a pointer to an exception (which had better be the last one in the list).
-Walks back through the list, freeing the memory of each one, until it encounters NULL.
-Used by C<destroy_exception_list>.
+Walks back through the list, freeing the memory of each one, until it
+encounters NULL.  Used by C<destroy_exception_list>.
 
 =cut
 
@@ -791,7 +794,7 @@ Used by C<destroy_exception_list>.
 void
 really_destroy_exception_list(ARGIN(Parrot_exception *e))
 {
-    while (e != NULL) {
+    while (e) {
         Parrot_exception * const prev = e->prev;
         mem_sys_free(e);
         e    = prev;
