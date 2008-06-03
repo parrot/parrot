@@ -193,7 +193,7 @@ works well for use Perl and PerlMonks, and text for the rest.
 
 =item a
 
-Submit the use Perl announcement story to Slashdot, Newsforge, LWN, etc.
+Submit the use Perl announcement story to Slashdot, Newsforge, LWN.net, etc.
 Don't forget to set a Reply-To: or Followup-To: header, if your mail
 client lets you.
 
