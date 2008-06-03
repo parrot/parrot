@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -167,16 +167,17 @@ sub runstep {
     }
     else {
         $conf->data->set(
-            jitarchname => 'nojit',
-            jitcpuarch  => $cpuarch,
-            jitcpu      => $cpuarch,
-            jitosname   => $osname,
-            jitcapable  => 0,
-            execcapable => 0,
-            cc_hasjit   => '',
-            TEMP_jit_o  => '',
-            TEMP_exec_h => '',
-            TEMP_exec_o => ''
+            jitarchname    => 'nojit',
+            jitcpuarch     => $cpuarch,
+            jitcpu         => $cpuarch,
+            jitosname      => $osname,
+            jitcapable     => 0,
+            execcapable    => 0,
+            cc_hasjit      => '',
+            TEMP_jit_o     => '',
+            TEMP_exec_h    => '',
+            TEMP_exec_o    => '',
+            TEMP_exec_dep  => '',
         );
     }
 
