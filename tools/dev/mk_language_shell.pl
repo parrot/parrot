@@ -36,7 +36,7 @@ be used to repopulate a language directory with omitted files.
 
 After populating the language directory, the script attempts to
 run tools/dev/reconfigure.pl to automatically generate the Makefile
-from config/makefiles/root.in . This step is only executed if the 
+from config/makefiles/root.in . This step is only executed if the
 optional C<path> argument is not specified.
 
 If all goes well, after creating the language shell one can simply
