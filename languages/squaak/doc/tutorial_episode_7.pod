@@ -105,8 +105,11 @@ Right; 16 grammar rules just to parse this simple input. I'd call this slightly
 inefficient. The point is, implementing operator precedence using a
 recursive-descent parser is somewhat problematic, and given the fact there
 are better methods to parse expressions like these, not the way to go. Check
-out this nice explanation or google it.Bottom-up parsing and stacks: operator
-tablesI would like to explain to you how bottom-up parsing works for expressions
+out this nice explanation or google it.
+
+=head2 Bottom-up parsing and stacks: operator tables
+
+I would like to explain to you how bottom-up parsing works for expressions
 (or bottom-up parsers in general; Yacc/Bison are parser generators that generate
 bottom-up parsers for your grammar specification), taking operator precedence
 into account. However, it's been about 6 years that I did this in a CS class,
