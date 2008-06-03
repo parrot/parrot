@@ -303,6 +303,20 @@ Returns the integer value for the element at C<*key>.
 
 /*
 
+=item C<FLOATVAL get_number()>
+
+Returns the size of the hash.
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL get_number() {
+        return (FLOATVAL)parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
+    }
+
+/*
+
 =item C<FLOATVAL get_number_keyed_str(STRING *key)>
 
 =item C<FLOATVAL get_number_keyed_int(INTVAL key)>
