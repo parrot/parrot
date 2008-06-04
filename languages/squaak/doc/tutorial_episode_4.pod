@@ -251,4 +251,170 @@ the "else" block (if any).
 =back
 
 
+=head2 Solutions to the exercises
+
+These are the solutions to the exercises in Episode 4 of the Parrot Compiler
+Tools tutorial.
+
+=over 4
+
+=item 1
+
+We showed how the if-statement was implemented. The while-statement and
+try-statement are very similar. Implement these. Check out pdd26 to see what
+C<PAST::Op> nodes you should create.
+
+The while-statement is straightforward:
+
+ method while_statement($/) {
+     my $cond := $( $<expression> );
+     my $body := $( $<block> );
+     make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
+ }
+
+The try-statement is a bit more complex. Here are the grammar rules and
+action methods.
+
+ rule try_statement {
+     'try' $<try>=<block>
+     'catch' <exception>
+     $<catch>=<block>
+     'end'
+     {*}
+ }
+
+ rule exception {
+     <identifier>
+     {*}
+ }
+
+ method try_statement($/) {
+     ## get the try block
+     my $try := $( $<try> );
+
+     ## create a new PAST::Stmts node for
+     ## the catch block; note that no
+     ## PAST::Block is created, as this
+     ## currently has problems with the
+     ## exception object. For now this will
+     ## do.
+     my $catch := PAST::Stmts.new( :node($/) );
+     $catch.push( $( $<catch> ) );
+
+     ## get the exception identifier;
+     ## set a declaration flag, the scope,
+     ## and clear the viviself attribute.
+     my $exc := $( $<exception> );
+     $exc.isdecl(1);
+     $exc.scope('lexical');
+     $exc.viviself(0);
+     ## generate instruction to retrieve the exception object (and the
+     ## exception message, that is passed automatically in PIR, this is stored
+     ## into $S0 (but not used).
+     my $pir := "    .get_results (%r, $S0)\n"
+              ~ "    store_lex '" ~ $exc.name()
+              ~ "', %r";
+
+     $catch.unshift( PAST::Op.new( :inline($pir), :node($/) ) );
+
+     ## do the declaration of the exception object as a lexical here:
+     $catch.unshift( $exc );
+     make PAST::Op.new( $try, $catch, :pasttype('try'), :node($/) );
+ }
+
+ method exception($/) {
+     our $?BLOCK;
+     my $past := $( $<identifier> );
+     $?BLOCK.symbol( $past.name(), :scope('lexical') );
+     make $past;
+ }
+
+Instead of putting "identifier" after the "catch" keyword, we made it a
+separate rule, with its own action method. This allows us to insert the
+identifier into the symbol table of the current block (the try-block),
+before the catch block is parsed.
+
+First the PAST node for the try block is retrieved. Then, the catch block is
+retrieved, and stored into a C<PAST::Stmts> node. This is needed, so that we
+can make sure that the instructions that retrieve the exception object come
+first in the exception handler.
+
+Then, we retrieve the PAST node for the exception identifier. We're setting
+its scope, a flag telling the PAST compiler this is a declaration, and we clear
+the viviself attribute. The viviself attribute is discussed in a later episode;
+if you didn't read that yet, just keep in mind the viviself attribute (if set)
+will make sure all declared variables are initialized. We must clear this
+attribute here, to make sure that this exception object is not initialized,
+because that will be done by the instruction that retrieves the thrown
+exception object, discussed next.
+
+In PIR, we can use the C<.get_results> directive to retrieve a thrown exception.
+You could also generate the C<get_results> instruction (note the missing dot),
+but this is much easier. Currently, in PIR, when retrieving the exception
+object, you must always specify both a variable (or register) for the exception
+object, and a string variable (or register) to store the exception message.
+The exception message is actually stored within the exception object. We use
+C<$S0> to store the exception message, and we'll ignore it after that. Just
+remember for now that if you want to retrieve the exception object, you must
+also specify a place to store the exception message.
+
+There is no special PAST node to generate these instructions, so we use a
+so-called inline C<PAST::Op> node. We store the instructions to be generated
+into a string and store that in the inline attribute of a C<PAST::Op> node.
+
+Once created, this node is unshifted onto the C<PAST::Stmts> node representing
+the exception handler. After that, the declaration is stored in that
+C<PAST::Stmts> node, so that this declaration comes first.
+
+Finally, we have the block representing the try block, and a C<PAST::Stmts>
+node representing the exception handler. Both are used to create a
+C<PAST::Op> node whose pasttype is set to the built-in "try" type.
+
+=item 2
+
+Start Squaak in interactive mode, and specify the target option to show the
+generated PIR instructions. Check out what instructions and labels are
+generated, and see if you can recognize which instructions make up the
+conditional expression, which represent the "then" block, and which represent
+the "else" block (if any).
+
+  > if 1 then else end
+
+  .namespace
+  .sub "_block16"
+    new $P18, "Integer"
+    assign $P18, 1
+
+    ## this is the condition:
+    if $P18, if_17
+
+    ## this is invoking the else-block:
+    get_global $P21, "_block19"
+    newclosure $P21, $P21
+    $P20 = $P21()
+    set $P18, $P20
+    goto if_17_end
+
+    ## this is invoking the then-block:
+    if_17:
+    get_global $P24, "_block22"
+    newclosure $P24, $P24
+    $P23 = $P24()
+    set $P18, $P23
+    if_17_end:
+    .return ($P18)
+  .end
+
+  .namespace
+  .sub "_block22" :outer("_block16")
+    .return ()
+  .end
+
+  .namespace
+  .sub "_block19" :outer("_block16")
+    .return ()
+  .end
+
+=back
+
 =cut
