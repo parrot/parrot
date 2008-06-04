@@ -18,11 +18,9 @@ For more, look in F<examples/opengl/>.
     load_bytecode 'library/NCI/call_toolkit_init.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
-    .local pmc import_gl_to, my_namespace
-    import_gl_to = get_global ['OpenGL'], '_export_all_functions_to'
-    my_namespace = get_namespace
-
-    import_gl_to(my_namespace)
+    .local pmc import_gl
+    import_gl = get_global ['OpenGL'], '_export_all_functions'
+    import_gl()
 
     # Initialize GLUT
     .local pmc call_toolkit_init
@@ -45,9 +43,9 @@ For more, look in F<examples/opengl/>.
     .const .Sub draw     = 'draw'
     .const .Sub idle     = 'idle'
     .const .Sub keyboard = 'keyboard'
-    glutcbDisplayFunc (draw)
-    glutcbIdleFunc    (idle)
-    glutcbKeyboardFunc(keyboard)
+    glutDisplayFunc (draw)
+    glutIdleFunc    (idle)
+    glutKeyboardFunc(keyboard)
 
     # Enter the GLUT main loop
     glutMainLoop()
@@ -59,10 +57,12 @@ This library is a straightforward Parrot NCI wrapper for OpenGL, GLU, and
 GLUT.  It is still a work in progress; work will generally start with the
 oldest, most widely supported functions and progress to the most recently
 standardized calls.  Generally you will find programming GLUT in PIR to be
-similar to GLUT in C, with the exception of the renaming of C<glut*Func>
-to C<glutcb*Func> to work around some current Parrot limitations.
+similar to GLUT in C -- for heavy drawing code, it is sometimes difficult
+to tell the difference except for the leading period on PIR constant names
+and lack of trailing semicolons on each line.
 
-The following sections describe other differences from OpenGL in C.
+The following sections describe features of Parrot's OpenGL bindings that
+are not part of the core C binding, or where they differ non-trivially.
 
 =head2 Initialization
 
@@ -244,35 +244,63 @@ this library.
 
 =over 4
 
-=item _export_all_functions_to(pmc namespace)
+=item _export_all_functions(pmc to_namespace :optional)
 
-Export all OpenGL/GLU/GLUT functions to the target C<namespace>.
+Export all OpenGL/GLU/GLUT functions to the target C<namespace>.  Unmangles
+callback names, so that the receiving namespace sees the standard names
+instead of the mangled versions.  If C<to_namespace> is missing, then the
+caller's namespace is assumed.
 
 =cut
 
-.sub _export_all_functions_to
-    .param pmc namespace
+.sub _export_all_functions
+    .param pmc to_namespace :optional
+    .param int has_to_ns    :opt_flag
 
-    .local pmc gl_namespace
+    if has_to_ns goto get_gl_ns
+    .local pmc     interp
+    interp       = getinterp
+    to_namespace = interp['namespace'; 1]
+
+  get_gl_ns:
+    .local pmc     gl_namespace
     gl_namespace = get_namespace
 
-    .local pmc    iterator, export_list
-    .local string symbol, tag
-    iterator    = new 'Iterator', gl_namespace
-    export_list = new 'ResizableStringArray'
+    .local pmc     iterator, export_list, export_renames
+    .local string  symbol, tag
+    iterator       = iter gl_namespace
+    export_list    = new 'ResizableStringArray'
+    export_renames = new 'Hash'
 
-    # Collect all symbols in the OpenGL namespace starting with 'gl'
+    # Prepare list of symbols and hash of renames for export
   symbol_loop:
-    unless iterator goto symbol_end
+    unless iterator goto symbol_loop_end
     symbol = shift iterator
-    tag    = substr symbol, 0, 2
+
+    # For now, only handle symbols starting with 'gl'
+    tag = substr symbol, 0, 2
     unless tag == 'gl' goto symbol_loop
+
+    # Special-case callbacks
+    tag = substr symbol, 0, 6
+    if tag == 'glutcb' goto rename_callbacks
+
+    # Add all other matching symbols to export list
     push export_list, symbol
     goto symbol_loop
-  symbol_end:
 
-    # Export them all to the requested namespace
-    gl_namespace.export_to(namespace, export_list)
+    # Rename all 'glutcb*' symbols to 'glut*'
+  rename_callbacks:
+    .local string renamed
+    renamed = clone symbol
+    substr renamed, 4, 2, ''
+    export_renames[symbol] = renamed
+    goto symbol_loop
+  symbol_loop_end:
+
+    # Export all symbols and renames to the requested namespace
+    gl_namespace.export_to(to_namespace, export_list)
+    gl_namespace.export_to(to_namespace, export_renames)
 .end
 
 
