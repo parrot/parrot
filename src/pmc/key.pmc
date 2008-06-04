@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -375,12 +375,13 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 */
 
     VTABLE void visit(visit_info *info) {
-        /*
-         * at end a PMCNULL is written during thaw,
-         * which should stop visiting the key
-         */
-        PMC ** const pos = (PMC **)&PMC_data(SELF);
-        info->thaw_ptr = pos;
+        /* at end a PMCNULL is written during thaw, which should stop visiting
+         * the key */
+
+        /* this two-stage casting avoids type punning warnings with -O */
+        DPOINTER ** const data = (DPOINTER **)&PMC_data(SELF);
+        PMC      ** const pos  = (PMC **)data;
+        info->thaw_ptr         = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
     }
 
