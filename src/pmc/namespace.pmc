@@ -561,8 +561,10 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
     METHOD add_sub(STRING *name, PMC *sub) {
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
+        STRING * const s_multisub = CONST_STRING(INTERP, "MultiSub");
 
-        if (!VTABLE_isa(INTERP, sub, s_sub))
+        if (!VTABLE_isa(INTERP, sub, s_sub) &&
+                !VTABLE_isa(INTERP, sub, s_multisub))
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d in add_sub()", sub->vtable->base_type);
 
