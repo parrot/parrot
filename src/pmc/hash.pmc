@@ -312,7 +312,9 @@ Returns the size of the hash.
 */
 
     VTABLE FLOATVAL get_number() {
-        return (FLOATVAL)parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
+        /* doing this in two steps avoids dodgy cast warnings with -O */
+        INTVAL size = parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
+        return (FLOATVAL)size;
     }
 
 /*
