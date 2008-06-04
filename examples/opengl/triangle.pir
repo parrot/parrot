@@ -21,7 +21,6 @@ ASCII key.
 =cut
 
 
-.include 'datatypes.pasm'
 .include 'opengl_defines.pasm'
 
 .sub main :main

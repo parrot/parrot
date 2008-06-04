@@ -5,7 +5,8 @@ OpenGL - Parrot extension for OpenGL bindings
 =head1 SYNOPSIS
 
 This covers only the basic OpenGL and GLUT initialization.
-For more, look in F<examples/opengl/>.
+For more, look in F<examples/opengl/>, starting with
+F<examples/opengl/triangle.pir>.
 
  # Include OpenGL constants
  .include 'opengl_defines.pasm'
