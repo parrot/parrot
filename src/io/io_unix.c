@@ -829,8 +829,7 @@ PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
         memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
     }
 AGAIN:
-    if ((connect(io->fd, (struct sockaddr*)&io->remote,
-                    sizeof (struct sockaddr_in))) != 0) {
+    if ((connect(io->fd, &io->remote, sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
             case EINTR:
                 goto AGAIN;
@@ -865,8 +864,7 @@ PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
 
     memcpy(&io->local, PObj_bufstart(l), sizeof (struct sockaddr_in));
 
-    if ((bind(io->fd, (struct sockaddr *)&io->local,
-                    sizeof (struct sockaddr_in))) == -1) {
+    if ((bind(io->fd, &io->local, sizeof (struct sockaddr_in))) == -1) {
         return -1;
     }
 
@@ -913,8 +911,7 @@ PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 
     Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
 
-    const int newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
-                          &addrlen);
+    const int newsock = accept(io->fd, &newio->remote, &addrlen);
     if (newsock == -1) {
         mem_sys_free(newio);
         return NULL;
