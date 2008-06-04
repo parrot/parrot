@@ -1,5 +1,12 @@
 # $Id$
 
+New for next release (2008-06-17, version undecided)
+- Configuration
+  + expanded step gen::opengl
+- Miscellaneous
+  + ported OpenGL/GLU/GLUT bindings to Win32 and more Mac OS X variants
+  + generate OpenGL/GLU/GLUT bindings by parsing system headers
+
 New in 0.6.2
 - Specification
   + updated and launched pdd28_strings.pod
