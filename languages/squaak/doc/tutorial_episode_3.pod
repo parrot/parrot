@@ -362,6 +362,88 @@ we'll need them, these rules will be added.
 
 =back
 
+=head2 Solutions to the exercises
+
+By now, you may have finished the PCT tutorial. If you felt too lazy to do the
+exercises or if you want to see what solution I had in mind, here are the
+solutions to the exercises in Episode 3 (Episode 1's exercise was discussed at
+the end of Episode 2, and the latter didn't have any coding assignments).
+
+=over 4
+
+=item 1
+
+Rename the names of the action methods according to the name changes we made
+on the grammar rules. So, "integer" becomes "integer_constant", "value" becomes
+"expression", and so on.
+
+I assume you don't need any help with this.
+
+=item 2
+
+Look at the grammar rule for statement. A statement currently consists of an
+assignment. Implement the action method "statement" to retrieve the result
+object of this assignment and set it as statement's result object using the
+special make function. Do the same for rule primary.
+
+ method statement($/) {
+     make $( $<assignment> );
+ }
+
+Note that at this point, the rule statement doesn't define different #= keys
+for each type of statement, so we don't declare a parameter C<$key>. This will
+be changed later.
+
+ method primary($/) {
+     make $( $<identifier> );
+ }
+
+=item 3
+
+Write the action method for the rule identifier. As a result object of this
+"match", a new C<PAST::Var> node should be set, taking as name a string
+representation of the match object ($/). For now, you can set the scope to
+'package'. See "pdd26: ast" for details on C<PAST::Var> nodes.
+
+ method identifier($/) {
+     make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
+ }
+
+=item 4
+
+Write the action method for assignment. Retrieve the result objects for
+"primary" and for "expression", and create a C<PAST::Op> node that binds the
+expression to the primary. (Check out pdd26 for C<PAST::Op> node types, and
+find out how you do such a binding).
+
+ method assignment($/) {
+     my $lhs := $( $<primary> );
+     my $rhs := $( $<expression> );
+     $lhs.lvalue(1);
+     make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
+ }
+
+Note that we set the lvalue flag on $lhs. See PDD26 for details on this flag.
+
+=item 5
+
+Run your compiler on a script or in interactive mode. Use the target option to
+see what PIR is being generated on the input "x = 42".
+
+ .namespace.sub "_block10"
+   new $P11, "Integer"
+   assign $P11, 42
+   set_global "x", $P11
+   .return ($P11)
+ .end
+
+The first two lines of code in the sub create an object to store the number 42,
+the third line stores this number as "x". The PAST compiler will always
+generate an instruction to return the result of the last statement, in this
+case C<$P11>.
+
+=back
+
 
 =cut
 
