@@ -92,7 +92,7 @@ internal_exception(int exitcode, ARGIN(const char *format), ...)
     fflush(stderr);
     va_end(arglist);
 /*
- * RT#45907 get rid of all the internal_exceptions or call them
+ * RT #45907 get rid of all the internal_exceptions or call them
  *          with an interpreter arg
     Parrot_exit(interp, exitcode);
  */
@@ -284,15 +284,15 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
 {
-    int exit_status, print_location;
-    int depth = 0;
+    int            depth          = 0;
+    int            exit_status    = 1;
+    int            print_location = 0;
     Stack_Entry_t *e;
 
     /* for now, we don't check the exception class and we don't
-     * look for matching handlers.  [this is being redesigned anyway.]
-     */
+     * look for matching handlers.  [this is being redesigned anyway.] */
 
-    /* [RT#45909: replace quadratic search with something linear, hopefully
+    /* [RT #45909: replace quadratic search with something linear, hopefully
      * without trashing abstraction layers.  -- rgr, 17-Sep-06.] */
     while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
         if (e->entry_type == STACK_ENTRY_PMC) {
@@ -335,22 +335,23 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
         }
     }
     PIO_flush(interp, PIO_STDERR(interp));
+
     /* caution against output swap (with PDB_backtrace) */
     fflush(stderr);
+
     if (print_location)
         PDB_backtrace(interp);
+
     /*
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
      *
-     * RT#45917 this check should better be in Parrot_exit
+     * RT #45917 this check should better be in Parrot_exit
      */
-    if (interp->thread_data && interp->thread_data->tid) {
-        /*
-         * we should probably detach the thread here
-         */
+
+    /* we should probably detach the thread here */
+    if (interp->thread_data && interp->thread_data->tid)
         return NULL;
-    }
 
     /*
      * only main should run the destroy functions - exit handler chain
@@ -607,7 +608,7 @@ rethrow_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
 =item C<void rethrow_c_exception>
 
-Return back to runloop, assumes exception is still in todo (see RT#45915) and
+Return back to runloop, assumes exception is still in todo (see RT #45915) and
 that this is called from within a handler setup with C<new_c_exception>.
 
 =cut
@@ -620,10 +621,10 @@ rethrow_c_exception(PARROT_INTERP)
 {
     Parrot_exception * const the_exception = interp->exceptions;
 
-    PMC * const exception = PMCNULL;   /* RT#45915 */
+    PMC * const exception = PMCNULL;   /* RT #45915 */
     PMC * const handler   = find_exception_handler(interp, exception);
 
-    /* RT#45911 we should only peek for the next handler */
+    /* RT #45911 we should only peek for the next handler */
     push_exception(interp, handler);
     /*
      * if there was no user handler, interpreter is already shutdown
