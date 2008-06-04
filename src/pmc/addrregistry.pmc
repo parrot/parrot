@@ -146,8 +146,11 @@ reaches 0, delete the entry.
         Hash       * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
         HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
 
-        if (b)
-            LVALUE_CAST(char *, b->value)++;
+        /* these casts look bad, but they avoid type punning warnings with -O */
+        if (b) {
+            long val = (long)b->value;
+            b->value = (void *)(++val);
+        }
         else
             parrot_hash_put(INTERP, hash, key, (void *)1);
     }
@@ -161,11 +164,14 @@ reaches 0, delete the entry.
         Hash       * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
         HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
 
+        /* these casts look bad, but they avoid type punning warnings with -O */
         if (b) {
-            if ((long)b->value == 1L)
+            long val = (long)b->value;
+
+            if (val == 1L)
                 parrot_hash_delete(INTERP, hash, key);
             else
-                LVALUE_CAST(long, b->value)--;
+                b->value = (void *)(--val);
         }
     }
 
