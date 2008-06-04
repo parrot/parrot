@@ -31,8 +31,9 @@ tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
 
 =head1 DESCRIPTION
 
-Recreates MANIFEST and MANIFEST.SKIP from the svn/svk directories.
-So far tested with svn 1.2.0, svn 1.4.2, and svk 1.08.
+Recreates MANIFEST and MANIFEST.SKIP from the svn directories.
+So far tested with svn 1.2.0 and svn 1.4.2.  This also worked with svk 1.08,
+but to keep our tasks manageable, we only guarantee support for Subversion.
 
 =head1 SEE ALSO
 

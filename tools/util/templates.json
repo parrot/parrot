@@ -8,7 +8,7 @@ at running all dynamic languages.
 
 Parrot @release.version@ is available via CPAN (soon), or follow the download
 instructions at @web.root@@web.source@.  For those who would like to develop on
-Parrot, or help develop Parrot itself, we recommend using Subversion or SVK on
+Parrot, or help develop Parrot itself, we recommend using Subversion on
 the source code repository to get the latest and best Parrot code.
 
 Parrot @release.version@ News:
@@ -31,7 +31,7 @@ is a virtual machine aimed at running all dynamic languages.</p>
 (soon), or <a href=\"@web.root@@web.source@\">follow the download
 instructions</a>.  For those who would like to develop on Parrot, or help
 develop Parrot itself, we recommend using <a
-href=\"@subversion.root@\">Subversion</a> or <a href=\"@svk.root@\">SVK</a> on
+href=\"@subversion.root@\">Subversion</a>  on
 <a href=\"@web.repository@\">our source code repository</a> to get the latest
 and best Parrot code.</p>
 

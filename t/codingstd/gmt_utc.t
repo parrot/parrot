@@ -43,7 +43,7 @@ my @failures;
 foreach my $file (@files) {
     my $buf = $DIST->slurp($file);
 
-    # trim out svn and svk Id lines
+    # trim out SVN Id line
     $buf =~ s{\$Id:.*}{}g;
 
     # if we have a timezone, check to see if it is GMT/UTC
