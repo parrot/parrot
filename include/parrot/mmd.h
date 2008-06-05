@@ -17,6 +17,8 @@
 #include "parrot/compiler.h"
 #include "parrot/parrot.h"
 
+#define PARROT_MMD_MAX_CLASS_DEPTH 1000
+
 /* function typedefs */
 typedef PMC*    (*mmd_f_p_ppp)(PARROT_INTERP, PMC *, PMC *, PMC *);
 typedef PMC*    (*mmd_f_p_pip)(PARROT_INTERP, PMC *, INTVAL, PMC *);

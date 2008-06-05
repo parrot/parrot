@@ -1540,7 +1540,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     dist = 0;
 
     if (args > n)
-        dist = 1000;   /* RT #45953 arbitrary > max_class_depth * n */
+        dist = PARROT_MMD_MAX_CLASS_DEPTH;
 
     /* now go through args */
     for (i = 0; i < n; ++i) {
