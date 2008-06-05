@@ -52,6 +52,7 @@ any value type.
     ##  %piropsig is a table of common opcode signatures
     .local pmc piropsig
     piropsig = new 'Hash'
+    piropsig['isa']      = 'IP~'
     piropsig['isfalse']  = 'IP'
     piropsig['issame']   = 'IPP'
     piropsig['istrue']   = 'IP'
@@ -72,7 +73,6 @@ any value type.
     piropsig['n_sub']    = 'PP+'
     piropsig['print']    = 'v*'
     piropsig['set']      = 'PP'
-    piropsig['isa']      = 'IP~'
     set_global '%piropsig', piropsig
 
     ##  %valflags specifies when PAST::Val nodes are allowed to
