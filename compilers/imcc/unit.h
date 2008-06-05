@@ -65,6 +65,7 @@ typedef struct _IMC_Unit {
     PMC *sub_pmc;       /* this sub */
     int is_vtable_method; /* 1 if a v-table method */
     char *vtable_name;  /* v-table method name, if any */
+    char *instance_of;  /* PMC or class this is an instance of, if any */
 
     struct imcc_ostat ostat;
 

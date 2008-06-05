@@ -638,7 +638,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
-%token <t> MULTI VTABLE_METHOD LOADLIB
+%token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF
 %token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -658,7 +658,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types outer
-%type <t> vtable
+%type <t> vtable instanceof
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
 %type <i> if_statement unless_statement
 %type <i> func_assign get_results
@@ -990,6 +990,14 @@ vtable:
          }
    ;
 
+instanceof:
+     SUB_INSTANCE_OF '(' STRINGC ')'
+         {
+           $$ = 0;
+           IMCC_INFO(interp)->cur_unit->instance_of = $3;
+         }
+   ;
+
 multi_types:
      /* empty */
          {
@@ -1107,6 +1115,7 @@ proto:
    | multi
    | outer
    | vtable
+   | instanceof
    ;
 
 pcc_call:
