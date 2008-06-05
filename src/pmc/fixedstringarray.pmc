@@ -130,6 +130,26 @@ size set by C<set_integer_native>.
 
 /*
 
+=item C<PMC *get_iter()>
+
+Gets an iterator for the array.
+
+=cut
+
+*/
+    VTABLE PMC *get_iter() {
+        PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC * const key      = pmc_new(INTERP, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        VTABLE_set_integer_native(INTERP, key,
+                VTABLE_get_bool(INTERP, SELF) ? 0 : -1);
+
+        return iter;
+    }
+
+/*
+
 =item C<INTVAL elements()>
 
 Returns the number of elements in the array.
