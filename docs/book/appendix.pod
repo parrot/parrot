@@ -10,11 +10,6 @@ in the meantime, enjoy this map of some of the rough patches.
 
 =over 4
 
-=item classoffset opcode
-
-Removed in favor of named attribute access.  Any attribute examples using this
-opcode need to be reworked.
-
 =back
 
 =cut
