@@ -19,7 +19,13 @@ $rules_file = shift @ARGV;
 usage() if !$rules_file || @ARGV;
 
 # Parse rules file.
-my @rules = parse_rules($rules_file);
+my $rules = require $rules_file;
+
+# and validate each of them
+while (my ($name, $rule) = each (%{$rules})) {
+    $rule->{name} = $name;
+    validate_rule($rule);
+}
 
 # Create metavariables table.
 my $metavars = {};
@@ -27,30 +33,30 @@ my $metavars = {};
 # Generate initial translator code and populate metafields.
 my $pir = generate_initial_pir();
 
-$pir .= generate_initial_dump( \@rules, $metavars );
+$pir .= generate_initial_dump();
 
 # Emit translation dispatch table.
-$pir .= generate_dispatch_table( \@rules, $metavars );
+$pir .= generate_dispatch_table( $rules );
 
 # Generate instruction translation code from rules.
-foreach (@rules) {
-    $pir .= generate_rule_dump( $_, $metavars );
+foreach (values %{$rules}) {
+    $pir .= generate_rule_dump( $_ );
 }
 
-$pir .= generate_final_dump( $metavars );
+$pir .= generate_final_dump();
 
-$pir .= generate_initial_code( \@rules, $metavars );
+$pir .= generate_initial_code( $metavars );
 
 # Emit translation dispatch table.
-$pir .= generate_dispatch_table( \@rules, $metavars );
+$pir .= generate_dispatch_table( $rules );
 
 # Generate instruction translation code from rules.
-foreach (@rules) {
+foreach (values %{$rules}) {
     $pir .= generate_rule_code( $_, $metavars );
 }
 
 # Generate final translator code.
-$pir .= generate_final_code( $metavars );
+$pir .= generate_final_code();
 
 # Finally, write generated PIR to output file.
 open my $fh, '>', $output_file
@@ -59,112 +65,11 @@ print $fh $pir;
 close $fh;
 
 # And display count of ops that can be translated.
-print scalar(@rules) . " instructions translated.\n";
+print scalar(keys %{$rules}) . " instructions translated.\n";
 
 ##############################################################################
 # Subroutines.
 ##############################################################################
-
-# Parse rules file and build a data structure.
-# ############################################
-sub parse_rules {
-
-    # Get filename and open the file.
-    my ($filename) = @_;
-
-    open my $fh, '<', $filename
-        or die "Unable to open $filename: $!\n";
-
-    # We'll store an array of hashes containing the data.
-    my @rules = ();
-    my $rule;
-
-    # Read through rules file line by line.
-    my $line       = 0;
-    my $in_heredoc = 0;
-    my ( $heredoc_key, $heredoc_value, $heredoc_terminator );
-    while (<$fh>) {
-        chomp;
-        $line++;
-
-        # If it's a blank line or a comemnt line, skip it.
-        next if !$in_heredoc && /^\s*#|^\s*$/;
-
-        # Is this a new rule?
-        if ( !$in_heredoc && /^\s*\[([\w\.]+)\]\s*$/ ) {
-
-            # If we have a current rule...
-            my $name = $1;
-            if ($rule) {
-
-                # Validate it.
-                validate_rule($rule);
-
-                # Save it.
-                push @rules, $rule;
-            }
-
-            # Create new rule structure.
-            $rule = { name => $name };
-        }
-
-        # Is it a value within a rule with a heredoc?
-        elsif ( !$in_heredoc && $rule && /^\s*(\w+)\s*=\s*<<(\w+)\s*$/ ) {
-
-            # Initialize heredoc.
-            $in_heredoc         = 1;
-            $heredoc_key        = $1;
-            $heredoc_value      = q{};
-            $heredoc_terminator = $2;
-        }
-
-        # Or is it a value within a rule and not a heredoc?
-        elsif ( !$in_heredoc && $rule && /^\s*(\w+)\s*=\s*(.+?)\s*$/ ) {
-            if ( exists $rule->{$1} ) {
-                die "Duplicate value for $rule->{$1} in rule $rule->{name}\n";
-            }
-
-            # Stash key and value.
-            $rule->{$1} = $2;
-        }
-
-        # Are we at the end of a heredoc?
-        elsif ( $in_heredoc && /^$heredoc_terminator\s*$/ ) {
-            if ( exists $rule->{$heredoc_key} ) {
-                die "Duplicate value for $rule->{$heredoc_key} in rule $rule->{name}\n";
-            }
-
-            # Stash key/value pair away and unset heredoc flag.
-            $rule->{$heredoc_key} = $heredoc_value;
-            $in_heredoc = 0;
-        }
-
-        # Is this heredoc content?
-        elsif ($in_heredoc) {
-            $heredoc_value .= "$_\n";
-        }
-
-        # Otherwise, syntax eror.
-        else {
-            die "Syntax error on line $line (\"$_\")\n";
-        }
-    }
-
-    # If we're still in a heredoc, we got an error.
-    if ($in_heredoc) {
-        die "Unterminated heredoc runs to end of file\n";
-    }
-
-    # If we've a rule left, validate and stash it.
-    if ($rule) {
-        validate_rule($rule);
-        push @rules, $rule;
-    }
-
-    # Close file and return parsed rules.
-    close $fh;
-    return @rules;
-}
 
 # Rule validator.
 # ###############
@@ -227,7 +132,7 @@ PIRCODE
 # Generate the translator initialization code.
 # ############################################
 sub generate_initial_code {
-    my ( $rules, $mv ) = @_;
+    my ( $mv ) = @_;
 
     # Set up some more metavariables.
     $mv->{INS}    = 'gen_pir';
@@ -308,7 +213,6 @@ PIRCODE
 # Generate the dumper initialization code.
 # ########################################
 sub generate_initial_dump {
-    my ( $rules, $mv ) = @_;
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
@@ -359,11 +263,11 @@ PIRCODE
 # Generate the dispatch table.
 # ############################
 sub generate_dispatch_table {
-    my ( $rules, $mv ) = @_;
+    my ( $rules ) = @_;
 
     my %hash;
     my @sorted_rules;
-    foreach ( @{$rules} ) {
+    foreach ( values %{$rules} ) {
         my $code = sprintf "%02d", $_->{code};
         $hash{ $code } = $_;
     }
@@ -508,7 +412,7 @@ sub translation_code {
 # Generate dump code relating to a rule.
 # #############################################
 sub generate_rule_dump {
-    my ( $rule, $mv ) = @_;
+    my ( $rule ) = @_;
 
     # Emit dispatch label.
     my $pir = <<"PIRCODE";
@@ -589,7 +493,6 @@ PIRCODE
 # Generate the translator trailer code.
 # #####################################
 sub generate_final_code {
-    my ( $mv ) = @_;
 
     # Emit complete label.
     # Emit label generation code.
