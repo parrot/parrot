@@ -32,7 +32,7 @@ See L<docs/pdd26_ast.pod>.
 
 Without any attributes, a PAST::Block translates to the following:
 
- .namespace
+ .namespace []
  .sub "_block10"
      .return ()
  .end
@@ -85,14 +85,14 @@ for creating functions.
 The block is invoked immediately. When the :blocktype attribute is set to this
 value, the generated PIR becomes:
 
- .namespace
+ .namespace []
  .sub "anon"
      get_global $P11, "_block10"
      newclosure $P11, $P11
      $P11()
  .end
 
- .namespace
+ .namespace []
  .sub "_block10"
      .return ()
  .end
