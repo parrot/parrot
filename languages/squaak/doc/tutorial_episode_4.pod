@@ -380,7 +380,7 @@ the "else" block (if any).
 
   > if 1 then else end
 
-  .namespace
+  .namespace []
   .sub "_block16"
     new $P18, "Integer"
     assign $P18, 1
@@ -405,12 +405,12 @@ the "else" block (if any).
     .return ($P18)
   .end
 
-  .namespace
+  .namespace []
   .sub "_block22" :outer("_block16")
     .return ()
   .end
 
-  .namespace
+  .namespace []
   .sub "_block19" :outer("_block16")
     .return ()
   .end

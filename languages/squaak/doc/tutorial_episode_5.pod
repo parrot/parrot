@@ -226,7 +226,7 @@ instructions. In order to allow us to write this as method calls, we create a
 new subclass of ResizablePMCArray. The code below creates the new class and
 defines the methods we need.
 
- 1 .namespace
+ 1 .namespace []
 
  2 .sub 'initlist' :anon :init :load
  3   subclass $P0, 'ResizablePMCArray', 'List'
