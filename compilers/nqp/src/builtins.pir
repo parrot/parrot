@@ -1,4 +1,4 @@
-.namespace
+.namespace []
 
 =over 4
 
