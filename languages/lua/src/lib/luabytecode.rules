@@ -7,10 +7,21 @@
 # See : A No-Frills Introduction to Lua 5.1 VM Instructions
 # by Kein-Hong Man
 
+use strict;
+use warnings;
+
+sub substitute {
+    my $str = shift;
+    my %hash = @_;
+    while (my ($key, $value) = each (%hash)) {
+        $str =~ s/$key/$value/gm;
+    }
+    return $str;
+}
 
 ## Loading Constants
 
-my %opcodes = (
+my $opcodes = {
     MOVE => {
         code => 0,
         format => 'AB',
@@ -286,230 +297,35 @@ PIR
         code => 13,
         format => 'ABC',
         synopsis => 'R(A) := RK(B) - RK(C)',
-        pir => <<'PIR',
-    ${INS} = concat "  sub "
-    unless ${A} == ${B} goto ${LABEL}_1
-    $I1 = 1
-    ${INS} = concat "${PTEMP}0"
-    goto ${LABEL}_2
-  ${LABEL}_1:
-    $I1 = 0
-    ${INS} = concat "${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-  ${LABEL}_2:
-    $I0 = ${B} & ${BITRK}
-    unless $I0 goto ${LABEL}_3
-    ${INS} = concat ", ${K}"
-    ${B} &= ${MASKRK}
-    goto ${LABEL}_4
-  ${LABEL}_3:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_4:
-    $S2 = ${B}
-    ${INS} = concat $S2
-    $I0 = ${C} & ${BITRK}
-    unless $I0 goto ${LABEL}_5
-    ${INS} = concat ", ${K}"
-    ${C} &= ${MASKRK}
-    goto ${LABEL}_6
-  ${LABEL}_5:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_6:
-    $S3 = ${C}
-    ${INS} = concat $S3
-    ${INS} = concat "\n"
-    unless $I1 goto ${LABEL}_7
-    ${INS} = concat "  ${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-    ${INS} = concat " = ${PTEMP}0\n"
-  ${LABEL}_7:
-PIR
+        # pir like ADD
     },
 
     MUL => {
         code => 14,
         format => 'ABC',
         synopsis => 'R(A) := RK(B) * RK(C)',
-        pir => <<'PIR',
-    ${INS} = concat "  mul "
-    unless ${A} == ${B} goto ${LABEL}_1
-    $I1 = 1
-    ${INS} = concat "${PTEMP}0"
-    goto ${LABEL}_2
-  ${LABEL}_1:
-    $I1 = 0
-    ${INS} = concat "${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-  ${LABEL}_2:
-    $I0 = ${B} & ${BITRK}
-    unless $I0 goto ${LABEL}_3
-    ${INS} = concat ", ${K}"
-    ${B} &= ${MASKRK}
-    goto ${LABEL}_4
-  ${LABEL}_3:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_4:
-    $S2 = ${B}
-    ${INS} = concat $S2
-    $I0 = ${C} & ${BITRK}
-    unless $I0 goto ${LABEL}_5
-    ${INS} = concat ", ${K}"
-    ${C} &= ${MASKRK}
-    goto ${LABEL}_6
-  ${LABEL}_5:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_6:
-    $S3 = ${C}
-    ${INS} = concat $S3
-    ${INS} = concat "\n"
-    unless $I1 goto ${LABEL}_7
-    ${INS} = concat "  ${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-    ${INS} = concat " = ${PTEMP}0\n"
-  ${LABEL}_7:
-PIR
+        # pir like ADD
     },
 
     DIV => {
         code => 15,
         format => 'ABC',
         synopsis => 'R(A) := RK(B) / RK(C)',
-        pir => <<'PIR',
-    ${INS} = concat "  div "
-    unless ${A} == ${B} goto ${LABEL}_1
-    $I1 = 1
-    ${INS} = concat "${PTEMP}0"
-    goto ${LABEL}_2
-  ${LABEL}_1:
-    $I1 = 0
-    ${INS} = concat "${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-  ${LABEL}_2:
-    $I0 = ${B} & ${BITRK}
-    unless $I0 goto ${LABEL}_3
-    ${INS} = concat ", ${K}"
-    ${B} &= ${MASKRK}
-    goto ${LABEL}_4
-  ${LABEL}_3:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_4:
-    $S2 = ${B}
-    ${INS} = concat $S2
-    $I0 = ${C} & ${BITRK}
-    unless $I0 goto ${LABEL}_5
-    ${INS} = concat ", ${K}"
-    ${C} &= ${MASKRK}
-    goto ${LABEL}_6
-  ${LABEL}_5:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_6:
-    $S3 = ${C}
-    ${INS} = concat $S3
-    ${INS} = concat "\n"
-    unless $I1 goto ${LABEL}_7
-    ${INS} = concat "  ${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-    ${INS} = concat " = ${PTEMP}0\n"
-  ${LABEL}_7:
-PIR
+        # pir like ADD
     },
 
     MOD => {
         code => 16,
         format => 'ABC',
         synopsis => 'R(A) := RK(B) % RK(C)',
-        pir => <<'PIR',
-    ${INS} = concat "  mod "
-    unless ${A} == ${B} goto ${LABEL}_1
-    $I1 = 1
-    ${INS} = concat "${PTEMP}0"
-    goto ${LABEL}_2
-  ${LABEL}_1:
-    $I1 = 0
-    ${INS} = concat "${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-  ${LABEL}_2:
-    $I0 = ${B} & ${BITRK}
-    unless $I0 goto ${LABEL}_3
-    ${INS} = concat ", ${K}"
-    ${B} &= ${MASKRK}
-    goto ${LABEL}_4
-  ${LABEL}_3:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_4:
-    $S2 = ${B}
-    ${INS} = concat $S2
-    $I0 = ${C} & ${BITRK}
-    unless $I0 goto ${LABEL}_5
-    ${INS} = concat ", ${K}"
-    ${C} &= ${MASKRK}
-    goto ${LABEL}_6
-  ${LABEL}_5:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_6:
-    $S3 = ${C}
-    ${INS} = concat $S3
-    ${INS} = concat "\n"
-    unless $I1 goto ${LABEL}_7
-    ${INS} = concat "  ${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-    ${INS} = concat " = ${PTEMP}0\n"
-  ${LABEL}_7:
-PIR
+        # pir like ADD
     },
 
     POW => {
         code => 17,
         format => 'ABC',
         synopsis => 'R(A) := RK(B) ^ RK(C)',
-        pir => <<'PIR',
-    ${INS} = concat "  pow "
-    unless ${A} == ${B} goto ${LABEL}_1
-    $I1 = 1
-    ${INS} = concat "${PTEMP}0"
-    goto ${LABEL}_2
-  ${LABEL}_1:
-    $I1 = 0
-    ${INS} = concat "${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-  ${LABEL}_2:
-    $I0 = ${B} & ${BITRK}
-    unless $I0 goto ${LABEL}_3
-    ${INS} = concat ", ${K}"
-    ${B} &= ${MASKRK}
-    goto ${LABEL}_4
-  ${LABEL}_3:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_4:
-    $S2 = ${B}
-    ${INS} = concat $S2
-    $I0 = ${C} & ${BITRK}
-    unless $I0 goto ${LABEL}_5
-    ${INS} = concat ", ${K}"
-    ${C} &= ${MASKRK}
-    goto ${LABEL}_6
-  ${LABEL}_5:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_6:
-    $S3 = ${C}
-    ${INS} = concat $S3
-    ${INS} = concat "\n"
-    unless $I1 goto ${LABEL}_7
-    ${INS} = concat "  ${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-    ${INS} = concat " = ${PTEMP}0\n"
-  ${LABEL}_7:
-PIR
+        # pir like ADD
     },
 
     UNM => {
@@ -531,15 +347,7 @@ PIR
         code => 19,
         format => 'AB',
         synopsis => 'R(A) := not RK(B)',
-        pir => <<'PIR',
-    ${INS} = concat "  not ${REG}"
-    $S1 = ${A}
-    ${INS} = concat $S1
-    ${INS} = concat ", ${REG}"
-    $S2 = ${B}
-    ${INS} = concat $S2
-    ${INS} = concat "\n"
-PIR
+        # pir like NOT
     },
 
     LEN => {
@@ -936,78 +744,14 @@ PIR
         code => 24,
         format => 'ABC',
         synopsis => 'if (RK(B) < RK(C)) ~= A) then PC++',
-        pir => <<'PIR',
-    if ${A} goto ${LABEL}_1
-    ${INS} = concat "  lt"
-    goto ${LABEL}_2
-  ${LABEL}_1:
-    ${INS} = concat "  ge"
-  ${LABEL}_2:
-    $I0 = ${B} & ${BITRK}
-    unless $I0 goto ${LABEL}_3
-    ${INS} = concat " ${K}"
-    ${B} &= ${MASKRK}
-    goto ${LABEL}_4
-  ${LABEL}_3:
-    ${INS} = concat " ${REG}"
-  ${LABEL}_4:
-    $S2 = ${B}
-    ${INS} = concat $S2
-    $I0 = ${C} & ${BITRK}
-    unless $I0 goto ${LABEL}_5
-    ${INS} = concat ", ${K}"
-    ${C} &= ${MASKRK}
-    goto ${LABEL}_6
-  ${LABEL}_5:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_6:
-    $S3 = ${C}
-    ${INS} = concat $S3
-    ${INS} = concat ", PC"
-    $I0 = ${NEXTPC} + 1
-    $S7 = $I0
-    ${INS} = concat $S7
-    ${INS} = concat "\n"
-PIR
+        # pir like EQ
     },
 
     LE => {
         code => 25,
         format => 'ABC',
         synopsis => 'if (RK(B) <= RK(C)) ~= A) then PC++',
-        pir => <<'PIR',
-    if ${A} goto ${LABEL}_1
-    ${INS} = concat "  le"
-    goto ${LABEL}_2
-  ${LABEL}_1:
-    ${INS} = concat "  gt"
-  ${LABEL}_2:
-    $I0 = ${B} & ${BITRK}
-    unless $I0 goto ${LABEL}_3
-    ${INS} = concat " ${K}"
-    ${B} &= ${MASKRK}
-    goto ${LABEL}_4
-  ${LABEL}_3:
-    ${INS} = concat " ${REG}"
-  ${LABEL}_4:
-    $S2 = ${B}
-    ${INS} = concat $S2
-    $I0 = ${C} & ${BITRK}
-    unless $I0 goto ${LABEL}_5
-    ${INS} = concat ", ${K}"
-    ${C} &= ${MASKRK}
-    goto ${LABEL}_6
-  ${LABEL}_5:
-    ${INS} = concat ", ${REG}"
-  ${LABEL}_6:
-    $S3 = ${C}
-    ${INS} = concat $S3
-    ${INS} = concat ", PC"
-    $I0 = ${NEXTPC} + 1
-    $S7 = $I0
-    ${INS} = concat $S7
-    ${INS} = concat "\n"
-PIR
+        # pir like EQ
     },
 
     TEST => {
@@ -1321,9 +1065,22 @@ PIR
     ${UPVAL} = 0 
 PIR
     },
-);
+};
 
-return \%opcodes;
+$opcodes->{SUB}->{pir} = substitute($opcodes->{ADD}->{pir}, 'add' => 'sub');
+$opcodes->{MUL}->{pir} = substitute($opcodes->{ADD}->{pir}, 'add' => 'mul');
+$opcodes->{DIV}->{pir} = substitute($opcodes->{ADD}->{pir}, 'add' => 'div');
+$opcodes->{MOD}->{pir} = substitute($opcodes->{ADD}->{pir}, 'add' => 'mod');
+$opcodes->{POW}->{pir} = substitute($opcodes->{ADD}->{pir}, 'add' => 'pow');
+
+$opcodes->{NOT}->{pir} = substitute($opcodes->{UNM}->{pir}, 'neg' => 'not');
+
+$opcodes->{LT}->{pir}  = substitute($opcodes->{EQ}->{pir},  'eq'  => 'lt',
+                                                            'ne'  => 'ge');
+$opcodes->{LE}->{pir}  = substitute($opcodes->{EQ}->{pir},  'eq'  => 'le',
+                                                            'ne'  => 'gt');
+
+return $opcodes;
 
 # Local Variables:
 #   mode: cperl
