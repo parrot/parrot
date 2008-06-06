@@ -560,10 +560,14 @@ sub _print_preamble_source {
 
 $self->{defines}
 
-static int get_op(const char * name, int full);
-
 END_C
 
+    if ( $self->{suffix} eq '' && !$self->{flag}->{dynamic} ) {
+        print $fh <<END_C_2;
+static int get_op(const char * name, int full);
+
+END_C_2
+    }
     my $text = $self->{ops}->preamble( $self->{trans} );
     $text =~ s/\bops_addr\b/$self->{bs}ops_addr/g;
     print $fh $text;
