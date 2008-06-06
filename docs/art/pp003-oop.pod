@@ -118,7 +118,7 @@ read L<perlboot>.
         print "Oink\n"
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Cow"
@@ -161,7 +161,7 @@ method name.
         print "bar\n"
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Foo"
@@ -218,7 +218,7 @@ same for the rest):
         print "woof"
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Dog"
@@ -374,7 +374,7 @@ Jonathan Scott Duff
         .return( "oink" )
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Animal"
