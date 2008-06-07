@@ -42,7 +42,7 @@ Francois Perrad.
     new $P0, 'LuaBytecode'
     script = $P0.'undump'(content)
     .local string gen_pir
-    gen_pir = script.translate()
+    gen_pir = script.'translate'()
     save_pir(gen_pir, filename)
     end
   _handler:

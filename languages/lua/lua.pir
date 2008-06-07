@@ -515,6 +515,7 @@ USAGE
 .include 'languages/lua/src/lib/luafile.pir'
 .include 'languages/lua/src/lib/luaos.pir'
 .include 'languages/lua/src/lib/luadebug.pir'
+.include 'languages/lua/src/lib/luabytecode.pir'
 
 
 =head1 SEE ALSO

@@ -404,6 +404,72 @@ with the string C<rep>.
 .end
 
 
+=item C<lua_load (data, name)>
+
+This function only loads a chunk; it does not run it.
+
+C<lua_load> automatically detects whether the chunk is text or binary,
+and loads it accordingly.
+
+The C<chunkname> argument gives a name to the chunk, which is used for error
+messages and in debug information. 
+
+=cut
+
+.sub 'lua_load'
+    .param string data
+    .param string chunkname
+    unless chunkname == '' goto L1
+    chunkname = '?'
+  L1:
+    $S0 = substr data, 0, 4
+    unless $S0 == "\033Lua" goto L2
+    .return undump(data, chunkname)
+  L2:
+    .return parser(data, chunkname)
+.end
+
+.sub 'parser' :anon
+    .param string data
+    .param string chunkname
+    .local pmc lua_comp
+    lua_comp = compreg 'Lua'
+    push_eh _handler
+    $P0 = lua_comp.'compile'(data)
+    $P0 = $P0[1]
+    .local pmc env
+    env = get_hll_global '_G'
+    $P0.'setfenv'(env)
+    .return ($P0)
+  _handler:
+    .get_results ($P0, $S0)
+    null $P0
+    .return ($P0, $S0)
+.end
+
+.sub 'undump' :anon
+    .param string buff
+    .param string chunkname
+    push_eh _handler
+    new $P0, 'LuaBytecode'
+    $P1 = $P0.'undump'(buff)
+    .local string pir
+    pir = $P1.'translate'()
+    .local pmc pir_comp
+    pir_comp = compreg 'PIR'
+    $P0 = pir_comp.'compile'(pir)
+    $P0 = $P0[1]
+    .local pmc env
+    env = get_hll_global '_G'
+    $P0.'setfenv'(env)
+    .return ($P0)
+  _handler:
+    .get_results ($P0, $S0)
+    null $P0
+    .return ($P0, $S0)
+.end
+
+
 =item C<lua_loadbuffer (buff, name)>
 
 Loads a buffer as a Lua chunk.
@@ -415,19 +481,7 @@ C<name> is the chunk name, used for debug information and error messages.
 .sub 'lua_loadbuffer'
     .param string buff
     .param string chunkname
-    .local pmc lua_comp
-    lua_comp = compreg 'Lua'
-    push_eh _handler
-    $P0 = lua_comp.'compile'(buff)
-    $P0 = $P0[1]
-    .local pmc env
-    env = get_hll_global '_G'
-    $P0.'setfenv'(env)
-    .return ($P0)
-  _handler:
-    .get_results ($P0, $S0)
-    null $P0
-    .return ($P0, $S0)
+    .return lua_load(buff, chunkname)
 .end
 
 
@@ -458,7 +512,7 @@ This function only loads the chunk; it does not run it.
     if filename == '' goto L4
     close f
   L4:
-    .return lua_loadbuffer($S0, chunkname)
+    .return lua_load($S0, chunkname)
   L3:
     $S0 = 'cannot open '
     $S0 .= filename
