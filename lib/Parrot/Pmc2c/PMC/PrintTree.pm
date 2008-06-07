@@ -14,6 +14,8 @@ Parrot::Pmc2c::PMC::PrintTree
 This class inherits from Parrot::Pmc2c::Pmc2cMain and adds one method,
 C<print_tree()>.  C<print_tree()> is called within F<tools/dev/pmctree.pl>.
 
+=head2 METHODS
+
 =head3 C<print_tree()>
 
     $self->print_tree( {
@@ -43,7 +45,7 @@ value of the C<args> key in C<Parrot::Pmc2c::Pmc2cMain::new()> will be used.
 
 B<Return Values:>  C<1> upon successful printing.
 
-B<Comment:>  C<print_tree() was formerly found within Parrot::Pmc2c::Pmc2cMain.
+B<Comment:>  C<print_tree()> was formerly found within Parrot::Pmc2c::Pmc2cMain.
 However, since the primary purpose of that class is to provide methods for a
 different program, F<tools/build/pmc2c.pl>, which is invoked repeatedly by
 F<make>, it was felt better to extract this method into a class of its own.
