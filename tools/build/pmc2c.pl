@@ -19,7 +19,6 @@ Getopt::Long::GetOptions(
     "vtable"  => \$action{default},
     "dump"    => \$action{dump},
     "c|gen-c" => \$action{gen_c},
-    "tree"    => \$action{tree},
 
     #command line options
     "no-lines"  => \$options{nolines},
@@ -49,11 +48,6 @@ if ( $action{default} ) {
 
 if ( $action{dump} ) {
     $self->dump_pmc();
-    exit;
-}
-
-if ( $action{tree} ) {
-    $self->print_tree();
     exit;
 }
 
@@ -90,10 +84,6 @@ Create F<src/pmc/foo.c> and C<pmc_foo.h> from F<src/pmc/foo.dump>:
     % perl tools/build/pmc2c.pl -c src/pmc/foo.pmc ...
 
 =head2 Other Options
-
-Print a class tree for the specified PMCs:
-
-    % perl tools/build/pmc2c.pl --tree src/pmc/*.pmc
 
 Create fooX.c and pmc_fooX.h from fooX.dump files, also create libfoo.c
 containing the initialization function for all fooX PMCs.

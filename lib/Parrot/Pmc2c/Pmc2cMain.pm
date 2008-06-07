@@ -128,92 +128,6 @@ sub dump_vtable {
 
 see C<lib/Parrot/Pmc2c/Dumper>.
 
-
-=head3 C<print_tree()>
-
-    $self->print_tree( {
-        depth   => 0,
-        files   => [ @files_to_be_printed ],    # optional
-    } );
-
-B<Purpose:>  Print the inheritance tree for each of the files, using the
-given directories to search for all of correct PMCs.
-
-B<Arguments:>  Reference to hash holding key-value pairs.
-
-=over 4
-
-=item * depth
-
-Number holding the display depth.  Used for the recursive
-definition of this function.  Defaults to C<0> if not specified.
-
-=item * files
-
-Optional.  Reference to an array holding a list of files.  If not supplied, the
-value of the C<args> key in C<Parrot::Pmc2c::Pmc2cMain::new()> will be used.
-(This is used for the recursive call.)
-
-=back
-
-B<Return Values:>  C<1> upon successful printing.
-
-B<Comment:>  In earlier version of F<pmc2c.pl>, this subroutine returned
-C<undef> upon success.  This was changed to more Perl-ish C<1>.
-
-The purpose of this method is unclear.  (1) It is not called by Makefile.  (2)
-Since internally calls read_dump(), a F<.dump> file must already exist for
-this method to generate meaningful output.  But since F<.dump> files do B<not>
-exist prior to calling F<make>, this can only be viewed as an attempt at a
-utility method to be called B<after> F<make> has run.  That might be useful.
-It would be responding to a request such as, "Given these F<.dump> files,
-reconstruct the inheritance trees of their ancestral F<.pmc> files."  But
-that's a very different purpose from the other methods in this program, whose
-point is to go from F<.pmc> to F<.c> files.
-
-=cut
-
-sub print_tree {
-    my ( $self, $argsref ) = @_;
-    my $depth = $argsref->{depth} || 0;
-    my @files;
-
-    # First, look for list of files provided as argument to 'files' key in
-    # hash passed by ref to this method call.
-    if ( defined $argsref->{files} ) {
-        die "Value of 'files' key in call to print_tree() must be array ref"
-            unless ref( $argsref->{files} ) eq 'ARRAY';
-        die
-"Array ref which is value of 'files' key in call to print_tree() must hold positive number of files"
-            unless scalar( @{ $argsref->{files} } );
-        @files = @{ $argsref->{files} };
-
-        # Next, look for list of files provided as argument to 'args' key of
-        # constructor.
-    }
-    else {
-        @files = @{ $self->{args} };
-        if ( !@files ) {
-            die "print_tree() lacked files to print; nothing in constructor's 'args' key";
-        }
-    }
-    for my $f (@files) {
-        my $class = $self->read_dump($f);
-        print "    " x $depth, $class->{name}, "\n";
-        for my $k ( @{ $class->parents } ) {
-            unless ( $k eq $class->{name} ) {
-                $self->print_tree(
-                    {
-                        depth => $depth + 1,
-                        files => [ lc("$k.pmc") ],
-                    }
-                );
-            }
-        }
-    }
-    return 1;
-}
-
 =head3 C<read_dump()>
 
   $self->read_dump('filename');
@@ -232,7 +146,7 @@ B<Return Values:>  Reference to hash holding recreated data structure.
 
 B<Comment:>  If the appropriate F<.dump> file cannot be located, program
 will die with error message (see C<find_file()> above).
-Called internally by C<print_tree()>, C<gen_c()>, C<gen_parent_list()>,
+Called internally by C<gen_c()>, C<gen_parent_list()>,
 C<dump_pmc()>.
 
 =cut
