@@ -12,7 +12,7 @@ Parrot::Pmc2c::PMC::PrintTree
 =head1 DESCRIPTION
 
 This class inherits from Parrot::Pmc2c::Pmc2cMain and adds one method,
-C<print_tree()>.  C<print_tree()> is called within F<tools/dev/pmc_tree.pl>.
+C<print_tree()>.  C<print_tree()> is called within F<tools/dev/pmctree.pl>.
 
 =head3 C<print_tree()>
 
