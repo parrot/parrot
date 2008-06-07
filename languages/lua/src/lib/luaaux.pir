@@ -412,7 +412,7 @@ C<lua_load> automatically detects whether the chunk is text or binary,
 and loads it accordingly.
 
 The C<chunkname> argument gives a name to the chunk, which is used for error
-messages and in debug information. 
+messages and in debug information.
 
 =cut
 
