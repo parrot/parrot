@@ -22,3 +22,10 @@ my $self = Parrot::Pmc2c::PMC::PrintTree->new(
 
 $self->print_tree();
 exit;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
