@@ -170,21 +170,6 @@ L<http://www.google.com/search?sourceid=navclient&q=site:archive%2Edevelooper%2E
 
 L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.perl6.internals>
 
-=item * Summaries
-
-If you find the traffic too much to keep up with, weekly summaries of the
-discussion on C<parrot-porters@perl.org> and C<perl6-language@perl.org> are
-posted to C<perl6-announce@perl.org>. Alternately, you can find these summaries
-here:
-
-L<http://www.nntp.perl.org/group/perl.perl6.announce>
-
-L<http://dev.perl.org/perl6/list-summaries/>
-
-Or if you prefer to subscribe to the list:
-
-L<http://lists.perl.org/showlist.cgi?name=perl6-announce>
-
 =back
 
 In addition, there is a mailing list which logs all commits to the Parrot SVN 
