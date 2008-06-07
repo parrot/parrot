@@ -455,18 +455,7 @@ This function only loads the chunk; it does not run it.
     if filename == '' goto L4
     close f
   L4:
-    .local pmc lua_comp
-    lua_comp = compreg 'Lua'
-    push_eh _handler
-    $P0 = lua_comp.'compile'($S0)
-    $P0 = $P0[1]
-    .local pmc env
-    env = get_hll_global '_G'
-    $P0.'setfenv'(env)
-    .return ($P0)
-  _handler:
-    .get_results ($P0, $S0)
-    goto L5
+    .return lua_loadbuffer($S0, filename)
   L3:
     $S0 = 'cannot open '
     $S0 .= filename
