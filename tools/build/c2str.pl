@@ -42,6 +42,7 @@ $do_all and do {
     exit;
 };
 $do_init and do {
+    close $ALL;
     unlink $outfile;
     exit;
 };
