@@ -443,11 +443,14 @@ This function only loads the chunk; it does not run it.
 
 .sub 'lua_loadfile'
     .param string filename
+    .local string chunkname
     .local pmc f
     unless filename == '' goto L1
+    chunkname = '=stdin'
     f = getstdin
     goto L2
   L1:
+    chunkname = filename
     f = open filename, '<'
     unless f goto L3
   L2:
@@ -455,7 +458,7 @@ This function only loads the chunk; it does not run it.
     if filename == '' goto L4
     close f
   L4:
-    .return lua_loadbuffer($S0, filename)
+    .return lua_loadbuffer($S0, chunkname)
   L3:
     $S0 = 'cannot open '
     $S0 .= filename
