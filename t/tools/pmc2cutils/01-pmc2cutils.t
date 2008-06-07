@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 21;
+use Test::More tests => 20;
 
 use_ok('Parrot::Pmc2c::Pmc2cMain');
 
@@ -37,7 +37,6 @@ $self = Parrot::Pmc2c::Pmc2cMain->new(
 isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
 can_ok( $self, q{find_file} );
 can_ok( $self, q{dump_vtable} );
-can_ok( $self, q{print_tree} );
 can_ok( $self, q{read_dump} );
 can_ok( $self, q{gen_c} );
 can_ok( $self, q{dump_pmc} );
