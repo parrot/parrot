@@ -309,10 +309,11 @@ data types and their names are specified in
 F<runtime/parrot/include/datatypes.pasm>X<datatypes.pasm file>.
 
 X<PMCs (Parrot Magic Cookies);types;generating list of>
-You can generate a complete and current list of valid PMC types by
-running this command within the main Parrot source directory:
+Once the F<parrot> executable has been built, You can generate a complete and
+current list of valid PMC types by running this command within the main Parrot
+source directory:
 
-  $ perl tools/build/pmc2c.pl --tree src/pmc/*.pmc
+  $ perl tools/dev/pmctree.pl src/pmc/*.pmc
 
 which produces output like:
 
