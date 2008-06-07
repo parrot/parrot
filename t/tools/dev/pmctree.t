@@ -1,34 +1,18 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 202007, The Perl Foundation.
 # $Id$
-# 06-print_tree.t
+# pmctree.t
 
 use strict;
 use warnings;
-
-BEGIN {
-    use FindBin qw($Bin);
-    use Cwd qw(cwd realpath);
-    realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
-    our $topdir = $1;
-    if ( defined $topdir ) {
-        print "\nOK:  Parrot top directory located\n";
-    }
-    else {
-        $topdir = realpath($Bin) . "/../../..";
-    }
-    unshift @INC, qq{$topdir/lib};
-}
-use Test::More tests => 55;
-use Carp;
+use Test::More tests => 52;
+use Cwd;
 use File::Basename;
 use File::Copy;
-use FindBin;
-use Data::Dumper;
-use_ok('Parrot::Pmc2c::Pmc2cMain');
+use File::Temp qw( tempdir );
+use lib qw( lib );
+use Parrot::Pmc2c::PMC::PrintTree;
 use IO::CaptureOutput qw| capture |;
-use_ok('Cwd');
-use_ok( 'File::Temp', qw| tempdir | );
 
 my ( %opt, @include, @args );
 my $dump_file;
@@ -36,19 +20,20 @@ my $self;
 my $rv;
 my $cwd = cwd();
 
-my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
+my @include_orig = qw( src/pmc src/dynpmc );
 
 # @args holds default.pmc; print_tree has no args, defaulting to 0 for depth
 # and contents of @args for files to be printed
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
+    touch_Makefile();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles     = glob("$main::topdir/src/pmc/*.pmc");
+    my @pmcfiles     = glob("$cwd/src/pmc/*.pmc");
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -60,16 +45,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, );
-    $self = Parrot::Pmc2c::Pmc2cMain->new(
+    $self = Parrot::Pmc2c::PMC::PrintTree->new(
         {
             include => \@include,
-            opt     => \%opt,
+            opt     => {},
             args    => [@args],
-            bin     => $Bin,
+            bin     => q{},
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
+    isa_ok( $self, q{Parrot::Pmc2c::PMC::PrintTree} );
+    $dump_file = $self->dump_vtable("$cwd/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ok( $self->dump_pmc(), "dump_pmc succeeded" );
@@ -93,12 +78,13 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
+    touch_Makefile();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
+    my @pmcfiles = ( "$cwd/src/pmc/default.pmc", "$cwd/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -110,16 +96,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/array.pmc}, );
-    $self = Parrot::Pmc2c::Pmc2cMain->new(
+    $self = Parrot::Pmc2c::PMC::PrintTree->new(
         {
             include => \@include,
-            opt     => \%opt,
+            opt     => {},
             args    => [@args],
-            bin     => $Bin,
+            bin     => q{},
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
+    isa_ok( $self, q{Parrot::Pmc2c::PMC::PrintTree} );
+    $dump_file = $self->dump_vtable("$cwd/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
@@ -147,12 +133,13 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
+    touch_Makefile();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
+    my @pmcfiles = ( "$cwd/src/pmc/default.pmc", "$cwd/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -164,16 +151,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/array.pmc}, );
-    $self = Parrot::Pmc2c::Pmc2cMain->new(
+    $self = Parrot::Pmc2c::PMC::PrintTree->new(
         {
             include => \@include,
-            opt     => \%opt,
+            opt     => {},
             args    => [@args],
-            bin     => $Bin,
+            bin     => q{},
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
+    isa_ok( $self, q{Parrot::Pmc2c::PMC::PrintTree} );
+    $dump_file = $self->dump_vtable("$cwd/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
@@ -201,12 +188,13 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
+    touch_Makefile();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
+    my @pmcfiles = ( "$cwd/src/pmc/default.pmc", "$cwd/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -218,16 +206,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/array.pmc}, );
-    $self = Parrot::Pmc2c::Pmc2cMain->new(
+    $self = Parrot::Pmc2c::PMC::PrintTree->new(
         {
             include => \@include,
-            opt     => \%opt,
+            opt     => {},
             args    => [@args],
-            bin     => $Bin,
+            bin     => q{},
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
+    isa_ok( $self, q{Parrot::Pmc2c::PMC::PrintTree} );
+    $dump_file = $self->dump_vtable("$cwd/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ### $self->dump_pmc();
@@ -251,12 +239,13 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
+    touch_Makefile();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
+    my @pmcfiles = ( "$cwd/src/pmc/default.pmc", "$cwd/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -268,16 +257,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ();
-    $self = Parrot::Pmc2c::Pmc2cMain->new(
+    $self = Parrot::Pmc2c::PMC::PrintTree->new(
         {
             include => \@include,
-            opt     => \%opt,
+            opt     => {},
             args    => [@args],
-            bin     => $Bin,
+            bin     => q{},
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-    $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
+    isa_ok( $self, q{Parrot::Pmc2c::PMC::PrintTree} );
+    $dump_file = $self->dump_vtable("$cwd/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ### $self->dump_pmc();
@@ -299,24 +288,31 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
 pass("Completed all tests in $0");
 
+sub touch_Makefile {
+    open my $FH, '>', q{Makefile}
+        or die "Unable to open handle for writing: $!";
+    print $FH "\n";
+    close $FH or die "Unable to close handle after writing: $!";
+}
+
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-06-print_tree.t - test C<Parrot::Pmc2c::Pmc2cMain::print_tree()>
+pmctree.t - test C<Parrot::Pmc2c::PMC::PrintTree::print_tree()>
 
 =head1 SYNOPSIS
 
-    % prove t/tools/pmc2cutils/06-print_tree.t
+    % prove t/tools/pmc2cutils/pmctree.t
 
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable methods of
-F<lib/Parrot/Pmc2c/Pmc2cMain.pm>.  By doing so, they test the functionality
+F<lib/Parrot/Pmc2c/PMC::PrintTree.pm>.  By doing so, they test the functionality
 of the F<pmc2c.pl> utility.  That functionality has largely been extracted
-into the methods of F<Pmc2cMain.pm>.
+into the methods of F<PMC::PrintTree.pm>.
 
-F<06-print_tree.t> tests the C<Parrot::Pmc2c::Pmc2cMain::print_tree()> method.
+F<pmctree.t> tests the C<Parrot::Pmc2c::PMC::PrintTree::print_tree()> method.
 This method is I<not> called F<make>. It appears to be intended as an aid in
 debugging once F<make> has run.
 
