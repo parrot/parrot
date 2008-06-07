@@ -56,7 +56,7 @@ C<undef> upon success.  This was changed to more Perl-ish C<1>.
 sub print_tree {
     my ( $self, $argsref ) = @_;
     die "This program may only be called after 'make' has run"
-        unless -e 'Makefile';
+        unless (-e 'parrot' or -e 'parrot.exe');
     my $depth = $argsref->{depth} || 0;
     my @files;
 

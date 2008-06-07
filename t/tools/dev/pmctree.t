@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More tests => 60;
 use Cwd;
 use File::Basename;
 use File::Copy;
@@ -27,7 +27,7 @@ my @include_orig = qw( src/pmc src/dynpmc );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
-    touch_Makefile();
+    touch_parrot();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
@@ -78,7 +78,7 @@ my @include_orig = qw( src/pmc src/dynpmc );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
-    touch_Makefile();
+    touch_parrot();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
@@ -133,7 +133,7 @@ my @include_orig = qw( src/pmc src/dynpmc );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
-    touch_Makefile();
+    touch_parrot();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
@@ -188,7 +188,7 @@ my @include_orig = qw( src/pmc src/dynpmc );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
-    touch_Makefile();
+    touch_parrot();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
@@ -239,7 +239,7 @@ my @include_orig = qw( src/pmc src/dynpmc );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
-    touch_Makefile();
+    touch_parrot();
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
@@ -286,10 +286,53 @@ my @include_orig = qw( src/pmc src/dynpmc );
     ok( chdir $cwd, "changed back to original directory" );
 }
 
+# failure case:  called before 'make' has run
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
+#    touch_parrot();
+    my $pmcdir = q{src/pmc};
+    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
+    my $temppmcdir = qq{$tdir/src/pmc};
+    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
+
+    my @pmcfiles = ( "$cwd/src/pmc/default.pmc", "$cwd/src/pmc/array.pmc", );
+    my $pmcfilecount = scalar(@pmcfiles);
+    my $copycount;
+    foreach my $pmcfile (@pmcfiles) {
+        my $basename = basename($pmcfile);
+        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
+        $copycount++ if $rv;
+    }
+    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
+    my @include = ( $tdir, $temppmcdir, @include_orig );
+
+    @args = ();
+    $self = Parrot::Pmc2c::PMC::PrintTree->new(
+        {
+            include => \@include,
+            opt     => {},
+            args    => [@args],
+            bin     => q{},
+        }
+    );
+    isa_ok( $self, q{Parrot::Pmc2c::PMC::PrintTree} );
+    $dump_file = $self->dump_vtable("$cwd/src/vtable.tbl");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
+
+    eval { $self->print_tree(); };
+    like($@,
+        qr/^This program may only be called after 'make' has run/,
+        "Got expected error message for running program at wrong time"
+    );
+    
+    ok( chdir $cwd, "changed back to original directory" );
+}
+
 pass("Completed all tests in $0");
 
-sub touch_Makefile {
-    open my $FH, '>', q{Makefile}
+sub touch_parrot {
+    open my $FH, '>', q{parrot}
         or die "Unable to open handle for writing: $!";
     print $FH "\n";
     close $FH or die "Unable to close handle after writing: $!";
