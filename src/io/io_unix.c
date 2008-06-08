@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -17,7 +17,7 @@ over-complicating this file.
 
 =head2 References:
 
-APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
+APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 =head2 Functions
 
@@ -829,7 +829,8 @@ PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
         memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
     }
 AGAIN:
-    if ((connect(io->fd, &io->remote, sizeof (struct sockaddr_in))) != 0) {
+    if ((connect(io->fd, (const sockaddr *)&io->remote,
+        sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
             case EINTR:
                 goto AGAIN;
@@ -864,7 +865,8 @@ PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
 
     memcpy(&io->local, PObj_bufstart(l), sizeof (struct sockaddr_in));
 
-    if ((bind(io->fd, &io->local, sizeof (struct sockaddr_in))) == -1) {
+    if ((bind(io->fd, (const sockaddr *)&io->local,
+            sizeof (struct sockaddr_in))) == -1) {
         return -1;
     }
 
@@ -910,8 +912,9 @@ PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
     ParrotIO * const newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
     Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
+    const int        newsock = accept(io->fd,
+                        (sockaddr *)&newio->remote, &addrlen);
 
-    const int newsock = accept(io->fd, &newio->remote, &addrlen);
     if (newsock == -1) {
         mem_sys_free(newio);
         return NULL;
