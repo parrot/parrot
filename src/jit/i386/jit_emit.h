@@ -94,19 +94,6 @@ extern UINTVAL ld(UINTVAL);
 #define ISR1 emit_EAX
 #define FSR1 0
 
-extern char **Parrot_exec_rel_addr;
-extern int Parrot_exec_rel_count;
-
-/* Register the address of a rellocation. */
-#if EXEC_CAPABLE
-#  define EXEC_RA(addr) \
-       if (Parrot_exec_rel_addr) \
-         Parrot_exec_rel_addr[Parrot_exec_rel_count++] = addr;
-#  define EXEC_RD \
-       if (Parrot_exec_rel_addr && Parrot_exec_rel_count) \
-         Parrot_exec_rel_count--;
-#endif /* EXEC_CAPABLE */
-
 #define emit_b00 0
 #define emit_b01 1
 #define emit_b10 2
@@ -170,9 +157,6 @@ emit_disp8_32(char *pc, int disp)
     }
     else {
         *(long *)pc = disp;
-#if EXEC_CAPABLE
-        EXEC_RA(pc);
-#endif /* EXEC_CAPABLE */
         return pc + 4;
     }
 }
@@ -240,9 +224,6 @@ emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, lo
     if (!base && !(i && scale)) {
         *(pc++) = (char)(emit_Mod_b00 | reg_opcode | emit_rm_b101);
         *(long *)pc = disp;
-#if EXEC_CAPABLE
-        EXEC_RA(pc);
-#endif /* EXEC_CAPABLE */
         return pc + 4;
     }
 
@@ -371,7 +352,6 @@ emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
        *(pc++) = (char) 0xff; \
        *(pc++) = (char) 0x35; \
        *(long *)pc = (long)mem; \
-       EXEC_RA(pc); \
        (pc) += 4; }
 #else /* EXEC_CAPABLE */
 #  define emitm_pushl_m(pc, mem) { \
@@ -1353,7 +1333,7 @@ static unsigned char *lastpc;
 #  define emitm_callm(pc, b, i, s, d) { \
        *((pc)++) = (char) 0xff; \
        (pc) = emit_r_X(interp, pc, emit_reg(emit_b010), b, i, s, d);\
-       EXEC_RD }
+       }
 #else /* EXEC_CAPABLE */
 #  define emitm_callm(pc, b, i, s, d) { \
        *((pc)++) = (char) 0xff; \
@@ -1376,7 +1356,7 @@ static unsigned char *lastpc;
 #  define emitm_jumpm(pc, b, i, s, d) { \
        *((pc)++) = (char) 0xff; \
        (pc) = emit_r_X(interp, pc, emit_reg(emit_b100), b, i, s, d); \
-       EXEC_RD }
+       }
 #else /* EXEC_CAPABLE */
 #  define emitm_jumpm(pc, b, i, s, d) { \
        *((pc)++) = (char) 0xff; \
