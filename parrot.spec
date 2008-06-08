@@ -16,6 +16,11 @@ BuildRequires:  bc
 BuildRequires:  m4
 BuildRequires:  libicu-devel
 
+%package languages
+Summary:        Parrot Virtual Machine languages
+License:        Artistic 2.0
+Group:          Development/Libraries
+
 %package devel
 Summary:        Parrot Virtual Machine development headers and libraries
 License:        Artistic 2.0
@@ -27,6 +32,9 @@ Requires:       %{_libdir}/pkgconfig
 Parrot is a virtual machine designed to efficiently compile and execute
 bytecode for dynamic languages. Parrot is a target for the Perl 6 compiler, and
 is already usable as a backend for Pugs, as well as variety of other languages.
+
+%description languages
+High-level languages which run on the Parrot virtual machine.
 
 %description devel
 Parrot Virtual Machine development headers and libraries.
@@ -57,6 +65,8 @@ Parrot Virtual Machine development headers and libraries.
 
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
 make
+make languages
+make perl6
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -76,8 +86,7 @@ find $RPM_BUILD_ROOT%{_libdir} -type f \( -name '*.so' -o -name '*.so.*' \) \
     -exec chmod 755 {} \;
 
 # These files *probably* aren't needed.
-rm -rf $RPM_BUILD_ROOT%{_usr}/compilers \
-    $RPM_BUILD_ROOT%{_usr}/config \
+rm -rf $RPM_BUILD_ROOT%{_usr}/config \
     $RPM_BUILD_ROOT%{_includedir}/src \
     $RPM_BUILD_ROOT%{_usr}/src \
     $RPM_BUILD_ROOT%{_usr}/tools
@@ -102,9 +111,17 @@ rm -rf $RPM_BUILD_ROOT
 %doc RESPONSIBLE_PARTIES TODO
 %doc docs examples
 %exclude %{_bindir}/parrot-config
+%exclude %{_bindir}/perl6
 %{_bindir}/*
 %{_libdir}/parrot
 %{_libdir}/libparrot.so.*
+%{_usr}/compilers
+
+%files languages
+%defattr(-,root,root,-)
+%{_bindir}/perl6
+%{_usr}/languages
+%{_usr}/runtime
 
 %files devel
 %defattr(-,root,root,-)
