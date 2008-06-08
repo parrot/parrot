@@ -24,8 +24,14 @@ These are the vtable functions for Parrot IO.
 #include "../src/io/io_private.h"
 
 #ifdef PARROT_HAS_READLINE
-extern char *readline(const char*);
+#ifdef __cplusplus
+extern "C" {
+#endif
+char *readline(const char *);
 void add_history(const char*);
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 pmclass ParrotIO need_ext {
@@ -171,25 +177,25 @@ SYNOPSIS
 
     METHOD set_readline_interactive(INTVAL on) {
         ParrotIO * const io = (ParrotIO *)PMC_data(SELF);
-#ifdef PARROT_HAS_READLINE
-        INTVAL flag;
-#endif
         if (!io)
             RETURN(INTVAL -2);
-
         if (!(io->flags & PIO_F_READ))
             RETURN(INTVAL -2);
+
 #ifdef PARROT_HAS_READLINE
-        if (on && !(io->flags & PIO_F_CONSOLE))
-            RETURN(INTVAL -2);
-        flag = !!(io->flags & PIO_F_READLINE);
+        {
+            INTVAL flag;
+            if (on && !(io->flags & PIO_F_CONSOLE))
+                RETURN(INTVAL -2);
+            flag = !!(io->flags & PIO_F_READLINE);
 
-        if (on)
-            io->flags |= PIO_F_READLINE;
-        else
-            io->flags &= ~PIO_F_READLINE;
+            if (on)
+                io->flags |= PIO_F_READLINE;
+            else
+                io->flags &= ~PIO_F_READLINE;
 
-        RETURN(INTVAL flag);
+            RETURN(INTVAL flag);
+        }
 #else
         RETURN(INTVAL -1);
 #endif
