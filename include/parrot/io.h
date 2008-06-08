@@ -264,7 +264,7 @@ INTVAL PIO_init_stacks(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void PIO_internal_shutdown(SHIM_INTERP);
+void PIO_internal_shutdown(PARROT_INTERP);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

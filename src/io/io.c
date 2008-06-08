@@ -36,14 +36,6 @@ Parrot ops. The C<ParrotIO struct> is defined in F<src/io/io_private.h>.
 
 /* HEADERIZER HFILE: include/parrot/io.h */
 
-/* This is list of valid layers */
-ParrotIOLayer **pio_registered_layers = NULL;
-
-/* This is the default stack used for IO. Copy this to each new interp */
-/*
-ParrotIOLayer   * pio_default_stack;
-*/
-
 /*
         The standard streams are:
 
@@ -375,10 +367,11 @@ IO system destructor, called on destruction of the last interpreter.
 
 PARROT_API
 void
-PIO_internal_shutdown(SHIM_INTERP)
+PIO_internal_shutdown(PARROT_INTERP)
 {
-    mem_sys_free(pio_registered_layers);
-    pio_registered_layers = NULL;
+    PARROT_ASSERT(! interp->parent_interpreter);
+    mem_sys_free(interp->piolayers);
+    interp->piolayers = NULL;
 }
 
 /*
@@ -415,11 +408,16 @@ PIO_init_stacks(PARROT_INTERP)
     PIO_push_layer(interp, PMCNULL, PIO_base_new_layer(&pio_buf_layer));
 
     fill = 0;
-    if (!pio_registered_layers) {
+    if (!interp->piolayers) {
         n = 5;  /* 2 default layers for now + utf8, mmap, string */
-        pio_registered_layers = (ParrotIOLayer **)mem_sys_allocate(
-                sizeof (ParrotIOLayer *) * (n + 1));
-        fill = 1;
+        if (interp->parent_interpreter) {
+            PARROT_ASSERT(interp->parent_interpreter->piolayers);
+            interp->piolayers = interp->parent_interpreter->piolayers;
+        }
+        else {
+            interp->piolayers = mem_allocate_n_typed(n + 1, ParrotIOLayer *);
+            fill = 1;
+        }
     }
 
     /* Note: All layer pushes should be done before init calls */
@@ -427,8 +425,8 @@ PIO_init_stacks(PARROT_INTERP)
         bottom = p;
         if (fill) {
             PARROT_ASSERT(i < n); /* XXX n can be undefined at this point. */
-            pio_registered_layers[i++] = p;
-            pio_registered_layers[i] = NULL;
+            interp->piolayers[i++] = p;
+            interp->piolayers[i]   = NULL;
         }
     }
     /*
@@ -451,11 +449,11 @@ PIO_init_stacks(PARROT_INTERP)
     }
     if (fill) {
         PARROT_ASSERT(i == 2);
-        PARROT_ASSERT(pio_registered_layers[2] == NULL);
-        pio_registered_layers[2] = PIO_utf8_register_layer();
-        pio_registered_layers[3] = PIO_mmap_register_layer();
-        pio_registered_layers[4] = PIO_string_register_layer();
-        pio_registered_layers[5] = NULL;
+        PARROT_ASSERT(interp->piolayers[2] == NULL);
+        interp->piolayers[2] = PIO_utf8_register_layer();
+        interp->piolayers[3] = PIO_mmap_register_layer();
+        interp->piolayers[4] = PIO_string_register_layer();
+        interp->piolayers[5] = NULL;
     }
 
     return 0;

@@ -177,11 +177,11 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIOLayer *
-PIO_get_layer(SHIM_INTERP, ARGIN(const char *name))
+PIO_get_layer(PARROT_INTERP, ARGIN(const char *name))
 {
     ParrotIOLayer **t;
 
-    for (t = pio_registered_layers; *t; ++t)
+    for (t = interp->piolayers; *t; ++t)
         if (strcmp(name, (*t)->name) == 0)
             return *t;
     return NULL;

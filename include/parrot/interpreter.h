@@ -299,26 +299,31 @@ struct _handler_node_t; /* forward def - exit.h */
  */
 struct parrot_interp_t {
     struct Interp_Context ctx;
-    context_mem ctx_mem;                      /* ctx memory managment */
+    context_mem           ctx_mem;            /* ctx memory managment */
 
     struct Arenas *arena_base;                /* Pointer to this interpreter's
                                                * arena */
 
-    PMC    *class_hash;                       /* Hash of classes */
+    PMC     *class_hash;                      /* Hash of classes */
     VTABLE **vtables;                         /* array of vtable ptrs */
-    int    n_vtable_max;                      /* highest used type */
-    int    n_vtable_alloced;                  /* alloced vtable space */
+    int      n_vtable_max;                    /* highest used type */
+    int      n_vtable_alloced;                /* alloced vtable space */
 
-    struct _ParrotIOData *piodata;            /* interpreter's IO system */
+    struct _ParrotIOLayer **piolayers;        /* IO registered layers */
+    struct _ParrotIOData   *piodata;          /* interpreter's IO system */
 
     op_lib_t  *op_lib;                        /* Opcode library */
     size_t     op_count;                      /* The number of ops */
-    op_info_t *op_info_table;                 /* Opcode info table (name, nargs, arg types) */
+    op_info_t *op_info_table;                 /* Opcode info table
+                                               * (name, nargs, arg types) */
 
-    op_func_t *op_func_table;                 /* opcode dispatch table (functions, labels,
-                                               * or nothing (e.g. switched core), which
-                                               * the interpreter is currently running */
-    op_func_t *evc_func_table;                /* opcode dispatch for event checking */
+    op_func_t *op_func_table;                  /* opcode dispatch table
+                                                * (functions, labels, or nothing
+                                                * (e.g. switched core), which
+                                                * the interpreter is currently
+                                                * running */
+
+    op_func_t *evc_func_table;                /* event check opcode dispatch */
     op_func_t *save_func_table;               /* for restoring op_func_table */
 
     int         n_libs;                       /* count of libs below */
@@ -333,27 +338,27 @@ struct parrot_interp_t {
     INTVAL run_core;                          /* type of core to run the ops */
 
     /* TODO profile per code segment or global */
-    RunProfile *profile;                      /* The structure and array where we keep the
-                                               * profile counters */
+    RunProfile *profile;                      /* profile counters */
 
     INTVAL resume_flag;
     size_t resume_offset;
 
     struct PackFile_ByteCode *code;           /* The code we are executing */
-    struct PackFile *initial_pf;              /* first created PF  */
+    struct PackFile          *initial_pf;     /* first created PF  */
 
     struct _imc_info_t *imc_info;             /* imcc data */
 
-    const char* output_file;                  /* The file into which output is written */
+    const char *output_file;                  /* where to write output */
 
-    PDB_t *pdb;                               /* Debug system */
-    Interp * debugger;                        /* trace / debug interpreter */
+    PDB_t  *pdb;                              /* Debug system */
+    Interp *debugger;                         /* trace / debug interpreter */
 
     struct Stack_Chunk *dynamic_env;          /* current dynamic environment */
 
-    void *lo_var_ptr;                         /* Pointer to memory on runops system stack */
+    void *lo_var_ptr;                         /* Pointer to memory on runops
+                                               * system stack */
 
-    Interp * parent_interpreter;
+    Interp *parent_interpreter;
 
     /* per interpreter global vars */
     INTVAL world_inited;                      /* world_init_once() is done */
@@ -364,34 +369,34 @@ struct parrot_interp_t {
     /* 2:   PMC *Argv;                   list of argv */
     /* 3:   PMC *NCI func hash           hash of NCI funcs */
     /* 4:   PMC *ParrotInterpreter       that's me */
-    /* 5:   PMC *Dyn_libs        Array of dynamically loaded ParrotLibrary  */
+    /* 5:   PMC *Dyn_libs                dynamically loaded ParrotLibrary */
     /* 6:   PMC *Config_Hash             Hash of config settings  */
     /* 7:   PMC *Lib_Paths               LoL of search paths  */
     /* 8:   PMC *PBC_Libs                Hash of load_bytecode cde */
     /* 9:   PMC *Executable              String PMC with name from argv[0]. */
 
-    PMC* DOD_registry;                        /* registered PMCs added to the root set */
+    PMC *DOD_registry;                        /* root set of registered PMCs */
 
-    PMC* HLL_info;                            /* storage for HLL names and types */
-    PMC* HLL_namespace;                       /* cache of HLL toplevel ns */
+    PMC *HLL_info;                            /* HLL names and types */
+    PMC *HLL_namespace;                       /* cache of HLL toplevel ns */
 
     PMC *root_namespace;                      /* namespace hash */
+    PMC *scheduler;                           /* concurrency scheduler */
 
     MMD_table *binop_mmd_funcs;               /* Table of MMD functions */
-    UINTVAL n_binop_mmd_funcs;                /* function count */
+    UINTVAL    n_binop_mmd_funcs;             /* MMD function count */
 
-    struct _Caches * caches;                  /* s. caches.h */
+    struct _Caches * caches;                  /* see caches.h */
 
     STRING **const_cstring_table;             /* CONST_STRING(x) items */
 
-    PMC *scheduler;                           /* concurrency scheduler */
     struct QUEUE* task_queue;                 /* per interpreter queue */
-    struct _handler_node_t *exit_handler_list;   /* exit.c */
+    struct _handler_node_t *exit_handler_list;/* exit.c */
     int sleeping;                             /* used during sleep in events */
 
     struct parrot_exception_t *exceptions;    /* internal exception stack */
     struct parrot_exception_t *exc_free_list; /* and free list */
-    PMC ** exception_list;                    /* precreated exception objects */
+    PMC                      **exception_list;/* precreated exception objects */
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
@@ -402,17 +407,17 @@ struct parrot_interp_t {
 
     UINTVAL gc_generation;                    /* GC generation number */
 
-    opcode_t *current_args;                   /* ptr into code with set_args opcode */
-    opcode_t *current_params;                 /* ptr into code with get_params opcode */
-    opcode_t *current_returns;                /* ptr into code with get_returns opcode */
-    PMC *args_signature;                      /* args signature pmc if it is non-const */
-    PMC *params_signature;                    /* params signature pmc if it is non-const */
-    PMC *returns_signature;                   /* returns signature pmc if it is non-const */
+    opcode_t *current_args;                   /* ptr into code w/ set_args op */
+    opcode_t *current_params;                 /* ... w/ get_params op */
+    opcode_t *current_returns;                /* ... w/ get_returns op */
+    PMC      *args_signature;                 /* non-const args signature PMC */
+    PMC      *params_signature;               /* non-const params sig PMC     */
+    PMC      *returns_signature;              /* non-const returns sig PMC    */
+
     /* during a call sequencer the caller fills these objects
-     * inside the invoke these get moved to the context structure
-     */
+     * inside the invoke these get moved to the context structure */
     PMC *current_cont;                        /* the return continuation PMC */
-    PMC *current_object;                      /* current object if a method call */
+    PMC *current_object;                      /* invocant, if a method call */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that
