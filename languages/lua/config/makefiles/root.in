@@ -178,7 +178,7 @@ $(LIBPATH)/luaos.pbc: $(LIBPATH)/luaos.pir
 $(LIBPATH)/luadebug.pbc: $(LIBPATH)/luadebug.pir
 	$(PARROT) --output=$(LIBPATH)/luadebug.pbc $(LIBPATH)/luadebug.pir
 
-$(LIBPATH)/luabytecode.pbc: $(LIBPATH)/luabytecode.pir
+$(LIBPATH)/luabytecode.pbc: $(LIBPATH)/luabytecode.pir $(LIBPATH)/luabytecode_gen.pir
 	$(PARROT) --output=$(LIBPATH)/luabytecode.pbc $(LIBPATH)/luabytecode.pir
 
 $(LIBPATH)/alarm.pbc: $(LIBPATH)/alarm.pir
