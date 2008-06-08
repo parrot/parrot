@@ -103,7 +103,7 @@ sub decl {
     $args =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
 
     my ( $decorators, $export, $extern, $newl, $semi, $interp, $pmcvar );
-    $decorators = length @$decs ? join $/ => @$decs, '' : '';
+    $decorators = join($/, @$decs, '');
     if ( $for_header eq 'HEADER' ) {
         $export = $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
         $extern = "";
