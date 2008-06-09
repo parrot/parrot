@@ -390,7 +390,8 @@ start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
 
 =item C<static void next_arg_sig>
 
-Moves the call state to the next argument in the signature.
+Moves the call state to the next argument in the signature, calculating which
+type of argument/parameter to get next.  The index gets increased elsewhere.
 
 =cut
 
@@ -438,6 +439,7 @@ Fetches the next argument from the signature in the given call state.
 
 */
 
+/* Fetch an argument from C code */
 static int
 fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
 {
@@ -493,7 +495,7 @@ fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
 
 =item C<static int fetch_arg_op>
 
-RT#48260: Not yet documented!!!
+Fetches an argument from the appropriate context.
 
 =cut
 
@@ -559,6 +561,8 @@ RT#48260: Not yet documented!!!
 
 */
 
+/* Fetch a new argument.
+ */
 PARROT_API
 int
 Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
@@ -573,7 +577,7 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
 
     next_arg_sig(&st->src);
 
-    /* check if we're at a :flat argument */
+    /* check if we're supposed to continue a :flat argument */
     if (st->src.mode & CALL_STATE_FLATTEN) {
         PARROT_ASSERT(st->src.slurp_i < st->src.slurp_n);
         if (!PMC_IS_NULL(st->key)) {
