@@ -308,6 +308,92 @@ Hint: use a C<PAST::Val> node for the string conversion.
 
 =back
 
+
+=head2 Solutions to the exercises
+
+=over 4
+
+=item 1
+
+    method key($/) {
+    my $key := $( $<expression> );
+
+    make PAST::Var.new( $key, :scope('keyed'),
+                              :vivibase('Hash'),
+                              :viviself('Undef'),
+                              :node($/) );
+    }
+
+=item 2
+
+    method named_field($/) {
+        my $past := $( $<expression> );
+        my $name := $( $<string_constant> );
+        ## the passed expression is in fact a named argument,
+        ## use the named() accessor to set that name.
+        $past.named($name);
+        make $past;
+    }
+
+    method array_constructor($/) {
+        ## use the parrot calling conventions to
+        ## create an array,
+        ## using the "anonymous" sub !array
+        ## (which is not a valid Squaak name)
+        my $past := PAST::Op.new( :name('!array'),
+                                  :pasttype('call'),
+                                  :node($/) );
+        for $<expression> {
+            $past.push($($_));
+        }
+        make $past;
+    }
+
+    method hash_constructor($/) {
+        ## use the parrot calling conventions to
+        ## create a hash, using the "anonymous" sub
+        ## !hash (which is not a valid Squaak name)
+        my $past := PAST::Op.new( :name('!hash'),
+                                  :pasttype('call'),
+                                  :node($/) );
+        for $<named_field> {
+            $past.push($($_));
+        }
+        make $past;
+    }
+
+=item 3
+
+    rule postfix_expression {
+        | <key> {*}         #= key
+        | <member> {*}      #= member
+        | <index> {*}       #= index
+    }
+
+    rule member {
+        '.' <identifier>
+        {*}
+    }
+
+    method member($/) {
+        my $member := $( $<identifier> );
+        ## x.y is syntactic sugar for x{"y"},
+        ## so stringify the identifier:
+        my $key    := PAST::Val.new( :returns('String'),
+                                     :value($member.name()),
+                                     :node($/) );
+
+        ## the rest of this method is the same
+        ## as method key() above.
+        make PAST::Var.new( $key, :scope('keyed'),
+                                  :vivibase('Hash'),
+                                  :viviself('Undef'),
+                                  :node($/) );
+    }
+
+=back
+
+
 =cut
 
 
