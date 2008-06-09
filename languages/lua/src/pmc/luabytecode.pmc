@@ -381,8 +381,14 @@ Loads Lua 5.1 VM bytecode.
 
 */
     METHOD PMC* undump(STRING* luabytecode) {
-        PMC * script = pmc_new(INTERP, pmc_type(INTERP,
-            const_string(INTERP, "Lua::Bytecode")));
+        PMC * script;
+        INTVAL type = pmc_type(INTERP, const_string(INTERP, "Lua::Bytecode"));
+
+        if (type <= 0)
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                "Lua::Bytecode not loaded");
+
+        script = pmc_new(INTERP, type);
 
         _init(INTERP, luabytecode);
         _load_header(INTERP, script);
