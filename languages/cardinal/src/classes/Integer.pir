@@ -80,6 +80,26 @@ Runs C<block> for each integer from the current value of the Integer down to n.
 .end
 
 
+=item upto(n, block)
+
+Runs C<block> for each integer from the current value of the Integer up to n.
+
+=cut
+
+.sub 'upto' :method
+    .param int n
+    .param pmc block
+    $I1 = self
+  upto_loop:
+    $I0 = $I1 > n
+    if $I0, upto_done
+    block($I1)
+    dec $I1
+    goto upto_loop
+  upto_done:
+.end
+
+
 =back
 
 =cut
