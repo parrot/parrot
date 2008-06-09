@@ -38,6 +38,7 @@ SOURCES = cardinal.pir \
 #  $(CARDINAL_GROUP)
 
 BUILTINS_PIR = \
+  src/builtins/guts.pir \
   src/builtins/say.pir \
   src/builtins/cmp.pir \
   src/classes/Object.pir \

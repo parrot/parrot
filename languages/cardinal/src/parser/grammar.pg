@@ -68,6 +68,7 @@ rule expr {
 
 
 token basic_expr {
+    | <classdef> {*}        #= classdef
     | <assignment> {*}      #= assignment
     | <arg> {*}             #= arg
     | <not_expr> {*}        #= not_expr
@@ -155,8 +156,8 @@ rule do_args {
 
 token variable {
     | <varname> {*}      #= varname
-    | 'nil'              #= nil
-    | 'self'             #= self
+    | 'nil'     {*}      #= nil
+    | 'self'    {*}      #= self
 }
 
 token varname {
@@ -281,6 +282,12 @@ rule module {
     {*}
 }
 
+rule classdef {
+    'class' <module_identifier> {*}  #= open
+    <comp_stmt>
+    'end'                       {*}  #= block
+}
+
 rule functiondef {
     'def' <fname> <argdecl>
     <comp_stmt>
@@ -354,7 +361,7 @@ token identifier {
 }
 
 token module_identifier {
-    <before <[A..Z]>> <ident>
+    <.before <[A..Z]>> <ident>
     {*}
 }
 

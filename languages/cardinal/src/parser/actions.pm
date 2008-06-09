@@ -20,6 +20,22 @@ class cardinal::Grammar::Actions;
 method TOP($/) {
     my $past := $( $<comp_stmt> );
     $past.blocktype('declaration');
+
+    our $?INIT;
+        if defined( $?INIT ) {
+        $?INIT.unshift(
+            PAST::Var.new(
+                :name('$def'),
+                :scope('lexical'),
+                :isdecl(1)
+            )
+        );
+        $?INIT.blocktype('declaration');
+        $?INIT.pirflags(':init :load');
+        $past.unshift( $?INIT );
+        $?INIT := PAST::Block.new(); # For the next eval.
+    }
+
     make $past;
 }
 
@@ -170,7 +186,17 @@ method indexed_variable($/) {
 }
 
 method variable($/, $key) {
-    make $( $/{$key} );
+    my $past;
+    if $key eq 'varname' {
+        $past := $( $/<varname> );
+    }
+    elsif $key eq 'self' {
+        $past := PAST::Op.new(:inline('%r = self'));
+    }
+    elsif $key eq 'nil' {
+        $/.panic('nil is not yet implemented');
+    }
+    make $past;
 }
 
 method varname($/, $key) {
@@ -182,7 +208,26 @@ method global($/) {
 }
 
 method instance_variable($/) {
-    make PAST::Var.new(  :name(~$/), :scope('attribute'), :viviself('Undef'), :node($/) );
+    our $?CLASS;
+    my $name := ~$/;
+    my $past := PAST::Var.new(  :name($name), :scope('attribute'), :viviself('Undef'), :node($/) );
+    my $block := $?CLASS[0];
+    unless $block.symbol(~$/) {
+        $?CLASS.push(
+            PAST::Op.new(
+                :pasttype('call'),
+                :name('!keyword_has'),
+                PAST::Var.new(
+                    :name('$def'),
+                    :scope('lexical')
+                ),
+                PAST::Val.new( :value($name) )
+            )
+        );
+
+        $block.symbol($name, :scope('attribute'));
+    }
+    make $past;
 }
 
 method local_variable($/) {
@@ -295,6 +340,85 @@ method begin_end($/) {
     make $past;
 }
 
+method classdef($/,$key) {
+    our $?CLASS;
+    our @?CLASS;
+    our $?INIT;
+    our $?ZOMG;
+    $?ZOMG := 'class';
+
+    my $name := ~$<module_identifier><ident>;
+    if $key eq 'open' {
+        my $decl := PAST::Stmts.new();
+        $decl.push(
+            PAST::Op.new(
+                :pasttype('bind'),
+                PAST::Var.new(
+                    :name('$def'),
+                    :scope('lexical')
+                ),
+                PAST::Op.new(
+                    :pasttype('call'),
+                    :name('!keyword_class'),
+                    PAST::Val.new( :value($name) )
+                )
+            )
+        );
+        @?CLASS.unshift( $?CLASS );
+        $?CLASS := $decl;
+        $?CLASS.unshift( PAST::Block.new() );
+    }
+    else {
+        my $block := $( $<comp_stmt> );
+        $block.namespace($name);
+        $block.blocktype('declaration');
+        $block.pirflags(':init :load');
+
+        $?CLASS.push(
+            PAST::Op.new(
+                :pasttype('callmethod'),
+                :name('register'),
+                PAST::Var.new(
+                    :scope('package'),
+                    :name('!CARDINALMETA'),
+                    :namespace('CardinalObject')
+                ),
+                PAST::Var.new(
+                    :scope('lexical'),
+                    :name('$def')
+                ),
+                PAST::Val.new(
+                    :value('CardinalObject'),
+                    :named( PAST::Val.new( :value('parent') ) )
+                )
+            )
+        );
+
+        unless defined( $?INIT ) {
+            $?INIT := PAST::Block.new();
+        }
+        for @( $?CLASS ) {
+            if $_.WHAT() eq 'Block' {
+                $block.push( $_ );
+            }
+            else {
+                $?INIT.push( $_ );
+            }
+        }
+
+        # Restore outer class.
+        if +@?CLASS {
+            $?CLASS := @?CLASS.shift();
+        }
+        else {
+            $?CLASS := @?CLASS[0];
+        }
+
+
+        make $block;
+    }
+}
+
 method functiondef($/) {
     my $past := $( $<comp_stmt> );
     my $name := $<fname>;
@@ -302,7 +426,11 @@ method functiondef($/) {
     #$past.push($args);
     $past.name(~$name);
     our $?BLOCK;
+    our $?CLASS;
     $?BLOCK.symbol(~$name, :scope('package'));
+    if defined($?CLASS) {
+        $past.pirflags(':method');
+    }
     make $past;
 }
 
