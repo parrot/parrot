@@ -387,4 +387,69 @@ Implement the missing operators: (binary) "-", "<=", ">=", "==", "!=", "/",
 
 docs/pct/pct_optable_guide.pod
 
+=head2 Solution to the exercises
+
+=over 4
+
+=item 1
+
+A floating-point number consists of zero or more digits, followed by a dot
+and at least one digit, or, at least one digit followed by a dot and any
+number of digits. Examples are: 42.0, 1., .0001. There may be no whitespace
+between the individual digits and the dot. Make sure you understand the
+difference between a C<rule> and a C<token>.
+
+    token float_constant {
+        [
+        | \d+ '.' \d*
+        | \d* '.' \d+
+        ]
+        {*}
+    }
+
+=item 2
+
+For sake of completeness (and easy copy-paste for you), here's the list of
+operator declarations as I wrote them for Squaak:
+
+    rule expression    is optable              { ... }
+
+    proto 'infix:or'   is precedence('1')
+                       is pasttype('unless')   { ... }
+    proto 'infix:and'  is tighter('infix:or')
+                       is pasttype('if')       { ... }
+
+    proto 'infix:<'    is tighter('infix:and') { ... }
+    proto 'infix:<='   is equiv('infix:<')     { ... }
+    proto 'infix:>'    is equiv('infix:<')     { ... }
+    proto 'infix:>='   is equiv('infix:<')     { ... }
+    proto 'infix:=='   is equiv('infix:<')     { ... }
+    proto 'infix:!='   is equiv('infix:<')     { ... }
+
+    proto 'infix:+'    is tighter('infix:<')
+                       is pirop('n_add')       { ... }
+    proto 'infix:-'    is equiv('infix:+')
+                       is pirop('n_sub')       { ... }
+
+    proto 'infix:..'   is equiv('infix:+')
+                       is pirop('n_concat')    { ... }
+
+    proto 'infix:*'    is tighter('infix:+')
+                       is pirop('n_mul')       { ... }
+    proto 'infix:%'    is equiv('infix:*')
+                       is pirop('n_mod')       { ... }
+    proto 'infix:/'    is equiv('infix:*')
+                       is pirop('n_div')       { ... }
+
+    proto 'prefix:not' is tighter('infix:*')
+                       is pirop('n_not')       { ... }
+    proto 'prefix:-'   is tighter('prefix:not')
+                       is pirop('n_neg')       { ... }
+
+    proto 'term:'      is tighter('prefix:-')
+                       is parsed(&term)        { ... }
+
+
+=back
+
 =cut
