@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -471,7 +471,9 @@ utf8_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL pos)
 
 =item C<static STRING * to_encoding>
 
-RT#48260: Not yet documented!!!
+Converts the string C<src> to this particular encoding.  If C<dest> is
+provided, it will contain the result.  Otherwise this function operates in
+place.
 
 =cut
 
@@ -557,7 +559,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 =item C<static UINTVAL get_codepoint>
 
-RT#48260: Not yet documented!!!
+Returns the codepoint in string C<src> at position C<offset>.
 
 =cut
 
@@ -574,7 +576,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 
 =item C<static void set_codepoint>
 
-RT#48260: Not yet documented!!!
+Sets, in string C<src> at position C<offset>, the codepoint C<codepoint>.
 
 =cut
 
@@ -596,7 +598,7 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
 
 =item C<static UINTVAL get_byte>
 
-RT#48260: Not yet documented!!!
+Returns the byte in string C<src> at position C<offset>.
 
 =cut
 
@@ -619,7 +621,7 @@ get_byte(SHIM_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 
 =item C<static void set_byte>
 
-RT#48260: Not yet documented!!!
+Sets, in string C<src> at position C<offset>, the byte C<byte>.
 
 =cut
 
@@ -641,7 +643,8 @@ set_byte(PARROT_INTERP, ARGIN(const STRING *src),
 
 =item C<static STRING * get_codepoints>
 
-RT#48260: Not yet documented!!!
+Returns the codepoints in string C<src> at position C<offset> and length
+C<count>.
 
 =cut
 
@@ -678,7 +681,7 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 
 =item C<static STRING * get_bytes>
 
-RT#48260: Not yet documented!!!
+Returns the bytes in string C<src> at position C<offset> and length C<count>.
 
 =cut
 
@@ -706,7 +709,8 @@ get_bytes(PARROT_INTERP, ARGMOD(STRING *src), UINTVAL offset, UINTVAL count)
 
 =item C<static STRING * get_codepoints_inplace>
 
-RT#48260: Not yet documented!!!
+Gets from string C<src> at position C<offset> C<count> codepoints and returns
+them in C<return_string>.
 
 =cut
 
@@ -719,15 +723,20 @@ get_codepoints_inplace(PARROT_INTERP, ARGMOD(STRING *src),
 {
     String_iter iter;
     UINTVAL start;
+
     Parrot_reuse_COW_reference(interp, src, return_string);
     iter_init(interp, src, &iter);
     iter.set_position(interp, &iter, offset);
+
     start = iter.bytepos;
-    return_string->strstart = (char *)return_string->strstart + start ;
+
+    return_string->strstart = (char *)return_string->strstart + start;
     iter.set_position(interp, &iter, offset + count);
+
     return_string->bufused = iter.bytepos - start;
-    return_string->strlen = count;
+    return_string->strlen  = count;
     return_string->hashval = 0;
+
     return return_string;
 }
 
@@ -735,7 +744,8 @@ get_codepoints_inplace(PARROT_INTERP, ARGMOD(STRING *src),
 
 =item C<static STRING * get_bytes_inplace>
 
-RT#48260: Not yet documented!!!
+Gets from string C<src> at position C<offset> C<count> bytes and returns them
+in C<return_string>.
 
 =cut
 
@@ -753,7 +763,8 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 =item C<static void set_codepoints>
 
-RT#48260: Not yet documented!!!
+Replaces in string C<src> at position C<offset> for C<count> codepoints with
+the contents of string C<new_codepoints>.
 
 =cut
 
@@ -770,7 +781,8 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
 
 =item C<static void set_bytes>
 
-RT#48260: Not yet documented!!!
+Replaces in string C<src> at position C<offset> for C<count> bytes with the
+contents of string C<new_bytes>.
 
 =cut
 
@@ -804,7 +816,7 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
 
 =item C<static UINTVAL codepoints>
 
-RT#48260: Not yet documented!!!
+Returns the number of codepoints in string C<src>.
 
 =cut
 
@@ -828,7 +840,7 @@ codepoints(PARROT_INTERP, ARGMOD(STRING *src))
 
 =item C<static UINTVAL bytes>
 
-RT#48260: Not yet documented!!!
+Returns the number of bytes in string C<src>.
 
 =cut
 
@@ -845,7 +857,7 @@ bytes(SHIM_INTERP, ARGIN(STRING *src))
 
 =item C<static void iter_init>
 
-RT#48260: Not yet documented!!!
+Initializes for string C<src> the string iterator C<iter>.
 
 =cut
 
@@ -854,19 +866,19 @@ RT#48260: Not yet documented!!!
 static void
 iter_init(SHIM_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 {
-    iter->str = src;
-    iter->bytepos = 0;
-    iter->charpos = 0;
+    iter->str             = src;
+    iter->bytepos         = 0;
+    iter->charpos         = 0;
     iter->get_and_advance = utf8_decode_and_advance;
     iter->set_and_advance = utf8_encode_and_advance;
-    iter->set_position =    utf8_set_position;
+    iter->set_position    = utf8_set_position;
 }
 
 /*
 
 =item C<ENCODING * Parrot_encoding_utf8_init>
 
-RT#48260: Not yet documented!!!
+Initializes the UTF-8 encoding.
 
 =cut
 
