@@ -156,7 +156,20 @@ PARROT_WARN_UNUSED_RESULT
 static int
 STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const void *bucket_key))
 {
-    return string_equal(interp, (const STRING *)search_key, (const STRING *)bucket_key);
+    STRING const *s1 = (STRING const *)search_key;
+    STRING const *s2 = (STRING const *)bucket_key;
+
+    if (!s2)
+        return 1;
+
+    if (s1->hashval != s2->hashval)
+        return 1;
+
+    /* COWed strings */
+    if (s1->strstart == s2->strstart && s1->bufused == s2->bufused)
+        return 0;
+
+    return CHARSET_COMPARE(interp, s1, s2);
 }
 
 /*
