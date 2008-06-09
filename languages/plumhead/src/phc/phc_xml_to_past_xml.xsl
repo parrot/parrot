@@ -9,7 +9,7 @@
 $Id$
 
 This transformation takes a XML abstract syntax tree as generated 
-by phc from PHP source. It generates a PAST data structure in XML.
+by PHC from PHP source code. It generates an XML representation of a PAST data structure.
 
 -->
 <xsl:output method='xml' indent='yes' />
@@ -116,16 +116,27 @@ by phc from PHP source. It generates a PAST data structure in XML.
   </past:Op>
 </xsl:template>
 
-<xsl:template match="phc:AST_assignment" >
+<!-- value assignment -->
+<xsl:template match="phc:AST_assignment[string(phc:bool) = 'false']" >
   <past:Op name='infix:=' pasttype='bind' >
     <xsl:apply-templates select="phc:AST_variable" />
     <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:AST_bin_op" />
   </past:Op>
 </xsl:template>
 
+<!-- aliasing -->
+<xsl:template match="phc:AST_assignment[string(phc:bool) = 'true']" >
+  <past:Op name='infix::=' pasttype='bind' >
+    <xsl:apply-templates select="phc:AST_variable" />
+    <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:AST_bin_op" />
+  </past:Op>
+</xsl:template>
+
 <xsl:template match="phc:AST_variable" >
-  <past:Var scope="package" viviself="Undef" lvalue="1" >
-    <xsl:attribute name="name" ><xsl:value-of select="concat( '$', phc:Token_variable_name/phc:value )" /></xsl:attribute>
+  <past:Var scope="package" >
+    <xsl:attribute name="name" >
+      <xsl:value-of select="concat( '$', phc:Token_variable_name/phc:value )" />
+    </xsl:attribute>
   </past:Var>
 </xsl:template>
 

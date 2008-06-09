@@ -127,8 +127,8 @@ language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'references', todo =>
 <?php
 
 $var = 1;
-$ref1 = &$var;
-$ref2 = &$var;
+$ref1 =& $var;
+$ref2 =& $var;
 $ref3 = $ref2;
 echo $var; echo $ref1; echo $ref2; echo $ref3; echo "\n";
 
