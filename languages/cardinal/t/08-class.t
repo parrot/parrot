@@ -3,7 +3,6 @@ puts '1..4'
 class OkayOnCreate
     def initialize(a)
         puts 'ok ', a
-        self
     end
 end
 
@@ -20,7 +19,6 @@ class OkaySayer
 
     def initialize(n)
         @num = n
-        self
     end
 
     def inc

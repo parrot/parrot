@@ -141,7 +141,7 @@ Create a new object having the same class as the invocant.
     $P1 = $P0.'new'()
     $P2 = $P1.'initialize'(args :flat, named_args :named :flat)
 
-    .return ($P2)
+    .return ($P1)
 .end
 
 =item WHENCE()
