@@ -234,7 +234,197 @@ the syntax of the for-statement. When implementing it, you will run into the
 same issue as we did when implementing subroutines and parameters. Use the same
 trick for the implementation of the for-statement.
 
-
 =back
+
+=head2 Solution to the exercise
+
+Without further ado, the solution to the exercise in Episode 6:
+
+By now you should have a good idea on the implementation of scope in Squaak.
+We haven't implemented the for-statement yet, as it needs proper scope handling
+to implement. Implement this. Check out Episode 3 for the BNF rules that define
+the syntax of the for-statement. When implementing it, you will run into the
+same issue as we did when implementing subroutines and parameters. Use the
+same trick for the implementation of the for-statement.
+
+First, let us look at the BNF of the for-statement:
+
+    for-statement ::= 'for' for-init ',' expression [step]
+                      'do'
+                      block
+                      'end'
+
+    step          ::= ',' expression
+
+    for-init      ::= 'var' identifier '=' expression
+
+It's pretty easy to convert this to Perl 6 rules:
+
+    rule for_statement {
+        'for' <for_init> ',' <expression> <step>?
+        'do' <statement>* 'end'
+        {*}
+    }
+
+    rule step {
+        ',' <expression>
+        {*}
+    }
+
+    rule for_init {
+        'var' <identifier> '=' <expression>
+        {*}
+    }
+
+Pretty easy huh? Let's take a look at the semantics. A for-loop is just
+another way to write a while loop, but much easier in certain cases. This:
+
+    for var <ident> = <expr1>, <expr2>, <expr3> do
+       <statement>*
+    end
+
+corresponds to:
+
+    do
+      var <ident> = <expr1>
+      while <ident> <= <expr2> do
+         <statement>*
+         <ident> = <ident> + <expr3>
+      end
+    end
+
+If <expr3> is absent, it defaults to the value C<1>. Note that the step
+expression (expr3) should be positive; the loop condition contains a "<="
+operator. When you specify a negative step expression, the loop variable
+will only decrease in value, which will never make the loop condition false
+(unless it overflows, but that's a different issue; this might even raise an
+exception in Parrot; this I do not know). Allowing negative step expressions
+introduces more complexity, which I felt was not worth the trouble for this
+tutorial language.
+
+Note that the loop variable <ident> is local to the for loop; this is expressed
+in the equivalent while loop by the surrounding do/end pair: a new do/end pair
+defines a new (nested) scope; after the C<end> keyword, the loop variable is no
+longer visible.
+
+Let's implement the action method for the for-statement. As was mentioned in
+the exercise description, we're dealing with the same situation as with
+subroutine parameters. In this case, we're dealing with the loop variable,
+which is local to the for-statement. Let's check out the rule for for_init:
+
+    method for_init($/) {
+        our $?BLOCK;
+        our @?BLOCK;
+
+        ## create a new scope here, so that we can
+        ## add the loop variable
+        ## to this block here, which is convenient.
+        $?BLOCK := PAST::Block.new( :blocktype('immediate'),
+                                    :node($/) );
+        @?BLOCK.unshift($?BLOCK);
+
+        my $iter := $( $<identifier> );
+        ## set a flag that this identifier is being declared
+        $iter.isdecl(1);
+        $iter.scope('lexical');
+        ## the identifier is initialized with this expression
+        $iter.viviself( $( $<expression> ) );
+
+        ## enter the loop variable into the symbol table.
+        $?BLOCK.symbol($iter.name(), :scope('lexical'));
+
+        make $iter;
+    }
+
+So, just as we created a new C<PAST::Block> for the subroutine in the action
+method for parameters, we create a new C<PAST::Block> for the for-statement in
+the action method that defines the loop variable. (Guess why we made for-init
+a subrule, and didn't put in "C<var> <ident&gt = <expression>" in the rule of
+for-statement). This block is the place to live for the loop variable. The
+loop variable is declared, initialized using the viviself attribute, and
+entered into the new block's symbol table. Note that after creating the new
+C<PAST::Block> object, we put it onto the stack scope.
+
+Now, the action method for the for statement is quite long, so I'll just
+embed my comments, which makes reading it easier.
+
+    method for_statement($/) {
+        our $?BLOCK;
+        our @?BLOCK;
+
+First, get the result object of the for statement initialization rule; this
+is the C<PAST::Var> object, representing the declaration and initialization
+of the loop variable.
+
+        my $init := $( $<for_init> );
+
+Then, create a new node for the loop variable. Yes, another one (besides the
+one that is currently contained in the C<PAST::Block>). This one is used when
+the loop variable is updated at the end of the code block (each iteration).
+The difference with the other one, is that it doesn't have the C<isdecl> flag,
+and it doesn't have a C<viviself> clause, which would result in extra
+instructions checking whether the variable is null (and we know it's not,
+because we initialize the loop variable).
+
+        ## cache the name of the loop variable
+        my $itername := $init.name();
+        my $iter := PAST::Var.new( :name($itername),
+                               :scope('lexical'),
+                               :node($/) );
+
+Now, retrieve the C<PAST::Block> node from the scope stack, and push all
+statement PAST nodes onto it.
+
+        ## the body of the loop consists of the statements written by the user and
+        ## the increment instruction of the loop iterator.
+
+        my $body := @?BLOCK.shift();
+        $?BLOCK  := @?BLOCK[0];
+        for $<statement> {
+            $body.push($($_));
+        }
+
+If there was a step, we use that value; otherwise, we use assume a default
+step size of C<1>. Negative step sizes won't work, but if you Feel Lucky, you
+could go ahead and try. It's not that hard, it's just a lot of work, and
+I'm too lazy for that now.... ehm, I mean, I leave it as the proverbial
+exercise to the reader.
+
+        my $step;
+        if $<step> {
+            my $stepsize := $( $<step>[0] );
+            $step := PAST::Op.new( $iter, $stepsize, :pirop('add'), :node($/) );
+        }
+        else { ## default is increment by 1
+            $step := PAST::Op.new( $iter, :pirop('inc'), :node($/) );
+        }
+
+The incrementing of the loop variable is part of the loop body, so add the
+incrementing statement to $body.
+
+        $body.push($step);
+
+The loop condition uses the "<=" operator, and compares the loop variable
+with the maximum value that was specified.
+
+        ## while loop iterator <= end-expression
+        my $cond := PAST::Op.new( $iter,
+                                  $( $<expression> ),
+                                  :name('infix:<=') );
+
+Now we have the PAST for the loop condition and the loop body, so now create
+a PAST to represent the (while) loop.
+
+        my $loop := PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
+
+Finally, the initialization of the loop variable should go before the loop
+itself, so create a C<PAST::Stmts> node to do this:
+
+        make PAST::Stmts.new( $init, $loop, :node($/) );
+    }
+
+
+Wow, we've done it! This was a good example of how to implement a
+non-trivial statement type using PAST.
 
 =cut
