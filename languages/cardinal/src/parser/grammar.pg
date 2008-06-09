@@ -127,7 +127,8 @@ rule call {
 }
 
 rule do_block {
-    'do' <do_args> <.term>? <comp_stmt> 'end' {*}
+    | 'do' <do_args> <.term>? <comp_stmt> 'end' {*}
+    | '{' <do_args> <.term>? <comp_stmt> '}' {*}
 }
 
 rule super_call {
