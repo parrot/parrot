@@ -76,7 +76,7 @@ Destroys C<*vtable>.
 
 PARROT_API
 void
-Parrot_destroy_vtable(SHIM_INTERP, ARGMOD(VTABLE *vtable))
+Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
 {
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
@@ -85,6 +85,11 @@ Parrot_destroy_vtable(SHIM_INTERP, ARGMOD(VTABLE *vtable))
     if (vtable->ro_variant_vtable) {
         mem_sys_free(vtable->ro_variant_vtable);
         vtable->ro_variant_vtable = NULL;
+    }
+
+    if (vtable->isa_hash) {
+        parrot_hash_destroy(interp, vtable->isa_hash);
+        vtable->isa_hash = NULL;
     }
 
     mem_sys_free(vtable);
@@ -187,8 +192,6 @@ mark_vtables(PARROT_INTERP)
             pobject_lives(interp, (PObj *)vtable->whoami);
         if (vtable->provides_str)
             pobject_lives(interp, (PObj *)vtable->provides_str);
-        if (vtable->isa_str)
-            pobject_lives(interp, (PObj *)vtable->isa_str);
         if (vtable->pmc_class)
             pobject_lives(interp, (PObj *)vtable->pmc_class);
     }

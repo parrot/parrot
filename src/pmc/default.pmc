@@ -915,8 +915,8 @@ true (1) is returned; otherwise, false (0) is returned.
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
         /* RT #46665 - walk mro */
-        return does_isa(INTERP, VTABLE_get_string(INTERP, lookup),
-                SELF->vtable->isa_str);
+        return !!parrot_hash_get_bucket(INTERP, SELF->vtable->isa_hash,
+                (void *)VTABLE_get_string(interp, lookup));
     }
 
 /*
@@ -933,7 +933,8 @@ true (1) is returned; otherwise, false (0) is returned.
 
     VTABLE INTVAL isa(STRING *_class) {
         /* RT #46665 - walk mro */
-        return does_isa(INTERP, _class, SELF->vtable->isa_str);
+        return !!parrot_hash_get_bucket(INTERP, SELF->vtable->isa_hash,
+                    (void *)_class);
     }
 
 /*

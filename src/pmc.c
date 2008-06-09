@@ -526,14 +526,14 @@ PARROT_API
 void
 Parrot_create_mro(PARROT_INTERP, INTVAL type)
 {
-    STRING *class_name, *isa;
-    INTVAL pos, parent_type, total;
-    PMC *_class, *mro;
+    PMC    *_class, *mro;
+    INTVAL i, count;
 
-    VTABLE *vtable = interp->vtables[type];
+    VTABLE *vtable   = interp->vtables[type];
+    PMC    *mro_list = vtable->mro;
 
     /* multithreaded: has already mro */
-    if (vtable->mro)
+    if (mro_list && mro_list->vtable->base_type != enum_class_ResizableStringArray)
         return;
 
     mro         = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -542,14 +542,11 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
     if (vtable->ro_variant_vtable)
         vtable->ro_variant_vtable->mro = mro;
 
-    class_name = vtable->whoami;
-    isa        = vtable->isa_str;
-    total      = (INTVAL)string_length(interp, isa);
+    count = VTABLE_elements(interp, mro_list);
 
-    for (pos = 0; ;) {
-        INTVAL len  = string_length(interp, class_name);
-        pos        += len + 1;
-        parent_type = pmc_type(interp, class_name);
+    for (i = 0; i < count; ++i) {
+        STRING *class_name  = VTABLE_get_string_keyed_int(interp, mro_list, i);
+        INTVAL  parent_type = pmc_type(interp, class_name);
 
         /* abstract classes don't have a vtable */
         if (!parent_type)
@@ -573,16 +570,6 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
             _class = create_class_pmc(interp, parent_type);
 
         VTABLE_push_pmc(interp, mro, _class);
-
-        if (pos >= total)
-            break;
-
-        len = string_str_index(interp, isa, CONST_STRING(interp, " "), pos);
-
-        if (len == -1)
-            len = total;
-
-        class_name = string_substr(interp, isa, pos, len - pos, NULL, 0);
     }
 }
 
