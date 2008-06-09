@@ -94,7 +94,7 @@ Runs C<block> for each integer from the current value of the Integer up to n.
     $I0 = $I1 > n
     if $I0, upto_done
     block($I1)
-    dec $I1
+    inc $I1
     goto upto_loop
   upto_done:
 .end

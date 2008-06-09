@@ -28,10 +28,11 @@ token comp_stmt {
 }
 
 rule stmts {
-    <.term>?[ <stmt> <.term>+]* {*}
+    <.term>?[ <stmt> [<.term>+ | <.before <end_block>>]]* {*}
 }
 
 token term { \n | ';' }
+token end_block { <.ws> [ 'end' | '}' ] }
 
 token basic_stmt {
     | <alias> {*}           #= alias
