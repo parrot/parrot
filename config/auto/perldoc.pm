@@ -20,7 +20,7 @@ package auto::perldoc;
 use strict;
 use warnings;
 
-use File::Temp;
+use File::Temp qw (tempfile );
 use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':auto';
 
@@ -37,9 +37,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $cmd = $conf->data->get_p5('scriptdirexp') . q{/perldoc};
-    my $tmpfile = File::Temp->new( UNLINK => 1, SUFFIX => '.tmp' );
-    my $mode = 0666;
-    chmod $mode, $tmpfile;
+    my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
     my $content = capture_output("$cmd -ud $tmpfile perldoc") || undef;
 
     return 1 unless defined( $self->_initial_content_check($conf, $content) );
