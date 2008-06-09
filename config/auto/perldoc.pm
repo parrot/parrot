@@ -37,12 +37,12 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $cmd = $conf->data->get_p5('scriptdirexp') . q{/perldoc};
-    my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
-    my $content = capture_output("$cmd -ud $tmpfile perldoc") || undef;
+    my ( $fh, $filename ) = tempfile( UNLINK => 1 );
+    my $content = capture_output("$cmd -ud $filename perldoc") || undef;
 
     return 1 unless defined( $self->_initial_content_check($conf, $content) );
 
-    my $version = $self->_analyze_perldoc($cmd, $tmpfile, $content);
+    my $version = $self->_analyze_perldoc($cmd, $filename, $content);
 
     _handle_version($conf, $version);
 
