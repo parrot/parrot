@@ -110,10 +110,9 @@ static int pointer_compare(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 static int STRING_compare(PARROT_INTERP,
     ARGIN(const void *search_key),
-    ARGIN(const void *bucket_key))
+    ARGIN_NULLOK(const void *bucket_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -154,7 +153,7 @@ Compares the two strings, returning 0 if they are identical.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const void *bucket_key))
+STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const void *bucket_key))
 {
     STRING const *s1 = (STRING const *)search_key;
     STRING const *s2 = (STRING const *)bucket_key;
