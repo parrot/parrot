@@ -642,7 +642,7 @@ EOC
 
     for my $isa ($classname, @isa) {
         $cout .= <<"EOC";
-        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING(interp, "$isa")), NULL);
+        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING(interp, "$isa")), PMCNULL);
 EOC
     }
 
