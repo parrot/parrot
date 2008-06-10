@@ -299,6 +299,27 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_sub * new_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_continuation_check(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void Parrot_continuation_rewind_environment(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void Parrot_continuation_runloop_check(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_find_pad(PARROT_INTERP,

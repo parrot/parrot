@@ -545,6 +545,176 @@ parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     return clos_pmc;
 }
 
+
+/*
+
+=item C<void Parrot_continuation_runloop_check>
+
+Verifies that the Parrot_cont contained in the current PMC is not trying to
+jump runloops.  Don't call this for a RetContinuation; that's what it's
+supposed to do.
+
+*/
+
+void
+Parrot_continuation_runloop_check(PARROT_INTERP, ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+{
+
+    /* it's ok to exit to "runloop 0"; there is no such
+       runloop, but the only continuation that thinks it came from runloop 0 is
+       for the return from the initial sub call. */
+
+    if (interp->current_runloop_id != cc->runloop_id
+    && cc->runloop_id              != 0)
+        fprintf(stderr, "[oops; continuation %p of type %d "
+                "is trying to jump from runloop %d to runloop %d]\n",
+                (void *)pmc, (int)pmc->vtable->base_type,
+                interp->current_runloop_id, cc->runloop_id);
+}
+
+
+/*
+
+=item C<void Parrot_continuation_check>
+
+Verifies that the provided continuation is sane.
+
+*/
+
+void
+Parrot_continuation_check(PARROT_INTERP, ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+{
+    Stack_Chunk_t    *stack_target = cc->dynamic_state;
+    parrot_context_t *to_ctx       = cc->to_ctx;
+    parrot_context_t *from_ctx     = CONTEXT(interp);
+
+#if CTX_LEAK_DEBUG
+    if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG))
+        fprintf(stderr,
+                "[invoke cont    %p, to_ctx %p, from_ctx %p (refs %d)]\n",
+                (void *)pmc, (void *)to_ctx, (void *)from_ctx, (int)from_ctx->ref_count);
+#endif
+    if (!to_ctx)
+        real_exception(interp, NULL, INVALID_OPERATION,
+                       "Continuation invoked after deactivation.");
+    if (!stack_target)
+        real_exception(interp, NULL, INVALID_OPERATION,
+                       "Continuation invoked without initialization.");
+}
+
+
+/*
+
+=item C<void Parrot_continuation_rewind_environment>
+
+Restores the appropriate context for the continuation.
+
+*/
+
+void
+Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc),
+        ARGIN(Parrot_cont *cc))
+{
+    int               stack_delta              =  0;
+    int               exception_continuation_p = -1;
+    parrot_context_t *to_ctx                   = cc->to_ctx;
+    Stack_Chunk_t    *stack_target             = cc->dynamic_state;
+    Stack_Chunk_t    *corresponding_target;
+
+    /* Rewind the dynamic environment. */
+    if (interp->dynamic_env != stack_target) {
+        /* compute the "stack delta", which is a measure of how much
+           unwinding we have to do.  if negative, we have to pop that many
+           entries; if positive, we are going back up the stack.
+           [bug: this is not true rewinding.  -- rgr, 30-Sep-06.]
+        */
+        stack_delta
+            = ((int) stack_height(interp, stack_target) -
+               (int) stack_height(interp, interp->dynamic_env));
+    }
+
+    /* descend down the target stack until we get to the same depth. */
+    corresponding_target = stack_target;
+
+    while (stack_delta > 0) {
+        corresponding_target = corresponding_target->prev;
+        stack_delta--;
+    }
+
+    /* both stacks are now at the same depth.  pop from both until we reach
+       their common ancestor. */
+    while (interp->dynamic_env != corresponding_target) {
+        PMC           *cleanup_sub = NULL;
+        Stack_Entry_t *e;
+
+        if (! interp->dynamic_env)
+            real_exception(interp, NULL, 1, "Control stack damaged");
+
+        e = stack_entry(interp, interp->dynamic_env, 0);
+
+        if (!e)
+            real_exception(interp, NULL, 1, "Control stack damaged");
+
+        if (e->entry_type == STACK_ENTRY_ACTION) {
+            /*
+             * Disable automatic cleanup routine execution in stack_pop so
+             * that we can run the action subroutine manually.  This is
+             * because we have to run the sub AFTER it has been popped, lest
+             * a new error in the sub cause an infinite loop when invoking
+             * an error handler.
+             */
+            cleanup_sub = UVal_pmc(e->entry);
+            e->cleanup  = STACK_CLEANUP_NULL;
+        }
+
+        (void)stack_pop(interp, &interp->dynamic_env,
+                        NULL, NO_STACK_ENTRY_TYPE);
+
+        /* Now it's safe to run. */
+        if (cleanup_sub) {
+            if (exception_continuation_p == -1)
+                exception_continuation_p =
+                    VTABLE_isa(interp, pmc, CONST_STRING(interp, "Exception_Handler"));
+            Parrot_runops_fromc_args(interp, cleanup_sub,
+                                     "vI", exception_continuation_p);
+        }
+
+        /* Keep corresponding_target in sync.  If stack_delta is negative,
+         * then dynamic_env is still above it; otherwise, we must step
+         * corresponding_target backwards as well. */
+        if (stack_delta < 0)
+            stack_delta++;
+        else {
+            Stack_Chunk_t *prev  = corresponding_target->prev;
+            (void)stack_pop(interp, &corresponding_target, NULL,
+                    NO_STACK_ENTRY_TYPE);
+            corresponding_target = prev;
+        }
+    }
+
+    /* run back up the target stack to our destination.  [when we support
+       dynamic binding (e.g.), we will have to traverse back up, and will
+       therefore need to keep track on the way down.  -- rgr, 30-Sep-06.] */
+    interp->dynamic_env->refcount--;
+    interp->dynamic_env = stack_target;
+
+    /* debug print before context is switched */
+    if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
+        PMC *sub = to_ctx->current_sub;
+
+        PIO_eprintf(interp, "# Back in sub '%Ss', env %p\n",
+                    Parrot_full_sub_name(interp, sub),
+                    interp->dynamic_env);
+    }
+
+    /* set context */
+    CONTEXT(interp)      = to_ctx;
+    interp->ctx.bp       = to_ctx->bp;
+    interp->ctx.bp_ps    = to_ctx->bp_ps;
+}
+
 /*
 
 =back
