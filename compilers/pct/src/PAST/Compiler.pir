@@ -37,6 +37,7 @@ any value type.
 =cut
 
 .include "cclass.pasm"
+.include "except_types.pasm"
 
 .namespace [ 'PAST::Compiler' ]
 
@@ -576,6 +577,17 @@ Return the POST representation of a C<PAST::Block>.
     compiler = node.'compiler'()
     if compiler goto children_compiler
 
+    ##  control exception handler
+    .local pmc ctrlpast, ctrllabel, rethrowlabel
+    ctrlpast = node.'control'()
+    unless ctrlpast goto children_past
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = self.'unique'('control_')
+    ctrllabel = $P0.'new'('result'=>$S0)
+    $S0 = concat $S0, '_rethrow'
+    rethrowlabel = $P0.'new'('result'=>$S0)
+    bpost.'push_pirop'('push_eh', ctrllabel)
+
   children_past:
     ##  all children but last are void context, last returns anything
     $P0 = node.'list'()
@@ -589,7 +601,29 @@ Return the POST representation of a C<PAST::Block>.
     ##  result of last child is return from block
     $P0 = ops[-1]
     bpost.'push_pirop'('return', $P0)
-    goto children_done
+
+    unless ctrlpast goto sub_done
+    bpost.'push'(ctrllabel)
+    bpost.'push_pirop'('.local pmc exception')
+    bpost.'push_pirop'('.get_results (exception, $S10)')
+    $I0 = isa ctrlpast, 'PAST::Node'
+    if $I0 goto control_past
+    if ctrlpast == 'return_pir' goto control_return
+    self.panic("Unrecognized control handler '", ctrlpast, "'")
+  control_return:
+    ##  handle 'return' exceptions
+    $S0 = self.'uniquereg'('P')
+    bpost.'push_pirop'('getattribute', $S0, 'exception', '"type"')
+    bpost.'push_pirop'('ne', $S0, .CONTROL_RETURN, rethrowlabel)
+    bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
+    bpost.'push_pirop'('return', $S0)
+    bpost.'push'(rethrowlabel)
+    bpost.'push_pirop'('throw', 'exception')
+    goto sub_done
+  control_past:
+    $P0 = self.'as_post'(ctrlpast, 'rtype'=>'*')
+    bpost.'push'($P0)
+    goto sub_done
 
   children_compiler:
     ##  set the compiler to use for the POST::Sub node, pass on
@@ -600,7 +634,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = node[0]
     bpost.'push'($P0)
 
-  children_done:
+  sub_done:
     ##  restore previous outer scope and symtable
     set_global '$?SUB', outerpost
     setattribute self, '%!symtable', outersym
@@ -1164,6 +1198,40 @@ to C<ResizablePMCArray> if not set.
     ops.'push_pirop'('push', listpost, $S0)
     goto iter_loop
   iter_end:
+    .return (ops)
+.end
+
+
+=item return(PAST::Op node)
+
+Generate a return exception, using the first child (if any) as
+a return value.
+
+=cut
+
+.sub 'return' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+
+    .local string exreg, extype
+    exreg = self.'uniquereg'('P')
+    extype = concat exreg, "['_type']"
+    ops.'push_pirop'('new', exreg, '"Exception"')
+    ops.'push_pirop'('set', extype, .CONTROL_RETURN)
+
+    .local pmc cpast, cpost
+    cpast = node[0]
+    unless cpast goto cpast_done
+    cpost = self.'as_post'(cpast, 'rtype'=>'P')
+    cpost = self.'coerce'(cpost, 'P')
+    ops.'push'(cpost)
+    ops.'push_pirop'('setattribute', exreg, "'payload'", cpost)
+  cpast_done:
+    ops.'push_pirop'('throw', exreg)
     .return (ops)
 .end
 
