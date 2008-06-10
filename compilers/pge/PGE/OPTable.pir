@@ -586,7 +586,7 @@ Adds (or replaces) a syntactic category's defaults.
     wspos = $I0
     mpos = $I0
   end_1b:
-    $P0 = $P0[0]
+    $P0 = $P0[-1]
     if null $P0 goto end_2
     $I0 = isa $P0, 'PGE::Match'
     if $I0 goto end_1a
