@@ -90,7 +90,7 @@ Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
     PARROT_ASSERT(vtable);
 
-    if (vtable->ro_vtable) {
+    if (vtable->ro_variant_vtable) {
         VTABLE *ro_vtable = vtable->ro_variant_vtable;
 
         if (ro_vtable->isa_hash) {
