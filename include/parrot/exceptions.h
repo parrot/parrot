@@ -115,7 +115,13 @@ typedef enum {
         INTERNAL_NOT_IMPLEMENTED,
         ERR_OVERFLOW,
         LOSSY_CONVERSION,
-        ROLE_COMPOSITION_METH_CONFLICT
+        ROLE_COMPOSITION_METH_CONFLICT,
+
+        CONTROL_RETURN,
+        CONTROL_OK,
+        CONTROL_BREAK,
+        CONTROL_CONTINUE,
+        CONTROL_ERROR
 } exception_type_enum;
 
 /* &end_gen */
