@@ -89,9 +89,10 @@ Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
     PARROT_ASSERT(vtable);
-    VTABLE *ro_vtable = vtable->ro_variant_vtable;
 
-    if (ro_vtable) {
+    if (vtable->ro_vtable) {
+        VTABLE *ro_vtable = vtable->ro_variant_vtable;
+
         if (ro_vtable->isa_hash) {
             parrot_hash_destroy(interp, ro_vtable->isa_hash);
             if (ro_vtable->isa_hash == vtable->isa_hash)
