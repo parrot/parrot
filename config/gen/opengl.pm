@@ -108,12 +108,19 @@ my %C_TYPE = (
     SphereMap               => 'void',
     Display                 => 'void',
     XVisualInfo             => 'void',
+    GLEWContext             => 'void',
+    GLXEWContext            => 'void',
+    WGLEWContext            => 'void',
     _CGLContextObject       => 'void',
+    CGDirectDisplayID       => 'void',
     GLXHyperpipeConfigSGIX  => 'void',
     GLXHyperpipeNetworkSGIX => 'void',
+    PIXELFORMATDESCRIPTOR   => 'void',
+    COLORREF                => 'void',
 
     wchar_t                 => 'void',
 
+    GLMfunctions            => 'void*',
     GLXContext              => 'void*',
     GLXFBConfig             => 'void*',
     GLXFBConfigSGIX         => 'void*',
@@ -121,6 +128,21 @@ my %C_TYPE = (
     CGLPixelFormatObj       => 'void*',
     CGLRendererInfoObj      => 'void*',
     CGLPBufferObj           => 'void*',
+    AGLContext              => 'void*',
+    AGLDevice               => 'void*',
+    AGLDrawable             => 'void*',
+    AGLPixelFormat          => 'void*',
+    AGLRendererInfo         => 'void*',
+    AGLPbuffer              => 'void*',
+    GDHandle                => 'void*',
+    WindowRef               => 'void*',
+    HIViewRef               => 'void*',
+    Style                   => 'void*',
+    HDC                     => 'void*',
+    HGLRC                   => 'void*',
+    LPGLYPHMETRICSFLOAT     => 'void*',
+    LPLAYERPLANEDESCRIPTOR  => 'void*',
+    LPPIXELFORMATDESCRIPTOR => 'void*',
 
     GLchar                  => 'char',
     GLcharARB               => 'char',
@@ -137,6 +159,8 @@ my %C_TYPE = (
     Status                  => 'int',
     GLint                   => 'int',
     GLsizei                 => 'int',
+    GLfixed                 => 'int',
+    GLclampx                => 'int',
     int32_t                 => 'int',
 
     GLenum                  => 'unsigned int',
@@ -234,6 +258,7 @@ my @IGNORE = (
     'glutGetProcAddress',
     'glXGetProcAddress',
     'glXGetProcAddressARB',
+    'wglGetProcAddress',
 
     # Don't handle this odd create/callback register function yet
     'glutCreateMenu',
@@ -260,6 +285,14 @@ my @IGNORE = (
     'uview_direction',
     'uviewpoint',
 
+    # Some versions of GLUT declare these both with and without prefixes;
+    # ignore the non-prefixed versions
+    'SwapBuffers',
+    'ChoosePixelFormat',
+    'DescribePixelFormat',
+    'GetPixelFormat',
+    'SetPixelFormat',
+
     # Can't handle longlong until RT 53406 is done
     'glPresentFrameKeyedNV',
     'glPresentFrameDualFillNV',
@@ -276,10 +309,36 @@ my @IGNORE = (
 );
 
 my @SKIP = (
+    # Can't properly support these yet; some (such as the internal headers)
+    # may never be supported.
+
+    # Mesa non-standard driver headers
+    'amesa.h',
+    'dmesa.h',
+    'foomesa.h',
+    'fxmesa.h',
+    'ggimesa.h',
+    'mesa_wgl.h',
+    'mglmesa.h',
+    'osmesa.h',
+    'svgamesa.h',
+    'uglmesa.h',
+    'wmesa.h',
+    'xmesa.h',
+    'xmesa_xf86.h',
+    'xmesa_x.h',
+
     # Mesa API-mangling headers (to load vendor GL and Mesa simultaneously)
     'gl_mangle.h',
     'glu_mangle.h',
     'glx_mangle.h',
+
+    # OpenVMS API-mangling header
+    'vms_x_fix.h',
+
+    # Internal headers for DRI
+    'dri_interface.h',
+    'glcore.h',
 
     # Apple CGL OpenGL API conversion macros
     'CGLMacro.h',
@@ -299,6 +358,12 @@ my @SKIP = (
     'gizmo.h',
     'hslider.h',
     'vslider.h',
+
+    # SGI GLw Drawing Area headers
+    'GLwDrawA.h',
+    'GLwDrawAP.h',
+    'GLwMDrawA.h',
+    'GLwMDrawAP.h',
 );
 
 my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pasm';
@@ -331,8 +396,9 @@ sub runstep {
     s{\\}{/}g foreach @include_paths_win32;
 
     my @header_globs = (
-        # Default location for most UNIX-like platforms
+        # Default locations for most UNIX-like platforms
         '/usr/include/GL/*.h',
+        '/usr/local/include/GL/*.h',
 
         # Mac OS X
         '/System/Library/Frameworks/OpenGL.framework/Headers/*.h',
@@ -341,6 +407,7 @@ sub runstep {
         # Windows/MSVC
         (map "$_/gl/*.h" => @include_paths_win32),
 
+#         # Portability testing headers
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
 #         "$ENV{HOME}/src/osx-10.4/GLUT/*.h",
@@ -350,6 +417,25 @@ sub runstep {
 #         "$ENV{HOME}/src/cygwin/opengl-1.1.0/glut-3.7.3/include/mui/*.h",
 #         "$ENV{HOME}/src/glut-3.7.6/include/GL/*.h",
 #         "$ENV{HOME}/src/glut-3.7.6/include/mui/*.h",
+#         "$ENV{HOME}/src/freebsd-gl/usr/local/include/GL/*.h",
+
+#         "$ENV{HOME}/src/osx-insane/Developer/Platforms/Aspen.platform/Developer/SDKs/Aspen1.2.sdk/System/Library/Frameworks/OpenGLES.framework/Headers/ES1/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/AGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/GLUT.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/AGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/GLUT.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/usr/X11/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/usr/X11/include/GL/internal/*.h",
+#         "$ENV{HOME}/src/osx-insane/System/Library/Frameworks/AGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/System/Library/Frameworks/GLUT.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/internal/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/X11R6 1/include/GL/*.h",
     );
 
     my @header_files = sort map {File::Glob::bsd_glob($_)} @header_globs;
@@ -382,7 +468,7 @@ HEADER
 sub gen_opengl_defines {
     my ($self, $conf, $header_files, $autogen_header, $verbose) = @_;
 
-    my (%defs, @macros);
+    my (%defs, @macros, %non_numeric);
     my $max_len = 0;
 
     foreach my $file (@$header_files) {
@@ -390,6 +476,8 @@ sub gen_opengl_defines {
         or die "Could not open header '$file': $!";
 
         while (<$header>) {
+            s/^\s*#\s*define\b/#define/;
+
             my (@F) = split;
             next unless @F > 2 and $F[0] eq '#define';
             next unless $F[1] =~ /^(AGL|CGL|WGL|GLX|MUI|SMAP|TUBE|GL[A-Z]*)_/;
@@ -398,7 +486,7 @@ sub gen_opengl_defines {
             $max_len = length $F[1] if $max_len < length $F[1];
 
             my $api = $1;
-            if ($F[2] =~ /^(?:[ACW])?GL/) {
+            if ($F[2] =~ /^(?:[ACW])?GL[A-Z]*_\w+$/) {
                 push @macros, [$api, $F[1], $F[2]];
             }
             elsif (   $F[2] =~ /^0x[0-9a-fA-F]+$/
@@ -406,7 +494,8 @@ sub gen_opengl_defines {
                 $defs{$api}{$F[1]} = $F[2];
             }
             else {
-                print "\nUnable to parse '$F[2]'\n" if $verbose;
+                $non_numeric{$F[1]}++;
+                print "\nNon-numeric value for '$F[1]': '$F[2]'\n" if $verbose;
             }
         }
     }
@@ -415,10 +504,12 @@ sub gen_opengl_defines {
         my ($api, $define, $value) = @$macro;
         my ($val_api) = $value =~ /^((?:[ACW])?GL[A-Z]*)_/;
 
-        $defs{$api}{$define} = $defs{$val_api}{$value};
+        unless (defined ($defs{$api}{$define} = $defs{$val_api}{$value})) {
+            delete $defs{$api}{$define};
+            next if $non_numeric{$define};
 
-        die "'$define' is defined as '$value', but no '$value' has been defined"
-        unless defined $defs{$val_api}{$value};
+            die "'$define' is defined as '$value', but no '$value' has been defined";
+        }
     }
 
     open my $macros, '>', $MACRO_FILE
@@ -484,7 +575,7 @@ sub gen_opengl_wrappers {
 
             # Get rid of junk needed for C, but not for Parrot NCI;
             # also do general cleanup to make parsing easier
-            s/\bAVAILABLE_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
+            s/\b(?:AVAILABLE|DEPRECATED_FOR)_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
             s/\b__cdecl\b\s*//;
             s/\b__stdcall\b\s*//;
             s/\b_CRTIMP\b\s*//;
@@ -493,7 +584,7 @@ sub gen_opengl_wrappers {
             s/\bconst\b\s*//g;
             s/\benum\b\s*//g;
             s/\bstruct\b\s*//g;
-            s/\b[A-Z]*API[A-Z]*\s*//g;
+            s/\b[_A-Z]*API[_A-Z]*\s*//g;
             s/\s*\*\s*/* /g;
             s/\* \*/**/g;
             s/\s*,\s*/, /g;
@@ -505,7 +596,8 @@ sub gen_opengl_wrappers {
 
             # Canonicalize types
             s/\b(\w+)\b/$C_TYPE{$1} || $1/eg;
-            s/\b(?:un)?signed //g;
+            s/\b(?:un)?signed (char|short|int|long)\b/$1/g;
+            s/\b(?:un)?signed /int /g;
             s/\blong long\b/longlong/g;
 
             # Parse the function prototype, trying hard to capture name
