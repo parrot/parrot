@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -638,8 +638,8 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     /* add new buckets to free_list in reverse order
      * lowest bucket is top on free list and will be used first */
     for (i = 0, b = (HashBucket*)new_bi - 1; i < old_nb; ++i, --b) {
-        b->next = hash->free_list;
-        b->key = b->value = NULL;
+        b->next         = hash->free_list;
+        b->key          = b->value         = NULL;
         hash->free_list = b;
     }
 
@@ -1087,7 +1087,7 @@ HashBucket*
 parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLOK(void *value))
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
-    HashBucket   *bucket = hash->bi[hashval & hash->mask];
+    HashBucket   *bucket  = hash->bi[hashval & hash->mask];
 
     while (bucket) {
         /* store hash_val or not */
@@ -1099,14 +1099,14 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLO
     if (bucket) {
         if (hash->entry_type == enum_type_PMC && hash->container) {
             DOD_WRITE_BARRIER_KEY(interp, hash->container,
-                    (PMC*)bucket->value, bucket->key, (PMC*)value, key);
+                    (PMC *)bucket->value, bucket->key, (PMC *)value, key);
         }
         bucket->value = value;        /* replace value */
     }
     else {
         if (hash->entry_type == enum_type_PMC && hash->container) {
             DOD_WRITE_BARRIER_KEY(interp, hash->container,
-                    NULL, NULL, (PMC*)value, key);
+                    NULL, NULL, (PMC *)value, key);
         }
 
         bucket = hash->free_list;
@@ -1200,7 +1200,10 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
                 break;
 
             case enum_type_PMC:
-                valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                if (PMC_IS_NULL((PMC *)b->value))
+                    valtmp = (void *)PMCNULL;
+                else
+                    valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
                 break;
 
             default:
