@@ -421,7 +421,7 @@ Called during interpreter destruction. Free used resources and memory pools.
 {{DEPRECATION NOTE: finalize_gc_system used to be
 de_init_gc_system.}}
 
-=item C<void (*init_pool) (Interp *, struct Small_Object_Pool *)>
+=item C<void (*init_pool) (Interp *, Small_Object_Pool *)>
 
 A function to initialize the given pool. This function should set the
 following object allocation functions for the given pool.
@@ -435,7 +435,7 @@ structures.
 
 =over 4
 
-=item C<PObj * (*get_free_object) (Interp *, struct Small_Object_Pool*)>
+=item C<PObj * (*get_free_object) (Interp *, Small_Object_Pool*)>
 
 Each header pool provides one function pointer to get a new object from that
 pool. It should return one free object from the given pool (removing it from
@@ -443,15 +443,15 @@ the pool's free list). Object flags are returned clear, except flags that are
 used by the garbage collector itself.  If the pool is a buffer header pool,
 all other object memory is zeroed.
 
-=item C<void (*add_free_object) (Interp *, struct Small_Object_Pool *, PObj *);>
+=item C<void (*add_free_object) (Interp *, Small_Object_Pool *, PObj *);>
 
 Add a freed object to the pool's free list.
 
-=item C<void (*alloc_objects) (Interp *, struct Small_Object_Pool *);>
+=item C<void (*alloc_objects) (Interp *, Small_Object_Pool *);>
 
 Initial allocation of objects for the pool.
 
-=item C<void (*more_objects) (Interp *, struct Small_Object_Pool *);>
+=item C<void (*more_objects) (Interp *, Small_Object_Pool *);>
 
 Reallocation for additional objects. It has the same signature as
 C<alloc_objects>, and in some GC cores the same function pointer is used for

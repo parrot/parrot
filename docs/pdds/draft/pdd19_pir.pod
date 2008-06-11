@@ -23,6 +23,8 @@ PIR is a stable, middle-level language intended both as a target for the
 generated output from high-level language compilers, and for human use
 developing core features and extensions for Parrot.
 
+=head1 IMPLEMENTATION
+
 =head2 Basic Syntax
 
 A valid PIR program consists of a sequence of statements, directives, comments
@@ -824,8 +826,10 @@ the C<assign_pmc> vtable function.
 {{ NOTE: response to the question:
 
     <pmichaud>  I don't think that 'morph' as a method call is a good idea
-    <pmichaud>  we need something that says "assign to value" versus "assign to container"
-    <pmichaud>  we can't eliminate the existing 'morph' opcode until we have a replacement
+    <pmichaud>  we need something that says "assign to value" versus
+        "assign to container"
+    <pmichaud>  we can't eliminate the existing 'morph' opcode until we have a
+        replacement
 
 }}
 
@@ -845,15 +849,15 @@ file are inserted as if they were written at the point where the
 C<.include> directive occurs.
 
 The include file is searched for in the current directory and in
-runtime/parrot/include, in that order. The first file of that name to
-be found is included.
+runtime/parrot/include, in that order. The first file of that name to be found
+is included.
 
-{{ Check the search order of the include directive and whether it's complete }}
+{{ Check the include directive's search order and whether it's complete }}
 
 =item * C<.macro> <identifier> [<parameters>]
 
-The C<.macro> directive starts the definition of a macro named by the
-specified identifier. The optional parameter list is a comma-separated list of
+The C<.macro> directive starts the a macro definition named by the specified
+identifier. The optional parameter list is a comma-separated list of
 identifiers, enclosed in parentheses.  See C<.endm> for ending the macro
 definition.
 

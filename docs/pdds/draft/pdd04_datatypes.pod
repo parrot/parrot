@@ -109,7 +109,7 @@ according to Leo they are now always PMCs, never register types of their own.
 =item Version 1.4
 
 Document basic PMC internals. Make clear the fact that the bigint/bignum
-description is still provisional. Other minor fixups to make the  documentation
+description is still provisional. Other minor fixups to make the documentation
 match reality.
 
 =item Version 1.3
