@@ -207,6 +207,11 @@ method block($/, $key) {
     }
 }
 
+method return_statement($/) {
+    my $expr := $( $<expression> );
+    make PAST::Op.new( $expr, :pasttype('return'), :node($/) );
+}
+
 method do_block($/) {
     make $( $<block> );
 }
@@ -237,6 +242,7 @@ method sub_definition($/) {
     @?BLOCK.shift();
     $?BLOCK := @?BLOCK[0];
 
+    $past.control('return_pir');
     make $past;
 }
 
