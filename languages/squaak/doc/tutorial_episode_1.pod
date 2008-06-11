@@ -141,7 +141,11 @@ type (assuming you're in parrot's root directory):
 
 (Note: if you're on Windows, you should use backslashes.) This will generate the
 files in a directory languages/squaak, and use the name Squaak as the language's
-name. After this, go to this directory and type:
+name. The last config step is to create the Makefile for your new language:
+
+ $  perl Configure.pl --languages=squaak
+
+After this, go to this directory and type:
 
  $ make test
 
