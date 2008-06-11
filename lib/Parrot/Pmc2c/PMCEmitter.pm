@@ -582,7 +582,7 @@ EOC
     if (pass == 0) {
 EOC
     $cout .= <<"EOC";
-        Hash          *isa_hash        = mem_allocate_typed(Hash);
+        Hash          *isa_hash;
         /* create vtable - clone it - we have to set a few items */
         VTABLE * const vt_clone        = Parrot_clone_vtable(interp,
                                              &temp_base_vtable);
