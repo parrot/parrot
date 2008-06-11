@@ -1,21 +1,15 @@
 # $Id$
 
-# Configuration settings
-LOAD_EXT        = @load_ext@
-
-# Set up commands
-PARROT          = ../../parrot@exe@
-PERL            = @perl@
-RM_F            = @rm_f@
-RECONFIGURE     = $(PERL) @build_dir@/tools/dev/reconfigure.pl
-PMCBUILD        = $(PERL) @build_dir@/tools/build/dynpmc.pl
-
 # Set up directories
 BUILD_DIR     = @build_dir@
-TGE_DIR       = ../../compilers/tge
-LIBRARY_DIR   = @build_dir@/runtime/parrot/library
-PMC_DIR       = pmc
-PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
+TGE_DIR       = $(BUILD_DIR)/compilers/tge
+LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
+
+# Set up commands
+PARROT          = $(BUILD_DIR)/parrot@exe@
+PERL            = @perl@
+RM_F            = @rm_f@
+RECONFIGURE     = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 
 
 # default
