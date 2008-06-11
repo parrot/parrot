@@ -62,7 +62,6 @@ $(C_BUILTIN)/cd.pir \
 $(C_BUILTIN)/expr.pir \
 $(C_BUILTIN)/list.pir \
 $(C_BUILTIN)/return.pir \
-runtime/hacks.pir \
 runtime/conversions.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \
