@@ -275,8 +275,6 @@ n_deb:
 
 .namespace [ 'Plumhead::Grammar' ]
 
-.include 'src/pct/Plumhead/Grammar.pir'
-
 .include 'src/pct/Plumhead_gen.pir'
 
 .include 'src/pct/PlumheadPAST_gen.pir'
