@@ -157,9 +157,9 @@ method try_statement($/) {
 
     ## get the exception identifier;
     my $exc := $( $<exception> );
-    $exc.isdecl(1);
+    $exc.isdecl( PAST::Val.new( :value(1) ) );
     $exc.scope('lexical');
-    $exc.viviself(0);
+    $exc.viviself( PAST::Val.new( :value(0) ) );
 
     ## generate instruction to retrieve the exception objct (and the exception message,
     ## that is passed automatically in PIR, this is stored into $S0 (but not used).
