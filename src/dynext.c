@@ -387,9 +387,12 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         type = CONST_STRING(interp, "NCI");
     else {
         /* we could set a private flag in the PMC header too
-         * but currently only ops files have struct_val set
-         */
-        type = const_string(interp, PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
+         * but currently only ops files have struct_val set */
+
+        if (PMC_struct_val(lib_pmc))
+            type = CONST_STRING(interp, "Ops");
+        else
+            type = CONST_STRING(interp, "PMC");
     }
 
     /* remember lib_pmc in iglobals */
@@ -470,8 +473,9 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
     void * const handle = PMC_data(lib_pmc);
     STRING * const type =
         VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, CONST_STRING(s, "_type")));
+    STRING * const ops  = CONST_STRING(s, "Ops");
 
-    if (!string_equal(s, type, CONST_STRING(s, "Ops"))) {
+    if (!string_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.
@@ -481,12 +485,9 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
         PMC * const new_lib_pmc = constant_pmc_new(d, enum_class_ParrotLibrary);
 
         PMC_data(new_lib_pmc) = handle;
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_filename"),
-            make_string_pmc(d, wo_ext));
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_lib_name"),
-            make_string_pmc(d, lib_name));
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_type"),
-            make_string_pmc(d, const_string(d, "Ops")));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), make_string_pmc(d, wo_ext));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), make_string_pmc(d, lib_name));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), make_string_pmc(d, ops));
 
         /* fixup d->all_op_libs, if necessary */
         if (d->n_libs != s->n_libs) {
