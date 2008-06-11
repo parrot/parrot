@@ -6,10 +6,12 @@ TGE_DIR       = $(BUILD_DIR)/compilers/tge
 LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
 
 # Set up commands
-PARROT          = $(BUILD_DIR)/parrot@exe@
-PERL            = @perl@
-RM_F            = @rm_f@
-RECONFIGURE     = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+PARROT        = $(BUILD_DIR)/parrot@exe@
+PERL          = @perl@
+RM_F          = @rm_f@
+RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
+PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
 
 # default
@@ -90,10 +92,15 @@ src/pct/PlumheadPAST_gen.pir: src/pct/PlumheadPAST.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir \
             --output=src/pct/PlumheadPAST_gen.pir src/pct/PlumheadPAST.tg
 
+src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
+	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
+	    --target=pir src/pct/actions.pm
+
 plumhead.pbc: \
     src/common/plumhead.pir \
     src/pct/Plumhead_gen.pir \
-    src/pct/PlumheadPAST_gen.pir
+    src/pct/PlumheadPAST_gen.pir \
+    src/pct/gen_actions.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
 test:     all test-pct

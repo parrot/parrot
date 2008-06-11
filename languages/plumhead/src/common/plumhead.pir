@@ -279,6 +279,8 @@ n_deb:
 
 .include 'src/pct/PlumheadPAST_gen.pir'
 
+.include 'src/pct/gen_actions.pir'
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
