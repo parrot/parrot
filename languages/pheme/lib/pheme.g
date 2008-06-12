@@ -11,7 +11,7 @@ rule application { <atom> <list_item>+ }
 rule cons { <list_item>+ }
 
 # quoted_string has to come first
-rule list_item { <quoted_string> | <atom> | <pheme_list> | <empty_list> }
+rule list_item { <quoted_string> | <empty_list> | <atom> | <pheme_list> }
 
 token empty_list { <quote>? '()' }
 
