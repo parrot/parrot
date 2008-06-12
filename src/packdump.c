@@ -253,7 +253,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         {
             PMC * const pmc = self->u.key;
             Parrot_sub *sub;
-            STRING * const null = const_string(interp, "(null)");
+            STRING * const null = CONST_STRING(interp, "(null)");
             STRING *namespace_description;
 
             pobj_flag_dump(interp, (long)PObj_get_FLAGS(pmc));
