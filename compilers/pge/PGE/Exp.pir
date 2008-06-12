@@ -455,15 +455,22 @@ tree as a PIR code object that can be compiled.
     .local pmc exp0
     exp0 = self[0]
 
-    .local int min, max
+    .local int backtrack, min, max
+    backtrack = self['backtrack']
     min = self['min']
     max = self['max']
-    if min != max goto reduce_exp0
-    if min != 1 goto reduce_exp0
-    $I0 = self['backtrack']
-    exp0['backtrack'] = $I0
+    if max != 1 goto reduce_exp0
+    if min != max goto reduce_max1
+    exp0['backtrack'] = backtrack
     exp0 = exp0.reduce(next)
     .return (exp0)
+
+  reduce_max1:
+    ##  special case of 0..1?: node
+    if backtrack != PGE_BACKTRACK_NONE goto reduce_exp0
+    $I0 = exists exp0['backtrack']
+    if $I0 goto reduce_exp0
+    exp0['backtrack'] = backtrack
 
   reduce_exp0:
     exp0 = exp0.reduce(next)
