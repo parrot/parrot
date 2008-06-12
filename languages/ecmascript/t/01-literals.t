@@ -1,4 +1,4 @@
-print("1..10\n");
+print("1..11\n");
 print("ok 1\n");
 
 try {
@@ -42,3 +42,8 @@ print("ok ");
 print(x);
 print("\n");
 
+function foo() {
+    return "ok 11\n";
+}
+
+print(foo());

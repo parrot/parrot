@@ -64,7 +64,7 @@ rule statement {
     #| <for4_statement> {*}        #= for4_statement
     | <continue_statement> {*}    #= continue_statement
     | <break_statement> {*}       #= break_statement
-    #| <return_statement> {*}      #= return_statement
+    | <return_statement> {*}      #= return_statement
     #| <with_statement> {*}        #= with_statement
     | <labelled_statement> {*}    #= labelled_statement
     #| <switch_statement> {*}      #= switch_statement
