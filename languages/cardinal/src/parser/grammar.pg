@@ -36,6 +36,15 @@ token end_block { <.ws> [ 'end' | '}' ] }
 
 token basic_stmt {
     | <alias> {*}           #= alias
+    | <classdef> {*}        #= classdef
+    | <functiondef> {*}     #= functiondef
+    | <if_stmt> {*}         #= if_stmt
+    | <while_stmt> {*}      #= while_stmt
+    | <for_stmt> {*}        #= for_stmt
+    | <unless_stmt> {*}     #= unless_stmt
+    | <module> {*}          #= module
+    | <begin_end> {*}       #= begin_end
+    | <assignment> {*}      #= assignment
     | <return_stmt> {*}     #= return_stmt
     | <expr> {*}            #= expr
     | <begin> {*}           #= begin
@@ -61,22 +70,8 @@ token stmt_mod {
     {*}
 }
 
-
 rule expr {
-    <basic_expr> [$<op>=['and'|'or'] <expr>]?
-    {*}
-}
-
-
-token basic_expr {
-    | <classdef> {*}        #= classdef
-    | <assignment> {*}      #= assignment
-    | <arg> {*}             #= arg
-    | <not_expr> {*}        #= not_expr
-}
-
-rule not_expr {
-    'not' <expr>
+    $<not>=['not']? <arg> [$<op>=['and'|'or'] <expr>]?
     {*}
 }
 
@@ -101,13 +96,11 @@ rule mlhs {
 }
 
 token lhs {
-    | <variable> {*}            #= variable
-    | <indexed_variable> {*}    #= indexed_variable
-    | <member_variable> {*}     #= member_variable
+    | <basic_primary> {*}            #= basic_primary
 }
 
-token indexed_variable {
-    <primary=variable> '[' <args>? ']'
+token indexed {
+    '[' <args>? ']'
     {*}
 }
 
@@ -116,13 +109,8 @@ token member_variable {
     {*}
 }
 
-token command {
-    | <call> {*}         #= call
-    | <super_call> {*}   #= super_call
-}
-
-rule call {
-    [ <primary=variable> $<dot>=['.'|'::'] | <.before [<operation><.ws><call_args>]>]
+token methodcall {
+    $<dot>=['.'|'::']
     <operation> <call_args>? <do_block>?
     {*}
 }
@@ -134,11 +122,6 @@ rule do_block {
 
 rule super_call {
     'super' <call_args>
-    {*}
-}
-
-rule not_command {
-    '!' <command>
     {*}
 }
 
@@ -188,39 +171,32 @@ proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 
 token basic_primary {
     | <literal> {*}                         #= literal
-    | <indexed_variable> {*}                #= indexed_variable
-    | <command> {*}                         #= command
-    | <not_command> {*}                     #= command
     | <variable> {*}                        #= variable
     | <array> {*}                           #= array
     | <ahash> {*}                           #= ahash
-    | <functiondef> {*}                     #= functiondef
-    | <if_stmt> {*}                         #= if_stmt
-    | <while_stmt> {*}                      #= while_stmt
-    | <for_stmt> {*}                        #= for_stmt
-    | <unless_stmt> {*}                     #= unless_stmt
-    | <module> {*}                          #= module
-    | <begin_end> {*}                       #= begin_end
     | <pcomp_stmt> {*}                      #= pcomp_stmt
     | <scope_identifier> {*}                #= scope_identifier
 }
 
-rule primary {
+token primary {
     <basic_primary> <post_primary_expr>*
     {*}
 }
 
-rule post_primary_expr {
+token post_primary_expr {
+    | <indexed> {*}            #= indexed
+    | <call_args> {*}          #= call_args
+    | <methodcall> {*}         #= methodcall
     | <scope_identifier> {*}   #= scope_identifier
     | '[' <args>? ']' {*}      #= args
 }
 
-rule scope_identifier {
+token scope_identifier {
     '::' <identifier>
     {*}
 }
 
-rule pcomp_stmt {
+token pcomp_stmt {
     '(' <comp_stmt> ')'
     {*}
 }
@@ -252,7 +228,7 @@ rule for_stmt {
     {*}
 }
 
-rule do { ':' | 'do' | <term> ['do']? }
+token do { ':' | 'do' | <term> ['do']? }
 
 rule unless_stmt {
     'unless' <expr> <.then> <comp_stmt>
@@ -261,13 +237,13 @@ rule unless_stmt {
     {*}
 }
 
-rule else {
-    'else' <comp_stmt>
+token else {
+    'else' <.ws> <comp_stmt>
     {*}
 }
 
-rule ensure {
-    'ensure' <comp_stmt>
+token ensure {
+    'ensure' <.ws> <comp_stmt>
     {*}
 }
 
