@@ -428,41 +428,28 @@ Multimethod helper to return the parrotclass for C<x>.
 
 =cut
 
-.sub 'get_parrotclass' :method :multi(_,Class)
+.sub 'get_parrotclass' :method
     .param pmc x
-    .return (x)
-.end
-
-.sub 'get_parrotclass' :method :multi(_,PMCProxy)
-    .param pmc x
-    .return (x)
-.end
-
-.sub 'get_parrotclass' :method :multi(_,P6metaclass)
-    .param pmc x
-    $P0 = getattribute x, 'parrotclass'
-    .return ($P0)
-.end
-
-.sub 'get_parrotclass' :method :multi(_,P6oobject)
-    .param pmc x
-    $P0 = x.'HOW'()
-    $P0 = getattribute $P0, 'parrotclass'
-    .return ($P0)
-.end
-
-.sub 'get_parrotclass' :method :multi(_,String)
-    .param pmc x
-    $P0 = get_class x
-    .return ($P0)
-.end
-
-.sub 'get_parrotclass' :method :multi(_,_)
-    .param pmc x
+    .local pmc parrotclass
+    parrotclass = x
+    $S0 = typeof x
+    if $S0 == 'Class' goto done
+    if $S0 == 'PMCProxy' goto done
+    $I0 = isa x, 'String'
+    if $I0 goto x_string
+    $I0 = isa x, 'P6object'
+    if $I0 goto x_p6object
     $P0 = typeof x
     .return ($P0)
+  x_p6object:
+    $P0 = x.'HOW'()
+    parrotclass = getattribute $P0, 'parrotclass'
+    .return (parrotclass)
+  x_string:
+    parrotclass = get_class x
+  done:
+    .return (parrotclass)
 .end
-
 
 =back
 
