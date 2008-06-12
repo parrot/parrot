@@ -52,7 +52,7 @@ PARROT_API void Parrot_setup_argv(Parrot_Interp, int argc, const char **argv);
 
 PARROT_API void Parrot_setup_opt(Parrot_Interp, int n, char *argv);
 
-PARROT_API void Parrot_runcode(Parrot_Interp, int argc, const char **argv);
+PARROT_API void Parrot_runcode(Parrot_Interp, int argc, char **argv);
 
 PARROT_API void Parrot_destroy(Parrot_Interp);
 

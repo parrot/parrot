@@ -42,40 +42,44 @@ run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
-    STRING *src, *pir, *smain;
-    PMC *comp, *prog, *compreg, *entry;
+    STRING *src, *smain;
+    PMC *prog, *entry;
     opcode_t *dest;
-    /*
-     * get PIR compiler  - TODO API
-     */
-    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
+
+    /* get PIR compiler  - TODO API */
+    PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
-    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    STRING *pir     = const_string(interp, "PIR");
+    PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
-    /*
-     * compile source
-     */
+
+    /* compile source */
     prog = imcc_compile_pir(interp, c_src);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
+
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
+
     /* locate function to run */
     smain = const_string(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
+
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = Parrot_PMC_invoke(interp, entry, NULL);
+    dest                 = Parrot_PMC_invoke(interp, entry, NULL);
+
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
+
     /* and go */
     Parrot_runcode(interp, argc, argv);
     return NULL;
@@ -98,6 +102,7 @@ main(int margc, char *margv[])
 
     /* this registers the PIR compiler */
     imcc_init(interp);
+
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -129,44 +134,47 @@ run(Parrot_Interp interp, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
-    STRING *src, *pir, *smain;
-    PMC *comp, *prog, *compreg, *entry;
+    STRING *src, *smain;
+    PMC *prog, *entry;
     opcode_t *dest;
     STRING *error;
-    /*
-     * get PIR compiler  - TODO API
-     */
-    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
+
+    /* get PIR compiler  - TODO API */
+    PMC   *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
-    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    STRING *pir    = const_string(interp, "PIR");
+    PMC    *comp   = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
 
-    /*
-     * compile source
-     */
+    /* compile source */
     prog = Parrot_compile_string(interp, pir, c_src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
+
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
+
     /* locate function to run */
     smain = const_string(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
+
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = Parrot_PMC_invoke(interp, entry, NULL);
+    dest                 = Parrot_PMC_invoke(interp, entry, NULL);
+
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
+
     /* and go */
-    Parrot_runcode(interp, argc, (const char **)argv);
+    Parrot_runcode(interp, argc, (char **)argv);
     return NULL;
 }
 
@@ -215,52 +223,57 @@ static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
-    STRING *smain;
-    PMC *prog, *entry;
-    STRING *error;
+    STRING   *smain;
+    PMC      *entry;
+    STRING   *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
+
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
+
     /* locate function to run */
     smain = const_string(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
+
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = Parrot_PMC_invoke(interp, entry, NULL);
+    dest                 = Parrot_PMC_invoke(interp, entry, NULL);
+
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
+
     /* and go */
-    Parrot_runcode(interp, argc, (const char **) argv);
+    Parrot_runcode(interp, argc, (char **)argv);
 }
 
 static opcode_t *
 run(Parrot_Interp interp, int argc, char *argv[])
 {
-    const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
+    const char *c_src  = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
     const char *c2_src =
         ".sub main :main\n" "    print \"hola\\n\"\n" ".end\n";
 
-    STRING *src, *pir, *smain;
-    PMC *comp, *compreg;
-    /*
-     * get PIR compiler  - TODO API
-     */
-    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
+    STRING *src, *smain;
+
+    /* get PIR compiler  - TODO API */
+    PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
-    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    STRING *pir     = const_string(interp, "PIR");
+    PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
+
     compile_run(interp, c_src, pir, argc, argv);
     compile_run(interp, c2_src, pir, argc, argv);
 }
@@ -282,6 +295,7 @@ main(int margc, char *margv[])
 
     /* this registers the PIR compiler */
     imcc_init(interp);
+
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -311,52 +325,57 @@ static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
-    STRING *smain;
-    PMC *prog, *entry;
-    STRING *error;
+    STRING   *smain;
+    PMC      *entry;
+    STRING   *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
+
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
+
     /* locate function to run */
     smain = const_string(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
+
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = Parrot_PMC_invoke(interp, entry, NULL);
+    dest                 = Parrot_PMC_invoke(interp, entry, NULL);
+
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
+
     /* and go */
-    Parrot_runcode(interp, argc, (const char **) argv);
+    Parrot_runcode(interp, argc, (char **) argv);
 }
 
 static opcode_t *
 run(Parrot_Interp interp, int argc, char *argv[])
 {
-    const char *c_src = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
+    const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
     const char *c2_src =
         ".sub main :main\n" "    print \"hola\\n\"\n" ".end\n";
 
-    STRING *src, *pir, *smain;
-    PMC *comp, *compreg;
-    /*
-     * get PIR compiler  - TODO API
-     */
-    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
+    STRING *src, *smain;
+
+    /* get PIR compiler  - TODO API */
+    PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
-    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    STRING *pir     = const_string(interp, "PIR");
+    PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
+
     compile_run(interp, c_src, pir, argc, argv);
     compile_run(interp, c2_src, pir, argc, argv);
 }
@@ -378,6 +397,7 @@ main(int margc, char *margv[])
 
     /* this registers the PIR compiler */
     imcc_init(interp);
+
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -407,52 +427,56 @@ static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
-    STRING *smain;
-    PMC *prog, *entry;
-    STRING *error;
+    STRING   *smain;
+    PMC      *entry;
+    STRING   *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
+
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
+
     /* locate function to run */
     smain = const_string(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
+
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = Parrot_PMC_invoke(interp, entry, NULL);
+    dest                 = Parrot_PMC_invoke(interp, entry, NULL);
+
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
+
     /* and go */
-    Parrot_runcode(interp, argc, (const char **) argv);
+    Parrot_runcode(interp, argc, (char **)argv);
 }
 
 static opcode_t *
 run(Parrot_Interp interp, int argc, char *argv[])
 {
-    const char *c_src = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
+    const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
     const char *c2_src =
         ".sub main :main\n" "    print \"hola\\n\"\n" ".end\n";
 
-    STRING *src, *pir, *smain;
-    PMC *comp, *compreg;
-    /*
-     * get PIR compiler  - TODO API
-     */
-    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
+    STRING *src, *smain;
+    /* get PIR compiler  - TODO API */
+    PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
-    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    STRING *pir     = const_string(interp, "PIR");
+    PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
+
     compile_run(interp, c2_src, pir, argc, argv);
     compile_run(interp, c_src, pir, argc, argv);
 }
@@ -474,6 +498,7 @@ main(int margc, char *margv[])
 
     /* this registers the PIR compiler */
     imcc_init(interp);
+
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -503,51 +528,55 @@ static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
-    STRING *smain;
-    PMC *prog, *entry;
-    STRING *error;
+    STRING   *smain;
+    PMC      *entry;
+    STRING   *error;
     opcode_t *dest;
-    prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
+
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
+
     /* locate function to run */
     smain = const_string(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
+
     /* location of the entry */
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = Parrot_PMC_invoke(interp, entry, NULL);
+    dest                 = Parrot_PMC_invoke(interp, entry, NULL);
+
     /* where to start */
     interp->resume_offset = dest -interp->code->base.data;
+
     /* and go */
-    Parrot_runcode(interp, argc, (const char **) argv);
+    Parrot_runcode(interp, argc, (char **)argv);
 }
 
 static opcode_t *
 run(Parrot_Interp interp, int argc, char *argv[])
 {
-    const char *c_src = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
+    const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
     const char *c2_src = ".sub main :main\n" "    print hola\\n\"\n" ".end\n";
 
-    STRING *src, *pir, *smain;
-    PMC *comp, *compreg;
-    /*
-     * get PIR compiler  - TODO API
-     */
-    compreg = Parrot_PMC_get_pmc_keyed_int(interp,
+    STRING *src, *smain;
+    /* get PIR compiler  - TODO API */
+    PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
-    comp = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+    STRING *pir     = const_string(interp, "PIR");
+    PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
+
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
+
     compile_run(interp, c_src, pir, argc, argv);
     compile_run(interp, c2_src, pir, argc, argv);
 }
@@ -569,8 +598,10 @@ main(int margc, char *margv[])
 
     /* this registers the PIR compiler */
     imcc_init(interp);
+
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
+
     /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
     Parrot_exit(interp, 0);
