@@ -370,10 +370,9 @@ third and subsequent children can be any value they wish.
     .local pmc npast, npost
     npast = cpast.'named'()
     unless npast goto iter_pos
-  iter_named:
+    if is_flat goto flat_named
     npost = self.'as_post'(npast, 'rtype'=>'~')
     $S0 = cpost
-    if is_flat goto flat_named
     $S1 = npost
     ops.'push'(npost)
     concat $S0, ' :named('
