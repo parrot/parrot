@@ -591,7 +591,7 @@ int
 main(int argc, char* argv[])
 {
     Parrot_PackFile packfile;
-    const char * code[] = { ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n" };
+    char * code[] = { ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n" };
 
     Parrot_Interp interp = Parrot_new(NULL);
     if (!interp) {
