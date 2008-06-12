@@ -445,8 +445,8 @@ thread_func(ARGIN_NULLOK(void *arg))
     PMC             *ret_val = NULL;
     Parrot_Interp    interp  = (Parrot_Interp)PMC_data(self);
 
-    Parrot_block_DOD(interp);
-    Parrot_block_GC(interp);
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
 
     /* need to set it here because argument passing can trigger GC */
     interp->lo_var_ptr = &lo_var_ptr;
@@ -469,8 +469,8 @@ thread_func(ARGIN_NULLOK(void *arg))
     else {
         /* run normally */
         push_new_c_exception_handler(interp, &exp);
-        Parrot_unblock_DOD(interp);
-        Parrot_unblock_GC(interp);
+        Parrot_unblock_GC_mark(interp);
+        Parrot_unblock_GC_sweep(interp);
         ret_val = Parrot_runops_fromc_args(interp, sub, "PF", sub_arg);
     }
 
@@ -524,11 +524,11 @@ resources are created in C<d>.
 void
 pt_clone_code(Parrot_Interp d, Parrot_Interp s)
 {
-    Parrot_block_DOD(d);
+    Parrot_block_GC_mark(d);
     Interp_flags_SET(d, PARROT_EXTERN_CODE_FLAG);
     d->code = NULL;
     Parrot_switch_to_cs(d, s->code, 1);
-    Parrot_unblock_DOD(d);
+    Parrot_unblock_GC_mark(d);
 }
 
 /*
@@ -593,9 +593,9 @@ Copies the global namespace when cloning a new interpreter.
 void
 pt_clone_globals(Parrot_Interp d, Parrot_Interp s)
 {
-    Parrot_block_DOD(d);
+    Parrot_block_GC_mark(d);
     pt_ns_clone(d, d->root_namespace, s, s->root_namespace);
-    Parrot_unblock_DOD(d);
+    Parrot_unblock_GC_mark(d);
 }
 
 /*
@@ -667,10 +667,10 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
     PMC *parent;
     Interp * const interpreter = (Parrot_Interp)PMC_data(dest_interp);
 
-    Parrot_block_GC(interpreter);
-    Parrot_block_DOD(interpreter);
-    Parrot_block_GC(interp);
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_sweep(interpreter);
+    Parrot_block_GC_mark(interpreter);
+    Parrot_block_GC_sweep(interp);
+    Parrot_block_GC_mark(interp);
 
     /* make a copy of the ParrotThread PMC so we can use it
      * to hold parameters to the new thread without it being
@@ -716,10 +716,10 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
      */
     interpreter->thread_data->state = THREAD_STATE_JOINABLE;
 
-    Parrot_unblock_GC(interpreter);
-    Parrot_unblock_DOD(interpreter);
-    Parrot_unblock_GC(interp);
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interpreter);
+    Parrot_unblock_GC_sweep(interpreter);
+    Parrot_unblock_GC_mark(interp);
+    Parrot_unblock_GC_sweep(interp);
 
     THREAD_CREATE_JOINABLE(interpreter->thread_data->thread,
             thread_func, dest_interp);
@@ -1193,7 +1193,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
     /* mark and sweep our world -- later callbacks will keep
      * it sync'd
      */
-    Parrot_dod_ms_run(interp, DOD_trace_stack_FLAG);
+    Parrot_dod_ms_run(interp, GC_trace_stack_FLAG);
 
     PARROT_ASSERT(!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC));
 }
@@ -1264,7 +1264,7 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
              * stack so block DOD during clone
              * XXX should probably acquire the parent's interpreter mutex
              */
-            Parrot_block_DOD(parent);
+            Parrot_block_GC_mark(parent);
             parent_ret = make_local_copy(parent, interp, retval);
 
             /* this PMC is living only in the stack of this currently
@@ -1272,7 +1272,7 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
              * XXX is this still needed?
              */
             dod_register_pmc(parent, parent_ret);
-            Parrot_unblock_DOD(parent);
+            Parrot_unblock_GC_mark(parent);
             retval = parent_ret;
         }
         else {

@@ -158,7 +158,7 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         Small_Object_Arena * const arena = pool->last_Arena;
         if (arena) {
             if (arena->used == arena->total_objects)
-                Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+                Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 
             if (pool->num_free_objects <= pool->replenish_level)
                 pool->skip = 1;
@@ -482,9 +482,9 @@ Parrot_gc_ms_init(PARROT_INTERP)
 {
     Arenas * const arena_base     = interp->arena_base;
 
-    arena_base->do_dod_run        = Parrot_dod_ms_run;
-    arena_base->de_init_gc_system = NULL;
-    arena_base->init_pool         = gc_ms_pool_init;
+    arena_base->do_gc_mark         = Parrot_dod_ms_run;
+    arena_base->finalize_gc_system = NULL;
+    arena_base->init_pool          = gc_ms_pool_init;
 }
 
 /*

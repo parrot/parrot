@@ -143,8 +143,8 @@ main(int argc, char *argv[])
     interp->debugger = debugger;
     pdb->debugee     = interp;
 
-    Parrot_block_DOD(interp);
-    Parrot_block_GC(interp);
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
     imcc_init(interp);
 
     do_yylex_init(interp, &yyscanner);
@@ -194,8 +194,8 @@ main(int argc, char *argv[])
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     }
 
-    Parrot_unblock_DOD(interp);
-    Parrot_unblock_GC(interp);
+    Parrot_unblock_GC_mark(interp);
+    Parrot_unblock_GC_sweep(interp);
 
     PDB_printwelcome();
 

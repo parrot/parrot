@@ -866,10 +866,10 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     self->directory.base.file_offset = (INTVAL)cursor - (INTVAL)self->src;
 
     /* now unpack dir, which unpacks its contents ... */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
     cursor = PackFile_Segment_unpack(interp,
                                      &self->directory.base, cursor);
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped

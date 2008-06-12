@@ -728,8 +728,8 @@ imcc_initialize(PARROT_INTERP)
 
     do_yylex_init(interp, &yyscanner);
 
-    Parrot_block_DOD(interp);
-    Parrot_block_GC(interp);
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
 
     IMCC_INFO(interp)->yyscanner = yyscanner;
     IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR;
@@ -767,8 +767,8 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN(const char *output_file),
         PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
 
     if (!IMCC_INFO(interp)->gc_off) {
-        Parrot_unblock_DOD(interp);
-        Parrot_unblock_GC(interp);
+        Parrot_unblock_GC_mark(interp);
+        Parrot_unblock_GC_sweep(interp);
     }
 
     if (obj_file)

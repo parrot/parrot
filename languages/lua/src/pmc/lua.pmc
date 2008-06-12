@@ -38,14 +38,14 @@ context_infostr(PARROT_INTERP, parrot_context_t *ctx)
     Parrot_Context_info info;
     STRING *res = NULL;
 
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     if (Parrot_Context_get_info(interp, ctx, &info)) {
         res = Parrot_sprintf_c(interp, "\t%Ss:%d in function '%Ss'\n",
                                        info.file, info.line, info.subname);
     }
 
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 
     return res;
 }
@@ -118,15 +118,15 @@ information see F<src/pmc.c>.
             PMC *cont;
             if (sub_ctx->current_sub && PMC_metadata(sub_ctx->current_sub)) {
                 Parrot_Context_info info;
-                Parrot_block_DOD(INTERP);
+                Parrot_block_GC_mark(INTERP);
 
                 if (Parrot_Context_get_info(INTERP, sub_ctx, &info)) {
                     STRING *retval = info.subname;
 
-                    Parrot_unblock_DOD(INTERP);
+                    Parrot_unblock_GC_mark(INTERP);
                     RETURN(STRING *retval);
                 }
-                Parrot_unblock_DOD(INTERP);
+                Parrot_unblock_GC_mark(INTERP);
                 break;
             }
 
@@ -406,16 +406,16 @@ information see F<src/pmc.c>.
             &&  PMC_metadata(sub)
             &&  VTABLE_isa(INTERP, sub, const_string(INTERP, "LuaClosure"))) {
                 Parrot_Context_info info;
-                Parrot_block_DOD(INTERP);
+                Parrot_block_GC_mark(INTERP);
 
                 if (Parrot_Context_get_info(INTERP, sub_ctx, &info)) {
                     STRING *res = Parrot_sprintf_c(INTERP, "%Ss:%d:",
                                                    info.file, info.line);
 
-                    Parrot_unblock_DOD(INTERP);
+                    Parrot_unblock_GC_mark(INTERP);
                     RETURN(STRING *res);
                 }
-                Parrot_unblock_DOD(INTERP);
+                Parrot_unblock_GC_mark(INTERP);
                 break;
             }
 

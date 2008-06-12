@@ -1097,14 +1097,14 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLO
 
     if (bucket) {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            DOD_WRITE_BARRIER_KEY(interp, hash->container,
+            GC_WRITE_BARRIER_KEY(interp, hash->container,
                     (PMC *)bucket->value, bucket->key, (PMC *)value, key);
         }
         bucket->value = value;        /* replace value */
     }
     else {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            DOD_WRITE_BARRIER_KEY(interp, hash->container,
+            GC_WRITE_BARRIER_KEY(interp, hash->container,
                     NULL, NULL, (PMC *)value, key);
         }
 

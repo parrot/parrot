@@ -265,10 +265,10 @@ destination to continue execution.
             opcode_t *dest_indexes = to_ctx->current_results;
             interp->current_args   = NULL;
 
-            Parrot_block_DOD(INTERP);
+            Parrot_block_GC_mark(INTERP);
             parrot_pass_args(INTERP, from_ctx, to_ctx,
                              src_indexes, dest_indexes, PARROT_PASS_PARAMS);
-            Parrot_unblock_DOD(INTERP);
+            Parrot_unblock_GC_mark(INTERP);
         }
 
         /* switch segment */

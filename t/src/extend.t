@@ -710,8 +710,8 @@ void interp_cleanup(Parrot_Interp interp, int status)
 {
     handler_node_t *node = interp->exit_handler_list;
 
-    Parrot_block_DOD(interp);
-    Parrot_block_GC(interp);
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
 
     while (node) {
         handler_node_t * const next = node->next;

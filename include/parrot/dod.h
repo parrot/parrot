@@ -14,39 +14,39 @@
 #include "parrot/parrot.h"
 
 /* Macros for recursively blocking and unblocking DOD */
-#define Parrot_block_DOD(interp) \
+#define Parrot_block_GC_mark(interp) \
         { \
             (interp)->arena_base->DOD_block_level++; \
             Parrot_shared_DOD_block(interp); \
         }
 
-#define Parrot_unblock_DOD(interp) \
+#define Parrot_unblock_GC_mark(interp) \
         if ((interp)->arena_base->DOD_block_level) { \
             (interp)->arena_base->DOD_block_level--; \
             Parrot_shared_DOD_unblock(interp); \
         }
 
 /* Macros for recursively blocking and unblocking GC */
-#define Parrot_block_GC(interp) \
+#define Parrot_block_GC_sweep(interp) \
         (interp)->arena_base->GC_block_level++
 
-#define Parrot_unblock_GC(interp) \
+#define Parrot_unblock_GC_sweep(interp) \
         if ((interp)->arena_base->GC_block_level) \
             (interp)->arena_base->GC_block_level--
 
 /* Macros for testing if the DOD and GC are blocked */
-#define Parrot_is_blocked_DOD(interp) \
+#define Parrot_is_blocked_GC_mark(interp) \
         ((interp)->arena_base->DOD_block_level)
 
-#define Parrot_is_blocked_GC(interp) \
+#define Parrot_is_blocked_GC_sweep(interp) \
         ((interp)->arena_base->GC_block_level)
 
-#define DOD_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areads and stack */
-#define DOD_trace_normal        (UINTVAL)(1 << 0)   /* the same */
-#define DOD_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
-#define DOD_finish_FLAG         (UINTVAL)(1 << 2)   /* on Parrot exit: mark (almost) all PMCs dead and */
+#define GC_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areas and stack */
+#define GC_trace_normal        (UINTVAL)(1 << 0)   /* the same */
+#define GC_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
+#define GC_finish_FLAG         (UINTVAL)(1 << 2)   /* on Parrot exit: mark (almost) all PMCs dead and */
                                                     /* garbage collect. */
-#define DOD_no_trace_volatile_roots (UINTVAL)(1 << 3)
+#define GC_no_trace_volatile_roots (UINTVAL)(1 << 3)
             /* trace all but volatile root set, i.e. registers */
 
 /* HEADERIZER BEGIN: src/gc/dod.c */
@@ -215,7 +215,7 @@ void Parrot_gc_ims_init(PARROT_INTERP)
  * write barrier
  */
 #if PARROT_GC_IMS
-#  define DOD_WRITE_BARRIER(interp, agg, old, _new) \
+#  define GC_WRITE_BARRIER(interp, agg, old, _new) \
     do { \
         if (!PMC_IS_NULL(_new)   && \
                 PObj_live_TEST(agg) && \
@@ -225,17 +225,17 @@ void Parrot_gc_ims_init(PARROT_INTERP)
         } \
     } while (0)
 
-#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) \
-          DOD_WRITE_BARRIER(interp, agg, old, _new)
+#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) \
+          GC_WRITE_BARRIER(interp, agg, old, _new)
 #endif
 
 #if PARROT_GC_MS
-#  define DOD_WRITE_BARRIER(interp, agg, old, _new)
-#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key)
+#  define GC_WRITE_BARRIER(interp, agg, old, _new)
+#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key)
 #endif
 
 #if PARROT_GC_GMS
-#  define DOD_WRITE_BARRIER(interp, agg, old, _new) do { \
+#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { \
     UINTVAL gen_agg, gen_new; \
     if (!(_new) || PMC_IS_NULL(_new)) \
         break; \
@@ -245,7 +245,7 @@ void Parrot_gc_ims_init(PARROT_INTERP)
         parrot_gc_gms_wb(interp, agg, old, _new); \
 } while (0)
 
-#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { \
+#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { \
     UINTVAL gen_agg, gen_new, gen_key; \
     if (!(_new) || PMC_IS_NULL(_new)) \
         break; \

@@ -420,7 +420,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
                 "FixedStringArray: index out of bounds!");
 
         data      = (STRING **)PMC_data(SELF);
-        DOD_WRITE_BARRIER(INTERP, SELF, data[key], value);
+        GC_WRITE_BARRIER(INTERP, SELF, data[key], value);
         data[key] = value;
     }
 

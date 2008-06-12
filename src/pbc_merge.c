@@ -843,7 +843,7 @@ main(int argc, const char **argv)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     Interp * const interp = Parrot_new(NULL);
 
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     /* Get options, ensuring we have at least one input
        file and an output file. */

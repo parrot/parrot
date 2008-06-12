@@ -859,7 +859,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     do_yylex_init(interp, &yyscanner);
 
     /* we create not yet anchored PMCs - e.g. Subs: turn off DOD */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     if (IMCC_INFO(interp)->last_unit) {
         /* a reentrant compile */
@@ -951,7 +951,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     else
         imc_cleanup(interp, yyscanner);
 
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 
     yylex_destroy(yyscanner);
 
@@ -1151,7 +1151,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
      * the string_compare() called from pmc_type() triggers DOD
      * which can destroy packfiles under construction
      */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
     ignored = Parrot_push_context(interp, regs_used);
     UNUSED(ignored);
 
@@ -1175,7 +1175,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         yylex_destroy(yyscanner);
     }
 
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
     Parrot_pop_context(interp);
 
     imc_cleanup(interp, NULL);

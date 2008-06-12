@@ -301,13 +301,13 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             STRING *j = CONST_STRING(interp, ";");
             STRING *res;
 
-            Parrot_block_DOD(interp);
+            Parrot_block_GC_mark(interp);
             ns_array = Parrot_ns_get_name(interp, s->namespace_stash);
             if (s->name)
                 VTABLE_push_string(interp, ns_array, s->name);
 
             res = string_join(interp, j, ns_array);
-            Parrot_unblock_DOD(interp);
+            Parrot_unblock_GC_mark(interp);
             return res;
         }
     }
@@ -428,7 +428,7 @@ Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
         ? "current instr.:"
         : "called from Sub";
 
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
     if (Parrot_Context_get_info(interp, ctx, &info)) {
         static const char unknown_file[] = "(unknown file)";
         DECL_CONST_CAST;
@@ -438,7 +438,7 @@ Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
             info.fullname, info.pc, info.file, info.line);
     }
 
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
     return res;
 }
 

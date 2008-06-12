@@ -1509,7 +1509,7 @@ string_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+        Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, minlen, enum_stringrep_one);
@@ -1625,7 +1625,7 @@ string_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+        Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, maxlen, enum_stringrep_one);
@@ -1700,7 +1700,7 @@ string_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+        Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, maxlen, enum_stringrep_one);
@@ -1776,7 +1776,7 @@ string_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+        Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, len, enum_stringrep_one);
@@ -2135,9 +2135,9 @@ string_unpin(PARROT_INTERP, ARGMOD(STRING *s))
      *
      * We have to block GC here, as we have a pointer to bufstart
      */
-    Parrot_block_GC(interp);
+    Parrot_block_GC_sweep(interp);
     Parrot_allocate_string(interp, s, size);
-    Parrot_unblock_GC(interp);
+    Parrot_unblock_GC_sweep(interp);
     mem_sys_memcopy(PObj_bufstart(s), memory, size);
 
     /* Mark the memory as neither immobile nor system allocated */

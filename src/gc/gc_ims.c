@@ -633,9 +633,9 @@ Parrot_gc_ims_init(PARROT_INTERP)
 
     /* set function hooks according to pdd09 */
 
-    arena_base->do_dod_run        = parrot_gc_ims_run;
-    arena_base->de_init_gc_system = parrot_gc_ims_deinit;
-    arena_base->init_pool         = gc_ims_pool_init;
+    arena_base->do_gc_mark         = parrot_gc_ims_run;
+    arena_base->finalize_gc_system = parrot_gc_ims_deinit;
+    arena_base->init_pool          = gc_ims_pool_init;
 
     /* run init state */
     parrot_gc_ims_run_increment(interp);
@@ -770,7 +770,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
      */
 
     /* TODO mark volatile roots */
-    Parrot_dod_trace_root(interp, g_ims->lazy ? 0 : DOD_trace_stack_FLAG);
+    Parrot_dod_trace_root(interp, g_ims->lazy ? 0 : GC_trace_stack_FLAG);
 
     /* mark (again) rest of children */
     Parrot_dod_trace_children(interp, (size_t) -1);
@@ -966,8 +966,8 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
 
 Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
-  DOD_lazy_FLAG   ... timely destruction
-  DOD_finish_FLAG ... run until live bits are clear
+  GC_lazy_FLAG   ... timely destruction
+  GC_finish_FLAG ... run until live bits are clear
 
 =cut
 
@@ -983,7 +983,7 @@ parrot_gc_ims_run(PARROT_INTERP, int flags)
     if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD)
         return;
 
-    if (flags & DOD_finish_FLAG) {
+    if (flags & GC_finish_FLAG) {
         /*
          * called from really_destroy. This interpreter is gonna die.
          * The destruction includes a sweep over PMCs, so that
@@ -1003,7 +1003,7 @@ parrot_gc_ims_run(PARROT_INTERP, int flags)
     /* make the test happy that checks the count ;) */
     arena_base->dod_runs++;
 
-    lazy = flags & DOD_lazy_FLAG;
+    lazy = flags & GC_lazy_FLAG;
 
     if (!lazy) {
         /* run a full cycle
@@ -1066,7 +1066,7 @@ parrot_gc_ims_run(PARROT_INTERP, int flags)
 
 =item C<void Parrot_dod_ims_wb>
 
-Write barrier called by the DOD_WRITE_BARRIER macro. Always when storing
+Write barrier called by the GC_WRITE_BARRIER macro. Always when storing
 a white object into a black aggregate, either the object must
 be greyed or the aggregate must be rescanned -- so grey it.
 

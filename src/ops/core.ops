@@ -1123,7 +1123,7 @@ op sweep(inconst INT) {
         Parrot_do_dod_run(interp, 0);
     else
         if (interp->arena_base->num_early_DOD_PMCs)
-            Parrot_do_dod_run(interp, DOD_lazy_FLAG);
+            Parrot_do_dod_run(interp, GC_lazy_FLAG);
 }
 
 =item B<collect>()
@@ -1143,7 +1143,7 @@ Disable DOD sweeps. (Nestable)
 =cut
 
 op sweepoff() {
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 }
 
 =item B<sweepon>()
@@ -1153,7 +1153,7 @@ Re-enable DOD sweeps.
 =cut
 
 op sweepon() {
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 }
 
 =item B<collectoff>()
@@ -1163,7 +1163,7 @@ Disable GC runs (nestable).
 =cut
 
 op collectoff() {
-    Parrot_block_GC(interp);
+    Parrot_block_GC_sweep(interp);
 }
 
 =item B<collecton>()
@@ -1173,7 +1173,7 @@ Re-enable GC.
 =cut
 
 op collecton() {
-    Parrot_unblock_GC(interp);
+    Parrot_unblock_GC_sweep(interp);
 }
 
 =item B<needs_destroy>(invar PMC)

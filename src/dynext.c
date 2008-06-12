@@ -353,7 +353,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
      * work around gcc 3.3.3 and other problem with dynpmcs
      * something during library loading doesn't stand a DOD run
      */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     /* get load_func */
     if (lib_name) {
@@ -399,7 +399,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     store_lib_pmc(interp, lib_pmc, wo_ext, type, lib_name);
 
     /* UNLOCK */
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 
     return lib_pmc;
 }

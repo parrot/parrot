@@ -1098,7 +1098,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
      * the sync sweep is always at the end, so that
      * the live bits are cleared
      */
-    if (flags & DOD_finish_FLAG) {
+    if (flags & GC_finish_FLAG) {
         clear_live_bits(interp->arena_base->pmc_pool);
         clear_live_bits(interp->arena_base->constant_pmc_pool);
 
@@ -1109,7 +1109,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
     }
 
     ++arena_base->DOD_block_level;
-    arena_base->lazy_dod = flags & DOD_lazy_FLAG;
+    arena_base->lazy_dod = flags & GC_lazy_FLAG;
 
     /* tell the threading system that we're doing DOD mark */
     pt_DOD_start_mark(interp);
@@ -1119,7 +1119,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
     Parrot_go_collect(interp);
 
     /* Now go trace the PMCs */
-    if (trace_active_PMCs(interp, flags & DOD_trace_stack_FLAG)) {
+    if (trace_active_PMCs(interp, flags & GC_trace_stack_FLAG)) {
         int ignored;
 
         arena_base->dod_trace_ptr = NULL;
@@ -1168,7 +1168,7 @@ Call the configured garbage collector to reclaim unused headers.
 void
 Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
 {
-    interp->arena_base->do_dod_run(interp, flags);
+    interp->arena_base->do_gc_mark(interp, flags);
     parrot_gc_context(interp);
 }
 

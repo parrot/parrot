@@ -594,13 +594,13 @@ void
 dod_register_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
     /* Better not trigger a DOD run with a potentially unanchored PMC */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     if (!interp->DOD_registry)
         interp->DOD_registry = pmc_new(interp, enum_class_AddrRegistry);
 
     VTABLE_set_pmc_keyed(interp, interp->DOD_registry, pmc, PMCNULL);
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 }
 
 /*

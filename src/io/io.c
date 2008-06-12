@@ -1051,7 +1051,7 @@ PIO_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug - but not during tests */
     if (0 && GC_DEBUG(interp))
-        Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+        Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 #endif
     return PIO_write_down(interp, l, io, s);
 }

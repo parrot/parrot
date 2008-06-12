@@ -467,9 +467,9 @@ Parrot_gc_gms_init(PARROT_INTERP)
     /*
      * set function hooks according to pdd09
      */
-    arena_base->do_dod_run = parrot_gc_gms_run;
-    arena_base->de_init_gc_system = parrot_gc_gms_deinit;
-    arena_base->init_pool = gc_gms_pool_init;
+    arena_base->do_gc_mark         = parrot_gc_gms_run;
+    arena_base->finalize_gc_system = parrot_gc_gms_deinit;
+    arena_base->init_pool          = gc_gms_pool_init;
 
 }
 
@@ -634,7 +634,7 @@ gc_gms_more_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     if (pool->skip)
         pool->skip = 0;
     else if (pool->last_Arena) {
-        Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+        Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
         if (pool->num_free_objects <= pool->replenish_level)
             pool->skip = 1;
     }
@@ -1712,8 +1712,8 @@ gc_gms_end_cycle(PARROT_INTERP)
 
 Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
-  DOD_lazy_FLAG   ... timely destruction
-  DOD_finish_FLAG ... run a final sweep to destruct objects at
+  GC_lazy_FLAG   ... timely destruction
+  GC_finish_FLAG ... run a final sweep to destruct objects at
                       interpreter shutdown
 
 =cut
@@ -1731,7 +1731,7 @@ parrot_gc_gms_run(PARROT_INTERP, int flags)
     }
     ++arena_base->DOD_block_level;
     g_gms = arena_base->gc_private;
-    if (flags & DOD_finish_FLAG) {
+    if (flags & GC_finish_FLAG) {
         Small_Object_Pool * const pool = arena_base->pmc_pool;
 
         pool->white = pool->marker.next;
@@ -1744,7 +1744,7 @@ parrot_gc_gms_run(PARROT_INTERP, int flags)
 
     /* normal or lazy DOD run */
     arena_base->dod_runs++;
-    arena_base->lazy_dod = (flags & DOD_lazy_FLAG);
+    arena_base->lazy_dod = (flags & GC_lazy_FLAG);
     gc_gms_init_mark(interp);
     if (gc_gms_trace_root(interp, !arena_base->lazy_dod) &&
             gc_gms_trace_children(interp)) {
