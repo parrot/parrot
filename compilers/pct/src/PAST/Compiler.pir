@@ -364,15 +364,15 @@ third and subsequent children can be any value they wish.
     cpost = self.'as_post'(cpast, 'rtype'=>rtype)
     cpost = self.'coerce'(cpost, rtype)
     ops.'push'(cpost)
-    .local pmc is_flat
-    is_flat = cpast.'flat'()
+    .local pmc isflat
+    isflat = cpast.'flat'()
     if rtype != ':' goto iter_pos
     .local pmc npast, npost
     npast = cpast.'named'()
     unless npast goto iter_pos
-    if is_flat goto flat_named
-    npost = self.'as_post'(npast, 'rtype'=>'~')
     $S0 = cpost
+    if isflat goto flat_named
+    npost = self.'as_post'(npast, 'rtype'=>'~')
     $S1 = npost
     ops.'push'(npost)
     concat $S0, ' :named('
@@ -385,7 +385,7 @@ third and subsequent children can be any value they wish.
     push namedargs, $S0
     goto iter_rtype
   iter_pos:
-    if is_flat goto flat_pos
+    if isflat goto flat_pos
     push posargs, cpost
     goto iter_rtype
   flat_pos:
