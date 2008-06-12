@@ -545,13 +545,14 @@ sub init_func {
     my $provides        = join( " ", keys( %{ $self->{flags}{provides} } ) );
     my $class_init_code = "";
 
-    $class_init_code    = $self->get_method('class_init')->body
-        if $self->has_method('class_init');
+    if ($self->has_method('class_init')) {
+        $class_init_code    = $self->get_method('class_init')->body;
 
-    $class_init_code =~ s/INTERP/interp/g;
+        $class_init_code =~ s/INTERP/interp/g;
 
-    # fix indenting
-    $class_init_code =~ s/^/        /mg;
+        # fix indenting
+        $class_init_code =~ s/^/        /mg;
+    }
 
     my %extra_vt;
     $extra_vt{ro} = $self->{ro} if $self->{ro};
@@ -675,23 +676,26 @@ EOC
     }
 
         $cout .= <<"EOC";
-        PMC           *mro      = pmc_new(interp, enum_class_ResizableStringArray);
-        VTABLE * const vt_clone = interp->vtables[entry];
+        {
+            PMC           *mro      = pmc_new(interp, enum_class_ResizableStringArray);
+            VTABLE * const vt_clone = interp->vtables[entry];
 
-        vt_clone->mro = mro;
+            vt_clone->mro = mro;
 
-        if (vt_clone->ro_variant_vtable)
-            vt_clone->ro_variant_vtable->mro = mro;
+            if (vt_clone->ro_variant_vtable)
+                vt_clone->ro_variant_vtable->mro = mro;
 
 EOC
 
     for my $isa ($classname, @isa) {
         $cout .= <<"EOC";
-        VTABLE_push_string(interp, mro, CONST_STRING(interp, "$isa"));
+            VTABLE_push_string(interp, mro, CONST_STRING(interp, "$isa"));
 EOC
     }
 
     $cout .= <<"EOC";
+        }
+
         /* setup MRO and _namespace */
         Parrot_create_mro(interp, entry);
 EOC
@@ -725,10 +729,8 @@ EOC
     }
 
     # include any class specific init code from the .pmc file
-    $cout .= <<"EOC";
-        /* class_init */
-EOC
     $cout .= <<"EOC" if $class_init_code;
+        /* class_init */
         {
 $class_init_code
         }
