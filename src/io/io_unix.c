@@ -825,12 +825,14 @@ static INTVAL
 PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
         ARGIN_NULLOK(STRING *r))
 {
-    if (r) {
+    struct sockaddr_in * saddr = &io->remote;
+
+    if (r)
         memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
-    }
+
 AGAIN:
-    if ((connect(io->fd, (const struct sockaddr_in *)&io->remote,
-        sizeof (struct sockaddr_in))) != 0) {
+    if ((connect(io->fd, (struct sockaddr *)saddr,
+            sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
             case EINTR:
                 goto AGAIN;
@@ -860,12 +862,14 @@ static INTVAL
 PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
         ARGMOD(STRING *l))
 {
+    struct sockaddr_in * saddr = &io->local;
+
     if (!l)
         return -1;
 
     memcpy(&io->local, PObj_bufstart(l), sizeof (struct sockaddr_in));
 
-    if ((bind(io->fd, (const struct sockaddr_in *)&io->local,
+    if ((bind(io->fd, (struct sockaddr *) saddr,
             sizeof (struct sockaddr_in))) == -1) {
         return -1;
     }
@@ -909,11 +913,12 @@ PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
-    ParrotIO * const newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
-
-    Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
-    const int        newsock = accept(io->fd,
-                        (struct sockaddr_in *)&newio->remote, &addrlen);
+    ParrotIO * const    newio   = PIO_new(interp, PIO_F_SOCKET, 0,
+                                    PIO_F_READ|PIO_F_WRITE);
+    Parrot_Socklen_t    addrlen = sizeof (struct sockaddr_in);
+    struct sockaddr_in *saddr   = &newio->remote;
+    const int           newsock = accept(io->fd, (struct sockaddr *)saddr,
+                                    &addrlen);
 
     if (newsock == -1) {
         mem_sys_free(newio);
@@ -926,8 +931,7 @@ PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
      * fill in the sockaddr_in structs for local and peer */
 
     /* Optionally do a gethostyaddr() to resolve remote IP address.
-     * This should be based on an option set in the master socket
-     */
+     * This should be based on an option set in the master socket */
 
     return newio;
 }
