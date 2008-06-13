@@ -1,6 +1,6 @@
 =head1 TITLE
 
-shapes.pir - Exercise basic OpenGL 1.1/GLUT 3.x APIs by drawing animated shapes
+shapes.pir - Exercise basic OpenGL 1.1/GLUT 3 APIs by drawing animated shapes
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ shapes.pir - Exercise basic OpenGL 1.1/GLUT 3.x APIs by drawing animated shapes
 =head1 DESCRIPTION
 
 This example is slightly more complex than F<triangle.pir>, and exercises more
-of the OpenGL 1.1 and GLUT 3.x APIs.  It is also a better behaved application,
+of the OpenGL 1.1 and GLUT 3 APIs.  It is also a better behaved application,
 correctly responding to resize events, pausing on minimize, and so on.
 
 To quit the example, press C<Q> or the C<ESCAPE> key, or close the window
@@ -41,12 +41,14 @@ ASCII key.
     init_globals()
 
     # Set up GLUT callbacks
-    .const .Sub draw     = 'draw'
-    .const .Sub idle     = 'idle'
-    .const .Sub keyboard = 'keyboard'
-    glutDisplayFunc (draw)
-    glutIdleFunc    (idle)
-    glutKeyboardFunc(keyboard)
+    .const .Sub draw       = 'draw'
+    .const .Sub idle       = 'idle'
+    .const .Sub keyboard   = 'keyboard'
+    .const .Sub visibility = 'visibility'
+    glutDisplayFunc   (draw)
+    glutIdleFunc      (idle)
+    glutKeyboardFunc  (keyboard)
+    glutVisibilityFunc(visibility)
 
     # Enter the GLUT main loop
     glutMainLoop()
@@ -287,6 +289,23 @@ ASCII key.
     paused = not paused
 .end
 
+.sub visibility
+    .param int state
+
+    # XXXX: Weirdly, on Debian-testing/GNOME hides don't
+    #       properly trigger the callback, but shows do.
+    print 'Visibility change; new state: '
+    say state
+
+    if state == .GLUT_NOT_VISIBLE goto hidden
+    .const .Sub idle = 'idle'
+    glutIdleFunc(idle)
+    .return ()
+
+  hidden:
+    $P0 = null
+    glutIdleFunc($P0)
+.end
 
 # Local Variables:
 #   mode: pir
