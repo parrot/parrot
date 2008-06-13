@@ -11,7 +11,7 @@ shapes.pir - Exercise basic OpenGL 1.1/GLUT 3 APIs by drawing animated shapes
 
 This example is slightly more complex than F<triangle.pir>, and exercises more
 of the OpenGL 1.1 and GLUT 3 APIs.  It is also a better behaved application,
-correctly responding to resize events, pausing on minimize, and so on.
+correctly responding to reshape events, pausing on minimize, and so on.
 
 To quit the example, press C<Q> or the C<ESCAPE> key, or close the window
 using your window manager (using the X in the corner of the window title
@@ -43,10 +43,12 @@ ASCII key.
     # Set up GLUT callbacks
     .const .Sub draw       = 'draw'
     .const .Sub idle       = 'idle'
+    .const .Sub reshape    = 'reshape'
     .const .Sub keyboard   = 'keyboard'
     .const .Sub visibility = 'visibility'
     glutDisplayFunc   (draw)
     glutIdleFunc      (idle)
+    glutReshapeFunc   (reshape)
     glutKeyboardFunc  (keyboard)
     glutVisibilityFunc(visibility)
 
@@ -86,6 +88,18 @@ ASCII key.
 .end
 
 .sub init_globals
+    # Set up global for current aspect ratio
+    .local pmc aspect
+    aspect = new 'Float'
+    aspect = 1.0
+    set_global 'aspect', aspect
+
+    # Set up global frame count
+    .local pmc frames
+    frames = new 'Integer'
+    frames = 0
+    set_global 'frames', frames
+
     # Set up global flag for running/paused
     .local pmc paused
     paused = new 'Integer'
@@ -139,13 +153,20 @@ ASCII key.
     set_2d_view()
 
     glutSwapBuffers()
+
+    .local pmc frames
+    frames = get_global 'frames'
+    inc frames
 .end
 
 .sub set_3d_view
     # Simple 60 degree FOV perspective view
+    .local pmc aspect
+    aspect = get_global 'aspect'
+
     glMatrixMode(.GL_PROJECTION)
     glLoadIdentity()
-    gluPerspective(60, 1, 1, 100)
+    gluPerspective(60, aspect, 1, 100)
 
     # Look at origin from (0,3,3), with +Y up
     glMatrixMode(.GL_MODELVIEW)
@@ -350,6 +371,26 @@ ASCII key.
     glutPostRedisplay()
 .end
 
+.sub reshape
+    .param int width
+    .param int height
+
+    # Avoid division by 0
+    if height goto height_ok
+    height = 1
+  height_ok:
+
+    # Set global aspect ratio
+    .local pmc aspect
+    .local num ratio
+    aspect = get_global 'aspect'
+    ratio  = width / height
+    aspect = ratio
+
+    # Set drawing viewport
+    glViewport(0, 0, width, height)
+.end
+
 .sub keyboard
     .param int key
     .param int x
@@ -376,10 +417,10 @@ ASCII key.
 .sub visibility
     .param int state
 
-    # XXXX: Weirdly, on Debian-testing/GNOME hides don't
-    #       properly trigger the callback, but shows do.
-    print 'Visibility change; new state: '
-    say state
+    # XXXX: Weirdly, on Debian-testing/GNOME minimize doesn't
+    #       properly trigger the callback, but hide/show does.
+    # print 'Visibility change; new state: '
+    # say state
 
     if state == .GLUT_NOT_VISIBLE goto hidden
     .const .Sub idle = 'idle'
@@ -387,6 +428,8 @@ ASCII key.
     .return ()
 
   hidden:
+    # XXXX: Idle callbacks are indeed being turned off, but
+    #       this just seems to shift most user CPU to system CPU
     $P0 = null
     glutIdleFunc($P0)
 .end
