@@ -719,7 +719,7 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
         if (codepoint >= 0x1b50 && codepoint <= 0x1b59) return 1;
         if (codepoint >= 0xff10 && codepoint <= 0xff19) return 1;
     }
-    if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric))
+    if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric | enum_cclass_newline))
         real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
     return 0;
