@@ -236,7 +236,7 @@ token simple_stmt {
     | <break_stmt>
     | <continue_stmt>
     | <import_stmt>
-    | <global_stmt>
+    | <global_stmt> {*}                          #= global_stmt
     | <exec_stmt>
 }
 
@@ -360,6 +360,7 @@ rule raise_stmt {
 
 rule global_stmt {
     'global' <identifier> [ ',' <identifier> ]*
+    {*}
 }
 
 rule exec_stmt {
@@ -522,7 +523,7 @@ rule atom {
     | <parenth_form> {*}                         #= parenth_form
     | <list_display> {*}                         #= list_display
    #| <generator_expression>           #   ""
-   #| <dict_display>                   #   ""
+    | <dict_display> {*}                         #= dict_display
    #| <string_conversion>              #   ""
 }
 
@@ -551,14 +552,17 @@ rule genexpr_if {
 
 rule dict_display {
     '{' <key_datum_list>? '}'
+    {*}
 }
 
 rule key_datum_list {
     <key_datum> [ ',' <key_datum> ]* ','?
+    {*}
 }
 
 rule key_datum {
-    <expression> ':' <expression>
+    <key=expression> ':' <value=expression>
+    {*}
 }
 
 rule string_conversion {

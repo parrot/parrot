@@ -11,7 +11,7 @@ src/builtins/lists.pir - List operations
 .namespace []
 
 .sub 'listmaker'
-    .param pmc args            :slurpy
+    .param pmc args  :slurpy
     unless null args goto have_args
     args = new 'ResizablePMCArray'
   have_args:
@@ -19,14 +19,22 @@ src/builtins/lists.pir - List operations
 .end
 
 .sub 'tuplemaker'
-    .param pmc args            :slurpy
+    .param pmc args  :slurpy
     .local pmc ret
-    ret = new .FixedPMCArray
+    ret = new 'FixedPMCArray'
     if null args goto no_args
     set ret, args
   no_args:
     .return (ret)
 .end
+
+
+.sub 'dictmaker'
+    .param pmc args  :slurpy :named
+    .return (args)
+.end
+
+
 =back
 
 =head1 AUTHOR
