@@ -1,6 +1,8 @@
 # $Id$
 
 New for next release (2008-06-17, version undecided)
+- Languages:
+  + Squaak: implement return statement
 - Configuration
   + expanded step gen::opengl
 - Miscellaneous
