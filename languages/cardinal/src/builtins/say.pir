@@ -26,22 +26,6 @@ builtin functions for Ruby.
     'print'(args :flat, "\n")
 .end
 
-.namespace ["Array"]
-
-.sub 'new' :method
-    .param pmc values :slurpy
-    .return (values)
-.end
-
-
-.namespace ["Hash"]
-
-.sub 'new' :method
-    .param pmc values :slurpy :named
-    .return (values)
-.end
-
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

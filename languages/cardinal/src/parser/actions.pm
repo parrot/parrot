@@ -143,6 +143,19 @@ method end($/) {
     make $past;
 }
 
+method indexed_assignment($/) {
+    my $key := $( $<key> );
+    my $rhs := $( $<rhs> );
+    my $primary := $( $<basic_primary> );
+
+    my $past := PAST::Op.new( :name('[]='), :pasttype('callmethod'), :node($/) );
+
+    $past.push( $primary );
+    $past.push( $key );
+    $past.push( $rhs );
+
+    make $past;
+}
 method assignment($/) {
     my $lhs := $( $<mlhs> );
     our $?BLOCK;
@@ -200,7 +213,7 @@ method indexed($/) {
         $args := $( $<args>[0] );
     }
 
-    my $past := PAST::Var.new( :scope('keyed'), :viviself('Undef'), :node($/) );
+    my $past := PAST::Op.new( :name('[]'), :pasttype('callmethod'), :node($/) );
     while $args[0] {
         $past.push( $args.shift() );
     }

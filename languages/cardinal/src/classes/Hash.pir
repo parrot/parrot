@@ -17,6 +17,8 @@ src/classes/CardinalHash.pir - Cardinal hash class and related functions
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
     mappingproto = cardinalmeta.'new_class'('CardinalHash', 'parent'=>'Hash CardinalObject')
     cardinalmeta.'register'('Hash', 'parent'=>'CardinalObject', 'protoobject'=>mappingproto)
+    $P0 = get_class 'CardinalHash'
+    addattribute $P0, 'default'
 .end
 
 
@@ -153,6 +155,27 @@ Run C<block> once for each item in C<self>, with the key and value passed as arg
     .return ($P0)
 .end
 
+.sub '[]' :method
+    .param pmc i
+    $P0 = self[i]
+  unless_null $P0, index_return
+    $P0 = getattribute self, 'default'
+    .local string type
+    type = typeof $P0
+    $I0 = iseq type, 'Closure'
+    unless $I0 goto index_return
+    $P1 = $P0(self,i)
+    $P0 = $P1
+  index_return:
+    .return($P0)
+.end
+
+.sub '[]=' :method
+    .param pmc k
+    .param pmc v
+    self[k] = v
+    .return(v)
+.end
 
 =back
 
@@ -256,6 +279,21 @@ property instead.
   pairs_loop_end:
     .return(ahash)
 .end
+
+.namespace ['Hash']
+
+.sub 'new' :method :multi(_)
+    $P0 = new 'CardinalHash'
+    .return($P0)
+.end
+
+.sub 'new' :method :multi(_,_)
+    .param pmc a
+    $P0 = new 'CardinalHash'
+    setattribute $P0, 'default', a
+    .return($P0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
