@@ -110,7 +110,16 @@ ASCII key.
     .local pmc float4
     float4 = new 'ResizablePMCArray'
     push float4, .DATATYPE_FLOAT
-    push float4, 4
+    push float4, 0
+    push float4, 0
+    push float4, .DATATYPE_FLOAT
+    push float4, 0
+    push float4, 0
+    push float4, .DATATYPE_FLOAT
+    push float4, 0
+    push float4, 0
+    push float4, .DATATYPE_FLOAT
+    push float4, 0
     push float4, 0
     set_global 'float4', float4
 .end
@@ -242,10 +251,10 @@ ASCII key.
     .local pmc float4, position
     float4   = get_global 'float4'
     position = new 'ManagedStruct', float4
-    position[0;0] = 0.0
-    position[0;1] = 2.0
-    position[0;2] = 0.0
-    position[0;3] = 1.0
+    position[0] = 0.0
+    position[1] = 2.0
+    position[2] = 0.0
+    position[3] = 1.0
 
     glLightfv(.GL_LIGHT0, .GL_POSITION, position)
 .end
@@ -287,16 +296,16 @@ ASCII key.
     .local pmc float4, color
     float4 = get_global 'float4'
     color  = new 'ManagedStruct', float4
-    color[0;0] = 0.0
-    color[0;1] = 0.8
-    color[0;2] = 0.8
-    color[0;3] = 1.0
+    color[0] = 0.0
+    color[1] = 0.8
+    color[2] = 0.8
+    color[3] = 1.0
     glMaterialfv(.GL_FRONT, .GL_AMBIENT_AND_DIFFUSE, color)
 
-    color[0;0] = 1.0
-    color[0;1] = 1.0
-    color[0;2] = 1.0
-    color[0;3] = 1.0
+    color[0] = 1.0
+    color[1] = 1.0
+    color[2] = 1.0
+    color[3] = 1.0
     glMaterialfv(.GL_FRONT, .GL_SPECULAR,  color)
     glMaterialf (.GL_FRONT, .GL_SHININESS, 64)
 
