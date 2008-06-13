@@ -23,7 +23,13 @@ Generates several files used by the OpenGL binding.  These include:
 
 For information about Parrot's OpenGL support on different platforms, and
 system libraries/headers that must be installed to enable OpenGL support,
-see L<config/auto/opengl.pm>, where this support is detected.
+see F<config/auto/opengl.pm>, where this support is detected.
+
+For information on how to I<use> Parrot's OpenGL support, see
+F<runtime/parrot/library/OpenGL.pir> for an overview, or the OpenGL examples
+starting with F<examples/opengl/triangle.pir> for more detail.
+
+=begin ignored
 
 =cut
 

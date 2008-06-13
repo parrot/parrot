@@ -665,6 +665,7 @@ examples/nci/QtHelloWorld.pasm                              [main]doc
 examples/nci/ls.pir                                         [main]doc
 examples/nci/sdl_blue_rectangle.pir                         [main]doc
 examples/nci/win32api.pir                                   [main]doc
+examples/opengl/shapes.pir                                  [main]doc
 examples/opengl/triangle.pir                                [main]doc
 examples/pasm/cat.pasm                                      [main]doc
 examples/pasm/fact.pasm                                     [main]doc

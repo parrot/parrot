@@ -18,6 +18,8 @@ using your window manager (using the X in the corner of the window title
 bar, for example).  To pause or restart the animation, press any other
 ASCII key.
 
+For a more complex and well-behaved example, try F<shapes.pir>.
+
 =cut
 
 
