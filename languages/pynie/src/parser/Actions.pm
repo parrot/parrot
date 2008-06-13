@@ -155,7 +155,10 @@ method lambda_form($/) {
     }
     ## handle the function body XXX must this be a /return/ <expr> statement?
     my $expr := $( $<expression> );
-    $past.push($expr);
+
+    ## add a return statement to this block
+    $past.push( PAST::Op.new( $expr, :pasttype('return'), :node($/) ) );
+    $past.control('return_pir');
     make $past;
 }
 
@@ -342,7 +345,13 @@ method print_stmt($/) {
 
 
 method expression($/, $key) {
-    make $( $<or_test>[0] );
+    ## XXX incomplete.
+    if $key eq 'lambda_form' {
+        make $( $<lambda_form> );
+    }
+    else {
+        make $( $<or_test>[0] );
+    }
 }
 
 method test($/, $key) {
