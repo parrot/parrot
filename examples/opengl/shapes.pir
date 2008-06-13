@@ -193,14 +193,20 @@ ASCII key.
 .end
 
 .sub draw_floor
+    # Partially transparent grey (so that reflection shows through)
     glColor4f(.7, .7, .7, .7)
 
-    glBegin(.GL_QUADS)
-    glVertex3f( 2, 0,  2)
-    glVertex3f( 2, 0, -2)
-    glVertex3f(-2, 0, -2)
-    glVertex3f(-2, 0,  2)
-    glEnd()
+    # Rotate quadric from +Z-up to +Y-up
+    glPushMatrix()
+    glRotatef(90, 1, 0, 0)
+
+    # Annulus floor (shapes sit in various spots above it)
+    .local pmc glu_quadric
+    glu_quadric = gluNewQuadric()
+    gluDisk(glu_quadric, 1, 2, 32, 16)
+    gluDeleteQuadric(glu_quadric)
+
+    glPopMatrix()
 .end
 
 .sub draw_objects
@@ -211,8 +217,9 @@ ASCII key.
     angle    *= 60
     angle    %= 360
 
+    # Spinning RGB triangle at -Z
     glPushMatrix()
-
+    glTranslatef(0, 0, -1.5)
     glRotatef(angle, 0, 1, 0)
 
     glBegin(.GL_TRIANGLES)
@@ -306,6 +313,24 @@ ASCII key.
     $P0 = null
     glutIdleFunc($P0)
 .end
+
+
+#
+# OLD AND UNUSED
+#
+
+.sub draw_floor_old
+    glColor4f(.7, .7, .7, .7)
+
+    glBegin(.GL_QUADS)
+    glVertex3f( 2, 0,  2)
+    glVertex3f( 2, 0, -2)
+    glVertex3f(-2, 0, -2)
+    glVertex3f(-2, 0,  2)
+    glEnd()
+.end
+
+
 
 # Local Variables:
 #   mode: pir
