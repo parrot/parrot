@@ -1,6 +1,6 @@
 =head1 TITLE
 
-shapes.pir - Exercise basic OpenGL 1.x/GLUT 3.x APIs by drawing animated shapes
+shapes.pir - Exercise basic OpenGL 1.1/GLUT 3.x APIs by drawing animated shapes
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ shapes.pir - Exercise basic OpenGL 1.x/GLUT 3.x APIs by drawing animated shapes
 =head1 DESCRIPTION
 
 This example is slightly more complex than F<triangle.pir>, and exercises more
-of the OpenGL 1.x and GLUT 3.x APIs.  It is also a better behaved application,
+of the OpenGL 1.1 and GLUT 3.x APIs.  It is also a better behaved application,
 correctly responding to resize events, pausing on minimize, and so on.
 
 To quit the example, press C<Q> or the C<ESCAPE> key, or close the window
@@ -44,9 +44,9 @@ ASCII key.
     .const .Sub draw     = 'draw'
     .const .Sub idle     = 'idle'
     .const .Sub keyboard = 'keyboard'
-    glutcbDisplayFunc (draw)
-    glutcbIdleFunc    (idle)
-    glutcbKeyboardFunc(keyboard)
+    glutDisplayFunc (draw)
+    glutIdleFunc    (idle)
+    glutKeyboardFunc(keyboard)
 
     # Enter the GLUT main loop
     glutMainLoop()
@@ -62,11 +62,9 @@ ASCII key.
     load_bytecode 'library/NCI/call_toolkit_init.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
-    .local pmc import_gl_to, my_namespace
-    import_gl_to = get_global ['OpenGL'], '_export_all_functions_to'
-    my_namespace = get_namespace
-
-    import_gl_to(my_namespace)
+    .local pmc import_gl
+    import_gl = get_global ['OpenGL'], '_export_all_functions'
+    import_gl()
 
     # Initialize GLUT, overwriting argv in place
     .local pmc call_toolkit_init
