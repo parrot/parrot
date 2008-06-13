@@ -223,7 +223,7 @@ rule lambda_form {
 }
 
 token simple_stmt {
-    | <assert_stmt>
+    | <assert_stmt> {*}                          #= assert_stmt
     | <assignment_stmt> {*}                      #= assignment_stmt
     | <augmented_assignment_stmt>
     | <expression_stmt> {*}                      #= expression_stmt
@@ -245,7 +245,8 @@ rule expression_stmt {
 }
 
 rule assert_stmt {
-    'assert' <expression> [ ',' <expression> ]?
+    'assert' <exp1=expression> [ ',' <exp2=expression> ]?
+    {*}
 }
 
 rule assignment_stmt {
@@ -304,11 +305,12 @@ rule slice_item {
 }
 
 rule proper_slice {
-    <short_slice> | <long_slice>
+    | <short_slice>
+    | <long_slice>
 }
 
 rule short_slice {
-    [$<start>=<expression>]? ':' [$<end>=<expression>]?
+    [<start=expression>]? ':' [<end=expression>]?
 }
 
 rule long_slice {

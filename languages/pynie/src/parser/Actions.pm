@@ -47,6 +47,41 @@ method compound_stmt($/, $key) {
     make $($/{$key});
 }
 
+method assert_stmt($/) {
+    ## assert exp1
+    ##
+    ## translates to:
+    ##
+    ## if __debug__:
+    ##   if not exp1
+    ##
+
+    ## XXX handle exp2.
+
+    my $exp1 := $( $<exp1> );
+
+    ## XXX change into "AssertionError"
+    my $exception := PAST::Op.new( :inline('    %r = new "Exception"') );
+
+    my $throwcode := PAST::Op.new( $exception, :pirop('throw'), :node($/) );
+
+    my $debugcode := PAST::Op.new( $exp1, $throwcode,
+                                   :pasttype('unless'),
+                                   :node($/) );
+
+    my $debugflag := PAST::Var.new( :name('__debug__'),
+                                    :scope('package'),
+                                    :viviself('Undef'),
+                                    :node($/) );
+
+    my $past := PAST::Op.new( $debugflag,
+                              $debugcode,
+                              :pasttype('if'),
+                              :node($/) );
+
+    make $past;
+}
+
 method if_stmt($/) {
     my $cond := +$<expression> - 1;
     my $past := PAST::Op.new( $( $<expression>[$cond] ),
