@@ -105,6 +105,14 @@ ASCII key.
     set_global 'time_prev', time_prev
     set_global 'time_curr', time_curr
     set_global 'time_sim',  time_sim
+
+    # Create structure definition for float4 structure
+    .local pmc float4
+    float4 = new 'ResizablePMCArray'
+    push float4, .DATATYPE_FLOAT
+    push float4, 4
+    push float4, 0
+    set_global 'float4', float4
 .end
 
 .sub draw
@@ -229,7 +237,17 @@ ASCII key.
 
 .sub set_lights
     glEnable(.GL_LIGHT0)
-    # glLightfv(.GL_LIGHT0, .GL_POSITION, ???)
+
+    # Light above origin
+    .local pmc float4, position
+    float4   = get_global 'float4'
+    position = new 'ManagedStruct', float4
+    position[0;0] = 0.0
+    position[0;1] = 2.0
+    position[0;2] = 0.0
+    position[0;3] = 1.0
+
+    glLightfv(.GL_LIGHT0, .GL_POSITION, position)
 .end
 
 .sub draw_objects
@@ -266,13 +284,23 @@ ASCII key.
     glTranslatef(1.5, .5, 0)
     glRotatef(90, 0, 1, 0)
 
-    glEnable(.GL_COLOR_MATERIAL)
-    glColor3f(0, .8, .8)
-    # glMaterialfv(.GL_FRONT_AND_BACK, .GL_AMBIENT_AND_DIFFUSE, ???)
+    .local pmc float4, color
+    float4 = get_global 'float4'
+    color  = new 'ManagedStruct', float4
+    color[0;0] = 0.0
+    color[0;1] = 0.8
+    color[0;2] = 0.8
+    color[0;3] = 1.0
+    glMaterialfv(.GL_FRONT, .GL_AMBIENT_AND_DIFFUSE, color)
+
+    color[0;0] = 1.0
+    color[0;1] = 1.0
+    color[0;2] = 1.0
+    color[0;3] = 1.0
+    glMaterialfv(.GL_FRONT, .GL_SPECULAR,  color)
+    glMaterialf (.GL_FRONT, .GL_SHININESS, 64)
 
     glutSolidTeapot(.5)
-
-    glDisable(.GL_COLOR_MATERIAL)
 
     glPopMatrix()
     glDisable(.GL_LIGHTING)
