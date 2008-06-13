@@ -6,6 +6,7 @@ New for next release (2008-06-17, version undecided)
 - Miscellaneous
   + ported OpenGL/GLU/GLUT bindings to Win32, BSD, and more Mac OS X variants
   + generate OpenGL/GLU/GLUT bindings by parsing system headers
+  + new OpenGL example shapes.pir, covering basic OpenGL 1.1 / GLUT 3 APIs
   + new float4.pir structure-packing benchmark
 
 New in 0.6.2
