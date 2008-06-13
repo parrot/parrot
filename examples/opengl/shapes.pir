@@ -178,6 +178,9 @@ ASCII key.
     glEnable(.GL_NORMALIZE)
     glCullFace(.GL_FRONT)
 
+    # Lights need to be reassigned after reflection
+    set_lights()
+
     # Draw the reflected objects
     draw_objects()
 
@@ -200,6 +203,9 @@ ASCII key.
     # Done with blending
     glDisable(.GL_BLEND)
 
+    # Set lights for upright view
+    set_lights()
+
     # Draw objects (now in upright orientation)
     draw_objects()
 .end
@@ -215,10 +221,15 @@ ASCII key.
     # Annulus floor (shapes sit in various spots above it)
     .local pmc glu_quadric
     glu_quadric = gluNewQuadric()
-    gluDisk(glu_quadric, 1, 2, 64, 16)
+    gluDisk(glu_quadric, 1, 2, 128, 1)
     gluDeleteQuadric(glu_quadric)
 
     glPopMatrix()
+.end
+
+.sub set_lights
+    glEnable(.GL_LIGHT0)
+    # glLightfv(.GL_LIGHT0, .GL_POSITION, ???)
 .end
 
 .sub draw_objects
@@ -229,7 +240,7 @@ ASCII key.
     angle    *= 90
     angle    %= 360
 
-    # Spinning RGB triangle at -Z
+    # Unlit spinning RGB triangle at -Z
     glPushMatrix()
     glTranslatef(0, 0, -1.5)
     glRotatef(angle, 0, 1, 0)
@@ -248,6 +259,23 @@ ASCII key.
     glEnd()
 
     glPopMatrix()
+
+    # Lit cyan teapot at +X
+    glEnable(.GL_LIGHTING)
+    glPushMatrix()
+    glTranslatef(1.5, .5, 0)
+    glRotatef(90, 0, 1, 0)
+
+    glEnable(.GL_COLOR_MATERIAL)
+    glColor3f(0, .8, .8)
+    # glMaterialfv(.GL_FRONT_AND_BACK, .GL_AMBIENT_AND_DIFFUSE, ???)
+
+    glutSolidTeapot(.5)
+
+    glDisable(.GL_COLOR_MATERIAL)
+
+    glPopMatrix()
+    glDisable(.GL_LIGHTING)
 .end
 
 .sub set_2d_view
