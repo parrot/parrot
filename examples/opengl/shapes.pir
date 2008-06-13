@@ -125,13 +125,25 @@ ASCII key.
 .end
 
 .sub set_3d_view
+    # Simple 60 degree FOV perspective view
     glMatrixMode(.GL_PROJECTION)
     glLoadIdentity()
     gluPerspective(60, 1, 1, 100)
 
+    # Look at origin from (0,3,3), with +Y up
     glMatrixMode(.GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 2, 2, 0, 0, 0, 0, 1, 0)
+    gluLookAt(0, 3, 3, 0, 0, 0, 0, 1, 0)
+
+    # Rotate view around origin, to see objects from all angles
+    .local pmc time_sim
+    .local num angle
+    time_sim  = get_global 'time_sim'
+    angle     = time_sim
+    angle    *= -36
+    angle    %= 360
+
+    glRotatef(angle, 0, 1, 0)
 .end
 
 .sub draw_reflected_scene
@@ -196,14 +208,14 @@ ASCII key.
     # Partially transparent grey (so that reflection shows through)
     glColor4f(.7, .7, .7, .7)
 
-    # Rotate quadric from +Z-up to +Y-up
+    # Rotate quadric from +Z up to +Y up
     glPushMatrix()
     glRotatef(90, 1, 0, 0)
 
     # Annulus floor (shapes sit in various spots above it)
     .local pmc glu_quadric
     glu_quadric = gluNewQuadric()
-    gluDisk(glu_quadric, 1, 2, 32, 16)
+    gluDisk(glu_quadric, 1, 2, 64, 16)
     gluDeleteQuadric(glu_quadric)
 
     glPopMatrix()
@@ -214,7 +226,7 @@ ASCII key.
     .local num angle
     time_sim  = get_global 'time_sim'
     angle     = time_sim
-    angle    *= 60
+    angle    *= 90
     angle    %= 360
 
     # Spinning RGB triangle at -Z
