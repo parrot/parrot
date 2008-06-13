@@ -294,6 +294,25 @@ method classdef($/) {
     make $past;
 }
 
+method del_stmt($/) {
+    our $?BLOCK;
+
+    my $targets := $( $<target_list> );
+
+    my $past := PAST::Stmts.new( :node($/) );
+
+    my $pir := "    .local pmc ns\n"
+             ~ '    ns = get_hll_namespace';
+
+    $past.push( PAST::Op.new( :inline($pir), :node($/) ) );
+    for @($targets) {
+        $pir := '    delete ns["' ~ $_.name() ~ '"]';
+        $past.push( PAST::Op.new( :inline($pir), :node($/) ) );
+    }
+
+    make $past;
+}
+
 method pass_stmt($/) {
     ## pass statement doesn't do anything, but do create a PAST
     ## node to prevent special case code.
@@ -540,14 +559,24 @@ method parenth_form($/) {
 }
 
 method assignment_stmt($/) {
-    my $lhs := $($<target_list>);
-    my $rhs := $($<expression_list>);
-    make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
+    my $lhs     := $( $<target_list> );
+    my $explist := $( $<expression_list> );
+    my $past    := PAST::Stmts.new( :node($/) );
+
+    for @($lhs) {
+        my $rhs := $explist.shift();
+        $past.push( PAST::Op.new( $_, $rhs, :pasttype('bind'), :node($/) ) );
+    }
+
+    make $past;
 }
 
 method target_list($/) {
-    my $past := $( $<target>[0] );
-    make $( $<target>[0] );
+    my $past := PAST::VarList.new( :node($/) );
+    for $<target> {
+        $past.push( $($_) );
+    }
+    make $past;
 }
 
 method target($/, $key) {

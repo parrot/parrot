@@ -74,7 +74,7 @@ rule if_stmt {
 
 rule while_stmt {
     'while' <expression> ':' <suite>
-    [ 'else' ':' $<else>=<suite> ]?
+    [ 'else' ':' <else=suite> ]?
     {*}
 }
 
@@ -228,7 +228,7 @@ token simple_stmt {
     | <augmented_assignment_stmt>
     | <expression_stmt> {*}                      #= expression_stmt
     | <pass_stmt> {*}                            #= pass_stmt
-    | <del_stmt>
+    | <del_stmt> {*}                             #= del_stmt
     | <print_stmt> {*}                           #= print_stmt
     | <return_stmt> {*}                          #= return_stmt
     | <yield_stmt>
@@ -285,7 +285,8 @@ rule subscription {
 }
 
 rule slicing {
-    <simple_slicing> | <extended_slicing>
+    | <simple_slicing>
+    | <extended_slicing>
 }
 
 rule simple_slicing {
@@ -331,7 +332,7 @@ rule pass_stmt {
 }
 
 rule del_stmt {
-    'del' <target_list>
+    'del' <target_list> {*}
 }
 
 rule return_stmt {
