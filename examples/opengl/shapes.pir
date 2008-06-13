@@ -401,7 +401,25 @@ ASCII key.
     if key ==  81 goto quit
     if key == 113 goto quit
     goto toggle_pause
+
   quit:
+    # Show FPS
+    .local pmc time_sim, frames
+    time_sim = get_global 'time_sim'
+    frames   = get_global 'frames'
+
+    if frames goto frames_ok
+    frames = 1
+  frames_ok:
+
+    .local num f, s, fps
+    f   = frames
+    s   = time_sim
+    fps = f / s
+    print 'FPS: '
+    say fps
+
+    # Destroy window and exit
     .local pmc glut_window
     glut_window = get_global 'glut_window'
     glutDestroyWindow(glut_window)
