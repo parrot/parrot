@@ -24,6 +24,13 @@ Squaak built-in routines
     .return ()
 .end
 
+.sub 'read'
+    $P0 = getstdin
+    $S0 = readline $P0
+    .return ($S0)
+.end
+
+
 ## this doesn't work for me :-(
 ## once this works, Game of Life runs much nicer.
 ## --kjs

@@ -1,0 +1,20 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+print("Please enter number: ")
+x = read()
+
+sub factorial(n)
+    ## test for < 2 because all numbers are represented by
+    ## floating-point numbers, and equality checks on those
+    ## do not work (yet?)
+    if n < 2 then
+        return 1
+    else
+        return n * factorial(n - 1)
+    end
+end
+
+print("factorial of ", x, " is: ", factorial(x))
+
+

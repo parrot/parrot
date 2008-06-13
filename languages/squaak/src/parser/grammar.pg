@@ -36,7 +36,7 @@ rule statement {
 }
 
 rule if_statement {
-    'if' <expression> 'then' <block> ['else' $<else>=<block>]? 'end'
+    'if' <expression> 'then' <block> ['else' <else=block>]? 'end'
     {*}
 }
 
@@ -46,7 +46,7 @@ rule while_statement {
 }
 
 rule for_statement {
-    'for' <for_init> ',' <expression> [',' $<step>=<expression>]? 'do'
+    'for' <for_init> ',' <expression> [',' <step=expression>]? 'do'
     <statement>*
     'end'
     {*}
@@ -58,7 +58,7 @@ rule for_init {
 }
 
 rule try_statement {
-    'try' $<try>=<block> 'catch' <exception> $<catch>=<block> 'end'
+    'try' <try=block> 'catch' <exception> <catch=block> 'end'
     {*}
 }
 
