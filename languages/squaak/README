@@ -12,9 +12,6 @@ Squaak does not have break or continue statements (or equivalents
 in your favorite syntax). Once PCT has built-in support for these, they
 will be added.
 
-Once PAST supports such control statements, Squaak will be extended with
-at least a return statement.
-
 Squaak has the following features:
 
    * global and local variables
@@ -23,6 +20,7 @@ Squaak has the following features:
    * operators: +, -, /, *, %, <, <=, >, >=, ==, !=, .., and, or, not
    * subroutines and parameters
    * assignments and various control statements, such as "if" and "while" and "return"
+   * library functions: print, read
 
 A number of common (more advanced) features are missing.
 Most notable are:
@@ -43,7 +41,7 @@ Running Squaak in interactive mode:
 
  $ ../../parrot squaak.pbc
 
-Running Squaak with a file (for instance, the included example):
+Running Squaak with a file (for instance, the included Game of Life example):
 
  $ ../../parrot squaak.pbc examples/life.sq
 
