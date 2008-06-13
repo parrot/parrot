@@ -310,6 +310,17 @@ to any options and return the resulting parse tree.
     .param pmc adverbs         :slurpy :named
     .local pmc parsegrammar_name, top
 
+    .local string tcode
+    tcode = adverbs['transcode']
+    unless tcode goto transcode_done
+    push_eh transcode_done
+    $I0 = find_charset tcode
+    $S0 = source
+    $S0 = trans_charset $S0, $I0
+    assign source, $S0
+    pop_eh
+  transcode_done:
+
     .local string target
     target = adverbs['target']
     target = downcase target
