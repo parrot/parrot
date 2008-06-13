@@ -4,8 +4,9 @@ New for next release (2008-06-17, version undecided)
 - Configuration
   + expanded step gen::opengl
 - Miscellaneous
-  + ported OpenGL/GLU/GLUT bindings to Win32 and more Mac OS X variants
+  + ported OpenGL/GLU/GLUT bindings to Win32, BSD, and more Mac OS X variants
   + generate OpenGL/GLU/GLUT bindings by parsing system headers
+  + new float4.pir structure-packing benchmark
 
 New in 0.6.2
 - Specification
