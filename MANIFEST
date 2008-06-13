@@ -555,6 +555,7 @@ examples/benchmarks/fib.pir                                 [main]doc
 examples/benchmarks/fib.pl                                  [main]doc
 examples/benchmarks/fib.py                                  [main]doc
 examples/benchmarks/fib.rb                                  [main]doc
+examples/benchmarks/float4.pir                              [main]doc
 examples/benchmarks/freeze.pasm                             [main]doc
 examples/benchmarks/freeze.pl                               [main]doc
 examples/benchmarks/gc_alloc_new.pasm                       [main]doc
