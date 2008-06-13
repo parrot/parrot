@@ -170,8 +170,9 @@ method funcdef($/) {
     }
     my $name := $( $<funcname> );
     $past.name( $name.name() );
-    my $suite := $( $<suite> );
-    $past.push($suite);
+    $past.push( $($<suite>) );
+
+    $past.control('return_pir');
     make $past;
 }
 
