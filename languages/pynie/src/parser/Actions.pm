@@ -296,6 +296,15 @@ method expression_stmt($/) {
     make $( $<expression_list> );
 }
 
+method return_stmt($/) {
+    my $past := PAST::Op.new( :pasttype('return'), :node($/) );
+    if $<expression_list> {
+        my $retvals := $( $<expression_list>[0] );
+        $past.push($retvals);
+    }
+    make $past;
+}
+
 method expression_list($/) {
     my $past;
     if (+$<expression> == 1) {
@@ -471,11 +480,11 @@ method shortstring($/) {
 
 method parenth_form($/) {
     if +$<tuple_or_scalar> {
-	make $( $<tuple_or_scalar>[0] );
+    make $( $<tuple_or_scalar>[0] );
     }
     else {
-	make PAST::Op.new( :name('tuplemaker'),
-			   :pasttype('call'));
+    make PAST::Op.new( :name('tuplemaker'),
+               :pasttype('call'));
     }
 }
 
@@ -500,7 +509,7 @@ method list_literal($/) {
     my $past := PAST::Op.new( :name('listmaker'),
                               :pasttype('call'));
     for $<expression> {
-	$past.push( $($_) );
+    $past.push( $($_) );
     }
     make $past;
 }
@@ -517,7 +526,7 @@ method tuple_constructor($/) {
     my $past := PAST::Op.new( :name('tuplemaker'),
                               :pasttype('call'));
     for $<expression> {
-	$past.push( $($_) );
+    $past.push( $($_) );
     }
     make $past;
 }

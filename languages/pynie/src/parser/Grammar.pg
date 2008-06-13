@@ -25,7 +25,7 @@ token ws { \h* [ '#' \N* ]? }
 
 token file_input {
     ^ [ <.newline> | <statement> ]*
-    [ $ | <.panic: 'syntax_error'> ]
+    [ $ || <.panic: 'syntax_error'> ]
     {*}
 }
 
@@ -84,7 +84,8 @@ rule for_stmt {
 }
 
 rule try_stmt {
-    <try1_stmt> | <try2_stmt>
+    | <try1_stmt>
+    | <try2_stmt>
 }
 
 rule try1_stmt {
@@ -190,7 +191,6 @@ rule excess_keyword_parameter {
 rule defparameter {
     <parameter> [ '=' <expression> ]?
     {*}
-
 }
 
 rule sublist {
@@ -230,7 +230,7 @@ token simple_stmt {
     | <pass_stmt> {*}                            #= pass_stmt
     | <del_stmt>
     | <print_stmt> {*}                           #= print_stmt
-    | <return_stmt>
+    | <return_stmt> {*}                          #= return_stmt
     | <yield_stmt>
     | <raise_stmt> {*}                           #= raise_stmt
     | <break_stmt>
@@ -334,6 +334,7 @@ rule del_stmt {
 
 rule return_stmt {
     'return' <expression_list>?
+    {*}
 }
 
 rule yield_stmt {
@@ -455,7 +456,7 @@ rule tuple_or_scalar {
 
 rule tuple_constructor {
       <expression> ',' [ <expression> [ ',' <expression> ]* ','? ]? {*}
-} 
+}
 
 rule list_display {
     '['
