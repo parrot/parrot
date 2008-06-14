@@ -3,6 +3,7 @@
 New for next release (2008-06-17, version undecided)
 - Languages:
   + Squaak: implement return statement
+  + Pynie: return statement, other minor updates
   + Cardinal:
     - dramatically improved parsing speed
     - added support for defining and instantiating classes
