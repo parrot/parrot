@@ -13,10 +13,6 @@ Intermediate Representation (PIR).
 This document describes PIR, a stable, middle-level language for both
 compiler and human to target on.
 
-=head1 VERSION
-
-$Revision$
-
 =head1 DESCRIPTION
 
 PIR is a stable, middle-level language intended both as a target for the

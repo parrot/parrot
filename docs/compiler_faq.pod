@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/compiler_faq.pod - Parrot FAQ for compiler writers
+docs/compiler_faq.pod - Parrot FAQ for compiler writers in PIR
 
 =head1 General Questions
 
@@ -13,9 +13,8 @@ Whoa, there--you're looking at the wrong FAQ.  This document is for people
 writing compilers that target Parrot.
 
 To answer your question, though, Parrot should theoretically work with any
-C89-compliant C compiler, although some features require C<gcc>.  See the
-F<README> files in the root directory for more information about building
-Parrot.
+C89-compliant C compiler. See the F<README> files in the root directory for
+more information about building Parrot.
 
 =head2 How can I implement a compiler to use as a compiler object from within
 Parrot?
@@ -32,7 +31,7 @@ as a comment (due to the C<#> character).
 
 =head2 How do I generate a sub call in PIR?
 
-IMCC makes this easy, handling the calling conventions for you.
+This looks like a function call in many HLLs:
 
    $P0( $P1, $P2, $P3 )
 
@@ -49,6 +48,10 @@ You can also get return value(s):
 If the function name might collide with a Parrot opcode, quote it:
 
    i = 'new'(42)
+
+You can also use the full PCC for these calls. See
+L<docs/draft/pdd19_pir.pod/Parameter Passing and Getting Flags> and other
+quesitons below for more information.
 
 =head2 How do I generate a method call in PIR?
 
@@ -71,19 +74,8 @@ the subroutine.
 If the sub is in the same compilation unit use a Sub constant:
 
   .const .Sub foo = 'foo'
-
-The subroutine object is available in PASM too with a similar syntax:
-
-  .const .Sub P2 = 'foo'      # any P register will do
   ...
-  .pcc_sub foo:               # denote a Sub constant
-
-If the PIR compiler finds a 'foo' function during compiling a file,
-then the syntax:
-
   foo()
-
-gets translated to above constant declaration.
 
 A more dynamic way is:
 
@@ -134,7 +126,8 @@ created as a Coroutine PMC:
       # ...
   .end
 
-The sub C<bar> will return to the caller of C<foo>.
+The sub C<bar> will return to the caller of C<foo>. (Warning! This fails
+in some cases. XXX Find the RT ticket and reference it here.) 
 
 =head2 How do I generate a sub call with a variable-length parameter
 list in PIR?
@@ -189,6 +182,8 @@ Use the C<:optional> and C<:opt_flag> pragmas:
 Please refer to L<docs/pdds/pdd20_lexical_vars.pod> for details: look for
 C<:outer>.
 
+XXX Fix L syntax here.
+
 =head1 Variables
 
 =head2 How do I fetch a variable from the global namespace?
@@ -238,8 +233,9 @@ Please refer to L<docs/pdds/pdd20_lexical_vars.pod> for details.
 
 =head2 How can I delete a lexical variable?
 
-You can't.  You can store a Null PMC as the value though, which will catch all
-further access to that variable and throw an exception.
+You can't.  You can store a PMCNULL as the value though, which will catch all
+further access to that variable and throw an exception. (You can create
+a PMCNULL with the C<null> opcode.)
 
 =head2 How do I resolve a variable name?
 
@@ -280,7 +276,7 @@ the same scope.
 
 =head2 How do I create a module?
 
-TODO
+XXX
 
 =head2 How do I create a class?
 
@@ -329,7 +325,7 @@ You can access attributes by a short name:
   $P0 = getattribute self, 'legs'
   assign $P0, 4                   # set attribute's value
 
-or by a fully qualified name:
+or by a fully qualified name: XXX This is long dead.
 
   $P0 = getattribute self, "Animal\0legs"
   assign $P0, 4                   # set attribute's value
@@ -428,80 +424,60 @@ key/value pairs:
 
 =head2 How do I add module/class methods?
 
-TODO
+XXX
 
 =head2 How do I access module/class variables?
 
-TODO
+XXX
 
 =head1 Exceptions
 
 =head2 How do I throw an exception in PIR?
 
-Create an Exception object and throw it!
+The easiest way is the perl-like
+
+    die 'Eeeek!'
+
+You can also explicitly create an exception object and throw it:
 
     $P0 = new 'Exception'
-    throw $P0
-
-Not too hard, is it?
-
-=head2 How do I throw an exception with an error message in PIR?
-
-    $P0 = new 'Exception'
-    $P0['_message'] = 'something happened'
-    throw $P0
+    $P0['_message'] = 'Eeek'
 
 =head2 How do I catch an exception in PIR?
 
-Use C<push_eh> to push an exception handler onto the stack.
+Use C<push_eh> to push an exception handler onto the stack. End the set of
+instructions that might throw the exception you're intrested in with 
+C<pop_eh>.
 
     push_eh handler
-      $P0 = new 'Exception'       # or any other code ...
-      throw $P0                   # ... that might throw
+      die 'whoops'  # or any other code that might throw an exception...
     pop_eh
-    exit 0
+    ... # ok
 
-An exception handler is called with two arguments: the exception and the
-message.  More information is available inside the exception 'object' (TBD).
+An exception handler is called with two arguments: the exception and its
+extracted message for your convenience.
 
-  handler:
+  handler: # exception
     .get_results ($P0, $S0)
     print 'Exception caught:'
-    print $S0
-    print "\n"
-    exit 1
+    say $S0
+    ...
 
 =head2 How do I let exceptions from C<exit> pass through my handler?
 
 Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
 
+  .include 'except_severity.pasm'
+  ...
   handler:
-    .include 'except_severity.pasm'
     .get_results ($P0, $S0)
     $I0 = $P0[2]
-    if $I0 == .EXCEPT_EXIT goto unexceptional
-    print "Exception caught!\n"
-    exit 1
-  unexceptional:
-    rethrow $P0
+    if $I0 == .EXCEPT_EXIT goto handle_exit
+    say 'Exception caught!'
+    ...
 
-=head2 How do I access the error message of an exception I've caught?
-
-    push_eh handler
-    $P0 = new 'Exception'
-    $P0['_message'] = 'something happened'
-    throw $P0
-    pop_eh
-    exit 0
-
-  handler:
-    .local pmc exception
-    .local string message
-    .get_results (exception, message)
-    print 'Exception: '
-    print message
-    print "\n"
-    exit 1
+  handle_exit
+    rethrow $P0 # let the next handler deal with it.
 
 =head1 C Extensions
 
