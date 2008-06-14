@@ -108,14 +108,14 @@ method adding_expression($/) {
        for $<adding_tail> {
            my $past_prev := $past;
            my $pir_op := $_<ADD_OP> eq '+' ?? 'n_add' !! 'n_sub';
-           $past := PAST::Op.new( 
+           $past := PAST::Op.new(
                         $past_prev,
                         $( $_<multiplying_expression> ),
                         :pirop($pir_op)
                     );
        }
     }
-    make $past; 
+    make $past;
 }
 
 method multiplying_expression($/) {
@@ -125,14 +125,14 @@ method multiplying_expression($/) {
        for $<multiplicand> {
            my $past_prev := $past;
            my $pir_op := $_<MUL_OP> eq '*' ?? 'n_mul' !! 'n_div';
-           $past := PAST::Op.new( 
+           $past := PAST::Op.new(
                         $past_prev,
                         $( $_<multiplying_expression> ),
                         :pirop($pir_op)
                     );
        }
     }
-    make $past; 
+    make $past;
 }
 
 method unary_expression($/) {
