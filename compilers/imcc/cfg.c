@@ -1193,8 +1193,8 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
     int          changed;
     Loop_info   *li;
 
-    int         n_loops   = unit->n_loops;
-    Loop_info **loop_info = unit->loop_info;
+    unsigned int n_loops  = (unsigned int)unit->n_loops;
+    Loop_info  **loop_info = unit->loop_info;
 
     for (i = 0; i < n_loops; i++) {
         loop_info[i]->size = 0;
