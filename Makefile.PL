@@ -14,9 +14,10 @@ Parrot.  If you're reading this yourself, use F<Configure.pl>
 
 =cut
 
-use 5.008_000;
 use strict;
 use warnings;
+
+BEGIN { require 5.008_000 }
 
 my %translations =
 (
