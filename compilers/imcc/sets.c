@@ -11,7 +11,7 @@ compilers/imcc/sets.c
 
 =head1 DESCRIPTION
 
-RT#48264
+An implementation of sets -- used for tracking register usage.
 
 =head2 Functions
 
@@ -49,7 +49,7 @@ Create a new Set object.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make(int length)
+set_make(unsigned int length)
 {
     Set * const s = mem_allocate_zeroed_typed(Set);
     s->length     = length;
@@ -70,7 +70,7 @@ Create a new Set object and clear all bits.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make_full(int length)
+set_make_full(unsigned int length)
 {
     Set * const s      = set_make(length);
     const size_t bytes = NUM_BYTES(length);
@@ -119,7 +119,7 @@ set_clear(ARGMOD(Set *s))
 
 =item C<Set* set_copy>
 
-RT#48260: Not yet documented!!!
+Copies the set C<s>, returning a new set pointer.
 
 =cut
 
@@ -140,7 +140,7 @@ set_copy(ARGIN(const Set *s))
 
 =item C<int set_equal>
 
-RT#48260: Not yet documented!!!
+Compares two sets for equality; sets are equal if they have the same elements.
 
 =cut
 
@@ -152,9 +152,8 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
     int mask;
     const int bytes = s1->length / 8;
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_equal", "Sets don't have the same length\n");
-    }
 
     if (bytes)
         if (memcmp(s1->bmp, s2->bmp, bytes) != 0)
@@ -175,14 +174,14 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 =item C<void set_add>
 
-RT#48260: Not yet documented!!!
+Adds to set C<s> the element C<element>.
 
 =cut
 
 */
 
 void
-set_add(ARGMOD(Set *s), int element)
+set_add(ARGMOD(Set *s), unsigned int element)
 {
     const int elem_byte_in_set = BYTE_IN_SET(element);
     const int bytes_in_set     = BYTE_IN_SET(s->length);
@@ -198,9 +197,9 @@ set_add(ARGMOD(Set *s), int element)
 
 /*
 
-=item C<int set_first_zero>
+=item C<unsigned int set_first_zero>
 
-RT#48260: Not yet documented!!!
+Sets the first unused item in the set.
 
 =cut
 
@@ -208,13 +207,15 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-int
+unsigned int
 set_first_zero(ARGIN(const Set *s))
 {
-    int i, j;
+    unsigned int i;
 
     for (i = 0; i < NUM_BYTES(s->length); ++i) {
         const int set_byte = s->bmp[i];
+        int j;
+
         if (set_byte == 0xFF)
             continue;
 
@@ -242,7 +243,7 @@ specified Set argument. Returns 1 if it is, 0 otherwise.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int
-set_contains(ARGIN(const Set *s), int element)
+set_contains(ARGIN(const Set *s), unsigned int element)
 {
     if (element > s->length)
         return 0;
@@ -275,14 +276,13 @@ PARROT_CANNOT_RETURN_NULL
 Set *
 set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
-    int i;
+    unsigned int i;
     Set * const s = set_make(s1->length);
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_union", "Sets don't have the same length\n");
-    }
 
-    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
+    for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] | s2->bmp[i];
     }
 
@@ -309,14 +309,13 @@ PARROT_CANNOT_RETURN_NULL
 Set *
 set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
-    int i;
+    unsigned int i;
     Set * const s = set_make(s1->length);
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_intersec", "Sets don't have the same length\n");
-    }
 
-    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
+    for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] & s2->bmp[i];
     }
 
@@ -338,13 +337,12 @@ becomes the result.
 void
 set_intersec_inplace(ARGMOD(Set *s1), ARGIN(const Set *s2))
 {
-    int i;
+    unsigned int i;
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_intersec_inplace", "Sets don't have the same length\n");
-    }
 
-    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
+    for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s1->bmp[i] &= s2->bmp[i];
     }
 }

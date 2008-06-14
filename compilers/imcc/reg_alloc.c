@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2003-2007, The Perl Foundation.
+ * Copyright (C) 2003-2008, The Perl Foundation.
  */
 
 /*
@@ -802,7 +802,7 @@ static int
 interferes(PARROT_INTERP, ARGIN(const IMC_Unit *unit),
         ARGIN(const SymReg *r0), ARGIN(const SymReg *r1))
 {
-    int i;
+    unsigned int i;
 
     /* Registers don't interfere with themselves
     */
@@ -850,11 +850,10 @@ interferes(PARROT_INTERP, ARGIN(const IMC_Unit *unit),
 
     /* Now: */
 
-    if (r0->life_info == NULL || r1->life_info == NULL) {
+    if (! r0->life_info || ! r1->life_info)
         PANIC(interp, "interferes: INTERNAL ERROR: Life range is NULL\n");
-    }
 
-    for (i=0; i < unit->n_basic_blocks; i++) {
+    for (i = 0; i < unit->n_basic_blocks; i++) {
         const Life_range * const l0 = r0->life_info[i];
         const Life_range * const l1 = r1->life_info[i];
 

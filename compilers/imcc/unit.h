@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2003-2007, The Perl Foundation.
+ * Copyright (C) 2003-2008, The Perl Foundation.
  */
 
 #ifndef PARROT_IMCC_UNIT_H_GUARD
@@ -38,7 +38,7 @@ typedef struct _IMC_Unit {
     Instruction * last_ins;
     SymHash hash;
     int bb_list_size;
-    int n_basic_blocks;
+    unsigned int n_basic_blocks;
     Basic_block **bb_list;
     Set** dominators;
     int* idoms;

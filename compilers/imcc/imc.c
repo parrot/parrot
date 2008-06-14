@@ -176,19 +176,23 @@ PARROT_CANNOT_RETURN_NULL
 IMC_Unit *
 imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 {
-    IMC_Unit * const unit = imc_new_unit(t);
+    IMC_Unit   * const unit     = imc_new_unit(t);
     imc_info_t * const imc_info = IMCC_INFO(interp);
 
     if (!imc_info->imc_units)
         imc_info->imc_units = unit;
     if (!imc_info->ghash.data)
         create_symhash(&imc_info->ghash);
+
     unit->prev = imc_info->last_unit;
+
     if (imc_info->last_unit)
         imc_info->last_unit->next = unit;
+
     imc_info->last_unit = unit;
     imc_info->n_comp_units++;
-    unit->file = imc_info->state->file;
+
+    unit->file      = imc_info->state->file;
     unit->pasm_file = imc_info->state->pasm_file;
 
     return unit;
@@ -209,9 +213,8 @@ void
 imc_close_unit(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 {
 #if COMPILE_IMMEDIATE
-    if (unit) {
+    if (unit)
         imc_compile_unit(interp, unit);
-    }
 #endif
 
     IMCC_INFO(interp)->cur_unit = NULL;

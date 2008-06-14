@@ -1133,7 +1133,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int changed = 0, i;
+    unsigned int i;
+    int          changed = 0;
 
     IMCC_info(interp, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -1368,12 +1369,12 @@ PARROT_WARN_UNUSED_RESULT
 static int
 unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int used;
-    int i;
-    int changed = 0;
+    int          used;
+    unsigned int i;
+    int          changed = 0;
 
     IMCC_info(interp, 2, "\tunused_label\n");
-    for (i=1; i < unit->n_basic_blocks; i++) {
+    for (i = 1; i < unit->n_basic_blocks; i++) {
         Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->symregs[0]->name != '_') {
             const SymReg * const lab = ins->symregs[0];
@@ -1441,7 +1442,7 @@ RT#48260: Not yet documented!!!
 static int
 dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int i;
+    unsigned int i;
     int changed = 0;
     Instruction *ins, *last;
 
@@ -1452,7 +1453,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     /* Unreachable blocks */
 
-    for (i=1; i < unit->n_basic_blocks; i++) {
+    for (i = 1; i < unit->n_basic_blocks; i++) {
         Basic_block * const bb = unit->bb_list[i];
 
         if ((bb->start->type & ITLABEL) && *bb->start->symregs[0]->name == '_')

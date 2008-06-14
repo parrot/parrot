@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2008, The Perl Foundation.
  * $Id$
  */
 
@@ -245,21 +245,25 @@ RT#48260: Not yet documented!!!
 void
 dump_cfg(ARGIN(const IMC_Unit *unit))
 {
-    int i;
+    unsigned int i;
     Edge *e;
 
     fprintf(stderr, "\nDumping the CFG:\n-------------------------------\n");
-    for (i=0; i < unit->n_basic_blocks; i++) {
+    for (i = 0; i < unit->n_basic_blocks; i++) {
         const Basic_block * const bb = unit->bb_list[i];
 
         fprintf(stderr, "%d (%d)\t -> ", bb->index, bb->loop_depth);
-        for (e=bb->succ_list; e != NULL; e=e->succ_next) {
+
+        for (e = bb->succ_list; e; e = e->succ_next) {
             fprintf(stderr, "%d ", e->to->index);
         }
+
         fprintf(stderr, "\t\t <- ");
-        for (e=bb->pred_list; e != NULL; e=e->pred_next) {
+
+        for (e = bb->pred_list; e; e = e->pred_next) {
             fprintf(stderr, "%d ", e->from->index);
         }
+
         fprintf(stderr, "\n");
     }
 
@@ -287,23 +291,29 @@ dump_loops(ARGIN(const IMC_Unit *unit))
     for (i = 0; i < unit->n_loops; i++) {
         const Set * const loop = loop_info[i]->loop;
         const Set * const exits = loop_info[i]->exits;
-        int j;
+        unsigned int j;
 
         fprintf(stderr,
                 "Loop %d, depth %d, size %d, header %d, preheader %d\n",
                 i, loop_info[i]->depth,
                 loop_info[i]->size, loop_info[i]->header,
                 loop_info[i]->preheader);
+
         fprintf(stderr, "  Contains blocks: ");
+
         for (j = 0; j < unit->n_basic_blocks; j++)
             if (set_contains(loop, j))
                 fprintf(stderr, "%d ", j);
+
         fprintf(stderr, "\n  Exit blocks: ");
+
         for (j = 0; j < unit->n_basic_blocks; j++)
             if (set_contains(exits, j))
                 fprintf(stderr, "%d ", j);
+
         fprintf(stderr, "\n");
     }
+
     fprintf(stderr, "\n");
 }
 
@@ -427,17 +437,15 @@ dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
 {
     fprintf(stderr, "\nSymbol %s:", r->name);
     if (r->life_info) {
-        int i;
+        unsigned int i;
 
-        for (i=0; i<unit->n_basic_blocks; i++) {
+        for (i = 0; i<unit->n_basic_blocks; i++) {
             const Life_range * const l = r->life_info[i];
 
-            if (l->flags & LF_lv_all) {
+            if (l->flags & LF_lv_all)
                 fprintf(stderr, "\n\t%i:ALL\t", i);
-            }
-            else if (l->flags & LF_lv_inside) {
+            else if (l->flags & LF_lv_inside)
                 fprintf(stderr, "\n\t%i:INSIDE", i);
-            }
 
             if (l->flags & LF_lv_in)
                 fprintf(stderr, "\n\t%i: IN\t", i);
@@ -445,6 +453,7 @@ dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
                 fprintf(stderr, "\n\t%i: OUT\t", i);
             else if (l->first_ins)
                 fprintf(stderr, "\n\t%i: INS\t", i);
+
             if (l->flags & LF_use)
                 fprintf(stderr, "u ");
             else if (l->flags & LF_def)
@@ -452,12 +461,12 @@ dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
             else
                 fprintf(stderr, "  ");
 
-            if (l->first_ins) {
+            if (l->first_ins)
                 fprintf(stderr, "[%d, %d]\t", l->first_ins->index,
                         l->last_ins->index);
-            }
         }
     }
+
     fprintf(stderr, "\n");
 }
 
@@ -513,18 +522,18 @@ RT#48260: Not yet documented!!!
 void
 dump_dominators(ARGIN(const IMC_Unit *unit))
 {
-    int i;
+    unsigned int i;
 
     fprintf(stderr, "\nDumping the Dominators Tree:"
             "\n-------------------------------\n");
-    for (i=0; i < unit->n_basic_blocks; i++) {
-        int j;
+
+    for (i = 0; i < unit->n_basic_blocks; i++) {
+        unsigned int j;
         fprintf(stderr, "%2d <- (%2d)", i, unit->idoms[i]);
 
-        for (j=0; j < unit->n_basic_blocks; j++) {
-            if (set_contains(unit->dominators[i], j)) {
+        for (j = 0; j < unit->n_basic_blocks; j++) {
+            if (set_contains(unit->dominators[i], j))
                 fprintf(stderr, " %2d", j);
-            }
         }
 
         fprintf(stderr, "\n");
@@ -546,18 +555,17 @@ RT#48260: Not yet documented!!!
 void
 dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
 {
-    int i;
+    unsigned int i;
 
     fprintf(stderr, "\nDumping the Dominance Frontiers:"
             "\n-------------------------------\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-        int j;
+        unsigned int j;
 
         fprintf(stderr, "%2d <-", i);
         for (j = 0; j < unit->n_basic_blocks; j++) {
-            if (set_contains(unit->dominance_frontiers[i], j)) {
+            if (set_contains(unit->dominance_frontiers[i], j))
                 fprintf(stderr, " %2d", j);
-            }
         }
 
         fprintf(stderr, "\n");
