@@ -59,7 +59,13 @@ method code($/) {
 
 method statement($/,$key) {
     if $key eq 'ECHO' {
-        make PAST::Op.new( $/[0], :pasttype('call'), :name('echo') ); 
+        make PAST::Op.new(
+                 PAST::Val.new( 
+                     :value(~$/[0]<expression><concat_expression><string><DOUBLEQUOTE_STRING><string_literal>),
+                 ),
+                 :pasttype('call'),
+                 :name('echo')
+             ); 
     }
     elsif $key eq 'inline_sea' {
         make PAST::Op.new(
