@@ -81,7 +81,7 @@ rule bitwise_expression       { <adding_expression> <bitwise_tail>? {*} }
 rule bitwise_tail             { <BITWISE_OP> <adding_expression> }
 
 # BUG: this gets precedence  wrong
-rule adding_expression        { <multiplying_expression> <adding_tail>* }
+rule adding_expression        { <multiplying_expression> <adding_tail>* {*} }
 
 rule adding_tail              { <ADD_OP> <multiplying_expression> }
 

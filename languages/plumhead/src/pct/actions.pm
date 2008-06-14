@@ -99,7 +99,24 @@ method expression($/,$key) {
 }
 
 method bitwise_expression($/) {
-    make $( $<adding_expression><multiplying_expression><unary_expression> );
+    make $( $<adding_expression> );
+}
+
+method adding_expression($/) {
+    #make PAST::Val.new( :name('kkkkkkkkkk'), :value($/) );
+    my $past := $( $<multiplying_expression><unary_expression> );
+    if $<adding_tail> {
+       for $<adding_tail> {
+           my $past_prev := $past;
+           my $pir_op := 'n_add';
+           $past := PAST::Op.new( 
+                        $past_prev,
+                        $( $_<multiplying_expression><unary_expression> ),
+                        :pirop($pir_op)
+                    );
+       }
+    }
+    make $past; 
 }
 
 method unary_expression($/) {
