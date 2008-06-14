@@ -119,7 +119,7 @@ GOT_PHP_SOURCE_FN:
     if variant == 'phc'       goto VARIANT_PHC
     $I0 = defined opt['run-nqp']
     unless $I0                goto VARIANT_PCT
-        .return run_nqp( source_fn ) 
+        .return run_nqp( source_fn, target ) 
 
 VARIANT_PCT:
     # use the Parrot Compiler Toolkit by default
@@ -147,9 +147,8 @@ VARIANT_PHC:
     cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_nqp.xsl  plumhead_phc_past.xml  > plumhead_phc_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
-    source_fn = 'plumhead_phc_past.nqp'
 
-    .return run_nqp( source_fn )
+    .return run_nqp( 'plumhead_phc_past.nqp', target )
 
 
 VARIANT_ANTLR3:
@@ -157,13 +156,11 @@ VARIANT_ANTLR3:
     err_msg = 'Generating PAST from annotated PHP source failed'
     cmd = 'java PlumheadAntlr3 '
     concat cmd, source_fn
-    source_fn = 'plumhead_antlr_past.nqp'
-    concat cmd, ' '
-    concat cmd, source_fn
+    concat cmd, ' plumhead_antlr_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
 
-    .return run_nqp( source_fn )
+    .return run_nqp( 'plumhead_antlr_past.nqp', target )
 
 ERROR:
     printerr err_msg
@@ -183,6 +180,7 @@ FINISH:
 
 .sub run_nqp
     .param string nqp_source_fn
+    .param string target
 
     # compile NQP to PIR
     .local string pir_fn, cmd
@@ -200,16 +198,17 @@ FINISH:
 
     .local pmc stmts
     ( stmts ) = php_entry()     # stmts contains the PAST
+    if target != 'past' goto NO_PAST_DUMP
+        _dumper( stmts )
+        .return ()
+    NO_PAST_DUMP:
 
     # compile and evaluate the PAST returned from scheme_entry()
     .local pmc past_compiler
     past_compiler = new [ 'PCT::HLLCompiler' ]
-    $P0 = split ' ', 'post pir'
+    $P0 = split ' ', 'post pir evalpmc'
     past_compiler.'stages'( $P0 )
-    $P1 = past_compiler.'eval'(stmts)
-    $P0 = split ' ', 'evalpmc'
-    past_compiler.'stages'( $P0 )
-    past_compiler.'eval'( $P1 )
+    past_compiler.'eval'(stmts)
 
     .return ()
 .end
