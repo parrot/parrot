@@ -19,16 +19,34 @@ class Plumhead::Grammar::Actions;
 
 # The method TOP is invoked per default by the HLLCompiler
 method TOP($/) {
-    make PAST::Block.new(
-             PAST::Stmts.new(
-                 PAST::Op.new(
-                     PAST::Val.new(
-                         :value("Hello,\nWorld!\n"),
-                         :returns('String') ),
-                     :pasttype('call'),
-                     :name('echo') ),
-                 :name('dummy TOP') ) ); 
+    make PAST::Block.new( $( $<program> ),              # there is exactly one program
+                          :name('TCFKAP'),
+                          :node($/), );
 }
+
+method program($/) {
+    my $past  := PAST::Stmts.new( :node($/) );
+    for $<sea_or_code> {
+        $past.push( $($_) );
+    }
+    make $past;
+}
+
+method sea_or_code($/,$key) {
+    make $( $/{$key} );
+} 
+
+method SEA($/) {
+    make PAST::Op.new(
+             PAST::Val.new(
+                 :value(~$/),
+                 :returns('String')
+             ),
+             :pasttype('call'),
+             :name('echo')
+         ); 
+}
+
 
 # Local Variables:
 #   mode: cperl

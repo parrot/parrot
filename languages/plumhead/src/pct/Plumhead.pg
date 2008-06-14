@@ -9,7 +9,7 @@ grammar Plumhead::Grammar is PCT::Grammar;
 
 token TOP                     { <program> {*} }
 
-regex SEA                     { <-[<]>+? ( <before \<> | $ ) }
+regex SEA                     { <-[<]>+? ( <before \<> | $ ) {*} } 
 regex SEA_empty_allowed       { <-[<]>*? <before \<> }
 token CODE_START              { '<?php' }
 token CODE_END                { '?>' \n? }
@@ -38,8 +38,10 @@ token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
 
 token IF                      { 'if' }
 token ELSE                    { 'else' }
-token program                 { ^ <sea_or_code>+ }
-token sea_or_code             { <SEA> | <code> }
+token program                 { ^ <sea_or_code>+ {*} }
+token sea_or_code             { <SEA>    {*}   #= SEA
+                              | <code>   {*}   #= code
+                              }
 
 rule  code                    { <.CODE_START> <statement>* <.CODE_END>? }
 
