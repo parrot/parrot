@@ -257,18 +257,15 @@ PARROT_API
 void
 string_init(PARROT_INTERP)
 {
-    size_t i;
+    Hash        *const_cstring_hash;
+    size_t       i;
     const size_t n_parrot_cstrings =
         sizeof (parrot_cstrings) / sizeof (parrot_cstrings[0]);
 
-    /*
-     * when string_init is called, the config hash isn't created
-     * so we can't get at the runtime path
-     * XXX do we still need this --leo
-     */
-
+    /* Set up the cstring cache, then load the basic encodings and charsets */
     if (!interp->parent_interpreter) {
-        /* Load in the basic encodings and charsets */
+        parrot_new_cstring_hash(interp, &const_cstring_hash);
+        interp->const_cstring_hash  = (struct Hash *)const_cstring_hash;
         Parrot_charsets_encodings_init(interp);
     }
 
@@ -276,17 +273,24 @@ string_init(PARROT_INTERP)
     if (interp->parent_interpreter) {
         interp->const_cstring_table =
             interp->parent_interpreter->const_cstring_table;
+        interp->const_cstring_hash  =
+            interp->parent_interpreter->const_cstring_hash;
         return;
     }
+
     interp->const_cstring_table =
         mem_allocate_n_zeroed_typed(n_parrot_cstrings, STRING *);
 
     for (i = 0; i < n_parrot_cstrings; ++i) {
-        interp->const_cstring_table[i] = string_make_direct(interp,
+        DECL_CONST_CAST;
+        STRING *s = string_make_direct(interp,
                 parrot_cstrings[i].string,
                 parrot_cstrings[i].len,
                 PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                 PObj_external_FLAG|PObj_constant_FLAG);
+        parrot_hash_put(interp, const_cstring_hash,
+            PARROT_const_cast(char *, parrot_cstrings[i].string), (void *)s);
+        interp->const_cstring_table[i] = s;
     }
 }
 
@@ -622,12 +626,23 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 const_string(PARROT_INTERP, ARGIN(const char *buffer))
 {
+    STRING *s;
+    Hash   *cstring_cache = (Hash *)interp->const_cstring_hash;
+
     PARROT_ASSERT(buffer);
 
-    /* TODO cache the strings */
-    return string_make_direct(interp, buffer, strlen(buffer),
+    s = (STRING *)parrot_hash_get(interp, cstring_cache, buffer);
+
+    if (s)
+        return s;
+
+    s = string_make_direct(interp, buffer, strlen(buffer),
                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                        PObj_external_FLAG|PObj_constant_FLAG);
+
+    parrot_hash_put(interp, cstring_cache, s, (void *)s);
+
+    return s;
 }
 
 /*

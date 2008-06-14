@@ -294,9 +294,8 @@ typedef struct _context_mem {
 } context_mem;
 
 struct _handler_node_t; /* forward def - exit.h */
-/*
- * The actual interpreter structure
- */
+
+/* The actual interpreter structure */
 struct parrot_interp_t {
     struct Interp_Context ctx;
     context_mem           ctx_mem;            /* ctx memory managment */
@@ -388,7 +387,8 @@ struct parrot_interp_t {
 
     struct _Caches * caches;                  /* see caches.h */
 
-    STRING **const_cstring_table;             /* CONST_STRING(x) items */
+    STRING     **const_cstring_table;         /* CONST_STRING(x) items */
+    struct Hash *const_cstring_hash;          /* cache of const_string items */
 
     struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;/* exit.c */
