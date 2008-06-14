@@ -77,7 +77,14 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     $P1 = new [ 'PCT::HLLCompiler' ]
     $P1.'language'('Plumhead')
     $P1.'parsegrammar'('Plumhead::Grammar')
+    #$P1.'parseactions'('Plumhead::Grammar::Actions')
     $P1.'astgrammar'('Plumhead::PAST::Grammar')
+
+    # register and set up the the HLLCompiler
+    $P2 = new [ 'PCT::HLLCompiler' ]
+    $P2.'language'('PlumheadWithNqpActions')
+    $P2.'parsegrammar'('Plumhead::Grammar')
+    $P2.'parseactions'('Plumhead::Grammar::Actions')
 
 .end
 
@@ -114,6 +121,7 @@ GOT_PHP_SOURCE_FN:
     variant = opt['variant']
     if variant == 'antlr3'    goto VARIANT_ANTLR3
     if variant == 'pct'       goto VARIANT_PCT
+    if variant == 'pct-with-nqp-actions' goto VARIANT_PCT_WITH_NQP_ACTIONS
     if variant == 'phc'       goto VARIANT_PHC
     $I0 = defined opt['run-nqp']
     unless $I0                goto VARIANT_PCT
@@ -124,6 +132,14 @@ VARIANT_PCT:
     err_msg = 'Compiling and executing with pct failed'
     .local pmc plumhead_compiler
     plumhead_compiler = compreg 'Plumhead'
+
+    .return plumhead_compiler.'evalfiles'( source_fn, 'target' => target )
+
+VARIANT_PCT_WITH_NQP_ACTIONS:
+    # use the Parrot Compiler Toolkit by default
+    err_msg = 'Compiling and executing with pct failed'
+    .local pmc plumhead_compiler
+    plumhead_compiler = compreg 'PlumheadWithNqpActions'
 
     .return plumhead_compiler.'evalfiles'( source_fn, 'target' => target )
 

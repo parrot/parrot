@@ -1,7 +1,6 @@
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
-
 =begin comments
 
 Plumhead::Grammar::Actions - ast transformations for Plumhead
@@ -18,6 +17,18 @@ value of the comment is passed as the second argument to the method.
 
 class Plumhead::Grammar::Actions;
 
+# The method TOP is invoked per default by the HLLCompiler
+method TOP($/) {
+    make PAST::Block.new(
+             PAST::Stmts.new(
+                 PAST::Op.new(
+                     PAST::Val.new(
+                         :value("Hello,\nWorld!\n"),
+                         :returns('String') ),
+                     :pasttype('call'),
+                     :name('echo') ),
+                 :name('dummy TOP') ) ); 
+}
 
 # Local Variables:
 #   mode: cperl

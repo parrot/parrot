@@ -7,7 +7,7 @@
 
 grammar Plumhead::Grammar is PCT::Grammar;
 
-token TOP                     { <program> }
+token TOP                     { <program> {*} }
 
 regex SEA                     { <-[<]>+? ( <before \<> | $ ) }
 regex SEA_empty_allowed       { <-[<]>*? <before \<> }
