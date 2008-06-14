@@ -69,7 +69,7 @@ my $uclang = uc $lang;
 ## the name and revision of the script, for use in the generated README
 my $script = $0;
 my $rev = '$Revision$';
-$rev =~ s/(\d+)/r$1/;
+$rev =~ s/^.*(\d+).*$/r$1/;
 
 ##  get the path from the command line, or if not supplied then
 ##  use languages/$lclang.
