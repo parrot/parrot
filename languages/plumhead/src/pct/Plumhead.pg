@@ -43,16 +43,16 @@ token sea_or_code             { <SEA>    {*}   #= SEA
                               | <code>   {*}   #= code
                               }
 
-rule  code                    { <.CODE_START> <statement>* <.CODE_END>? }
+rule  code                    { <.CODE_START> <statement>*  <.CODE_END>? {*} }
 
 rule relational_expression    { <expression> <rel_op_clause>? }
 
-rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )  ( ';' | <before \? > | $ )
-                              | <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE> ( ';' | <before \? > | $ )
-                              | <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
-                              | <inline_sea> 
-                              | <scalar_assign>
-                              | <array_assign>
+rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )  ( ';' | <before \? > | $ ) {*} #= ECHO
+                              | <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE> ( ';' | <before \? > | $ )                   {*} #= VAR_DUMP
+                              | <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE> \{ <statement>* \} <else_clause>?        {*}   #= IF
+                              | <inline_sea>                                                                                       {*}  #= inline_sea
+                              | <scalar_assign>                                                                                    {*}  #= scalar_assign
+                              | <array_assign>                                                                                     {*}  #= scalar_assign
                               }
 
 rule else_clause              { <.ELSE> \{ <statement>* \} }

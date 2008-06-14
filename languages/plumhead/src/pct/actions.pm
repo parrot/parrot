@@ -47,6 +47,23 @@ method SEA($/) {
          ); 
 }
 
+method code($/) {
+    my $past  := PAST::Stmts.new( :node($/), :name('code') );
+    for $<statement> {
+        $past.push( $( $_ ) );
+    }
+    make $past;
+}
+
+method statement($/,$key) {
+    if ($key eq 'ECHO') {
+        make PAST::Op.new( $/[0], :pasttype('call'), :name('echo') ); 
+    }
+    else {
+        make PAST::Op.new( $/, :pasttype('call'), :name('echo2') ); 
+    } 
+} 
+
 
 # Local Variables:
 #   mode: cperl
