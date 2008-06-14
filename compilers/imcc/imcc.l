@@ -936,6 +936,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
         else if (c == '{') {
             current = read_braced(&val, interp, macro_name, current, yyscanner);
             c       = yylex_skip(&val, interp, " \n", yyscanner);
+            len     = strlen(current);
         }
         else {
             if (!need_id || c != ' ') {

@@ -30,7 +30,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 34
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -75,6 +75,7 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
+#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -104,8 +105,6 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
-
-#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -213,6 +212,13 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 	while ( 0 )
 
 #define unput(c) yyunput( c, yyg->yytext_ptr , yyscanner )
+
+/* The following is because we cannot portably get our hands on size_t
+ * (without autoconf's help, which isn't available because we want
+ * flex-generated scanners to compile on their own).
+ * Given that the standard has decreed that size_t exists since 1989,
+ * I guess we can afford to depend on it. Manoj.
+ */
 
 #ifndef YY_TYPEDEF_YY_SIZE_T
 #define YY_TYPEDEF_YY_SIZE_T
@@ -2770,7 +2776,7 @@ static void include_file(PARROT_INTERP, char *file_name, ARGMOD(void *yyscanner)
 
 
 
-#line 2774 "compilers/imcc/imclexer.c"
+#line 2780 "compilers/imcc/imclexer.c"
 
 #define INITIAL 0
 #define emit 1
@@ -2924,7 +2930,7 @@ static int input (yyscan_t yyscanner );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		size_t n; \
+		int n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -3029,7 +3035,7 @@ YY_DECL
             return 0;
         }
 
-#line 3033 "compilers/imcc/imclexer.c"
+#line 3039 "compilers/imcc/imclexer.c"
 
 	if ( !yyg->yy_init )
 		{
@@ -4214,7 +4220,7 @@ YY_RULE_SETUP
 #line 742 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 4218 "compilers/imcc/imclexer.c"
+#line 4224 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -5615,6 +5621,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
         else if (c == '{') {
             current = read_braced(&val, interp, macro_name, current, yyscanner);
             c       = yylex_skip(&val, interp, " \n", yyscanner);
+            len     = strlen(current);
         }
         else {
             if (!need_id || c != ' ') {
