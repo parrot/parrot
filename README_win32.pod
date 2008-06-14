@@ -156,6 +156,13 @@ properties so they are available whenever you open a shell.)
 Note: It is possible to use ActiveState Perl with the Toolkit: you don't
 have to compile your own perl.
 
+=item Strawberry Perl
+
+With the Strawberry perl distro from
+L<http://strawberryperl.com/>, gcc is included. To build parrot,
+use the strawberry perl binary to run Configure.pl, and then
+follow the directions.
+
 =item MinGW32 with GCC
 
 The latest release of MinGW package at the time of writing is 5.1.3,
@@ -174,8 +181,6 @@ With the ActiveState Perl distribution, tell Configure.pl to use gcc :
          --icudatadir="C:\usr\local\icu\data"
 or
     perl Configure.pl --cc=gcc --without-icu
-
-With the strawberry distribution, gcc is already the compiler.
 
 =item Intel C++
 
