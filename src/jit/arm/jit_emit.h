@@ -358,14 +358,13 @@ emit_ldrstr_offset(char *pc,
                     int offset)
 {
     ldr_str_dir_t direction = dir_Up;
-    if (offset > 4095 || offset < -4095) {
-        internal_exception(JIT_ERROR,
-                           "Unable to generate offset %d, larger than 4095\n",
-                           offset);
-    }
+    if (offset > 4095 || offset < -4095)
+        real_exception(interp, NULL, JIT_ERROR,
+            "Unable to generate offset %d, larger than 4095\n", offset);
+
     if (offset < 0) {
         direction = dir_Down;
-        offset = -offset;
+        offset    = -offset;
     }
     return emit_ldrstr(pc, cond, l_s, direction, pre, writeback, byte, dest,
                        base, 0, offset);
@@ -678,11 +677,11 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
         case PARROT_ARG_I:
             offset = ((char *)&interp->int_reg.registers[val])
                 - (char *)interp;
-            if (offset > 4095) {
+            if (offset > 4095)
                 real_exception(interp, NULL, JIT_ERROR,
-                                   "integer load register %d generates offset %d, larger than 4095\n",
-                           val, offset);
-            }
+                       "integer load register %d generates offset %d, "
+                       "larger than 4095\n", val, offset);
+
             jit_info->native_ptr = emit_ldrstr_offset(jit_info->native_ptr,
                                                        cond,
                                                        is_load,
@@ -701,8 +700,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
             break;
         default:
             real_exception(interp, NULL, JIT_ERROR,
-                               "Unsupported op parameter type %d in jit_int_load\n",
-                               op_type);
+               "Unsupported op parameter type %d in jit_int_load\n", op_type);
     }
 }
 
@@ -722,11 +720,12 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
         case PARROT_ARG_I:
             offset = ((char *)&interp->int_reg.registers[val])
                 - (char *)interp;
-            if (offset > 4095) {
+
+            if (offset > 4095)
                 real_exception(interp, NULL, JIT_ERROR,
-                                   "integer store register %d generates offset %d, larger than 4095\n",
-                           val, offset);
-            }
+                    "integer store register %d generates offset %d, "
+                    "larger than 4095\n", val, offset);
+
             jit_info->native_ptr = emit_ldrstr_offset(jit_info->native_ptr,
                                                        cond,
                                                        is_store,
@@ -740,8 +739,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
         case PARROT_ARG_N:
         default:
             real_exception(interp, NULL, JIT_ERROR,
-                            "Unsupported op parameter type %d in jit_int_store\n",
-                               op_type);
+                "Unsupported op parameter type %d in jit_int_store\n", op_type);
     }
 }
 
@@ -838,8 +836,7 @@ Parrot_jit_jumpif_const(Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
-                         Interp * interp,
-                         arm_register_t reg)
+                         PARROT_INTERP, arm_register_t reg)
 {
     /* This is effectively the pseudo-opcode ldr - ie load relative to PC.
        So offset includes pipeline.  */
@@ -862,8 +859,7 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
 #endif /* JIT_EMIT */
 #if JIT_EMIT == 2
 
-void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                        PARROT_INTERP)
+void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     Parrot_jit_fixup_t *fixup = jit_info->arena.fixups;
 
@@ -881,8 +877,8 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 break;
             }
             default:
-                real_exception(interp, NULL, JIT_ERROR, "Unknown fixup type:%d\n",
-                                   fixup->type);
+                real_exception(interp, NULL, JIT_ERROR,
+                    "Unknown fixup type:%d\n", fixup->type);
                 break;
         }
         fixup = fixup->next;
@@ -897,8 +893,7 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 */
 
 void
-Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 PARROT_INTERP)
+Parrot_jit_begin(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG12_ip, REG13_sp);
     jit_info->native_ptr = emit_ldmstm(jit_info->native_ptr,
@@ -952,8 +947,7 @@ need to adr beyond:
     .L2:                      ; next instruction - return point from func.
 */
 void
-Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
+Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     jit_info->native_ptr = emit_mov(jit_info->native_ptr, r1, r4);
 #  ifndef ARM_K_BUG
@@ -984,8 +978,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 /* We get back address of opcode in bytecode.
    We want address of equivalent bit of jit code, which is stored as an
    address at the same offset in a jit table. */
-void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                        PARROT_INTERP)
+void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     Parrot_jit_normal_op(jit_info, interp);
     Parrot_jump_to_op_in_reg(jit_info, interp, r0);
@@ -1082,11 +1075,10 @@ arm_sync_d_i_cache(void *start, void *end)
         : "r" ((long)start), "r" ((long)end)
         : "r0", "r1", "r2");
 
-    if (result < 0) {
-        internal_exception(JIT_ERROR,
-                           "Synchronising I and D caches failed with errno=%d\n",
-                           -result);
-    }
+    if (result < 0)
+        real_exception(interp, NULL, JIT_ERROR,
+               "Synchronising I and D caches failed with errno=%d\n", -result);
+
 #      else
 #        error "ARM needs to sync D and I caches, and I don't know how to embed assmbler on this C compiler"
 #      endif
