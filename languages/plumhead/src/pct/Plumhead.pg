@@ -13,8 +13,8 @@ regex SEA                     { <-[<]>+? ( <before \<> | $ ) {*} }
 regex SEA_empty_allowed       { <-[<]>*? <before \<> }
 token CODE_START              { '<?php' }
 token CODE_END                { '?>' \n? }
-token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"' }
-token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \' }
+token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
+token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
 token ECHO                    { 'echo' }
 token VAR_DUMP                { 'var_dump' }
 token PHP_SAPI_NAME           { 'php_sapi_name' }
@@ -72,7 +72,9 @@ rule  array_key               { <expression>  }
 rule  var                     { <VAR_NAME> }
 
 rule concat_expression        { <string> <concat_tail>* }
-rule string                   { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> }
+rule string                   { <DOUBLEQUOTE_STRING>  {*}   #= DOUBLEQUOTE_STRING
+                              | <SINGLEQUOTE_STRING>  {*}   #= SINGLEQUOTE_STRING
+                              }
 rule concat_tail              { <CONCAT_OP> <string> }
 
 rule bitwise_expression       { <adding_expression> <bitwise_tail>? }

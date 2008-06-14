@@ -60,9 +60,7 @@ method code($/) {
 method statement($/,$key) {
     if $key eq 'ECHO' {
         make PAST::Op.new(
-                 PAST::Val.new( 
-                     :value(~$/[0]<expression><concat_expression><string><DOUBLEQUOTE_STRING><string_literal>),
-                 ),
+                 $( $/[0]<expression><concat_expression><string> ),
                  :pasttype('call'),
                  :name('echo')
              ); 
@@ -80,10 +78,30 @@ method statement($/,$key) {
 } 
 
 
+method SINGLEQUOTE_STRING($/) {
+    make PAST::Val.new(
+             :value( $($<string_literal>) ),
+             :returns('String'),
+             :node($/)
+         );
+}
+
+method string($/,$key) {
+    make $( $/{$key} );
+} 
+
+method DOUBLEQUOTE_STRING($/) {
+    make PAST::Val.new(
+             :value( $($<string_literal>) ),
+             :returns('String'),
+             :node($/)
+         );
+}
+
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
