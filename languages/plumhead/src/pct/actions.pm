@@ -103,15 +103,31 @@ method bitwise_expression($/) {
 }
 
 method adding_expression($/) {
-    #make PAST::Val.new( :name('kkkkkkkkkk'), :value($/) );
-    my $past := $( $<multiplying_expression><unary_expression> );
+    my $past := $( $<multiplying_expression> );
     if $<adding_tail> {
        for $<adding_tail> {
            my $past_prev := $past;
            my $pir_op := $_<ADD_OP> eq '+' ?? 'n_add' !! 'n_sub';
            $past := PAST::Op.new( 
                         $past_prev,
-                        $( $_<multiplying_expression><unary_expression> ),
+                        $( $_<multiplying_expression> ),
+                        :pirop($pir_op)
+                    );
+       }
+    }
+    make $past; 
+}
+
+method multiplying_expression($/) {
+    # make PAST::Val( :name('kkkk'), :value($/) );
+    my $past := $( $<unary_expression> );
+    if $<multiplicand> {
+       for $<multiplicand> {
+           my $past_prev := $past;
+           my $pir_op := $_<MUL_OP> eq '*' ?? 'n_mul' !! 'n_div';
+           $past := PAST::Op.new( 
+                        $past_prev,
+                        $( $_<multiplying_expression> ),
                         :pirop($pir_op)
                     );
        }

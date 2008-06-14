@@ -86,7 +86,7 @@ rule adding_expression        { <multiplying_expression> <adding_tail>* {*} }
 rule adding_tail              { <ADD_OP> <multiplying_expression> }
 
 # TODO: this gets precedence wrong, see adding_expression
-rule multiplying_expression   { <unary_expression> <multiplicand>? }
+rule multiplying_expression   { <unary_expression> <multiplicand>? {*} }
 
 rule multiplicand             { <MUL_OP> <multiplying_expression> }
 
