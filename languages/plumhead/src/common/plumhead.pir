@@ -125,7 +125,7 @@ GOT_PHP_SOURCE_FN:
     if variant == 'phc'       goto VARIANT_PHC
     $I0 = defined opt['run-nqp']
     unless $I0                goto VARIANT_PCT
-        .return run_nqp( source_fn, target ) 
+        .return run_nqp( source_fn, target )
 
 VARIANT_PCT:
     # use the Parrot Compiler Toolkit by default

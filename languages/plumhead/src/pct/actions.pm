@@ -34,7 +34,7 @@ method program($/) {
 
 method sea_or_code($/,$key) {
     make $( $/{$key} );
-} 
+}
 
 # The surrounding HTML is printed out
 method SEA($/) {
@@ -45,7 +45,7 @@ method SEA($/) {
              ),
              :pasttype('call'),
              :name('echo')
-         ); 
+         );
 }
 
 # loop over the statements in the PHP section
@@ -63,7 +63,7 @@ method statement($/,$key) {
                  $( $/[0]<expression> ),
                  :pasttype('call'),
                  :name('echo')
-             ); 
+             );
     }
     elsif $key eq 'inline_sea' {
         make PAST::Op.new(
@@ -73,9 +73,9 @@ method statement($/,$key) {
                  ),
                  :pasttype('call'),
                  :name('echo')
-             );     
-    } 
-} 
+             );
+    }
+}
 
 
 method SINGLEQUOTE_STRING($/) {
@@ -96,19 +96,19 @@ method INTEGER($/) {
 }
 method expression($/,$key) {
     make $( $/{$key} );
-} 
+}
 
 method bitwise_expression($/) {
     make $( $<adding_expression><multiplying_expression><unary_expression><postfix_expression><INTEGER> );
-} 
+}
 
 method concat_expression($/) {
     make $( $<string> );
-} 
+}
 
 method string($/,$key) {
     make $( $/{$key} );
-} 
+}
 
 method DOUBLEQUOTE_STRING($/) {
     make PAST::Val.new(
