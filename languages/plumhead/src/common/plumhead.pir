@@ -116,7 +116,8 @@ GOT_PHP_SOURCE_FN:
     if variant == 'pct'       goto VARIANT_PCT
     if variant == 'phc'       goto VARIANT_PHC
     $I0 = defined opt['run-nqp']
-    if $I0                    goto RUN_NQP
+    unless $I0                goto VARIANT_PHC
+        .return run_nqp( source_fn ) 
 
 VARIANT_PCT:
     # use the Parrot Compiler Toolkit by default
@@ -150,7 +151,8 @@ VARIANT_PHC:
     ret = spawnw cmd
     if ret goto ERROR
     source_fn = 'plumhead_phc_past.nqp'
-    goto RUN_NQP
+
+    .return run_nqp( source_fn )
 
 
 VARIANT_ANTLR3:
@@ -163,38 +165,8 @@ VARIANT_ANTLR3:
     concat cmd, source_fn
     ret = spawnw cmd
     if ret goto ERROR
-    goto RUN_NQP
 
-RUN_NQP:
-    # compile NQP to PIR
-    err_msg = 'Executing NQP failed'
-    .local string pir_fn
-    .local int ret
-    clone pir_fn, source_fn
-    substr pir_fn, -3, 3, 'pir'
-    cmd = "./parrot ./compilers/nqp/nqp.pbc --target=pir --output="
-    concat cmd, pir_fn
-    concat cmd, " "
-    concat cmd, source_fn
-    ret = spawnw cmd
-
-    # load the generated PIR
-    load_bytecode pir_fn
-
-    .local pmc stmts
-    ( stmts ) = php_entry()
-
-    # compile and evaluate the PAST returned from scheme_entry()
-    .local pmc past_compiler
-    past_compiler = new [ 'PCT::HLLCompiler' ]
-    $P0 = split ' ', 'post pir'
-    past_compiler.'stages'( $P0 )
-    $P1 = past_compiler.'eval'(stmts)
-    $P0 = split ' ', 'evalpmc'
-    past_compiler.'stages'( $P0 )
-    past_compiler.'eval'( $P1 )
-
-    exit 0
+    .return run_nqp( source_fn )
 
 ERROR:
     printerr err_msg
@@ -212,6 +184,38 @@ FINISH:
 
 .end
 
+.sub run_nqp
+    .param string nqp_source_fn
+
+    # compile NQP to PIR
+    .local string pir_fn, cmd
+    .local int ret
+    clone pir_fn, nqp_source_fn
+    substr pir_fn, -3, 3, 'pir'     # change extension from '.nqp' to '.pir'
+    cmd = "./parrot ./compilers/nqp/nqp.pbc --target=pir --output="
+    concat cmd, pir_fn
+    concat cmd, " "
+    concat cmd, nqp_source_fn
+    ret = spawnw cmd
+
+    # load the generated PIR
+    load_bytecode pir_fn
+
+    .local pmc stmts
+    ( stmts ) = php_entry()     # stmts contains the PAST
+
+    # compile and evaluate the PAST returned from scheme_entry()
+    .local pmc past_compiler
+    past_compiler = new [ 'PCT::HLLCompiler' ]
+    $P0 = split ' ', 'post pir'
+    past_compiler.'stages'( $P0 )
+    $P1 = past_compiler.'eval'(stmts)
+    $P0 = split ' ', 'evalpmc'
+    past_compiler.'stages'( $P0 )
+    past_compiler.'eval'( $P1 )
+
+    .return ()
+.end
 
 # get commandline options
 .sub parse_options
