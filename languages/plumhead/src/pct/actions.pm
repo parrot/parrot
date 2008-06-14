@@ -108,7 +108,7 @@ method adding_expression($/) {
     if $<adding_tail> {
        for $<adding_tail> {
            my $past_prev := $past;
-           my $pir_op := 'n_add';
+           my $pir_op := $_<ADD_OP> eq '+' ?? 'n_add' !! 'n_sub';
            $past := PAST::Op.new( 
                         $past_prev,
                         $( $_<multiplying_expression><unary_expression> ),
