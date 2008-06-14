@@ -36,6 +36,7 @@ method sea_or_code($/,$key) {
     make $( $/{$key} );
 } 
 
+# The surrounding HTML is printed out
 method SEA($/) {
     make PAST::Op.new(
              PAST::Val.new(
@@ -47,6 +48,7 @@ method SEA($/) {
          ); 
 }
 
+# loop over the statements in the PHP section
 method code($/) {
     my $past  := PAST::Stmts.new( :node($/), :name('code') );
     for $<statement> {
@@ -56,11 +58,18 @@ method code($/) {
 }
 
 method statement($/,$key) {
-    if ($key eq 'ECHO') {
+    if $key eq 'ECHO' {
         make PAST::Op.new( $/[0], :pasttype('call'), :name('echo') ); 
     }
-    else {
-        make PAST::Op.new( $/, :pasttype('call'), :name('echo2') ); 
+    elsif $key eq 'inline_sea' {
+        make PAST::Op.new(
+                 PAST::Val.new(
+                     :value(~$<inline_sea><SEA_empty_allowed>),
+                     :returns('String')
+                 ),
+                 :pasttype('call'),
+                 :name('echo')
+             );     
     } 
 } 
 
