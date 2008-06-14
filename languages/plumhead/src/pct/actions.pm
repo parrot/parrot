@@ -99,11 +99,28 @@ method expression($/,$key) {
 }
 
 method bitwise_expression($/) {
-    make $( $<adding_expression><multiplying_expression><unary_expression><postfix_expression><INTEGER> );
+    make $( $<adding_expression><multiplying_expression><unary_expression> );
+}
+
+method unary_expression($/) {
+    if $<UNARY_MINUS> {
+        make PAST::Op.new(
+                 $( $<postfix_expression> ),
+                 :name('prefix:-'),
+                 :pirop('n_neg')
+             );
+    }
+    else {
+        make $( $<postfix_expression> );
+    }
 }
 
 method concat_expression($/) {
     make $( $<string> );
+}
+
+method postfix_expression($/,$key) {
+    make $( $/{$key} );
 }
 
 method string($/,$key) {

@@ -90,11 +90,11 @@ rule multiplying_expression   { <unary_expression> <multiplicand>? }
 
 rule multiplicand             { <MUL_OP> <multiplying_expression> }
 
-rule unary_expression         { <UNARY_MINUS>? <postfix_expression> }
+rule unary_expression         { <UNARY_MINUS>? <postfix_expression> {*} }
 
-rule postfix_expression       { <NUMBER>
-                              | <INTEGER>
-                              | <.PAREN_OPEN> <expression> <.PAREN_CLOSE>
-                              | <array_elem>
-                              | <var>
+rule postfix_expression       { <NUMBER>                                   {*}    #= NUMBER
+                              | <INTEGER>                                  {*}    #= INTEGER
+                              | <.PAREN_OPEN> <expression> <.PAREN_CLOSE>  {*}    #= expression
+                              | <array_elem>                               {*}    #= array_elem
+                              | <var>                                      {*}    #= var
                               }
