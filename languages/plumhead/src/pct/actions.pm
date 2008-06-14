@@ -60,7 +60,7 @@ method code($/) {
 method statement($/,$key) {
     if $key eq 'ECHO' {
         make PAST::Op.new(
-                 $( $/[0]<expression><concat_expression><string> ),
+                 $( $/[0]<expression> ),
                  :pasttype('call'),
                  :name('echo')
              ); 
@@ -85,6 +85,26 @@ method SINGLEQUOTE_STRING($/) {
              :node($/)
          );
 }
+
+
+method INTEGER($/) {
+    make PAST::Val.new(
+        :value( +$/ ),
+        :returns('Integer'),
+        :node($/)
+    );
+}
+method expression($/,$key) {
+    make $( $/{$key} );
+} 
+
+method bitwise_expression($/) {
+    make $( $<adding_expression><multiplying_expression><unary_expression><postfix_expression><INTEGER> );
+} 
+
+method concat_expression($/) {
+    make $( $<string> );
+} 
 
 method string($/,$key) {
     make $( $/{$key} );

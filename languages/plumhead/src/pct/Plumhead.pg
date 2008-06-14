@@ -24,7 +24,7 @@ token PAREN_CLOSE             { \) }
 token IDENT                   { <[a..zA..Z_]>* <[a..zA..Z_0..9]>* }
 token VAR_NAME                {  '$' <IDENT> }
 
-token INTEGER                 { \d+ }
+token INTEGER                 { \d+   {*} }
 token NUMBER                  { ( \d+ )? '.' \d+ }
 
 token UNARY_MINUS             { \- }
@@ -63,21 +63,20 @@ token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> }
 rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
 
-token expression              { <concat_expression>
-                              | <bitwise_expression>
+token expression              { <concat_expression>       {*}  #= concat_expression
+                              | <bitwise_expression>      {*}  #= bitwise_expression
                               }
 
 rule  array_elem              { <VAR_NAME> '[' <array_key> ']' }
 rule  array_key               { <expression>  }
 rule  var                     { <VAR_NAME> }
-
-rule concat_expression        { <string> <concat_tail>* }
-rule string                   { <DOUBLEQUOTE_STRING>  {*}   #= DOUBLEQUOTE_STRING
-                              | <SINGLEQUOTE_STRING>  {*}   #= SINGLEQUOTE_STRING
+rule  concat_expression       { <string> <concat_tail>* {*} }
+rule  string                  { <DOUBLEQUOTE_STRING> {*}   #= DOUBLEQUOTE_STRING
+                              | <SINGLEQUOTE_STRING> {*}   #= SINGLEQUOTE_STRING
                               }
 rule concat_tail              { <CONCAT_OP> <string> }
 
-rule bitwise_expression       { <adding_expression> <bitwise_tail>? }
+rule bitwise_expression       { <adding_expression> <bitwise_tail>? {*} }
 
 rule bitwise_tail             { <BITWISE_OP> <adding_expression> }
 
