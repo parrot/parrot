@@ -407,7 +407,7 @@ static void
 make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *cols))
 {
     /* register usage summary */
-    SymHash * const hsh    = &unit->hash;
+    SymHash * const hsh = &unit->hash;
     int             i;
 
     for (i = 0; i < hsh->size; i++) {
@@ -593,7 +593,7 @@ build_reglist(Parrot_Interp interp, ARGMOD(IMC_Unit *unit))
     if (count == 0)
         return;
 
-    unit->reglist = (SymReg **)mem_sys_allocate(count * sizeof (SymReg*));
+    unit->reglist = mem_allocate_n_typed(count, SymReg *);
 
     for (i = count = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -956,7 +956,10 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
     if (unit->max_color >= n)
         n = unit->max_color + 1;
 
-    avail = (char *)mem_sys_allocate(n);
+    if (!n)
+        return -1;
+
+    avail = mem_allocate_n_typed(n, char);
 
     for (x = 0; x < unit->n_symbols; ++x) {
         int     already_allocated, color;
@@ -1102,7 +1105,7 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
-                if (REG_NEEDS_ALLOC(r) && r->color == -1 && (r->usage & usage)) {
+                if (REG_NEEDS_ALLOC(r) && r->color == -1 && (r->usage & usage) && r->use_count) {
                     if (set_contains(avail, first_reg))
                         first_reg = first_avail(unit, reg_set, NULL);
 
@@ -1150,7 +1153,7 @@ vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
     for (i = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {
             /* TODO Ignore non-volatiles */
-            if (REG_NEEDS_ALLOC(r))
+            if (REG_NEEDS_ALLOC(r) && r->use_count)
                 r->color = -1;
         }
     }
@@ -1164,7 +1167,7 @@ vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
-                if (REG_NEEDS_ALLOC(r) && (r->color == -1)) {
+                if (REG_NEEDS_ALLOC(r) && (r->color == -1) && r->use_count) {
                     if (set_contains(avail, first_reg))
                         first_reg = first_avail(unit, reg_set, NULL);
 

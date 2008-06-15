@@ -194,7 +194,7 @@ _mk_symreg(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
     SymReg * r = _get_sym_typed(hsh, name, t);
 
     if (!r) {
-        r = mem_allocate_zeroed_typed(SymReg);
+        r             = mem_allocate_zeroed_typed(SymReg);
         r->set        = t;
         r->type       = VTREG;
         r->name       = str_dup(name);
