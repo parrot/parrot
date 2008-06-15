@@ -10,7 +10,8 @@ When a conditional is labeled as a parameter, the valid syntax is limited.
 Only code snippets such as C<$P0>, C<< $I0 <= 42 >>, C<null $P0>, are allowed.
 Groupings such as C<< $I0 <= 42 || $I0 > 142 >> are not allowed, although it is
 possible to write a macro that contains two parameters representing
-conditionals.
+conditionals. It's important to avoid the { } delimiter on the conditionals
+since a newline in the conditional renders the generated PIR invalid.
 
 =head2 Code blocks
 
@@ -32,6 +33,7 @@ Using C<.NL()> in a line will insert a linebreak.
 
 =cut
 
+
 .macro NL()
 .endm
 
@@ -45,7 +47,7 @@ Runs the code in C<code> if C<conditional> is true.
 .macro If(conditional, code)
     unless .conditional goto .$endif
     .code
-.local $endif:
+.label $endif:
 .endm
 
 
@@ -58,7 +60,7 @@ Runs the code in C<code> if C<conditional> is false.
 .macro Unless(conditional, code)
     if .conditional goto .$endif
     .code
-.local $endif:
+.label $endif:
 .endm
 
 
@@ -73,9 +75,9 @@ C<false>.
     unless .conditional goto .$else
     .true
     goto .$endif
-.local $else:
+.label $else:
     .false
-.local $endif:
+.label $endif:
 .endm
 
 
@@ -86,11 +88,11 @@ Runs the code in C<code> as long as C<conditional> is true.
 =cut
 
 .macro While(conditional, code)
-.local $beginwhile:
+.label $beginwhile:
     unless .conditional goto .$endwhile
     .code
     goto .$beginwhile
-.local $endwhile:
+.label $endwhile:
 .endm
 
 
@@ -101,7 +103,7 @@ Runs the code in C<code> once, and then as long as C<conditional> is true.
 =cut
 
 .macro DoWhile(code, conditional)
-.local $beginwhile:
+.label $beginwhile:
     .code
     if .conditional goto .$beginwhile
 .endm
@@ -113,7 +115,7 @@ Runs the code in C<code> forever.
 =cut
 
 .macro Loop(code)
-.local $beginloop:
+.label $beginloop:
     .code
     goto .$beginloop
 .endm
@@ -127,12 +129,12 @@ true, runs C<code>, and then the C<continue> code, such as C<inc i>.
 
 .macro For(start, conditional, cont, code)
     .start
-.local $beginfor:
+.label $beginfor:
     unless .conditional goto .$endfor
     .code
     .cont
     goto .$beginfor
-.local $endfor:
+.label $endfor:
 .endm
 
 
@@ -144,17 +146,20 @@ work with in C<code>.
 
 =cut
 
+# RT #55808 - the unlikely to conflict variable names here must be
+# replaced with the .macro_local syntax.
 .macro Foreach(name, array, code)
-    .sym int local__Foreach__i, local__Foreach__k
-    local__Foreach__i = 0
-    local__Foreach__k = .array
-.local $beginforeach:
-    unless local__Foreach__i < local__Foreach__k goto .$endforeach
-    .name = .array[local__Foreach__i]
+    .local int __Foreach__local__i
+    .local int __Foreach__local__k
+    __Foreach__local__i = 0
+    __Foreach__local__k = .array
+.label $beginforeach:
+    unless __Foreach__local__i < __Foreach__local__k goto .$endforeach
+    .name = .array[__Foreach__local__i]
     .code
-    inc local__Foreach__i
+    inc __Foreach__local__i
     goto .$beginforeach
-.local $endforeach:
+.label $endforeach:
 .endm
 
 
