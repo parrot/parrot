@@ -125,7 +125,10 @@ clean-common:
 	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
 
 clean-pct:
-	$(RM_F) src/pct/Plumhead_gen.pir src/pct/PlumheadPAST_gen.pir
+	$(RM_F) \
+  src/pct/Plumhead_gen.pir \
+  src/pct/PlumheadPAST_gen.pir \
+  src/pct/gen_actions.pir
 
 clean-antlr3:
 	$(RM_F) src/antlr3/*.class
