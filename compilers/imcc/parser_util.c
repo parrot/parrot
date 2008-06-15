@@ -583,7 +583,8 @@ PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
 INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
-        ARGIN_NULLOK(const char *fmt), ARGIN(SymReg **r), int n, int keyvec, int emit)
+    ARGIN_NULLOK(const char *fmt), ARGIN(SymReg **r), int n, int keyvec,
+    int emit)
 {
     int i, op, len;
     int dirs = 0;
@@ -591,12 +592,11 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     op_info_t   *op_info;
     char fullname[64], format[128], buf[10];
 
-    if ((STREQ(name, "set_args"))    ||
-        (STREQ(name, "get_results")) ||
-        (STREQ(name, "get_params"))  ||
-        (STREQ(name, "set_returns"))) {
+    if ((STREQ(name, "set_args"))
+    ||  (STREQ(name, "get_results"))
+    ||  (STREQ(name, "get_params"))
+    ||  (STREQ(name, "set_returns")))
         return var_arg_ins(interp, unit, name, r, n, emit);
-    }
 
     op = is_infix(name, n, r);
 
@@ -604,12 +604,12 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
         name = to_infix(interp, name, r, &n, op);
     }
-    else if ((IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS) &&
-            ((STREQ(name, "abs"))  ||
-             (STREQ(name, "neg"))  ||
-             (STREQ(name, "not"))  ||
-             (STREQ(name, "bnot")) ||
-             (STREQ(name, "bnots")))) {
+    else if ((IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS)
+         && ((STREQ(name, "abs"))
+         ||  (STREQ(name, "neg"))
+         ||  (STREQ(name, "not"))
+         ||  (STREQ(name, "bnot"))
+         ||  (STREQ(name, "bnots")))) {
         strcpy(buf, "n_");
         strcat(buf, name);
         name = buf;
@@ -669,21 +669,19 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             return ins;
     }
 
-    if (op < 0) {
+    if (op < 0)
         IMCC_fataly(interp, E_SyntaxError,
                     "The opcode '%s' (%s<%d>) was not found. "
                     "Check the type and number of the arguments",
                     fullname, name, n);
-    }
 
     op_info = &interp->op_info_table[op];
-
     *format = '\0';
 
     /* info->op_count is args + 1
      * build instruction format
      * set LV_in / out flags */
-    if (n != op_info->op_count-1)
+    if (n != op_info->op_count - 1)
         IMCC_fataly(interp, E_SyntaxError,
                 "arg count mismatch: op #%d '%s' needs %d given %d",
                 op, fullname, op_info->op_count-1, n);
@@ -704,6 +702,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             default:
                 PARROT_ASSERT(0);
         };
+
         if (keyvec & KEY_BIT(i)) {
             len          = strlen(format);
             len         -= 2;
@@ -726,13 +725,14 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         strncpy(format, fmt, sizeof (format) - 1);
         format[sizeof (format) - 1] = '\0';
     }
+
 #if 1
     IMCC_debug(interp, DEBUG_PARSER, "%s %s\t%s\n", name, format, fullname);
 #endif
-    /* make the instruction */
 
-    ins        = _mk_instruction(name, format, n, r, dirs);
-    ins->keys |= keyvec;
+    /* make the instruction */
+    ins         = _mk_instruction(name, format, n, r, dirs);
+    ins->keys  |= keyvec;
 
     /* fill in oplib's info */
     ins->opnum  = op;
@@ -761,9 +761,8 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     }
 
     /* set up branch flags
-     * mark registers that are labels
-     */
-    for (i = 0; i < op_info->op_count-1; i++) {
+     * mark registers that are labels */
+    for (i = 0; i < op_info->op_count - 1; i++) {
         if (op_info->labels[i])
             ins->type |= ITBRANCH | (1 << i);
         else {
@@ -776,14 +775,14 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     if (op_info->jump && op_info->jump != PARROT_JUMP_ENEXT) {
         ins->type |= ITBRANCH;
         /* TODO use opnum constants */
-        if (STREQ(name, "branch")   ||
-            STREQ(name, "tailcall") ||
-            STREQ(name, "returncc"))
+        if (STREQ(name, "branch")
+        ||  STREQ(name, "tailcall")
+        ||  STREQ(name, "returncc"))
             ins->type |= IF_goto;
-        else if (STREQ(fullname, "jump_i")  ||
-                STREQ(fullname, "jsr_i")    ||
-                STREQ(fullname, "branch_i") ||
-                STREQ(fullname, "bsr_i"))
+        else if (STREQ(fullname, "jump_i")
+             ||  STREQ(fullname, "jsr_i")
+             ||  STREQ(fullname, "branch_i")
+             ||  STREQ(fullname, "bsr_i"))
             IMCC_INFO(interp)->dont_optimize = 1;
     }
     else if (STREQ(name, "set") && n == 2) {
@@ -794,7 +793,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     else if (STREQ(name, "compile"))
         ++IMCC_INFO(interp)->has_compile;
 
-found_ins:
+  found_ins:
     if (emit)
         emitb(interp, unit, ins);
 

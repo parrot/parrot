@@ -2720,7 +2720,7 @@ typedef struct macro_frame_t {
     YY_BUFFER_STATE buffer;
 } macro_frame_t;
 
-/* static function declariations */
+/* static function declarations */
 static void pop_parser_state(PARROT_INTERP, ARGMOD(void *yyscanner));
 
 static struct macro_frame_t *new_frame(PARROT_INTERP);

@@ -33,42 +33,42 @@ struct imcc_ostat {
 } ;
 
 typedef struct _IMC_Unit {
-    INTVAL type;
-    Instruction * instructions;
-    Instruction * last_ins;
-    SymHash hash;
-    int bb_list_size;
-    unsigned int n_basic_blocks;
-    Basic_block **bb_list;
-    Set** dominators;
-    int* idoms;
-    Set** dominance_frontiers;
-    int n_loops;
-    Loop_info ** loop_info;
-    Edge * edge_list;
+    INTVAL            type;
+    Instruction      *instructions;
+    Instruction      *last_ins;
+    SymHash           hash;
+    int               bb_list_size;
+    unsigned int      n_basic_blocks;
+    Basic_block     **bb_list;
+    Set             **dominators;
+    int              *idoms;
+    Set             **dominance_frontiers;
+    int               n_loops;
+    Loop_info       **loop_info;
+    Edge             *edge_list;
 
     /* register allocation */
-    unsigned int* interference_graph;
-    SymReg** reglist;
-    int n_symbols;
-    int max_color;
-    struct _IMC_Unit * prev;
-    struct _IMC_Unit * next;
+    unsigned int     *interference_graph;
+    SymReg          **reglist;
+    int               n_symbols;
+    int               max_color;
+    struct _IMC_Unit *prev;
+    struct _IMC_Unit *next;
 
-    SymReg *_namespace;
-    int pasm_file;
-    const char *file;
-    int n_vars_used[4]; /* INSP in PIR */
-    int n_regs_used[4]; /* INSP in PBC */
-    int first_avail[4]; /* INSP */
-    SymReg *outer;
-    PMC *sub_pmc;       /* this sub */
-    int is_vtable_method; /* 1 if a v-table method */
-    char *vtable_name;  /* v-table method name, if any */
-    char *instance_of;  /* PMC or class this is an instance of, if any */
+    SymReg           *_namespace;
+    int               pasm_file;
+    const char       *file;
+    int               n_vars_used[4]; /* INSP in PIR */
+    int               n_regs_used[4]; /* INSP in PBC */
+    int               first_avail[4]; /* INSP */
+    SymReg           *outer;
+    PMC              *sub_pmc;          /* this sub */
+    int               is_vtable_method; /* 1 if a v-table method */
+    char             *vtable_name;      /* v-table method name, if any */
+    char             *instance_of;      /* PMC or class this is an instance of
+                                         * if any */
 
-    struct imcc_ostat ostat;
-
+    struct            imcc_ostat ostat;
 } IMC_Unit;
 
 
@@ -84,4 +84,3 @@ typedef struct _IMC_Unit {
  * End:
  * vim: expandtab shiftwidth=4:
  */
-

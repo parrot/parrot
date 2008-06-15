@@ -47,12 +47,11 @@ enum LIFEFLAG {    /* The status of a var inside a basic block can be */
 };
 
 /* Liveness represents the usage of a var inside a basic block
-   This is represented by pairs of [definition, usage] in *intervals:
-*/
+   This is represented by pairs of [definition, usage] in *intervals: */
 typedef struct _Life_range {
-    int flags;
-    struct _Instruction * first_ins;
-    struct _Instruction * last_ins;
+    int                  flags;
+    struct _Instruction *first_ins;
+    struct _Instruction *last_ins;
 } Life_range;
 
 enum USAGE {
@@ -65,47 +64,47 @@ enum USAGE {
 };
 
 typedef struct _SymReg {
-    char * name;
-    INTVAL type;             /* Variable type */
-    INTVAL usage;            /* s. USAGE above */
-    int set;                 /* Which register set/file it belongs to */
-    int want_regno;          /* wanted register number */
-    INTVAL color;            /* Color: parrot register number
-                                and parrot const table index of VTCONST */
-    int offset;              /* used for label fixup */
-    int use_count;           /* How often this symbol is used */
-    int lhs_use_count;       /* How often this symbol is written to */
-    Life_range **life_info;  /* Each block has its Life_range status */
-    struct _SymReg * next;   /* used in the symbols hash */
-    struct _Instruction * first_ins; /* first and last instruction */
-    struct _Instruction * last_ins;  /* this symbol is in */
+    char                *name;
+    INTVAL               type;          /* Variable type */
+    INTVAL               usage;         /* s. USAGE above */
+    int                  set;           /* parent register set/file */
+    int                  want_regno;    /* wanted register number */
+    INTVAL               color;         /* Color: parrot register number
+                                         * and const table index of VTCONST */
+    int                  offset;        /* used for label fixup */
+    int                  use_count;     /* How often this symbol is used */
+    int                  lhs_use_count; /* Frequency of writing to this symbol*/
+    Life_range         **life_info;     /* Each block has a Life_range status */
+    struct _SymReg      *next;          /* used in the symbols hash */
+    struct _Instruction *first_ins;     /* first and last instruction */
+    struct _Instruction *last_ins;      /* this symbol is in */
     /* also used by labels as position of label and last reference */
-    struct _SymReg * nextkey;        /* keys */
-    struct _SymReg * reg;    /* key->register for VTREGKEYs */
-    struct pcc_sub_t *pcc_sub;       /* PCC subroutine */
-    struct _SymReg * used;   /* used register in invoke */
-    int pmc_type;            /* class enum */
+    struct _SymReg      *nextkey;       /* keys */
+    struct _SymReg      *reg;           /* key->register for VTREGKEYs */
+    struct pcc_sub_t    *pcc_sub;       /* PCC subroutine */
+    struct _SymReg      *used;          /* used register in invoke */
+    int                  pmc_type;      /* class enum */
 } SymReg;
 
 typedef struct _SymHash {
-    SymReg ** data;
-    int size;
-    int entries;
+    SymReg **data;
+    int      size;
+    int      entries;
 } SymHash;
 
 /* namespaces */
 
 typedef struct ident_t Identifier;
 struct ident_t {
-    char * name;
-    Identifier * next;
+    char       *name;
+    Identifier *next;
 };
 
 typedef struct namespace_t Namespace;
 struct namespace_t {
-    Namespace * parent;
-    char * name;
-    Identifier * idents;
+    Namespace  *parent;
+    char       *name;
+    Identifier *idents;
 };
 
 EXTERN Namespace * _namespace;

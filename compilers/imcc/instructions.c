@@ -98,7 +98,7 @@ Instruction *
 _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         ARGIN(SymReg * const *r), int flags)
 {
-    const size_t reg_space = (n>1) ? (sizeof (SymReg *) * (n - 1)) : 0;
+    const size_t reg_space  = (n > 1) ? (sizeof (SymReg *) * (n - 1)) : 0;
     Instruction * const ins =
         (Instruction*)mem_sys_allocate_zeroed(sizeof (Instruction) + reg_space);
     int i;
@@ -108,7 +108,7 @@ _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
     ins->symreg_count = n;
 
     for (i = 0; i < n; i++)
-        ins->symregs[i] = r[i];
+        ins->symregs[i]  = r[i];
 
     ins->flags = flags;
     ins->opnum = -1;
