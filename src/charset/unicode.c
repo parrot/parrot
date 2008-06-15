@@ -682,6 +682,7 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
     if (codepoint < 256) {
         return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
     }
+    if (flags == enum_cclass_any) { return 1; }
     if (flags & enum_cclass_whitespace) {
         /* from http://www.unicode.org/Public/UNIDATA/PropList.txt */
         switch (codepoint) {
@@ -816,6 +817,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
         iter.set_position(interp, &iter, pos);
 
     end = source_string->strlen < end ? source_string->strlen : end;
+    if (flags == enum_cclass_any) return end;
     for (; pos < end; ++pos) {
         codepoint = iter.get_and_advance(interp, &iter);
         if (codepoint >= 256) {
