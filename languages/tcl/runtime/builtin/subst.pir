@@ -92,7 +92,7 @@ subst:
     pir.emit(".HLL 'Tcl', ''")
     pir.emit(".loadlib 'tcl_ops'")
     pir.emit('.namespace %0', namespace)
-    pir.emit(".include 'languages/tcl/src/returncodes.pir'")
+    pir.emit(".include 'languages/tcl/src/returncodes.pasm'")
     pir.emit(".sub '_anon' :anon")
     pir .= code
     pir.emit('  .return(%0)', ret)

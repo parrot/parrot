@@ -16,8 +16,8 @@ while_loop:
 while_loop_exception:
   .catch()
   .get_return_code($I0)
-  if $I0 == TCL_CONTINUE goto while_loop
-  if $I0 == TCL_BREAK    goto while_loop_done
+  if $I0 == .TCL_CONTINUE goto while_loop
+  if $I0 == .TCL_BREAK    goto while_loop_done
   .rethrow()
 
 while_loop_done:

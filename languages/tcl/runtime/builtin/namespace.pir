@@ -273,7 +273,7 @@ global_ns:
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
 .sub compiled_tcl_sub_%2
-  .include 'languages/tcl/src/returncodes.pir'
+  .include 'languages/tcl/src/returncodes.pasm'
   .local pmc epoch, colons, split, unk, interactive :unique_reg
   epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
