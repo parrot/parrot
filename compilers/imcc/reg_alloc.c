@@ -407,7 +407,6 @@ static void
 make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *cols))
 {
     /* register usage summary */
-    const char      type[] = "INSP";
     SymHash * const hsh    = &unit->hash;
     int             i;
 
@@ -415,18 +414,27 @@ make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *c
         SymReg *r;
 
         for (r = hsh->data[i]; r; r = r->next) {
-            int j;
+            /* should be fine uninitialized, but analysis tools get confused */
+            int j = 0;
+
             if (r->color > unit->max_color)
                 unit->max_color = r->color;
 
-            for (j = 0; j < 4; j++)
-                if (r->set == type[j] && REG_NEEDS_ALLOC(r)) {
-                    if (sets)
-                        sets[j]++;
-                    if (cols)
-                        if (r->color > cols[j])
-                            cols[j] = r->color;
-                }
+            switch (r->set) {
+                case 'I': j = 0; break;
+                case 'N': j = 1; break;
+                case 'S': j = 2; break;
+                case 'P': j = 3; break;
+                default :        continue;
+            }
+
+            if (REG_NEEDS_ALLOC(r)) {
+                if (sets)
+                    sets[j]++;
+                if (cols)
+                    if (r->color > cols[j])
+                        cols[j] = r->color;
+            }
         }
     }
 
@@ -456,7 +464,7 @@ imc_stat_init(ARGMOD(IMC_Unit *unit))
 
     for (j = 0; j < 4; j++) {
         unit->n_regs_used[j] = -1;
-        unit->first_avail[j] = 0;
+        unit->first_avail[j] =  0;
     }
 
     memset(&(unit->ostat), 0, sizeof (unit->ostat));
