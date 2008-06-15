@@ -431,6 +431,7 @@ make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *c
             if (REG_NEEDS_ALLOC(r)) {
                 if (sets)
                     sets[j]++;
+
                 if (cols)
                     if (r->color > cols[j])
                         cols[j] = r->color;
@@ -944,54 +945,54 @@ If we run out of colors, then we need to spill the top node.
 static int
 try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
-    int x;
-    char *avail;
-    int t, n;
-    unsigned int *graph     = unit->interference_graph;
+    int             x;
+    char           *avail;
+    unsigned int   *graph   = unit->interference_graph;
     SymReg ** const reglist = unit->reglist;
 
-    /*
-     * unit->n_symbols should be an upper limit of needed colors
-     */
-    n = unit->n_symbols;
+    /* unit->n_symbols should be an upper limit of needed colors */
+    int n = unit->n_symbols;
+
     if (unit->max_color >= n)
         n = unit->max_color + 1;
 
     avail = (char *)mem_sys_allocate(n);
 
     for (x = 0; x < unit->n_symbols; ++x) {
+        int     already_allocated, color;
         SymReg *r = reglist[x];
+        int     t = -1;
+
         if (r->color >= 0)
             continue;
 
-        for (t = 0; t < 4; t++) {
-            const int typ               = "INSP"[t];
-            int       already_allocated = unit->first_avail[t];
-
-            /* don't even consider these regs */
-            if (r->set == typ) {
-                int color;
-
-                memset(avail, 1, n);
-                map_colors(unit, x, graph, avail, typ, already_allocated);
-                color = ig_find_color(unit, avail);
-                if (color >= 0) {
-                    color += already_allocated;
-                    r->color = color;
-
-                    IMCC_debug(interp, DEBUG_IMC,
-                            "#[%s] gets color [%d]\n",
-                            r->name, color);
-                    break;
-                }
-
-                if (r->color == -1) {
-                    IMCC_fatal(interp, DEBUG_IMC,
-                            "# no more colors - this should not happen\n");
-
-                }
-            }
+        switch (r->set) {
+            case 'I': t = 0; break;
+            case 'N': t = 1; break;
+            case 'S': t = 2; break;
+            case 'P': t = 3; break;
+            default :        break;
         }
+
+        if (t == -1)
+            continue;
+
+        already_allocated = unit->first_avail[t];
+
+        /* don't even consider these regs */
+        memset(avail, 1, n);
+        map_colors(unit, x, graph, avail, r->set, already_allocated);
+        color = ig_find_color(unit, avail);
+
+        if (color == -1)
+            IMCC_fatal(interp, DEBUG_IMC,
+                    "# no more colors - this should not happen\n");
+
+        color   += already_allocated;
+        r->color = color;
+
+        IMCC_debug(interp, DEBUG_IMC, "#[%s] gets color [%d]\n",
+            r->name, color);
     }
 
     mem_sys_free(avail);
