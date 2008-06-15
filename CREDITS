@@ -154,7 +154,7 @@ N: Chris Dolan
 D: TAP language author, and Parrot Bug fixes
 E: cdolan@cpan.org
 
-N: Christoph Otto
+N: Christoph Otto a.k.a. cotto
 D: Patch for key flags in pdd08
 D: Range check in Env PMC
 D: PHPArray implementation
