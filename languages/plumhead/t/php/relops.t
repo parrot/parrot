@@ -23,10 +23,27 @@ use lib "$FindBin::Bin/../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 12;
+use Test::More     tests => 13;
 
 # True tests
 my $expected = "Condition is true.\n";
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'zero is less than' );
+<?php
+if ( 0 < 2 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
 
 language_output_is( 'Plumhead', <<'END_CODE', $expected, 'less than' );
 <?php

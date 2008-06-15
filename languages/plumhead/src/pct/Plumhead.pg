@@ -24,8 +24,8 @@ token PAREN_CLOSE             { \) }
 token IDENT                   { <[a..zA..Z_]>* <[a..zA..Z_0..9]>* }
 token VAR_NAME                {  '$' <IDENT> }
 
-token INTEGER                 { \d+   {*} }
-token NUMBER                  { ( \d+ )? '.' \d+ }
+token INTEGER                 { \d+              {*} }
+token NUMBER                  { ( \d+ )? '.' \d+ {*} }
 
 token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
@@ -45,7 +45,7 @@ token sea_or_code             { <SEA>    {*}   #= SEA
 
 rule  code                    { <.CODE_START> <statement>*  <.CODE_END>? {*} }
 
-rule relational_expression    { <expression> <rel_op_clause>? }
+rule relational_expression    { <expression> <rel_op_clause>? {*} }
 
 rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )  ( ';' | <before \? > | $ ) {*} #= ECHO
                               | <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE> ( ';' | <before \? > | $ )                   {*} #= VAR_DUMP

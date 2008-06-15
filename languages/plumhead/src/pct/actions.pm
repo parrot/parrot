@@ -19,9 +19,11 @@ class Plumhead::Grammar::Actions;
 
 # The method TOP is invoked per default by the HLLCompiler
 method TOP($/) {
-    make PAST::Block.new( $( $<program> ),              # there is exactly one program
-                          :name('TCFKAP'),
-                          :node($/), );
+    make PAST::Block.new(
+             $( $<program> ),
+             :name('Plum-Headed Parakeet'),
+             :node($/)
+         );
 }
 
 method program($/) {
@@ -44,15 +46,19 @@ method SEA($/) {
                  :returns('String')
              ),
              :pasttype('call'),
-             :name('echo')
+             :name('echo'),
+             :node($/)
          );
 }
 
 # loop over the statements in the PHP section
 method code($/) {
-    my $past  := PAST::Stmts.new( :node($/), :name('code') );
+    my $past  := PAST::Stmts.new(
+                     :node($/),
+                     :name('code')
+                 );
     for $<statement> {
-        $past.push( $( $_ ) );
+        $past.push( $($_) );
     }
     make $past;
 }
@@ -62,7 +68,28 @@ method statement($/,$key) {
         make PAST::Op.new(
                  $( $/[0]<expression> ),
                  :pasttype('call'),
-                 :name('echo')
+                 :name('echo'),
+                 :node($/)
+             );
+    }
+    elsif $key eq 'VAR_DUMP' {
+        make PAST::Op.new(
+                 $( $<expression> ),
+                 :pasttype('call'),
+                 :name('var_dump'),
+                 :node($/)
+             );
+    }
+    elsif $key eq 'IF' {
+        my $past_if_block := PAST::Stmts.new( );
+        for $<statement> {
+            $past_if_block.push( $($_) );
+        }
+        make PAST::Op.new(
+                 $( $<relational_expression> ),
+                 $past_if_block,
+                 :pasttype('if'),
+                 :node($/)
              );
     }
     elsif $key eq 'inline_sea' {
@@ -72,34 +99,54 @@ method statement($/,$key) {
                      :returns('String')
                  ),
                  :pasttype('call'),
-                 :name('echo')
+                 :name('echo'),
+                 :node($/)
              );
     }
 }
 
-
-method SINGLEQUOTE_STRING($/) {
-    make PAST::Val.new(
-             :value( $($<string_literal>) ),
-             :returns('String'),
-             :node($/)
-         );
+method relational_expression($/) {
+    if $<rel_op_clause> {
+        my %name;
+        %name{'=='} := 'infix:eq';
+        %name{'!='} := 'infix:ne';
+        my $rel_op_clause := $/{'rel_op_clause'}{'REL_OP'};
+        my $op := ~$rel_op_clause{'REL_OP'};
+        my $name := %name{ $op } || "infix:" ~ $op;
+        make PAST::Op.new(
+                 $( $<expression> ),
+                 $( $rel_op_clause{'expression'} ),
+                 :node($/),
+                 :name($name)
+             );
+    }
+    else {
+        make $( $<expression> );
+    }
 }
 
-
-method INTEGER($/) {
-    make PAST::Val.new(
-        :value( +$/ ),
-        :returns('Integer'),
-        :node($/)
-    );
-}
 method expression($/,$key) {
     make $( $/{$key} );
 }
 
 method bitwise_expression($/) {
-    make $( $<adding_expression> );
+    my $past := $( $<adding_expression> );
+    if $<bitwise_tail> {
+       for $<bitwise_tail> {
+           my $past_prev := $past;
+           my %name;
+           %name{'&'} := 'infix:+&';
+           %name{'|'} := 'infix:+|';
+           %name{'^'} := 'infix:+^';
+           my $name := %name{ $_<BITWISE_OP> };
+           $past := PAST::Op.new(
+                        $past_prev,
+                        $( $_<adding_expression> ),
+                        :name($name)
+                    );
+       }
+    }
+    make $past;
 }
 
 method adding_expression($/) {
@@ -124,7 +171,11 @@ method multiplying_expression($/) {
     if $<multiplicand> {
        for $<multiplicand> {
            my $past_prev := $past;
-           my $pir_op := $_<MUL_OP> eq '*' ?? 'n_mul' !! 'n_div';
+           my %pirop;
+           %pirop{'*'} := 'n_mul';
+           %pirop{'/'} := 'n_div';
+           %pirop{'%'} := 'n_mod';
+           my $pir_op := %pirop{ $_<MUL_OP> };
            $past := PAST::Op.new(
                         $past_prev,
                         $( $_<multiplying_expression> ),
@@ -140,7 +191,8 @@ method unary_expression($/) {
         make PAST::Op.new(
                  $( $<postfix_expression> ),
                  :name('prefix:-'),
-                 :pirop('n_neg')
+                 :pirop('n_neg'),
+                 :node($/)
              );
     }
     else {
@@ -158,6 +210,30 @@ method postfix_expression($/,$key) {
 
 method string($/,$key) {
     make $( $/{$key} );
+}
+
+method INTEGER($/) {
+    make PAST::Val.new(
+             :value( ~$/ ),
+             :returns('Integer'),
+             :node($/)
+         );
+}
+
+method NUMBER($/) {
+    make PAST::Val.new(
+             :value( +$/ ),
+             :returns('Float'),
+             :node($/)
+         );
+}
+
+method SINGLEQUOTE_STRING($/) {
+    make PAST::Val.new(
+             :value( $($<string_literal>) ),
+             :returns('String'),
+             :node($/)
+         );
 }
 
 method DOUBLEQUOTE_STRING($/) {
