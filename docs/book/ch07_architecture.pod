@@ -86,7 +86,7 @@ afterward.
 =begin figure Parrot's flow
 
 Z<CHP-7-FIG-1>
-F<figs/p6e_0801.gif>
+F<figs/p6e_0801.png>
 
 =end figure
 
