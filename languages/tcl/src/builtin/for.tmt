@@ -19,14 +19,14 @@ continue:
 command_exception:
   .catch()
   .get_return_code($I0)
-  if $I0 == .TCL_CONTINUE goto continue
-  if $I0 == .TCL_BREAK    goto done
+  if $I0 == .CONTROL_CONTINUE goto continue
+  if $I0 == .CONTROL_BREAK    goto done
   .rethrow()
 
 next_exception:
   .catch()
   .get_return_code($I0)
-  if $I0 == .TCL_BREAK goto done
+  if $I0 == .CONTROL_BREAK goto done
   .rethrow()
 
 done:

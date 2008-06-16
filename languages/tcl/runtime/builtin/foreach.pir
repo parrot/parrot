@@ -112,8 +112,8 @@ handle_continue:
   .catch()
   .local int return_type
   .get_return_code(return_type)
-  if return_type == .TCL_BREAK goto done
-  if return_type == .TCL_CONTINUE goto next_iteration
+  if return_type == .CONTROL_BREAK goto done
+  if return_type == .CONTROL_CONTINUE goto next_iteration
   .rethrow()
 
 done:

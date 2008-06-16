@@ -225,9 +225,9 @@ is_return:
   .catch()
   .get_return_code($I0)
   $P0 = pop call_chain
-  if $I0 == .TCL_CONTINUE goto bad_continue
-  if $I0 == .TCL_BREAK    goto bad_break
-  if $I0 != .TCL_RETURN goto not_return_nor_ok
+  if $I0 == .CONTROL_CONTINUE goto bad_continue
+  if $I0 == .CONTROL_BREAK    goto bad_break
+  if $I0 != .CONTROL_RETURN   goto not_return_nor_ok
   .get_message($P0)
   .return ($P0)
 bad_continue:

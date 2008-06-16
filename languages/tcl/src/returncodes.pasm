@@ -4,6 +4,9 @@ A convenience: we need these return codes in many different bytecode files.
 
 =cut
 
+ .include 'except_types.pasm'
+ .include 'except_severity.pasm'
+
  .macro_const TCL_OK       0
  .macro_const TCL_ERROR    1
  .macro_const TCL_RETURN   2
@@ -12,8 +15,8 @@ A convenience: we need these return codes in many different bytecode files.
 
  # values for accessing exception information
  .macro_const VALUE_SLOT    0 # _message
+ .macro_const CODE_SLOT     1 # _type
  .macro_const SEVERITY_SLOT 2 # _severity
- .macro_const CODE_SLOT     9 # tcl return code.
 
 # Local Variables:
 #   mode: pir

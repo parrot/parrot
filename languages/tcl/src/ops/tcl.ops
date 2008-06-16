@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2007, The Perl Foundation.
+ * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
 /*
@@ -9,6 +9,7 @@
 
 #include "parrot/parrot.h"
 #include "parrot/string_funcs.h"
+#include "parrot/exceptions.h"
 
 #include "../binary.h"
 
@@ -84,11 +85,10 @@ Generate a $1 with $2 as the value.
 inline op tcl_error(in PMC) {
   opcode_t * ret;
   opcode_t * dest;
-  INTVAL TCL_ERROR = 1;
   PMC* exception = pmc_new(interp, enum_class_Exception);
 
   VTABLE_set_pmc_keyed_int(interp, exception, (INTVAL)0, $1);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_ERROR);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, CONTROL_ERROR);
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);
@@ -98,11 +98,10 @@ inline op tcl_error(in PMC) {
 inline op tcl_error(in STR) {
   opcode_t * ret;
   opcode_t * dest;
-  INTVAL TCL_ERROR = 1;
   PMC* exception = pmc_new(interp, enum_class_Exception);
 
   VTABLE_set_string_keyed_int(interp, exception, 0, $1);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_ERROR);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, CONTROL_ERROR);
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);
@@ -112,7 +111,6 @@ inline op tcl_error(in STR) {
 inline op tcl_error(in STR, in PMC) {
   opcode_t * ret;
   opcode_t * dest;
-  INTVAL TCL_ERROR = 1;
   PMC* errorCode, *ns;
   PMC* const root_ns = interp->root_namespace;
   PMC* exception = pmc_new(interp, enum_class_Exception);
@@ -125,7 +123,7 @@ inline op tcl_error(in STR, in PMC) {
   VTABLE_assign_pmc(interp, errorCode, $2);
 
   VTABLE_set_string_keyed_int(interp, exception, 0, $1);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_ERROR);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, CONTROL_ERROR);
 
   ret = expr NEXT();
   dest = (opcode_t *)
@@ -139,7 +137,7 @@ inline op tcl_error(in INT, in PMC) {
   PMC* exception = pmc_new(interp, enum_class_Exception);
 
   VTABLE_set_pmc_keyed_int(interp, exception, 0, $2);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, $1);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, $1);
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);
@@ -157,11 +155,10 @@ Generate a TCL_RETURN, returning the specified value
 inline op tcl_return(in PMC) {
   opcode_t * ret;
   opcode_t * dest;
-  INTVAL TCL_RETURN = 2;
   PMC* exception = pmc_new(interp, enum_class_Exception);
 
   VTABLE_set_pmc_keyed_int(interp, exception, 0, $1);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_RETURN);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, CONTROL_RETURN);
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);
@@ -171,11 +168,10 @@ inline op tcl_return(in PMC) {
 inline op tcl_return(in STR) {
   opcode_t * ret;
   opcode_t * dest;
-  INTVAL TCL_RETURN = 2;
   PMC* exception = pmc_new(interp, enum_class_Exception);
 
   VTABLE_set_string_keyed_int(interp, exception, 0, $1);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_RETURN);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, CONTROL_RETURN);
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);
@@ -191,12 +187,11 @@ Generate a TCL_BREAK
 inline op tcl_break() {
   opcode_t * ret;
   opcode_t * dest;
-  INTVAL TCL_BREAK = 3;
   PMC* exception = pmc_new(interp, enum_class_Exception);
   STRING* empty = string_make_empty(interp, enum_stringrep_one, 0);
 
   VTABLE_set_string_keyed_int(interp, exception, 0, empty);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_BREAK);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, CONTROL_BREAK);
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);
@@ -212,12 +207,11 @@ Generate a TCL_CONTINUE
 inline op tcl_continue() {
   opcode_t * ret;
   opcode_t * dest;
-  INTVAL TCL_CONTINUE = 4;
   PMC* exception = pmc_new(interp, enum_class_Exception);
   STRING* empty = string_make_empty(interp, enum_stringrep_one, 0);
 
   VTABLE_set_string_keyed_int(interp, exception, 0, empty);
-  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_CONTINUE);
+  VTABLE_set_integer_keyed_int(interp, exception, 1, CONTROL_CONTINUE);
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);

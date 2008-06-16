@@ -293,8 +293,8 @@ end_script_loop:
 body_handler:
   .catch()
   .get_return_code($I0)
-  if $I0 == .TCL_CONTINUE goto script_loop
-  if $I0 == .TCL_BREAK goto end_script_loop
+  if $I0 == .CONTROL_CONTINUE goto script_loop
+  if $I0 == .CONTROL_BREAK goto end_script_loop
   .rethrow()
 
 bad_script_args:
@@ -361,8 +361,8 @@ for_loop:
 loop_handler:
   .catch()
   .get_return_code($I0)
-  if $I0 == .TCL_CONTINUE goto for_loop
-  if $I0 == .TCL_BREAK goto for_loop_done
+  if $I0 == .CONTROL_CONTINUE goto for_loop
+  if $I0 == .CONTROL_BREAK goto for_loop_done
   .rethrow()
 
 for_loop_done:
