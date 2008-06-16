@@ -384,9 +384,8 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 SET_FLAG(PARROT_PROFILE_FLAG);
                 break;
             case 't':
-                if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
+                if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
                     SET_TRACE(strtoul(opt.opt_arg, 0, 16));
-                }
                 else
                     SET_TRACE(PARROT_TRACE_OPS_FLAG);
                 break;

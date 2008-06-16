@@ -177,7 +177,7 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                         }
                     }
                     else if (dptr->opt_flags & OPTION_optional_FLAG) {
-                        if (dex+1 < argc && argv[dex+1][0] &&
+                        if (dex+2 < argc && argv[dex+1][0] &&
                                 argv[dex+1][0] != '-') {
                             info_buf->opt_arg = argv[dex+1];
                             ++info_buf->opt_index;
