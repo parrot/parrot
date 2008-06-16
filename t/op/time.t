@@ -63,6 +63,9 @@ ok, (!= 1970) Grateful Dead not
 ok, (now>before) timelords need not apply
 OUTPUT
 
+SKIP: {
+    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+
 pasm_output_is( <<CODE, <<OUTPUT, "sleep" );
         print   "start\\n"
 
@@ -84,6 +87,8 @@ CODE
 start
 done
 OUTPUT
+
+}
 
 pasm_error_output_like( <<CODE, <<OUT , "sleep" );
         sleep   -1

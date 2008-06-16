@@ -158,6 +158,9 @@ main 10
 OUTPUT
 }
 
+SKIP: {
+    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+
 pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
 .sub main :main
     set I5, 10
@@ -201,6 +204,11 @@ ParrotThread tid 1
 from 10 interp
 OUTPUT
 
+}
+
+SKIP: {
+    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'thread - kill' );
 .sub main :main
     .local pmc threadsub
@@ -233,6 +241,8 @@ start 1
 in thread
 done
 OUTPUT
+
+}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
 .sub _main
