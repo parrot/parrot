@@ -13,7 +13,7 @@ RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 LANGUAGES = \
     abc APL \
     BASIC befunge bf \
-    c99 cardinal cola \
+    c99 cardinal chitchat cola \
     dotnet \
     eclectus ecmascript \
     forth \
@@ -81,7 +81,7 @@ test-unified: all
 test-separate: all \
     abc.test APL.test \
     befunge.test bf.test \
-    c99.test cardinal.test cola.test \
+    c99.test cardinal.test chitchat.test cola.test \
     dotnet.test \
     eclectus.test ecmascript.test \
     forth.test \
@@ -109,7 +109,7 @@ smoke-clean :
 clean: \
     abc.clean APL.clean \
     BASIC.clean befunge.clean bf.clean \
-    c99.clean cardinal.clean cola.clean \
+    c99.clean cardinal.clean chitchat.clean cola.clean \
     dotnet.clean \
     ecmascript.clean \
     forth.clean \
@@ -131,7 +131,7 @@ clean: \
 realclean: \
     abc.realclean APL.realclean \
     befunge.realclean bf.realclean \
-    c99.realclean cardinal.realclean cola.realclean \
+    c99.realclean cardinal.realclean chitchat.realclean cola.realclean \
     dotnet.realclean \
     eclectus.realclean ecmascript.realclean \
     forth.realclean \
@@ -222,6 +222,16 @@ cardinal.clean:
 	- $(MAKE) cardinal clean
 cardinal.realclean:
 	- $(MAKE) cardinal realclean
+
+chitchat : chitchat.dummy
+chitchat.dummy:
+	- $(MAKE) chitchat
+chitchat.test:
+	- $(MAKE) chitchat test
+chitchat.clean:
+	- $(MAKE) chitchat clean
+chitchat.realclean:
+	- $(MAKE) chitchat realclean
 
 cola : cola.dummy
 cola.dummy:

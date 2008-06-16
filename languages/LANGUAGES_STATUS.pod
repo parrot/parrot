@@ -173,12 +173,13 @@ C<languages/c99>
 
 =item Description
 
-Implementation of Ruby CVS Head 1.9
+Implementation of Ruby 1.9
 
 =item Status
 
 Parser is pretty complete.
-Generates PIR for basic Ruby programs
+Decent support for aggregates and classes.
+Minimal class hierarchy.
 
 =item Last verified with parrot version
 
@@ -187,6 +188,29 @@ Generates PIR for basic Ruby programs
 =item Location
 
 C<languages/cardinal>
+
+=back
+
+=head2 Chitchat
+
+=over 4
+
+=item Description
+
+Smalltalk compiler
+
+=item Status
+
+Parser is decent.
+Everything else is nonexistant.
+
+=item Last verified with parrot version
+
+0.6.2
+
+=item Location
+
+C<languages/chitchat>
 
 =back
 
