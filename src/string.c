@@ -268,9 +268,8 @@ string_init(PARROT_INTERP)
         interp->const_cstring_hash  = (struct Hash *)const_cstring_hash;
         Parrot_charsets_encodings_init(interp);
     }
-
     /* initialize the constant string table */
-    if (interp->parent_interpreter) {
+    else {
         interp->const_cstring_table =
             interp->parent_interpreter->const_cstring_table;
         interp->const_cstring_hash  =
