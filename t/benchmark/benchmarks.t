@@ -205,7 +205,9 @@ SArray:\s\d+\.\d+s\n
 
 # These scripts are known to be failing.
 # Heh, currently all tests are working!
-my %todo = ();
+my %todo = ( 'primes2_i.pasm' => 'deprecated opcodes are being used',
+             'primes2.pasm' => 'deprecated opcodes are being used' 
+           );
 
 plan tests => scalar keys %outputs;
 
