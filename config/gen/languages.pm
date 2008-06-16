@@ -49,7 +49,7 @@ sub runstep {
     $languages = qq{
         APL abc
         befunge bf
-        cardinal c99 cola
+        cardinal chitchat cola c99
         eclectus ecmascript
         forth
         hq9plus
