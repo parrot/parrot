@@ -1,7 +1,7 @@
 #! perl
 # $Id$
 
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 
 =head1 NAME
 
@@ -24,7 +24,8 @@ my $string_private_h = 'src/string_private_cstring.h';
 
 # add read/write permissions even if we don't read/write the file
 # for example, Solaris requires write permissions for exclusive locks
-my $ALL = IO::File->new($outfile, O_CREAT | O_RDWR) or die "Can't open '$outfile': $!\n";
+my $ALL = IO::File->new($outfile, O_CREAT | O_RDWR)
+    or die "Can't open '$outfile': $!\n";
 
 flock( $ALL, LOCK_EX ) or die "Can't lock '$outfile': $!\n";
 
@@ -52,7 +53,7 @@ $file =~ s/\.c$//;
 my $infile = $file . '.c';
 die "$0: $infile: $!" unless -e $infile;
 
-my %known_strings = ();
+my %known_strings;
 my @all_strings;
 
 read_all();
@@ -86,7 +87,7 @@ sub read_all {
         # len hashval "string"
         if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
             push @all_strings, [ $1, $2, $3 ];
-            $known_strings{$3} = scalar @all_strings;
+            $known_strings{$3} = @all_strings;
         }
     }
     return;
@@ -113,6 +114,9 @@ sub process_cfile {
 #define CONCAT(a,b) a##b
 #define _CONST_STRING(i, l) (i)->const_cstring_table[CONCAT(_CONST_STRING_, l)]
 #define CONST_STRING(i, s) _CONST_STRING(i, __LINE__)
+#define CONST_STRING_GEN(i, s) _CONST_STRING_GEN(i, __LINE__)
+#define _CONST_STRING_GEN(i, l) \\
+    (i)->const_cstring_table[CONCAT(_CONST_STRING_GEN_, l)]
 
 HEADER
     print $ALL "# $infile\n";
@@ -137,28 +141,30 @@ HEADER
         }
         $line++;
         next if m/^\s*#/;    # otherwise ignore preprocessor
-        next unless s/.*\bCONST_STRING\s*\(\w+\s*,//;
+        next unless s/.*\bCONST_STRING(_GEN)?\s*\(\w+\s*,//;
+        my $const_string = defined $1 ? 'CONST_STRING_GEN' : 'CONST_STRING';
 
-        if ( $lines_seen{$line}++ ) {
+        if ( $lines_seen{"$line:$const_string"}++ ) {
             die "Seen line $line before in $infile - can't continue";
         }
 
-        # RT#46909 maybe cope with escaped \"
+        # RT #46909 maybe cope with escaped \"
         my $cnt = tr/"/"/;
-        die "bogus CONST_STRING at line $line" if $cnt % 2;
+        die "bogus $const_string at line $line" if $cnt % 2;
 
         my $str = extract_delimited;    # $_, '"';
-        $str = substr $str, 1, -1;
+        $str    = substr $str, 1, -1;
         ## print STDERR "** '$str' $line\n";
         my $n;
         if ( $n = $known_strings{$str} ) {
-            if ( $this_file_seen{$str} ) {
-                print "#define _CONST_STRING_$line _CONST_STRING_", $this_file_seen{$str}, "\n";
+            if ( $this_file_seen{"$const_string:$str"} ) {
+                print "#define _${const_string}_$line _${const_string}_",
+                    $this_file_seen{"$const_string:$str"}, "\n";
             }
             else {
-                print "#define _CONST_STRING_$line $n\n";
+                print "#define _${const_string}_$line $n\n";
             }
-            $this_file_seen{$str} = $line;
+            $this_file_seen{"$const_string:$str"} = $line;
             next;
         }
         my $len               = get_length($str);
@@ -167,8 +173,8 @@ HEADER
 
         $n                    = @all_strings;
         $known_strings{$str}  = $n;
-        $this_file_seen{$str} = $line;
-        print "#define _CONST_STRING_$line $n\n";
+        $this_file_seen{"$const_string:$str"} = $line;
+        print "#define _${const_string}_$line $n\n";
         print $ALL qq!$len\t$hashval\t"$str"\n!;
     }
     close($IN);

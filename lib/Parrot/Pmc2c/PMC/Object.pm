@@ -1,6 +1,6 @@
 package Parrot::Pmc2c::PMC::Object;
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 use base 'Parrot::Pmc2c::PMC';
@@ -42,7 +42,7 @@ sub pre_method_gen {
         $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     Parrot_Object * const obj       = PARROT_OBJECT(pmc);
     Parrot_Class  * const _class    = PARROT_CLASS(obj->_class);
-    STRING        * const meth_name = CONST_STRING(interp, "$vt_method_name");
+    STRING        * const meth_name = CONST_STRING_GEN(interp, "$vt_method_name");
 
     /* Walk and search for the vtable method. */
     const int num_classes = VTABLE_elements(interp, _class->all_parents);
@@ -60,7 +60,7 @@ sub pre_method_gen {
         if (cur_class->vtable->base_type == enum_class_PMCProxy) {
             /* Get the PMC instance and call the vtable method on that. */
             PMC * const del_object =
-                VTABLE_get_attr_keyed(interp, SELF, cur_class, CONST_STRING(interp, "proxy"));
+                VTABLE_get_attr_keyed(interp, SELF, cur_class, CONST_STRING_GEN(interp, "proxy"));
 
             if (!PMC_IS_NULL(del_object)) {
                 ${return}VTABLE_$vt_method_name(interp, del_object$args);

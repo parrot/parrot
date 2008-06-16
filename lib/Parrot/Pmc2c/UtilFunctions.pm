@@ -158,7 +158,7 @@ EOC
     while ( my ( $class, $info ) = each %classes ) {
         my $lhs = $info->{flags}{no_init} ? "" : "type$class = ";
         $cout .= <<"EOC";
-    whoami = CONST_STRING(interp, "$class");
+    whoami = CONST_STRING_GEN(interp, "$class");
     ${lhs}pmc_register(interp, whoami);
 EOC
     }

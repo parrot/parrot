@@ -181,7 +181,7 @@ sub gen_arg_accessor {
         return "    $name = CTX_REG_$tiss(_ctx, $index);\n";
     }
     elsif ( 'name' eq $arg_type ) {
-        return "    CTX_REG_$tiss(_ctx, $index) = CONST_STRING(interp, $name);\n";
+        return "    CTX_REG_$tiss(_ctx, $index) = CONST_STRING_GEN(interp, $name);\n";
     }
     else {  #$arg_type eq 'param' or $arg_type eq 'return'
         return "    CTX_REG_$tiss(_ctx, $index) = $name;\n";
@@ -581,7 +581,7 @@ sub process_pccmethod_parameters {
     my $parameters                       = shift;
     my ($interp, $pmc, $method, @params) = split /,\s*/, $parameters;
 
-    $method = 'CONST_STRING(interp, ' . $method . ')';
+    $method = 'CONST_STRING_GEN(interp, ' . $method . ')';
 
     my $fixed_params = join ', ', $interp, $pmc, $method;
 
@@ -643,7 +643,7 @@ sub process_parameter {
         $type .= $type_mod;
 
         next unless $type eq 'named';
-        push @arg_names, qq|CONST_STRING(interp, "$argument")|;
+        push @arg_names, qq|CONST_STRING_GEN(interp, "$argument")|;
     }
 
     return ($type, @arg_names);

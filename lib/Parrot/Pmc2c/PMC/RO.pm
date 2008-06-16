@@ -90,7 +90,7 @@ sub new {
             my $real_findmethod = 'Parrot_' . $find_method_parent . '_find_method';
             my $body            = <<"EOC";
     PMC *const method = $real_findmethod(interp, pmc, method_name);
-    if (!PMC_IS_NULL(VTABLE_getprop(interp, method, CONST_STRING(interp, "write"))))
+    if (!PMC_IS_NULL(VTABLE_getprop(interp, method, CONST_STRING_GEN(interp, "write"))))
         return PMCNULL;
     else
         return method;

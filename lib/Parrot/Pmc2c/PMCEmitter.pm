@@ -70,6 +70,7 @@ sub generate_c_file {
     if ($self->is_dynamic) {
         $c->emit("#define PARROT_IN_EXTENSION\n");
         $c->emit("#define CONST_STRING(i, s) const_string((i), s)\n");
+        $c->emit("#define CONST_STRING_GEN(i, s) const_string((i), s)\n");
     }
 
     $self->gen_includes;
@@ -612,8 +613,8 @@ EOC
     }
     else {
         $cout .= <<"EOC";
-        vt_clone->whoami       = CONST_STRING(interp, "$classname");
-        vt_clone->provides_str = CONST_STRING(interp, "$provides");
+        vt_clone->whoami       = CONST_STRING_GEN(interp, "$classname");
+        vt_clone->provides_str = CONST_STRING_GEN(interp, "$provides");
 
         /* set up isa hash */
         parrot_new_hash(interp, &isa_hash);
@@ -643,7 +644,7 @@ EOC
 
     for my $isa ($classname, @isa) {
         $cout .= <<"EOC";
-        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING(interp, "$isa")), PMCNULL);
+        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING_GEN(interp, "$isa")), PMCNULL);
 EOC
     }
 
@@ -660,7 +661,7 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING(interp, "$hll")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll")
             );
             if (pmc_id > 0) {
 EOC
@@ -689,7 +690,7 @@ EOC
 
     for my $isa ($classname, @isa) {
         $cout .= <<"EOC";
-            VTABLE_push_string(interp, mro, CONST_STRING(interp, "$isa"));
+            VTABLE_push_string(interp, mro, CONST_STRING_GEN(interp, "$isa"));
 EOC
     }
 
