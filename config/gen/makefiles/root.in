@@ -733,8 +733,8 @@ help :
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
 	@echo "  cover:             Run test suite coverage analysis."
-	@echo "  tags:              Create tags for the vi editor."
-	@echo "  TAGS:              Create tags for the EMACS editor."
+	@echo "  tags-vi:           Create tags for the vi editor."
+	@echo "  tags-emacs:        Create tags for the EMACS editor."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
@@ -2168,7 +2168,7 @@ $(LIBGLUTCB_SO): $(LIBPARROT) $(SRC_DIR)/glut_callbacks$(O)
 # emacs etags
 # this needs exuberant-ctags
 
-TAGS: TAGS.dummy
+tags-emacs: tags.emacs.dummy
 	$(RM_F) TAGS
 	@ctags@ -e \
         --links=no --totals \
@@ -2178,12 +2178,12 @@ TAGS: TAGS.dummy
         -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
         $(CUR_DIR)
 
-TAGS.dummy:
+tags.emacs.dummy:
 
 # vim ctags
 # this needs exuberant-ctags
 
-tags: tags.dummy
+tags-vi: tags.vi.dummy
 	$(RM_F) tags
 	@ctags@ \
     --links=no --totals \
@@ -2194,7 +2194,7 @@ tags: tags.dummy
     $(CUR_DIR)
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
-tags.dummy:
+tags.vi.dummy:
 
 # This target will eventually create all the headers automatically.  If you are
 # having problems with linkage in Win32 (or elsewhere), because something is
