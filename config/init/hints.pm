@@ -40,21 +40,21 @@ sub runstep {
     my $hints_file = catfile('config', 'init', 'hints', "$osname.pm");
     if ( -f $hints_file ) {
         my $hints_pkg = "init::hints::" . $osname;
-    
+
         print "$hints_pkg " if $verbose;
-    
+
         eval "use $hints_pkg";
         die $@ if $@;
-    
+
         # Call the runstep method if it exists.
         # Otherwise the step must have done its work when it was loaded.
         $hints_pkg->runstep( $conf, @_ ) if $hints_pkg->can('runstep');
         $hints_used++;
-    
+
         $hints_pkg = "init::hints::local";
         print "$hints_pkg " if $verbose;
         eval "use $hints_pkg";
-    
+
         unless ($@) {
             $hints_pkg->runstep( $conf, @_ ) if $hints_pkg->can('runstep');
             $hints_used++;
