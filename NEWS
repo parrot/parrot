@@ -2,14 +2,15 @@
 
 New for next release (2008-06-17, version undecided)
 - Languages:
-  + Squaak: implement return statement
-  + Pynie: return statement, other minor updates
   + Cardinal:
     - dramatically improved parsing speed
     - added support for defining and instantiating classes
     - started fleshing out the builtin class hierarchy
     - added support for hashes and arrays
   + Chitchat: added the start of a smalltalk compiler
+  + Pynie: return statement, other minor updates
+  + Squaak: implement return statement
+  + Tcl: updated control flow exceptions to use new builtin types
 - Configuration
   + expanded step gen::opengl
 - Miscellaneous
