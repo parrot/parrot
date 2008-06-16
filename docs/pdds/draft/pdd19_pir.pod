@@ -5,6 +5,11 @@
 
 docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
 
+=head1 VERSION
+
+$Revision$
+
+
 =head1 ABSTRACT
 
 This document outlines the architecture and core syntax of the Parrot
