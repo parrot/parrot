@@ -21,6 +21,21 @@ object.
 
 =cut
 
+.namespace [ 'Transcript' ]
+
+.sub 'show:' :method
+    .param pmc arg
+    say arg
+.end
+
+.namespace []
+
+.sub 'onload' :anon :load :init
+    $P0 = newclass 'Transcript'
+    $P0 = new 'Transcript'
+    set_hll_global 'Transcript', $P0
+.end
+
 .namespace [ 'ChitChat::Compiler' ]
 
 .loadlib 'chitchat_group'

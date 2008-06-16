@@ -20,36 +20,90 @@ class ChitChat::Grammar::Actions;
 
 method TOP($/) {
     my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    for $<statement> {
+    for $<exprs> {
         $past.push( $( $_ ) );
     }
     make $past;
 }
 
 
-method statement($/) {
-    my $past := PAST::Op.new( :name('say'), :pasttype('call'), :node( $/ ) );
-    for $<value> {
+method exprs($/) {
+    my $past := PAST::Stmts.new();
+    for $<expr> {
         $past.push( $( $_ ) );
     }
     make $past;
 }
 
+method expr($/) {
+    make $( $<expr2> );
+}
 
-method value($/, $key) {
+method expr2($/) {
+    make $( $<msgexpr> );
+}
+
+method msgexpr($/,$key) {
     make $( $/{$key} );
 }
 
-
-method integer($/) {
-    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
+method keyexpr($/) {
+    my $past := PAST::Op.new( :pasttype('callmethod') );
+    $past.push( PAST::Var.new( :name(~$<keyexpr2>), :scope('package') ) );
+    my @args := $( $<keymsg> );
+    my $name := '';
+    while +@args {
+        $name := $name ~ ~@args.shift();
+        $past.push( @args.shift() );
+    }
+    $past.name($name);
+    make $past;
 }
 
-
-method quote($/) {
-    make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );
+method keyexpr2($/) {
+    make $( $<primary> );
 }
 
+method keymsg($/) {
+    my @past;
+    my $num := +$<keysel>;
+    my $i := 0;
+    while $i < $num {
+        @past.push( ~$<keysel>[$i] );
+        @past.push( $($<keyexpr2>[$i]) );
+        $i++;
+    }
+    make @past;
+}
+
+method binaryexpr($/) {
+    $/.panic('binary expressions not yet implemented');
+}
+
+method unaryexpr($/) {
+    $/.panic('unary expressions not yet implemented');
+}
+
+method primary($/) {
+    make $( $<unit> );
+}
+
+method unit($/,$key) {
+    if $key eq 'literal' {
+        make $( $/{$key} );
+    }
+    else {
+        make ~$/;
+    }
+}
+
+method literal($/,$key) {
+    make $( $/{$key} );
+}
+
+method string($/) {
+    make PAST::Val.new( :value(~$<text>), :returns('String') );
+}
 
 # Local Variables:
 #   mode: cperl

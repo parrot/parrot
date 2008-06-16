@@ -9,222 +9,114 @@ This is the grammar for ChitChat written as a sequence of Perl 6 rules.
 grammar ChitChat::Grammar is PCT::Grammar;
 
 token TOP {
-    <.ws>?
-    <ExecutableCode>+
-    <.ws>?
+    <ws>
+    [ | <exprs>
+      | <methods>
+      | '!'
+    ]+
+    <ws>
     [ $ || <panic: 'Syntax error'> ]
     {*}
 }
 
-token WhitespaceCharacter {
-    \h | \n | \t
-}
-token CommentCharacter {
-    <-["]>
-}
+token whitespace { \h | \v | <comment> }
 
-token Comment {
-    '"' <.CommentCharacter>* '"'
-}
-token OptionalWhitespace {
-    [ <.WhitespaceCharacter> | <Comment> ]*
-}
-token ws {
-    [ <.WhitespaceCharacter> | <Comment> ]+
-}
-token Whitespace { <ws> }
+token ws { <whitespace>* }
 
-token Identifier {
-    [<.alpha>|'_'] [<.alnum>|'_']*
-}
+token comment { '"' <-["]>* '"' }
 
-token Reference { <Identifier> }
+rule methods { '!' <id> 'class'? 'methodsFor:' <string> '!' [<method> '!']? '!' }
 
-token ConstantReference {
-    | 'nil'
-    | 'false'
-    | 'true'
-}
+rule method { <message> <pragma>? <temps>? <exprs> }
 
-token PsuedoVariableReference {
-    | 'self'
-    | 'super'
-    | 'thisContext'
-}
+token message { <id> | <binsel> <.ws> <id> | [<keysel> <.ws> <id>]+ }
 
-token ReservedIdentifier {
-    | <PsuedoVariableReference>
-    | <ConstantReference>
-}
+token pragma { '<' <keymsg> '>' }
 
-token BindableIdentifier {
-    <!ReservedIdentifier> <Identifier>
-}
+rule temps { '|' [<id> ]* '|' }
 
-token UnaryMessageSelector { <Identifier> }
+token unit { 
+             | <id>                  {*}  #= id
+             | <literal>             {*}  #= literal
+             | <block>               {*}  #= block
+             | <arrayconstructor>    {*}  #= arrayconstructor
+             | '(' <expr> ')'        {*}  #= expr
+           }
 
-token Keyword {
-    <Identifier> ':'
-}
+rule unaryexpr { <unit> [<!keysel><id> ]+ {*} }
 
-token KeywordMessageSelector {
-    <Keyword>+
-}
+token primary { <!unaryexpr> <unit> {*} | <unaryexpr> {*} }
 
-token BinarySelectorChar {
-    <[~!@%&*\-+=|\\<>,?/]>
-}
+rule exprs {  [
+                | <expr> [ '.' <expr>]* ['.' '^' <expr>]? '.'?
+                | '^' <expr> '.'?
+              ] {*}
+           }
 
-token BinaryMessageSelector {
-    <BinarySelectorChar>**{1..2}
-}
+rule expr { [<id> [':='|'_']]* <expr2>  {*} }
 
-token IntegerLiteral {
-    '-'? <UnsignedIntegerLiteral>
-}
+rule expr2 {[ <msgexpr> [ ';' <cascade> ]* | <primary> ] {*} }
 
-token UnsignedIntegerLiteral {
-    | <DecimalIntegerLiteral> 'r' <BaseNIntegerLiteral>
-    | <DecimalIntegerLiteral>
-}
+token msgexpr {
+                | <keyexpr>      {*}  #= keyexpr
+                | <binexpr>      {*}  #= binexpr
+                | <unaryexpr>    {*}  #= unaryexpr
+              }
 
-token DecimalIntegerLiteral {
-    <digit>+
-}
+token cascade { <id> | <binmsg> | <keymsg> }
 
-token BaseNIntegerLiteral {
-    <alnum>+
-}
+rule binexpr { <primary> <binmsg> [<binmsg> ]* {*} }
 
-token ScaledDecimalLiteral {
-    '-'? <DecimalIntegerLiteral> [ '.' <DecimalIntegerLiteral> ]? 's' <DecimalIntegerLiteral>?
-}
+rule binmsg { <binsel> <primary> }
 
-token FloatingPointLiteral {
-    '-'? <DecimalIntegerLiteral> [ '.' <DecimalIntegerLiteral> <Exponent>? | <Exponent> ]
-}
+token binsel { <binchar>**{1..2} }
 
-token Exponent {
-    <[ <edq]> ['-'? <DecimalIntegerLiteral>]?
-}
+rule keyexpr { <keyexpr2> <keymsg> {*} }
 
-token CharacterLiteral {
-    '$' .
-}
+token keyexpr2 { <!binexpr> <primary> {*} | <binexpr> {*} }
 
-token StringLiteral {
-    \' [<.StringLiteralCharacter> | \'\']* \'
-}
+rule keymsg { [<keysel> <keyexpr2> ]+ {*} }
 
-token StringLiteralCharacter {
-    <!before \'> .
-}
+token keysel { <id> ':' }
 
-token SymbolInArrayLiteral {
-    | <!ConstantReference> <UnaryMessageSelector>
-    | <KeywordMessageSelector>
-    | <BinaryMessageSelector>
-}
+rule block { '[' [[':' <id>]* '|']? <temps>? <exprs> ']' }
 
-token SymbolLiteral {
-    '#' [ <SymbolInArrayLiteral> | <ConstantReference> | <StringLiteral> ]
-}
+token arrayconstructor { '{' <exprs> '}' }
 
-token ArrayLiteral {
-    | <ObjectArrayLiteral>
-    | <ByteArrayLiteral>
-}
+token literal { 
+                | <number>           {*}  #= number
+                | <string>           {*}  #= string
+                | <charconst>        {*}  #= charconst
+                | <symconst>         {*}  #= symconst
+                | <arrayconst>       {*}  #= arrayconst
+                | <binding>          {*}  #= binding
+                | <eval>             {*}  #= eval
+              }
 
-token ObjectArrayLiteral {
-    '#' <NestedObjectArrayLiteral>
-}
+token arrayconst { '#' <array> | '#' <bytearray> }
 
-token NestedObjectArrayLiteral {
-    '('
-        <OptionalWhitespace> 
-        [<LiteralArrayElement> [ <Whitespace> <LiteralArrayElement>]* ]?
-        <OptionalWhitespace> 
-    ')'
-}
+token bytearray { '[' <number>* ']' }
 
-token LiteralArrayElement {
-    | <!BlockLiteral> <Literal>
-    | <NestedObjectArrayLiteral>
-    | <SymbolInArrayLiteral>
-    | <ConstantReference>
-}
+rule array { '(' [ <literal> | <array> | <bytearray> | <arraysym> ]* ')' }
 
-token ByteArrayLiteral {
-    '#['
-        <OptionalWhitespace>
-        [<UnsignedIntegerLiteral> [<Whitespace> <UnsignedIntegerLiteral>]*]?
-        <OptionalWhitespace>
-    ']'
-}
+token number { [<.digit>+ 'r']? '-'? <.alnum>+ ['.' <.alnum>+]? [<exp> '-'? <dig>+]? }
 
-token FormalBlockArgumentDeclaration { ':' <BindableIdentifier> }
-token FormalBlockArgumentDeclarationList { <FormalBlockArgumentDeclaration> [ <Whitespace> <FormalBlockArgumentDeclaration> ]* }
-token BlockLiteral { '[' [ <OptionalWhitespace> <FormalBlockArgumentDeclarationList> <OptionalWhitespace> '|']? <ExecutableCode> <OptionalWhitespace> ']'}
+token string { \' $<text>:=<-[']>* \' {*} }
 
-token Literal { | <ConstantReference>
-                | <IntegerLiteral>
-                | <ScaledDecimalLiteral>
-                | <FloatingPointLiteral>
-                | <CharacterLiteral>
-                | <StringLiteral>
-                | <SymbolLiteral>
-                | <ArrayLiteral>
-                | <BlockLiteral> }
+token charconst { '$' . }
 
-token NestedExpression { '(' <Statement> <OptionalWhitespace> ')'}
-token Operand { | <Literal>
-                | <Reference>
-                | <NestedExpression> }
+token symconst { '#'<symbol> | '#'<string> }
 
-token UnaryMessage { <!Keyword> <UnaryMessageSelector> }
-token UnaryMessageChain { [<OptionalWhitespace> <UnaryMessage>]* }
+token arraysym { [<id> | ':']* }
 
-token BinaryMessageOperand { <Operand> <UnaryMessageChain> }
-token BinaryMessage { <BinaryMessageSelector> <OptionalWhitespace> <BinaryMessageOperand> }
-token BinaryMessageChain { [ <OptionalWhitespace> <BinaryMessage> ]* }
+token exp { <[deqs]> }
 
-token KeywordMessageArgument { <BinaryMessageOperand> <BinaryMessageChain> }
-token KeywordMessageSegment { <Keyword> <OptionalWhitespace> <KeywordMessageArgument> }
-token KeywordMessage { <OptionalWhitespace> <KeywordMessageSegment> [ <OptionalWhitespace> <KeywordMessageSegment> ]* }
+token binding { '#{' [<id> '.']* <id> '}' }
 
-token MessageChain {
-                      | <BinaryMessage> <BinaryMessageChain> <KeywordMessage>?
-                      | <KeywordMessage>
-                      | <UnaryMessage> <UnaryMessageChain> <BinaryMessageChain> <KeywordMessage>?
-                   }
+token symbol { <id> | <binsel> | <keysel>**{1..2} }
 
-token CascadedMessage { '}' <OptionalWhitespace> <MessageChain> }
-token Expression { <Operand> [ <OptionalWhitespace> <MessageChain> [ <OptionalWhitespace> <CascadedMessage> ]* ]? }
+rule eval { '##(' <temps>? <exprs> ')' }
 
-token AssignmentOperation { <OptionalWhitespace> <BindableIdentifier> <OptionalWhitespace> ':='}
-token Statement { <AssignmentOperation>* <OptionalWhitespace> <Expression> }
+token id { <.alpha> [ <.alpha> | <.digit> ]* }
 
-token MethodReturnOperator { <OptionalWhitespace> '^'}
-token ReturnStatement { <MethodReturnOperator> <Statement> }
-
-token LocalVariableDeclarationList { <OptionalWhitespace> '|' <OptionalWhitespace> [ <BindableIdentifier> [ <Whitespace> <BindableIdentifier> ]* ]? <OptionalWhitespace> '|'}
-
-token ExecutableCode { <LocalVariableDeclarationList>? [ 
-                                                           [ | <Statement> [ <OptionalWhitespace> '.' <Statement> ]*
-                                                               [<OptionalWhitespace> '.' <ReturnStatement>]? '.'?
-                                                             | <ReturnStatement> '.'?
-                                                           ]
-                                                          
-                                                       ] 
-                     }
-
-
-token UnaryMethodHeader { <UnaryMessageSelector> }
-token BinaryMethodHeader { <BinaryMessageSelector> <OptionalWhitespace> <BindableIdentifier> }
-token KeywordMethodHeaderSegment { <Keyword> <OptionalWhitespace> <BindableIdentifier> }
-token KeywordMethodHeader { <KeywordMethodHeaderSegment> [ <Whitespace> <KeywordMethodHeaderSegment> ]* }
-token MethodHeader { | <UnaryMethodHeader>
-                     | <BinaryMethodHeader>
-                     | <KeywordMethodHeader> }
-token MethodDeclaration { <OptionalWhitespace> <MethodHeader> <ExecutableCode> }
-
+token binchar { <[+\-*/~,<>=&´?\\%]> }
