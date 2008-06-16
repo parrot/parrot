@@ -177,7 +177,7 @@ done:
 file_error:
   .catch()
   .get_severity($I0)
-  
+
   if $I0 == .EXCEPT_EXIT goto exit_exception
   .get_return_code($I0)
   if $I0 == .CONTROL_CONTINUE goto continue_outside_loop

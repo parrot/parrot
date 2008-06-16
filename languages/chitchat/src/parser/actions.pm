@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2008, The Perl Foundation.
+
 =begin comments
 
 ChitChat::Grammar::Actions - ast transformations for ChitChat

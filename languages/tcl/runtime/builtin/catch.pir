@@ -48,7 +48,7 @@ got_retval:
   __set(varname,code_retval)
 
 handle_retval:
-  # We need to convert the code 
+  # We need to convert the code
   if retval != .CONTROL_OK goto handle_error
   retval = .TCL_OK
   goto done
