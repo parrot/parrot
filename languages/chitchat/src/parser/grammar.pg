@@ -1,0 +1,230 @@
+# $Id$
+
+=begin overview
+
+This is the grammar for ChitChat written as a sequence of Perl 6 rules.
+
+=end overview
+
+grammar ChitChat::Grammar is PCT::Grammar;
+
+token TOP {
+    <.ws>?
+    <ExecutableCode>+
+    <.ws>?
+    [ $ || <panic: 'Syntax error'> ]
+    {*}
+}
+
+token WhitespaceCharacter {
+    \h | \n | \t
+}
+token CommentCharacter {
+    <-["]>
+}
+
+token Comment {
+    '"' <.CommentCharacter>* '"'
+}
+token OptionalWhitespace {
+    [ <.WhitespaceCharacter> | <Comment> ]*
+}
+token ws {
+    [ <.WhitespaceCharacter> | <Comment> ]+
+}
+token Whitespace { <ws> }
+
+token Identifier {
+    [<.alpha>|'_'] [<.alnum>|'_']*
+}
+
+token Reference { <Identifier> }
+
+token ConstantReference {
+    | 'nil'
+    | 'false'
+    | 'true'
+}
+
+token PsuedoVariableReference {
+    | 'self'
+    | 'super'
+    | 'thisContext'
+}
+
+token ReservedIdentifier {
+    | <PsuedoVariableReference>
+    | <ConstantReference>
+}
+
+token BindableIdentifier {
+    <!ReservedIdentifier> <Identifier>
+}
+
+token UnaryMessageSelector { <Identifier> }
+
+token Keyword {
+    <Identifier> ':'
+}
+
+token KeywordMessageSelector {
+    <Keyword>+
+}
+
+token BinarySelectorChar {
+    <[~!@%&*\-+=|\\<>,?/]>
+}
+
+token BinaryMessageSelector {
+    <BinarySelectorChar>**{1..2}
+}
+
+token IntegerLiteral {
+    '-'? <UnsignedIntegerLiteral>
+}
+
+token UnsignedIntegerLiteral {
+    | <DecimalIntegerLiteral> 'r' <BaseNIntegerLiteral>
+    | <DecimalIntegerLiteral>
+}
+
+token DecimalIntegerLiteral {
+    <digit>+
+}
+
+token BaseNIntegerLiteral {
+    <alnum>+
+}
+
+token ScaledDecimalLiteral {
+    '-'? <DecimalIntegerLiteral> [ '.' <DecimalIntegerLiteral> ]? 's' <DecimalIntegerLiteral>?
+}
+
+token FloatingPointLiteral {
+    '-'? <DecimalIntegerLiteral> [ '.' <DecimalIntegerLiteral> <Exponent>? | <Exponent> ]
+}
+
+token Exponent {
+    <[ <edq]> ['-'? <DecimalIntegerLiteral>]?
+}
+
+token CharacterLiteral {
+    '$' .
+}
+
+token StringLiteral {
+    \' [<.StringLiteralCharacter> | \'\']* \'
+}
+
+token StringLiteralCharacter {
+    <!before \'> .
+}
+
+token SymbolInArrayLiteral {
+    | <!ConstantReference> <UnaryMessageSelector>
+    | <KeywordMessageSelector>
+    | <BinaryMessageSelector>
+}
+
+token SymbolLiteral {
+    '#' [ <SymbolInArrayLiteral> | <ConstantReference> | <StringLiteral> ]
+}
+
+token ArrayLiteral {
+    | <ObjectArrayLiteral>
+    | <ByteArrayLiteral>
+}
+
+token ObjectArrayLiteral {
+    '#' <NestedObjectArrayLiteral>
+}
+
+token NestedObjectArrayLiteral {
+    '('
+        <OptionalWhitespace> 
+        [<LiteralArrayElement> [ <Whitespace> <LiteralArrayElement>]* ]?
+        <OptionalWhitespace> 
+    ')'
+}
+
+token LiteralArrayElement {
+    | <!BlockLiteral> <Literal>
+    | <NestedObjectArrayLiteral>
+    | <SymbolInArrayLiteral>
+    | <ConstantReference>
+}
+
+token ByteArrayLiteral {
+    '#['
+        <OptionalWhitespace>
+        [<UnsignedIntegerLiteral> [<Whitespace> <UnsignedIntegerLiteral>]*]?
+        <OptionalWhitespace>
+    ']'
+}
+
+token FormalBlockArgumentDeclaration { ':' <BindableIdentifier> }
+token FormalBlockArgumentDeclarationList { <FormalBlockArgumentDeclaration> [ <Whitespace> <FormalBlockArgumentDeclaration> ]* }
+token BlockLiteral { '[' [ <OptionalWhitespace> <FormalBlockArgumentDeclarationList> <OptionalWhitespace> '|']? <ExecutableCode> <OptionalWhitespace> ']'}
+
+token Literal { | <ConstantReference>
+                | <IntegerLiteral>
+                | <ScaledDecimalLiteral>
+                | <FloatingPointLiteral>
+                | <CharacterLiteral>
+                | <StringLiteral>
+                | <SymbolLiteral>
+                | <ArrayLiteral>
+                | <BlockLiteral> }
+
+token NestedExpression { '(' <Statement> <OptionalWhitespace> ')'}
+token Operand { | <Literal>
+                | <Reference>
+                | <NestedExpression> }
+
+token UnaryMessage { <!Keyword> <UnaryMessageSelector> }
+token UnaryMessageChain { [<OptionalWhitespace> <UnaryMessage>]* }
+
+token BinaryMessageOperand { <Operand> <UnaryMessageChain> }
+token BinaryMessage { <BinaryMessageSelector> <OptionalWhitespace> <BinaryMessageOperand> }
+token BinaryMessageChain { [ <OptionalWhitespace> <BinaryMessage> ]* }
+
+token KeywordMessageArgument { <BinaryMessageOperand> <BinaryMessageChain> }
+token KeywordMessageSegment { <Keyword> <OptionalWhitespace> <KeywordMessageArgument> }
+token KeywordMessage { <OptionalWhitespace> <KeywordMessageSegment> [ <OptionalWhitespace> <KeywordMessageSegment> ]* }
+
+token MessageChain {
+                      | <BinaryMessage> <BinaryMessageChain> <KeywordMessage>?
+                      | <KeywordMessage>
+                      | <UnaryMessage> <UnaryMessageChain> <BinaryMessageChain> <KeywordMessage>?
+                   }
+
+token CascadedMessage { '}' <OptionalWhitespace> <MessageChain> }
+token Expression { <Operand> [ <OptionalWhitespace> <MessageChain> [ <OptionalWhitespace> <CascadedMessage> ]* ]? }
+
+token AssignmentOperation { <OptionalWhitespace> <BindableIdentifier> <OptionalWhitespace> ':='}
+token Statement { <AssignmentOperation>* <OptionalWhitespace> <Expression> }
+
+token MethodReturnOperator { <OptionalWhitespace> '^'}
+token ReturnStatement { <MethodReturnOperator> <Statement> }
+
+token LocalVariableDeclarationList { <OptionalWhitespace> '|' <OptionalWhitespace> [ <BindableIdentifier> [ <Whitespace> <BindableIdentifier> ]* ]? <OptionalWhitespace> '|'}
+
+token ExecutableCode { <LocalVariableDeclarationList>? [ 
+                                                           [ | <Statement> [ <OptionalWhitespace> '.' <Statement> ]*
+                                                               [<OptionalWhitespace> '.' <ReturnStatement>]? '.'?
+                                                             | <ReturnStatement> '.'?
+                                                           ]
+                                                          
+                                                       ] 
+                     }
+
+
+token UnaryMethodHeader { <UnaryMessageSelector> }
+token BinaryMethodHeader { <BinaryMessageSelector> <OptionalWhitespace> <BindableIdentifier> }
+token KeywordMethodHeaderSegment { <Keyword> <OptionalWhitespace> <BindableIdentifier> }
+token KeywordMethodHeader { <KeywordMethodHeaderSegment> [ <Whitespace> <KeywordMethodHeaderSegment> ]* }
+token MethodHeader { | <UnaryMethodHeader>
+                     | <BinaryMethodHeader>
+                     | <KeywordMethodHeader> }
+token MethodDeclaration { <OptionalWhitespace> <MethodHeader> <ExecutableCode> }
+

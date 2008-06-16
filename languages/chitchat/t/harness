@@ -1,0 +1,8 @@
+#! perl
+
+# $Id$
+
+use FindBin;
+use lib qw( . lib ../lib ../../lib );
+use Parrot::Test::Harness language => 'ChitChat', compiler => 'chitchat.pbc';
+
