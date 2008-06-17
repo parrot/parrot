@@ -11,15 +11,38 @@ New for next release (2008-06-17, version undecided)
     - added support for hashes and arrays
   + Chitchat: added the start of a smalltalk compiler
   + Pynie: return statement, other minor updates
+  + Rakudo:
+    - added working list and hash contexts
+    - added 'return' statements
+    - added => pair constructor
+    - added ?? !! ternary
+    - added Range, range operators, Complex
+    - added common List, Hash methods
+    - refactored base classes
+    - added Mutable, Perl6Scalar classes
+    - added type-checking, is readonly/rw/copy for parameters
+    - added make localtest, docs/spectest-progress.csv
+    - fix named unaries
   + Squaak: implement return statement
   + Tcl: updated control flow exceptions to use new builtin types
 - Compilers
-  + PGE: Added "return" PAST.op node type for subroutine returns
+  + All tools converted to P6object metamodel
+  + PGE: <?foo> is now a zero-width match
+  + PCT:
+    - added "return" PAST.op node type for subroutine returns
+    - added "keyed_int" scoping to PAST::Var
+    - fixed calls to closures
+    - automatically transcode 7-bit unicode to ascii for faster processing
+  + NQP: added 'return' statement, ?? !! ternary operator
 - Configuration
   + expanded step gen::opengl
 - Implementation
   + updated function and macro names to match pdd09_gc.pod
+  + removed 'Super' PMC
+  + add ".namespace []" as alternative to ".namespace"
+  + make codetest target runs standard coding tests
 - Miscellaneous
+  + added P6object class for Perl 6 interfaces to objects in Parrot
   + ported OpenGL/GLU/GLUT bindings to Win32, BSD, and more Mac OS X variants
   + generate OpenGL/GLU/GLUT bindings by parsing system headers
   + new OpenGL example shapes.pir, covering basic OpenGL 1.1 / GLUT 3 APIs
