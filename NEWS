@@ -1,9 +1,9 @@
 # $Id$
 
 New for next release (2008-06-17, version undecided)
-- Specification:
+- Specification
   + updated pdd09_gc.pod
-- Languages:
+- Languages
   + Cardinal:
     - dramatically improved parsing speed
     - added support for defining and instantiating classes
@@ -13,6 +13,8 @@ New for next release (2008-06-17, version undecided)
   + Pynie: return statement, other minor updates
   + Squaak: implement return statement
   + Tcl: updated control flow exceptions to use new builtin types
+- Compilers
+  + PGE: Added "return" PAST.op node type for subroutine returns
 - Configuration
   + expanded step gen::opengl
 - Miscellaneous
