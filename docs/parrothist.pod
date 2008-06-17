@@ -118,4 +118,6 @@ the strings?).
 
  chromatic 0.6.2          2008-May-20     "Reverse Sublimation"
 
+ smash     0.6.3          2008-Jun-17     "Beautiful Parrot"
+
 =cut

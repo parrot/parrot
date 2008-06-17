@@ -21,4 +21,5 @@
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
     "subversion.root"  : "http://subversion.tigris.org/",
+    "svk.root"         : "http://svk.bestpractical.com/"
 }
