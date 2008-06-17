@@ -10,6 +10,7 @@ New for next release (2008-06-17, version undecided)
     - started fleshing out the builtin class hierarchy
     - added support for hashes and arrays
   + Chitchat: added the start of a smalltalk compiler
+  + Pheme: updated to match PGE changes
   + Pynie: return statement, other minor updates
   + Rakudo:
     - added working list and hash contexts
@@ -27,27 +28,32 @@ New for next release (2008-06-17, version undecided)
   + Tcl: updated control flow exceptions to use new builtin types
 - Compilers
   + All tools converted to P6object metamodel
-  + PGE: <?foo> is now a zero-width match
+  + PGE:
+    - <?foo> is now a zero-width match
+    - reduced backtracking to improve parsing speed
   + PCT:
     - added "return" PAST.op node type for subroutine returns
     - added "keyed_int" scoping to PAST::Var
     - fixed calls to closures
     - automatically transcode 7-bit unicode to ascii for faster processing
-  + NQP: added 'return' statement, ?? !! ternary operator
+  + NQP: added "return" statement, ?? !! ternary operator
 - Configuration
   + expanded step gen::opengl
 - Implementation
   + updated function and macro names to match pdd09_gc.pod
-  + removed 'Super' PMC
+  + removed Super PMC
   + add ".namespace []" as alternative to ".namespace"
-  + make codetest target runs standard coding tests
+  + "make codetest" target runs standard coding tests
 - Miscellaneous
   + added P6object class for Perl 6 interfaces to objects in Parrot
   + ported OpenGL/GLU/GLUT bindings to Win32, BSD, and more Mac OS X variants
   + generate OpenGL/GLU/GLUT bindings by parsing system headers
   + new OpenGL example shapes.pir, covering basic OpenGL 1.1 / GLUT 3 APIs
   + new float4.pir structure-packing benchmark
-
+  + reduced memory use for variables
+  + improved constant string caching
+  + made code g++ and gcc (with optimizations) safe
+  + the usual collection of bugfixes and optimizations
 
 New in 0.6.2
 - Specification
