@@ -216,43 +216,6 @@ LF_EOL_STYLE: {
 
 }    # LF_EOL_STYLE
 
-=for skip
-
-# When unskipped, rewrite to conform to other tests.
-
-SKIP: {
-    skip 'custom svn keywords not yet supported' => 1;
-## Copyright keyword
-COPYRIGHT: {
-    my $readme = catfile( $PConfig{build_dir}, 'README' );
-    open my $IN, '<' => $readme
-        or die qq|can't open $readme: $!|;
-
-    my $official_copyright;
-    while( <$IN> )
-    {
-        next unless m/^Parrot is (Copyright .*)/;
-        $official_copyright = $1;
-        last;
-    }
-    fail('official copyright not found') and last COPYRIGHT
-        unless length $official_copyright;
-
-    @cmd = qw(pg Copyright);
-
-    $msg = 'Copyright property matches official copyright';
-    diag $msg;
-
-    is(
-        sub{ my $r = qx($cmd @cmd $_); chomp $r; "$_: $r" }->(),
-        "$_: $official_copyright",
-        "$msg ($_)"
-    ) for @manifest_files;
-} # COPYRIGHT
-} # SKIP
-
-=cut
-
 BEGIN {
     if ( -d '.git' ) {
         my $git_svn_metadata = catfile(qw/.git svn git-svn unhandled.log/);
