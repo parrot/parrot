@@ -32,7 +32,7 @@ rule statement {
     | <while_statement> {*}                    #= while_statement
     | <for_statement> {*}                      #= for_statement
     | <compound_statement> {*}                 #= compound_statement
-    | <string> {*}                               #= string
+    | <string> {*}                             #= string
     # | 'break'
     # | 'continue'
     # | 'halt'
