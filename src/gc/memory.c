@@ -30,7 +30,8 @@ setup function to initialize the memory pools.
 
 =item C<void * mem_sys_allocate>
 
-Uses C<malloc> to allocate system memory.
+Uses C<malloc> to allocate system memory. Panics if the system cannot
+return memory.
 
 =cut
 
@@ -55,7 +56,9 @@ mem_sys_allocate(size_t size)
 
 =item C<void * mem__internal_allocate>
 
-RT#48260: Not yet documented!!!
+Allocates memory from the system using C<malloc>, Panics if there is no
+memory available. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
+debug information to C<STDERR>.
 
 =cut
 
@@ -83,7 +86,8 @@ mem__internal_allocate(size_t size, ARGIN(const char *file), int line)
 
 =item C<void * mem_sys_allocate_zeroed>
 
-Uses C<calloc> to allocate system memory.  Guaranteed to succeed.
+Uses C<calloc> to allocate system memory.  Guaranteed to succeed, Panics
+otherwise.
 
 =cut
 
@@ -108,7 +112,9 @@ mem_sys_allocate_zeroed(size_t size)
 
 =item C<void * mem__internal_allocate_zeroed>
 
-RT#48260: Not yet documented!!!
+Uses C<calloc> to allocate system memory.  Guaranteed to succeed, Panics
+otherwise. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
+debug information to C<STDERR>.
 
 =cut
 
@@ -203,7 +209,10 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 
 =item C<void * mem__internal_realloc>
 
-RT#48260: Not yet documented!!!
+Resize a chunk of system memory.  Unlike realloc(), it can handle a
+NULL pointer, in which case you get a malloc back. If
+C<DETAIL_MEMORY_DEBUG> macro is defined, prints debug information to
+C<STDERR>.
 
 =cut
 
@@ -255,7 +264,9 @@ mem_sys_free(ARGFREE(void *from))
 
 =item C<void mem__internal_free>
 
-RT#48260: Not yet documented!!!
+Free a chunk of memory back to the system. If
+C<DETAIL_MEMORY_DEBUG> macro is defined, prints debug information to
+C<STDERR>.
 
 =cut
 
@@ -277,7 +288,9 @@ mem__internal_free(ARGFREE(void *from), ARGIN(const char *file), int line)
 
 =item C<void mem_setup_allocator>
 
-Initializes the allocator.
+Initializes the memory allocator and the garbage collection subsystem.
+Calls the initialization function associated with each collector, which
+is determined at compile time.
 
 =cut
 
