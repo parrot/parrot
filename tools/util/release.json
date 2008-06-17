@@ -1,9 +1,9 @@
 {
-    "release.version"  : "0.6.2",
-    "release.name"     : "Reverse Sublimation",
+    "release.version"  : "0.6.3",
+    "release.name"     : "Beautiful Parrot",
     "release.day"      : "Tuesday",
-    "release.date"     : "20 May 2008",
-    "release.nextdate" : "17 June 2008",
+    "release.date"     : "17 June 2008",
+    "release.nextdate" : "15 July 2008",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",
@@ -11,13 +11,13 @@
     "web.repository"   : "https://svn.perl.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 June 2008",
+    "bugday.date"      : "12 July 2008",
 
     "rt.root"          : "https://rt.perl.org/rt3/",
-    "rt.tracking"      : "Ticket/Display.html?id=54542",
+    "rt.tracking"      : "Ticket/Display.html?id=55926",
 
     "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2008_06_14",
+    "wiki.bugday"      : "bug_day_2008_08_12",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
     "subversion.root"  : "http://subversion.tigris.org/",
