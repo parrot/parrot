@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-ABC::Grammar::Actions - ast transformations for abc
+abc::Grammar::Actions - ast transformations for abc
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ we're really saying "the ast of C<< <foo> >>".
 
 =cut
 
-class ABC::Grammar::Actions;
+class abc::Grammar::Actions;
 
 ##  The ast of the entire program is the ast of the
 ##  top-level <statement_list>.

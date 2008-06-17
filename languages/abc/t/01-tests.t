@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -151,7 +151,7 @@ sub abc_template {
 .sub 'main' :main
     load_bytecode '$abcdir/abc.pbc'
     .local pmc compiler, code
-    compiler = compreg 'ABC'
+    compiler = compreg 'abc'
     code = compiler.'compile'("<<EXPR>>")
     code()
 .end
