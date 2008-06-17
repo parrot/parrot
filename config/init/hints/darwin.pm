@@ -21,12 +21,21 @@ sub runstep {
         }
     }
 
+    unless (exists $ENV{'MACOSX_DEPLOYMENT_TARGET'}) {
+        my $OSX_vers = `sw_vers -productVersion`;
+        chomp $OSX_vers;
+        # remove minor version
+        $OSX_vers =join '.', (split /[.]/, $OSX_vers)[0,1]; 
+        $ENV{'MACOSX_DEPLOYMENT_TARGET'} = $OSX_vers;
+    }
+
     my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
     $ldflags .= " -L$lib_dir";
     $ccflags .= " -pipe -fno-common -Wno-long-double ";
 
     $conf->data->set(
         darwin              => 1,
+        osx_version         => $ENV{'MACOSX_DEPLOYMENT_TARGET'},
         ccflags             => $ccflags,
         ldflags             => $ldflags,
         ccwarn              => "-Wno-shadow",
