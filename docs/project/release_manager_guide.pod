@@ -39,7 +39,7 @@ F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
 F<README>.
 
 Also update the version number, date, and your name in the
-the files: F<DEVELOPING> and F<docs/parrothist.pod>.
+the file: F<docs/parrothist.pod>.
 
 Update this file to remove the pending release you're in the middle of.
 
@@ -307,7 +307,6 @@ the 3rd Tuesday of each month. Version numbers for each release will be
 determined each month, and will depend on the features actually present in
 that release.
 
- - June 17th, 2008      - Nuno Carvalho
  - July 15th, 2008      - Bernhard Schmalhofer
  - August 19th, 2008    - Bob Rogers
  - September 16th, 2008 - Patrick R. Michaud

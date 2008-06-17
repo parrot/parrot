@@ -92,7 +92,7 @@ Mailinglist/Action" link:
 
 You want to follow the "Change Permissions" action for PARROTRE:
 
-       https://pause.perl.org/pause/authenquery?HIDDENNAME=PARROTRE&ACTIONREQ=share_perms&pause99_select_ml_actio n_sub=Submit
+       https://pause.perl.org/pause/authenquery?HIDDENNAME=PARROTRE&ACTIONREQ=share_perms&pause99_select_ml_action_sub=Submit
        
 The "Change Permissions" form looks the same as the one that you see
 for your personal PAUSE ID, but now you can edit the permissions for
