@@ -1,6 +1,8 @@
 # $Id$
 
 New for next release (2008-06-17, version undecided)
+- Specification:
+  + updated pdd09_gc.pod
 - Languages:
   + Cardinal:
     - dramatically improved parsing speed
@@ -18,6 +20,7 @@ New for next release (2008-06-17, version undecided)
   + generate OpenGL/GLU/GLUT bindings by parsing system headers
   + new OpenGL example shapes.pir, covering basic OpenGL 1.1 / GLUT 3 APIs
   + new float4.pir structure-packing benchmark
+  + updated function and macro names to match pdd09_gc.pod
 
 New in 0.6.2
 - Specification
