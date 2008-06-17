@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 38;
 
 # macro tests
 
@@ -155,6 +155,37 @@ pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
   set .FOO,"foo"
   .answer(.FOO)
   end
+CODE
+
+
+pir_output_is( <<'CODE', '42', 'macro_const int in PIR' );
+.macro_const theanswer 42
+.sub main :main
+    print .theanswer
+.end
+CODE
+
+pir_output_is( <<'CODE', 'Hello', 'macro_const string in PIR' );
+.macro_const sayhello "Hello"
+.sub main :main
+    print .sayhello
+.end
+CODE
+
+pir_output_is( <<'CODE', 'Hello', 'macro_const register in PIR' );
+.macro_const firstreg S0
+.sub main :main
+    .firstreg = "Hello"
+    print .firstreg
+.end
+CODE
+
+pir_output_like( <<'CODE', '/3\.14/', 'macro_const num in PIR' );
+.macro_const pi 3.14
+.sub main :main
+    print .pi
+    print "\n"
+.end
 CODE
 
 open my $FOO, '>', 'macro.tempfile';

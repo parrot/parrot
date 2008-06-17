@@ -421,13 +421,10 @@ SP              [ ]
 ">>>="                 return SHR_U_ASSIGN;
 ".="                   return CONCAT_ASSIGN;
 
-<emit,INITIAL>".macro" {
-        return read_macro(valp, interp, yyscanner);
-    }
-
-<emit>".macro_const" {
+<emit,INITIAL>".macro_const" {
         int c;
         int start_line;
+        int start_cond  = YY_START;
 
         BEGIN(macro);
         c = yylex_skip(valp, interp, " ", yyscanner);
@@ -450,8 +447,12 @@ SP              [ ]
 
         IMCC_INFO(interp)->cur_macro_name = NULL;
 
-        BEGIN(emit);
+        BEGIN(start_cond);
         return MACRO;
+    }
+
+<emit,INITIAL>".macro" {
+        return read_macro(valp, interp, yyscanner);
     }
 
 <emit,INITIAL>".include" {
