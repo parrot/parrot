@@ -251,7 +251,7 @@ CLEANUPS = \
   $(PMC_DIR)/*.lib \
 
 
-clean:
+clean: testclean
 	$(RM_RF) $(CLEANUPS)
 
 realclean: clean
@@ -376,7 +376,7 @@ token term {
 rule expression is optable { ... }
 
 __src/parser/grammar-oper.pg__
-# $Id$
+# @Id@
 
 ##  expressions and operators
 proto 'term:'     is precedence('=')     is parsed(&term)      { ... }
@@ -521,9 +521,14 @@ __t/harness__
 
 # @Id@
 
-use FindBin;
-use lib qw( . lib ../lib ../../lib );
-use Parrot::Test::Harness language => '@lang@', compiler => '@lclang@.pbc';
+# pragmata
+use strict;
+use warnings;
+use 5.008;
+
+use lib qw( . lib ../lib ../../lib ../../lib );
+use Parrot::Test::Harness language => '@lang@',
+                          compiler => '@lclang@.pbc';
 
 __t/00-sanity.t__
 # This just checks that the basic parsing and call to builtin say() works.
