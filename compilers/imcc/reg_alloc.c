@@ -1089,38 +1089,42 @@ allocate lexicals or non-volatile in ascending order
 static void
 allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
 {
-    char     type[] = "INSP";
     SymHash *hsh = &unit->hash;
     SymReg  *r;
-    Set     *avail;
-    int      j, first_reg;
 
-    for (j = 0; j < 4; j++) {
-        int i;
-        const int reg_set = type[j];
+    int i;
 
-        first_reg = first_avail(unit, reg_set, &avail);
+    for (i = 0; i < hsh->size; i++) {
+        for (r = hsh->data[i]; r; r = r->next) {
+            int j = -1;
 
-        for (i = 0; i < hsh->size; i++) {
-            for (r = hsh->data[i]; r; r = r->next) {
-                if (r->set != reg_set)
-                    continue;
-                if (REG_NEEDS_ALLOC(r) && r->color == -1 && (r->usage & usage) && r->use_count) {
-                    if (set_contains(avail, first_reg))
-                        first_reg = first_avail(unit, reg_set, NULL);
+            switch (r->set) {
+                case 'I': j = 0; break;
+                case 'N': j = 1; break;
+                case 'S': j = 2; break;
+                case 'P': j = 3; break;
+                default :        continue;
+            }
 
-                    set_add(avail, first_reg);
-                    r->color = first_reg++;
-                    IMCC_debug(interp, DEBUG_IMC,
-                            "allocate %s sym %c '%s'  color %d\n",
-                            usage & U_LEXICAL ? "Lexical" : "Non-vol",
-                            reg_set, r->name, r->color);
-                }
+            if (REG_NEEDS_ALLOC(r)
+            &&  r->color == -1
+            && (r->usage & usage)
+            && r->use_count) {
+                Set *avail;
+                int first_reg = first_avail(unit, (int)r->set, &avail);
+
+                set_add(avail, first_reg);
+                r->color = first_reg++;
+
+                IMCC_debug(interp, DEBUG_IMC,
+                        "allocate %s sym %c '%s'  color %d\n",
+                        usage & U_LEXICAL ? "Lexical" : "Non-vol",
+                        (int)r->set, r->name, r->color);
+
+                set_free(avail);
+                unit->first_avail[j] = first_reg;
             }
         }
-
-        set_free(avail);
-        unit->first_avail[j] = first_reg;
     }
 
     /*
