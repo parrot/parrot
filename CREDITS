@@ -256,7 +256,7 @@ N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
 
 N: Geoff Broadwell (japhb)
-D: OpenGL binding
+D: OpenGL binding and examples
 D: Disassembly/source weaver
 D: Miscellaneous fixes
 
