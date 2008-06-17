@@ -50,14 +50,11 @@ isa_ok( $step, $step_name );
         \$stdout,
         \$stderr,
     );;
-    TODO: {
-    local $TODO = 'fails on win32' if $^O =~ m/win32/i;
     like(
         $stdout,
-        qr/No $hints_file found/s,
+        qr/No \Q$hints_file\E found/s,
         "Got expected verbose output when no hints file found"
     );
-    }
 }
 
 pass("Completed all tests in $0");
