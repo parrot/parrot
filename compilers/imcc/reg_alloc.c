@@ -1089,7 +1089,8 @@ allocate lexicals or non-volatile in ascending order
 static void
 allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
 {
-    SymHash *hsh = &unit->hash;
+    SymHash *hsh     = &unit->hash;
+    Set     *sets[4] = { NULL, NULL, NULL, NULL };
     SymReg  *r;
 
     int i;
@@ -1110,7 +1111,7 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
             &&  r->color == -1
             && (r->usage & usage)
             && r->use_count) {
-                Set *avail;
+                Set *avail    = sets[j];
                 int first_reg = first_avail(unit, (int)r->set, &avail);
 
                 set_add(avail, first_reg);
@@ -1121,10 +1122,14 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
                         usage & U_LEXICAL ? "Lexical" : "Non-vol",
                         (int)r->set, r->name, r->color);
 
-                set_free(avail);
                 unit->first_avail[j] = first_reg;
             }
         }
+    }
+
+    for (i = 0; i < 4; ++i) {
+        if (sets[i])
+            set_free(sets[i]);
     }
 
     /*
