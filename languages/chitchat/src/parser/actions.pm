@@ -26,6 +26,34 @@ method TOP($/) {
     make $past;
 }
 
+method block($/) {
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    for $<id> {
+        my $param := $( $_ );
+        $param.isdecl(1);
+        $param.scope('parameter');
+        $past.push($param);
+    }
+    if $<temps> {
+        my $temps := $( $<temps>[0] );
+        $past.push($temps);
+    }
+
+    $past.push( $( $<exprs> ) );
+
+    make $past;
+}
+
+method temps($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<id> {
+        my $temp := $( $_ );
+        $temp.scope('lexical');
+        $temp.isdecl(1);
+        $past.push( $temp );
+    }
+    make $past;
+}
 
 method exprs($/) {
     my $past := PAST::Stmts.new();
@@ -49,7 +77,7 @@ method msgexpr($/,$key) {
 
 method keyexpr($/) {
     my $past := PAST::Op.new( :pasttype('callmethod') );
-    $past.push( PAST::Var.new( :name(~$<keyexpr2>), :scope('package') ) );
+    $past.push( PAST::Var.new( :name( $( $<keyexpr2>).name() ), :scope('package') ) );
     my @args := $( $<keymsg> );
     my $name := '';
     while +@args {
@@ -89,12 +117,7 @@ method primary($/) {
 }
 
 method unit($/,$key) {
-    if $key eq 'literal' {
-        make $( $/{$key} );
-    }
-    else {
-        make ~$/;
-    }
+    make $( $/{$key} );
 }
 
 method literal($/,$key) {
@@ -103,6 +126,10 @@ method literal($/,$key) {
 
 method string($/) {
     make PAST::Val.new( :value(~$<text>), :returns('String') );
+}
+
+method id($/) {
+    make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
 }
 
 # Local Variables:

@@ -21,102 +21,181 @@ token TOP {
 
 token whitespace { \h | \v | <comment> }
 
-token ws { <whitespace>* }
+token ws { <.whitespace>* }
 
 token comment { '"' <-["]>* '"' }
 
-rule methods { '!' <id> 'class'? 'methodsFor:' <string> '!' [<method> '!']? '!' }
+rule methods {
+    '!' <id> 'class'? 'methodsFor:' <string>
+    '!' [<method> '!']?
+    '!'
+}
 
-rule method { <message> <pragma>? <temps>? <exprs> }
+rule method {
+    <message> <pragma>? <temps>? <exprs>
+}
 
-token message { <id> | <binsel> <.ws> <id> | [<keysel> <.ws> <id>]+ }
+token message {
+    | <id>
+    | <binsel> <.ws> <id>
+    | [<keysel> <.ws> <id>]+
+}
 
 token pragma { '<' <keymsg> '>' }
 
-rule temps { '|' [<id> ]* '|' }
+rule temps {
+    '|' [<id> ]* '|'
+}
 
-token unit { 
-             | <id>                  {*}  #= id
-             | <literal>             {*}  #= literal
-             | <block>               {*}  #= block
-             | <arrayconstructor>    {*}  #= arrayconstructor
-             | '(' <expr> ')'        {*}  #= expr
-           }
+token unit {
+    | <id>                  {*}  #= id
+    | <literal>             {*}  #= literal
+    | <block>               {*}  #= block
+    | <arrayconstructor>    {*}  #= arrayconstructor
+    | '(' <expr> ')'        {*}  #= expr
+}
 
-rule unaryexpr { <unit> [<!keysel><id> ]+ {*} }
+rule unaryexpr {
+    <unit> [<!keysel><id> ]+
+    {*}
+}
 
-token primary { <!unaryexpr> <unit> {*} | <unaryexpr> {*} }
+token primary {
+    | <!unaryexpr> <unit> {*}
+    | <unaryexpr> {*}
+}
 
-rule exprs {  [
-                | <expr> [ '.' <expr>]* ['.' '^' <expr>]? '.'?
-                | '^' <expr> '.'?
-              ] {*}
-           }
+rule exprs {
+    [
+    | <expr> [ '.' <expr>]* ['.' '^' <expr>]? '.'?
+    | '^' <expr> '.'?
+    ]
+    {*}
+}
 
-rule expr { [<id> [':='|'_']]* <expr2>  {*} }
+rule expr {
+    [<id> [':='|'_']]* <expr2>
+    {*}
+}
 
-rule expr2 {[ <msgexpr> [ ';' <cascade> ]* | <primary> ] {*} }
+rule expr2 {
+    [ <msgexpr> [ ';' <cascade> ]* | <primary> ]
+    {*}
+}
 
 token msgexpr {
-                | <keyexpr>      {*}  #= keyexpr
-                | <binexpr>      {*}  #= binexpr
-                | <unaryexpr>    {*}  #= unaryexpr
-              }
+    | <keyexpr>      {*}  #= keyexpr
+    | <binexpr>      {*}  #= binexpr
+    | <unaryexpr>    {*}  #= unaryexpr
+}
 
-token cascade { <id> | <binmsg> | <keymsg> }
+token cascade {
+    | <id>
+    | <binmsg>
+    | <keymsg>
+}
 
-rule binexpr { <primary> <binmsg> [<binmsg> ]* {*} }
+rule binexpr {
+    <primary> <binmsg> [<binmsg> ]*
+    {*}
+}
 
-rule binmsg { <binsel> <primary> }
+rule binmsg {
+    <binsel> <primary>
+}
 
 token binsel { <binchar>**{1..2} }
 
-rule keyexpr { <keyexpr2> <keymsg> {*} }
+rule keyexpr {
+    <keyexpr2> <keymsg>
+    {*}
+}
 
-token keyexpr2 { <!binexpr> <primary> {*} | <binexpr> {*} }
+token keyexpr2 {
+    | <!binexpr> <primary> {*}
+    | <binexpr> {*}
+}
 
-rule keymsg { [<keysel> <keyexpr2> ]+ {*} }
+rule keymsg {
+    [<keysel> <keyexpr2> ]+
+    {*}
+}
 
 token keysel { <id> ':' }
 
-rule block { '[' [[':' <id>]* '|']? <temps>? <exprs> ']' }
+rule block {
+    '[' [[':' <id>]* '|']? <temps>? <exprs> ']'
 
-token arrayconstructor { '{' <exprs> '}' }
+}
 
-token literal { 
-                | <number>           {*}  #= number
-                | <string>           {*}  #= string
-                | <charconst>        {*}  #= charconst
-                | <symconst>         {*}  #= symconst
-                | <arrayconst>       {*}  #= arrayconst
-                | <binding>          {*}  #= binding
-                | <eval>             {*}  #= eval
-              }
+token arrayconstructor {
+    '{' <exprs> '}'
+}
 
-token arrayconst { '#' <array> | '#' <bytearray> }
+token literal {
+    | <number>           {*}  #= number
+    | <string>           {*}  #= string
+    | <charconst>        {*}  #= charconst
+    | <symconst>         {*}  #= symconst
+    | <arrayconst>       {*}  #= arrayconst
+    | <binding>          {*}  #= binding
+    | <eval>             {*}  #= eval
+}
 
-token bytearray { '[' <number>* ']' }
+token arrayconst {
+    | '#' <array>
+    | '#' <bytearray>
+}
 
-rule array { '(' [ <literal> | <array> | <bytearray> | <arraysym> ]* ')' }
+token bytearray {
+    '[' <number>* ']'
+}
 
-token number { [<.digit>+ 'r']? '-'? <.alnum>+ ['.' <.alnum>+]? [<exp> '-'? <dig>+]? }
+rule array {
+    '(' [ <literal> | <array> | <bytearray> | <arraysym> ]* ')'
+}
 
-token string { \' $<text>:=<-[']>* \' {*} }
+token number {
+    [<.digit>+ 'r']? '-'? <.alnum>+ ['.' <.alnum>+]? [<exp> '-'? <dig>+]?
+}
+
+token string {
+    \' $<text>:=<-[']>* \'
+    {*}
+}
 
 token charconst { '$' . }
 
-token symconst { '#'<symbol> | '#'<string> }
+token symconst {
+    | '#'<symbol>
+    | '#'<string>
+}
 
-token arraysym { [<id> | ':']* }
+token arraysym {
+    [<id> | ':']*
+}
 
-token exp { <[deqs]> }
+token exp {
+    <[deqs]>
+}
 
-token binding { '#{' [<id> '.']* <id> '}' }
+token binding {
+    '#{' [<id> '.']* <id> '}'
+}
 
-token symbol { <id> | <binsel> | <keysel>**{1..2} }
+token symbol {
+    | <id>
+    | <binsel>
+    | <keysel>**{1..2}
+}
 
-rule eval { '##(' <temps>? <exprs> ')' }
+rule eval {
+    '##(' <temps>? <exprs> ')'
+}
 
-token id { <.alpha> [ <.alpha> | <.digit> ]* }
+token id {
+    <alpha> [ <alpha> | <digit> ]*
+    {*}
+}
 
 token binchar { <[+\-*/~,<>=&´?\\%]> }
