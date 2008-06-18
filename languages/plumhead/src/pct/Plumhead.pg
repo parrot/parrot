@@ -52,14 +52,14 @@ rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <.PAREN_
                               | <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE> \{ <statement>* \} <else_clause>?        {*}   #= IF
                               | <inline_sea>                                                                                       {*}  #= inline_sea
                               | <scalar_assign>                                                                                    {*}  #= scalar_assign
-                              | <array_assign>                                                                                     {*}  #= scalar_assign
+                              | <array_assign>                                                                                     {*}  #= array_assign
                               }
 
 rule else_clause              { <.ELSE> \{ <statement>* \} {*} }
 # TODO: rel_op_clause is not a nice name
 rule  rel_op_clause           { <REL_OP> <expression> }
 token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) {*} }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
 
 token expression              { <concat_expression>       {*}  #= concat_expression
@@ -68,7 +68,7 @@ token expression              { <concat_expression>       {*}  #= concat_express
 
 rule  array_elem              { <VAR_NAME> '[' <array_key> ']' }
 rule  array_key               { <expression>  }
-rule  var                     { <VAR_NAME> }
+rule  var                     { <VAR_NAME> {*} }
 rule  concat_expression       { <string> <concat_tail>* {*} }
 rule  string                  { <DOUBLEQUOTE_STRING> {*}   #= DOUBLEQUOTE_STRING
                               | <SINGLEQUOTE_STRING> {*}   #= SINGLEQUOTE_STRING

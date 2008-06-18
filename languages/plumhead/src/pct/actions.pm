@@ -107,6 +107,26 @@ method statement($/,$key) {
                  :node($/)
              );
     }
+    elsif $key eq 'scalar_assign' {
+        make $( $/{$key} );
+    }
+}
+
+method scalar_assign($/) {
+    make PAST::Op.new(
+             $( $<var> ),
+             $( $<expression> ),
+             :pasttype('bind'),
+         );
+}
+
+method var($/) {
+    make PAST::Var.new(
+             :scope("package"),
+             :name(~$<VAR_NAME>),
+             :viviself("Undef"),
+             :lvalue(1)
+        );
 }
 
 # loop over the statements in the else block
