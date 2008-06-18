@@ -248,10 +248,13 @@ personal taste):
 
 Add code to the file squaak.pir to achieve this.
 
-Hint 1: look in the subroutine onload.
+Hint 1: Look in the onload subroutine.
 
 Hint 2: Note that only double-quoted strings in PIR can interpret
 escape-characters such as '\n'.
+
+Hint 3: The functions to do this are documented in
+compilers/pct/src/PCT/HLLCompiler.pir.
 
 =head2 References
 
