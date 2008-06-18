@@ -10,7 +10,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
-    
+
     # @flags is the list of options that have -arch flags added to them
     # implicitly through config/init/defaults.pm when using Apple's Perl
     # 5.8 build to run Configure.pl (it's a multi-architecture build).
