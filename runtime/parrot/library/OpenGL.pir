@@ -150,7 +150,7 @@ match can be found on the system.
     .param pmc    fallback_list
 
     .local pmc    list_iter
-    list_iter = new 'Iterator', fallback_list
+    list_iter = iter fallback_list
 
     .local string libname
     .local pmc    library
@@ -218,7 +218,7 @@ alternating function names and Parrot NCI signatures.
     namespace_key = namespace.get_name()
 
     .local pmc list_iter
-    list_iter = new 'Iterator', nci_list
+    list_iter = iter nci_list
 
     .local string func_name, signature
     .local pmc    function
