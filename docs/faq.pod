@@ -55,7 +55,7 @@ both common and successful. However, register-based implementations give
 us a number of benefits: Less code needed to manipulate the stack
 frequently, access to decades of optimization for register-based hardware,
 and a minimization of stack overflow security problems. For many
-programmers, our register architecture just I<feels> more normal then
+programmers, our register architecture just I<feels> more normal than
 doing everything on a stack too.
 
 =head2 Why aren't you using external tool or library I<X>?
