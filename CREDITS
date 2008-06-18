@@ -611,6 +611,9 @@ D: Various code fixes and improvements
 N: Stéphane Peiry
 D: Lot of JIT/sun patches
 
+N: Stephen Weeks
+D: ChitChat, a Smalltalk compiler
+
 N: Sterling Hughes
 D: Questions for the FAQ
 
