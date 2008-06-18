@@ -85,12 +85,16 @@ method statement($/,$key) {
         for $<statement> {
             $past_if_block.push( $($_) );
         }
-        make PAST::Op.new(
-                 $( $<relational_expression> ),
-                 $past_if_block,
-                 :pasttype('if'),
-                 :node($/)
-             );
+        my $past := PAST::Op.new(
+                        $( $<relational_expression> ),
+                        $past_if_block,
+                        :pasttype('if'),
+                        :node($/)
+                    );
+        for $<else_clause> {
+            $past.push( $( $_ ) );
+        }
+        make $past;
     }
     elsif $key eq 'inline_sea' {
         make PAST::Op.new(
@@ -103,6 +107,18 @@ method statement($/,$key) {
                  :node($/)
              );
     }
+}
+
+# loop over the statements in the else block
+method else_clause($/) {
+    my $past  := PAST::Stmts.new(
+                     :node($/),
+                     :name('else block')
+                 );
+    for $<statement> {
+        $past.push( $($_) );
+    }
+    make $past;
 }
 
 method relational_expression($/) {

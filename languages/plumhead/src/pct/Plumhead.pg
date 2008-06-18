@@ -55,10 +55,9 @@ rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <.PAREN_
                               | <array_assign>                                                                                     {*}  #= scalar_assign
                               }
 
-rule else_clause              { <.ELSE> \{ <statement>* \} }
+rule else_clause              { <.ELSE> \{ <statement>* \} {*} }
 # TODO: rel_op_clause is not a nice name
 rule  rel_op_clause           { <REL_OP> <expression> }
-rule  else_clause             { <.ELSE> \{ <statement>* \} }
 token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> }
 rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) }
