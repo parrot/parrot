@@ -21,9 +21,6 @@ simple test file written in parrot.
 
     test_namespace."export_to"(curr_namespace, exports)
 
-# XXX This isn't really valid PIR. It's a PIR snippet. Should the coda
-# have to go here?
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
