@@ -269,8 +269,21 @@ method unary_expression($/) {
 }
 
 method concat_expression($/) {
-    make $( $<string> );
+    my $past := $( $<string> );
+    if $<concat_tail> {
+       for $<concat_tail> {
+           my $past_prev := $past;
+           my $op := $_<CONCAT_OP> eq '.' ?? '~' !! ~$_<CONCAT_OP>;
+           $past := PAST::Op.new(
+                        $past_prev,
+                        $( $_<string> ),
+                        :name( "infix:" ~ $op )
+                    );
+       }
+    }
+    make $past;
 }
+
 
 method postfix_expression($/,$key) {
     make $( $/{$key} );
