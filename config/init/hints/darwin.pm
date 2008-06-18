@@ -25,7 +25,7 @@ sub runstep {
         my $OSX_vers = `sw_vers -productVersion`;
         chomp $OSX_vers;
         # remove minor version
-        $OSX_vers =join '.', (split /[.]/, $OSX_vers)[0,1]; 
+        $OSX_vers =join '.', (split /[.]/, $OSX_vers)[0,1];
         $ENV{'MACOSX_DEPLOYMENT_TARGET'} = $OSX_vers;
     }
 

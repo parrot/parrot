@@ -2,7 +2,7 @@
 
 =head1
 
-src/builtins/all.pir -- abc bulitin functions
+src/builtins/all.pir -- abc builtin functions
 
 =cut
 
@@ -145,9 +145,9 @@ src/builtins/all.pir -- abc bulitin functions
     print "\n"
 .end
 
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
+
