@@ -9,6 +9,45 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $verbose = $conf->options->get('verbose');
+    
+    # @flags is the list of options that have -arch flags added to them
+    # implicitly through config/init/defaults.pm when using Apple's Perl
+    # 5.8 build to run Configure.pl (it's a multi-architecture build).
+    # This doesn't play nice with getting parrot to build on PPC systems
+    # and causes all sorts of fun issues with lipo and friends.  So, it's
+    # time to remove all -arch flags set in $conf->data that haven't been
+    # requested by command-line options and force a single, native
+    # architecture to being the default build.
+    my @flags = qw(ccflags linkflags ldflags ld_share_flags ld_load_flags);
+    my @arches = qw(i386 ppc ppc64 x86_64);
+
+    print "\nChecking for -arch flags not explicitly added:\n" if $verbose;
+    for my $flag (@flags) {
+        my $set_flags;
+        if ($flag =~ /^ld/) {
+            $set_flags = $conf->options->get('ldflags')||'';
+        }
+        else {
+            $set_flags = $conf->options->get($flag)||'';
+        }
+        my $stored = $conf->data->get($flag)||'';
+
+        print "Checking $flag...\n" if $verbose;
+        print "User-specified: ".($set_flags||'(nil)')."\n" if $verbose;
+        print "Pre-check: ".($stored||'(nil)')."\n" if $verbose;
+
+        for my $arch (@arches) {
+            if (!$set_flags || $set_flags !~ /(?:^|\W)-arch\s+$arch(?:\W|$)/) {
+                $stored =~ s/-arch\s+$arch//g;
+                $conf->data->set($flag => $stored);
+            }
+        }
+        print "Post-check: ".($conf->data->get($flag)||'(nil)')."\n" if $verbose;
+    }
+    # And now, after possibly losing a few undesired compiler and linker
+    # flags, on to the main Darwin config.
+
     my ( $ccflags, $ldflags, $libs ) = $conf->data->get(qw(ccflags ldflags libs));
 
     my $OSVers = `uname -r`;
