@@ -25,7 +25,7 @@ could run both Perl and Python, it seemed like a perfect fit.
 =head2 Is Parrot the same as Perl 6?
 
 No. Perl 6 is just one of the languages that will run on Parrot. For
-information about Perl 6 on Parrot, see L<languages/perl6/>.
+information about Perl 6 on Parrot (a.k.a Rakudo), see L<languages/perl6/>.
 
 =head2 Can I use Parrot today?
 
@@ -34,117 +34,19 @@ Yes.
 Although Parrot is currently still under development, Parrot has been usable for
 a long time. The primary way to use Parrot is to write Parrot Intermediate
 Representation (PIR), described in L<PDD19|docs/pdds/draft/pdd19_pir.pod>.
-PIR is a high-level assembly language. PIR maps to the more low-level
-Parrot Assembly language (PASM), which is harder to write and read.
-Although you could write PASM instead of PIR, PIR is the recommended way
-to program for Parrot. See the examples to see what both PIR and PASM
-looks like.
-
-You can also create dynamic content within Apache using Ask Bjorn Hansen's
-mod_parrot module.  You are strongly advised that mod_parrot is a toy, and
-should not be used with any production code.
-
-=head2 Why should I program in PIR?
-
-Lots of reasons, actually.  :^)
-
-=over 4
-
-=item *
-
-All the L<cool kids|"LINKS"> are doing it.
-
-=item *
-
-It's easy to write and read.
-
-=item *
-
-You get all the pleasure of programming in assembly language (albeit a high-level
-assembly language) without any of the requisite system crashes.
-
-=back
-
-Seriously, though, PIR is generally easy to learn if you have a background
-in dynamic languages. Programming in PIR is an effective way to write
-libraries for Parrot, and one of the best ways to write test cases for
-Parrot.
+PIR is a high-level assembly language. See the L<examples> directory.
 
 =head2 When can I expect to use Parrot with a I<real> programming language?
 
-You can already today! There are quite a few high level languages being
-targeted to Parrot. Since the introduction of the Parrot Compiler Tools (the
-Parrot Grammar Engine (PGE) and the Tree Grammar Engine (TGE)), targeting a
-language to Parrot has become a snap! Please note that, although some languages
-have come a long way, due to the fact that Parrot is still under active
-development, most library development is still done in PIR.
-
-Below is a list of some languages that are actively worked on.
-
-=over 4
-
-=item *
-
-Will Coleda and Matt Diephouse are working hard on their Tcl port to Parrot
-(called ParTcl). Will also created an APL implementation with Patrick R.
-Michaud.
-
-=item *
-
-Patrick R. Michaud is working on a Perl 6 implementation using the Parrot
-Compiler Tools. (although the Perl 6 specification is not finished yet).
-
-=item *
-
-François Perrad is working on a Lua implementation for Parrot.
-
-=item *
-
-Allison Randal is working on a Perl 1 port to Parrot, called Punie.
-
-=item *
-
-Jonathan Worthington has been working on a .NET to Parrot translator.
-
-=item *
-
-Many other languages are worked on, some more actively than others. See
-C<http://www.parrotcode.org/languages/> for a complete list.
-
-=back
+While the languages that are shipped with our pre-release versions of
+parrot are in varying states of development, many of them are quite
+functional. See L<languages/LANGUAGES.STATUS> for information about
+the various languages that are targeting parrot.
 
 =head2 What language is Parrot written in?
 
-C.
-
-=head2 For the love of God, man, why?!?!?!?
-
-Because it's the best we've got.
-
-=head2 That's sad.
-
-So true.  Regardless, C's available pretty much everywhere.  Perl 5's in C, so
-we can potentially build any place Perl 5 builds.
-
-=head2 Why not write it in I<insert favorite language here>?
-
-Because of one of:
-
-=over 4
-
-=item *
-
-Not available everywhere.
-
-=item *
-
-Limited talent pool for core programmers.
-
-=item *
-
-Not fast enough.
-
-=back
+While much of the build system currently uses perl 5.8.0, the parrot
+runtime is C89.
 
 =head2 Why aren't you using external tool or library I<X>?
 
@@ -152,270 +54,20 @@ The most common issues are:
 
 =over 4
 
-=item *
-License compatibility.
+=item License compatibility
 
 Parrot uses the Artistic License 2.0, which is compatible with
 the GNU GPL. This means you can combine Parrot with GPL'ed code.
 
-Code accepted into the core interpreter must fall under the same terms as
-Parrot. Library code (for example the ICU library we're using for Unicode) we
-link into the interpreter can be covered by other licenses so long as their
-terms don't prohibit this.
-
-=item *
-Platform compatibility.
+=item Platform compatibility
 
 Parrot has to work on most of Perl 5's platforms, as well as a few of its own.
 Perl 5 runs on eighty platforms; Parrot must run on Unix, Windows, Mac OS (X
 and Classic), VMS, Crays, Windows CE, and Palm OS, just to name a few.  Among
 its processor architectures will be x86, SPARC, Alpha, IA-64, ARM, and 68x00
 (Palms and old Macs).  If something doesn't work on all of these, we can't use
-it in Parrot.
-
-=item *
-Speed, size, and flexibility.
-
-Not only does Parrot have to run on all those platforms, but it must also run
-efficiently.  Parrot's core size is currently between 250K and 700K, depending
-on compiler.  That's pushing it on the handheld platforms.  Any library used by
-Parrot must be fast enough to have a fairly small performance impact, small
-enough to have little impact on core size, and flexible enough to handle the
-varying demands of Perl, Python, Tcl, Ruby, Scheme, and whatever else some
-clever or twisted hacker throws at Parrot.
+it in core Parrot.
 
 =back
-
-These tests are very hard to pass; currently we're expecting we'll probably
-have to write everything but the Unicode stuff.
-
-=head2 Why your own virtual machine?  Why not compile to JVM/.NET?
-
-Those VMs are designed for statically typed languages. That's fine, since Java,
-C#, and lots of other languages are statically typed. Perl isn't.  For a
-variety of reasons, it means that Perl would run more slowly there than on an
-interpreter geared towards dynamic languages.
-
-The .NET VM didn't even exist when we started development, or at least we
-didn't know about it when we were working on the design. We do now, though it's
-still not suitable.
-
-=head2 So you won't run on JVM/.NET?
-
-Sure we will. They're just not our first target. We build our own
-interpreter/VM, then when that's working we start in on the JVM and/or .NET
-back ends.
-
-=head2 What about I<insert other VM here>
-
-While I'm sure that's a perfectly nice, fast VM, it's probably got the same
-issues as do the languages in the "Why not something besides C" question does.
-I realize that the Scheme-48 interpreter's darned fast, for example, but we're
-looking at the same sort of portability and talent pool problems that we are
-with, say, Erlang or Haskell as an implementation language.
-
-=head2 Why is the development list called perl6-internals?
-
-It's not anymore.  As of July 2006, the list is called parrot-porters
-to reflect the growing list of languages and platforms embraced by
-Parrot.  The old perl6-internals list forwards to the new one.
-
-=head1 PARROT IMPLEMENTATION ISSUES
-
-=head2 Why a register-based VM instead of a stack-based one?
-
-The JVM and the CLR (Mono and .NET) are two successful stack-based
-virtual machines. Many interpreters such as Perl, Python, and Ruby are
-also internally stack-based.
-
-On the other hand, most hardware is register-based, as are several virtual
-machines designed to emulate hardware (such as the 68K
-emulator--L<http://en.wikipedia.org/wiki/Mac_68k_emulator>--Apple shipped with
-its PPC-enabled versions of Mac OS).
-
-A few reasons we chose a register-based architecture:
-
-=over 4
-
-=item *
-
-Executing opcodes on a register-based VM takes fewer instructions (since
-you eliminate all the steps to push items on to the stack and pull them
-off again), which means less CPU time.
-
-=item *
-
-One class of security problems in modern software are a result of
-problems with the stack (stack overflows, stack smashing). We can't
-entirely eliminate these (since Parrot is written in C, which is
-stack-based), but we can significantly minimize them.
-
-=item *
-
-A register-based VM is far more pleasant to work with than a stack-based VM.
-
-=item *
-
-In the early days of Parrot one motivating factor was taking advantage of
-decades of register-based hardware research. We've now moved away from a
-fixed number of registers to a variable (and potentially unlimited) number
-of registers per sub. This change opens up many new possibilities, but it
-does push us past the limits of most research into register-based hardware.
-
-=item *
-
-See also L<http://www.usenix.org/publications/library/proceedings/vee05/full_papers/p153-yunhe.pdf>.
-
-We're pushing forward the state-of-the art in virtual machines.
-Innovation often involves breaking with tradition. We're pleased
-with the results so far, and we're not finished yet.
-
-=back
-
-
-=head2 Why aren't you using reference counting?
-
-Reference counting has three big issues.
-
-=over 4
-
-=item Code complexity
-
-Every single place where an object is referenced, and every single place where
-a reference is dropped, I<must> properly alter the refcount of the objects
-being manipulated. One mistake and an object (and everything it references,
-directly or indirectly) lives forever or dies prematurely. Since a lot of code
-references objects, that's a lot of places to scatter reference counting code.
-While some of it can be automated, that's a lot of discipline that has to be
-maintained.
-
-It's enough of a problem to track down garbage collection systems as it is, and
-when your garbage collection system is scattered across your entire source
-base, and possibly across all your extensions, it's a massive annoyance. More
-sophisticated garbage collection systems, on the other hand, involve much less
-code. It is, granted, trickier code, but it's a small chunk of code, contained
-in one spot. Once you get that one chunk correct, you don't have to bother with
-the garbage collector any more.
-
-=item Cost
-
-For reference counting to work right, you need to twiddle reference counts
-every time an object is referenced, or unreferenced. This generally includes
-even short-lived objects that will exist only briefly before dying. The cost of
-a reference counting scheme is directly linked to the number of times code
-references, or unreferences, objects. A tracing system of one sort or another
-(and there are many) has an average-case cost that's based on the number of
-live objects.
-
-There are a number of hidden costs in a reference-counting scheme. Since the
-code to manipulate the reference counts I<must> be scattered throughout the
-interpreter, the interpreter code is less dense than it would be without
-reference counts. That means that more of the processor's cache is dedicated to
-reference count code, code that is ultimately just interpreter bookkeeping, and
-not dedicated to running your program. The data is also less dense, as there
-has to be a reference count embedded in it. Once again, that means more cache
-used for each object during normal running, and lower cache density.
-
-A tracing collector, on the other hand, has much denser code, since all it's
-doing is running through active objects in a tight loop. If done right, the
-entire tracing system will fit nicely in a processor's L1 cache, which is about
-as tight as you can get. The data being accessed is also done in a linear
-fashion, at least in part, which lends itself well to processor's prefetch
-mechanisms where they exist. The garbage collection data can also be put in a
-separate area and designed in a way that's much tighter and more cache-dense.
-
-Having said that, the worst-case performance for a tracing garbage collecting
-system is worse than that of a reference counting system. Luckily the
-pathological cases are quite rare, and there are a number of fairly good
-techniques to deal with those. Refcounting schemes are also more deterministic
-than tracing systems, which can be an advantage in some cases. Making a tracing
-collector deterministic can be somewhat expensive.
-
-=item Self-referential structures live forever
-
-Or nearly forever. Since the only time an object is destroyed is when its
-refcount drops to zero, data in a self-referential structure will live on
-forever. It's possible to detect this and clean it up, of course... by
-implementing a full tracing garbage collector. That means that you have two
-full garbage collection systems rather than one, which adds to the code
-complexity.
-
-=back
-
-=head2 Could we do a partial refcounting scheme?
-
-Well... no. It's all or nothing. If we were going to do a partial scheme we
-might as well do a full scheme. (A partial refcounting scheme is actually more
-expensive, since partial schemes check to see whether refcounts need twiddling,
-and checks are more expensive than you might think)
-
-=head2 Why are there so many opcodes?
-
-Whether we have a lot or not actually depends on how you count.  In absolute,
-unique op numbers we have more than pretty much any other processor, but that
-is in part because we have *no* runtime op variance.
-
-It's also important to note that there's no less code (or, for the
-hardware, complexity) involved in doing it our way or the decode-at-runtime
-way -- all the code is still there in every case, since we all have to do
-the same things (add a mix of ints, floats, and objects, with a variety of
-ways of finding them) so there's no real penalty to doing it our way. It
-actually simplifies the JIT some (no need to puzzle out the parameter
-types), so in that we get a win over other platforms since JIT expenses are
-paid by the user every run, while our form of decoding's only paid when you
-compile.
-
-Finally, there's the big "does it matter, and to whom?" question. To someone
-actually writing Parrot assembly, it looks like Parrot only has one "add" op --
-when emitting PASM or PIR you use the "add" mnemonic. That it gets qualified
-and assembles down to one variant or another based on the (fixed at assemble
-time) parameters is just an implementation detail. For those of us writing op
-bodies, it just looks like we've got an engine with full signature-based
-dispatching (which, really, we do -- it's just a static variant), so rather
-than having to have a big switch statement or chain of ifs at the beginning of
-the add op we just write the specific variants identified by function prototype
-and leave it to the engine to choose the right variant.
-
-Heck, we could, if we chose, switch over to a system with a single add op with
-tagged parameter types and do runtime decoding without changing the source for
-the ops at all -- the op preprocessor could glob them all together and
-autogenerate the big switch/if ladder at the head of the function. (We're not
-going to, of course, but we could.)
-
-=head2 What are the criteria for adding and deleting opcodes?
-
-As for what the rationale is... well, it's a combination of whim and necessity
-for adding them, and brutal reality for deleting them.
-
-Our ops fall into two basic categories. The first, like add, are just basic
-operations that any engine has to perform. The second, like time, are low-level
-library functions.
-
-For something like hardware, splitting standard library from the CPU makes
-sense -- often the library requires resources that the hardware doesn't have
-handy.  Hardware is also often bit-limited -- opcodes need to fit in 8 or 9
-bits.
-
-Parrot, on the other hand, *isn't* bit-limited, since our ops are 32 bits. (A
-more efficient design on RISC systems where byte-access is expensive.) That
-opens things up a bunch.
-
-If you think about it, the core opcode functions and the core low-level
-libraries are *always* available. Always. The library functions also have a
-very fixed parameter list. Fixed parameter list, guaranteed availability...
-looks like an opcode function to me.  So they are. We could make them library
-functions instead, but all that'd mean would be that they'd be more expensive
-to call (our sub/method call is a bit heavyweight) and that you'd have to do
-more work to find and call the functions. Seemed silly.
-
-Or, I suppose, you could think of it as if we had *no* opcodes at all other
-than C<end> and C<loadoplib>. Heck, we've a loadable opcode system -- it'd
-not be too much of a stretch to consider all the opcode functions other
-than those two as just functions with a fast-path calling system. The fact
-that a while bunch of 'em are available when you start up's just a
-convenience for you.
-
-See L<http://www.nntp.perl.org/group/perl.perl6.internals/22003> for more
-details.
 
 =cut
