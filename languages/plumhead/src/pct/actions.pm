@@ -110,6 +110,9 @@ method statement($/,$key) {
     elsif $key eq 'scalar_assign' {
         make $( $/{$key} );
     }
+    elsif $key eq 'array_assign' {
+        make $( $/{$key} );
+    }
 }
 
 method scalar_assign($/) {
@@ -120,10 +123,39 @@ method scalar_assign($/) {
          );
 }
 
+method array_key($/) {
+    make $( $<expression> );
+}
+
+method array_assign($/) {
+    make PAST::Op.new(
+             $( $<array_elem> ),
+             $( $<expression> ),
+             :pasttype('copy'),
+         );
+}
+
+method array_elem($/) {
+    my $past_var_name := $( $<VAR_NAME> );
+    $past_var_name.scope('package');
+    $past_var_name.viviself('Hash');
+    make PAST::Var.new(
+             $past_var_name,
+             $( $<array_key> ),
+             :scope('keyed'),
+             :viviself("Undef"),
+             :lvalue(1)
+        );
+}
+
 method var($/) {
+    make $( $<VAR_NAME> );
+}
+
+method VAR_NAME($/) {
     make PAST::Var.new(
              :scope("package"),
-             :name(~$<VAR_NAME>),
+             :name(~$/),
              :viviself("Undef"),
              :lvalue(1)
         );
