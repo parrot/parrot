@@ -40,6 +40,9 @@ ASCII key.
     # Init miscellaneous globals
     init_globals()
 
+    # Create particle effect
+    init_particle_effect()
+
     # Set up GLUT callbacks
     .const .Sub draw       = 'draw'
     .const .Sub idle       = 'idle'
@@ -107,18 +110,21 @@ ASCII key.
     set_global 'paused', paused
 
     # Set up time bases to control animation
-    .local pmc time_prev, time_curr, time_sim
+    .local pmc time_prev, time_curr, time_sim, time_sim_dt
     .local num now
-    now       = time
-    time_prev = new 'Float'
-    time_prev = now
-    time_curr = new 'Float'
-    time_curr = now
-    time_sim  = new 'Float'
-    time_sim  = 0
-    set_global 'time_prev', time_prev
-    set_global 'time_curr', time_curr
-    set_global 'time_sim',  time_sim
+    now         = time
+    time_prev   = new 'Float'
+    time_prev   = now
+    time_curr   = new 'Float'
+    time_curr   = now
+    time_sim    = new 'Float'
+    time_sim    = 0
+    time_sim_dt = new 'Float'
+    time_sim_dt = 0
+    set_global 'time_prev',   time_prev
+    set_global 'time_curr',   time_curr
+    set_global 'time_sim',    time_sim
+    set_global 'time_sim_dt', time_sim_dt
 
     # Create structure definition for float4 structure
     .local pmc float4
@@ -136,6 +142,24 @@ ASCII key.
     push float4, 0
     push float4, 0
     set_global 'float4', float4
+.end
+
+.sub init_particle_effect
+    .local pmc pfx_pos
+    pfx_pos = new 'FixedFloatArray'
+    pfx_pos = 3
+    pfx_pos[0] = 4.0
+    pfx_pos[1] = 0.0
+    pfx_pos[2] = 0.0
+    set_global 'pfx_pos', pfx_pos
+
+    .local pmc pfx_vel
+    pfx_vel = new 'FixedFloatArray'
+    pfx_vel = 3
+    pfx_vel[0] = 0.0125
+    pfx_vel[1] = 0.135
+    pfx_vel[2] = 0.0
+    set_global 'pfx_vel', pfx_vel
 .end
 
 .sub draw
@@ -178,7 +202,7 @@ ASCII key.
     .local num angle
     time_sim  = get_global 'time_sim'
     angle     = time_sim
-    angle    *= -36
+    angle    *= -18
     angle    %= 360
 
     glRotatef(angle, 0, 1, 0)
@@ -281,19 +305,26 @@ ASCII key.
 .end
 
 .sub draw_objects
-    draw_rgb_triangle()
-    draw_lit_teapot()
-    draw_particle_effect()
+    .local pmc time_sim, time_sim_dt
+    .local num time, dt
+    time_sim    = get_global 'time_sim'
+    time_sim_dt = get_global 'time_sim_dt'
+    time        = time_sim
+    dt          = time_sim_dt
+
+    draw_rgb_triangle   (time)
+    draw_lit_teapot     ()
+    draw_particle_effect(dt)
 .end
 
 .sub draw_rgb_triangle
+    .param num time
+
     # Unlit spinning RGB triangle at -Z
 
-    .local pmc time_sim
     .local num angle
-    time_sim  = get_global 'time_sim'
-    angle     = time_sim
-    angle    *= 90
+    angle     = time
+    angle    *= 45
     angle    %= 360
 
     glPushMatrix()
@@ -349,18 +380,120 @@ ASCII key.
 .end
 
 .sub draw_particle_effect
-    # Particle effect at +Z
+    .param num dt
+
+    # "Black hole" particle effect at +Z
+
+    # Speed up time a little; this effect is *slow*
+    dt  *= 20
+
+    # Constants
+    .const num G           = -.075   # Gravitational force constant
+    .const num Cd          = -.00033 # Coefficient of drag
+    .const num event_grav  = -.3     # Gravity at "event horizon"
+    .const num min_dist2   =  .001   # Minimum distance**2 before calc blows up
+    .const num escape_dist = 30      # Distance at which "escape" occurs
+
+    # Particle states
+    .local pmc pfx_pos, pfx_vel
+    .local num x, y, z, vx, vy, vz
+    pfx_pos = get_global 'pfx_pos'
+    pfx_vel = get_global 'pfx_vel'
+    x  = pfx_pos[0]
+    y  = pfx_pos[1]
+    z  = pfx_pos[2]
+    vx = pfx_vel[0]
+    vy = pfx_vel[1]
+    vz = pfx_vel[2]
+
+    # Calculate distance and distance squared
+    .local num x2, y2, z2, dist2, dist
+    x2     = x * x
+    y2     = y * y
+    z2     = z * z
+    dist2  = x2 + y2
+    dist2 += z2
+    if dist2 >= min_dist2 goto dist2_ok
+    dist2  = min_dist2
+  dist2_ok:
+    dist   = sqrt dist2
+
+    # Calculate gravity vector (always directed toward center of "hole")
+    .local num grav, gx, gy, gz
+    grav  = G / dist2
+    gx    = x / dist
+    gy    = y / dist
+    gz    = z / dist
+    gx   *= grav
+    gy   *= grav
+    gz   *= grav
+
+    # Calculate drag vector (always directed opposite of velocity)
+    # NOTE: Using drag proportional to velocity, instead of velocity squared
+    .local num dragx, dragy, dragz
+    dragx = Cd * vx
+    dragy = Cd * vy
+    dragz = Cd * vz
+
+    # Acceleration is gravity + drag
+    .local num ax, ay, az
+    ax = gx + dragx
+    ay = gy + dragy
+    az = gz + dragz
+
+    # Update velocity and position with simple Euler integration
+    .local num dvx, dvy, dvz
+    .local num  dx,  dy,  dz
+    dvx  = ax * dt
+    dvy  = ay * dt
+    dvz  = az * dt
+    vx  += dvx
+    vy  += dvy
+    vz  += dvz
+    dx   = vx * dt
+    dy   = vy * dt
+    dz   = vz * dt
+    x   += dx
+    y   += dy
+    z   += dz
+
+    # Save new values back to particle state
+    pfx_vel[0] = vx
+    pfx_vel[1] = vy
+    pfx_vel[2] = vz
+    pfx_pos[0] = x
+    pfx_pos[1] = y
+    pfx_pos[2] = z
 
     glPushMatrix()
     glTranslatef(0, .5, 1.5)
     glRotatef(-30, 0, 0, 1)
+    glRotatef( 90, 1, 0, 0)
+    glScalef(.1, .1, .1)
 
+    glEnable(.GL_BLEND)
+    glBlendFunc(.GL_SRC_ALPHA, .GL_ONE)
+    glDepthMask(.GL_FALSE)
+    glEnable(.GL_POINT_SMOOTH)
+    glPointSize(10)
+
+    # Show plane of effect
+    glColor4f(1, 1, 1, .2)
     glBegin(.GL_QUADS)
-    glVertex3f(-.5, 0,  .5)
-    glVertex3f( .5, 0,  .5)
-    glVertex3f( .5, 0, -.5)
-    glVertex3f(-.5, 0, -.5)
+    glVertex3f(-2, -2, 0)
+    glVertex3f( 2, -2, 0)
+    glVertex3f( 2,  2, 0)
+    glVertex3f(-2,  2, 0)
     glEnd()
+
+    # Draw particles
+    glColor4f(1, 1, 1, .5)
+    glBegin(.GL_POINTS)
+    glVertex3f(x, y, z)
+    glEnd()
+
+    glDepthMask(.GL_TRUE)
+    glDisable(.GL_BLEND)
 
     glPopMatrix()
 .end
@@ -389,14 +522,18 @@ ASCII key.
     .local pmc paused
     paused = get_global 'paused'
     unless paused goto update_time_sim
-    .return ()
-
+    dt     = 0
   update_time_sim:
-    .local pmc time_sim
-    time_sim  = get_global 'time_sim'
-    time_sim += dt
+    .local pmc time_sim, time_sim_dt
+    time_sim     = get_global 'time_sim'
+    time_sim_dt  = get_global 'time_sim_dt'
+    time_sim_dt  = dt
+    time_sim    += dt
 
     # Request redraw if sim time updated
+    unless paused goto post_redisplay
+    .return ()
+  post_redisplay:
     glutPostRedisplay()
 .end
 
