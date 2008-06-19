@@ -281,6 +281,14 @@ ASCII key.
 .end
 
 .sub draw_objects
+    draw_rgb_triangle()
+    draw_lit_teapot()
+    draw_particle_effect()
+.end
+
+.sub draw_rgb_triangle
+    # Unlit spinning RGB triangle at -Z
+
     .local pmc time_sim
     .local num angle
     time_sim  = get_global 'time_sim'
@@ -288,9 +296,8 @@ ASCII key.
     angle    *= 90
     angle    %= 360
 
-    # Unlit spinning RGB triangle at -Z
     glPushMatrix()
-    glTranslatef(0, 0, -1.5)
+    glTranslatef(0, 0.04, -1.5)
     glRotatef(angle, 0, 1, 0)
 
     glBegin(.GL_TRIANGLES)
@@ -307,12 +314,16 @@ ASCII key.
     glEnd()
 
     glPopMatrix()
+.end
 
+.sub draw_lit_teapot
     # Lit cyan teapot at +X
-    glEnable(.GL_LIGHTING)
+
     glPushMatrix()
     glTranslatef(1.5, .5, 0)
     glRotatef(90, 0, 1, 0)
+
+    glEnable(.GL_LIGHTING)
 
     .local pmc float4, color
     float4 = get_global 'float4'
@@ -332,8 +343,26 @@ ASCII key.
 
     glutSolidTeapot(.5)
 
-    glPopMatrix()
     glDisable(.GL_LIGHTING)
+
+    glPopMatrix()
+.end
+
+.sub draw_particle_effect
+    # Particle effect at +Z
+
+    glPushMatrix()
+    glTranslatef(0, .5, 1.5)
+    glRotatef(-30, 0, 0, 1)
+
+    glBegin(.GL_QUADS)
+    glVertex3f(-.5, 0,  .5)
+    glVertex3f( .5, 0,  .5)
+    glVertex3f( .5, 0, -.5)
+    glVertex3f(-.5, 0, -.5)
+    glEnd()
+
+    glPopMatrix()
 .end
 
 .sub set_2d_view
