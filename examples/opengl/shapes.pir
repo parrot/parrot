@@ -149,31 +149,10 @@ ASCII key.
     pfx_pos = new 'ResizablePMCArray'
     pfx_vel = new 'ResizablePMCArray'
 
-    new_particle(pfx_pos, pfx_vel)
+    new_particle(0, pfx_pos, pfx_vel)
 
     set_global 'pfx_pos', pfx_pos
     set_global 'pfx_vel', pfx_vel
-.end
-
-.sub new_particle
-    .param pmc pfx_pos
-    .param pmc pfx_vel
-
-    .local pmc pos
-    pos = new 'FixedFloatArray'
-    pos = 3
-    pos[0] = 4.0
-    pos[1] = 0.0
-    pos[2] = 0.0
-    push pfx_pos, pos
-
-    .local pmc vel
-    vel = new 'FixedFloatArray'
-    vel = 3
-    vel[0] = 0.0125
-    vel[1] = 0.135
-    vel[2] = 0.0
-    push pfx_vel, vel
 .end
 
 .sub draw
@@ -183,6 +162,12 @@ ASCII key.
     glClear(buffers)
 
     set_3d_view()
+
+    .local pmc time_sim_dt
+    .local num dt
+    time_sim_dt = get_global 'time_sim_dt'
+    dt          = time_sim_dt
+    update_particle_effect(dt)
 
     draw_reflected_scene()
 
@@ -206,10 +191,10 @@ ASCII key.
     glLoadIdentity()
     gluPerspective(60, aspect, 1, 100)
 
-    # Look at origin from (0,3,3), with +Y up
+    # Look at origin from (0,2,4), with +Y up
     glMatrixMode(.GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 3, 3, 0, 0, 0, 0, 1, 0)
+    gluLookAt(0, 2, 4, 0, 0, 0, 0, 1, 0)
 
     # Rotate view around origin, to see objects from all angles
     .local pmc time_sim
@@ -319,16 +304,14 @@ ASCII key.
 .end
 
 .sub draw_objects
-    .local pmc time_sim, time_sim_dt
-    .local num time, dt
-    time_sim    = get_global 'time_sim'
-    time_sim_dt = get_global 'time_sim_dt'
-    time        = time_sim
-    dt          = time_sim_dt
+    .local pmc time_sim
+    .local num time
+    time_sim = get_global 'time_sim'
+    time     = time_sim
 
     draw_rgb_triangle   (time)
     draw_lit_teapot     ()
-    draw_particle_effect(dt)
+    draw_particle_effect()
 .end
 
 .sub draw_rgb_triangle
@@ -365,7 +348,7 @@ ASCII key.
     # Lit cyan teapot at +X
 
     glPushMatrix()
-    glTranslatef(1.5, .5, 0)
+    glTranslatef(1.5, .4, 0)
     glRotatef(90, 0, 1, 0)
 
     glEnable(.GL_LIGHTING)
@@ -393,13 +376,71 @@ ASCII key.
     glPopMatrix()
 .end
 
-.sub draw_particle_effect
+.sub new_particle
+    .param int particle_num
+    .param pmc pfx_pos
+    .param pmc pfx_vel
+
+    .local num x, y, z, vx, vy, vz
+    x  = 4.0
+    y  = 0.0
+    z  = 0.0
+
+    vx = 0.0
+    vy = 0.135
+    vz = 0.0
+
+    .local pmc random
+    .local num rand
+    random = new 'Random'
+    rand  = random
+    rand *= .1
+    x    += rand
+    rand  = random
+    rand *= .1
+    y    += rand
+    rand  = random
+    rand *= .1
+    z    += rand
+
+    rand  = random
+    rand -= .5
+    rand *= .01
+    vx   += rand
+    rand  = random
+    rand -= .5
+    rand *= .01
+    vy   += rand
+    rand  = random
+    rand -= .5
+    rand *= .01
+    vz   += rand
+
+    .local pmc pos
+    pos = new 'FixedFloatArray'
+    pos = 3
+    pos[0] = x
+    pos[1] = y
+    pos[2] = z
+
+    .local pmc vel
+    vel = new 'FixedFloatArray'
+    vel = 3
+    vel[0] = vx
+    vel[1] = vy
+    vel[2] = vz
+
+    pfx_pos[particle_num] = pos
+    pfx_vel[particle_num] = vel
+.end
+
+.sub update_particle_effect
     .param num dt
 
     # "Black hole" particle effect at +Z
 
     # Speed up time a little; this effect is *slow*
-    dt *= 20
+    dt *= 30.0
 
     # Global particle state arrays
     .local pmc pfx_pos, pfx_vel
@@ -409,79 +450,36 @@ ASCII key.
     # Add a particle at random
     .local int count
     count = pfx_pos
-    if count > 1000 goto set_opengl_state
+    if count > 1000 goto update_particles
     .local pmc random
     .local num rand
     random = new 'Random'
     rand   = random
     rand  *= 4
-    if rand > dt goto set_opengl_state
-    new_particle(pfx_pos, pfx_vel)
-    inc count
+    if rand > dt goto update_particles
+    new_particle(count, pfx_pos, pfx_vel)
 
-    # Make it visually interesting
-  set_opengl_state:
-    glPushMatrix()
-    glTranslatef(0, .5, 1.5)
-    glRotatef(-30, 0, 0, 1)
-    glRotatef( 90, 1, 0, 0)
-    glScalef(.1, .1, .1)
-
-    # OpenGL state for "glowing transparent particles"
-    glEnable(.GL_BLEND)
-    glBlendFunc(.GL_SRC_ALPHA, .GL_ONE)
-    glDepthMask(.GL_FALSE)
-    glEnable(.GL_POINT_SMOOTH)
-    glPointSize(3)
-
-#     # Show plane of effect
-#     glColor4f(1, 1, 1, .2)
-#     glBegin(.GL_QUADS)
-#     glVertex3f(-2, -2, 0)
-#     glVertex3f( 2, -2, 0)
-#     glVertex3f( 2,  2, 0)
-#     glVertex3f(-2,  2, 0)
-#     glEnd()
-
-    # Start drawing particles
-    glColor4f(1, 1, 1, .5)
-    glBegin(.GL_POINTS)
-
-    # Loop over all particles, updating and drawing them
-  particle_loop:
+    # Update all particles
+  update_particles:
     dec count
-    if count < 0 goto particle_loop_end
+    if count < 0 goto update_particles_end
 
     # Update particle states
-    .local pmc pos, vel
-    pos = pfx_pos[count]
-    vel = pfx_vel[count]
-    update_particle(pos, vel, dt)
+    update_particle(pfx_pos, pfx_vel, count, dt)
 
-    # Draw particle
-    .local num x, y, z
-    x = pos[0]
-    y = pos[1]
-    z = pos[2]
-    glVertex3f(x, y, z)
-
-    goto particle_loop
-
-    # Finished with all particles
-  particle_loop_end:
-    glEnd()
-
-    # Done, return to normal OpenGL state
-    glDepthMask(.GL_TRUE)
-    glDisable(.GL_BLEND)
-
-    glPopMatrix()
+    goto update_particles
+  update_particles_end:
 .end
 
 .sub update_particle
-    .param pmc pos
-    .param pmc vel
+    .param pmc pfx_pos
+    .param pmc pfx_vel
+    .param int particle_num
     .param num dt
+
+    .local pmc pos, vel
+    pos = pfx_pos[particle_num]
+    vel = pfx_vel[particle_num]
 
     # Constants
     .const num G           = -.075   # Gravitational force constant
@@ -511,15 +509,30 @@ ASCII key.
   dist2_ok:
     dist   = sqrt dist2
 
+    # If distance is too great, particle has "escaped"; regenerate it
+    if dist < escape_dist goto dist_ok
+    new_particle(particle_num, pfx_pos, pfx_vel)
+    .return ()
+  dist_ok:
+
+    # Compute gravity force
+    .local num grav
+    grav = G / dist2
+
+    # If gravity is too strong, it has "passed the event horizon"; regenerate it
+    if grav > event_grav goto grav_ok
+    new_particle(particle_num, pfx_pos, pfx_vel)
+    .return ()
+  grav_ok:
+
     # Calculate gravity vector (always directed toward center of "hole")
-    .local num grav, gx, gy, gz
-    grav  = G / dist2
-    gx    = x / dist
-    gy    = y / dist
-    gz    = z / dist
-    gx   *= grav
-    gy   *= grav
-    gz   *= grav
+    .local num gx, gy, gz
+    gx  = x / dist
+    gy  = y / dist
+    gz  = z / dist
+    gx *= grav
+    gy *= grav
+    gz *= grav
 
     # Calculate drag vector (always directed opposite of velocity)
     # NOTE: Using drag proportional to velocity, instead of velocity squared
@@ -557,6 +570,70 @@ ASCII key.
     pos[0] = x
     pos[1] = y
     pos[2] = z
+.end
+
+.sub draw_particle_effect
+    # "Black hole" particle effect at +Z
+
+    # Make it visually interesting
+    glPushMatrix()
+    glTranslatef(0, .3, 1.5)
+    glRotatef(-20, 0, 0, 1)
+    glRotatef( 90, 1, 0, 0)
+    glScalef(.15, .15, .15)
+
+    # OpenGL state for "glowing transparent particles"
+    glEnable(.GL_BLEND)
+    glBlendFunc(.GL_SRC_ALPHA, .GL_ONE)
+    glDepthMask(.GL_FALSE)
+    glEnable(.GL_POINT_SMOOTH)
+    glPointSize(4)
+
+#     # Show plane of effect
+#     glColor4f(1, 1, 1, .2)
+#     glBegin(.GL_QUADS)
+#     glVertex3f(-2, -2, 0)
+#     glVertex3f( 2, -2, 0)
+#     glVertex3f( 2,  2, 0)
+#     glVertex3f(-2,  2, 0)
+#     glEnd()
+
+    # Start drawing particles
+    glColor4f(1, 1, 1, .5)
+    glBegin(.GL_POINTS)
+
+    # Global particle state arrays
+    .local pmc pfx_pos, pfx_vel
+    pfx_pos = get_global 'pfx_pos'
+    pfx_vel = get_global 'pfx_vel'
+
+    # Loop over all particles, updating and drawing them
+    .local int count
+    count = pfx_pos
+  draw_particle_loop:
+    dec count
+    if count < 0 goto draw_particle_loop_end
+
+    # Draw particle
+    .local pmc pos
+    .local num x, y, z
+    pos = pfx_pos[count]
+    x   = pos[0]
+    y   = pos[1]
+    z   = pos[2]
+    glVertex3f(x, y, z)
+
+    goto draw_particle_loop
+
+    # Finished with all particles
+  draw_particle_loop_end:
+    glEnd()
+
+    # Done, return to normal OpenGL state
+    glDepthMask(.GL_TRUE)
+    glDisable(.GL_BLEND)
+
+    glPopMatrix()
 .end
 
 .sub set_2d_view
