@@ -145,21 +145,35 @@ ASCII key.
 .end
 
 .sub init_particle_effect
-    .local pmc pfx_pos
-    pfx_pos = new 'FixedFloatArray'
-    pfx_pos = 3
-    pfx_pos[0] = 4.0
-    pfx_pos[1] = 0.0
-    pfx_pos[2] = 0.0
-    set_global 'pfx_pos', pfx_pos
+    .local pmc pfx_pos, pfx_vel
+    pfx_pos = new 'ResizablePMCArray'
+    pfx_vel = new 'ResizablePMCArray'
 
-    .local pmc pfx_vel
-    pfx_vel = new 'FixedFloatArray'
-    pfx_vel = 3
-    pfx_vel[0] = 0.0125
-    pfx_vel[1] = 0.135
-    pfx_vel[2] = 0.0
+    new_particle(pfx_pos, pfx_vel)
+
+    set_global 'pfx_pos', pfx_pos
     set_global 'pfx_vel', pfx_vel
+.end
+
+.sub new_particle
+    .param pmc pfx_pos
+    .param pmc pfx_vel
+
+    .local pmc pos
+    pos = new 'FixedFloatArray'
+    pos = 3
+    pos[0] = 4.0
+    pos[1] = 0.0
+    pos[2] = 0.0
+    push pfx_pos, pos
+
+    .local pmc vel
+    vel = new 'FixedFloatArray'
+    vel = 3
+    vel[0] = 0.0125
+    vel[1] = 0.135
+    vel[2] = 0.0
+    push pfx_vel, vel
 .end
 
 .sub draw
@@ -202,7 +216,7 @@ ASCII key.
     .local num angle
     time_sim  = get_global 'time_sim'
     angle     = time_sim
-    angle    *= -18
+    angle    *= -24
     angle    %= 360
 
     glRotatef(angle, 0, 1, 0)
@@ -385,21 +399,28 @@ ASCII key.
     # "Black hole" particle effect at +Z
 
     # Speed up time a little; this effect is *slow*
-    dt  *= 20
+    dt *= 20
 
-    # Update particle state
-    .local pmc pos, vel
-    pos = get_global 'pfx_pos'
-    vel = get_global 'pfx_vel'
-    update_particle(pos, vel, dt)
+    # Global particle state arrays
+    .local pmc pfx_pos, pfx_vel
+    pfx_pos = get_global 'pfx_pos'
+    pfx_vel = get_global 'pfx_vel'
 
-    # Easier to deal with as separate variables
-    .local num x, y, z
-    x  = pos[0]
-    y  = pos[1]
-    z  = pos[2]
+    # Add a particle at random
+    .local int count
+    count = pfx_pos
+    if count > 1000 goto set_opengl_state
+    .local pmc random
+    .local num rand
+    random = new 'Random'
+    rand   = random
+    rand  *= 4
+    if rand > dt goto set_opengl_state
+    new_particle(pfx_pos, pfx_vel)
+    inc count
 
     # Make it visually interesting
+  set_opengl_state:
     glPushMatrix()
     glTranslatef(0, .5, 1.5)
     glRotatef(-30, 0, 0, 1)
@@ -411,21 +432,43 @@ ASCII key.
     glBlendFunc(.GL_SRC_ALPHA, .GL_ONE)
     glDepthMask(.GL_FALSE)
     glEnable(.GL_POINT_SMOOTH)
-    glPointSize(10)
+    glPointSize(3)
 
-    # Show plane of effect
-    glColor4f(1, 1, 1, .2)
-    glBegin(.GL_QUADS)
-    glVertex3f(-2, -2, 0)
-    glVertex3f( 2, -2, 0)
-    glVertex3f( 2,  2, 0)
-    glVertex3f(-2,  2, 0)
-    glEnd()
+#     # Show plane of effect
+#     glColor4f(1, 1, 1, .2)
+#     glBegin(.GL_QUADS)
+#     glVertex3f(-2, -2, 0)
+#     glVertex3f( 2, -2, 0)
+#     glVertex3f( 2,  2, 0)
+#     glVertex3f(-2,  2, 0)
+#     glEnd()
 
-    # Draw particles
+    # Start drawing particles
     glColor4f(1, 1, 1, .5)
     glBegin(.GL_POINTS)
+
+    # Loop over all particles, updating and drawing them
+  particle_loop:
+    dec count
+    if count < 0 goto particle_loop_end
+
+    # Update particle states
+    .local pmc pos, vel
+    pos = pfx_pos[count]
+    vel = pfx_vel[count]
+    update_particle(pos, vel, dt)
+
+    # Draw particle
+    .local num x, y, z
+    x = pos[0]
+    y = pos[1]
+    z = pos[2]
     glVertex3f(x, y, z)
+
+    goto particle_loop
+
+    # Finished with all particles
+  particle_loop_end:
     glEnd()
 
     # Done, return to normal OpenGL state
