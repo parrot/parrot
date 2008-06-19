@@ -14,11 +14,11 @@ the whole and everything and memory management.
 =head1 OVERVIEW
 
 All allocated items are managed in memory pools. Memory pools hold collections
-of similar items. These pools can be roughly divided into two kinds: pools
-holding fixed sized items and variable sized items.
+of similar items. These can be roughly divided into two kinds: pools
+holding fixed sized items and pools holding variable sized items.
 
-A pool is organized as a linked list of big chunks, holding many managed items
-of one kind.
+A pool is organized as a linked list of big chunks, called I<Arenas>. Each
+Arena holds and manages a set number of items of a single size and shape.
 
 =head2 Abbreviations used here
 
@@ -26,52 +26,47 @@ DOD ... dead object detection, see F<docs/pdds/pdd09_gc.pod> for details.
 
 By scanning through all the interpreter's registers, stacks and the processor
 stack, all objects that are detected here are marked as alive. Objects in all
-pools not alive are considered dead.
+pools not alive at the end of the detection phase are considered dead.
 
 =head1 Top down: the interpreter
 
 A overall layout of the interpreter's memory management looks like so:
 
-    typedef Interp {
+    typedef struct Interp {
         ...
         struct Arenas *arena_base;
         ...
     } Interp;
 
 All object-like things that get allocated during the execution of parrot
-bytecode are managed here.
+bytecode are managed from the C<arena_base> member of the interpreter
+structure.
 
 =head1 Arenas
 
 C<struct Arenas> holds pointers to different subkinds of managed memory. A
 simplification looks similar to this:
 
-    struct Arenas {
+    typedef struct Arenas {
         struct Memory_Pool *memory_pool;
         ...
         struct Small_Object_Pool * header_pool;
-    }
+    } Arenas;
 
 C<Memory_pool> and C<header_pool> are variable and fixed sized pool pointers
-respectively.
-
-=head1 Memory_Pool
-
-Here all variable sized items are allocated, managed in linked lists of
-C<Memory_Blocks> - but see below.
-
-=head1 Small_Object_Pool
-
-This pool manages C<Small_Object_Arena>s, linked together, which provide the
-space for the fixed sized objects.
+respectively. These are just two examples, there are other C<Memory_Pool>s
+and C<Small_Object_Pool>s in the Parrot system. Pools of type
+C<struct Memory_Pool> are for variable-size objects, such as string buffers.
+Pools of type C<struct Small_Object_Pool> are for fixed-size objects such
+as headers or PMCs.
 
 =head1 Fixed sized items
 
-These items are either objects by themselves, like a C<PMC>, or are a header
-structure of a variable sized object like a C<STRING>.  The general object of
-this kind is a buffer-like object, which consists of a C<Buffer> or a C<PObj>
-at the beginning and a variable but fixed sized part after the buffer
-structure. Examples of this are a C<STRING> or an C<IntList>.
+Fixed-size items are either objects by themselves, like a C<PMC>, or are
+header structures of variable-sized objects like C<STRING>.  The general
+object of this kind is a buffer-like object, which consists of a
+C<Buffer> or a C<PObj> at the beginning and a variable but fixed sized
+part after the buffer structure.
 
 Buffer-like objects of the same size are maintained in the
 I<sized_header_pools>, which manage objects of the same size in one slot.
@@ -81,22 +76,25 @@ onto the pool's C<free_list>. When there is need for a new object it is taken
 off the free list, and when it stops being used, it will be put back on the
 free list again. DOD detects which objects are no longer being used.
 
-If the free list is empty then a DOD run is started, which may be able to
-refill the free list with dead objects it detects are free for re-use.  If it
-finds none then a new pool is allocated to hold more objects.
+If the free list is empty then a DOD run is initiated. This may be able to
+find some dead objects and free them up for immediate reuse. However, if
+there are no objects that can be immediately recycled, a new arena will be
+allocated.
 
 These fixed-sized objects are never returned to the operating system
 during the lifetime of an interpreter, they just get reused or recycled.
+Eventually, this policy may change and unused arenas may be returned to
+the OS.
 
 =head2 General structure of a buffer-like item
 
     struct parrot_object_t {
-    struct {
-        void *bufstart;
-        size_t buflen;
-    } b;
-    unsigned flags;
-    ...
+        struct {
+            void *bufstart;
+            size_t buflen;
+        } b;
+        unsigned flags;
+        ...
     } PObj;
 
 This does not totally reflect the current implementation, but is the spirit of
@@ -112,89 +110,14 @@ C<PObj_on_free_list_FLAG>, and C<PObj_is_special_PMC_FLAG>.  Normally these
 flags are stored in C<PObj-E<gt>flags>, meaning that each PMC must be accessed
 during the DOD run.
 
-An alternative approach is to store the DOD-Flags in the Arenas as a packed
-array of bits. This approach will be used if the preprocessor variable
-C<ARENA_DOD_FLAGS> is defined to 1, which happens by default if the system
-provides a memory alignment primitive such as C<memalign>. In this case the
-C<struct Small_Object_Arena> is extended with a pointer to the packed bitarray
-
-    struct Small_Object_Arena {
-        UINTVAL *dod_flags;
-        size_t object_size;
-        ...
-    };
-
-The memory for this Small_Object_Arena is allocated at the beginning of a 
-large aligned block of memory (currently 4Mib) and the objects in this arena 
-come from this memory block. Therefore the arena of an object can be found by 
-simply masking out the lower bits of the pointer to the object:
-
-    arena = object & ARENA_MASK;
-
-The macro C<GET_ARENA> does exactly this, including the necessary type casts to
-remove warnings. The dod_flags are accessed by getting the element number in
-the arena (this is possible because the C<object_size> is fixed and stored in
-the C<struct Small_Object_Arena>), creating the appropriate bitmask by shifting
-and accessing the right element of C<dod_flags[]>.
-
-    n = (object - arena->start_objects) / arena->object_size;
-    arena->dod_flags[n >> ARENA_FLAG_SHIFT] 
-        & flag << ((n & ARENA_FLAG_MASK) << 2)
-
+An alternative approach is to store the DOD-Flags together somewhere, such as
+in the individual arenas, as a packed array of bits. This approach, called
+cardmarking, should be indicated by defining the preprocessor variable
+C<ARENA_DOD_FLAGS> to 1.
 
 F<pobj.h> provides macros to facilitate referencing individual object flags:
-C<DOD_flag_SET>, C<DOD_flag_CLEAR> and C<DOD_flag_TEST>. They are also defined
-in the case without ARENA_DOD_FLAGS, so they make up a portable way of
-manipulating the DOD-relevant object flags.
-
-=head3 Flag packing format
-
-The three object flags consulted during DOD are packed into one 4-bit nibble
-per object (one bit is currently unused).  Since C<arena-E<gt>dod_flags[]> is
-an array of native-sized UINTVALs ("words"), the number of nibbles per array
-entry varies depending on the platform.
-
-To reference a particular flag in a test, set, or clear operation, we require
-both the word containing the object's flags and a bitmask to isolate the flag.
-
-The flag word for object o is found as follows:
-
-- Get the C<dod_flags[]> array for the object's arena
-
-    [GET_ARENA(o)->dod_flags]
-
-- Get the index of the object in its arena
-
-    [n=GET_OBJ_N(arena,o)]
-
-- Determine which word in dod_flags contains the needed flag nibble
-
-    [(obj index)/(obj flag sets per word) = n>>ARENA_FLAG_SHIFT]
-
-The composite expression to reference the flag word is then
-
-    GET_ARENA(o)->dod_flags[ GET_OBJ_N(GET_ARENA(o), o) >> ARENA_FLAG_SHIFT ]
-
-The bitmask for the desired flag is constructed as follows:
-
-- Determine the index into the flag word of the object's nibble
-
-    [(obj index)%(nibbles per word) = n & ARENA_FLAG_MASK]
-
-- Convert nibble index into bit index
-
-    [(nibble index)*(bits per nibble) = (n & ARENA_FLAG_MASK) << 2]
-
-- Create bitmask for desired flag by shifting base flag by bit index
-
-    [d_PObj_whatever_FLAG << (nibble index)]
-
-The composite expression to form the bitmask is then
-
-    (d_PObj_ ## flag ## _FLAG << (( GET_OBJ_N(GET_ARENA(o), o) &
-        ARENA_FLAG_MASK ) << 2))
-
-The DOD_flag_* macros combine these constructions to access the flags.
+C<DOD_flag_SET>, C<DOD_flag_CLEAR> and C<DOD_flag_TEST>. They make up a
+portable way of manipulating the DOD-relevant object flags.
 
 =head1 Variable sized items
 
@@ -315,13 +238,10 @@ filled in ;-)
 =head1 FILES
 
 smallobject.[ch], headers.c, resources.[ch], res_lea.c, dod.c, string.[ch],
-pobj.h.
+pobj.h. Other garbage collector implementations may use separate files as
+well.
 
 =head1 BUGS
-
-All spelling errors belong to those who honestly collected them, as well as all
-errors related to my abuse of the English language - I'm not natively speaking
-it.
 
 To minimize this bugs section - please patch this document and keep it up to
 date - thanks.
