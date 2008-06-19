@@ -387,6 +387,59 @@ ASCII key.
     # Speed up time a little; this effect is *slow*
     dt  *= 20
 
+    # Update particle state
+    .local pmc pos, vel
+    pos = get_global 'pfx_pos'
+    vel = get_global 'pfx_vel'
+    update_particle(pos, vel, dt)
+
+    # Easier to deal with as separate variables
+    .local num x, y, z
+    x  = pos[0]
+    y  = pos[1]
+    z  = pos[2]
+
+    # Make it visually interesting
+    glPushMatrix()
+    glTranslatef(0, .5, 1.5)
+    glRotatef(-30, 0, 0, 1)
+    glRotatef( 90, 1, 0, 0)
+    glScalef(.1, .1, .1)
+
+    # OpenGL state for "glowing transparent particles"
+    glEnable(.GL_BLEND)
+    glBlendFunc(.GL_SRC_ALPHA, .GL_ONE)
+    glDepthMask(.GL_FALSE)
+    glEnable(.GL_POINT_SMOOTH)
+    glPointSize(10)
+
+    # Show plane of effect
+    glColor4f(1, 1, 1, .2)
+    glBegin(.GL_QUADS)
+    glVertex3f(-2, -2, 0)
+    glVertex3f( 2, -2, 0)
+    glVertex3f( 2,  2, 0)
+    glVertex3f(-2,  2, 0)
+    glEnd()
+
+    # Draw particles
+    glColor4f(1, 1, 1, .5)
+    glBegin(.GL_POINTS)
+    glVertex3f(x, y, z)
+    glEnd()
+
+    # Done, return to normal OpenGL state
+    glDepthMask(.GL_TRUE)
+    glDisable(.GL_BLEND)
+
+    glPopMatrix()
+.end
+
+.sub update_particle
+    .param pmc pos
+    .param pmc vel
+    .param num dt
+
     # Constants
     .const num G           = -.075   # Gravitational force constant
     .const num Cd          = -.00033 # Coefficient of drag
@@ -395,16 +448,13 @@ ASCII key.
     .const num escape_dist = 30      # Distance at which "escape" occurs
 
     # Particle states
-    .local pmc pfx_pos, pfx_vel
     .local num x, y, z, vx, vy, vz
-    pfx_pos = get_global 'pfx_pos'
-    pfx_vel = get_global 'pfx_vel'
-    x  = pfx_pos[0]
-    y  = pfx_pos[1]
-    z  = pfx_pos[2]
-    vx = pfx_vel[0]
-    vy = pfx_vel[1]
-    vz = pfx_vel[2]
+    x  = pos[0]
+    y  = pos[1]
+    z  = pos[2]
+    vx = vel[0]
+    vy = vel[1]
+    vz = vel[2]
 
     # Calculate distance and distance squared
     .local num x2, y2, z2, dist2, dist
@@ -458,44 +508,12 @@ ASCII key.
     z   += dz
 
     # Save new values back to particle state
-    pfx_vel[0] = vx
-    pfx_vel[1] = vy
-    pfx_vel[2] = vz
-    pfx_pos[0] = x
-    pfx_pos[1] = y
-    pfx_pos[2] = z
-
-    glPushMatrix()
-    glTranslatef(0, .5, 1.5)
-    glRotatef(-30, 0, 0, 1)
-    glRotatef( 90, 1, 0, 0)
-    glScalef(.1, .1, .1)
-
-    glEnable(.GL_BLEND)
-    glBlendFunc(.GL_SRC_ALPHA, .GL_ONE)
-    glDepthMask(.GL_FALSE)
-    glEnable(.GL_POINT_SMOOTH)
-    glPointSize(10)
-
-    # Show plane of effect
-    glColor4f(1, 1, 1, .2)
-    glBegin(.GL_QUADS)
-    glVertex3f(-2, -2, 0)
-    glVertex3f( 2, -2, 0)
-    glVertex3f( 2,  2, 0)
-    glVertex3f(-2,  2, 0)
-    glEnd()
-
-    # Draw particles
-    glColor4f(1, 1, 1, .5)
-    glBegin(.GL_POINTS)
-    glVertex3f(x, y, z)
-    glEnd()
-
-    glDepthMask(.GL_TRUE)
-    glDisable(.GL_BLEND)
-
-    glPopMatrix()
+    vel[0] = vx
+    vel[1] = vy
+    vel[2] = vz
+    pos[0] = x
+    pos[1] = y
+    pos[2] = z
 .end
 
 .sub set_2d_view
