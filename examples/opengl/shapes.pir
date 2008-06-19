@@ -73,6 +73,9 @@ ASCII key.
     import_gl = get_global ['OpenGL'], '_export_all_functions'
     import_gl()
 
+    # Set larger default window size
+    glutInitWindowSize(500, 500)
+
     # Initialize GLUT, overwriting argv in place
     .local pmc call_toolkit_init
     call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
