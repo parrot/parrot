@@ -41,9 +41,19 @@ the Parrot distribution. The procedure for this is:
 
 =item *
 
-Or, if you're one of those rsync folks, you can access the repository with:
+If you're one of those rsync folks, you can access the repository with:
 
 C<rsync -av --delete svn.perl.org::parrot-HEAD parrot>
+
+=item *
+
+If you're using git-svn, you should check out just the latest version. First:
+
+C<svn info https://svn.perl.org/parrot>
+
+Note the current revision. Then:
+
+C<< git svn clone -s -r <revision> https://svn.perl.org/parrot >>
 
 =back
 
