@@ -6,8 +6,8 @@ LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
 
 # Set up commands
 PARROT        = $(BUILD_DIR)/parrot@exe@
-PERL            = @perl@
-RM_F            = @rm_f@
+PERL          = @perl@
+RM_F          = @rm_f@
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
 PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
@@ -142,17 +142,17 @@ src/common/plumheadlib.pbc: src/common/builtins.pir src/common/php_standard.pir 
 src/common/php_ctype.pbc: src/common/php_ctype.pir src/common/php_MACRO.pir
 	$(PARROT) -o src/common/php_ctype.pbc src/common/php_ctype.pir
 
-src/pct/Plumhead_gen.pir: $(LIBRARY_DIR)/PGE/Perl6Grammar.pir src/pct/Plumhead.pg
+src/pct/gen_grammar.pir: $(LIBRARY_DIR)/PGE/Perl6Grammar.pir src/pct/grammar.pg
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir \
-            --output=src/pct/Plumhead_gen.pir src/pct/Plumhead.pg
+            --output=src/pct/gen_grammar.pir src/pct/grammar.pg
 
 src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
-	    --target=pir src/pct/actions.pm
+  --target=pir src/pct/actions.pm
 
 plumhead.pbc: \
     src/common/plumhead.pir \
-    src/pct/Plumhead_gen.pir \
+    src/pct/gen_grammar.pir \
     src/pct/gen_actions.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
@@ -179,7 +179,7 @@ clean-common:
 
 clean-pct:
 	$(RM_F) \
-  src/pct/Plumhead_gen.pir \
+  src/pct/gen_grammar.pir \
   src/pct/gen_actions.pir
 
 clean-antlr3:
