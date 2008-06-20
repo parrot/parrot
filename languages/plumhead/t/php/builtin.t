@@ -25,7 +25,11 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More   skip_all => 'Compiler updates needed'; #  tests => 4;
+use Test::More     tests => 4;
+
+TODO: {
+    local $TODO = 'awaiting compiler changes';
+
 use Parrot::Test;
 
 
@@ -61,6 +65,8 @@ CODE
 /Wrong parameter count for/
 OUTPUT
 
+
+}
 
 # Local Variables:
 #   mode: cperl

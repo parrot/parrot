@@ -25,7 +25,11 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More  skip_all => 'Compiler updates needed'; #   tests => 11;
+use Test::More     tests => 11;
+
+TODO: {
+    local $TODO = 'awaiting compiler changes';
+
 use Parrot::Test;
 
 
@@ -112,6 +116,8 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(seed)' );
 ?>
 CODE
 OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl

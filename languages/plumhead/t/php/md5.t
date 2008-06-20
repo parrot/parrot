@@ -25,7 +25,11 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More  skip_all => 'Compiler updates needed'; #   tests => 3;
+use Test::More     tests => 3;
+
+TODO: {
+    local $TODO = 'awaiting compiler changes';
+
 use Parrot::Test;
 
 
@@ -59,6 +63,8 @@ CODE
 string
 16
 OUTPUT
+}
+
 }
 
 # Local Variables:
