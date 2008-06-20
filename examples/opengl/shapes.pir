@@ -589,8 +589,11 @@ ASCII key.
     glEnable(.GL_BLEND)
     glBlendFunc(.GL_SRC_ALPHA, .GL_ONE)
     glDepthMask(.GL_FALSE)
-    glEnable(.GL_POINT_SMOOTH)
     glPointSize(4)
+
+    # XXXX: Disabled for now because it's broken on many systems;
+    #       will replace later with textured quads
+    # glEnable(.GL_POINT_SMOOTH)
 
 #     # Show plane of effect
 #     glColor4f(1, 1, 1, .2)
