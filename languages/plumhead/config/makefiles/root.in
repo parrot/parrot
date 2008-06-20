@@ -2,7 +2,6 @@
 
 # Set up directories
 BUILD_DIR     = @build_dir@
-TGE_DIR       = $(BUILD_DIR)/compilers/tge
 LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
 
 # Set up commands
@@ -88,10 +87,6 @@ src/pct/Plumhead_gen.pir: $(LIBRARY_DIR)/PGE/Perl6Grammar.pir src/pct/Plumhead.p
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir \
             --output=src/pct/Plumhead_gen.pir src/pct/Plumhead.pg
 
-src/pct/PlumheadPAST_gen.pir: src/pct/PlumheadPAST.tg
-	$(PARROT) $(TGE_DIR)/tgc.pir \
-            --output=src/pct/PlumheadPAST_gen.pir src/pct/PlumheadPAST.tg
-
 src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
 	    --target=pir src/pct/actions.pm
@@ -99,7 +94,6 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 plumhead.pbc: \
     src/common/plumhead.pir \
     src/pct/Plumhead_gen.pir \
-    src/pct/PlumheadPAST_gen.pir \
     src/pct/gen_actions.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
@@ -127,7 +121,6 @@ clean-common:
 clean-pct:
 	$(RM_F) \
   src/pct/Plumhead_gen.pir \
-  src/pct/PlumheadPAST_gen.pir \
   src/pct/gen_actions.pir
 
 clean-antlr3:

@@ -1,29 +1,56 @@
 # Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
-# PHP grammar for Plumhead partrige
-
-# The starting rule is TOP
+# PHP grammar for Plumhead PCT
 
 grammar Plumhead::Grammar is PCT::Grammar;
 
-token TOP                     { <program> {*} }
-
+token TOP                     { ^ <sea_or_code>+ {*} }
+token sea_or_code             { <SEA>    {*}   #= SEA
+                              | <code>   {*}   #= code
+                              }
 regex SEA                     { <-[<]>+? ( <before \<> | $ ) {*} } 
-regex SEA_empty_allowed       { <-[<]>*? <before \<> }
+rule  code                    { <.CODE_START> <statements>  <.CODE_END>? {*} }
 token CODE_START              { '<?php' }
 token CODE_END                { '?>' \n? }
-token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
-token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
+
+rule statements               { <statement>*           {*} }
+rule statement                { <echo_statement>       {*} #= echo_statement
+                              | <var_dump_statement>   {*} #= var_dump_statement
+                              | <if_statement>         {*} #= if_statement
+                              | <inline_sea>           {*} #= inline_sea
+                              | <scalar_assign>        {*} #= scalar_assign
+                              | <array_assign>         {*} #= array_assign
+                              }
+rule  echo_statement          { <ECHO>
+                                ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )
+                                ( ';' | <before \? > | $ )
+                                {*}
+                              }
+rule var_dump_statement       { <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE>
+                                ( ';' | <before \? > | $ )
+                                {*}
+                              }
+rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE>
+                                \{ <statements> \}
+                                <else_clause>?
+                                {*}
+                              }
+token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> {*} }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) {*} }
+rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) {*} }
+
 token ECHO                    { 'echo' }
 token VAR_DUMP                { 'var_dump' }
-token PHP_SAPI_NAME           { 'php_sapi_name' }
+token PHP_SAPI_NAME           { 'php_sapi_name' {*} }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
 token IDENT                   { <[a..zA..Z_]>* <[a..zA..Z_0..9]>* }
 token VAR_NAME                {  '$' <IDENT> {*} }
 
+token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
+token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
 token INTEGER                 { \d+              {*} }
 token NUMBER                  { ( \d+ )? '.' \d+ {*} }
 
@@ -38,29 +65,12 @@ token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
 
 token IF                      { 'if' }
 token ELSE                    { 'else' }
-token program                 { ^ <sea_or_code>+ {*} }
-token sea_or_code             { <SEA>    {*}   #= SEA
-                              | <code>   {*}   #= code
-                              }
-
-rule  code                    { <.CODE_START> <statement>*  <.CODE_END>? {*} }
 
 rule relational_expression    { <expression> <rel_op_clause>? {*} }
 
-rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )  ( ';' | <before \? > | $ ) {*} #= ECHO
-                              | <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE> ( ';' | <before \? > | $ )                   {*} #= VAR_DUMP
-                              | <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE> \{ <statement>* \} <else_clause>?        {*}   #= IF
-                              | <inline_sea>                                                                                       {*}  #= inline_sea
-                              | <scalar_assign>                                                                                    {*}  #= scalar_assign
-                              | <array_assign>                                                                                     {*}  #= array_assign
-                              }
-
-rule else_clause              { <.ELSE> \{ <statement>* \} {*} }
-# TODO: rel_op_clause is not a nice name
+rule  else_clause             { <.ELSE> \{ <statements> \} {*} }
 rule  rel_op_clause           { <REL_OP> <expression> }
-token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) {*} }
-rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) {*} }
+regex SEA_empty_allowed       { <-[<]>*? <before \<> }  # everthing till the next '<'
 
 token expression              { <concat_expression>       {*}  #= concat_expression
                               | <bitwise_expression>      {*}  #= bitwise_expression

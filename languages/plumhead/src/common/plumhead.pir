@@ -10,13 +10,13 @@ plumhead.pir - three variants of PHP on Parrot
 
    ./parrot languages/plumhead/plumhead.pbc t.php
 
-   ./parrot languages/plumhead/plumhead.pbc --variant=pct t.php
+   ./parrot languages/plumhead/plumhead.pbc --variant=pct   t.php
 
-   ./parrot languages/plumhead/plumhead.pbc --variant=phc t.php
+   ./parrot languages/plumhead/plumhead.pbc --variant=phc   t.php
 
    ./parrot languages/plumhead/plumhead.pbc --variant=antlr t.php
 
-   ./parrot languages/plumhead/plumhead.pbc --run-nqp t.nqp
+   ./parrot languages/plumhead/plumhead.pbc --run-nqp       t.nqp
 
 =head1 DESCRIPTION
 
@@ -121,23 +121,12 @@ GOT_PHP_SOURCE_FN:
     variant = opt['variant']
     if variant == 'antlr3'    goto VARIANT_ANTLR3
     if variant == 'pct'       goto VARIANT_PCT
-    if variant == 'pct-with-nqp-actions' goto VARIANT_PCT_WITH_NQP_ACTIONS
     if variant == 'phc'       goto VARIANT_PHC
     $I0 = defined opt['run-nqp']
-    unless $I0                goto VARIANT_PCT
-        .return run_nqp( source_fn, target )
+    if  $I0                   goto RUN_NQP
 
 VARIANT_PCT:
     # use the Parrot Compiler Toolkit by default
-    err_msg = 'Compiling and executing with pct failed'
-    .local pmc plumhead_compiler
-    plumhead_compiler = compreg 'Plumhead'
-
-    .return plumhead_compiler.'evalfiles'( source_fn, 'target' => target )
-
-VARIANT_PCT_WITH_NQP_ACTIONS:
-    # use the Parrot Compiler Toolkit by default
-    err_msg = 'Compiling and executing with pct failed'
     .local pmc plumhead_compiler
     plumhead_compiler = compreg 'PlumheadWithNqpActions'
 
@@ -176,6 +165,11 @@ VARIANT_ANTLR3:
 
     .return run_nqp( 'plumhead_antlr_past.nqp', target )
 
+RUN_NQP:
+
+    .return run_nqp( source_fn, target )
+
+
 ERROR:
     printerr err_msg
     printerr "\n"
@@ -187,7 +181,6 @@ ERROR:
     #os."rm"('plumhead_phc_past.nqp')
     #os."rm"('plumhead_antlr_past.nqp')
 
-FINISH:
    exit ret
 
 .end
@@ -282,8 +275,6 @@ n_help:
 .namespace [ 'Plumhead::Grammar' ]
 
 .include 'src/pct/Plumhead_gen.pir'
-
-.include 'src/pct/PlumheadPAST_gen.pir'
 
 .include 'src/pct/gen_actions.pir'
 

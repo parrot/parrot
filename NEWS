@@ -1,5 +1,10 @@
 # $Id$
 
+New in 0.6.4
+- Languages
+  + Plumhead
+    - convert from PCT with TGE to PCT with NQP actions
+
 New in 0.6.3
 - Specification
   + updated pdd09_gc.pod
