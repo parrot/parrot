@@ -40,7 +40,7 @@ An implementation of sets -- used for tracking register usage.
 
 =item C<Set* set_make>
 
-Create a new Set object.
+Creates a new Set object.
 
 =cut
 
@@ -53,15 +53,18 @@ set_make(unsigned int length)
 {
     Set * const s = mem_allocate_zeroed_typed(Set);
     s->length     = length;
-    s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length), unsigned char);
+    s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length),
+                        unsigned char);
+
     return s;
 }
+
 
 /*
 
 =item C<Set* set_make_full>
 
-Create a new Set object and clear all bits.
+Creates a new Set object of C<length> items, setting them all to full.
 
 =cut
 
@@ -81,11 +84,12 @@ set_make_full(unsigned int length)
     return s;
 }
 
+
 /*
 
 =item C<void set_free>
 
-Free memory allocated for the Set argument.
+Frees the given Set and its allocated memory.
 
 =cut
 
@@ -96,14 +100,16 @@ set_free(ARGMOD(Set *s))
 {
     if (s->bmp)
         mem_sys_free(s->bmp);
+
     mem_sys_free(s);
 }
+
 
 /*
 
 =item C<void set_clear>
 
-Clear all bits in the Set argument.
+Clears all bits in the Set.
 
 =cut
 
@@ -114,6 +120,7 @@ set_clear(ARGMOD(Set *s))
 {
     memset(s->bmp, 0, NUM_BYTES(s->length));
 }
+
 
 /*
 
@@ -136,11 +143,15 @@ set_copy(ARGIN(const Set *s))
     return d;
 }
 
+
 /*
 
 =item C<int set_equal>
 
-Compares two sets for equality; sets are equal if they have the same elements.
+Compares two sets for equality; sets are equal if they contain the same
+elements.
+
+Raises a fatal error if the two Sets have different lengths.
 
 =cut
 
@@ -170,6 +181,7 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
     return 1;
 }
 
+
 /*
 
 =item C<void set_add>
@@ -194,6 +206,7 @@ set_add(ARGMOD(Set *s), unsigned int element)
 
     s->bmp[elem_byte_in_set] |= BIT_IN_BYTE(element);
 }
+
 
 /*
 
@@ -229,12 +242,13 @@ set_first_zero(ARGIN(const Set *s))
     return s->length;
 }
 
+
 /*
 
 =item C<int set_contains>
 
-Check whether the specified element is present in the
-specified Set argument. Returns 1 if it is, 0 otherwise.
+Checks whether the specified element is present in the specified Set argument.
+Returns 1 if it is, 0 otherwise.
 
 =cut
 
@@ -257,15 +271,14 @@ set_contains(ARGIN(const Set *s), unsigned int element)
     }
 }
 
+
 /*
 
 =item C<Set * set_union>
 
-Compute the union of the two Set arguments. A new
-resulting Set object is returned.
+Computes the union of the two Set arguments, returning it as a new Set.
 
-If the two Set arguments have different lengths, a
-fatal error is raised.
+Raises a fatal error if the two Sets have different lengths.
 
 =cut
 
@@ -289,16 +302,15 @@ set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
     return s;
 }
 
+
 /*
 
 =item C<Set * set_intersec>
 
-Create a new Set object that is the intersection of the
-Set arguments. Intersection is defined through the binary
-and operator.
+Creates a new Set object that is the intersection of the Set arguments (defined
+through the binary C<and> operator.)
 
-If the argument Sets don't have the same length, a fatal
-error is raised.
+Raises a fatal error if the two Sets have different lengths.
 
 =cut
 
@@ -322,13 +334,13 @@ set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
     return s;
 }
 
+
 /*
 
 =item C<void set_intersec_inplace>
 
-See set_intersec, except that the first argument Set
-is changed inplace; in other words, the first Set argument
-becomes the result.
+Performs a set intersection in place -- the first Set argument changes to
+contain the result.
 
 =cut
 
