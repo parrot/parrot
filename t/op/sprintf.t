@@ -287,7 +287,6 @@ tag 'all' is allowed for todo tests that should fail on any system
     # TODOs
     todo_info[64] = 'undecided perl5 vs. posix behavior'
     todo_info[153] = '%hf should be rejected'
-    todo_info[157] = 'fails on win32'
     todo_info[187] = '%h alone is invalid'
     todo_info[191] = '%l alone is invalid'
     todo_info[223] = '%v alone is invalid, but a valid parrot extension'
