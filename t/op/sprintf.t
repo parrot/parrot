@@ -6,58 +6,53 @@
 
 t/op/sprintf.t  -- sprintf tests
 
+=head1 SYNOPSIS
+
+    % prove t/op/sprintf.t
+
 =head1 DESCRIPTION
 
-These tests are based on sprintf tests from perl 5.9.4.
+These tests are based on C<sprintf> tests from perl 5.9.4.
 
-Tests sprintf, excluding handling of 64-bit integers or long
+Tests C<sprintf>, excluding handling of 64-bit integers or long
 doubles (if supported), of machine-specific short and long
 integers, machine-specific floating point exceptions (infinity,
-not-a-number ...), of the effects of locale, and of features
+not-a-number, etc.), of the effects of locale, and of features
 specific to multi-byte characters (under the utf8 pragma and such).
 
-Individual tests are stored in the C<sprintf_tests> file in the same
+Individual tests are stored in the F<sprintf_tests> file in the same
 directory; There is one test per line. In each test, there are three
 required fields:
 
 =over 4
 
-=item printf template
+=item * printf template
 
-=item data to be formatted (as a parrot expression)
+=item * data to be formatted (as a parrot expression)
 
-=item expected result of formatting
-
-=back
-
-Optional fields contain
-
-=over 4
-
-=item a comment
+=item * expected result of formatting
 
 =back
+
+Optional fields contain a comment.
 
 Each field is separated by one or more tabs.  If formatting requires more than
 one data item (for example, if variable field widths are used), the Parrot
 data expression should return a reference to an array having the requisite
 number of elements.  Even so, subterfuge is sometimes required:
-see tests for %n and %p.
+see tests for C<%n> and C<%p>.
 
-XXX: FIXME: TODO:
+=head1 XXX: FIXME: TODO:
+
 Tests that are expected to fail on a certain OS can be marked as such
-by trailing the comment with a skip: section. Skips are tags separated
-by space consisting of a $^O optionally trailed with :osvers. In the
+by trailing the comment with a C<skip:> section. Skips are tags separated
+by space consisting of a C<$^O> optionally trailed with C<:osvers>. In the
 latter case, all os-levels below that are expected to fail. A special
-tag 'all' is allowed for todo tests that should fail on any system
+tag C<all> is allowed for todo tests that should fail on any system.
 
->%GE<gt>   >1234567e96<  >1.23457E+102<   >exponent too big skip: os390<
->%.0g< >-0.0<        >-0<             >No minus skip: MSWin32 VMS hpux:10.20<
->%d<   >4<           >1<              >4 != 1 skip: all<
-
-=head1 SYNOPSIS
-
-    % prove t/op/sprintf.t
+	%G	1234567e96	1.23457E+102	exponent too big skip: os390
+	%.0f	-0.1	-0	C library bug: no minus skip: VMS
+	%d 	4	1	4 != 1 skip: all
 
 =cut
 
