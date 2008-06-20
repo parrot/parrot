@@ -2,15 +2,8 @@
 
 # a helper for the PHC variant
 .sub 'decode_base64'
-   .param string base64
-
-   .local pmc dec_sub
-    dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
-
-    .local string result_decode
-    result_decode = dec_sub( base64 )
-
-    .return ( result_decode )
+    .param pmc args :slurpy
+    .return base64_decode(args :flat)
 .end
 
 .sub 'print_newline'
@@ -271,94 +264,58 @@
   .return()
 .end
 
-# For now, only plain old CGI is supported
-# Lie about the 'fcgi', in order to keep in line with the reference implementation
-.sub 'php_sapi_name'
-  .return( 'cgi-fcgi' )
+
+.include 'languages/plumhead/src/common/php_standard.pir'
+
+.sub '__onload' :anon :load
+    $P0 = subclass 'Boolean', 'PhpBoolean'
+    $P0 = subclass 'Float', 'PhpFloat'
+    $P0 = subclass 'Integer', 'PhpInteger'
+    $P0 = subclass 'String', 'PhpString'
+    $P0 = subclass 'Undef', 'PhpUndef'
 .end
 
-.include "library/dumper.pir"
-.include "cclass.pasm"
+.namespace [ 'PhpBoolean' ]
 
-# TODO: pass in indent_level, proper escaping
-.sub var_dump
-    .param pmc a
-
-    .local string type_of_pmc
-    type_of_pmc = typeof a
-
-    ne type_of_pmc, 'String', not_a_string
-        .local int string_len
-
-        string_len = elements a
-        print 'string('
-        print string_len
-        print ') "'
-        print a
-        print '"'
-        say ''
-
-       .return()
-
-not_a_string:
-
-    ne type_of_pmc, 'Hash', not_a_hash
-
-        .local int num_elements
-	num_elements = elements a
-        string_len = elements a
-        print 'array('
-        print num_elements
-        say ') {'
-
-        .local pmc    iter, val
-	.local string indent, key
-	.local int    key_starts_with_digit
-	indent = '  '
-        new iter, .Iterator, a
-        set iter, 0
-iter_loop:
-    unless iter, iter_end
-        shift key, iter
-        # TODO: ugly workaround as Hash keys are stringified
-        key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key, 0
-	print indent
-	print '['
-	if key_starts_with_digit goto key_is_an_integer_1
-	    print '"'
-key_is_an_integer_1:
-	print key
-	if key_starts_with_digit goto key_is_an_integer_2
-	    print '"'
-key_is_an_integer_2:
-	say ']=>'
-	print indent
-	val = a[key]
-	var_dump(val)
-
-        branch iter_loop
-iter_end:
-
-
-        say '}'
-       .return()
-
-not_a_hash:
-
-    ne type_of_pmc, 'Integer', not_a_integer
-
-        print 'int('
-        print a
-        say ')'
-
-       .return()
-
-not_a_integer:
-
-    _dumper(a)
-
-    .return()
+.sub 'name' :vtable :method
+    .return ('boolean')
 .end
+
+.sub 'get_string' :vtable :method
+    unless self goto L1
+    .return ('1')
+  L1:
+    .return ('')
+.end
+
+
+.namespace [ 'PhpFloat' ]
+
+.sub 'name' :vtable :method
+    .return ('double')
+.end
+
+
+.namespace [ 'PhpInteger' ]
+
+.sub 'name' :vtable :method
+    .return ('integer')
+.end
+
+
+.namespace [ 'PhpString' ]
+
+.sub 'name' :vtable :method
+    .return ('string')
+.end
+
+
+.namespace [ 'PhpUndef' ]
+
+.sub 'name' :vtable :method
+    .return ('NULL')
+.end
+
 
 # Local Variables:
 #   mode: pir

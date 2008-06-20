@@ -6,12 +6,68 @@ LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
 
 # Set up commands
 PARROT        = $(BUILD_DIR)/parrot@exe@
-PERL          = @perl@
-RM_F          = @rm_f@
+PERL            = @perl@
+RM_F            = @rm_f@
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
 PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
+PHP_SRC_STD_EXT= \
+  src/common/php_API.pir \
+  src/common/php_array.pir \
+  src/common/php_assert.pir \
+  src/common/php_base64.pir \
+  src/common/php_basic.pir \
+  src/common/php_builtin.pir \
+  src/common/php_browscap.pir \
+  src/common/php_crc32.pir \
+  src/common/php_crypt.pir \
+  src/common/php_cyr_convert.pir \
+  src/common/php_datetime.pir \
+  src/common/php_dir.pir \
+  src/common/php_dl.pir \
+  src/common/php_dns.pir \
+  src/common/php_exec.pir \
+  src/common/php_file.pir \
+  src/common/php_filestat.pir \
+  src/common/php_formatted_print.pir \
+  src/common/php_fsock.pir \
+  src/common/php_ftok.pir \
+  src/common/php_head.pir \
+  src/common/php_html.pir \
+  src/common/php_http.pir \
+  src/common/php_image.pir \
+  src/common/php_info.pir \
+  src/common/php_iptc.pir \
+  src/common/php_lcg.pir \
+  src/common/php_levenshtein.pir \
+  src/common/php_link.pir \
+  src/common/php_mail.pir \
+  src/common/php_math.pir \
+  src/common/php_md5.pir \
+  src/common/php_metaphone.pir \
+  src/common/php_microtime.pir \
+  src/common/php_pack.pir \
+  src/common/php_pageinfo.pir \
+  src/common/php_proc_open.pir \
+  src/common/php_quot_print.pir \
+  src/common/php_rand.pir \
+  src/common/php_reg.pir \
+  src/common/php_sha1.pir \
+  src/common/php_soundex.pir \
+  src/common/php_streamsfuncs.pir \
+  src/common/php_string.pir \
+  src/common/php_syslog.pir \
+  src/common/php_type.pir \
+  src/common/php_uniqid.pir \
+  src/common/php_url.pir \
+  src/common/php_user_filters.pir \
+  src/common/php_uuencode.pir \
+  src/common/php_var.pir \
+  src/common/php_versioning.pir
+
+PHP_EXT= \
+  src/common/php_ctype.pbc
 
 # default
 all: build
@@ -70,7 +126,7 @@ build:           build-pct
 
 build-all:       build-pct build-phc build-antlr3
 
-build-common:    src/common/plumheadlib.pbc plumhead.pbc
+build-common:    src/common/plumheadlib.pbc plumhead.pbc $(PHP_EXT)
 
 build-pct:       build-common
 
@@ -80,8 +136,11 @@ build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java 
 
-src/common/plumheadlib.pbc: src/common/builtins.pir
+src/common/plumheadlib.pbc: src/common/builtins.pir src/common/php_standard.pir $(PHP_SRC_STD_EXT) src/common/php_API.pir src/common/php_MACRO.pir
 	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
+
+src/common/php_ctype.pbc: src/common/php_ctype.pir src/common/php_MACRO.pir
+	$(PARROT) -o src/common/php_ctype.pbc src/common/php_ctype.pir
 
 src/pct/Plumhead_gen.pir: $(LIBRARY_DIR)/PGE/Perl6Grammar.pir src/pct/Plumhead.pg
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir \
