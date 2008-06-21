@@ -175,7 +175,10 @@ test-pct:
 clean: clean-common clean-pct clean-antlr3 clean-test
 
 clean-common:
-	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
+	$(RM_F) \
+  src/common/plumheadlib.pbc \
+  src/common/*.pbc \
+  plumhead.pbc
 
 clean-pct:
 	$(RM_F) \
