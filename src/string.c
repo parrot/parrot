@@ -312,6 +312,7 @@ string_deinit(PARROT_INTERP)
         mem_sys_free(interp->const_cstring_table);
         interp->const_cstring_table = NULL;
         Parrot_charsets_encodings_deinit(interp);
+        parrot_hash_destroy(interp, interp->const_cstring_hash);
     }
 }
 
