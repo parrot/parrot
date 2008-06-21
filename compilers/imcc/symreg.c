@@ -985,9 +985,12 @@ PARROT_CANNOT_RETURN_NULL
 SymReg *
 dup_sym(ARGIN(const SymReg *r))
 {
-    SymReg * const new_sym = mem_allocate_typed(SymReg);
+    SymReg * const new_sym = mem_allocate_zeroed_typed(SymReg);
     STRUCT_COPY(new_sym, r);
     new_sym->name = str_dup(r->name);
+
+    if (r->nextkey)
+        new_sym->nextkey = dup_sym(r->nextkey);
 
     return new_sym;
 }
@@ -1065,8 +1068,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
 
     for (i = 0; i < nargs; i++) {
         /* if any component is a variable, we need to track it in
-         * life analysis
-         */
+         * life analysis */
         if (REG_NEEDS_ALLOC(keys[i]))
             keychain->type |= VTREGKEY;
 
@@ -1115,7 +1117,18 @@ free_sym(ARGMOD(SymReg *r))
     }
 
     /* TODO free keychain */
-    mem_sys_free(r->name);
+    if (r->set == 'K') {
+        SymReg *key     = r->nextkey;
+        while (key) {
+            SymReg *nextkey = key->nextkey;
+            free_sym(key);
+            key = nextkey;
+        }
+    }
+
+    if (r->name && *r->name != 0)
+        mem_sys_free(r->name);
+
     mem_sys_free(r);
 }
 
@@ -1138,7 +1151,7 @@ Create a symbol hash table with space for 16 entries.
 void
 create_symhash(ARGOUT(SymHash *hash))
 {
-    hash->data    = (SymReg **)mem_sys_allocate_zeroed(16 * sizeof (SymReg *));
+    hash->data    = mem_allocate_n_zeroed_typed(16, SymReg *);
     hash->size    = 16;
     hash->entries = 0;
 }
