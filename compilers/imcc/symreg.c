@@ -251,17 +251,17 @@ symreg_to_str(ARGIN(const SymReg *s))
     sprintf(buf, "symbol [%s]  set [%c]  color [" INTVAL_FMT "]  type [",
                  s->name, s->set, s->color);
 
-    if (t & VTCONST)      { strcat(buf, "VTCONST "      ); }
-    if (t & VTREG)        { strcat(buf, "VTREG "        ); }
-    if (t & VTIDENTIFIER) { strcat(buf, "VTIDENTIFIER " ); }
-    if (t & VTADDRESS)    { strcat(buf, "VTADDRESS "    ); }
-    if (t & VTREGKEY)     { strcat(buf, "VTREGKEY "     ); }
-    if (t & VTPASM)       { strcat(buf, "VTPASM "       ); }
-    if (t & VT_CONSTP)    { strcat(buf, "VT_CONSTP "    ); }
-    if (t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB "   ); }
-    if (t & VT_FLAT)      { strcat(buf, "VT_FLAT "      ); }
-    if (t & VT_OPTIONAL)  { strcat(buf, "VT_OPTIONAL "  ); }
-    if (t & VT_NAMED)     { strcat(buf, "VT_NAMED "     ); }
+    if (t & VTCONST)      { strcat(buf, "VTCONST ");       }
+    if (t & VTREG)        { strcat(buf, "VTREG ");         }
+    if (t & VTIDENTIFIER) { strcat(buf, "VTIDENTIFIER ");  }
+    if (t & VTADDRESS)    { strcat(buf, "VTADDRESS ");     }
+    if (t & VTREGKEY)     { strcat(buf, "VTREGKEY ");      }
+    if (t & VTPASM)       { strcat(buf, "VTPASM ");        }
+    if (t & VT_CONSTP)    { strcat(buf, "VT_CONSTP ");     }
+    if (t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB ");    }
+    if (t & VT_FLAT)      { strcat(buf, "VT_FLAT ");       }
+    if (t & VT_OPTIONAL)  { strcat(buf, "VT_OPTIONAL ");   }
+    if (t & VT_NAMED)     { strcat(buf, "VT_NAMED ");      }
 
     strcat(buf, "]");
 
