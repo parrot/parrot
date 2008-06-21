@@ -327,11 +327,13 @@ PARROT_CANNOT_RETURN_NULL
 SymReg * mk_temp_reg(PARROT_INTERP, int t)
         __attribute__nonnull__(1);
 
-void pop_namespace(ARGIN(const char *name))
-        __attribute__nonnull__(1);
+void pop_namespace(PARROT_INTERP, ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void push_namespace(ARGIN(const char *name))
-        __attribute__nonnull__(1);
+void push_namespace(SHIM_INTERP, ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
         __attribute__nonnull__(1)

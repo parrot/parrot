@@ -891,8 +891,8 @@ add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *n
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
-    add_pcc_param(cur_call, r);
-    add_pcc_param(cur_call, value);
+    add_pcc_arg(cur_call, r);
+    add_pcc_arg(cur_call, value);
 }
 
 static void
@@ -902,8 +902,8 @@ add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
-    add_pcc_return(cur_call, r);
-    add_pcc_return(cur_call, value);
+    add_pcc_result(cur_call, r);
+    add_pcc_result(cur_call, value);
 }
 
 /* XXX Can name be consted? */
@@ -3102,7 +3102,7 @@ yyreduce:
                  IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_param(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (3)].sr));
+               add_pcc_arg(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (3)].sr));
          }
     break;
 
@@ -3561,7 +3561,7 @@ yyreduce:
 #line 1234 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(1) - (2)].sr))
-               add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(1) - (2)].sr));
+               add_pcc_result(IMCC_INFO(interp)->sr_return, (yyvsp[(1) - (2)].sr));
          }
     break;
 
@@ -3569,7 +3569,7 @@ yyreduce:
 #line 1239 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(2) - (3)].sr))
-               add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(2) - (3)].sr));
+               add_pcc_result(IMCC_INFO(interp)->sr_return, (yyvsp[(2) - (3)].sr));
          }
     break;
 
@@ -3618,7 +3618,7 @@ yyreduce:
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(1) - (1)].sr));
+               add_pcc_result(IMCC_INFO(interp)->sr_return, (yyvsp[(1) - (1)].sr));
          }
     break;
 
@@ -3638,7 +3638,7 @@ yyreduce:
                IMCC_INFO(interp)->adv_named_id = NULL;
              }
              else
-                 add_pcc_return(IMCC_INFO(interp)->sr_return, (yyvsp[(3) - (3)].sr));
+                 add_pcc_result(IMCC_INFO(interp)->sr_return, (yyvsp[(3) - (3)].sr));
          }
     break;
 
@@ -3742,12 +3742,12 @@ yyreduce:
 
   case 162:
 #line 1391 "compilers/imcc/imcc.y"
-    { push_namespace((yyvsp[(2) - (2)].s)); mem_sys_free((yyvsp[(2) - (2)].s)); }
+    { push_namespace(interp, (yyvsp[(2) - (2)].s)); mem_sys_free((yyvsp[(2) - (2)].s)); }
     break;
 
   case 163:
 #line 1392 "compilers/imcc/imcc.y"
-    { pop_namespace((yyvsp[(2) - (2)].s)); mem_sys_free((yyvsp[(2) - (2)].s)); }
+    { pop_namespace(interp, (yyvsp[(2) - (2)].s)); mem_sys_free((yyvsp[(2) - (2)].s)); }
     break;
 
   case 164:

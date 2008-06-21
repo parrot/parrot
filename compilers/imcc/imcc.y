@@ -569,8 +569,8 @@ add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *n
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
-    add_pcc_param(cur_call, r);
-    add_pcc_param(cur_call, value);
+    add_pcc_arg(cur_call, r);
+    add_pcc_arg(cur_call, value);
 }
 
 static void
@@ -580,8 +580,8 @@ add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
-    add_pcc_return(cur_call, r);
-    add_pcc_return(cur_call, value);
+    add_pcc_result(cur_call, r);
+    add_pcc_result(cur_call, value);
 }
 
 /* XXX Can name be consted? */
@@ -923,7 +923,7 @@ sub_params:
                  IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_param(IMCC_INFO(interp)->cur_call, $2);
+               add_pcc_arg(IMCC_INFO(interp)->cur_call, $2);
          }
    ;
 
@@ -1233,12 +1233,12 @@ pcc_returns:
    | pcc_returns '\n'
          {
            if ($1)
-               add_pcc_return(IMCC_INFO(interp)->sr_return, $1);
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
          }
    | pcc_returns pcc_return '\n'
          {
            if ($2)
-               add_pcc_return(IMCC_INFO(interp)->sr_return, $2);
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $2);
          }
    ;
 
@@ -1274,7 +1274,7 @@ var_returns:
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_return(IMCC_INFO(interp)->sr_return, $1);
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
          }
    | STRINGC ADV_ARROW var
          {
@@ -1288,7 +1288,7 @@ var_returns:
                IMCC_INFO(interp)->adv_named_id = NULL;
              }
              else
-                 add_pcc_return(IMCC_INFO(interp)->sr_return, $3);
+                 add_pcc_result(IMCC_INFO(interp)->sr_return, $3);
          }
    | var_returns COMMA STRINGC ADV_ARROW var
          {
@@ -1388,8 +1388,8 @@ opt_unique_reg:
 labeled_inst:
      assignment
    | conditional_statement
-   | NAMESPACE IDENTIFIER      { push_namespace($2); mem_sys_free($2); }
-   | ENDNAMESPACE IDENTIFIER   { pop_namespace($2); mem_sys_free($2); }
+   | NAMESPACE IDENTIFIER      { push_namespace(interp, $2); mem_sys_free($2); }
+   | ENDNAMESPACE IDENTIFIER   { pop_namespace(interp, $2); mem_sys_free($2); }
    | LOCAL { is_def=1; } type id_list
          {
            IdList *l = $4;
