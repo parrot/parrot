@@ -388,7 +388,7 @@ struct parrot_interp_t {
     struct _Caches * caches;                  /* see caches.h */
 
     STRING     **const_cstring_table;         /* CONST_STRING(x) items */
-    struct Hash *const_cstring_hash;          /* cache of const_string items */
+    Hash        *const_cstring_hash;          /* cache of const_string items */
 
     struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;/* exit.c */
