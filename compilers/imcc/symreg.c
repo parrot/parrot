@@ -1126,9 +1126,7 @@ free_sym(ARGMOD(SymReg *r))
         }
     }
 
-    if (r->name && *r->name != 0)
-        mem_sys_free(r->name);
-
+    mem_sys_free(r->name);
     mem_sys_free(r);
 }
 
@@ -1142,7 +1140,7 @@ free_sym(ARGMOD(SymReg *r))
 
 =item C<void create_symhash>
 
-Create a symbol hash table with space for 16 entries.
+Creates a symbol hash table with space for 16 entries.
 
 =cut
 
@@ -1156,11 +1154,12 @@ create_symhash(ARGOUT(SymHash *hash))
     hash->entries = 0;
 }
 
+
 /*
 
 =item C<static void resize_symhash>
 
-Resize a symbol hash table.
+Resizes a symbol hash table.
 
 =cut
 
@@ -1169,32 +1168,29 @@ Resize a symbol hash table.
 static void
 resize_symhash(ARGMOD(SymHash *hsh))
 {
-    SymHash nh;                          /* new symbol table */
     const int new_size = hsh->size << 1; /* new size is twice as large */
-    int i;                               /* for loop index */
-    SymReg ** next_r;
-    int n_next;
+    int       n_next   = 16;
+    SymReg  **next_r   = mem_allocate_n_zeroed_typed(n_next, SymReg *);
+    SymHash   nh;                        /* new symbol table */
+    int       i;
 
     nh.data = mem_allocate_n_zeroed_typed(new_size, SymReg *);
-    n_next  = 16;
-    next_r  = mem_allocate_n_zeroed_typed(n_next, SymReg *);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r, *next;
-        int j = 0, k;
+        int     k;
+        int     j = 0;
 
         for (r = hsh->data[i]; r; r = next) {
             next = r->next;
-            /*
-             * have to remember all the chained next pointers and
-             * clear r->next
-             */
+
+            /* remember all the chained next pointers and clear r->next */
             if (j >= n_next) {
                 n_next <<= 1;
-                mem_realloc_n_typed(next_r, n_next, SymReg*);
+                mem_realloc_n_typed(next_r, n_next, SymReg *);
             }
 
-            r->next = NULL;
+            r->next     = NULL;
             next_r[j++] = r;
         }
 
@@ -1217,11 +1213,12 @@ resize_symhash(ARGMOD(SymHash *hsh))
     hsh->size = new_size;
 }
 
+
 /*
 
 =item C<void _store_symreg>
 
-Stores a symbol into the hash
+Stores a symbol in the hash (internal use only).
 
 =cut
 
@@ -1243,11 +1240,12 @@ _store_symreg(ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
         resize_symhash(hsh);
 }
 
+
 /*
 
 =item C<void store_symreg>
 
-Wrapper for _store_symreg.
+Stores a symbol in the hash.
 
 =cut
 
@@ -1259,11 +1257,12 @@ store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
     _store_symreg(&IMCC_INFO(interp)->cur_unit->hash, r);
 }
 
+
 /*
 
 =item C<SymReg * _get_sym>
 
-Gets a symbol from the hash
+Fetches a symbol from the hash (internal use only).
 
 =cut
 
@@ -1292,7 +1291,7 @@ _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 
 =item C<SymReg * get_sym>
 
-Gets a symbol from the current unit symbol table
+Gets a symbol from the current unit's symbol table.
 
 =cut
 
@@ -1306,11 +1305,12 @@ get_sym(PARROT_INTERP, ARGIN(const char *name))
     return _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 }
 
+
 /*
 
 =item C<SymReg * _find_sym>
 
-find a symbol hash or ghash
+Find a symbol hash or ghash (internal use only);
 
 =cut
 
@@ -1322,8 +1322,8 @@ SymReg *
 _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
         ARGIN(const SymHash *hsh), ARGIN(const char *name))
 {
-    const Namespace * ns;
-    SymReg *p;
+    const Namespace *ns;
+    SymReg          *p;
 
     for (ns = nspace; ns; ns = ns->parent) {
         char * const fullname = _mk_fullname(ns, name);
@@ -1353,9 +1353,8 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
 
 =item C<SymReg * find_sym>
 
-Wrapper for _find_sym; only if there's a current
-IMC_Unit, will _find_sym be invoked; otherwise NULL
-is returned.
+Finds a symbol hash or ghash in the current unit, if it exists.  Otherwise
+returns NULL.
 
 =cut
 
@@ -1378,8 +1377,7 @@ find_sym(PARROT_INTERP, ARGIN(const char *name))
 
 =item C<void clear_sym_hash>
 
-Free all memory of the symbols in the specified
-hash table.
+Frees all memory of the symbols in the specified hash table.
 
 =cut
 
@@ -1400,6 +1398,7 @@ clear_sym_hash(ARGMOD(SymHash *hsh))
             free_sym(p);
             p = next;
         }
+
         hsh->data[i] = NULL;
     }
 
@@ -1410,11 +1409,12 @@ clear_sym_hash(ARGMOD(SymHash *hsh))
     hsh->size    = 0;
 }
 
+
 /*
 
 =item C<void debug_dump_sym_hash>
 
-Print all identifiers in the specified hash table.
+Prints all identifiers in the specified hash table to stderr.
 
 =cut
 
@@ -1434,11 +1434,12 @@ debug_dump_sym_hash(ARGIN(const SymHash *hsh))
     }
 }
 
+
 /*
 
 =item C<void clear_locals>
 
-Deletes all local symbols and clears life info
+Deletes all local symbols and clears life info from the given IMC_Unit.
 
 =cut
 
@@ -1468,11 +1469,12 @@ clear_locals(ARGIN_NULLOK(struct _IMC_Unit *unit))
     hsh->entries = 0;
 }
 
+
 /*
 
 =item C<void clear_globals>
 
-Clear global symbols
+Clears global symbols.
 
 =cut
 
@@ -1494,7 +1496,7 @@ clear_globals(PARROT_INTERP)
 
 =item C<unsigned int hash_str>
 
-Compute the hash value for the string argument.
+Computes the hash value for the string argument.
 
 =cut
 
@@ -1507,11 +1509,12 @@ hash_str(ARGIN(const char *str))
     unsigned long  key = 0;
     const    char *s;
 
-    for (s=str; *s; s++)
+    for (s = str; *s; s++)
         key = key * 65599 + *s;
 
     return key;
 }
+
 
 /*
 
