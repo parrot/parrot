@@ -851,6 +851,7 @@ pasm_inst:                     { clear_state(interp); }
            set_lexical(interp, r, $2);
            $$ = 0;
            mem_sys_free($2);
+           mem_sys_free($4);
          }
    | /* none */                { $$ = 0;}
    ;
@@ -1907,7 +1908,7 @@ reg:
    | NREG                      { $$ = mk_symreg(interp, $1, 'N'); }
    | SREG                      { $$ = mk_symreg(interp, $1, 'S'); }
    | PREG                      { $$ = mk_symreg(interp, $1, 'P'); }
-   | REG                       { $$ = mk_pasm_reg(interp, $1);    }
+   | REG                       { $$ = mk_pasm_reg(interp, $1); mem_sys_free($1); }
    ;
 
 const:
