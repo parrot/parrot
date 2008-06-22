@@ -63,15 +63,6 @@ The functionality originally found in F<tools/build/ops2pm.pl> has been
 extracted into this package's methods in order to support component-focused
 testing and future refactoring.
 
-=cut
-
-############### Package-scoped Lexical Variables ###############
-
-my $NUM_FILE  = "src/ops/ops.num";
-my $SKIP_FILE = "src/ops/ops.skip";
-
-############### Subroutines ###############
-
 =head1 METHODS
 
 =head2 C<new()>
@@ -127,6 +118,8 @@ sub new {
         unless -e $file;
     $argsref->{file} = $file;
     $argsref->{argv} = \@argv;
+    $argsref->{num_file}    = "src/ops/ops.num";
+    $argsref->{skip_file}   = "src/ops/ops.skip";
     return bless $argsref, $class;
 }
 
@@ -232,7 +225,7 @@ stepping stone on the path to building F<lib/Parrot/OpLib/core.pm>.
 sub renum_op_map_file {
     my $self = shift;
 
-    my $file = scalar(@_) ? shift : $NUM_FILE;
+    my $file = scalar(@_) ? shift : $self->{num_file};
     my ( $name, $number, @lines, %seen, %fixed, $fix );
     $fix = 1;
     open my $OP, '<', $file
@@ -309,8 +302,8 @@ F<src/ops/ops.skip>.
 
 sub load_op_map_files {
     my $self      = shift;
-    my $num_file  = $NUM_FILE;
-    my $skip_file = $SKIP_FILE;
+    my $num_file  = $self->{num_file};
+    my $skip_file = $self->{skip_file};
 
     my ( $op, $name, $number, $prev );
 
