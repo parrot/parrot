@@ -1032,12 +1032,31 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
         }
     }
 
+    /* Do we have to create an instance of a specific type for this sub? */
+    if (unit->instance_of) {
+        /* Look it up as a class and as a PMC type. */
+        STRING * const classname = string_from_cstring(interp, unit->instance_of + 1,
+                 strlen(unit->instance_of) - 2);
+        PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
+        if (!PMC_IS_NULL(classobj))
+            sub_pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = pmc_type(interp, classname);
+            if (type <= 0)
+                real_exception(interp, NULL, NO_CLASS,
+                    "Class '%Ss' specified in :instanceof(...) not found", classname);
+            sub_pmc = pmc_new(interp, type);
+        }
+    }
+    else {
+        /* use a possible type mapping for the Sub PMCs, and create it */
+        type = Parrot_get_ctx_HLL_type(interp, type);
 
-    /* use a possible type mapping for the Sub PMCs */
-    type = Parrot_get_ctx_HLL_type(interp, type);
+        /* TODO create constant - see also src/packfile.c */
+        sub_pmc = pmc_new(interp, type);
+    }
 
-    /* TODO create constant - see also src/packfile.c */
-    sub_pmc                      = pmc_new(interp, type);
+    /* Set flags and get the sub info. */
     PObj_get_FLAGS(sub_pmc)     |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
     Sub_comp_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
     sub                          = PMC_sub(sub_pmc);
