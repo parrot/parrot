@@ -66,7 +66,7 @@ sub check_duplicates {
 
     # append to the extra_coda array if coda-like text appears more than once
     my $vim_many = 0;
-    $vim_many++ while $buf =~ m{^ [* \t]* vim: }gmx;
+    $vim_many++ while $buf =~ m{^ [* \t]* vim[:] }gmx;
     my $emacs_many = 0;
     $emacs_many++ while $buf =~ m{^ [* \t]* Local \s variables: }gmx;
     return ($vim_many <= 1 && $emacs_many <= 1);
