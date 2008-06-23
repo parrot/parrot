@@ -146,7 +146,7 @@ our $lf_files_regexp = qr{
     ^examples/shootout/.*\.pir_input$ |
     ^examples/shootout/.*\.pir_output$ |
     ^t/compilers/pge/p5regex/re_tests$ |
-    ^t/library/perlhist.txt$ |
+    ^t/library/perlhist\.txt$ |
     ^t/op/sprintf_tests$
      }x;
 
