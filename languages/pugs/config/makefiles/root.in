@@ -2,6 +2,9 @@ RM_F    = @rm_f@
 PERL    = @perl@
 PARROT  = ../../parrot@exe@
 PBC_MERGE = ../../pbc_merge@exe@
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 LIBPATH  = lib
 BUILD   = $(PERL) @build_dir@/tools/build/dynpmc.pl

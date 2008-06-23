@@ -19,6 +19,9 @@ PBCMERGE = ${trans_parrot_path}${slash}pbc_merge${exe}
 PMCBUILD = $(PERL) ${build_dir}${slash}tools${slash}build${slash}dynpmc.pl
 OPSBUILD = $(PERL) ${build_dir}${slash}tools${slash}build${slash}dynoplibs.pl
 DESTDIR  = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 
 # FILE EXTENSIONS

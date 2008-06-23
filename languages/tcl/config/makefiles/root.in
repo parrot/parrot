@@ -5,6 +5,9 @@ PARROT  = ../../parrot@exe@
 BUILD_DIR   = @build_dir@
 RECONFIGURE = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 PBC_TO_EXE    = $(BUILD_DIR)/pbc_to_exe@exe@
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 C_BUILTIN = src/builtin
 TCL_LIB   = library
