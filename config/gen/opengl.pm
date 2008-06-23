@@ -410,6 +410,9 @@ sub runstep {
         '/System/Library/Frameworks/OpenGL.framework/Headers/*.h',
         '/System/Library/Frameworks/GLUT.framework/Headers/*.h',
 
+        # Cygwin
+        '/usr/include/w32api/GL/*.h',
+
         # Windows/MSVC
         (map "$_/gl/*.h" => @include_paths_win32),
 
@@ -444,10 +447,18 @@ sub runstep {
 #         "$ENV{HOME}/src/osx-insane/usr/X11R6 1/include/GL/*.h",
     );
 
+    print "\nChecking for OpenGL headers using the following globs:\n\t",
+        join("\n\t", @header_globs), "\n"
+        if $verbose;
+
     my @header_files = sort map {File::Glob::bsd_glob($_)} @header_globs;
 
     my %skip = map {($_ => 1)} @SKIP;
     @header_files = grep {my ($file) = m{([^/]+)$}; !$skip{$file}} @header_files;
+
+    print "\nFound the following OpenGL headers:\n\t",
+        join("\n\t", @header_files), "\n"
+        if $verbose;
 
     die "OpenGL enabled and detected, but no OpenGL headers found!"
         unless @header_files;
