@@ -1598,7 +1598,11 @@ attribute.
     pop_eh
     .return self.$P0(node, bindpost)
   scope_error:
-    .return self.'panic'("Scope ", scope, " not found for PAST::Var '", name, "'")
+    unless scope goto scope_error_1
+    scope = concat " '", scope
+    scope = concat scope, "'"
+  scope_error_1:
+    .return self.'panic'("Scope", scope, " not found for PAST::Var '", name, "'")
 .end
 
 
