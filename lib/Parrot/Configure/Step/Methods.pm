@@ -198,11 +198,11 @@ sub _add_to_libs {
     croak "_add_to_libs() takes hashref: $!" unless ref($args) eq 'HASH';
     my $platform =
           (($args->{osname} =~ /mswin32/i ||
-	    $args->{osname} =~ /cygwin/i) &&
+           $args->{osname} =~ /cygwin/i) &&
            $args->{cc} =~ /^gcc/i)          ? 'win32_gcc'
         :  $args->{osname} =~ /mswin32/i    ? 'win32_nongcc'
         :  $args->{osname} =~ /darwin/i     ? 'darwin'
-        :  'default';
+        :                                     'default';
     my $libs = defined($args->{$platform})
         ? $args->{$platform}
         : $args->{default};
