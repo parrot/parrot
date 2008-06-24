@@ -274,7 +274,7 @@ n_help:
 
 .namespace [ 'Plumhead::Grammar' ]
 
-.include 'src/pct/Plumhead_gen.pir'
+.include 'src/pct/gen_grammar.pir'
 
 .include 'src/pct/gen_actions.pir'
 
