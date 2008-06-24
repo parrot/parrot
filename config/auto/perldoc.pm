@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -44,7 +44,7 @@ sub runstep {
 
     my $version = $self->_analyze_perldoc($cmd, $filename, $content);
 
-    _handle_version($conf, $version);
+    _handle_version($conf, $version, $cmd);
 
     return 1;
 }
@@ -105,11 +105,14 @@ sub _handle_no_perldoc {
 }
 
 sub _handle_version {
-    my ($conf, $version) = @_;
+    my ($conf, $version, $cmd) = @_;
     $conf->data->set(
         has_perldoc => $version != 0 ? 1 : 0,
         new_perldoc => $version == 2 ? 1 : 0
     );
+
+    $conf->data->set( perldoc => $cmd ) if $version;
+
     return 1;
 }
 

@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 # auto_perldoc-02.t
 
 use strict;
 use warnings;
-use Test::More tests =>  24;
+use Test::More tests =>  27;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -46,28 +46,34 @@ is($step->result(),
 
 my $version;
 $version = 0;
-ok(auto::perldoc::_handle_version($conf, $version),
+ok(auto::perldoc::_handle_version($conf, $version, 'not_a_path'),
     "_handle_version() returned true value");
 is($conf->data->get('has_perldoc'), 0,
     "Got expected value for 'has_perldoc'");
 is($conf->data->get('new_perldoc'), 0,
     "Got expected value for 'new_perldoc'");
+is($conf->data->get('perldoc'), undef,
+    "... and expected 'perldoc' path");
 
 $version = 1;
-ok(auto::perldoc::_handle_version($conf, $version),
+ok(auto::perldoc::_handle_version($conf, $version, 'path_to_pd'),
     "_handle_version() returned true value");
 is($conf->data->get('has_perldoc'), 1,
     "Got expected value for 'has_perldoc'");
 is($conf->data->get('new_perldoc'), 0,
     "Got expected value for 'new_perldoc'");
+is($conf->data->get('perldoc'), 'path_to_pd',
+    "... and expected 'perldoc' path");
 
 $version = 2;
-ok(auto::perldoc::_handle_version($conf, $version),
+ok(auto::perldoc::_handle_version($conf, $version, 'another_path_to_pd'),
     "_handle_version() returned true value");
 is($conf->data->get('has_perldoc'), 1,
     "Got expected value for 'has_perldoc'");
 is($conf->data->get('new_perldoc'), 1,
     "Got expected value for 'new_perldoc'");
+is($conf->data->get('perldoc'), 'another_path_to_pd',
+    "... and expected 'perldoc' path");
 
 $version = $step->_handle_old_perldoc();
 is($version, 1, "Got expected version setting for old perldoc");
