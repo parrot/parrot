@@ -56,7 +56,7 @@ mem_sys_allocate(size_t size)
 
 =item C<void * mem__internal_allocate>
 
-Allocates memory from the system using C<malloc>, Panics if there is no
+Calls C<malloc> to allocate memory from the system, Panics if there is no
 memory available. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
 debug information to C<STDERR>.
 
@@ -142,8 +142,9 @@ mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)
 
 =item C<void * mem_sys_realloc>
 
-Resize a chunk of system memory.  Unlike realloc(), it can handle a
-NULL pointer, in which case you get a malloc back.
+Resizes a chunk of memory.  Unlike C<realloc>, it can handle a
+NULL pointer, in which case it calls C<calloc> to create the memory
+block.
 
 =cut
 
@@ -176,7 +177,9 @@ mem_sys_realloc(ARGFREE(void *from), size_t size)
 
 =item C<void * mem_sys_realloc_zeroed>
 
-Resize a chunk of system memory. Fill the newly allocated space with zeroes.
+Resizes a chunk of system memory and fills the newly allocated space
+with zeroes. If the pointer is C<NULL> a new memory block is
+allocated and zeroed instead.
 
 =cut
 
@@ -209,10 +212,10 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 
 =item C<void * mem__internal_realloc>
 
-Resize a chunk of system memory.  Unlike realloc(), it can handle a
-NULL pointer, in which case you get a malloc back. If
-C<DETAIL_MEMORY_DEBUG> macro is defined, prints debug information to
-C<STDERR>.
+Resizes a chunk of system memory.  Unlike C<realloc>, it can handle a
+NULL pointer, in which case a new memory block is allocated for the
+requested size. If C<DETAIL_MEMORY_DEBUG> macro is defined, debug
+information is printed to C<STDERR>.
 
 =cut
 
@@ -243,7 +246,7 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
 
 =item C<void mem_sys_free>
 
-Free a chunk of memory back to the system.
+Frees a chunk of memory back to the system.
 
 =cut
 
@@ -264,7 +267,7 @@ mem_sys_free(ARGFREE(void *from))
 
 =item C<void mem__internal_free>
 
-Free a chunk of memory back to the system. If
+Frees a chunk of memory back to the system. If
 C<DETAIL_MEMORY_DEBUG> macro is defined, prints debug information to
 C<STDERR>.
 
