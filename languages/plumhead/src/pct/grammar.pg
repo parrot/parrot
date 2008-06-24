@@ -14,22 +14,23 @@ rule  code                    { <.CODE_START> <statements>  <.CODE_END>? {*} }
 token CODE_START              { '<?php' }
 token CODE_END                { '?>' \n? }
 
-rule statements               { <statement>*           {*} }
-rule statement                { <echo_statement>       {*} #= echo_statement
+rule  statements              { <statement>*           {*} }
+rule  statement               { <echo_statement>       {*} #= echo_statement
                               | <var_dump_statement>   {*} #= var_dump_statement
                               | <if_statement>         {*} #= if_statement
                               | <inline_sea>           {*} #= inline_sea
                               | <scalar_assign>        {*} #= scalar_assign
                               | <array_assign>         {*} #= array_assign
                               }
+rule  statement_delimiter     { ';' | <before \? > | $ }
 rule  echo_statement          { <ECHO>
                                 ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )
-                                ( ';' | <before \? > | $ )
                                 {*}
+                                <statement_delimiter>
                               }
 rule var_dump_statement       { <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE>
-                                ( ';' | <before \? > | $ )
                                 {*}
+                                <statement_delimiter>
                               }
 rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE>
                                 \{ <statements> \}
@@ -37,8 +38,8 @@ rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAR
                                 {*}
                               }
 token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> {*} }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) {*} }
-rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ';' | <before \? > | $ ) {*} }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression>        {*} <statement_delimiter> }
+rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} <statement_delimiter> }
 
 token ECHO                    { 'echo' }
 token VAR_DUMP                { 'var_dump' }
