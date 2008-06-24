@@ -615,8 +615,11 @@ D: Various code fixes and improvements
 N: Stéphane Peiry
 D: Lot of JIT/sun patches
 
-N: Stephen Weeks
+N: tene
+D: Cardinal, a Ruby compiler
 D: ChitChat, a Smalltalk compiler
+D: Minor Rakudo patches
+E: tene@allalone.org
 
 N: Sterling Hughes
 D: Questions for the FAQ
