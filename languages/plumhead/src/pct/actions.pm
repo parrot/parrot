@@ -78,21 +78,29 @@ method echo_statement($/) {
                   :node($/)
               );
      }
-     elsif $/[0]<PHP_SAPI_NAME> {
+     elsif $/[0]<function_call> {
          make PAST::Op.new(
-                  $( $/[0]<PHP_SAPI_NAME> ),
+                  $( $/[0]<function_call> ),
                   :name('echo'),
                   :node($/)
               );
      }
 }
 
-method var_dump_statement($/) {
-    make PAST::Op.new(
-             $( $<expression> ),
-             :name('var_dump'),
-             :node($/)
-         );
+method function_call($/) {
+    my $past := $( $<arguments> );
+    $past.name( ~$<FUNCTION_NAME> );
+
+    make $past;
+}
+
+method arguments($/) {
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    for $<expression> {
+        $past.push($($_));
+    }
+
+    make $past;
 }
 
 method if_statement($/) {
@@ -283,13 +291,6 @@ method postfix_expression($/,$key) {
 
 method string($/,$key) {
     make $( $/{$key} );
-}
-
-method PHP_SAPI_NAME($/) {
-    make PAST::Op.new(
-             :name( ~$/ ),
-             :node($/)
-         );
 }
 
 method INTEGER($/) {

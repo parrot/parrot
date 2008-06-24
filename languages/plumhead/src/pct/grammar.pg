@@ -15,39 +15,35 @@ token CODE_START              { '<?php' }
 token CODE_END                { '?>' \n? }
 
 rule  statements              { <statement>*           {*} }
-rule  statement               { <echo_statement>       {*} #= echo_statement
-                              | <var_dump_statement>   {*} #= var_dump_statement
-                              | <if_statement>         {*} #= if_statement
-                              | <inline_sea>           {*} #= inline_sea
-                              | <scalar_assign>        {*} #= scalar_assign
-                              | <array_assign>         {*} #= array_assign
+rule  statement               { <echo_statement>       {*} <statement_delimiter>  #= echo_statement
+                              | <function_call>        {*} <statement_delimiter>  #= function_call
+                              | <if_statement>         {*}                        #= if_statement
+                              | <inline_sea>           {*}                        #= inline_sea
+                              | <scalar_assign>        {*} <statement_delimiter>  #= scalar_assign
+                              | <array_assign>         {*} <statement_delimiter>  #= array_assign
                               }
 rule  statement_delimiter     { ';' | <before \? > | $ }
 rule  echo_statement          { <ECHO>
-                                ( <expression> | <PHP_SAPI_NAME> <.PAREN_OPEN> <.PAREN_CLOSE> )
+                                ( <expression> | <function_call> )
                                 {*}
-                                <statement_delimiter>
                               }
-rule var_dump_statement       { <VAR_DUMP> <.PAREN_OPEN>  <expression> <.PAREN_CLOSE>
-                                {*}
-                                <statement_delimiter>
-                              }
+rule function_call            { <FUNCTION_NAME> <.PAREN_OPEN> <arguments> <.PAREN_CLOSE> {*} }
+rule  arguments               { <expression>*  {*} }
 rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE>
                                 \{ <statements> \}
                                 <else_clause>?
                                 {*}
                               }
 token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> {*} }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression>        {*} <statement_delimiter> }
-rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} <statement_delimiter> }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression>        {*} }
+rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} }
 
 token ECHO                    { 'echo' }
-token VAR_DUMP                { 'var_dump' }
-token PHP_SAPI_NAME           { 'php_sapi_name' {*} }
+token FUNCTION_NAME           { <IDENT> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
-token IDENT                   { <[a..zA..Z_]>* <[a..zA..Z_0..9]>* }
+token IDENT                   { <[a..zA..Z_]>+ <[a..zA..Z_0..9]>* }
 token VAR_NAME                {  '$' <IDENT> {*} }
 
 token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
