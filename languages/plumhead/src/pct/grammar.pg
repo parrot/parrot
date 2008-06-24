@@ -27,7 +27,7 @@ rule  echo_statement          { <ECHO>
                                 ( <expression> | <function_call> )
                                 {*}
                               }
-rule function_call            { <FUNCTION_NAME> <.PAREN_OPEN> <arguments> <.PAREN_CLOSE> {*} }
+rule  function_call           { <FUNCTION_NAME> <.PAREN_OPEN> <arguments> <.PAREN_CLOSE> {*} }
 rule  arguments               { <expression>*  {*} }
 rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE>
                                 \{ <statements> \}
@@ -56,14 +56,14 @@ token UNARY_PLUS              { \+ }
 token CONCAT_OP               { \. }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { '*' | '/' | '%' }
-token BITWISE_OP              { '|'  | '&' | '^' }
+token BITWISE_OP              { '|' | '&' | '^' }
 token ASSIGN_OP               { '=' }
 token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
 
 token IF                      { 'if' }
 token ELSE                    { 'else' }
 
-rule relational_expression    { <expression> <rel_op_clause>? {*} }
+rule  relational_expression   { <expression> <rel_op_clause>? {*} }
 
 rule  else_clause             { <.ELSE> \{ <statements> \} {*} }
 rule  rel_op_clause           { <REL_OP> <expression> }
@@ -80,25 +80,25 @@ rule  concat_expression       { <string> <concat_tail>* {*} }
 rule  string                  { <DOUBLEQUOTE_STRING> {*}   #= DOUBLEQUOTE_STRING
                               | <SINGLEQUOTE_STRING> {*}   #= SINGLEQUOTE_STRING
                               }
-rule concat_tail              { <CONCAT_OP> <string> }
+rule  concat_tail             { <CONCAT_OP> <string> }
 
-rule bitwise_expression       { <adding_expression> <bitwise_tail>? {*} }
+rule  bitwise_expression      { <adding_expression> <bitwise_tail>? {*} }
 
-rule bitwise_tail             { <BITWISE_OP> <adding_expression> }
+rule  bitwise_tail            { <BITWISE_OP> <adding_expression> }
 
 # BUG: this gets precedence  wrong
-rule adding_expression        { <multiplying_expression> <adding_tail>* {*} }
+rule  adding_expression       { <multiplying_expression> <adding_tail>* {*} }
 
-rule adding_tail              { <ADD_OP> <multiplying_expression> }
+rule  adding_tail             { <ADD_OP> <multiplying_expression> }
 
 # TODO: this gets precedence wrong, see adding_expression
-rule multiplying_expression   { <unary_expression> <multiplicand>? {*} }
+rule  multiplying_expression  { <unary_expression> <multiplicand>? {*} }
 
-rule multiplicand             { <MUL_OP> <multiplying_expression> }
+rule  multiplicand            { <MUL_OP> <multiplying_expression> }
 
-rule unary_expression         { <UNARY_MINUS>? <postfix_expression> {*} }
+rule  unary_expression        { <UNARY_MINUS>? <postfix_expression> {*} }
 
-rule postfix_expression       { <NUMBER>                                   {*}    #= NUMBER
+rule  postfix_expression      { <NUMBER>                                   {*}    #= NUMBER
                               | <INTEGER>                                  {*}    #= INTEGER
                               | <.PAREN_OPEN> <expression> <.PAREN_CLOSE>  {*}    #= expression
                               | <array_elem>                               {*}    #= array_elem
