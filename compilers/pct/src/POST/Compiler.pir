@@ -217,15 +217,11 @@ the sub.
     pirflags = node.'pirflags'()
 
   pirflags_method:
-    ##  FIXME: RT#47794 - Parrot currently doesn't allow both
-    ##  :method and :outer flags on a sub, so if we have :method
-    ##  we automatically skip :outer processing.
     $I0 = index pirflags, ':method'
-    if $I0 >= 0 goto pirflags_done
+    if $I0 >= 0 goto pirflags_method_done
     $S0 = node.'blocktype'()
     if $S0 != 'method' goto pirflags_method_done
     pirflags = concat pirflags, ' :method'
-    goto pirflags_done
   pirflags_method_done:
 
     .local pmc outerpost, outername
