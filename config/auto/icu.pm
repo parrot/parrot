@@ -3,11 +3,16 @@
 
 =head1 NAME
 
-config/auto/icu.pm - ICU
+config/auto/icu.pm - Detect International Components for Unicode (ICU)
 
 =head1 DESCRIPTION
 
-Configures ICU and add appropriate targets to the Makefile.
+Determines whether ICU is available.  If so, configures ICU and add
+appropriate targets to the Makefile.
+
+From the ICU home page (L<http://www.icu-project.org/>):  "ICU is a mature,
+widely used set of C/C++ and Java libraries providing Unicode and
+Globalization support for software applications."
 
 =cut
 
@@ -34,19 +39,17 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $icushared, $icuheaders, $icuconfig, $without ) = $conf->options->get(
-        qw|
+    my ( $verbose, $icushared, $icuheaders, $icuconfig, $without ) =
+        $conf->options->get( qw|
             verbose
             icushared
             icuheaders
             icu-config
             without-icu
-            |
-    );
+    | );
 
     my @icu_headers = qw(ucnv.h utypes.h uchar.h);
-    my $autodetect  = !defined($icushared)
-        && !defined($icuheaders);
+    my $autodetect  = !defined($icushared) && !defined($icuheaders);
 
     $self->set_result(undef);
     unless ($without) {
@@ -54,6 +57,16 @@ sub runstep {
             print "specified a icu config parameter,\nICU autodetection disabled.\n" if $verbose;
         }
         elsif ( !defined $icuconfig || !$icuconfig ) {
+
+            # From the icu-config(1) man page
+            # (L<http://linux.die.net/man/1/icu-config>):
+
+            # "icu-config simplifies the task of building and linking against
+            # ICU as compared to manually configuring user makefiles or
+            # equivalent. Because icu-config is an executable script, it also
+            # solves the problem of locating the ICU libraries and headers, by
+            # allowing the system PATH to locate it."
+
             my ( undef, undef, $ret ) = capture_output( "icu-config", "--exists" );
 
             if ( ( $ret == -1 ) || ( ( $ret >> 8 ) != 0 ) ) {
@@ -134,7 +147,7 @@ sub runstep {
         }
     }
 
-    die <<"HELP" unless $ok;    # this text is also in Configure.PL!
+    die <<"HELP" unless $ok;
 Something is wrong with your ICU installation!
 
    If you do not have a full ICU installation:
@@ -144,8 +157,6 @@ Something is wrong with your ICU installation!
    --icuheaders=(path)  Location of ICU headers without /unicode
    --icushared=(flags)  Full linker command to create shared libraries
 HELP
-
-    #'
 
     my $icudir = dirname($icuheaders);
 
