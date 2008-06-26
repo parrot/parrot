@@ -169,7 +169,7 @@ really a public API.
             parrot_hash_get_bucket(INTERP, NS_HASH(SELF), key);
 
         /* If it's a sub... */
-        if (value->vtable->base_type == enum_class_Sub) {
+        if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
             Parrot_NameSpace * const nsinfo   = PARROT_NAMESPACE(SELF);
             PMC              *       vtable   = nsinfo->vtable;
             Parrot_sub       * const sub      = PMC_sub(value);
