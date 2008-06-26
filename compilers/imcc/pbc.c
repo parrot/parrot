@@ -963,7 +963,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         return NULL;
 
     for (s = globals.cs->first; s; s = s->next) {
-        if (STREQ(s->unit->lexid, unit->outer->name)) {
+        if (STREQ(s->unit->lexid->name, unit->outer->name)) {
             PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
         }
@@ -1033,15 +1033,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
         }
     }
 
-    /* If the unit has no lexid, set the lexid to match the name; otherwise,
-     * need to strip lexid of its quotes. */
-    if (!unit->lexid)
-        unit->lexid = r->name;
-    else {
-        unit->lexid++;
-        unit->lexid[strlen(unit->lexid) - 1] = 0;
-    }
-
     /* Do we have to create an instance of a specific type for this sub? */
     if (unit->instance_of) {
         /* Look it up as a class and as a PMC type. */
@@ -1073,6 +1064,20 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
 
     r->color  = add_const_str(interp, r);
     sub->name = ct->constants[r->color]->u.string;
+
+    /* If the unit has no lexid, set the lexid to match the name. */
+    if (!unit->lexid) {
+        unit->lexid = r;
+    }
+    else {
+        /* Otherwise, create string constant for it. */
+        unit->lexid->color = add_const_str(interp, unit->lexid);
+
+        /* We should also trim the quotes off it. */
+        unit->lexid->name++;
+        unit->lexid->name[strlen(unit->lexid->name) - 1] = 0;
+    }
+    sub->lexid = ct->constants[unit->lexid->color]->u.string;
 
     ns_pmc    = NULL;
 

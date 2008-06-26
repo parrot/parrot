@@ -67,7 +67,7 @@ typedef struct _IMC_Unit {
     char             *vtable_name;      /* v-table method name, if any */
     char             *instance_of;      /* PMC or class this is an instance of
                                          * if any */
-    char             *lexid;            /* Unique lexical scope id */
+    SymReg           *lexid;            /* Unique lexical scope id */
 
     struct            imcc_ostat ostat;
 } IMC_Unit;

@@ -3203,7 +3203,8 @@ yyreduce:
 #line 1005 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
-           IMCC_INFO(interp)->cur_unit->lexid = (yyvsp[(3) - (4)].s);
+           IMCC_INFO(interp)->cur_unit->lexid = mk_const(interp, (yyvsp[(3) - (4)].s), 'S');
+           mem_sys_free((yyvsp[(3) - (4)].s));
          }
     break;
 
