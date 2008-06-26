@@ -17,6 +17,8 @@ php_bcmath.pir - PHP bcmath  Library
 
 Returns the sum of two arbitrary precision numbers
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bcadd'
@@ -26,6 +28,8 @@ Returns the sum of two arbitrary precision numbers
 =item C<int bccomp(string left_operand, string right_operand [, int scale])>
 
 Compares two arbitrary precision numbers
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Compares two arbitrary precision numbers
 
 Returns the quotient of two arbitrary precision numbers (division)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bcdiv'
@@ -46,6 +52,8 @@ Returns the quotient of two arbitrary precision numbers (division)
 =item C<string bcmod(string left_operand, string right_operand)>
 
 Returns the modulus of the two arbitrary precision operands
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns the modulus of the two arbitrary precision operands
 
 Returns the multiplication of two arbitrary precision numbers
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bcmul'
@@ -66,6 +76,8 @@ Returns the multiplication of two arbitrary precision numbers
 =item C<string bcpow(string x, string y [, int scale])>
 
 Returns the value of an arbitrary precision number raised to the power of another
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns the value of an arbitrary precision number raised to the power of anothe
 
 Returns the value of an arbitrary precision number raised to the power of another reduced by a modulous
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bcpowmod'
@@ -86,6 +100,8 @@ Returns the value of an arbitrary precision number raised to the power of anothe
 =item C<bool bcscale(int scale)>
 
 Sets default scale parameter for all bc math functions
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Sets default scale parameter for all bc math functions
 
 Returns the square root of an arbitray precision number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bcsqrt'
@@ -106,6 +124,8 @@ Returns the square root of an arbitray precision number
 =item C<string bcsub(string left_operand, string right_operand [, int scale])>
 
 Returns the difference between two arbitrary precision numbers
+
+NOT IMPLEMENTED.
 
 =cut
 

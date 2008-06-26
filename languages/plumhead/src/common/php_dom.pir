@@ -17,6 +17,8 @@ php_dom.pir - PHP dom  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMAttr::__construct'
@@ -26,6 +28,8 @@ php_dom.pir - PHP dom  Library
 =item C<void DOMCdataSection::__construct(string value)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ php_dom.pir - PHP dom  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMComment::__construct'
@@ -46,6 +52,8 @@ php_dom.pir - PHP dom  Library
 =item C<void DOMDocument::__construct([string version], [string encoding])>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ php_dom.pir - PHP dom  Library
 
 Register extended class used to create base node type
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMDocument::registerNodeClass'
@@ -66,6 +76,8 @@ Register extended class used to create base node type
 =item C<void DOMDocumentFragment::__construct()>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Register extended class used to create base node type
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMDocumentFragment::appendXML'
@@ -86,6 +100,8 @@ Register extended class used to create base node type
 =item C<void DOMElement::__construct(string name, [string value], [string uri])>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Register extended class used to create base node type
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMEntityReference::__construct'
@@ -106,6 +124,8 @@ Register extended class used to create base node type
 =item C<string DOMNode::C14N([bool exclusive [, bool with_comments [, array xpath [, array ns_prefixes]]]])>
 
 Canonicalize nodes to a string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Canonicalize nodes to a string
 
 Canonicalize nodes to a file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMNode::C14NFile'
@@ -126,6 +148,8 @@ Canonicalize nodes to a file
 =item C<int DOMNode::getNodePath()>
 
 Gets an xpath for a node
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Gets an xpath for a node
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMProcessingInstruction::__construct'
@@ -147,6 +173,8 @@ Gets an xpath for a node
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DOMText::__construct'
@@ -156,6 +184,8 @@ Gets an xpath for a node
 =item C<void DOMXPath::__construct(DOMDocument doc)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -169,6 +199,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Attr-
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_attr_is_id'
@@ -180,6 +212,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-32791A2F
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -193,6 +227,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_characterdata_delete_data'
@@ -204,6 +240,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-3EDB695F
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +255,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_characterdata_replace_data'
@@ -228,6 +268,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-6531BCCF
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -241,6 +283,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_adopt_node'
@@ -252,6 +296,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-1084891198
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -265,6 +311,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_create_attribute_ns'
@@ -276,6 +324,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-D26C0AF8
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -289,6 +339,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_create_comment'
@@ -300,6 +352,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-35CB04B5
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -313,6 +367,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_create_element'
@@ -324,6 +380,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-DocCrElNS
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +395,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_create_entity_reference'
@@ -348,6 +408,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-135944439
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -361,6 +423,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_create_text_node'
@@ -372,6 +436,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-getElBId
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -385,6 +451,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_get_elements_by_tag_name'
@@ -396,6 +464,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-getElBTNNS
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -409,6 +479,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_import_node'
@@ -421,6 +493,8 @@ URL: http://www.w3.org/TR/DOM-Level-3-LS/load-save.html#LS-DocumentLS-load
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_load'
@@ -432,6 +506,8 @@ Since: DOM Level 3
 Since: DOM extended
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_load_html'
@@ -442,6 +518,8 @@ Since: DOM extended
 
 Since: DOM extended
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -455,6 +533,8 @@ URL: http://www.w3.org/TR/DOM-Level-3-LS/load-save.html#LS-DocumentLS-loadXML
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_loadxml'
@@ -467,6 +547,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_normalize_document'
@@ -477,6 +559,8 @@ Since: DOM Level 3
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_relaxNG_validate_file'
@@ -486,6 +570,8 @@ Since: DOM Level 3
 =item C<boolean dom_document_relaxNG_validate_xml(string source)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -499,6 +585,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_rename_node'
@@ -509,6 +597,8 @@ Since: DOM Level 3
 
 Convenience method to save to file
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -521,6 +611,8 @@ Convenience method to save to file
 Convenience method to output as html
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_save_html'
@@ -531,6 +623,8 @@ Convenience method to output as html
 
 Convenience method to save to file as html
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -544,6 +638,8 @@ URL: http://www.w3.org/TR/DOM-Level-3-LS/load-save.html#LS-DocumentLS-saveXML
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_savexml'
@@ -554,6 +650,8 @@ Since: DOM Level 3
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_schema_validate'
@@ -563,6 +661,8 @@ Since: DOM Level 3
 =item C<boolean dom_document_schema_validate_file(string filename)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -575,6 +675,8 @@ Since: DOM Level 3
 Since: DOM extended
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_document_validate'
@@ -584,6 +686,8 @@ Since: DOM extended
 =item C<int dom_document_xinclude([int options])>
 
 Substitutues xincludes in a DomDocument
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -597,6 +701,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#DOMCo
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_domconfiguration_can_set_parameter'
@@ -608,6 +714,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#DOMConfiguration-getParameter
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -621,6 +729,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#DOMCo
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_domconfiguration_set_parameter'
@@ -632,6 +742,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-ERRORS-DOMErrorHandler-handleError
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -645,6 +757,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Level
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_domimplementation_create_document'
@@ -656,6 +770,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Level-2-Core-DOM-createDocType
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -669,6 +785,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#DOMIm
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_domimplementation_get_feature'
@@ -680,6 +798,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-5CED94D7
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -693,6 +813,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#DOMIm
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_domimplementationlist_item'
@@ -704,6 +826,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-getDOMImpl
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -717,6 +841,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-ge
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_domimplementationsource_get_domimplementations'
@@ -728,6 +854,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#DOMStringList-item
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -741,6 +869,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_get_attribute'
@@ -752,6 +882,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-217A91B8
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -765,6 +897,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_get_attribute_node_ns'
@@ -776,6 +910,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-ElGetAttrNS
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -789,6 +925,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_get_elements_by_tag_name'
@@ -800,6 +938,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-A6C90942
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -813,6 +953,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_has_attribute'
@@ -824,6 +966,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-ElHasAttrNS
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -837,6 +981,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_remove_attribute'
@@ -848,6 +994,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-D589198
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -861,6 +1009,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_remove_attribute_ns'
@@ -872,6 +1022,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-F68F082
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -885,6 +1037,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_set_attribute_node'
@@ -896,6 +1050,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-ElSetAtNodeNS
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -909,6 +1065,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_set_attribute_ns'
@@ -920,6 +1078,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-ElSetIdAttr
 Since: DOM Level 3
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -933,6 +1093,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_set_id_attribute_node'
@@ -945,6 +1107,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_element_set_id_attribute_ns'
@@ -954,6 +1118,8 @@ Since: DOM Level 3
 =item C<somNode dom_import_simplexml(sxeobject node)>
 
 Get a simplexml_element object from dom to allow for processing
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -967,6 +1133,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_namednodemap_get_named_item'
@@ -978,6 +1146,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-getNamedItemNS
 Since: DOM Level 2
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -991,6 +1161,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_namednodemap_item'
@@ -1002,6 +1174,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-D58B193
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1015,6 +1189,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_namednodemap_remove_named_item_ns'
@@ -1026,6 +1202,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-1025163788
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1039,6 +1217,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_namednodemap_set_named_item_ns'
@@ -1050,6 +1230,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#NameList-getName
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1063,6 +1245,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#NameL
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_namelist_get_namespace_uri'
@@ -1074,6 +1258,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-184E7107
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1087,6 +1273,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_clone_node'
@@ -1098,6 +1286,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Node3-compareDocumentPosition
 Since: DOM Level 3
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1111,6 +1301,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Node3
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_get_feature'
@@ -1122,6 +1314,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Node3-getUserData
 Since: DOM Level 3
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1135,6 +1329,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_has_attributes'
@@ -1146,6 +1342,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-810594187
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1159,6 +1357,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_insert_before'
@@ -1170,6 +1370,8 @@ Since:
 URL: http://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-isDefaultNamespace
 Since: DOM Level 3
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1183,6 +1385,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Node3
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_is_equal_node'
@@ -1194,6 +1398,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Node3-isSameNode
 Since: DOM Level 3
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1207,6 +1413,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 2
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_is_supported'
@@ -1218,6 +1426,8 @@ Since: DOM Level 2
 URL: http://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-lookupNamespaceURI
 Since: DOM Level 3
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1231,6 +1441,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Node3
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_lookup_prefix'
@@ -1242,6 +1454,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-normalize
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1255,6 +1469,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_remove_child'
@@ -1266,6 +1482,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-ID-785887307
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1279,6 +1497,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#Node3
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_node_set_user_data'
@@ -1290,6 +1510,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-844377136
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1303,6 +1525,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#i18n-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_string_extend_find_offset16'
@@ -1314,6 +1538,8 @@ Since:
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#i18n-methods-StringExtend-findOffset32
 Since:
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1327,6 +1553,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since: DOM Level 3
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_text_is_whitespace_in_element_content'
@@ -1338,6 +1566,8 @@ Since: DOM Level 3
 URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-Text3-replaceWholeText
 Since: DOM Level 3
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1351,6 +1581,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#core-
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_text_split_text'
@@ -1363,6 +1595,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#ID-ha
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_userdatahandler_handle'
@@ -1372,6 +1606,8 @@ Since:
 =item C<mixed dom_xpath_evaluate(string expr [,DOMNode context])>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1383,6 +1619,8 @@ Since:
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dom_xpath_query'
@@ -1392,6 +1630,8 @@ Since:
 =item C<boolean dom_xpath_register_ns(string prefix, string uri)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 

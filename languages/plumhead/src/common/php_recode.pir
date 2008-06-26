@@ -17,6 +17,8 @@ php_recode.pir - PHP recode  Library
 
 Recode file input into file output according to request
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'recode_file'
@@ -26,6 +28,8 @@ Recode file input into file output according to request
 =item C<string recode_string(string request, string str)>
 
 Recode string str according to request string
+
+NOT IMPLEMENTED.
 
 =cut
 

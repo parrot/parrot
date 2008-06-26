@@ -17,6 +17,8 @@ php_xsl.pir - PHP xsl  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xsl_xsltprocessor_get_parameter'
@@ -26,6 +28,8 @@ php_xsl.pir - PHP xsl  Library
 =item C<bool xsl_xsltprocessor_has_exslt_support()>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -39,6 +43,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xsl_xsltprocessor_import_stylesheet'
@@ -48,6 +54,8 @@ Since:
 =item C<void xsl_xsltprocessor_register_php_functions([mixed $restrict])>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -59,6 +67,8 @@ Since:
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xsl_xsltprocessor_remove_parameter'
@@ -68,6 +78,8 @@ Since:
 =item C<bool xsl_xsltprocessor_set_parameter(string namespace, mixed name [, string value])>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -81,6 +93,8 @@ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#
 Since:
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xsl_xsltprocessor_transform_to_doc'
@@ -91,6 +105,8 @@ Since:
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xsl_xsltprocessor_transform_to_uri'
@@ -100,6 +116,8 @@ Since:
 =item C<string xsl_xsltprocessor_transform_to_xml(domdocument doc)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_oci8.pir - PHP oci8  Library
 
 Bind a PHP array to an Oracle PL/SQL type by name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_bind_array_by_name'
@@ -26,6 +28,8 @@ Bind a PHP array to an Oracle PL/SQL type by name
 =item C<bool oci_bind_by_name(resource stmt, string name, mixed &var, [, int maxlength [, int type]])>
 
 Bind a PHP variable to an Oracle placeholder by name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Bind a PHP variable to an Oracle placeholder by name
 
 Cancel reading from a cursor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_cancel'
@@ -46,6 +52,8 @@ Cancel reading from a cursor
 =item C<bool oci_close(resource connection)>
 
 Disconnect from database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Disconnect from database
 
 Append an object to the collection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_collection_append'
@@ -66,6 +76,8 @@ Append an object to the collection
 =item C<bool oci_collection_assign(object from)>
 
 Assign a collection from another existing collection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Assign a collection from another existing collection
 
 Assign element val to collection at index ndx
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_collection_element_assign'
@@ -86,6 +100,8 @@ Assign element val to collection at index ndx
 =item C<string oci_collection_element_get(int ndx)>
 
 Retrieve the value at collection index ndx
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Retrieve the value at collection index ndx
 
 Return the max value of a collection. For a varray this is the maximum length of the array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_collection_max'
@@ -106,6 +124,8 @@ Return the max value of a collection. For a varray this is the maximum length of
 =item C<int oci_collection_size()>
 
 Return the size of a collection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Return the size of a collection
 
 Trim num elements from the end of a collection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_collection_trim'
@@ -126,6 +148,8 @@ Trim num elements from the end of a collection
 =item C<bool oci_commit(resource connection)>
 
 Commit the current context
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Commit the current context
 
 Connect to an Oracle database and log on. Returns a new session.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_connect'
@@ -146,6 +172,8 @@ Connect to an Oracle database and log on. Returns a new session.
 =item C<bool oci_define_by_name(resource stmt, string name, mixed &var [, int type])>
 
 Define a PHP variable to an Oracle column by name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Define a PHP variable to an Oracle column by name
 
 Return the last error of stmt|connection|global. If no error happened returns false.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_error'
@@ -166,6 +196,8 @@ Return the last error of stmt|connection|global. If no error happened returns fa
 =item C<bool oci_execute(resource stmt [, int mode])>
 
 Execute a parsed statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Execute a parsed statement
 
 Prepare a new row of data for reading
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_fetch'
@@ -186,6 +220,8 @@ Prepare a new row of data for reading
 =item C<int oci_fetch_all(resource stmt, array &output[, int skip[, int maxrows[, int flags]]])>
 
 Fetch all rows of result data into an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Fetch all rows of result data into an array
 
 Fetch a result row as an array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_fetch_array'
@@ -206,6 +244,8 @@ Fetch a result row as an array
 =item C<array oci_fetch_assoc( resource stmt )>
 
 Fetch a result row as an associative array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Fetch a result row as an associative array
 
 Fetch a result row as an object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_fetch_object'
@@ -226,6 +268,8 @@ Fetch a result row as an object
 =item C<array oci_fetch_row( resource stmt )>
 
 Fetch a result row as an enumerated array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Fetch a result row as an enumerated array
 
 Tell whether a column is NULL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_field_is_null'
@@ -246,6 +292,8 @@ Tell whether a column is NULL
 =item C<string oci_field_name(resource stmt, int col)>
 
 Tell the name of a column
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Tell the name of a column
 
 Tell the precision of a column
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_field_precision'
@@ -266,6 +316,8 @@ Tell the precision of a column
 =item C<int oci_field_scale(resource stmt, int col)>
 
 Tell the scale of a column
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Tell the scale of a column
 
 Tell the maximum data size of a column
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_field_size'
@@ -286,6 +340,8 @@ Tell the maximum data size of a column
 =item C<mixed oci_field_type(resource stmt, int col)>
 
 Tell the data type of a column
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Tell the data type of a column
 
 Tell the raw oracle data type of a column
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_field_type_raw'
@@ -306,6 +364,8 @@ Tell the raw oracle data type of a column
 =item C<bool oci_free_collection()>
 
 Deletes collection object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Deletes collection object
 
 Deletes large object description
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_free_descriptor'
@@ -326,6 +388,8 @@ Deletes large object description
 =item C<bool oci_free_statement(resource stmt)>
 
 Free all resources associated with a statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Free all resources associated with a statement
 
 Toggle internal debugging output for the OCI extension
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_internal_debug'
@@ -346,6 +412,8 @@ Toggle internal debugging output for the OCI extension
 =item C<bool oci_lob_append( object lob )>
 
 Appends data from a LOB to another LOB
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Appends data from a LOB to another LOB
 
 Closes lob descriptor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_close'
@@ -366,6 +436,8 @@ Closes lob descriptor
 =item C<bool oci_lob_copy( object lob_to, object lob_from [, int length ] )>
 
 Copies data from a LOB to another LOB
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Copies data from a LOB to another LOB
 
 Checks if EOF is reached
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_eof'
@@ -386,6 +460,8 @@ Checks if EOF is reached
 =item C<int oci_lob_erase( [ int offset [, int length ] ] )>
 
 Erases a specified portion of the internal LOB, starting at a specified offset
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Erases a specified portion of the internal LOB, starting at a specified offset
 
 Writes a large object into a file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_export'
@@ -406,6 +484,8 @@ Writes a large object into a file
 =item C<bool oci_lob_flush( [ int flag ] )>
 
 Flushes the LOB buffer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Flushes the LOB buffer
 
 Loads file into a LOB
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_import'
@@ -426,6 +508,8 @@ Loads file into a LOB
 =item C<bool oci_lob_is_equal( object lob1, object lob2 )>
 
 Tests to see if two LOB/FILE locators are equal
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Tests to see if two LOB/FILE locators are equal
 
 Loads a large object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_load'
@@ -446,6 +532,8 @@ Loads a large object
 =item C<string oci_lob_read( int length )>
 
 Reads particular part of a large object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Reads particular part of a large object
 
 Rewind pointer of a LOB
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_rewind'
@@ -466,6 +556,8 @@ Rewind pointer of a LOB
 =item C<bool oci_lob_save( string data [, int offset ])>
 
 Saves a large object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Saves a large object
 
 Moves the pointer of a LOB
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_seek'
@@ -486,6 +580,8 @@ Moves the pointer of a LOB
 =item C<int oci_lob_size()>
 
 Returns size of a large object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Returns size of a large object
 
 Tells LOB pointer position
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_tell'
@@ -506,6 +604,8 @@ Tells LOB pointer position
 =item C<bool oci_lob_truncate( [ int length ])>
 
 Truncates a LOB
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -517,6 +617,8 @@ Truncates a LOB
 
 Writes data to current position of a LOB
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_lob_write'
@@ -526,6 +628,8 @@ Writes data to current position of a LOB
 =item C<bool oci_lob_write_temporary(string var [, int lob_type])>
 
 Writes temporary blob
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -537,6 +641,8 @@ Writes temporary blob
 
 Initialize a new collection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_new_collection'
@@ -546,6 +652,8 @@ Initialize a new collection
 =item C<resource oci_new_connect(string user, string pass [, string db])>
 
 Connect to an Oracle database and log on. Returns a new session.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -557,6 +665,8 @@ Connect to an Oracle database and log on. Returns a new session.
 
 Return a new cursor (Statement-Handle) - use this to bind ref-cursors!
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_new_cursor'
@@ -566,6 +676,8 @@ Return a new cursor (Statement-Handle) - use this to bind ref-cursors!
 =item C<object oci_new_descriptor(resource connection [, int type])>
 
 Initialize a new empty descriptor LOB/FILE (LOB is default)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -577,6 +689,8 @@ Initialize a new empty descriptor LOB/FILE (LOB is default)
 
 Return the number of result columns in a statement
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_num_fields'
@@ -586,6 +700,8 @@ Return the number of result columns in a statement
 =item C<int oci_num_rows(resource stmt)>
 
 Return the row count of an OCI statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -597,6 +713,8 @@ Return the row count of an OCI statement
 
 Parse a query and return a statement
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_parse'
@@ -606,6 +724,8 @@ Parse a query and return a statement
 =item C<bool oci_password_change(resource connection, string username, string old_password, string new_password)>
 
 Changes the password of an account
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -617,6 +737,8 @@ Changes the password of an account
 
 Connect to an Oracle database using a persistent connection and log on. Returns a new session.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_pconnect'
@@ -626,6 +748,8 @@ Connect to an Oracle database using a persistent connection and log on. Returns 
 =item C<string oci_result(resource stmt, mixed column)>
 
 Return a single column of result data
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -637,6 +761,8 @@ Return a single column of result data
 
 Rollback the current context
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_rollback'
@@ -646,6 +772,8 @@ Rollback the current context
 =item C<string oci_server_version(resource connection)>
 
 Return a string containing server version information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -657,6 +785,8 @@ Return a string containing server version information
 
 Sets the number of rows to be prefetched on execute to prefetch_rows for stmt
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'oci_set_prefetch'
@@ -666,6 +796,8 @@ Sets the number of rows to be prefetched on execute to prefetch_rows for stmt
 =item C<string oci_statement_type(resource stmt)>
 
 Return the query type of an OCI statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -677,6 +809,8 @@ Return the query type of an OCI statement
 
 Fetch a row of result data into an array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ocifetchinto'
@@ -687,6 +821,8 @@ Fetch a row of result data into an array
 
 Returns current state of buffering for a LOB
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ocigetbufferinglob'
@@ -696,6 +832,8 @@ Returns current state of buffering for a LOB
 =item C<bool ocisetbufferinglob( boolean flag )>
 
 Enables/disables buffering for a LOB
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_http.pir - PHP http Standard Library
 
 Generates a form-encoded query string from an associative array or object.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'http_build_query'

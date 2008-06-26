@@ -17,6 +17,8 @@ php_array.pir - PHP array Standard Library
 
 Retuns an array with all string keys lowercased [or uppercased]
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_change_key_case'
@@ -26,6 +28,8 @@ Retuns an array with all string keys lowercased [or uppercased]
 =item C<array array_chunk(array input, int size [, bool preserve_keys])>
 
 Split array into chunks
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Split array into chunks
 
 Creates an array by using the elements of the first parameter as keys and the elements of the second as the corresponding values
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_combine'
@@ -46,6 +52,8 @@ Creates an array by using the elements of the first parameter as keys and the el
 =item C<array array_count_values(array input)>
 
 Return the value as key and the frequency of that value in input as value
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Return the value as key and the frequency of that value in input as value
 
 Returns the entries of arr1 that have values which are not present in any of the others arguments.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_diff'
@@ -66,6 +76,8 @@ Returns the entries of arr1 that have values which are not present in any of the
 =item C<array array_diff_assoc(array arr1, array arr2 [, array ...])>
 
 Returns the entries of arr1 that have values which are not present in any of the others arguments but do additional checks whether the keys are equal
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns the entries of arr1 that have values which are not present in any of the
 
 Returns the entries of arr1 that have keys which are not present in any of the others arguments. This function is like array_diff() but works on the keys instead of the values. The associativity is preserved.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_diff_key'
@@ -86,6 +100,8 @@ Returns the entries of arr1 that have keys which are not present in any of the o
 =item C<array array_diff_uassoc(array arr1, array arr2 [, array ...], callback data_comp_func)>
 
 Returns the entries of arr1 that have values which are not present in any of the others arguments but do additional checks whether the keys are equal. Elements are compared by user supplied function.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the entries of arr1 that have values which are not present in any of the
 
 Returns the entries of arr1 that have keys which are not present in any of the others arguments. User supplied function is used for comparing the keys. This function is like array_udiff() but works on the keys instead of the values. The associativity is preserved.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_diff_ukey'
@@ -106,6 +124,8 @@ Returns the entries of arr1 that have keys which are not present in any of the o
 =item C<array array_fill(int start_key, int num, mixed val)>
 
 Create an array containing num elements starting with index start_key each initialized to val
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Create an array containing num elements starting with index start_key each initi
 
 Create an array using the elements of the first parameter as keys each initialized to val
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_fill_keys'
@@ -126,6 +148,8 @@ Create an array using the elements of the first parameter as keys each initializ
 =item C<array array_filter(array input [, mixed callback])>
 
 Filters elements from the array via the callback.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Filters elements from the array via the callback.
 
 Return array with key <-> value flipped
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_flip'
@@ -146,6 +172,8 @@ Return array with key <-> value flipped
 =item C<array array_intersect(array arr1, array arr2 [, array ...])>
 
 Returns the entries of arr1 that have values which are present in all the other arguments
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Returns the entries of arr1 that have values which are present in all the other 
 
 Returns the entries of arr1 that have values which are present in all the other arguments. Keys are used to do more restrictive check
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_intersect_assoc'
@@ -166,6 +196,8 @@ Returns the entries of arr1 that have values which are present in all the other 
 =item C<array array_intersect_key(array arr1, array arr2 [, array ...])>
 
 Returns the entries of arr1 that have keys which are present in all the other arguments. Kind of equivalent to array_diff(array_keys($arr1), array_keys($arr2)[,array_keys(...)]). Equivalent of array_intersect_assoc() but does not do compare of the data.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Returns the entries of arr1 that have keys which are present in all the other ar
 
 Returns the entries of arr1 that have values which are present in all the other arguments. Keys are used to do more restrictive check and they are compared by using an user-supplied callback.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_intersect_uassoc'
@@ -186,6 +220,8 @@ Returns the entries of arr1 that have values which are present in all the other 
 =item C<array array_intersect_ukey(array arr1, array arr2 [, array ...], callback key_compare_func)>
 
 Returns the entries of arr1 that have keys which are present in all the other arguments. Kind of equivalent to array_diff(array_keys($arr1), array_keys($arr2)[,array_keys(...)]). The comparison of the keys is performed by a user supplied function. Equivalent of array_intersect_uassoc() but does not do compare of the data.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns the entries of arr1 that have keys which are present in all the other ar
 
 Checks if the given key or index exists in the array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_key_exists'
@@ -206,6 +244,8 @@ Checks if the given key or index exists in the array
 =item C<array array_keys(array input [, mixed search_value[, bool strict]])>
 
 Return just the keys from the input array, optionally only for the specified search_value
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Return just the keys from the input array, optionally only for the specified sea
 
 Applies the callback to the elements in given arrays.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_map'
@@ -226,6 +268,8 @@ Applies the callback to the elements in given arrays.
 =item C<array array_merge(array arr1, array arr2 [, array ...])>
 
 Merges elements from passed arrays into one array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Merges elements from passed arrays into one array
 
 Recursively merges elements from passed arrays into one array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_merge_recursive'
@@ -246,6 +292,8 @@ Recursively merges elements from passed arrays into one array
 =item C<bool array_multisort(array ar1 [, SORT_ASC|SORT_DESC [, SORT_REGULAR|SORT_NUMERIC|SORT_STRING]] [, array ar2 [, SORT_ASC|SORT_DESC [, SORT_REGULAR|SORT_NUMERIC|SORT_STRING]], ...])>
 
 Sort multiple arrays at once similar to how ORDER BY clause works in SQL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Sort multiple arrays at once similar to how ORDER BY clause works in SQL
 
 Returns a copy of input array padded with pad_value to size pad_size
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_pad'
@@ -266,6 +316,8 @@ Returns a copy of input array padded with pad_value to size pad_size
 =item C<mixed array_pop(array stack)>
 
 Pops an element off the end of the array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Pops an element off the end of the array
 
 Returns the product of the array entries
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_product'
@@ -286,6 +340,8 @@ Returns the product of the array entries
 =item C<int array_push(array stack, mixed var [, mixed ...])>
 
 Pushes elements onto the end of the array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Pushes elements onto the end of the array
 
 Return key/keys for random entry/entries in the array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_rand'
@@ -306,6 +364,8 @@ Return key/keys for random entry/entries in the array
 =item C<mixed array_reduce(array input, mixed callback [, int initial])>
 
 Iteratively reduce the array to a single value via the callback.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Iteratively reduce the array to a single value via the callback.
 
 Return input as a new array with the order of the entries reversed
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_reverse'
@@ -326,6 +388,8 @@ Return input as a new array with the order of the entries reversed
 =item C<mixed array_search(mixed needle, array haystack [, bool strict])>
 
 Searches the array for a given value and returns the corresponding key if successful
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Searches the array for a given value and returns the corresponding key if succes
 
 Pops an element off the beginning of the array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_shift'
@@ -346,6 +412,8 @@ Pops an element off the beginning of the array
 =item C<array array_slice(array input, int offset [, int length [, bool preserve_keys]])>
 
 Returns elements specified by offset and length
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Returns elements specified by offset and length
 
 Removes the elements designated by offset and length and replace them with supplied array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_splice'
@@ -366,6 +436,8 @@ Removes the elements designated by offset and length and replace them with suppl
 =item C<mixed array_sum(array input)>
 
 Returns the sum of the array entries
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Returns the sum of the array entries
 
 Returns the entries of arr1 that have values which are not present in any of the others arguments. Elements are compared by user supplied function.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_udiff'
@@ -386,6 +460,8 @@ Returns the entries of arr1 that have values which are not present in any of the
 =item C<array array_udiff_assoc(array arr1, array arr2 [, array ...], callback key_comp_func)>
 
 Returns the entries of arr1 that have values which are not present in any of the others arguments but do additional checks whether the keys are equal. Keys are compared by user supplied function.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Returns the entries of arr1 that have values which are not present in any of the
 
 Returns the entries of arr1 that have values which are not present in any of the others arguments but do additional checks whether the keys are equal. Keys and elements are compared by user supplied functions.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_udiff_uassoc'
@@ -406,6 +484,8 @@ Returns the entries of arr1 that have values which are not present in any of the
 =item C<array array_uintersect(array arr1, array arr2 [, array ...], callback data_compare_func)>
 
 Returns the entries of arr1 that have values which are present in all the other arguments. Data is compared by using an user-supplied callback.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Returns the entries of arr1 that have values which are present in all the other 
 
 Returns the entries of arr1 that have values which are present in all the other arguments. Keys are used to do more restrictive check. Data is compared by using an user-supplied callback.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_uintersect_assoc'
@@ -426,6 +508,8 @@ Returns the entries of arr1 that have values which are present in all the other 
 =item C<array array_uintersect_uassoc(array arr1, array arr2 [, array ...], callback data_compare_func, callback key_compare_func)>
 
 Returns the entries of arr1 that have values which are present in all the other arguments. Keys are used to do more restrictive check. Both data and keys are compared by using user-supplied callbacks.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Returns the entries of arr1 that have values which are present in all the other 
 
 Removes duplicate values from array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_unique'
@@ -446,6 +532,8 @@ Removes duplicate values from array
 =item C<int array_unshift(array stack, mixed var [, mixed ...])>
 
 Pushes elements onto the beginning of the array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Pushes elements onto the beginning of the array
 
 Return just the values from the input array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_values'
@@ -466,6 +556,8 @@ Return just the values from the input array
 =item C<bool array_walk(array input, string funcname [, mixed userdata])>
 
 Apply a user function to every member of an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Apply a user function to every member of an array
 
 Apply a user function recursively to every member of an array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'array_walk_recursive'
@@ -486,6 +580,8 @@ Apply a user function recursively to every member of an array
 =item C<bool arsort(array &array_arg [, int sort_flags])>
 
 Sort an array in reverse order and maintain index association
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Sort an array in reverse order and maintain index association
 
 Sort an array and maintain index association
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'asort'
@@ -506,6 +604,8 @@ Sort an array and maintain index association
 =item C<array compact(mixed var_names [, mixed ...])>
 
 Creates a hash containing variables and their values
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -517,6 +617,8 @@ Creates a hash containing variables and their values
 
 Count the number of elements in a variable (usually an array)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'count'
@@ -526,6 +628,8 @@ Count the number of elements in a variable (usually an array)
 =item C<mixed current(array array_arg)>
 
 Return the element currently pointed to by the internal array pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -537,6 +641,8 @@ Return the element currently pointed to by the internal array pointer
 
 Advances array argument's internal pointer to the last element and return it
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'end'
@@ -546,6 +652,8 @@ Advances array argument's internal pointer to the last element and return it
 =item C<int extract(array var_array [, int extract_type [, string prefix]])>
 
 Imports variables into symbol table from an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -557,6 +665,8 @@ Imports variables into symbol table from an array
 
 Checks if the given value exists in the array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'in_array'
@@ -566,6 +676,8 @@ Checks if the given value exists in the array
 =item C<mixed key(array array_arg)>
 
 Return the key of the element currently pointed to by the internal array pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -577,6 +689,8 @@ Return the key of the element currently pointed to by the internal array pointer
 
 Sort an array by key value in reverse order
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'krsort'
@@ -586,6 +700,8 @@ Sort an array by key value in reverse order
 =item C<bool ksort(array &array_arg [, int sort_flags])>
 
 Sort an array by key
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -597,6 +713,8 @@ Sort an array by key
 
 Return the highest value in an array or a series of arguments
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'max'
@@ -606,6 +724,8 @@ Return the highest value in an array or a series of arguments
 =item C<mixed min(mixed arg1 [, mixed arg2 [, mixed ...]])>
 
 Return the lowest value in an array or a series of arguments
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -617,6 +737,8 @@ Return the lowest value in an array or a series of arguments
 
 Sort an array using case-insensitive natural sort
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'natcasesort'
@@ -626,6 +748,8 @@ Sort an array using case-insensitive natural sort
 =item C<void natsort(array &array_arg)>
 
 Sort an array using natural sort
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -637,6 +761,8 @@ Sort an array using natural sort
 
 Move array argument's internal pointer to the next element and return it
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'next'
@@ -646,6 +772,8 @@ Move array argument's internal pointer to the next element and return it
 =item C<mixed prev(array array_arg)>
 
 Move array argument's internal pointer to the previous element and return it
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -657,6 +785,8 @@ Move array argument's internal pointer to the previous element and return it
 
 Create an array containing the range of integers or characters from low to high (inclusive)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'range'
@@ -666,6 +796,8 @@ Create an array containing the range of integers or characters from low to high 
 =item C<mixed reset(array array_arg)>
 
 Set array argument's internal pointer to the first element and return it
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -677,6 +809,8 @@ Set array argument's internal pointer to the first element and return it
 
 Sort an array in reverse order
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'rsort'
@@ -686,6 +820,8 @@ Sort an array in reverse order
 =item C<bool shuffle(array array_arg)>
 
 Randomly shuffle the contents of an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -697,6 +833,8 @@ Randomly shuffle the contents of an array
 
 Sort an array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sort'
@@ -706,6 +844,8 @@ Sort an array
 =item C<bool uasort(array array_arg, string cmp_function)>
 
 Sort an array with a user-defined comparison function and maintain index association
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -717,6 +857,8 @@ Sort an array with a user-defined comparison function and maintain index associa
 
 Sort an array by keys using a user-defined comparison function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'uksort'
@@ -726,6 +868,8 @@ Sort an array by keys using a user-defined comparison function
 =item C<bool usort(array array_arg, string cmp_function)>
 
 Sort an array by values using a user-defined comparison function
+
+NOT IMPLEMENTED.
 
 =cut
 

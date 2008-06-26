@@ -17,6 +17,8 @@ php_gettext.pir - PHP gettext  Library
 
 Specify the character encoding in which the messages from the DOMAIN message catalog will be returned.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bind_textdomain_codeset'
@@ -26,6 +28,8 @@ Specify the character encoding in which the messages from the DOMAIN message cat
 =item C<string bindtextdomain(string domain_name, string dir)>
 
 Bind to the text domain domain_name, looking for translations in dir. Returns the current domain
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Bind to the text domain domain_name, looking for translations in dir. Returns th
 
 Return the translation of msgid for domain_name and category, or msgid unaltered if a translation does not exist
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dcgettext'
@@ -46,6 +52,8 @@ Return the translation of msgid for domain_name and category, or msgid unaltered
 =item C<string dcngettext(string domain, string msgid1, string msgid2, int n, int category)>
 
 Plural version of dcgettext()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Plural version of dcgettext()
 
 Return the translation of msgid for domain_name, or msgid unaltered if a translation does not exist
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dgettext'
@@ -66,6 +76,8 @@ Return the translation of msgid for domain_name, or msgid unaltered if a transla
 =item C<string dngettext(string domain, string msgid1, string msgid2, int count)>
 
 Plural version of dgettext()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Plural version of dgettext()
 
 Return the translation of msgid for the current domain, or msgid unaltered if a translation does not exist
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gettext'
@@ -87,6 +101,8 @@ Return the translation of msgid for the current domain, or msgid unaltered if a 
 
 Plural version of gettext()
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ngettext'
@@ -96,6 +112,8 @@ Plural version of gettext()
 =item C<string textdomain(string domain)>
 
 Set the textdomain to "domain". Returns the current domain
+
+NOT IMPLEMENTED.
 
 =cut
 

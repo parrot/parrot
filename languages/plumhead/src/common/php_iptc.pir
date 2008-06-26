@@ -17,6 +17,8 @@ php_iptc.pir - PHP iptc Standard Library
 
 Embed binary IPTC data into a JPEG image.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'iptcembed'
@@ -26,6 +28,8 @@ Embed binary IPTC data into a JPEG image.
 =item C<array iptcparse(string iptcdata)>
 
 Parse binary IPTC-data into associative array
+
+NOT IMPLEMENTED.
 
 =cut
 

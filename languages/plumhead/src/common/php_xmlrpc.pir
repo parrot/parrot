@@ -17,6 +17,8 @@ php_xmlrpc.pir - PHP xmlrpc  Library
 
 Decodes XML into native PHP types
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlrpc_decode'
@@ -26,6 +28,8 @@ Decodes XML into native PHP types
 =item C<array xmlrpc_decode_request(string xml, string& method [, string encoding])>
 
 Decodes XML into native PHP types
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Decodes XML into native PHP types
 
 Generates XML for a PHP value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlrpc_encode'
@@ -46,6 +52,8 @@ Generates XML for a PHP value
 =item C<string xmlrpc_encode_request(string method, mixed params)>
 
 Generates XML for a method request
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Generates XML for a method request
 
 Gets xmlrpc type for a PHP value. Especially useful for base64 and datetime strings
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlrpc_get_type'
@@ -66,6 +76,8 @@ Gets xmlrpc type for a PHP value. Especially useful for base64 and datetime stri
 =item C<bool xmlrpc_is_fault(array)>
 
 Determines if an array value represents an XMLRPC fault.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Determines if an array value represents an XMLRPC fault.
 
 Decodes XML into a list of method descriptions
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlrpc_parse_method_descriptions'
@@ -86,6 +100,8 @@ Decodes XML into a list of method descriptions
 =item C<int xmlrpc_server_add_introspection_data(resource server, array desc)>
 
 Adds introspection documentation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Adds introspection documentation
 
 Parses XML requests and call methods
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlrpc_server_call_method'
@@ -106,6 +124,8 @@ Parses XML requests and call methods
 =item C<resource xmlrpc_server_create(void)>
 
 Creates an xmlrpc server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Creates an xmlrpc server
 
 Destroys server resources
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlrpc_server_destroy'
@@ -126,6 +148,8 @@ Destroys server resources
 =item C<bool xmlrpc_server_register_introspection_callback(resource server, string function)>
 
 Register a PHP function to generate documentation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Register a PHP function to generate documentation
 
 Register a PHP function to handle method matching method_name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlrpc_server_register_method'
@@ -146,6 +172,8 @@ Register a PHP function to handle method matching method_name
 =item C<bool xmlrpc_set_type(string value, string type)>
 
 Sets xmlrpc type, base64 or datetime, for a PHP string value
+
+NOT IMPLEMENTED.
 
 =cut
 

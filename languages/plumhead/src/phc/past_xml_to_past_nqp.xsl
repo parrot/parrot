@@ -43,7 +43,7 @@ sub php_entry ()
 <!-- handle attributes -->
 <xsl:template match="@value[../@encoding = 'base64']">
 <xsl:param name="indent" />
-<xsl:value-of select="$indent" />:<xsl:value-of select="name()" />( decode_base64( '<xsl:value-of select="." />' ) ),
+<xsl:value-of select="$indent" />:<xsl:value-of select="name()" />( base64_decode( '<xsl:value-of select="." />' ) ),
 </xsl:template>
 
 <xsl:template match="@encoding"></xsl:template>

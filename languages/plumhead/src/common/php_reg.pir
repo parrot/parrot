@@ -17,6 +17,8 @@ php_reg.pir - PHP reg Standard Library
 
 Regular expression match
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ereg'
@@ -26,6 +28,8 @@ Regular expression match
 =item C<string ereg_replace(string pattern, string replacement, string string)>
 
 Replace regular expression
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Replace regular expression
 
 Case-insensitive regular expression match
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'eregi'
@@ -46,6 +52,8 @@ Case-insensitive regular expression match
 =item C<string eregi_replace(string pattern, string replacement, string string)>
 
 Case insensitive replace regular expression
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Case insensitive replace regular expression
 
 Split string into array by regular expression
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'split'
@@ -67,6 +77,8 @@ Split string into array by regular expression
 
 Split string into array by regular expression case-insensitive
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'spliti'
@@ -76,6 +88,8 @@ Split string into array by regular expression case-insensitive
 =item C<string sql_regcase(string string)>
 
 Make regular expression for case insensitive match
+
+NOT IMPLEMENTED.
 
 =cut
 

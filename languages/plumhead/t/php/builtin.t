@@ -25,13 +25,25 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 4;
+use Test::More     tests => 5;
 
 TODO: {
     local $TODO = 'awaiting compiler changes';
 
 use Parrot::Test;
 
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strcmp()' );
+<?php
+  echo strcmp('ABC', 'ABC'), "\n";
+  echo strcmp('ABC', 'BCD'), "\n";
+  echo strcmp('BCD', 'ABC'), "\n";
+?>
+CODE
+0
+-1
+1
+OUTPUT
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen()' );
 <?php

@@ -29,6 +29,8 @@ php_snmp.pir - PHP snmp  Library
 *
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'php_snmpv3'
@@ -38,6 +40,8 @@ php_snmp.pir - PHP snmp  Library
 =item C<string snmp2_get(string host, string community, string object_id [, int timeout [, int retries]])>
 
 Fetch a SNMP object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -49,6 +53,8 @@ Fetch a SNMP object
 
 Fetch a SNMP object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp2_getnext'
@@ -58,6 +64,8 @@ Fetch a SNMP object
 =item C<array snmp2_real_walk(string host, string community, string object_id [, int timeout [, int retries]])>
 
 Return all objects including their respective object id withing the specified one
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -69,6 +77,8 @@ Return all objects including their respective object id withing the specified on
 
 Set the value of a SNMP object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp2_set'
@@ -78,6 +88,8 @@ Set the value of a SNMP object
 =item C<array snmp2_walk(string host, string community, string object_id [, int timeout [, int retries]])>
 
 Return all objects under the specified object id
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -89,6 +101,8 @@ Return all objects under the specified object id
 
 Fetch the value of a SNMP object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp3_get'
@@ -98,6 +112,8 @@ Fetch the value of a SNMP object
 =item C<int snmp3_getnext(string host, string sec_name, string sec_level, string auth_protocol, string auth_passphrase, string priv_protocol, string priv_passphrase, string object_id [, int timeout [, int retries]])>
 
 Fetch the value of a SNMP object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -109,6 +125,8 @@ Fetch the value of a SNMP object
 
 Fetch the value of a SNMP object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp3_real_walk'
@@ -118,6 +136,8 @@ Fetch the value of a SNMP object
 =item C<int snmp3_set(string host, string sec_name, string sec_level, string auth_protocol, string auth_passphrase, string priv_protocol, string priv_passphrase, string object_id, string type, mixed value [, int timeout [, int retries]])>
 
 Fetch the value of a SNMP object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -129,6 +149,8 @@ Fetch the value of a SNMP object
 
 Fetch the value of a SNMP object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp3_walk'
@@ -138,6 +160,8 @@ Fetch the value of a SNMP object
 =item C<bool snmp_get_quick_print(void)>
 
 Return the current status of quick_print
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -149,6 +173,8 @@ Return the current status of quick_print
 
 Return the method how the SNMP values will be returned
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp_get_valueretrieval'
@@ -158,6 +184,8 @@ Return the method how the SNMP values will be returned
 =item C<int snmp_read_mib(string filename)>
 
 Reads and parses a MIB file into the active MIB tree.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -169,6 +197,8 @@ Reads and parses a MIB file into the active MIB tree.
 
 Return all values that are enums with their enum value instead of the raw integer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp_set_enum_print'
@@ -178,6 +208,8 @@ Return all values that are enums with their enum value instead of the raw intege
 =item C<void snmp_set_oid_output_format(int oid_format)>
 
 Set the OID output format.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -189,6 +221,8 @@ Set the OID output format.
 
 Return all objects including their respective object id withing the specified one
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmp_set_quick_print'
@@ -198,6 +232,8 @@ Return all objects including their respective object id withing the specified on
 =item C<int snmp_set_valueretrieval(int method)>
 
 Specify the method how the SNMP values will be returned
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -209,6 +245,8 @@ Specify the method how the SNMP values will be returned
 
 Fetch a SNMP object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmpget'
@@ -218,6 +256,8 @@ Fetch a SNMP object
 =item C<string snmpgetnext(string host, string community, string object_id [, int timeout [, int retries]])>
 
 Fetch a SNMP object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -229,6 +269,8 @@ Fetch a SNMP object
 
 Return all objects including their respective object id withing the specified one
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmprealwalk'
@@ -239,6 +281,8 @@ Return all objects including their respective object id withing the specified on
 
 Set the value of a SNMP object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'snmpset'
@@ -248,6 +292,8 @@ Set the value of a SNMP object
 =item C<array snmpwalk(string host, string community, string object_id [, int timeout [, int retries]])>
 
 Return all objects under the specified object id
+
+NOT IMPLEMENTED.
 
 =cut
 

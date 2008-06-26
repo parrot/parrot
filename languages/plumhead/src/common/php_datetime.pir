@@ -17,6 +17,8 @@ php_datetime.pir - PHP datetime Standard Library
 
 Parse a time/date generated with strftime()
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strptime'

@@ -17,6 +17,8 @@ php_exec.pir - PHP exec Standard Library
 
 Quote and escape an argument for use in a shell command
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'escapeshellarg'
@@ -26,6 +28,8 @@ Quote and escape an argument for use in a shell command
 =item C<string escapeshellcmd(string command)>
 
 Escape shell metacharacters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Escape shell metacharacters
 
 Execute an external program
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'exec'
@@ -46,6 +52,8 @@ Execute an external program
 =item C<void passthru(string command [, int &return_value])>
 
 Execute an external program and display raw output
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Execute an external program and display raw output
 
 Change the priority of the current process
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'proc_nice'
@@ -67,6 +77,8 @@ Change the priority of the current process
 
 Execute command via shell and return complete output as string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'shell_exec'
@@ -76,6 +88,8 @@ Execute command via shell and return complete output as string
 =item C<int system(string command [, int &return_value])>
 
 Execute an external program and display output
+
+NOT IMPLEMENTED.
 
 =cut
 

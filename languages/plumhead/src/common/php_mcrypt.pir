@@ -17,6 +17,8 @@ php_mcrypt.pir - PHP mcrypt  Library
 
 CBC crypt/decrypt data using key key with cipher cipher starting with iv
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_cbc'
@@ -26,6 +28,8 @@ CBC crypt/decrypt data using key key with cipher cipher starting with iv
 =item C<string mcrypt_cfb(int cipher, string key, string data, int mode, string iv)>
 
 CFB crypt/decrypt data using key key with cipher cipher starting with iv
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ CFB crypt/decrypt data using key key with cipher cipher starting with iv
 
 Create an initialization vector (IV)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_create_iv'
@@ -46,6 +52,8 @@ Create an initialization vector (IV)
 =item C<string mcrypt_decrypt(string cipher, string key, string data, string mode, string iv)>
 
 OFB crypt/decrypt data using key key with cipher cipher starting with iv
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ OFB crypt/decrypt data using key key with cipher cipher starting with iv
 
 ECB crypt/decrypt data using key key with cipher cipher starting with iv
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_ecb'
@@ -66,6 +76,8 @@ ECB crypt/decrypt data using key key with cipher cipher starting with iv
 =item C<string mcrypt_enc_get_algorithms_name(resource td)>
 
 Returns the name of the algorithm specified by the descriptor td
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns the name of the algorithm specified by the descriptor td
 
 Returns the block size of the cipher specified by the descriptor td
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_enc_get_block_size'
@@ -86,6 +100,8 @@ Returns the block size of the cipher specified by the descriptor td
 =item C<int mcrypt_enc_get_iv_size(resource td)>
 
 Returns the size of the IV in bytes of the algorithm specified by the descriptor td
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the size of the IV in bytes of the algorithm specified by the descriptor
 
 Returns the maximum supported key size in bytes of the algorithm specified by the descriptor td
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_enc_get_key_size'
@@ -106,6 +124,8 @@ Returns the maximum supported key size in bytes of the algorithm specified by th
 =item C<string mcrypt_enc_get_modes_name(resource td)>
 
 Returns the name of the mode specified by the descriptor td
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns the name of the mode specified by the descriptor td
 
 This function decrypts the crypttext
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_enc_get_supported_key_sizes'
@@ -126,6 +148,8 @@ This function decrypts the crypttext
 =item C<bool mcrypt_enc_is_block_algorithm(resource td)>
 
 Returns TRUE if the alrogithm is a block algorithms
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Returns TRUE if the alrogithm is a block algorithms
 
 Returns TRUE if the mode is for use with block algorithms
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_enc_is_block_algorithm_mode'
@@ -146,6 +172,8 @@ Returns TRUE if the mode is for use with block algorithms
 =item C<bool mcrypt_enc_is_block_mode(resource td)>
 
 Returns TRUE if the mode outputs blocks
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Returns TRUE if the mode outputs blocks
 
 This function runs the self test on the algorithm specified by the descriptor td
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_enc_self_test'
@@ -166,6 +196,8 @@ This function runs the self test on the algorithm specified by the descriptor td
 =item C<string mcrypt_encrypt(string cipher, string key, string data, string mode, string iv)>
 
 OFB crypt/decrypt data using key key with cipher cipher starting with iv
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ OFB crypt/decrypt data using key key with cipher cipher starting with iv
 
 This function encrypts the plaintext
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_generic'
@@ -186,6 +220,8 @@ This function encrypts the plaintext
 =item C<bool mcrypt_generic_deinit(resource td)>
 
 This function terminates encrypt specified by the descriptor td
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ This function terminates encrypt specified by the descriptor td
 
 This function initializes all buffers for the specific module
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_generic_init'
@@ -206,6 +244,8 @@ This function initializes all buffers for the specific module
 =item C<int mcrypt_get_block_size(string cipher, string module)>
 
 Get the key size of cipher
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Get the key size of cipher
 
 Get the key size of cipher
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_get_cipher_name'
@@ -226,6 +268,8 @@ Get the key size of cipher
 =item C<int mcrypt_get_iv_size(string cipher, string module)>
 
 Get the IV size of cipher (Usually the same as the blocksize)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Get the IV size of cipher (Usually the same as the blocksize)
 
 Get the key size of cipher
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_get_key_size'
@@ -246,6 +292,8 @@ Get the key size of cipher
 =item C<array mcrypt_list_algorithms([string lib_dir])>
 
 List all algorithms in "module_dir"
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ List all algorithms in "module_dir"
 
 List all modes "module_dir"
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_list_modes'
@@ -266,6 +316,8 @@ List all modes "module_dir"
 =item C<bool mcrypt_module_close(resource td)>
 
 Free the descriptor td
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Free the descriptor td
 
 Returns the block size of the algorithm
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_module_get_algo_block_size'
@@ -286,6 +340,8 @@ Returns the block size of the algorithm
 =item C<int mcrypt_module_get_algo_key_size(string algorithm [, string lib_dir])>
 
 Returns the maximum supported key size of the algorithm
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Returns the maximum supported key size of the algorithm
 
 This function decrypts the crypttext
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_module_get_supported_key_sizes'
@@ -306,6 +364,8 @@ This function decrypts the crypttext
 =item C<bool mcrypt_module_is_block_algorithm(string algorithm [, string lib_dir])>
 
 Returns TRUE if the algorithm is a block algorithm
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Returns TRUE if the algorithm is a block algorithm
 
 Returns TRUE if the mode is for use with block algorithms
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_module_is_block_algorithm_mode'
@@ -326,6 +388,8 @@ Returns TRUE if the mode is for use with block algorithms
 =item C<bool mcrypt_module_is_block_mode(string mode [, string lib_dir])>
 
 Returns TRUE if the mode outputs blocks of bytes
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Returns TRUE if the mode outputs blocks of bytes
 
 Opens the module of the algorithm and the mode to be used
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_module_open'
@@ -346,6 +412,8 @@ Opens the module of the algorithm and the mode to be used
 =item C<bool mcrypt_module_self_test(string algorithm [, string lib_dir])>
 
 Does a self test of the module "module"
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Does a self test of the module "module"
 
 OFB crypt/decrypt data using key key with cipher cipher starting with iv
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mcrypt_ofb'
@@ -366,6 +436,8 @@ OFB crypt/decrypt data using key key with cipher cipher starting with iv
 =item C<string mdecrypt_generic(resource td, string data)>
 
 This function decrypts the plaintext
+
+NOT IMPLEMENTED.
 
 =cut
 

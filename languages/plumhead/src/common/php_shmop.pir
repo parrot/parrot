@@ -17,6 +17,8 @@ php_shmop.pir - PHP shmop  Library
 
 closes a shared memory segment
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'shmop_close'
@@ -26,6 +28,8 @@ closes a shared memory segment
 =item C<bool shmop_delete(int shmid)>
 
 mark segment for deletion
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ mark segment for deletion
 
 gets and attaches a shared memory segment
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'shmop_open'
@@ -46,6 +52,8 @@ gets and attaches a shared memory segment
 =item C<string shmop_read(int shmid, int start, int count)>
 
 reads from a shm segment
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ reads from a shm segment
 
 returns the shm size
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'shmop_size'
@@ -66,6 +76,8 @@ returns the shm size
 =item C<int shmop_write(int shmid, string data, int offset)>
 
 writes to a shared memory segment
+
+NOT IMPLEMENTED.
 
 =cut
 

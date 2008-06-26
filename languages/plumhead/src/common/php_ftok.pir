@@ -17,6 +17,8 @@ php_ftok.pir - PHP ftok Standard Library
 
 Convert a pathname and a project identifier to a System V IPC key
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftok'

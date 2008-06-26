@@ -17,6 +17,8 @@ php_dir.pir - PHP dir Standard Library
 
 Change the current directory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'chdir'
@@ -26,6 +28,8 @@ Change the current directory
 =item C<bool chroot(string directory)>
 
 Change root directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Change root directory
 
 Close directory connection identified by the dir_handle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'closedir'
@@ -46,6 +52,8 @@ Close directory connection identified by the dir_handle
 =item C<object dir(string directory[, resource context])>
 
 Directory class with properties, handle and class and methods read, rewind and close
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Directory class with properties, handle and class and methods read, rewind and c
 
 Gets the current directory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getcwd'
@@ -66,6 +76,8 @@ Gets the current directory
 =item C<array glob(string pattern [, int flags])>
 
 Find pathnames matching a pattern
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Find pathnames matching a pattern
 
 Open a directory and return a dir_handle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'opendir'
@@ -86,6 +100,8 @@ Open a directory and return a dir_handle
 =item C<string readdir([resource dir_handle])>
 
 Read directory entry from dir_handle
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Read directory entry from dir_handle
 
 Rewind dir_handle back to the start
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'rewinddir'
@@ -106,6 +124,8 @@ Rewind dir_handle back to the start
 =item C<array scandir(string dir [, int sorting_order [, resource context]])>
 
 List files & directories inside the specified path
+
+NOT IMPLEMENTED.
 
 =cut
 

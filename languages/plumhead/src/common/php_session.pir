@@ -17,6 +17,8 @@ php_session.pir - PHP session  Library
 
 Return the current cache expire. If new_cache_expire is given, the current cache_expire is replaced with new_cache_expire
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_cache_expire'
@@ -26,6 +28,8 @@ Return the current cache expire. If new_cache_expire is given, the current cache
 =item C<string session_cache_limiter([string new_cache_limiter])>
 
 Return the current cache limiter. If new_cache_limited is given, the current cache_limiter is replaced with new_cache_limiter
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Return the current cache limiter. If new_cache_limited is given, the current cac
 
 Deserializes data and reinitializes the variables
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_decode'
@@ -46,6 +52,8 @@ Deserializes data and reinitializes the variables
 =item C<bool session_destroy(void)>
 
 Destroy the current session and all data associated with it
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Destroy the current session and all data associated with it
 
 Serializes the current setup and returns the serialized representation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_encode'
@@ -66,6 +76,8 @@ Serializes the current setup and returns the serialized representation
 =item C<array session_get_cookie_params(void)>
 
 Return the session cookie parameters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Return the session cookie parameters
 
 Return the current session id. If newid is given, the session id is replaced with newid
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_id'
@@ -86,6 +100,8 @@ Return the current session id. If newid is given, the session id is replaced wit
 =item C<bool session_is_registered(string varname)>
 
 Checks if a variable is registered in session
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Checks if a variable is registered in session
 
 Return the current module name used for accessing session data. If newname is given, the module name is replaced with newname
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_module_name'
@@ -106,6 +124,8 @@ Return the current module name used for accessing session data. If newname is gi
 =item C<string session_name([string newname])>
 
 Return the current session name. If newname is given, the session name is replaced with newname
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Return the current session name. If newname is given, the session name is replac
 
 Update the current session id with a newly generated one. If delete_old_session is set to true, remove the old session.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_regenerate_id'
@@ -126,6 +148,8 @@ Update the current session id with a newly generated one. If delete_old_session 
 =item C<bool session_register(mixed var_names [, mixed ...])>
 
 Adds varname(s) to the list of variables which are freezed at the session end
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Adds varname(s) to the list of variables which are freezed at the session end
 
 Return the current save path passed to module_name. If newname is given, the save path is replaced with newname
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_save_path'
@@ -146,6 +172,8 @@ Return the current save path passed to module_name. If newname is given, the sav
 =item C<void session_set_cookie_params(int lifetime [, string path [, string domain [, bool secure[, bool httponly]]]])>
 
 Set session cookie parameters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Set session cookie parameters
 
 Sets user-level functions
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_set_save_handler'
@@ -166,6 +196,8 @@ Sets user-level functions
 =item C<bool session_start(void)>
 
 Begin session - reinitializes freezed variables, registers browsers etc
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Begin session - reinitializes freezed variables, registers browsers etc
 
 Removes varname from the list of variables which are freezed at the session end
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_unregister'
@@ -187,6 +221,8 @@ Removes varname from the list of variables which are freezed at the session end
 
 Unset all registered variables
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'session_unset'
@@ -196,6 +232,8 @@ Unset all registered variables
 =item C<void session_write_close(void)>
 
 Write session data and end session
+
+NOT IMPLEMENTED.
 
 =cut
 

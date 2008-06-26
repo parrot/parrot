@@ -25,12 +25,12 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 3;
+use Test::More     tests => 5;
+
+use Parrot::Test;
 
 TODO: {
     local $TODO = 'awaiting compiler changes';
-
-use Parrot::Test;
 
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg)' );
@@ -65,6 +65,34 @@ string
 OUTPUT
 }
 
+unlink '../file.txt' if (-f '../file.txt');
+open my $X, '>', '../file.txt';
+print {$X} 'message digest';
+close $X;
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5_file(file)' );
+<?php
+  echo md5_file('file.txt'), "\n";
+?>
+CODE
+f96b697d7cb7938d525a2f31aaf161d0
+OUTPUT
+
+unlink '../file.txt' if (-f '../file.txt');
+
+}
+
+TODO:
+{
+    local $TODO = 'handle no file';
+
+language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
+<?php
+  echo md5_file('nofile.txt'), "\n";
+?>
+CODE
+/md5_file/
+OUTPUT
 }
 
 # Local Variables:

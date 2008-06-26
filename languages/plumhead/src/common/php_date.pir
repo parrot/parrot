@@ -18,6 +18,8 @@ php_date.pir - PHP date  Library
 Creates new DateTime object
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DateTime::__construct'
@@ -29,6 +31,8 @@ Creates new DateTime object
 Creates new DateTimeZone object.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'DateTimeZone::__construct'
@@ -39,6 +43,8 @@ Creates new DateTimeZone object.
 
 Returns true(1) if it is a valid date in gregorian calendar
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'checkdate'
@@ -48,6 +54,8 @@ Returns true(1) if it is a valid date in gregorian calendar
 =item C<string date(string format [, long timestamp])>
 
 Format a local date/time
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -60,6 +68,8 @@ Format a local date/time
 Returns new DateTime object
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_create'
@@ -71,6 +81,8 @@ Returns new DateTime object
 Sets the date.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_date_set'
@@ -81,6 +93,8 @@ Sets the date.
 
 Gets the default timezone used by all date/time functions in a script
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_default_timezone_get'
@@ -90,6 +104,8 @@ Gets the default timezone used by all date/time functions in a script
 =item C<bool date_default_timezone_set(string timezone_identifier)>
 
 Sets the default timezone used by all date/time functions in a script
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -102,6 +118,8 @@ Sets the default timezone used by all date/time functions in a script
 Returns date formatted according to given format
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_format'
@@ -112,6 +130,8 @@ Returns date formatted according to given format
 
 Sets the ISO date.
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -124,6 +144,8 @@ Sets the ISO date.
 Alters the timestamp.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_modify'
@@ -134,6 +156,8 @@ Alters the timestamp.
 
 Returns the DST offset.
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -146,6 +170,8 @@ Returns the DST offset.
 Returns associative array with detailed info about given date
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_parse'
@@ -155,6 +181,8 @@ Returns associative array with detailed info about given date
 =item C<array date_sun_info(long time, float latitude, float longitude)>
 
 Returns an array with information about sun set/rise and twilight begin/end
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -166,6 +194,8 @@ Returns an array with information about sun set/rise and twilight begin/end
 
 Returns time of sunrise for a given day and location
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_sunrise'
@@ -175,6 +205,8 @@ Returns time of sunrise for a given day and location
 =item C<mixed date_sunset(mixed time [, int format [, float latitude [, float longitude [, float zenith [, float gmt_offset]]]]])>
 
 Returns time of sunset for a given day and location
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -187,6 +219,8 @@ Returns time of sunset for a given day and location
 Sets the time.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_time_set'
@@ -197,6 +231,8 @@ Sets the time.
 
 Return new DateTimeZone object relative to give DateTime
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -209,6 +245,8 @@ Return new DateTimeZone object relative to give DateTime
 Sets the timezone for the DateTime object.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'date_timezone_set'
@@ -218,6 +256,8 @@ Sets the timezone for the DateTime object.
 =item C<array getdate([int timestamp])>
 
 Get date/time information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -229,6 +269,8 @@ Get date/time information
 
 Format a GMT date/time
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmdate'
@@ -238,6 +280,8 @@ Format a GMT date/time
 =item C<int gmmktime([int hour [, int min [, int sec [, int mon [, int day [, int year]]]]]])>
 
 Get UNIX timestamp for a GMT date
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -249,6 +293,8 @@ Get UNIX timestamp for a GMT date
 
 Format a GMT/UCT time/date according to locale settings
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmstrftime'
@@ -258,6 +304,8 @@ Format a GMT/UCT time/date according to locale settings
 =item C<int idate(string format [, int timestamp])>
 
 Format a local time/date as integer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -269,6 +317,8 @@ Format a local time/date as integer
 
 Returns the results of the C system call localtime as an associative array if the associative_array argument is set to 1 other wise it is a regular array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'localtime'
@@ -278,6 +328,8 @@ Returns the results of the C system call localtime as an associative array if th
 =item C<int mktime([int hour [, int min [, int sec [, int mon [, int day [, int year]]]]]])>
 
 Get UNIX timestamp for a date
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -289,6 +341,8 @@ Get UNIX timestamp for a date
 
 Format a local time/date according to locale settings
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strftime'
@@ -299,6 +353,8 @@ Format a local time/date according to locale settings
 
 Convert string representation of date and time to a timestamp
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strtotime'
@@ -308,6 +364,8 @@ Convert string representation of date and time to a timestamp
 =item C<int time(void)>
 
 Return current UNIX timestamp
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -320,6 +378,8 @@ Return current UNIX timestamp
 Returns associative array containing dst, offset and the timezone name
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'timezone_abbreviations_list'
@@ -330,6 +390,8 @@ Returns associative array containing dst, offset and the timezone name
 
 Returns numerically index array with all timezone identifiers.
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -342,6 +404,8 @@ Returns numerically index array with all timezone identifiers.
 Returns the timezone name from abbrevation
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'timezone_name_from_abbr'
@@ -352,6 +416,8 @@ Returns the timezone name from abbrevation
 
 Returns the name of the timezone.
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -364,6 +430,8 @@ Returns the name of the timezone.
 Returns the timezone offset.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'timezone_offset_get'
@@ -375,6 +443,8 @@ Returns the timezone offset.
 Returns new DateTimeZone object
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'timezone_open'
@@ -385,6 +455,8 @@ Returns new DateTimeZone object
 
 Returns numeracilly indexed array containing associative array for all transitions for the timezone.
 
+
+NOT IMPLEMENTED.
 
 =cut
 

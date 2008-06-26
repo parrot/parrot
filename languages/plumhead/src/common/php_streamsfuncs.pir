@@ -17,6 +17,8 @@ php_streamsfuncs.pir - PHP streamsfuncs Standard Library
 
 Create a file context and optionally set parameters
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_context_create'
@@ -26,6 +28,8 @@ Create a file context and optionally set parameters
 =item C<resource stream_context_get_default([array options])>
 
 Get a handle on the default file/stream context and optionally set parameters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Get a handle on the default file/stream context and optionally set parameters
 
 Retrieve options for a stream/wrapper/context
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_context_get_options'
@@ -46,6 +52,8 @@ Retrieve options for a stream/wrapper/context
 =item C<bool stream_context_set_option(resource context|resource stream, string wrappername, string optionname, mixed value)>
 
 Set an option for a wrapper
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Set an option for a wrapper
 
 Set parameters for a file context
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_context_set_params'
@@ -66,6 +76,8 @@ Set parameters for a file context
 =item C<long stream_copy_to_stream(resource source, resource dest [, long maxlen [, long pos]])>
 
 Reads up to maxlen bytes from source stream and writes them to dest stream.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Reads up to maxlen bytes from source stream and writes them to dest stream.
 
 Append a filter to a stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_filter_append'
@@ -86,6 +100,8 @@ Append a filter to a stream
 =item C<resource stream_filter_prepend(resource stream, string filtername[, int read_write[, string filterparams]])>
 
 Prepend a filter to a stream
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Prepend a filter to a stream
 
 Flushes any data in the filter's internal buffer, removes it from the chain, and frees the resource
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_filter_remove'
@@ -106,6 +124,8 @@ Flushes any data in the filter's internal buffer, removes it from the chain, and
 =item C<long stream_get_contents(resource source [, long maxlen [, long offset]])>
 
 Reads all remaining bytes (or up to maxlen bytes) from a stream and returns them as a string.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Reads all remaining bytes (or up to maxlen bytes) from a stream and returns them
 
 Read up to maxlen bytes from a stream or until the ending string is found
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_get_line'
@@ -126,6 +148,8 @@ Read up to maxlen bytes from a stream or until the ending string is found
 =item C<array stream_get_meta_data(resource fp)>
 
 Retrieves header/meta data from streams/file pointers
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Retrieves header/meta data from streams/file pointers
 
 Retrieves list of registered socket transports
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_get_transports'
@@ -146,6 +172,8 @@ Retrieves list of registered socket transports
 =item C<array stream_get_wrappers()>
 
 Retrieves list of registered stream wrappers
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Retrieves list of registered stream wrappers
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_is_local'
@@ -166,6 +196,8 @@ Retrieves list of registered stream wrappers
 =item C<int stream_select(array &read_streams, array &write_streams, array &except_streams, int tv_sec[, int tv_usec])>
 
 Runs the select() system call on the sets of streams with a timeout specified by tv_sec and tv_usec
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Runs the select() system call on the sets of streams with a timeout specified by
 
 Set blocking/non-blocking mode on a socket or stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_set_blocking'
@@ -186,6 +220,8 @@ Set blocking/non-blocking mode on a socket or stream
 =item C<bool stream_set_timeout(resource stream, int seconds, int microseconds)>
 
 Set timeout on stream read to seconds + microseonds
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Set timeout on stream read to seconds + microseonds
 
 Set file write buffer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_set_write_buffer'
@@ -206,6 +244,8 @@ Set file write buffer
 =item C<resource stream_socket_accept(resource serverstream, [ double timeout, string &peername ])>
 
 Accept a client connection from a server socket
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Accept a client connection from a server socket
 
 Open a client connection to a remote address
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_socket_client'
@@ -226,6 +268,8 @@ Open a client connection to a remote address
 =item C<int stream_socket_enable_crypto(resource stream, bool enable [, int cryptokind, resource sessionstream])>
 
 Enable or disable a specific kind of crypto on the stream
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Enable or disable a specific kind of crypto on the stream
 
 Returns either the locally bound or remote name for a socket stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_socket_get_name'
@@ -246,6 +292,8 @@ Returns either the locally bound or remote name for a socket stream
 =item C<array stream_socket_pair(int domain, int type, int protocol)>
 
 Creates a pair of connected, indistinguishable socket streams
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Creates a pair of connected, indistinguishable socket streams
 
 Receives data from a socket stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_socket_recvfrom'
@@ -267,6 +317,8 @@ Receives data from a socket stream
 
 Send data to a socket stream.  If target_addr is specified it must be in dotted quad (or [ipv6]) format
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_socket_sendto'
@@ -276,6 +328,8 @@ Send data to a socket stream.  If target_addr is specified it must be in dotted 
 =item C<resource stream_socket_server(string localaddress [, long &errcode, string &errstring, long flags, resource context])>
 
 Create a server socket bound to localaddress
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -290,6 +344,8 @@ with stream to be shut down.  If how is SHUT_RD,  further receptions will
 be disallowed. If how is SHUT_WR, further transmissions will be disallowed.
 If how is SHUT_RDWR,  further  receptions and transmissions will be
 disallowed.
+
+NOT IMPLEMENTED.
 
 =cut
 

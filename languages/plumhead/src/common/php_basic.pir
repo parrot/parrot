@@ -17,6 +17,8 @@ php_basic.pir - PHP basic Standard Library
 
 Call a user function which is the first parameter
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'call_user_func'
@@ -26,6 +28,8 @@ Call a user function which is the first parameter
 =item C<mixed call_user_func_array(string function_name, array parameters)>
 
 Call a user function which is the first parameter with the arguments contained in array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Call a user function which is the first parameter with the arguments contained i
 
 Call a user method on a specific object or class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'call_user_method'
@@ -46,6 +52,8 @@ Call a user method on a specific object or class
 =item C<mixed call_user_method_array(string method_name, mixed object, array params)>
 
 Call a user method on a specific object or class using a parameter array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Call a user method on a specific object or class using a parameter array
 
 Returns true if client disconnected
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'connection_aborted'
@@ -66,6 +76,8 @@ Returns true if client disconnected
 =item C<int connection_status(void)>
 
 Returns the connection status bitfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns the connection status bitfield
 
 Given the name of a constant this function will return the constants associated value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'constant'
@@ -86,6 +100,8 @@ Given the name of a constant this function will return the constants associated 
 =item C<array error_get_last()>
 
 Get the last occurred error as associative array. Returns NULL if there hasn't been an error yet.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Get the last occurred error as associative array. Returns NULL if there hasn't b
 
 Send an error message somewhere
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'error_log'
@@ -106,6 +124,8 @@ Send an error message somewhere
 =item C<void flush(void)>
 
 Flush the output buffer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Flush the output buffer
 
 Get the value of a PHP configuration option
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_cfg_var'
@@ -126,6 +148,8 @@ Get the value of a PHP configuration option
 =item C<string get_current_user(void)>
 
 Get the name of the owner of the current PHP script
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get the name of the owner of the current PHP script
 
 Get the current include_path configuration option
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_include_path'
@@ -146,6 +172,8 @@ Get the current include_path configuration option
 =item C<int get_magic_quotes_gpc(void)>
 
 Get the current active configuration setting of magic_quotes_gpc
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Get the current active configuration setting of magic_quotes_gpc
 
 Get the current active configuration setting of magic_quotes_runtime
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_magic_quotes_runtime'
@@ -166,6 +196,8 @@ Get the current active configuration setting of magic_quotes_runtime
 =item C<string getenv(string varname)>
 
 Get the value of an environment variable
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Get the value of an environment variable
 
 Get options from the command line argument list
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getopt'
@@ -186,6 +220,8 @@ Get options from the command line argument list
 =item C<int getprotobyname(string name)>
 
 Returns protocol number associated with name as per /etc/protocols
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns protocol number associated with name as per /etc/protocols
 
 Returns protocol name associated with protocol number proto
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getprotobynumber'
@@ -206,6 +244,8 @@ Returns protocol name associated with protocol number proto
 =item C<int getservbyname(string service, string protocol)>
 
 Returns port associated with service. Protocol must be "tcp" or "udp"
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Returns port associated with service. Protocol must be "tcp" or "udp"
 
 Returns service name associated with port. Protocol must be "tcp" or "udp"
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getservbyport'
@@ -226,6 +268,8 @@ Returns service name associated with port. Protocol must be "tcp" or "udp"
 =item C<bool highlight_file(string file_name [, bool return] )>
 
 Syntax highlight a source file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Syntax highlight a source file
 
 Syntax highlight a string or optionally return it
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'highlight_string'
@@ -246,6 +292,8 @@ Syntax highlight a string or optionally return it
 =item C<int ignore_user_abort(bool value)>
 
 Set whether we want to ignore a user abort event or not
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Set whether we want to ignore a user abort event or not
 
 Import GET/POST/Cookie variables into the global scope
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'import_request_variables'
@@ -266,6 +316,8 @@ Import GET/POST/Cookie variables into the global scope
 =item C<string inet_ntop(string in_addr)>
 
 Converts a packed inet address to a human readable IP address string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Converts a packed inet address to a human readable IP address string
 
 Converts a human readable IP address to a packed binary string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'inet_pton'
@@ -286,6 +340,8 @@ Converts a human readable IP address to a packed binary string
 =item C<string ini_get(string varname)>
 
 Get a configuration option
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Get a configuration option
 
 Get all configuration options
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ini_get_all'
@@ -306,6 +364,8 @@ Get all configuration options
 =item C<void ini_restore(string varname)>
 
 Restore the value of a configuration option specified by varname
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Restore the value of a configuration option specified by varname
 
 Set a configuration option, returns false on error and the old value of the configuration option on success
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ini_set'
@@ -326,6 +388,8 @@ Set a configuration option, returns false on error and the old value of the conf
 =item C<int ip2long(string ip_address)>
 
 Converts a string containing an (IPv4) Internet Protocol dotted address into a proper address
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Converts a string containing an (IPv4) Internet Protocol dotted address into a p
 
 Check if file was created by rfc1867 upload
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_uploaded_file'
@@ -346,6 +412,8 @@ Check if file was created by rfc1867 upload
 =item C<string long2ip(int proper_address)>
 
 Converts an (IPv4) Internet network address into a string in Internet standard dotted format
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Converts an (IPv4) Internet network address into a string in Internet standard d
 
 Move a file if and only if it was created by an upload
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'move_uploaded_file'
@@ -366,6 +436,8 @@ Move a file if and only if it was created by an upload
 =item C<array parse_ini_file(string filename [, bool process_sections])>
 
 Parse configuration file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Parse configuration file
 
 Return source with stripped comments and whitespace
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'php_strip_whitespace'
@@ -386,6 +460,8 @@ Return source with stripped comments and whitespace
 =item C<mixed print_r(mixed var [, bool return])>
 
 Prints out or returns information about the specified variable
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Prints out or returns information about the specified variable
 
 Set the value of an environment variable
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'putenv'
@@ -406,6 +484,8 @@ Set the value of an environment variable
 =item C<void register_shutdown_function(string function_name)>
 
 Register a user-level function to be called on request termination
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Register a user-level function to be called on request termination
 
 Registers a tick callback function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'register_tick_function'
@@ -426,6 +508,8 @@ Registers a tick callback function
 =item C<void restore_include_path()>
 
 Restore the value of the include_path configuration option
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Restore the value of the include_path configuration option
 
 Sets the include_path configuration option
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'set_include_path'
@@ -446,6 +532,8 @@ Sets the include_path configuration option
 =item C<bool set_magic_quotes_runtime(int new_setting)>
 
 Set the current active configuration setting of magic_quotes_runtime and return previous
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Set the current active configuration setting of magic_quotes_runtime and return 
 
 Delay for a given number of seconds
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sleep'
@@ -466,6 +556,8 @@ Delay for a given number of seconds
 =item C<array sys_getloadavg()>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Delay for a given number of seconds
 
 Delay for a number of seconds and nano seconds
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'time_nanosleep'
@@ -486,6 +580,8 @@ Delay for a number of seconds and nano seconds
 =item C<mixed time_sleep_until(float timestamp)>
 
 Make the script sleep until the specified time
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Make the script sleep until the specified time
 
 Unregisters a tick callback function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'unregister_tick_function'
@@ -506,6 +604,8 @@ Unregisters a tick callback function
 =item C<void usleep(int micro_seconds)>
 
 Delay for a given number of micro seconds
+
+NOT IMPLEMENTED.
 
 =cut
 

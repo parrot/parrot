@@ -17,6 +17,8 @@ php_gd.pir - PHP gd  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gd_info'
@@ -26,6 +28,8 @@ php_gd.pir - PHP gd  Library
 =item C<bool image2wbmp(resource im [, string filename [, int threshold]])>
 
 Output WBMP image to browser or file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Output WBMP image to browser or file
 
 Turn alpha blending mode on or off for the given image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagealphablending'
@@ -46,6 +52,8 @@ Turn alpha blending mode on or off for the given image
 =item C<bool imageantialias(resource im, bool on)>
 
 Should antialiased functions used or not
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Should antialiased functions used or not
 
 Draw a partial ellipse
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagearc'
@@ -66,6 +76,8 @@ Draw a partial ellipse
 =item C<bool imagechar(resource im, int font, int x, int y, string c, int col)>
 
 Draw a character
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Draw a character
 
 Draw a character rotated 90 degrees counter-clockwise
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecharup'
@@ -86,6 +100,8 @@ Draw a character rotated 90 degrees counter-clockwise
 =item C<int imagecolorallocate(resource im, int red, int green, int blue)>
 
 Allocate a color for an image
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Allocate a color for an image
 
 Allocate a color with an alpha level.  Works for true color and palette based images
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolorallocatealpha'
@@ -106,6 +124,8 @@ Allocate a color with an alpha level.  Works for true color and palette based im
 =item C<int imagecolorat(resource im, int x, int y)>
 
 Get the index of the color of a pixel
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Get the index of the color of a pixel
 
 Get the index of the closest color to the specified color
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolorclosest'
@@ -126,6 +148,8 @@ Get the index of the closest color to the specified color
 =item C<int imagecolorclosestalpha(resource im, int red, int green, int blue, int alpha)>
 
 Find the closest matching colour with alpha transparency
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Find the closest matching colour with alpha transparency
 
 Get the index of the color which has the hue, white and blackness nearest to the given color
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolorclosesthwb'
@@ -146,6 +172,8 @@ Get the index of the color which has the hue, white and blackness nearest to the
 =item C<bool imagecolordeallocate(resource im, int index)>
 
 De-allocate a color for an image
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ De-allocate a color for an image
 
 Get the index of the specified color
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolorexact'
@@ -166,6 +196,8 @@ Get the index of the specified color
 =item C<int imagecolorexactalpha(resource im, int red, int green, int blue, int alpha)>
 
 Find exact match for colour with transparency
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Find exact match for colour with transparency
 
 Makes the colors of the palette version of an image more closely match the true color version
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolormatch'
@@ -186,6 +220,8 @@ Makes the colors of the palette version of an image more closely match the true 
 =item C<int imagecolorresolve(resource im, int red, int green, int blue)>
 
 Get the index of the specified color or its closest possible alternative
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Get the index of the specified color or its closest possible alternative
 
 Resolve/Allocate a colour with an alpha level.  Works for true colour and palette based images
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolorresolvealpha'
@@ -206,6 +244,8 @@ Resolve/Allocate a colour with an alpha level.  Works for true colour and palett
 =item C<void imagecolorset(resource im, int col, int red, int green, int blue)>
 
 Set the color for the specified palette index
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Set the color for the specified palette index
 
 Get the colors for an index
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolorsforindex'
@@ -226,6 +268,8 @@ Get the colors for an index
 =item C<int imagecolorstotal(resource im)>
 
 Find out the number of colors in an image's palette
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Find out the number of colors in an image's palette
 
 Define a color as transparent
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecolortransparent'
@@ -246,6 +292,8 @@ Define a color as transparent
 =item C<resource imageconvolution(resource src_im, array matrix3x3, double div, double offset)>
 
 Apply a 3x3 convolution matrix, using coefficient div and offset
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Apply a 3x3 convolution matrix, using coefficient div and offset
 
 Copy part of an image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecopy'
@@ -266,6 +316,8 @@ Copy part of an image
 =item C<bool imagecopymerge(resource src_im, resource dst_im, int dst_x, int dst_y, int src_x, int src_y, int src_w, int src_h, int pct)>
 
 Merge one part of an image with another
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Merge one part of an image with another
 
 Merge one part of an image with another
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecopymergegray'
@@ -286,6 +340,8 @@ Merge one part of an image with another
 =item C<bool imagecopyresampled(resource dst_im, resource src_im, int dst_x, int dst_y, int src_x, int src_y, int dst_w, int dst_h, int src_w, int src_h)>
 
 Copy and resize part of an image using resampling to help ensure clarity
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Copy and resize part of an image using resampling to help ensure clarity
 
 Copy and resize part of an image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecopyresized'
@@ -306,6 +364,8 @@ Copy and resize part of an image
 =item C<resource imagecreate(int x_size, int y_size)>
 
 Create a new image
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Create a new image
 
 Create a new image from GD file or URL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecreatefromgd'
@@ -326,6 +388,8 @@ Create a new image from GD file or URL
 =item C<resource imagecreatefromgd2(string filename)>
 
 Create a new image from GD2 file or URL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Create a new image from GD2 file or URL
 
 Create a new image from a given part of GD2 file or URL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecreatefromgd2part'
@@ -346,6 +412,8 @@ Create a new image from a given part of GD2 file or URL
 =item C<resource imagecreatefromgif(string filename)>
 
 Create a new image from GIF file or URL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Create a new image from GIF file or URL
 
 Create a new image from JPEG file or URL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecreatefromjpeg'
@@ -366,6 +436,8 @@ Create a new image from JPEG file or URL
 =item C<resource imagecreatefrompng(string filename)>
 
 Create a new image from PNG file or URL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Create a new image from PNG file or URL
 
 Create a new image from the image stream in the string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecreatefromstring'
@@ -386,6 +460,8 @@ Create a new image from the image stream in the string
 =item C<resource imagecreatefromwbmp(string filename)>
 
 Create a new image from WBMP file or URL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Create a new image from WBMP file or URL
 
 Create a new image from XBM file or URL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecreatefromxbm'
@@ -406,6 +484,8 @@ Create a new image from XBM file or URL
 =item C<resource imagecreatefromxpm(string filename)>
 
 Create a new image from XPM file or URL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Create a new image from XPM file or URL
 
 Create a new true color image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagecreatetruecolor'
@@ -426,6 +508,8 @@ Create a new true color image
 =item C<bool imagedashedline(resource im, int x1, int y1, int x2, int y2, int col)>
 
 Draw a dashed line
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Draw a dashed line
 
 Destroy an image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagedestroy'
@@ -446,6 +532,8 @@ Destroy an image
 =item C<bool imageellipse(resource im, int cx, int cy, int w, int h, int color)>
 
 Draw an ellipse
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Draw an ellipse
 
 Flood fill
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagefill'
@@ -466,6 +556,8 @@ Flood fill
 =item C<bool imagefilledarc(resource im, int cx, int cy, int w, int h, int s, int e, int col, int style)>
 
 Draw a filled partial ellipse
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Draw a filled partial ellipse
 
 Draw an ellipse
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagefilledellipse'
@@ -486,6 +580,8 @@ Draw an ellipse
 =item C<bool imagefilledpolygon(resource im, array point, int num_points, int col)>
 
 Draw a filled polygon
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Draw a filled polygon
 
 Draw a filled rectangle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagefilledrectangle'
@@ -506,6 +604,8 @@ Draw a filled rectangle
 =item C<bool imagefilltoborder(resource im, int x, int y, int border, int col)>
 
 Flood fill to specific color
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -517,6 +617,8 @@ Flood fill to specific color
 
 Applies Filter an image using a custom angle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagefilter'
@@ -526,6 +628,8 @@ Applies Filter an image using a custom angle
 =item C<int imagefontheight(int font)>
 
 Get font height
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -537,6 +641,8 @@ Get font height
 
 Get font width
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagefontwidth'
@@ -546,6 +652,8 @@ Get font width
 =item C<array imageftbbox(float size, float angle, string font_file, string text [, array extrainfo])>
 
 Give the bounding box of a text using fonts via freetype2
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -557,6 +665,8 @@ Give the bounding box of a text using fonts via freetype2
 
 Write text to the image using fonts via freetype2
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagefttext'
@@ -566,6 +676,8 @@ Write text to the image using fonts via freetype2
 =item C<bool imagegammacorrect(resource im, float inputgamma, float outputgamma)>
 
 Apply a gamma correction to a GD image
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -577,6 +689,8 @@ Apply a gamma correction to a GD image
 
 Output GD image to browser or file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagegd'
@@ -586,6 +700,8 @@ Output GD image to browser or file
 =item C<bool imagegd2(resource im [, string filename, [, int chunk_size, [, int type]]])>
 
 Output GD2 image to browser or file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -597,6 +713,8 @@ Output GD2 image to browser or file
 
 Output GIF image to browser or file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagegif'
@@ -606,6 +724,8 @@ Output GIF image to browser or file
 =item C<resource imagegrabscreen()>
 
 Grab a screenshot
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -617,6 +737,8 @@ Grab a screenshot
 
 Grab a window or its client area using a windows handle (HWND property in COM instance)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagegrabwindow'
@@ -626,6 +748,8 @@ Grab a window or its client area using a windows handle (HWND property in COM in
 =item C<int imageinterlace(resource im [, int interlace])>
 
 Enable or disable interlace
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -637,6 +761,8 @@ Enable or disable interlace
 
 return true if the image uses truecolor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imageistruecolor'
@@ -646,6 +772,8 @@ return true if the image uses truecolor
 =item C<bool imagejpeg(resource im [, string filename [, int quality]])>
 
 Output JPEG image to browser or file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -657,6 +785,8 @@ Output JPEG image to browser or file
 
 Set the alpha blending flag to use the bundled libgd layering effects
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagelayereffect'
@@ -666,6 +796,8 @@ Set the alpha blending flag to use the bundled libgd layering effects
 =item C<bool imageline(resource im, int x1, int y1, int x2, int y2, int col)>
 
 Draw a line
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -677,6 +809,8 @@ Draw a line
 
 Load a new font
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imageloadfont'
@@ -686,6 +820,8 @@ Load a new font
 =item C<void imagepalettecopy(resource dst, resource src)>
 
 Copy the palette from the src image onto the dst image
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -697,6 +833,8 @@ Copy the palette from the src image onto the dst image
 
 Output PNG image to browser or file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagepng'
@@ -706,6 +844,8 @@ Output PNG image to browser or file
 =item C<bool imagepolygon(resource im, array point, int num_points, int col)>
 
 Draw a polygon
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -717,6 +857,8 @@ Draw a polygon
 
 Return the bounding box needed by a string if rasterized
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagepsbbox'
@@ -726,6 +868,8 @@ Return the bounding box needed by a string if rasterized
 =item C<int imagepscopyfont(int font_index)>
 
 Make a copy of a font for purposes like extending or reenconding
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -737,6 +881,8 @@ Make a copy of a font for purposes like extending or reenconding
 
 To change a fonts character encoding vector
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagepsencodefont'
@@ -746,6 +892,8 @@ To change a fonts character encoding vector
 =item C<bool imagepsextendfont(resource font_index, float extend)>
 
 Extend or or condense (if extend < 1) a font
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -757,6 +905,8 @@ Extend or or condense (if extend < 1) a font
 
 Free memory used by a font
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagepsfreefont'
@@ -766,6 +916,8 @@ Free memory used by a font
 =item C<resource imagepsloadfont(string pathname)>
 
 Load a new font from specified file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -777,6 +929,8 @@ Load a new font from specified file
 
 Slant a font
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagepsslantfont'
@@ -786,6 +940,8 @@ Slant a font
 =item C<array imagepstext(resource image, string text, resource font, int size, int foreground, int background, int xcoord, int ycoord [, int space, int tightness, float angle, int antialias])>
 
 Rasterize a string over an image
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -797,6 +953,8 @@ Rasterize a string over an image
 
 Draw a rectangle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagerectangle'
@@ -806,6 +964,8 @@ Draw a rectangle
 =item C<resource imagerotate(resource src_im, float angle, int bgdcolor [, int ignoretransparent])>
 
 Rotate an image using a custom angle
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -817,6 +977,8 @@ Rotate an image using a custom angle
 
 Include alpha channel to a saved image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagesavealpha'
@@ -826,6 +988,8 @@ Include alpha channel to a saved image
 =item C<bool imagesetbrush(resource image, resource brush)>
 
 Set the brush image to $brush when filling $image with the "IMG_COLOR_BRUSHED" color
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -837,6 +1001,8 @@ Set the brush image to $brush when filling $image with the "IMG_COLOR_BRUSHED" c
 
 Set a single pixel
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagesetpixel'
@@ -846,6 +1012,8 @@ Set a single pixel
 =item C<bool imagesetstyle(resource im, array styles)>
 
 Set the line drawing styles for use with imageline and IMG_COLOR_STYLED.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -857,6 +1025,8 @@ Set the line drawing styles for use with imageline and IMG_COLOR_STYLED.
 
 Set line thickness for drawing lines, ellipses, rectangles, polygons etc.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagesetthickness'
@@ -866,6 +1036,8 @@ Set line thickness for drawing lines, ellipses, rectangles, polygons etc.
 =item C<bool imagesettile(resource image, resource tile)>
 
 Set the tile image to $tile when filling $image with the "IMG_COLOR_TILED" color
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -877,6 +1049,8 @@ Set the tile image to $tile when filling $image with the "IMG_COLOR_TILED" color
 
 Draw a string horizontally
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagestring'
@@ -886,6 +1060,8 @@ Draw a string horizontally
 =item C<bool imagestringup(resource im, int font, int x, int y, string str, int col)>
 
 Draw a string vertically - rotated 90 degrees counter-clockwise
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -897,6 +1073,8 @@ Draw a string vertically - rotated 90 degrees counter-clockwise
 
 Get image width
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagesx'
@@ -906,6 +1084,8 @@ Get image width
 =item C<int imagesy(resource im)>
 
 Get image height
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -917,6 +1097,8 @@ Get image height
 
 Convert a true colour image to a palette based image with a number of colours, optionally using dithering.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagetruecolortopalette'
@@ -926,6 +1108,8 @@ Convert a true colour image to a palette based image with a number of colours, o
 =item C<array imagettfbbox(float size, float angle, string font_file, string text)>
 
 Give the bounding box of a text using TrueType fonts
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -937,6 +1121,8 @@ Give the bounding box of a text using TrueType fonts
 
 Write text to the image using a TrueType font
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagettftext'
@@ -946,6 +1132,8 @@ Write text to the image using a TrueType font
 =item C<int imagetypes(void)>
 
 Return the types of images supported in a bitfield - 1=GIF, 2=JPEG, 4=PNG, 8=WBMP, 16=XPM
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -957,6 +1145,8 @@ Return the types of images supported in a bitfield - 1=GIF, 2=JPEG, 4=PNG, 8=WBM
 
 Output WBMP image to browser or file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imagewbmp'
@@ -966,6 +1156,8 @@ Output WBMP image to browser or file
 =item C<int imagexbm(int im, string filename [, int foreground])>
 
 Output XBM image to browser or file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -977,6 +1169,8 @@ Output XBM image to browser or file
 
 Convert JPEG image to WBMP image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'jpeg2wbmp'
@@ -986,6 +1180,8 @@ Convert JPEG image to WBMP image
 =item C<bool png2wbmp(string f_org, string f_dest, int d_height, int d_width, int threshold)>
 
 Convert PNG image to WBMP image
+
+NOT IMPLEMENTED.
 
 =cut
 

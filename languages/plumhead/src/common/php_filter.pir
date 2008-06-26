@@ -18,6 +18,8 @@ php_filter.pir - PHP filter  Library
 * Returns true if the variable with the name 'name' exists in source.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'filter_has_var'
@@ -27,6 +29,8 @@ php_filter.pir - PHP filter  Library
 =item C< filter_id(string filtername)>
 
 * Returns the filter ID belonging to a named filter
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -39,6 +43,8 @@ php_filter.pir - PHP filter  Library
 * Returns the filtered variable 'name'* from source `type`.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'filter_input'
@@ -50,6 +56,8 @@ php_filter.pir - PHP filter  Library
 * Returns an array with all arguments defined in 'definition'.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'filter_input_array'
@@ -59,6 +67,8 @@ php_filter.pir - PHP filter  Library
 =item C< filter_list()>
 
 * Returns a list of all supported filters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -71,6 +81,8 @@ php_filter.pir - PHP filter  Library
 * Returns the filtered version of the vriable.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'filter_var'
@@ -81,6 +93,8 @@ php_filter.pir - PHP filter  Library
 
 * Returns an array with all arguments defined in 'definition'.
 
+
+NOT IMPLEMENTED.
 
 =cut
 

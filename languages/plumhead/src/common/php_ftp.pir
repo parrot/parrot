@@ -17,6 +17,8 @@ php_ftp.pir - PHP ftp  Library
 
 Attempt to allocate space on the remote FTP server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_alloc'
@@ -26,6 +28,8 @@ Attempt to allocate space on the remote FTP server
 =item C<bool ftp_cdup(resource stream)>
 
 Changes to the parent directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Changes to the parent directory
 
 Changes directories
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_chdir'
@@ -46,6 +52,8 @@ Changes directories
 =item C<int ftp_chmod(resource stream, int mode, string filename)>
 
 Sets permissions on a file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Sets permissions on a file
 
 Closes the FTP stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_close'
@@ -66,6 +76,8 @@ Closes the FTP stream
 =item C<resource ftp_connect(string host [, int port [, int timeout]])>
 
 Opens a FTP stream
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Opens a FTP stream
 
 Deletes a file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_delete'
@@ -86,6 +100,8 @@ Deletes a file
 =item C<bool ftp_exec(resource stream, string command)>
 
 Requests execution of a program on the FTP server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Requests execution of a program on the FTP server
 
 Retrieves a file from the FTP server and writes it to an open file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_fget'
@@ -106,6 +124,8 @@ Retrieves a file from the FTP server and writes it to an open file
 =item C<bool ftp_fput(resource stream, string remote_file, resource fp, int mode[, int startpos])>
 
 Stores a file from an open file to the FTP server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Stores a file from an open file to the FTP server
 
 Retrieves a file from the FTP server and writes it to a local file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_get'
@@ -126,6 +148,8 @@ Retrieves a file from the FTP server and writes it to a local file
 =item C<mixed ftp_get_option(resource stream, int option)>
 
 Gets an FTP option
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Gets an FTP option
 
 Logs into the FTP server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_login'
@@ -146,6 +172,8 @@ Logs into the FTP server
 =item C<int ftp_mdtm(resource stream, string filename)>
 
 Returns the last modification time of the file, or -1 on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Returns the last modification time of the file, or -1 on error
 
 Creates a directory and returns the absolute path for the new directory or false on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_mkdir'
@@ -166,6 +196,8 @@ Creates a directory and returns the absolute path for the new directory or false
 =item C<int ftp_nb_continue(resource stream)>
 
 Continues retrieving/sending a file nbronously
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Continues retrieving/sending a file nbronously
 
 Retrieves a file from the FTP server asynchronly and writes it to an open file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_nb_fget'
@@ -186,6 +220,8 @@ Retrieves a file from the FTP server asynchronly and writes it to an open file
 =item C<int ftp_nb_fput(resource stream, string remote_file, resource fp, int mode[, int startpos])>
 
 Stores a file from an open file to the FTP server nbronly
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Stores a file from an open file to the FTP server nbronly
 
 Retrieves a file from the FTP server nbhronly and writes it to a local file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_nb_get'
@@ -206,6 +244,8 @@ Retrieves a file from the FTP server nbhronly and writes it to a local file
 =item C<int ftp_nb_put(resource stream, string remote_file, string local_file, int mode[, int startpos])>
 
 Stores a file on the FTP server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Stores a file on the FTP server
 
 Returns an array of filenames in the given directory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_nlist'
@@ -226,6 +268,8 @@ Returns an array of filenames in the given directory
 =item C<bool ftp_pasv(resource stream, bool pasv)>
 
 Turns passive mode on or off
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Turns passive mode on or off
 
 Stores a file on the FTP server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_put'
@@ -246,6 +292,8 @@ Stores a file on the FTP server
 =item C<string ftp_pwd(resource stream)>
 
 Returns the present working directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Returns the present working directory
 
 Sends a literal command to the FTP server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_raw'
@@ -266,6 +316,8 @@ Sends a literal command to the FTP server
 =item C<array ftp_rawlist(resource stream, string directory [, bool recursive])>
 
 Returns a detailed listing of a directory as an array of output lines
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns a detailed listing of a directory as an array of output lines
 
 Renames the given file to a new path
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_rename'
@@ -286,6 +340,8 @@ Renames the given file to a new path
 =item C<bool ftp_rmdir(resource stream, string directory)>
 
 Removes a directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Removes a directory
 
 Sets an FTP option
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_set_option'
@@ -306,6 +364,8 @@ Sets an FTP option
 =item C<bool ftp_site(resource stream, string cmd)>
 
 Sends a SITE command to the server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Sends a SITE command to the server
 
 Returns the size of the file, or -1 on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_size'
@@ -327,6 +389,8 @@ Returns the size of the file, or -1 on error
 
 Opens a FTP-SSL stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftp_ssl_connect'
@@ -336,6 +400,8 @@ Opens a FTP-SSL stream
 =item C<string ftp_systype(resource stream)>
 
 Returns the system type identifier
+
+NOT IMPLEMENTED.
 
 =cut
 

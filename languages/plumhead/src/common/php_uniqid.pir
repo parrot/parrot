@@ -17,6 +17,8 @@ php_uniqid.pir - PHP uniqid Standard Library
 
 Generates a unique ID
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'uniqid'

@@ -17,6 +17,8 @@ php_bz2.pir - PHP bz2  Library
 
 Compresses a string into BZip2 encoded data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bzcompress'
@@ -26,6 +28,8 @@ Compresses a string into BZip2 encoded data
 =item C<string bzdecompress(string source [, int small])>
 
 Decompresses BZip2 compressed data
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Decompresses BZip2 compressed data
 
 Returns the error number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bzerrno'
@@ -46,6 +52,8 @@ Returns the error number
 =item C<array bzerror(resource bz)>
 
 Returns the error number and error string in an associative array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns the error number and error string in an associative array
 
 Returns the error string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bzerrstr'
@@ -67,6 +77,8 @@ Returns the error string
 
 Opens a new BZip2 stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'bzopen'
@@ -76,6 +88,8 @@ Opens a new BZip2 stream
 =item C<string bzread(resource bz[, int length])>
 
 Reads up to length bytes from a BZip2 stream, or 1024 bytes if length is not specified
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_zip.pir - PHP zip  Library
 
 Add a file in a Zip archive using its path and the name to use.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::addFile'
@@ -26,6 +28,8 @@ Add a file in a Zip archive using its path and the name to use.
 =item C<bool ZipArchive::addFromString(string name, string content)>
 
 Add a file using content and the entry name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Add a file using content and the entry name
 
 close the zip archive
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::close'
@@ -46,6 +52,8 @@ close the zip archive
 =item C<bool ZipArchive::createEmptyDir(string dirname)>
 
 Returns the index of the entry named filename in the archive
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns the index of the entry named filename in the archive
 
 Delete a file using its index
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::deleteIndex'
@@ -66,6 +76,8 @@ Delete a file using its index
 =item C<bool ZipArchive::deleteName(string name)>
 
 Delete a file using its index
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Delete a file using its index
 
 Extract one or more file from a zip archive
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::extractTo'
@@ -86,6 +100,8 @@ Extract one or more file from a zip archive
 =item C<string ZipArchive::getArchiveComment()>
 
 Returns the comment of an entry using its index
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the comment of an entry using its index
 
 Returns the comment of an entry using its index
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::getCommentIndex'
@@ -106,6 +124,8 @@ Returns the comment of an entry using its index
 =item C<string ZipArchive::getCommentName(string name)>
 
 Returns the comment of an entry using its name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns the comment of an entry using its name
 
 get the contents of an entry using its index
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::getFromIndex'
@@ -126,6 +148,8 @@ get the contents of an entry using its index
 =item C<string ZipArchive::getFromName(string entryname[, int len [, int flags]])>
 
 get the contents of an entry using its name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ get the contents of an entry using its name
 
 Returns the name of the file at position index
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::getNameIndex'
@@ -146,6 +172,8 @@ Returns the name of the file at position index
 =item C<resource ZipArchive::getStream(string entryname)>
 
 get a stream for an entry using its name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ get a stream for an entry using its name
 
 Returns the index of the entry named filename in the archive
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::locateName'
@@ -166,6 +196,8 @@ Returns the index of the entry named filename in the archive
 =item C<mixed ZipArchive::open(string source [, int flags])>
 
 Create new zip using source uri for output, return TRUE on success or the error code
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Create new zip using source uri for output, return TRUE on success or the error 
 
 Rename an entry selected by its index to new_name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::renameIndex'
@@ -186,6 +220,8 @@ Rename an entry selected by its index to new_name
 =item C<bool ZipArchive::renameName(string name, string new_name)>
 
 Rename an entry selected by its name to new_name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Rename an entry selected by its name to new_name
 
 Set or remove (NULL/'') the comment of the archive
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::setArchiveComment'
@@ -206,6 +244,8 @@ Set or remove (NULL/'') the comment of the archive
 =item C<bool ZipArchive::setCommentIndex(int index, string comment)>
 
 Set or remove (NULL/'') the comment of an entry using its index
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Set or remove (NULL/'') the comment of an entry using its index
 
 Set or remove (NULL/'') the comment of an entry using its Name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::setCommentName'
@@ -226,6 +268,8 @@ Set or remove (NULL/'') the comment of an entry using its Name
 =item C<resource ZipArchive::statIndex(int index[, int flags])>
 
 Returns the zip entry informations using its index
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Returns the zip entry informations using its index
 
 Returns the information about a the zip entry filename
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::statName'
@@ -246,6 +292,8 @@ Returns the information about a the zip entry filename
 =item C<bool ZipArchive::unchangeAll()>
 
 All changes to files and global information in archive are reverted
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ All changes to files and global information in archive are reverted
 
 Revert all global changes to the archive archive.  For now, this only reverts archive comment changes.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::unchangeAll'
@@ -266,6 +316,8 @@ Revert all global changes to the archive archive.  For now, this only reverts ar
 =item C<bool ZipArchive::unchangeIndex(int index)>
 
 Changes to the file at position index are reverted
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Changes to the file at position index are reverted
 
 Changes to the file named 'name' are reverted
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ZipArchive::unchangeName'
@@ -286,6 +340,8 @@ Changes to the file named 'name' are reverted
 =item C<void zip_close(resource zip)>
 
 Close a Zip archive
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Close a Zip archive
 
 Close a zip entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'zip_entry_close'
@@ -306,6 +364,8 @@ Close a zip entry
 =item C<int zip_entry_compressedsize(resource zip_entry)>
 
 Return the compressed size of a ZZip entry
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Return the compressed size of a ZZip entry
 
 Return a string containing the compression method used on a particular entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'zip_entry_compressionmethod'
@@ -326,6 +388,8 @@ Return a string containing the compression method used on a particular entry
 =item C<int zip_entry_filesize(resource zip_entry)>
 
 Return the actual filesize of a ZZip entry
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Return the actual filesize of a ZZip entry
 
 Return the name given a ZZip entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'zip_entry_name'
@@ -346,6 +412,8 @@ Return the name given a ZZip entry
 =item C<bool zip_entry_open(resource zip_dp, resource zip_entry [, string mode])>
 
 Open a Zip File, pointed by the resource entry
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Open a Zip File, pointed by the resource entry
 
 Read from an open directory entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'zip_entry_read'
@@ -367,6 +437,8 @@ Read from an open directory entry
 
 Create new zip using source uri for output
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'zip_open'
@@ -376,6 +448,8 @@ Create new zip using source uri for output
 =item C<resource zip_read(resource zip)>
 
 Returns the next file in the archive
+
+NOT IMPLEMENTED.
 
 =cut
 

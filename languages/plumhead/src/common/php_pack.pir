@@ -17,6 +17,8 @@ php_pack.pir - PHP pack Standard Library
 
 Takes one or more arguments and packs them into a binary string according to the format argument
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pack'
@@ -26,6 +28,8 @@ Takes one or more arguments and packs them into a binary string according to the
 =item C<array unpack(string format, string input)>
 
 Unpack binary string into named array elements according to format argument
+
+NOT IMPLEMENTED.
 
 =cut
 

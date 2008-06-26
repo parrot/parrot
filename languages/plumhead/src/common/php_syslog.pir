@@ -17,6 +17,8 @@ php_syslog.pir - PHP syslog Standard Library
 
 Close connection to system logger
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'closelog'
@@ -26,6 +28,8 @@ Close connection to system logger
 =item C<void define_syslog_variables(void)>
 
 Initializes all syslog-related variables
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Initializes all syslog-related variables
 
 Open connection to system logger
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openlog'
@@ -46,6 +52,8 @@ Open connection to system logger
 =item C<bool syslog(int priority, string message)>
 
 Generate a system log message
+
+NOT IMPLEMENTED.
 
 =cut
 

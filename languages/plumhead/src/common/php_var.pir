@@ -17,6 +17,8 @@ php_var.pir - PHP var Standard Library
 
 Dumps a string representation of an internal zend value to output.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'debug_zval_dump'
@@ -26,6 +28,8 @@ Dumps a string representation of an internal zend value to output.
 =item C<int memory_get_peak_usage([real_usage])>
 
 Returns the peak allocated by PHP memory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns the peak allocated by PHP memory
 
 Returns the allocated by PHP memory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'memory_get_usage'
@@ -47,6 +53,8 @@ Returns the allocated by PHP memory
 
 Returns a string representation of variable (which can later be unserialized)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'serialize'
@@ -56,6 +64,8 @@ Returns a string representation of variable (which can later be unserialized)
 =item C<mixed unserialize(string variable_representation)>
 
 Takes a string representation of variable and recreates it
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -155,6 +165,8 @@ not_a_integer:
 =item C<mixed var_export(mixed var [, bool return])>
 
 Outputs or returns a string representation of a variable
+
+NOT IMPLEMENTED.
 
 =cut
 

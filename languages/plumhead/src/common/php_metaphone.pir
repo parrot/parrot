@@ -17,6 +17,8 @@ php_metaphone.pir - PHP metaphone Standard Library
 
 Break english phrases down into their phonemes
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'metaphone'

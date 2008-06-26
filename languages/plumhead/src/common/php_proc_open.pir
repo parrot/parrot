@@ -17,6 +17,8 @@ php_proc_open.pir - PHP proc_open Standard Library
 
 close a process opened by proc_open
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'proc_close'
@@ -26,6 +28,8 @@ close a process opened by proc_open
 =item C<array proc_get_status(resource process)>
 
 get information about a process opened by proc_open
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ get information about a process opened by proc_open
 
 Run a process with more control over it's file descriptors
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'proc_open'
@@ -46,6 +52,8 @@ Run a process with more control over it's file descriptors
 =item C<bool proc_terminate(resource process [, long signal])>
 
 kill a process opened by proc_open
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_filestat.pir - PHP filestat Standard Library
 
 Change file group
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'chgrp'
@@ -26,6 +28,8 @@ Change file group
 =item C<bool chmod(string filename, int mode)>
 
 Change file mode
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Change file mode
 
 Change file owner
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'chown'
@@ -46,6 +52,8 @@ Change file owner
 =item C<bool chown(string filename, mixed user)>
 
 Change file owner
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Change file owner
 
 Clear file stat cache
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'clearstatcache'
@@ -66,6 +76,8 @@ Clear file stat cache
 =item C<float disk_free_space(string path)>
 
 Get free disk space for filesystem that path is on
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Get free disk space for filesystem that path is on
 
 Get total disk space for filesystem that path is on
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'disk_total_space'
@@ -86,6 +100,8 @@ Get total disk space for filesystem that path is on
 =item C<bool file_exists(string filename)>
 
 Returns true if filename exists
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns true if filename exists
 
 Get last access time of file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fileatime'
@@ -106,6 +124,8 @@ Get last access time of file
 =item C<int filectime(string filename)>
 
 Get inode modification time of file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Get inode modification time of file
 
 Get file group
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'filegroup'
@@ -126,6 +148,8 @@ Get file group
 =item C<int fileinode(string filename)>
 
 Get file inode
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get file inode
 
 Get last modification time of file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'filemtime'
@@ -146,6 +172,8 @@ Get last modification time of file
 =item C<int fileowner(string filename)>
 
 Get file owner
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Get file owner
 
 Get file permissions
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fileperms'
@@ -166,6 +196,8 @@ Get file permissions
 =item C<int filesize(string filename)>
 
 Get file size
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Get file size
 
 Get file type
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'filetype'
@@ -186,6 +220,8 @@ Get file type
 =item C<bool is_dir(string filename)>
 
 Returns true if file is directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns true if file is directory
 
 Returns true if file is executable
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_executable'
@@ -206,6 +244,8 @@ Returns true if file is executable
 =item C<bool is_file(string filename)>
 
 Returns true if file is a regular file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Returns true if file is a regular file
 
 Returns true if file is symbolic link
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_link'
@@ -226,6 +268,8 @@ Returns true if file is symbolic link
 =item C<bool is_readable(string filename)>
 
 Returns true if file can be read
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Returns true if file can be read
 
 Returns true if file can be written
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_writable'
@@ -246,6 +292,8 @@ Returns true if file can be written
 =item C<bool lchgrp(string filename, mixed group)>
 
 Change symlink group
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Change symlink group
 
 Give information about a file or symbolic link
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'lstat'
@@ -267,6 +317,8 @@ Give information about a file or symbolic link
 
 Give information about a file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stat'
@@ -276,6 +328,8 @@ Give information about a file
 =item C<bool touch(string filename [, int time [, int atime]])>
 
 Set modification time of file
+
+NOT IMPLEMENTED.
 
 =cut
 

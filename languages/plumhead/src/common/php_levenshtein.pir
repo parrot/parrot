@@ -17,6 +17,8 @@ php_levenshtein.pir - PHP levenshtein Standard Library
 
 Calculate Levenshtein distance between two strings
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'levenshtein'

@@ -17,6 +17,8 @@ php_cyr_convert.pir - PHP cyr_convert Standard Library
 
 Convert from one Cyrillic character set to another
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'convert_cyr_string'

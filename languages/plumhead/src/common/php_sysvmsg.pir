@@ -17,6 +17,8 @@ php_sysvmsg.pir - PHP sysvmsg  Library
 
 Attach to a message queue
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msg_get_queue'
@@ -26,6 +28,8 @@ Attach to a message queue
 =item C<mixed msg_receive(resource queue, int desiredmsgtype, int &msgtype, int maxsize, mixed message [, bool unserialize=true [, int flags=0 [, int errorcode]]])>
 
 Send a message of type msgtype (must be > 0) to a message queue
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Send a message of type msgtype (must be > 0) to a message queue
 
 Destroy the queue
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msg_remove_queue'
@@ -46,6 +52,8 @@ Destroy the queue
 =item C<bool msg_send(resource queue, int msgtype, mixed message [, bool serialize=true [, bool blocking=true [, int errorcode]]])>
 
 Send a message of type msgtype (must be > 0) to a message queue
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Send a message of type msgtype (must be > 0) to a message queue
 
 Set information for a message queue
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msg_set_queue'
@@ -66,6 +76,8 @@ Set information for a message queue
 =item C<array msg_stat_queue(resource queue)>
 
 Returns information about a message queue
+
+NOT IMPLEMENTED.
 
 =cut
 

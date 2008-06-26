@@ -17,6 +17,8 @@ php_sqlite.pir - PHP sqlite  Library
 
 Executes a query against a given database and returns an array of arrays.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_array_query'
@@ -26,6 +28,8 @@ Executes a query against a given database and returns an array of arrays.
 =item C<void sqlite_busy_timeout(resource db, int ms)>
 
 Set busy timeout duration. If ms <= 0, all busy handlers are disabled.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Set busy timeout duration. If ms <= 0, all busy handlers are disabled.
 
 Returns the number of rows that were changed by the most recent SQL statement.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_changes'
@@ -46,6 +52,8 @@ Returns the number of rows that were changed by the most recent SQL statement.
 =item C<void sqlite_close(resource db)>
 
 Closes an open sqlite database.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Closes an open sqlite database.
 
 Fetches a column from the current row of a result set.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_column'
@@ -66,6 +76,8 @@ Fetches a column from the current row of a result set.
 =item C<bool sqlite_create_aggregate(resource db, string funcname, mixed step_func, mixed finalize_func[, long num_args])>
 
 Registers an aggregate function for queries.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Registers an aggregate function for queries.
 
 Registers a "regular" function for queries.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_create_function'
@@ -86,6 +100,8 @@ Registers a "regular" function for queries.
 =item C<array sqlite_current(resource result [, int result_type [, bool decode_binary]])>
 
 Fetches the current row from a result set as an array.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Fetches the current row from a result set as an array.
 
 Returns the textual description of an error code.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_error_string'
@@ -106,6 +124,8 @@ Returns the textual description of an error code.
 =item C<string sqlite_escape_string(string item)>
 
 Escapes a string for use as a query parameter.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Escapes a string for use as a query parameter.
 
 Executes a result-less query against a given database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_exec'
@@ -126,6 +148,8 @@ Executes a result-less query against a given database
 =item C<object sqlite_factory(string filename [, int mode [, string &error_message]])>
 
 Opens a SQLite database and creates an object for it. Will create the database if it does not exist.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Opens a SQLite database and creates an object for it. Will create the database i
 
 Fetches all rows from a result set as an array of arrays.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_fetch_all'
@@ -146,6 +172,8 @@ Fetches all rows from a result set as an array of arrays.
 =item C<array sqlite_fetch_array(resource result [, int result_type [, bool decode_binary]])>
 
 Fetches the next row from a result set as an array.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Fetches the next row from a result set as an array.
 
 Return an array of column types from a particular table.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_fetch_column_types'
@@ -166,6 +196,8 @@ Return an array of column types from a particular table.
 =item C<object sqlite_fetch_object(resource result [, string class_name [, NULL|array ctor_params [, bool decode_binary]]])>
 
 Fetches the next row from a result set as an object.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Fetches the next row from a result set as an object.
 
 Fetches the first column of a result set as a string.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_fetch_single'
@@ -186,6 +220,8 @@ Fetches the first column of a result set as a string.
 =item C<string sqlite_field_name(resource result, int field_index)>
 
 Returns the name of a particular field of a result set.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns the name of a particular field of a result set.
 
 * Returns whether a previous row is available.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_has_prev'
@@ -206,6 +244,8 @@ Returns the name of a particular field of a result set.
 =item C<int sqlite_key(resource result)>
 
 Return the current row index of a buffered result.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Return the current row index of a buffered result.
 
 Returns the error code of the last error for a database.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_last_error'
@@ -226,6 +268,8 @@ Returns the error code of the last error for a database.
 =item C<int sqlite_last_insert_rowid(resource db)>
 
 Returns the rowid of the most recently inserted row.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Returns the rowid of the most recently inserted row.
 
 Returns the encoding (iso8859 or UTF-8) of the linked SQLite library.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_libencoding'
@@ -246,6 +292,8 @@ Returns the encoding (iso8859 or UTF-8) of the linked SQLite library.
 =item C<string sqlite_libversion()>
 
 Returns the version of the linked SQLite library.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Returns the version of the linked SQLite library.
 
 Seek to the next row number of a result set.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_next'
@@ -266,6 +316,8 @@ Seek to the next row number of a result set.
 =item C<int sqlite_num_fields(resource result)>
 
 Returns the number of fields in a result set.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns the number of fields in a result set.
 
 Returns the number of rows in a buffered result set.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_num_rows'
@@ -286,6 +340,8 @@ Returns the number of rows in a buffered result set.
 =item C<resource sqlite_open(string filename [, int mode [, string &error_message]])>
 
 Opens a SQLite database. Will create the database if it does not exist.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Opens a SQLite database. Will create the database if it does not exist.
 
 Opens a persistent handle to a SQLite database. Will create the database if it does not exist.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_popen'
@@ -306,6 +364,8 @@ Opens a persistent handle to a SQLite database. Will create the database if it d
 =item C<bool sqlite_prev(resource result)>
 
 * Seek to the previous row number of a result set.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Opens a persistent handle to a SQLite database. Will create the database if it d
 
 Executes a query against a given database and returns a result handle.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_query'
@@ -326,6 +388,8 @@ Executes a query against a given database and returns a result handle.
 =item C<bool sqlite_rewind(resource result)>
 
 Seek to the first row number of a buffered result set.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Seek to the first row number of a buffered result set.
 
 Seek to a particular row number of a buffered result set.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_seek'
@@ -346,6 +412,8 @@ Seek to a particular row number of a buffered result set.
 =item C<array sqlite_single_query(resource db, string query [, bool first_row_only [, bool decode_binary]])>
 
 Executes a query and returns either an array for one single column or the value of the first row.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Executes a query and returns either an array for one single column or the value 
 
 Decode binary encoding on a string parameter passed to an UDF.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_udf_decode_binary'
@@ -366,6 +436,8 @@ Decode binary encoding on a string parameter passed to an UDF.
 =item C<string sqlite_udf_encode_binary(string data)>
 
 Apply binary encoding (if required) to a string to return from an UDF.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Apply binary encoding (if required) to a string to return from an UDF.
 
 Executes a query that does not prefetch and buffer all data.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sqlite_unbuffered_query'
@@ -386,6 +460,8 @@ Executes a query that does not prefetch and buffer all data.
 =item C<bool sqlite_valid(resource result)>
 
 Returns whether more rows are available.
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_quot_print.pir - PHP quot_print Standard Library
 
 Convert a quoted-printable string to an 8 bit string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'quoted_printable_decode'

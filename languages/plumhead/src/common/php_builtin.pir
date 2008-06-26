@@ -17,6 +17,8 @@ php_builtin.pir - PHP builtin  Library
 
 Checks if the class exists
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'class_exists'
@@ -26,6 +28,8 @@ Checks if the class exists
 =item C<string create_function(string args, string code)>
 
 Creates an anonymous function, and returns its name (funny, eh?)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Creates an anonymous function, and returns its name (funny, eh?)
 
 Return backtrace as array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'debug_backtrace'
@@ -46,6 +52,8 @@ Return backtrace as array
 =item C<void debug_print_backtrace(void)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Return backtrace as array
 
 Define a new constant
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'define'
@@ -66,6 +76,8 @@ Define a new constant
 =item C<bool defined(string constant_name)>
 
 Check whether a constant exists
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Check whether a constant exists
 
 Return the currently pointed key..value pair in the passed array, and advance the pointer to the next element
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'each'
@@ -86,6 +100,8 @@ Return the currently pointed key..value pair in the passed array, and advance th
 =item C<int error_reporting(int new_error_level=null)>
 
 Return the current error_reporting level, and if an argument was passed - change to the new level
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Return the current error_reporting level, and if an argument was passed - change
 
 Returns true if the named extension is loaded
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'extension_loaded'
@@ -106,6 +124,8 @@ Returns true if the named extension is loaded
 =item C<mixed func_get_arg(int arg_num)>
 
 Get the $arg_num'th argument that was passed to the function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Get the $arg_num'th argument that was passed to the function
 
 Get an array of the arguments that were passed to the function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'func_get_args'
@@ -126,6 +148,8 @@ Get an array of the arguments that were passed to the function
 =item C<int func_num_args(void)>
 
 Get the number of arguments that were passed to the function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get the number of arguments that were passed to the function
 
 Checks if the function exists
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'function_exists'
@@ -146,6 +172,8 @@ Checks if the function exists
 =item C<string get_class([object object])>
 
 Retrieves the class name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Retrieves the class name
 
 Returns an array of method names for class or class instance.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_class_methods'
@@ -166,6 +196,8 @@ Returns an array of method names for class or class instance.
 =item C<array get_class_vars(string class_name)>
 
 Returns an array of default properties of the class.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Returns an array of default properties of the class.
 
 Returns an array of all declared classes.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_declared_classes'
@@ -186,6 +220,8 @@ Returns an array of all declared classes.
 =item C<array get_declared_interfaces()>
 
 Returns an array of all declared interfaces.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns an array of all declared interfaces.
 
 Return an array containing the names and values of all defined constants
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_defined_constants'
@@ -206,6 +244,8 @@ Return an array containing the names and values of all defined constants
 =item C<array get_defined_functions(void)>
 
 Returns an array of all defined functions
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Returns an array of all defined functions
 
 Returns an associative array of names and values of all currently defined variable names (variables in the current scope)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_defined_vars'
@@ -226,6 +268,8 @@ Returns an associative array of names and values of all currently defined variab
 =item C<array get_extension_funcs(string extension_name)>
 
 Returns an array with the names of functions belonging to the named extension
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Returns an array with the names of functions belonging to the named extension
 
 Returns an array with the file names that were include_once()'d
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_included_files'
@@ -246,6 +292,8 @@ Returns an array with the file names that were include_once()'d
 =item C<array get_loaded_extensions([bool zend_extensions])>
 
 Return an array containing names of loaded extensions
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Return an array containing names of loaded extensions
 
 Returns an array of object properties
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_object_vars'
@@ -266,6 +316,8 @@ Returns an array of object properties
 =item C<string get_parent_class([mixed object])>
 
 Retrieves the parent class name for object or class or current scope.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Retrieves the parent class name for object or class or current scope.
 
 Get the resource type name for a given resource
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_resource_type'
@@ -286,6 +340,8 @@ Get the resource type name for a given resource
 =item C<bool interface_exists(string classname [, bool autoload])>
 
 Checks if the class exists
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Checks if the class exists
 
 Returns true if the object is of this class or has this class as one of its parents
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_a'
@@ -306,6 +364,8 @@ Returns true if the object is of this class or has this class as one of its pare
 =item C<bool is_subclass_of(object object, string class_name)>
 
 Returns true if the object has this class as one of its parents
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Returns true if the object has this class as one of its parents
 
 Cause an intentional memory leak, for testing/debugging purposes
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'leak'
@@ -326,6 +388,8 @@ Cause an intentional memory leak, for testing/debugging purposes
 =item C<bool method_exists(object object, string method)>
 
 Checks if the class method exists
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Checks if the class method exists
 
 Checks if the object or class has a property
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'property_exists'
@@ -346,6 +412,8 @@ Checks if the object or class has a property
 =item C<void restore_error_handler(void)>
 
 Restores the previously defined error handler function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Restores the previously defined error handler function
 
 Restores the previously defined exception handler function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'restore_exception_handler'
@@ -366,6 +436,8 @@ Restores the previously defined exception handler function
 =item C<string set_error_handler(string error_handler [, int error_types])>
 
 Sets a user-defined error handler function.  Returns the previously defined error handler, or false on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Sets a user-defined error handler function.  Returns the previously defined erro
 
 Sets a user-defined exception handler function.  Returns the previously defined exception handler, or false on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'set_exception_handler'
@@ -386,6 +460,8 @@ Sets a user-defined exception handler function.  Returns the previously defined 
 =item C<int strcasecmp(string str1, string str2)>
 
 Binary safe case-insensitive string comparison
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -400,7 +476,19 @@ Binary safe string comparison
 =cut
 
 .sub 'strcmp'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    $P2 = shift args
+    $S2 = $P2
+    $I0 = cmp $S1, $S2
+    .RETURN_LONG($I0)
 .end
 
 =item C<int strlen(string str)>
@@ -427,6 +515,8 @@ Get string length
 
 Binary safe string comparison
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strncasecmp'
@@ -436,6 +526,8 @@ Binary safe string comparison
 =item C<int strncmp(string str1, string str2, int len)>
 
 Binary safe string comparison
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -447,6 +539,8 @@ Binary safe string comparison
 
 Generates a user-level error/warning/notice message
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'trigger_error'
@@ -456,6 +550,8 @@ Generates a user-level error/warning/notice message
 =item C<string zend_version(void)>
 
 Get the version of the Zend Engine
+
+NOT IMPLEMENTED.
 
 =cut
 

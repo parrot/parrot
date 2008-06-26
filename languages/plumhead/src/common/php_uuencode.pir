@@ -17,6 +17,8 @@ php_uuencode.pir - PHP uuencode Standard Library
 
 decode a uuencoded string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'convert_uudecode'
@@ -26,6 +28,8 @@ decode a uuencoded string
 =item C<string convert_uuencode(string data)>
 
 uuencode a string
+
+NOT IMPLEMENTED.
 
 =cut
 

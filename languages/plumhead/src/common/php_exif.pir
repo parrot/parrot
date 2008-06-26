@@ -17,6 +17,8 @@ php_exif.pir - PHP exif  Library
 
 Get the type of an image
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'exif_imagetype'
@@ -26,6 +28,8 @@ Get the type of an image
 =item C<array exif_read_data(string filename [, sections_needed [, sub_arrays[, read_thumbnail]]])>
 
 Reads header data from the JPEG/TIFF image filename and optionally reads the internal thumbnails
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Reads header data from the JPEG/TIFF image filename and optionally reads the int
 
 Get headername for index or false if not defined
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'exif_tagname'
@@ -46,6 +52,8 @@ Get headername for index or false if not defined
 =item C<string exif_thumbnail(string filename [, &width, &height [, &imagetype]])>
 
 Reads the embedded thumbnail
+
+NOT IMPLEMENTED.
 
 =cut
 

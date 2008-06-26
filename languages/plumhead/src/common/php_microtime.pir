@@ -17,6 +17,8 @@ php_microtime.pir - PHP microtime Standard Library
 
 Returns an array of usage statistics
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getrusage'
@@ -27,6 +29,8 @@ Returns an array of usage statistics
 
 Returns the current time as array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gettimeofday'
@@ -36,6 +40,8 @@ Returns the current time as array
 =item C<mixed microtime([bool get_as_float])>
 
 Returns either a string or a float containing the current time in seconds and microseconds
+
+NOT IMPLEMENTED.
 
 =cut
 

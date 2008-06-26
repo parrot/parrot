@@ -17,6 +17,8 @@ php_tidy.pir - PHP tidy  Library
 
 Returns the parent node if available or NULL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidyNode::getParent'
@@ -26,6 +28,8 @@ Returns the parent node if available or NULL
 =item C<boolean tidyNode::hasChildren()>
 
 Returns true if this node has children
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns true if this node has children
 
 Returns true if this node has siblings
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidyNode::hasSiblings'
@@ -46,6 +52,8 @@ Returns true if this node has siblings
 =item C<boolean tidyNode::isAsp()>
 
 Returns true if this node is ASP
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns true if this node is ASP
 
 Returns true if this node represents a comment
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidyNode::isComment'
@@ -66,6 +76,8 @@ Returns true if this node represents a comment
 =item C<boolean tidyNode::isHtml()>
 
 Returns true if this node is part of a HTML document
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns true if this node is part of a HTML document
 
 Returns true if this node is JSTE
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidyNode::isJste'
@@ -86,6 +100,8 @@ Returns true if this node is JSTE
 =item C<boolean tidyNode::isPhp()>
 
 Returns true if this node is PHP
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns true if this node is PHP
 
 Returns true if this node represents text (no markup)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidyNode::isText'
@@ -106,6 +124,8 @@ Returns true if this node represents text (no markup)
 =item C<int tidy_access_count()>
 
 Returns the Number of Tidy accessibility warnings encountered for specified document.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns the Number of Tidy accessibility warnings encountered for specified docu
 
 Execute configured cleanup and repair operations on parsed markup
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_clean_repair'
@@ -126,6 +148,8 @@ Execute configured cleanup and repair operations on parsed markup
 =item C<int tidy_config_count()>
 
 Returns the Number of Tidy configuration errors encountered for specified document.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Returns the Number of Tidy configuration errors encountered for specified docume
 
 Run configured diagnostics on parsed and repaired markup.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_diagnose'
@@ -146,6 +172,8 @@ Run configured diagnostics on parsed and repaired markup.
 =item C<int tidy_error_count()>
 
 Returns the Number of Tidy errors encountered for specified document.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Returns the Number of Tidy errors encountered for specified document.
 
 Returns a TidyNode Object starting from the <BODY> tag of the tidy parse tree
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_get_body'
@@ -166,6 +196,8 @@ Returns a TidyNode Object starting from the <BODY> tag of the tidy parse tree
 =item C<array tidy_get_config()>
 
 Get current Tidy configuarion
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Get current Tidy configuarion
 
 Return warnings and errors which occured parsing the specified document
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_get_error_buffer'
@@ -186,6 +220,8 @@ Return warnings and errors which occured parsing the specified document
 =item C<TidyNode tidy_get_head()>
 
 Returns a TidyNode Object starting from the <HEAD> tag of the tidy parse tree
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns a TidyNode Object starting from the <HEAD> tag of the tidy parse tree
 
 Returns a TidyNode Object starting from the <HTML> tag of the tidy parse tree
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_get_html'
@@ -206,6 +244,8 @@ Returns a TidyNode Object starting from the <HTML> tag of the tidy parse tree
 =item C<int tidy_get_html_ver()>
 
 Get the Detected HTML version for the specified document.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Get the Detected HTML version for the specified document.
 
 Returns the documentation for the given option name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_get_opt_doc'
@@ -226,6 +268,8 @@ Returns the documentation for the given option name
 =item C<string tidy_get_output()>
 
 Return a string representing the parsed tidy markup
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Return a string representing the parsed tidy markup
 
 Get release date (version) for Tidy library
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_get_release'
@@ -246,6 +292,8 @@ Get release date (version) for Tidy library
 =item C<TidyNode tidy_get_root()>
 
 Returns a TidyNode Object representing the root of the tidy parse tree
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Returns a TidyNode Object representing the root of the tidy parse tree
 
 Get status of specfied document.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_get_status'
@@ -266,6 +316,8 @@ Get status of specfied document.
 =item C<mixed tidy_getopt(string option)>
 
 Returns the value of the specified configuration option for the tidy document.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns the value of the specified configuration option for the tidy document.
 
 Indicates if the document is a XHTML document.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_is_xhtml'
@@ -286,6 +340,8 @@ Indicates if the document is a XHTML document.
 =item C<boolean tidy_is_xml()>
 
 Indicates if the document is a generic (non HTML/XHTML) XML document.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Indicates if the document is a generic (non HTML/XHTML) XML document.
 
 Parse markup in file or URI
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_parse_file'
@@ -306,6 +364,8 @@ Parse markup in file or URI
 =item C<bool tidy_parse_string(string input [, mixed config_options [, string encoding]])>
 
 Parse a document stored in a string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Parse a document stored in a string
 
 Repair a file using an optionally provided configuration file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_repair_file'
@@ -327,6 +389,8 @@ Repair a file using an optionally provided configuration file
 
 Repair a string using an optionally provided configuration file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tidy_repair_string'
@@ -336,6 +400,8 @@ Repair a string using an optionally provided configuration file
 =item C<int tidy_warning_count()>
 
 Returns the Number of Tidy warnings encountered for specified document.
+
+NOT IMPLEMENTED.
 
 =cut
 

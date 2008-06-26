@@ -17,6 +17,8 @@ php_openssl.pir - PHP openssl  Library
 
 Exports a CSR to file or a var
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_csr_export'
@@ -26,6 +28,8 @@ Exports a CSR to file or a var
 =item C<bool openssl_csr_export_to_file(resource csr, string outfilename [, bool notext=true])>
 
 Exports a CSR to file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Exports a CSR to file
 
 Returns the subject of a CERT or FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_csr_get_public_key'
@@ -46,6 +52,8 @@ Returns the subject of a CERT or FALSE on error
 =item C<mixed openssl_csr_get_subject(mixed csr)>
 
 Returns the subject of a CERT or FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns the subject of a CERT or FALSE on error
 
 Generates a privkey and CSR
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_csr_new'
@@ -66,6 +76,8 @@ Generates a privkey and CSR
 =item C<resource openssl_csr_sign(mixed csr, mixed x509, mixed priv_key, long days [, array config_args [, long serial]])>
 
 Signs a cert with another CERT
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Signs a cert with another CERT
 
 Returns a description of the last error, and alters the index of the error messages. Returns false when the are no more messages
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_error_string'
@@ -86,6 +100,8 @@ Returns a description of the last error, and alters the index of the error messa
 =item C<bool openssl_open(string data, &string opendata, string ekey, mixed privkey)>
 
 Opens data
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Opens data
 
 Creates and exports a PKCS12 to a var
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_pkcs12_export'
@@ -106,6 +124,8 @@ Creates and exports a PKCS12 to a var
 =item C<bool openssl_pkcs12_export_to_file(mixed x509, string filename, mixed priv_key, string pass[, array args])>
 
 Creates and exports a PKCS to file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Creates and exports a PKCS to file
 
 Parses a PKCS12 to an array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_pkcs12_read'
@@ -126,6 +148,8 @@ Parses a PKCS12 to an array
 =item C<bool openssl_pkcs7_decrypt(string infilename, string outfilename, mixed recipcert [, mixed recipkey])>
 
 Decrypts the S/MIME message in the file name infilename and output the results to the file name outfilename.  recipcert is a CERT for one of the recipients. recipkey specifies the private key matching recipcert, if recipcert does not include the key
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Decrypts the S/MIME message in the file name infilename and output the results t
 
 Encrypts the message in the file named infile with the certificates in recipcerts and output the result to the file named outfile
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_pkcs7_encrypt'
@@ -146,6 +172,8 @@ Encrypts the message in the file named infile with the certificates in recipcert
 =item C<bool openssl_pkcs7_sign(string infile, string outfile, mixed signcert, mixed signkey, array headers [, long flags [, string extracertsfilename]])>
 
 Signs the MIME message in the file named infile with signcert/signkey and output the result to file name outfile. headers lists plain text headers to exclude from the signed portion of the message, and should include to, from and subject as a minimum
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Signs the MIME message in the file named infile with signcert/signkey and output
 
 Verifys that the data block is intact, the signer is who they say they are, and returns the CERTs of the signers
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_pkcs7_verify'
@@ -166,6 +196,8 @@ Verifys that the data block is intact, the signer is who they say they are, and 
 =item C<bool openssl_pkey_export(mixed key, &mixed out [, string passphrase [, array config_args]])>
 
 Gets an exportable representation of a key into a string or file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Gets an exportable representation of a key into a string or file
 
 Gets an exportable representation of a key into a file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_pkey_export_to_file'
@@ -186,6 +220,8 @@ Gets an exportable representation of a key into a file
 =item C<void openssl_pkey_free(int key)>
 
 Frees a key
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Frees a key
 
 returns an array with the key details (bits, pkey, type)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_pkey_get_details'
@@ -206,6 +244,8 @@ returns an array with the key details (bits, pkey, type)
 =item C<int openssl_pkey_get_private(string key [, string passphrase])>
 
 Gets private keys
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Gets private keys
 
 Gets public key from X.509 certificate
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_pkey_get_public'
@@ -226,6 +268,8 @@ Gets public key from X.509 certificate
 =item C<resource openssl_pkey_new([array configargs])>
 
 Generates a new private key
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Generates a new private key
 
 Decrypts data with private key
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_private_decrypt'
@@ -246,6 +292,8 @@ Decrypts data with private key
 =item C<bool openssl_private_encrypt(string data, string crypted, mixed key [, int padding])>
 
 Encrypts data with private key
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Encrypts data with private key
 
 Decrypts data with public key
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_public_decrypt'
@@ -266,6 +316,8 @@ Decrypts data with public key
 =item C<bool openssl_public_encrypt(string data, string crypted, mixed key [, int padding])>
 
 Encrypts data with public key
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Encrypts data with public key
 
 Seals data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_seal'
@@ -286,6 +340,8 @@ Seals data
 =item C<bool openssl_sign(string data, &string signature, mixed key[, int signature_alg])>
 
 Signs data
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Signs data
 
 Verifys data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_verify'
@@ -306,6 +364,8 @@ Verifys data
 =item C<bool openssl_x509_check_private_key(mixed cert, mixed key)>
 
 Checks if a private key corresponds to a CERT
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Checks if a private key corresponds to a CERT
 
 Checks the CERT to see if it can be used for the purpose in purpose. cainfo holds information about trusted CAs
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_x509_checkpurpose'
@@ -326,6 +388,8 @@ Checks the CERT to see if it can be used for the purpose in purpose. cainfo hold
 =item C<bool openssl_x509_export(mixed x509, string &out [, bool notext = true])>
 
 Exports a CERT to file or a var
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Exports a CERT to file or a var
 
 Exports a CERT to file or a var
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_x509_export_to_file'
@@ -346,6 +412,8 @@ Exports a CERT to file or a var
 =item C<void openssl_x509_free(resource x509)>
 
 Frees X.509 certificates
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Frees X.509 certificates
 
 Returns an array of the fields/values of the CERT
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'openssl_x509_parse'
@@ -366,6 +436,8 @@ Returns an array of the fields/values of the CERT
 =item C<resource openssl_x509_read(mixed cert)>
 
 Reads X.509 certificates
+
+NOT IMPLEMENTED.
 
 =cut
 

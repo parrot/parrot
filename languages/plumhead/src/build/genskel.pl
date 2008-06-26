@@ -278,6 +278,8 @@ HEADER
 
 $doc
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub '$func'

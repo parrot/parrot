@@ -17,6 +17,8 @@ php_dba.pir - PHP dba  Library
 
 Closes database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_close'
@@ -28,6 +30,8 @@ Closes database
 Deletes the entry associated with key
 If inifile: remove all other key lines
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_delete'
@@ -37,6 +41,8 @@ If inifile: remove all other key lines
 =item C<bool dba_exists(string key, resource handle)>
 
 Checks, if the specified key exists
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -48,6 +54,8 @@ Checks, if the specified key exists
 
 Fetches the data associated with key
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_fetch'
@@ -58,6 +66,8 @@ Fetches the data associated with key
 
 Resets the internal key pointer and returns the first key
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_firstkey'
@@ -67,6 +77,8 @@ Resets the internal key pointer and returns the first key
 =item C<array dba_handlers([bool full_info])>
 
 List configured database handlers
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -79,6 +91,8 @@ List configured database handlers
 If not inifile: Insert value as key, return false, if key exists already
 If inifile: Add vakue as key (next instance of key)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_insert'
@@ -88,6 +102,8 @@ If inifile: Add vakue as key (next instance of key)
 =item C<array|false dba_key_split(string key)>
 
 Splits an inifile key into an array of the form array(0=>group,1=>value_name) but returns false if input is false or null
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -99,6 +115,8 @@ Splits an inifile key into an array of the form array(0=>group,1=>value_name) bu
 
 List opened databases
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_list'
@@ -108,6 +126,8 @@ List opened databases
 =item C<string dba_nextkey(resource handle)>
 
 Returns the next key
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -119,6 +139,8 @@ Returns the next key
 
 Opens path using the specified handler in mode
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_open'
@@ -129,6 +151,8 @@ Opens path using the specified handler in mode
 
 Optimizes (e.g. clean up, vacuum) database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_optimize'
@@ -138,6 +162,8 @@ Optimizes (e.g. clean up, vacuum) database
 =item C<resource dba_popen(string path, string mode [, string handlername, string ...])>
 
 Opens path using the specified handler in mode persistently
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -150,6 +176,8 @@ Opens path using the specified handler in mode persistently
 Inserts value as key, replaces key, if key exists already
 If inifile: remove all other key lines
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dba_replace'
@@ -159,6 +187,8 @@ If inifile: remove all other key lines
 =item C<bool dba_sync(resource handle)>
 
 Synchronizes database
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_odbc.pir - PHP odbc  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'birdstep_autocommit'
@@ -26,6 +28,8 @@ php_odbc.pir - PHP odbc  Library
 =item C<bool birdstep_close(int id)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ php_odbc.pir - PHP odbc  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'birdstep_commit'
@@ -46,6 +52,8 @@ php_odbc.pir - PHP odbc  Library
 =item C<int birdstep_connect(string server, string user, string pass)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ php_odbc.pir - PHP odbc  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'birdstep_exec'
@@ -66,6 +76,8 @@ php_odbc.pir - PHP odbc  Library
 =item C<bool birdstep_fetch(int index)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ php_odbc.pir - PHP odbc  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'birdstep_fieldname'
@@ -86,6 +100,8 @@ php_odbc.pir - PHP odbc  Library
 =item C<int birdstep_fieldnum(int index)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ php_odbc.pir - PHP odbc  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'birdstep_freeresult'
@@ -106,6 +124,8 @@ php_odbc.pir - PHP odbc  Library
 =item C<bool birdstep_off_autocommit(int index)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ php_odbc.pir - PHP odbc  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'birdstep_result'
@@ -126,6 +148,8 @@ php_odbc.pir - PHP odbc  Library
 =item C<bool birdstep_rollback(int index)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ php_odbc.pir - PHP odbc  Library
 
 Toggle autocommit mode or get status
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_autocommit'
@@ -146,6 +172,8 @@ Toggle autocommit mode or get status
 =item C<bool odbc_binmode(int result_id, int mode)>
 
 Handle binary column data
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Handle binary column data
 
 Close an ODBC connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_close'
@@ -166,6 +196,8 @@ Close an ODBC connection
 =item C<void odbc_close_all(void)>
 
 Close all ODBC connections
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Close all ODBC connections
 
 Returns a result identifier that can be used to fetch a list of columns and associated privileges for the specified table
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_columnprivileges'
@@ -186,6 +220,8 @@ Returns a result identifier that can be used to fetch a list of columns and asso
 =item C<resource odbc_columns(resource connection_id [, string qualifier [, string owner [, string table_name [, string column_name]]]])>
 
 Returns a result identifier that can be used to fetch a list of column names in specified tables
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns a result identifier that can be used to fetch a list of column names in 
 
 Commit an ODBC transaction
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_commit'
@@ -206,6 +244,8 @@ Commit an ODBC transaction
 =item C<resource odbc_connect(string DSN, string user, string password [, int cursor_option])>
 
 Connect to a datasource
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Connect to a datasource
 
 Get cursor name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_cursor'
@@ -226,6 +268,8 @@ Get cursor name
 =item C<array odbc_data_source(resource connection_id, int fetch_type)>
 
 Return information about the currently connected data source
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Return information about the currently connected data source
 
 Get the last error code
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_error'
@@ -246,6 +292,8 @@ Get the last error code
 =item C<string odbc_errormsg([resource connection_id])>
 
 Get the last error message
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Get the last error message
 
 Prepare and execute an SQL statement
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_exec'
@@ -266,6 +316,8 @@ Prepare and execute an SQL statement
 =item C<bool odbc_execute(resource result_id [, array parameters_array])>
 
 Execute a prepared statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Execute a prepared statement
 
 Fetch a result row as an associative array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_fetch_array'
@@ -286,6 +340,8 @@ Fetch a result row as an associative array
 =item C<int odbc_fetch_into(resource result_id, array result_array, [, int rownumber])>
 
 Fetch one result row into an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Fetch one result row into an array
 
 Fetch a result row as an object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_fetch_object'
@@ -306,6 +364,8 @@ Fetch a result row as an object
 =item C<bool odbc_fetch_row(resource result_id [, int row_number])>
 
 Fetch a row
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Fetch a row
 
 Get the length (precision) of a column
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_field_len'
@@ -326,6 +388,8 @@ Get the length (precision) of a column
 =item C<string odbc_field_name(resource result_id, int field_number)>
 
 Get a column name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Get a column name
 
 Return column number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_field_num'
@@ -346,6 +412,8 @@ Return column number
 =item C<int odbc_field_scale(resource result_id, int field_number)>
 
 Get the scale of a column
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Get the scale of a column
 
 Get the datatype of a column
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_field_type'
@@ -366,6 +436,8 @@ Get the datatype of a column
 =item C<resource odbc_foreignkeys(resource connection_id, string pk_qualifier, string pk_owner, string pk_table, string fk_qualifier, string fk_owner, string fk_table)>
 
 Returns a result identifier to either a list of foreign keys in the specified table or a list of foreign keys in other tables that refer to the primary key in the specified table
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Returns a result identifier to either a list of foreign keys in the specified ta
 
 Free resources associated with a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_free_result'
@@ -386,6 +460,8 @@ Free resources associated with a result
 =item C<resource odbc_gettypeinfo(resource connection_id [, int data_type])>
 
 Returns a result identifier containing information about data types supported by the data source
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Returns a result identifier containing information about data types supported by
 
 Handle LONG columns
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_longreadlen'
@@ -406,6 +484,8 @@ Handle LONG columns
 =item C<bool odbc_next_result(resource result_id)>
 
 Checks if multiple results are avaiable
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Checks if multiple results are avaiable
 
 Get number of columns in a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_num_fields'
@@ -426,6 +508,8 @@ Get number of columns in a result
 =item C<int odbc_num_rows(resource result_id)>
 
 Get number of rows in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Get number of rows in a result
 
 Establish a persistent connection to a datasource
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_pconnect'
@@ -446,6 +532,8 @@ Establish a persistent connection to a datasource
 =item C<resource odbc_prepare(resource connection_id, string query)>
 
 Prepares a statement for execution
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Prepares a statement for execution
 
 Returns a result identifier listing the column names that comprise the primary key for a table
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_primarykeys'
@@ -466,6 +556,8 @@ Returns a result identifier listing the column names that comprise the primary k
 =item C<resource odbc_procedurecolumns(resource connection_id [, string qualifier, string owner, string proc, string column])>
 
 Returns a result identifier containing the list of input and output parameters, as well as the columns that make up the result set for the specified procedures
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Returns a result identifier containing the list of input and output parameters, 
 
 Returns a result identifier containg the list of procedure names in a datasource
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_procedures'
@@ -486,6 +580,8 @@ Returns a result identifier containg the list of procedure names in a datasource
 =item C<mixed odbc_result(resource result_id, mixed field)>
 
 Get result data
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Get result data
 
 Print result as HTML table
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_result_all'
@@ -506,6 +604,8 @@ Print result as HTML table
 =item C<bool odbc_rollback(resource connection_id)>
 
 Rollback a transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -517,6 +617,8 @@ Rollback a transaction
 
 Sets connection or statement options
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_setoption'
@@ -526,6 +628,8 @@ Sets connection or statement options
 =item C<resource odbc_specialcolumns(resource connection_id, int type, string qualifier, string owner, string table, int scope, int nullable)>
 
 Returns a result identifier containing either the optimal set of columns that uniquely identifies a row in the table or columns that are automatically updated when any value in the row is updated by a transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -537,6 +641,8 @@ Returns a result identifier containing either the optimal set of columns that un
 
 Returns a result identifier that contains statistics about a single table and the indexes associated with the table
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_statistics'
@@ -546,6 +652,8 @@ Returns a result identifier that contains statistics about a single table and th
 =item C<resource odbc_tableprivileges(resource connection_id, string qualifier, string owner, string name)>
 
 Returns a result identifier containing a list of tables and the privileges associated with each table
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -557,6 +665,8 @@ Returns a result identifier containing a list of tables and the privileges assoc
 
 Call the SQLTables function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'odbc_tables'
@@ -566,6 +676,8 @@ Call the SQLTables function
 =item C<bool solid_fetch_prev(resource result_id)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 

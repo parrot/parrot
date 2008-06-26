@@ -24,7 +24,21 @@ php_api.pir - PHP API Library
 .end
 
 
+=item C<get_module_version>
+
+DUMMY IMPLEMENTATION.
+
+=cut
+
+.sub 'get_module_version'
+    .param string ext
+    .return ('')
+.end
+
+
 =item C<parse_parameters>
+
+DUMMY IMPLEMENTATION.
 
 =cut
 

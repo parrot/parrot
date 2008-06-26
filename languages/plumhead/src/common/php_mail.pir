@@ -17,6 +17,8 @@ php_mail.pir - PHP mail Standard Library
 
 Calculate EZMLM list hash value.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ezmlm_hash'
@@ -26,6 +28,8 @@ Calculate EZMLM list hash value.
 =item C<int mail(string to, string subject, string message [, string additional_headers [, string additional_parameters]])>
 
 Send an email message
+
+NOT IMPLEMENTED.
 
 =cut
 

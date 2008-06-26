@@ -17,6 +17,8 @@ php_assert.pir - PHP assert Standard Library
 
 Checks if assertion is false
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'assert'
@@ -26,6 +28,8 @@ Checks if assertion is false
 =item C<mixed assert_options(int what [, mixed value])>
 
 Set/get the various assert flags
+
+NOT IMPLEMENTED.
 
 =cut
 

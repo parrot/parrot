@@ -17,6 +17,8 @@ php_pcntl.pir - PHP pcntl  Library
 
 Set an alarm clock for delivery of a signal
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pcntl_alarm'
@@ -26,6 +28,8 @@ Set an alarm clock for delivery of a signal
 =item C<bool pcntl_exec(string path [, array args [, array envs]])>
 
 Executes specified program in current process space as defined by exec(2)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Executes specified program in current process space as defined by exec(2)
 
 Forks the currently running process following the same behavior as the UNIX fork() system call
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pcntl_fork'
@@ -46,6 +52,8 @@ Forks the currently running process following the same behavior as the UNIX fork
 =item C<int pcntl_getpriority([int pid [, int process_identifier]])>
 
 Get the priority of any process
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Get the priority of any process
 
 Change the priority of any process
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pcntl_setpriority'
@@ -66,6 +76,8 @@ Change the priority of any process
 =item C<bool pcntl_signal(int signo, callback handle [, bool restart_syscalls])>
 
 Assigns a system signal handler to a PHP function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Assigns a system signal handler to a PHP function
 
 Waits on or returns the status of a forked child as defined by the waitpid() system call
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pcntl_wait'
@@ -86,6 +100,8 @@ Waits on or returns the status of a forked child as defined by the waitpid() sys
 =item C<int pcntl_waitpid(int pid, int &status, int options)>
 
 Waits on or returns the status of a forked child as defined by the waitpid() system call
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Waits on or returns the status of a forked child as defined by the waitpid() sys
 
 Returns the status code of a child's exit
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pcntl_wexitstatus'
@@ -106,6 +124,8 @@ Returns the status code of a child's exit
 =item C<bool pcntl_wifexited(int status)>
 
 Returns true if the child status code represents a successful exit
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns true if the child status code represents a successful exit
 
 Returns true if the child status code represents a process that was terminated due to a signal
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pcntl_wifsignaled'
@@ -126,6 +148,8 @@ Returns true if the child status code represents a process that was terminated d
 =item C<bool pcntl_wifstopped(int status)>
 
 Returns true if the child status code represents a stopped process (WUNTRACED must have been used with waitpid)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Returns true if the child status code represents a stopped process (WUNTRACED mu
 
 Returns the number of the signal that caused the process to stop who's status code is passed
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pcntl_wstopsig'
@@ -146,6 +172,8 @@ Returns the number of the signal that caused the process to stop who's status co
 =item C<int pcntl_wtermsig(int status)>
 
 Returns the number of the signal that terminated the process who's status code is passed
+
+NOT IMPLEMENTED.
 
 =cut
 

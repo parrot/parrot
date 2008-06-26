@@ -17,6 +17,8 @@ php_formatted_print.pir - PHP formatted_print Standard Library
 
 Output a formatted string into a stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fprintf'
@@ -26,6 +28,8 @@ Output a formatted string into a stream
 =item C<int printf(string format [, mixed arg1 [, mixed ...]])>
 
 Output a formatted string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Output a formatted string
 
 Return a formatted string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sprintf'
@@ -46,6 +52,8 @@ Return a formatted string
 =item C<int vfprintf(resource stream, string format, array args)>
 
 Output a formatted string into a stream
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Output a formatted string into a stream
 
 Output a formatted string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'vprintf'
@@ -66,6 +76,8 @@ Output a formatted string
 =item C<string vsprintf(string format, array args)>
 
 Return a formatted string
+
+NOT IMPLEMENTED.
 
 =cut
 

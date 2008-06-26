@@ -17,6 +17,8 @@ php_calendar.pir - PHP calendar  Library
 
 Returns the number of days in a month for a given year and calendar
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'cal_days_in_month'
@@ -26,6 +28,8 @@ Returns the number of days in a month for a given year and calendar
 =item C<array cal_from_jd(int jd, int calendar)>
 
 Converts from Julian Day Count to a supported calendar and return extended information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Converts from Julian Day Count to a supported calendar and return extended infor
 
 Returns information about a particular calendar
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'cal_info'
@@ -46,6 +52,8 @@ Returns information about a particular calendar
 =item C<int cal_to_jd(int calendar, int month, int day, int year)>
 
 Converts from a supported calendar to Julian Day Count
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Converts from a supported calendar to Julian Day Count
 
 Converts a french republic calendar date to julian day count
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'frenchtojd'
@@ -66,6 +76,8 @@ Converts a french republic calendar date to julian day count
 =item C<int gregoriantojd(int month, int day, int year)>
 
 Converts a gregorian calendar date to julian day count
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Converts a gregorian calendar date to julian day count
 
 Returns name or number of day of week from julian day count
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'jddayofweek'
@@ -86,6 +100,8 @@ Returns name or number of day of week from julian day count
 =item C<string jdmonthname(int juliandaycount, int mode)>
 
 Returns name of month for julian day count
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns name of month for julian day count
 
 Converts a julian day count to a french republic calendar date
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'jdtofrench'
@@ -106,6 +124,8 @@ Converts a julian day count to a french republic calendar date
 =item C<string jdtogregorian(int juliandaycount)>
 
 Converts a julian day count to a gregorian calendar date
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Converts a julian day count to a gregorian calendar date
 
 Converts a julian day count to a jewish calendar date
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'jdtojewish'
@@ -126,6 +148,8 @@ Converts a julian day count to a jewish calendar date
 =item C<string jdtojulian(int juliandaycount)>
 
 Convert a julian day count to a julian calendar date
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Convert a julian day count to a julian calendar date
 
 Converts a jewish calendar date to a julian day count
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'jewishtojd'
@@ -146,6 +172,8 @@ Converts a jewish calendar date to a julian day count
 =item C<int juliantojd(int month, int day, int year)>
 
 Converts a julian calendar date to julian day count
+
+NOT IMPLEMENTED.
 
 =cut
 

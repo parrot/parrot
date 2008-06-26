@@ -9,6 +9,8 @@ php_ctype.pir - PHP ctype Library
 
 =head2 Functions
 
+STILL INCOMPLETE (see CTYPE).
+
 =over 4
 
 =cut

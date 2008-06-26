@@ -13,9 +13,60 @@ php_string.pir - PHP string Standard Library
 
 =cut
 
+.sub '_bin2hex' :anon
+    .param string old
+    .const string hexconvtab = '0123456789abcdef'
+    $P0 = split '', old
+    $S0 = ''
+  L1:
+    unless $P0 goto L2
+    $S1 = shift $P0
+    $I1 = ord $S1
+    $I2 = $I1 >> 4
+    $S1 = substr hexconvtab, $I2, 1
+    $S0 .= $S1
+    $I2 = $I1 & 0x0f
+    $S1 = substr hexconvtab, $I2, 1
+    $S0 .= $S1
+    goto L1
+  L2:
+    .return ($S0)
+.end
+
+.sub '_trim' :anon
+    .param string str
+    .param string what
+    .param int mode
+    # dummy implementation
+    $S0 = str
+    .RETURN_STRING($S0)
+.end
+
+.macro DO_TRIM(args, mode)
+    .local int argc
+    argc = .args
+    if argc < 1 goto L1
+    if argc > 2 goto L1
+    goto L2
+  L1:
+    wrong_param_count()
+    .RETURN_NULL()
+  L2:
+    $P1 = shift args
+    $S1 = $P1
+    unless argc > 1 goto L3
+    $P2 = shift args
+    $S2 = $P2
+    .return _trim($S1, $S2, .mode)
+  L3:
+    .return _trim($S1, " \n\r\t\v\0", .mode)
+.endm
+
 =item C<string addcslashes(string str, string charlist)>
 
 Escapes all chars mentioned in charlist with backslash. It creates octal representations if asked to backslash characters with 8th bit set or with an ascii valeu less than 32 (except '\n', '\r', '\t' etc...).
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -27,6 +78,8 @@ Escapes all chars mentioned in charlist with backslash. It creates octal represe
 
 Escapes single quote, double quotes and backslash characters in a string with backslashes
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'addslashes'
@@ -36,6 +89,8 @@ Escapes single quote, double quotes and backslash characters in a string with ba
 =item C<string basename(string path [, string suffix])>
 
 Returns the filename component of the path
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -50,7 +105,17 @@ Converts the binary representation of data to hex
 =cut
 
 .sub 'bin2hex'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    $S0 = _bin2hex($S1)
+    .RETURN_STRING($S0)
 .end
 
 =item C<string chr(int ascii)>
@@ -60,12 +125,24 @@ Converts ASCII code to a character
 =cut
 
 .sub 'chr'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $I1 = $P1
+    $S0 = chr $I1
+    .RETURN_STRING($S0)
 .end
 
 =item C<string chunk_split(string str [, int chunklen [, string ending]])>
 
 Returns split line
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +154,8 @@ Returns split line
 
 Returns info about what characters are used in input
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'count_chars'
@@ -86,6 +165,8 @@ Returns info about what characters are used in input
 =item C<string dirname(string path)>
 
 Returns the directory name component of the path
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +178,8 @@ Returns the directory name component of the path
 
 Splits a string on string separator and return array of components. If limit is positive only limit number of components is returned. If limit is negative all components except the last abs(limit) are returned.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'explode'
@@ -106,6 +189,8 @@ Splits a string on string separator and return array of components. If limit is 
 =item C<string hebrev(string str [, int max_chars_per_line])>
 
 Converts logical Hebrew text to visual text
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +202,8 @@ Converts logical Hebrew text to visual text
 
 Converts logical Hebrew text to visual text with newline conversion
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'hebrevc'
@@ -126,6 +213,8 @@ Converts logical Hebrew text to visual text with newline conversion
 =item C<string implode([string glue,] array pieces)>
 
 Joins array elements placing glue string between items and return one string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -140,12 +229,15 @@ An alias for implode
 =cut
 
 .sub 'join'
-    not_implemented()
+    .param pmc args :slurpy
+    .return implode(args :flat)
 .end
 
 =item C<array localeconv(void)>
 
 Returns numeric formatting information based on the current locale
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,15 +249,20 @@ Returns numeric formatting information based on the current locale
 
 Strips whitespace from the beginning of a string
 
+STILL INCOMPLETE (see _trim).
+
 =cut
 
 .sub 'ltrim'
-    not_implemented()
+    .param pmc args :slurpy
+    .DO_TRIM(args, 1)
 .end
 
 =item C<string money_format(string format , float value)>
 
 Convert monetary value(s) to string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +274,8 @@ Convert monetary value(s) to string
 
 Converts newlines to HTML line breaks
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'nl2br'
@@ -186,6 +285,8 @@ Converts newlines to HTML line breaks
 =item C<string nl_langinfo(int item)>
 
 Query language and locale information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -200,12 +301,28 @@ Returns ASCII value of character
 =cut
 
 .sub 'ord'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    $I1 = length $S1
+    unless $I1 goto L2
+    $I0 = ord $S1
+    .RETURN_LONG($I0)
+  L2:
+    .RETURN_LONG(0)
 .end
 
 =item C<void parse_str(string encoded_string [, array result])>
 
 Parses GET/POST/COOKIE data and sets global variables
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +334,8 @@ Parses GET/POST/COOKIE data and sets global variables
 
 Returns information about a certain string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pathinfo'
@@ -226,6 +345,8 @@ Returns information about a certain string
 =item C<string quotemeta(string str)>
 
 Quotes meta characters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,15 +358,20 @@ Quotes meta characters
 
 Removes trailing whitespace
 
+STILL INCOMPLETE (see _trim).
+
 =cut
 
 .sub 'rtrim'
-    not_implemented()
+    .param pmc args :slurpy
+    .DO_TRIM(args, 2)
 .end
 
 =item C<string setlocale(mixed category, string locale [, string ...])>
 
 Set locale information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +383,8 @@ Set locale information
 
 Calculates the similarity between two strings
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'similar_text'
@@ -266,6 +394,8 @@ Calculates the similarity between two strings
 =item C<mixed sscanf(string str, string format [, string ...])>
 
 Implements an ANSI C compatible sscanf
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +407,8 @@ Implements an ANSI C compatible sscanf
 
 Replaces all occurrences of search in haystack with replace / case-insensitive
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'str_ireplace'
@@ -286,6 +418,8 @@ Replaces all occurrences of search in haystack with replace / case-insensitive
 =item C<string str_pad(string input, int pad_length [, string pad_string [, int pad_type]])>
 
 Returns input string padded on the left or right to specified length with pad_string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -300,12 +434,30 @@ Returns the input string repeat mult times
 =cut
 
 .sub 'str_repeat'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    $P2 = shift args
+    $I2 = $P2
+    unless $I2 < 0 goto L2
+    error("Second argument has to be greater than or equal to 0")
+    .RETURN_NULL()
+  L2:
+    $S0 = repeat $S1, $I2
+    .RETURN_STRING($S0)
 .end
 
 =item C<mixed str_replace(mixed search, mixed replace, mixed subject [, int &replace_count])>
 
 Replaces all occurrences of search in haystack with replace
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +469,8 @@ Replaces all occurrences of search in haystack with replace
 
 Perform the rot13 transform on a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'str_rot13'
@@ -327,6 +481,8 @@ Perform the rot13 transform on a string
 
 Shuffles string. One permutation of all possible is created
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'str_shuffle'
@@ -336,6 +492,8 @@ Shuffles string. One permutation of all possible is created
 =item C<array str_split(string str [, int split_length])>
 
 Convert a string to an array. If split_length is specified, break the string down into chunks each split_length characters long.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -356,6 +514,8 @@ string containing alphabetic characters, which also may contain, but not start
 with "'" and "-" characters.
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'str_word_count'
@@ -369,12 +529,15 @@ An alias for strstr
 =cut
 
 .sub 'strchr'
-    not_implemented()
+    .param pmc args :slurpy
+    .return strstr(args :flat)
 .end
 
 =item C<int strcoll(string str1, string str2)>
 
 Compares two strings using the current locale
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -386,6 +549,8 @@ Compares two strings using the current locale
 
 Finds length of initial segment consisting entirely of characters not found in mask. If start or/and length is provide works like strcspn(substr($s,$start,$len),$bad_chars)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strcspn'
@@ -395,6 +560,8 @@ Finds length of initial segment consisting entirely of characters not found in m
 =item C<string strip_tags(string str [, string allowable_tags])>
 
 Strips HTML and PHP tags from a string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -406,6 +573,8 @@ Strips HTML and PHP tags from a string
 
 Strips backslashes from a string. Uses C-style conventions
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stripcslashes'
@@ -415,6 +584,8 @@ Strips backslashes from a string. Uses C-style conventions
 =item C<int stripos(string haystack, string needle [, int offset])>
 
 Finds position of first occurrence of a string within another, case insensitive
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -426,6 +597,8 @@ Finds position of first occurrence of a string within another, case insensitive
 
 Strips backslashes from a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stripslashes'
@@ -435,6 +608,8 @@ Strips backslashes from a string
 =item C<string stristr(string haystack, string needle)>
 
 Finds first occurrence of a string within another, case insensitive
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -446,6 +621,8 @@ Finds first occurrence of a string within another, case insensitive
 
 Returns the result of case-insensitive string comparison using 'natural' algorithm
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strnatcasecmp'
@@ -456,6 +633,8 @@ Returns the result of case-insensitive string comparison using 'natural' algorit
 
 Returns the result of string comparison using 'natural' algorithm
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strnatcmp'
@@ -465,6 +644,8 @@ Returns the result of string comparison using 'natural' algorithm
 =item C<array strpbrk(string haystack, string char_list)>
 
 Search a string for any of a set of characters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -479,12 +660,49 @@ Finds position of first occurrence of a string within another
 =cut
 
 .sub 'strpos'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    if argc < 2 goto L1
+    if argc > 3 goto L1
+    goto L2
+  L1:
+    wrong_param_count()
+    .RETURN_NULL()
+  L2:
+    $P1 = shift args
+    $S1 = $P1
+    $P2 = shift args
+    $I3 = 0
+    unless argc > 2 goto L3
+    $P3 = shift args
+    $I3 = $P3
+  L3:
+    $I1 = length $S1
+    if $I3 < 0 goto L4
+    if $I3 > $I1 goto L4
+    goto L5
+  L4:
+    error("Offset not contained in string")
+    .RETURN_FALSE()
+  L5:
+    $S2 = $P2
+    unless $S2 == '' goto L6
+    error("Empty delimiter")
+    .RETURN_FALSE()
+  L6:
+    $I0 = index $S1, $S2, $I3
+    if $I0 < 0 goto L7
+    .RETURN_LONG($I0)
+  L7:
+    .RETURN_FALSE()
 .end
 
 =item C<string strrchr(string haystack, string needle)>
 
 Finds the last occurrence of a character in a string within another
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -496,6 +714,8 @@ Finds the last occurrence of a character in a string within another
 
 Reverse a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strrev'
@@ -505,6 +725,8 @@ Reverse a string
 =item C<int strripos(string haystack, string needle [, int offset])>
 
 Finds position of last occurrence of a string within another string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -516,6 +738,8 @@ Finds position of last occurrence of a string within another string
 
 Finds position of last occurrence of a string within another string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'strrpos'
@@ -525,6 +749,8 @@ Finds position of last occurrence of a string within another string
 =item C<int strspn(string str, string mask [, start [, len]])>
 
 Finds length of initial segment consisting entirely of characters found in mask. If start or/and length is provided works like strspn(substr($s,$start,$len),$good_chars)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -539,12 +765,34 @@ Finds first occurrence of a string within another
 =cut
 
 .sub 'strstr'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    $P2 = shift args
+    $S2 = $P2
+    unless $S2 == '' goto L2
+    error("Empty delimiter")
+    .RETURN_FALSE()
+  L2:
+    $I0 = index $S1, $S2
+    if $I0 < 0 goto L3
+    $S0 = substr $S1, $I0
+    .RETURN_STRING($S0)
+  L3:
+    .RETURN_FALSE()
 .end
 
 =item C<string strtok([string str,] string token)>
 
 Tokenize a string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -559,7 +807,17 @@ Makes a string lowercase
 =cut
 
 .sub 'strtolower'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S0 = $P1
+    downcase $S0
+    .RETURN_STRING($S0)
 .end
 
 =item C<string strtoupper(string str)>
@@ -569,12 +827,24 @@ Makes a string uppercase
 =cut
 
 .sub 'strtoupper'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S0 = $P1
+    upcase $S0
+    .RETURN_STRING($S0)
 .end
 
 =item C<string strtr(string str, string from[, string to])>
 
 Translates characters in str using given translation tables
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -589,12 +859,36 @@ Returns part of a string
 =cut
 
 .sub 'substr'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    if argc < 2 goto L1
+    if argc > 3 goto L1
+    goto L2
+  L1:
+    wrong_param_count()
+    .RETURN_NULL()
+  L2:
+    $P1 = shift args
+    $S1 = $P1
+    $P2 = shift args
+    $I2 = $P2
+    $I3 = 0
+    unless argc > 2 goto L3
+    $P3 = shift args
+    $I3 = $P3
+    $S0 = substr $S1, $I2, $I3
+    .RETURN_STRING($S0)
+  L3:
+    $S0 = substr $S1, $I2
+    .RETURN_STRING($S0)
 .end
 
 =item C<int substr_compare(string main_str, string str, int offset [, int length [, bool case_sensitivity]])>
 
 Binary safe optionally case insensitive comparison of 2 strings from an offset, up to length characters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -606,6 +900,8 @@ Binary safe optionally case insensitive comparison of 2 strings from an offset, 
 
 Returns the number of times a substring occurs in the string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'substr_count'
@@ -615,6 +911,8 @@ Returns the number of times a substring occurs in the string
 =item C<mixed substr_replace(mixed str, mixed repl, mixed start [, mixed length])>
 
 Replaces part of a string with another string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -626,10 +924,13 @@ Replaces part of a string with another string
 
 Strips whitespace from the beginning and end of a string
 
+STILL INCOMPLETE (see _trim).
+
 =cut
 
 .sub 'trim'
-    not_implemented()
+    .param pmc args :slurpy
+    .DO_TRIM(args, 3)
 .end
 
 =item C<string ucfirst(string str)>
@@ -639,12 +940,30 @@ Makes a string's first character uppercase
 =cut
 
 .sub 'ucfirst'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    unless $S1 == '' goto L2
+    .RETURN_EMPTY_STRING()
+  L2:
+    $S2 = substr $S1, 0, 1
+    upcase $S2
+    $S3 = substr $S1, 1
+    $S0 = concat $S2, $S3
+    .RETURN_STRING($S0)
 .end
 
 =item C<string ucwords(string str)>
 
 Uppercase the first character of every word in a string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -655,6 +974,8 @@ Uppercase the first character of every word in a string
 =item C<string wordwrap(string str [, int width [, string break [, boolean cut]]])>
 
 Wraps buffer to selected number of characters using string break char
+
+NOT IMPLEMENTED.
 
 =cut
 

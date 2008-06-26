@@ -17,6 +17,8 @@ php_sha1.pir - PHP sha1 Standard Library
 
 Calculate the sha1 hash of a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sha1'
@@ -26,6 +28,8 @@ Calculate the sha1 hash of a string
 =item C<string sha1_file(string filename [, bool raw_output])>
 
 Calculate the sha1 hash of given filename
+
+NOT IMPLEMENTED.
 
 =cut
 

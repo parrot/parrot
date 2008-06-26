@@ -17,6 +17,8 @@ php_file.pir - PHP file Standard Library
 
 Copy a file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'copy'
@@ -26,6 +28,8 @@ Copy a file
 =item C<bool fclose(resource fp)>
 
 Close an open file pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Close an open file pointer
 
 Test for end-of-file on a file pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'feof'
@@ -46,6 +52,8 @@ Test for end-of-file on a file pointer
 =item C<bool fflush(resource fp)>
 
 Flushes output
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Flushes output
 
 Get a character from file pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fgetc'
@@ -66,6 +76,8 @@ Get a character from file pointer
 =item C<array fgetcsv(resource fp [,int length [, string delimiter [, string enclosure]]])>
 
 Get line from file pointer and parse for CSV fields
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Get line from file pointer and parse for CSV fields
 
 Get a line from file pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fgets'
@@ -86,6 +100,8 @@ Get a line from file pointer
 =item C<string fgetss(resource fp [, int length, string allowable_tags])>
 
 Get a line from file pointer and strip HTML tags
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Get a line from file pointer and strip HTML tags
 
 Read entire file into an array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'file'
@@ -106,6 +124,8 @@ Read entire file into an array
 =item C<string file_get_contents(string filename [, bool use_include_path [, resource context [, long offset [, long maxlen]]]])>
 
 Read the entire file into a string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Read the entire file into a string
 
 Write/Create a file with contents data and return the number of bytes written
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'file_put_contents'
@@ -126,6 +148,8 @@ Write/Create a file with contents data and return the number of bytes written
 =item C<bool flock(resource fp, int operation [, int &wouldblock])>
 
 Portable file locking
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Portable file locking
 
 Match filename against pattern
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fnmatch'
@@ -146,6 +172,8 @@ Match filename against pattern
 =item C<resource fopen(string filename, string mode [, bool use_include_path [, resource context]])>
 
 Open a file or a URL and return a file pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Open a file or a URL and return a file pointer
 
 Output all remaining data from a file pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fpassthru'
@@ -166,6 +196,8 @@ Output all remaining data from a file pointer
 =item C<int fputcsv(resource fp, array fields [, string delimiter [, string enclosure]])>
 
 Format line as CSV and write to file pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Format line as CSV and write to file pointer
 
 Binary-safe file read
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fread'
@@ -186,6 +220,8 @@ Binary-safe file read
 =item C<mixed fscanf(resource stream, string format [, string ...])>
 
 Implements a mostly ANSI compatible fscanf()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Implements a mostly ANSI compatible fscanf()
 
 Seek on a file pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fseek'
@@ -206,6 +244,8 @@ Seek on a file pointer
 =item C<array fstat(resource fp)>
 
 Stat() on a filehandle
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Stat() on a filehandle
 
 Get file pointer's read/write position
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ftell'
@@ -226,6 +268,8 @@ Get file pointer's read/write position
 =item C<bool ftruncate(resource fp, int size)>
 
 Truncate file to 'size' length
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Truncate file to 'size' length
 
 Binary-safe file write
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fwrite'
@@ -246,6 +292,8 @@ Binary-safe file write
 =item C<array get_meta_tags(string filename [, bool use_include_path])>
 
 Extracts all meta tag content attributes from a file and returns an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Extracts all meta tag content attributes from a file and returns an array
 
 Create a directory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mkdir'
@@ -266,6 +316,8 @@ Create a directory
 =item C<int pclose(resource fp)>
 
 Close a file pointer opened by popen()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Close a file pointer opened by popen()
 
 Execute a command and open either a read or a write pipe to it
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'popen'
@@ -286,6 +340,8 @@ Execute a command and open either a read or a write pipe to it
 =item C<int readfile(string filename [, bool use_include_path[, resource context]])>
 
 Output a file or a URL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Output a file or a URL
 
 Return the resolved path
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'realpath'
@@ -306,6 +364,8 @@ Return the resolved path
 =item C<bool rename(string old_name, string new_name[, resource context])>
 
 Rename a file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Rename a file
 
 Rewind the position of a file pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'rewind'
@@ -326,6 +388,8 @@ Rewind the position of a file pointer
 =item C<bool rmdir(string dirname[, resource context])>
 
 Remove a directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Remove a directory
 
 Returns directory path used for temporary files
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sys_get_temp_dir'
@@ -346,6 +412,8 @@ Returns directory path used for temporary files
 =item C<string tempnam(string dir, string prefix)>
 
 Create a unique filename in a directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Create a unique filename in a directory
 
 Create a temporary file that will be deleted automatically after use
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'tmpfile'
@@ -367,6 +437,8 @@ Create a temporary file that will be deleted automatically after use
 
 Return or change the umask
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'umask'
@@ -376,6 +448,8 @@ Return or change the umask
 =item C<bool unlink(string filename[, context context])>
 
 Delete a file
+
+NOT IMPLEMENTED.
 
 =cut
 

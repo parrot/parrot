@@ -13,6 +13,34 @@ php_info.pir - PHP info Standard Library
 
 =cut
 
+.include 'languages/plumhead/src/common/php_MACRO.pir'
+
+.const string PHP_LOGO_GUID = 'PHPE9568F34-D428-11d2-A769-00AA001ACF42'
+.const string PHP_EGG_LOGO_GUID = 'PHPE9568F36-D428-11d2-A769-00AA001ACF42'
+.const string ZEND_LOGO_GUID = 'PHPE9568F35-D428-11d2-A769-00AA001ACF42'
+
+.include 'tm.pasm'
+
+.sub 'logo_guid' :anon
+    $I0 = time
+    $P0 = decodetime $I0
+    $I0 = $P0[.TM_MON]
+    unless $I0 == 4 goto L1
+    $I0 = $P0[.TM_MDAY]
+    unless $I0 == 1 goto L1
+    .RETURN_STRING(PHP_EGG_LOGO_GUID)
+  L1:
+    .RETURN_STRING(PHP_LOGO_GUID)
+.end
+
+.include 'sysinfo.pasm'
+
+.sub 'get_uname' :anon
+    .param string mode
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    .RETURN_STRING($S0)
+.end
+
 =item C<string php_egg_logo_guid(void)>
 
 Return the special ID used to request the PHP logo in phpinfo screens
@@ -20,12 +48,21 @@ Return the special ID used to request the PHP logo in phpinfo screens
 =cut
 
 .sub 'php_egg_logo_guid'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .RETURN_STRING(PHP_EGG_LOGO_GUID)
 .end
 
 =item C<string php_ini_loaded_file(void)>
 
 Return the actual loaded ini filename
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -36,6 +73,8 @@ Return the actual loaded ini filename
 =item C<string php_ini_scanned_files(void)>
 
 Return comma-separated string of .ini files parsed from the additional ini dir
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -50,7 +89,14 @@ Return the special ID used to request the PHP logo in phpinfo screens
 =cut
 
 .sub 'php_logo_guid'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .return logo_guid()
 .end
 
 =item C<string php_real_logo_guid(void)>
@@ -60,35 +106,67 @@ Return the special ID used to request the PHP logo in phpinfo screens
 =cut
 
 .sub 'php_real_logo_guid'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .RETURN_STRING(PHP_LOGO_GUID)
 .end
 
 =item C<string php_sapi_name(void)>
 
 Return the current SAPI module name
 
+DUMMY IMPLEMENTATION.
+
 =cut
 
-# For now, only plain old CGI is supported
-# Lie about the 'fcgi', in order to keep in line with the reference implementation
 .sub 'php_sapi_name'
-  .return( 'cgi-fcgi' )
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    # For now, only plain old CGI is supported
+    # Lie about the 'fcgi', in order to keep in line with the reference implementation
+    .RETURN_STRING('cgi-fcgi')
 .end
 
 
-=item C<string php_uname(void)>
+=item C<string php_uname([string mode])>
 
 Return information about the system PHP was built on
+
+STILL INCOMPLETE (see get_uname).
 
 =cut
 
 .sub 'php_uname'
-    not_implemented()
+    .param pmc args :slurpy
+    .local pmc mode
+    ($I0, mode) = parse_parameters('|s', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    if null mode goto L2
+    $S1 = mode
+    goto L3
+  L2:
+    $S1 = 'a'
+  L3:
+    .return get_uname($S1)
 .end
 
 =item C<void phpcredits([int flag])>
 
 Prints the list of people who've contributed to the PHP project
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -100,6 +178,8 @@ Prints the list of people who've contributed to the PHP project
 
 Output a page of useful information about PHP and the current request
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'phpinfo'
@@ -110,10 +190,29 @@ Output a page of useful information about PHP and the current request
 
 Return the current PHP version
 
+STILL INCOMPLETE (see get_module_version).
+
 =cut
 
 .sub 'phpversion'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    if argc goto L1
+    .RETURN_STRING('5.2 on Parrot')
+  L1:
+    unless argc == 1 goto L2
+    .local string ext
+    $P1 = shift args
+    ext = $P1
+    $S0 = get_module_version(ext)
+    unless $S0 == '' goto L3
+    .RETURN_FALSE()
+  L3:
+    .RETURN_STRING($S0)
+  L2:
+    wrong_param_count()
+    .RETURN_NULL()
 .end
 
 =item C<string zend_logo_guid(void)>
@@ -123,7 +222,14 @@ Return the special ID used to request the Zend logo in phpinfo screens
 =cut
 
 .sub 'zend_logo_guid'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .RETURN_STRING(ZEND_LOGO_GUID)
 .end
 
 =back

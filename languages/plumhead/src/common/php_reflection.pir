@@ -17,6 +17,8 @@ php_reflection.pir - PHP reflection  Library
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'Reflection::export'
@@ -26,6 +28,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 =item C<array Reflection::getModifierNames(int modifiers)>
 
 Returns an array of modifier names
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns an array of modifier names
 
 Constructor. Takes a string or an instance as an argument
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::__construct'
@@ -46,6 +52,8 @@ Constructor. Takes a string or an instance as an argument
 =item C<string ReflectionClass::__toString()>
 
 Returns a string representation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns a string representation
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::export'
@@ -66,6 +76,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 =item C<mixed ReflectionClass::getConstant(string name)>
 
 Returns the class' constant specified by its name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns the class' constant specified by its name
 
 Returns an associative array containing this class' constants and their values
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getConstants'
@@ -86,6 +100,8 @@ Returns an associative array containing this class' constants and their values
 =item C<ReflectionMethod ReflectionClass::getConstructor()>
 
 Returns the class' constructor if there is one, NULL otherwise
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the class' constructor if there is one, NULL otherwise
 
 Returns an associative array containing copies of all default property values of the class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getDefaultProperties'
@@ -106,6 +124,8 @@ Returns an associative array containing copies of all default property values of
 =item C<string ReflectionClass::getDocComment()>
 
 Returns the doc comment for this class
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns the doc comment for this class
 
 Returns the line this class' declaration ends at
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getEndLine'
@@ -126,6 +148,8 @@ Returns the line this class' declaration ends at
 =item C<ReflectionExtension|NULL ReflectionClass::getExtension()>
 
 Returns NULL or the extension the class belongs to
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Returns NULL or the extension the class belongs to
 
 Returns false or the name of the extension the class belongs to
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getExtensionName'
@@ -146,6 +172,8 @@ Returns false or the name of the extension the class belongs to
 =item C<string ReflectionClass::getFileName()>
 
 Returns the filename of the file this class was declared in
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Returns the filename of the file this class was declared in
 
 Returns an array of names of interfaces this class implements
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getInterfaceNames'
@@ -166,6 +196,8 @@ Returns an array of names of interfaces this class implements
 =item C<ReflectionClass[] ReflectionClass::getInterfaces()>
 
 Returns an array of interfaces this class implements
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Returns an array of interfaces this class implements
 
 Returns the class' method specified by its name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getMethod'
@@ -186,6 +220,8 @@ Returns the class' method specified by its name
 =item C<ReflectionMethod[] ReflectionClass::getMethods([long $filter])>
 
 Returns an array of this class' methods
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Returns an array of this class' methods
 
 Returns a bitfield of the access modifiers for this class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getModifiers'
@@ -206,6 +244,8 @@ Returns a bitfield of the access modifiers for this class
 =item C<string ReflectionClass::getName()>
 
 Returns the class' name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Returns the class' name
 
 Returns the class' parent class, or, if none exists, FALSE
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getParentClass'
@@ -226,6 +268,8 @@ Returns the class' parent class, or, if none exists, FALSE
 =item C<ReflectionProperty[] ReflectionClass::getProperties([long $filter])>
 
 Returns an array of this class' properties
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Returns an array of this class' properties
 
 Returns the class' property specified by its name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getProperty'
@@ -246,6 +292,8 @@ Returns the class' property specified by its name
 =item C<int ReflectionClass::getStartLine()>
 
 Returns the line this class' declaration starts at
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Returns the line this class' declaration starts at
 
 Returns an associative array containing all static property values of the class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::getStaticProperties'
@@ -266,6 +316,8 @@ Returns an associative array containing all static property values of the class
 =item C<mixed ReflectionClass::getStaticPropertyValue(string name [, mixed default])>
 
 Returns the value of a static property
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns the value of a static property
 
 Returns whether a constant exists or not
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::hasConstant'
@@ -286,6 +340,8 @@ Returns whether a constant exists or not
 =item C<bool ReflectionClass::hasMethod(string name)>
 
 Returns whether a method exists or not
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Returns whether a method exists or not
 
 Returns whether a property exists or not
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::hasProperty'
@@ -306,6 +364,8 @@ Returns whether a property exists or not
 =item C<bool ReflectionClass::implementsInterface(string|ReflectionClass interface_name)>
 
 Returns whether this class is a subclass of another class
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Returns whether this class is a subclass of another class
 
 Returns whether this class is abstract
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::isAbstract'
@@ -326,6 +388,8 @@ Returns whether this class is abstract
 =item C<bool ReflectionClass::isFinal()>
 
 Returns whether this class is final
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Returns whether this class is final
 
 Returns whether the given object is an instance of this class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::isInstance'
@@ -346,6 +412,8 @@ Returns whether the given object is an instance of this class
 =item C<bool ReflectionClass::isInstantiable()>
 
 Returns whether this class is instantiable
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Returns whether this class is instantiable
 
 Returns whether this is an interface or a class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::isInterface'
@@ -366,6 +436,8 @@ Returns whether this is an interface or a class
 =item C<bool ReflectionClass::isInternal()>
 
 Returns whether this class is an internal class
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Returns whether this class is an internal class
 
 Returns whether this class is iterateable (can be used inside foreach)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::isIterateable'
@@ -386,6 +460,8 @@ Returns whether this class is iterateable (can be used inside foreach)
 =item C<bool ReflectionClass::isSubclassOf(string|ReflectionClass class)>
 
 Returns whether this class is a subclass of another class
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Returns whether this class is a subclass of another class
 
 Returns whether this class is user-defined
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::isUserDefined'
@@ -406,6 +484,8 @@ Returns whether this class is user-defined
 =item C<stdclass ReflectionClass::newInstance(mixed* args, ...)>
 
 Returns an instance of this class
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Returns an instance of this class
 
 Returns an instance of this class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionClass::newInstanceArgs'
@@ -426,6 +508,8 @@ Returns an instance of this class
 =item C<void ReflectionClass::setStaticPropertyValue($name, $value)>
 
 Sets the value of a static property
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Sets the value of a static property
 
 Constructor. Throws an Exception in case the given extension does not exist
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionExtension::__construct'
@@ -446,6 +532,8 @@ Constructor. Throws an Exception in case the given extension does not exist
 =item C<string ReflectionExtension::__toString()>
 
 Returns a string representation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Returns a string representation
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionExtension::export'
@@ -466,6 +556,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 =item C<array ReflectionExtension::getClassNames()>
 
 Returns an array containing all names of all classes of this extension
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Returns an array containing all names of all classes of this extension
 
 Returns an array containing ReflectionClass objects for all classes of this extension
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionExtension::getClasses'
@@ -486,6 +580,8 @@ Returns an array containing ReflectionClass objects for all classes of this exte
 =item C<array ReflectionExtension::getConstants()>
 
 Returns an associative array containing this extension's constants and their values
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Returns an associative array containing this extension's constants and their val
 
 Returns an array containing all names of all extensions this extension depends on
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionExtension::getDependencies'
@@ -506,6 +604,8 @@ Returns an array containing all names of all extensions this extension depends o
 =item C<ReflectionFunction[] ReflectionExtension::getFunctions()>
 
 Returns an array of this extension's fuctions
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -517,6 +617,8 @@ Returns an array of this extension's fuctions
 
 Returns an associative array containing this extension's INI entries and their values
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionExtension::getINIEntries'
@@ -526,6 +628,8 @@ Returns an associative array containing this extension's INI entries and their v
 =item C<string ReflectionExtension::getName()>
 
 Returns this extension's name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -537,6 +641,8 @@ Returns this extension's name
 
 Returns this extension's version
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionExtension::getVersion'
@@ -546,6 +652,8 @@ Returns this extension's version
 =item C<void ReflectionExtension::info()>
 
 Prints phpinfo block for the extension
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -557,6 +665,8 @@ Prints phpinfo block for the extension
 
 Constructor. Throws an Exception in case the given function does not exist
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::__construct'
@@ -566,6 +676,8 @@ Constructor. Throws an Exception in case the given function does not exist
 =item C<string ReflectionFunction::__toString()>
 
 Returns a string representation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -577,6 +689,8 @@ Returns a string representation
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::export'
@@ -586,6 +700,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 =item C<string ReflectionFunction::getDocComment()>
 
 Returns the doc comment for this function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -597,6 +713,8 @@ Returns the doc comment for this function
 
 Returns the line this function's declaration ends at
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::getEndLine'
@@ -606,6 +724,8 @@ Returns the line this function's declaration ends at
 =item C<ReflectionExtension|NULL ReflectionFunction::getExtension()>
 
 Returns NULL or the extension the function belongs to
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -617,6 +737,8 @@ Returns NULL or the extension the function belongs to
 
 Returns false or the name of the extension the function belongs to
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::getExtensionName'
@@ -626,6 +748,8 @@ Returns false or the name of the extension the function belongs to
 =item C<string ReflectionFunction::getFileName()>
 
 Returns the filename of the file this function was declared in
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -637,6 +761,8 @@ Returns the filename of the file this function was declared in
 
 Returns this function's name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::getName'
@@ -646,6 +772,8 @@ Returns this function's name
 =item C<bool ReflectionFunction::getNumberOfParameters()>
 
 Gets the number of required parameters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -657,6 +785,8 @@ Gets the number of required parameters
 
 Gets the number of required parameters
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::getNumberOfRequiredParameters'
@@ -666,6 +796,8 @@ Gets the number of required parameters
 =item C<ReflectionParameter[] ReflectionFunction::getParameters()>
 
 Returns an array of parameter objects for this function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -677,6 +809,8 @@ Returns an array of parameter objects for this function
 
 Returns the line this function's declaration starts at
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::getStartLine'
@@ -686,6 +820,8 @@ Returns the line this function's declaration starts at
 =item C<array ReflectionFunction::getStaticVariables()>
 
 Returns an associative array containing this function's static variables and their values
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -697,6 +833,8 @@ Returns an associative array containing this function's static variables and the
 
 Invokes the function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::invoke'
@@ -706,6 +844,8 @@ Invokes the function
 =item C<mixed ReflectionFunction::invokeArgs(array args)>
 
 Invokes the function and pass its arguments as array.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -717,6 +857,8 @@ Invokes the function and pass its arguments as array.
 
 Returns whether this function is deprecated
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::isDeprecated'
@@ -726,6 +868,8 @@ Returns whether this function is deprecated
 =item C<bool ReflectionFunction::isDisabled()>
 
 Returns whether this function has been disabled or not
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -737,6 +881,8 @@ Returns whether this function has been disabled or not
 
 Returns whether this is an internal function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::isInternal'
@@ -746,6 +892,8 @@ Returns whether this is an internal function
 =item C<bool ReflectionFunction::isUserDefined()>
 
 Returns whether this is an user-defined function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -757,6 +905,8 @@ Returns whether this is an user-defined function
 
 Gets whether this function returns a reference
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionFunction::returnsReference'
@@ -766,6 +916,8 @@ Gets whether this function returns a reference
 =item C<void ReflectionMethod::__construct(mixed class_or_method [, string name])>
 
 Constructor. Throws an Exception in case the given method does not exist
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -777,6 +929,8 @@ Constructor. Throws an Exception in case the given method does not exist
 
 Returns a string representation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::__toString'
@@ -786,6 +940,8 @@ Returns a string representation
 =item C<mixed ReflectionMethod::export(mixed class, string name [, bool return])>
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -797,6 +953,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 
 Get the declaring class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::getDeclaringClass'
@@ -806,6 +964,8 @@ Get the declaring class
 =item C<int ReflectionMethod::getModifiers()>
 
 Returns a bitfield of the access modifiers for this method
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -817,6 +977,8 @@ Returns a bitfield of the access modifiers for this method
 
 Get the prototype
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::getPrototype'
@@ -826,6 +988,8 @@ Get the prototype
 =item C<mixed ReflectionMethod::invoke(mixed object, mixed* args)>
 
 Invokes the method.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -837,6 +1001,8 @@ Invokes the method.
 
 Invokes the function and pass its arguments as array.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::invokeArgs'
@@ -846,6 +1012,8 @@ Invokes the function and pass its arguments as array.
 =item C<bool ReflectionMethod::isAbstract()>
 
 Returns whether this method is abstract
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -857,6 +1025,8 @@ Returns whether this method is abstract
 
 Returns whether this method is the constructor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::isConstructor'
@@ -866,6 +1036,8 @@ Returns whether this method is the constructor
 =item C<bool ReflectionMethod::isDestructor()>
 
 Returns whether this method is static
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -877,6 +1049,8 @@ Returns whether this method is static
 
 Returns whether this method is final
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::isFinal'
@@ -886,6 +1060,8 @@ Returns whether this method is final
 =item C<bool ReflectionMethod::isPrivate()>
 
 Returns whether this method is private
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -897,6 +1073,8 @@ Returns whether this method is private
 
 Returns whether this method is protected
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::isProtected'
@@ -906,6 +1084,8 @@ Returns whether this method is protected
 =item C<bool ReflectionMethod::isPublic()>
 
 Returns whether this method is public
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -917,6 +1097,8 @@ Returns whether this method is public
 
 Returns whether this method is static
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionMethod::isStatic'
@@ -926,6 +1108,8 @@ Returns whether this method is static
 =item C<void ReflectionObject::__construct(mixed argument)>
 
 Constructor. Takes an instance as an argument
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -937,6 +1121,8 @@ Constructor. Takes an instance as an argument
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionObject::export'
@@ -946,6 +1132,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 =item C<void ReflectionParameter::__construct(mixed function, mixed parameter)>
 
 Constructor. Throws an Exception in case the given method does not exist
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -957,6 +1145,8 @@ Constructor. Throws an Exception in case the given method does not exist
 
 Returns a string representation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionParameter::__toString'
@@ -966,6 +1156,8 @@ Returns a string representation
 =item C<bool ReflectionParameter::allowsNull()>
 
 Returns whether NULL is allowed as this parameters's value
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -977,6 +1169,8 @@ Returns whether NULL is allowed as this parameters's value
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionParameter::export'
@@ -986,6 +1180,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 =item C<ReflectionClass|NULL ReflectionParameter::getClass()>
 
 Returns this parameters's class hint or NULL if there is none
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -997,6 +1193,8 @@ Returns this parameters's class hint or NULL if there is none
 
 Returns in which class this parameter is defined (not the typehint of the parameter)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionParameter::getDeclaringClass'
@@ -1006,6 +1204,8 @@ Returns in which class this parameter is defined (not the typehint of the parame
 =item C<ReflectionFunction ReflectionParameter::getDeclaringFunction()>
 
 Returns the ReflectionFunction for the function of this parameter
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1017,6 +1217,8 @@ Returns the ReflectionFunction for the function of this parameter
 
 Returns the default value of this parameter or throws an exception
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionParameter::getDefaultValue'
@@ -1026,6 +1228,8 @@ Returns the default value of this parameter or throws an exception
 =item C<string ReflectionParameter::getName()>
 
 Returns this parameters's name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1037,6 +1241,8 @@ Returns this parameters's name
 
 Returns whether this parameter is an optional parameter
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionParameter::getPosition'
@@ -1046,6 +1252,8 @@ Returns whether this parameter is an optional parameter
 =item C<bool ReflectionParameter::isArray()>
 
 Returns whether parameter MUST be an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1057,6 +1265,8 @@ Returns whether parameter MUST be an array
 
 Returns whether the default value of this parameter is available
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionParameter::isDefaultValueAvailable'
@@ -1066,6 +1276,8 @@ Returns whether the default value of this parameter is available
 =item C<bool ReflectionParameter::isOptional()>
 
 Returns whether this parameter is an optional parameter
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1077,6 +1289,8 @@ Returns whether this parameter is an optional parameter
 
 Returns whether this parameters is passed to by reference
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionParameter::isPassedByReference'
@@ -1086,6 +1300,8 @@ Returns whether this parameters is passed to by reference
 =item C<void ReflectionProperty::__construct(mixed class, string name)>
 
 Constructor. Throws an Exception in case the given property does not exist
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1097,6 +1313,8 @@ Constructor. Throws an Exception in case the given property does not exist
 
 Returns a string representation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionProperty::__toString'
@@ -1106,6 +1324,8 @@ Returns a string representation
 =item C<mixed ReflectionProperty::export(mixed class, string name [, bool return])>
 
 Exports a reflection object. Returns the output if TRUE is specified for return, printing it otherwise.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1117,6 +1337,8 @@ Exports a reflection object. Returns the output if TRUE is specified for return,
 
 Get the declaring class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionProperty::getDeclaringClass'
@@ -1126,6 +1348,8 @@ Get the declaring class
 =item C<string ReflectionProperty::getDocComment()>
 
 Returns the doc comment for this property
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1137,6 +1361,8 @@ Returns the doc comment for this property
 
 Returns a bitfield of the access modifiers for this property
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionProperty::getModifiers'
@@ -1146,6 +1372,8 @@ Returns a bitfield of the access modifiers for this property
 =item C<string ReflectionProperty::getName()>
 
 Returns the class' name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1157,6 +1385,8 @@ Returns the class' name
 
 Returns this property's value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionProperty::getValue'
@@ -1166,6 +1396,8 @@ Returns this property's value
 =item C<bool ReflectionProperty::isDefault()>
 
 Returns whether this property is default (declared at compilation time).
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1177,6 +1409,8 @@ Returns whether this property is default (declared at compilation time).
 
 Returns whether this property is private
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionProperty::isPrivate'
@@ -1186,6 +1420,8 @@ Returns whether this property is private
 =item C<bool ReflectionProperty::isProtected()>
 
 Returns whether this property is protected
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1197,6 +1433,8 @@ Returns whether this property is protected
 
 Returns whether this property is public
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionProperty::isPublic'
@@ -1207,6 +1445,8 @@ Returns whether this property is public
 
 Returns whether this property is static
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ReflectionProperty::isStatic'
@@ -1216,6 +1456,8 @@ Returns whether this property is static
 =item C<void ReflectionProperty::setValue([stdclass object,] mixed value)>
 
 Sets this property's value
+
+NOT IMPLEMENTED.
 
 =cut
 

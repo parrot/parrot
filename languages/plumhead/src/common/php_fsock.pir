@@ -17,6 +17,8 @@ php_fsock.pir - PHP fsock Standard Library
 
 Open Internet or Unix domain socket connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'fsockopen'
@@ -26,6 +28,8 @@ Open Internet or Unix domain socket connection
 =item C<resource pfsockopen(string hostname, int port [, int errno [, string errstr [, float timeout]]])>
 
 Open persistent Internet or Unix domain socket connection
+
+NOT IMPLEMENTED.
 
 =cut
 

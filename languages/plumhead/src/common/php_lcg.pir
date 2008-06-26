@@ -17,6 +17,8 @@ php_lcg.pir - PHP lcg Standard Library
 
 Returns a value from the combined linear congruential generator
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'lcg_value'

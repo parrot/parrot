@@ -17,6 +17,8 @@ php_sybase_ct.pir - PHP sybase_ct  Library
 
 Get number of affected rows in last query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_affected_rows'
@@ -26,6 +28,8 @@ Get number of affected rows in last query
 =item C<bool sybase_close([int link_id])>
 
 Close Sybase connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Close Sybase connection
 
 Open Sybase server connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_connect'
@@ -46,6 +52,8 @@ Open Sybase server connection
 =item C<bool sybase_data_seek(int result, int offset)>
 
 Move internal row pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Move internal row pointer
 
 Sets deadlock retry count
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_deadlock_retry_count'
@@ -66,6 +76,8 @@ Sets deadlock retry count
 =item C<array sybase_fetch_array(int result)>
 
 Fetch row as array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Fetch row as array
 
 Fetch row as array without numberic indices
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_fetch_assoc'
@@ -86,6 +100,8 @@ Fetch row as array without numberic indices
 =item C<object sybase_fetch_field(int result [, int offset])>
 
 Get field information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Get field information
 
 Fetch row as object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_fetch_object'
@@ -106,6 +124,8 @@ Fetch row as object
 =item C<array sybase_fetch_row(int result)>
 
 Get row as enumerated array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Get row as enumerated array
 
 Set field offset
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_field_seek'
@@ -126,6 +148,8 @@ Set field offset
 =item C<bool sybase_free_result(int result)>
 
 Free result memory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Free result memory
 
 Returns the last message from server (over min_message_severity)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_get_last_message'
@@ -146,6 +172,8 @@ Returns the last message from server (over min_message_severity)
 =item C<void sybase_min_client_severity(int severity)>
 
 Sets minimum client severity
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Sets minimum client severity
 
 Sets minimum server severity
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_min_server_severity'
@@ -166,6 +196,8 @@ Sets minimum server severity
 =item C<int sybase_num_fields(int result)>
 
 Get number of fields in result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Get number of fields in result
 
 Get number of rows in result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_num_rows'
@@ -186,6 +220,8 @@ Get number of rows in result
 =item C<int sybase_pconnect([string host [, string user [, string password [, string charset [, string appname]]]]])>
 
 Open persistent Sybase connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Open persistent Sybase connection
 
 Send Sybase query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_query'
@@ -207,6 +245,8 @@ Send Sybase query
 
 Get result data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_result'
@@ -216,6 +256,8 @@ Get result data
 =item C<bool sybase_select_db(string database [, int link_id])>
 
 Select Sybase database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -228,6 +270,8 @@ Select Sybase database
 Set the error handler, to be called when a server message is raised.
 If error_func is NULL the handler will be deleted
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sybase_set_message_handler'
@@ -237,6 +281,8 @@ If error_func is NULL the handler will be deleted
 =item C<int sybase_unbuffered_query(string query [, int link_id])>
 
 Send Sybase query
+
+NOT IMPLEMENTED.
 
 =cut
 

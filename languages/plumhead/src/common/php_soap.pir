@@ -17,6 +17,8 @@ php_soap.pir - PHP soap  Library
 
 SoapClient constructor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapClient::SoapClient'
@@ -26,6 +28,8 @@ SoapClient constructor
 =item C<mixed SoapClient::__call( string function_name, array arguments [, array options [, array input_headers [, array output_headers]]])>
 
 Calls a SOAP function
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Calls a SOAP function
 
 SoapClient::__doRequest()
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapClient::__doRequest'
@@ -46,6 +52,8 @@ SoapClient::__doRequest()
 =item C<array SoapClient::__getFunctions( void )>
 
 Returns list of SOAP functions
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns list of SOAP functions
 
 Returns last SOAP request
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapClient::__getLastRequest'
@@ -66,6 +76,8 @@ Returns last SOAP request
 =item C<string SoapClient::__getLastRequestHeaders(void)>
 
 Returns last SOAP request headers
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns last SOAP request headers
 
 Returns last SOAP response
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapClient::__getLastResponse'
@@ -87,6 +101,8 @@ Returns last SOAP response
 
 Returns last SOAP response headers
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapClient::__getLastResponseHeaders'
@@ -96,6 +112,8 @@ Returns last SOAP response headers
 =item C<array SoapClient::__getTypes( void )>
 
 Returns list of SOAP types
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -108,6 +126,8 @@ Returns list of SOAP types
 Sets cookie thet will sent with SOAP request.
 The call to this function will effect all folowing calls of SOAP methods.
 If value is not specified cookie is removed.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -123,6 +143,8 @@ If new_location is not specified or null then SoapClient will use endpoint
 from WSDL file.
 The function returns old value of location options.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapClient::__setLocation'
@@ -135,6 +157,8 @@ Sets SOAP headers for subsequent calls (replaces any previous
 values).
 If no value is specified, all of the headers are removed.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapClient::__setSoapHeaders'
@@ -145,6 +169,8 @@ If no value is specified, all of the headers are removed.
 
 SoapFault constructor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapFault::SoapFault'
@@ -154,6 +180,8 @@ SoapFault constructor
 =item C<object SoapFault::SoapFault( string faultcode, string faultstring [, string faultactor [, mixed detail [, string faultname [, mixed headerfault]]]])>
 
 SoapFault constructor
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -165,6 +193,8 @@ SoapFault constructor
 
 SoapHeader constructor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapHeader::SoapHeader'
@@ -174,6 +204,8 @@ SoapHeader constructor
 =item C<object SoapParam::SoapParam( mixed data, string name)>
 
 SoapParam constructor
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -185,6 +217,8 @@ SoapParam constructor
 
 SoapServer constructor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapServer::SoapServer'
@@ -194,6 +228,8 @@ SoapServer constructor
 =item C<void SoapServer::addFunction(mixed functions)>
 
 Adds one or several functions those will handle SOAP requests
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -205,6 +241,8 @@ Adds one or several functions those will handle SOAP requests
 
 Issue SoapFault indicating an error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapServer::fault'
@@ -214,6 +252,8 @@ Issue SoapFault indicating an error
 =item C<array SoapServer::getFunctions(void)>
 
 Returns list of defined functions
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -225,6 +265,8 @@ Returns list of defined functions
 
 Handles a SOAP request
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapServer::handle'
@@ -234,6 +276,8 @@ Handles a SOAP request
 =item C<void SoapServer::setClass(string class_name [, mixed args])>
 
 Sets class which will handle SOAP requests
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -245,6 +289,8 @@ Sets class which will handle SOAP requests
 
 Sets object which will handle SOAP requests
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapServer::setObject'
@@ -255,6 +301,8 @@ Sets object which will handle SOAP requests
 
 Sets persistence mode of SoapServer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SoapServer::setPersistence'
@@ -264,6 +312,8 @@ Sets persistence mode of SoapServer
 =item C<object SoapVar::SoapVar( mixed data, int encoding [, string type_name [, string type_namespace [, string node_name [, string node_namespace]]]])>
 
 SoapVar constructor
+
+NOT IMPLEMENTED.
 
 =cut
 

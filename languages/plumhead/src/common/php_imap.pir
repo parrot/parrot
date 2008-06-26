@@ -17,6 +17,8 @@ php_imap.pir - PHP imap  Library
 
 Convert an 8-bit string to a quoted-printable string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_8bit'
@@ -26,6 +28,8 @@ Convert an 8-bit string to a quoted-printable string
 =item C<array imap_alerts(void)>
 
 Returns an array of all IMAP alerts that have been generated since the last page load or since the last imap_alerts() call, whichever came last. The alert stack is cleared after imap_alerts() is called.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns an array of all IMAP alerts that have been generated since the last page
 
 Append a new message to a specified mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_append'
@@ -46,6 +52,8 @@ Append a new message to a specified mailbox
 =item C<string imap_base64(string text)>
 
 Decode BASE64 encoded text
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Decode BASE64 encoded text
 
 Convert an 8bit string to a base64 string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_binary'
@@ -66,6 +76,8 @@ Convert an 8bit string to a base64 string
 =item C<string imap_body(resource stream_id, int msg_no [, int options])>
 
 Read the message body
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Read the message body
 
 Read the structure of a specified body section of a specific message
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_bodystruct'
@@ -86,6 +100,8 @@ Read the structure of a specified body section of a specific message
 =item C<object imap_check(resource stream_id)>
 
 Get mailbox properties
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Get mailbox properties
 
 Clears flags on messages
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_clearflag_full'
@@ -106,6 +124,8 @@ Clears flags on messages
 =item C<bool imap_close(resource stream_id [, int options])>
 
 Close an IMAP stream
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Close an IMAP stream
 
 Create a new mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_createmailbox'
@@ -126,6 +148,8 @@ Create a new mailbox
 =item C<bool imap_delete(resource stream_id, int msg_no [, int options])>
 
 Mark a message for deletion
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Mark a message for deletion
 
 Delete a mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_deletemailbox'
@@ -146,6 +172,8 @@ Delete a mailbox
 =item C<array imap_errors(void)>
 
 Returns an array of all IMAP errors generated since the last page load, or since the last imap_errors() call, whichever came last. The error stack is cleared after imap_errors() is called.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Returns an array of all IMAP errors generated since the last page load, or since
 
 Permanently delete all messages marked for deletion
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_expunge'
@@ -166,6 +196,8 @@ Permanently delete all messages marked for deletion
 =item C<array imap_fetch_overview(resource stream_id, int msg_no [, int options])>
 
 Read an overview of the information in the headers of the given message sequence
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Read an overview of the information in the headers of the given message sequence
 
 Get a specific body section
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_fetchbody'
@@ -186,6 +220,8 @@ Get a specific body section
 =item C<string imap_fetchheader(resource stream_id, int msg_no [, int options])>
 
 Get the full unfiltered header for a message
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Get the full unfiltered header for a message
 
 Read the full structure of a message
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_fetchstructure'
@@ -206,6 +244,8 @@ Read the full structure of a message
 =item C<array imap_get_quota(resource stream_id, string qroot)>
 
 Returns the quota set to the mailbox account qroot
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Returns the quota set to the mailbox account qroot
 
 Returns the quota set to the mailbox account mbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_get_quotaroot'
@@ -226,6 +268,8 @@ Returns the quota set to the mailbox account mbox
 =item C<array imap_getacl(resource stream_id, string mailbox)>
 
 Gets the ACL for a given mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Gets the ACL for a given mailbox
 
 Reads the list of mailboxes and returns a full array of objects containing name, attributes, and delimiter
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_getmailboxes'
@@ -246,6 +292,8 @@ Reads the list of mailboxes and returns a full array of objects containing name,
 =item C<array imap_getsubscribed(resource stream_id, string ref, string pattern)>
 
 Return a list of subscribed mailboxes, in the same format as imap_getmailboxes()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Return a list of subscribed mailboxes, in the same format as imap_getmailboxes()
 
 Read the headers of the message
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_headerinfo'
@@ -266,6 +316,8 @@ Read the headers of the message
 =item C<array imap_headers(resource stream_id)>
 
 Returns headers for all messages in a mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns headers for all messages in a mailbox
 
 Returns the last error that was generated by an IMAP function. The error stack is NOT cleared after this call.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_last_error'
@@ -286,6 +340,8 @@ Returns the last error that was generated by an IMAP function. The error stack i
 =item C<array imap_list(resource stream_id, string ref, string pattern)>
 
 Read the list of mailboxes
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Read the list of mailboxes
 
 Return a list of subscribed mailboxes
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_lsub'
@@ -306,6 +364,8 @@ Return a list of subscribed mailboxes
 =item C<bool imap_mail(string to, string subject, string message [, string additional_headers [, string cc [, string bcc [, string rpath]]]])>
 
 Send an email message
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Send an email message
 
 Create a MIME message based on given envelope and body sections
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_mail_compose'
@@ -326,6 +388,8 @@ Create a MIME message based on given envelope and body sections
 =item C<bool imap_mail_copy(resource stream_id, int msg_no, string mailbox [, int options])>
 
 Copy specified message to a mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Copy specified message to a mailbox
 
 Move specified message to a mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_mail_move'
@@ -346,6 +412,8 @@ Move specified message to a mailbox
 =item C<object imap_mailboxmsginfo(resource stream_id)>
 
 Returns info about the current mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Returns info about the current mailbox
 
 Decode mime header element in accordance with RFC 2047 and return array of objects containing 'charset' encoding and decoded 'text'
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_mime_header_decode'
@@ -366,6 +436,8 @@ Decode mime header element in accordance with RFC 2047 and return array of objec
 =item C<int imap_msgno(resource stream_id, int unique_msg_id)>
 
 Get the sequence number associated with a UID
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Get the sequence number associated with a UID
 
 Gives the number of messages in the current mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_num_msg'
@@ -386,6 +460,8 @@ Gives the number of messages in the current mailbox
 =item C<int imap_num_recent(resource stream_id)>
 
 Gives the number of recent messages in current mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Gives the number of recent messages in current mailbox
 
 Open an IMAP stream to a mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_open'
@@ -406,6 +484,8 @@ Open an IMAP stream to a mailbox
 =item C<bool imap_ping(resource stream_id)>
 
 Check if the IMAP stream is still active
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Check if the IMAP stream is still active
 
 Convert a quoted-printable string to an 8-bit string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_qprint'
@@ -426,6 +508,8 @@ Convert a quoted-printable string to an 8-bit string
 =item C<bool imap_renamemailbox(resource stream_id, string old_name, string new_name)>
 
 Rename a mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Rename a mailbox
 
 Reopen an IMAP stream to a new mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_reopen'
@@ -446,6 +532,8 @@ Reopen an IMAP stream to a new mailbox
 =item C<array imap_rfc822_parse_adrlist(string address_string, string default_host)>
 
 Parses an address string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Parses an address string
 
 Parse a set of mail headers contained in a string, and return an object similar to imap_headerinfo()
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_rfc822_parse_headers'
@@ -466,6 +556,8 @@ Parse a set of mail headers contained in a string, and return an object similar 
 =item C<string imap_rfc822_write_address(string mailbox, string host, string personal)>
 
 Returns a properly formatted email address given the mailbox, host, and personal info
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Returns a properly formatted email address given the mailbox, host, and personal
 
 Save a specific body section to a file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_savebody'
@@ -486,6 +580,8 @@ Save a specific body section to a file
 =item C<array imap_scan(resource stream_id, string ref, string pattern, string content)>
 
 Read list of mailboxes containing a certain string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Read list of mailboxes containing a certain string
 
 Return a list of messages matching the given criteria
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_search'
@@ -506,6 +604,8 @@ Return a list of messages matching the given criteria
 =item C<bool imap_set_quota(resource stream_id, string qroot, int mailbox_size)>
 
 Will set the quota for qroot mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -517,6 +617,8 @@ Will set the quota for qroot mailbox
 
 Sets the ACL for a given mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_setacl'
@@ -526,6 +628,8 @@ Sets the ACL for a given mailbox
 =item C<bool imap_setflag_full(resource stream_id, string sequence, string flag [, int options])>
 
 Sets flags on messages
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -537,6 +641,8 @@ Sets flags on messages
 
 Sort an array of message headers, optionally including only messages that meet specified criteria.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_sort'
@@ -546,6 +652,8 @@ Sort an array of message headers, optionally including only messages that meet s
 =item C<object imap_status(resource stream_id, string mailbox, int options)>
 
 Get status info from a mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -557,6 +665,8 @@ Get status info from a mailbox
 
 Subscribe to a mailbox
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_subscribe'
@@ -566,6 +676,8 @@ Subscribe to a mailbox
 =item C<array imap_thread(resource stream_id [, int options])>
 
 Return threaded by REFERENCES tree
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -577,6 +689,8 @@ Return threaded by REFERENCES tree
 
 Set or fetch imap timeout
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_timeout'
@@ -586,6 +700,8 @@ Set or fetch imap timeout
 =item C<int imap_uid(resource stream_id, int msg_no)>
 
 Get the unique message id associated with a standard sequential message number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -597,6 +713,8 @@ Get the unique message id associated with a standard sequential message number
 
 Remove the delete flag from a message
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_undelete'
@@ -606,6 +724,8 @@ Remove the delete flag from a message
 =item C<bool imap_unsubscribe(resource stream_id, string mailbox)>
 
 Unsubscribe from a mailbox
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -617,6 +737,8 @@ Unsubscribe from a mailbox
 
 Decode a modified UTF-7 string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_utf7_decode'
@@ -627,6 +749,8 @@ Decode a modified UTF-7 string
 
 Encode a string in modified UTF-7
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'imap_utf7_encode'
@@ -636,6 +760,8 @@ Encode a string in modified UTF-7
 =item C<string imap_utf8(string mime_encoded_text)>
 
 Convert a mime-encoded text to UTF-8
+
+NOT IMPLEMENTED.
 
 =cut
 

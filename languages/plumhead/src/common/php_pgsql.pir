@@ -17,6 +17,8 @@ php_pgsql.pir - PHP pgsql  Library
 
 Returns the number of affected tuples
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_affected_rows'
@@ -26,6 +28,8 @@ Returns the number of affected tuples
 =item C<bool pg_cancel_query(resource connection)>
 
 Cancel request
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Cancel request
 
 Get the current client encoding
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_client_encoding'
@@ -46,6 +52,8 @@ Get the current client encoding
 =item C<bool pg_close([resource connection])>
 
 Close a PostgreSQL connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Close a PostgreSQL connection
 
 Open a PostgreSQL connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_connect'
@@ -66,6 +76,8 @@ Open a PostgreSQL connection
 =item C<bool pg_connection_busy(resource connection)>
 
 Get connection is busy or not
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Get connection is busy or not
 
 Reset connection (reconnect)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_connection_reset'
@@ -86,6 +100,8 @@ Reset connection (reconnect)
 =item C<int pg_connection_status(resource connnection)>
 
 Get connection status
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Get connection status
 
 Check and convert values for PostgreSQL SQL statement
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_convert'
@@ -106,6 +124,8 @@ Check and convert values for PostgreSQL SQL statement
 =item C<bool pg_copy_from(resource connection, string table_name , array rows [, string delimiter [, string null_as]])>
 
 Copy table from array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Copy table from array
 
 Copy table to array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_copy_to'
@@ -126,6 +148,8 @@ Copy table to array
 =item C<string pg_dbname([resource connection])>
 
 Get the database name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get the database name
 
 Delete records has ids (id=>value)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_delete'
@@ -146,6 +172,8 @@ Delete records has ids (id=>value)
 =item C<bool pg_end_copy([resource connection])>
 
 Sync with backend. Completes the Copy command
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Sync with backend. Completes the Copy command
 
 Escape binary for bytea type
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_escape_bytea'
@@ -166,6 +196,8 @@ Escape binary for bytea type
 =item C<string pg_escape_string([resource connection,] string data)>
 
 Escape string for text/char type
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Escape string for text/char type
 
 Execute a prepared query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_execute'
@@ -186,6 +220,8 @@ Execute a prepared query
 =item C<array pg_fetch_all(resource result)>
 
 Fetch all rows into array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Fetch all rows into array
 
 Fetch all rows into array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_fetch_all_columns'
@@ -206,6 +244,8 @@ Fetch all rows into array
 =item C<array pg_fetch_array(resource result [, int row [, int result_type]])>
 
 Fetch a row as an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Fetch a row as an array
 
 Fetch a row as an assoc array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_fetch_assoc'
@@ -226,6 +268,8 @@ Fetch a row as an assoc array
 =item C<object pg_fetch_object(resource result [, int row [, string class_name [, NULL|array ctor_params]]])>
 
 Fetch a row as an object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Fetch a row as an object
 
 Returns values from a result identifier
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_fetch_result'
@@ -246,6 +292,8 @@ Returns values from a result identifier
 =item C<array pg_fetch_row(resource result [, int row [, int result_type]])>
 
 Get a row as an enumerated array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Get a row as an enumerated array
 
 Test if a field is NULL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_field_is_null'
@@ -266,6 +316,8 @@ Test if a field is NULL
 =item C<string pg_field_name(resource result, int field_number)>
 
 Returns the name of the field
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns the name of the field
 
 Returns the field number of the named field
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_field_num'
@@ -286,6 +340,8 @@ Returns the field number of the named field
 =item C<int pg_field_prtlen(resource result, [int row,] mixed field_name_or_number)>
 
 Returns the printed length
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Returns the printed length
 
 Returns the internal size of the field
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_field_size'
@@ -306,6 +364,8 @@ Returns the internal size of the field
 =item C<mixed pg_field_table(resource result, int field_number[, bool oid_only])>
 
 Returns the name of the table field belongs to, or table's oid if oid_only is true
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Returns the name of the table field belongs to, or table's oid if oid_only is tr
 
 Returns the type name for the given field
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_field_type'
@@ -326,6 +388,8 @@ Returns the type name for the given field
 =item C<string pg_field_type_oid(resource result, int field_number)>
 
 Returns the type oid for the given field
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Returns the type oid for the given field
 
 Free result memory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_free_result'
@@ -346,6 +412,8 @@ Free result memory
 =item C<array pg_get_notify([resource connection[, result_type]])>
 
 Get asynchronous notification
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Get asynchronous notification
 
 Get backend(server) pid
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_get_pid'
@@ -366,6 +436,8 @@ Get backend(server) pid
 =item C<resource pg_get_result(resource connection)>
 
 Get asynchronous query result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Get asynchronous query result
 
 Returns the host name associated with the connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_host'
@@ -386,6 +460,8 @@ Returns the host name associated with the connection
 =item C<mixed pg_insert(resource db, string table, array values[, int options])>
 
 Insert values (filed=>value) to table
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Insert values (filed=>value) to table
 
 Get the error message string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_last_error'
@@ -406,6 +484,8 @@ Get the error message string
 =item C<string pg_last_notice(resource connection)>
 
 Returns the last notice set by the backend
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Returns the last notice set by the backend
 
 Returns the last object identifier
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_last_oid'
@@ -426,6 +508,8 @@ Returns the last object identifier
 =item C<bool pg_lo_close(resource large_object)>
 
 Close a large object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Close a large object
 
 Create a large object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_lo_create'
@@ -446,6 +532,8 @@ Create a large object
 =item C<bool pg_lo_export([resource connection, ] int objoid, string filename)>
 
 Export large object direct to filesystem
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Export large object direct to filesystem
 
 Import large object direct from filesystem
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_lo_import'
@@ -466,6 +556,8 @@ Import large object direct from filesystem
 =item C<resource pg_lo_open([resource connection,] int large_object_oid, string mode)>
 
 Open a large object and return fd
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Open a large object and return fd
 
 Read a large object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_lo_read'
@@ -486,6 +580,8 @@ Read a large object
 =item C<int pg_lo_read_all(resource large_object)>
 
 Read a large object and send straight to browser
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -497,6 +593,8 @@ Read a large object and send straight to browser
 
 Seeks position of large object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_lo_seek'
@@ -506,6 +604,8 @@ Seeks position of large object
 =item C<int pg_lo_tell(resource large_object)>
 
 Returns current position of large object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -517,6 +617,8 @@ Returns current position of large object
 
 Delete a large object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_lo_unlink'
@@ -526,6 +628,8 @@ Delete a large object
 =item C<int pg_lo_write(resource large_object, string buf [, int len])>
 
 Write a large object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -537,6 +641,8 @@ Write a large object
 
 Get meta_data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_meta_data'
@@ -546,6 +652,8 @@ Get meta_data
 =item C<int pg_num_fields(resource result)>
 
 Return the number of fields in the result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -557,6 +665,8 @@ Return the number of fields in the result
 
 Return the number of rows in the result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_num_rows'
@@ -566,6 +676,8 @@ Return the number of rows in the result
 =item C<string pg_options([resource connection])>
 
 Get the options associated with the connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -577,6 +689,8 @@ Get the options associated with the connection
 
 Returns the value of a server parameter
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_parameter_status'
@@ -586,6 +700,8 @@ Returns the value of a server parameter
 =item C<resource pg_pconnect(string connection_string | [string host, string port [, string options [, string tty,]]] string database)>
 
 Open a persistent PostgreSQL connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -597,6 +713,8 @@ Open a persistent PostgreSQL connection
 
 Ping database. If connection is bad, try to reconnect.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_ping'
@@ -606,6 +724,8 @@ Ping database. If connection is bad, try to reconnect.
 =item C<int pg_port([resource connection])>
 
 Return the port number associated with the connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -617,6 +737,8 @@ Return the port number associated with the connection
 
 Prepare a query for future execution
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_prepare'
@@ -626,6 +748,8 @@ Prepare a query for future execution
 =item C<bool pg_put_line([resource connection,] string query)>
 
 Send null-terminated string to backend server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -637,6 +761,8 @@ Send null-terminated string to backend server
 
 Execute a query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_query'
@@ -646,6 +772,8 @@ Execute a query
 =item C<resource pg_query_params([resource connection,] string query, array params)>
 
 Execute a query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -657,6 +785,8 @@ Execute a query
 
 Get error message associated with result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_result_error'
@@ -666,6 +796,8 @@ Get error message associated with result
 =item C<string pg_result_error_field(resource result, int fieldcode)>
 
 Get error message field associated with result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -677,6 +809,8 @@ Get error message field associated with result
 
 Set internal row offset
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_result_seek'
@@ -686,6 +820,8 @@ Set internal row offset
 =item C<mixed pg_result_status(resource result[, long result_type])>
 
 Get status of query result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -697,6 +833,8 @@ Get status of query result
 
 Select records that has ids (id=>value)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_select'
@@ -706,6 +844,8 @@ Select records that has ids (id=>value)
 =item C<bool pg_send_execute(resource connection, string stmtname, array params)>
 
 Executes prevriously prepared stmtname asynchronously
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -717,6 +857,8 @@ Executes prevriously prepared stmtname asynchronously
 
 Asynchronously prepare a query for future execution
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_send_prepare'
@@ -726,6 +868,8 @@ Asynchronously prepare a query for future execution
 =item C<bool pg_send_query(resource connection, string query)>
 
 Send asynchronous query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -737,6 +881,8 @@ Send asynchronous query
 
 Send asynchronous parameterized query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_send_query_params'
@@ -746,6 +892,8 @@ Send asynchronous parameterized query
 =item C<int pg_set_client_encoding([resource connection,] string encoding)>
 
 Set client encoding
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -757,6 +905,8 @@ Set client encoding
 
 Set error verbosity
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_set_error_verbosity'
@@ -766,6 +916,8 @@ Set error verbosity
 =item C<bool pg_trace(string filename [, string mode [, resource connection]])>
 
 Enable tracing a PostgreSQL connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -777,6 +929,8 @@ Enable tracing a PostgreSQL connection
 
 Get transaction status
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_transaction_status'
@@ -786,6 +940,8 @@ Get transaction status
 =item C<string pg_tty([resource connection])>
 
 Return the tty name associated with the connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -797,6 +953,8 @@ Return the tty name associated with the connection
 
 Unescape binary for bytea type
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_unescape_bytea'
@@ -806,6 +964,8 @@ Unescape binary for bytea type
 =item C<bool pg_untrace([resource connection])>
 
 Disable tracing of a PostgreSQL connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -817,6 +977,8 @@ Disable tracing of a PostgreSQL connection
 
 Update table using values (field=>value) and ids (id=>value)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pg_update'
@@ -826,6 +988,8 @@ Update table using values (field=>value) and ids (id=>value)
 =item C<array pg_version([resource connection])>
 
 Returns an array with client, protocol and server version (when available)
+
+NOT IMPLEMENTED.
 
 =cut
 

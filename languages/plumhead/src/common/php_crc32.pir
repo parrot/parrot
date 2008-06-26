@@ -17,6 +17,8 @@ php_crc32.pir - PHP crc32 Standard Library
 
 Calculate the crc32 polynomial of a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'crc32'

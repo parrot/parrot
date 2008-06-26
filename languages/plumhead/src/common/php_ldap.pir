@@ -17,6 +17,8 @@ php_ldap.pir - PHP ldap  Library
 
 Translate 8859 characters to t61 characters
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_8859_to_t61'
@@ -26,6 +28,8 @@ Translate 8859 characters to t61 characters
 =item C<bool ldap_add(resource link, string dn, array entry)>
 
 Add entries to LDAP directory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Add entries to LDAP directory
 
 Bind to LDAP directory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_bind'
@@ -46,6 +52,8 @@ Bind to LDAP directory
 =item C<bool ldap_compare(resource link, string dn, string attr, string value)>
 
 Determine if an entry has a specific value for one of its attributes
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Determine if an entry has a specific value for one of its attributes
 
 Connect to an LDAP server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_connect'
@@ -66,6 +76,8 @@ Connect to an LDAP server
 =item C<int ldap_count_entries(resource link, resource result)>
 
 Count the number of entries in a search result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Count the number of entries in a search result
 
 Delete an entry from a directory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_delete'
@@ -86,6 +100,8 @@ Delete an entry from a directory
 =item C<string ldap_dn2ufn(string dn)>
 
 Convert DN to User Friendly Naming format
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Convert DN to User Friendly Naming format
 
 Convert error number to error string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_err2str'
@@ -106,6 +124,8 @@ Convert error number to error string
 =item C<int ldap_errno(resource link)>
 
 Get the current ldap error number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Get the current ldap error number
 
 Get the current ldap error string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_error'
@@ -126,6 +148,8 @@ Get the current ldap error string
 =item C<array ldap_explode_dn(string dn, int with_attrib)>
 
 Splits DN into its component parts
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Splits DN into its component parts
 
 Return first attribute
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_first_attribute'
@@ -146,6 +172,8 @@ Return first attribute
 =item C<resource ldap_first_entry(resource link, resource result)>
 
 Return first result id
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Return first result id
 
 Return first reference
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_first_reference'
@@ -166,6 +196,8 @@ Return first reference
 =item C<bool ldap_free_result(resource result)>
 
 Free result memory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Free result memory
 
 Get attributes from a search result entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_get_attributes'
@@ -186,6 +220,8 @@ Get attributes from a search result entry
 =item C<string ldap_get_dn(resource link, resource result_entry)>
 
 Get the DN of a result entry
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Get the DN of a result entry
 
 Get all result entries
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_get_entries'
@@ -206,6 +244,8 @@ Get all result entries
 =item C<bool ldap_get_option(resource link, int option, mixed retval)>
 
 Get the current value of various session-wide parameters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Get the current value of various session-wide parameters
 
 Get all values with lengths from a result entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_get_values_len'
@@ -226,6 +268,8 @@ Get all values with lengths from a result entry
 =item C<resource ldap_list(resource link, string base_dn, string filter [, array attrs [, int attrsonly [, int sizelimit [, int timelimit [, int deref]]]]])>
 
 Single-level search
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Single-level search
 
 Add attribute values to current
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_mod_add'
@@ -246,6 +292,8 @@ Add attribute values to current
 =item C<bool ldap_mod_del(resource link, string dn, array entry)>
 
 Delete attribute values
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Delete attribute values
 
 Replace attribute values with new ones
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_mod_replace'
@@ -266,6 +316,8 @@ Replace attribute values with new ones
 =item C<string ldap_next_attribute(resource link, resource result_entry)>
 
 Get the next attribute in result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Get the next attribute in result
 
 Get next result entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_next_entry'
@@ -286,6 +340,8 @@ Get next result entry
 =item C<resource ldap_next_reference(resource link, resource reference_entry)>
 
 Get next reference
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Get next reference
 
 Extract information from reference entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_parse_reference'
@@ -306,6 +364,8 @@ Extract information from reference entry
 =item C<bool ldap_parse_result(resource link, resource result, int errcode, string matcheddn, string errmsg, array referrals)>
 
 Extract information from result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Extract information from result
 
 Read an entry
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_read'
@@ -326,6 +388,8 @@ Read an entry
 =item C<bool ldap_rename(resource link, string dn, string newrdn, string newparent, bool deleteoldrdn)>
 
 Modify the name of an entry
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Modify the name of an entry
 
 Bind to LDAP directory using SASL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_sasl_bind'
@@ -346,6 +412,8 @@ Bind to LDAP directory using SASL
 =item C<resource ldap_search(resource link, string base_dn, string filter [, array attrs [, int attrsonly [, int sizelimit [, int timelimit [, int deref]]]]])>
 
 Search LDAP tree under base_dn
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Search LDAP tree under base_dn
 
 Set the value of various session-wide parameters
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_set_option'
@@ -366,6 +436,8 @@ Set the value of various session-wide parameters
 =item C<bool ldap_set_rebind_proc(resource link, string callback)>
 
 Set a callback function to do re-binds on referral chasing.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Set a callback function to do re-binds on referral chasing.
 
 Sort LDAP result entries
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_sort'
@@ -386,6 +460,8 @@ Sort LDAP result entries
 =item C<bool ldap_start_tls(resource link)>
 
 Start TLS
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Start TLS
 
 Translate t61 characters to 8859 characters
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ldap_t61_to_8859'
@@ -406,6 +484,8 @@ Translate t61 characters to 8859 characters
 =item C<bool ldap_unbind(resource link)>
 
 Unbind from LDAP directory
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_html.pir - PHP html Standard Library
 
 Returns the internal translation table used by htmlspecialchars and htmlentities
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_html_translation_table'
@@ -26,6 +28,8 @@ Returns the internal translation table used by htmlspecialchars and htmlentities
 =item C<string html_entity_decode(string string [, int quote_style][, string charset])>
 
 Convert all HTML entities to their applicable characters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Convert all HTML entities to their applicable characters
 
 Convert all applicable characters to HTML entities
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'htmlentities'
@@ -47,6 +53,8 @@ Convert all applicable characters to HTML entities
 
 Convert special characters to HTML entities
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'htmlspecialchars'
@@ -56,6 +64,8 @@ Convert special characters to HTML entities
 =item C<string htmlspecialchars_decode(string string [, int quote_style])>
 
 Convert special HTML entities back to characters
+
+NOT IMPLEMENTED.
 
 =cut
 

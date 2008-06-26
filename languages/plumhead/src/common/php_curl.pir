@@ -17,6 +17,8 @@ php_curl.pir - PHP curl  Library
 
 Close a cURL session
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_close'
@@ -26,6 +28,8 @@ Close a cURL session
 =item C<resource curl_copy_handle(resource ch)>
 
 Copy a cURL handle along with all of it's preferences
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Copy a cURL handle along with all of it's preferences
 
 Return an integer containing the last error number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_errno'
@@ -46,6 +52,8 @@ Return an integer containing the last error number
 =item C<string curl_error(resource ch)>
 
 Return a string contain the last error for the current session
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Return a string contain the last error for the current session
 
 Perform a cURL session
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_exec'
@@ -66,6 +76,8 @@ Perform a cURL session
 =item C<mixed curl_getinfo(resource ch [, int option])>
 
 Get information regarding a specific transfer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Get information regarding a specific transfer
 
 Initialize a cURL session
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_init'
@@ -86,6 +100,8 @@ Initialize a cURL session
 =item C<int curl_multi_add_handle(resource mh, resource ch)>
 
 Add a normal cURL handle to a cURL multi handle
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Add a normal cURL handle to a cURL multi handle
 
 Close a set of cURL handles
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_multi_close'
@@ -106,6 +124,8 @@ Close a set of cURL handles
 =item C<int curl_multi_exec(resource mh, int &still_running)>
 
 Run the sub-connections of the current cURL handle
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Run the sub-connections of the current cURL handle
 
 Return the content of a cURL handle if CURLOPT_RETURNTRANSFER is set
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_multi_getcontent'
@@ -126,6 +148,8 @@ Return the content of a cURL handle if CURLOPT_RETURNTRANSFER is set
 =item C<array curl_multi_info_read(resource mh [, long msgs_in_queue])>
 
 Get information about the current transfers
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get information about the current transfers
 
 Returns a new cURL multi handle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_multi_init'
@@ -146,6 +172,8 @@ Returns a new cURL multi handle
 =item C<int curl_multi_remove_handle(resource mh, resource ch)>
 
 Remove a multi handle from a set of cURL handles
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Remove a multi handle from a set of cURL handles
 
 Get all the sockets associated with the cURL extension, which can then be "selected"
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_multi_select'
@@ -166,6 +196,8 @@ Get all the sockets associated with the cURL extension, which can then be "selec
 =item C<bool curl_setopt(resource ch, int option, mixed value)>
 
 Set an option for a cURL transfer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Set an option for a cURL transfer
 
 Set an array of option for a cURL transfer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'curl_setopt_array'
@@ -186,6 +220,8 @@ Set an array of option for a cURL transfer
 =item C<array curl_version([int version])>
 
 Return cURL version information.
+
+NOT IMPLEMENTED.
 
 =cut
 

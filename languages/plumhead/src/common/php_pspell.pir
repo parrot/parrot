@@ -17,6 +17,8 @@ php_pspell.pir - PHP pspell  Library
 
 Adds a word to a personal list
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_add_to_personal'
@@ -26,6 +28,8 @@ Adds a word to a personal list
 =item C<bool pspell_add_to_session(int pspell, string word)>
 
 Adds a word to the current session
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Adds a word to the current session
 
 Returns true if word is valid
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_check'
@@ -46,6 +52,8 @@ Returns true if word is valid
 =item C<bool pspell_clear_session(int pspell)>
 
 Clears the current session
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Clears the current session
 
 Create a new config to be used later to create a manager
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_config_create'
@@ -66,6 +76,8 @@ Create a new config to be used later to create a manager
 =item C<bool pspell_config_data_dir(int conf, string directory)>
 
 location of language data files
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ location of language data files
 
 location of the main word list
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_config_dict_dir'
@@ -86,6 +100,8 @@ location of the main word list
 =item C<bool pspell_config_ignore(int conf, int ignore)>
 
 Ignore words <= n chars
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Ignore words <= n chars
 
 Select mode for config (PSPELL_FAST, PSPELL_NORMAL or PSPELL_BAD_SPELLERS)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_config_mode'
@@ -106,6 +124,8 @@ Select mode for config (PSPELL_FAST, PSPELL_NORMAL or PSPELL_BAD_SPELLERS)
 =item C<bool pspell_config_personal(int conf, string personal)>
 
 Use a personal dictionary for this config
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Use a personal dictionary for this config
 
 Use a personal dictionary with replacement pairs for this config
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_config_repl'
@@ -126,6 +148,8 @@ Use a personal dictionary with replacement pairs for this config
 =item C<bool pspell_config_runtogether(int conf, bool runtogether)>
 
 Consider run-together words as valid components
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Consider run-together words as valid components
 
 Save replacement pairs when personal list is saved for this config
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_config_save_repl'
@@ -146,6 +172,8 @@ Save replacement pairs when personal list is saved for this config
 =item C<int pspell_new(string language [, string spelling [, string jargon [, string encoding [, int mode]]]])>
 
 Load a dictionary
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Load a dictionary
 
 Load a dictionary based on the given config
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_new_config'
@@ -166,6 +196,8 @@ Load a dictionary based on the given config
 =item C<int pspell_new_personal(string personal, string language [, string spelling [, string jargon [, string encoding [, int mode]]]])>
 
 Load a dictionary with a personal wordlist
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Load a dictionary with a personal wordlist
 
 Saves the current (personal) wordlist
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_save_wordlist'
@@ -187,6 +221,8 @@ Saves the current (personal) wordlist
 
 Notify the dictionary of a user-selected replacement
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pspell_store_replacement'
@@ -196,6 +232,8 @@ Notify the dictionary of a user-selected replacement
 =item C<array pspell_suggest(int pspell, string word)>
 
 Returns array of suggestions
+
+NOT IMPLEMENTED.
 
 =cut
 

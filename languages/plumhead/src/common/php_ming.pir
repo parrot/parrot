@@ -17,6 +17,8 @@ php_ming.pir - PHP ming  Library
 
 Returns the action flag for keyPress(char)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ming_keypress'
@@ -26,6 +28,8 @@ Returns the action flag for keyPress(char)
 =item C<void ming_setcubicthreshold(int threshold)>
 
 Set cubic threshold (?)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Set cubic threshold (?)
 
 Set scale (?)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ming_setscale'
@@ -46,6 +52,8 @@ Set scale (?)
 =item C<void ming_useconstants(int use)>
 
 Use constant pool (?)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Use constant pool (?)
 
 Use SWF version (?)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ming_useswfversion'
@@ -66,6 +76,8 @@ Use SWF version (?)
 =item C<void swfaction::__construct(string)>
 
 Creates a new SWFAction object, compiling the given script
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Creates a new SWFAction object, compiling the given script
 
 Creates a new SWFBitmap object from jpg (with optional mask) or dbl file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfbitmap::__construct'
@@ -86,6 +100,8 @@ Creates a new SWFBitmap object from jpg (with optional mask) or dbl file
 =item C<float swfbitmap::getHeight()>
 
 Returns the height of this bitmap
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the height of this bitmap
 
 Returns the width of this bitmap
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfbitmap::getWidth'
@@ -106,6 +124,8 @@ Returns the width of this bitmap
 =item C<void swfbutton::__construct()>
 
 Creates a new SWFButton object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -118,6 +138,8 @@ Creates a new SWFButton object
 associates a sound with a button transition
 NOTE: the transitions are all wrong _UP, _OVER, _DOWN _HIT
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfbutton::addASound'
@@ -127,6 +149,8 @@ NOTE: the transitions are all wrong _UP, _OVER, _DOWN _HIT
 =item C<void swfbutton::addAction(object SWFAction, int flags)>
 
 Sets the action to perform when conditions described in flags is met
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -138,6 +162,8 @@ Sets the action to perform when conditions described in flags is met
 
 Sets the character to display for the condition described in flags
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfbutton::addShape'
@@ -147,6 +173,8 @@ Sets the character to display for the condition described in flags
 =item C<void swfbutton::setAction(object SWFAction)>
 
 Sets the action to perform when button is pressed
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -158,6 +186,8 @@ Sets the action to perform when button is pressed
 
 Sets the character for this button's down state
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfbutton::setDown'
@@ -167,6 +197,8 @@ Sets the character for this button's down state
 =item C<void swfbutton::setHit(object SWFCharacter)>
 
 Sets the character for this button's hit test state
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -178,6 +210,8 @@ Sets the character for this button's hit test state
 
 enable track as menu button behaviour
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfbutton::setMenu'
@@ -187,6 +221,8 @@ enable track as menu button behaviour
 =item C<void swfbutton::setOver(object SWFCharacter)>
 
 Sets the character for this button's over state
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -198,6 +234,8 @@ Sets the character for this button's over state
 
 Sets the character for this button's up state
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfbutton::setUp'
@@ -207,6 +245,8 @@ Sets the character for this button's up state
 =item C<void swfdisplayitem::addAction(object SWFAction, int flags)>
 
 Adds this SWFAction to the given SWFSprite instance
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -218,6 +258,8 @@ Adds this SWFAction to the given SWFSprite instance
 
 Sets the add color part of this SWFDisplayItem's CXform to (r, g, b [, a]), a defaults to 0
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::addColor'
@@ -227,6 +269,8 @@ Sets the add color part of this SWFDisplayItem's CXform to (r, g, b [, a]), a de
 =item C<void swfdisplayitem::endMask()>
 
 another way of defining a MASK layer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -238,6 +282,8 @@ another way of defining a MASK layer
 
 Displaces this SWFDisplayItem by (dx, dy) in movie coordinates
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::move'
@@ -247,6 +293,8 @@ Displaces this SWFDisplayItem by (dx, dy) in movie coordinates
 =item C<void swfdisplayitem::moveTo(int x, int y)>
 
 Moves this SWFDisplayItem to movie coordinates (x, y)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -258,6 +306,8 @@ Moves this SWFDisplayItem to movie coordinates (x, y)
 
 Sets the multiply color part of this SWFDisplayItem's CXform to (r, g, b [, a]), a defaults to 1.0
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::multColor'
@@ -267,6 +317,8 @@ Sets the multiply color part of this SWFDisplayItem's CXform to (r, g, b [, a]),
 =item C<void swfdisplayitem::rotate(float degrees)>
 
 Rotates this SWFDisplayItem the given (clockwise) degrees from its current orientation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -278,6 +330,8 @@ Rotates this SWFDisplayItem the given (clockwise) degrees from its current orien
 
 Rotates this SWFDisplayItem the given (clockwise) degrees from its original orientation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::rotateTo'
@@ -287,6 +341,8 @@ Rotates this SWFDisplayItem the given (clockwise) degrees from its original orie
 =item C<void swfdisplayitem::scale(float xScale, float yScale)>
 
 Multiplies this SWFDisplayItem's current x scale by xScale, its y scale by yScale
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -298,6 +354,8 @@ Multiplies this SWFDisplayItem's current x scale by xScale, its y scale by yScal
 
 Scales this SWFDisplayItem by xScale in the x direction, yScale in the y, or both to xScale if only one arg
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::scaleTo'
@@ -307,6 +365,8 @@ Scales this SWFDisplayItem by xScale in the x direction, yScale in the y, or bot
 =item C<void swfdisplayitem::setDepth(int depth)>
 
 Sets this SWFDisplayItem's z-depth to depth.  Items with higher depth values are drawn on top of those with lower values
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -318,6 +378,8 @@ Sets this SWFDisplayItem's z-depth to depth.  Items with higher depth values are
 
 defines a MASK layer at level
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::setMaskLevel'
@@ -327,6 +389,8 @@ defines a MASK layer at level
 =item C<void swfdisplayitem::setMatrix(float a, float b, float c, float d, float x, float y)>
 
 Sets the item's transform matrix
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -338,6 +402,8 @@ Sets the item's transform matrix
 
 Sets this SWFDisplayItem's name to name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::setName'
@@ -347,6 +413,8 @@ Sets this SWFDisplayItem's name to name
 =item C<void swfdisplayitem::setRatio(float ratio)>
 
 Sets this SWFDisplayItem's ratio to ratio.  Obviously only does anything if displayitem was created from an SWFMorph
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -358,6 +426,8 @@ Sets this SWFDisplayItem's ratio to ratio.  Obviously only does anything if disp
 
 Adds xSkew to this SWFDisplayItem's x skew value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::skewX'
@@ -367,6 +437,8 @@ Adds xSkew to this SWFDisplayItem's x skew value
 =item C<void swfdisplayitem::skewXTo(float xSkew)>
 
 Sets this SWFDisplayItem's x skew value to xSkew
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -378,6 +450,8 @@ Sets this SWFDisplayItem's x skew value to xSkew
 
 Adds ySkew to this SWFDisplayItem's y skew value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfdisplayitem::skewY'
@@ -387,6 +461,8 @@ Adds ySkew to this SWFDisplayItem's y skew value
 =item C<void swfdisplayitem::skewYTo(float ySkew)>
 
 Sets this SWFDisplayItem's y skew value to ySkew
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -398,6 +474,8 @@ Sets this SWFDisplayItem's y skew value to ySkew
 
 Creates a new SWFFill object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffill::__construct'
@@ -407,6 +485,8 @@ Creates a new SWFFill object
 =item C<void swffill::moveTo(float x, float y)>
 
 Moves this SWFFill to shape coordinates (x,y)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -418,6 +498,8 @@ Moves this SWFFill to shape coordinates (x,y)
 
 Rotates this SWFFill the given (clockwise) degrees from its original orientation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffill::rotateTo'
@@ -427,6 +509,8 @@ Rotates this SWFFill the given (clockwise) degrees from its original orientation
 =item C<void swffill::scaleTo(float xScale [, float yScale])>
 
 Scales this SWFFill by xScale in the x direction, yScale in the y, or both to xScale if only one arg
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -438,6 +522,8 @@ Scales this SWFFill by xScale in the x direction, yScale in the y, or both to xS
 
 Sets this SWFFill's x skew value to xSkew
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffill::skewXTo'
@@ -447,6 +533,8 @@ Sets this SWFFill's x skew value to xSkew
 =item C<void swffill::skewYTo(float ySkew)>
 
 Sets this SWFFill's y skew value to ySkew
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -458,6 +546,8 @@ Sets this SWFFill's y skew value to ySkew
 
 Creates a new SWFFont object from given file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffont::__construct'
@@ -467,6 +557,8 @@ Creates a new SWFFont object from given file
 =item C<void swffont::addChars(string)>
 
 adds characters to a font required within textfields
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -478,6 +570,8 @@ adds characters to a font required within textfields
 
 Returns the ascent of the font, or 0 if not available
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffont::getAscent'
@@ -487,6 +581,8 @@ Returns the ascent of the font, or 0 if not available
 =item C<float swffont::getDescent()>
 
 Returns the descent of the font, or 0 if not available
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -498,6 +594,8 @@ Returns the descent of the font, or 0 if not available
 
 Returns the leading of the font, or 0 if not available
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffont::getLeading'
@@ -507,6 +605,8 @@ Returns the leading of the font, or 0 if not available
 =item C<string swffont::getShape(code)>
 
 Returns the glyph shape of a char as a text string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -518,6 +618,8 @@ Returns the glyph shape of a char as a text string
 
 Calculates the width of the given string in this font at full height
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffont::getUTF8Width'
@@ -527,6 +629,8 @@ Calculates the width of the given string in this font at full height
 =item C<int swffont::getWideWidth(string)>
 
 Calculates the width of the given string in this font at full height
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -538,6 +642,8 @@ Calculates the width of the given string in this font at full height
 
 Calculates the width of the given string in this font at full height
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffont::getWidth'
@@ -547,6 +653,8 @@ Calculates the width of the given string in this font at full height
 =item C<void swffontcha::raddChars(string)>
 
 adds characters to a font for exporting font
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -558,6 +666,8 @@ adds characters to a font for exporting font
 
 adds characters to a font for exporting font
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swffontchar::addChars'
@@ -567,6 +677,8 @@ adds characters to a font for exporting font
 =item C<void swfgradient::__construct()>
 
 Creates a new SWFGradient object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -578,6 +690,8 @@ Creates a new SWFGradient object
 
 Adds given entry to the gradient
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfgradient::addEntry'
@@ -587,6 +701,8 @@ Adds given entry to the gradient
 =item C<void swfmorph::__construct()>
 
 Creates a new SWFMorph object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -598,6 +714,8 @@ Creates a new SWFMorph object
 
 Return's this SWFMorph's start shape object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmorph::getShape1'
@@ -607,6 +725,8 @@ Return's this SWFMorph's start shape object
 =item C<object swfmorph::getShape2()>
 
 Return's this SWFMorph's start shape object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -618,6 +738,8 @@ Return's this SWFMorph's start shape object
 
 Creates swfmovie object according to the passed version
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::__construct'
@@ -627,6 +749,8 @@ Creates swfmovie object according to the passed version
 =item C<object swfmovie::add(object SWFBlock)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -638,6 +762,8 @@ Creates swfmovie object according to the passed version
 
 Labels frame
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::labelframe'
@@ -647,6 +773,8 @@ Labels frame
 =item C<void swfmovie::namedanchor(string name)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -658,6 +786,8 @@ Labels frame
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::nextframe'
@@ -667,6 +797,8 @@ Labels frame
 =item C<int swfmovie::output([int compression])>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -678,6 +810,8 @@ Labels frame
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::protect'
@@ -687,6 +821,8 @@ Labels frame
 =item C<void swfmovie::remove(object SWFBlock)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -698,6 +834,8 @@ Labels frame
 
 Saves the movie. 'where' can be stream and the movie will be saved there otherwise it is treated as string and written in file with that name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::save'
@@ -707,6 +845,8 @@ Saves the movie. 'where' can be stream and the movie will be saved there otherwi
 =item C<int swfmovie::saveToFile(stream x [, int compression])>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -718,6 +858,8 @@ Saves the movie. 'where' can be stream and the movie will be saved there otherwi
 
 Sets background color (r,g,b)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::setBackground'
@@ -727,6 +869,8 @@ Sets background color (r,g,b)
 =item C<void swfmovie::setDimension(float x, float y)>
 
 Sets movie dimension
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -738,6 +882,8 @@ Sets movie dimension
 
 Sets number of frames
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::setFrames'
@@ -747,6 +893,8 @@ Sets number of frames
 =item C<void swfmovie::setRate(float rate)>
 
 Sets movie rate
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -758,6 +906,8 @@ Sets movie rate
 
 Sets sound stream of the SWF movie. The parameter can be stream or string. Retuens the number of frames.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfmovie::streamMP3'
@@ -767,6 +917,8 @@ Sets sound stream of the SWF movie. The parameter can be stream or string. Retue
 =item C<class swfprebuiltclip_init([file])>
 
 Returns a SWFPrebuiltClip object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -778,6 +930,8 @@ Returns a SWFPrebuiltClip object
 
 Creates a new SWFShape object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::__construct'
@@ -787,6 +941,8 @@ Creates a new SWFShape object
 =item C<object swfshape::addfill(mixed arg1, int arg2, [int b [, int a]])>
 
 Returns a fill object, for use with swfshape_setleftfill and swfshape_setrightfill. If 1 or 2 parameter(s) is (are) passed first should be object (from gradient class) and the second int (flags). Gradient fill is performed. If 3 or 4 parameters are passed : r, g, b [, a]. Solid fill is performed.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -798,6 +954,8 @@ Returns a fill object, for use with swfshape_setleftfill and swfshape_setrightfi
 
 Draws an arc of radius r centered at the current location, from angle startAngle to angle endAngle measured clockwise from 12 o'clock
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::drawarc'
@@ -807,6 +965,8 @@ Draws an arc of radius r centered at the current location, from angle startAngle
 =item C<void swfshape::drawcircle(float r)>
 
 Draws a circle of radius r centered at the current location, in a counter-clockwise fashion
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -818,6 +978,8 @@ Draws a circle of radius r centered at the current location, in a counter-clockw
 
 Draws a cubic bezier curve using the current position and the three given points as control points
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::drawcubic'
@@ -827,6 +989,8 @@ Draws a cubic bezier curve using the current position and the three given points
 =item C<void swfshape::drawcubic(float bx, float by, float cx, float cy, float dx, float dy)>
 
 Draws a cubic bezier curve using the current position and the three given points as control points
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -838,6 +1002,8 @@ Draws a cubic bezier curve using the current position and the three given points
 
 Draws a curve from the current pen position (x, y) to the point (x+bdx, y+bdy) in the current line style, using point (x+adx, y+ady) as a control point or draws a cubic bezier to point (x+cdx, x+cdy) with control points (x+adx, y+ady) and (x+bdx, y+bdy)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::drawcurve'
@@ -847,6 +1013,8 @@ Draws a curve from the current pen position (x, y) to the point (x+bdx, y+bdy) i
 =item C<void swfshape::drawcurveto(float ax, float ay, float bx, float by [, float dx, float dy])>
 
 Draws a curve from the current pen position (x,y) to the point (bx, by) in the current line style, using point (ax, ay) as a control point. Or draws a cubic bezier to point (dx, dy) with control points (ax, ay) and (bx, by)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -858,6 +1026,8 @@ Draws a curve from the current pen position (x,y) to the point (bx, by) in the c
 
 Draws the first character in the given string into the shape using the glyph definition from the given font
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::drawglyph'
@@ -867,6 +1037,8 @@ Draws the first character in the given string into the shape using the glyph def
 =item C<void swfshape::drawline(float dx, float dy)>
 
 Draws a line from the current pen position (x, y) to the point (x+dx, y+dy) in the current line style
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -878,6 +1050,8 @@ Draws a line from the current pen position (x, y) to the point (x+dx, y+dy) in t
 
 Draws a line from the current pen position to shape coordinates (x, y) in the current line style
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::drawlineto'
@@ -887,6 +1061,8 @@ Draws a line from the current pen position to shape coordinates (x, y) in the cu
 =item C<void swfshape::movepen(float x, float y)>
 
 Moves the pen from its current location by vector (x, y)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -898,6 +1074,8 @@ Moves the pen from its current location by vector (x, y)
 
 Moves the pen to shape coordinates (x, y)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::movepento'
@@ -907,6 +1085,8 @@ Moves the pen to shape coordinates (x, y)
 =item C<void swfshape::setleftfill(int arg1 [, int g ,int b [,int a]])>
 
 Sets the left side fill style to fill in case only one parameter is passed. When 3 or 4 parameters are passed they are treated as : int r, int g, int b, int a . Solid fill is performed in this case before setting left side fill type.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -918,6 +1098,8 @@ Sets the left side fill style to fill in case only one parameter is passed. When
 
 Sets the right side fill style to fill in case only one parameter is passed. When 3 or 4 parameters are passed they are treated as : int r, int g, int b, int a . Solid fill is performed in this case before setting right side fill type.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfshape::setleftfill'
@@ -927,6 +1109,8 @@ Sets the right side fill style to fill in case only one parameter is passed. Whe
 =item C<void swfshape::setline(int width, int r, int g, int b [, int a])>
 
 Sets the current line style for this SWFShape
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -938,6 +1122,8 @@ Sets the current line style for this SWFShape
 
 Creates a new SWFSound object from given file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfsound::__construct'
@@ -947,6 +1133,8 @@ Creates a new SWFSound object from given file
 =item C<void swfsprite::__construct()>
 
 Creates a new SWFSprite object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -958,6 +1146,8 @@ Creates a new SWFSprite object
 
 Adds the character to the sprite, returns a displayitem object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfsprite::add'
@@ -967,6 +1157,8 @@ Adds the character to the sprite, returns a displayitem object
 =item C<void swfsprite::labelFrame(string label)>
 
 Labels frame
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -978,6 +1170,8 @@ Labels frame
 
 Moves the sprite to the next frame
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfsprite::nextFrame'
@@ -987,6 +1181,8 @@ Moves the sprite to the next frame
 =item C<void swfsprite::remove(object SWFDisplayItem)>
 
 Remove the named character from the sprite's display list
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -998,6 +1194,8 @@ Remove the named character from the sprite's display list
 
 Sets the number of frames in this SWFSprite
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swfsprite::setFrames'
@@ -1008,6 +1206,8 @@ Sets the number of frames in this SWFSprite
 
 Creates new SWFText object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::__construct'
@@ -1017,6 +1217,8 @@ Creates new SWFText object
 =item C<void swftext::addString(string text)>
 
 Writes the given text into this SWFText object at the current pen position, using the current font, height, spacing, and color
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1029,6 +1231,8 @@ Writes the given text into this SWFText object at the current pen position, usin
 Writes the given text into this SWFText object at the current pen position,
 using the current font, height, spacing, and color
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::addUTF8String'
@@ -1040,6 +1244,8 @@ using the current font, height, spacing, and color
 Writes the given text into this SWFText object at the current pen position,
 using the current font, height, spacing, and color
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::addWideString'
@@ -1049,6 +1255,8 @@ using the current font, height, spacing, and color
 =item C<float swftext::getAscent()>
 
 Returns the ascent of the current font at its current size, or 0 if not available
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1060,6 +1268,8 @@ Returns the ascent of the current font at its current size, or 0 if not availabl
 
 Returns the descent of the current font at its current size, or 0 if not available
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::getDescent'
@@ -1069,6 +1279,8 @@ Returns the descent of the current font at its current size, or 0 if not availab
 =item C<float swftext::getLeading()>
 
 Returns the leading of the current font at its current size, or 0 if not available
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1080,6 +1292,8 @@ Returns the leading of the current font at its current size, or 0 if not availab
 
 calculates the width of the given string in this text objects current font and size
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::getUTF8Width'
@@ -1089,6 +1303,8 @@ calculates the width of the given string in this text objects current font and s
 =item C<double swftext::getWideWidth(string)>
 
 calculates the width of the given string in this text objects current font and size
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1100,6 +1316,8 @@ calculates the width of the given string in this text objects current font and s
 
 Calculates the width of the given string in this text objects current font and size
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::getWidth'
@@ -1109,6 +1327,8 @@ Calculates the width of the given string in this text objects current font and s
 =item C<void swftext::moveTo(float x, float y)>
 
 Moves this SWFText object's current pen position to (x, y) in text coordinates
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1120,6 +1340,8 @@ Moves this SWFText object's current pen position to (x, y) in text coordinates
 
 Sets this SWFText object's current color to the given color
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::setColor'
@@ -1129,6 +1351,8 @@ Sets this SWFText object's current color to the given color
 =item C<void swftext::setFont(object font)>
 
 Sets this SWFText object's current font to given font
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1140,6 +1364,8 @@ Sets this SWFText object's current font to given font
 
 Sets this SWFText object's current height to given height
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftext::setHeight'
@@ -1149,6 +1375,8 @@ Sets this SWFText object's current height to given height
 =item C<void swftext::setSpacing(float spacing)>
 
 Sets this SWFText object's current letterspacing to given spacing
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1160,6 +1388,8 @@ Sets this SWFText object's current letterspacing to given spacing
 
 Creates a new SWFTextField object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::__construct'
@@ -1169,6 +1399,8 @@ Creates a new SWFTextField object
 =item C<void swftextfield::addChars(string)>
 
 adds characters to a font that will be available within a textfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1180,6 +1412,8 @@ adds characters to a font that will be available within a textfield
 
 Adds the given string to this textfield
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::addString'
@@ -1189,6 +1423,8 @@ Adds the given string to this textfield
 =item C<void swftextfield::align(int alignment)>
 
 Sets the alignment of this textfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1200,6 +1436,8 @@ Sets the alignment of this textfield
 
 Sets the width and height of this textfield
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::setBounds'
@@ -1209,6 +1447,8 @@ Sets the width and height of this textfield
 =item C<void swftextfield::setColor(int r, int g, int b [, int a])>
 
 Sets the color of this textfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1220,6 +1460,8 @@ Sets the color of this textfield
 
 Sets the font for this textfield
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::setFont'
@@ -1229,6 +1471,8 @@ Sets the font for this textfield
 =item C<void swftextfield::setHeight(float height)>
 
 Sets the font height of this textfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1240,6 +1484,8 @@ Sets the font height of this textfield
 
 Sets the indentation of the first line of this textfield
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::setIndentation'
@@ -1249,6 +1495,8 @@ Sets the indentation of the first line of this textfield
 =item C<void swftextfield::setLeftMargin(float margin)>
 
 Sets the left margin of this textfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1260,6 +1508,8 @@ Sets the left margin of this textfield
 
 Sets the line spacing of this textfield
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::setLineSpacing'
@@ -1269,6 +1519,8 @@ Sets the line spacing of this textfield
 =item C<void swftextfield::setMargins(float left, float right)>
 
 Sets both margins of this textfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1280,6 +1532,8 @@ Sets both margins of this textfield
 
 Sets the variable name of this textfield
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::setName'
@@ -1289,6 +1543,8 @@ Sets the variable name of this textfield
 =item C<void swftextfield::setPadding(float padding)>
 
 Sets the padding of this textfield
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -1300,6 +1556,8 @@ Sets the padding of this textfield
 
 Sets the right margin of this textfield
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'swftextfield::setRightMargin'
@@ -1309,6 +1567,8 @@ Sets the right margin of this textfield
 =item C<class swfvideostream_init([file])>
 
 Returns a SWVideoStream object
+
+NOT IMPLEMENTED.
 
 =cut
 

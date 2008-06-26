@@ -23,6 +23,8 @@ php_base64.pir - PHP base64 Standard Library
 
 Decodes string using MIME base64 algorithm
 
+STILL INCOMPLETE.
+
 =cut
 
 .sub 'base64_decode'

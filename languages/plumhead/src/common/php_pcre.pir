@@ -17,6 +17,8 @@ php_pcre.pir - PHP pcre  Library
 
 Searches array and returns entries which match regex
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'preg_grep'
@@ -26,6 +28,8 @@ Searches array and returns entries which match regex
 =item C<int preg_last_error()>
 
 Returns the error code of the last regexp execution.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns the error code of the last regexp execution.
 
 Perform a Perl-style regular expression match
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'preg_match'
@@ -46,6 +52,8 @@ Perform a Perl-style regular expression match
 =item C<int preg_match_all(string pattern, string subject, array subpatterns [, int flags [, int offset]])>
 
 Perform a Perl-style global regular expression match
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Perform a Perl-style global regular expression match
 
 Quote regular expression characters plus an optional character
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'preg_quote'
@@ -66,6 +76,8 @@ Quote regular expression characters plus an optional character
 =item C<string preg_replace(mixed regex, mixed replace, mixed subject [, int limit [, count]])>
 
 Perform Perl-style regular expression replacement.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Perform Perl-style regular expression replacement.
 
 Perform Perl-style regular expression replacement using replacement callback.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'preg_replace_callback'
@@ -86,6 +100,8 @@ Perform Perl-style regular expression replacement using replacement callback.
 =item C<array preg_split(string pattern, string subject [, int limit [, int flags]])>
 
 Split string into an array using a perl-style regular expression as a delimiter
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_simplexml.pir - PHP simplexml  Library
 
 SimpleXMLElement constructor
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SimpleXMLElement::__construct'
@@ -26,6 +28,8 @@ SimpleXMLElement constructor
 =item C<void SimpleXMLElement::addAttribute(string qName, string value [,string ns])>
 
 Add Attribute with optional namespace information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Add Attribute with optional namespace information
 
 Add Element with optional namespace information
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SimpleXMLElement::addChild'
@@ -46,6 +52,8 @@ Add Element with optional namespace information
 =item C<string SimpleXMLElement::asXML([string filename])>
 
 Return a well-formed XML string based on SimpleXML element
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Return a well-formed XML string based on SimpleXML element
 
 Identifies an element's attributes
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SimpleXMLElement::attributes'
@@ -66,6 +76,8 @@ Identifies an element's attributes
 =item C<object SimpleXMLElement::children([string ns [, bool is_prefix]])>
 
 Finds children of given node
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Finds children of given node
 
 Return all namespaces registered with document
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SimpleXMLElement::getDocNamespaces'
@@ -86,6 +100,8 @@ Return all namespaces registered with document
 =item C<object SimpleXMLElement::getName()>
 
 Finds children of given node
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Finds children of given node
 
 Return all namespaces in use
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SimpleXMLElement::getNamespaces'
@@ -106,6 +124,8 @@ Return all namespaces in use
 =item C<bool SimpleXMLElement::registerXPathNamespace(string prefix, string ns)>
 
 Creates a prefix/ns context for the next XPath query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Creates a prefix/ns context for the next XPath query
 
 Runs XPath query on the XML data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'SimpleXMLElement::xpath'
@@ -126,6 +148,8 @@ Runs XPath query on the XML data
 =item C<simplemxml_element simplexml_import_dom(domNode node [, string class_name])>
 
 Get a simplexml_element object from dom to allow for processing
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get a simplexml_element object from dom to allow for processing
 
 Load a filename and return a simplexml_element object to allow for processing
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'simplexml_load_file'
@@ -146,6 +172,8 @@ Load a filename and return a simplexml_element object to allow for processing
 =item C<simplemxml_element simplexml_load_string(string data [, string class_name [, int options [, string ns [, bool is_prefix]]]])>
 
 Load a string and return a simplexml_element object to allow for processing
+
+NOT IMPLEMENTED.
 
 =cut
 

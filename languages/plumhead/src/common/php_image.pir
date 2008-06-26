@@ -17,6 +17,8 @@ php_image.pir - PHP image Standard Library
 
 Get the size of an image as 4-element array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getimagesize'
@@ -27,6 +29,8 @@ Get the size of an image as 4-element array
 
 Get file extension for image-type returned by getimagesize, exif_read_data, exif_thumbnail, exif_imagetype
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'image_type_to_extension'
@@ -36,6 +40,8 @@ Get file extension for image-type returned by getimagesize, exif_read_data, exif
 =item C<string image_type_to_mime_type(int imagetype)>
 
 Get Mime-Type for image-type returned by getimagesize, exif_read_data, exif_thumbnail, exif_imagetype
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_com_dotnet.pir - PHP com_dotnet  Library
 
 Determines the filename into which an object will be saved, or false if none is set, via IPersistFile::GetCurFile
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'COMPersistHelper::GetCurFile'
@@ -26,6 +28,8 @@ Determines the filename into which an object will be saved, or false if none is 
 =item C<int COMPersistHelper::GetMaxStreamSize()>
 
 Gets maximum stream size required to store the object data, via IPersistStream::GetSizeMax (or IPersistStreamInit::GetSizeMax)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Gets maximum stream size required to store the object data, via IPersistStream::
 
 Initializes the object to a default state, via IPersistStreamInit::InitNew
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'COMPersistHelper::InitNew'
@@ -46,6 +52,8 @@ Initializes the object to a default state, via IPersistStreamInit::InitNew
 =item C<bool COMPersistHelper::LoadFromFile(string filename [, int flags])>
 
 Load object data from file, via IPersistFile::Load
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Load object data from file, via IPersistFile::Load
 
 Initializes an object from the stream where it was previously saved, via IPersistStream::Load or OleLoadFromStream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'COMPersistHelper::LoadFromStream'
@@ -66,6 +76,8 @@ Initializes an object from the stream where it was previously saved, via IPersis
 =item C<bool COMPersistHelper::SaveToFile(string filename [, bool remember])>
 
 Persist object data to file, via IPersistFile::Save
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Persist object data to file, via IPersistFile::Save
 
 Saves the object to a stream, via IPersistStream::Save
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'COMPersistHelper::SaveToStream'
@@ -86,6 +100,8 @@ Saves the object to a stream, via IPersistStream::Save
 =item C<int COMPersistHelper::__construct([object com_object])>
 
 Creates a persistence helper object, usually associated with a com_object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Creates a persistence helper object, usually associated with a com_object
 
 Generate a globally unique identifier (GUID)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'com_create_guid'
@@ -106,6 +124,8 @@ Generate a globally unique identifier (GUID)
 =item C<bool com_event_sink(object comobject, object sinkobject [, mixed sinkinterface])>
 
 Connect events from a COM object to a PHP object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Connect events from a COM object to a PHP object
 
 Returns a handle to an already running instance of a COM object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'com_get_active_object'
@@ -126,6 +148,8 @@ Returns a handle to an already running instance of a COM object
 =item C<bool com_load_typelib(string typelib_name [, int case_insensitive])>
 
 Loads a Typelibrary and registers its constants
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Loads a Typelibrary and registers its constants
 
 Process COM messages, sleeping for up to timeoutms milliseconds
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'com_message_pump'
@@ -146,6 +172,8 @@ Process COM messages, sleeping for up to timeoutms milliseconds
 =item C<bool com_print_typeinfo(object comobject | string typelib, string dispinterface, bool wantsink)>
 
 Print out a PHP class definition for a dispatchable interface
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Print out a PHP class definition for a dispatchable interface
 
 Returns the absolute value of a variant
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_abs'
@@ -166,6 +196,8 @@ Returns the absolute value of a variant
 =item C<mixed variant_add(mixed left, mixed right)>
 
 "Adds" two variant values together and returns the result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Returns the absolute value of a variant
 
 performs a bitwise AND operation between two variants and returns the result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_and'
@@ -186,6 +220,8 @@ performs a bitwise AND operation between two variants and returns the result
 =item C<object variant_cast(object variant, int type)>
 
 Convert a variant into a new variant object of another type
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Convert a variant into a new variant object of another type
 
 concatenates two variant values together and returns the result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_cat'
@@ -206,6 +244,8 @@ concatenates two variant values together and returns the result
 =item C<int variant_cmp(mixed left, mixed right [, int lcid [, int flags]])>
 
 Compares two variants
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Compares two variants
 
 Returns a variant date representation of a unix timestamp
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_date_from_timestamp'
@@ -226,6 +268,8 @@ Returns a variant date representation of a unix timestamp
 =item C<int variant_date_to_timestamp(object variant)>
 
 Converts a variant date/time value to unix timestamp
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Converts a variant date/time value to unix timestamp
 
 Returns the result from dividing two variants
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_div'
@@ -246,6 +292,8 @@ Returns the result from dividing two variants
 =item C<mixed variant_eqv(mixed left, mixed right)>
 
 Performs a bitwise equivalence on two variants
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Performs a bitwise equivalence on two variants
 
 Returns the integer part ? of a variant
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_fix'
@@ -266,6 +316,8 @@ Returns the integer part ? of a variant
 =item C<int variant_get_type(object variant)>
 
 Returns the VT_XXX type code for a variant
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns the VT_XXX type code for a variant
 
 Converts variants to integers and then returns the result from dividing them
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_idiv'
@@ -286,6 +340,8 @@ Converts variants to integers and then returns the result from dividing them
 =item C<mixed variant_imp(mixed left, mixed right)>
 
 Performs a bitwise implication on two variants
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Performs a bitwise implication on two variants
 
 Returns the integer portion of a variant
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_int'
@@ -306,6 +364,8 @@ Returns the integer portion of a variant
 =item C<mixed variant_mod(mixed left, mixed right)>
 
 Divides two variants and returns only the remainder
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Divides two variants and returns only the remainder
 
 multiplies the values of the two variants and returns the result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_mul'
@@ -326,6 +388,8 @@ multiplies the values of the two variants and returns the result
 =item C<mixed variant_neg(mixed left)>
 
 Performs logical negation on a variant
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Performs logical negation on a variant
 
 Performs bitwise not negation on a variant
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_not'
@@ -346,6 +412,8 @@ Performs bitwise not negation on a variant
 =item C<mixed variant_or(mixed left, mixed right)>
 
 Performs a logical disjunction on two variants
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Performs a logical disjunction on two variants
 
 Returns the result of performing the power function with two variants
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_pow'
@@ -366,6 +436,8 @@ Returns the result of performing the power function with two variants
 =item C<mixed variant_round(mixed left, int decimals)>
 
 Rounds a variant to the specified number of decimal places
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Rounds a variant to the specified number of decimal places
 
 Assigns a new value for a variant object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_set'
@@ -386,6 +460,8 @@ Assigns a new value for a variant object
 =item C<void variant_set_type(object variant, int type)>
 
 Convert a variant into another type.  Variant is modified "in-place"
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Convert a variant into another type.  Variant is modified "in-place"
 
 subtracts the value of the right variant from the left variant value and returns the result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'variant_sub'
@@ -406,6 +484,8 @@ subtracts the value of the right variant from the left variant value and returns
 =item C<mixed variant_xor(mixed left, mixed right)>
 
 Performs a logical exclusion on two variants
+
+NOT IMPLEMENTED.
 
 =cut
 

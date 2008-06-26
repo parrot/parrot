@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<xsl:stylesheet 
+<xsl:stylesheet
   xmlns:phc="http://www.phpcompiler.org/phc-1.0"
   xmlns:past="http://www.parrotcode.org/PAST-0.1"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -8,7 +8,7 @@
 
 $Id$
 
-This transformation takes a XML abstract syntax tree as generated 
+This transformation takes a XML abstract syntax tree as generated
 by PHC from PHP source code. It generates an XML representation of a PAST data structure.
 
 -->
@@ -46,7 +46,7 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
   <past:Stmts>
     <xsl:apply-templates select="phc:AST_eval_expr" />
     <xsl:apply-templates select="phc:AST_if" />
-  </past:Stmts>                                                                  
+  </past:Stmts>
 </xsl:template>
 
 <xsl:template match="phc:AST_eval_expr" >
@@ -69,6 +69,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
   <xsl:apply-templates select="  phc:AST_method_invocation
                                | phc:Token_string
                                | phc:Token_int
+                               | phc:Token_bool
+                               | phc:Token_null
                                | phc:Token_real
                                | phc:AST_bin_op
                                | phc:AST_unary_op
@@ -185,14 +187,29 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
 </xsl:template>
 
 <xsl:template match="phc:Token_int" >
-  <past:Val returns="Integer" >
+  <past:Val returns="PhpInteger" >
     <xsl:attribute name="value" ><xsl:value-of select="phc:value" /></xsl:attribute>
+  </past:Val>
+</xsl:template>
+
+<xsl:template match="phc:Token_bool" >
+  <past:Val returns="PhpBoolean" >
+    <xsl:attribute name="value" ><xsl:choose>
+      <xsl:when test="phc:value = 'True'" >1</xsl:when>
+      <xsl:when test="phc:value = 'False'"   >0</xsl:when>
+    </xsl:choose></xsl:attribute>
+  </past:Val>
+</xsl:template>
+
+<xsl:template match="phc:Token_null" >
+  <past:Val returns="PhpUndef" >
+    <xsl:attribute name="value" >0</xsl:attribute>
   </past:Val>
 </xsl:template>
 
 <!-- looks like phc is running into a floating point issue -->
 <xsl:template match="phc:Token_real" >
-  <past:Val returns='Float' >
+  <past:Val returns='PhpFloat' >
     <xsl:attribute name="value" ><xsl:value-of select="phc:source_rep" /></xsl:attribute>
   </past:Val>
 </xsl:template>

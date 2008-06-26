@@ -17,6 +17,8 @@ php_xmlreader.pir - PHP xmlreader  Library
 
 Sets the string that the the XMLReader will parse.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::XML'
@@ -26,6 +28,8 @@ Sets the string that the the XMLReader will parse.
 =item C<boolean XMLReader::close()>
 
 Closes xmlreader - current frees resources until xmlTextReaderClose is fixed in libxml
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Closes xmlreader - current frees resources until xmlTextReaderClose is fixed in 
 
 Moves the position of the current instance to the next node in the stream.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::expand'
@@ -46,6 +52,8 @@ Moves the position of the current instance to the next node in the stream.
 =item C<string XMLReader::getAttribute(string name)>
 
 Get value of an attribute from current element
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Get value of an attribute from current element
 
 Get value of an attribute at index from current element
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::getAttributeNo'
@@ -67,6 +77,8 @@ Get value of an attribute at index from current element
 
 Get value of a attribute via name and namespace from current element
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::getAttributeNs'
@@ -76,6 +88,8 @@ Get value of a attribute via name and namespace from current element
 =item C<boolean XMLReader::getParserProperty(int property)>
 
 Indicates whether given property (one of the parser option constants) is set or not on parser
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -89,6 +103,8 @@ Returns boolean indicating if parsed document is valid or not.
 Must set XMLREADER_LOADDTD or XMLREADER_VALIDATE parser option prior to the first call to read
 or this method will always return FALSE
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::isValid'
@@ -99,6 +115,8 @@ or this method will always return FALSE
 
 Return namespaceURI for associated prefix on current node
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::lookupNamespace'
@@ -108,6 +126,8 @@ Return namespaceURI for associated prefix on current node
 =item C<boolean XMLReader::moveToAttribute(string name)>
 
 Positions reader at specified attribute - Returns TRUE on success and FALSE on failure
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -120,6 +140,8 @@ Positions reader at specified attribute - Returns TRUE on success and FALSE on f
 Positions reader at attribute at spcecified index.
 Returns TRUE on success and FALSE on failure
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::moveToAttributeNo'
@@ -131,6 +153,8 @@ Returns TRUE on success and FALSE on failure
 Positions reader at attribute spcified by name and namespaceURI.
 Returns TRUE on success and FALSE on failure
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::moveToAttributeNs'
@@ -140,6 +164,8 @@ Returns TRUE on success and FALSE on failure
 =item C<boolean XMLReader::moveToElement()>
 
 Moves the position of the current instance to the node that contains the current Attribute node.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -151,6 +177,8 @@ Moves the position of the current instance to the node that contains the current
 
 Moves the position of the current instance to the first attribute associated with the current node.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::moveToFirstAttribute'
@@ -160,6 +188,8 @@ Moves the position of the current instance to the first attribute associated wit
 =item C<boolean XMLReader::moveToNextAttribute()>
 
 Moves the position of the current instance to the next attribute associated with the current node.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -171,6 +201,8 @@ Moves the position of the current instance to the next attribute associated with
 
 Moves the position of the current instance to the next node in the stream.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::next'
@@ -180,6 +212,8 @@ Moves the position of the current instance to the next node in the stream.
 =item C<boolean XMLReader::open(string URI [, string encoding [, int options]])>
 
 Sets the URI that the the XMLReader will parse.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -191,6 +225,8 @@ Sets the URI that the the XMLReader will parse.
 
 Moves the position of the current instance to the next node in the stream.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::read'
@@ -200,6 +236,8 @@ Moves the position of the current instance to the next node in the stream.
 =item C<boolean XMLReader::readInnerXml()>
 
 Reads the contents of the current node, including child nodes and markup.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -211,6 +249,8 @@ Reads the contents of the current node, including child nodes and markup.
 
 Reads the contents of the current node, including child nodes and markup.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::readOuterXml'
@@ -220,6 +260,8 @@ Reads the contents of the current node, including child nodes and markup.
 =item C<boolean XMLReader::readString()>
 
 Reads the contents of an element or a text node as a string.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -232,6 +274,8 @@ Reads the contents of an element or a text node as a string.
 Sets parser property (one of the parser option constants).
 Properties must be set after open() or XML() and before the first read() is called
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::setParserProperty'
@@ -241,6 +285,8 @@ Properties must be set after open() or XML() and before the first read() is call
 =item C<boolean XMLReader::setRelaxNGSchema(string filename)>
 
 Sets the string that the the XMLReader will parse.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -252,6 +298,8 @@ Sets the string that the the XMLReader will parse.
 
 Sets the string that the the XMLReader will parse.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'XMLReader::setRelaxNGSchemaSource'
@@ -261,6 +309,8 @@ Sets the string that the the XMLReader will parse.
 =item C<boolean XMLReader::setSchema(string filename)>
 
 Use W3C XSD schema to validate the document as it is processed. Activation is only possible before the first Read().
+
+NOT IMPLEMENTED.
 
 =cut
 

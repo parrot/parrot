@@ -17,6 +17,8 @@ php_pdo.pir - PHP pdo  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::__construct'
@@ -26,6 +28,8 @@ php_pdo.pir - PHP pdo  Library
 =item C<int PDO::__sleep()>
 
 Prevents serialization of a PDO instance
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Prevents serialization of a PDO instance
 
 Prevents use of a PDO instance that has been unserialized
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::__wakeup'
@@ -46,6 +52,8 @@ Prevents use of a PDO instance that has been unserialized
 =item C<bool PDO::beginTransaction()>
 
 Initiates a transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Initiates a transaction
 
 Commit a transaction
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::commit'
@@ -66,6 +76,8 @@ Commit a transaction
 =item C<string PDO::errorCode()>
 
 Fetch the error code associated with the last operation on the database handle
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Fetch the error code associated with the last operation on the database handle
 
 Fetch extended error information associated with the last operation on the database handle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::errorInfo'
@@ -86,6 +100,8 @@ Fetch extended error information associated with the last operation on the datab
 =item C<long PDO::exec(string query)>
 
 Execute a query that does not return a row set, returning the number of affected rows
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Execute a query that does not return a row set, returning the number of affected
 
 Get an attribute
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::getAttribute'
@@ -106,6 +124,8 @@ Get an attribute
 =item C<string PDO::lastInsertId([string seqname])>
 
 Returns the id of the last row that we affected on this connection.  Some databases require a sequence or table name to be passed in.  Not always meaningful.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns the id of the last row that we affected on this connection.  Some databa
 
 Prepares a statement for execution and returns a statement object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::prepare'
@@ -126,6 +148,8 @@ Prepares a statement for execution and returns a statement object
 =item C<object PDO::query(string sql [, PDOStatement::setFetchMode() args])>
 
 Prepare and execute $sql; returns the statement object for iteration
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Prepare and execute $sql; returns the statement object for iteration
 
 quotes string for use in a query.  The optional paramtype acts as a hint for drivers that have alternate quoting styles.  The default value is PDO_PARAM_STR
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::quote'
@@ -146,6 +172,8 @@ quotes string for use in a query.  The optional paramtype acts as a hint for dri
 =item C<bool PDO::rollBack()>
 
 roll back a transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ roll back a transaction
 
 Set an attribute
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::setAttribute'
@@ -166,6 +196,8 @@ Set an attribute
 =item C<int PDOStatement::__sleep()>
 
 Prevents serialization of a PDOStatement instance
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Prevents serialization of a PDOStatement instance
 
 Prevents use of a PDOStatement instance that has been unserialized
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::__wakeup'
@@ -186,6 +220,8 @@ Prevents use of a PDOStatement instance that has been unserialized
 =item C<bool PDOStatement::bindColumn(mixed $column, mixed &$param [, int $type [, int $maxlen [, mixed $driverdata]]])>
 
 bind a column to a PHP variable.  On each row fetch $param will contain the value of the corresponding column.  $column is the 1-based offset of the column, or the column name.  For portability, don't call this before execute().
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ bind a column to a PHP variable.  On each row fetch $param will contain the valu
 
 bind a parameter to a PHP variable.  $paramno is the 1-based position of the placeholder in the SQL statement (but can be the parameter name for drivers that support named placeholders).  This isn't supported by all drivers.  It should be called prior to execute().
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::bindParam'
@@ -206,6 +244,8 @@ bind a parameter to a PHP variable.  $paramno is the 1-based position of the pla
 =item C<bool PDOStatement::bindValue(mixed $paramno, mixed $param [, int $type ])>
 
 bind an input parameter to the value of a PHP variable.  $paramno is the 1-based position of the placeholder in the SQL statement (but can be the parameter name for drivers that support named placeholders).  It should be called prior to execute().
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ bind an input parameter to the value of a PHP variable.  $paramno is the 1-based
 
 Closes the cursor, leaving the statement ready for re-execution.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::closeCursor'
@@ -226,6 +268,8 @@ Closes the cursor, leaving the statement ready for re-execution.
 =item C<int PDOStatement::columnCount()>
 
 Returns the number of columns in the result set
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Returns the number of columns in the result set
 
 A utility for internals hackers to debug parameter internals
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::debugDumpParams'
@@ -246,6 +292,8 @@ A utility for internals hackers to debug parameter internals
 =item C<string PDOStatement::errorCode()>
 
 Fetch the error code associated with the last operation on the statement handle
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Fetch the error code associated with the last operation on the statement handle
 
 Fetch extended error information associated with the last operation on the statement handle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::errorInfo'
@@ -266,6 +316,8 @@ Fetch extended error information associated with the last operation on the state
 =item C<bool PDOStatement::execute([array $bound_input_params])>
 
 Execute a prepared statement, optionally binding parameters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Execute a prepared statement, optionally binding parameters
 
 Fetches the next row and returns it, or false if there are no more rows
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::fetch'
@@ -286,6 +340,8 @@ Fetches the next row and returns it, or false if there are no more rows
 =item C<array PDOStatement::fetchAll([int $how = PDO_FETCH_BOTH [, string class_name [, NULL|array ctor_args]]])>
 
 Returns an array of all of the results.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Returns an array of all of the results.
 
 Returns a data of the specified column in the result set.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::fetchColumn'
@@ -306,6 +364,8 @@ Returns a data of the specified column in the result set.
 =item C<mixed PDOStatement::fetchObject(string class_name [, NULL|array ctor_args])>
 
 Fetches the next row and returns it as an object.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Fetches the next row and returns it as an object.
 
 Get an attribute
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::getAttribute'
@@ -326,6 +388,8 @@ Get an attribute
 =item C<array PDOStatement::getColumnMeta(int $column)>
 
 Returns meta data for a numbered column
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Returns meta data for a numbered column
 
 Advances to the next rowset in a multi-rowset statement handle. Returns true if it succeded, false otherwise
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::nextRowset'
@@ -346,6 +412,8 @@ Advances to the next rowset in a multi-rowset statement handle. Returns true if 
 =item C<int PDOStatement::rowCount()>
 
 Returns the number of rows in a result set, or the number of rows affected by the last execute().  It is not always meaningful.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Returns the number of rows in a result set, or the number of rows affected by th
 
 Set an attribute
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDOStatement::setAttribute'
@@ -366,6 +436,8 @@ Set an attribute
 =item C<bool PDOStatement::setFetchMode(int mode [mixed* params])>
 
 Changes the default fetch mode for subsequent fetches (params have different meaning for different fetch modes)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Changes the default fetch mode for subsequent fetches (params have different mea
 
 Return array of available PDO drivers
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'pdo_drivers'
@@ -386,6 +460,8 @@ Return array of available PDO drivers
 =item C<array pdo_drivers()>
 
 Return array of available PDO drivers
+
+NOT IMPLEMENTED.
 
 =cut
 

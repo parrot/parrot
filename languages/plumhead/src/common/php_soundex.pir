@@ -17,6 +17,8 @@ php_soundex.pir - PHP soundex Standard Library
 
 Calculate the soundex key of a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'soundex'

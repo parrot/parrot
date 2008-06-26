@@ -17,6 +17,8 @@ php_crypt.pir - PHP crypt Standard Library
 
 Encrypt a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'crypt'

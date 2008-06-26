@@ -17,6 +17,8 @@ php_user_filters.pir - PHP user_filters Standard Library
 
 Append bucket to brigade
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_bucket_append'
@@ -26,6 +28,8 @@ Append bucket to brigade
 =item C<object stream_bucket_make_writeable(resource brigade)>
 
 Return a bucket object from the brigade for operating on
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Return a bucket object from the brigade for operating on
 
 Create a new bucket for use on the current stream
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_bucket_new'
@@ -46,6 +52,8 @@ Create a new bucket for use on the current stream
 =item C<void stream_bucket_prepend(resource brigade, resource bucket)>
 
 Prepend bucket to brigade
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Prepend bucket to brigade
 
 Registers a custom filter handler class
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'stream_filter_register'
@@ -66,6 +76,8 @@ Registers a custom filter handler class
 =item C<array stream_get_filters(void)>
 
 Returns a list of registered filters
+
+NOT IMPLEMENTED.
 
 =cut
 

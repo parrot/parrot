@@ -17,6 +17,8 @@ php_mysqli.pir - PHP mysqli  Library
 
 Get number of affected rows in previous MySQL operation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_affected_rows'
@@ -26,6 +28,8 @@ Get number of affected rows in previous MySQL operation
 =item C<bool mysqli_autocommit(object link, bool mode)>
 
 Turn auto commit on or of
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Turn auto commit on or of
 
 Change logged-in user of the active connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_change_user'
@@ -46,6 +52,8 @@ Change logged-in user of the active connection
 =item C<string mysqli_character_set_name(object link)>
 
 Returns the name of the character set used for this connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Returns the name of the character set used for this connection
 
 Close connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_close'
@@ -66,6 +76,8 @@ Close connection
 =item C<bool mysqli_commit(object link)>
 
 Commit outstanding actions and close transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Commit outstanding actions and close transaction
 
 Open a connection to a mysql server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_connect'
@@ -86,6 +100,8 @@ Open a connection to a mysql server
 =item C<int mysqli_connect_errno(void)>
 
 Returns the numerical value of the error message from last connect command
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the numerical value of the error message from last connect command
 
 Returns the text of the error message from previous MySQL operation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_connect_error'
@@ -106,6 +124,8 @@ Returns the text of the error message from previous MySQL operation
 =item C<bool mysqli_data_seek(object result, int offset)>
 
 Move internal result pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Move internal result pointer
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_debug'
@@ -126,6 +148,8 @@ Move internal result pointer
 =item C<void mysqli_disable_reads_from_master(object link)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Move internal result pointer
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_disable_rpl_parse'
@@ -146,6 +172,8 @@ Move internal result pointer
 =item C<bool mysqli_dump_debug_info(object link)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Move internal result pointer
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_embedded_server_end'
@@ -166,6 +196,8 @@ Move internal result pointer
 =item C<bool mysqli_embedded_server_start(bool start, array arguments, array groups)>
 
 initialize and start embedded server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ initialize and start embedded server
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_enable_reads_from_master'
@@ -186,6 +220,8 @@ initialize and start embedded server
 =item C<void mysqli_enable_rpl_parse(object link)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ initialize and start embedded server
 
 Returns the numerical value of the error message from previous MySQL operation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_errno'
@@ -206,6 +244,8 @@ Returns the numerical value of the error message from previous MySQL operation
 =item C<string mysqli_error(object link)>
 
 Returns the text of the error message from previous MySQL operation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Returns the text of the error message from previous MySQL operation
 
 Fetch a result row as an associative array, a numeric array, or both
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_fetch_array'
@@ -226,6 +268,8 @@ Fetch a result row as an associative array, a numeric array, or both
 =item C<mixed mysqli_fetch_assoc(object result)>
 
 Fetch a result row as an associative array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Fetch a result row as an associative array
 
 Get column information from a result and return as an object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_fetch_field'
@@ -246,6 +292,8 @@ Get column information from a result and return as an object
 =item C<mixed mysqli_fetch_field_direct(object result, int offset)>
 
 Fetch meta-data for a single field
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Fetch meta-data for a single field
 
 Return array of objects containing field meta-data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_fetch_fields'
@@ -266,6 +316,8 @@ Return array of objects containing field meta-data
 =item C<mixed mysqli_fetch_lengths(object result)>
 
 Get the length of each output in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Get the length of each output in a result
 
 Fetch a result row as an object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_fetch_object'
@@ -286,6 +340,8 @@ Fetch a result row as an object
 =item C<array mysqli_fetch_row(object result)>
 
 Get a result row as an enumerated array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -298,6 +354,8 @@ Get a result row as an enumerated array
 Fetch the number of fields returned by the last query for the given link
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_field_count'
@@ -309,6 +367,8 @@ Fetch the number of fields returned by the last query for the given link
 Set result pointer to a specified field offset
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_field_seek'
@@ -318,6 +378,8 @@ Set result pointer to a specified field offset
 =item C<int mysqli_field_tell(object result)>
 
 Get current field offset of result pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -329,6 +391,8 @@ Get current field offset of result pointer
 
 Free query result memory for the given result handle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_free_result'
@@ -338,6 +402,8 @@ Free query result memory for the given result handle
 =item C<object mysqli_get_charset(object link)>
 
 returns a character set object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -349,6 +415,8 @@ returns a character set object
 
 Get MySQL client info
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_get_client_info'
@@ -358,6 +426,8 @@ Get MySQL client info
 =item C<int mysqli_get_client_version(void)>
 
 Get MySQL client info
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -369,6 +439,8 @@ Get MySQL client info
 
 Get MySQL host info
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_get_host_info'
@@ -378,6 +450,8 @@ Get MySQL host info
 =item C<int mysqli_get_proto_info(object link)>
 
 Get MySQL protocol information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -389,6 +463,8 @@ Get MySQL protocol information
 
 Get MySQL server info
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_get_server_info'
@@ -398,6 +474,8 @@ Get MySQL server info
 =item C<int mysqli_get_server_version(object link)>
 
 Return the MySQL version for the server referenced by the given link
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -409,6 +487,8 @@ Return the MySQL version for the server referenced by the given link
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_get_warnings'
@@ -418,6 +498,8 @@ Return the MySQL version for the server referenced by the given link
 =item C<string mysqli_info(object link)>
 
 Get information about the most recent query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -429,6 +511,8 @@ Get information about the most recent query
 
 Initialize mysqli and return a resource for use with mysql_real_connect
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_init'
@@ -438,6 +522,8 @@ Initialize mysqli and return a resource for use with mysql_real_connect
 =item C<mixed mysqli_insert_id(object link)>
 
 Get the ID generated from the previous INSERT operation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -449,6 +535,8 @@ Get the ID generated from the previous INSERT operation
 
 Kill a mysql process on the server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_kill'
@@ -458,6 +546,8 @@ Kill a mysql process on the server
 =item C<bool mysqli_master_query(object link, string query)>
 
 Enforce execution of a query on the master in a master/slave setup
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -469,6 +559,8 @@ Enforce execution of a query on the master in a master/slave setup
 
 check if there any more query results from a multi query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_more_results'
@@ -478,6 +570,8 @@ check if there any more query results from a multi query
 =item C<bool mysqli_multi_query(object link, string query)>
 
 Binary-safe version of mysql_query()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -489,6 +583,8 @@ Binary-safe version of mysql_query()
 
 read next result from multi_query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_next_result'
@@ -498,6 +594,8 @@ read next result from multi_query
 =item C<int mysqli_num_fields(object result)>
 
 Get number of fields in result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -509,6 +607,8 @@ Get number of fields in result
 
 Get number of rows in result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_num_rows'
@@ -518,6 +618,8 @@ Get number of rows in result
 =item C<bool mysqli_options(object link, int flags, mixed values)>
 
 Set options
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -529,6 +631,8 @@ Set options
 
 Ping a server connection or reconnect if there is no connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_ping'
@@ -538,6 +642,8 @@ Ping a server connection or reconnect if there is no connection
 =item C<mixed mysqli_prepare(object link, string query)>
 
 Prepare a SQL statement for execution
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -549,6 +655,8 @@ Prepare a SQL statement for execution
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_query'
@@ -558,6 +666,8 @@ Prepare a SQL statement for execution
 =item C<bool mysqli_real_connect(object link [,string hostname [,string username [,string passwd [,string dbname [,int port [,string socket [,int flags]]]]]]])>
 
 Open a connection to a mysql server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -569,6 +679,8 @@ Open a connection to a mysql server
 
 Escapes special characters in a string for use in a SQL statement, taking into account the current charset of the connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_real_escape_string'
@@ -578,6 +690,8 @@ Escapes special characters in a string for use in a SQL statement, taking into a
 =item C<bool mysqli_real_query(object link, string query)>
 
 Binary-safe version of mysql_query()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -589,6 +703,8 @@ Binary-safe version of mysql_query()
 
 sets report level
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_report'
@@ -598,6 +714,8 @@ sets report level
 =item C<bool mysqli_rollback(object link)>
 
 Undo actions from current transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -609,6 +727,8 @@ Undo actions from current transaction
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_rpl_parse_enabled'
@@ -618,6 +738,8 @@ Undo actions from current transaction
 =item C<bool mysqli_rpl_probe(object link)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -629,6 +751,8 @@ Undo actions from current transaction
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_rpl_query_type'
@@ -638,6 +762,8 @@ Undo actions from current transaction
 =item C<string mysqli_select_db(object link, string dbname)>
 
 Select a MySQL database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -649,6 +775,8 @@ Select a MySQL database
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_send_query'
@@ -658,6 +786,8 @@ Select a MySQL database
 =item C<bool mysqli_set_charset(object link, string csname)>
 
 sets client character set
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -669,6 +799,8 @@ sets client character set
 
 unsets user defined handler for load local infile command
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_set_local_infile_default'
@@ -678,6 +810,8 @@ unsets user defined handler for load local infile command
 =item C<bool mysqli_set_local_infile_handler(object link, callback read_func)>
 
 Set callback functions for LOAD DATA LOCAL INFILE
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -689,6 +823,8 @@ Set callback functions for LOAD DATA LOCAL INFILE
 
 Enforce execution of a query on a slave in a master/slave setup
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_slave_query'
@@ -698,6 +834,8 @@ Enforce execution of a query on a slave in a master/slave setup
 =item C<string mysqli_sqlstate(object link)>
 
 Returns the SQLSTATE error from previous MySQL operation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -709,6 +847,8 @@ Returns the SQLSTATE error from previous MySQL operation
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_ssl_set'
@@ -718,6 +858,8 @@ Returns the SQLSTATE error from previous MySQL operation
 =item C<mixed mysqli_stat(object link)>
 
 Get current system status
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -729,6 +871,8 @@ Get current system status
 
 Return the number of rows affected in the last query for the given link
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_affected_rows'
@@ -738,6 +882,8 @@ Return the number of rows affected in the last query for the given link
 =item C<int mysqli_stmt_attr_get(object stmt, long attr)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -749,6 +895,8 @@ Return the number of rows affected in the last query for the given link
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_attr_set'
@@ -758,6 +906,8 @@ Return the number of rows affected in the last query for the given link
 =item C<bool mysqli_stmt_bind_param(object stmt, string types, mixed variable [,mixed,....])>
 
 Bind variables to a prepared statement as parameters
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -769,6 +919,8 @@ Bind variables to a prepared statement as parameters
 
 Bind variables to a prepared statement for result storage
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_bind_result'
@@ -778,6 +930,8 @@ Bind variables to a prepared statement for result storage
 =item C<bool mysqli_stmt_close(object stmt)>
 
 Close statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -789,6 +943,8 @@ Close statement
 
 Move internal result pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_data_seek'
@@ -798,6 +954,8 @@ Move internal result pointer
 =item C<int mysqli_stmt_errno(object stmt)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -809,6 +967,8 @@ Move internal result pointer
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_error'
@@ -818,6 +978,8 @@ Move internal result pointer
 =item C<bool mysqli_stmt_execute(object stmt)>
 
 Execute a prepared statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -829,6 +991,8 @@ Execute a prepared statement
 
 Fetch results from a prepared statement into the bound variables
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_fetch'
@@ -838,6 +1002,8 @@ Fetch results from a prepared statement into the bound variables
 =item C<int mysqli_stmt_field_count(object stmt)>
 
 Return the number of result columns for the given statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -849,6 +1015,8 @@ Return the number of result columns for the given statement
 
 Free stored result memory for the given statement handle
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_free_result'
@@ -858,6 +1026,8 @@ Free stored result memory for the given statement handle
 =item C<object mysqli_stmt_get_warnings(object link)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -870,6 +1040,8 @@ Free stored result memory for the given statement handle
 Initialize statement object
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_init'
@@ -879,6 +1051,8 @@ Initialize statement object
 =item C<mixed mysqli_stmt_insert_id(object stmt)>
 
 Get the ID generated from the previous INSERT operation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -890,6 +1064,8 @@ Get the ID generated from the previous INSERT operation
 
 Return the number of rows in statements result set
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_num_rows'
@@ -899,6 +1075,8 @@ Return the number of rows in statements result set
 =item C<int mysqli_stmt_param_count(object stmt)>
 
 Return the number of parameter for the given statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -911,6 +1089,8 @@ Return the number of parameter for the given statement
 prepare server side statement with query
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_prepare'
@@ -920,6 +1100,8 @@ prepare server side statement with query
 =item C<bool mysqli_stmt_reset(object stmt)>
 
 reset a prepared statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -931,6 +1113,8 @@ reset a prepared statement
 
 return result set from statement
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_result_metadata'
@@ -940,6 +1124,8 @@ return result set from statement
 =item C<bool mysqli_stmt_send_long_data(object stmt, int param_nr, string data)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -951,6 +1137,8 @@ return result set from statement
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_stmt_sqlstate'
@@ -960,6 +1148,8 @@ return result set from statement
 =item C<bool mysqli_stmt_store_result(stmt)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -971,6 +1161,8 @@ return result set from statement
 
 Buffer result set on client
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_store_result'
@@ -980,6 +1172,8 @@ Buffer result set on client
 =item C<int mysqli_thread_id(object link)>
 
 Return the current thread ID
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -991,6 +1185,8 @@ Return the current thread ID
 
 Return whether thread safety is given or not
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_thread_safe'
@@ -1001,6 +1197,8 @@ Return whether thread safety is given or not
 
 Directly retrieve query results - do not buffer results on client side
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysqli_use_result'
@@ -1010,6 +1208,8 @@ Directly retrieve query results - do not buffer results on client side
 =item C<int mysqli_warning_count(object link)>
 
 Return number of warnings from the last query for the given link
+
+NOT IMPLEMENTED.
 
 =cut
 

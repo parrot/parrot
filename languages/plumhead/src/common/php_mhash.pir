@@ -17,6 +17,8 @@ php_mhash.pir - PHP mhash  Library
 
 Hash data with hash
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mhash'
@@ -26,6 +28,8 @@ Hash data with hash
 =item C<int mhash_count(void)>
 
 Gets the number of available hashes
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Gets the number of available hashes
 
 Gets the block size of hash
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mhash_get_block_size'
@@ -47,6 +53,8 @@ Gets the block size of hash
 
 Gets the name of hash
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mhash_get_hash_name'
@@ -56,6 +64,8 @@ Gets the name of hash
 =item C<string mhash_keygen_s2k(int hash, string input_password, string salt, int bytes)>
 
 Generates a key using hash functions
+
+NOT IMPLEMENTED.
 
 =cut
 

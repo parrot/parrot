@@ -17,6 +17,8 @@ php_wddx.pir - PHP wddx  Library
 
 Serializes given variables and adds them to packet given by packet_id
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'wddx_add_vars'
@@ -26,6 +28,8 @@ Serializes given variables and adds them to packet given by packet_id
 =item C<mixed wddx_deserialize(mixed packet)>
 
 Deserializes given packet and returns a PHP value
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Deserializes given packet and returns a PHP value
 
 Ends specified WDDX packet and returns the string containing the packet
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'wddx_packet_end'
@@ -46,6 +52,8 @@ Ends specified WDDX packet and returns the string containing the packet
 =item C<int wddx_packet_start([string comment])>
 
 Starts a WDDX packet with optional comment and returns the packet id
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Starts a WDDX packet with optional comment and returns the packet id
 
 Creates a new packet and serializes the given value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'wddx_serialize_value'
@@ -66,6 +76,8 @@ Creates a new packet and serializes the given value
 =item C<string wddx_serialize_vars(mixed var_name [, mixed ...])>
 
 Creates a new packet and serializes given variables into a struct
+
+NOT IMPLEMENTED.
 
 =cut
 

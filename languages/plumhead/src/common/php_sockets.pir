@@ -17,6 +17,8 @@ php_sockets.pir - PHP sockets  Library
 
 Accepts a connection on the listening socket fd
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_accept'
@@ -26,6 +28,8 @@ Accepts a connection on the listening socket fd
 =item C<bool socket_bind(resource socket, string addr [, int port])>
 
 Binds an open socket to a listening port, port is only specified in AF_INET family.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Binds an open socket to a listening port, port is only specified in AF_INET fami
 
 Clears the error on the socket or the last error code.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_clear_error'
@@ -46,6 +52,8 @@ Clears the error on the socket or the last error code.
 =item C<void socket_close(resource socket)>
 
 Closes a file descriptor
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Closes a file descriptor
 
 Opens a connection to addr:port on the socket specified by socket
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_connect'
@@ -66,6 +76,8 @@ Opens a connection to addr:port on the socket specified by socket
 =item C<resource socket_create(int domain, int type, int protocol)>
 
 Creates an endpoint for communication in the domain specified by domain, of type specified by type
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Creates an endpoint for communication in the domain specified by domain, of type
 
 Opens a socket on port to accept connections
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_create_listen'
@@ -86,6 +100,8 @@ Opens a socket on port to accept connections
 =item C<bool socket_create_pair(int domain, int type, int protocol, array &fd)>
 
 Creates a pair of indistinguishable sockets and stores them in fds.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Creates a pair of indistinguishable sockets and stores them in fds.
 
 Gets socket options for the socket
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_get_option'
@@ -106,6 +124,8 @@ Gets socket options for the socket
 =item C<bool socket_getpeername(resource socket, string &addr[, int &port])>
 
 Queries the remote side of the given socket which may either result in host/port or in a UNIX filesystem path, dependent on its type.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Queries the remote side of the given socket which may either result in host/port
 
 Queries the remote side of the given socket which may either result in host/port or in a UNIX filesystem path, dependent on its type.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_getsockname'
@@ -126,6 +148,8 @@ Queries the remote side of the given socket which may either result in host/port
 =item C<int socket_last_error([resource socket])>
 
 Returns the last socket error (either the last used or the provided socket resource)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Returns the last socket error (either the last used or the provided socket resou
 
 Sets the maximum number of connections allowed to be waited for on the socket specified by fd
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_listen'
@@ -146,6 +172,8 @@ Sets the maximum number of connections allowed to be waited for on the socket sp
 =item C<string socket_read(resource socket, int length [, int type])>
 
 Reads a maximum of length bytes from socket
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Reads a maximum of length bytes from socket
 
 Receives data from a connected socket
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_recv'
@@ -166,6 +196,8 @@ Receives data from a connected socket
 =item C<int socket_recvfrom(resource socket, string &buf, int len, int flags, string &name [, int &port])>
 
 Receives data from a socket, connected or not
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Receives data from a socket, connected or not
 
 Runs the select() system call on the sets mentioned with a timeout specified by tv_sec and tv_usec
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_select'
@@ -186,6 +220,8 @@ Runs the select() system call on the sets mentioned with a timeout specified by 
 =item C<int socket_send(resource socket, string buf, int len, int flags)>
 
 Sends data to a connected socket
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Sends data to a connected socket
 
 Sends a message to a socket, whether it is connected or not
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_sendto'
@@ -206,6 +244,8 @@ Sends a message to a socket, whether it is connected or not
 =item C<bool socket_set_block(resource socket)>
 
 Sets blocking mode on a socket resource
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Sets blocking mode on a socket resource
 
 Sets nonblocking mode on a socket resource
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_set_nonblock'
@@ -226,6 +268,8 @@ Sets nonblocking mode on a socket resource
 =item C<bool socket_set_option(resource socket, int level, int optname, int|array optval)>
 
 Sets socket options for the socket
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Sets socket options for the socket
 
 Shuts down a socket for receiving, sending, or both.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_shutdown'
@@ -247,6 +293,8 @@ Shuts down a socket for receiving, sending, or both.
 
 Returns a string describing an error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'socket_strerror'
@@ -256,6 +304,8 @@ Returns a string describing an error
 =item C<int socket_write(resource socket, string buf[, int length])>
 
 Writes the buffer to the socket resource, length is optional
+
+NOT IMPLEMENTED.
 
 =cut
 

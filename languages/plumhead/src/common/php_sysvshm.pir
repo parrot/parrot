@@ -17,6 +17,8 @@ php_sysvshm.pir - PHP sysvshm  Library
 
 Creates or open a shared memory segment
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'shm_attach'
@@ -26,6 +28,8 @@ Creates or open a shared memory segment
 =item C<bool shm_detach(int shm_identifier)>
 
 Disconnects from shared memory segment
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Disconnects from shared memory segment
 
 Returns a variable from shared memory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'shm_get_var'
@@ -46,6 +52,8 @@ Returns a variable from shared memory
 =item C<bool shm_put_var(int shm_identifier, int variable_key, mixed variable)>
 
 Inserts or updates a variable in shared memory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Inserts or updates a variable in shared memory
 
 Removes shared memory from Unix systems
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'shm_remove'
@@ -66,6 +76,8 @@ Removes shared memory from Unix systems
 =item C<bool shm_remove_var(int id, int variable_key)>
 
 Removes variable from shared memory
+
+NOT IMPLEMENTED.
 
 =cut
 

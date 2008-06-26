@@ -17,6 +17,8 @@ php_mssql.pir - PHP mssql  Library
 
 Adds a parameter to a stored procedure or a remote stored procedure
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_bind'
@@ -26,6 +28,8 @@ Adds a parameter to a stored procedure or a remote stored procedure
 =item C<bool mssql_close([resource conn_id])>
 
 Closes a connection to a MS-SQL server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Closes a connection to a MS-SQL server
 
 Establishes a connection to a MS-SQL server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_connect'
@@ -46,6 +52,8 @@ Establishes a connection to a MS-SQL server
 =item C<bool mssql_data_seek(resource result_id, int offset)>
 
 Moves the internal row pointer of the MS-SQL result associated with the specified result identifier to pointer to the specified row number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Moves the internal row pointer of the MS-SQL result associated with the specifie
 
 Executes a stored procedure on a MS-SQL server database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_execute'
@@ -66,6 +76,8 @@ Executes a stored procedure on a MS-SQL server database
 =item C<array mssql_fetch_array(resource result_id [, int result_type])>
 
 Returns an associative array of the current row in the result set specified by result_id
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns an associative array of the current row in the result set specified by r
 
 Returns an associative array of the current row in the result set specified by result_id
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_fetch_assoc'
@@ -86,6 +100,8 @@ Returns an associative array of the current row in the result set specified by r
 =item C<int mssql_fetch_batch(resource result_index)>
 
 Returns the next batch of records
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the next batch of records
 
 Gets information about certain fields in a query result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_fetch_field'
@@ -106,6 +124,8 @@ Gets information about certain fields in a query result
 =item C<object mssql_fetch_object(resource result_id [, int result_type])>
 
 Returns a psuedo-object of the current row in the result set specified by result_id
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns a psuedo-object of the current row in the result set specified by result
 
 Returns an array of the current row in the result set specified by result_id
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_fetch_row'
@@ -126,6 +148,8 @@ Returns an array of the current row in the result set specified by result_id
 =item C<int mssql_field_length(resource result_id [, int offset])>
 
 Get the length of a MS-SQL field
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get the length of a MS-SQL field
 
 Returns the name of the field given by offset in the result set given by result_id
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_field_name'
@@ -146,6 +172,8 @@ Returns the name of the field given by offset in the result set given by result_
 =item C<bool mssql_field_seek(int result_id, int offset)>
 
 Seeks to the specified field offset
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Seeks to the specified field offset
 
 Returns the type of a field
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_field_type'
@@ -166,6 +196,8 @@ Returns the type of a field
 =item C<bool mssql_free_result(resource result_index)>
 
 Free a MS-SQL result index
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Free a MS-SQL result index
 
 Free a MS-SQL statement index
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_free_statement'
@@ -186,6 +220,8 @@ Free a MS-SQL statement index
 =item C<string mssql_get_last_message(void)>
 
 Gets the last message from the MS-SQL server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Gets the last message from the MS-SQL server
 
 Converts a 16 byte binary GUID to a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_guid_string'
@@ -206,6 +244,8 @@ Converts a 16 byte binary GUID to a string
 =item C<int mssql_init(string sp_name [, resource conn_id])>
 
 Initializes a stored procedure or a remote stored procedure
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Initializes a stored procedure or a remote stored procedure
 
 Sets the lower error severity
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_min_error_severity'
@@ -226,6 +268,8 @@ Sets the lower error severity
 =item C<void mssql_min_message_severity(int severity)>
 
 Sets the lower message severity
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Sets the lower message severity
 
 Move the internal result pointer to the next result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_next_result'
@@ -246,6 +292,8 @@ Move the internal result pointer to the next result
 =item C<int mssql_num_fields(resource mssql_result_index)>
 
 Returns the number of fields fetched in from the result id specified
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Returns the number of fields fetched in from the result id specified
 
 Returns the number of rows fetched in from the result id specified
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_num_rows'
@@ -266,6 +316,8 @@ Returns the number of rows fetched in from the result id specified
 =item C<int mssql_pconnect([string servername [, string username [, string password [, bool new_link]]]])>
 
 Establishes a persistent connection to a MS-SQL server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Establishes a persistent connection to a MS-SQL server
 
 Perform an SQL query on a MS-SQL server database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_query'
@@ -286,6 +340,8 @@ Perform an SQL query on a MS-SQL server database
 =item C<string mssql_result(resource result_id, int row, mixed field)>
 
 Returns the contents of one cell from a MS-SQL result set
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Returns the contents of one cell from a MS-SQL result set
 
 Returns the number of records affected by the query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mssql_rows_affected'
@@ -306,6 +364,8 @@ Returns the number of records affected by the query
 =item C<bool mssql_select_db(string database_name [, resource conn_id])>
 
 Select a MS-SQL database
+
+NOT IMPLEMENTED.
 
 =cut
 

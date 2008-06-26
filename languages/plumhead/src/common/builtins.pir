@@ -1,14 +1,6 @@
 # $Id$
 
-# a helper for the PHC variant
-.sub 'decode_base64'
-    .param pmc args :slurpy
-    .return base64_decode(args :flat)
-.end
-
-.sub 'print_newline'
-    say ''
-.end
+.loadlib 'php_group'
 
 # steal builtins from Perl6
 .sub 'print'
@@ -266,56 +258,6 @@
 
 
 .include 'languages/plumhead/src/common/php_standard.pir'
-
-.sub '__onload' :anon :load
-    $P0 = subclass 'Boolean', 'PhpBoolean'
-    $P0 = subclass 'Float', 'PhpFloat'
-    $P0 = subclass 'Integer', 'PhpInteger'
-    $P0 = subclass 'String', 'PhpString'
-    $P0 = subclass 'Undef', 'PhpUndef'
-.end
-
-.namespace [ 'PhpBoolean' ]
-
-.sub 'name' :vtable :method
-    .return ('boolean')
-.end
-
-.sub 'get_string' :vtable :method
-    unless self goto L1
-    .return ('1')
-  L1:
-    .return ('')
-.end
-
-
-.namespace [ 'PhpFloat' ]
-
-.sub 'name' :vtable :method
-    .return ('double')
-.end
-
-
-.namespace [ 'PhpInteger' ]
-
-.sub 'name' :vtable :method
-    .return ('integer')
-.end
-
-
-.namespace [ 'PhpString' ]
-
-.sub 'name' :vtable :method
-    .return ('string')
-.end
-
-
-.namespace [ 'PhpUndef' ]
-
-.sub 'name' :vtable :method
-    .return ('NULL')
-.end
-
 
 # Local Variables:
 #   mode: pir

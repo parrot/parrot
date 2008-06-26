@@ -19,6 +19,8 @@ Get information about the capabilities of a browser. If browser_name is omitted
 or null, HTTP_USER_AGENT is used. Returns an object by default; if return_array
 is true, returns an array.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_browser'

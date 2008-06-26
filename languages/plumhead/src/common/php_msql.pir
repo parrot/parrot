@@ -17,6 +17,8 @@ php_msql.pir - PHP msql  Library
 
 Return number of affected rows
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_affected_rows'
@@ -26,6 +28,8 @@ Return number of affected rows
 =item C<bool msql_close([resource link_identifier])>
 
 Close an mSQL connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Close an mSQL connection
 
 Open a connection to an mSQL Server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_connect'
@@ -46,6 +52,8 @@ Open a connection to an mSQL Server
 =item C<bool msql_create_db(string database_name [, resource link_identifier])>
 
 Create an mSQL database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Create an mSQL database
 
 Move internal result pointer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_data_seek'
@@ -66,6 +76,8 @@ Move internal result pointer
 =item C<resource msql_db_query(string database_name, string query [, resource link_identifier])>
 
 Send an SQL query to mSQL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Send an SQL query to mSQL
 
 Drop (delete) an mSQL database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_drop_db'
@@ -86,6 +100,8 @@ Drop (delete) an mSQL database
 =item C<string msql_error(void)>
 
 Returns the text of the error message from previous mSQL operation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the text of the error message from previous mSQL operation
 
 Fetch a result row as an associative array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_fetch_array'
@@ -106,6 +124,8 @@ Fetch a result row as an associative array
 =item C<object msql_fetch_field(resource query [, int field_offset])>
 
 Get column information from a result and return as an object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Get column information from a result and return as an object
 
 Fetch a result row as an object
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_fetch_object'
@@ -126,6 +148,8 @@ Fetch a result row as an object
 =item C<array msql_fetch_row(resource query)>
 
 Get a result row as an enumerated array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get a result row as an enumerated array
 
 Get the flags associated with the specified field in a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_field_flags'
@@ -146,6 +172,8 @@ Get the flags associated with the specified field in a result
 =item C<int msql_field_len(int query, int field_offet)>
 
 Returns the length of the specified field
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Returns the length of the specified field
 
 Get the name of the specified field in a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_field_name'
@@ -166,6 +196,8 @@ Get the name of the specified field in a result
 =item C<bool msql_field_seek(resource query, int field_offset)>
 
 Set result pointer to a specific field offset
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Set result pointer to a specific field offset
 
 Get name of the table the specified field is in
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_field_table'
@@ -186,6 +220,8 @@ Get name of the table the specified field is in
 =item C<string msql_field_type(resource query, int field_offset)>
 
 Get the type of the specified field in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Get the type of the specified field in a result
 
 Free result memory
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_free_result'
@@ -206,6 +244,8 @@ Free result memory
 =item C<resource msql_list_dbs([resource link_identifier])>
 
 List databases available on an mSQL server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ List databases available on an mSQL server
 
 List mSQL result fields
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_list_fields'
@@ -226,6 +268,8 @@ List mSQL result fields
 =item C<resource msql_list_tables(string database_name [, resource link_identifier])>
 
 List tables in an mSQL database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ List tables in an mSQL database
 
 Get number of fields in a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_num_fields'
@@ -246,6 +292,8 @@ Get number of fields in a result
 =item C<int msql_num_rows(resource query)>
 
 Get number of rows in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Get number of rows in a result
 
 Open a persistent connection to an mSQL Server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_pconnect'
@@ -266,6 +316,8 @@ Open a persistent connection to an mSQL Server
 =item C<resource msql_query(string query [, resource link_identifier])>
 
 Send an SQL query to mSQL
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Send an SQL query to mSQL
 
 Get result data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'msql_result'
@@ -286,6 +340,8 @@ Get result data
 =item C<bool msql_select_db(string database_name [, resource link_identifier])>
 
 Select an mSQL database
+
+NOT IMPLEMENTED.
 
 =cut
 

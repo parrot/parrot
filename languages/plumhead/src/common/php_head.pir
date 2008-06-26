@@ -17,6 +17,8 @@ php_head.pir - PHP head Standard Library
 
 Sends a raw HTTP header
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'header'
@@ -26,6 +28,8 @@ Sends a raw HTTP header
 =item C<array headers_list(void)>
 
 Return list of headers to be sent / already sent
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Return list of headers to be sent / already sent
 
 Returns true if headers have already been sent, false otherwise
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'headers_sent'
@@ -47,6 +53,8 @@ Returns true if headers have already been sent, false otherwise
 
 Send a cookie
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'setcookie'
@@ -56,6 +64,8 @@ Send a cookie
 =item C<bool setrawcookie(string name [, string value [, int expires [, string path [, string domain [, bool secure[, bool httponly]]]]]])>
 
 Send a cookie with no url encoding of the value
+
+NOT IMPLEMENTED.
 
 =cut
 

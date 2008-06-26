@@ -17,6 +17,8 @@ php_pageinfo.pir - PHP pageinfo Standard Library
 
 Get time of last page modification
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getlastmod'
@@ -26,6 +28,8 @@ Get time of last page modification
 =item C<int getmygid(void)>
 
 Get PHP script owner's GID
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Get PHP script owner's GID
 
 Get the inode of the current script being parsed
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getmyinode'
@@ -47,6 +53,8 @@ Get the inode of the current script being parsed
 
 Get current process ID
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'getmypid'
@@ -56,6 +64,8 @@ Get current process ID
 =item C<int getmyuid(void)>
 
 Get PHP script owner's UID
+
+NOT IMPLEMENTED.
 
 =cut
 

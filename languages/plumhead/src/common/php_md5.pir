@@ -86,7 +86,7 @@ Calculate the md5 hash of given filename
     .local pmc f, md, res
     push_eh _handler
     $S1 = filename
-    f = open $S1, '>'
+    f = open $S1, '<'
     if null f goto L2
     new md, 'MD5'
     md.'Init'()

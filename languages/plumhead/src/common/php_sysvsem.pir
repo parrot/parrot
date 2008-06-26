@@ -17,6 +17,8 @@ php_sysvsem.pir - PHP sysvsem  Library
 
 Acquires the semaphore with the given id, blocking if necessary
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sem_acquire'
@@ -26,6 +28,8 @@ Acquires the semaphore with the given id, blocking if necessary
 =item C<resource sem_get(int key [, int max_acquire [, int perm [, int auto_release]])>
 
 Return an id for the semaphore with the given key, and allow max_acquire (default 1) processes to acquire it simultaneously
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Return an id for the semaphore with the given key, and allow max_acquire (defaul
 
 Releases the semaphore with the given id
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'sem_release'
@@ -46,6 +52,8 @@ Releases the semaphore with the given id
 =item C<bool sem_remove(resource id)>
 
 Removes semaphore from Unix systems
+
+NOT IMPLEMENTED.
 
 =cut
 

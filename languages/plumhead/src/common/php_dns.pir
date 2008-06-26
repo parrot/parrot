@@ -17,6 +17,8 @@ php_dns.pir - PHP dns Standard Library
 
 Check DNS records corresponding to a given Internet host name or IP address
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dns_check_record'
@@ -26,6 +28,8 @@ Check DNS records corresponding to a given Internet host name or IP address
 =item C<bool dns_get_mx(string hostname, array mxhosts [, array weight])>
 
 Get MX records corresponding to a given Internet host name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Get MX records corresponding to a given Internet host name
 
 Get any Resource Record corresponding to a given Internet host name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dns_get_record'
@@ -46,6 +52,8 @@ Get any Resource Record corresponding to a given Internet host name
 =item C<string gethostbyaddr(string ip_address)>
 
 Get the Internet host name corresponding to a given IP address
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Get the Internet host name corresponding to a given IP address
 
 Get the IP address corresponding to a given Internet host name
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gethostbyname'
@@ -66,6 +76,8 @@ Get the IP address corresponding to a given Internet host name
 =item C<array gethostbynamel(string hostname)>
 
 Return a list of IP addresses that a given hostname resolves to.
+
+NOT IMPLEMENTED.
 
 =cut
 

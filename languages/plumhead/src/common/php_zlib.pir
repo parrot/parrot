@@ -17,6 +17,8 @@ php_zlib.pir - PHP zlib  Library
 
 Gzip-compress a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gzcompress'
@@ -26,6 +28,8 @@ Gzip-compress a string
 =item C<string gzdeflate(string data [, int level])>
 
 Gzip-compress a string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Gzip-compress a string
 
 GZ encode a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gzencode'
@@ -46,6 +52,8 @@ GZ encode a string
 =item C<array gzfile(string filename [, int use_include_path])>
 
 Read und uncompress entire .gz-file into an array
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Read und uncompress entire .gz-file into an array
 
 Unzip a gzip-compressed string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gzinflate'
@@ -66,6 +76,8 @@ Unzip a gzip-compressed string
 =item C<resource gzopen(string filename, string mode [, int use_include_path])>
 
 Open a .gz-file and return a .gz-file pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Open a .gz-file and return a .gz-file pointer
 
 Unzip a gzip-compressed string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gzuncompress'
@@ -86,6 +100,8 @@ Unzip a gzip-compressed string
 =item C<string ob_gzhandler(string str, int mode)>
 
 Encode str based on accept-encoding setting - designed to be called from ob_start()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Encode str based on accept-encoding setting - designed to be called from ob_star
 
 Output a .gz-file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'readgzfile'
@@ -106,6 +124,8 @@ Output a .gz-file
 =item C<string zlib_get_coding_type(void)>
 
 Returns the coding type used for output compression
+
+NOT IMPLEMENTED.
 
 =cut
 

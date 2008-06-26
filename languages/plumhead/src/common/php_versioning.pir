@@ -17,6 +17,8 @@ php_versioning.pir - PHP versioning Standard Library
 
 Compares two "PHP-standardized" version number strings
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'version_compare'

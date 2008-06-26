@@ -17,6 +17,8 @@ php_iconv.pir - PHP iconv  Library
 
 Returns str converted to the out_charset character set
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'iconv'
@@ -26,6 +28,8 @@ Returns str converted to the out_charset character set
 =item C<mixed iconv_get_encoding([string type])>
 
 Get internal encoding and output encoding for ob_iconv_handler()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Get internal encoding and output encoding for ob_iconv_handler()
 
 Decodes a mime header field
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'iconv_mime_decode'
@@ -46,6 +52,8 @@ Decodes a mime header field
 =item C<array iconv_mime_decode_headers(string headers [, int mode, string charset])>
 
 Decodes multiple mime header fields
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Decodes multiple mime header fields
 
 Composes a mime header field with field_name and field_value in a specified scheme
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'iconv_mime_encode'
@@ -66,6 +76,8 @@ Composes a mime header field with field_name and field_value in a specified sche
 =item C<bool iconv_set_encoding(string type, string charset)>
 
 Sets internal encoding and output encoding for ob_iconv_handler()
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Sets internal encoding and output encoding for ob_iconv_handler()
 
 Returns the character count of str
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'iconv_strlen'
@@ -86,6 +100,8 @@ Returns the character count of str
 =item C<int iconv_strpos(string haystack, string needle [, int offset [, string charset]])>
 
 Finds position of first occurrence of needle within part of haystack beginning with offset
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Finds position of first occurrence of needle within part of haystack beginning w
 
 Finds position of last occurrence of needle within part of haystack beginning with offset
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'iconv_strrpos'
@@ -107,6 +125,8 @@ Finds position of last occurrence of needle within part of haystack beginning wi
 
 Returns specified part of a string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'iconv_substr'
@@ -116,6 +136,8 @@ Returns specified part of a string
 =item C<string ob_iconv_handler(string contents, int status)>
 
 Returns str in output buffer converted to the iconv.output_encoding character set
+
+NOT IMPLEMENTED.
 
 =cut
 

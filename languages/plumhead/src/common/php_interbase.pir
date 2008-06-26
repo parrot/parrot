@@ -17,6 +17,8 @@ php_interbase.pir - PHP interbase  Library
 
 Add a user to security database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_add_user'
@@ -26,6 +28,8 @@ Add a user to security database
 =item C<int ibase_affected_rows( [ resource link_identifier ] )>
 
 Returns the number of rows affected by the previous INSERT, UPDATE or DELETE statement
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns the number of rows affected by the previous INSERT, UPDATE or DELETE sta
 
 Initiates a backup task in the service manager and returns immediately
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_backup'
@@ -46,6 +52,8 @@ Initiates a backup task in the service manager and returns immediately
 =item C<bool ibase_blob_add(resource blob_handle, string data)>
 
 Add data into created blob
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Add data into created blob
 
 Cancel creating blob
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_blob_cancel'
@@ -66,6 +76,8 @@ Cancel creating blob
 =item C<string ibase_blob_close(resource blob_handle)>
 
 Close blob
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Close blob
 
 Create blob for adding data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_blob_create'
@@ -86,6 +100,8 @@ Create blob for adding data
 =item C<bool ibase_blob_echo([ resource link_identifier, ] string blob_id)>
 
 Output blob contents to browser
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Output blob contents to browser
 
 Get len bytes data from open blob
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_blob_get'
@@ -106,6 +124,8 @@ Get len bytes data from open blob
 =item C<string ibase_blob_import([ resource link_identifier, ] resource file)>
 
 Create blob, copy file in it, and close it
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Create blob, copy file in it, and close it
 
 Return blob length and other useful info
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_blob_info'
@@ -126,6 +148,8 @@ Return blob length and other useful info
 =item C<resource ibase_blob_open([ resource link_identifier, ] string blob_id)>
 
 Open blob for retrieving data parts
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Open blob for retrieving data parts
 
 Close an InterBase connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_close'
@@ -146,6 +172,8 @@ Close an InterBase connection
 =item C<bool ibase_commit( resource link_identifier )>
 
 Commit transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Commit transaction
 
 Commit transaction and retain the transaction context
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_commit_ret'
@@ -166,6 +196,8 @@ Commit transaction and retain the transaction context
 =item C<resource ibase_connect(string database [, string username [, string password [, string charset [, int buffers [, int dialect [, string role]]]]]])>
 
 Open a connection to an InterBase database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Open a connection to an InterBase database
 
 Request statistics about a database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_db_info'
@@ -186,6 +220,8 @@ Request statistics about a database
 =item C<bool ibase_delete_user(resource service_handle, string user_name, string password [, string first_name [, string middle_name [, string last_name]]])>
 
 Delete a user from security database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Delete a user from security database
 
 Drop an InterBase database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_drop_db'
@@ -206,6 +244,8 @@ Drop an InterBase database
 =item C<int ibase_errcode(void)>
 
 Return error code
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Return error code
 
 Return error message
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_errmsg'
@@ -226,6 +268,8 @@ Return error message
 =item C<mixed ibase_execute(resource query [, mixed bind_arg [, mixed bind_arg [, ...]]])>
 
 Execute a previously prepared query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Execute a previously prepared query
 
 Fetch a row  from the results of a query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_fetch_assoc'
@@ -246,6 +292,8 @@ Fetch a row  from the results of a query
 =item C<object ibase_fetch_object(resource result [, int fetch_flags])>
 
 Fetch a object from the results of a query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Fetch a object from the results of a query
 
 Fetch a row  from the results of a query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_fetch_row'
@@ -266,6 +316,8 @@ Fetch a row  from the results of a query
 =item C<array ibase_field_info(resource query_result, int field_number)>
 
 Get information about a field
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Get information about a field
 
 Frees the event handler set by ibase_set_event_handler()
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_free_event_handler'
@@ -286,6 +340,8 @@ Frees the event handler set by ibase_set_event_handler()
 =item C<bool ibase_free_query(resource query)>
 
 Free memory used by a query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Free memory used by a query
 
 Free the memory used by a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_free_result'
@@ -306,6 +364,8 @@ Free the memory used by a result
 =item C<int ibase_gen_id(string generator [, int increment [, resource link_identifier ]])>
 
 Increments the named generator and returns its new value
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Increments the named generator and returns its new value
 
 Execute a maintenance command on the database server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_maintain_db'
@@ -326,6 +388,8 @@ Execute a maintenance command on the database server
 =item C<bool ibase_modify_user(resource service_handle, string user_name, string password [, string first_name [, string middle_name [, string last_name]]])>
 
 Modify a user in security database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Modify a user in security database
 
 Assign a name to a result for use with ... WHERE CURRENT OF <name> statements
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_name_result'
@@ -346,6 +412,8 @@ Assign a name to a result for use with ... WHERE CURRENT OF <name> statements
 =item C<int ibase_num_fields(resource query_result)>
 
 Get the number of fields in result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Get the number of fields in result
 
 Get the number of params in a prepared query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_num_params'
@@ -366,6 +436,8 @@ Get the number of params in a prepared query
 =item C<int ibase_num_rows( resource result_identifier )>
 
 Return the number of rows that are available in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Return the number of rows that are available in a result
 
 Get information about a parameter
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_param_info'
@@ -386,6 +460,8 @@ Get information about a parameter
 =item C<resource ibase_pconnect(string database [, string username [, string password [, string charset [, int buffers [, int dialect [, string role]]]]]])>
 
 Open a persistent connection to an InterBase database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Open a persistent connection to an InterBase database
 
 Prepare a query for later execution
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_prepare'
@@ -406,6 +484,8 @@ Prepare a query for later execution
 =item C<mixed ibase_query([resource link_identifier, [ resource link_identifier, ]] string query [, mixed bind_arg [, mixed bind_arg [, ...]]])>
 
 Execute a query
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Execute a query
 
 Initiates a restore task in the service manager and returns immediately
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_restore'
@@ -426,6 +508,8 @@ Initiates a restore task in the service manager and returns immediately
 =item C<bool ibase_rollback( resource link_identifier )>
 
 Rollback transaction
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Rollback transaction
 
 Rollback transaction and retain the transaction context
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_rollback_ret'
@@ -446,6 +532,8 @@ Rollback transaction and retain the transaction context
 =item C<string ibase_server_info(resource service_handle, int action)>
 
 Request information about a database server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Request information about a database server
 
 Connect to the service manager
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_service_attach'
@@ -466,6 +556,8 @@ Connect to the service manager
 =item C<bool ibase_service_detach(resource service_handle)>
 
 Disconnect from the service manager
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -477,6 +569,8 @@ Disconnect from the service manager
 
 Register the callback for handling each of the named events
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_set_event_handler'
@@ -487,6 +581,8 @@ Register the callback for handling each of the named events
 
 Start a transaction over one or several databases
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'ibase_trans'
@@ -496,6 +592,8 @@ Start a transaction over one or several databases
 =item C<string ibase_wait_event([resource link_identifier,] string event [, string event [, ...]])>
 
 Waits for any one of the passed Interbase events to be posted by the database, and returns its name
+
+NOT IMPLEMENTED.
 
 =cut
 

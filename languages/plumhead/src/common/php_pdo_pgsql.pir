@@ -17,6 +17,8 @@ php_pdo_pgsql.pir - PHP pdo_pgsql  Library
 
 Creates a new large object, returning its identifier.  Must be called inside a transaction.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::pgsqlLOBCreate'
@@ -27,6 +29,8 @@ Creates a new large object, returning its identifier.  Must be called inside a t
 
 Opens an existing large object stream.  Must be called inside a transaction.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'PDO::pgsqlLOBOpen'
@@ -36,6 +40,8 @@ Opens an existing large object stream.  Must be called inside a transaction.
 =item C<bool PDO::pgsqlLOBUnlink(string oid)>
 
 Deletes the large object identified by oid.  Must be called inside a transaction.
+
+NOT IMPLEMENTED.
 
 =cut
 

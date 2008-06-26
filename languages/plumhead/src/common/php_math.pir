@@ -13,6 +13,40 @@ php_math.pir - PHP math Standard Library
 
 =cut
 
+.const num PI = 3.14159265358979323846
+
+.sub 'longtobase' :anon
+    .param int value
+    .param int base
+    .const string digits = '0123456789abcdefghijklmnopqrstuvwxyz'
+    $S0 = ''
+  L1:
+    $I0 = value % base
+    $S1 = substr digits, $I0, 1
+    $S0 = concat $S1, $S0
+    value = value / base
+    if value goto L1
+    .return ($S0)
+.end
+
+.macro ROUND_WITH_FUZZ(val, places)
+    .local num tmp
+    tmp = .val
+    .local num f
+    f = pow 10.0, .places
+    tmp *= f
+    unless tmp >= 0.0 goto L11
+    tmp += 0.5
+    tmp = floor tmp
+    goto L12
+  L11:
+    tmp -= 0.5
+    tmp =ceil tmp
+  L12:
+    .val = tmp / f
+.endm
+
+
 =item C<int abs(int number)>
 
 Return the absolute value of the number
@@ -20,7 +54,28 @@ Return the absolute value of the number
 =cut
 
 .sub 'abs'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $P1 = $P1.'to_number'()
+    $I0 = isa $P1, 'PhpFloat'
+    unless $I0 goto L2
+    $N1 = $P1
+    $N0 = abs $N1
+    .RETURN_DOUBLE($N0)
+  L2:
+    $I0 = isa $P1, 'PhpInteger'
+    unless $I0 goto L3
+    $I1 = $P1
+    $I0 = abs $I1
+    .RETURN_LONG($I0)
+  L3:
+    .RETURN_FALSE()
 .end
 
 =item C<float acos(float number)>
@@ -30,16 +85,35 @@ Return the arc cosine of the number in radians
 =cut
 
 .sub 'acos'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = acos $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float acosh(float number)>
 
 Returns the inverse hyperbolic cosine of the number, i.e. the value whose hyperbolic cosine is number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'acosh'
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
     not_implemented()
 .end
 
@@ -50,16 +124,35 @@ Returns the arc sine of the number in radians
 =cut
 
 .sub 'asin'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = asin $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float asinh(float number)>
 
 Returns the inverse hyperbolic sine of the number, i.e. the value whose hyperbolic sine is number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'asinh'
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
     not_implemented()
 .end
 
@@ -70,7 +163,17 @@ Returns the arc tangent of the number in radians
 =cut
 
 .sub 'atan'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = atan $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float atan2(float y, float x)>
@@ -80,16 +183,37 @@ Returns the arc tangent of y/x, with the resulting quadrant determined by the si
 =cut
 
 .sub 'atan2'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $P2 = shift args
+    $N2 = $P2
+    $N0 = atan $N1, $N2
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float atanh(float number)>
 
 Returns the inverse hyperbolic tangent of the number, i.e. the value whose hyperbolic tangent is number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'atanh'
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
     not_implemented()
 .end
 
@@ -100,7 +224,43 @@ Converts a number in a string from any base <= 36 to any base <= 36
 =cut
 
 .sub 'base_convert'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 3 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    new $P1, 'PhpString'
+    set $P1, $S1
+    $P2 = shift args
+    $I2 = $P2
+    $P3 = shift args
+    $I3 = $P3
+    if $I2 < 2 goto L2
+    if $I2 > 36 goto L2
+    goto L3
+  L2:
+    error("Invalid `from base' (", $I2, ")")
+    .RETURN_FALSE()
+  L3:
+    if $I3 < 2 goto L4
+    if $I3 > 36 goto L4
+    goto L5
+  L4:
+    error("Invalid `to base' (", $I3, ")")
+    .RETURN_FALSE()
+  L5:
+    $P0 = $P1.'to_base'($I2)
+    $I0 = isa $P0, 'PhpInteger'
+    unless $I0 goto L6
+    $I0 = $P0
+    $S0 = longtobase($I0, $I3)
+    .RETURN_STRING($S0)
+  L6:
+    .RETURN_FALSE()
 .end
 
 =item C<int bindec(string binary_number)>
@@ -110,7 +270,19 @@ Returns the decimal equivalent of the binary number
 =cut
 
 .sub 'bindec'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    new $P1, 'PhpString'
+    set $P1, $S1
+    $P0 = $P1.'to_base'(2)
+    .return ($P0)
 .end
 
 =item C<float ceil(float number)>
@@ -120,7 +292,27 @@ Returns the next highest integer value of the number
 =cut
 
 .sub 'ceil'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $P1 = $P1.'to_number'()
+    $I0 = isa $P1, 'PhpFloat'
+    unless $I0 goto L2
+    $N1 = $P1
+    $N0 = ceil $N1
+    .RETURN_DOUBLE($N0)
+  L2:
+    $I0 = isa $P1, 'PhpInteger'
+    unless $I0 goto L3
+    $N0 = $P1
+    .RETURN_DOUBLE($N0)
+  L3:
+    .RETURN_FALSE()
 .end
 
 =item C<float cos(float number)>
@@ -130,7 +322,17 @@ Returns the cosine of the number in radians
 =cut
 
 .sub 'cos'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = cos $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float cosh(float number)>
@@ -140,7 +342,17 @@ Returns the hyperbolic cosine of the number, defined as (exp(number) + exp(-numb
 =cut
 
 .sub 'cosh'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = cosh $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<string decbin(int decimal_number)>
@@ -150,7 +362,17 @@ Returns a string containing a binary representation of the number
 =cut
 
 .sub 'decbin'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $I1 = $P1
+    $S0 = longtobase($I1, 2)
+    .RETURN_STRING($S0)
 .end
 
 =item C<string dechex(int decimal_number)>
@@ -160,7 +382,17 @@ Returns a string containing a hexadecimal representation of the given number
 =cut
 
 .sub 'dechex'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $I1 = $P1
+    $S0 = longtobase($I1, 16)
+    .RETURN_STRING($S0)
 .end
 
 =item C<string decoct(int decimal_number)>
@@ -170,7 +402,17 @@ Returns a string containing an octal representation of the given number
 =cut
 
 .sub 'decoct'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $I1 = $P1
+    $S0 = longtobase($I1, 8)
+    .RETURN_STRING($S0)
 .end
 
 =item C<float deg2rad(float number)>
@@ -180,7 +422,18 @@ Converts the number in degrees to the radian equivalent
 =cut
 
 .sub 'deg2rad'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = $N1 / 180.0
+    $N0 *= PI
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float exp(float number)>
@@ -190,12 +443,22 @@ Returns e raised to the power of the number
 =cut
 
 .sub 'exp'
-    not_implemented()
+    .param pmc args :slurpy
+    .local pmc number
+    ($I0, number) = parse_parameters('d', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    $N1 = number
+    $N0 = exp $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float expm1(float number)>
 
 Returns exp(number) - 1, computed in a way that accurate even when the value of number is close to zero
+
+NOT IMPLEMENTED. WARNING: this function is experimental.
 
 =cut
 
@@ -210,7 +473,27 @@ Returns the next lowest integer value from the number
 =cut
 
 .sub 'floor'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $P1 = $P1.'to_number'()
+    $I0 = isa $P1, 'PhpFloat'
+    unless $I0 goto L2
+    $N1 = $P1
+    $N0 = floor $N1
+    .RETURN_DOUBLE($N0)
+  L2:
+    $I0 = isa $P1, 'PhpInteger'
+    unless $I0 goto L3
+    $N0 = $P1
+    .RETURN_DOUBLE($N0)
+  L3:
+    .RETURN_FALSE()
 .end
 
 =item C<float fmod(float x, float y)>
@@ -220,7 +503,17 @@ Returns the remainder of dividing x by y as a float
 =cut
 
 .sub 'fmod'
-    not_implemented()
+    .param pmc args :slurpy
+    .local pmc x
+    .local pmc y
+    ($I0, x, y) = parse_parameters('dd', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    $N1 = x
+    $N2 = y
+    $N0 = cmod $N1, $N2
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<int hexdec(string hexadecimal_number)>
@@ -230,7 +523,19 @@ Returns the decimal equivalent of the hexadecimal number
 =cut
 
 .sub 'hexdec'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    new $P1, 'PhpString'
+    set $P1, $S1
+    $P0 = $P1.'to_base'(16)
+    .return ($P0)
 .end
 
 =item C<float hypot(float num1, float num2)>
@@ -240,16 +545,39 @@ Returns sqrt(num1*num1 + num2*num2)
 =cut
 
 .sub 'hypot'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $P2 = shift args
+    $N2 = $P2
+    $N1 *= $N1
+    $N2 *= $N2
+    $N1 += $N2
+    $N0 = sqrt $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<bool is_finite(float val)>
 
 Returns whether argument is finite
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_finite'
+    .param pmc args :slurpy
+    .local pmc val
+    ($I0, val) = parse_parameters('d', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
     not_implemented()
 .end
 
@@ -257,9 +585,17 @@ Returns whether argument is finite
 
 Returns whether argument is infinite
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_infinite'
+    .param pmc args :slurpy
+    .local pmc val
+    ($I0, val) = parse_parameters('d', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
     not_implemented()
 .end
 
@@ -267,9 +603,17 @@ Returns whether argument is infinite
 
 Returns whether argument is not a number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'is_nan'
+    .param pmc args :slurpy
+    .local pmc val
+    ($I0, val) = parse_parameters('d', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
     not_implemented()
 .end
 
@@ -280,7 +624,31 @@ Returns the natural logarithm of the number, or the base log if base is specifie
 =cut
 
 .sub 'log'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc == 1 goto L1
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = ln $N1
+    .RETURN_DOUBLE($N0)
+  L1:
+    unless argc == 2 goto L2
+    $P1 = shift args
+    $N1 = $P1
+    $P2 = shift args
+    $N2 = $P2
+    unless $N2 <= 0.0 goto L3
+    error("base must be greater than 0")
+    .RETURN_FALSE()
+  L3:
+    $N1 = ln $N1
+    $N2 = ln $N2
+    $N0 = $N1 / $N2
+    .RETURN_DOUBLE($N0)
+  L2:
+    wrong_param_count()
+    .RETURN_NULL()
 .end
 
 =item C<float log10(float number)>
@@ -290,12 +658,24 @@ Returns the base-10 logarithm of the number
 =cut
 
 .sub 'log10'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = log10 $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float log1p(float number)>
 
 Returns log(1 + number), computed in a way that accurate even when the value of number is close to zero
+
+NOT IMPLEMENTED. WARNING: this function is experimental.
 
 =cut
 
@@ -306,6 +686,8 @@ Returns log(1 + number), computed in a way that accurate even when the value of 
 =item C<string number_format(float number [, int num_decimal_places [, string dec_seperator, string thousands_seperator]])>
 
 Formats a number with grouped thousands
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -320,7 +702,19 @@ Returns the decimal equivalent of an octal string
 =cut
 
 .sub 'octdec'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    new $P1, 'PhpString'
+    set $P1, $S1
+    $P0 = $P1.'to_base'(8)
+    .return ($P0)
 .end
 
 =item C<float pi(void)>
@@ -330,7 +724,8 @@ Returns an approximation of pi
 =cut
 
 .sub 'pi'
-    not_implemented()
+    .param pmc args :slurpy
+    .RETURN_DOUBLE(PI)
 .end
 
 =item C<number pow(number base, number exponent)>
@@ -340,7 +735,29 @@ Returns base raised to the power of exponent. Returns integer result when possib
 =cut
 
 .sub 'pow'
-    not_implemented()
+    .param pmc args :slurpy
+    .local pmc base
+    .local pmc exponent
+    ($I0, base, exponent) = parse_parameters('z/z/', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    base = base.'to_number'()
+    exponent = exponent.'to_number'()
+    $I0 = isa base, 'PhpInteger'
+    unless $I0 goto L2
+    $I0 = isa exponent, 'PhpInteger'
+    unless $I0 goto L2
+    $N1 = base
+    $N2 = exponent
+    $N0 = pow $N1, $N2
+    $I0 = $N0
+    .RETURN_LONG($I0)
+  L2:
+    $N1 = base
+    $N2 = exponent
+    $N0 = pow $N1, $N2
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float rad2deg(float number)>
@@ -350,7 +767,18 @@ Converts the radian number to the equivalent number in degrees
 =cut
 
 .sub 'rad2deg'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = $N1 / PI
+    $N0 *= 180.0
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float round(float number [, int precision])>
@@ -360,7 +788,37 @@ Returns the number rounded to specified precision
 =cut
 
 .sub 'round'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    if argc < 1 goto L1
+    if argc > 2 goto L1
+    goto L2
+  L1:
+    wrong_param_count()
+    .RETURN_NULL()
+  L2:
+    $P1 = shift args
+    $I2 = 0
+    unless argc == 2 goto L3
+    $P2 = shift args
+    $I2 = $P2
+  L3:
+    $I0 = isa $P1, 'PhpInteger'
+    unless $I0 goto L4
+    unless $I2 >= 0 goto L5
+    $N0 = $P1
+    .RETURN_DOUBLE($N0)
+  L4:
+    $I0 = isa $P1, 'PhpFloat'
+    unless $I0 goto L6
+  L5:
+    $N0 = $P1
+    $N2 = $I2
+    .ROUND_WITH_FUZZ($N0, $N2)
+    .RETURN_DOUBLE($N0)
+  L6:
+    .RETURN_FALSE()
 .end
 
 =item C<float sin(float number)>
@@ -370,7 +828,17 @@ Returns the sine of the number in radians
 =cut
 
 .sub 'sin'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = sin $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float sinh(float number)>
@@ -380,7 +848,17 @@ Returns the hyperbolic sine of the number, defined as (exp(number) - exp(-number
 =cut
 
 .sub 'sinh'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = sinh $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float sqrt(float number)>
@@ -390,7 +868,17 @@ Returns the square root of the number
 =cut
 
 .sub 'sqrt'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = sqrt $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float tan(float number)>
@@ -400,7 +888,17 @@ Returns the tangent of the number in radians
 =cut
 
 .sub 'tan'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = tan $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float tanh(float number)>
@@ -410,7 +908,17 @@ Returns the hyperbolic tangent of the number, defined as sinh(number)/cosh(numbe
 =cut
 
 .sub 'tanh'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $N1 = $P1
+    $N0 = tanh $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =back

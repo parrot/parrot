@@ -17,6 +17,8 @@ php_dbase.pir - PHP dbase  Library
 
 Adds a record to the database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dbase_add_record'
@@ -26,6 +28,8 @@ Adds a record to the database
 =item C<bool dbase_close(int identifier)>
 
 Closes an open dBase-format database file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Closes an open dBase-format database file
 
 Creates a new dBase-format database file
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dbase_create'
@@ -46,6 +52,8 @@ Creates a new dBase-format database file
 =item C<bool dbase_delete_record(int identifier, int record)>
 
 Marks a record to be deleted
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Marks a record to be deleted
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dbase_get_header_info'
@@ -66,6 +76,8 @@ Marks a record to be deleted
 =item C<array dbase_get_record(int identifier, int record)>
 
 Returns an array representing a record from the database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Returns an array representing a record from the database
 
 Returns an associative array representing a record from the database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dbase_get_record_with_names'
@@ -86,6 +100,8 @@ Returns an associative array representing a record from the database
 =item C<int dbase_numfields(int identifier)>
 
 Returns the number of fields (columns) in the database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Returns the number of fields (columns) in the database
 
 Returns the number of records in the database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dbase_numrecords'
@@ -106,6 +124,8 @@ Returns the number of records in the database
 =item C<int dbase_open(string name, int mode)>
 
 Opens a dBase-format database file
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Opens a dBase-format database file
 
 Packs the database (deletes records marked for deletion)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dbase_pack'
@@ -126,6 +148,8 @@ Packs the database (deletes records marked for deletion)
 =item C<bool dbase_replace_record(int identifier, array data, int recnum)>
 
 Replaces a record to the database
+
+NOT IMPLEMENTED.
 
 =cut
 

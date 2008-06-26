@@ -17,6 +17,8 @@ php_xmlwriter.pir - PHP xmlwriter  Library
 
 End attribute - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_end_attribute'
@@ -26,6 +28,8 @@ End attribute - returns FALSE on error
 =item C<bool xmlwriter_end_cdata(resource xmlwriter)>
 
 End current CDATA - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ End current CDATA - returns FALSE on error
 
 Create end comment - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_end_comment'
@@ -46,6 +52,8 @@ Create end comment - returns FALSE on error
 =item C<bool xmlwriter_end_document(resource xmlwriter)>
 
 End current document - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ End current document - returns FALSE on error
 
 End current DTD - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_end_dtd'
@@ -66,6 +76,8 @@ End current DTD - returns FALSE on error
 =item C<bool xmlwriter_end_dtd_attlist(resource xmlwriter)>
 
 End current DTD AttList - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ End current DTD AttList - returns FALSE on error
 
 End current DTD element - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_end_dtd_element'
@@ -86,6 +100,8 @@ End current DTD element - returns FALSE on error
 =item C<bool xmlwriter_end_dtd_entity(resource xmlwriter)>
 
 End current DTD Entity - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ End current DTD Entity - returns FALSE on error
 
 End current element - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_end_element'
@@ -106,6 +124,8 @@ End current element - returns FALSE on error
 =item C<bool xmlwriter_end_pi(resource xmlwriter)>
 
 End current PI - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ End current PI - returns FALSE on error
 
 Output current buffer
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_flush'
@@ -126,6 +148,8 @@ Output current buffer
 =item C<bool xmlwriter_full_end_element(resource xmlwriter)>
 
 End current element - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ End current element - returns FALSE on error
 
 Create new xmlwriter using memory for string output
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_open_memory'
@@ -146,6 +172,8 @@ Create new xmlwriter using memory for string output
 =item C<resource xmlwriter_open_uri(resource xmlwriter, string source)>
 
 Create new xmlwriter using source uri for output
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Create new xmlwriter using source uri for output
 
 Output current buffer as string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_output_memory'
@@ -166,6 +196,8 @@ Output current buffer as string
 =item C<bool xmlwriter_set_indent(resource xmlwriter, bool indent)>
 
 Toggle indentation on/off - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Toggle indentation on/off - returns FALSE on error
 
 Set string used for indenting - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_set_indent_string'
@@ -186,6 +220,8 @@ Set string used for indenting - returns FALSE on error
 =item C<bool xmlwriter_start_attribute(resource xmlwriter, string name)>
 
 Create start attribute - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Create start attribute - returns FALSE on error
 
 Create start namespaced attribute - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_start_attribute_ns'
@@ -206,6 +244,8 @@ Create start namespaced attribute - returns FALSE on error
 =item C<bool xmlwriter_start_cdata(resource xmlwriter)>
 
 Create start CDATA tag - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Create start CDATA tag - returns FALSE on error
 
 Create start comment - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_start_comment'
@@ -226,6 +268,8 @@ Create start comment - returns FALSE on error
 =item C<bool xmlwriter_start_document(resource xmlwriter, string version, string encoding, string standalone)>
 
 Create document tag - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Create document tag - returns FALSE on error
 
 Create start DTD tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_start_dtd'
@@ -246,6 +292,8 @@ Create start DTD tag - returns FALSE on error
 =item C<bool xmlwriter_start_dtd_attlist(resource xmlwriter, string name)>
 
 Create start DTD AttList - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Create start DTD AttList - returns FALSE on error
 
 Create start DTD element - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_start_dtd_element'
@@ -266,6 +316,8 @@ Create start DTD element - returns FALSE on error
 =item C<bool xmlwriter_start_dtd_entity(resource xmlwriter, string name, bool isparam)>
 
 Create start DTD Entity - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Create start DTD Entity - returns FALSE on error
 
 Create start element tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_start_element'
@@ -286,6 +340,8 @@ Create start element tag - returns FALSE on error
 =item C<bool xmlwriter_start_element_ns(resource xmlwriter, string prefix, string name, string uri)>
 
 Create start namespaced element tag - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Create start namespaced element tag - returns FALSE on error
 
 Create start PI tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_start_pi'
@@ -306,6 +364,8 @@ Create start PI tag - returns FALSE on error
 =item C<bool xmlwriter_text(resource xmlwriter, string content)>
 
 Write text - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Write text - returns FALSE on error
 
 Write full attribute - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_write_attribute'
@@ -326,6 +388,8 @@ Write full attribute - returns FALSE on error
 =item C<bool xmlwriter_write_attribute_ns(resource xmlwriter, string prefix, string name, string uri, string content)>
 
 Write full namespaced attribute - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Write full namespaced attribute - returns FALSE on error
 
 Write full CDATA tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_write_cdata'
@@ -346,6 +412,8 @@ Write full CDATA tag - returns FALSE on error
 =item C<bool xmlwriter_write_comment(resource xmlwriter, string content)>
 
 Write full comment tag - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Write full comment tag - returns FALSE on error
 
 Write full DTD tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_write_dtd'
@@ -366,6 +436,8 @@ Write full DTD tag - returns FALSE on error
 =item C<bool xmlwriter_write_dtd_attlist(resource xmlwriter, string name, string content)>
 
 Write full DTD AttList tag - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Write full DTD AttList tag - returns FALSE on error
 
 Write full DTD element tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_write_dtd_element'
@@ -386,6 +460,8 @@ Write full DTD element tag - returns FALSE on error
 =item C<bool xmlwriter_write_dtd_entity(resource xmlwriter, string name, string content [, int pe [, string pubid [, string sysid [, string ndataid]]]])>
 
 Write full DTD Entity tag - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Write full DTD Entity tag - returns FALSE on error
 
 Write full element tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_write_element'
@@ -406,6 +484,8 @@ Write full element tag - returns FALSE on error
 =item C<bool xmlwriter_write_element_ns(resource xmlwriter, string prefix, string name, string uri[, string content])>
 
 Write full namesapced element tag - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Write full namesapced element tag - returns FALSE on error
 
 Write full PI tag - returns FALSE on error
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'xmlwriter_write_pi'
@@ -426,6 +508,8 @@ Write full PI tag - returns FALSE on error
 =item C<bool xmlwriter_write_raw(resource xmlwriter, string content)>
 
 Write text - returns FALSE on error
+
+NOT IMPLEMENTED.
 
 =cut
 

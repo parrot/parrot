@@ -17,6 +17,8 @@ php_json.pir - PHP json  Library
 
 Decodes the JSON representation into a PHP value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'json_decode'
@@ -26,6 +28,8 @@ Decodes the JSON representation into a PHP value
 =item C<string json_encode(mixed data)>
 
 Returns the JSON representation of a value
+
+NOT IMPLEMENTED.
 
 =cut
 

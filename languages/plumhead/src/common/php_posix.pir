@@ -17,6 +17,8 @@ php_posix.pir - PHP posix  Library
 
 Determine accessibility of a file (POSIX.1 5.6.3)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_access'
@@ -26,6 +28,8 @@ Determine accessibility of a file (POSIX.1 5.6.3)
 =item C<string posix_ctermid(void)>
 
 Generate terminal path name (POSIX.1, 4.7.1)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Generate terminal path name (POSIX.1, 4.7.1)
 
 Retrieve the error number set by the last posix function which failed.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_get_last_error'
@@ -46,6 +52,8 @@ Retrieve the error number set by the last posix function which failed.
 =item C<string posix_getcwd(void)>
 
 Get working directory pathname (POSIX.1, 5.2.2)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Get working directory pathname (POSIX.1, 5.2.2)
 
 Get the current effective group id (POSIX.1, 4.2.1)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getegid'
@@ -66,6 +76,8 @@ Get the current effective group id (POSIX.1, 4.2.1)
 =item C<int posix_geteuid(void)>
 
 Get the current effective user id (POSIX.1, 4.2.1)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Get the current effective user id (POSIX.1, 4.2.1)
 
 Get the current group id (POSIX.1, 4.2.1)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getgid'
@@ -86,6 +100,8 @@ Get the current group id (POSIX.1, 4.2.1)
 =item C<array posix_getgrgid(long gid)>
 
 Group database access (POSIX.1, 9.2.1)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Group database access (POSIX.1, 9.2.1)
 
 Group database access (POSIX.1, 9.2.1)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getgrnam'
@@ -106,6 +124,8 @@ Group database access (POSIX.1, 9.2.1)
 =item C<array posix_getgroups(void)>
 
 Get supplementary group id's (POSIX.1, 4.2.3)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Get supplementary group id's (POSIX.1, 4.2.3)
 
 Get user name (POSIX.1, 4.2.4)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getlogin'
@@ -126,6 +148,8 @@ Get user name (POSIX.1, 4.2.4)
 =item C<int posix_getpgid(void)>
 
 Get the process group id of the specified process (This is not a POSIX function, but a SVR4ism, so we compile conditionally)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Get the process group id of the specified process (This is not a POSIX function,
 
 Get current process group id (POSIX.1, 4.3.1)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getpgrp'
@@ -146,6 +172,8 @@ Get current process group id (POSIX.1, 4.3.1)
 =item C<int posix_getpid(void)>
 
 Get the current process id (POSIX.1, 4.1.1)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Get the current process id (POSIX.1, 4.1.1)
 
 Get the parent process id (POSIX.1, 4.1.1)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getppid'
@@ -166,6 +196,8 @@ Get the parent process id (POSIX.1, 4.1.1)
 =item C<array posix_getpwnam(string groupname)>
 
 User database access (POSIX.1, 9.2.2)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ User database access (POSIX.1, 9.2.2)
 
 User database access (POSIX.1, 9.2.2)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getpwuid'
@@ -186,6 +220,8 @@ User database access (POSIX.1, 9.2.2)
 =item C<array posix_getrlimit(void)>
 
 Get system resource consumption limits (This is not a POSIX function, but a BSDism and a SVR4ism. We compile conditionally)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Get system resource consumption limits (This is not a POSIX function, but a BSDi
 
 Get process group id of session leader (This is not a POSIX function, but a SVR4ism, so be compile conditionally)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_getsid'
@@ -206,6 +244,8 @@ Get process group id of session leader (This is not a POSIX function, but a SVR4
 =item C<int posix_getuid(void)>
 
 Get the current user id (POSIX.1, 4.2.1)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Get the current user id (POSIX.1, 4.2.1)
 
 Calculate the group access list for the user specified in name.
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_initgroups'
@@ -226,6 +268,8 @@ Calculate the group access list for the user specified in name.
 =item C<bool posix_isatty(int fd)>
 
 Determine if filedesc is a tty (POSIX.1, 4.7.1)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Determine if filedesc is a tty (POSIX.1, 4.7.1)
 
 Send a signal to a process (POSIX.1, 3.3.2)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_kill'
@@ -246,6 +292,8 @@ Send a signal to a process (POSIX.1, 3.3.2)
 =item C<bool posix_mkfifo(string pathname, int mode)>
 
 Make a FIFO special file (POSIX.1, 5.4.2)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Make a FIFO special file (POSIX.1, 5.4.2)
 
 Make a special or ordinary file (POSIX.1)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_mknod'
@@ -266,6 +316,8 @@ Make a special or ordinary file (POSIX.1)
 =item C<bool posix_setegid(long uid)>
 
 Set effective group id
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Set effective group id
 
 Set effective user id
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_seteuid'
@@ -286,6 +340,8 @@ Set effective user id
 =item C<bool posix_setgid(int uid)>
 
 Set group id (POSIX.1, 4.2.2)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Set group id (POSIX.1, 4.2.2)
 
 Set process group id for job control (POSIX.1, 4.3.3)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_setpgid'
@@ -306,6 +364,8 @@ Set process group id for job control (POSIX.1, 4.3.3)
 =item C<int posix_setsid(void)>
 
 Create session and set process group id (POSIX.1, 4.3.2)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Create session and set process group id (POSIX.1, 4.3.2)
 
 Set user id (POSIX.1, 4.2.2)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_setuid'
@@ -326,6 +388,8 @@ Set user id (POSIX.1, 4.2.2)
 =item C<string posix_strerror(int errno)>
 
 Retrieve the system error message associated with the given errno.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Retrieve the system error message associated with the given errno.
 
 Get process times (POSIX.1, 4.5.2)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_times'
@@ -347,6 +413,8 @@ Get process times (POSIX.1, 4.5.2)
 
 Determine terminal device name (POSIX.1, 4.7.2)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'posix_ttyname'
@@ -356,6 +424,8 @@ Determine terminal device name (POSIX.1, 4.7.2)
 =item C<array posix_uname(void)>
 
 Get system name (POSIX.1, 4.4.1)
+
+NOT IMPLEMENTED.
 
 =cut
 

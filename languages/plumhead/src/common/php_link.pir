@@ -17,6 +17,8 @@ php_link.pir - PHP link Standard Library
 
 Create a hard link
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'link'
@@ -26,6 +28,8 @@ Create a hard link
 =item C<int linkinfo(string filename)>
 
 Returns the st_dev field of the UNIX C stat structure describing the link
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns the st_dev field of the UNIX C stat structure describing the link
 
 Return the target of a symbolic link
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'readlink'
@@ -46,6 +52,8 @@ Return the target of a symbolic link
 =item C<int symlink(string target, string link)>
 
 Create a symbolic link
+
+NOT IMPLEMENTED.
 
 =cut
 

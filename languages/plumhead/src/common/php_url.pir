@@ -17,6 +17,8 @@ php_url.pir - PHP url Standard Library
 
 fetches all the headers sent by the server in response to a HTTP request
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'get_headers'
@@ -26,6 +28,8 @@ fetches all the headers sent by the server in response to a HTTP request
 =item C<mixed parse_url(string url, [int url_component])>
 
 Parse a URL and return its components
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Parse a URL and return its components
 
 Decodes URL-encodes string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'rawurldecode'
@@ -46,6 +52,8 @@ Decodes URL-encodes string
 =item C<string rawurlencode(string str)>
 
 URL-encodes string
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ URL-encodes string
 
 Decodes URL-encoded string
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'urldecode'
@@ -66,6 +76,8 @@ Decodes URL-encoded string
 =item C<string urlencode(string str)>
 
 URL-encodes string
+
+NOT IMPLEMENTED.
 
 =cut
 

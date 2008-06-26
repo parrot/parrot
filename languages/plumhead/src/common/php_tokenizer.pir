@@ -17,6 +17,8 @@ php_tokenizer.pir - PHP tokenizer  Library
 
 
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'token_get_all'
@@ -26,6 +28,8 @@ php_tokenizer.pir - PHP tokenizer  Library
 =item C<string token_name(int type)>
 
 
+
+NOT IMPLEMENTED.
 
 =cut
 

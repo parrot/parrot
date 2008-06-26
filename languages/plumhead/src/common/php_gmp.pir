@@ -17,6 +17,8 @@ php_gmp.pir - PHP gmp  Library
 
 Calculates absolute value
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_abs'
@@ -26,6 +28,8 @@ Calculates absolute value
 =item C<resource gmp_add(resource a, resource b)>
 
 Add a and b
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Add a and b
 
 Calculates logical AND of a and b
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_and'
@@ -46,6 +52,8 @@ Calculates logical AND of a and b
 =item C<void gmp_clrbit(resource &a, int index)>
 
 Clears bit in a
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Clears bit in a
 
 Compares two numbers
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_cmp'
@@ -66,6 +76,8 @@ Compares two numbers
 =item C<resource gmp_com(resource a)>
 
 Calculates one's complement of a
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Calculates one's complement of a
 
 Divide a by b, returns quotient only
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_div_q'
@@ -86,6 +100,8 @@ Divide a by b, returns quotient only
 =item C<array gmp_div_qr(resource a, resource b [, int round])>
 
 Divide a by b, returns quotient and reminder
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Divide a by b, returns quotient and reminder
 
 Divide a by b, returns reminder only
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_div_r'
@@ -106,6 +124,8 @@ Divide a by b, returns reminder only
 =item C<resource gmp_divexact(resource a, resource b)>
 
 Divide a by b using exact division algorithm
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Divide a by b using exact division algorithm
 
 Calculates factorial function
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_fact'
@@ -126,6 +148,8 @@ Calculates factorial function
 =item C<resource gmp_gcd(resource a, resource b)>
 
 Computes greatest common denominator (gcd) of a and b
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Computes greatest common denominator (gcd) of a and b
 
 Computes G, S, and T, such that AS + BT = G = `gcd' (A, B)
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_gcdext'
@@ -146,6 +172,8 @@ Computes G, S, and T, such that AS + BT = G = `gcd' (A, B)
 =item C<int gmp_hamdist(resource a, resource b)>
 
 Calculates hamming distance between a and b
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Calculates hamming distance between a and b
 
 Initializes GMP number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_init'
@@ -166,6 +196,8 @@ Initializes GMP number
 =item C<int gmp_intval(resource gmpnumber)>
 
 Gets signed long value of GMP number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Gets signed long value of GMP number
 
 Computes the inverse of a modulo b
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_invert'
@@ -186,6 +220,8 @@ Computes the inverse of a modulo b
 =item C<int gmp_jacobi(resource a, resource b)>
 
 Computes Jacobi symbol
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Computes Jacobi symbol
 
 Computes Legendre symbol
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_legendre'
@@ -206,6 +244,8 @@ Computes Legendre symbol
 =item C<resource gmp_mod(resource a, resource b)>
 
 Computes a modulo b
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Computes a modulo b
 
 Multiply a and b
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_mul'
@@ -226,6 +268,8 @@ Multiply a and b
 =item C<resource gmp_neg(resource a)>
 
 Negates a number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Negates a number
 
 Finds next prime of a
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_nextprime'
@@ -246,6 +292,8 @@ Finds next prime of a
 =item C<resource gmp_or(resource a, resource b)>
 
 Calculates logical OR of a and b
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Calculates logical OR of a and b
 
 Checks if a is an exact square
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_perfect_square'
@@ -266,6 +316,8 @@ Checks if a is an exact square
 =item C<int gmp_popcount(resource a)>
 
 Calculates the population count of a
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Calculates the population count of a
 
 Raise base to power exp
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_pow'
@@ -286,6 +340,8 @@ Raise base to power exp
 =item C<resource gmp_powm(resource base, resource exp, resource mod)>
 
 Raise base to power exp and take result modulo mod
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Raise base to power exp and take result modulo mod
 
 Checks if a is "probably prime"
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_prob_prime'
@@ -306,6 +364,8 @@ Checks if a is "probably prime"
 =item C<resource gmp_random([int limiter])>
 
 Gets random number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Gets random number
 
 Finds first zero bit
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_scan0'
@@ -326,6 +388,8 @@ Finds first zero bit
 =item C<int gmp_scan1(resource a, int start)>
 
 Finds first non-zero bit
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ Finds first non-zero bit
 
 Sets or clear bit in a
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_setbit'
@@ -346,6 +412,8 @@ Sets or clear bit in a
 =item C<int gmp_sign(resource a)>
 
 Gets the sign of the number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ Gets the sign of the number
 
 Takes integer part of square root of a
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_sqrt'
@@ -366,6 +436,8 @@ Takes integer part of square root of a
 =item C<array gmp_sqrtrem(resource a)>
 
 Square root with remainder
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Square root with remainder
 
 Gets string representation of GMP number
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_strval'
@@ -387,6 +461,8 @@ Gets string representation of GMP number
 
 Subtract b from a
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'gmp_sub'
@@ -396,6 +472,8 @@ Subtract b from a
 =item C<resource gmp_xor(resource a, resource b)>
 
 Calculates logical exclusive OR of a and b
+
+NOT IMPLEMENTED.
 
 =cut
 

@@ -17,6 +17,8 @@ php_dl.pir - PHP dl Standard Library
 
 Load a PHP extension at runtime
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'dl'

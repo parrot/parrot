@@ -17,6 +17,8 @@ php_mysql.pir - PHP mysql  Library
 
 Gets number of affected rows in previous MySQL operation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_affected_rows'
@@ -26,6 +28,8 @@ Gets number of affected rows in previous MySQL operation
 =item C<string mysql_client_encoding([int link_identifier])>
 
 Returns the default character set for the current connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -37,6 +41,8 @@ Returns the default character set for the current connection
 
 Close a MySQL connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_close'
@@ -46,6 +52,8 @@ Close a MySQL connection
 =item C<resource mysql_connect([string hostname[:port][:/path/to/socket] [, string username [, string password [, bool new [, int flags]]]]])>
 
 Opens a connection to a MySQL Server
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -57,6 +65,8 @@ Opens a connection to a MySQL Server
 
 Create a MySQL database
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_create_db'
@@ -66,6 +76,8 @@ Create a MySQL database
 =item C<bool mysql_data_seek(resource result, int row_number)>
 
 Move internal result pointer
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -77,6 +89,8 @@ Move internal result pointer
 
 Sends an SQL query to MySQL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_db_query'
@@ -86,6 +100,8 @@ Sends an SQL query to MySQL
 =item C<bool mysql_drop_db(string database_name [, int link_identifier])>
 
 Drops (delete) a MySQL database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -97,6 +113,8 @@ Drops (delete) a MySQL database
 
 Returns the number of the error message from previous MySQL operation
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_errno'
@@ -106,6 +124,8 @@ Returns the number of the error message from previous MySQL operation
 =item C<string mysql_error([int link_identifier])>
 
 Returns the text of the error message from previous MySQL operation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -117,6 +137,8 @@ Returns the text of the error message from previous MySQL operation
 
 Escape string for mysql query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_escape_string'
@@ -126,6 +148,8 @@ Escape string for mysql query
 =item C<array mysql_fetch_array(resource result [, int result_type])>
 
 Fetch a result row as an array (associative, numeric or both)
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -137,6 +161,8 @@ Fetch a result row as an array (associative, numeric or both)
 
 Fetch a result row as an associative array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_fetch_assoc'
@@ -146,6 +172,8 @@ Fetch a result row as an associative array
 =item C<object mysql_fetch_field(resource result [, int field_offset])>
 
 Gets column information from a result and return as an object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -157,6 +185,8 @@ Gets column information from a result and return as an object
 
 Gets max data size of each column in a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_fetch_lengths'
@@ -166,6 +196,8 @@ Gets max data size of each column in a result
 =item C<object mysql_fetch_object(resource result [, string class_name [, NULL|array ctor_params]])>
 
 Fetch a result row as an object
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -177,6 +209,8 @@ Fetch a result row as an object
 
 Gets a result row as an enumerated array
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_fetch_row'
@@ -186,6 +220,8 @@ Gets a result row as an enumerated array
 =item C<string mysql_field_flags(resource result, int field_offset)>
 
 Gets the flags associated with the specified field in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -197,6 +233,8 @@ Gets the flags associated with the specified field in a result
 
 Returns the length of the specified field
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_field_len'
@@ -206,6 +244,8 @@ Returns the length of the specified field
 =item C<string mysql_field_name(resource result, int field_index)>
 
 Gets the name of the specified field in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -217,6 +257,8 @@ Gets the name of the specified field in a result
 
 Sets result pointer to a specific field offset
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_field_seek'
@@ -226,6 +268,8 @@ Sets result pointer to a specific field offset
 =item C<string mysql_field_table(resource result, int field_offset)>
 
 Gets name of the table the specified field is in
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -237,6 +281,8 @@ Gets name of the table the specified field is in
 
 Gets the type of the specified field in a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_field_type'
@@ -246,6 +292,8 @@ Gets the type of the specified field in a result
 =item C<bool mysql_free_result(resource result)>
 
 Free result memory
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -257,6 +305,8 @@ Free result memory
 
 Returns a string that represents the client library version
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_get_client_info'
@@ -266,6 +316,8 @@ Returns a string that represents the client library version
 =item C<string mysql_get_host_info([int link_identifier])>
 
 Returns a string describing the type of connection in use, including the server host name
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -277,6 +329,8 @@ Returns a string describing the type of connection in use, including the server 
 
 Returns the protocol version used by current connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_get_proto_info'
@@ -286,6 +340,8 @@ Returns the protocol version used by current connection
 =item C<string mysql_get_server_info([int link_identifier])>
 
 Returns a string that represents the server version number
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -297,6 +353,8 @@ Returns a string that represents the server version number
 
 Returns a string containing information about the most recent query
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_info'
@@ -306,6 +364,8 @@ Returns a string containing information about the most recent query
 =item C<int mysql_insert_id([int link_identifier])>
 
 Gets the ID generated from the previous INSERT operation
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -317,6 +377,8 @@ Gets the ID generated from the previous INSERT operation
 
 List databases available on a MySQL server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_list_dbs'
@@ -326,6 +388,8 @@ List databases available on a MySQL server
 =item C<resource mysql_list_fields(string database_name, string table_name [, int link_identifier])>
 
 List MySQL result fields
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -337,6 +401,8 @@ List MySQL result fields
 
 Returns a result set describing the current server threads
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_list_processes'
@@ -346,6 +412,8 @@ Returns a result set describing the current server threads
 =item C<resource mysql_list_tables(string database_name [, int link_identifier])>
 
 List tables in a MySQL database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -357,6 +425,8 @@ List tables in a MySQL database
 
 Gets number of fields in a result
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_num_fields'
@@ -366,6 +436,8 @@ Gets number of fields in a result
 =item C<int mysql_num_rows(resource result)>
 
 Gets number of rows in a result
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -377,6 +449,8 @@ Gets number of rows in a result
 
 Opens a persistent connection to a MySQL Server
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_pconnect'
@@ -386,6 +460,8 @@ Opens a persistent connection to a MySQL Server
 =item C<bool mysql_ping([int link_identifier])>
 
 Ping a server connection. If no connection then reconnect.
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -397,6 +473,8 @@ Ping a server connection. If no connection then reconnect.
 
 Sends an SQL query to MySQL
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_query'
@@ -406,6 +484,8 @@ Sends an SQL query to MySQL
 =item C<string mysql_real_escape_string(string to_be_escaped [, int link_identifier])>
 
 Escape special characters in a string for use in a SQL statement, taking into account the current charset of the connection
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -417,6 +497,8 @@ Escape special characters in a string for use in a SQL statement, taking into ac
 
 Gets result data
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_result'
@@ -426,6 +508,8 @@ Gets result data
 =item C<bool mysql_select_db(string database_name [, int link_identifier])>
 
 Selects a MySQL database
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -437,6 +521,8 @@ Selects a MySQL database
 
 sets client character set
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_set_charset'
@@ -446,6 +532,8 @@ sets client character set
 =item C<string mysql_stat([int link_identifier])>
 
 Returns a string containing status information
+
+NOT IMPLEMENTED.
 
 =cut
 
@@ -457,6 +545,8 @@ Returns a string containing status information
 
 Returns the thread id of current connection
 
+NOT IMPLEMENTED.
+
 =cut
 
 .sub 'mysql_thread_id'
@@ -466,6 +556,8 @@ Returns the thread id of current connection
 =item C<resource mysql_unbuffered_query(string query [, int link_identifier])>
 
 Sends an SQL query to MySQL, without fetching and buffering the result rows
+
+NOT IMPLEMENTED.
 
 =cut
 
