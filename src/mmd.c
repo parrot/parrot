@@ -1511,8 +1511,8 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     if (pmc->vtable->base_type == enum_class_NCI) {
         multi_sig = PMC_pmc_val(pmc);
     }
-    else if (pmc->vtable->base_type == enum_class_Sub
-         ||  pmc->vtable->base_type == enum_class_Closure) {
+    else if (VTABLE_isa(interp, pmc, CONST_STRING(interp, "Sub"))
+         ||  VTABLE_isa(interp, pmc, CONST_STRING(interp, "Closure"))) {
         multi_sig = PMC_sub(pmc)->multi_signature;
 
         /* some method */
