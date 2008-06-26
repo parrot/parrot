@@ -465,7 +465,7 @@ PARROT_API
 INTVAL PackFile_funcs_register(SHIM_INTERP,
     ARGOUT(PackFile *pf),
     UINTVAL type,
-    PackFile_funcs funcs)
+    const PackFile_funcs funcs)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pf);
 

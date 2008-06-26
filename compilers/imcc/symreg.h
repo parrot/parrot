@@ -177,19 +177,7 @@ void add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*r);
 
-void add_pcc_param(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*r)
-        FUNC_MODIFIES(*arg);
-
 void add_pcc_result(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*r)
-        FUNC_MODIFIES(*arg);
-
-void add_pcc_return(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r)
@@ -332,7 +320,6 @@ void pop_namespace(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(2);
 
 void push_namespace(SHIM_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
