@@ -963,12 +963,6 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         return NULL;
 
     for (s = globals.cs->first; s; s = s->next) {
-        /*SymReg * const sub = s->unit->instructions->symregs[0];
-
-        if (STREQ(sub->name, unit->outer->name)) {
-            PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
-            return s->unit->sub_pmc;
-        }*/
         if (STREQ(s->unit->lexid, unit->outer->name)) {
             PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
