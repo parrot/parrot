@@ -1070,12 +1070,17 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
         unit->lexid = r;
     }
     else {
+        char *name;
+
         /* Otherwise, create string constant for it. */
         unit->lexid->color = add_const_str(interp, unit->lexid);
 
         /* We should also trim the quotes off it. */
-        unit->lexid->name++;
-        unit->lexid->name[strlen(unit->lexid->name) - 1] = 0;
+        name = mem_sys_allocate(strlen(unit->lexid->name) - 1);
+        strcpy(name, unit->lexid->name + 1);
+        name[strlen(name) - 1] = 0;
+        mem_sys_free(unit->lexid->name);
+        unit->lexid->name = name;
     }
     sub->lexid = ct->constants[unit->lexid->color]->u.string;
 
