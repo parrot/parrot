@@ -951,12 +951,10 @@ fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
                         PMC_sync(p)->owner = dest_interp;
                     }
                     else {
-                        /* XXX: This error-handling is bad, we should do
-                                something more standard here instead. */
-                        /* fprintf(stderr, "BAD PMC: address=%p,
-                                   base_type=%d\n",
-                                   p, p->vtable->base_type); */
-                        PARROT_ASSERT(0);
+                        real_exception(dest_interp, NULL, INTERP_ERROR,
+                            "Unshared PMC still alive after interpreter \
+                            destruction. address=%p, base_type=%d\n",
+                            p, p->vtable->base_type);
                     }
                 }
             }
