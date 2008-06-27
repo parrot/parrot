@@ -933,33 +933,25 @@ transferring their sync values to the destionation interpreter.
 static void
 fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
 {
-    /* XXX largely copied from dod_sweep */
     Small_Object_Arena *cur_arena;
     const UINTVAL object_size = pool->object_size;
 
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
-        Buffer *b = (Buffer *)cur_arena->start_objects;
+        PMC * p = (PMC *)((char*)cur_arena->start_objects + GC_HEADER_SIZE);
         size_t i;
 
         for (i = 0; i < cur_arena->used; i++) {
-            if (PObj_on_free_list_TEST(b))
-                ; /* if it's on free list, do nothing */
-            else {
-                if (PObj_is_PMC_TEST(b)) {
-                    PMC * const p = (PMC *)b;
-                    if (PObj_is_PMC_shared_TEST(p)) {
-                        PMC_sync(p)->owner = dest_interp;
-                    }
-                    else {
-                        real_exception(dest_interp, NULL, INTERP_ERROR,
-                            "Unshared PMC still alive after interpreter \
-                            destruction. address=%p, base_type=%d\n",
-                            p, p->vtable->base_type);
-                    }
-                }
+            if (!PObj_on_free_list_TEST(p) && PObj_is_PMC_TEST(p)) {
+                if (PObj_is_PMC_shared_TEST(p))
+                    PMC_sync(p)->owner = dest_interp;
+                else
+                    real_exception(dest_interp, NULL, INTERP_ERROR,
+                        "Unshared PMC still alive after interpreter \
+                        destruction. address=%p, base_type=%d\n",
+                        p, p->vtable->base_type);
             }
 
-            b = (Buffer *)((char *)b + object_size);
+            p = (PMC *)((char *)p + object_size);
         }
     }
 }
