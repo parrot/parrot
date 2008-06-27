@@ -242,6 +242,30 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
     return ptr;
 }
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem__internal_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size,
+    ARGIN(const char *file), int line)
+{
+    void * const ptr = realloc(from, size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n",
+            from, size, file, line);
+    fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
+            size, ptr, file, line);
+#else
+    UNUSED(file);
+    UNUSED(line);
+#endif
+    if (!ptr)
+        PANIC(NULL, "Out of mem");
+    if (size > old_size)
+        memset((char*)ptr + old_size, 0, size - old_size);
+
+    return ptr;
+}
+
 /*
 
 =item C<void mem_sys_free>
