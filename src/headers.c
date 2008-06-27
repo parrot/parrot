@@ -1025,7 +1025,7 @@ Parrot_merge_header_pools(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_inte
 
 =item C<void Parrot_initialize_header_pool_names>
 
-UNUSED. Sets the C<name> parameter of the various header pools to a 
+UNUSED. Sets the C<name> parameter of the various header pools to a
 Parrot string structure for the name of the pool.
 
 =cut
