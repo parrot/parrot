@@ -49,6 +49,20 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 =cut
 
+
+.namespace [ 'PAST::Compiler' ]
+
+.sub '__onload' :anon :load :init
+    load_bytecode 'PCT.pbc'
+
+    ##  %valflags specifies when PAST::Val nodes are allowed to
+    ##  be used as a constant.  The 'e' flag indicates that the
+    ##  value must be quoted+escaped in PIR code.
+    .local pmc valflags
+    valflags = get_global '%valflags'
+    valflags['PhpString']   = 's~*e'
+.end
+
 .namespace [ 'Plumhead' ]
 
 .const string VERSION = "0.0.1"
@@ -59,8 +73,6 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'PGE/Dumper.pbc'
-
-    load_bytecode 'PCT.pbc'
 
     load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
     load_bytecode 'languages/plumhead/src/common/php_ctype.pbc'

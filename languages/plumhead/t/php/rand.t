@@ -27,13 +27,9 @@ use lib "$FindBin::Bin/../../lib";
 
 use Test::More     tests => 11;
 
-TODO: {
-    local $TODO = 'awaiting compiler changes';
-
 use Parrot::Test;
 
-
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getrandmax()' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getrandmax()', todo => 'awaiting compiler changes' );
 <?php
   echo getrandmax(), "\n";
 ?>
@@ -49,7 +45,7 @@ CODE
 /Wrong parameter count for/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'mt_getrandmax()' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'mt_getrandmax()', todo => 'awaiting compiler changes' );
 <?php
   echo mt_getrandmax(), "\n";
 ?>
@@ -116,8 +112,6 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(seed)' );
 ?>
 CODE
 OUTPUT
-
-}
 
 # Local Variables:
 #   mode: cperl

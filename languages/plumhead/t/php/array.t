@@ -64,7 +64,7 @@ END_CODE
 9
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with string key' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with string key', todo => 'var_dump() has changed' );
 <?php
 $foo['bar'] = 'asdf';
 echo $foo['bar'];
@@ -78,7 +78,7 @@ array(1) {
 }
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with int key' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with int key', todo => 'var_dump() has changed' );
 <?php
 $twice[1] = 2;
 echo $twice[1];

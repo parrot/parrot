@@ -8,6 +8,7 @@
 
 #include "parrot/parrot.h"
 
+extern INTVAL dynpmc_PhpArray;
 extern INTVAL dynpmc_PhpBoolean;
 extern INTVAL dynpmc_PhpFloat;
 extern INTVAL dynpmc_PhpInteger;

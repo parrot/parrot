@@ -243,14 +243,14 @@ Converts a number in a string from any base <= 36 to any base <= 36
     if $I2 > 36 goto L2
     goto L3
   L2:
-    error("Invalid `from base' (", $I2, ")")
+    error(E_WARNING, "Invalid `from base' (", $I2, ")")
     .RETURN_FALSE()
   L3:
     if $I3 < 2 goto L4
     if $I3 > 36 goto L4
     goto L5
   L4:
-    error("Invalid `to base' (", $I3, ")")
+    error(E_WARNING, "Invalid `to base' (", $I3, ")")
     .RETURN_FALSE()
   L5:
     $P0 = $P1.'to_base'($I2)
@@ -639,7 +639,7 @@ Returns the natural logarithm of the number, or the base log if base is specifie
     $P2 = shift args
     $N2 = $P2
     unless $N2 <= 0.0 goto L3
-    error("base must be greater than 0")
+    error(E_WARNING, "base must be greater than 0")
     .RETURN_FALSE()
   L3:
     $N1 = ln $N1

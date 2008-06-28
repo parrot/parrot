@@ -86,12 +86,12 @@ TODO:
 {
     local $TODO = 'handle no file';
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
 <?php
   echo md5_file('nofile.txt'), "\n";
 ?>
 CODE
-/md5_file/
+
 OUTPUT
 }
 

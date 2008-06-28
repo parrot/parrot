@@ -13,6 +13,23 @@ php_MACRO.pir - PHP API macros
 
 =cut
 
+.const int E_ERROR = 0x0001
+.const int E_WARNING = 0x0002
+.const int E_PARSE = 0x0004
+.const int E_NOTICE	= 0x0008
+.const int E_CORE_ERROR = 0x0010
+.const int E_CORE_WARNING = 0x0020
+.const int E_COMPILE_ERROR = 0x0040
+.const int E_COMPILE_WARNING = 0x0080
+.const int E_USER_ERROR = 0x0100
+.const int E_USER_WARNING = 0x0200
+.const int E_USER_NOTICE = 0x0400
+.const int E_STRICT = 0x0800
+.const int E_RECOVERABLE_ERROR = 0x1000
+
+.const int E_ALL = 0x1fff
+.const int E_CORE = 0x0030
+
 
 =item C<.RETURN_BOOL( val )>
 

@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 17;
+use Test::More     tests => 18;
 use Parrot::Test;
 
 TODO: {
@@ -83,10 +83,6 @@ CODE
 double
 OUTPUT
 
-TODO:
-{
-    local $TODO = 'update compiler';
-
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype("str")' );
 <?php
   echo gettype('str'), "\n";
@@ -95,7 +91,15 @@ CODE
 string
 OUTPUT
 
-}
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype($array)' );
+<?php
+  $hello['world'] = 'hi';
+  echo gettype($hello), "\n";
+?>
+CODE
+array
+OUTPUT
+
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'intval()' );
 <?php

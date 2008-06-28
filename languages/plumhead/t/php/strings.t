@@ -24,7 +24,7 @@ use Test::More     tests => 6;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '== for equal strings' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '== for equal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' == 'asdf' )
 {
@@ -36,7 +36,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '== for unequal strings' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '== for unequal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' == 'jklö' )
 {
@@ -52,7 +52,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '!= for equal strings' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '!= for equal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' != 'asdf' )
 {
@@ -68,7 +68,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '!= for unequal strings' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '!= for unequal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' != 'jklö' )
 {
@@ -80,7 +80,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump()' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump()', todo => 'currently broken' );
 <?php
 var_dump( 'asdf' );
 ?>

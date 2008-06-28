@@ -13,12 +13,14 @@ php_api.pir - PHP API Library
 
 =cut
 
+.include 'languages/plumhead/src/common/php_MACRO.pir'
 
 =item C<error>
 
 =cut
 
 .sub 'error'
+    .param int level
     .param string msg
     printerr msg
 .end
@@ -56,7 +58,7 @@ DUMMY IMPLEMENTATION.
 .sub 'wrong_param_count'
     .local string msg
     msg = 'Wrong parameter count for '
-    error(msg)
+    error(E_WARNING, msg)
 .end
 
 

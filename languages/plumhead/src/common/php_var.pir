@@ -89,7 +89,7 @@ Dumps a string representation of variable to output
     .local string type_of_pmc
     type_of_pmc = typeof a
 
-    ne type_of_pmc, 'String', not_a_string
+    ne type_of_pmc, 'string', not_a_string
         .local int string_len
 
         string_len = elements a
@@ -104,7 +104,7 @@ Dumps a string representation of variable to output
 
 not_a_string:
 
-    ne type_of_pmc, 'Hash', not_a_hash
+    ne type_of_pmc, 'array', not_a_hash
 
         .local int num_elements
         num_elements = elements a
@@ -147,7 +147,7 @@ iter_end:
 
 not_a_hash:
 
-    ne type_of_pmc, 'Integer', not_a_integer
+    ne type_of_pmc, 'integer', not_a_integer
 
         print 'int('
         print a

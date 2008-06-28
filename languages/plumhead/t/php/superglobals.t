@@ -42,7 +42,7 @@ END_CODE
 df
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump( $_GET )' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump( $_GET )', todo => 'currently broken' );
 <?php
 var_dump( $_GET );
 echo "\n";

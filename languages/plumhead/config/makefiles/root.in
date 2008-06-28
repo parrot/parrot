@@ -21,6 +21,7 @@ PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
 PMCS = \
  php \
+ phparray \
  phpboolean \
  phpfloat \
  phpinteger \
@@ -29,6 +30,7 @@ PMCS = \
 
 PMC_SOURCES = \
  $(PMCDIR)/php.pmc \
+ $(PMCDIR)/phparray.pmc \
  $(PMCDIR)/phpboolean.pmc \
  $(PMCDIR)/phpfloat.pmc \
  $(PMCDIR)/phpinteger.pmc \
@@ -113,7 +115,7 @@ help:
 	@echo "                     Current this has nothing to do."
 	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
 	@echo "                     Needs javac and a proper CLASSPATH."
-	@echo "  pmc				Build all PMCs."
+	@echo "  pmc                Build all PMCs."
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite for 'Plumhead pct'."
@@ -186,7 +188,7 @@ plumhead.pbc: \
 
 pmc: $(PHP_GROUP)
 
-$(PHP_GROUP): $(PARROT) $(PMC_FILES)
+$(PHP_GROUP): $(PARROT) $(PMC_SOURCES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)

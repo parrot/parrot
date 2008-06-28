@@ -73,6 +73,8 @@ Calculate the md5 hash of a string
 
 Calculate the md5 hash of given filename
 
+STILL INCOMPLETE (needs stream for URL).
+
 =cut
 
 .sub 'md5_file'
@@ -84,10 +86,9 @@ Calculate the md5 hash of given filename
     .RETURN_NULL()
   L1:
     .local pmc f, md, res
-    push_eh _handler
     $S1 = filename
     f = open $S1, '<'
-    if null f goto L2
+    unless f goto L2
     new md, 'MD5'
     md.'Init'()
   L3:
@@ -106,7 +107,6 @@ Calculate the md5 hash of given filename
     $S0 = make_digest($S0)
   L6:
     .RETURN_STRING($S0)
-  _handler:
   L2:
     .RETURN_FALSE()
 .end

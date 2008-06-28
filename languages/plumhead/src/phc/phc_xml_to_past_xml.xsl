@@ -101,9 +101,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
             <xsl:when test="phc:Token_op/phc:value = 'Jg=='" >infix:&amp;</xsl:when>
           </xsl:choose>
         </xsl:when>
-        <xsl:when test="phc:Token_op/phc:value = '==' and phc:Token_string" >infix:eq</xsl:when>
-        <xsl:when test="phc:Token_op/phc:value = '!=' and phc:Token_string" >infix:ne</xsl:when>
-        <xsl:when test="phc:Token_op/phc:value = '^'" >infix:+^</xsl:when>
+        <xsl:when test="phc:Token_op/phc:value = '&amp;&amp;'" >infix:AND</xsl:when>
+        <xsl:when test="phc:Token_op/phc:value = '||'" >infix:OR</xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat('infix:', phc:Token_op/phc:value)" />
         </xsl:otherwise>
@@ -169,7 +168,7 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
         </past:Var>
       </xsl:when>
       <xsl:otherwise>
-        <past:Var viviself="Hash" scope="package" lvalue="1" >
+        <past:Var viviself="PhpArray" scope="package" lvalue="1" >
           <xsl:attribute name="name" ><xsl:value-of select="concat( '$', phc:Token_variable_name/phc:value )" /></xsl:attribute>
         </past:Var>
       </xsl:otherwise>
@@ -180,7 +179,7 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
 </xsl:template>
 
 <xsl:template match="phc:Token_string" >
-  <past:Val returns="String" >
+  <past:Val returns="PhpString" >
     <xsl:attribute name="encoding" ><xsl:value-of select="phc:value/@encoding" /></xsl:attribute>
     <xsl:attribute name="value" ><xsl:value-of select="phc:value" /></xsl:attribute>
   </past:Val>

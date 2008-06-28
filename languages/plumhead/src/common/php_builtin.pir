@@ -13,6 +13,8 @@ php_builtin.pir - PHP builtin  Library
 
 =cut
 
+.include 'languages/plumhead/src/common/php_MACRO.pir'
+
 =item C<bool class_exists(string classname [, bool autoload])>
 
 Checks if the class exists
@@ -101,12 +103,12 @@ NOT IMPLEMENTED.
 
 Return the current error_reporting level, and if an argument was passed - change to the new level
 
-NOT IMPLEMENTED.
+DUMMY IMPLEMENTATION.
 
 =cut
 
 .sub 'error_reporting'
-    not_implemented()
+    .RETURN_LONG(0)
 .end
 
 =item C<bool extension_loaded(string extension_name)>

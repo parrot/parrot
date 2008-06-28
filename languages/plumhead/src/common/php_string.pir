@@ -446,7 +446,7 @@ Returns the input string repeat mult times
     $P2 = shift args
     $I2 = $P2
     unless $I2 < 0 goto L2
-    error("Second argument has to be greater than or equal to 0")
+    error(E_WARNING, "Second argument has to be greater than or equal to 0")
     .RETURN_NULL()
   L2:
     $S0 = repeat $S1, $I2
@@ -683,12 +683,12 @@ Finds position of first occurrence of a string within another
     if $I3 > $I1 goto L4
     goto L5
   L4:
-    error("Offset not contained in string")
+    error(E_WARNING, "Offset not contained in string")
     .RETURN_FALSE()
   L5:
     $S2 = $P2
     unless $S2 == '' goto L6
-    error("Empty delimiter")
+    error(E_WARNING, "Empty delimiter")
     .RETURN_FALSE()
   L6:
     $I0 = index $S1, $S2, $I3
@@ -777,7 +777,7 @@ Finds first occurrence of a string within another
     $P2 = shift args
     $S2 = $P2
     unless $S2 == '' goto L2
-    error("Empty delimiter")
+    error(E_WARNING, "Empty delimiter")
     .RETURN_FALSE()
   L2:
     $I0 = index $S1, $S2

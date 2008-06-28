@@ -17,7 +17,7 @@ php_type.pir - PHP type Standard Library
     .local int argc
     argc = .args
     unless argc != 1 goto L1
-    error('Only one argument expected')
+    error(E_WARNING, 'Only one argument expected')
     .RETURN_FALSE()
   L1:
     $P1 = shift .args
@@ -169,11 +169,8 @@ Returns true if value is a number or a numeric string
     if $I0 goto L2
     $I0 = isa $P1, 'PhpInteger'
     if $I0 goto L2
-    $I0 = isa $P1, 'String'
+    $I0 = isa $P1, 'PhpString'
     unless $I0 goto L3
-    $S0 = $P1 ###
-    new $P1, 'PhpString' ###
-    set $P1, $S0 ###
     $I0 = $P1.'is_numeric'()
     .RETURN_BOOL($I0)
   L3:
@@ -227,7 +224,7 @@ Returns true if value is a scalar
     if $I0 goto L2
     $I0 = isa $P1, 'PhpInteger'
     if $I0 goto L2
-    $I0 = isa $P1, 'String'
+    $I0 = isa $P1, 'PhpString'
     if $I0 goto L2
     .RETURN_FALSE()
   L2:
@@ -242,7 +239,7 @@ Returns true if variable is a string
 
 .sub 'is_string'
     .param pmc args :slurpy
-    .IS_TYPE('String', args)
+    .IS_TYPE('PhpString', args)
 .end
 
 =item C<bool settype(mixed var, string type)>
