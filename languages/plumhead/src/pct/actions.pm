@@ -71,20 +71,11 @@ method inline_sea($/) {
 }
 
 method echo_statement($/) {
-     if $/[0]<expression> {
-         make PAST::Op.new(
-                  $( $/[0]<expression> ),
-                  :name('echo'),
-                  :node($/)
-              );
-     }
-     elsif $/[0]<function_call> {
-         make PAST::Op.new(
-                  $( $/[0]<function_call> ),
-                  :name('echo'),
-                  :node($/)
-              );
-     }
+     make PAST::Op.new(
+              $( $<expression> ),
+              :name('echo'),
+              :node($/)
+          );
 }
 
 method function_call($/) {
