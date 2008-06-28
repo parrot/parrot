@@ -25,8 +25,6 @@ On inserted and fetch, keys are converted to STRINGs.
 =head2 store
 
 PMC insert values are converted to STRINGs.
-RT#46387: Integer insert values are converted to STRINGs.
-RT#46389: Number insert values are converted to STRINGs.
 
 =head2 fetch
 
@@ -35,7 +33,6 @@ as integers usually can't be converted.
 
 When a PMC is requested, a String PMC is returned.
 
-RT#46391: return None PMC for nonexisting keys.
 
 =head2 Functions
 
@@ -224,8 +221,8 @@ Returns the string value for the element at C<*key>.
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
         datum key_gdbm, val_gdbm;
 
-        if (!key) return NULL;
-        if (!dbf) return NULL;
+        if (!key) return PMCNULL;
+        if (!dbf) return PMCNULL;
         keystr = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
