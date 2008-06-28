@@ -140,7 +140,7 @@ method array_assign($/) {
 method array_elem($/) {
     my $past_var_name := $( $<VAR_NAME> );
     $past_var_name.scope('package');
-    $past_var_name.viviself('Hash');
+    $past_var_name.viviself('PhpArray');
 
     make PAST::Var.new(
              $past_var_name,
