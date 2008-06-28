@@ -1116,7 +1116,6 @@ free_sym(ARGMOD(SymReg *r))
         mem_sys_free(sub);
     }
 
-    /* TODO free keychain */
     if (r->set == 'K') {
         SymReg *key     = r->nextkey;
         while (key) {
