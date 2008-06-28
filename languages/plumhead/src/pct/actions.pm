@@ -35,7 +35,7 @@ method SEA($/) {
     make PAST::Op.new(
              PAST::Val.new(
                  :value(~$/),
-                 :returns('String')
+                 :returns('PhpString')
              ),
              :name('echo'),
              :node($/)
@@ -63,7 +63,7 @@ method inline_sea($/) {
    make PAST::Op.new(
             PAST::Val.new(
                 :value(~$<SEA_empty_allowed>),
-                :returns('String')
+                :returns('PhpString')
             ),
             :name('echo'),
             :node($/)
@@ -312,7 +312,7 @@ method NUMBER($/) {
 method SINGLEQUOTE_STRING($/) {
     make PAST::Val.new(
              :value( $( $<string_literal> ) ),
-             :returns('String'),
+             :returns('PhpString'),
              :node($/)
          );
 }
@@ -320,7 +320,7 @@ method SINGLEQUOTE_STRING($/) {
 method DOUBLEQUOTE_STRING($/) {
     make PAST::Val.new(
              :value( $( $<string_literal> ) ),
-             :returns('String'),
+             :returns('PhpString'),
              :node($/)
          );
 }

@@ -64,7 +64,7 @@ END_CODE
 9
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with string key', todo => 'var_dump() has changed' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with string key' );
 <?php
 $foo['bar'] = 'asdf';
 echo $foo['bar'];

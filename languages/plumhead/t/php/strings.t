@@ -80,7 +80,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump()', todo => 'currently broken' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump()' );
 <?php
 var_dump( 'asdf' );
 ?>
