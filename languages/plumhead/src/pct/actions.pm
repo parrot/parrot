@@ -71,11 +71,10 @@ method inline_sea($/) {
 }
 
 method echo_statement($/) {
-     make PAST::Op.new(
-              $( $<expression> ),
-              :name('echo'),
-              :node($/)
-          );
+    my $past := $( $<arguments> );
+    $past.name( ~$<ECHO> );
+
+    make $past;
 }
 
 method function_call($/) {
@@ -86,7 +85,10 @@ method function_call($/) {
 }
 
 method arguments($/) {
-    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+    my $past := PAST::Op.new(
+                    :pasttype('call'),
+                    :node($/)
+                );
     for $<expression> {
         $past.push($($_));
     }

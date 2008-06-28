@@ -28,10 +28,6 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 11;
 use Parrot::Test;
 
-TODO: {
-    local $TODO = 'awaiting compiler updates';
-
-
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'bin2hex' );
 <?php
   echo bin2hex('Ab3'), "\n";
@@ -141,8 +137,6 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ucfirst' );
 CODE
 Abc
 OUTPUT
-
-}
 
 # Local Variables:
 #   mode: cperl

@@ -28,7 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 3;
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getenv()', todo => 'currently broken' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getenv()' );
 <?php
   echo getenv('PARROT_TMP'), "\n";
 ?>
@@ -38,7 +38,7 @@ OUTPUT
 
 $ENV{PARROT_TMP} = 'GETENV_PARROT';
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getenv()', todo => 'currently broken' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getenv()' );
 <?php
   echo getenv('PARROT_TMP'), "\n";
 ?>

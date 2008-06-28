@@ -23,19 +23,16 @@ rule  statement               { <echo_statement>       {*} <statement_delimiter>
                               | <array_assign>         {*} <statement_delimiter>  #= array_assign
                               }
 rule  statement_delimiter     { ';' | <before \? > | $ }
-rule  echo_statement          { <ECHO>
-                                <expression>
-                                {*}
-                              }
-rule  function_call           { <FUNCTION_NAME> <.PAREN_OPEN> <arguments> <.PAREN_CLOSE> {*} }
-rule  arguments               { <expression>*  {*} }
+rule  echo_statement          { <ECHO> <arguments> {*} }
+rule  function_call           { <FUNCTION_NAME> <.PAREN_OPEN> <arguments> <.PAREN_CLOSE>  {*} }
+rule  arguments               {  [ <expression> [',' <expression>]* ]?                    {*} }
 rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE>
                                 \{ <statements> \}
                                 <else_clause>?
                                 {*}
                               }
-token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START> {*} }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression>        {*} }
+token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START>             {*} }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression>                            {*} }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} }
 
 token ECHO                    { 'echo' }

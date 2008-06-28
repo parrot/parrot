@@ -26,12 +26,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 use Test::More     tests => 2;
-
-TODO: {
-    local $TODO = 'awaiting compiler changes';
-
 use Parrot::Test;
-
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(str)' );
 <?php
@@ -48,8 +43,6 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_decode(str)' );
 CODE
 Plum Headed Parakeet
 OUTPUT
-
-}
 
 # Local Variables:
 #   mode: cperl

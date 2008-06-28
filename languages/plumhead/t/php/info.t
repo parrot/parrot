@@ -28,7 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 8;
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'php_egg_logo_guid()', todo => 'awaiting compiler updates' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'php_egg_logo_guid()' );
 <?php
   echo php_egg_logo_guid(), "\n";
 ?>
@@ -36,7 +36,7 @@ CODE
 PHPE9568F36-D428-11d2-A769-00AA001ACF42
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'php_logo_guid()', todo => 'awaiting compiler updates' );
+language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'php_logo_guid()' );
 <?php
   echo php_logo_guid(), "\n";
 ?>
@@ -44,7 +44,7 @@ CODE
 /PHPE9568F3[46]-D428-11d2-A769-00AA001ACF42/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'php_real_logo_guid()', todo => 'awaiting compiler updates' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'php_real_logo_guid()' );
 <?php
   echo php_real_logo_guid(), "\n";
 ?>
@@ -68,7 +68,7 @@ CODE
 /.+/
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'phpversion()', todo => 'awaiting compiler updates' );
+language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'phpversion()' );
 <?php
   echo phpversion(), "\n";
 ?>
@@ -76,7 +76,7 @@ CODE
 /^5\.2/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'phpversion("ctype")', todo => 'awaiting compiler updates' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'phpversion("ctype")' );
 <?php
   echo phpversion('ctype'), "\n";
 ?>
@@ -84,7 +84,7 @@ CODE
 
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'zend_logo_guid()', todo => 'awaiting compiler updates' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'zend_logo_guid()' );
 <?php
   echo zend_logo_guid(), "\n";
 ?>

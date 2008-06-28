@@ -29,7 +29,7 @@ use Test::More     tests => 11;
 
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getrandmax()', todo => 'awaiting compiler changes' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getrandmax()' );
 <?php
   echo getrandmax(), "\n";
 ?>
@@ -45,7 +45,7 @@ CODE
 /Wrong parameter count for/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'mt_getrandmax()', todo => 'awaiting compiler changes' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'mt_getrandmax()' );
 <?php
   echo mt_getrandmax(), "\n";
 ?>

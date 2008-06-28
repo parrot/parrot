@@ -28,10 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 32;
 use Parrot::Test;
 
-TODO: {
-    local $TODO = 'awaiting compiler updates';
-
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'abs' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'abs', todo => 'broken in PCT variant' );
 <?php
   echo abs(-3), "\n";
   echo abs(-3.14), "\n";
@@ -298,7 +295,6 @@ language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'tanh' );
 CODE
 /^0\.462/
 OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl

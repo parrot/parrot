@@ -29,10 +29,6 @@ use Test::More     tests => 5;
 
 use Parrot::Test;
 
-TODO: {
-    local $TODO = 'awaiting compiler changes';
-
-
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg)' );
 <?php
   echo md5('message digest'), "\n";
@@ -41,7 +37,7 @@ CODE
 f96b697d7cb7938d525a2f31aaf161d0
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, FALSE)' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, FALSE)', todo => 'booleans not supported yet in PCT variant' );
 <?php
   echo md5('message digest', FALSE), "\n";
 ?>
@@ -49,11 +45,7 @@ CODE
 f96b697d7cb7938d525a2f31aaf161d0
 OUTPUT
 
-TODO:
-{
-    local $TODO = 'update compiler';
-
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, TRUE)' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, TRUE)', todo => 'booleans not supported yet in PCT variant' );
 <?php
   $md = md5('message digest', TRUE);
   echo gettype($md), "\n";
@@ -63,7 +55,6 @@ CODE
 string
 16
 OUTPUT
-}
 
 unlink '../file.txt' if (-f '../file.txt');
 open my $X, '>', '../file.txt';
@@ -80,12 +71,6 @@ OUTPUT
 
 unlink '../file.txt' if (-f '../file.txt');
 
-}
-
-TODO:
-{
-    local $TODO = 'handle no file';
-
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
 <?php
   echo md5_file('nofile.txt'), "\n";
@@ -93,7 +78,6 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
 CODE
 
 OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl
