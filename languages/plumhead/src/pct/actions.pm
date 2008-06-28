@@ -304,7 +304,7 @@ method INTEGER($/) {
 method NUMBER($/) {
     make PAST::Val.new(
              :value( +$/ ),
-             :returns('Float'),
+             :returns('PhpFloat'),
              :node($/)
          );
 }
