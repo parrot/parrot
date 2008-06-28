@@ -296,7 +296,7 @@ method string($/,$key) {
 method INTEGER($/) {
     make PAST::Val.new(
              :value( ~$/ ),
-             :returns('Integer'),
+             :returns('PhpInteger'),
              :node($/)
          );
 }

@@ -78,7 +78,7 @@ array(1) {
 }
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with int key', todo => 'var_dump() has changed' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with int key' );
 <?php
 $twice[1] = 2;
 echo $twice[1];
