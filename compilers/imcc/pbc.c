@@ -1770,7 +1770,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         npc = 0;
 
         /* add debug if necessary */
-        if ( IMCC_INFO(interp)->optimizer_level == 0
+        if (IMCC_INFO(interp)->optimizer_level == 0
           || IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
             const char * const sourcefile = unit->file;
 

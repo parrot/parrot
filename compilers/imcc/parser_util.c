@@ -705,7 +705,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         };
 
         if (keyvec & KEY_BIT(i)) {
-            // XXX Assert that len > 2
+            /* XXX Assert that len > 2 */
             len          = strlen(format) - 2;
             PARROT_ASSERT(len >= 0);
             format[len]  = '\0';
