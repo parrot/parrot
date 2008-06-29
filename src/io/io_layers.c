@@ -182,7 +182,7 @@ PIO_get_layer(PARROT_INTERP, ARGIN(const char *name))
     ParrotIOLayer **t;
 
     for (t = interp->piolayers; *t; ++t)
-        if (strcmp(name, (*t)->name) == 0)
+        if (STREQ(name, (*t)->name))
             return *t;
     return NULL;
 }
