@@ -263,9 +263,9 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
         /* chop pasm/pir */
 
         ext = strrchr(src, '.');
-        if (ext && strcmp(ext, ".pasm") == 0)
+        if (ext && STREQ(ext, ".pasm"))
             string_chopn_inplace(interp, file, 4);
-        else if (ext && strcmp(ext, ".pir") == 0)
+        else if (ext && STREQ(ext, ".pir"))
             string_chopn_inplace(interp, file, 3);
         else if (!ext) /* EVAL_n */
             file = string_append(interp, file,

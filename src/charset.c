@@ -143,7 +143,7 @@ Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))
     const int n = all_charsets->n_charsets;
 
     for (i = 0; i < n; ++i) {
-        if (strcmp(all_charsets->set[i].charset->name, charsetname) == 0) {
+        if (STREQ(all_charsets->set[i].charset->name, charsetname)) {
             return all_charsets->set[i].charset;
         }
     }
@@ -302,7 +302,7 @@ register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
     int i;
 
     for (i = 0; i < n; ++i) {
-        if (strcmp(all_charsets->set[i].charset->name, charsetname) == 0)
+        if (STREQ(all_charsets->set[i].charset->name, charsetname))
             return 0;
     }
     /*
@@ -371,19 +371,19 @@ Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
         all_charsets->n_charsets = 0;
         all_charsets->set = NULL;
     }
-    if (strcmp("binary", charsetname) == 0) {
+    if (STREQ("binary", charsetname)) {
         Parrot_binary_charset_ptr = charset;
         return register_charset(interp, charsetname, charset);
     }
-    if (strcmp("iso-8859-1", charsetname) == 0) {
+    if (STREQ("iso-8859-1", charsetname)) {
         Parrot_iso_8859_1_charset_ptr = charset;
         return register_charset(interp, charsetname, charset);
     }
-    if (strcmp("unicode", charsetname) == 0) {
+    if (STREQ("unicode", charsetname)) {
         Parrot_unicode_charset_ptr = charset;
         return register_charset(interp, charsetname, charset);
     }
-    if (strcmp("ascii", charsetname) == 0) {
+    if (STREQ("ascii", charsetname)) {
         if (!Parrot_default_charset_ptr) {
             Parrot_default_charset_ptr = charset;
         }

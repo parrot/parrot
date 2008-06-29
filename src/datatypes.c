@@ -44,7 +44,7 @@ Parrot_get_datatype_enum(PARROT_INTERP, ARGIN(const STRING *type_name))
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
-        if (strcmp(data_types[i - enum_first_type].name, type) == 0) {
+        if (STREQ(data_types[i - enum_first_type].name, type)) {
             string_cstring_free(type);
             return i;
         }
