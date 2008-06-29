@@ -194,8 +194,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
 <xsl:template match="phc:Token_bool" >
   <past:Val returns="PhpBoolean" >
     <xsl:attribute name="value" ><xsl:choose>
-      <xsl:when test="phc:value = 'True'" >1</xsl:when>
-      <xsl:when test="phc:value = 'False'"   >0</xsl:when>
+      <xsl:when test="phc:value = 'True'"  >1</xsl:when>
+      <xsl:when test="phc:value = 'False'" >0</xsl:when>
     </xsl:choose></xsl:attribute>
   </past:Val>
 </xsl:template>

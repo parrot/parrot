@@ -286,6 +286,30 @@ method string($/,$key) {
     make $( $/{$key} );
 }
 
+method TRUE($/) {
+    make PAST::Val.new(
+             :value( 1 ),
+             :returns('PhpBoolean'),
+             :node($/)
+         );
+}
+
+method FALSE($/) {
+    make PAST::Val.new(
+             :value( 0 ),
+             :returns('PhpBoolean'),
+             :node($/)
+         );
+}
+
+method NULL($/) {
+    make PAST::Val.new(
+             :value( 0 ),
+             :returns('PhpUndef'),
+             :node($/)
+         );
+}
+
 method INTEGER($/) {
     make PAST::Val.new(
              :value( ~$/ ),

@@ -43,10 +43,13 @@ token PAREN_CLOSE             { \) }
 token IDENT                   { <[a..zA..Z_]>+ <[a..zA..Z_0..9]>* }
 token VAR_NAME                {  '$' <IDENT> {*} }
 
+token TRUE                    { 'TRUE'                         {*} }
+token FALSE                   { 'FALSE'                        {*} }
+token NULL                    { 'NULL'                         {*} }
 token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
 token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
-token INTEGER                 { \d+              {*} }
-token NUMBER                  { ( \d+ )? '.' \d+ {*} }
+token INTEGER                 { \d+                            {*} }
+token NUMBER                  { ( \d+ )? '.' \d+               {*} }
 
 token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
@@ -66,7 +69,8 @@ rule  else_clause             { <.ELSE> \{ <statements> \} {*} }
 rule  rel_op_clause           { <REL_OP> <expression> }
 regex SEA_empty_allowed       { <-[<]>*? <before \<> }  # everthing till the next '<'
 
-token expression              { <concat_expression>       {*}  #= concat_expression
+token expression              { 
+                              | <concat_expression>       {*}  #= concat_expression
                               | <bitwise_expression>      {*}  #= bitwise_expression
                               | <function_call>           {*}  #= function_call
                               }
@@ -96,7 +100,10 @@ rule  multiplicand            { <MUL_OP> <multiplying_expression> }
 
 rule  unary_expression        { <UNARY_MINUS>? <postfix_expression> {*} }
 
-rule  postfix_expression      { <NUMBER>                                   {*}    #= NUMBER
+rule  postfix_expression      { <TRUE>                                     {*}    #= TRUE
+                              | <FALSE>                                    {*}    #= FALSE
+                              | <NULL>                                     {*}    #= NULL
+                              | <NUMBER>                                   {*}    #= NUMBER
                               | <INTEGER>                                  {*}    #= INTEGER
                               | <.PAREN_OPEN> <expression> <.PAREN_CLOSE>  {*}    #= expression
                               | <array_elem>                               {*}    #= array_elem

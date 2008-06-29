@@ -52,7 +52,7 @@ CODE
 My4xNA==
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(TRUE)', todo => 'await support in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(TRUE)' );
 <?php
   echo base64_encode(TRUE), "\n";
 ?>
@@ -60,7 +60,7 @@ CODE
 MQ==
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(NULL)', todo => 'await support in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(NULL)' );
 <?php
   echo base64_encode(NULL), "\n";
 ?>

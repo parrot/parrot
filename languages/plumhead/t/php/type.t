@@ -28,7 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 18;
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'floatval()', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'floatval()' );
 <?php
   echo floatval(TRUE), "\n";
   echo floatval(NULL), "\n";
@@ -48,7 +48,7 @@ CODE
 0
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(TRUE)', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(TRUE)' );
 <?php
   echo gettype(TRUE), "\n";
 ?>
@@ -56,7 +56,7 @@ CODE
 boolean
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(NULL)', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(NULL)' );
 <?php
   echo gettype(NULL), "\n";
 ?>
@@ -98,7 +98,7 @@ array
 OUTPUT
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'intval()', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'intval()' );
 <?php
   echo intval(TRUE), "\n";
   echo intval(NULL), "\n";
@@ -132,7 +132,7 @@ CODE
 /Only one argument expected/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_bool(TRUE)', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_bool(TRUE)' );
 <?php
   echo is_bool(TRUE), "\n";
 ?>
@@ -156,7 +156,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_null(NULL)', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_null(NULL)' );
 <?php
   echo is_null(NULL), "\n";
 ?>
@@ -164,7 +164,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_numeric()', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_numeric()' );
 <?php
   echo is_numeric(3), "\n";
   echo is_numeric(3.14), "\n";
@@ -190,7 +190,7 @@ CODE
 
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_scalar()', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_scalar()' );
 <?php
   echo is_scalar(NULL), "\n";
   echo is_scalar(TRUE), "\n";
@@ -231,7 +231,7 @@ OUTPUT
 
 }
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strval(TRUE)', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strval(TRUE)' );
 <?php
   echo strval(TRUE), "\n";
 ?>

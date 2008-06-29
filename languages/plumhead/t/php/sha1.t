@@ -37,17 +37,13 @@ CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1(msg, FALSE)', todo => 'await support in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1(msg, FALSE)' );
 <?php
   echo sha1('message digest', FALSE), "\n";
 ?>
 CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
 OUTPUT
-
-TODO:
-{
-    local $TODO = 'update compiler';
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1(msg, TRUE)' );
 <?php
@@ -59,7 +55,6 @@ CODE
 string
 20
 OUTPUT
-}
 
 unlink '../file.txt' if (-f '../file.txt');
 open my $X, '>', '../file.txt';

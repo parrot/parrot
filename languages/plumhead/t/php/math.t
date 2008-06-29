@@ -28,7 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 32;
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'abs', todo => 'broken in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'abs' );
 <?php
   echo abs(-3), "\n";
   echo abs(-3.14), "\n";

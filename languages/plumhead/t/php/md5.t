@@ -37,7 +37,7 @@ CODE
 f96b697d7cb7938d525a2f31aaf161d0
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, FALSE)', todo => 'booleans not supported yet in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, FALSE)' );
 <?php
   echo md5('message digest', FALSE), "\n";
 ?>
@@ -45,7 +45,7 @@ CODE
 f96b697d7cb7938d525a2f31aaf161d0
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, TRUE)', todo => 'booleans not supported yet in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg, TRUE)' );
 <?php
   $md = md5('message digest', TRUE);
   echo gettype($md), "\n";

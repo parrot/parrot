@@ -166,14 +166,14 @@ CODE
 /srand\(\) expects parameter 1 to be long, string given/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(TRUE)', todo => 'await support in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(TRUE)' );
 <?php
   srand(TRUE);
 ?>
 CODE
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(NULL)', todo => 'await support in PCT variant' );
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(NULL)' );
 <?php
   srand(NULL);
 ?>
