@@ -590,9 +590,9 @@ find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), ARGOUT(int 
         SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if names and namespaces are matching - ok */
-        if (r && !strcmp(r->name, name)
+        if (r && (strcmp(r->name, name) == 0)
               && ((sym->unit->_namespace && s->unit->_namespace
-              &&  !strcmp(sym->unit->_namespace->name, s->unit->_namespace->name))
+              &&  (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
               || (!sym->unit->_namespace && !s->unit->_namespace)))
             return s;
 
@@ -959,7 +959,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
     len = strlen(unit->outer->name);
 
-    if (!len)
+    if (len == 0)
         return NULL;
 
     for (s = globals.cs->first; s; s = s->next) {
@@ -1770,7 +1770,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         npc = 0;
 
         /* add debug if necessary */
-        if (!IMCC_INFO(interp)->optimizer_level
+        if ( IMCC_INFO(interp)->optimizer_level == 0
           || IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
             const char * const sourcefile = unit->file;
 
