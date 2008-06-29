@@ -203,18 +203,17 @@ STILL INCOMPLETE.
 
 .sub 'getenv'
     .param pmc args :slurpy
-    .local pmc varname
+    .local string varname
     ($I0, varname) = parse_parameters('s', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $S1 = varname
-#    $S0 = sapi_getenv($S1)
+#    $S0 = sapi_getenv(varname)
 #    unless $S0 goto L2
 #    .RETURN_STRING($S0)
 #  L2:
     new $P0, 'Env'
-    $S0 = $P0[$S1]
+    $S0 = $P0[varname]
     unless $S0 goto L3
     .RETURN_STRING($S0)
   L3:
@@ -565,13 +564,12 @@ Delay for a given number of seconds
 
 .sub 'sleep'
     .param pmc args :slurpy
-    .local pmc seconds
+    .local int seconds
     ($I0, seconds) = parse_parameters('l', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $I1 = seconds
-    sleep $I1
+    sleep seconds
 .end
 
 =item C<array sys_getloadavg()>

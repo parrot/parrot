@@ -171,7 +171,7 @@ Returns true if value is a number or a numeric string
     if $I0 goto L2
     $I0 = isa $P1, 'PhpString'
     unless $I0 goto L3
-    $I0 = $P1.'is_numeric'()
+    $I0 = $P1.'is_numeric'(0)
     .RETURN_BOOL($I0)
   L3:
     .RETURN_FALSE()

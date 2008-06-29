@@ -34,12 +34,39 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'abs', todo => 'broken in 
   echo abs(-3.14), "\n";
   echo abs(TRUE), "\n";
   echo abs(NULL), "\n";
+  echo abs('0x03'), "\n";
+  echo abs('-3'), "\n";
+  echo abs('-3.14'), "\n";
+  echo abs(' 0x03'), "\n";
+  echo abs(' -3'), "\n";
+  echo abs(' -3.14'), "\n";
+  echo abs(' 0x03 '), "\n";
+  echo abs(' -3 '), "\n";
+  echo abs(' -3.14 '), "\n";
+  echo abs('str'), "\n";
+  echo abs(' str'), "\n";
+  echo abs(' str '), "\n";
+  $hello['world'] = 'hi';
+  echo abs($hello), "\n";
 ?>
 CODE
 3
 3.14
 1
 0
+3
+3
+3.14
+3
+3
+3.14
+3
+3
+3.14
+0
+0
+0
+
 OUTPUT
 
 language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'acos' );

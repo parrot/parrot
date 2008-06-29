@@ -63,7 +63,7 @@ language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen() no arg' );
   echo strlen(), "\n";
 ?>
 CODE
-/Wrong parameter count for/
+/Wrong parameter count for strlen\(\)/
 OUTPUT
 
 language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen() too many arg' );
@@ -71,7 +71,7 @@ language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen() too many arg' 
   echo strlen('str', 42), "\n";
 ?>
 CODE
-/Wrong parameter count for/
+/Wrong parameter count for strlen\(\)/
 OUTPUT
 
 # Local Variables:

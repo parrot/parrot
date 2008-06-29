@@ -83,16 +83,14 @@ Returns a random number from Mersenne Twister
     $I0 = $P0.'genrand_int31'()
     .RETURN_LONG($I0)
   L1:
-    .local pmc min
-    .local pmc max
+    .local int min
+    .local int max
     ($I0, min, max) = parse_parameters('ll', args :flat)
     if $I0 goto L2
     .RETURN_NULL()
   L2:
     $N0 = $P0.'genrand_real2'()
-    $I1 = min
-    $I2 = max
-    .RAND_RANGE($I0, $N0, $I1, $I2)
+    .RAND_RANGE($I0, $N0, min, max)
     .RETURN_LONG($I0)
 .end
 
@@ -104,19 +102,18 @@ Seeds Mersenne Twister random number generator
 
 .sub 'mt_srand'
     .param pmc args :slurpy
-    .local pmc seed
+    .local int seed
     ($I0, seed) = parse_parameters('|l', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    if null seed goto L2
-    $I1 = seed
-    goto L3
+    .local int argc
+    argc = args
+    if argc goto L2
+    seed = generate_seed()
   L2:
-    $I1 = generate_seed()
-  L3:
     $P0 = get_hll_global 'mt19937'
-    $P0.'init_genrand'($I1)
+    $P0.'init_genrand'(seed)
     .return ()
 .end
 
@@ -135,16 +132,14 @@ Returns a random number
     $I0 = $P0
     .RETURN_LONG($I0)
   L1:
-    .local pmc min
-    .local pmc max
+    .local int min
+    .local int max
     ($I0, min, max) = parse_parameters('ll', args :flat)
     if $I0 goto L2
     .RETURN_NULL()
   L2:
     $N0 = $P0
-    $I1 = min
-    $I2 = max
-    .RAND_RANGE($I0, $N0, $I1, $I2)
+    .RAND_RANGE($I0, $N0, min, max)
     .RETURN_LONG($I0)
 .end
 
@@ -156,19 +151,18 @@ Seeds random number generator
 
 .sub 'srand'
     .param pmc args :slurpy
-    .local pmc seed
+    .local int seed
     ($I0, seed) = parse_parameters('|l', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    if null seed goto L2
-    $I1 = seed
-    goto L3
+    .local int argc
+    argc = args
+    if argc goto L2
+    seed = generate_seed()
   L2:
-    $I1 = generate_seed()
-  L3:
     new $P0, 'Random'
-    set $P0, $I1
+    set $P0, seed
     .return ()
 .end
 

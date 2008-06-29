@@ -148,18 +148,13 @@ STILL INCOMPLETE (see get_uname).
 
 .sub 'php_uname'
     .param pmc args :slurpy
-    .local pmc mode
+    .local string mode
+    mode = 'a'
     ($I0, mode) = parse_parameters('|s', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    if null mode goto L2
-    $S1 = mode
-    goto L3
-  L2:
-    $S1 = 'a'
-  L3:
-    .return get_uname($S1)
+    .return get_uname(mode)
 .end
 
 =item C<void phpcredits([int flag])>

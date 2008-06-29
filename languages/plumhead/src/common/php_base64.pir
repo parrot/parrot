@@ -29,15 +29,15 @@ STILL INCOMPLETE.
 
 .sub 'base64_decode'
     .param pmc args :slurpy
-    .local pmc str
-    .local pmc strict # not used, (not handled by MIME::Base64)
+    .local string str
+    .local int strict # not used, (not handled by MIME::Base64)
+    strict = 0
     ($I0, str, strict) = parse_parameters('s|b', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $S1 = str
     $P0 = get_hll_global [ 'MIME'; 'Base64' ], 'decode_base64'
-    $S0 = $P0($S1)
+    $S0 = $P0(str)
     .RETURN_STRING($S0)
 .end
 
@@ -50,14 +50,13 @@ Encodes string using MIME base64 algorithm
 
 .sub 'base64_encode'
     .param pmc args :slurpy
-    .local pmc str
+    .local string str
     ($I0, str) = parse_parameters('s', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $S1 = str
     $P0 = get_hll_global ['MIME'; 'Base64'], 'encode_base64'
-    $S0 = $P0($S1)
+    $S0 = $P0(str)
     if $S0 == '' goto L2
     .RETURN_STRING($S0)
   L2:

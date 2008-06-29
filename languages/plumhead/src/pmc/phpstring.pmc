@@ -60,12 +60,12 @@ Return the string 'string'.
 
 =over 4
 
-=item C<INTVAL is_numeric()>
+=item C<INTVAL is_numeric(INTVAL allow_errors)>
 
 =cut
 
 */
-    METHOD INTVAL is_numeric() {
+    METHOD INTVAL is_numeric(INTVAL allow_errors) {
         INTVAL       retval = 0;
         STRING       *rep = SELF.get_string();
         char         *s   = string_to_cstring(INTERP, rep);
@@ -82,13 +82,13 @@ Return the string 'string'.
         else
             i = strtol(s1, &s2, 10);
 
-        if (s1 != s2 && *s2 == '\0') {
+        if (s1 != s2 && (*s2 == '\0' || (allow_errors && isspace((unsigned char)*s2)))) {
             retval = 1;
         }
         else {
             FLOATVAL d = strtod(s1, &s2);
 
-            if (s1 != s2 && *s2 == '\0') {
+            if (s1 != s2 && (*s2 == '\0' || (allow_errors && isspace((unsigned char)*s2)))) {
                 retval = 1;
             }
         }

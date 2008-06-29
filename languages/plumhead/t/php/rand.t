@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 11;
+use Test::More     tests => 20;
 
 use Parrot::Test;
 
@@ -42,7 +42,7 @@ language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'getrandmax(wrong param)
   echo getrandmax(42);
 ?>
 CODE
-/Wrong parameter count for/
+/Wrong parameter count for getrandmax\(\)/
 OUTPUT
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'mt_getrandmax()' );
@@ -99,6 +99,22 @@ CODE
 /\d/
 OUTPUT
 
+language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'rand(too few arg)' );
+<?php
+  echo rand(1);
+?>
+CODE
+/rand\(\) expects exactly 2 parameters, 1 given/
+OUTPUT
+
+language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'rand(too many arg)' );
+<?php
+  echo rand(1, 10, 100);
+?>
+CODE
+/rand\(\) expects exactly 2 parameters, 3 given/
+OUTPUT
+
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand()' );
 <?php
   srand();
@@ -109,6 +125,57 @@ OUTPUT
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(seed)' );
 <?php
   srand(42);
+?>
+CODE
+OUTPUT
+
+language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(too many arg)' );
+<?php
+  echo srand(42, 12);
+?>
+CODE
+/srand\(\) expects at most 1 parameter, 2 given/
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand("42")' );
+<?php
+  srand('42');
+?>
+CODE
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(" 42")' );
+<?php
+  srand(' 42');
+?>
+CODE
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(" 42 ")' );
+<?php
+  srand(' 42 ');
+?>
+CODE
+OUTPUT
+
+language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(" str ")' );
+<?php
+  srand('str');
+?>
+CODE
+/srand\(\) expects parameter 1 to be long, string given/
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(TRUE)', todo => 'await support in PCT variant' );
+<?php
+  srand(TRUE);
+?>
+CODE
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'srand(NULL)', todo => 'await support in PCT variant' );
+<?php
+  srand(NULL);
 ?>
 CODE
 OUTPUT

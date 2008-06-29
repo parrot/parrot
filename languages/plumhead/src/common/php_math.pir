@@ -444,13 +444,12 @@ Returns e raised to the power of the number
 
 .sub 'exp'
     .param pmc args :slurpy
-    .local pmc number
+    .local num number
     ($I0, number) = parse_parameters('d', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $N1 = number
-    $N0 = exp $N1
+    $N0 = exp number
     .RETURN_DOUBLE($N0)
 .end
 
@@ -504,15 +503,13 @@ Returns the remainder of dividing x by y as a float
 
 .sub 'fmod'
     .param pmc args :slurpy
-    .local pmc x
-    .local pmc y
+    .local num x
+    .local num y
     ($I0, x, y) = parse_parameters('dd', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $N1 = x
-    $N2 = y
-    $N0 = cmod $N1, $N2
+    $N0 = cmod x, y
     .RETURN_DOUBLE($N0)
 .end
 
@@ -573,7 +570,7 @@ NOT IMPLEMENTED.
 
 .sub 'is_finite'
     .param pmc args :slurpy
-    .local pmc val
+    .local num val
     ($I0, val) = parse_parameters('d', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
@@ -591,7 +588,7 @@ NOT IMPLEMENTED.
 
 .sub 'is_infinite'
     .param pmc args :slurpy
-    .local pmc val
+    .local num val
     ($I0, val) = parse_parameters('d', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
@@ -609,7 +606,7 @@ NOT IMPLEMENTED.
 
 .sub 'is_nan'
     .param pmc args :slurpy
-    .local pmc val
+    .local num val
     ($I0, val) = parse_parameters('d', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
