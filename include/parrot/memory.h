@@ -26,6 +26,7 @@
     (t *)mem__internal_allocate_zeroed(sizeof (t), __FILE__, __LINE__)
 
 #define mem_internal_realloc(x, y) mem__internal_realloc(x, y, __FILE__, __LINE__)
+#define mem_internal_realloc_zeroed(p, x, y) mem__internal_realloc_zeroed(p, x, y, __FILE__, __LINE__)
 #define mem_internal_free(x) mem__internal_free(x, __FILE__, __LINE__)
 
 #define mem_allocate_new_stash() NULL
@@ -99,6 +100,16 @@ void * mem__internal_realloc(
     ARGIN(const char *file),
     int line)
         __attribute__nonnull__(3);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void * mem__internal_realloc_zeroed(
+    ARGFREE(void *from),
+    size_t size,
+    size_t old_size,
+    ARGIN(const char *file),
+    int line)
+        __attribute__nonnull__(4);
 
 void mem_setup_allocator(PARROT_INTERP)
         __attribute__nonnull__(1);

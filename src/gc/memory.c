@@ -244,6 +244,19 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
 
 #if 0
 
+/*
+
+=item C<mem__internal_realloc_zeroed>
+
+Reallocates a given buffer of size C<old_size> to C<size>. If the new size
+is larger then the old size, the difference is filled with zeros. Contains
+debugging information, and can print filename and line number where it is
+used if C<DETAIL_MEMORY_DEBUG> is defined.
+
+=cut
+
+*/
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
