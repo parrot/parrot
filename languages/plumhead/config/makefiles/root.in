@@ -222,7 +222,7 @@ clean-common: clean-pmc
   plumhead.pbc
 
 clean-pmc:
-	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/*\.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
+	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/*.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
 
 clean-pct:
 	$(RM_F) \
