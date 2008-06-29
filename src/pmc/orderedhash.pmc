@@ -55,7 +55,7 @@ Marks the OrderedHash as live.
 */
 
     VTABLE void mark() {
-        Hash   *h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)PMC_struct_val(SELF);
         INTVAL  i;
 
         if (!h)
