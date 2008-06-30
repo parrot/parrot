@@ -113,16 +113,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
         source_fn = rest
 GOT_PHP_SOURCE_FN:
 
-    # the superglobals _GET and _POST need to be set up for any variant
-    .local pmc parse_get_sub, superglobal_GET
-    parse_get_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'
-    ( superglobal_GET ) = parse_get_sub()
-    set_hll_global '$_GET', superglobal_GET
-
-    .local pmc parse_post_sub, superglobal_POST
-    parse_post_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'
-    ( superglobal_POST ) = parse_post_sub()
-    set_hll_global '$_POST', superglobal_POST
+    set_superglobals()
 
     .local string target
     target = opt['target']
@@ -282,6 +273,50 @@ n_help:
     rest = argv[argc]
 
     .return (opt, rest )
+.end
+
+# Most of the superglobals are not initialized yet
+.sub set_superglobals
+
+    # the superglobals _GET and _POST need to be set up for any variant
+    .local pmc parse_get_sub, superglobal_GET
+    parse_get_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'
+    ( superglobal_GET ) = parse_get_sub()
+    set_hll_global '$_GET', superglobal_GET
+
+    .local pmc parse_post_sub, superglobal_POST
+    parse_post_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'
+    ( superglobal_POST ) = parse_post_sub()
+    set_hll_global '$_POST', superglobal_POST
+
+    .local pmc superglobal_SERVER
+    superglobal_SERVER = new 'PhpArray'
+    set_hll_global '$_SERVER', superglobal_SERVER
+
+    .local pmc superglobal_GLOBALS
+    superglobal_GLOBALS = new 'PhpArray'
+    set_hll_global '$_GLOBALS', superglobal_GLOBALS
+
+    .local pmc superglobal_FILES
+    superglobal_FILES = new 'PhpArray'
+    set_hll_global '$_FILES', superglobal_FILES
+
+    .local pmc superglobal_COOKIE
+    superglobal_COOKIE = new 'PhpArray'
+    set_hll_global '$_COOKIE', superglobal_COOKIE
+
+    .local pmc superglobal_SESSION
+    superglobal_SESSION = new 'PhpArray'
+    set_hll_global '$_SESSION', superglobal_SESSION
+
+    .local pmc superglobal_REQUEST
+    superglobal_REQUEST = new 'PhpArray'
+    set_hll_global '$_REQUEST', superglobal_REQUEST
+
+    .local pmc superglobal_ENV
+    superglobal_ENV = new 'PhpArray'
+    set_hll_global '$_ENV', superglobal_ENV
+
 .end
 
 .namespace [ 'Plumhead::Grammar' ]
