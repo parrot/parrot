@@ -1,255 +1,53 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-use lib qw(. lib ../lib ../../lib);
+use lib qw{lib};
 
-use Fatal qw(open);
-use File::Find;
 use File::Spec;
-use Test::More;
-use Parrot::Config qw{%PConfig};
-use Parrot::Distribution;
 use Getopt::Long;
+use Parrot::Config qw(%PConfig);
+use Parrot::Distribution;
+use Test::More;
 
-BEGIN {
-    eval { require Perl::Critic; };
-    if ($@) {
-        plan skip_all => 'Perl::Critic not installed';
-    }
-    my $required_version = 1.03;
-    if ( $Perl::Critic::VERSION < $required_version ) {
-        plan skip_all => "Perl::Critic v$required_version required, v$Perl::Critic::VERSION found";
-    }
+eval { require Test::Perl::Critic };
+if ($@) {
+  plan( skip_all => 'Test::Perl::Critic required to criticize code');
+  exit;
 }
 
-my $perl_tidy_conf = 'tools/util/perltidy.conf';
-
-my %policies;
-my ( $list_policies_flag, $list_files_flag, @input_policies );
-my $policy_group = 'default';
-
+my $theme = 'parrot';
 GetOptions(
-    'list'      => \$list_policies_flag,
-    'listfiles' => \$list_files_flag,
-    'policy=s'  => \@input_policies,
-    'group=s'   => \$policy_group,         # all, default, extra
+    'theme=s'   => \$theme
 );
 
-# if we we're given a policy (or policies), set it to the policies hash
-# this still doesn't implement passing options to policies though...
-# i.e. need to be able to handle --policy=foo=>{'bar'=>baz}
-if (@input_policies) {
-    foreach my $input_policy (@input_policies) {
+my $config = File::Spec->catfile( qw{tools util perlcritic.conf} );
 
-        # now split on commas if that's been used as well
-        my @sub_policies = split( /,/, $input_policy );
-        foreach my $sub_policy (@sub_policies) {
-            $policies{$sub_policy} = 1;
-        }
-    }
-}
+Test::Perl::Critic->import(
+    -profile => $config,
+    -theme   => $theme
+);
 
-# get the files to check
-my $DIST = Parrot::Distribution->new();
+my $dist = Parrot::Distribution->new();
+my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages' );
+
 my @files;
 if ( !@ARGV ) {
 
-    @files = map { $_->path } $DIST->get_perl_language_files();
+    # Skip any files in languages/
+    @files = grep { ! m{^\Q$languages_dir\E} }
+             map { $_->path }
+             $dist->get_perl_language_files();
 
-    # Skip any language files...
-    my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages' );
-    @files = grep { !m{\Q$languages_dir\E} } @files;
-}
-else {
-
-    # if we're passed a directory, find all the matching files
-    # under that directory.
-
-    # use $_ for the check below, as File::Find chdirs on us.
-    # RT#44441 Change this to simply return all files in the distribution
-    #     from this point down? -Coke
-    foreach my $file (@ARGV) {
-        ( -d $file )
-            ? find(
-            sub {
-                if ( -d $_ and $_ eq '.svn' ) {
-                    $File::Find::prune = 1;
-                    return;
-                }
-                if ( is_perl($_) ) {
-                    push @files, $File::Find::name;
-                }
-            },
-            $file
-            )
-            : push @files, $file;
-    }
+} else {
+    @files = @ARGV;
 }
 
-if ($list_files_flag) {
-    print "Files to be tested by perlcritic:\n";
-    for my $file (@files) {
-        print $file, "\n";
-    }
-
-    exit;
-}
-
-# Add in the few cases we should care about.
-# For a list of available policies, perldoc Perl::Critic
-if ( keys %policies ) {
-
-    # if the policy is passed in on the command line, and it's one of the
-    # ones where we require certain config arguments, then set them to the
-    # ones we want here.
-
-    # XXX this information is being duplicated, we should only specify the
-    # perltidyrc once, e.g.
-
-    if ( grep /CodeLayout::RequireTidyCode/, @input_policies ) {
-        $policies{'CodeLayout::RequireTidyCode'} = { perltidyrc => $perl_tidy_conf };
-    }
-    elsif ( grep /CodeLayout::ProhibitHardTabs/, @input_policies ) {
-        $policies{'CodeLayout::ProhibitHardTabs'} = { allow_leading_tabs => 0 };
-    }
-}
-else {
-    # otherwise, just run perlcritic.t normally
-
-    my %default_policies = (
-        'BuiltinFunctions::ProhibitStringySplit'          => 1,
-        'CodeLayout::ProhibitDuplicateCoda'               => 1,
-        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
-        'CodeLayout::ProhibitTrailingWhitespace'          => 1,
-        'CodeLayout::UseParrotCoda'                       => 1,
-        'InputOutput::ProhibitBarewordFileHandles'        => 1,
-        'InputOutput::ProhibitTwoArgOpen'                 => 1,
-        'Subroutines::ProhibitExplicitReturnUndef'        => 1,
-        'Subroutines::ProhibitSubroutinePrototypes'       => 1,
-        'TestingAndDebugging::MisplacedShebang'           => 1,
-        'TestingAndDebugging::ProhibitShebangWarningsArg' => 1,
-        'TestingAndDebugging::RequirePortableShebang'     => 1,
-        'TestingAndDebugging::RequireUseStrict'           => 1,
-        'TestingAndDebugging::RequireUseWarnings'         => 1,
-        'Variables::ProhibitConditionalDeclarations'      => 1,
-    );
-
-    # Allow some names normally proscribed by PBP.
-    my @ambiguousNames = grep {$_ ne 'abstract'}
-        Perl::Critic::Policy::NamingConventions::ProhibitAmbiguousNames::default_forbidden_words();
-
-    # These policies are not yet passing consistently.
-    my %extra_policies = (
-        'CodeLayout::RequireTidyCode' =>
-            { perltidyrc => $perl_tidy_conf },
-        'NamingConventions::ProhibitAmbiguousNames' =>
-            { forbid => join(" ", @ambiguousNames)},
-        'Subroutines::ProhibitBuiltinHomonyms'      => 1,
-        'Subroutines::RequireFinalReturn'           => 1,
-    );
-
-    # Add Perl::Critic::Bangs if it exists
-    eval { require Perl::Critic::Bangs; };
-    if ($@) {
-        diag "Perl::Critic::Bangs not installed: not testing for TODO items in code";
-    }
-    else {
-        $default_policies{'Bangs::ProhibitFlagComments'} = 1;
-    }
-
-    # decide which policy group to use
-    if ( $policy_group eq 'default' ) {
-        %policies = %default_policies;
-    }
-    elsif ( $policy_group eq 'extra' ) {
-        %policies = %extra_policies;
-    }
-    elsif ( $policy_group eq 'all' ) {
-        %policies = ( %default_policies, %extra_policies );
-    }
-    else {
-        warn "Unknown policy group, using 'default' policy group";
-    }
-
-    # Give a diag to let users know if this is doing anything, how to repeat.
-    if (exists $policies{'CodeLayout::RequireTidyCode'}) {
-        eval { require Perl::Tidy; };
-        if ( !$@ ) {
-            diag "Using $perl_tidy_conf for Perl::Tidy settings";
-        }
-    }
-}
-
-if ($list_policies_flag) {
-    use Data::Dumper;
-    $Data::Dumper::Indent = 1;
-    $Data::Dumper::Terse  = 1;
-    foreach my $policy ( sort keys %policies ) {
-        if ( $policies{$policy} == 1 ) {
-            print $policy, "\n";
-        }
-        else {
-            warn $policy, " => ", Dumper( \$policies{$policy} );
-        }
-    }
-    exit;
-}
-
-# the number of tests is the number of policies
-if ( keys %policies ) {
-    plan tests => scalar keys %policies;
-}
-else {
-    exit;
-}
-
-# Create a critic object with all of the policies we care about.
-
-# By default, don't complain about anything.
-my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
-
-foreach my $policy ( keys %policies ) {
-    $config->add_policy(
-        -policy => $policy,
-        ref $policies{$policy} ? ( -config => $policies{$policy} ) : (),
-    ) or die;
-}
-
-my $critic = Perl::Critic->new(
-    -config => $config,
-    -top    => 50,
-);
-
-$Perl::Critic::Violation::FORMAT = '%f:%l.%c';
-
-my %violations = map { $_, [] } ( keys %policies );
-
-# check each file for the given policies
-foreach my $file ( sort @files ) {
-    if ( !-r $file ) {
-        diag "skipping invalid file: $file\n";
-        next;
-    }
-
-    foreach my $violation ( $critic->critique($file) ) {
-        my $policy = $violation->policy();
-        $policy =~ s/^Perl::Critic::Policy:://;
-        push @{ $violations{$policy} }, $violation->to_string();
-    }
-}
-
-foreach my $policy ( sort keys %violations ) {
-    my @violations = @{ $violations{$policy} };
-    ok( !@violations, $policy )
-        or diag( "Policy: $policy failed in "
-            . scalar @violations
-            . " instances:\n"
-            . join( "\n", @violations ) );
-}
+plan(tests => scalar(@files));
+critic_ok($_) foreach @files;
 
 __END__
 
@@ -261,54 +59,25 @@ t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
 
  % prove t/codingstd/perlcritic.t
 
- % perl --policy=TestingAndDebugging::RequireUseWarnings t/codingstd/perlcritic.t
+ % perl --theme=extra t/codingstd/perlcritic.t
 
- % perl --group=all t/codingstd/perlcritic.t
-
- % perl --group=extra t/codingstd/perlcritic.t
+ % perl t/codingstd/perlcritic.t <file>
 
 =head1 DESCRIPTION
 
 Tests all perl source files for some very specific perl coding violations.
 
 Optionally specify directories or files on the command line to test B<only>
-those files, otherwise all files in the C<MANIFEST> will be checked.
+those files, otherwise all perl 5 files in the C<MANIFEST> will be checked.
 
-By default, this script will validate the specified files against a default
-set of policies. To run the test for a B<specific> Rule, specify it on the
-command line before any other files, as:
+This test uses a standard perlcriticrc file, located in
+F<tools/utils/perlcritic.conf>
 
- perl t/codingstd/perlcritic.t --policy=TestingAndDebugging::RequireUseWarnings
+If you wish to run a specific policy, the easiest way to do so is to
+temporarily add a custom theme to the configuration file and then specify
+that on the command line to this script.
 
-This will, for example, use B<only> that policy (see L<Perl::Critic> for
-more information on policies) when examining files from the manifest.
-
-Multiple policies can be specified either by separating the individual
-policies with a comma:
-
- --policy=foo,bar
-
-and/or by specifying the C<--policy> argument multiple times on the command
-line.
-
-If you just wish to get a listing of the polices that will be checked
-without actually running them, use:
-
- perl t/codingstd/perlcritic.t --list
-
-If you just wish to get a listing of the files that will be checked
-without actually running the tests, use:
-
- perl t/codingstd/perlcritic.t --listfiles
-
-Not all policies are analysed by default.  To process the extra policies,
-use the C<--group=extra> argument.  To process all policies use:
-
- perl t/codingstd/perlcritic.t --group=all
-
-=head1 BUGS AND LIMITATIONS
-
-There's no way to specify options to policies when they are specified on the
+If you wish to test a specific file, you can pass that as an argument on the
 command line.
 
 =cut
