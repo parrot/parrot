@@ -421,7 +421,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/scheduler$(O) \
     $(SRC_DIR)/spf_render$(O) \
     $(SRC_DIR)/spf_vtable$(O) \
-    $(SRC_DIR)/stack_common$(O) \
     $(SRC_DIR)/stacks$(O) \
     $(SRC_DIR)/stm/backend$(O) \
     $(SRC_DIR)/stm/waitlist$(O) \
@@ -1146,8 +1145,6 @@ $(SRC_DIR)/gc/register$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/runops_cores$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/stacks$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/stack_common$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/tsq$(O) : $(GENERAL_H_FILES)
 
