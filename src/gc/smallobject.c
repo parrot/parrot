@@ -188,6 +188,7 @@ static void
 gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
 {
     PMC_EXT *object        = (PMC_EXT *)to_add;
+    object->_metadata      = NULL;
 
     /* yes, this cast is a hack for now, but a pointer is a pointer */
     object->_next_for_GC   = (PMC *)pool->free_list;
