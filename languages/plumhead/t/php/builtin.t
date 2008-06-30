@@ -26,7 +26,6 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 use Test::More     tests => 5;
-
 use Parrot::Test;
 
 
@@ -73,6 +72,7 @@ language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen() too many arg' 
 CODE
 /Wrong parameter count for strlen\(\)/
 OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

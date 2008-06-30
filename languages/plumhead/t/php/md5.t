@@ -26,8 +26,8 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 use Test::More     tests => 5;
-
 use Parrot::Test;
+
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'md5(msg)' );
 <?php

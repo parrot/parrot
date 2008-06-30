@@ -26,7 +26,6 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 use Test::More     tests => 3;
-
 use Parrot::Test;
 
 
