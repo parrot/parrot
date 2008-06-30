@@ -168,8 +168,6 @@ sub full_name {
 
     $name .= "_" . join( "_", @arg_types ) if @arg_types;
 
-    $name = "deprecated_$name" if ( $self->body =~ /DEPRECATED/ );
-
     return $name;
 }
 

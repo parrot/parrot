@@ -974,17 +974,10 @@ op interpinfo(out STR, in INT) {
 
 Turns on warnings categories. Categories already turned on will stay on.
 Initial setting is currently all warnings off.  Include F<warnings.pasm> to
-access the categories.  They are:
+access the categories. Refer to that file for the current list of warnings
+available.
 
 =over 4
-
-=item .PARROT_WARNINGS_UNDEF_FLAG
-
-=item .PARROT_WARNINGS_IO_FLAG
-
-=item .PARROT_WARNINGS_PLATFORM_FLAG
-
-=item .PARROT_WARNINGS_ALL_FLAG
 
 =back
 

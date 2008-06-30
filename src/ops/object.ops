@@ -366,7 +366,7 @@ system.
 
 =cut
 
-inline op getclass(out PMC, in STR) :object_classes :flow {
+inline op getclass(out PMC, in STR) :object_classes :flow :deprecated {
     PMC      * const _class = Parrot_class_lookup(interp, $2);
     opcode_t * const next   = expr NEXT();
 
@@ -376,11 +376,9 @@ inline op getclass(out PMC, in STR) :object_classes :flow {
     $1 = _class;
 
   goto ADDRESS(next);
-/*  real_exception(interp, NULL, UNIMPLEMENTED,
-        "The 'getclass' opcode has been deprecated, use 'get_class'. See RT #47972.");*/
 }
 
-inline op getclass(out PMC, in PMC) :object_classes :flow {
+inline op getclass(out PMC, in PMC) :object_classes :flow :deprecated {
   PMC      * const _class = Parrot_class_lookup_p(interp, $2);
   opcode_t * const next   = expr NEXT();
 
@@ -391,8 +389,6 @@ inline op getclass(out PMC, in PMC) :object_classes :flow {
   else
     $1 = _class;
   goto ADDRESS(next);
-/*  real_exception(interp, NULL, UNIMPLEMENTED,
-        "The 'getclass' opcode has been deprecated, use 'get_class'. See RT #47972.");*/
 }
 
 ###############################################################################

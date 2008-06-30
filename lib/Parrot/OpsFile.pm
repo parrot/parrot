@@ -89,6 +89,10 @@ The presence (or absence) of certain flags will change how the op
 behaviors. For example, the lack of the C<flow> flag will cause the
 op to be implicitly terminated with C<goto NEXT()>. (See next section).
 
+The :deprecated flag will generate a diagnostic to standard error at
+runtime when a deprecated opcode is invoked. (If and only if
+PARROT_WARNINGS_DEPRECATED_FLAG has been set with the warningson)
+
 =back
 
 =head2 Op Body (Macro Substitutions)
@@ -478,6 +482,12 @@ sub make_op {
     my $next     = 0;
     my $restart  = 0;
 
+    if (exists($$flags{deprecated})) {
+        $body = <<"END_CODE" . $body;
+INTVAL unused = PARROT_WARNINGS_test(interp,PARROT_WARNINGS_DEPRECATED_FLAG) &&
+  fprintf(stderr,"Warning: instruction '$short_name' is deprecated\\n");
+END_CODE
+}
     unless (exists($$flags{flow})) {
         $body .= "\ngoto NEXT();";
     }

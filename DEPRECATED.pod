@@ -10,6 +10,16 @@ deprecated, but a firm deadline for their removal has not yet been established.
 When deprecated items are removed, all usage of the feature in the
 repository should be updated or removed; including documentation.
 
+When deprecating opcodes, in addition to the ticket, be sure to mark the
+opcode with the :deprecated flag; this will allow users to enable deprecation
+warnings selectively with:
+
+ .include 'include/warnings.pasm'
+ warningson .PARROT_WARNINGS_DEPRECATED_FLAG
+
+And then receive runtime warnings if they are using any deprecated opcodes.  The C<-w>
+command line option for parrot can also be used to enable all warnings.
+
 =head1 vtable entries
 
 =over 4

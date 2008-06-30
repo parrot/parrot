@@ -356,7 +356,7 @@ op set_root_global(in PMC, in STR, invar PMC) {
 
 ###############################################################################
 
-=head2 Deprecated global variable ops
+=head2 Global variable ops
 
 Operations to modify global variables
 
@@ -380,15 +380,15 @@ of strings.
 
 =cut
 
-op store_global(in STR, invar PMC) {
+op store_global(in STR, invar PMC) :deprecated {
     Parrot_store_global_cur(interp, $1, $2);
 }
 
-op store_global(in STR, in STR, invar PMC) {
+op store_global(in STR, in STR, invar PMC) :deprecated {
     Parrot_store_global_s(interp, $1, $2, $3);
 }
 
-op store_global(in PMC, in STR, invar PMC) {
+op store_global(in PMC, in STR, invar PMC) :deprecated {
     Parrot_store_global_k(interp, $1, $2, $3);
 }
 
@@ -418,19 +418,19 @@ Null PMC, depending on current errors settings.  See B<errorson>.
 
 =cut
 
-op find_global(out PMC, in STR) {
+op find_global(out PMC, in STR) :deprecated {
     PMC * const cur_ns = CONTEXT(interp)->current_namespace;
     $1 = Parrot_find_global_op(interp, cur_ns, $2, expr NEXT());
 }
 
-op find_global(out PMC, in STR, in STR) {
+op find_global(out PMC, in STR, in STR) :deprecated {
     PMC * const ns = Parrot_get_namespace_keyed_str(interp,
                                                     Parrot_get_ctx_HLL_namespace(interp),
                                                     $2);
     $1 = Parrot_find_global_op(interp, ns, $3, expr NEXT());
 }
 
-op find_global(out PMC, in PMC, in STR) {
+op find_global(out PMC, in PMC, in STR) :deprecated {
     PMC * const ns = Parrot_get_namespace_keyed(interp,
                                                 Parrot_get_ctx_HLL_namespace(interp),
                                                 $2);

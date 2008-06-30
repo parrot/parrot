@@ -11,12 +11,13 @@
 /* Warning flags */
 /* &gen_from_enum(warnings.pasm)  */
 typedef enum {
-    PARROT_WARNINGS_ALL_FLAG      = 0xFF,
-    PARROT_WARNINGS_NONE_FLAG     = 0x00,
-    PARROT_WARNINGS_UNDEF_FLAG    = 0x01,
-    PARROT_WARNINGS_IO_FLAG       = 0x02,
-    PARROT_WARNINGS_PLATFORM_FLAG = 0x04,
-    PARROT_WARNINGS_DYNEXT_FLAG   = 0x08
+    PARROT_WARNINGS_ALL_FLAG        = 0xFF,
+    PARROT_WARNINGS_NONE_FLAG       = 0x00,
+    PARROT_WARNINGS_UNDEF_FLAG      = 0x01,
+    PARROT_WARNINGS_IO_FLAG         = 0x02,
+    PARROT_WARNINGS_PLATFORM_FLAG   = 0x04,
+    PARROT_WARNINGS_DYNEXT_FLAG     = 0x08,
+    PARROT_WARNINGS_DEPRECATED_FLAG = 0x10
 } Warnings_classes;
 
 /* &end_gen */
