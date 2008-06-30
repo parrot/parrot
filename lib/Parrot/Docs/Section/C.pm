@@ -139,11 +139,7 @@ sub new {
             'Registers and Stacks',
             '',
             $self->c_item( '', 'pairs' => ['register'], ),
-            $self->c_item(
-                '',
-                'pairs'   => ['stacks'],
-                'sources' => ['stack_common']
-            ),
+            $self->c_item( '', 'pairs'   => ['stacks'], ),
             $self->c_header_item( '', 'enums' ),
         ),
         $self->new_group(
