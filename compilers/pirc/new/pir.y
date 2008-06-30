@@ -195,6 +195,7 @@ extern YY_DECL;
        TK_FLAG_MULTI        ":multi"
        TK_FLAG_POSTCOMP     ":postcomp"
        TK_FLAG_IMMEDIATE    ":immediate"
+       TK_FLAG_LEXID        ":lexid"
 
 %token TK_FLAG_UNIQUE_REG   ":unique_reg"
        TK_FLAG_NAMED        ":named"
@@ -212,6 +213,7 @@ extern YY_DECL;
              if_null_type
              sub_id
              opt_paren_string
+             paren_string
              parrot_instruction
 
 %type <targ> sub
@@ -432,6 +434,8 @@ sub_flag         : ":anon"
                         { $$ = SUB_FLAG_OUTER;  set_sub_outer(lexer, $3); }
                  | ":vtable" opt_paren_string
                         { $$ = SUB_FLAG_VTABLE; set_sub_vtable(lexer, $2); }
+                 | ":lexid" paren_string
+                        { $$ = SUB_FLAG_LEXID; /* do something with this */ }
                  ;
 
 
@@ -978,7 +982,11 @@ arg_flag         : ":flat"
 
 opt_paren_string : /* empty */
                         { $$ = NULL; }
-                 | '(' TK_STRINGC ')'
+                 | paren_string
+                        { $$ = $1; }
+                 ;
+
+paren_string     : '(' TK_STRINGC ')'
                         { $$ = $2; }
                  ;
 

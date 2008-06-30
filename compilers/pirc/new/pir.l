@@ -376,6 +376,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ":outer"      { return TK_FLAG_OUTER; }
 ":vtable"     { return TK_FLAG_VTABLE; }
 ":multi"      { return TK_FLAG_MULTI; }
+":lexid"      { return TK_FLAG_LEXID; }
 
 ":unique_reg" { return TK_FLAG_UNIQUE_REG; }
 ":optional"   { return TK_FLAG_OPTIONAL; }
