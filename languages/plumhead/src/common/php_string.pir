@@ -37,9 +37,37 @@ php_string.pir - PHP string Standard Library
     .param string str
     .param string what
     .param int mode
-    # dummy implementation
-    $S0 = str
-    .RETURN_STRING($S0)
+    .local int idx, len
+    $I0 = mode & 1
+    unless $I0 goto L1
+    idx = 0
+    len = length str
+  L2:
+    unless idx < len goto L3
+    $S0 = substr str, idx, 1
+    $I0 = index what, $S0
+    if $I0 < 0 goto L3
+    inc idx
+    goto L2
+  L3:
+    str = substr str, idx
+  L1:
+    $I0 = mode & 2
+    unless $I0 goto L4
+    len = length str
+    idx = len - 1
+  L5:
+    unless idx >= 0 goto L6
+    $S0 = substr str, idx, 1
+    $I0 = index what, $S0
+    if $I0 < 0 goto L6
+    dec idx
+    goto L5
+  L6:
+    inc idx
+    str = substr str, 0, idx
+  L4:
+    .RETURN_STRING(str)
 .end
 
 .macro DO_TRIM(args, mode)
@@ -249,8 +277,6 @@ NOT IMPLEMENTED.
 
 Strips whitespace from the beginning of a string
 
-STILL INCOMPLETE (see _trim).
-
 =cut
 
 .sub 'ltrim'
@@ -357,8 +383,6 @@ NOT IMPLEMENTED.
 =item C<string rtrim(string str [, string character_mask])>
 
 Removes trailing whitespace
-
-STILL INCOMPLETE (see _trim).
 
 =cut
 
@@ -923,8 +947,6 @@ NOT IMPLEMENTED.
 =item C<string trim(string str [, string character_mask])>
 
 Strips whitespace from the beginning and end of a string
-
-STILL INCOMPLETE (see _trim).
 
 =cut
 

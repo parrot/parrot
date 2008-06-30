@@ -16,6 +16,8 @@ src/pmc/phpfloat.pmc - PHP Float
 
 */
 
+#include "php_private.h"
+
 pmclass PhpFloat
     extends  Float
     provides scalar
@@ -57,6 +59,102 @@ Return the string 'double'.
 =head2 Specific Methods
 
 =over 4
+
+=item C<PMC* acosh()>
+
+=cut
+
+*/
+    METHOD acosh() {
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC_num_val(d) = acosh(PMC_num_val(SELF));
+        RETURN(PMC *d);
+    }
+
+/*
+
+=item C<PMC* asinh()>
+
+=cut
+
+*/
+    METHOD asinh() {
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC_num_val(d) = asinh(PMC_num_val(SELF));
+        RETURN(PMC *d);
+    }
+
+/*
+
+=item C<PMC* atanh()>
+
+=cut
+
+*/
+    METHOD atanh() {
+        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC_num_val(d) = atanh(PMC_num_val(SELF));
+        RETURN(PMC *d);
+    }
+
+/*
+
+=item C<PMC* is_finite()>
+
+=cut
+
+*/
+    METHOD PMC* is_finite() {
+        PMC *retval = pmc_new(INTERP, dynpmc_PhpBoolean);
+#if 1
+        FLOATVAL d = SELF.get_number();
+        INTVAL val = finite(d);
+        VTABLE_set_bool(INTERP, retval, val);
+#else
+        VTABLE_set_bool(INTERP, retval, 0);
+#endif
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* is_infinite()>
+
+=cut
+
+*/
+    METHOD PMC* is_infinite() {
+        PMC *retval = pmc_new(INTERP, dynpmc_PhpBoolean);
+#if 1
+        FLOATVAL d = SELF.get_number();
+        INTVAL val = isinf(d);
+        VTABLE_set_bool(INTERP, retval, val);
+#else
+        VTABLE_set_bool(INTERP, retval, 0);
+#endif
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* is_nan()>
+
+=cut
+
+*/
+    METHOD PMC* is_nan() {
+        PMC *retval = pmc_new(INTERP, dynpmc_PhpBoolean);
+#if 1
+        FLOATVAL d = SELF.get_number();
+        INTVAL val = isnan(d);
+        VTABLE_set_bool(INTERP, retval, val);
+#else
+        VTABLE_set_bool(INTERP, retval, 0);
+#endif
+        RETURN(PMC *retval);
+    }
+
+/*
 
 =item C<PMC* to_number()>
 

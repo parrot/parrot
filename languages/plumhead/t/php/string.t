@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 11;
+use Test::More     tests => 14;
 use Parrot::Test;
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'bin2hex' );
@@ -44,6 +44,14 @@ CODE
 A
 OUTPUT
 
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ltrim' );
+<?php
+  echo ltrim('  abc'), "\n";
+?>
+CODE
+abc
+OUTPUT
+
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ord' );
 <?php
   echo ord('A'), "\n";
@@ -52,6 +60,14 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ord' );
 CODE
 65
 0
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'rtrim' );
+<?php
+  echo rtrim('  abc  '), "\n";
+?>
+CODE
+  abc
 OUTPUT
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'str_repeat' );
@@ -128,6 +144,20 @@ cdef
 cd
 ef
 e
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'trim' );
+<?php
+  echo trim('  abc  '), "\n";
+  echo trim('   '), "\n";
+  echo trim(''), "\n";
+  echo trim('  abc  ', ' a'), "\n";
+?>
+CODE
+abc
+
+
+bc
 OUTPUT
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ucfirst' );
