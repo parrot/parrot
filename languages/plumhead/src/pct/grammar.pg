@@ -6,6 +6,15 @@
 grammar Plumhead::Grammar is PCT::Grammar;
 
 token TOP                     { ^ <sea_or_code>+ {*} }
+token ws                      { [ \h | \v ]*
+                                <singlelinecomment>?
+                                <multilinecomment>?
+                              }
+token singlelinecomment       { '#'  \N*
+                              | '//' \N*
+                              }
+token multilinecomment        { '/*' .*? '*/' }
+
 token sea_or_code             { <SEA>    {*}   #= SEA
                               | <code_tp1>   {*}   #= code_tp1
                               | <code_tp2>   {*}   #= code_tp2
