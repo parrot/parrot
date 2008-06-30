@@ -246,7 +246,7 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
 
 /*
 
-=item C<mem__internal_realloc_zeroed>
+=item C<void * mem__internal_realloc_zeroed>
 
 Reallocates a given buffer of size C<old_size> to C<size>. If the new size
 is larger then the old size, the difference is filled with zeros. Contains

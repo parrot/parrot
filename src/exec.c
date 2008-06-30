@@ -31,6 +31,7 @@ src/exec.c - Generate an object file
 /* HEADERIZER HFILE: include/parrot/exec.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void add_data_member(
     ARGMOD(Parrot_exec_objfile_t *obj),
@@ -48,6 +49,7 @@ static int symbol_list_find(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*

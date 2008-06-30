@@ -17,6 +17,7 @@
 #define PARROT_I386_EXEC_DEP_H_GUARD
 
 /* HEADERIZER BEGIN: src/exec_dep.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void offset_fixup(Parrot_exec_objfile_t *obj);
 void Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
@@ -31,6 +32,7 @@ void Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exec_dep.c */
 
 #endif /* PARROT_I386_EXEC_DEP_H_GUARD */

@@ -98,6 +98,7 @@ typedef struct Parrot_exec_objfile_t {
 } Parrot_exec_objfile_t;
 
 /* HEADERIZER BEGIN: src/exec.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 void Parrot_exec_add_text_rellocation(
@@ -148,6 +149,7 @@ int Parrot_exec_add_symbol(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exec.c */
 
 #endif /* EXEC_CAPABLE */
