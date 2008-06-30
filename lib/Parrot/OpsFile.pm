@@ -90,8 +90,8 @@ behaviors. For example, the lack of the C<flow> flag will cause the
 op to be implicitly terminated with C<goto NEXT()>. (See next section).
 
 The :deprecated flag will generate a diagnostic to standard error at
-runtime when a deprecated opcode is invoked. (If and only if
-PARROT_WARNINGS_DEPRECATED_FLAG has been set with the warningson)
+runtime when a deprecated opcode is invoked and
+C<PARROT_WARNINGS_DEPRECATED_FLAG> has been set.
 
 =back
 
