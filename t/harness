@@ -7,7 +7,11 @@ use warnings;
 use lib qw( lib );
 
 use Getopt::Std;
+
+# need runtests from T::H, but avoid running all our parrot invocations with -w
 use Test::Harness ();
+undef $Test::Harness::Switches;
+
 use Parrot::Harness::DefaultTests qw(
     get_default_tests
     @developing_tests
