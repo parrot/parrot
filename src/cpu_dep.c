@@ -51,7 +51,11 @@ extern void *flush_reg_store(void);
 
 =item C<void trace_system_areas>
 
-Traces the system stack and any additional CPU-specific areas.
+Initiates a trace of the system stack, looking for pointers which are being
+used by functions in the call chain, but which might not be marked as alive
+in any other way. Setting the trace up, which involves storing the processor
+context onto the stack, is highly system dependent. However, once stored,
+tracing the stack is very straightforward.
 
 =cut
 
@@ -111,7 +115,10 @@ trace_system_areas(PARROT_INTERP)
 
 =item C<static void trace_system_stack>
 
-Traces the memory block starting at C<< interp->lo_var_ptr >>.
+Traces the memory block starting at C<< interp->lo_var_ptr >>. This should
+be the address of a local variable which has been created on the stack early
+in the interpreters lifecycle. We trace until the address of another local
+stack variable in this function, which should be at the "top" of the stack.
 
 =cut
 
