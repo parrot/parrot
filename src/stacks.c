@@ -554,8 +554,7 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env)
 
 =head1 SEE ALSO
 
-F<include/parrot/stacks.h>, F<include/parrot/enums.h>, and
-F<src/stack_common.c>
+F<include/parrot/stacks.h> and F<include/parrot/enums.h>.
 
 =cut
 
