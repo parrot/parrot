@@ -26,6 +26,51 @@ where each chunk has room for one entry.
 
 /*
 
+=item C<void stack_system_init>
+
+Called from C<make_interpreter()> to initialize the interpreter's
+register stacks.
+
+=cut
+
+*/
+
+PARROT_API
+void
+stack_system_init(SHIM_INTERP)
+{
+}
+
+/*
+
+=item C<Stack_Chunk_t * cst_new_stack_chunk>
+
+Get a new chunk either from the freelist or allocate one.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+Stack_Chunk_t *
+cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
+{
+    Small_Object_Pool * const pool = chunk->pool;
+    Stack_Chunk_t * const new_chunk = (Stack_Chunk_t *)pool->get_free_object(interp, pool);
+
+    PObj_bufstart(new_chunk) = NULL;
+    PObj_buflen(new_chunk)   = 0;
+
+    new_chunk->pool          = chunk->pool;
+    new_chunk->name          = chunk->name;
+
+    return new_chunk;
+}
+
+/*
+
 =item C<Stack_Chunk_t * new_stack>
 
 Create a new stack and name it. C<< stack->name >> is used for
@@ -41,7 +86,14 @@ PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t *
 new_stack(PARROT_INTERP, ARGIN(const char *name))
 {
-    return register_new_stack(interp, name, sizeof (Stack_Entry_t));
+    Small_Object_Pool * const pool = make_bufferlike_pool(interp, sizeof (Stack_Chunk_t));
+    Stack_Chunk_t     * const chunk = (Stack_Chunk_t *)(pool->get_free_object)(interp, pool);
+
+    chunk->prev = chunk;        /* mark the top of the stack */
+    chunk->name = name;
+    chunk->pool = pool;         /* cache the pool pointer, for ease */
+
+    return chunk;
 }
 
 
@@ -222,6 +274,31 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
 
 /*
 
+=item C<Stack_Entry_t* stack_prepare_push>
+
+Return a pointer, where new entries go for push.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+Stack_Entry_t*
+stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
+{
+    Stack_Chunk_t * const chunk     = *stack_p;
+    Stack_Chunk_t * const new_chunk = cst_new_stack_chunk(interp, chunk);
+
+    new_chunk->prev = chunk;
+    *stack_p        = new_chunk;
+
+    return STACK_DATAP(new_chunk);
+}
+
+/*
+
 =item C<void stack_push>
 
 Push something on the generic stack.
@@ -264,6 +341,34 @@ stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
             real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
                     "Invalid Stack_Entry_type!");
     }
+}
+
+/*
+
+=item C<Stack_Entry_t* stack_prepare_pop>
+
+Return a pointer, where new entries are popped off.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+Stack_Entry_t*
+stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
+{
+    Stack_Chunk_t * const chunk = *stack_p;
+
+    /* the first entry (initial top) refers to itself */
+    if (chunk == chunk->prev)
+        real_exception(interp, NULL, ERROR_STACK_EMPTY,
+            "No entries on %s Stack!", chunk->name);
+
+    *stack_p = chunk->prev;
+
+    return STACK_DATAP(chunk);
 }
 
 /*
@@ -316,8 +421,7 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
 
     /* recycle this chunk to the free list if it's otherwise unreferenced */
     if (cur_chunk->refcount <= 0) {
-        Small_Object_Pool * const pool =
-            get_bufferlike_pool(interp, cur_chunk->size);
+        Small_Object_Pool * const pool = cur_chunk->pool;
 
         pool->dod_object(interp, pool, (PObj *)cur_chunk);
         pool->add_free_object(interp, pool, (PObj *)cur_chunk);
