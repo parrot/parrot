@@ -42,7 +42,11 @@ method SEA($/) {
          );
 }
 
-method code($/) {
+method code_tp1($/) {
+    make $( $<statements> );
+}
+
+method code_tp2($/) {
     make $( $<statements> );
 }
 
@@ -59,7 +63,7 @@ method statement($/,$key) {
     make $( $/{$key} );
 }
 
-method inline_sea($/) {
+method inline_sea_tp1($/) {
    make PAST::Op.new(
             PAST::Val.new(
                 :value(~$<SEA_empty_allowed>),

@@ -7,18 +7,23 @@ grammar Plumhead::Grammar is PCT::Grammar;
 
 token TOP                     { ^ <sea_or_code>+ {*} }
 token sea_or_code             { <SEA>    {*}   #= SEA
-                              | <code>   {*}   #= code
+                              | <code_tp1>   {*}   #= code_tp1
+                              | <code_tp2>   {*}   #= code_tp2
                               }
 regex SEA                     { <-[<]>+? ( <before \<> | $ ) {*} } 
-rule  code                    { <.CODE_START> <statements>  <.CODE_END>? {*} }
-token CODE_START              { '<?php' }
-token CODE_END                { '?>' \n? }
+rule  code_tp1                { <.CODE_START_TP1> <statements>  <.CODE_END_TP1>? {*} }
+rule  code_tp2                { <.CODE_START_TP2> <statements>  <.CODE_END_TP2>? {*} }
+token CODE_START_TP1          { '<?php'  }
+token CODE_START_TP2          { '<script language="php">'  }
+token CODE_END_TP1            { '?>' \n? }
+token CODE_END_TP2            { '</script>' \n? }
 
 rule  statements              { <statement>*           {*} }
 rule  statement               { <echo_statement>       {*} <statement_delimiter>  #= echo_statement
                               | <expression>           {*} <statement_delimiter>  #= expression
                               | <if_statement>         {*}                        #= if_statement
-                              | <inline_sea>           {*}                        #= inline_sea
+                              | <inline_sea_tp1>       {*}                        #= inline_sea_tp1
+                              | <inline_sea_tp2>       {*}                        #= inline_sea_tp2
                               | <scalar_assign>        {*} <statement_delimiter>  #= scalar_assign
                               | <array_assign>         {*} <statement_delimiter>  #= array_assign
                               }
@@ -31,7 +36,8 @@ rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAR
                                 <else_clause>?
                                 {*}
                               }
-token inline_sea              { <.CODE_END> <SEA_empty_allowed> <.CODE_START>             {*} }
+token inline_sea_tp1          { <.CODE_END_TP1> <SEA_empty_allowed> <.CODE_START_TP1>     {*} }
+token inline_sea_tp2          { <.CODE_END_TP2> <SEA_empty_allowed> <.CODE_START_TP2>     {*} }
 rule  scalar_assign           { <var> <ASSIGN_OP> <expression>                            {*} }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} }
 
