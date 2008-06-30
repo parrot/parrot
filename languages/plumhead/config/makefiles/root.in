@@ -213,7 +213,7 @@ test-pct:
 test-pmc:
 	- $(PERL) -I../../lib t/pmc/*t
 
-clean: clean-common clean-pct clean-antlr3 clean-test clean-pmc
+clean: clean-common clean-pct clean-antlr3 clean-test
 
 clean-common: clean-pmc
 	$(RM_F) \
