@@ -190,7 +190,7 @@ macro_def *find_macro(constant_table *table, char *name);
 
 extern char *dupstr(char *str);
 
-char *concat(char *str1, char *str2);
+char *concat(char *str1, char *str2, int insert_space);
 
 
 
@@ -1609,7 +1609,7 @@ yyreduce:
 
   case 31:
 #line 215 "macro.y"
-    { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
+    { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval), 1); ;}
     break;
 
   case 32:
@@ -1636,8 +1636,8 @@ yyreduce:
 #line 228 "macro.y"
     { /* create a string like ".local <type> <id>" */
                      (yyval.sval) = dupstr(".local");
-                     (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval));
-                     (yyval.sval) = concat((yyval.sval), (yyvsp[(3) - (3)].sval));
+                     (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval), 1);
+                     (yyval.sval) = concat((yyval.sval), (yyvsp[(3) - (3)].sval), 1);
                    ;}
     break;
 
@@ -1723,7 +1723,7 @@ yyreduce:
 
   case 57:
 #line 273 "macro.y"
-    { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
+    { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval), 0); ;}
     break;
 
 
@@ -2032,6 +2032,7 @@ update_unique_id(lexer_state *lexer) {
     lexer->id_gen++;
     /* Count number of digits:
      * log10 returns a double, get the part before the dot (so, "3.14" -> "3")
+     * using the floor() function.
      * log10(1000) -> 3, so add 1 more digit.
      */
     lexer->num_digits = floor(log10(lexer->id_gen)) + 1;
@@ -2187,13 +2188,14 @@ find_macro(constant_table *table, char *name) {
 =item C<concat>
 
 Concatenate two strings, and return the result. If the first string is NULL, then
-the result consists of the second string.
+the result consists of the second string. If need_space is true, a space is
+inserted between the two strings.
 
 =cut
 
 */
 char *
-concat(char *str1, char *str2) {
+concat(char *str1, char *str2, int need_space) {
     assert (str2 != NULL);
     if (str1 == NULL) {
         return str2;
@@ -2204,10 +2206,10 @@ concat(char *str1, char *str2) {
          * buffer, and only increase it if it's full. For now this is the easiest solution.
          */
         int   strlen1   = strlen(str1);
-        char *newbuffer = (char *)calloc(strlen1 + strlen(str2) + 1 + 1, sizeof (char));
+        char *newbuffer = (char *)calloc(strlen1 + strlen(str2) + 1 + (need_space ? 1 : 0), sizeof (char));
 
         assert(newbuffer != NULL);
-        sprintf(newbuffer, "%s %s", str1, str2);
+        sprintf(newbuffer, "%s%s%s", str1, need_space ? " " : "", str2);
 
         /*
         free(str1);

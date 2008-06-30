@@ -191,12 +191,6 @@ REG            "$"?[SNIP]{DIGITS}
 
 <BRACEDARGS>{NEWLINE} { yylval->sval = "\n"; return TK_ANY; }
 
-<*>{WS}             { /* skip whitespace */ }
-
-<*>{NEWLINE}        { /* in all other states, return newline as the newline token */
-                      yylval->sval = dupstr("\n");
-                      return TK_NL;
-                    }
 
 ".line"             { /* */
                       yy_push_state(LINE, yyscanner);
@@ -332,6 +326,8 @@ REG            "$"?[SNIP]{DIGITS}
                      yy_push_state(BRACEDARGS, yyscanner);
                      return '{';
                    }
+
+<BRACEDARGS>[\ ]   { yylval->sval = dupstr(" "); return TK_ANY; }
 
 <BRACEDARGS>[^}]   {
                      yylval->sval = dupstr(yytext);
@@ -600,6 +596,12 @@ REG            "$"?[SNIP]{DIGITS}
                     }
 
 
+<*>{WS}             { /* skip whitespace */ }
+
+<*>{NEWLINE}        { /* in all other states, return newline as the newline token */
+                      yylval->sval = dupstr("\n");
+                      return TK_NL;
+                    }
 
 <*>.                   { /* just return any single character token we didn't match before. */
                          yylval->sval = dupstr(yytext);

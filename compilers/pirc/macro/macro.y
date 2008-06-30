@@ -55,7 +55,7 @@ macro_def *find_macro(constant_table *table, char *name);
 
 extern char *dupstr(char *str);
 
-char *concat(char *str1, char *str2);
+char *concat(char *str1, char *str2, int insert_space);
 
 
 %}
@@ -212,7 +212,7 @@ opt_macro_body: /* empty, make sure the macro body is a valid string. */ { $$ = 
               ;
 
 macro_body: body_token               { $$ = $1; }
-          | macro_body body_token    { $$ = concat($1, $2); }
+          | macro_body body_token    { $$ = concat($1, $2, 1); }
           ;
 
 body_token: TK_ANY                   { $$ = $1; }
@@ -227,8 +227,8 @@ label_declaration: ".macro_label" TK_LABEL_ID
 local_declaration: ".macro_local" type TK_LOCAL_ID
                    { /* create a string like ".local <type> <id>" */
                      $$ = dupstr(".local");
-                     $$ = concat($$, $2);
-                     $$ = concat($$, $3);
+                     $$ = concat($$, $2, 1);
+                     $$ = concat($$, $3, 1);
                    }
                  ;
 
@@ -270,7 +270,7 @@ braced_arg: '{' long_arg '}' { $$ = $2; }
           ;
 
 long_arg: /* empty */      { $$ = ""; }
-        | long_arg TK_ANY  { $$ = concat($1, $2); }
+        | long_arg TK_ANY  { $$ = concat($1, $2, 0); }
         ;
 
 
@@ -529,13 +529,14 @@ find_macro(constant_table *table, char *name) {
 =item C<concat>
 
 Concatenate two strings, and return the result. If the first string is NULL, then
-the result consists of the second string.
+the result consists of the second string. If need_space is true, a space is
+inserted between the two strings.
 
 =cut
 
 */
 char *
-concat(char *str1, char *str2) {
+concat(char *str1, char *str2, int need_space) {
     assert (str2 != NULL);
     if (str1 == NULL) {
         return str2;
@@ -546,10 +547,10 @@ concat(char *str1, char *str2) {
          * buffer, and only increase it if it's full. For now this is the easiest solution.
          */
         int   strlen1   = strlen(str1);
-        char *newbuffer = (char *)calloc(strlen1 + strlen(str2) + 1 + 1, sizeof (char));
+        char *newbuffer = (char *)calloc(strlen1 + strlen(str2) + 1 + (need_space ? 1 : 0), sizeof (char));
 
         assert(newbuffer != NULL);
-        sprintf(newbuffer, "%s %s", str1, str2);
+        sprintf(newbuffer, "%s%s%s", str1, need_space ? " " : "", str2);
 
         /*
         free(str1);
