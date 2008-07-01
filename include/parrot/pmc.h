@@ -82,9 +82,8 @@ PMC* pmc_reuse(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL pmc_type(PARROT_INTERP, ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+INTVAL pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
+        __attribute__nonnull__(1);
 
 PARROT_API
 INTVAL pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))

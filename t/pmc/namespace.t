@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 62;
+use Parrot::Test tests => 63;
 use Parrot::Config;
 
 =head1 NAME
@@ -1056,6 +1056,20 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace' );
 .end
 CODE
 Found root namespace.
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'root namespace is not a class' );
+.sub main :main
+    .local pmc root_ns
+    root_ns = get_root_namespace
+    .local pmc root_class
+    root_class = get_class root_ns
+    .local int is_class
+    is_class = defined root_class
+    say is_class
+.end
+CODE
+0
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace "Foo"' );

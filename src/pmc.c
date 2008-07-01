@@ -422,20 +422,24 @@ Returns the PMC type for C<name>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-pmc_type(PARROT_INTERP, ARGIN(STRING *name))
+pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 {
-    PMC * const classname_hash = interp->class_hash;
-    PMC * const item           =
-        (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
+    if (!name)
+        return enum_type_undef;
+    else {
+        PMC * const classname_hash = interp->class_hash;
+        PMC * const item           =
+            (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
 
-    /* nested namespace with same name */
-    if (item->vtable->base_type == enum_class_NameSpace)
-        return 0;
+        /* nested namespace with same name */
+        if (item->vtable->base_type == enum_class_NameSpace)
+            return enum_type_undef;
 
-    if (!PMC_IS_NULL(item))
-        return VTABLE_get_integer(interp, item);
+        if (!PMC_IS_NULL(item))
+            return VTABLE_get_integer(interp, item);
 
-    return Parrot_get_datatype_enum(interp, name);
+        return Parrot_get_datatype_enum(interp, name);
+    }
 }
 
 /*
