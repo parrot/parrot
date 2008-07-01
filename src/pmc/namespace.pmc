@@ -74,6 +74,7 @@ other fields.
         PMC_data(SELF)                 =
                 mem_allocate_zeroed_typed(Parrot_NameSpace);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
+        PARROT_NAMESPACE(SELF)->_class = PMCNULL;
     }
 
 /*

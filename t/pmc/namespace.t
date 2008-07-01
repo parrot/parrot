@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 63;
+use Parrot::Test tests => 64;
 use Parrot::Config;
 
 =head1 NAME
@@ -1699,7 +1699,7 @@ CODE
 /Finding method/
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT#39978" );
+pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT #39978" );
 .sub main :main
      $P0 = new 'String'
      $P0 = "Ook...BANG!\n"
@@ -1724,6 +1724,16 @@ loop_end:
 CODE
 Explosion
 T0
+OUT
+
+pir_error_output_like( <<'CODE', <<OUT, "NameSpace with no class, RT #55620" );
+.sub 'main' :main
+    $P1 = new 'NameSpace'
+    set_args '(0)', $P1
+    tailcallmethod $P1, 'bob'
+.end
+CODE
+/Null PMC access in get_string()/
 OUT
 
 # Local Variables:
