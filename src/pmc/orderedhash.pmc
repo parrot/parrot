@@ -40,7 +40,6 @@ See F<t/pmc/orderedhash.t>.
 */
 
 #include "parrot/parrot.h"
-#include "pmc_hash.h"
 
 pmclass OrderedHash extends Hash need_ext provides array provides hash {
 
