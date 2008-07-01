@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -102,7 +102,7 @@ trace_system_areas(PARROT_INTERP)
 
     /* Trace the memory block for the register backing stack, which
        is separate from the normal system stack. The register backing
-       stack starts at memory address 0x80000FF80000000 and ends at
+       stack starts at memory address 0x80000FFF80000000 and ends at
        current_regstore_top. */
     trace_mem_block(interp, 0x80000fff80000000,
             (size_t)current_regstore_top);
@@ -135,10 +135,10 @@ trace_system_areas(PARROT_INTERP)
 
 =item C<static void trace_system_stack>
 
-Traces the memory block starting at C<< interp->lo_var_ptr >>. This should
-be the address of a local variable which has been created on the stack early
-in the interpreters lifecycle. We trace until the address of another local
-stack variable in this function, which should be at the "top" of the stack.
+Traces the memory block starting at C<< interp->lo_var_ptr >>. This should be
+the address of a local variable which has been created on the stack early in
+the interpreter's lifecycle. We trace until the address of another local stack
+variable in this function, which should be at the "top" of the stack.
 
 =cut
 
