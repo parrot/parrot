@@ -28,6 +28,9 @@ object.
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
 
+    $P0 = new 'ResizablePMCArray'
+    set_hll_global ['lolcode';'Grammar';'Actions'], '@?BLOCK', $P0
+
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
     $P1.'language'('lolcode')

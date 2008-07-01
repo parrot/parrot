@@ -40,16 +40,39 @@ method statement ($/, $key) {
 
 
 method declare($/) {
+    our $?BLOCK;
+    our @?BLOCK;
+
+    my $name := ~$<variable><identifier>;
+
+    my $var := PAST::Var.new( :name( $name ),
+                        :viviself('Undef'),
+                        :node( $/ )
+                    );
+
+    my $scope := 'lexical';
+    if $<scope>[0] {
+        if ~$<scope>[0] eq 'FARAWAY' {
+            $scope := 'package';
+        }
+    }
+
+    $var.scope(~$scope);
+    unless $?BLOCK.symbol($name) {
+        $?BLOCK.symbol($name, :scope($scope));
+        $var.isdecl(1);
+    }
+
     if ($<expression>) {
-        $($<variable>).isdecl(1);
+        $var.isdecl(1);
         # XXX Someone clever needs to refactor this into C<assign>
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
-        $past.push( $( $<variable> ) );
+        $past.push( $var );
         $past.push( $( $<expression>[0] ) );
         make $past;
     }
     else {
-        make $( $<variable> );
+        make $var;
     }
 }
 
@@ -80,10 +103,10 @@ method function($/) {
 
 
     my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
-    $block[0].unshift($it);
+    $block[1].unshift($it);
 
     $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
-    $block[0].push($it);
+    $block[1].push($it);
 
     if $<parameters> { $block.unshift($arglist); }
 
@@ -130,14 +153,24 @@ method ifthen($/) {
     make $past;
 }
 
-method block($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    my $stmts := PAST::Stmts.new( :node( $/ ) );
-    for $<statement> {
-        $stmts.push( $( $_ ) );
+method block($/,$key) {
+    our $?BLOCK;
+    our @?BLOCK;
+    if $key eq 'open' {
+        $?BLOCK := PAST::Block.new( PAST::Stmts.new(), :node($/) );
+        @?BLOCK.unshift($?BLOCK);
     }
-    $past.push($stmts);
-    make $past;
+    elsif $key eq 'close' {
+        #my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
+        my $past := @?BLOCK.shift();
+        $?BLOCK := @?BLOCK[0];
+        my $stmts := PAST::Stmts.new( :node( $/ ) );
+        for $<statement> {
+            $stmts.push( $( $_ ) );
+        }
+        $past.push($stmts);
+        make $past;
+    }
 }
 
 method value($/, $key) {
@@ -193,11 +226,40 @@ method variable ($/) {
         make PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
     }
     else {
-        make PAST::Var.new( :name( $<identifier> ),
+        our $?BLOCK;
+        our @?BLOCK;
+
+        my $var := PAST::Var.new( :name( $<identifier> ),
                             :scope('lexical'),
                             :viviself('Undef'),
                             :node( $/ )
-                          );
+                        );
+        if $?BLOCK.symbol($<identifier>) {
+            my $scope := '' ~ $?BLOCK.symbol($<identifier>)<scope>;
+            $var.scope(~$scope);
+        }
+        else {
+            our @?BLOCK;
+            my $exists := 0;
+            my $scope;
+            for @?BLOCK {
+                if $_ {
+                    my $sym_table := $_.symbol(~$<identifier>);
+                    if $sym_table {
+                        $exists := 1;
+                        $scope := '' ~ $sym_table<scope>;
+                    }
+                }
+            }
+            if $exists == 0 {
+                $var.scope('package');
+            }
+            else {
+                $var.scope($scope);
+            }
+        }
+
+        make $var;
     }
 }
 
