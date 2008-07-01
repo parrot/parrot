@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 64;
+use Parrot::Test tests => 65;
 use Parrot::Config;
 
 =head1 NAME
@@ -1514,6 +1514,27 @@ DEF::inner
 DEF lex
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', ':lexid and identical string constants' );
+.sub 'main'
+    'foo'()
+    'bar'()
+.end
+
+.sub 'foo'
+    new $P0, "String"
+    assign $P0, "abc"
+    say $P0
+.end
+
+.sub 'bar'  :lexid("abc")
+    new $P0, "String"
+    assign $P0, "abc"
+    say $P0
+.end
+CODE
+abc
+abc
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

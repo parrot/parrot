@@ -1161,8 +1161,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
         unit->lexid->name = str_dup(unit->lexid->name + 1);
 
         /* Otherwise, create string constant for it. */
-        unit->lexid->color = add_const_str(interp, unit->lexid);
         unit->lexid->name[strlen(unit->lexid->name) - 1] = 0;
+        unit->lexid->color = add_const_str(interp, unit->lexid);
     }
     sub->lexid = ct->constants[unit->lexid->color]->u.string;
 
