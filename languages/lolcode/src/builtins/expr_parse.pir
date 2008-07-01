@@ -35,8 +35,7 @@ expr_parse.pir - parse an expression and dispatch function calls with their appr
       .local pmc args_array
       item = shift t_iter
       unless_null item, not_found
-      item = new 'Integer'
-      item = 0
+      item = new 'Undef'
     not_found:
       $I0 = isntsame item, mkay
     if $I0 goto check_type
