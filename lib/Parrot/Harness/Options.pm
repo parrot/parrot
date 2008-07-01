@@ -50,6 +50,14 @@ sub handle_long_options {
     $longopts{help} = grep { $_ eq '--help' } @argv;
     @argv = grep { $_ ne '--help' } @argv;
 
+    $longopts{archive} = grep { $_ eq '--archive' } @argv;
+    @argv = grep { $_ ne '--archive' } @argv;
+
+    if( $longopts{archive} ) {
+        $longopts{send_to_smolder} = grep { $_ eq '--send-to-smolder' } @argv;
+        @argv = grep { $_ ne '--send-to-smolder' } @argv;
+    }
+
     return (\%longopts, @argv);
 }
 
@@ -91,6 +99,8 @@ perl t/harness [options] [testfiles]
     --runcore-tests
     --html
     --code-tests
+    --archive  ... create a TAP archive of the test run
+    --send-to-smolder ... send the TAP archive to the Parrot Smolder server
 EOF
 
     return;

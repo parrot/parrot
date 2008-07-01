@@ -23,6 +23,7 @@ use Parrot::Harness::Options qw(
 );
 use Parrot::Harness::Smoke qw(
     generate_html_smoke_report
+    send_archive_to_smolder
 );
 
 local @ARGV = @ARGV;
@@ -55,20 +56,45 @@ my @default_tests = get_default_tests(
     $longopts->{runcore_tests_only}
 );
 
-my @tests = map { glob( $_ ) } (@ARGV ? @ARGV : @default_tests);
+my @tests;
+if ($longopts->{code}) {
+    @tests = @developing_tests;
+} else {
+    @tests = map { glob($_) } (@ARGV ? @ARGV : @default_tests);
+}
 
-if ( $longopts->{code} ) {
-    Test::Harness::runtests(@developing_tests);
-}
-elsif ( $longopts->{html} ) {
-    generate_html_smoke_report ( {
-        tests       => \@tests,
-        args        => $args,
-        file        => 'smoke.html',
-    } );
-}
-else {
-    Test::Harness::runtests(@tests);
+if ($longopts->{html}) {
+    generate_html_smoke_report(
+        {
+            tests => \@tests,
+            args  => $args,
+            file  => 'smoke.html',
+        }
+    );
+} else {
+    my $harness;
+    if ($longopts->{archive}) {
+        eval { require TAP::Harness::Archive };
+        if( $@ ) {
+            die "\n" . ('-' x 55) . "\nCould not load TAP::Harness::Archive."
+                . "\nPlease install it if you want to create TAP archives.\n"
+                . ('-' x 55) . "\n\n$@\n";
+        }
+        $harness = TAP::Harness::Archive->new(
+            {
+                verbosity => $ENV{HARNESS_VERBOSE},
+                archive   => 'parrot_test_run.tar.gz',
+                merge     => 1,
+            }
+        );
+    } else {
+        $harness = TAP::Harness->new({verbosity => $ENV{HARNESS_VERBOSE}, merge => 0});
+    }
+    $harness->runtests(@tests);
+
+    if($longopts->{send_to_smolder}) {
+        send_archive_to_smolder();
+    }
 }
 
 =head1 NAME
