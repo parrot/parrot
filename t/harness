@@ -75,7 +75,7 @@ if ($longopts->{html}) {
     my $harness;
     if ($longopts->{archive}) {
         eval { require TAP::Harness::Archive };
-        if( $@ ) {
+        if ($@) {
             die "\n" . ('-' x 55) . "\nCould not load TAP::Harness::Archive."
                 . "\nPlease install it if you want to create TAP archives.\n"
                 . ('-' x 55) . "\n\n$@\n";
@@ -88,11 +88,19 @@ if ($longopts->{html}) {
             }
         );
     } else {
-        $harness = TAP::Harness->new({verbosity => $ENV{HARNESS_VERBOSE}, merge => 0});
+        eval { require TAP::Harness };
+        if ($@) {
+            Test::Harness::runtests(@tests);
+        }
+        else {
+            $harness = TAP::Harness->new({
+                verbosity => $ENV{HARNESS_VERBOSE}, merge => 0
+            });
+            $harness->runtests(@tests);
+        }
     }
-    $harness->runtests(@tests);
 
-    if($longopts->{send_to_smolder}) {
+    if ($longopts->{send_to_smolder}) {
         send_archive_to_smolder();
     }
 }
