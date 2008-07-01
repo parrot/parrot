@@ -23,16 +23,17 @@ use Test::More     tests => 1;
 # Parrot modules
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'function with not args', todo => 'not implemented yet' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'function with not args' );
 <?php
 
 function dummy_no_args()  {
-  echo "dummy_no_args() was called\n";
+  echo "The function dummy_no_args() has been called.\n";
 }
 
 dummy_no_args();
 
 ?>
 END_CODE
+The function dummy_no_args() has been called.
 END_EXPECTED
 

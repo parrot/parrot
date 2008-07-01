@@ -346,6 +346,38 @@ method DOUBLEQUOTE_STRING($/) {
          );
 }
 
+method function_definition($/) {
+
+    ## note that $<parameters> creates a new PAST::Block.
+    my $past := $( $<parameters> );
+
+    ## set the function name
+    $past.name( ~$<FUNCTION_NAME> );
+    for $<statement> {
+        $past.push($($_));
+    }
+
+    $past.control('return_pir');
+
+    make $past;
+}
+
+method parameters($/) {
+
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    for $<VAR_NAME> {
+        my $param := $( $_ );
+        $param.scope('parameter');
+        $past.push($param);
+
+        ## enter the parameter as a lexical into the block's symbol table
+        $past.symbol($param.name(), :scope('lexical'));
+    }
+
+    make $past;
+}
+
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

@@ -35,6 +35,7 @@ rule  statement               { <echo_statement>       {*} <statement_delimiter>
                               | <inline_sea_tp2>       {*}                        #= inline_sea_tp2
                               | <scalar_assign>        {*} <statement_delimiter>  #= scalar_assign
                               | <array_assign>         {*} <statement_delimiter>  #= array_assign
+                              | <function_definition>  {*}                        #= function_definition
                               }
 rule  statement_delimiter     { ';' | <before \? > | $ }
 rule  echo_statement          { <ECHO> <arguments> {*} }
@@ -124,3 +125,7 @@ rule  postfix_expression      { <TRUE>                                     {*}  
                               | <array_elem>                               {*}    #= array_elem
                               | <var>                                      {*}    #= var
                               }
+
+rule  function_definition     { 'function' <FUNCTION_NAME> <.PAREN_OPEN> <parameters> <.PAREN_CLOSE> '{' <statement>* '}' {*} }
+rule  parameters              {  [ <VAR_NAME> [',' <VAR_NAME>]* ]?                    {*} }
+
