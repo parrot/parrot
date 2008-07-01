@@ -630,12 +630,110 @@ NOT IMPLEMENTED. WARNING: this function is experimental.
 
 Formats a number with grouped thousands
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'number_format'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    .local string thousand_sep, dec_point
+    thousand_sep = ','
+    dec_point = '.'
+    unless argc == 1 goto L1
+    $P1 = shift args
+    $P1 = $P1.'to_number'()
+    $N1 = $P1
+    .return _number_format($N1, 0, dec_point, thousand_sep)
+  L1:
+    unless argc == 2 goto L2
+    $P1 = shift args
+    $P1 = $P1.'to_number'()
+    $N1 = $P1
+    $P2 = shift args
+    $I2 = $P2
+    .return _number_format($N1, $I2, dec_point, thousand_sep)
+  L2:
+    unless argc == 4 goto L3
+    $P1 = shift args
+    $P1 = $P1.'to_number'()
+    $N1 = $P1
+    $P2 = shift args
+    $I2 = $P2
+    $P3 = shift args
+    $I0 = isa $P3, 'PhpUndef'
+    if $I0 goto L4
+    dec_point = $P3
+    $I3 = length dec_point
+    unless $I3 goto L4
+    dec_point =substr dec_point, 0, 1
+  L4:
+    $P4 = shift args
+    $I0 = isa $P4, 'PhpUndef'
+    if $I0 goto L5
+    thousand_sep = $P4
+    $I4 = length thousand_sep
+    unless $I4 goto L5
+    thousand_sep =substr thousand_sep, 0, 1
+  L5:
+    .return _number_format($N1, $I2, dec_point, thousand_sep)
+  L3:
+    wrong_param_count()
+    .RETURN_NULL()
+.end
+
+.sub '_number_format' :anon
+    .param num d
+    .param int dec
+    .param string dec_point
+    .param string thousand_sep
+    .local int is_negative
+    is_negative = 0
+    unless d < 0 goto L1
+    is_negative = 1
+    neg d
+  L1:
+    unless dec < 0 goto L2
+    dec = 0
+  L2:
+    .ROUND_WITH_FUZZ(d, dec)
+    $S1 = dec
+    $S0 = concat '%.', $S1
+    $S0 = concat 'f'
+    new $P0, 'FixedFloatArray'
+    set $P0, 1
+    $P0[0] = d
+    .local string tmpbuf
+    tmpbuf = sprintf $S0, $P0
+    $S0 = ''
+    $I0 = index tmpbuf, '.'
+    unless $I0 < 0 goto L3
+    $I0 = length tmpbuf
+    goto L4
+  L3:
+    unless dec goto L4
+    $I1 = $I0 + 1
+    $S0 = substr tmpbuf, $I1
+    unless dec_point goto L4
+    $S0 = concat dec_point, $S0
+  L4:
+    $I1 = $I0 - 3
+    $I2 = 3
+    unless $I1 < 0 goto L5
+    $I1 = 0
+    $I2 = $I0
+  L5:
+    $S1 = substr tmpbuf, $I1, $I2
+    $S0 = concat $S1, $S0
+    $I0 -= 3
+    unless $I0 > 0 goto L6
+    unless thousand_sep goto L4
+    $S0 = concat thousand_sep, $S0
+    goto L4
+  L6:
+    unless is_negative goto L7
+    $S0 = concat '-', $S0
+  L7:
+    .RETURN_STRING($S0)
 .end
 
 =item C<int octdec(string octal_number)>

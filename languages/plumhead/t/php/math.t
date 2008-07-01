@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 38;
+use Test::More     tests => 39;
 use Parrot::Test;
 
 
@@ -284,6 +284,20 @@ language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'log10' );
 ?>
 CODE
 2
+OUTPUT
+
+language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'number_format' );
+<?php
+  echo number_format(42), "\n";
+  echo number_format(-4096), "\n";
+  echo number_format(123456789), "\n";
+  echo number_format(3.14159, 2), "\n";
+?>
+CODE
+42
+-4,096
+123,456,789
+3.14
 OUTPUT
 
 language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'octdec' );
