@@ -13,10 +13,15 @@ use Parrot::Config qw(%PConfig);
 use Parrot::Distribution;
 use Test::More;
 
+# There's no point in continuing if we're missing some certain modules.
 eval { require Test::Perl::Critic };
 if ($@) {
-  plan( skip_all => 'Test::Perl::Critic required to criticize code');
-  exit;
+  give_up('Test::Perl::Critic');
+}
+
+my $minimum_version = 1.086;
+if ($Perl::Critic::VERSION < $minimum_version) {
+  give_up("Perl::Critic version $minimum_version");
 }
 
 my $theme = 'parrot';
@@ -48,6 +53,13 @@ if ( !@ARGV ) {
 
 plan(tests => scalar(@files));
 critic_ok($_) foreach @files;
+
+sub give_up {
+  my $excuse = shift;
+  plan(skip_all => "$excuse required to criticize code.");
+  exit;
+}
+
 
 __END__
 
