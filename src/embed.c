@@ -673,17 +673,20 @@ measured with time C<parrot -b>.
 static FLOATVAL
 calibrate(PARROT_INTERP)
 {
-    /* minimum opcode count for calibration */
-    size_t   count  = interp->op_count < 1000000 ? 1000000 : interp->op_count;
+    size_t   count  = 1000000;
     size_t   n      = count;
     opcode_t code[] = { 1 };      /* noop */
     opcode_t *pc    = code;
     FLOATVAL start  = Parrot_floatval_time();
+    FLOATVAL now    = start;
 
-    for (; n; --n)
-       pc = (interp->op_func_table[*code])(pc, interp);
+    /* op timing isn't free; it requires at least one time fetch per op */
+    for (; n; --n) {
+        pc = (interp->op_func_table[*code])(pc, interp);
+        now = Parrot_floatval_time();
+    }
 
-    return (Parrot_floatval_time() - start) / (FLOATVAL) count;
+    return (now - start) / (FLOATVAL) count;
 }
 
 
@@ -710,7 +713,8 @@ print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         FLOATVAL       sum_time   = 0.0;
         const FLOATVAL empty      = calibrate(interp);
 
-        PIO_printf(interp, "Calibration: noop = %.6f ms\n", 1000.0 * empty);
+        PIO_printf(interp,
+                   "Calibration: overhead = %.6f ms/op\n", 1000.0 * empty);
 
         PIO_printf(interp,
                    " Code J Name                         "
