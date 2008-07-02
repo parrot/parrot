@@ -13,6 +13,54 @@ php_array.pir - PHP array Standard Library
 
 =cut
 
+
+.const int EXTR_OVERWRITE               = 0
+.const int EXTR_SKIP                    = 1
+.const int EXTR_PREFIX_SAME             = 2
+.const int EXTR_PREFIX_ALL              = 3
+.const int EXTR_PREFIX_INVALID          = 4
+.const int EXTR_PREFIX_IF_EXISTS        = 5
+.const int EXTR_IF_EXISTS               = 6
+
+.const int EXTR_REFS                    = 0x100
+
+.const int SORT_REGULAR                 = 0
+.const int SORT_NUMERIC                 = 1
+.const int SORT_STRING                  = 2
+.const int SORT_LOCALE_STRING           = 5
+
+.const int SORT_DESC                    = 3
+.const int SORT_ASC                     = 4
+
+.const int CASE_LOWER                   = 0
+.const int CASE_UPPER                   = 1
+
+.const int COUNT_NORMAL                 = 0
+.const int COUNT_RECURSIVE              = 1
+
+.sub '__init' :anon :load :init
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_OVERWRITE', EXTR_OVERWRITE)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_SKIP', EXTR_SKIP)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_PREFIX_SAME', EXTR_PREFIX_SAME)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_PREFIX_ALL', EXTR_PREFIX_ALL)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_PREFIX_INVALID', EXTR_PREFIX_INVALID)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_PREFIX_IF_EXISTS', EXTR_PREFIX_IF_EXISTS)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_IF_EXISTS', EXTR_IF_EXISTS)
+    .REGISTER_LONG_CONSTANT(cst, 'EXTR_REFS', EXTR_REFS)
+    .REGISTER_LONG_CONSTANT(cst, 'SORT_ASC', SORT_ASC)
+    .REGISTER_LONG_CONSTANT(cst, 'SORT_DESC', SORT_DESC)
+    .REGISTER_LONG_CONSTANT(cst, 'SORT_REGULAR', SORT_REGULAR)
+    .REGISTER_LONG_CONSTANT(cst, 'SORT_NUMERIC', SORT_NUMERIC)
+    .REGISTER_LONG_CONSTANT(cst, 'SORT_STRING', SORT_STRING)
+    .REGISTER_LONG_CONSTANT(cst, 'SORT_LOCALE_STRING', SORT_LOCALE_STRING)
+    .REGISTER_LONG_CONSTANT(cst, 'CASE_LOWER', CASE_LOWER)
+    .REGISTER_LONG_CONSTANT(cst, 'CASE_UPPER', CASE_UPPER)
+    .REGISTER_LONG_CONSTANT(cst, 'COUNT_NORMAL', COUNT_NORMAL)
+    .REGISTER_LONG_CONSTANT(cst, 'COUNT_RECURSIVE', COUNT_RECURSIVE)
+.end
+
 =item C<array array_change_key_case(array input [, int case=CASE_LOWER])>
 
 Retuns an array with all string keys lowercased [or uppercased]
@@ -617,12 +665,40 @@ NOT IMPLEMENTED.
 
 Count the number of elements in a variable (usually an array)
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub 'count'
+    .param pmc args :slurpy
+    .local pmc array
+    .local int mode
+    mode = COUNT_NORMAL
+    ($I0, array, mode) = parse_parameters('z|l', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    $I0 = isa array, 'PhpUndef'
+    unless $I0 goto L2
+    .RETURN_LONG(0)
+  L2:
+    $I0 = isa array, 'PhpArray'
+    unless $I0 goto L3
+    $I0 = count_recursive(array, mode)
+    .RETURN_LONG($I0)
+  L3:
+    $I0 = isa array, 'PhpObject'
+    unless $I0 goto L4
     not_implemented()
+  L4:
+    .RETURN_LONG(1)
+.end
+
+.sub 'count_recursive' :anon
+    .param pmc array
+    .param int mode
+    $I0 = elements array
+    .return ($I0)
 .end
 
 =item C<mixed current(array array_arg)>

@@ -1,3 +1,5 @@
+#! perl
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,7 +25,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use Parrot::Config ();
 use Parrot::Test;
-use Test::More     tests => 4;
+use Test::More     tests => 5;
 
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
@@ -64,3 +66,19 @@ END_CODE
 9
 END_OUT
 
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'count' );
+<?php
+  $hello['world'] = 'hi';
+  $hello['World'] = 'Hi';
+  echo count($hello), "\n";
+?>
+CODE
+2
+OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
