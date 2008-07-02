@@ -17,8 +17,8 @@ token TOP {
 }
 
 rule source_element {
-    | <statement> {*}              #= statement
     | <function_declaration> {*}   #= function_declaration
+    | <statement> {*}              #= statement
 }
 
 ##
@@ -161,7 +161,7 @@ rule finally {
     {*}
 }
 
-rule throw_statement {
+token throw_statement {
     'throw' \N <expression> ';'
     {*}
 }
@@ -186,8 +186,8 @@ rule expression_statement {
     {*}
 }
 
-rule return_statement {
-    'return' \N <expression>? ';'
+token return_statement {
+    'return' \N <expression>?  ';'
     {*}
 }
 
