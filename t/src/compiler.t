@@ -35,8 +35,6 @@ SKIP: {
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-extern void imcc_init(Parrot_Interp interp);
-
 static opcode_t *
 run(Parrot_Interp interp, int argc, char *argv[])
 {
@@ -100,9 +98,6 @@ main(int margc, char *margv[])
     if (interp == NULL)
         return 1;
 
-    /* this registers the PIR compiler */
-    imcc_init(interp);
-
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -122,12 +117,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-
-#ifndef __cplusplus
-extern void imcc_init(Parrot_Interp interp);
-#else
-extern "C" void imcc_init(Parrot_Interp interp);
-#endif
 
 static opcode_t *
 run(Parrot_Interp interp, int argc, char *argv[])
@@ -193,8 +182,6 @@ main(int margc, char *margv[])
     if (interp == NULL)
         return 1;
 
-    /* this registers the PIR compiler */
-    imcc_init(interp);
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -212,12 +199,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple Calls" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-
-#ifndef __cplusplus
-extern void imcc_init(Parrot_Interp interp);
-#else
-extern "C" void imcc_init(Parrot_Interp interp);
-#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -293,9 +274,6 @@ main(int margc, char *margv[])
     if (interp == NULL)
         return 1;
 
-    /* this registers the PIR compiler */
-    imcc_init(interp);
-
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -314,12 +292,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 1st bad PIR" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-
-#ifndef __cplusplus
-extern void imcc_init(Parrot_Interp interp);
-#else
-extern "C" void imcc_init(Parrot_Interp interp);
-#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -395,9 +367,6 @@ main(int margc, char *margv[])
     if (interp == NULL)
         return 1;
 
-    /* this registers the PIR compiler */
-    imcc_init(interp);
-
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -416,12 +385,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 2nd bad PIR" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-
-#ifndef __cplusplus
-extern void imcc_init(Parrot_Interp interp);
-#else
-extern "C" void imcc_init(Parrot_Interp interp);
-#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -496,9 +459,6 @@ main(int margc, char *margv[])
     if (interp == NULL)
         return 1;
 
-    /* this registers the PIR compiler */
-    imcc_init(interp);
-
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
@@ -517,12 +477,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple bad PIR" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-
-#ifdef __cplusplus
-extern "C" void imcc_init(Parrot_Interp interp);
-#else
-extern void imcc_init(Parrot_Interp interp);
-#endif
 
 static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
@@ -595,9 +549,6 @@ main(int margc, char *margv[])
     interp = Parrot_new(NULL);
     if (interp == NULL)
         return 1;
-
-    /* this registers the PIR compiler */
-    imcc_init(interp);
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");

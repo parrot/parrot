@@ -124,8 +124,6 @@ Parrot_debug().
 
 */
 
-extern void imcc_init(Parrot_Interp interp);
-
 int
 main(int argc, char *argv[])
 {
@@ -145,7 +143,6 @@ main(int argc, char *argv[])
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
-    imcc_init(interp);
 
     do_yylex_init(interp, &yyscanner);
 

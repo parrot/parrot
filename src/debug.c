@@ -34,7 +34,6 @@ debugger, and the C<debug> ops.
 PARROT_API
 void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...);
-extern void imcc_init(PARROT_INTERP);
 
 /*
  * These constants correspond to the debugger commands.
