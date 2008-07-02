@@ -656,18 +656,9 @@ Return the POST representation of a C<PAST::Block>.
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
     bpost.'push_pirop'('get_global', result, name)
-    goto block_decl_closure
+    goto block_done
   block_decl_ns:
     bpost.'push_pirop'('get_hll_global', result, ns, name)
-  block_decl_closure:
-    .local pmc closurelabel
-    $P0 = get_hll_global ['POST'], 'Label'
-    closurelabel = $P0.'new'('name'=>'closure_')
-    $S0 = self.'uniquereg'('I')
-    bpost.'push_pirop'('isa', $S0, result, "'Closure'")
-    bpost.'push_pirop'('unless', $S0, closurelabel)
-    bpost.'push_pirop'('newclosure', result, result)
-    bpost.'push'(closurelabel)
     goto block_done
 
   block_immediate:
@@ -675,10 +666,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_immediate_ns
-    $S0 = '$P10'
-    bpost.'push_pirop'('get_global', $S0, name)
-    bpost.'push_pirop'('newclosure', $S0, $S0)
-    bpost.'push_pirop'('call', $S0, 'result'=>result)
+    bpost.'push_pirop'('call', name, 'result'=>result)
     goto block_done
   block_immediate_ns:
     $S0 = '$P10'
@@ -1156,7 +1144,6 @@ by C<node>.
     .local pmc subpost
     subpost = self.'as_post'(subpast, 'rtype'=>'P')
     ops.'push'(subpost)
-    ops.'push_pirop'('newclosure', subpost, subpost)
     ops.'push_pirop'('call', subpost, arglist :flat)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
