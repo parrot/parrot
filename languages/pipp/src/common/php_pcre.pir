@@ -22,7 +22,9 @@ php_pcre.pir - PHP pcre  Library
     $P1 = $P0()
     new $P0, 'PhpInteger'
     set $P0, 0
-    set_global 'pcre_error_code', $P0
+    set_hll_global 'pcre_error_code', $P0
+    new $P0, 'Hash'
+    set_hll_global 'pcre_cache', $P0
 .end
 
 # options PCRE
@@ -98,9 +100,14 @@ php_pcre.pir - PHP pcre  Library
 
 .sub 'pcre_get_compiled_regex_cache' :anon
     .param string regex
-    .local string delimiter
-    .local string pat
+    .local pmc cache
     .local pmc code
+    cache = get_hll_global 'pcre_cache'
+    $I0 = exists cache[regex]
+    unless $I0 goto L0
+    code = cache[regex]
+    .return (code)
+  L0:
     null code
     $I1 = length regex
     $I0 = find_not_cclass .CCLASS_WHITESPACE, regex, 0, $I1
@@ -108,9 +115,10 @@ php_pcre.pir - PHP pcre  Library
     error(E_WARNING, "Empty regular expression")
     .return (code)
   L1:
+    .local string delimiter
     delimiter = substr regex, $I0, 1
-    inc $I0
-    regex = substr regex, $I0
+    .local int start_pat
+    start_pat = $I0 + 1
     $I0 = is_cclass .CCLASS_ALPHANUMERIC, delimiter, 0
     if $I0 goto L2
     if delimiter == "\\" goto L2
@@ -127,7 +135,7 @@ php_pcre.pir - PHP pcre  Library
   L4:
     end_delimiter = delimiter
     $I1 = length regex
-    $I0 = 0
+    $I0 = start_pat
     unless start_delimiter == end_delimiter goto L5
   L6:
     unless $I0 < $I1 goto L7
@@ -164,18 +172,21 @@ php_pcre.pir - PHP pcre  Library
     inc $I0
     goto L11
   L10:
-    pat = substr regex, 0, $I0
+    .local string pat
+    $I1 = $I0 - start_pat
+    pat = substr regex, start_pat, $I1
+    .local string options
     inc $I0
-    regex = substr regex, $I0
+    options = substr regex, $I0
     .local int coptions, poptions, do_study
     coptions = 0
     poptions = 0
     do_study = 0
     $I0 = 0
-    $I1 = length regex
+    $I1 = length options
   L20:
     unless $I0 < $I1 goto L21
-    $S0 = substr regex, $I0, 1
+    $S0 = substr options, $I0, 1
     unless $S0 == 'i' goto L23
     coptions |= PCRE_CASELESS
     goto L22
@@ -232,6 +243,11 @@ php_pcre.pir - PHP pcre  Library
     .local int errptr
     $P0 = get_global ['PCRE'], 'compile'
     (code, error, errptr)= $P0(pat, coptions)
+    unless null code goto L34
+#    error(E_WARNING, "Compilation failed: ", error, " at offset ", errptr)
+    .return (code)
+  L34:
+    cache[regex] = code
     .return (code)
 .end
 
@@ -254,6 +270,18 @@ NOT IMPLEMENTED.
     if $I0 goto L1
     .RETURN_NULL()
   L1:
+    .local pmc pce
+    pce = pcre_get_compiled_regex_cache(regex)
+    unless null pce goto L2
+    .RETURN_FALSE()
+  L2:
+    .return preg_grep_impl(pce, input, flags)
+.end
+
+.sub 'preg_grep_impl' :anon
+    .param pmc pce
+    .param pmc input
+    .param int flags
     not_implemented()
 .end
 
@@ -269,7 +297,7 @@ Returns the error code of the last regexp execution.
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $P0 = get_global 'pcre_error_code'
+    $P0 = get_hll_global 'pcre_error_code'
     .return ($P0)
 .end
 
@@ -277,7 +305,7 @@ Returns the error code of the last regexp execution.
 
 Perform a Perl-style regular expression match
 
-STILL INCOMPLETE.
+STILL INCOMPLETE (see pcre_match_impl).
 
 =cut
 
@@ -294,18 +322,35 @@ STILL INCOMPLETE.
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    .local pmc code
-    code = pcre_get_compiled_regex_cache(regex)
-    unless null code goto L2
+    .local pmc pce
+    pce = pcre_get_compiled_regex_cache(regex)
+    unless null pce goto L2
     .RETURN_FALSE()
   L2:
+    .local int use_flags
+    use_flags = 0
+    $I0 = args
+    unless $I0 >= 4 goto L3
+    use_flags = 1
+  L3:
+    .return pcre_match_impl(pce, subject, subpats, 0, use_flags, flags, start_offset)
+.end
+
+.sub 'pcre_match_impl' :anon
+    .param pmc pce
+    .param string subject
+    .param pmc subpats
+    .param int _global
+    .param int use_flags
+    .param int flags
+    .param int start_offset
     .local int ok
     .local pmc result
     $P0 = get_global ['PCRE'], 'match'
-    (ok, result)= $P0(code, subject, 0, 0)
-    unless ok < 0 goto L3
+    (ok, result)= $P0(pce, subject, 0, 0)
+    unless ok < 0 goto L1
     .RETURN_LONG(0)
-  L3:
+  L1:
     .RETURN_LONG(1)
 .end
 
@@ -313,7 +358,7 @@ STILL INCOMPLETE.
 
 Perform a Perl-style global regular expression match
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE (see pcre_match_impl).
 
 =cut
 
@@ -326,11 +371,22 @@ NOT IMPLEMENTED.
     .local int start_offset
     flags = 0
     start_offset = 0
-    ($I0, regex, subject, subpats, flags, start_offset) = parse_parameters('ssz|ll', args :flat)
+    ($I0, regex, subject, subpats, flags, start_offset) = parse_parameters('ss|zll', args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    not_implemented()
+    .local pmc pce
+    pce = pcre_get_compiled_regex_cache(regex)
+    unless null pce goto L2
+    .RETURN_FALSE()
+  L2:
+    .local int use_flags
+    use_flags = 0
+    $I0 = args
+    unless $I0 >= 4 goto L3
+    use_flags = 1
+  L3:
+    .return pcre_match_impl(pce, subject, subpats, 1, use_flags, flags, start_offset)
 .end
 
 =item C<string preg_quote(string str [, string delim_char])>
@@ -422,6 +478,19 @@ NOT IMPLEMENTED.
     if $I0 goto L1
     .RETURN_NULL()
   L1:
+    .local pmc pce
+    pce = pcre_get_compiled_regex_cache(regex)
+    unless null pce goto L2
+    .RETURN_FALSE()
+  L2:
+    .return pcre_split_impl(pce, subject, limit, flags)
+.end
+
+.sub 'pcre_split_impl' :anon
+    .param pmc pce
+    .param string subject
+    .param int limit
+    .param int flags
     not_implemented()
 .end
 

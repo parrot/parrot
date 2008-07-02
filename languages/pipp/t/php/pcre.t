@@ -25,8 +25,16 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 3;
+use Test::More;
 use Parrot::Test;
+use Parrot::Config;
+
+if ( $PConfig{HAS_PCRE} ) {
+    plan tests => 7;
+}
+else {
+    plan skip_all => "no PCRE";
+}
 
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants', todo => 'compiler supports constant');
@@ -45,7 +53,7 @@ CODE
 4
 OUTPUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match()', todo => 'proper check whether pcre is there' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match()' );
 <?php
   echo preg_match('/b/', 'abc'), "\n";
   echo preg_match('/b/', 'aaa'), "\n";
@@ -59,7 +67,39 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_quote()', todo => 'proper check whether pcre is there' );
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() empty regex' );
+<?php
+  echo preg_match('   ', 'abc'), "\n";
+?>
+CODE
+/Empty regular expression/
+OUTPUT
+
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() bad delim' );
+<?php
+  echo preg_match(' 7b7', 'abc'), "\n";
+?>
+CODE
+/Delimiter must not be alphanumeric or backslash/
+OUTPUT
+
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() no end' );
+<?php
+  echo preg_match(' |b', 'abc'), "\n";
+?>
+CODE
+/ No ending delimiter '|' found/
+OUTPUT
+
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() unknown modif' );
+<?php
+  echo preg_match(' /b/ia', 'abc'), "\n";
+?>
+CODE
+/Unknown modifier 'a'/
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_quote()' );
 <?php
   echo preg_quote('{}[]()'), "\n";
 ?>
