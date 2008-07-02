@@ -176,8 +176,8 @@ $out = `$parrot languages/pheme/pheme.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pheme");
 unlink($filename);
 
-$out = `$parrot languages/plumhead/plumhead.pbc`;
-ok($out =~ /^usage/, "check plumhead");
+$out = `$parrot languages/pipp/pipp.pbc`;
+ok($out =~ /^usage/, "check pipp");
 
 $filename = 'test.p1';
 open $FH, '>', $filename

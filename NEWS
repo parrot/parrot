@@ -2,8 +2,11 @@
 
 New in 0.6.4
 - Languages
-  + Plumhead
-    - convert from PCT with TGE to PCT with NQP actions
+  + Pipp
+    - Renamed from Plumhead
+    - Support for a lot of builtin functions.
+    - Pipp now uses PHP specific data types.
+    - Converted from PCT with TGE to PCT with NQP actions
 
 New in 0.6.3
 - Specification

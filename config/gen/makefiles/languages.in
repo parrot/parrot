@@ -22,7 +22,7 @@ LANGUAGES = \
     lazy-k lisp lolcode lua \
     m4 \
     ook \
-    parrot_compiler perl6 pheme PIR plumhead punie pynie \
+    parrot_compiler perl6 pheme PIR pipp punie pynie \
     regex \
     scheme squaak \
     tcl \
@@ -90,7 +90,7 @@ test-separate: all \
     lazy-k.test lisp.test lolcode.test lua.test \
     m4.test \
     ook.test \
-    parrot_compiler.test perl6.test pheme.test PIR.test plumhead.test pugs.test punie.test pynie.test \
+    parrot_compiler.test perl6.test pheme.test PIR.test pipp.test pugs.test punie.test pynie.test \
     regex.test \
     scheme.test squaak.test \
     tcl.test \
@@ -119,7 +119,7 @@ clean: \
     lolcode.clean lua.clean \
     m4.clean \
     ook.clean \
-    parrot_compiler.clean perl6.clean pheme.clean PIR.clean plumhead.clean punie.clean pynie.clean \
+    parrot_compiler.clean perl6.clean pheme.clean PIR.clean pipp.clean punie.clean pynie.clean \
     regex.clean \
     scheme.clean squaak.clean \
     tcl.clean \
@@ -140,7 +140,7 @@ realclean: \
     lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
     m4.realclean \
     ook.realclean \
-    parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean plumhead.realclean pugs.realclean punie.realclean pynie.realclean \
+    parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean pugs.realclean punie.realclean pynie.realclean \
     regex.realclean \
     scheme.realclean squaak.realclean \
     tcl.realclean \
@@ -404,6 +404,16 @@ pheme.clean:
 pheme.realclean:
 	- $(MAKE) pheme realclean
 
+pipp : pipp.dummy
+pipp.dummy:
+	- $(MAKE) pipp
+pipp.test:
+	- $(MAKE) pipp test
+pipp.clean:
+	- $(MAKE) pipp clean
+pipp.realclean:
+	- $(MAKE) pipp realclean
+
 PIR: PIR.dummy
 PIR.dummy:
 	- $(MAKE) PIR
@@ -413,16 +423,6 @@ PIR.clean:
 	- $(MAKE) PIR clean
 PIR.realclean:
 	- $(MAKE) PIR realclean
-
-plumhead : plumhead.dummy
-plumhead.dummy:
-	- $(MAKE) plumhead
-plumhead.test:
-	- $(MAKE) plumhead test
-plumhead.clean:
-	- $(MAKE) plumhead clean
-plumhead.realclean:
-	- $(MAKE) plumhead realclean
 
 pugs : pugs.dummy
 pugs.dummy:

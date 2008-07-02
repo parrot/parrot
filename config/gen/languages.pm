@@ -57,7 +57,7 @@ sub runstep {
         lazy-k lisp lolcode lua
         m4
         ook
-        parrot_compiler perl6 pheme PIR plumhead pugs punie pynie
+        parrot_compiler perl6 pheme PIR pipp pugs punie pynie
         regex
         scheme squaak
         tcl

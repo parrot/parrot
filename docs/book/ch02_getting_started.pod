@@ -95,7 +95,7 @@ the documentation is a great place to start contributing.
 
 The F<languages/> directory contains the code that implements various
 language compilers: Perl 6, Python ("Pynie"), Ruby ("Cardinal"), PHP
-("Plumhead"), Lisp, Lua, Tcl ("partcl"), WMLScript, Forth, Scheme,
+("Pipp"), Lisp, Lua, Tcl ("partcl"), WMLScript, Forth, Scheme,
 Befunge, BASIC, and many others. These language compilers are in
 various stages of partial completion. The file F<LANGUAGES.STATUS>
 provides meta information on the included languages and on the many

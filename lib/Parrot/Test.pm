@@ -254,7 +254,7 @@ Generate functions that are only used by a couple of
 Parrot::Test::<lang> modules.
 See RT#43266.
 This implementation is experimental and currently only works
-for languages/plumhead.
+for languages/pipp.
 
 =back
 

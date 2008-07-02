@@ -8,6 +8,6 @@ on PAST-pm.  Only simple nodes are available, but it will
 expand rapidly.
 
 PCT is used for example by F<compilers/nqp>, F<languages/abc>, F<languages/perl6>
-and F<languages/plumhead>.
+and F<languages/pipp>.
 
 =cut
