@@ -15,7 +15,7 @@ STILL INCOMPLETE (see CTYPE).
 
 =cut
 
-.include 'languages/plumhead/src/common/php_MACRO.pir'
+.include 'languages/pipp/src/common/php_MACRO.pir'
 .include 'cclass.pasm'
 
 .macro CTYPE(class, args)

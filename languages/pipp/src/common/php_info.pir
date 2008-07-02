@@ -13,7 +13,7 @@ php_info.pir - PHP info Standard Library
 
 =cut
 
-.include 'languages/plumhead/src/common/php_MACRO.pir'
+.include 'languages/pipp/src/common/php_MACRO.pir'
 
 .const string PHP_LOGO_GUID = 'PHPE9568F34-D428-11d2-A769-00AA001ACF42'
 .const string PHP_EGG_LOGO_GUID = 'PHPE9568F36-D428-11d2-A769-00AA001ACF42'

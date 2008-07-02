@@ -106,26 +106,26 @@ help:
 	@echo "Following targets are available for the user:"
 	@echo ""
 	@echo "Building:"
-	@echo "  all:               Build plumhead.pbc"
-	@echo "                     with support for variant 'Plumhead pct'."
+	@echo "  all:               Build pipp.pbc"
+	@echo "                     with support for variant 'Pipp pct'."
 	@echo "                     This is the default."
 	@echo "  build              Same as 'all'."
 	@echo "  build-all          Build all three variants"
 	@echo "  build-pct          Same as 'build', which is same as 'all'."
-	@echo "  build-phc          Build support for variant 'Plumhead phc'."
+	@echo "  build-phc          Build support for variant 'Pipp phc'."
 	@echo "                     Current this has nothing to do."
-	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
+	@echo "  build-antlr3       Build support for variant 'Pipp antlr3'."
 	@echo "                     Needs javac and a proper CLASSPATH."
 	@echo "  pmc                Build all PMCs."
 	@echo ""
 	@echo "Testing:"
-	@echo "  test:              Run the test suite for 'Plumhead pct'."
+	@echo "  test:              Run the test suite for 'Pipp pct'."
 	@echo "  test-all:          Run the test suite for the reference and all variants."
 	@echo "  test-php:          Run the test suite for the reference implementation."
-	@echo "  test-phc:          Run the test suite for 'Plumhead phc'."
-	@echo "  test-antlr3:       Run the test suite for 'Plumhead antlr3'."
-	@echo "  test-pct:          Run the test suite for 'Plumhead pct'."
-	@echo "  test-pmc:          Run the test suite for Plumhead's PMCs."
+	@echo "  test-phc:          Run the test suite for 'Pipp phc'."
+	@echo "  test-antlr3:       Run the test suite for 'Pipp antlr3'."
+	@echo "  test-pct:          Run the test suite for 'Pipp pct'."
+	@echo "  test-pmc:          Run the test suite for Pipp's PMCs."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
@@ -137,27 +137,27 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 	@echo "Only for maintainer:"
-	@echo "  maintain:          Maintainance for 'Plumhead antlr3'."
+	@echo "  maintain:          Maintainance for 'Pipp antlr3'."
 	@echo "                     The other variants need no maintainance."
 	@echo "  maintain-antlr3:   Generate Java source files with ANTLR 3."
 	@echo ""
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=plumhead
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=pipp
 
 maintain: maintain-antlr3
 
-maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastNqp.g
+maintain-antlr3: src/antlr3/Pipp.g src/antlr3/GenPastNqp.g
 	@echo 'Be sure to set CLASSPATH first, see docs/antlr3.pod'
-	java org.antlr.Tool src/antlr3/Plumhead.g
+	java org.antlr.Tool src/antlr3/Pipp.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastNqp.g
 
 build:           build-pct
 
 build-all:       build-pct build-phc build-antlr3
 
-build-common:    pmc src/common/plumheadlib.pbc plumhead.pbc $(PHP_EXT)
+build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT)
 
 build-pct:       build-common
 
@@ -167,8 +167,8 @@ build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java
 
-src/common/plumheadlib.pbc: src/common/builtins.pir src/common/php_standard.pir $(PHP_SRC_STD_EXT) src/common/php_API.pir src/common/php_MACRO.pir
-	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
+src/common/pipplib.pbc: src/common/builtins.pir src/common/php_standard.pir $(PHP_SRC_STD_EXT) src/common/php_API.pir src/common/php_MACRO.pir
+	$(PARROT) -o src/common/pipplib.pbc src/common/builtins.pir
 
 src/common/php_ctype.pbc: src/common/php_ctype.pir src/common/php_MACRO.pir
 	$(PARROT) -o src/common/php_ctype.pbc src/common/php_ctype.pir
@@ -184,11 +184,11 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
   --target=pir src/pct/actions.pm
 
-plumhead.pbc: \
-    src/common/plumhead.pir \
+pipp.pbc: \
+    src/common/pipp.pir \
     src/pct/gen_grammar.pir \
     src/pct/gen_actions.pir
-	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
+	$(PARROT) -o pipp.pbc src/common/pipp.pir
 
 pmc: $(PHP_GROUP)
 
@@ -203,16 +203,16 @@ test:     all test-pct
 test-all: all test-php test-phc test-antlr3 test-pct test-pmc
 
 test-php:
-	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
+	- cd .. && $(PERL) -I../lib -I pipp/lib pipp/t/harness --with-php
 
 test-phc:
-	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc
+	- cd .. && $(PERL) -I../lib -I pipp/lib pipp/t/harness --with-phc
 
 test-antlr3:
-	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-antlr3
+	- cd .. && $(PERL) -I../lib -I pipp/lib pipp/t/harness --with-antlr3
 
 test-pct:
-	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-pct
+	- cd .. && $(PERL) -I../lib -I pipp/lib pipp/t/harness --with-pct
 
 test-pmc:
 	- $(PERL) -I../../lib t/pmc/*t
@@ -221,9 +221,9 @@ clean: clean-common clean-pct clean-antlr3 clean-test
 
 clean-common: clean-pmc
 	$(RM_F) \
-  src/common/plumheadlib.pbc \
+  src/common/pipplib.pbc \
   src/common/*.pbc \
-  plumhead.pbc
+  pipp.pbc
 
 clean-pmc:
 	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/*.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
@@ -242,7 +242,7 @@ clean-test:
   t/php/*.pir \
   t/php/*.out \
   t/pmc/*.pir \
-  ../../plumhead_*
+  ../../pipp_*
 
 
 realclean: clean

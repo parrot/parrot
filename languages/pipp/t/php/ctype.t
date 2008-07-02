@@ -8,12 +8,12 @@ t/php/ctype.t - Library ctype
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/ctype.t
+    % perl -I../lib pipp/t/php/ctype.t
 
 =head1 DESCRIPTION
 
 Tests PHP Library ctype
-(implemented in F<languages/plumhead/src/common/php_ctype.pir>).
+(implemented in F<languages/pipp/src/common/php_ctype.pir>).
 
 See L<http://www.php.net/manual/en/ref.ctype.php>.
 
@@ -29,7 +29,7 @@ use Test::More     tests => 3;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ctype_alnum() ok' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ctype_alnum() ok' );
 <?php
   echo ctype_alnum('12abc'), "\n";
 ?>
@@ -37,7 +37,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ctype_alnum() ko' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ctype_alnum() ko' );
 <?php
   echo ctype_alnum('12-abc'), "\n";
 ?>
@@ -45,7 +45,7 @@ CODE
 
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ctype_alnum() empty' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ctype_alnum() empty' );
 <?php
   echo ctype_alnum(''), "\n";
 ?>

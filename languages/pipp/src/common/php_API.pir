@@ -13,7 +13,7 @@ php_api.pir - PHP API Library
 
 =cut
 
-.include 'languages/plumhead/src/common/php_MACRO.pir'
+.include 'languages/pipp/src/common/php_MACRO.pir'
 
 .sub '__onload' :anon :load :init
     # symbol table for constants

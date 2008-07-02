@@ -1,8 +1,8 @@
 # $Id$
 
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 
-package Parrot::Test::Plumhead;
+package Parrot::Test::Pipp;
 
 # pragmata
 use strict;
@@ -12,32 +12,32 @@ use Data::Dumper;
 use File::Basename;
 
 use Parrot::Test;
-use Parrot::Test::Plumhead::PHP;
-use Parrot::Test::Plumhead::Phc;
-use Parrot::Test::Plumhead::Antlr3;
-use Parrot::Test::Plumhead::PCT;
+use Parrot::Test::Pipp::PHP;
+use Parrot::Test::Pipp::Phc;
+use Parrot::Test::Pipp::Antlr3;
+use Parrot::Test::Pipp::PCT;
 
 =head1 NAME
 
-Test/Plumhead.pm - Testing routines specific to 'php'.
+Test/Pipp.pm - Testing routines specific to 'php'.
 
 =head1 DESCRIPTION
 
-Call 'plumhead.pl' and 'php'.
+Call 'pipp.pl' and 'php'.
 
 =head1 METHODS
 
 =head2 new
 
-A kind of factory, that finds the proper subclass of Parrot::Test::Plumhead.
+A kind of factory, that finds the proper subclass of Parrot::Test::Pipp.
 XXX: Do not configure with environment variables.
-Use plumhead.pl in smoke testing.
+Use pipp.pl in smoke testing.
 
 =cut
 
 sub new {
-    my $test_module =    $ENV{PARROT_PLUMHEAD_TEST_MODULE}
-                      || 'Parrot::Test::Plumhead::PCT';
+    my $test_module =    $ENV{PARROT_PIPP_TEST_MODULE}
+                      || 'Parrot::Test::Pipp::PCT';
     return bless {}, $test_module;
 }
 

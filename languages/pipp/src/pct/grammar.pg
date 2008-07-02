@@ -1,9 +1,9 @@
 # Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
-# PHP grammar for Plumhead PCT
+# PHP grammar for Pipp PCT
 
-grammar Plumhead::Grammar is PCT::Grammar;
+grammar Pipp::Grammar is PCT::Grammar;
 
 token TOP                     { ^ <sea_or_code>+ {*} }
 token ws                      { [ \h | \v ]*

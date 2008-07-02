@@ -2,24 +2,24 @@
 
 =head1 NAME
 
-languages/plumhead/t/harness - A harness for Plumhead
+languages/pipp/t/harness - A harness for Pipp
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib plumhead/t/harness --files
+  cd languages && perl -I../lib pipp/t/harness --files
 
-  cd languages && perl -I../lib plumhead/t/harness 
+  cd languages && perl -I../lib pipp/t/harness 
 
-  cd languages && perl -I../lib plumhead/t/harness --with-php
+  cd languages && perl -I../lib pipp/t/harness --with-php
 
-  cd languages && perl -I../lib plumhead/t/harness --with-phc
+  cd languages && perl -I../lib pipp/t/harness --with-phc
 
-  cd languages && perl -I../lib plumhead/t/harness --with-antlr3
+  cd languages && perl -I../lib pipp/t/harness --with-antlr3
 
-  cd languages && perl -I../lib plumhead/t/harness --with-pct
+  cd languages && perl -I../lib pipp/t/harness --with-pct
 
-  cd languages && perl -I../lib plumhead/t/harness \
-                   plumhead/t/hello.t 
+  cd languages && perl -I../lib pipp/t/harness \
+                   pipp/t/hello.t 
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ use Cwd                   ();
 use File::Spec;
 use Test::Harness         ();
 
-my $language = 'plumhead';
+my $language = 'pipp';
 
 if ( grep { m/^--files$/ } @ARGV ) {
     # Only the Makefile in 'parrot/languages' uses --files
@@ -83,19 +83,19 @@ if ( grep { m/^--files$/ } @ARGV ) {
 
     # XXX There should be a better to indicate which implementation should be used
     if ( $with_php ) {
-       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::PHP';
+       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PHP';
     }
     elsif ( $with_phc ) {
-       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Phc';
+       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
     }
     elsif ( $with_antlr3 ) {
-       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Antlr3';
+       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Antlr3';
     }
     elsif ( $with_pct ) {
-       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::PCT';
+       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
     }
     else {
-       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::PCT';
+       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
     }
 
     Test::Harness::runtests( @files ) if scalar( @files );

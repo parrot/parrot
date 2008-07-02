@@ -3,11 +3,11 @@
 
 =begin comments
 
-Plumhead::Grammar::Actions - AST transformations for Plumhead
+Pipp::Grammar::Actions - AST transformations for Pipp
 
 This file contains the methods that are used by the parse grammar
-to build the PAST representation of a Plumhead program.
-Each method below corresponds to a rule in F<src/pct/Plumhead.pg>,
+to build the PAST representation of a Pipp program.
+Each method below corresponds to a rule in F<src/pct/grammar.pg>,
 and is invoked at the point where C<{*}> appears in the rule,
 with the current match object as the first argument.  If the
 line containing C<{*}> also has a C<#= key> comment, then the
@@ -15,7 +15,7 @@ value of the comment is passed as the second argument to the method.
 
 =end comments
 
-class Plumhead::Grammar::Actions;
+class Pipp::Grammar::Actions;
 
 method TOP($/) {
     my $past  := PAST::Stmts.new( :node($/) );

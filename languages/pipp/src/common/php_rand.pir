@@ -13,7 +13,7 @@ php_rand.pir - PHP rand Standard Library
 
 =cut
 
-.include 'languages/plumhead/src/common/php_MACRO.pir'
+.include 'languages/pipp/src/common/php_MACRO.pir'
 
 .sub '__onload' :anon :load
     load_bytecode 'Math/Random/mt19937ar.pbc'

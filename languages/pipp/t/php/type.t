@@ -8,12 +8,12 @@ t/php/type.t - Standard Library type
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/type.t
+    % perl -I../lib pipp/t/php/type.t
 
 =head1 DESCRIPTION
 
 Tests PHP Standard Library type
-(implemented in F<languages/plumhead/src/common/php_type.pir>).
+(implemented in F<languages/pipp/src/common/php_type.pir>).
 
 See L<http://www.php.net/manual/en/ref.type.php>.
 
@@ -28,7 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 18;
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'floatval()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'floatval()' );
 <?php
   echo floatval(TRUE), "\n";
   echo floatval(NULL), "\n";
@@ -48,7 +48,7 @@ CODE
 0
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gettype(TRUE)' );
 <?php
   echo gettype(TRUE), "\n";
 ?>
@@ -56,7 +56,7 @@ CODE
 boolean
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(NULL)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gettype(NULL)' );
 <?php
   echo gettype(NULL), "\n";
 ?>
@@ -64,7 +64,7 @@ CODE
 NULL
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(42)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gettype(42)' );
 <?php
   echo gettype(42), "\n";
 ?>
@@ -72,7 +72,7 @@ CODE
 integer
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype(3.14)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gettype(3.14)' );
 <?php
   echo gettype(3.14), "\n";
 ?>
@@ -80,7 +80,7 @@ CODE
 double
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype("str")' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gettype("str")' );
 <?php
   echo gettype('str'), "\n";
 ?>
@@ -88,7 +88,7 @@ CODE
 string
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'gettype($array)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gettype($array)' );
 <?php
   $hello['world'] = 'hi';
   echo gettype($hello), "\n";
@@ -98,7 +98,7 @@ array
 OUTPUT
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'intval()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'intval()' );
 <?php
   echo intval(TRUE), "\n";
   echo intval(NULL), "\n";
@@ -124,7 +124,7 @@ CODE
 0
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_bool() no args' );
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'is_bool() no args' );
 <?php
   echo is_bool(), "\n";
 ?>
@@ -132,7 +132,7 @@ CODE
 /Only one argument expected/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_bool(TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_bool(TRUE)' );
 <?php
   echo is_bool(TRUE), "\n";
 ?>
@@ -140,7 +140,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_float(3.14)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_float(3.14)' );
 <?php
   echo is_float(3.14), "\n";
 ?>
@@ -148,7 +148,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_long(42)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_long(42)' );
 <?php
   echo is_long(42), "\n";
 ?>
@@ -156,7 +156,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_null(NULL)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_null(NULL)' );
 <?php
   echo is_null(NULL), "\n";
 ?>
@@ -164,7 +164,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_numeric()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_numeric()' );
 <?php
   echo is_numeric(3), "\n";
   echo is_numeric(3.14), "\n";
@@ -190,7 +190,7 @@ CODE
 
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_scalar()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_scalar()' );
 <?php
   echo is_scalar(NULL), "\n";
   echo is_scalar(TRUE), "\n";
@@ -206,7 +206,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'is_string("str")' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_string("str")' );
 <?php
   echo is_string('str'), "\n";
 ?>
@@ -218,7 +218,7 @@ TODO:
 {
     local $TODO = 'update compiler';
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'settype()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'settype()' );
 <?php
   $var = 3.14;
   echo settype($var, 'int'), "\n";
@@ -231,7 +231,7 @@ OUTPUT
 
 }
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strval(TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strval(TRUE)' );
 <?php
   echo strval(TRUE), "\n";
 ?>

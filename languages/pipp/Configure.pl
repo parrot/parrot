@@ -2,7 +2,7 @@
 
 # Copyright (C) 2006-2007, The Perl Foundation.
 
-# Configuration script for Plumhead.
+# Configuration script for Pipp.
 
 # RT#31633: need to steal from gen::languages and tools/dev/reconfigure.pl
 #           in order to make this work

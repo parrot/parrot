@@ -2,7 +2,7 @@
 
 .loadlib 'php_group'
 
-.include 'languages/plumhead/src/common/php_MACRO.pir'
+.include 'languages/pipp/src/common/php_MACRO.pir'
 
 # steal builtins from Perl6
 .sub 'print'
@@ -303,7 +303,7 @@
 .end
 
 
-.include 'languages/plumhead/src/common/php_standard.pir'
+.include 'languages/pipp/src/common/php_standard.pir'
 
 # Local Variables:
 #   mode: pir

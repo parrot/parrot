@@ -8,12 +8,12 @@ t/php/basic.t - Standard Library basic
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/basic.t
+    % perl -I../lib pipp/t/php/basic.t
 
 =head1 DESCRIPTION
 
 Tests PHP Standard Library basic
-(implemented in F<languages/plumhead/src/common/php_basic.pir>).
+(implemented in F<languages/pipp/src/common/php_basic.pir>).
 
 See L<http://www.php.net/manual/en/ref.?.php>.
 
@@ -28,7 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More     tests => 3;
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getenv()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'getenv()' );
 <?php
   echo getenv('PARROT_TMP'), "\n";
 ?>
@@ -38,7 +38,7 @@ OUTPUT
 
 $ENV{PARROT_TMP} = 'GETENV_PARROT';
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'getenv()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'getenv()' );
 <?php
   echo getenv('PARROT_TMP'), "\n";
 ?>
@@ -46,7 +46,7 @@ CODE
 GETENV_PARROT
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sleep()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sleep()' );
 <?php
   sleep(1);
 ?>

@@ -2,13 +2,13 @@
 
 # Copyright (C) 2006-2007, The Perl Foundation.
 
-package Parrot::Test::Plumhead::Antlr3;
+package Parrot::Test::Pipp::PHP;
 
 # pragmata
 use strict;
 use warnings;
 
-use base 'Parrot::Test::Plumhead';
+use base 'Parrot::Test::Pipp';
 
 # Generate output_is(), output_isnt() and output_like() in current package.
 Parrot::Test::generate_languages_functions();
@@ -17,7 +17,7 @@ sub get_out_fn {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    return Parrot::Test::per_test( '_antlr3.out', $count );
+    return Parrot::Test::per_test( '_php.out', $count );
 }
 
 # Use PHP on the command line
@@ -26,8 +26,8 @@ sub get_test_prog {
     my ( $count, $options ) = @_;
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
-
-    return qq{./parrot languages/plumhead/plumhead.pbc --variant=antlr3 languages/${lang_fn}};
+    $ENV{SCRIPT_FILENAME} = "languages/$lang_fn";
+    return ('php-cgi -q ');
 }
 
 # never skip the reference implementation

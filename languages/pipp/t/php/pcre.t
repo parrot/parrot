@@ -8,12 +8,12 @@ t/php/pcre.t - Library pcre
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/pcre.t
+    % perl -I../lib pipp/t/php/pcre.t
 
 =head1 DESCRIPTION
 
 Tests PHP Library pcre
-(implemented in F<languages/plumhead/src/common/php_pcre.pir>).
+(implemented in F<languages/pipp/src/common/php_pcre.pir>).
 
 See L<http://www.php.net/manual/en/ref.pcre.php>.
 
@@ -29,7 +29,7 @@ use Test::More     tests => 3;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'constants', todo => 'compiler supports constant');
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants', todo => 'compiler supports constant');
 <?php
   echo PREG_NO_ERROR, "\n";
   echo PREG_INTERNAL_ERROR, "\n";
@@ -45,7 +45,7 @@ CODE
 4
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'preg_match()', todo => 'proper check whether pcre is there' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match()', todo => 'proper check whether pcre is there' );
 <?php
   echo preg_match('/b/', 'abc'), "\n";
   echo preg_match('/b/', 'aaa'), "\n";
@@ -59,7 +59,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'preg_quote()', todo => 'proper check whether pcre is there' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_quote()', todo => 'proper check whether pcre is there' );
 <?php
   echo preg_quote('{}[]()'), "\n";
 ?>

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/superglobals.t - tests for Plumhead
+pipp/t/superglobals.t - tests for Pipp
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ use Parrot::Config ();
 use Parrot::Test;
 use Test::More     tests => 3;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'php_sapi_name' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'php_sapi_name' );
 <?php
 echo php_sapi_name();
 echo "\n";
@@ -33,7 +33,7 @@ END_EXPECTED
 $ENV{REQUEST_TYPE} = 'GET';
 $ENV{QUERY_STRING} = 'as=df';
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '$_GET' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '$_GET' );
 <?php
 echo $_GET['as'];
 echo "\n";
@@ -42,7 +42,7 @@ END_CODE
 df
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump( $_GET )', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'var_dump( $_GET )', todo => 'currently broken' );
 <?php
 var_dump( $_GET );
 echo "\n";

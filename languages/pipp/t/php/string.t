@@ -8,12 +8,12 @@ t/php/string.t - Standard Library string
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/string.t
+    % perl -I../lib pipp/t/php/string.t
 
 =head1 DESCRIPTION
 
 Tests PHP Standard Library string
-(implemented in F<languages/plumhead/src/common/php_string.pir>).
+(implemented in F<languages/pipp/src/common/php_string.pir>).
 
 See L<http://www.php.net/manual/en/ref.string.php>.
 
@@ -29,7 +29,7 @@ use Test::More     tests => 14;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'bin2hex' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'bin2hex' );
 <?php
   echo bin2hex('Ab3'), "\n";
 ?>
@@ -37,7 +37,7 @@ CODE
 416233
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'chr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'chr' );
 <?php
   echo chr(65), "\n";
 ?>
@@ -45,7 +45,7 @@ CODE
 A
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ltrim' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ltrim' );
 <?php
   echo ltrim('  abc'), "\n";
 ?>
@@ -53,7 +53,7 @@ CODE
 abc
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ord' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ord' );
 <?php
   echo ord('A'), "\n";
   echo ord(''), "\n";
@@ -63,7 +63,7 @@ CODE
 0
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'rtrim' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'rtrim' );
 <?php
   echo rtrim('  abc  '), "\n";
 ?>
@@ -71,7 +71,7 @@ CODE
   abc
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'str_repeat' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'str_repeat' );
 <?php
   echo str_repeat('Ab', 3), "\n";
   echo str_repeat('Ab', 0), "\n";
@@ -85,7 +85,7 @@ Ab
 
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strchr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strchr' );
 <?php
   echo strchr('abcdef', 'cd'), "\n";
   echo strchr('abcdef', 'g'), "\n";
@@ -95,7 +95,7 @@ cdef
 
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strpos' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strpos' );
 <?php
   echo strpos('abcdef', 'cd'), "\n";
   echo strpos('abcdef', 'g'), "\n";
@@ -107,7 +107,7 @@ CODE
 4
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strstr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strstr' );
 <?php
   echo strstr('abcdef', 'cd'), "\n";
   echo strstr('abcdef', 'g'), "\n";
@@ -117,7 +117,7 @@ cdef
 
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strtolower' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strtolower' );
 <?php
   echo strtolower('aBc'), "\n";
 ?>
@@ -125,7 +125,7 @@ CODE
 abc
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strtoupper' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strtoupper' );
 <?php
   echo strtoupper('aBc'), "\n";
 ?>
@@ -133,7 +133,7 @@ CODE
 ABC
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'substr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'substr' );
 <?php
   echo substr('abcdef', 2), "\n";
   echo substr('abcdef', 2, 2), "\n";
@@ -147,7 +147,7 @@ ef
 e
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'trim' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'trim' );
 <?php
   echo trim('  abc  '), "\n";
   echo trim('   '), "\n";
@@ -161,7 +161,7 @@ abc
 bc
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'ucfirst' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ucfirst' );
 <?php
   echo ucfirst('abc'), "\n";
 ?>

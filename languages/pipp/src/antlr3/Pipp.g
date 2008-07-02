@@ -1,11 +1,11 @@
 // Copyright (C) 2006-2007, The Perl Foundation.
-// $Id$ 
+// $Id$
  
-// PHP grammar for Plumhead antlr3
+// PHP grammar for Pipp antlr3
 
 // The starting rule is 'program'
 
-grammar Plumhead;
+grammar Pipp;
 
 options 
 {

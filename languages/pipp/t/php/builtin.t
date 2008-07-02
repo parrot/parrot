@@ -8,12 +8,12 @@ t/php/builtin.t - Standard Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/builtin.t
+    % perl -I../lib pipp/t/php/builtin.t
 
 =head1 DESCRIPTION
 
 Tests PHP Standard Library
-(implemented in F<languages/plumhead/src/common/php_builtin.pir>).
+(implemented in F<languages/pipp/src/common/php_builtin.pir>).
 
 See L<http://www.php.net/manual/en/ref.?.php>.
 
@@ -29,7 +29,7 @@ use Test::More     tests => 5;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strcmp()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strcmp()' );
 <?php
   echo strcmp('ABC', 'ABC'), "\n";
   echo strcmp('ABC', 'BCD'), "\n";
@@ -41,7 +41,7 @@ CODE
 1
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen()' );
 <?php
   echo strlen('str'), "\n";
 ?>
@@ -49,7 +49,7 @@ CODE
 3
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen() empty string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen() empty string' );
 <?php
   echo strlen(''), "\n";
 ?>
@@ -57,7 +57,7 @@ CODE
 0
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen() no arg' );
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen() no arg' );
 <?php
   echo strlen(), "\n";
 ?>
@@ -65,7 +65,7 @@ CODE
 /Wrong parameter count for strlen\(\)/
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'strlen() too many arg' );
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen() too many arg' );
 <?php
   echo strlen('str', 42), "\n";
 ?>

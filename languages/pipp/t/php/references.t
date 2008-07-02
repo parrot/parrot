@@ -21,7 +21,7 @@ use Parrot::Config ();
 use Parrot::Test;
 use Test::More     tests => 1;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'references', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'references', todo => 'not implemented yet' );
 <?php
 
 $var = 1;

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/arithmetics.t - tests for Plumhead
+pipp/t/arithmetics.t - tests for Pipp
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ END_CODE
         # use default description when '' or undef is set up
         $desc ||= "bc: $php_code";
 
-        language_output_is( 'plumhead', $php_code, $expected . "\n", $desc, %options );
+        language_output_is( 'pipp', $php_code, $expected . "\n", $desc, %options );
     }
 }
 

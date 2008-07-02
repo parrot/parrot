@@ -8,12 +8,12 @@ t/php/base64.t - Standard Library base64
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/base64.t
+    % perl -I../lib pipp/t/php/base64.t
 
 =head1 DESCRIPTION
 
 Tests PHP Standard Library base64
-(implemented in F<languages/plumhead/src/common/php_base64.pir>).
+(implemented in F<languages/pipp/src/common/php_base64.pir>).
 
 See L<http://www.php.net/manual/en/ref.url.php>.
 
@@ -29,7 +29,7 @@ use Test::More     tests => 8;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(str)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_encode(str)' );
 <?php
   echo base64_encode('Plum Headed Parakeet'), "\n";
 ?>
@@ -37,7 +37,7 @@ CODE
 UGx1bSBIZWFkZWQgUGFyYWtlZXQ=
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(no arg)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_encode(no arg)' );
 <?php
   echo base64_encode(), "\n";
 ?>
@@ -45,7 +45,7 @@ CODE
 /base64_encode\(\) expects exactly 1 parameter, 0 given/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(3.14)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_encode(3.14)' );
 <?php
   echo base64_encode(3.14), "\n";
 ?>
@@ -53,7 +53,7 @@ CODE
 My4xNA==
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_encode(TRUE)' );
 <?php
   echo base64_encode(TRUE), "\n";
 ?>
@@ -61,7 +61,7 @@ CODE
 MQ==
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(NULL)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_encode(NULL)' );
 <?php
   echo base64_encode(NULL), "\n";
 ?>
@@ -69,7 +69,7 @@ CODE
 
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_encode(array)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_encode(array)' );
 <?php
   $hello['world'] = 'hi';
   echo base64_encode($hello), "\n";
@@ -78,7 +78,7 @@ CODE
 /base64_encode\(\) expects parameter 1 to be string, array given/
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_decode(str)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_decode(str)' );
 <?php
   echo base64_decode('UGx1bSBIZWFkZWQgUGFyYWtlZXQ='), "\n";
 ?>
@@ -86,7 +86,7 @@ CODE
 Plum Headed Parakeet
 OUTPUT
 
-language_output_like( 'Plumhead', <<'CODE', <<'OUTPUT', 'base64_decode(no arg)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'base64_decode(no arg)' );
 <?php
   echo base64_decode(), "\n";
 ?>

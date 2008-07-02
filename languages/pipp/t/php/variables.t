@@ -22,7 +22,7 @@ use Parrot::Test;
 use Test::More     tests => 6;
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'string assignment' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'string assignment' );
 <?php
 $hello = "Hallo\n";
 echo $hello;
@@ -31,7 +31,7 @@ END_CODE
 Hallo
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'integer assignment' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'integer assignment' );
 <?php
 $hello = -1000;
 echo $hello;
@@ -41,7 +41,7 @@ END_CODE
 -1000
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'expression assignment' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'expression assignment' );
 <?php
 $hello = -1000 + 2000;
 echo $hello;
@@ -51,7 +51,7 @@ END_CODE
 1000
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'expression assignment' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'expression assignment' );
 <?php
 $h = -1000;
 $e = 2000;
@@ -63,7 +63,7 @@ END_CODE
 1000
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'expression assignment' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'expression assignment' );
 <?php
 $h       = 1;
 $e1      = 2;
@@ -92,7 +92,7 @@ END_CODE
 7
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'case sensitivity' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'case sensitivity' );
 <?php
 $abc = 1;
 $abC = 2;

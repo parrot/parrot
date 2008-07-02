@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/relops.t - tests for Plumhead
+pipp/t/relops.t - tests for Pipp
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ use Test::More     tests => 13;
 # True tests
 my $expected = "Condition is true.\n";
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'zero is less than' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'zero is less than' );
 <?php
 if ( 0 < 2 )
 {
@@ -45,7 +45,7 @@ Condition is false.
 ?>
 END_CODE
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'less than' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'less than' );
 <?php
 if ( 1 < 2 )
 {
@@ -63,7 +63,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'less equal' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'less equal' );
 <?php
 if ( 1 <= 1 )
 {
@@ -81,7 +81,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'equal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'equal', todo => 'currently broken' );
 <?php
 if ( 1 == 1 )
 {
@@ -99,7 +99,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'greater equal' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'greater equal' );
 <?php
 if ( 1 >= 1 )
 {
@@ -117,7 +117,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'greater than' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'greater than' );
 <?php
 if ( 2 > 1 )
 {
@@ -135,7 +135,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'unequal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'unequal', todo => 'currently broken' );
 <?php
 if ( 1 != 2 )
 {
@@ -154,7 +154,7 @@ END_CODE
 
 $expected = "Condition is false.\n";
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not less than' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not less than' );
 <?php
 if ( 2 < 1 )
 {
@@ -172,7 +172,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not less equal' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not less equal' );
 <?php
 if ( 2 <= 1 )
 {
@@ -190,7 +190,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not equal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not equal', todo => 'currently broken' );
 <?php
 if ( 1 == 2 )
 {
@@ -208,7 +208,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not greater equal' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not greater equal' );
 <?php
 if ( 1 >= 2 )
 {
@@ -226,7 +226,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not greater than' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not greater than' );
 <?php
 if ( 2 > 2 )
 {
@@ -244,7 +244,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not unequal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not unequal', todo => 'currently broken' );
 <?php
 if ( 1 != 1 )
 {

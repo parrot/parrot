@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/control_flow.t - tests for Plumhead
+pipp/t/control_flow.t - tests for Pipp
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ use Parrot::Config ();
 use Parrot::Test;
 use Test::More     tests => 10;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if, one statement in block' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if, one statement in block' );
 <?php
 if (1)
 {
@@ -32,7 +32,7 @@ END_CODE
 Hi
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if, no statements in block' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if, no statements in block' );
 <?php
 if (1)
 {
@@ -43,7 +43,7 @@ END_CODE
 Hi
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if, two statements in block' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if, two statements in block' );
 <?php
 if (1)
 {
@@ -55,7 +55,7 @@ END_CODE
 Hi
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if/else taking if-branch' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if/else taking if-branch' );
 <?php
 if (1)
 {
@@ -70,7 +70,7 @@ END_CODE
 if block
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'i/else taking else-branchf' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'i/else taking else-branchf' );
 <?php
 if (0)
 {
@@ -85,7 +85,7 @@ END_CODE
 else block
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED' . q{  }, 'positive int' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED' . q{  }, 'positive int' );
 <?php
 if (1) {
   ?>
@@ -97,7 +97,7 @@ END_CODE
     Condition is true.
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'zero' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'zero' );
 <?php
 if (0) {
   ?>
@@ -110,7 +110,7 @@ END_CODE
 Condition is false.
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'string' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string' );
 <?php
 if ( 'false' ) {
 ?>
@@ -122,7 +122,7 @@ END_CODE
 The string 'false' is true.
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'string' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string' );
 <?php
 if ( 'vrai' ) {
 ?>
@@ -141,7 +141,7 @@ The string 'vrai' is true.
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'string' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string' );
 <?php
 if ( 0 ) {
 ?>

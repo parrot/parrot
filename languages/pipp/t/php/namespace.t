@@ -23,7 +23,7 @@ use Test::More     tests => 1;
 # Parrot modules
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'namespace with dummy class', todo => 'no implemented yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'namespace with dummy class', todo => 'no implemented yet' );
 <?php
 
 namespace A::B;

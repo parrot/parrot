@@ -9,7 +9,7 @@ tree grammar GenPastNqp;
 options
 {
   ASTLabelType = CommonTree;
-  tokenVocab   = Plumhead;      // Token file is found because of '-lib' option
+  tokenVocab   = Pipp;      // Token file is found because of '-lib' option
 }
 
 
@@ -121,7 +121,7 @@ node
     }
   | ^( infix=( PLUS | MINUS | MUL_OP | BITWISE_OP )
        { 
-         // Todo. This is not nice, handle pirops in Plumhead.g
+         // Todo. This is not nice, handle pirops in Pipp.g
          String op = $infix.text;
          String pirop = "";
          if      ( op.equals( "+" ) )  { pirop = "n_add"; }

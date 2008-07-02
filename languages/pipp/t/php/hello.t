@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/hello.t - tests for Plumhead
+pipp/t/hello.t - tests for Pipp
 
 =head1 DESCRIPTION
 
@@ -23,12 +23,12 @@ use Test::More     tests => 22;
 # Parrot modules
 use Parrot::Test;
 
-language_output_is( 'Plumhead', <<'END_CODE', 'Hello, World!', 'sea without newline' );
+language_output_is( 'Pipp', <<'END_CODE', 'Hello, World!', 'sea without newline' );
 Hello, World!<?php
 ?>
 END_CODE
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea with one newline' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'sea with one newline' );
 Hello, World!
 <?php
 ?>
@@ -36,7 +36,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea with two newlines' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'sea with two newlines' );
 Hello,
 World!
 <?php
@@ -46,7 +46,7 @@ Hello,
 World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea without following PHP code' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'sea without following PHP code' );
 Hello,
 World!
 END_CODE
@@ -54,7 +54,7 @@ Hello,
 World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea without following PHP code' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'sea without following PHP code' );
 Hello,<?php
   ?> World!
 <?php
@@ -63,7 +63,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php
 echo "Hello, World!\n";
 ?>
@@ -71,7 +71,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php
 echo 'Hello, World!';
 echo "\n";
@@ -81,11 +81,11 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', 'Hello World', 'only alphanumic' );
+language_output_is( 'Pipp', <<'END_CODE', 'Hello World', 'only alphanumic' );
 <?php echo "Hello World"; ?>
 END_CODE
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'two echo statements' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'two echo statements' );
 <?php
 echo "Hello, ";
 echo "World!\n";
@@ -94,7 +94,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'two echo statements' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'two echo statements' );
 <?php
 echo "Hello, ";
 ?>Wo<?php
@@ -109,7 +109,7 @@ END_EXPECTED
 TODO: {
     local $TODO = '< not handled correctly';
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello with some HTML', todo => '< not handled correctly' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello with some HTML', todo => '< not handled correctly' );
 <html>
 <head>
   <title>Servus</title>
@@ -138,7 +138,7 @@ END_EXPECTED
 }
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello in a scalar' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello in a scalar' );
 <?php
 $h = "Hello, World!\n";
 echo $h;
@@ -148,7 +148,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello in a hash' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello in a hash' );
 <?php
 $h["e"] = "Hello, World!\n";
 echo $h["e"];
@@ -158,7 +158,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'no semicolon befor CODE_END' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'no semicolon befor CODE_END' );
 <?php
 echo 'Hello, ';
 echo "World!\n"
@@ -168,7 +168,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'concatenation of two strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenation of two strings', todo => 'currently broken' );
 <?php
 echo 'Hello, ' . "World!\n"
 ?>
@@ -177,7 +177,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'concatenation of four strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenation of four strings', todo => 'currently broken' );
 <?php
 echo 'Hell' . 'o, ' . 'World!' . "\n"
 ?>
@@ -185,7 +185,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'script tags' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'script tags' );
 <script language="php">
 echo "Hello, World!\n";
 </script>
@@ -194,7 +194,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'end of line comment #' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'end of line comment #' );
 <script language="php">
 echo "Hello, World!\n";   # comment till end of line
 </script>
@@ -203,7 +203,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'end of line comment //' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'end of line comment //' );
 <script language="php">
 echo "Hello, World!\n";   // comment till end of line
 </script>
@@ -212,7 +212,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'single line /* */ comment' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'single line /* */ comment' );
 <script language="php">
 echo "Hello, World!\n";   /* comment till end of line */
 </script>
@@ -221,7 +221,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'multi line /* */ comment' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'multi line /* */ comment' );
 <script language="php">
 echo "Hello, World!\n";   /* multi
     line
@@ -232,7 +232,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'script tags' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'script tags' );
 <script language="php">
 echo "Hello, World!\n";
 </script>

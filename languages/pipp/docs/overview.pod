@@ -2,12 +2,11 @@
 
 =head1 NAME
  
-Plumhead - Introduction
+Pipp - Introduction
 
-=head1 What is Plumhead?
+=head1 What is Pipp?
 
-Plumhead is an incomplete implementation of PHP on Parrot.
-Plumhead is short for Plum-headed Parakeet.
+Pipp is an incomplete implementation of PHP on Parrot.
 
 =head1 Goals
 
@@ -54,7 +53,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =over 4
 
-=item L<http://www.perlfoundation.org/parrot/index.cgi?plumhead>
+=item L<http://www.perlfoundation.org/parrot/index.cgi?pipp>
 
 =item L<http://phpcompiler.org/>
 

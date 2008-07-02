@@ -2,11 +2,11 @@
 
 =head1 Overview
 
-These are some ramblings on using ANTLR 3 for Plumhead, or with Parrot in general.
+These are some ramblings on using ANTLR 3 for Pipp, or with Parrot in general.
 
 =head1 Making it work
 
-Plumhead.java needs to find the needed classes. This works for me:
+Pipp.java needs to find the needed classes. This works for me:
 
   export ANTLR_HOME=/home/bernhard/devel/antlr/antlr-3
   export PARROT_HOME=/home/bernhard/devel/Parrot/trunk
@@ -14,11 +14,11 @@ Plumhead.java needs to find the needed classes. This works for me:
 $ANTLR_HOME/lib/antlr-3.0.1.jar:\
 $ANTLR_HOME:/lib/antlr-runtime-3.0.1.jar:\
 $ANTLR_HOME/lib/stringtemplate-3.1b1.jar:\
-$PARROT_HOME/languages/plumhead/src/antlr3:\
-$PARROT_HOME/languages/plumhead 
+$PARROT_HOME/languages/pipp/src/antlr3:\
+$PARROT_HOME/languages/pipp 
 
 Now try:
-   cd languages/plumhead
+   cd languages/pipp
    make maintain-antlr3
    make build-antlr3
    make test-antlr3 
@@ -89,7 +89,7 @@ A lexer grammar is automatically generated.
 
 =head2 Backend for Parrot
 
-=head2 Plumhead
+=head2 Pipp
 
 =head1 Glossary
 

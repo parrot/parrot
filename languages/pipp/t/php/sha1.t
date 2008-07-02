@@ -8,12 +8,12 @@ t/php/sha1.t - Standard Library sha1
 
 =head1 SYNOPSIS
 
-    % perl -I../lib plumhead/t/php/sha1.t
+    % perl -I../lib pipp/t/php/sha1.t
 
 =head1 DESCRIPTION
 
 Tests PHP Standard Library sha1
-(implemented in F<languages/plumhead/src/common/php_sha1.pir>).
+(implemented in F<languages/pipp/src/common/php_sha1.pir>).
 
 See L<http://www.php.net/manual/en/ref.strings.php>.
 
@@ -29,7 +29,7 @@ use Test::More     tests => 5;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1(msg)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1(msg)' );
 <?php
   echo sha1('message digest'), "\n";
 ?>
@@ -37,7 +37,7 @@ CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1(msg, FALSE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1(msg, FALSE)' );
 <?php
   echo sha1('message digest', FALSE), "\n";
 ?>
@@ -45,7 +45,7 @@ CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
 OUTPUT
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1(msg, TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1(msg, TRUE)' );
 <?php
   $md = sha1('message digest', TRUE);
   echo gettype($md), "\n";
@@ -61,7 +61,7 @@ open my $X, '>', '../file.txt';
 print {$X} 'message digest';
 close $X;
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1_file(file)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1_file(file)' );
 <?php
   echo sha1_file('file.txt'), "\n";
 ?>
@@ -71,7 +71,7 @@ OUTPUT
 
 unlink '../file.txt' if (-f '../file.txt');
 
-language_output_is( 'Plumhead', <<'CODE', <<'OUTPUT', 'sha1_file(nofile)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1_file(nofile)' );
 <?php
   echo sha1_file('nofile.txt'), "\n";
 ?>

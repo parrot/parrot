@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/strings.t - tests for Plumhead
+pipp/t/strings.t - tests for Pipp
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,7 @@ use Test::More     tests => 6;
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '== for equal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for equal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' == 'asdf' )
 {
@@ -36,7 +36,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '== for unequal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for unequal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' == 'jklö' )
 {
@@ -52,7 +52,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '!= for equal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for equal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' != 'asdf' )
 {
@@ -68,7 +68,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '!= for unequal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for unequal strings', todo => 'currently broken' );
 <?php
 if ( 'asdf' != 'jklö' )
 {
@@ -80,7 +80,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump()' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'var_dump()' );
 <?php
 var_dump( 'asdf' );
 ?>
@@ -89,7 +89,7 @@ string(4) "asdf"
 END_EXPECTED
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'string interpolation', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation', todo => 'not implemented yet' );
 <?php
 $var1 = "VAR1";
 $var2 = "VAR2";

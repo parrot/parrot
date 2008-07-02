@@ -311,13 +311,13 @@ print $STD <<'HEADER';
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
-.include 'languages/plumhead/src/common/php_API.pir'
+.include 'languages/pipp/src/common/php_API.pir'
 
 HEADER
 foreach (sort keys %ext) {
     my $files = $ext{$_};
     if ($files->[0] =~ /standard|Zend/) {
-        print $STD ".include 'languages/plumhead/src/common/php_",$_,".pir'\n";
+        print $STD ".include 'languages/pipp/src/common/php_",$_,".pir'\n";
     }
 }
     print $STD <<"TRAILER";

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/array.t - tests for Plumhead
+pipp/t/array.t - tests for Pipp
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ use Parrot::Test;
 use Test::More     tests => 6;
 
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'less than' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
 <?php
 $hello['world'] = 'hi';
 echo $hello['world'];
@@ -36,7 +36,7 @@ END_CODE
 hi
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'less than' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
 <?php
 $hello['world'] = 'hi';
 echo $hello['world'];
@@ -46,7 +46,7 @@ END_CODE
 hi
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'less than' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
 <?php
 $hello['world'] = 'hi';
 echo $hello['world'];
@@ -55,7 +55,7 @@ END_CODE
 hi
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'array with integer index' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'array with integer index' );
 <?php
 $thrice[3] = 9;
 echo $thrice[3];
@@ -64,7 +64,7 @@ END_CODE
 9
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with string key' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'var_dump() with string key' );
 <?php
 $foo['bar'] = 'asdf';
 echo $foo['bar'];
@@ -78,7 +78,7 @@ array(1) {
 }
 END_OUT
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'var_dump() with int key' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'var_dump() with int key' );
 <?php
 $twice[1] = 2;
 echo $twice[1];
