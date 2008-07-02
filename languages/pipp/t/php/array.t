@@ -21,9 +21,9 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Parrot::Config (); 
+use Parrot::Config ();
 use Parrot::Test;
-use Test::More     tests => 6;
+use Test::More     tests => 4;
 
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
@@ -64,30 +64,3 @@ END_CODE
 9
 END_OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'var_dump() with string key' );
-<?php
-$foo['bar'] = 'asdf';
-echo $foo['bar'];
-echo "\n";
-var_dump( $foo ); 
-END_CODE
-asdf
-array(1) {
-  ["bar"]=>
-  string(4) "asdf"
-}
-END_OUT
-
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'var_dump() with int key' );
-<?php
-$twice[1] = 2;
-echo $twice[1];
-echo "\n";
-var_dump( $twice ); 
-END_CODE
-2
-array(1) {
-  [1]=>
-  int(2)
-}
-END_OUT
