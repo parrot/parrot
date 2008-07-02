@@ -18,7 +18,7 @@ LANGUAGES = \
     eclectus ecmascript \
     forth \
     hq9plus \
-    jako \
+    jako json \
     lazy-k lisp lolcode lua \
     m4 \
     ook \
@@ -86,7 +86,7 @@ test-separate: all \
     eclectus.test ecmascript.test \
     forth.test \
     hq9plus.test \
-    jako.test \
+    jako.test json.test \
     lazy-k.test lisp.test lolcode.test lua.test \
     m4.test \
     ook.test \
@@ -114,7 +114,7 @@ clean: \
     ecmascript.clean \
     forth.clean \
     hq9plus.clean \
-    jako.clean \
+    jako.clean json.clean \
     lisp.clean \
     lolcode.clean lua.clean \
     m4.clean \
@@ -136,7 +136,7 @@ realclean: \
     eclectus.realclean ecmascript.realclean \
     forth.realclean \
     hq9plus.realclean \
-    jako.realclean \
+    jako.realclean json.realclean \
     lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
     m4.realclean \
     ook.realclean \
@@ -302,6 +302,16 @@ jako.test:
 jako.clean:
 	- $(MAKE) jako clean
 jako.realclean:
+	- $(MAKE) jako realclean
+
+json: json.dummy
+json.dummy:
+	- $(MAKE) json
+json.test:
+	- $(MAKE) json test
+json.clean:
+	- $(MAKE) json clean
+json.realclean:
 	- $(MAKE) jako realclean
 
 lazy-k: lazy-k.dummy

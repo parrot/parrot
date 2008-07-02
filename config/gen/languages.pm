@@ -53,7 +53,7 @@ sub runstep {
         eclectus ecmascript
         forth
         hq9plus
-        jako
+        jako json
         lazy-k lisp lolcode lua
         m4
         ook
