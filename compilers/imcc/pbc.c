@@ -1046,7 +1046,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
     len = strlen(unit->outer->name);
 
-    if (len == 0)
+    if (!len)
         return NULL;
 
     for (s = globals.cs->first; s; s = s->next) {
@@ -1059,7 +1059,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     /* could be eval too; check if :outer is the current sub */
     current = CONTEXT(interp)->current_sub;
 
-    if (! current)
+    if (!current)
         IMCC_fatal(interp, 1, "Undefined :outer sub '%s'.\n",
                    unit->outer->name);
 
