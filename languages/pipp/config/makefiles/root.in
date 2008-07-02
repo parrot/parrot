@@ -214,10 +214,10 @@ test-antlr3:
 test-pct:
 	- cd .. && $(PERL) -I../lib -I pipp/lib pipp/t/harness --with-pct
 
-test-pmc:
+test-pmc: pmc
 	- $(PERL) -I../../lib t/pmc/*t
 
-clean: clean-common clean-pct clean-antlr3 clean-test
+clean: clean-common clean-pct clean-antlr3 clean-test clean-pmc
 
 clean-common: clean-pmc
 	$(RM_F) \
@@ -240,7 +240,6 @@ clean-antlr3:
   src/antlr3/Pipp.tokens \
   src/antlr3/Pipp__.g
 
-
 clean-test:
 	$(RM_F) \
   t/php/*.php \
@@ -248,7 +247,6 @@ clean-test:
   t/php/*.out \
   t/pmc/*.pir \
   ../../pipp_*
-
 
 realclean: clean
 	$(RM_F) Makefile
