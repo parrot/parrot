@@ -194,6 +194,13 @@ Get/set the opcode type for this node.
 .end
 
 
+.sub 'lexid' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('lexid', value, has_value)
+.end
+
+
 .sub 'pirflags' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
