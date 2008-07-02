@@ -448,6 +448,32 @@ C<languages/jako>
 =back
 
 
+=head2 JSON
+
+=over 4
+
+=item Description
+
+Implements JSON with the PCT. JSON is a
+data description (sub) language.
+Running the pct-based JSON language, just input some string on the command
+line, like [1, 2, 3], and the output is dumped to stdout.
+
+=item Status
+
+unknown
+
+=item Last verified with parrot version
+
+not verified
+
+=item Location
+
+C<languages/json>
+
+=back
+
+
 =head2 Kea Common Lisp
 
 =over 4

@@ -401,6 +401,7 @@ N: Klaas-Jan Stol a.k.a. kj[s]?
 D: clean-ups of compilers/imcc and its documentation.
 D: compilers/pirc and languages/PIR.
 D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
+D: languages/json
 E: parrotcode@gmail.com
 
 N: Lars Balker Rasmussen
