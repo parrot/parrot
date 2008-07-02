@@ -90,14 +90,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     $P1 = new [ 'PCT::HLLCompiler' ]
     $P1.'language'('Pipp')
     $P1.'parsegrammar'('Pipp::Grammar')
-    #$P1.'parseactions'('Pipp::Grammar::Actions')
-    $P1.'astgrammar'('Pipp::PAST::Grammar')
-
-    # register and set up the the HLLCompiler
-    $P2 = new [ 'PCT::HLLCompiler' ]
-    $P2.'language'('PippWithNqpActions')
-    $P2.'parsegrammar'('Pipp::Grammar')
-    $P2.'parseactions'('Pipp::Grammar::Actions')
+    $P1.'parseactions'('Pipp::Grammar::Actions')
 
 .end
 
@@ -132,7 +125,7 @@ GOT_PHP_SOURCE_FN:
 VARIANT_PCT:
     # use the Parrot Compiler Toolkit by default
     .local pmc pipp_compiler
-    pipp_compiler = compreg 'PippWithNqpActions'
+    pipp_compiler = compreg 'Pipp'
 
     .return pipp_compiler.'evalfiles'( source_fn, 'target' => target )
 
