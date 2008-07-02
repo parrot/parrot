@@ -234,7 +234,12 @@ clean-pct:
   src/pct/gen_actions.pir
 
 clean-antlr3:
-	$(RM_F) src/antlr3/*.class
+	$(RM_F) \
+  src/antlr3/*.class \
+  src/antlr3/GenPastNqp.tokens \
+  src/antlr3/Pipp.tokens \
+  src/antlr3/Pipp__.g
+
 
 clean-test:
 	$(RM_F) \
