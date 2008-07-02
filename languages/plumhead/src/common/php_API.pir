@@ -15,6 +15,12 @@ php_api.pir - PHP API Library
 
 .include 'languages/plumhead/src/common/php_MACRO.pir'
 
+.sub '__onload' :anon :load :init
+    # symbol table for constants
+    new $P0, 'Hash'
+    set_hll_global 'php_constants', $P0
+.end
+
 =item C<error>
 
 =cut

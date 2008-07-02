@@ -94,7 +94,8 @@ PHP_SRC_STD_EXT= \
   src/common/php_versioning.pir
 
 PHP_EXT= \
-  src/common/php_ctype.pbc
+  src/common/php_ctype.pbc \
+  src/common/php_pcre.pbc
 
 # default
 all: build
@@ -171,6 +172,9 @@ src/common/plumheadlib.pbc: src/common/builtins.pir src/common/php_standard.pir 
 
 src/common/php_ctype.pbc: src/common/php_ctype.pir src/common/php_MACRO.pir
 	$(PARROT) -o src/common/php_ctype.pbc src/common/php_ctype.pir
+
+src/common/php_pcre.pbc: src/common/php_pcre.pir src/common/php_MACRO.pir
+	$(PARROT) -o src/common/php_pcre.pbc src/common/php_pcre.pir
 
 src/pct/gen_grammar.pir: $(LIBRARY_DIR)/PGE/Perl6Grammar.pir src/pct/grammar.pg
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir \

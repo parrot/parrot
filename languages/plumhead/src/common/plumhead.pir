@@ -76,6 +76,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
     load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
     load_bytecode 'languages/plumhead/src/common/php_ctype.pbc'
+    # load_bytecode 'languages/plumhead/src/common/php_pcre.pbc'
 
     load_bytecode 'CGI/QueryHash.pbc'
     load_bytecode 'dumper.pbc'
