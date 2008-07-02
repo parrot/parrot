@@ -17,6 +17,7 @@ php_pcre.pir - PHP pcre  Library
 .include 'cclass.pasm'
 
 .sub '__onload' :anon :load :init
+    push_eh _handler
     load_bytecode "library/pcre.pir"
     $P0 = get_global ['PCRE'], 'init'
     $P1 = $P0()
@@ -25,6 +26,8 @@ php_pcre.pir - PHP pcre  Library
     set_hll_global 'pcre_error_code', $P0
     new $P0, 'Hash'
     set_hll_global 'pcre_cache', $P0
+    __init()
+  _handler:
 .end
 
 # options PCRE
@@ -76,7 +79,7 @@ php_pcre.pir - PHP pcre  Library
 .const int PHP_PCRE_BAD_UTF8_ERROR         = 4
 
 
-.sub '__init' :anon :load :init
+.sub '__init' :anon
     .local pmc cst
     .GET_CONSTANTS(cst)
     .REGISTER_LONG_CONSTANT(cst, 'PREG_PATTERN_ORDER', PREG_PATTERN_ORDER)
