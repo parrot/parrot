@@ -1715,6 +1715,8 @@ test-clean :
 	$(RM_F) \
      "test$(EXE)" \
      "test.*"
+	$(RM_F) \
+     "parrot_test_run.tar.gz"
 
 imcc-clean:
 	$(RM_F) \
