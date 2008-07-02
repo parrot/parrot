@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 
 =head1 NAME
 
@@ -1103,7 +1103,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'Example for RT 44395' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'Example for RT #44395' );
 
 =for never
 
@@ -1241,6 +1241,45 @@ Sub 3 was called 3 times. Any sub was called 9 times.
 Sub 1 was called 4 times. Any sub was called 10 times.
 Sub 2 was called 4 times. Any sub was called 11 times.
 Sub 3 was called 4 times. Any sub was called 12 times.
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'Double-inner scope called from closure (RT #56184)' );
+.sub 'main' :main
+    .local pmc x
+    x = 'foo'()
+    x('world')
+.end
+
+.sub 'foo' :outer('main')
+    .local pmc a, bar
+    a = new 'String'
+    a = 'hello '
+    .lex '$a', a
+    $P0 = get_global 'bar'
+    bar = newclosure $P0
+    .return (bar)
+.end
+
+.sub 'bar' :outer('foo')
+    .param pmc b
+    .lex '$b', b
+    .local pmc a
+    a = find_lex '$a'
+    print a
+    say b
+    'bar_inner'()
+.end
+
+.sub 'bar_inner' :outer('bar')
+    .local pmc a, b
+    a = find_lex '$a'
+    b = find_lex '$b'
+    print a
+    say b
+.end
+CODE
+hello world
+hello world
 OUTPUT
 
 # Local Variables:
