@@ -779,11 +779,11 @@ pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
 	$(PERL) tools/dev/pbc_to_exe_gen.pl \
     > pbc_to_exe.pir
 
-$(PBC_TO_EXE) : pbc_to_exe.pir
+$(PBC_TO_EXE) : pbc_to_exe.pir $(PARROT)
 	$(PARROT) -o pbc_to_exe.pbc pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pir pbc_to_exe.pbc
 
-$(PARROT_CONFIG) : tools/util/parrot-config.pir
+$(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
 	$(PARROT) pbc_to_exe.pir parrot_config.pbc
 
