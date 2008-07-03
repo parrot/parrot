@@ -88,6 +88,16 @@ method function_call($/) {
     make $past;
 }
 
+method constant($/) {
+    make PAST::Op.new(
+             :name('constant'),
+             PAST::Val.new(
+                 :returns('PhpString'),
+                 :value( ~$<CONSTANT_NAME> ),
+             )
+         );
+}
+
 method arguments($/) {
     my $past := PAST::Op.new(
                     :pasttype('call'),

@@ -37,9 +37,13 @@ rule  statement               { <echo_statement>       {*} <statement_delimiter>
                               | <array_assign>         {*} <statement_delimiter>  #= array_assign
                               | <function_definition>  {*}                        #= function_definition
                               }
-rule  statement_delimiter     { ';' | <before \? > | $ }
-rule  echo_statement          { <ECHO> <arguments> {*} }
+rule  statement_delimiter     { ';'
+                              | <before \? >
+                              | $
+                              }
+rule  echo_statement          { <ECHO> <arguments>                                        {*} }
 rule  function_call           { <FUNCTION_NAME> <.PAREN_OPEN> <arguments> <.PAREN_CLOSE>  {*} }
+rule  constant                { <CONSTANT_NAME>                                           {*} }
 rule  arguments               {  [ <expression> [',' <expression>]* ]?                    {*} }
 rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE>
                                 \{ <statements> \}
@@ -53,6 +57,7 @@ rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} }
 
 token ECHO                    { 'echo' }
 token FUNCTION_NAME           { <IDENT> }
+token CONSTANT_NAME           { <IDENT> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
@@ -89,6 +94,7 @@ token expression              {
                               | <concat_expression>       {*}  #= concat_expression
                               | <bitwise_expression>      {*}  #= bitwise_expression
                               | <function_call>           {*}  #= function_call
+                              | <constant>                {*}  #= constant
                               }
 
 rule  array_elem              { <VAR_NAME> '[' <array_key> ']' {*} }

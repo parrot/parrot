@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 8;
+use Test::More     tests => 9;
 use Parrot::Test;
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), string' );
@@ -81,7 +81,7 @@ END_CODE
 1
 END_OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define and print', todo => 'not supported yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and echo, String' );
 <?php
 
 define( "THIS_IS", "it" );
@@ -89,6 +89,15 @@ echo THIS_IS;
 echo "\n";
 END_CODE
 it
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and echo, Float' );
+<?php
+
+define( "PI", 3.14159 );
+echo PI, "\n";
+END_CODE
+3.14159
 END_OUT
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and defined()' );
@@ -101,7 +110,6 @@ END_CODE
 1
 
 END_OUT
-
 
 # Local Variables:
 #   mode: cperl

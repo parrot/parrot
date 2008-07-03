@@ -29,7 +29,7 @@ use Test::More     tests => 5;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants', todo => 'compiler supports constant');
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
 <?php
   echo SEEK_SET, "\n";
   echo SEEK_CUR, "\n";
