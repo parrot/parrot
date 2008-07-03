@@ -218,56 +218,22 @@ method bitwise_expression($/) {
     make $past;
 }
 
-method adding_expression($/) {
-    my $past := $( $<multiplying_expression> );
-    if $<adding_tail> {
-       for $<adding_tail> {
-           my $past_prev := $past;
-           my $pir_op := $_<ADD_OP> eq '+' ?? 'n_add' !! 'n_sub';
-           $past := PAST::Op.new(
-                        $past_prev,
-                        $( $_<multiplying_expression> ),
-                        :pirop($pir_op)
-                    );
-       }
-    }
-
-    make $past;
-}
-
-method multiplying_expression($/) {
-    my $past := $( $<unary_expression> );
-    if $<multiplicand> {
-       my %pirop;
-       %pirop{'*'} := 'n_mul';
-       %pirop{'/'} := 'n_div';
-       %pirop{'%'} := 'n_mod';
-
-       for $<multiplicand> {
-           my $past_prev := $past;
-           my $pir_op := %pirop{ $_<MUL_OP> };
-           $past := PAST::Op.new(
-                        $past_prev,
-                        $( $_<multiplying_expression> ),
-                        :pirop($pir_op)
-                    );
-       }
-    }
-
-    make $past;
-}
-
-method unary_expression($/) {
-    if $<UNARY_MINUS> {
-        make PAST::Op.new(
-                 $( $<postfix_expression> ),
-                 :name('prefix:-'),
-                 :pirop('n_neg'),
-                 :node($/)
-             );
+## Handle the operator precedence table.
+method adding_expression($/, $key) {
+    if ($key eq 'end') {
+        make $($<expr>);
     }
     else {
-        make $( $<postfix_expression> );
+        my $past := PAST::Op.new( :name($<type>),
+                                  :pasttype($<top><pasttype>),
+                                  :pirop($<top><pirop>),
+                                  :lvalue($<top><lvalue>),
+                                  :node($/)
+                                );
+        for @($/) {
+            $past.push( $($_) );
+        }
+        make $past;
     }
 }
 

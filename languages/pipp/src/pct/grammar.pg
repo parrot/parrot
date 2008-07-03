@@ -72,11 +72,8 @@ token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
 token INTEGER                 { \d+                            {*} }
 token NUMBER                  { ( \d+ )? '.' \d+               {*} }
 
-token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
 token CONCAT_OP               { \. }
-token ADD_OP                  { \+ | \- }
-token MUL_OP                  { '*' | '/' | '%' }
 token BITWISE_OP              { '|' | '&' | '^' }
 token ASSIGN_OP               { '=' }
 token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
@@ -110,17 +107,18 @@ rule  bitwise_expression      { <adding_expression> <bitwise_tail>? {*} }
 
 rule  bitwise_tail            { <BITWISE_OP> <adding_expression> }
 
-# BUG: this gets precedence  wrong
-rule  adding_expression       { <multiplying_expression> <adding_tail>* {*} }
+rule adding_expression is optable                                       { ... }
 
-rule  adding_tail             { <ADD_OP> <multiplying_expression> }
+proto 'infix:+'   is precedence('1')     is pirop('n_add')              { ... }
+proto 'infix:-'   is equiv('infix:+')    is pirop('n_sub')              { ... }
 
-# TODO: this gets precedence wrong, see adding_expression
-rule  multiplying_expression  { <unary_expression> <multiplicand>? {*} }
+proto 'infix:*'   is tighter('infix:+')  is pirop('n_mul')              { ... }
+proto 'infix:%'   is equiv('infix:*')    is pirop('n_mod')              { ... }
+proto 'infix:/'   is equiv('infix:*')    is pirop('n_div')              { ... }
 
-rule  multiplicand            { <MUL_OP> <multiplying_expression> }
+proto 'prefix:-'  is tighter('infix:/')  is pirop('n_neg')              { ... }
 
-rule  unary_expression        { <UNARY_MINUS>? <postfix_expression> {*} }
+proto 'term:'     is tighter('infix:-')  is parsed(&postfix_expression) { ... }
 
 rule  postfix_expression      { <TRUE>                                     {*}    #= TRUE
                               | <FALSE>                                    {*}    #= FALSE
