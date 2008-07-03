@@ -125,12 +125,42 @@ NOT IMPLEMENTED.
 
 Read the entire file into a string
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub 'file_get_contents'
-    not_implemented()
+    .param pmc args :slurpy
+    .local string filename
+    .local int use_include_path
+    .local pmc context
+    .local int offset
+    .local int maxlen
+    use_include_path = 0
+    offset = -1
+    maxlen = PHP_STREAM_COPY_ALL
+    ($I0, filename, use_include_path, context, offset, maxlen) = parse_parameters('s|br!ll', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    $I0 = args
+    unless $I0 == 5 goto L2
+    unless maxlen < 0 goto L2
+    error(E_WARNING, "length must be greater than or equal to zero")
+    .RETURN_FALSE()
+  L2:
+    .local pmc stream
+    $I0 = ENFORCE_SAFE_MODE | REPORT_ERRORS
+    unless use_include_path goto L3
+    $I0 |= USE_PATH
+  L3:
+    stream = stream_open(filename, '<', $I0, context)
+    if stream goto L4
+    .RETURN_FALSE()
+  L4:
+    $S0 = stream.'slurp'('')
+    close stream
+    .RETURN_STRING($S0)
 .end
 
 =item C<int file_put_contents(string file, mixed data [, int flags [, resource context]])>
@@ -178,7 +208,56 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'fopen'
-    not_implemented()
+    .param pmc args :slurpy
+    .local string filename
+    .local string mode
+    .local int use_include_path
+    .local pmc context
+    use_include_path = 0
+    ($I0, filename, mode, use_include_path, context) = parse_parameters('ss|br', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    .local pmc stream
+    $I0 = ENFORCE_SAFE_MODE | REPORT_ERRORS
+    unless use_include_path goto L2
+    $I0 |= USE_PATH
+  L2:
+    $S0 = _getmode(mode)
+    stream = stream_open(filename, $S0, $I0, context)
+    .RETURN_RESOURCE(stream)
+.end
+
+.sub '_getmode' :anon
+    .param string mode
+    .local string res
+    unless mode == 'r' goto L1
+    res = '<'
+    goto L9
+  L1:
+    unless mode == 'w' goto L2
+    res = '>'
+    goto L9
+  L2:
+    unless mode == 'a' goto L3
+    res = '>>'
+    goto L9
+  L3:
+    unless mode == 'r+' goto L4
+    res = '+<'
+    goto L9
+  L4:
+    unless mode == 'w+' goto L5
+    res = '+>'
+    goto L9
+  L5:
+    unless mode == 'a+' goto L6
+    res = '+>>'
+    goto L9
+  L6:
+    res = ''
+  L9:
+    .return (res)
 .end
 
 =item C<int fpassthru(resource fp)>
@@ -341,12 +420,34 @@ NOT IMPLEMENTED.
 
 Output a file or a URL
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE (see stream_open)
 
 =cut
 
 .sub 'readfile'
-    not_implemented()
+    .param pmc args :slurpy
+    .local string filename
+    .local int use_include_path
+    .local pmc context
+    use_include_path = 0
+    ($I0, filename, use_include_path, context) = parse_parameters('s|br!', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    .local pmc stream
+    $I0 = ENFORCE_SAFE_MODE | REPORT_ERRORS
+    unless use_include_path goto L2
+    $I0 |= USE_PATH
+  L2:
+    stream = stream_open(filename, '<', $I0, context)
+    unless stream goto L3
+    $S0 = stream.'slurp'('')
+    close stream
+    $I0 = length $S0
+    print $S0
+    .RETURN_LONG($I0)
+  L3:
+    .RETURN_FALSE()
 .end
 
 =item C<string realpath(string path)>

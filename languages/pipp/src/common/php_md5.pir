@@ -70,7 +70,7 @@ Calculate the md5 hash of a string
 
 Calculate the md5 hash of given filename
 
-STILL INCOMPLETE (needs stream for URL).
+STILL INCOMPLETE (see open_stream).
 
 =cut
 
@@ -84,7 +84,8 @@ STILL INCOMPLETE (needs stream for URL).
     .RETURN_NULL()
   L1:
     .local pmc f, md, res
-    f = open filename, '<'
+    $I0 = REPORT_ERRORS | ENFORCE_SAFE_MODE
+    f = stream_open(filename, '<', $I0)
     unless f goto L2
     new md, 'MD5'
     md.'Init'()

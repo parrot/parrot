@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-php_api.pir - PHP API Library
+php_API.pir - PHP API Library
 
 =head1 DESCRIPTION
 
@@ -336,6 +336,43 @@ STILL INCOMPLETE (see parse_arg_impl).
     error(E_WARNING, 'Wrong parameter count for ', $P1, '()')
 .end
 
+=back
+
+=head2 Stream Functions
+
+=over 4
+
+=cut
+
+.const int PHP_STREAM_COPY_ALL = -1
+
+.const int IGNORE_PATH                      = 0
+.const int USE_PATH                         = 1
+.const int IGNORE_URL                       = 2
+.const int ENFORCE_SAFE_MODE                = 4
+.const int REPORT_ERRORS                    = 8
+.const int STREAM_MUST_SEEK                 = 16
+.const int STREAM_WILL_CAST                 = 32
+.const int STREAM_LOCATE_WRAPPERS_ONLY      = 64
+.const int STREAM_OPEN_FOR_INCLUDE          = 128
+.const int STREAM_USE_URL                   = 256
+.const int STREAM_ONLY_GET_HEADERS          = 512
+.const int STREAM_DISABLE_OPEN_BASEDIR      = 1024
+.const int STREAM_OPEN_PERSISTENT           = 2048
+.const int STREAM_DISABLE_URL_PROTECTION    = 0x00002000
+
+=item C<stream_open>
+
+=cut
+
+.sub 'stream_open'
+    .param string path
+    .param string mode
+    .param int options
+    .param pmc context :optional
+    $P0 = open path, mode
+    .return ($P0)
+.end
 
 =back
 
