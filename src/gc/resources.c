@@ -708,32 +708,38 @@ Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
      */
     new_size = aligned_size(buffer, newsize);
     old_size = aligned_size(buffer, PObj_buflen(buffer));
-    needed = new_size - old_size;
-    if ((pool->top_block->free >= needed) &&
-            (pool->top_block->top == (char*)PObj_bufstart(buffer) + old_size)) {
+    needed   = new_size - old_size;
+
+    if ((pool->top_block->free >= needed)
+    &&  (pool->top_block->top  == (char *)PObj_bufstart(buffer) + old_size)) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
         PObj_buflen(buffer) = newsize;
         return;
     }
+
     copysize = PObj_buflen(buffer);
-    if (!PObj_COW_TEST(buffer)) {
+
+    if (!PObj_COW_TEST(buffer))
         pool->guaranteed_reclaimable += copysize;
-    }
+
     pool->possibly_reclaimable += copysize;
-    mem = (char *)mem_allocate(interp, new_size, pool);
-    mem = aligned_mem(buffer, mem);
+    mem                         = (char *)mem_allocate(interp, new_size, pool);
+    mem                         = aligned_mem(buffer, mem);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
-    if (copysize) {
+    if (copysize)
         memcpy(mem, PObj_bufstart(buffer), copysize);
-    }
+
     PObj_bufstart(buffer) = mem;
+
     if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof (void*);
+        new_size -= sizeof (void *);
+
     PObj_buflen(buffer) = new_size;
 }
+
 
 /*
 

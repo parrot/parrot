@@ -188,7 +188,7 @@ new_ret_continuation(PARROT_INTERP)
     cc->from_ctx        = NULL;    /* filled in during a call */
     cc->dynamic_state   = NULL;
     cc->runloop_id      = 0;
-    cc->seg = interp->code;
+    cc->seg             = interp->code;
     cc->current_results = NULL;
     cc->address         = NULL;
     return cc;
