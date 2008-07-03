@@ -83,40 +83,43 @@ method assign($/) {
     make $past;
 }
 
-method function($/) {
-    my $block := $( $<block> );
-    $block.blocktype('declaration');
+method function($/,$key) {
+    our $?BLOCK;
+    if $key eq 'params' {
+        our $?BLOCK_SIGNATURE;
+        my $arglist;
+        $arglist := PAST::Stmts.new();
+        # if there are any parameters, get the PAST for each of them and
+        # adjust the scope to parameter.
+        for $<parameters> {
+            my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
+            $param.isdecl(1);
+            $arglist.push($param);
+        }
+        $?BLOCK_SIGNATURE := $arglist;
+    }
+    elsif $key eq 'block' {
+        my $block := $( $<block> );
+        $block.blocktype('declaration');
+        $?BLOCK.symbol(~$<variable><identifier>, :arity($block.arity()));
 
-    my $arglist;
-    $arglist := PAST::Stmts.new();
-    # if there are any parameters, get the PAST for each of them and
-    # adjust the scope to parameter.
-    $block.arity(0);
-    for $<parameters> {
-        #my $param := $($_);
-        #$param.scope('parameter');
-        my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
-        $param.isdecl(1);
-        $arglist.push($param);
-        $block.arity($block.arity() + 1);
+
+        my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
+        $block[1].unshift($it);
+
+        $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
+        $block[1].push($it);
+        $block.name(~$<variable><identifier>);
+        make $block;
+        #my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+        #$($<variable>).isdecl(1);
+        #$past.push( $( $<variable> ) );
+        #$past.push( $block );
+        #make $past;
     }
 
 
-    my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
-    $block[1].unshift($it);
 
-    $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
-    $block[1].push($it);
-
-    if $<parameters> { $block.unshift($arglist); }
-
-    $block.name(~$<variable><identifier>);
-    make $block;
-    #my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
-    #$($<variable>).isdecl(1);
-    #$past.push( $( $<variable> ) );
-    #$past.push( $block );
-    #make $past;
 }
 
 method ifthen($/) {
@@ -157,8 +160,16 @@ method block($/,$key) {
     our $?BLOCK;
     our @?BLOCK;
     if $key eq 'open' {
+        our $?BLOCK_SIGNATURE;
         $?BLOCK := PAST::Block.new( PAST::Stmts.new(), :node($/) );
         @?BLOCK.unshift($?BLOCK);
+        my $iter := $?BLOCK_SIGNATURE.iterator();
+        $?BLOCK.arity(0);
+        for $iter {
+            $?BLOCK.arity($?BLOCK.arity() + 1);
+            $?BLOCK[0].push($_);
+            $?BLOCK.symbol($_.name(), :scope('lexical'));
+        }
     }
     elsif $key eq 'close' {
         #my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
@@ -183,10 +194,22 @@ method bang($/) {
 
 method expression($/) {
     my $past := PAST::Op.new( :name('expr_parse'), :pasttype('call'), :node( $/ ) );
+    VISIBLE("parse expression");
     for $<tokens> {
+        my $name := ~$_<identifier>;
+        my $foo := lookup($name);
+        VISIBLE($foo);
         if($_<identifier>) {
-            my $inline := '%r = find_name "' ~ $_<identifier> ~ '"';
-            $past.push(PAST::Op.new( :inline($inline) ));
+            our $?BLOCK;
+            our @?BLOCK;
+            if $?BLOCK.symbol($name) && $?BLOCK.symbol($name)<scope> {
+                VISIBLE("FOUND SYMTABLE ENTRY FOR ", $name);
+                $past.push(PAST::Var.new(:name($name), :scope($?BLOCK.symbol($name)<scope>)));
+            }
+            else {
+                my $inline := '%r = find_name "' ~ $_<identifier> ~ '"';
+                $past.push(PAST::Op.new( :inline($inline) ));
+            }
         }
         elsif($_ eq "MKAY"){
             my $inline := '%r = find_name "MKAY"';

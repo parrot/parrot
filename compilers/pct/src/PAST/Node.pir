@@ -89,7 +89,7 @@ associated with the argument.
 .end
 
 
-=item flat([value]
+=item flat([value])
 
 Accessor method -- sets/returns the "flatten" flag on arguments.
 

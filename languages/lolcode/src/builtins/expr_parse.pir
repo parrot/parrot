@@ -118,6 +118,15 @@ it_done:
     .return (return_val)
 .end
 
+.sub lookup
+    .param string name
+    $P0 = find_name name
+    if_null $P0, null_token
+    $P0 = typeof $P0
+    .return($P0)
+  null_token:
+    .return("NULL")
+.end
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

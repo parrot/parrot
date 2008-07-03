@@ -46,9 +46,10 @@ rule function {
     # $<parameters> is only getting the first parameter, not all of them
     # like I'd expect...
     'HOW' 'DUZ' 'I' <variable> ['YR' $<parameters>=<variable> [ 'AN' 'YR' $<parameters>=<variable>]* ]?<statement_terminator>
+    {*}                         #= params
     <block>
     'IF' 'U' 'SAY' 'SO'
-    {*}
+    {*}                         #= block
 }
 
 rule ifthen {
