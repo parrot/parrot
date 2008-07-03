@@ -106,10 +106,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-TODO: {
-    local $TODO = '< not handled correctly';
-
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello with some HTML', todo => '< not handled correctly' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello with some HTML' );
 <html>
 <head>
   <title>Servus</title>
@@ -134,8 +131,6 @@ Hello, World!
 </body>
 </html>
 END_EXPECTED
-
-}
 
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'hello in a scalar' );
