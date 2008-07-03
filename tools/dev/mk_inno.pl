@@ -35,6 +35,7 @@ Source: "$PConfig{icu_dir}\\bin\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
 my %dll = (
     has_gdbm     => [ 'gdbm3.dll' ],
     HAS_GETTEXT  => [ 'libintl3.dll', 'libiconv2.dll' ],
+    HAS_PCRE     => [ 'pcre3.dll' ],
     HAS_READLINE => [ 'readline5.dll' ],
 );
 
