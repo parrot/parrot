@@ -67,29 +67,77 @@ NOT IMPLEMENTED.
 
 Define a new constant
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub 'define'
-    .param pmc symb
-    .param pmc val
- 
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    .local int case_sensitive
+    case_sensitive = 1 # not used
+    unless argc == 2 goto L1
+    $P1 = shift args
+    $P2 = shift args
+    goto L2
+  L1:
+    unless argc == 3 goto L3
+    $P1 = shift args
+    $P2 = shift args
+    $P3 = shift args
+    case_sensitive = $P3
+    goto L2
+  L3:
+    wrong_param_count()
+    .RETURN_NULL()
+  L2:
+    $I0 = isa $P2, 'PhpInteger'
+    if $I0 goto L4
+    $I0 = isa $P2, 'PhpFloat'
+    if $I0 goto L4
+    $I0 = isa $P2, 'PhpString'
+    if $I0 goto L4
+    $I0 = isa $P2, 'PhpBoolean'
+    if $I0 goto L4
+    $I0 = isa $P2, 'PhpResource'
+    if $I0 goto L4
+    $I0 = isa $P2, 'PhpUndef'
+    if $I0 goto L4
+    $I0 = isa $P2, 'PhpObject'
+    unless $I0 goto L5
+    #
+  L5:
+    error(E_WARNING,"Constants may only evaluate to scalar values")
+    .RETURN_FALSE()
+  L4:
+    $S1 = $P1
     .local pmc cst
     .GET_CONSTANTS(cst)
-    cst[symb] = val
+    cst[$S1] = $P2
+    .RETURN_TRUE()
 .end
 
 =item C<bool defined(string constant_name)>
 
 Check whether a constant exists
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'defined'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    $I0 = exists cst[$S1]
+    .RETURN_BOOL($I0)
 .end
 
 =item C<array each(array arr)>

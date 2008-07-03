@@ -13,6 +13,18 @@ php_file.pir - PHP file Standard Library
 
 =cut
 
+.const int SEEK_SET = 0
+.const int SEEK_CUR = 1
+.const int SEEK_END = 2
+
+.sub '__init' :anon :load :init
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    .REGISTER_LONG_CONSTANT(cst, 'SEEK_SET', SEEK_SET)
+    .REGISTER_LONG_CONSTANT(cst, 'SEEK_CUR', SEEK_CUR)
+    .REGISTER_LONG_CONSTANT(cst, 'SEEK_END', SEEK_END)
+.end
+
 =item C<bool copy(string source_file, string destination_file)>
 
 Copy a file
