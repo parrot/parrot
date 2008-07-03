@@ -194,16 +194,13 @@ method bang($/) {
 
 method expression($/) {
     my $past := PAST::Op.new( :name('expr_parse'), :pasttype('call'), :node( $/ ) );
-    VISIBLE("parse expression");
     for $<tokens> {
         my $name := ~$_<identifier>;
-        my $foo := lookup($name);
-        VISIBLE($foo);
         if($_<identifier>) {
+            my $foo := lookup($name);
             our $?BLOCK;
             our @?BLOCK;
             if $?BLOCK.symbol($name) && $?BLOCK.symbol($name)<scope> {
-                VISIBLE("FOUND SYMTABLE ENTRY FOR ", $name);
                 $past.push(PAST::Var.new(:name($name), :scope($?BLOCK.symbol($name)<scope>)));
             }
             else {
