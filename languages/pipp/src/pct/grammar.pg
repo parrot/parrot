@@ -74,7 +74,6 @@ token NUMBER                  { ( \d+ )? '.' \d+               {*} }
 
 token UNARY_PLUS              { \+ }
 token CONCAT_OP               { \. }
-token BITWISE_OP              { '|' | '&' | '^' }
 token ASSIGN_OP               { '=' }
 token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
 
@@ -103,13 +102,13 @@ rule  string                  { <DOUBLEQUOTE_STRING> {*}   #= DOUBLEQUOTE_STRING
                               }
 rule  concat_tail             { <CONCAT_OP> <string> }
 
-rule  bitwise_expression      { <adding_expression> <bitwise_tail>? {*} }
+rule bitwise_expression is optable                                      { ... }
 
-rule  bitwise_tail            { <BITWISE_OP> <adding_expression> }
+proto 'infix:|'   is precedence('1')     is pirop('bor')                { ... }
+proto 'infix:&'   is equiv('infix:|')    is pirop('band')               { ... }
+proto 'infix:^'   is equiv('infix:&')    is pirop('bxor')               { ... }
 
-rule adding_expression is optable                                       { ... }
-
-proto 'infix:+'   is precedence('1')     is pirop('n_add')              { ... }
+proto 'infix:+'   is tighter('infix:^')  is pirop('n_add')              { ... }
 proto 'infix:-'   is equiv('infix:+')    is pirop('n_sub')              { ... }
 
 proto 'infix:*'   is tighter('infix:+')  is pirop('n_mul')              { ... }

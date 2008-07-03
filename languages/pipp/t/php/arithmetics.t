@@ -112,13 +112,13 @@ my @tests = (
     [ '2 / 2 + .1', '1.1', ],
     [ '2 * 2 + .4', '4.4', ],
     [ '.1 - 6 / 2', '-2.9', ],
-    # TODO [ '-1.0000001', '-1.0000001', 'probably limited precission of Float PMC', ],
-    # TODO [ '1 & 3', '1', 'bitwise and', ],
-    # TODO [ '2 & 2 + 8', '2', 'bitwise and, less precedence than +', ],
-    # TODO [ '1 | 2', '3', 'bitwise or', ],
-    # TODO [ '6 ^ 5', '3', 'bitwise xor', ],
-    # TODO [ '010', 8, 'octal' ],
-    # TODO [ '0x10', 16, 'hex' ],
+    [ '-1.0000001', '-1.0000001', 'probably limited precission of Float PMC', todo => 'broken' ],
+    [ '1 & 3', '1', 'bitwise and', todo => 'broken' ],
+    [ '2 & 2 + 8', '2', 'bitwise and, less precedence than +', todo => 'broken' ],
+    [ '1 | 2', '3', 'bitwise or', todo => 'broken' ],
+    [ '6 ^ 5', '3', 'bitwise xor', todo => 'broken' ],
+    [ '010', 8, 'octal', todo => 'broken' ],
+    [ '0x10', 16, 'hex', todo => 'broken' ],
 );
 
 plan( tests => scalar(@tests) );

@@ -196,30 +196,8 @@ method expression($/,$key) {
     make $( $/{$key} );
 }
 
-method bitwise_expression($/) {
-    my $past := $( $<adding_expression> );
-    if $<bitwise_tail> {
-       my %name;
-       %name{'&'} := 'infix:+&';
-       %name{'|'} := 'infix:+|';
-       %name{'^'} := 'infix:+^';
-
-       for $<bitwise_tail> {
-           my $past_prev := $past;
-           my $name := %name{ $_<BITWISE_OP> };
-           $past := PAST::Op.new(
-                        $past_prev,
-                        $( $_<adding_expression> ),
-                        :name($name)
-                    );
-       }
-    }
-
-    make $past;
-}
-
 ## Handle the operator precedence table.
-method adding_expression($/, $key) {
+method bitwise_expression($/, $key) {
     if ($key eq 'end') {
         make $($<expr>);
     }
