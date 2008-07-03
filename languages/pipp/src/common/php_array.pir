@@ -698,6 +698,9 @@ STILL INCOMPLETE.
     .param pmc array
     .param int mode
     $I0 = elements array
+    unless mode == COUNT_RECURSIVE goto L1
+    not_implemented()
+  L1:
     .return ($I0)
 .end
 
