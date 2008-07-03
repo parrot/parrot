@@ -116,7 +116,6 @@ php_MACRO.pir - PHP API macros
 =cut
 
 .macro RETURN_RESOURCE(val)
-    not_implemented()
     new $P0, 'PhpResource', .val
     .return ($P0)
 .endm

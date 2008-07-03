@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 5;
+use Test::More     tests => 9;
 use Parrot::Test;
 
 
@@ -65,6 +65,47 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'file_get_contents(nofile)' );
 ?>
 CODE
 
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'fopen(file)' );
+<?php
+  $fp = fopen('file.txt', 'r');
+  echo gettype($fp), "\n";
+?>
+CODE
+resource
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'fopen(nofile)' );
+<?php
+  $fp = fopen('nofile.txt', 'r');
+  echo gettype($fp), "\n";
+  echo $fp, "\n";
+?>
+CODE
+boolean
+
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'fopen(file) & fclose' );
+<?php
+  $fp = fopen('file.txt', 'r');
+  echo fclose($fp), "\n";
+?>
+CODE
+1
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'fpassthru()' );
+<?php
+  $fp = fopen('file.txt', 'r');
+  fpassthru($fp);
+  fclose($fp);
+?>
+CODE
+line 1
+line 2
+line 3
 OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'readfile(file)' );

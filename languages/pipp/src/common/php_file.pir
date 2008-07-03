@@ -41,12 +41,24 @@ NOT IMPLEMENTED.
 
 Close an open file pointer
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'fclose'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    .local pmc stream
+    stream = deref $P1
+    if stream goto L2
+    .RETURN_FALSE()
+  L2:
+    close stream
+    .RETURN_TRUE()
 .end
 
 =item C<bool feof(resource fp)>
@@ -215,7 +227,7 @@ NOT IMPLEMENTED.
 
 Open a file or a URL and return a file pointer
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE (see _getmode)
 
 =cut
 
@@ -237,6 +249,9 @@ NOT IMPLEMENTED.
   L2:
     $S0 = _getmode(mode)
     stream = stream_open(filename, $S0, $I0, context)
+    if stream goto L3
+    .RETURN_FALSE()
+  L3:
     .RETURN_RESOURCE(stream)
 .end
 
@@ -276,12 +291,24 @@ NOT IMPLEMENTED.
 
 Output all remaining data from a file pointer
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'fpassthru'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    .local pmc stream
+    stream = deref $P1
+    if stream goto L2
+    .RETURN_FALSE()
+  L2:
+    $I0 = stream_passthru(stream)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int fputcsv(resource fp, array fields [, string delimiter [, string enclosure]])>
@@ -453,10 +480,8 @@ STILL INCOMPLETE (see stream_open)
   L2:
     stream = stream_open(filename, '<', $I0, context)
     unless stream goto L3
-    $S0 = stream.'slurp'('')
+    $I0 = stream_passthru(stream)
     close stream
-    $I0 = length $S0
-    print $S0
     .RETURN_LONG($I0)
   L3:
     .RETURN_FALSE()

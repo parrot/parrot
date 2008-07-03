@@ -275,8 +275,14 @@ STILL INCOMPLETE (see parse_arg_impl).
     .return ('boolean')
   not_boolean:
     unless c == 'r' goto not_resource
-    ###
+    $I0 = isa arg, 'PhpResource'
+    if $I0 goto L5
+    $I0 = isa arg, 'PhpUndef'
+    unless $I0 goto L51
+    unless return_null goto L51
     goto L5
+  L51:
+    .return ('resource')
   not_resource:
     unless c == 'a' goto not_array
     $I0 = isa arg, 'PhpArray'
@@ -372,6 +378,18 @@ STILL INCOMPLETE (see parse_arg_impl).
     .param pmc context :optional
     $P0 = open path, mode
     .return ($P0)
+.end
+
+=item C<stream_passthru>
+
+=cut
+
+.sub 'stream_passthru'
+    .param pmc stream
+    $S0 = stream.'slurp'('')
+    $I0 = length $S0
+    print $S0
+    .return ($I0)
 .end
 
 =back
