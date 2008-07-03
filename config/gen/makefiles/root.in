@@ -468,6 +468,7 @@ PINFO               = $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE            = $(CUR_DIR)/pbc_merge$(EXE)
 PDB                 = $(CUR_DIR)/pdb$(EXE)
 PBC_TO_EXE          = $(CUR_DIR)/pbc_to_exe$(EXE)
+PARROT_CONFIG       = $(CUR_DIR)/parrot-config$(EXE)
 
 # HLL Executables
 PERL6               = $(CUR_DIR)/perl6$(EXE)
@@ -558,6 +559,7 @@ all : \
     dynoplibs \
     compilers \
     $(PBC_TO_EXE) \
+    $(PARROT_CONFIG) \
     $(DIS) \
     $(PBCMERGE)
 
@@ -626,7 +628,7 @@ help :
 	@echo "  world:             'all' and 'parrot_utils'."
 	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
-	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB), $(PBCMERGE) and $(PBC_TO_EXE)"
+	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB), $(PBCMERGE) and $(PBC_TO_EXE) $(PARROT_CONFIG)"
 	@echo " $(PDUMP):"
 	@echo "                     Parrot Dumper"
 	@echo " $(DIS):"
@@ -639,6 +641,8 @@ help :
 	@echo "                     Merge bytecode files"
 	@echo " $(PBC_TO_EXE):"
 	@echo "                     Generate C, compile, and link bytecode files"
+	@echo " $(PARROT_CONFIG):"
+	@echo "                     Provide Parrot configuration information"
 	@echo ""
 	@echo "HLL Executables:"
 	@echo " $(PERL6):"
@@ -747,7 +751,7 @@ help :
 
 world : all parrot_utils
 
-parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE)
+parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
 
@@ -779,6 +783,9 @@ $(PBC_TO_EXE) : pbc_to_exe.pir
 	$(PARROT) -o pbc_to_exe.pbc pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pir pbc_to_exe.pbc
 
+$(PARROT_CONFIG) : tools/util/parrot-config.pir
+	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
+	$(PARROT) pbc_to_exe.pir parrot_config.pbc
 
 # HLL Executable targets
 #CONDITIONED_LINE(win32):perl6 : $(PERL6)
