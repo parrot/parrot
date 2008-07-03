@@ -37,7 +37,6 @@ our @valid_options = qw{
     gc
     help
     icu-config
-    icudatadir
     icuheaders
     icushared
     includedir
@@ -213,7 +212,6 @@ ICU Options:
    --without-icu        Build parrot without ICU support
    --icuheaders=(path)  Location of ICU headers without /unicode
    --icushared=(flags)  Full linker command to create shared libraries
-   --icudatadir=(path)  Directory to locate ICU's data file(s)
 
 Other Options (may not be implemented):
 

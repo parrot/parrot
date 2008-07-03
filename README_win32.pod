@@ -75,7 +75,6 @@ Configure.pl to use it.
     perl Configure.pl
         --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib"
         --icuheaders="C:\usr\lib\icu\include"
-        --icudatadir="C:\usr\local\icu\data"
 
 Note the step of creating the F<C:\usr\lib\data> directory, as Parrot
 really wants it and the binary packages don't contain it.  It doesn't
@@ -178,7 +177,6 @@ With the ActiveState Perl distribution, tell Configure.pl to use gcc :
          --cc=gcc
          --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib"
          --icuheaders="C:\usr\lib\icu\include"
-         --icudatadir="C:\usr\local\icu\data"
 or
     perl Configure.pl --cc=gcc --without-icu
 
