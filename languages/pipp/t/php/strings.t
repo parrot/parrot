@@ -24,7 +24,7 @@ use Test::More     tests => 6;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for equal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for equal strings' );
 <?php
 if ( 'asdf' == 'asdf' )
 {
@@ -36,7 +36,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for unequal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for unequal strings' );
 <?php
 if ( 'asdf' == 'jklö' )
 {
@@ -52,7 +52,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for equal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for equal strings' );
 <?php
 if ( 'asdf' != 'asdf' )
 {
@@ -68,7 +68,7 @@ END_CODE
 END_EXPECTED
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for unequal strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for unequal strings' );
 <?php
 if ( 'asdf' != 'jklö' )
 {

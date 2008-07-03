@@ -177,12 +177,9 @@ method else_clause($/) {
 
 method relational_expression($/) {
     if $<rel_op_clause> {
-        my %name;
-        %name{'=='} := 'infix:eq';
-        %name{'!='} := 'infix:ne';
         my $rel_op_clause := $/{'rel_op_clause'}{'REL_OP'};
-        my $op := ~$rel_op_clause{'REL_OP'};
-        my $name := %name{ $op } || "infix:" ~ $op;
+        my $op            := ~$rel_op_clause{'REL_OP'};
+        my $name          := 'infix:' ~ $op;
         make PAST::Op.new(
                  $( $<expression> ),
                  $( $rel_op_clause{'expression'} ),

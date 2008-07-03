@@ -81,7 +81,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Pipp', <<'END_CODE', $expected, 'equal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'equal' );
 <?php
 if ( 1 == 1 )
 {
@@ -135,7 +135,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Pipp', <<'END_CODE', $expected, 'unequal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'unequal' );
 <?php
 if ( 1 != 2 )
 {
@@ -190,7 +190,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Pipp', <<'END_CODE', $expected, 'not equal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not equal' );
 <?php
 if ( 1 == 2 )
 {
@@ -244,7 +244,7 @@ Condition is false.
 END_CODE
 
 
-language_output_is( 'Pipp', <<'END_CODE', $expected, 'not unequal', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', $expected, 'not unequal' );
 <?php
 if ( 1 != 1 )
 {
