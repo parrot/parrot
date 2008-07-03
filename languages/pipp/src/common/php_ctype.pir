@@ -9,8 +9,6 @@ php_ctype.pir - PHP ctype Library
 
 =head2 Functions
 
-STILL INCOMPLETE (see CTYPE).
-
 =over 4
 
 =cut
@@ -20,23 +18,44 @@ STILL INCOMPLETE (see CTYPE).
 
 .macro CTYPE(class, args)
     .local pmc c
-    ($I0, c) = parse_parameters('s', .args :flat)
+    ($I0, c) = parse_parameters('z', .args :flat)
     if $I0 goto L1
     .RETURN_NULL()
   L1:
+    $I0 = isa c, 'PhpInteger'
+    unless $I0 goto L2
+    $I0 = c
+    unless $I0 <= 255 goto L3
+    unless $I0 >= 0 goto L3
+    $S0 = chr $I0
+    $I0 = is_cclass .class, $S0, 0
+    .RETURN_BOOL($I0)
+  L3:
+    unless $I0 >= -128 goto L4
+    unless $I0 < 0 goto L4
+    $I0 += 256
+    $S0 = chr $I0
+    $I0 = is_cclass .class, $S0, 0
+    .RETURN_BOOL($I0)
+  L2:
+    $I0 = isa c, 'PhpString'
+    unless $I0 goto L5
+  L4:
     $S1 = c
     $I1 = length $S1
     $I0 = 0 # if empty string
     .local int i
     i = 0
-  L2:
-    unless i < $I1 goto L3
+  L6:
+    unless i < $I1 goto L7
     $I0 = is_cclass .class, $S1, i
-    unless $I0 goto L3
+    unless $I0 goto L7
     inc i
-    goto L2
-  L3:
+    goto L6
+  L7:
     .RETURN_BOOL($I0)
+  L5:
+    .RETURN_FALSE()
 .endm
 
 

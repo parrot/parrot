@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 3;
+use Test::More     tests => 4;
 use Parrot::Test;
 
 
@@ -52,6 +52,19 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ctype_alnum() empty' );
 CODE
 
 OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ctype_alnum() int' );
+<?php
+  echo ctype_alnum(65), "\n";
+  echo ctype_alnum(32), "\n";
+  echo ctype_alnum(512), "\n";
+?>
+CODE
+1
+
+1
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
