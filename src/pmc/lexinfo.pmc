@@ -20,6 +20,9 @@ These are the vtable functions for the lexinfo PMC.
 
 #include "parrot/parrot.h"
 
+/* included manually to prevent breaking C++ builds -- see RT #56534*/
+#include "pmc_hash.h"
+
 /*
  * LexInfo contains a constant Hash with constant string
  * keys and integer indices - no marking and no pmc_ext
