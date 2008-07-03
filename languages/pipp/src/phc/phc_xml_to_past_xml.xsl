@@ -74,7 +74,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
                                | phc:Token_real
                                | phc:AST_bin_op
                                | phc:AST_unary_op
-                               | phc:AST_variable" />
+                               | phc:AST_variable 
+                               | phc:AST_constant" />
 </xsl:template>
 
 <xsl:template match="phc:AST_bin_op" >
@@ -114,7 +115,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
                                  | phc:Token_real
                                  | phc:AST_bin_op
                                  | phc:AST_unary_op
-                                 | phc:AST_variable" />
+                                 | phc:AST_variable
+                                 | phc:AST_constant" />
 
   </past:Op>
 </xsl:template>
@@ -137,7 +139,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
     <xsl:apply-templates select="phc:AST_variable" />
     <xsl:apply-templates select="  phc:Token_string
                                  | phc:Token_int
-                                 | phc:AST_bin_op" />
+                                 | phc:AST_bin_op
+                                 | phc:AST_constant" />
   </past:Op>
 </xsl:template>
 
@@ -147,7 +150,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
     <xsl:apply-templates select="phc:AST_variable" />
     <xsl:apply-templates select="  phc:Token_string
                                  | phc:Token_int
-                                 | phc:AST_bin_op" />
+                                 | phc:AST_bin_op
+                                 | phc:AST_constant" />
   </past:Op>
 </xsl:template>
 
@@ -176,6 +180,14 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
     <xsl:apply-templates select="  phc:AST_expr_list/phc:Token_string
                                  | phc:AST_expr_list/phc:Token_int" />
   </past:Var>
+</xsl:template>
+
+<xsl:template match="phc:AST_constant" >
+  <past:Op name="constant" >
+    <past:Val returns="PhpString" >
+      <xsl:attribute name="value" ><xsl:value-of select="phc:Token_constant_name/phc:value" /></xsl:attribute>
+    </past:Val>
+  </past:Op>
 </xsl:template>
 
 <xsl:template match="phc:Token_string" >
@@ -225,7 +237,8 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
                                  | phc:Token_real
                                  | phc:AST_bin_op
                                  | phc:AST_unary_op
-                                 | phc:AST_variable" />
+                                 | phc:AST_variable
+                                 | phc:AST_constant" />
     <past:Block blocktype="immediate" >
       <xsl:apply-templates select="phc:AST_statement_list[1]" />
     </past:Block>
