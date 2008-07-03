@@ -163,7 +163,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenation of two strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenation of two strings' );
 <?php
 echo 'Hello, ' . "World!\n"
 ?>
@@ -172,7 +172,7 @@ Hello, World!
 END_EXPECTED
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenation of four strings', todo => 'currently broken' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenation of four strings' );
 <?php
 echo 'Hell' . 'o, ' . 'World!' . "\n"
 ?>
