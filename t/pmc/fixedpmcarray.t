@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 18;
 use Test::More;
 
 =head1 NAME
@@ -552,6 +552,84 @@ ok 3
 ok 4
 ok 5
 ok 6
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'basic splice');
+.sub 'main'
+    .local pmc one
+    one = new 'Integer'
+    one = 1
+
+    .local pmc fpa
+    fpa = new 'FixedPMCArray'
+    fpa = 5
+
+    splice fpa, one, 0, 5
+    print_array( fpa )
+
+    .local pmc two
+    two = new 'Integer'
+    two = 2
+
+    splice fpa, two, 1, 3
+    print_array( fpa )
+
+    .local pmc three
+    three = new 'Integer'
+    three = 3
+
+    splice fpa, three, 2, 3
+    print_array( fpa )
+.end
+
+.sub 'print_array'
+    .param pmc fpa
+
+    .local pmc it
+    iter it, fpa
+
+    .local pmc elem
+  iter_start:
+    elem = shift it
+    print elem
+    if it goto iter_start
+  iter_end:
+    print "\n"
+.end
+CODE
+11111
+12221
+12333
+OUTPUT
+
+pir_error_output_like(<<'CODE', <<'OUTPUT', 'splice out of bounds, offset 0');
+.sub 'main'
+    .local pmc fpa
+    fpa = new 'FixedPMCArray'
+    fpa = 5
+
+    .local pmc nil
+    nil = new 'Undef'
+
+    splice fpa, nil, 0, 6
+.end
+CODE
+/FixedPMCArray: index out of bounds!/
+OUTPUT
+
+pir_error_output_like(<<'CODE', <<'OUTPUT', 'splice out of bounds, big offset');
+.sub 'main'
+    .local pmc fpa
+    fpa = new 'FixedPMCArray'
+    fpa = 5
+
+    .local pmc nil
+    nil = new 'Undef'
+
+    splice fpa, nil, 6, 0
+.end
+CODE
+/FixedPMCArray: index out of bounds!/
 OUTPUT
 
 # Local Variables:
