@@ -25,6 +25,7 @@ PMCS = \
  phpboolean \
  phpfloat \
  phpinteger \
+ phpresource \
  phpstring \
  phpundef
 
@@ -34,6 +35,7 @@ PMC_SOURCES = \
  $(PMCDIR)/phpboolean.pmc \
  $(PMCDIR)/phpfloat.pmc \
  $(PMCDIR)/phpinteger.pmc \
+ $(PMCDIR)/phpresource.pmc \
  $(PMCDIR)/phpstring.pmc \
  $(PMCDIR)/phpundef.pmc
 

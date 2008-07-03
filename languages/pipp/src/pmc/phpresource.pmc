@@ -1,0 +1,105 @@
+/*
+Copyright (C) 2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/phpresource.pmc - PHP Resource
+
+=head1 DESCRIPTION
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "php_private.h"
+
+pmclass PhpResource
+    extends  Ref
+    provides ref
+    dynpmc
+    group    php_group
+    hll      PHP
+    maps     Ref {
+
+/*
+
+=item C<STRING* name()>
+
+Return the string 'resource'.
+
+=cut
+
+*/
+    STRING* name() {
+        return const_string(INTERP, "resource");
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns a string representation of the resource.
+
+=cut
+
+*/
+    VTABLE STRING *get_string() {
+        return Parrot_sprintf_c(INTERP, "Resource id #%08X", SELF);
+    }
+
+
+/*
+
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
+
+=item C<PMC* to_number()>
+
+=cut
+
+*/
+    METHOD PMC* to_number() {
+        RETURN(PMC *SELF);
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=cut
+
+*/
+
+}
+
+/*
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad.
+
+=cut
+
+*/
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
