@@ -94,7 +94,15 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'constant'
-    not_implemented()
+    .param pmc symb
+
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    
+    .local pmc val
+    val = cst[symb]
+
+    .return( val )
 .end
 
 =item C<array error_get_last()>

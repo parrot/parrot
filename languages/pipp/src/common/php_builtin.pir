@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-php_builtin.pir - PHP builtin  Library
+php_builtin.pir - PHP builtin Library
 
 =head1 DESCRIPTION
 
@@ -72,7 +72,12 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'define'
-    not_implemented()
+    .param pmc symb
+    .param pmc val
+ 
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    cst[symb] = val
 .end
 
 =item C<bool defined(string constant_name)>

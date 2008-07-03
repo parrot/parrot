@@ -24,9 +24,62 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 1;
+use Test::More     tests => 7;
 use Parrot::Test;
 
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), string' );
+<?php
+
+define( "THIS_IS", "it" );
+echo constant("THIS_IS"), "\n";
+END_CODE
+it
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), integer' );
+<?php
+
+define( "TEN_TIMES_TEN", 100 );
+echo constant("TEN_TIMES_TEN"), "\n";
+END_CODE
+100
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), TRUE' );
+<?php
+
+define( "FAUX", FALSE );
+echo constant("FAUX"), "\n";
+END_CODE
+
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), NULL' );
+<?php
+
+define( "NUL", NULL );
+echo constant("NUL"), "\n";
+END_CODE
+
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), Float' );
+<?php
+
+define( "PI", 3.14159 );
+echo constant("PI"), "\n";
+END_CODE
+3.14159
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), FALSE' );
+<?php
+
+define( "VRAI", TRUE );
+echo constant("VRAI"), "\n";
+END_CODE
+1
+END_OUT
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define and print', todo => 'not supported yet' );
 <?php
