@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 9;
+use Test::More     tests => 12;
 use Parrot::Test;
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), string' );
@@ -45,7 +45,7 @@ END_CODE
 100
 END_OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), TRUE' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), FALSE' );
 <?php
 
 define( "FAUX", FALSE );
@@ -72,7 +72,7 @@ END_CODE
 3.14159
 END_OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), FALSE' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), TRUE' );
 <?php
 
 define( "VRAI", TRUE );
@@ -100,6 +100,26 @@ END_CODE
 3.14159
 END_OUT
 
+language_output_like( 'Pipp', <<'END_CODE', <<'END_OUT', 'define(), Array' );
+<?php
+  $hello['world'] = 'hi';
+  define( "HELLO", $hello );
+END_CODE
+/Constants may only evaluate to scalar values/
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() write once' );
+<?php
+
+  echo define( 'MY_VAR', 'Ok' ), "\n";
+  echo define( 'MY_VAR', 'redefine' ), "\n";
+  echo MY_VAR, "\n";
+END_CODE
+1
+
+Ok
+END_OUT
+
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and defined()' );
 <?php
 
@@ -109,6 +129,14 @@ echo defined("UNDEF_PI"), "\n";
 END_CODE
 1
 
+END_OUT
+
+language_output_like( 'Pipp', <<'END_CODE', <<'END_OUT', 'constant() undefined' );
+<?php
+
+  echo constant("UNDEF_CST");
+END_CODE
+/Couldn't find constant UNDEF_CST/
 END_OUT
 
 # Local Variables:

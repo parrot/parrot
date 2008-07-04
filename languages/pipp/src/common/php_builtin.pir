@@ -114,8 +114,12 @@ STILL INCOMPLETE.
     $S1 = $P1
     .local pmc cst
     .GET_CONSTANTS(cst)
+    $I0 = exists cst[$S1]
+    if $I0 goto L6
     cst[$S1] = $P2
     .RETURN_TRUE()
+  L6:
+    .RETURN_FALSE()
 .end
 
 =item C<bool defined(string constant_name)>

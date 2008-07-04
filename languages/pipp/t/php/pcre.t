@@ -37,7 +37,7 @@ else {
 }
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants', todo => 'compiler supports constant');
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
 <?php
   echo PREG_NO_ERROR, "\n";
   echo PREG_INTERNAL_ERROR, "\n";
