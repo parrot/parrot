@@ -42,8 +42,8 @@ php_API.pir - PHP API Library
 .sub 'fetch_resource'
     .param pmc val
     .param string type
-    $S0 = typeof val
-    if $S0 == 'resource' goto L1
+    $I0 = isa val, 'PhpResource'
+    if $I0 goto L1
     $P0 = getinterp
     $P1 = $P0['sub', 1]
     error(E_WARNING, $P1, "(): supplied argument is not a valid ", type, " resource")
