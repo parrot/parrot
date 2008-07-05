@@ -69,7 +69,7 @@ ok1:
     close CONF
     .local pmc conf_hash
     thaw conf_hash, image
-    # XXX hash should probably be marked read-only...
+    RT #56614 hash should probably be marked read-only...
 
     .return( conf_hash )
 .end
@@ -77,7 +77,7 @@ ok1:
 =head1 AUTHOR
 
 Brent Royal-Gordon E<lt>brent@brentdax.comE<gt> is the author and maintainer.
-Please send patches and suggestions to the Perl 6 Internals mailing list.
+Please send patches and suggestions to the Parrot porters mailing list.
 
 =head1 COPYRIGHT
 
