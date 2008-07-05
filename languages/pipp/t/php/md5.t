@@ -56,8 +56,8 @@ string
 16
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
-open my $X, '>', '../file.txt';
+unlink 'pipp/file.txt' if -f 'pipp/file.txt';
+open my $X, '>', 'pipp/file.txt';
 print {$X} 'message digest';
 close $X;
 
@@ -69,7 +69,7 @@ CODE
 f96b697d7cb7938d525a2f31aaf161d0
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
+unlink 'pipp/file.txt' if -f 'pipp/file.txt';
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
 <?php

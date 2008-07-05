@@ -10,6 +10,7 @@ use warnings;
 
 use Data::Dumper;
 use File::Basename;
+use File::Spec;
 
 use Parrot::Test;
 use Parrot::Test::Pipp::PHP;
@@ -45,7 +46,7 @@ sub get_cd {
     my $self = shift;
     my ( $options ) = @_;
 
-    return $self->{relpath};
+    return File::Spec->catdir( $self->{relpath}, 'languages', 'pipp' );
 }
 
 sub get_lang_fn {

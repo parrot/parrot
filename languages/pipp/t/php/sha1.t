@@ -56,8 +56,8 @@ string
 20
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
-open my $X, '>', '../file.txt';
+unlink 'pipp/file.txt' if -f 'pipp/file.txt';
+open my $X, '>', 'pipp/file.txt';
 print {$X} 'message digest';
 close $X;
 
@@ -69,7 +69,7 @@ CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
+unlink 'pipp/file.txt' if -f 'pipp/file.txt';
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1_file(nofile)' );
 <?php

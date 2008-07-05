@@ -41,8 +41,8 @@ CODE
 2
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
-open my $X, '>', '../file.txt';
+unlink 'pipp/file.txt' if -f 'pipp/file.txt';
+open my $X, '>', 'pipp/file.txt';
 print {$X} "line 1\n";
 print {$X} "line 2\n";
 print {$X} "line 3\n";
@@ -135,7 +135,7 @@ CODE
 
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
+unlink 'pipp/file.txt' if -f 'pipp/file.txt';
 
 
 # Local Variables:

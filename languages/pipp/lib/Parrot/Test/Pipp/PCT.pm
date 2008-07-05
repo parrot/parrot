@@ -27,7 +27,7 @@ sub get_test_prog {
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
 
-    return "./parrot languages/pipp/pipp.pbc --variant=pct languages/${lang_fn}";
+    return "../$self->{relpath}/parrot ../$self->{relpath}/languages/pipp/pipp.pbc --variant=pct ../$self->{relpath}/languages/${lang_fn}";
 }
 
 # never skip the reference implementation
