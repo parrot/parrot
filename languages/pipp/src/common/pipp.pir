@@ -83,15 +83,15 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     cfg  = _config()
     .local string lib_dir, pbc_fn
     lib_dir = cfg['build_dir']
-    lib_dir .= '/languages/pipp/src/common'    
+    lib_dir .= '/languages/pipp/src/common'
 
-    pbc_fn = concat lib_dir, '/pipplib.pbc' 
+    pbc_fn = concat lib_dir, '/pipplib.pbc'
     load_bytecode pbc_fn
-    pbc_fn = concat lib_dir, '/php_ctype.pbc' 
+    pbc_fn = concat lib_dir, '/php_ctype.pbc'
     load_bytecode pbc_fn
-    pbc_fn = concat lib_dir, '/php_gmp.pbc' 
+    pbc_fn = concat lib_dir, '/php_gmp.pbc'
     load_bytecode pbc_fn
-    pbc_fn = concat lib_dir, '/php_pcre.pbc' 
+    pbc_fn = concat lib_dir, '/php_pcre.pbc'
     load_bytecode pbc_fn
 
     load_bytecode 'CGI/QueryHash.pbc'
@@ -173,7 +173,7 @@ VARIANT_PHC:
 
     err_msg = 'Creating NQP with xsltproc failed'
     cmd  = 'xsltproc '
-    cmd .= phc_src_dir 
+    cmd .= phc_src_dir
     cmd .= '/past_xml_to_past_nqp.xsl  pipp_phc_past.xml  > pipp_phc_past.nqp'
     ret = spawnw cmd
     if ret goto ERROR
@@ -227,7 +227,7 @@ ERROR:
     .local int ret
     pir_fn  = build_dir
     pir_fn .= '/languages/pipp/'
-    pir_fn .=  nqp_source_fn 
+    pir_fn .=  nqp_source_fn
     substr pir_fn, -3, 3, 'pir'     # change extension from '.nqp' to '.pir'
     cmd  = build_dir
     cmd .= '/parrot '
