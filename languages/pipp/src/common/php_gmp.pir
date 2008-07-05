@@ -9,7 +9,7 @@ php_gmp.pir - PHP gmp  Library
 
 Note:
 Using BigInt is not the good way.
-The good way is by a complete NCI wrapper over GMP library.
+The good way is by a full NCI wrapper over the GMP library.
 
 =head2 Functions
 

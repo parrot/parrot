@@ -420,6 +420,17 @@ STILL INCOMPLETE (see parse_arg_impl).
     .return ($I0)
 .end
 
+=item C<stream_stat>
+
+=cut
+
+.sub 'stream_stat'
+    .param string path
+    .param int type
+    $I0 = stat path, type
+    .return ($I0)
+.end
+
 =back
 
 =cut

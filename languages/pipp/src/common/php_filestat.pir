@@ -13,6 +13,24 @@ php_filestat.pir - PHP filestat Standard Library
 
 =cut
 
+.include 'stat.pasm'
+
+.macro STAT(res, args, type)
+    .local int argc
+    argc = .args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    unless $S1 == '' goto L2
+    .RETURN_FALSE()
+  L2:
+    .res = stream_stat($S1, .type)
+.endm
+
+
 =item C<bool chgrp(string filename, mixed group)>
 
 Change file group
@@ -101,108 +119,108 @@ NOT IMPLEMENTED.
 
 Returns true if filename exists
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'file_exists'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_EXISTS)
+    .RETURN_BOOL($I0)
 .end
 
 =item C<int fileatime(string filename)>
 
 Get last access time of file
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'fileatime'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_ACCESSTIME)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int filectime(string filename)>
 
 Get inode modification time of file
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'filectime'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_CREATETIME)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int filegroup(string filename)>
 
 Get file group
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'filegroup'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_GID)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int fileinode(string filename)>
 
 Get file inode
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'fileinode'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_PLATFORM_INODE)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int filemtime(string filename)>
 
 Get last modification time of file
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'filemtime'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_MODIFYTIME)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int fileowner(string filename)>
 
 Get file owner
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'fileowner'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_UID)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int fileperms(string filename)>
 
 Get file permissions
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'fileperms'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_PLATFORM_MODE)
+    .RETURN_LONG($I0)
 .end
 
 =item C<int filesize(string filename)>
 
 Get file size
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'filesize'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_FILESIZE)
+    .RETURN_LONG($I0)
 .end
 
 =item C<string filetype(string filename)>
@@ -221,12 +239,12 @@ NOT IMPLEMENTED.
 
 Returns true if file is directory
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'is_dir'
-    not_implemented()
+    .param pmc args :slurpy
+    .STAT($I0, args, .STAT_ISDIR)
+    .RETURN_BOOL($I0)
 .end
 
 =item C<bool is_executable(string filename)>
