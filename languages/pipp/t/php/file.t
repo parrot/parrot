@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 9;
+use Test::More     tests => 10;
 use Parrot::Test;
 
 
@@ -94,6 +94,14 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'fopen(file) & fclose' );
 ?>
 CODE
 1
+OUTPUT
+
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'fclose() bad arg' );
+<?php
+  fclose('bad');
+?>
+CODE
+/fclose\(\): supplied argument is not a valid (stream|ParrotIO) resource/
 OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'fpassthru()' );

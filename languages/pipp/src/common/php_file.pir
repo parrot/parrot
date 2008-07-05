@@ -13,6 +13,8 @@ php_file.pir - PHP file Standard Library
 
 =cut
 
+.const string STREAM_PMC = 'ParrotIO'
+
 .const int SEEK_SET = 0
 .const int SEEK_CUR = 1
 .const int SEEK_END = 2
@@ -53,8 +55,8 @@ Close an open file pointer
   L1:
     $P1 = shift args
     .local pmc stream
-    stream = deref $P1
-    if stream goto L2
+    stream = fetch_resource($P1, STREAM_PMC)
+    unless null stream goto L2
     .RETURN_FALSE()
   L2:
     close stream

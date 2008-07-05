@@ -42,11 +42,19 @@ php_API.pir - PHP API Library
 .sub 'fetch_resource'
     .param pmc val
     .param string type
-    $P0 = deref val
-    $I0 = isa $P0, type
-    unless $I0 goto L1
+    $S0 = typeof val
+    if $S0 == 'resource' goto L1
+    $P0 = getinterp
+    $P1 = $P0['sub', 1]
+    error(E_WARNING, $P1, "(): supplied argument is not a valid ", type, " resource")
+    null $P0
     .return ($P0)
   L1:
+    $P0 = deref val
+    $I0 = isa $P0, type
+    unless $I0 goto L2
+    .return ($P0)
+  L2:
     $P0 = getinterp
     $P1 = $P0['sub', 1]
     error(E_WARNING, $P1, "(): supplied resource is not a valid ", type, " resource")
