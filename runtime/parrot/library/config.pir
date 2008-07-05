@@ -69,7 +69,7 @@ ok1:
     close CONF
     .local pmc conf_hash
     thaw conf_hash, image
-    RT #56614 hash should probably be marked read-only...
+    #  RT #56614 hash should probably be marked read-only...
 
     .return( conf_hash )
 .end
