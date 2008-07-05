@@ -97,6 +97,7 @@ PHP_SRC_STD_EXT= \
 
 PHP_EXT= \
   src/common/php_ctype.pbc \
+  src/common/php_gmp.pbc \
   src/common/php_pcre.pbc
 
 # default
@@ -174,6 +175,9 @@ src/common/pipplib.pbc: src/common/builtins.pir src/common/php_standard.pir $(PH
 
 src/common/php_ctype.pbc: src/common/php_ctype.pir src/common/php_MACRO.pir
 	$(PARROT) -o src/common/php_ctype.pbc src/common/php_ctype.pir
+
+src/common/php_gmp.pbc: src/common/php_gmp.pir src/common/php_MACRO.pir
+	$(PARROT) -o src/common/php_gmp.pbc src/common/php_gmp.pir
 
 src/common/php_pcre.pbc: src/common/php_pcre.pir src/common/php_MACRO.pir
 	$(PARROT) -o src/common/php_pcre.pbc src/common/php_pcre.pir

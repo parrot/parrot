@@ -13,6 +13,25 @@ php_gmp.pir - PHP gmp  Library
 
 =cut
 
+.include 'languages/pipp/src/common/php_MACRO.pir'
+
+.const string GMP_PMC          = 'BigInt'
+
+.const int GMP_ROUND_ZERO      = 0
+.const int GMP_ROUND_PLUSINF   = 1
+.const int GMP_ROUND_MINUSINF  = 2
+
+.sub '__init' :anon :load :init
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    .REGISTER_LONG_CONSTANT(cst, 'GMP_ROUND_ZERO', GMP_ROUND_ZERO)
+    .REGISTER_LONG_CONSTANT(cst, 'GMP_ROUND_PLUSINF', GMP_ROUND_PLUSINF)
+    .REGISTER_LONG_CONSTANT(cst, 'GMP_ROUND_MINUSINF', GMP_ROUND_MINUSINF)
+#    $S0 =
+#    .REGISTER_STRING_CONSTANT(cst, 'GMP_VERSION', $S0)
+.end
+
+
 =item C<resource gmp_abs(resource a)>
 
 Calculates absolute value
@@ -185,24 +204,55 @@ NOT IMPLEMENTED.
 
 Initializes GMP number
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub 'gmp_init'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    if argc < 1 goto L1
+    if argc > 2 goto L1
+    goto L2
+  L1:
+    wrong_param_count()
+    .RETURN_NULL()
+  L2:
+    $P1 = shift args
+    $I1 = $P1
+    new $P0, GMP_PMC
+    set $P0, $I1
+    .RETURN_RESOURCE($P0)
 .end
 
 =item C<int gmp_intval(resource gmpnumber)>
 
 Gets signed long value of GMP number
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_intval'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S0 = typeof $P1
+    unless $S0 == 'resource' goto L2
+    .local pmc gmpnum
+    gmpnum = fetch_resource($P1, GMP_PMC)
+    unless null gmpnum goto L3
+    .RETURN_FALSE()
+  L3:
+    $I0 = gmpnum
+    .RETURN_LONG($I0)
+  L2:
+    $I0 = $P1
+    .RETURN_LONG($I0)
 .end
 
 =item C<resource gmp_invert(resource a, resource b)>

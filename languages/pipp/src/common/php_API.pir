@@ -35,6 +35,26 @@ php_API.pir - PHP API Library
 .end
 
 
+=item C<fetch_resource>
+
+=cut
+
+.sub 'fetch_resource'
+    .param pmc val
+    .param string type
+    $P0 = deref val
+    $I0 = isa $P0, type
+    unless $I0 goto L1
+    .return ($P0)
+  L1:
+    $P0 = getinterp
+    $P1 = $P0['sub', 1]
+    error(E_WARNING, $P1, "(): supplied resource is not a valid ", type, " resource")
+    null $P0
+    .return ($P0)
+.end
+
+
 =item C<get_module_version>
 
 DUMMY IMPLEMENTATION.
