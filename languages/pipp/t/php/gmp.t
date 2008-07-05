@@ -28,7 +28,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Parrot::Test;
 
-plan tests => 6;
+plan tests => 24;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
 <?php
@@ -40,6 +40,92 @@ CODE
 0
 1
 2
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_abs()' );
+<?php
+  $a = gmp_init(-2);
+  $r = gmp_abs($a);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+2
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_add()' );
+<?php
+  $a = gmp_init(3);
+  $b = gmp_init(4);
+  $r = gmp_add($a, $b);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+7
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_add()' );
+<?php
+  $a = gmp_init(3);
+  $r = gmp_add($a, 4);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+7
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_and()', todo => "BigInt improvement needed" );
+<?php
+  $a = gmp_init(5);
+  $b = gmp_init(6);
+  $r = gmp_and($a, $b);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+4
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_and()', todo => "BigInt improvement needed" );
+<?php
+  $a = gmp_init(5);
+  $r = gmp_and($a, 6);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+4
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_cmp()' );
+<?php
+  $a = gmp_init(3);
+  $b = gmp_init(4);
+  $r = gmp_cmp($a, $b);
+  echo gmp_intval($r), "\n";
+  $r = gmp_cmp($b, $a);
+  echo gmp_intval($r), "\n";
+  $r = gmp_cmp($a, $a);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+-1
+1
+0
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_cmp()' );
+<?php
+  $a = gmp_init(3);
+  $b = gmp_init(4);
+  $r = gmp_cmp($a, 4);
+  echo gmp_intval($r), "\n";
+  $r = gmp_cmp($b, 3);
+  echo gmp_intval($r), "\n";
+  $r = gmp_cmp($a, 3);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+-1
+1
+0
 OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_init()' );
@@ -86,6 +172,121 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_intval(" 2 ")' );
 ?>
 CODE
 2
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_mod()' );
+<?php
+  $a = gmp_init(8);
+  $b = gmp_init(3);
+  $r = gmp_mod($a, $b);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+2
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_mod()', todo => "BigInt improvement needed" );
+<?php
+  $a = gmp_init(8);
+  $r = gmp_mod($a, 3);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+2
+OUTPUT
+
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_mod() by zero' );
+<?php
+  $a = gmp_init(7);
+  $b = gmp_init(0);
+  $r = gmp_mod($a, $b);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+/Zero operand not allowed/
+OUTPUT
+
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_mod() by zero' );
+<?php
+  $a = gmp_init(7);
+  $r = gmp_mod($a, 0);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+/Zero operand not allowed/
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_mul()' );
+<?php
+  $a = gmp_init(3);
+  $b = gmp_init(4);
+  $r = gmp_mul($a, $b);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+12
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_mul()' );
+<?php
+  $a = gmp_init(3);
+  $r = gmp_mul($a, 4);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+12
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_neg()' );
+<?php
+  $a = gmp_init(2);
+  $r = gmp_neg($a);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+-2
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_or()', todo => "BigInt improvement needed" );
+<?php
+  $a = gmp_init(5);
+  $b = gmp_init(6);
+  $r = gmp_or($a, $b);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+7
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_or()', todo => "BigInt improvement needed" );
+<?php
+  $a = gmp_init(5);
+  $r = gmp_or($a, 6);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+7
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_sub()' );
+<?php
+  $a = gmp_init(3);
+  $b = gmp_init(4);
+  $r = gmp_sub($a, $b);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+-1
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_sub()' );
+<?php
+  $a = gmp_init(3);
+  $r = gmp_sub($a, 4);
+  echo gmp_intval($r), "\n";
+?>
+CODE
+-1
 OUTPUT
 
 # Local Variables:

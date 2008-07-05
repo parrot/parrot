@@ -7,6 +7,10 @@ php_gmp.pir - PHP gmp  Library
 
 =head1 DESCRIPTION
 
+Note:
+Using BigInt is not the good way.
+The good way is by a complete NCI wrapper over GMP library.
+
 =head2 Functions
 
 =over 4
@@ -31,41 +35,114 @@ php_gmp.pir - PHP gmp  Library
 #    .REGISTER_STRING_CONSTANT(cst, 'GMP_VERSION', $S0)
 .end
 
+.macro UNARY_OP(args, op)
+    .local int argc
+    argc = .args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    .local pmc gmpnum_a
+    gmpnum_a = fetch_resource($P1, GMP_PMC)
+    unless null gmpnum_a goto L2
+    .RETURN_FALSE()
+  L2:
+    new $P0, GMP_PMC
+    $P0 = .op gmpnum_a
+    .RETURN_RESOURCE($P0)
+.endm
+
+.macro BINARY_OP(args, op, allow_ui_return, check_b_zero)
+    $P1 = shift args
+    $P2 = shift args
+    .local pmc gmpnum_a
+    gmpnum_a = fetch_resource($P1, GMP_PMC)
+    unless null gmpnum_a goto L2
+    .RETURN_FALSE()
+  L2:
+    .local int use_ui
+    use_ui = 0
+    $I0 = isa $P2, 'PhpInteger'
+    unless $I0 goto L3
+    use_ui = 1
+    goto L4
+  L3:
+    .local pmc gmpnum_b
+    gmpnum_b = fetch_resource($P2, GMP_PMC)
+    unless null gmpnum_b goto L4
+    .RETURN_FALSE()
+  L4:
+    unless .check_b_zero goto L5
+    .local int b_is_zero
+    b_is_zero = 0
+    unless use_ui goto L6
+    $I2 = $P2
+    b_is_zero = iseq $I2, 0
+    goto L7
+  L6:
+    $I2 = gmpnum_b
+    b_is_zero = iseq $I2, 0
+  L7:
+    unless b_is_zero goto L5
+    error(E_WARNING, "Zero operand not allowed")
+    .RETURN_FALSE()
+  L5:
+    new $P0, GMP_PMC
+    unless use_ui goto L8
+    $I2 = $P2
+    $P0 = .op gmpnum_a, $I2
+    goto L9
+  L8:
+    $P0 = .op gmpnum_a, gmpnum_b
+  L9:
+    .RETURN_RESOURCE($P0)
+.endm
+
 
 =item C<resource gmp_abs(resource a)>
 
 Calculates absolute value
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_abs'
-    not_implemented()
+    .param pmc args :slurpy
+    .UNARY_OP(args, neg)
 .end
 
 =item C<resource gmp_add(resource a, resource b)>
 
 Add a and b
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_add'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .BINARY_OP(args, add, 0, 0)
 .end
 
 =item C<resource gmp_and(resource a, resource b)>
 
 Calculates logical AND of a and b
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_and'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .BINARY_OP(args, band, 0, 0) # not working
 .end
 
 =item C<void gmp_clrbit(resource &a, int index)>
@@ -84,12 +161,43 @@ NOT IMPLEMENTED.
 
 Compares two numbers
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_cmp'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $P2 = shift args
+    .local pmc gmpnum_a
+    gmpnum_a = fetch_resource($P1, GMP_PMC)
+    unless null gmpnum_a goto L2
+    .RETURN_FALSE()
+  L2:
+    .local int use_ui
+    use_ui = 0
+    $I0 = isa $P2, 'PhpInteger'
+    unless $I0 goto L3
+    use_ui = 1
+    goto L4
+  L3:
+    .local pmc gmpnum_b
+    gmpnum_b = fetch_resource($P2, GMP_PMC)
+    unless null gmpnum_b goto L4
+    .RETURN_FALSE()
+  L4:
+    unless use_ui goto L5
+    $I2 = $P2
+    $I0 = cmp gmpnum_a, $I2
+    goto L6
+  L5:
+    $I0 = cmp gmpnum_a, gmpnum_b
+  L6:
+    .RETURN_LONG($I0)
 .end
 
 =item C<resource gmp_com(resource a)>
@@ -295,36 +403,45 @@ NOT IMPLEMENTED.
 
 Computes a modulo b
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_mod'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .BINARY_OP(args, mod, 1, 1)
 .end
 
 =item C<resource gmp_mul(resource a, resource b)>
 
 Multiply a and b
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_mul'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .BINARY_OP(args, mul, 0, 0)
 .end
 
 =item C<resource gmp_neg(resource a)>
 
 Negates a number
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_neg'
-    not_implemented()
+    .param pmc args :slurpy
+    .UNARY_OP(args, neg)
 .end
 
 =item C<resource gmp_nextprime(resource a)>
@@ -343,12 +460,17 @@ NOT IMPLEMENTED.
 
 Calculates logical OR of a and b
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_or'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .BINARY_OP(args, bor, 0, 0) # not working
 .end
 
 =item C<bool gmp_perfect_square(resource a)>
@@ -511,12 +633,17 @@ NOT IMPLEMENTED.
 
 Subtract b from a
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'gmp_sub'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 2 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    .BINARY_OP(args, sub, 0, 0)
 .end
 
 =item C<resource gmp_xor(resource a, resource b)>
