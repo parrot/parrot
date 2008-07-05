@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
@@ -13,10 +13,11 @@ use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use_ok('config::init::defaults');
 use_ok('config::auto::icu');
+use IO::CaptureOutput qw( capture );
 
 my $args = process_options(
     {
-        argv => [ ],
+        argv => [ q{--verbose} ],
         mode => q{configure},
     }
 );
@@ -42,14 +43,45 @@ ok( $step->description(), "$step_name has description" );
 my $phony = q{phony};
 $step->{icuconfig_default} = $phony;
 
-my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
-TODO: {
-    local $TODO = 'reported failing on Win32';
-    my $expected = q{failed};
+{
+    my ($stdout, $stderr);
+    my $ret;
+    capture(
+        sub { $ret = $step->runstep($conf); },
+        \$stdout,
+        \$stderr,
+    );
+    ok( $ret, "$step_name runstep() returned true value" );
+    my $expected = q{no icu-config};
     is($step->result(), $expected,
         "Got expected return value: $expected");
+    like($stdout,
+        qr/Discovered $step->{icuconfig_default} --exists returns/s,
+        "Got expected verbose output re return value",
+    );
+    like($stdout,
+        qr/Could not locate an icu-config program/s,
+        "Got expected verbose output re inability to locate icu-config program",
+    );
 }
+$step->set_result( q{} );
+
+$conf->options->set( verbose => undef );
+{
+    my ($stdout, $stderr);
+    my $ret;
+    capture(
+        sub { $ret = $step->runstep($conf); },
+        \$stdout,
+        \$stderr,
+    );
+    ok( $ret, "$step_name runstep() returned true value" );
+    my $expected = q{no icu-config};
+    is($step->result(), $expected,
+        "Got expected return value: $expected");
+    ok(! $stdout, "No verbose output captured, as expected");
+}
+
     
 pass("Completed all tests in $0");
 

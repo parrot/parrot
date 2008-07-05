@@ -25,6 +25,7 @@ use base qw(Parrot::Configure::Step);
 
 use Cwd qw(cwd);
 use File::Basename;
+use lib qw( lib );
 use Parrot::Configure::Utils qw(capture_output);
 
 
@@ -91,7 +92,7 @@ sub runstep {
 
     # 1st possible return point
     if ( $without_opt ) {
-        $self->_set_no_configure_with_icu($conf, q{no});
+        $self->_set_no_configure_with_icu($conf, q{not requested});
         return 1;
     }
 
@@ -112,7 +113,9 @@ sub runstep {
     # attempt to configure with ICU and so may return here.
     # 2nd possible return point
     if ( $without ) {
-        $self->_set_no_configure_with_icu($conf, q{failed});
+        $self->_set_no_configure_with_icu($conf, q{no icu-config});
+        print "Could not locate an icu-config program\n"
+            if $verbose;
         return 1;
     }
 
@@ -120,16 +123,16 @@ sub runstep {
         $self->_try_icuconfig(
             $conf,
             {
-                conf            => $conf,
                 without         => $without,
                 autodetect      => $autodetect,
                 icuconfig       => $icuconfig,
+                verbose         => $verbose,
             }
         );
 
     # 3rd possible return point
     if ( $without ) {
-        $self->_set_no_configure_with_icu($conf, q{no});
+        $self->_set_no_configure_with_icu($conf, q{not found});
         return 1;
     }
 
@@ -213,17 +216,14 @@ Something is wrong with your ICU installation!
    --icuheaders=(path)  Location of ICU headers without /unicode
    --icushared=(flags)  Full linker command to create shared libraries
 HELP
+#/
     return $die;
 }
 
 sub _handle_search_for_icu_config {
     my $self = shift;
     my $arg = shift;
-    if (
-        ( $arg->{ret} == -1 )
-            ||
-        ( ( $arg->{ret} >> 8 ) != 0 )
-    ) {
+    if ( $arg->{ret} ) {
         undef $arg->{icuconfig};
         $arg->{autodetect} = 0;
         $arg->{without}    = 1;
@@ -245,6 +245,9 @@ sub _handle_autodetect {
 
             my ( undef, undef, $ret ) =
                 capture_output( $self->{icuconfig_default}, "--exists" );
+
+            print "Discovered $self->{icuconfig_default} --exists returns $ret\n"
+                if $arg->{verbose};
 
             ($arg->{icuconfig}, $arg->{autodetect}, $arg->{without}) =
                 $self->_handle_search_for_icu_config( {
@@ -276,21 +279,26 @@ sub _try_icuconfig {
         $arg->{icuconfig}
     ) {
         # ldflags
+        print "Trying $arg->{icuconfig} with '--ldflags'\n"
+            if $arg->{verbose};
         $icushared = capture_output("$arg->{icuconfig} --ldflags");
+        print "icushared:  captured $icushared\n"
+            if $arg->{verbose};
         ($icushared, $arg->{without}) =
             $self->_handle_icushared($icushared, $arg->{without});
+        print "For icushared, found $icushared and $arg->{without}\n"
+            if $arg->{verbose};
+
         # location of header files
+        print "Trying $arg->{icuconfig} with '--prefix'\n"
+            if $arg->{verbose};
         $icuheaders = capture_output("$arg->{icuconfig} --prefix");
+        print "icuheaders:  captured $icuheaders\n"
+            if $arg->{verbose};
         ($icuheaders, $arg->{without}) =
             $self->_handle_icuheaders($conf, $icuheaders, $arg->{without});
-
-        # This branch is going to be very difficult to cover during testing
-        # because we would have to be able to manipulate the return values of
-        # either capture_output() call above.  We can't do this because we're
-        # autoconfiguring with the standard icu-config program.
-        if ($arg->{without}) {
-            $self->set_result("failed");
-        }
+        print "For icuheaders, found $icuheaders and $arg->{without}\n"
+            if $arg->{verbose};
     }
 
     return ($arg->{without}, $icushared, $icuheaders);

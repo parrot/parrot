@@ -52,7 +52,7 @@ is( $conf->data->get('icu_shared'), q{},
     "Got expected value for 'icu_shared'" );
 is( $conf->data->get('icu_dir'), q{},
     "Got expected value for 'icu_dir'" );
-is( $step->result(), 'no', "Got expected result" );
+is( $step->result(), 'not requested', "Got expected result" );
 $step->set_result(q{});  # prepare for subsequent tests
 
 # Test some internal routines
