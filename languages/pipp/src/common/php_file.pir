@@ -305,8 +305,8 @@ Output all remaining data from a file pointer
   L1:
     $P1 = shift args
     .local pmc stream
-    stream = deref $P1
-    if stream goto L2
+    stream = fetch_resource($P1, STREAM_PMC)
+    unless null stream goto L2
     .RETURN_FALSE()
   L2:
     $I0 = stream_passthru(stream)
