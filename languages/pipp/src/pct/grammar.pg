@@ -104,9 +104,9 @@ rule  concat_tail             { <CONCAT_OP> <string> }
 
 rule bitwise_expression is optable                                      { ... }
 
-proto 'infix:|'   is precedence('1')     is pirop('bor')                { ... }
-proto 'infix:&'   is equiv('infix:|')    is pirop('band')               { ... }
-proto 'infix:^'   is equiv('infix:&')    is pirop('bxor')               { ... }
+proto 'infix:|'   is precedence('1')                                    { ... }
+proto 'infix:&'   is equiv('infix:|')                                   { ... }
+proto 'infix:^'   is equiv('infix:&')                                   { ... }
 
 proto 'infix:+'   is tighter('infix:^')  is pirop('n_add')              { ... }
 proto 'infix:-'   is equiv('infix:+')    is pirop('n_sub')              { ... }
