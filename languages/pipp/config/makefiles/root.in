@@ -235,7 +235,8 @@ clean-common: clean-pmc
 	$(RM_F) \
   src/common/pipplib.pbc \
   src/common/*.pbc \
-  pipp.pbc
+  pipp.pbc \
+  pipp.c pipp.o pipp
 
 clean-pmc:
 	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/*.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
@@ -258,7 +259,8 @@ clean-test:
   t/php/*.pir \
   t/php/*.out \
   t/pmc/*.pir \
-  ../../pipp_*
+  pipp_phc_ast.xml pipp_phc_past.xml pipp_phc_past.nqp pipp_phc_past.pir \
+  pipp_antlr_past.nqp  pipp_antlr_past.pir
 
 realclean: clean
 	$(RM_F) Makefile
