@@ -57,6 +57,8 @@ my @tests = (
     [ '22', [ 22 ], 'positive 22', ],
     [ '333', [ 333 ], 'positive 333', ],
     [ '12345678', [ 12345678 ], 'large positive int',  ],
+    [ '+4444', [ 4444 ], 'unary plus, no whitespace',  ],
+    [ '+  55555', [ 55555 ], 'unary plus, with whitespace',  ],
     [ '-1', [ -1 ], 'negative 1', ],
     [ '-22', [ -22 ], 'negative 22', ],
     [ '-333', [ -333 ], 'negative 333', ],

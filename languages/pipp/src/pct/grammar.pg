@@ -116,6 +116,7 @@ proto 'infix:%'   is equiv('infix:*')    is pirop('n_mod')              { ... }
 proto 'infix:/'   is equiv('infix:*')    is pirop('n_div')              { ... }
 
 proto 'prefix:-'  is tighter('infix:/')  is pirop('n_neg')              { ... }
+proto 'prefix:+'  is equiv('prefix:-')                                  { ... }
 
 proto 'term:'     is tighter('infix:-')  is parsed(&postfix_expression) { ... }
 

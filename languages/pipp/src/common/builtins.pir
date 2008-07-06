@@ -70,6 +70,14 @@
     .param pmc a
     $P1 = a.'to_number'()
     neg $P1
+
+    .return ($P1)
+.end
+
+.sub 'prefix:+'
+    .param pmc a
+    $P1 = a.'to_number'()
+
     .return ($P1)
 .end
 
