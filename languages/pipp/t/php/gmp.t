@@ -156,7 +156,7 @@ CODE
 /gmp_intval\(\): supplied resource is not a valid (GMP integer|BigInt) resource/
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
+unlink 'pipp/file.txt' if (-f '../file.txt');
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'gmp_intval(2)' );
 <?php
