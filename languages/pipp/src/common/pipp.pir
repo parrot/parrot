@@ -182,7 +182,7 @@ GOT_VARIANT:
     err_msg .= variant
     err_msg .= "'."
     goto ERROR
- 
+
 VARIANT_PCT:
     # use the Parrot Compiler Toolkit by default
     .local pmc pipp_compiler
