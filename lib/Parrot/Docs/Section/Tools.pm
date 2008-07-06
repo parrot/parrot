@@ -53,7 +53,6 @@ sub new {
         ),
         $self->new_group(
             'Bytecode', '',
-            $self->new_item( '', 'tools/build/pbc2c.pl' ),
             $self->new_item( '', 'tools/dev/pbc_header.pl' ),
         ),
         $self->new_group(
