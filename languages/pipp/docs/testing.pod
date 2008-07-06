@@ -6,28 +6,41 @@ Pipp - Testing
 
 =head1 Testsuite
 
-For testing the test-suite from a current PHP release is used.
-For sanity checking there are also very few tests in
-F<languages/pipp/t/php>. These are used by 'make test'.
-
-The PMC implementations are checked in F<t/pmc>
+For testing the test-suite from PHP 5.3 is used.
+For sanity checking there are also few tests in
+F<languages/pipp/t/php> and F<languages/pipp/t/pmc>.
+These tests are used by 'make test'.
 
 =head1 How to run the PHP test suite
 
-A problem are relative paths used by both the PHP test suite and
-by the generated PIR. Something like this worked for me under Linux.
+The testscript from the PHP 5.3 distribution is prepared to test other PHP implementations.
+Something like this worked for me under Linux.
 
+  # build Parrot
   cd ~/devel/Parrot/trunk
   perl Configure.pl && make
-  cd ~/devel/PHP/php-5.2.0
-  ./configure && make
-  ln -s ../../Parrot/trunk/parrot
-  ln -s ../../Parrot/trunk/languages
+
+  # build Pipp
+  cd languages/pipp
+  make pipp
+
+  # build PHP 5.3
+  cd ~/devel/PHP/
+  wget http://snaps.php.net/php5.3-200807061430.tar.gz
+  tar xvzf php5.3-200807061430.tar.gz
+  cd php5.3-200807061430/
+  ./configure
+  make
+
+  # configure run-tests.php
   export PATH=.:$PATH
-  export TEST_PHP_EXECUTABLE=languages/pipp/pipp.pl
-  export TEST_PHP_CGI_EXECUTABLE=languages/pipp/pipp.pl
+  export TEST_PHP_EXECUTABLE=languages/pipp/pipp
+  export TEST_PHP_CGI_EXECUTABLE=languages/pipp/pipp
   export PIPP_VARIANT=phc
-  php run-tests.php -v --keep-all -r languages/pipp/t/selection.txt | tee run-tests.log
+  export NO_INTERACTION=1
+
+  # run the test-suite
+  ./sapi/cli/php run-tests.php -v --keep-all | tee run-tests.log
   
 Good luck.
 
