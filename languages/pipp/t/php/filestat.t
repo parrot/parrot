@@ -29,7 +29,7 @@ use Test::More     tests => 3;
 use Parrot::Test;
 
 
-unlink '../file.txt' if (-f '../file.txt');
+unlink 'pipp/file.txt' if (-f 'pipp/file.txt');
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'file_exists()' );
 <?php
@@ -39,7 +39,7 @@ CODE
 
 OUTPUT
 
-open my $X, '>', '../file.txt';
+open my $X, '>', 'pipp/file.txt';
 print {$X} "line 1\n";
 print {$X} "line 2\n";
 print {$X} "line 3\n";
@@ -61,7 +61,7 @@ CODE
 21
 OUTPUT
 
-unlink '../file.txt' if (-f '../file.txt');
+unlink 'pipp/file.txt' if (-f 'pipp/file.txt');
 
 
 # Local Variables:
