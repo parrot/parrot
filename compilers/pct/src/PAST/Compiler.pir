@@ -1140,13 +1140,13 @@ by C<node>.
     .local pmc arglist
     arglist = new 'ResizablePMCArray'
   arity_loop:
-    if arity < 1 goto arity_end
     .local string nextval
     nextval = self.'uniquereg'('P')
-    push arglist, nextval
     ops.'push_pirop'('shift', nextval, iter)
+    if arity < 1 goto arity_end
+    push arglist, nextval
     dec arity
-    goto arity_loop
+    if arity > 0 goto arity_loop
   arity_end:
 
     .local pmc subpost
