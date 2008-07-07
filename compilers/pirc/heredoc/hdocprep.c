@@ -216,7 +216,20 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
 
-    #define YY_LESS_LINENO(n)
+    /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
+     *       access to the local variable yy_act. Since yyless() is a macro, it would break
+     *       existing scanners that call yyless() from OUTSIDE hd_prelex.
+     *       One obvious solution it to make yy_act a global. I tried that, and saw
+     *       a 5% performance hit in a non-yylineno scanner, because yy_act is
+     *       normally declared as a register variable-- so it is not worth it.
+     */
+    #define  YY_LESS_LINENO(n) \
+            do { \
+                int yyl;\
+                for ( yyl = n; yyl < yyleng; ++yyl )\
+                    if ( yytext[yyl] == '\n' )\
+                        --yylineno;\
+            }while(0)
 
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -431,8 +444,8 @@ static void yy_fatal_error (yyconst char msg[] ,yyscan_t yyscanner );
     yyg->yy_c_buf_p = yy_cp;
 
 /* %% [4.0] data tables for the DFA and the user's section 1 definitions go here */
-#define YY_NUM_RULES 15
-#define YY_END_OF_BUFFER 16
+#define YY_NUM_RULES 16
+#define YY_END_OF_BUFFER 17
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -440,36 +453,37 @@ struct yy_trans_info
     flex_int32_t yy_verify;
     flex_int32_t yy_nxt;
     };
-static yyconst flex_int16_t yy_accept[94] =
+static yyconst flex_int16_t yy_accept[105] =
     {   0,
-        0,    0,    3,    3,   13,   13,    0,    0,    0,    0,
-        0,    0,    0,    0,   16,   14,   15,   14,   14,   14,
-        3,    4,    3,    3,    3,   13,   12,   13,   13,   14,
-       10,   14,   14,   14,   11,   14,   14,    6,    7,    6,
-        6,    6,    0,    1,    0,    0,    0,    2,    0,    3,
-        4,    4,    4,    3,    3,    3,   13,   12,   13,   13,
-        0,   10,    0,    0,    1,    0,    0,   11,    0,    0,
-        1,    0,    7,    0,    0,    0,    3,    0,    0,    0,
-        9,    0,    0,    3,    0,    8,    0,    0,    3,    5,
-        3,    0,    0
+        0,    0,    0,    0,   12,   12,    0,    0,    0,    0,
+        0,    0,    0,    0,   17,   15,   13,   15,   15,   15,
+       15,   16,    4,   16,   16,   16,   12,   11,   12,   12,
+       16,   14,   16,   16,   16,    9,   16,   16,   16,   10,
+       16,   16,    6,    5,    6,    6,    6,   13,    0,   13,
+        0,    1,    0,    0,    0,    2,    0,    0,    4,    0,
+        4,    0,    1,    0,    0,   12,   11,   12,   12,   14,
+        0,    9,    0,    9,    0,    1,    0,    0,   10,    0,
+       10,    0,    1,    0,    5,    0,    0,    0,    0,    0,
+        0,    0,    8,    0,    0,    0,    0,    7,    0,    0,
 
+        0,    3,    0,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
-        1,    2,    4,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    2,    1,    1,    1,    1,
-        1,    2,    1,    5,    6,    1,    1,    1,    7,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
+        1,    1,    3,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    8,
-        9,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    4,    5,    1,    1,    1,    6,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    7,
+        8,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,   10,    1,    1,    1,    1,    1,    1,   11,    1,
+        1,    9,    1,    1,    1,    1,    1,    1,   10,    1,
 
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,   12,   13,    1,    1,    1,
+        1,    1,    1,    1,    1,   11,   12,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -487,104 +501,115 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[14] =
+static yyconst flex_int32_t yy_meta[13] =
     {   0,
-        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1
+        1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1
     } ;
 
-static yyconst flex_int16_t yy_base[115] =
+static yyconst flex_int16_t yy_base[127] =
     {   0,
         0,    6,   13,   17,   24,   28,   32,   36,   40,   44,
-       48,   52,   56,   62,   49,  196,  196,   68,   37,   70,
-        0,   73,   38,   75,   29,    0,  196,   34,   77,   79,
-      196,   81,   83,   85,  196,   87,   89,  196,  196,   33,
-       91,   25,   93,  196,   95,   95,  100,  196,  102,    0,
-        0,    0,    0,  104,  106,   16,    0,  196,  108,  110,
-      112,  196,  114,  116,  196,  118,  120,  196,  122,  124,
-      196,  126,  196,  126,  129,   18,   12,  135,   15,  141,
-      196,    0,   11,  149,  149,  196,    0,    6,  157,  159,
-      161,    8,  196,  165,  167,  169,  171,  173,  175,  177,
+       48,   52,   56,   62,   62,  216,   68,   58,   70,   49,
+       72,   74,  216,   76,   78,   80,    0,  216,   50,   89,
+      216,  216,   46,   91,   93,  216,   95,   97,   99,  216,
+      101,  103,  216,  216,   42,  105,   33,    0,   34,    0,
+      107,  216,  109,  109,  114,  216,  116,   22,  216,   18,
+      216,  118,  216,  120,  114,    0,  216,  125,  127,  216,
+      129,  216,  131,  216,  133,  216,  135,  137,  216,  139,
+      216,  141,  216,  143,  216,  143,  146,   18,  146,  154,
+       17,  160,  216,    0,   15,  168,  168,  216,    0,   11,
 
-      179,    9,  181,    6,  183,  185,  187,  189,  191,    4,
-        3,    1,    0,  193
+      176,  216,  178,  216,  181,  183,  185,  187,  189,  191,
+      193,  195,  197,  199,  201,   11,  203,  205,  207,  209,
+      211,    9,    5,    3,    0,  213
     } ;
 
-static yyconst flex_int16_t yy_def[115] =
+static yyconst flex_int16_t yy_def[127] =
     {   0,
-       94,   94,   95,   95,   96,   96,   94,   94,   97,   97,
-       98,   98,   99,   99,   93,   93,   93,  100,   93,  101,
-      102,   93,  102,  103,  102,  104,   93,  104,  105,  106,
-       93,  106,  107,  108,   93,  108,  109,   93,   93,   93,
-      100,   93,  100,   93,  100,   93,  101,   93,  101,  102,
-       22,   22,   22,  103,  103,  102,  104,   93,  105,  105,
-      106,   93,  106,  107,   93,  107,  108,   93,  108,  109,
-       93,  109,   93,   93,  110,  111,  102,  112,  113,  110,
-       93,  110,  111,  114,  112,   93,  112,  113,  114,   93,
-      114,   93,    0,   93,   93,   93,   93,   93,   93,   93,
+      105,  105,  106,  106,  107,  107,  108,  108,  109,  109,
+      110,  110,  111,  111,  104,  104,  104,  104,  112,  104,
+      113,  114,  104,  114,  115,  114,  116,  104,  116,  117,
+      104,  104,  104,  112,  118,  104,  118,  119,  120,  104,
+      120,  121,  104,  104,  104,  112,  104,   17,  104,   17,
+      112,  104,  112,  104,  113,  104,  113,   26,  104,   26,
+      104,  115,  104,  115,   26,  116,  104,  117,  117,  104,
+      118,  104,  118,  104,  119,  104,  119,  120,  104,  120,
+      104,  121,  104,  121,  104,  104,  122,  123,   26,  124,
+      125,  122,  104,  122,  123,  126,  124,  104,  124,  125,
 
-       93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
-       93,   93,   93,   93
+      126,  104,  126,    0,  104,  104,  104,  104,  104,  104,
+      104,  104,  104,  104,  104,  104,  104,  104,  104,  104,
+      104,  104,  104,  104,  104,  104
     } ;
 
-static yyconst flex_int16_t yy_nxt[210] =
+static yyconst flex_int16_t yy_nxt[229] =
     {   0,
-       88,   85,   17,   83,   80,   18,   57,   19,   17,   50,
-       90,   18,   86,   19,   20,   22,   23,   81,   24,   22,
-       23,   86,   24,   84,   81,   25,   27,   28,   77,   29,
-       27,   28,   74,   29,   17,   73,   58,   18,   17,   56,
-       53,   18,   31,   32,   46,   33,   31,   32,   93,   33,
-       35,   36,   93,   37,   35,   36,   93,   37,   39,   40,
-       93,   41,   93,   42,   39,   40,   93,   41,   93,   42,
-       44,   45,   48,   49,   51,   51,   52,   44,   55,   44,
-       60,   62,   63,   62,   63,   65,   66,   68,   69,   68,
-       69,   71,   72,   44,   45,   44,   45,   44,   45,   75,
+      100,   17,   18,   97,   19,   95,   20,   17,   18,   92,
+       19,   66,   20,   21,   23,   24,   98,   25,   23,   24,
+       93,   25,   98,   93,   26,   28,   29,   58,   30,   28,
+       29,   58,   30,   32,   33,   48,   34,   32,   33,   86,
+       34,   36,   37,   85,   38,   36,   37,   70,   38,   40,
+       41,   67,   42,   40,   41,   54,   42,   44,   45,   50,
+       46,  104,   47,   44,   45,  104,   46,  104,   47,   48,
+       49,   52,   53,   56,   57,   59,   60,   61,   60,   63,
+       64,   59,   60,  104,  104,  104,  104,  104,  104,   65,
+       52,   69,   52,   53,   72,   73,   74,   73,   76,   77,
 
-       93,   76,   48,   49,   48,   49,   44,   55,   44,   55,
-       44,   60,   44,   60,   62,   63,   62,   63,   65,   66,
-       65,   66,   68,   69,   68,   69,   71,   72,   71,   72,
-       78,   93,   79,   81,   93,   93,   93,   93,   82,   86,
-       93,   93,   93,   93,   87,   81,   93,   93,   93,   93,
-       82,   90,   91,   86,   93,   93,   93,   93,   87,   90,
-       91,   90,   92,   90,   91,   16,   16,   21,   21,   26,
-       26,   30,   30,   34,   34,   38,   38,   43,   43,   47,
-       47,   54,   54,   59,   59,   61,   61,   64,   64,   67,
-       67,   70,   70,   89,   89,   15,   93,   93,   93,   93,
+       79,   80,   81,   80,   83,   84,   52,   53,   52,   53,
+       52,   53,   87,  104,   88,   56,   57,   56,   57,   63,
+       64,   63,   64,   58,  104,   89,   52,   69,   52,   69,
+       72,   73,   72,   73,   76,   77,   76,   77,   79,   80,
+       79,   80,   83,   84,   83,   84,   90,  104,   91,   93,
+      104,  104,  104,  104,   94,   58,   96,   98,  104,  104,
+      104,  104,   99,   93,  104,  104,  104,  104,   94,  102,
+      103,   98,  104,  104,  104,  104,   99,  102,  103,  102,
+      103,   16,   16,   22,   22,   27,   27,   31,   31,   35,
+       35,   39,   39,   43,   43,   51,   51,   55,   55,   58,
 
-       93,   93,   93,   93,   93,   93,   93,   93,   93
+       58,   62,   62,   68,   68,   71,   71,   75,   75,   78,
+       78,   82,   82,  101,  101,   15,  104,  104,  104,  104,
+      104,  104,  104,  104,  104,  104,  104,  104
     } ;
 
-static yyconst flex_int16_t yy_chk[210] =
+static yyconst flex_int16_t yy_chk[229] =
     {   0,
-      113,  112,    1,  111,  110,    1,  104,    1,    2,  102,
-       92,    2,   88,    2,    2,    3,    3,   83,    3,    4,
-        4,   79,    4,   77,   76,    4,    5,    5,   56,    5,
-        6,    6,   42,    6,    7,   40,   28,    7,    8,   25,
-       23,    8,    9,    9,   19,    9,   10,   10,   15,   10,
-       11,   11,    0,   11,   12,   12,    0,   12,   13,   13,
-        0,   13,    0,   13,   14,   14,    0,   14,    0,   14,
-       18,   18,   20,   20,   22,   22,   22,   24,   24,   29,
-       29,   30,   30,   32,   32,   33,   33,   34,   34,   36,
-       36,   37,   37,   41,   41,   43,   43,   45,   45,   46,
+      125,    1,    1,  124,    1,  123,    1,    2,    2,  122,
+        2,  116,    2,    2,    3,    3,  100,    3,    4,    4,
+       95,    4,   91,   88,    4,    5,    5,   60,    5,    6,
+        6,   58,    6,    7,    7,   49,    7,    8,    8,   47,
+        8,    9,    9,   45,    9,   10,   10,   33,   10,   11,
+       11,   29,   11,   12,   12,   20,   12,   13,   13,   18,
+       13,   15,   13,   14,   14,    0,   14,    0,   14,   17,
+       17,   19,   19,   21,   21,   22,   22,   24,   24,   25,
+       25,   26,   26,    0,    0,    0,    0,    0,    0,   26,
+       30,   30,   34,   34,   35,   35,   37,   37,   38,   38,
 
-        0,   46,   47,   47,   49,   49,   54,   54,   55,   55,
-       59,   59,   60,   60,   61,   61,   63,   63,   64,   64,
-       66,   66,   67,   67,   69,   69,   70,   70,   72,   72,
-       74,    0,   74,   75,    0,    0,    0,    0,   75,   78,
-        0,    0,    0,    0,   78,   80,    0,    0,    0,    0,
-       80,   84,   84,   85,    0,    0,    0,    0,   85,   89,
-       89,   90,   90,   91,   91,   94,   94,   95,   95,   96,
-       96,   97,   97,   98,   98,   99,   99,  100,  100,  101,
-      101,  103,  103,  105,  105,  106,  106,  107,  107,  108,
-      108,  109,  109,  114,  114,   93,   93,   93,   93,   93,
+       39,   39,   41,   41,   42,   42,   46,   46,   51,   51,
+       53,   53,   54,    0,   54,   55,   55,   57,   57,   62,
+       62,   64,   64,   65,    0,   65,   68,   68,   69,   69,
+       71,   71,   73,   73,   75,   75,   77,   77,   78,   78,
+       80,   80,   82,   82,   84,   84,   86,    0,   86,   87,
+        0,    0,    0,    0,   87,   89,   89,   90,    0,    0,
+        0,    0,   90,   92,    0,    0,    0,    0,   92,   96,
+       96,   97,    0,    0,    0,    0,   97,  101,  101,  103,
+      103,  105,  105,  106,  106,  107,  107,  108,  108,  109,
+      109,  110,  110,  111,  111,  112,  112,  113,  113,  114,
 
-       93,   93,   93,   93,   93,   93,   93,   93,   93
+      114,  115,  115,  117,  117,  118,  118,  119,  119,  120,
+      120,  121,  121,  126,  126,  104,  104,  104,  104,  104,
+      104,  104,  104,  104,  104,  104,  104,  104
     } ;
 
-static yyconst flex_int16_t yy_rule_linenum[15] =
+/* Table of booleans, true if rule could match eol. */
+static yyconst flex_int32_t yy_rule_can_match_eol[17] =
     {   0,
-      209,  211,  213,  215,  217,  226,  230,  245,  255,  265,
-      273,  284,  307,  361
+1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0,     };
+
+static yyconst flex_int16_t yy_rule_linenum[16] =
+    {   0,
+      278,  280,  283,  287,  294,  296,  319,  329,  339,  359,
+      372,  394,  442,  446,  448
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -605,14 +630,17 @@ static yyconst flex_int16_t yy_rule_linenum[15] =
 /*
  * This pre-processor processes all heredoc strings into
  * normal strings. Newline characters are escaped.
- * POD comments and line comments are filtered out as well.
+ * POD comments and line comments are filtered out.
  *
  */
 
 /* TODO:
- * - improve memory management
- * - use a buffer of a certain (large) size, instead of resizing on each
- *   line, which is not efficient. Only resize if realsize > fixedsize.
+   - there's a weirdness in the SAVELINE state; we need to duplicate
+     the yytext string twice, otherwise things go wrong badly.
+
+   - it might be interesting to improve memory handling to make things
+     a bit more efficient.
+
  */
 
 #include <stdio.h>
@@ -620,31 +648,35 @@ static yyconst flex_int16_t yy_rule_linenum[15] =
 #include <assert.h>
 #include <stdlib.h>
 
+/* keep Microsoft Visual Studio compiler happy */
 #define YY_NO_UNISTD_H
 
+/* declare the prototype of hd_prelex */
 #define YY_DECL int hd_prelex(yyscan_t yyscanner)
+
 
 extern char *hd_preget_text(yyscan_t yyscanner);
 extern void  hd_preset_in(FILE *fp,yyscan_t yyscanner);
 extern int   hd_prelex_destroy(yyscan_t yyscanner);
 extern int   hd_prelex(yyscan_t yyscanner);
 
+
 /* all globals are collected in this structure which
  * is set in yyscan_t's "extra" field, available through
  * yy{get,set}_extra() function.
  */
 typedef struct global_state {
-    int   line;
-    char *heredoc;
-    char *linebuff;
-    char *delimiter;
-    char *filename;
-    YY_BUFFER_STATE file_buffer;
+    char *heredoc;           /* heredoc string buffer */
+    char *linebuffer;        /* buffer to save the 'rest of the line' before scanning a heredoc */
+    char *delimiter;         /* buffer to save the delimiter of the heredoc string being scanned */
+    char *filename;          /* name of the file being scanned */
+    YY_BUFFER_STATE file_buffer;   /* needed to store the ref. to the file when scanning a string buffer */
 
 } global_state;
 
 /* accessor methods for setting and getting the lexer_state */
 #define YY_EXTRA_TYPE  struct global_state *
+
 extern YY_EXTRA_TYPE  hd_preget_extra(yyscan_t scanner);
 extern void hd_preset_extra(YY_EXTRA_TYPE lexer ,yyscan_t scanner);
 
@@ -669,9 +701,82 @@ Emit an error message.
 
 */
 static void
-lex_error(char *msg, global_state *state) {
-    fprintf(stderr, "\nHeredoc pre-processor error");
-    fprintf(stderr, " in '%s' (line %d): %s\n", state->filename, state->line, msg);
+lex_error(char const * const message, int lineno, global_state *state) {
+    fprintf(stderr, "\nHeredoc pre-processor error in '%s' (line %d): %s\n",
+            state->filename, lineno, message);
+}
+
+
+/*
+
+=item C<dupstr>
+
+The C89 standard does not define a dupstr() in the C library,
+so define our own dupstr. Function names beginning with "str"
+are reserved (I think), so make it dupstr, as that is what it
+does: duplicate a string.
+
+=cut
+
+*/
+char *
+dupstr(char * const source) {
+    char *newstring = (char *)calloc(strlen(source) + 1, sizeof (char));
+    assert(newstring != NULL);
+    strcpy(newstring, source);
+    return newstring;
+}
+
+
+void
+printrules(void) {
+    extern int ctr[];
+    int i;
+    for (i = 0; i < YY_NUM_RULES; i++)
+        fprintf(output, "#rule %d was used %d times\n", i, ctr[i]);
+}
+
+
+/*
+
+=item C<init_global_state>
+
+create and initialize a global_state structure, containing all 'global'
+variables that are needed during the scanning.
+
+=cut
+
+*/
+static global_state *
+init_global_state(char * const filename) {
+    global_state *state = (global_state *)malloc(sizeof (global_state));
+    assert(state != NULL);
+    state->filename    = filename;
+    state->heredoc     = NULL;
+    state->linebuffer  = dupstr("");
+    state->delimiter   = NULL;
+    state->file_buffer = NULL;
+    return state;
+}
+
+/*
+
+=item C<destroy_global_state>
+
+free all memory of the global state structure.
+
+=cut
+
+*/
+static void
+destroy_global_state(global_state *state) {
+    if (state->linebuffer)
+        free(state->linebuffer);
+    if (state->heredoc)
+        free(state->heredoc);
+
+    free(state);
+    state = NULL;
 }
 
 
@@ -698,6 +803,7 @@ main(int argc, char *argv[]) {
 
     /* open the file */
     fp = fopen(argv[1], "r");
+
     if (fp == NULL) {
         fprintf(stderr, "error opening file '%s'\n", argv[1]);
         exit(EXIT_FAILURE);
@@ -708,23 +814,25 @@ main(int argc, char *argv[]) {
     /* set the scanner to a string buffer and go parse */
     hd_preset_in(fp,yyscanner);
 
-    state = (global_state *)malloc(sizeof (global_state));
-    assert(state != NULL);
-    state->line      = 1;
-    state->filename  = argv[1];
-    state->heredoc   = NULL;
-    state->linebuff  = NULL;
-    state->delimiter = NULL;
+    state = init_global_state(argv[1]);
+
     hd_preset_extra(state,yyscanner);
 
-    /* the lexer never returns, only call it once. Don't give a YYSTYPE object. */
+    /* the lexer never returns anything, only call it once.
+     * Don't give a YYSTYPE object.
+     */
     hd_prelex(yyscanner);
+
+
+    printrules();
 
     /* clean up after playing */
     hd_prelex_destroy(yyscanner);
-    free(state);
+    destroy_global_state(state);
+
     return 0;
 }
+
 
 /*
 
@@ -736,7 +844,9 @@ main(int argc, char *argv[]) {
 
 
 /*
+
 using this we can check how often each rule is executed.
+XXX this should be removed at some point (globals!)
 
 */
 
@@ -744,22 +854,7 @@ int ctr[YY_NUM_RULES];
 
 int num_rules = YY_NUM_RULES;
 
-
-
-/* after a rule is matched, execute this block of code to keep track of the line no. */
-#define YY_USER_ACTION   {                                               \
-                           global_state *state = hd_preget_extra(yyscanner); \
-                           ++ctr[yy_act];                                \
-                           do {                                          \
-                               char *iter = yytext;                      \
-                               while (*iter != '\0') {                   \
-                                   if (*iter == '\n')                    \
-                                       state->line++;                    \
-                                   iter++;                               \
-                               }                                         \
-                           }                                             \
-                           while (0);                                    \
-                         }
+#define YY_USER_ACTION    do { ++ctr[yy_act]; } while (0);
 
 
 
@@ -768,7 +863,7 @@ int num_rules = YY_NUM_RULES;
 
 
 
-#line 772 "hdocprep.c"
+#line 867 "hdocprep.c"
 
 #define INITIAL 0
 #define POD 1
@@ -1059,10 +1154,10 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 207 "hdocprep.l"
+#line 276 "hdocprep.l"
 
 
-#line 1066 "hdocprep.c"
+#line 1161 "hdocprep.c"
 
     if ( !yyg->yy_init )
         {
@@ -1126,13 +1221,13 @@ yy_match:
             while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
                 {
                 yy_current_state = (int) yy_def[yy_current_state];
-                if ( yy_current_state >= 94 )
+                if ( yy_current_state >= 105 )
                     yy_c = yy_meta[(unsigned int) yy_c];
                 }
             yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
             ++yy_cp;
             }
-        while ( yy_current_state != 93 );
+        while ( yy_current_state != 104 );
         yy_cp = yyg->yy_last_accepting_cpos;
         yy_current_state = yyg->yy_last_accepting_state;
 
@@ -1144,6 +1239,18 @@ yy_find_action:
 
 /* %% [11.0] code for yylineno update goes here */
 
+        if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
+            {
+            int yyl;
+            for ( yyl = 0; yyl < yyleng; ++yyl )
+                if ( yytext[yyl] == '\n' )
+
+    do{ yylineno++;
+        yycolumn=0;
+    }while(0)
+;
+            }
+
 do_action:  /* This label is used only to access EOF actions. */
 
 /* %% [12.0] debug code goes here */
@@ -1151,13 +1258,13 @@ do_action:  /* This label is used only to access EOF actions. */
             {
             if ( yy_act == 0 )
                 fprintf( stderr, "--scanner backing up\n" );
-            else if ( yy_act < 15 )
+            else if ( yy_act < 16 )
                 fprintf( stderr, "--accepting rule at line %ld (\"%s\")\n",
                          (long)yy_rule_linenum[yy_act], yytext );
-            else if ( yy_act == 15 )
+            else if ( yy_act == 16 )
                 fprintf( stderr, "--accepting default rule (\"%s\")\n",
                          yytext );
-            else if ( yy_act == 16 )
+            else if ( yy_act == 17 )
                 fprintf( stderr, "--(end of buffer or a NUL)\n" );
             else
                 fprintf( stderr, "--EOF (start condition %d)\n", YY_START );
@@ -1176,198 +1283,202 @@ do_action:  /* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 209 "hdocprep.l"
+#line 278 "hdocprep.l"
 { /* ignore line comments */ }
     YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 211 "hdocprep.l"
+#line 280 "hdocprep.l"
 { yy_push_state(POD, yyscanner); }
     YY_BREAK
 case 3:
+/* rule 3 can match eol */
 YY_RULE_SETUP
-#line 213 "hdocprep.l"
-{ /* ignore pod comments */ }
-    YY_BREAK
-case 4:
-/* rule 4 can match eol */
-YY_RULE_SETUP
-#line 215 "hdocprep.l"
-{ /* skip newlines */}
-    YY_BREAK
-case 5:
-/* rule 5 can match eol */
-YY_RULE_SETUP
-#line 217 "hdocprep.l"
+#line 283 "hdocprep.l"
 { /* end of POD comment */
                          yy_pop_state(yyscanner);
                        }
     YY_BREAK
+case 4:
+/* rule 4 can match eol */
+YY_RULE_SETUP
+#line 287 "hdocprep.l"
+{ /* ignore pod comments */ }
+    YY_BREAK
 case YY_STATE_EOF(POD):
-#line 221 "hdocprep.l"
+#line 289 "hdocprep.l"
 { /* we're scanning a POD comment, but encountered end-of-file. */
-                         lex_error("POD comment not closed!", hd_preget_extra(yyscanner));
+                         lex_error("POD comment not closed!", yylineno, hd_preget_extra(yyscanner));
                          yyterminate();
                        }
     YY_BREAK
+case 5:
+/* rule 5 can match eol */
+YY_RULE_SETUP
+#line 294 "hdocprep.l"
+{ /* don't do anything */ }
+    YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 226 "hdocprep.l"
+#line 296 "hdocprep.l"
 { /* echo everything when scanning the string. */
                          fprintf(output, "%s", yytext);
                        }
     YY_BREAK
-case 7:
-/* rule 7 can match eol */
-YY_RULE_SETUP
-#line 230 "hdocprep.l"
-{ /* don't do anything */
-
-                       }
-    YY_BREAK
 case YY_STATE_EOF(SCANSTRING):
-#line 234 "hdocprep.l"
+#line 300 "hdocprep.l"
 { /* end of saved string */
                          global_state *state = hd_preget_extra(yyscanner);
                          assert(state->file_buffer);
                          hd_pre_switch_to_buffer(state->file_buffer,yyscanner);
-                         /* clear the temp. variable */
+
+                         /* clear the temp. variable; file_buffer is only used to temporarily
+                          * store a reference to the current buffer when we switch from file
+                          * to string scanning; after finishing scanning the string (which
+                          * is now, as we just scanned <<EOF>>), we switch back to the file
+                          * buffer.
+                          */
                          state->file_buffer = NULL;
+
                          BEGIN(INITIAL);
-                         fprintf(output, "\nsetline %d\n", state->line);
+
+                         fprintf(output, "\n    setline %d\n", yylineno);
                        }
     YY_BREAK
-case 8:
+case 7:
 YY_RULE_SETUP
-#line 245 "hdocprep.l"
+#line 319 "hdocprep.l"
 { /* 2nd and later heredoc argument */
                              global_state *state = hd_preget_extra(yyscanner);
-                             state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                             state->delimiter    = (char *)calloc(yyleng - 4 + 1, sizeof (char));
                              assert(state->delimiter);
                              strncpy(state->delimiter, yytext + 3, yyleng - 4);
 
-                             state->heredoc = strdup("");
+                             state->heredoc = dupstr("");
                              BEGIN(SAVELINE2);
                            }
     YY_BREAK
-case 9:
+case 8:
 YY_RULE_SETUP
-#line 255 "hdocprep.l"
+#line 329 "hdocprep.l"
 { /* only copy the string after "<<'" and skip the last quote too */
                          global_state *state = hd_preget_extra(yyscanner);
-                         state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                         /* allocate storage for the delimiter, skip the << and quote characters. */
+                         state->delimiter    = (char *)calloc(yyleng - 4 + 1, sizeof (char));
                          assert(state->delimiter);
                          strncpy(state->delimiter, yytext + 3, yyleng - 4);
-                         state->heredoc = strdup("");
+                         state->heredoc = dupstr("");
                          BEGIN(SAVELINE);
+                        }
+    YY_BREAK
+case 9:
+/* rule 9 can match eol */
+YY_RULE_SETUP
+#line 339 "hdocprep.l"
+{ /* this state is used when reading the first heredoc delimiter
+                          * argument. Save the rest of the line and go scan the heredoc.
+                          */
+                         global_state *state = hd_preget_extra(yyscanner);
+                         char *temp;
+
+
+                         assert(state->linebuffer != NULL);
+                         free(state->linebuffer);
+
+                         /* somehow, if we don't duplicate the string twice,
+                          * things don't work. Unclear to me why this is.
+                          */
+                         temp = dupstr(yytext);
+                         state->linebuffer = dupstr(temp);
+                         assert(strcmp(temp,state->linebuffer)==0 && strcmp(temp,yytext)==0);
+
+                         BEGIN(HEREDOC);
                        }
     YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 265 "hdocprep.l"
-{ /* this state is used when reading the first heredoc delimiter
-                            argument. Save the rest of the line and go scan the heredoc.
-                          */
-                         global_state *state = hd_preget_extra(yyscanner);
-                         state->linebuff = strdup(yytext);
-                         BEGIN(HEREDOC);
-                       }
-    YY_BREAK
-case 11:
-/* rule 11 can match eol */
-YY_RULE_SETUP
-#line 273 "hdocprep.l"
+#line 359 "hdocprep.l"
 { /* this state is used when reading the 2nd and later heredoc
                             delimiter arguments. Save the rest of the line and go scan
                             the heredoc string. First, though, switch back to the file,
                             because <SAVELINE2> state is activated when reading a string.
                           */
                          global_state *state = hd_preget_extra(yyscanner);
-                         state->linebuff = strdup(yytext);
+
+                         state->linebuffer = dupstr(yytext);
+
                          hd_pre_switch_to_buffer(state->file_buffer,yyscanner);
                          BEGIN(HEREDOC);
                        }
     YY_BREAK
-case 12:
-/* rule 12 can match eol */
+case 11:
+/* rule 11 can match eol */
 YY_RULE_SETUP
-#line 284 "hdocprep.l"
+#line 372 "hdocprep.l"
 { /* Scan a newline character, append this to the heredoc, but
                             escape it.
                           */
                          global_state *state = hd_preget_extra(yyscanner);
-                         int len = strlen(state->heredoc);
-                         char *temp = (char *)calloc(len + 1 + 2, sizeof (char));
+                         int len             = strlen(state->heredoc);
+                         char *temp          = (char *)calloc(len + 1 + 2, sizeof (char));
                          assert(temp != NULL);
                          strcpy(temp, state->heredoc);
 
-/* somehow this fails on windows
-                         if (heredoc)
-                            free(heredoc);
-*/
                          state->heredoc = temp;
 
                          assert(state->heredoc != NULL);
 
                          /* translate "\n" to a "\" and "n" character */
-                         state->heredoc[len] = '\\';
+                         /*
+                         state->heredoc[len]     = '\\';
                          state->heredoc[len + 1] = 'n';
                          state->heredoc[len + 2] = '\0';
+                         */
+                         strcpy(state->heredoc + len, "\\n");
                        }
     YY_BREAK
-case 13:
+case 12:
 YY_RULE_SETUP
-#line 307 "hdocprep.l"
+#line 394 "hdocprep.l"
 { /* scan heredoc string contents */
 
                          global_state *state = hd_preget_extra(yyscanner);
                          /* on windows remove the '\r' character */
                          if (yytext[yyleng - 1] == '\r') {
-                           chop_yytext();
+                            chop_yytext();
                          }
 
                          if (strcmp(yytext, state->delimiter) == 0) {
-                            int heredoc_length = strlen(state->heredoc);
-                            char *hdstring = (char *)calloc(heredoc_length + 3, sizeof (char));
-                            assert(hdstring != NULL);
 
-                            sprintf(hdstring, "\"%s\"", state->heredoc);
-                            fprintf(output, "%s", hdstring);
-
-
+                            fprintf(output, "\"%s\"", state->heredoc);
                             /* free the delimiter memory */
                             free(state->delimiter);
                             state->delimiter = NULL;
 
-                            /* free the just allocated memory */
-                            free(hdstring);
-                            hdstring = NULL;
+                            assert(state->heredoc != NULL);
+                            free(state->heredoc);
 
-                            /*
-                            assert(heredoc != NULL);
-                            free(heredoc);
-                            */
-                            state->heredoc = strdup("");
+                            state->heredoc = dupstr("");
 
                             /* save the current buffer, because we go scan the
-                               rest of the string that was saved in <SAVELINE(2)>.
+                             * rest of the string that was saved in <SAVELINE(2)>.
                              */
                             state->file_buffer = YY_CURRENT_BUFFER;
                             BEGIN(SCANSTRING);
-                            assert(state->linebuff != NULL);
-                            hd_pre_scan_string(state->linebuff,yyscanner);
+                            assert(state->linebuffer != NULL);
+                            hd_pre_scan_string(state->linebuffer,yyscanner);
                          }
                          else {
                             /* save this heredoc string line */
-                            char *line = strdup(yytext);
-                            state->heredoc = strcat(state->heredoc, line);
+                            char *thisline = dupstr(yytext);
+                            state->heredoc = strcat(state->heredoc, thisline);
                          }
                        }
     YY_BREAK
 case YY_STATE_EOF(HEREDOC):
-#line 353 "hdocprep.l"
+#line 429 "hdocprep.l"
 { /* End of file while reading a heredoc string. This is bad. */
                          global_state *state = hd_preget_extra(yyscanner);
                          fprintf(stderr,
@@ -1376,29 +1487,42 @@ case YY_STATE_EOF(HEREDOC):
                          yyterminate();
                        }
     YY_BREAK
-case 14:
-YY_RULE_SETUP
-#line 361 "hdocprep.l"
-{ /* just echo everything else */
-                         /*fprintf(stderr, "<*>.: [%s]\n", yytext); */
-                         fprintf(output, "%s", yytext);
-                       }
-    YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(HEREDOC2):
 case YY_STATE_EOF(SAVELINE):
 case YY_STATE_EOF(SAVELINE2):
-#line 366 "hdocprep.l"
+#line 438 "hdocprep.l"
 { /* end of file */
                          yyterminate();
                        }
     YY_BREAK
+case 13:
+/* rule 13 can match eol */
+YY_RULE_SETUP
+#line 442 "hdocprep.l"
+{ /* we only want to print a single newline instead of all newlines. */
+                         fprintf(output, "\n");
+                       }
+    YY_BREAK
+case 14:
+/* rule 14 can match eol */
+YY_RULE_SETUP
+#line 446 "hdocprep.l"
+{ /* do nothing. */ }
+    YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 372 "hdocprep.l"
+#line 448 "hdocprep.l"
+{ /* just echo everything else */
+                         fprintf(output, "%s", yytext);
+                       }
+    YY_BREAK
+case 16:
+YY_RULE_SETUP
+#line 452 "hdocprep.l"
 ECHO;
     YY_BREAK
-#line 1402 "hdocprep.c"
+#line 1526 "hdocprep.c"
 
     case YY_END_OF_BUFFER:
         {
@@ -1705,7 +1829,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
         while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
             {
             yy_current_state = (int) yy_def[yy_current_state];
-            if ( yy_current_state >= 94 )
+            if ( yy_current_state >= 105 )
                 yy_c = yy_meta[(unsigned int) yy_c];
             }
         yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1739,11 +1863,11 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
     while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
         {
         yy_current_state = (int) yy_def[yy_current_state];
-        if ( yy_current_state >= 94 )
+        if ( yy_current_state >= 105 )
             yy_c = yy_meta[(unsigned int) yy_c];
         }
     yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-    yy_is_jam = (yy_current_state == 93);
+    yy_is_jam = (yy_current_state == 104);
 
     return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1829,6 +1953,12 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 
 /* %% [19.0] update BOL and yylineno */
     YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
+    if ( YY_CURRENT_BUFFER_LVALUE->yy_at_bol )
+
+    do{ yylineno++;
+        yycolumn=0;
+    }while(0)
+;
 
     return c;
 }
@@ -2641,10 +2771,7 @@ void hd_prefree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 372 "hdocprep.l"
-
-
-
+#line 452 "hdocprep.l"
 
 
 
