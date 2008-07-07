@@ -127,9 +127,10 @@ sub runstep {
                 autodetect      => $autodetect,
                 icuconfig       => $icuconfig,
                 verbose         => $verbose,
-            }
+                icushared       => $icushared,
+                icuheaders      => $icuheaders,
+            },
         );
-
     # 3rd possible return point
     if ( $without ) {
         $self->_set_no_configure_with_icu($conf, q{not found});
@@ -272,7 +273,12 @@ sub _try_icuconfig {
     my $self = shift;
     my $conf = shift;
     my $arg = shift;
-    my ($icushared, $icuheaders);
+    my $icushared = ( defined $arg->{icushared} )
+        ? $arg->{icushared}
+        : undef;
+    my $icuheaders = ( defined $arg->{icuheaders} )
+        ? $arg->{icuheaders}
+        : undef;
     if (
         ( ! $arg->{without} )  &&
         $arg->{autodetect}    &&

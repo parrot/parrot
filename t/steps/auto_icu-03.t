@@ -20,7 +20,7 @@ use Parrot::Configure::Utils qw( capture_output );
         plan skip_all => "icu-config not available";
     }
     else {
-        plan tests => 14;
+        plan tests => 13;
     }
 }
 use_ok('config::init::defaults');
@@ -64,8 +64,6 @@ ok( $step->description(), "$step_name has description" );
         \$stderr,
     );
     ok(! defined $ret, "runstep() returned undefined value as expected");
-    like($stderr, qr/error: icushared not defined/s,
-        "Got expected warnings");
     like($stderr, qr/error: icuheaders not defined or invalid/s,
         "Got expected warnings");
     like($stderr, qr/Something is wrong with your ICU installation/s,
