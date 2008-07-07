@@ -42,28 +42,24 @@ rule  statement_delimiter     { ';'
                               | <before \? >
                               | $
                               }
-rule  echo_statement          { <ECHO> <arguments>                                        {*} }
-rule  function_call           { <FUNCTION_NAME> <.PAREN_OPEN> <arguments> <.PAREN_CLOSE>  {*} }
+rule  echo_statement          { 'echo' <arguments>                                        {*} }
+rule  function_call           { <FUNCTION_NAME> '(' <arguments> ')'                       {*} }
 rule  constant                { <CONSTANT_NAME>                                           {*} }
 rule  arguments               {  [ <expression> [',' <expression>]* ]?                    {*} }
-rule  if_statement            { <IF> <.PAREN_OPEN> <relational_expression> <.PAREN_CLOSE>
+rule  if_statement            { <IF> '(' <relational_expression> ')'
                                 \{ <statements> \}
-                                <else_clause>?
-                                {*}
+                                <else_clause>?                                 
+                                                                                          {*}
                               }
 token inline_sea_tp1          { <.CODE_END_TP1> <SEA_empty_allowed> <.CODE_START_TP1>     {*} }
 token inline_sea_tp2          { <.CODE_END_TP2> <SEA_empty_allowed> <.CODE_START_TP2>     {*} }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression>                            {*} }
-rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} }
+rule  scalar_assign           { <var> '=' <expression>                                    {*} }
+rule  array_assign            { <array_elem> '=' <expression>                             {*} }
 
-token ECHO                    { 'echo' }
+token IDENT                   { <[a..zA..Z_]>+ <[a..zA..Z_0..9]>* }
 token FUNCTION_NAME           { <IDENT> }
 token CONSTANT_NAME           { <IDENT> }
 token CLASS_NAME              { <IDENT> }
-token PAREN_OPEN              { \( }
-token PAREN_CLOSE             { \) }
-
-token IDENT                   { <[a..zA..Z_]>+ <[a..zA..Z_0..9]>* }
 token VAR_NAME                {  '$' <IDENT> {*} }
 
 token TRUE                    { 'TRUE'                         {*} }
@@ -71,12 +67,12 @@ token FALSE                   { 'FALSE'                        {*} }
 token NULL                    { 'NULL'                         {*} }
 token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
 token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
+token string                  { <DOUBLEQUOTE_STRING>           {*}   #= DOUBLEQUOTE_STRING
+                              | <SINGLEQUOTE_STRING>           {*}   #= SINGLEQUOTE_STRING
+                              }
 token INTEGER                 { \d+                            {*} }
 token NUMBER                  { ( \d+ )? '.' \d+               {*} }
 
-token UNARY_PLUS              { \+ }
-token CONCAT_OP               { \. }
-token ASSIGN_OP               { '=' }
 token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
 
 token IF                      { 'if' }
@@ -99,10 +95,7 @@ rule  array_elem              { <VAR_NAME> '[' <array_key> ']' {*} }
 rule  array_key               { <expression> {*} }
 rule  var                     { <VAR_NAME> {*} }
 rule  concat_expression       { <string> <concat_tail>* {*} }
-rule  string                  { <DOUBLEQUOTE_STRING> {*}   #= DOUBLEQUOTE_STRING
-                              | <SINGLEQUOTE_STRING> {*}   #= SINGLEQUOTE_STRING
-                              }
-rule  concat_tail             { <CONCAT_OP> <string> }
+rule  concat_tail             { '.' <string> }
 
 rule bitwise_expression is optable                                      { ... }
 
@@ -122,17 +115,17 @@ proto 'prefix:+'  is equiv('prefix:-')                                  { ... }
 
 proto 'term:'     is tighter('infix:-')  is parsed(&postfix_expression) { ... }
 
-rule  postfix_expression      { <TRUE>                                     {*}    #= TRUE
-                              | <FALSE>                                    {*}    #= FALSE
-                              | <NULL>                                     {*}    #= NULL
-                              | <NUMBER>                                   {*}    #= NUMBER
-                              | <INTEGER>                                  {*}    #= INTEGER
-                              | <.PAREN_OPEN> <expression> <.PAREN_CLOSE>  {*}    #= expression
-                              | <array_elem>                               {*}    #= array_elem
-                              | <var>                                      {*}    #= var
+rule  postfix_expression      { <TRUE>                  {*}    #= TRUE
+                              | <FALSE>                 {*}    #= FALSE
+                              | <NULL>                  {*}    #= NULL
+                              | <NUMBER>                {*}    #= NUMBER
+                              | <INTEGER>               {*}    #= INTEGER
+                              | '(' <expression> ')'    {*}    #= expression
+                              | <array_elem>            {*}    #= array_elem
+                              | <var>                   {*}    #= var
                               }
 
-rule  function_definition     { 'function' <FUNCTION_NAME> <.PAREN_OPEN> <parameters> <.PAREN_CLOSE> '{' <statement>* '}' {*} }
-rule  parameters              {  [ <VAR_NAME> [',' <VAR_NAME>]* ]?                    {*} }
+rule  function_definition     { 'function' <FUNCTION_NAME> '(' <parameters> ')' '{' <statement>* '}' {*} }
+rule  parameters              {  [ <VAR_NAME> [',' <VAR_NAME>]* ]?                                   {*} }
 
-rule  class_definition        { 'class' <CLASS_NAME> '{' <statement>* '}' {*} }
+rule  class_definition        { 'class' <CLASS_NAME> '{' <statement>* '}'                            {*} }

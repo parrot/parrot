@@ -76,7 +76,7 @@ method inline_sea_tp1($/) {
 
 method echo_statement($/) {
     my $past := $( $<arguments> );
-    $past.name( ~$<ECHO> );
+    $past.name( 'echo' );
 
     make $past;
 }
@@ -222,7 +222,7 @@ method concat_expression($/) {
         $past := PAST::Op.new(
                      $past_prev,
                      $( $_<string> ),
-                     :name( "infix:" ~ $_<CONCAT_OP> )
+                     :name( 'infix:.' )
                  );
     }
 
