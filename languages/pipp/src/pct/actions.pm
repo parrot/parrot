@@ -99,10 +99,10 @@ method method_call($/) {
 }
 
 method constructor_call($/) {
-    my $past := PAST::Op.new( 
+    my $past := PAST::Op.new(
                     :name( 'new' ),
                     :pasttype( 'callmethod' ),
-                    PAST::Var.new( 
+                    PAST::Var.new(
                         :name( ~$<CLASS_NAME> ),
                         :scope( 'package' )
                     )
