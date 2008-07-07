@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 40;
 
 =head1 NAME
 
@@ -1197,6 +1197,35 @@ CODE
 two
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', 'sort with broken comparison -- RT #56636');
+.sub 'main' :main
+    .local pmc array
+    array = new 'ResizablePMCArray'
+    push array, 4
+    push array, 5
+    push array, 3
+    push array, 2
+    push array, 5
+    push array, 1
+
+    $S0 = join ' ', array
+    say $S0
+
+    $P0 = get_global 'cmp_func'
+    array.sort($P0)
+    say "Sort finished without crashing!"
+.end
+
+.sub 'cmp_func'
+    .param pmc a
+    .param pmc b
+    $I0 = 1
+    .return ($I0)
+.end
+CODE
+4 5 3 2 5 1
+Sort finished without crashing!
+OUTPUT
 
 # don't forget to change the number of tests
 

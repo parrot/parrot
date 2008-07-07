@@ -875,7 +875,8 @@ Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)
         for (i = 0, j = n; ;) {
             do
                 --j;
-            while (COMPARE(interp, data[j], data[0], cmp) > 0);
+
+            while (j > 0 && COMPARE(interp, data[j], data[0], cmp) > 0);
 
             do
                 ++i;
