@@ -88,6 +88,29 @@ method function_call($/) {
     make $past;
 }
 
+method method_call($/) {
+    my $past := PAST::Op.new(
+                    :name( ~$<METHOD_NAME> ),
+                    :pasttype( 'callmethod' ),
+                    :name( ~$<METHOD_NAME> )
+                );
+
+    make $past;
+}
+
+method constructor_call($/) {
+    my $past := PAST::Op.new( 
+                    :name( 'new' ),
+                    :pasttype( 'callmethod' ),
+                    PAST::Var.new( 
+                        :name( ~$<CLASS_NAME> ),
+                        :scope( 'package' )
+                    )
+                );
+
+    make $past;
+}
+
 method constant($/) {
     make PAST::Op.new(
              :name('constant'),
@@ -310,6 +333,22 @@ method function_definition($/) {
     make $past;
 }
 
+method method_definition($/) {
+
+    ## note that $<parameters> creates a new PAST::Block.
+    my $past := $( $<parameters> );
+
+    ## set the function name
+    $past.name( ~$<FUNCTION_NAME> );
+    for $<statement> {
+        $past.push($($_));
+    }
+
+    $past.control('return_pir');
+
+    make $past;
+}
+
 method parameters($/) {
 
     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
@@ -326,7 +365,16 @@ method parameters($/) {
 }
 
 method class_definition($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := PAST::Block.new(
+                    :node($/),
+                    :blocktype('declaration'),
+                    :namespace( ~$<CLASS_NAME> ),
+                    :pirflags( ':init :load' ),
+                    PAST::Stmts.new()                # cargo culting from Rakudo
+                );
+    for $<method_definition> {
+        $past.push( $($_) );
+    }
 
     make $past;
 }
