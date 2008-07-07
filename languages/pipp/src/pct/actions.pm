@@ -325,6 +325,12 @@ method parameters($/) {
     make $past;
 }
 
+method class_definition($/) {
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+
+    make $past;
+}
+
 
 # Local Variables:
 #   mode: cperl

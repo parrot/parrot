@@ -36,6 +36,7 @@ rule  statement               { <echo_statement>       {*} <statement_delimiter>
                               | <scalar_assign>        {*} <statement_delimiter>  #= scalar_assign
                               | <array_assign>         {*} <statement_delimiter>  #= array_assign
                               | <function_definition>  {*}                        #= function_definition
+                              | <class_definition>     {*}                        #= class_definition
                               }
 rule  statement_delimiter     { ';'
                               | <before \? >
@@ -58,6 +59,7 @@ rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> {*} }
 token ECHO                    { 'echo' }
 token FUNCTION_NAME           { <IDENT> }
 token CONSTANT_NAME           { <IDENT> }
+token CLASS_NAME              { <IDENT> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
@@ -133,3 +135,4 @@ rule  postfix_expression      { <TRUE>                                     {*}  
 rule  function_definition     { 'function' <FUNCTION_NAME> <.PAREN_OPEN> <parameters> <.PAREN_CLOSE> '{' <statement>* '}' {*} }
 rule  parameters              {  [ <VAR_NAME> [',' <VAR_NAME>]* ]?                    {*} }
 
+rule  class_definition        { 'class' <CLASS_NAME> '{' <statement>* '}' {*} }
