@@ -40,7 +40,7 @@ END_CODE
 After class definition.
 END_EXPECTED
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'dummy class', todo => 'no implemented yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'dummy class' );
 <?php
 
 class Dings {

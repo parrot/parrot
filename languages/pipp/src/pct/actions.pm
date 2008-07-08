@@ -105,7 +105,6 @@ method constructor_call($/) {
                     :pasttype( 'callmethod' ),
                     PAST::Var.new(
                         :name( ~$<CLASS_NAME> ),
-                        :namespace( $<CLASS_NAME><ident> ),
                         :scope( 'package' ),
                     )
                 );

@@ -79,6 +79,9 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'PGE/Dumper.pbc'
 
+    load_bytecode 'P6object.pbc'
+
+
     .local pmc cfg
     cfg  = _config()
     .local string lib_dir, pbc_fn
