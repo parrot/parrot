@@ -339,7 +339,7 @@ method method_definition($/) {
     my $past := $( $<parameters> );
 
     ## set the function name
-    $past.name( ~$<FUNCTION_NAME> );
+    $past.name( ~$<METHOD_NAME> );
     for $<statement> {
         $past.push($($_));
     }
