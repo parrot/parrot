@@ -203,6 +203,8 @@ typedef struct parrot_interp_t Interp;
 /* work around warning:
  * cast discards qualifiers from pointer target type
  * for usage grep e.g. in string.c
+ * The casted to type must differ only in constness,
+ * to allow a stricter compiler check in C++ builds.
  */
 
 #ifndef __cplusplus
