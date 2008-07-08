@@ -8,7 +8,7 @@ src/builtins/oper.pir - operators
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'infix:=='
     .param pmc a

@@ -28,7 +28,7 @@ print "  .include 'languages/tcl/$dynamic_dir/$_.pir'\n" for @dynamic_cmds;
 #print <<'END_PIR';
 #
 #.HLL 'tcl', 'tcl_group'
-#.namespace
+#.namespace []
 #
 #END_PIR
 

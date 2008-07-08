@@ -274,6 +274,7 @@ typedef void (*funcptr_t)(void);
 #define PACKAGE     "parrot"
 #define LOCALEDIR  "."
 
+typedef struct _hash Hash;
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"

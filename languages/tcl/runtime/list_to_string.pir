@@ -1,5 +1,5 @@
 .HLL '_Tcl', ''
-.namespace
+.namespace []
 
 =head __dictToString
 

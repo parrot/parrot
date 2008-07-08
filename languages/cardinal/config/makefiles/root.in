@@ -17,6 +17,9 @@ PARROT        = ../../parrot@exe@
 CAT           = $(PERL) -MExtUtils::Command -e cat
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 ## places to look for things
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
@@ -38,12 +41,14 @@ SOURCES = cardinal.pir \
 #  $(CARDINAL_GROUP)
 
 BUILTINS_PIR = \
+  src/builtins/guts.pir \
   src/builtins/say.pir \
   src/builtins/cmp.pir \
   src/classes/Object.pir \
   src/classes/String.pir \
   src/classes/Integer.pir \
   src/classes/Array.pir \
+  src/classes/Hash.pir \
 
 # PMCS = cardinal
 # PMC_SOURCES = $(PMC_DIR)/cardinal.pmc

@@ -590,7 +590,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
     .begin_return
     .end_return
 .end
-.namespace
+.namespace []
 .include "library/yaml_dumper.pir"
 CODE
 ---
@@ -1037,7 +1037,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper", todo => 'not yet implement
     dumper.'yaml'('attr', ar)
     print "\n}"
 .end
-.namespace
+.namespace []
 .include 'library/yaml_dumper.pir'
 
 CODE

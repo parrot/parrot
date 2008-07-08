@@ -56,7 +56,7 @@ typedef struct _hashbucket {
     void *value;
 } HashBucket;
 
-typedef struct _hash {
+struct _hash {
     HashBucket *bs;             /* store of buckets */
     HashBucket **bi;            /* list of Bucket pointers */
     HashBucket *free_list;      /* empty buckets */
@@ -69,7 +69,7 @@ typedef struct _hash {
                                    updated for each new hash */
     hash_comp_fn   compare;     /* compare two keys, 0 = equal */
     hash_hash_key_fn hash_val;  /* generate a hash value for key */
-} Hash;
+};
 
 /* HEADERIZER BEGIN: src/hash.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

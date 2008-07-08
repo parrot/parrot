@@ -2,7 +2,7 @@
 # [encoding]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub '&encoding'
   .param pmc argv :slurpy

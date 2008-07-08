@@ -20,11 +20,11 @@ Creates the Perl 6 compiler by subclassing a C<PCT::HLLCompiler> object.
 
 =cut
 
+.loadlib 'perl6_group'
+.loadlib 'perl6_ops'
 .include 'src/gen_builtins.pir'
 
 .namespace [ 'Perl6::Compiler' ]
-
-.loadlib 'perl6_group'
 
 .sub 'onload' :load :init :anon
     load_bytecode 'PCT.pbc'
@@ -33,7 +33,6 @@ Creates the Perl 6 compiler by subclassing a C<PCT::HLLCompiler> object.
     p6meta = get_hll_global ['Perl6Object'], '$!P6META'
     p6meta.'new_class'('Perl6::Compiler', 'parent'=>'PCT::HLLCompiler')
 .end
-
 
 .sub 'init' :vtable :method
     load_bytecode 'config.pbc'
@@ -154,19 +153,6 @@ to the Perl 6 compiler.
 .sub 'main' :main
     .param pmc args_str
 
-    ##  create $*IN, $*OUT and $*ERR handles
-    .local pmc pio, perl6io, perl6ioclass
-    perl6ioclass = get_hll_global "IO"
-    pio = getstdin
-    perl6io = perl6ioclass.'new'("PIO" => pio)
-    set_hll_global "$IN", perl6io
-    pio = getstdout
-    perl6io = perl6ioclass.'new'("PIO" => pio)
-    set_hll_global "$OUT", perl6io
-    pio = getstderr
-    perl6io = perl6ioclass.'new'("PIO" => pio)
-    set_hll_global "$ERR", perl6io
-
     ##  create @ARGS global.  We could possibly use the args pmc
     ##  coming directly from Parrot, but currently Parrot provides
     ##  it as a ResizableStringArray and we need Undefs for
@@ -183,7 +169,7 @@ to the Perl 6 compiler.
     set_hll_global '@ARGS', args
 
     $P0 = compreg 'Perl6'
-    $P1 = $P0.'command_line'(args)
+    $P1 = $P0.'command_line'(args, 'encoding'=>'utf8', 'transcode'=>'iso-8859-1')
 
     .include 'iterator.pasm'
     .local pmc iter

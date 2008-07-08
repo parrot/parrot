@@ -455,15 +455,22 @@ tree as a PIR code object that can be compiled.
     .local pmc exp0
     exp0 = self[0]
 
-    .local int min, max
+    .local int backtrack, min, max
+    backtrack = self['backtrack']
     min = self['min']
     max = self['max']
-    if min != max goto reduce_exp0
-    if min != 1 goto reduce_exp0
-    $I0 = self['backtrack']
-    exp0['backtrack'] = $I0
+    if max != 1 goto reduce_exp0
+    if min != max goto reduce_max1
+    exp0['backtrack'] = backtrack
     exp0 = exp0.reduce(next)
     .return (exp0)
+
+  reduce_max1:
+    ##  special case of 0..1?: node
+    if backtrack != PGE_BACKTRACK_NONE goto reduce_exp0
+    $I0 = exists exp0['backtrack']
+    if $I0 goto reduce_exp0
+    exp0['backtrack'] = backtrack
 
   reduce_exp0:
     exp0 = exp0.reduce(next)
@@ -1106,21 +1113,28 @@ tree as a PIR code object that can be compiled.
     max = quant['max']
     backtrack = quant['backtrack']
 
-    .local string token, negstr
-    .local int cclass, negate
+    ##  output initial label
+    code.'emit'("        %L: # cclass %0 %Q", self, args :flat :named)
 
-    token = self
+    .local int cclass, negate
     cclass = self['cclass']
     negate = self['negate']
+    if cclass == .CCLASS_ANY goto emit_dot
+    .local string negstr
     negstr = '_not'
-    if negate == 0 goto emit_pir
+    if negate == 0 goto emit_find
     negstr = ''
+  emit_find:
+    code.emit(<<"        CODE", negstr, cclass)
+          $I0 = find%0_cclass %1, target, pos, lastpos
+          rep = $I0 - pos
+        CODE
+    goto emit_pir
+  emit_dot:
+    code.emit("          rep = lastpos - pos")
 
   emit_pir:
-    code.emit(<<"        CODE", token, negstr, cclass, args :flat :named)
-        %L: # cclass %0 %Q
-          $I0 = find%1_cclass %2, target, pos, lastpos
-          rep = $I0 - pos
+    code.emit(<<"        CODE", args :flat :named)
           %Mif rep < %m goto fail
           %Nif rep <= %n goto %L_1
           %Nrep = %n

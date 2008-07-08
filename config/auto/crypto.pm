@@ -79,7 +79,7 @@ sub runstep {
 sub _evaluate_cc_run {
     my $self = shift;
     my ($conf, $test, $has_crypto, $verbose) = @_;
-    if ( $test =~ m/^OpenSSL (\d\.\d\.\d\w)/ ) {
+    if ( $test =~ m/^OpenSSL (\d\.\d\.\d\w?)/ ) {
         my $version = $1;
         $has_crypto = 1;
         $conf->data->set( openssl_version => $version );

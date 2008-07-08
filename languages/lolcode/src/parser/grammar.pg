@@ -9,9 +9,9 @@ This is the grammar for lolcode written as a sequence of Perl 6 rules.
 grammar lolcode::Grammar is PCT::Grammar;
 
 rule TOP {
-    'HAI' <version> <statement_terminator>
+    ['HAI' <version> <statement_terminator>]?
     <block>
-    'KTHXBYE' <statement_terminator>
+    ['KTHXBYE' <statement_terminator>]?
     [ $ || <panic: 'Syntax error'> ]
     {*}
 }
@@ -29,8 +29,13 @@ rule statement {
 token statement_terminator { [ ',' | \n+ | $ ] }
 
 rule declare {
-    'I' 'HAS' 'A' <variable> [ 'ITZ' <expression> ]?
+    'I' 'HAS' 'A' <scope>? <variable> [ 'ITZ' <expression> ]?
     {*}
+}
+
+token scope {
+    | 'FARAWAY'
+    | 'NEARBY'
 }
 
 rule assign {
@@ -41,9 +46,10 @@ rule function {
     # $<parameters> is only getting the first parameter, not all of them
     # like I'd expect...
     'HOW' 'DUZ' 'I' <variable> ['YR' $<parameters>=<variable> [ 'AN' 'YR' $<parameters>=<variable>]* ]?<statement_terminator>
+    {*}                         #= params
     <block>
     'IF' 'U' 'SAY' 'SO'
-    {*}
+    {*}                         #= block
 }
 
 rule ifthen {
@@ -78,7 +84,9 @@ rule switch {
 }
 
 rule block {
-    [<statement> <statement_terminator>]* {*}
+    {*}                                          #= open
+    [<statement> <statement_terminator>]*
+    {*}                                          #= close
 }
 
 rule parameters {
@@ -118,7 +126,7 @@ token keyword {
     [ 'YR' | 'YA' | 'WTF?' | 'WIN' | 'WAI' | 'U' | 'SO'
     | 'SAY' | 'RLY?' | 'RLY' | 'R' 
     | 'OMGWTF' | 'OMG' | 'OIC' | 'OF' | 'O' | 'NO' | 'MKAY' | 'MEBBE' | 'KTHXBYE'
-    | 'ITZ' | 'IF' | 'I' | 'HOW' | 'HAS' | 'GTFO' | 'FOUND' | 'FAIL' 
+    | 'ITZ' | 'IF' | 'I' | 'HOW' | 'HAS' | 'GTFO' | 'FOUND' | 'FARAWAY' | 'FAIL' 
     | 'AN' | 'A' ] >>
 }
 

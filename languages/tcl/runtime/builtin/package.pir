@@ -3,7 +3,7 @@
 =cut
 
 .HLL 'Tcl', ''
-.namespace
+.namespace []
 
 # RT#40707: Stub
 # help tcltest compile

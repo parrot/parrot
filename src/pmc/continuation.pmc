@@ -241,136 +241,13 @@ destination to continue execution.
     VTABLE opcode_t *invoke(void *next) {
         Parrot_cont      *cc           = PMC_cont(SELF);
         Stack_Chunk_t    *stack_target = cc->dynamic_state;
-        int               stack_delta  = 0;
         parrot_context_t *from_ctx     = CONTEXT(interp);
         parrot_context_t *to_ctx       = cc->to_ctx;
         opcode_t         *pc           = cc->address;
-        Stack_Chunk_t    *corresponding_target;
 
-        int exception_continuation_p
-            = VTABLE_isa(INTERP, SELF, CONST_STRING(INTERP, "Exception_Handler"));
-        int ret_continuation_p
-            = VTABLE_isa(INTERP, SELF, CONST_STRING(INTERP, "RetContinuation"));
-
-        if (interp->current_runloop_id != cc->runloop_id
-            /* it's ok if we are exiting to "runloop 0"; there is no such
-               runloop, but the only continuation that thinks it came from
-               runloop 0 is for the return from the initial sub call. */
-            && cc->runloop_id != 0
-            /* since a RetContinuation [currently] only returns to the next
-               outer frame, exiting to the inner run loop does the right thing,
-               since it normally returns to the next outer runloop anyway.  */
-            && ! ret_continuation_p) {
-            fprintf(stderr, "[oops; continuation %p of type %d "
-                    "is trying to jump from runloop %d to runloop %d]\n",
-                    (void *) SELF, (int) SELF->vtable->base_type,
-                    interp->current_runloop_id, cc->runloop_id);
-        }
-#if CTX_LEAK_DEBUG
-        if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
-            fprintf(stderr,
-                    "[invoke cont    %p, to_ctx %p, from_ctx %p (refs %d)]\n",
-                    (void *) SELF, (void *) to_ctx, (void *) from_ctx, (int) from_ctx->ref_count);
-        }
-#endif
-        if (! to_ctx)
-            real_exception(interp, NULL, INVALID_OPERATION,
-                           "Continuation invoked after deactivation.");
-        if (! stack_target)
-            real_exception(interp, NULL, INVALID_OPERATION,
-                           "Continuation invoked without initialization.");
-
-        /* Rewind the dynamic environment. */
-        if (interp->dynamic_env != stack_target) {
-            /* compute the "stack delta", which is a measure of how much
-               unwinding we have to do.  if negative, we have to pop that many
-               entries; if positive, we are going back up the stack.
-               [bug: this is not true rewinding.  -- rgr, 30-Sep-06.]
-            */
-            stack_delta
-                = ((int) stack_height(interp, stack_target) -
-                   (int) stack_height(interp, interp->dynamic_env));
-        }
-
-        /* descend down the target stack until we get to the same depth. */
-        corresponding_target = stack_target;
-
-        while (stack_delta > 0) {
-            corresponding_target = corresponding_target->prev;
-            stack_delta--;
-        }
-
-        /* both stacks are now at the same depth.  pop from both until we reach
-           their common ancestor. */
-        while (interp->dynamic_env != corresponding_target) {
-            PMC           *cleanup_sub = NULL;
-            Stack_Entry_t *e;
-
-            if (! interp->dynamic_env)
-                real_exception(interp, NULL, 1, "Control stack damaged");
-
-            e = stack_entry(interp, interp->dynamic_env, 0);
-
-            if (!e)
-                real_exception(interp, NULL, 1, "Control stack damaged");
-
-            if (e->entry_type == STACK_ENTRY_ACTION) {
-                /*
-                 * Disable automatic cleanup routine execution in stack_pop so
-                 * that we can run the action subroutine manually.  This is
-                 * because we have to run the sub AFTER it has been popped, lest
-                 * a new error in the sub cause an infinite loop when invoking
-                 * an error handler.
-                 */
-                cleanup_sub = UVal_pmc(e->entry);
-                e->cleanup  = STACK_CLEANUP_NULL;
-            }
-
-            (void)stack_pop(INTERP, &interp->dynamic_env,
-                            NULL, NO_STACK_ENTRY_TYPE);
-
-            /* Now it's safe to run. */
-            if (cleanup_sub)
-                Parrot_runops_fromc_args(interp, cleanup_sub,
-                                         "vI", exception_continuation_p);
-
-            /* Keep corresponding_target in sync.  If stack_delta is negative,
-             * then dynamic_env is still above it; otherwise, we must step
-             * corresponding_target backwards as well.
-             */
-            if (stack_delta < 0)
-                stack_delta++;
-            else {
-                Stack_Chunk_t *prev  = corresponding_target->prev;
-                (void)stack_pop(INTERP, &corresponding_target, NULL,
-                        NO_STACK_ENTRY_TYPE);
-                corresponding_target = prev;
-            }
-        }
-
-        /* run back up the target stack to our destination.  [when we support
-           dynamic binding (e.g.), we will have to traverse back up, and will
-           therefore need to keep track on the way down.  -- rgr, 30-Sep-06.] */
-        interp->dynamic_env->refcount--;
-        interp->dynamic_env = stack_target;
-
-        /* debug print before context is switched */
-        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
-            PMC *sub = to_ctx->current_sub;
-
-            PIO_eprintf(INTERP, "# Back in sub '%Ss', env %p\n",
-                        Parrot_full_sub_name(INTERP, sub),
-                        interp->dynamic_env);
-        }
-
-        /* set context */
-        CONTEXT(interp)      = to_ctx;
-        INTERP->ctx.bp       = to_ctx->bp;
-        INTERP->ctx.bp_ps    = to_ctx->bp_ps;
-
-        /* RetContinuation arg passing is handled elsewhere. */
-        if (ret_continuation_p)
-            return pc;
+        Parrot_continuation_runloop_check(interp, SELF, cc);
+        Parrot_continuation_check(interp, SELF, cc);
+        Parrot_continuation_rewind_environment(interp, SELF, cc);
 
         /* pass args to where caller wants result */
         if (cc->current_results)
@@ -388,10 +265,10 @@ destination to continue execution.
             opcode_t *dest_indexes = to_ctx->current_results;
             interp->current_args   = NULL;
 
-            Parrot_block_DOD(INTERP);
+            Parrot_block_GC_mark(INTERP);
             parrot_pass_args(INTERP, from_ctx, to_ctx,
                              src_indexes, dest_indexes, PARROT_PASS_PARAMS);
-            Parrot_unblock_DOD(INTERP);
+            Parrot_unblock_GC_mark(INTERP);
         }
 
         /* switch segment */

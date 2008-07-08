@@ -14,26 +14,38 @@ Stolen from Rakudo
 .namespace ['CardinalArray']
 
 .sub 'onload' :anon :load :init
-    $P0 = subclass 'ResizablePMCArray', 'CardinalArray'
-    #$P1 = get_hll_global 'Any'
-    #$P1 = $P1.HOW()
-    #addparent $P0, $P1
-    $P1 = get_hll_global ['CardinalObject'], 'make_proto'
-    $P1($P0, 'CardinalArray')
+    .local pmc cardinalmeta, arrayproto
+    cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
+    arrayproto = cardinalmeta.'new_class'('CardinalArray', 'parent'=>'ResizablePMCArray CardinalObject')
+    cardinalmeta.'register'('ResizablePMCArray', 'parent'=>'CardinalObject', 'protoobject'=>arrayproto)
 .end
 
 
 =item get_string()    (vtable method)
 
-Return the elements of the list joined by spaces.
+Return the elements of the list concatenated.
 
 =cut
 
 .sub 'get_string' :vtable :method
-    $S0 = join ' ', self
+    $S0 = join ', ', self
+    $S0 = concat '[', $S0
+    $S0 = concat $S0, ']'
     .return ($S0)
 .end
 
+=item to_s()    (method)
+
+Return a CardinalString representing the Array.
+
+=cut
+
+.sub 'to_s' :method
+    $S0 = self.get_string()
+    $P0 = new 'CardinalString'
+    $P0 = $S0
+    .return($P0)
+.end
 
 =item clone()    (vtable method)
 
@@ -551,6 +563,41 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
     .return(retv)
 .end
 
+
+=item each(block)
+
+Run C<block> once for each item in C<self>, with the item passed as an arg.
+
+=cut
+
+.sub 'each' :method
+    .param pmc block
+    $P0 = new 'Iterator', self
+  each_loop:
+    unless $P0 goto each_loop_end
+    $P1 = shift $P0
+    block($P1)
+    goto each_loop
+  each_loop_end:
+.end
+
+
+.sub '[]' :method
+    .param pmc i
+    $P0 = self[i]
+    .return($P0)
+.end
+
+.sub '[]=' :method
+    .param pmc k
+    .param pmc v
+    self[k] = v
+    .return()
+.end
+
+
+
+
 =back
 
 =head1 Functions
@@ -563,7 +610,7 @@ Build a CardinalArray from its arguments.
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'list'
     .param pmc args            :slurpy
@@ -574,8 +621,8 @@ Build a CardinalArray from its arguments.
     item = shift args
     $I0 = defined item
     unless $I0 goto add_item
-    # $I0 = isa item, 'CardinalArray'
-    # if $I0 goto add_item
+    $I0 = isa item, 'CardinalArray'
+    if $I0 goto add_item
     $I0 = does item, 'array'
     unless $I0 goto add_item
     splice args, item, 0, 0

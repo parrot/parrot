@@ -51,12 +51,13 @@ As you might guess, the C<.namespace> directive tells Parrot
 what namespace to group subroutines under.  A namespace ends when
 another C<.namespace> directive changes the namespace or when
 the end of the file is reached. A bare C<.namespace> directive
-(i.e., with no name following it) changes back to the default
+(i.e., with no names in the brackets) changes back to the default
 namespace.
 
 Perl programmers will recognize that Parrot
 C<.namespace> declarations are just like Perl C<package>
-declarations. But there are a few differences. I'll
+declarations, albeit with different syntax.
+But there are a few other differences. I'll
 talk more about how Parrot uses namespaces and classes
 together in just a minute.
 
@@ -64,8 +65,8 @@ together in just a minute.
 
 Creating classes in Parrot is relatively easy. There are
 opcodes for it. The easiest to start with is C<newclass>;
-just say C<$P0 = newclass 'Foo'> where $P0 can be any PMC
-thing (a register or a local variable) and 'Foo' is the name
+just say C<$P0 = newclass 'Foo'> where $P0 is a PMC
+register, and 'Foo' is the name
 of the class you want to create.
 
 When you wish to instantiate objects that belong to the class
@@ -118,7 +119,7 @@ read L<perlboot>.
         print "Oink\n"
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Cow"
@@ -161,7 +162,7 @@ method name.
         print "bar\n"
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Foo"
@@ -218,7 +219,7 @@ same for the rest):
         print "woof"
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Dog"
@@ -374,7 +375,7 @@ Jonathan Scott Duff
         .return( "oink" )
     .end
 
-    .namespace
+    .namespace []
 
     .sub _ :main
         $P0 = newclass "Animal"

@@ -185,10 +185,10 @@ static void help(void)
 }
 
 static struct longopt_opt_decl options[] = {
-    { 'h', 'h', 0,       { "--header-only" } },
-    { '?', '?', 0, { "--help" } },
-    { 't', 't', 0, { "--terse" } },
-    { 'd', 'd', 0, { "--disassemble" } },
+    { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
+    { '?', '?', OPTION_optional_FLAG, { "--help" } },
+    { 't', 't', OPTION_optional_FLAG, { "--terse" } },
+    { 'd', 'd', OPTION_optional_FLAG, { "--disassemble" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } }
 };
 

@@ -21,10 +21,10 @@ Stolen from Rakudo
 .include 'cclass.pasm'
 
 .sub 'onload' :anon :init :load
-    $P0 = subclass 'String', 'CardinalString'
-    $P1 = get_hll_global ['CardinalObject'], 'make_proto'
-    $P1('String', 'CardinalString')
-    #$P1('CardinalString', 'Str')
+    .local pmc cardinalmeta, strproto
+    cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
+    strproto = cardinalmeta.'new_class'('CardinalString', 'parent'=>'String CardinalObject')
+    cardinalmeta.'register'('CardinalString', 'parent'=>'CardinalObject', 'protoobject'=>strproto)
 .end
 
 
@@ -229,6 +229,18 @@ Returns a Perl representation of the Str.
     .return ($S0)
 .end
 
+=item to_s()
+
+Returns self
+
+=cut
+
+.sub 'to_s' :method
+    $P0 = new 'CardinalString'
+    $P0 = self
+    .return ($P0)
+.end
+
 =back
 
 =head1 Functions
@@ -237,7 +249,7 @@ Returns a Perl representation of the Str.
 
 =cut
 
-.namespace
+.namespace []
 
 .include 'cclass.pasm'
 

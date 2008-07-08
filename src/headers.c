@@ -85,7 +85,9 @@ static int sweep_cb_pmc(PARROT_INTERP,
 
 =item C<static void * get_free_buffer>
 
-Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
+Gets a free object or buffer from the given C<pool> and returns it.
+If the object is larger then a starndard C<PObj> structure, all
+additional memory is cleared.
 
 =cut
 
@@ -118,7 +120,7 @@ get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
 
 =item C<Small_Object_Pool * new_pmc_pool>
 
-Creates an new pool for PMCs and returns it.
+Creates and initializes a new pool for PMCs and returns it.
 
 =cut
 
@@ -144,8 +146,8 @@ new_pmc_pool(PARROT_INTERP)
 
 =item C<Small_Object_Pool * new_bufferlike_pool>
 
-Creates a new pool for buffer-like structures. Usually you would need
-C<make_bufferlike_pool()>.
+Creates a new pool for buffer-like structures. This is called from
+C<make_bufferlike_pool()>, and should probably not be called directly.
 
 =cut
 
@@ -172,7 +174,10 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 
 =item C<Small_Object_Pool * new_buffer_pool>
 
-Non-constant strings and plain Buffers are in the sized header pools.
+Creates a new C<Small_Object_Pool> structure for managing buffer objects.
+
+Non-constant strings and plain Buffers are stored in the sized header
+pools.
 
 =cut
 
@@ -198,7 +203,9 @@ new_buffer_pool(PARROT_INTERP)
 
 =item C<Small_Object_Pool * new_string_pool>
 
-Creates a new pool for C<STRINGS> and returns it.
+Creates a new pool for C<STRINGS> and returns it. This calls
+C<make_bufferlike_pool> internally, which in turn calls
+C<new_bufferlike_pool>.
 
 =cut
 
@@ -226,7 +233,9 @@ new_string_pool(PARROT_INTERP, INTVAL constant)
 
 =item C<Small_Object_Pool * make_bufferlike_pool>
 
-Make and return a bufferlike header pool.
+Make and return a bufferlike header pool for objects of a given size. If
+a pool for objects of that size already exists no new pool will be
+created, and the pointer to the existing pool is returned.
 
 =cut
 
@@ -246,6 +255,10 @@ make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
     /* Expand the array of sized resource pools, if necessary */
     if (num_old <= idx) {
         const UINTVAL num_new = idx + 1;
+        /* XXX: use mem_sys_realloc_zeroed to do this easier? If we want the
+                same debugging behavior as mem_internal_realloc, we would
+                need to add a new function/macro for
+                mem_internal_realloc_zeroed, to mirror mem_sys_realloc_zeroed. */
         sized_pools = (Small_Object_Pool **)mem_internal_realloc(sized_pools,
                                            num_new * sizeof (void *));
         memset(sized_pools + num_old, 0, sizeof (void *) * (num_new - num_old));
@@ -265,7 +278,9 @@ make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 
 =item C<Small_Object_Pool * get_bufferlike_pool>
 
-Return a bufferlike header pool, it must exist.
+Returns a bufferlike header pool for objects of a given size. Does
+not check to see if the pool already exists, so if the pool is
+non-existant, this will return an invalid pointer.
 
 =cut
 
@@ -286,7 +301,10 @@ get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 
 =item C<PMC * new_pmc_header>
 
-Get a header.
+Gets a new PMC header from the PMC pool's free list. Guaranteed to
+return a valid PMC object or else Parrot will panic. Set's the
+necessary flags for the objects and initializes the PMC data pointer
+to C<NULL>.
 
 =cut
 
@@ -329,7 +347,9 @@ new_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 =item C<static PMC_EXT * new_pmc_ext>
 
-Creates a new C<PMC_EXT> and returns it.
+Gets a new free C<PMC_EXT> structure from the PMC_EXT pool. A pointer to
+the new PMC_EXT is returned. Does not check to ensure the PMC_EXT is
+non-null before it is returned (yet).
 
 =cut
 
@@ -341,6 +361,8 @@ static PMC_EXT *
 new_pmc_ext(PARROT_INTERP)
 {
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
+    /* XXX: Should we check here to ensure the PMC_EXT is non-null
+            like we do in C<new_pmc>? */
     return (PMC_EXT *)pool->get_free_object(interp, pool);
 }
 
@@ -348,7 +370,9 @@ new_pmc_ext(PARROT_INTERP)
 
 =item C<void add_pmc_ext>
 
-Adds a new C<PMC_EXT> to C<pmc>.
+Obtains a new C<PMC_EXT> structure, and attaches it to the given C<PMC>.
+Sets the necessary flags associated with the PMC_EXT structure. Ensures
+that the PMC_EXT structure is marked as "alive" by the GC.
 
 =cut
 
@@ -375,7 +399,9 @@ add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<void add_pmc_sync>
 
-Adds a PMC_sync field to C<pmc>.
+Adds a C<Sync*> structure to the given C<PMC>. Initializes the PMC's owner
+field and the synchronization mutext. Does not check to ensure the C<Sync*>
+is non-null.
 
 =cut
 
@@ -387,6 +413,8 @@ add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
         add_pmc_ext(interp, pmc);
     }
+    /* XXX: Should we test the Sync* for non-null? should we allocate these
+            from a bufferlike pool instead of directly from the system? */
     PMC_sync(pmc) = (Sync *)mem_internal_allocate(sizeof (*PMC_sync(pmc)));
     PMC_sync(pmc)->owner = interp;
     MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
@@ -396,7 +424,10 @@ add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<STRING * new_string_header>
 
-Returns a new C<STRING> header.
+Returns a new C<STRING> structure from the string pool or the constant
+string pool. Sets default flags on the string object:
+C<PObj_is_string_FLAG>, C<PObj_is_COWable_FLAG>, and C<PObj_live_FLAG>
+(for GC). Initializes the data field of the string buffer to C<NULL>.
 
 =cut
 
@@ -424,7 +455,9 @@ new_string_header(PARROT_INTERP, UINTVAL flags)
 
 =item C<Buffer * new_buffer_header>
 
-Creates and returns a new C<Buffer>.
+Creates and returns a new C<Buffer> from the buffer header pool. Does
+not check that the pointer is non-null. Calls C<get_free_buffer> to do
+all the work.
 
 =cut
 
@@ -444,7 +477,8 @@ new_buffer_header(PARROT_INTERP)
 
 =item C<void * new_bufferlike_header>
 
-Creates and returns a new buffer-like header.
+Returns a new buffer-like header from the appropriate sized pool. Does
+not check to ensure the header is non-null.
 
 =cut
 
@@ -464,7 +498,12 @@ new_bufferlike_header(PARROT_INTERP, size_t size)
 
 =item C<size_t get_max_buffer_address>
 
-Calculates the maximum buffer address and returns it.
+Calculates the maximum buffer address and returns it. This is done by
+looping through all the sized pools, and finding the pool whose
+C<end_arena_memory> field is the highest. Notice that arenas in each
+pool are not necessarily located directly next to each other in memory,
+and the last arena in the pool's list may not be located at the highest
+memory address.
 
 =cut
 
@@ -480,7 +519,7 @@ get_max_buffer_address(PARROT_INTERP)
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i]) {
-            if (arena_base-> sized_header_pools[i]->end_arena_memory > max)
+            if (arena_base->sized_header_pools[i]->end_arena_memory > max)
                 max = arena_base->sized_header_pools[i]->end_arena_memory;
         }
     }
@@ -492,7 +531,12 @@ get_max_buffer_address(PARROT_INTERP)
 
 =item C<size_t get_min_buffer_address>
 
-Calculates the minimum buffer address and returns it.
+Calculates the minimum buffer address and returns it. Loops through
+all sized pools, and finds the one with the smallest
+C<start_arena_memory> field. Notice that the memory region between
+C<get_min_buffer_address> and C<get_max_buffer_address> may be
+fragmented, and parts of it may not be available for Parrot to use
+directly (such as bookkeeping data for the OS memory manager).
 
 =cut
 
@@ -520,7 +564,7 @@ get_min_buffer_address(PARROT_INTERP)
 
 =item C<size_t get_max_pmc_address>
 
-Calculates the maximum PMC address and returns it.
+Returns the maximum memory address used by the C<pmc_pool>.
 
 =cut
 
@@ -537,7 +581,10 @@ get_max_pmc_address(PARROT_INTERP)
 
 =item C<size_t get_min_pmc_address>
 
-Calculates the maximum PMC address and returns it.
+Returns the minimum memory address used by the C<pmc_pool>. Notice that
+the memory region between C<get_min_pmc_address> and
+C<get_max_pmc_address> may be fragmented, and not all of it may be
+used directly by Parrot for storing PMCs.
 
 =cut
 
@@ -554,7 +601,8 @@ get_min_pmc_address(PARROT_INTERP)
 
 =item C<int is_buffer_ptr>
 
-Checks that C<ptr> is actually a C<Buffer>.
+Checks whether the given C<ptr> is located within one of the sized
+header pools. Returns C<1> if it is, and C<0> if not.
 
 =cut
 
@@ -580,7 +628,8 @@ is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
 =item C<int is_pmc_ptr>
 
-Checks that C<ptr> is actually a PMC.
+Checks that C<ptr> is actually a PMC pointer. Returns C<1> if it is,
+returns C<0> otherwise.
 
 =cut
 
@@ -598,7 +647,12 @@ is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
 =item C<void Parrot_initialize_header_pools>
 
-Initialize the pools for the tracked resources.
+The initialization routine for the interpreter's header pools. Initializes
+pools for string headers, constant string headers, buffers, PMCs,
+PMC_EXTs, and constant PMCs.
+
+The C<string_header_pool> and C<buffer_header_pool> are actually both in
+the sized pools, although no other sized pools are created here.
 
 =cut
 
@@ -633,6 +687,8 @@ Parrot_initialize_header_pools(PARROT_INTERP)
     /* pmc extension buffer */
     arena_base->pmc_ext_pool =
         new_small_object_pool(sizeof (PMC_EXT), 1024);
+
+#if PARROT_GC_MS
     /*
      * pmc_ext isn't a managed item. If a PMC has a pmc_ext structure
      * it is returned to the pool instantly - the structure is never
@@ -640,6 +696,9 @@ Parrot_initialize_header_pools(PARROT_INTERP)
      * Use GS MS pool functions
      */
     gc_pmc_ext_pool_init(arena_base->pmc_ext_pool);
+#else
+    /* rational, consistant behavior (as yet unwritten) */
+#endif
     arena_base->pmc_ext_pool->name = "pmc_ext";
 
     /* constant PMCs */
@@ -653,8 +712,11 @@ Parrot_initialize_header_pools(PARROT_INTERP)
 
 =item C<int Parrot_forall_header_pools>
 
-Iterate through all header pools by calling the passed function. Returns
-zero if the iteration didn't stop or the returned value.
+Iterates through header pools, invoking the given callback function
+on each pool in the list matching the given criteria. Determines
+which pools to iterate over depending on flags passed to the function.
+Returns the callback's return value, if non-zero. A non-zero return
+value from the callback function will terminate the iteration prematurely.
 
 =over 4
 
@@ -665,7 +727,10 @@ zero if the iteration didn't stop or the returned value.
   POOL_CONST
   POOL_ALL
 
-Only matching pools will be used.
+Only matching pools will be used. Notice that it is not possible to iterate
+over certain sets of pools using the provided flags in the single pass. For
+instance, both the PMC pool and the constant PMC pool cannot be iterated
+over in a single pass.
 
 =item arg
 
@@ -673,7 +738,7 @@ This argument is passed on to the iteration function.
 
 =item pool_iter_fn
 
-It is called with C<Interp*, Small_Object_Pool *, int flag, void *arg)>
+It is called with C<(Interp*, Small_Object_Pool *, int flag, void *arg)>
 If the function returns a non-zero value iteration will stop.
 
 =back
@@ -732,7 +797,9 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
 
 =item C<static void free_pool>
 
-Loops backwards through the provided pool, freeing all of its arenas.
+Frees a pool and all of it's arenas. Loops through the list of arenas
+backwards and returns each to the memory manager. Then, it frees the
+pool structure itself.
 
 =cut
 
@@ -756,7 +823,9 @@ free_pool(ARGMOD(Small_Object_Pool *pool))
 
 =item C<static int sweep_cb_buf>
 
-Sweeps and frees the provided pool.  Returns 0.
+Performs a final garbage collection sweep, and then frees the pool. Calls
+C<Parrot_dod_sweep> to perform the sweep, and C<free_pool> to free the
+pool and all it's arenas.
 
 =cut
 
@@ -788,7 +857,9 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
 
 =item C<static int sweep_cb_pmc>
 
-Sweeps and frees a memory pool.  Returns 0.
+Performs a garbage collection sweep of the given pmc pool, and then frees
+it. Calls C<Parrot_dod_sweep> to perform the sweep, and C<free_pool> to
+free the pool and all it's arenas. Always returns C<0>.
 
 =cut
 
@@ -807,7 +878,10 @@ sweep_cb_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 
 =item C<void Parrot_destroy_header_pools>
 
-Destroys the header pools.
+Performs a garbage collection sweep on all pools, and then frees them.
+Calls C<Parrot_forall_header_pools> to loop over all the pools, passing
+C<sweep_cb_pmc> and C<sweep_cb_buf> callback routines. Frees the array
+of sized header pointers in the C<Arenas> structure too.
 
 =cut
 
@@ -859,33 +933,25 @@ transferring their sync values to the destionation interpreter.
 static void
 fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
 {
-    /* XXX largely copied from dod_sweep */
     Small_Object_Arena *cur_arena;
     const UINTVAL object_size = pool->object_size;
 
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
-        Buffer *b = (Buffer *)cur_arena->start_objects;
+        PMC * p = (PMC *)((char*)cur_arena->start_objects + GC_HEADER_SIZE);
         size_t i;
 
         for (i = 0; i < cur_arena->used; i++) {
-            if (PObj_on_free_list_TEST(b))
-                ; /* if it's on free list, do nothing */
-            else {
-                if (PObj_is_PMC_TEST(b)) {
-                    PMC * const p = (PMC *)b;
-                    if (PObj_is_PMC_shared_TEST(p)) {
-                        PMC_sync(p)->owner = dest_interp;
-                    }
-                    else {
-                        /* fprintf(stderr, "BAD PMC: address=%p,
-                                   base_type=%d\n",
-                                   p, p->vtable->base_type); */
-                        PARROT_ASSERT(0);
-                    }
-                }
+            if (!PObj_on_free_list_TEST(p) && PObj_is_PMC_TEST(p)) {
+                if (PObj_is_PMC_shared_TEST(p))
+                    PMC_sync(p)->owner = dest_interp;
+                else
+                    real_exception(dest_interp, NULL, INTERP_ERROR,
+                        "Unshared PMC still alive after interpreter \
+                        destruction. address=%p, base_type=%d\n",
+                        p, p->vtable->base_type);
             }
 
-            b = (Buffer *)((char *)b + object_size);
+            p = (PMC *)((char *)p + object_size);
         }
     }
 }
@@ -949,7 +1015,8 @@ Parrot_merge_header_pools(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_inte
 
 =item C<void Parrot_initialize_header_pool_names>
 
-If we want these names, they must be added in DOD.
+UNUSED. Sets the C<name> parameter of the various header pools to a
+Parrot string structure for the name of the pool.
 
 =cut
 

@@ -67,7 +67,11 @@ sub generate_c_file {
     my $c      = $self->{emitter};
 
     $c->emit( dont_edit( $self->filename ) );
-    $c->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
+    if ($self->is_dynamic) {
+        $c->emit("#define PARROT_IN_EXTENSION\n");
+        $c->emit("#define CONST_STRING(i, s) const_string((i), s)\n");
+        $c->emit("#define CONST_STRING_GEN(i, s) const_string((i), s)\n");
+    }
 
     $self->gen_includes;
 
@@ -505,7 +509,7 @@ sub vtable_decl {
         NULL,       /* whoami */
         $vtbl_flag, /* flags */
         NULL,       /* provides_str */
-        NULL,       /* isa_str */
+        NULL,       /* isa_hash */
         NULL,       /* class */
         NULL,       /* mro */
         NULL,       /* ro_variant_vtable */
@@ -537,19 +541,19 @@ sub init_func {
     my $mmd_list = join( ",\n        ",
         map { "{ $_->[0], $_->[1], $_->[2], (funcptr_t) $_->[3] }" } @$mmds );
 
-    my $isa = join( " ", $classname, @{ $self->parents } );
-    $isa =~ s/\s?default$//;
+    my @isa = grep { $_ ne 'default' } @{ $self->parents };
 
     my $provides        = join( " ", keys( %{ $self->{flags}{provides} } ) );
     my $class_init_code = "";
 
-    $class_init_code    = $self->get_method('class_init')->body
-        if $self->has_method('class_init');
+    if ($self->has_method('class_init')) {
+        $class_init_code    = $self->get_method('class_init')->body;
 
-    $class_init_code =~ s/INTERP/interp/g;
+        $class_init_code =~ s/INTERP/interp/g;
 
-    # fix indenting
-    $class_init_code =~ s/^/        /mg;
+        # fix indenting
+        $class_init_code =~ s/^/        /mg;
+    }
 
     my %extra_vt;
     $extra_vt{ro} = $self->{ro} if $self->{ro};
@@ -580,6 +584,7 @@ EOC
     if (pass == 0) {
 EOC
     $cout .= <<"EOC";
+        Hash          *isa_hash;
         /* create vtable - clone it - we have to set a few items */
         VTABLE * const vt_clone        = Parrot_clone_vtable(interp,
                                              &temp_base_vtable);
@@ -597,25 +602,30 @@ EOC
         vt_clone->base_type    = entry;
         vt_clone->whoami       = string_make(interp, "$classname", @{[length($classname)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
-        vt_clone->isa_str      = string_make(interp, "$isa", @{[length($isa)]}, "ascii",
-            PObj_constant_FLAG|PObj_external_FLAG);
         vt_clone->provides_str = string_append(interp, vt_clone->provides_str,
             string_make(interp, " $provides", @{[length($provides) + 1]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG));
+
+        /* set up isa hash */
+        parrot_new_hash(interp, &isa_hash);
+        vt_clone->isa_hash     = isa_hash;
 EOC
     }
     else {
         $cout .= <<"EOC";
-        vt_clone->whoami       = CONST_STRING(interp, "$classname");
-        vt_clone->isa_str      = CONST_STRING(interp, "$isa");
-        vt_clone->provides_str = CONST_STRING(interp, "$provides");
+        vt_clone->whoami       = CONST_STRING_GEN(interp, "$classname");
+        vt_clone->provides_str = CONST_STRING_GEN(interp, "$provides");
+
+        /* set up isa hash */
+        parrot_new_hash(interp, &isa_hash);
+        vt_clone->isa_hash     = isa_hash;
 EOC
     }
+
     for my $k ( keys %extra_vt ) {
         $cout .= <<"EOC";
         vt_${k}_clone->base_type    = entry;
         vt_${k}_clone->whoami       = vt_clone->whoami;
-        vt_${k}_clone->isa_str      = vt_clone->isa_str;
         vt_${k}_clone->provides_str = vt_clone->provides_str;
 EOC
     }
@@ -624,12 +634,20 @@ EOC
         $cout .= <<"EOC";
         vt_clone->ro_variant_vtable    = vt_ro_clone;
         vt_ro_clone->ro_variant_vtable = vt_clone;
+        vt_ro_clone->isa_hash          = isa_hash;
 EOC
     }
 
     $cout .= <<"EOC";
         interp->vtables[entry]         = vt_clone;
 EOC
+
+    for my $isa ($classname, @isa) {
+        $cout .= <<"EOC";
+        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING_GEN(interp, "$isa")), PMCNULL);
+EOC
+    }
+
     $cout .= <<"EOC";
     }
     else { /* pass */
@@ -643,7 +661,7 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            const INTVAL pmc_id = Parrot_get_HLL_id( interp, const_string(interp, "$hll")
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll")
             );
             if (pmc_id > 0) {
 EOC
@@ -658,7 +676,27 @@ EOC
 EOC
     }
 
+        $cout .= <<"EOC";
+        {
+            PMC           *mro      = pmc_new(interp, enum_class_ResizableStringArray);
+            VTABLE * const vt_clone = interp->vtables[entry];
+
+            vt_clone->mro = mro;
+
+            if (vt_clone->ro_variant_vtable)
+                vt_clone->ro_variant_vtable->mro = mro;
+
+EOC
+
+    for my $isa ($classname, @isa) {
+        $cout .= <<"EOC";
+            VTABLE_push_string(interp, mro, CONST_STRING_GEN(interp, "$isa"));
+EOC
+    }
+
     $cout .= <<"EOC";
+        }
+
         /* setup MRO and _namespace */
         Parrot_create_mro(interp, entry);
 EOC
@@ -692,10 +730,8 @@ EOC
     }
 
     # include any class specific init code from the .pmc file
-    $cout .= <<"EOC";
-        /* class_init */
-EOC
     $cout .= <<"EOC" if $class_init_code;
+        /* class_init */
         {
 $class_init_code
         }

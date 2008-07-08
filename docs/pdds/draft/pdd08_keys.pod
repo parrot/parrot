@@ -285,7 +285,7 @@ variant vtable methods.
 
 =back
 
-=head2 REFERENCES
+=head1 REFERENCES
 
 To come.
 

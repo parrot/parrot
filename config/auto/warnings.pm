@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -44,13 +44,10 @@ sub _init {
         -W
         -Wall
         -Waggregate-return
-        -Wbad-function-cast
-        -Wc++-compat
         -Wcast-align
         -Wcast-qual
         -Wchar-subscripts
         -Wcomment
-        -Wdeclaration-after-statement
         -Wdisabled-optimization
         -Wendif-labels
         -Wextra
@@ -60,23 +57,15 @@ sub _init {
         -Wformat-security
         -Wformat-y2k
         -Wimplicit
-        -Wimplicit-function-declaration
-        -Wimplicit-int
         -Wimport
         -Winit-self
         -Winline
         -Winvalid-pch
         -Wlogical-op
-        -Wmain
         -Wmissing-braces
-        -Wmissing-declarations
         -Wmissing-field-initializers
         -Wno-missing-format-attribute
         -Wmissing-include-dirs
-        -Wmissing-prototypes
-        -Wnested-externs
-        -Wnonnull
-        -Wold-style-definition
         -Wpacked
         -Wparentheses
         -Wpointer-arith
@@ -86,7 +75,6 @@ sub _init {
         -Wsign-compare
         -Wstrict-aliasing
         -Wstrict-aliasing=2
-        -Wstrict-prototypes
         -Wswitch
         -Wswitch-default
         -Wtrigraphs
@@ -96,6 +84,20 @@ sub _init {
         -Wvariadic-macros
         -Wwrite-strings
         -Wnot-a-real-warning
+    );
+    my @potential_warnings_no_cpp = qw(
+        -Wbad-function-cast
+        -Wc++-compat
+        -Wdeclaration-after-statement
+        -Wimplicit-function-declaration
+        -Wimplicit-int
+        -Wmain
+        -Wmissing-declarations
+        -Wmissing-prototypes
+        -Wnested-externs
+        -Wnonnull
+        -Wold-style-definition
+        -Wstrict-prototypes
     );
 
     my @cage_warnings = qw(
@@ -133,8 +135,10 @@ sub _init {
         -Wunused-macros
     );
 
-    $data{potential_warnings} = \@potential_warnings;
-    $data{cage_warnings} = \@cage_warnings;
+    $data{potential_warnings}        = \@potential_warnings;
+    $data{potential_warnings_no_cpp} = \@potential_warnings_no_cpp;
+    $data{cage_warnings}             = \@cage_warnings;
+
     return \%data;
 }
 
@@ -145,6 +149,9 @@ sub runstep {
     print "\n" if $verbose;
     if ( defined $conf->data->get('gccversion') ) {
 
+        # Dirty way of checking if compiling with c++
+        my $nocpp = index($conf->data->get('cc'), '++') < 0;
+
         # add on some extra warnings if requested
         $self->_add_cage_warnings($conf);
         $self->_add_maintainer_warnings($conf);
@@ -153,7 +160,18 @@ sub runstep {
         for my $maybe_warning (@{ $self->{potential_warnings} }) {
             $self->try_warning( $conf, $maybe_warning, $verbose );
         }
-        $self->set_result("set for gcc");
+        if ($nocpp) {
+            for my $maybe_warning (@{ $self->{potential_warnings_no_cpp} }) {
+                $self->try_warning( $conf, $maybe_warning, $verbose );
+            }
+        }
+
+        if ($nocpp) {
+           $self->set_result("set for gcc");
+        }
+        else {
+           $self->set_result("set for g++");
+        }
     }
     else {
         print "Currently we only set warnings if using gcc as C compiler\n"

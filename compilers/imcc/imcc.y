@@ -536,6 +536,7 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN(const char *name))
     /* chain all names in r->reg */
     n->reg = r->reg;
     r->reg = n;
+    r->use_count++;
 }
 
 static void
@@ -568,8 +569,8 @@ add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *n
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
-    add_pcc_param(cur_call, r);
-    add_pcc_param(cur_call, value);
+    add_pcc_arg(cur_call, r);
+    add_pcc_arg(cur_call, value);
 }
 
 static void
@@ -579,8 +580,8 @@ add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
-    add_pcc_return(cur_call, r);
-    add_pcc_return(cur_call, value);
+    add_pcc_result(cur_call, r);
+    add_pcc_result(cur_call, value);
 }
 
 /* XXX Can name be consted? */
@@ -638,7 +639,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
-%token <t> MULTI VTABLE_METHOD LOADLIB
+%token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUB_LEXID
 %token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -658,7 +659,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types outer
-%type <t> vtable
+%type <t> vtable instanceof lexid
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
 %type <i> if_statement unless_statement
 %type <i> func_assign get_results
@@ -850,6 +851,7 @@ pasm_inst:                     { clear_state(interp); }
            set_lexical(interp, r, $2);
            $$ = 0;
            mem_sys_free($2);
+           mem_sys_free($4);
          }
    | /* none */                { $$ = 0;}
    ;
@@ -893,6 +895,7 @@ class_namespace:
 
 maybe_ns:
      '[' keylist ']'           { $$ = $2; }
+   | '[' ']'                   { $$ = NULL; }
    |                           { $$ = NULL; }
    ;
 
@@ -921,7 +924,7 @@ sub_params:
                  IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_param(IMCC_INFO(interp)->cur_call, $2);
+               add_pcc_arg(IMCC_INFO(interp)->cur_call, $2);
          }
    ;
 
@@ -986,6 +989,23 @@ vtable:
            $$ = 0;
            IMCC_INFO(interp)->cur_unit->vtable_name = $3;
            IMCC_INFO(interp)->cur_unit->is_vtable_method = 1;
+         }
+   ;
+
+instanceof:
+     SUB_INSTANCE_OF '(' STRINGC ')'
+         {
+           $$ = 0;
+           IMCC_INFO(interp)->cur_unit->instance_of = mk_const(interp, $3, 'S');
+           mem_sys_free($3);
+         }
+   ;
+
+lexid:
+     SUB_LEXID '(' STRINGC ')'
+         {
+           $$ = 0;
+           IMCC_INFO(interp)->cur_unit->lexid = $3;
          }
    ;
 
@@ -1106,6 +1126,8 @@ proto:
    | multi
    | outer
    | vtable
+   | instanceof
+   | lexid
    ;
 
 pcc_call:
@@ -1222,12 +1244,12 @@ pcc_returns:
    | pcc_returns '\n'
          {
            if ($1)
-               add_pcc_return(IMCC_INFO(interp)->sr_return, $1);
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
          }
    | pcc_returns pcc_return '\n'
          {
            if ($2)
-               add_pcc_return(IMCC_INFO(interp)->sr_return, $2);
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $2);
          }
    ;
 
@@ -1263,7 +1285,7 @@ var_returns:
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_return(IMCC_INFO(interp)->sr_return, $1);
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
          }
    | STRINGC ADV_ARROW var
          {
@@ -1277,7 +1299,7 @@ var_returns:
                IMCC_INFO(interp)->adv_named_id = NULL;
              }
              else
-                 add_pcc_return(IMCC_INFO(interp)->sr_return, $3);
+                 add_pcc_result(IMCC_INFO(interp)->sr_return, $3);
          }
    | var_returns COMMA STRINGC ADV_ARROW var
          {
@@ -1377,8 +1399,8 @@ opt_unique_reg:
 labeled_inst:
      assignment
    | conditional_statement
-   | NAMESPACE IDENTIFIER      { push_namespace($2); mem_sys_free($2); }
-   | ENDNAMESPACE IDENTIFIER   { pop_namespace($2); mem_sys_free($2); }
+   | NAMESPACE IDENTIFIER      { push_namespace(interp, $2); mem_sys_free($2); }
+   | ENDNAMESPACE IDENTIFIER   { pop_namespace(interp, $2); mem_sys_free($2); }
    | LOCAL { is_def=1; } type id_list
          {
            IdList *l = $4;
@@ -1526,36 +1548,37 @@ assignment:
          }
    ;
 
+/* C++ hates implicit casts from string constants to char *, so be explicit */
 un_op:
-     '!'                       { $$ = "not"; }
-   | '~'                       { $$ = "bnot"; }
-   | '-'                       { $$ = "neg"; }
+     '!'                       { $$ = (char *)"not"; }
+   | '~'                       { $$ = (char *)"bnot"; }
+   | '-'                       { $$ = (char *)"neg"; }
    ;
 
 bin_op:
-     '-'                       { $$ = "sub"; }
-   | '+'                       { $$ = "add"; }
-   | '*'                       { $$ = "mul"; }
-   | '/'                       { $$ = "div"; }
-   | '%'                       { $$ = "mod"; }
-   | FDIV                      { $$ = "fdiv"; }
-   | POW                       { $$ = "pow"; }
-   | CONCAT                    { $$ = "concat"; }
-   | RELOP_EQ                  { $$ = "iseq"; }
-   | RELOP_NE                  { $$ = "isne"; }
-   | RELOP_GT                  { $$ = "isgt"; }
-   | RELOP_GTE                 { $$ = "isge"; }
-   | RELOP_LT                  { $$ = "islt"; }
-   | RELOP_LTE                 { $$ = "isle"; }
-   | SHIFT_LEFT                { $$ = "shl"; }
-   | SHIFT_RIGHT               { $$ = "shr"; }
-   | SHIFT_RIGHT_U             { $$ = "lsr"; }
-   | LOG_AND                   { $$ = "and"; }
-   | LOG_OR                    { $$ = "or"; }
-   | LOG_XOR                   { $$ = "xor"; }
-   | '&'                       { $$ = "band"; }
-   | '|'                       { $$ = "bor"; }
-   | '~'                       { $$ = "bxor"; }
+     '-'                       { $$ = (char *)"sub"; }
+   | '+'                       { $$ = (char *)"add"; }
+   | '*'                       { $$ = (char *)"mul"; }
+   | '/'                       { $$ = (char *)"div"; }
+   | '%'                       { $$ = (char *)"mod"; }
+   | FDIV                      { $$ = (char *)"fdiv"; }
+   | POW                       { $$ = (char *)"pow"; }
+   | CONCAT                    { $$ = (char *)"concat"; }
+   | RELOP_EQ                  { $$ = (char *)"iseq"; }
+   | RELOP_NE                  { $$ = (char *)"isne"; }
+   | RELOP_GT                  { $$ = (char *)"isgt"; }
+   | RELOP_GTE                 { $$ = (char *)"isge"; }
+   | RELOP_LT                  { $$ = (char *)"islt"; }
+   | RELOP_LTE                 { $$ = (char *)"isle"; }
+   | SHIFT_LEFT                { $$ = (char *)"shl"; }
+   | SHIFT_RIGHT               { $$ = (char *)"shr"; }
+   | SHIFT_RIGHT_U             { $$ = (char *)"lsr"; }
+   | LOG_AND                   { $$ = (char *)"and"; }
+   | LOG_OR                    { $$ = (char *)"or"; }
+   | LOG_XOR                   { $$ = (char *)"xor"; }
+   | '&'                       { $$ = (char *)"band"; }
+   | '|'                       { $$ = (char *)"bor"; }
+   | '~'                       { $$ = (char *)"bxor"; }
    ;
 
 
@@ -1579,19 +1602,19 @@ op_assign:
    ;
 
 assign_op:
-     PLUS_ASSIGN               { $$ = "add"; }
-   | MINUS_ASSIGN              { $$ = "sub"; }
-   | MUL_ASSIGN                { $$ = "mul"; }
-   | DIV_ASSIGN                { $$ = "div"; }
-   | MOD_ASSIGN                { $$ = "mod"; }
-   | FDIV_ASSIGN               { $$ = "fdiv"; }
-   | CONCAT_ASSIGN             { $$ = "concat"; }
-   | BAND_ASSIGN               { $$ = "band"; }
-   | BOR_ASSIGN                { $$ = "bor"; }
-   | BXOR_ASSIGN               { $$ = "bxor"; }
-   | SHR_ASSIGN                { $$ = "shr"; }
-   | SHL_ASSIGN                { $$ = "shl"; }
-   | SHR_U_ASSIGN              { $$ = "lsr"; }
+     PLUS_ASSIGN               { $$ = (char *)"add"; }
+   | MINUS_ASSIGN              { $$ = (char *)"sub"; }
+   | MUL_ASSIGN                { $$ = (char *)"mul"; }
+   | DIV_ASSIGN                { $$ = (char *)"div"; }
+   | MOD_ASSIGN                { $$ = (char *)"mod"; }
+   | FDIV_ASSIGN               { $$ = (char *)"fdiv"; }
+   | CONCAT_ASSIGN             { $$ = (char *)"concat"; }
+   | BAND_ASSIGN               { $$ = (char *)"band"; }
+   | BOR_ASSIGN                { $$ = (char *)"bor"; }
+   | BXOR_ASSIGN               { $$ = (char *)"bxor"; }
+   | SHR_ASSIGN                { $$ = (char *)"shr"; }
+   | SHL_ASSIGN                { $$ = (char *)"shl"; }
+   | SHR_U_ASSIGN              { $$ = (char *)"lsr"; }
    ;
 
 
@@ -1767,12 +1790,12 @@ comma_or_goto:
    ;
 
 relop:
-     RELOP_EQ                  { $$ = "eq"; }
-   | RELOP_NE                  { $$ = "ne"; }
-   | RELOP_GT                  { $$ = "gt"; }
-   | RELOP_GTE                 { $$ = "ge"; }
-   | RELOP_LT                  { $$ = "lt"; }
-   | RELOP_LTE                 { $$ = "le"; }
+     RELOP_EQ                  { $$ = (char *)"eq"; }
+   | RELOP_NE                  { $$ = (char *)"ne"; }
+   | RELOP_GT                  { $$ = (char *)"gt"; }
+   | RELOP_GTE                 { $$ = (char *)"ge"; }
+   | RELOP_LT                  { $$ = (char *)"lt"; }
+   | RELOP_LTE                 { $$ = (char *)"le"; }
    ;
 
 target:
@@ -1895,7 +1918,7 @@ reg:
    | NREG                      { $$ = mk_symreg(interp, $1, 'N'); }
    | SREG                      { $$ = mk_symreg(interp, $1, 'S'); }
    | PREG                      { $$ = mk_symreg(interp, $1, 'P'); }
-   | REG                       { $$ = mk_pasm_reg(interp, $1);    }
+   | REG                       { $$ = mk_pasm_reg(interp, $1); mem_sys_free($1); }
    ;
 
 const:

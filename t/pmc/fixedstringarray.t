@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 =head1 NAME
 
@@ -329,6 +329,27 @@ CODE
 2000
 4000
 8000
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
+.sub 'main' :main
+    new P0, 'FixedStringArray'
+    set P0, 3
+    P0[0] = 42
+    P0[1] = 43
+    P0[2] = 44
+    P1 = iter P0
+  loop:
+    unless P1 goto loop_end
+    S2 = shift P1
+    say S2
+    goto loop
+  loop_end:
+.end
+CODE
+42
+43
+44
 OUTPUT
 
 1;

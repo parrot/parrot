@@ -11,7 +11,7 @@ Test::More - Parrot extension for testing modules
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports        = split ' ', 'plan diag ok is is_deeply like isa_ok'
+    exports        = split ' ', 'plan diag ok is is_deeply like isa_ok isnt'
 
     test_namespace.'export_to'(curr_namespace, exports)
 
@@ -47,10 +47,10 @@ Test::More - Parrot extension for testing modules
 
 =head1 DESCRIPTION
 
-C<Test::More> is a pure-Parrot library for testing modules.  It provides
-the C<ok()>, C<is()>, C<is_deeply()>, and C<like()> comparison functions for
-you.  It also provides the C<plan()> and C<diag()> helper functions. It uses
-C<Test::Builder>, a simple, single backend for multiple test modules
+C<Test::More> is a pure-Parrot library for testing modules.  It provides the
+C<ok()>, C<is()>, C<isnt()>, C<is_deeply()>, and C<like()> comparison functions
+for you.  It also provides the C<plan()> and C<diag()> helper functions. It
+uses C<Test::Builder>, a simple, single backend for multiple test modules
 to use within your tests.
 
 =head1 FUNCTIONS
@@ -113,16 +113,16 @@ C<passed>, recording it with the optional test description in C<description>.
 =cut
 
 .sub nok
-	.param int passed
-	.param string description :optional
+    .param int passed
+    .param string description :optional
 
-	.local pmc test
-	find_global test, [ 'Test'; 'More' ], '_test'
+    .local pmc test
+    find_global test, [ 'Test'; 'More' ], '_test'
 
-	.local int reverse_passed
-	reverse_passed = not passed
+    .local int reverse_passed
+    reverse_passed = not passed
 
-	test.ok( reverse_passed, description )
+    test.ok( reverse_passed, description )
 .end
 
 =item C<is( left, right, description )>
@@ -257,34 +257,34 @@ add more.
     .local int pass
     pass = 0
 
-	.local string r_type
-	r_type = typeof right
+    .local string r_type
+    r_type = typeof right
 
-	if r_type == 'Float' goto num_compare
-	if r_type == 'Int'   goto num_compare
-	goto string_compare
+    if r_type == 'Float' goto num_compare
+    if r_type == 'Int'   goto num_compare
+    goto string_compare
 
   num_compare:
- 	.local num l_val
- 	.local num r_val
-	l_val = left
-	r_val = right
+     .local num l_val
+     .local num r_val
+    l_val = left
+    r_val = right
 
     if l_val == r_val goto pass_it
 
-	# XXX - significant places?  I don't care :)
-	.local num diff
-	diff = l_val - r_val
+    # XXX - significant places?  I don't care :)
+    .local num diff
+    diff = l_val - r_val
 
-	if diff < 0.000000000001 goto pass_it
+    if diff < 0.000000000001 goto pass_it
 
   string_compare:
-	.local string l_val
-	.local string r_val
-	l_val = left
-	r_val = right
-	eq l_val, r_val, pass_it
-	goto report
+    .local string l_val
+    .local string r_val
+    l_val = left
+    r_val = right
+    eq l_val, r_val, pass_it
+    goto report
 
   pass_it:
     pass = 1
@@ -299,6 +299,175 @@ add more.
 
     l_string    = left
     r_string    = right
+
+    diagnostic = _make_diagnostic( l_string, r_string )
+    test.diag( diagnostic )
+  done:
+.end
+
+=item C<isnt( left, right, description )>
+
+Like C<is>, but succeeds if the arguments I<don't> match.
+
+=cut
+
+.sub isnt :multi( int, int )
+    .param int    left
+    .param int    right
+    .param string description :optional
+
+    .local pmc test
+    find_global test, [ 'Test'; 'More' ], '_test'
+
+    .local int pass
+    pass       = 0
+
+    if left != right goto pass_it
+    goto report
+
+  pass_it:
+    pass = 1
+
+  report:
+    test.ok( pass, description )
+    if pass goto done
+
+    .local string diagnostic
+    .local string l_string
+    .local string r_string
+
+    l_string = left
+    r_string = right
+    r_string = 'not ' . r_string
+
+    diagnostic = _make_diagnostic( l_string, r_string )
+    test.diag( diagnostic )
+  done:
+.end
+
+.sub isnt :multi( num, num )
+    .param num  left
+    .param num  right
+    .param string description :optional
+
+    .local pmc test
+    find_global test, [ 'Test'; 'More' ], '_test'
+
+    .local int pass
+    pass = 0
+
+    ne left, right, pass_it
+    goto report
+
+  pass_it:
+    pass = 1
+
+  report:
+    test.ok( pass, description )
+    if pass goto done
+
+    .local string diagnostic
+    .local string l_string
+    .local string r_string
+
+    l_string = left
+    r_string = right
+    r_string = 'not ' . r_string
+
+    diagnostic = _make_diagnostic( l_string, r_string )
+    test.diag( diagnostic )
+  done:
+.end
+
+.sub isnt :multi( string, string )
+    .param string left
+    .param string right
+    .param string description :optional
+
+    .local pmc test
+    find_global test, [ 'Test'; 'More' ], '_test'
+
+    .local int pass
+    pass = 0
+
+    ne left, right, pass_it
+    goto report
+
+  pass_it:
+    pass = 1
+
+  report:
+    test.ok( pass, description )
+    if pass goto done
+
+    .local string diagnostic
+    .local string l_string
+    .local string r_string
+
+    l_string = left
+    r_string = right
+    r_string = 'not ' . r_string
+
+    diagnostic = _make_diagnostic( l_string, r_string )
+    test.diag( diagnostic )
+  done:
+.end
+
+.sub isnt :multi()
+    .param pmc    left
+    .param pmc    right
+    .param string description :optional
+
+    .local pmc test
+    find_global test, [ 'Test'; 'More' ], '_test'
+
+    .local int pass
+    pass = 0
+
+    .local string r_type
+    r_type = typeof right
+
+    if r_type == 'Float' goto num_compare
+    if r_type == 'Int'   goto num_compare
+    goto string_compare
+
+  num_compare:
+     .local num l_val
+     .local num r_val
+    l_val = left
+    r_val = right
+
+    if l_val != r_val goto pass_it
+
+    # XXX - significant places?  I don't care :)
+    .local num diff
+    diff = l_val - r_val
+
+    if diff < 0.000000000001 goto pass_it
+
+  string_compare:
+    .local string l_val
+    .local string r_val
+    l_val  = left
+    r_val  = right
+
+    ne l_val, r_val, pass_it
+    goto report
+
+  pass_it:
+    pass = 1
+
+  report:
+    test.ok( pass, description )
+    if pass goto done
+
+    .local string diagnostic
+    .local string l_string
+    .local string r_string
+
+    l_string = left
+    r_string = right
+    r_string = 'not ' . r_string
 
     diagnostic = _make_diagnostic( l_string, r_string )
     test.diag( diagnostic )

@@ -1,6 +1,9 @@
 RM_F = @rm_f@
 PERL = @perl@
 PARROT=../../parrot
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 default: build
 

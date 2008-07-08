@@ -11,8 +11,14 @@
  * the typedefs or prototypes of readline.  Let's boldly make stuff up
  * and even lie for the sake of this test. */
 
-extern char* readline(const char*);
-extern void* rl_get_keymap(void); 
+#ifdef __cplusplus
+extern "C" {
+#endif
+char * readline(const char *);
+void * rl_get_keymap(void);
+#ifdef __cplusplus
+}
+#endif
 
 int main(int argc, char *argv[])
 {

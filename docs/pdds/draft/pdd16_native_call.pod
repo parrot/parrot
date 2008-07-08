@@ -34,6 +34,8 @@ parseable anyway, and there is no generic way to query a function for its
 signature) the signature must be passed in when the linkage between the C
 function and parrot is made.
 
+=head1 IMPLEMENTATION
+
 =head2 Function signatures
 
 The following list are the valid letters in the function signatures for

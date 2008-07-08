@@ -80,7 +80,7 @@ and imports many definitions from the full Lua compiler
 .include 'languages/lua/src/dumplex_gen.pir'
 .include 'languages/lua/src/lua51_testlex_gen.pir'
 
-.namespace
+.namespace []
 
 .sub 'println'
     .param pmc arg

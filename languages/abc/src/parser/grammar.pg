@@ -1,0 +1,105 @@
+grammar abc::Grammar is PCT::Grammar;
+
+=begin overview
+
+The following is the grammar for abc written as a sequence of
+Perl 6 rules.  In each of the rules, the special notation {*}
+marks a point in the rule where the corresponding action in
+abc::Grammar::Actions is to be invoked (see grammar-actions.pl).
+These actions are then used to construct the ast nodes for
+the program.
+
+The #= markers at the ends of lines are used to distinguish
+among multiple {*} actions within a rule, by passing the value
+after the marker as a 'key' argument to the action method. Note
+that there must be space between the #= marker and the key.
+
+=end overview
+
+rule TOP {
+    ^ <statement_list>
+    [ $ || <panic: 'Syntax error'> ]
+    {*}
+}
+
+rule statement_list {
+    <statement>? [ ';' <statement>? ]*
+    {*}
+}
+
+rule statement {
+    | <if_statement> {*}                       #= if_statement
+    | <while_statement> {*}                    #= while_statement
+    | <for_statement> {*}                      #= for_statement
+    | <compound_statement> {*}                 #= compound_statement
+    | <string> {*}                             #= string
+    # | 'break'
+    # | 'continue'
+    # | 'halt'
+    # | 'return' [ '(' <expression> ')' ]?
+    | <expression> {*}                           #= expression
+}
+
+
+rule if_statement {
+    'if' '(' <expression> ')' <statement> [ 'else' <statement> ]?
+    {*}
+}
+
+
+rule while_statement {
+    'while' '(' <expression> ')' <statement>
+    {*}
+}
+
+
+rule for_statement {
+    'for' '(' <expression> ';' <expression> ';' <expression> ')' <statement>
+    {*}
+}
+
+
+rule compound_statement {
+    '{' <statement_list> '}'
+    {*}
+}
+
+
+token string {
+    '"' <string_literal: '"'> '"'
+    {*}
+}
+
+
+## create operator precedence parser
+rule 'expression'   is optable { ... }
+
+## recognize terms
+token term {
+    | <float> {*}                                #= float
+    | <integer> {*}                              #= integer
+    | <variable> {*}                             #= variable
+}
+
+token float {
+    [
+    | \d+ '.' \d*
+    | '.' \d+
+    ]
+    {*}
+}
+
+token integer {
+    \d+
+    {*}
+}
+
+token variable {
+    $<name>=[ <[a..z]> <[_a..z0..9]>* ]
+    [ '(' <expression> ')' {*}                   #= call
+    | <.null> {*}                                #= var
+    ]
+}
+
+
+## vim: expandtab sw=4

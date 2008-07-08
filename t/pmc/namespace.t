@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 62;
+use Parrot::Test tests => 64;
 use Parrot::Config;
 
 =head1 NAME
@@ -284,7 +284,7 @@ calling Foo::foo
   Foo::bar
   fie
 calling baz
-Could not invoke non-existent sub baz/
+Could not find non-existent sub baz/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get namespace of :anon .sub' );
@@ -369,7 +369,7 @@ pir_output_is( <<'CODE', <<'OUT', "latin1 namespace, global" );
     print "latin1 namespaces are fun\n"
 .end
 
-.namespace
+.namespace []
 
 .sub 'main' :main
     $P0 = get_global [iso-8859-1:"François"], 'test'
@@ -386,7 +386,7 @@ pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
     print "unicode namespaces are fun\n"
 .end
 
-.namespace
+.namespace []
 
 .sub 'main' :main
     $P0 = get_global [unicode:"Fran\xe7ois"], 'test'
@@ -650,7 +650,7 @@ SKIP:
 
     pir_output_is( <<'CODE', <<'OUTPUT', "get_global in current" );
 .HLL 'bork', ''
-.namespace
+.namespace []
 
 .sub a :immediate
   $P1 = new 'String'
@@ -842,7 +842,7 @@ pir_error_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (an
 CODE
 /^a_foo
 b_foo
-Could not invoke non-existent sub b_foo/
+Could not find non-existent sub b_foo/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_parent" );
@@ -901,7 +901,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_global with empty array" );
-.namespace
+.namespace []
 
 .sub print_ok
   print "ok\n"
@@ -1056,6 +1056,20 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace' );
 .end
 CODE
 Found root namespace.
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'root namespace is not a class' );
+.sub main :main
+    .local pmc root_ns
+    root_ns = get_root_namespace
+    .local pmc root_class
+    root_class = get_class root_ns
+    .local int is_class
+    is_class = defined root_class
+    say is_class
+.end
+CODE
+0
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace "Foo"' );
@@ -1685,7 +1699,7 @@ CODE
 /Finding method/
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT#39978" );
+pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT #39978" );
 .sub main :main
      $P0 = new 'String'
      $P0 = "Ook...BANG!\n"
@@ -1710,6 +1724,16 @@ loop_end:
 CODE
 Explosion
 T0
+OUT
+
+pir_error_output_like( <<'CODE', <<OUT, "NameSpace with no class, RT #55620" );
+.sub 'main' :main
+    $P1 = new 'NameSpace'
+    set_args '(0)', $P1
+    tailcallmethod $P1, 'bob'
+.end
+CODE
+/Null PMC access in get_string()/
 OUT
 
 # Local Variables:

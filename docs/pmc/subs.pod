@@ -2,200 +2,322 @@
 
 Subs - Parrot Subroutines
 
+=head1 VERSION
+
+$Revision$
+
+=head1 ABSTRACT
+
+This document describes how to define, call, and return from Parrot subroutine
+objects and other invokables.
+
 =head1 DESCRIPTION
 
-Parrot comes with different subroutine and alike classes which implement CPS
+Parrot comes with different subroutine and related classes which implement CPS
 (Continuation Passing Style) and PCC (Parrot Calling Conventions)
 F<docs/pdds/pdd03_calling_conventions.pod>.
 
-Please note, that this document refers to PASM assembler only. The PIR
-assembler has a more HLL-like syntax for Parrot Calling Conventions. S.
-F<imcc/docs/calling_conventions.pod>
-
 =head2 Class Tree
+
+These are all of the built-in classes that are directly callable, or
+"invokable":
 
   Sub
     Closure
-      Continuation
-	Coroutine
-      Eval
-      RetContinuation
+    Coroutine
+    Eval
+  Continuation
+    RetContinuation
+    Exception_Handler
 
-=head2 Items in the Subs Context
+By "invokable" we mean that they can be supplied as the first argument to the
+C<invoke>, C<invokecc>, or C<tailcall> instructions.  Generally speaking,
+invokable objects are divided into two subtypes:  C<Sub> and classes that are
+built on it create a new context when invoked, and C<Continuation> classes
+return control to an existing context that was captured when the
+C<Continuation> was created.
 
-  Subtype	Controlstack  PadStack UserStack RegStacks Warnings
-  ------------------------------------------------------------------
-  Sub                -           -         -         -        C
-  Closure            -           C         -         -        C
-  Continuation       C           C         C         C        C
-  Coroutine          C           C         C         C        C
-  RetContinuation    X           X         X         X        X
+There are (of course) two classes that straddle this distinction:
 
-  "C" ... COWed copy is in context
-  "X" ... is in context
-  "-" ... isn't.
+=over 4
+
+=item 1.
+
+Invoking a C<Closure> object creates a new context for the sub it refers to
+directly, but it also captures an "outer" context that provides bindings for
+the immediately-enclosing lexical scope (and, if that context is itself is for
+a C<Closure>, the subsequent scopes working outwards).
+
+[add a C<newclosure> example?  -- rgr, 6-Apr-08.]
+
+=item 2.
+
+A C<Coroutine> acts like a normal sub when called initially, and can also
+return normally, but acts like a continuation when exited via the C<yield>
+instruction and re-entered by re-invoking.
+
+[need a reference to a C<coroutine> example.  -- rgr, 6-Apr-08.]
+
+=back
 
 =head1 SYNOPSIS
 
-=head2 Creation
+=head2 Creating subs
 
-Create a subroutine of class C<Sub> and assign the subroutine address to it:
+Subs are created by IMCC (the PIR compiler) via the B<.sub> directive.  Unless
+the C<:anon> pragma is included, they are stored in the constant table
+associated with the bytecode and can be fetched with the B<get_hll_global> and
+B<get_root_global> opcodes.  Within the PIR source, they can also be put in
+registers with a C<.const .Sub> declaration:
 
-  new P0, 'Sub'
-  set_addr P0, _sub_label
+    .const .Sub rsub = 'random_sub'
 
-This can be done with one opcode:
+This uses C<find_sub_not_null> under the hood to look up the sub named
+"random_sub".
 
-  newsub P0, .Sub, _sub_label
+Here's an example of fetching a sub from another namespace:
 
-Create a subroutine (in P0) and a return continuation (in P1):
+    .sub main :main
+	get_hll_global $P0, ['Other'; 'Namespace'], "the_sub"
+	$P0()
+	print "back\n"
+    .end
 
-  newsub .Sub, .RetContinuation, _sub_label, ret_label
+    .namespace ['Other'; 'Namespace']
 
-=head2 Refering to existing Subs
+    .sub the_sub
+	print "in sub\n"
+    .end
 
-Subroutines denoted with B<.pcc_sub> (and all PIR B<.sub> subroutines that use
-Parrot Calling Conventions) are stored in the constant table and can be fetched
-with the B<get_hll_global> and B<get_root_global> opcodes.
-
-E.g. get a reference to a (possibly) external subroutine:
-
-  get_hll_global $P0, "_the_sub"
-  ...
-  .pcc_sub _the_sub:
+Note that C<the_sub> could be defined in a different bytecode or PIR source
+file from C<main>.
 
 =head2 Program entry point
 
-Exactly one subroutine in the first executed source or byte code file may be
-flagged as the "main" subroutine, where executions starts.
+One subroutine in the first executed source or bytecode file may be flagged as
+the "main" subroutine, where execution starts.
 
-  .pcc_sub :main _main:
+  .sub the_main_event :main
 
 In the absence of a B<:main> entry Parrot starts execution at the first
-statement.
+statement.  Any C<:main> directives in a subsequent PIR or bytecode file that
+are loaded under program control are ignored.
 
-=head2 Automatically loaded initializer code
+Note that if the first executed source or bytecode file contains more than one
+sub flagged as C<:main>, Parrot currently picks the I<last> such sub to start
+execution.  This is arguably a bug, so users should not depend upon it.
+
+=head2 Load-time initialization
 
 If a subroutine is marked as B<:load> this subroutine is run, before the
 B<load_bytecode> opcode returns.
 
 e.g.
 
-  .pcc_sub :main _main:
+  .sub main :main
      print "in main\n"
-     load_bytecode "library_code.pasm"
-     ...
+     load_bytecode "library_code.pir"
+     print "back to main\n"
+  .end
 
-# library_code.pasm
+  # library_code.pir
 
-     ...
-  .pcc_sub :load _my_lib_init:
-     ...
-     invoke P1
+  .sub _my_lib_init :load
+     print "initializing library\n"
+  .end
 
-B<:load> is ignored, if another subroutine in that file is marked with
-B<:main>.
+If a subroutine is marked as B<:init> this subroutine is run before the
+B<:main> or the first subroutine in the source file runs.  Unlike B<:main>
+subs, B<:init> subs are also run when compiling from memory.  B<:load> subs
+are run only in any source or bytecode files loaded subsequently.
 
-If a subroutine is marked as B<:init> this subroutine is run, before the
-B<:main> or the first subroutine in the source file runs.
+These markers are called "pragmas", and are defined fully in
+L<docs/pdds/draft/pdd19_pir.pod>.  The following table summarizes the behavior
+of the five pragmas that cause Parrot to run a sub implicitly:
 
-=head2 Invocation i.e. calling the sub
+                ------ Executed when --------
+                compiling to    -- loading --
+  Sub Pragma    disk  memory    first   after
+  ==========    ====  ======    =====   =====
+   :immediate   yes   yes       no      no        
+   :postcomp    yes   no        no      no        
+   :load        no    no        no      yes       
+   :init        no    yes       yes     no        
+   :main        no    no        yes     no        
 
-  invoke	# call the subroutine in P0 (P1 was created earlier)
+The same load-time behavior applies regardless of whether the loaded file is
+PIR source or bytecode.  Note that it is possible to mark a sub with both
+B<:load> and B<:init>.
 
-  invokecc	# call sub in P0 and create return continuation in P1
+=head2 Calling the sub
+
+PIR sub invocation syntax is similar to HLL syntax:
+
+    $P0 = do_something($P1, $S3)
+
+This is syntactic sugar for the following four bytecode instructions:
+
+    # Establish arguments.
+    set_args '(0,0)', $P1, $S3
+    # Find the sub.
+    $P8 = find_sub_not_null "do_something"
+    # Establish return values.
+    get_results '(0)', $P0
+    # Call the sub in $P8, implicitly creating a return continuation.
+    invokecc $P8
+
+The sub name could be replaced with a PMC register, in which case the
+C<find_sub_not_null> instruction would not be needed.  If the return values
+from the sub were ignored (by dropping the C<$P0 => part), the C<get_results>
+instruction would be omitted.  However, C<set_args> is emitted even in the
+case of a call without arguments.
+
+The first operands to the C<set_args> and C<get_results> instructions are
+actually placeholders for an integer array that describes the register types.
+For example, the '(0,0)' for C<set_args> is replaced internally with C<[2,
+1]>, which means "two arguments, of type PMC and string".  Note that return
+values get the same register type coercion as sub parameters.  This is all
+described in much more detail in L<docs/pdds/pdd03_calling_conventions.pod>.
+
+To receive multiple values, put the register names in parentheses:
+
+    ($P10, $P11) = do_something($P1, $S3)
+
+To test whether a value was returned, declare it C<:optional>, and follow it
+with an integer register declared C<:opt_val>:
+
+    ($P10 :optional, $I10 :opt_val) = do_something($P1, $S3)
+
+Both of these affect only the signature provided via C<get_results>.
+
+[should also describe :flat, :slurpy, :named, ..., or at least provide a
+reference.  -- rgr, 25-May-08.]
+
+    # Call the sub in $P8, with continuation (created earlier) in $P9.
+    invoke $P8, $P9
 
 =head2 Returning from a sub
 
-  invoke P1	# call return continuation in P1
+PIR supports a convenient syntax for returning any number of values from a sub
+or closure:
+
+    .return ($P0, $I1, $S3)
+
+Integer, float, and string constants are also accepted.  This is translated
+to:
+
+    get_results '(0,0,0)', $P0, $I1, $S3
+    returncc	# return by calling the current continuation
+
+As for C<set_args>, the '(0,0,0)' is actually a placeholder for an integer
+array that describes the register types; it is replaced internally with C<[2,
+0, 1]>, which means "three arguments, of type PMC, integer, and string".
+
+Another way to return from a sub is to use tail-calling, which calls a new sub
+with the current continuation, so that the new sub returns directly to the
+caller of the old sub (i.e. without first returning to the old sub).  This
+passes the three values to C<another_sub> via tail-calling:
+
+    .return another_sub($P0, $I1, $S3)
+
+This is translated into a C<set_args> instruction for the call, but with
+C<tailcall> instead of C<invokecc>:
+
+    set_args '(0,0,0)', $P0, $I1, $S3
+    $P8 = find_sub_not_null "another_sub"
+    tailcall $P8
+
+As for calling, the sub name could be replaced with a PMC register, in which
+case the C<find_sub_not_null> instruction would not be needed.
+
+If needed, the current continuation can be extracted and called explicitly as
+follows:
+
+    ## This is what defines .INTERPINFO_CURRENT_CONT.
+    .include 'interpinfo.pasm'
+    ## Store our return continuation as exit_cont.
+    .local pmc exit_cont
+    exit_cont = interpinfo .INTERPINFO_CURRENT_CONT
+    ## Invoke it explicitly:
+    invokecc exit_cont
+    ## ... or equivalently:
+    tailcall exit_cont
+
+To return values, use C<set_args> as before.
 
 =head2 All together now
 
-The following scheme can be used if a subroutine is called once or if
-performance doesn't matter:
+The following complete example illustrates the typical call/return pattern:
 
-    newsub P0, .Sub, _sub_label	# create subroutine
-    set I5, 42			# pass an argument
-    invokecc			# create ret continuation and call sub
-    end				# fin.
-  _sub_label:
-    print I5			# do something with parameters
-    invoke P1			# return
+    .sub main :main
+	print "in main\n"
+        the_sub()
+	print "back to main\n"
+    .end
 
-If a subroutine is called several times, for instance inside a loop, the
-creation of the return continuation can be done outside the loop if performance
-is an issue:
+    .sub the_sub
+	print "in sub\n"
+    .end
 
-    newsub .Sub, .RetContinuation, _sub_label, ret_label
-    set I16, 1000000
-    set I17, 0
-  lp:
-    pushtopi		# preserve counter vars
-    invoke
-  ret_label:
-    poptopi
-    inc I17
-    lt I17, I16, lp
-    end
-  _sub_label:
-    # do_something
-    invoke P1
+Notice that we are not passing or returning values here.
 
-If items in the interpreter context are changed between creation of the
-subroutine/return continuation and its invocation, the C<updatecc> opcode
-should be used, so that the state of the return continuation matches that of
-the interpreter:
+[example of passing values.  this could get pretty elaborate; look for other
+examples first.  -- rgr, 6-Apr-08.]
 
-    newsub .Sub, .RetContinuation, _sub_label, ret_label
-    ...
-    warningson 1
-    ...
-    updatecc
-    invoke
-    ...
+If a short subroutine is called several times, for instance inside a loop, the
+creation of the return continuation can be done outside the loop:
 
-=head2 Generating a Subroutine Symbol Table Entry
+    .sub main :main
+	    ## Initialize the sub and the return cont.
+	    .local pmc cont
+	    cont = new 'Continuation'
+	    set_addr cont, ret_label
+	    .const .Sub rsub = 'random_sub'
+	    ## Loop initialization.
+	    .local int loop_max, i
+	    loop_max = 1000000
+	    i = 0
 
-When a subroutine label is prefixed by B<.pcc_sub>, the name of the subroutine
-(i.e. the label) gets stored in the global stash.
+	    ## Main loop.
+    again:
+	    set_args '(0)', i
+	    invoke rsub, cont
+    ret_label:
+	    ## This is where "cont" returns.
+	    inc i
+	    if i < loop_max goto again
+    .end
 
-    find_global P0, "_the_sub"
-    invokecc
-    print "back\n"
-    end
+    .sub random_sub
+	    .param int foo
+	    ## do_something
+    .end
 
-  .pcc_sub _the_sub:
-    print "in sub\n"
-    invoke P1
+If the sub returns values, the C<get_results> must be B<after> C<ret_label> in
+order to receive them.
 
-=head2 Optimized Tail Calls
-
-    find_global P0, "_the::sub"
-    invokecc
-    print "back\n"
-    end
-
-  .pcc_sub _the::sub:
-    print "in sub\n"			# must preserve P1
-    find_global P0, "_next::sub"
-    get_addr I0, P0			# get the absolute address
-    jump I0				# jump to absolute address
-
-  .pcc_sub _next::sub: 			# must preserve P1
-    print "in next sub\n"
-    invoke P1				# return to main
+Since this is much more obscure than the PIR calling syntax, it should only be
+done if there is a measurable performance advantage.  Even in this trivial
+example, calling "rsub(i)" is only about a third slower on x86.
 
 =head1 FILES
 
 F<src/pmc/sub.pmc>, F<src/pmc/closure.pmc>,
-F<src/pmc/continuation.pmc>, F<src/pmc/coroutine.pmc>, F<sub.c>,
+F<src/pmc/continuation.pmc>, F<src/pmc/coroutine.pmc>, F<src/sub.c>,
 F<t/pmc/sub.t>
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd03_calling_conventions.pod> F<imcc/docs/calling_conventions.pod>
+F<docs/pdds/pdd03_calling_conventions.pod>
+F<docs/pdds/draft/pdd19_pir.pod>
 
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
 
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

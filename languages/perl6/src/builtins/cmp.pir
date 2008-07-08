@@ -10,7 +10,7 @@ src/builtins/cmp.pir - Perl6 comparison builtins
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'infix:==' :multi(_,_)
     .param num a
@@ -20,6 +20,14 @@ src/builtins/cmp.pir - Perl6 comparison builtins
 .end
 
 
+.sub 'infix:!==' :multi(_,_)
+    .param num a
+    .param num b
+    $I0 = isne a, b
+    .return 'prefix:?'($I0)
+.end
+
+# Shortcut for infix:!==, so same code
 .sub 'infix:!=' :multi(_,_)
     .param num a
     .param num b
@@ -64,7 +72,16 @@ src/builtins/cmp.pir - Perl6 comparison builtins
     .param pmc a
     .param pmc b
     $I0 = cmp_num a, b
-    .return ($I0)
+    if $I0 < 0 goto increase
+    if $I0 > 0 goto decrease
+    $P0 = get_hll_global ['Order'], 'Same'
+    .return ($P0)
+  increase:
+    $P0 = get_hll_global ['Order'], 'Increase'
+    .return ($P0)
+  decrease:
+    $P0 = get_hll_global ['Order'], 'Decrease'
+    .return ($P0)
 .end
 
 
@@ -72,6 +89,13 @@ src/builtins/cmp.pir - Perl6 comparison builtins
     .param string a
     .param string b
     $I0 = iseq a, b
+    .return 'prefix:?'($I0)
+.end
+
+.sub 'infix:!eq' :multi(_,_)
+    .param string a
+    .param string b
+    $I0 = isne a, b
     .return 'prefix:?'($I0)
 .end
 
@@ -120,7 +144,9 @@ src/builtins/cmp.pir - Perl6 comparison builtins
     .param pmc a
     .param pmc b
     $I0 = cmp a, b
-    .return ($I0)
+    ##  Don't use a tailcall here due to RT#56448
+    $P0 = 'infix:<=>'($I0, 0)
+    .return ($P0)
 .end
 
 
@@ -128,7 +154,9 @@ src/builtins/cmp.pir - Perl6 comparison builtins
     .param string a
     .param string b
     $I0 = cmp a, b
-    .return ($I0)
+    ##  Don't use a tailcall here due to RT#56448
+    $P0 = 'infix:<=>'($I0, 0)
+    .return ($P0)
 .end
 
 

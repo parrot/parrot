@@ -836,7 +836,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     jit_emit_branch_to_opcode(jit_info->native_ptr, r3);
 }
 
-static void Parrot_end_jit(Parrot_jit_info_t *, Interp *);
+static void Parrot_end_jit(Parrot_jit_info_t *, PARROT_INTERP);
 
 #  undef Parrot_jit_restart_op
 /* Parrot_jit_restart_op is based on the i386 version */
@@ -957,11 +957,10 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     }
 }
 
-static int jit_save_regs_call(Parrot_jit_info_t *, Interp * , int skip);
+static int jit_save_regs_call(Parrot_jit_info_t *, PARROT_INTERP, int skip);
 
 static void
-jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-        int recursive)
+jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP, int recursive)
 {
     PMC *sig_args, *sig_params, *sig_result;
     INTVAL *sig_bits, sig, i, n;
@@ -1339,7 +1338,7 @@ ppc_sync_cache(void *_start, void *_end)
 }
 
 static void
-ppc_flush_cache(Parrot_jit_info_t * jit_info, Interp *i)
+ppc_flush_cache(Parrot_jit_info_t * jit_info, PARROT_INTERP)
 {
     ppc_sync_cache(jit_info->arena.start, jit_info->native_ptr);
 }

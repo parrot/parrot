@@ -28,7 +28,7 @@ F<docs/pdds/pdd26_ast.pod>
 
 =cut
 
-.namespace
+.namespace []
 
 .sub '__onload' :init
     load_bytecode 'PGE.pbc'

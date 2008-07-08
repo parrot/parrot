@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 21;
 use Test::More;
 use Parrot::Test::Lua;
 
@@ -41,7 +41,7 @@ OUT
 
 SKIP:
 {
-skip('only with an interpreter', 15) if ( $test_prog eq 'luac.pl'
+skip('only with an interpreter', 17) if ( $test_prog eq 'luac.pl'
                                        || $test_prog eq 'luap.pir'
                                        || $test_prog eq 'luac2pir.pir' );
 
@@ -58,11 +58,19 @@ open my $X, '>', '../hello.lua';
 print {$X} "print 'Hello World'\n";
 close $X;
 
+language_output_is( 'lua', undef, << 'OUTPUT', 'file', params => "hello.lua"  );
+Hello World
+OUTPUT
+
 language_output_is( 'lua', undef, << 'OUTPUT', 'redirect', params => "< hello.lua"  );
 Hello World
 OUTPUT
 
 unlink('../hello.lua') if ( -f '../hello.lua' );
+
+language_output_like( 'lua', undef, << 'OUTPUT', 'no file', params => "no_file.lua"  );
+/^lua[^:]*: cannot open no_file.lua: No such file or directory$/
+OUTPUT
 
 $ENV{LUA_INIT} = 'print "init"';
 language_output_is( 'lua', <<'CODE', <<'OUT', 'LUA_INIT string' );

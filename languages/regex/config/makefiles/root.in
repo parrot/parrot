@@ -12,6 +12,9 @@ PMC_DIR       = pmc
 BUILD_DYNPMC  = $(PERL) @build_dir@/tools/build/dynpmc.pl
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 # Set up directories
 LOAD_EXT      = @load_ext@

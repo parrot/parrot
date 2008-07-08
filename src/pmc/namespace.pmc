@@ -74,6 +74,7 @@ other fields.
         PMC_data(SELF)                 =
                 mem_allocate_zeroed_typed(Parrot_NameSpace);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
+        PARROT_NAMESPACE(SELF)->_class = PMCNULL;
     }
 
 /*
@@ -169,7 +170,7 @@ really a public API.
             parrot_hash_get_bucket(INTERP, NS_HASH(SELF), key);
 
         /* If it's a sub... */
-        if (value->vtable->base_type == enum_class_Sub) {
+        if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
             Parrot_NameSpace * const nsinfo   = PARROT_NAMESPACE(SELF);
             PMC              *       vtable   = nsinfo->vtable;
             Parrot_sub       * const sub      = PMC_sub(value);
@@ -561,8 +562,10 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
     METHOD add_sub(STRING *name, PMC *sub) {
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
+        STRING * const s_multisub = CONST_STRING(INTERP, "MultiSub");
 
-        if (!VTABLE_isa(INTERP, sub, s_sub))
+        if (!VTABLE_isa(INTERP, sub, s_sub) &&
+                !VTABLE_isa(INTERP, sub, s_multisub))
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d in add_sub()", sub->vtable->base_type);
 

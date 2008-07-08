@@ -30,7 +30,51 @@ use Parrot::Config qw/%PConfig/;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     generate_html_smoke_report
+    send_archive_to_smolder
 );
+
+my %SMOLDER_CONFIG = (
+    server     => 'http://smolder.plusthree.com',
+    username   => 'parrot-autobot',
+    password   => 'squ@wk',
+    project_id => 8,
+);
+
+sub send_archive_to_smolder {
+    eval { require LWP::UserAgent };
+    if( $@ ) {
+        die "\n" . ('-' x 55) . "\nCould not load LWP::UserAgent."
+            . "\nPlease install it if you want to send TAP archives smolder.\n"
+            . ('-' x 55) . "\n\n$@\n";
+    }
+
+    # get the comments from svn
+    my @lines = grep { $_ =~ /URL|Revision|LastChanged/ } `svn info`;
+    push @lines, `$^X -v | grep -i 'this is perl'`;
+    chomp @lines;
+    my $comments = join("\n", @lines);
+
+    my $url = "$SMOLDER_CONFIG{server}/app/developer_projects/process_add_report/$SMOLDER_CONFIG{project_id}";
+    my $ua = LWP::UserAgent->new();
+    my $response = $ua->post(
+        $url,
+        Content_Type => 'form-data',
+        Content      => [
+            architecture => $PConfig{cpuarch},
+            platform     => $PConfig{osname},
+            comments     => $comments,
+            username     => $SMOLDER_CONFIG{username},
+            password     => $SMOLDER_CONFIG{password},
+            report_file  => ['parrot_test_run.tar.gz'],
+        ]
+    );
+
+    if ($response->code != 302) {
+        die "Could not upload report to Smolder at $SMOLDER_CONFIG{server}"
+            . "\nHTTP CODE: " . $response->code . " ("
+            .  $response->message . ")\n";
+    }
+}
 
 sub generate_html_smoke_report {
     my $argsref = shift;

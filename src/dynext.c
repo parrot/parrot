@@ -276,11 +276,8 @@ get_path(PARROT_INTERP, ARGMOD(STRING *lib), ARGOUT(void **handle),
     /* And on cygwin replace a leading "lib" by "cyg". */
 #ifdef __CYGWIN__
     if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
-        strcpy(path->strstart, lib->strstart);
-
-        path->strstart[0] = 'c';
-        path->strstart[1] = 'y';
-        path->strstart[2] = 'g';
+        path = string_append(interp, CONST_STRING(interp, "cyg"),
+            string_substr(interp, lib, 3, lib->strlen - 3, NULL, 0));
 
         *handle           = Parrot_dlopen(path->strstart);
 
@@ -353,7 +350,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
      * work around gcc 3.3.3 and other problem with dynpmcs
      * something during library loading doesn't stand a DOD run
      */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     /* get load_func */
     if (lib_name) {
@@ -387,16 +384,19 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         type = CONST_STRING(interp, "NCI");
     else {
         /* we could set a private flag in the PMC header too
-         * but currently only ops files have struct_val set
-         */
-        type = const_string(interp, PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
+         * but currently only ops files have struct_val set */
+
+        if (PMC_struct_val(lib_pmc))
+            type = CONST_STRING(interp, "Ops");
+        else
+            type = CONST_STRING(interp, "PMC");
     }
 
     /* remember lib_pmc in iglobals */
     store_lib_pmc(interp, lib_pmc, wo_ext, type, lib_name);
 
     /* UNLOCK */
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 
     return lib_pmc;
 }
@@ -470,8 +470,9 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
     void * const handle = PMC_data(lib_pmc);
     STRING * const type =
         VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, CONST_STRING(s, "_type")));
+    STRING * const ops  = CONST_STRING(s, "Ops");
 
-    if (!string_equal(s, type, CONST_STRING(s, "Ops"))) {
+    if (!string_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.
@@ -481,12 +482,9 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
         PMC * const new_lib_pmc = constant_pmc_new(d, enum_class_ParrotLibrary);
 
         PMC_data(new_lib_pmc) = handle;
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_filename"),
-            make_string_pmc(d, wo_ext));
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_lib_name"),
-            make_string_pmc(d, lib_name));
-        VTABLE_setprop(d, new_lib_pmc, const_string(d, "_type"),
-            make_string_pmc(d, const_string(d, "Ops")));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), make_string_pmc(d, wo_ext));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), make_string_pmc(d, lib_name));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), make_string_pmc(d, ops));
 
         /* fixup d->all_op_libs, if necessary */
         if (d->n_libs != s->n_libs) {

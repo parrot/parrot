@@ -13,7 +13,23 @@ Generates several files used by the OpenGL binding.  These include:
 
 =item F<runtime/parrot/include/opengl_defines.pasm>
 
+=item F<runtime/parrot/library/OpenGL_funcs.pir>
+
+=item F<config/gen/call_list/opengl.in>
+
+=item F<src/glut_callbacks.c>
+
 =back
+
+For information about Parrot's OpenGL support on different platforms, and
+system libraries/headers that must be installed to enable OpenGL support,
+see F<config/auto/opengl.pm>, where this support is detected.
+
+For information on how to I<use> Parrot's OpenGL support, see
+F<runtime/parrot/library/OpenGL.pir> for an overview, or the OpenGL examples
+starting with F<examples/opengl/triangle.pir> for more detail.
+
+=begin ignored
 
 =cut
 
@@ -21,6 +37,7 @@ package gen::opengl;
 
 use strict;
 use warnings;
+use File::Glob;
 
 use base qw(Parrot::Configure::Step);
 
@@ -79,7 +96,285 @@ my @FREEGLUT_CALLBACKS = (
     [ 'Mouse Wheel',      'int wheel, int direction, int x, int y' ],
 );
 
+# These typemaps try to be both portable and accurate.  However, there is
+# at least one OS release known to get some of these wrong: Mac OS X 10.4
+# headers typedef some of the 'int' types as 'long' instead.  This disagrees
+# with all other headers I can find, and was fixed in Mac OS X 10.5 -- those
+# typedefs now match accepted standards.  I am told that Mac OS X 10.4 has
+# a 32-bit core, making the difference immaterial, so I don't bother to
+# alter the typemaps to fit this bug.
+
+my %C_TYPE = (
+    GLvoid                  => 'void',
+    GLUnurbs                => 'void',
+    GLUquadric              => 'void',
+    GLUtesselator           => 'void',
+    gleGC                   => 'void',
+    muiObject               => 'void',
+    SphereMap               => 'void',
+    Display                 => 'void',
+    XVisualInfo             => 'void',
+    GLEWContext             => 'void',
+    GLXEWContext            => 'void',
+    WGLEWContext            => 'void',
+    _CGLContextObject       => 'void',
+    CGDirectDisplayID       => 'void',
+    GLXHyperpipeConfigSGIX  => 'void',
+    GLXHyperpipeNetworkSGIX => 'void',
+    PIXELFORMATDESCRIPTOR   => 'void',
+    COLORREF                => 'void',
+
+    wchar_t                 => 'void',
+
+    GLMfunctions            => 'void*',
+    GLXContext              => 'void*',
+    GLXFBConfig             => 'void*',
+    GLXFBConfigSGIX         => 'void*',
+    CGLContextObj           => 'void*',
+    CGLPixelFormatObj       => 'void*',
+    CGLRendererInfoObj      => 'void*',
+    CGLPBufferObj           => 'void*',
+    AGLContext              => 'void*',
+    AGLDevice               => 'void*',
+    AGLDrawable             => 'void*',
+    AGLPixelFormat          => 'void*',
+    AGLRendererInfo         => 'void*',
+    AGLPbuffer              => 'void*',
+    GDHandle                => 'void*',
+    WindowRef               => 'void*',
+    HIViewRef               => 'void*',
+    Style                   => 'void*',
+    HDC                     => 'void*',
+    HGLRC                   => 'void*',
+    LPGLYPHMETRICSFLOAT     => 'void*',
+    LPLAYERPLANEDESCRIPTOR  => 'void*',
+    LPPIXELFORMATDESCRIPTOR => 'void*',
+
+    GLchar                  => 'char',
+    GLcharARB               => 'char',
+    GLbyte                  => 'signed char',
+    GLubyte                 => 'unsigned char',
+    GLboolean               => 'unsigned char',
+
+    GLshort                 => 'short',
+    GLushort                => 'unsigned short',
+    GLhalfARB               => 'unsigned short',
+    GLhalfNV                => 'unsigned short',
+
+    Bool                    => 'int',
+    Status                  => 'int',
+    GLint                   => 'int',
+    GLsizei                 => 'int',
+    GLfixed                 => 'int',
+    GLclampx                => 'int',
+    int32_t                 => 'int',
+
+    GLenum                  => 'unsigned int',
+    CGLPixelFormatAttribute => 'unsigned int',
+    CGLRendererProperty     => 'unsigned int',
+    CGLContextEnable        => 'unsigned int',
+    CGLContextParameter     => 'unsigned int',
+    CGLGlobalOption         => 'unsigned int',
+    CGLError                => 'unsigned int',
+    SphereMapFlags          => 'unsigned int',
+
+    GLuint                  => 'unsigned int',
+    GLbitfield              => 'unsigned int',
+    GLhandleARB             => 'unsigned int',
+    GLXVideoDeviceNV        => 'unsigned int',
+
+    XID                     => 'unsigned long',
+    Window                  => 'unsigned long',
+    Drawable                => 'unsigned long',
+    Font                    => 'unsigned long',
+    Pixmap                  => 'unsigned long',
+    Cursor                  => 'unsigned long',
+    Colormap                => 'unsigned long',
+    GContext                => 'unsigned long',
+    KeySym                  => 'unsigned long',
+    GLXContextID            => 'unsigned long',
+    GLXPixmap               => 'unsigned long',
+    GLXDrawable             => 'unsigned long',
+    GLXPbuffer              => 'unsigned long',
+    GLXWindow               => 'unsigned long',
+    GLXFBConfigID           => 'unsigned long',
+    GLXPbufferSGIX          => 'unsigned long',
+    GLXFBConfigIDSGIX       => 'unsigned long',
+    GLXVideoSourceSGIX      => 'unsigned long',
+
+    int64_t                 => 'long long',
+    GLint64EXT              => 'signed long long',
+    GLuint64EXT             => 'unsigned long long',
+
+    GLfloat                 => 'float',
+    GLclampf                => 'float',
+    GLdouble                => 'double',
+    GLclampd                => 'double',
+    gleDouble               => 'double',
+
+    GLintptr                => 'ptrdiff_t',
+    GLsizeiptr              => 'ptrdiff_t',
+    GLintptrARB             => 'ptrdiff_t',
+    GLsizeiptrARB           => 'ptrdiff_t',
+);
+
+my %NCI_TYPE = (
+    void         => 'v',
+    char         => 'c',
+    short        => 's',
+    int          => 'i',
+    long         => 'l',
+    size_t       => 'l',
+    ptrdiff_t    => 'l',
+    # Requires RT 53406
+    # longlong     => 'L',
+    float        => 'f',
+    double       => 'd',
+
+    'char*'      => 't',
+
+    'short*'     => 'p',
+    'int*'       => 'p',
+    'long*'      => 'p',
+    'longlong*'  => 'p',
+    'float*'     => 'p',
+    'double*'    => 'p',
+    'void*'      => 'p',
+
+    'char**'     => 'p',
+    'short**'    => 'p',
+    'int**'      => 'p',
+    'long**'     => 'p',
+    'longlong**' => 'p',
+    'float**'    => 'p',
+    'double**'   => 'p',
+    'void**'     => 'p',
+
+    'double***'  => 'p',
+);
+
+my %OVERRIDE = (
+    'glutInit'  => 'v3p',
+);
+
+my @IGNORE = (
+    # Most of these are limitations of this module or Parrot NCI
+
+    # Don't handle GetProcAddress type functions yet
+    'glutGetProcAddress',
+    'glXGetProcAddress',
+    'glXGetProcAddressARB',
+    'wglGetProcAddress',
+
+    # Don't handle this odd create/callback register function yet
+    'glutCreateMenu',
+
+    # Don't handle Mesa, GLU, or MUI callbacks yet
+    'glProgramCallbackMESA',
+    'gluNurbsCallback',
+    'gluQuadricCallback',
+    'gluTessCallback',
+    'muiSetCallback',
+    'muiSetNonMUIcallback',
+    'handler',
+    'callback',
+
+    # Don't handle functions without "namespace" prefixes matching library
+    'rot_axis',
+    'rot_about_axis',
+    'rot_omega',
+    'rot_prince',
+    'urot_axis',
+    'urot_about_axis',
+    'urot_omega',
+    'urot_prince',
+    'uview_direction',
+    'uviewpoint',
+
+    # Some versions of GLUT declare these both with and without prefixes;
+    # ignore the non-prefixed versions
+    'SwapBuffers',
+    'ChoosePixelFormat',
+    'DescribePixelFormat',
+    'GetPixelFormat',
+    'SetPixelFormat',
+
+    # Can't handle longlong until RT 53406 is done
+    'glPresentFrameKeyedNV',
+    'glPresentFrameDualFillNV',
+    'glXSwapBuffersMscOML',
+    'glXWaitForMscOML',
+    'glXWaitForSbcOML',
+
+    # Can't handle weird data types specified only in proprietary headers
+    'glXCreateGLXVideoSourceSGIX',
+    'glXAssociateDMPbufferSGIX',
+
+    # Ignore internal GLUT Win32 compatibility hackage
+    'exit',
+);
+
+my @SKIP = (
+    # Can't properly support these yet; some (such as the internal headers)
+    # may never be supported.
+
+    # Mesa non-standard driver headers
+    'amesa.h',
+    'dmesa.h',
+    'foomesa.h',
+    'fxmesa.h',
+    'ggimesa.h',
+    'mesa_wgl.h',
+    'mglmesa.h',
+    'osmesa.h',
+    'svgamesa.h',
+    'uglmesa.h',
+    'wmesa.h',
+    'xmesa.h',
+    'xmesa_xf86.h',
+    'xmesa_x.h',
+
+    # Mesa API-mangling headers (to load vendor GL and Mesa simultaneously)
+    'gl_mangle.h',
+    'glu_mangle.h',
+    'glx_mangle.h',
+
+    # OpenVMS API-mangling header
+    'vms_x_fix.h',
+
+    # Internal headers for DRI
+    'dri_interface.h',
+    'glcore.h',
+
+    # Apple CGL OpenGL API conversion macros
+    'CGLMacro.h',
+
+    # Internal headers for GLE (OpenGL Extrusions) library
+    'extrude.h',
+    'segment.h',
+
+    # Rotation math utility functions from GLE
+    'gutil.h',
+
+    # Plane math utility functions/macros from GLE
+    'intersect.h',
+
+    # MUI (internal?) headers lacking "namespace" identifier prefixes
+    'browser.h',
+    'gizmo.h',
+    'hslider.h',
+    'vslider.h',
+
+    # SGI GLw Drawing Area headers
+    'GLwDrawA.h',
+    'GLwDrawAP.h',
+    'GLwMDrawA.h',
+    'GLwMDrawAP.h',
+);
+
 my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pasm';
+my $FUNCS_FILE = 'runtime/parrot/library/OpenGL_funcs.pir';
+my $SIGS_FILE  = 'config/gen/call_list/opengl.in';
 my $C_FILE     = 'src/glut_callbacks.c';
 
 
@@ -87,80 +382,88 @@ sub _init {
     my $self = shift;
 
     return {
-        description  => q{Generating OpenGL bindings},
-        result       => q{},
+        description => q{Generating OpenGL bindings},
+        result      => q{},
     }
 }
 
 sub runstep {
-    my ( $self, $conf ) = @_;
+    my ($self, $conf) = @_;
 
-    unless ( $conf->data->get('has_opengl') ) {
+    unless ($conf->data->get('has_opengl')) {
         $self->set_result('skipped');
         return 1;
     }
 
+    my $verbose = $conf->options->get('verbose') || 0;
+
+    my @include_paths_win32 = grep /\S/ => split /;/ => ($ENV{INCLUDE} || '');
+
+    s{\\}{/}g foreach @include_paths_win32;
+
     my @header_globs = (
+        # Default locations for most UNIX-like platforms
         '/usr/include/GL/*.h',
+        '/usr/local/include/GL/*.h',
+
+        # Mac OS X
         '/System/Library/Frameworks/OpenGL.framework/Headers/*.h',
         '/System/Library/Frameworks/GLUT.framework/Headers/*.h',
+
+        # Cygwin
+        '/usr/include/w32api/GL/*.h',
+
+        # Windows/MSVC
+        (map "$_/gl/*.h" => @include_paths_win32),
+
+#         # Portability testing headers
+#         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
+#         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
+#         "$ENV{HOME}/src/osx-10.4/GLUT/*.h",
+#         "$ENV{HOME}/src/osx-10.4/OpenGL/*.h",
+#         "$ENV{HOME}/src/cygwin/opengl-1.1.0/GLUI_v2_1_beta/*.h",
+#         "$ENV{HOME}/src/cygwin/opengl-1.1.0/glut-3.7.3/include/GL/*.h",
+#         "$ENV{HOME}/src/cygwin/opengl-1.1.0/glut-3.7.3/include/mui/*.h",
+#         "$ENV{HOME}/src/glut-3.7.6/include/GL/*.h",
+#         "$ENV{HOME}/src/glut-3.7.6/include/mui/*.h",
+#         "$ENV{HOME}/src/freebsd-gl/usr/local/include/GL/*.h",
+
+#         "$ENV{HOME}/src/osx-insane/Developer/Platforms/Aspen.platform/Developer/SDKs/Aspen1.2.sdk/System/Library/Frameworks/OpenGLES.framework/Headers/ES1/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/AGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/GLUT.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/AGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/GLUT.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/usr/X11/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/Developer/SDKs/MacOSX10.5.sdk/usr/X11/include/GL/internal/*.h",
+#         "$ENV{HOME}/src/osx-insane/System/Library/Frameworks/AGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/System/Library/Frameworks/GLUT.framework/Versions/A/Headers/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/internal/*.h",
+#         "$ENV{HOME}/src/osx-insane/usr/X11R6 1/include/GL/*.h",
     );
 
-    my @header_files = sort map {glob} @header_globs;
+    print "\nChecking for OpenGL headers using the following globs:\n\t",
+        join("\n\t", @header_globs), "\n"
+        if $verbose;
 
-    $self->gen_opengl_defines($conf, \@header_files);
-    $self->gen_glut_callbacks($conf);
+    my @header_files = sort map {File::Glob::bsd_glob($_)} @header_globs;
 
-    return 1;
-}
+    my %skip = map {($_ => 1)} @SKIP;
+    @header_files = grep {my ($file) = m{([^/]+)$}; !$skip{$file}} @header_files;
 
-sub gen_opengl_defines {
-    my ( $self, $conf, $header_files ) = @_;
+    print "\nFound the following OpenGL headers:\n\t",
+        join("\n\t", @header_files), "\n"
+        if $verbose;
 
-    my $verbose = $conf->options->get('verbose');
+    die "OpenGL enabled and detected, but no OpenGL headers found!"
+        unless @header_files;
 
-    my (%defs, @macros);
-    my $max_len = 0;
-
-    foreach my $file (@$header_files) {
-        open my $header, '<', $file
-        or die "Could not open header '$file': $!";
-
-        while (<$header>) {
-            my (@F) = split;
-            next unless @F > 2 and $F[0] eq '#define';
-            next unless $F[1] =~ /^(GL(?:X|(?:UT?))?)_/;
-
-            $max_len = length $F[1] if $max_len < length $F[1];
-
-            my $api = $1;
-            if ($F[2] =~ /^GL/) {
-                push @macros, [$api, $F[1], $F[2]];
-            }
-            elsif (   $F[2] =~ /^0x[0-9a-fA-F]+$/
-                   || $F[2] =~ /^\d+(?:\.\d*)?(?:e\d+)?$/) {
-                $defs{$api}{$F[1]} = $F[2];
-            }
-            else {
-                print "\nUnable to parse '$F[2]'\n" if $verbose;
-            }
-        }
-    }
-
-    foreach my $macro (@macros) {
-        my ($api, $define, $value) = @$macro;
-        my ($val_api) = $value =~ /^(GL[A-Z]*)_/;
-
-        $defs{$api}{$define} = $defs{$val_api}{$value};
-
-        die "'$define' is defined as '$value', but no '$value' has been defined"
-        unless defined $defs{$val_api}{$value};
-    }
-
-    open my $macros, '>', $MACRO_FILE
-        or die "Could not open macro file '$MACRO_FILE' for write: $!";
-
-    print $macros <<"HEADER";
+    my $autogen_header = <<'HEADER';
 # DO NOT EDIT THIS FILE.
 #
 # Any changes made here will be lost.
@@ -170,7 +473,66 @@ sub gen_opengl_defines {
 #
 HEADER
 
-    print $macros "# $_\n" foreach @$header_files;
+    $autogen_header .= "# $_\n" foreach @header_files;
+
+    $self->gen_opengl_defines ($conf, \@header_files, $autogen_header, $verbose);
+    $self->gen_opengl_wrappers($conf, \@header_files, $autogen_header, $verbose);
+    $self->gen_glut_callbacks ($conf);
+
+    return 1;
+}
+
+sub gen_opengl_defines {
+    my ($self, $conf, $header_files, $autogen_header, $verbose) = @_;
+
+    my (%defs, @macros, %non_numeric);
+    my $max_len = 0;
+
+    foreach my $file (@$header_files) {
+        open my $header, '<', $file
+        or die "Could not open header '$file': $!";
+
+        while (<$header>) {
+            s/^\s*#\s*define\b/#define/;
+
+            my (@F) = split;
+            next unless @F > 2 and $F[0] eq '#define';
+            next unless $F[1] =~ /^(AGL|CGL|WGL|GLX|MUI|SMAP|TUBE|GL[A-Z]*)_/;
+            next if     $F[1] =~ /\(/;
+
+            $max_len = length $F[1] if $max_len < length $F[1];
+
+            my $api = $1;
+            if ($F[2] =~ /^(?:[ACW])?GL[A-Z]*_\w+$/) {
+                push @macros, [$api, $F[1], $F[2]];
+            }
+            elsif (   $F[2] =~ /^0x[0-9a-fA-F]+$/
+                   || $F[2] =~ /^\d+(?:\.\d*)?(?:e\d+)?$/) {
+                $defs{$api}{$F[1]} = $F[2];
+            }
+            else {
+                $non_numeric{$F[1]}++;
+                print "\nNon-numeric value for '$F[1]': '$F[2]'\n" if $verbose;
+            }
+        }
+    }
+
+    foreach my $macro (@macros) {
+        my ($api, $define, $value) = @$macro;
+        my ($val_api) = $value =~ /^((?:[ACW])?GL[A-Z]*)_/;
+
+        unless (defined ($defs{$api}{$define} = $defs{$val_api}{$value})) {
+            delete $defs{$api}{$define};
+            next if $non_numeric{$define};
+
+            die "'$define' is defined as '$value', but no '$value' has been defined";
+        }
+    }
+
+    open my $macros, '>', $MACRO_FILE
+        or die "Could not open macro file '$MACRO_FILE' for write: $!";
+
+    print $macros $autogen_header;
     print $macros "\n\n";
 
     foreach my $api (sort keys %defs) {
@@ -183,6 +545,309 @@ HEADER
     }
 
     $conf->append_configure_log($MACRO_FILE);
+
+    return 1;
+}
+
+sub gen_opengl_wrappers {
+    my ($self, $conf, $header_files, $autogen_header, $verbose) = @_;
+
+    my %IGNORE = map {($_ => 1)} @IGNORE;
+
+    my (%pass, %fail, %ignore, %sigs, %funcs);
+
+    # PHASE 1: Parse Headers
+    foreach my $file (@$header_files) {
+        open my $header, '<', $file
+            or die "Could not open header '$file': $!";
+
+      PROTO:
+        while (<$header>) {
+            # Get rid of C comments
+            s{/\*.*?\*/}{}g;
+            if (m{/\*}) {
+                chomp;
+                $_ .= <$header>;
+                redo;
+            }
+
+            # Make sure the entire parameter list is on a single line
+            next unless /\(/;
+            unless (/\)/) {
+                chomp;
+                $_ .= <$header>;
+                redo;
+            }
+
+            # We only care about regular function prototypes
+            next unless /API/ or /\bextern\b/ or /\bmui[A-Z]/;
+            next if     /^#/;
+            next if     /\btypedef\b/;
+
+            # Save a (space compressed) copy of the source line
+            # for later error reporting
+            my $orig =  $_;
+               $orig =~ s/\s+/ /g;
+               $orig =~ s/ $/\n/;
+
+            # Get rid of junk needed for C, but not for Parrot NCI;
+            # also do general cleanup to make parsing easier
+            s/\b(?:AVAILABLE|DEPRECATED_FOR)_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
+            s/\b__cdecl\b\s*//;
+            s/\b__stdcall\b\s*//;
+            s/\b_CRTIMP\b\s*//;
+            s/\bextern\b\s*//;
+            s/\bstatic\b\s*//;
+            s/\bconst\b\s*//g;
+            s/\benum\b\s*//g;
+            s/\bstruct\b\s*//g;
+            s/\b[_A-Z]*API[_A-Z]*\s*//g;
+            s/\s*\*\s*/* /g;
+            s/\* \*/**/g;
+            s/\s*,\s*/, /g;
+            s/\s*\(\s*/(/g;
+            s/\s*\)\s*/)/g;
+            s/\s+/ /g;
+            s/\s+$//;
+            s/^\s+//;
+
+            # Canonicalize types
+            s/\b(\w+)\b/$C_TYPE{$1} || $1/eg;
+            s/\b(?:un)?signed (char|short|int|long)\b/$1/g;
+            s/\b(?:un)?signed /int /g;
+            s/\blong long\b/longlong/g;
+
+            # Parse the function prototype, trying hard to capture name
+            my ($return, $name, $params) = /^(\w+\**) (\w+)\(([^)]*)\);$/;
+            ($name) = /^\w+\(?\** (\w+)\)?/ unless defined $name;
+
+            # Is this a function we're ignoring for now or handling elsewhere?
+            if (defined $name) {
+                # Callback reg functions handled by gen_*_callbacks()
+                $pass  {$file}++, next if /\bglut[A-Z][a-zA-Z]+Func\b/;
+                $ignore{$file}++, next if /\bsmap[A-Z][a-zA-Z]+Func\b/;
+
+                # Ignore all library-internal functions
+                $ignore{$file}++, next if $name =~ /^__/;
+                $ignore{$file}++, next if $name =~ /_ATEXIT_HACK$/;
+
+                # Miscellaneous ignores
+                $ignore{$file}++, next if $IGNORE{$name};
+            }
+
+            # Successful parse?
+            unless (defined $return and defined $name and defined $params) {
+                $fail{$file}++;
+                $name ||= '';
+                warn "In OpenGL header '$file', can't parse canonicalized prototype for '$name':\n  $_\nOriginal prototype:\n  $orig\n";
+                next;
+            }
+
+            # Figure out what group/library this function belongs to
+            my ($group) = $name =~ /^(agl|CGL|wgl|glX|mui|smap|gl[a-z]*)/;
+
+            unless ($group) {
+                $fail{$file}++;
+                warn "In OpenGL header '$file', found a non-OpenGL function: '$name'\n";
+                next;
+            }
+
+            $group = lc $group;
+
+            # Convert return and param types to NCI signature
+            my $nci_sig = $OVERRIDE{$name};
+
+            unless ($nci_sig) {
+                $params = '' if $params eq 'void';
+                my @params = split /, / => $params;
+                unshift @params, $return;
+
+                foreach my $param (@params) {
+                    1 while $param =~ s/(\w+\**) (\w+)\s*\[\d*\]/$1* $2/;
+                    $param =~ s/ \w+$// unless $NCI_TYPE{$param};
+                    unless ($NCI_TYPE{$param}) {
+                        $fail{$file}++;
+                        warn "In OpenGL header '$file', prototype '$name', can't handle type '$param'; original prototype:\n  $orig\n";
+                        next PROTO;
+                    }
+                    $nci_sig .= $NCI_TYPE{$param};
+                }
+
+                if ($nci_sig =~ /.v/) {
+                    $fail{$file}++;
+                    warn "In OpenGL header '$file', prototype '$name', there is a void parameter; original prototype:\n  $orig\n";
+                    next PROTO;
+                }
+            }
+
+            # Success!  Save results.
+            $pass{$file}++;
+            $sigs{$nci_sig}++;
+            push @{$funcs{$group}}, [$name, $nci_sig];
+
+            print "$group\t$nci_sig\t$return $name($params);\n" if $verbose >= 3;
+        }
+    }
+
+    # PHASE 2: Write unique signatures to NCI signatures file
+    my @sigs = sort keys %sigs;
+
+    open my $sigs, '>', $SIGS_FILE
+        or die "Could not open NCI signatures file '$SIGS_FILE' for write: $!";
+
+    print $sigs <<"HEADER";
+# Used by OpenGL (including GLU and GLUT)
+#
+$autogen_header
+
+# GLUT callbacks
+v    JP
+v    JPi
+v    JPii
+
+# Generated signatures
+HEADER
+
+    foreach my $nci_sig (@sigs) {
+        my ($return, $params) = $nci_sig =~ /^(.)(.*)$/;
+
+        print $sigs "$return    $params\n";
+    }
+
+    close $sigs;
+    $conf->append_configure_log($SIGS_FILE);
+
+    # PHASE 3: Write function lists for each OpenGL-related library
+
+    open my $funcs, '>', $FUNCS_FILE
+        or die "Could not open function list file '$FUNCS_FILE' for write: $!";
+
+    print $funcs $autogen_header;
+    print $funcs <<'GLUTCB_FUNCS';
+
+
+.sub _glutcb_func_list
+    .local pmc glutcb_funcs
+    glutcb_funcs = new 'ResizableStringArray'
+    push glutcb_funcs, 'glutcbCloseFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbDisplayFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbIdleFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbMenuDestroyFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbOverlayDisplayFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbWMCloseFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbEntryFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbMenuStateFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbVisibilityFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbWindowStatusFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbButtonBoxFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbDialsFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbMotionFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbPassiveMotionFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbReshapeFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbSpaceballButtonFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbTabletMotionFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbKeyboardFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbKeyboardUpFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbMenuStatusFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbSpaceballMotionFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbSpaceballRotateFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbSpecialFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbSpecialUpFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbMouseFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbMouseWheelFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbTabletButtonFunc'
+    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'glutcbTimerFunc'
+    push glutcb_funcs, 'vJPii'
+    push glutcb_funcs, 'glutcbJoystickFunc'
+    push glutcb_funcs, 'vJPi'
+
+    .return (glutcb_funcs)
+.end
+GLUTCB_FUNCS
+
+    foreach my $group (sort keys %funcs) {
+        my $sub_name  = "_${group}_func_list";
+        my $list_name = "${group}_funcs";
+
+        print $funcs <<"SUB_HEADER";
+
+
+.sub $sub_name
+    .local pmc $list_name
+    $list_name = new 'ResizableStringArray'
+
+SUB_HEADER
+
+        my @funcs = sort {$a->[0] cmp $b->[0]} @{$funcs{$group}};
+        foreach my $func (@funcs) {
+            my ($name, $sig) = @$func;
+
+            print $funcs <<"FUNCTION"
+    push $list_name, '$name'
+    push $list_name, '$sig'
+FUNCTION
+        }
+        print $funcs <<"SUB_FOOTER";
+
+    .return ($list_name)
+.end
+SUB_FOOTER
+    }
+
+    close $funcs;
+    $conf->append_configure_log($FUNCS_FILE);
+
+    # PHASE 4: Print statistical info on parse results if verbose
+    if ($verbose) {
+        print "\nPASS  FAIL  IGNORE   HEADER\n";
+        foreach my $file (@$header_files, 'TOTAL') {
+            my $pass   = $pass  {$file} || 0;
+            my $fail   = $fail  {$file} || 0;
+            my $ignore = $ignore{$file} || 0;
+
+            printf "%4d  %4d  %4d     %s\n", $pass, $fail, $ignore, $file;
+
+            $pass  {TOTAL} += $pass;
+            $fail  {TOTAL} += $fail;
+            $ignore{TOTAL} += $ignore;
+        }
+
+        print "\nCOUNT   NCI SIGNATURE\n" if $verbose >= 2;
+        foreach my $nci_sig (@sigs, 'TOTAL') {
+            printf "%5d   %s\n", $sigs{$nci_sig}, $nci_sig if $verbose >= 2;
+            $sigs{TOTAL} += $sigs{$nci_sig};
+        }
+
+        printf "\n===> %d unique signatures successfully translated.\n",
+               scalar @sigs
+    }
 
     return 1;
 }
@@ -251,11 +916,11 @@ sub gen_glut_callbacks {
 
    foreach (@callbacks) {
         $enums     .= "    $_->{enum},\n";
-        $thunks    .= "           void $_->{thunk}($_->{proto});\n";
-        $reg_funcs .= "PARROT_API void $_->{glutcb}(Parrot_Interp, PMC *);\n";
+        $thunks    .= "                     void $_->{thunk}($_->{proto});\n";
+        $reg_funcs .= "PARROT_DYNEXT_EXPORT void $_->{glutcb}(Parrot_Interp, PMC *);\n";
    }
 
-    my $header = <<HEADER;
+    my $header = <<"HEADER";
 /*
 # DO NOT EDIT THIS FILE.
 #
@@ -283,6 +948,8 @@ cannot be used.
 
 */
 
+#define PARROT_IN_EXTENSION
+
 #include <$glut_header>
 #include "parrot/parrot.h"
 
@@ -306,14 +973,14 @@ typedef struct GLUT_CB_data {
 GLUT_CB_data callback_data[GLUT_NUM_CALLBACKS];
 
 
-           int  is_safe(Parrot_Interp, PMC *);
+                     int  is_safe(Parrot_Interp, PMC *);
 
-           void glut_timer_func(int);
-PARROT_API void glutcbTimerFunc(Parrot_Interp, PMC *, unsigned int, int);
+                     void glut_timer_func(int);
+PARROT_DYNEXT_EXPORT void glutcbTimerFunc(Parrot_Interp, PMC *, unsigned int, int);
 
 #if GLUT_API_VERSION >= 4
-           void glut_joystick_func(unsigned int, int, int, int);
-PARROT_API void glutcbJoystickFunc(Parrot_Interp, PMC *, int);
+                void glut_joystick_func(unsigned int, int, int, int);
+PARROT_DYNEXT_EXPORT void glutcbJoystickFunc(Parrot_Interp, PMC *, int);
 #endif
 
 $thunks
@@ -356,7 +1023,7 @@ glut_timer_func(int data)
         Parrot_runops_fromc_args_event(interp, sub, "vi", data);
 }
 
-PARROT_API
+PARROT_DYNEXT_EXPORT
 void
 glutcbTimerFunc(PARROT_INTERP, PMC *sub, unsigned int milliseconds, int data)
 {
@@ -391,7 +1058,7 @@ glut_joystick_func(unsigned int buttons, int xaxis, int yaxis, int zaxis)
         Parrot_runops_fromc_args_event(interp, sub, "viiii", buttons, xaxis, yaxis, zaxis);
 }
 
-PARROT_API
+PARROT_DYNEXT_EXPORT
 void
 glutcbJoystickFunc(PARROT_INTERP, PMC *sub, int pollinterval)
 {
@@ -431,7 +1098,7 @@ $_->{thunk}($_->{params})
         Parrot_runops_fromc_args_event(interp, sub, "$_->{sig}"$_->{args});
 }
 
-PARROT_API
+PARROT_DYNEXT_EXPORT
 void
 $_->{glutcb}(PARROT_INTERP, PMC *sub)
 {
@@ -447,7 +1114,7 @@ IMPLEMENTATION
     }
 
 
-    my $footer = <<FOOTER;
+    my $footer = <<'FOOTER';
 
 /*
 

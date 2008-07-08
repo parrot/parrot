@@ -53,9 +53,6 @@ Argument direction is one of:
     inout         the argument passes a value into and out of the op
     inconst       the argument passes a constant value into the op
     invar         the argument passes a variable value into the op
-    label         an in argument containing a branch offset or address
-    labelconst    an invar argument containing a branch offset or address
-    labelvar      an inconst argument containing a branch offset or address
 
 Argument direction is used to determine the life times of symbols and
 their related register allocations. When an argument is passed into an
@@ -70,6 +67,7 @@ Argument type is one of:
     PMC       the argument is an PMC
     KEY       the argument is an aggregate PMC key
     INTKEY    the argument is an aggregate PMC integer key
+    LABEL     the argument is an integer branch offset or address
 
 The size of the return offset is determined from the op function's
 signature.
@@ -90,6 +88,10 @@ suitable ops for a Parrot safe mode, or for inclusion in miniparrot.
 The presence (or absence) of certain flags will change how the op
 behaviors. For example, the lack of the C<flow> flag will cause the
 op to be implicitly terminated with C<goto NEXT()>. (See next section).
+
+The :deprecated flag will generate a diagnostic to standard error at
+runtime when a deprecated opcode is invoked and
+C<PARROT_WARNINGS_DEPRECATED_FLAG> has been set.
 
 =back
 
@@ -355,33 +357,31 @@ sub read_ops {
 
             $flags = { map { $_ => undef } (split(/[ :]+/, $flags)) };
 
-            my @temp = ();
+            my @temp;
 
-            foreach my $arg (@args) {
+            for my $arg (@args) {
                 my ( $use, $type ) =
-                    $arg =~ m/^(in|out|inout|inconst|invar|label|labelconst|labelvar)
+                    $arg =~ m/^(in|out|inout|inconst|invar)
                     \s+
-                    (INT|NUM|STR|PMC|KEY|INTKEY)$/ix;
+                    (INT|NUM|STR|PMC|KEY|INTKEY|LABEL)$/ix;
 
                 die "Unrecognized arg format '$arg' in '$_'!"
-                    unless defined($use)
-                        and defined($type);
+                    unless defined($use) and defined($type);
 
-                if ( $type =~ /^INTKEY$/i ) {
-                    $type = "ki";
-                }
-                else {
-                    $type = lc substr( $type, 0, 1 );
-                }
-
-                # convert e.g. "labelvar" to "invar" and remember labels
-
-                if ( $use =~ /label(\w*)/ ) {
+                # remember it's a label, then turn it to an int
+                if ( $type =~ /^LABEL$/i ) {
+                    $type = 'i';
                     push @labels, 1;
-                    $use = "in$1";
                 }
                 else {
                     push @labels, 0;
+                }
+
+                if ( $type =~ /^INTKEY$/i ) {
+                    $type = 'ki';
+                }
+                else {
+                    $type = lc substr( $type, 0, 1 );
                 }
 
                 if ( $use eq 'in' ) {
@@ -482,6 +482,12 @@ sub make_op {
     my $next     = 0;
     my $restart  = 0;
 
+    if (exists($$flags{deprecated})) {
+        $body = <<"END_CODE" . $body;
+INTVAL unused = PARROT_WARNINGS_test(interp,PARROT_WARNINGS_DEPRECATED_FLAG) &&
+  fprintf(stderr,"Warning: instruction '$short_name' is deprecated\\n");
+END_CODE
+}
     unless (exists($$flags{flow})) {
         $body .= "\ngoto NEXT();";
     }

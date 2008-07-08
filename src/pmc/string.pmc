@@ -462,8 +462,7 @@ C<value>; returns true if they match.
 */
 
     VTABLE INTVAL is_equal_num(PMC *value) {
-        const FLOATVAL sf = string_to_num(INTERP,
-            VTABLE_get_string(INTERP, SELF));
+        const FLOATVAL sf = string_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
         const FLOATVAL vf = VTABLE_get_number(INTERP, value);
         return (INTVAL)(sf == vf);
     }
@@ -532,8 +531,8 @@ are equal, and 1 if C<value> is smaller.
 
 */
     VTABLE INTVAL cmp_num(PMC *value) {
-        FLOATVAL sf = string_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
-        FLOATVAL vf = VTABLE_get_number(INTERP, value);
+        const FLOATVAL sf = string_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
+        const FLOATVAL vf = VTABLE_get_number(INTERP, value);
 
         if (sf < vf)
             return (INTVAL)(-1);
@@ -604,8 +603,8 @@ numbers count from the end.
 */
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        INTVAL n = string_length(INTERP, VTABLE_get_string(INTERP, SELF));
-        INTVAL k = VTABLE_get_integer(INTERP, key);
+        const INTVAL n = string_length(INTERP, VTABLE_get_string(INTERP, SELF));
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         return (INTVAL)((k>=0 && k<=n) || (k<0 && -k<=n));
     }
 
@@ -773,8 +772,7 @@ Return length of the string.
             return iter;
         }
 
-        real_exception(INTERP, NULL, E_ValueError,
-                "String: Unknown slice type");
+        real_exception(INTERP, NULL, E_ValueError, "String: Unknown slice type");
     }
 
     VTABLE PMC *get_iter() {
@@ -955,7 +953,7 @@ Checks if the ascii STRING C<str> is just an integer.
     }
 
     VTABLE PMC *share_ro() {
-        PMC *ret = SUPER();
+        PMC * const ret = SUPER();
 
         /* prevent wrong garbage collection */
         PObj_is_shared_SET(PMC_str_val(SELF));

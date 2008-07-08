@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -151,12 +151,12 @@ sub makefiles {
                     $pod =~ s/\.ops$/.pod/;
                     print {$MAKEFILE} "ops$slash$pod: ..${slash}src${slash}ops${slash}$ops\n";
                     if ( $new_perldoc == 1 ) {
-                        print {$MAKEFILE} "\tperldoc -ud ops${slash}$pod"
+                        print {$MAKEFILE} "\t\$(PERLDOC) -ud ops${slash}$pod"
                             . " ..${slash}src${slash}ops${slash}$ops\n";
                         print {$MAKEFILE} "\t\$(CHMOD) 0644 ops${slash}$pod\n\n";
                     }
                     else {
-                        print {$MAKEFILE} "\tperldoc -u ..${slash}ops${slash}$ops"
+                        print {$MAKEFILE} "\t\$(PERLDOC) -u ..${slash}ops${slash}$ops"
                             . " > ops${slash}$pod\n";
                         print {$MAKEFILE} "\t\$(CHMOD) 0644 ..${slash}ops${slash}$pod\n\n";
                     }

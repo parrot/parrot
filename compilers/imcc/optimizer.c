@@ -83,6 +83,16 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
+static int _is_ins_save(
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *check_ins),
+    ARGIN(const SymReg *r),
+    int what)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -138,6 +148,17 @@ static int if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+static int is_ins_save(PARROT_INTERP,
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *ins),
+    ARGIN(const SymReg *r),
+    int what)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -1133,7 +1154,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int changed = 0, i;
+    unsigned int i;
+    int          changed = 0;
 
     IMCC_info(interp, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -1368,12 +1390,12 @@ PARROT_WARN_UNUSED_RESULT
 static int
 unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int used;
-    int i;
-    int changed = 0;
+    int          used;
+    unsigned int i;
+    int          changed = 0;
 
     IMCC_info(interp, 2, "\tunused_label\n");
-    for (i=1; i < unit->n_basic_blocks; i++) {
+    for (i = 1; i < unit->n_basic_blocks; i++) {
         Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->symregs[0]->name != '_') {
             const SymReg * const lab = ins->symregs[0];
@@ -1441,7 +1463,7 @@ RT#48260: Not yet documented!!!
 static int
 dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int i;
+    unsigned int i;
     int changed = 0;
     Instruction *ins, *last;
 
@@ -1452,7 +1474,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     /* Unreachable blocks */
 
-    for (i=1; i < unit->n_basic_blocks; i++) {
+    for (i = 1; i < unit->n_basic_blocks; i++) {
         Basic_block * const bb = unit->bb_list[i];
 
         if ((bb->start->type & ITLABEL) && *bb->start->symregs[0]->name == '_')

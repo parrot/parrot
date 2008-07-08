@@ -59,7 +59,7 @@ print inlined_badargs( $cmd, @args );
 print footer();
 
 print ".HLL 'Tcl', 'tcl_group'\n";
-print ".namespace\n";
+print ".namespace []\n";
 print header( $cmd, @args );
 print arg_check(@args);
 print helpers(@args);

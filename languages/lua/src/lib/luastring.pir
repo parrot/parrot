@@ -133,11 +133,19 @@ L<http://www.lua.org/manual/5.1/manual.html#5.4>.
 .sub 'posrelat' :anon
     .param int pos
     .param int len
-    if pos >= 0 goto L1
-    pos = len + pos
-    inc pos
-  L1:
+    unless pos >= 0 goto L1
     .return (pos)
+  L1:
+    $I1 = - pos
+    if pos == $I1 goto L2
+    if $I1 > len goto L2
+    goto L3
+  L2:
+    .return (0)
+  L3:
+    $I0 = len - $I1
+    inc $I0
+    .return ($I0)
 .end
 
 
@@ -164,13 +172,14 @@ Note that numerical codes are not necessarily portable across platforms.
     .local int pose
     pose = lua_optint(3, j, posi)
     pose = posrelat(pose, l)
-    unless posi <= 0 goto L1
+    unless posi < 1 goto L1
     posi = 1
   L1:
     unless pose > l goto L2
     pose = l
   L2:
     unless posi > pose goto L3
+    # empty interval
     .return ()
   L3:
     .local int n

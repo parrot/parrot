@@ -1,0 +1,430 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+=head1 Episode 6: Scope and Subroutines
+
+In Episode 5, we looked at variable declarations and implementing scope.
+We covered a lot of information then, but did not tell the full story, in order
+to keep that post short. In this episode we'll address the missing parts,
+which will also result in implementing subroutines.
+
+=head2 Variables
+
+In the previous episode, we entered local variables into the current block's
+symbol table. As we've seen earlier, using the do-block statement, scopes may
+nest. Consider this example:
+
+ do
+     var x = 42
+     do
+         print(x)
+     end
+ end
+
+In this example, the print statement should print 42, even though x was not
+declared in the scope where it is referenced. How does the compiler know it's
+still a local variable? That's simple: it should look in all scopes, starting
+at the innermost scope. Only when the variable is found in any scope, should
+its scope be set to "lexical", so that the right instructions are being
+generated.
+
+The solution I came up with is shown below. Please note that I'm not 100% sure
+if this is the "best" solution, but my personal understanding of the PAST
+compiler is limited. So, while this solution works, I may teach you the wrong
+"habit". Please be aware of this.
+
+ method identifier($/) {
+     our @?BLOCK;
+     my $name  := ~$<ident>;
+     my $scope := 'package'; # default value
+     # go through all scopes and check if the symbol
+     # is registered as a local. If so, set scope to
+     # local.
+     for @?BLOCK {
+         if $_.symbol($name) {
+             $scope := 'lexical';
+         }
+     }
+
+     make PAST::Var.new( :name($name),
+                         :scope($scope),
+                         :viviself('Undef'),
+                         :node($/) );
+ }
+
+=head2 Viviself
+
+You might have noticed the viviself attribute before. This attribute will
+result in extra instructions that will initialize the variable if it doesn't
+exist. As you know, global variables spring into life automatically when
+they're used. Earlier we mentioned that uninitialized variables have a default
+value of "Undef": the viviself attribute does this.
+For local variables, we use this mechanism to set the (optional) initialization
+value. When the identifier is a parameter, the parameter will be initialized
+automatically if it doesn't receive a value when the subroutine it belongs to
+is invoked. Effectively this means that all parameters in Squaak are optional!
+
+=head2 Subroutines
+
+We already mentioned subroutines before, and introduced the C<PAST::Block> node
+type. We also briefly mentioned the blocktype attribute that can be set on a
+C<PAST::Block> node, which indicates whether the block is to be executed
+immediately (for instance, a do-block or if statement) or it represents a
+declaration (for instance, subroutines). Let us now look at the grammar rule
+for subroutine definitions:
+
+ rule sub_definition {
+     'sub' <identifier> <parameters>
+     <statement>*
+     'end'
+     {*}
+ }
+
+ rule parameters {
+     '(' [<identifier> [',' <identifier>]* ]? ')'
+     {*}
+ }
+
+This is rather straightforward, and the action methods for these rules are
+quite simple, as you will see. First, however, let's have a look at the rule
+for sub definitions. Why is the sub body defined as <statement>* and not as a
+<block>? Surely, a subroutine defines a new scope, which was already covered
+by <block> Well, you're right in that. However, as we will see, by the time
+that a new C<PAST::Block> node would be created, we are too late! The
+parameters would already have been parsed, and not entered into the block's
+symbol table. That's a problem, because parameters are most likely to be used
+in the subroutine's body, and as they are not registered as local variables
+(which they are), any usage of parameters would not be compiled down to the
+right instructions to fetch any parameters.
+
+So, how do we solve this in an efficient way?
+
+The solution is simple. The only place where parameters live, is in the
+subroutine's body, represented by a PAST::Block node. Why don't we create the
+C<PAST::Block> node in the action method for the parameters rule. By doing so,
+the block is already in place and the parameters are registered as local
+symbols right in time. Let's look at the action methods.
+
+ method parameters($/) {
+     our $?BLOCK;
+     our @?BLOCK;
+     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+
+     # now add all parameters to this block
+     for $<identifier> {
+         my $param := $( $_ );
+         $param.scope('parameter');
+         $past.push($param);
+
+         # register the parameter as a local symbol
+         $past.symbol($param.name(), :scope('lexical'));
+     }
+
+     # now put the block into place on the scope stack
+     $?BLOCK := $past;
+     @?BLOCK.unshift($past);
+
+     make $past;
+ }
+
+ method sub_definition($/) {
+     our $?BLOCK;
+     our @?BLOCK;
+     my $past := $( $<parameters> );
+     my $name := $( $<identifier> );
+
+     # set the sub's name
+     $past.name( $name.name() );
+
+     # add all statements to the sub's body
+     for $<statement> {
+         $past.push( $( $_ ) );
+     }
+
+     # and remove the block from the scope stack and restore the current block
+     @?BLOCK.shift();
+     $?BLOCK := @?BLOCK[0];
+     make $past;
+ }
+
+First, let's check out the parse action for parameters. First, a new
+C<PAST::Block> node is created. Then, we iterate over the list of identifiers
+(which may be empty), each representing a parameter. After retrieving the
+result object for a parameter (which is just an identifier), we set its scope
+to "parameter", and we add it to the block object. After that, we register the
+parameter as a symbol in the block object, specifying the scope as "lexical".
+Parameters are just a special kind of local variables, and there's no
+difference in a parameter and a declared local variable in a subroutine, except
+that a parameter will usually be initialized with a value that is passed when
+the subroutine is invoked.
+After handling the parameters, we set the current block (referred to by our
+package variable C<$?BLOCK>) to C<PAST::Block> node we just created, and push it
+on the scope stack (referred to by our package variable C<@?BLOCK>).
+
+After the whole subroutine definition is parsed, the action method
+C<sub_definition> is invoked. This will retrieve the result object for
+parameters, which is the C<PAST::Block> node that will represent the sub.
+After retrieving the result object for the sub's name, we set the name on the
+block node, and add all statements to the block. After this, we pop off this
+block node of the scope stack (C<@?BLOCK>), and restore the current block
+(C<$?BLOCK>).
+
+Pretty easy, huh?
+
+=head2 Subroutine invocation
+
+Once you defined a subroutine, you'll want to invoke it. In the exercises of
+Episode 5, we already gave some tips on how to create the PAST nodes for a
+subroutine invocation. In this section, we'll give a complete description.
+First we'll introduce the grammar rules.
+
+ rule sub_call {
+     <primary> <arguments>
+     {*}
+ }
+
+Not only allows this to invoke subroutines by their name, you can also store
+the subroutines in an array or hash field, and invoke them from there. Let's
+take a look at the action method, which is really quite straightforward.
+
+ method sub_call($/) {
+     my $invocant := $( $<primary> );
+     my $past     := $( $<arguments> );
+     $past.unshift($invocant);
+     make $past;
+ }
+
+ method arguments($/) {
+     my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+     for $<expression> {
+         $past.push( $( $_ ) );
+     }
+     make $past;
+ }
+
+The result object of the sub_call method should be a C<PAST::Op> node (of type
+C<call>), which contains a number of child nodes: the first one is the invocant
+object, and all remaining children are the arguments to that sub call.
+
+In order to "move" the result objects of the arguments to the sub_call method,
+we create the C<PAST::Op> node in the method arguments, which is then retrieved
+by sub_call. In sub_call, the invocant object is set as the first child
+(using unshift). This is all too easy, isn't it? :-)
+
+=head2 What's Next?
+
+In this episode we finished the implementation of scope in Squaak, and
+implemented subroutines. Our language is coming along nicely! In the next
+episode, we'll explore how to implement operators and an operator precedence
+table for efficient expression parsing.
+
+In the mean time, should you have any problems or questions, don't hesitate to
+leave a comment!
+
+=head2 Exercises
+
+=over 4
+
+=item *
+
+By now you should have a good idea on the implementation of scope in Squaak.
+We haven't implemented the for-statement yet, as it needs proper scope handling
+to implement. Implement this. Check out episode 3 for the BNF rules that define
+the syntax of the for-statement. When implementing it, you will run into the
+same issue as we did when implementing subroutines and parameters. Use the same
+trick for the implementation of the for-statement.
+
+=back
+
+=head2 Solution to the exercise
+
+Without further ado, the solution to the exercise in Episode 6:
+
+By now you should have a good idea on the implementation of scope in Squaak.
+We haven't implemented the for-statement yet, as it needs proper scope handling
+to implement. Implement this. Check out Episode 3 for the BNF rules that define
+the syntax of the for-statement. When implementing it, you will run into the
+same issue as we did when implementing subroutines and parameters. Use the
+same trick for the implementation of the for-statement.
+
+First, let us look at the BNF of the for-statement:
+
+    for-statement ::= 'for' for-init ',' expression [step]
+                      'do'
+                      block
+                      'end'
+
+    step          ::= ',' expression
+
+    for-init      ::= 'var' identifier '=' expression
+
+It's pretty easy to convert this to Perl 6 rules:
+
+    rule for_statement {
+        'for' <for_init> ',' <expression> <step>?
+        'do' <statement>* 'end'
+        {*}
+    }
+
+    rule step {
+        ',' <expression>
+        {*}
+    }
+
+    rule for_init {
+        'var' <identifier> '=' <expression>
+        {*}
+    }
+
+Pretty easy huh? Let's take a look at the semantics. A for-loop is just
+another way to write a while loop, but much easier in certain cases. This:
+
+    for var <ident> = <expr1>, <expr2>, <expr3> do
+       <statement>*
+    end
+
+corresponds to:
+
+    do
+      var <ident> = <expr1>
+      while <ident> <= <expr2> do
+         <statement>*
+         <ident> = <ident> + <expr3>
+      end
+    end
+
+If <expr3> is absent, it defaults to the value C<1>. Note that the step
+expression (expr3) should be positive; the loop condition contains a "<="
+operator. When you specify a negative step expression, the loop variable
+will only decrease in value, which will never make the loop condition false
+(unless it overflows, but that's a different issue; this might even raise an
+exception in Parrot; this I do not know). Allowing negative step expressions
+introduces more complexity, which I felt was not worth the trouble for this
+tutorial language.
+
+Note that the loop variable <ident> is local to the for loop; this is expressed
+in the equivalent while loop by the surrounding do/end pair: a new do/end pair
+defines a new (nested) scope; after the C<end> keyword, the loop variable is no
+longer visible.
+
+Let's implement the action method for the for-statement. As was mentioned in
+the exercise description, we're dealing with the same situation as with
+subroutine parameters. In this case, we're dealing with the loop variable,
+which is local to the for-statement. Let's check out the rule for for_init:
+
+    method for_init($/) {
+        our $?BLOCK;
+        our @?BLOCK;
+
+        ## create a new scope here, so that we can
+        ## add the loop variable
+        ## to this block here, which is convenient.
+        $?BLOCK := PAST::Block.new( :blocktype('immediate'),
+                                    :node($/) );
+        @?BLOCK.unshift($?BLOCK);
+
+        my $iter := $( $<identifier> );
+        ## set a flag that this identifier is being declared
+        $iter.isdecl(1);
+        $iter.scope('lexical');
+        ## the identifier is initialized with this expression
+        $iter.viviself( $( $<expression> ) );
+
+        ## enter the loop variable into the symbol table.
+        $?BLOCK.symbol($iter.name(), :scope('lexical'));
+
+        make $iter;
+    }
+
+So, just as we created a new C<PAST::Block> for the subroutine in the action
+method for parameters, we create a new C<PAST::Block> for the for-statement in
+the action method that defines the loop variable. (Guess why we made for-init
+a subrule, and didn't put in "C<var> <ident&gt = <expression>" in the rule of
+for-statement). This block is the place to live for the loop variable. The
+loop variable is declared, initialized using the viviself attribute, and
+entered into the new block's symbol table. Note that after creating the new
+C<PAST::Block> object, we put it onto the stack scope.
+
+Now, the action method for the for statement is quite long, so I'll just
+embed my comments, which makes reading it easier.
+
+    method for_statement($/) {
+        our $?BLOCK;
+        our @?BLOCK;
+
+First, get the result object of the for statement initialization rule; this
+is the C<PAST::Var> object, representing the declaration and initialization
+of the loop variable.
+
+        my $init := $( $<for_init> );
+
+Then, create a new node for the loop variable. Yes, another one (besides the
+one that is currently contained in the C<PAST::Block>). This one is used when
+the loop variable is updated at the end of the code block (each iteration).
+The difference with the other one, is that it doesn't have the C<isdecl> flag,
+and it doesn't have a C<viviself> clause, which would result in extra
+instructions checking whether the variable is null (and we know it's not,
+because we initialize the loop variable).
+
+        ## cache the name of the loop variable
+        my $itername := $init.name();
+        my $iter := PAST::Var.new( :name($itername),
+                               :scope('lexical'),
+                               :node($/) );
+
+Now, retrieve the C<PAST::Block> node from the scope stack, and push all
+statement PAST nodes onto it.
+
+        ## the body of the loop consists of the statements written by the user and
+        ## the increment instruction of the loop iterator.
+
+        my $body := @?BLOCK.shift();
+        $?BLOCK  := @?BLOCK[0];
+        for $<statement> {
+            $body.push($($_));
+        }
+
+If there was a step, we use that value; otherwise, we use assume a default
+step size of C<1>. Negative step sizes won't work, but if you Feel Lucky, you
+could go ahead and try. It's not that hard, it's just a lot of work, and
+I'm too lazy for that now.... ehm, I mean, I leave it as the proverbial
+exercise to the reader.
+
+        my $step;
+        if $<step> {
+            my $stepsize := $( $<step>[0] );
+            $step := PAST::Op.new( $iter, $stepsize, :pirop('add'), :node($/) );
+        }
+        else { ## default is increment by 1
+            $step := PAST::Op.new( $iter, :pirop('inc'), :node($/) );
+        }
+
+The incrementing of the loop variable is part of the loop body, so add the
+incrementing statement to $body.
+
+        $body.push($step);
+
+The loop condition uses the "<=" operator, and compares the loop variable
+with the maximum value that was specified.
+
+        ## while loop iterator <= end-expression
+        my $cond := PAST::Op.new( $iter,
+                                  $( $<expression> ),
+                                  :name('infix:<=') );
+
+Now we have the PAST for the loop condition and the loop body, so now create
+a PAST to represent the (while) loop.
+
+        my $loop := PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
+
+Finally, the initialization of the loop variable should go before the loop
+itself, so create a C<PAST::Stmts> node to do this:
+
+        make PAST::Stmts.new( $init, $loop, :node($/) );
+    }
+
+
+Wow, we've done it! This was a good example of how to implement a
+non-trivial statement type using PAST.
+
+=cut

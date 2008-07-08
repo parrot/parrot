@@ -17,6 +17,8 @@ Parrot.  If you're reading this yourself, use F<Configure.pl>
 use strict;
 use warnings;
 
+BEGIN { require 5.008_000 }
+
 my %translations =
 (
     INSTALL_BASE => 'prefix',

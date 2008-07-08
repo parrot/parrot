@@ -184,17 +184,17 @@ depending on the context.
 
 =cut
 
-.sub target
-        .param pmc mob
-        .param pmc adverbs :slurpy :named
-        $P0 = get_global 'macro_context'
-        if null $P0 goto do_normal
-        if $P0 > 0 goto do_macro
-    do_normal:
-        .return normal_target(mob, adverbs :flat :named)
-    do_macro:
-        .return macro_target(mob, adverbs :flat :named)
-.end
+#.sub target
+#        .param pmc mob
+#        .param pmc adverbs :slurpy :named
+#        $P0 = get_global 'macro_context'
+#        if null $P0 goto do_normal
+#        if $P0 > 0 goto do_macro
+#    do_normal:
+#        .return normal_target(mob, adverbs :flat :named)
+#    do_macro:
+#        .return macro_target(mob, adverbs :flat :named)
+#.end
 
 
 .sub label

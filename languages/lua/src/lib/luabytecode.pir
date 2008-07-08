@@ -68,7 +68,8 @@ lib/luabytecode.pir - Lua bytecode translation Library
 .include 'interpinfo.pasm'
 .HLL 'Lua', 'lua_group'
 
-.namespace
+.namespace []
+
 .sub '&start' :anon :main
     .param pmc args :optional
 #    print "start\n"

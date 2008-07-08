@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -17,7 +17,7 @@ over-complicating this file.
 
 =head2 References:
 
-APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
+APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 =head2 Functions
 
@@ -825,12 +825,14 @@ static INTVAL
 PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
         ARGIN_NULLOK(STRING *r))
 {
-    if (r) {
+    struct sockaddr_in * saddr = &io->remote;
+
+    if (r)
         memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
-    }
+
 AGAIN:
-    if ((connect(io->fd, (struct sockaddr*)&io->remote,
-                    sizeof (struct sockaddr_in))) != 0) {
+    if ((connect(io->fd, (struct sockaddr *)saddr,
+            sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
             case EINTR:
                 goto AGAIN;
@@ -860,13 +862,15 @@ static INTVAL
 PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io),
         ARGMOD(STRING *l))
 {
+    struct sockaddr_in * saddr = &io->local;
+
     if (!l)
         return -1;
 
     memcpy(&io->local, PObj_bufstart(l), sizeof (struct sockaddr_in));
 
-    if ((bind(io->fd, (struct sockaddr *)&io->local,
-                    sizeof (struct sockaddr_in))) == -1) {
+    if ((bind(io->fd, (struct sockaddr *) saddr,
+            sizeof (struct sockaddr_in))) == -1) {
         return -1;
     }
 
@@ -909,12 +913,13 @@ PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
-    ParrotIO * const newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+    ParrotIO * const    newio   = PIO_new(interp, PIO_F_SOCKET, 0,
+                                    PIO_F_READ|PIO_F_WRITE);
+    Parrot_Socklen_t    addrlen = sizeof (struct sockaddr_in);
+    struct sockaddr_in *saddr   = &newio->remote;
+    const int           newsock = accept(io->fd, (struct sockaddr *)saddr,
+                                    &addrlen);
 
-    Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
-
-    const int newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
-                          &addrlen);
     if (newsock == -1) {
         mem_sys_free(newio);
         return NULL;
@@ -926,8 +931,7 @@ PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
      * fill in the sockaddr_in structs for local and peer */
 
     /* Optionally do a gethostyaddr() to resolve remote IP address.
-     * This should be based on an option set in the master socket
-     */
+     * This should be based on an option set in the master socket */
 
     return newio;
 }

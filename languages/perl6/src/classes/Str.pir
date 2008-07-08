@@ -15,7 +15,7 @@ as the Perl 6 C<Str> class.
 
 =cut
 
-.namespace ['Perl6Str']
+.namespace ['Str']
 
 .include 'cclass.pasm'
 
@@ -23,8 +23,11 @@ as the Perl 6 C<Str> class.
     .local pmc p6meta, strproto
     p6meta = get_hll_global ['Perl6Object'], '$!P6META'
     strproto = p6meta.'new_class'('Str', 'parent'=>'Perl6Str Any')
-    p6meta.'register'('Perl6Str', 'parent'=>'Any', 'protoobject'=>strproto)
-    p6meta.'register'('String', 'parent'=>'Any', 'protoobject'=>strproto)
+    p6meta.'register'('Perl6Str', 'parent'=>strproto, 'protoobject'=>strproto)
+    p6meta.'register'('String', 'parent'=>strproto, 'protoobject'=>strproto)
+
+    $P0 = get_hll_namespace ['Str']
+    '!EXPORT'('sprintf', 'from'=>$P0)
 .end
 
 
@@ -33,18 +36,7 @@ as the Perl 6 C<Str> class.
     .return 'infix:eq'(topic, self)
 .end
 
-.sub 'chars' :method
-    .local pmc retv
-
-    retv = new 'Integer'
-    $S0  = self
-    $I0  = length $S0
-    retv = $I0
-
-    .return (retv)
-.end
-
-.sub 'reverse' :method
+.sub 'reverse' :method :multi('String')
     .local pmc retv
 
     retv = self.'split'('')
@@ -54,7 +46,7 @@ as the Perl 6 C<Str> class.
     .return(retv)
 .end
 
-.sub split :method :multi('Perl6Str')
+.sub 'split' :method :multi('Perl6Str')
     .param string delim
     .local string objst
     .local pmc pieces
@@ -223,10 +215,50 @@ Returns a Perl representation of the Str.
 .sub 'perl' :method
     $S0 = "\""
     $S1 = self
+    # TODO: escape $, @, $, {, } and the like
     $S1 = escape $S1
     concat $S0, $S1
     concat $S0, "\""
     .return ($S0)
+.end
+
+=item sprintf( *@args )
+
+=cut
+
+.sub 'sprintf' :method
+    .param pmc args            :slurpy
+    args.'!flatten'()
+    $P0 = new 'Str'
+    sprintf $P0, self, args
+    .return ($P0)
+.end
+
+
+=item substr()
+
+=cut
+
+.sub 'substr' :method
+    .param int start
+    .param int len     :optional
+    .param int has_len :opt_flag
+    .local pmc s
+
+    if has_len goto check_len
+    len = self.'chars'()
+
+  check_len:
+    if len > 0 goto end
+    $I0 = self.'chars'()
+    len = $I0 + len
+    len = len - start
+
+  end:
+    $S0 = substr self, start, len
+    s = new 'Str'
+    s = $S0
+    .return (s)
 .end
 
 =back
@@ -237,7 +269,7 @@ Returns a Perl representation of the Str.
 
 =cut
 
-.namespace
+.namespace []
 
 .include 'cclass.pasm'
 
@@ -363,43 +395,6 @@ B<Note:> partial implementation only
 .end
 
 
-=item join
-
-B<Note:> partial implementation only
-
-=cut
-
-.sub 'join'
-    .param pmc args            :slurpy
-    .local pmc flatargs
-    .local string sep
-
-    flatargs = new 'List'
-    sep = ''
-    unless args goto have_flatargs
-    $P0 = args[0]
-    $I0 = isa $P0, 'List'
-    if $I0 goto have_sep
-    $P0 = shift args
-    sep = $P0
-  have_sep:
-  arg_loop:
-    unless args goto have_flatargs
-    $P0 = shift args
-    $I0 = isa $P0, 'List'
-    if $I0 goto arg_array
-    push flatargs, $P0
-    goto arg_loop
-  arg_array:
-    $I0 = elements flatargs
-    splice flatargs, $P0, $I0, 0
-    goto arg_loop
-  have_flatargs:
-    $S0 = join sep, flatargs
-    .return ($S0)
-.end
-
-
 =item substr
 
  multi substr (Str $s, StrPos $start  : StrPos $end,      $replace)
@@ -414,17 +409,11 @@ B<Note:> partial implementation only
     .param string x
     .param int start
     .param int len     :optional
-    .param int has_len :opt_flag
     .local pmc s
 
-    if has_len goto end
     s = new 'Perl6Str'
     s = x
-    len = s.'chars'()
-
-  end:
-    $S0 = substr x, start, len
-    .return ($S0)
+    .return s.'substr'(start, len)
 .end
 
 =item chop

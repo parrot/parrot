@@ -75,7 +75,6 @@ Configure.pl to use it.
     perl Configure.pl
         --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib"
         --icuheaders="C:\usr\lib\icu\include"
-        --icudatadir="C:\usr\local\icu\data"
 
 Note the step of creating the F<C:\usr\lib\data> directory, as Parrot
 really wants it and the binary packages don't contain it.  It doesn't
@@ -156,6 +155,13 @@ properties so they are available whenever you open a shell.)
 Note: It is possible to use ActiveState Perl with the Toolkit: you don't
 have to compile your own perl.
 
+=item Strawberry Perl
+
+With the Strawberry perl distro from
+L<http://strawberryperl.com/>, gcc is included. To build parrot,
+use the strawberry perl binary to run Configure.pl, and then
+follow the directions.
+
 =item MinGW32 with GCC
 
 The latest release of MinGW package at the time of writing is 5.1.3,
@@ -171,11 +177,8 @@ With the ActiveState Perl distribution, tell Configure.pl to use gcc :
          --cc=gcc
          --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib"
          --icuheaders="C:\usr\lib\icu\include"
-         --icudatadir="C:\usr\local\icu\data"
 or
     perl Configure.pl --cc=gcc --without-icu
-
-With the strawberry distribution, gcc is already the compiler.
 
 =item Intel C++
 

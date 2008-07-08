@@ -69,15 +69,20 @@ get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
 static INTVAL
 get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
 {
-    Parrot_Class * const _class = PARROT_CLASS(self);
-    PMC *parent_class = PMCNULL;
-    STRING *fq_name;
+    Parrot_Class * const _class       = PARROT_CLASS(self);
+    PMC          * const class_cache  = VTABLE_get_pmc_keyed_str(interp,
+                    _class->attrib_cache, VTABLE_get_string(interp, key));
+    PMC                 *parent_class;
+    STRING              *fq_name;
 
-    parent_class = Parrot_oo_get_class(interp, key);
+    if (!PMC_IS_NULL(class_cache))
+        if (VTABLE_exists_keyed_str(interp, class_cache, name))
+            return VTABLE_get_integer_keyed_str(interp, class_cache, name);
 
     /* Build a string representing the fully qualified attribute name. */
-    fq_name = VTABLE_get_string(interp, parent_class);
-    fq_name = string_append(interp, fq_name, name);
+    parent_class = Parrot_oo_get_class(interp, key);
+    fq_name      = VTABLE_get_string(interp, parent_class);
+    fq_name      = string_append(interp, fq_name, name);
 
     /* Look up. */
     if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {

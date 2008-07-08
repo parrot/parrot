@@ -215,13 +215,13 @@ Splitting of query string is taken from HTTP/Daemon.pir.
 =head1 TODO
 
 Better method names.
-Add stuff that Plumhead needs.
+Add stuff that Pipp needs.
 Find or write a test suite for CGI.
 
 =head1 SEE ALSO
 
 F<runtime/parrot/library/HTTP/Daemon.pir>,
-F<languages/plumhead/plumhead.pir>, F<t/library/cgi_query_hash.t>,
+F<languages/pipp/pipp.pir>, F<t/library/cgi_query_hash.t>,
 L<http://hoohoo.ncsa.uiuc.edu/cgi/overview.html>
 
 =head1 AUTHOR

@@ -41,9 +41,19 @@ the Parrot distribution. The procedure for this is:
 
 =item *
 
-Or, if you're one of those rsync folks, you can access the repository with:
+If you're one of those rsync folks, you can access the repository with:
 
 C<rsync -av --delete svn.perl.org::parrot-HEAD parrot>
+
+=item *
+
+If you're using git-svn, you should check out just the latest version. First:
+
+C<svn info https://svn.perl.org/parrot>
+
+Note the current revision. Then:
+
+C<< git svn clone -s -r <revision> https://svn.perl.org/parrot >>
 
 =back
 
@@ -154,41 +164,17 @@ L<news://nntp.perl.org/perl.perl6.internals>
 
 L<http://nntp.x.perl.org/group/perl.perl6.internals>
 
-=item * Parrot Archives
+=item * Parrot Archives, RSS 
 
-L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.perl6.internals>
+L<http://groups.google.com/group/perl.perl6.internals/about> provides
+archives, search, and RSS feeds.
 
 L<http://www.nntp.perl.org/group/perl.perl6.internals>
-
-=item * Searching the Parrot Mailing List
-
-There are no directly searchable interfaces to the mailing lists. However,
-Google works quite well. After clicking the below links, just add your search
-terms to the Google search box.
-
-L<http://www.google.com/search?sourceid=navclient&q=site:archive%2Edevelooper%2Ecom+perl6+internals>
-
-L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.perl6.internals>
-
-=item * Summaries
-
-If you find the traffic too much to keep up with, weekly summaries of the
-discussion on C<parrot-porters@perl.org> and C<perl6-language@perl.org> are
-posted to C<perl6-announce@perl.org>. Alternately, you can find these summaries
-here:
-
-L<http://www.nntp.perl.org/group/perl.perl6.announce>
-
-L<http://dev.perl.org/perl6/list-summaries/>
-
-Or if you prefer to subscribe to the list:
-
-L<http://lists.perl.org/showlist.cgi?name=perl6-announce>
 
 =back
 
 In addition, there is a mailing list which logs all commits to the Parrot SVN 
-repository. If you're interested in Parrot development, you might find it  very
+repository. If you're interested in Parrot development, you might find it very
 helpful to subscribe and keep up on changes that people are making.
 
 =over 4
@@ -203,23 +189,13 @@ L<news://nntp.perl.org/perl.cvs.parrot>
 
 L<http://nntp.x.perl.org/group/perl.cvs.parrot>
 
-=item * Commit List Archives
+=item * Commit List Archives, RSS
 
-L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.cvs.parrot>
+L<http://groups.google.com/group/perl.cvs.parrot/about>
 
 L<http://www.nntp.perl.org/group/perl.cvs.parrot>
 
-=item * Searching the Parrot Commits List
-
-After clicking the below links, just add your search terms to the Google search
-box.
-
-L<http://www.google.com/search?sourceid=navclient&q=site:archive%2Edevelooper%2Ecom+cvs+parrot>
-
-L<http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.cvs.parrot>
-
 =back
-
 
 
 =head2 What other ways can I get in contact with the Parrot developers?
@@ -242,7 +218,7 @@ As such, a better solution would be to submit your patch to RT, the request
 tracker system that maintains bugs and patches for the Parrot project. To 
 visit RT, go here:
 
-L<http://bugs6.perl.org/>
+L<https://rt.perl.org/rt3/>
 
 Or if you want to submit a patch, send an email to
 C<parrotbug@parrotcode.org> with the moniker [PATCH] (including the brackets)
@@ -283,22 +259,3 @@ Located at:
 L<http://www.parrotcode.org/wiki>
 
 =back
-
-=head1 VERSION
-
-=over 4
-
-=item Revision 0.2 - 10 November 2006
-
-Remove link to old wiki page (dead since 2004.)
-
-Add irc.perl.org IRC server.
-
-=item Revision 0.1 - 27 July 2002
-
-Written to prepare for the fallout from TPC 6.
-
-=back
-
-=cut
-

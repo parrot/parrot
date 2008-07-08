@@ -92,7 +92,7 @@ internal_exception(int exitcode, ARGIN(const char *format), ...)
     fflush(stderr);
     va_end(arglist);
 /*
- * RT#45907 get rid of all the internal_exceptions or call them
+ * RT #45907 get rid of all the internal_exceptions or call them
  *          with an interpreter arg
     Parrot_exit(interp, exitcode);
  */
@@ -284,17 +284,15 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
 {
-    char *m;
-    int exit_status, print_location;
-    int depth = 0;
+    int            depth          = 0;
+    int            exit_status    = 1;
+    int            print_location = 0;
     Stack_Entry_t *e;
 
     /* for now, we don't check the exception class and we don't
-     * look for matching handlers.  [this is being redesigned anyway.]
-     */
-    STRING * const message = VTABLE_get_string_keyed_int(interp, exception, 0);
+     * look for matching handlers.  [this is being redesigned anyway.] */
 
-    /* [RT#45909: replace quadratic search with something linear, hopefully
+    /* [RT #45909: replace quadratic search with something linear, hopefully
      * without trashing abstraction layers.  -- rgr, 17-Sep-06.] */
     while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
         if (e->entry_type == STACK_ENTRY_PMC) {
@@ -315,45 +313,45 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
         PIO_flush(interp->debugger, PIO_STDERR(interp->debugger));
     }
 
-    m = string_to_cstring(interp, message);
-    exit_status = print_location = 1;
-    if (m && *m) {
-        fputs(m, stderr);
-        if (m[strlen(m)-1] != '\n')
-            fprintf(stderr, "%c", '\n');
-        string_cstring_free(m);
-    }
-    else {
-        if (m)
-            string_cstring_free(m); /* coverity fix, m was allocated but was "\0" */
-        /* new block for const assignment */
-        {
-            const INTVAL severity = VTABLE_get_integer_keyed_int(interp, exception, 2);
+    { /* Scope for message */
+        STRING * const message =
+            VTABLE_get_string_keyed_int(interp, exception, 0);
+        if (message && string_length(interp, message) > 0) {
+            exit_status = print_location = 1;
+            PIO_eprintf(interp, "%Ss", message);
+            if (string_ord(interp, message, -1) != '\n')
+                PIO_eprintf(interp, "%c", '\n');
+        }
+        else {
+            const INTVAL severity =
+                VTABLE_get_integer_keyed_int(interp, exception, 2);
             if (severity == EXCEPT_exit) {
                 print_location = 0;
                 exit_status =
                     (int)VTABLE_get_integer_keyed_int(interp, exception, 1);
             }
             else
-                fprintf(stderr, "No exception handler and no message\n");
+                PIO_eprintf(interp, "No exception handler and no message\n");
         }
     }
+    PIO_flush(interp, PIO_STDERR(interp));
+
     /* caution against output swap (with PDB_backtrace) */
     fflush(stderr);
+
     if (print_location)
         PDB_backtrace(interp);
+
     /*
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
      *
-     * RT#45917 this check should better be in Parrot_exit
+     * RT #45917 this check should better be in Parrot_exit
      */
-    if (interp->thread_data && interp->thread_data->tid) {
-        /*
-         * we should probably detach the thread here
-         */
+
+    /* we should probably detach the thread here */
+    if (interp->thread_data && interp->thread_data->tid)
         return NULL;
-    }
 
     /*
      * only main should run the destroy functions - exit handler chain
@@ -610,7 +608,7 @@ rethrow_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
 =item C<void rethrow_c_exception>
 
-Return back to runloop, assumes exception is still in todo (see RT#45915) and
+Return back to runloop, assumes exception is still in todo (see RT #45915) and
 that this is called from within a handler setup with C<new_c_exception>.
 
 =cut
@@ -623,10 +621,10 @@ rethrow_c_exception(PARROT_INTERP)
 {
     Parrot_exception * const the_exception = interp->exceptions;
 
-    PMC * const exception = PMCNULL;   /* RT#45915 */
+    PMC * const exception = PMCNULL;   /* RT #45915 */
     PMC * const handler   = find_exception_handler(interp, exception);
 
-    /* RT#45911 we should only peek for the next handler */
+    /* RT #45911 we should only peek for the next handler */
     push_exception(interp, handler);
     /*
      * if there was no user handler, interpreter is already shutdown
@@ -775,8 +773,11 @@ associated exceptions free list for the specified interpreter.
 void
 destroy_exception_list(PARROT_INTERP)
 {
-    really_destroy_exception_list(interp->exceptions);
-    really_destroy_exception_list(interp->exc_free_list);
+    if (interp->exceptions)
+        really_destroy_exception_list(interp->exceptions);
+
+    if (interp->exc_free_list)
+        really_destroy_exception_list(interp->exc_free_list);
 }
 
 /*
@@ -784,8 +785,8 @@ destroy_exception_list(PARROT_INTERP)
 =item C<void really_destroy_exception_list>
 
 Takes a pointer to an exception (which had better be the last one in the list).
-Walks back through the list, freeing the memory of each one, until it encounters NULL.
-Used by C<destroy_exception_list>.
+Walks back through the list, freeing the memory of each one, until it
+encounters NULL.  Used by C<destroy_exception_list>.
 
 =cut
 
@@ -794,7 +795,7 @@ Used by C<destroy_exception_list>.
 void
 really_destroy_exception_list(ARGIN(Parrot_exception *e))
 {
-    while (e != NULL) {
+    while (e) {
         Parrot_exception * const prev = e->prev;
         mem_sys_free(e);
         e    = prev;
@@ -1024,7 +1025,6 @@ Parrot_print_backtrace(void)
     size_t i;
 
     const size_t size = backtrace(array, BACKTRACE_DEPTH);
-    char ** strings;
 
     fprintf(stderr,
             "Backtrace - Obtained %zd stack frames (max trace depth is %d).\n",
@@ -1047,11 +1047,13 @@ Parrot_print_backtrace(void)
         }
     }
 #  else
-    strings = backtrace_symbols(array, size);
-    for (i = 0; i < size; i++)
-        fprintf(stderr, "%s\n", strings[i]);
+    { /* Scope for strings */
+        char ** strings = backtrace_symbols(array, size);
+        for (i = 0; i < size; i++)
+            fprintf(stderr, "%s\n", strings[i]);
 
-    mem_sys_free(strings);
+        mem_sys_free(strings);
+    }
 #  endif
 
 #  undef BACKTRACE_DEPTH

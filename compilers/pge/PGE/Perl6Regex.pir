@@ -732,6 +732,7 @@ Parses a subrule token.
 
     ##  default to non-capturing rule
     .local int iscapture
+    iscapture = 0
 
     ##  see what type of subrule this is
     if key == '<.' goto scan_subname
@@ -1373,6 +1374,10 @@ Parse a modifier.
   end:
     self['subname'] = 'ws'
     self['iscapture'] = 0
+    $I0 = pad['ratchet']
+    unless $I0 goto end_1
+    self['backtrack'] = PGE_BACKTRACK_NONE
+  end_1:
     .return (self)
 .end
 

@@ -25,7 +25,7 @@ token ws { \h* [ '#' \N* ]? }
 
 token file_input {
     ^ [ <.newline> | <statement> ]*
-    [ $ | <.panic: 'syntax_error'> ]
+    [ $ || <.panic: 'syntax_error'> ]
     {*}
 }
 
@@ -74,7 +74,7 @@ rule if_stmt {
 
 rule while_stmt {
     'while' <expression> ':' <suite>
-    [ 'else' ':' $<else>=<suite> ]?
+    [ 'else' ':' <else=suite> ]?
     {*}
 }
 
@@ -84,7 +84,8 @@ rule for_stmt {
 }
 
 rule try_stmt {
-    <try1_stmt> | <try2_stmt>
+    | <try1_stmt>
+    | <try2_stmt>
 }
 
 rule try1_stmt {
@@ -190,7 +191,6 @@ rule excess_keyword_parameter {
 rule defparameter {
     <parameter> [ '=' <expression> ]?
     {*}
-
 }
 
 rule sublist {
@@ -223,20 +223,20 @@ rule lambda_form {
 }
 
 token simple_stmt {
-    | <assert_stmt>
+    | <assert_stmt> {*}                          #= assert_stmt
     | <assignment_stmt> {*}                      #= assignment_stmt
     | <augmented_assignment_stmt>
     | <expression_stmt> {*}                      #= expression_stmt
     | <pass_stmt> {*}                            #= pass_stmt
-    | <del_stmt>
+    | <del_stmt> {*}                             #= del_stmt
     | <print_stmt> {*}                           #= print_stmt
-    | <return_stmt>
+    | <return_stmt> {*}                          #= return_stmt
     | <yield_stmt>
     | <raise_stmt> {*}                           #= raise_stmt
     | <break_stmt>
     | <continue_stmt>
     | <import_stmt>
-    | <global_stmt>
+    | <global_stmt> {*}                          #= global_stmt
     | <exec_stmt>
 }
 
@@ -245,7 +245,8 @@ rule expression_stmt {
 }
 
 rule assert_stmt {
-    'assert' <expression> [ ',' <expression> ]?
+    'assert' <exp1=expression> [ ',' <exp2=expression> ]?
+    {*}
 }
 
 rule assignment_stmt {
@@ -284,7 +285,8 @@ rule subscription {
 }
 
 rule slicing {
-    <simple_slicing> | <extended_slicing>
+    | <simple_slicing>
+    | <extended_slicing>
 }
 
 rule simple_slicing {
@@ -304,11 +306,12 @@ rule slice_item {
 }
 
 rule proper_slice {
-    <short_slice> | <long_slice>
+    | <short_slice>
+    | <long_slice>
 }
 
 rule short_slice {
-    [$<start>=<expression>]? ':' [$<end>=<expression>]?
+    [<start=expression>]? ':' [<end=expression>]?
 }
 
 rule long_slice {
@@ -329,11 +332,12 @@ rule pass_stmt {
 }
 
 rule del_stmt {
-    'del' <target_list>
+    'del' <target_list> {*}
 }
 
 rule return_stmt {
     'return' <expression_list>?
+    {*}
 }
 
 rule yield_stmt {
@@ -359,6 +363,7 @@ rule raise_stmt {
 
 rule global_stmt {
     'global' <identifier> [ ',' <identifier> ]*
+    {*}
 }
 
 rule exec_stmt {
@@ -455,7 +460,7 @@ rule tuple_or_scalar {
 
 rule tuple_constructor {
       <expression> ',' [ <expression> [ ',' <expression> ]* ','? ]? {*}
-} 
+}
 
 rule list_display {
     '['
@@ -521,7 +526,7 @@ rule atom {
     | <parenth_form> {*}                         #= parenth_form
     | <list_display> {*}                         #= list_display
    #| <generator_expression>           #   ""
-   #| <dict_display>                   #   ""
+    | <dict_display> {*}                         #= dict_display
    #| <string_conversion>              #   ""
 }
 
@@ -550,14 +555,17 @@ rule genexpr_if {
 
 rule dict_display {
     '{' <key_datum_list>? '}'
+    {*}
 }
 
 rule key_datum_list {
     <key_datum> [ ',' <key_datum> ]* ','?
+    {*}
 }
 
 rule key_datum {
-    <expression> ':' <expression>
+    <key=expression> ':' <value=expression>
+    {*}
 }
 
 rule string_conversion {

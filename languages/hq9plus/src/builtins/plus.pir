@@ -7,7 +7,7 @@ plus.pir -- simple implementation of a plus function
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'postfix:++' :multi(_)
     .param pmc a

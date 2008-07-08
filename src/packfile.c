@@ -154,7 +154,9 @@ static const opcode_t * directory_unpack(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
+static PMC* do_1_sub_pragma(PARROT_INTERP,
+    ARGMOD(PMC *sub_pmc),
+    pbc_action_enum_t action)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*sub_pmc);
@@ -309,7 +311,9 @@ static void sort_segs(ARGMOD(PackFile_Directory *dir))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*dir);
 
-static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
+static int sub_pragma(PARROT_INTERP,
+    pbc_action_enum_t action,
+    ARGIN(const PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -866,10 +870,10 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     self->directory.base.file_offset = (INTVAL)cursor - (INTVAL)self->src;
 
     /* now unpack dir, which unpacks its contents ... */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
     cursor = PackFile_Segment_unpack(interp,
                                      &self->directory.base, cursor);
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped
@@ -1183,7 +1187,7 @@ Register the C<pack>/C<unpack>/... functions for a packfile type.
 PARROT_API
 INTVAL
 PackFile_funcs_register(SHIM_INTERP, ARGOUT(PackFile *pf), UINTVAL type,
-                        PackFile_funcs funcs)
+                        const PackFile_funcs funcs)
 {
     /* TODO dynamic registering */
     pf->PackFuncs[type] = funcs;
@@ -1366,7 +1370,7 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         default_dump
     };
 
-    PackFile_funcs debugf = {
+    const PackFile_funcs debugf = {
         pf_debug_new,
         pf_debug_destroy,
         pf_debug_packed_size,

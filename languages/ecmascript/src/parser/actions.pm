@@ -41,6 +41,8 @@ method function_common($/) {
     @?BLOCK.shift();
     $?BLOCK := @?BLOCK[0];
 
+    $past.control('return_pir');
+
     make $past;
 }
 
@@ -252,14 +254,12 @@ method throw_statement($/) {
 }
 
 method return_statement($/) {
-    # XXX returns don't work propertly yet
+    my $past := PAST::Op.new( :pasttype('return'), :node($/) );
     if $<expression> {
         my $expr := $( $<expression>[0] );
-        make PAST::Op.new( $expr, :inline('    .return (%0)'), :node($/) );
+        $past.push($expr);
     }
-    else {
-        make PAST::Op.new( :inline('    .return ()'), :node($/) );
-    }
+    make $past;
 }
 
 method variable_statement($/) {

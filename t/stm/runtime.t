@@ -502,9 +502,6 @@ do_ret:
 .end
 CODE
 
-TODO: {
-        local $TODO = "sub bodies aren't properly cloned in threads, RT# 46519";
-
 # test 4
 pir_output_is( $queue_test . <<'CODE', <<'OUTPUT', "queue adapted for the library" );
 .const int MAX = 5000
@@ -572,8 +569,6 @@ not_okay:
 CODE
 ok
 OUTPUT
-
-}
 
 # test 5
 pir_output_is( $queue_test . <<'CODE', <<'OUTPUT', "queue (non-blocking; nested)" );

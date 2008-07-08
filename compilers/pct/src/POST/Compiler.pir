@@ -216,16 +216,23 @@ the sub.
     name = node.'name'()
     pirflags = node.'pirflags'()
 
+  pirflags_lexid:
+    $I0 = index pirflags, ':lexid('
+    if $I0 >= 0 goto pirflags_lexid_done
+    .local string lexid
+    lexid = code.'unique'()
+    node.'lexid'(lexid)
+    pirflags = concat pirflags, ' :lexid("'
+    pirflags .= lexid
+    pirflags .= '")'
+  pirflags_lexid_done:
+
   pirflags_method:
-    ##  FIXME: RT#47794 - Parrot currently doesn't allow both
-    ##  :method and :outer flags on a sub, so if we have :method
-    ##  we automatically skip :outer processing.
     $I0 = index pirflags, ':method'
-    if $I0 >= 0 goto pirflags_done
+    if $I0 >= 0 goto pirflags_method_done
     $S0 = node.'blocktype'()
     if $S0 != 'method' goto pirflags_method_done
     pirflags = concat pirflags, ' :method'
-    goto pirflags_done
   pirflags_method_done:
 
     .local pmc outerpost, outername
@@ -245,7 +252,7 @@ the sub.
     if $I0 >= 0 goto pirflags_done
     $I0 = index $S0, ':load'
     if $I0 >= 0 goto pirflags_done
-    outername = outerpost.'name'()
+    outername = outerpost.'lexid'()
     $S0 = code.'escape'(outername)
     pirflags = concat pirflags, ' :outer('
     concat pirflags, $S0

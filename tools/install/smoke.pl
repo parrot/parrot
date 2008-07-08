@@ -110,7 +110,7 @@ $out = `$parrot languages/bf/bfco.pbc`;
 ok($out =~ /^usage/, "check bfco");
 
 $out = `$parrot languages/cardinal/cardinal.pbc -e "print 'hello world';"`;
-ok($out eq "hello world\n", "check cardinal");
+ok($out eq "hello world", "check cardinal");
 
 $out = `$parrot languages/dotnet/net2pbc.pbc`;
 ok($out =~ /^Usage/, "check dotnet");
@@ -176,8 +176,13 @@ $out = `$parrot languages/pheme/pheme.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pheme");
 unlink($filename);
 
-$out = `$parrot languages/plumhead/plumhead.pbc`;
-ok($out =~ /^usage/, "check plumhead");
+$filename = 'test.php';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "<?php echo \"Hello, World!\\n\"; ?>";
+close $FH;
+$out = `$parrot languages/pipp/pipp.pbc $filename`;
+ok($out eq "Hello, World!\n", "check pipp");
 
 $filename = 'test.p1';
 open $FH, '>', $filename

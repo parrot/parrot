@@ -56,10 +56,9 @@ compile out of the box. It is highly suggested to use this script to
 get started with the PCT.
 The script is located in C<tools/dev/mk_language_shell.pl>.
 
-{{ Not sure whether the mk_language_shell.pl script should be mentioned long term
-   In a sense, this script can also be considered part of the parrot compiler "tools",
-   as it is used to create a compiler.
-}}
+{{ Not sure whether the mk_language_shell.pl script should be mentioned long
+term.  In a sense, this script can also be considered part of the parrot
+compiler "tools", as it is used to create a compiler.  }}
 
 =head2 Parser Synopsis
 

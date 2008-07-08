@@ -53,20 +53,17 @@ sub new {
         ),
         $self->new_group(
             'Bytecode', '',
-            $self->new_item( '', 'tools/build/pbc2c.pl' ),
             $self->new_item( '', 'tools/dev/pbc_header.pl' ),
         ),
         $self->new_group(
             'QA',
             '',
             $self->new_item( '', 'parrotbug' ),
-            $self->new_item( '', 'tools/docs/pod_errors.pl' ),
             $self->new_item( '', 'tools/dev/manicheck.pl' ),
         ),
         $self->new_group(
             'Documentation',
             '',
-            $self->new_item( '', 'tools/dev/extract_file_descriptions.pl' ),
             $self->new_item( '', 'tools/dev/lib_deps.pl' ),
             $self->new_item( '', 'tools/dev/parrot_coverage.pl' ),
             $self->new_item( '', 'tools/docs/write_docs.pl' ),

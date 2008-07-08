@@ -1,0 +1,455 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+=head1 Episode 7: Operators and Precedence
+
+Up till now, we've implemented a great deal of the Squaak language. We've seen
+assignments, control-flow statements, variable declarations and scope,
+subroutines and invocation. Our expressions have been limited so far to singular
+values, such as string literals and integer constants. In this episode, we'll
+enhance Squaak so it can handle operators, so you can construct more complex
+expressions.
+
+=head2 Operators, precedence and parse trees
+
+We will first briefly introduce the problem with recursive-descent parsers
+(which parsers generated with the PCT are) when parsing expressions. Consider
+the following mini-grammar, which is a very basic calculator.
+
+ rule TOP {
+     <expression>*
+ }
+
+ rule expression {
+     <term>
+ }
+
+ rule term {
+     <factor> [ <addop> <factor> ]*
+ }
+
+ token addop { '+' | '-' }
+
+ rule factor {
+     <value> [ <mulop> <value> ]*
+ }
+
+ token mulop { '*' | '/' | '%' }
+
+ rule value{
+     | <number>
+     | '(' <expression> ')'
+ }
+
+This basic expression grammar implements operator precedence by taking
+advantage of the nature of a recursive-descent parser (if you haven't seen
+the word, google it). However, the big disadvantage of parsing expressions
+this way, is that the parse trees can become quite large. Perhaps more
+importantly, the parsing process is not very efficient. Let's take a look at
+some sample input. We won't show the parse trees as shown in Episode 2, but
+we'll just show an outline.
+
+ input: 42 results in this parse tree:
+
+ TOP
+   expression
+     term
+       factor
+         value
+           number
+             42
+
+As you can see, the input of this single number will invoke 6 grammar rules
+
+before parsing the actual digits. Not that bad, you might think.
+
+ input: "1 + 2" results in this parse tree (we ignore the operator for now):
+
+ TOP
+   expression
+     term
+       factor
+       | value
+       |   number
+       |     1
+       factor
+         value
+           number
+             2
+
+Only a few more grammar rules are invoked, not really a problem either.
+
+ input: "(1 + 2) * 3" results in this parse tree:
+
+ TOP
+   expression
+     term
+       factor
+         value
+         | expression
+         |   term
+         |   | factor
+         |   |   value
+         |   |     number
+         |   |       1
+         |   term
+         |     factor
+         |       value
+         |         number
+         |           2
+         value
+           number
+             3
+
+Right; 16 grammar rules just to parse this simple input. I'd call this slightly
+inefficient. The point is, implementing operator precedence using a
+recursive-descent parser is somewhat problematic, and given the fact there
+are better methods to parse expressions like these, not the way to go. Check
+out this nice explanation or google it.
+
+=head2 Bottom-up parsing and stacks: operator tables
+
+I would like to explain to you how bottom-up parsing works for expressions
+(or bottom-up parsers in general; Yacc/Bison are parser generators that generate
+bottom-up parsers for your grammar specification), taking operator precedence
+into account. However, it's been about 6 years that I did this in a CS class,
+and I don't remember the particular details. If you really want to know, check
+out the links at the end of the previous section. It's actually worth checking
+out. For now, I'll just assume you know what the problem is, so that I'll
+introduce the solution for PCT-based compilers immediately.
+At some point when parsing your input, you might encounter an expression. At
+this point, we'd like the parser to switch from top-down to bottom-up parsing.
+The Parrot Grammar Engine supports this, and is used as follows:
+
+ rule expression is optable { ... }
+
+Note that we used the word C<expression> here, but you can name it anything.
+This declares that, whenever you need an expression, the bottom-up parser is
+activated. Of course, this "optable" must be populated with some operators that
+we need to be able to parse. This can be done by declaring operators as follows:
+
+ proto 'infix:*' is tighter('infix:+') { ... }
+
+This defines the operator C<*> (the C<infix:> is a prefix that tells the
+operator parser that this operator is an infix operator; there are other types,
+such as prefix, postfix and others). The C<is tighter> clause tells that the
+C<*> operator has a higher precedence than the C<+> operator. As you could have
+guessed, there are other clauses to declare equivalent precedence (C<is equiv>)
+and lower precedence (C<is looser>).It is very important to spell all clauses,
+such as C<is equiv> correctly (for instance, not C<is equil>), otherwise you
+might get some cryptic error message when trying to run your compiler. See the
+references section for the optable guide, that has more details on this.
+
+Of course, the expression parser does not just parse operators, it must also
+parse the operands. So, how do we declare the most basic entity that represents
+an operand? It can be anything, from a basic integer-constant, a function call,
+or even a function definition (but adding two function definition doesn't
+really make sense, does it?). The operands are parsed in a recursive-descent
+fashion, so somewhere the parser must switch back from bottom-up
+(expression parsing) to top-down. To declare this "switch-back" point, write:
+
+ proto 'term:' is tighter('prefix:-') is parsed(&term) { ... }
+
+The name C<term:> is a built-in name of the operator bottom-up parser; it is
+invoked every time a new operand is needed. The C<is parsed> clause tells the
+parser that C<term> (which accidentally looks like C<term:>, but you could also
+have named it anything else) parses the operands.
+
+Note: it is very important to add a C<is tighter> clause to the declaration of
+the C<term:> rule. Otherwise your expression parser will not work! My knowledge
+here is a bit limited, but I usually define it as C<is tighter> relative to the
+tightest operator defined.
+
+=head2 Squaak Operators
+
+We have defined the entry and exit point of the expression (bottom-up) parser,
+now it's time to add the operators. Let's have a look at Squaak's operators and
+their precedence. The operators are listed with decreasing precedence (so that
+high-precedence operators are listed at the top). (I'm not sure if this
+precedence table is common compared to other languages; some operators may have
+a different precedence w.r.t. other operators than you're used to. At least the
+mathematical operators are organized according to standard math rules).
+
+ unary "-"
+ unary "not"
+ * / %
+ + - ..
+ < <= >= > != ==
+ and
+ or
+
+(".." is the string concatenation operator). Besides defining an entry and exit
+point for the expression parser, you need to define some operator as a reference
+point, so that other operators' precedence can be defined relative to that
+reference point. My personal preference is to declare the operator with the
+lowest precedence as the reference point. This can be done like this:
+
+ proto 'infix:or' is precedence('1') { ... }
+
+Now, other operators can be defined:
+
+ proto 'infix:and'  is tighter('infix:or')   { ... }
+ proto 'infix:<'    is tighter('infix:and')  { ... }
+ proto 'infix:+'    is tighter('infix:<')    { ... }
+ proto 'infix:*'    is tighter('infix:+')    { ... }
+ proto 'prefix:not' is tighter('infix:*')    { ... }
+ proto 'prefix:-'   is tighter('prefix:not') { ... }
+
+Note that some operators are missing. See the exercises section for this.
+For more details on the use of the optable, check out
+F<docs/pct/pct_optable_guide.pod> in the Parrot repository.
+
+=head2 Short-circuiting logical operators
+
+Squaak has two logical operators: C<and> and C<or>; and results true if and
+only if both operands evaluate to true, while or results true if at least one
+of its operands evaluates to true. Both operands are short-circuited, which
+means that they don't evaluate both operands if that's unnecessary. For
+instance, if the first operand of the and operator evaluates to false, then
+there's no need to evaluate the second operand, as the final result of the
+and-expression cannot become true anymore (remember: both operands must
+evaluate to true).Let's think about how to implement this. When evaluating an
+and-expression, we first evaluate the first operand, and if it's true, only
+then does it make sense to evaluate the second operand. This behavior looks
+very much the same as an if-statement, doesn't it? In an if-statement, the
+first child is always evaluated, and if true, the second child
+(the C<then> block) is evaluated (remember, the third child -- the C<else>
+clause -- is optional). It would be great to be able to implement the and
+operator using a C<PAST::Op( :pasttype('if') )> node. Well, you can, using
+the C<is pasttype> clause! Here's how:
+
+ proto 'infix:and' is tighter('infix:or') is pasttype('if') { ... }
+
+So what about the or operator? When evaluating an or-expression, the first
+operand is evaluated. If it evaluates to true, then there's no need to evaluate
+the second operand, as the result of the or-expression is already true! Only if
+the first operand evaluates to false, is it necessary to evaluate the second
+child. Mmmmm.... what we're saying here is, unless the first operand evaluates
+to true, evaluate the second child. Guess what pasttype you'd need for that!
+
+=head2 Operators PAST types and PIR instructions
+
+In the previous section, we introduced the C<pasttype> clause that you can
+specify. This means that for that operator (for instance, the C<and> operator
+we discussed), a C<PAST::Op( :pasttype('if') )> node is created. What happens
+if you don't specify a pasttype? In that case a default C<PAST::Op> node is
+created, and the default pasttype is C<call>. In other words, a C<PAST::Op>
+node is created that calls the declared operator. For instance, the C<infix:+>
+operator results in a call to the subroutine "infix:+". This means you'll need
+to implement subroutines for each operator. Now, that's a bit of a shame.
+Obviously, some languages have very exotic semantics for the C<+> operator,
+but many languages just want to use Parrot's built-in C<add> instruction. How
+do we achieve that?
+
+Instead of adding a C<pasttype> clause, specify a C<pirop> clause. The
+C<pirop>, or I<PIR operator>, clause tells the code generator what operator
+should be generated. Instead of generating a subroutine invocation with the
+operands as arguments, it will generate the specified instruction with the
+operator's operands as arguments. Neat huh? Let's look at an example:
+
+ proto 'infix:+' is tighter('infix:<') is pirop('n_add') { ... }
+
+This specifies to use the C<n_add> instruction, which tells Parrot to create a
+new result object instead of changing one of the operands. Why not just the
+C<add> instruction (which takes two operands, updating the first), you might
+think. Well, if you leave out this C<is pirop> stuff, this will be generated:
+
+ $P12 = "infix:+"($P10, $P11)
+
+You see, three registers are involved. As we mentioned before, PCT does not do
+any optimizations. Therefore, instead of the generated instruction above, it
+just emit the following:
+
+ n_add $P12, $P10, $P11
+
+which means that the PMCs in registers C<$P10> and C<$P11> are added, and
+assigned to a newly created PMC which is stored in register C<$P12>.
+
+=head2 To circumfix or not to circumfix
+
+Squaak supports parenthesized expressions. Parentheses can be used to change
+the order of evaluation in an expression, just as you're probably have seen
+this in other languages. Besides infix, prefix and postfix operators, you can
+define circumfix operators, which is specified with the left and right
+delimiter. This is an ideal way to implement parenthesized expressions:
+
+ proto 'circumfix:( )' is looser('infix:+') is pirop('set') { ... }
+
+By default, a subroutine invocation will be generated for each operator,
+in this case a call to C<circumfix:( )>. However, we are merely interested in
+the expression that has been parenthesized. The subroutine would merely return
+the expression. Instead, we can use the pirop attribute to specify what PIR
+operation should be generated; in this case that is the C<set> operation, which
+sets one register to the contents of another. This solution works fine, except
+that C<set> instructions are a bit of a waste. What happens is, the contents of
+some register is just copied to another register, which is then used in further
+code generation. This C<set> instruction might as well be optimized away.
+Currently, there are no optimizations implemented in the PCT.
+
+There is an alternative solution for adding grammar rules for the parenthesized
+expressions, by adding it as an alternative of term. The grammar rule term then
+ends up as:
+
+ rule term {
+     | <float_constant> {*}     #= float_constant
+     | <integer_constant> {*}   #= integer_constant
+     | <string_constant&gt {*}  #= string_constant
+     | <primary> {*}            #= primary
+     | '(' <expression> ')' {*} #= expression
+ }
+
+Of course, although we save one generated instruction, the parser will be
+slightly more inefficient, for reasons that we discussed at the beginning of
+this episode. Of course, you are free to decide for yourself how to implement
+this; this section just explains both methods. At some point, optimizations
+will be implemented in the PCT. I suspect "useless" instructions (such as the
+C<set> instruction we just saw) will then be removed.
+
+=head2 Expression parser's action method
+
+For all grammar rules we introduced, we also introduced an action method that
+is invoked after the grammar rule was done matching. What about the action
+method for the optable? Naturally, there must be some actions to be executed.
+Well, there is, but to be frank, I cannot explain it to you. Every time I
+needed the action method for an optable, I just copied it from an existing
+actions file. Of course, the action method's name should match the name of the
+optable (the rule that has the "is optable" clause). So, here goes:
+
+ method expression($/, $key) {
+     if ($key eq 'end') {
+         make $($<expr>);
+     }
+     else {
+         my $past := PAST::Op.new( :name($<type>),
+                                   :pasttype($<top><pasttype>),
+                                   :pirop($<top><pirop>),
+                                   :lvalue($<top><lvalue>),
+                                   :node($/) );
+
+         for @($/) {
+             $past.push( $($_) );
+         }
+
+         make $past;
+     }
+ }
+
+=head2 What's Next?
+
+This episode covered the implementation of operators, which allows us to write
+complex expressions. By now, most of our language is implemented, except for
+one thing: aggregate data structures. This will be the topic of Episode 8. We
+will introduce the two aggregate data types: array and hashtables, and see how
+we can implement these. We'll also discuss what happens when we pass such
+aggregates as subroutine arguments, and the difference with the basic data
+types.
+
+=head2 Exercises
+
+=over 4
+
+=item *
+
+Currently, Squaak only has grammar rules for integer and string constants, not
+floating point constants. Implement this grammar rule. A floating-point number
+consists of zero or more digits, followed by a dot and at least one digit, or,
+at least one digit followed by a dot and any number of digits. Examples are:
+
+ 42.0, 1., .0001.
+
+There may be no whitespace between the individual digits and the dot. Make sure
+you understand the difference between a "rule" and a "token".
+
+Hint: currently, the Parrot Grammar Engine (PGE), the component that "executes"
+the regular expressions (your grammar rules), matches alternative subrules in
+order. This means that this won't work:
+
+ rule term {
+     | <integer_constant>
+     | <float_constant>
+     ...
+ }
+
+because when giving the input C<42.0>, C<42> will be matched by
+<integer_constant>, and the dot and "0" will remain. Therefore, put the
+<float_constant> alternative in rule term before <integer_constant>.
+At some point, PGE will support I<longest-token matching>, so that this issue
+will disappear.
+
+=item *
+
+Implement the missing operators: (binary) "-", "<=", ">=", "==", "!=", "/",
+"%", "or"
+
+=back
+
+=head2 References
+
+docs/pct/pct_optable_guide.pod
+
+=head2 Solution to the exercises
+
+=over 4
+
+=item 1
+
+A floating-point number consists of zero or more digits, followed by a dot
+and at least one digit, or, at least one digit followed by a dot and any
+number of digits. Examples are: 42.0, 1., .0001. There may be no whitespace
+between the individual digits and the dot. Make sure you understand the
+difference between a C<rule> and a C<token>.
+
+    token float_constant {
+        [
+        | \d+ '.' \d*
+        | \d* '.' \d+
+        ]
+        {*}
+    }
+
+=item 2
+
+For sake of completeness (and easy copy-paste for you), here's the list of
+operator declarations as I wrote them for Squaak:
+
+    rule expression    is optable              { ... }
+
+    proto 'infix:or'   is precedence('1')
+                       is pasttype('unless')   { ... }
+    proto 'infix:and'  is tighter('infix:or')
+                       is pasttype('if')       { ... }
+
+    proto 'infix:<'    is tighter('infix:and') { ... }
+    proto 'infix:<='   is equiv('infix:<')     { ... }
+    proto 'infix:>'    is equiv('infix:<')     { ... }
+    proto 'infix:>='   is equiv('infix:<')     { ... }
+    proto 'infix:=='   is equiv('infix:<')     { ... }
+    proto 'infix:!='   is equiv('infix:<')     { ... }
+
+    proto 'infix:+'    is tighter('infix:<')
+                       is pirop('n_add')       { ... }
+    proto 'infix:-'    is equiv('infix:+')
+                       is pirop('n_sub')       { ... }
+
+    proto 'infix:..'   is equiv('infix:+')
+                       is pirop('n_concat')    { ... }
+
+    proto 'infix:*'    is tighter('infix:+')
+                       is pirop('n_mul')       { ... }
+    proto 'infix:%'    is equiv('infix:*')
+                       is pirop('n_mod')       { ... }
+    proto 'infix:/'    is equiv('infix:*')
+                       is pirop('n_div')       { ... }
+
+    proto 'prefix:not' is tighter('infix:*')
+                       is pirop('n_not')       { ... }
+    proto 'prefix:-'   is tighter('prefix:not')
+                       is pirop('n_neg')       { ... }
+
+    proto 'term:'      is tighter('prefix:-')
+                       is parsed(&term)        { ... }
+
+
+=back
+
+=cut

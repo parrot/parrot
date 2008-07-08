@@ -1603,6 +1603,9 @@ CODE
 done
 OUTPUT
 
+SKIP: {
+    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+
 pir_output_is( << 'CODE', << 'OUTPUT', "sinh of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
@@ -1645,6 +1648,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sinh of complex numbers" );
 CODE
 done
 OUTPUT
+
+}
 
 pir_output_is( << 'CODE', << 'OUTPUT', "cosh of complex numbers" );
 .macro DoIt(val, res)

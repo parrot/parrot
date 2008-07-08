@@ -10,12 +10,12 @@ src/builtins/io.pir - Perl6 builtins for I/O
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'print'
     .param pmc args            :slurpy
     .local pmc iter
-    args = 'list'(args)
+    args.'!flatten'()
     iter = new 'Iterator', args
   iter_loop:
     unless iter goto iter_end
@@ -29,7 +29,7 @@ src/builtins/io.pir - Perl6 builtins for I/O
 
 .sub 'say'
     .param pmc list            :slurpy
-    'print'(list)
+    'print'(list :flat)
     print "\n"
     .return (1)
 .end
@@ -110,6 +110,21 @@ opened_ok:
     obj = obj.'new'()
     setattribute obj, "$!PIO", $P0
     .return(obj)
+.end
+
+.sub 'close'
+    .param pmc obj
+    obj.'close'()
+.end
+
+.sub 'slurp'
+    .param string filename
+    .local string contents
+
+    $P0 = 'open'(filename, 'r')
+    contents = $P0.'slurp'()
+    'close'($P0)
+    .return(contents)
 .end
 
 =back

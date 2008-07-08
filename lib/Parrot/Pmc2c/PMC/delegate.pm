@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 Parrot::Pmc2c::delegate Instance Methods
@@ -39,9 +39,9 @@ sub pre_method_gen {
 
         $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
 
-    STRING * const meth = CONST_STRING(interp, "$vt_method_name");
-    PMC * const classobj = Parrot_oo_get_class_str(interp, VTABLE_name(interp, pmc));
-    PMC * const sub = Parrot_oo_find_vtable_override(interp, classobj, meth);
+    STRING * const meth     = CONST_STRING_GEN(interp, "$vt_method_name");
+    PMC    * const classobj = Parrot_oo_get_class_str(interp, VTABLE_name(interp, pmc));
+    PMC    * const sub      = Parrot_oo_find_vtable_override(interp, classobj, meth);
     if (PMC_IS_NULL(sub))
         vtable_meth_not_found(interp, pmc, "$vt_method_name");
     ${func_ret}Parrot_run_meth_fromc_args$ret_suffix(interp, sub, pmc, meth, "$sig"$args);

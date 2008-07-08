@@ -16,11 +16,11 @@ src/classes/Mapping.pir - Perl 6 hash class and related functions
     .local pmc p6meta, mappingproto
     p6meta = get_hll_global ['Perl6Object'], '$!P6META'
     mappingproto = p6meta.'new_class'('Mapping', 'parent'=>'Hash Any')
-    p6meta.'register'('Hash', 'parent'=>'Any', 'protoobject'=>mappingproto)
+    p6meta.'register'('Hash', 'parent'=>mappingproto, 'protoobject'=>mappingproto)
 .end
 
 
-.sub 'get_string' :vtable :method
+.sub 'get_string' :method :vtable
     $S0 = ''
     .local pmc iter
     iter = new 'Iterator', self
@@ -36,6 +36,58 @@ src/classes/Mapping.pir - Perl 6 hash class and related functions
   end:
     .return ($S0)
 .end
+
+
+=item hash()
+
+Return invocant as a Hash
+
+=cut
+
+.sub 'hash' :method
+    .local pmc result, iter
+    result = new 'Perl6Hash'
+    iter = new 'Iterator', self
+  iter_loop:
+    unless iter goto iter_end
+    $S0 = shift iter
+    $P0 = self[$S0]
+    result[$S0] = $P0
+    goto iter_loop
+  iter_end:
+    .return (result)
+.end
+
+
+=item perl()
+
+Return perl representation of the invocant.
+
+=cut
+
+.sub 'perl' :method
+    .local string result
+    .local pmc keys
+    result = '{'
+    keys = self.'keys'()
+    unless keys goto iter_end
+  iter_loop:
+    .local pmc key, value
+    key = shift keys
+    value = self[key]
+    $S0 = key.'perl'()
+    result .= $S0
+    result .= ' => '
+    $S0 = value.'perl'()
+    result .= $S0
+    unless keys goto iter_end
+    result .= ', '
+    goto iter_loop
+  iter_end:
+    result .= '}'
+    .return (result)
+.end
+
 
 =item kv (method)
 
@@ -92,22 +144,6 @@ Returns elements of hash as array of C<Pair(key, value)>
 .end
 
 
-## FIXME:  Parrot currently requires us to write our own "clone" method.
-.sub 'clone' :vtable :method
-    $P0 = new 'Mapping'
-    .local pmc iter
-    iter = new 'Iterator', self
-  loop:
-    unless iter goto end
-    $P1 = shift iter
-    $P2 = iter[$P1]
-    $P0[$P1] = $P2
-    goto loop
-  end:
-    .return ($P0)
-.end
-
-
 =back
 
 =head1 Functions
@@ -122,7 +158,7 @@ Returns elements of hash as array of C<Pair(key, value)>
 
 =cut
 
-.namespace
+.namespace []
 
 =item delete
 
@@ -145,7 +181,7 @@ otherwise.
 
 =cut
 
-.sub kv :multi('Hash')
+.sub kv :multi(Mapping)
     .param pmc hash
 
     .return hash.'kv'()

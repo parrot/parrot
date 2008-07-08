@@ -49,7 +49,7 @@ END_PIR
 
 my $template = <<'END_OF_TEMPLATE';
 
-.namespace
+.namespace []
 
 # any registers #'d 100 or higher are used here for temporary conversions
 # to other types required by the various opcodes. XXX This should go away

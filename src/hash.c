@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -110,10 +110,9 @@ static int pointer_compare(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 static int STRING_compare(PARROT_INTERP,
     ARGIN(const void *search_key),
-    ARGIN(const void *bucket_key))
+    ARGIN_NULLOK(const void *bucket_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -154,9 +153,22 @@ Compares the two strings, returning 0 if they are identical.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const void *bucket_key))
+STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const void *bucket_key))
 {
-    return string_equal(interp, (const STRING *)search_key, (const STRING *)bucket_key);
+    STRING const *s1 = (STRING const *)search_key;
+    STRING const *s2 = (STRING const *)bucket_key;
+
+    if (!s2)
+        return 1;
+
+    if (s1->hashval != s2->hashval)
+        return 1;
+
+    /* COWed strings */
+    if (s1->strstart == s2->strstart && s1->bufused == s2->bufused)
+        return 0;
+
+    return CHARSET_COMPARE(interp, s1, s2);
 }
 
 /*
@@ -625,8 +637,8 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     /* add new buckets to free_list in reverse order
      * lowest bucket is top on free list and will be used first */
     for (i = 0, b = (HashBucket*)new_bi - 1; i < old_nb; ++i, --b) {
-        b->next = hash->free_list;
-        b->key = b->value = NULL;
+        b->next         = hash->free_list;
+        b->key          = b->value         = NULL;
         hash->free_list = b;
     }
 
@@ -1074,7 +1086,7 @@ HashBucket*
 parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLOK(void *value))
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
-    HashBucket   *bucket = hash->bi[hashval & hash->mask];
+    HashBucket   *bucket  = hash->bi[hashval & hash->mask];
 
     while (bucket) {
         /* store hash_val or not */
@@ -1085,15 +1097,15 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLO
 
     if (bucket) {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            DOD_WRITE_BARRIER_KEY(interp, hash->container,
-                    (PMC*)bucket->value, bucket->key, (PMC*)value, key);
+            GC_WRITE_BARRIER_KEY(interp, hash->container,
+                    (PMC *)bucket->value, bucket->key, (PMC *)value, key);
         }
         bucket->value = value;        /* replace value */
     }
     else {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            DOD_WRITE_BARRIER_KEY(interp, hash->container,
-                    NULL, NULL, (PMC*)value, key);
+            GC_WRITE_BARRIER_KEY(interp, hash->container,
+                    NULL, NULL, (PMC *)value, key);
         }
 
         bucket = hash->free_list;
@@ -1187,7 +1199,10 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
                 break;
 
             case enum_type_PMC:
-                valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                if (PMC_IS_NULL((PMC *)b->value))
+                    valtmp = (void *)PMCNULL;
+                else
+                    valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
                 break;
 
             default:

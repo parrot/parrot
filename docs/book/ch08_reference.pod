@@ -2,18 +2,18 @@
 
 =head0 Parrot Reference
 
-Z<CHP-11>
+Z<CHP-8>
 
 This chapter contains  a condensed list of PASM opcodes, PIR directives
 and instructions, and Parrot command-line options, sorted alphabetically
 for easy reference. Any PASM opcode is valid in PIR code, so if you're
-looking up PIR syntax you should check A<CHP-11-SECT-1>"PASM Opcodes",
-A<CHP-11-SECT-2>"PIR Directives", and A<CHP-11-SECT-3>"PIR
+looking up PIR syntax you should check A<CHP-8-SECT-1>"PASM Opcodes",
+A<CHP-8-SECT-2>"PIR Directives", and A<CHP-8-SECT-3>"PIR
 Instructions".
 
 =head1 PASM Opcodes
 
-Z<CHP-11-SECT-1>
+Z<CHP-8-SECT-1>
 
 X<PASM (Parrot assembly language);opcodes, quick reference>
 For complete details on each opcode and the latest changes, read the
@@ -619,16 +619,6 @@ I<Arguments: P, S>
 
 See also: C<setprop> and C<getprop>.
 
-=head2 depth
-
-X<depth opcode (PASM)>
-
-  depth R<DEST>
-
-Return the depth of the user stack.
-
-I<Arguments: I>
-
 =head2 deref
 
 X<deref opcode (PASM)>
@@ -728,17 +718,6 @@ X<enternative opcode (PASM)>
   enternative
 
 Run the C<run_native> C function.
-
-=head2 entrytype
-
-X<entrytype opcode (PASM)>
-
-  entrytype R<DEST>, R<INT>
-
-Return the type of an entry on the user stack. R<INT> specifies the
-position on the stack.
-
-I<Arguments: I, I>
 
 =head2 eq
 
@@ -1272,11 +1251,11 @@ X<interpinfo opcode (PASM)>
 
 Return information about the interpreter. An integer flag selects
 which information to return, as listed in
-A<CHP-11-TABLE-1>Table 11-1.
+A<CHP-8-TABLE-1>Table 11-1.
 
 =begin table picture Interpinfo flags
 
-Z<CHP-11-TABLE-1>
+Z<CHP-8-TABLE-1>
 
 =headrow
 
@@ -1550,18 +1529,6 @@ X<log2 opcode (PASM)>
 The base 2 logarithm of R<VAL>.
 
 I<Arguments: NR, I or NR, N>
-
-=head2 lookback
-
-X<lookback opcode (PASM)>
-
-  lookback R<DEST>, R<OFFSET>
-
-Retrieve an entry from the user stack by position. A positive offset
-counts from the top of the stack; a negative offset counts from the
-bottom.
-
-I<Arguments: IR, I or NR, I or SR, I or P, I>
 
 =head2 lsr
 
@@ -2119,24 +2086,6 @@ Repeat a string R<REPEAT> number of times.
 
 I<Arguments: SR, S, I or P, P, I or P, P, P>
 
-=head2 restore
-
-X<restore opcode (PASM)>
-
-  restore R<DEST>
-
-Restore a register from the user stack.
-
-I<Arguments: IR or NR or SR or P>
-
-=head2 restoreall
-
-X<restoreall opcode (PASM)>
-
-  restoreall
-
-Restore all the registers. Does a C<pop>R<X> for every type.
-
 =head2 restoretop
 
 X<restoretop opcode (PASM)>
@@ -2168,21 +2117,6 @@ I<Arguments: P>
 
 See also: C<throw>
 
-=head2 rotate_up
-
-X<rotate_up opcode (PASM)>
-
-  rotate_up R<COUNT>
-
-Rotate the top R<COUNT> entries on the user stack. A positive number
-rotates up: the top entry becomes the R<COUNT>th entry, and the others
-move up one (the second entry becomes first, the third becomes the
-second, etc.). A negative number rotates down: the R<COUNT>th entry
-becomes the top, and the others move down (the first becomes second,
-etc.).
-
-I<Arguments: I>
-
 =head2 runinterp
 
 X<runinterp opcode (PASM)>
@@ -2195,42 +2129,6 @@ offset.
 I<Arguments: P, I>
 
 See also: C<newinterp>.
-
-=head2 save
-
-X<save opcode (PASM)>
-
-  save R<VAL>
-
-Save a value onto the user stack.
-
-I<Arguments: I or N or S or P>
-
-=head2 saveall
-
-X<saveall opcode (PASM)>
-
-  saveall
-
-Save all the registers. Does a C<push>R<X> for every type.
-
-=head2 savec
-
-X<savec opcode (PASM)>
-
-  savec R<VAL>
-
-Save a clone of a value onto the user stack.
-
-I<Arguments: S or P>
-
-=head2 savetop
-
-X<savetop opcode (PASM)>
-
-  savetop
-
-Save registers 16..31. Does a C<push>R<X> for every type.
 
 =head2 sec
 
@@ -2556,11 +2454,11 @@ X<stringinfo opcode (PASM)>
   stringinfo R<DEST>, R<STRING>, R<FLAG>
 
 Return information about a string. An integer flag selects which
-information to return, as listed in A<CHP-11-TABLE-2>Table 11-2.
+information to return, as listed in A<CHP-8-TABLE-2>Table 11-2.
 
 =begin table picture Stringinfo arguments
 
-Z<CHP-11-TABLE-2>
+Z<CHP-8-TABLE-2>
 
 =headrow
 
@@ -2965,7 +2863,7 @@ I<Arguments: IR, I, I or P, P, P>
 
 =head1 PIR Directives
 
-Z<CHP-11-SECT-2>
+Z<CHP-8-SECT-2>
 
 X<PIR (Parrot intermediate representation);quick reference;directives>
 This is a summary of PIR directives. Directives are preprocessed by the
@@ -2979,7 +2877,7 @@ X<.arg directive>
 
   .arg R<VAL>
 
-Push a value onto the user stack or set it according to PCC.
+pass a value to a subroutine according to PCC.
 
 =head2 .const
 
@@ -3111,7 +3009,7 @@ X<.param directive>
   .param R<DEST>
   .param R<TYPE>R<NAME>
 
-Pop a value off the user stack into a register or typed identifier.
+Define a subroutine parameter.
 
 =head2 .begin_call
 
@@ -3153,7 +3051,6 @@ for PASM code only.
 
 X<.pragma directive>
 
-  .pragma fastcall
   .pragma prototyped
 
 Set default calling conventions.
@@ -3164,7 +3061,7 @@ X<.result directive>
 
   .result R<DEST>
 
-Pop a value off the user stack or get it according to PCC.
+Get a return value according to PCC.
 
 =head2 .return
 
@@ -3172,8 +3069,7 @@ X<.return directive>
 
   .return R<VAL>
 
-Return a value to the calling subroutine by pushing it onto the user
-stack or set it according to PCC.
+Return a value to the calling subroutine according to PCC.
 
 =head2 .sub
 
@@ -3194,7 +3090,7 @@ Same as C<.local>.
 
 =head1 PIR Instructions
 
-Z<CHP-11-SECT-3>
+Z<CHP-8-SECT-3>
 
 X<PIR (Parrot intermediate representation);quick reference;instructions>
 This section is a quick reference to PIR instructions. For more details
@@ -3494,7 +3390,7 @@ Unless the value evaluates as true, jump to the named identifier.
 
 =head1 Parrot Command-Line Options
 
-Z<CHP-11-SECT-4>
+Z<CHP-8-SECT-4>
 
 X<command-line options (Parrot)>
 X<Parrot;command-line options>
@@ -3507,7 +3403,7 @@ have the latest details. Or just run F<parrot --help>.
 
 =head2 General Usage
 
-Z<CHP-11-SECT-4.1>
+Z<CHP-8-SECT-4.1>
 
   parrot [options] file [arguments]
 
@@ -3517,7 +3413,7 @@ command-line R<arguments> and stores it in C<P5> on program start.
 
 =head2 Assembler Options
 
-Z<CHP-11-SECT-4.2>
+Z<CHP-8-SECT-4.2>
 
 =over 4
 
@@ -3539,13 +3435,13 @@ Parrot to immediately execute a bytecode file piped in on C<stdin>.
 
 Turn on debugging output. The C<-d> switch takes an optional argument,
 which is a hex value of debug bits. The individual bits are shown in
-A<CHP-11-TABLE-3>Table 11-3. When R<hexbits> isn't specified,
+A<CHP-8-TABLE-3>Table 11-3. When R<hexbits> isn't specified,
 the default debugging level is 0001. If R<hexbits> is separated
 from the C<-d> switch by whitespace, it has to start with a number.
 
 =begin table picture Debug bits
 
-Z<CHP-11-TABLE-3>
+Z<CHP-8-TABLE-3>
 
 =headrow
 
@@ -3677,14 +3573,14 @@ Print the program version to C<stdout> and exit.
 =item -Ox
 
 Turn on optimizations. The flags currently implemented are shown in
-A<CHP-11-TABLE-4>Table 11-4.
+A<CHP-8-TABLE-4>Table 11-4.
 
 X<Parrot;optimizations>
 X<optimizations (Parrot)>
 
 =begin table picture Optimizations
 
-Z<CHP-11-TABLE-4>
+Z<CHP-8-TABLE-4>
 
 =headrow
 
@@ -3732,7 +3628,7 @@ Z<CHP-11-TABLE-4>
 
 =head2 Bytecode Interpreter Options
 
-Z<CHP-11-SECT-4.3>
+Z<CHP-8-SECT-4.3>
 
 X<Parrot;bytecode interpreter options>
 X<bytecode interpreter options (Parrot)>

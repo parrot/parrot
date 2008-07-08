@@ -4,19 +4,42 @@
 
 src/classes/List.pir - Perl 6 List class and related functions
 
-=head1 Methods
+=head2 Object Methods
 
 =over 4
 
 =cut
 
-.namespace ['List']
-
 .sub 'onload' :anon :load :init
     .local pmc p6meta, listproto
     p6meta = get_hll_global ['Perl6Object'], '$!P6META'
     listproto = p6meta.'new_class'('List', 'parent'=>'ResizablePMCArray Any')
-    p6meta.'register'('ResizablePMCArray', 'parent'=>'Any', 'protoobject'=>listproto)
+    p6meta.'register'('ResizablePMCArray', 'parent'=>listproto, 'protoobject'=>listproto)
+
+    $P0 = get_hll_namespace ['List']
+    '!EXPORT'('first grep keys kv map pairs reduce values', $P0)
+.end
+
+=item clone()    (vtable method)
+
+Return a clone of this list.  (Clones its elements also.)
+
+=cut
+
+.namespace ['List']
+.sub 'clone' :vtable :method
+    .local pmc p6meta, result, iter
+    $P0 = typeof self
+    result = new $P0
+    iter = self.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P0 = clone $P0
+    push result, $P0
+    goto iter_loop
+  iter_end:
+    .return (result)
 .end
 
 
@@ -32,15 +55,87 @@ Return the elements of the list joined by spaces.
 .end
 
 
-=item clone()    (vtable method)
+=item hash()
 
-Clones the list.
+Return the List invocant as a Hash.
 
 =cut
 
-.sub 'clone' :vtable :method
-    $P0 = 'list'(self)
+.sub 'hash' :method
+    .local pmc result, iter
+    result = new 'Perl6Hash'
+    iter = self.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc elem, key, value
+    elem = shift iter
+    $I0 = does elem, 'hash'
+    if $I0 goto iter_hash
+    $I0 = isa elem, 'Perl6Pair'
+    if $I0 goto iter_pair
+    unless iter goto err_odd_list
+    value = shift iter
+    value = clone value
+    result[elem] = value
+    goto iter_loop
+  iter_hash:
+    .local pmc hashiter
+    hashiter = elem.'keys'()
+  hashiter_loop:
+    unless hashiter goto hashiter_end
+    $S0 = shift hashiter
+    value = elem[$S0]
+    result[$S0] = value
+    goto hashiter_loop
+  hashiter_end:
+    goto iter_loop
+  iter_pair:
+    key = elem.'key'()
+    value = elem.'value'()
+    result[key] = value
+    goto iter_loop
+  iter_end:
+    .return (result)
+
+  err_odd_list:
+    die "Odd number of elements found where hash expected"
+.end
+
+
+=item item()
+
+Return the List invocant in scalar context (i.e., an Array).
+
+=cut
+
+.sub 'item' :method
+    $P0 = new 'Perl6Array'
+    splice $P0, self, 0, 0
     .return ($P0)
+.end
+
+
+=item list()
+
+Return the List as a list.
+
+=cut
+
+.namespace ['ResizablePMCArray']
+.sub 'list' :method
+    ##  this code morphs a ResizablePMCArray into a List
+    ##  without causing a clone of any of the elements
+    $P0 = new 'ResizablePMCArray'
+    splice $P0, self, 0, 0
+    $P1 = new 'List'
+    copy self, $P1
+    splice self, $P0, 0, 0
+    .return (self)
+.end
+
+.namespace ['List']
+.sub 'list' :method
+    .return (self)
 .end
 
 
@@ -51,77 +146,76 @@ Returns a Perl representation of a List.
 =cut
 
 .sub 'perl' :method
-    .local string res
-    res .= '['
+    .local string result
+    result = '['
 
-    .local pmc elem
-    .local int elems
-    .local int i
-
-    elems = self.'elems'()
-    i = 0
-
-  loop:
-    if i == elems goto done
-    unless i  > 0 goto no_comma
-
-    res .= ', '
-  no_comma:
-    elem = self[i]
-    $S0 = elem
-    res .= $S0
-
-    i += 1
-    goto loop
-
-
-  done:
-    res .= ']'
-
-    .return(res)
-
+    .local pmc iter
+    iter = self.'iterator'()
+    unless iter goto iter_done
+  iter_loop:
+    $P1 = shift iter
+    $S1 = $P1.'perl'()
+    result .= $S1
+    unless iter goto iter_done
+    result .= ', '
+    goto iter_loop
+  iter_done:
+    result .= ']'
+    .return (result)
 .end
 
 
-=item ACCEPTS(topic)
+=back
+
+=head2 List methods
+
+=over 4
+
+=item !flatten()
+
+Flatten the invocant, as in list context.  This doesn't necessarily
+make the list eager, it just brings any nested Lists to the top
+layer.  It will likely change substantially when we have lazy lists.
 
 =cut
 
-.sub 'ACCEPTS' :method
-    .param pmc topic
-    .local int i
+.sub '!flatten' :method
+    .param int size            :optional
+    .param int has_size        :opt_flag
 
-    .local string what
-    what = topic.'WHAT'()
-    if what == "List" goto acc_list
-    goto no_match
-
-acc_list:
-    # Smartmatch against another list. Smartmatch each
-    # element.
-    .local int count_1, count_2
-    count_1 = self.'elems'()
-    count_2 = topic.'elems'()
-    if count_1 != count_2 goto no_match
+    ##  we use the 'elements' opcode here because we want the true length
+    .local int len, i
+    len = elements self
     i = 0
-list_cmp_loop:
-    if i >= count_1 goto list_cmp_loop_end
-    .local pmc elem_1, elem_2
-    elem_1 = self[i]
-    elem_2 = topic[i]
-    ($I0) = elem_1.ACCEPTS(elem_2)
-    unless $I0 goto no_match
+  flat_loop:
+    if i >= len goto flat_end
+    unless has_size goto flat_loop_1
+    if i >= size goto flat_end
+  flat_loop_1:
+    .local pmc elem
+    elem = self[i]
+    $I0 = defined elem
+    unless $I0 goto flat_next
+    $I0 = isa elem, 'Perl6Scalar'
+    if $I0 goto flat_next
+    $I0 = isa elem, 'Range'
+    unless $I0 goto not_range
+    elem = elem.'list'()
+  not_range:
+    $I0 = does elem, 'array'
+    unless $I0 goto flat_next
+    splice self, elem, i, 1
+    len = elements self
+    goto flat_loop
+  flat_next:
     inc i
-    goto list_cmp_loop
-list_cmp_loop_end:
-    goto match
-
-no_match:
-    $P0 = get_hll_global ['Bool'], 'False'
-    .return($P0)
-match:
-    $P0 = get_hll_global ['Bool'], 'True'
-    .return($P0)
+    goto flat_loop
+  flat_end:
+    $I0 = isa self, 'List'
+    if $I0 goto end
+    self.'list'()
+  end:
+    .return (self)
 .end
 
 
@@ -131,483 +225,30 @@ Return the number of elements in the list.
 
 =cut
 
-.sub 'elems' :method
+.sub 'elems' :method :multi('ResizablePMCArray') :vtable('get_number')
+    self.'!flatten'()
     $I0 = elements self
     .return ($I0)
 .end
 
-=item unshift(ELEMENTS)
-
-Prepends ELEMENTS to the front of the list.
-
-=cut
-
-.sub 'unshift' :method
-    .param pmc args :slurpy
-    .local int narg
-    .local int i
-
-    narg = args
-    i = 0
-
-    .local pmc tmp
-  loop:
-    if i == narg goto done
-    pop tmp, args
-    unshift self, tmp
-    inc i
-    goto loop
-  done:
-.end
-
-=item keys()
-
-Returns a List containing the keys of the List.
-
-=cut
-
-.sub 'keys' :method
-    .local pmc elem
-    .local pmc res
-    .local int len
-    .local int i
-
-    res = new 'List'
-    len = self.'elems'()
-    i = 0
-
-  loop:
-    if i == len goto done
-
-    elem = new 'Integer'
-    elem = i
-    res.'push'(elem)
-
-    inc i
-    goto loop
-
-  done:
-    .return(res)
-.end
-
-=item values()
-
-Returns a List containing the values of the List.
-
-=cut
-
-.sub 'values' :method
-    .local pmc elem
-    .local pmc res
-    .local int len
-    .local int i
-
-    res = new 'List'
-    len = self.'elems'()
-    i = 0
-
-  loop:
-    if i == len goto done
-
-    elem = new 'Integer'
-    elem = self[i]
-    res.'push'(elem)
-
-    inc i
-    goto loop
-
-  done:
-    .return(res)
-.end
-
-=item shift()
-
-Shifts the first item off the list and returns it.
-
-=cut
-
-.sub 'shift' :method
-    .local pmc x
-    x = shift self
-    .return (x)
-.end
-
-=item pop()
-
-Treats the list as a stack, popping the last item off the list and returning it.
-
-=cut
-
-.sub 'pop' :method
-    .local pmc x
-    .local int len
-
-    len = self.'elems'()
-
-    if len == 0 goto empty
-    pop x, self
-    goto done
-
-  empty:
-    x = new 'Undef'
-    goto done
-
-  done:
-    .return (x)
-.end
-
-=item push(ELEMENTS)
-
-Treats the list as a stack, pushing ELEMENTS onto the end of the list.  Returns the new length of the list.
-
-=cut
-
-.sub 'push' :method
-    .param pmc args :slurpy
-    .local int len
-    .local pmc tmp
-    .local int i
-
-    len = args
-    i = 0
-
-  loop:
-    if i == len goto done
-    shift tmp, args
-    push self, tmp
-    inc i
-    goto loop
-  done:
-    len = self.'elems'()
-    .return (len)
-.end
-
-=item join(SEPARATOR)
-
-Returns a string comprised of all of the list, separated by the string SEPARATOR.  Given an empty list, join returns the empty string.
-
-=cut
-
-.sub 'join' :method
-    .param string sep
-    .local string res
-    .local string tmp
-    .local int len
-    .local int i
-
-    res = ""
-
-    len = self.'elems'()
-    if len == 0 goto done
-
-    len = len - 1
-    i = 0
-
-  loop:
-    if i == len goto last
-
-    tmp = self[i]
-    concat res, tmp
-    concat res, sep
-
-    inc i
-    goto loop
-
-  last:
-    tmp = self[i]
-    concat res, tmp
-
-  done:
-    .return(res)
-.end
-
-=item reverse()
-
-Returns a list of the elements in revese order.
-
-=cut
-
-.sub 'reverse' :method
-    .local pmc res
-    .local int len
-    .local int i
-
-    res = new 'List'
-
-    len = self.'elems'()
-    if len == 0 goto done
-    i = 0
-
-    .local pmc elem
-loop:
-    if len == 0 goto done
-
-    dec len
-    elem = self[len]
-    res[i] = elem
-    inc i
-
-    goto loop
-
-done:
-    .return(res)
-.end
-
-=item delete()
-
-Deletes the given elements from the List, replacing them with Undef.  Returns a List of removed elements.
-
-=cut
-
-.sub delete :method
-    .param pmc indices :slurpy
-    .local pmc newelem
-    .local pmc elem
-    .local int last
-    .local pmc res
-    .local int ind
-    .local int len
-    .local int i
-
-    newelem = new 'Undef'
-    res = new 'List'
-
-    # Index of the last element in the array
-    last = self.'elems'()
-    dec last
-
-    len = elements indices
-    i = 0
-
-  loop:
-    if i == len goto done
-
-    ind = indices[i]
-
-    if ind == -1 goto endofarray
-    if ind == last goto endofarray
-    goto restofarray
-
-  endofarray:
-    # If we're at the end of the array, remove the element entirely
-    elem = pop self
-    res.push(elem)
-    goto next
-
-  restofarray:
-    # Replace the element with undef.
-    elem = self[ind]
-    res.push(elem)
-
-    self[ind] = newelem
-
-  next:
-    inc i
-    goto loop
-  done:
-    .return(res)
-.end
-
-=item exists(INDEX)
-
-Checks to see if the specified index or indices have been assigned to.  Returns a Bool value.
-
-=cut
-
-.sub exists :method
-    .param pmc indices :slurpy
-    .local int test
-    .local int len
-    .local pmc res
-    .local int ind
-    .local int i
-
-    test = 1
-    len = elements indices
-    i = 0
-
-  loop:
-    if i == len goto done
-
-    ind = indices[i]
-
-    test = exists self[ind]
-    if test == 0 goto done
-
-    inc i
-    goto loop
-
-  done:
-    .return 'prefix:?'(test)
-.end
-
-=item kv()
-
-=cut
-
-.sub kv :method
-    .local pmc elem
-    .local pmc res
-    .local int len
-    .local int i
-
-    res = new 'List'
-    len = self.'elems'()
-    i = 0
-
-  loop:
-    if i == len goto done
-
-    elem = new 'Integer'
-    elem = i
-    res.'push'(elem)
-
-    elem = self[i]
-    res.'push'(elem)
-
-    inc i
-    goto loop
-
-  done:
-    .return(res)
-.end
-
-=item pairs()
-
-=cut
-
-.sub pairs :method
-    .local pmc pair
-    .local pmc key
-    .local pmc val
-    .local pmc res
-    .local int len
-    .local int i
-
-    res = new 'List'
-    len = self.'elems'()
-    i = 0
-
-  loop:
-    if i == len goto done
-
-    key = new 'Integer'
-    key = i
-
-    val = self[i]
-
-    pair = new 'Pair'
-    pair[key] = val
-
-    res.'push'(pair)
-
-    inc i
-    goto loop
-
-  done:
-    .return(res)
-.end
-
-=item grep(...)
-
-=cut
-
-.sub grep :method
-    .param pmc test
-    .local pmc retv
-    .local pmc block
-    .local pmc block_res
-    .local pmc block_arg
-    .local int narg
-    .local int i
-
-    retv = new 'List'
-    narg = self.'elems'()
-    i = 0
-
-  loop:
-    if i == narg goto done
-    block_arg = self[i]
-
-    newclosure block, test
-    block_res = block(block_arg)
-
-    if block_res goto grepped
-    goto next
-
-  grepped:
-    retv.'push'(block_arg)
-    goto next
-
-  next:
-    inc i
-    goto loop
-
-  done:
-    .return(retv)
-.end
-
-=item reduce(...)
-
-=cut
-
-.sub reduce :method
-    .param pmc test
-    .local pmc retv
-    .local pmc block
-    .local pmc block_arg
-    .local int narg
-    .local int i
-
-    narg = self.'elems'()
-    if narg == 0 goto empty
-    retv = self[0]
-    i = 1
-
-  loop:
-    if i >= narg goto done
-
-    newclosure block, test
-    block_arg = self[i]
-    retv = block(retv, block_arg)
-
-    inc i
-    goto loop
-
-  empty:
-    retv = new 'Undef'
-    goto done
-
-  done:
-    .return(retv)
-.end
 
 =item first(...)
 
 =cut
 
-.sub first :method
+.sub 'first' :method :multi('ResizablePMCArray', 'Sub')
     .param pmc test
     .local pmc retv
-    .local pmc block
+    .local pmc iter
     .local pmc block_res
     .local pmc block_arg
-    .local int narg
-    .local int i
 
-    narg = self.'elems'()
-    i = 0
-
+    iter = self.'iterator'()
   loop:
-    if i == narg goto nomatch
-    block_arg = self[i]
-
-    newclosure block, test
-    block_res = block(block_arg)
-
+    unless iter goto nomatch
+    block_arg = shift iter
+    block_res = test(block_arg)
     if block_res goto matched
-
-    inc i
     goto loop
 
   matched:
@@ -615,17 +256,272 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
     goto done
 
   nomatch:
-    retv = new 'Undef'
+    retv = new 'Failure'
     goto done
 
   done:
     .return(retv)
 .end
 
+
+.sub 'first' :multi('Sub')
+    .param pmc test
+    .param pmc values :slurpy
+
+    .return values.'first'(test)
+.end
+
+
+=item grep(...)
+
+=cut
+
+.sub 'grep' :method :multi('ResizablePMCArray', 'Sub')
+    .param pmc test
+    .local pmc retv
+    .local pmc iter
+    .local pmc block_res
+    .local pmc block_arg
+
+    retv = new 'List'
+    iter = self.'iterator'()
+  loop:
+    unless iter goto done
+    block_arg = shift iter
+    block_res = test(block_arg)
+
+    unless block_res goto loop
+    retv.'push'(block_arg)
+    goto loop
+
+  done:
+    .return(retv)
+.end
+
+.sub 'grep' :multi('Sub')
+    .param pmc test
+    .param pmc values          :slurpy
+    .return values.'grep'(test)
+.end
+
+
+=item iterator()
+
+Returns an iterator for the list.
+
+=cut
+
+.sub 'iterator' :method
+    self.'!flatten'()
+    $P0 = iter self
+    .return ($P0)
+.end
+
+
+=item keys()
+
+Returns a List containing the keys of the invocant.
+
+=cut
+
+.sub 'keys' :method :multi(ResizablePMCArray)
+    $I0 = self.'elems'()
+    dec $I0
+    $P0 = 'infix:..'(0, $I0)
+    .return $P0.'list'()
+.end
+
+.sub 'keys' :multi()
+    .param pmc values          :slurpy
+    .return values.'keys'()
+.end
+
+
+=item kv()
+
+Return items in invocant as 2-element (index, value) lists.
+
+=cut
+
+.sub 'kv' :method :multi(ResizablePMCArray)
+    .local pmc result, iter
+    .local int i
+
+    result = new 'List'
+    iter = self.'iterator'()
+    i = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    push result, i
+    push result, $P0
+    inc i
+    goto iter_loop
+  iter_end:
+    .return (result)
+.end
+
+.sub 'kv' :multi()
+    .param pmc values          :slurpy
+    .return values.'kv'()
+.end
+
+
+=item map()
+
+Map.
+
+=cut
+
+.sub 'map' :method :multi('ResizablePMCArray', 'Sub')
+    .param pmc expression
+    .local pmc res, elem, block, mapres, iter, args
+    .local int i, arity
+
+    arity = expression.'arity'()
+    if arity > 0 goto body
+    arity = 1
+  body:
+    res = new 'List'
+    iter = self.'iterator'()
+  map_loop:
+    unless iter goto done
+
+    # Creates arguments for closure
+    args = new 'ResizablePMCArray'
+
+    i = 0
+  args_loop:
+    if i == arity goto invoke
+    unless iter goto elem_undef
+    elem = shift iter
+    goto push_elem
+  elem_undef:
+    elem = new 'Failure'
+  push_elem:
+    push args, elem
+    inc i
+    goto args_loop
+
+  invoke:
+    (mapres :slurpy) = expression(args :flat)
+    unless mapres goto map_loop
+    mapres.'!flatten'()
+    $I0 = elements res
+    splice res, mapres, $I0, 0
+    goto map_loop
+
+  done:
+    .return(res)
+.end
+
+
+.sub 'map' :multi('Sub')
+    .param pmc expression
+    .param pmc values          :slurpy
+    .return values.'map'(expression)
+.end
+
+
+=item pairs()
+
+Return a list of Pair(index, value) elements for the invocant.
+
+=cut
+
+.sub 'pairs' :method :multi(ResizablePMCArray)
+    .local pmc result, iter
+    .local int i
+
+    result = new 'List'
+    iter = self.'iterator'()
+    i = 0
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = 'infix:=>'(i, $P0)
+    push result, $P1
+    inc i
+    goto iter_loop
+  iter_end:
+    .return (result)
+.end
+
+.sub 'pairs' :multi()
+    .param pmc values          :slurpy
+    .return values.'pairs'()
+.end
+
+
+=item reduce(...)
+
+=cut
+
+.sub 'reduce' :method :multi('ResizablePMCArray', 'Sub')
+    .param pmc expression
+    .local pmc retv
+    .local pmc iter
+    .local pmc elem
+    .local pmc args
+    .local int i, arity
+
+    arity = expression.'arity'()
+    if arity < 2 goto error
+
+    iter = self.'iterator'()
+    unless iter goto empty
+    retv = shift iter
+  loop:
+    unless iter goto done
+
+    # Create arguments for closure
+    args = new 'ResizablePMCArray'
+    # Start with 1. First argument is result of previous call
+    i = 1
+
+  args_loop:
+    if i == arity goto invoke
+    unless iter goto elem_undef
+    elem = shift iter
+    goto push_elem
+  elem_undef:
+    elem = new 'Failure'
+
+  push_elem:
+    push args, elem
+    inc i
+    goto args_loop
+
+  invoke:
+    retv = expression(retv, args :flat)
+    goto loop
+
+  empty:
+    retv = new 'Undef'
+    goto done
+
+  error:
+    'die'('Cannot reduce() using a unary or nullary function.')
+    goto done
+
+  done:
+    .return(retv)
+.end
+
+.sub 'reduce' :multi('Sub')
+    .param pmc expression
+    .param pmc values          :slurpy
+    .return values.'reduce'(expression)
+.end
+
+
 =item uniq(...)
 
 =cut
 
+# TODO Rewrite it. It's too naive.
+
+.namespace ['List']
 .sub uniq :method
     .local pmc ulist
     .local pmc key
@@ -668,46 +564,23 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
     .return(ulist)
 .end
 
-=item sort()
 
-Sort list by copying into FPA, sorting and creating new List.
+=item values()
+
+Returns a List containing the values of the invocant.
 
 =cut
 
-.sub 'sort' :method
-    .param pmc comparer :optional
-    .param int have_comparer :opt_flag
-    .local pmc elem, arr, comparer
-    .local int len, i
-
-    # Creating FPA
-    arr = new 'FixedPMCArray'
-    len = self.'elems'()
-    arr = len
-
-    # Copy all elements into it
-    i = 0
-  copy_to:
-    if i == len goto done_to
-    elem = self[i]
-    arr[i] = elem
-    inc i
-    goto copy_to
-
-  done_to:
-
-    # Check comparer
-    if have_comparer goto do_sort
-    get_hll_global comparer, 'infix:cmp'
-
-  do_sort:
-
-    # Sort in-place
-    arr.'sort'(comparer)
-
-    # and return new List.
-    .return 'list'(arr)
+.sub 'values' :method :multi('ResizablePMCArray')
+    self.'!flatten'()
+    .return (self)
 .end
+
+.sub 'values' :multi()
+    .param pmc values          :slurpy
+    .return values.'!flatten'()
+.end
+
 
 =back
 
@@ -721,52 +594,11 @@ Build a List from its arguments.
 
 =cut
 
-.namespace
-
+.namespace []
 .sub 'list'
-    .param pmc args            :slurpy
-    .local pmc list, item
-    list = new 'List'
-  args_loop:
-    unless args goto args_end
-    item = shift args
-    $I0 = defined item
-    unless $I0 goto add_item
-    # $I0 = isa item, 'Array'
-    # if $I0 goto add_item
-    $I0 = does item, 'array'
-    unless $I0 goto add_item
-    splice args, item, 0, 0
-    goto args_loop
-  add_item:
-    push list, item
-    goto args_loop
-  args_end:
-    .return (list)
+    .param pmc values          :slurpy
+    .return values.'!flatten'()
 .end
-
-
-=item C<sort>
-
-Sort arguments using (optional) comparition sub.
-
-=cut
-
-.sub 'sort'
-    .param pmc comparer :optional
-    .param pmc args :slurpy
-    .local pmc l
-
-    $I0 = isa comparer, 'Sub'
-    if $I0 goto with_cmp
-    l = 'list'(comparer, args :flat)
-    .return l.'sort'()
-
-  with_cmp:
-    l = 'list'(args :flat)
-    .return l.'sort'(comparer)
-.end
-
 
 =item C<infix:,(...)>
 
@@ -776,7 +608,7 @@ Operator form for building a list from its arguments.
 
 .sub 'infix:,'
     .param pmc args            :slurpy
-    .return 'list'(args :flat)
+    .return args.'!flatten'()
 .end
 
 
@@ -999,126 +831,7 @@ find_max_loop_end:
     .return(cur_max)
 .end
 
-=item C<reverse(LIST)>
-
-Returns the elements of LIST in the opposite order.
-
-=cut
-
-.sub 'reverse'
-    .param pmc list :slurpy
-    .local string type
-    .local pmc retv
-    .local pmc elem
-    .local int len
-    .local int i
-
-    len = elements list
-
-    if len > 1 goto islist
-
-    # If we're not a list, check if we're a string.
-    elem = list[0]
-    typeof type, elem
-
-    # This is a bit of a work around - some operators (ie. ~) return
-    # a String object instead of a Perl6String.
-    eq type, 'String', parrotstring
-    eq type, 'Perl6Str', perl6string
-    goto islist
-
-  parrotstring:
-    .local string tmps
-    tmps = elem
-    elem = new 'Perl6Str'
-    elem = tmps
-
-  perl6string:
-    retv = elem.'reverse'()
-    goto done
-
-  islist:
-    retv = new 'List'
-    i = 0
-
-  loop:
-    if i == len goto done
-    elem = list[i]
-    retv.'unshift'(elem)
-    inc i
-    goto loop
-
-  done:
-    .return(retv)
-.end
-
-.sub keys :multi('List')
-  .param pmc list
-
-  .return list.'keys'()
-.end
-
-.sub values :multi('List')
-  .param pmc list
-
-  .return list.'values'()
-.end
-
-.sub delete :multi('List')
-  .param pmc list
-  .param pmc indices :slurpy
-
-  .return list.'delete'(indices :flat)
-.end
-
-.sub exists :multi('List')
-  .param pmc list
-  .param pmc indices :slurpy
-
-  .return list.'exists'(indices :flat)
-.end
-
-.sub kv :multi('List')
-    .param pmc list
-
-    .return list.'kv'()
-.end
-
-.sub pairs :multi('List')
-    .param pmc list
-
-    .return list.'pairs'()
-.end
-
-.sub grep :multi(_,'List')
-    .param pmc test
-    .param pmc list :slurpy
-
-    .return list.'grep'(test)
-.end
-
-.sub reduce :multi(_,'List')
-    .param pmc test
-    .param pmc list
-
-    .return list.'reduce'(test)
-.end
-
-
-.sub first :multi(_,'List')
-    .param pmc test
-    .param pmc list :slurpy
-
-    .return list.'first'(test)
-.end
-
-.sub uniq :multi('List')
-    .param pmc list
-
-    .return list.'uniq'()
-.end
-
-## TODO: join map reduce sort zip
+## TODO: zip
 
 =back
 

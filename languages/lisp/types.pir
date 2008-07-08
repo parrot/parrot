@@ -762,7 +762,7 @@ DONE:
     .return(retv)
 .end
 
-.namespace
+.namespace []
 
 # Local Variables:
 #   mode: pir

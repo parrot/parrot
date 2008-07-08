@@ -1,8 +1,10 @@
 =pod
 
+Z<CHP-4>
+
 =head1 Subroutines
 
-Z<CHP-10-SECT-6>
+Z<CHP-4-SECT-1>
 
 X<PIR (Parrot intermediate representation);subroutines>
 X<subroutines;in PIR>
@@ -20,7 +22,7 @@ a set of building blocks and tools, not a single prepackaged solution.
 
 =head2 Parrot Calling Conventions
 
-Z<CHP-10-SECT-6.1>
+Z<CHP-4-SECT-1.1>
 
 X<PIR (Parrot intermediate representation);subroutines;Parrot calling conventions>
 X<subroutines;Parrot calling conventions;in PIR>
@@ -168,116 +170,9 @@ look at the details of how the PIR code translates to PASM:
 
   $ parrot -o- factorial.pir
 
-=head2 Stack-Based Subroutine Calls
-
-Z<CHP-10-SECT-6.2>
-
-The Parrot calling conventions are PIR's default for subroutine calls,
-but it does also provide some syntax for stack-based calls.
-Stack-based calls are fast, so they're sometimes useful for purely
-internal code. To turn on support for stack-based calls, you have to
-set the C<fastcall> pragma:
-
-  .pragma fastcall       # turn on stack calling conventions
-
-The standard calling conventions are set by the C<prototyped> pragma.
-You'll rarely need to explicitly set C<prototyped> since it's on by
-default. You can mix stack-based subroutines and prototyped
-subroutines in the same file, but you really shouldn't--stack-based
-calls interfere with exception handling, and don't interoperate well
-with prototyped calls.
-
-When the C<fastcall> pragma is on, the C<.arg>, C<.result>, C<.param>,
-and C<.return> directives push and pop on the user stack instead of
-setting registers. Internally they are just the PASM C<save> and
-C<restore> opcodes. Because of this, you have to reverse the order of
-your arguments. You push the final argument onto the user stack first,
-because it'll be the last parameter popped off the stack on the other
-end:
-
-  .arg y             # save args in reverse order
-  .arg x
-  call _foo          # (r, s) = _foo(x,y)
-  .result r
-  .result s          # restore results in order
-
-Multiple return values are also passed in reverse order for the same
-reason.  Often the first parameter or result in a stack-based call
-will be a count of values passed in, especially when the number of
-arguments can vary.
-
-X<call instruction (PIR)>
-Another significant difference is that instead of the single line call
-or a C<.call>, stack-based calls use the C<call> instruction. This
-is the same as PASM's C<bsr>X<bsr opcode (PASM)> opcode. It branches
-to a subroutine label and pushes the current location onto the control
-stack so it can return to it later.
-
-This example reworks the factorial code above to use stack-based
-calls:
-
-  .pragma fastcall       # turn on stack calling conventions
-  .sub _main
-      .local int count
-      .local int product
-      count = 5
-      product = 1
-      .arg product       # second argument
-      .arg count         # first argument
-      call _fact         # call the subroutine
-      .result $I0        # retrieve the result
-      print $I0
-      print "\n"
-      end
-  .end
-
-  .sub _fact
-      saveall            # save caller's registers
-      .param int c       # retrieve the parameters
-      .param int p
-
-  loop:
-     if c <= 1 goto fin
-     p = c * p
-     dec c
-     branch loop
-  fin:
-      .return p          # return the result
-      restoreall         # restore caller's registers
-      ret                # back to the caller
-  .end
-
-The C<_main> compilation unit sets up two local variables and pushes
-them onto the user stack in reverse order using the C<.arg> directive.
-It then calls C<_fact> with the C<call> instruction. The C<.result>
-directive pops a return value off the user stack.
-
-X<saveall opcode (PASM)>
-This example uses the callee save convention, so the first statement
-in the C<_fact> subroutine is C<saveall>. (See
-A<CHP-9-SECT-7.1.2>"Callee saves" in Chapter 9 for more details on
-this convention.) With callee save in PIR, Parrot can ignore the
-subroutine's register usage when it allocates registers for the
-calling routine.
-
-X<.param directive>
-The C<.param> directive pops a function parameter off the user stack
-as an integer and creates a new named local variable for the
-parameter. Parrot does check the types of the
-parameters to make sure they match what the the caller passes to the
-subroutine, but the amount of paramets isn't checked, so both sides
-have to agree on the argument count.
-
-The C<.return>X<.return directive> statement at the end pushes the
-final value of C<p> onto the user stack, so C<.result> can retrieve it
-after the subroutine ends. C<restoreall> restores the caller's
-register values, and C<ret> pops the top item off the control
-stack--in this case, the location of the call to C<_fact>--and returns
-to it.
-
 =head2 Compilation Units Revisited
 
-Z<CHP-10-SECT-6.3>
+Z<CHP-4-SECT-1.2>
 
 The example above could have been written using simple labels instead
 of separate compilation units:
@@ -328,7 +223,7 @@ even inlining the entire function.
 
 =begin sidebar A Short Note on the Optimizer
 
-Z<CHP-10-SIDEBAR-1>
+Z<CHP-4-SIDEBAR-1>
 
 X<optimizer>
 The optimizer isn't powerful enough to inline small subroutines yet.
@@ -350,7 +245,7 @@ up your code. Parrot does it already.
 
 =head2 PASM Subroutines
 
-Z<CHP-10-SECT-6.4>
+Z<CHP-4-SECT-1.4>
 
 X<subroutines;PASM>
 X<PASM (Parrot assembly language);subroutines>
@@ -372,14 +267,69 @@ entry labels inside C<.emit> blocks have to be global labels:
 
 =head1 Methods
 
-Z<CHP-10-SECT-7>
+Z<CHP-4-SECT-2>
 
 X<PIR (Parrot intermediate representation);methods>
 X<methods;in PIR>
 X<classes;methods>
 X<. (dot);. (method call);instruction (PIR)>
-PIR provides syntax to simplify writing methods and method calls.
-These calls follow the Parrot calling conventions. The basic syntax is
+PIR provides syntax to simplify writing methods and method calls for
+object-oriented programming. These calls follow the Parrot
+calling conventions as well. First we want to discuss I<namespaces>
+in Parrot.
+
+=head2 Namespaces
+
+Z<CHP-4-SECT-2.1>
+
+X<Namespaces>
+X<.namespace>
+Namespaces provide a mechanism where names can be reused. This may not
+sound like much, but in large complicated systems, or systems with
+many included libraries, it can become a big hassle very quickly. Each
+namespace get's it's own area for function names and global variables.
+This way, you can have multiple functions named C<create> or C<new>
+or C<convert>, for instance, without having to use I<Multi-Method
+Dispatch> (MMD), which we will describe later.
+
+Namespaces are specified with the C<.namespace []> directive. The brackets
+are themselves not optional, but the keys inside them are. Here are some
+examples:
+
+    .namespace [ ]               # The root namespace
+    .namespace [ "Foo" ]         # The namespace "Foo"
+    .namespace [ "Foo" ; "Bar" ] # Namespace Foo::Bar
+
+Using semicolons, namespaces can be nested to any arbitrary depth. Namespaces
+are special types of PMC, so we can access them and manipulate them just
+like other data objects. We can get the PMC for the root namespace using
+the C<get_root_namespace> opcode:
+
+    $P0 = get_root_namespace
+
+The current namespace, which might be different from the root namespace
+can be retrieved with the C<get_namespace> opcode:
+
+    $P0 = get_namespace             # get current namespace
+    $P0 = get_namespace [ "Foo" ]   # get PMC for namespace "Foo"
+
+Once we have a namespace PMC, we can call functions in it, or retrieve
+global variables from it using the following functions:
+
+    $P1 = get_global $S0            # Get global in current namespace
+    $P1 = get_global [ "Foo" ], $S0 # Get global in namespace "Foo"
+    $P1 = get_global $P0, $S0       # Get global in $P0 namespace PMC
+
+In the examples above, of course, C<$S0> contains the string name of the
+global variable or function from the namespace to find.
+
+
+=head2 Method Syntax
+
+Z<CHP-4-SECT-2.2>
+
+Now that we've discussed namespaces, we can start to discuss
+object-oriented programming and method calls. The basic syntax is
 similar to the single line subroutine call above, but instead of a
 subroutine label name it takes a variable for the invocant PMC and a
 string with the name of the method:
@@ -435,4 +385,7 @@ return values just like a single line subroutine call:
 
 =cut
 
-# vim: expandtab shiftwidth=2 tw=70:
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

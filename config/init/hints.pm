@@ -17,6 +17,7 @@ package init::hints;
 use strict;
 use warnings;
 
+use File::Spec::Functions qw/catfile/;
 use base qw(Parrot::Configure::Step);
 
 sub _init {
@@ -31,28 +32,36 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
+    print "\n[ " if $verbose;
 
     my $hints_used = 0;
 
-    my $hints = "init::hints::" . lc( $conf->data->get_p5('OSNAME') );
+    my $osname = lc( $conf->data->get_p5('OSNAME') );
+    my $hints_file = catfile('config', 'init', 'hints', "$osname.pm");
+    if ( -f $hints_file ) {
+        my $hints_pkg = "init::hints::" . $osname;
 
-    print "[ $hints " if $verbose;
+        print "$hints_pkg " if $verbose;
 
-    eval "use $hints";
-    die $@ if $@;
+        eval "use $hints_pkg";
+        die $@ if $@;
 
-    # Call the runstep method if it exists.
-    # Otherwise the step must have done its work when it was loaded.
-    $hints->runstep( $conf, @_ ) if $hints->can('runstep');
-    $hints_used++;
-
-    $hints = "init::hints::local";
-    print "$hints " if $verbose;
-    eval "use $hints";
-
-    unless ($@) {
-        $hints->runstep( $conf, @_ ) if $hints->can('runstep');
+        # Call the runstep method if it exists.
+        # Otherwise the step must have done its work when it was loaded.
+        $hints_pkg->runstep( $conf, @_ ) if $hints_pkg->can('runstep');
         $hints_used++;
+
+        $hints_pkg = "init::hints::local";
+        print "$hints_pkg " if $verbose;
+        eval "use $hints_pkg";
+
+        unless ($@) {
+            $hints_pkg->runstep( $conf, @_ ) if $hints_pkg->can('runstep');
+            $hints_used++;
+        }
+    }
+    else {
+        print "No $hints_file found.  " if $verbose;
     }
 
     if ( $hints_used == 0 and $verbose ) {

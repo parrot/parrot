@@ -157,9 +157,9 @@ method try_statement($/) {
 
     ## get the exception identifier;
     my $exc := $( $<exception> );
-    $exc.isdecl(1);
+    $exc.isdecl( PAST::Val.new( :value(1) ) );
     $exc.scope('lexical');
-    $exc.viviself(0);
+    $exc.viviself( PAST::Val.new( :value(0) ) );
 
     ## generate instruction to retrieve the exception objct (and the exception message,
     ## that is passed automatically in PIR, this is stored into $S0 (but not used).
@@ -207,6 +207,11 @@ method block($/, $key) {
     }
 }
 
+method return_statement($/) {
+    my $expr := $( $<expression> );
+    make PAST::Op.new( $expr, :pasttype('return'), :node($/) );
+}
+
 method do_block($/) {
     make $( $<block> );
 }
@@ -237,6 +242,7 @@ method sub_definition($/) {
     @?BLOCK.shift();
     $?BLOCK := @?BLOCK[0];
 
+    $past.control('return_pir');
     make $past;
 }
 

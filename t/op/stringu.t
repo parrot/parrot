@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Parrot::Config;
 
 =head1 NAME
@@ -324,6 +324,35 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode" );
 .end
 CODE
 1102269
+OUTPUT
+
+# Tests for .CCLASS_ANY
+pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_ANY in unicode" );
+.sub main
+    .include 'cclass.pasm'
+    .local string s
+    s = unicode:" \t\u207babc\n\u2000\u2009"
+    $I9 = length s
+    $I0 = is_cclass .CCLASS_ANY, s, 0
+    print $I0
+    $I0 = is_cclass .CCLASS_ANY, s, 1
+    print $I0
+    $I0 = is_cclass .CCLASS_ANY, s, 2
+    print $I0
+    $I0 = is_cclass .CCLASS_ANY, s, $I9
+    print $I0
+    $I0 = find_not_cclass .CCLASS_ANY, s, 0, $I9
+    print $I0
+    $I0 = find_not_cclass .CCLASS_ANY, s, $I0, $I9
+    print $I0
+    $I0 = find_cclass .CCLASS_ANY, s, $I0, $I9
+    print $I0
+    $I0 = find_cclass .CCLASS_ANY, s, 2, $I9
+    print $I0
+    print "\n"
+.end
+CODE
+11109992
 OUTPUT
 
 SKIP: {

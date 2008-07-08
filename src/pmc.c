@@ -422,20 +422,24 @@ Returns the PMC type for C<name>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-pmc_type(PARROT_INTERP, ARGIN(STRING *name))
+pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 {
-    PMC * const classname_hash = interp->class_hash;
-    PMC * const item           =
-        (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
+    if (!name)
+        return enum_type_undef;
+    else {
+        PMC * const classname_hash = interp->class_hash;
+        PMC * const item           =
+            (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
 
-    /* nested namespace with same name */
-    if (item->vtable->base_type == enum_class_NameSpace)
-        return 0;
+        /* nested namespace with same name */
+        if (item->vtable->base_type == enum_class_NameSpace)
+            return enum_type_undef;
 
-    if (!PMC_IS_NULL(item))
-        return VTABLE_get_integer(interp, item);
+        if (!PMC_IS_NULL(item))
+            return VTABLE_get_integer(interp, item);
 
-    return Parrot_get_datatype_enum(interp, name);
+        return Parrot_get_datatype_enum(interp, name);
+    }
 }
 
 /*
@@ -526,14 +530,14 @@ PARROT_API
 void
 Parrot_create_mro(PARROT_INTERP, INTVAL type)
 {
-    STRING *class_name, *isa;
-    INTVAL pos, parent_type, total;
-    PMC *_class, *mro;
+    PMC    *_class, *mro;
+    INTVAL i, count;
 
-    VTABLE *vtable = interp->vtables[type];
+    VTABLE *vtable   = interp->vtables[type];
+    PMC    *mro_list = vtable->mro;
 
     /* multithreaded: has already mro */
-    if (vtable->mro)
+    if (mro_list && mro_list->vtable->base_type != enum_class_ResizableStringArray)
         return;
 
     mro         = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -542,14 +546,11 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
     if (vtable->ro_variant_vtable)
         vtable->ro_variant_vtable->mro = mro;
 
-    class_name = vtable->whoami;
-    isa        = vtable->isa_str;
-    total      = (INTVAL)string_length(interp, isa);
+    count = VTABLE_elements(interp, mro_list);
 
-    for (pos = 0; ;) {
-        INTVAL len  = string_length(interp, class_name);
-        pos        += len + 1;
-        parent_type = pmc_type(interp, class_name);
+    for (i = 0; i < count; ++i) {
+        STRING *class_name  = VTABLE_get_string_keyed_int(interp, mro_list, i);
+        INTVAL  parent_type = pmc_type(interp, class_name);
 
         /* abstract classes don't have a vtable */
         if (!parent_type)
@@ -573,16 +574,6 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
             _class = create_class_pmc(interp, parent_type);
 
         VTABLE_push_pmc(interp, mro, _class);
-
-        if (pos >= total)
-            break;
-
-        len = string_str_index(interp, isa, CONST_STRING(interp, " "), pos);
-
-        if (len == -1)
-            len = total;
-
-        class_name = string_substr(interp, isa, pos, len - pos, NULL, 0);
     }
 }
 
@@ -607,13 +598,13 @@ void
 dod_register_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
     /* Better not trigger a DOD run with a potentially unanchored PMC */
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     if (!interp->DOD_registry)
         interp->DOD_registry = pmc_new(interp, enum_class_AddrRegistry);
 
     VTABLE_set_pmc_keyed(interp, interp->DOD_registry, pmc, PMCNULL);
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 }
 
 /*

@@ -83,7 +83,8 @@ typedef enum sub_flags {
     SUB_FLAG_IMMEDIATE = 0x080,
     SUB_FLAG_VTABLE    = 0x100,
     SUB_FLAG_LEX       = 0x200,
-    SUB_FLAG_MULTI     = 0x400
+    SUB_FLAG_MULTI     = 0x400,
+    SUB_FLAG_LEXID     = 0x800
 
 } sub_flag;
 

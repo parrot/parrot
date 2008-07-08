@@ -690,7 +690,7 @@ Parrot_clear_n(PARROT_INTERP)
 
 =head1 SEE ALSO
 
-F<include/parrot/register.h> and F<src/stack_common.c>
+F<include/parrot/register.h> and F<src/stacks.c>.
 
 =cut
 

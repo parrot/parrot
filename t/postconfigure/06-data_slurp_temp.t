@@ -85,10 +85,10 @@ SKIP: {
 If you have already completed configuration,
 you can call Parrot::Configure::Data::slurp().
 You appear not to have completed configuration;
-hence, two tests are skipped.
+hence, three tests are skipped.
 REASON
 
-    skip $reason, 2 unless defined $res;
+    skip $reason, 3 unless defined $res;
 
     eval { $conf->data()->slurp(); };
     ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::slurp() succeeded" );

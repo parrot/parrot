@@ -743,8 +743,10 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
     }
 
     /* if we have a tail call then insert a tailcall opcode */
-    if (tail_call)
-        return insert_tail_call(interp, unit, ins, sub, meth);
+    if (tail_call) {
+        insert_tail_call(interp, unit, ins, sub, meth);
+        return;
+    }
 
     /* handle return results */
     n   = sub->pcc_sub->nret;

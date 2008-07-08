@@ -5,14 +5,13 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  16;
+use Test::More tests =>  11;
 use Carp;
 use Cwd;
 use File::Path ();
 use File::Temp qw(tempdir);
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::init::install');
 use_ok('config::init::hints');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -29,7 +28,6 @@ my $args = process_options(
 my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
-test_step_thru_runstep( $conf, q{init::install},  $args );
 
 my ( $task, $step_name, $step, $ret );
 my $pkg = q{init::hints};
@@ -37,7 +35,7 @@ my $pkg = q{init::hints};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
-$task        = $conf->steps->[2];
+$task        = $conf->steps->[-1];
 $step_name   = $task->step;
 
 $step = $step_name->new();

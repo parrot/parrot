@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2007 The Perl Foundation.
+# Copyright (C) 2007-2008 The Perl Foundation.
 # $Id$
 
 use strict;
@@ -38,7 +38,7 @@ Colin Kuskie - <ckuskie@sterling.net>
 my %expected = (
     '01_temp_var.pir' => << 'END_EXPECTED',
 42
-3.141590
+3.14159
 Hello
 Ford
 END_EXPECTED

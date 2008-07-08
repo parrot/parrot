@@ -1936,17 +1936,17 @@ pmclass DotNetAssembly dynpmc group dotnet {
         /* We create some PMCs that aren't reachable for a while, and GC
            runs will eat them. Thus we'll block DOD while we do it (and
            unblock it again later). */
-        Parrot_block_DOD(INTERP);
+        Parrot_block_GC_mark(INTERP);
 
         /* Finally, we're ready to do something useful. Turn metadata into
            a myriad of PMCs. Woohoo! */
         if (!metadata_to_pmcs(INTERP, SELF, in, ass))
         {
             fclose(in);
-            Parrot_unblock_DOD(INTERP);
+            Parrot_unblock_GC_mark(INTERP);
             return;
         }
-        Parrot_unblock_DOD(INTERP);
+        Parrot_unblock_GC_mark(INTERP);
 
         /* We're done. Close file and set loaded flag. */
         fclose(in);

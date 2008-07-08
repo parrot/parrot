@@ -85,12 +85,6 @@ Some ideas from AT&T SFIO.
 #define PIO_DEFAULTMODE DEFAULT_OPEN_MODE
 #define PIO_UNBOUND     (size_t)-1
 
-/* This is list of valid layers */
-extern ParrotIOLayer **pio_registered_layers;
-
-/* This is the actual (default) layer stack which is used for IO */
-/* extern ParrotIOLayer *pio_default_stack; */
-
 typedef struct _ParrotIOBuf ParrotIOBuf;
 typedef PMC **ParrotIOTable;
 

@@ -194,7 +194,7 @@ END_HEADER
 
 .sub 'body'
     $S0 = <<'END_BODY'
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
     PackFile     *pf;
     Parrot_Interp interp;
@@ -321,7 +321,7 @@ END_BODY
 
     $P0 = '_config'()
     .local string cc, ld, link_dynamic, linkflags, ld_out, libparrot, libs, o
-    .local string rpath, osname, build_dir, slash
+    .local string rpath, osname, build_dir, slash, icushared
     cc           = $P0['cc']
     ld           = $P0['ld']
     link_dynamic = $P0['link_dynamic']
@@ -334,6 +334,7 @@ END_BODY
     osname       = $P0['osname']
     build_dir    = $P0['build_dir']
     slash        = $P0['slash']
+    icushared    = $P0['icu_shared']
 
     .local string config, pathquote
     config     = concat build_dir, slash
@@ -369,6 +370,8 @@ END_BODY
     link .= linkflags
     link .= ' '
     link .= libs
+    link .= ' '
+    link .= icushared
     link .= ' '
     link .= config
 

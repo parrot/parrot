@@ -95,7 +95,7 @@ the documentation is a great place to start contributing.
 
 The F<languages/> directory contains the code that implements various
 language compilers: Perl 6, Python ("Pynie"), Ruby ("Cardinal"), PHP
-("Plumhead"), Lisp, Lua, Tcl ("partcl"), WMLScript, Forth, Scheme,
+("Pipp"), Lisp, Lua, Tcl ("partcl"), WMLScript, Forth, Scheme,
 Befunge, BASIC, and many others. These language compilers are in
 various stages of partial completion. The file F<LANGUAGES.STATUS>
 provides meta information on the included languages and on the many
@@ -281,7 +281,7 @@ With the attached file F<list_chunk_initialize.patch>:
   --- list.c        27 Dec 2002 09:33:11 -0000        1.23
   +++ list.c        28 Dec 2002 03:37:35 -0000
   @@ -187,6 +187,10 @@
-       Parrot_block_GC(interpreter);
+       Parrot_block_GC_sweep(interpreter);
        chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
        chunk->items = items;
   +    chunk->n_chunks = 0;
@@ -289,8 +289,8 @@ With the attached file F<list_chunk_initialize.patch>:
   +    chunk->next     = NULL;
   +    chunk->prev     = NULL;
        Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
-       Parrot_unblock_DOD(interpreter);
-       Parrot_unblock_GC(interpreter);
+       Parrot_unblock_GC_mark(interpreter);
+       Parrot_unblock_GC_sweep(interpreter);
 
 =head3 Bug tracking
 

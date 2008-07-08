@@ -1,0 +1,420 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+=head1 Episode 4: PAST Nodes and More Statements
+
+=head2 Introduction
+
+The previous episode introduced the full grammar specification of Squaak, and
+we finally started working on the implementation. If you're doing the exercises,
+you currently have basic assignments working; strings and integers can be
+assigned to (global) variables. This episode will focus on implementation of
+some statement types and explain a few bits about the different PAST node types.
+
+=head2 Parrot Abstract Syntax Tree
+
+A Parrot Abstract Syntax Tree (PAST) represents a program written in Squaak (or
+any other Parrot-ported language), and consists of nodes. In the previous
+episode, we already saw nodes to represent string and integer literals,
+identifiers and "operator" nodes (PAST::Op), in our case assignment.
+Other operators represent other high-level language constructs such as
+conditional statements, loops, and subroutine invocation. Depending on the node
+type, a PAST node can take child nodes. For instance, a PAST node to represent
+an if-statement can have up to three child nodes. The first child node
+represents the condition; if true, the second child node is evaluated. If the
+condition evaluates to false, and there's a third child node, this third child
+node is evaluated (the else part).
+If the PAST represents a subroutine invocation, the child nodes are evaluated
+in a different way. In that case, the first child node represents the subroutine
+that is to be invoked (unless the :name attribute was set on this node, but
+more on that in a later episode), and all other child nodes are passed to that
+subroutine as arguments.
+It generally doesn't matter of which PAST node type the children are. For
+instance, consider a language in which a simple expression is a statement:
+
+    42
+
+You might wonder what kind of code is generated for this. Well, it's really
+very simple: a new C<PAST::Val> node is created (of a certain type, for this
+example that would be C<Integer>), and the value is assigned to this node. It
+might seem a bit confusing to write something like this, as it doesn't really
+do anything (note that this is not valid Squaak input):
+
+    if 42 then "hi" else "bye" end
+
+But again, this works out correctly; the "then" and "else" blocks are compiled
+to instructions that load that particular literal into a C<PAST::Val> node and
+leave it there. That's fine, if your language allows such statements.
+The point I'm trying to make is, that all PAST nodes are equal. You don't need
+to think about the node types if you set a node as a child of some other parent
+node. Each PAST node is compiled into a number of PIR instructions.
+
+=head2 Go with the control-flow
+
+Now you know a bit more on PAST nodes, let's get our hands dirty and implement
+some more statement types. In the rest of this episode, we'll handle
+if-statements and throw-statements.
+
+=head2 If-then-else
+
+The first statement we're going to implement now is the if-statement. An
+if-statement has typically three parts (but this of course depends on the
+programming language): a conditional expression, a "then" part and an "else"
+part. Implementing this in Perl 6 rules and PAST is almost trivial:
+
+    rule if_statement {
+        'if' <expression> 'then' <block>
+        ['else' $<else>=<block> ]?
+        'end'
+        {*}
+    }
+
+    rule block {
+        <statement>*
+        {*}
+    }
+
+    rule statement {
+        | <assignment> {*}          #= assignment
+        | <if_statement> {*}        #= if_statement
+    }
+
+Note that the optional else block is stored in the match object's "else" field.
+If we hadn't written this $<else>= part, then <block> would have been an array,
+with block[0] the "then" part, and block[1] the optional else part. Assigning
+the optional else block to a different field, makes the action method slightly
+easier to read.
+Also note that the statement rule has been updated; a statement is now either
+an assignment or an if-statement. As a result, the action method statement now
+takes a key argument. The relevant action methods are shown below:
+
+    method statement($/, $key) {
+        # get the field stored in $key from the $/ object,
+        # and retrieve the result object from that field.
+        make $( $/{$key} );
+    }
+
+    method block($/) {
+        # create a new block, set its type to 'immediate',
+        # meaning it is potentially executed immediately
+        # (as opposed to a declaration, such as a
+        # subroutine definition).
+        my $past := PAST::Block.new( :blocktype('immediate'),
+                                     :node($/) );
+
+        # for each statement, add the result
+        # object to the block
+        for $<statement> {
+            $past.push( $( $_ ) );
+        }
+        make $past;
+    }
+
+    method if_statement($/) {
+        my $cond := $( $<expression> );
+        my $then := $( $<block> );
+        my $past := PAST::Op.new( $cond, $then,
+                                  :pasttype('if'),
+                                  :node($/) );
+        if $<else> {
+            $past.push( $( $<else>[0] ) );
+        }
+        make $past;
+    }
+
+That's, easy, huh? First, we get the result objects for the conditional
+expression and the then part. Then, a new C<PAST::Op> node is created, and the
+C<:pasttype> is set to C<if>, meaning this node represents an if-statement.
+Then, if there is an "else" block, this block's result object is retrieved and
+added as the third child of the PAST node. Finally, the result object is set
+with the make function.
+
+=head2 Result objects
+
+At this point it's wise to spend a few words on the make function, the parse
+actions and how the whole PAST is created by the individual parse actions.
+Have another look at the action method if_statement. In the first two lines,
+we request the result objects for the conditional expression and the "then"
+block. When were these result objects created? How can we be sure they're there?
+The answer lies in the order in which the parse actions are executed. The
+special "{*}" symbol that triggers a parse action invocation, is usually placed
+at the end of the rule. For this input string: "if 42 then x = 1 end" this
+implies the following order:
+
+=over 4
+
+=item  1. parse TOP
+
+=item  2. parse statement
+
+=item  3. parse if_statement
+
+=item  4. parse expression
+
+=item  5. parse integer
+
+=item  6. create PAST::Val( :value(42) )
+
+=item  7. parse block
+
+=item  8. parse statement
+
+=item  9. parse assignment
+
+=item 10. parse identifier
+
+=item 11. create PAST::Var( :name('x'))
+
+=item 12. parse integer
+
+=item 13. create PAST::Val( :value(1) )
+
+=item 14. create PAST::Op( :pasttype('bind') )
+
+=item 15. create PAST::Block (in action method block)
+
+=item 16. create PAST::Op( :pasttype('if') )
+
+=item 17. create PAST::Block (in action method TOP)
+
+=back
+
+As you can see, PAST nodes are created in the leafs of the parse tree first,
+so that later, action methods higher in the parse tree can retrieve them.
+
+=head2 Throwing Exceptions
+
+The grammar rule for the "throw" statement is really quite easy, but it's useful
+to discuss the parse action, as it shows the use of generating custom PIR
+instructions. First the grammar rule:
+
+    rule throw_statement {
+        'throw' <expression>
+        {*}
+    }
+
+I assume you know how to update the "statement" rule by now. The throw statement
+will compile down to Parrot's "throw" instruction, which takes one argument.
+In order to generate a custom Parrot instruction, the instruction can be
+specified in the C<:pirop> attribute when creating a C<PAST::Op> node. Any child
+nodes are passed as arguments to this instruction, so we need to pass the result
+object of the expression being thrown as a child of the C<PAST::Op> node
+representing the "throw" instruction.
+
+    method throw_statement($/) {
+        make PAST::Op.new( $( $<expression> ),
+                           :pirop('throw'),
+                           :node($/) );
+    }
+
+
+=head2 What's Next?
+
+In this episode we implemented two more statement types of Squaak. You should
+get a general idea of how and when PAST nodes are created, and how they can be
+retrieved as sub (parse) trees. In the next episode we'll take a closer look at
+variable scope and subroutines.
+
+In the mean time, I can imagine some things are not too clear. In case you're
+lost, don't hesitate to leave comment, and I'll try to answer
+(as far as my knowledge goes).
+
+=head2 Exercises
+
+=over 4
+
+=item 1.
+
+We showed how the if-statement was implemented. The while-statement and
+try-statement are very similar. Implement these. Check out pdd26 to see what
+C<PAST::Op> nodes you should create.
+
+=item 2.
+
+Start Squaak in interactive mode, and specify the target option to show the
+generated PIR instructions. Check out what instructions and labels are
+generated, and see if you can recognize which instructions make up the
+conditional expression, which represent the "then" block, and which represent
+the "else" block (if any).
+
+=back
+
+
+=head2 References
+
+=over 4
+
+=item * PDD26: AST
+
+=item * docs/art/*.pod for good introductions to PIR
+
+=back
+
+
+=head2 Solutions to the exercises
+
+These are the solutions to the exercises in Episode 4 of the Parrot Compiler
+Tools tutorial.
+
+=over 4
+
+=item 1
+
+We showed how the if-statement was implemented. The while-statement and
+try-statement are very similar. Implement these. Check out pdd26 to see what
+C<PAST::Op> nodes you should create.
+
+The while-statement is straightforward:
+
+ method while_statement($/) {
+     my $cond := $( $<expression> );
+     my $body := $( $<block> );
+     make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
+ }
+
+The try-statement is a bit more complex. Here are the grammar rules and
+action methods.
+
+ rule try_statement {
+     'try' $<try>=<block>
+     'catch' <exception>
+     $<catch>=<block>
+     'end'
+     {*}
+ }
+
+ rule exception {
+     <identifier>
+     {*}
+ }
+
+ method try_statement($/) {
+     ## get the try block
+     my $try := $( $<try> );
+
+     ## create a new PAST::Stmts node for
+     ## the catch block; note that no
+     ## PAST::Block is created, as this
+     ## currently has problems with the
+     ## exception object. For now this will
+     ## do.
+     my $catch := PAST::Stmts.new( :node($/) );
+     $catch.push( $( $<catch> ) );
+
+     ## get the exception identifier;
+     ## set a declaration flag, the scope,
+     ## and clear the viviself attribute.
+     my $exc := $( $<exception> );
+     $exc.isdecl(1);
+     $exc.scope('lexical');
+     $exc.viviself(0);
+     ## generate instruction to retrieve the exception object (and the
+     ## exception message, that is passed automatically in PIR, this is stored
+     ## into $S0 (but not used).
+     my $pir := "    .get_results (%r, $S0)\n"
+              ~ "    store_lex '" ~ $exc.name()
+              ~ "', %r";
+
+     $catch.unshift( PAST::Op.new( :inline($pir), :node($/) ) );
+
+     ## do the declaration of the exception object as a lexical here:
+     $catch.unshift( $exc );
+     make PAST::Op.new( $try, $catch, :pasttype('try'), :node($/) );
+ }
+
+ method exception($/) {
+     our $?BLOCK;
+     my $past := $( $<identifier> );
+     $?BLOCK.symbol( $past.name(), :scope('lexical') );
+     make $past;
+ }
+
+Instead of putting "identifier" after the "catch" keyword, we made it a
+separate rule, with its own action method. This allows us to insert the
+identifier into the symbol table of the current block (the try-block),
+before the catch block is parsed.
+
+First the PAST node for the try block is retrieved. Then, the catch block is
+retrieved, and stored into a C<PAST::Stmts> node. This is needed, so that we
+can make sure that the instructions that retrieve the exception object come
+first in the exception handler.
+
+Then, we retrieve the PAST node for the exception identifier. We're setting
+its scope, a flag telling the PAST compiler this is a declaration, and we clear
+the viviself attribute. The viviself attribute is discussed in a later episode;
+if you didn't read that yet, just keep in mind the viviself attribute (if set)
+will make sure all declared variables are initialized. We must clear this
+attribute here, to make sure that this exception object is not initialized,
+because that will be done by the instruction that retrieves the thrown
+exception object, discussed next.
+
+In PIR, we can use the C<.get_results> directive to retrieve a thrown exception.
+You could also generate the C<get_results> instruction (note the missing dot),
+but this is much easier. Currently, in PIR, when retrieving the exception
+object, you must always specify both a variable (or register) for the exception
+object, and a string variable (or register) to store the exception message.
+The exception message is actually stored within the exception object. We use
+C<$S0> to store the exception message, and we'll ignore it after that. Just
+remember for now that if you want to retrieve the exception object, you must
+also specify a place to store the exception message.
+
+There is no special PAST node to generate these instructions, so we use a
+so-called inline C<PAST::Op> node. We store the instructions to be generated
+into a string and store that in the inline attribute of a C<PAST::Op> node.
+
+Once created, this node is unshifted onto the C<PAST::Stmts> node representing
+the exception handler. After that, the declaration is stored in that
+C<PAST::Stmts> node, so that this declaration comes first.
+
+Finally, we have the block representing the try block, and a C<PAST::Stmts>
+node representing the exception handler. Both are used to create a
+C<PAST::Op> node whose pasttype is set to the built-in "try" type.
+
+=item 2
+
+Start Squaak in interactive mode, and specify the target option to show the
+generated PIR instructions. Check out what instructions and labels are
+generated, and see if you can recognize which instructions make up the
+conditional expression, which represent the "then" block, and which represent
+the "else" block (if any).
+
+  > if 1 then else end
+
+  .namespace []
+  .sub "_block16"
+    new $P18, "Integer"
+    assign $P18, 1
+
+    ## this is the condition:
+    if $P18, if_17
+
+    ## this is invoking the else-block:
+    get_global $P21, "_block19"
+    newclosure $P21, $P21
+    $P20 = $P21()
+    set $P18, $P20
+    goto if_17_end
+
+    ## this is invoking the then-block:
+    if_17:
+    get_global $P24, "_block22"
+    newclosure $P24, $P24
+    $P23 = $P24()
+    set $P18, $P23
+    if_17_end:
+    .return ($P18)
+  .end
+
+  .namespace []
+  .sub "_block22" :outer("_block16")
+    .return ()
+  .end
+
+  .namespace []
+  .sub "_block19" :outer("_block16")
+    .return ()
+  .end
+
+=back
+
+=cut

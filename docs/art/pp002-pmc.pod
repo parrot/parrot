@@ -5,7 +5,7 @@
 To run the example code in this article, you'll need to
 obtain a copy of Parrot and build it for your system. For
 information on obtaining Parrot, see
-http://www.parrotcode.org/. Instructions for compiling
+L<http://www.parrotcode.org/>. Instructions for compiling
 Parrot are available in the Parrot distribution itself. All
 code examples in this article were tested with Parrot 0.4.5
 
@@ -15,7 +15,7 @@ As mentioned by Alberto Manuel Simões in TPR 2.3, Parrot is
 a register-based virtual machine with 4 register types:
 Integer, String, Number, PMC. Registers are
 referenced by a capital letter signifying the register type
-followed by the register number (C<S15> is String register
+followed by the register number (C<$S15> is String register
 number 15). Parrot programs consist of lines of text where
 each line contains one opcode and its arguments.
 
@@ -31,8 +31,8 @@ difference from the original design of Parrot, in which there
 were 32 registers for each of the built-in types (int, num,
 pmc, string).
 PIR also provides for a more "natural" syntax for opcodes.
-Rather than saying C<set I1, 0> to assign a zero to the I1
-register, you may say instead C<I1 = 0>.
+Rather than saying C<set $I1, 0> to assign a zero to the $I1
+register, you may say instead C<$I1 = 0>.
 PIR also provides syntax for easily creating named variables
 and constants, subroutines, passing parameters to subroutines,
 accessing parameters by name, etc.

@@ -33,6 +33,8 @@ down to those closest to the operating system.
  |                    Extensions                     |
  +---------------------------------------------------+
 
+=head1 IMPLEMENTATION
+
 =head2 Parser
 
 While individual high-level languages may implement their own parser,

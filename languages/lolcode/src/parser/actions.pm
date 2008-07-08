@@ -40,16 +40,39 @@ method statement ($/, $key) {
 
 
 method declare($/) {
+    our $?BLOCK;
+    our @?BLOCK;
+
+    my $name := ~$<variable><identifier>;
+
+    my $var := PAST::Var.new( :name( $name ),
+                        :viviself('Undef'),
+                        :node( $/ )
+                    );
+
+    my $scope := 'lexical';
+    if $<scope>[0] {
+        if ~$<scope>[0] eq 'FARAWAY' {
+            $scope := 'package';
+        }
+    }
+
+    $var.scope(~$scope);
+    unless $?BLOCK.symbol($name) {
+        $?BLOCK.symbol($name, :scope($scope));
+        $var.isdecl(1);
+    }
+
     if ($<expression>) {
-        $($<variable>).isdecl(1);
+        $var.isdecl(1);
         # XXX Someone clever needs to refactor this into C<assign>
         my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
-        $past.push( $( $<variable> ) );
+        $past.push( $var );
         $past.push( $( $<expression>[0] ) );
         make $past;
     }
     else {
-        make $( $<variable> );
+        make $var;
     }
 }
 
@@ -60,40 +83,43 @@ method assign($/) {
     make $past;
 }
 
-method function($/) {
-    my $block := $( $<block> );
-    $block.blocktype('declaration');
+method function($/,$key) {
+    our $?BLOCK;
+    if $key eq 'params' {
+        our $?BLOCK_SIGNATURE;
+        my $arglist;
+        $arglist := PAST::Stmts.new();
+        # if there are any parameters, get the PAST for each of them and
+        # adjust the scope to parameter.
+        for $<parameters> {
+            my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
+            $param.isdecl(1);
+            $arglist.push($param);
+        }
+        $?BLOCK_SIGNATURE := $arglist;
+    }
+    elsif $key eq 'block' {
+        my $block := $( $<block> );
+        $block.blocktype('declaration');
+        $?BLOCK.symbol(~$<variable><identifier>, :arity($block.arity()));
 
-    my $arglist;
-    $arglist := PAST::Stmts.new();
-    # if there are any parameters, get the PAST for each of them and
-    # adjust the scope to parameter.
-    $block.arity(0);
-    for $<parameters> {
-        #my $param := $($_);
-        #$param.scope('parameter');
-        my $param := PAST::Var.new(:name(~$_<identifier>), :scope('parameter'), :node($($_)));
-        $param.isdecl(1);
-        $arglist.push($param);
-        $block.arity($block.arity() + 1);
+
+        my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
+        $block[1].unshift($it);
+
+        $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
+        $block[1].push($it);
+        $block.name(~$<variable><identifier>);
+        make $block;
+        #my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+        #$($<variable>).isdecl(1);
+        #$past.push( $( $<variable> ) );
+        #$past.push( $block );
+        #make $past;
     }
 
 
-    my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
-    $block[0].unshift($it);
 
-    $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'));
-    $block[0].push($it);
-
-    if $<parameters> { $block.unshift($arglist); }
-
-    $block.name(~$<variable><identifier>);
-    make $block;
-    #my $past := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
-    #$($<variable>).isdecl(1);
-    #$past.push( $( $<variable> ) );
-    #$past.push( $block );
-    #make $past;
 }
 
 method ifthen($/) {
@@ -130,14 +156,32 @@ method ifthen($/) {
     make $past;
 }
 
-method block($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    my $stmts := PAST::Stmts.new( :node( $/ ) );
-    for $<statement> {
-        $stmts.push( $( $_ ) );
+method block($/,$key) {
+    our $?BLOCK;
+    our @?BLOCK;
+    if $key eq 'open' {
+        our $?BLOCK_SIGNATURE;
+        $?BLOCK := PAST::Block.new( PAST::Stmts.new(), :node($/) );
+        @?BLOCK.unshift($?BLOCK);
+        my $iter := $?BLOCK_SIGNATURE.iterator();
+        $?BLOCK.arity(0);
+        for $iter {
+            $?BLOCK.arity($?BLOCK.arity() + 1);
+            $?BLOCK[0].push($_);
+            $?BLOCK.symbol($_.name(), :scope('lexical'));
+        }
     }
-    $past.push($stmts);
-    make $past;
+    elsif $key eq 'close' {
+        #my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
+        my $past := @?BLOCK.shift();
+        $?BLOCK := @?BLOCK[0];
+        my $stmts := PAST::Stmts.new( :node( $/ ) );
+        for $<statement> {
+            $stmts.push( $( $_ ) );
+        }
+        $past.push($stmts);
+        make $past;
+    }
 }
 
 method value($/, $key) {
@@ -151,9 +195,18 @@ method bang($/) {
 method expression($/) {
     my $past := PAST::Op.new( :name('expr_parse'), :pasttype('call'), :node( $/ ) );
     for $<tokens> {
+        my $name := ~$_<identifier>;
         if($_<identifier>) {
-            my $inline := '%r = find_name "' ~ $_<identifier> ~ '"';
-            $past.push(PAST::Op.new( :inline($inline) ));
+            my $foo := lookup($name);
+            our $?BLOCK;
+            our @?BLOCK;
+            if $?BLOCK.symbol($name) && $?BLOCK.symbol($name)<scope> {
+                $past.push(PAST::Var.new(:name($name), :scope($?BLOCK.symbol($name)<scope>)));
+            }
+            else {
+                my $inline := '%r = find_name "' ~ $_<identifier> ~ '"';
+                $past.push(PAST::Op.new( :inline($inline) ));
+            }
         }
         elsif($_ eq "MKAY"){
             my $inline := '%r = find_name "MKAY"';
@@ -193,11 +246,40 @@ method variable ($/) {
         make PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
     }
     else {
-        make PAST::Var.new( :name( $<identifier> ),
+        our $?BLOCK;
+        our @?BLOCK;
+
+        my $var := PAST::Var.new( :name( $<identifier> ),
                             :scope('lexical'),
                             :viviself('Undef'),
                             :node( $/ )
-                          );
+                        );
+        if $?BLOCK.symbol($<identifier>) {
+            my $scope := '' ~ $?BLOCK.symbol($<identifier>)<scope>;
+            $var.scope(~$scope);
+        }
+        else {
+            our @?BLOCK;
+            my $exists := 0;
+            my $scope;
+            for @?BLOCK {
+                if $_ {
+                    my $sym_table := $_.symbol(~$<identifier>);
+                    if $sym_table {
+                        $exists := 1;
+                        $scope := '' ~ $sym_table<scope>;
+                    }
+                }
+            }
+            if $exists == 0 {
+                $var.scope('package');
+            }
+            else {
+                $var.scope($scope);
+            }
+        }
+
+        make $var;
     }
 }
 

@@ -48,8 +48,8 @@ Compiler Developer              Vishal Soni (BCG, IMCC)
 High Level Language Developer   Patrick Michaud (Perl 6, NQP)
                                 Matt Diephouse (Tcl)
                                 Will Coleda (Tcl)
-                                Francois Perrad (Lua)
-                                Bernhard Schmalhofer (Plumhead (PHP), Eclectus (Scheme))
+                                Francois Perrad (Lua, Pipp (PHP))
+                                Bernhard Schmalhofer (Pipp (PHP), Eclectus (Scheme))
                                 Kevin Tew (Cardinal (Ruby))
 
 Build Manager                   Joshua Hoblitt

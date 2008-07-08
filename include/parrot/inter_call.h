@@ -16,38 +16,58 @@
 #ifndef PARROT_INTER_CALL_H_GUARD
 #define PARROT_INTER_CALL_H_GUARD
 
-enum call_state_mode {
-    /* arg processing states
-     *       <src>_<dest>           sd  nibbles    */
+typedef enum call_state_mode {
+    /* argument fetching/putting modes */
+    CALL_STATE_SIG     = 0x100, /* runops, nci. In case we're interfacing with
+                                   C and va_lists. */
+    CALL_STATE_OP      = 0x200, /* get_, set_ ops. In case we're interfacing
+                                   with Parrot code and get the signature from
+                                   call_state_item.u.op. */
+    CALL_S_D_MASK      = 0x300, /* src/dest mask */
 
-    CALL_STATE_SIG        =  0x100,     /* runops, nci */
-    CALL_STATE_OP         =  0x200,     /* get_, set_ ops */
-    CALL_S_D_MASK         =  0x300,     /* src/dest mask */
-
-    CALL_STATE_FLATTEN    =  0x400      /* flatten src */
-
-};
+    CALL_STATE_FLATTEN = 0x400  /* whether we are busy in a :flat argument */
+} call_state_mode;
 
 typedef struct call_state_item {
-    int mode;       /* from_sig, from_set_ops, flatten ...*/
+    /* We have one call_state_item for both the caller (source,
+       arguments/returns) and the callee (destination, parameters/results). */
+    int mode;                /* this specifies:
+                             - where we get our arguments from / where we put
+                               our parameters (from C code or from set_*,get_*)
+                             - if we're in the middle of a :flat */
+
     union {
-        struct {
-            void *ap;   /* a ptr to va_list */
-            const char *sig;
+        struct {             /* In case the caller (or callee? FIXME) is C */
+            void       *ap;  /* a ptr to va_list */
+            const char *sig; /* C string describing the type of each argument */
         } sig;
-        struct {
-            opcode_t *pc;
-            PMC *signature;
+
+        struct {             /* In case the caller/callee was Parrot code: */
+            opcode_t *pc;    /* array of 'indexes' for each argument:
+                               - if it's a constant, the constant number
+                               - if it's a register, the register number */
+            PMC *signature;  /* a PMC array holding a Call_bits_enum_t
+                                signature for each argument */
         } op;
     } u;
-    parrot_context_t *ctx;
-    INTVAL used;
-    INTVAL i;
-    INTVAL n;
-    INTVAL sig;
-    PMC *slurp;
-    INTVAL slurp_i;
-    INTVAL slurp_n;
+
+    parrot_context_t *ctx;   /* the source or destination context */
+    INTVAL used;             /* src: whether this argument has been consumed
+                              * (or: whether the previous arg has?) */
+    INTVAL i;                /* number of args/params already processed */
+    INTVAL n;                /* number of args/params to match.
+                              * may include :slurpys and :flats */
+    INTVAL sig;              /* type of current arg/param
+                              * (counting from 1, the i'th) */
+
+    /* We might encounter a :flat. */
+    /* FIXME bgeron: is this used for :slurpys?
+     * I can't find a reference in slurpy-filling code. */
+
+    PMC   *slurp;             /* PMC in which to put the args we slurp up
+                               * or source from where to flatten */
+    INTVAL slurp_i;           /* index of :flat/:slurpy arg/param to match */
+    INTVAL slurp_n;           /* number of :flat/:slurpy args/params to match */
 } call_state_item;
 
 typedef struct call_state {

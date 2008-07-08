@@ -47,6 +47,41 @@ method compound_stmt($/, $key) {
     make $($/{$key});
 }
 
+method assert_stmt($/) {
+    ## assert exp1
+    ##
+    ## translates to:
+    ##
+    ## if __debug__:
+    ##   if not exp1
+    ##
+
+    ## XXX handle exp2.
+
+    my $exp1 := $( $<exp1> );
+
+    ## XXX change into "AssertionError"
+    my $exception := PAST::Op.new( :inline('    %r = new "Exception"') );
+
+    my $throwcode := PAST::Op.new( $exception, :pirop('throw'), :node($/) );
+
+    my $debugcode := PAST::Op.new( $exp1, $throwcode,
+                                   :pasttype('unless'),
+                                   :node($/) );
+
+    my $debugflag := PAST::Var.new( :name('__debug__'),
+                                    :scope('package'),
+                                    :viviself('Undef'),
+                                    :node($/) );
+
+    my $past := PAST::Op.new( $debugflag,
+                              $debugcode,
+                              :pasttype('if'),
+                              :node($/) );
+
+    make $past;
+}
+
 method if_stmt($/) {
     my $cond := +$<expression> - 1;
     my $past := PAST::Op.new( $( $<expression>[$cond] ),
@@ -153,9 +188,12 @@ method lambda_form($/) {
     else { # if no parameters, create a block here:
         $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
     }
-    ## handle the function body XXX must this be a /return/ <expr> statement?
+
     my $expr := $( $<expression> );
-    $past.push($expr);
+
+    ## add a return statement to this block
+    $past.push( PAST::Op.new( $expr, :pasttype('return'), :node($/) ) );
+    $past.control('return_pir');
     make $past;
 }
 
@@ -170,8 +208,9 @@ method funcdef($/) {
     }
     my $name := $( $<funcname> );
     $past.name( $name.name() );
-    my $suite := $( $<suite> );
-    $past.push($suite);
+    $past.push( $($<suite>) );
+
+    $past.control('return_pir');
     make $past;
 }
 
@@ -255,6 +294,25 @@ method classdef($/) {
     make $past;
 }
 
+method del_stmt($/) {
+    our $?BLOCK;
+
+    my $targets := $( $<target_list> );
+
+    my $past := PAST::Stmts.new( :node($/) );
+
+    my $pir := "    .local pmc ns\n"
+             ~ '    ns = get_hll_namespace';
+
+    $past.push( PAST::Op.new( :inline($pir), :node($/) ) );
+    for @($targets) {
+        $pir := '    delete ns["' ~ $_.name() ~ '"]';
+        $past.push( PAST::Op.new( :inline($pir), :node($/) ) );
+    }
+
+    make $past;
+}
+
 method pass_stmt($/) {
     ## pass statement doesn't do anything, but do create a PAST
     ## node to prevent special case code.
@@ -296,6 +354,24 @@ method expression_stmt($/) {
     make $( $<expression_list> );
 }
 
+method return_stmt($/) {
+    my $past := PAST::Op.new( :pasttype('return'), :node($/) );
+    if $<expression_list> {
+        my $retvals := $( $<expression_list>[0] );
+        $past.push($retvals);
+    }
+    make $past;
+}
+
+method global_stmt($/) {
+    our $?BLOCK;
+    for $<identifier> {
+        $?BLOCK.symbol( $( $_ ).name(), :scope('package') );
+    }
+    ## make a no-op
+    make PAST::Op.new( :inline('    # global declaration'), :node($/) );
+}
+
 method expression_list($/) {
     my $past;
     if (+$<expression> == 1) {
@@ -314,8 +390,7 @@ method expression_list($/) {
 method identifier($/) {
     make PAST::Var.new( :name( ~$/ ),
                         :scope('package'),
-                        :node($/)
-                      );
+                        :node($/) );
 }
 
 
@@ -332,7 +407,13 @@ method print_stmt($/) {
 
 
 method expression($/, $key) {
-    make $( $<or_test>[0] );
+    ## XXX incomplete.
+    if $key eq 'lambda_form' {
+        make $( $<lambda_form> );
+    }
+    else {
+        make $( $<or_test>[0] );
+    }
 }
 
 method test($/, $key) {
@@ -346,8 +427,7 @@ method or_test($/) {
         $count := $count - 1;
         my $past := PAST::Op.new( $($<and_test>[$count]),
                                   $past,
-                                  :pasttype('if')
-                                );
+                                  :pasttype('if') );
     }
     make $past;
 }
@@ -359,8 +439,7 @@ method and_test($/) {
         $count := $count - 1;
         my $past := PAST::Op.new( $($<not_test>[$count]),
                                   $past,
-                                  :pasttype('unless')
-                                );
+                                  :pasttype('unless') );
     }
     make $past;
 }
@@ -471,23 +550,33 @@ method shortstring($/) {
 
 method parenth_form($/) {
     if +$<tuple_or_scalar> {
-	make $( $<tuple_or_scalar>[0] );
+    make $( $<tuple_or_scalar>[0] );
     }
     else {
-	make PAST::Op.new( :name('tuplemaker'),
-			   :pasttype('call'));
+        make PAST::Op.new( :name('tuplemaker'),
+                           :pasttype('call'));
     }
 }
 
 method assignment_stmt($/) {
-    my $lhs := $($<target_list>);
-    my $rhs := $($<expression_list>);
-    make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
+    my $lhs     := $( $<target_list> );
+    my $explist := $( $<expression_list> );
+    my $past    := PAST::Stmts.new( :node($/) );
+
+    for @($lhs) {
+        my $rhs := $explist.shift();
+        $past.push( PAST::Op.new( $_, $rhs, :pasttype('bind'), :node($/) ) );
+    }
+
+    make $past;
 }
 
 method target_list($/) {
-    my $past := $( $<target>[0] );
-    make $( $<target>[0] );
+    my $past := PAST::VarList.new( :node($/) );
+    for $<target> {
+        $past.push( $($_) );
+    }
+    make $past;
 }
 
 method target($/, $key) {
@@ -497,10 +586,9 @@ method target($/, $key) {
 }
 
 method list_literal($/) {
-    my $past := PAST::Op.new( :name('listmaker'),
-                              :pasttype('call'));
+    my $past := PAST::Op.new( :name('listmaker'), :pasttype('call'), :node($/) );
     for $<expression> {
-	$past.push( $($_) );
+        $past.push( $($_) );
     }
     make $past;
 }
@@ -509,15 +597,43 @@ method list_display($/, $key) {
     make $( $/{$key} );
 }
 
+method dict_display($/) {
+    if $<key_datum_list> {
+        make $( $<key_datum_list>[0] );
+    }
+    else {
+        ## if there's no list of key_datum items, have 'dictmaker' return an empty
+        ## dictionary.
+        make PAST::Op.new( :name('dictmaker'), :pasttype('call'), :node($/) );
+    }
+}
+
+method key_datum_list($/) {
+    my $past := PAST::Op.new( :name('dictmaker'), :pasttype('call'), :node($/) );
+    for $<key_datum> {
+        $past.push( $( $_ ) );
+    }
+    make $past;
+}
+
+method key_datum($/) {
+    my $key   := $( $<key> );
+    my $value := $( $<value> );
+    ## this only works if $key /has/ a name() method
+    ## XXX need for some generic solution for all PAST node types.
+    my $hashedkey := PAST::Val.new( :value($key.name()) );
+    $value.named($hashedkey);
+    make $value;
+}
+
 method tuple_or_scalar($/, $key) {
     make $( $/{$key} );
 }
 
 method tuple_constructor($/) {
-    my $past := PAST::Op.new( :name('tuplemaker'),
-                              :pasttype('call'));
+    my $past := PAST::Op.new( :name('tuplemaker'), :pasttype('call'), :node($/) );
     for $<expression> {
-	$past.push( $($_) );
+        $past.push( $($_) );
     }
     make $past;
 }

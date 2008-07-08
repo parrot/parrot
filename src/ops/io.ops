@@ -77,7 +77,7 @@ RT#42373: integral file descriptors might not exist outside of the UNIX
 
 =cut
 
-inline op getfd(out INT, invar PMC) :advanced_io {
+inline op getfd(out INT, invar PMC) :advanced_io :deprecated {
   $1 = (INTVAL)PIO_getfd(interp, $2);
 }
 
@@ -120,7 +120,7 @@ Examples: setting the record separator or setting the buffering
 
 =cut
 
-inline op pioctl(out INT, invar PMC, in INT, in INT) :advanced_io {
+inline op pioctl(out INT, invar PMC, in INT, in INT) :advanced_io :deprecated {
   $1 = PIO_pioctl(interp, $2, $3, $4);
 }
 

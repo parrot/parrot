@@ -287,6 +287,22 @@
 .end
 
 
+##    method return_statement($/) {
+##        make PAST::Op.new( $($<EXPR>),
+##                           :pasttype('return'),
+##                           :node($/) );
+##    }
+.sub 'return_statement' :method
+    .param pmc match
+    $P0 = match['EXPR']
+    $P0 = $P0.'item'()
+
+    $P1 = get_hll_global ['PAST'], 'Op'
+    $P1 = $P1.'new'( $P0, 'pasttype'=>'return', 'node'=>match)
+    match.'result_object'($P1)
+.end
+
+
 ##    method make_statement($/) {
 ##        make PAST::Op.new( PAST::Var.new( :name('$/'),
 ##                                          :scope('lexical') ),
@@ -355,6 +371,7 @@
 ##        $past.name(~$<ident>);
 ##        $past.node($/);
 ##        $past.blocktype('declaration');
+##        $past.control('return_pir');
 ##        my $params := $past[0];
 ##        if $<declarator> eq 'method' {
 ##            $past.blocktype('method');
@@ -375,6 +392,7 @@
     past.'name'($S0)
     past.'node'(match)
     past.'blocktype'('declaration')
+    past.'control'('return_pir')
     .local pmc params
     params = past[0]
     $S0 = match['declarator']

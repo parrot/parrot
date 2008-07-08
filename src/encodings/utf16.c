@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -174,8 +174,10 @@ static void utf16_set_position(PARROT_INTERP,
 
 =item C<static STRING * to_encoding>
 
-Convert string C<src> to this encoding. If C<dest> is set
-fill it with the converted result, else operate inplace.
+Converts the string C<src> to this particular encoding.  If C<dest> is
+provided, it will contain the result.  Otherwise this function operates in
+place.
+
 
 =cut
 
@@ -282,7 +284,7 @@ to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 =item C<static UINTVAL get_codepoint>
 
-RT#48260: Not yet documented!!!
+Returns the codepoint in string C<src> at position C<offset>.
 
 =cut
 
@@ -311,7 +313,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 
 =item C<static void set_codepoint>
 
-RT#48260: Not yet documented!!!
+Sets, in string C<src> at position C<offset>, the codepoint C<codepoint>.
 
 =cut
 
@@ -331,7 +333,7 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
 
 =item C<static UINTVAL get_byte>
 
-RT#48260: Not yet documented!!!
+Returns the byte in string C<src> at position C<offset>.
 
 =cut
 
@@ -354,7 +356,7 @@ get_byte(SHIM_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 
 =item C<static void set_byte>
 
-RT#48260: Not yet documented!!!
+Sets, in string C<src> at position C<offset>, the byte C<byte>.
 
 =cut
 
@@ -375,7 +377,8 @@ set_byte(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL byte)
 
 =item C<static STRING * get_codepoints>
 
-RT#48260: Not yet documented!!!
+Returns the codepoints in string C<src> at position C<offset> and length
+C<count>.
 
 =cut
 
@@ -406,7 +409,8 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 
 =item C<static STRING * get_codepoints_inplace>
 
-RT#48260: Not yet documented!!!
+Gets from string C<src> at position C<offset> C<count> codepoints and returns
+them in C<return_string>.
 
 =cut
 
@@ -436,7 +440,7 @@ get_codepoints_inplace(PARROT_INTERP, ARGIN(STRING *src),
 
 =item C<static STRING * get_bytes>
 
-RT#48260: Not yet documented!!!
+Returns the bytes in string C<src> at position C<offset> and length C<count>.
 
 =cut
 
@@ -458,7 +462,8 @@ get_bytes(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 
 =item C<static STRING * get_bytes_inplace>
 
-RT#48260: Not yet documented!!!
+Gets from string C<src> at position C<offset> C<count> bytes and returns them
+in C<return_string>.
 
 =cut
 
@@ -482,7 +487,8 @@ get_bytes_inplace(PARROT_INTERP, ARGIN(STRING *src),
 
 =item C<static void set_codepoints>
 
-RT#48260: Not yet documented!!!
+Replaces in string C<src> at position C<offset> for C<count> codepoints with
+the contents of string C<new_codepoints>.
 
 =cut
 
@@ -504,7 +510,8 @@ set_codepoints(PARROT_INTERP, ARGIN(STRING *src),
 
 =item C<static void set_bytes>
 
-RT#48260: Not yet documented!!!
+Replaces in string C<src> at position C<offset> for C<count> bytes with the
+contents of string C<new_bytes>.
 
 =cut
 
@@ -541,7 +548,7 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
 
 =item C<static UINTVAL codepoints>
 
-RT#48260: Not yet documented!!!
+Returns the number of codepoints in string C<src>.
 
 =cut
 
@@ -566,7 +573,7 @@ codepoints(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static UINTVAL bytes>
 
-RT#48260: Not yet documented!!!
+Returns the number of bytes in string C<src>.
 
 =cut
 
@@ -584,7 +591,7 @@ bytes(SHIM_INTERP, ARGIN(STRING *src))
 
 =item C<static UINTVAL utf16_decode_and_advance>
 
-RT#48260: Not yet documented!!!
+Moves the string iterator C<i> to the next UTF-16 codepoint.
 
 =cut
 
@@ -610,7 +617,8 @@ utf16_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 
 =item C<static void utf16_encode_and_advance>
 
-RT#48260: Not yet documented!!!
+With the string iterator C<i>, appends the codepoint C<c> and advances to the
+next position in the string.
 
 =cut
 
@@ -631,7 +639,7 @@ utf16_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 
 =item C<static void utf16_set_position>
 
-RT#48260: Not yet documented!!!
+Moves the string iterator C<i> to the position C<n> in the string.
 
 =cut
 
@@ -654,7 +662,7 @@ utf16_set_position(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 
 =item C<static void iter_init>
 
-RT#48260: Not yet documented!!!
+Initializes for string C<src> the string iterator C<iter>.
 
 =cut
 
@@ -679,7 +687,7 @@ iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 
 =item C<ENCODING * Parrot_encoding_utf16_init>
 
-RT#48260: Not yet documented!!!
+Initializes the UTF-16 encoding.
 
 =cut
 

@@ -37,6 +37,46 @@ for executable objects.
     .return (match)
 .end
 
+=item perl()
+
+Return a response to .perl.
+
+=cut
+
+.sub 'perl' :method
+    .return ('{ ... }')
+.end
+
+=item WHAT()
+
+Gets the proto-object for this value.
+
+=cut
+
+.sub 'WHAT' :method
+    $P0 = getprop '$!proto', self
+    if null $P0 goto block
+    .return ($P0)
+  block:
+    $P0 = get_hll_global 'Block'
+    .return ($P0)
+.end
+
+=item signature()
+
+Gets the signature for the block, or returns Failure if it lacks one.
+
+=cut
+
+.sub 'signature' :method
+    $P0 = getprop '$!signature', self
+    if null $P0 goto no_sig
+    .return ($P0)
+  no_sig:
+    $P0 = get_hll_global 'Failure'
+    .return ($P0)
+.end
+
 =back
 
 =cut

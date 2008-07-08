@@ -194,8 +194,6 @@ locations:
 
 =item PMC register stack
 
-=item General/User stack
-
 =back
 
 =head2 Incremental Marking
@@ -229,8 +227,6 @@ The root set for buffers includes the following locations:
 =item Current String register set
 
 =item String register set stack
-
-=item General/User stack
 
 =item Control stack
 
@@ -367,8 +363,6 @@ Trigger or perform a GC run. With an incremental GC core, this may only
 start/continue a partial mark phase, rather than marking the entire tree of
 live objects.
 
-{{DEPRECATION NOTE: do_gc_mark used to be do_dod_run.}}.
-
 Flags is one of:
 
 =over 4
@@ -385,9 +379,6 @@ incremental GC system just finished the mark phase, it would do nothing.  OTOH
 if no objects are currently marked live, the implementation should run the
 mark phase, so that copying of dead objects is avoided.
 
-{{DEPRECATION NOTE: GC_trace_normal used to be DOD_trace_normal.
-GC_trace_stack_FLAG used to be DOD_trace_stack_FLAG.}}
-
 =item GC_lazy_FLAG
 
 Do a timely destruction run. The goal is either to detect all objects that
@@ -395,22 +386,15 @@ need timely destruction or to do a full collection. In the former case the
 collection can be interrupted or postponed. This is called from the Parrot
 run-loop. No system areas have to be traced.
 
-{{DEPRECATION NOTE: GC_lazy_FLAG used to be DOD_lazy_FLAG.}}
-
 =item GC_finish_FLAG
 
 Called during interpreter destruction. The GC subsystem must clear the live
 state of all objects and perform a sweep in the PMC header pool, so that
 destructors and finalizers get called.
 
-{{DEPRECATION NOTE: GC_finish_FLAG used to be DOD_finish_FLAG.}}
-
 =item GC_no_trace_volatile_roots
 
 Trace root set except volatile roots. That is skip e.g. registers.
-
-{{DEPRECATION NOTE: GC_no_trace_volatile_roots used to be
-DOD_no_trace_volatile_roots.}}
 
 =back
 
@@ -418,10 +402,7 @@ DOD_no_trace_volatile_roots.}}
 
 Called during interpreter destruction. Free used resources and memory pools.
 
-{{DEPRECATION NOTE: finalize_gc_system used to be
-de_init_gc_system.}}
-
-=item C<void (*init_pool) (Interp *, struct Small_Object_Pool *)>
+=item C<void (*init_pool) (Interp *, Small_Object_Pool *)>
 
 A function to initialize the given pool. This function should set the
 following object allocation functions for the given pool.
@@ -435,7 +416,7 @@ structures.
 
 =over 4
 
-=item C<PObj * (*get_free_object) (Interp *, struct Small_Object_Pool*)>
+=item C<PObj * (*get_free_object) (Interp *, Small_Object_Pool*)>
 
 Each header pool provides one function pointer to get a new object from that
 pool. It should return one free object from the given pool (removing it from
@@ -443,15 +424,15 @@ the pool's free list). Object flags are returned clear, except flags that are
 used by the garbage collector itself.  If the pool is a buffer header pool,
 all other object memory is zeroed.
 
-=item C<void (*add_free_object) (Interp *, struct Small_Object_Pool *, PObj *);>
+=item C<void (*add_free_object) (Interp *, Small_Object_Pool *, PObj *);>
 
 Add a freed object to the pool's free list.
 
-=item C<void (*alloc_objects) (Interp *, struct Small_Object_Pool *);>
+=item C<void (*alloc_objects) (Interp *, Small_Object_Pool *);>
 
 Initial allocation of objects for the pool.
 
-=item C<void (*more_objects) (Interp *, struct Small_Object_Pool *);>
+=item C<void (*more_objects) (Interp *, Small_Object_Pool *);>
 
 Reallocation for additional objects. It has the same signature as
 C<alloc_objects>, and in some GC cores the same function pointer is used for
@@ -470,15 +451,11 @@ Each GC core has to provide these (possibly empty) macros:
 This macro is invoked when in aggregate C<agg> the element C<old> is getting
 overritten by C<new>. Both C<old> and C<new> may be NULL.
 
-{{DEPRECATION NOTE: used to be DOD_WRITE_BARRIER.}}
-
 =item C<GC_WRITE_BARRIER_KEY(Interp *, PMC *agg, PMC *old, PObj
 *old_key, PMC *new, PObj *new_key)>
 
 Like above. Invoked when a hash key is inserted, possibly replacing an old
 key.
-
-{{DEPRECATION NOTE: used to be DOD_WRITE_BARRIER_KEY.}}
 
 =back
 
@@ -494,27 +471,27 @@ routines control GC:
 
 Block the GC mark phase for the passed interpreter. (But not the sweep phase)
 
-{{DEPRECATION NOTE: used to be Parrot_block_DOD.}}
-
 =item Parrot_block_GC_sweep(Interp *interpreter)
 
 Block the GC sweep phase for the passed interpreter. (But not the mark phase)
-
-{{DEPRECATION NOTE: used to be Parrot_block_GC.}}
 
 =item Parrot_unblock_GC_mark(Interp *interpreter)
 
 Unblock the GC mark phase for the passed interpreter. (But not the sweep
 phase)
 
-{{DEPRECATION NOTE: used to be Parrot_unblock_DOD.}}
-
 =item Parrot_unblock_GC_sweep(Interp *interpreter)
 
 Unblock the GC sweep phase for the passed interpreter. (But not the mark
 phase)
 
-{{DEPRECATION NOTE: used to be Parrot_unblock_GC.}}
+=item Parrot_is_blocked_GC_mark(Interp *interpreter)
+
+Test whether the mark phase has been blocked.
+
+=item Parrot_is_blocked_GC_sweep(Interp *interpreter)
+
+Test whether the sweep phase has been blocked.
 
 =back
 

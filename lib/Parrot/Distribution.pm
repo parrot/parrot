@@ -396,9 +396,6 @@ This is to exclude automatically generated C-language files Parrot might have.
             languages/cola/lexer.c
             languages/cola/parser.c
             languages/cola/parser.h
-            languages/plumhead/src/yacc/plumhead_lexer.c
-            languages/plumhead/src/yacc/plumhead_parser.c
-            languages/plumhead/src/yacc/plumhead_parser.h
             src/malloc.c
             } unless @exemptions;
 
@@ -622,7 +619,7 @@ sub perl_script_file_directories {
             dotnet dotnet/build dotnet/tools
             lua
             m4/tools
-            plumhead
+            pipp
             python
             regex
             scheme scheme/Scheme
@@ -682,7 +679,7 @@ sub perl_module_file_directories {
             m4/lib/Parrot/Test m4/lib/Parrot/Test/M4
             parrot_compiler/lib/Parrot/Test
             perl6/t/01-sanity
-            plumhead/lib/Parrot/Test plumhead/lib/Parrot/Test/Plumhead
+            pipp/lib/Parrot/Test pipp/lib/Parrot/Test/Pipp
             pugs/t
             regex/lib
             scheme scheme/Scheme

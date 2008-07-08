@@ -16,22 +16,6 @@ src/builtins/math.pir - Perl6 math functions
 ## .namespace [ 'Math::Basic' ]
 
 
-=item abs
-
- our Num multi Num::abs ( Num $x )
- our Num multi Math::Basic::abs ( Num $x )
-
-Absolute Value.
-
-=cut
-
-.sub 'abs'
-    .param pmc a
-    $P0 = abs a
-    .return ($P0)
-.end
-
-
 =item floor
 
  our Int multi Num::floor ( Num $x )
@@ -107,55 +91,6 @@ or more succinctly:
 .end
 
 
-=item sqrt
-
- our Num     multi Num::sqrt ( Num  $x )
- our Complex multi Complex::sqrt ( Num  $x )
- our Complex multi Complex::sqrt ( Complex  $x )
- our Num     multi Math::Basic::sqrt ( Num $x )
-
-C<$x ** 0.5>
-
-=cut
-
-.sub 'sqrt'
-    .param num a
-    a = sqrt a
-    .return (a)
-.end
-
-
-=item truncate
-
- our Int multi Num::truncate ( Num $x )
- our &Num::int ::= &Num::truncate;
-
-Returns the closest integer to $x whose absolute value is not greater
-than the absolute value of $x.  (In other words, just chuck any
-fractional part.)  This is the default rounding function used by an
-C<int()> cast, for historic reasons.  But see Int constructor above
-for a rounded version.
-
-=cut
-
-.sub 'truncate'
-    .param num a
-    eq a, 0, return
-    lt a, 0, under
-    floor a
-    goto return
-  under:
-    ceil a
-  return:
-    .return (a)
-.end
-
-.sub 'int'
-    .param num a
-    .return 'truncate'(a)
-.end
-
-
 =item exp
 
  our Num multi Num::exp         ( Num $exponent: Num :$base = Num::e )
@@ -166,7 +101,7 @@ constant I<e>.
 
 =cut
 
-.sub 'exp'
+.sub 'exp' :multi(_)
     .param num a
     a = exp a
     .return (a)
@@ -223,6 +158,11 @@ error.
 =cut
 
 .sub 'pi'
+    .param pmc x               :slurpy
+    ## 0-argument test, RT#56366
+    unless x goto no_args
+    die "too many arguments passed - 0 params expected"
+  no_args:
     $N0 = atan 1
     $N0 *= 4
     .return ($N0)

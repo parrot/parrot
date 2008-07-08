@@ -341,7 +341,8 @@ the dependencies between them.
 void
 build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 {
-    int i, changes;
+    unsigned int i;
+    int changes;
     Basic_block *last = NULL;
 
     IMCC_info(interp, 2, "build_cfg\n");
@@ -379,7 +380,7 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
              * s. #25948
              */
             if (!bb->pred_list) {
-                int j;
+                unsigned int j;
 
                 for (j = i; j < unit->n_basic_blocks; j++) {
                     Basic_block * const b_bsr = unit->bb_list[j];
@@ -438,8 +439,9 @@ invok:
      * predecessors) from the CFG
      */
     do {
-        int i;
+        unsigned int i;
         changes = 0;
+
         for (i = 1; i < unit->n_basic_blocks; i++) {
             Basic_block * const bb = unit->bb_list[i];
             if (!bb->pred_list) {
@@ -701,7 +703,7 @@ RT#48260: Not yet documented!!!
 static void
 analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
 {
-    int i;
+    unsigned int i;
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "cfg.c: analyse_life_symbol(%s)\n", r->name);
@@ -714,13 +716,13 @@ analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
     /* First we make a pass to each block to gather the information
      * that can be obtained locally */
 
-    for (i=0; i < unit->n_basic_blocks; i++) {
+    for (i = 0; i < unit->n_basic_blocks; i++) {
         analyse_life_block(unit->bb_list[i], r);
     }
 
     /* Now we need to consider the relations between blocks */
 
-    for (i=0; i < unit->n_basic_blocks; i++) {
+    for (i = 0; i < unit->n_basic_blocks; i++) {
         if (r->life_info[i]->flags & LF_use) {
             const Instruction * const ins = unit->bb_list[i]->start;
 
@@ -769,10 +771,12 @@ free_life_info(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg *r))
     fprintf(stderr, "free_life_into(%s)\n", r->name);
 #endif
     if (r->life_info) {
-        int i;
-        for (i=0; i < unit->n_basic_blocks; i++) {
+        unsigned int i;
+
+        for (i = 0; i < unit->n_basic_blocks; i++) {
             mem_sys_free(r->life_info[i]);
         }
+
         mem_sys_free(r->life_info);
         r->life_info = NULL;
     }
@@ -965,7 +969,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
     dominators       = mem_allocate_n_zeroed_typed(n, Set*);
     unit->dominators = dominators;
 
-    dominators[0] = set_make(n);
+    dominators[0]    = set_make(n);
     set_add(dominators[0], 0);
 
     for (i = n - 1; i; --i) {
@@ -1134,11 +1138,12 @@ static void
 free_dominators(ARGMOD(IMC_Unit *unit))
 {
     if (unit->dominators) {
-        int i;
+        unsigned int i;
 
-        for (i=0; i < unit->n_basic_blocks; i++) {
+        for (i = 0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominators[i]);
         }
+
         mem_sys_free(unit->dominators);
         unit->dominators = NULL;
         mem_sys_free(unit->idoms);
@@ -1159,11 +1164,12 @@ static void
 free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 {
     if (unit->dominance_frontiers) {
-        int i;
+        unsigned int i;
 
-        for (i=0; i < unit->n_basic_blocks; i++) {
+        for (i = 0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominance_frontiers[i]);
         }
+
         mem_sys_free(unit->dominance_frontiers);
         unit->dominance_frontiers = NULL;
     }
@@ -1183,10 +1189,12 @@ RT#48260: Not yet documented!!!
 static void
 sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
-    int i, j, changed;
-    Loop_info *li;
-    int n_loops = unit->n_loops;
-    Loop_info ** loop_info = unit->loop_info;
+    unsigned int i, j;
+    int          changed;
+    Loop_info   *li;
+
+    unsigned int n_loops  = (unsigned int)unit->n_loops;
+    Loop_info  **loop_info = unit->loop_info;
 
     for (i = 0; i < n_loops; i++) {
         loop_info[i]->size = 0;
@@ -1194,21 +1202,23 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
             if (set_contains(loop_info[i]->loop, j))
                 loop_info[i]->size++;
     }
+
     changed = 1;
+
     while (changed) {
         changed = 0;
-        for (i = 0; i < n_loops-1; i++)
-            if (loop_info[i]->size < loop_info[i+1]->size) {
-                li = loop_info[i];
-                loop_info[i] = loop_info[i+1];
+        for (i = 0; n_loops && i < n_loops - 1; i++)
+            if (loop_info[i]->size < loop_info[i + 1]->size) {
+                li             = loop_info[i];
+                loop_info[i]   = loop_info[i + 1];
                 loop_info[i+1] = li;
-                changed = 1;
+                changed        = 1;
             }
     }
+
     /* set depth, it's incorrect til now, as it did depend on the
-     * order of finding loops
-     */
-    for (i = 0; i < n_loops-1; i++) {
+     * order of finding loops */
+    for (i = 0; n_loops && i < n_loops - 1; i++) {
         int first = -1, last = 0;
         loop_info[i]->depth = 1;
         /* we could also take the depth of the first contained
@@ -1253,17 +1263,16 @@ go from a node to one of its dominators.
 void
 find_loops(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 {
-    int i;
+    unsigned int i;
 
     IMCC_info(interp, 2, "find_loops\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
         const Set * const dom = unit->dominators[i];
         const Edge *edge;
 
-        for (edge=unit->bb_list[i]->succ_list; edge; edge=edge->succ_next) {
-            if (set_contains(dom, edge->to->index)) {
+        for (edge = unit->bb_list[i]->succ_list; edge; edge = edge->succ_next) {
+            if (set_contains(dom, edge->to->index))
                 mark_loop(interp, unit, edge);
-            }
         }
     }
 
@@ -1324,19 +1333,18 @@ Increases the loop_depth of all the nodes in a loop
 static void
 mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 {
-    Set* loop;
-    Set* exits;
-    Basic_block *header, *footer, *enter;
-    int i;
+    Set *loop;
+    Set *exits;
+    Basic_block *header = e->to;
+    Basic_block *footer = e->from;
+    Basic_block *enter  = 0;
+
+    unsigned int i;
     Edge *edge;
     int n_loops;
     Loop_info ** loop_info;
 
-    header =  e->to;
-    footer =  e->from;
-    enter = 0;
     /* look from where loop was entered */
-
     for (i = 0, edge=header->pred_list; edge; edge=edge->pred_next)
         if (footer != edge->from) {
             enter = edge->from;
@@ -1369,6 +1377,7 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
     }
 
     exits = set_make(unit->n_basic_blocks);
+
     for (i = 1; i < unit->n_basic_blocks; i++) {
         if (set_contains(loop, i)) {
             for (edge = unit->bb_list[i]->succ_list; edge;
@@ -1382,9 +1391,8 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
     }
 
     /* now 'loop' contains the set of nodes inside the loop.  */
-    n_loops  = unit->n_loops;
-
-    loop_info = mem_realloc_n_typed(unit->loop_info, n_loops+1, Loop_info *);
+    n_loops   = unit->n_loops;
+    loop_info = mem_realloc_n_typed(unit->loop_info, n_loops + 1, Loop_info *);
 
     loop_info[n_loops]            = mem_allocate_typed(Loop_info);
     loop_info[n_loops]->loop      = loop;
@@ -1411,13 +1419,16 @@ static void
 free_loops(ARGMOD(IMC_Unit *unit))
 {
     int i;
+
     for (i = 0; i < unit->n_loops; i++) {
         set_free(unit->loop_info[i]->loop);
         set_free(unit->loop_info[i]->exits);
         mem_sys_free(unit->loop_info[i]);
     }
+
     mem_sys_free(unit->loop_info);
-    unit->n_loops = 0;
+
+    unit->n_loops   = 0;
     unit->loop_info = 0;
 }
 
@@ -1487,13 +1498,15 @@ void
 clear_basic_blocks(ARGMOD(struct _IMC_Unit *unit))
 {
     if (unit->bb_list) {
-        int i;
+        unsigned int i;
 
-        for (i=0; i < unit->n_basic_blocks; i++)
+        for (i = 0; i < unit->n_basic_blocks; i++)
             mem_sys_free(unit->bb_list[i]);
+
         mem_sys_free(unit->bb_list);
         unit->bb_list = NULL;
     }
+
     free_edge(unit);
     free_dominators(unit);
     free_dominance_frontiers(unit);

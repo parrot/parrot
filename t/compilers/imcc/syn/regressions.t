@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -91,6 +91,18 @@ pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(RT#46499)', todo =>
 .end
 CODE
 hello
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (RT#40204)', todo=>'broken');
+.sub foo :main
+  $P0 = new 'Hash'
+  $P1 = $P0['x']
+  unless $P1 goto no
+  print "yes\n"
+no:
+.end
+CODE
+/(?s:Null PMC access in get_bool.*current instr.*:4\))/
 OUT
 
 # Local Variables:

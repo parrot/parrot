@@ -314,28 +314,6 @@ intlist_get(PARROT_INTERP, ARGMOD(IntList *list), INTVAL idx)
 
 /*
 
-=item C<void intlist_dump>
-
-Prints out the list in human-readable form.
-
-=cut
-
-*/
-
-void
-intlist_dump(ARGMOD(FILE *fp), ARGMOD(IntList *list), int verbose)
-{
-#ifdef LIST_DEBUG
-    list_dump(fp, (List *)list, verbose);
-#else
-    UNUSED(fp);
-    UNUSED(list);
-    UNUSED(verbose);
-#endif
-}
-
-/*
-
 =back
 
 =head1 SEE ALSO

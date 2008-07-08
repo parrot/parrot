@@ -118,6 +118,16 @@ Adds (or replaces) a syntactic category's defaults.
     goto args_loop
   args_end:
 
+    ##  handle token word boundaries
+    unless key goto with_wb
+    $I0 = exists token['wb']
+    if $I0 goto with_wb
+    $I0 = length key
+    $I1 = find_not_cclass .CCLASS_WORD, key, 0, $I0
+    if $I1 < $I0 goto with_wb
+    token['wb'] = 1
+  with_wb:
+
     $S0 = token['match']
     if $S0 > '' goto with_match
     token['match'] = 'PGE::Match'
@@ -522,10 +532,15 @@ Adds (or replaces) a syntactic category's defaults.
     if $I0 goto token_match_end
     $I0 = exists token['parsed']
     if $I0 goto token_match_sub
-    $S0 = token['match']
-    oper = mob.'new'(mob, 'grammar'=>$S0)
     $I0 = length key
     $I0 += pos
+    $I1 = token['wb']
+    unless $I1 goto token_match_key
+    $I1 = is_cclass .CCLASS_WORD, target, $I0
+    if $I1 goto token_match_end
+  token_match_key:
+    $S0 = token['match']
+    oper = mob.'new'(mob, 'grammar'=>$S0)
     oper.'to'($I0)
     goto token_match_success
   token_match_sub:
@@ -571,7 +586,7 @@ Adds (or replaces) a syntactic category's defaults.
     wspos = $I0
     mpos = $I0
   end_1b:
-    $P0 = $P0[0]
+    $P0 = $P0[-1]
     if null $P0 goto end_2
     $I0 = isa $P0, 'PGE::Match'
     if $I0 goto end_1a

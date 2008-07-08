@@ -1,5 +1,5 @@
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 #
 # When this sub is invoked, it will load in the actual definition

@@ -47,10 +47,10 @@ static void
 stop_GC(Interp *parent, Interp *thread)
 {
 #if 0
-    Parrot_block_DOD(parent);
-    Parrot_block_DOD(thread);
-    Parrot_block_GC(parent);
-    Parrot_block_GC(thread);
+    Parrot_block_GC_mark(parent);
+    Parrot_block_GC_mark(thread);
+    Parrot_block_GC_sweep(parent);
+    Parrot_block_GC_sweep(thread);
 #endif
 }
 

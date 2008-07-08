@@ -17,7 +17,7 @@ symbols for C<Bool::True> and C<Bool::False>.
     .local pmc p6meta, boolproto
     p6meta = get_hll_global ['Perl6Object'], '$!P6META'
     boolproto = p6meta.'new_class'('Bool', 'parent'=>'Boolean Any')
-    # p6meta.'register'('Boolean', 'parent'=>'Any', 'protoobject'=>boolproto)
+    p6meta.'register'('Boolean', 'parent'=>boolproto, 'protoobject'=>boolproto)
 
     $P0 = boolproto.'new'()
     $P0 = 0
@@ -42,11 +42,21 @@ symbols for C<Bool::True> and C<Bool::False>.
     .return (self)
 .end
 
-.sub 'increment' :method :vtable
+
+.sub 'perl' :method
+    if self goto false
+    .return ('Bool::False')
+  false:
+    .return ('Bool::True')
+.end
+
+
+.sub 'succ' :method :vtable('increment')
     self = 1
 .end
 
-.sub 'decrement' :method :vtable
+
+.sub 'pred' :method :vtable('decrement')
     self = 0
 .end
 

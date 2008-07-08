@@ -105,55 +105,27 @@ sub runstep {
             last;
         }
     }
-    if ( !defined( $hugeintval{hugeintvalsize} )
-        || $hugeintval{hugeintvalsize} == $intvalsize )
-    {
-
-        # Could not find anything bigger than intval.
-        $conf->data->set(
-            hugeintval     => $intval,
-            hugeintvalsize => $intvalsize,
-        );
-    }
+    _handle_hugeintvalsize(
+        $conf,
+        {
+            hugeintval      => \%hugeintval,
+            intval          => $intval,
+            intvalsize      => $intvalsize,
+        },
+    );
 
     $conf->cc_clean();
 
     #get HUGEFLOATVAL
-    if (
-        my $size = eval {
-            open( my $TEST, ">", "test.c" ) or die "Can't open test.c: $!";
-            print {$TEST} <<'END';
-#include <stdio.h>
-
-int main() {
-    long double foo;
-    printf("%u", sizeof(foo));
-    return 0;
-}
-END
-            close $TEST;
-
-            $conf->cc_build();
-            $conf->cc_run();
-        }
-        )
-    {
-        $conf->data->set(
-            hugefloatval     => 'long double',
-            hugefloatvalsize => $size
-        );
-    }
-    else {
-        $conf->data->set(
-            hugefloatval     => 'double',
-            hugefloatvalsize => $conf->data->get('doublesize')
-        );
-    }
+    my $size = _probe_for_hugefloatval( $conf );
+    _set_hugefloatval( $conf, $size );
 
     $conf->cc_clean();
 
     return 1;
 }
+
+#################### INTERNAL SUBROUTINES ####################
 
 sub _handle_intval_ptrsize_discrepancy {
     my $resultsref = shift;
@@ -229,6 +201,58 @@ sub _set_float8 {
 Can't find a float type with size 8, conversion ops might fail!
 
 END
+    }
+}
+
+sub _handle_hugeintvalsize {
+    my $conf = shift;
+    my $arg = shift;
+    if ( ! defined( $arg->{hugeintval}{hugeintvalsize} )
+        || $arg->{hugeintval}{hugeintvalsize} == $arg->{intvalsize} )
+    {
+
+        # Could not find anything bigger than intval.
+        $conf->data->set(
+            hugeintval     => $arg->{intval},
+            hugeintvalsize => $arg->{intvalsize},
+        );
+    }
+}
+
+sub _probe_for_hugefloatval {
+    my $conf = shift;
+    my $size = q{};
+    $size = eval {
+        open( my $TEST, ">", "test.c" ) or die "Can't open test.c: $!";
+        print {$TEST} <<'END';
+#include <stdio.h>
+
+int main() {
+    long double foo;
+    printf("%u", sizeof(foo));
+    return 0;
+}
+END
+        close $TEST;
+
+        $conf->cc_build();
+        $conf->cc_run();
+    };
+}
+
+sub _set_hugefloatval {
+    my ( $conf, $size ) = @_;
+    if ( $size ) {
+        $conf->data->set(
+            hugefloatval     => 'long double',
+            hugefloatvalsize => $size
+        );
+    }
+    else {
+        $conf->data->set(
+            hugefloatval     => 'double',
+            hugefloatvalsize => $conf->data->get('doublesize')
+        );
     }
 }
 

@@ -74,7 +74,7 @@ typedef struct macro_frame_t {
     YY_BUFFER_STATE buffer;
 } macro_frame_t;
 
-/* static function declariations */
+/* static function declarations */
 static void pop_parser_state(PARROT_INTERP, ARGMOD(void *yyscanner));
 
 static struct macro_frame_t *new_frame(PARROT_INTERP);
@@ -351,6 +351,8 @@ SP              [ ]
 <emit,INITIAL>":lex"       return NEED_LEX;
 <emit,INITIAL>":vtable"    return VTABLE_METHOD;
 ":unique_reg"              return UNIQUE_REG;
+":instanceof"              return SUB_INSTANCE_OF;
+":lexid"                   return SUB_LEXID;
 
 ".result"                  return RESULT;
 ".get_results"             return GET_RESULTS;
@@ -420,13 +422,10 @@ SP              [ ]
 ">>>="                 return SHR_U_ASSIGN;
 ".="                   return CONCAT_ASSIGN;
 
-<emit,INITIAL>".macro" {
-        return read_macro(valp, interp, yyscanner);
-    }
-
-<emit>".macro_const" {
+<emit,INITIAL>".macro_const" {
         int c;
         int start_line;
+        int start_cond  = YY_START;
 
         BEGIN(macro);
         c = yylex_skip(valp, interp, " ", yyscanner);
@@ -449,8 +448,12 @@ SP              [ ]
 
         IMCC_INFO(interp)->cur_macro_name = NULL;
 
-        BEGIN(emit);
+        BEGIN(start_cond);
         return MACRO;
+    }
+
+<emit,INITIAL>".macro" {
+        return read_macro(valp, interp, yyscanner);
     }
 
 <emit,INITIAL>".include" {
@@ -935,6 +938,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
         else if (c == '{') {
             current = read_braced(&val, interp, macro_name, current, yyscanner);
             c       = yylex_skip(&val, interp, " \n", yyscanner);
+            len     = strlen(current);
         }
         else {
             if (!need_id || c != ' ') {

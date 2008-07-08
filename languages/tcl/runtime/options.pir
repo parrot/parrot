@@ -1,5 +1,5 @@
 .HLL '_Tcl', ''
-.namespace
+.namespace []
 
 =head1 _Tcl::select_option(array options, string choice, ?string type?)
 

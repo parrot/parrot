@@ -1,0 +1,449 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+=head1 Episode 3: Squaak Details and First Steps
+
+=head2 Introduction
+
+In the previous episodes we introduced the Parrot Compiler Tools (PCT).
+Starting from a high-level overview, we quickly created our own little scripting
+language called I<Squaak>, using a Perl script provided with Parrot. We
+discussed the general structure of PCT-based compilers, and each of the default
+four transformation phases.
+This third episode is where the Fun begins. In this episode, we shall introduce
+the full specification of Squaak. In this and following episodes, we will
+implement this specification step by step, in small increments that are easy to
+digest. Once you get a feel for it, you'll notice implementing Squaak is almost
+trivial, and most important, a lot of fun! So, let's get started!
+
+=head2 Squaak Grammar
+
+Without further ado, here is the full grammar specification for Squaak. This
+specification uses the following meta-syntax:
+
+    statement   indicates a non-terminal, named "statement"
+    {statement} indicates zero or more statements
+    [step]      indicates an optional step
+    'do'        indicates the keyword 'do'
+
+Below is Squaak's grammar. The start symbol is program.
+
+    program              ::= {stat-or-def}
+
+    stat-or-def          ::= statement
+                           | sub-definition
+
+    statement            ::= if-statement
+                           | while-statement
+                           | for-statement
+                           | try-statement
+                           | throw-statement
+                           | variable-declaration
+                           | assignment
+                           | sub-call
+                           | do-block
+
+    block                ::= {statement}
+
+    do-block             ::= 'do' block 'end'
+
+    if-statement         ::= 'if' expression 'then' block
+                             ['else' block]
+                             'end'
+
+    while-statement      ::= 'while' expression 'do'
+                             block 'end'
+
+    for-statement        ::= 'for' for-init ',' expression [step]
+                             'do'
+                             block
+                             'end'
+
+    step                 ::= ',' expression
+
+    for-init             ::= 'var' identifier '=' expression
+
+    try-statement        ::= 'try' block 'catch' identifier
+                             block
+                             'end'
+
+    throw-statement      ::= 'throw' expression
+
+    sub-definition       ::= 'sub' identifier parameters
+                             block
+                             'end'
+
+    parameters           ::= '(' [identifier {',' identifier}] ')'
+
+    variable-declaration ::= 'var' identifier ['=' expression]
+
+    assignment           ::= primary '=' expression
+
+    sub-call             ::= primary arguments
+
+    primary              ::= identifier postfix-expression*
+
+    postfix-expression   ::= key
+                           | index
+                           | member
+
+    key                  ::= '{' expression '}'
+
+    index                ::= '[' expression ']'
+
+    member               ::= '.' identifier
+
+    arguments            ::= '(' [expression {',' expression}] ')'
+
+    expression           ::= expression {binary-op expression}
+                           | unary-op expression
+                           | '(' expression ')'
+                           | term
+
+    term                 ::= float-constant
+                           | integer-constant
+                           | string-constant
+                           | array-constructor
+                           | hash-constructor
+                           | primary
+
+    hash-constructor     ::= '{' [named-field {',' named-field}] '}'
+
+    named-field          ::= string-constant '=>' expression
+
+    array-constructor    ::= '[' [expression {',' expression} ] ']'
+
+    binary-op            ::= '+'  | '-'  | '/'  | '*'  | '%'  | '..'
+                           | 'and | 'or' | '>'  | '>=' | '<'  | '<='
+                           | '==' | '!='
+
+    unary-op             ::= 'not' | '-'
+
+Gee, that's a lot, isn't it? Actually, this grammar is rather small compared to
+"real world" languages such as C, not to mention Perl 6. No worries though, we
+won't implement the whole thing at once, but in small steps. What's more, the
+exercises section contains enough exercises for you to learn to use the PCT
+yourself! The solutions to these exercises will be posted a few days later (but
+you really only need a couple of hours to figure them out).
+
+=head2 Semantics
+
+Most of the Squaak language is straightforward; the if-statement executes
+exactly as you would expect. When we discuss a grammar rule (for its
+implementation), a semantic specification will be included. This is to prevent
+myself from writing a complete language manual, which could take some pages.
+
+=head2 Interactive Squaak
+
+Although the Squaak compiler can be used in interactive mode, there is one point
+of attention to be noted. When defining a local variable using the C<var>
+keyword, this variable will be lost in any consecutive commands. The variable
+will only be available to other statements within the same command (a command is
+a set of statements before you press enter). This has to do with the code
+generation by the PCT, and will be fixed at a later point. For now, just
+remember it doesn't work.
+
+=head2 Let's get started!
+
+In the rest of this episode we will implement the basic parts of the grammar,
+such as the basic data types and assignments. At the end of this episode,
+you'll be able to assign simple values to (global) variables. It ain't much, but
+it's a very important first step. Once these basics are in place, you'll notice
+that adding a certain syntactic construct becomes a matter of minutes.
+
+First, open your editor and open the files F<src/parser/grammar.pg> and
+F<src/parser/actions.pm>. The former implements the parser using Perl 6 rules,
+and the latter contains the parse actions, which are executed during the parsing
+stage.
+
+In the file grammar.pg, you'll see the top-level rule, named C<TOP>. It's
+located at, ehm... the top. When the parser is invoked, it will start at this
+rule (a rule is nothing else than a method of the grammar class).
+When we generated this language (in the first episode), some default rules were
+defined. Now we're going to make some small changes, just enough to get us
+started. Firstly, change the statement rule to this:
+
+    rule statement {
+        <assignment>
+        {*}
+    }
+
+and add these rules:
+
+    rule assignment {
+        <primary> '=' <expression>
+        {*}
+    }
+
+    rule primary {
+        <identifier>
+        {*}
+    }
+
+    token identifier {
+        <!keyword> <ident>
+        {*}
+    }
+
+    token keyword {
+        ['and'|'catch'|'do'   |'else' |'end' |'for' |'if'
+        |'not'|'or'   |'sub'  |'throw'|'try' |'var'|'while']>>
+    }
+
+Now, change the rule "value" into this (renaming to "expression"):
+
+    rule expression {
+        | <string_constant> {*}        #= string_constant
+        | <integer_constant> {*}       #= integer_constant
+    }
+
+Rename the rule C<integer> as C<integer_constant>, and C<quote> as
+C<string_constant> (to better match our language specification).
+
+Phew, that was a lot of information! Let's have a closer look at some things
+that may look unfamiliar. The first new thing is in the rule C<identifier>.
+Instead of the C<rule> keyword, you see the keyword C<token>. In short, a token
+doesn't skip whitespace between the different parts specified in the token,
+while a rule does. For now, it's enough to remember to use a token if you want
+to match a string that doesn't contain any whitespace (such as literal constants
+and identifiers), and use a rule if your string does (and should) contain
+whitespace (such as a an if-statement). We shall use the word C<rule> in a
+general sense, which could refer to a token. For more information on rules and
+tokens (and there's a third type, called C<regex>), take a look at synopsis 5.
+
+In token C<identifier>, the first subrule is called an assertion. It asserts
+that an C<identifier> does not match the rule keyword. In other words, a keyword
+cannot be used as an identifier. The second subrule is called C<ident>, which is
+a built-in rule in the class C<PCT::Grammar>, of which this grammar is a
+subclass.
+
+In token C<keyword>, all keywords of Squaak are listed. At the end there's a
+C<<< >> >>> marker, which indicates a word boundary. Without this marker, an
+identifier such as "forloop" would wrongly be disqualified, because the part
+"for" would match the rule keyword, and the part "loop" would match the rule
+"ident". However, as the assertion <!keyword> is false (as "for" could be
+matched), the string "forloop" cannot be matched as an identifier. The required
+presence of the word boundary prevents this.
+
+The last rule is C<expression>. An expression is either a string-constant or an
+integer-constant. Either way, an action is executed. However, when the action is
+executed, it does not know what the parser matched; was it a string-constant, or
+an integer-constant? Of course, the match object can be checked, but consider
+the case where you have 10 alternatives, then doing 9 checks only to find out
+the last alternative was matched is somewhat inefficient (and adding new
+alternatives requires you to update this check). That's why you see the special
+comments starting with a "#=" character. Using this notation, you can specify a
+key, which will be passed as a second argument to the action method. As we will
+see, this allows us to write very simple and efficient action methods for rules
+such as expression. (Note there's a space between the C<#=> and the key's name).
+
+=head2 Testing the Parser
+
+It is useful to test the parser before writing any action methods. This can save
+you a lot of work; if you write the actions immediately after writing the
+grammar rules, and only later find out that your parser must be updated, then
+your action methods probably need to be updated as well.
+In Episode 2 we saw the target command line option. In order to test the parser,
+the "parse" target is especially helpful. When specifying this option, your
+compiler will print the parse tree of your input string, or print a syntax
+error. It is wise to test your parser with both correct and incorrect input, so
+you know for sure your parser doesn't accept input that it shouldn't.
+
+=head2 And... Action!
+
+Now we have implemented the initial version of the Squaak grammar, it's time to
+implement the parse actions we mentioned before. The actions are written in a
+file called F<src/parser/actions.pm>. If you look at the methods in this file,
+here and there you'll see that the match object ($/) , or rather, hash fields of
+it (like $<statement>) is evaluated in scalar context, by writing "$( ... )".
+As mentioned in Synopsis 5, evaluating a Match object in scalar context returns
+its result object. Normally the result object is the matched portion of the
+source text, but the special make function can be used to set the result object
+to some other value.
+This means that each node in the parse tree (a Match object) can also hold its
+PAST representation. Thus we use the make function to set the PAST
+representation of the current node in the parse tree, and later use the $( ... )
+operator to retrieve the PAST representation from it.
+
+In recap, the match object ($/) and any subrules of it (for instance
+$<statement>) represent the parse tree; of course, $<statement>
+represents only the parse tree what the $<statement> rule matched. So, any
+action method has access to the parse tree that the equally named grammar rule
+matched, as the match object is always passed as an argument. Evaluating a parse
+tree in scalar context yields the PAST representation (obviously, this PAST
+object should be set using the make function).
+
+If you're following this tutorial, I highly advise you to get your feet wet, and
+do the exercises. Remember, learning and not doing is not learning (or something
+like that :-). This week's exercises are not that difficult, and after doing
+them, you'll have implemented the first part of our little Squaak language.
+
+=head2 What's next?
+
+In this episode we introduced the full grammar of Squaak. We took the first
+steps to implement this language. The first, and currently only, statement type
+is assignments. We briefly touched on how to write the action methods that are
+invoked during the parsing phase.
+In the next episode, we shall take a closer look on the different PAST node
+types, and implement some more parts of the Squaak language. Once we have all
+basic parts in place, adding statement types will be rather straightforward.
+In the mean time, if you have any questions or are stuck, don't hesitate to
+leave a comment or contact me.
+
+=head2 Exercises
+
+This episode's exercises are simple enough to get started on implementing
+Squaak.
+
+=over 4
+
+=item 1.
+
+Rename the names of the action methods according to the name changes we made on
+the grammar rules. So, "integer" becomes "integer_constant", "value" becomes
+"expression", and so on.
+
+=item 2.
+
+Look at the grammar rule for statement. A statement currently consists of an
+assignment. Implement the action method "statement" to retrieve the result
+object of this assignment and set it as statement's result object using the
+special make function. Do the same for rule primary.
+
+=item 3.
+
+Write the action method for the rule identifier. As a result object of this
+"match", a new PAST::Var node should be set, taking as name a string
+representation of the match object ($/). For now, you can set the scope to
+'package'. See "pdd26: ast" for details on PAST::Var nodes.
+
+=item 4.
+
+Write the action method for assignment. Retrieve the result objects for
+"primary" and for "expression", and create a PAST::Op node that binds the
+expression to the primary. (Check out pdd26 for PAST::Op node types, and find
+out how you do such a binding).
+
+=item 5.
+
+Run your compiler on a script or in interactive mode. Use the target option to
+see what PIR is being generated on the input "x = 42".
+
+=back
+
+=head2 Some Notes
+
+=over 4
+
+=item * Help! I get the error message "no result object".
+
+This means that the result object was not set properly (duh!).
+Make sure each action method is invoked (check each rule for a "{*}" marker),
+and that there is an action method for that rule, and that "make" is used to set
+the appropriate PAST node. Note that not all rules have action methods, for
+instance the C<keyword> rule (there's no point in that).
+
+=item * While we're constructing parts of Squaak's grammar, we'll sometimes
+make a shortcut, by forgetting about certain rules for a while. For instance,
+you might have noticed we're ignoring float-constants right now. That's ok. When
+we'll need them, these rules will be added.
+
+=back
+
+=head2 References
+
+=over 4
+
+=item * pdd26: ast
+
+=item * synopsis 5: Rules
+
+=item * docs/pct/*.pod
+
+=back
+
+=head2 Solutions to the exercises
+
+By now, you may have finished the PCT tutorial. If you felt too lazy to do the
+exercises or if you want to see what solution I had in mind, here are the
+solutions to the exercises in Episode 3 (Episode 1's exercise was discussed at
+the end of Episode 2, and the latter didn't have any coding assignments).
+
+=over 4
+
+=item 1
+
+Rename the names of the action methods according to the name changes we made
+on the grammar rules. So, "integer" becomes "integer_constant", "value" becomes
+"expression", and so on.
+
+I assume you don't need any help with this.
+
+=item 2
+
+Look at the grammar rule for statement. A statement currently consists of an
+assignment. Implement the action method "statement" to retrieve the result
+object of this assignment and set it as statement's result object using the
+special make function. Do the same for rule primary.
+
+ method statement($/) {
+     make $( $<assignment> );
+ }
+
+Note that at this point, the rule statement doesn't define different #= keys
+for each type of statement, so we don't declare a parameter C<$key>. This will
+be changed later.
+
+ method primary($/) {
+     make $( $<identifier> );
+ }
+
+=item 3
+
+Write the action method for the rule identifier. As a result object of this
+"match", a new C<PAST::Var> node should be set, taking as name a string
+representation of the match object ($/). For now, you can set the scope to
+'package'. See "pdd26: ast" for details on C<PAST::Var> nodes.
+
+ method identifier($/) {
+     make PAST::Var.new( :name(~$/), :scope('package'), :node($/) );
+ }
+
+=item 4
+
+Write the action method for assignment. Retrieve the result objects for
+"primary" and for "expression", and create a C<PAST::Op> node that binds the
+expression to the primary. (Check out pdd26 for C<PAST::Op> node types, and
+find out how you do such a binding).
+
+ method assignment($/) {
+     my $lhs := $( $<primary> );
+     my $rhs := $( $<expression> );
+     $lhs.lvalue(1);
+     make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
+ }
+
+Note that we set the lvalue flag on $lhs. See PDD26 for details on this flag.
+
+=item 5
+
+Run your compiler on a script or in interactive mode. Use the target option to
+see what PIR is being generated on the input "x = 42".
+
+ .namespace.sub "_block10"
+   new $P11, "Integer"
+   assign $P11, 42
+   set_global "x", $P11
+   .return ($P11)
+ .end
+
+The first two lines of code in the sub create an object to store the number 42,
+the third line stores this number as "x". The PAST compiler will always
+generate an instruction to return the result of the last statement, in this
+case C<$P11>.
+
+=back
+
+
+=cut
+

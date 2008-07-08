@@ -18,7 +18,7 @@ Excercise select_options() - the feature that lets us specify, for example
 =cut
 
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub main :main
     load_bytecode 'library/Test/More.pir'

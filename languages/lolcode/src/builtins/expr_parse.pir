@@ -4,7 +4,7 @@ expr_parse.pir - parse an expression and dispatch function calls with their appr
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'setup_global_parsing_tokens' :init :load :anon
     $P0 = new 'String'
@@ -34,6 +34,9 @@ expr_parse.pir - parse an expression and dispatch function calls with their appr
       .local pmc sub_to_call
       .local pmc args_array
       item = shift t_iter
+      unless_null item, not_found
+      item = new 'Undef'
+    not_found:
       $I0 = isntsame item, mkay
     if $I0 goto check_type
       has_slurpy:
@@ -115,6 +118,15 @@ it_done:
     .return (return_val)
 .end
 
+.sub lookup
+    .param string name
+    $P0 = find_name name
+    if_null $P0, null_token
+    $P0 = typeof $P0
+    .return($P0)
+  null_token:
+    .return("NULL")
+.end
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

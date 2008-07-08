@@ -24,23 +24,19 @@ typedef struct Stack_Entry {
     void (*cleanup)(PARROT_INTERP, struct Stack_Entry *);
 } Stack_Entry_t;
 
+struct Small_Object_Pool; /* forward decl */
+
 typedef struct Stack_Chunk {
     UnionVal            cache;
     Parrot_UInt         flags;
-    int                 size;
+    struct Small_Object_Pool  *pool;
     const char         *name;
     struct Stack_Chunk *prev;
     Parrot_UInt         refcount;
-    union { /* force appropriate alignment of 'data'.  If alignment
-               is necessary, assume double is good enough.  27-04-2007. */
-        Stack_Entry_t data;
-#if PARROT_PTR_ALIGNMENT > 1
-        double d_dummy;
-#endif
-    } u;
+    Stack_Entry_t       data;
 } Stack_Chunk_t;
 
-#define STACK_DATAP(chunk)    &((chunk)->u.data)
+#define STACK_DATAP(chunk)    &((chunk)->data)
 /* #define STACK_ITEMSIZE(chunk) PObj_buflen(chunk) */
 
 
@@ -50,6 +46,14 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 
 /* HEADERIZER BEGIN: src/stacks.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+Stack_Chunk_t * cst_new_stack_chunk(PARROT_INTERP,
+    ARGIN(const Stack_Chunk_t *chunk))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
@@ -121,44 +125,6 @@ void * stack_pop(PARROT_INTERP,
         FUNC_MODIFIES(*stack_p);
 
 PARROT_API
-void stack_push(PARROT_INTERP,
-    ARGMOD(Stack_Chunk_t **stack_p),
-    ARGIN(void *thing),
-    Stack_entry_type type,
-    NULLOK(Stack_cleanup_method cleanup))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*stack_p);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-Stack_entry_type get_entry_type(ARGIN(const Stack_Entry_t *entry))
-        __attribute__nonnull__(1);
-
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/stacks.c */
-/* HEADERIZER BEGIN: src/stack_common.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Stack_Chunk_t * cst_new_stack_chunk(PARROT_INTERP,
-    ARGIN(const Stack_Chunk_t *chunk))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Stack_Chunk_t * register_new_stack(PARROT_INTERP,
-    ARGIN(const char *name),
-    size_t item_size)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Entry_t* stack_prepare_pop(PARROT_INTERP,
@@ -177,11 +143,26 @@ Stack_Entry_t* stack_prepare_push(PARROT_INTERP,
         FUNC_MODIFIES(*stack_p);
 
 PARROT_API
+void stack_push(PARROT_INTERP,
+    ARGMOD(Stack_Chunk_t **stack_p),
+    ARGIN(void *thing),
+    Stack_entry_type type,
+    NULLOK(Stack_cleanup_method cleanup))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*stack_p);
+
+PARROT_API
 void stack_system_init(SHIM_INTERP);
 
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/stack_common.c */
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+Stack_entry_type get_entry_type(ARGIN(const Stack_Entry_t *entry))
+        __attribute__nonnull__(1);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/stacks.c */
 
 #define ERROR_STACK_EMPTY 1
 #define ERROR_STACK_SHALLOW 1

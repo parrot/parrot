@@ -8,51 +8,51 @@ This is the base file for the basic calculator.
 
 This file includes the parsing and grammar rules from
 the src/ directory, loads the relevant PGE libraries,
-and registers the compiler under the name 'ABC'.
+and registers the compiler under the name 'abc'.
 
 =head2 Functions
 
 =over 4
 
-=item C<__onload()>
+=item onload()
 
-Loads the PGE libraries needed for running the parser,
-and registers the "compile" subroutine as the "ABC" compiler.
+Creates the abc compiler using a C<PCT::HLLCompiler>
+object.
 
 =cut
 
-.namespace [ 'ABC' ]
+.namespace [ 'abc::Compiler' ]
 
-.sub '__onload' :load :init
+.loadlib 'abc_group'
+
+.sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
 
-    $P0 = new [ 'PCT::HLLCompiler' ]
-    $P0.'language'('ABC')
-    $P0.'parsegrammar'('ABC::Grammar')
-    $P0.'parseactions'('ABC::Grammar::Actions')
+    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+    $P1 = $P0.'new'()
+    $P1.'language'('abc')
+    $P1.'parsegrammar'('abc::Grammar')
+    $P1.'parseactions'('abc::Grammar::Actions')
 .end
 
+=item main(args :slurpy)  :main
 
-=item main([arg1, ...]) :main
-
-Start the compiler from the command line.  We simply pass any
-command line argument's to the ABC compiler's <command_line>
-method (inherited from C<HLLCompiler>).
+Start compilation by passing any command line C<args>
+to the abc compiler.
 
 =cut
 
 .sub 'main' :main
     .param pmc args
-    $P0 = compreg 'ABC'
-    .return $P0.'command_line'(args)
+
+    $P0 = compreg 'abc'
+    $P1 = $P0.'command_line'(args)
 .end
 
 
-.include 'src/builtins.pir'
-
+.include 'src/gen_builtins.pir'
 .include 'src/gen_grammar.pir'
-
-.include 'src/gen_grammar-actions.pir'
+.include 'src/gen_actions.pir'
 
 =back
 
@@ -68,3 +68,4 @@ Patrick R. Michaud <pmichaud@pobox.com>
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
+

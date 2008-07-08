@@ -144,28 +144,30 @@
      MULTI = 349,
      VTABLE_METHOD = 350,
      LOADLIB = 351,
-     UNIQUE_REG = 352,
-     LABEL = 353,
-     EMIT = 354,
-     EOM = 355,
-     IREG = 356,
-     NREG = 357,
-     SREG = 358,
-     PREG = 359,
-     IDENTIFIER = 360,
-     REG = 361,
-     MACRO = 362,
-     ENDM = 363,
-     STRINGC = 364,
-     INTC = 365,
-     FLOATC = 366,
-     USTRINGC = 367,
-     PARROT_OP = 368,
-     VAR = 369,
-     LINECOMMENT = 370,
-     FILECOMMENT = 371,
-     DOT = 372,
-     CONCAT = 373
+     SUB_INSTANCE_OF = 352,
+     SUB_LEXID = 353,
+     UNIQUE_REG = 354,
+     LABEL = 355,
+     EMIT = 356,
+     EOM = 357,
+     IREG = 358,
+     NREG = 359,
+     SREG = 360,
+     PREG = 361,
+     IDENTIFIER = 362,
+     REG = 363,
+     MACRO = 364,
+     ENDM = 365,
+     STRINGC = 366,
+     INTC = 367,
+     FLOATC = 368,
+     USTRINGC = 369,
+     PARROT_OP = 370,
+     VAR = 371,
+     LINECOMMENT = 372,
+     FILECOMMENT = 373,
+     DOT = 374,
+     CONCAT = 375
    };
 #endif
 /* Tokens.  */
@@ -263,35 +265,37 @@
 #define MULTI 349
 #define VTABLE_METHOD 350
 #define LOADLIB 351
-#define UNIQUE_REG 352
-#define LABEL 353
-#define EMIT 354
-#define EOM 355
-#define IREG 356
-#define NREG 357
-#define SREG 358
-#define PREG 359
-#define IDENTIFIER 360
-#define REG 361
-#define MACRO 362
-#define ENDM 363
-#define STRINGC 364
-#define INTC 365
-#define FLOATC 366
-#define USTRINGC 367
-#define PARROT_OP 368
-#define VAR 369
-#define LINECOMMENT 370
-#define FILECOMMENT 371
-#define DOT 372
-#define CONCAT 373
+#define SUB_INSTANCE_OF 352
+#define SUB_LEXID 353
+#define UNIQUE_REG 354
+#define LABEL 355
+#define EMIT 356
+#define EOM 357
+#define IREG 358
+#define NREG 359
+#define SREG 360
+#define PREG 361
+#define IDENTIFIER 362
+#define REG 363
+#define MACRO 364
+#define ENDM 365
+#define STRINGC 366
+#define INTC 367
+#define FLOATC 368
+#define USTRINGC 369
+#define PARROT_OP 370
+#define VAR 371
+#define LINECOMMENT 372
+#define FILECOMMENT 373
+#define DOT 374
+#define CONCAT 375
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 608 "compilers/imcc/imcc.y"
+#line 611 "compilers/imcc/imcc.y"
 {
     IdList * idlist;
     int t;
@@ -299,8 +303,8 @@ typedef union YYSTYPE
     SymReg * sr;
     Instruction *i;
 }
-/* Line 1529 of yacc.c.  */
-#line 293 "compilers/imcc/imcparser.h"
+/* Line 1489 of yacc.c.  */
+#line 297 "compilers/imcc/imcparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

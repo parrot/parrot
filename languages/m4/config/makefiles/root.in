@@ -9,6 +9,9 @@ RM_RF         = @rm_rf@
 TOUCH         = $(PERL) -MExtUtils::Command -e touch
 BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 default: all
 all: build 
@@ -21,6 +24,7 @@ help:
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
+	@echo "  test-gnu-m4:       Run the test suite on the installed GNU m4."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Basic cleaning up."
@@ -39,8 +43,9 @@ Makefile: config/makefiles/root.in
 
 test: build
 	$(PERL) -Ilib -I../../lib t/harness
-# TODO: reenable testing of GNU m4, by setting env 
-#CONDITIONED_LINE(has_gnu_m4):	PARROT_M4_TEST_PROG='m4' $(PERL) -Ilib -I../../lib t/harness $(USE_GNU_M4)
+
+test-gnu-m4: build
+	PARROT_M4_TEST_PROG='m4' $(PERL) -Ilib -I../../lib t/harness
 
 build: m4.pbc 
 

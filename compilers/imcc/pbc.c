@@ -112,6 +112,15 @@ static int add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static int add_const_table(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static int add_const_table_key(PARROT_INTERP, PMC *key)
+        __attribute__nonnull__(1);
+
+static int add_const_table_pmc(PARROT_INTERP, PMC *pmc)
+        __attribute__nonnull__(1);
+
 static opcode_t build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -184,6 +193,9 @@ static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+static int old_blocks(void);
+
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -221,7 +233,7 @@ static int old_blocks(void);
 
 =item C<static void imcc_globals_destroy>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -251,11 +263,93 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
     globals.cs = NULL;
 }
 
+
+/*
+
+=item C<static int add_const_table>
+
+Adds an empty item to constant table, returning its position.
+
+=cut
+
+*/
+
+static int
+add_const_table(PARROT_INTERP)
+{
+    const size_t oldcount = interp->code->const_table->const_count;
+    const size_t newcount = oldcount + 1;
+
+    /* Allocate a new constant */
+    PackFile_Constant * new_constant = PackFile_Constant_new(interp);
+
+    /* Update the constant count and reallocate */
+    if (interp->code->const_table->constants) {
+        interp->code->const_table->constants =
+            (PackFile_Constant **)mem_sys_realloc(interp->code->const_table->constants,
+                newcount * sizeof (PackFile_Constant *));
+    }
+    else {
+        interp->code->const_table->constants =
+            (PackFile_Constant **)mem_sys_allocate(newcount * sizeof (PackFile_Constant *));
+    }
+
+    interp->code->const_table->constants[newcount - 1] = new_constant;
+    interp->code->const_table->const_count             = newcount;
+
+    return oldcount;
+}
+
+
+/*
+
+=item C<static int add_const_table_pmc>
+
+Adds a PMC to the const table, returning its position.
+
+=cut
+
+*/
+
+static int
+add_const_table_pmc(PARROT_INTERP, PMC *pmc)
+{
+    int newitem = add_const_table(interp);
+
+    interp->code->const_table->constants[newitem]->type  = PFC_PMC;
+    interp->code->const_table->constants[newitem]->u.key = pmc;
+
+    return newitem;
+}
+
+
+/*
+
+=item C<static int add_const_table_key>
+
+Adds a key to the const table, returning its position.
+
+=cut
+
+*/
+
+static int
+add_const_table_key(PARROT_INTERP, PMC *key)
+{
+    int newitem = add_const_table(interp);
+
+    interp->code->const_table->constants[newitem]->type  = PFC_KEY;
+    interp->code->const_table->constants[newitem]->u.key = key;
+
+    return newitem;
+}
+
+
 /*
 
 =item C<int e_pbc_open>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -291,7 +385,6 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
     /* we need some segments */
     if (!interp->code) {
         PMC *self;
-        int k;
 
         cs->seg = interp->code =
             PF_create_default_segs(interp,
@@ -305,10 +398,7 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
          */
         self = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                 IGLOBALS_INTERPRETER);
-        k    = PDB_extend_const_table(interp);
-
-        interp->code->const_table->constants[k]->type  = PFC_PMC;
-        interp->code->const_table->constants[k]->u.key = self;
+        (void) add_const_table_pmc(interp, self);
     }
 
     globals.cs = cs;
@@ -346,7 +436,7 @@ old_blocks(void)
 
 =item C<opcode_t * make_jit_info>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -448,7 +538,7 @@ get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
 
 =item C<static void store_sub_size>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -465,7 +555,7 @@ store_sub_size(size_t size, size_t ins_line)
 
 =item C<static void store_fixup>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -492,7 +582,7 @@ store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
 
 =item C<static void store_key_const>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -587,9 +677,9 @@ find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), ARGOUT(int 
         SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if names and namespaces are matching - ok */
-        if (r && !strcmp(r->name, name)
+        if (r && (strcmp(r->name, name) == 0)
               && ((sym->unit->_namespace && s->unit->_namespace
-              &&  !strcmp(sym->unit->_namespace->name, s->unit->_namespace->name))
+              &&  (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
               || (!sym->unit->_namespace && !s->unit->_namespace)))
             return s;
 
@@ -701,7 +791,7 @@ fixup_globals(PARROT_INTERP)
 
 =item C<STRING * IMCC_string_from_reg>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -763,7 +853,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 {
-    const int      k = PDB_extend_const_table(interp);
+    const int      k = add_const_table(interp);
     STRING * const s = IMCC_string_from_reg(interp, r);
 
     interp->code->const_table->constants[k]->type     = PFC_STRING;
@@ -776,7 +866,7 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 
 =item C<static int add_const_num>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -786,7 +876,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 {
-    const int      k = PDB_extend_const_table(interp);
+    const int      k = add_const_table(interp);
     STRING * const s = string_from_cstring(interp, buf, 0);
 
     interp->code->const_table->constants[k]->type     = PFC_NUMBER;
@@ -799,7 +889,7 @@ add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 
 =item C<static PMC* mk_multi_sig>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -860,7 +950,7 @@ typedef void (*decl_func_t)(Interp *, PMC *, STRING *, INTVAL);
 
 =item C<static PMC* create_lexinfo>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -929,7 +1019,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
 
 =item C<static PMC* find_outer>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -960,9 +1050,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         return NULL;
 
     for (s = globals.cs->first; s; s = s->next) {
-        SymReg * const sub = s->unit->instructions->symregs[0];
-
-        if (STREQ(sub->name, unit->outer->name)) {
+        if (STREQ(s->unit->lexid->name, unit->outer->name)) {
             PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
         }
@@ -971,7 +1059,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     /* could be eval too; check if :outer is the current sub */
     current = CONTEXT(interp)->current_sub;
 
-    if (! current)
+    if (!current)
         IMCC_fatal(interp, 1, "Undefined :outer sub '%s'.\n",
                    unit->outer->name);
 
@@ -988,7 +1076,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 =item C<static int add_const_pmc_sub>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1003,7 +1091,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
     PMC                 *sub_pmc;
     Parrot_sub          *sub;
 
-    int                  k            = PDB_extend_const_table(interp);
+    const int            k            = add_const_table(interp);
     IMC_Unit            * const unit  = globals.cs->subs->unit;
     PackFile_ConstTable *ct           = interp->code->const_table;
     PackFile_Constant   *pfc          = ct->constants[k];
@@ -1032,18 +1120,51 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
         }
     }
 
+    /* Do we have to create an instance of a specific type for this sub? */
+    if (unit->instance_of) {
+        /* Look it up as a class and as a PMC type. */
+        STRING * const classname = string_from_cstring(interp, unit->instance_of + 1,
+                 strlen(unit->instance_of) - 2);
+        PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
+        if (!PMC_IS_NULL(classobj))
+            sub_pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = pmc_type(interp, classname);
+            if (type <= 0)
+                real_exception(interp, NULL, NO_CLASS,
+                    "Class '%Ss' specified in :instanceof(...) not found", classname);
+            sub_pmc = pmc_new(interp, type);
+        }
+    }
+    else {
+        /* use a possible type mapping for the Sub PMCs, and create it */
+        type = Parrot_get_ctx_HLL_type(interp, type);
 
-    /* use a possible type mapping for the Sub PMCs */
-    type = Parrot_get_ctx_HLL_type(interp, type);
+        /* TODO create constant - see also src/packfile.c */
+        sub_pmc = pmc_new(interp, type);
+    }
 
-    /* TODO create constant - see also src/packfile.c */
-    sub_pmc                      = pmc_new(interp, type);
+    /* Set flags and get the sub info. */
     PObj_get_FLAGS(sub_pmc)     |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
     Sub_comp_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
     sub                          = PMC_sub(sub_pmc);
 
     r->color  = add_const_str(interp, r);
     sub->name = ct->constants[r->color]->u.string;
+
+    /* If the unit has no lexid, set the lexid to match the name. */
+    if (!unit->lexid) {
+        unit->lexid = r;
+    }
+    else {
+        /* trim the quotes  */
+        unit->lexid->name = str_dup(unit->lexid->name + 1);
+
+        /* Otherwise, create string constant for it. */
+        unit->lexid->name[strlen(unit->lexid->name) - 1] = 0;
+        unit->lexid->color = add_const_str(interp, unit->lexid);
+    }
+    sub->lexid = ct->constants[unit->lexid->color]->u.string;
 
     ns_pmc    = NULL;
 
@@ -1111,7 +1232,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
     unit->sub_pmc = sub_pmc;
 
     IMCC_debug(interp, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' flags %d color %d (%s) "
+            "add_const_pmc_sub '%s' flags %x color %d (%s) "
             "lex_info %s :outer(%s)\n",
             r->name, r->pcc_sub->pragma, k,
             (char *) sub_pmc->vtable->whoami->strstart,
@@ -1159,10 +1280,7 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
             "add_const_key: PackFile_Constant error\n");
     }
 
-    k = PDB_extend_const_table(interp);
-
-    interp->code->const_table->constants[k]->type  = PFC_KEY;
-    interp->code->const_table->constants[k]->u.key = pfc->u.key;
+    k = add_const_table_key(interp, pfc->u.key);
 
     store_key_const(s_key, k);
 
@@ -1180,7 +1298,7 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
 
 =item C<static const char * slice_deb>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1344,7 +1462,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 
 =item C<INTVAL IMCC_int_from_reg>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1387,7 +1505,7 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 =item C<static void make_pmc_const>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1413,10 +1531,7 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     p       = VTABLE_new_from_string(interp, _class, s, PObj_constant_FLAG);
 
     /* append PMC constant */
-    k       = PDB_extend_const_table(interp);
-
-    interp->code->const_table->constants[k]->type  = PFC_PMC;
-    interp->code->const_table->constants[k]->u.key = p;
+    k = add_const_table_pmc(interp, p);
 
     r->color = k;
 }
@@ -1425,7 +1540,7 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
 
 =item C<static void add_1_const>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1535,7 +1650,7 @@ constant_folding(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 =item C<int e_pbc_new_sub>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1557,7 +1672,7 @@ e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 
 =item C<int e_pbc_end_sub>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1664,11 +1779,7 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
 
     if (changed_sig) {
         /* append PMC constant */
-        const int k = PDB_extend_const_table(interp);
-
-        interp->code->const_table->constants[k]->type  = PFC_PMC;
-        interp->code->const_table->constants[k]->u.key = changed_sig;
-
+        const int k = add_const_table_pmc(interp, changed_sig);
         pc[-1] = k;
     }
 }
@@ -1736,7 +1847,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         npc = 0;
 
         /* add debug if necessary */
-        if (!IMCC_INFO(interp)->optimizer_level
+        if (IMCC_INFO(interp)->optimizer_level == 0
           || IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
             const char * const sourcefile = unit->file;
 
@@ -1904,7 +2015,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
 =item C<int e_pbc_close>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 

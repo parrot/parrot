@@ -1,5 +1,5 @@
 .HLL '_Tcl', ''
-.namespace
+.namespace []
 
 .sub __listToDict
   .param pmc list

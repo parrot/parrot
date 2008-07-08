@@ -104,9 +104,6 @@ sub source_files {
     foreach my $file ( sort keys(%$manifest) ) {
         my $full_path = File::Spec->catfile( $build_dir, $file );
 
-        # skip binary files (including .pbc files)
-        next if -B $full_path;
-
         # skip files specified in __DATA__ section
         next if exists $skip_files{$file};
 

@@ -131,8 +131,7 @@ void Parrot_initialize_core_pmcs(PARROT_INTERP)
     int pass;
     for (pass = 0; pass <= 1; ++pass) {
         /* first the PMC with the highest enum
-         * this reduces MMD table resize action
-         */
+         * this reduces MMD table resize action */
 END_C
 
     print {$OUT} "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"

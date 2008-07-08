@@ -128,11 +128,6 @@ void list_insert(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*list);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
-        __attribute__nonnull__(2);
-
 PARROT_API
 void list_mark(PARROT_INTERP, ARGMOD(List *list))
         __attribute__nonnull__(1)
@@ -223,6 +218,11 @@ void list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pinfo);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
+        __attribute__nonnull__(2);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/list.c */

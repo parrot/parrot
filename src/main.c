@@ -36,7 +36,7 @@ The entry point from the command line into Parrot.
 */
 
 int
-main(int argc, const char * argv[])
+main(int argc, char * argv[])
 {
     const char *sourcefile;
     Interp  *interp;

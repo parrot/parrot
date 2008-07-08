@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -119,12 +119,12 @@ sub runstep {
         {
             $execcapable = 1;
             unless ( ( $osname eq 'openbsd' )
-                || ( $osname eq 'freebsd' )
-                || ( $osname eq 'netbsd' )
-                || ( $osname eq 'linux' )
-                || ( $osname eq 'darwin' )
-                || ( $osname eq 'cygwin' )
-                || ( $osname eq 'MSWin32' ) )
+                || (   $osname eq 'freebsd' )
+                || (   $osname eq 'netbsd' )
+                || (   $osname eq 'linux' )
+                || (   $osname eq 'darwin' )
+                || (   $osname eq 'cygwin' )
+                || (   $osname eq 'MSWin32' ) )
             {
                 $execcapable = 0;
             }
@@ -153,7 +153,7 @@ sub runstep {
             $conf->cc_clean();
         }
 
-        # RT#43146 use executable memory for this test if needed
+        # RT #43146 use executable memory for this test if needed
         #
         # test for some instructions
         if ( $jitcpuarch eq 'i386' ) {
@@ -167,16 +167,17 @@ sub runstep {
     }
     else {
         $conf->data->set(
-            jitarchname => 'nojit',
-            jitcpuarch  => $cpuarch,
-            jitcpu      => $cpuarch,
-            jitosname   => $osname,
-            jitcapable  => 0,
-            execcapable => 0,
-            cc_hasjit   => '',
-            TEMP_jit_o  => '',
-            TEMP_exec_h => '',
-            TEMP_exec_o => ''
+            jitarchname    => 'nojit',
+            jitcpuarch     => $cpuarch,
+            jitcpu         => $cpuarch,
+            jitosname      => $osname,
+            jitcapable     => 0,
+            execcapable    => 0,
+            cc_hasjit      => '',
+            TEMP_jit_o     => '',
+            TEMP_exec_h    => '',
+            TEMP_exec_o    => '',
+            TEMP_exec_dep  => '',
         );
     }
 
@@ -186,19 +187,24 @@ sub runstep {
 sub _handle_execcapable {
     my ($conf, $execcapable) = @_;
     if ($execcapable) {
+        my $cpuarch = $conf->data->get('cpuarch');
         $conf->data->set(
             TEMP_exec_h =>
 '$(SRC_DIR)/jit.h $(INC_DIR)/exec.h $(SRC_DIR)/exec_dep.h $(SRC_DIR)/exec_save.h',
             TEMP_exec_o =>
                 '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_dep$(O) $(SRC_DIR)/exec_save$(O)',
+            TEMP_exec_dep =>
+                "\$(SRC_DIR)/exec_dep.c : \$(SRC_DIR)/jit/$cpuarch/exec_dep.c\n"
+                . "\t\$(CP) \$(SRC_DIR)/jit/$cpuarch/exec_dep.c \$(SRC_DIR)/exec_dep.c",
             execcapable => 1
         );
     }
     else {
         $conf->data->set(
-            TEMP_exec_h => '',
-            TEMP_exec_o => '',
-            execcapable => 0
+            TEMP_exec_h   => '',
+            TEMP_exec_o   => '',
+            TEMP_exec_dep => '',
+            execcapable   => 0,
         );
     }
     return 1;

@@ -1225,7 +1225,7 @@ do_thaw(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info *info))
         /*
          * that's a duplicate
          if (info->container)
-         DOD_WRITE_BARRIER(interp, info->container, NULL, pmc);
+         GC_WRITE_BARRIER(interp, info->container, NULL, pmc);
          */
         *info->thaw_ptr = pmc;
         return;
@@ -1244,7 +1244,7 @@ do_thaw(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info *info))
         info->thaw_result = pmc;
     else {
         if (info->container) {
-            DOD_WRITE_BARRIER(interp, info->container, NULL, pmc);
+            GC_WRITE_BARRIER(interp, info->container, NULL, pmc);
         }
         *info->thaw_ptr = pmc;
     }
@@ -1679,8 +1679,8 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
      */
     if (1 || (string_length(interp, image) > THAW_BLOCK_DOD_SIZE)) {
         Parrot_do_dod_run(interp, 1);
-        Parrot_block_DOD(interp);
-        Parrot_block_GC(interp);
+        Parrot_block_GC_mark(interp);
+        Parrot_block_GC_sweep(interp);
         dod_block = 1;
     }
 
@@ -1703,8 +1703,8 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
     PARROT_ASSERT(image->strstart >= (char *)PObj_bufstart(image));
 
     if (dod_block) {
-        Parrot_unblock_DOD(interp);
-        Parrot_unblock_GC(interp);
+        Parrot_unblock_GC_mark(interp);
+        Parrot_unblock_GC_sweep(interp);
     }
     PackFile_destroy(interp, info.image_io->pf);
     mem_sys_free(info.image_io);
@@ -1738,7 +1738,7 @@ Parrot_freeze_at_destruct(PARROT_INTERP, ARGIN(PMC* pmc))
 {
     visit_info info;
 
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
     cleanup_next_for_GC(interp);
     info.what = VISIT_FREEZE_AT_DESTRUCT;
     info.mark_ptr = pmc;
@@ -1750,7 +1750,7 @@ Parrot_freeze_at_destruct(PARROT_INTERP, ARGIN(PMC* pmc))
 
     visit_loop_next_for_GC(interp, pmc, &info);
 
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
     PackFile_destroy(interp, info.image_io->pf);
     mem_sys_free(info.image_io);
     return info.image;

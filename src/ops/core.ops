@@ -167,13 +167,13 @@ The control flow opcodes check conditions and manage program flow.
 
 ########################################
 
-=item B<branch>(label INT)
+=item B<branch>(in LABEL)
 
 Branch forward or backward by the amount in $1.
 
 =cut
 
-inline op branch(label INT) :base_loop :flow {
+inline op branch(in LABEL) :base_loop :flow {
     goto OFFSET($1);
 }
 
@@ -206,14 +206,14 @@ inline op branch_cs(in STR) :base_loop :check_event :flow {
 
 ########################################
 
-=item B<bsr>(label INT)
+=item B<bsr>(in LABEL)
 
 Branch to the location specified by $1. Push the current location onto the call
 stack for later returning.
 
 =cut
 
-inline op bsr(label INT) :base_core :check_event :flow {
+inline op bsr(in LABEL) :base_core :check_event :flow {
     stack_push(interp, &interp->dynamic_env,
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
     goto OFFSET($1);
@@ -232,14 +232,14 @@ inline op ret() :flow {
 
 ########################################
 
-=item B<jsr>(label INT)
+=item B<jsr>(in LABEL)
 
 Jump to the location specified by register $1. Push the current
 location onto the call stack for later returning.
 
 =cut
 
-inline op jsr(label INT) :base_core :check_event :flow {
+inline op jsr(in LABEL) :base_core :check_event :flow {
     opcode_t * loc;
     stack_push(interp, &interp->dynamic_env,
              expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
@@ -250,13 +250,13 @@ inline op jsr(label INT) :base_core :check_event :flow {
 
 ########################################
 
-=item B<jump>(label INT)
+=item B<jump>(in LABEL)
 
 Jump to the address held in register $1.
 
 =cut
 
-inline op jump(label INT) :base_loop :flow {
+inline op jump(in LABEL) :base_loop :flow {
     opcode_t * const loc = INTVAL2PTR(opcode_t *, $1);
     goto ADDRESS(loc);
 }
@@ -292,68 +292,68 @@ met, the branch happens.  Otherwise control falls to the next operation.
 
 ########################################
 
-=item B<if>(invar INT, labelconst INT)
+=item B<if>(invar INT, inconst LABEL)
 
-=item B<if>(invar NUM, labelconst INT)
+=item B<if>(invar NUM, inconst LABEL)
 
-=item B<if>(invar PMC, labelconst INT)
+=item B<if>(invar PMC, inconst LABEL)
 
-=item B<if>(invar STR, labelconst INT)
+=item B<if>(invar STR, inconst LABEL)
 
 Check register $1. If true, branch by $2.
 
 =cut
 
-inline op if(invar INT, labelconst INT) {
+inline op if(invar INT, inconst LABEL) {
     if ($1 != 0)
         goto OFFSET($2);
 }
 
-inline op if(invar NUM, labelconst INT) {
+inline op if(invar NUM, inconst LABEL) {
     if (!FLOAT_IS_ZERO($1))
         goto OFFSET($2);
 }
 
-op if (invar STR, labelconst INT) {
+op if (invar STR, inconst LABEL) {
     if (string_bool(interp, $1))
         goto OFFSET($2);
 }
 
-op if(invar PMC, labelconst INT) {
+op if(invar PMC, inconst LABEL) {
     if (VTABLE_get_bool(interp, $1))
         goto OFFSET($2);
 }
 
 ########################################
 
-=item B<unless>(invar INT, labelconst INT)
+=item B<unless>(invar INT, inconst LABEL)
 
-=item B<unless>(invar NUM, labelconst INT)
+=item B<unless>(invar NUM, inconst LABEL)
 
-=item B<unless>(invar PMC, labelconst INT)
+=item B<unless>(invar PMC, inconst LABEL)
 
-=item B<unless>(invar STR, labelconst INT)
+=item B<unless>(invar STR, inconst LABEL)
 
 Check register $1. If false, branch by $2.
 
 =cut
 
-inline op unless(invar INT, labelconst INT) {
+inline op unless(invar INT, inconst LABEL) {
     if ($1 == 0)
         goto OFFSET($2);
 }
 
-inline op unless(invar NUM, labelconst INT) {
+inline op unless(invar NUM, inconst LABEL) {
     if (FLOAT_IS_ZERO($1))
         goto OFFSET($2);
 }
 
-op unless(invar STR, labelconst INT) {
+op unless(invar STR, inconst LABEL) {
     if (!string_bool(interp, $1))
         goto OFFSET($2);
 }
 
-op unless(invar PMC, labelconst INT) {
+op unless(invar PMC, inconst LABEL) {
     if (!VTABLE_get_bool(interp, $1))
         goto OFFSET($2);
 }
@@ -614,15 +614,15 @@ inline op result_info(out PMC) {
 
 =over 4
 
-=item B<set_addr>(out INT, labelconst INT)
+=item B<set_addr>(out INT, inconst LABEL)
 
 Sets register $1 to the current address plus the offset $2.
 
-=item B<set_addr>(invar PMC, labelconst INT)
+=item B<set_addr>(invar PMC, inconst LABEL)
 
 Sets PMC in register $1 to the current address plus the offset $2.
 
-=item B<set_addr>(invar PMC, labelvar INT)
+=item B<set_addr>(invar PMC, invar LABEL)
 
 Sets PMC in register $1 to the absolute address $2 obtained from B<get_addr>.
 
@@ -632,15 +632,15 @@ Sets $1 to the absolute address of the Sub PMC $2.
 
 =cut
 
-inline op set_addr(out INT, labelconst INT) {
+inline op set_addr(out INT, inconst LABEL) {
     $1 = PTR2OPCODE_T(CUR_OPCODE + $2);
 }
 
-inline op set_addr(invar PMC, labelconst INT) {
+inline op set_addr(invar PMC, inconst LABEL) {
     VTABLE_set_pointer(interp, $1, (CUR_OPCODE + $2));
 }
 
-inline op set_addr(invar PMC, labelvar INT) {
+inline op set_addr(invar PMC, invar LABEL) {
     VTABLE_set_pointer(interp, $1, (void*)$2);
 }
 
@@ -687,7 +687,7 @@ inline op addhandler(invar PMC) {
 
 =over 4
 
-=item B<push_eh>(labelconst INT)
+=item B<push_eh>(inconst LABEL)
 
 Create an exception handler for the given catch label and push it onto
 the exception handler stack.
@@ -763,7 +763,7 @@ return; C<1> means an exception has been raised.
 
 =cut
 
-inline op push_eh(labelconst INT) {
+inline op push_eh(inconst LABEL) {
     PMC * const eh = pmc_new(interp, enum_class_Exception_Handler);
     VTABLE_set_pointer(interp, eh, CUR_OPCODE + $1);
     push_exception(interp, eh);
@@ -974,17 +974,10 @@ op interpinfo(out STR, in INT) {
 
 Turns on warnings categories. Categories already turned on will stay on.
 Initial setting is currently all warnings off.  Include F<warnings.pasm> to
-access the categories.  They are:
+access the categories. Refer to that file for the current list of warnings
+available.
 
 =over 4
-
-=item .PARROT_WARNINGS_UNDEF_FLAG
-
-=item .PARROT_WARNINGS_IO_FLAG
-
-=item .PARROT_WARNINGS_PLATFORM_FLAG
-
-=item .PARROT_WARNINGS_ALL_FLAG
 
 =back
 
@@ -1057,7 +1050,7 @@ inline op errorsoff(in INT) {
 
 ########################################
 
-=item B<runinterp>(invar PMC, label INT)
+=item B<runinterp>(invar PMC, in LABEL)
 
 Run the code starting at offset $2 within interpreter $1.
 
@@ -1067,7 +1060,7 @@ Get the current ParrotInterpreter.
 
 =cut
 
-op runinterp(invar PMC, label INT) {
+op runinterp(invar PMC, in LABEL) {
     Interp * const new_interp = (Interp *)PMC_data($1);
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
     new_interp->code = interp->code;
@@ -1123,7 +1116,7 @@ op sweep(inconst INT) {
         Parrot_do_dod_run(interp, 0);
     else
         if (interp->arena_base->num_early_DOD_PMCs)
-            Parrot_do_dod_run(interp, DOD_lazy_FLAG);
+            Parrot_do_dod_run(interp, GC_lazy_FLAG);
 }
 
 =item B<collect>()
@@ -1143,7 +1136,7 @@ Disable DOD sweeps. (Nestable)
 =cut
 
 op sweepoff() {
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 }
 
 =item B<sweepon>()
@@ -1153,7 +1146,7 @@ Re-enable DOD sweeps.
 =cut
 
 op sweepon() {
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 }
 
 =item B<collectoff>()
@@ -1163,7 +1156,7 @@ Disable GC runs (nestable).
 =cut
 
 op collectoff() {
-    Parrot_block_GC(interp);
+    Parrot_block_GC_sweep(interp);
 }
 
 =item B<collecton>()
@@ -1173,7 +1166,7 @@ Re-enable GC.
 =cut
 
 op collecton() {
-    Parrot_unblock_GC(interp);
+    Parrot_unblock_GC_sweep(interp);
 }
 
 =item B<needs_destroy>(invar PMC)

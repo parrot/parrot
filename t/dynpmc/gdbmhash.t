@@ -112,6 +112,16 @@ pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "get_integer" );
     print "After 15 assignments GDBMHash has size "
     print hash_size
     print ".\n"
+
+    delete hash_1["key7"]
+    delete hash_1["key9"]
+
+    hash_size = hash_1
+    print "After 15 assignments and 2 deletes GDBMHash has size "
+    print hash_size
+    print ".\n"
+
+
 .end
 CODE
 An unitialized GDBMHash has size 0.
@@ -119,6 +129,7 @@ An GDBMHash for a new file has size 0.
 After one assignment GDBMHash has size 1.
 After two assignments GDBMHash has size 2.
 After 15 assignments GDBMHash has size 15.
+After 15 assignments and 2 deletes GDBMHash has size 13.
 OUTPUT
 unlink('gdbm_hash_1');
 

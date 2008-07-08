@@ -7,7 +7,7 @@ hello.pir -- simple implementation of a hello function
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'hello'
 

@@ -130,13 +130,14 @@
      TK_FLAG_MULTI = 346,
      TK_FLAG_POSTCOMP = 347,
      TK_FLAG_IMMEDIATE = 348,
-     TK_FLAG_UNIQUE_REG = 349,
-     TK_FLAG_NAMED = 350,
-     TK_FLAG_SLURPY = 351,
-     TK_FLAG_FLAT = 352,
-     TK_FLAG_OPTIONAL = 353,
-     TK_FLAG_OPT_FLAG = 354,
-     TK_FLAG_INVOCANT = 355
+     TK_FLAG_LEXID = 349,
+     TK_FLAG_UNIQUE_REG = 350,
+     TK_FLAG_NAMED = 351,
+     TK_FLAG_SLURPY = 352,
+     TK_FLAG_FLAT = 353,
+     TK_FLAG_OPTIONAL = 354,
+     TK_FLAG_OPT_FLAG = 355,
+     TK_FLAG_INVOCANT = 356
    };
 #endif
 /* Tokens.  */
@@ -231,13 +232,14 @@
 #define TK_FLAG_MULTI 346
 #define TK_FLAG_POSTCOMP 347
 #define TK_FLAG_IMMEDIATE 348
-#define TK_FLAG_UNIQUE_REG 349
-#define TK_FLAG_NAMED 350
-#define TK_FLAG_SLURPY 351
-#define TK_FLAG_FLAT 352
-#define TK_FLAG_OPTIONAL 353
-#define TK_FLAG_OPT_FLAG 354
-#define TK_FLAG_INVOCANT 355
+#define TK_FLAG_LEXID 349
+#define TK_FLAG_UNIQUE_REG 350
+#define TK_FLAG_NAMED 351
+#define TK_FLAG_SLURPY 352
+#define TK_FLAG_FLAT 353
+#define TK_FLAG_OPTIONAL 354
+#define TK_FLAG_OPT_FLAG 355
+#define TK_FLAG_INVOCANT 356
 
 
 
@@ -259,7 +261,7 @@ typedef union YYSTYPE
     void *fixme;
 }
 /* Line 1489 of yacc.c.  */
-#line 263 "pirparser.h"
+#line 265 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

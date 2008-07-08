@@ -91,13 +91,14 @@ sub check_parens {
         my @lines = split( /\n/, $buf );
         for my $line (@lines) {
             next if $line =~ m{#\s*define};    # skip #defines
-            if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }x ) {
+            if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }xo ) {
+                my $paren = $1;
 
                 # ops use the same names as some C keywords, so skip
                 next if $line =~ m{^op};
-                push @keyword_paren => "$path: $1";
+                push @keyword_paren => "$path: $paren";
             }
-            if ( $line =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }x ) {
+            if ( $line =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }xo ) {
                 push @non_keyword_paren => "$path: $1";
             }
             if ( $line =~ m{ ( \( [ \t]+ [^\n] | [^\n] [ \t]+ \) ) }x ) {

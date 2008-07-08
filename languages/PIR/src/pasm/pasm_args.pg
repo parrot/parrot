@@ -34,18 +34,18 @@ rule arg_pmc_var {
 
 rule arg_exp_exp_lab {
   <simple_expr> 
-  [ \, | <syntax_error: ',' expected> ]
+  [ \, | <syntax_error: '\',\' expected'> ]
   <simple_expr> 
-  [ \, | <syntax_error: ',' expected> ]
+  [ \, | <syntax_error: '\',\' expected'> ]
   <id> 
 }
 
 rule isXX_args {
-  [ <int_reg> | <id> ] 
-  [ \, | <syntax_error: ',' expected> ]
-  [ <simple_expr> | <syntax_error: simple expr expected> ]
-  [ \,            | <syntax_error: ',' expected> ]
-  [ <simple_expr> | <syntax_error: simple expr expected> ]
+  [ <int_reg> | <id> ]
+  [ ','           | <syntax_error: '\',\' expected'> ]
+  [ <simple_expr> | <syntax_error: 'simple expr expected'> ]
+  [ ','           | <syntax_error: '\',\' expected'> ]
+  [ <simple_expr> | <syntax_error: 'simple expr expected'> ]
 }
 
 rule arg_get_params { 
@@ -53,12 +53,12 @@ rule arg_get_params {
 }
 
 rule param_flag_list {
-  [ \" | \' | <syntax_error: '"' expected> ]
-  [ \(      | <syntax_error: '(' expected> ]
+  [ \" | \' | <syntax_error: '\'"\' expected'> ]
+  [ \(      | <syntax_error: '\'(\' expected'> ]
   <pasm_param_flags>?
-  [ \)      | <syntax_error: ')' expected> ]  
-  [ \" | \' | <syntax_error: closing quote expected> ]
-  [ \, | <syntax_error: ',' expected> ]   
+  [ \)      | <syntax_error: '\')\' expected'> ]  
+  [ \" | \' | <syntax_error: 'closing quote expected'> ]
+  [ \, | <syntax_error: '\',\' expected'> ]   
 }
 
 rule arg_pmc_var_list {

@@ -63,7 +63,7 @@
     .param pmc propname
 .end
 
-.namespace
+.namespace []
 
 ## built-in functions
 ##

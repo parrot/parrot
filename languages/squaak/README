@@ -7,12 +7,10 @@ Note that Squaak is NOT an implementation Squeak; it has nothing to do
 with any SmallTalk implementation.
 
 Squaak demonstrates some common language constructs, but at the same
-time is lacking some other, seemingly simple features. For instance,
-Squaak does not have return, break or continue statements (or equivalents
-in your favorite syntax). This is due to lack of support by PAST currently
-
-Once PAST supports such control statements, Squaak will be extended with
-at least a return statement.
+time is currently lacking some other, seemingly simple features. For instance,
+Squaak does not have break or continue statements (or equivalents
+in your favorite syntax). Once PCT has built-in support for these, they
+will be added.
 
 Squaak has the following features:
 
@@ -21,13 +19,14 @@ Squaak has the following features:
    * aggregate types: arrays and hash tables
    * operators: +, -, /, *, %, <, <=, >, >=, ==, !=, .., and, or, not
    * subroutines and parameters
-   * assignments and various control statements, such as "if" and "while"
+   * assignments and various control statements, such as "if" and "while" and "return"
+   * library functions: print, read
 
 A number of common (more advanced) features are missing.
 Most notable are:
 
    * classes and objects
-   * exceptional control statements such as break and return
+   * exceptional control statements such as break and continue
    * advanced control statements such as switch
    * closures (nested subroutines and accessing local variables in an outer scope)
 
@@ -42,7 +41,7 @@ Running Squaak in interactive mode:
 
  $ ../../parrot squaak.pbc
 
-Running Squaak with a file (for instance, the included example):
+Running Squaak with a file (for instance, the included Game of Life example):
 
  $ ../../parrot squaak.pbc examples/life.sq
 

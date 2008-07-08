@@ -29,12 +29,12 @@ Tests all non-branching conditional operators.
 .endm
 
 .macro TEST()
-  test:
     is( res, exp, desc )
     ret
 .endm
 
 .macro SET_DESC(op)
+    .local string desc
     desc = .op
 .endm
 
@@ -46,8 +46,6 @@ Tests all non-branching conditional operators.
 
 .sub 'main' :main
     .include 'include/test_more.pir'
-
-    .local string res, exp, desc
 
     'plan'(TESTS)
 
@@ -68,7 +66,6 @@ Tests all non-branching conditional operators.
 
 .sub 'issame'
     .local int exp, res
-    .local string desc
     .SET_DESC('issame')
 
   init:
@@ -95,7 +92,6 @@ Tests all non-branching conditional operators.
 
 .sub 'isntsame'
     .local int exp, res
-    .local string desc
     .SET_DESC('isntsame')
 
   init:
@@ -122,7 +118,6 @@ Tests all non-branching conditional operators.
 
 .sub 'istrue'
     .local int exp, res
-    .local string desc
     .SET_DESC('istrue')
 
   init:
@@ -144,7 +139,6 @@ Tests all non-branching conditional operators.
 
 .sub 'isfalse'
     .local int exp, res
-    .local string desc
     .SET_DESC('isfalse')
 
   init:
@@ -166,7 +160,6 @@ Tests all non-branching conditional operators.
 
 .sub 'isnull'
     .local int exp, res
-    .local string desc
     .SET_DESC('isnull')
 
   init:
@@ -190,13 +183,13 @@ Tests all non-branching conditional operators.
 
   fubar:
     res = isnull $P0
+  test:
     .TEST()
 .end
 
 
 .sub 'isgt'
     .local string exp, res
-    .local string desc
 
     exp = '001'
 
@@ -353,7 +346,6 @@ Tests all non-branching conditional operators.
 
 .sub 'isge'
     .local string exp, res
-    .local string desc
 
     exp = '011'
 
@@ -510,7 +502,6 @@ Tests all non-branching conditional operators.
 
 .sub 'isle'
     .local string exp, res
-    .local string desc
 
     exp = '110'
 
@@ -667,7 +658,6 @@ Tests all non-branching conditional operators.
 
 .sub 'islt'
     .local string exp, res
-    .local string desc
 
     exp = '100'
 
@@ -824,7 +814,6 @@ Tests all non-branching conditional operators.
 
 .sub 'iseq'
     .local string exp, res
-    .local string desc
 
     exp = '010'
 
@@ -981,7 +970,6 @@ Tests all non-branching conditional operators.
 
 .sub 'isne'
     .local string exp, res
-    .local string desc
 
     exp = '101'
 
@@ -1138,7 +1126,6 @@ Tests all non-branching conditional operators.
 
 .sub 'cmp'
     .local string exp, res
-    .local string desc
     .SET_DESC('cmp')
 
   init:

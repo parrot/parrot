@@ -35,27 +35,27 @@ their operands.
 
 ########################################
 
-=item B<eq>(in INT, in INT, labelconst INT)
+=item B<eq>(in INT, in INT, inconst LABEL)
 
-=item B<eq>(in NUM, in NUM, labelconst INT)
+=item B<eq>(in NUM, in NUM, inconst LABEL)
 
-=item B<eq>(in STR, in STR, labelconst INT)
+=item B<eq>(in STR, in STR, inconst LABEL)
 
-=item B<eq>(invar PMC, invar PMC, labelconst INT)
+=item B<eq>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<eq>(invar PMC, in INT, labelconst INT)
+=item B<eq>(invar PMC, in INT, inconst LABEL)
 
-=item B<eq>(invar PMC, in NUM, labelconst INT)
+=item B<eq>(invar PMC, in NUM, inconst LABEL)
 
-=item B<eq>(invar PMC, in STR, labelconst INT)
+=item B<eq>(invar PMC, in STR, inconst LABEL)
 
-=item B<eq_str>(invar PMC, invar PMC, labelconst INT)
+=item B<eq_str>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<eq_num>(invar PMC, invar PMC, labelconst INT)
+=item B<eq_num>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<eq_addr>(in STR, in STR, labelconst INT)
+=item B<eq_addr>(in STR, in STR, inconst LABEL)
 
-=item B<eq_addr>(invar PMC, invar PMC, labelconst INT)
+=item B<eq_addr>(invar PMC, invar PMC, inconst LABEL)
 
 Branch if $1 is equal to $2. For PMCs this does a generic comparison,
 whatever that is for the involved PMCs. Mixed PMC number/string
@@ -67,31 +67,31 @@ B<eq_addr> compares the address of the objects or strings.
 
 =cut
 
-inline op eq(in INT, in INT, labelconst INT) :base_core {
+inline op eq(in INT, in INT, inconst LABEL) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
 }
 
-inline op eq(in NUM, in NUM, labelconst INT) :base_core {
+inline op eq(in NUM, in NUM, inconst LABEL) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
 }
 
-op eq(in STR, in STR, labelconst INT) :base_core {
+op eq(in STR, in STR, inconst LABEL) :base_core {
   if (string_equal(interp, $1, $2) == 0) {
     goto OFFSET($3);
   }
 }
 
-op eq(invar PMC, invar PMC, labelconst INT) :base_core {
+op eq(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
 }
 
-op eq(invar PMC, in INT, labelconst INT) :base_core {
+op eq(invar PMC, in INT, inconst LABEL) :base_core {
   /*
    * see also #34949
    * the temp is necessary, *if* $1 isa BigInt
@@ -103,7 +103,7 @@ op eq(invar PMC, in INT, labelconst INT) :base_core {
   }
 }
 
-op eq(invar PMC, in NUM, labelconst INT) :base_core {
+op eq(invar PMC, in NUM, inconst LABEL) :base_core {
   /*
    * the get_number and get_string should probably
    * be also replaced with code like above, as
@@ -115,32 +115,32 @@ op eq(invar PMC, in NUM, labelconst INT) :base_core {
   }
 }
 
-op eq(invar PMC, in STR, labelconst INT) :base_core {
+op eq(invar PMC, in STR, inconst LABEL) :base_core {
   if (0 == string_equal(interp,
       VTABLE_get_string(interp, $1), $2)) {
     goto OFFSET($3);
   }
 }
 
-op eq_str(invar PMC, invar PMC, labelconst INT) :base_core {
+op eq_str(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STREQ)) {
     goto OFFSET($3);
   }
 }
 
-op eq_num(invar PMC, invar PMC, labelconst INT) :base_core {
+op eq_num(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMEQ)) {
     goto OFFSET($3);
   }
 }
 
-op eq_addr(in STR, in STR, labelconst INT) :base_core {
+op eq_addr(in STR, in STR, inconst LABEL) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
 }
 
-op eq_addr(invar PMC, invar PMC, labelconst INT) :base_core {
+op eq_addr(invar PMC, invar PMC, inconst LABEL) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
@@ -148,57 +148,57 @@ op eq_addr(invar PMC, invar PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<ne>(in INT, in INT, labelconst INT)
+=item B<ne>(in INT, in INT, inconst LABEL)
 
-=item B<ne>(in NUM, in NUM, labelconst INT)
+=item B<ne>(in NUM, in NUM, inconst LABEL)
 
-=item B<ne>(in STR, in STR, labelconst INT)
+=item B<ne>(in STR, in STR, inconst LABEL)
 
-=item B<ne>(invar PMC, invar PMC, labelconst INT)
+=item B<ne>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<ne>(invar PMC, in INT, labelconst INT)
+=item B<ne>(invar PMC, in INT, inconst LABEL)
 
-=item B<ne>(invar PMC, in NUM, labelconst INT)
+=item B<ne>(invar PMC, in NUM, inconst LABEL)
 
-=item B<ne>(invar PMC, in STR, labelconst INT)
+=item B<ne>(invar PMC, in STR, inconst LABEL)
 
-=item B<ne_str>(invar PMC, invar PMC, labelconst INT)
+=item B<ne_str>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<ne_num>(invar PMC, invar PMC, labelconst INT)
+=item B<ne_num>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<ne_addr>(in STR, in STR, labelconst INT)
+=item B<ne_addr>(in STR, in STR, inconst LABEL)
 
-=item B<ne_addr>(invar PMC, invar PMC, labelconst INT)
+=item B<ne_addr>(invar PMC, invar PMC, inconst LABEL)
 
 Branch if $1 is not equal to $2.
 
 =cut
 
-inline op ne(in INT, in INT, labelconst INT) :base_core {
+inline op ne(in INT, in INT, inconst LABEL) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
 }
 
-inline op ne(in NUM, in NUM, labelconst INT) :base_core {
+inline op ne(in NUM, in NUM, inconst LABEL) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
 }
 
-op ne(in STR, in STR, labelconst INT) :base_core {
+op ne(in STR, in STR, inconst LABEL) :base_core {
   if (string_equal(interp, $1, $2) != 0) {
     goto OFFSET($3);
   }
 }
 
-op ne(invar PMC, invar PMC, labelconst INT) :base_core {
+op ne(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (! mmd_dispatch_i_pp(interp, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
 }
 
-op ne(invar PMC, in INT, labelconst INT) :base_core {
+op ne(invar PMC, in INT, inconst LABEL) :base_core {
   PMC *temp = pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (! mmd_dispatch_i_pp(interp, $1, temp, MMD_EQ)) {
@@ -206,38 +206,38 @@ op ne(invar PMC, in INT, labelconst INT) :base_core {
   }
 }
 
-op ne(invar PMC, in NUM, labelconst INT) :base_core {
+op ne(invar PMC, in NUM, inconst LABEL) :base_core {
   if (VTABLE_get_number(interp, $1) != $2) {
     goto OFFSET($3);
   }
 }
 
-op ne(invar PMC, in STR, labelconst INT) :base_core {
+op ne(invar PMC, in STR, inconst LABEL) :base_core {
   if (0 != string_equal(interp,
       VTABLE_get_string(interp, $1), $2)) {
     goto OFFSET($3);
   }
 }
 
-op ne_str(invar PMC, invar PMC, labelconst INT) :base_core {
+op ne_str(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) != 0) {
     goto OFFSET($3);
   }
 }
 
-op ne_num(invar PMC, invar PMC, labelconst INT) :base_core {
+op ne_num(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) != 0) {
     goto OFFSET($3);
   }
 }
 
-op ne_addr(in STR, in STR, labelconst INT) :base_core {
+op ne_addr(in STR, in STR, inconst LABEL) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
 }
 
-op ne_addr(invar PMC, invar PMC, labelconst INT) :base_core {
+op ne_addr(invar PMC, invar PMC, inconst LABEL) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
@@ -245,53 +245,53 @@ op ne_addr(invar PMC, invar PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<lt>(in INT, in INT, labelconst INT)
+=item B<lt>(in INT, in INT, inconst LABEL)
 
-=item B<lt>(in NUM, in NUM, labelconst INT)
+=item B<lt>(in NUM, in NUM, inconst LABEL)
 
-=item B<lt>(in STR, in STR, labelconst INT)
+=item B<lt>(in STR, in STR, inconst LABEL)
 
-=item B<lt>(invar PMC, invar PMC, labelconst INT)
+=item B<lt>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<lt>(invar PMC, in INT, labelconst INT)
+=item B<lt>(invar PMC, in INT, inconst LABEL)
 
-=item B<lt>(invar PMC, in NUM, labelconst INT)
+=item B<lt>(invar PMC, in NUM, inconst LABEL)
 
-=item B<lt>(invar PMC, in STR, labelconst INT)
+=item B<lt>(invar PMC, in STR, inconst LABEL)
 
-=item B<lt_str>(invar PMC, invar PMC, labelconst INT)
+=item B<lt_str>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<lt_num>(invar PMC, invar PMC, labelconst INT)
+=item B<lt_num>(invar PMC, invar PMC, inconst LABEL)
 
 Branch if $1 is less than $2.
 
 =cut
 
-inline op lt(in INT, in INT, labelconst INT) :base_core {
+inline op lt(in INT, in INT, inconst LABEL) :base_core {
   if ($1 < $2) {
     goto OFFSET($3);
   }
 }
 
-inline op lt(in NUM, in NUM, labelconst INT) :base_core {
+inline op lt(in NUM, in NUM, inconst LABEL) :base_core {
   if ($1 < $2) {
     goto OFFSET($3);
   }
 }
 
-op lt(in STR, in STR, labelconst INT) :base_core {
+op lt(in STR, in STR, inconst LABEL) :base_core {
   if (string_compare(interp, $1, $2) < 0) {
     goto OFFSET($3);
   }
 }
 
-op lt(invar PMC, invar PMC, labelconst INT) :base_core {
+op lt(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) < 0) {
     goto OFFSET($3);
   }
 }
 
-op lt(invar PMC, in INT, labelconst INT) :base_core {
+op lt(invar PMC, in INT, inconst LABEL) :base_core {
   PMC *temp = pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) < 0) {
@@ -299,26 +299,26 @@ op lt(invar PMC, in INT, labelconst INT) :base_core {
   }
 }
 
-op lt(invar PMC, in NUM, labelconst INT) :base_core {
+op lt(invar PMC, in NUM, inconst LABEL) :base_core {
   if (VTABLE_get_number(interp, $1) < $2) {
     goto OFFSET($3);
   }
 }
 
-op lt(invar PMC, in STR, labelconst INT) :base_core {
+op lt(invar PMC, in STR, inconst LABEL) :base_core {
   if (string_compare(interp,
       VTABLE_get_string(interp, $1), $2) < 0) {
     goto OFFSET($3);
   }
 }
 
-op lt_str(invar PMC, invar PMC, labelconst INT) :base_core {
+op lt_str(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) < 0) {
     goto OFFSET($3);
   }
 }
 
-op lt_num(invar PMC, invar PMC, labelconst INT) :base_core {
+op lt_num(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) < 0) {
     goto OFFSET($3);
   }
@@ -326,53 +326,53 @@ op lt_num(invar PMC, invar PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<le>(in INT, in INT, labelconst INT)
+=item B<le>(in INT, in INT, inconst LABEL)
 
-=item B<le>(in NUM, in NUM, labelconst INT)
+=item B<le>(in NUM, in NUM, inconst LABEL)
 
-=item B<le>(in STR, in STR, labelconst INT)
+=item B<le>(in STR, in STR, inconst LABEL)
 
-=item B<le>(invar PMC, invar PMC, labelconst INT)
+=item B<le>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<le>(invar PMC, in INT, labelconst INT)
+=item B<le>(invar PMC, in INT, inconst LABEL)
 
-=item B<le>(invar PMC, in NUM, labelconst INT)
+=item B<le>(invar PMC, in NUM, inconst LABEL)
 
-=item B<le>(invar PMC, in STR, labelconst INT)
+=item B<le>(invar PMC, in STR, inconst LABEL)
 
-=item B<le_str>(invar PMC, invar PMC, labelconst INT)
+=item B<le_str>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<le_num>(invar PMC, invar PMC, labelconst INT)
+=item B<le_num>(invar PMC, invar PMC, inconst LABEL)
 
 Branch if $1 is less than or equal to $2.
 
 =cut
 
-inline op le(in INT, in INT, labelconst INT) :base_core {
+inline op le(in INT, in INT, inconst LABEL) :base_core {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
 }
 
-inline op le(in NUM, in NUM, labelconst INT) :base_core {
+inline op le(in NUM, in NUM, inconst LABEL) :base_core {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
 }
 
-op le(in STR, in STR, labelconst INT) :base_core {
+op le(in STR, in STR, inconst LABEL) :base_core {
   if (string_compare(interp, $1, $2) <= 0) {
     goto OFFSET($3);
   }
 }
 
-op le(invar PMC, invar PMC, labelconst INT) :base_core {
+op le(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) <= 0) {
     goto OFFSET($3);
   }
 }
 
-op le(invar PMC, in INT, labelconst INT) :base_core {
+op le(invar PMC, in INT, inconst LABEL) :base_core {
   PMC *temp = pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) <= 0) {
@@ -380,26 +380,26 @@ op le(invar PMC, in INT, labelconst INT) :base_core {
   }
 }
 
-op le(invar PMC, in NUM, labelconst INT) :base_core {
+op le(invar PMC, in NUM, inconst LABEL) :base_core {
   if (VTABLE_get_number(interp, $1) <= $2) {
     goto OFFSET($3);
   }
 }
 
-op le(invar PMC, in STR, labelconst INT) :base_core {
+op le(invar PMC, in STR, inconst LABEL) :base_core {
   if (string_compare(interp,
       VTABLE_get_string(interp, $1), $2) <= 0) {
     goto OFFSET($3);
   }
 }
 
-op le_str(invar PMC, invar PMC, labelconst INT) :base_core {
+op le_str(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) <= 0) {
     goto OFFSET($3);
   }
 }
 
-op le_num(invar PMC, invar PMC, labelconst INT) :base_core {
+op le_num(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) <= 0) {
     goto OFFSET($3);
   }
@@ -407,29 +407,29 @@ op le_num(invar PMC, invar PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<gt>(invar PMC, invar PMC, labelconst INT)
+=item B<gt>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<gt>(invar PMC, in INT, labelconst INT)
+=item B<gt>(invar PMC, in INT, inconst LABEL)
 
-=item B<gt>(invar PMC, in NUM, labelconst INT)
+=item B<gt>(invar PMC, in NUM, inconst LABEL)
 
-=item B<gt>(invar PMC, in STR, labelconst INT)
+=item B<gt>(invar PMC, in STR, inconst LABEL)
 
-=item B<gt_str>(invar PMC, invar PMC, labelconst INT)
+=item B<gt_str>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<gt_num>(invar PMC, invar PMC, labelconst INT)
+=item B<gt_num>(invar PMC, invar PMC, inconst LABEL)
 
 Branch if $1 is greater than $2.
 
 =cut
 
-op gt(invar PMC, invar PMC, labelconst INT) :base_core {
+op gt(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) > 0) {
     goto OFFSET($3);
   }
 }
 
-op gt(invar PMC, in INT, labelconst INT) :base_core {
+op gt(invar PMC, in INT, inconst LABEL) :base_core {
   PMC *temp = pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) > 0) {
@@ -437,26 +437,26 @@ op gt(invar PMC, in INT, labelconst INT) :base_core {
   }
 }
 
-op gt(invar PMC, in NUM, labelconst INT) :base_core {
+op gt(invar PMC, in NUM, inconst LABEL) :base_core {
   if (VTABLE_get_number(interp, $1) > $2) {
     goto OFFSET($3);
   }
 }
 
-op gt(invar PMC, in STR, labelconst INT) :base_core {
+op gt(invar PMC, in STR, inconst LABEL) :base_core {
   if (string_compare(interp,
       VTABLE_get_string(interp, $1), $2) > 0) {
     goto OFFSET($3);
   }
 }
 
-op gt_str(invar PMC, invar PMC, labelconst INT) :base_core {
+op gt_str(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) > 0) {
     goto OFFSET($3);
   }
 }
 
-op gt_num(invar PMC, invar PMC, labelconst INT) :base_core {
+op gt_num(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) > 0) {
     goto OFFSET($3);
   }
@@ -464,29 +464,29 @@ op gt_num(invar PMC, invar PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<ge>(invar PMC, invar PMC, labelconst INT)
+=item B<ge>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<ge>(invar PMC, in INT, labelconst INT)
+=item B<ge>(invar PMC, in INT, inconst LABEL)
 
-=item B<ge>(invar PMC, in NUM, labelconst INT)
+=item B<ge>(invar PMC, in NUM, inconst LABEL)
 
-=item B<ge>(invar PMC, in STR, labelconst INT)
+=item B<ge>(invar PMC, in STR, inconst LABEL)
 
-=item B<ge_str>(invar PMC, invar PMC, labelconst INT)
+=item B<ge_str>(invar PMC, invar PMC, inconst LABEL)
 
-=item B<ge_num>(invar PMC, invar PMC, labelconst INT)
+=item B<ge_num>(invar PMC, invar PMC, inconst LABEL)
 
 Branch if $1 is greater than or equal to $2.
 
 =cut
 
-op ge(invar PMC, invar PMC, labelconst INT) :base_core {
+op ge(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_CMP) >= 0) {
     goto OFFSET($3);
   }
 }
 
-op ge(invar PMC, in INT, labelconst INT) :base_core {
+op ge(invar PMC, in INT, inconst LABEL) :base_core {
   PMC *temp = pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
   if (mmd_dispatch_i_pp(interp, $1, temp, MMD_CMP) >= 0) {
@@ -494,25 +494,25 @@ op ge(invar PMC, in INT, labelconst INT) :base_core {
   }
 }
 
-op ge(invar PMC, in NUM, labelconst INT) :base_core {
+op ge(invar PMC, in NUM, inconst LABEL) :base_core {
   if (VTABLE_get_number(interp, $1) >= $2) {
     goto OFFSET($3);
   }
 }
 
-op ge(invar PMC, in STR, labelconst INT) :base_core {
+op ge(invar PMC, in STR, inconst LABEL) :base_core {
   if (string_compare(interp, VTABLE_get_string(interp, $1), $2) >= 0) {
     goto OFFSET($3);
   }
 }
 
-op ge_str(invar PMC, invar PMC, labelconst INT) :base_core {
+op ge_str(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_STRCMP) >= 0) {
     goto OFFSET($3);
   }
 }
 
-op ge_num(invar PMC, invar PMC, labelconst INT) :base_core {
+op ge_num(invar PMC, invar PMC, inconst LABEL) :base_core {
   if (mmd_dispatch_i_pp(interp, $1, $2, MMD_NUMCMP) >= 0) {
     goto OFFSET($3);
   }
@@ -520,23 +520,23 @@ op ge_num(invar PMC, invar PMC, labelconst INT) :base_core {
 
 ########################################
 
-=item B<if_null>(invar PMC, labelconst INT)
+=item B<if_null>(invar PMC, inconst LABEL)
 
 Branch to $2 if $1 is a NULL PMC.
 
-=item B<if_null>(invar STR, labelconst INT)
+=item B<if_null>(invar STR, inconst LABEL)
 
 Branch to $2 if $1 is a NULL STRING.
 
 =cut
 
-op if_null(invar PMC, labelconst INT) {
+op if_null(invar PMC, inconst LABEL) {
   if (PMC_IS_NULL($1)) {
     goto OFFSET($2);
   }
 }
 
-op if_null(invar STR, labelconst INT) {
+op if_null(invar STR, inconst LABEL) {
   if (!$1) {
     goto OFFSET($2);
   }
@@ -544,23 +544,23 @@ op if_null(invar STR, labelconst INT) {
 
 ########################################
 
-=item B<unless_null>(invar PMC, labelconst INT)
+=item B<unless_null>(invar PMC, inconst LABEL)
 
 Branch to $2 if $1 is I<not> a NULL PMC.
 
-=item B<unless_null>(invar STR, labelconst INT)
+=item B<unless_null>(invar STR, inconst LABEL)
 
 Branch to $2 if $1 is I<not> a NULL STRING.
 
 =cut
 
-op unless_null(invar PMC, labelconst INT) {
+op unless_null(invar PMC, inconst LABEL) {
   if (!PMC_IS_NULL($1)) {
     goto OFFSET($2);
   }
 }
 
-op unless_null(invar STR, labelconst INT) {
+op unless_null(invar STR, inconst LABEL) {
   if ($1) {
     goto OFFSET($2);
   }

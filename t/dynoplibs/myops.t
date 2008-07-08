@@ -79,6 +79,8 @@ END_PASM
     my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
        ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
 
+TODO: {
+local $TODO = 'fails on win32' if $^O =~ m/win32/i;
 pir_output_is( << 'CODE', << 'OUTPUT', "one alarm", @todo );
 .loadlib "myops_ops"
 
@@ -108,6 +110,7 @@ alarm
 3
 done.
 OUTPUT
+}
 
 SKIP: {
     skip "three alarms, infinite loop under mingw32", 2 if $is_mingw;
@@ -294,4 +297,3 @@ OUTPUT
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-

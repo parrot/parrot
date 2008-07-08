@@ -172,6 +172,16 @@ typedef struct PDB {
 /* HEADERIZER BEGIN: src/debug.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_debugger_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
+        __attribute__nonnull__(1);
+
 long PDB_add_label(
     ARGMOD(PDB_file_t *file),
     ARGIN(const opcode_t *cur_opcode),
@@ -249,9 +259,6 @@ void PDB_eval(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int PDB_extend_const_table(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PDB_breakpoint_t * PDB_find_breakpoint(PARROT_INTERP,
@@ -326,51 +333,6 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/debug.c */
-
-
-/*
- * These constants correspond to the debugger commands and are
- * used in src/debug.c. To map command strings to their
- * numeric values, use the algorithm from parse_command() in that file.
- */
-
-#define PARROT_c_b             25245
-#define PARROT_c_c             25500
-#define PARROT_c_d             25755
-#define PARROT_c_e             26010
-#define PARROT_c_h             26775
-#define PARROT_c_i             27030
-#define PARROT_c_l             27795
-#define PARROT_c_n             28305
-#define PARROT_c_p             28815
-#define PARROT_c_q             29070
-#define PARROT_c_r             29325
-#define PARROT_c_s             29580
-#define PARROT_c_t             29835
-#define PARROT_c_w             30600
-#define PARROT_c_int           175185
-#define PARROT_c_run           176460
-#define PARROT_c_num           174675
-#define PARROT_c_str           179265
-#define PARROT_c_pmc           163455
-#define PARROT_c_eval          277950
-#define PARROT_c_help          282540
-#define PARROT_c_info          281775
-#define PARROT_c_list          295035
-#define PARROT_c_load          268005
-#define PARROT_c_next          297330
-#define PARROT_c_quit          294780
-#define PARROT_c_break         409785
-#define PARROT_c_print         441150
-#define PARROT_c_stack         414120
-#define PARROT_c_trace         405705
-#define PARROT_c_watch         416160
-#define PARROT_c_enable        571455
-#define PARROT_c_delete        588285
-#define PARROT_c_script_file   617610
-#define PARROT_c_disable       772140
-#define PARROT_c_continue      1053405
-#define PARROT_c_disassemble   1903830
 
 #endif /* PARROT_PDB_H_GUARD */
 

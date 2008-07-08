@@ -2,7 +2,7 @@
 # help shootout compile
 
 .HLL '_Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub 'interp'
   .param string retval

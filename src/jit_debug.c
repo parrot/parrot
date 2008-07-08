@@ -289,9 +289,9 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
         /* chop pasm/pir */
 
         ext = strrchr(src, '.');
-        if (ext && strcmp(ext, ".pasm") == 0)
+        if (ext && STREQ(ext, ".pasm"))
             string_chopn_inplace(interp, file, 4);
-        else if (ext && strcmp(ext, ".pir") == 0)
+        else if (ext && STREQ(ext, ".pir"))
             string_chopn_inplace(interp, file, 3);
         else if (!ext) /* EVAL_n */
             file = string_append(interp, file,
@@ -307,15 +307,15 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
     stabsfile = debug_file(interp, file, "stabs.s");
     ofile     = debug_file(interp, file, "o");
     {
-        char *temp = string_to_cstring(interp, stabsfile);
-        stabs      = fopen(temp, "w");
+        char *const temp = string_to_cstring(interp, stabsfile);
+        stabs            = fopen(temp, "w");
         string_cstring_free(temp);
     }
     if (stabs == NULL)
         return;
 
     {
-        char *temp = string_to_cstring(interp, pasmfile);
+        char * const temp = string_to_cstring(interp, pasmfile);
         /* filename info */
         fprintf(stabs, ".data\n.text\n");       /* darwin wants it */
         fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n", temp);

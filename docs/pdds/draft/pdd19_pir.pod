@@ -5,6 +5,11 @@
 
 docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
 
+=head1 VERSION
+
+$Revision$
+
+
 =head1 ABSTRACT
 
 This document outlines the architecture and core syntax of the Parrot
@@ -13,15 +18,13 @@ Intermediate Representation (PIR).
 This document describes PIR, a stable, middle-level language for both
 compiler and human to target on.
 
-=head1 VERSION
-
-$Revision$
-
 =head1 DESCRIPTION
 
 PIR is a stable, middle-level language intended both as a target for the
 generated output from high-level language compilers, and for human use
 developing core features and extensions for Parrot.
+
+=head1 IMPLEMENTATION
 
 =head2 Basic Syntax
 
@@ -276,20 +279,21 @@ Closes the scope block that was opened with .namespace <identifier>.
 
 =item .namespace [ <identifier> ; <identifier> ]
 
+   .namespace [ <key>? ]
+
+   key: <identifier> [';' <identifier>]*
+
 Defines the namespace from this point onwards.  By default the program is not
 in any namespace.  If you specify more than one, separated by semicolons, it
 creates nested namespaces, by storing the inner namespace object in the outer
 namespace's global pad.
 
-{{ PROPOSAL: make the brackets non-optional for specifying the "root"
-namespace, so the key becomes optional.
+You can specify the root namespace by using empty brackets, such as:
 
-   .namespace [ <key>? ]
+    .namespace [ ]
 
-   key: <identifier> [';' <identifier>]*
+The brackets are not optional, although the string inside them is.
 
-   Also, the "identifier" should be a quoted string?
-}}
 
 =item .pragma n_operators
 
@@ -823,8 +827,10 @@ the C<assign_pmc> vtable function.
 {{ NOTE: response to the question:
 
     <pmichaud>  I don't think that 'morph' as a method call is a good idea
-    <pmichaud>  we need something that says "assign to value" versus "assign to container"
-    <pmichaud>  we can't eliminate the existing 'morph' opcode until we have a replacement
+    <pmichaud>  we need something that says "assign to value" versus
+        "assign to container"
+    <pmichaud>  we can't eliminate the existing 'morph' opcode until we have a
+        replacement
 
 }}
 
@@ -844,15 +850,15 @@ file are inserted as if they were written at the point where the
 C<.include> directive occurs.
 
 The include file is searched for in the current directory and in
-runtime/parrot/include, in that order. The first file of that name to
-be found is included.
+runtime/parrot/include, in that order. The first file of that name to be found
+is included.
 
-{{ Check the search order of the include directive and whether it's complete }}
+{{ Check the include directive's search order and whether it's complete }}
 
 =item * C<.macro> <identifier> [<parameters>]
 
-The C<.macro> directive starts the definition of a macro named by the
-specified identifier. The optional parameter list is a comma-separated list of
+The C<.macro> directive starts the a macro definition named by the specified
+identifier. The optional parameter list is a comma-separated list of
 identifiers, enclosed in parentheses.  See C<.endm> for ending the macro
 definition.
 

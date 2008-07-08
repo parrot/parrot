@@ -7,7 +7,7 @@ quine.pir -- a simple print, the code is passed in
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'quine'
 

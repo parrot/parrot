@@ -161,8 +161,8 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
     /* Set up the memory allocation system */
     mem_setup_allocator(interp);
-    Parrot_block_DOD(interp);
-    Parrot_block_GC(interp);
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
 
     /*
      * Set up the string subsystem
@@ -249,8 +249,8 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
      * Actually, we could enable DOD/GC earlier, but here all setup is
      * done
      */
-    Parrot_unblock_DOD(interp);
-    Parrot_unblock_GC(interp);
+    Parrot_unblock_GC_mark(interp);
+    Parrot_unblock_GC_sweep(interp);
 
     /* all sys running, init the event and signal stuff
      * the first or "master" interpreter is handling events and signals
@@ -345,7 +345,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
-    Parrot_do_dod_run(interp, DOD_finish_FLAG);
+    Parrot_do_dod_run(interp, GC_finish_FLAG);
 
 #if STM_PROFILE
     if (interp->thread_data && interp->thread_data->stm_log &&
@@ -407,8 +407,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Parrot_merge_memory_pools(interp->parent_interpreter, interp);
     }
 
-    if (interp->arena_base->de_init_gc_system)
-        interp->arena_base->de_init_gc_system(interp);
+    if (interp->arena_base->finalize_gc_system)
+        interp->arena_base->finalize_gc_system(interp);
 
     /* copies of constant tables */
     Parrot_destroy_constants(interp);

@@ -557,7 +557,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
                 _("FixedPMCArray: index out of bounds!"));
 
         data      = (PMC**)PMC_data(SELF);
-        DOD_WRITE_BARRIER(INTERP, SELF, data[key], src);
+        GC_WRITE_BARRIER(INTERP, SELF, data[key], src);
         data[key] = src;
     }
 
@@ -688,6 +688,31 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         const INTVAL ix = key_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
+
+/*
+
+=item C<void splice(PMC *value, INTVAL offset, INTVAL count)>
+
+Replaces C<count> elements starting at C<offset> with the elements in C<value>.
+
+If C<count> is 0 then the elements in C<value> will be inserted after
+C<offset>.
+
+This throws an exception if any of the spliced in values are out of the range
+of this array.
+
+*/
+
+    void splice(PMC *value, INTVAL offset, INTVAL count) {
+        if (count + offset > PMC_int_val(SELF))
+            real_exception(INTERP, NULL, E_IndexError,
+                _("FixedPMCArray: index out of bounds!"));
+
+        for (count--; count >= 0; --count) {
+            VTABLE_set_pmc_keyed_int(INTERP, SELF, offset + count, value);
+        }
+    }
+
 
 /*
 

@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -14,13 +14,13 @@ use Test::Harness  ();
 
 =head1 Languages harness
 
-There are 4 ways to run a language test: 
+There are 4 ways to run a language test:
 
 =over 4
 
 =item Overall Harness
 
-    make languages-test 
+    make languages-test
 
 or
 
@@ -68,8 +68,8 @@ called by languages/Makefile with an explicit perl.
 # Step 0: handle command line args
 my $do_gen_html;       # smoke testing
 my $languages_list;    # select a subset of languages
-my $result = GetOptions( 'html'          => \$do_gen_html,    
-                         'languages=s'   => \$languages_list );  
+my $result = GetOptions( 'html'          => \$do_gen_html,
+                         'languages=s'   => \$languages_list );
 
 # Step 1: find harness files for testable languages
 
@@ -87,7 +87,7 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 my @unified_testable_languages
     = defined $languages_list ?
           split( /\s*,\s*/, $languages_list )
-          : 
+          :
           qw( abc APL
               befunge bf
               cola
@@ -97,7 +97,7 @@ my @unified_testable_languages
               lazy-k lisp lua
               m4
               ook
-              parrot_compiler PIR plumhead punie
+              parrot_compiler PIR pipp punie
               regex
               scheme
               tcl
@@ -115,7 +115,7 @@ my @harnesses
 my @tests;
 foreach my $harness (@harnesses) {
     my $perl = "$^X -I" . File::Spec->join(File::Spec->updir(), 'lib');
-    open(FILES, "$perl $harness --files --master |");  
+    open(FILES, "$perl $harness --files --master |");
     push @tests, <FILES>;
     close(FILES);
 }
@@ -190,3 +190,10 @@ else {
         print "$html_fn has been generated.\n";
     }
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -2,16 +2,16 @@ This file is best viewed with "perldoc README.cygwin".
 
 =head1 NAME
 
-README.cygwin - Parrot under cygwin
+README.cygwin - Parrot under Cygwin
 
-=head1 SYNOPSIS 
+=head1 SYNOPSIS
 
-parrot builds out of the box under cygwin. 
-Some tweaks are needed for different names of dynamic loading of some dll's.
+Parrot builds out of the box under Cygwin.  Some tweaks are needed for
+different names of dynamic loading of some dll's.
 
 =head1 Packages
 
-You'll need the following cygwin packages to build parrot.
+You'll need the following Cygwin packages to build Parrot.
 
 =over 4
 
@@ -23,17 +23,19 @@ You'll need the following cygwin packages to build parrot.
 
 =item subversion
 
-If you use svn to get a copy of parrot, you should use the cygwin svn
-and not the tortoiseSVN client to avoid build errors.
+If you use SVN to get a copy of Parrot, you should use the Cygwin SVN
+and not the TortoiseSVN client to avoid build errors.  Similarly you will
+need Cygwin Perl rather than ActiveState or Strawberry Perl.
 
-=item ICU 
+=item ICU
 
-This is no official cygwin package yet.
-However, icu4c-3_8 builds out of the box on cygwin.
+This is no official Cygwin package yet.  However, icu4c-3_8 builds out of the
+box on Cygwin.
+
   http://download.icu-project.org/files/icu4c/3.8/icu4c-3_8-src.tgz
 
-Note that ICU is now optional, you can build Parrot without it, 
-by not installing it or asking Parrot to ignore it (C<--without-icu>). 
+Note that ICU is now optional, you can build Parrot without it,
+by not installing it or asking Parrot to ignore it (C<--without-icu>).
 
 =back
 
@@ -59,17 +61,17 @@ fix the blib/lib PATH issue
 
 cyg*-1.1.dll instead of lib*.so.1.1
 
-Thanks to the L<Windows DLL Hell / http://> and the impossibility of file 
-hardlinks, windows dll names are versioned, so the loadlib function or the various 
-pir's needs more logic.
+Thanks to the L<Windows DLL Hell / http://> and the impossibility of file
+hardlinks, windows dll names are versioned, so the loadlib function or the
+various pir's needs more logic.
 
-Either add the version to each loadlib call, and stem the version from 
-POSIX versions within get_path(), or add an optional version argument to 
-loadlib for win32. Or just fix all the pir's.
+Either add the version to each loadlib call, and stem the version from POSIX
+versions within get_path(), or add an optional version argument to loadlib for
+win32. Or just fix all the pir's.
 
 =item Features
 
-Threads, Events, and Signals are missing. 
+Threads, Events, and Signals are missing.
 
 =back
 
@@ -85,8 +87,8 @@ Threads, Events, and Signals are missing.
 
     L<parrot>
 
-=head1 HISTORY 
+=head1 HISTORY
 
-Last updated: 13 April 2008
+Last updated: 1 June 2008
 
 =cut

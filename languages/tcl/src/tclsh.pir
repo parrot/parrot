@@ -8,7 +8,7 @@
 
 .HLL 'Tcl', 'tcl_group'
 
-.include 'languages/tcl/src/returncodes.pir'
+.include 'languages/tcl/src/returncodes.pasm'
 .include 'languages/tcl/src/macros.pir'
 
 .macro set_tcl_argv()
@@ -115,7 +115,6 @@ loop_error:
 loop_error_real:
   .get_stacktrace($S0)
   print $S0
-  #goto input_loop_continue
 
 input_loop_continue:
   level = 1
@@ -178,11 +177,11 @@ done:
 file_error:
   .catch()
   .get_severity($I0)
-  .include 'except_severity.pasm'
+
   if $I0 == .EXCEPT_EXIT goto exit_exception
   .get_return_code($I0)
-  if $I0 == TCL_CONTINUE goto continue_outside_loop
-  if $I0 == TCL_BREAK    goto break_outside_loop
+  if $I0 == .CONTROL_CONTINUE goto continue_outside_loop
+  if $I0 == .CONTROL_BREAK    goto break_outside_loop
   .get_stacktrace($S0)
   print $S0
   end

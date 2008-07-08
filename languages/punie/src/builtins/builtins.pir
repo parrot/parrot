@@ -1,4 +1,4 @@
-.namespace
+.namespace []
 
 .sub 'infix:=='
     .param pmc a

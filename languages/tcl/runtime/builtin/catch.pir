@@ -2,7 +2,7 @@
 # [catch]
 
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub '&catch'
   .param pmc argv :slurpy
@@ -26,7 +26,7 @@
   push_eh non_ok
     $P2 = __script(code, 'ns' => ns)
     code_retval = $P2()
-    retval = TCL_OK  # no exception => TCL_OK
+    retval = .CONTROL_OK
   pop_eh
 
   goto got_retval
@@ -37,7 +37,7 @@ non_ok:
   .get_message(code_retval)
 
 got_retval:
-  if argc == 1 goto done
+  if argc == 1 goto handle_retval
 
   varname = argv[1]
 
@@ -46,6 +46,26 @@ got_retval:
   .local pmc __set
   __set = get_root_global ['_tcl'], '__set'
   __set(varname,code_retval)
+
+handle_retval:
+  # We need to convert the code
+  if retval != .CONTROL_OK goto handle_error
+  retval = .TCL_OK
+  goto done
+handle_error:
+  if retval != .CONTROL_ERROR goto handle_return
+  retval = .TCL_ERROR
+  goto done
+handle_return:
+  if retval != .CONTROL_RETURN goto handle_break
+  retval = .TCL_RETURN
+  goto done
+handle_break:
+  if retval != .CONTROL_BREAK goto handle_continue
+  retval = .TCL_BREAK
+  goto done
+handle_continue:
+  retval = .TCL_CONTINUE
 
 done:
   .return(retval)

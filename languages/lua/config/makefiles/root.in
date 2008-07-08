@@ -16,6 +16,9 @@ TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 PBC_TO_EXE = ../../pbc_to_exe@exe@
 RECONFIGURE = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 ## places to look for things
 LIBPATH  = src/lib
@@ -62,7 +65,8 @@ LIB_SRCS = \
  $(LIBPATH)/luaio.pir \
  $(LIBPATH)/luafile.pir \
  $(LIBPATH)/luaos.pir \
- $(LIBPATH)/luadebug.pir
+ $(LIBPATH)/luadebug.pir \
+ $(LIBPATH)/luabytecode.pir
 
 LIB_PBCS = \
  $(LIBPATH)/luaaux.pbc \
@@ -76,7 +80,8 @@ LIB_PBCS = \
  $(LIBPATH)/luaio.pbc \
  $(LIBPATH)/luafile.pbc \
  $(LIBPATH)/luaos.pbc \
- $(LIBPATH)/luadebug.pbc
+ $(LIBPATH)/luadebug.pbc \
+ $(LIBPATH)/luabytecode.pbc
 
 GEN_PIR = \
  src/lua51_testlex_gen.pir \
@@ -175,6 +180,9 @@ $(LIBPATH)/luaos.pbc: $(LIBPATH)/luaos.pir
 
 $(LIBPATH)/luadebug.pbc: $(LIBPATH)/luadebug.pir
 	$(PARROT) --output=$(LIBPATH)/luadebug.pbc $(LIBPATH)/luadebug.pir
+
+$(LIBPATH)/luabytecode.pbc: $(LIBPATH)/luabytecode.pir $(LIBPATH)/luabytecode_gen.pir
+	$(PARROT) --output=$(LIBPATH)/luabytecode.pbc $(LIBPATH)/luabytecode.pir
 
 $(LIBPATH)/alarm.pbc: $(LIBPATH)/alarm.pir
 	$(PARROT) --output=$(LIBPATH)/alarm.pbc $(LIBPATH)/alarm.pir

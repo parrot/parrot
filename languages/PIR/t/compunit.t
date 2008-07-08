@@ -62,7 +62,7 @@ CODE
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'Root namespace' );
 
-.namespace
+.namespace []
 
 CODE
 

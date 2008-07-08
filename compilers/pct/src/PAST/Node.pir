@@ -89,7 +89,7 @@ associated with the argument.
 .end
 
 
-=item flat([value]
+=item flat([value])
 
 Accessor method -- sets/returns the "flatten" flag on arguments.
 
@@ -453,6 +453,21 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('blocktype', value, has_value)
+.end
+
+
+=item control([value])
+
+Get/set the control exception handler for this block to C<value>.
+The exception handler can be any PAST tree.  The special (string)
+value "return" generates code to handle C<CONTROL_RETURN> exceptions.
+
+=cut
+
+.sub 'control' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('control', value, has_value)
 .end
 
 

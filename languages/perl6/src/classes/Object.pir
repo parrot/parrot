@@ -22,129 +22,111 @@ Perform initializations and create the base classes.
 
 =cut
 
-.namespace ['Perl6Object']
-
+.namespace []
 .sub 'onload' :anon :init :load
     .local pmc p6meta
     load_bytecode 'P6object.pbc'
-    $P0 = get_hll_global 'P6metaclass'
-    $P0.'new_class'('Perl6Object', 'attr'=>'%!properties', 'name'=>'Object')
+    $P0 = get_root_global ['parrot'], 'P6metaclass'
+    $P0.'new_class'('Perl6Object', 'name'=>'Object')
     p6meta = $P0.'HOW'()
     set_hll_global ['Perl6Object'], '$!P6META', p6meta
 .end
 
+=item infix:=(source)  (assignment method)
 
-=item !keyword_class(name)
-
-Internal helper method to create a class.
-
-=cut
-
-.sub '!keyword_class' :method
-    .param string name
-    .local pmc class, resolve_list, methods, iter
-
-    # Create class.
-    class = newclass name
-
-    # Set resolve list to include all methods of the class.
-    methods = inspect class, 'methods'
-    iter = new 'Iterator', methods
-    resolve_list = new 'ResizableStringArray'
-resolve_loop:
-    unless iter goto resolve_loop_end
-    $P0 = shift iter
-    push resolve_list, $P0
-    goto resolve_loop
-resolve_loop_end:
-    class.resolve_method(resolve_list)
-
-    .return(class)
-.end
-
-=item !keyword_role(name)
-
-Internal helper method to create a role.
+Assigns C<source> to C<target>.  We use the 'item' method to allow Lists
+and Mappings to be converted into Array(ref) and Hash(ref).
 
 =cut
 
-.sub '!keyword_role' :method
-    .param string name
-    .local pmc info, role
+.namespace ['Perl6Object']
+.sub 'infix:=' :method
+    .param pmc source
+    $I0 = can source, 'item'
+    unless $I0 goto have_source
+    source = source.'item'()
+  have_source:
 
-    # Need to make sure it ends up attached to the right
-    # namespace.
-    info = new 'Hash'
-    info['name'] = name
-    $P0 = new 'ResizablePMCArray'
-    $P0[0] = name
-    info['namespace'] = $P0
+    $I0 = isa self, 'Mutable'
+    unless $I0 goto copy
+    assign self, source
+    goto end
 
-    # Create role.
-    role = new 'Role', info
+  copy:
+    .local pmc type
+    getprop type, 'type', self
+    if null type goto do_assign
+    $I0 = type.'ACCEPTS'(source)
+    if $I0 goto do_assign
+    die "Type mismatch in assignment."
 
-    # Stash in namespace.
-    $P0 = new 'ResizableStringArray'
-    set_hll_global $P0, name, role
-
-    .return(role)
+  do_assign:
+    eq_addr self, source, end
+    copy self, source
+  end:
+    .return (self)
 .end
 
-=item !keyword_grammar(name)
-
-Internal helper method to create a grammar.
-
-=cut
-
-.sub '!keyword_grammar' :method
-    .param string name
-    .local pmc info, grammar
-
-    # Need to make sure it ends up attached to the right
-    # namespace.
-    info = new 'Hash'
-    info['name'] = name
-    $P0 = new 'ResizablePMCArray'
-    $P0[0] = name
-    info['namespace'] = $P0
-
-    # Create grammar class..
-    grammar = new 'Class', info
-
-    .return(grammar)
-.end
-
-=item !keyword_does(class, role_name)
-
-Internal helper method to implement the functionality of the does keyword.
-
-=cut
-
-.sub '!keyword_does' :method
-    .param pmc class
-    .param string role_name
-    .local pmc role
-    role = get_hll_global role_name
-    addrole class, role
-.end
-
-=item !keyword_has(class, attr_name)
-
-Adds an attribute with the given name to the class.
-
-=cut
-
-.sub '!keyword_has' :method
-    .param pmc class
-    .param string attr_name
-    addattribute class, attr_name
-.end
 
 =back
 
 =head2 Object methods
 
-=over
+=over 4
+
+=item hash()
+
+Return the scalar as a Hash.
+
+=cut
+
+.namespace ['Perl6Object']
+
+.sub 'hash' :method
+    $P0 = self.'list'()
+    .return $P0.'hash'()
+.end
+
+=item item()
+
+Return the scalar component of the invocant.  For most objects,
+this is simply the invocant itself.
+
+=cut
+
+.namespace []
+.sub 'item'
+    .param pmc x               :slurpy
+    $I0 = elements x
+    unless $I0 == 1 goto have_x
+    x = shift x
+  have_x:
+    $I0 = can x, 'item'
+    unless $I0 goto have_item
+    x = x.'item'()
+  have_item:
+    .return (x)
+.end
+
+.namespace ['Perl6Object']
+.sub 'item' :method
+    .return (self)
+.end
+
+
+=item list()
+
+Return the list component of the invocant.  For most (Scalar)
+objects, we create a List containing the invocant.
+
+=cut
+
+.sub 'list' :method
+    $P0 = new 'List'
+    push $P0, self
+    .return ($P0)
+.end
+
 
 =item new()
 
@@ -235,15 +217,37 @@ Create a new object having the same class as the invocant.
   iter_loop:
     unless iter goto iter_end
     $S0 = shift iter
+
+    # See if we have an init value; use Undef if not.
+    .local int got_init_value
     $S1 = substr $S0, 2
-    $I0 = exists init_attribs[$S1]
-    if $I0 goto have_init_value
+    got_init_value = exists init_attribs[$S1]
+    if got_init_value goto have_init_value
     $P2 = new 'Undef'
     goto init_done
   have_init_value:
     $P2 = init_attribs[$S1]
     delete init_attribs[$S1]
   init_done:
+
+    # Is it a scalar? If so, want a scalar container with the type set on it.
+    .local string sigil
+    sigil = substr $S0, 0, 1
+    if sigil != '$' goto no_scalar
+    .local pmc attr_info, type
+    attr_info = attribs[$S0]
+    if null attr_info goto no_scalar
+    type = attr_info['type']
+    if null type goto no_scalar
+    if got_init_value goto no_proto_init
+    $I0 = isa type, 'P6protoobject'
+    unless $I0 goto no_proto_init
+    set $P2, type
+  no_proto_init:
+    $P2 = new 'Perl6Scalar', $P2
+    setprop $P2, 'type', type
+  no_scalar:
+
     push_eh set_attrib_eh
     setattribute $P1, cur_class, $S0, $P2
 set_attrib_eh:
@@ -317,6 +321,121 @@ Print the object
     $P0 = get_hll_global 'say'
     .return $P0(self)
 .end
+
+=back
+
+=head2 Private methods
+
+=over 4
+
+=item !cloneattr(attrlist)
+
+Create a clone of self, also cloning the attributes given by attrlist.
+
+=cut
+
+.sub '!cloneattr' :method
+    .param string attrlist
+    .local pmc p6meta, result
+    p6meta = get_hll_global ['Perl6Object'], '$!P6META'
+    $P0 = p6meta.'get_parrotclass'(self)
+    result = new $P0
+
+    .local pmc attr_it
+    attr_it = split ' ', attrlist
+  attr_loop:
+    unless attr_it goto attr_end
+    $S0 = shift attr_it
+    unless $S0 goto attr_loop
+    $P1 = getattribute self, $S0
+    $P1 = clone $P1
+    setattribute result, $S0, $P1
+    goto attr_loop
+  attr_end:
+    .return (result)
+.end
+
+
+.sub '!.?' :method
+    .param string method_name
+    .param pmc pos_args     :slurpy
+    .param pmc named_args   :slurpy :named
+
+    # For now we won't worry about signature, just if a method exists.
+    $I0 = can self, method_name
+    if $I0 goto invoke
+    $P0 = get_hll_global 'Failure'
+    .return ($P0)
+
+    # If we do have a method, call it.
+  invoke:
+    .return self.method_name(pos_args :flat, named_args :named :flat)
+.end
+
+
+.sub '!.*' :method
+    .param string method_name
+    .param pmc pos_args     :slurpy
+    .param pmc named_args   :slurpy :named
+
+    # Return an empty list if no methods exist at all.
+    $I0 = can self, method_name
+    if $I0 goto invoke
+    .return 'list'()
+
+    # Now find all methods and call them - since we know there are methods,
+    # we just pass on to infix:.+.
+  invoke:
+    .return self.'!.+'(method_name, pos_args :flat, named_args :named :flat)
+.end
+
+
+.sub '!.+' :method
+    .param string method_name
+    .param pmc pos_args     :slurpy
+    .param pmc named_args   :slurpy :named
+
+    # We need to find all methods we could call with the right name.
+    .local pmc p6meta, result_list, class, mro, it, cap_class, failure_class
+    result_list = 'list'()
+    p6meta = get_hll_global ['Perl6Object'], '$!P6META'
+    class = self.'HOW'()
+    class = p6meta.get_parrotclass(class)
+    mro = inspect class, 'all_parents'
+    it = iter mro
+    cap_class = get_hll_global 'Capture'
+    failure_class = get_hll_global 'Failure'
+  mro_loop:
+    unless it goto mro_loop_end
+    .local pmc cur_class, meths, cur_meth
+    cur_class = shift it
+    meths = inspect cur_class, 'methods'
+    cur_meth = meths[method_name]
+    if null cur_meth goto mro_loop
+
+    # If we're here, found a method. Invoke it and add capture of the results
+    # to the result list.
+    .local pmc pos_res, named_res, cap
+    (pos_res :slurpy, named_res :named :slurpy) = cur_meth(self, pos_args :flat, named_args :named :flat)
+    cap = 'prefix:\\'(pos_res :flat, named_res :flat :named)
+    push result_list, cap
+    goto mro_loop
+  mro_loop_end:
+
+    # Make sure we got some elements, or we have to die.
+    $I0 = elements result_list
+    if $I0 == 0 goto failure
+    .return (result_list)
+  failure:
+    $S0 = "Could not invoke method '"
+    concat $S0, method_name
+    concat $S0, "' on invocant of type '"
+    $S1 = self.WHAT()
+    concat $S0, $S1
+    concat $S0, "'"
+    'die'($S0)
+.end
+
 
 =back
 

@@ -2,28 +2,29 @@
 
 =head0 Parrot Internals
 
-Z<CHP-8>
+Z<CHP-7>
 
 This chapter details the architecture and internal workings of Parrot,
-the interpreter behind Perl 6. Parrot is a register-based,
-bytecode-driven, object-oriented, multithreaded, dynamically typed,
-self-modifying, asynchronous interpreter. While that's an awful lot of
-buzzwords, the design fits together remarkably well.
+and attempts to explain how Parrot has been designed and how it operates.
+As we've mentioned before, Parrot is a register-based, bytecode-driven,
+object-oriented, multithreaded, dynamically typed, self-modifying,
+asynchronous interpreter. That may seem awfully confusing when you first
+look at it, but the design fits together remarkably well.
 
 =head1 Core Design Principles
 
-Z<CHP-8-SECT-1>
+Z<CHP-7-SECT-1>
 
 X<Parrot;internals>
-Three main principles drive the design of 
-X<Parrot;core design principles> Parrot--speed, abstraction, and
+Three main principles drive the design of
+X<Parrot;core design principles> Parrot: speed, abstraction, and
 stability.
 
 I<Speed> is a paramount concern. Parrot absolutely must be as fast as
 possible, since the engine effectively imposes an upper limit on the
 speed of any program running on it. It doesn't matter how efficient
 your program is or how clever your program's algorithms are if the
-engine it runs on limps along. While Parrot can't make a poorly
+engine it runs on limps slowly along. While Parrot can't make a poorly
 written program run fast, it could make a well-written program run
 slowly, a possibility we find entirely unacceptable.
 
@@ -71,12 +72,12 @@ have sometimes been made to Perl itself.
 
 =head1 Parrot's Architecture
 
-Z<CHP-8-SECT-2>
+Z<CHP-7-SECT-2>
 
 The X<architecture;Parrot>
 X<Parrot;architecture>
 Parrot system is divided into four main parts, each with its own
-specific task. The diagram in A<CHP-8-FIG-1>Figure 8-1 shows
+specific task. The diagram in A<CHP-7-FIG-1>Figure 7-1 shows
 the parts, and the way source code and control flows through Parrot.
 Each of the four parts of Parrot are covered briefly here, with the
 features and parts of the interpreter covered in more detail
@@ -84,8 +85,8 @@ afterward.
 
 =begin figure Parrot's flow
 
-Z<CHP-8-FIG-1>
-F<figs/p6e_0801.gif>
+Z<CHP-7-FIG-1>
+F<figs/p6e_0801.png>
 
 =end figure
 
@@ -112,34 +113,40 @@ small section.
 
 =head2 Parser
 
-Z<CHP-8-SECT-2.1>
+Z<CHP-7-SECT-2.1>
 
 The X<parser, Parrot>
 X<Parrot;parser module>
-parser module is responsible for taking source code in and turning it
-into an X<AST (Abstract Syntax Tree)>
-X<Abstract Syntax Tree (AST)> Abstract
-Syntax Tree (AST). An AST is a digested form of the program, one
-that's much more amenable to manipulation. In some systems this task
-is split into two parts--the lexing and the parsing--but since the
-tasks are so closely bound, Parrot combines them into a single module.
+parser module is responsible for source code in PASM, PIR, or one of
+the high-level languages, and turning it into an X<AST (Abstract Syntax
+Tree)> X<Abstract Syntax Tree (AST)> Abstract Syntax Tree (AST). An AST
+is a digested form of the program, one that's much easier for Parrot to
+work with. In some systems this task is split into two parts--the
+lexing and the parsing--but since the tasks are so closely bound, Parrot
+combines them into a single module.
 
 X<lexing>
 Lexing (or X<tokenizing> tokenizing) turns a stream of characters into a
 stream of tokens. It doesn't assign any meaning to those tokens--that's
-the job of the parser--but it is smart enough to see that C<$a = 1 + 2;>
-is composed of 6 tokens (C<$>, C<a>, C<=>, C<1>, C<+>, and C<2>).
+the job of the parser--but it is smart enough to see that an input line
+such as C<$a = 1 + 2;> is composed of 6 tokens (C<$>, C<a>, C<=>, C<1>,
+C<+>, and C<2>).
 
 Parsing is the task of taking the tokens that the lexer has found and
-assigning some meaning to them. Sometimes the parsed output can be
-directly executed.
+assigning some meaning to them. Individual tokens from the lexer are
+combined by the parser into larger and more complex tokens, which
+represent common programming constructs like statements, subroutines,
+and programs. When the input source code has been completely converted
+into these complex data structures, the parsing stage is complete.
+Sometimes the parsed output can be directly executed by the interpreter,
+sometimes it is compiled first.
 
-Parsing can be a chore, as anyone who's done it before knows. In some
+Parsing can be a chore as anyone who's done it before knows. In some
 cases it can be downright maddening--Perl 5's parser has over ten
-thousand lines of C code.  Utility programs such as I<lex> and I<yacc>
-are often used to automate the generation of parser code. Perl 5
-itself uses a I<yacc>-processed grammar to handle some of the task of
-parsing Perl code.N<I<yacc> can handle only part of the task, though.
+thousand lines of C code. Special utility programs such as I<lex>
+and I<yacc> are often used to automate the generation of parser code.
+Perl 5 itself uses a I<yacc>-based grammar to handle parts of the
+processing task.N<I<yacc> can handle only part of the task, though.
 As the quote goes, "The task of parsing Perl is divided between
 I<lex>, I<yacc>, smoke, and mirrors."> Rather than going with a
 custom-built parser for each language, Parrot provides a
@@ -164,41 +171,34 @@ the quirks in a new parser.
 
 =head2 Compiler
 
-Z<CHP-8-SECT-2.2>
+Z<CHP-7-SECT-2.2>
 
+The parser outputs data in a form called an Abstract Syntax Tree (AST).
 The X<Parrot;compiler module>
 X<compiler module, Parrot>
-compiler module takes the AST that the parser generates and turns it
-into code that the interpreter engine can execute. This translation is
-very straightforward. It involves little more than flattening the AST
-and running the flattened tree though a series of substitutions.
-
-The compiler is the least interesting part of Parrot. It transforms
-one machine representation of your program--the AST that the parser
-generated--into another machine representation of your program--the
-bytecode that the interpreter needs.  It's little more than a simple,
-rule-based filter module, albeit one that's necessary for Parrot to
-understand your source code.
+compiler module takes this AST and converts it into bytecode that the
+interpreter engine can execute. This translation is very straightforward
+and isn't too expensive in terms of operating time and resources. The
+tree is flattened, and is passed into a series of substitutions and
+transformations. The compiler is the least interesting part or Parrot,
+little more than a simple rule-based filter module. It is simple, but
+it's a necessart part of Parrot.
 
 For many languages the parser and compiler are essentially a single
-unit. Like the parser, the compiler is pluggable, so you can load
-in your own compiler. When not using the Perl 6 grammar engine, the
-compiler and parser modules will usually be loaded together. Parrot
-itself comes with two compiler modules for Parrot assembly and
-PIR.N<Parrot Intermediate Representation. See A<CHP-11>Chapter 11.>
-It's likely many compilers will actually emit either assembly or
-PIR code, rather than directly emitting bytecode.
+unit. Like the parser, the compiler is modular, so you can load
+in your own compiler if needed. Parrot itself comes with two compiler
+modules for Parrot assembly and PIR. Instead of emitting bytecode
+directly, many HLL compilers emit PIR code, and that is compiled by
+Parrot into bytecode.
 
 =head2 Optimizer
 
-Z<CHP-8-SECT-2.3>
+Z<CHP-7-SECT-2.3>
 
 X<Parrot;optimizer module>
 X<optimizer>
-The optimizer module takes the AST that the parser generated and the
-bytecode that the compiler generated, and transforms the bytecode to
-make it run faster.
-
+The optimizer module takes the AST from the parser and the bytecode
+from the compiler, and transforms the bytecode to make it run faster.
 X<optimizing code for dynamic languages>
 Optimizing code for dynamic languages such as Perl, Python, and Ruby
 is an interesting task. The languages are so dynamic that the
@@ -218,7 +218,7 @@ standard optimizer would turn that code into the single line:
 
 and remove the loop entirely. Unfortunately, that's not necessarily
 appropriate for Perl. C<$a> could easily be tied, perhaps representing
-the position of some external hardware. If incrementing the variable
+the state of some external hardware. If incrementing the variable
 ten thousand times smoothly moves a stepper motor from 0 to 10000 in
 increments of one, just assigning a value of 10000 to the variable
 might whip the motor forward in one step, damaging the hardware. A
@@ -235,8 +235,8 @@ optimizations piecemeal without affecting the compiler.  There's a lot
 of exciting work going into the problem of optimizing dynamic
 languages, and we fully expect to take advantage of it where we can.
 
-Optimization is potentially an expensive operation, another good
-reason to have it in a separate module. Spending ten seconds
+Optimization is potentially an expensive operation, which is another
+good reason to have it in a separate module. Spending ten seconds
 optimizing a program that will run in five seconds is a huge waste of
 time when using Perl's traditional compile-and-go model--optimizing
 the code will make the program run slower. On the other hand, spending
@@ -249,17 +249,20 @@ directly, but this can be changed with a command-line switch.
 
 Perl 5, Python, and Ruby all lack a robust optimizer (outside their
 regular expression engines), so any optimizations we add will increase
-their performance. This, we feel, is a good thing.
+their performance. In fact, optimizations that we add might
+help improve the performance of all high-level languages that run on
+Parrot. This, we feel, is a good thing.
 
 =head2 Interpreter
 
-Z<CHP-8-SECT-2.4>
+Z<CHP-7-SECT-2.4>
 
 The interpreter module is the part of the engine that executes the
 generated bytecode. Calling it an interpreter is something of a
 misnomer, since Parrot's core includes both a traditional bytecode
-interpreter module as well as a high-performance JIT engine, but you
-can consider that an implementation detail.
+interpreter module as well as a high-performance just-in-time (JIT)
+compiler engine, but that's a detail of the implementation that we
+don't need to discuss here at length.
 
 All the interesting things happen inside the interpreter, and the
 remainder of the chapter is dedicated to the interpreter and the
@@ -270,7 +273,7 @@ to feed bytecode to the interpreter.
 
 =head2 Bytecode Loader
 
-Z<CHP-8-SECT-2.5>
+Z<CHP-7-SECT-2.5>
 
 The X<Parrot;bytecode loader>
 X<bytecode, Parrot;loader>
@@ -309,7 +312,7 @@ execute Z-machine bytecode, but happy accidents are the best kind.
 
 =head1 The Interpreter
 
-Z<CHP-8-SECT-3>
+Z<CHP-7-SECT-3>
 
 The X<interpreter, Parrot>
 interpreter is the engine that actually runs the code emitted by the
@@ -333,10 +336,9 @@ not run Prolog or Scheme code as fast as a dedicated engine would, the
 flexibility Parrot provides to mix and match languages more than makes
 up for that.
 
-Parrot's core design is that of a register rich CISC CPU, like many of
+Parrot's core design is that of a register-rich CISC CPU, like many of
 the CISC machines of the past such as the VAX, Motorola 68000, and IBM
-System/3x0. Many of Parrot's basic instructions perform complex
-operations. It also bears some resemblance to modern RISC CPUs such as
+System/3x0. It also bears some resemblance to modern RISC CPUs such as
 the IBM Power series and Intel Alpha,N<Formerly HP, formerly Compaq,
 formerly Digital Alpha.> as it does all its operations on data in
 registers. Using a core design similar to older systems gives us
@@ -354,12 +356,12 @@ correct design decision.
 
 =head2 Registers
 
-Z<CHP-8-SECT-3.1>
+Z<CHP-7-SECT-3.1>
 
 X<interpreter, Parrot;registers>
 Parrot has four basic types of registers: PMC, string, integer, and
-floating-point, one for each of the core data types in Parrot. PMCs,
-short for Parrot Magic Cookies, are the structures that represent high
+floating-point numbers, one for each of the core data types in Parrot.
+PMCs, short for Parrot Magic Cookies, are the structures that represent high
 level variables such as arrays, hashes, scalars, and objects. We
 separate the register types for ease of implementation, garbage
 collection, and space efficiency. Since PMCs and strings are
@@ -369,87 +371,9 @@ garbage collector a bit faster and simpler. Having integers and floats
 in separate register sets makes sense from a space standpoint, since
 floats are normally larger than integers.
 
-The current Parrot architecture provides 32 of each register type, for
-a total of 128 registers. While this may seem like overkill,
-compensating for running out of registers can be a significant speed
-hit, so it's in our best interests to make sure it happens rarely. 32
-is a good compromise between performance and memory usage.
-
-=head2 Stacks
-
-Z<CHP-8-SECT-3.2>
-
-X<stacks;Parrot>
-X<interpreter, Parrot;stacks>
-Parrot has seven separate stacks, each with a specific purpose. The
-four register sets each have its own stack for quickly saving register
-contents. There is a separate stack dedicated to saving and restoring
-individual integers, which the regular expression system uses heavily.
-The control stack keeps track of control information, exception
-handlers, and other such things. Finally, the general-purpose typed
-stack stores individual values.
-
-The backing stacks for the register sets are somewhat special.
-Operations on the register stacks don't act on single registers. The
-engine pushes and pops entire register sets in one operation. This may
-seem somewhat unusual, but it makes the primary use of these
-stacks--to save registers across function calls--very fast. A save or
-restore operation is essentially a single memory copy operation,
-something that's highly optimized just about everywhere.N<The SPARC
-processor, for example, has a cache-friendly memory copy as a core
-operation.> The integer stack is specifically designed to hold
-integers. Since it doesn't have to be general purpose, integer stack
-operations can be faster than operations on the general-purpose
-stack--a speed gain the regular expression code makes use of.  Regular
-expressions make heavy use of integer code, as they move back and
-forth within strings, and make heavy use of the integer stack to
-manage backtracking information.
-
-The control stack is private to the interpreter, so user code can't
-directly access it. The interpreter engine uses it to manage exception
-handlers, return locations for function calls, and track other
-internal data. User code can inspect the stack through Parrot's
-introspective features.
-
-Finally, the general-purpose stack is used to save and restore
-individual registers. It's a typed stack, so it doesn't allow you to
-do things like push an integer register onto the stack and pop the
-value into a string register. For compiled code, this stack is used if
-a routine needs more than 32 registers of the same type. The extra
-values are pushed on and popped off the stack in an operation called
-register spilling. This stack is also used when Parrot runs code
-designed for a stack machine such as the JVM or .NET. Stack-based code
-is less efficient than register-based code, but we can still run it.
-
-All of Parrot's stacks are segmented--they're composed of a set of
-stack pieces instead of a single chunk of memory. Segmenting has a
-small performance impact, but it allows us to make better usage of
-available memory. Traditional stacks are composed of a single chunk of
-memory, since this makes it faster to read from and write to the
-stack. Usually when you run off the end of that chunk of memory your
-program crashes. To avoid this, most systems allocate a large stack.
-This isn't much of a problem if you have only a single stack, but it
-doesn't work well in today's multithreaded world, where each thread
-has to have its own stack.
-
-Another pleasant benefit of segmenting the stacks is that it makes
-supporting coroutines and continuations much easier. It is much easier
-to save off part of a segmented stack. Combined with Parrot's
-copy-on-write features, this makes for efficient continuations and
-coroutines. It may not be a feature that many folks will use, but it's
-a pleasant fall-out from other things.
-
-Interestingly, while Parrot's stacks look and act like stacks in all
-but the most extreme circumstances, they're really trees. Each
-subroutine (and potentially each block, as they're occasionally the
-same thing) gets a fresh stack frame, linked to the stack of its
-caller. Those stack frames will be cleaned up by the garbage collector
-when there are no outstanding references to them, though it's not
-guaranteed to happen immediately.
-
 =head2 Strings
 
-Z<CHP-8-SECT-3.3>
+Z<CHP-7-SECT-3.3>
 
 X<strings;Parrot>
 X<interpreter, Parrot;strings>
@@ -501,8 +425,8 @@ X<strings;language>
 Finally, the I<language> for a string determines how the string behaves
 in some contexts. Different languages have different rules for sorting
 and case-folding characters. Whether an accented character keeps its
-accent when upper-cased or lowercased depends on the language that the
-string came from.
+accent when upper-cased or lowercased, for instance, depends on the
+language that the string came from.
 
 The capability of translating strings from one encoding to another and
 one character set to another, and to determine when it's needed, is
@@ -529,7 +453,7 @@ does to try and reimplement Unicode again.
 
 =head2 Variables
 
-Z<CHP-8-SECT-3.4>
+Z<CHP-7-SECT-3.4>
 
 X<variables;Parrot interpreter and>
 X<interpreter, Parrot;variables>
@@ -554,7 +478,8 @@ constructs.
 The first big issue that Parrot had to face was implementing these
 constructs. The second was doing it in a way that allowed Perl code to
 use Ruby objects, Ruby code to use Python objects, and Lisp code to
-use both. Parrot's solution is the PMC, or Parrot Magic Cookie.
+use both.N<Or vice-versa> Parrot's solution is the PMC, or Parrot Magic
+Cookie.
 
 A PMC is an abstract variable and a base data type--the same way that
 integers and floating-point numbers are base data types for hardware
@@ -581,7 +506,7 @@ operators that might be overloaded for a PMC--have vtable entries.
 
 =head2 Bytecode
 
-Z<CHP-8-SECT-3.5>
+Z<CHP-7-SECT-3.5>
 
 Like any CPU, software, or hardware, Parrot needs a set of
 instructions to tell it what to do. For hardware, this is a stream of
@@ -614,7 +539,7 @@ those bits of the file your program actually executes will get read in
 from disk. This can save a lot of time.
 
 Parrot creates bytecode in a format optimized for the platform it's
-built on, since the common case by far is executing bytecode that's
+built on, since the most common case by far is executing bytecode that's
 been built on the system you're using. This means that floating-point
 numbers are stored in the current platform's native format, integers
 are in the native size, and both are stored in the byte order for the
@@ -635,7 +560,7 @@ X<Parrot;interpreter;;(see interpreter, Parrot)>
 
 =head1 I/O, Events, and Threads
 
-Z<CHP-8-SECT-4>
+Z<CHP-7-SECT-4>
 
 Parrot has comprehensive support for I/O, threads, and events. These
 three systems are interrelated, so we'll treat them together. The
@@ -645,7 +570,7 @@ design and implementation.
 
 =head2 I/O
 
-Z<CHP-8-SECT-4.1>
+Z<CHP-7-SECT-4.1>
 
 Parrot's base X<I/O;Parrot> I/O system is fully X<asynchronous I/O>
 asynchronous I/O with callbacks and per-request private data. Since this
@@ -655,11 +580,10 @@ I/O layer that your programs can use if they don't need the extra power.
 Asynchronous I/O is conceptually pretty simple. Your program makes an
 I/O request. The system takes that request and returns control to your
 program, which keeps running. Meanwhile the system works on satisfying
-the I/O request. When the request is satisfied, the system notifies
-your program in some way. Since there can be multiple requests
-outstanding, and you can't be sure exactly what your program will be
-doing when a request is satisfied, programs that make use of
-asynchronous I/O can be complex.
+the I/O request. Once satisfied, the system notifies your program in
+some way. Since there can be multiple requests outstanding, and you can't
+be sure exactly what your program will be doing when a request is
+satisfied, programs that make use of asynchronous I/O can be complex.
 
 X<synchronous I/O>
 Synchronous I/O is even simpler. Your program makes a request to the
@@ -713,20 +637,20 @@ are plenty of systems around that demonstrate what a bad idea that is.
 
 =head2 Events
 
-Z<CHP-8-SECT-4.2>
+Z<CHP-7-SECT-4.2>
 
 An X<events, Parrot> event is a notification that something has
 happened: the user has manipulated a GUI element, an I/O request has
 completed, a signal has been triggered, or a timer has expired.  Most
 systems these days have an event handler,N<Often two or three, which is
 something of a problem.> because handling events is so fundamental to
-modern GUI programming.  Unfortunately, the event handling system is not
-integrated, or poorly integrated, with the I/O system, leading to nasty
-code and unpleasant workarounds to try and make a program responsive to
-network, file, and GUI events simultaneously. Parrot presents a unified
-event handling system, integrated with its I/O system, which makes it
-possible to write cross-platform programs that work well in a complex
-environment.
+modern GUI programming. Unfortunately, most event handling systems are
+not integrated, or poorly integrated, with the I/O system. This leads
+to nasty code and unpleasant workarounds to try and make a program
+responsive to network, file, and GUI events simultaneously. Parrot,
+on the other hand, presents a unified event handling system integrated
+with its I/O system; this makes it possible to write cross-platform
+programs that work well in a complex environment.
 
 Parrot's events are fairly simple. An event has an event type, some
 event data, an event handler, and a priority. Each thread has an event
@@ -781,7 +705,7 @@ do.
 
 =head2 Signals
 
-Z<CHP-8-SECT-4.3>
+Z<CHP-7-SECT-4.3>
 
 X<signals, Parrot>
 Signals are a special form of event, based on the Unix signal mechanism.
@@ -833,7 +757,7 @@ and private data, to be outstanding.
 
 =head2 Threads
 
-Z<CHP-8-SECT-4.4>
+Z<CHP-7-SECT-4.4>
 
 X<threads, Parrot>
 Threads are a means of splitting a process into multiple pieces that
@@ -928,23 +852,22 @@ function is in progress.
 
 =head1 Objects
 
-Z<CHP-8-SECT-5>
+Z<CHP-7-SECT-5>
 
 X<objects;Parrot>
 Perl 5, Perl 6, Python, and Ruby are all object-oriented languages in
 some form or other, so Parrot has to have core support for objects and
 classes. Unfortunately, all these languages have somewhat different
 object systems, which made the design of Parrot's object system
-somewhat tricky.N<As I write this it's still in progress, though it
-should be done by the time this book is in print.> It turns out that
-if you draw the abstraction lines in the right places, support for the
-different systems is easily possible. This is especially true if you
-provide core support for things like method dispatch that the
-different object systems can use and override.
+somewhat tricky. It turns out that if you draw the abstraction lines
+in the right places, support for the different systems is easily
+possible. This is especially true if you provide core support for things
+like method dispatch that the different object systems can use and
+override.
 
 =head2 Generic Object Interfacing
 
-Z<CHP-8-SECT-5.1>
+Z<CHP-7-SECT-5.1>
 
 X<PMCs (Parrot Magic Cookies);handling method calls>
 Parrot's object system is very simple--in fact, a PMC only has to handle
@@ -969,7 +892,7 @@ same name.
 
 =head2 Parrot Objects
 
-Z<CHP-8-SECT-5.2>
+Z<CHP-7-SECT-5.2>
 
 X<objects;Parrot>
 X<Parrot;objects>
@@ -980,7 +903,7 @@ alternate object systems, such as the one Perl 5 uses. In this
 section, though, we're talking about what we provide in our standard
 object system. Parrot's standard object system is pretty
 traditional--it's a class-based system with multiple inheritance,
-interface declarations, and slot-based objects. 
+interface declarations, and slot-based objects.
 
 X<inheritance;in Parrot>
 Each object is a member of a class, which defines how the object
@@ -1031,7 +954,7 @@ part to implement Perl 6's roles.
 
 =head2 Mixed Class-Type Support
 
-Z<CHP-8-SECT-5.3>
+Z<CHP-7-SECT-5.3>
 
 X<mixed class-type support in Parrot>
 X<classes;Parrot;mixed class support>
@@ -1061,7 +984,7 @@ difficulty.
 
 =head1 Advanced Features
 
-Z<CHP-8-SECT-6>
+Z<CHP-7-SECT-6>
 
 Since the languages Parrot targets (like Perl and Ruby) have
 sophisticated concepts as core features, it's in Parrot's best
@@ -1070,7 +993,7 @@ not all) of these features.
 
 =head2 Garbage Collection
 
-Z<CHP-8-SECT-6.1>
+Z<CHP-7-SECT-6.1>
 
 X<garbage collection;Parrot>
 It's expected that modern languages have garbage collection built in.
@@ -1145,7 +1068,7 @@ which it would have to do if PMC or string structures could move.
 
 =head2 Multimethod Dispatching
 
-Z<CHP-8-SECT-6.2>
+Z<CHP-7-SECT-6.2>
 
 X<multimethod;dispatching>
 Multimethod dispatching (also known as signature-based dispatching) is
@@ -1208,7 +1131,7 @@ general version for normal subroutine and method dispatch.
 
 =head2 Continuations
 
-Z<CHP-8-SECT-6.3>
+Z<CHP-7-SECT-6.3>
 
 X<continuations>
 Continuations are possibly the most powerful high-level flow control
@@ -1280,7 +1203,7 @@ for languages that want them.
 
 =head2 Coroutines
 
-Z<CHP-8-SECT-6.4>
+Z<CHP-7-SECT-6.4>
 
 X<coroutines>
 A coroutine is a subroutine or method that can suspend itself partway
@@ -1302,7 +1225,7 @@ for them.
 
 =head1 Conclusion
 
-Z<CHP-8-SECT-7>
+Z<CHP-7-SECT-7>
 
 We've touched on much of Parrot's core functionality, but certainly
 not all. Hopefully we've given you enough of a feel for how Parrot

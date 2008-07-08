@@ -294,7 +294,7 @@ static void rehash(PARROT_INTERP, Hash *t)
 
     LUA_ASSERT(nelems<=oldsize, "wrong count");
 
-    Parrot_block_DOD(interp);
+    Parrot_block_GC_mark(interp);
 
     /* using more than 3/4? */
     if (nelems >= oldsize-oldsize/4)
@@ -313,7 +313,7 @@ static void rehash(PARROT_INTERP, Hash *t)
             *lua_set(interp, t, old->key) = old->val;
     }
 
-    Parrot_unblock_DOD(interp);
+    Parrot_unblock_GC_mark(interp);
 
     /* free old array */
     mem_sys_free(nold);

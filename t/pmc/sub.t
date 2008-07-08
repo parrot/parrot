@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 63;
+use Parrot::Test tests => 65;
 use Parrot::Config;
 
 =head1 NAME
@@ -1467,6 +1467,73 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'set_outer' );
 .end
 CODE
 I can has outer?
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names' );
+.sub 'main' :main
+    $P0 = get_hll_global ['ABC'], 'outer'
+    $P0('ABC lex')
+
+    $P0 = get_hll_global ['DEF'], 'outer'
+    $P0('DEF lex')
+.end
+
+.namespace ['ABC']
+.sub 'outer' :lexid('abc_outer')
+    .param pmc x
+    .lex '$abc', x
+    say 'ABC::outer'
+    'inner'()
+.end
+
+.sub 'inner' :outer('abc_outer')
+    say 'ABC::inner'
+    $P0 = find_lex '$abc'
+    say $P0
+.end
+
+.namespace ['DEF']
+.sub 'outer' :lexid('def_outer')
+    .param pmc x
+    .lex '$def', x
+    say 'DEF::outer'
+    'inner'()
+.end
+
+.sub 'inner' :outer('def_outer')
+    say 'DEF::inner'
+    $P0 = find_lex '$def'
+    say $P0
+.end
+CODE
+ABC::outer
+ABC::inner
+ABC lex
+DEF::outer
+DEF::inner
+DEF lex
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', ':lexid and identical string constants' );
+.sub 'main'
+    'foo'()
+    'bar'()
+.end
+
+.sub 'foo'
+    new $P0, "String"
+    assign $P0, "abc"
+    say $P0
+.end
+
+.sub 'bar'  :lexid("abc")
+    new $P0, "String"
+    assign $P0, "abc"
+    say $P0
+.end
+CODE
+abc
+abc
 OUTPUT
 
 # Local Variables:

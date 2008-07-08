@@ -18,13 +18,10 @@ CardinalInteger - Cardinal integers
 =cut
 
 .sub 'onload' :anon :init :load
-    $P0 = subclass 'Integer', 'CardinalInteger'
-    #$P1 = get_hll_global 'Any'
-    #$P1 = $P1.HOW()
-    #addparent $P0, $P1
-    $P1 = get_hll_global ['CardinalObject'], 'make_proto'
-    $P1($P0, 'CardinalInteger')
-    $P1('Integer', 'CardinalInteger')
+    .local pmc cardinalmeta, intproto
+    cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
+    intproto = cardinalmeta.'new_class'('CardinalInteger', 'parent'=>'Integer CardinalObject')
+    cardinalmeta.'register'('Float', 'parent'=>'CardinalObject', 'protoobject'=>intproto)
 .end
 
 
@@ -38,19 +35,6 @@ CardinalInteger - Cardinal integers
 .end
 
 
-=item clone()
-
-=cut
-
-.sub 'clone' :method :vtable
-    .local pmc clone_type
-    clone_type = self.HOW()
-    $P0 = clone_type.'new'()
-    $P0 = self
-    .return($P0)
-.end
-
-
 =item perl()
 
 Returns a Perl representation of the CardinalInteger.
@@ -60,6 +44,19 @@ Returns a Perl representation of the CardinalInteger.
 .sub 'perl' :method
     $S0 = self
     .return($S0)
+.end
+
+
+=item to_s()
+
+Returns a CardinalString representation of the CardinalInteger.
+
+=cut
+
+.sub 'to_s' :method
+    $P0 = new 'CardinalString'
+    $P0 = self
+    .return($P0)
 .end
 
 
@@ -80,6 +77,26 @@ Runs C<block> for each integer from the current value of the Integer down to n.
     dec $I1
     goto downto_loop
   downto_done:
+.end
+
+
+=item upto(n, block)
+
+Runs C<block> for each integer from the current value of the Integer up to n.
+
+=cut
+
+.sub 'upto' :method
+    .param int n
+    .param pmc block
+    $I1 = self
+  upto_loop:
+    $I0 = $I1 > n
+    if $I0, upto_done
+    block($I1)
+    inc $I1
+    goto upto_loop
+  upto_done:
 .end
 
 

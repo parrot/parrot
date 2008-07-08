@@ -56,7 +56,7 @@ registers. The register types are:
 =back
 
 Registers are designated by the type of register followed by a number.
-For instance, the integer registers are C<I0>, C<I1> and so on. The
+For instance, the integer registers are C<$I0>, C<$I1> and so on. The
 PMC registers hold arbitrary data objects and are parrot's mechanism
 for implementing more complex behavior than the ones that can be
 expressed using the other 3 register types alone. PMCs will be covered
@@ -82,13 +82,13 @@ install it into the system.
 The keywords starting with a dot (C<.sub> and C<.end>) are PIR directives.
 They are used together to define subroutines. After the C<.sub> keyword
 I use the name of the subroutine. The keyword that starts with a colon
-(C<:main>) is an attribute (more on those later) that tells parrot that
+(C<:main>) is an pragma that tells parrot that
 this is the main body of the program and that it should start by
 executing this subroutine. By the way, I could use C<.sub foo :main> and
 Parrot will use the C<foo> subroutine as the main body of the program.
 The actual name of the subroutine does not matter as long as it has the
-attribute C<:main>.
-
+C<:main> pragma.  The full set of pragmas are defined in
+L<docs/pdds/draft/pdd19_pir.pod>.
 
 Before going into more details about subroutines and calling
 conventions, let's compare some PIR syntax to the equivalent PASM.
@@ -97,43 +97,42 @@ If I want to add two integer registers using PASM I would use the
 Parrot C<set> opcode to put values into registers, and the C<add>
 opcode to add them, like this:
 
-   set I1, 5
-   set I2, 3
-   add I0, I1, I2   # I0 yields 5+3
+   set $I1, 5
+   set $I2, 3
+   add $I0, $I1, $I2   # $I0 yields 5+3
 
 PIR includes infix operators for these common opcodes. I could write
 this same code as
 
-   I1 = 5
-   I2 = 3
-   I0 = I1 + I2
+   $I1 = 5
+   $I2 = 3
+   $I0 = $I1 + $I2
 
 There are the four arithmetic operators as you should be expecting, as
 well as the six different comparison operators, which return a boolean
 value:
 
-   I1 = 5
-   I2 = 3
-   I0 = I1 <= I2   # I0 yields 0 (false)
+   $I1 = 5
+   $I2 = 3
+   $I0 = $I1 <= $I2   # $I0 yields 0 (false)
 
 I can also use the short accumulation-like operators, like C<+=>.
 
-Also, PIR allows an extended syntax for registers. If the register
-name is prefixed with a dollar sign, like C<$I1>, the parrot PIR
-compiler will automatically assign these "virtual registers" to actual
-registers as needed and handle whatever manipulations are needed for
-optimization.
-
 Another PIR perk is that local variable names may be declared and used
 instead of register names. For that I just need to declare the
-variable using the C<.local> keyword:
+variable using the C<.local> keyword with any of the four data
+types available on PIR: C<int>, C<string>, C<num> and C<pmc>:
 
    .local int size
    size = 5
 
-The parrot compiler will choose one register and associate it with my
-variable name. I can declare local variables for any of the four data
-types available on PIR: C<int>, C<string>, C<num> and C<pmc>.
+Note that all registers, both numbered and named, are consolidated by
+the Parrot register allocator, assigning these "virtual registers" to
+actual registers as needed.  The register allocator even coalesces two
+more more virtual names onto the same physical register when it can
+prove that they have non-overlapping lifetimes, so there is no need to
+be stingy with register names.  To see the actual registers used, use
+C<disassemble> on the C<*.pbc> output.
 
 =head2 Branching
 
@@ -141,9 +140,9 @@ Another simplification of PASM are branches. Basically, when I want to
 test a condition and jump to another place in the code, I would write
 the following PASM code:
 
-   le I1, I2, LESS_EQ
+   le $I1, $I2, LESS_EQ
 
-Meaning, if C<I1> is less or equal than C<I2>, jump to label
+Meaning, if C<$I1> is less or equal than C<$I2>, jump to label
 C<LESS_EQ>. In PIR I would write it in a more legible way:
 
    if $I1 <= $I2 goto LESS_EQ
@@ -187,6 +186,10 @@ followed by one or more arguments, just like this:
 
   .return (10, 20, 30)
 
+To accept values from such a function, use a parenthesized results list:
+
+  ($I1, $I2, $I3) = compute_it($I8, $I9)
+
 =head2 Factorial Example
 
 Now, for a little more complicated example, let me show how I would
@@ -200,9 +203,9 @@ code Factorial subroutine:
 
   .sub factorial
      .param int i
-     if i > 1 goto recurse
+     if i > 1 goto recur
      .return (1)
-  recurse:
+  recur:
      $I1 = i - 1
      $I2 = factorial($I1)
      $I2 *= i

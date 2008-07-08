@@ -31,6 +31,7 @@ src/exec.c - Generate an object file
 /* HEADERIZER HFILE: include/parrot/exec.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void add_data_member(
     ARGMOD(Parrot_exec_objfile_t *obj),
@@ -48,6 +49,7 @@ static int symbol_list_find(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -61,9 +63,6 @@ static int symbol_list_find(
  */
 
 int Parrot_exec_run = 0;
-
-extern char **Parrot_exec_rel_addr;
-extern int Parrot_exec_rel_count;
 
 /*
 
@@ -90,7 +89,6 @@ Parrot_exec(PARROT_INTERP, ARGIN(opcode_t *pc),
     Parrot_exec_objfile_t * const obj =
         mem_allocate_zeroed_typed(Parrot_exec_objfile_t);
     exec_init(obj);
-    Parrot_exec_rel_addr = mem_allocate_n_zeroed_typed(4, char *);
     obj->bytecode_header_size =
         (interp->code->base.file_offset + 4) * sizeof (opcode_t);
     jit_info = parrot_build_asm(interp, code_start, code_end,
@@ -341,10 +339,7 @@ Parrot_exec_add_text_rellocation(ARGIN(Parrot_exec_objfile_t *obj), ARGIN(char *
             break;
     }
 
-    if (Parrot_exec_rel_count)
-        addr = Parrot_exec_rel_addr[--Parrot_exec_rel_count];
-    else
-        addr = nptr + disp;
+    addr = nptr + disp;
     new_relloc->offset        = (int)(addr - obj->text.code);
     new_relloc->symbol_number = symbol_number;
     new_relloc->type          = type;

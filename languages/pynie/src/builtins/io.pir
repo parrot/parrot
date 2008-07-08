@@ -8,7 +8,7 @@ src/builtins/inplace.pir - Inplace assignments
 
 =cut
 
-.namespace
+.namespace []
 
 .include 'cclass.pasm'
 

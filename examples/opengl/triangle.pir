@@ -18,10 +18,11 @@ using your window manager (using the X in the corner of the window title
 bar, for example).  To pause or restart the animation, press any other
 ASCII key.
 
+For a more complex and well-behaved example, try F<shapes.pir>.
+
 =cut
 
 
-.include 'datatypes.pasm'
 .include 'opengl_defines.pasm'
 
 .sub main :main
@@ -32,11 +33,9 @@ ASCII key.
     load_bytecode 'library/NCI/call_toolkit_init.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
-    .local pmc import_gl_to, my_namespace
-    import_gl_to = get_global ['OpenGL'], '_export_all_functions_to'
-    my_namespace = get_namespace
-
-    import_gl_to(my_namespace)
+    .local pmc import_gl
+    import_gl = get_global ['OpenGL'], '_export_all_functions'
+    import_gl()
 
     # Initialize GLUT
     .local pmc call_toolkit_init
@@ -59,9 +58,9 @@ ASCII key.
     .const .Sub draw     = 'draw'
     .const .Sub idle     = 'idle'
     .const .Sub keyboard = 'keyboard'
-    glutcbDisplayFunc (draw)
-    glutcbIdleFunc    (idle)
-    glutcbKeyboardFunc(keyboard)
+    glutDisplayFunc (draw)
+    glutIdleFunc    (idle)
+    glutKeyboardFunc(keyboard)
 
     # Set up global flag for rotating/paused
     .local pmc rotating

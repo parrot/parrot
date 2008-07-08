@@ -6,6 +6,7 @@ PERL   = @perl@
 RM_F   = @rm_f@
 MKPATH = @mkpath@
 CHMOD  = @chmod@
+PERLDOC = @perldoc@
 
 # long list of .pod files
 POD = @pod@

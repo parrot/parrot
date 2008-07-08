@@ -35,7 +35,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -85,7 +85,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -134,7 +134,7 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -173,20 +173,44 @@ C<languages/c99>
 
 =item Description
 
-Implementation of Ruby CVS Head 1.9
+Implementation of Ruby 1.9
 
 =item Status
 
 Parser is pretty complete.
-Generates PIR for basic Ruby programs
+Decent support for aggregates and classes.
+Minimal class hierarchy.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
 C<languages/cardinal>
+
+=back
+
+=head2 Chitchat
+
+=over 4
+
+=item Description
+
+Smalltalk compiler
+
+=item Status
+
+Parser is decent.
+Everything else is nonexistant.
+
+=item Last verified with parrot version
+
+0.6.3
+
+=item Location
+
+C<languages/chitchat>
 
 =back
 
@@ -260,7 +284,7 @@ has been commented out.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -377,7 +401,7 @@ Based on PCT.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -415,11 +439,37 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
 C<languages/jako>
+
+=back
+
+
+=head2 JSON
+
+=over 4
+
+=item Description
+
+Implements JSON with the PCT. JSON is a
+data description (sub) language.
+Running the pct-based JSON language, just input some string on the command
+line, like [1, 2, 3], and the output is dumped to stdout.
+
+=item Status
+
+unknown
+
+=item Last verified with parrot version
+
+not verified
+
+=item Location
+
+C<languages/json>
 
 =back
 
@@ -470,7 +520,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -494,7 +544,7 @@ VISIBLE and BTW "work"
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -522,7 +572,7 @@ L<http://www.parrotcode.org/talks/LuaOnParrot.pdf>.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -584,7 +634,7 @@ Development is stalled. Takers are welcome.  Some tests fail.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -631,7 +681,7 @@ In progress.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -678,7 +728,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -703,7 +753,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -731,11 +781,42 @@ builtins.
 
 =item Last verified with Parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
 C<languages/pheme>
+
+=back
+
+
+=head2 Pipp
+
+=over 4
+
+=item Description
+
+Pipp is Parrot's PHP.
+
+One idea of Pipp is to have side by side comparison of different parsing
+and tree transformation strategies. Currently there are three variants:
+phc, PGE and ANTLR3.
+
+=item Status
+
+Started.
+
+=item Last verified with parrot version
+
+0.6.3
+
+=item Location
+
+C<languages/pipp>
+
+=item Wiki
+
+L<http://www.perlfoundation.org/parrot/index.cgi?pipp>
 
 =back
 
@@ -792,36 +873,6 @@ L<http://www.perlfoundation.org/parrot/index.cgi?javascript>
 =back
 
 
-=head2 Plumhead
-
-=over 4
-
-=item Description
-
-The Plumheaded Parakeet aims to become an implementation of PHP on Parrot.
-The grand idea is to have side by side comparison of different parsing
-and tree transformation strategies. Currently there are three variants:
-phc, PGE and ANTLR3.
-
-=item Status
-
-Started.
-
-=item Last verified with parrot version
-
-0.6.2
-
-=item Location
-
-C<languages/plumhead>
-
-=item Wiki
-
-L<http://www.perlfoundation.org/parrot/index.cgi?plumhead>
-
-=back
-
-
 =head2 Pugs
 
 =over 4
@@ -862,7 +913,7 @@ Parser is 90% complete; waiting for more PAST support.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -981,7 +1032,7 @@ An example languages from the PCT tutorial.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.3
 
 =item Location
 
@@ -1006,7 +1057,7 @@ use tcltest.tcl)
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -1036,7 +1087,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -1060,7 +1111,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -1088,7 +1139,7 @@ See details in F<languages/WMLScript/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.3
 
 =item Location
 
@@ -1162,6 +1213,10 @@ for some Perl 5 - specific functionality that was heavily used in early parrot d
 An experimental implementation of PHP. Described at
 L<http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html>,
 but no updates since August 2004, and the link to source is a 404.
+
+=head2 Plumhead
+
+Plumhead was the PHP on Parrot implementation. It has been renamed to Pipp.
 
 =head2 Ruby
 

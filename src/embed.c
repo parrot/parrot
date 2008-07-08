@@ -49,7 +49,7 @@ static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
+static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -563,7 +563,7 @@ Creates and returns C<ARGS> array PMC.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
+setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
     INTVAL i;
     PMC   *userargv;
@@ -673,16 +673,20 @@ measured with time C<parrot -b>.
 static FLOATVAL
 calibrate(PARROT_INTERP)
 {
-    /* minimum opcode count for calibration */
-    size_t   n      = interp->op_count < 1000000 ? 1000000 : interp->op_count;
-    FLOATVAL start  = Parrot_floatval_time();
+    size_t   count  = 1000000;
+    size_t   n      = count;
     opcode_t code[] = { 1 };      /* noop */
     opcode_t *pc    = code;
+    FLOATVAL start  = Parrot_floatval_time();
+    FLOATVAL now    = start;
 
-    for (; n; --n)
-       pc = (interp->op_func_table[*code])(pc, interp);
+    /* op timing isn't free; it requires at least one time fetch per op */
+    for (; n; --n) {
+        pc = (interp->op_func_table[*code])(pc, interp);
+        now = Parrot_floatval_time();
+    }
 
-    return (Parrot_floatval_time() - start) / (FLOATVAL)n;
+    return (now - start) / (FLOATVAL) count;
 }
 
 
@@ -708,6 +712,9 @@ print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         UINTVAL        call_count = 0;
         FLOATVAL       sum_time   = 0.0;
         const FLOATVAL empty      = calibrate(interp);
+
+        PIO_printf(interp,
+                   "Calibration: overhead = %.6f ms/op\n", 1000.0 * empty);
 
         PIO_printf(interp,
                    " Code J Name                         "
@@ -860,7 +867,7 @@ Sets up C<ARGV> and runs the ops.
 
 PARROT_API
 void
-Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
+Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
     PMC *userargv, *main_sub;
 

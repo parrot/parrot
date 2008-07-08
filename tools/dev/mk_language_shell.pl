@@ -23,9 +23,11 @@ For a language 'Xyz', this script will create the following
 files and directories (relative to C<path>, which defaults
 to F<languages/xyz> if an explicit C<path> isn't given):
 
+    README
     xyz.pir
     config/makefiles/root.in
     src/parser/grammar.pg
+    src/parser/grammar-oper.pg
     src/parser/actions.pm
     src/builtins/say.pir
     t/harness
@@ -36,7 +38,8 @@ be used to repopulate a language directory with omitted files.
 
 After populating the language directory, the script attempts to
 run tools/dev/reconfigure.pl to automatically generate the Makefile
-from config/makefiles/root.in .
+from config/makefiles/root.in . This step is only executed if the
+optional C<path> argument is not specified.
 
 If all goes well, after creating the language shell one can simply
 change to the language directory and type
@@ -63,6 +66,10 @@ my $lang = $ARGV[0];
 my $lclang = lc $lang;
 my $uclang = uc $lang;
 
+## the name and revision of the script, for use in the generated README
+my $script = $0;
+my $rev = '$Revision$';
+$rev =~ s/^\D*(\d+)\D*$/r$1/;
 
 ##  get the path from the command line, or if not supplied then
 ##  use languages/$lclang.
@@ -80,6 +87,8 @@ while (<DATA>) {
     s{\@lclang\@} {$lclang}ig;
     s{\@UCLANG\@} {$uclang}ig;
     s{\@Id\@}     {\$Id\$}ig;
+    s{\@script\@} {$script}ig;
+    s{\@rev\@}    {$rev}ig;
     if (/^__(.*)__$/) { start_new_file("$path$PConfig{slash}$1"); }
     elsif ($fh) { print $fh $_; }
 }
@@ -123,6 +132,9 @@ sub start_new_file {
 ###  @UCLANG@, and @Id@ as appropriate).
 
 __DATA__
+__README__
+Language '@lang@' was created with @script@, @rev@.
+
 __config/makefiles/root.in__
 ## @Id@
 
@@ -143,6 +155,9 @@ PARROT        = ../../parrot@exe@
 CAT           = $(PERL) -MExtUtils::Command -e cat
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 ## places to look for things
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
@@ -173,10 +188,11 @@ BUILTINS_PIR = \
 @lclang@.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o @lclang@.pbc @lclang@.pir
 
-src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
+src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg src/parser/grammar-oper.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
 	    --output=src/gen_grammar.pir \
-	    src/parser/grammar.pg
+	    src/parser/grammar.pg \
+	    src/parser/grammar-oper.pg \
 
 src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
@@ -238,7 +254,7 @@ CLEANUPS = \
   $(PMC_DIR)/*.lib \
 
 
-clean:
+clean: testclean
 	$(RM_RF) $(CLEANUPS)
 
 realclean: clean
@@ -339,7 +355,7 @@ token ws {
 }
 
 rule statement {
-    'say' <value> [ ',' <value> ]* ';'
+    'say' <expression> [ ',' <expression> ]* ';'
     {*}
 }
 
@@ -355,6 +371,26 @@ rule quote {
     {*}
 }
 
+##  terms
+token term {
+    | <value> {*}                                #= value
+}
+
+rule expression is optable { ... }
+
+__src/parser/grammar-oper.pg__
+# @Id@
+
+##  expressions and operators
+proto 'term:'     is precedence('=')     is parsed(&term)      { ... }
+
+## multiplicative operators
+proto infix:<*>   is looser(term:)       is pirop('n_mul')     { ... }
+proto infix:</>   is equiv(infix:<*>)    is pirop('n_div')     { ... }
+
+## additive operators
+proto infix:<+>   is looser(infix:<*>)   is pirop('n_add')     { ... }
+proto infix:<->   is equiv(infix:<+>)    is pirop('n_sub')     { ... }
 
 __src/parser/actions.pm__
 # @Id@
@@ -386,10 +422,46 @@ method TOP($/) {
 
 method statement($/) {
     my $past := PAST::Op.new( :name('say'), :pasttype('call'), :node( $/ ) );
-    for $<value> {
+    for $<expression> {
         $past.push( $( $_ ) );
     }
     make $past;
+}
+
+##  expression:
+##    This is one of the more complex transformations, because
+##    our grammar is using the operator precedence parser here.
+##    As each node in the expression tree is reduced by the
+##    parser, it invokes this method with the operator node as
+##    the match object and a $key of 'reduce'.  We then build
+##    a PAST::Op node using the information provided by the
+##    operator node.  (Any traits for the node are held in $<top>.)
+##    Finally, when the entire expression is parsed, this method
+##    is invoked with the expression in $<expr> and a $key of 'end'.
+method expression($/, $key) {
+    if ($key eq 'end') {
+        make $($<expr>);
+    }
+    else {
+        my $past := PAST::Op.new( :name($<type>),
+                                  :pasttype($<top><pasttype>),
+                                  :pirop($<top><pirop>),
+                                  :lvalue($<top><lvalue>),
+                                  :node($/)
+                                );
+        for @($/) {
+            $past.push( $($_) );
+        }
+        make $past;
+    }
+}
+
+
+##  term:
+##    Like 'statement' above, the $key has been set to let us know
+##    which term subrule was matched.
+method term($/, $key) {
+    make $( $/{$key} );
 }
 
 
@@ -424,7 +496,7 @@ say.pir -- simple implementation of a say function
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'say'
     .param pmc args            :slurpy
@@ -452,15 +524,21 @@ __t/harness__
 
 # @Id@
 
-use FindBin;
-use lib qw( . lib ../lib ../../lib );
-use Parrot::Test::Harness language => '@lang@', compiler => '@lclang@.pbc';
+# pragmata
+use strict;
+use warnings;
+use 5.008;
+
+use lib qw( . lib ../lib ../../lib ../../lib );
+use Parrot::Test::Harness language => '@lang@',
+                          compiler => '@lclang@.pbc';
 
 __t/00-sanity.t__
 # This just checks that the basic parsing and call to builtin say() works.
-say '1..2';
+say '1..3';
 say 'ok 1';
 say 'ok ', 2;
+say 'ok ', 2 + 1;
 
 __DATA__
 

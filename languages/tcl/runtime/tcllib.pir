@@ -31,7 +31,6 @@ providing a compreg-compatible method.
 .include 'languages/tcl/runtime/string_to_list.pir'
 .include 'languages/tcl/runtime/variables.pir'
 .include 'languages/tcl/runtime/options.pir'
-.include 'languages/tcl/runtime/hacks.pir'
 
 # class files (HLL: _Tcl)
 .include 'languages/tcl/src/class/tclconst.pir'
@@ -46,7 +45,7 @@ providing a compreg-compatible method.
 .end
 
 .HLL '_Tcl', ''
-.namespace
+.namespace []
 
 .sub __load_macros :load :anon
   $P0 = compreg 'PIR'
@@ -261,7 +260,7 @@ env_loop_done:
 
 # Load the standard library
 .HLL 'Tcl', ''
-.namespace
+.namespace []
 
 .sub __load_stdlib :load :anon
   .include 'iglobals.pasm'

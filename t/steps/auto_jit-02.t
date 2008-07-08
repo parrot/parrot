@@ -38,6 +38,9 @@ $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 
+if (! defined $conf->data->get('cpuarch') ) {
+    $conf->data->set('cpuarch' => 1)
+}
 
 ok(auto::jit::_handle_execcapable($conf, 1),
     "_handle_execcapable() returned true value");
@@ -51,7 +54,6 @@ ok(auto::jit::_handle_execcapable($conf, 0),
 is($conf->data->get('execcapable'), 0,
     "Got expected value for execcapable");
 $conf->data->set('execcapable' => undef);
-
 
 pass("Completed all tests in $0");
 

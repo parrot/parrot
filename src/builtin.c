@@ -158,7 +158,7 @@ find_builtin(ARGIN(const char *func))
             /* we have to loop here because there is currently more than one
                entry for the 'say' opcode and we depend on having the first
                one so we can check signatures. --mdiep */
-            while (i>0 && strcmp(func, builtins[i-1].c_name) == 0)
+            while (i>0 && STREQ(func, builtins[i-1].c_name))
                 i--;
             return i;
         }

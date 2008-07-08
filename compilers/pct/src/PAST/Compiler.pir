@@ -37,6 +37,7 @@ any value type.
 =cut
 
 .include "cclass.pasm"
+.include "except_types.pasm"
 
 .namespace [ 'PAST::Compiler' ]
 
@@ -52,6 +53,7 @@ any value type.
     ##  %piropsig is a table of common opcode signatures
     .local pmc piropsig
     piropsig = new 'Hash'
+    piropsig['isa']      = 'IP~'
     piropsig['isfalse']  = 'IP'
     piropsig['issame']   = 'IPP'
     piropsig['istrue']   = 'IP'
@@ -362,16 +364,15 @@ third and subsequent children can be any value they wish.
     cpost = self.'as_post'(cpast, 'rtype'=>rtype)
     cpost = self.'coerce'(cpost, rtype)
     ops.'push'(cpost)
-    .local pmc is_flat
-    is_flat = cpast.'flat'()
+    .local pmc isflat
+    isflat = cpast.'flat'()
     if rtype != ':' goto iter_pos
     .local pmc npast, npost
     npast = cpast.'named'()
     unless npast goto iter_pos
-  iter_named:
-    npost = self.'as_post'(npast, 'rtype'=>'~')
     $S0 = cpost
-    if is_flat goto flat_named
+    if isflat goto flat_named
+    npost = self.'as_post'(npast, 'rtype'=>'~')
     $S1 = npost
     ops.'push'(npost)
     concat $S0, ' :named('
@@ -384,7 +385,7 @@ third and subsequent children can be any value they wish.
     push namedargs, $S0
     goto iter_rtype
   iter_pos:
-    if is_flat goto flat_pos
+    if isflat goto flat_pos
     push posargs, cpost
     goto iter_rtype
   flat_pos:
@@ -575,6 +576,17 @@ Return the POST representation of a C<PAST::Block>.
     compiler = node.'compiler'()
     if compiler goto children_compiler
 
+    ##  control exception handler
+    .local pmc ctrlpast, ctrllabel, rethrowlabel
+    ctrlpast = node.'control'()
+    unless ctrlpast goto children_past
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = self.'unique'('control_')
+    ctrllabel = $P0.'new'('result'=>$S0)
+    $S0 = concat $S0, '_rethrow'
+    rethrowlabel = $P0.'new'('result'=>$S0)
+    bpost.'push_pirop'('push_eh', ctrllabel)
+
   children_past:
     ##  all children but last are void context, last returns anything
     $P0 = node.'list'()
@@ -588,7 +600,29 @@ Return the POST representation of a C<PAST::Block>.
     ##  result of last child is return from block
     $P0 = ops[-1]
     bpost.'push_pirop'('return', $P0)
-    goto children_done
+
+    unless ctrlpast goto sub_done
+    bpost.'push'(ctrllabel)
+    bpost.'push_pirop'('.local pmc exception')
+    bpost.'push_pirop'('.get_results (exception, $S10)')
+    $I0 = isa ctrlpast, 'PAST::Node'
+    if $I0 goto control_past
+    if ctrlpast == 'return_pir' goto control_return
+    self.panic("Unrecognized control handler '", ctrlpast, "'")
+  control_return:
+    ##  handle 'return' exceptions
+    $S0 = self.'uniquereg'('P')
+    bpost.'push_pirop'('getattribute', $S0, 'exception', '"type"')
+    bpost.'push_pirop'('ne', $S0, .CONTROL_RETURN, rethrowlabel)
+    bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
+    bpost.'push_pirop'('return', $S0)
+    bpost.'push'(rethrowlabel)
+    bpost.'push_pirop'('throw', 'exception')
+    goto sub_done
+  control_past:
+    $P0 = self.'as_post'(ctrlpast, 'rtype'=>'*')
+    bpost.'push'($P0)
+    goto sub_done
 
   children_compiler:
     ##  set the compiler to use for the POST::Sub node, pass on
@@ -599,7 +633,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = node[0]
     bpost.'push'($P0)
 
-  children_done:
+  sub_done:
     ##  restore previous outer scope and symtable
     set_global '$?SUB', outerpost
     setattribute self, '%!symtable', outersym
@@ -622,18 +656,9 @@ Return the POST representation of a C<PAST::Block>.
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
     bpost.'push_pirop'('get_global', result, name)
-    goto block_decl_closure
+    goto block_done
   block_decl_ns:
     bpost.'push_pirop'('get_hll_global', result, ns, name)
-  block_decl_closure:
-    .local pmc closurelabel
-    $P0 = get_hll_global ['POST'], 'Label'
-    closurelabel = $P0.'new'('name'=>'closure_')
-    $S0 = self.'uniquereg'('I')
-    bpost.'push_pirop'('isa', $S0, result, "'Closure'")
-    bpost.'push_pirop'('unless', $S0, closurelabel)
-    bpost.'push_pirop'('newclosure', result, result)
-    bpost.'push'(closurelabel)
     goto block_done
 
   block_immediate:
@@ -641,10 +666,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_immediate_ns
-    $S0 = '$P10'
-    bpost.'push_pirop'('get_global', $S0, name)
-    bpost.'push_pirop'('newclosure', $S0, $S0)
-    bpost.'push_pirop'('call', $S0, 'result'=>result)
+    bpost.'push_pirop'('call', name, 'result'=>result)
     goto block_done
   block_immediate_ns:
     $S0 = '$P10'
@@ -777,8 +799,7 @@ for calling a sub.
     signature = 'vP:'
   have_signature:
 
-    .local pmc ops, posargs, namedargs
-    .local string name
+    .local pmc name, ops, posargs, namedargs
     name = node.'name'()
     if name goto call_by_name
     ##  our first child is the thing to be invoked, so make sure it's a PMC
@@ -787,8 +808,17 @@ for calling a sub.
     goto children_done
   call_by_name:
     (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
+    $I0 = isa name, 'PAST::Node'
+    if $I0 goto call_by_name_past
     $S0 = self.'escape'(name)
     unshift posargs, $S0
+    goto children_done
+  call_by_name_past:
+    .local pmc name_post
+    name_post = self.'as_post'(name, 'rtype'=>'s')
+    name_post = self.'coerce'(name_post, 's')
+    ops.'push'(name_post)
+    unshift posargs, name_post
   children_done:
 
     ##  generate the call itself
@@ -1110,19 +1140,18 @@ by C<node>.
     .local pmc arglist
     arglist = new 'ResizablePMCArray'
   arity_loop:
-    if arity < 1 goto arity_end
     .local string nextval
     nextval = self.'uniquereg'('P')
-    push arglist, nextval
     ops.'push_pirop'('shift', nextval, iter)
+    if arity < 1 goto arity_end
+    push arglist, nextval
     dec arity
-    goto arity_loop
+    if arity > 0 goto arity_loop
   arity_end:
 
     .local pmc subpost
     subpost = self.'as_post'(subpast, 'rtype'=>'P')
     ops.'push'(subpost)
-    ops.'push_pirop'('newclosure', subpost, subpost)
     ops.'push_pirop'('call', subpost, arglist :flat)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
@@ -1167,6 +1196,40 @@ to C<ResizablePMCArray> if not set.
 .end
 
 
+=item return(PAST::Op node)
+
+Generate a return exception, using the first child (if any) as
+a return value.
+
+=cut
+
+.sub 'return' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+
+    .local string exreg, extype
+    exreg = self.'uniquereg'('P')
+    extype = concat exreg, "['_type']"
+    ops.'push_pirop'('new', exreg, '"Exception"')
+    ops.'push_pirop'('set', extype, .CONTROL_RETURN)
+
+    .local pmc cpast, cpost
+    cpast = node[0]
+    unless cpast goto cpast_done
+    cpost = self.'as_post'(cpast, 'rtype'=>'P')
+    cpost = self.'coerce'(cpost, 'P')
+    ops.'push'(cpost)
+    ops.'push_pirop'('setattribute', exreg, "'payload'", cpost)
+  cpast_done:
+    ops.'push_pirop'('throw', exreg)
+    .return (ops)
+.end
+
+
 =item try(PAST::Op node)
 
 Return the POST representation of a C<PAST::Op>
@@ -1192,12 +1255,21 @@ handler.
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
 
+    .local string rtype
+    rtype = options['rtype']
+
     .local pmc trypast, trypost
     trypast = node[0]
-    trypost = self.'as_post'(trypast, 'rtype'=>'P')
+    trypost = self.'as_post'(trypast, 'rtype'=>rtype)
     ops.'push_pirop'('push_eh', catchlabel)
     ops.'push'(trypost)
     ops.'push_pirop'('pop_eh')
+    .local pmc elsepast, elsepost
+    elsepast = node[2]
+    if null elsepast goto else_done
+    elsepost = self.'as_post'(elsepast, 'rtype'=>'v')
+    ops.'push'(elsepost)
+  else_done:
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(catchlabel)
     .local pmc catchpast, catchpost
@@ -1521,7 +1593,11 @@ attribute.
     pop_eh
     .return self.$P0(node, bindpost)
   scope_error:
-    .return self.'panic'("Scope ", scope, " not found for PAST::Var '", name, "'")
+    unless scope goto scope_error_1
+    scope = concat " '", scope
+    scope = concat scope, "'"
+  scope_error_1:
+    .return self.'panic'("Scope", scope, " not found for PAST::Var '", name, "'")
 .end
 
 
@@ -1709,6 +1785,8 @@ attribute.
 
     $P0 = node.'vivibase'()
     unless $P0 goto have_vivibase
+    $I0 = can basepast, 'viviself'
+    unless $I0 goto have_vivibase
     $P1 = basepast.'viviself'()
     unless $P1 goto vivibase_1
     if $P1 != 'Undef' goto have_vivibase

@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  31;
+use Test::More qw(no_plan); # tests =>  35;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -191,6 +191,85 @@ isa_ok( $step, $step_name );
     like($stdout, qr/conversion ops might fail/s,
         "Got expected warning");
 }
+
+my (%hugeintval, $intval, $intvalsize);
+
+$conf->data->set( intval => undef );
+$conf->data->set( intvalsize => undef );
+$hugeintval{hugeintvalsize} = undef;
+$intval = q{integer};
+$intvalsize = 4;
+auto::sizes::_handle_hugeintvalsize(
+    $conf,
+    {
+        hugeintval      => \%hugeintval,
+        intval          => $intval,
+        intvalsize      => $intvalsize,
+    },
+);
+is( $conf->data->get( 'hugeintval' ), $intval,
+    "Got expected value for hugeintval");
+is( $conf->data->get( 'hugeintvalsize' ), $intvalsize,
+    "Got expected value for hugeintvalsize");
+$conf->data->set( hugeintval => undef );
+$conf->data->set( hugeintvalsize => undef );
+
+$conf->data->set( intval => undef );
+$conf->data->set( intvalsize => undef );
+$hugeintval{hugeintvalsize} = 4;
+$intval = q{integer};
+$intvalsize = 4;
+auto::sizes::_handle_hugeintvalsize(
+    $conf,
+    {
+        hugeintval      => \%hugeintval,
+        intval          => $intval,
+        intvalsize      => $intvalsize,
+    },
+);
+is( $conf->data->get( 'hugeintval' ), $intval,
+    "Got expected value for hugeintval");
+is( $conf->data->get( 'hugeintvalsize' ), $intvalsize,
+    "Got expected value for hugeintvalsize");
+$conf->data->set( hugeintval => undef );
+$conf->data->set( hugeintvalsize => undef );
+
+$conf->data->set( intval => undef );
+$conf->data->set( intvalsize => undef );
+$hugeintval{hugeintvalsize} = 8;
+$intval = q{integer};
+$intvalsize = 4;
+auto::sizes::_handle_hugeintvalsize(
+    $conf,
+    {
+        hugeintval      => \%hugeintval,
+        intval          => $intval,
+        intvalsize      => $intvalsize,
+    },
+);
+ok( ! defined $conf->data->get( 'hugeintval' ), 
+    "Got expected value for hugeintval");
+ok( ! defined $conf->data->get( 'hugeintvalsize' ), 
+    "Got expected value for hugeintvalsize");
+$conf->data->set( hugeintval => undef );
+$conf->data->set( hugeintvalsize => undef );
+
+$conf->data->set( intval => undef );
+$conf->data->set( intvalsize => undef );
+
+my $size = 12;
+auto::sizes::_set_hugefloatval( $conf, $size );
+is( $conf->data->get( 'hugefloatval' ), 'long double',
+    "Got expected type for hugefloatval");
+is( $conf->data->get( 'hugefloatvalsize' ), $size,
+    "Got expected size for hugefloatvalsize");
+
+auto::sizes::_set_hugefloatval( $conf, 0 );
+is( $conf->data->get( 'hugefloatval' ), 'double',
+    "Got expected type for hugefloatval");
+is( $conf->data->get( 'hugefloatvalsize' ), $conf->data->get('doublesize'),
+    "Got expected size for hugefloatvalsize");
+
 
 pass("Completed all tests in $0");
 

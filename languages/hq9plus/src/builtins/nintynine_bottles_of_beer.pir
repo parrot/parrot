@@ -7,7 +7,7 @@ nintynine_bottles_of_beer.pir -- simple implementation of a nintynine_bottles_of
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'nintynine_bottles_of_beer'
 

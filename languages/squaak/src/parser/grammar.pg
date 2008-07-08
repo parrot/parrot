@@ -28,6 +28,7 @@ rule statement {
     | <for_statement> {*}                    #= for_statement
     | <try_statement> {*}                    #= try_statement
     | <throw_statement> {*}                  #= throw_statement
+    | <return_statement> {*}                 #= return_statement
     | <sub_call> {*}                         #= sub_call
     | <assignment> {*}                       #= assignment
     | <variable_declaration> {*}             #= variable_declaration
@@ -35,7 +36,7 @@ rule statement {
 }
 
 rule if_statement {
-    'if' <expression> 'then' <block> ['else' $<else>=<block>]? 'end'
+    'if' <expression> 'then' <block> ['else' <else=block>]? 'end'
     {*}
 }
 
@@ -45,7 +46,7 @@ rule while_statement {
 }
 
 rule for_statement {
-    'for' <for_init> ',' <expression> [',' $<step>=<expression>]? 'do'
+    'for' <for_init> ',' <expression> [',' <step=expression>]? 'do'
     <statement>*
     'end'
     {*}
@@ -57,7 +58,7 @@ rule for_init {
 }
 
 rule try_statement {
-    'try' $<try>=<block> 'catch' <exception> $<catch>=<block> 'end'
+    'try' <try=block> 'catch' <exception> <catch=block> 'end'
     {*}
 }
 
@@ -68,6 +69,11 @@ rule exception {
 
 rule throw_statement {
     'throw' <expression>
+    {*}
+}
+
+rule return_statement {
+    'return' <expression>
     {*}
 }
 
@@ -146,6 +152,7 @@ rule term {
    | <string_constant> {*}           #= string_constant
    | <hash_constructor> {*}          #= hash_constructor
    | <array_constructor> {*}         #= array_constructor
+   | <sub_call> {*}                  #= sub_call
    | <primary> {*}                   #= primary
    | '(' <expression> ')' {*}        #= expression
 }
@@ -189,8 +196,8 @@ token string_constant {
 }
 
 token keyword {
-    ['and'|'catch'|'do'   |'else'|'end'|'for'  |'if'   |'not'
-    |'or' |'sub'  |'throw'|'try' |'var'|'while']>>
+    ['and'|'catch' |'do' |'else' |'end' |'for'|'if'   |'not'
+    |'or' |'return'|'sub'|'throw'|'try' |'var'|'while']>>
 }
 
 rule expression is optable { ... }

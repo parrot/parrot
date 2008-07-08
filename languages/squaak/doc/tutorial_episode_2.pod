@@ -1,0 +1,245 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+=head1 Episode 2: Poking in Compiler Guts
+
+=head2 Introduction
+
+In the first episode, we introduced the Parrot Compiler Tools, and generated a
+very simple language using a shell script provided with the Parrot distribution.
+We also announced Squaak, a simple programming language developed specially for
+this tutorial. Squaak will be the case study to show how PCT can be used as a
+very effective set of tools to implement a language for Parrot. A list of
+features of Squaak was specified. If you felt lucky, you might even have tried
+to do the exercise at the end of the previous episode.
+
+In this episode, we will take a closer look at the generated compiler. We shall
+check out the different stages of the compilation process, and show what's going
+on in PCT-based compilers.
+
+=head2 Under the Hood
+
+Remember how we invoked our compiler in the previous episode? We can pass a
+file, or invoke the compiler without a command line argument, in which case our
+compiler enters the interactive mode. Consider the first case, passing the file
+test.sq, just as we did before:
+
+ $ ../../parrot squaak.pbc test.sq
+
+When invoking our compiler like this, the file test.sq is compiled and the
+generated code (bytecode) is executed immediately by Parrot. How does this work,
+you might wonder. The interpretation of a script is done through a series of
+transformations, starting at the script source and ending in a format that can
+be executed by Parrot. Compilers built with the PCT (based on the HLLCompiler
+class) can take a target option, to show one of the intermediate
+representations. This option can have the following values, corresponding to the
+four default compilation phases of an HLLCompiler object:
+
+=over 4
+
+=item * --target=parse
+
+=item * --target=past
+
+=item * --target=post
+
+=item * --target=pir
+
+=back
+
+This is an example of using the target option set to "parse", which will print
+the parse tree of the input to stdout:
+
+ $ ../../parrot squaak.pbc --target=parse test.sq
+
+In interactive mode, giving this input:
+
+ say 42;
+
+will print this parse tree (without the line numbers):
+
+  1 "parse" => PMC 'Squaak::Grammar' => "say 42;\r\n" @ 0 {
+  2    <statement> => ResizablePMCArray (size:1) [
+  3        PMC 'Squaak::Grammar' => "say 42;\r\n" @ 0 {
+  4            <value> => ResizablePMCArray (size:1) [
+  5                PMC 'Squaak::Grammar' => "42" @ 4 {
+  6                    <integer> => PMC 'Squaak::Grammar' => "42" @ 4
+  7                }
+  8            ]
+  9        }
+ 10    ]
+ 11 }
+
+When changing the value of the target option, the output changes into a
+different representation of the input. Why don't you try that right now?
+
+So, a HLLCompiler object has four compilation phases: parsing, construction of a
+Parrot Abstract Syntax Tree (PAST), construction of a Parrot Opcode Syntax Tree
+(POST), generation of Parrot Intermediate Representation (PIR). After
+compilation, the generated PIR is executed immediately.
+
+If your compiler needs additional stages, you can add them to your HLLCompiler
+object. For Squaak, we will not need this, but for details, check out
+F<compilers/pct/src/pct/HLLCompiler.pir>.
+
+We shall now discuss each compilation phase in more detail. The first two
+phases, parsing the input and construction of the PAST are executed
+simultaneously. Therefore, these are discussed together.
+
+Parse phase: match objects and PAST construction
+During the parsing phase, the input is analyzed using Perl 6's extended regular
+expressions, known as Rules (see Synopsis 5 for details). When a rule matches
+some input string, a so-called Match object is created. A Match object is a
+combined array and hashtable, implying it can be indexed by integers as well as
+strings. As rules typically consist of other (sub) rules, it is easy to retrieve
+a certain part of the match. For instance, this rule:
+
+ rule if_statement {
+     'if' <expression> 'then' <statement> 'end'
+     {*}
+ }
+
+has two other subrules: expression and statement. The match object for the rule
+if_statement represents the whole string from if to end. When you're interested
+only in the expression or statement part, you can retrieve that by indexing the
+match object by the name of the subrule (in this case, expression and statement,
+respectively).
+
+During the parse phase, the PAST is constructed. There is a small set of PAST
+node types, for instance, C<PAST::Var> to represent variables (identifiers, such
+as C<print>), C<PAST::Val> to represent literal values (for instance, C<"hello">
+and C<42>), and so on. Later we shall discuss the various PAST nodes in more
+detail.
+
+Now, you might wonder, at which point exactly is this PAST construction
+happening? This is where the special {*} symbol comes in, just below the string
+'if' in the if_statement rule shown above. These special markers indicate that a
+parse action should be invoked. Such a parse action is just a method that has
+the same name as the rule in which it is written (in this case: if_statement).
+So, during the parsing phase, several parse actions are executed, each of which
+builds a piece of the total PAST representing the input string. More on this
+will be explained later.
+
+The Parrot Abstract Syntax Tree is just a different representation of the same
+input string (your program being compiled). It is a convenient data structure to
+transform into something different (such as executable Parrot code) but also to
+do all sorts of analysis, such as compile-time type checking.
+
+=head2 PAST to POST
+
+After the parse phase during which the PAST is constructed, the HLLCompiler
+transforms this PAST into something called a Parrot Opcode Syntax Tree (POST).
+The POST representation is also a tree structure, but these nodes are on a lower
+abstraction level. For instance, on the PAST level there is a node type to
+represent a while statement (constructed as
+C<PAST::Op.new( :pasttype('while') )> ).
+
+The template for a while statement typically consists of a number of labels and
+jump instructions. On the POST level, the same while statement is represented by
+a set of nodes, each representing a one instruction or a label. Therefore, it is
+much easier to transform a POST into something executable than when this is done
+from the PAST level.
+Usually, as a user of the PCT, you don't need to know details of POST nodes,
+which is why this will not be discussed in further detail. Use the target option
+to see what a POST looks like.
+
+=head2 POST to PIR
+
+In the fourth (and final) stage, the POST is transformed into Parrot
+Intermediate Representation (PIR). As mentioned, transforming a POST into
+something executable is rather straightforward, as POST nodes already represent
+individual instructions and labels. Again, normal usage of the PCT does not
+require you to know any details about this transformation.
+
+=head2 And now for the good news...
+
+We established the general data flow of PCT-based compilers, which consists of
+four stages:
+
+=over 4
+
+=item 1. source to parse tree
+
+=item 2. parse tree to PAST
+
+=item 3. PAST to POST
+
+=item 4. POST to PIR
+
+=back
+
+where we noted that the first two are done during the parse stage. Now, as
+you're reading this tutorial, you're probably interested in using the PCT for
+implementing Your Favorite Language for Parrot. We already saw that a language
+grammar is expressed in Perl 6 Rules. What about the other transformations?
+Well, earlier in this episode we mentioned the term parse actions, and that
+these actions create PAST nodes. After you have written a parse action for each
+grammar rule, you're done!
+
+Say what?
+
+That's right. Once you have correctly constructed a PAST, your compiler can
+generate executable PIR, which means you just implemented your first language
+for Parrot. Of course, you still need to implement any language specific
+libraries, but that's besides the point.
+
+PCT-based compilers already know how to transform a PAST into a POST, and how to
+transform a POST into PIR. These transformation stages are already provided by
+the PCT.
+
+=head2 What's next?
+
+In this episode we took a closer look at the internals of a PCT-based compiler.
+We discussed the four compilation stages, that transform an input string (a
+program, or script, depending on your definition) into a PAST, a POST and
+finally executable PIR.
+The next episodes is where the Fun Stuff is: we will be implementing Squaak for
+Parrot. Piece by piece, we will implement the parser and the parse actions.
+Finally, we shall demonstrate John Conway's "Game of Life" running on Parrot,
+implemented in Squaak.
+
+=head2 Exercises
+
+Last episode's exercise was to add a command line banner and prompt for the
+interactive mode of our compiler. Given the hints that were provided, it was
+probably not too hard to find the solution, which is shown below. This
+subroutine onload can be found in the file Squaak.pir. The relevant lines are
+marked with a comment
+
+  .sub 'onload' :anon :load :init
+      load_bytecode 'PCT.pbc'
+
+      $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+      $P1 = $P0.'new'()
+      $P1.'language'('Squaak')
+      $P1.'parsegrammar'('Squaak::Grammar')
+      $P1.'parseactions'('Squaak::Grammar::Actions')
+
+      $P1.'commandline_banner'("Squaak for Parrot VM\n") ## set banner
+      $P1.'commandline_prompt'('> ')                     ## set prompt
+
+  .end
+
+Starting in the next episode, the exercises will be more interesting. For now,
+it would be useful to browse around through the source files of the compiler,
+and see if you understand the relation between the grammar rules in grammar.pg
+and the methods in actions.pm.
+It's also useful to experiment with the --target option described in this
+episode. If you don't know PIR, now is the time to do some preparation for that.
+There's sufficient information to be found on PIR, see the References section
+for details. In the mean time, if you have any suggestions, questions and
+whatnot, don't hesitate to leave a comment.
+
+=head2 References
+
+=over 4
+
+=item 1. PIR language specification: docs/pdds/draft/PDD19_pir.pod
+
+=item 2. PIR articles: docs/art/*.pod
+
+=back
+
+
+=cut
+

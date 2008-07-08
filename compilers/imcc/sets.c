@@ -11,7 +11,7 @@ compilers/imcc/sets.c
 
 =head1 DESCRIPTION
 
-RT#48264
+An implementation of sets -- used for tracking register usage.
 
 =head2 Functions
 
@@ -40,7 +40,7 @@ RT#48264
 
 =item C<Set* set_make>
 
-Create a new Set object.
+Creates a new Set object.
 
 =cut
 
@@ -49,19 +49,22 @@ Create a new Set object.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make(int length)
+set_make(unsigned int length)
 {
     Set * const s = mem_allocate_zeroed_typed(Set);
     s->length     = length;
-    s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length), unsigned char);
+    s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length),
+                        unsigned char);
+
     return s;
 }
+
 
 /*
 
 =item C<Set* set_make_full>
 
-Create a new Set object and clear all bits.
+Creates a new Set object of C<length> items, setting them all to full.
 
 =cut
 
@@ -70,7 +73,7 @@ Create a new Set object and clear all bits.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make_full(int length)
+set_make_full(unsigned int length)
 {
     Set * const s      = set_make(length);
     const size_t bytes = NUM_BYTES(length);
@@ -81,11 +84,12 @@ set_make_full(int length)
     return s;
 }
 
+
 /*
 
 =item C<void set_free>
 
-Free memory allocated for the Set argument.
+Frees the given Set and its allocated memory.
 
 =cut
 
@@ -96,14 +100,16 @@ set_free(ARGMOD(Set *s))
 {
     if (s->bmp)
         mem_sys_free(s->bmp);
+
     mem_sys_free(s);
 }
+
 
 /*
 
 =item C<void set_clear>
 
-Clear all bits in the Set argument.
+Clears all bits in the Set.
 
 =cut
 
@@ -115,11 +121,12 @@ set_clear(ARGMOD(Set *s))
     memset(s->bmp, 0, NUM_BYTES(s->length));
 }
 
+
 /*
 
 =item C<Set* set_copy>
 
-RT#48260: Not yet documented!!!
+Copies the set C<s>, returning a new set pointer.
 
 =cut
 
@@ -136,11 +143,15 @@ set_copy(ARGIN(const Set *s))
     return d;
 }
 
+
 /*
 
 =item C<int set_equal>
 
-RT#48260: Not yet documented!!!
+Compares two sets for equality; sets are equal if they contain the same
+elements.
+
+Raises a fatal error if the two Sets have different lengths.
 
 =cut
 
@@ -152,9 +163,8 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
     int mask;
     const int bytes = s1->length / 8;
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_equal", "Sets don't have the same length\n");
-    }
 
     if (bytes)
         if (memcmp(s1->bmp, s2->bmp, bytes) != 0)
@@ -171,18 +181,19 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
     return 1;
 }
 
+
 /*
 
 =item C<void set_add>
 
-RT#48260: Not yet documented!!!
+Adds to set C<s> the element C<element>.
 
 =cut
 
 */
 
 void
-set_add(ARGMOD(Set *s), int element)
+set_add(ARGMOD(Set *s), unsigned int element)
 {
     const int elem_byte_in_set = BYTE_IN_SET(element);
     const int bytes_in_set     = BYTE_IN_SET(s->length);
@@ -196,11 +207,12 @@ set_add(ARGMOD(Set *s), int element)
     s->bmp[elem_byte_in_set] |= BIT_IN_BYTE(element);
 }
 
+
 /*
 
-=item C<int set_first_zero>
+=item C<unsigned int set_first_zero>
 
-RT#48260: Not yet documented!!!
+Sets the first unused item in the set.
 
 =cut
 
@@ -208,13 +220,15 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-int
+unsigned int
 set_first_zero(ARGIN(const Set *s))
 {
-    int i, j;
+    unsigned int i;
 
     for (i = 0; i < NUM_BYTES(s->length); ++i) {
         const int set_byte = s->bmp[i];
+        int j;
+
         if (set_byte == 0xFF)
             continue;
 
@@ -228,12 +242,13 @@ set_first_zero(ARGIN(const Set *s))
     return s->length;
 }
 
+
 /*
 
 =item C<int set_contains>
 
-Check whether the specified element is present in the
-specified Set argument. Returns 1 if it is, 0 otherwise.
+Checks whether the specified element is present in the specified Set argument.
+Returns 1 if it is, 0 otherwise.
 
 =cut
 
@@ -242,7 +257,7 @@ specified Set argument. Returns 1 if it is, 0 otherwise.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int
-set_contains(ARGIN(const Set *s), int element)
+set_contains(ARGIN(const Set *s), unsigned int element)
 {
     if (element > s->length)
         return 0;
@@ -256,15 +271,14 @@ set_contains(ARGIN(const Set *s), int element)
     }
 }
 
+
 /*
 
 =item C<Set * set_union>
 
-Compute the union of the two Set arguments. A new
-resulting Set object is returned.
+Computes the union of the two Set arguments, returning it as a new Set.
 
-If the two Set arguments have different lengths, a
-fatal error is raised.
+Raises a fatal error if the two Sets have different lengths.
 
 =cut
 
@@ -275,30 +289,28 @@ PARROT_CANNOT_RETURN_NULL
 Set *
 set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
-    int i;
+    unsigned int i;
     Set * const s = set_make(s1->length);
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_union", "Sets don't have the same length\n");
-    }
 
-    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
+    for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] | s2->bmp[i];
     }
 
     return s;
 }
 
+
 /*
 
 =item C<Set * set_intersec>
 
-Create a new Set object that is the intersection of the
-Set arguments. Intersection is defined through the binary
-and operator.
+Creates a new Set object that is the intersection of the Set arguments (defined
+through the binary C<and> operator.)
 
-If the argument Sets don't have the same length, a fatal
-error is raised.
+Raises a fatal error if the two Sets have different lengths.
 
 =cut
 
@@ -309,27 +321,26 @@ PARROT_CANNOT_RETURN_NULL
 Set *
 set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
-    int i;
+    unsigned int i;
     Set * const s = set_make(s1->length);
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_intersec", "Sets don't have the same length\n");
-    }
 
-    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
+    for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] & s2->bmp[i];
     }
 
     return s;
 }
 
+
 /*
 
 =item C<void set_intersec_inplace>
 
-See set_intersec, except that the first argument Set
-is changed inplace; in other words, the first Set argument
-becomes the result.
+Performs a set intersection in place -- the first Set argument changes to
+contain the result.
 
 =cut
 
@@ -338,13 +349,12 @@ becomes the result.
 void
 set_intersec_inplace(ARGMOD(Set *s1), ARGIN(const Set *s2))
 {
-    int i;
+    unsigned int i;
 
-    if (s1->length != s2->length) {
+    if (s1->length != s2->length)
         fatal(1, "set_intersec_inplace", "Sets don't have the same length\n");
-    }
 
-    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
+    for (i = 0; i < BYTE_IN_SET(s1->length); i++) {
         s1->bmp[i] &= s2->bmp[i];
     }
 }

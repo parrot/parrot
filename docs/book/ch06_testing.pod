@@ -3,16 +3,16 @@
 Z<CHP-9-SECT-13>
 
 X<testing Parrot>
-As we mentioned earlier, contributions to the Parrot project are
-welcome.  Contributing tests is a good place to start. You don't have
-to understand the code behind a PASM opcodeN<Or IMCC instruction.> to
-test it, you only have to understand what it's supposed to do. If
-you're working on some code and it doesn't do what the documentation
-advertises, you can isolate the problem in a test or series of tests
-and send them to the bug tracking system. There's a good chance the
-problem will be fixed before the next release. Writing tests makes it
-a lot easier for the developer to know when they've solved your
-problem--it's solved when your tests pass. It also prevents that
+Parrot is volunteer-driven, and contributions from new users are always
+welcome. Contributing tests is a good place for a new developer to start.
+You don't have to understand the code behind a PASM opcodeN<Or PIR
+instruction, or whatever.> to test it, you only have to understand
+the desired behavior. If you're working on some code and it doesn't do
+what the documentation claims, you can isolate the problem in a test or
+series of tests and send them to the bug tracking system. There's a
+good chance the problem will be fixed before the next release. Writing
+tests makes it a lot easier for the developer to know when they've solved
+your problem--it's solved when your tests pass. It also prevents that
 problem from appearing again, because it's checked every time anyone
 runs C<make> C<test>. As you move along, you'll want to write tests
 for every bug you fix or new feature you add.
@@ -22,8 +22,10 @@ X<Parrot::Test module>
 The Perl 5 testing framework is at the core of Parrot tests,
 particularly F<Test::Builder>. Parrot's F<Parrot::Test> module is an
 interface to F<Test::Builder> and implements the extra features needed
-for testing Parrot, like the fact that PASM code has to be compiled to
-bytecode before it runs.
+for testing Parrot, like the fact that PASM and PIR code has to be
+compiled to bytecode before it runs. F<Parrot::Test> handles the
+compilation and running of the test code, and collects the output for
+verification.
 
 The main Parrot tests are in the top-level F<t/> directory of the
 Parrot source tree. F<t/op> contains tests for basic opcodes and

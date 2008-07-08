@@ -20,6 +20,22 @@ class cardinal::Grammar::Actions;
 method TOP($/) {
     my $past := $( $<comp_stmt> );
     $past.blocktype('declaration');
+
+    our $?INIT;
+        if defined( $?INIT ) {
+        $?INIT.unshift(
+            PAST::Var.new(
+                :name('$def'),
+                :scope('lexical'),
+                :isdecl(1)
+            )
+        );
+        $?INIT.blocktype('declaration');
+        $?INIT.pirflags(':init :load');
+        $past.unshift( $?INIT );
+        $?INIT := PAST::Block.new(); # For the next eval.
+    }
+
     make $past;
 }
 
@@ -82,24 +98,17 @@ method stmt_mod($/) {
 }
 
 method expr($/) {
-    my $past := $( $<basic_expr> );
+    my $past := $( $<arg> );
+    if +$<not> {
+        $past := PAST::Op.new( $past, :pirop('not'), :node($/) );
+    }
     if $<expr> {
         my $op;
         if ~$<op>[0] eq 'and' { $op := 'if'; }
         else { $op := 'unless'; }
-        make PAST::Op.new( $past, $( $<expr>[0] ), :pasttype($op), :node($/) );
+        $past := PAST::Op.new( $past, $( $<expr>[0] ), :pasttype($op), :node($/) );
     }
-    else {
-        make $past;
-    }
-}
-
-method basic_expr($/, $key) {
-    make $( $/{$key} );
-}
-
-method not_expr($/) {
-    make PAST::Op.new( $( $<expr> ), :pirop('not'), :node($/) );
+    make $past;
 }
 
 method return_stmt($/) {
@@ -134,10 +143,55 @@ method end($/) {
     make $past;
 }
 
+method indexed_assignment($/) {
+    my $key := $( $<key> );
+    my $rhs := $( $<rhs> );
+    my $primary := $( $<basic_primary> );
+
+    my $past := PAST::Op.new( :name('[]='), :pasttype('callmethod'), :node($/) );
+
+    $past.push( $primary );
+    $past.push( $key );
+    $past.push( $rhs );
+
+    make $past;
+}
 method assignment($/) {
     my $lhs := $( $<mlhs> );
+    our $?BLOCK;
+    my $name := $lhs.name();
+    unless $?BLOCK.symbol(~$name) {
+        our @?BLOCK;
+        my $exists := 0;
+        my $scope;
+        for @?BLOCK {
+            if $_ {
+                my $sym_table := $_.symbol(~$name);
+                if $sym_table {
+                    $exists := 1;
+                    $scope := '' ~ $sym_table<scope>;
+                }
+            }
+        }
+        our $?CLASS;
+        if $exists == 0 && defined($?CLASS) {
+            my $block := $?CLASS[0];
+            my $sym_table := $block.symbol(~$name);
+            if $sym_table {
+                $exists := 1;
+                $scope := '' ~ $sym_table<scope>;
+            }
+        }
+        if $exists == 0 {
+            $lhs.isdecl(1);
+            $scope := 'lexical';
+        }
+        $?BLOCK.symbol(~$name, :scope($scope));
+        $lhs.scope($scope);
+    }
+
     my $rhs := $( $<mrhs> );
-    make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
+    make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :lvalue(1), :node($/) );
 }
 
 method mlhs($/, $key) {
@@ -153,15 +207,13 @@ method member_variable($/) {
     # XXX fix field.
 }
 
-method indexed_variable($/) {
-    my $var := $( $<primary> );
+method indexed($/) {
     my $args;
     if $<args> {
         $args := $( $<args>[0] );
     }
 
-    my $past := PAST::Var.new( :scope('keyed'), :node($/) );
-    $past.push($var);
+    my $past := PAST::Op.new( :name('[]'), :pasttype('callmethod'), :node($/) );
     while $args[0] {
         $past.push( $args.shift() );
     }
@@ -170,7 +222,17 @@ method indexed_variable($/) {
 }
 
 method variable($/, $key) {
-    make $( $/{$key} );
+    my $past;
+    if $key eq 'varname' {
+        $past := $( $/<varname> );
+    }
+    elsif $key eq 'self' {
+        $past := PAST::Op.new(:inline('%r = self'));
+    }
+    elsif $key eq 'nil' {
+        $/.panic('nil is not yet implemented');
+    }
+    make $past;
 }
 
 method varname($/, $key) {
@@ -182,29 +244,66 @@ method global($/) {
 }
 
 method instance_variable($/) {
-    make PAST::Var.new(  :name(~$/), :scope('attribute'), :viviself('Undef'), :node($/) );
+    our $?CLASS;
+    our $?BLOCK;
+    my $name := ~$/;
+    my $past := PAST::Var.new(  :name($name), :scope('attribute'), :viviself('Undef'), :node($/) );
+    my $block := $?CLASS[0];
+    unless $block.symbol(~$/) {
+        $?CLASS.push(
+            PAST::Op.new(
+                :pasttype('call'),
+                :name('!keyword_has'),
+                PAST::Var.new(
+                    :name('$def'),
+                    :scope('lexical')
+                ),
+                PAST::Val.new( :value($name) )
+            )
+        );
+
+        $block.symbol(~$name, :scope('attribute'));
+        $?BLOCK.symbol(~$name, :scope('attribute'));
+    }
+    make $past;
 }
 
 method local_variable($/) {
     our $?BLOCK;
-    my $past := PAST::Var.new( :name(~$/), :scope('lexical'), :node($/), :viviself('Undef') );
-    unless $?BLOCK.symbol($<ident>) {
+    my $past := PAST::Var.new( :name(~$/), :node($/), :viviself('Undef') );
+    if $?BLOCK.symbol($<ident>) {
+        my $scope := '' ~ $?BLOCK.symbol($<ident>)<scope>;
+        $past.scope(~$scope);
+    }
+    else {
         our @?BLOCK;
         my $exists := 0;
+        my $scope;
         for @?BLOCK {
             if $_ {
                 my $sym_table := $_.symbol(~$<ident>);
                 if $sym_table {
                     $exists := 1;
+                    $scope := '' ~ $sym_table<scope>;
                 }
             }
         }
         if $exists == 0 {
-            $past.isdecl(1);
+            $past.scope('package');
+            my @a;
+            $past.namespace(@a);
         }
-        my $scope := 'lexical';
-        $?BLOCK.symbol(~$<ident>, :scope($scope));
+        else {
+            $past.scope($scope);
+        }
     }
+    make $past;
+}
+
+
+method constant_variable($/) {
+    my @a;
+    my $past := PAST::Var.new( :name(~$/), :scope('package'), :node($/), :viviself('Undef'), :namespace( @a ) );
     make $past;
 }
 
@@ -259,7 +358,19 @@ method ensure($/) {
 method while_stmt($/) {
     my $cond := $( $<expr> );
     my $body := $( $<comp_stmt> );
+    $body.blocktype('immediate');
     make PAST::Op.new( $cond, $body, :pasttype(~$<sym>), :node($/) );
+}
+
+method for_stmt($/) {
+    my $list := $( $<expr> );
+    my $body := $( $<comp_stmt> );
+    my $var := $( $<variable> );
+    $body.blocktype('declaration');
+    $var.scope('parameter');
+    $var.isdecl(0);
+    $body[0].push($var);
+    make PAST::Op.new( $list, $body, :pasttype('for'), :node($/) );
 }
 
 method module($/) {
@@ -276,6 +387,83 @@ method begin_end($/) {
     make $past;
 }
 
+method classdef($/,$key) {
+    our $?CLASS;
+    our @?CLASS;
+    our $?INIT;
+
+    my $name := ~$<module_identifier><ident>;
+    if $key eq 'open' {
+        my $decl := PAST::Stmts.new();
+        $decl.push(
+            PAST::Op.new(
+                :pasttype('bind'),
+                PAST::Var.new(
+                    :name('$def'),
+                    :scope('lexical')
+                ),
+                PAST::Op.new(
+                    :pasttype('call'),
+                    :name('!keyword_class'),
+                    PAST::Val.new( :value($name) )
+                )
+            )
+        );
+        @?CLASS.unshift( $?CLASS );
+        $?CLASS := $decl;
+        $?CLASS.unshift( PAST::Block.new() );
+    }
+    else {
+        my $block := $( $<comp_stmt> );
+        $block.namespace($name);
+        $block.blocktype('declaration');
+        $block.pirflags(':init :load');
+
+        $?CLASS.push(
+            PAST::Op.new(
+                :pasttype('callmethod'),
+                :name('register'),
+                PAST::Var.new(
+                    :scope('package'),
+                    :name('!CARDINALMETA'),
+                    :namespace('CardinalObject')
+                ),
+                PAST::Var.new(
+                    :scope('lexical'),
+                    :name('$def')
+                ),
+                PAST::Val.new(
+                    :value('CardinalObject'),
+                    :named( PAST::Val.new( :value('parent') ) )
+                )
+            )
+        );
+
+        unless defined( $?INIT ) {
+            $?INIT := PAST::Block.new();
+        }
+        for @( $?CLASS ) {
+            if $_.WHAT() eq 'Block' {
+                $block.push( $_ );
+            }
+            else {
+                $?INIT.push( $_ );
+            }
+        }
+
+        # Restore outer class.
+        if +@?CLASS {
+            $?CLASS := @?CLASS.shift();
+        }
+        else {
+            $?CLASS := @?CLASS[0];
+        }
+
+
+        make $block;
+    }
+}
+
 method functiondef($/) {
     my $past := $( $<comp_stmt> );
     my $name := $<fname>;
@@ -283,7 +471,11 @@ method functiondef($/) {
     #$past.push($args);
     $past.name(~$name);
     our $?BLOCK;
+    our $?CLASS;
     $?BLOCK.symbol(~$name, :scope('package'));
+    if defined($?CLASS) {
+        $past.pirflags(':method');
+    }
     make $past;
 }
 
@@ -333,26 +525,17 @@ method mrhs($/) {
     make $( $<args> );
 }
 
-method command($/, $key) {
-    make $( $/{$key} );
-}
-
-method call($/) {
+method methodcall($/) {
     my $op := $<operation>;
     my $past;
     if $<call_args> {
-        $past := $( $<call_args> );
+        $past := $( $<call_args>[0] );
     }
     else {
         $past := PAST::Op.new();
     }
 
-    if $<primary> {
-        my $invocant := $( $<primary>[0] );
-        # XXX what's the diff. between "." and "::", in $<op>[0] ?
-        $past.unshift($invocant);
-        $past.pasttype('callmethod');
-    }
+    $past.pasttype('callmethod');
 
     if $<do_block> {
         $past.push( $( $<do_block>[0] ) );
@@ -371,10 +554,6 @@ method super_call($/) {
     my $past := $( $<call_args> );
     ## how to invoke super.xxx ?
     make $past;
-}
-
-method not_command($/) {
-    make PAST::Op.new( $( $<command> ), :pirop('not'), :node($/) );
 }
 
 method operation($/) {
@@ -447,28 +626,29 @@ method pcomp_stmt($/) {
 }
 
 method array($/) {
-    my $past;
-    ## XXX the "new" method should be invoked on the "Array" class (use get_class)
-    ## but that doesn't work yet.
-    my $getclass := PAST::Op.new( :inline('    %r = new "CardinalArray"'), :node($/) );
+    my $list;
     if $<args> {
-        $past := $( $<args>[0] );
-        $past.unshift( $getclass );
-        $past.name('new');
-        $past.pasttype('callmethod');
+        $list := $( $<args>[0] );
+        $list.name('list');
     }
     else {
-        $past := PAST::Op.new( $getclass, :name('new'), :pasttype('callmethod'), :node($/) );
+        $list := PAST::Op.new( :name('list'), :node($/) );
     }
-    make $past;
+
+    make $list;
 }
 
 method ahash($/) {
-    # XXX handle class stuff
-    my $past;
-    my $getclass := PAST::Op.new( :inline('    %r = new "Hash"'), :node($/) );
-    $past := PAST::Op.new( $getclass, :name('new'), :pasttype('callmethod'), :node($/) );
-    make $past;
+    my $hash;
+    if $<args> {
+        $hash := $( $<args>[0] );
+        $hash.name('hash');
+    }
+    else {
+        $hash := PAST::Op.new( :name('hash'), :node($/) );
+    }
+
+    make $hash;
 }
 
 method assocs($/) {

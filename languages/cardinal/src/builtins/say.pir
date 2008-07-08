@@ -6,7 +6,7 @@ builtin functions for Ruby.
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'print'
     .param pmc args            :slurpy
@@ -25,22 +25,6 @@ builtin functions for Ruby.
     .param pmc args            :slurpy
     'print'(args :flat, "\n")
 .end
-
-.namespace ["Array"]
-
-.sub 'new' :method
-    .param pmc values :slurpy
-    .return (values)
-.end
-
-
-.namespace ["Hash"]
-
-.sub 'new' :method
-    .param pmc values :slurpy :named
-    .return (values)
-.end
-
 
 # Local Variables:
 #   mode: pir

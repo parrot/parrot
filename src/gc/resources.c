@@ -105,8 +105,9 @@ static Memory_Pool * new_memory_pool(
 
 =item C<static void alloc_new_block>
 
-Allocate a new memory block. We allocate the larger of the requested size or
-the default size.  The given text is used for debugging.
+Allocate a new memory block. We allocate either the requested size or the
+default size, whichever is larger. Add the new block to the given memory
+pool. The given C<char *why> text is used for debugging.
 
 =cut
 
@@ -216,7 +217,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
          */
         if (!interp->arena_base->DOD_block_level
         &&   interp->arena_base->mem_allocs_since_last_collect) {
-            Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+            Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 #if !PARROT_GC_IMS
             /* Compact the pool if allowed and worthwhile */
             if (pool->compact) {
@@ -318,7 +319,8 @@ debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
 
 =item C<static void compact_pool>
 
-Compact the buffer pool.
+Compact the string buffer pool. Does not perform a GC scan, or mark items
+as being alive in any way.
 
 =cut
 
@@ -548,8 +550,9 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
 =item C<void Parrot_go_collect>
 
-Go do a GC run. This only scans the string pools and compacts them, it
-doesn't check for string liveness.
+Scan the string pools and compact them. This does not perform a GC mark or
+sweep run, and does not check whether string buffers are still alive.
+Redirects to C<compact_pool>.
 
 =cut
 
@@ -636,7 +639,8 @@ aligned_string_size(size_t len)
 
 =item C<int Parrot_in_memory_pool>
 
-RT#48260: Not yet documented!!!
+Determines if the given C<bufstart> pointer points to a location inside the
+memory pool. Returns 1 if the pointer is in the memory pool, 0 otherwise.
 
 =cut
 
@@ -704,32 +708,38 @@ Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
      */
     new_size = aligned_size(buffer, newsize);
     old_size = aligned_size(buffer, PObj_buflen(buffer));
-    needed = new_size - old_size;
-    if ((pool->top_block->free >= needed) &&
-            (pool->top_block->top == (char*)PObj_bufstart(buffer) + old_size)) {
+    needed   = new_size - old_size;
+
+    if ((pool->top_block->free >= needed)
+    &&  (pool->top_block->top  == (char *)PObj_bufstart(buffer) + old_size)) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
         PObj_buflen(buffer) = newsize;
         return;
     }
+
     copysize = PObj_buflen(buffer);
-    if (!PObj_COW_TEST(buffer)) {
+
+    if (!PObj_COW_TEST(buffer))
         pool->guaranteed_reclaimable += copysize;
-    }
+
     pool->possibly_reclaimable += copysize;
-    mem = (char *)mem_allocate(interp, new_size, pool);
-    mem = aligned_mem(buffer, mem);
+    mem                         = (char *)mem_allocate(interp, new_size, pool);
+    mem                         = aligned_mem(buffer, mem);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
-    if (copysize) {
+    if (copysize)
         memcpy(mem, PObj_bufstart(buffer), copysize);
-    }
+
     PObj_bufstart(buffer) = mem;
+
     if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof (void*);
+        new_size -= sizeof (void *);
+
     PObj_buflen(buffer) = new_size;
 }
+
 
 /*
 
@@ -901,7 +911,8 @@ Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
 
 =item C<static Memory_Pool * new_memory_pool>
 
-Create a new memory pool.
+Allocate a new C<Memory_Pool> structures, and set some initial values.
+return a pointer to the new pool.
 
 =cut
 
@@ -929,7 +940,10 @@ new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 
 =item C<void Parrot_initialize_memory_pools>
 
-Initialize the managed memory pools.
+Initialize the managed memory pools. Parrot maintains two C<Memory_Pool>
+structures, the general memory pool and the constant string pool. Create
+and initialize both pool structures, and allocate initial blocks of memory
+for both.
 
 =cut
 
@@ -953,7 +967,9 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
 
 =item C<void Parrot_destroy_memory_pools>
 
-Destroys the memory pools.
+Destroys the memory pool and the constant string pool. Loop through both
+pools and destroy all memory blocks contained in them. Once all the
+blocks are freed, free the pools themselves.
 
 =cut
 
@@ -986,7 +1002,9 @@ Parrot_destroy_memory_pools(PARROT_INTERP)
 
 =item C<static void merge_pools>
 
-RT#48260: Not yet documented!!!
+Merge two memory pools together. Do this by moving all memory blocks
+from the C<*source> pool into the C<*dest> pool. The C<source> pool
+is emptied, but is not destroyed here.
 
 =cut
 
@@ -1028,7 +1046,9 @@ merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 
 =item C<void Parrot_merge_memory_pools>
 
-Merge the memory pools of C<source_interp> into C<dest_interp>.
+Merge the memory pools of two interpreter structures. Merge the general
+memory pool and the constant string pools from C<source_interp> into
+C<dest_interp>.
 
 =cut
 

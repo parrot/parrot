@@ -1,5 +1,5 @@
 .HLL 'Tcl', 'tcl_group'
-.namespace
+.namespace []
 
 .sub '&regsub'
   .param pmc argv :slurpy

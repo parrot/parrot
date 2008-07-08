@@ -20,7 +20,7 @@ This file implements the IO file handle class.
     .local pmc p6meta
     p6meta = get_hll_global ['Perl6Object'], '$!P6META'
     p6meta.'new_class'('IO', 'parent'=>'Any', 'attr'=>'$!PIO')
-    p6meta.'new_class'('IOIterator', 'parent'=>'Perl6Object', 'attr'=>'$!I0')
+    p6meta.'new_class'('IOIterator', 'parent'=>'Perl6Object', 'attr'=>'$!IO')
 .end
 
 =item print
@@ -76,6 +76,20 @@ Reads a line from the file handle.
 .end
 
 
+=item slurp
+
+Slurp a file into a string.
+
+=cut
+
+.sub 'slurp' :method
+    .local pmc PIO
+    PIO = getattribute self, "$!PIO"
+    $S0 = PIO.slurp('')
+    .return($S0)
+.end
+
+
 =item close
 
 Closes the file.
@@ -90,7 +104,7 @@ Closes the file.
 .end
 
 
-.namespace
+.namespace []
 
 =back
 

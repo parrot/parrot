@@ -236,7 +236,7 @@ it in the thread, that will receive that signal.
 static void
 Parrot_sigaction(int sig, ARGIN(void (*handler)(int)))
 {
-#if PARROT_HAS_SIGACTION
+#ifdef PARROT_HAS_SIGACTION
     struct sigaction action;
     sigset_t block_mask;
 
@@ -270,7 +270,7 @@ unblock a signal
 static void
 Parrot_unblock_signal(int sig)
 {
-#if PARROT_HAS_SIGACTION
+#ifdef PARROT_HAS_SIGACTION
     sigset_t block_mask;
 
     sigemptyset(&block_mask);

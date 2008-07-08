@@ -17,8 +17,8 @@ token TOP {
 }
 
 rule source_element {
-    | <statement> {*}              #= statement
     | <function_declaration> {*}   #= function_declaration
+    | <statement> {*}              #= statement
 }
 
 ##
@@ -64,7 +64,7 @@ rule statement {
     #| <for4_statement> {*}        #= for4_statement
     | <continue_statement> {*}    #= continue_statement
     | <break_statement> {*}       #= break_statement
-    #| <return_statement> {*}      #= return_statement
+    | <return_statement> {*}      #= return_statement
     #| <with_statement> {*}        #= with_statement
     | <labelled_statement> {*}    #= labelled_statement
     #| <switch_statement> {*}      #= switch_statement
@@ -161,7 +161,7 @@ rule finally {
     {*}
 }
 
-rule throw_statement {
+token throw_statement {
     'throw' \N <expression> ';'
     {*}
 }
@@ -186,8 +186,8 @@ rule expression_statement {
     {*}
 }
 
-rule return_statement {
-    'return' \N <expression>? ';'
+token return_statement {
+    'return' \N <expression>?  ';'
     {*}
 }
 
@@ -338,8 +338,8 @@ token exponent_part { <[eE]> <[+\-]> <digit>+ }
 
 token str_literal {
     [
-    | '"' <string_literal: "> '"'
-    | \' <string_literal: '> \'
+    | '"' <string_literal: '"'> '"'
+    | \' <string_literal: '\''> \'
     ]
     {*}
 }

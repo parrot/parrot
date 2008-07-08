@@ -89,7 +89,7 @@ static void more_traceable_objects(PARROT_INTERP,
 
 =item C<INTVAL contained_in_pool>
 
-Returns whether C<pool> contains C<*ptr>.
+Returns whether the given C<*ptr> points to a location in C<pool>.
 
 =cut
 
@@ -120,7 +120,8 @@ contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
 
 =item C<int Parrot_is_const_pmc>
 
-Returns whether C<*pmc> is a constant PMC.
+Returns whether C<*pmc> is a constant PMC. The given pointer is a constant
+PMC if it points into the constant PMC pool.
 
 =cut
 
@@ -143,7 +144,8 @@ Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
 
 =item C<static void more_traceable_objects>
 
-We're out of traceable objects. Try a DOD, then get some more if needed.
+We're out of traceable objects. First we try a DOD run to free some up. If
+that doesn't work, allocate a new arena.
 
 =cut
 
@@ -158,7 +160,7 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         Small_Object_Arena * const arena = pool->last_Arena;
         if (arena) {
             if (arena->used == arena->total_objects)
-                Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+                Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 
             if (pool->num_free_objects <= pool->replenish_level)
                 pool->skip = 1;
@@ -175,7 +177,8 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 =item C<static void gc_ms_add_free_pmc_ext>
 
-Add an unused PMC_EXT structure back to the free pool for later reuse.
+Add a freed PMC_EXT structure to the free list in the PMC_EXT pool. Objects
+on the free list can be reused later.
 
 =cut
 
@@ -185,6 +188,7 @@ static void
 gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
 {
     PMC_EXT *object        = (PMC_EXT *)to_add;
+    object->_metadata      = NULL;
 
     /* yes, this cast is a hack for now, but a pointer is a pointer */
     object->_next_for_GC   = (PMC *)pool->free_list;
@@ -195,7 +199,8 @@ gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void 
 
 =item C<static void gc_ms_add_free_object>
 
-Add an unused object back to the free pool for later reuse.
+Add an unused object back to the pool's free list for later reuse. Set
+the PObj flags to indicate that the item is free.
 
 =cut
 
@@ -218,7 +223,10 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *
 
 =item C<static void * gc_ms_get_free_object>
 
-Get a new object from the free pool and return it.
+Free object allocator for the MS garbage collector system. If there are no
+free objects, call C<gc_ms_add_free_object> to either free them up with a
+DOD run, or allocate new objects. If there are objects available on the
+free list, pop it off and return it.
 
 =cut
 
@@ -318,7 +326,9 @@ Parrot_add_to_free_list(PARROT_INTERP,
 
 =item C<void Parrot_append_arena_in_pool>
 
-insert the new arena into the pool's structure, update stats
+Insert the new arena into the pool's structure. Arenas are stored in a
+linked list, so add the new arena to the list. Set information in the
+arenas structure, such as the number of objects allocated in it.
 
 =cut
 
@@ -354,8 +364,9 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
 
 =item C<static void gc_ms_alloc_objects>
 
-We have no more headers on the free header pool. Go allocate more
-and put them on.
+New arena allocator function for the MS garbage collector system. Allocates
+and initializes a new memory arena in the given pool. Adds all the new
+objects to the pool's free list for later allocation.
 
 =cut
 
@@ -404,6 +415,8 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 =item C<Small_Object_Pool * new_small_object_pool>
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
+Initializes the pool structure based on the size of objects in the
+pool and the number of items to allocate in each arena.
 
 =cut
 
@@ -430,7 +443,8 @@ new_small_object_pool(size_t object_size, size_t objects_per_alloc)
 
 =item C<void gc_pmc_ext_pool_init>
 
-RT#48260: Not yet documented!!!
+Initialize the PMC_EXT pool functions. This is done separately from other
+pools.
 
 =cut
 
@@ -449,7 +463,9 @@ gc_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
 
 =item C<static void gc_ms_pool_init>
 
-RT#48260: Not yet documented!!!
+Initialize a memory pool for the MS garbage collector system. Sets the
+function pointers necessary to perform basic operations on a pool, such
+as object allocation.
 
 =cut
 
@@ -482,16 +498,19 @@ Parrot_gc_ms_init(PARROT_INTERP)
 {
     Arenas * const arena_base     = interp->arena_base;
 
-    arena_base->do_dod_run        = Parrot_dod_ms_run;
-    arena_base->de_init_gc_system = NULL;
-    arena_base->init_pool         = gc_ms_pool_init;
+    arena_base->do_gc_mark         = Parrot_dod_ms_run;
+    arena_base->finalize_gc_system = NULL;
+    arena_base->init_pool          = gc_ms_pool_init;
 }
 
 /*
 
 =item C<void Parrot_small_object_pool_merge>
 
-Merge C<source> into C<dest>.
+Merge pool C<source> into pool C<dest>. Combines the free lists directly,
+moves all arenas to the new pool, and remove the old pool. To merge, the
+two pools must have the same object size, and the same name (if they have
+names).
 
 =cut
 

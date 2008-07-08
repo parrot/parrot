@@ -8,15 +8,34 @@ Any - Perl 6 Any class
 
 This file implements the Any class.
 
+=head2 Basic C<Any> methods
+
+=over 4
+
 =cut
 
-.namespace [ 'Any' ]
-
+.namespace []
 .sub 'onload' :anon :init :load
     .local pmc p6meta
     p6meta = get_hll_global ['Perl6Object'], '$!P6META'
     p6meta.'new_class'('Any', 'parent'=>'Perl6Object')
 .end
+
+
+=item can($x)
+
+=cut
+
+.namespace ['Any']
+.sub 'can' :method
+    .param pmc x
+    $P0 = self.'HOW'()
+    .return $P0.'can'(x)
+.end
+
+=item isa($x)
+
+=cut
 
 .sub 'isa' :method
     .param pmc x
@@ -24,11 +43,9 @@ This file implements the Any class.
     .return $P0.'isa'(x)
 .end
 
-.sub 'can' :method
-    .param pmc x
-    $P0 = self.'HOW'()
-    .return $P0.'can'(x)
-.end
+=back
+
+=cut
 
 # Local Variables:
 #   mode: pir

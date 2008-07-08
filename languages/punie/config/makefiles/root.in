@@ -10,6 +10,9 @@ RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 PGE_DIR       = ../../compilers/pge
 NQP_DIR       = ../../compilers/nqp
 CP       = @cp@
+#CONDITIONED_LINE(darwin):
+#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 PARROT_LIBRARY = ../../runtime/parrot/library
 PGE_LIBRARY   = ../../runtime/parrot/library/PGE

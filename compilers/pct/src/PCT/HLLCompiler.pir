@@ -133,6 +133,18 @@ Accessor for the C<parseactions> attribute.
 
 Accessor for the C<astgrammar> attribute.
 
+=item commandline_banner([string value])
+
+Set the string in $S0 as a commandline prompt on the compiler in $P0.  The
+prompt is the text that is shown on the commandline before a command is entered
+when the compiler is started in interactive mode.
+
+=item commandline_prompt([string value])
+
+Set the string in $S0 as a commandline banner on the compiler in $P0.  The
+banner is the first text that is shown when the com‐ piler is started in
+interactive mode. This can be used for a copyright notice or other information.
+
 =cut
 
 .sub 'stages' :method
@@ -309,6 +321,17 @@ to any options and return the resulting parse tree.
     .param pmc source
     .param pmc adverbs         :slurpy :named
     .local pmc parsegrammar_name, top
+
+    .local string tcode
+    tcode = adverbs['transcode']
+    unless tcode goto transcode_done
+    push_eh transcode_done
+    $I0 = find_charset tcode
+    $S0 = source
+    $S0 = trans_charset $S0, $I0
+    assign source, $S0
+    pop_eh
+  transcode_done:
 
     .local string target
     target = adverbs['target']

@@ -185,6 +185,23 @@ Returns or sets the offset at the end of this match.
 .end
 
 
+=item C<chars()>
+
+Returns C<.to()> - C<.from()>.
+
+=cut
+
+.sub 'chars' :method
+    $I0 = self.'to'()
+    $I1 = self.'from'()
+    $I2 = $I0 - $I1
+    unless $I2 < 0 goto done
+    $I2 = 0
+  done:
+    .return ($I2)
+.end
+
+
 =item C<text()>
 
 Returns the portion of the target string matched by this object.

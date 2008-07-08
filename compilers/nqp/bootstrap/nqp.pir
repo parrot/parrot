@@ -54,7 +54,7 @@ to the nqp compiler.
 .include 'bootstrap/gen_actions.pir'
 
 
-.namespace
+.namespace []
 
 .sub 'initlist' :anon :load :init
     subclass $P0, 'ResizablePMCArray', 'List'

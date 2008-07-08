@@ -50,7 +50,7 @@
 
 .include "library/dumper.pir"
 
-.namespace
+.namespace []
 
 .sub '__onload' :init
     load_bytecode 'PGE.pbc'

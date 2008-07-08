@@ -393,7 +393,7 @@ op runinterp(invar PMC, in PMC) {
 =item B<substr_r>(out STR, in STR, in INT, in INT)
 
 Make $1 refer to the given part of $2, basically like above, but it
-is reusing the given destination string and doesn't care if the
+is reusing the given destination string and does not care if the
 source string is changed later. This I<is changed> includes
 also GC runs, which will move the referenced string. This also
 means that $1 has to be reset before any GC may happen.
@@ -401,7 +401,7 @@ means that $1 has to be reset before any GC may happen.
 This opcode should really be just used to quickly refer to a substring of
 another part, e.g. for printing and is a temporary hack.
 
-B<Handle with care>
+B<Handle with care.>
 
 =cut
 
@@ -419,7 +419,7 @@ inline op find_sub_not_null(out PMC, in STR) :base_core {
 
     if (PMC_IS_NULL(sub))
         real_exception(interp, NULL, GLOBAL_NOT_FOUND,
-            "Could not invoke non-existent sub %Ss", $2);
+                       "Could not find non-existent sub %Ss", $2);
 
     $1 = sub;
 }

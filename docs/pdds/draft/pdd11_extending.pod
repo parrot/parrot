@@ -32,7 +32,9 @@ B<Note:> The extension API has not yet been completely specified. New
 functions may be added, and those described below may change or be removed.
 You have been warned...
 
-=head1 API - Group 1: Internals-unaware functions
+=head1 IMPLEMENTATION
+
+=head2 API - Group 1: Internals-unaware functions
 
 These functions are the ones that are largely unaware of the structure and
 architecture of Parrot. They deal mainly in data as abstract entities, and
@@ -40,7 +42,7 @@ Parrot itself as a black box that, at best, can make subroutine or method
 calls. This is sufficient for many extensions which act as black box
 processing units and in turn treat Parrot itself as a black box.
 
-=head2 PMC access functions
+=head3 PMC access functions
 
 The following functions are for storing and retrieving data inside PMCs. Note
 that use of the _keyed functions with non-aggregate PMCs will generally just
@@ -139,7 +141,8 @@ at element <key> of the passed-in PMC.
 
 Assign the passed-in pointer to the passed-in PMC.
 
-=item C<Parrot_PMC_set_pointer_intkey(interp, pmc, void *value, Parrot_Int key)>
+=item C<Parrot_PMC_set_pointer_intkey(interp, pmc, void *value,
+Parrot_Int key)>
 
 Keyed version of C<Parrot_PMC_set_pointer>. Assigns C<value> to the PMC stored
 at element <key> of the passed-in PMC.
@@ -199,7 +202,7 @@ the PMC stored at element <key> of the passed-in PMC.
 
 =back
 
-=head2 Creation and destruction
+=head3 Creation and destruction
 
 Functions used to create and destroy PMCs, Parrot_Strings, etc.
 
@@ -268,7 +271,7 @@ run.
 
 =back
 
-=head2 Subroutine and method calls
+=head3 Subroutine and method calls
 
 Functions to call Parrot subroutines and methods
 
@@ -288,7 +291,7 @@ This is not yet implemented and may change.
 
 =back
 
-=head1 API - Group 2: Internals aware
+=head2 API - Group 2: Internals aware
 
 The internals-aware functions are for those extensions that need to query or
 alter the state of Parrot's internals in some way.

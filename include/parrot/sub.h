@@ -146,6 +146,7 @@ typedef struct Parrot_sub {
                                   */
     PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
     STRING   *name;              /* name of the sub */
+    STRING   *lexid;             /* The lexical ID of the sub. */
     INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
     PMC      *multi_signature;   /* list of types for MMD */
     INTVAL   n_regs_used[4];     /* INSP in PBC */
@@ -178,6 +179,7 @@ typedef struct Parrot_coro {
                                   */
     PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
     STRING   *name;              /* name of the sub */
+    STRING   *lexid;             /* The lexical ID of the sub. */
     INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
     PMC      *multi_signature;   /* list of types for MMD */
     INTVAL   n_regs_used[4];     /* INSP in PBC */
@@ -298,6 +300,27 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_sub * new_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+void Parrot_continuation_check(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void Parrot_continuation_rewind_environment(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void Parrot_continuation_runloop_check(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(Parrot_cont *cc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT

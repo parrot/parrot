@@ -94,15 +94,12 @@ Generate and emit the C code for an attribute get/set accessor pair.
 
 sub generate_accessor {
     my ( $self, $pmc ) = @_;
-    my $h        = $pmc->{emitter};
-    my $pmcname  = $pmc->{name};
-    my $attrtype = $self->{type};
-    my $attrname = $self->{name};
 
-
-    my $decl = '';
-
-    $decl = <<"EOA";
+    my $h              = $pmc->{emitter};
+    my $pmcname        = $pmc->{name};
+    my $attrtype       = $self->{type};
+    my $attrname       = $self->{name};
+    my $decl           = <<"EOA";
 
 /* Generated macro accessors for '$attrname' attribute of $pmcname PMC. */
 #define GETATTR_${pmcname}_${attrname}(interp, pmc, dest) \\

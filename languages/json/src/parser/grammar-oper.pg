@@ -1,0 +1,12 @@
+# $Id$
+
+##  expressions and operators
+proto 'term:'     is precedence('=')     is parsed(&term)      { ... }
+
+## multiplicative operators
+proto infix:<*>   is looser(term:)       is pirop('n_mul')     { ... }
+proto infix:</>   is equiv(infix:<*>)    is pirop('n_div')     { ... }
+
+## additive operators
+proto infix:<+>   is looser(infix:<*>)   is pirop('n_add')     { ... }
+proto infix:<->   is equiv(infix:<+>)    is pirop('n_sub')     { ... }

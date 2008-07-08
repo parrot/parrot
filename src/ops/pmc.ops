@@ -680,7 +680,7 @@ direct reference so messing with it can do harm to the method lookup.
 
 =cut
 
-op get_mro(out PMC, invar PMC) {
+op get_mro(out PMC, invar PMC) :deprecated {
   $1 = $2->vtable->mro;
 }
 

@@ -2,37 +2,42 @@
 
 =head0 Parrot Assembly Language
 
-Z<CHP-9>
+Z<CHP-5>
 
 X<Parrot Assembly Language;;(see PASM)>
 X<PASM (Parrot assembly language)>
 Parrot assembly (PASM) is an assembly language written for Parrot's
-virtual CPU.  PASM has an interesting mix of features. Because it's an
-assembly language, it has many low-level features, such as flow
-control based on branches and jumps, and direct manipulation of values
-in the software registers and on the stacks.  Basic register operations or
-branches are generally a single CPU instruction.N<This means the JIT
-run time has a performance of up to one PASM instruction per processor
-cycle.> On the other hand, because it's designed to implement dynamic
-high-level languages, it has support for many advanced features, such
-as lexical and global variables, objects, garbage collection,
+virtual CPU.  PASM is an interesting language with a mix of mix of
+features. As an assembly language it is decidedly low-level with many such
+aspects: flow control based on branches and jumps; and direct manipulation
+of values in the software registers and on the stacks.  Basic register
+operations or branches generally translate into a single CPU instruction.
+N<This means the JIT run time has a performance of up to one PASM instruction
+per processor cycle.> On the other hand, because it's designed to
+implement dynamic high-level languages, it has support for many advanced
+features such as lexical and global variables, objects, garbage collection,
 continuations, coroutines, and much more.
 
 =head1 Basics
 
-Z<CHP-9-SECT-2>
+Z<CHP-5-SECT-2>
 
 X<PASM (Parrot assembly language);overview>
-PASM has a simple syntax. Each statement stands on its own line.
-Statements begin with a Parrot instruction code (commonly referred to
-as an "opcode"). The arguments follow, separated by commas:
+PASM has a simple syntax that will be familiar to people who have experience
+programming other assembly languages. Each statement stands on its own line
+and there is no end-of-line delimiter like is used in many other languages.
+Statements begin with a Parrot instruction, commonly referred to
+as an "opcode"N<More accurately, it should probably be referred to as a
+"mnemonic">. The arguments follow, separated by commas:
 
   [label] opcode dest, source, source ...
 
 If the opcode returns a result, it is stored in the first argument.
 Sometimes the first register is both a source value and the
-destination of the result. The arguments are either registers or
-constants, though only source arguments can be constants:
+destination of the result, this is the case when we want to modify a
+value in place, without consuming a new Parrot register to hold the
+value. The arguments can be either registers or constants, although the
+destination argument cannot be constant.
 
   LABEL:
       print "The answer is: "
@@ -43,9 +48,9 @@ constants, though only source arguments can be constants:
 X<PASM (Parrot assembly language);labels>
 A label names a line of code so other instructions can refer to it.
 Label names consist of letters, numbers, and underscores. Simple
-labels are often all caps to make them stand out more clearly.  A
-label definition is simply the name of the label followed by a colon.
-It can be on its own line:
+labels are often all caps to make them stand out from the rest of the
+sourace code more clearly.  A label definition is simply the name of the
+label followed by a colon. It can be on its own line:
 
   LABEL:
       print "Norwegian Blue\n"
@@ -66,9 +71,15 @@ marks the end of a POD block.
   ...
   =cut
 
+Besides POD, there are also ordinary 1-line comments using the # sign:
+
+  LABEL:                        # This is a comment for a label
+    print 'Norwegian Blue\n"    # Print a color
+
+
 =head2 Constants
 
-Z<CHP-9-SECT-2.1>
+Z<CHP-5-SECT-2.1>
 
 X<PASM (Parrot assembly language);constants>
 Integer constants are signed integers.N<The size of integers is
@@ -106,20 +117,25 @@ C<\r> (return), C<\f> (form feed), C<\\> (literal slash), C<\">
 
 =head2 Working with Registers
 
-Z<CHP-9-SECT-2.2>
+Z<CHP-5-SECT-2.2>
 
 X<PASM (Parrot assembly language);registers>
 X<registers;Parrot;;(see PASM, registers)>
 Parrot is a register-based virtual machine. It has 4 typed register
-sets with 32 registers in each set.  The types are integers,
-floating-point numbers, strings, and Parrot objects. Register names
-consist of a capital letter indicating the register set and the number
-of the register, between 0 and 31. For example:
+sets: integers, floating-point numbers, strings, and Parrot objects
+(called PMCs). Register names consist of a capital letter indicating
+the register set type and the number of the register. Register numbers
+are non-negative (zero and positive numbers), and do not have a
+pre-defined upper limit N<At least not a restrictive limit. Parrot
+registers are stored internally as an array, and the register number is
+an index to that array. If you call C<N2000> you are implicitly creating
+a register array with 2000 entries. This can carry a performance
+penalty>. For example:
 
   I0   integer register #0
   N11  number or floating point register #11
   S2   string register #2
-  P31  PMC register #31
+  P33  PMC register #33
 
 Integer and number registers hold values, while string and PMC
 registers contain pointers to allocated memory for a string header or
@@ -129,7 +145,7 @@ The length of strings is limited only by your system's virtual memory
 and by the size of integers on the particular platform. Parrot can
 work with strings of different character types and encodings. It
 automatically converts string operands with mixed characteristics to
-Unicode.N<This conversion isn't fully implemented yet.>
+Unicode.N<This conversion isn't fully implemented yet. We're working on it.>
 X<PMCs (Parrot Magic Cookies)>
 X<Parrot Magic Cookies;;(see PMCs)>
 Parrot Magic Cookies (PMCs) are Parrot's low-level objects. They can
@@ -139,7 +155,7 @@ containing function pointers that implement each operation.
 
 =head3 Register assignment
 
-Z<CHP-9-SECT-2.2.1>
+Z<CHP-5-SECT-2.2.1>
 
 X<PASM (Parrot assembly language);registers;assignment>
 The most basic operation on registers is assignment using the C<set>
@@ -168,12 +184,15 @@ value. Assigning one string register to another:
   end
 
 doesn't make a copy of the string; it makes a copy of the pointer.
-Just after C<set> C<S1>, C<S0>, both C<S0> and C<S1> point to the same
-string. But assigning a constant string to a string register allocates
-a new string. When "Zaphod" is assigned to C<S0>, the pointer changes
-to point to the location of the new string, leaving the old string
-untouched. So strings act like simple values on the user level, even
-though they're implemented as pointers.
+N<Strings in Parrot use Copy-On-Write (COW) optimizations. When we
+call C<set S1, S0> we copy the pointer only, so both registers point
+to the same string memory. We don't actually make a copy of the string
+until one of two registers is modified.> Just after C<set> C<S1>, C<S0>,
+both C<S0> and C<S1> point to the same string. But assigning a constant
+string to a string register allocates a new string. When "Zaphod" is
+assigned to C<S0>, the pointer changes to point to the location of the
+new string, leaving the old string untouched. So strings act like simple
+values on the user level, even though they're implemented as pointers.
 
 Unlike strings, assignment to a PMC doesn't automatically create a new
 object; it only calls the PMC's vtable method for assignment. So,
@@ -198,12 +217,12 @@ C<P0> is assigned to C<P1>:
 it copies the pointer, so C<P1> and C<P0> are both aliases to the same
 PMC. Then, assigning the string "Zaphod" to C<P0> changes the
 underlying PMC, so printing C<P1> or C<P0> prints "Zaphod".N<Contrast
-this with C<assign> in A<-CHP-9-SECT-3.2>"PMC Assignment" later in
+this with C<assign> in A<-CHP-5-SECT-3.2>"PMC Assignment" later in
 this chapter.>
 
 =head3 PMC object types
 
-Z<CHP-9-SECT-2.2.2>
+Z<CHP-5-SECT-2.2.2>
 
 X<PMCs (Parrot Magic Cookies);object types>
 Internally, PMC types are represented by positive integers, and
@@ -290,10 +309,11 @@ data types and their names are specified in
 F<runtime/parrot/include/datatypes.pasm>X<datatypes.pasm file>.
 
 X<PMCs (Parrot Magic Cookies);types;generating list of>
-You can generate a complete and current list of valid PMC types by
-running this command within the main Parrot source directory:
+Once the F<parrot> executable has been built, You can generate a complete and
+current list of valid PMC types by running this command within the main Parrot
+source directory:
 
-  $ perl tools/build/pmc2c.pl --tree src/pmc/*.pmc
+  $ perl tools/dev/pmctree.pl src/pmc/*.pmc
 
 which produces output like:
 
@@ -318,7 +338,7 @@ read this.
 
 =head3 Type morphing
 
-Z<CHP-9-SECT-2.2.3>
+Z<CHP-5-SECT-2.2.3>
 
 X<typemorphing>
 The classes C<Undef>X<Undef PMC>, C<Int>,
@@ -344,7 +364,7 @@ to C<Int>.
 
 =head2 Math Operations
 
-Z<CHP-9-SECT-2.3>
+Z<CHP-5-SECT-2.3>
 
 X<PASM (Parrot assembly language);math operations>
 PASM has a full set of math instructions. These work with integers,
@@ -395,7 +415,7 @@ Opcodes" in Chapter 11.
 
 =head3 Unary math opcodes
 
-Z<CHP-9-SECT-2.3.1>
+Z<CHP-5-SECT-2.3.1>
 
 The unary opcodes have either a destination argument and a source
 argument, or a single argument as destination and source. Some of the
@@ -409,7 +429,7 @@ most common unary math opcodes are C<inc> (increment), C<dec>
 
 =head3 Binary math opcodes
 
-Z<CHP-9-SECT-2.3.2>
+Z<CHP-5-SECT-2.3.2>
 
 X<PASM (Parrot assembly language);math operations;binary>
 Binary opcodes have two source arguments and a destination argument.
@@ -430,7 +450,7 @@ multiple).
 
 =head3 Floating-point operations
 
-Z<CHP-9-SECT-2.3.3>
+Z<CHP-5-SECT-2.3.3>
 
 X<PASM (Parrot assembly language);math operations;floating-point>
 Although most of the math operations work with both floating-point
@@ -461,24 +481,24 @@ variant that implements C's C<atan2()>:
 
 =head2 Working with Strings
 
-Z<CHP-9-SECT-2.4>
+Z<CHP-5-SECT-2.4>
 
 X<PASM (Parrot assembly language);string operations>
-The string operations work with string registers and with PMCs that
+String operations work with string registers and with PMCs that
 implement a string class.
 
 Most operations on string registers generate new strings in the
 destination register. Some operations have an optimized form that
 modifies an existing string in place. These are denoted by an C<_r>
-suffix, as in C<substr_r>. Please note that C<substr_r> has been
-deprecated.
+suffix, as in C<substr_r>.N<Please note that C<substr_r> has been
+deprecated.>
 
 String operations on PMC registers require all their string arguments
 to be PMCs.
 
 =head3 Concatenating strings
 
-Z<CHP-9-SECT-2.4.1>
+Z<CHP-5-SECT-2.4.1>
 
 X<PASM (Parrot assembly language);string operations;concatenation>
 Use the C<concat>X<concat opcode (PASM)> opcode to concatenate
@@ -520,7 +540,7 @@ the result in C<P2>.
 
 =head3 Repeating strings
 
-Z<CHP-9-SECT-2.4.2>
+Z<CHP-5-SECT-2.4.2>
 
 X<PASM (Parrot assembly language);string operations;repeating strings>
 The C<repeat>X<repeat opcode (PASM)> opcode repeats a string a certain
@@ -537,7 +557,7 @@ five times and stores a pointer to it in C<S1>.
 
 =head3 Length of a string
 
-Z<CHP-9-SECT-2.4.3>
+Z<CHP-5-SECT-2.4.3>
 
 X<PASM (Parrot assembly language);string operations;length>
 The C<length>X<length opcode (PASM)> opcode returns the length of a
@@ -555,7 +575,7 @@ it probably will be implemented in the future.
 
 =head3 Substrings
 
-Z<CHP-9-SECT-2.4.4>
+Z<CHP-5-SECT-2.4.4>
 
 X<PASM (Parrot assembly language);string operations;substrings>
 The simplest version of the C<substr>X<substr opcode (PASM)> opcode
@@ -610,7 +630,7 @@ The PMC versions of C<substr> are not yet implemented.
 
 =head3 Chopping strings
 
-Z<CHP-9-SECT-2.4.5>
+Z<CHP-5-SECT-2.4.5>
 
 X<PASM (Parrot assembly language);string operations;chopping strings>
 The C<chopn>X<chopn opcode (PASM)> opcode removes characters from the
@@ -645,7 +665,7 @@ untouched:
 
 =head3 Copying strings
 
-Z<CHP-9-SECT-2.4.6>
+Z<CHP-5-SECT-2.4.6>
 
 X<PASM (Parrot assembly language);string operations;copying>
 The C<clone>X<clone opcode (PASM)> opcode makes a deep copy of a
@@ -673,7 +693,7 @@ memory location on assignment.
 
 =head3 Converting characters
 
-Z<CHP-9-SECT-2.4.7>
+Z<CHP-5-SECT-2.4.7>
 
 X<PASM (Parrot assembly language);string operations;converting strings>
 The C<chr>X<chr opcode (PASM)> opcode takes an integer value and
@@ -698,7 +718,7 @@ the last character.
 
 =head3 Formatting strings
 
-Z<CHP-9-SECT-2.4.8>
+Z<CHP-5-SECT-2.4.8>
 
 X<PASM (Parrot assembly language);string operations;formatting
 strings> The C<sprintf>X<sprintf opcode (PASM)> opcode generates a
@@ -716,11 +736,11 @@ but with some extensions for Parrot data types. Each format field in
 the string starts with a C<%>
 X<% (percent sign);% format strings for sprintf opcode (PASM)> and
 ends with a character specifying the output format. The output format
-characters are listed in A<CHP-9-TABLE-1>Table 9-1.
+characters are listed in A<CHP-5-TABLE-1>Table 5-1.
 
 =begin table picture Format characters
 
-Z<CHP-9-TABLE-1>
+Z<CHP-5-TABLE-1>
 
 =headrow
 
@@ -834,11 +854,11 @@ whichever fits best.
 
 Each format field can be specified with several options: R<flags>,
 R<width>, R<precision>, and R<size>. The format flags are listed in
-A<CHP-9-TABLE-2>Table 9-2.
+A<CHP-5-TABLE-2>Table 5-2.
 
 =begin table picture Format flags
 
-Z<CHP-9-TABLE-2>
+Z<CHP-5-TABLE-2>
 
 =headrow
 
@@ -889,11 +909,11 @@ If either R<width> or R<precision> is an asterisk (C<*>), it takes its
 value from the next argument in the PMC.
 
 The R<size> modifier defines the type of the argument the field takes.
-The flags are listed in A<CHP-9-TABLE-3>Table 9-3.
+The flags are listed in A<CHP-5-TABLE-3>Table 5-3.
 
 =begin table picture Size flags
 
-Z<CHP-9-TABLE-3>
+Z<CHP-5-TABLE-3>
 
 =headrow
 
@@ -980,7 +1000,7 @@ examples of format strings.
 
 =head3 Testing for substrings
 
-Z<CHP-9-SECT-2.4.9>
+Z<CHP-5-SECT-2.4.9>
 
 X<PASM (Parrot assembly language);string operations;testing for substrings>
 The C<index>X<index opcode (PASM)> opcode searches for a substring
@@ -1052,7 +1072,7 @@ its length is zero.
 
 =head2 I/O Operations
 
-Z<CHP-9-SECT-2.5>
+Z<CHP-5-SECT-2.5>
 
 X<PASM (Parrot assembly language);I/O operations>
 The I/O subsystem has at least one set of significant revisions ahead,
@@ -1062,7 +1082,7 @@ even if their arguments and underlying functionality change.
 
 =head3 Open and close a file
 
-Z<CHP-9-SECT-2.5.1>
+Z<CHP-5-SECT-2.5.1>
 
 The C<open>X<open opcode (PASM)> opcode opens a file for access. It
 takes three arguments: a destination register, the name of the file,
@@ -1082,7 +1102,7 @@ The C<close>X<close opcode (PASM)> opcode closes a C<ParrotIO> object:
 
 =head3 Output operations
 
-Z<CHP-9-SECT-2.5.2>
+Z<CHP-5-SECT-2.5.2>
 
 We already saw the C<print>X<print opcode (PASM)> opcode in several
 examples above. The one argument form prints a register or constant to
@@ -1106,7 +1126,7 @@ Printing to C<stderr> has a shortcut:
 
 =head3 Reading from files
 
-Z<CHP-9-SECT-2.5.3>
+Z<CHP-5-SECT-2.5.3>
 
 The C<read>X<read opcode (PASM)> opcode reads a specified number of
 bytes from either C<stdin> or a C<ParrotIO> object:
@@ -1138,7 +1158,7 @@ constructed from two 32-bit arguments.
 
 =head2 Logical and Bitwise Operations
 
-Z<CHP-9-SECT-2.6>
+Z<CHP-5-SECT-2.6>
 
 X<PASM (Parrot assembly language);bitwise operations>
 X<PASM (Parrot assembly language);logical operations>
@@ -1226,7 +1246,7 @@ specified number of bits:
 
 =head1 Working with PMCs
 
-Z<CHP-9-SECT-3>
+Z<CHP-5-SECT-3>
 
 In most of the examples we've shown so far, X<PMCs (Parrot Magic
 Cookies);working with> PMCs just duplicate the functionality of
@@ -1236,7 +1256,7 @@ each with its own set of operations.
 
 =head2 Aggregates
 
-Z<CHP-9-SECT-3.1>
+Z<CHP-5-SECT-3.1>
 
 PMCs can define complex types that hold multiple values. These are
 commonly called "X<PMCs (Parrot Magic Cookies);aggregate>
@@ -1252,7 +1272,7 @@ described here.
 
 =head3 Arrays
 
-Z<CHP-9-SECT-3.1.1>
+Z<CHP-5-SECT-3.1.1>
 
 X<PMCs (Parrot Magic Cookies);arrays>
 The C<Array>X<Array PMC> PMC is an ordered aggregate with
@@ -1294,7 +1314,7 @@ A<CHP-11-SECT-1>"PASM Opcodes" in Chapter 11).
 
 =head3 Hashes
 
-Z<CHP-9-SECT-3.1.2>
+Z<CHP-5-SECT-3.1.2>
 
 X<PMCs (Parrot Magic Cookies);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate with
@@ -1322,7 +1342,7 @@ with hashes: it removes a key/value pair.
 
 =head3 Iterators
 
-Z<CHP-9-SECT-3.1.3>
+Z<CHP-5-SECT-3.1.3>
 
 Iterators extract values from an aggregate PMC. You create an iterator
 by creating a new C<Iterator> PMC, and passing the array to C<new> as
@@ -1376,7 +1396,7 @@ since they don't define any order for their keys.
 
 =head3 Data structures
 
-Z<CHP-9-SECT-3.1.4>
+Z<CHP-5-SECT-3.1.4>
 
 X<PMCs (Parrot Magic Cookies);data structures>
 Arrays and hashes can hold any data type, including other aggregates.
@@ -1406,7 +1426,7 @@ or string values.
 
 =head2 PMC Assignment
 
-Z<CHP-9-SECT-3.2>
+Z<CHP-5-SECT-3.2>
 
 We mentioned before that C<set> on two X<PMCs (Parrot Magic
 Cookies);assignment> PMCs simply aliases them both to the same object,
@@ -1438,7 +1458,7 @@ or reuse the source object (as with C<set>).
 
 =head2 Properties
 
-Z<CHP-9-SECT-3.3>
+Z<CHP-5-SECT-3.3>
 
 X<PMCs (Parrot Magic Cookies);properties>
 PMCs can have additional values attached to them as "properties" of
@@ -1488,7 +1508,7 @@ C<prophash>X<prophash opcode (PASM)>.
 
 =head1 Flow Control
 
-Z<CHP-9-SECT-4>
+Z<CHP-5-SECT-4>
 
 X<PASM (Parrot assembly language);flow control>
 Although it has many advanced features, at heart PASM is an assembly
@@ -1535,7 +1555,7 @@ chance of crashing the interpreter.
 
 =head2 Conditional Branches
 
-Z<CHP-9-SECT-4.1>
+Z<CHP-5-SECT-4.1>
 
 X<PASM (Parrot assembly language);conditional branches>
 X<conditional branches in PASM>
@@ -1609,7 +1629,7 @@ opcode branches if a PMC is NULL (has no assigned address):
 
 =head2 Iteration
 
-Z<CHP-9-SECT-4.2>
+Z<CHP-5-SECT-4.2>
 
 X<iteration;in PASM>
 X<PASM (Parrot assembly language);iteration>
@@ -1672,227 +1692,24 @@ loop.
 
 =head1 Stacks and Register Frames
 
-Z<CHP-9-SECT-5>
+Z<CHP-5-SECT-5>
 
-X<Parrot;stacks and registers;;(see registers stacks)>
-Parrot provides 32 registers of each type: integer, floating-point
-number, string, and PMC. This is a generous number of registers, but
-it's still too restrictive for the average use. You can hardly limit
-your code to 32 integers at a time. This is especially true when you
-start working with subroutines and need a way to store the caller's
-values and the subroutine's values. So, Parrot also provides stacks
-for storing values outside the 32 registers. Parrot has seven basic
-stacks, each used for a different purpose: the user stack, the control
-stack, the pad stack, and the four register backing stacks.
-
-=head2 User Stack
-
-Z<CHP-9-SECT-5.1>
-
-The X<stacks;user> X<user stack> user stack, also known as the
-X<general purpose stack> general-purpose stack, stores individual
-values. The two main opcodes for working with the user stack are
-C<save>X<save opcode (PASM)>, to push a value onto the stack, and
-C<restore>X<restore opcode (PASM)>, to pop one off the stack:
-
-  save 42         # push onto user stack
-  restore I1      # pop off user stack
-
-The one argument to C<save> can be either a constant or a register.
-The user stack is a typed stack, so C<restore> will only pop a value
-into a register of the same type as the original value:
-
-  save 1
-  set I0, 4
-  restore I0
-  print I0        # prints 1
-  end
-
-If that restore were C<restore> C<N0> instead of an integer register,
-you'd get an exception, "Wrong type on top of stack!"
-
-A handful of other instructions are useful for manipulating the user
-stack. C<rotate_up>X<rotate_up opcode (PASM)> rotates a given number
-of elements on the user stack to put a different element on the top of
-the stack. The C<depth>X<depth opcode (PASM)> opcode returns the
-number of entries currently on the stack. The C<entrytype>X<entrytype
-opcode (PASM)> opcode returns the type of the stack entry at a given
-depth, and C<lookback>X<lookback opcode (PASM)> returns the value of
-the element at the given depth without popping the element off the
-stack:
-
-  save 1
-  save 2.3
-  set S0, "hi\n"
-  save S0
-  save P0
-  entrytype I0, 0
-  print I0         # prints 4 (PMC)
-  entrytype I0, 1
-  print I0         # prints 3 (STRING)
-  entrytype I0, 2
-  print I0         # prints 2 (FLOATVAL)
-  entrytype I0, 3
-  print I0         # prints 1 (INTVAL)
-  print "\n"
-  depth I2         # get entries
-  print I2         # prints 4
-  print "\n"
-  lookback S1, 1   # get entry at depth 1
-  print S1         # prints "hi\n"
-  depth I2         # unchanged
-  print I2         # prints 4
-  print "\n"
-  end
-
-This example pushes four elements onto the user stack: an integer, a
-floating-point number, a string, and a PMC. It checks the C<entrytype>
-of all four elements and prints them out. It then checks the C<depth>
-of the stack, gets the value of the second element with a C<lookback>,
-and checks that the number of elements hasn't changed.
+X<Parrot;stacks;>
+Parrot has a control stack to handle the passage of control between
+subroutines and coroutines.
 
 =head2 Control Stack
 
-Z<CHP-9-SECT-5.2>
+Z<CHP-5-SECT-5.1>
 
 The X<stacks;control> X<control stack> control stack, also known as
 the X<stacks;call> X<call stack> call stack, stores return addresses
 for subroutines called by C<bsr> and exception handlers. There are no
 instructions for directly manipulating the control stack.
 
-=head2 Register Frames
-
-Z<CHP-9-SECT-5.4>
-
-The final set of stacks are the X<stacks;register backing>
-X<register backing stacks> register backing stacks. Parrot has four
-backing stacks, one for each type of register. Instead of saving and
-restoring individual values, the backing stacks work with register
-frames. Each register frame is the full set of 32 registers for one
-type. Each frame is separated into two halves: the bottom half
-(registers 0-15) and the top half (registers 16-32). Some opcodes work
-with full frames while others work with half-frames. The backing
-stacks are commonly used for saving the contents of all the registers
-(or just the top half of each frame) before a subroutine call, so they
-can be restored when control returns to the caller.
-
-PASM has five opcodes for storing full register frames, one for each
-register type and one that saves all four at once:
-
-X<pushi opcode (PASM)>
-X<pushn opcode (PASM)>
-X<pushs opcode (PASM)>
-X<pushp opcode (PASM)>
-X<saveall opcode (PASM)>
-
-  pushi               # copy I-register frame
-  pushn               # copy N-register frame
-  pushs               # copy S-register frame
-  pushp               # copy P-register frame
-  saveall             # copy all register frames
-
-Each C<pushi>, C<pushn>, C<pushs>, or C<pushp> pushes a register frame
-containing all the current values of one register type onto the
-backing stack of that type. C<saveall> simply calls C<pushi>,
-C<pushn>, C<pushs>, and C<pushp>.
-
-PASM also has five opcodes to restore full register frames. Again it
-has one for each register type and one that restores all four at once:
-
-X<popi opcode (PASM)>
-X<popn opcode (PASM)>
-X<pops opcode (PASM)>
-X<popp opcode (PASM)>
-X<restoreall opcode (PASM)>
-
-  popi                # restore I-register frame
-  popn                # restore N-register frame
-  pops                # restore S-register frame
-  popp                # restore P-register frame
-  restoreall          # restore all register frames
-
-The C<popi>, C<popn>, C<pops>, and C<popp> opcodes pop a single
-register frame off a particular stack and replace the values in all 32
-registers of that type with the values in the restored register frame.
-C<restoreall> calls C<popi>, C<popn>, C<pops>, and C<popp>, restoring
-every register of every type to values saved earlier.
-
-Saving a X<register frames;saving> register frame to the backing stack
-doesn't alter the values stored in the registers; it simply copies the
-values:
-
-  set I0, 1
-  print I0            # prints 1
-  pushi               # copy away I0..I31
-  print I0            # unchanged, still 1
-  inc I0
-  print I0            # now 2
-  popi                # restore registers to state of previous pushi
-  print I0            # old value restored, now 1
-  print "\n"
-  end
-
-This example sets the value of C<I0> to 1 and stores the complete set
-of integer registers. Before C<I0> is incremented, it has the same
-value as before the C<pushi>.
-
-In A<CHP-9-SECT-2.2>"Working with Registers" earlier in this chapter
-we mentioned that string and PMC registers hold pointers to the actual
-objects. When string or PMC register frames are saved, only the
-pointers are copied, not the actual contents of the strings or PMCs.
-The same is true when string or PMC register frames are restored:
-
-  set S0, "hello"          # set S0 to "hello"
-  pushs
-  substr S0, 0, 5, "world" # alter the string in S0
-  set S0, "test"           # set S0 to a new string
-  pops                     # restores the first string pointer
-  print S0                 # prints "world"
-  end
-
-In this example, we first use the C<pushs> opcode to copy the string
-pointer to the string register frame stack. This gives us two pointers to
-the same underlying string, with one currently stored in C<S0>, and the other
-saved in the string register frame stack. If we then use C<substr> to alter
-the contents of the string, both pointers will now point to the altered
-string, and so restoring our original pointer using C<pops> does not restore
-the original string value.
-
-Each of the above C<pushX> and C<popX> opcodes has a variant that will
-save or restore only the top or bottom half of one register set or all
-the register sets:
-
-  pushtopi            # save I16..I31
-  popbottoms          # restore S0..S15
-  savetop             # save regs 16-31 in each frame
-  restoretop          # restore regs 16-31 in each frame
-
-PASM also has opcodes to clear individual X<register frames;clearing>
-register frames:
-C<cleari>X<cleari opcode (PASM)>,
-C<clearn>X<clearn opcode (PASM)>,
-C<clears>X<clears opcode (PASM)>, and
-C<clearp>X<clearp opcode (PASM)>. These reset
-the numeric registers to 0 values and the string and PMC registers to
-null pointers, which is the same state that they have when the interpreter
-first starts.
-
-The X<stacks;user>X<user stack> user stack can be useful for holding
-onto some values that would otherwise be obliterated by a
-C<restoreall>:
-
-  # ... coming from a subroutine
-  save I5     # Push some registers
-  save I6     # holding the return values
-  save N5     # of the sub.
-  restoreall  # restore registers to state before calling subroutine
-  restore N0  # pop off last pushed
-  restore I0  # pop 2nd
-  restore I1  # and so on
-
 =head1 Lexicals and Globals
 
-Z<CHP-9-SECT-6>
+Z<CHP-5-SECT-6>
 
 So far, we've been treating Parrot registers like the variables of a
 high-level language. This is fine, as far as it goes, but it isn't the
@@ -1901,8 +1718,8 @@ languages like Perl make it desirable to manipulate variables by name,
 instead of just by register or stack location. These languages also
 have global variables, which are visible throughout the entire
 program. Storing a global variable in a register would either tie up
-that register for the lifetime of the program or require unwieldy
-manipulation of the user stack.
+that register for the lifetime of the program or require some unweildy way
+to shuffle the data into and out of registers.
 
 Parrot provides structures for storing both global and lexically
 scoped named variables. Lexical and global variables must be PMC
@@ -1912,7 +1729,7 @@ their values.
 
 =head2 Globals
 
-Z<CHP-9-SECT-6.1>
+Z<CHP-5-SECT-6.1>
 
 X<PASM (Parrot assembly language);global variables>
 Global variables are stored in a C<Hash>, so every variable name
@@ -1968,136 +1785,32 @@ aren't finished yet.
 
 =head2 Lexicals
 
-Z<CHP-9-SECT-6.2>
+Z<CHP-5-SECT-6.2>
 
 X<PASM (Parrot assembly language);lexical variables>
 Lexical variables are stored in a lexical scratchpad. There's one pad
 for each lexical scope. Every pad has both a hash and an array, so
-elements can be stored either by name or by numeric index. Parrot
-stores the scratchpads for nested lexical scopes in a pad stack.
+elements can be stored either by name or by numeric index.
 
 =head3 Basic instructions
 
-Z<CHP-9-SECT-6.2.1>
+Z<CHP-5-SECT-6.2.1>
 
-The instructions for manipulating lexical scratchpads are C<new_pad>
-to create a new pad, C<store_lex> to store a variable in a pad,
-C<find_lex> to retrieve a variable from a pad, C<push_pad> to push a
-pad onto the pad stack, and C<pop_pad> to remove a pad from the stack:
+To store a lexical variable in the current scope pad, use C<store_lex>.
+Likewise, use C<find_lex> to retrieve a variable from the current pad pad.
 
-  new_pad 0                # create and push a pad with depth 0
   new P0, "Int"            # create a variable
   set P0, 10               # assign value to it
-  store_lex 0, "$foo", P0  # store the var at depth 0 by name
+  store_lex "foo", P0      # store the var with the variable name "foo"
   # ...
-  find_lex P1, 0, "$foo"   # get the var into P1
+  find_lex P1, "foo"       # get the var "foo" into P1
   print P1
   print "\n"               # prints 10
-  pop_pad                  # remove pad
   end
-
-The first statement creates a new scratchpad and pushes it onto the
-pad stack. It's created with depth 0, which is the outermost lexical
-scope. The next two statements create a new PMC object in C<P0>, and
-give it a value. The C<store_lex>X<store_lex opcode (PASM)> opcode
-stores the object in C<P0> as the named variable C<$foo> in the
-scratchpad at depth 0. At some later point in the program, the
-C<find_lex>X<find_lex opcode (PASM)> opcode retrieves the value of
-C<$foo> in the pad at depth 0 and stores it in the register C<P1> so
-it can be printed. At the very end, C<pop_pad>X<pop_pad opcode (PASM)>
-removes the pad from the pad stack.
-
-The C<new_pad>X<new_pad opcode (PASM)> opcode has two forms, one that creates
-a new scratchpad and stores it in a PMC, and another that creates a
-new scratchpad and immediately pushes it onto the pad stack. If the
-pad were stored in a PMC, you would have to push it onto the pad stack
-before you could use it:
-
-  new_pad P10, 0                # create a new pad in P10
-  push_pad P10                  # push it onto the pad stack
-
-In a simple case like this, it really doesn't make sense to separate
-out the two instructions, but you'll see later in
-A<CHP-9-SECT-7>"Subroutines" why it's valuable to have both.
-
-The C<store_lex>X<store_lex opcode (PASM)> and C<find_lex>
-X<find_lex opcode (PASM)> opcodes can take an integer index in place
-of a name for the variable:
-
-  store_lex 0, 0, P0  # store by index
-  # ...
-  find_lex P1, 0      # retrieve by index
-
-With an index, the variable is stored in the X<scratchpads> scratchpad
-array, instead of the scratchpad hash.
-
-=head3 Nested scratchpads
-
-Z<CHP-9-SECT-6.2.2>
-
-To create a X<scopes, nested>X<nested scopes> nested scope, you create
-another scratchpad with a higher depth number and push it onto the pad
-stack. The outermost scope is always depth 0, and each nested scope
-is one higher. The pad stack won't allow you to push on a scratchpad
-that's more than one level higher than the current depth of the top of
-the stack:
-
-  new_pad 0                  # outer scope
-  new_pad 1                  # inner scope
-  new P0, "Int"
-  set P0, 10
-  store_lex -1, "$foo", P0   # store in top pad
-  new P1, "Int"
-  set P1, 20
-  store_lex -2, "$foo", P1   # store in next outer scope
-  find_lex P2, "$foo"        # find in all scopes
-  print P2                   # prints 10
-  print "\n"
-  find_lex P2, -1, "$foo"    # find in top pad
-  print P2                   # prints 10
-  print "\n"
-  find_lex P2, -2, "$foo"    # find in next outer scope
-  print P2                   # prints 20
-  print "\n"
-  pop_pad
-  pop_pad
-  end
-
-The first two statements create two new scratchpads, one at depth 0
-and one at depth 1, and push them onto the pad stack. When
-C<store_lex> and C<find_lex> have a negative number for the depth
-specifier, they count backward from the top pad on the stack, so -1 is
-the top pad, and -2 is the second pad back. In this case, the pad at
-depth 1 is the top pad, and the pad at depth 0 is the second pad. So:
-
-  store_lex -1, "$foo", P0   # store in top pad
-
-stores the object in C<P0> as the named variable C<$foo> in the pad at
-depth 1. Then:
-
-  store_lex -2, "$foo", P1   # store in next outer scope
-
-stores the object in C<P1> as the named variable C<$foo> in the pad at
-depth 0.
-
-A C<find_lex> statement with no depth specified searches every
-scratchpad in the stack from the top of the stack to the bottom:
-
-  find_lex P2, "$foo"        # find in all scopes
-
-Both pad 0 and pad 1 have variables named C<$foo>, but only the value
-from the top pad is returned.  C<store_lex> also has a version with no
-depth specified, but it only works if the named lexical has already
-been created at a particular depth. It searches the stack from top to
-bottom and stores the object in the first lexical it finds with the
-right name.
-
-The C<peek_pad> instruction retrieves the top entry on the pad stack
-into a PMC register, but doesn't pop it off the stack.
 
 =head1 Subroutines
 
-Z<CHP-9-SECT-7>
+Z<CHP-5-SECT-7>
 
 X<subroutines>
 Subroutines and methods are the basic building blocks of larger
@@ -2135,7 +1848,7 @@ opcode (PASM)> opcode:
 
 =head2 Calling Conventions
 
-Z<CHP-9-SECT-7.1>
+Z<CHP-5-SECT-7.1>
 
 X<registers;usage for subroutine calls>
 X<subroutines;register usage>
@@ -2154,7 +1867,7 @@ agree on all the answers.
 
 =head3 Reserved registers
 
-Z<CHP-9-SECT-7.1.1>
+Z<CHP-5-SECT-7.1.1>
 
 X<registers;reserved>
 A very simple system would be to declare that the caller uses
@@ -2163,45 +1876,10 @@ works in a small program with light register usage. But what about a
 subroutine call from within another subroutine or a recursive call?
 The solution doesn't extend to a large scale.
 
-=head3 Callee saves
-
-Z<CHP-9-SECT-7.1.2>
-
-Another possibility is to make the X<subroutines;saving caller's
-registers> subroutine responsible for saving the caller's registers:
-
-    set I0, 42
-    save I0              # pass args on stack
-    bsr _inc             # j = inc(i)
-    restore I1           # restore args from stack
-    print I1
-    print "\n"
-    end
-  _inc:
-    saveall              # preserve all registers
-    restore I0           # get argument
-    inc I0               # do all the work
-    save I0              # push return value
-    restoreall           # restore caller's registers
-    ret
-
-This example stores arguments to the subroutine and return values from
-the subroutine on the user stack. The first statement in the C<_inc>
-subroutine is a C<saveall> to save all the caller's registers onto the
-backing stacks, and the last statement before the return restores
-them.
-
-One advantage of this approach is that the subroutine can choose to
-save and restore only the register frames it actually uses, for a
-small speed gain. The example above could use C<pushi> and C<popi>
-instead of C<saveall> and C<restoreall> because it only uses integer
-registers. One disadvantage is that it doesn't allow optimization of
-tail calls, where the last statement of a recursive subroutine is a
-call to itself.
 
 =head3 Parrot calling conventions
 
-Z<CHP-9-SECT-7.1.3>
+Z<CHP-5-SECT-7.1.2>
 
 Internal subroutines can use whatever calling convention serves them
 best. Externally visible subroutines and methods need stricter rules.
@@ -2215,12 +1893,12 @@ the caller is responsible for preserving its own registers. The first
 11 arguments of each register type are passed in Parrot registers, as
 are several other pieces of information.
 X<registers;usage for subroutine calls> Register usage for subroutine
-calls is listed in A<CHP-9-TABLE-4>Table 9-4.
+calls is listed in A<CHP-5-TABLE-4>Table 5-4.
 X<parameters;in PASM>
 
 =begin table picture Calling and return conventions
 
-Z<CHP-9-TABLE-4>
+Z<CHP-5-TABLE-4>
 
 =headrow
 
@@ -2391,7 +2069,7 @@ system executes each register setup opcode in one CPU cycle.
 
 =head2 Native Call Interface
 
-Z<CHP-9-SECT-7.2>
+Z<CHP-5-SECT-7.2>
 
 X<subroutines;calling conventions;NCI>
 A special version of the Parrot calling conventions are used by the
@@ -2427,11 +2105,11 @@ argument) with a known function signature (fourth argument). The
 function signature is a string where the first character is the return
 value and the rest of the parameters are the function parameters. The
 characters used in X<NCI (Native Call Interface);function signatures>
-NCI function signatures are listed in A<CHP-9-TABLE-5>Table 9-5.
+NCI function signatures are listed in A<CHP-5-TABLE-5>Table 5-5.
 
 =begin table picture Function signature letters
 
-Z<CHP-9-TABLE-5>
+Z<CHP-5-TABLE-5>
 
 =headrow
 
@@ -2564,7 +2242,7 @@ F<docs/pdds/pdd16_native_call.pod> and F<docs/pmc/struct.pod>.
 
 =head2 Closures
 
-Z<CHP-9-SECT-7.3>
+Z<CHP-5-SECT-7.3>
 
 X<closures>
 X<subroutines;closures>
@@ -2643,7 +2321,7 @@ available when C<_closure> was defined are available when it's called.
 
 =head2 Coroutines
 
-Z<CHP-9-SECT-7.4>
+Z<CHP-5-SECT-7.4>
 
 As we mentioned in the previous chapter, coroutines are
 X<subroutines;coroutines> subroutines that
@@ -2716,7 +2394,7 @@ coroutines have their own register frame stacks.
 
 =head2 Continuations
 
-Z<CHP-9-SECT-7.5>
+Z<CHP-5-SECT-7.5>
 
 X<continuations>
 X<subroutines;continuations>
@@ -2750,7 +2428,7 @@ This prints:
 
 =head2 Evaluating a Code String
 
-Z<CHP-9-SECT-7.6>
+Z<CHP-5-SECT-7.6>
 
 X<code strings, evaluating>
 This isn't really a subroutine operation, but it does produce a code
@@ -2792,7 +2470,7 @@ compiler in a shared library.
 
 =head1 Exceptions and Exception Handlers
 
-Z<CHP-9-SECT-8>
+Z<CHP-5-SECT-8>
 
 X<exceptions>
 X<exception handlers>
@@ -2878,7 +2556,7 @@ idea to combine the two.
 
 =head1 Events
 
-Z<CHP-9-SECT-9>
+Z<CHP-5-SECT-9>
 
 An event is a notification that something has happened: a timer
 expired, an IO operation finished, a thread sent a message to
@@ -2898,7 +2576,7 @@ design is subject to change.
 
 =head2 Timers
 
-Z<CHP-9-SECT-9.1>
+Z<CHP-5-SECT-9.1>
 
 C<Timer> objects are the replacement for Perl 5's C<alarm> handlers.
 They are also a significant improvement. Timers can fire once or
@@ -2909,7 +2587,7 @@ please consult the documentation for examples.
 
 =head2 Signals
 
-Z<CHP-9-SECT-9.2>
+Z<CHP-5-SECT-9.2>
 
 Signal handling is related to events. When Parrot gets a signal it
 needs to handle from the OS, it converts that signal into an event and
@@ -2944,7 +2622,7 @@ handler, so this example won't work on other platforms.>
 
 =head1 Threads
 
-Z<CHP-9-SECT-10>
+Z<CHP-5-SECT-10>
 
 Threads allow multiple pieces of code to run in parallel. This is
 useful when you have multiple physical CPUs to share the load of
@@ -3020,7 +2698,7 @@ This example creates a C<ParrotThread> object and calls its C<thread3>
 method, passing three arguments: a PMC for the C<_th1> subroutine in
 C<P5>, a string argument in C<P6>, and a C<TQueue> object in C<P7>
 containing a single integer. Remember from the earlier section
-A<CHP-9-SECT-7.1.3>"Parrot calling conventions" that registers 5-15
+A<CHP-5-SECT-7.1.3>"Parrot calling conventions" that registers 5-15
 hold the arguments for a subroutine or method call and C<I3> stores
 the number of arguments. The thread object is passed in C<P2>.
 
@@ -3102,7 +2780,7 @@ of opcodes.
 
 =head1 Loading Bytecode
 
-Z<CHP-9-SECT-11>
+Z<CHP-5-SECT-11>
 
 In addition to running Parrot bytecode on the command-line, you can
 also load pre-compiled bytecode directly into your PASM source file.
@@ -3173,12 +2851,7 @@ before C<load_bytecode> returns, so the final output is:
 
 =head1 Classes and Objects
 
-Z<CHP-9-SECT-12>
-
-Parrot's object system is a new addition in version 0.1.0. Objects
-still have some rough edges (for example, you currently can't add
-new attributes to a class after it has been instantiated), but they're
-functional for basic use.
+Z<CHP-5-SECT-12>
 
 This section revolves around one complete example that defines a
 class, instantiates objects, and uses them. The whole example is
@@ -3186,7 +2859,7 @@ included at the end of the section.
 
 =head2 Class declaration
 
-Z<CHP-9-SECT-12.1>
+Z<CHP-5-SECT-12.1>
 
 X<classes;in PASM>
 The C<newclass>X<newclass opcode (PASM)> opcode defines a new class.
@@ -3209,7 +2882,7 @@ method named "__init" and calls it if it exists.
 
 =head2 Attributes
 
-Z<CHP-9-SECT-12.2>
+Z<CHP-5-SECT-12.2>
 
 X<attributes;in PASM>
 X<classes;attributes>
@@ -3268,7 +2941,7 @@ again after you modify its value:
 
 =head2 Methods
 
-Z<CHP-9-SECT-12.3>
+Z<CHP-5-SECT-12.3>
 
 X<methods;in PASM>
 X<classes;methods>
@@ -3324,7 +2997,7 @@ to you.
 
 =head3 Overriding vtable functions
 
-Z<CHP-9-SECT-12.3.1>
+Z<CHP-5-SECT-12.3.1>
 
 Every object inherits a default set of I<vtable> functions from the
 C<ParrotObject> PMC, but you can also override them with your own
@@ -3379,7 +3052,7 @@ whenever an integer or string value is retrieved from a C<Foo> object:
 
 =head2 Inheritance
 
-Z<CHP-9-SECT-12.4>
+Z<CHP-5-SECT-12.4>
 
 X<inheritance;in PASM>
 X<classes;inheritance>
@@ -3438,7 +3111,7 @@ the class:
 
 =head2 Additional Object Opcodes
 
-Z<CHP-9-SECT-12.5>
+Z<CHP-5-SECT-12.5>
 
 The C<isa> and C<can> opcodes are also useful when working with
 objects. C<isa>X<isa opcode (PASM)> checks whether an object belongs
@@ -3452,7 +3125,7 @@ or false value.
 
 =head2 Complete Example
 
-Z<CHP-9-SECT-12.6>
+Z<CHP-5-SECT-12.6>
 
     newclass P1, "Foo"
     addattribute P1, "$.i"                # Foo.i
@@ -3510,7 +3183,7 @@ Z<CHP-9-SECT-12.6>
 
 =head2 Additional Object Opcodes
 
-Z<CHP-9-SECT-12.5>
+Z<CHP-5-SECT-12.5>
 
 The C<isa> and C<can> opcodes are also useful when working with
 objects. C<isa>X<isa opcode (PASM)> checks whether an object belongs to or
@@ -3523,7 +3196,7 @@ an object has a particular method. Both return a true or false value.
 
 =head2 Complete Example
 
-Z<CHP-9-SECT-12.6>
+Z<CHP-5-SECT-12.6>
 
     newclass P1, "Foo"
     addattribute P1, "$.i"                # Foo.i
@@ -3581,7 +3254,7 @@ Z<CHP-9-SECT-12.6>
 
 =head2 Additional Object Opcodes
 
-Z<CHP-9-SECT-12.5>
+Z<CHP-5-SECT-12.5>
 
 The C<isa> and C<can> opcodes are also useful when working with
 objects. C<isa>X<isa opcode (PASM)> checks whether an object belongs to or
@@ -3594,7 +3267,7 @@ an object has a particular method. Both return a true or false value.
 
 =head2 Complete Example
 
-Z<CHP-9-SECT-12.6>
+Z<CHP-5-SECT-12.6>
 
     newclass P1, "Foo"
     addattribute P1, "$.i"                # Foo.i

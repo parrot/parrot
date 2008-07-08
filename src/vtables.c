@@ -54,11 +54,19 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE *
-Parrot_clone_vtable(SHIM_INTERP, ARGIN(const VTABLE *base_vtable))
+Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 {
     VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
 
     STRUCT_COPY(new_vtable, base_vtable);
+
+    /* when called from global PMC initialization, not all vtables have isa_hash
+     * when called at runtime, they do */
+    if (base_vtable->isa_hash) {
+        parrot_new_hash(interp, &new_vtable->isa_hash);
+        parrot_hash_clone(interp, base_vtable->isa_hash, new_vtable->isa_hash);
+    }
+
 
     return new_vtable;
 }
@@ -76,15 +84,30 @@ Destroys C<*vtable>.
 
 PARROT_API
 void
-Parrot_destroy_vtable(SHIM_INTERP, ARGMOD(VTABLE *vtable))
+Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
 {
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
     PARROT_ASSERT(vtable);
 
     if (vtable->ro_variant_vtable) {
-        mem_sys_free(vtable->ro_variant_vtable);
+        VTABLE *ro_vtable = vtable->ro_variant_vtable;
+
+        if (ro_vtable->isa_hash) {
+            parrot_hash_destroy(interp, ro_vtable->isa_hash);
+            if (ro_vtable->isa_hash == vtable->isa_hash)
+                vtable->isa_hash = NULL;
+
+            ro_vtable->isa_hash = NULL;
+        }
+
+        mem_sys_free(ro_vtable);
         vtable->ro_variant_vtable = NULL;
+    }
+
+    if (vtable->isa_hash) {
+        parrot_hash_destroy(interp, vtable->isa_hash);
+        vtable->isa_hash = NULL;
     }
 
     mem_sys_free(vtable);
@@ -187,8 +210,6 @@ mark_vtables(PARROT_INTERP)
             pobject_lives(interp, (PObj *)vtable->whoami);
         if (vtable->provides_str)
             pobject_lives(interp, (PObj *)vtable->provides_str);
-        if (vtable->isa_str)
-            pobject_lives(interp, (PObj *)vtable->isa_str);
         if (vtable->pmc_class)
             pobject_lives(interp, (PObj *)vtable->pmc_class);
     }

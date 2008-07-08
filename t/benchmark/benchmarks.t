@@ -167,9 +167,9 @@ SArray:\s\d+\.\d+s\n
     q{primes.pasm}  => qr/^N\sprimes\sup\sto\s10000\sis:\s1229\n
         last\sis:\s10001\n
         Elapsed\stime:\s\d+\.\d+\n$/x,
-    q{primes2.pasm} => qr/^N\sprimes\scalculated\sto\s5000\sis\s670\n
+    q{primes2.pir} => qr/^N\sprimes\scalculated\sto\s5000\sis\s670\n
         last\sis:\s4999\n$/x,
-    q{primes2_i.pasm} => qr/^N\sprimes\scalculated\sto\s10000\s
+    q{primes2_i.pir} => qr/^N\sprimes\scalculated\sto\s10000\s
         is\s1230\nlast\sis:\s9973\n$/x,
     q{primes_i.pasm} => qr/^N\sprimes\sup\sto\s10000\sis:\s1229\n
         last\sis:\s9973\nElapsed\stime:\s\d+\.\d+\n$/x,
@@ -204,7 +204,6 @@ SArray:\s\d+\.\d+s\n
 );
 
 # These scripts are known to be failing.
-# Heh, currently all tests are working!
 my %todo = ();
 
 plan tests => scalar keys %outputs;
