@@ -81,7 +81,9 @@ Returns an integer representation of the number (by casting).
 */
 
     VTABLE INTVAL get_integer() {
-        return (INTVAL) SELF.get_number();
+        /* two steps avoid casting warnings */
+        FLOATVAL n = SELF.get_number();
+        return (INTVAL) n;
     }
 
 /*
