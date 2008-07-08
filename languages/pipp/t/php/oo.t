@@ -18,10 +18,27 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 1;
+use Test::More     tests => 2;
 
 # Parrot modules
 use Parrot::Test;
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'definition of a class' );
+<?php
+
+class Dings {
+    
+    function bums() {
+        echo "The function bums() in class dings has been called.\n";
+    }
+}
+
+echo "After class definition.\n"
+ 
+?>
+END_CODE
+After class definition.
+END_EXPECTED
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'dummy class', todo => 'no implemented yet' );
 <?php
