@@ -51,6 +51,13 @@ rule sub_id {
 }
 
 rule sub_pragma {
+    | <short_sub_pragma> {*} #= short_sub_pragma
+    | <vtable_pragma>  {*} #= vtable_pragma
+    | <multi_pragma>   {*} #= multi_pragma
+    | <outer_pragma>   {*} #= outer_pragma
+}
+
+token short_sub_pragma {
     | ':load'
     | ':init'
     | ':immediate'
@@ -58,9 +65,6 @@ rule sub_pragma {
     | ':main'
     | ':anon'
     | ':lex'
-    | <vtable_pragma>  {*} #= vtable_pragma
-    | <multi_pragma>   {*} #= multi_pragma
-    | <outer_pragma>   {*} #= outer_pragma
 }
 
 rule vtable_pragma {
@@ -102,6 +106,7 @@ rule param_decl {
 
 rule parameter {
     <pir_type> [ <string_constant> '=>' ]? <id>
+    {*}
 }
 
 rule parameter_flags {
@@ -218,12 +223,12 @@ rule goto_stat {
 }
 
 token relational_operator {
-    || '=='
-    || '!='
-    || '<='
-    || '<'
-    || '>='
-    || '>'
+    | '=='
+    | '!='
+    | '<='
+    | '<'
+    | '>='
+    | '>'
 }
 
 token binary_operator {
@@ -241,9 +246,9 @@ token unary_operator {
 }
 
 rule expression {
-    | <binary_expr>   #= binary_expr
-    | <unary_expr>    #= unary_expr
-    | <simple_expr>   #= simple_expr
+    | <binary_expr> {*}  #= binary_expr
+    | <unary_expr>  {*}  #= unary_expr
+    | <simple_expr> {*}  #= simple_expr
 }
 
 rule binary_expr {
@@ -278,10 +283,30 @@ rule key {
 
 
 rule assignment_stat {
-    | <target> '=' <rhs>                        {*} #= simple_assign
-    | <target> <assign_operator> <simple_expr>  {*} #= augment_assign
-    | <target> <keylist> '=' <simple_expr>      {*} #= key_assign
-    | <result_var_list> '=' <short_sub_call>    {*} #= subcall_assign
+    | <simple_assignment> {*}        #= simple_assignment
+    | <augment_assignment> {*}       #= augment_assignment
+    | <keyed_assignment> {*}         #= keyed_assignment
+    | <call_assignment> {*}          #= call_assignment
+}
+
+rule augment_assignment {
+    <target> <assign_operator> <simple_expr>
+    {*}
+}
+
+rule keyed_assignment {
+    <target> <keylist> '=' <simple_expr>
+    {*}
+}
+
+rule call_assignment {
+    <result_var_list> '=' <short_sub_call>
+    {*}
+}
+
+rule simple_assignment {
+    <target> '=' <rhs>
+    {*}
 }
 
 rule rhs {
@@ -290,7 +315,14 @@ rule rhs {
     | <expression>                            {*} #= expression
     | <pasm_instruction> \N*                  {*} #= pasm_instr
     | <heredoc>                               {*} #= heredoc
-    | 'new' [ <string_constant> | <keylist> ]    {*} #= instantiation
+    | <instantiation>                         {*} #= instantiation
+}
+
+rule instantiation {
+    'new'
+    [ <string_constant> {*}         #= string_constant
+    | <keylist> {*}                 #= keylist
+    ]
 }
 
 
@@ -596,9 +628,11 @@ rule macro_label_decl {
 }
 
 rule int_constant {
+    [
     | '0b' \d+
     | '0x' \d+
     | ['-']? \d+
+    ]
     {*}
 }
 
@@ -610,6 +644,7 @@ rule float_constant {
 rule string_constant {
     [ <encoding_specifier>? <charset_specifier> ]?
     [ <stringdouble> | <stringsingle> ]
+    {*}
 }
 
 token encoding_specifier {
@@ -640,6 +675,11 @@ token pir_type {
     $<type>=['int'|'num'|'pmc'|'string']
 }
 
+token target {
+    <normal_target>
+    {*}
+}
+
 token normal_target {
     | <id>         {*} #= id
     | <register>   {*} #= register
@@ -659,6 +699,7 @@ token macro_target {
 
 token id {
     <!keyword> \w+
+    {*}
 }
 
 token macro_id {

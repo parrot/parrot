@@ -22,7 +22,7 @@ method compilation_unit($/, $key) {
 method sub_def($/) {
     my $sub := PAST::Block.new( :blocktype('declaration'), :node($/) );
     my $subname := $( $<sub_id> );
-    $sub.name($subname);
+    $sub.name($subname.name());
 
     if $<param_decl> {
         for $<param_decl> {
@@ -97,8 +97,9 @@ method param_decl($/) {
 
 method parameter($/) {
     my $parameter := $($<id>);
-    my $type := $($<pir_type>);
-    $parameter.type($type);
+    # is the type usable at this point (where PCT only supports P registers?)
+    my $type := ~$<pir_type>;
+    #$parameter.type($type);
     $parameter.scope('parameter');
     make $parameter;
 }
@@ -123,20 +124,38 @@ method binary_expr($/) {
 
 }
 
-method constant($/) {
-
+method constant($/, $key) {
+    make $( $/{$key} );
 }
 
 method target($/) {
+    make $( $<normal_target> );
+}
 
+method normal_target($/, $key) {
+    make $( $/{$key} );
 }
 
 method key($/) {
     make $( $<simple_expr> );
 }
 
+method integer_constant($/) {
+    make PAST::Val.new( :value(~$/), :returns('Integer'), :node($/) );
+}
+
+method string_constant($/) {
+    make PAST::Val.new( :value(~$/), :returns('String'), :node($/) );
+}
+
+method float_constant($/) {
+    make PAST::Val.new( :value(~$/), :returns('Float'), :node($/) );
+}
+
+
+
 method id($/) {
-    make PAST::Var.new( :name($<name>), :node($/) );
+    make PAST::Var.new( :name(~$/), :node($/) );
 }
 
 # Local Variables:
