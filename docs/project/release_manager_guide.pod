@@ -26,7 +26,8 @@ Make sure you're up to date:
 You may want to ask the developer base to stop committing big changes;
 it will avoid complications.  Or you could create a release branch,
 make release-related changes there, and fold them back into the trunk
-once the release is done.  This process is explained in L<Appendix 1|"Appendix 1 - Releasing from a branch">.
+once the release is done. This process is explained in
+L<Appendix 1|"Appendix 1 - Releasing from a branch">.
 
 =item 2.
 
