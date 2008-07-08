@@ -35,9 +35,8 @@ static void PackFile_Constant_dump(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void pobj_flag_dump(PARROT_INTERP, ARGIN(long flags))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static void pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
+        __attribute__nonnull__(1);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -114,7 +113,7 @@ static const char *flag_bit_names[] =
 };
 
 static void
-pobj_flag_dump(PARROT_INTERP, ARGIN(long flags))
+pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
 /* Given a word of flags, generate a dump line of the whole word in hex,
  * followed by individual bits.
  */
