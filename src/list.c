@@ -963,12 +963,12 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
             continue;
         }
         real_exception(interp, NULL, INTERNAL_PANIC, 
-            "Cannot determine how to find location %d in list %p\n",
-            *idx, list);
+            "Cannot determine how to find location %d in list %p of %d items\n",
+            *idx, list, list->cap);
     }
     real_exception(interp, NULL, INTERNAL_PANIC, 
-        "Cannot find index %d in list %p using any method\n",
-        *idx, list);
+        "Cannot find index %d in list %p of %d items using any method\n",
+        *idx, list, list->cap);
 }
 
 /*
