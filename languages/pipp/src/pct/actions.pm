@@ -92,7 +92,8 @@ method method_call($/) {
     my $past := PAST::Op.new(
                     :name( ~$<METHOD_NAME> ),
                     :pasttype( 'callmethod' ),
-                    :name( ~$<METHOD_NAME> )
+                    :name( ~$<METHOD_NAME> ),
+                    $( $<VAR_NAME> )
                 );
 
     make $past;
@@ -104,7 +105,8 @@ method constructor_call($/) {
                     :pasttype( 'callmethod' ),
                     PAST::Var.new(
                         :name( ~$<CLASS_NAME> ),
-                        :scope( 'package' )
+                        :namespace( $<CLASS_NAME><ident> ),
+                        :scope( 'package' ),
                     )
                 );
 
@@ -340,13 +342,18 @@ method method_definition($/) {
 
     ## set the function name
     $past.name( ~$<METHOD_NAME> );
-    for $<statement> {
-        $past.push($($_));
-    }
-
+    $past.blocktype( 'method' );
     $past.control('return_pir');
+    $past.push( PAST::Stmts.new() );
 
-    make $past;
+    my $stmts := PAST::Stmts.new();
+    for $<statement> {
+        $stmts.push($($_));
+    }
+    $past.push( $stmts );
+
+
+    make PAST::Stmts.new( $past );
 }
 
 method parameters($/) {
@@ -368,9 +375,15 @@ method class_definition($/) {
     my $past := PAST::Block.new(
                     :node($/),
                     :blocktype('declaration'),
-                    :namespace( ~$<CLASS_NAME> ),
+                    :namespace( $<CLASS_NAME><ident> ),
                     :pirflags( ':init :load' ),
-                    PAST::Stmts.new()                # cargo culting from Rakudo
+                    :lexical( 0 ),
+                    PAST::Stmts.new(
+                        PAST::Op.new(
+                            :inline( "$P0 = get_hll_global 'P6metaclass'\n $P1 = split '::', 'Dings'\n push_eh subclass_done\n $P2 = $P0.'new_class'($P1)\n pop_eh\n subclass_done:\n" ),
+                            :pasttype( 'inline' )
+                        )
+                    )
                 );
     for $<method_definition> {
         $past.push( $($_) );
