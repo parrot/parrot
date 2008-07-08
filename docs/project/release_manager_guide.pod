@@ -9,10 +9,12 @@ To prepare a release:
 
 =item 0.
 
-Announce to parrot-porters and #parrot at least a couple days in advance,
-asking if there are any showstopping bugs.  It's also good to ask for
-updates to F<NEWS>, F<CREDITS>, F<PLATFORMS>, F<RESPONSIBLE_PARTIES>,
-etc.  You might also select a name for your release (e.g., perhaps
+Announce the new release to parrot-porters and to the IRC channel #parrot
+at least a couple days in advance. Ask whether there are any showstopping bugs.
+It's also good to ask for updates to F<NEWS>, F<CREDITS>, F<PLATFORMS>,
+F<RESPONSIBLE_PARTIES>, F<LANGUAGES_STATUS>, etc.
+
+You might also select a name for your release (e.g., perhaps
 select a name from L<http://en.wikipedia.org/wiki/List_of_parrots>).
 
 =item 1.
@@ -24,7 +26,7 @@ Make sure you're up to date:
 You may want to ask the developer base to stop committing big changes;
 it will avoid complications.  Or you could create a release branch,
 make release-related changes there, and fold them back into the trunk
-once the release is done.  This process is explained in L<Appendix 1>.
+once the release is done.  This process is explained in L<Appendix 1|"Appendix 1 - Releasing from a branch">.
 
 =item 2.
 
@@ -61,7 +63,7 @@ fields that must be updated at each release:
 
 =item C<release.*>
 
-The date of the next release is in L<Appendix 2>.
+The date of the next release is in L<Appendix 2|"Appendix 2 - Upcoming releases">.
 
 =item C<rt.tracking>
 
@@ -153,7 +155,7 @@ in step 3, above.
  $ svn copy -m"tagged release a.b.c" \
    $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
 
-See also L<Appendix 1> below.
+See also L<Appendix 1|"Appendix 1 - Releasing from a branch"> below.
 
 =item 8.
 
@@ -205,7 +207,8 @@ Modify the topic on #parrot, e.g.:
 
 =item c
 
-Update the next planned release date on the wiki.
+Update the wiki frontpage at L<http://www.perlfoundation.org/parrot/index.cgi?parrot>.
+Update the next planned release date on the wiki at L<http://www.perlfoundation.org/parrot/index.cgi?release_schedule_2008>.
 
 =item d
 
@@ -216,12 +219,14 @@ Add a release announcement to news/[year]/Parrot-[release].html.
 Update C</index.html> (The old mini-announcement may be commented out).
 Update C</.htredirects> to point to the proper CPAN URL.
 
-Update the Wikipedia entry at L<http://en.wikipedia.org/wiki/Parrot_virtual_machine>.
-
 If your name is Allison, Will, or chromatic, you will be able to
 commit these changes yourself; be sure to test locally in combust
 before pushing the update out.  Otherwise, prepare the changes and
 send a patch to one of the anointed.
+
+=item e
+
+Update the Wikipedia entry at L<http://en.wikipedia.org/wiki/Parrot_virtual_machine>.
 
 =back
 
@@ -243,7 +248,7 @@ This document was written after a couple of subtly incorrectly assembled
 releases--usually when someone forgot to delete F<DEVELOPING> (which is now
 automated!), but at least once where the F<MANIFEST> check failed. The intent
 of this file is to document what must be done to release so that such mistakes
-don't happen again.
+won't happen again.
 
 =head1 SEE ALSO
 
