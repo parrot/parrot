@@ -65,6 +65,103 @@ can.
 
 /*
 
+=item C<int Parrot_vfprintf>
+
+Writes a C string format with a varargs list to a PIO.
+
+=item C<int Parrot_fprintf>
+
+Writes a C string format with varargs to a PIO.
+
+=item C<int Parrot_printf>
+
+Writes a C string format with varargs to C<stdout>.
+
+=item C<int Parrot_eprintf>
+
+Writes a C string format with varargs to C<stderr>.
+
+*/
+
+PARROT_API
+int
+Parrot_vfprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
+        ARGIN(const char *s), va_list args)
+{
+    STRING * str;
+    INTVAL retval;
+
+    PARROT_CALLIN_START(interp);
+    str = Parrot_vsprintf_c(interp, s, args);
+    retval = PIO_putps(interp, pio, str);
+    PARROT_CALLIN_END(interp);
+
+    return retval;
+}
+
+PARROT_API
+int
+Parrot_fprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
+        ARGIN(const char *s), ...)
+{
+    va_list args;
+    INTVAL retval;
+
+    va_start(args, s);
+    retval = Parrot_vfprintf(interp, pio, s, args);
+    va_end(args);
+
+    return retval;
+}
+
+PARROT_API
+int
+Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
+{
+    va_list args;
+    INTVAL retval;
+    va_start(args, s);
+
+    if (interp) {
+        retval = Parrot_vfprintf(interp, PIO_STDOUT(interp), s, args);
+    }
+    else {
+        /* Be nice about this...
+         **   XXX BD Should this use the default PIO_STDOUT or something?
+         */
+        retval = vfprintf(stdout, s, args);
+    }
+    va_end(args);
+
+    return retval;
+}
+
+PARROT_API
+int
+Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
+{
+    va_list args;
+    INTVAL retval;
+
+    va_start(args, s);
+
+    if (interp) {
+        retval = Parrot_vfprintf(interp, PIO_STDERR(interp), s, args);
+    }
+    else {
+        /* Be nice about this...
+         **   XXX BD Should this use the default PIO_STDOUT or something?
+         */
+        retval=vfprintf(stderr, s, args);
+    }
+
+    va_end(args);
+
+    return retval;
+}
+
+/*
+
 =item C<Parrot_String Parrot_PMC_get_string_intkey>
 
 Return the integer keyed string value of the passed-in PMC

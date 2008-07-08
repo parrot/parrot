@@ -102,7 +102,7 @@ main(int argc, char* argv[]) {
         return 1;
 
     output = Parrot_new_string(interp, "Test", 4, "iso-8859-1", 0);
-    PIO_eprintf(interp, "%S\n", output);
+    Parrot_eprintf(interp, "%S\n", output);
 
     Parrot_exit(interp, 0);
     return 0;
@@ -132,7 +132,7 @@ main(int argc, char* argv[]) {
     Parrot_set_strreg(interp, parrot_reg, value);
 
     new_value = Parrot_get_strreg(interp, parrot_reg);
-    PIO_eprintf(interp, "%S\n", new_value);
+    Parrot_eprintf(interp, "%S\n", new_value);
 
     Parrot_exit(interp, 0);
     return 0;
@@ -309,7 +309,7 @@ main(int argc, char* argv[]) {
     Parrot_PMC_set_string(interp, testpmc, value);
     new_value = Parrot_PMC_get_string(interp, testpmc);
 
-    PIO_eprintf(interp, "%S\n", new_value);
+    Parrot_eprintf(interp, "%S\n", new_value);
 
     Parrot_exit(interp, 0);
     return 0;
@@ -444,7 +444,7 @@ the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
     Parrot_loadbc(interp, pf);
     sub = Parrot_find_global_cur(interp, name);
     Parrot_call_sub(interp, sub, "v");
-    PIO_eprintf(interp, "back\n");
+    Parrot_eprintf(interp, "back\n");
 
     /* win32 seems to buffer stderr ? */
     PIO_flush(interp, PIO_STDERR(interp));
@@ -457,7 +457,7 @@ the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
                  string_from_cstring(interp, "hello ", 0));
 
     Parrot_call_sub(interp, sub, "vP", arg);
-    PIO_eprintf(interp, "back\n");
+    Parrot_eprintf(interp, "back\n");
 
     return NULL;
 }
@@ -520,7 +520,7 @@ the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
     sub = Parrot_find_global_cur(interp, name);
 
     if (setjmp(jb.destination)) {
-        PIO_eprintf(interp, "caught\n");
+        Parrot_eprintf(interp, "caught\n");
     }
     else {
         /* pretend the EH was pushed by the sub call. */
@@ -530,7 +530,7 @@ the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
         Parrot_call_sub(interp, sub, "v");
     }
 
-    PIO_eprintf(interp, "back\n");
+    Parrot_eprintf(interp, "back\n");
 
     return NULL;
 }

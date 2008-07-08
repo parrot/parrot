@@ -117,8 +117,21 @@ Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+int Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
+        __attribute__nonnull__(2);
+
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language Parrot_find_language(SHIM_INTERP, SHIM(char *language));
+
+PARROT_API
+int Parrot_fprintf(PARROT_INTERP,
+    ARGIN(Parrot_PMC pio),
+    ARGIN(const char *s),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_free_cstring(ARGIN_NULLOK(char *string));
@@ -360,6 +373,10 @@ Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
+int Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
 
@@ -384,6 +401,15 @@ void Parrot_set_strreg(PARROT_INTERP,
 PARROT_API
 void Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
+
+PARROT_API
+int Parrot_vfprintf(PARROT_INTERP,
+    ARGIN(Parrot_PMC pio),
+    ARGIN(const char *s),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/extend.c */
