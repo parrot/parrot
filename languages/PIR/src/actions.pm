@@ -108,20 +108,34 @@ method pir_type($/) {
     make PAST::Val.new( :type('string'), :value(~$<type>), :node($/) );
 }
 
+method assignment_stat($/, $key) {
+    make $( $/{$key} );
+}
+
+method simple_assignment($/) {
+    my $lhs := $( $<target> );
+    my $rhs := $( $<rhs> );
+    make PAST::Op.new( $lhs, $rhs, :pasttype('bind'), :node($/) );
+}
+
+method rhs($/, $key) {
+    make $( $/{$key} );
+}
+
 method expression($/, $key) {
     make $( $/{$key} );
 }
 
 method simple_expr($/, $key) {
-    make $( $/{key} );
+    make $( $/{$key} );
 }
 
 method unary_expr($/) {
-
+     make $( $<simple_expr> );
 }
 
 method binary_expr($/) {
-
+    make $( $<simple_expr>[0] );
 }
 
 method constant($/, $key) {
@@ -140,7 +154,7 @@ method key($/) {
     make $( $<simple_expr> );
 }
 
-method integer_constant($/) {
+method int_constant($/) {
     make PAST::Val.new( :value(~$/), :returns('Integer'), :node($/) );
 }
 
@@ -152,10 +166,8 @@ method float_constant($/) {
     make PAST::Val.new( :value(~$/), :returns('Float'), :node($/) );
 }
 
-
-
 method id($/) {
-    make PAST::Var.new( :name(~$/), :node($/) );
+    make PAST::Var.new( :name(~$/), :scope('lexical'), :node($/) );
 }
 
 # Local Variables:
