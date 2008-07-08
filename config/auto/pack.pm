@@ -38,9 +38,9 @@ sub runstep {
     my $longsize = $conf->data->get('longsize');
     my $ptrsize  = $conf->data->get('ptrsize');
 
-    foreach ( 'intvalsize', 'opcode_t_size' ) {
-        my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
-        my $size = $conf->data->get($_);
+    foreach my $type ( 'intvalsize', 'opcode_t_size' ) {
+        my $which = $type eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
+        my $size = $conf->data->get($type);
         my $format;
         if (    $size == $longsize
              && $size == $conf->data->get_p5('longsize')
@@ -56,20 +56,20 @@ sub runstep {
             # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
             $format = 'q';
         }
-        warn "Configure.pl:  Unable to find a suitable packtype for $_.\n"
+        warn "Configure.pl:  Unable to find a suitable packtype for $type.\n"
             unless $format;
 
         my $test = eval { pack $format, 0 };
         unless ( defined $test ) {
             warn <<"AARGH"
-Configure.pl:  Unable to find a functional packtype for $_.
+Configure.pl:  Unable to find a functional packtype for $type.
                '$format' failed: $@
 AARGH
         }
         if ($test) {
             unless ( length $test == $size ) {
                 warn sprintf <<"AARGH", $size, length $test;
-Configure.pl:  Unable to find a functional packtype for $_.
+Configure.pl:  Unable to find a functional packtype for $type.
                Need a format for %d bytes, but '$format' gave %d bytes.
 AARGH
             }
