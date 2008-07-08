@@ -33,9 +33,9 @@ Something like this worked for me under Linux.
   make
 
   # configure run-tests.php
-  export PATH=.:$PATH
-  export TEST_PHP_EXECUTABLE=languages/pipp/pipp
-  export TEST_PHP_CGI_EXECUTABLE=languages/pipp/pipp
+  export PARROT_HOME=/home/bernhard/devel/Parrot/trunk
+  export TEST_PHP_EXECUTABLE=$PARROT_HOME/languages/pipp/pipp
+  export TEST_PHP_CGI_EXECUTABLE=$PARROT_HOME/languages/pipp/pipp
   export PIPP_VARIANT=phc
   export NO_INTERACTION=1
 
