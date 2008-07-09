@@ -478,8 +478,6 @@ set_integer_keyed, get_number_keyed: 128.000000
 set_integer_keyed, get_string_keyed: 128
 OUTPUT
 
-TODO: {
-    local $TODO = "fix breakage when comparing assigned element vs. initialized but unassigned (case 4)";
 pir_output_is( <<'CODE', <<'OUTPUT', "equality" );
 .sub main :main
     .local pmc fpa1, fpa2, p1, p2
@@ -518,14 +516,14 @@ L3: say "equal"
     p1 = ''
     p2 = ''
 
-    fpa2[1] = p1
+    fpa1[1] = p1
 
     print "4:"
     if fpa1 == fpa2 goto L4
     print "not "
 L4: say "equal"
 
-    fpa2[2] = p2
+    fpa2[1] = p2
 
     print "5:"
     if fpa1 == fpa2 goto L5
@@ -540,7 +538,6 @@ CODE
 4:not equal
 5:equal
 OUTPUT
-}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
 .sub main :main
