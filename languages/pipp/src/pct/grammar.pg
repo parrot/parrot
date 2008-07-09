@@ -28,21 +28,22 @@ token CODE_END_TP1            { '?>' \n? }
 token CODE_END_TP2            { '</script>' \n? }
 
 rule  statements              { <statement>*           {*} }
-rule  statement               { <echo_statement>       {*} <statement_delimiter>  #= echo_statement
-                              | <expression>           {*} <statement_delimiter>  #= expression
-                              | <if_statement>         {*}                        #= if_statement
-                              | <inline_sea_tp1>       {*}                        #= inline_sea_tp1
-                              | <inline_sea_tp2>       {*}                        #= inline_sea_tp2
-                              | <scalar_assign>        {*} <statement_delimiter>  #= scalar_assign
-                              | <array_assign>         {*} <statement_delimiter>  #= array_assign
-                              | <function_definition>  {*}                        #= function_definition
-                              | <class_definition>     {*}                        #= class_definition
+rule  statement               { <echo_statement>              {*}  #= echo_statement
+                              | <expression_statement>        {*}  #= expression_statement
+                              | <if_statement>                {*}  #= if_statement
+                              | <inline_sea_tp1>              {*}  #= inline_sea_tp1
+                              | <inline_sea_tp2>              {*}  #= inline_sea_tp2
+                              | <scalar_assign>               {*}  #= scalar_assign
+                              | <array_assign>                {*}  #= array_assign
+                              | <function_definition>         {*}  #= function_definition
+                              | <class_definition>            {*}  #= class_definition
                               }
 rule  statement_delimiter     { ';'
                               | <before \? >
                               | $
                               }
-rule  echo_statement          { 'echo' <arguments>                                        {*} }
+rule  echo_statement          { 'echo' <arguments> <.statement_delimiter>                 {*} }
+rule  expression_statement    { <expression> <.statement_delimiter>                       {*} }
 rule  function_call           { <FUNCTION_NAME> '(' <arguments> ')'                       {*} }
 rule  method_call             { <VAR_NAME> '->' <METHOD_NAME> '(' <arguments> ')'         {*} }
 rule  constant                { <CONSTANT_NAME>                                           {*} }
@@ -55,8 +56,8 @@ rule  if_statement            { <IF> '(' <relational_expression> ')'
 rule  constructor_call        { 'new' <CLASS_NAME>                                        {*} }
 token inline_sea_tp1          { <.CODE_END_TP1> <SEA_empty_allowed> <.CODE_START_TP1>     {*} }
 token inline_sea_tp2          { <.CODE_END_TP2> <SEA_empty_allowed> <.CODE_START_TP2>     {*} }
-rule  scalar_assign           { <var>        '=' <expression>                             {*} }
-rule  array_assign            { <array_elem> '=' <expression>                             {*} }
+rule  scalar_assign           { <var>        '=' <expression> <.statement_delimiter>      {*} }
+rule  array_assign            { <array_elem> '=' <expression> <.statement_delimiter>      {*} }
 
 token FUNCTION_NAME           { <ident> }
 token METHOD_NAME             { <ident> }

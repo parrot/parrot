@@ -81,6 +81,10 @@ method echo_statement($/) {
     make $past;
 }
 
+method expression_statement($/) {
+    make $( $<expression> );
+}
+
 method function_call($/) {
     my $past := $( $<arguments> );
     $past.name( ~$<FUNCTION_NAME> );
