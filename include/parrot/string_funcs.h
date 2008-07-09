@@ -426,6 +426,14 @@ PMC* string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_string_split(PARROT_INTERP,
+    ARGIN_NULLOK(STRING *delim),
+    ARGIN_NULLOK(STRING *str))
+        __attribute__nonnull__(1);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL string_str_index(PARROT_INTERP,
     ARGIN(const STRING *s),
     ARGIN(const STRING *s2),

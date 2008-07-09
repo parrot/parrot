@@ -452,7 +452,7 @@ op join(out STR, in STR, invar PMC) :base_core {
 }
 
 op split(out PMC, in STR, in STR) :base_core {
-    $1 = string_split(interp, $2, $3);
+    $1 = Parrot_string_split(interp, $2, $3);
 }
 
 

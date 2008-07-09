@@ -2969,6 +2969,31 @@ string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
 
 /*
 
+=item C<PMC* Parrot_string_split>
+
+Split a string with a delimiter.
+Returns PMCNULL if the string or the delimiter is NULL,
+else is the same as string_split.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_string_split(PARROT_INTERP,
+    ARGIN_NULLOK(STRING *delim), ARGIN_NULLOK(STRING *str))
+{
+    if (! delim || ! str)
+        return PMCNULL;
+    else
+        return string_split(interp, delim, str);
+}
+
+/*
+
 =item C<STRING* uint_to_str>
 
 Returns C<num> converted to a Parrot C<STRING>.
