@@ -160,10 +160,6 @@ method scalar_assign($/) {
          );
 }
 
-method array_key($/) {
-    make $( $<expression> );
-}
-
 method array_assign($/) {
     make PAST::Op.new(
              $( $<array_elem> ),
@@ -179,7 +175,7 @@ method array_elem($/) {
 
     make PAST::Var.new(
              $past_var_name,
-             $( $<array_key> ),
+             $( $<expression> ),
              :scope('keyed'),
              :viviself('Undef'),
              :lvalue(1)
