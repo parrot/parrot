@@ -221,8 +221,10 @@ Returns the string value for the element at C<*key>.
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
         datum key_gdbm, val_gdbm;
 
-        if (!key) return PMCNULL;
-        if (!dbf) return PMCNULL;
+        if (!key) 
+            return CONST_STR(INTERP, "");
+        if (!dbf) 
+            return CONST_STR(INTERP, "");
         keystr = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
