@@ -43,14 +43,24 @@ method SEA($/) {
 }
 
 method code_tp1($/) {
-    make $( $<statements> );
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<statement> {
+        $past.push( $($_) );
+    }
+
+    make $past;
 }
 
 method code_tp2($/) {
-    make $( $<statements> );
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<statement> {
+        $past.push( $($_) );
+    }
+
+    make $past;
 }
 
-method statements($/) {
+method block($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> {
         $past.push( $($_) );
@@ -141,7 +151,7 @@ method arguments($/) {
 method if_statement($/) {
     my $past := PAST::Op.new(
                     $( $<expression> ),
-                    $( $<statements> ),
+                    $( $<block> ),
                     :pasttype('if'),
                     :node($/)
                 );
@@ -202,7 +212,7 @@ method this($/) {
 }
 
 method else_clause($/) {
-    make $( $<statements> );
+    make $( $<block> );
 }
 
 # Handle the operator precedence table.
@@ -291,51 +301,45 @@ method DOUBLEQUOTE_STRING($/) {
 
 method function_definition($/) {
 
-    ## note that $<parameters> creates a new PAST::Block.
+    # note that $<parameters> creates a new PAST::Block.
     my $past := $( $<parameters> );
 
-    ## set the function name
     $past.name( ~$<FUNCTION_NAME> );
-    for $<statement> {
-        $past.push($($_));
-    }
-
     $past.control('return_pir');
+    $past.push( $( $<block> ) );
 
     make $past;
 }
 
 method method_definition($/) {
 
-    ## note that $<parameters> creates a new PAST::Block.
+    # note that $<parameters> creates a new PAST::Block.
     my $past := $( $<parameters> );
 
-    ## set the function name
     $past.name( ~$<METHOD_NAME> );
     $past.blocktype( 'method' );
     $past.control('return_pir');
-    $past.push( PAST::Stmts.new() );
+    $past.push( $( $<block> ) );
 
-    my $stmts := PAST::Stmts.new();
-    for $<statement> {
-        $stmts.push($($_));
-    }
-    $past.push( $stmts );
-
-
-    make PAST::Stmts.new( $past );
+    make $past;
 }
 
 method parameters($/) {
 
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := PAST::Block.new(
+                    :blocktype('declaration'),
+                    :node($/)
+                );
     for $<VAR_NAME> {
         my $param := $( $_ );
         $param.scope('parameter');
         $past.push($param);
 
-        ## enter the parameter as a lexical into the block's symbol table
-        $past.symbol($param.name(), :scope('lexical'));
+        # enter the parameter as a lexical into the block's symbol table
+        $past.symbol( 
+             :scope('lexical'),
+             $param.name()
+        );
     }
 
     make $past;
