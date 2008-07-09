@@ -52,7 +52,7 @@ typedef struct Node {
     struct Node *next;  /* for chaining */
 } Node;
 
-typedef struct Hash {
+typedef struct LuaHash {
     Node *node;
     Node *firstfree;  /* this position is free; all positions after it are full */
     PMC *container;
