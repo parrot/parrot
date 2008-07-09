@@ -104,8 +104,9 @@ PIRCODE
   L1:
 PIRCODE
     post.'outer'(start)
+    start.'push'(post)
     $P0 = get_hll_global ['Lua'; 'POST'], 'Chunk'
-    .return $P0.'new'(post, start, 'node'=>node, 'prologue'=><<'PIRCODE')
+    .return $P0.'new'(start, 'node'=>node, 'prologue'=><<'PIRCODE')
 .include "interpinfo.pasm"
 .HLL "Lua", "lua_group"
 PIRCODE
