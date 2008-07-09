@@ -222,9 +222,9 @@ Returns the string value for the element at C<*key>.
         datum key_gdbm, val_gdbm;
 
         if (!key)
-            return CONST_STR(INTERP, "");
+            return CONST_STRING(INTERP, "");
         if (!dbf)
-            return CONST_STR(INTERP, "");
+            return CONST_STRING(INTERP, "");
         keystr = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
