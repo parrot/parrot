@@ -5,7 +5,7 @@
 
 grammar Pipp::Grammar is PCT::Grammar;
 
-token TOP                     { ^ <sea_or_code>+ {*} }
+token TOP                     { ^ <sea_or_code>+                                          {*} }
 token ws                      { [ \h | \v ]*
                                 <singlelinecomment>?
                                 <multilinecomment>?
@@ -15,19 +15,19 @@ token singlelinecomment       { '#'  \N*
                               }
 token multilinecomment        { '/*' .*? '*/' }
 
-token sea_or_code             { <code_tp1>   {*}   #= code_tp1
-                              | <code_tp2>   {*}   #= code_tp2
-                              | <SEA>        {*}   #= SEA
+token sea_or_code             { <code_tp1>                    {*}  #= code_tp1
+                              | <code_tp2>                    {*}  #= code_tp2
+                              | <SEA>                         {*}  #= SEA
                               }
-regex SEA                     { <[<]>? .+? ( <before \<> | $ ) {*} } 
-rule  code_tp1                { <.CODE_START_TP1> <statements>  <.CODE_END_TP1>? {*} }
-rule  code_tp2                { <.CODE_START_TP2> <statements>  <.CODE_END_TP2>? {*} }
+regex SEA                     { '<'? .+? ( <before '<'> | $ )                             {*} } 
+rule  code_tp1                { <.CODE_START_TP1> <statements>  <.CODE_END_TP1>?          {*} }
+rule  code_tp2                { <.CODE_START_TP2> <statements>  <.CODE_END_TP2>?          {*} }
 token CODE_START_TP1          { '<?php'  }
 token CODE_START_TP2          { '<script language="php">'  }
 token CODE_END_TP1            { '?>' \n? }
 token CODE_END_TP2            { '</script>' \n? }
 
-rule  statements              { <statement>*           {*} }
+rule  statements              { <statement>*                                              {*} }
 rule  statement               { <echo_statement>              {*}  #= echo_statement
                               | <expression_statement>        {*}  #= expression_statement
                               | <if_statement>                {*}  #= if_statement
@@ -39,7 +39,7 @@ rule  statement               { <echo_statement>              {*}  #= echo_state
                               | <class_definition>            {*}  #= class_definition
                               }
 rule  statement_delimiter     { ';'
-                              | <before \? >
+                              | <before '?'>
                               | $
                               }
 rule  echo_statement          { 'echo' <arguments> <.statement_delimiter>                 {*} }
@@ -49,10 +49,13 @@ rule  method_call             { <VAR_NAME> '->' <METHOD_NAME> '(' <arguments> ')
 rule  constant                { <CONSTANT_NAME>                                           {*} }
 rule  arguments               { [ <expression> [',' <expression>]* ]?                     {*} }
 rule  if_statement            { <IF> '(' <expression> ')'
-                                \{ <statements> \}
+                                '{'
+                                    <statements> 
+                                '}'
                                 <else_clause>?                                 
                                                                                           {*}
                               }
+rule  else_clause             { <.ELSE> '{' <statements> '}'                              {*} }
 rule  constructor_call        { 'new' <CLASS_NAME>                                        {*} }
 token inline_sea_tp1          { <.CODE_END_TP1> <SEA_empty_allowed> <.CODE_START_TP1>     {*} }
 token inline_sea_tp2          { <.CODE_END_TP2> <SEA_empty_allowed> <.CODE_START_TP2>     {*} }
@@ -63,27 +66,58 @@ token FUNCTION_NAME           { <ident> }
 token METHOD_NAME             { <ident> }
 token CONSTANT_NAME           { <ident> }
 token CLASS_NAME              { <ident>  [ '::' <ident> ]* }
-token VAR_NAME                {  '$' <ident> {*} }
+token VAR_NAME                {  '$' <ident>                                              {*} }
 
-token TRUE                    { 'TRUE'                         {*} }
-token FALSE                   { 'FALSE'                        {*} }
-token NULL                    { 'NULL'                         {*} }
-token INTEGER                 { \d+                            {*} }
-token NUMBER                  { ( \d+ )? '.' \d+               {*} }
-token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
-token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
+token TRUE                    { 'TRUE'                                                    {*} }
+token FALSE                   { 'FALSE'                                                   {*} }
+token NULL                    { 'NULL'                                                    {*} }
+token INTEGER                 { \d+                                                       {*} }
+token NUMBER                  { ( \d+ )? '.' \d+                                          {*} }
+token SINGLEQUOTE_STRING      { \'  <string_literal: "'"> \'                              {*} }
+token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'                             {*} }
 
 token IF                      { 'if' }
 token ELSE                    { 'else' }
 
-rule  else_clause             { <.ELSE> \{ <statements> \} {*} }
-regex SEA_empty_allowed       { <-[<]>*? <before \<> }  # everthing till the next '<'
+regex SEA_empty_allowed       { <-[<]>*? <before '<'> }  # everthing till the next '<'
 
-rule  array_elem              { <VAR_NAME> '[' <array_key> ']' {*} }
+rule  array_elem              { <VAR_NAME> '[' <array_key> ']'                            {*} }
 rule  array_key               { <expression> {*} }
 rule  var                     { <VAR_NAME> {*} }
 
-rule expression is optable                                              { ... }
+rule  term                    { <method_call>                 {*}  #= method_call
+                              | <function_call>               {*}  #= function_call
+                              | <constructor_call>            {*}  #= constructor_call
+                              | <TRUE>                        {*}  #= TRUE
+                              | <FALSE>                       {*}  #= FALSE
+                              | <NULL>                        {*}  #= NULL
+                              | <NUMBER>                      {*}  #= NUMBER
+                              | <INTEGER>                     {*}  #= INTEGER
+                              | <DOUBLEQUOTE_STRING>          {*}  #= DOUBLEQUOTE_STRING
+                              | <SINGLEQUOTE_STRING>          {*}  #= SINGLEQUOTE_STRING
+                              | <constant>                    {*}  #= constant
+                              | '(' <expression> ')'          {*}  #= expression
+                              | <array_elem>                  {*}  #= array_elem
+                              | <var>                         {*}  #= var
+                              }
+
+rule  function_definition     { 'function' <FUNCTION_NAME> '(' <parameters> ')'
+                                '{'
+                                    <statement>*
+                                '}'
+                                                                                          {*}
+                              }
+rule  method_definition       { 'function' <METHOD_NAME> '(' <parameters> ')'
+                                '{'
+                                    <statement>*
+                                '}'
+                                                                                          {*}
+                              }
+rule  parameters              {  [ <VAR_NAME> [',' <VAR_NAME>]* ]?                        {*} }
+rule  class_definition        { 'class' <CLASS_NAME> '{' <method_definition>* '}'         {*} }
+
+# operator precedence table
+rule  expression is optable                                             { ... }
 
 proto 'infix:|'   is precedence('1')                                    { ... }
 proto 'infix:&'   is equiv('infix:|')                                   { ... }
@@ -109,24 +143,3 @@ proto 'prefix:+'  is equiv('prefix:-')                                  { ... }
 
 proto 'term:'     is tighter('prefix:-') is parsed(&term) { ... }
 
-rule  term                    { <method_call>           {*}    #= method_call
-                              | <function_call>         {*}    #= function_call
-                              | <constructor_call>      {*}    #= constructor_call
-                              | <TRUE>                  {*}    #= TRUE
-                              | <FALSE>                 {*}    #= FALSE
-                              | <NULL>                  {*}    #= NULL
-                              | <NUMBER>                {*}    #= NUMBER
-                              | <INTEGER>               {*}    #= INTEGER
-                              | <DOUBLEQUOTE_STRING>    {*}    #= DOUBLEQUOTE_STRING
-                              | <SINGLEQUOTE_STRING>    {*}    #= SINGLEQUOTE_STRING
-                              | <constant>              {*}    #= constant
-                              | '(' <expression> ')'    {*}    #= expression
-                              | <array_elem>            {*}    #= array_elem
-                              | <var>                   {*}    #= var
-                              }
-
-rule  function_definition     { 'function' <FUNCTION_NAME> '(' <parameters> ')' '{' <statement>* '}' {*} }
-rule  method_definition       { 'function' <METHOD_NAME> '(' <parameters> ')' '{' <statement>* '}' {*} }
-rule  parameters              {  [ <VAR_NAME> [',' <VAR_NAME>]* ]?                                   {*} }
-
-rule  class_definition        { 'class' <CLASS_NAME> '{' <method_definition>* '}'                    {*} }
