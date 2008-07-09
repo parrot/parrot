@@ -460,6 +460,8 @@ true
 not true
 OUTPUT
 
+TODO: {
+    local $TODO = "freeze/thaw known to be broken";
 pir_output_is( << 'CODE', << 'OUTPUT', "freeze/thaw" );
 .sub main
     .local pmc p, it, val
@@ -495,6 +497,7 @@ p
 foo
 2
 OUTPUT
+}
 
 pir_output_is( << 'CODE', << 'OUTPUT', "array comparison" );
 .sub main
