@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 16;
 
 =head1 NAME
 
@@ -420,6 +420,124 @@ CODE
 0
 1
 0
+OUTPUT
+
+
+pir_output_is( << 'CODE', << 'OUTPUT', "get_bool" );
+
+.sub _main
+    .local pmc p
+    .local int i
+    p = new 'Array'
+
+    if p goto L1
+    print "not "
+L1: say "true"
+
+    p = 4
+
+    if p goto L2
+    print "is not "
+L2: say "true"
+
+
+    p[0] = 2
+    if p goto L3
+    print "not "
+L3: say "true"
+
+    p = new 'Array'
+    p = 0
+    if p goto L4
+    print "not "
+L4: say "true"
+
+.end
+CODE
+not true
+true
+true
+not true
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "freeze/thaw" );
+.sub main
+    .local pmc p, it, val
+    .local string s
+
+    p = new 'Array'
+
+    unshift p, 2
+    unshift p, "foo"
+    unshift p, 9999
+    unshift p, -3
+    unshift p, "p"
+
+    s = freeze p
+    p = thaw s
+
+    it = iter p
+
+iter_loop:
+    unless it goto iter_end
+    val = shift it
+    print val
+    print "\n"
+    goto iter_loop
+
+iter_end:
+
+.end
+CODE
+p
+-3
+9999
+foo
+2
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "array comparison" );
+.sub main
+    .local pmc a1, a2
+    .local int i
+
+    a1 = new 'Array'
+    a2 = new 'Array'
+
+    if a1 == a2 goto L1
+    print "not "
+L1: say "equal"
+
+    a1 = 4
+
+    if a1 == a2 goto L2
+    print "not "
+L2: say "equal"
+
+    a2 = 4
+
+    a1[0] = "foo"
+    a2[0] = "foo"
+
+    if a1 == a2 goto L3
+    print "not "
+L3: say "equal"
+
+    a1[1] = 234
+    a2[1] = 234
+    a1[3] = "bar"
+    a2[3] = "bar"
+
+    if a1 == a2 goto L4
+    print "not "
+L4: say "equal"
+
+.end
+CODE
+equal
+not equal
+equal
+equal
 OUTPUT
 
 1;
