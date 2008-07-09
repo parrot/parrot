@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 22;
+use Test::More     tests => 21;
 
 # Parrot modules
 use Parrot::Test;
@@ -171,14 +171,6 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenation of four strings' );
-<?php
-echo 'Hell' . 'o, ' . 'World!' . "\n"
-?>
-END_CODE
-Hello, World!
-END_EXPECTED
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'script tags' );
 <script language="php">
