@@ -25,7 +25,6 @@ This implementation is based on the Lua 4.0 one.
 
 #define LUA_ASSERT(c, s)         assert(((void)(s), (c)))
 
-#define Hash LuaHash
 #define PMC_hash(s) (LuaHash *)PMC_struct_val((s))
 
 #define MAX_INT (INT_MAX-2)     /* maximum value of an int (-2 for safety) */
@@ -58,7 +57,7 @@ typedef struct Hash {
     Node *firstfree;  /* this position is free; all positions after it are full */
     PMC *container;
     int   size;
-} Hash;
+} LuaHash;
 
 #define node(t, i)       (&(t)->node[i])
 
@@ -88,7 +87,7 @@ static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
 ** returns the `main' position of an element in a table (that is, the index
 ** of its hash value)
 */
-static Node *mainposition(PARROT_INTERP, const Hash *t, const PMC *key)
+static Node *mainposition(PARROT_INTERP, const LuaHash *t, PMC *key)
 {
     unsigned long h;
 
@@ -116,7 +115,7 @@ static Node *mainposition(PARROT_INTERP, const Hash *t, const PMC *key)
 }
 
 /* specialized version for strings */
-static PMC** lua_getstr(PARROT_INTERP, const Hash *t, STRING *key)
+static PMC** lua_getstr(PARROT_INTERP, const LuaHash *t, STRING *key)
 {
     unsigned long h = string_hash(interp, key, 3793);
     Node         *n = &t->node[h&(t->size-1)];
@@ -133,7 +132,7 @@ static PMC** lua_getstr(PARROT_INTERP, const Hash *t, STRING *key)
     return NULL;
 }
 
-static PMC** lua_get(PARROT_INTERP, const Hash *t, const PMC *key)
+static PMC** lua_get(PARROT_INTERP, const LuaHash *t, PMC *key)
 {
     Node *n = mainposition(interp, t, key);
 
@@ -150,7 +149,7 @@ static PMC** lua_get(PARROT_INTERP, const Hash *t, const PMC *key)
     return NULL;
 }
 
-static Node* lua_next(PARROT_INTERP, const Hash *t, const PMC *key)
+static Node* lua_next(PARROT_INTERP, const LuaHash *t, PMC *key)
 {
     int i;
 
@@ -177,7 +176,7 @@ static Node* lua_next(PARROT_INTERP, const Hash *t, const PMC *key)
     return NULL;
 }
 
-static void rehash(PARROT_INTERP, Hash *t);
+static void rehash(PARROT_INTERP, LuaHash *t);
 
 /*
 ** inserts a key into a hash table; first, check whether key is
@@ -187,7 +186,7 @@ static void rehash(PARROT_INTERP, Hash *t);
 ** in its main position; otherwise (colliding node is in its main position),
 ** new key goes to an empty position.
 */
-static PMC** lua_set(PARROT_INTERP, Hash *t, PMC *key)
+static PMC** lua_set(PARROT_INTERP, LuaHash *t, PMC *key)
 {
     Node *mp = mainposition(interp, t, key);
     Node *n  = mp;
@@ -257,7 +256,7 @@ static PMC** lua_set(PARROT_INTERP, Hash *t, PMC *key)
     return lua_set(interp, t, key);
 }
 
-static void setnodevector(PARROT_INTERP, Hash *t, int size)
+static void setnodevector(PARROT_INTERP, LuaHash *t, int size)
 {
     int i;
 
@@ -271,7 +270,8 @@ static void setnodevector(PARROT_INTERP, Hash *t, int size)
     t->firstfree = &t->node[size-1];
 }
 
-static int numuse(const Hash *t) {
+static int numuse(const LuaHash *t)
+{
     Node *v       = t->node;
     int   size    = t->size;
     int   realuse = 0;
@@ -285,7 +285,7 @@ static int numuse(const Hash *t) {
     return realuse;
 }
 
-static void rehash(PARROT_INTERP, Hash *t)
+static void rehash(PARROT_INTERP, LuaHash *t)
 {
     int   oldsize = t->size;
     Node *nold    = t->node;
@@ -321,20 +321,20 @@ static void rehash(PARROT_INTERP, Hash *t)
 
 static void lua_new_table(PARROT_INTERP, PMC *container)
 {
-    Hash * const t            = mem_allocate_zeroed_typed(Hash);
+    LuaHash * const t         = mem_allocate_zeroed_typed(LuaHash);
     PMC_struct_val(container) = t;
     t->container              = container;
 
     setnodevector(interp, t, MINPOWER2);
 }
 
-static void lua_destroy_table(PARROT_INTERP, Hash *t)
+static void lua_destroy_table(PARROT_INTERP, LuaHash *t)
 {
     mem_sys_free(t->node);
     mem_sys_free(t);
 }
 
-static void lua_mark_table(PARROT_INTERP, Hash *t, STRING *mode)
+static void lua_mark_table(PARROT_INTERP, LuaHash *t, STRING *mode)
 {
     Node *v        = t->node;
     int   mark_key = 1;
