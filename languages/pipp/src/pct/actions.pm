@@ -239,20 +239,6 @@ method bitwise_expression($/, $key) {
     }
 }
 
-method concat_expression($/) {
-    my $past := $( $<string>.shift() );
-    for $<string> {
-        my $past_prev := $past;
-        $past := PAST::Op.new(
-                     $past_prev,
-                     $( $_ ),
-                     :name( 'infix:.' )
-                 );
-    }
-
-    make $past;
-}
-
 
 method postfix_expression($/,$key) {
     make $( $/{$key} );

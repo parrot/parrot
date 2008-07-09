@@ -39,7 +39,7 @@ END_CODE
 Hello, World!
 END_EXPECTED
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenate an int and a string', todo => 'not suppported yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenate an int and a string' );
 <?php
 echo 1 . "a\n"
 ?>

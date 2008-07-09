@@ -67,13 +67,10 @@ token VAR_NAME                {  '$' <ident> {*} }
 token TRUE                    { 'TRUE'                         {*} }
 token FALSE                   { 'FALSE'                        {*} }
 token NULL                    { 'NULL'                         {*} }
-token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
-token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
-token string                  { <DOUBLEQUOTE_STRING>           {*}   #= DOUBLEQUOTE_STRING
-                              | <SINGLEQUOTE_STRING>           {*}   #= SINGLEQUOTE_STRING
-                              }
 token INTEGER                 { \d+                            {*} }
 token NUMBER                  { ( \d+ )? '.' \d+               {*} }
+token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
+token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
 
 token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
 
@@ -86,8 +83,7 @@ rule  else_clause             { <.ELSE> \{ <statements> \} {*} }
 rule  rel_op_clause           { <REL_OP> <expression> }
 regex SEA_empty_allowed       { <-[<]>*? <before \<> }  # everthing till the next '<'
 
-token expression              { <concat_expression>       {*}  #= concat_expression
-                              | <method_call>             {*}  #= method_call
+token expression              { <method_call>             {*}  #= method_call
                               | <bitwise_expression>      {*}  #= bitwise_expression
                               | <function_call>           {*}  #= function_call
                               | <constructor_call>        {*}  #= constructor_call
@@ -97,7 +93,6 @@ token expression              { <concat_expression>       {*}  #= concat_express
 rule  array_elem              { <VAR_NAME> '[' <array_key> ']' {*} }
 rule  array_key               { <expression> {*} }
 rule  var                     { <VAR_NAME> {*} }
-rule  concat_expression       { <string>  [ '.' <string> ]*  {*} }
 
 rule bitwise_expression is optable                                      { ... }
 
@@ -107,6 +102,7 @@ proto 'infix:^'   is equiv('infix:&')                                   { ... }
 
 proto 'infix:+'   is tighter('infix:^')  is pirop('n_add')              { ... }
 proto 'infix:-'   is equiv('infix:+')    is pirop('n_sub')              { ... }
+proto 'infix:.'   is equiv('infix:-')    is pirop('n_concat')           { ... }
 
 proto 'infix:*'   is tighter('infix:+')  is pirop('n_mul')              { ... }
 proto 'infix:%'   is equiv('infix:*')    is pirop('n_mod')              { ... }
@@ -122,6 +118,8 @@ rule  postfix_expression      { <TRUE>                  {*}    #= TRUE
                               | <NULL>                  {*}    #= NULL
                               | <NUMBER>                {*}    #= NUMBER
                               | <INTEGER>               {*}    #= INTEGER
+                              | <DOUBLEQUOTE_STRING>    {*}    #= DOUBLEQUOTE_STRING
+                              | <SINGLEQUOTE_STRING>    {*}    #= SINGLEQUOTE_STRING
                               | '(' <expression> ')'    {*}    #= expression
                               | <array_elem>            {*}    #= array_elem
                               | <var>                   {*}    #= var
