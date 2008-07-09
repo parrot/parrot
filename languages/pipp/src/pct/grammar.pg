@@ -82,17 +82,19 @@ rule  array_elem            { <VAR_NAME> '[' <expression> ']'                   
 rule  var                   { <this> {*}                   #= this
                             | <VAR_NAME> {*}               #= VAR_NAME
                             }
-rule  term                  { <method_call> {*}            #= method_call
-                            | <function_call> {*}          #= function_call
-                            | <constructor_call> {*}       #= constructor_call
-                            | '(' <expression> {*} ')'     #= expression
-                            | <TRUE> {*}                   #= TRUE
+rule  literal               { <TRUE> {*}                   #= TRUE
                             | <FALSE> {*}                  #= FALSE
                             | <NULL> {*}                   #= NULL
                             | <NUMBER> {*}                 #= NUMBER
                             | <INTEGER> {*}                #= INTEGER
                             | <DOUBLEQUOTE_STRING> {*}     #= DOUBLEQUOTE_STRING
                             | <SINGLEQUOTE_STRING> {*}     #= SINGLEQUOTE_STRING
+                            }
+rule  term                  { <method_call> {*}            #= method_call
+                            | <function_call> {*}          #= function_call
+                            | <constructor_call> {*}       #= constructor_call
+                            | '(' <expression> {*} ')'     #= expression
+                            | <literal> {*}                #= literal
                             | <constant> {*}               #= constant
                             | <array_elem> {*}             #= array_elem
                             | <var> {*}                    #= var
@@ -102,8 +104,10 @@ rule  term                  { <method_call> {*}            #= method_call
 rule  function_definition   { 'function' <FUNCTION_NAME> <param_list> <block>        {*} }
 rule  method_definition     { 'function' <METHOD_NAME> <param_list> <block>          {*} }
 rule  param_list            { '(' [ <VAR_NAME> [',' <VAR_NAME>]* ]? ')'              {*} }
+rule  member_definition     { 'public' <var> '=' <literal> <.statement_delimiter>    {*} }
 rule  class_definition      { 'class' <CLASS_NAME>
                               '{'
+                                   <member_definition>*
                                    <method_definition>*
                               '}'
                                                                                      {*} }

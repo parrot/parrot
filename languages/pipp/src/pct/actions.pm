@@ -239,7 +239,7 @@ method term($/,$key) {
     make $( $/{$key} );
 }
 
-method string($/,$key) {
+method literal($/,$key) {
     make $( $/{$key} );
 }
 
@@ -309,6 +309,14 @@ method function_definition($/) {
     $past.push( $( $<block> ) );
 
     make $past;
+}
+
+method member_definition($/) {
+    make PAST::Op.new(
+             $( $<var> ),
+             $( $<literal> ),
+             :pasttype('bind'),
+         );
 }
 
 method method_definition($/) {
