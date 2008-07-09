@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
 
 =head1 NAME
@@ -477,6 +477,70 @@ set_integer_keyed, get_pmc_keyed: 128
 set_integer_keyed, get_number_keyed: 128.000000
 set_integer_keyed, get_string_keyed: 128
 OUTPUT
+
+TODO: {
+    local $TODO = "fix breakage when comparing assigned element vs. initialized but unassigned (case 4)";
+pir_output_is( <<'CODE', <<'OUTPUT', "equality" );
+.sub main :main
+    .local pmc fpa1, fpa2, p1, p2
+    .local int i
+    fpa1 = new 'FixedPMCArray'
+    fpa2 = new 'FixedPMCArray'
+
+    print "1:"
+    if fpa1 == fpa2 goto L1
+    print "not "
+L1: say "equal"    
+
+    fpa1 = 3
+    print "2:"
+    if fpa1 == fpa2 goto L2
+    print "not "
+L2: say "equal"
+
+    fpa2 = 3
+
+    p1 = new 'String'
+    p1 = "foobarx"
+    p2 = new 'String'
+    p2 = "foobarx"
+
+    fpa1[0] = p1
+    fpa2[0] = p2
+
+    print "3:"
+    if fpa1 == fpa2 goto L3
+    print "not "
+L3: say "equal"
+
+    p1 = new 'String'
+    p2 = new 'String'
+    p1 = ''
+    p2 = ''
+
+    fpa2[1] = p1
+
+    print "4:"
+    if fpa1 == fpa2 goto L4
+    print "not "
+L4: say "equal"
+
+    fpa2[2] = p2
+
+    print "5:"
+    if fpa1 == fpa2 goto L5
+    print "not "
+L5: say "equal"
+
+.end
+CODE
+1:equal
+2:not equal
+3:equal
+4:not equal
+5:equal
+OUTPUT
+}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
 .sub main :main
