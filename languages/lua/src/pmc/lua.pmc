@@ -308,7 +308,7 @@ information see F<src/pmc.c>.
             char *s = string_to_cstring(INTERP, fmt);
             reslen = strftime(b, sizeof b, s, &stm);
             string_cstring_free(s);
-	}
+        }
 
         retval = string_from_cstring(INTERP, b, reslen);
         RETURN(STRING *retval);
