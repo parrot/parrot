@@ -26,8 +26,8 @@ sub get_test_prog {
     my ( $count, $options ) = @_;
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
-    $ENV{SCRIPT_FILENAME} = "languages/$lang_fn";
-    return ('php-cgi -q ');
+
+    return "php-cgi -q -C -n ../$lang_fn";
 }
 
 # never skip the reference implementation

@@ -17,7 +17,7 @@ sub get_out_fn {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    return Parrot::Test::per_test( '_php.out', $count );
+    return Parrot::Test::per_test( '_phc.out', $count );
 }
 
 # Use PHP on the command line
