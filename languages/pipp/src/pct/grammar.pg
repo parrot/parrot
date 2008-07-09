@@ -99,15 +99,9 @@ rule  term                  { <method_call> {*}            #= method_call
                             }
 
 # declarations
-rule  function_definition   { 'function' <FUNCTION_NAME> '(' <parameters> ')'
-                              <block>
-                                                                                     {*}
-                            }
-rule  method_definition     { 'function' <METHOD_NAME> '(' <parameters> ')'
-                              <block>
-                                                                                     {*}
-                            }
-rule  parameters            {  [ <VAR_NAME> [',' <VAR_NAME>]* ]?                     {*} }
+rule  function_definition   { 'function' <FUNCTION_NAME> <param_list> <block>        {*} }
+rule  method_definition     { 'function' <METHOD_NAME> <param_list> <block>          {*} }
+rule  param_list            { '(' [ <VAR_NAME> [',' <VAR_NAME>]* ]? ')'              {*} }
 rule  class_definition      { 'class' <CLASS_NAME>
                               '{'
                                    <method_definition>*

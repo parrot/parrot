@@ -301,8 +301,8 @@ method DOUBLEQUOTE_STRING($/) {
 
 method function_definition($/) {
 
-    # note that $<parameters> creates a new PAST::Block.
-    my $past := $( $<parameters> );
+    # note that $<param_list> creates a new PAST::Block.
+    my $past := $( $<param_list> );
 
     $past.name( ~$<FUNCTION_NAME> );
     $past.control('return_pir');
@@ -313,8 +313,8 @@ method function_definition($/) {
 
 method method_definition($/) {
 
-    # note that $<parameters> creates a new PAST::Block.
-    my $past := $( $<parameters> );
+    # note that $<param_list> creates a new PAST::Block.
+    my $past := $( $<param_list> );
 
     $past.name( ~$<METHOD_NAME> );
     $past.blocktype( 'method' );
@@ -324,7 +324,7 @@ method method_definition($/) {
     make $past;
 }
 
-method parameters($/) {
+method param_list($/) {
 
     my $past := PAST::Block.new(
                     :blocktype('declaration'),
