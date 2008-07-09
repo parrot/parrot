@@ -344,7 +344,7 @@ method param_list($/) {
         $past.push($param);
 
         # enter the parameter as a lexical into the block's symbol table
-        $past.symbol( 
+        $past.symbol(
              :scope('lexical'),
              $param.name()
         );
