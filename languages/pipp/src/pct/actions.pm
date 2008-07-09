@@ -240,12 +240,12 @@ method bitwise_expression($/, $key) {
 }
 
 method concat_expression($/) {
-    my $past := $( $<string> );
-    for $<concat_tail> {
+    my $past := $( $<string>.shift() );
+    for $<string> {
         my $past_prev := $past;
         $past := PAST::Op.new(
                      $past_prev,
-                     $( $_<string> ),
+                     $( $_ ),
                      :name( 'infix:.' )
                  );
     }

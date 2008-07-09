@@ -97,8 +97,7 @@ token expression              { <concat_expression>       {*}  #= concat_express
 rule  array_elem              { <VAR_NAME> '[' <array_key> ']' {*} }
 rule  array_key               { <expression> {*} }
 rule  var                     { <VAR_NAME> {*} }
-rule  concat_expression       { <string> <concat_tail>* {*} }
-rule  concat_tail             { '.' <string> }
+rule  concat_expression       { <string>  [ '.' <string> ]*  {*} }
 
 rule bitwise_expression is optable                                      { ... }
 
