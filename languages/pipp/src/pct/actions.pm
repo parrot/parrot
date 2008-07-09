@@ -140,7 +140,7 @@ method arguments($/) {
 
 method if_statement($/) {
     my $past := PAST::Op.new(
-                    $( $<relational_expression> ),
+                    $( $<expression> ),
                     $( $<statements> ),
                     :pasttype('if'),
                     :node($/)
@@ -201,23 +201,6 @@ method VAR_NAME($/) {
 
 method else_clause($/) {
     make $( $<statements> );
-}
-
-method relational_expression($/) {
-    if $<rel_op_clause> {
-        my $rel_op_clause := $/{'rel_op_clause'}{'REL_OP'};
-        my $op            := ~$rel_op_clause{'REL_OP'};
-        my $name          := 'infix:' ~ $op;
-        make PAST::Op.new(
-                 $( $<expression> ),
-                 $( $rel_op_clause{'expression'} ),
-                 :node($/),
-                 :name($name)
-             );
-    }
-    else {
-        make $( $<expression> );
-    }
 }
 
 # Handle the operator precedence table.

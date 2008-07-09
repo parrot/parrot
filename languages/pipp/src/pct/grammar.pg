@@ -48,7 +48,7 @@ rule  function_call           { <FUNCTION_NAME> '(' <arguments> ')'             
 rule  method_call             { <VAR_NAME> '->' <METHOD_NAME> '(' <arguments> ')'         {*} }
 rule  constant                { <CONSTANT_NAME>                                           {*} }
 rule  arguments               { [ <expression> [',' <expression>]* ]?                     {*} }
-rule  if_statement            { <IF> '(' <relational_expression> ')'
+rule  if_statement            { <IF> '(' <expression> ')'
                                 \{ <statements> \}
                                 <else_clause>?                                 
                                                                                           {*}
@@ -73,15 +73,10 @@ token NUMBER                  { ( \d+ )? '.' \d+               {*} }
 token SINGLEQUOTE_STRING      { \'  <string_literal: '\''> \'  {*} }
 token DOUBLEQUOTE_STRING      { '"' <string_literal: '"'> '"'  {*} }
 
-token REL_OP                  { '==' | '<=' | '>=' | '!=' | '<'  | '>' }
-
 token IF                      { 'if' }
 token ELSE                    { 'else' }
 
-rule  relational_expression   { <expression> <rel_op_clause>? {*} }
-
 rule  else_clause             { <.ELSE> \{ <statements> \} {*} }
-rule  rel_op_clause           { <REL_OP> <expression> }
 regex SEA_empty_allowed       { <-[<]>*? <before \<> }  # everthing till the next '<'
 
 rule  array_elem              { <VAR_NAME> '[' <array_key> ']' {*} }
@@ -94,7 +89,14 @@ proto 'infix:|'   is precedence('1')                                    { ... }
 proto 'infix:&'   is equiv('infix:|')                                   { ... }
 proto 'infix:^'   is equiv('infix:|')                                   { ... }
 
-proto 'infix:+'   is tighter('infix:|')  is pirop('n_add')              { ... }
+proto 'infix:<'   is tighter('infix:|')                                 { ... }
+proto 'infix:<='  is equiv('infix:<')                                   { ... }
+proto 'infix:>'   is equiv('infix:<')                                   { ... }
+proto 'infix:>='  is equiv('infix:<')                                   { ... }
+proto 'infix:=='  is equiv('infix:<')                                   { ... }
+proto 'infix:!='  is equiv('infix:<')                                   { ... }
+
+proto 'infix:+'   is tighter('infix:<')  is pirop('n_add')              { ... }
 proto 'infix:-'   is equiv('infix:+')    is pirop('n_sub')              { ... }
 proto 'infix:.'   is equiv('infix:+')    is pirop('n_concat')           { ... }
 
