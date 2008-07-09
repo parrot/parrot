@@ -72,7 +72,7 @@ token CLASS_NAME            { <ident> [ '::' <ident> ]*                         
 token VAR_NAME              {  '$' <ident>                                           {*} }
 
 # terms
-rule  method_call           { <VAR_NAME> '->' <METHOD_NAME> '(' <arguments> ')'      {*} }
+rule  method_call           { <var> '->' <METHOD_NAME> '(' <arguments> ')'           {*} }
 rule  function_call         { <FUNCTION_NAME> '(' <arguments> ')'                    {*} }
 rule  constructor_call      { 'new' <CLASS_NAME>                                     {*} }
 token TRUE                  { 'TRUE'                                                 {*} }
@@ -83,8 +83,11 @@ token INTEGER               { \d+                                               
 token DOUBLEQUOTE_STRING    { '"' <string_literal: '"'> '"'                          {*} }
 token SINGLEQUOTE_STRING    { \' <string_literal: "'"> \'                            {*} }
 rule  constant              { <CONSTANT_NAME>                                        {*} }
+rule  this                  { '$this'                                                {*} } 
 rule  array_elem            { <VAR_NAME> '[' <expression> ']'                        {*} }
-rule  var                   { <VAR_NAME>                                             {*} }
+rule  var                   { <this> {*}                   #= this
+                            | <VAR_NAME> {*}               #= VAR_NAME
+                            }
 rule  term                  { <method_call> {*}            #= method_call
                             | <function_call> {*}          #= function_call
                             | <constructor_call> {*}       #= constructor_call

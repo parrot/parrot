@@ -97,7 +97,7 @@ method method_call($/) {
                     :name( ~$<METHOD_NAME> ),
                     :pasttype( 'callmethod' ),
                     :name( ~$<METHOD_NAME> ),
-                    $( $<VAR_NAME> )
+                    $( $<var> )
                 );
 
     make $past;
@@ -182,8 +182,8 @@ method array_elem($/) {
         );
 }
 
-method var($/) {
-    make $( $<VAR_NAME> );
+method var($/,$key) {
+    make $( $/{$key} );
 }
 
 method VAR_NAME($/) {
@@ -192,6 +192,12 @@ method VAR_NAME($/) {
              :name(~$/),
              :viviself('Undef'),
              :lvalue(1)
+         );
+}
+
+method this($/) {
+    make PAST::Op.new(
+             :inline( "%r = self" )
          );
 }
 
@@ -344,7 +350,9 @@ method class_definition($/) {
                     :lexical( 0 ),
                     PAST::Stmts.new(
                         PAST::Op.new(
-                            :inline( "$P0 = get_hll_global 'P6metaclass'\n $P1 = split '::', 'Dings'\n push_eh subclass_done\n $P2 = $P0.'new_class'($P1)\n pop_eh\n subclass_done:\n" ),
+                            :inline(   "$P0 = get_hll_global 'P6metaclass'\n $P1 = split '::', '"
+                                     ~ $<CLASS_NAME>
+                                     ~ "'\n push_eh subclass_done\n $P2 = $P0.'new_class'($P1)\n pop_eh\n subclass_done:\n" ),
                             :pasttype( 'inline' )
                         )
                     )
