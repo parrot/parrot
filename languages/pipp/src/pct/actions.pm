@@ -216,12 +216,8 @@ method relational_expression($/) {
     }
 }
 
-method expression($/,$key) {
-    make $( $/{$key} );
-}
-
-## Handle the operator precedence table.
-method bitwise_expression($/, $key) {
+# Handle the operator precedence table.
+method expression($/, $key) {
     if ($key eq 'end') {
         make $($<expr>);
     }
@@ -240,7 +236,7 @@ method bitwise_expression($/, $key) {
 }
 
 
-method postfix_expression($/,$key) {
+method term($/,$key) {
     make $( $/{$key} );
 }
 
