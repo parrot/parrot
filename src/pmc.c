@@ -56,7 +56,7 @@ Tests if the given pmc is null.
 
 PARROT_API
 INTVAL
-PMC_is_null(SHIM_INTERP, NULLOK(PMC *pmc))
+PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc))
 {
 #if PARROT_CATCH_NULL
     return pmc == PMCNULL || pmc == NULL;

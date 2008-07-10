@@ -49,7 +49,7 @@ void Parrot_create_mro(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL PMC_is_null(SHIM_INTERP, NULLOK(PMC *pmc));
+INTVAL PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc));
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
