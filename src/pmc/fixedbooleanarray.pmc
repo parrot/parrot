@@ -224,7 +224,7 @@ Returns the Parrot string representation of the array.
         STRING *str = NULL;
 
         elems = SELF.elements();
-        string_repeat(INTERP, CONST_STRING(INTERP,'0'),elems,&str);
+        string_repeat(INTERP, CONST_STRING(INTERP, '0'), elems, &str);
 
         for (i = 0; i < elems; i++) {
             if (SELF.get_integer_keyed_int(i)) {
