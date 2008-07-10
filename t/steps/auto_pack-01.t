@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 31;
+use Test::More tests => 33;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -103,6 +103,27 @@ my $use64bitint_orig = $conf->data->get_p5('use64bitint');
         qr/Configure\.pl:  Unable to find a suitable packtype for $type/,
         "Got expected warning re format size"
     );
+}
+
+{
+    my ($stdout, $stderr);
+    my $type = q{intvalsize};
+    my $size = 16;
+    my $longsize = 16;
+    $conf->data->set_p5( longsize => 32 );
+    my $format;
+    capture(
+        sub { $format =
+            auto::pack::_set_format( $conf, $type, $size, $longsize ); },
+        \$stdout,
+        \$stderr,
+    );
+    ok( ! defined $format, "Format size undef, as expected");
+    like($stderr,
+        qr/Configure\.pl:  Unable to find a suitable packtype for $type/,
+        "Got expected warning re format size"
+    );
+    $conf->data->set_p5( longsize => $longsize_orig );
 }
 
 ##### _pack_test() #####
