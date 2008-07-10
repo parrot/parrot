@@ -452,7 +452,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  */
 
 #  define jit_emit_3a(pc, opcode, D, A, B, C, type, Rc) \
-    *((pc)++) = (opcode )<< 2 | (D) >> 3; \
+    *((pc)++) = (opcode)<< 2 | (D) >> 3; \
     *((pc)++) = (char)((D) << 5 | (A)); \
     *((pc)++) = (char)((B) << 3 | (C) >> 2); \
     *((pc)++) = (char)((C) << 6 | (type) << 1 | (Rc))
