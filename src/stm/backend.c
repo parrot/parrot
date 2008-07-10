@@ -964,10 +964,8 @@ Parrot_STM_abort(PARROT_INTERP)
 
     STM_TRACE_SAFE("abort");
 
-    if (log->depth == 0) {
+    if (log->depth == 0)
         real_exception(interp, NULL, 1, "stm_abort without transaction\n");
-        return;
-    }
 
     PARROT_ASSERT(log->depth > 0);
 
