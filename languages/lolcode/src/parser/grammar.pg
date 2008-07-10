@@ -115,7 +115,7 @@ token bang {
     '!' {*}
 }
 
-token operator { $<identifier>=(<.identifier> <.ws> 'OF') {*} }
+token operator { $<identifier>=(<.identifier> <.ws> 'OF'|'BOTH SAEM') {*} }
 token variable { <identifier> {*} }
 
 token identifier { <!keyword> <[a..zA..Z]> \w* }
