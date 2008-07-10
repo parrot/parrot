@@ -456,12 +456,12 @@ typedef enum {
 
 #if PARROT_CATCH_NULL
 PARROT_DATA PMC * PMCNULL;   /* Holds single Null PMC */
-#  define PMC_IS_NULL(p)  ((p) == PMCNULL || (p) == NULL)
 #else
 #  define PMCNULL         ((PMC *)NULL)
-#  define PMC_IS_NULL(p)  ((p) == PMCNULL)
 #endif /* PARROT_CATCH_NULL */
 
+/* Maybe PMC_IS_NULL(interp, pmc) ? */
+#define PMC_IS_NULL(pmc) PMC_is_null(NULL, pmc)
 
 #define STRING_IS_NULL(s) ((s) == NULL)
 #define STRING_IS_EMPTY(s) !(int)(s)->strlen

@@ -46,6 +46,27 @@ PMC * PMCNULL;
 
 /*
 
+=item C<INTVAL PMC_is_null>
+
+Tests if the given pmc is null.
+
+=cut
+
+*/
+
+PARROT_API
+INTVAL
+PMC_is_null(SHIM_INTERP, NULLOK(PMC *pmc))
+{
+#if PARROT_CATCH_NULL
+    return pmc == PMCNULL || pmc == NULL;
+#else
+    return pmc == NULL;
+#endif
+}
+
+/*
+
 =item C<PMC * pmc_new>
 
 Creates a new PMC of type C<base_type> (which is an index into the list of PMC
