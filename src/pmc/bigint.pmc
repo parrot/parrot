@@ -82,8 +82,8 @@ static long
 bigint_get_long(PARROT_INTERP, PMC *self) {
     if (mpz_fits_slong_p(BN(self)))
         return mpz_get_si(BN(self));
-    real_exception(interp, NULL, 1, "bigint_get_long: number too big");
-    return 0;
+    else
+        real_exception(interp, NULL, 1, "bigint_get_long: number too big");
 }
 
 static int
