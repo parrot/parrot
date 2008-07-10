@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 6;
+use Test::More     tests => 7;
 
 # Parrot modules
 use Parrot::Test;
@@ -99,3 +99,18 @@ END_CODE
 VAR1 VAR2
 END_EXPECTED
 
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'single quotes and backslash' );
+<?php
+
+echo 'backslash at end: \\', "\n";
+echo 'backslash not at end: \dummy', "\n";
+echo 'single quote: \'', "\n";
+echo 'backslash and single quote: \\\'', "\n";
+
+?>
+END_CODE
+backslash at end: \
+backslash not at end: \dummy
+single quote: '
+backslash and single quote: \'
+END_EXPECTED
