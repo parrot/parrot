@@ -24,10 +24,10 @@ These are the vtable functions for the Capture PMC.
 #define CAPTURE_DATA_SIZE   2
 #define CAPTURE_array_CREATE(i, obj) \
     if (!PARROT_CAPTURE(obj)->array) \
-        PARROT_CAPTURE(obj)->array = pmc_new(i, enum_class_ResizablePMCArray);
+        PARROT_CAPTURE(obj)->array = pmc_new((i), enum_class_ResizablePMCArray);
 #define CAPTURE_hash_CREATE(i, obj) \
     if (!PARROT_CAPTURE(obj)->hash) \
-        PARROT_CAPTURE(obj)->hash = pmc_new(i, enum_class_Hash);
+        PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
 pmclass Capture need_ext provides array provides hash {
     ATTR PMC *array;
