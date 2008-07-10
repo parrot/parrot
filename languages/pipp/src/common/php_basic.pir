@@ -376,7 +376,16 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'ini_get'
-    not_implemented()
+    .param pmc key
+
+    $P0 = get_hll_global 'pipp_ini'
+    .local string val_s
+    val_s = $P0[key]
+    .local pmc val
+    val = new 'PhpString'
+    val = val_s
+    
+    .return ( val )
 .end
 
 =item C<array ini_get_all([string extension])>
