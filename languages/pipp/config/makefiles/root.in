@@ -173,7 +173,7 @@ build-antlr3:    build-common
 	javac src/antlr3/*.java
 
 # Target for building a standalone Pipp.
-pipp$(EXE): pipp.pbc
+pipp$(EXE): build-common
 	$(PBC_TO_EXE) pipp.pbc
 
 src/common/pipplib.pbc: src/common/builtins.pir src/common/php_standard.pir $(PHP_SRC_STD_EXT) src/common/php_API.pir src/common/php_MACRO.pir
