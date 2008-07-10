@@ -421,7 +421,16 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'ini_set'
-    not_implemented()
+    .param pmc key
+    .param pmc val
+
+    $P0 = get_hll_global 'pipp_ini'
+    .local string val_s
+    val_s = val
+
+    $P0[key] = val_s
+    
+    .return ( val )
 .end
 
 =item C<int ip2long(string ip_address)>

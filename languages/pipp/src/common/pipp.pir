@@ -146,6 +146,7 @@ GOT_PHP_SOURCE_FN:
     pipp_ini = opt['d']
     set_ini( pipp_ini )
 
+    set_predefined_variables()
     set_superglobals()
 
     # target of compilation
@@ -366,6 +367,14 @@ NO_REST:
     .param pmc pipp_ini
 
     set_hll_global 'pipp_ini', pipp_ini
+.end
+
+# there is a distinction between predifined vars and superglobals
+.sub set_predefined_variables
+    .local pmc php_errormsg
+    php_errormsg = new 'PhpString'
+    php_errormsg = ''
+    set_hll_global '$php_errormsg', php_errormsg
 .end
 
 # Most of the superglobals are not initialized yet
