@@ -156,6 +156,43 @@ method ifthen($/) {
     make $past;
 }
 
+method switch($/) {
+    my $count := +$<value> - 1;
+    my $val  := $( $<value>[$count] );
+    my $then  := $( $<block>[$count] );
+    my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
+    my $expr := PAST::Op.new(:pasttype('call'), :name('BOTH SAEM'), $it, $val);
+    $then.blocktype('immediate');
+    my $past := PAST::Op.new( $expr, $then,
+                              :pasttype('if'),
+                              :node( $/ )
+                            );
+    if ( $<else> ) {
+        my $else := $( $<else>[0] );
+        $else.blocktype('immediate');
+        $past.push( $else );
+    }
+    while ($count != 0) {
+        $count := $count - 1;
+        $val  := $( $<value>[$count] );
+        $expr := PAST::Op.new(:pasttype('call'), :name('BOTH SAEM'), $it, $val);
+        $then  := $( $<block>[$count] );
+        $then.blocktype('immediate');
+        $past  := PAST::Op.new( $expr, $then, $past,
+                               :pasttype('if'),
+                               :node( $/ )
+                             );
+    }
+    #$expr := $past.shift();
+    #my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'));
+    #my $bind := PAST::Op.new( :pasttype('bind'), :node( $/ ) );
+    #$bind.push( $it );
+    #$bind.push( $expr );
+    #$past.unshift( $it );
+    my $past := PAST::Stmts.new( $past, :node( $/ ) );
+    make $past;
+}
+
 method block($/,$key) {
     our $?BLOCK;
     our @?BLOCK;
