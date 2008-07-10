@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -285,7 +285,36 @@ CODE
 1
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
+.sub main :main
+    .local pmc fba
+    .local int i
+    .local string s
+
+    fba = new 'FixedBooleanArray'
+    fba = 17
+
+    fba[1]  = 1
+    fba[4]  = 1
+    fba[8]  = 1
+    fba[12] = 1
+    fba[15] = 1
+
+    say fba
+    s = freeze fba
+    fba.'fill'(0)
+    fba = thaw s
+    say fba
+
+.end    
+
+CODE
+01001000100010010
+01001000100010010
+OUTPUT
+
 1;
+
 
 # Local Variables:
 #   mode: cperl
