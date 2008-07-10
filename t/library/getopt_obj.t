@@ -1,20 +1,21 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 15;
 
 =head1 NAME
 
-t/library/getopt_obj.t - testing the module Getopt/Obj.pir
+t/library/getopt_obj.t - testing the PIR module Getopt::Obj
 
 =head1 SYNOPSIS
 
-        % prove t/library/getopt_obj.t
+    % prove t/library/getopt_obj.t
 
 =head1 DESCRIPTION
 
@@ -24,7 +25,7 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
 =cut
 
 # 1
-pir_output_is( <<'CODE', <<'OUT', "basic long options" );
+pir_output_is( <<'CODE', <<'OUT', 'basic long options' );
 
 .sub main :main
         .local pmc argv
