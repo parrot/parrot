@@ -39,52 +39,13 @@ sub runstep {
     my $ptrsize  = $conf->data->get('ptrsize');
 
     foreach my $type ( 'intvalsize', 'opcode_t_size' ) {
-        my $which = $type eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
         my $size = $conf->data->get($type);
-        my $format;
-        if (
-            $size == $longsize
-                &&
-            $size == $conf->data->get_p5('longsize')
-        ) {
-            $format = 'l!';
-        }
-        elsif ( $size == 4 ) {
-            $format = 'l';
-        }
-        elsif (
-            $size == 8
-                ||
-            $conf->data->get_p5('use64bitint') eq 'define'
-        ) {
-            # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
-            $format = 'q';
-        }
-        else {
-            warn "Configure.pl:  Unable to find a suitable packtype for $type.\n"
-        }
+        my $format = _set_format( $conf, $type, $size, $longsize );
 
         my $test = eval { pack $format, 0 };
-        if ( ! defined $test ) {
-            warn <<"AARGH"
-Configure.pl:  Unable to find a functional packtype for $type.
-               '$format' failed: $@
-AARGH
-        }
-        else {
-            if ($test) {
-                unless ( length $test == $size ) {
-                    warn sprintf <<"AARGH", $size, length $test;
-Configure.pl:  Unable to find a functional packtype for $type.
-               Need a format for %d bytes, but '$format' gave %d bytes.
-AARGH
-                }
-            }
-            else {
-                $format = '?';
-            }
-        }
+        $format = _pack_test($format, $type, $size, $test);
 
+        my $which = $type eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
         $conf->data->set( $which => $format );
     }
 
@@ -95,6 +56,59 @@ AARGH
     _set_ptrconst($conf, $ptrsize, $intsize, $longsize);
 
     return 1;
+}
+
+##################### INTERNAL SUBROUTINES #####################
+
+sub _set_format {
+    my ( $conf, $type, $size, $longsize ) = @_;
+    my $format;
+    if (
+        ( $size == $longsize )
+            and
+        ( $size == $conf->data->get_p5('longsize') )
+    ) {
+        $format = 'l!';
+    }
+    elsif ( $size == 4 ) {
+        $format = 'l';
+    }
+    elsif (
+        $size == 8
+            or
+        $conf->data->get_p5('use64bitint') eq 'define'
+    ) {
+        # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
+        $format = 'q';
+    }
+    else {
+        warn "Configure.pl:  Unable to find a suitable packtype for $type.\n"
+    }
+    return $format;
+}
+
+sub _pack_test {
+    my ($format, $type, $size, $test) = @_;
+    if ( ! defined $test ) {
+        warn <<"AARGH"
+Configure.pl:  Unable to find a functional packtype for $type.
+               '$format' failed: $@
+AARGH
+    }
+    else {
+        if ($test) {
+            unless ( length $test == $size ) {
+                warn sprintf <<"AARGH", $size, length $test;
+Configure.pl:  Unable to find a functional packtype for $type.
+               Need a format for %d bytes, but '$format' gave %d bytes.
+AARGH
+            }
+        }
+        else {
+            $format = '?';
+        }
+    }
+    return $format;
 }
 
 sub _set_packtypes {

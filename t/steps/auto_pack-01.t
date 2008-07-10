@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 31;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -39,6 +39,141 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
+my $longsize_orig = $conf->data->get_p5('longsize');
+my $use64bitint_orig = $conf->data->get_p5('use64bitint');
+
+##### _set_format() #####
+
+{
+    my $type = q{intvalsize};
+    my $size = 8;
+    my $longsize = 8;
+    $conf->data->set_p5( longsize => 8 );
+    my $format = auto::pack::_set_format( $conf, $type, $size, $longsize );
+    is( $format, q{l!}, "Got expected format size: $format" );
+    $conf->data->set_p5( longsize => $longsize_orig );
+}
+
+{
+    my $type = q{intvalsize};
+    my $size = 4;
+    my $longsize = 8;
+    $conf->data->set_p5( longsize => 8 );
+    my $format = auto::pack::_set_format( $conf, $type, $size, $longsize );
+    is( $format, q{l}, "Got expected format size: $format" );
+    $conf->data->set_p5( longsize => $longsize_orig );
+}
+
+{
+    my $type = q{intvalsize};
+    my $size = 8;
+    my $longsize = 16;
+    $conf->data->set_p5( longsize => 16 );
+    my $format = auto::pack::_set_format( $conf, $type, $size, $longsize );
+    is( $format, q{q}, "Got expected format size: $format" );
+    $conf->data->set_p5( longsize => $longsize_orig );
+}
+
+{
+    my $type = q{intvalsize};
+    my $size = 16;
+    my $longsize = 8;
+    $conf->data->set_p5( longsize => undef );
+    $conf->data->set_p5( use64bitint => 'define');
+    my $format = auto::pack::_set_format( $conf, $type, $size, $longsize );
+    is( $format, q{q}, "Got expected format size: $format" );
+    $conf->data->set_p5( longsize => $longsize_orig );
+    $conf->data->set_p5( use64bitint => $use64bitint_orig );
+}
+
+{
+    my ($stdout, $stderr);
+    my $type = q{intvalsize};
+    my $size = 23;
+    my $longsize = 8;
+    my $format;
+    capture(
+        sub { $format =
+            auto::pack::_set_format( $conf, $type, $size, $longsize ); },
+        \$stdout,
+        \$stderr,
+    );
+    ok( ! defined $format, "Format size undef, as expected");
+    like($stderr,
+        qr/Configure\.pl:  Unable to find a suitable packtype for $type/,
+        "Got expected warning re format size"
+    );
+}
+
+##### _pack_test() #####
+
+{
+    my $format = q{Y};
+    my $type = q{intvalsize};
+    my $size = 4;
+    my $test;
+    my ($stdout, $stderr);
+    capture(
+        sub { $format =
+            auto::pack::_pack_test( $format, $type, $size, $test ); },
+        \$stdout,
+        \$stderr,
+    );
+    like($stderr,
+        qr/Configure\.pl:  Unable to find a functional packtype for $type/,
+        "Got expected warning from _pack_test()"
+    );
+}
+
+{
+    my $format = q{l!};
+    my $type = q{intvalsize};
+    my $size = 4;
+    my $test = q{abcd};
+    my ($stdout, $stderr, $ret);
+    capture(
+        sub { $ret = auto::pack::_pack_test( $format, $type, $size, $test ) },
+        \$stdout,
+        \$stderr,
+    );
+    is( $ret, $format, "Got expected format" );
+    ok(! $stderr, "Nothing on STDERR, as expected" );
+}
+
+{
+    my $format = q{l!};
+    my $type = q{intvalsize};
+    my $size = 4;
+    my $test = q{abcde};
+    my ($stdout, $stderr, $ret);
+    capture(
+        sub { $ret = auto::pack::_pack_test( $format, $type, $size, $test ) },
+        \$stdout,
+        \$stderr,
+    );
+    like($stderr,
+        qr/Configure\.pl:  Unable to find a functional packtype for $type/,
+        "Got expected warning in _pack_test()."
+    );
+}
+
+{
+    my $format = q{l!};
+    my $type = q{intvalsize};
+    my $size = 4;
+    my $test = q{};
+    my ($stdout, $stderr, $ret);
+    capture(
+        sub { $ret = auto::pack::_pack_test( $format, $type, $size, $test ) },
+        \$stdout,
+        \$stderr,
+    );
+    is( $ret, q{?}, "Got expected format" );
+    ok(! $stderr, "Nothing on STDERR, as expected" );
+}
+
+##### _set_packtypes() #####
+
 {
     my $current_numvalsize = $conf->data->get('numvalsize');
     $conf->data->set( numvalsize => 12 );
@@ -68,6 +203,8 @@ ok($step->description(), "$step_name has description");
     $conf->data->set( packtype_b => undef );
     $conf->data->set( packtype_n => undef );
 }
+
+##### _set_ptrconst() #####
 
 {
     my ($ptrsize, $intsize, $longsize);
@@ -123,7 +260,8 @@ auto_pack-01.t - test config::auto::pack
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::pack.
+The tests in this file test auto::pack internal subroutines C<_set_packtypes()>
+and C<_set_ptrcons()>.
 
 =head1 AUTHOR
 
