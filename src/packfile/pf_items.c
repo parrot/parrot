@@ -21,6 +21,9 @@ as is. These functions don't check the available size.
 C<< PF_size_<item>() >> functions return the store size of item in
 C<opcode_t> units.
 
+C<BE> and C<be> are short for "Big-endian", while C<LE> and C<le> are short
+for "little endian".
+
 =head2 Functions
 
 =over 4
@@ -104,7 +107,7 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 
 =item C<static void cvt_num12_num8>
 
-convert i386 LE 12 byte long double to IEEE 754 8 byte double
+Converts i386 LE 12-byte long double to IEEE 754 8 byte double
 
 =cut
 
@@ -162,7 +165,8 @@ nul:
 
 =item C<static void cvt_num12_num8_be>
 
-RT#48260: Not yet documented!!!
+Converts a 12-byte i386 long double into a big-endian IEEE 754 8-byte double.
+converting to BE not yet implemented (throws internal_exception).
 
 =cut
 
@@ -180,7 +184,8 @@ cvt_num12_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 =item C<static void cvt_num12_num8_le>
 
-RT#48260: Not yet documented!!!
+Converts a 12-byte i386 long double into a little-endian IEEE 754
+8-byte double.
 
 =cut
 
@@ -198,7 +203,7 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
 
 =item C<static opcode_t fetch_op_test>
 
-RT#48260: Not yet documented!!!
+Fetches an C<opcode_t> operation in little-endian format.
 
 =cut
 
@@ -257,7 +262,8 @@ fetch_op_mixed_le(ARGIN(const unsigned char *b))
 
 =item C<static opcode_t fetch_op_mixed_be>
 
-Fetch an opcode and convert to BE
+Fetch an opcode and convert to BE. Determines size of opcode from
+C<OPCODE_T_SIZE> macro, and proceeds accordingly.
 
 =cut
 
@@ -290,7 +296,7 @@ fetch_op_mixed_be(ARGIN(const unsigned char *b))
 
 =item C<static opcode_t fetch_op_be_4>
 
-RT#48260: Not yet documented!!!
+Fetches a 4-byte big-endian opcode.
 
 =cut
 
@@ -323,7 +329,7 @@ fetch_op_be_4(ARGIN(const unsigned char *b))
 
 =item C<static opcode_t fetch_op_be_8>
 
-RT#48260: Not yet documented!!!
+Fetches an 8-byte big-endian opcode.
 
 =cut
 
@@ -352,7 +358,7 @@ fetch_op_be_8(ARGIN(const unsigned char *b))
 
 =item C<static opcode_t fetch_op_le_4>
 
-RT#48260: Not yet documented!!!
+Fetches a 4-byte little-endian opcode
 
 =cut
 
@@ -385,7 +391,7 @@ fetch_op_le_4(ARGIN(const unsigned char *b))
 
 =item C<static opcode_t fetch_op_le_8>
 
-RT#48260: Not yet documented!!!
+Fetches an 8-byte little-endian opcode
 
 =cut
 
@@ -414,7 +420,7 @@ fetch_op_le_8(ARGIN(const unsigned char *b))
 
 =item C<opcode_t PF_fetch_opcode>
 
-Fetch an C<opcode_t> from the stream, converting byteorder if needed.
+Fetches an C<opcode_t> from the stream, converting byteorder if needed.
 
 =cut
 
@@ -439,7 +445,7 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
 
 =item C<opcode_t* PF_store_opcode>
 
-Store an C<opcode_t> to stream as is.
+Stores an C<opcode_t> to stream as-is.
 
 =cut
 
@@ -458,8 +464,8 @@ PF_store_opcode(ARGOUT(opcode_t *cursor), opcode_t val)
 
 =item C<size_t PF_size_opcode>
 
-Return size of an item in C<opcode_t> units, which is 1 I<per
-definitionem>.
+Returns the size of an item in C<opcode_t> units. The size of C<opcode_t>
+is 1 I<per definition>.
 
 =cut
 
@@ -476,7 +482,7 @@ PF_size_opcode(void)
 
 =item C<INTVAL PF_fetch_integer>
 
-Fetch an C<INTVAL> from the stream, converting byteorder if needed.
+Fetches an C<INTVAL> from the stream, converting byteorder if needed.
 
 XXX assumes C<sizeof (INTVAL) == sizeof (opcode_t)> - we don't have
 C<INTVAL> size in the PackFile header.
@@ -506,7 +512,7 @@ PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 
 =item C<opcode_t* PF_store_integer>
 
-Store an C<INTVAL> to stream as is.
+Stores an C<INTVAL> to stream as is.
 
 =cut
 
@@ -525,7 +531,7 @@ PF_store_integer(ARGOUT(opcode_t *cursor), INTVAL val)
 
 =item C<size_t PF_size_integer>
 
-Return store size of C<INTVAL> in C<opcode_t> units.
+Returns stored size of C<INTVAL> in C<opcode_t> units.
 
 =cut
 
@@ -543,8 +549,8 @@ PF_size_integer(void)
 
 =item C<FLOATVAL PF_fetch_number>
 
-Fetch a C<FLOATVAL> from the stream, converting byteorder if needed.
-Then advance stream pointer by amount of packfile float size.
+Fetches a C<FLOATVAL> from the stream, converting byteorder if needed.
+Then advances the stream pointer by the packfile float size.
 
 =cut
 
@@ -590,7 +596,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 
 =item C<opcode_t* PF_store_number>
 
-Write a C<FLOATVAL> to the opcode stream as is.
+Writes a C<FLOATVAL> to the opcode stream as-is.
 
 =cut
 
@@ -612,7 +618,7 @@ PF_store_number(ARGOUT(opcode_t *cursor), ARGIN(const FLOATVAL *val))
 
 =item C<size_t PF_size_number>
 
-Return store size of FLOATVAL in opcode_t units.
+Returns stored size of FLOATVAL in C<opcode_t> units.
 
 =cut
 
@@ -629,7 +635,7 @@ PF_size_number(void)
 
 =item C<STRING * PF_fetch_string>
 
-Fetch a C<STRING> from bytecode and return a new C<STRING>.
+Fetches a C<STRING> from bytecode and return a new C<STRING>.
 
 Opcode format is:
 
@@ -694,7 +700,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
 =item C<opcode_t* PF_store_string>
 
-Write a STRING to the opcode stream.
+Writes a C<STRING> to the opcode stream.
 
 =cut
 
@@ -752,7 +758,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
 =item C<size_t PF_size_string>
 
-Report store size of C<STRING> in C<opcode_t> units.
+Reports stored size of C<STRING> in C<opcode_t> units.
 
 =cut
 
@@ -776,7 +782,7 @@ PF_size_string(ARGIN(const STRING *s))
 
 =item C<char * PF_fetch_cstring>
 
-Fetch a cstring from bytecode and return an allocated copy
+Fetches a cstring from bytecode and returns an allocated copy
 
 =cut
 
@@ -802,7 +808,7 @@ PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
 
 =item C<opcode_t* PF_store_cstring>
 
-Write a 0-terminated string to the stream.
+Writes a C<NULL>-terminated string to the stream.
 
 =cut
 
@@ -821,7 +827,7 @@ PF_store_cstring(ARGOUT(opcode_t *cursor), ARGIN(const char *s))
 
 =item C<size_t PF_size_cstring>
 
-Return store size of a C-string in C<opcode_t> units.
+Returns store size of a C-string in C<opcode_t> units.
 
 =cut
 
@@ -842,7 +848,7 @@ PF_size_cstring(ARGIN(const char *s))
 
 =item C<void PackFile_assign_transforms>
 
-Assign transform functions to vtable.
+Assigns transform functions to the vtable.
 
 =cut
 
