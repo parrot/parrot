@@ -138,10 +138,6 @@ PARROT_API
 void Parrot_free_cstring(ARGIN_NULLOK(char *string));
 
 PARROT_API
-Parrot_PMC Parrot_get_dod_registry(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_API
 Parrot_Int Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 

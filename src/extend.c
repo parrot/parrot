@@ -1273,31 +1273,6 @@ Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
 
 /*
 
-=item C<Parrot_PMC Parrot_get_dod_registry>
-
-Return Parrot's internal DOD registry PMC.
-See also: F<src/pmc/addrregistry.pmc>.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_PMC
-Parrot_get_dod_registry(PARROT_INTERP)
-{
-    PMC *registry = interp->DOD_registry;
-    PARROT_CALLIN_START(interp);
-    if (!registry) {
-        registry = interp->DOD_registry =
-            pmc_new(interp, enum_class_AddrRegistry);
-    }
-    PARROT_CALLIN_END(interp);
-    return registry;
-}
-
-/*
-
 =item C<void Parrot_PMC_set_vtable>
 
 Replaces the vtable of the PMC.

@@ -223,8 +223,8 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->code            = NULL;
     interp->profile         = NULL;
 
-    /* null out the root set registry */
-    interp->DOD_registry    = NULL;
+    /* create the root set registry */
+    interp->DOD_registry    = pmc_new(interp, enum_class_AddrRegistry);
 
     /* create exceptions list */
     interp->current_runloop_id    = 0;

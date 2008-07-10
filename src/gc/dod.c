@@ -315,9 +315,9 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     /* Now mark the class hash */
     pobject_lives(interp, (PObj *)interp->class_hash);
 
-    /* Mark the registry if any */
-    if (interp->DOD_registry)
-        pobject_lives(interp, (PObj *)interp->DOD_registry);
+    /* Mark the registry */
+    PARROT_ASSERT(interp->DOD_registry);
+    pobject_lives(interp, (PObj *)interp->DOD_registry);
 
     /* Mark the transaction log */
     /* XXX do this more generically? */
