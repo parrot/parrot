@@ -384,7 +384,7 @@ NOT IMPLEMENTED.
     .local pmc val
     val = new 'PhpString'
     val = val_s
-    
+
     .return ( val )
 .end
 
@@ -429,7 +429,7 @@ NOT IMPLEMENTED.
     val_s = val
 
     $P0[key] = val_s
-    
+
     .return ( val )
 .end
 
