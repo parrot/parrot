@@ -1138,7 +1138,7 @@ static unsigned char *lastpc;
       emitm_fstw(pc); \
       emitm_sahf(pc); \
     } while (0)
-#  define emitm_fcomi(pc, sti) DO { \
+#  define emitm_fcomi(pc, sti) do { \
       emitm_fcom((pc), (sti)); \
       emitm_fstw(pc); \
       emitm_sahf(pc); \
