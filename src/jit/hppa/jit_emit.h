@@ -125,34 +125,34 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_ls(pc, op, b, tr, s, im14) \
-    *(pc++) = op << 2 | b >> 3; \
-    *(pc++) = (char)(b << 5 | tr); \
-    *(pc++) = s << 6 | ((im14 >> 7) & 0x3f) ; \
-    if (im14 < 0) \
-      *(pc++) = (char)(im14 << 1) + 1; \
+    *((pc)++) = (op) << 2 | (b) >> 3; \
+    *((pc)++) = (char)((b) << 5 | (tr)); \
+    *((pc)++) = (s) << 6 | (((im14) >> 7) & 0x3f) ; \
+    if ((im14) < 0) \
+      *((pc)++) = (char)((im14) << 1) + 1; \
     else \
-      *(pc++) = (char)im14 << 1
+      *((pc)++) = (char)(im14) << 1
 
 #  define emit_ldw(pc, b, t, d) \
-    emit_ls(pc, 18, b, t, 0, d)
+    emit_ls((pc), 18, (b), (t), 0, (d))
 
 #  define emit_ldo(pc, b, t, d) \
-    emit_ls(pc, 13, b, t, 0, d)
+    emit_ls((pc), 13, (b), (t), 0, (d))
 
 #  define emit_stw(pc, b, r, d) \
-    emit_ls(pc, 26, b, r, 0, d)
+    emit_ls((pc), 26, (b), (r), 0, (d))
 
 #  define emit_stwm(pc, b, r, d) \
-    emit_ls(pc, 27, b, r, 0, d)
+    emit_ls((pc), 27, (b), (r), 0, (d))
 
 #  define emit_ldwm(pc, b, r, d) \
-    emit_ls(pc, 19, b, r, 0, d)
+    emit_ls((pc), 19, (b), (r), 0, (d))
 
 #  define emit_ldd(pc, b, t, d) \
-    emit_ls(pc, 20, b, t, 0, d)
+    emit_ls((pc), 20, (b), (t), 0, (d))
 
 #  define emit_std(pc, b, r, d) \
-    emit_ls(pc, 28, b, r, 0, d)
+    emit_ls((pc), 28, (b), (r), 0, (d))
 
 /* Load / Store Indexed.
  *
@@ -166,10 +166,10 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_lsi(pc, op, b, x, tr) \
-    *(pc++) = op << 2 | b >> 3; \
-    *(pc++) = (char)(b << 5 | x); \
-    pc++; \
-    *(pc++) = (2 << 6) | tr;
+    *((pc)++) = (op) << 2 | (b) >> 3; \
+    *((pc)++) = (char)((b) << 5 | (x)); \
+    (pc)++; \
+    *((pc)++) = (2 << 6) | (tr);
 
 
 /*  21 bit immediates.
@@ -186,14 +186,14 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_im21(pc, op, r, imm) \
-    *(pc++) = op << 2 | r >> 3; \
-    *(pc++) = (char)(r << 5 | ((imm >> 2) & 0x1f)); \
-    *(pc++) = (char)((((imm >> 7) & 0x3) << 6) | ((imm & 0x3) << 4) | \
-        ((imm >> 16) & 0xf)); \
-    *(pc++) = (char)((((imm >> 9) & 0x7f) << 1) | ((imm >> 20) & 1));
+    *((pc)++) = (op) << 2 | (r) >> 3; \
+    *((pc)++) = (char)((r) << 5 | (((imm) >> 2) & 0x1f)); \
+    *((pc)++) = (char)(((((imm) >> 7) & 0x3) << 6) | (((imm) & 0x3) << 4) | \
+        (((imm) >> 16) & 0xf)); \
+    *((pc)++) = (char)(((((imm) >> 9) & 0x7f) << 1) | (((imm) >> 20) & 1));
 
 #  define emit_ldil(pc, r, imm) \
-    emit_im21(pc, 8, r, imm)
+    emit_im21((pc), 8, (r), (imm))
 
 /*  Arithmetic
  *
@@ -206,25 +206,25 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_arith(pc, op, ext6, s2, s1, t) \
-    *(pc++) = op << 2 | s2 >> 3; \
-    *(pc++) = (char)(s2 << 5 | s1); \
-    *(pc++) = (char)(ext6 >> 2); \
-    *(pc++) = (char)(ext6 << 6 | t)
+    *((pc)++) = (op) << 2 | (s2) >> 3; \
+    *((pc)++) = (char)((s2) << 5 | (s1)); \
+    *((pc)++) = (char)((ext6) >> 2); \
+    *((pc)++) = (char)((ext6) << 6 | (t))
 
 #  define jit_emit_add_rrr(pc, dst, src1, src2) \
-    emit_arith(pc, 2, 0x18, src2, src1, dst)
+    emit_arith((pc), 2, 0x18, (src2), (src1), (dst))
 
 #  define jit_emit_sub_rrr(pc, dst, src1, src2) \
-    emit_arith(pc, 2, 0x10, src2, src1, dst)
+    emit_arith((pc), 2, 0x10, (src2), (src1), (dst))
 
 #  define jit_emit_or_rrr(pc, dst, src1, src2) \
-    emit_arith(pc, 2, 9, src2, src1, dst)
+    emit_arith((pc), 2, 9, (src2), (src1), (dst))
 
 #  define jit_emit_xor_rrr(pc, dst, src1, src2) \
-    emit_arith(pc, 2, 0xA, src2, src1, dst)
+    emit_arith((pc), 2, 0xA, (src2), (src1), (dst))
 
 #  define jit_emit_and_rrr(pc, dst, src1, src2) \
-    emit_arith(pc, 2, 8, src2, src1, dst)
+    emit_arith((pc), 2, 8, (src2), (src1), (dst))
 
 /*  Deposit / Extract
  *
@@ -237,16 +237,16 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_depext(pc, op, r, t, x, p, clen) \
-    *(pc++) = op << 2 | r >> 3; \
-    *(pc++) = (char)(r << 5 | t); \
-    *(pc++) = (char)(x << 2 | p >> 3); \
-    *(pc++) = (char)(p << 5 | clen)
+    *((pc)++) = (op) << 2 | (r) >> 3; \
+    *((pc)++) = (char)((r) << 5 | (t)); \
+    *((pc)++) = (char)((x) << 2 | (p) >> 3); \
+    *((pc)++) = (char)((p) << 5 | (clen))
 
 #  define emit_extu(pc, r, t, p, clen) \
-    emit_depext(pc, 0x34, r, t, 6, p, clen);
+    emit_depext((pc), 0x34, (r), (t), 6, (p), (clen));
 
 #  define emit_exts(pc, r, t, p, clen) \
-    emit_depext(pc, 0x34, r, t, 7, p, clen);
+    emit_depext((pc), 0x34, (r), (t), 7, (p), (clen));
 
 /* Conditions */
 
@@ -280,16 +280,16 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_cmpbch(pc, op, s2, s1, c, trg, n, w) \
-    *(pc++) = op << 2 | s2 >> 3; \
-    *(pc++) = (char)(s2 << 5 | s1); \
-    *(pc++) = c << 5 | trg >> 6; \
-    *(pc++) = (char)(trg << 3 | n << 1 | w)
+    *((pc)++) = (op) << 2 | (s2) >> 3; \
+    *((pc)++) = (char)((s2) << 5 | (s1)); \
+    *((pc)++) = (c) << 5 | (trg) >> 6; \
+    *((pc)++) = (char)((trg) << 3 | (n) << 1 | (w))
 
 #  define jit_emit_cmpbt(pc, s2, s1, c, targ, n) \
-    emit_cmpbch(pc, 0x20, s2, s1, c, targ, n, ((targ >> 11) & 1))
+    emit_cmpbch((pc), 0x20, (s2), (s1), (c), (targ), (n), (((targ) >> 11) & 1))
 
 #  define jit_emit_cmpbf(pc, s2, s1, c, targ, n) \
-    emit_cmpbch(pc, 0x22, s2, s1, c, targ, n, ((targ >> 11) & 1))
+    emit_cmpbch((pc), 0x22, (s2), (s1), (c), (targ), (n), (((targ) >> 11) & 1))
 
 /* Branch and link.
  *
@@ -307,18 +307,18 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define _emit_bl(pc, op, t, w1, w2, n, w) \
-    *(pc++) = op << 2 | t >> 3; \
-    *(pc++) = (char)(t << 5 | w1); \
-    *(pc++) = w2 >> 6; \
-    *(pc++) = (char)(w2 << 3 | n << 1 | w)
+    *((pc)++) = (op) << 2 | (t) >> 3; \
+    *((pc)++) = (char)((t) << 5 | (w1)); \
+    *((pc)++) = (w2) >> 6; \
+    *((pc)++) = (char)((w2) << 3 | (n) << 1 | (w))
 
 #  define emit_bl(pc, disp) \
-    _emit_bl(pc, 0x3A, r2, \
-      ((disp >> 11) & 0x1f), (((disp & 0x3ff) << 1) + ((disp >> 10) & 1)), \
-        0, ((disp >> 31) & 1));
+    _emit_bl((pc), 0x3A, r2, \
+      (((disp) >> 11) & 0x1f), ((((disp) & 0x3ff) << 1) + (((disp) >> 10) & 1)), \
+        0, (((disp) >> 31) & 1));
 
 #  define emit_b(pc) \
-    _emit_bl(pc, 0x3A, r2, 0, 0, 0, 0)
+    _emit_bl((pc), 0x3A, r2, 0, 0, 0, 0)
 
 /* Branch and Link Register.
  *
@@ -335,29 +335,29 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_blr(pc, t, x, n) \
-    *(pc++) = 0x3a << 2 | t >> 3; \
-    *(pc++) = (char)(t << 5 | x); \
-    *(pc++) = 2 << 5; \
-    *(pc++) = (n << 1)
+    *((pc)++) = 0x3a << 2 | (t) >> 3; \
+    *((pc)++) = (char)((t) << 5 | (x)); \
+    *((pc)++) = 2 << 5; \
+    *((pc)++) = ((n) << 1)
 
 /*  Move.
  XXX MOVE AND BRACH
  */
 
 #  define jit_emit_mov_rr(pc, dst, src) \
-    *(pc++) = 8; \
-    *(pc++) = src; \
-    *(pc++) = 2; \
-    *(pc++) = 0x40 + dst
+    *((pc)++) = 8; \
+    *((pc)++) = (src); \
+    *((pc)++) = 2; \
+    *((pc)++) = 0x40 + (dst)
 
 /*
  */
 
 #  define emit_ret(pc) \
-    *(pc++) = 0xe8; \
-    *(pc++) = 0x40; \
-    *(pc++) = 0xc0; \
-    *(pc++) = 0x02
+    *((pc)++) = 0xe8; \
+    *((pc)++) = 0x40; \
+    *((pc)++) = 0xc0; \
+    *((pc)++) = 0x02
 
 /* Branch Vectored.
  *
@@ -374,13 +374,13 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define _emit_bv(pc, op, b, x, n) \
-    *(pc++) = op << 2 | b >> 3; \
-    *(pc++) = (char)(b << 5 | x); \
-    *(pc++) = 6 << 5; \
-    *(pc++) = n << 1
+    *((pc)++) = (op) << 2 | (b) >> 3; \
+    *((pc)++) = (char)((b) << 5 | (x)); \
+    *((pc)++) = 6 << 5; \
+    *((pc)++) = (n) << 1
 
 #  define emit_bv(pc, b, x, n) \
-    _emit_bv(pc, 0x3A, b, x, n);
+    _emit_bv((pc), 0x3A, (b), (x), (n));
 
 /*  Immediate
  *
@@ -394,10 +394,10 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define _emit_imm11(pc, op, r, t, imm11) \
-    *(pc++) = op << 2 | r >> 3; \
-    *(pc++) = (char)(r << 5 | t); \
-    *(pc++) = (char)(imm11 >> 7); \
-    *(pc++) = (char)(imm11 << 1)
+    *((pc)++) = (op) << 2 | (r) >> 3; \
+    *((pc)++) = (char)((r) << 5 | (t)); \
+    *((pc)++) = (char)((imm11) >> 7); \
+    *((pc)++) = (char)((imm11) << 1)
 
 #  define emit_addimm11(pc, r, t, imm11) \
     _emit_imm11(pc, 0x2d, r, t, imm11);
@@ -413,16 +413,16 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define emit_sync(pc) \
-    *(pc++) = 0; \
-    *(pc++) = 0; \
-    *(pc++) = 0x4; \
-    *(pc++) = 0;
+    *((pc)++) = 0; \
+    *((pc)++) = 0; \
+    *((pc)++) = 0x4; \
+    *((pc)++) = 0;
 
 
 /* Pseudo instructions. */
 
 #  define jit_emit_nop(pc) \
-    jit_emit_or_rrr(pc, 0, 0, 0)
+    jit_emit_or_rrr((pc), 0, 0, 0)
 
 /* ldil loads a 21 bits immediate into the left part of a general register,
  * ldo loads a 14 bits offset into a general register, so we use it to add
@@ -430,20 +430,20 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #  define jit_emit_mov_ri_i(pc, D, imm) \
-    emit_ldil(pc, D, ((imm >> 11) & 0x1fffff)); \
-    emit_ldo(pc, D, D, (imm & 0x7ff))
+    emit_ldil((pc), (D), (((imm) >> 11) & 0x1fffff)); \
+    emit_ldo((pc), (D), (D), ((imm) & 0x7ff))
 
 #  define jit_emit_mov_rm_i(pc, reg, offs) \
-    emit_ldw(pc, BASE, reg, offs);
+    emit_ldw((pc), BASE, (reg), (offs));
 
 #  define jit_emit_mov_mr_i(pc, offs, reg) \
-    emit_stw(pc, BASE, reg, offs);
+    emit_stw((pc), BASE, (reg), (offs));
 
 #  define jit_emit_mov_mr_n(pc, offs, reg) \
-    emit_std(pc, BASE, reg, offs);
+    emit_std((pc), BASE, (reg), (offs));
 
 #  define jit_emit_mov_rm_n(pc, offs, reg) \
-    emit_ldd(pc, BASE, reg, offs);
+    emit_ldd((pc), BASE, (reg), (offs));
 
 /*  emit_cmpbranch
  *
@@ -452,15 +452,15 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  */
 
 #define jit_emit_cmpbranch(pc, s1, s2, cond, dest) { \
-    if (cond >= emit_GTE) { \
-        jit_emit_cmpbf(pc, (cond - 7), s2, s1, 3, 0); \
+    if ((cond) >= emit_GTE) { \
+        jit_emit_cmpbf((pc), ((cond) - 7), (s2), (s1), 3, 0); \
     } \
     else { \
-        jit_emit_cmpbf(pc, cond, s1, s2, 3, 0); \
+        jit_emit_cmpbf((pc), (cond), (s1), (s2), 3, 0); \
     } \
     jit_emit_nop(pc); \
-    jit_emit_mov_ri_i(pc, ISR2, (dest)); \
-    emit_bv(pc, ISR2, r0, 1); \
+    jit_emit_mov_ri_i((pc), ISR2, (dest)); \
+    emit_bv((pc), ISR2, r0, 1); \
 }
 
 static void
@@ -530,8 +530,8 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info, PARROT_INTERP)
     emit_ldw(jit_info->native_ptr, r30, r17, -0x38); \
     emit_ldw(jit_info->native_ptr, r30, r18, -0x40); \
     emit_ldw(jit_info->native_ptr, r3, r2, -0x14); \
-    emit_ldo(pc, r3, r30, 0x40); \
-    emit_ldwm(pc, r30, r4, -0x40); \
+    emit_ldo((pc), r3, r30, 0x40); \
+    emit_ldwm((pc), r30, r4, -0x40); \
     emit_ret(pc)
 
 /*
