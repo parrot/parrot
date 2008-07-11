@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-disassemble - Parrot disassembler
+pbc_disassemble - Parrot disassembler
 
 =head1 SYNOPSIS
 
-    disassemble file.pbc
+    pbc_disassemble file.pbc
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ main(int argc, char *argv[])
     interp->lo_var_ptr = &interp;
 
     if (argc != 2) {
-        fprintf(stderr, "Usage: disassemble programfile \n");
+        fprintf(stderr, "Usage: pbc_disassemble programfile \n");
         Parrot_exit(interp, 1);
     }
 
@@ -110,6 +110,8 @@ Initial version by Daniel Grunblatt on 2002.5.26.
 
 Florian Ragwitz: Moved POD documentation that's not necessary to know how to
 actually run the disassembler to normal C comments (Wed, 16 Nov 2005).
+
+Reini Urban: Renamed from disassemble to pbc_disassemble (2008-07-03).
 
 =cut
 

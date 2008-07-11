@@ -463,7 +463,7 @@ OPS_FILES = @ops@ $(GEN_OPSFILES)
 # Executables
 PARROT              = $(CUR_DIR)/@test_prog@$(EXE)
 MINIPARROT          = $(CUR_DIR)/miniparrot$(EXE)
-DIS                 = $(CUR_DIR)/disassemble$(EXE)
+DIS                 = $(CUR_DIR)/pbc_disassemble$(EXE)
 PDUMP               = $(CUR_DIR)/pdump$(EXE)
 PINFO               = $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE            = $(CUR_DIR)/pbc_merge$(EXE)
@@ -476,7 +476,7 @@ PERL6               = $(CUR_DIR)/perl6$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT   = $(CUR_DIR)/installable_parrot$(EXE)
-INSTALLABLEDIS      = $(CUR_DIR)/installable_disassemble$(EXE)
+INSTALLABLEDIS      = $(CUR_DIR)/installable_pbc_disassemble$(EXE)
 INSTALLABLEPDUMP    = $(CUR_DIR)/installable_pdump$(EXE)
 INSTALLABLEPINFO    = $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
@@ -902,16 +902,16 @@ $(INSTALLABLEPDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 # Parrot Disassembler
 #
 
-$(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/pbc_disassemble$(O) : $(GENERAL_H_FILES)
 
-$(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
+$(DIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/disassemble$(O) \
+    $(SRC_DIR)/pbc_disassemble$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
-$(INSTALLABLEDIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
+$(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/disassemble$(O) \
+    $(SRC_DIR)/pbc_disassemble$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 #
@@ -1607,7 +1607,7 @@ prog-clean :
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/pdb$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
-    $(DIS) $(SRC_DIR)/disassemble$(O) \
+    $(DIS) $(SRC_DIR)/pbc_disassemble$(O) \
     $(SRC_DIR)/main$(O) \
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
@@ -1643,7 +1643,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/pdb$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
-    $(DIS) $(SRC_DIR)/disassemble$(O) \
+    $(DIS) $(SRC_DIR)/pbc_disassemble$(O) \
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     $(SRC_DIR)/install_config$(O) \

@@ -13,7 +13,7 @@ tools/util/dump_pbc.pl - Weave together PBC disassembly with PIR source
 
 =head1 DESCRIPTION
 
-dump_pbc.pl uses Parrot's F<disassemble> program to disassemble the opcodes
+dump_pbc.pl uses Parrot's F<pbc_disassemble> program to disassemble the opcodes
 in a PBC (Parrot ByteCode) file, then weaves the disassembly together with
 the original PIR source file(s).  This makes it easier to see how the PIR
 syntactic sugar is desugared into raw Parrot opcodes.
@@ -45,7 +45,7 @@ BEGIN {
 use lib "$PARROT_ROOT/lib";
 use Parrot::Config '%PConfig';
 
-my $DISASSEMBLER = "$PConfig{build_dir}$PConfig{slash}disassemble$PConfig{exe}";
+my $DISASSEMBLER = "$PConfig{build_dir}$PConfig{slash}pbc_disassemble$PConfig{exe}";
 
 go(@ARGV);
 
