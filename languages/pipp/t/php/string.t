@@ -15,7 +15,7 @@ t/php/string.t - Standard Library string
 Tests PHP Standard Library string
 (implemented in F<languages/pipp/src/common/php_string.pir>).
 
-See L<http://www.php.net/manual/en/ref.string.php>.
+See L<http://www.php.net/manual/en/ref.strings.php>.
 
 =cut
 

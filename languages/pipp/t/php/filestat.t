@@ -15,7 +15,7 @@ t/php/filestat.t - Standard Library filestat
 Tests PHP Standard Library file
 (implemented in F<languages/pipp/src/common/php_filestat.pir>).
 
-See L<http://www.php.net/manual/en/ref.filestat.php>.
+See L<http://www.php.net/manual/en/ref.filesystem.php>.
 
 =cut
 

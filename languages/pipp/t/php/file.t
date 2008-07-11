@@ -15,7 +15,7 @@ t/php/file.t - Standard Library file
 Tests PHP Standard Library file
 (implemented in F<languages/pipp/src/common/php_file.pir>).
 
-See L<http://www.php.net/manual/en/ref.file.php>.
+See L<http://www.php.net/manual/en/ref.filesystem.php>.
 
 =cut
 

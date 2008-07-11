@@ -15,7 +15,7 @@ t/php/type.t - Standard Library type
 Tests PHP Standard Library type
 (implemented in F<languages/pipp/src/common/php_type.pir>).
 
-See L<http://www.php.net/manual/en/ref.type.php>.
+See L<http://www.php.net/manual/en/ref.var.php>.
 
 =cut
 
