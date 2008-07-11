@@ -2,7 +2,7 @@ print 1;
 print 2, "\n";
 print 34, "\n";
 print 5.6, "\n";
-print 'ok 7\n', "\n";
+print 'ok 7\n', "\n"; # show '\n' is literal 
 print "ok 8\n";
 print "ok 9\n","ok 10\n","ok 11\n","ok 12\n";
 label1: print "ok 13\n";
