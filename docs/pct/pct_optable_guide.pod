@@ -8,11 +8,14 @@ pct_optable_guide.pod - A Guide to Using an Operator Parsing Table in PGE-based 
 =head1 DESCRIPTION
 
 This document describes how to use an operator parsing table in grammars
-written for the Parrot Grammar Engine.
+written for the Parrot Grammar Engine. The C<mk_language_shell.pl> script
+will generate a very simple grammar that already includes an operator
+table. This document may help you to understand the syntax of defining
+an optable.
 
 =head1 WHY AN OPTABLE?
 
-Even in simple languages such as C<abc>, parse trees can become very
+Even in simple languages such as C<languages/abc>, parse trees can become very
 big for even very simple expressions.
 
 Consider the following example grammar:
@@ -98,7 +101,8 @@ the rule named C<simple_expression>. In other words, this is the point
 where the parser switches back from bottom-up to top-down.
 
 Be sure to add the C<tighter> clause, to make sure that your I<terms>
-are parsed correctly.
+are parsed correctly. The grammar compiler (PGE) will not notify you
+if you don't do this.
 
 =head2 Defining operators
 
@@ -135,8 +139,8 @@ tighter than the precedence of the operator C<OP>.
 
 =back
 
-Be sure that OP is defined I<before> referencing it in a operator precedence
-statement as discussed in this section.
+Be sure that C<OP> is defined I<before> referencing it in a operator
+precedence statement as discussed in this section.
 
 =head3 Where's the operator?
 
@@ -289,7 +293,7 @@ This associecity is expressed using the C<assoc> trait, like so:
 
  proto 'infix:-' is assoc('left') ...
 
-If you don't specify the association, it defaults to C<'left'>. C<right>
+If you don't specify the association, it defaults to C<left>. C<right>
 association works the other way around. In mathematics, the power operator
 is right associated.
 
@@ -326,7 +330,7 @@ subroutine calls.
 
 =head3 The C<pasttype> trait
 
-Some operators have behavior that can be implemented by certain PAST
+Some operators have behavior that can be implemented by certain C<PAST>
 nodes. For instance, many languages define the semantics of the C<and>
 operator to be the following:
 
@@ -349,7 +353,7 @@ This is very similar to the PAST::Op node with the C<if> C<:pasttype>:
 
 Therefore, an operator such as C<and> can be implemented as an C<if>
 statement. In order to specify that the C<and> operator must be handled
-as a PAST::Op( :pasttype('if') ) node, you can use the C<pasttype> trait,
+as a C<PAST::Op( :pasttype('if') )> node, you can use the C<pasttype> trait,
 like so:
 
  proto 'infix:and' ... is pasttype('if') { ... }
@@ -422,7 +426,7 @@ The PGE will not warn you for such errors.
 
 =item * How many operator tables can I use in my language?
 
-{{ I think one only? }}
+{{ XXX I think one only? Anybody? }}
 
 =item * How does an optable parser work?
 

@@ -29,7 +29,7 @@ Getting started using the PCT is easy.  The steps are:
 
 =back
 
-The acronyms you should learn are:
+The acronyms you will encounter, are:
 
 =over 4
 
@@ -109,10 +109,7 @@ C<languages/foo>, type:
 
 This will create a complete language that compiles out of the box, except for
 the fact that there's no Makefile yet. In order to resolve that, you should
-make a small edit to a file located in C<config/gen/languages.pm>. You'll see
-an array named C<languages> being initialized with a list of languages. Just
-add the name of the directory of your language, in this example's case C<foo>.
-Save the file, and run the following command from the Parrot root directory:
+(re)run the Configure.pl script:
 
  $ perl Configure.pl
 
@@ -129,15 +126,15 @@ setting up the tests for your language very easy!
 The generated directories and files have the following structure:
 
  foo/
-    /config/makefiles/root.in  # input for the Makefile generator
-                               # as long as you don't add source files,
-                               # there's no need to update this file.
+    /config/makefiles/root.in    # input for the Makefile generator
+                                 # as long as you don't add source files,
+                                 # there's no need to update this file.
     /src/
         /parser/
-               /actions.pm     # the language's grammar rules
-               /grammar.pm     # a file containing the parse actions
-                               # these files should be updated to change your
-                               # language
+               /actions.pm       # the language's grammar rules; a file
+               /grammar.pm       # containing the parse actions;
+               /grammar-oper.pg  # file containing a default operator table.
+
         /builtins/
                  /say.pir      # a file containing a built-in function
                                # add more "standard library" routines here
@@ -147,17 +144,18 @@ The generated directories and files have the following structure:
                                # more tests can be added here
 
     /foo.pir                   # file containing the main routine
+    /README                    # an almost empty readme file
 
 
 When you want to run a script through your language's compiler, (assuming
 you're in your language's directory, in this case F<languages/foo>) type:
 
- $ ../../parrot foo.pbc I<file.foo>
+ $ ../../parrot foo.pbc file.foo
 
 You can give an command line option to your compiler which specifies what kind
 of output you want. This is the C<target> option:
 
- $ ../../parrot foo.pbc --target=pir I<file.foo>
+ $ ../../parrot foo.pbc --target=pir file.foo
 
 this will print the generated PIR instructions to stdout. Other options for the
 C<target> option are C<parse>, C<past>, and C<post>.
@@ -196,6 +194,11 @@ The following documents might be useful to learn more:
 
 =over 4
 
+=item * L<languages/squaak/doc/>
+
+This directory contains the Parrot Compiler Toolkit Tutorial, describing the
+implementation of a simple yet non-trivial language.
+
 =item * L<docs/past_building_blocks.pod>
 
 =item * L<docs/pdds/pdd26_past.pod>
@@ -212,12 +215,12 @@ You can also have a look at some existing languages that are being developed
 using the PCT, all located in the C<languages> subdirectory of Parrot. These
 are: perl6 (commonly referred to as C<Rakudo>), lua (see the L<lua/pct>
 directory), ecmascript (a standardized C<JavaScript>), punie (Perl 1 on
-Parrot), pynie (python on Parrot), and cardinal (Ruby on Parrot).
+Parrot), pynie (Python on Parrot), and cardinal (Ruby on Parrot).
 
 =head2 IRC
 
 Everyday, a bunch of Parrot enthusiasts can be found on #parrot on
-irc.perl.org.  You're welcome to ask questions.
+irc.perl.org. You're welcome to ask questions.
 
 =head1 SUGGESTIONS
 
