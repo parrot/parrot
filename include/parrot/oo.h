@@ -35,8 +35,8 @@ typedef enum {
 #define get_attrib_num(x, y)    ((PMC **)(x))[(y)]
 #define set_attrib_num(o, x, y, z) \
     do { \
-        GC_WRITE_BARRIER(interp, o, ((PMC **)x)[y], z); \
-        ((PMC **)x)[y] = z; \
+        GC_WRITE_BARRIER(interp, (o), ((PMC **)(x))[y], (z)); \
+        ((PMC **)(x))[(y)] = (z); \
     } while (0)
 #define set_attrib_flags(x) do { \
         PObj_data_is_PMC_array_SET(x); \
@@ -44,7 +44,7 @@ typedef enum {
     } while (0)
 #define set_attrib_array_size(o, y) do { \
     PMC_data(o) = mem_sys_allocate_zeroed((sizeof (PMC *)*(y))); \
-    PMC_int_val(o) = y; \
+    PMC_int_val(o) = (y); \
 } while (0)
 
 /*

@@ -19,9 +19,9 @@
       do { \
           FLOATVAL the_time = (time); \
           int time_bucket = ceil(the_time * 200.0); \
-          int cycle_bucket = cycles - 1; \
+          int cycle_bucket = (cycles) - 1; \
           struct STM_profile_data *profile = &PROFILE(log); \
-          if (cycles == 0) { \
+          if ((cycles) == 0) { \
               ++profile->num_non_waits; \
           } \
           else { \
@@ -39,7 +39,7 @@
               ++profile->wait_cycles[cycle_bucket]; \
               ++profile->wait_time[time_bucket]; \
               profile->total_wait_time += the_time; \
-              profile->total_wait_cycles += cycles; \
+              profile->total_wait_cycles += (cycles); \
           } \
       } while (0)
 
