@@ -145,11 +145,11 @@ unlink($filename);
 $filename = 'test.lolcode';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH q{
+print $FH <<'LOLCODE';
 HAI 1.2
     VISIBLE "HAI WORLD!"
 KTHXBYE
-};
+LOLCODE
 close $FH;
 $out = `$parrot languages/lolcode/lolcode.pbc $filename`;
 ok($out eq "HAI WORLD!\n", "check lolcode");
