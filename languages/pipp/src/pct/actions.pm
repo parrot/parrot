@@ -419,7 +419,7 @@ method quote_term($/, $key) {
     make $past;
 }
 
-method circumfix($/) {
+method curly_interpolation($/) {
     make $( $<var> );
 }
 

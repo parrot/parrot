@@ -5,6 +5,7 @@
 .sub 'peek_brackets' :method
     .param string target
     .param int pos
+
     .local string brackets, start, stop
     brackets = unicode:"<>[](){}\xab\xbb"
     start = substr target, pos, 1
@@ -25,7 +26,7 @@
 
 .sub 'quote_expression' :method
     .param string flags
-    .param pmc options         :slurpy :named
+    .param pmc    options    :slurpy :named
 
     ##  create a new match object
     .local pmc mob
@@ -45,16 +46,9 @@
     unless iter goto iter_end
     .local string oname
     oname = shift iter
-    oname = substr oname, 1
+    oname = substr oname, 1   # remove the leading colon
     options[oname] = 1
-    if oname == 'ww' goto opt_ww
-    if oname == 'w' goto opt_w
     if oname == 'qq' goto opt_qq
-    if oname == 'b' goto opt_b
-    goto iter_loop
-  opt_ww:
-  opt_w:
-    options['wsstop'] = 1
     goto iter_loop
   opt_qq:
     options['s'] = 1
@@ -63,8 +57,7 @@
     options['f'] = 1
     options['c'] = 1
     options['b'] = 1
-  opt_b:
-    options['q'] = 1
+    options['q'] = 1         #
     goto iter_loop
   iter_end:
 
@@ -74,28 +67,13 @@
     ##  determine pos, lastpos
     $I0 = length start
     pos += $I0
-    .local int stoplen, lastpos, wsstop
+    .local int stoplen, lastpos
     stoplen = length stop
-    wsstop = options['wsstop']
     lastpos = length target
     lastpos -= stoplen
     options['stop'] = stop
 
-    ##  handle :regex parsing
-    .local pmc p6regex, quote_regex
-    $I0 = options['regex']
-    unless $I0 goto word_start
-  regex_start:
-    p6regex = get_root_global ['parrot';'PGE::Perl6Regex'], 'regex'
-    mob.'to'(pos)
-    quote_regex = p6regex(mob, options :flat :named)
-    unless quote_regex goto fail
-    pos = quote_regex.'to'()
     .local string key
-    key = 'quote_regex'
-    mob[key] = quote_regex
-    goto succeed
-
     ##  handle word parsing
   word_start:
     ##  set up escapes based on flags
@@ -112,43 +90,17 @@
   have_escapes:
     options['escapes'] = escapes
 
-    .local int optww
-    optww = options['ww']
-    unless optww goto have_wwopts
-    .local pmc wwsingleopts, wwdoubleopts
-    wwsingleopts = new 'Hash'
-    wwsingleopts['q'] = 1
-    wwsingleopts['stop'] = "'"
-    wwsingleopts['action'] = action
-    ##  FIXME: RT#48112  -- currently 'clone' on a Hash can't
-    ##  handle null entries (and does a deepcopy), so we're
-    ##  using an iterator to do it.
-    ##  wwdoubleopts = clone options
-            wwdoubleopts = new 'Hash'
-            .local pmc iter2
-            iter2 = new 'Iterator', options
-          iter2_loop:
-            unless iter2 goto iter2_end
-            $S0 = shift iter2
-            $P0 = options[$S0]
-            wwdoubleopts[$S0] = $P0
-            goto iter2_loop
-          iter2_end:
-    wwdoubleopts['stop'] = '"'
-    wwdoubleopts['wsstop'] = 0
-  have_wwopts:
-
     .local pmc quote_concat
     quote_concat = new 'ResizablePMCArray'
 
-    unless wsstop goto word_plain
+    goto word_plain
   word_loop:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     if pos > lastpos goto fail
     $S0 = substr target, pos, stoplen
     if $S0 == stop goto word_succeed
     if pos >= lastpos goto fail
-    unless optww goto word_plain
+    goto word_plain
   word_shell:
     $S0 = substr target, pos, 1
     if $S0 == '"' goto word_shell_double
@@ -156,7 +108,7 @@
   word_shell_single:
     inc pos
     mob.'to'(pos)
-    $P0 = mob.'quote_concat'(wwsingleopts)
+    $P0 = mob.'quote_concat'()
     unless $P0 goto fail
     push quote_concat, $P0
     pos = $P0.'to'()
@@ -165,7 +117,7 @@
   word_shell_double:
     inc pos
     mob.'to'(pos)
-    $P0 = mob.'quote_concat'(wwdoubleopts)
+    $P0 = mob.'quote_concat'()
     unless $P0 goto fail
     push quote_concat, $P0
     pos = $P0.'to'()
@@ -208,9 +160,8 @@
 
     ##  determine pos, lastpos
     .local string stop
-    .local int stoplen, lastpos, wsstop
+    .local int stoplen, lastpos
     stop = options['stop']
-    wsstop = options['wsstop']
     stoplen = length stop
     lastpos = length target
     lastpos -= stoplen
@@ -230,7 +181,7 @@
     if pos > lastpos goto fail
     $S0 = substr target, pos, stoplen
     if $S0 == stop goto succeed
-    unless wsstop goto term_loop
+    goto term_loop
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
     unless $I0 goto term_loop
   succeed:
@@ -272,6 +223,7 @@
     if leadchar == '{' goto term_closure
   term_literal:
     mob.'to'(pos)
+    #_dumper(pos)
     $P0 = mob.'quote_literal'(options)
     unless $P0 goto fail
     pos = $P0.'to'()
@@ -291,10 +243,10 @@
 
   term_closure:
     mob.'to'(pos)
-    $P0 = mob.'circumfix'('action'=>action)
+    $P0 = mob.'curly_interpolation'('action'=>action)
     unless $P0 goto term_literal
     pos = $P0.'to'()
-    key = 'circumfix'
+    key = 'curly_interpolation'
     mob[key] = $P0
     goto succeed
 
@@ -316,15 +268,16 @@
 .sub 'quote_literal' :method
     .param pmc options
 
+    #_dumper( options )
+
     .local pmc mob
     .local int pos
     .local string target
     (mob, pos, target) = self.'new'(self)
 
     .local string stop, stop1
-    .local int stoplen, lastpos, wsstop
+    .local int stoplen, lastpos
     stop = options['stop']
-    wsstop = options['wsstop']
     stop1 = substr stop, 0, 1
     stoplen = length stop
     lastpos = length target
@@ -343,7 +296,7 @@
     if pos > lastpos goto fail
     $S0 = substr target, pos, stoplen
     if $S0 == stop goto succeed
-    unless wsstop goto scan_loop_1
+    goto scan_loop_1
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
     if $I0 goto succeed
   scan_loop_1:

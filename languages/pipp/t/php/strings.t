@@ -109,6 +109,18 @@ END_CODE
 VAR1 VAR2
 END_EXPECTED
 
+=for comment
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'print a pair of curlies' );
+<?php
+echo "curlies: {}\n";
+?>
+END_CODE
+curlies: {}
+END_EXPECTED
+
+=cut
+
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'single quotes and backslash' );
 <?php
 

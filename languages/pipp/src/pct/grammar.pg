@@ -73,7 +73,7 @@ token NULL                  { 'NULL'                                            
 token NUMBER                { ( \d+ )? '.' \d+                                       {*} }
 token INTEGER               { \d+                                                    {*} }
 token quote                 { [ <.before '"' > <quote_expression: :qq>
-                              | <.before \'> <quote_expression: :q>
+                              | <.before \'  > <quote_expression: :q>
                               ]
                                                                                      {*}
                             }
@@ -112,7 +112,7 @@ rule  class_definition      { 'class' <CLASS_NAME>
                               '}'
                                                                                      {*} }
 
-token circumfix             { '{' <var> '}'                                          {*} }
+token curly_interpolation   { '{' <var> '}'                                          {*} }
 
 # operator precedence table
 rule  expression  is optable                                                       { ... }
