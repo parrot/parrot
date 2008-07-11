@@ -62,6 +62,7 @@ sub check_macro_args {
                     # eliminate any properly formed usage of the macro arg
                     $definition =~ s/\Q($arg)//g;
                     $definition =~ s/\Q[$arg]//g;
+                    $definition =~ s/\Q## $arg ##//g;
                     # Any remaining usage must be improper
                     if ($definition =~ m/\b\Q$arg\E\b/) {
                         push (@defines, "$path: $macro has unwrapped arg: $arg\n");
