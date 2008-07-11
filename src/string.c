@@ -398,7 +398,8 @@ string_rep_compatible(SHIM_INTERP,
 
     /* a table could possibly simplify the logic */
     if (a->encoding == Parrot_utf8_encoding_ptr &&
-            b->charset == Parrot_ascii_charset_ptr) {
+            (b->charset == Parrot_ascii_charset_ptr ||
+             b->charset == Parrot_iso_8859_1_charset_ptr)) {
         if (a->strlen == a->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return Parrot_ascii_charset_ptr;
@@ -407,7 +408,8 @@ string_rep_compatible(SHIM_INTERP,
         return a->charset;
     }
     if (b->encoding == Parrot_utf8_encoding_ptr &&
-            a->charset == Parrot_ascii_charset_ptr) {
+            (a->charset == Parrot_ascii_charset_ptr ||
+             a->charset == Parrot_iso_8859_1_charset_ptr)) {
         if (b->strlen == b->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return a->charset;
