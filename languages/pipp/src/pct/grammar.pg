@@ -74,12 +74,15 @@ token FALSE                 { 'FALSE'                                           
 token NULL                  { 'NULL'                                                 {*} }
 token NUMBER                { ( \d+ )? '.' \d+                                       {*} }
 token INTEGER               { \d+                                                    {*} }
-token DOUBLEQUOTE_STRING    { '"' <string_literal: '"'> '"'                          {*} }
-token SINGLEQUOTE_STRING    { \' <string_literal: "'"> \'                            {*} }
+token quote                 { [ <.before '"' > <quote_expression: :qq>
+                              | <.before \'> <quote_expression: :q>
+                              ]
+                                                                                     {*}
+                            }
 rule  constant              { <CONSTANT_NAME>                                        {*} }
 rule  this                  { '$this'                                                {*} } 
 rule  array_elem            { <VAR_NAME> '[' <expression> ']'                        {*} }
-rule  var                   { <this> {*}                   #= this
+token var                   { <this> {*}                   #= this
                             | <VAR_NAME> {*}               #= VAR_NAME
                             }
 rule  literal               { <TRUE> {*}                   #= TRUE
@@ -87,8 +90,7 @@ rule  literal               { <TRUE> {*}                   #= TRUE
                             | <NULL> {*}                   #= NULL
                             | <NUMBER> {*}                 #= NUMBER
                             | <INTEGER> {*}                #= INTEGER
-                            | <DOUBLEQUOTE_STRING> {*}     #= DOUBLEQUOTE_STRING
-                            | <SINGLEQUOTE_STRING> {*}     #= SINGLEQUOTE_STRING
+                            | <quote> {*}                  #= quote
                             }
 rule  term                  { <method_call> {*}            #= method_call
                             | <function_call> {*}          #= function_call

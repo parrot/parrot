@@ -1,6 +1,6 @@
 .include 'cclass.pasm'
 
-.namespace ['Perl6::Grammar']
+.namespace ['Pipp::Grammar']
 
 .sub 'peek_brackets' :method
     .param string target
@@ -282,10 +282,10 @@
 
   term_scalar:
     mob.'to'(pos)
-    $P0 = mob.'variable'('action'=>action)
+    $P0 = mob.'var'('action'=>action)
     unless $P0 goto term_literal
     pos = $P0.'to'()
-    key = 'variable'
+    key = 'var'
     mob[key] = $P0
     goto succeed
 

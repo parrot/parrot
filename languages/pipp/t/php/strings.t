@@ -89,7 +89,7 @@ string(4) "asdf"
 END_EXPECTED
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation' );
 <?php
 $var1 = "VAR1";
 $var2 = "VAR2";

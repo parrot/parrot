@@ -283,22 +283,6 @@ method NUMBER($/) {
          );
 }
 
-method SINGLEQUOTE_STRING($/) {
-    make PAST::Val.new(
-             :value( $( $<string_literal> ) ),
-             :returns('PhpString'),
-             :node($/)
-         );
-}
-
-method DOUBLEQUOTE_STRING($/) {
-    make PAST::Val.new(
-             :value( $( $<string_literal> ) ),
-             :returns('PhpString'),
-             :node($/)
-         );
-}
-
 method function_definition($/) {
 
     # note that $<param_list> creates a new PAST::Block.
@@ -432,11 +416,11 @@ method quote_term($/, $key) {
     if ($key eq 'literal') {
         $past := PAST::Val.new(
             :value( ~$<quote_literal> ),
-            :returns('Perl6Str'), :node($/)
+            :returns('PhpString'), :node($/)
         );
     }
-    elsif ($key eq 'variable') {
-        $past := $( $<variable> );
+    elsif ($key eq 'var') {
+        $past := $( $<var> );
     }
     elsif ($key eq 'circumfix') {
         $past := $( $<circumfix> );
