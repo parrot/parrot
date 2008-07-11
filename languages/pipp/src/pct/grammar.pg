@@ -38,8 +38,7 @@ rule  statement             { <echo_statement> {*}         #= echo_statement
                             | <if_statement> {*}           #= if_statement
                             | <inline_sea_tp1> {*}         #= inline_sea_tp1
                             | <inline_sea_tp2> {*}         #= inline_sea_tp2
-                            | <scalar_assign> {*}          #= scalar_assign
-                            | <array_assign> {*}           #= array_assign
+                            | <var_assign> {*}             #= var_assign
                             | <function_definition> {*}    #= function_definition
                             | <class_definition> {*}       #= class_definition
                             }
@@ -55,8 +54,7 @@ rule  else_clause           { 'else' <block>                                    
 token inline_sea_tp1        { <.CODE_END_TP1> <SEA_empty_allowed> <.CODE_START_TP1>  {*} }
 token inline_sea_tp2        { <.CODE_END_TP2> <SEA_empty_allowed> <.CODE_START_TP2>  {*} }
 regex SEA_empty_allowed     { <-[<]>*? <before '<'>                                      }
-rule  scalar_assign         { <var>        '=' <expression> <.statement_delimiter>   {*} }
-rule  array_assign          { <array_elem> '=' <expression> <.statement_delimiter>   {*} }
+rule  var_assign            { <var>        '=' <expression> <.statement_delimiter>   {*} }
 
 # identifiers
 token FUNCTION_NAME         { <ident>                                                    }
@@ -83,6 +81,7 @@ rule  constant              { <CONSTANT_NAME>                                   
 rule  this                  { '$this'                                                {*} } 
 rule  array_elem            { <VAR_NAME> '[' <expression> ']'                        {*} }
 token var                   { <this> {*}                   #= this
+                            | <array_elem> {*}             #= array_elem
                             | <VAR_NAME> {*}               #= VAR_NAME
                             }
 rule  literal               { <TRUE> {*}                   #= TRUE
@@ -98,7 +97,6 @@ rule  term                  { <method_call> {*}            #= method_call
                             | '(' <expression> {*} ')'     #= expression
                             | <literal> {*}                #= literal
                             | <constant> {*}               #= constant
-                            | <array_elem> {*}             #= array_elem
                             | <var> {*}                    #= var
                             }
 

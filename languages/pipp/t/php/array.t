@@ -25,7 +25,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use Parrot::Config ();
 use Parrot::Test;
-use Test::More     tests => 5;
+use Test::More     tests => 6;
 
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
@@ -64,6 +64,14 @@ echo $thrice[3];
 echo "\n";
 END_CODE
 9
+END_OUT
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'string interpolation' );
+<?php
+$thrice[3] = 9;
+echo "3 times 3 equals $thrice[3]\n";
+END_CODE
+3 times 3 equals 9
 END_OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'count' );

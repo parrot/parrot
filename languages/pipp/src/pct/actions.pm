@@ -162,19 +162,11 @@ method if_statement($/) {
     make $past;
 }
 
-method scalar_assign($/) {
+method var_assign($/) {
     make PAST::Op.new(
              $( $<var> ),
              $( $<expression> ),
              :pasttype('bind'),
-         );
-}
-
-method array_assign($/) {
-    make PAST::Op.new(
-             $( $<array_elem> ),
-             $( $<expression> ),
-             :pasttype('copy'),
          );
 }
 
@@ -189,7 +181,7 @@ method array_elem($/) {
              :scope('keyed'),
              :viviself('Undef'),
              :lvalue(1)
-        );
+         );
 }
 
 method var($/,$key) {
