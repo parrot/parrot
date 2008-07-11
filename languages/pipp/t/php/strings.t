@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 7;
+use Test::More     tests => 8;
 
 # Parrot modules
 use Parrot::Test;
@@ -89,11 +89,21 @@ string(4) "asdf"
 END_EXPECTED
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation, simple syntax' );
 <?php
 $var1 = "VAR1";
 $var2 = "VAR2";
 echo "$var1 $var2\n";
+?>
+END_CODE
+VAR1 VAR2
+END_EXPECTED
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation, complex syntax' );
+<?php
+$var1 = "VAR1";
+$var2 = "VAR2";
+echo "{$var1} {$var2}\n";
 ?>
 END_CODE
 VAR1 VAR2

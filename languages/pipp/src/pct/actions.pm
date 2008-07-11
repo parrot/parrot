@@ -408,17 +408,19 @@ method quote_term($/, $key) {
     if ($key eq 'literal') {
         $past := PAST::Val.new(
             :value( ~$<quote_literal> ),
-            :returns('PhpString'), :node($/)
+            :returns('PhpString'),
+            :node($/)
         );
     }
-    elsif ($key eq 'var') {
-        $past := $( $<var> );
+    else {
+        $past := $( $/{ $key } );
     }
-    elsif ($key eq 'circumfix') {
-        $past := $( $<circumfix> );
-        $past.blocktype('immediate');
-    }
+     
     make $past;
+}
+
+method circumfix($/) {
+    make $( $<var> );
 }
 
 

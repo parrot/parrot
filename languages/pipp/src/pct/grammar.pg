@@ -112,6 +112,8 @@ rule  class_definition      { 'class' <CLASS_NAME>
                               '}'
                                                                                      {*} }
 
+token circumfix             { '{' <var> '}'                                          {*} }
+
 # operator precedence table
 rule  expression  is optable                                                       { ... }
 
