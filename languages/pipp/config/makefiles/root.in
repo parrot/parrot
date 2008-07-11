@@ -199,7 +199,8 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 pipp.pbc: \
     src/common/pipp.pir \
     src/pct/gen_grammar.pir \
-    src/pct/gen_actions.pir
+    src/pct/gen_actions.pir \
+    src/pct/quote_expression.pir
 	$(PARROT) -o pipp.pbc src/common/pipp.pir
 
 pmc: $(PHP_GROUP)

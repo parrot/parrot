@@ -424,8 +424,8 @@ NO_REST:
 .namespace [ 'Pipp::Grammar' ]
 
 .include 'src/pct/gen_grammar.pir'
-
 .include 'src/pct/gen_actions.pir'
+.include 'src/pct/quote_expression.pir'
 
 # Local Variables:
 #   mode: pir
