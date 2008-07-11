@@ -994,11 +994,21 @@ Look for NCI methods and properties.
 
 */
     VTABLE PMC *get_class() {
-        /* Create a proxy */
-        INTVAL  type     = VTABLE_type(interp, SELF);
-        PMC    *type_num = pmc_new(interp, enum_class_Integer);
-        VTABLE_set_integer_native(interp, type_num, type);
-        return pmc_new_init(interp, enum_class_PMCProxy, type_num);
+        PMC *ns     = VTABLE_get_namespace(interp, SELF);
+        PMC *_class = PMCNULL;
+
+        if (!PMC_IS_NULL(ns))
+            _class = VTABLE_get_class(interp, ns);
+
+        if (PMC_IS_NULL(_class)) {
+            INTVAL type      = VTABLE_type(interp, SELF);
+            PMC   *type_num  = pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, type_num, type);
+            return pmc_new_init(interp, enum_class_PMCProxy, type_num);
+        }
+
+        return _class;
+
     }
 
     VTABLE PMC *get_attr_str(STRING *name) {
