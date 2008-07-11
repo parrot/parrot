@@ -291,10 +291,13 @@
 
     .local string literal
     literal = ''
-
   scan_loop:
     if pos > lastpos goto fail
     $S0 = substr target, pos, stoplen
+    #_dumper( target, pos, $S0 )
+    #_dumper( pos )
+    #_dumper( $S0 )
+    #_dumper( stop )
     if $S0 == stop goto succeed
     goto scan_loop_1
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
@@ -306,7 +309,9 @@
     .local string litchar
     litchar = substr target, pos, 1
     ##  if we've reached an escape char, we're done
+    if litchar == '{' goto add_litchar
     $I0 = index escapes, litchar
+    #_dumper( escapes )
     if $I0 >= 0 goto succeed
     ##  if this isn't an interpolation, add the char
     unless optq goto add_litchar

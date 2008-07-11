@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 8;
+use Test::More     tests => 10;
 
 # Parrot modules
 use Parrot::Test;
@@ -99,7 +99,16 @@ END_CODE
 VAR1 VAR2
 END_EXPECTED
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation, complex syntax' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'curly string interpolation, one var' );
+<?php
+$var1 = "VAR1";
+echo "{$var1}\n";
+?>
+END_CODE
+VAR1
+END_EXPECTED
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'curly string interpolation, two vars', todo => 'broken' );
 <?php
 $var1 = "VAR1";
 $var2 = "VAR2";
@@ -109,8 +118,6 @@ END_CODE
 VAR1 VAR2
 END_EXPECTED
 
-=for comment
-
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'print a pair of curlies' );
 <?php
 echo "curlies: {}\n";
@@ -118,8 +125,6 @@ echo "curlies: {}\n";
 END_CODE
 curlies: {}
 END_EXPECTED
-
-=cut
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'single quotes and backslash' );
 <?php
