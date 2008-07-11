@@ -415,7 +415,7 @@ method quote_term($/, $key) {
     else {
         $past := $( $/{ $key } );
     }
-     
+
     make $past;
 }
 

@@ -495,8 +495,8 @@ v-table method a different name, use B<:vtable("...")>. For example, to have
 the method B<ToString> also be the v-table method B<get_string>), use
 B<:vtable("get_string")>.
 
-When the B<:vtable> flag is set, the object PMC cn be referred to with C<self>,
-as with the B<:method> flag.
+When the B<:vtable> flag is set, the object PMC cn be referred to with 
+C<self>, as with the B<:method> flag.
 
 
 =item :outer(subname)
