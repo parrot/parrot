@@ -644,7 +644,7 @@ const_string(PARROT_INTERP, ARGIN(const char *buffer))
                        PObj_external_FLAG|PObj_constant_FLAG);
 
     parrot_hash_put(interp, cstring_cache,
-        PARROT_const_cast(void *, buffer), (void *)s);
+        PARROT_const_cast(char *, buffer), (void *)s);
 
     return s;
 }
