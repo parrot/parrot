@@ -35,14 +35,14 @@ typedef struct Parrot_atomic_pointer {
 #if PTR_SIZE == 8
 #  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
       do { \
-          result = parrot_sparc_cas64((INTVAL *) &(a).val, \
-              (INTVAL) expect, (INTVAL) update); \
+          (result) = parrot_sparc_cas64((INTVAL *) &(a).val, \
+              (INTVAL) (expect), (INTVAL) (update)); \
       } while (0)
 #else
 #  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
       do { \
-          result = parrot_sparc_cas32((Parrot_UInt4 *) &(a).val, \
-              (Parrot_UInt4) expect, (Parrot_UInt4) update); \
+          (result) = parrot_sparc_cas32((Parrot_UInt4 *) &(a).val, \
+              (Parrot_UInt4) (expect), (Parrot_UInt4) (update)); \
       } while (0)
 #endif
 
@@ -64,7 +64,7 @@ typedef struct Parrot_atomic_integer {
 
 #define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
-        result = parrot_sparc_cas32((Parrot_UInt4*) &(a).val, \
+        (result) = parrot_sparc_cas32((Parrot_UInt4*) &(a).val, \
             (Parrot_UInt4) (expect), (Parrot_UInt4) (update)); \
     } while (0)
 
@@ -74,9 +74,9 @@ typedef struct Parrot_atomic_integer {
         Parrot_Int4 old; \
         do { \
             old = (a).val; \
-            PARROT_ATOMIC_INT_CAS(successp, a, old, old + what); \
+            PARROT_ATOMIC_INT_CAS(successp, (a), old, old + (what)); \
         } while (!successp); \
-        result = old + what; \
+        (result) = (old) + (what); \
     } while (0)
 
 
