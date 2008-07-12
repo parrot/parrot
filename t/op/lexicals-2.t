@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2008, The Perl Foundation.
-# $Id: lexicals-2.t 28939 2008-07-02 08:33:21Z chromatic $
+# $Id$
 
 use strict;
 use warnings;
