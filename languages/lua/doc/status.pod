@@ -207,11 +207,6 @@ F<languages/lua/src/lib/luaregex.pir> implements a regex compiler using PGE.
 
 Complete some of these libraries.
 
-=head2 IMPROVEMENT
-
-As compiled regex are not stored in Lua variable, the Regex compiler needs a
-Memoization mecanism (well-known optimization).
-
 =head1 Extension Libraries
 
 These libraries are loaded dynamically with the Lua function C<require>.
