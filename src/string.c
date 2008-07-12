@@ -642,7 +642,8 @@ const_string(PARROT_INTERP, ARGIN(const char *buffer))
                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                        PObj_external_FLAG|PObj_constant_FLAG);
 
-    parrot_hash_put(interp, cstring_cache, s, (void *)s);
+    parrot_hash_put(interp, cstring_cache,
+        (char *) buffer, (void *)s);
 
     return s;
 }
