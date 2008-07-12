@@ -251,7 +251,7 @@ sub new {
                 'pairs'   => ['debug'],
                 'sources' => ['pdb']
             ),
-            $self->c_source_item( '', 'disassemble' ),
+            $self->c_source_item( '', 'pbc_disassemble' ),
             $self->c_pair_item( '', 'trace' ),
             $self->c_source_item( '', 'test_main' ),
         ),
