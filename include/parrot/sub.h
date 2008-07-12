@@ -98,7 +98,7 @@ typedef enum {
 #define Sub_comp_flag_CLEAR(flag, o) (Sub_comp_get_FLAGS(o) &= ~(UINTVAL)(SUB_COMP_FLAG_ ## flag))
 
 #define Sub_comp_flags_SETTO(o, f) Sub_comp_get_FLAGS(o) = (f)
-#define Sub_comp_flags_CLEARALL(o) Sub_comp_flags_SETTO(o, 0)
+#define Sub_comp_flags_CLEARALL(o) Sub_comp_flags_SETTO((o), 0)
 
 #define Sub_comp_INIT_TEST(o) Sub_comp_flag_TEST(PF_INIT, o)
 #define Sub_comp_INIT_SET(o) Sub_comp_flag_SET(PF_INIT, o)

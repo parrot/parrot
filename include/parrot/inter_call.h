@@ -247,7 +247,7 @@ STRING* set_retval_s(PARROT_INTERP,
 
 #define ASSERT_SIG_PMC(sig) \
     PARROT_ASSERT(PObj_is_PMC_TEST(sig)); \
-    PARROT_ASSERT(sig->vtable->base_type == enum_class_FixedIntegerArray)
+    PARROT_ASSERT((sig)->vtable->base_type == enum_class_FixedIntegerArray)
 
 #define SIG_ELEMS(sig) PMC_int_val(sig)
 #define SIG_ARRAY(sig) (INTVAL*)PMC_data(sig)
