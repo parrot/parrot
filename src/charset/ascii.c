@@ -731,9 +731,6 @@ RT#48260: Not yet documented!!!
 
 */
 
-/*
- * TODO pass in the Hash's seed value as initial hashval
- */
 PARROT_PURE_FUNCTION
 size_t
 ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *source_string), size_t seed)
