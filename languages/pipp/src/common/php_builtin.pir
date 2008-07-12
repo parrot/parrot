@@ -388,12 +388,25 @@ NOT IMPLEMENTED.
 
 Get the resource type name for a given resource
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'get_resource_type'
-    not_implemented()
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $I0 = isa $P1, 'PhpResource'
+    if $I0 goto L2
+    error(E_WARNING, "Supplied argument is not a valid resource handle")
+    .RETURN_FALSE()
+  L2:
+    $P0 = deref $P1
+    $S0 = typeof $P0
+    .RETURN_STRING($S0)
 .end
 
 =item C<bool interface_exists(string classname [, bool autoload])>
