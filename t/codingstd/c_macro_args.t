@@ -59,7 +59,7 @@ sub check_macro_args {
             # it's referenced in the definition.
             if ($definition ne "") {
                 foreach my $arg (split /\s*,\s*/, $args) {
-                    
+
                     # eliminate any properly formed usage of the macro arg
                     $definition =~ s/\Q($arg)//g;
                     $definition =~ s/\Q[$arg]//g;
