@@ -33,7 +33,7 @@ my $pkg = q{inter::lex};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
-$task        = $conf->steps->[1];
+$task        = $conf->steps->[-1];
 $step_name   = $task->step;
 
 $step = $step_name->new();
