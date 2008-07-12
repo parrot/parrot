@@ -40,6 +40,7 @@ CODE
 OUTPUT
 
 open my $X, '>', 'pipp/file.txt';
+binmode $X, ':raw';
 print {$X} "line 1\n";
 print {$X} "line 2\n";
 print {$X} "line 3\n";
