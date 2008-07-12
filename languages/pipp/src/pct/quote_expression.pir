@@ -51,8 +51,6 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
 
 =cut
 
-.include 'cclass.pasm'  # used only for .CCLASS_WHITESPACE
-
 .namespace ['Pipp::Grammar']
 
 # called from code in grammar.pg
@@ -124,34 +122,11 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
 
     goto word_plain
   word_loop:
-    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
-    if pos > lastpos goto fail
     $S0 = substr target, pos, 1
     if $S0 == stop goto word_succeed
     if pos >= lastpos goto fail
     goto word_plain
-  word_shell:
-    $S0 = substr target, pos, 1
-    if $S0 == '"' goto word_shell_double
-    if $S0 != "'" goto word_plain
-  word_shell_single:
-    inc pos
-    mob.'to'(pos)
-    $P0 = mob.'quote_concat'()
-    unless $P0 goto fail
-    push quote_concat, $P0
-    pos = $P0.'to'()
-    inc pos
-    goto word_loop
-  word_shell_double:
-    inc pos
-    mob.'to'(pos)
-    $P0 = mob.'quote_concat'()
-    unless $P0 goto fail
-    push quote_concat, $P0
-    pos = $P0.'to'()
-    inc pos
-    goto word_loop
+
   word_plain:
     mob.'to'(pos)
     $P0 = mob.'quote_concat'(options)
@@ -210,8 +185,6 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     $S0 = substr target, pos, 1
     if $S0 == stop goto succeed
     goto term_loop
-    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
-    unless $I0 goto term_loop
   succeed:
     ##  save the array of captured terms
     mob['quote_term'] = quote_term
@@ -327,8 +300,6 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     #_dumper( stop )
     if $S0 == stop goto succeed
     goto scan_loop_1
-    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
-    if $I0 goto succeed
   scan_loop_1:
     if pos >= lastpos goto fail
 
