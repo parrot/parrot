@@ -104,7 +104,7 @@ ok(auto::readline::_handle_ncurses_need($conf, $osname, $cc),
 $newlibs = $conf->data->get( 'libs' );
 like(
     $newlibs,
-    qr/\s+-lncuses/,
+    qr/\s+-lncurses/,
     "Value expected for $osname, $cc added to 'libs'"
 );
 $conf->data->set( libs => undef );
