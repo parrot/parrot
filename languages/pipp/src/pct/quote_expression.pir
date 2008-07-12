@@ -55,28 +55,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
 
 .namespace ['Pipp::Grammar']
 
-.sub 'peek_brackets' :method
-    .param string target
-    .param int pos
-
-    .local string brackets, start, stop
-    brackets = unicode:"<>[](){}\xab\xbb"
-    start = substr target, pos, 1
-    stop = start
-    $I0 = index brackets, start
-    if $I0 < 0 goto end
-    $I1 = $I0 % 2
-    unless $I1 goto bracket_valid
-    self.'panic'("Using a closing delimiter for an opener is reserved")
-    goto end
-  bracket_valid:
-    inc $I0
-    stop = substr brackets, $I0, 1
-  end:
-    .return (start, stop)
-.end
-
-
+# called from code in grammar.pg
 .sub 'quote_expression' :method
     .param string flags
     .param pmc    options    :slurpy :named
@@ -104,27 +83,24 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     if oname == 'qq' goto opt_qq
     goto iter_loop
   opt_qq:
-    options['s'] = 1
-    options['a'] = 1
-    options['h'] = 1
-    options['f'] = 1
-    options['c'] = 1
-    options['b'] = 1
-    options['q'] = 1         #
+    options['s'] = 1        # interpolate variables
+    options['c'] = 1        # interpolate stuff in '{ }', when there is a $ right after the '{'
+    options['b'] = 1        # Interpolate \n, \t, etc.    
+    options['q'] = 1        # Interpolate \\, \q and \' (or whatever)
     goto iter_loop
   iter_end:
 
+    ## there is no heredoc-support yet, so the delimiter are either single or double quotes
     .local string start, stop
-    (start, stop) = self.'peek_brackets'(target, pos)
-
-    ##  determine pos, lastpos
-    $I0 = length start
-    pos += $I0
-    .local int stoplen, lastpos
-    stoplen = length stop
-    lastpos = length target
-    lastpos -= stoplen
+    start = substr target, pos, 1
+    stop  = start
     options['stop'] = stop
+    pos = pos + 1
+
+    ##  determine lastpos
+    .local int lastpos
+    lastpos = length target
+    lastpos -= 1
 
     .local string key
     ##  handle word parsing
@@ -150,7 +126,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
   word_loop:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     if pos > lastpos goto fail
-    $S0 = substr target, pos, stoplen
+    $S0 = substr target, pos, 1
     if $S0 == stop goto word_succeed
     if pos >= lastpos goto fail
     goto word_plain
@@ -188,7 +164,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     mob[key] = quote_concat
 
   succeed:
-    pos += stoplen
+    pos += 1
     mob.'to'(pos)
     if null action goto succeed_done
     $I0 = can action, 'quote_expression'
@@ -213,11 +189,10 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
 
     ##  determine pos, lastpos
     .local string stop
-    .local int stoplen, lastpos
+    .local int lastpos
     stop = options['stop']
-    stoplen = length stop
     lastpos = length target
-    lastpos -= stoplen
+    lastpos -= 1
 
     .local string escapes
     escapes = options['escapes']
@@ -232,7 +207,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     push quote_term, $P0
     pos = $P0.'to'()
     if pos > lastpos goto fail
-    $S0 = substr target, pos, stoplen
+    $S0 = substr target, pos, 1
     if $S0 == stop goto succeed
     goto term_loop
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
@@ -329,12 +304,11 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     (mob, pos, target) = self.'new'(self)
 
     .local string stop, stop1
-    .local int stoplen, lastpos
+    .local int lastpos
     stop = options['stop']
     stop1 = substr stop, 0, 1
-    stoplen = length stop
     lastpos = length target
-    lastpos -= stoplen
+    lastpos -= 1
 
     .local string escapes
     .local int optq, optb
@@ -346,7 +320,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     literal = ''
   scan_loop:
     if pos > lastpos goto fail
-    $S0 = substr target, pos, stoplen
+    $S0 = substr target, pos, 1
     #_dumper( target, pos, $S0 )
     #_dumper( pos )
     #_dumper( $S0 )
