@@ -1,4 +1,57 @@
-.include 'cclass.pasm'
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+=for comment
+
+PHP 5.3 has four kinds of literal strings.
+
+=over 4
+
+=item single quoted
+
+Single quotes need to be escaped with a backslash. 
+A backslash escapes a following backslash.
+A literal backslash needs to be escaped at end of string, as otherwise the delimiting single quote
+would be recognised as a literal single quote.
+Backslashes that preceede any other character besides backslash or single quote are literal. 
+
+=item double quoted
+
+Backslash notation for
+\n, \r, \t, \v, \f, \\, \$, \".
+
+Octal notation for chars: \[0-7]{1,3}
+Hex notation for chars: \x[0-9A-Fa-f]{1,2}
+
+=item heredoc 
+
+   $param = 'dummy';
+   $example = <<<EXAMPLE
+   Variables are interpolated.
+   $param
+   EXAMPLE
+
+Double quotes are literal.
+The backslashes before a double quote are literal.
+Unlike in Perl 5, the newline before the delimiter is not part of the string.
+   
+=item nowdoc
+
+A heredoc with single quotes.
+
+   $param = 'dummy';
+   $example = <<<'EXAMPLE'
+   Variables are not interpolated.
+   $param
+   EXAMPLE
+
+Single quotes are literal.
+Backslashes are literal.
+Unlike in Perl 5, the newline before the delimiter is not part of the string.
+
+=cut
+
+.include 'cclass.pasm'  # used only for .CCLASS_WHITESPACE
 
 .namespace ['Pipp::Grammar']
 
