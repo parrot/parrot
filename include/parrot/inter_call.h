@@ -259,8 +259,8 @@ STRING* set_retval_s(PARROT_INTERP,
             *(pc) == PARROT_OP_get_results_pc || \
             *(pc) == PARROT_OP_get_params_pc || \
             *(pc) == PARROT_OP_set_returns_pc) { \
-        PMC * const sig = seg->const_table->constants[pc[1]]->u.key; \
-        n += SIG_ELEMS(sig); \
+        PMC * const sig = (seg)->const_table->constants[(pc)[1]]->u.key; \
+        (n) += SIG_ELEMS(sig); \
     } \
 } while (0)
 

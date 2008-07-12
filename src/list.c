@@ -294,11 +294,11 @@ static void split_chunk(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 #define chunk_list_size(list) \
-                (PObj_buflen(&list->chunk_list) / sizeof (List_chunk *))
+                (PObj_buflen(&(list)->chunk_list) / sizeof (List_chunk *))
 
 /* hide the ugly cast somehow: */
 #define chunk_list_ptr(list, idx) \
-        ((List_chunk**) PObj_bufstart(&list->chunk_list))[idx]
+        ((List_chunk**) PObj_bufstart(&(list)->chunk_list))[(idx)]
 
 /*
 

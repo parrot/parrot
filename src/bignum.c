@@ -66,11 +66,11 @@ Get value of digit at C<pos>.
 
 */
 #define BN_setd(x, y, z) \
-    (x->buffer[(y) / BN_D_PER_NIB] = \
+    ((x)->buffer[(y) / BN_D_PER_NIB] = \
      ((z) << ((y) % BN_D_PER_NIB)*4) | \
-     (x->buffer[(y) / BN_D_PER_NIB] & ~(15<< ((y) % BN_D_PER_NIB)*4)))
+     ((x)->buffer[(y) / BN_D_PER_NIB] & ~(15<< ((y) % BN_D_PER_NIB)*4)))
 #define BN_getd(x, y) \
-    ((x->buffer[(y) / BN_D_PER_NIB] >> \
+    (((x)->buffer[(y) / BN_D_PER_NIB] >> \
      ((y) % BN_D_PER_NIB)*4) & 15)
 
 /*
