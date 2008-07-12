@@ -628,6 +628,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 const_string(PARROT_INTERP, ARGIN(const char *buffer))
 {
+    DECL_CONST_CAST;
     STRING *s;
     Hash   *cstring_cache = (Hash *)interp->const_cstring_hash;
 
@@ -643,7 +644,7 @@ const_string(PARROT_INTERP, ARGIN(const char *buffer))
                        PObj_external_FLAG|PObj_constant_FLAG);
 
     parrot_hash_put(interp, cstring_cache,
-        (char *) buffer, (void *)s);
+        PARROT_const_cast(void *, buffer), (void *)s);
 
     return s;
 }
