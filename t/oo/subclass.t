@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -589,6 +589,36 @@ pir_error_output_like( <<'CODE', <<'OUT', "the same parent can't be added twice"
 .end
 CODE
 /The class 'Bar' already has a parent class 'Foo'./
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', "can't be own parent");
+.sub main :main
+    $P0 = newclass 'Foo'
+    addparent $P0, $P0
+.end
+CODE
+/Can't be own parent/
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', "can't be own grandparent");
+.sub main :main
+    $P0 = newclass 'Foo'
+    $P1 = subclass 'Foo', 'Bar'
+    addparent $P0, $P1
+.end
+CODE
+/Loop in class hierarchy: 'Foo' is an ancestor of 'Bar'./
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', "can't create loop in hierarchy");
+.sub main :main
+    $P0 = newclass 'Foo'
+    $P1 = newclass 'Bar'
+    addparent $P1, $P0
+    addparent $P0, $P1
+.end
+CODE
+/Loop in class hierarchy: 'Foo' is an ancestor of 'Bar'./
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'subclass should do what the parent does' );
