@@ -3950,3 +3950,7 @@ tools/util/smokeserv-client.pl                              []
 tools/util/smokeserv-server.pl                              []
 tools/util/templates.json                                   []
 tools/util/update_copyright.pl                              []
+# Local variables:
+#   mode: text
+#   buffer-read-only: t
+# End:

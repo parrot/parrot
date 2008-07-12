@@ -1,5 +1,5 @@
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: $
+# $Id$
 
 =head1 NAME
 
@@ -38,6 +38,13 @@ sub _init {
     }
 }
 
+my $text_file_coda = <<'CODA';
+# Local variables:
+#   mode: text
+#   buffer-read-only: t
+# End:
+CODA
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
@@ -57,6 +64,7 @@ sub runstep {
 
         print {$combined} $fragment;
     }
+    print {$combined} $text_file_coda;
 
     $conf->append_configure_log($combined_file);
 
@@ -65,6 +73,7 @@ sub runstep {
 
 1;
 
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
