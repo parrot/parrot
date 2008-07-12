@@ -28,7 +28,7 @@ An implementation of sets -- used for tracking register usage.
 
 /* XXX */
 #define fatal(e, s1, s2) do { \
-    fprintf(stderr, "%s: %s", s1, s2); \
+    fprintf(stderr, "%s: %s", (s1), (s2)); \
     exit(e); \
 } while (0)
 

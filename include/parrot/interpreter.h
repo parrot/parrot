@@ -461,7 +461,7 @@ PARROT_DATA PMC * PMCNULL;   /* Holds single Null PMC */
 #endif /* PARROT_CATCH_NULL */
 
 /* Maybe PMC_IS_NULL(interp, pmc) ? */
-#define PMC_IS_NULL(pmc) PMC_is_null(NULL, pmc)
+#define PMC_IS_NULL(pmc) PMC_is_null(NULL, (pmc))
 
 #define STRING_IS_NULL(s) ((s) == NULL)
 #define STRING_IS_EMPTY(s) !(int)(s)->strlen

@@ -1560,18 +1560,18 @@ do { \
     size_t       _index; \
  \
     if (s1) { \
-        curr1   = (type1 *)s1->strstart; \
-        length1 = s1->strlen; \
+        curr1   = (type1 *)(s1)->strstart; \
+        length1 = (s1)->strlen; \
     } \
     if (s2) { \
-        curr2   = (type2 *)s2->strstart; \
-        length2 = s2->strlen; \
+        curr2   = (type2 *)(s2)->strstart; \
+        length2 = (s2)->strlen; \
     } \
  \
-    dp = (restype *)res->strstart; \
+    dp = (restype *)(res)->strstart; \
     _index = 0; \
  \
-    for (; _index < maxlen ; ++curr1, ++curr2, ++dp, ++_index) { \
+    for (; _index < (maxlen) ; ++curr1, ++curr2, ++dp, ++_index) { \
         if (_index < length1) { \
             if (_index < length2) \
                 *dp = *curr1 op *curr2; \
@@ -1735,10 +1735,10 @@ string_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
 #define BITWISE_NOT_STRING(type, s, res) \
 do { \
-    if (s && res) { \
-        const type   *curr   = (type *)s->strstart; \
-        size_t        length = s->strlen; \
-        Parrot_UInt1 *dp     = (Parrot_UInt1 *)res->strstart; \
+    if ((s) && (res)) { \
+        const type   *curr   = (type *)(s)->strstart; \
+        size_t        length = (s)->strlen; \
+        Parrot_UInt1 *dp     = (Parrot_UInt1 *)(res)->strstart; \
  \
         for (; length ; --length, ++dp, ++curr) \
             *dp = 0xFF & ~ *curr; \
