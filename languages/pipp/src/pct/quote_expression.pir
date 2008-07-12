@@ -9,11 +9,11 @@ PHP 5.3 has four kinds of literal strings.
 
 =item single quoted
 
-Single quotes need to be escaped with a backslash. 
+Single quotes need to be escaped with a backslash.
 A backslash escapes a following backslash.
 A literal backslash needs to be escaped at end of string, as otherwise the delimiting single quote
 would be recognised as a literal single quote.
-Backslashes that preceede any other character besides backslash or single quote are literal. 
+Backslashes that preceede any other character besides backslash or single quote are literal.
 
 =item double quoted
 
@@ -23,7 +23,7 @@ Backslash notation for
 Octal notation for chars: \[0-7]{1,3}
 Hex notation for chars: \x[0-9A-Fa-f]{1,2}
 
-=item heredoc 
+=item heredoc
 
    $param = 'dummy';
    $example = <<<EXAMPLE
@@ -34,7 +34,7 @@ Hex notation for chars: \x[0-9A-Fa-f]{1,2}
 Double quotes are literal.
 The backslashes before a double quote are literal.
 Unlike in Perl 5, the newline before the delimiter is not part of the string.
-   
+
 =item nowdoc
 
 A heredoc with single quotes.
@@ -83,7 +83,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
   opt_qq:
     options['s'] = 1        # interpolate variables
     options['c'] = 1        # interpolate stuff in '{ }', when there is a $ right after the '{'
-    options['b'] = 1        # Interpolate \n, \t, etc.    
+    options['b'] = 1        # Interpolate \n, \t, etc.
     options['q'] = 1        # Interpolate \\, \q and \' (or whatever)
     goto iter_loop
   iter_end:
