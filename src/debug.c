@@ -493,13 +493,15 @@ first frees the old one and updates it with the current one.
 
 Also prints the next line to run if the program is still active.
 
-The user input can't be longer than 255 characters.
+The user input can't be longer than DEBUG_CMD_BUFFER_LENGTH characters.
 
 The input is saved in C<< pdb->cur_command >>.
 
 =cut
 
 */
+
+#define DEBUG_CMD_BUFFER_LENGTH 255
 
 void
 PDB_get_command(PARROT_INTERP)
@@ -539,8 +541,8 @@ PDB_get_command(PARROT_INTERP)
     i = 0;
 
     /* RT #46109 who frees that */
-    /* need to allocate 256 chars as string is null-terminated i.e. 255 + 1*/
-    c = (char *)mem_sys_allocate(256);
+    /* need to allocate one more char as string is null-terminated */
+    c = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
 
     PIO_eprintf(interp, "\n(pdb) ");
 
@@ -549,8 +551,8 @@ PDB_get_command(PARROT_INTERP)
         ch = fgetc(stdin);
     } while (isspace((unsigned char)ch) && ch != '\n');
 
-    /* generate string (no more than 255 chars) */
-    while (ch != EOF && ch != '\n' && (i < 255)) {
+    /* generate string (no more than buffer length) */
+    while (ch != EOF && ch != '\n' && (i < DEBUG_CMD_BUFFER_LENGTH)) {
         c[i++] = (char)ch;
         ch     = fgetc(stdin);
     }
@@ -838,7 +840,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 {
     PDB_condition_t *condition;
     int              i, reg_number;
-    char             str[255];
+    char             str[DEBUG_CMD_BUFFER_LENGTH + 1];
 
     /* Return if no more arguments */
     if (!(command && *command)) {
@@ -994,7 +996,7 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
         condition->type               |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_str) {
-        for (i = 1; ((command[i] != '"') && (i < 255)); i++)
+        for (i = 1; ((command[i] != '"') && (i < DEBUG_CMD_BUFFER_LENGTH)); i++)
             str[i - 1] = command[i];
         str[i - 1] = '\0';
         condition->value = string_make(interp,
@@ -2190,7 +2192,7 @@ void
 PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 {
     FILE          *file;
-    char           f[255];
+    char           f[DEBUG_CMD_BUFFER_LENGTH + 1];
     int            i, c;
     PDB_file_t    *pfile;
     PDB_line_t    *pline;
