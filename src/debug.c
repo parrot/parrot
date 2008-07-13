@@ -396,6 +396,7 @@ debugger and then continue the normal execution of the program.
 
 */
 
+PARROT_API
 void
 Parrot_debugger_init(PARROT_INTERP)
 {
@@ -410,6 +411,7 @@ Parrot_debugger_init(PARROT_INTERP)
     pdb->state     |= PDB_RUNNING;
 }
 
+PARROT_API
 void
 Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
 {
@@ -423,6 +425,7 @@ Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
     string_cstring_free(file);
 }
 
+PARROT_API
 void
 Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 {
