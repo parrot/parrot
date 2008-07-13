@@ -84,7 +84,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
   opt_qq:
     options['s'] = 1        # interpolate variables
     options['c'] = 1        # interpolate stuff in '{ }', when there is a $ right after the '{'
-    options['b'] = 1        # Interpolate \n, \t, etc.
+    options['b'] = 1        # Interpolate \n, \t, etc. 'b' stands for backslash
     options['q'] = 1        # Interpolate \\, \q and \' (or whatever)
     goto iter_loop
   iter_end:
@@ -295,10 +295,6 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
   scan_loop:
     if pos > lastpos goto fail
     $S0 = substr target, pos, 1
-    #_dumper( target, pos, $S0 )
-    #_dumper( pos )
-    #_dumper( $S0 )
-    #_dumper( stop )
     if $S0 == stop goto succeed
     goto scan_loop_1
   scan_loop_1:
@@ -324,64 +320,57 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     if backchar == stop1 goto add_backchar
     unless optb goto add_litchar
     ##  handle :b options
-    $I0 = index "0abefnrtxdo123456789", backchar
-    if $I0 < 0 goto add_backchar
-    if $I0 >= 11 goto fail_backchar_digit
-    if $I0 >= 8 goto scan_xdo
-    litchar = substr "\0\a\b\e\f\n\r\t", $I0, 1
-    if $I0 >= 1 goto add_litchar2
-    ##  peek ahead for octal digits after \0
-    $I0 = pos + 2
-    $S0 = substr target, $I0, 1
-    $I0 = index "01234567", $S0
-    if $I0 >= 0 goto fail_backchar_digit
+    $I0 = index "vfnrt\\$\"x0123456789", backchar
+    if $I0 < 0 goto add_backslash_and_backchar
+    if $I0 >  8 goto scan_octal
+    if $I0 == 8 goto scan_hex
+    litchar = substr "\v\f\n\r\t\\$\"", $I0, 1
   add_litchar2:
     pos += 2
     literal .= litchar
     goto scan_loop
+  add_backslash_and_backchar:
+    literal .= '\'
   add_backchar:
-    literal .= backchar
     pos += 2
+    literal .= backchar
     goto scan_loop
   add_litchar:
+    pos += 1
     literal .= litchar
-    inc pos
     goto scan_loop
 
-  scan_xdo:
-    ##  handle \x, \d, and \o escapes.  start by converting
-    ##  the backchar into 8, 10, or 16 (yes, it's a hack
-    ##  but it works).  Then loop through the characters
+  
+    .local int base, decnum
+  scan_octal:
+    base = 8
+    pos += 1     # octal digits come right after the '\'
+    goto got_base
+  scan_hex:
+    base = 16
+    pos += 2     # skip the 'x'
+  got_base:
+    ##  Handle hex and octal escapes.
+    ##  The base is either 8 or 16.
+    ##  Then loop through the characters
     ##  that follow to compute the decimal value of codepoints,
     ##  and add the codepoints to our literal.
-    .local int base, decnum, isbracketed
-    base = index '        o d     x', backchar
     decnum = 0
-    pos += 2
     $S0 = substr target, pos, 1
-    isbracketed = iseq $S0, '['
-    pos += isbracketed
-  scan_xdo_char_loop:
+  scan_xo_char_loop:
     $S0 = substr target, pos, 1
     $I0 = index '0123456789abcdef0123456789ABCDEF', $S0
-    if $I0 < 0 goto scan_xdo_char_end
+    if $I0 < 0 goto scan_xo_char_end
     $I0 %= 16
-    if $I0 >= base goto scan_xdo_char_end
+    if $I0 >= base goto scan_xo_char_end
     decnum *= base
     decnum += $I0
     inc pos
-    goto scan_xdo_char_loop
-  scan_xdo_char_end:
+    goto scan_xo_char_loop
+  scan_xo_char_end:
     $S1 = chr decnum
     concat literal, $S1
-    unless isbracketed goto scan_xdo_end
-    if $S0 == ']' goto scan_xdo_end
-    if $S0 != ',' goto fail
-    inc pos
-    decnum = 0
-    goto scan_xdo_char_loop
-  scan_xdo_end:
-    pos += isbracketed
+  scan_xo_end:
     goto scan_loop
 
   succeed:
@@ -389,7 +378,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     mob.'to'(pos)
     .return (mob)
   fail_backchar_digit:
-    self.panic('\123 form deprecated, use \o123 instead')
+    self.panic('encountered invalid octal digit')
   fail:
     mob.'to'(-1)
     .return (mob)
