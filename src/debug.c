@@ -144,11 +144,6 @@ PARROT_CANNOT_RETURN_NULL
 static const char * skip_command(ARGIN(const char *str))
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char * skip_ws(ARGIN(const char *str))
-        __attribute__nonnull__(1);
-
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -184,28 +179,6 @@ nextarg(ARGIN_NULLOK(const char *command))
     }
 
     return command;
-}
-
-/*
-
-=item C<static const char * skip_ws>
-
-Returns the pointer past any whitespace.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char *
-skip_ws(ARGIN(const char *str))
-{
-    /* as long as str is not NULL and it contains space, skip it */
-    while (*str && isspace((unsigned char) *str))
-        str++;
-
-    return str;
 }
 
 /*
