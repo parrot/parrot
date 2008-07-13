@@ -7,6 +7,8 @@ New in 0.6.4
     - Support for a lot of builtin functions.
     - Pipp now uses PHP specific data types.
     - Converted from PCT with TGE to PCT with NQP actions
+- Tools
+  + pbc_disassemble renamed from disassemble
 
 New in 0.6.3
 - Specification
