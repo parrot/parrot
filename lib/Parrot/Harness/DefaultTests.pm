@@ -90,6 +90,7 @@ our @EXPORT_OK = qw(
         c_cppcomments.t
         c_header_guards.t
         c_indent.t
+        c_macro_args.t
         c_operator.t
         c_parens.t
         c_returns.t
