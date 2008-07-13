@@ -306,7 +306,3 @@ src/parrot_config.c                               [main]
 src/string_private_cstring.h                      [main]include
 tools/build/dynpmc.pl                             [devel]
 tools/install/smoke.pl                            [main]
-# Local variables:
-#   mode: text
-#   buffer-read-only: t
-# End:
