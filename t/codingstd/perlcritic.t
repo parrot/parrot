@@ -71,16 +71,15 @@ t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
 
  % prove t/codingstd/perlcritic.t
 
- % perl --theme=extra t/codingstd/perlcritic.t
-
- % perl t/codingstd/perlcritic.t <file>
+ % perl t/codingstd/perlcritic.t [--theme=sometheme] [file]
 
 =head1 DESCRIPTION
 
-Tests all perl source files for some very specific perl coding violations.
+By default, tests all perl source files for some very specific perl coding
+violations.
 
-Optionally specify directories or files on the command line to test B<only>
-those files, otherwise all perl 5 files in the C<MANIFEST> will be checked.
+Optionally specify a file on the command line to test B<only>
+that file.
 
 This test uses a standard perlcriticrc file, located in
 F<tools/utils/perlcritic.conf>
@@ -88,9 +87,6 @@ F<tools/utils/perlcritic.conf>
 If you wish to run a specific policy, the easiest way to do so is to
 temporarily add a custom theme to the configuration file and then specify
 that on the command line to this script.
-
-If you wish to test a specific file, you can pass that as an argument on the
-command line.
 
 =cut
 
