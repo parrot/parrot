@@ -340,7 +340,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     literal .= litchar
     goto scan_loop
 
-  
+
     .local int base, decnum
   scan_octal:
     base = 8
