@@ -37,16 +37,19 @@ Test::Perl::Critic->import(
 );
 
 my $dist = Parrot::Distribution->new();
-my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages' );
+
+# We want to skip any language's perl files except those which have declared
+# they wish to be tested. Language developers: don't break the build!
+
+my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages');
+my $keep_languages = qr/^\Q$languages_dir$PConfig{slash}\E(?!tcl)/;
 
 my @files;
 if ( !@ARGV ) {
-
-    # Skip any files in languages/
-    @files = grep { ! m{^\Q$languages_dir\E} }
+    
+    @files = grep {! m/$keep_languages/}
              map { $_->path }
              $dist->get_perl_language_files();
-
 } else {
     @files = @ARGV;
 }

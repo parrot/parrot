@@ -123,7 +123,7 @@ sub parse_usage {
         $arg->{optional}  = !!$1;
         $arg->{option}    = !!$2;
         $arg->{name}      = $3;
-        $arg->{type}      = [ grep length, split( ':', $4 ) ];
+        $arg->{type}      = [ grep length, split( /:/, $4 ) ];
         $arg->{default}   = $5;
         $arg->{repeating} = $6 eq '+';
 

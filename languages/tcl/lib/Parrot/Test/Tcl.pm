@@ -3,7 +3,11 @@ package Parrot::Test::Tcl;
 # Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
+use strict;
 use warnings;
+use vars qw($language);
+no strict qw(refs);
+
 use File::Basename;
 
 require Parrot::Test;
@@ -33,7 +37,7 @@ foreach my $func ( keys %language_test_map ) {
 
         my ( $self, $code, $output, $desc ) = @_;
 
-        $count = $self->{builder}->current_test + 1;
+        my $count = $self->{builder}->current_test + 1;
 
         $desc = $language unless $desc;
 
@@ -66,8 +70,7 @@ foreach my $func ( keys %language_test_map ) {
         my $lang_f = Parrot::Test::per_test( '.tcl', $count );
         my $out_f  = Parrot::Test::per_test( '.out', $count );
 
-        $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-        my $args = $TEST_PROG_ARGS;
+        my $args = $ENV{TEST_PROG_ARGS} || '';
 
         Parrot::Test::write_code_to_file( $code, $lang_f );
 
