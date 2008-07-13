@@ -1830,6 +1830,8 @@ Signatures:
   f flatten
   n named
   s slurpy
+  o optional
+  p opt flag
 
   -> is the separator between args and results, similar to type theory notation.
 
@@ -1917,24 +1919,41 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
 
     /* first loop through signature to get sizing info */
     for (x = signature; *x != '\0'; x++) {
-        /* detect -> separator */
-        if (*x == '-') {
-            seen_arrow = 1 ;
-        }
-        else if (isupper((unsigned char)*x)) {
-             /* calculate needed length of arg and result sig FIAs */
-            arg_ret_cnt[seen_arrow]++;
-
-            /* calculate max reg types (INSP) needed in context */
-            switch (*x) {
-                case 'I': max_regs[seen_arrow * 4 + REGNO_INT]++; break;
-                case 'N': max_regs[seen_arrow * 4 + REGNO_NUM]++; break;
-                case 'S': max_regs[seen_arrow * 4 + REGNO_STR]++; break;
-                case 'P': max_regs[seen_arrow * 4 + REGNO_PMC]++; break;
-                default:
+        switch (*x) {
+            case '-':
+                /* detect -> separator */
+                seen_arrow = 1 ;
+                ++x;
+                if (*x != '>')
                     real_exception(interp, NULL, E_IndexError,
-                        "Parrot_PCCINVOKE: invalid reg type %c!", *x);
-            }
+                        "Parrot_PCCINVOKE: invalid signature separator %c!",
+                        *x);
+                break;
+            case 'I':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_INT]++;
+                break;
+            case 'N':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_NUM]++;
+                break;
+            case 'S':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_STR]++;
+                break;
+            case 'P':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_PMC]++;
+                break;
+            case 'f':
+            case 'n':
+            case 's':
+            case 'o':
+            case 'p':
+                break;
+            default:
+                real_exception(interp, NULL, E_IndexError,
+                    "Parrot_PCCINVOKE: invalid reg type %c!", *x);
         }
     }
 
