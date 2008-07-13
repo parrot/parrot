@@ -147,15 +147,14 @@ reaches 0, delete the entry.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         Hash       * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
-        HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
+        void       *oldval      = parrot_hash_get(INTERP, hash, key);
+        long        newval      = 1;
+        UNUSED(value);
 
-        /* these casts look bad, but they avoid type punning warnings with -O */
-        if (b) {
-            long val = (long)b->value;
-            b->value = (void *)(++val);
-        }
-        else
-            parrot_hash_put(INTERP, hash, key, (void *)1);
+        if (oldval)
+            newval += (long)oldval;
+
+        parrot_hash_put(INTERP, hash, key, (void *)newval);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
