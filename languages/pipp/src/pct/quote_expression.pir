@@ -9,7 +9,8 @@ PHP 5.3 has four kinds of literal strings.
 
 =item single quoted
 
-Single quotes need to be escaped with a backslash.
+There is neither variable nor special character interpolation within single quotes.
+Single quotes need to be escaped with a backslash in order to be not taken for the delimiter.
 A backslash escapes a following backslash.
 A literal backslash needs to be escaped at end of string, as otherwise the delimiting single quote
 would be recognised as a literal single quote.
