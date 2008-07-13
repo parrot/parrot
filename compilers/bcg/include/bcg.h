@@ -14,7 +14,7 @@
                              switch (setjmp((bcg_info)->jump_location)) { \
                                case 0:
 #define BCG_CATCH(excp)          break; \
-                               case excp:
+                               case (excp):
 #define BCG_END_TRY          default: break; \
                                } \
                           } while (0)

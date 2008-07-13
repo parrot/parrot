@@ -19,8 +19,7 @@
 
 /* Declarations of accessors */
 
-#define CSTRING_WITH_LEN(s) (s ""), (sizeof (s)-1)
-#define string_from_literal(i, s) string_from_cstring((i), CSTRING_WITH_LEN(s))
+#define string_from_literal(i, s) string_from_cstring((i), (s), (sizeof (s)-1))
 #define Parrot_unCOW_string(i, s) PObj_COW_TEST((s)) ? \
     Parrot_unmake_COW((i), (s)), (s) : (s)
 

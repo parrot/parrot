@@ -307,7 +307,7 @@ typedef enum PObj_enum {
         (PObj_get_FLAGS(o) &= ~(UINTVAL)(PObj_ ## flag ## _FLAG))
 
 #define PObj_flags_SETTO(o, f) PObj_get_FLAGS(o) = (f)
-#define PObj_flags_CLEARALL(o) PObj_flags_SETTO(o, 0)
+#define PObj_flags_CLEARALL(o) PObj_flags_SETTO((o), 0)
 
 #define PObj_COW_TEST(o) PObj_flag_TEST(COW, o)
 #define PObj_COW_SET(o) PObj_flag_SET(COW, o)
