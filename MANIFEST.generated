@@ -26,8 +26,6 @@ config/gen/platform/ansi/time.c                   [main]
 config/gen/platform/darwin/memalign.c             [main]
 config/gen/platform/generic/stat.c                [main]
 config/gen/platform/win32/stat.c                  [main]
-disassemble                                       [main]bin
-disassemble.exe                                   [main]bin
 docs/ops/bit.pod                                  [main]doc
 docs/ops/cmp.pod                                  [main]doc
 docs/ops/core.pod                                 [main]doc
@@ -74,6 +72,8 @@ installable_pdump                                 [main]bin
 installable_pdump.exe                             [main]bin
 libparrot.dll                                     [main]bin
 parrot.pc                                         [main]pkgconfig
+pbc_disassemble                                   [main]bin
+pbc_disassemble.exe                               [main]bin
 pbc_info                                          [main]bin
 pbc_info.exe                                      [main]bin
 pbc_merge                                         [main]bin
