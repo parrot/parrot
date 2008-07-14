@@ -132,7 +132,7 @@ sub parse_usage {
 
         die "Optionals need to be optional.\n"
             if $arg->{option}
-            and not $arg->{optional};
+                and not $arg->{optional};
 
         push @results, $arg;
     }
@@ -415,7 +415,7 @@ sub inlined_body {
                 $code .= emit( "temp = a_${name}_%0()", 'loop_num' );
 
                 # if that's all there is, remove it
-                $line        =~ s/^\s*a_${name}_%0\s*$//m
+                $line =~ s/^\s*a_${name}_%0\s*$//m
                     or $line =~ s/a_${name}_%0/temp/;
             }
         }
@@ -471,7 +471,7 @@ sub inlined_badargs {
 
     my $usage = create_usage(@args);
     my $code =
-          "bad_args: \n"
+        "bad_args: \n"
         . "  .return(\"  tcl_error 'wrong # args: should be "
         . "\\\"$cmd$usage\\\"' \\n\") \n";
 

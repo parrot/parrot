@@ -79,7 +79,7 @@ foreach my $func ( keys %language_test_map ) {
         my $pass      = 0;
 
         my $executable =
-              File::Spec->join( $path_to_parrot, $self->{parrot} )
+            File::Spec->join( $path_to_parrot, $self->{parrot} )
             . " $args "
             . File::Spec->join( $path_to_tcl, 'tcl.pbc' );
         if ( defined( $ENV{PARROT_TCLSH} ) ) {
