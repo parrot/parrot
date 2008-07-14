@@ -166,7 +166,7 @@ really a public API.
         const int   val_is_NS =
             value->vtable->base_type == enum_class_NameSpace;
         PMC        *new_tuple = NULL;
-        PMC * const old       = parrot_hash_get(INTERP, NS_HASH(SELF), key);
+        PMC * const old       = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
         /* If it's a sub... */
         if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
