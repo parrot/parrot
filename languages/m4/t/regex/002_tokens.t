@@ -15,7 +15,7 @@ use Parrot::Test::PGE;
 
 # Tests for PGE
 my %regex = ( word     => q{^<[_a..zA..Z]><[_a..zA..Z0..9]>*},
-              string   => q{^`<-[`]>*'},
+              string   => q{^\\`<-[`]>*\\'},
               simple   => q{^<-[`#_a..zA..Z]>}, 
               comment  => q{^\#\N*\n}, 
             );
