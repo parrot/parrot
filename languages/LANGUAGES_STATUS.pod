@@ -1192,6 +1192,9 @@ run-time lexical word, class and variable scopes.
 Removed from the repository (C<languages/parakeet>)
 prior to 0.4.10, after having been broken since 0.0.11.
 
+Parakeet is also the name of a project the extends the Jikes RVM in order to run Parrot bytecode.
+See L<http://parakeet.wiki.sourceforge.net/>.
+
 =head2 BASIC/interpreter
 
 BASIC interpreter was written in PASM, and used the global stack. It was last
