@@ -15,11 +15,14 @@ New in 0.6.4
     - Support for a lot of builtin functions.
     - Pipp now uses PHP specific data types.
     - Converted from PCT with TGE to PCT with NQP actions
-    - Improvements in the PCT variant
+    - Improvements in the PCT variant by using optok parsing
     - Start to support objects
+  + pir
+    - Make simple assignments work
   + json
     - add a PCT-based implementation of JSON parsing
   + lolcode
+    - Improve handling of symbols
     - Add support for block handling
     - Add support for globals
   + Lua
@@ -35,6 +38,9 @@ New in 0.6.4
     - Declaration of lists of variables now work
     - Improvements to test infrastructure
     - 910 more passing spec tests since last release
+- Compilers
+  + PCT:
+    - Allow subroutine and method names to be a PAST tree that produces the name.
 - Tools
   + pbc_disassemble renamed from disassemble
 - Implementation
