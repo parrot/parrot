@@ -38,20 +38,34 @@ Test::Perl::Critic->import(
 
 my $dist = Parrot::Distribution->new();
 
-# We want to skip any language's perl files except those which have declared
-# they wish to be tested. Language developers: don't break the build!
-
-my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages');
-my $keep_languages = qr/^\Q$languages_dir$PConfig{slash}\E(?!eclectus|hq9plus|m4|pipp|tcl)/;
-
 my @files;
 if ( !@ARGV ) {
+
+    # We want to skip any language's perl files except those which have declared
+    # they wish to be tested. Language developers: don't break the build!
+
+    my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages');
+    my $filter_languages = qr/
+        ^ \Q $languages_dir $PConfig{slash} \E
+	(?!eclectus|hq9plus|m4|pipp|tcl)
+    /x;
     
-    @files = grep {! m/$keep_languages/}
+    @files = grep {! m/$filter_languages/}
              map { $_->path }
              $dist->get_perl_language_files();
 } else {
-    @files = @ARGV;
+    my $node = shift;
+    if (-f $node) {
+        @files = ($node);
+    } elsif (-d $node) {
+
+        $node = File::Spec->rel2abs( $node );
+        @files = grep { m/^$node/ }
+                 map { $_->path }
+                 $dist->get_perl_language_files();
+    } else {
+        die "invalid file '$node' specified.\n";
+    }
 }
 
 plan(tests => scalar(@files));
@@ -74,7 +88,7 @@ t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
 
  % prove t/codingstd/perlcritic.t
 
- % perl t/codingstd/perlcritic.t [--theme=sometheme] [file]
+ % perl t/codingstd/perlcritic.t [--theme=sometheme] [file|directory]
 
 =head1 DESCRIPTION
 
@@ -82,7 +96,8 @@ By default, tests all perl source files for some very specific perl coding
 violations.
 
 Optionally specify a file on the command line to test B<only>
-that file.
+that file. If you specify a directory, any perl files under that directory
+are tested.
 
 This test uses a standard perlcriticrc file, located in
 F<tools/utils/perlcritic.conf>
