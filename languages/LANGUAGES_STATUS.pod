@@ -705,7 +705,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.4
 
 =item Location
 
