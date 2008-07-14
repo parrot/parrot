@@ -17,7 +17,7 @@ Parrot.  If you're reading this yourself, use F<Configure.pl>
 use strict;
 use warnings;
 
-BEGIN { require 5.008_000 }
+BEGIN { require 5.008 }
 
 my %translations =
 (

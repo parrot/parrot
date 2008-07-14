@@ -3,7 +3,7 @@
 # Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-use 5.008_000;
+use 5.008;
 use strict;
 use warnings;
 use lib 'lib';
