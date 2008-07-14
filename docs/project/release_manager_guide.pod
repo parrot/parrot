@@ -68,11 +68,13 @@ The date of the next release is in L<Appendix 2|"Appendix 2 - Upcoming releases"
 
 =item C<rt.tracking>
 
-Create a new ticket for the next release.  Change the URL fragment here to use
-that ticket's number.  Please use the release month in the ticket, and *don't*
-use the release number.  Releases are date-based, while release numbers are
-feature-based.  Project team members agree on the release number near the
+Create a new RT-ticket for the next release.
+Please use the release month in the ticket, and *do not*
+use the release number. Releases are date-based, while release numbers are
+feature-based. Project team members agree on the release number near the
 actual release, based on the features available in trunk at the time.
+Mark the ticket for the next release as dependent on the current release. 
+Change the URL fragment in rt.tracking to use the number of the ticket for the next release.
 
 =item C<rt.saved_search>
 
@@ -93,16 +95,20 @@ Make sure F<RESPONSIBLE_PARTIES> is still accurate.
 
 =item e
 
+Give yourself credit for the release in F<CREDITS>.
+
+=item f
+
 Configure parrot and run C<make distro_tests>, and either fix
 what those tests complain about, or fix them so they don't complain.
 
-=item f
+=item g
 
 Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
 to update version and fingerprint in the native tests.
 You may check with C<perl t/native_pbc/*.t>
 
-=item g
+=item h
 
 Make sure everything works:
 
