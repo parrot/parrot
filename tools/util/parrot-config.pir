@@ -59,8 +59,8 @@ ok2:
     end
 dump:
    .local pmc iter
-    .include "iterator.pasm"
-    new iter, .Iterator, conf_hash
+    .include 'iterator.pasm'
+    new iter, 'Iterator', conf_hash
     iter = .ITERATE_FROM_START
 iter_loop:
     unless iter goto iter_end
