@@ -2,60 +2,64 @@
 
 New in 0.6.4
 - Documentation
-  + Remove a lot of old information from the FAQ
-  + Improve function level documentation
+  + removed a lot of old information from the FAQ
+  + improved function level documentation
 - Configuration
-  + Remove the configuration item 'has_gnu_m4'
-  + Refactor ICU-detection
+  + removed the configuration item 'has_gnu_m4'
+  + refactored ICU-detection
 - Languages
   + ChitChat
-    - Work on the Smalltalk implementation
+    - new Smalltalk implementation
   + Pipp
-    - Renamed Plumhead to Pipp
-    - Support for a lot of builtin functions.
+    - renamed Plumhead to Pipp
+    - support for a lot of builtin functions.
     - Pipp now uses PHP specific data types.
-    - Converted from PCT with TGE to PCT with NQP actions
-    - Improvements in the PCT variant by using optok parsing
-    - Start to support objects
+    - converted from PCT with TGE to PCT with NQP actions
+    - improvements in the PCT variant by using optok parsing
+    - start of object support
   + pir
-    - Make simple assignments work
+    - simple assignments work
   + json
-    - add a PCT-based implementation of JSON parsing
+    - added a PCT-based implementation of JSON parsing
   + lolcode
-    - Improve handling of symbols
-    - Add support for block handling
-    - Add support for globals
+    - improved handling of symbols
+    - added support for block handling
+    - added support for globals
   + Lua
     - more tests
   + Rakudo
-    - Implemented Enums
-    - Runtime mixing of roles with 'does' and 'but'
-    - Added generic type declarations
-    - Better handling of contextual variables
-    - Method calls on $_ work implicitly
-    - Many improvements for complex math
-    - Moved many builtins to class Any
-    - Declaration of lists of variables now work
-    - Improvements to test infrastructure
+    - implemented Enums
+    - added runtime mixing of roles with 'does' and 'but'
+    - added generic type declarations
+    - improved contextual variable handling
+    - method calls on $_ work implicitly
+    - many improvements for complex math
+    - moved many builtins to class Any
+    - declaration of lists of variables now work
+    - improved test infrastructure
     - 910 more passing spec tests since last release
 - Compilers
   + PCT:
-    - Allow subroutine and method names to be a PAST tree that produces the name.
+    - allowed subroutine and method names to be a PAST tree that produces the name
 - Tools
   + pbc_disassemble renamed from disassemble
 - Implementation
-  + allow .macro_const in PIR
-  + add the flag :lexid(...) for subroutines
-  + Make multiple dispatch work when you have your own sub type
-  + Fix garbage collection bug related to the metadata attached to a PMC_EXT structure
-  + Emit a warning when deprecated opcodes are used
-  + Simplify the stacks implementation
+  + allowed .macro_const in PIR
+  + added the flag :lexid(...) for subroutines
+  + made multiple dispatch work for sub types
+  + fixed garbage collection bug related to the metadata attached to a PMC_EXT structure
+  + added a warning when using deprecated opcodes
+  + simplified the stacks implementation
+  + fixed C++ build
+  + improved closure and lexical support
+  + improved IMCC register allocator
+  + added cache for all runtime-constant strings, reducing memory usage
 - Miscellaneous
-  + Improve OpenGL/GLU/GLUT bindings
-  + Use a standard profile for Perl::Critic coding standard testing
-  + Add support for smoke testing with Smolder
-  + Make use of Test::Harness 3.0 if available, but don't require it for 'make test' 
-  + Add the executable 'parrot_config'
+  + improved OpenGL/GLU/GLUT bindings
+  + added a standard profile for Perl::Critic coding standard testing
+  + added support for smoke testing with Smolder
+  + enabled use of Test::Harness 3.0 if available, but don't require it for 'make test'
+  + added the executable 'parrot_config' to query Parrot configuration
 
 New in 0.6.3
 - Specification
