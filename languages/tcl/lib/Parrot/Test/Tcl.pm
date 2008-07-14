@@ -50,7 +50,7 @@ foreach my $func ( keys %language_test_map ) {
         #  languages/tcl
         #  languages/tcl/t
 
-        my $path_to_parrot = $INC{"Parrot/Config.pm"};
+        my $path_to_parrot = $INC{'Parrot/Config.pm'};
         $path_to_parrot =~ s:/lib/Parrot/Config.pm$::;
         my $dir_count = scalar( File::Spec->splitdir($path_to_parrot) );
         my $path_to_tcl;
