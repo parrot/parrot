@@ -28,19 +28,24 @@ New in 0.6.4
   + Lua
     - more tests
   + Rakudo
-    - implemented Enums
+    - updated Range implementation
+    - added enums
+    - added generic type declarations (::T)
     - added runtime mixing of roles with 'does' and 'but'
     - added generic type declarations
-    - improved contextual variable handling
-    - method calls on $_ work implicitly
-    - many improvements for complex math
+    - fixed handling of implicit lexicals ($_, $!, and $/)
+    - fixed implicit method calls on $_
+    - improved complex math builtins, added Complex
     - moved many builtins to class Any
     - declaration of lists of variables now work
     - improved test infrastructure
-    - 910 more passing spec tests since last release
+    - 910 additional passing spec tests since last release
+    - more convergence with STD.pm grammar
+    - added named 0-ary parsing and ops
 - Compilers
   + PCT:
     - allowed subroutine and method names to be a PAST tree that produces the name
+    - Improved lexical handling
 - Tools
   + pbc_disassemble renamed from disassemble
 - Implementation
