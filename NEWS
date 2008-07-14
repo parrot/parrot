@@ -33,6 +33,8 @@ New in 0.6.4
     - Many improvements for complex math
     - Moved many builtins to class Any
     - Declaration of lists of variables now work
+    - Improvements to test infrastructure
+    - 910 more passing spec tests since last release
 - Tools
   + pbc_disassemble renamed from disassemble
 - Implementation
