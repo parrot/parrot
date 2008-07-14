@@ -250,6 +250,7 @@ sub print_manifest_skip {
     my $print_str = shift;
     open my $MANIFEST_SKIP, '>', $self->{skip}
         or die "Unable to open $self->{skip} for writing";
+    $print_str .= $text_file_coda;
     print $MANIFEST_SKIP $print_str;
     close $MANIFEST_SKIP
         or die "Unable to close $self->{skip} after writing";
