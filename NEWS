@@ -1,12 +1,29 @@
 # $Id$
 
 New in 0.6.4
+- Documentation
+  + Remove a lot of old information from the FAQ
+  + Improve function level documentation
+- Configuration
+  + Remove the configuration item 'has_gnu_m4'
+  + Refactor ICU-detection
 - Languages
+  + ChitChat
+    - Work on the Smalltalk implementation
   + Pipp
-    - Renamed from Plumhead
+    - Renamed Plumhead to Pipp
     - Support for a lot of builtin functions.
     - Pipp now uses PHP specific data types.
     - Converted from PCT with TGE to PCT with NQP actions
+    - Improvements in the PCT variant
+    - Start to support objects
+  + json
+    - add a PCT-based implementation of JSON parsing
+  + lolcode
+    - Add support for block handling
+    - Add support for globals
+  + Lua
+    - more tests
   + Rakudo
     - Implemented Enums
     - Runtime mixing of roles with 'does' and 'but'
@@ -18,6 +35,19 @@ New in 0.6.4
     - Declaration of lists of variables now work
 - Tools
   + pbc_disassemble renamed from disassemble
+- Implementation
+  + allow .macro_const in PIR
+  + add the flag :lexid(...) for subroutines
+  + Make multiple dispatch work when you have your own sub type
+  + Fix garbage collection bug related to the metadata attached to a PMC_EXT structure
+  + Emit a warning when deprecated opcodes are used
+  + Simplify the stacks implementation
+- Miscellaneous
+  + Improve OpenGL/GLU/GLUT bindings
+  + Use a standard profile for Perl::Critic coding standard testing
+  + Add support for smoke testing with Smolder
+  + Make use of Test::Harness 3.0 if available, but don't require it for 'make test' 
+  + Add the executable 'parrot_config'
 
 New in 0.6.3
 - Specification
