@@ -183,7 +183,7 @@ Minimal class hierarchy.
 
 =item Last verified with parrot version
 
-0.6.3
+0.6.4
 
 =item Location
 
@@ -206,7 +206,7 @@ Everything else is nonexistant.
 
 =item Last verified with parrot version
 
-0.6.3
+0.6.4
 
 =item Location
 
@@ -332,7 +332,7 @@ Planned.
 
 =item Last verified with parrot version
 
-0.6.2
+0.6.4
 
 =item Location
 
@@ -355,7 +355,7 @@ Much work needed on parse actions and data types (PMCs or classes.
 
 =item Last verified with parrot version
 
-0.6.1
+0.6.4
 
 =item Location
 
@@ -439,7 +439,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.3
+0.6.4
 
 =item Location
 
@@ -544,7 +544,7 @@ VISIBLE and BTW "work"
 
 =item Last verified with parrot version
 
-0.6.3
+0.6.4
 
 =item Location
 
@@ -753,7 +753,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.6.3
+0.6.4
 
 =item Location
 
@@ -781,7 +781,7 @@ builtins.
 
 =item Last verified with Parrot version
 
-0.6.3
+0.6.4
 
 =item Location
 
@@ -1032,7 +1032,7 @@ An example languages from the PCT tutorial.
 
 =item Last verified with parrot version
 
-0.6.3
+0.6.4
 
 =item Location
 
