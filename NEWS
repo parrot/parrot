@@ -7,6 +7,15 @@ New in 0.6.4
     - Support for a lot of builtin functions.
     - Pipp now uses PHP specific data types.
     - Converted from PCT with TGE to PCT with NQP actions
+  + Rakudo
+    - Implemented Enums
+    - Runtime mixing of roles with 'does' and 'but'
+    - Added generic type declarations
+    - Better handling of contextual variables
+    - Method calls on $_ work implicitly
+    - Many improvements for complex math
+    - Moved many builtins to class Any
+    - Declaration of lists of variables now work
 - Tools
   + pbc_disassemble renamed from disassemble
 
