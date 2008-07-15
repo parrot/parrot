@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -305,6 +305,32 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
     fba.'fill'(0)
     fba = thaw s
     say fba
+
+.end    
+
+CODE
+01001000100010010
+01001000100010010
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
+.sub main :main
+    .local pmc fba1, fba2
+    .local int i
+    .local string s
+
+    fba1 = new 'FixedBooleanArray'
+    fba1 = 17
+
+    fba1[1]  = 1
+    fba1[4]  = 1
+    fba1[8]  = 1
+    fba1[12] = 1
+    fba1[15] = 1
+
+    say fba1
+    fba2 = clone fba1
+    say fba2
 
 .end    
 
