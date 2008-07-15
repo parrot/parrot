@@ -41,7 +41,7 @@ set skipped_tests [dict create \
     switch-4.1 switch-4.5
     while-4.3
     while-old-4.6
-  } {RT# 39768} {
+  } {http://code.google.com/p/partcl/issues/detail?id=2} {
     subst-5.7
   } {[interp]} {
     basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
