@@ -127,8 +127,9 @@ escape sequences are processed.
 =item "double-quoted string constants"
 
 Are delimited by double-quotes (C<">). A C<"> inside a string must be escaped
-by C<\>.  Only 7-bit ASCII is accepted in string constants; to use characters
-outside that range, specify an encoding in the way below.
+by C<\>. The default encoding for a double-quoted string constant is 7-bit
+ASCII, other character sets and encodings must be marked explicitly using a
+charset or encoding flag.
 
 =item <<"heredoc",  <<'heredoc'
 
