@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -92,7 +92,7 @@ sub convert_tests {
 sub checkout_tests {
     print "Checking out tests from CVS\n";
 
-    my $tag = 'core-8-5-1';    # For the version we're targeting.
+    my $tag = 'core-8-5-2';    # For the version we're targeting.
 
     my $command =
         'cvs -z3 -d :pserver:anonymous:\@tcl.cvs.sourceforge.net:'
