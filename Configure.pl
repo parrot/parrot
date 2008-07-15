@@ -20,6 +20,7 @@ use Parrot::Configure::Messages qw(
     print_conclusion
 );
 use Parrot::Configure::Step::List qw( get_steps_list );
+use Parrot::Revision;
 
 $| = 1;    # $OUTPUT_AUTOFLUSH = 1;
 
@@ -51,6 +52,9 @@ my $parrot_version = $Parrot::Configure::Options::Conf::parrot_version;
 
 # from Parrot::Configure::Messages
 print_introduction($parrot_version);
+
+# Update revision number if needed
+Parrot::Revision::update();
 
 my $conf = Parrot::Configure->new();
 
