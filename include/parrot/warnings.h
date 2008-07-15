@@ -65,14 +65,6 @@ INTVAL Parrot_warn(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-INTVAL Parrot_warn_s(
-    NULLOK_INTERP,
-    INTVAL warnclass,
-    ARGIN(STRING *message),
-    ...)
-        __attribute__nonnull__(3);
-
-PARROT_API
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 

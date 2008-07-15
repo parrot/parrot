@@ -86,6 +86,14 @@ INTVAL Parrot_string_is_cclass(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_string_split(PARROT_INTERP,
+    ARGIN_NULLOK(STRING *delim),
+    ARGIN_NULLOK(STRING *str))
+        __attribute__nonnull__(1);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_string_trans_charset(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *src),
@@ -422,14 +430,6 @@ PMC* string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_string_split(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *delim),
-    ARGIN_NULLOK(STRING *str))
-        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
