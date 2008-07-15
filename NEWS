@@ -32,7 +32,6 @@ New in 0.6.4
     - added enums
     - added generic type declarations (::T)
     - added runtime mixing of roles with 'does' and 'but'
-    - added generic type declarations
     - fixed handling of implicit lexicals ($_, $!, and $/)
     - fixed implicit method calls on $_
     - improved complex math builtins, added Complex
