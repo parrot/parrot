@@ -129,7 +129,7 @@ are being run. It is not necessary to quiet all the codingstd tests for a releas
 When all is well, then commit your changes:
 
  svn diff | more
- svn commit -m 'Changes for Parrot release ....'
+ svn commit
 
 Write down the revision number from this commit. You will need it later.
 
