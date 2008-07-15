@@ -75,10 +75,10 @@ different objects over the lifetime of the program.
 Let's say you have written (or generated) a huge .pasm or .pir file.  It's not
 working. You'd like some help in figuring out why.
 
-=head2 pdb
+=head2 parrot_debugger
 
-One possible tool is C<pdb>, the Parrot Debugger. See F<docs/debugger.pod> for
-details on it.
+One possible tool is C<parrot_debugger>, the Parrot Debugger.
+See F<docs/debugger.pod> for details on it.
 
 =head2 stabs
 

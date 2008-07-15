@@ -467,7 +467,7 @@ DIS                 = $(CUR_DIR)/pbc_disassemble$(EXE)
 PDUMP               = $(CUR_DIR)/pdump$(EXE)
 PINFO               = $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE            = $(CUR_DIR)/pbc_merge$(EXE)
-PDB                 = $(CUR_DIR)/pdb$(EXE)
+PDB                 = $(CUR_DIR)/parrot_debugger$(EXE)
 PBC_TO_EXE          = $(CUR_DIR)/pbc_to_exe$(EXE)
 PARROT_CONFIG       = $(CUR_DIR)/parrot-config$(EXE)
 
@@ -886,16 +886,16 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 # Parrot Debugger
 #
 
-$(SRC_DIR)/pdb$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/parrot_debugger$(O) : $(GENERAL_H_FILES)
 
-$(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
+$(PDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/pdb$(O) \
+    $(SRC_DIR)/parrot_debugger$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
-$(INSTALLABLEPDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
+$(INSTALLABLEPDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/pdb$(O) \
+    $(SRC_DIR)/parrot_debugger$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 #
@@ -1606,7 +1606,7 @@ prog-clean :
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
-    $(PDB) $(SRC_DIR)/pdb$(O) \
+    $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
     $(DIS) $(SRC_DIR)/pbc_disassemble$(O) \
     $(SRC_DIR)/main$(O) \
@@ -1642,7 +1642,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
-    $(PDB) $(SRC_DIR)/pdb$(O) \
+    $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
     $(DIS) $(SRC_DIR)/pbc_disassemble$(O) \
     $(SRC_DIR)/null_config$(O) \
@@ -1720,7 +1720,7 @@ test-clean :
 	$(RM_F) \
      "t/tools/pmc2c.t_*" \
      "t/tools/pmc2c.pmc_t_*" \
-     "t/tools/pdb.t.*"
+     "t/tools/parrot_debugger.t.*"
 	$(RM_F) \
      "test$(EXE)" \
      "test.*"

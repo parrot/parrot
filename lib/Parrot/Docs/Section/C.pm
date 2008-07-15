@@ -249,7 +249,7 @@ sub new {
             $self->c_item(
                 '',
                 'pairs'   => ['debug'],
-                'sources' => ['pdb']
+                'sources' => ['parrot_debugger']
             ),
             $self->c_source_item( '', 'pbc_disassemble' ),
             $self->c_pair_item( '', 'trace' ),

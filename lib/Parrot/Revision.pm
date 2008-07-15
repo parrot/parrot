@@ -36,7 +36,7 @@ sub update {
             open my $FH, ">", $cache;
             print $FH "$revision\n";
             close $FH;
-	    $current = $revision;
+            $current = $revision;
         };
     }
 }
