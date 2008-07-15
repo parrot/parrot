@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 
 =head1 NAME
 
@@ -858,6 +858,65 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
 
     rba1[0]    = 1
     rba1[5000] = 1
+
+    rba2 = clone rba1
+
+    i = rba1[5000]
+    if i == 1 goto ok_0
+    print "nok 0 "
+
+ok_0:
+    i = pop rba1
+    if i == 1 goto ok_1
+    print "nok 1 "
+
+ok_1:
+    i = rba1
+    if i == 5000 goto ok_2
+    print "nok 2 "
+    print i
+
+ok_2:
+    i = pop rba2
+    if i == 1 goto ok_3
+    print "nok 3 "
+
+ok_3:
+    i = rba2
+    if i == 5000 goto ok_4
+    print "nok 4 "
+
+ok_4:
+    i = rba2[5000]
+    if i == 1 goto ok_5
+    print "nok 5 "
+
+ok_5:
+    i = pop rba2
+    if i == 1 goto ok_6
+    print "nok 6 "
+    end
+
+ok_6:
+    print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "clone (alternate)" );
+.sub _main
+    .local pmc rba1, rba2
+    .local int i
+    rba1 = new 'ResizableBooleanArray'
+
+    rba1[0]    = 1
+    rba1[4]    = 1
+    rba1[5004] = 1
+    i = shift rba1
+    i = shift rba1
+    i = shift rba1
+    i = shift rba1
 
     rba2 = clone rba1
 
