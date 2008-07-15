@@ -100,13 +100,15 @@ LIB_LOADED:
     #        int buffersize);
     dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
     store_global 'PCRE::NCI', 'PCRE_copy_substring', pcre_function
-	branch LIB_RETURN
+
+    # const char *pcre_version(void);
+    dlfunc pcre_function, libpcre, 'pcre_version', 't'
+    store_global 'PCRE::NCI', 'PCRE_version', pcre_function
+
+    .return( libpcre )
 
 LIB_FAILED:
     die "Failed to load libpcre"
-
-LIB_RETURN:
-    .return( libpcre )
 .end
 
 
@@ -184,6 +186,22 @@ Returns the match.
     .return( matched )
 .end
 
+
+=item sub (string)= version()
+
+=cut
+
+.sub version
+    .local pmc pcre_function
+
+    pcre_function= find_global 'PCRE::NCI', 'PCRE_version'
+
+    .local string ver
+
+    ver = pcre_function()
+
+    .return( ver )
+.end
 
 .include "library/config.pir"
 
