@@ -30,7 +30,7 @@ our $current = _get_revision();
 sub update {
     my $prev = _get_revision();
     my $current = _analyze_sandbox();
-    if ($current ne $prev) {
+    if (defined ($prev) && ($current ne $prev)) {
     	$current = 'unknown' unless defined $current;
         eval {
             open my $FH, ">", $cache;
