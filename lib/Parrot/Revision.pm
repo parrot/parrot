@@ -67,9 +67,11 @@ sub _get_revision {
 sub _analyze_sandbox {
     my $revision = 0;
     # code taken from pugs/util/version_h.pl rev 14410
+    # modified because in xml output commit and entry revision
+    # are difficult to distinguih in a simplified parsing
     my $nul = File::Spec->devnull;
-    if ( my @svn_info = qx/svn --xml info 2>$nul/ and $? == 0 ) {
-        if ( my ($line) = grep /^\s*revision=/, @svn_info ) {
+    if ( my @svn_info = qx/LANG=C svn info 2>$nul/ and $? == 0 ) {
+        if ( my ($line) = grep /^Revision:/, @svn_info ) {
             ($revision) = $line =~ /(\d+)/;
         }
     }
