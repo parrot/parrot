@@ -9,7 +9,7 @@ New in 0.6.4
   + refactored ICU-detection
 - Languages
   + ChitChat
-    - new Smalltalk implementation
+    - improved the Smalltalk implementation
   + Pipp
     - renamed Plumhead to Pipp
     - support for a lot of builtin functions.

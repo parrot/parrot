@@ -108,6 +108,7 @@ D: Bugfixes
 D: Eclectus, Scheme on Parrot
 D: Parrot m4
 D: Pipp, PHP on Parrot
+D: HQ9plus
 D: Release manager for Parrot 0.6.0 and Parrot 0.6.4 
 D: Tests for languages/lisp
 E: Bernhard.Schmalhofer@gmx.de

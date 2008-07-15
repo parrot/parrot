@@ -120,4 +120,6 @@ the strings?).
 
  smash     0.6.3          2008-Jun-17     "Beautiful Parrot"
 
+ Barney    0.6.4          2008-Jul-15     "St. Vincent Amazon"
+
 =cut

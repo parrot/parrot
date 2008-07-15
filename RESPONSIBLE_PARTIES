@@ -21,6 +21,7 @@ Release Manager                 Bob Rogers
                                 Jerry Gay
                                 chromatic
                                 Will Coleda
+                                Andrew Whitworth
 
 Metacommitter                   Allison Randal
                                 Jerry Gay
@@ -40,6 +41,7 @@ Core Developer                  Jonathan Worthington
                                 chromatic
                                 Chip Salzenberg
                                 Allison Randal
+                                Andrew Whitworth
 
 Compiler Developer              Vishal Soni (BCG, IMCC)
                                 Patrick Michaud (PGE, PCT)
@@ -51,6 +53,7 @@ High Level Language Developer   Patrick Michaud (Perl 6, NQP)
                                 Francois Perrad (Lua, Pipp (PHP))
                                 Bernhard Schmalhofer (Pipp (PHP), Eclectus (Scheme))
                                 Kevin Tew (Cardinal (Ruby))
+                                Christoh Otto (Pipp (PHP))
 
 Build Manager                   Joshua Hoblitt
 
