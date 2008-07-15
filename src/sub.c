@@ -527,6 +527,9 @@ parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     cont            = ctx->current_cont;
 
+    /* mark clos_pmc as having been created by newclosure. */
+    SUB_FLAG_flag_SET(NEWCLOSURE, clos_pmc);
+
     /* preserve this frame by converting the continuation */
     cont->vtable    = interp->vtables[enum_class_Continuation];
 
