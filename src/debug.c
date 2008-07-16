@@ -461,7 +461,7 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         }
 
         /* RT #42378 this is not ok */
-        //exit(EXIT_SUCCESS);
+        /*exit(EXIT_SUCCESS);*/
     }
     else {
         interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
