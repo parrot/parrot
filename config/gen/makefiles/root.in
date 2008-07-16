@@ -1587,7 +1587,7 @@ clean : \
 	$(RM_F) chartypes "*.s" "*~"
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
-	$(RM_F) lib/Parrot/OpLib
+	$(RM_RF) lib/Parrot/OpLib
 
 prog-clean :
 	$(RM_F) \
