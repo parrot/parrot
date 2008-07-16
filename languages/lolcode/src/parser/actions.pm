@@ -19,6 +19,7 @@ class lolcode::Grammar::Actions;
 
 method TOP($/) {
     my $block := $( $<block> );
+    $block.symbol('IT', :scope('lexical'));
     my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
     $block.unshift($it);
     make $block;
@@ -198,7 +199,7 @@ method block($/,$key) {
     our @?BLOCK;
     if $key eq 'open' {
         our $?BLOCK_SIGNATURE;
-        $?BLOCK := PAST::Block.new( PAST::Stmts.new(), :node($/) );
+        $?BLOCK := PAST::Block.new( PAST::Stmts.new(), :node($/), :lexical(1) );
         @?BLOCK.unshift($?BLOCK);
         my $iter := $?BLOCK_SIGNATURE.iterator();
         $?BLOCK.arity(0);
@@ -229,31 +230,105 @@ method bang($/) {
     make PAST::Val.new( :value( ~$/ ), :returns('String'), :node($/) );
 }
 
-method expression($/) {
-    my $past := PAST::Op.new( :name('expr_parse'), :pasttype('call'), :node( $/ ) );
-    for $<tokens> {
-        my $name := ~$_<identifier>;
-        if($_<identifier>) {
-            my $foo := lookup($name);
-            our $?BLOCK;
-            our @?BLOCK;
-            if $?BLOCK.symbol($name) && $?BLOCK.symbol($name)<scope> {
-                $past.push(PAST::Var.new(:name($name), :scope($?BLOCK.symbol($name)<scope>)));
-            }
-            else {
-                my $inline := '%r = find_name "' ~ $_<identifier> ~ '"';
-                $past.push(PAST::Op.new( :inline($inline) ));
-            }
-        }
-        elsif($_ eq "MKAY"){
-            my $inline := '%r = find_name "MKAY"';
-            $past.push(PAST::Op.new( :inline($inline) ));
+sub find_in_blocks($name) {
+    our $?BLOCK;
+    our @?BLOCK;
+    if $?BLOCK.symbol(~$name) {
+        return $?BLOCK.symbol($name);
+    }
+    for @?BLOCK {
+        if $_.symbol(~$name) { return $_.symbol($name); }
+    }
+    return 0;
+}
+
+sub is_sub($name) {
+    my $sym := find_in_blocks($name);
+    if $sym && defined($sym<arity>) { return 1; }
+    my $lex := lookup($name);
+    if lookup_class($lex) eq 'Sub' { return 1; }
+    return 0;
+}
+
+sub get_item($name) {
+    if is_sub($name) {
+        return PAST::Op.new( :name($name), :pasttype('call') );
+    }
+    else {
+        my $var := PAST::Var.new(:name($name));
+        my $sym := find_in_blocks($name);
+        if $sym && defined($sym<scope>) { $var<scope> := $sym<scope> }
+        return $var;
+    }
+}
+
+sub get_arity($name) {
+    my $sym := find_in_blocks($name);
+    if $sym {
+        return $sym<arity>;
+    }
+    else {
+        my $lex := lookup($name);
+        my $ii := get_inspect_info($lex);
+        if $ii<pos_slurpy> {
+            return -1;
         }
         else {
-            $past.push( $( $_ ) );
+            return $lex.arity();
         }
     }
-    make $past;
+}
+
+method expression($/) {
+    my @subs;
+    my @vals;
+    my @arity;
+    my $mkay := 'mkay';
+
+    for $<tokens> {
+        if($_<identifier>) {
+            my $name := ~$_<identifier>;
+            my $item := get_item($name);
+            if is_sub($name) {
+                my $arity := get_arity($name);
+                $item<arity> := $arity;
+                @subs.push($item);
+                @arity.unshift($arity + 0);
+                if @arity[0] == -1 { @vals.push($mkay) }
+            }
+            else {
+                @vals.push($item);
+                if defined(@arity[0]) {@arity[0]--};
+            }
+        }
+        else {
+            my $item := $( $_ );
+            @vals.push($item);
+            if defined(@arity[0]) {@arity[0]--};
+        }
+
+        while defined(@arity[0]) && @arity[0] == 0 {
+            my $sub := @subs.pop();
+            @arity.shift();
+            my $arity := $sub<arity> + 0;
+            while $arity > 0 {
+                $sub.unshift(@vals.pop());
+                $arity--;
+            }
+            @vals.push($sub);
+            if defined(@arity[0]) {@arity[0]--};
+        }
+    }
+
+    if @vals[0] eq $mkay {
+        @vals.shift();
+        my $sub := @subs.pop();
+        while +@vals {
+            $sub.unshift(@vals.pop());
+        }
+        @vals.push($sub);
+    }
+    make @vals[0];
 }
 
 method integer($/) {

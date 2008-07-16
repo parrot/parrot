@@ -46,8 +46,7 @@ BUILTINS_PIR = \
   src/builtins/say.pir \
   src/builtins/expr_parse.pir \
   src/builtins/math.pir \
-  src/builtins/cmp.pir \
-  src/builtins/var_or_function.pir
+  src/builtins/cmp.pir
 
 # PMCS = lolcode
 # PMC_SOURCES = $(PMC_DIR)/lolcode.pmc

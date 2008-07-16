@@ -6,13 +6,19 @@ HAI 1.2
   IF U SAY SO
 
   HOW DUZ I increment
+    I HAS A FARAWAY testcount
     testcount R SUM OF testcount AN 1
   IF U SAY SO
 
+  HOW DUZ I report
+    I HAS A FARAWAY testcount
+    VISIBLE "ok " AN testcount
+  IF U SAY SO
+
   setup
-  VISIBLE "ok " AN testcount
+  report
   increment
-  VISIBLE "ok " AN testcount
+  report
 
   BTW vim: set filetype=lolcode :
 KTHXBYE
