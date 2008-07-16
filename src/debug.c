@@ -22,6 +22,7 @@ the Parrot debugger, and the C<debug> ops.
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "interp_guts.h"
 #include "parrot/oplib.h"
 #include "trace.h"
@@ -401,12 +402,16 @@ void
 Parrot_debugger_init(PARROT_INTERP)
 {
     PDB_t *pdb;
+    Parrot_Interp debugger;
 
     if (interp->pdb)
         return;
 
     pdb             = mem_allocate_zeroed_typed(PDB_t);
+    debugger        = Parrot_new(interp);
     interp->pdb     = pdb;
+    debugger->pdb   = pdb;
+    pdb->debugee    = interp;
     pdb->cur_opcode = interp->code->base.data;
     pdb->state     |= PDB_RUNNING;
 }
@@ -437,6 +442,11 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
     if (!(interp->pdb->state & PDB_BREAK)) {
         const char * command;
+        new_internal_exception(interp);
+        if (setjmp(interp->exceptions->destination)) {
+            fprintf(stderr, "Unhandled exception in debugger\n");
+            return;
+        }
 
         interp->pdb->state     |= PDB_BREAK;
         interp->pdb->state     |= PDB_STOPPED;
@@ -451,11 +461,12 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         }
 
         /* RT #42378 this is not ok */
-        exit(EXIT_SUCCESS);
+        //exit(EXIT_SUCCESS);
     }
-
-    interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
-    PDB_set_break(interp, NULL);
+    else {
+        interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
+        PDB_set_break(interp, NULL);
+    }
 }
 
 /*
@@ -504,14 +515,17 @@ PDB_get_command(PARROT_INTERP)
     if ((pdb->state & PDB_STOPPED) && (pdb->state & PDB_RUNNING)) {
         PDB_line_t *line = pdb->file->line;
 
-        while (pdb->cur_opcode != line->opcode)
-            line = line->next;
+        while (line && pdb->cur_opcode != line->opcode) {
+                line = line->next;
+        }
 
-        PIO_eprintf(interp, "%li  ", line->number);
-        c = pdb->file->source + line->source_offset;
+        if (line) {
+            PIO_eprintf(interp, "%li  ", line->number);
+            c = pdb->file->source + line->source_offset;
 
-        while (c && (*c != '\n'))
-            PIO_eprintf(interp, "%c", *(c++));
+            while (c && (*c != '\n'))
+                PIO_eprintf(interp, "%c", *(c++));
+        }
     }
 
     i = 0;

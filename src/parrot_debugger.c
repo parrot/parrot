@@ -130,8 +130,8 @@ Parrot_debug().
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp     debugger = Parrot_new(NULL);
-    Parrot_Interp     interp   = Parrot_new(debugger);
+    Parrot_Interp     interp   = Parrot_new(NULL);
+    Parrot_Interp     debugger = Parrot_new(interp);
     PDB_t            *pdb      = mem_allocate_zeroed_typed(PDB_t);
     const char       *filename;
     char             *ext;
@@ -141,6 +141,7 @@ main(int argc, char *argv[])
 
     /* attach pdb structure */
     debugger->pdb    = pdb;
+    interp->pdb      = pdb;
     interp->debugger = debugger;
     pdb->debugee     = interp;
 
