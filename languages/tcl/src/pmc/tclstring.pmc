@@ -1,9 +1,6 @@
-/* TclString.pmc
- *  Copyright (C) 2001-2003, The Perl Foundation.
- *  SVN Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the TclString base class
+/*
+ *  Copyright (C) 2001-2008, The Perl Foundation.
+ *  $Id$
  */
 
 #include "parrot/embed.h"
@@ -20,16 +17,19 @@ pmclass TclString
 {
 
     METHOD get_list(STRING* str) {
-        PMC*   retval = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclList")));
-        INTVAL pos = -1; /* we're going to increment before we use it... */
-        INTVAL len;
-        INTVAL I0, I1, depth;
-        PMC* P0;
-        STRING* S0;
+        PMC*    retval = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclList")));
+        INTVAL  pos = -1;       /* we increment before we use it */
+        INTVAL  len;            /* length of the string */
+        INTVAL  character;      /* which character we're testing */
+        STRING* element_string; /* string chunk to add to the list */
+        INTVAL  element_length; /* size of chunk to add to list */
+        PMC*    element_pmc;    /* An item to add to the list */
+        INTVAL  peek_pos;       /* keep track of pos when scanning ahead */
+        INTVAL  depth;          /* keep track of nested {} pairs */
 
-        if (! str) {
+        if (! str)
              RETURN(PMC *SELF);
-        }
+
         /*
          * RT#48166 This prevents a segfault; retval gets claimed before it
          * it is used below without this register. This shouldn't happen
@@ -44,128 +44,132 @@ pmclass TclString
       loop:
         if (pos >= len) goto done;
 
-        I0 = string_ord(INTERP, str, pos);
-        if (I0 == '{') {
+        character = string_ord(INTERP, str, pos);
+        if (character == '{') {
             depth = 1;
-            I1 = pos;
+            peek_pos = pos;
           find_close_bracket:
-            I1++;
-            if (I1 >= len) {
+            peek_pos++;
+            if (peek_pos >= len) {
                 Parrot_unregister_pmc(INTERP, retval);
                 real_exception(INTERP, NULL, 1, "unmatched open brace in list");
             }
 
-            I0 = string_ord(INTERP, str, I1);
-            if (I0 == '{') {
+            character = string_ord(INTERP, str, peek_pos);
+            if (character == '{') {
                 depth++;
                 goto find_close_bracket;
             }
-            else if (I0 == '}')  {
+            else if (character == '}')  {
                 if (--depth) goto find_close_bracket;
 
-                I0 = I1 + 1;
-                if (I0 >= len) goto found_close_bracket;
-                if (!Parrot_string_is_cclass(INTERP, enum_cclass_whitespace, str, I0)) {
-                    I1++;
-                    I0 = len - I1;
-                    I0 = CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str, I1, I0);
-                    I0 = I0 - I1;
-                    S0 = string_substr(INTERP, str, I1, I0, &S0, 0);
+                if (peek_pos + 1 >= len) goto found_close_bracket;
+                if (!Parrot_string_is_cclass(INTERP, enum_cclass_whitespace, str, peek_pos + 1)) {
+                    STRING* follows_brace;
+                    INTVAL  chunk_length;
+                    INTVAL  ws_pos;
+                    peek_pos++;
+                    ws_pos = CHARSET_FIND_CCLASS(INTERP,
+                        enum_cclass_whitespace, str, peek_pos, len-peek_pos);
+                    chunk_length = ws_pos - peek_pos;
+                    follows_brace = string_substr(INTERP, str, peek_pos,
+                        chunk_length, &follows_brace, 0);
 
                     Parrot_unregister_pmc(INTERP, retval);
                     real_exception(INTERP, NULL, 1,
                             "list element in braces followed by \"%s\" instead of space",
-                            string_to_cstring(INTERP, S0));
+                            string_to_cstring(INTERP, follows_brace));
                 }
 
               found_close_bracket:
-                /* length -- if we have "{ }", pos and $I0 should both be 1 */
-                I0 = I1 - pos++ - 1;
-                S0 = string_substr(INTERP, str, pos, I0, &S0, 0);
-                pos = pos + I0 + 1;
+                element_length = peek_pos - pos++ - 1;
+                element_string = string_substr(INTERP, str, pos,
+                    element_length, &element_string, 0);
+                pos = pos + element_length + 1;
 
                 /* Now add that list as another element*/
-                VTABLE_push_string(INTERP, retval, S0);
+                VTABLE_push_string(INTERP, retval, element_string);
                 goto eat_space;
             }
-            else if (I0 == '\\') {
-                I1++;
+            else if (character == '\\') {
+                peek_pos++;
                 goto find_close_bracket;
             }
             else
               goto find_close_bracket;
             }
-        else if (I0 == '"') {
+        else if (character == '"') {
             /* find the closing '"'*/
-            I1 = ++pos;
+            peek_pos = ++pos;
           quote_loop:
-            if (I1 >= len) {
+            if (peek_pos >= len) {
                 Parrot_unregister_pmc(INTERP, retval);
                 real_exception(INTERP, NULL, 1, "unmatched open quote in list");
             }
-            I0 = string_ord(INTERP, str, I1);
-            if (I0 == '\\') {
-                I1 += 2;
+            character = string_ord(INTERP, str, peek_pos);
+            if (character == '\\') {
+                peek_pos += 2;
                 goto quote_loop;
             }
-            else if (I0 == '"') goto found_quote;
-            I1++;
+            else if (character == '"') goto found_quote;
+            peek_pos++;
             goto quote_loop;
         }
-        I0 = pos;
+        peek_pos = pos;
 
-        while (I0 < len) {
-            if ('\\' == string_ord(INTERP, str, I0)) {
-                I0 += 2;
+        while (peek_pos < len) {
+            if ('\\' == string_ord(INTERP, str, peek_pos)) {
+                peek_pos += 2;
                 continue;
             }
-            if (Parrot_string_is_cclass(INTERP, enum_cclass_whitespace, str, I0))
+            if (Parrot_string_is_cclass(INTERP, enum_cclass_whitespace, str, peek_pos))
                 break;
 
-            I0++;
+            peek_pos++;
         }
 
       extract:
         /*  extract the element */
-        I1 = I0 - pos;
-        S0 = string_substr(INTERP, str, pos, I1, &S0, 0);
+        element_length = peek_pos - pos;
+        element_string = string_substr(INTERP, str, pos, element_length, &element_string, 0);
 
         /* add it to the list*/
-        P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
-        VTABLE_set_string_native(INTERP, P0, S0);
-        VTABLE_push_pmc(INTERP, retval, P0);
+        element_pmc = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
+        VTABLE_set_string_native(INTERP, element_pmc, element_string);
+        VTABLE_push_pmc(INTERP, retval, element_pmc);
 
         /* find the next pos */
-        pos = I0;
+        pos = peek_pos;
         goto eat_space;
 
       found_quote:
-        I0 = I1 + 1;
-        if (I0 >= len) {
+        if (peek_pos + 1 >= len)
             goto found_close_quote;
-        }
 
-        if (!Parrot_string_is_cclass(INTERP, enum_cclass_whitespace, str, I0)) {
-            I1++;
-            I0 = len - I1;
-            I0 = CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str, I1, I0);
-            I0 = I0 - I1;
-            S0 = string_substr(INTERP, str, I1, I0, &S0, 0);
+        if (!Parrot_string_is_cclass(INTERP, enum_cclass_whitespace, str, peek_pos+1)) {
+            STRING* follows_quote;
+            INTVAL  chunk_length;
+            INTVAL  ws_pos;
+            peek_pos++;
+            ws_pos = CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str,
+                peek_pos, len - peek_pos);
+            chunk_length = ws_pos - peek_pos;
+            follows_quote = string_substr(INTERP, str, peek_pos, chunk_length, &follows_quote, 0);
             Parrot_unregister_pmc(INTERP, retval);
             real_exception(INTERP, NULL, 1,
                     "list element in quotes followed by \"%s\" instead of space",
-                    string_to_cstring(INTERP, S0));
+                    string_to_cstring(INTERP, follows_quote));
         }
 
      found_close_quote:
-        I0 = I1 - pos;
-        S0 = string_substr(INTERP, str, pos, I0, &S0, 0);
+        element_length = peek_pos - pos;
+        element_string = string_substr(INTERP, str, pos, element_length, &element_string, 0);
 
-        P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
-        VTABLE_set_string_native(INTERP, P0, S0);
-        VTABLE_push_pmc(INTERP, retval, P0);
+        element_pmc = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
+        VTABLE_set_string_native(INTERP, element_pmc, element_string);
+        VTABLE_push_pmc(INTERP, retval, element_pmc);
 
-        pos = I1 + 1;
+        pos = peek_pos + 1;
         goto eat_space;
 
       done:
