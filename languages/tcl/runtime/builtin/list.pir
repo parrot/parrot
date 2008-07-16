@@ -4,6 +4,17 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace []
 
+# RT #56958 We should be getting a TclList as a result of :slurpy
+# The sub should be this simple:
+#
+#  .sub '&list'
+#    .param pmc argv :slurpy
+#    .return(argv)
+#  .end
+#
+# t/tcl_misc.t will fail with current parrot and the short version
+# of this sub.
+
 .sub '&list'
   .param pmc argv :slurpy
 
@@ -13,8 +24,6 @@
 
 
 fixup:
-  # XXX This shouldn't be necessary. We should be getting a TclList
-  # as a result of slurpification. (This *used* to be the case)
   .local pmc iter, retval
   retval = new 'TclList'
 
@@ -26,7 +35,6 @@ fixup:
     goto iter_loop
   iter_end:
   .return(retval)
-
 .end
 
 # Local Variables:
