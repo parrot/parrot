@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 Committer Guide
@@ -79,16 +79,19 @@ C<svn:ignore> property like so:
 
   $ svn propset svn:ignore <filename>
 
-=head1 Tests before committing; t/doc/pod.t
+=head1 Tests before committing; make codetest
 
-Your Parrot working copy should B<at least> C<make> before committing changes
-to the repository (people haven't checked for such things in the past,
-unfortunately, I think I'm one of them...).  It would be best practice to
-run C<make test> and make sure that your change hasn't broken anything
-before committing any changes.  Your file should have some form of
-documentation, in most cases this will be pod.  Hence, you should run
-F<t/doc/pod.t> over the file to make sure that the pod is sane.  If you
-choose the C<make test> path this test should be taken care of for you.
+Your Parrot working copy must C<make> successfully before
+committing your changes to the repository.
+
+It would be best practice to run C<make test> and make sure that your change
+hasn't broken anything before committing.
+However, as C<make test> takes a long time, it is recommended to run at least
+C<make codetest>. This target runs only the file metadata and the
+basic coding standards tests.
+
+In case you want to check the POD of your changed file, you can run
+C<perl t/doc/pod.t path/to/my/file >.
 
 =head1 License
 
