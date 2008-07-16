@@ -12,12 +12,12 @@
   $I0 = argv
   if $I0 < 3 goto wrong_args
 
-  .local pmc __list
-  __list = get_root_global ['_tcl'], '__list'
+  .local pmc toList
+  toList = get_root_global ['_tcl'], 'toList'
 
   .local pmc the_list
   the_list = shift argv
-  the_list = __list(the_list)
+  the_list = toList(the_list)
 
   .local string position
   position = shift argv

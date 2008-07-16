@@ -77,7 +77,7 @@ no_args:
   push_eh dict_error
     dictionary = read(dict_name)
   pop_eh
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   goto got_dict
 
 dict_error:
@@ -166,7 +166,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
 
   .local pmc key
 loop:
@@ -197,7 +197,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
 
   .local pmc options
   options = new 'TclList'
@@ -257,7 +257,7 @@ do_script_prelude:
 
   .local pmc vars, body
   vars = shift argv
-  vars = __list(vars)
+  vars = toList(vars)
   $I0 = elements vars
   if $I0 != 2 goto bad_list_size
 
@@ -328,7 +328,7 @@ bad_args:
   .local string keyVar, valueVar
 
   varNames = shift argv
-  varNames = __list(varNames)
+  varNames = toList(varNames)
   $I0 = elements varNames
   if $I0 != 2 goto bad_list_size
   keyVar   = varNames[0]
@@ -336,7 +336,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
 
   .local pmc body,code
   body = shift argv
@@ -386,7 +386,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   if argc < 0 goto loop_done
 
   .local pmc key
@@ -396,7 +396,7 @@ loop:
   key = shift argv
   dictionary = dictionary[key]
   if_null dictionary, not_exist
-  dictionary = __dict(dictionary) # might be a string, error out if so
+  dictionary = toDict(dictionary) # might be a string, error out if so
   goto loop
 
 loop_done:
@@ -434,7 +434,7 @@ bad_args:
   push_eh dict_error
     dictionary = read(dict_name)
   pop_eh
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   goto got_dict
 
 dict_error:
@@ -453,7 +453,7 @@ got_dict:
 
   if argc == 2 goto got_increment
   increment = shift argv
-  increment = __integer (increment)
+  increment = toInteger (increment)
 
   .local pmc value
 
@@ -465,7 +465,7 @@ got_increment:
 
 vivified:
   value = dictionary[key]
-  value = __integer(value)
+  value = toInteger(value)
   value += increment
 
 done:
@@ -499,7 +499,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
 
   .return (dictionary)
 
@@ -524,7 +524,7 @@ bad_args:
   push_eh dict_error
     dictionary = read(dict_name)
   pop_eh
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   goto got_dict
 
 dict_error:
@@ -546,7 +546,7 @@ got_dict:
 
 vivified:
   value = dictionary[key]
-  value = __list(value)
+  value = toList(value)
 
 loop:
   argc = elements argv
@@ -580,7 +580,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
 
   .local string pattern
   pattern = '*'
@@ -625,7 +625,7 @@ bad_args:
   .local pmc retval
   $P1 = argv[0]
   retval = clone $P1
-  retval = __dict(retval)
+  retval = toDict(retval)
   if argc == 1 goto done
   $P2 =  shift argv # discard
 
@@ -635,7 +635,7 @@ dict_loop:
   $I1 = elements argv
   unless $I1 goto done
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   iterator = new 'Iterator', dictionary
 key_loop:
   unless iterator goto dict_loop
@@ -660,7 +660,7 @@ nothing:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   dictionary = clone dictionary
 
   .local pmc key, value
@@ -689,7 +689,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   dictionary = clone dictionary
 
   if argc < 0 goto loop_done
@@ -731,7 +731,7 @@ bad_args:
   push_eh dict_error
     dictionary = read(dict_name)
   pop_eh
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   goto got_dict
 
 dict_error:
@@ -786,7 +786,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
 
   .local int size
   size = elements dictionary
@@ -813,7 +813,7 @@ bad_args:
   push_eh dict_error
     dictionary = read(dict_name)
   pop_eh
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   goto got_dict
 
 dict_error:
@@ -874,7 +874,7 @@ bad_args:
   push_eh dict_error
     dictionary = read(dict_name)
   pop_eh
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   goto got_dict
 
 dict_error:
@@ -945,7 +945,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
 
   .local string pattern
   pattern = '*'
@@ -996,7 +996,7 @@ bad_args:
   push_eh dict_error
     dictionary = read(dict_name)
   pop_eh
-  dictionary = __dict(dictionary)
+  dictionary = toDict(dictionary)
   goto got_dict
 
 dict_error:

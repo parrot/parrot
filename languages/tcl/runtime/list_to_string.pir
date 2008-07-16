@@ -1,13 +1,13 @@
 .HLL '_Tcl', ''
 .namespace []
 
-=head __dictToString
+=head dictToString
 
 Given a dictionary, return a string representing it.
 
 =cut
 
-.sub __dictToString
+.sub dictToString
   .param pmc dict
 
   .local pmc list

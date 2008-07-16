@@ -58,9 +58,9 @@ c_int:
 
 got_list:
 
-  .local pmc __list
-  __list = get_root_global ['_tcl'], '__list'
-  $P0 = __list($P0)
+  .local pmc toList
+  toList = get_root_global ['_tcl'], 'toList'
+  $P0 = toList($P0)
 
   $P0.'sort'(compare)
 
@@ -121,11 +121,11 @@ wrong_args:
   # check that they're actually integers.
   # This points out that we should really be caching
   # the integer value rather than recalculating on each compare.
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
   .local pmc i1,i2
-  i1 = __integer(s1)
-  i2 = __integer(s2)
+  i1 = toInteger(s1)
+  i2 = toInteger(s2)
   $I0 = cmp_num i1, i2
   .return ($I0)
 
@@ -208,10 +208,10 @@ greater:
   .param pmc s2
 
   # check that they're actually numbers
-  .local pmc __number
-  __number = get_root_global ['_tcl'], '__number'
-  s1 = __number(s1)
-  s2 = __number(s2)
+  .local pmc toNumber
+  toNumber = get_root_global ['_tcl'], 'toNumber'
+  s1 = toNumber(s1)
+  s2 = toNumber(s2)
 
   $I0 = cmp_num s1, s2
   .return ($I0)

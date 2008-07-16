@@ -36,11 +36,11 @@
   if argc != 2 goto bad_args
 
   .local string option, pattern
-  .local pmc list, __list
+  .local pmc list, toList
 
-  __list = get_root_global [ '_tcl' ] , '__list'
+  toList = get_root_global [ '_tcl' ] , 'toList'
   list    = shift argv
-  list = __list(list)
+  list = toList(list)
   pattern = shift argv
 
   .local pmc iter

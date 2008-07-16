@@ -33,7 +33,7 @@ is_list:
 
 is_string:
   # Can we listify the value here? If so, make it into a dictionary.
-  $P3 = __list($P2)
+  $P3 = toList($P2)
   $I0 = elements $P3
   if $I0 <= 1 goto only_string
   push_eh only_string

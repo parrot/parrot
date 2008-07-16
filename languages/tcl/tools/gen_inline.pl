@@ -39,8 +39,8 @@ our %conversions = (
     bool    => '__boolean',
     channel => '__channel',
     expr    => '__expr',
-    int     => '__integer',
-    list    => '__list',
+    int     => 'toInteger',
+    list    => 'toList',
     script  => '__script',
     var     => '__read',
 );

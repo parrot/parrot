@@ -221,7 +221,7 @@ TCL
 ok
 OUT
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', 'order of arguments with __integer conversion' );
+language_output_is( 'tcl', <<'TCL', <<'OUT', 'order of arguments with integer conversion' );
 set x 0012
 puts [list $x [incr x]]
 TCL

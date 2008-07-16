@@ -24,10 +24,10 @@
     value = read(listname)
   pop_eh
 
-  .local pmc __list
+  .local pmc toList
 
-  __list = get_root_global ['_tcl'], '__list'
-  value  = __list(value)
+  toList = get_root_global ['_tcl'], 'toList'
+  value  = toList(value)
   goto loop
 
 new_variable:

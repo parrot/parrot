@@ -11,10 +11,10 @@
   argc = elements argv
   if argc == 0 goto no_args
 
-  .local pmc __list, lambda
-  __list = get_root_global ['_tcl'], '__list'
+  .local pmc toList, lambda
+  toList = get_root_global ['_tcl'], 'toList'
   lambda = argv[0]
-  lambda = __list(lambda)
+  lambda = toList(lambda)
 
   $I0 = elements lambda
   if $I0 < 2 goto bad_lambda

@@ -11,11 +11,11 @@
     argc = elements argv
     if argc < 3 goto bad_args
 
-    .local pmc list, __list, retval, iterator, __index
-    __list = get_root_global ['_tcl'], '__list'
+    .local pmc list, toList, retval, iterator, __index
+    toList = get_root_global ['_tcl'], 'toList'
     __index = get_root_global ['_tcl'], '__index'
     $P0 = shift argv
-    list = __list($P0)
+    list = toList($P0)
     list = clone list
 
     .local int size

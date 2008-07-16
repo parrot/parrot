@@ -23,11 +23,11 @@ Functions are very similar to ops, so handle them similarly here.
 .sub '&abs'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc b
@@ -43,11 +43,11 @@ is_string:
 .sub '&acos'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     if a < -1 goto domain_error
@@ -78,11 +78,11 @@ domain_error:
 .sub '&asin'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     if a < -1 goto domain_error
@@ -113,11 +113,11 @@ domain_error:
 .sub '&atan'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -146,11 +146,11 @@ is_string:
 .sub '&ceil'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -167,11 +167,11 @@ is_string:
 .sub '&cos'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -191,11 +191,11 @@ is_string:
 .sub '&cosh'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -215,11 +215,11 @@ is_string:
 .sub '&double'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -235,11 +235,11 @@ is_string:
 .sub '&entier'
     .param pmc n
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      n = __number(n)
+      n = toNumber(n)
     pop_eh
 
     .local pmc ret
@@ -257,11 +257,11 @@ is_string:
 .sub '&exp'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -283,11 +283,11 @@ is_string:
 
     .local pmc result
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      result = __number(a)
+      result = toNumber(a)
     pop_eh
 
     if result >= 0 goto positive
@@ -318,11 +318,11 @@ is_string:
 .sub '&int'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     $I0 = a
@@ -341,11 +341,11 @@ is_string:
 .sub '&log'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     if a < 0 goto domain_error
@@ -375,11 +375,11 @@ is_string:
 .sub '&log10'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     if a < 0 goto domain_error
@@ -441,11 +441,11 @@ done:
 .sub '&round'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     if a < 0 goto neg
@@ -467,11 +467,11 @@ is_string:
 .sub '&sin'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -491,11 +491,11 @@ is_string:
 .sub '&sinh'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -515,11 +515,11 @@ is_string:
 .sub '&sqrt'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -551,11 +551,11 @@ is_string:
 .sub '&tan'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -575,11 +575,11 @@ is_string:
 .sub '&tanh'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .local pmc ret
@@ -600,11 +600,11 @@ is_string:
 .sub '&wide'
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     $I0 = a
@@ -625,12 +625,12 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     $N0 = a
@@ -649,12 +649,12 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     if b == 0 goto domain_error
@@ -682,12 +682,12 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     $N0 = a
@@ -711,12 +711,12 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     $N0 = a

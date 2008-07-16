@@ -11,12 +11,12 @@
   argc = elements argv
   if argc < 2 goto bad_args
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   .local int count
   $P0   = argv[0]
-  count = __integer($P0)
+  count = toInteger($P0)
 
   if count < 1 goto must_have_count
 
