@@ -343,9 +343,8 @@ RT#46089 TBD
 
 Get the file descriptor out of the ParrotIO object.
 
-RT#48312 TBD
-RT#42373: integral file descriptors might not exist outside of the UNIX
-     platform.
+RT#48312 Still to do: integral file descriptors might not exist outside of the UNIX platform.
+                      or for other streams.
 
 =cut
 
