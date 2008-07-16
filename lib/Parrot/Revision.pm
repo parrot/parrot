@@ -70,11 +70,14 @@ sub _analyze_sandbox {
     # modified because in xml output commit and entry revision
     # are difficult to distinguih in a simplified parsing
     my $nul = File::Spec->devnull;
-    if ( my @svn_info = qx/LANG=C svn info 2>$nul/ and $? == 0 ) {
+    my $oldLANG = $ENV{LANG};
+    $ENV{LANG} = 'C';
+    if ( my @svn_info = qx/svn info 2>$nul/ and $? == 0 ) {
         if ( my ($line) = grep /^Revision:/, @svn_info ) {
             ($revision) = $line =~ /(\d+)/;
         }
     }
+    $ENV{LANG} = $oldLANG;
     return $revision;
 }
 
