@@ -183,6 +183,7 @@ print $FH "<?php echo \"Hello, World!\\n\"; ?>";
 close $FH;
 $out = `$parrot languages/pipp/pipp.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pipp");
+unlink($filename);
 
 $filename = 'test.p1';
 open $FH, '>', $filename
