@@ -41,7 +41,7 @@ use File::Spec;
 my $path_to_pdb;
 
 BEGIN {
-    $path_to_pdb = File::Spec->catfile( ".", "pdb" );
+    $path_to_pdb = File::Spec->catfile( ".", "parrot_debugger" );
     my $exefile = $path_to_pdb . $PConfig{exe};
     unless ( -f $exefile ) {
         plan skip_all => "parrot_debugger hasn't been built";
