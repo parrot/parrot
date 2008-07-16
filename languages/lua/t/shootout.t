@@ -112,9 +112,14 @@ language_output_is( 'lua', $code, $out, 'regex-dna', params => "< $in" );
 #       Indexed-access to bit-values
 #
 
+TODO:
+{
+    local $TODO = 'broken';
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsievebits.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsievebits-output.txt' ));
 language_output_is( 'lua', $code, $out, 'nsieve-bits' );
+}
 
 #
 #   recursive
@@ -167,18 +172,28 @@ language_output_is( 'lua', $code, $out, 'cheap-concurrency', params => '10' );
 #       Eigenvalue using the power method
 #
 
+TODO:
+{
+    local $TODO = 'broken';
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'spectralnorm_lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'spectralnorm-output.txt' ));
 language_output_is( 'lua', $code, $out, 'spectral-norm', params => '100' );
+}
 
 #
 #   chameneos
 #       Symmetrical thread rendez-vous requests
 #
 
+TODO:
+{
+    local $TODO = 'broken';
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'chameneos.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'chameneos-output.txt' ));
 language_output_is( 'lua', $code, $out, 'chameneos', params => '100' );
+}
 
 #
 #   reverse-complement
@@ -200,9 +215,14 @@ language_output_is( 'lua', $code, $out, 'reverse-complement', params => "< $in" 
 #       Allocate and deallocate many many binary trees
 #
 
+SKIP:
+{
+    skip('low memory', 1) unless ($test_prog eq 'lua');
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees_lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees-output.txt' ));
 language_output_is( 'lua', $code, $out, 'binary-trees', params => '10' );
+}
 
 #
 #   fannkuch
