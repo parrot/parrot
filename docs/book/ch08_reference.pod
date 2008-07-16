@@ -1080,16 +1080,6 @@ Return the class PMC of the given name.
 
 I<Arguments: P, S>
 
-=head2 getfd
-
-X<getfd opcode (PASM)>
-
-  getfd R<DEST>, R<PIO>
-
-Return the file the descriptor for the given ParrotIO object.
-
-I<Arguments: IR, P>
-
 =head2 getfile
 
 X<getfile opcode (PASM)>

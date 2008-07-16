@@ -1,10 +1,11 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 45;
 
@@ -111,9 +112,11 @@ CODE
 a line
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "getfd/fdopen" );
-        getstdout P0
-        getfd I0, P0
+# RT#46843
+pir_output_is( <<'CODE', <<'OUTPUT', "get_fd()/fdopen" );
+.sub main :main
+    getstdout P0
+    I0 = P0.get_fd()
     fdopen P1, I0, ">"
     defined I0, P1
     unless I0, nok
@@ -122,14 +125,16 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "getfd/fdopen" );
     end
 nok:
     print "fdopen failed\n"
-    end
+.end
 CODE
 ok
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "fdopen - no close" );
-        getstdout P0
-        getfd I0, P0
+# RT#46843
+pir_output_is( <<'CODE', <<'OUTPUT', 'fdopen - no close' );
+.sub main :main
+    getstdout P0
+    I0 = P0.get_fd()
     fdopen P1, I0, ">"
     defined I0, P1
     unless I0, nok
@@ -137,7 +142,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "fdopen - no close" );
     end
 nok:
     print "fdopen failed\n"
-    end
+.end
 CODE
 ok
 OUTPUT
@@ -454,22 +459,24 @@ OUTPUT
 
 unlink("temp.file");
 
-pasm_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
+# RT#46843
+pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
+.sub main :main
        getstdin P0
-       getfd I0, P0
+       I0 = P0.get_fd()
        # I0 is 0 on Unix and non-Null on stdio and win32
        print "ok 1\n"
        getstdout P1
-       getfd I1, P1
+       I1 = P1.get_fd()
        if I1, OK_2
        print "not "
 OK_2:  print "ok 2\n"
        getstderr P2
-       getfd I2, P2
+       I2 = P2.get_fd()
        if I2, OK_3
        print "not "
 OK_3:  print "ok 3\n"
-       end
+.end
 CODE
 ok 1
 ok 2

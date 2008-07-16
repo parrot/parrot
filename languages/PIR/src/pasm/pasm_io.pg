@@ -6,7 +6,6 @@ rule io_op {
   #                   
   close               <var>
 | fdopen              <var> \, <simple_expr> \, [ <string_constant> | <string_reg> | <id> ]
-| getfd               <var> \, <var>
 | getstdin            <var>
 | getstdout           <var>
 | getstderr           <var>

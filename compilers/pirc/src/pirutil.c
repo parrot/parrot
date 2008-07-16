@@ -294,7 +294,6 @@ static char const *parrot_ops[] = {
         "getline",
         "getinterp",
         "getfile",
-        "getfd",
         "getattribute",
         "get_root_namespace",
         "get_root_global",

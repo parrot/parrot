@@ -194,7 +194,6 @@ token pasm_instruction {
 | getline           
 | getinterp         
 | getfile           
-| getfd                         
 | get_class          
 | getattribute      
 | get_root_namespace

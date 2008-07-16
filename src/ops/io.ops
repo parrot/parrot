@@ -68,19 +68,6 @@ inline op fdopen(out PMC, in INT, in STR) :filesys_open {
     string_cstring_free(mode);
 }
 
-=item B<getfd>(out INT, invar PMC)
-
-Get the file descriptor out of the ParrotIO object $2 and store it in $1
-
-RT#42373: integral file descriptors might not exist outside of the UNIX
-     platform.
-
-=cut
-
-inline op getfd(out INT, invar PMC) :advanced_io :deprecated {
-  $1 = (INTVAL)PIO_getfd(interp, $2);
-}
-
 =item B<getstdin>(out PMC)
 
 Create a new ParrotIO object for the stdin file descriptor and
