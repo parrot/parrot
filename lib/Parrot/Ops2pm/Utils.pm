@@ -375,8 +375,8 @@ None.
 
 =item * Return Value
 
-None.  Internally, sets the C<ops> key of the object's data
-structure.
+Returns true value upon successful completion.  Internally, sets the C<ops>
+key of the object's data structure.
 
 =item * Comment
 
@@ -411,7 +411,7 @@ sub sort_ops {
     @{ $self->{ops}->{OPS} } =
         sort { $a->{CODE} <=> $b->{CODE} } ( @{ $self->{ops}->{OPS} } );
 
-    return;
+    return 1;
 }
 
 =head2 C<prepare_real_ops()>
@@ -429,8 +429,8 @@ C<load_op_map_files()> above.)
 
 =item * Return Value
 
-None.  Internally, sets the C<real_ops> key of the object's
-data structure.
+Returns true value upon successful completion.  Internally, sets the
+C<real_ops> key of the object's data structure.
 
 =item * Comment
 
@@ -462,7 +462,7 @@ sub prepare_real_ops {
     }
     $self->{real_ops} = $real_ops;
 
-    return;
+    return 1;
 }
 
 =head2 C<print_module()>
@@ -476,12 +476,12 @@ the C<real_ops> element -- to create F<lib/Parrot/OpLib/core.pm>.
 
 =item * Arguments
 
-None.  (Implicitly requires that the constructor have the
-following keys defined:  C<argv>, C<script>, C<moddir> and C<module>.)
+None.  (Implicitly requires that the constructor have the following keys
+defined:  C<argv>, C<script>, C<moddir> and C<module>.)
 
 =item * Return Value
 
-Returns true value upon success.
+Returns true value upon successful completion.  
 
 =item * Comment
 
