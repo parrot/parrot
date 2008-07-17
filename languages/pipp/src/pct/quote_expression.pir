@@ -9,20 +9,23 @@ PHP 5.3 has four kinds of literal strings.
 
 =item single quoted
 
-There is neither variable nor special character interpolation within single quotes.
+Neither variable nor backslash interpolation, besides B<\'> and B<\\> is done within single quotes.
 Single quotes need to be escaped with a backslash in order to be not taken for the delimiter.
 A backslash escapes a following backslash.
 A literal backslash needs to be escaped at end of string, as otherwise the delimiting single quote
 would be recognised as a literal single quote.
-Backslashes that preceede any other character besides backslash or single quote are literal.
+In contrast to Perl 5, backslashes that preceede any other character are literal.
 
 =item double quoted
 
-Backslash notation for
-\n, \r, \t, \v, \f, \\, \$, \".
+The escape sequences 
+\n, \r, \t, \v, \f, \\, \$, \"
+are recognised.
 
-Octal notation for chars: \[0-7]{1,3}
-Hex notation for chars: \x[0-9A-Fa-f]{1,2}
+Charactes can alse be written in octal notation, \[0-7]{1,3},
+and hexadecimal notation, \x[0-9A-Fa-f]{1,2}.
+The octal notation allows to specify values greater 256. In theses
+cases the value is taken as mod 256.
 
 =item heredoc
 
