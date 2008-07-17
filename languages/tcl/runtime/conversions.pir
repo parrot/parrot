@@ -187,6 +187,9 @@ not_integer_eh:
 
 =head2 _Tcl::__index
 
+Given a tcl string index and an List pmc, return the corresponding numeric
+index.
+
 =cut
 
 .sub __index
