@@ -22,6 +22,7 @@ the Parrot debugger, and the C<debug> ops.
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "parrot/embed.h"
 #include "interp_guts.h"
 #include "parrot/oplib.h"
@@ -797,6 +798,13 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     debugee     = pdb->debugee;
 
     /* execute n ops */
+    new_internal_exception(debugee);
+    if (setjmp(debugee->exceptions->destination)) {
+        Parrot_eprintf(interp, "Unhandled exception while tracing\n");
+        pdb->state |= PDB_STOPPED;
+        return;
+    }
+
     for (; n && pdb->cur_opcode; n--) {
         trace_op(debugee,
                 debugee->code->base.data,
