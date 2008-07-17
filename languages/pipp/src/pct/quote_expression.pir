@@ -18,7 +18,7 @@ In contrast to Perl 5, backslashes that preceede any other character are literal
 
 =item double quoted
 
-The escape sequences 
+The escape sequences
 \n, \r, \t, \v, \f, \\, \$, \"
 are recognised.
 
