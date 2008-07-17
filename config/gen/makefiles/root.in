@@ -480,7 +480,7 @@ INSTALLABLEDIS      = $(CUR_DIR)/installable_pbc_disassemble$(EXE)
 INSTALLABLEPDUMP    = $(CUR_DIR)/installable_pdump$(EXE)
 INSTALLABLEPINFO    = $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
-INSTALLABLEPDB      = $(CUR_DIR)/installable_pdb$(EXE)
+INSTALLABLEPDB      = $(CUR_DIR)/installable_parrot_debugger$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
