@@ -1,5 +1,9 @@
 # $Id$
 
+New in 0.7.0
+- Implementation
+  + removed opcode getfd
+
 New in 0.6.4
 - Documentation
   + removed a lot of old information from the FAQ
