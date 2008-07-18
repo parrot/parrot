@@ -95,20 +95,12 @@ sub collect_test_environment_data {
         'Optimize'     => ($PConfig{optimize} || 'none'),
         'Perl Version' => (sprintf('%vd', $^V) . " $PConfig{archname}"),
         'Platform'     => $PConfig{osname},
-        'SVN Revision' => _get_svn_revision(),
+        'SVN Revision' => $PConfig{revision},
         'Version'      => $PConfig{VERSION},
     );
 }
 
-# TODO expand this to handle svk and/or git checkouts too
-sub _get_svn_revision {
-    foreach my $line (`svn info`) {
-        return $1 if $line =~ /^Revision:\s*(\d+)/;
-    }
-    return 'unknown';
-}
-
-# TODO expand this to more than just GCC
+# this can be expanded to more than just GCC
 sub _get_compiler_version {
     my $compiler = $PConfig{cc};
     if($compiler eq 'gcc') {
