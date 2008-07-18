@@ -1004,7 +1004,7 @@ lexid:
      SUB_LEXID '(' STRINGC ')'
          {
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->lexid = mk_const(interp, $3);
+           IMCC_INFO(interp)->cur_unit->lexid = mk_const(interp, $3, 'S');
            mem_sys_free($3);
          }
    ;
