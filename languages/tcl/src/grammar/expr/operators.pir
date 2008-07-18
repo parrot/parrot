@@ -118,11 +118,11 @@ empty_string:
 .sub 'prefix:!' :multi(String)
     .param pmc a
 
-    .local pmc __boolean
-    __boolean = get_root_global ['_tcl'], '__boolean'
+    .local pmc toBoolean
+    toBoolean = get_root_global ['_tcl'], 'toBoolean'
 
     push_eh is_string
-      a = __boolean(a)
+      a = toBoolean(a)
     pop_eh
 
     $I0 = a

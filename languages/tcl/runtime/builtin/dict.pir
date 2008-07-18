@@ -205,10 +205,10 @@ bad_args:
   options[1] = 'script'
   options[2] = 'value'
 
-  .local pmc select_option, __script, __boolean
+  .local pmc select_option, __script, toBoolean
   select_option  = get_root_global ['_tcl'], 'select_option'
   __script  = get_root_global ['_tcl'], '__script'
-  __boolean  = get_root_global ['_tcl'], '__boolean'
+  toBoolean  = get_root_global ['_tcl'], 'toBoolean'
   .local pmc option
   option = shift argv
   option = select_option(options, option, 'filterType')
@@ -283,7 +283,7 @@ script_loop:
   push_eh body_handler
     $P1 = body_proc()
   pop_eh
-  $P1 = __boolean($P1)
+  $P1 = toBoolean($P1)
   unless $P1 goto script_loop
   retval[check_key] = check_value
   goto script_loop

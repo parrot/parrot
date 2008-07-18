@@ -1,11 +1,11 @@
 [for start:script test:expr next:script command:script]
 
-  .local pmc __boolean
-  __boolean = get_root_global ['_tcl'], '__boolean'
+  .local pmc toBoolean
+  toBoolean = get_root_global ['_tcl'], 'toBoolean'
   $start
 loop:
   $P0 = $test
-  $I0 = __boolean($P0)
+  $I0 = toBoolean($P0)
   unless $I0 goto done
   push_eh command_exception
     $command

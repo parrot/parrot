@@ -36,7 +36,7 @@ variable name, integer, channel, list, string, script, and expressions.
 our %conversions = (
 
     # type     subroutine
-    bool    => '__boolean',
+    bool    => 'toBoolean',
     channel => '__channel',
     expr    => '__expr',
     int     => 'toInteger',

@@ -528,14 +528,14 @@ return:
   .return(ns_name)
 .end
 
-=head2 _Tcl::__boolean
+=head2 _Tcl::toBoolean
 
 Given a string, return its boolean value if it's a valid boolean. Otherwise,
 throw an exception.
 
 =cut
 
-.sub __boolean
+.sub toBoolean
     .param pmc value
 
     .local string lc

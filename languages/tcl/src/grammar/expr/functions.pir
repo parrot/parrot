@@ -137,10 +137,10 @@ is_string:
 .sub '&bool'
     .param pmc a
 
-    .local pmc __boolean
-    __boolean = get_root_global ['_tcl'], '__boolean'
+    .local pmc toBoolean
+    toBoolean = get_root_global ['_tcl'], 'toBoolean'
 
-    .return __boolean(a)
+    .return toBoolean(a)
 .end
 
 .sub '&ceil'
