@@ -238,6 +238,7 @@ FAILING_TCL_TESTS = \
   t_tcl/dcall.t \
   t_tcl/dstring.t \
   t_tcl/event.t \
+  t_tcl/exec.t \
   t_tcl/history.t \
   t_tcl/indexObj.t \
   t_tcl/init.t \
@@ -247,6 +248,7 @@ FAILING_TCL_TESTS = \
   t_tcl/load.t \
   t_tcl/macOSXFCmd.t \
   t_tcl/main.t \
+  t_tcl/mathop.t \
   t_tcl/misc.t \
   t_tcl/notify.t \
   t_tcl/obj.t \
@@ -277,14 +279,12 @@ DYING_TCL_TESTS = \
   t_tcl/async.t \
   t_tcl/autoMkindex.t \
   t_tcl/encoding.t \
-  t_tcl/exec.t \
   t_tcl/fCmd.t \
   t_tcl/fileSystem.t \
   t_tcl/http.t \
   t_tcl/httpold.t \
   t_tcl/io.t \
   t_tcl/iogt.t \
-  t_tcl/mathop.t \
   t_tcl/msgcat.t \
   t_tcl/macOSXLoad.t \
   t_tcl/opt.t \
