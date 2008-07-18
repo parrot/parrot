@@ -359,8 +359,10 @@ or 'Object').
     ##  save the protoobject
     setattribute how, 'protoobject', protoobject
 
-    ##  store the long and short names in the protoobject
+    ##  store the long and short names in the protoobject; skip if anonymous
     .local pmc longname, shortname
+    $I0 = elements ns
+    if $I0 == 0 goto anonymous_class
     $S0 = join '::', ns
     longname = new 'String'
     longname = $S0
@@ -371,6 +373,14 @@ or 'Object').
     ##  store the protoobject in appropriate namespace
     $S0 = pop ns
     set_hll_global ns, $S0, protoobject
+    goto have_how
+
+    ##  anonymous classes have empty strings for shortname and longname
+  anonymous_class:
+    longname = new 'String'
+    shortname = new 'String'
+    setattribute how, 'longname', longname
+    setattribute how, 'shortname', shortname
 
   have_how:
     ##  map parrotclass to the metaobject
