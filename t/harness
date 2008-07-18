@@ -24,6 +24,7 @@ use Parrot::Harness::Options qw(
 use Parrot::Harness::Smoke qw(
     generate_html_smoke_report
     send_archive_to_smolder
+    collect_test_environment_data
 );
 
 local @ARGV = @ARGV;
@@ -80,30 +81,36 @@ if ($longopts->{html}) {
                 . "\nPlease install it if you want to create TAP archives.\n"
                 . ('-' x 55) . "\n\n$@\n";
         }
+        # for extra_properties we need TAP::Harness::Archive >= .10
+        if ($TAP::Harness::Archive::VERSION < .10) {
+            die "\n" . ('-' x 55) . "\nWe need TAP::Harness::Archive >= .10."
+                . "\nPlease install it if you want to create TAP archives.\n"
+                . ('-' x 55) . "\n";
+        }
+
+        my %env_data = collect_test_environment_data();
         $harness = TAP::Harness::Archive->new(
             {
-                verbosity => $ENV{HARNESS_VERBOSE},
-                archive   => 'parrot_test_run.tar.gz',
-                merge     => 1,
+                verbosity        => $ENV{HARNESS_VERBOSE},
+                archive          => 'parrot_test_run.tar.gz',
+                merge            => 1,
+                extra_properties => \%env_data,
             }
         );
+        $harness->runtests(@tests);
+        send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
+        
     } else {
         eval { require TAP::Harness };
         if ($@) {
             Test::Harness::runtests(@tests);
             exit;
-        }
-        else {
+        } else {
             $harness = TAP::Harness->new({
                 verbosity => $ENV{HARNESS_VERBOSE}, merge => 0
             });
         }
-    }
-
-    $harness->runtests(@tests);
-
-    if ($longopts->{send_to_smolder}) {
-        send_archive_to_smolder();
+        $harness->runtests(@tests);
     }
 }
 
