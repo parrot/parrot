@@ -692,6 +692,7 @@ help :
 	@echo "  smokeexec:         Same as smoke, but generate first executables"
 	@echo "                     with the exec runcore"
 	@echo "  smoke-clean:       clean up smoke.html"
+	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
