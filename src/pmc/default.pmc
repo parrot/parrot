@@ -30,7 +30,7 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 /*
 
-=item C<static const char *caller(PARROT_INTERP, PMC *pmc)>
+=item C<static STRING *caller(PARROT_INTERP, PMC *pmc)>
 
 Returns a C string for the name of C<*pmc>.
 
@@ -38,11 +38,11 @@ Returns a C string for the name of C<*pmc>.
 
 */
 
-static const char *
+static STRING *
 caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
-        VTABLE_name(interp, pmc)->strstart : "(null)";
+        VTABLE_name(interp, pmc) : CONST_STRING(interp, "(null)");
 }
 
 /*
@@ -61,7 +61,7 @@ static void
 cant_do_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, const char *methname)
 {
     real_exception(interp, NULL, ILL_INHERIT,
-                       "%s() not implemented in class '%s'", methname,
+                       "%s() not implemented in class '%Ss'", methname,
                        caller(interp, pmc));
 }
 
@@ -296,7 +296,7 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
             SELF.init();
         else
             real_exception(interp, NULL, ILL_INHERIT,
-                       "init_pmc() not implemented in class '%s'",
+                       "init_pmc() not implemented in class '%Ss'",
                        caller(interp, pmc));
     }
 
