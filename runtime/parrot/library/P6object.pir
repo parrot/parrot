@@ -164,11 +164,12 @@ Return a true value if the invocant 'isa' C<x>.
 =cut
 
 .sub 'isa' :method
+    .param pmc obj
     .param pmc x
 
     .local pmc parrotclass
     parrotclass = self.'get_parrotclass'(x)
-    $P0 = self.'WHAT'()
+    $P0 = obj.'WHAT'()
     $I0 = isa $P0, parrotclass
     .return ($I0)
 .end
@@ -180,9 +181,9 @@ Return a true value if the invocant 'can' C<x>.
 =cut
 
 .sub 'can' :method
+    .param pmc obj
     .param string x
-    .local pmc parrotclass
-    $P0 = self.'WHAT'()
+    $P0 = obj.'WHAT'()
     $I0 = can $P0, x
     .return ($I0)
 .end

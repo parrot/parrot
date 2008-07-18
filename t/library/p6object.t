@@ -114,10 +114,10 @@ t/library/p6object.t -- P6object tests
     is($S0, 'ABC', 'typeof ABC proto eq "ABC"')
     $P0 = abcproto.'HOW'()
     isa_ok($P0, 'P6metaclass', 'ABC proto .HOW')
-    $I0 = $P0.'can'('foo')
-    ok($I0, "ABC.HOW.can('foo')")
-    $I0 = $P0.'can'('bar')
-    nok($I0, "ABC.HOW.can('bar')")
+    $I0 = $P0.'can'(abcproto, 'foo')
+    ok($I0, "ABC.HOW.can(ABC, 'foo')")
+    $I0 = $P0.'can'(abcproto, 'bar')
+    nok($I0, "ABC.HOW.can(ABC, 'bar')")
     $I0 = defined metaproto
     nok($I0, 'ABC proto undefined')
 
