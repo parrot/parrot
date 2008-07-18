@@ -10,13 +10,17 @@ Parrot::Harness::Smoke - Subroutines used by F<t/harness> to generate smoke repo
 This package exports on request subroutines used by F<t/harness> to generate
 smoke reports.
 
-Currently, only one such subroutine is supported:
+Following subroutines are supported:
 
     generate_html_smoke_report (
         tests       => \@tests,
         args        => $args,
         file        => 'smoke.html',
     );
+
+    my %env_data = collect_test_environment_data();
+
+    send_archive_to_smolder( %env_data );
 
 =cut
 
@@ -30,9 +34,8 @@ use Parrot::Config qw/%PConfig/;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     generate_html_smoke_report
-    send_archive_to_smolder
-    smolder_url
     collect_test_environment_data
+    send_archive_to_smolder
 );
 
 my %SMOLDER_CONFIG = (
