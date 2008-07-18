@@ -53,8 +53,7 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 no_args:
-  tcl_error 'wrong # args: should be "dict subcommand ?arg ...?"'
-
+  tcl_error 'wrong # args: should be "dict subcommand ?argument ...?"'
 .end
 
 .HLL '_Tcl', ''
