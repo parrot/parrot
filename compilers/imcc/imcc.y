@@ -996,8 +996,7 @@ instanceof:
      SUB_INSTANCE_OF '(' STRINGC ')'
          {
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->instance_of = mk_const(interp, $3, 'S');
-           mem_sys_free($3);
+           IMCC_INFO(interp)->cur_unit->instance_of = $3;
          }
    ;
 
@@ -1005,7 +1004,8 @@ lexid:
      SUB_LEXID '(' STRINGC ')'
          {
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->lexid = $3;
+           IMCC_INFO(interp)->cur_unit->lexid = mk_const(interp, $3);
+           mem_sys_free($3);
          }
    ;
 
