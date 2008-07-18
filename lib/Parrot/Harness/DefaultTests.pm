@@ -83,33 +83,11 @@ our @EXPORT_OK = qw(
     t/distro/manifest.t
 );
 
-@developing_tests = (
-    't/distro/file_metadata.t',
-    map { "t/codingstd/$_" } qw(
-        c_code_coda.t
-        c_cppcomments.t
-        c_header_guards.t
-        c_indent.t
-        c_macro_args.t
-        c_operator.t
-        c_parens.t
-        c_returns.t
-        c_struct.t
-        check_isxxx.t
-        check_toxxx.t
-        copyright.t
-        cuddled_else.t
-        filenames.t
-        gmt_utc.t
-        linelength.t
-        pccmethod_deps.t
-        perlcritic.t
-        pir_code_coda.t
-        svn_id.t
-        tabs.t
-        trailing_space.t
-    )
-);
+@developing_tests = ( 't/distro/file_metadata.t' );
+# Add in all t/codingstd except for a few skips.
+push @developing_tests,
+  grep { ! m/(c_function_docs|fixme|pdd_format|pod_todo)\.t$/ }
+  glob 't/codingstd/*.t';
 
 sub get_default_tests {
     my ($core_tests_only, $runcore_tests_only) = @_;
