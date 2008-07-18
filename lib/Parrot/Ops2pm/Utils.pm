@@ -481,7 +481,7 @@ defined:  C<argv>, C<script>, C<moddir> and C<module>.)
 
 =item * Return Value
 
-Returns true value upon successful completion.  
+Returns true value upon successful completion.
 
 =item * Comment
 
