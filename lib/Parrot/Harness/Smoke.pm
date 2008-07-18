@@ -50,7 +50,7 @@ sub send_archive_to_smolder {
     eval { require LWP::UserAgent };
     if( $@ ) {
         die "\n" . ('-' x 55) . "\nCould not load LWP::UserAgent."
-            . "\nPlease install it if you want to send TAP archives Smolder.\n"
+            . "\nPlease install it if you want to send TAP archives to Smolder.\n"
             . ('-' x 55) . "\n\n$@\n";
     }
 
