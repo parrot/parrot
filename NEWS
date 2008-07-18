@@ -1,6 +1,8 @@
 # $Id$
 
 New in August 2008 release
+- Tools
+  + parrot_debugger renamed from pdb
 - Implementation
   + removed opcode getfd
 
