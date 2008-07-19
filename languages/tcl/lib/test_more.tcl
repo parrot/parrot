@@ -122,11 +122,12 @@ proc diag {diagnostic} {
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description args} {
     global skipped_tests
+    global abort_after
     if {![info exists skipped_tests]} {
         # get listing of all the tests we can't run.
         source lib/skipped_tests.tcl
     }
-    global abort_after
+
     set full_desc "$num $description"
 
     set should_skip [dict filter $skipped_tests script {K V} {
