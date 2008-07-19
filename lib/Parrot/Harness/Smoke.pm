@@ -75,10 +75,13 @@ sub send_archive_to_smolder {
     );
 
     if ($response->code == 302) {
-        print "Test report successfully sent to Smolder at\n"
-          . $SMOLDER_CONFIG{server}
+        my ($report_id) = $response->content =~ /Reported #(\d+) added/i;
+        my $report_url = "$SMOLDER_CONFIG{server}/app/public_projects/report_details/$report_id";
+        my $project_url = $SMOLDER_CONFIG{server}
           . '/app/public_projects/smoke_reports/'
-          . $SMOLDER_CONFIG{project_id} . "\n";
+          . $SMOLDER_CONFIG{project_id};
+        print "Test report successfully sent to Smolder at\n$report_url"
+            . "\nYou can see other recent reports at\n$project_url.\n\n";
     }
     else {
         die "Could not upload report to Smolder at $SMOLDER_CONFIG{server}"
